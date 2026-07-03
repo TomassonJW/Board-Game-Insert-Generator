@@ -22,14 +22,18 @@ manquants et les sections minimales absentes.
 La mission `P0-M005` du 2026-07-03 stabilise le format des ADR avec un template
 dedie et un index de decisions plus prescriptif.
 
+La mission `P1-M001` du 2026-07-03 consolide le contrat des dataclasses coeur :
+les objets restent des value objects legers en millimetres, avec validation
+agregee dans `validation.py`.
+
 ## Phase active
 
-Phase active : **Phase 0 - Fondation projet**.
+Phase active : **Phase 1 - Moteur Python pur**.
 
 Etat : autonomie operatoire documentee, dry run de selection execute, controle
-documentaire de base implemente et format ADR stabilise. La prochaine mission
-recommandee est `P1-M001 - Consolidate core data models`, afin de reprendre le
-developpement produit sur le moteur Python pur.
+documentaire de base implemente, format ADR stabilise et contrat des modeles
+coeur teste. La prochaine mission recommandee est `P1-M002 - Harden config
+loading and validation`, afin de durcir les erreurs de chargement et validation.
 
 ## Implemente
 
@@ -52,6 +56,7 @@ developpement produit sur le moteur Python pur.
 - Dry run de selection autonome `P0-M004`.
 - Verification documentaire de base `P0-M002`.
 - Template ADR stabilise `P0-M005`.
+- Contrat des dataclasses coeur documente et teste `P1-M001`.
 
 ## Experimental
 
@@ -60,6 +65,8 @@ developpement produit sur le moteur Python pur.
 - Les `PrimitiveVolume`, `CompositeModule`, `Cavity` et `Feature` existent comme
   concepts mais ne pilotent pas encore une generation complete.
 - Les tolerances par defaut sont prudentes mais non calibrees sur impression.
+- Les dataclasses restent volontairement legeres ; les erreurs metier sont
+  agregees par `validation.py`.
 
 ## Prevu
 
@@ -99,11 +106,11 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant la mission `P0-M005` :
+Derniere verification pendant la mission `P1-M001` :
 
-- `python -m unittest discover -s tests` : OK, 9 tests passes.
+- `python -m unittest discover -s tests` : OK, 14 tests passes.
 - `python -m board_game_insert_generator examples/simple_box.json --format markdown` :
-  non relance, CLI non modifiee pendant cette mission.
+  OK, rapport Markdown genere.
 - `git diff --check` : OK.
 
 ## Risques actifs

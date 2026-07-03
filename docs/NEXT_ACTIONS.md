@@ -8,23 +8,21 @@ Codex doit choisir la premiere mission `ready` listee ici.
 
 ## Mission suivante recommandee
 
-### 1. P1-M001 - Consolidate core data models
+### 1. P1-M002 - Harden config loading and validation
 
 Pourquoi maintenant :
 
-- `P0-M005` stabilise maintenant le format des ADR ;
-- la Phase 0 dispose des garde-fous suffisants pour reprendre le developpement
-  produit ;
-- les dataclasses actuelles contiennent deja des concepts futurs qu'il faut
-  clarifier avant de durcir le chargement et la validation ;
-- la mission est la premiere carte produit `ready` et ne lance pas Fusion 360.
+- `P1-M001` clarifie et teste le contrat des dataclasses coeur ;
+- la validation agregee reste le point de controle des erreurs actionnables ;
+- le loader JSON accepte encore peu de cas limites de facon explicite ;
+- la mission renforce le moteur pur sans toucher a Fusion 360.
 
 Livrable attendu :
 
-- invariants explicites pour `BoxSpec`, `ModuleRequest`, `ToleranceProfile`,
-  `Cell` et `PrintableBody` ;
-- tests de creation valides et invalides ;
-- documentation de modele alignee avec les concepts reellement implementes.
+- loader JSON plus robuste ;
+- erreurs actionnables pour champs inconnus, types invalides et cas limites ;
+- tests unitaires dedies ;
+- exemple CLI existant toujours passant.
 
 Verification minimale :
 
@@ -33,18 +31,19 @@ $env:PYTHONPATH = "src"
 python -m unittest discover -s tests
 ```
 
-## Missions suivantes si P1-M001 est terminee
+## Missions suivantes si P1-M002 est terminee
 
-### 2. P1-M002 - Harden config loading and validation
+### 2. P1-M003 - Improve CLI reporting
 
 Condition :
 
-- lancer seulement apres `P1-M001`.
+- lancer seulement apres `P1-M002`.
 
 Objectif :
 
-- rendre le chargement et la validation plus precis ;
-- couvrir champs inconnus, types invalides et cas limites.
+- rendre les rapports CLI plus utiles pour diagnostiquer validation, layout,
+  tolerances et warnings ;
+- exposer les valeurs importantes sans promettre de validite CAD ou impression.
 
 ### 3. P2-M001 - Formalize simple rectangular layout model
 

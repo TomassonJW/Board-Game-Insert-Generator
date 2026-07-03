@@ -1,3 +1,11 @@
+"""Core value objects for the pure Python engine.
+
+All domain dimensions are expressed in millimeters. These dataclasses stay
+lightweight on purpose: aggregate validation lives in `validation.py` so the CLI
+can report multiple actionable issues at once instead of failing on the first
+constructor call.
+"""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
