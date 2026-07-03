@@ -17,6 +17,7 @@ REQUIRED_PROJECT_FILES = (
     "docs/ROADMAP.md",
     "docs/ARCHITECTURE.md",
     "docs/CALIBRATION_PROTOCOL.md",
+    "docs/CAD_IR_CONTRACT.md",
     "docs/FUSION_360_GATE_REPORT.md",
     "docs/QUALITY_RULES.md",
     "docs/DECISIONS/ADR-TEMPLATE.md",
@@ -74,6 +75,12 @@ REQUIRED_SECTIONS = {
         "## Coupons a preparer",
         "## Tableau de resultats",
         "## Regles d'interpretation",
+    ),
+    "docs/CAD_IR_CONTRACT.md": (
+        "## Objectif",
+        "## Scene V0",
+        "## Operations abstraites",
+        "## Gate suivante",
     ),
     "docs/FUSION_360_GATE_REPORT.md": (
         "## Declencheur",

@@ -132,7 +132,9 @@ Etat actuel :
 - rapport JSON ;
 - rapport Markdown ;
 - comparaison simple de strategies de layout dans les rapports ;
-- concepts de primitives, cavites et features deja nommes.
+- concepts de primitives, cavites et features deja nommes ;
+- contrat CAD IR V0 dans `src/board_game_insert_generator/cad_ir.py`, documente
+  dans `docs/CAD_IR_CONTRACT.md`.
 
 Etat cible :
 
@@ -191,3 +193,4 @@ Ces options ne doivent pas modifier le contrat du moteur pur.
 - ADR-0004 : documentation comme plan de controle projet.
 - ADR-0005 : regles de tolerance par role de face.
 - ADR-0006 : profils d'impression explicites et surchargeables.
+- ADR-0007 : representation intermediaire CAD-agnostic.

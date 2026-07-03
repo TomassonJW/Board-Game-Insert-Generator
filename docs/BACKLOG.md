@@ -302,9 +302,8 @@ commitee sans melanger plusieurs decisions structurantes.
   rectangulaires sont representables.
 - Tests ou verifications : tests serialization si code ajoute.
 - Dependances : P1-M003, P3-M001.
-- Gate humaine : en attente de validation du rapport
-  `docs/FUSION_360_GATE_REPORT.md`.
-- Statut : `blocked`.
+- Gate humaine : validee explicitement pour `P4-M001` le 2026-07-03.
+- Statut : `done`.
 
 ### P4-M002 - Creer un squelette d'adaptateur Fusion 360
 
@@ -317,7 +316,8 @@ commitee sans melanger plusieurs decisions structurantes.
   squelette explique comment tester hors Fusion.
 - Tests ou verifications : suite coeur Python ; verification d'import.
 - Dependances : P4-M001.
-- Statut : `todo`.
+- Gate humaine : en attente de validation explicite pour tout squelette ou`n  adaptateur Fusion executable.
+- Statut : `blocked`.
 
 ### P4-M003 - Generer des blanks rectangulaires Fusion
 

@@ -43,17 +43,24 @@ Responsabilites de l'adaptateur :
 
 ## Representation intermediaire
 
-Le moteur doit fournir une representation claire :
+Le moteur fournit maintenant une CAD IR V0 documentee dans
+`docs/CAD_IR_CONTRACT.md` et implementee dans
+`src/board_game_insert_generator/cad_ir.py`.
 
-- corps imprimables ;
-- primitives ;
-- cavites ;
-- features ;
-- metadata de nommage ;
-- warnings ;
-- rapport de validation.
+La scene V0 contient :
 
-L'adaptateur Fusion convertit cette representation en operations CAO.
+- boite de reference non imprimable ;
+- composants nommes ;
+- corps imprimables rectangulaires ;
+- dimensions theoriques et dimensions imprimables ;
+- classifications de faces ;
+- tolerances appliquees ;
+- operations abstraites `create_rectangular_prism` ;
+- parametres et metadata de nommage ;
+- warnings du moteur.
+
+L'adaptateur Fusion convertira cette representation en operations CAO sans
+recalculer layout ou tolerances.
 
 ## Premiere cible Fusion
 
@@ -110,9 +117,10 @@ Verifications dans Fusion :
 
 ## Rapport de gate actuel
 
-Le rapport `docs/FUSION_360_GATE_REPORT.md` prepare la decision humaine avant
-toute integration Fusion 360 executable. Sa recommandation actuelle est de
-commencer par `P4-M001`, c'est-a-dire un contrat CAD-agnostic sans import `adsk`.
+Le rapport `docs/FUSION_360_GATE_REPORT.md` a prepare la decision humaine avant
+toute integration Fusion 360 executable. La mission `P4-M001` a maintenant livre
+le contrat CAD-agnostic. La prochaine gate concerne le perimetre de `P4-M002`,
+c'est-a-dire un eventuel squelette d'adaptateur Fusion.
 
 ## Gates avant implementation Fusion
 

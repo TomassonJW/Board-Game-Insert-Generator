@@ -78,9 +78,15 @@ rapport recommande de commencer par un contrat CAD-agnostic (`P4-M001`) avant
 tout adaptateur Fusion executable. La gate humaine `Premiere integration Fusion
 360` est maintenant atteinte.
 
+La mission `P4-M001` du 2026-07-03 definit une representation intermediaire CAD
+abstraite et serialisable. La CAD IR V0 represente boite de reference,
+composants, corps rectangulaires, dimensions theoriques/imprimables,
+classifications de faces, tolerances appliquees, operations abstraites et
+metadata, sans import Fusion 360.
+
 ## Phase active
 
-Phase active : **Phase 4 - Gate Fusion 360 a valider**.
+Phase active : **Phase 4 - Contrat CAD IR pret, gate P4-M002 a valider**.
 
 Etat : autonomie operatoire documentee, controle documentaire de base, contrat
 des modeles coeur, loader JSON strict, rapports enrichis et commande de
@@ -89,10 +95,7 @@ diagnostic sont en place. Le contrat de layout Phase 2 est maintenant explicite 
 reserve. La comparaison simple des strategies existe dans les rapports. Les
 faces des corps rectangulaires simples sont classees explicitement et leurs
 regles de tolerance appliquees sont exposees dans les rapports. Les profils
-d'impression explicites sont resolus et visibles. La prochaine etape recommandee
-est une decision humaine sur le rapport `docs/FUSION_360_GATE_REPORT.md`. Aucune
-integration Fusion executable ne doit commencer tant que cette gate n'est pas
-validee.
+d'impression explicites sont resolus et visibles. La representation intermediaire CAD est maintenant definie et testee. La prochaine etape recommandee est une decision humaine sur le perimetre de `P4-M002`. Aucun squelette ni adaptateur Fusion executable ne doit commencer sans nouvelle validation.
 
 ## Implemente
 
@@ -128,6 +131,7 @@ validee.
 - Profils d'impression explicites et surchargeables `P3-M003`.
 - Protocole de calibration physique `P3-M004`.
 - Rapport de gate Fusion 360 `P4-M000`.
+- Representation intermediaire CAD-agnostic `P4-M001`.
 
 ## Experimental
 
@@ -146,7 +150,6 @@ validee.
 ## Prevu
 
 - Strategie de layout `columns`.
-- Representation intermediaire CAD-agnostic.
 - Adaptateur Fusion 360.
 - Cavites, receptacles, encoches, fonds arrondis.
 - Modules composites en L/T.
@@ -180,12 +183,14 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant la mission `P4-M000` :
+Derniere verification pendant la mission `P4-M001` :
 
-- `python -m unittest discover -s tests` : OK, 44 tests passes.
-- `python -m board_game_insert_generator examples/simple_box.json --format markdown` :
-  OK, rapport Markdown genere.
+- `python -m unittest discover -s tests` : OK, 48 tests passes.
+- `python -m board_game_insert_generator examples/simple_box.json --format markdown` : OK.
+- `python -m board_game_insert_generator examples/simple_grid.json --format markdown` : OK.
+- `python -m board_game_insert_generator examples/simple_box.json --format json` : OK.
 - `git diff --check` : OK.
+- `rg -n "adsk" src` : OK, aucune occurrence.
 
 ## Risques actifs
 
