@@ -143,7 +143,7 @@ commitee sans melanger plusieurs decisions structurantes.
   expose les valeurs importantes ; les exemples existants restent reproductibles.
 - Tests ou verifications : tests unitaires et execution d'exemple CLI.
 - Dependances : P1-M002.
-- Statut : `ready`.
+- Statut : `done`.
 
 ### P1-M004 - Ajouter une commande CLI de diagnostic
 
@@ -155,7 +155,7 @@ commitee sans melanger plusieurs decisions structurantes.
   documentation donne la commande et le resultat attendu.
 - Tests ou verifications : tests CLI et execution d'exemple.
 - Dependances : P1-M003.
-- Statut : `todo`.
+- Statut : `ready`.
 
 ## Phase 2 - Layout rectangulaire simple
 

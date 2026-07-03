@@ -1,0 +1,42 @@
+from __future__ import annotations
+
+import json
+import unittest
+
+from context import ROOT
+
+from board_game_insert_generator.config_loader import load_config
+from board_game_insert_generator.layout import generate_basic_layout
+from board_game_insert_generator.report import layout_to_json, layout_to_markdown
+
+
+class ReportTests(unittest.TestCase):
+    def test_markdown_report_exposes_summary_and_tolerances(self) -> None:
+        config = load_config(ROOT / "examples" / "simple_box.json")
+        result = generate_basic_layout(config)
+
+        report = layout_to_markdown(config, result)
+
+        self.assertIn("## Summary", report)
+        self.assertIn("- Layout strategy: `row_fill`", report)
+        self.assertIn("- Requested modules: 3", report)
+        self.assertIn("- Generated instances: 4", report)
+        self.assertIn("## Tolerance profile", report)
+        self.assertIn("| Module gap | 0.60 mm |", report)
+
+    def test_json_report_exposes_diagnostic_fields(self) -> None:
+        config = load_config(ROOT / "examples" / "simple_box.json")
+        result = generate_basic_layout(config)
+
+        report = json.loads(layout_to_json(config, result))
+
+        self.assertEqual(report["layout"]["strategy"], "row_fill")
+        self.assertEqual(report["summary"]["requested_module_count"], 3)
+        self.assertEqual(report["summary"]["expanded_instance_count"], 4)
+        self.assertEqual(report["summary"]["warning_count"], 2)
+        self.assertEqual(len(report["module_requests"]), 3)
+        self.assertEqual(report["module_requests"][0]["id"], "cards-main")
+
+
+if __name__ == "__main__":
+    unittest.main()
