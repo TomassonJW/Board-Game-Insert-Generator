@@ -17,6 +17,7 @@ REQUIRED_PROJECT_FILES = (
     "docs/ROADMAP.md",
     "docs/ARCHITECTURE.md",
     "docs/CALIBRATION_PROTOCOL.md",
+    "docs/FUSION_360_GATE_REPORT.md",
     "docs/QUALITY_RULES.md",
     "docs/DECISIONS/ADR-TEMPLATE.md",
     "docs/DECISIONS/README.md",
@@ -53,7 +54,7 @@ REQUIRED_SECTIONS = {
         "## Tests et verifications connus",
     ),
     "docs/NEXT_ACTIONS.md": (
-        "## Mission suivante recommandee",
+        "## Gate humaine active",
         "## Fin de chaque mission",
     ),
     "docs/BACKLOG.md": (
@@ -73,6 +74,12 @@ REQUIRED_SECTIONS = {
         "## Coupons a preparer",
         "## Tableau de resultats",
         "## Regles d'interpretation",
+    ),
+    "docs/FUSION_360_GATE_REPORT.md": (
+        "## Declencheur",
+        "## Etat actuel du moteur",
+        "## Options techniques",
+        "## Validation demandee",
     ),
     "docs/QUALITY_RULES.md": (
         "## Regles de documentation",

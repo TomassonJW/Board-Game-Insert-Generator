@@ -108,6 +108,12 @@ Verifications dans Fusion :
 - Les exports STL/3MF devront etre verifies par module.
 - Une verification Fusion ne remplace pas une validation par impression reelle.
 
+## Rapport de gate actuel
+
+Le rapport `docs/FUSION_360_GATE_REPORT.md` prepare la decision humaine avant
+toute integration Fusion 360 executable. Sa recommandation actuelle est de
+commencer par `P4-M001`, c'est-a-dire un contrat CAD-agnostic sans import `adsk`.
+
 ## Gates avant implementation Fusion
 
 Avant de coder l'adaptateur Fusion :

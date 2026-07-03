@@ -289,7 +289,7 @@ commitee sans melanger plusieurs decisions structurantes.
   formulee explicitement.
 - Tests ou verifications : suite unitaire du coeur, relecture documentaire.
 - Dependances : P1-M003, P2-M002, P3-M002.
-- Statut : `ready`.
+- Statut : `done`.
 
 ### P4-M001 - Definir le contrat de representation intermediaire CAD
 
@@ -302,7 +302,9 @@ commitee sans melanger plusieurs decisions structurantes.
   rectangulaires sont representables.
 - Tests ou verifications : tests serialization si code ajoute.
 - Dependances : P1-M003, P3-M001.
-- Statut : `todo`.
+- Gate humaine : en attente de validation du rapport
+  `docs/FUSION_360_GATE_REPORT.md`.
+- Statut : `blocked`.
 
 ### P4-M002 - Creer un squelette d'adaptateur Fusion 360
 

@@ -73,9 +73,14 @@ La mission `P3-M004` du 2026-07-03 ajoute un protocole de calibration physique.
 Ce protocole decrit coupons, mesures, contexte d'impression et criteres OK/KO,
 sans realiser ni revendiquer d'impression reelle.
 
+La mission `P4-M000` du 2026-07-03 prepare le rapport de gate Fusion 360. Le
+rapport recommande de commencer par un contrat CAD-agnostic (`P4-M001`) avant
+tout adaptateur Fusion executable. La gate humaine `Premiere integration Fusion
+360` est maintenant atteinte.
+
 ## Phase active
 
-Phase active : **Phase 3 - Tolerances intelligentes**.
+Phase active : **Phase 4 - Gate Fusion 360 a valider**.
 
 Etat : autonomie operatoire documentee, controle documentaire de base, contrat
 des modeles coeur, loader JSON strict, rapports enrichis et commande de
@@ -85,8 +90,9 @@ reserve. La comparaison simple des strategies existe dans les rapports. Les
 faces des corps rectangulaires simples sont classees explicitement et leurs
 regles de tolerance appliquees sont exposees dans les rapports. Les profils
 d'impression explicites sont resolus et visibles. La prochaine etape recommandee
-est `P4-M000` pour preparer le rapport de gate Fusion 360, sans integrer Fusion
-360 tant que la gate humaine n'est pas validee.
+est une decision humaine sur le rapport `docs/FUSION_360_GATE_REPORT.md`. Aucune
+integration Fusion executable ne doit commencer tant que cette gate n'est pas
+validee.
 
 ## Implemente
 
@@ -121,6 +127,7 @@ est `P4-M000` pour preparer le rapport de gate Fusion 360, sans integrer Fusion
 - Regles de tolerance appliquees par role de face `P3-M002`.
 - Profils d'impression explicites et surchargeables `P3-M003`.
 - Protocole de calibration physique `P3-M004`.
+- Rapport de gate Fusion 360 `P4-M000`.
 
 ## Experimental
 
@@ -173,7 +180,7 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant la mission `P3-M004` :
+Derniere verification pendant la mission `P4-M000` :
 
 - `python -m unittest discover -s tests` : OK, 44 tests passes.
 - `python -m board_game_insert_generator examples/simple_box.json --format markdown` :
