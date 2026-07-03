@@ -185,9 +185,10 @@ Elle porte un role explicite :
 - `internal` : interne a un futur module composite ;
 - `welded` : jonction soudee future entre primitives du meme module.
 
-En `P3-M001`, cette classification est une metadonnee explicable et testee. Elle
-prepare une application de tolerance plus riche, mais ne valide pas physiquement
-les jeux et ne change pas les dimensions imprimables des exemples existants.
+Depuis `P3-M002`, cette classification pilote une application de tolerance
+explicite et testee par role de face. Elle ne valide pas physiquement les jeux
+et ne change pas les valeurs de tolerance par defaut. Les exemples existants
+gardent leurs dimensions imprimables attendues.
 
 ## Etat actuel
 
@@ -199,11 +200,13 @@ Implemente :
 - corps imprimables rectangulaires ;
 - offsets par face pour cas simples ;
 - classification explicite des faces pour corps rectangulaires simples ;
+- regles de tolerance appliquees par role de face ;
 - representation conceptuelle des primitives et composites.
 
 Experimental :
 
-- roles `internal` et `welded` presents mais non exploites par le layout ;
+- detection automatique des roles `internal` et `welded` non exploitee par le
+  layout ;
 - concepts `Cavity` et `Feature` presents mais non generes ;
 - `CompositeModule` present mais non exploite par le layout.
 

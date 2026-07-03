@@ -28,6 +28,10 @@ class ReportTests(unittest.TestCase):
         self.assertIn("## Face classifications", report)
         self.assertIn("x_min: peripheral", report)
         self.assertIn("x_max: neighbor", report)
+        self.assertIn("## Applied tolerances", report)
+        self.assertIn("| cards-main-01 | x_min | peripheral | 0.80 mm |", report)
+        self.assertIn("peripheral_clearance_mm + printer_compensation_mm", report)
+        self.assertIn("neighbor_half_module_gap", report)
         self.assertIn("## Tolerance profile", report)
         self.assertIn("| Module gap | 0.60 mm |", report)
 
@@ -56,6 +60,15 @@ class ReportTests(unittest.TestCase):
             first_body["face_classifications"][1]["neighbor_instance_id"],
             "cards-main-02",
         )
+        self.assertEqual(first_body["applied_tolerances"][0]["face"], "x_min")
+        self.assertEqual(first_body["applied_tolerances"][0]["role"], "peripheral")
+        self.assertEqual(first_body["applied_tolerances"][0]["offset_mm"], 0.8)
+        self.assertEqual(
+            first_body["applied_tolerances"][0]["rule_id"],
+            "peripheral_clearance",
+        )
+        self.assertTrue(first_body["applied_tolerances"][0]["receives_clearance"])
+        self.assertEqual(first_body["applied_tolerances"][5]["rule_id"], "functional_vertical_lid_clearance")
         self.assertEqual(len(report["module_requests"]), 3)
         self.assertEqual(report["module_requests"][0]["id"], "cards-main")
 

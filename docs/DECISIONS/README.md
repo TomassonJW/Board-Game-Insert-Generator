@@ -84,6 +84,8 @@ Tests, cartes backlog ou gates humaines a preparer.
 - `ADR-0003-json-first-csv-and-sheets-later.md` - JSON avant CSV/Sheets.
 - `ADR-0004-docs-as-control-plane.md` - documentation comme plan de controle
   projet.
+- `ADR-0005-face-role-tolerance-rules.md` - regles de tolerance par role de
+  face.
 
 ## Regles de maintenance
 

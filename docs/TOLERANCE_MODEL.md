@@ -46,10 +46,10 @@ Ces valeurs sont prudentes et doivent etre ajustees selon l'imprimante :
 
 ## Application par face
 
-Depuis `P3-M001`, le moteur represente explicitement les six faces d'un corps
-rectangulaire simple avant de calculer les offsets. Cette etape est preparatoire :
-elle n'ajoute pas de nouvelles valeurs par defaut et ne change pas les dimensions
-imprimables des exemples existants.
+Depuis `P3-M002`, le moteur represente explicitement les six faces d'un corps
+rectangulaire simple puis transforme chaque classification en application de
+tolerance testable. Cette etape n'ajoute pas de nouvelles valeurs par defaut et
+ne change pas les dimensions imprimables des exemples existants.
 
 Faces nommees :
 
@@ -70,16 +70,25 @@ Roles actuels :
 - `internal` : role reserve pour une future face interne ;
 - `welded` : role reserve pour une future jonction soudee de module composite.
 
-Regle d'offset V0 preservee :
+Regles appliquees en `P3-M002` :
 
-- une face `peripheral` recoit le jeu peripherique ;
-- une face `neighbor` recoit la moitie du jeu entre modules ;
-- une face `exposed` recoit seulement la compensation imprimante si elle existe ;
-- `z_max` recoit le jeu vertical sous couvercle ;
-- `z_min` reste a Z=0.
+| Role | Faces typiques | Offset applique | Recoit un jeu ? | Statut |
+| --- | --- | ---: | --- | --- |
+| `peripheral` | X/Y contre la boite | `peripheral_clearance_mm + printer_compensation_mm` | oui | implemente |
+| `neighbor` | X/Y contre une cellule voisine | `module_gap_mm / 2 + printer_compensation_mm` | oui | implemente |
+| `exposed` | X/Y libre | `printer_compensation_mm` seulement si non nul | non | implemente |
+| `functional` | `z_min` | `0.0` | non | implemente |
+| `functional` | `z_max` | `vertical_lid_clearance_mm` | oui | implemente |
+| `internal` | future face interne | `0.0` | non | regle testee, detection future |
+| `welded` | future jonction soudee | `0.0` | non | regle testee, detection future |
 
 Si deux modules voisins recoivent chacun `module_gap_mm / 2`, le jeu total entre
-leurs corps imprimables est `module_gap_mm`.
+leurs corps imprimables est `module_gap_mm`. Une face `internal` ou `welded` ne
+recoit aucun jeu inter-module et aucune compensation imprimante, afin de
+preserver la matiere continue d'un futur module composite.
+
+Les rapports Markdown et JSON exposent les tolerances appliquees par face :
+offset, source, identifiant de regle et raison.
 
 ## Modules composites
 
@@ -118,19 +127,20 @@ Implemente :
 
 - offsets simples sur X/Y/Z pour corps rectangulaires ;
 - classification explicite des faces rectangulaires simples ;
-- distinction peripherie, voisin, face exposee et face fonctionnelle dans les cas
-  simples ;
-- exposition des classifications dans les rapports ;
+- moteur de regles de tolerance par role de face ;
+- distinction peripherie, voisin, face exposee, face fonctionnelle, face interne
+  et face soudee dans les regles ;
+- exposition des classifications et tolerances appliquees dans les rapports ;
 - validation que les offsets ne rendent pas le corps non positif.
 
 Experimental :
 
-- roles `internal` et `welded` reserves pour modules composites futurs ;
+- detection automatique des roles `internal` et `welded` pour modules composites
+  futurs ;
 - valeurs de tolerance non calibrees physiquement.
 
 Prevu :
 
-- application dimensionnelle plus avancee a partir des roles de faces ;
 - profils d'impression ;
 - tolerances de cavites ;
 - jeux de couvercles, rainures, charnieres et clips ;

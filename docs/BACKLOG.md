@@ -242,9 +242,9 @@ commitee sans melanger plusieurs decisions structurantes.
   cas simples.
 - Tests ou verifications : tests unitaires de tolerance et exemple CLI.
 - Dependances : P3-M001.
-- Gate humaine : requise si la mission modifie le calcul dimensionnel ou les
-  valeurs de tolerance appliquees.
-- Statut : `blocked`.
+- Gate humaine : validee explicitement pour cette mission le 2026-07-03, sans
+  changement des valeurs de tolerance par defaut.
+- Statut : `done`.
 
 ### P3-M003 - Ajouter des profils d'impression
 
@@ -257,7 +257,7 @@ commitee sans melanger plusieurs decisions structurantes.
   rapport montre les valeurs finales.
 - Tests ou verifications : tests loader, validation et rapport.
 - Dependances : P3-M002.
-- Statut : `todo`.
+- Statut : `ready`.
 
 ### P3-M004 - Ajouter un protocole de calibration physique
 

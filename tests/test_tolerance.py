@@ -10,6 +10,7 @@ from board_game_insert_generator.models import (
     BoxSpec,
     Cell,
     Dimension3D,
+    FaceClassification,
     FaceName,
     FaceRole,
     FunctionalType,
@@ -19,7 +20,10 @@ from board_game_insert_generator.models import (
     Point3D,
     ToleranceProfile,
 )
-from board_game_insert_generator.tolerance import classify_cell_faces
+from board_game_insert_generator.tolerance import (
+    classify_cell_faces,
+    face_tolerance_applications_from_classifications,
+)
 
 
 class ToleranceTests(unittest.TestCase):
@@ -58,6 +62,58 @@ class ToleranceTests(unittest.TestCase):
         self.assertEqual(FaceRole.FUNCTIONAL.value, "functional")
         self.assertEqual(FaceRole.INTERNAL.value, "internal")
         self.assertEqual(FaceRole.WELDED.value, "welded")
+
+    def test_face_tolerance_rules_cover_each_role(self) -> None:
+        config = _config(tolerances=ToleranceProfile(printer_compensation_mm=0.2))
+        classifications = (
+            FaceClassification(FaceName.X_MIN, FaceRole.PERIPHERAL, "peripheral test"),
+            FaceClassification(FaceName.X_MAX, FaceRole.NEIGHBOR, "neighbor test"),
+            FaceClassification(FaceName.Y_MIN, FaceRole.EXPOSED, "exposed test"),
+            FaceClassification(FaceName.Y_MAX, FaceRole.INTERNAL, "internal test"),
+            FaceClassification(FaceName.Z_MIN, FaceRole.WELDED, "welded test"),
+            FaceClassification(FaceName.Z_MAX, FaceRole.FUNCTIONAL, "functional test"),
+        )
+
+        applications = _apps_by_face(
+            face_tolerance_applications_from_classifications(classifications, config)
+        )
+
+        self.assertAlmostEqual(applications[FaceName.X_MIN].offset_mm, 1.0)
+        self.assertEqual(applications[FaceName.X_MIN].rule_id, "peripheral_clearance")
+        self.assertTrue(applications[FaceName.X_MIN].receives_clearance)
+        self.assertAlmostEqual(applications[FaceName.X_MAX].offset_mm, 0.5)
+        self.assertEqual(applications[FaceName.X_MAX].rule_id, "neighbor_half_module_gap")
+        self.assertTrue(applications[FaceName.X_MAX].receives_clearance)
+        self.assertAlmostEqual(applications[FaceName.Y_MIN].offset_mm, 0.2)
+        self.assertFalse(applications[FaceName.Y_MIN].receives_clearance)
+        self.assertAlmostEqual(applications[FaceName.Y_MAX].offset_mm, 0.0)
+        self.assertEqual(applications[FaceName.Y_MAX].rule_id, "internal_no_clearance")
+        self.assertFalse(applications[FaceName.Y_MAX].receives_clearance)
+        self.assertAlmostEqual(applications[FaceName.Z_MIN].offset_mm, 0.0)
+        self.assertEqual(applications[FaceName.Z_MIN].rule_id, "welded_no_clearance")
+        self.assertFalse(applications[FaceName.Z_MIN].receives_clearance)
+        self.assertAlmostEqual(applications[FaceName.Z_MAX].offset_mm, 1.0)
+        self.assertEqual(applications[FaceName.Z_MAX].rule_id, "functional_vertical_lid_clearance")
+        self.assertTrue(applications[FaceName.Z_MAX].receives_clearance)
+
+    def test_bottom_functional_face_receives_no_clearance(self) -> None:
+        config = _config()
+        classifications = (
+            FaceClassification(FaceName.X_MIN, FaceRole.EXPOSED, "exposed test"),
+            FaceClassification(FaceName.X_MAX, FaceRole.EXPOSED, "exposed test"),
+            FaceClassification(FaceName.Y_MIN, FaceRole.EXPOSED, "exposed test"),
+            FaceClassification(FaceName.Y_MAX, FaceRole.EXPOSED, "exposed test"),
+            FaceClassification(FaceName.Z_MIN, FaceRole.FUNCTIONAL, "bottom functional test"),
+            FaceClassification(FaceName.Z_MAX, FaceRole.FUNCTIONAL, "top functional test"),
+        )
+
+        applications = _apps_by_face(
+            face_tolerance_applications_from_classifications(classifications, config)
+        )
+
+        self.assertAlmostEqual(applications[FaceName.Z_MIN].offset_mm, 0.0)
+        self.assertEqual(applications[FaceName.Z_MIN].rule_id, "bottom_anchor_no_clearance")
+        self.assertFalse(applications[FaceName.Z_MIN].receives_clearance)
 
     def test_simple_rectangular_cell_faces_are_classified(self) -> None:
         config = _config()
@@ -136,7 +192,7 @@ class ToleranceTests(unittest.TestCase):
         )
 
 
-def _config() -> InsertConfig:
+def _config(tolerances: ToleranceProfile | None = None) -> InsertConfig:
     return InsertConfig(
         project_name="Tolerance test",
         units="mm",
@@ -145,7 +201,7 @@ def _config() -> InsertConfig:
             usable_height_mm=30.0,
             lid_clearance_mm=5.0,
         ),
-        tolerances=ToleranceProfile(),
+        tolerances=tolerances or ToleranceProfile(),
         defaults=GeometryDefaults(),
         layout=LayoutSettings(),
         modules=(),
@@ -154,6 +210,10 @@ def _config() -> InsertConfig:
 
 def _by_face(classifications):
     return {classification.face: classification for classification in classifications}
+
+
+def _apps_by_face(applications):
+    return {application.face: application for application in applications}
 
 
 def _body_snapshot(result):

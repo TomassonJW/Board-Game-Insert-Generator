@@ -187,6 +187,17 @@ class FaceClassification:
 
 
 @dataclass(frozen=True)
+class FaceToleranceApplication:
+    face: FaceName
+    role: FaceRole
+    offset_mm: float
+    rule_id: str
+    clearance_source: str
+    receives_clearance: bool
+    reason: str
+
+
+@dataclass(frozen=True)
 class PrintableBody:
     module_id: str
     instance_id: str
@@ -196,6 +207,7 @@ class PrintableBody:
     offsets: FaceOffsets
     primitive_volumes: tuple[PrimitiveVolume, ...]
     face_classifications: tuple[FaceClassification, ...] = ()
+    tolerance_applications: tuple[FaceToleranceApplication, ...] = ()
 
 
 @dataclass(frozen=True)

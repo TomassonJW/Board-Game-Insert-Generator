@@ -112,10 +112,10 @@ Fichier actuel :
 - `src/board_game_insert_generator/tolerance.py`
 
 Le moteur applique des jeux selon les faces : contre la boite, contre un voisin,
-libre, ou sous couvercle. Depuis `P3-M001`, ces faces portent une classification
-explicite comme metadonnee, sans changement des valeurs d'offset V0. Les volumes
-internes soudes d'un meme futur module composite ne doivent pas recevoir de jeu
-entre eux.
+libre, ou sous couvercle. Depuis `P3-M002`, ces faces portent une classification
+explicite et une application de tolerance indiquant offset, source et regle. Les
+valeurs par defaut ne changent pas. Les volumes internes soudes d'un meme futur
+module composite ne doivent pas recevoir de jeu entre eux.
 
 ### 6. Geometrie abstraite
 
@@ -185,3 +185,4 @@ Ces options ne doivent pas modifier le contrat du moteur pur.
 - ADR-0002 : separation cellule theorique / corps imprimable.
 - ADR-0003 : JSON d'abord, CSV/Sheets plus tard.
 - ADR-0004 : documentation comme plan de controle projet.
+- ADR-0005 : regles de tolerance par role de face.
