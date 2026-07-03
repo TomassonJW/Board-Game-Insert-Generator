@@ -10,7 +10,7 @@ Toutes les dimensions sont en millimetres. Le champ `units` doit valoir `mm`.
 
 Le loader V0 refuse les champs inconnus aux niveaux suivants :
 
-- racine du document ;
+- racine du document, incluant `print_profile` ;
 - `box` ;
 - `box.inner_dimensions_mm` ;
 - `tolerances` ;
@@ -38,6 +38,7 @@ possible.
   "project_name": "Example insert",
   "units": "mm",
   "box": {},
+  "print_profile": "default",
   "tolerances": {},
   "defaults": {},
   "layout": {},
@@ -60,6 +61,22 @@ Convention :
 - `inner_dimensions_mm` represente le volume interieur mesure ;
 - `usable_height_mm` represente la hauteur maximale allouee aux modules ;
 - `lid_clearance_mm` represente une contrainte physique reservee sous couvercle.
+
+## `print_profile`
+
+Champ optionnel racine.
+
+Valeurs reconnues :
+
+- `default` : valeurs V0 par defaut ;
+- `pla_standard` : point de depart PLA standard ;
+- `petg_standard` : point de depart PETG standard ;
+- `fast_draft` : point de depart impression rapide ;
+- `fine_detail` : point de depart detail fin.
+
+Le profil est resolu en `ToleranceProfile`, puis les champs explicites de
+`tolerances` surchargent les valeurs du profil champ par champ. Les profils sont
+experimentaux et ne constituent pas une validation physique.
 
 ## `tolerances`
 
@@ -126,6 +143,7 @@ Chaque module contient :
     "usable_height_mm": 45,
     "lid_clearance_mm": 5
   },
+  "print_profile": "default",
   "tolerances": {
     "peripheral_clearance_mm": 0.8,
     "module_gap_mm": 0.6,

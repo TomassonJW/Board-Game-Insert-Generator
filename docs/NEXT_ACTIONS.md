@@ -8,34 +8,34 @@ Codex doit choisir la premiere mission `ready` listee ici.
 
 ## Mission suivante recommandee
 
-### 1. P3-M003 - Ajouter des profils d'impression
+### 1. P3-M004 - Ajouter un protocole de calibration physique
 
 Statut : `ready`.
 
 Pourquoi maintenant :
 
-- `P3-M001` a ajoute la classification explicite des faces ;
-- `P3-M002` applique maintenant les regles de tolerance depuis ces roles ;
-- les valeurs par defaut n'ont pas change ;
-- les rapports exposent les tolerances appliquees et leurs raisons.
+- `P3-M002` rend les tolerances appliquees explicites par face ;
+- `P3-M003` ajoute des profils d'impression opt-in et surchargeables ;
+- les profils restent experimentaux et non calibres physiquement ;
+- le projet doit eviter de confondre preset logiciel et validation par impression.
 
 Objectif :
 
-- ajouter des profils d'impression explicites qui se resolvent en
-  `ToleranceProfile` visible, sans cacher les valeurs finales.
+- documenter un protocole de calibration physique par coupons de test et tableau
+  de mesure, sans effectuer ni revendiquer d'impression reelle.
 
 Contraintes :
 
-- ne pas modifier les valeurs par defaut sans gate humaine separee ;
-- ne pas presenter un profil comme valide physiquement ;
-- garder le coeur Python independant de Fusion 360 ;
-- ne pas lancer Fusion 360, STL ou 3MF.
+- ne pas modifier les valeurs de tolerance par defaut ;
+- ne pas declarer les profils valides physiquement ;
+- ne pas lancer Fusion 360, STL ou 3MF ;
+- rester sur documentation et exemples locaux reproductibles.
 
 Validation attendue :
 
-- tests unitaires loader/validation/rapport ;
-- exemple CLI Markdown et JSON ;
-- documentation des profils et de leurs limites physiques.
+- relecture documentaire ;
+- suite unitaire pour verifier la coherence des fichiers de pilotage ;
+- `git diff --check`.
 
 ## Missions a ne pas lancer tout de suite
 
@@ -47,8 +47,7 @@ Validation attendue :
 - Modules composites complets tant que `P6-M001` n'est pas cadree.
 - Assistant de conception tant que plusieurs strategies et profils ne sont pas
   stabilises.
-- Packaging produit tant que des exemples imprimes reels ne sont pas
-  disponibles.
+- Packaging produit tant que des exemples imprimes reels ne sont pas disponibles.
 
 ## Fin de chaque mission
 

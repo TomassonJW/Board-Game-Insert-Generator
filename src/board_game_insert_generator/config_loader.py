@@ -16,9 +16,13 @@ from board_game_insert_generator.models import (
     ModuleRequest,
     ToleranceProfile,
 )
+from board_game_insert_generator.print_profiles import (
+    PRINT_PROFILE_DEFAULT,
+    resolve_print_profile,
+)
 
 
-ROOT_FIELDS = {"project_name", "units", "box", "tolerances", "defaults", "layout", "modules"}
+ROOT_FIELDS = {"project_name", "units", "box", "print_profile", "tolerances", "defaults", "layout", "modules"}
 BOX_FIELDS = {"inner_dimensions_mm", "usable_height_mm", "lid_clearance_mm"}
 MODULE_FIELDS = {
     "id",
@@ -56,7 +60,8 @@ def load_config(path: str | Path) -> InsertConfig:
         raise ConfigError(f"Unsupported units '{units}'. V0 only supports millimeters.")
 
     box = _parse_box(_required_mapping(raw, "box", "root.box"))
-    tolerances = _parse_float_dataclass(ToleranceProfile, raw.get("tolerances", {}), "tolerances")
+    print_profile = _optional_string(raw, "print_profile", "root", default=PRINT_PROFILE_DEFAULT)
+    tolerances = _parse_tolerances(raw.get("tolerances", {}), print_profile)
     defaults = _parse_float_dataclass(GeometryDefaults, raw.get("defaults", {}), "defaults")
     layout = _parse_layout(raw.get("layout", {}))
     modules = tuple(_parse_modules(raw.get("modules", [])))
@@ -74,6 +79,7 @@ def load_config(path: str | Path) -> InsertConfig:
         defaults=defaults,
         layout=layout,
         modules=modules,
+        print_profile=print_profile,
         source_path=str(config_path),
     )
 
@@ -142,6 +148,24 @@ def _parse_functional_type(value: Any, index: int) -> FunctionalType:
             f"Allowed values: {allowed}."
         ) from exc
 
+
+def _parse_tolerances(raw: Any, print_profile: str) -> ToleranceProfile:
+    if raw is None:
+        raw = {}
+    if not isinstance(raw, dict):
+        raise ConfigError("'tolerances' must be an object.")
+
+    allowed = {field.name for field in fields(ToleranceProfile)}
+    _reject_unknown_fields(raw, allowed, "tolerances")
+    overrides = {
+        field.name: _number_value(raw[field.name], f"tolerances.{field.name}")
+        for field in fields(ToleranceProfile)
+        if field.name in raw
+    }
+    try:
+        return resolve_print_profile(print_profile, overrides)
+    except ValueError as exc:
+        raise ConfigError(str(exc)) from exc
 
 def _parse_float_dataclass(cls: type[Any], raw: Any, field_name: str) -> Any:
     if raw is None:

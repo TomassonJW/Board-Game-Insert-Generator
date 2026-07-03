@@ -257,7 +257,7 @@ commitee sans melanger plusieurs decisions structurantes.
   rapport montre les valeurs finales.
 - Tests ou verifications : tests loader, validation et rapport.
 - Dependances : P3-M002.
-- Statut : `ready`.
+- Statut : `done`.
 
 ### P3-M004 - Ajouter un protocole de calibration physique
 
@@ -270,7 +270,7 @@ commitee sans melanger plusieurs decisions structurantes.
   ajustements.
 - Tests ou verifications : relecture documentaire.
 - Dependances : P3-M003.
-- Statut : `todo`.
+- Statut : `ready`.
 
 ## Phase 4 - Generation Fusion 360 de blanks
 

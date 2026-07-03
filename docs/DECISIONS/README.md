@@ -86,6 +86,8 @@ Tests, cartes backlog ou gates humaines a preparer.
   projet.
 - `ADR-0005-face-role-tolerance-rules.md` - regles de tolerance par role de
   face.
+- `ADR-0006-explicit-print-profiles.md` - profils d'impression explicites et
+  surchargeables.
 
 ## Regles de maintenance
 

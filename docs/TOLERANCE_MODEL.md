@@ -105,27 +105,33 @@ tolerances s'appliquent seulement :
 Cette regle est une contrainte d'architecture. Elle evite de casser un module
 soude en appliquant un jeu la ou il devrait exister une matiere continue.
 
-## Profils d'impression futurs
+## Profils d'impression
 
-Le modele doit permettre des profils comme :
+Depuis `P3-M003`, le JSON V0 accepte un champ racine optionnel `print_profile`.
+Le loader resout ce profil en `ToleranceProfile`, puis applique les champs
+explicites de `tolerances` comme overrides champ par champ.
 
-- PLA standard ;
-- PETG ;
-- impression rapide ;
-- impression fine ;
-- imprimante calibree ;
-- imprimante non calibree ;
-- buse large ;
-- couche epaisse.
+Profils implementes :
 
-Un profil ne doit pas cacher ses valeurs. Il doit produire un ensemble explicite
-de champs de tolerance.
+| Profil | Role | Statut |
+| --- | --- | --- |
+| `default` | valeurs V0 historiques | implemente, non valide physiquement |
+| `pla_standard` | point de depart PLA standard | experimental |
+| `petg_standard` | point de depart PETG standard | experimental |
+| `fast_draft` | point de depart impression rapide | experimental |
+| `fine_detail` | point de depart detail fin | experimental |
+
+Un profil ne cache jamais ses valeurs finales : les rapports Markdown/JSON
+exposent le profil et la table `tolerances` resolue. Les profils ne sont pas une
+validation physique ; ils doivent etre calibres par impression reelle avant toute
+promesse utilisateur.
 
 ## Statuts
 
 Implemente :
 
 - offsets simples sur X/Y/Z pour corps rectangulaires ;
+- profils d'impression explicites et surchargeables ;
 - classification explicite des faces rectangulaires simples ;
 - moteur de regles de tolerance par role de face ;
 - distinction peripherie, voisin, face exposee, face fonctionnelle, face interne
@@ -141,7 +147,7 @@ Experimental :
 
 Prevu :
 
-- profils d'impression ;
+- calibration physique des profils ;
 - tolerances de cavites ;
 - jeux de couvercles, rainures, charnieres et clips ;
 - protocole de calibration par coupons imprimes.

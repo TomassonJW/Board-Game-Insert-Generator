@@ -17,6 +17,7 @@ class ConfigLoaderTests(unittest.TestCase):
 
         self.assertEqual(config.units, "mm")
         self.assertEqual(config.project_name, "Simple square box V0")
+        self.assertEqual(config.print_profile, "default")
         self.assertEqual(len(config.modules), 3)
         self.assertEqual(config.modules[0].functional_type, FunctionalType.SLEEVED_CARDS)
         self.assertEqual(config.modules[0].quantity, 2)
@@ -51,6 +52,25 @@ class ConfigLoaderTests(unittest.TestCase):
             "Field 'tolerances.module_gap_mm' must be a number.",
         ):
             _load_payload(payload)
+
+    def test_rejects_unknown_print_profile(self) -> None:
+        payload = _simple_payload()
+        payload["print_profile"] = "magic_filament"
+
+        with self.assertRaisesRegex(ConfigError, "Unsupported print_profile 'magic_filament'"):
+            _load_payload(payload)
+
+    def test_resolves_print_profile_then_tolerance_overrides(self) -> None:
+        payload = _simple_payload()
+        payload["print_profile"] = "petg_standard"
+        payload["tolerances"] = {"module_gap_mm": 0.42}
+
+        config = _load_payload(payload)
+
+        self.assertEqual(config.print_profile, "petg_standard")
+        self.assertAlmostEqual(config.tolerances.peripheral_clearance_mm, 1.0)
+        self.assertAlmostEqual(config.tolerances.printer_compensation_mm, 0.05)
+        self.assertAlmostEqual(config.tolerances.module_gap_mm, 0.42)
 
     def test_rejects_non_integer_quantity(self) -> None:
         payload = _simple_payload()

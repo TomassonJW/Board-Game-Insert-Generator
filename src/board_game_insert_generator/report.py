@@ -12,6 +12,7 @@ from board_game_insert_generator.models import (
     LayoutResult,
     Point3D,
 )
+from board_game_insert_generator.print_profiles import print_profile_label, print_profile_note
 from board_game_insert_generator.tolerance import ToleranceError
 from board_game_insert_generator.validation import ValidationError
 
@@ -27,6 +28,11 @@ def layout_to_dict(config: InsertConfig, result: LayoutResult) -> dict[str, Any]
             "lid_clearance_mm": config.box.lid_clearance_mm,
         },
         "layout": asdict(config.layout),
+        "print_profile": {
+            "id": config.print_profile,
+            "label": print_profile_label(config.print_profile),
+            "note": print_profile_note(config.print_profile),
+        },
         "tolerances": asdict(config.tolerances),
         "defaults": asdict(config.defaults),
         "summary": {
@@ -138,6 +144,9 @@ def layout_to_markdown(config: InsertConfig, result: LayoutResult) -> str:
         *_format_comparison_rows(_layout_comparison(config, result)),
         "",
         "## Tolerance profile",
+        "",
+        f"- Print profile: `{config.print_profile}` ({print_profile_label(config.print_profile)})",
+        f"- Profile note: {print_profile_note(config.print_profile)}",
         "",
         "| Setting | Value |",
         "| --- | ---: |",

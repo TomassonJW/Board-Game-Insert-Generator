@@ -43,7 +43,9 @@ Fichiers actuels :
 - `examples/*.json`
 
 La configuration ne doit contenir aucun secret et toutes les dimensions sont en
-millimetres.
+millimetres. Le champ optionnel `print_profile` choisit un preset de tolerance
+local et explicite ; les champs `tolerances` restent les valeurs finales ou les
+overrides visibles.
 
 ### 2. Modele metier
 
@@ -114,8 +116,10 @@ Fichier actuel :
 Le moteur applique des jeux selon les faces : contre la boite, contre un voisin,
 libre, ou sous couvercle. Depuis `P3-M002`, ces faces portent une classification
 explicite et une application de tolerance indiquant offset, source et regle. Les
-valeurs par defaut ne changent pas. Les volumes internes soudes d'un meme futur
-module composite ne doivent pas recevoir de jeu entre eux.
+valeurs par defaut ne changent pas. Depuis `P3-M003`, un profil d'impression
+opt-in peut resoudre des valeurs de tolerance experimentales, toujours visibles
+dans les rapports. Les volumes internes soudes d'un meme futur module composite
+ne doivent pas recevoir de jeu entre eux.
 
 ### 6. Geometrie abstraite
 
@@ -186,3 +190,4 @@ Ces options ne doivent pas modifier le contrat du moteur pur.
 - ADR-0003 : JSON d'abord, CSV/Sheets plus tard.
 - ADR-0004 : documentation comme plan de controle projet.
 - ADR-0005 : regles de tolerance par role de face.
+- ADR-0006 : profils d'impression explicites et surchargeables.

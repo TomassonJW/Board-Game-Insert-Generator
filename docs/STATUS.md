@@ -64,6 +64,11 @@ offset, source, regle et raison. Les valeurs de tolerance par defaut restent
 inchangees et les dimensions imprimables des exemples existants restent
 identiques.
 
+La mission `P3-M003` du 2026-07-03 ajoute des profils d'impression explicites et
+surchargeables dans le JSON V0. Le profil est resolu en `ToleranceProfile`, puis
+les champs `tolerances` surchargent les valeurs champ par champ. Les profils sont
+experimentaux et non valides physiquement.
+
 ## Phase active
 
 Phase active : **Phase 3 - Tolerances intelligentes**.
@@ -74,9 +79,10 @@ diagnostic sont en place. Le contrat de layout Phase 2 est maintenant explicite 
 `row_fill` et `grid` sont executables et couverts par tests, `columns` reste
 reserve. La comparaison simple des strategies existe dans les rapports. Les
 faces des corps rectangulaires simples sont classees explicitement et leurs
-regles de tolerance appliquees sont exposees dans les rapports. La prochaine
-etape recommandee est `P3-M003` pour ajouter des profils d'impression explicites,
-sans changer les valeurs par defaut sans gate humaine separee.
+regles de tolerance appliquees sont exposees dans les rapports. Les profils
+d'impression explicites sont resolus et visibles. La prochaine etape recommandee
+est `P3-M004` pour documenter un protocole de calibration physique, sans
+revendiquer de validation sans impression reelle.
 
 ## Implemente
 
@@ -109,6 +115,7 @@ sans changer les valeurs par defaut sans gate humaine separee.
 - Resume comparatif de layout dans les rapports `P2-M004`.
 - Classification explicite des faces rectangulaires simples `P3-M001`.
 - Regles de tolerance appliquees par role de face `P3-M002`.
+- Profils d'impression explicites et surchargeables `P3-M003`.
 
 ## Experimental
 
@@ -119,14 +126,15 @@ sans changer les valeurs par defaut sans gate humaine separee.
   sont pas encore detectes automatiquement par des modules composites.
 - Les `PrimitiveVolume`, `CompositeModule`, `Cavity` et `Feature` existent comme
   concepts mais ne pilotent pas encore une generation complete.
-- Les tolerances par defaut sont prudentes mais non calibrees sur impression.
+- Les tolerances par defaut et les profils d'impression sont prudents mais non
+  calibres sur impression.
 - Les dataclasses restent volontairement legeres ; les erreurs metier sont
   agregees par `validation.py`.
 
 ## Prevu
 
 - Strategie de layout `columns`.
-- Profils d'impression explicites.
+- Protocole de calibration physique des profils.
 - Representation intermediaire CAD-agnostic.
 - Adaptateur Fusion 360.
 - Cavites, receptacles, encoches, fonds arrondis.
@@ -161,15 +169,15 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant la mission `P3-M002` :
+Derniere verification pendant la mission `P3-M003` :
 
-- `python -m unittest discover -s tests` : OK, 42 tests passes.
+- `python -m unittest discover -s tests` : OK, 44 tests passes.
 - `python -m board_game_insert_generator examples/simple_box.json --format markdown` :
-  OK, rapport Markdown genere avec tolerances appliquees.
+  OK, rapport Markdown genere avec profil d'impression et tolerances appliquees.
 - `python -m board_game_insert_generator examples/simple_grid.json --format markdown` :
-  OK, rapport Markdown genere avec tolerances appliquees.
+  OK, rapport Markdown genere avec profil d'impression et tolerances appliquees.
 - `python -m board_game_insert_generator examples/simple_box.json --format json` :
-  OK, rapport JSON genere avec tolerances appliquees.
+  OK, rapport JSON genere avec profil d'impression et tolerances appliquees.
 - `git diff --check` : OK.
 
 ## Risques actifs
