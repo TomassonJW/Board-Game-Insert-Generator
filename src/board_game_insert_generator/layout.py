@@ -1,6 +1,14 @@
 from __future__ import annotations
 
-from board_game_insert_generator.models import Cell, Dimension3D, InsertConfig, LayoutResult, Point3D
+from board_game_insert_generator.models import (
+    IMPLEMENTED_LAYOUT_STRATEGIES,
+    LAYOUT_STRATEGY_ROW_FILL,
+    Cell,
+    Dimension3D,
+    InsertConfig,
+    LayoutResult,
+    Point3D,
+)
 from board_game_insert_generator.tolerance import build_printable_bodies
 from board_game_insert_generator.validation import assert_valid_config
 
@@ -12,8 +20,12 @@ class LayoutError(ValueError):
 def generate_basic_layout(config: InsertConfig) -> LayoutResult:
     assert_valid_config(config)
 
-    if config.layout.strategy != "row_fill":
-        raise LayoutError(f"Unsupported layout strategy: {config.layout.strategy}")
+    if config.layout.strategy != LAYOUT_STRATEGY_ROW_FILL:
+        implemented = ", ".join(IMPLEMENTED_LAYOUT_STRATEGIES)
+        raise LayoutError(
+            f"Unsupported layout strategy: {config.layout.strategy}. "
+            f"Implemented strategies: {implemented}."
+        )
 
     cells = _row_fill_cells(config)
     printable_bodies = build_printable_bodies(cells, config)

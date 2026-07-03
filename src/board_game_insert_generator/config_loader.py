@@ -10,6 +10,7 @@ from board_game_insert_generator.models import (
     Dimension3D,
     FunctionalType,
     GeometryDefaults,
+    LAYOUT_STRATEGY_ROW_FILL,
     InsertConfig,
     LayoutSettings,
     ModuleRequest,
@@ -169,7 +170,7 @@ def _parse_layout(raw: Any) -> LayoutSettings:
     _reject_unknown_fields(raw, allowed, "layout")
 
     return LayoutSettings(
-        strategy=_optional_string(raw, "strategy", "layout", default="row_fill"),
+        strategy=_optional_string(raw, "strategy", "layout", default=LAYOUT_STRATEGY_ROW_FILL),
         allow_global_rotation=_bool(
             raw,
             "allow_global_rotation",

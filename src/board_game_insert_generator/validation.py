@@ -2,7 +2,12 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 
-from board_game_insert_generator.models import Dimension3D, InsertConfig
+from board_game_insert_generator.models import (
+    Dimension3D,
+    IMPLEMENTED_LAYOUT_STRATEGIES,
+    RESERVED_LAYOUT_STRATEGIES,
+    InsertConfig,
+)
 
 
 @dataclass(frozen=True)
@@ -101,12 +106,16 @@ def validate_config(config: InsertConfig) -> list[ValidationIssue]:
                 )
             )
 
-    if config.layout.strategy != "row_fill":
+    if config.layout.strategy not in IMPLEMENTED_LAYOUT_STRATEGIES:
+        implemented = ", ".join(f"'{strategy}'" for strategy in IMPLEMENTED_LAYOUT_STRATEGIES)
+        message = f"V0 supports only the {implemented} layout strategy."
+        if config.layout.strategy in RESERVED_LAYOUT_STRATEGIES:
+            message += " This strategy is reserved for a later layout mission."
         issues.append(
             _issue(
                 "layout.strategy",
                 "UNSUPPORTED_LAYOUT_STRATEGY",
-                "V0 supports only the 'row_fill' layout strategy.",
+                message,
             )
         )
 
