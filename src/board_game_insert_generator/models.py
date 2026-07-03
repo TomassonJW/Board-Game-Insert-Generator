@@ -123,6 +123,7 @@ class InsertConfig:
     defaults: GeometryDefaults
     layout: LayoutSettings
     modules: tuple[ModuleRequest, ...]
+    print_profile: str = "default"
     source_path: str | None = None
 
 

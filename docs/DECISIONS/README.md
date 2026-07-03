@@ -86,6 +86,13 @@ Tests, cartes backlog ou gates humaines a preparer.
   projet.
 - `ADR-0005-face-role-tolerance-rules.md` - regles de tolerance par role de
   face.
+- `ADR-0006-explicit-print-profiles.md` - profils d'impression explicites et
+  surchargeables.
+- `ADR-0007-cad-agnostic-ir.md` - representation intermediaire CAD-agnostic.
+- `ADR-0008-fusion-adapter-skeleton-boundary.md` - frontiere du squelette
+  d'adaptateur Fusion 360.
+- `ADR-0009-fusion-sketch-extrusion-blanks.md` - generation Fusion minimale par
+  esquisse et extrusion.
 
 ## Regles de maintenance
 

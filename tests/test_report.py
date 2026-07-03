@@ -33,6 +33,8 @@ class ReportTests(unittest.TestCase):
         self.assertIn("peripheral_clearance_mm + printer_compensation_mm", report)
         self.assertIn("neighbor_half_module_gap", report)
         self.assertIn("## Tolerance profile", report)
+        self.assertIn("- Print profile: `default` (Default V0 values)", report)
+        self.assertIn("Preset values are experimental starting points", report)
         self.assertIn("| Module gap | 0.60 mm |", report)
 
     def test_json_report_exposes_diagnostic_fields(self) -> None:
@@ -42,6 +44,9 @@ class ReportTests(unittest.TestCase):
         report = json.loads(layout_to_json(config, result))
 
         self.assertEqual(report["layout"]["strategy"], "row_fill")
+        self.assertEqual(report["print_profile"]["id"], "default")
+        self.assertEqual(report["print_profile"]["label"], "Default V0 values")
+        self.assertIn("not physical validation", report["print_profile"]["note"])
         self.assertEqual(report["summary"]["requested_module_count"], 3)
         self.assertEqual(report["summary"]["expanded_instance_count"], 4)
         self.assertEqual(report["summary"]["warning_count"], 2)

@@ -6,49 +6,53 @@ Ce fichier indique les prochaines missions recommandees. Il doit rester court,
 priorise et directement actionnable. Si aucune mission explicite n'est donnee,
 Codex doit choisir la premiere mission `ready` listee ici.
 
-## Mission suivante recommandee
+## Gate humaine active
 
-### 1. P3-M003 - Ajouter des profils d'impression
+### Gate - Autoriser le prochain perimetre Fusion apres P4-M003
 
-Statut : `ready`.
+Statut : `blocked`.
 
-Pourquoi maintenant :
+Decision demandee :
 
-- `P3-M001` a ajoute la classification explicite des faces ;
-- `P3-M002` applique maintenant les regles de tolerance depuis ces roles ;
-- les valeurs par defaut n'ont pas change ;
-- les rapports exposent les tolerances appliquees et leurs raisons.
+- choisir le prochain lot Fusion ou revenir au coeur Python ;
+- confirmer explicitement le perimetre autorise avant toute nouvelle generation
+  Fusion ;
+- maintenir separees validation CAD, validation d'impression et exports.
 
-Objectif :
+Contexte :
 
-- ajouter des profils d'impression explicites qui se resolvent en
-  `ToleranceProfile` visible, sans cacher les valeurs finales.
+- `P4-M003` code une premiere generation minimale depuis `cad_ir_input.json` ;
+- l'add-in cree une esquisse de reference de boite et des blanks rectangulaires
+  dans le composant racine ;
+- le smoke test manuel confirme que l'add-in apparait, que le message final est
+  OK, que les modules/blanks sont visibles et que les dimensions mesurees sont
+  conformes a la fixture ;
+- la validation physique par impression 3D n'est pas realisee ;
+- `adsk` reste interdit dans `src/board_game_insert_generator`.
 
-Contraintes :
+Options possibles pour la suite, a valider explicitement :
 
-- ne pas modifier les valeurs par defaut sans gate humaine separee ;
-- ne pas presenter un profil comme valide physiquement ;
-- garder le coeur Python independant de Fusion 360 ;
-- ne pas lancer Fusion 360, STL ou 3MF.
+- Option 1 : ameliorer le chargement local de CAD IR et l'UX d'erreur de l'add-in.
+- Option 2 : etudier une sortie Assembly avec composants enfants, separee du mode
+  Part Design.
+- Option 3 : revenir au coeur Python pour cavites, modules composites ou qualite
+  de layout avant d'elargir Fusion.
 
-Validation attendue :
+Risques :
 
-- tests unitaires loader/validation/rapport ;
-- exemple CLI Markdown et JSON ;
-- documentation des profils et de leurs limites physiques.
+- confondre validation CAD visuelle et validation d'impression reelle ;
+- recreer trop tot des composants enfants Fusion sans cible Assembly claire ;
+- elargir vers cavites, fillets ou exports sans gate.
 
-## Missions a ne pas lancer tout de suite
+## Missions bloquees tant que la gate n'est pas validee
 
-- Modification des valeurs de tolerance par defaut sans gate humaine dediee.
-- Generation Fusion 360 de blanks tant que `P4-M000` n'a pas produit de rapport
-  de gate.
-- Cavites complexes tant que les parois minimales et clearances ne sont pas
-  formalisees.
-- Modules composites complets tant que `P6-M001` n'est pas cadree.
-- Assistant de conception tant que plusieurs strategies et profils ne sont pas
-  stabilises.
-- Packaging produit tant que des exemples imprimes reels ne sont pas
-  disponibles.
+- Toute suite Fusion apres `P4-M003`.
+- Premier export STL/3MF.
+- Cavites Fusion.
+- Fillets/conges Fusion.
+- Validation physique par impression reelle.
+- Modification des valeurs de tolerance par defaut.
+- Modules composites complets.
 
 ## Fin de chaque mission
 

@@ -1,0 +1,95 @@
+from __future__ import annotations
+
+import unittest
+
+from context import ROOT
+
+from board_game_insert_generator.cad_ir import (
+    CAD_IR_SCHEMA_VERSION,
+    CadIrError,
+    build_blank_cad_scene,
+)
+from board_game_insert_generator.config_loader import load_config
+from board_game_insert_generator.layout import generate_basic_layout
+from board_game_insert_generator.models import LayoutResult
+
+
+class CadIrTests(unittest.TestCase):
+    def test_blank_scene_exposes_reference_box_components_and_units(self) -> None:
+        config = load_config(ROOT / "examples" / "simple_box.json")
+        layout = generate_basic_layout(config)
+
+        scene = build_blank_cad_scene(config, layout)
+        payload = scene.to_dict()
+
+        self.assertEqual(payload["schema_version"], CAD_IR_SCHEMA_VERSION)
+        self.assertEqual(payload["units"], "mm")
+        self.assertEqual(payload["coordinate_system"], "right_handed_z_up_mm")
+        self.assertFalse(payload["box_reference"]["printable"])
+        self.assertEqual(payload["box_reference"]["size_mm"]["x"], 285.0)
+        self.assertEqual(len(payload["components"]), 4)
+        self.assertEqual(payload["components"][0]["id"], "component:cards-main-01")
+        self.assertEqual(payload["components"][0]["body"]["kind"], "rectangular_blank")
+        self.assertEqual(
+            payload["components"][0]["body"]["operations"][0]["kind"],
+            "create_rectangular_prism",
+        )
+        self.assertEqual(payload["metadata"]["layout_strategy"], "row_fill")
+        self.assertEqual(payload["metadata"]["print_profile"], "default")
+
+    def test_scene_keeps_theoretical_and_printable_dimensions_separate(self) -> None:
+        config = load_config(ROOT / "examples" / "simple_box.json")
+        layout = generate_basic_layout(config)
+
+        payload = build_blank_cad_scene(config, layout).to_dict()
+        first_body = payload["components"][0]["body"]
+
+        self.assertEqual(
+            first_body["theoretical_origin_mm"],
+            {"x": 0.0, "y": 0.0, "z": 0.0},
+        )
+        self.assertEqual(
+            first_body["theoretical_size_mm"],
+            {"x": 70.0, "y": 100.0, "z": 45.0},
+        )
+        self.assertEqual(
+            first_body["printable_origin_mm"],
+            {"x": 0.8, "y": 0.8, "z": 0.0},
+        )
+        self.assertEqual(
+            first_body["printable_size_mm"],
+            {"x": 68.9, "y": 99.2, "z": 44.0},
+        )
+
+    def test_scene_serializes_face_classifications_and_tolerance_rules(self) -> None:
+        config = load_config(ROOT / "examples" / "simple_box.json")
+        layout = generate_basic_layout(config)
+
+        first_body = build_blank_cad_scene(config, layout).to_dict()["components"][0]["body"]
+
+        self.assertEqual(first_body["face_classifications"][0]["face"], "x_min")
+        self.assertEqual(first_body["face_classifications"][0]["role"], "peripheral")
+        self.assertEqual(
+            first_body["face_classifications"][1]["neighbor_instance_id"],
+            "cards-main-02",
+        )
+        self.assertEqual(first_body["applied_tolerances"][0]["rule_id"], "peripheral_clearance")
+        self.assertEqual(first_body["applied_tolerances"][0]["offset_mm"], 0.8)
+        self.assertTrue(first_body["applied_tolerances"][0]["receives_clearance"])
+        self.assertEqual(
+            first_body["applied_tolerances"][3]["rule_id"],
+            "exposed_printer_compensation_only",
+        )
+        self.assertFalse(first_body["applied_tolerances"][3]["receives_clearance"])
+
+    def test_scene_rejects_inconsistent_layout_result(self) -> None:
+        config = load_config(ROOT / "examples" / "simple_box.json")
+        layout = generate_basic_layout(config)
+        inconsistent = LayoutResult(cells=layout.cells, printable_bodies=(), warnings=layout.warnings)
+
+        with self.assertRaisesRegex(CadIrError, "Missing printable bodies"):
+            build_blank_cad_scene(config, inconsistent)
+
+
+if __name__ == "__main__":
+    unittest.main()

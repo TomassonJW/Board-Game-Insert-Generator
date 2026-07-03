@@ -64,9 +64,42 @@ offset, source, regle et raison. Les valeurs de tolerance par defaut restent
 inchangees et les dimensions imprimables des exemples existants restent
 identiques.
 
+La mission `P3-M003` du 2026-07-03 ajoute des profils d'impression explicites et
+surchargeables dans le JSON V0. Le profil est resolu en `ToleranceProfile`, puis
+les champs `tolerances` surchargent les valeurs champ par champ. Les profils sont
+experimentaux et non valides physiquement.
+
+La mission `P3-M004` du 2026-07-03 ajoute un protocole de calibration physique.
+Ce protocole decrit coupons, mesures, contexte d'impression et criteres OK/KO,
+sans realiser ni revendiquer d'impression reelle.
+
+La mission `P4-M000` du 2026-07-03 prepare le rapport de gate Fusion 360. Le
+rapport recommande de commencer par un contrat CAD-agnostic (`P4-M001`) avant
+tout adaptateur Fusion executable. La gate humaine `Premiere integration Fusion
+360` est maintenant atteinte.
+
+La mission `P4-M001` du 2026-07-03 definit une representation intermediaire CAD
+abstraite et serialisable. La CAD IR V0 represente boite de reference,
+composants, corps rectangulaires, dimensions theoriques/imprimables,
+classifications de faces, tolerances appliquees, operations abstraites et
+metadata, sans import Fusion 360.
+
+La mission `P4-M002` du 2026-07-03 cree un squelette d'adaptateur Fusion 360
+isole dans `fusion_addin/BoardGameInsertGenerator`. Il contient un manifeste, un
+point d'entree `run(context)` / `stop(context)`, une detection Zero Doc et une
+planification CAD IR `planned_only`, sans creation de geometrie Fusion reelle.
+
+La mission `P4-M003` du 2026-07-03 code la premiere generation Fusion minimale
+depuis une CAD IR JSON locale. L'add-in cree une esquisse de reference de boite
+et des blanks rectangulaires par esquisse + extrusion dans le composant racine.
+Le manifeste d'add-in a ete corrige au format JSON attendu par Fusion et le
+chemin Part Design a ete adapte au composant racine. Le smoke test manuel a
+confirme que l'add-in apparait, que le message final est OK, que les modules
+sont visibles et que les dimensions mesurees correspondent a la CAD IR.
+
 ## Phase active
 
-Phase active : **Phase 3 - Tolerances intelligentes**.
+Phase active : **Phase 4 - Generation Fusion minimale validee manuellement, prochaine gate Fusion requise**.
 
 Etat : autonomie operatoire documentee, controle documentaire de base, contrat
 des modeles coeur, loader JSON strict, rapports enrichis et commande de
@@ -74,9 +107,13 @@ diagnostic sont en place. Le contrat de layout Phase 2 est maintenant explicite 
 `row_fill` et `grid` sont executables et couverts par tests, `columns` reste
 reserve. La comparaison simple des strategies existe dans les rapports. Les
 faces des corps rectangulaires simples sont classees explicitement et leurs
-regles de tolerance appliquees sont exposees dans les rapports. La prochaine
-etape recommandee est `P3-M003` pour ajouter des profils d'impression explicites,
-sans changer les valeurs par defaut sans gate humaine separee.
+regles de tolerance appliquees sont exposees dans les rapports. Les profils
+d'impression explicites sont resolus et visibles. La representation intermediaire
+CAD est definie et testee. L'adaptateur Fusion isole sait charger une CAD IR
+locale et coder une premiere generation de blanks rectangulaires dans le
+composant racine, sans recalculer
+layout ou tolerances. La prochaine etape recommandee est une decision humaine sur le prochain perimetre Fusion. Aucune suite Fusion ne doit commencer sans nouvelle
+validation humaine.
 
 ## Implemente
 
@@ -109,6 +146,16 @@ sans changer les valeurs par defaut sans gate humaine separee.
 - Resume comparatif de layout dans les rapports `P2-M004`.
 - Classification explicite des faces rectangulaires simples `P3-M001`.
 - Regles de tolerance appliquees par role de face `P3-M002`.
+- Profils d'impression explicites et surchargeables `P3-M003`.
+- Protocole de calibration physique `P3-M004`.
+- Rapport de gate Fusion 360 `P4-M000`.
+- Representation intermediaire CAD-agnostic `P4-M001`.
+- Squelette d'adaptateur Fusion 360 isole et non generateur `P4-M002`.
+- Chargement CAD IR et plan de generation Fusion minimale testes hors Fusion P4-M003.
+- Manifeste Fusion JSON verifie par test hors Fusion.
+- Chemin Fusion P4-M003 compatible documents Part Design via composant racine.
+- Smoke test CAD manuel P4-M003 valide dans Fusion : add-in visible, message OK,
+  modules visibles et dimensions conformes a la fixture.
 
 ## Experimental
 
@@ -119,16 +166,19 @@ sans changer les valeurs par defaut sans gate humaine separee.
   sont pas encore detectes automatiquement par des modules composites.
 - Les `PrimitiveVolume`, `CompositeModule`, `Cavity` et `Feature` existent comme
   concepts mais ne pilotent pas encore une generation complete.
-- Les tolerances par defaut sont prudentes mais non calibrees sur impression.
+- Les tolerances par defaut et les profils d'impression sont prudents mais non
+  calibres sur impression.
 - Les dataclasses restent volontairement legeres ; les erreurs metier sont
   agregees par `validation.py`.
+- Le squelette Fusion P4-M002 est testable hors Fusion.
+- La generation Fusion P4-M003 est validee manuellement dans Fusion pour le
+  chargement, le message final, l'apparition des modules et les dimensions de
+  la fixture. Elle ne valide pas l'impression reelle.
 
 ## Prevu
 
 - Strategie de layout `columns`.
-- Profils d'impression explicites.
-- Representation intermediaire CAD-agnostic.
-- Adaptateur Fusion 360.
+- Decision humaine sur le prochain perimetre Fusion apres P4-M003.
 - Cavites, receptacles, encoches, fonds arrondis.
 - Modules composites en L/T.
 - Couvercles, rainures et mecanismes.
@@ -161,16 +211,16 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant la mission `P3-M002` :
+Derniere verification pendant la mission `P4-M003` :
 
-- `python -m unittest discover -s tests` : OK, 42 tests passes.
-- `python -m board_game_insert_generator examples/simple_box.json --format markdown` :
-  OK, rapport Markdown genere avec tolerances appliquees.
-- `python -m board_game_insert_generator examples/simple_grid.json --format markdown` :
-  OK, rapport Markdown genere avec tolerances appliquees.
-- `python -m board_game_insert_generator examples/simple_box.json --format json` :
-  OK, rapport JSON genere avec tolerances appliquees.
+- `python -m unittest discover -s tests` : OK, 63 tests passes.
+- `python -m board_game_insert_generator examples/simple_box.json --format markdown` : OK.
+- `python -m board_game_insert_generator examples/simple_grid.json --format markdown` : OK.
+- `python -m board_game_insert_generator examples/simple_box.json --format json` : OK.
 - `git diff --check` : OK.
+- `rg -n "adsk" src/board_game_insert_generator` : OK, aucune occurrence.
+- Smoke test manuel Fusion P4-M003 : add-in visible, message OK, modules visibles
+  et dimensions conformes a la fixture.
 
 ## Risques actifs
 

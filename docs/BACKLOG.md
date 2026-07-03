@@ -257,7 +257,7 @@ commitee sans melanger plusieurs decisions structurantes.
   rapport montre les valeurs finales.
 - Tests ou verifications : tests loader, validation et rapport.
 - Dependances : P3-M002.
-- Statut : `ready`.
+- Statut : `done`.
 
 ### P3-M004 - Ajouter un protocole de calibration physique
 
@@ -270,7 +270,7 @@ commitee sans melanger plusieurs decisions structurantes.
   ajustements.
 - Tests ou verifications : relecture documentaire.
 - Dependances : P3-M003.
-- Statut : `todo`.
+- Statut : `done`.
 
 ## Phase 4 - Generation Fusion 360 de blanks
 
@@ -289,7 +289,7 @@ commitee sans melanger plusieurs decisions structurantes.
   formulee explicitement.
 - Tests ou verifications : suite unitaire du coeur, relecture documentaire.
 - Dependances : P1-M003, P2-M002, P3-M002.
-- Statut : `todo`.
+- Statut : `done`.
 
 ### P4-M001 - Definir le contrat de representation intermediaire CAD
 
@@ -302,33 +302,65 @@ commitee sans melanger plusieurs decisions structurantes.
   rectangulaires sont representables.
 - Tests ou verifications : tests serialization si code ajoute.
 - Dependances : P1-M003, P3-M001.
-- Statut : `todo`.
+- Gate humaine : validee explicitement pour `P4-M001` le 2026-07-03.
+- Statut : `done`.
 
 ### P4-M002 - Creer un squelette d'adaptateur Fusion 360
 
 - Phase liee : Phase 4 - Generation Fusion 360 de blanks
 - Objectif : isoler l'integration Fusion sans polluer le coeur Python.
 - Livrable attendu : repertoire d'adaptateur avec documentation d'installation.
-- Fichiers probablement concernes : `fusion/` ou `src/.../fusion_adapter/`,
-  `docs/FUSION_360_STRATEGY.md`.
+- Fichiers concernes : `fusion_addin/BoardGameInsertGenerator/`,
+  `docs/FUSION_360_STRATEGY.md`, `docs/CAD_IR_CONTRACT.md`, tests hors Fusion.
 - Criteres d'acceptation : le coeur Python reste importable sans Fusion ; le
-  squelette explique comment tester hors Fusion.
-- Tests ou verifications : suite coeur Python ; verification d'import.
+  squelette explique comment tester hors Fusion ; le cas Zero Doc est anticipe ;
+  aucune geometrie Fusion reelle n'est creee.
+- Tests ou verifications : suite coeur Python ; verification `adsk` hors coeur ;
+  tests du squelette hors Fusion.
 - Dependances : P4-M001.
-- Statut : `todo`.
+- Gate humaine : validee explicitement pour `P4-M002` le 2026-07-03, sans
+  generation de geometrie Fusion exploitable.
+- Statut : `done`.
 
 ### P4-M003 - Generer des blanks rectangulaires Fusion
 
 - Phase liee : Phase 4 - Generation Fusion 360 de blanks
-- Objectif : creer composants, corps rectangulaires, noms et rayons simples.
-- Livrable attendu : script ou add-in Fusion capable de generer les blanks V0.
-- Fichiers probablement concernes : adaptateur Fusion, exemples, docs.
-- Criteres d'acceptation : une config valide produit des composants inspectables
-  ; aucun layout n'est recalcule dans Fusion.
-- Tests ou verifications : test coeur Python et verification manuelle Fusion
-  documentee avec captures ou notes.
+- Objectif : creer une reference, des sketches et des corps rectangulaires nommes pour un smoke test Fusion minimal.
+- Livrable attendu : add-in Fusion capable de generer les blanks V0 depuis une
+  CAD IR JSON locale.
+- Fichiers concernes : `fusion_addin/BoardGameInsertGenerator/`,
+  `docs/FUSION_360_STRATEGY.md`, `docs/CAD_IR_CONTRACT.md`, tests hors Fusion.
+- Criteres d'acceptation : une CAD IR locale peut etre chargee ; l'add-in code
+  la creation d'une reference et de blanks rectangulaires ; aucun layout n'est
+  recalcule dans Fusion ; le cas Zero Doc reste gere explicitement ; aucun
+  export STL/3MF, aucune cavite, aucun couvercle et aucun fillet ne sont ajoutes.
+- Tests ou verifications : suite coeur Python ; tests hors Fusion du plan de
+  generation ; verification `adsk` hors coeur ; smoke test manuel Fusion a
+  realiser par Thomas.
 - Dependances : P4-M002.
-- Statut : `todo`.
+- Gate humaine : validee explicitement pour `P4-M003` le 2026-07-03, sans export
+  STL/3MF et sans validation physique.
+- Statut : `done` pour le code, les tests hors Fusion et le smoke test CAD
+  manuel dans Fusion ; dimensions conformes a la fixture ; impression reelle non
+  validee.
+
+### P4-M004 - Valider manuellement la generation Fusion minimale
+
+- Phase liee : Phase 4 - Generation Fusion 360 de blanks
+- Objectif : executer le smoke test P4-M003 dans Fusion 360 et documenter le
+  resultat observe.
+- Livrable attendu : log de validation manuelle avec sketches, bodies,
+  dimensions mesurees, ecarts et decision OK/KO.
+- Fichiers probablement concernes : `docs/LOGS/`, `docs/STATUS.md`,
+  `docs/NEXT_ACTIONS.md`, eventuellement `fusion_addin/README.md` si la procedure
+  doit etre corrigee.
+- Criteres d'acceptation : Thomas a lance l'add-in dans Fusion ; les sketches
+  et bodies sont visibles ; les dimensions mesurees sont conformes a la fixture ;
+  les limites restent distinctes de la validation d'impression reelle.
+- Tests ou verifications : smoke test manuel Fusion documente.
+- Dependances : P4-M003.
+- Gate humaine : satisfaite par validation humaine du 2026-07-03.
+- Statut : `done` par validation humaine du 2026-07-03.
 
 ## Phase 5 - Cavites et receptacles
 

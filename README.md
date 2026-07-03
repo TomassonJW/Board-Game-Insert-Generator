@@ -119,6 +119,8 @@ Fusion 360 sera ajoute comme adaptateur de sortie. Voir
 - [Modele geometrique](docs/GEOMETRY_MODEL.md)
 - [Modele de tolerance](docs/TOLERANCE_MODEL.md)
 - [Strategie Fusion 360](docs/FUSION_360_STRATEGY.md)
+- [Contrat CAD IR](docs/CAD_IR_CONTRACT.md)
+- [Rapport de gate Fusion 360](docs/FUSION_360_GATE_REPORT.md)
 - [Schema de configuration](docs/CONFIG_SCHEMA.md)
 - [Roadmap](docs/ROADMAP.md)
 - [Backlog](docs/BACKLOG.md)
@@ -126,6 +128,7 @@ Fusion 360 sera ajoute comme adaptateur de sortie. Voir
 - [Next actions](docs/NEXT_ACTIONS.md)
 - [Glossaire](docs/GLOSSARY.md)
 - [Regles qualite](docs/QUALITY_RULES.md)
+- [Protocole de calibration](docs/CALIBRATION_PROTOCOL.md)
 - [Decisions](docs/DECISIONS/README.md)
 - [Logs](docs/LOGS/README.md)
 

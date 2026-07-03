@@ -1,0 +1,94 @@
+{
+  "schema_version": "cad_ir.v0",
+  "units": "mm",
+  "coordinate_system": "right_handed_z_up_mm",
+  "frame": {
+    "origin_mm": {"x": 0.0, "y": 0.0, "z": 0.0},
+    "x_axis": "+x",
+    "y_axis": "+y",
+    "z_axis": "+z",
+    "handedness": "right"
+  },
+  "box_reference": {
+    "id": "box-reference",
+    "name": "BGIG box reference - not printable",
+    "origin_mm": {"x": 0.0, "y": 0.0, "z": 0.0},
+    "size_mm": {"x": 285.0, "y": 285.0, "z": 70.0},
+    "printable": false,
+    "role": "reference_box"
+  },
+  "parameters": [],
+  "components": [
+    {
+      "id": "component:cards-main-01",
+      "name": "cards-main-01 - Main cards",
+      "module_id": "cards-main",
+      "instance_id": "cards-main-01",
+      "functional_type": "sleeved_cards",
+      "body": {
+        "id": "cards-main-01-body",
+        "name": "cards-main-01 rectangular blank",
+        "kind": "rectangular_blank",
+        "source_cell_instance_id": "cards-main-01",
+        "theoretical_origin_mm": {"x": 0.0, "y": 0.0, "z": 0.0},
+        "theoretical_size_mm": {"x": 70.0, "y": 100.0, "z": 45.0},
+        "printable_origin_mm": {"x": 0.8, "y": 0.8, "z": 0.0},
+        "printable_size_mm": {"x": 68.9, "y": 99.2, "z": 44.0},
+        "face_classifications": [],
+        "applied_tolerances": [],
+        "operations": [
+          {
+            "id": "cards-main-01-body:create_rectangular_prism",
+            "kind": "create_rectangular_prism",
+            "target_id": "cards-main-01-body",
+            "parameters": {
+              "origin_source": "printable_origin_mm",
+              "size_source": "printable_size_mm",
+              "coordinate_frame": "scene.frame"
+            }
+          }
+        ]
+      },
+      "metadata": {"label": "Main cards", "source_index": 0, "rotated": false}
+    },
+    {
+      "id": "component:dice-01",
+      "name": "dice-01 - Dice tray",
+      "module_id": "dice",
+      "instance_id": "dice-01",
+      "functional_type": "dice",
+      "body": {
+        "id": "dice-01-body",
+        "name": "dice-01 rectangular blank",
+        "kind": "rectangular_blank",
+        "source_cell_instance_id": "dice-01",
+        "theoretical_origin_mm": {"x": 220.0, "y": 0.0, "z": 0.0},
+        "theoretical_size_mm": {"x": 60.0, "y": 60.0, "z": 30.0},
+        "printable_origin_mm": {"x": 220.3, "y": 0.8, "z": 0.0},
+        "printable_size_mm": {"x": 59.7, "y": 59.2, "z": 29.0},
+        "face_classifications": [],
+        "applied_tolerances": [],
+        "operations": [
+          {
+            "id": "dice-01-body:create_rectangular_prism",
+            "kind": "create_rectangular_prism",
+            "target_id": "dice-01-body",
+            "parameters": {
+              "origin_source": "printable_origin_mm",
+              "size_source": "printable_size_mm",
+              "coordinate_frame": "scene.frame"
+            }
+          }
+        ]
+      },
+      "metadata": {"label": "Dice tray", "source_index": 2, "rotated": false}
+    }
+  ],
+  "metadata": {
+    "project_name": "BGIG Fusion smoke fixture",
+    "source_path": "fusion_addin/BoardGameInsertGenerator/cad_ir_input.json",
+    "layout_strategy": "row_fill",
+    "print_profile": "default",
+    "warnings": ["Manual Fusion smoke fixture; not physically validated."]
+  }
+}
