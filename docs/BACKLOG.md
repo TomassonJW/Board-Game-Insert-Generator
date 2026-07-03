@@ -155,7 +155,7 @@ commitee sans melanger plusieurs decisions structurantes.
   documentation donne la commande et le resultat attendu.
 - Tests ou verifications : tests CLI et execution d'exemple.
 - Dependances : P1-M003.
-- Statut : `ready`.
+- Statut : `done`.
 
 ## Phase 2 - Layout rectangulaire simple
 
@@ -170,7 +170,7 @@ commitee sans melanger plusieurs decisions structurantes.
   est documentee ; aucun couplage Fusion n'est introduit.
 - Tests ou verifications : tests layout existants et nouveaux cas de non-regression.
 - Dependances : P1-M001.
-- Statut : `todo`.
+- Statut : `ready`.
 
 ### P2-M002 - Cover row_fill edge cases
 
