@@ -128,7 +128,7 @@ commitee sans melanger plusieurs decisions structurantes.
   ; les exemples existants passent.
 - Tests ou verifications : tests unitaires loader et CLI.
 - Dependances : P1-M001.
-- Statut : `ready`.
+- Statut : `done`.
 
 ### P1-M003 - Improve CLI reporting
 
@@ -143,7 +143,7 @@ commitee sans melanger plusieurs decisions structurantes.
   expose les valeurs importantes ; les exemples existants restent reproductibles.
 - Tests ou verifications : tests unitaires et execution d'exemple CLI.
 - Dependances : P1-M002.
-- Statut : `todo`.
+- Statut : `ready`.
 
 ### P1-M004 - Ajouter une commande CLI de diagnostic
 

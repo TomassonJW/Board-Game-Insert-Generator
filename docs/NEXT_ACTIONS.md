@@ -8,21 +8,23 @@ Codex doit choisir la premiere mission `ready` listee ici.
 
 ## Mission suivante recommandee
 
-### 1. P1-M002 - Harden config loading and validation
+### 1. P1-M003 - Improve CLI reporting
 
 Pourquoi maintenant :
 
-- `P1-M001` clarifie et teste le contrat des dataclasses coeur ;
-- la validation agregee reste le point de controle des erreurs actionnables ;
-- le loader JSON accepte encore peu de cas limites de facon explicite ;
-- la mission renforce le moteur pur sans toucher a Fusion 360.
+- `P1-M002` durcit le chargement JSON et les erreurs de type ;
+- la CLI peut maintenant mieux exposer les erreurs, warnings et valeurs utiles ;
+- les rapports doivent rester exploitables sans promettre de validite CAD ou
+  impression ;
+- la mission reste dans le moteur pur et ne touche pas Fusion 360.
 
 Livrable attendu :
 
-- loader JSON plus robuste ;
-- erreurs actionnables pour champs inconnus, types invalides et cas limites ;
-- tests unitaires dedies ;
-- exemple CLI existant toujours passant.
+- sortie Markdown/JSON plus utile pour diagnostiquer validation, layout et
+  tolerances ;
+- erreurs et warnings actionnables ;
+- tests unitaires de rapport ;
+- exemple CLI existant toujours reproductible.
 
 Verification minimale :
 
@@ -31,19 +33,18 @@ $env:PYTHONPATH = "src"
 python -m unittest discover -s tests
 ```
 
-## Missions suivantes si P1-M002 est terminee
+## Missions suivantes si P1-M003 est terminee
 
-### 2. P1-M003 - Improve CLI reporting
+### 2. P1-M004 - Ajouter une commande CLI de diagnostic
 
 Condition :
 
-- lancer seulement apres `P1-M002`.
+- lancer seulement apres `P1-M003`.
 
 Objectif :
 
-- rendre les rapports CLI plus utiles pour diagnostiquer validation, layout,
-  tolerances et warnings ;
-- exposer les valeurs importantes sans promettre de validite CAD ou impression.
+- fournir une boucle courte pour valider config, layout et rapport ;
+- documenter une commande de diagnostic lisible et ses codes de sortie.
 
 ### 3. P2-M001 - Formalize simple rectangular layout model
 

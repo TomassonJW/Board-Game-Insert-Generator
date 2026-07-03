@@ -26,14 +26,18 @@ La mission `P1-M001` du 2026-07-03 consolide le contrat des dataclasses coeur :
 les objets restent des value objects legers en millimetres, avec validation
 agregee dans `validation.py`.
 
+La mission `P1-M002` du 2026-07-03 durcit le loader JSON V0 : champs inconnus et
+types invalides sont refuses avec des erreurs `ConfigError` actionnables.
+
 ## Phase active
 
 Phase active : **Phase 1 - Moteur Python pur**.
 
 Etat : autonomie operatoire documentee, dry run de selection execute, controle
 documentaire de base implemente, format ADR stabilise et contrat des modeles
-coeur teste. La prochaine mission recommandee est `P1-M002 - Harden config
-loading and validation`, afin de durcir les erreurs de chargement et validation.
+coeur teste. Le chargement JSON est maintenant plus strict sur les champs et
+types. La prochaine mission recommandee est `P1-M003 - Improve CLI reporting`,
+afin de rendre les rapports et erreurs plus exploitables.
 
 ## Implemente
 
@@ -57,6 +61,7 @@ loading and validation`, afin de durcir les erreurs de chargement et validation.
 - Verification documentaire de base `P0-M002`.
 - Template ADR stabilise `P0-M005`.
 - Contrat des dataclasses coeur documente et teste `P1-M001`.
+- Chargement JSON strict sur champs inconnus et types invalides `P1-M002`.
 
 ## Experimental
 
@@ -106,9 +111,9 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant la mission `P1-M001` :
+Derniere verification pendant la mission `P1-M002` :
 
-- `python -m unittest discover -s tests` : OK, 14 tests passes.
+- `python -m unittest discover -s tests` : OK, 20 tests passes.
 - `python -m board_game_insert_generator examples/simple_box.json --format markdown` :
   OK, rapport Markdown genere.
 - `git diff --check` : OK.
