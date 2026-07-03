@@ -208,7 +208,7 @@ commitee sans melanger plusieurs decisions structurantes.
   score reste explicable.
 - Tests ou verifications : tests rapport et exemples.
 - Dependances : P2-M003.
-- Statut : `ready`.
+- Statut : `done`.
 
 ## Phase 3 - Tolerances intelligentes
 
@@ -224,7 +224,8 @@ commitee sans melanger plusieurs decisions structurantes.
   exposent les classifications.
 - Tests ou verifications : tests unitaires de voisinage et offsets.
 - Dependances : P2-M002.
-- Statut : `todo`.
+- Gate humaine : changement du modele de tolerance.
+- Statut : `blocked`.
 
 ### P3-M002 - Apply tolerance rules from face classification
 

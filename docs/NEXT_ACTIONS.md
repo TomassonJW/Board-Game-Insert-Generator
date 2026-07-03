@@ -8,37 +8,37 @@ Codex doit choisir la premiere mission `ready` listee ici.
 
 ## Mission suivante recommandee
 
-### 1. P2-M004 - Exporter un resume de layout comparatif
+### 1. Gate tolerance - decision avant P3-M001
 
 Pourquoi maintenant :
 
 - `P2-M001` a formalise le contrat de layout rectangulaire simple ;
 - `P2-M002` couvre maintenant les cas limites `row_fill` essentiels ;
 - `P2-M003` ajoute une strategie `grid` executable et testee ;
-- il existe maintenant au moins deux strategies simples a comparer.
+- `P2-M004` ajoute une comparaison simple entre `row_fill` et `grid` ;
+- la prochaine carte technique, `P3-M001`, touche au modele de tolerance et aux
+  roles de faces.
 
-Livrable attendu :
+Decision humaine attendue :
 
-- resume comparatif listant strategie, occupation, warnings et score basique ;
-- comparaison au moins entre `row_fill` et `grid` ;
-- score lisible et non presente comme optimisation globale ;
-- tests rapport/exemples.
+- autoriser ou reporter le demarrage de `P3-M001 - Classify exposed, internal and
+  functional faces` ;
+- confirmer que la strategie de classification de faces peut etre preparee dans
+  le coeur Python pur, sans modifier les valeurs de tolerance par defaut ;
+- confirmer que toute modification des valeurs par defaut restera hors scope sans
+  nouvelle validation.
 
-Verification minimale :
+Validation attendue :
 
-```powershell
-$env:PYTHONPATH = "src"
-python -m unittest discover -s tests
-```
+- validation humaine explicite de la gate `Changement du modele de tolerance`.
 
-## Missions suivantes si P2-M004 est terminee
+## Missions suivantes si la gate est validee
 
 ### 2. P3-M001 - Classify exposed, internal and functional faces
 
 Condition :
 
-- necessite une revue rapide de gate tolerance avant execution, car la mission
-  touche au modele d'offsets et de faces.
+- lancer seulement apres validation humaine explicite.
 
 Objectif :
 
@@ -46,7 +46,7 @@ Objectif :
 
 ## Missions a ne pas lancer tout de suite
 
-- `P3-M001` sans revue de gate tolerance.
+- `P3-M001` sans validation humaine de la gate tolerance.
 - Generation Fusion 360 de blanks tant que le contrat intermediaire n'est pas
   stabilise et que `P4-M000` n'a pas produit de rapport de gate.
 - Cavites complexes tant que les parois minimales et clearances ne sont pas

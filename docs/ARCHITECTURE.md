@@ -125,6 +125,7 @@ Etat actuel :
 - dataclasses Python ;
 - rapport JSON ;
 - rapport Markdown ;
+- comparaison simple de strategies de layout dans les rapports ;
 - concepts de primitives, cavites et features deja nommes.
 
 Etat cible :

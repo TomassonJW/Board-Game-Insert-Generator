@@ -72,8 +72,9 @@ python -m board_game_insert_generator examples/simple_grid.json --format markdow
 
 Les rapports exposent un resume de diagnostic : strategie de layout, nombre de
 modules demandes, instances generees, corps imprimables, rotations, empreinte du
-layout, tolerances principales et warnings. Ces informations restent une
-validation abstraite du moteur, pas une validation Fusion 360 ou impression 3D.
+layout, comparaison simple `row_fill` / `grid`, tolerances principales et
+warnings. Ces informations restent une validation abstraite du moteur, pas une
+validation Fusion 360 ou impression 3D.
 
 Pour lancer un diagnostic court sans choisir un format de rapport :
 

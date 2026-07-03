@@ -49,6 +49,10 @@ La mission `P2-M003` du 2026-07-03 ajoute la strategie `grid` : cellules XY
 regulieres, placement ligne/colonne deterministe, refus des grilles trop
 profondes et exemple `examples/simple_grid.json`.
 
+La mission `P2-M004` du 2026-07-03 ajoute un resume comparatif dans les rapports
+Markdown/JSON : strategies, statut, empreinte, occupation XY, warnings et score
+simple explicable.
+
 ## Phase active
 
 Phase active : **Phase 2 - Layout rectangulaire simple**.
@@ -57,8 +61,9 @@ Etat : autonomie operatoire documentee, controle documentaire de base, contrat
 des modeles coeur, loader JSON strict, rapports enrichis et commande de
 diagnostic sont en place. Le contrat de layout Phase 2 est maintenant explicite :
 `row_fill` et `grid` sont executables et couverts par tests, `columns` reste
-reserve. La prochaine mission recommandee est `P2-M004 - Exporter un resume de
-layout comparatif`.
+reserve. La comparaison simple des strategies existe dans les rapports. La
+prochaine etape est une gate humaine avant `P3-M001`, car la classification des
+faces touche au modele de tolerance.
 
 ## Implemente
 
@@ -88,6 +93,7 @@ layout comparatif`.
 - Contrat de strategies layout formalise `P2-M001`.
 - Cas limites `row_fill` couverts par tests `P2-M002`.
 - Strategie de layout `grid` implementee et documentee `P2-M003`.
+- Resume comparatif de layout dans les rapports `P2-M004`.
 
 ## Experimental
 
@@ -103,7 +109,8 @@ layout comparatif`.
 
 ## Prevu
 
-- Strategie de layout `columns` et comparaison de variantes.
+- Strategie de layout `columns`.
+- Classification explicite des faces apres gate tolerance.
 - Profils d'impression explicites.
 - Representation intermediaire CAD-agnostic.
 - Adaptateur Fusion 360.
@@ -139,13 +146,15 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant la mission `P2-M003` :
+Derniere verification pendant la mission `P2-M004` :
 
 - `python -m unittest discover -s tests` : OK, 34 tests passes.
 - `python -m board_game_insert_generator examples/simple_box.json --format markdown` :
   OK, rapport Markdown genere.
 - `python -m board_game_insert_generator examples/simple_grid.json --format markdown` :
   OK, rapport Markdown genere.
+- `python -m board_game_insert_generator examples/simple_box.json --format json` :
+  OK, rapport JSON genere.
 - `git diff --check` : OK.
 
 ## Risques actifs
