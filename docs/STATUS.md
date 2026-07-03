@@ -15,14 +15,18 @@ La mission d'autonomie operatoire du 2026-07-03 ajoute une couche de controle
 plus stricte : protocole d'autonomie, boucle d'execution, gates humaines, matrice
 de validation, roles logiques, plan de sprint et runbook humain.
 
+La mission `P0-M002` du 2026-07-03 ajoute une verification documentaire de base
+dans la suite unitaire afin de detecter les fichiers de pilotage critiques
+manquants et les sections minimales absentes.
+
 ## Phase active
 
 Phase active : **Phase 0 - Fondation projet**.
 
-Etat : autonomie operatoire documentee et dry run de selection execute. La
-prochaine mission recommandee est `P0-M002 - Ajouter une verification
-documentaire de base`, afin de securiser les fichiers critiques du plan de
-controle.
+Etat : autonomie operatoire documentee, dry run de selection execute et controle
+documentaire de base implemente. La prochaine mission recommandee est
+`P0-M005 - Stabiliser le format des ADR`, afin de rendre les prochaines
+decisions structurantes plus homogenes.
 
 ## Implemente
 
@@ -43,6 +47,7 @@ controle.
 - Plan de sprint 2 a 4 semaines.
 - Runbook humain de supervision.
 - Dry run de selection autonome `P0-M004`.
+- Verification documentaire de base `P0-M002`.
 
 ## Experimental
 
@@ -90,9 +95,9 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant la mission de dry run d'autonomie :
+Derniere verification pendant la mission `P0-M002` :
 
-- `python -m unittest discover -s tests` : OK, 7 tests passes.
+- `python -m unittest discover -s tests` : OK, 9 tests passes.
 - `python -m board_game_insert_generator examples/simple_box.json --format markdown` :
   OK, rapport Markdown genere.
 - `git diff --check` : OK.
