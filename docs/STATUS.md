@@ -19,14 +19,17 @@ La mission `P0-M002` du 2026-07-03 ajoute une verification documentaire de base
 dans la suite unitaire afin de detecter les fichiers de pilotage critiques
 manquants et les sections minimales absentes.
 
+La mission `P0-M005` du 2026-07-03 stabilise le format des ADR avec un template
+dedie et un index de decisions plus prescriptif.
+
 ## Phase active
 
 Phase active : **Phase 0 - Fondation projet**.
 
-Etat : autonomie operatoire documentee, dry run de selection execute et controle
-documentaire de base implemente. La prochaine mission recommandee est
-`P0-M005 - Stabiliser le format des ADR`, afin de rendre les prochaines
-decisions structurantes plus homogenes.
+Etat : autonomie operatoire documentee, dry run de selection execute, controle
+documentaire de base implemente et format ADR stabilise. La prochaine mission
+recommandee est `P1-M001 - Consolidate core data models`, afin de reprendre le
+developpement produit sur le moteur Python pur.
 
 ## Implemente
 
@@ -48,6 +51,7 @@ decisions structurantes plus homogenes.
 - Runbook humain de supervision.
 - Dry run de selection autonome `P0-M004`.
 - Verification documentaire de base `P0-M002`.
+- Template ADR stabilise `P0-M005`.
 
 ## Experimental
 
@@ -95,11 +99,11 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant la mission `P0-M002` :
+Derniere verification pendant la mission `P0-M005` :
 
 - `python -m unittest discover -s tests` : OK, 9 tests passes.
 - `python -m board_game_insert_generator examples/simple_box.json --format markdown` :
-  OK, rapport Markdown genere.
+  non relance, CLI non modifiee pendant cette mission.
 - `git diff --check` : OK.
 
 ## Risques actifs

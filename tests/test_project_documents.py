@@ -17,6 +17,7 @@ REQUIRED_PROJECT_FILES = (
     "docs/ROADMAP.md",
     "docs/ARCHITECTURE.md",
     "docs/QUALITY_RULES.md",
+    "docs/DECISIONS/ADR-TEMPLATE.md",
     "docs/DECISIONS/README.md",
     "docs/LOGS/README.md",
 )
@@ -71,8 +72,18 @@ REQUIRED_SECTIONS = {
         "## Garde-fous documentaires automatises",
     ),
     "docs/DECISIONS/README.md": (
-        "## Format recommande",
+        "## Template ADR",
+        "## Format minimal",
         "## ADR existantes",
+    ),
+    "docs/DECISIONS/ADR-TEMPLATE.md": (
+        "## Statut",
+        "## Contexte",
+        "## Options",
+        "## Decision",
+        "## Consequences",
+        "## Alternatives refusees",
+        "## Suivi",
     ),
     "docs/LOGS/README.md": (
         "## Format recommande",

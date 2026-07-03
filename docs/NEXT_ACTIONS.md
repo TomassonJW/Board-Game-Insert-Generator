@@ -8,43 +8,34 @@ Codex doit choisir la premiere mission `ready` listee ici.
 
 ## Mission suivante recommandee
 
-### 1. P0-M005 - Stabiliser le format des ADR
+### 1. P1-M001 - Consolidate core data models
 
 Pourquoi maintenant :
 
-- `P0-M002` ajoute maintenant un controle documentaire automatise ;
-- les prochaines decisions structurantes auront besoin d'un format ADR stable ;
-- la mission est documentaire, petite et sans gate humaine si elle ne change pas
-  une decision acceptee ;
-- elle renforce la qualite du plan de controle avant les travaux Phase 1.
+- `P0-M005` stabilise maintenant le format des ADR ;
+- la Phase 0 dispose des garde-fous suffisants pour reprendre le developpement
+  produit ;
+- les dataclasses actuelles contiennent deja des concepts futurs qu'il faut
+  clarifier avant de durcir le chargement et la validation ;
+- la mission est la premiere carte produit `ready` et ne lance pas Fusion 360.
 
 Livrable attendu :
 
-- template ADR confirme ou complete ;
-- index `docs/DECISIONS/README.md` mis a jour si necessaire ;
-- criteres minimaux clairs pour contexte, options, decision, consequences et
-  alternatives refusees.
+- invariants explicites pour `BoxSpec`, `ModuleRequest`, `ToleranceProfile`,
+  `Cell` et `PrintableBody` ;
+- tests de creation valides et invalides ;
+- documentation de modele alignee avec les concepts reellement implementes.
 
 Verification minimale :
 
-Relecture documentaire et `git diff --check`.
+```powershell
+$env:PYTHONPATH = "src"
+python -m unittest discover -s tests
+```
 
-## Missions suivantes si P0-M005 est terminee
+## Missions suivantes si P1-M001 est terminee
 
-### 2. P1-M001 - Consolidate core data models
-
-Objectif :
-
-- verifier que les dataclasses actuelles couvrent bien le contrat Phase 1 ;
-- ajouter ou documenter les invariants non evidents ;
-- eviter de coder des concepts futurs seulement decoratifs.
-
-Point d'attention :
-
-- ne pas introduire de validation dans tous les constructeurs sans arbitrage ;
-- si le contrat de modele change fortement, creer une ADR.
-
-### 3. P1-M002 - Harden config loading and validation
+### 2. P1-M002 - Harden config loading and validation
 
 Condition :
 
@@ -55,7 +46,7 @@ Objectif :
 - rendre le chargement et la validation plus precis ;
 - couvrir champs inconnus, types invalides et cas limites.
 
-### 4. P2-M001 - Formalize simple rectangular layout model
+### 3. P2-M001 - Formalize simple rectangular layout model
 
 Condition :
 

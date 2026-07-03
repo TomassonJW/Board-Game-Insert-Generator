@@ -84,7 +84,7 @@ commitee sans melanger plusieurs decisions structurantes.
   consequences et alternatives refusees.
 - Tests ou verifications : relecture documentaire.
 - Dependances : P0-M001.
-- Statut : `ready`.
+- Statut : `done`.
 
 ### P0-M006 - Definir une nomenclature de versions et releases
 
