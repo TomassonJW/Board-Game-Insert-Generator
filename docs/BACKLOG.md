@@ -170,7 +170,7 @@ commitee sans melanger plusieurs decisions structurantes.
   est documentee ; aucun couplage Fusion n'est introduit.
 - Tests ou verifications : tests layout existants et nouveaux cas de non-regression.
 - Dependances : P1-M001.
-- Statut : `ready`.
+- Statut : `done`.
 
 ### P2-M002 - Cover row_fill edge cases
 
@@ -182,7 +182,7 @@ commitee sans melanger plusieurs decisions structurantes.
   priorites sont stables ; les rotations autorisees sont testees.
 - Tests ou verifications : suite unitaire complete.
 - Dependances : P2-M001.
-- Statut : `todo`.
+- Statut : `done`.
 
 ### P2-M003 - Ajouter une strategie grille explicite
 
@@ -195,7 +195,7 @@ commitee sans melanger plusieurs decisions structurantes.
   cellules sont reproductibles ; un exemple montre l'usage.
 - Tests ou verifications : tests unitaires et rapport exemple.
 - Dependances : P2-M001.
-- Statut : `todo`.
+- Statut : `done`.
 
 ### P2-M004 - Exporter un resume de layout comparatif
 
@@ -208,7 +208,7 @@ commitee sans melanger plusieurs decisions structurantes.
   score reste explicable.
 - Tests ou verifications : tests rapport et exemples.
 - Dependances : P2-M003.
-- Statut : `todo`.
+- Statut : `done`.
 
 ## Phase 3 - Tolerances intelligentes
 
@@ -224,7 +224,8 @@ commitee sans melanger plusieurs decisions structurantes.
   exposent les classifications.
 - Tests ou verifications : tests unitaires de voisinage et offsets.
 - Dependances : P2-M002.
-- Statut : `todo`.
+- Gate humaine : changement du modele de tolerance.
+- Statut : `blocked`.
 
 ### P3-M002 - Apply tolerance rules from face classification
 

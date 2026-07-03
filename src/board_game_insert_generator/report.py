@@ -1,10 +1,19 @@
 from __future__ import annotations
 
 import json
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from typing import Any
 
-from board_game_insert_generator.models import Dimension3D, InsertConfig, LayoutResult, Point3D
+from board_game_insert_generator.layout import LayoutError, generate_basic_layout
+from board_game_insert_generator.models import (
+    IMPLEMENTED_LAYOUT_STRATEGIES,
+    Dimension3D,
+    InsertConfig,
+    LayoutResult,
+    Point3D,
+)
+from board_game_insert_generator.tolerance import ToleranceError
+from board_game_insert_generator.validation import ValidationError
 
 
 def layout_to_dict(config: InsertConfig, result: LayoutResult) -> dict[str, Any]:
@@ -31,6 +40,7 @@ def layout_to_dict(config: InsertConfig, result: LayoutResult) -> dict[str, Any]
             "warning_count": len(result.warnings),
             "warnings": list(result.warnings),
         },
+        "layout_comparison": _layout_comparison(config, result),
         "module_requests": [
             {
                 "id": module.id,
@@ -94,6 +104,17 @@ def layout_to_markdown(config: InsertConfig, result: LayoutResult) -> str:
         f"- Rotated cells: {sum(1 for cell in result.cells if cell.rotated)}",
         f"- Layout footprint: {_format_dim(_layout_footprint(result))}",
         f"- Max printable height: {_max_printable_height(result):.2f} mm",
+        "",
+        "## Layout comparison",
+        "",
+        (
+            "Simple score: higher means a smaller XY footprint inside the box and fewer "
+            "warnings. It is not a global optimization proof."
+        ),
+        "",
+        "| Strategy | Status | Footprint | Occupation | Warnings | Simple score |",
+        "| --- | --- | ---: | ---: | ---: | ---: |",
+        *_format_comparison_rows(_layout_comparison(config, result)),
         "",
         "## Tolerance profile",
         "",
@@ -191,3 +212,75 @@ def _max_printable_height(result: LayoutResult) -> float:
     if not result.printable_bodies:
         return 0.0
     return max(body.size.z for body in result.printable_bodies)
+
+
+def _layout_comparison(config: InsertConfig, current_result: LayoutResult) -> list[dict[str, Any]]:
+    comparison: list[dict[str, Any]] = []
+    for strategy in IMPLEMENTED_LAYOUT_STRATEGIES:
+        if strategy == config.layout.strategy:
+            result = current_result
+        else:
+            candidate = replace(config, layout=replace(config.layout, strategy=strategy))
+            try:
+                result = generate_basic_layout(candidate)
+            except (LayoutError, ToleranceError, ValidationError) as exc:
+                comparison.append(
+                    {
+                        "strategy": strategy,
+                        "status": "error",
+                        "error": str(exc),
+                        "score": 0.0,
+                    }
+                )
+                continue
+
+        footprint = _layout_footprint(result)
+        occupation_percent = _occupation_percent(config, footprint)
+        comparison.append(
+            {
+                "strategy": strategy,
+                "status": "ok",
+                "cell_count": len(result.cells),
+                "rotated_cell_count": sum(1 for cell in result.cells if cell.rotated),
+                "footprint_mm": _dim(footprint),
+                "occupation_percent": occupation_percent,
+                "warning_count": len(result.warnings),
+                "warnings": list(result.warnings),
+                "score": _simple_layout_score(occupation_percent, len(result.warnings)),
+            }
+        )
+    return comparison
+
+
+def _format_comparison_rows(comparison: list[dict[str, Any]]) -> list[str]:
+    rows: list[str] = []
+    for entry in comparison:
+        if entry["status"] != "ok":
+            rows.append(f"| `{entry['strategy']}` | error | n/a | n/a | n/a | 0.00 |")
+            continue
+
+        footprint = entry["footprint_mm"]
+        footprint_text = (
+            f"{footprint['x']:.2f} x {footprint['y']:.2f} x {footprint['z']:.2f} mm"
+        )
+        rows.append(
+            "| "
+            f"`{entry['strategy']}` | "
+            f"{entry['status']} | "
+            f"{footprint_text} | "
+            f"{entry['occupation_percent']:.2f}% | "
+            f"{entry['warning_count']} | "
+            f"{entry['score']:.2f} |"
+        )
+    return rows
+
+
+def _occupation_percent(config: InsertConfig, footprint: Dimension3D) -> float:
+    box_area = config.box.inner_dimensions.x * config.box.inner_dimensions.y
+    if box_area <= 0:
+        return 0.0
+    return _clean_float((footprint.x * footprint.y / box_area) * 100.0)
+
+
+def _simple_layout_score(occupation_percent: float, warning_count: int) -> float:
+    return _clean_float(max(0.0, 100.0 - occupation_percent - warning_count * 5.0))

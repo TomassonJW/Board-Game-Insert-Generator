@@ -94,7 +94,8 @@ Ces champs ne pilotent pas encore une geometrie creuse en V0, mais ils fixent le
 
 Champs reconnus :
 
-- `strategy` : `row_fill` en V0.
+- `strategy` : `row_fill` ou `grid` en V0. L'identifiant `columns` est reserve
+  dans le contrat interne, mais encore refuse par la validation.
 - `allow_global_rotation` : reserve pour evolution future.
 
 ## `modules`

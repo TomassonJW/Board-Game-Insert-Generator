@@ -75,6 +75,37 @@ Une cellule sert a raisonner sur l'organisation. Elle n'est pas directement le
 corps imprime. Deux cellules peuvent se toucher sans que les corps imprimables se
 touchent, car les jeux sont appliques ensuite.
 
+### Contrat de layout rectangulaire simple
+
+Le layout Phase 2 manipule des rectangles theoriques dans le plan XY. Il ne
+calcule pas de tolerance, ne choisit pas de cavite et ne produit pas de corps
+CAD.
+
+Strategies implementees :
+
+- `row_fill` trie les modules par priorite descendante, puis par ordre de
+  declaration ;
+- chaque quantite de module devient une instance separee ;
+- le placement remplit une ligne sur X, puis commence une nouvelle ligne sur Y ;
+- la profondeur d'une ligne est la plus grande dimension Y des cellules de cette
+  ligne ;
+- la rotation est decidee module par module selon `allow_rotation` et seulement
+  pour faire tenir la cellule dans la ligne ou dans la boite.
+- `grid` trie les modules avec la meme regle, calcule une cellule reguliere XY
+  depuis la plus grande empreinte de module orientee, puis place les instances
+  ligne par ligne ;
+- `grid` garde une hauteur Z par module, meme si la reservation XY est reguliere
+  pour toutes les cellules ;
+- `grid` refuse la configuration si le nombre de cellules regulieres depasse la
+  profondeur disponible de la boite.
+
+Identifiant reserve :
+
+- `columns` : colonnes explicites futures pour regroupements par type ou usage.
+
+Cet identifiant reserve est connu du contrat interne, mais il reste refuse par la
+validation tant qu'une mission dediee ne l'implemente pas.
+
 ### PrimitiveVolume
 
 Volume rectangulaire de base. Il est utile pour representer une partie simple

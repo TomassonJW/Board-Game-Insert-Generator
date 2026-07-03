@@ -8,47 +8,45 @@ Codex doit choisir la premiere mission `ready` listee ici.
 
 ## Mission suivante recommandee
 
-### 1. P2-M001 - Formalize simple rectangular layout model
+### 1. Gate tolerance - decision avant P3-M001
 
 Pourquoi maintenant :
 
-- `P1-M004` ajoute maintenant une boucle CLI courte de diagnostic ;
-- le coeur Python pur dispose d'un loader strict, de modeles testes et de
-  rapports exploitables ;
-- `row_fill` existe mais son contrat d'extension reste implicite ;
-- la mission ne touche pas Fusion 360 et prepare les futurs cas limites layout.
+- `P2-M001` a formalise le contrat de layout rectangulaire simple ;
+- `P2-M002` couvre maintenant les cas limites `row_fill` essentiels ;
+- `P2-M003` ajoute une strategie `grid` executable et testee ;
+- `P2-M004` ajoute une comparaison simple entre `row_fill` et `grid` ;
+- la prochaine carte technique, `P3-M001`, touche au modele de tolerance et aux
+  roles de faces.
 
-Livrable attendu :
+Decision humaine attendue :
 
-- contrat interne documente pour `row_fill`, grille future et colonnes ;
-- tests de non-regression layout si necessaire ;
-- aucun recalcul de tolerance dans le layout ;
-- aucun couplage Fusion 360.
+- autoriser ou reporter le demarrage de `P3-M001 - Classify exposed, internal and
+  functional faces` ;
+- confirmer que la strategie de classification de faces peut etre preparee dans
+  le coeur Python pur, sans modifier les valeurs de tolerance par defaut ;
+- confirmer que toute modification des valeurs par defaut restera hors scope sans
+  nouvelle validation.
 
-Verification minimale :
+Validation attendue :
 
-```powershell
-$env:PYTHONPATH = "src"
-python -m unittest discover -s tests
-```
+- validation humaine explicite de la gate `Changement du modele de tolerance`.
 
-## Missions suivantes si P2-M001 est terminee
+## Missions suivantes si la gate est validee
 
-### 2. P2-M002 - Cover row_fill edge cases
+### 2. P3-M001 - Classify exposed, internal and functional faces
 
 Condition :
 
-- lancer seulement apres `P2-M001`.
+- lancer seulement apres validation humaine explicite.
 
 Objectif :
 
-- tester rotation, retour a la ligne, depassement et priorites ;
-- rendre les erreurs de placement previsibles.
+- separer faces exposees, voisines, internes, libres et fonctionnelles.
 
 ## Missions a ne pas lancer tout de suite
 
-- `P2-M002` tant que `P2-M001` n'est pas terminee.
-- `P3-M001` tant que `P2-M002` n'est pas terminee.
+- `P3-M001` sans validation humaine de la gate tolerance.
 - Generation Fusion 360 de blanks tant que le contrat intermediaire n'est pas
   stabilise et que `P4-M000` n'a pas produit de rapport de gate.
 - Cavites complexes tant que les parois minimales et clearances ne sont pas

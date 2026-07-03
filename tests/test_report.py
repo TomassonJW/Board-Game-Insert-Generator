@@ -21,6 +21,10 @@ class ReportTests(unittest.TestCase):
         self.assertIn("- Layout strategy: `row_fill`", report)
         self.assertIn("- Requested modules: 3", report)
         self.assertIn("- Generated instances: 4", report)
+        self.assertIn("## Layout comparison", report)
+        self.assertIn("| `row_fill` | ok |", report)
+        self.assertIn("| `grid` | ok |", report)
+        self.assertIn("Simple score: higher means", report)
         self.assertIn("## Tolerance profile", report)
         self.assertIn("| Module gap | 0.60 mm |", report)
 
@@ -34,6 +38,13 @@ class ReportTests(unittest.TestCase):
         self.assertEqual(report["summary"]["requested_module_count"], 3)
         self.assertEqual(report["summary"]["expanded_instance_count"], 4)
         self.assertEqual(report["summary"]["warning_count"], 2)
+        self.assertEqual(
+            [entry["strategy"] for entry in report["layout_comparison"]],
+            ["row_fill", "grid"],
+        )
+        self.assertEqual(report["layout_comparison"][0]["status"], "ok")
+        self.assertIn("occupation_percent", report["layout_comparison"][0])
+        self.assertIn("score", report["layout_comparison"][0])
         self.assertEqual(len(report["module_requests"]), 3)
         self.assertEqual(report["module_requests"][0]["id"], "cards-main")
 

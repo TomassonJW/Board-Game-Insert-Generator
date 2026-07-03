@@ -22,6 +22,14 @@ class FunctionalType(str, Enum):
     OTHER = "other"
 
 
+LAYOUT_STRATEGY_ROW_FILL = "row_fill"
+LAYOUT_STRATEGY_GRID = "grid"
+LAYOUT_STRATEGY_COLUMNS = "columns"
+
+IMPLEMENTED_LAYOUT_STRATEGIES = (LAYOUT_STRATEGY_ROW_FILL, LAYOUT_STRATEGY_GRID)
+RESERVED_LAYOUT_STRATEGIES = (LAYOUT_STRATEGY_COLUMNS,)
+
+
 @dataclass(frozen=True)
 class Dimension3D:
     x: float
@@ -71,7 +79,7 @@ class GeometryDefaults:
 
 @dataclass(frozen=True)
 class LayoutSettings:
-    strategy: str = "row_fill"
+    strategy: str = LAYOUT_STRATEGY_ROW_FILL
     allow_global_rotation: bool = False
 
 

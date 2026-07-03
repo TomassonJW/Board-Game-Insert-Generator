@@ -8,6 +8,8 @@
 - Le JSON n'est pas le modele interne.
 - Les tolerances ne sont pas codees en dur dans le layout.
 - Les cellules theoriques ne sont pas des corps imprimables.
+- Une strategie de layout reservee ne doit pas etre acceptee tant qu'elle n'est
+  pas implementee et testee.
 - Les modules composites ne recoivent pas de jeu entre primitives internes
   soudees.
 - Les valeurs de tolerance doivent rester visibles et ajustables.
