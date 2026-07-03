@@ -6,6 +6,31 @@ Le format V0 est JSON pour rester local, lisible et simple a valider.
 
 Toutes les dimensions sont en millimetres. Le champ `units` doit valoir `mm`.
 
+## Validation stricte
+
+Le loader V0 refuse les champs inconnus aux niveaux suivants :
+
+- racine du document ;
+- `box` ;
+- `box.inner_dimensions_mm` ;
+- `tolerances` ;
+- `defaults` ;
+- `layout` ;
+- chaque entree de `modules` ;
+- chaque `modules[].min_dimensions_mm`.
+
+Les types sont egalement verifies au chargement :
+
+- les dimensions, tolerances et valeurs de defaults doivent etre numeriques ;
+- `priority` et `quantity` doivent etre des entiers JSON ;
+- `allow_rotation` et `layout.allow_global_rotation` doivent etre booleens ;
+- `project_name`, `id`, `name` et `comment` doivent etre des chaines si fournis.
+
+Les contraintes metier agregees, comme dimensions positives, hauteur utile,
+quantites strictement positives et ids dupliques, restent validees par
+`validation.py` afin de retourner plusieurs issues actionnables quand c'est
+possible.
+
 ## Structure generale
 
 ```json
