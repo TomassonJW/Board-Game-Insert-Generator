@@ -34,6 +34,38 @@ class ConfigLoaderTests(unittest.TestCase):
         self.assertEqual(cavity.size.x, 62.0)
         self.assertEqual(cavity.clearance_mm, 0.6)
 
+
+    def test_card_cavities_default_clearance_from_profile(self) -> None:
+        config = load_config(ROOT / "examples" / "simple_card_tray.json")
+
+        standard_cavity = config.modules[0].cavities[0]
+        sleeved_cavity = config.modules[1].cavities[0]
+
+        self.assertEqual(standard_cavity.functional_type, FunctionalType.CARDS)
+        self.assertEqual(standard_cavity.clearance_mm, 0.45)
+        self.assertEqual(standard_cavity.clearance_source, "tolerances.card_clearance_mm")
+        self.assertEqual(sleeved_cavity.functional_type, FunctionalType.SLEEVED_CARDS)
+        self.assertEqual(sleeved_cavity.clearance_mm, 0.95)
+        self.assertEqual(sleeved_cavity.clearance_source, "tolerances.sleeved_card_clearance_mm")
+
+    def test_rejects_missing_generic_cavity_clearance(self) -> None:
+        payload = _simple_payload()
+        payload["modules"][0]["functional_type"] = "tokens"
+        payload["modules"][0]["cavities"] = [
+            {
+                "id": "missing-clearance",
+                "functional_type": "tokens",
+                "origin_mm": {"x": 2, "y": 2, "z": 1.2},
+                "size_mm": {"x": 10, "y": 10, "z": 5},
+            }
+        ]
+
+        with self.assertRaisesRegex(
+            ConfigError,
+            r"Missing required field 'modules\[0\]\.cavities\[0\]\.clearance_mm'",
+        ):
+            _load_payload(payload)
+
     def test_rejects_unknown_cavity_field(self) -> None:
         payload = _simple_payload()
         payload["modules"][0]["cavities"] = [

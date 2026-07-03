@@ -108,6 +108,7 @@ class Cavity:
     origin: Point3D
     size: Dimension3D
     clearance_mm: float
+    clearance_source: str = "explicit"
     comment: str = ""
 
 

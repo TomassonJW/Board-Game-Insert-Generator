@@ -146,17 +146,20 @@ Champs reconnus :
 - `origin_mm.x`, `origin_mm.y`, `origin_mm.z` : origine locale de la cavite dans
   le module ;
 - `size_mm.x`, `size_mm.y`, `size_mm.z` : dimensions internes de la cavite ;
-- `clearance_mm` : jeu fonctionnel explicite associe a la cavite ;
+- `clearance_mm` : jeu fonctionnel associe a la cavite. Obligatoire pour les cavites generiques ; optionnel pour `cards` et `sleeved_cards`, ou il est resolu depuis `card_clearance_mm` ou `sleeved_card_clearance_mm` ;
 - `comment` : note humaine optionnelle.
 
-Validation P5-M001 :
+Validation P5-M001/P5-M002 :
 
 - dimensions de cavite strictement positives ;
 - origine et clearance non negatives ;
+- les cavites `cards` et `sleeved_cards` doivent respecter au minimum le jeu du profil actif ;
+- les rapports et la CAD IR exposent `clearance_source` (`explicit`, `tolerances.card_clearance_mm` ou `tolerances.sleeved_card_clearance_mm`) ;
 - la cavite doit rester dans les dimensions externes du module ;
 - les parois X/Y doivent conserver `defaults.wall_thickness_mm` ;
 - le fond doit conserver `defaults.floor_thickness_mm` ;
 - la cavite reste abstraite et non validee par impression.
+
 ## Exemple minimal
 
 ```json

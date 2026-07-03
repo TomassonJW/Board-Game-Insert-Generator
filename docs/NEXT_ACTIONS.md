@@ -28,6 +28,7 @@ Perimetre autorise :
 - modele de cavite simple ;
 - configuration JSON ;
 - validation des dimensions, parois et fond ;
+- specialisation de clearances pour `cards` et `sleeved_cards` ;
 - rapports Markdown/JSON ;
 - CAD IR avec operations abstraites de cavite ;
 - export CAD IR compatible avec l'add-in existant.
@@ -45,27 +46,30 @@ Perimetre toujours bloque sans nouvelle gate :
 Appliquer la politique active `direct-to-main` : tests complets, commit propre,
 integration directe dans `main`, push vers `origin/main`, puis reprise depuis
 `origin/main` si aucune vraie gate humaine n'est atteinte.
+
 ## Mission ready
 
-### P5-M002 - Ajouter logements de cartes et cartes sleevees
+### P5-M003 - Ajouter bacs a tokens, des et meeples
 
 Statut : `ready`.
 
-Objectif : specialiser les cavites simples pour les decks `cards` et
-`sleeved_cards`, en conservant le moteur Python pur et la CAD IR abstraite.
+Objectif : specialiser les cavites simples pour les receptacles ouverts de
+`tokens`, `dice` et `meeples`, en conservant le moteur Python pur et la CAD IR
+abstraite.
 
 Livrable attendu :
 
-- regles de dimensions/clearances pour cartes et cartes sleevees ;
-- tests de validation ;
+- regles de clearances fonctionnelles pour tokens, des et meeples ;
+- validation des parois/fonds deja existante conservee ;
 - exemple ou extension d'exemple ;
 - rapports et CAD IR enrichis si necessaire ;
 - aucune generation Fusion reelle.
 
-Dependances : `P5-M001` done.
+Dependances : `P5-M002` done.
 
-Verifications minimales : suite unitaire, exemples `simple_box` et
-`simple_tray`, export CAD IR, `git diff --check`, absence de `adsk` dans le coeur.
+Verifications minimales : suite unitaire, exemples `simple_box`, `simple_tray` et
+`simple_card_tray`, export CAD IR, `git diff --check`, absence de `adsk` dans le
+coeur.
 
 ## Gate obligatoire suivante
 

@@ -68,7 +68,7 @@ def load_config(path: str | Path) -> InsertConfig:
     tolerances = _parse_tolerances(raw.get("tolerances", {}), print_profile)
     defaults = _parse_float_dataclass(GeometryDefaults, raw.get("defaults", {}), "defaults")
     layout = _parse_layout(raw.get("layout", {}))
-    modules = tuple(_parse_modules(raw.get("modules", [])))
+    modules = tuple(_parse_modules(raw.get("modules", []), tolerances))
 
     return InsertConfig(
         project_name=_optional_string(
@@ -101,7 +101,7 @@ def _parse_box(raw: dict[str, Any]) -> BoxSpec:
     )
 
 
-def _parse_modules(raw_modules: Any) -> list[ModuleRequest]:
+def _parse_modules(raw_modules: Any, tolerances: ToleranceProfile) -> list[ModuleRequest]:
     if not isinstance(raw_modules, list):
         raise ConfigError("'modules' must be a list.")
 
@@ -119,7 +119,7 @@ def _parse_modules(raw_modules: Any) -> list[ModuleRequest]:
             default_z=height,
         )
         functional_type = _parse_functional_type(raw.get("functional_type", "other"), index)
-        cavities = tuple(_parse_cavities(raw.get("cavities", []), module_field, functional_type))
+        cavities = tuple(_parse_cavities(raw.get("cavities", []), module_field, functional_type, tolerances))
         module_id = _optional_string(raw, "id", module_field, default=f"module-{index + 1}")
         module_name = _optional_string(
             raw,
@@ -152,6 +152,7 @@ def _parse_cavities(
     raw_cavities: Any,
     module_field: str,
     module_functional_type: FunctionalType,
+    tolerances: ToleranceProfile,
 ) -> list[Cavity]:
     if raw_cavities is None:
         return []
@@ -169,6 +170,12 @@ def _parse_cavities(
             cavity_field,
         )
         cavity_id = _optional_string(raw, "id", cavity_field, default=f"cavity-{index + 1}")
+        clearance_mm, clearance_source = _parse_cavity_clearance(
+            raw,
+            cavity_field,
+            functional_type,
+            tolerances,
+        )
         cavities.append(
             Cavity(
                 id=cavity_id,
@@ -181,12 +188,27 @@ def _parse_cavities(
                     _required_mapping(raw, "size_mm", f"{cavity_field}.size_mm"),
                     field_name=f"{cavity_field}.size_mm",
                 ),
-                clearance_mm=_float(raw, "clearance_mm", f"{cavity_field}.clearance_mm"),
+                clearance_mm=clearance_mm,
+                clearance_source=clearance_source,
                 comment=_optional_string(raw, "comment", cavity_field, default=""),
             )
         )
     return cavities
 
+
+def _parse_cavity_clearance(
+    raw: dict[str, Any],
+    cavity_field: str,
+    functional_type: FunctionalType,
+    tolerances: ToleranceProfile,
+) -> tuple[float, str]:
+    if "clearance_mm" in raw:
+        return _number_value(raw["clearance_mm"], f"{cavity_field}.clearance_mm"), "explicit"
+    if functional_type == FunctionalType.CARDS:
+        return tolerances.card_clearance_mm, "tolerances.card_clearance_mm"
+    if functional_type == FunctionalType.SLEEVED_CARDS:
+        return tolerances.sleeved_card_clearance_mm, "tolerances.sleeved_card_clearance_mm"
+    raise ConfigError(f"Missing required field '{cavity_field}.clearance_mm'.")
 
 def _parse_functional_type_value(value: Any, field_path: str) -> FunctionalType:
     try:

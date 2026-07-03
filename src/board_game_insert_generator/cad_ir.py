@@ -151,6 +151,7 @@ class CadCavity:
     local_origin: Point3D
     size: Dimension3D
     clearance_mm: float
+    clearance_source: str
     comment: str
     status: str = "abstract_only"
     fusion_generation: str = "not_implemented"
@@ -162,6 +163,7 @@ class CadCavity:
             "local_origin_mm": _point_to_dict(self.local_origin),
             "size_mm": _dimension_to_dict(self.size),
             "clearance_mm": self.clearance_mm,
+            "clearance_source": self.clearance_source,
             "comment": self.comment,
             "status": self.status,
             "fusion_generation": self.fusion_generation,
@@ -372,6 +374,7 @@ def _cad_cavities(cavities: tuple[Cavity, ...]) -> tuple[CadCavity, ...]:
             local_origin=cavity.origin,
             size=cavity.size,
             clearance_mm=cavity.clearance_mm,
+            clearance_source=cavity.clearance_source,
             comment=cavity.comment,
         )
         for cavity in cavities
@@ -390,6 +393,7 @@ def _cavity_operations(body_id: str, cavities: tuple[Cavity, ...]) -> tuple[CadO
                 "local_origin_mm": _point_to_dict(cavity.origin),
                 "size_mm": _dimension_to_dict(cavity.size),
                 "clearance_mm": cavity.clearance_mm,
+                "clearance_source": cavity.clearance_source,
                 "coordinate_frame": "body.local",
                 "execution_status": "abstract_only",
                 "fusion_generation": "not_implemented",

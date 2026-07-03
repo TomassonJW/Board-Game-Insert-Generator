@@ -102,8 +102,10 @@ Pour chaque blank rectangulaire, l'operation principale est :
   rectangulaire depuis une origine locale et une taille deja validees par le
   moteur.
 
-Les cavites sont aussi exposees dans `body.cavities` avec `status: abstract_only`
-et `fusion_generation: not_implemented`.
+Les cavites sont aussi exposees dans `body.cavities` avec `status: abstract_only`,
+`fusion_generation: not_implemented` et `clearance_source`. Pour les cavites
+`cards` et `sleeved_cards`, `clearance_source` indique si le jeu vient de
+`tolerances.card_clearance_mm` ou `tolerances.sleeved_card_clearance_mm`.
 
 Ces operations sont des intentions CAD-agnostic. Elles ne sont pas des appels
 Fusion et ne garantissent pas encore une sortie CAD concrete sans validation

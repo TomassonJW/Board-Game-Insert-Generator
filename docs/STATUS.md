@@ -125,16 +125,23 @@ parois X/Y et le fond, exposees dans les rapports Markdown/JSON et transportees
 dans la CAD IR par l'operation abstraite `subtract_rectangular_cavity`. Fusion ne
 les coupe pas encore.
 
+La mission `P5-M002` du 2026-07-04 specialise les logements de cartes et cartes
+sleevees : les cavites `cards` et `sleeved_cards` peuvent omettre `clearance_mm`,
+qui est alors resolu depuis `card_clearance_mm` ou `sleeved_card_clearance_mm` du
+profil actif. Une valeur explicite inferieure au profil actif est refusee et la
+source de clearance est exposee dans les rapports et la CAD IR.
+
 ## Phase active
 
 Phase active : **Phase 5 - Cavites simples abstraites cote moteur et CAD IR**.
 
 Etat : le pipeline P4 reste stable pour les blanks rectangulaires Fusion. La
 vague P5 est ouverte uniquement cote moteur Python pur, configuration, rapports
-et CAD IR. Les cavites simples sont maintenant des intentions abstraites
-validables et exportables ; elles ne sont pas encore generees dans Fusion. La
-prochaine mission recommandee est `P5-M002 - Ajouter logements de cartes et
-cartes sleevees`, sans operation Fusion soustractive.
+et CAD IR. Les cavites simples, incluant les logements `cards` et
+`sleeved_cards`, sont des intentions abstraites validables et exportables ; elles
+ne sont pas encore generees dans Fusion. La prochaine mission recommandee est
+`P5-M003 - Ajouter bacs a tokens, des et meeples`, sans operation Fusion
+soustractive.
 
 ## Implemente
 
@@ -182,6 +189,8 @@ cartes sleevees`, sans operation Fusion soustractive.
   actionnables dans Fusion.
 - Cavites rectangulaires simples abstraites dans la configuration, la validation,
   les rapports Markdown/JSON et la CAD IR `subtract_rectangular_cavity`.
+- Clearances de logements `cards` et `sleeved_cards` resolues depuis le profil
+  actif et tracables via `clearance_source`.
 - Smoke test CAD manuel P4-M003 valide dans Fusion : add-in visible, message OK,
   modules visibles et dimensions conformes a la fixture.
 
@@ -194,8 +203,8 @@ cartes sleevees`, sans operation Fusion soustractive.
   sont pas encore detectes automatiquement par des modules composites.
 - Les `PrimitiveVolume`, `CompositeModule` et `Feature` existent comme concepts
   mais ne pilotent pas encore une generation complete.
-- Les cavites P5-M001 sont abstraites : elles ne sont pas encore coupees dans
-  Fusion et ne sont pas validees par impression.
+- Les cavites P5-M001/P5-M002 sont abstraites : elles ne sont pas encore coupees
+  dans Fusion et ne sont pas validees par impression.
 - Les tolerances par defaut et les profils d'impression sont prudents mais non
   calibres sur impression.
 - Les dataclasses restent volontairement legeres ; les erreurs metier sont
@@ -211,8 +220,7 @@ cartes sleevees`, sans operation Fusion soustractive.
 
 - Strategie de layout `columns`.
 - Decision humaine sur le prochain perimetre Fusion apres stabilisation P4-M004/P4-M006.
-- Logements cartes/cartes sleevees specialises, bacs tokens/des/meeples et
-  ergonomie de cavites.
+- Bacs tokens/des/meeples specialises et ergonomie de cavites.
 - Modules composites en L/T.
 - Couvercles, rainures et mecanismes.
 - Surcouche esthetique.
@@ -244,15 +252,18 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant `P5-M001 - Cavites rectangulaires simples abstraites` :
+Derniere verification pendant `P5-M002 - Logements cards et sleeved_cards` :
 
-- `python -m unittest discover -s tests` : OK, 79 tests passes.
+- `python -m unittest discover -s tests` : OK, 83 tests passes.
 - `python -m board_game_insert_generator examples\simple_box.json --format markdown` : OK.
 - `python -m board_game_insert_generator examples\simple_box.json --format json` : OK.
 - `python -m board_game_insert_generator export-cad-ir examples\simple_box.json --output "$env:TEMP\bgig-cad-ir-input.json"` : OK, schema `cad_ir.v0`, 4 composants.
 - `python -m board_game_insert_generator examples\simple_tray.json --format markdown` : OK, 1 cavite planifiee `abstract_only`.
 - `python -m board_game_insert_generator examples\simple_tray.json --format json` : OK, `planned_cavity_count = 1`.
 - `python -m board_game_insert_generator export-cad-ir examples\simple_tray.json --output "$env:TEMP\bgig-simple-tray-cad-ir.json"` : OK, schema `cad_ir.v0`, 1 composant.
+- `python -m board_game_insert_generator examples\simple_card_tray.json --format markdown` : OK, clearances `cards` et `sleeved_cards` resolues depuis le profil.
+- `python -m board_game_insert_generator examples\simple_card_tray.json --format json` : OK, `clearance_source` expose.
+- `python -m board_game_insert_generator export-cad-ir examples\simple_card_tray.json --output "$env:TEMP\bgig-simple-card-tray-cad-ir.json"` : OK, schema `cad_ir.v0`, 2 composants.
 - `git diff --check` : OK.
 - `rg -n "adsk" src/board_game_insert_generator` : OK, aucune occurrence dans le coeur Python.
 

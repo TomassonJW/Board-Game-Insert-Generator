@@ -135,6 +135,28 @@ class ModelContractTests(unittest.TestCase):
         self.assertIn(("modules[0].cavities[0]", "CAVITY_WALL_TOO_THIN"), keys)
         self.assertIn(("modules[0].cavities[0]", "CAVITY_FLOOR_TOO_THIN"), keys)
 
+
+    def test_card_cavity_clearance_must_meet_active_profile_minimum(self) -> None:
+        cavity = Cavity(
+            id="tight-card-pocket",
+            functional_type=FunctionalType.CARDS,
+            origin=Point3D(x=2.0, y=2.0, z=1.2),
+            size=Dimension3D(x=60.0, y=88.0, z=20.0),
+            clearance_mm=0.1,
+        )
+        module = _module(cavities=(cavity,))
+        config = _config(
+            modules=(module,),
+            tolerances=ToleranceProfile(card_clearance_mm=0.5),
+        )
+
+        issues = validate_config(config)
+
+        self.assertIn(
+            ("modules[0].cavities[0].clearance_mm", "CARD_CAVITY_CLEARANCE_TOO_LOW"),
+            _issue_keys(issues),
+        )
+
     def test_cell_and_printable_body_remain_distinct_contract_objects(self) -> None:
         result = generate_basic_layout(_config())
 

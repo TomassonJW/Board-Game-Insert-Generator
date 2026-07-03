@@ -468,7 +468,7 @@ commitee sans melanger plusieurs decisions structurantes.
 - Tests ou verifications : tests unitaires et exemple de config.
 - Dependances : P5-M001.
 - Gate humaine : vague P5 moteur/CAD IR validee le 2026-07-04 ; generation Fusion reelle exclue.
-- Statut : `ready`.
+- Statut : `done`.
 
 ### P5-M003 - Ajouter bacs a tokens, des et meeples
 
@@ -481,7 +481,7 @@ commitee sans melanger plusieurs decisions structurantes.
   les formes irregulieres.
 - Tests ou verifications : tests et rapport exemple.
 - Dependances : P5-M001.
-- Statut : `todo`.
+- Statut : `ready`.
 
 ### P5-M004 - Ajouter encoches de doigts et fonds arrondis
 

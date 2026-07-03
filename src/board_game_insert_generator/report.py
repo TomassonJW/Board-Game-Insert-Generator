@@ -210,8 +210,8 @@ def layout_to_markdown(config: InsertConfig, result: LayoutResult) -> str:
     if planned_cavity_count:
         lines.extend(
             [
-                "| Instance | Cavity | Type | Local origin | Size | Clearance | Status |",
-                "| --- | --- | --- | ---: | ---: | ---: | --- |",
+                "| Instance | Cavity | Type | Local origin | Size | Clearance | Source | Status |",
+                "| --- | --- | --- | ---: | ---: | ---: | --- | --- |",
                 *_format_cavity_rows(planned_cavities),
             ]
         )
@@ -272,6 +272,7 @@ def _cavity_to_dict(cavity: Cavity) -> dict[str, Any]:
         "local_origin_mm": _point(cavity.origin),
         "size_mm": _dim(cavity.size),
         "clearance_mm": _clean_float(cavity.clearance_mm),
+        "clearance_source": cavity.clearance_source,
         "comment": cavity.comment,
         "status": "abstract_only",
     }
@@ -321,6 +322,7 @@ def _format_cavity_rows(planned_cavities: dict[str, tuple[Cavity, ...]]) -> list
                 f"{_format_point(cavity.origin)} | "
                 f"{_format_dim(cavity.size)} | "
                 f"{cavity.clearance_mm:.2f} mm | "
+                f"{cavity.clearance_source} | "
                 "abstract_only |"
             )
     return rows

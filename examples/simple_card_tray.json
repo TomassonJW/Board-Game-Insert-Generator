@@ -1,0 +1,62 @@
+{
+  "project_name": "Simple card tray with profile clearances V0",
+  "units": "mm",
+  "box": {
+    "inner_dimensions_mm": { "x": 160, "y": 110, "z": 45 },
+    "usable_height_mm": 32,
+    "lid_clearance_mm": 5
+  },
+  "print_profile": "default",
+  "tolerances": {
+    "card_clearance_mm": 0.45,
+    "sleeved_card_clearance_mm": 0.95
+  },
+  "defaults": {
+    "wall_thickness_mm": 1.2,
+    "floor_thickness_mm": 1.2,
+    "corner_radius_mm": 1.5
+  },
+  "layout": {
+    "strategy": "row_fill"
+  },
+  "modules": [
+    {
+      "id": "standard-card-tray",
+      "name": "Standard card pocket",
+      "functional_type": "cards",
+      "min_dimensions_mm": { "x": 70, "y": 96 },
+      "height_mm": 24,
+      "priority": 100,
+      "allow_rotation": false,
+      "quantity": 1,
+      "comment": "Card pocket clearance resolved from card_clearance_mm.",
+      "cavities": [
+        {
+          "id": "standard-card-pocket",
+          "origin_mm": { "x": 2, "y": 2, "z": 1.2 },
+          "size_mm": { "x": 66, "y": 92, "z": 20 },
+          "comment": "Abstract card pocket; Fusion cutting is gated later."
+        }
+      ]
+    },
+    {
+      "id": "sleeved-card-tray",
+      "name": "Sleeved card pocket",
+      "functional_type": "sleeved_cards",
+      "min_dimensions_mm": { "x": 76, "y": 104 },
+      "height_mm": 26,
+      "priority": 90,
+      "allow_rotation": false,
+      "quantity": 1,
+      "comment": "Sleeved card pocket clearance resolved from sleeved_card_clearance_mm.",
+      "cavities": [
+        {
+          "id": "sleeved-card-pocket",
+          "origin_mm": { "x": 2, "y": 2, "z": 1.2 },
+          "size_mm": { "x": 72, "y": 100, "z": 22 },
+          "comment": "Abstract sleeved card pocket; Fusion cutting is gated later."
+        }
+      ]
+    }
+  ]
+}

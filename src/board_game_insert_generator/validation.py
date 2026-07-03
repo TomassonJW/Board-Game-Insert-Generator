@@ -5,9 +5,11 @@ from dataclasses import asdict, dataclass
 from board_game_insert_generator.models import (
     Cavity,
     Dimension3D,
+    FunctionalType,
     IMPLEMENTED_LAYOUT_STRATEGIES,
     RESERVED_LAYOUT_STRATEGIES,
     InsertConfig,
+    ToleranceProfile,
 )
 
 
@@ -112,6 +114,7 @@ def validate_config(config: InsertConfig) -> list[ValidationIssue]:
             prefix,
             module.min_dimensions,
             module.desired_height_mm,
+            config.tolerances,
             config.defaults.wall_thickness_mm,
             config.defaults.floor_thickness_mm,
             issues,
@@ -144,6 +147,7 @@ def _validate_module_cavities(
     module_field: str,
     module_size: Dimension3D,
     module_height_mm: float,
+    tolerances: ToleranceProfile,
     wall_thickness_mm: float,
     floor_thickness_mm: float,
     issues: list[ValidationIssue],
@@ -162,6 +166,18 @@ def _validate_module_cavities(
         _validate_non_negative_number(cavity.origin.z, f"{prefix}.origin_mm.z", issues)
         _validate_positive_dimensions(cavity.size, f"{prefix}.size_mm", issues)
         _validate_non_negative_number(cavity.clearance_mm, f"{prefix}.clearance_mm", issues)
+        minimum_clearance = _minimum_card_cavity_clearance(cavity, tolerances)
+        if minimum_clearance is not None and cavity.clearance_mm < minimum_clearance:
+            issues.append(
+                _issue(
+                    f"{prefix}.clearance_mm",
+                    "CARD_CAVITY_CLEARANCE_TOO_LOW",
+                    (
+                        "Card cavity clearance must be at least the active profile value "
+                        f"({minimum_clearance:.2f} mm)."
+                    ),
+                )
+            )
 
         right_wall = module_size.x - (cavity.origin.x + cavity.size.x)
         back_wall = module_size.y - (cavity.origin.y + cavity.size.y)
@@ -199,6 +215,18 @@ def _validate_module_cavities(
                     ),
                 )
             )
+
+
+def _minimum_card_cavity_clearance(
+    cavity: Cavity,
+    tolerances: ToleranceProfile,
+) -> float | None:
+    if cavity.functional_type == FunctionalType.CARDS:
+        return tolerances.card_clearance_mm
+    if cavity.functional_type == FunctionalType.SLEEVED_CARDS:
+        return tolerances.sleeved_card_clearance_mm
+    return None
+
 
 def _validate_positive_dimensions(
     dimensions: Dimension3D,

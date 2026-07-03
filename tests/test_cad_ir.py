@@ -98,6 +98,22 @@ class CadIrTests(unittest.TestCase):
         self.assertEqual(cavity_operation["parameters"]["coordinate_frame"], "body.local")
         self.assertEqual(cavity_operation["parameters"]["fusion_generation"], "not_implemented")
 
+
+    def test_scene_serializes_card_cavity_profile_clearance_sources(self) -> None:
+        config = load_config(ROOT / "examples" / "simple_card_tray.json")
+        layout = generate_basic_layout(config)
+
+        payload = build_blank_cad_scene(config, layout).to_dict()
+        first_cavity = payload["components"][0]["body"]["cavities"][0]
+        second_cavity = payload["components"][1]["body"]["cavities"][0]
+
+        self.assertEqual(first_cavity["functional_type"], "cards")
+        self.assertEqual(first_cavity["clearance_mm"], 0.45)
+        self.assertEqual(first_cavity["clearance_source"], "tolerances.card_clearance_mm")
+        self.assertEqual(second_cavity["functional_type"], "sleeved_cards")
+        self.assertEqual(second_cavity["clearance_mm"], 0.95)
+        self.assertEqual(second_cavity["clearance_source"], "tolerances.sleeved_card_clearance_mm")
+
     def test_scene_rejects_inconsistent_layout_result(self) -> None:
         config = load_config(ROOT / "examples" / "simple_box.json")
         layout = generate_basic_layout(config)

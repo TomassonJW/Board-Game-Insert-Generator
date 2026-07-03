@@ -53,6 +53,7 @@ class ReportTests(unittest.TestCase):
         self.assertEqual(body_cavity["functional_type"], "tokens")
         self.assertEqual(body_cavity["local_origin_mm"], {"x": 4.0, "y": 4.0, "z": 1.2})
         self.assertEqual(body_cavity["status"], "abstract_only")
+        self.assertEqual(body_cavity["clearance_source"], "explicit")
 
     def test_json_report_exposes_diagnostic_fields(self) -> None:
         config = load_config(ROOT / "examples" / "simple_box.json")
