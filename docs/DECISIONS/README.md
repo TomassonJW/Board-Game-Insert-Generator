@@ -13,7 +13,26 @@ Une ADR est obligatoire pour toute decision structurante, notamment :
 - ajout de dependance majeure ;
 - changement d'API publique, CLI ou format de fichier.
 
-## Format recommande
+## Template ADR
+
+Utiliser `ADR-TEMPLATE.md` pour toute nouvelle ADR. Le template impose au
+minimum :
+
+- statut ;
+- date ;
+- carte liee ;
+- contexte ;
+- options comparees ;
+- decision ;
+- consequences positives, negatives et risques ;
+- alternatives refusees ;
+- suivi.
+
+Les options doivent etre comparees selon la simplicite, l'evolutivite, le cout
+de maintenance, la securite, la performance si pertinente, le risque de dette
+technique, la compatibilite MVP et la facilite de test.
+
+## Format minimal
 
 ```markdown
 # ADR-000X - Titre court
@@ -21,6 +40,14 @@ Une ADR est obligatoire pour toute decision structurante, notamment :
 ## Statut
 
 Propose | Accepte | Remplace | Deprecie
+
+## Date
+
+YYYY-MM-DD
+
+## Carte liee
+
+- `PX-MYYY - Titre de la mission`
 
 ## Contexte
 
@@ -43,6 +70,10 @@ Effets positifs, negatifs et risques.
 ## Alternatives refusees
 
 Pourquoi les autres options ne sont pas retenues maintenant.
+
+## Suivi
+
+Tests, cartes backlog ou gates humaines a preparer.
 ```
 
 ## ADR existantes
@@ -60,3 +91,5 @@ Pourquoi les autres options ne sont pas retenues maintenant.
 - Cree une nouvelle ADR qui remplace l'ancienne si la decision evolue.
 - Mets a jour cet index a chaque nouvelle ADR.
 - Lie la carte backlog concernee quand c'est utile.
+- Ne cree pas d'ADR pour une micro-implementation reversible sans decision
+  structurante ; documente plutot dans le log de mission.
