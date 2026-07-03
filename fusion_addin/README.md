@@ -8,9 +8,11 @@ Il est volontairement separe du coeur Python `src/board_game_insert_generator`.
 Le coeur reste testable sans Fusion 360 et ne doit pas importer `adsk`.
 
 Depuis `P4-M003`, l'add-in contient une premiere generation minimale de blocs
-rectangulaires depuis une CAD IR JSON locale. Cette generation est codee, mais
-reste en statut `manual validation required` tant qu'elle n'a pas ete lancee et
-inspectee dans Fusion 360 par Thomas.
+rectangulaires depuis une CAD IR JSON locale. La fixture P4-M003 a ete lancee,
+inspectee et mesuree dans Fusion 360. Depuis `P4-M004`, le chargement du fichier
+CAD IR est stabilise : l'add-in peut consommer `cad_ir_input.json` dans son
+dossier ou un chemin declare dans `cad_ir_path.txt`. Toute nouvelle CAD IR
+exportee doit encore etre inspectee dans Fusion avant d'etre consideree validee.
 
 Ce que l'add-in cree maintenant :
 
@@ -40,6 +42,8 @@ Ce que l'add-in ne cree pas :
   generation.
 - `BoardGameInsertGenerator/cad_ir_input.json` : fixture CAD IR locale chargee
   par defaut par l'add-in.
+- `BoardGameInsertGenerator/cad_ir_path.txt` : fichier optionnel ignore par Git,
+  permettant de pointer vers une CAD IR JSON exportee ailleurs.
 
 ## Installation locale
 
@@ -50,6 +54,7 @@ BoardGameInsertGenerator/
   BoardGameInsertGenerator.py
   BoardGameInsertGenerator.manifest
   cad_ir_input.json
+  cad_ir_path.txt  # optionnel, local
   fusion_skeleton.py
 ```
 
@@ -84,10 +89,25 @@ lancer l'add-in.
 
 ## CAD IR locale
 
-L'add-in charge le fichier suivant dans son propre dossier :
+Par defaut, l'add-in charge le fichier suivant dans son propre dossier :
 
 ```text
 BoardGameInsertGenerator/cad_ir_input.json
+```
+
+Il peut aussi charger un fichier exporte ailleurs si un fichier optionnel existe
+au meme niveau :
+
+```text
+BoardGameInsertGenerator/cad_ir_path.txt
+```
+
+Dans `cad_ir_path.txt`, la premiere ligne non vide et non commentee doit etre un
+chemin vers le JSON CAD IR. Le chemin peut etre absolu, ou relatif au dossier de
+l'add-in. Exemple :
+
+```text
+C:\Users\janko\AppData\Local\Temp\bgig-cad-ir-input.json
 ```
 
 La fixture fournie contient :
@@ -106,9 +126,12 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator export-cad-ir examples/simple_box.json --output fusion_addin/BoardGameInsertGenerator/cad_ir_input.json
 ```
 
-Pour une installation locale Fusion, copier ensuite le fichier genere dans le
-dossier `BoardGameInsertGenerator` installe, ou utiliser directement ce chemin
-d'installation comme cible de `--output`.
+Pour une installation locale Fusion, utiliser l'une des deux methodes :
+
+1. Copier ensuite le fichier genere dans le dossier `BoardGameInsertGenerator`
+   installe sous le nom `cad_ir_input.json`.
+2. Laisser le fichier genere ailleurs et ecrire son chemin dans
+   `cad_ir_path.txt`, place dans le dossier `BoardGameInsertGenerator` installe.
 
 ## Cas Zero Doc
 
@@ -128,7 +151,7 @@ Procedure :
 2. Ouvrir Fusion 360.
 3. Creer un nouveau design vide ou ouvrir un design de test.
 4. Verifier que `cad_ir_input.json` est present dans le dossier AddIns installe,
-   ou le regenerer avec la commande `export-cad-ir` documentee plus haut.
+   ou que `cad_ir_path.txt` pointe vers un JSON CAD IR exporte et existant.
 5. Lancer `Board Game Insert Generator` depuis `Utilities > Add-ins`.
 6. Verifier le message final : il doit annoncer 1 reference outline, 2 blank
    bodies et une creation dans le composant racine.
@@ -164,11 +187,12 @@ Les tests doivent rester independants de Fusion 360. Toute future logique qui ne
 necessite pas l'API Fusion doit d'abord vivre dans `fusion_skeleton.py` ou un
 module adjacent sans import `adsk`.
 
-## Frontiere P4-M003
+## Frontiere P4-M004
 
-La conversion actuelle :
+La conversion actuelle stabilisee :
 
-- charge et valide une CAD IR locale ;
+- charge et valide une CAD IR locale depuis `cad_ir_input.json` ou depuis un
+  chemin declare dans `cad_ir_path.txt` ;
 - cree un plan de generation hors Fusion ;
 - cree une esquisse de reference de boite dans le composant racine ;
 - cree des rectangles dans le composant racine puis extrude des bodies simples

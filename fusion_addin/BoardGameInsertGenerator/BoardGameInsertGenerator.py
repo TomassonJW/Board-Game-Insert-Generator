@@ -15,10 +15,12 @@ try:
         FusionGenerationPlan,
         FusionSkeletonError,
         FusionSolidPlan,
+        cad_ir_input_guidance,
         describe_document_state,
         generation_plan_from_cad_ir,
         load_cad_ir_json,
         mm_to_cm,
+        resolve_cad_ir_input_path,
     )
 except ImportError:  # pragma: no cover - Fusion may load the file as a script.
     from fusion_skeleton import (  # type: ignore[no-redef]
@@ -26,10 +28,12 @@ except ImportError:  # pragma: no cover - Fusion may load the file as a script.
         FusionGenerationPlan,
         FusionSkeletonError,
         FusionSolidPlan,
+        cad_ir_input_guidance,
         describe_document_state,
         generation_plan_from_cad_ir,
         load_cad_ir_json,
         mm_to_cm,
+        resolve_cad_ir_input_path,
     )
 
 try:
@@ -39,7 +43,6 @@ except ImportError:  # pragma: no cover - exercised only outside Fusion.
     adsk = None  # type: ignore[assignment]
 
 
-CAD_IR_INPUT_FILENAME = "cad_ir_input.json"
 
 _app = None
 _ui = None
@@ -66,13 +69,18 @@ def run(context) -> None:  # noqa: ANN001 - Fusion controls the signature.
         return
 
     try:
-        cad_ir_path = Path(__file__).with_name(CAD_IR_INPUT_FILENAME)
+        addin_dir = Path(__file__).resolve().parent
+        cad_ir_path = resolve_cad_ir_input_path(addin_dir)
         payload = load_cad_ir_json(cad_ir_path)
         generation_plan = generation_plan_from_cad_ir(payload)
         design = _active_design(_app)
         result = _generate_from_plan(design, generation_plan)
     except FusionSkeletonError as exc:
-        _show_message(f"Board Game Insert Generator CAD IR error:\n{exc}")
+        _show_message(
+            "Board Game Insert Generator CAD IR error:\n"
+            f"{exc}\n\n"
+            f"{cad_ir_input_guidance(Path(__file__).resolve().parent)}"
+        )
         return
     except Exception as exc:  # pragma: no cover - Fusion runtime boundary.
         _show_message(f"Board Game Insert Generator Fusion error:\n{exc}")
@@ -81,6 +89,7 @@ def run(context) -> None:  # noqa: ANN001 - Fusion controls the signature.
     _show_message(
         "Board Game Insert Generator generated minimal rectangular blanks.\n"
         f"Project: {generation_plan.project_name}\n"
+        f"Input CAD IR: {cad_ir_path}\n"
         f"Reference outlines: {result['reference_outlines']}\n"
         f"Blank bodies: {result['blank_bodies']}\n"
         "Creation scope: root component, compatible with Part Design documents.\n"

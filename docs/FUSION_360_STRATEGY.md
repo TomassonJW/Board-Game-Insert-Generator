@@ -51,7 +51,8 @@ Il contient :
 - un point d'entree Fusion `BoardGameInsertGenerator.py` avec `run(context)` et
   `stop(context)` ;
 - une couche `fusion_skeleton.py` testable hors Fusion ;
-- une fixture locale `cad_ir_input.json` pour le smoke test manuel.
+- une fixture locale `cad_ir_input.json` pour le smoke test manuel ;
+- un override local optionnel `cad_ir_path.txt` pour pointer vers une CAD IR exportee ailleurs.
 
 Le squelette peut importer `adsk` uniquement dans le fichier d'entree Fusion. La
 couche testable et le coeur Python restent sans dependance Fusion.
@@ -71,6 +72,16 @@ Depuis `P4-M003`, l'add-in code une premiere generation minimale :
 - creation de sketches et bodies rectangulaires simples dans le composant racine ;
 - statut `manual validation required` tant que Fusion 360 n'a pas ete lance et
   inspecte par Thomas.
+
+Depuis `P4-M004`, le pipeline d'entree est stabilise sans elargir la geometrie :
+
+- l'add-in resout l'entree depuis `cad_ir_input.json` ou depuis le chemin declare
+  dans `cad_ir_path.txt` ;
+- les chemins relatifs de `cad_ir_path.txt` sont resolus depuis le dossier de
+  l'add-in ;
+- les erreurs d'override vide, fichier absent, JSON invalide, schema invalide et
+  unites invalides affichent un message Fusion actionnable ;
+- le fichier charge reste une CAD IR deja calculee par le coeur Python.
 
 ## Representation intermediaire
 
@@ -159,8 +170,9 @@ Tests hors Fusion :
 - tolerances ;
 - rapports ;
 - serialization de la representation intermediaire ;
-- chargement CAD IR locale ;
+- chargement CAD IR locale ou pointee par `cad_ir_path.txt` ;
 - plan de generation Fusion sans import `adsk` ;
+- resolution du fichier CAD IR et erreurs de chargement testees hors Fusion ;
 - conversion millimetres vers centimetres internes Fusion.
 
 Verifications dans Fusion :
@@ -187,9 +199,12 @@ Le rapport `docs/FUSION_360_GATE_REPORT.md` a prepare la decision humaine avant
 toute integration Fusion 360 executable. La mission `P4-M001` a livre le contrat
 CAD-agnostic. La mission `P4-M002` ajoute un squelette d'adaptateur isole. La
 mission `P4-M003` code la premiere generation minimale de blanks rectangulaires.
+La mission de stabilisation P4-M004/P4-M006 rend le chemin CAD IR consommable par
+Fusion plus robuste sans ajouter de geometrie.
 
-La validation Fusion reelle reste `manual validation required` tant que Thomas
-n'a pas lance l'add-in dans Fusion 360 et note le resultat du smoke test.
+La fixture P4-M003 a ete validee manuellement dans Fusion. Toute nouvelle CAD IR
+exportee doit encore etre inspectee dans Fusion avant d'etre consideree validee,
+et aucune validation d'impression reelle n'est revendiquee.
 
 ## Gates avant elargissement Fusion
 
@@ -199,6 +214,6 @@ Avant d'elargir la generation Fusion :
   generation minimale sont prets ;
 - le backlog doit pointer une mission Fusion precise ;
 - les tests du coeur Python doivent passer ;
-- la validation manuelle P4-M003 doit etre documentee si la suite depend de la
-  geometrie Fusion observee ;
+- la validation manuelle P4-M003 est documentee, mais toute nouvelle CAD IR doit
+  etre inspectee avant usage ;
 - aucune logique metier nouvelle ne doit etre prevue uniquement dans Fusion.

@@ -20,11 +20,18 @@ Le depot contient :
 - une application simple des tolerances par face ;
 - des rapports Markdown/JSON ;
 - des tests unitaires hors Fusion 360 ;
-- une documentation de pilotage pour travailler mission par mission.
+- une documentation de pilotage pour travailler mission par mission ;
+- une commande `export-cad-ir` pour produire une CAD IR JSON depuis une
+  configuration BGIG ;
+- un add-in Fusion isole capable de charger cette CAD IR depuis
+  `cad_ir_input.json` ou `cad_ir_path.txt`.
 
-Le depot genere maintenant des blanks rectangulaires Fusion minimaux depuis une
-CAD IR JSON locale. Il ne genere pas encore de cavites, couvercles, fillets,
-exports STL/3MF ou pieces validees par impression reelle.
+Le depot couvre maintenant le pipeline minimal : configuration BGIG -> layout ->
+CAD IR JSON -> add-in Fusion -> blanks rectangulaires dans le composant racine.
+Fusion consomme les dimensions deja calculees par le coeur Python et ne
+recalcule ni layout, ni offsets, ni tolerances. Il ne genere pas encore de
+cavites, couvercles, fillets, exports STL/3MF ou pieces validees par impression
+reelle.
 
 Consulter d'abord :
 
@@ -99,10 +106,28 @@ python -m board_game_insert_generator export-cad-ir examples/simple_box.json --o
 
 Le fichier genere suit le contrat `cad_ir.v0` et contient la boite de reference,
 les blanks rectangulaires, les dimensions theoriques/imprimables, les roles de
-faces et les tolerances deja calculees par le coeur Python. Pour tester dans
-Fusion, copier ce `cad_ir_input.json` dans le dossier `BoardGameInsertGenerator`
-installe par Fusion, ou utiliser directement le chemin du dossier AddIns comme
-valeur de `--output`.
+faces et les tolerances deja calculees par le coeur Python.
+
+Deux methodes sont supportees pour alimenter l'add-in Fusion installe :
+
+1. Copier ou generer le fichier sous le nom `cad_ir_input.json` dans le dossier
+   `BoardGameInsertGenerator` charge par Fusion.
+2. Creer un fichier `cad_ir_path.txt` dans ce meme dossier. Sa premiere ligne non
+   vide doit pointer vers le JSON CAD IR exporte, en chemin absolu ou en chemin
+   relatif au dossier de l'add-in.
+
+Workflow complet minimal :
+
+```powershell
+$env:PYTHONPATH = "src"
+python -m board_game_insert_generator export-cad-ir examples/simple_box.json --output $env:TEMP\bgig-cad-ir-input.json
+Set-Content -Path "$env:APPDATA\Autodesk\FusionAddins\BoardGameInsertGenerator\cad_ir_path.txt" -Value "$env:TEMP\bgig-cad-ir-input.json"
+```
+
+Ensuite ouvrir Fusion 360, ouvrir ou creer un design, lancer l'add-in
+`BoardGameInsertGenerator`, puis verifier les sketches et bodies nommes. La
+validation Fusion reste une inspection CAD ; elle ne vaut pas validation
+physique par impression.
 
 ## Tests
 
@@ -122,7 +147,7 @@ Le coeur logique est volontairement independant de Fusion 360 :
 - `tolerance.py` transforme les cellules en corps imprimables ;
 - `report.py` produit une representation lisible.
 
-Fusion 360 sera ajoute comme adaptateur de sortie. Voir
+Fusion 360 est isole comme adaptateur de sortie. Voir
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) et
 [docs/FUSION_360_STRATEGY.md](docs/FUSION_360_STRATEGY.md).
 
@@ -162,7 +187,9 @@ actions si necessaire, puis lancer les tests disponibles.
 - Les cavites, couvercles, modules composites et mecanismes sont prevus mais non
   fonctionnels.
 - Les tolerances par defaut doivent etre validees par impression reelle.
-- Aucun comportement Fusion 360 n'est encore implemente.
+- Le comportement Fusion 360 implemente reste limite aux blanks rectangulaires
+  minimaux charges depuis une CAD IR JSON; aucune cavite, aucun fillet et aucun
+  export STL/3MF ne sont implementes.
 
 ## Licence
 

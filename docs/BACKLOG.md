@@ -400,6 +400,27 @@ commitee sans melanger plusieurs decisions structurantes.
   unique, sans extension de geometrie Fusion.
 - Statut : `done`.
 
+### P4-M006 - Stabiliser le pipeline CAD IR vers Fusion
+
+- Phase liee : Phase 4 - Generation Fusion 360 de blanks
+- Objectif : fiabiliser la chaine configuration BGIG -> export CAD IR -> fichier
+  JSON -> add-in Fusion -> blanks rectangulaires minimaux.
+- Livrable attendu : chargement CAD IR configurable et documente, validations
+  d'entree plus explicites et erreurs Fusion actionnables.
+- Fichiers concernes : `fusion_addin/BoardGameInsertGenerator/`,
+  `docs/FUSION_360_STRATEGY.md`, `docs/CAD_IR_CONTRACT.md`, `README.md`, tests
+  hors Fusion et pilotage projet.
+- Criteres d'acceptation : `cad_ir_input.json` reste supporte ; `cad_ir_path.txt`
+  peut pointer vers un export CAD IR ; les erreurs de fichier absent, override
+  vide et contrat invalide sont testees ; aucune nouvelle geometrie Fusion n'est
+  ajoutee ; le coeur Python reste sans `adsk`.
+- Tests ou verifications : suite unitaire, exemples CLI Markdown/JSON, export
+  CAD IR CLI, `git diff --check`, verification `adsk` hors coeur.
+- Dependances : P4-M005.
+- Gate humaine : validee explicitement sous le libelle `P4-M004` le 2026-07-03,
+  sans cavite, fillet, export STL/3MF ni changement de tolerance.
+- Statut : `done`.
+
 ## Phase 5 - Cavites et receptacles
 
 ### P5-M001 - Modeliser les cavites simples

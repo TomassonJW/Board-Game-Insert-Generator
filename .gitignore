@@ -28,6 +28,7 @@ Thumbs.db
 .vscode/
 
 # Fusion 360 / CAD generated artifacts
+fusion_addin/BoardGameInsertGenerator/cad_ir_path.txt
 *.f3d
 *.f3z
 *.step

@@ -102,6 +102,11 @@ La mission `Export CAD IR CLI` du 2026-07-03 ajoute la commande
 lisible et compatible avec le squelette Fusion existant. Cette commande ne
 modifie pas les dimensions, les tolerances ou la geometrie Fusion ; elle rend la
 fixture `cad_ir_input.json` regenerable depuis le moteur.
+La mission `P4-M006` du 2026-07-03 stabilise le pipeline CAD IR vers Fusion,
+autorise par gate humaine sous le libelle `P4-M004`. L'add-in resout maintenant
+l'entree CAD IR depuis `cad_ir_input.json` ou `cad_ir_path.txt`, valide le
+contrat minimal avant generation, affiche des erreurs Fusion actionnables et
+garde la geometrie limitee aux blanks rectangulaires deja autorises.
 
 La decision de gouvernance `Autonomous Git Integration Policy` du 2026-07-03
 autorise Codex a gerer automatiquement les operations Git normales apres une
@@ -112,7 +117,7 @@ d'authentification ou risques de perte de travail.
 
 ## Phase active
 
-Phase active : **Phase 4 - Generation Fusion minimale validee manuellement, prochaine gate Fusion requise**.
+Phase active : **Phase 4 - Pipeline CAD IR vers Fusion stabilise, prochaine gate Fusion requise**.
 
 Etat : autonomie operatoire documentee, controle documentaire de base, contrat
 des modeles coeur, loader JSON strict, rapports enrichis et commande de
@@ -122,13 +127,14 @@ reserve. La comparaison simple des strategies existe dans les rapports. Les
 faces des corps rectangulaires simples sont classees explicitement et leurs
 regles de tolerance appliquees sont exposees dans les rapports. Les profils
 d'impression explicites sont resolus et visibles. La representation intermediaire
-CAD est definie et testee. L'adaptateur Fusion isole sait charger une CAD IR
-locale et coder une premiere generation de blanks rectangulaires dans le
-composant racine, sans recalculer
-layout ou tolerances. La CLI `export-cad-ir` peut maintenant produire le fichier
-CAD IR JSON attendu par l'add-in depuis une configuration BGIG. La prochaine
-etape recommandee est une decision humaine sur le prochain perimetre Fusion. Aucune suite Fusion ne doit commencer sans nouvelle
-validation humaine.
+CAD est definie et testee. La CLI `export-cad-ir` produit une CAD IR JSON V0
+depuis une configuration BGIG. L'adaptateur Fusion isole sait charger une CAD IR
+depuis `cad_ir_input.json` ou `cad_ir_path.txt`, valider le contrat minimal,
+signaler les erreurs de chargement et generer des blanks rectangulaires dans le
+composant racine sans recalculer layout ou tolerances. La prochaine etape
+recommandee est une decision humaine sur le prochain perimetre Fusion ou un
+retour explicite au coeur Python. Aucune suite Fusion ne doit commencer sans
+nouvelle validation humaine.
 
 ## Implemente
 
@@ -171,6 +177,9 @@ validation humaine.
 - Manifeste Fusion JSON verifie par test hors Fusion.
 - Chemin Fusion P4-M003 compatible documents Part Design via composant racine.
 - Commande CLI `export-cad-ir` pour generer une CAD IR JSON V0 depuis une configuration BGIG.
+- Pipeline CAD IR vers Fusion stabilise : entree par `cad_ir_input.json` ou
+  `cad_ir_path.txt`, validation minimale du contrat et messages d'erreur
+  actionnables dans Fusion.
 - Smoke test CAD manuel P4-M003 valide dans Fusion : add-in visible, message OK,
   modules visibles et dimensions conformes a la fixture.
 
@@ -190,12 +199,14 @@ validation humaine.
 - Le squelette Fusion P4-M002 est testable hors Fusion.
 - La generation Fusion P4-M003 est validee manuellement dans Fusion pour le
   chargement, le message final, l'apparition des modules et les dimensions de
-  la fixture. Elle ne valide pas l'impression reelle.
+  la fixture. Depuis P4-M004/P4-M006, toute nouvelle CAD IR exportee peut etre
+  pointee par `cad_ir_path.txt`, mais doit encore etre inspectee dans Fusion.
+  Cela ne valide pas l'impression reelle.
 
 ## Prevu
 
 - Strategie de layout `columns`.
-- Decision humaine sur le prochain perimetre Fusion apres P4-M003.
+- Decision humaine sur le prochain perimetre Fusion apres stabilisation P4-M004/P4-M006.
 - Cavites, receptacles, encoches, fonds arrondis.
 - Modules composites en L/T.
 - Couvercles, rainures et mecanismes.
@@ -228,13 +239,16 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant la mission `Autonomous Git Integration Policy` :
+Derniere verification pendant la mission `P4-M006 - Stabiliser le pipeline CAD IR vers Fusion` :
 
-- `python -m unittest discover -s tests` : OK, 64 tests passes.
+- `python -m unittest discover -s tests` : OK, 72 tests passes.
+- `python -m board_game_insert_generator examples\simple_box.json --format markdown` : OK.
+- `python -m board_game_insert_generator examples\simple_grid.json --format markdown` : OK.
+- `python -m board_game_insert_generator examples\simple_box.json --format json` : OK.
+- `python -m board_game_insert_generator export-cad-ir examples\simple_box.json --output "$env:TEMP\bgig-cad-ir-input.json"` : OK, schema `cad_ir.v0`, 4 composants.
 - `git diff --check` : OK ; avertissements CRLF/LF Windows uniquement.
 - `rg -n "adsk" src/board_game_insert_generator` : OK, aucune occurrence dans le coeur Python.
-- Integration de `codex/export-cad-ir-cli` dans `origin/main` : OK, push
-  fast-forward `8634f21..9c6cbd1`.
+
 ## Risques actifs
 
 - Le moteur a deja des concepts futurs dans `models.py`; il faut eviter de les
@@ -244,8 +258,9 @@ Derniere verification pendant la mission `Autonomous Git Integration Policy` :
 - Les tolerances seront credibles seulement apres une boucle d'impression reelle.
 - Le backlog est volontairement large ; chaque mission doit rester petite et
   testable.
-- L'autonomie Codex doit rester bornee a une mission par run ; toute gate humaine
-  doit arreter l'execution.
+- L'autonomie Git ne doit pas masquer les vraies gates produit : toute extension
+  Fusion, export imprimable ou validation physique reste bloquee tant que la gate
+  correspondante n'est pas explicitement validee.
 - Les cartes avec dependances non terminees doivent rester `todo` et ne pas etre
   selectionnees comme `ready`.
 

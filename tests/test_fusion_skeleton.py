@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import json
+import tempfile
 import unittest
+from pathlib import Path
 
 from context import ROOT
 
@@ -9,16 +11,20 @@ from board_game_insert_generator.cad_ir import build_blank_cad_scene
 from board_game_insert_generator.config_loader import load_config
 from board_game_insert_generator.layout import generate_basic_layout
 from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
+    CAD_IR_PATH_OVERRIDE_FILENAME,
+    DEFAULT_CAD_IR_INPUT_FILENAME,
     DOCUMENT_STATUS_READY,
     DOCUMENT_STATUS_ZERO_DOC,
     FUSION_MANUAL_VALIDATION_REQUIRED,
     PLAN_STATUS_PLANNED_ONLY,
     FusionSkeletonError,
+    cad_ir_input_guidance,
     describe_document_state,
     generation_plan_from_cad_ir,
     load_cad_ir_json,
     mm_to_cm,
     planned_operations_from_cad_ir,
+    resolve_cad_ir_input_path,
     validate_cad_ir_payload,
 )
 
@@ -76,6 +82,27 @@ class FusionSkeletonTests(unittest.TestCase):
         with self.assertRaisesRegex(FusionSkeletonError, "Unsupported CAD IR units"):
             validate_cad_ir_payload(payload)
 
+    def test_rejects_payload_without_reference_box(self) -> None:
+        payload = _cad_ir_payload()
+        del payload["box_reference"]
+
+        with self.assertRaisesRegex(FusionSkeletonError, "box_reference"):
+            validate_cad_ir_payload(payload)
+
+    def test_rejects_empty_components_list(self) -> None:
+        payload = _cad_ir_payload()
+        payload["components"] = []
+
+        with self.assertRaisesRegex(FusionSkeletonError, "at least one component"):
+            validate_cad_ir_payload(payload)
+
+    def test_rejects_non_object_component_with_index(self) -> None:
+        payload = _cad_ir_payload()
+        payload["components"][0] = "bad component"
+
+        with self.assertRaisesRegex(FusionSkeletonError, r"components\[0\]"):
+            validate_cad_ir_payload(payload)
+
     def test_plans_operations_without_executing_geometry(self) -> None:
         payload = _cad_ir_payload()
 
@@ -104,6 +131,63 @@ class FusionSkeletonTests(unittest.TestCase):
 
         with self.assertRaisesRegex(FusionSkeletonError, "file not found"):
             load_cad_ir_json(missing_path)
+
+    def test_resolves_default_cad_ir_input_path(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            addin_dir = Path(temp_dir)
+
+            resolved_path = resolve_cad_ir_input_path(addin_dir)
+
+            self.assertEqual(resolved_path, addin_dir / DEFAULT_CAD_IR_INPUT_FILENAME)
+
+    def test_resolves_relative_cad_ir_override_path(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            addin_dir = Path(temp_dir)
+            custom_path = addin_dir / "generated" / "simple_box_cad_ir.json"
+            custom_path.parent.mkdir()
+            custom_path.write_text(json.dumps(_cad_ir_payload()), encoding="utf-8")
+            (addin_dir / CAD_IR_PATH_OVERRIDE_FILENAME).write_text(
+                "# BGIG CAD IR input\ngenerated/simple_box_cad_ir.json\n",
+                encoding="utf-8",
+            )
+
+            resolved_path = resolve_cad_ir_input_path(addin_dir)
+            payload = load_cad_ir_json(resolved_path)
+
+            self.assertEqual(resolved_path, custom_path.resolve())
+            self.assertEqual(payload["schema_version"], "cad_ir.v0")
+
+    def test_rejects_empty_cad_ir_override_path(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            addin_dir = Path(temp_dir)
+            (addin_dir / CAD_IR_PATH_OVERRIDE_FILENAME).write_text(
+                "# only comments\n\n",
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(FusionSkeletonError, "override file is empty"):
+                resolve_cad_ir_input_path(addin_dir)
+
+    def test_rejects_missing_configured_cad_ir_override_path(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            addin_dir = Path(temp_dir)
+            (addin_dir / CAD_IR_PATH_OVERRIDE_FILENAME).write_text(
+                "missing_scene.json\n",
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(
+                FusionSkeletonError,
+                "Configured CAD IR JSON file not found",
+            ):
+                resolve_cad_ir_input_path(addin_dir)
+
+    def test_guidance_mentions_default_override_and_export_command(self) -> None:
+        guidance = cad_ir_input_guidance(ROOT / "fusion_addin" / "BoardGameInsertGenerator")
+
+        self.assertIn(DEFAULT_CAD_IR_INPUT_FILENAME, guidance)
+        self.assertIn(CAD_IR_PATH_OVERRIDE_FILENAME, guidance)
+        self.assertIn("export-cad-ir", guidance)
 
     def test_builds_generation_plan_from_engine_cad_ir(self) -> None:
         payload = _cad_ir_payload()
@@ -173,6 +257,9 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("root_component.sketches.add", source)
         self.assertIn("root_component.features.extrudeFeatures.addSimple", source)
         self.assertIn("compatible with Part Design documents", source)
+        self.assertIn("resolve_cad_ir_input_path", source)
+        self.assertIn("cad_ir_input_guidance", source)
+        self.assertIn("Input CAD IR", source)
 
 
 def _cad_ir_payload() -> dict:

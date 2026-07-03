@@ -64,10 +64,16 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator export-cad-ir examples/simple_box.json --output fusion_addin/BoardGameInsertGenerator/cad_ir_input.json
 ```
 
-Le chemin de sortie est libre. Pour alimenter l'add-in Fusion installe, ecrire ou
-copier le fichier genere sous le nom `cad_ir_input.json` dans le dossier
-`BoardGameInsertGenerator` charge par Fusion. L'export ne modifie pas les valeurs
-de tolerance, ne recalcule pas dans Fusion et ne cree aucun STL/3MF.
+Le chemin de sortie est libre. Pour alimenter l'add-in Fusion installe, deux
+methodes sont supportees :
+
+1. ecrire ou copier le fichier genere sous le nom `cad_ir_input.json` dans le
+   dossier `BoardGameInsertGenerator` charge par Fusion ;
+2. ecrire le fichier ailleurs et placer dans le dossier de l'add-in un fichier
+   `cad_ir_path.txt` dont la premiere ligne non vide pointe vers ce JSON.
+
+L'export ne modifie pas les valeurs de tolerance, ne recalcule pas dans Fusion et
+ne cree aucun STL/3MF.
 
 ## Composants et corps
 
@@ -102,9 +108,30 @@ manuelle.
 Le squelette `P4-M002` consommait uniquement une CAD IR serialisee et produisait
 un plan `planned_only`.
 
-Depuis `P4-M003`, l'adaptateur charge une CAD IR JSON locale, valide la version
-de schema, les unites `mm`, la reference de boite et les composants, puis cree un
-plan de generation Fusion. Ce plan copie :
+Depuis `P4-M003`, l'adaptateur cree une premiere geometrie minimale. Depuis
+`P4-M004`, le pipeline de chargement est stabilise : l'add-in resout d'abord le
+fichier CAD IR a consommer, puis valide le contrat minimal avant de construire le
+plan de generation.
+
+Resolution d'entree :
+
+- par defaut : `cad_ir_input.json` dans le dossier `BoardGameInsertGenerator` ;
+- override optionnel : `cad_ir_path.txt` dans le meme dossier ;
+- dans `cad_ir_path.txt`, la premiere ligne non vide et non commentee est un
+  chemin absolu ou relatif au dossier de l'add-in ;
+- les erreurs de fichier absent, override vide, JSON invalide, schema ou unites
+  incompatibles sont signalees avec un message actionnable dans Fusion.
+
+Validation minimale consommee par l'add-in :
+
+- payload JSON objet ;
+- `schema_version == cad_ir.v0` ;
+- `units == mm` ;
+- `box_reference` objet ;
+- `components` liste non vide d'objets ;
+- `metadata` objet si present.
+
+Le plan copie :
 
 - `box_reference.origin_mm` et `box_reference.size_mm` pour une esquisse de
   reference non imprimable ;
@@ -113,8 +140,8 @@ plan de generation Fusion. Ce plan copie :
 
 Fusion ne recalcule pas les cellules, offsets, roles de faces ou tolerances. La
 generation reelle reste limitee a des rectangles extrudes dans le composant
-racine et ne produit aucun STL/3MF. P4-M003 ne cree pas de composants enfants
-Fusion, pour rester compatible avec les documents Part Design.
+racine et ne produit aucun STL/3MF. La generation actuelle ne cree pas de
+composants enfants Fusion, pour rester compatible avec les documents Part Design.
 
 ## Face roles et tolerances
 
@@ -140,6 +167,8 @@ Le contrat V0 est valide par tests unitaires :
 - serialization des classifications et tolerances ;
 - refus d'un layout incoherent sans corps imprimable correspondant ;
 - chargement d'une fixture CAD IR locale par le squelette Fusion ;
+- resolution du fichier d'entree Fusion par defaut ou via `cad_ir_path.txt` ;
+- erreurs actionnables pour override vide, fichier absent et contrat CAD IR invalide ;
 - export CLI d'une CAD IR JSON depuis `examples/simple_box.json` ;
 - transformation en plan de generation hors Fusion.
 
@@ -149,7 +178,12 @@ exports STL/3MF ou l'impression reelle.
 ## Gate suivante
 
 `P4-M003 - Generer des blanks rectangulaires Fusion` est code et valide
-manuellement pour la fixture P4-M003. L'export CLI permet maintenant de produire
-une CAD IR depuis une configuration BGIG, mais toute extension Fusion au-dela des
-blanks rectangulaires ou tout export imprimable reste soumise a une nouvelle gate
+manuellement pour la fixture P4-M003. `P4-M005 - Exporter une CAD IR depuis la
+CLI` rend la fixture regenerable depuis une configuration BGIG. `P4-M006 -
+Stabiliser le pipeline CAD IR vers Fusion`, autorisee par gate humaine sous le
+libelle `P4-M004`, stabilise le choix du fichier d'entree et les messages
+d'erreur Fusion.
+
+Toute extension Fusion au-dela du chargement, de la validation et des blanks
+rectangulaires, ou tout export imprimable, reste soumise a une nouvelle gate
 humaine.

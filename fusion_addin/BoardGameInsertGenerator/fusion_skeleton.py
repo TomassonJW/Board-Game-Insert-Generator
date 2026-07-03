@@ -15,6 +15,8 @@ from typing import Any
 
 SUPPORTED_CAD_IR_SCHEMA_VERSION = "cad_ir.v0"
 SUPPORTED_UNITS = "mm"
+DEFAULT_CAD_IR_INPUT_FILENAME = "cad_ir_input.json"
+CAD_IR_PATH_OVERRIDE_FILENAME = "cad_ir_path.txt"
 
 DOCUMENT_STATUS_READY = "ready"
 DOCUMENT_STATUS_ZERO_DOC = "zero_doc"
@@ -164,6 +166,73 @@ def describe_document_state(application: Any) -> FusionDocumentState:
     )
 
 
+def resolve_cad_ir_input_path(
+    addin_dir: str | Path,
+    default_filename: str = DEFAULT_CAD_IR_INPUT_FILENAME,
+    override_filename: str = CAD_IR_PATH_OVERRIDE_FILENAME,
+) -> Path:
+    """Resolve the CAD IR JSON file consumed by the add-in.
+
+    By default the add-in loads ``cad_ir_input.json`` from its own folder. If a
+    ``cad_ir_path.txt`` file exists next to the add-in, the first non-empty,
+    non-comment line becomes the input path. Relative override paths are resolved
+    from the add-in folder.
+    """
+
+    root = Path(addin_dir)
+    override_path = root / override_filename
+    default_path = root / default_filename
+
+    if not override_path.is_file():
+        return default_path
+
+    configured_value = _first_path_value(override_path)
+    if configured_value is None:
+        raise FusionSkeletonError(
+            f"CAD IR path override file is empty: {override_path}. "
+            f"Delete it to use {default_filename!r}, or write a CAD IR JSON path."
+        )
+
+    configured_path = Path(configured_value).expanduser()
+    if not configured_path.is_absolute():
+        configured_path = root / configured_path
+    configured_path = configured_path.resolve()
+
+    if configured_path.is_dir():
+        raise FusionSkeletonError(
+            f"Configured CAD IR path points to a directory, not a JSON file: {configured_path}. "
+            f"Check {override_path}."
+        )
+    if not configured_path.is_file():
+        raise FusionSkeletonError(
+            f"Configured CAD IR JSON file not found: {configured_path}. "
+            f"Check {override_path}, or generate one with export-cad-ir."
+        )
+
+    return configured_path
+
+
+def cad_ir_input_guidance(addin_dir: str | Path) -> str:
+    """Return short user-facing guidance for Fusion CAD IR loading errors."""
+
+    root = Path(addin_dir)
+    return "\n".join(
+        [
+            "CAD IR input guidance:",
+            f"- Default input: {root / DEFAULT_CAD_IR_INPUT_FILENAME}",
+            f"- Optional path override: {root / CAD_IR_PATH_OVERRIDE_FILENAME}",
+            (
+                "- Override format: first non-empty line is an absolute path "
+                "or a path relative to the add-in folder."
+            ),
+            (
+                "- Generate from BGIG: python -m board_game_insert_generator "
+                "export-cad-ir <config.json> --output <cad_ir_input.json>"
+            ),
+        ]
+    )
+
+
 def load_cad_ir_json(path: str | Path) -> dict[str, Any]:
     """Load and validate a serialized CAD IR payload from JSON."""
 
@@ -200,9 +269,22 @@ def validate_cad_ir_payload(payload: Any) -> dict[str, Any]:
             f"Unsupported CAD IR units {units!r}; expected {SUPPORTED_UNITS!r}."
         )
 
+    reference_payload = payload.get("box_reference")
+    if not isinstance(reference_payload, dict):
+        raise FusionSkeletonError("CAD IR payload must contain a box_reference object.")
+
     components = payload.get("components")
     if not isinstance(components, list):
         raise FusionSkeletonError("CAD IR payload must contain a components list.")
+    if not components:
+        raise FusionSkeletonError("CAD IR components list must contain at least one component.")
+    for index, component in enumerate(components):
+        if not isinstance(component, dict):
+            raise FusionSkeletonError(f"CAD IR components[{index}] must be an object.")
+
+    metadata = payload.get("metadata")
+    if metadata is not None and not isinstance(metadata, dict):
+        raise FusionSkeletonError("CAD IR metadata must be an object when present.")
 
     return payload
 
@@ -392,6 +474,14 @@ def _vector_from_payload(
         y=_required_number(value, "y", label),
         z=_required_number(value, "z", label),
     )
+
+
+def _first_path_value(path: Path) -> str | None:
+    for line in path.read_text(encoding="utf-8").splitlines():
+        value = line.strip()
+        if value and not value.startswith("#"):
+            return value.strip('"')
+    return None
 
 
 def _required_number(source: dict[str, Any], key: str, label: str) -> float:
