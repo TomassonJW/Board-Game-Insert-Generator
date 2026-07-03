@@ -1,12 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<manifest>
-  <autodeskProduct>Fusion360</autodeskProduct>
-  <type>addin</type>
-  <id>BoardGameInsertGenerator</id>
-  <version>0.1.0</version>
-  <name>Board Game Insert Generator</name>
-  <description>BGIG P4-M002 Fusion 360 adapter skeleton. No geometry is generated.</description>
-  <author>BGIG</author>
-  <supportedOS>windows|mac</supportedOS>
-  <runOnStartup>false</runOnStartup>
-</manifest>
+{
+  "autodeskProduct": "Fusion",
+  "type": "addin",
+  "id": "",
+  "author": "BGIG",
+  "description": {
+    "": "Board Game Insert Generator P4-M003: minimal rectangular blank generation from local CAD IR. Manual Fusion validation required."
+  },
+  "version": "0.1.1",
+  "runOnStartup": false,
+  "supportedOS": "windows|mac",
+  "editEnabled": true
+}

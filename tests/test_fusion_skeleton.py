@@ -146,6 +146,25 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(mm_to_cm(1.0), 0.1)
         self.assertAlmostEqual(mm_to_cm(68.9), 6.89)
 
+    def test_addin_manifest_matches_current_fusion_contract(self) -> None:
+        addin_dir = ROOT / "fusion_addin" / "BoardGameInsertGenerator"
+        script_path = addin_dir / "BoardGameInsertGenerator.py"
+        manifest_path = addin_dir / "BoardGameInsertGenerator.manifest"
+
+        self.assertTrue(script_path.is_file())
+        self.assertTrue(manifest_path.is_file())
+        self.assertEqual(addin_dir.name, script_path.stem)
+        self.assertEqual(addin_dir.name, manifest_path.stem)
+
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8-sig"))
+        self.assertEqual(manifest["autodeskProduct"], "Fusion")
+        self.assertEqual(manifest["type"], "addin")
+        self.assertEqual(manifest["supportedOS"], "windows|mac")
+        self.assertFalse(manifest["runOnStartup"])
+        self.assertTrue(manifest["editEnabled"])
+        self.assertIsInstance(manifest["description"], dict)
+        self.assertIn("", manifest["description"])
+
 
 def _cad_ir_payload() -> dict:
     config = load_config(ROOT / "examples" / "simple_box.json")

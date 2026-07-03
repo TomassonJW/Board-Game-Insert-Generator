@@ -47,7 +47,7 @@ coeur `src/board_game_insert_generator`.
 
 Il contient :
 
-- un manifeste d'add-in `BoardGameInsertGenerator.manifest` ;
+- un manifeste d'add-in JSON `BoardGameInsertGenerator.manifest` ;
 - un point d'entree Fusion `BoardGameInsertGenerator.py` avec `run(context)` et
   `stop(context)` ;
 - une couche `fusion_skeleton.py` testable hors Fusion ;

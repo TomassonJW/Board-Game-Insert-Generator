@@ -93,7 +93,8 @@ La mission `P4-M003` du 2026-07-03 code la premiere generation Fusion minimale
 depuis une CAD IR JSON locale. L'add-in cree une esquisse de reference de boite
 et des blanks rectangulaires par esquisse + extrusion. Cette sortie reste
 `manual validation required` tant qu'elle n'a pas ete lancee et inspectee dans
-Fusion 360.
+Fusion 360. Le manifeste d'add-in a ensuite ete corrige au format JSON attendu
+par Fusion pour permettre la decouverte locale.
 
 ## Phase active
 
@@ -149,7 +150,8 @@ validation humaine.
 - Rapport de gate Fusion 360 `P4-M000`.
 - Representation intermediaire CAD-agnostic `P4-M001`.
 - Squelette d'adaptateur Fusion 360 isole et non generateur `P4-M002`.
-- Chargement CAD IR et plan de generation Fusion minimale testes hors Fusion `P4-M003`.
+- Chargement CAD IR et plan de generation Fusion minimale testes hors Fusion P4-M003.
+- Manifeste Fusion JSON verifie par test hors Fusion.
 
 ## Experimental
 
@@ -206,7 +208,7 @@ python -m board_game_insert_generator examples/simple_box.json --format markdown
 
 Derniere verification pendant la mission `P4-M003` :
 
-- `python -m unittest discover -s tests` : OK, 61 tests passes.
+- `python -m unittest discover -s tests` : OK, 62 tests passes.
 - `python -m board_game_insert_generator examples/simple_box.json --format markdown` : OK.
 - `python -m board_game_insert_generator examples/simple_grid.json --format markdown` : OK.
 - `python -m board_game_insert_generator examples/simple_box.json --format json` : OK.

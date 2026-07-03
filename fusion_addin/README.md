@@ -43,7 +43,29 @@ Ce que l'add-in ne cree pas :
 
 ## Installation locale
 
-Depuis la racine du depot :
+La version courante de Fusion attend cette structure exacte :
+
+```text
+BoardGameInsertGenerator/
+  BoardGameInsertGenerator.py
+  BoardGameInsertGenerator.manifest
+  cad_ir_input.json
+  fusion_skeleton.py
+```
+
+Le nom du dossier, du fichier Python principal et du fichier `.manifest` doit
+etre identique. Le manifeste est un fichier texte en JSON, pas en XML.
+
+Option recommandee pour une installation locale non-App-Store :
+
+```powershell
+$source = Resolve-Path .\fusion_addin\BoardGameInsertGenerator
+$target = Join-Path $env:APPDATA "Autodesk\FusionAddins\BoardGameInsertGenerator"
+New-Item -ItemType Directory -Force $target | Out-Null
+Copy-Item -Path "$source\*" -Destination $target -Recurse -Force
+```
+
+Option alternative, egalement recherchee par Fusion sur Windows :
 
 ```powershell
 $source = Resolve-Path .\fusion_addin\BoardGameInsertGenerator
@@ -52,8 +74,13 @@ New-Item -ItemType Directory -Force $target | Out-Null
 Copy-Item -Path "$source\*" -Destination $target -Recurse -Force
 ```
 
-Puis ouvrir Fusion 360, aller dans `Utilities > Add-ins`, selectionner
-`Board Game Insert Generator` et lancer l'add-in.
+Si l'add-in est ajoute manuellement avec le bouton `+`, selectionner le dossier
+exact `BoardGameInsertGenerator`, pas son parent `fusion_addin` ni le dossier
+`AddIns`.
+
+Puis redemarrer Fusion 360 ou ouvrir `Utilities > Add-ins`, afficher `All scripts
+and add-ins` ou filtrer `Add-ins`, selectionner `BoardGameInsertGenerator` et
+lancer l'add-in.
 
 ## CAD IR locale
 
