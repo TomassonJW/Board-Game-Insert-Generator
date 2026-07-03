@@ -182,7 +182,7 @@ commitee sans melanger plusieurs decisions structurantes.
   priorites sont stables ; les rotations autorisees sont testees.
 - Tests ou verifications : suite unitaire complete.
 - Dependances : P2-M001.
-- Statut : `ready`.
+- Statut : `done`.
 
 ### P2-M003 - Ajouter une strategie grille explicite
 
@@ -195,7 +195,7 @@ commitee sans melanger plusieurs decisions structurantes.
   cellules sont reproductibles ; un exemple montre l'usage.
 - Tests ou verifications : tests unitaires et rapport exemple.
 - Dependances : P2-M001.
-- Statut : `todo`.
+- Statut : `ready`.
 
 ### P2-M004 - Exporter un resume de layout comparatif
 

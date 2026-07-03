@@ -41,6 +41,10 @@ La mission `P2-M001` du 2026-07-03 formalise le contrat de layout rectangulaire
 simple : `row_fill` est la seule strategie implementee, tandis que `grid` et
 `columns` sont reserves mais encore refuses par la validation.
 
+La mission `P2-M002` du 2026-07-03 ajoute la couverture unitaire des cas limites
+`row_fill` : priorite, stabilite de l'ordre source, rotation, retour a la ligne
+et depassement vertical.
+
 ## Phase active
 
 Phase active : **Phase 2 - Layout rectangulaire simple**.
@@ -48,8 +52,9 @@ Phase active : **Phase 2 - Layout rectangulaire simple**.
 Etat : autonomie operatoire documentee, controle documentaire de base, contrat
 des modeles coeur, loader JSON strict, rapports enrichis et commande de
 diagnostic sont en place. Le contrat de layout Phase 2 est maintenant explicite :
-`row_fill` est executable, `grid` et `columns` sont reserves. La prochaine
-mission recommandee est `P2-M002 - Cover row_fill edge cases`.
+`row_fill` est executable et couvert sur ses cas limites principaux, `grid` et
+`columns` sont reserves. La prochaine mission recommandee est `P2-M003 - Ajouter
+une strategie grille explicite`.
 
 ## Implemente
 
@@ -77,6 +82,7 @@ mission recommandee est `P2-M002 - Cover row_fill edge cases`.
 - Rapports Markdown/JSON enrichis et erreurs CLI categorisees `P1-M003`.
 - Commande CLI de diagnostic `P1-M004`.
 - Contrat de strategies layout formalise `P2-M001`.
+- Cas limites `row_fill` couverts par tests `P2-M002`.
 
 ## Experimental
 
@@ -128,9 +134,9 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant la mission `P2-M001` :
+Derniere verification pendant la mission `P2-M002` :
 
-- `python -m unittest discover -s tests` : OK, 27 tests passes.
+- `python -m unittest discover -s tests` : OK, 31 tests passes.
 - `python -m board_game_insert_generator examples/simple_box.json --format markdown` :
   OK, rapport Markdown genere.
 - `git diff --check` : OK.
