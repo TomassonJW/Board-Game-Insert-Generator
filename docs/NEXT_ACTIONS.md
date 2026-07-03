@@ -8,46 +8,45 @@ Codex doit choisir la premiere mission `ready` listee ici.
 
 ## Mission suivante recommandee
 
-### 1. P3-M004 - Ajouter un protocole de calibration physique
+### 1. P4-M000 - Prepare Fusion 360 integration gate report
 
 Statut : `ready`.
 
 Pourquoi maintenant :
 
-- `P3-M002` rend les tolerances appliquees explicites par face ;
-- `P3-M003` ajoute des profils d'impression opt-in et surchargeables ;
-- les profils restent experimentaux et non calibres physiquement ;
-- le projet doit eviter de confondre preset logiciel et validation par impression.
+- le moteur Python pur charge, valide, place, applique les tolerances et produit
+  des rapports Markdown/JSON ;
+- les profils d'impression et le protocole de calibration existent ;
+- la prochaine phase concerne Fusion 360, qui est protegee par gate humaine ;
+- aucune integration Fusion executable ne doit etre commencee sans validation.
 
 Objectif :
 
-- documenter un protocole de calibration physique par coupons de test et tableau
-  de mesure, sans effectuer ni revendiquer d'impression reelle.
+- preparer un rapport de gate Fusion 360 indiquant etat du moteur, readiness,
+  manques, risques, options techniques, recommandation et criteres d'acceptation.
 
 Contraintes :
 
-- ne pas modifier les valeurs de tolerance par defaut ;
-- ne pas declarer les profils valides physiquement ;
-- ne pas lancer Fusion 360, STL ou 3MF ;
-- rester sur documentation et exemples locaux reproductibles.
+- ne pas importer `adsk` ;
+- ne pas creer d'adaptateur Fusion executable ;
+- ne pas exporter STL/3MF ;
+- ne pas pretendre que les sorties sont imprimables ou physiquement validees.
 
 Validation attendue :
 
+- suite unitaire du coeur ;
 - relecture documentaire ;
-- suite unitaire pour verifier la coherence des fichiers de pilotage ;
 - `git diff --check`.
 
 ## Missions a ne pas lancer tout de suite
 
+- Integration Fusion 360 executable sans validation humaine de la gate `Premiere
+  integration Fusion 360`.
+- Premier export STL/3MF sans gate humaine dediee.
 - Modification des valeurs de tolerance par defaut sans gate humaine dediee.
-- Generation Fusion 360 de blanks tant que `P4-M000` n'a pas produit de rapport
-  de gate.
+- Modules composites complets sans gate humaine dediee.
 - Cavites complexes tant que les parois minimales et clearances ne sont pas
   formalisees.
-- Modules composites complets tant que `P6-M001` n'est pas cadree.
-- Assistant de conception tant que plusieurs strategies et profils ne sont pas
-  stabilises.
-- Packaging produit tant que des exemples imprimes reels ne sont pas disponibles.
 
 ## Fin de chaque mission
 

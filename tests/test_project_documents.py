@@ -16,6 +16,7 @@ REQUIRED_PROJECT_FILES = (
     "docs/BACKLOG.md",
     "docs/ROADMAP.md",
     "docs/ARCHITECTURE.md",
+    "docs/CALIBRATION_PROTOCOL.md",
     "docs/QUALITY_RULES.md",
     "docs/DECISIONS/ADR-TEMPLATE.md",
     "docs/DECISIONS/README.md",
@@ -66,6 +67,12 @@ REQUIRED_SECTIONS = {
     "docs/ARCHITECTURE.md": (
         "## Frontieres non negociables",
         "## Couches logicielles",
+    ),
+    "docs/CALIBRATION_PROTOCOL.md": (
+        "## Objectif",
+        "## Coupons a preparer",
+        "## Tableau de resultats",
+        "## Regles d'interpretation",
     ),
     "docs/QUALITY_RULES.md": (
         "## Regles de documentation",

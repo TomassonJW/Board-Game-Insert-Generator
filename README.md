@@ -126,6 +126,7 @@ Fusion 360 sera ajoute comme adaptateur de sortie. Voir
 - [Next actions](docs/NEXT_ACTIONS.md)
 - [Glossaire](docs/GLOSSARY.md)
 - [Regles qualite](docs/QUALITY_RULES.md)
+- [Protocole de calibration](docs/CALIBRATION_PROTOCOL.md)
 - [Decisions](docs/DECISIONS/README.md)
 - [Logs](docs/LOGS/README.md)
 

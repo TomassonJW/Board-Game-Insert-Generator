@@ -270,7 +270,7 @@ commitee sans melanger plusieurs decisions structurantes.
   ajustements.
 - Tests ou verifications : relecture documentaire.
 - Dependances : P3-M003.
-- Statut : `ready`.
+- Statut : `done`.
 
 ## Phase 4 - Generation Fusion 360 de blanks
 
@@ -289,7 +289,7 @@ commitee sans melanger plusieurs decisions structurantes.
   formulee explicitement.
 - Tests ou verifications : suite unitaire du coeur, relecture documentaire.
 - Dependances : P1-M003, P2-M002, P3-M002.
-- Statut : `todo`.
+- Statut : `ready`.
 
 ### P4-M001 - Definir le contrat de representation intermediaire CAD
 

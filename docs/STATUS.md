@@ -69,6 +69,10 @@ surchargeables dans le JSON V0. Le profil est resolu en `ToleranceProfile`, puis
 les champs `tolerances` surchargent les valeurs champ par champ. Les profils sont
 experimentaux et non valides physiquement.
 
+La mission `P3-M004` du 2026-07-03 ajoute un protocole de calibration physique.
+Ce protocole decrit coupons, mesures, contexte d'impression et criteres OK/KO,
+sans realiser ni revendiquer d'impression reelle.
+
 ## Phase active
 
 Phase active : **Phase 3 - Tolerances intelligentes**.
@@ -81,8 +85,8 @@ reserve. La comparaison simple des strategies existe dans les rapports. Les
 faces des corps rectangulaires simples sont classees explicitement et leurs
 regles de tolerance appliquees sont exposees dans les rapports. Les profils
 d'impression explicites sont resolus et visibles. La prochaine etape recommandee
-est `P3-M004` pour documenter un protocole de calibration physique, sans
-revendiquer de validation sans impression reelle.
+est `P4-M000` pour preparer le rapport de gate Fusion 360, sans integrer Fusion
+360 tant que la gate humaine n'est pas validee.
 
 ## Implemente
 
@@ -116,6 +120,7 @@ revendiquer de validation sans impression reelle.
 - Classification explicite des faces rectangulaires simples `P3-M001`.
 - Regles de tolerance appliquees par role de face `P3-M002`.
 - Profils d'impression explicites et surchargeables `P3-M003`.
+- Protocole de calibration physique `P3-M004`.
 
 ## Experimental
 
@@ -134,7 +139,6 @@ revendiquer de validation sans impression reelle.
 ## Prevu
 
 - Strategie de layout `columns`.
-- Protocole de calibration physique des profils.
 - Representation intermediaire CAD-agnostic.
 - Adaptateur Fusion 360.
 - Cavites, receptacles, encoches, fonds arrondis.
@@ -169,15 +173,11 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant la mission `P3-M003` :
+Derniere verification pendant la mission `P3-M004` :
 
 - `python -m unittest discover -s tests` : OK, 44 tests passes.
 - `python -m board_game_insert_generator examples/simple_box.json --format markdown` :
-  OK, rapport Markdown genere avec profil d'impression et tolerances appliquees.
-- `python -m board_game_insert_generator examples/simple_grid.json --format markdown` :
-  OK, rapport Markdown genere avec profil d'impression et tolerances appliquees.
-- `python -m board_game_insert_generator examples/simple_box.json --format json` :
-  OK, rapport JSON genere avec profil d'impression et tolerances appliquees.
+  OK, rapport Markdown genere.
 - `git diff --check` : OK.
 
 ## Risques actifs

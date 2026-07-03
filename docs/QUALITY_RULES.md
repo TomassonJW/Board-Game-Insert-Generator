@@ -100,7 +100,10 @@ ou `Sections de pilotage manquantes`.
 ## Regles d'impression reelle
 
 - Ne pas declarer stable un jeu fonctionnel non imprime.
+- Utiliser `docs/CALIBRATION_PROTOCOL.md` pour preparer les coupons, mesures et
+  criteres OK/KO.
 - Documenter le filament, l'imprimante, la buse, la hauteur de couche et le
   slicer si une mesure d'impression influence les valeurs.
 - Garder les tolerances par defaut prudentes tant que les calibrations sont
   insuffisantes.
+- Toute modification des valeurs de tolerance par defaut reste une gate humaine.

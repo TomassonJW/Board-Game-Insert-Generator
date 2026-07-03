@@ -164,3 +164,7 @@ A valider par impression reelle :
 Aucune valeur de tolerance ne doit etre presentee comme universelle. Les rapports
 doivent rappeler que les jeux doivent etre valides par impression reelle, surtout
 pour les couvercles, charnieres et cartes sleevees.
+
+Le protocole `docs/CALIBRATION_PROTOCOL.md` decrit les coupons, mesures et
+criteres d'interpretation attendus avant toute modification des valeurs par
+defaut ou declaration de profil stable.
