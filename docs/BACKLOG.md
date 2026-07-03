@@ -52,7 +52,7 @@ commitee sans melanger plusieurs decisions structurantes.
   `docs/VALIDATION_MATRIX.md`, `docs/AGENT_ROLES.md`,
   `docs/SPRINT_PLAN.md`, `docs/AUTONOMY_RUNBOOK.md`, `docs/LOGS/`.
 - Criteres d'acceptation : les documents existent ; les gates sont explicites ;
-  `P0-M004` est la prochaine mission recommandee ; le depot reste hors
+  `P0-M004` est creee comme mission de dry run ; le depot reste hors
   developpement produit profond.
 - Tests ou verifications : suite unitaire, exemple CLI, `git diff --check`.
 - Dependances : P0-M001.
@@ -71,7 +71,7 @@ commitee sans melanger plusieurs decisions structurantes.
   implementation produit n'est faite ; les ambiguities de pilotage sont notees.
 - Tests ou verifications : relecture documentaire, `git diff --check`.
 - Dependances : P0-M003.
-- Statut : `ready`.
+- Statut : `done`.
 
 ### P0-M005 - Stabiliser le format des ADR
 
@@ -128,7 +128,7 @@ commitee sans melanger plusieurs decisions structurantes.
   ; les exemples existants passent.
 - Tests ou verifications : tests unitaires loader et CLI.
 - Dependances : P1-M001.
-- Statut : `ready`.
+- Statut : `todo`.
 
 ### P1-M003 - Improve CLI reporting
 
@@ -170,7 +170,7 @@ commitee sans melanger plusieurs decisions structurantes.
   est documentee ; aucun couplage Fusion n'est introduit.
 - Tests ou verifications : tests layout existants et nouveaux cas de non-regression.
 - Dependances : P1-M001.
-- Statut : `ready`.
+- Statut : `todo`.
 
 ### P2-M002 - Cover row_fill edge cases
 
@@ -182,7 +182,7 @@ commitee sans melanger plusieurs decisions structurantes.
   priorites sont stables ; les rotations autorisees sont testees.
 - Tests ou verifications : suite unitaire complete.
 - Dependances : P2-M001.
-- Statut : `ready`.
+- Statut : `todo`.
 
 ### P2-M003 - Ajouter une strategie grille explicite
 
@@ -224,7 +224,7 @@ commitee sans melanger plusieurs decisions structurantes.
   exposent les classifications.
 - Tests ou verifications : tests unitaires de voisinage et offsets.
 - Dependances : P2-M002.
-- Statut : `ready`.
+- Statut : `todo`.
 
 ### P3-M002 - Apply tolerance rules from face classification
 

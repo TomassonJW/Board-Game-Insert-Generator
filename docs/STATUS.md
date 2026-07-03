@@ -19,9 +19,10 @@ de validation, roles logiques, plan de sprint et runbook humain.
 
 Phase active : **Phase 0 - Fondation projet**.
 
-Etat : autonomie operatoire documentee. La prochaine mission recommandee est
-`P0-M004 - Dry-run autonomous mission selection`, afin de verifier la selection
-autonome avant de reprendre les missions moteur.
+Etat : autonomie operatoire documentee et dry run de selection execute. La
+prochaine mission recommandee est `P0-M002 - Ajouter une verification
+documentaire de base`, afin de securiser les fichiers critiques du plan de
+controle.
 
 ## Implemente
 
@@ -41,6 +42,7 @@ autonome avant de reprendre les missions moteur.
 - Roles logiques d'agents.
 - Plan de sprint 2 a 4 semaines.
 - Runbook humain de supervision.
+- Dry run de selection autonome `P0-M004`.
 
 ## Experimental
 
@@ -88,7 +90,7 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant la mission d'autonomie operatoire :
+Derniere verification pendant la mission de dry run d'autonomie :
 
 - `python -m unittest discover -s tests` : OK, 7 tests passes.
 - `python -m board_game_insert_generator examples/simple_box.json --format markdown` :
@@ -106,8 +108,8 @@ Derniere verification pendant la mission d'autonomie operatoire :
   testable.
 - L'autonomie Codex doit rester bornee a une mission par run ; toute gate humaine
   doit arreter l'execution.
-- `P0-M004` doit verifier le protocole a blanc avant de relancer les missions de
-  developpement moteur.
+- Les cartes avec dependances non terminees doivent rester `todo` et ne pas etre
+  selectionnees comme `ready`.
 
 ## Regle de mise a jour
 
