@@ -12,6 +12,12 @@ Contenu :
 
 - documentation de vision et produit ;
 - protocole Codex ;
+- protocole d'autonomie operatoire ;
+- boucle d'execution standard ;
+- gates humaines ;
+- matrice de validation ;
+- roles logiques d'agents ;
+- runbook humain ;
 - roadmap macro ;
 - backlog actionnable ;
 - statut projet ;
@@ -25,6 +31,8 @@ Criteres de reussite :
 - un futur agent peut reprendre sans contexte oral ;
 - les missions sont petites, testables et documentees ;
 - les decisions structurantes ont un emplacement clair ;
+- les gates humaines sont identifiees avant implementation ;
+- une boucle se limite a une mission `ready` ;
 - le depot indique ce qui est implemente, experimental, prevu et a valider par
   impression reelle.
 

@@ -11,6 +11,8 @@ types, les commandes ou la documentation officielle imposent l'anglais.
 
 Avant de proposer ou modifier quoi que ce soit, lis au minimum :
 
+- `docs/AUTONOMY_PROTOCOL.md`
+- `docs/HUMAN_GATES.md`
 - `docs/STATUS.md`
 - `docs/ROADMAP.md`
 - `docs/BACKLOG.md`
@@ -29,6 +31,27 @@ petites et documente ce decoupage dans `docs/BACKLOG.md`.
 
 Le depot doit rester autopilotable : a la fin d'une mission, un futur agent doit
 pouvoir reprendre sans contexte oral.
+
+## Autonomous execution rules
+
+Si aucune mission explicite n'est donnee, choisis la premiere mission `ready`
+dans `docs/NEXT_ACTIONS.md`, puis seulement en fallback dans `docs/BACKLOG.md`.
+
+Regles obligatoires :
+
+- execute une seule mission par run ;
+- ne travaille jamais sur plusieurs missions a la fois ;
+- ne commence pas une mission dont les dependances ne sont pas terminees ;
+- n'ignore jamais une gate humaine decrite dans `docs/HUMAN_GATES.md` ;
+- ne modifie jamais la North Star sans validation humaine explicite ;
+- prefere un changement petit, teste, documente et commite ;
+- mets a jour les fichiers de pilotage a la fin de toute mission significative ;
+- si la mission modifie le depot, fais un commit propre apres verification du
+  diff et des tests disponibles ;
+- termine par un rapport operationnel clair.
+
+La boucle standard est decrite dans `docs/EXECUTION_LOOP.md`. Le protocole
+d'autonomie est decrit dans `docs/AUTONOMY_PROTOCOL.md`.
 
 ## Frontieres d'architecture
 

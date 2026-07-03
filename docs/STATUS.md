@@ -11,13 +11,17 @@ mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
 roadmap macro, backlog actionnable, prochaines actions, index ADR/logs et
 templates GitHub.
 
+La mission d'autonomie operatoire du 2026-07-03 ajoute une couche de controle
+plus stricte : protocole d'autonomie, boucle d'execution, gates humaines, matrice
+de validation, roles logiques, plan de sprint et runbook humain.
+
 ## Phase active
 
 Phase active : **Phase 0 - Fondation projet**.
 
-Etat : quasiment terminee pour le pilotage documentaire. La prochaine mission
-recommandee est de consolider les garde-fous automatiques et de reprendre ensuite
-la Phase 1 sur le moteur Python pur.
+Etat : autonomie operatoire documentee. La prochaine mission recommandee est
+`P0-M004 - Dry-run autonomous mission selection`, afin de verifier la selection
+autonome avant de reprendre les missions moteur.
 
 ## Implemente
 
@@ -31,6 +35,12 @@ la Phase 1 sur le moteur Python pur.
 - Tests unitaires hors Fusion 360.
 - ADR initiales sur moteur pur, cellules theoriques et JSON.
 - Gouvernance projet et backlog Codex.
+- Protocole d'autonomie operatoire.
+- Gates humaines obligatoires.
+- Matrice de validation.
+- Roles logiques d'agents.
+- Plan de sprint 2 a 4 semaines.
+- Runbook humain de supervision.
 
 ## Experimental
 
@@ -78,11 +88,12 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant la mission de gouvernance :
+Derniere verification pendant la mission d'autonomie operatoire :
 
 - `python -m unittest discover -s tests` : OK, 7 tests passes.
 - `python -m board_game_insert_generator examples/simple_box.json --format markdown` :
   OK, rapport Markdown genere.
+- `git diff --check` : OK.
 
 ## Risques actifs
 
@@ -93,6 +104,10 @@ Derniere verification pendant la mission de gouvernance :
 - Les tolerances seront credibles seulement apres une boucle d'impression reelle.
 - Le backlog est volontairement large ; chaque mission doit rester petite et
   testable.
+- L'autonomie Codex doit rester bornee a une mission par run ; toute gate humaine
+  doit arreter l'execution.
+- `P0-M004` doit verifier le protocole a blanc avant de relancer les missions de
+  developpement moteur.
 
 ## Regle de mise a jour
 

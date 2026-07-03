@@ -39,7 +39,41 @@ commitee sans melanger plusieurs decisions structurantes.
 - Dependances : P0-M001.
 - Statut : `ready`.
 
-### P0-M003 - Stabiliser le format des ADR
+### P0-M003 - Bootstrap autonomy protocol
+
+- Phase liee : Phase 0 - Fondation projet
+- Objectif : creer la couche d'autonomie operatoire permettant a Codex de
+  selectionner, executer, tester, documenter et committer une mission unique en
+  respectant les gates humaines.
+- Livrable attendu : protocole d'autonomie, boucle d'execution, gates humaines,
+  matrice de validation, roles agents, plan de sprint, runbook et log.
+- Fichiers probablement concernes : `AGENTS.md`, `docs/AUTONOMY_PROTOCOL.md`,
+  `docs/EXECUTION_LOOP.md`, `docs/HUMAN_GATES.md`,
+  `docs/VALIDATION_MATRIX.md`, `docs/AGENT_ROLES.md`,
+  `docs/SPRINT_PLAN.md`, `docs/AUTONOMY_RUNBOOK.md`, `docs/LOGS/`.
+- Criteres d'acceptation : les documents existent ; les gates sont explicites ;
+  `P0-M004` est la prochaine mission recommandee ; le depot reste hors
+  developpement produit profond.
+- Tests ou verifications : suite unitaire, exemple CLI, `git diff --check`.
+- Dependances : P0-M001.
+- Statut : `done`.
+
+### P0-M004 - Dry-run autonomous mission selection
+
+- Phase liee : Phase 0 - Fondation projet
+- Objectif : executer une selection autonome a blanc pour verifier que Codex
+  choisit correctement la prochaine mission `ready` sans la demarrer.
+- Livrable attendu : rapport de dry-run indiquant fichiers lus, mission choisie,
+  dependances, gates, criteres d'acceptation et raison de non-execution.
+- Fichiers probablement concernes : `docs/NEXT_ACTIONS.md`,
+  `docs/BACKLOG.md`, `docs/STATUS.md`, `docs/LOGS/`.
+- Criteres d'acceptation : la mission selectionnee est justifiee ; aucune
+  implementation produit n'est faite ; les ambiguities de pilotage sont notees.
+- Tests ou verifications : relecture documentaire, `git diff --check`.
+- Dependances : P0-M003.
+- Statut : `ready`.
+
+### P0-M005 - Stabiliser le format des ADR
 
 - Phase liee : Phase 0 - Fondation projet
 - Objectif : definir un template ADR utilisable pour les futures decisions.
@@ -52,7 +86,7 @@ commitee sans melanger plusieurs decisions structurantes.
 - Dependances : P0-M001.
 - Statut : `ready`.
 
-### P0-M004 - Definir une nomenclature de versions et releases
+### P0-M006 - Definir une nomenclature de versions et releases
 
 - Phase liee : Phase 0 - Fondation projet
 - Objectif : clarifier comment passer de V0 experimental a releases utilisables.
@@ -67,7 +101,7 @@ commitee sans melanger plusieurs decisions structurantes.
 
 ## Phase 1 - Moteur Python pur
 
-### P1-M001 - Consolider les modeles de donnees de base
+### P1-M001 - Consolidate core data models
 
 - Phase liee : Phase 1 - Moteur Python pur
 - Objectif : stabiliser `BoxSpec`, `ModuleRequest`, `ToleranceProfile`,
@@ -82,11 +116,11 @@ commitee sans melanger plusieurs decisions structurantes.
 - Dependances : P0-M001.
 - Statut : `ready`.
 
-### P1-M002 - Durcir le chargement JSON
+### P1-M002 - Harden config loading and validation
 
 - Phase liee : Phase 1 - Moteur Python pur
-- Objectif : rendre les erreurs de configuration plus precises et couvrir les
-  champs inconnus, types invalides et cas limites.
+- Objectif : rendre le chargement et la validation plus precis, notamment pour
+  les champs inconnus, types invalides et cas limites.
 - Livrable attendu : loader JSON robuste avec tests d'erreurs.
 - Fichiers probablement concernes : `config_loader.py`, `tests/`,
   `docs/CONFIG_SCHEMA.md`.
@@ -96,16 +130,18 @@ commitee sans melanger plusieurs decisions structurantes.
 - Dependances : P1-M001.
 - Statut : `ready`.
 
-### P1-M003 - Produire un rapport de validation structure
+### P1-M003 - Improve CLI reporting
 
 - Phase liee : Phase 1 - Moteur Python pur
-- Objectif : exposer les erreurs et warnings sous forme exploitable par la CLI,
-  Fusion 360 et de futurs assistants.
-- Livrable attendu : structure de rapport de validation serialisable.
-- Fichiers probablement concernes : `validation.py`, `report.py`, `tests/`.
-- Criteres d'acceptation : les erreurs conservent un code stable, un champ et un
-  message ; le rapport JSON les expose clairement.
-- Tests ou verifications : tests unitaires et exemple JSON.
+- Objectif : rendre les rapports CLI plus utiles pour diagnostiquer validation,
+  layout, tolerances et warnings.
+- Livrable attendu : sortie Markdown/JSON plus structurante, lisible et
+  exploitable par un futur adaptateur.
+- Fichiers probablement concernes : `cli.py`, `report.py`, `validation.py`,
+  `tests/`, `README.md`.
+- Criteres d'acceptation : les erreurs et warnings sont actionnables ; le rapport
+  expose les valeurs importantes ; les exemples existants restent reproductibles.
+- Tests ou verifications : tests unitaires et execution d'exemple CLI.
 - Dependances : P1-M002.
 - Statut : `todo`.
 
@@ -123,11 +159,12 @@ commitee sans melanger plusieurs decisions structurantes.
 
 ## Phase 2 - Layout rectangulaire simple
 
-### P2-M001 - Formaliser l'interface de strategie de layout
+### P2-M001 - Formalize simple rectangular layout model
 
 - Phase liee : Phase 2 - Layout rectangulaire simple
-- Objectif : preparer plusieurs strategies sans disperser la logique.
-- Livrable attendu : contrat interne pour `row_fill`, grille et colonnes.
+- Objectif : formaliser le modele rectangulaire simple sans disperser la logique
+  de placement.
+- Livrable attendu : contrat interne pour `row_fill`, grille future et colonnes.
 - Fichiers probablement concernes : `layout.py`, `models.py`, `docs/ARCHITECTURE.md`.
 - Criteres d'acceptation : `row_fill` garde son comportement ; l'extension future
   est documentee ; aucun couplage Fusion n'est introduit.
@@ -135,7 +172,7 @@ commitee sans melanger plusieurs decisions structurantes.
 - Dependances : P1-M001.
 - Statut : `ready`.
 
-### P2-M002 - Couvrir les cas limites de `row_fill`
+### P2-M002 - Cover row_fill edge cases
 
 - Phase liee : Phase 2 - Layout rectangulaire simple
 - Objectif : tester rotation, retour a la ligne, depassement et priorites.
@@ -175,10 +212,10 @@ commitee sans melanger plusieurs decisions structurantes.
 
 ## Phase 3 - Tolerances intelligentes
 
-### P3-M001 - Classifier explicitement les faces
+### P3-M001 - Classify exposed, internal and functional faces
 
 - Phase liee : Phase 3 - Tolerances intelligentes
-- Objectif : separer faces peripheriques, voisines, libres, internes et
+- Objectif : separer faces exposees, voisines, internes, libres et
   fonctionnelles.
 - Livrable attendu : modele de classification de faces teste.
 - Fichiers probablement concernes : `tolerance.py`, `models.py`,
@@ -189,7 +226,23 @@ commitee sans melanger plusieurs decisions structurantes.
 - Dependances : P2-M002.
 - Statut : `ready`.
 
-### P3-M002 - Ajouter des profils d'impression
+### P3-M002 - Apply tolerance rules from face classification
+
+- Phase liee : Phase 3 - Tolerances intelligentes
+- Objectif : appliquer les jeux selon la classification explicite des faces au
+  lieu d'une logique implicite difficile a expliquer.
+- Livrable attendu : calcul d'offsets fonde sur les roles de faces et rapports
+  indiquant les raisons d'application.
+- Fichiers probablement concernes : `tolerance.py`, `models.py`, `report.py`,
+  `tests/`, `docs/TOLERANCE_MODEL.md`.
+- Criteres d'acceptation : chaque offset expose sa raison ; les faces internes
+  de futurs modules composites ne recoivent pas de jeu ; les tests couvrent les
+  cas simples.
+- Tests ou verifications : tests unitaires de tolerance et exemple CLI.
+- Dependances : P3-M001.
+- Statut : `todo`.
+
+### P3-M003 - Ajouter des profils d'impression
 
 - Phase liee : Phase 3 - Tolerances intelligentes
 - Objectif : permettre des presets PLA/PETG/rapide/fin sans cacher les valeurs.
@@ -199,10 +252,10 @@ commitee sans melanger plusieurs decisions structurantes.
 - Criteres d'acceptation : un profil peut etre surcharge champ par champ ; le
   rapport montre les valeurs finales.
 - Tests ou verifications : tests loader, validation et rapport.
-- Dependances : P3-M001.
+- Dependances : P3-M002.
 - Statut : `todo`.
 
-### P3-M003 - Ajouter un protocole de calibration physique
+### P3-M004 - Ajouter un protocole de calibration physique
 
 - Phase liee : Phase 3 - Tolerances intelligentes
 - Objectif : documenter comment valider les jeux par impression reelle.
@@ -212,10 +265,27 @@ commitee sans melanger plusieurs decisions structurantes.
 - Criteres d'acceptation : le protocole distingue theorie, impression et
   ajustements.
 - Tests ou verifications : relecture documentaire.
-- Dependances : P3-M002.
+- Dependances : P3-M003.
 - Statut : `todo`.
 
 ## Phase 4 - Generation Fusion 360 de blanks
+
+### P4-M000 - Prepare Fusion 360 integration gate report
+
+- Phase liee : Phase 4 - Generation Fusion 360 de blanks
+- Objectif : preparer le rapport de gate humaine avant toute integration Fusion
+  360 executable.
+- Livrable attendu : rapport indiquant etat du moteur Python pur, tests,
+  contrat intermediaire attendu, risques et perimetre exact de la premiere
+  integration.
+- Fichiers probablement concernes : `docs/FUSION_360_STRATEGY.md`,
+  `docs/HUMAN_GATES.md`, `docs/STATUS.md`, `docs/LOGS/`.
+- Criteres d'acceptation : aucune API Fusion n'est importee dans le coeur ; les
+  preconditions de demarrage sont verifiees ; la validation humaine attendue est
+  formulee explicitement.
+- Tests ou verifications : suite unitaire du coeur, relecture documentaire.
+- Dependances : P1-M003, P2-M002, P3-M002.
+- Statut : `todo`.
 
 ### P4-M001 - Definir le contrat de representation intermediaire CAD
 
@@ -492,7 +562,7 @@ commitee sans melanger plusieurs decisions structurantes.
 - Criteres d'acceptation : une release indique ce qui est implemente, experimental
   et a valider par impression.
 - Tests ou verifications : checklist release executee.
-- Dependances : P0-M004.
+- Dependances : P0-M006.
 - Statut : `todo`.
 
 ### P10-M003 - Preparer la distribution utilisateur
