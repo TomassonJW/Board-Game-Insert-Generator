@@ -166,18 +166,20 @@ def _validate_module_cavities(
         _validate_non_negative_number(cavity.origin.z, f"{prefix}.origin_mm.z", issues)
         _validate_positive_dimensions(cavity.size, f"{prefix}.size_mm", issues)
         _validate_non_negative_number(cavity.clearance_mm, f"{prefix}.clearance_mm", issues)
-        minimum_clearance = _minimum_card_cavity_clearance(cavity, tolerances)
-        if minimum_clearance is not None and cavity.clearance_mm < minimum_clearance:
-            issues.append(
-                _issue(
-                    f"{prefix}.clearance_mm",
-                    "CARD_CAVITY_CLEARANCE_TOO_LOW",
-                    (
-                        "Card cavity clearance must be at least the active profile value "
-                        f"({minimum_clearance:.2f} mm)."
-                    ),
+        minimum_clearance = _minimum_profile_cavity_clearance(cavity, tolerances)
+        if minimum_clearance is not None:
+            minimum_value, source = minimum_clearance
+            if cavity.clearance_mm < minimum_value:
+                issues.append(
+                    _issue(
+                        f"{prefix}.clearance_mm",
+                        _clearance_issue_code(cavity),
+                        (
+                            "Cavity clearance must be at least the active profile value "
+                            f"from {source} ({minimum_value:.2f} mm)."
+                        ),
+                    )
                 )
-            )
 
         right_wall = module_size.x - (cavity.origin.x + cavity.size.x)
         back_wall = module_size.y - (cavity.origin.y + cavity.size.y)
@@ -217,15 +219,27 @@ def _validate_module_cavities(
             )
 
 
-def _minimum_card_cavity_clearance(
+def _minimum_profile_cavity_clearance(
     cavity: Cavity,
     tolerances: ToleranceProfile,
-) -> float | None:
+) -> tuple[float, str] | None:
     if cavity.functional_type == FunctionalType.CARDS:
-        return tolerances.card_clearance_mm
+        return tolerances.card_clearance_mm, "tolerances.card_clearance_mm"
     if cavity.functional_type == FunctionalType.SLEEVED_CARDS:
-        return tolerances.sleeved_card_clearance_mm
+        return tolerances.sleeved_card_clearance_mm, "tolerances.sleeved_card_clearance_mm"
+    if cavity.functional_type == FunctionalType.TOKENS:
+        return tolerances.token_clearance_mm, "tolerances.token_clearance_mm"
+    if cavity.functional_type == FunctionalType.DICE:
+        return tolerances.token_clearance_mm, "tolerances.token_clearance_mm"
+    if cavity.functional_type == FunctionalType.MEEPLES:
+        return tolerances.meeple_clearance_mm, "tolerances.meeple_clearance_mm"
     return None
+
+
+def _clearance_issue_code(cavity: Cavity) -> str:
+    if cavity.functional_type in (FunctionalType.CARDS, FunctionalType.SLEEVED_CARDS):
+        return "CARD_CAVITY_CLEARANCE_TOO_LOW"
+    return "OPEN_RECEPTACLE_CLEARANCE_TOO_LOW"
 
 
 def _validate_positive_dimensions(

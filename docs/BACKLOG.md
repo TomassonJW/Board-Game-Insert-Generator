@@ -481,7 +481,7 @@ commitee sans melanger plusieurs decisions structurantes.
   les formes irregulieres.
 - Tests ou verifications : tests et rapport exemple.
 - Dependances : P5-M001.
-- Statut : `ready`.
+- Statut : `done`.
 
 ### P5-M004 - Ajouter encoches de doigts et fonds arrondis
 
@@ -494,7 +494,7 @@ commitee sans melanger plusieurs decisions structurantes.
   mapper plus tard.
 - Tests ou verifications : tests de serialization ou rapport.
 - Dependances : P5-M002, P5-M003.
-- Statut : `todo`.
+- Statut : `blocked`.
 
 ## Phase 6 - Modules composites
 

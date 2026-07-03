@@ -204,11 +204,29 @@ def _parse_cavity_clearance(
 ) -> tuple[float, str]:
     if "clearance_mm" in raw:
         return _number_value(raw["clearance_mm"], f"{cavity_field}.clearance_mm"), "explicit"
+
+    profile_clearance = _profile_cavity_clearance(functional_type, tolerances)
+    if profile_clearance is not None:
+        return profile_clearance
+
+    raise ConfigError(f"Missing required field '{cavity_field}.clearance_mm'.")
+
+
+def _profile_cavity_clearance(
+    functional_type: FunctionalType,
+    tolerances: ToleranceProfile,
+) -> tuple[float, str] | None:
     if functional_type == FunctionalType.CARDS:
         return tolerances.card_clearance_mm, "tolerances.card_clearance_mm"
     if functional_type == FunctionalType.SLEEVED_CARDS:
         return tolerances.sleeved_card_clearance_mm, "tolerances.sleeved_card_clearance_mm"
-    raise ConfigError(f"Missing required field '{cavity_field}.clearance_mm'.")
+    if functional_type == FunctionalType.TOKENS:
+        return tolerances.token_clearance_mm, "tolerances.token_clearance_mm"
+    if functional_type == FunctionalType.DICE:
+        return tolerances.token_clearance_mm, "tolerances.token_clearance_mm"
+    if functional_type == FunctionalType.MEEPLES:
+        return tolerances.meeple_clearance_mm, "tolerances.meeple_clearance_mm"
+    return None
 
 def _parse_functional_type_value(value: Any, field_path: str) -> FunctionalType:
     try:

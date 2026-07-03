@@ -140,7 +140,7 @@ et de features.
 ### Cavity
 
 Volume rectangulaire retire a l'interieur d'un module pour contenir un objet.
-Depuis P5-M001/P5-M002, une cavite simple porte :
+Depuis P5-M001/P5-M002/P5-M003, une cavite simple porte :
 
 - un identifiant stable ;
 - un type fonctionnel ;
@@ -161,11 +161,12 @@ Exemples :
 Les cavites ont leurs propres jeux. Le jeu autour d'une carte sleevee n'est pas
 le meme que le jeu entre deux modules voisins. Depuis P5-M001, la validation
 porte sur l'enveloppe externe du module, les parois X/Y minimales et le fond
-minimal. Depuis P5-M002, les cavites `cards` et `sleeved_cards` peuvent omettre
-`clearance_mm` : le moteur utilise alors `card_clearance_mm` ou
-`sleeved_card_clearance_mm` du profil actif et refuse une valeur explicite
-inferieure. La cavite est transportee dans la CAD IR comme intention abstraite ;
-elle n'est pas encore coupee dans Fusion.
+minimal. Depuis P5-M002/P5-M003, les cavites `cards`, `sleeved_cards`,
+`tokens`, `dice` et `meeples` peuvent omettre `clearance_mm` : le moteur
+utilise alors la valeur de profil active correspondante et refuse une valeur
+explicite inferieure. Les des utilisent provisoirement `token_clearance_mm`
+tant qu'aucune calibration ne justifie un champ dedie. La cavite est transportee
+dans la CAD IR comme intention abstraite ; elle n'est pas encore coupee dans Fusion.
 
 ### Feature
 

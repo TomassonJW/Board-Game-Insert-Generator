@@ -1,0 +1,81 @@
+{
+  "project_name": "Simple open receptacles V0",
+  "units": "mm",
+  "box": {
+    "inner_dimensions_mm": { "x": 180, "y": 120, "z": 45 },
+    "usable_height_mm": 32,
+    "lid_clearance_mm": 5
+  },
+  "print_profile": "default",
+  "tolerances": {
+    "token_clearance_mm": 0.7,
+    "meeple_clearance_mm": 1.1
+  },
+  "defaults": {
+    "wall_thickness_mm": 1.2,
+    "floor_thickness_mm": 1.2,
+    "corner_radius_mm": 1.5
+  },
+  "layout": {
+    "strategy": "row_fill"
+  },
+  "modules": [
+    {
+      "id": "token-cup",
+      "name": "Token cup",
+      "functional_type": "tokens",
+      "min_dimensions_mm": { "x": 60, "y": 60 },
+      "height_mm": 24,
+      "priority": 100,
+      "allow_rotation": false,
+      "quantity": 1,
+      "comment": "Token clearance resolved from token_clearance_mm.",
+      "cavities": [
+        {
+          "id": "token-open-bin",
+          "origin_mm": { "x": 2, "y": 2, "z": 1.2 },
+          "size_mm": { "x": 56, "y": 56, "z": 20 },
+          "comment": "Abstract token bin; Fusion cutting is gated later."
+        }
+      ]
+    },
+    {
+      "id": "dice-cup",
+      "name": "Dice cup",
+      "functional_type": "dice",
+      "min_dimensions_mm": { "x": 50, "y": 50 },
+      "height_mm": 28,
+      "priority": 90,
+      "allow_rotation": false,
+      "quantity": 1,
+      "comment": "Dice use token_clearance_mm until a calibrated dice clearance exists.",
+      "cavities": [
+        {
+          "id": "dice-open-bin",
+          "origin_mm": { "x": 2, "y": 2, "z": 1.2 },
+          "size_mm": { "x": 46, "y": 46, "z": 24 },
+          "comment": "Abstract dice bin; Fusion cutting is gated later."
+        }
+      ]
+    },
+    {
+      "id": "meeple-cup",
+      "name": "Meeple cup",
+      "functional_type": "meeples",
+      "min_dimensions_mm": { "x": 62, "y": 50 },
+      "height_mm": 24,
+      "priority": 80,
+      "allow_rotation": false,
+      "quantity": 1,
+      "comment": "Meeple clearance resolved from meeple_clearance_mm.",
+      "cavities": [
+        {
+          "id": "meeple-open-bin",
+          "origin_mm": { "x": 2, "y": 2, "z": 1.2 },
+          "size_mm": { "x": 58, "y": 46, "z": 20 },
+          "comment": "Abstract meeple bin; Fusion cutting is gated later."
+        }
+      ]
+    }
+  ]
+}

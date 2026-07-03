@@ -114,6 +114,26 @@ class CadIrTests(unittest.TestCase):
         self.assertEqual(second_cavity["clearance_mm"], 0.95)
         self.assertEqual(second_cavity["clearance_source"], "tolerances.sleeved_card_clearance_mm")
 
+
+    def test_scene_serializes_open_receptacle_profile_clearance_sources(self) -> None:
+        config = load_config(ROOT / "examples" / "simple_open_tray.json")
+        layout = generate_basic_layout(config)
+
+        payload = build_blank_cad_scene(config, layout).to_dict()
+        sources = [
+            component["body"]["cavities"][0]["clearance_source"]
+            for component in payload["components"]
+        ]
+
+        self.assertEqual(
+            sources,
+            [
+                "tolerances.token_clearance_mm",
+                "tolerances.token_clearance_mm",
+                "tolerances.meeple_clearance_mm",
+            ],
+        )
+
     def test_scene_rejects_inconsistent_layout_result(self) -> None:
         config = load_config(ROOT / "examples" / "simple_box.json")
         layout = generate_basic_layout(config)

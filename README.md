@@ -87,13 +87,14 @@ Pour tester une cavite simple planifiee cote moteur/CAD IR :
 $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_tray.json --format markdown
 python -m board_game_insert_generator examples/simple_card_tray.json --format markdown
+python -m board_game_insert_generator examples/simple_open_tray.json --format markdown
 python -m board_game_insert_generator export-cad-ir examples/simple_tray.json --output $env:TEMP\bgig-simple-tray-cad-ir.json
 ```
 
 La cavite apparait dans les rapports et dans la CAD IR comme operation abstraite
-`subtract_rectangular_cavity`. Pour `cards` et `sleeved_cards`, `clearance_mm`
-peut etre resolu depuis le profil actif et apparait avec `clearance_source`.
-L'add-in Fusion actuel ne l'execute pas encore.
+`subtract_rectangular_cavity`. Pour `cards`, `sleeved_cards`, `tokens`, `dice`
+et `meeples`, `clearance_mm` peut etre resolu depuis le profil actif et
+apparait avec `clearance_source`.
 
 Les rapports exposent un resume de diagnostic : strategie de layout, nombre de
 modules demandes, instances generees, corps imprimables, rotations, empreinte du

@@ -131,17 +131,22 @@ qui est alors resolu depuis `card_clearance_mm` ou `sleeved_card_clearance_mm` d
 profil actif. Une valeur explicite inferieure au profil actif est refusee et la
 source de clearance est exposee dans les rapports et la CAD IR.
 
+La mission `P5-M003` du 2026-07-04 specialise les receptacles ouverts pour
+`tokens`, `dice` et `meeples`. Les cavites `tokens` et `dice` peuvent utiliser
+`token_clearance_mm`, les cavites `meeples` utilisent `meeple_clearance_mm`, et
+les sources sont exposees via `clearance_source`. Aucune valeur dediee aux des
+n'est ajoutee tant qu'elle n'est pas calibree physiquement.
+
 ## Phase active
 
 Phase active : **Phase 5 - Cavites simples abstraites cote moteur et CAD IR**.
 
 Etat : le pipeline P4 reste stable pour les blanks rectangulaires Fusion. La
 vague P5 est ouverte uniquement cote moteur Python pur, configuration, rapports
-et CAD IR. Les cavites simples, incluant les logements `cards` et
-`sleeved_cards`, sont des intentions abstraites validables et exportables ; elles
-ne sont pas encore generees dans Fusion. La prochaine mission recommandee est
-`P5-M003 - Ajouter bacs a tokens, des et meeples`, sans operation Fusion
-soustractive.
+et CAD IR. Les cavites simples, incluant les logements `cards`, `sleeved_cards`,
+`tokens`, `dice` et `meeples`, sont des intentions abstraites validables et
+exportables ; elles ne sont pas encore generees dans Fusion. La prochaine etape
+recommandee est une gate avant ergonomie avancee ou generation Fusion soustractive.
 
 ## Implemente
 
@@ -189,8 +194,8 @@ soustractive.
   actionnables dans Fusion.
 - Cavites rectangulaires simples abstraites dans la configuration, la validation,
   les rapports Markdown/JSON et la CAD IR `subtract_rectangular_cavity`.
-- Clearances de logements `cards` et `sleeved_cards` resolues depuis le profil
-  actif et tracables via `clearance_source`.
+- Clearances de logements `cards`, `sleeved_cards`, `tokens`, `dice` et
+  `meeples` resolues depuis le profil actif et tracables via `clearance_source`.
 - Smoke test CAD manuel P4-M003 valide dans Fusion : add-in visible, message OK,
   modules visibles et dimensions conformes a la fixture.
 
@@ -203,7 +208,7 @@ soustractive.
   sont pas encore detectes automatiquement par des modules composites.
 - Les `PrimitiveVolume`, `CompositeModule` et `Feature` existent comme concepts
   mais ne pilotent pas encore une generation complete.
-- Les cavites P5-M001/P5-M002 sont abstraites : elles ne sont pas encore coupees
+- Les cavites P5-M001/P5-M002/P5-M003 sont abstraites : elles ne sont pas encore coupees
   dans Fusion et ne sont pas validees par impression.
 - Les tolerances par defaut et les profils d'impression sont prudents mais non
   calibres sur impression.
@@ -220,7 +225,7 @@ soustractive.
 
 - Strategie de layout `columns`.
 - Decision humaine sur le prochain perimetre Fusion apres stabilisation P4-M004/P4-M006.
-- Bacs tokens/des/meeples specialises et ergonomie de cavites.
+- Ergonomie avancee de cavites, sous gate si elle implique fonds arrondis, fillets ou generation Fusion.
 - Modules composites en L/T.
 - Couvercles, rainures et mecanismes.
 - Surcouche esthetique.
@@ -252,21 +257,23 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant `P5-M002 - Logements cards et sleeved_cards` :
+Derniere verification pendant `P5-M003 - Receptacles tokens, dice et meeples` :
 
-- `python -m unittest discover -s tests` : OK, 83 tests passes.
+- `python -m unittest discover -s tests` : OK, 86 tests passes.
 - `python -m board_game_insert_generator examples\simple_box.json --format markdown` : OK.
 - `python -m board_game_insert_generator examples\simple_box.json --format json` : OK.
 - `python -m board_game_insert_generator export-cad-ir examples\simple_box.json --output "$env:TEMP\bgig-cad-ir-input.json"` : OK, schema `cad_ir.v0`, 4 composants.
-- `python -m board_game_insert_generator examples\simple_tray.json --format markdown` : OK, 1 cavite planifiee `abstract_only`.
-- `python -m board_game_insert_generator examples\simple_tray.json --format json` : OK, `planned_cavity_count = 1`.
-- `python -m board_game_insert_generator export-cad-ir examples\simple_tray.json --output "$env:TEMP\bgig-simple-tray-cad-ir.json"` : OK, schema `cad_ir.v0`, 1 composant.
-- `python -m board_game_insert_generator examples\simple_card_tray.json --format markdown` : OK, clearances `cards` et `sleeved_cards` resolues depuis le profil.
-- `python -m board_game_insert_generator examples\simple_card_tray.json --format json` : OK, `clearance_source` expose.
-- `python -m board_game_insert_generator export-cad-ir examples\simple_card_tray.json --output "$env:TEMP\bgig-simple-card-tray-cad-ir.json"` : OK, schema `cad_ir.v0`, 2 composants.
+- `python -m board_game_insert_generator examples\simple_tray.json --format markdown` : OK.
+- `python -m board_game_insert_generator examples\simple_tray.json --format json` : OK.
+- `python -m board_game_insert_generator export-cad-ir examples\simple_tray.json --output "$env:TEMP\bgig-simple-tray-cad-ir.json"` : OK.
+- `python -m board_game_insert_generator examples\simple_card_tray.json --format markdown` : OK.
+- `python -m board_game_insert_generator examples\simple_card_tray.json --format json` : OK.
+- `python -m board_game_insert_generator export-cad-ir examples\simple_card_tray.json --output "$env:TEMP\bgig-simple-card-tray-cad-ir.json"` : OK.
+- `python -m board_game_insert_generator examples\simple_open_tray.json --format markdown` : OK, clearances `tokens`, `dice` et `meeples` resolues depuis le profil.
+- `python -m board_game_insert_generator examples\simple_open_tray.json --format json` : OK, `clearance_source` expose.
+- `python -m board_game_insert_generator export-cad-ir examples\simple_open_tray.json --output "$env:TEMP\bgig-simple-open-tray-cad-ir.json"` : OK, schema `cad_ir.v0`, 3 composants.
 - `git diff --check` : OK.
 - `rg -n "adsk" src/board_game_insert_generator` : OK, aucune occurrence dans le coeur Python.
-
 ## Risques actifs
 
 - Le moteur a deja des concepts futurs dans `models.py`; il faut eviter de les

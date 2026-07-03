@@ -48,13 +48,31 @@ class ConfigLoaderTests(unittest.TestCase):
         self.assertEqual(sleeved_cavity.clearance_mm, 0.95)
         self.assertEqual(sleeved_cavity.clearance_source, "tolerances.sleeved_card_clearance_mm")
 
-    def test_rejects_missing_generic_cavity_clearance(self) -> None:
+
+    def test_open_receptacles_default_clearance_from_profile(self) -> None:
+        config = load_config(ROOT / "examples" / "simple_open_tray.json")
+
+        token_cavity = config.modules[0].cavities[0]
+        dice_cavity = config.modules[1].cavities[0]
+        meeple_cavity = config.modules[2].cavities[0]
+
+        self.assertEqual(token_cavity.functional_type, FunctionalType.TOKENS)
+        self.assertEqual(token_cavity.clearance_mm, 0.7)
+        self.assertEqual(token_cavity.clearance_source, "tolerances.token_clearance_mm")
+        self.assertEqual(dice_cavity.functional_type, FunctionalType.DICE)
+        self.assertEqual(dice_cavity.clearance_mm, 0.7)
+        self.assertEqual(dice_cavity.clearance_source, "tolerances.token_clearance_mm")
+        self.assertEqual(meeple_cavity.functional_type, FunctionalType.MEEPLES)
+        self.assertEqual(meeple_cavity.clearance_mm, 1.1)
+        self.assertEqual(meeple_cavity.clearance_source, "tolerances.meeple_clearance_mm")
+
+    def test_rejects_missing_free_cavity_clearance(self) -> None:
         payload = _simple_payload()
-        payload["modules"][0]["functional_type"] = "tokens"
+        payload["modules"][0]["functional_type"] = "free"
         payload["modules"][0]["cavities"] = [
             {
                 "id": "missing-clearance",
-                "functional_type": "tokens",
+                "functional_type": "free",
                 "origin_mm": {"x": 2, "y": 2, "z": 1.2},
                 "size_mm": {"x": 10, "y": 10, "z": 5},
             }

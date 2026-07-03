@@ -90,6 +90,24 @@ preserver la matiere continue d'un futur module composite.
 Les rapports Markdown et JSON exposent les tolerances appliquees par face :
 offset, source, identifiant de regle et raison.
 
+## Clearances de cavites abstraites
+
+Depuis P5-M002/P5-M003, certaines cavites peuvent omettre `clearance_mm` dans la
+configuration. Le loader resout alors la valeur depuis le profil actif et expose
+la source dans les rapports et la CAD IR :
+
+| Type de cavite | Source de clearance | Statut |
+| --- | --- | --- |
+| `cards` | `card_clearance_mm` | implemente, non valide physiquement |
+| `sleeved_cards` | `sleeved_card_clearance_mm` | implemente, non valide physiquement |
+| `tokens` | `token_clearance_mm` | implemente, non valide physiquement |
+| `dice` | `token_clearance_mm` | provisoire, non calibre comme valeur dediee |
+| `meeples` | `meeple_clearance_mm` | implemente, non valide physiquement |
+
+Les cavites `free` et `other` doivent garder un `clearance_mm` explicite. Aucune
+nouvelle valeur par defaut n'est ajoutee pour les des tant qu'une calibration
+physique ne justifie pas un champ dedie.
+
 ## Modules composites
 
 Pour un module composite, les primitives internes sont fusionnees.
@@ -137,6 +155,8 @@ Implemente :
 - distinction peripherie, voisin, face exposee, face fonctionnelle, face interne
   et face soudee dans les regles ;
 - exposition des classifications et tolerances appliquees dans les rapports ;
+- clearances de cavites abstraites resolues depuis le profil actif pour cartes,
+  cartes sleevees, tokens, des et meeples ;
 - validation que les offsets ne rendent pas le corps non positif.
 
 Experimental :
@@ -148,7 +168,7 @@ Experimental :
 Prevu :
 
 - calibration physique des profils ;
-- tolerances de cavites ;
+- ergonomie avancee des cavites ;
 - jeux de couvercles, rainures, charnieres et clips ;
 - protocole de calibration par coupons imprimes.
 

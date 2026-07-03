@@ -18,28 +18,32 @@ structurant, authentification absente ou refus de push direct.
 
 ## Gate humaine active
 
-Statut : `validated_for_scope`.
+Statut : `blocked`.
 
-Decision humaine du 2026-07-04 : poursuivre vers les premieres cavites simples
-cote moteur Python pur, configuration, rapports et CAD IR.
+Decision demandee : autoriser ou recadrer `P5-M004 - Ajouter encoches de doigts
+et fonds arrondis`.
 
-Perimetre autorise :
+Contexte :
 
-- modele de cavite simple ;
-- configuration JSON ;
-- validation des dimensions, parois et fond ;
-- specialisation de clearances pour `cards` et `sleeved_cards` ;
-- rapports Markdown/JSON ;
-- CAD IR avec operations abstraites de cavite ;
-- export CAD IR compatible avec l'add-in existant.
+- `P5-M001` modele les cavites rectangulaires simples abstraites ;
+- `P5-M002` specialise les clearances de logements `cards` et `sleeved_cards` ;
+- `P5-M003` specialise les receptacles ouverts `tokens`, `dice` et `meeples` ;
+- la gate P5 validee couvrait les cavites simples cote moteur/CAD IR ;
+- `P5-M004` parle d'encoches de doigts et de fonds arrondis, ce qui peut sortir
+  du simple volume rectangulaire et toucher aux features, fillets/conges ou a une
+  future generation Fusion soustractive.
 
-Perimetre toujours bloque sans nouvelle gate :
+Options :
 
-- creation reelle de cavites dans Fusion ;
-- extrusion cut, boolean soustractif ou sketch de coupe Fusion ;
-- fillets/conges, couvercles, charnieres ;
-- export STL/3MF ;
-- validation d'impression reelle.
+1. Autoriser uniquement des features abstraites CAD-agnostic sans Fusion et sans
+   fillets reels.
+2. Recadrer P5-M004 en simple documentation/specification ergonomique sans code.
+3. Reporter P5-M004 et revenir a une autre mission moteur non gated.
+4. Autoriser une etude Fusion/cuts/booleans, ce qui declenche une gate Fusion
+   separee avant implementation.
+
+Recommandation : option 1 ou 2. Garder les encoches/fonds arrondis abstraits tant
+qu'aucune gate Fusion soustractive n'est explicitement validee.
 
 ## Fin de chaque mission
 
@@ -49,30 +53,11 @@ integration directe dans `main`, push vers `origin/main`, puis reprise depuis
 
 ## Mission ready
 
-### P5-M003 - Ajouter bacs a tokens, des et meeples
-
-Statut : `ready`.
-
-Objectif : specialiser les cavites simples pour les receptacles ouverts de
-`tokens`, `dice` et `meeples`, en conservant le moteur Python pur et la CAD IR
-abstraite.
-
-Livrable attendu :
-
-- regles de clearances fonctionnelles pour tokens, des et meeples ;
-- validation des parois/fonds deja existante conservee ;
-- exemple ou extension d'exemple ;
-- rapports et CAD IR enrichis si necessaire ;
-- aucune generation Fusion reelle.
-
-Dependances : `P5-M002` done.
-
-Verifications minimales : suite unitaire, exemples `simple_box`, `simple_tray` et
-`simple_card_tray`, export CAD IR, `git diff --check`, absence de `adsk` dans le
-coeur.
+Aucune mission `ready` ne doit etre lancee tant que la gate P5-M004 n'est pas
+tranchee ou qu'une autre mission explicitement non gated n'est pas selectionnee.
 
 ## Gate obligatoire suivante
 
 Si la prochaine mission implique de creer reellement les cavites dans Fusion 360,
 par sketch, extrusion cut, boolean ou toute operation geometrique Fusion
-soustractive, Codex doit s'arreter avec un rapport de gate.
+soustractive, Codex doit s'arreter avec un rapport de gate Fusion dedie.

@@ -104,8 +104,10 @@ Pour chaque blank rectangulaire, l'operation principale est :
 
 Les cavites sont aussi exposees dans `body.cavities` avec `status: abstract_only`,
 `fusion_generation: not_implemented` et `clearance_source`. Pour les cavites
-`cards` et `sleeved_cards`, `clearance_source` indique si le jeu vient de
-`tolerances.card_clearance_mm` ou `tolerances.sleeved_card_clearance_mm`.
+`cards`, `sleeved_cards`, `tokens`, `dice` et `meeples`, `clearance_source`
+indique si le jeu vient de `tolerances.card_clearance_mm`,
+`tolerances.sleeved_card_clearance_mm`, `tolerances.token_clearance_mm` ou
+`tolerances.meeple_clearance_mm`.
 
 Ces operations sont des intentions CAD-agnostic. Elles ne sont pas des appels
 Fusion et ne garantissent pas encore une sortie CAD concrete sans validation

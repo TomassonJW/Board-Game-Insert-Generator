@@ -157,6 +157,33 @@ class ModelContractTests(unittest.TestCase):
             _issue_keys(issues),
         )
 
+
+    def test_open_receptacle_clearance_must_meet_active_profile_minimum(self) -> None:
+        cavity = Cavity(
+            id="tight-token-bin",
+            functional_type=FunctionalType.TOKENS,
+            origin=Point3D(x=2.0, y=2.0, z=1.2),
+            size=Dimension3D(x=56.0, y=56.0, z=20.0),
+            clearance_mm=0.2,
+        )
+        module = _module(
+            module_id="token-cup",
+            height_mm=24.0,
+            min_dimensions=Dimension3D(x=60.0, y=60.0, z=24.0),
+            cavities=(cavity,),
+        )
+        config = _config(
+            modules=(module,),
+            tolerances=ToleranceProfile(token_clearance_mm=0.7),
+        )
+
+        issues = validate_config(config)
+
+        self.assertIn(
+            ("modules[0].cavities[0].clearance_mm", "OPEN_RECEPTACLE_CLEARANCE_TOO_LOW"),
+            _issue_keys(issues),
+        )
+
     def test_cell_and_printable_body_remain_distinct_contract_objects(self) -> None:
         result = generate_basic_layout(_config())
 
