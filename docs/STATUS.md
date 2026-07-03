@@ -33,6 +33,10 @@ La mission `P1-M003` du 2026-07-03 enrichit les rapports Markdown/JSON avec un
 resume de diagnostic, les parametres de layout, les demandes de modules et les
 valeurs de tolerance principales.
 
+La mission `P1-M004` du 2026-07-03 ajoute la commande CLI `diagnose`, qui charge
+une configuration, genere le layout et verifie la production des rapports
+Markdown/JSON.
+
 ## Phase active
 
 Phase active : **Phase 1 - Moteur Python pur**.
@@ -41,8 +45,9 @@ Etat : autonomie operatoire documentee, dry run de selection execute, controle
 documentaire de base implemente, format ADR stabilise et contrat des modeles
 coeur teste. Le chargement JSON est maintenant plus strict sur les champs et
 types. Les rapports CLI exposent maintenant davantage de contexte exploitable.
-La prochaine mission recommandee est `P1-M004 - Ajouter une commande CLI de
-diagnostic`, afin de fournir une boucle courte de verification.
+Une commande courte de diagnostic existe. La prochaine mission recommandee est
+`P2-M001 - Formalize simple rectangular layout model`, afin de documenter le
+contrat d'extension du layout simple.
 
 ## Implemente
 
@@ -68,6 +73,7 @@ diagnostic`, afin de fournir une boucle courte de verification.
 - Contrat des dataclasses coeur documente et teste `P1-M001`.
 - Chargement JSON strict sur champs inconnus et types invalides `P1-M002`.
 - Rapports Markdown/JSON enrichis et erreurs CLI categorisees `P1-M003`.
+- Commande CLI de diagnostic `P1-M004`.
 
 ## Experimental
 
@@ -117,9 +123,11 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant la mission `P1-M003` :
+Derniere verification pendant la mission `P1-M004` :
 
-- `python -m unittest discover -s tests` : OK, 23 tests passes.
+- `python -m unittest discover -s tests` : OK, 24 tests passes.
+- `python -m board_game_insert_generator diagnose examples/simple_box.json` :
+  OK, diagnostic genere.
 - `python -m board_game_insert_generator examples/simple_box.json --format markdown` :
   OK, rapport Markdown genere.
 - `python -m board_game_insert_generator examples/simple_box.json --format json` :

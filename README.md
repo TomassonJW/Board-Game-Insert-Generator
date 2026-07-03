@@ -68,6 +68,18 @@ modules demandes, instances generees, corps imprimables, rotations, empreinte du
 layout, tolerances principales et warnings. Ces informations restent une
 validation abstraite du moteur, pas une validation Fusion 360 ou impression 3D.
 
+Pour lancer un diagnostic court sans choisir un format de rapport :
+
+```powershell
+$env:PYTHONPATH = "src"
+python -m board_game_insert_generator diagnose examples/simple_box.json
+```
+
+Resultat attendu : code de sortie `0` si la configuration se charge, si le layout
+se genere et si les rapports Markdown/JSON peuvent etre produits. En erreur, la
+CLI retourne `2` avec une categorie lisible : configuration, validation, layout
+ou tolerance.
+
 ## Tests
 
 ```powershell

@@ -8,21 +8,22 @@ Codex doit choisir la premiere mission `ready` listee ici.
 
 ## Mission suivante recommandee
 
-### 1. P1-M004 - Ajouter une commande CLI de diagnostic
+### 1. P2-M001 - Formalize simple rectangular layout model
 
 Pourquoi maintenant :
 
-- `P1-M003` enrichit les rapports Markdown/JSON et les categories d'erreur CLI ;
-- il manque encore une commande courte dediee au diagnostic de configuration ;
-- cette mission reste dans le moteur Python pur ;
-- elle peut preparer les futures boucles utilisateur sans changer Fusion 360.
+- `P1-M004` ajoute maintenant une boucle CLI courte de diagnostic ;
+- le coeur Python pur dispose d'un loader strict, de modeles testes et de
+  rapports exploitables ;
+- `row_fill` existe mais son contrat d'extension reste implicite ;
+- la mission ne touche pas Fusion 360 et prepare les futurs cas limites layout.
 
 Livrable attendu :
 
-- commande CLI documentee pour valider rapidement config, layout et rapport ;
-- code de sortie non nul en erreur ;
-- sortie lisible ;
-- tests CLI et exemple existant passant.
+- contrat interne documente pour `row_fill`, grille future et colonnes ;
+- tests de non-regression layout si necessaire ;
+- aucun recalcul de tolerance dans le layout ;
+- aucun couplage Fusion 360.
 
 Verification minimale :
 
@@ -31,23 +32,21 @@ $env:PYTHONPATH = "src"
 python -m unittest discover -s tests
 ```
 
-## Missions suivantes si P1-M004 est terminee
+## Missions suivantes si P2-M001 est terminee
 
-### 2. P2-M001 - Formalize simple rectangular layout model
+### 2. P2-M002 - Cover row_fill edge cases
 
 Condition :
 
-- lancer seulement apres `P1-M001`.
+- lancer seulement apres `P2-M001`.
 
 Objectif :
 
-- formaliser le modele rectangulaire simple avant de couvrir plus largement les
-  cas limites `row_fill`.
+- tester rotation, retour a la ligne, depassement et priorites ;
+- rendre les erreurs de placement previsibles.
 
 ## Missions a ne pas lancer tout de suite
 
-- `P1-M002` tant que `P1-M001` n'est pas terminee.
-- `P2-M001` tant que `P1-M001` n'est pas terminee.
 - `P2-M002` tant que `P2-M001` n'est pas terminee.
 - `P3-M001` tant que `P2-M002` n'est pas terminee.
 - Generation Fusion 360 de blanks tant que le contrat intermediaire n'est pas
