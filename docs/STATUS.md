@@ -84,9 +84,14 @@ composants, corps rectangulaires, dimensions theoriques/imprimables,
 classifications de faces, tolerances appliquees, operations abstraites et
 metadata, sans import Fusion 360.
 
+La mission `P4-M002` du 2026-07-03 cree un squelette d'adaptateur Fusion 360
+isole dans `fusion_addin/BoardGameInsertGenerator`. Il contient un manifeste, un
+point d'entree `run(context)` / `stop(context)`, une detection Zero Doc et une
+planification CAD IR `planned_only`, sans creation de geometrie Fusion reelle.
+
 ## Phase active
 
-Phase active : **Phase 4 - Contrat CAD IR pret, gate P4-M002 a valider**.
+Phase active : **Phase 4 - Squelette Fusion isole pret, gate P4-M003 a valider**.
 
 Etat : autonomie operatoire documentee, controle documentaire de base, contrat
 des modeles coeur, loader JSON strict, rapports enrichis et commande de
@@ -95,7 +100,12 @@ diagnostic sont en place. Le contrat de layout Phase 2 est maintenant explicite 
 reserve. La comparaison simple des strategies existe dans les rapports. Les
 faces des corps rectangulaires simples sont classees explicitement et leurs
 regles de tolerance appliquees sont exposees dans les rapports. Les profils
-d'impression explicites sont resolus et visibles. La representation intermediaire CAD est maintenant definie et testee. La prochaine etape recommandee est une decision humaine sur le perimetre de `P4-M002`. Aucun squelette ni adaptateur Fusion executable ne doit commencer sans nouvelle validation.
+d'impression explicites sont resolus et visibles. La representation intermediaire
+CAD est definie et testee. Un squelette d'adaptateur Fusion isole existe dans
+`fusion_addin/BoardGameInsertGenerator` ; il ne cree aucune geometrie et ne
+recalcule pas layout ou tolerances. La prochaine etape recommandee est une
+decision humaine sur le perimetre de `P4-M003`. Aucune generation de blank Fusion
+exploitable ne doit commencer sans nouvelle validation.
 
 ## Implemente
 
@@ -132,6 +142,7 @@ d'impression explicites sont resolus et visibles. La representation intermediair
 - Protocole de calibration physique `P3-M004`.
 - Rapport de gate Fusion 360 `P4-M000`.
 - Representation intermediaire CAD-agnostic `P4-M001`.
+- Squelette d'adaptateur Fusion 360 isole et non generateur `P4-M002`.
 
 ## Experimental
 
@@ -146,11 +157,13 @@ d'impression explicites sont resolus et visibles. La representation intermediair
   calibres sur impression.
 - Les dataclasses restent volontairement legeres ; les erreurs metier sont
   agregees par `validation.py`.
+- Le squelette Fusion P4-M002 est testable hors Fusion et non generateur ; son
+  chargement dans une installation Fusion reelle reste a verifier.
 
 ## Prevu
 
 - Strategie de layout `columns`.
-- Adaptateur Fusion 360.
+- Generation Fusion 360 de blanks rectangulaires.
 - Cavites, receptacles, encoches, fonds arrondis.
 - Modules composites en L/T.
 - Couvercles, rainures et mecanismes.
@@ -183,14 +196,14 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant la mission `P4-M001` :
+Derniere verification pendant la mission `P4-M002` :
 
-- `python -m unittest discover -s tests` : OK, 48 tests passes.
+- `python -m unittest discover -s tests` : OK, 56 tests passes.
 - `python -m board_game_insert_generator examples/simple_box.json --format markdown` : OK.
 - `python -m board_game_insert_generator examples/simple_grid.json --format markdown` : OK.
 - `python -m board_game_insert_generator examples/simple_box.json --format json` : OK.
 - `git diff --check` : OK.
-- `rg -n "adsk" src` : OK, aucune occurrence.
+- `rg -n "adsk" src/board_game_insert_generator` : OK, aucune occurrence.
 
 ## Risques actifs
 

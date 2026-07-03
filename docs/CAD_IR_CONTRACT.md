@@ -4,7 +4,7 @@
 
 La CAD IR est une representation intermediaire CAD-agnostic entre le moteur BGIG
 et les futurs adaptateurs CAD. Elle prepare Fusion 360 sans importer Fusion,
-sans creer d'add-in executable et sans exporter de STL/3MF.
+sans creer elle-meme d'add-in executable et sans exporter de STL/3MF.
 
 ## Statut
 
@@ -79,6 +79,15 @@ Pour chaque blank rectangulaire, l'operation principale est :
 Ces operations sont des intentions CAD-agnostic. Elles ne sont pas des appels
 Fusion et ne garantissent pas encore une sortie CAD concrete.
 
+## Consommation par le squelette Fusion
+
+Le squelette `P4-M002` consomme uniquement une CAD IR serialisee. Il valide la
+version de schema, les unites `mm` et la liste de composants, puis transforme les
+operations abstraites en plan `planned_only`.
+
+Ce plan est une preparation d'adaptateur : il ne cree aucun composant Fusion,
+aucun corps, aucune esquisse, aucune extrusion et aucun export.
+
 ## Face roles et tolerances
 
 La scene transporte les donnees explicables de tolerance :
@@ -108,6 +117,7 @@ reelle.
 
 ## Gate suivante
 
-`P4-M002 - Creer un squelette d'adaptateur Fusion 360` reste bloque tant qu'une
-validation humaine n'autorise pas explicitement le perimetre du premier adaptateur
-ou squelette Fusion.
+`P4-M002 - Creer un squelette d'adaptateur Fusion 360` est implemente comme
+squelette non generateur. La prochaine gate est `P4-M003 - Generer des blanks
+rectangulaires Fusion`, car elle introduira la premiere creation reelle de
+geometrie Fusion.

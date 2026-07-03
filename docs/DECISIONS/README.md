@@ -88,6 +88,9 @@ Tests, cartes backlog ou gates humaines a preparer.
   face.
 - `ADR-0006-explicit-print-profiles.md` - profils d'impression explicites et
   surchargeables.
+- `ADR-0007-cad-agnostic-ir.md` - representation intermediaire CAD-agnostic.
+- `ADR-0008-fusion-adapter-skeleton-boundary.md` - frontiere du squelette
+  d'adaptateur Fusion 360.
 
 ## Regles de maintenance
 

@@ -145,12 +145,20 @@ Etat cible :
 
 ### 7. Adaptateur Fusion 360
 
-Responsabilite future : convertir la geometrie abstraite en composants Fusion
-360.
+Responsabilite : convertir la geometrie abstraite en composants Fusion 360, sans
+recalculer le layout ni les tolerances.
 
-Cette couche ne doit pas recalculer le layout, ni porter les decisions de
-tolerance. Elle doit recevoir des `PrintableBody`, `Cavity` et `Feature` deja
-resolus.
+Etat actuel :
+
+- squelette isole dans `fusion_addin/BoardGameInsertGenerator` ;
+- point d'entree `run(context)` / `stop(context)` ;
+- detection du cas Zero Doc ;
+- validation CAD IR et plan d'operations `planned_only` hors Fusion ;
+- aucune creation de geometrie Fusion reelle.
+
+Cette couche doit recevoir une CAD IR deja resolue. Les futurs `PrintableBody`,
+`Cavity` et `Feature` doivent etre calcules dans le coeur Python pur avant d'etre
+convertis par l'adaptateur.
 
 ### 8. Interfaces utilisateur futures
 
@@ -185,6 +193,9 @@ Ces options ne doivent pas modifier le contrat du moteur pur.
 6. Appliquer esquisses, extrusions, shells, cuts, fillets et chamfers.
 7. Exporter ou laisser inspecter les composants.
 
+Le flux P4-M002 s'arrete avant l'etape 4 : il verifie la presence d'un document
+Fusion actif et prepare seulement un plan d'operations non executable.
+
 ## Decisions structurantes connues
 
 - ADR-0001 : moteur Python pur avant Fusion 360.
@@ -194,3 +205,4 @@ Ces options ne doivent pas modifier le contrat du moteur pur.
 - ADR-0005 : regles de tolerance par role de face.
 - ADR-0006 : profils d'impression explicites et surchargeables.
 - ADR-0007 : representation intermediaire CAD-agnostic.
+- ADR-0008 : frontiere du squelette d'adaptateur Fusion 360.

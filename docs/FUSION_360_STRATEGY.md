@@ -41,6 +41,28 @@ Responsabilites de l'adaptateur :
 - appliquer des parametres utilisateurs Fusion si utile ;
 - exporter les modules en STL ou 3MF dans une phase ulterieure.
 
+## Squelette P4-M002
+
+Le squelette actuel vit dans `fusion_addin/BoardGameInsertGenerator`, hors du
+coeur `src/board_game_insert_generator`.
+
+Il contient :
+
+- un manifeste d'add-in `BoardGameInsertGenerator.manifest` ;
+- un point d'entree Fusion `BoardGameInsertGenerator.py` avec `run(context)` et
+  `stop(context)` ;
+- une couche `fusion_skeleton.py` testable hors Fusion.
+
+Le squelette peut importer `adsk` uniquement dans le fichier d'entree Fusion. La
+couche testable et le coeur Python restent sans dependance Fusion.
+
+Ce squelette ne cree aucune geometrie Fusion. Il se limite a :
+
+- detecter si Fusion expose un document actif ;
+- signaler explicitement le cas Zero Doc ;
+- valider une CAD IR serialisee ;
+- transformer les operations abstraites en plan `planned_only`.
+
 ## Representation intermediaire
 
 Le moteur fournit maintenant une CAD IR V0 documentee dans
@@ -87,6 +109,13 @@ python -m unittest discover -s tests
 Cette boucle courte evite de debugger la logique metier dans l'environnement
 Fusion.
 
+La partie testable du squelette Fusion peut aussi etre lancee hors Fusion :
+
+```powershell
+$env:PYTHONPATH = "src"
+python -m unittest tests.test_fusion_skeleton
+```
+
 ## Strategie de test
 
 Tests hors Fusion :
@@ -118,15 +147,19 @@ Verifications dans Fusion :
 ## Rapport de gate actuel
 
 Le rapport `docs/FUSION_360_GATE_REPORT.md` a prepare la decision humaine avant
-toute integration Fusion 360 executable. La mission `P4-M001` a maintenant livre
-le contrat CAD-agnostic. La prochaine gate concerne le perimetre de `P4-M002`,
-c'est-a-dire un eventuel squelette d'adaptateur Fusion.
+toute integration Fusion 360 executable. La mission `P4-M001` a livre le contrat
+CAD-agnostic. La mission `P4-M002` ajoute un squelette d'adaptateur isole, sans
+generation CAD exploitable.
+
+La prochaine gate concerne `P4-M003`, c'est-a-dire la premiere creation reelle de
+blanks rectangulaires dans Fusion 360.
 
 ## Gates avant implementation Fusion
 
-Avant de coder l'adaptateur Fusion :
+Avant de coder la generation Fusion :
 
-- `docs/STATUS.md` doit indiquer que le contrat intermediaire est pret ;
+- `docs/STATUS.md` doit indiquer que le contrat intermediaire et le squelette
+  sont prets ;
 - le backlog doit pointer une mission Fusion precise ;
 - les tests du coeur Python doivent passer ;
 - aucune logique metier nouvelle ne doit etre prevue uniquement dans Fusion.

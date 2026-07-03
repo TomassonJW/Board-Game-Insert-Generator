@@ -310,14 +310,17 @@ commitee sans melanger plusieurs decisions structurantes.
 - Phase liee : Phase 4 - Generation Fusion 360 de blanks
 - Objectif : isoler l'integration Fusion sans polluer le coeur Python.
 - Livrable attendu : repertoire d'adaptateur avec documentation d'installation.
-- Fichiers probablement concernes : `fusion/` ou `src/.../fusion_adapter/`,
-  `docs/FUSION_360_STRATEGY.md`.
+- Fichiers concernes : `fusion_addin/BoardGameInsertGenerator/`,
+  `docs/FUSION_360_STRATEGY.md`, `docs/CAD_IR_CONTRACT.md`, tests hors Fusion.
 - Criteres d'acceptation : le coeur Python reste importable sans Fusion ; le
-  squelette explique comment tester hors Fusion.
-- Tests ou verifications : suite coeur Python ; verification d'import.
+  squelette explique comment tester hors Fusion ; le cas Zero Doc est anticipe ;
+  aucune geometrie Fusion reelle n'est creee.
+- Tests ou verifications : suite coeur Python ; verification `adsk` hors coeur ;
+  tests du squelette hors Fusion.
 - Dependances : P4-M001.
-- Gate humaine : en attente de validation explicite pour tout squelette ou`n  adaptateur Fusion executable.
-- Statut : `blocked`.
+- Gate humaine : validee explicitement pour `P4-M002` le 2026-07-03, sans
+  generation de geometrie Fusion exploitable.
+- Statut : `done`.
 
 ### P4-M003 - Generer des blanks rectangulaires Fusion
 
@@ -326,11 +329,13 @@ commitee sans melanger plusieurs decisions structurantes.
 - Livrable attendu : script ou add-in Fusion capable de generer les blanks V0.
 - Fichiers probablement concernes : adaptateur Fusion, exemples, docs.
 - Criteres d'acceptation : une config valide produit des composants inspectables
-  ; aucun layout n'est recalcule dans Fusion.
+  ; aucun layout n'est recalcule dans Fusion ; le cas Zero Doc reste gere
+  explicitement.
 - Tests ou verifications : test coeur Python et verification manuelle Fusion
   documentee avec captures ou notes.
 - Dependances : P4-M002.
-- Statut : `todo`.
+- Gate humaine : requise avant toute creation reelle de geometrie Fusion.
+- Statut : `blocked`.
 
 ## Phase 5 - Cavites et receptacles
 
