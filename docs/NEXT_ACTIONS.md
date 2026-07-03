@@ -8,45 +8,46 @@ Codex doit choisir la premiere mission `ready` listee ici.
 
 ## Mission suivante recommandee
 
-### 1. Gate tolerance - decision avant P3-M001
+### 1. Gate tolerance - decision avant P3-M002
 
 Pourquoi maintenant :
 
-- `P2-M001` a formalise le contrat de layout rectangulaire simple ;
-- `P2-M002` couvre maintenant les cas limites `row_fill` essentiels ;
-- `P2-M003` ajoute une strategie `grid` executable et testee ;
-- `P2-M004` ajoute une comparaison simple entre `row_fill` et `grid` ;
-- la prochaine carte technique, `P3-M001`, touche au modele de tolerance et aux
-  roles de faces.
+- `P3-M001` a ajoute une classification explicite des faces dans le coeur Python
+  pur ;
+- les rapports exposent maintenant ces classifications comme metadonnees ;
+- les dimensions imprimables des exemples existants restent inchangees ;
+- `P3-M002` appliquerait les regles de tolerance depuis ces roles et peut donc
+  modifier le calcul dimensionnel.
 
 Decision humaine attendue :
 
-- autoriser ou reporter le demarrage de `P3-M001 - Classify exposed, internal and
-  functional faces` ;
-- confirmer que la strategie de classification de faces peut etre preparee dans
-  le coeur Python pur, sans modifier les valeurs de tolerance par defaut ;
-- confirmer que toute modification des valeurs par defaut restera hors scope sans
-  nouvelle validation.
+- autoriser, limiter ou reporter `P3-M002 - Apply tolerance rules from face
+  classification` ;
+- confirmer si la mission peut modifier le calcul d'offsets ;
+- confirmer que les valeurs de tolerance par defaut restent inchangees, sauf
+  validation explicite separee.
 
 Validation attendue :
 
-- validation humaine explicite de la gate `Changement du modele de tolerance`.
+- nouvelle validation humaine de la gate `Changement du modele de tolerance` si
+  `P3-M002` modifie les dimensions finales ou les valeurs appliquees.
 
 ## Missions suivantes si la gate est validee
 
-### 2. P3-M001 - Classify exposed, internal and functional faces
+### 2. P3-M002 - Apply tolerance rules from face classification
 
 Condition :
 
-- lancer seulement apres validation humaine explicite.
+- lancer seulement apres validation humaine explicite du perimetre dimensionnel.
 
 Objectif :
 
-- separer faces exposees, voisines, internes, libres et fonctionnelles.
+- appliquer les jeux selon la classification explicite des faces, en gardant les
+  raisons d'offset visibles.
 
 ## Missions a ne pas lancer tout de suite
 
-- `P3-M001` sans validation humaine de la gate tolerance.
+- `P3-M002` sans validation humaine si le calcul dimensionnel change.
 - Generation Fusion 360 de blanks tant que le contrat intermediaire n'est pas
   stabilise et que `P4-M000` n'a pas produit de rapport de gate.
 - Cavites complexes tant que les parois minimales et clearances ne sont pas

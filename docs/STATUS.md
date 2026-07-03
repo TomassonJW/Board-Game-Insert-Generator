@@ -53,17 +53,23 @@ La mission `P2-M004` du 2026-07-03 ajoute un resume comparatif dans les rapports
 Markdown/JSON : strategies, statut, empreinte, occupation XY, warnings et score
 simple explicable.
 
+La mission `P3-M001` du 2026-07-03 ajoute une classification explicite des faces
+rectangulaires simples dans le coeur Python pur. Cette etape est preparatoire :
+les valeurs de tolerance par defaut et les dimensions imprimables des exemples
+existants ne changent pas.
+
 ## Phase active
 
-Phase active : **Phase 2 - Layout rectangulaire simple**.
+Phase active : **Phase 3 - Tolerances intelligentes**.
 
 Etat : autonomie operatoire documentee, controle documentaire de base, contrat
 des modeles coeur, loader JSON strict, rapports enrichis et commande de
 diagnostic sont en place. Le contrat de layout Phase 2 est maintenant explicite :
 `row_fill` et `grid` sont executables et couverts par tests, `columns` reste
-reserve. La comparaison simple des strategies existe dans les rapports. La
-prochaine etape est une gate humaine avant `P3-M001`, car la classification des
-faces touche au modele de tolerance.
+reserve. La comparaison simple des strategies existe dans les rapports. Les
+faces des corps rectangulaires simples sont maintenant classees explicitement et
+exposees dans les rapports. La prochaine etape est une nouvelle gate humaine
+avant `P3-M002` si le calcul dimensionnel des offsets doit changer.
 
 ## Implemente
 
@@ -94,13 +100,15 @@ faces touche au modele de tolerance.
 - Cas limites `row_fill` couverts par tests `P2-M002`.
 - Strategie de layout `grid` implementee et documentee `P2-M003`.
 - Resume comparatif de layout dans les rapports `P2-M004`.
+- Classification explicite des faces rectangulaires simples `P3-M001`.
 
 ## Experimental
 
 - Le layout `row_fill` est formalise mais n'est pas un optimiseur.
 - La strategie `grid` est deterministe mais n'est pas un optimiseur.
 - La strategie `columns` est reservee mais non executable.
-- La classification des faces est implicite dans le calcul d'offsets.
+- Les roles `internal` et `welded` sont reserves mais pas encore exploites par
+  des modules composites.
 - Les `PrimitiveVolume`, `CompositeModule`, `Cavity` et `Feature` existent comme
   concepts mais ne pilotent pas encore une generation complete.
 - Les tolerances par defaut sont prudentes mais non calibrees sur impression.
@@ -110,7 +118,8 @@ faces touche au modele de tolerance.
 ## Prevu
 
 - Strategie de layout `columns`.
-- Classification explicite des faces apres gate tolerance.
+- Application dimensionnelle plus avancee depuis les classifications de faces
+  apres nouvelle gate tolerance si les offsets changent.
 - Profils d'impression explicites.
 - Representation intermediaire CAD-agnostic.
 - Adaptateur Fusion 360.
@@ -146,15 +155,15 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant la mission `P2-M004` :
+Derniere verification pendant la mission `P3-M001` :
 
-- `python -m unittest discover -s tests` : OK, 34 tests passes.
+- `python -m unittest discover -s tests` : OK, 40 tests passes.
 - `python -m board_game_insert_generator examples/simple_box.json --format markdown` :
-  OK, rapport Markdown genere.
+  OK, rapport Markdown genere avec classifications de faces.
 - `python -m board_game_insert_generator examples/simple_grid.json --format markdown` :
-  OK, rapport Markdown genere.
+  OK, rapport Markdown genere avec classifications de faces.
 - `python -m board_game_insert_generator examples/simple_box.json --format json` :
-  OK, rapport JSON genere.
+  OK, rapport JSON genere avec classifications de faces.
 - `git diff --check` : OK.
 
 ## Risques actifs

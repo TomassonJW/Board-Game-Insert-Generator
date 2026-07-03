@@ -30,6 +30,24 @@ IMPLEMENTED_LAYOUT_STRATEGIES = (LAYOUT_STRATEGY_ROW_FILL, LAYOUT_STRATEGY_GRID)
 RESERVED_LAYOUT_STRATEGIES = (LAYOUT_STRATEGY_COLUMNS,)
 
 
+class FaceName(str, Enum):
+    X_MIN = "x_min"
+    X_MAX = "x_max"
+    Y_MIN = "y_min"
+    Y_MAX = "y_max"
+    Z_MIN = "z_min"
+    Z_MAX = "z_max"
+
+
+class FaceRole(str, Enum):
+    PERIPHERAL = "peripheral"
+    NEIGHBOR = "neighbor"
+    EXPOSED = "exposed"
+    FUNCTIONAL = "functional"
+    INTERNAL = "internal"
+    WELDED = "welded"
+
+
 @dataclass(frozen=True)
 class Dimension3D:
     x: float
@@ -161,6 +179,14 @@ class FaceOffsets:
 
 
 @dataclass(frozen=True)
+class FaceClassification:
+    face: FaceName
+    role: FaceRole
+    reason: str
+    neighbor_instance_id: str | None = None
+
+
+@dataclass(frozen=True)
 class PrintableBody:
     module_id: str
     instance_id: str
@@ -169,6 +195,7 @@ class PrintableBody:
     size: Dimension3D
     offsets: FaceOffsets
     primitive_volumes: tuple[PrimitiveVolume, ...]
+    face_classifications: tuple[FaceClassification, ...] = ()
 
 
 @dataclass(frozen=True)

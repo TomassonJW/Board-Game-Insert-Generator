@@ -46,13 +46,37 @@ Ces valeurs sont prudentes et doivent etre ajustees selon l'imprimante :
 
 ## Application par face
 
-Dans l'etat actuel :
+Depuis `P3-M001`, le moteur represente explicitement les six faces d'un corps
+rectangulaire simple avant de calculer les offsets. Cette etape est preparatoire :
+elle n'ajoute pas de nouvelles valeurs par defaut et ne change pas les dimensions
+imprimables des exemples existants.
 
-- une face contre la boite recoit le jeu peripherique ;
-- une face partagee avec un module voisin recoit la moitie du jeu entre modules ;
-- une face libre recoit seulement la compensation imprimante si elle existe ;
-- la face superieure recoit le jeu vertical sous couvercle ;
-- la face basse reste a Z=0, sauf evolution future explicite.
+Faces nommees :
+
+- `x_min` ;
+- `x_max` ;
+- `y_min` ;
+- `y_max` ;
+- `z_min` ;
+- `z_max`.
+
+Roles actuels :
+
+- `peripheral` : face contre la limite interieure mesuree de la boite ;
+- `neighbor` : face en contact avec une autre cellule theorique ;
+- `exposed` : face libre dans une zone non occupee ;
+- `functional` : face reservee a une contrainte fonctionnelle, comme le dessous
+  ancre a Z=0 ou le dessus sous couvercle ;
+- `internal` : role reserve pour une future face interne ;
+- `welded` : role reserve pour une future jonction soudee de module composite.
+
+Regle d'offset V0 preservee :
+
+- une face `peripheral` recoit le jeu peripherique ;
+- une face `neighbor` recoit la moitie du jeu entre modules ;
+- une face `exposed` recoit seulement la compensation imprimante si elle existe ;
+- `z_max` recoit le jeu vertical sous couvercle ;
+- `z_min` reste a Z=0.
 
 Si deux modules voisins recoivent chacun `module_gap_mm / 2`, le jeu total entre
 leurs corps imprimables est `module_gap_mm`.
@@ -93,17 +117,20 @@ de champs de tolerance.
 Implemente :
 
 - offsets simples sur X/Y/Z pour corps rectangulaires ;
-- distinction peripherie, voisin et face libre dans les cas simples ;
+- classification explicite des faces rectangulaires simples ;
+- distinction peripherie, voisin, face exposee et face fonctionnelle dans les cas
+  simples ;
+- exposition des classifications dans les rapports ;
 - validation que les offsets ne rendent pas le corps non positif.
 
 Experimental :
 
-- classification de voisinage implicite par contact de cellules ;
+- roles `internal` et `welded` reserves pour modules composites futurs ;
 - valeurs de tolerance non calibrees physiquement.
 
 Prevu :
 
-- classification explicite de faces ;
+- application dimensionnelle plus avancee a partir des roles de faces ;
 - profils d'impression ;
 - tolerances de cavites ;
 - jeux de couvercles, rainures, charnieres et clips ;

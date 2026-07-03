@@ -3,7 +3,10 @@ from __future__ import annotations
 from board_game_insert_generator.models import (
     Cell,
     Dimension3D,
+    FaceClassification,
+    FaceName,
     FaceOffsets,
+    FaceRole,
     InsertConfig,
     Point3D,
     PrimitiveVolume,
@@ -27,7 +30,8 @@ def printable_body_for_cell(
     all_cells: tuple[Cell, ...],
     config: InsertConfig,
 ) -> PrintableBody:
-    offsets = face_offsets_for_cell(cell, all_cells, config)
+    face_classifications = classify_cell_faces(cell, all_cells, config)
+    offsets = face_offsets_from_classifications(face_classifications, config)
     printable_size = Dimension3D(
         x=cell.size.x - offsets.x_min - offsets.x_max,
         y=cell.size.y - offsets.y_min - offsets.y_max,
@@ -57,6 +61,30 @@ def printable_body_for_cell(
         size=printable_size,
         offsets=offsets,
         primitive_volumes=(primitive,),
+        face_classifications=face_classifications,
+    )
+
+
+def classify_cell_faces(
+    cell: Cell,
+    all_cells: tuple[Cell, ...],
+    config: InsertConfig,
+) -> tuple[FaceClassification, ...]:
+    return (
+        _classify_horizontal_face(cell, all_cells, config, FaceName.X_MIN, axis="x", direction=-1),
+        _classify_horizontal_face(cell, all_cells, config, FaceName.X_MAX, axis="x", direction=1),
+        _classify_horizontal_face(cell, all_cells, config, FaceName.Y_MIN, axis="y", direction=-1),
+        _classify_horizontal_face(cell, all_cells, config, FaceName.Y_MAX, axis="y", direction=1),
+        FaceClassification(
+            face=FaceName.Z_MIN,
+            role=FaceRole.FUNCTIONAL,
+            reason="Bottom face is anchored at Z=0; no V0 clearance is applied.",
+        ),
+        FaceClassification(
+            face=FaceName.Z_MAX,
+            role=FaceRole.FUNCTIONAL,
+            reason="Top face receives vertical lid clearance in V0.",
+        ),
     )
 
 
@@ -65,67 +93,101 @@ def face_offsets_for_cell(
     all_cells: tuple[Cell, ...],
     config: InsertConfig,
 ) -> FaceOffsets:
-    profile = config.tolerances
-    box = config.box.inner_dimensions
-    compensation = profile.printer_compensation_mm
+    return face_offsets_from_classifications(classify_cell_faces(cell, all_cells, config), config)
 
+
+def face_offsets_from_classifications(
+    classifications: tuple[FaceClassification, ...],
+    config: InsertConfig,
+) -> FaceOffsets:
+    by_face = {classification.face: classification for classification in classifications}
     return FaceOffsets(
-        x_min=_horizontal_offset(
-            touches_boundary=_almost_equal(cell.origin.x, 0.0),
-            has_neighbor=_has_neighbor(cell, all_cells, axis="x", direction=-1),
-            peripheral_clearance=profile.peripheral_clearance_mm,
-            module_gap=profile.module_gap_mm,
-            printer_compensation=compensation,
-        ),
-        x_max=_horizontal_offset(
-            touches_boundary=_almost_equal(cell.origin.x + cell.size.x, box.x),
-            has_neighbor=_has_neighbor(cell, all_cells, axis="x", direction=1),
-            peripheral_clearance=profile.peripheral_clearance_mm,
-            module_gap=profile.module_gap_mm,
-            printer_compensation=compensation,
-        ),
-        y_min=_horizontal_offset(
-            touches_boundary=_almost_equal(cell.origin.y, 0.0),
-            has_neighbor=_has_neighbor(cell, all_cells, axis="y", direction=-1),
-            peripheral_clearance=profile.peripheral_clearance_mm,
-            module_gap=profile.module_gap_mm,
-            printer_compensation=compensation,
-        ),
-        y_max=_horizontal_offset(
-            touches_boundary=_almost_equal(cell.origin.y + cell.size.y, box.y),
-            has_neighbor=_has_neighbor(cell, all_cells, axis="y", direction=1),
-            peripheral_clearance=profile.peripheral_clearance_mm,
-            module_gap=profile.module_gap_mm,
-            printer_compensation=compensation,
-        ),
+        x_min=_horizontal_offset_for_role(by_face[FaceName.X_MIN].role, config),
+        x_max=_horizontal_offset_for_role(by_face[FaceName.X_MAX].role, config),
+        y_min=_horizontal_offset_for_role(by_face[FaceName.Y_MIN].role, config),
+        y_max=_horizontal_offset_for_role(by_face[FaceName.Y_MAX].role, config),
         z_min=0.0,
-        z_max=profile.vertical_lid_clearance_mm,
+        z_max=config.tolerances.vertical_lid_clearance_mm,
     )
 
 
-def _horizontal_offset(
-    touches_boundary: bool,
-    has_neighbor: bool,
-    peripheral_clearance: float,
-    module_gap: float,
-    printer_compensation: float,
-) -> float:
-    if touches_boundary:
-        return peripheral_clearance + printer_compensation
-    if has_neighbor:
-        return (module_gap / 2.0) + printer_compensation
-    return printer_compensation
+def _classify_horizontal_face(
+    cell: Cell,
+    all_cells: tuple[Cell, ...],
+    config: InsertConfig,
+    face: FaceName,
+    axis: str,
+    direction: int,
+) -> FaceClassification:
+    if _touches_box_boundary(cell, config, face):
+        return FaceClassification(
+            face=face,
+            role=FaceRole.PERIPHERAL,
+            reason="Face touches the measured inner box boundary.",
+        )
+
+    neighbor_instance_id = _neighbor_instance_id(cell, all_cells, axis=axis, direction=direction)
+    if neighbor_instance_id is not None:
+        return FaceClassification(
+            face=face,
+            role=FaceRole.NEIGHBOR,
+            reason="Face touches another theoretical layout cell.",
+            neighbor_instance_id=neighbor_instance_id,
+        )
+
+    return FaceClassification(
+        face=face,
+        role=FaceRole.EXPOSED,
+        reason="Face is exposed in free space; no box boundary or neighbor touches it.",
+    )
+
+
+def _horizontal_offset_for_role(role: FaceRole, config: InsertConfig) -> float:
+    profile = config.tolerances
+    compensation = profile.printer_compensation_mm
+
+    if role == FaceRole.PERIPHERAL:
+        return profile.peripheral_clearance_mm + compensation
+    if role == FaceRole.NEIGHBOR:
+        return (profile.module_gap_mm / 2.0) + compensation
+    if role == FaceRole.EXPOSED:
+        return compensation
+    if role in (FaceRole.INTERNAL, FaceRole.WELDED):
+        return 0.0
+    return compensation
+
+
+def _touches_box_boundary(cell: Cell, config: InsertConfig, face: FaceName) -> bool:
+    box = config.box.inner_dimensions
+    if face == FaceName.X_MIN:
+        return _almost_equal(cell.origin.x, 0.0)
+    if face == FaceName.X_MAX:
+        return _almost_equal(cell.origin.x + cell.size.x, box.x)
+    if face == FaceName.Y_MIN:
+        return _almost_equal(cell.origin.y, 0.0)
+    if face == FaceName.Y_MAX:
+        return _almost_equal(cell.origin.y + cell.size.y, box.y)
+    return False
 
 
 def _has_neighbor(cell: Cell, all_cells: tuple[Cell, ...], axis: str, direction: int) -> bool:
+    return _neighbor_instance_id(cell, all_cells, axis=axis, direction=direction) is not None
+
+
+def _neighbor_instance_id(
+    cell: Cell,
+    all_cells: tuple[Cell, ...],
+    axis: str,
+    direction: int,
+) -> str | None:
     for other in all_cells:
         if other.instance_id == cell.instance_id:
             continue
         if axis == "x" and _touching_x(cell, other, direction):
-            return True
+            return other.instance_id
         if axis == "y" and _touching_y(cell, other, direction):
-            return True
-    return False
+            return other.instance_id
+    return None
 
 
 def _touching_x(cell: Cell, other: Cell, direction: int) -> bool:

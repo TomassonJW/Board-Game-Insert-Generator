@@ -112,8 +112,10 @@ Fichier actuel :
 - `src/board_game_insert_generator/tolerance.py`
 
 Le moteur applique des jeux selon les faces : contre la boite, contre un voisin,
-libre, ou sous couvercle. Les volumes internes soudes d'un meme futur module
-composite ne doivent pas recevoir de jeu entre eux.
+libre, ou sous couvercle. Depuis `P3-M001`, ces faces portent une classification
+explicite comme metadonnee, sans changement des valeurs d'offset V0. Les volumes
+internes soudes d'un meme futur module composite ne doivent pas recevoir de jeu
+entre eux.
 
 ### 6. Geometrie abstraite
 

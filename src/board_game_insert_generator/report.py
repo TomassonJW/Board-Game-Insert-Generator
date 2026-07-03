@@ -75,6 +75,15 @@ def layout_to_dict(config: InsertConfig, result: LayoutResult) -> dict[str, Any]
                 "size_mm": _dim(body.size),
                 "offsets_mm": asdict(body.offsets),
                 "primitive_count": len(body.primitive_volumes),
+                "face_classifications": [
+                    {
+                        "face": classification.face.value,
+                        "role": classification.role.value,
+                        "reason": classification.reason,
+                        "neighbor_instance_id": classification.neighbor_instance_id,
+                    }
+                    for classification in body.face_classifications
+                ],
             }
             for body in result.printable_bodies
         ],
@@ -161,10 +170,23 @@ def layout_to_markdown(config: InsertConfig, result: LayoutResult) -> str:
     lines.extend(
         [
             "",
+            "## Face classifications",
+            "",
+            "| Instance | Roles |",
+            "| --- | --- |",
+        ]
+    )
+    for body in result.printable_bodies:
+        lines.append(f"| {body.instance_id} | {_format_face_roles(body)} |")
+
+    lines.extend(
+        [
+            "",
             "## Interpretation",
             "",
             "Cell size is the theoretical layout reservation. Printable size is the body after "
-            "face-level tolerance offsets. V0 does not guarantee an optimized layout.",
+            "face-level tolerance offsets. Face classifications are preparatory metadata; "
+            "V0 does not guarantee an optimized layout or physically validated tolerances.",
         ]
     )
     return "\n".join(lines)
@@ -196,6 +218,15 @@ def _format_offsets(offsets: Any) -> str:
         f"y-{offsets.y_min:.2f}, y+{offsets.y_max:.2f}, "
         f"z-{offsets.z_min:.2f}, z+{offsets.z_max:.2f}"
     )
+
+
+def _format_face_roles(body: Any) -> str:
+    roles = {
+        classification.face.value: classification.role.value
+        for classification in body.face_classifications
+    }
+    ordered_faces = ("x_min", "x_max", "y_min", "y_max", "z_min", "z_max")
+    return ", ".join(f"{face}: {roles.get(face, 'unknown')}" for face in ordered_faces)
 
 
 def _layout_footprint(result: LayoutResult) -> Dimension3D:
