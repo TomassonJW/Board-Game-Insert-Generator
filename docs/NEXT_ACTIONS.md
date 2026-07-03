@@ -8,22 +8,21 @@ Codex doit choisir la premiere mission `ready` listee ici.
 
 ## Mission suivante recommandee
 
-### 1. P2-M003 - Ajouter une strategie grille explicite
+### 1. P2-M004 - Exporter un resume de layout comparatif
 
 Pourquoi maintenant :
 
 - `P2-M001` a formalise le contrat de layout rectangulaire simple ;
 - `P2-M002` couvre maintenant les cas limites `row_fill` essentiels ;
-- `grid` est un identifiant reserve mais encore non executable ;
-- la prochaine etape utile est d'ajouter une deuxieme strategie simple avant de
-  pouvoir comparer des variantes.
+- `P2-M003` ajoute une strategie `grid` executable et testee ;
+- il existe maintenant au moins deux strategies simples a comparer.
 
 Livrable attendu :
 
-- strategie `grid` documentee et testee ;
-- refus explicite des grilles impossibles ;
-- exemple JSON minimal si le schema existant suffit ;
-- aucun couplage Fusion 360.
+- resume comparatif listant strategie, occupation, warnings et score basique ;
+- comparaison au moins entre `row_fill` et `grid` ;
+- score lisible et non presente comme optimisation globale ;
+- tests rapport/exemples.
 
 Verification minimale :
 
@@ -32,23 +31,22 @@ $env:PYTHONPATH = "src"
 python -m unittest discover -s tests
 ```
 
-## Missions suivantes si P2-M003 est terminee
+## Missions suivantes si P2-M004 est terminee
 
-### 2. P2-M004 - Exporter un resume de layout comparatif
+### 2. P3-M001 - Classify exposed, internal and functional faces
 
 Condition :
 
-- lancer seulement apres `P2-M003`.
+- necessite une revue rapide de gate tolerance avant execution, car la mission
+  touche au modele d'offsets et de faces.
 
 Objectif :
 
-- comparer au moins `row_fill` et `grid` avec un score basique explicable.
+- separer faces exposees, voisines, internes, libres et fonctionnelles.
 
 ## Missions a ne pas lancer tout de suite
 
-- `P2-M004` tant que `P2-M003` n'est pas terminee.
-- `P3-M001` tant que les strategies de layout Phase 2 ne sont pas suffisamment
-  stabilisees.
+- `P3-M001` sans revue de gate tolerance.
 - Generation Fusion 360 de blanks tant que le contrat intermediaire n'est pas
   stabilise et que `P4-M000` n'a pas produit de rapport de gate.
 - Cavites complexes tant que les parois minimales et clearances ne sont pas

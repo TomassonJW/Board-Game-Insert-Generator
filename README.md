@@ -16,7 +16,7 @@ Le depot contient :
 
 - un moteur Python minimal ;
 - des exemples JSON ;
-- un layout rectangulaire `row_fill` ;
+- des layouts rectangulaires simples `row_fill` et `grid` ;
 - une application simple des tolerances par face ;
 - des rapports Markdown/JSON ;
 - des tests unitaires hors Fusion 360 ;
@@ -61,6 +61,13 @@ Pour produire un rapport JSON :
 ```powershell
 $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/cards_and_tokens.json --format json
+```
+
+Pour tester la strategie grille :
+
+```powershell
+$env:PYTHONPATH = "src"
+python -m board_game_insert_generator examples/simple_grid.json --format markdown
 ```
 
 Les rapports exposent un resume de diagnostic : strategie de layout, nombre de

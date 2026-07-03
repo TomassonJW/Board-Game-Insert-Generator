@@ -91,13 +91,15 @@ reproductible sans pretendre resoudre l'optimisation.
 
 Contrat Phase 2 :
 
-- `row_fill` est la seule strategie implementee ;
-- `grid` et `columns` sont des identifiants reserves pour missions futures, pas
-  des comportements executables ;
+- `row_fill` et `grid` sont les strategies implementees ;
+- `columns` est un identifiant reserve pour mission future, pas un comportement
+  executable ;
 - le layout produit uniquement des `Cell` theoriques, sans appliquer de
   tolerance et sans creer de geometrie CAD ;
 - le tri de `row_fill` reste deterministe : priorite descendante, puis ordre de
   declaration dans la configuration ;
+- `grid` calcule une cellule reguliere XY depuis la plus grande empreinte de
+  module orientee, puis place les instances en lignes et colonnes ;
 - une extension de strategie doit rester dans le coeur Python pur et recevoir
   ses tests avant tout adaptateur Fusion 360.
 

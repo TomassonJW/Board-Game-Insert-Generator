@@ -108,7 +108,7 @@ def validate_config(config: InsertConfig) -> list[ValidationIssue]:
 
     if config.layout.strategy not in IMPLEMENTED_LAYOUT_STRATEGIES:
         implemented = ", ".join(f"'{strategy}'" for strategy in IMPLEMENTED_LAYOUT_STRATEGIES)
-        message = f"V0 supports only the {implemented} layout strategy."
+        message = f"V0 supports only these layout strategies: {implemented}."
         if config.layout.strategy in RESERVED_LAYOUT_STRATEGIES:
             message += " This strategy is reserved for a later layout mission."
         issues.append(

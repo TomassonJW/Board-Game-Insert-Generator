@@ -45,6 +45,10 @@ La mission `P2-M002` du 2026-07-03 ajoute la couverture unitaire des cas limites
 `row_fill` : priorite, stabilite de l'ordre source, rotation, retour a la ligne
 et depassement vertical.
 
+La mission `P2-M003` du 2026-07-03 ajoute la strategie `grid` : cellules XY
+regulieres, placement ligne/colonne deterministe, refus des grilles trop
+profondes et exemple `examples/simple_grid.json`.
+
 ## Phase active
 
 Phase active : **Phase 2 - Layout rectangulaire simple**.
@@ -52,9 +56,9 @@ Phase active : **Phase 2 - Layout rectangulaire simple**.
 Etat : autonomie operatoire documentee, controle documentaire de base, contrat
 des modeles coeur, loader JSON strict, rapports enrichis et commande de
 diagnostic sont en place. Le contrat de layout Phase 2 est maintenant explicite :
-`row_fill` est executable et couvert sur ses cas limites principaux, `grid` et
-`columns` sont reserves. La prochaine mission recommandee est `P2-M003 - Ajouter
-une strategie grille explicite`.
+`row_fill` et `grid` sont executables et couverts par tests, `columns` reste
+reserve. La prochaine mission recommandee est `P2-M004 - Exporter un resume de
+layout comparatif`.
 
 ## Implemente
 
@@ -83,11 +87,13 @@ une strategie grille explicite`.
 - Commande CLI de diagnostic `P1-M004`.
 - Contrat de strategies layout formalise `P2-M001`.
 - Cas limites `row_fill` couverts par tests `P2-M002`.
+- Strategie de layout `grid` implementee et documentee `P2-M003`.
 
 ## Experimental
 
 - Le layout `row_fill` est formalise mais n'est pas un optimiseur.
-- Les strategies `grid` et `columns` sont reservees mais non executables.
+- La strategie `grid` est deterministe mais n'est pas un optimiseur.
+- La strategie `columns` est reservee mais non executable.
 - La classification des faces est implicite dans le calcul d'offsets.
 - Les `PrimitiveVolume`, `CompositeModule`, `Cavity` et `Feature` existent comme
   concepts mais ne pilotent pas encore une generation complete.
@@ -97,8 +103,7 @@ une strategie grille explicite`.
 
 ## Prevu
 
-- Implementation des strategies de layout grille/colonnes et comparaison de
-  variantes.
+- Strategie de layout `columns` et comparaison de variantes.
 - Profils d'impression explicites.
 - Representation intermediaire CAD-agnostic.
 - Adaptateur Fusion 360.
@@ -134,10 +139,12 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant la mission `P2-M002` :
+Derniere verification pendant la mission `P2-M003` :
 
-- `python -m unittest discover -s tests` : OK, 31 tests passes.
+- `python -m unittest discover -s tests` : OK, 34 tests passes.
 - `python -m board_game_insert_generator examples/simple_box.json --format markdown` :
+  OK, rapport Markdown genere.
+- `python -m board_game_insert_generator examples/simple_grid.json --format markdown` :
   OK, rapport Markdown genere.
 - `git diff --check` : OK.
 

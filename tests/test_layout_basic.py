@@ -34,8 +34,8 @@ class LayoutBasicTests(unittest.TestCase):
         self.assertEqual(result.cells[1].origin.x, 70.0)
 
     def test_layout_strategy_contract_names_current_and_reserved_strategies(self) -> None:
-        self.assertEqual(IMPLEMENTED_LAYOUT_STRATEGIES, ("row_fill",))
-        self.assertEqual(RESERVED_LAYOUT_STRATEGIES, ("grid", "columns"))
+        self.assertEqual(IMPLEMENTED_LAYOUT_STRATEGIES, ("row_fill", "grid"))
+        self.assertEqual(RESERVED_LAYOUT_STRATEGIES, ("columns",))
 
     def test_row_fill_keeps_priority_order_and_source_order(self) -> None:
         config = load_config(ROOT / "examples" / "simple_box.json")
@@ -119,12 +119,71 @@ class LayoutBasicTests(unittest.TestCase):
 
     def test_reserved_layout_strategy_is_not_executable_yet(self) -> None:
         config = load_config(ROOT / "examples" / "simple_box.json")
-        grid_config = replace(config, layout=LayoutSettings(strategy="grid"))
+        columns_config = replace(config, layout=LayoutSettings(strategy="columns"))
 
-        issues = validate_config(grid_config)
+        issues = validate_config(columns_config)
 
         self.assertIn(("layout.strategy", "UNSUPPORTED_LAYOUT_STRATEGY"), _issue_keys(issues))
         self.assertIn("reserved for a later layout mission", issues[0].message)
+
+    def test_grid_layout_generates_regular_cells_in_priority_order(self) -> None:
+        config = _config(
+            box_x=100.0,
+            box_y=90.0,
+            layout_strategy="grid",
+            modules=(
+                _module("a", x=40.0, y=20.0, priority=10),
+                _module("b", x=30.0, y=30.0, priority=9),
+                _module("c", x=20.0, y=25.0, priority=8),
+            ),
+        )
+
+        result = generate_basic_layout(config)
+
+        self.assertEqual([cell.instance_id for cell in result.cells], ["a-01", "b-01", "c-01"])
+        self.assertEqual(
+            [(cell.origin.x, cell.origin.y) for cell in result.cells],
+            [(0.0, 0.0), (40.0, 0.0), (0.0, 30.0)],
+        )
+        self.assertEqual(
+            [(cell.size.x, cell.size.y) for cell in result.cells],
+            [(40.0, 30.0), (40.0, 30.0), (40.0, 30.0)],
+        )
+        self.assertIn("V0 grid layout uses regular cells", result.warnings[0])
+
+    def test_grid_layout_rotates_module_that_only_fits_box_when_rotated(self) -> None:
+        config = _config(
+            box_x=60.0,
+            box_y=130.0,
+            layout_strategy="grid",
+            modules=(
+                _module("rotate-only", x=120.0, y=40.0, priority=10, allow_rotation=True),
+            ),
+        )
+
+        result = generate_basic_layout(config)
+        cell = result.cells[0]
+
+        self.assertTrue(cell.rotated)
+        self.assertEqual((cell.size.x, cell.size.y), (40.0, 120.0))
+
+    def test_grid_layout_reports_regular_cells_overflow(self) -> None:
+        config = _config(
+            box_x=100.0,
+            box_y=50.0,
+            layout_strategy="grid",
+            modules=(
+                _module("a", x=60.0, y=30.0, priority=10),
+                _module("b", x=60.0, y=30.0, priority=9),
+                _module("c", x=60.0, y=30.0, priority=8),
+            ),
+        )
+
+        with self.assertRaisesRegex(
+            LayoutError,
+            r"Grid layout cannot fit 3 instance\(s\).*Needed Y up to 90\.00 mm",
+        ):
+            generate_basic_layout(config)
 
     def test_cards_and_tokens_example_fits(self) -> None:
         config = load_config(ROOT / "examples" / "cards_and_tokens.json")
@@ -153,6 +212,7 @@ def _issue_keys(issues) -> set[tuple[str, str]]:
 def _config(
     box_x: float = 300.0,
     box_y: float = 200.0,
+    layout_strategy: str = "row_fill",
     modules: tuple[ModuleRequest, ...] = (),
 ) -> InsertConfig:
     return InsertConfig(
@@ -165,7 +225,7 @@ def _config(
         ),
         tolerances=ToleranceProfile(),
         defaults=GeometryDefaults(),
-        layout=LayoutSettings(),
+        layout=LayoutSettings(strategy=layout_strategy),
         modules=modules,
     )
 

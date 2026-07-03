@@ -195,7 +195,7 @@ commitee sans melanger plusieurs decisions structurantes.
   cellules sont reproductibles ; un exemple montre l'usage.
 - Tests ou verifications : tests unitaires et rapport exemple.
 - Dependances : P2-M001.
-- Statut : `ready`.
+- Statut : `done`.
 
 ### P2-M004 - Exporter un resume de layout comparatif
 
@@ -208,7 +208,7 @@ commitee sans melanger plusieurs decisions structurantes.
   score reste explicable.
 - Tests ou verifications : tests rapport et exemples.
 - Dependances : P2-M003.
-- Statut : `todo`.
+- Statut : `ready`.
 
 ## Phase 3 - Tolerances intelligentes
 

@@ -81,7 +81,7 @@ Le layout Phase 2 manipule des rectangles theoriques dans le plan XY. Il ne
 calcule pas de tolerance, ne choisit pas de cavite et ne produit pas de corps
 CAD.
 
-Strategie implementee :
+Strategies implementees :
 
 - `row_fill` trie les modules par priorite descendante, puis par ordre de
   declaration ;
@@ -91,14 +91,20 @@ Strategie implementee :
   ligne ;
 - la rotation est decidee module par module selon `allow_rotation` et seulement
   pour faire tenir la cellule dans la ligne ou dans la boite.
+- `grid` trie les modules avec la meme regle, calcule une cellule reguliere XY
+  depuis la plus grande empreinte de module orientee, puis place les instances
+  ligne par ligne ;
+- `grid` garde une hauteur Z par module, meme si la reservation XY est reguliere
+  pour toutes les cellules ;
+- `grid` refuse la configuration si le nombre de cellules regulieres depasse la
+  profondeur disponible de la boite.
 
-Identifiants reserves :
+Identifiant reserve :
 
-- `grid` : grille reguliere future pour cas simples ;
 - `columns` : colonnes explicites futures pour regroupements par type ou usage.
 
-Ces identifiants reserves sont connus du contrat interne, mais ils restent
-refuses par la validation tant qu'une mission dediee ne les implemente pas.
+Cet identifiant reserve est connu du contrat interne, mais il reste refuse par la
+validation tant qu'une mission dediee ne l'implemente pas.
 
 ### PrimitiveVolume
 
