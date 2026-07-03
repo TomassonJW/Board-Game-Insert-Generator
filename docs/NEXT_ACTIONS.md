@@ -11,11 +11,15 @@ Codex doit choisir la premiere mission `ready` listee ici.
 Statut : `active`.
 
 Depuis la decision humaine du 2026-07-03, les operations Git standard sont gerees
-automatiquement par Codex apres une mission reussie. Une mission doit etre testee,
-commitee et integree dans `main` avant selection d'une mission suivante. Une pause
-humaine reste requise seulement pour les vraies gates, les echecs, les conflits,
-les protections de branche, les problemes d'authentification ou les risques de
-perte de travail.
+automatiquement par Codex apres une mission reussie. Depuis la decision corrective
+du 2026-07-03, le chemin standard est `direct-to-main` : une mission doit etre
+testee, commitee, integree directement dans `main`, puis poussee vers
+`origin/main` avant selection d'une mission suivante. Les pull requests sont
+reservees aux cas de repli : protection GitHub, review imposee, conflit,
+divergence non triviale, risque structurant, authentification absente ou refus de
+push direct. Une pause humaine reste requise seulement pour les vraies gates, les
+echecs, les conflits, les protections de branche, les problemes d'authentification
+ou les risques de perte de travail.
 
 ## Gate humaine active
 

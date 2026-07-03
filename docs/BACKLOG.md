@@ -119,6 +119,26 @@ commitee sans melanger plusieurs decisions structurantes.
 - Gate humaine : decision explicitement validee le 2026-07-03.
 - Statut : `done`.
 
+### P0-M008 - Corriger l'integration autonome en direct-to-main
+
+- Phase liee : Phase 0 - Fondation projet
+- Objectif : remplacer la strategie PR par defaut par une integration autonome
+  directe dans `main` lorsque la branche est propre, testee et fast-forward.
+- Livrable attendu : politique `Direct-to-main autonomous integration` inscrite
+  dans les protocoles, gates, runbook, statut, next actions, backlog et logs.
+- Fichiers concernes : `AGENTS.md`, `docs/AUTONOMY_PROTOCOL.md`,
+  `docs/EXECUTION_LOOP.md`, `docs/HUMAN_GATES.md`,
+  `docs/AUTONOMY_RUNBOOK.md`, `docs/STATUS.md`, `docs/NEXT_ACTIONS.md`,
+  `docs/BACKLOG.md`, `docs/LOGS/`.
+- Criteres d'acceptation : les pull requests ne sont plus la voie normale ; le
+  push direct vers `origin/main` est obligatoire quand il est fast-forward et non
+  conflictuel ; les PR restent un repli pour protection, review, conflit,
+  divergence, risque ou authentification indisponible.
+- Tests ou verifications : suite unitaire, `git diff --check`, verification
+  `adsk` hors coeur.
+- Dependances : P0-M007.
+- Gate humaine : decision explicitement validee le 2026-07-03.
+- Statut : `done`.
 ## Phase 1 - Moteur Python pur
 
 ### P1-M001 - Consolidate core data models

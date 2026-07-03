@@ -18,13 +18,21 @@ Quand une gate est atteinte, Codex doit :
 ## Operations Git standard
 
 Les operations Git standard ne sont pas des gates humaines depuis la decision du
-2026-07-03. Codex peut donc pousser, creer une PR, merger, supprimer une branche
-integree et repartir de `origin/main` sans validation humaine si les tests passent
-et si les regles GitHub le permettent.
+2026-07-03. La decision corrective du 2026-07-03 precise que le chemin standard
+est l'integration directe dans `main`, puis le push de `main` vers `origin/main`,
+quand les tests passent, que `git diff --check` passe, que la branche est basee
+sur `origin/main` et qu'aucune vraie gate humaine n'est atteinte.
+
+Codex peut donc pousser, integrer en fast-forward ou merge simple non conflictuel,
+supprimer une branche integree et repartir de `origin/main` sans validation
+humaine. Les pull requests sont seulement un repli si le push direct est refuse,
+si une protection impose une PR, si une review humaine est requise, si un conflit
+ou une divergence non triviale apparait, ou si la mission est risquee ou
+structurante.
 
 Une pause humaine reste obligatoire si l'infrastructure impose une review, si
-l'authentification manque, si une protection de branche refuse le merge, si un
-conflit reel apparait ou si une action risque de perdre du travail.
+l'authentification manque, si une protection de branche refuse le push ou le
+merge, si un conflit reel apparait ou si une action risque de perdre du travail.
 
 ## Gates obligatoires
 

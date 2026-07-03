@@ -58,22 +58,42 @@ d'autonomie est decrit dans `docs/AUTONOMY_PROTOCOL.md`.
 ## Autonomous Git Integration Policy
 
 La decision humaine du 2026-07-03 autorise l'integration Git autonome pour les
-operations normales. Une mission reste atomique, mais un run autonome peut
-enchainer plusieurs missions si la demande le precise et si chaque mission est
-terminee, testee, documentee, commitee puis integree dans `main` avant la
-suivante.
+operations normales. La decision corrective du 2026-07-03 rend l'integration
+`direct-to-main` obligatoire comme chemin standard : les pull requests ne sont
+plus le chemin normal d'une mission autonome.
 
-Codex ne sollicite pas l'humain pour push, fetch, rebase simple, PR standard,
-merge vers `main`, nettoyage raisonnable de branche ou reprise depuis
-`origin/main`, tant que :
+Une mission reste atomique, mais un run autonome peut enchainer plusieurs
+missions si la demande le precise et si chaque mission est terminee, testee,
+documentee, commitee puis integree dans `main` avant la suivante.
 
-- le workspace est propre ;
-- les tests pertinents passent ;
-- `git diff --check` passe ;
-- `adsk` reste absent du coeur Python sauf mission explicitement autorisee ;
-- l'integration est fast-forward ou geree par une PR/checks sans review humaine
-  obligatoire ;
-- aucune gate de `docs/HUMAN_GATES.md` n'est atteinte.
+## Direct-to-main autonomous integration
+
+Quand les tests passent, que `git diff --check` passe, que le workspace est
+propre, qu'aucune vraie gate humaine n'est atteinte, que la branche est basee
+sur `origin/main` et que l'integration est fast-forward ou non conflictuelle,
+Codex doit integrer directement dans `main` par Git local puis pousser `main`
+vers `origin/main`.
+
+Chemin standard :
+
+1. terminer la mission sur une branche dediee ;
+2. lancer les tests et validations pertinentes ;
+3. committer ;
+4. `git fetch origin --prune` ;
+5. verifier que `origin/main` n'a pas diverge ;
+6. rebaser seulement si necessaire et sans conflit ;
+7. integrer localement dans `main` par fast-forward ou merge simple non
+   conflictuel ;
+8. relancer les tests critiques si l'integration modifie l'etat teste ;
+9. pousser directement `main` vers `origin/main` ;
+10. supprimer les branches mission locales/distantes devenues inutiles ;
+11. repartir d'une branche propre basee sur `origin/main`.
+
+Les pull requests sont autorisees uniquement si GitHub refuse le push direct vers
+`main`, si une protection de branche impose une PR, si une review humaine est
+explicitement demandee, si une gate humaine est atteinte, si un conflit ou une
+divergence non triviale apparait, ou si la mission est risquee ou structurante.
+Un refus de merge PR par un controleur n'est pas une gate produit.
 
 Codex s'arrete seulement pour une vraie gate, un echec de test non reparable dans
 le scope, un conflit Git reel, une protection de branche, un probleme

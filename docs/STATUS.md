@@ -110,10 +110,13 @@ garde la geometrie limitee aux blanks rectangulaires deja autorises.
 
 La decision de gouvernance `Autonomous Git Integration Policy` du 2026-07-03
 autorise Codex a gerer automatiquement les operations Git normales apres une
-mission reussie : commit, fetch, push, PR/merge si necessaire, integration dans
-`main`, nettoyage raisonnable et reprise depuis `origin/main`. Les arrets restent
-limites aux vraies gates, echecs, conflits, protections de branche, problemes
-d'authentification ou risques de perte de travail.
+mission reussie. La decision corrective `Direct-to-main autonomous integration`
+du 2026-07-03 rend le push direct de `main` vers `origin/main` obligatoire comme
+chemin standard quand les tests passent, que `git diff --check` passe, que le
+workspace est propre et qu'aucune vraie gate humaine n'est atteinte. Les pull
+requests ne sont plus la voie normale ; elles restent un repli pour protection de
+branche, review imposee, conflit, divergence non triviale, risque structurant,
+probleme d'authentification ou refus GitHub.
 
 ## Phase active
 
@@ -239,7 +242,7 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant la mission `P4-M006 - Stabiliser le pipeline CAD IR vers Fusion` :
+Derniere verification pendant la correction `Direct-to-main autonomous integration` :
 
 - `python -m unittest discover -s tests` : OK, 72 tests passes.
 - `python -m board_game_insert_generator examples\simple_box.json --format markdown` : OK.

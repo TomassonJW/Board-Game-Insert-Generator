@@ -121,9 +121,11 @@ Le commit doit couvrir une seule mission.
 ### 8. Integration Git autonome
 
 Apres un commit de mission reussi, Codex integre automatiquement le travail dans
-`main` sans demander de validation humaine pour les operations Git standard.
+`main` sans demander de validation humaine pour les operations Git standard. Le
+chemin standard est maintenant `direct-to-main` ; une pull request est seulement
+un repli si GitHub ou le depot refuse l'integration directe.
 
-Procedure :
+Procedure minimale :
 
 ```powershell
 git status --short --branch
@@ -131,21 +133,34 @@ git diff --check
 git fetch origin --prune
 ```
 
-Si `origin/main` est ancetre de `HEAD`, l'integration directe autorisee est :
+Si `origin/main` est ancetre de `HEAD` et qu'aucun conflit n'existe, l'integration
+directe autorisee est :
 
 ```powershell
-git push origin HEAD:main
+git push origin HEAD:refs/heads/main
 ```
 
-Si ce push est refuse par les regles GitHub, Codex peut creer une PR et la merger
-automatiquement seulement si les checks obligatoires passent et qu'aucune review
-humaine n'est requise. Si la protection de branche, l'authentification, un conflit
-ou une review humaine bloque l'integration, Codex s'arrete avec un rapport
-d'infrastructure.
+Si `main` est disponible dans le worktree courant, le chemin local equivalent est :
+
+```powershell
+git switch main
+git pull --ff-only origin main
+git merge --ff-only <branche-mission>
+git push origin main
+```
+
+Si `main` est deja utilise par un autre worktree, Codex ne force pas ce worktree :
+il pousse le `HEAD` verifie vers `origin/main` quand la relation est
+fast-forward, puis synchronise l'autre worktree seulement s'il est propre.
+
+Si le push direct est refuse par les regles GitHub, Codex peut creer une PR et la
+merger automatiquement seulement si les checks obligatoires passent et qu'aucune
+review humaine n'est requise. Si la protection de branche, l'authentification, un
+conflit ou une review humaine bloque l'integration, Codex s'arrete avec un
+rapport d'infrastructure.
 
 Apres integration, Codex repart d'une branche propre basee sur `origin/main` pour
-la mission suivante. Si `main` est deja utilise par un autre worktree, il ne force
-pas ce worktree et cree la nouvelle branche directement depuis `origin/main`.
+la mission suivante.
 
 ## Echecs et blocages
 

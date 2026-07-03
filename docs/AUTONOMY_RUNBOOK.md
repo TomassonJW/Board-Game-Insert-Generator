@@ -24,14 +24,39 @@ doit les ignorer, travailler autour ou s'arreter.
 
 ## Autonomous Git Integration Policy
 
-Par defaut, apres une mission reussie, Codex doit maintenant integrer le commit
+Par defaut, apres une mission reussie, Codex doit integrer le commit directement
 sur `main` sans demander a l'humain de pousser ou merger manuellement. La boucle
-normale est : tester, `git diff --check`, verifier `adsk`, commit, fetch, push ou
-PR/merge automatique, puis repartir d'une branche propre depuis `origin/main`.
+normale est : tester, `git diff --check`, verifier `adsk`, commit, fetch,
+verifier que `origin/main` n'a pas diverge, integrer en fast-forward ou merge
+simple non conflictuel, pousser `main` vers `origin/main`, puis repartir d'une
+branche propre depuis `origin/main`.
+
+Les pull requests ne sont plus la voie normale. Elles restent un repli seulement
+si le push direct est refuse, si une protection impose une PR ou une review, si
+une gate humaine est atteinte, si un conflit apparait, si la divergence est non
+triviale ou si la mission est risquee ou structurante.
 
 L'humain doit intervenir seulement pour une vraie gate produit, un echec de tests
 non reparable, un conflit Git, une protection GitHub, une authentification absente
 ou une review humaine obligatoire.
+
+## Direct-to-main quick check
+
+Avant de pousser `main`, controler :
+
+```powershell
+git status --short --branch
+git diff --check
+git fetch origin --prune
+git merge-base --is-ancestor origin/main HEAD
+```
+
+Si le dernier controle reussit et que les tests sont OK, le push direct autorise
+est :
+
+```powershell
+git push origin HEAD:refs/heads/main
+```
 
 ## Verifier apres une mission
 

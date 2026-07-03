@@ -81,8 +81,12 @@ Codex execute la mission par petits changements :
 ## Autonomous Git Integration Policy
 
 La decision humaine du 2026-07-03 etablit que les operations Git normales ne sont
-plus des gates humaines. Apres chaque mission reussie, Codex doit integrer le
-travail avant de selectionner une mission suivante.
+plus des gates humaines. La decision corrective du 2026-07-03 etablit que les
+pull requests ne sont plus le chemin standard d'integration autonome. Apres
+chaque mission reussie, Codex doit integrer le travail dans `main` avant de
+selectionner une mission suivante.
+
+## Direct-to-main autonomous integration
 
 Flux obligatoire apres mission :
 
@@ -92,14 +96,29 @@ Flux obligatoire apres mission :
    mission explicitement autorisee.
 4. Committer le scope de mission si le depot a change.
 5. `git fetch origin --prune`.
-6. Integrer dans `main` par la methode la plus sure autorisee : push
-   fast-forward vers `origin/main`, PR puis merge automatique, ou integration Git
-   distante equivalente.
-7. Si l'integration reussit, repartir d'une branche propre basee sur
-   `origin/main` avant toute mission suivante.
+6. Verifier que la branche de mission est basee sur `origin/main` et que
+   `origin/main` n'a pas diverge.
+7. Rebaser seulement si necessaire, uniquement si le rebase est propre et sans
+   conflit.
+8. Integrer dans `main` par fast-forward ou merge simple non conflictuel.
+9. Relancer les tests critiques si l'etat integre differe de l'etat teste.
+10. Pousser directement `main` vers `origin/main`.
+11. Supprimer les branches mission locales/distantes devenues inutiles si
+    l'integration est confirmee.
+12. Repartir d'une branche propre basee sur `origin/main` avant toute mission
+    suivante.
+
+Si `main` est deja utilise par un autre worktree local, Codex ne force pas ce
+worktree. Il peut pousser un `HEAD` verifie directement vers `refs/heads/main`
+quand la relation est fast-forward, puis synchroniser le worktree `main` separe
+si celui-ci est propre.
+
+Les pull requests ne sont autorisees qu'en repli : push direct refuse ou protege,
+review humaine imposee, gate humaine atteinte, conflit reel, divergence non
+triviale, checks obligatoires indisponibles ou mission risquee/structurante.
 
 L'humain n'est pas sollicite pour push, pull/fetch, rebase simple, creation de
-branche, PR standard, merge standard, suppression raisonnable de branche ou
+branche, integration direct-to-main, suppression raisonnable de branche ou
 reprise depuis `origin/main`.
 
 Arrets obligatoires lies a Git : conflit reel, push/merge refuse par protection,
