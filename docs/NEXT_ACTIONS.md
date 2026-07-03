@@ -8,51 +8,47 @@ Codex doit choisir la premiere mission `ready` listee ici.
 
 ## Mission suivante recommandee
 
-### 1. Gate tolerance - decision avant P3-M001
+### 1. P3-M003 - Ajouter des profils d'impression
+
+Statut : `ready`.
 
 Pourquoi maintenant :
 
-- `P2-M001` a formalise le contrat de layout rectangulaire simple ;
-- `P2-M002` couvre maintenant les cas limites `row_fill` essentiels ;
-- `P2-M003` ajoute une strategie `grid` executable et testee ;
-- `P2-M004` ajoute une comparaison simple entre `row_fill` et `grid` ;
-- la prochaine carte technique, `P3-M001`, touche au modele de tolerance et aux
-  roles de faces.
-
-Decision humaine attendue :
-
-- autoriser ou reporter le demarrage de `P3-M001 - Classify exposed, internal and
-  functional faces` ;
-- confirmer que la strategie de classification de faces peut etre preparee dans
-  le coeur Python pur, sans modifier les valeurs de tolerance par defaut ;
-- confirmer que toute modification des valeurs par defaut restera hors scope sans
-  nouvelle validation.
-
-Validation attendue :
-
-- validation humaine explicite de la gate `Changement du modele de tolerance`.
-
-## Missions suivantes si la gate est validee
-
-### 2. P3-M001 - Classify exposed, internal and functional faces
-
-Condition :
-
-- lancer seulement apres validation humaine explicite.
+- `P3-M001` a ajoute la classification explicite des faces ;
+- `P3-M002` applique maintenant les regles de tolerance depuis ces roles ;
+- les valeurs par defaut n'ont pas change ;
+- les rapports exposent les tolerances appliquees et leurs raisons.
 
 Objectif :
 
-- separer faces exposees, voisines, internes, libres et fonctionnelles.
+- ajouter des profils d'impression explicites qui se resolvent en
+  `ToleranceProfile` visible, sans cacher les valeurs finales.
+
+Contraintes :
+
+- ne pas modifier les valeurs par defaut sans gate humaine separee ;
+- ne pas presenter un profil comme valide physiquement ;
+- garder le coeur Python independant de Fusion 360 ;
+- ne pas lancer Fusion 360, STL ou 3MF.
+
+Validation attendue :
+
+- tests unitaires loader/validation/rapport ;
+- exemple CLI Markdown et JSON ;
+- documentation des profils et de leurs limites physiques.
 
 ## Missions a ne pas lancer tout de suite
 
-- `P3-M001` sans validation humaine de la gate tolerance.
-- Generation Fusion 360 de blanks tant que le contrat intermediaire n'est pas
-  stabilise et que `P4-M000` n'a pas produit de rapport de gate.
+- Modification des valeurs de tolerance par defaut sans gate humaine dediee.
+- Generation Fusion 360 de blanks tant que `P4-M000` n'a pas produit de rapport
+  de gate.
 - Cavites complexes tant que les parois minimales et clearances ne sont pas
   formalisees.
-- Assistant de conception tant que plusieurs strategies de layout n'existent pas.
-- Packaging produit tant que des exemples imprimes reels ne sont pas disponibles.
+- Modules composites complets tant que `P6-M001` n'est pas cadree.
+- Assistant de conception tant que plusieurs strategies et profils ne sont pas
+  stabilises.
+- Packaging produit tant que des exemples imprimes reels ne sont pas
+  disponibles.
 
 ## Fin de chaque mission
 

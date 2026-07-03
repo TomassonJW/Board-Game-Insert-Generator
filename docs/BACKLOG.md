@@ -224,8 +224,9 @@ commitee sans melanger plusieurs decisions structurantes.
   exposent les classifications.
 - Tests ou verifications : tests unitaires de voisinage et offsets.
 - Dependances : P2-M002.
-- Gate humaine : changement du modele de tolerance.
-- Statut : `blocked`.
+- Gate humaine : changement du modele de tolerance, validee pour preparation
+  sans modification dimensionnelle.
+- Statut : `done`.
 
 ### P3-M002 - Apply tolerance rules from face classification
 
@@ -241,7 +242,9 @@ commitee sans melanger plusieurs decisions structurantes.
   cas simples.
 - Tests ou verifications : tests unitaires de tolerance et exemple CLI.
 - Dependances : P3-M001.
-- Statut : `todo`.
+- Gate humaine : validee explicitement pour cette mission le 2026-07-03, sans
+  changement des valeurs de tolerance par defaut.
+- Statut : `done`.
 
 ### P3-M003 - Ajouter des profils d'impression
 
@@ -254,7 +257,7 @@ commitee sans melanger plusieurs decisions structurantes.
   rapport montre les valeurs finales.
 - Tests ou verifications : tests loader, validation et rapport.
 - Dependances : P3-M002.
-- Statut : `todo`.
+- Statut : `ready`.
 
 ### P3-M004 - Ajouter un protocole de calibration physique
 

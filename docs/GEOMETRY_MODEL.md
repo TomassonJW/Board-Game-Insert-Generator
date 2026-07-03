@@ -43,6 +43,8 @@ Regle actuelle :
 - `Cell` represente uniquement une reservation theorique de layout ;
 - `PrintableBody` represente un corps imprimable deja reduit par les offsets de
   tolerance ;
+- `FaceName`, `FaceRole` et `FaceClassification` portent les metadonnees de
+  classification de faces ;
 - `PrimitiveVolume`, `CompositeModule`, `Cavity` et `Feature` existent comme
   concepts, mais ne pilotent pas encore une generation complete.
 
@@ -170,16 +172,23 @@ Exemples :
 
 ## Faces
 
-Une face peut etre :
+Une face rectangulaire est identifiee par son nom geometrique : `x_min`, `x_max`,
+`y_min`, `y_max`, `z_min` ou `z_max`.
 
-- peripherique contre la boite ;
-- voisine d'un autre module ;
-- libre dans une zone non occupee ;
-- interne a un module composite ;
-- fonctionnelle pour une cavite ou un couvercle.
+Elle porte un role explicite :
 
-Le type de face determine le jeu applique. Le systeme ne doit jamais reduire
-aveuglement tous les volumes avec une seule valeur globale.
+- `peripheral` : contre la boite ;
+- `neighbor` : voisine d'un autre module ;
+- `exposed` : libre dans une zone non occupee ;
+- `functional` : liee a une contrainte fonctionnelle comme le dessous ancre ou le
+  dessus sous couvercle ;
+- `internal` : interne a un futur module composite ;
+- `welded` : jonction soudee future entre primitives du meme module.
+
+Depuis `P3-M002`, cette classification pilote une application de tolerance
+explicite et testee par role de face. Elle ne valide pas physiquement les jeux
+et ne change pas les valeurs de tolerance par defaut. Les exemples existants
+gardent leurs dimensions imprimables attendues.
 
 ## Etat actuel
 
@@ -190,11 +199,14 @@ Implemente :
 - cellules rectangulaires ;
 - corps imprimables rectangulaires ;
 - offsets par face pour cas simples ;
+- classification explicite des faces pour corps rectangulaires simples ;
+- regles de tolerance appliquees par role de face ;
 - representation conceptuelle des primitives et composites.
 
 Experimental :
 
-- detection de voisinage par contact de cellules ;
+- detection automatique des roles `internal` et `welded` non exploitee par le
+  layout ;
 - concepts `Cavity` et `Feature` presents mais non generes ;
 - `CompositeModule` present mais non exploite par le layout.
 
