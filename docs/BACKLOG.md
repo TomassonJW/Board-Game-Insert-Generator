@@ -340,8 +340,9 @@ commitee sans melanger plusieurs decisions structurantes.
 - Dependances : P4-M002.
 - Gate humaine : validee explicitement pour `P4-M003` le 2026-07-03, sans export
   STL/3MF et sans validation physique.
-- Statut : done pour le code et les tests hors Fusion ; smoke test visuel
-  observe dans Fusion ; mesures dimensionnelles encore a documenter.
+- Statut : `done` pour le code, les tests hors Fusion et le smoke test CAD
+  manuel dans Fusion ; dimensions conformes a la fixture ; impression reelle non
+  validee.
 
 ### P4-M004 - Valider manuellement la generation Fusion minimale
 
@@ -354,12 +355,12 @@ commitee sans melanger plusieurs decisions structurantes.
   `docs/NEXT_ACTIONS.md`, eventuellement `fusion_addin/README.md` si la procedure
   doit etre corrigee.
 - Criteres d'acceptation : Thomas a lance l'add-in dans Fusion ; les sketches
-  et bodies sont visibles ; les dimensions mesurees restent a noter ; les limites
-  restent distinctes de la validation d'impression reelle.
+  et bodies sont visibles ; les dimensions mesurees sont conformes a la fixture ;
+  les limites restent distinctes de la validation d'impression reelle.
 - Tests ou verifications : smoke test manuel Fusion documente.
 - Dependances : P4-M003.
-- Gate humaine : requise avant execution et interpretation comme jalon Fusion.
-- Statut : `blocked`.
+- Gate humaine : satisfaite par validation humaine du 2026-07-03.
+- Statut : `done` par validation humaine du 2026-07-03.
 
 ## Phase 5 - Cavites et receptacles
 

@@ -8,52 +8,45 @@ Codex doit choisir la premiere mission `ready` listee ici.
 
 ## Gate humaine active
 
-### Gate - Finaliser la validation dimensionnelle P4-M003
+### Gate - Autoriser le prochain perimetre Fusion apres P4-M003
 
 Statut : `blocked`.
 
 Decision demandee :
 
-- confirmer les mesures dimensionnelles des deux blanks de la fixture ;
-- documenter tout ecart observe dans Fusion avant toute mission Fusion suivante ;
-- autoriser explicitement une suite `P4-M004` si le perimetre Fusion doit etre
-  elargi.
+- choisir le prochain lot Fusion ou revenir au coeur Python ;
+- confirmer explicitement le perimetre autorise avant toute nouvelle generation
+  Fusion ;
+- maintenir separees validation CAD, validation d'impression et exports.
 
 Contexte :
 
 - `P4-M003` code une premiere generation minimale depuis `cad_ir_input.json` ;
-- l'add-in cree une esquisse de reference de boite et des blanks rectangulaires dans le composant racine ;
-- les tests hors Fusion couvrent le chargement CAD IR et le plan de generation ;
-- le smoke test manuel a confirme que l'add-in apparait, que le message final est OK et que les modules sont visibles ;
-- les mesures dimensionnelles des blanks restent a confirmer/documenter ;
+- l'add-in cree une esquisse de reference de boite et des blanks rectangulaires
+  dans le composant racine ;
+- le smoke test manuel confirme que l'add-in apparait, que le message final est
+  OK, que les modules/blanks sont visibles et que les dimensions mesurees sont
+  conformes a la fixture ;
+- la validation physique par impression 3D n'est pas realisee ;
 - `adsk` reste interdit dans `src/board_game_insert_generator`.
 
-Smoke test manuel restant a completer :
+Options possibles pour la suite, a valider explicitement :
 
-1. Mesurer les blanks :
-   - `cards-main-01` : `68.9 x 99.2 x 44.0 mm` ;
-   - `dice-01` : `59.7 x 59.2 x 29.0 mm`.
-2. Noter OK/KO et ecarts dans un log de validation.
-
-Options apres validation :
-
-- Option 1 recommandee : documenter le resultat manuel et corriger seulement les
-  ecarts P4-M003 si necessaire.
-- Option 2 : autoriser une mission `P4-M004` limitee a une meilleure UX de
-  chargement CAD IR ou a un rapport de validation Fusion.
-- Option 3 : bloquer Fusion et revenir au coeur Python si la generation minimale
-  est instable.
+- Option 1 : ameliorer le chargement local de CAD IR et l'UX d'erreur de l'add-in.
+- Option 2 : etudier une sortie Assembly avec composants enfants, separee du mode
+  Part Design.
+- Option 3 : revenir au coeur Python pour cavites, modules composites ou qualite
+  de layout avant d'elargir Fusion.
 
 Risques :
 
-- la generation peut fonctionner hors tests mais echouer dans l'environnement
-  Fusion local ;
-- une validation visuelle Fusion ne valide pas l'impression reelle ;
-- l'elargissement vers cavites, fillets ou exports doit rester gate.
+- confondre validation CAD visuelle et validation d'impression reelle ;
+- recreer trop tot des composants enfants Fusion sans cible Assembly claire ;
+- elargir vers cavites, fillets ou exports sans gate.
 
 ## Missions bloquees tant que la gate n'est pas validee
 
-- `P4-M004` ou toute suite Fusion.
+- Toute suite Fusion apres `P4-M003`.
 - Premier export STL/3MF.
 - Cavites Fusion.
 - Fillets/conges Fusion.
