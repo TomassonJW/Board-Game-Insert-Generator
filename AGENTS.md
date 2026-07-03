@@ -39,7 +39,7 @@ dans `docs/NEXT_ACTIONS.md`, puis seulement en fallback dans `docs/BACKLOG.md`.
 
 Regles obligatoires :
 
-- execute une seule mission par run ;
+- execute une seule mission a la fois ;
 - ne travaille jamais sur plusieurs missions a la fois ;
 - ne commence pas une mission dont les dependances ne sont pas terminees ;
 - n'ignore jamais une gate humaine decrite dans `docs/HUMAN_GATES.md` ;
@@ -48,10 +48,37 @@ Regles obligatoires :
 - mets a jour les fichiers de pilotage a la fin de toute mission significative ;
 - si la mission modifie le depot, fais un commit propre apres verification du
   diff et des tests disponibles ;
-- termine par un rapport operationnel clair.
+- termine par un rapport operationnel clair, ou continue la boucle si un run
+  autonome multi-missions a ete explicitement demande et que la mission vient
+  d'etre integree dans `main`.
 
 La boucle standard est decrite dans `docs/EXECUTION_LOOP.md`. Le protocole
 d'autonomie est decrit dans `docs/AUTONOMY_PROTOCOL.md`.
+
+## Autonomous Git Integration Policy
+
+La decision humaine du 2026-07-03 autorise l'integration Git autonome pour les
+operations normales. Une mission reste atomique, mais un run autonome peut
+enchainer plusieurs missions si la demande le precise et si chaque mission est
+terminee, testee, documentee, commitee puis integree dans `main` avant la
+suivante.
+
+Codex ne sollicite pas l'humain pour push, fetch, rebase simple, PR standard,
+merge vers `main`, nettoyage raisonnable de branche ou reprise depuis
+`origin/main`, tant que :
+
+- le workspace est propre ;
+- les tests pertinents passent ;
+- `git diff --check` passe ;
+- `adsk` reste absent du coeur Python sauf mission explicitement autorisee ;
+- l'integration est fast-forward ou geree par une PR/checks sans review humaine
+  obligatoire ;
+- aucune gate de `docs/HUMAN_GATES.md` n'est atteinte.
+
+Codex s'arrete seulement pour une vraie gate, un echec de test non reparable dans
+le scope, un conflit Git reel, une protection de branche, un probleme
+d'authentification GitHub, un risque de perte de travail ou une decision
+ambigue que les docs ne resolvent pas.
 
 ## Frontieres d'architecture
 

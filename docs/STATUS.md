@@ -103,6 +103,13 @@ lisible et compatible avec le squelette Fusion existant. Cette commande ne
 modifie pas les dimensions, les tolerances ou la geometrie Fusion ; elle rend la
 fixture `cad_ir_input.json` regenerable depuis le moteur.
 
+La decision de gouvernance `Autonomous Git Integration Policy` du 2026-07-03
+autorise Codex a gerer automatiquement les operations Git normales apres une
+mission reussie : commit, fetch, push, PR/merge si necessaire, integration dans
+`main`, nettoyage raisonnable et reprise depuis `origin/main`. Les arrets restent
+limites aux vraies gates, echecs, conflits, protections de branche, problemes
+d'authentification ou risques de perte de travail.
+
 ## Phase active
 
 Phase active : **Phase 4 - Generation Fusion minimale validee manuellement, prochaine gate Fusion requise**.
@@ -136,6 +143,7 @@ validation humaine.
 - ADR initiales sur moteur pur, cellules theoriques et JSON.
 - Gouvernance projet et backlog Codex.
 - Protocole d'autonomie operatoire.
+- Politique d'integration Git autonome apres mission reussie.
 - Gates humaines obligatoires.
 - Matrice de validation.
 - Roles logiques d'agents.
@@ -220,18 +228,13 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant la mission `Export CAD IR CLI` :
+Derniere verification pendant la mission `Autonomous Git Integration Policy` :
 
 - `python -m unittest discover -s tests` : OK, 64 tests passes.
-- `python -m board_game_insert_generator examples/simple_box.json --format markdown` : OK.
-- `python -m board_game_insert_generator examples/simple_box.json --format json` : OK.
-- `python -m board_game_insert_generator examples/simple_grid.json --format markdown` : OK.
-- `python -m board_game_insert_generator export-cad-ir examples/simple_box.json --output "$env:TEMP\bgig-cad-ir-input.json"` : OK, fichier `cad_ir.v0` genere avec 4 composants.
-- `git diff --check` : OK apres suppression d'une ligne vide finale en trop.
+- `git diff --check` : OK ; avertissements CRLF/LF Windows uniquement.
 - `rg -n "adsk" src/board_game_insert_generator` : OK, aucune occurrence dans le coeur Python.
-- Smoke test manuel Fusion P4-M003 : add-in visible, message OK, modules visibles
-  et dimensions conformes a la fixture.
-
+- Integration de `codex/export-cad-ir-cli` dans `origin/main` : OK, push
+  fast-forward `8634f21..9c6cbd1`.
 ## Risques actifs
 
 - Le moteur a deja des concepts futurs dans `models.py`; il faut eviter de les

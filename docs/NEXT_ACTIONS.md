@@ -6,6 +6,17 @@ Ce fichier indique les prochaines missions recommandees. Il doit rester court,
 priorise et directement actionnable. Si aucune mission explicite n'est donnee,
 Codex doit choisir la premiere mission `ready` listee ici.
 
+## Politique active - Integration Git autonome
+
+Statut : `active`.
+
+Depuis la decision humaine du 2026-07-03, les operations Git standard sont gerees
+automatiquement par Codex apres une mission reussie. Une mission doit etre testee,
+commitee et integree dans `main` avant selection d'une mission suivante. Une pause
+humaine reste requise seulement pour les vraies gates, les echecs, les conflits,
+les protections de branche, les problemes d'authentification ou les risques de
+perte de travail.
+
 ## Gate humaine active
 
 ### Gate - Autoriser le prochain perimetre Fusion apres P4-M003
@@ -68,4 +79,6 @@ Avant de terminer :
 - ajouter une ADR si une decision structurante a ete prise ;
 - ajouter une entree de log si l'orientation ou le statut a change ;
 - lancer les tests disponibles ou expliquer pourquoi ils n'ont pas ete lances ;
-- committer proprement si le depot a ete modifie.
+- committer proprement si le depot a ete modifie ;
+- integrer automatiquement dans `main` si les tests passent et qu'aucune gate ou
+  blocage Git n'est atteint.

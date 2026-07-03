@@ -15,6 +15,17 @@ Quand une gate est atteinte, Codex doit :
 5. Donner une recommandation argumentee si possible.
 6. Attendre une validation humaine explicite.
 
+## Operations Git standard
+
+Les operations Git standard ne sont pas des gates humaines depuis la decision du
+2026-07-03. Codex peut donc pousser, creer une PR, merger, supprimer une branche
+integree et repartir de `origin/main` sans validation humaine si les tests passent
+et si les regles GitHub le permettent.
+
+Une pause humaine reste obligatoire si l'infrastructure impose une review, si
+l'authentification manque, si une protection de branche refuse le merge, si un
+conflit reel apparait ou si une action risque de perdre du travail.
+
 ## Gates obligatoires
 
 | Gate | Pourquoi elle existe | Ce que Codex peut preparer seul | Validation humaine | Rapport attendu |

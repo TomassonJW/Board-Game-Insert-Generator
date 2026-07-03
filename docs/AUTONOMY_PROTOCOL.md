@@ -14,7 +14,7 @@ validation humaine explicite.
 
 ## Principes
 
-- Executer une seule mission par run.
+- Executer une seule mission a la fois.
 - Preferer un changement petit, teste, documente et commite.
 - Lire l'etat reel avant de choisir une mission.
 - Ne jamais confondre `ready`, `done`, `experimental`, `prevu` et `a valider par
@@ -38,7 +38,8 @@ Codex doit refuser de lancer une mission si :
 - une gate humaine est ouverte ;
 - les criteres d'acceptation sont absents ou ambigus ;
 - la mission melange plusieurs changements structurants ;
-- le run courant a deja execute une autre mission.
+- une mission precedente du meme run n'a pas encore ete testee, commitee et
+  integree dans `main`, ou la limite de missions du run est atteinte.
 
 Si aucune mission n'est prete, Codex s'arrete avec un rapport de blocage et une
 proposition de clarification.
@@ -74,6 +75,40 @@ Codex execute la mission par petits changements :
 9. Relire le diff.
 10. Mettre a jour le pilotage.
 11. Committer proprement si le depot a ete modifie.
+12. Integrer automatiquement dans `main` si les tests passent et qu'aucune gate
+    ou blocage Git n'est atteint.
+
+## Autonomous Git Integration Policy
+
+La decision humaine du 2026-07-03 etablit que les operations Git normales ne sont
+plus des gates humaines. Apres chaque mission reussie, Codex doit integrer le
+travail avant de selectionner une mission suivante.
+
+Flux obligatoire apres mission :
+
+1. Verifier `git status --short --branch`.
+2. Lancer les tests pertinents et `git diff --check`.
+3. Verifier que `adsk` reste absent de `src/board_game_insert_generator` sauf
+   mission explicitement autorisee.
+4. Committer le scope de mission si le depot a change.
+5. `git fetch origin --prune`.
+6. Integrer dans `main` par la methode la plus sure autorisee : push
+   fast-forward vers `origin/main`, PR puis merge automatique, ou integration Git
+   distante equivalente.
+7. Si l'integration reussit, repartir d'une branche propre basee sur
+   `origin/main` avant toute mission suivante.
+
+L'humain n'est pas sollicite pour push, pull/fetch, rebase simple, creation de
+branche, PR standard, merge standard, suppression raisonnable de branche ou
+reprise depuis `origin/main`.
+
+Arrets obligatoires lies a Git : conflit reel, push/merge refuse par protection,
+authentification GitHub indisponible, checks obligatoires en echec, review humaine
+obligatoire, divergence non triviale ou risque de perte de travail.
+
+Les rapports finaux doivent rester courts et orientes decision : missions faites,
+commits, integrations, tests, branche finale, workspace, prochaine mission et
+gate eventuelle.
 
 ## Tests et validations
 

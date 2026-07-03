@@ -11,7 +11,7 @@ Cette boucle est le mode standard d'un run Codex autonome sur ce depot.
 5. Identifier la premiere mission `ready` non bloquee et non gated.
 6. Verifier ses dependances.
 7. Creer une branche ou travailler dans un worktree si disponible.
-8. Executer exactement une mission.
+8. Executer exactement une mission atomique.
 9. Lancer les tests pertinents.
 10. Mettre a jour les docs impactees.
 11. Mettre a jour `docs/STATUS.md`.
@@ -19,7 +19,10 @@ Cette boucle est le mode standard d'un run Codex autonome sur ce depot.
 13. Mettre a jour `docs/BACKLOG.md` si de nouvelles taches apparaissent.
 14. Creer une ADR si une decision structurante a ete prise.
 15. Committer proprement.
-16. S'arreter avec un rapport clair.
+16. Integrer automatiquement dans `main` si les tests passent et qu'aucune gate
+    n'est atteinte.
+17. Continuer sur une branche propre si le run autorise plusieurs missions, sinon
+    s'arreter avec un rapport clair.
 
 ## Detail operationnel
 
@@ -58,9 +61,9 @@ git switch -c codex/p0-m004-autonomy-dry-run
 Si un worktree existe deja pour la mission, l'utiliser. Si le workspace contient
 des modifications non liees, s'arreter ou travailler autour sans les ecraser.
 
-### 4. Execution d'une mission unique
+### 4. Execution d'une mission atomique
 
-Une mission unique peut modifier plusieurs fichiers, mais elle doit garder un
+Une mission atomique peut modifier plusieurs fichiers, mais elle doit garder un
 objectif coherent. Elle ne doit pas cumuler, par exemple, une refonte de modele,
 un changement de CLI et une preparation Fusion.
 
@@ -114,6 +117,35 @@ git commit -m "<message court>"
 ```
 
 Le commit doit couvrir une seule mission.
+
+### 8. Integration Git autonome
+
+Apres un commit de mission reussi, Codex integre automatiquement le travail dans
+`main` sans demander de validation humaine pour les operations Git standard.
+
+Procedure :
+
+```powershell
+git status --short --branch
+git diff --check
+git fetch origin --prune
+```
+
+Si `origin/main` est ancetre de `HEAD`, l'integration directe autorisee est :
+
+```powershell
+git push origin HEAD:main
+```
+
+Si ce push est refuse par les regles GitHub, Codex peut creer une PR et la merger
+automatiquement seulement si les checks obligatoires passent et qu'aucune review
+humaine n'est requise. Si la protection de branche, l'authentification, un conflit
+ou une review humaine bloque l'integration, Codex s'arrete avec un rapport
+d'infrastructure.
+
+Apres integration, Codex repart d'une branche propre basee sur `origin/main` pour
+la mission suivante. Si `main` est deja utilise par un autre worktree, il ne force
+pas ce worktree et cree la nouvelle branche directement depuis `origin/main`.
 
 ## Echecs et blocages
 

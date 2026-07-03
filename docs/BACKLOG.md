@@ -99,6 +99,26 @@ commitee sans melanger plusieurs decisions structurantes.
 - Dependances : P0-M001.
 - Statut : `todo`.
 
+### P0-M007 - Activer l'integration Git autonome
+
+- Phase liee : Phase 0 - Fondation projet
+- Objectif : inscrire durablement que Codex gere les operations Git normales sans
+  validation humaine apres une mission reussie.
+- Livrable attendu : politique documentee dans les protocoles, gates, runbook,
+  statut, next actions, backlog et logs.
+- Fichiers concernes : `AGENTS.md`, `docs/AUTONOMY_PROTOCOL.md`,
+  `docs/EXECUTION_LOOP.md`, `docs/HUMAN_GATES.md`,
+  `docs/AUTONOMY_RUNBOOK.md`, `docs/STATUS.md`, `docs/NEXT_ACTIONS.md`,
+  `docs/BACKLOG.md`, `docs/LOGS/`.
+- Criteres d'acceptation : les operations Git standard ne sont plus presentees
+  comme gates ; les vraies gates produit et infrastructure restent explicites ;
+  les tests conditionnent l'integration.
+- Tests ou verifications : suite unitaire, `git diff --check`, verification
+  `adsk` hors coeur.
+- Dependances : P0-M003.
+- Gate humaine : decision explicitement validee le 2026-07-03.
+- Statut : `done`.
+
 ## Phase 1 - Moteur Python pur
 
 ### P1-M001 - Consolidate core data models

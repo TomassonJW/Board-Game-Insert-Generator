@@ -8,8 +8,9 @@ Demande type :
 
 ```text
 Lis AGENTS.md, suis docs/EXECUTION_LOOP.md, prends la premiere mission ready dans
-docs/NEXT_ACTIONS.md, execute une seule mission, teste, mets a jour le pilotage
-et fais un commit propre.
+docs/NEXT_ACTIONS.md, execute une mission atomique, teste, mets a jour le
+pilotage, fais un commit propre, integre dans main si tout passe, puis continue
+jusqu'a gate ou limite.
 ```
 
 Avant lancement, verifier rapidement :
@@ -20,6 +21,17 @@ git status --short --branch
 
 Si le workspace contient des changements humains non commites, dire a Codex s'il
 doit les ignorer, travailler autour ou s'arreter.
+
+## Autonomous Git Integration Policy
+
+Par defaut, apres une mission reussie, Codex doit maintenant integrer le commit
+sur `main` sans demander a l'humain de pousser ou merger manuellement. La boucle
+normale est : tester, `git diff --check`, verifier `adsk`, commit, fetch, push ou
+PR/merge automatique, puis repartir d'une branche propre depuis `origin/main`.
+
+L'humain doit intervenir seulement pour une vraie gate produit, un echec de tests
+non reparable, un conflit Git, une protection GitHub, une authentification absente
+ou une review humaine obligatoire.
 
 ## Verifier apres une mission
 
