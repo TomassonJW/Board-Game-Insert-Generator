@@ -1,0 +1,18 @@
+[project]
+name = "board-game-insert-generator"
+version = "0.1.0"
+description = "Pure Python foundation for parametric board game insert generation."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+big-report = "board_game_insert_generator.cli:main"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"

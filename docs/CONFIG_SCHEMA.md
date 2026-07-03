@@ -1,0 +1,142 @@
+# Configuration Schema V0
+
+## Format
+
+Le format V0 est JSON pour rester local, lisible et simple a valider.
+
+Toutes les dimensions sont en millimetres. Le champ `units` doit valoir `mm`.
+
+## Structure generale
+
+```json
+{
+  "project_name": "Example insert",
+  "units": "mm",
+  "box": {},
+  "tolerances": {},
+  "defaults": {},
+  "layout": {},
+  "modules": []
+}
+```
+
+## `box`
+
+Champs obligatoires :
+
+- `inner_dimensions_mm.x`
+- `inner_dimensions_mm.y`
+- `inner_dimensions_mm.z`
+- `usable_height_mm`
+- `lid_clearance_mm`
+
+Convention :
+
+- `inner_dimensions_mm` represente le volume interieur mesure ;
+- `usable_height_mm` represente la hauteur maximale allouee aux modules ;
+- `lid_clearance_mm` represente une contrainte physique reservee sous couvercle.
+
+## `tolerances`
+
+Champs reconnus :
+
+- `peripheral_clearance_mm`
+- `module_gap_mm`
+- `vertical_lid_clearance_mm`
+- `card_clearance_mm`
+- `sleeved_card_clearance_mm`
+- `token_clearance_mm`
+- `meeple_clearance_mm`
+- `sliding_lid_clearance_mm`
+- `hinge_clearance_mm`
+- `printer_compensation_mm`
+- `default_corner_radius_mm`
+- `default_chamfer_mm`
+
+Les valeurs absentes utilisent les valeurs par defaut du moteur.
+
+## `defaults`
+
+Champs reconnus :
+
+- `wall_thickness_mm`
+- `floor_thickness_mm`
+- `corner_radius_mm`
+
+Ces champs ne pilotent pas encore une geometrie creuse en V0, mais ils fixent le contrat pour les versions suivantes.
+
+## `layout`
+
+Champs reconnus :
+
+- `strategy` : `row_fill` en V0.
+- `allow_global_rotation` : reserve pour evolution future.
+
+## `modules`
+
+Chaque module contient :
+
+- `id` : identifiant stable ;
+- `name` : nom humain ;
+- `functional_type` : `cards`, `sleeved_cards`, `tokens`, `meeples`, `dice`, `free`, `other` ;
+- `min_dimensions_mm.x` ;
+- `min_dimensions_mm.y` ;
+- `height_mm` ;
+- `priority` ;
+- `allow_rotation` ;
+- `quantity` ;
+- `comment`.
+
+`min_dimensions_mm.z` est accepte mais optionnel. Si absent, le moteur utilise `height_mm`.
+
+## Exemple minimal
+
+```json
+{
+  "project_name": "Small box",
+  "units": "mm",
+  "box": {
+    "inner_dimensions_mm": { "x": 200, "y": 150, "z": 60 },
+    "usable_height_mm": 45,
+    "lid_clearance_mm": 5
+  },
+  "tolerances": {
+    "peripheral_clearance_mm": 0.8,
+    "module_gap_mm": 0.6,
+    "vertical_lid_clearance_mm": 1.0
+  },
+  "defaults": {
+    "wall_thickness_mm": 1.2,
+    "floor_thickness_mm": 1.2,
+    "corner_radius_mm": 1.5
+  },
+  "layout": {
+    "strategy": "row_fill"
+  },
+  "modules": [
+    {
+      "id": "cards",
+      "name": "Cards",
+      "functional_type": "sleeved_cards",
+      "min_dimensions_mm": { "x": 72, "y": 98 },
+      "height_mm": 40,
+      "priority": 100,
+      "allow_rotation": true,
+      "quantity": 1,
+      "comment": "Main deck"
+    }
+  ]
+}
+```
+
+## Evolution CSV et Google Sheets
+
+CSV et Google Sheets ne doivent pas remplacer le modele interne. Ils doivent etre des formats d'entree convertis vers `InsertConfig`.
+
+Approche prevue :
+
+1. Definir un mapping colonnes vers champs JSON.
+2. Valider les unites explicitement.
+3. Convertir chaque ligne en `ModuleRequest`.
+4. Generer un JSON canonique ou un `InsertConfig`.
+5. Reutiliser exactement le meme moteur.

@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Fusion 360 / CAD generated artifacts
+*.f3d
+*.f3z
+*.step
+*.stp
+*.iges
+*.igs
+*.stl
+*.3mf
+*.obj
+*.fbx
+exports/
+generated/
+out/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+tmp/

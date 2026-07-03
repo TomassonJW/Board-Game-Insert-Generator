@@ -1,0 +1,94 @@
+{
+  "project_name": "Cards and tokens V0",
+  "units": "mm",
+  "box": {
+    "inner_dimensions_mm": {
+      "x": 300,
+      "y": 220,
+      "z": 80
+    },
+    "usable_height_mm": 62,
+    "lid_clearance_mm": 10
+  },
+  "tolerances": {
+    "peripheral_clearance_mm": 0.9,
+    "module_gap_mm": 0.7,
+    "vertical_lid_clearance_mm": 1.2,
+    "card_clearance_mm": 0.5,
+    "sleeved_card_clearance_mm": 1.1,
+    "token_clearance_mm": 0.7,
+    "meeple_clearance_mm": 1.1,
+    "sliding_lid_clearance_mm": 0.4,
+    "hinge_clearance_mm": 0.45,
+    "printer_compensation_mm": 0.0,
+    "default_corner_radius_mm": 1.6,
+    "default_chamfer_mm": 0.45
+  },
+  "defaults": {
+    "wall_thickness_mm": 1.2,
+    "floor_thickness_mm": 1.2,
+    "corner_radius_mm": 1.6
+  },
+  "layout": {
+    "strategy": "row_fill",
+    "allow_global_rotation": false
+  },
+  "modules": [
+    {
+      "id": "sleeved-deck",
+      "name": "Sleeved deck well",
+      "functional_type": "sleeved_cards",
+      "min_dimensions_mm": {
+        "x": 96,
+        "y": 70
+      },
+      "height_mm": 55,
+      "priority": 100,
+      "allow_rotation": true,
+      "quantity": 2,
+      "comment": "Designed as blank first; cavity comes in V3."
+    },
+    {
+      "id": "token-bank",
+      "name": "Token bank",
+      "functional_type": "tokens",
+      "min_dimensions_mm": {
+        "x": 80,
+        "y": 90
+      },
+      "height_mm": 38,
+      "priority": 80,
+      "allow_rotation": true,
+      "quantity": 2,
+      "comment": "Two token trays."
+    },
+    {
+      "id": "meeples",
+      "name": "Meeple tray",
+      "functional_type": "meeples",
+      "min_dimensions_mm": {
+        "x": 70,
+        "y": 80
+      },
+      "height_mm": 42,
+      "priority": 60,
+      "allow_rotation": true,
+      "quantity": 1,
+      "comment": "Irregular pieces need larger cavity clearance later."
+    },
+    {
+      "id": "dice-free",
+      "name": "Dice and free space",
+      "functional_type": "dice",
+      "min_dimensions_mm": {
+        "x": 50,
+        "y": 50
+      },
+      "height_mm": 35,
+      "priority": 40,
+      "allow_rotation": true,
+      "quantity": 1,
+      "comment": "Reserved blank for dice."
+    }
+  ]
+}
