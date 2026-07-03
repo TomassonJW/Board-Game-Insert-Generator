@@ -1,6 +1,6 @@
 # Status
 
-Derniere mise a jour : 2026-07-03
+Derniere mise a jour : 2026-07-04
 
 ## Etat global
 
@@ -117,27 +117,24 @@ workspace est propre et qu'aucune vraie gate humaine n'est atteinte. Les pull
 requests ne sont plus la voie normale ; elles restent un repli pour protection de
 branche, review imposee, conflit, divergence non triviale, risque structurant,
 probleme d'authentification ou refus GitHub.
+La gate humaine du 2026-07-04 autorise la vague P5 limitee aux cavites simples
+cote moteur Python pur, configuration, rapports et CAD IR. La mission `P5-M001`
+ajoute des cavites rectangulaires simples abstraites : elles sont chargees depuis
+`modules[].cavities`, validees contre les dimensions externes du module, les
+parois X/Y et le fond, exposees dans les rapports Markdown/JSON et transportees
+dans la CAD IR par l'operation abstraite `subtract_rectangular_cavity`. Fusion ne
+les coupe pas encore.
 
 ## Phase active
 
-Phase active : **Phase 4 - Pipeline CAD IR vers Fusion stabilise, prochaine gate Fusion requise**.
+Phase active : **Phase 5 - Cavites simples abstraites cote moteur et CAD IR**.
 
-Etat : autonomie operatoire documentee, controle documentaire de base, contrat
-des modeles coeur, loader JSON strict, rapports enrichis et commande de
-diagnostic sont en place. Le contrat de layout Phase 2 est maintenant explicite :
-`row_fill` et `grid` sont executables et couverts par tests, `columns` reste
-reserve. La comparaison simple des strategies existe dans les rapports. Les
-faces des corps rectangulaires simples sont classees explicitement et leurs
-regles de tolerance appliquees sont exposees dans les rapports. Les profils
-d'impression explicites sont resolus et visibles. La representation intermediaire
-CAD est definie et testee. La CLI `export-cad-ir` produit une CAD IR JSON V0
-depuis une configuration BGIG. L'adaptateur Fusion isole sait charger une CAD IR
-depuis `cad_ir_input.json` ou `cad_ir_path.txt`, valider le contrat minimal,
-signaler les erreurs de chargement et generer des blanks rectangulaires dans le
-composant racine sans recalculer layout ou tolerances. La prochaine etape
-recommandee est une decision humaine sur le prochain perimetre Fusion ou un
-retour explicite au coeur Python. Aucune suite Fusion ne doit commencer sans
-nouvelle validation humaine.
+Etat : le pipeline P4 reste stable pour les blanks rectangulaires Fusion. La
+vague P5 est ouverte uniquement cote moteur Python pur, configuration, rapports
+et CAD IR. Les cavites simples sont maintenant des intentions abstraites
+validables et exportables ; elles ne sont pas encore generees dans Fusion. La
+prochaine mission recommandee est `P5-M002 - Ajouter logements de cartes et
+cartes sleevees`, sans operation Fusion soustractive.
 
 ## Implemente
 
@@ -183,6 +180,8 @@ nouvelle validation humaine.
 - Pipeline CAD IR vers Fusion stabilise : entree par `cad_ir_input.json` ou
   `cad_ir_path.txt`, validation minimale du contrat et messages d'erreur
   actionnables dans Fusion.
+- Cavites rectangulaires simples abstraites dans la configuration, la validation,
+  les rapports Markdown/JSON et la CAD IR `subtract_rectangular_cavity`.
 - Smoke test CAD manuel P4-M003 valide dans Fusion : add-in visible, message OK,
   modules visibles et dimensions conformes a la fixture.
 
@@ -193,8 +192,10 @@ nouvelle validation humaine.
 - La strategie `columns` est reservee mais non executable.
 - Les roles `internal` et `welded` ont des regles de tolerance sans jeu, mais ne
   sont pas encore detectes automatiquement par des modules composites.
-- Les `PrimitiveVolume`, `CompositeModule`, `Cavity` et `Feature` existent comme
-  concepts mais ne pilotent pas encore une generation complete.
+- Les `PrimitiveVolume`, `CompositeModule` et `Feature` existent comme concepts
+  mais ne pilotent pas encore une generation complete.
+- Les cavites P5-M001 sont abstraites : elles ne sont pas encore coupees dans
+  Fusion et ne sont pas validees par impression.
 - Les tolerances par defaut et les profils d'impression sont prudents mais non
   calibres sur impression.
 - Les dataclasses restent volontairement legeres ; les erreurs metier sont
@@ -210,7 +211,8 @@ nouvelle validation humaine.
 
 - Strategie de layout `columns`.
 - Decision humaine sur le prochain perimetre Fusion apres stabilisation P4-M004/P4-M006.
-- Cavites, receptacles, encoches, fonds arrondis.
+- Logements cartes/cartes sleevees specialises, bacs tokens/des/meeples et
+  ergonomie de cavites.
 - Modules composites en L/T.
 - Couvercles, rainures et mecanismes.
 - Surcouche esthetique.
@@ -242,14 +244,16 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant la correction `Direct-to-main autonomous integration` :
+Derniere verification pendant `P5-M001 - Cavites rectangulaires simples abstraites` :
 
-- `python -m unittest discover -s tests` : OK, 72 tests passes.
+- `python -m unittest discover -s tests` : OK, 79 tests passes.
 - `python -m board_game_insert_generator examples\simple_box.json --format markdown` : OK.
-- `python -m board_game_insert_generator examples\simple_grid.json --format markdown` : OK.
 - `python -m board_game_insert_generator examples\simple_box.json --format json` : OK.
 - `python -m board_game_insert_generator export-cad-ir examples\simple_box.json --output "$env:TEMP\bgig-cad-ir-input.json"` : OK, schema `cad_ir.v0`, 4 composants.
-- `git diff --check` : OK ; avertissements CRLF/LF Windows uniquement.
+- `python -m board_game_insert_generator examples\simple_tray.json --format markdown` : OK, 1 cavite planifiee `abstract_only`.
+- `python -m board_game_insert_generator examples\simple_tray.json --format json` : OK, `planned_cavity_count = 1`.
+- `python -m board_game_insert_generator export-cad-ir examples\simple_tray.json --output "$env:TEMP\bgig-simple-tray-cad-ir.json"` : OK, schema `cad_ir.v0`, 1 composant.
+- `git diff --check` : OK.
 - `rg -n "adsk" src/board_game_insert_generator` : OK, aucune occurrence dans le coeur Python.
 
 ## Risques actifs

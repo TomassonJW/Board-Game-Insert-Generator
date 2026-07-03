@@ -7,6 +7,7 @@ from typing import Any
 
 from board_game_insert_generator.models import (
     BoxSpec,
+    Cavity,
     Dimension3D,
     FunctionalType,
     GeometryDefaults,
@@ -14,6 +15,7 @@ from board_game_insert_generator.models import (
     InsertConfig,
     LayoutSettings,
     ModuleRequest,
+    Point3D,
     ToleranceProfile,
 )
 from board_game_insert_generator.print_profiles import (
@@ -34,7 +36,9 @@ MODULE_FIELDS = {
     "allow_rotation",
     "quantity",
     "comment",
+    "cavities",
 }
+CAVITY_FIELDS = {"id", "functional_type", "origin_mm", "size_mm", "clearance_mm", "comment"}
 
 
 class ConfigError(ValueError):
@@ -115,6 +119,7 @@ def _parse_modules(raw_modules: Any) -> list[ModuleRequest]:
             default_z=height,
         )
         functional_type = _parse_functional_type(raw.get("functional_type", "other"), index)
+        cavities = tuple(_parse_cavities(raw.get("cavities", []), module_field, functional_type))
         module_id = _optional_string(raw, "id", module_field, default=f"module-{index + 1}")
         module_name = _optional_string(
             raw,
@@ -133,18 +138,63 @@ def _parse_modules(raw_modules: Any) -> list[ModuleRequest]:
                 allow_rotation=_bool(raw, "allow_rotation", module_field, default=False),
                 quantity=_int(raw, "quantity", module_field, default=1),
                 comment=_optional_string(raw, "comment", module_field, default=""),
+                cavities=cavities,
             )
         )
     return parsed
 
 
 def _parse_functional_type(value: Any, index: int) -> FunctionalType:
+    return _parse_functional_type_value(value, f"modules[{index}]")
+
+
+def _parse_cavities(
+    raw_cavities: Any,
+    module_field: str,
+    module_functional_type: FunctionalType,
+) -> list[Cavity]:
+    if raw_cavities is None:
+        return []
+    if not isinstance(raw_cavities, list):
+        raise ConfigError(f"'{module_field}.cavities' must be a list.")
+
+    cavities: list[Cavity] = []
+    for index, raw in enumerate(raw_cavities):
+        cavity_field = f"{module_field}.cavities[{index}]"
+        if not isinstance(raw, dict):
+            raise ConfigError(f"{cavity_field} must be an object.")
+        _reject_unknown_fields(raw, CAVITY_FIELDS, cavity_field)
+        functional_type = _parse_functional_type_value(
+            raw.get("functional_type", module_functional_type.value),
+            cavity_field,
+        )
+        cavity_id = _optional_string(raw, "id", cavity_field, default=f"cavity-{index + 1}")
+        cavities.append(
+            Cavity(
+                id=cavity_id,
+                functional_type=functional_type,
+                origin=_parse_point(
+                    _required_mapping(raw, "origin_mm", f"{cavity_field}.origin_mm"),
+                    field_name=f"{cavity_field}.origin_mm",
+                ),
+                size=_parse_dimensions(
+                    _required_mapping(raw, "size_mm", f"{cavity_field}.size_mm"),
+                    field_name=f"{cavity_field}.size_mm",
+                ),
+                clearance_mm=_float(raw, "clearance_mm", f"{cavity_field}.clearance_mm"),
+                comment=_optional_string(raw, "comment", cavity_field, default=""),
+            )
+        )
+    return cavities
+
+
+def _parse_functional_type_value(value: Any, field_path: str) -> FunctionalType:
     try:
         return FunctionalType(str(value))
     except ValueError as exc:
         allowed = ", ".join(item.value for item in FunctionalType)
         raise ConfigError(
-            f"Unsupported functional_type for modules[{index}]: {value!r}. "
+            f"Unsupported functional_type for {field_path}: {value!r}. "
             f"Allowed values: {allowed}."
         ) from exc
 
@@ -166,6 +216,7 @@ def _parse_tolerances(raw: Any, print_profile: str) -> ToleranceProfile:
         return resolve_print_profile(print_profile, overrides)
     except ValueError as exc:
         raise ConfigError(str(exc)) from exc
+
 
 def _parse_float_dataclass(cls: type[Any], raw: Any, field_name: str) -> Any:
     if raw is None:
@@ -201,6 +252,15 @@ def _parse_layout(raw: Any) -> LayoutSettings:
             "layout",
             default=False,
         ),
+    )
+
+
+def _parse_point(raw: dict[str, Any], field_name: str) -> Point3D:
+    _reject_unknown_fields(raw, {"x", "y", "z"}, field_name)
+    return Point3D(
+        x=_number(raw, "x", field_name),
+        y=_number(raw, "y", field_name),
+        z=_number(raw, "z", field_name),
     )
 
 

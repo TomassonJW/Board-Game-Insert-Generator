@@ -23,15 +23,17 @@ Le depot contient :
 - une documentation de pilotage pour travailler mission par mission ;
 - une commande `export-cad-ir` pour produire une CAD IR JSON depuis une
   configuration BGIG ;
+- des cavites rectangulaires simples abstraites cote moteur, rapports et CAD IR ;
 - un add-in Fusion isole capable de charger cette CAD IR depuis
   `cad_ir_input.json` ou `cad_ir_path.txt`.
 
 Le depot couvre maintenant le pipeline minimal : configuration BGIG -> layout ->
 CAD IR JSON -> add-in Fusion -> blanks rectangulaires dans le composant racine.
 Fusion consomme les dimensions deja calculees par le coeur Python et ne
-recalcule ni layout, ni offsets, ni tolerances. Il ne genere pas encore de
-cavites, couvercles, fillets, exports STL/3MF ou pieces validees par impression
-reelle.
+recalcule ni layout, ni offsets, ni tolerances. Les cavites P5-M001 restent
+abstraites dans le moteur et la CAD IR : Fusion ne les coupe pas encore et ne
+genere pas de couvercles, fillets, exports STL/3MF ou pieces validees par
+impression reelle.
 
 Consulter d'abord :
 
@@ -78,6 +80,17 @@ Pour tester la strategie grille :
 $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_grid.json --format markdown
 ```
+
+Pour tester une cavite simple planifiee cote moteur/CAD IR :
+
+```powershell
+$env:PYTHONPATH = "src"
+python -m board_game_insert_generator examples/simple_tray.json --format markdown
+python -m board_game_insert_generator export-cad-ir examples/simple_tray.json --output $env:TEMP\bgig-simple-tray-cad-ir.json
+```
+
+La cavite apparait dans les rapports et dans la CAD IR comme operation abstraite
+`subtract_rectangular_cavity`. L'add-in Fusion actuel ne l'execute pas encore.
 
 Les rapports exposent un resume de diagnostic : strategie de layout, nombre de
 modules demandes, instances generees, corps imprimables, rotations, empreinte du

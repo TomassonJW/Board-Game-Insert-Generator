@@ -97,7 +97,13 @@ La CAD IR V0 represente l'intention minimale sous forme d'operations abstraites.
 Pour chaque blank rectangulaire, l'operation principale est :
 
 - `create_rectangular_prism` : creer un prisme depuis `printable_origin_mm` et
-  `printable_size_mm` dans le repere de scene.
+  `printable_size_mm` dans le repere de scene ;
+- `subtract_rectangular_cavity` : decrire une future soustraction de cavite
+  rectangulaire depuis une origine locale et une taille deja validees par le
+  moteur.
+
+Les cavites sont aussi exposees dans `body.cavities` avec `status: abstract_only`
+et `fusion_generation: not_implemented`.
 
 Ces operations sont des intentions CAD-agnostic. Elles ne sont pas des appels
 Fusion et ne garantissent pas encore une sortie CAD concrete sans validation
@@ -142,6 +148,8 @@ Fusion ne recalcule pas les cellules, offsets, roles de faces ou tolerances. La
 generation reelle reste limitee a des rectangles extrudes dans le composant
 racine et ne produit aucun STL/3MF. La generation actuelle ne cree pas de
 composants enfants Fusion, pour rester compatible avec les documents Part Design.
+Si la CAD IR contient des operations `subtract_rectangular_cavity`, l'adaptateur
+P4 les conserve comme donnees de planification mais ne les execute pas encore.
 
 ## Face roles et tolerances
 
@@ -170,7 +178,9 @@ Le contrat V0 est valide par tests unitaires :
 - resolution du fichier d'entree Fusion par defaut ou via `cad_ir_path.txt` ;
 - erreurs actionnables pour override vide, fichier absent et contrat CAD IR invalide ;
 - export CLI d'une CAD IR JSON depuis `examples/simple_box.json` ;
-- transformation en plan de generation hors Fusion.
+- transformation en plan de generation hors Fusion ;
+- serialization de cavites rectangulaires abstraites et de l'operation
+  `subtract_rectangular_cavity` depuis `examples/simple_tray.json`.
 
 La validation automatisee ne couvre pas l'execution reelle dans Fusion 360, les
 exports STL/3MF ou l'impression reelle.
@@ -185,5 +195,6 @@ libelle `P4-M004`, stabilise le choix du fichier d'entree et les messages
 d'erreur Fusion.
 
 Toute extension Fusion au-dela du chargement, de la validation et des blanks
-rectangulaires, ou tout export imprimable, reste soumise a une nouvelle gate
-humaine.
+rectangulaires, notamment la premiere execution reelle de
+`subtract_rectangular_cavity` par sketch/extrusion cut/boolean, ou tout export
+imprimable, reste soumise a une nouvelle gate humaine.

@@ -66,6 +66,34 @@ class CliTests(unittest.TestCase):
             {"x": 68.9, "y": 99.2, "z": 44.0},
         )
 
+    def test_cli_exports_cad_ir_with_abstract_cavity_compatible_with_fusion_plan(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            output_path = Path(temporary_directory) / "simple_tray_cad_ir.json"
+            stdout = io.StringIO()
+
+            with redirect_stdout(stdout):
+                code = main(
+                    [
+                        "export-cad-ir",
+                        str(ROOT / "examples" / "simple_tray.json"),
+                        "--output",
+                        str(output_path),
+                    ]
+                )
+
+            payload = load_cad_ir_json(output_path)
+            plan = generation_plan_from_cad_ir(payload)
+
+        self.assertEqual(code, 0)
+        self.assertIn("CAD IR export OK - Simple tray with planned cavity V0", stdout.getvalue())
+        self.assertEqual(payload["components"][0]["body"]["cavities"][0]["id"], "token-pocket")
+        self.assertEqual(
+            payload["components"][0]["body"]["operations"][1]["kind"],
+            "subtract_rectangular_cavity",
+        )
+        self.assertEqual(plan.created_object_count, 2)
+        self.assertEqual(plan.blanks[0].body_name, "token-tray-01 rectangular blank")
+
     def test_cli_reports_configuration_error_category(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
             path = Path(temporary_directory) / "config.json"

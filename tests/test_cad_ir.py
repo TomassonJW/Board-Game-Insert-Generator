@@ -6,6 +6,7 @@ from context import ROOT
 
 from board_game_insert_generator.cad_ir import (
     CAD_IR_SCHEMA_VERSION,
+    CAVITY_OPERATION_KIND,
     CadIrError,
     build_blank_cad_scene,
 )
@@ -81,6 +82,21 @@ class CadIrTests(unittest.TestCase):
             "exposed_printer_compensation_only",
         )
         self.assertFalse(first_body["applied_tolerances"][3]["receives_clearance"])
+
+    def test_scene_serializes_abstract_cavity_operations(self) -> None:
+        config = load_config(ROOT / "examples" / "simple_tray.json")
+        layout = generate_basic_layout(config)
+
+        body = build_blank_cad_scene(config, layout).to_dict()["components"][0]["body"]
+
+        self.assertEqual(body["cavities"][0]["id"], "token-pocket")
+        self.assertEqual(body["cavities"][0]["status"], "abstract_only")
+        self.assertEqual(body["cavities"][0]["fusion_generation"], "not_implemented")
+        operation_kinds = [operation["kind"] for operation in body["operations"]]
+        self.assertEqual(operation_kinds, ["create_rectangular_prism", CAVITY_OPERATION_KIND])
+        cavity_operation = body["operations"][1]
+        self.assertEqual(cavity_operation["parameters"]["coordinate_frame"], "body.local")
+        self.assertEqual(cavity_operation["parameters"]["fusion_generation"], "not_implemented")
 
     def test_scene_rejects_inconsistent_layout_result(self) -> None:
         config = load_config(ROOT / "examples" / "simple_box.json")

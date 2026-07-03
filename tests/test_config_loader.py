@@ -22,6 +22,36 @@ class ConfigLoaderTests(unittest.TestCase):
         self.assertEqual(config.modules[0].functional_type, FunctionalType.SLEEVED_CARDS)
         self.assertEqual(config.modules[0].quantity, 2)
 
+    def test_loads_module_cavities(self) -> None:
+        config = load_config(ROOT / "examples" / "simple_tray.json")
+
+        self.assertEqual(len(config.modules), 1)
+        cavity = config.modules[0].cavities[0]
+        self.assertEqual(cavity.id, "token-pocket")
+        self.assertEqual(cavity.functional_type, FunctionalType.TOKENS)
+        self.assertEqual(cavity.origin.x, 4.0)
+        self.assertEqual(cavity.origin.z, 1.2)
+        self.assertEqual(cavity.size.x, 62.0)
+        self.assertEqual(cavity.clearance_mm, 0.6)
+
+    def test_rejects_unknown_cavity_field(self) -> None:
+        payload = _simple_payload()
+        payload["modules"][0]["cavities"] = [
+            {
+                "id": "bad-pocket",
+                "origin_mm": {"x": 2, "y": 2, "z": 1.2},
+                "size_mm": {"x": 10, "y": 10, "z": 5},
+                "clearance_mm": 0.5,
+                "surprise": True,
+            }
+        ]
+
+        with self.assertRaisesRegex(
+            ConfigError,
+            r"Unknown field\(s\) in 'modules\[0\]\.cavities\[0\]': surprise",
+        ):
+            _load_payload(payload)
+
     def test_rejects_missing_file(self) -> None:
         with self.assertRaises(ConfigError):
             load_config(ROOT / "examples" / "missing.json")

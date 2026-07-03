@@ -1,6 +1,6 @@
 # Next Actions
 
-Derniere mise a jour : 2026-07-03
+Derniere mise a jour : 2026-07-04
 
 Ce fichier indique les prochaines missions recommandees. Il doit rester court,
 priorise et directement actionnable. Si aucune mission explicite n'est donnee,
@@ -10,79 +10,65 @@ Codex doit choisir la premiere mission `ready` listee ici.
 
 Statut : `active`.
 
-Depuis la decision humaine du 2026-07-03, les operations Git standard sont gerees
-automatiquement par Codex apres une mission reussie. Depuis la decision corrective
-du 2026-07-03, le chemin standard est `direct-to-main` : une mission doit etre
-testee, commitee, integree directement dans `main`, puis poussee vers
-`origin/main` avant selection d'une mission suivante. Les pull requests sont
-reservees aux cas de repli : protection GitHub, review imposee, conflit,
-divergence non triviale, risque structurant, authentification absente ou refus de
-push direct. Une pause humaine reste requise seulement pour les vraies gates, les
-echecs, les conflits, les protections de branche, les problemes d'authentification
-ou les risques de perte de travail.
+Le chemin standard est `direct-to-main` : une mission doit etre testee, commitee,
+integree directement dans `main`, puis poussee vers `origin/main` avant selection
+d'une mission suivante. Les pull requests sont reservees aux cas de repli :
+protection GitHub, review imposee, conflit, divergence non triviale, risque
+structurant, authentification absente ou refus de push direct.
 
 ## Gate humaine active
 
-### Gate - Autoriser le prochain perimetre apres P4-M004/P4-M006
+Statut : `validated_for_scope`.
 
-Statut : `blocked`.
+Decision humaine du 2026-07-04 : poursuivre vers les premieres cavites simples
+cote moteur Python pur, configuration, rapports et CAD IR.
 
-Decision demandee :
+Perimetre autorise :
 
-- choisir explicitement le prochain lot Fusion ou le retour au coeur Python ;
-- confirmer le perimetre autorise avant toute nouvelle generation Fusion ;
-- maintenir separees validation CAD, validation d'impression et exports.
+- modele de cavite simple ;
+- configuration JSON ;
+- validation des dimensions, parois et fond ;
+- rapports Markdown/JSON ;
+- CAD IR avec operations abstraites de cavite ;
+- export CAD IR compatible avec l'add-in existant.
 
-Contexte :
+Perimetre toujours bloque sans nouvelle gate :
 
-- `P4-M003` code et valide manuellement une premiere generation minimale depuis
-  une CAD IR JSON ;
-- `P4-M005` rend la CAD IR regenerable depuis une configuration BGIG via
-  `export-cad-ir` ;
-- `P4-M006`, autorisee sous le libelle humain `P4-M004`, stabilise le pipeline
-  d'entree Fusion : `cad_ir_input.json` par defaut ou `cad_ir_path.txt` comme
-  chemin configure ;
-- l'add-in valide le contrat minimal avant generation et affiche des erreurs
-  Fusion actionnables ;
-- la validation physique par impression 3D n'est pas realisee ;
-- `adsk` reste interdit dans `src/board_game_insert_generator`.
-
-Options possibles pour la suite, a valider explicitement :
-
-- Option 1 : revenir au coeur Python pour cavites abstraites, modules composites
-  ou qualite de layout avant d'elargir Fusion.
-- Option 2 : etudier une sortie Assembly avec composants enfants, separee du mode
-  Part Design.
-- Option 3 : autoriser une prochaine mission Fusion ciblee, par exemple cavites
-  simples ou preparations d'exports, avec perimetre et validations explicites.
-
-Risques :
-
-- confondre validation CAD visuelle et validation d'impression reelle ;
-- elargir vers cavites, fillets, composants enfants ou exports sans gate ;
-- laisser Fusion recalculer layout, offsets ou tolerances au lieu de consommer la
-  CAD IR deja resolue.
-
-## Missions bloquees tant que la gate n'est pas validee
-
-- Toute suite Fusion apres stabilisation du pipeline CAD IR.
-- Premier export STL/3MF.
-- Cavites Fusion.
-- Fillets/conges Fusion.
-- Validation physique par impression reelle.
-- Modification des valeurs de tolerance par defaut.
-- Modules composites complets.
+- creation reelle de cavites dans Fusion ;
+- extrusion cut, boolean soustractif ou sketch de coupe Fusion ;
+- fillets/conges, couvercles, charnieres ;
+- export STL/3MF ;
+- validation d'impression reelle.
 
 ## Fin de chaque mission
 
-Avant de terminer :
+Appliquer la politique active `direct-to-main` : tests complets, commit propre,
+integration directe dans `main`, push vers `origin/main`, puis reprise depuis
+`origin/main` si aucune vraie gate humaine n'est atteinte.
+## Mission ready
 
-- mettre a jour `docs/STATUS.md` ;
-- mettre a jour `docs/BACKLOG.md` ;
-- remplacer cette liste par les prochaines actions reelles ;
-- ajouter une ADR si une decision structurante a ete prise ;
-- ajouter une entree de log si l'orientation ou le statut a change ;
-- lancer les tests disponibles ou expliquer pourquoi ils n'ont pas ete lances ;
-- committer proprement si le depot a ete modifie ;
-- integrer automatiquement dans `main` si les tests passent et qu'aucune gate ou
-  blocage Git n'est atteint.
+### P5-M002 - Ajouter logements de cartes et cartes sleevees
+
+Statut : `ready`.
+
+Objectif : specialiser les cavites simples pour les decks `cards` et
+`sleeved_cards`, en conservant le moteur Python pur et la CAD IR abstraite.
+
+Livrable attendu :
+
+- regles de dimensions/clearances pour cartes et cartes sleevees ;
+- tests de validation ;
+- exemple ou extension d'exemple ;
+- rapports et CAD IR enrichis si necessaire ;
+- aucune generation Fusion reelle.
+
+Dependances : `P5-M001` done.
+
+Verifications minimales : suite unitaire, exemples `simple_box` et
+`simple_tray`, export CAD IR, `git diff --check`, absence de `adsk` dans le coeur.
+
+## Gate obligatoire suivante
+
+Si la prochaine mission implique de creer reellement les cavites dans Fusion 360,
+par sketch, extrusion cut, boolean ou toute operation geometrique Fusion
+soustractive, Codex doit s'arreter avec un rapport de gate.

@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 
 from board_game_insert_generator.models import (
+    Cavity,
     Dimension3D,
     IMPLEMENTED_LAYOUT_STRATEGIES,
     RESERVED_LAYOUT_STRATEGIES,
@@ -106,6 +107,16 @@ def validate_config(config: InsertConfig) -> list[ValidationIssue]:
                 )
             )
 
+        _validate_module_cavities(
+            module.cavities,
+            prefix,
+            module.min_dimensions,
+            module.desired_height_mm,
+            config.defaults.wall_thickness_mm,
+            config.defaults.floor_thickness_mm,
+            issues,
+        )
+
     if config.layout.strategy not in IMPLEMENTED_LAYOUT_STRATEGIES:
         implemented = ", ".join(f"'{strategy}'" for strategy in IMPLEMENTED_LAYOUT_STRATEGIES)
         message = f"V0 supports only these layout strategies: {implemented}."
@@ -127,6 +138,67 @@ def assert_valid_config(config: InsertConfig) -> None:
     if issues:
         raise ValidationError(issues)
 
+
+def _validate_module_cavities(
+    cavities: tuple[Cavity, ...],
+    module_field: str,
+    module_size: Dimension3D,
+    module_height_mm: float,
+    wall_thickness_mm: float,
+    floor_thickness_mm: float,
+    issues: list[ValidationIssue],
+) -> None:
+    seen_ids: set[str] = set()
+    for index, cavity in enumerate(cavities):
+        prefix = f"{module_field}.cavities[{index}]"
+        if not cavity.id:
+            issues.append(_issue(f"{prefix}.id", "EMPTY_ID", "Cavity id cannot be empty."))
+        if cavity.id in seen_ids:
+            issues.append(_issue(f"{prefix}.id", "DUPLICATE_ID", f"Duplicate cavity id '{cavity.id}'."))
+        seen_ids.add(cavity.id)
+
+        _validate_non_negative_number(cavity.origin.x, f"{prefix}.origin_mm.x", issues)
+        _validate_non_negative_number(cavity.origin.y, f"{prefix}.origin_mm.y", issues)
+        _validate_non_negative_number(cavity.origin.z, f"{prefix}.origin_mm.z", issues)
+        _validate_positive_dimensions(cavity.size, f"{prefix}.size_mm", issues)
+        _validate_non_negative_number(cavity.clearance_mm, f"{prefix}.clearance_mm", issues)
+
+        right_wall = module_size.x - (cavity.origin.x + cavity.size.x)
+        back_wall = module_size.y - (cavity.origin.y + cavity.size.y)
+        top_remaining = module_height_mm - (cavity.origin.z + cavity.size.z)
+        if right_wall < 0 or back_wall < 0 or top_remaining < 0:
+            issues.append(
+                _issue(
+                    prefix,
+                    "CAVITY_OUTSIDE_MODULE",
+                    "Cavity must stay inside the module external dimensions.",
+                )
+            )
+
+        min_side_wall = min(cavity.origin.x, cavity.origin.y, right_wall, back_wall)
+        if min_side_wall < wall_thickness_mm:
+            issues.append(
+                _issue(
+                    prefix,
+                    "CAVITY_WALL_TOO_THIN",
+                    (
+                        "Cavity must preserve the configured wall thickness "
+                        f"({wall_thickness_mm:.2f} mm) on X/Y sides."
+                    ),
+                )
+            )
+
+        if cavity.origin.z < floor_thickness_mm:
+            issues.append(
+                _issue(
+                    prefix,
+                    "CAVITY_FLOOR_TOO_THIN",
+                    (
+                        "Cavity must preserve the configured floor thickness "
+                        f"({floor_thickness_mm:.2f} mm)."
+                    ),
+                )
+            )
 
 def _validate_positive_dimensions(
     dimensions: Dimension3D,

@@ -102,6 +102,16 @@ class LayoutSettings:
 
 
 @dataclass(frozen=True)
+class Cavity:
+    id: str
+    functional_type: FunctionalType
+    origin: Point3D
+    size: Dimension3D
+    clearance_mm: float
+    comment: str = ""
+
+
+@dataclass(frozen=True)
 class ModuleRequest:
     id: str
     name: str
@@ -112,6 +122,7 @@ class ModuleRequest:
     allow_rotation: bool
     quantity: int = 1
     comment: str = ""
+    cavities: tuple[Cavity, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -151,15 +162,6 @@ class CompositeModule:
     id: str
     primitive_volumes: tuple[PrimitiveVolume, ...]
     note: str = ""
-
-
-@dataclass(frozen=True)
-class Cavity:
-    id: str
-    functional_type: FunctionalType
-    origin: Point3D
-    size: Dimension3D
-    clearance_mm: float
 
 
 @dataclass(frozen=True)

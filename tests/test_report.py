@@ -37,6 +37,23 @@ class ReportTests(unittest.TestCase):
         self.assertIn("Preset values are experimental starting points", report)
         self.assertIn("| Module gap | 0.60 mm |", report)
 
+    def test_reports_expose_planned_cavities(self) -> None:
+        config = load_config(ROOT / "examples" / "simple_tray.json")
+        result = generate_basic_layout(config)
+
+        markdown = layout_to_markdown(config, result)
+        payload = json.loads(layout_to_json(config, result))
+
+        self.assertIn("## Planned cavities", markdown)
+        self.assertIn("| token-tray-01 | token-pocket | tokens |", markdown)
+        self.assertIn("abstract_only", markdown)
+        self.assertEqual(payload["summary"]["planned_cavity_count"], 1)
+        self.assertEqual(payload["module_requests"][0]["cavities"][0]["id"], "token-pocket")
+        body_cavity = payload["printable_bodies"][0]["planned_cavities"][0]
+        self.assertEqual(body_cavity["functional_type"], "tokens")
+        self.assertEqual(body_cavity["local_origin_mm"], {"x": 4.0, "y": 4.0, "z": 1.2})
+        self.assertEqual(body_cavity["status"], "abstract_only")
+
     def test_json_report_exposes_diagnostic_fields(self) -> None:
         config = load_config(ROOT / "examples" / "simple_box.json")
         result = generate_basic_layout(config)

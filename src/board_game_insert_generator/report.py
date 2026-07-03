@@ -7,9 +7,11 @@ from typing import Any
 from board_game_insert_generator.layout import LayoutError, generate_basic_layout
 from board_game_insert_generator.models import (
     IMPLEMENTED_LAYOUT_STRATEGIES,
+    Cavity,
     Dimension3D,
     InsertConfig,
     LayoutResult,
+    ModuleRequest,
     Point3D,
 )
 from board_game_insert_generator.print_profiles import print_profile_label, print_profile_note
@@ -18,6 +20,7 @@ from board_game_insert_generator.validation import ValidationError
 
 
 def layout_to_dict(config: InsertConfig, result: LayoutResult) -> dict[str, Any]:
+    planned_cavities = _planned_cavities_by_instance(config, result)
     return {
         "project_name": config.project_name,
         "units": config.units,
@@ -40,6 +43,7 @@ def layout_to_dict(config: InsertConfig, result: LayoutResult) -> dict[str, Any]
             "expanded_instance_count": len(result.cells),
             "cell_count": len(result.cells),
             "printable_body_count": len(result.printable_bodies),
+            "planned_cavity_count": sum(len(entries) for entries in planned_cavities.values()),
             "rotated_cell_count": sum(1 for cell in result.cells if cell.rotated),
             "layout_footprint_mm": _dim(_layout_footprint(result)),
             "max_printable_height_mm": _max_printable_height(result),
@@ -57,6 +61,7 @@ def layout_to_dict(config: InsertConfig, result: LayoutResult) -> dict[str, Any]
                 "desired_height_mm": _clean_float(module.desired_height_mm),
                 "priority": module.priority,
                 "allow_rotation": module.allow_rotation,
+                "cavities": [_cavity_to_dict(cavity) for cavity in module.cavities],
             }
             for module in config.modules
         ],
@@ -81,6 +86,10 @@ def layout_to_dict(config: InsertConfig, result: LayoutResult) -> dict[str, Any]
                 "size_mm": _dim(body.size),
                 "offsets_mm": asdict(body.offsets),
                 "primitive_count": len(body.primitive_volumes),
+                "planned_cavities": [
+                    _cavity_to_dict(cavity)
+                    for cavity in planned_cavities.get(body.instance_id, ())
+                ],
                 "face_classifications": [
                     {
                         "face": classification.face.value,
@@ -113,6 +122,8 @@ def layout_to_json(config: InsertConfig, result: LayoutResult) -> str:
 
 
 def layout_to_markdown(config: InsertConfig, result: LayoutResult) -> str:
+    planned_cavities = _planned_cavities_by_instance(config, result)
+    planned_cavity_count = sum(len(entries) for entries in planned_cavities.values())
     lines = [
         f"# Layout report - {config.project_name}",
         "",
@@ -128,6 +139,7 @@ def layout_to_markdown(config: InsertConfig, result: LayoutResult) -> str:
         f"- Requested modules: {len(config.modules)}",
         f"- Generated instances: {len(result.cells)}",
         f"- Printable bodies: {len(result.printable_bodies)}",
+        f"- Planned cavities: {planned_cavity_count}",
         f"- Rotated cells: {sum(1 for cell in result.cells if cell.rotated)}",
         f"- Layout footprint: {_format_dim(_layout_footprint(result))}",
         f"- Max printable height: {_max_printable_height(result):.2f} mm",
@@ -191,6 +203,24 @@ def layout_to_markdown(config: InsertConfig, result: LayoutResult) -> str:
     lines.extend(
         [
             "",
+            "## Planned cavities",
+            "",
+        ]
+    )
+    if planned_cavity_count:
+        lines.extend(
+            [
+                "| Instance | Cavity | Type | Local origin | Size | Clearance | Status |",
+                "| --- | --- | --- | ---: | ---: | ---: | --- |",
+                *_format_cavity_rows(planned_cavities),
+            ]
+        )
+    else:
+        lines.append("- No planned cavities.")
+
+    lines.extend(
+        [
+            "",
             "## Face classifications",
             "",
             "| Instance | Roles |",
@@ -218,8 +248,10 @@ def layout_to_markdown(config: InsertConfig, result: LayoutResult) -> str:
             "## Interpretation",
             "",
             "Cell size is the theoretical layout reservation. Printable size is the body after "
-            "face-level tolerance offsets. Face classifications drive explicit tolerance rules; "
-            "V0 does not guarantee an optimized layout or physically validated tolerances.",
+            "face-level tolerance offsets. Face classifications drive explicit tolerance rules. "
+            "Planned cavities are abstract engine/CAD IR intent only; Fusion does not cut them "
+            "yet in P5-M001. V0 does not guarantee an optimized layout or physically validated "
+            "tolerances.",
         ]
     )
     return "\n".join(lines)
@@ -231,6 +263,30 @@ def _dim(dimensions: Dimension3D) -> dict[str, float]:
 
 def _point(point: Point3D) -> dict[str, float]:
     return {"x": _clean_float(point.x), "y": _clean_float(point.y), "z": _clean_float(point.z)}
+
+
+def _cavity_to_dict(cavity: Cavity) -> dict[str, Any]:
+    return {
+        "id": cavity.id,
+        "functional_type": cavity.functional_type.value,
+        "local_origin_mm": _point(cavity.origin),
+        "size_mm": _dim(cavity.size),
+        "clearance_mm": _clean_float(cavity.clearance_mm),
+        "comment": cavity.comment,
+        "status": "abstract_only",
+    }
+
+
+def _planned_cavities_by_instance(
+    config: InsertConfig,
+    result: LayoutResult,
+) -> dict[str, tuple[Cavity, ...]]:
+    modules_by_id: dict[str, ModuleRequest] = {module.id: module for module in config.modules}
+    planned: dict[str, tuple[Cavity, ...]] = {}
+    for cell in result.cells:
+        module = modules_by_id.get(cell.module_id)
+        planned[cell.instance_id] = module.cavities if module is not None else ()
+    return planned
 
 
 def _clean_float(value: float) -> float:
@@ -251,6 +307,23 @@ def _format_offsets(offsets: Any) -> str:
         f"y-{offsets.y_min:.2f}, y+{offsets.y_max:.2f}, "
         f"z-{offsets.z_min:.2f}, z+{offsets.z_max:.2f}"
     )
+
+
+def _format_cavity_rows(planned_cavities: dict[str, tuple[Cavity, ...]]) -> list[str]:
+    rows: list[str] = []
+    for instance_id, cavities in planned_cavities.items():
+        for cavity in cavities:
+            rows.append(
+                "| "
+                f"{instance_id} | "
+                f"{cavity.id} | "
+                f"{cavity.functional_type.value} | "
+                f"{_format_point(cavity.origin)} | "
+                f"{_format_dim(cavity.size)} | "
+                f"{cavity.clearance_mm:.2f} mm | "
+                "abstract_only |"
+            )
+    return rows
 
 
 def _format_face_roles(body: Any) -> str:

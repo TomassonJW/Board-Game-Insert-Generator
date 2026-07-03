@@ -139,7 +139,15 @@ et de features.
 
 ### Cavity
 
-Volume retire a l'interieur d'un module pour contenir un objet.
+Volume rectangulaire retire a l'interieur d'un module pour contenir un objet.
+Depuis P5-M001, une cavite simple porte :
+
+- un identifiant stable ;
+- un type fonctionnel ;
+- une origine locale dans le module ;
+- des dimensions internes ;
+- une clearance explicite ;
+- un commentaire optionnel.
 
 Exemples :
 
@@ -150,8 +158,10 @@ Exemples :
 - gorge de couvercle.
 
 Les cavites ont leurs propres jeux. Le jeu autour d'une carte sleevee n'est pas
-le meme que le jeu entre deux modules voisins.
-
+le meme que le jeu entre deux modules voisins. En P5-M001, la validation porte
+sur l'enveloppe externe du module, les parois X/Y minimales et le fond minimal.
+La cavite est transportee dans la CAD IR comme intention abstraite ; elle n'est
+pas encore coupee dans Fusion.
 ### Feature
 
 Detail ajoute ou retire sur un corps imprimable.
@@ -201,7 +211,9 @@ Implemente :
 - offsets par face pour cas simples ;
 - classification explicite des faces pour corps rectangulaires simples ;
 - regles de tolerance appliquees par role de face ;
-- representation conceptuelle des primitives et composites.
+- representation conceptuelle des primitives et composites ;
+- cavites rectangulaires simples abstraites dans la configuration, la validation,
+  les rapports et la CAD IR.
 
 Experimental :
 

@@ -5,12 +5,14 @@ import unittest
 from board_game_insert_generator.layout import generate_basic_layout
 from board_game_insert_generator.models import (
     BoxSpec,
+    Cavity,
     Dimension3D,
     FunctionalType,
     GeometryDefaults,
     InsertConfig,
     LayoutSettings,
     ModuleRequest,
+    Point3D,
     ToleranceProfile,
 )
 from board_game_insert_generator.validation import validate_config
@@ -21,6 +23,7 @@ def _module(
     quantity: int = 1,
     height_mm: float = 35.0,
     min_dimensions: Dimension3D | None = None,
+    cavities: tuple[Cavity, ...] = (),
 ) -> ModuleRequest:
     return ModuleRequest(
         id=module_id,
@@ -31,6 +34,7 @@ def _module(
         priority=10,
         allow_rotation=True,
         quantity=quantity,
+        cavities=cavities,
     )
 
 
@@ -88,6 +92,48 @@ class ModelContractTests(unittest.TestCase):
         issues = validate_config(_config(tolerances=tolerances))
 
         self.assertIn(("tolerances.module_gap_mm", "NEGATIVE_VALUE"), _issue_keys(issues))
+
+    def test_valid_simple_cavity_contract_has_no_validation_issues(self) -> None:
+        cavity = Cavity(
+            id="token-pocket",
+            functional_type=FunctionalType.TOKENS,
+            origin=Point3D(x=4.0, y=4.0, z=1.2),
+            size=Dimension3D(x=62.0, y=52.0, z=20.0),
+            clearance_mm=0.6,
+        )
+        module = _module(
+            module_id="token-tray",
+            height_mm=24.0,
+            min_dimensions=Dimension3D(x=70.0, y=60.0, z=24.0),
+            cavities=(cavity,),
+        )
+
+        issues = validate_config(_config(modules=(module,)))
+
+        self.assertEqual(issues, [])
+
+    def test_cavity_contract_reports_invalid_walls_floor_and_bounds(self) -> None:
+        cavity = Cavity(
+            id="bad-pocket",
+            functional_type=FunctionalType.TOKENS,
+            origin=Point3D(x=0.5, y=0.5, z=0.5),
+            size=Dimension3D(x=80.0, y=70.0, z=30.0),
+            clearance_mm=-0.1,
+        )
+        module = _module(
+            module_id="token-tray",
+            height_mm=24.0,
+            min_dimensions=Dimension3D(x=70.0, y=60.0, z=24.0),
+            cavities=(cavity,),
+        )
+
+        issues = validate_config(_config(modules=(module,)))
+
+        keys = _issue_keys(issues)
+        self.assertIn(("modules[0].cavities[0].clearance_mm", "NEGATIVE_VALUE"), keys)
+        self.assertIn(("modules[0].cavities[0]", "CAVITY_OUTSIDE_MODULE"), keys)
+        self.assertIn(("modules[0].cavities[0]", "CAVITY_WALL_TOO_THIN"), keys)
+        self.assertIn(("modules[0].cavities[0]", "CAVITY_FLOOR_TOO_THIN"), keys)
 
     def test_cell_and_printable_body_remain_distinct_contract_objects(self) -> None:
         result = generate_basic_layout(_config())

@@ -11,11 +11,13 @@ from dataclasses import dataclass
 from typing import Any
 
 from board_game_insert_generator.models import (
+    Cavity,
     Dimension3D,
     FaceClassification,
     FaceToleranceApplication,
     InsertConfig,
     LayoutResult,
+    ModuleRequest,
     Point3D,
     PrintableBody,
 )
@@ -24,6 +26,7 @@ from board_game_insert_generator.models import (
 CAD_IR_SCHEMA_VERSION = "cad_ir.v0"
 CAD_IR_UNITS = "mm"
 CAD_IR_COORDINATE_SYSTEM = "right_handed_z_up_mm"
+CAVITY_OPERATION_KIND = "subtract_rectangular_cavity"
 
 
 class CadIrError(ValueError):
@@ -142,6 +145,30 @@ class CadToleranceRecord:
 
 
 @dataclass(frozen=True)
+class CadCavity:
+    id: str
+    functional_type: str
+    local_origin: Point3D
+    size: Dimension3D
+    clearance_mm: float
+    comment: str
+    status: str = "abstract_only"
+    fusion_generation: str = "not_implemented"
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "functional_type": self.functional_type,
+            "local_origin_mm": _point_to_dict(self.local_origin),
+            "size_mm": _dimension_to_dict(self.size),
+            "clearance_mm": self.clearance_mm,
+            "comment": self.comment,
+            "status": self.status,
+            "fusion_generation": self.fusion_generation,
+        }
+
+
+@dataclass(frozen=True)
 class CadBody:
     id: str
     name: str
@@ -151,6 +178,7 @@ class CadBody:
     theoretical_size: Dimension3D
     printable_origin: Point3D
     printable_size: Dimension3D
+    cavities: tuple[CadCavity, ...]
     face_classifications: tuple[CadFaceRecord, ...]
     applied_tolerances: tuple[CadToleranceRecord, ...]
     operations: tuple[CadOperation, ...]
@@ -165,6 +193,7 @@ class CadBody:
             "theoretical_size_mm": _dimension_to_dict(self.theoretical_size),
             "printable_origin_mm": _point_to_dict(self.printable_origin),
             "printable_size_mm": _dimension_to_dict(self.printable_size),
+            "cavities": [cavity.to_dict() for cavity in self.cavities],
             "face_classifications": [entry.to_dict() for entry in self.face_classifications],
             "applied_tolerances": [entry.to_dict() for entry in self.applied_tolerances],
             "operations": [operation.to_dict() for operation in self.operations],
@@ -236,10 +265,10 @@ class CadScene:
 
 
 def build_blank_cad_scene(config: InsertConfig, layout: LayoutResult) -> CadScene:
-    """Build the first CAD IR contract for rectangular printable blanks.
+    """Build the CAD IR contract for rectangular blanks and abstract cavities.
 
     The scene mirrors already-resolved engine output. It does not infer layout,
-    change tolerances, create cavities, call Fusion 360, or export files.
+    change tolerances, cut cavities in Fusion 360, call Fusion 360, or export files.
     """
 
     if config.units != CAD_IR_UNITS:
@@ -254,8 +283,17 @@ def build_blank_cad_scene(config: InsertConfig, layout: LayoutResult) -> CadScen
     if extra_body_ids:
         raise CadIrError("Printable bodies without cells: " + ", ".join(extra_body_ids))
 
+    modules_by_id = {module.id: module for module in config.modules}
+    missing_module_ids = sorted({cell.module_id for cell in layout.cells} - set(modules_by_id))
+    if missing_module_ids:
+        raise CadIrError("Missing module requests for cells: " + ", ".join(missing_module_ids))
+
     components = tuple(
-        _component_from_cell_and_body(cell, printable_by_instance[cell.instance_id])
+        _component_from_cell_and_body(
+            cell,
+            printable_by_instance[cell.instance_id],
+            modules_by_id[cell.module_id],
+        )
         for cell in layout.cells
     )
     return CadScene(
@@ -281,9 +319,10 @@ def build_blank_cad_scene(config: InsertConfig, layout: LayoutResult) -> CadScen
     )
 
 
-def _component_from_cell_and_body(cell, body: PrintableBody) -> CadComponent:
+def _component_from_cell_and_body(cell, body: PrintableBody, module: ModuleRequest) -> CadComponent:
     component_id = f"component:{cell.instance_id}"
     body_name = f"{cell.instance_id} rectangular blank"
+    cad_cavities = _cad_cavities(module.cavities)
     cad_body = CadBody(
         id=body.body_id,
         name=body_name,
@@ -293,6 +332,7 @@ def _component_from_cell_and_body(cell, body: PrintableBody) -> CadComponent:
         theoretical_size=cell.size,
         printable_origin=body.origin,
         printable_size=body.size,
+        cavities=cad_cavities,
         face_classifications=_face_records(body.face_classifications),
         applied_tolerances=_tolerance_records(body.tolerance_applications),
         operations=(
@@ -306,6 +346,7 @@ def _component_from_cell_and_body(cell, body: PrintableBody) -> CadComponent:
                     "coordinate_frame": "scene.frame",
                 },
             ),
+            *_cavity_operations(body.body_id, module.cavities),
         ),
     )
     return CadComponent(
@@ -320,6 +361,41 @@ def _component_from_cell_and_body(cell, body: PrintableBody) -> CadComponent:
             "source_index": cell.source_index,
             "rotated": cell.rotated,
         },
+    )
+
+
+def _cad_cavities(cavities: tuple[Cavity, ...]) -> tuple[CadCavity, ...]:
+    return tuple(
+        CadCavity(
+            id=cavity.id,
+            functional_type=cavity.functional_type.value,
+            local_origin=cavity.origin,
+            size=cavity.size,
+            clearance_mm=cavity.clearance_mm,
+            comment=cavity.comment,
+        )
+        for cavity in cavities
+    )
+
+
+def _cavity_operations(body_id: str, cavities: tuple[Cavity, ...]) -> tuple[CadOperation, ...]:
+    return tuple(
+        CadOperation(
+            id=f"{body_id}:{cavity.id}:{CAVITY_OPERATION_KIND}",
+            kind=CAVITY_OPERATION_KIND,
+            target_id=body_id,
+            parameters={
+                "cavity_id": cavity.id,
+                "functional_type": cavity.functional_type.value,
+                "local_origin_mm": _point_to_dict(cavity.origin),
+                "size_mm": _dimension_to_dict(cavity.size),
+                "clearance_mm": cavity.clearance_mm,
+                "coordinate_frame": "body.local",
+                "execution_status": "abstract_only",
+                "fusion_generation": "not_implemented",
+            },
+        )
+        for cavity in cavities
     )
 
 

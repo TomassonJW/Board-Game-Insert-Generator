@@ -128,10 +128,35 @@ Chaque module contient :
 - `priority` ;
 - `allow_rotation` ;
 - `quantity` ;
-- `comment`.
+- `comment` ;
+- `cavities` : liste optionnelle de cavites rectangulaires simples abstraites.
 
 `min_dimensions_mm.z` est accepte mais optionnel. Si absent, le moteur utilise `height_mm`.
 
+## `modules[].cavities`
+
+Chaque cavite simple est un volume rectangulaire local au module. Elle decrit une
+intention de creusage future, sans execution Fusion en P5-M001.
+
+Champs reconnus :
+
+- `id` : identifiant stable de cavite, optionnel mais recommande ;
+- `functional_type` : type fonctionnel de la cavite, optionnel ; par defaut le
+  type du module est utilise ;
+- `origin_mm.x`, `origin_mm.y`, `origin_mm.z` : origine locale de la cavite dans
+  le module ;
+- `size_mm.x`, `size_mm.y`, `size_mm.z` : dimensions internes de la cavite ;
+- `clearance_mm` : jeu fonctionnel explicite associe a la cavite ;
+- `comment` : note humaine optionnelle.
+
+Validation P5-M001 :
+
+- dimensions de cavite strictement positives ;
+- origine et clearance non negatives ;
+- la cavite doit rester dans les dimensions externes du module ;
+- les parois X/Y doivent conserver `defaults.wall_thickness_mm` ;
+- le fond doit conserver `defaults.floor_thickness_mm` ;
+- la cavite reste abstraite et non validee par impression.
 ## Exemple minimal
 
 ```json

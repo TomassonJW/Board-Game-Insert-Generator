@@ -454,7 +454,7 @@ commitee sans melanger plusieurs decisions structurantes.
   clearance ; elle ne rend pas les parois invalides.
 - Tests ou verifications : tests de validation et rapport.
 - Dependances : P4-M001.
-- Statut : `todo`.
+- Statut : `done`.
 
 ### P5-M002 - Ajouter logements de cartes et cartes sleevees
 
@@ -467,7 +467,8 @@ commitee sans melanger plusieurs decisions structurantes.
   les parois minimales sont verifiees.
 - Tests ou verifications : tests unitaires et exemple de config.
 - Dependances : P5-M001.
-- Statut : `todo`.
+- Gate humaine : vague P5 moteur/CAD IR validee le 2026-07-04 ; generation Fusion reelle exclue.
+- Statut : `ready`.
 
 ### P5-M003 - Ajouter bacs a tokens, des et meeples
 

@@ -111,7 +111,9 @@ La premiere cible Fusion se limite a des blanks rectangulaires :
 - sketches, features et bodies nommes dans le composant racine ;
 - dimensions issues de `printable_origin_mm` et `printable_size_mm` ;
 - boite de reference sous forme d'esquisse non imprimable ;
-- aucun creusage avance ;
+- aucun creusage avance execute dans Fusion ;
+- les cavites P5-M001 peuvent etre presentes dans la CAD IR mais restent
+  bstract_only ;
 - aucun couvercle ;
 - aucun fillet/conge ;
 - aucun export STL/3MF ;
@@ -173,7 +175,9 @@ Tests hors Fusion :
 - chargement CAD IR locale ou pointee par `cad_ir_path.txt` ;
 - plan de generation Fusion sans import `adsk` ;
 - resolution du fichier CAD IR et erreurs de chargement testees hors Fusion ;
-- conversion millimetres vers centimetres internes Fusion.
+- conversion millimetres vers centimetres internes Fusion ;
+- compatibilite des CAD IR enrichies avec cavites abstraites, sans execution de
+  coupe Fusion.
 
 Verifications dans Fusion :
 
@@ -216,4 +220,6 @@ Avant d'elargir la generation Fusion :
 - les tests du coeur Python doivent passer ;
 - la validation manuelle P4-M003 est documentee, mais toute nouvelle CAD IR doit
   etre inspectee avant usage ;
-- aucune logique metier nouvelle ne doit etre prevue uniquement dans Fusion.
+- aucune logique metier nouvelle ne doit etre prevue uniquement dans Fusion ;
+- toute execution reelle de cavite, extrusion cut ou boolean soustractif doit
+  repasser par une gate humaine dediee.
