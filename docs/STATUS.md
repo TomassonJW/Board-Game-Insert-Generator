@@ -91,10 +91,13 @@ planification CAD IR `planned_only`, sans creation de geometrie Fusion reelle.
 
 La mission `P4-M003` du 2026-07-03 code la premiere generation Fusion minimale
 depuis une CAD IR JSON locale. L'add-in cree une esquisse de reference de boite
-et des blanks rectangulaires par esquisse + extrusion dans le composant racine. Cette sortie reste
+et des blanks rectangulaires par esquisse + extrusion dans le composant racine.
+Cette sortie reste
 `manual validation required` tant qu'elle n'a pas ete lancee et inspectee dans
 Fusion 360. Le manifeste d'add-in a ensuite ete corrige au format JSON attendu
-par Fusion pour permettre la decouverte locale.
+par Fusion pour permettre la decouverte locale. Un smoke test manuel a ensuite
+confirme que l'add-in apparait, que le message final est OK et que les modules
+sont visibles dans Fusion ; les mesures dimensionnelles restent a documenter.
 
 ## Phase active
 
@@ -109,9 +112,10 @@ faces des corps rectangulaires simples sont classees explicitement et leurs
 regles de tolerance appliquees sont exposees dans les rapports. Les profils
 d'impression explicites sont resolus et visibles. La representation intermediaire
 CAD est definie et testee. L'adaptateur Fusion isole sait charger une CAD IR
-locale et coder une premiere generation de blanks rectangulaires dans le composant racine, sans recalculer
-layout ou tolerances. La prochaine etape recommandee est le smoke test manuel
-Fusion 360 de `P4-M003`. Aucune suite Fusion ne doit commencer sans nouvelle
+locale et coder une premiere generation de blanks rectangulaires dans le
+composant racine, sans recalculer
+layout ou tolerances. La prochaine etape recommandee est la mesure dimensionnelle Fusion 360 de
+P4-M003. Aucune suite Fusion ne doit commencer sans nouvelle
 validation humaine.
 
 ## Implemente
@@ -168,13 +172,14 @@ validation humaine.
 - Les dataclasses restent volontairement legeres ; les erreurs metier sont
   agregees par `validation.py`.
 - Le squelette Fusion P4-M002 est testable hors Fusion.
-- La generation Fusion P4-M003 est codee mais non testee manuellement dans Fusion
-  360 ; son statut reste `manual validation required`.
+- La generation Fusion P4-M003 est codee et observee manuellement dans Fusion
+  360 pour la decouverte, le message final et l'apparition des modules ; les
+  dimensions mesurees restent a documenter avant d'elargir Fusion.
 
 ## Prevu
 
 - Strategie de layout `columns`.
-- Validation manuelle Fusion 360 de la generation minimale P4-M003.
+- Validation dimensionnelle Fusion 360 de la generation minimale P4-M003.
 - Cavites, receptacles, encoches, fonds arrondis.
 - Modules composites en L/T.
 - Couvercles, rainures et mecanismes.
@@ -215,6 +220,7 @@ Derniere verification pendant la mission `P4-M003` :
 - `python -m board_game_insert_generator examples/simple_box.json --format json` : OK.
 - `git diff --check` : OK.
 - `rg -n "adsk" src/board_game_insert_generator` : OK, aucune occurrence.
+- Smoke test manuel Fusion P4-M003 : add-in visible, message OK et modules visibles ; mesures dimensionnelles non encore documentees.
 
 ## Risques actifs
 

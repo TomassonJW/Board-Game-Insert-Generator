@@ -8,16 +8,14 @@ Codex doit choisir la premiere mission `ready` listee ici.
 
 ## Gate humaine active
 
-### Gate - Validation manuelle P4-M003 dans Fusion 360
+### Gate - Finaliser la validation dimensionnelle P4-M003
 
 Statut : `blocked`.
 
 Decision demandee :
 
-- lancer ou faire lancer le smoke test manuel Fusion 360 de `P4-M003` ;
-- confirmer si les sketches, bodies, noms, origines et dimensions observees
-  correspondent a la CAD IR ;
-- documenter les ecarts eventuels avant toute mission Fusion suivante ;
+- confirmer les mesures dimensionnelles des deux blanks de la fixture ;
+- documenter tout ecart observe dans Fusion avant toute mission Fusion suivante ;
 - autoriser explicitement une suite `P4-M004` si le perimetre Fusion doit etre
   elargi.
 
@@ -26,26 +24,16 @@ Contexte :
 - `P4-M003` code une premiere generation minimale depuis `cad_ir_input.json` ;
 - l'add-in cree une esquisse de reference de boite et des blanks rectangulaires dans le composant racine ;
 - les tests hors Fusion couvrent le chargement CAD IR et le plan de generation ;
-- l'execution reelle dans Fusion 360 n'a pas encore ete realisee dans ce run ;
+- le smoke test manuel a confirme que l'add-in apparait, que le message final est OK et que les modules sont visibles ;
+- les mesures dimensionnelles des blanks restent a confirmer/documenter ;
 - `adsk` reste interdit dans `src/board_game_insert_generator`.
 
-Smoke test manuel attendu :
+Smoke test manuel restant a completer :
 
-1. Installer `fusion_addin/BoardGameInsertGenerator` dans le dossier AddIns local.
-2. Ouvrir ou creer un design Fusion vide.
-3. Lancer `Board Game Insert Generator` depuis `Utilities > Add-ins`.
-4. Verifier le message final : 1 reference outline, 2 blank bodies et creation dans le composant racine.
-5. Verifier les sketches dans le composant racine :
-   - `BGIG box reference - not printable outline` ;
-   - `cards-main-01 - Main cards footprint` ;
-   - `dice-01 - Dice tray footprint`.
-6. Verifier les bodies :
-   - `cards-main-01 rectangular blank` ;
-   - `dice-01 rectangular blank`.
-7. Mesurer les blanks :
+1. Mesurer les blanks :
    - `cards-main-01` : `68.9 x 99.2 x 44.0 mm` ;
    - `dice-01` : `59.7 x 59.2 x 29.0 mm`.
-8. Noter OK/KO et ecarts dans un log de validation.
+2. Noter OK/KO et ecarts dans un log de validation.
 
 Options apres validation :
 
