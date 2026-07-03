@@ -22,6 +22,7 @@ Contenu :
 - backlog actionnable ;
 - statut projet ;
 - prochaines actions ;
+- garde-fou documentaire automatise ;
 - ADR et logs ;
 - regles qualite ;
 - templates GitHub.

@@ -8,41 +8,30 @@ Codex doit choisir la premiere mission `ready` listee ici.
 
 ## Mission suivante recommandee
 
-### 1. P0-M002 - Ajouter une verification documentaire de base
+### 1. P0-M005 - Stabiliser le format des ADR
 
 Pourquoi maintenant :
 
-- le dry run `P0-M004` a confirme que le depot est pilotable par documents ;
-- il manque encore un garde-fou automatise contre les fichiers de pilotage
-  absents ou incomplets ;
-- la mission est petite, testable et sans gate humaine ;
-- elle renforce l'autonomie sans demarrer de developpement produit profond.
+- `P0-M002` ajoute maintenant un controle documentaire automatise ;
+- les prochaines decisions structurantes auront besoin d'un format ADR stable ;
+- la mission est documentaire, petite et sans gate humaine si elle ne change pas
+  une decision acceptee ;
+- elle renforce la qualite du plan de controle avant les travaux Phase 1.
 
 Livrable attendu :
 
-- test ou script local verifiant les fichiers de pilotage critiques ;
-- messages d'erreur lisibles si un document obligatoire manque ;
-- mise a jour courte de `docs/QUALITY_RULES.md` si le controle documentaire est
-  ajoute aux regles qualite.
+- template ADR confirme ou complete ;
+- index `docs/DECISIONS/README.md` mis a jour si necessaire ;
+- criteres minimaux clairs pour contexte, options, decision, consequences et
+  alternatives refusees.
 
 Verification minimale :
 
-```powershell
-$env:PYTHONPATH = "src"
-python -m unittest discover -s tests
-```
+Relecture documentaire et `git diff --check`.
 
-## Missions suivantes si P0-M002 est terminee
+## Missions suivantes si P0-M005 est terminee
 
-### 2. P0-M005 - Stabiliser le format des ADR
-
-Objectif :
-
-- confirmer ou completer le template ADR ;
-- eviter que les prochaines decisions structurantes soient documentees de facon
-  heterogene.
-
-### 3. P1-M001 - Consolidate core data models
+### 2. P1-M001 - Consolidate core data models
 
 Objectif :
 
@@ -55,7 +44,7 @@ Point d'attention :
 - ne pas introduire de validation dans tous les constructeurs sans arbitrage ;
 - si le contrat de modele change fortement, creer une ADR.
 
-### 4. P1-M002 - Harden config loading and validation
+### 3. P1-M002 - Harden config loading and validation
 
 Condition :
 
@@ -66,7 +55,7 @@ Objectif :
 - rendre le chargement et la validation plus precis ;
 - couvrir champs inconnus, types invalides et cas limites.
 
-### 5. P2-M001 - Formalize simple rectangular layout model
+### 4. P2-M001 - Formalize simple rectangular layout model
 
 Condition :
 

@@ -37,7 +37,7 @@ commitee sans melanger plusieurs decisions structurantes.
   documente les manques avec un message lisible.
 - Tests ou verifications : test unitaire dedie et suite complete.
 - Dependances : P0-M001.
-- Statut : `ready`.
+- Statut : `done`.
 
 ### P0-M003 - Bootstrap autonomy protocol
 
