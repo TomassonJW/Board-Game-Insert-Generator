@@ -326,15 +326,39 @@ commitee sans melanger plusieurs decisions structurantes.
 
 - Phase liee : Phase 4 - Generation Fusion 360 de blanks
 - Objectif : creer composants, corps rectangulaires, noms et rayons simples.
-- Livrable attendu : script ou add-in Fusion capable de generer les blanks V0.
-- Fichiers probablement concernes : adaptateur Fusion, exemples, docs.
-- Criteres d'acceptation : une config valide produit des composants inspectables
-  ; aucun layout n'est recalcule dans Fusion ; le cas Zero Doc reste gere
-  explicitement.
-- Tests ou verifications : test coeur Python et verification manuelle Fusion
-  documentee avec captures ou notes.
+- Livrable attendu : add-in Fusion capable de generer les blanks V0 depuis une
+  CAD IR JSON locale.
+- Fichiers concernes : `fusion_addin/BoardGameInsertGenerator/`,
+  `docs/FUSION_360_STRATEGY.md`, `docs/CAD_IR_CONTRACT.md`, tests hors Fusion.
+- Criteres d'acceptation : une CAD IR locale peut etre chargee ; l'add-in code
+  la creation d'une reference et de blanks rectangulaires ; aucun layout n'est
+  recalcule dans Fusion ; le cas Zero Doc reste gere explicitement ; aucun
+  export STL/3MF, aucune cavite, aucun couvercle et aucun fillet ne sont ajoutes.
+- Tests ou verifications : suite coeur Python ; tests hors Fusion du plan de
+  generation ; verification `adsk` hors coeur ; smoke test manuel Fusion a
+  realiser par Thomas.
 - Dependances : P4-M002.
-- Gate humaine : requise avant toute creation reelle de geometrie Fusion.
+- Gate humaine : validee explicitement pour `P4-M003` le 2026-07-03, sans export
+  STL/3MF et sans validation physique.
+- Statut : `done` pour le code et les tests hors Fusion ; validation Fusion
+  manuelle requise.
+
+### P4-M004 - Valider manuellement la generation Fusion minimale
+
+- Phase liee : Phase 4 - Generation Fusion 360 de blanks
+- Objectif : executer le smoke test P4-M003 dans Fusion 360 et documenter le
+  resultat observe.
+- Livrable attendu : log de validation manuelle avec composants, bodies,
+  dimensions mesurees, ecarts et decision OK/KO.
+- Fichiers probablement concernes : `docs/LOGS/`, `docs/STATUS.md`,
+  `docs/NEXT_ACTIONS.md`, eventuellement `fusion_addin/README.md` si la procedure
+  doit etre corrigee.
+- Criteres d'acceptation : Thomas a lance l'add-in dans Fusion ; les composants
+  et dimensions sont notes ; les limites restent distinctes de la validation
+  d'impression reelle.
+- Tests ou verifications : smoke test manuel Fusion documente.
+- Dependances : P4-M003.
+- Gate humaine : requise avant execution et interpretation comme jalon Fusion.
 - Statut : `blocked`.
 
 ## Phase 5 - Cavites et receptacles

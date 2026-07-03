@@ -11,8 +11,9 @@ sans creer elle-meme d'add-in executable et sans exporter de STL/3MF.
 Statut : `implemente` pour le contrat V0 de blanks rectangulaires, couvert par
 tests unitaires Python purs.
 
-La couche reste experimentale pour toute sortie CAD concrete : aucun composant
-Fusion, aucun fichier imprimable et aucune validation physique ne sont produits.
+La sortie Fusion concrete est maintenant codee pour des blanks rectangulaires
+minimaux, mais reste `manual validation required` tant qu'elle n'a pas ete lancee
+et inspectee dans Fusion 360.
 
 ## Frontieres
 
@@ -77,16 +78,26 @@ Pour chaque blank rectangulaire, l'operation principale est :
   `printable_size_mm` dans le repere de scene.
 
 Ces operations sont des intentions CAD-agnostic. Elles ne sont pas des appels
-Fusion et ne garantissent pas encore une sortie CAD concrete.
+Fusion et ne garantissent pas encore une sortie CAD concrete sans validation
+manuelle.
 
-## Consommation par le squelette Fusion
+## Consommation par l'adaptateur Fusion
 
-Le squelette `P4-M002` consomme uniquement une CAD IR serialisee. Il valide la
-version de schema, les unites `mm` et la liste de composants, puis transforme les
-operations abstraites en plan `planned_only`.
+Le squelette `P4-M002` consommait uniquement une CAD IR serialisee et produisait
+un plan `planned_only`.
 
-Ce plan est une preparation d'adaptateur : il ne cree aucun composant Fusion,
-aucun corps, aucune esquisse, aucune extrusion et aucun export.
+Depuis `P4-M003`, l'adaptateur charge une CAD IR JSON locale, valide la version
+de schema, les unites `mm`, la reference de boite et les composants, puis cree un
+plan de generation Fusion. Ce plan copie :
+
+- `box_reference.origin_mm` et `box_reference.size_mm` pour une esquisse de
+  reference non imprimable ;
+- `body.printable_origin_mm` et `body.printable_size_mm` pour les blanks ;
+- les noms de composants et bodies.
+
+Fusion ne recalcule pas les cellules, offsets, roles de faces ou tolerances. La
+generation reelle reste limitee a des rectangles extrudes et ne produit aucun
+STL/3MF.
 
 ## Face roles et tolerances
 
@@ -110,14 +121,16 @@ Le contrat V0 est valide par tests unitaires :
 - generation d'une scene depuis les exemples existants ;
 - separation explicite cellule theorique / corps imprimable ;
 - serialization des classifications et tolerances ;
-- refus d'un layout incoherent sans corps imprimable correspondant.
+- refus d'un layout incoherent sans corps imprimable correspondant ;
+- chargement d'une fixture CAD IR locale par le squelette Fusion ;
+- transformation en plan de generation hors Fusion.
 
-La validation ne couvre pas Fusion 360, les exports STL/3MF ou l'impression
-reelle.
+La validation automatisee ne couvre pas l'execution reelle dans Fusion 360, les
+exports STL/3MF ou l'impression reelle.
 
 ## Gate suivante
 
-`P4-M002 - Creer un squelette d'adaptateur Fusion 360` est implemente comme
-squelette non generateur. La prochaine gate est `P4-M003 - Generer des blanks
-rectangulaires Fusion`, car elle introduira la premiere creation reelle de
-geometrie Fusion.
+`P4-M003 - Generer des blanks rectangulaires Fusion` est code pour une fixture
+CAD IR locale et pour le contrat V0. La prochaine etape est une validation
+manuelle dans Fusion 360 avant d'elargir le perimetre Fusion ou de declarer le
+jalon CAD observe.

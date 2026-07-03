@@ -89,9 +89,15 @@ isole dans `fusion_addin/BoardGameInsertGenerator`. Il contient un manifeste, un
 point d'entree `run(context)` / `stop(context)`, une detection Zero Doc et une
 planification CAD IR `planned_only`, sans creation de geometrie Fusion reelle.
 
+La mission `P4-M003` du 2026-07-03 code la premiere generation Fusion minimale
+depuis une CAD IR JSON locale. L'add-in cree une esquisse de reference de boite
+et des blanks rectangulaires par esquisse + extrusion. Cette sortie reste
+`manual validation required` tant qu'elle n'a pas ete lancee et inspectee dans
+Fusion 360.
+
 ## Phase active
 
-Phase active : **Phase 4 - Squelette Fusion isole pret, gate P4-M003 a valider**.
+Phase active : **Phase 4 - Generation Fusion minimale codee, validation manuelle P4-M003 requise**.
 
 Etat : autonomie operatoire documentee, controle documentaire de base, contrat
 des modeles coeur, loader JSON strict, rapports enrichis et commande de
@@ -101,11 +107,11 @@ reserve. La comparaison simple des strategies existe dans les rapports. Les
 faces des corps rectangulaires simples sont classees explicitement et leurs
 regles de tolerance appliquees sont exposees dans les rapports. Les profils
 d'impression explicites sont resolus et visibles. La representation intermediaire
-CAD est definie et testee. Un squelette d'adaptateur Fusion isole existe dans
-`fusion_addin/BoardGameInsertGenerator` ; il ne cree aucune geometrie et ne
-recalcule pas layout ou tolerances. La prochaine etape recommandee est une
-decision humaine sur le perimetre de `P4-M003`. Aucune generation de blank Fusion
-exploitable ne doit commencer sans nouvelle validation.
+CAD est definie et testee. L'adaptateur Fusion isole sait charger une CAD IR
+locale et coder une premiere generation de blanks rectangulaires, sans recalculer
+layout ou tolerances. La prochaine etape recommandee est le smoke test manuel
+Fusion 360 de `P4-M003`. Aucune suite Fusion ne doit commencer sans nouvelle
+validation humaine.
 
 ## Implemente
 
@@ -143,6 +149,7 @@ exploitable ne doit commencer sans nouvelle validation.
 - Rapport de gate Fusion 360 `P4-M000`.
 - Representation intermediaire CAD-agnostic `P4-M001`.
 - Squelette d'adaptateur Fusion 360 isole et non generateur `P4-M002`.
+- Chargement CAD IR et plan de generation Fusion minimale testes hors Fusion `P4-M003`.
 
 ## Experimental
 
@@ -157,13 +164,14 @@ exploitable ne doit commencer sans nouvelle validation.
   calibres sur impression.
 - Les dataclasses restent volontairement legeres ; les erreurs metier sont
   agregees par `validation.py`.
-- Le squelette Fusion P4-M002 est testable hors Fusion et non generateur ; son
-  chargement dans une installation Fusion reelle reste a verifier.
+- Le squelette Fusion P4-M002 est testable hors Fusion.
+- La generation Fusion P4-M003 est codee mais non testee manuellement dans Fusion
+  360 ; son statut reste `manual validation required`.
 
 ## Prevu
 
 - Strategie de layout `columns`.
-- Generation Fusion 360 de blanks rectangulaires.
+- Validation manuelle Fusion 360 de la generation minimale P4-M003.
 - Cavites, receptacles, encoches, fonds arrondis.
 - Modules composites en L/T.
 - Couvercles, rainures et mecanismes.
@@ -196,9 +204,9 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant la mission `P4-M002` :
+Derniere verification pendant la mission `P4-M003` :
 
-- `python -m unittest discover -s tests` : OK, 56 tests passes.
+- `python -m unittest discover -s tests` : OK, 61 tests passes.
 - `python -m board_game_insert_generator examples/simple_box.json --format markdown` : OK.
 - `python -m board_game_insert_generator examples/simple_grid.json --format markdown` : OK.
 - `python -m board_game_insert_generator examples/simple_box.json --format json` : OK.

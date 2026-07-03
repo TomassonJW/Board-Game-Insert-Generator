@@ -8,73 +8,67 @@ Codex doit choisir la premiere mission `ready` listee ici.
 
 ## Gate humaine active
 
-### Gate - P4-M003 generation de blanks rectangulaires Fusion
+### Gate - Validation manuelle P4-M003 dans Fusion 360
 
 Statut : `blocked`.
 
 Decision demandee :
 
-- autoriser ou refuser le demarrage de `P4-M003` ;
-- confirmer que la premiere generation Fusion peut creer des composants, corps
-  rectangulaires ou esquisses reels ;
-- confirmer que Fusion ne doit toujours pas recalculer layout, tolerances ou CAD
-  IR ;
-- definir le niveau de validation manuelle attendu dans Fusion ;
-- confirmer qu'aucun export STL/3MF ni validation physique ne sont inclus dans ce
-  lot.
+- lancer ou faire lancer le smoke test manuel Fusion 360 de `P4-M003` ;
+- confirmer si les composants, bodies, noms, origines et dimensions observees
+  correspondent a la CAD IR ;
+- documenter les ecarts eventuels avant toute mission Fusion suivante ;
+- autoriser explicitement une suite `P4-M004` si le perimetre Fusion doit etre
+  elargi.
 
 Contexte :
 
-- `P4-M001` a livre la CAD IR V0 dans `src/board_game_insert_generator/cad_ir.py` ;
-- `P4-M002` a cree le squelette isole `fusion_addin/BoardGameInsertGenerator` ;
-- le squelette detecte le cas Zero Doc et planifie les operations en
-  `planned_only` ;
-- `adsk` reste interdit dans `src/board_game_insert_generator` ;
-- aucune geometrie Fusion reelle n'est encore generee.
+- `P4-M003` code une premiere generation minimale depuis `cad_ir_input.json` ;
+- l'add-in cree une esquisse de reference de boite et des blanks rectangulaires ;
+- les tests hors Fusion couvrent le chargement CAD IR et le plan de generation ;
+- l'execution reelle dans Fusion 360 n'a pas encore ete realisee dans ce run ;
+- `adsk` reste interdit dans `src/board_game_insert_generator`.
 
-Options :
+Smoke test manuel attendu :
 
-- Option 1 recommandee : autoriser une generation minimale de blanks
-  rectangulaires depuis la CAD IR, sans export et sans logique metier nouvelle.
-- Option 2 : demander une verification manuelle du chargement du squelette dans
-  Fusion avant toute creation de geometrie.
-- Option 3 : differer Fusion et renforcer d'abord les cavites ou modules
-  composites dans le coeur Python.
+1. Installer `fusion_addin/BoardGameInsertGenerator` dans le dossier AddIns local.
+2. Ouvrir ou creer un design Fusion vide.
+3. Lancer `Board Game Insert Generator` depuis `Utilities > Add-ins`.
+4. Verifier le message final : 1 reference outline et 2 blank bodies.
+5. Verifier les composants :
+   - `BGIG box reference - not printable` ;
+   - `cards-main-01 - Main cards` ;
+   - `dice-01 - Dice tray`.
+6. Verifier les bodies :
+   - `cards-main-01 rectangular blank` ;
+   - `dice-01 rectangular blank`.
+7. Mesurer les blanks :
+   - `cards-main-01` : `68.9 x 99.2 x 44.0 mm` ;
+   - `dice-01` : `59.7 x 59.2 x 29.0 mm`.
+8. Noter OK/KO et ecarts dans un log de validation.
 
-Recommandation :
+Options apres validation :
 
-- choisir l'option 1 seulement si la mission reste limitee a la creation de
-  blanks rectangulaires inspectables dans Fusion ;
-- garder les exports STL/3MF et la validation physique pour des gates separees ;
-- documenter explicitement la procedure Zero Doc et les resultats de verification
-  manuelle Fusion.
+- Option 1 recommandee : documenter le resultat manuel et corriger seulement les
+  ecarts P4-M003 si necessaire.
+- Option 2 : autoriser une mission `P4-M004` limitee a une meilleure UX de
+  chargement CAD IR ou a un rapport de validation Fusion.
+- Option 3 : bloquer Fusion et revenir au coeur Python si la generation minimale
+  est instable.
 
 Risques :
 
-- transfert accidentel de logique metier dans Fusion ;
-- confusion entre verification visuelle Fusion et validation d'impression ;
-- dependance implicite a une version locale de Fusion ;
-- creation de geometrie difficile a tester automatiquement.
-
-Fichiers concernes probables si la gate est validee :
-
-- `fusion_addin/BoardGameInsertGenerator/` ;
-- `docs/FUSION_360_STRATEGY.md` ;
-- `docs/CAD_IR_CONTRACT.md` ;
-- tests hors Fusion pour la conversion non-API ;
-- log de mission et pilotage projet.
-
-Validation attendue de l'humain :
-
-- repondre explicitement que `P4-M003` est autorisee ;
-- confirmer le perimetre exact de generation Fusion ;
-- confirmer si une verification manuelle dans Fusion est obligatoire pendant la
-  mission.
+- la generation peut fonctionner hors tests mais echouer dans l'environnement
+  Fusion local ;
+- une validation visuelle Fusion ne valide pas l'impression reelle ;
+- l'elargissement vers cavites, fillets ou exports doit rester gate.
 
 ## Missions bloquees tant que la gate n'est pas validee
 
-- `P4-M003 - Generer des blanks rectangulaires Fusion`.
+- `P4-M004` ou toute suite Fusion.
 - Premier export STL/3MF.
+- Cavites Fusion.
+- Fillets/conges Fusion.
 - Validation physique par impression reelle.
 - Modification des valeurs de tolerance par defaut.
 - Modules composites complets.

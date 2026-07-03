@@ -11,10 +11,13 @@ from board_game_insert_generator.layout import generate_basic_layout
 from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     DOCUMENT_STATUS_READY,
     DOCUMENT_STATUS_ZERO_DOC,
+    FUSION_MANUAL_VALIDATION_REQUIRED,
     PLAN_STATUS_PLANNED_ONLY,
     FusionSkeletonError,
     describe_document_state,
+    generation_plan_from_cad_ir,
     load_cad_ir_json,
+    mm_to_cm,
     planned_operations_from_cad_ir,
     validate_cad_ir_payload,
 )
@@ -50,7 +53,7 @@ class FusionSkeletonTests(unittest.TestCase):
 
         self.assertEqual(state.status, DOCUMENT_STATUS_READY)
         self.assertEqual(state.document_name, "BGIG test design")
-        self.assertIn("does not create geometry", state.message)
+        self.assertIn("manual validation", state.message)
 
     def test_validates_minimal_cad_ir_contract(self) -> None:
         payload = _cad_ir_payload()
@@ -95,6 +98,53 @@ class FusionSkeletonTests(unittest.TestCase):
 
         self.assertEqual(payload["schema_version"], "cad_ir.v0")
         self.assertEqual(len(payload["components"]), 4)
+
+    def test_missing_cad_ir_json_path_has_actionable_error(self) -> None:
+        missing_path = ROOT / "missing_cad_ir_payload.json"
+
+        with self.assertRaisesRegex(FusionSkeletonError, "file not found"):
+            load_cad_ir_json(missing_path)
+
+    def test_builds_generation_plan_from_engine_cad_ir(self) -> None:
+        payload = _cad_ir_payload()
+
+        plan = generation_plan_from_cad_ir(payload)
+
+        self.assertEqual(plan.project_name, "Simple square box V0")
+        self.assertEqual(plan.validation_status, FUSION_MANUAL_VALIDATION_REQUIRED)
+        self.assertEqual(plan.reference_box.component_name, "Box reference - not printable")
+        self.assertFalse(plan.reference_box.printable)
+        self.assertEqual(plan.reference_box.operation_kind, "create_reference_outline")
+        self.assertEqual(len(plan.blanks), 4)
+        self.assertEqual(plan.blanks[0].component_name, "cards-main-01 - Main cards")
+        self.assertEqual(plan.blanks[0].body_name, "cards-main-01 rectangular blank")
+        self.assertEqual(plan.blanks[0].origin_mm.to_dict(), {"x": 0.8, "y": 0.8, "z": 0.0})
+        self.assertEqual(plan.blanks[0].size_mm.to_dict(), {"x": 68.9, "y": 99.2, "z": 44.0})
+        self.assertEqual(plan.blanks[0].validation_status, FUSION_MANUAL_VALIDATION_REQUIRED)
+
+    def test_loads_addin_fixture_generation_plan(self) -> None:
+        fixture_path = ROOT / "fusion_addin" / "BoardGameInsertGenerator" / "cad_ir_input.json"
+
+        plan = generation_plan_from_cad_ir(load_cad_ir_json(fixture_path))
+
+        self.assertEqual(plan.project_name, "BGIG Fusion smoke fixture")
+        self.assertEqual(plan.created_object_count, 3)
+        self.assertEqual([blank.body_name for blank in plan.blanks], [
+            "cards-main-01 rectangular blank",
+            "dice-01 rectangular blank",
+        ])
+
+    def test_rejects_generation_without_rectangular_prism_operation(self) -> None:
+        payload = _cad_ir_payload()
+        payload["components"][0]["body"]["operations"][0]["kind"] = "create_cavity"
+
+        with self.assertRaisesRegex(FusionSkeletonError, "create_rectangular_prism"):
+            generation_plan_from_cad_ir(payload)
+
+    def test_converts_millimeters_to_fusion_centimeters(self) -> None:
+        self.assertEqual(mm_to_cm(0.0), 0.0)
+        self.assertEqual(mm_to_cm(1.0), 0.1)
+        self.assertAlmostEqual(mm_to_cm(68.9), 6.89)
 
 
 def _cad_ir_payload() -> dict:

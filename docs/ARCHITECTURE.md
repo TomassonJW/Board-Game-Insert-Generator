@@ -150,15 +150,18 @@ recalculer le layout ni les tolerances.
 
 Etat actuel :
 
-- squelette isole dans `fusion_addin/BoardGameInsertGenerator` ;
+- add-in isole dans `fusion_addin/BoardGameInsertGenerator` ;
 - point d'entree `run(context)` / `stop(context)` ;
 - detection du cas Zero Doc ;
-- validation CAD IR et plan d'operations `planned_only` hors Fusion ;
-- aucune creation de geometrie Fusion reelle.
+- chargement d'une CAD IR JSON locale ;
+- plan de generation hors Fusion ;
+- premiere generation minimale de blanks rectangulaires par esquisse + extrusion ;
+- validation Fusion reelle encore manuelle.
 
 Cette couche doit recevoir une CAD IR deja resolue. Les futurs `PrintableBody`,
 `Cavity` et `Feature` doivent etre calcules dans le coeur Python pur avant d'etre
-convertis par l'adaptateur.
+convertis par l'adaptateur. L'adaptateur ne doit pas recalculer layout, offsets
+ou tolerances.
 
 ### 8. Interfaces utilisateur futures
 
@@ -193,8 +196,9 @@ Ces options ne doivent pas modifier le contrat du moteur pur.
 6. Appliquer esquisses, extrusions, shells, cuts, fillets et chamfers.
 7. Exporter ou laisser inspecter les composants.
 
-Le flux P4-M002 s'arrete avant l'etape 4 : il verifie la presence d'un document
-Fusion actif et prepare seulement un plan d'operations non executable.
+Le flux P4-M003 atteint les etapes 4 et 5 pour des blanks rectangulaires simples,
+mais il reste hors cavites, couvercles, fillets, exports et validation physique.
+La verification dans Fusion 360 reste manuelle.
 
 ## Decisions structurantes connues
 
@@ -206,3 +210,4 @@ Fusion actif et prepare seulement un plan d'operations non executable.
 - ADR-0006 : profils d'impression explicites et surchargeables.
 - ADR-0007 : representation intermediaire CAD-agnostic.
 - ADR-0008 : frontiere du squelette d'adaptateur Fusion 360.
+- ADR-0009 : generation Fusion minimale par esquisse et extrusion.

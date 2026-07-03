@@ -27,21 +27,20 @@ Fusion 360 ne doit pas servir a :
 
 ## Integration cible
 
-L'integration future prendra probablement la forme d'un add-in Python Fusion 360
-ou d'un script d'automatisation structure.
+L'integration future prend la forme d'un add-in Python Fusion 360 isole dans
+`fusion_addin/BoardGameInsertGenerator`.
 
 Responsabilites de l'adaptateur :
 
-- lire ou recevoir une configuration ;
-- appeler le moteur pur ;
+- lire ou recevoir une CAD IR deja resolue ;
 - creer une boite de reference ;
 - creer un composant par module ;
 - nommer proprement les composants ;
-- creer les esquisses, extrusions, shells, fillets et chamfers ;
-- appliquer des parametres utilisateurs Fusion si utile ;
+- creer les esquisses et extrusions autorisees ;
+- appliquer des parametres utilisateurs Fusion si utile dans une phase future ;
 - exporter les modules en STL ou 3MF dans une phase ulterieure.
 
-## Squelette P4-M002
+## Squelette et generation minimale
 
 Le squelette actuel vit dans `fusion_addin/BoardGameInsertGenerator`, hors du
 coeur `src/board_game_insert_generator`.
@@ -51,17 +50,22 @@ Il contient :
 - un manifeste d'add-in `BoardGameInsertGenerator.manifest` ;
 - un point d'entree Fusion `BoardGameInsertGenerator.py` avec `run(context)` et
   `stop(context)` ;
-- une couche `fusion_skeleton.py` testable hors Fusion.
+- une couche `fusion_skeleton.py` testable hors Fusion ;
+- une fixture locale `cad_ir_input.json` pour le smoke test manuel.
 
 Le squelette peut importer `adsk` uniquement dans le fichier d'entree Fusion. La
 couche testable et le coeur Python restent sans dependance Fusion.
 
-Ce squelette ne cree aucune geometrie Fusion. Il se limite a :
+Depuis `P4-M003`, l'add-in code une premiere generation minimale :
 
-- detecter si Fusion expose un document actif ;
-- signaler explicitement le cas Zero Doc ;
-- valider une CAD IR serialisee ;
-- transformer les operations abstraites en plan `planned_only`.
+- detection d'un document Fusion actif ;
+- signalement explicite du cas Zero Doc ;
+- chargement de `cad_ir_input.json` dans le dossier add-in ;
+- validation de la CAD IR serialisee ;
+- creation d'une esquisse de reference de boite non imprimable ;
+- creation de composants et bodies rectangulaires simples pour les blanks ;
+- statut `manual validation required` tant que Fusion 360 n'a pas ete lance et
+  inspecte par Thomas.
 
 ## Representation intermediaire
 
@@ -81,20 +85,45 @@ La scene V0 contient :
 - parametres et metadata de nommage ;
 - warnings du moteur.
 
-L'adaptateur Fusion convertira cette representation en operations CAO sans
+L'adaptateur Fusion convertit cette representation en operations CAO sans
 recalculer layout ou tolerances.
 
 ## Premiere cible Fusion
 
-La premiere cible Fusion doit se limiter a des blanks rectangulaires :
+La premiere cible Fusion se limite a des blanks rectangulaires :
 
 - composants nommes ;
-- dimensions correctes ;
-- rayons simples ;
-- boite de reference ;
+- dimensions issues de `printable_origin_mm` et `printable_size_mm` ;
+- boite de reference sous forme d'esquisse non imprimable ;
 - aucun creusage avance ;
 - aucun couvercle ;
+- aucun fillet/conge ;
+- aucun export STL/3MF ;
 - aucun algorithme d'optimisation nouveau.
+
+## Choix API Fusion P4-M003
+
+Apres verification de la documentation officielle Autodesk, l'approche retenue
+est `sketch + extrusion` :
+
+- `Occurrences.addNewComponent` cree un composant par blank ;
+- `Sketches.add` cree une esquisse sur le plan XY du composant ;
+- `SketchLines.addTwoPointRectangle` cree l'empreinte rectangulaire ;
+- `ExtrudeFeatures.addSimple` cree le body avec `NewBodyFeatureOperation` ;
+- `ValueInput.createByString("... mm")` garde des longueurs explicites en
+  millimetres pour l'extrusion.
+
+Liens de reference :
+
+- <https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/Occurrences_addNewComponent.htm>
+- <https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/Sketches_add.htm>
+- <https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/SketchLines_addTwoPointRectangle.htm>
+- <https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/ExtrudeFeatures_addSimple.htm>
+- <https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/ValueInput_createByString.htm>
+
+Le B-Rep direct est reporte : il est plus adapte a une couche geometrique plus
+avancee, alors que P4-M003 doit seulement prouver des blocs rectangulaires
+inspectables.
 
 ## Debug local
 
@@ -113,7 +142,7 @@ La partie testable du squelette Fusion peut aussi etre lancee hors Fusion :
 
 ```powershell
 $env:PYTHONPATH = "src"
-python -m unittest tests.test_fusion_skeleton
+python -m unittest discover -s tests -p test_fusion_skeleton.py
 ```
 
 ## Strategie de test
@@ -124,16 +153,19 @@ Tests hors Fusion :
 - layout ;
 - tolerances ;
 - rapports ;
-- serialization de la representation intermediaire.
+- serialization de la representation intermediaire ;
+- chargement CAD IR locale ;
+- plan de generation Fusion sans import `adsk` ;
+- conversion millimetres vers centimetres internes Fusion.
 
 Verifications dans Fusion :
 
-- presence des composants ;
+- presence du composant de reference non imprimable ;
+- presence des composants de blanks ;
 - noms ;
 - dimensions ;
-- origine ;
-- rayons ;
-- exports ;
+- origines ;
+- absence de cavites, couvercles, fillets et exports ;
 - absence de recalcul metier dans l'adaptateur.
 
 ## Limitations attendues
@@ -141,25 +173,27 @@ Verifications dans Fusion :
 - L'API Fusion 360 impose son modele d'objets et ses contraintes d'unites.
 - Le debug d'add-in est plus lent que le debug Python local.
 - Les operations booleennes complexes peuvent echouer si la geometrie est fragile.
-- Les exports STL/3MF devront etre verifies par module.
+- Les exports STL/3MF devront etre verifies par module dans une phase future.
 - Une verification Fusion ne remplace pas une validation par impression reelle.
 
 ## Rapport de gate actuel
 
 Le rapport `docs/FUSION_360_GATE_REPORT.md` a prepare la decision humaine avant
 toute integration Fusion 360 executable. La mission `P4-M001` a livre le contrat
-CAD-agnostic. La mission `P4-M002` ajoute un squelette d'adaptateur isole, sans
-generation CAD exploitable.
+CAD-agnostic. La mission `P4-M002` ajoute un squelette d'adaptateur isole. La
+mission `P4-M003` code la premiere generation minimale de blanks rectangulaires.
 
-La prochaine gate concerne `P4-M003`, c'est-a-dire la premiere creation reelle de
-blanks rectangulaires dans Fusion 360.
+La validation Fusion reelle reste `manual validation required` tant que Thomas
+n'a pas lance l'add-in dans Fusion 360 et note le resultat du smoke test.
 
-## Gates avant implementation Fusion
+## Gates avant elargissement Fusion
 
-Avant de coder la generation Fusion :
+Avant d'elargir la generation Fusion :
 
-- `docs/STATUS.md` doit indiquer que le contrat intermediaire et le squelette
-  sont prets ;
+- `docs/STATUS.md` doit indiquer que le contrat intermediaire, le squelette et la
+  generation minimale sont prets ;
 - le backlog doit pointer une mission Fusion precise ;
 - les tests du coeur Python doivent passer ;
+- la validation manuelle P4-M003 doit etre documentee si la suite depend de la
+  geometrie Fusion observee ;
 - aucune logique metier nouvelle ne doit etre prevue uniquement dans Fusion.
