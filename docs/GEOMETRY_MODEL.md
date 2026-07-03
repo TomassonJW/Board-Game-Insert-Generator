@@ -27,6 +27,29 @@ Cette separation evite de confondre organisation, impression et operations CAD.
 
 ## Concepts
 
+### Contrat des dataclasses Phase 1
+
+Les dataclasses du coeur Python sont des objets de valeur legers. Elles portent
+les champs du domaine, mais ne cherchent pas a valider seules toute la
+configuration.
+
+Regle actuelle :
+
+- les dimensions metier sont toujours exprimees en millimetres ;
+- `Dimension3D` et `Point3D` representent des valeurs numeriques, sans unite
+  alternative ;
+- `BoxSpec` decrit le volume interieur et la hauteur utile demandee ;
+- `ModuleRequest` decrit une demande utilisateur avant placement ;
+- `Cell` represente uniquement une reservation theorique de layout ;
+- `PrintableBody` represente un corps imprimable deja reduit par les offsets de
+  tolerance ;
+- `PrimitiveVolume`, `CompositeModule`, `Cavity` et `Feature` existent comme
+  concepts, mais ne pilotent pas encore une generation complete.
+
+La validation agregee reste dans `validation.py` afin de produire plusieurs
+messages d'erreur actionnables en une seule passe. Les constructeurs ne doivent
+donc pas devenir le lieu principal de validation sans decision explicite.
+
 ### Box
 
 Volume interieur reel mesure dans la boite de jeu. Il represente la contrainte

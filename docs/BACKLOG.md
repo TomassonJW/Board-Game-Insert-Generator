@@ -114,7 +114,7 @@ commitee sans melanger plusieurs decisions structurantes.
   invariants non evidents sont testes ; les concepts sont alignes avec les docs.
 - Tests ou verifications : suite unitaire complete.
 - Dependances : P0-M001.
-- Statut : `ready`.
+- Statut : `done`.
 
 ### P1-M002 - Harden config loading and validation
 
@@ -128,7 +128,7 @@ commitee sans melanger plusieurs decisions structurantes.
   ; les exemples existants passent.
 - Tests ou verifications : tests unitaires loader et CLI.
 - Dependances : P1-M001.
-- Statut : `todo`.
+- Statut : `ready`.
 
 ### P1-M003 - Improve CLI reporting
 
