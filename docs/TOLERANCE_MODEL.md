@@ -4,7 +4,10 @@
 
 Le modele de tolerance evite de confondre volume theorique et volume imprime.
 
-Un insert qui remplit exactement le volume interieur d'une boite en CAO ne rentrera pas toujours dans la boite reelle. A l'inverse, reduire tous les volumes uniformement peut creer des jeux inutiles, des parois trop fines ou des modules mal ajustes.
+Un insert qui remplit exactement le volume interieur d'une boite en CAO ne
+rentrera pas toujours dans la boite reelle. A l'inverse, reduire tous les volumes
+uniformement peut creer des jeux inutiles, des parois trop fines ou des modules
+mal ajustes.
 
 ## Jeux a distinguer
 
@@ -22,7 +25,7 @@ Le projet distingue au minimum :
 - compensation liee au filament et a l'imprimante ;
 - arrondis et chanfreins de confort.
 
-## Valeurs V0 par defaut recommandees
+## Valeurs actuelles par defaut
 
 Ces valeurs sont prudentes et doivent etre ajustees selon l'imprimante :
 
@@ -43,7 +46,7 @@ Ces valeurs sont prudentes et doivent etre ajustees selon l'imprimante :
 
 ## Application par face
 
-En V0 :
+Dans l'etat actuel :
 
 - une face contre la boite recoit le jeu peripherique ;
 - une face partagee avec un module voisin recoit la moitie du jeu entre modules ;
@@ -51,20 +54,23 @@ En V0 :
 - la face superieure recoit le jeu vertical sous couvercle ;
 - la face basse reste a Z=0, sauf evolution future explicite.
 
-Si deux modules voisins recoivent chacun `module_gap_mm / 2`, le jeu total entre leurs corps imprimables est `module_gap_mm`.
+Si deux modules voisins recoivent chacun `module_gap_mm / 2`, le jeu total entre
+leurs corps imprimables est `module_gap_mm`.
 
 ## Modules composites
 
 Pour un module composite, les primitives internes sont fusionnees.
 
-Les faces internes entre primitives du meme module ne recoivent aucun jeu. Les tolerances s'appliquent seulement :
+Les faces internes entre primitives du meme module ne recoivent aucun jeu. Les
+tolerances s'appliquent seulement :
 
 - aux faces exposees au monde exterieur ;
 - aux faces fonctionnelles ;
 - aux cavites ;
 - aux interfaces de couvercles ou charnieres.
 
-Cette regle est une contrainte d'architecture. Elle evite de casser un module soude en appliquant un jeu la ou il devrait exister une matiere continue.
+Cette regle est une contrainte d'architecture. Elle evite de casser un module
+soude en appliquant un jeu la ou il devrait exister une matiere continue.
 
 ## Profils d'impression futurs
 
@@ -79,8 +85,39 @@ Le modele doit permettre des profils comme :
 - buse large ;
 - couche epaisse.
 
-Un profil ne doit pas cacher ses valeurs. Il doit produire un ensemble explicite de champs de tolerance.
+Un profil ne doit pas cacher ses valeurs. Il doit produire un ensemble explicite
+de champs de tolerance.
+
+## Statuts
+
+Implemente :
+
+- offsets simples sur X/Y/Z pour corps rectangulaires ;
+- distinction peripherie, voisin et face libre dans les cas simples ;
+- validation que les offsets ne rendent pas le corps non positif.
+
+Experimental :
+
+- classification de voisinage implicite par contact de cellules ;
+- valeurs de tolerance non calibrees physiquement.
+
+Prevu :
+
+- classification explicite de faces ;
+- profils d'impression ;
+- tolerances de cavites ;
+- jeux de couvercles, rainures, charnieres et clips ;
+- protocole de calibration par coupons imprimes.
+
+A valider par impression reelle :
+
+- toutes les valeurs par defaut ;
+- toutes les interfaces fonctionnelles ;
+- tous les mecanismes ;
+- les modules composites et unions Fusion.
 
 ## Validation par impression
 
-Aucune valeur de tolerance ne doit etre presentee comme universelle. Les rapports doivent rappeler que les jeux doivent etre valides par impression reelle, surtout pour les couvercles, charnieres et cartes sleevees.
+Aucune valeur de tolerance ne doit etre presentee comme universelle. Les rapports
+doivent rappeler que les jeux doivent etre valides par impression reelle, surtout
+pour les couvercles, charnieres et cartes sleevees.

@@ -1,0 +1,105 @@
+# Status
+
+Derniere mise a jour : 2026-07-03
+
+## Etat global
+
+Statut produit : **V0 fondateur experimental**.
+
+Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
+mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
+roadmap macro, backlog actionnable, prochaines actions, index ADR/logs et
+templates GitHub.
+
+## Phase active
+
+Phase active : **Phase 0 - Fondation projet**.
+
+Etat : quasiment terminee pour le pilotage documentaire. La prochaine mission
+recommandee est de consolider les garde-fous automatiques et de reprendre ensuite
+la Phase 1 sur le moteur Python pur.
+
+## Implemente
+
+- Chargement de configurations JSON locales.
+- Modeles Python par dataclasses.
+- Validation de dimensions et contraintes de base.
+- Layout rectangulaire `row_fill` deterministe.
+- Application de tolerances simples par face.
+- Rapports Markdown et JSON.
+- Exemples JSON.
+- Tests unitaires hors Fusion 360.
+- ADR initiales sur moteur pur, cellules theoriques et JSON.
+- Gouvernance projet et backlog Codex.
+
+## Experimental
+
+- Le layout `row_fill` existe mais n'est pas un optimiseur.
+- La classification des faces est implicite dans le calcul d'offsets.
+- Les `PrimitiveVolume`, `CompositeModule`, `Cavity` et `Feature` existent comme
+  concepts mais ne pilotent pas encore une generation complete.
+- Les tolerances par defaut sont prudentes mais non calibrees sur impression.
+
+## Prevu
+
+- Strategies de layout grille/colonnes et comparaison de variantes.
+- Profils d'impression explicites.
+- Representation intermediaire CAD-agnostic.
+- Adaptateur Fusion 360.
+- Cavites, receptacles, encoches, fonds arrondis.
+- Modules composites en L/T.
+- Couvercles, rainures et mecanismes.
+- Surcouche esthetique.
+- Assistant de conception.
+- Packaging produit et exemples reels.
+
+## A valider par impression reelle
+
+- Jeux peripheriques.
+- Jeux inter-modules.
+- Jeux pour cartes sleevees.
+- Jeux de couvercles coulissants.
+- Charnieres, clips et mecanismes.
+- Epaisseurs minimales, rayons, chanfreins et patterns.
+
+## Tests et verifications connus
+
+Commande de test principale :
+
+```powershell
+$env:PYTHONPATH = "src"
+python -m unittest discover -s tests
+```
+
+Commande d'exemple :
+
+```powershell
+$env:PYTHONPATH = "src"
+python -m board_game_insert_generator examples/simple_box.json --format markdown
+```
+
+Derniere verification pendant la mission de gouvernance :
+
+- `python -m unittest discover -s tests` : OK, 7 tests passes.
+- `python -m board_game_insert_generator examples/simple_box.json --format markdown` :
+  OK, rapport Markdown genere.
+
+## Risques actifs
+
+- Le moteur a deja des concepts futurs dans `models.py`; il faut eviter de les
+  presenter comme fonctionnels tant qu'ils ne sont pas generes et testes.
+- L'integration Fusion 360 peut facilement aspirer de la logique metier ; les ADR
+  et `AGENTS.md` interdisent ce couplage.
+- Les tolerances seront credibles seulement apres une boucle d'impression reelle.
+- Le backlog est volontairement large ; chaque mission doit rester petite et
+  testable.
+
+## Regle de mise a jour
+
+Mettre a jour ce fichier apres toute mission significative, notamment si :
+
+- une carte change de statut ;
+- un comportement est implemente ou retire ;
+- une verification passe ou echoue ;
+- une hypothese devient une decision ;
+- une limite est decouverte.

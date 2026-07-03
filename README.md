@@ -1,29 +1,53 @@
 # Board Game Insert Generator
 
-Board Game Insert Generator est une fondation Python pour concevoir des inserts parametriques de boites de jeux de societe, avec une cible initiale claire : generer a terme des composants Fusion 360 via son API Python, sans enfermer la logique produit dans Fusion 360.
+Board Game Insert Generator est un projet Python pour construire progressivement
+un generateur intelligent d'inserts parametriques de jeux de societe imprimables
+en 3D.
 
-Statut actuel : **V0 fondateur experimental**. Le depot contient un moteur pur minimal, des exemples JSON, des tests unitaires et une documentation de conception. Il ne genere pas encore de geometrie Fusion 360, STL ou 3MF.
+Le projet vise d'abord un moteur Python pur, testable hors Fusion 360, puis une
+integration Fusion 360 comme cible de generation de composants CAD. Fusion 360 ne
+doit pas porter la logique de layout, de tolerance ou de validation.
 
-## Vision courte
+## Statut actuel
 
-Le projet vise a transformer une description de boite, d'assets internes et d'intentions de rangement en propositions d'inserts imprimables en 3D FDM.
+Statut : **V0 fondateur experimental**.
 
-En V0, le systeme sait :
+Le depot contient :
 
-- charger une configuration JSON lisible ;
-- valider les dimensions principales ;
-- representer une boite, des modules demandes, des cellules de layout et des corps imprimables ;
-- appliquer un modele simple de tolerance sur les faces exposees ;
-- produire un layout rectangulaire trivial par lignes ;
-- generer un rapport Markdown ou JSON ;
-- executer des tests hors Fusion 360.
+- un moteur Python minimal ;
+- des exemples JSON ;
+- un layout rectangulaire `row_fill` ;
+- une application simple des tolerances par face ;
+- des rapports Markdown/JSON ;
+- des tests unitaires hors Fusion 360 ;
+- une documentation de pilotage pour travailler mission par mission.
+
+Le depot ne genere pas encore de composants Fusion 360, STL ou 3MF.
+
+Consulter d'abord :
+
+- [AGENTS.md](AGENTS.md)
+- [Statut projet](docs/STATUS.md)
+- [Roadmap](docs/ROADMAP.md)
+- [Backlog](docs/BACKLOG.md)
+- [Next actions](docs/NEXT_ACTIONS.md)
+
+## North Star
+
+Transformer des contraintes de rangement mesurees en geometries imprimables,
+modulaires, tolerancees, comprehensibles et iterables, sans enfermer la logique de
+conception dans Fusion 360.
+
+Le produit cible doit aider a concevoir des modules pour cartes, cartes sleevees,
+tokens, meeples, des, livrets, couvercles et modules composites, avec des
+tolerances visibles et ajustables.
 
 ## Installation locale
 
 Prerequis :
 
 - Python 3.10 ou plus recent ;
-- aucune dependance externe obligatoire pour la V0.
+- aucune dependance externe obligatoire pour le socle actuel.
 
 Depuis la racine du depot :
 
@@ -46,7 +70,7 @@ $env:PYTHONPATH = "src"
 python -m unittest discover -s tests
 ```
 
-## Architecture
+## Architecture courte
 
 Le coeur logique est volontairement independant de Fusion 360 :
 
@@ -57,41 +81,44 @@ Le coeur logique est volontairement independant de Fusion 360 :
 - `tolerance.py` transforme les cellules en corps imprimables ;
 - `report.py` produit une representation lisible.
 
-Fusion 360 sera ajoute comme adaptateur de sortie, pas comme moteur de decision. Voir [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) et [docs/FUSION_360_STRATEGY.md](docs/FUSION_360_STRATEGY.md).
-
-## Principe important
-
-Le projet ne confond pas :
-
-- le volume interieur reel de la boite ;
-- le volume utile disponible ;
-- les cellules theoriques de layout ;
-- les modules imprimables ajustes ;
-- les cavites internes ;
-- les features ajoutees ou retirees.
-
-Cette separation est documentee dans [docs/GEOMETRY_MODEL.md](docs/GEOMETRY_MODEL.md) et [docs/TOLERANCE_MODEL.md](docs/TOLERANCE_MODEL.md).
-
-## Limites de la V0
-
-- Le layout automatique est volontairement simple : placement par lignes, trie par priorite.
-- Les modules composites sont modelises mais pas encore generes par algorithme dedie.
-- Les cavites, couvercles, charnieres, rainures et gravures sont prevus mais non implementes.
-- Les tolerances sont appliquees de maniere prudente sur des volumes rectangulaires simples.
-- Toute valeur de tolerance devra etre confirmee par impression reelle.
+Fusion 360 sera ajoute comme adaptateur de sortie. Voir
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) et
+[docs/FUSION_360_STRATEGY.md](docs/FUSION_360_STRATEGY.md).
 
 ## Documentation principale
 
 - [North Star](docs/NORTH_STAR.md)
-- [Product brief](docs/PRODUCT_BRIEF.md)
+- [Product Spec](docs/PRODUCT_SPEC.md)
+- [Product Brief](docs/PRODUCT_BRIEF.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Modele geometrique](docs/GEOMETRY_MODEL.md)
 - [Modele de tolerance](docs/TOLERANCE_MODEL.md)
 - [Strategie Fusion 360](docs/FUSION_360_STRATEGY.md)
 - [Schema de configuration](docs/CONFIG_SCHEMA.md)
 - [Roadmap](docs/ROADMAP.md)
+- [Backlog](docs/BACKLOG.md)
+- [Statut](docs/STATUS.md)
+- [Next actions](docs/NEXT_ACTIONS.md)
 - [Glossaire](docs/GLOSSARY.md)
 - [Regles qualite](docs/QUALITY_RULES.md)
+- [Decisions](docs/DECISIONS/README.md)
+- [Logs](docs/LOGS/README.md)
+
+## Regle de contribution
+
+Avant chaque mission, lire `AGENTS.md`, `docs/STATUS.md`, `docs/ROADMAP.md`,
+`docs/BACKLOG.md` et `docs/NEXT_ACTIONS.md`.
+
+Une mission terminee doit mettre a jour le statut, le backlog et les prochaines
+actions si necessaire, puis lancer les tests disponibles.
+
+## Limites importantes
+
+- Le layout actuel est deterministe mais non optimise.
+- Les cavites, couvercles, modules composites et mecanismes sont prevus mais non
+  fonctionnels.
+- Les tolerances par defaut doivent etre validees par impression reelle.
+- Aucun comportement Fusion 360 n'est encore implemente.
 
 ## Licence
 
