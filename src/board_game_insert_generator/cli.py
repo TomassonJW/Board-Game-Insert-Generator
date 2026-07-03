@@ -36,8 +36,17 @@ def main(argv: list[str] | None = None) -> int:
             if args.format == "json"
             else layout_to_markdown(config, result)
         )
-    except (ConfigError, ValidationError, LayoutError, ToleranceError) as exc:
-        print(f"Error: {exc}", file=sys.stderr)
+    except ConfigError as exc:
+        _print_error("Configuration error", exc)
+        return 2
+    except ValidationError as exc:
+        _print_error("Validation error", exc)
+        return 2
+    except LayoutError as exc:
+        _print_error("Layout error", exc)
+        return 2
+    except ToleranceError as exc:
+        _print_error("Tolerance error", exc)
         return 2
 
     if args.output:
@@ -45,3 +54,7 @@ def main(argv: list[str] | None = None) -> int:
     else:
         print(report)
     return 0
+
+
+def _print_error(title: str, exc: Exception) -> None:
+    print(f"{title}: {exc}", file=sys.stderr)

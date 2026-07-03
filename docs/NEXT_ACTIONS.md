@@ -8,23 +8,21 @@ Codex doit choisir la premiere mission `ready` listee ici.
 
 ## Mission suivante recommandee
 
-### 1. P1-M003 - Improve CLI reporting
+### 1. P1-M004 - Ajouter une commande CLI de diagnostic
 
 Pourquoi maintenant :
 
-- `P1-M002` durcit le chargement JSON et les erreurs de type ;
-- la CLI peut maintenant mieux exposer les erreurs, warnings et valeurs utiles ;
-- les rapports doivent rester exploitables sans promettre de validite CAD ou
-  impression ;
-- la mission reste dans le moteur pur et ne touche pas Fusion 360.
+- `P1-M003` enrichit les rapports Markdown/JSON et les categories d'erreur CLI ;
+- il manque encore une commande courte dediee au diagnostic de configuration ;
+- cette mission reste dans le moteur Python pur ;
+- elle peut preparer les futures boucles utilisateur sans changer Fusion 360.
 
 Livrable attendu :
 
-- sortie Markdown/JSON plus utile pour diagnostiquer validation, layout et
-  tolerances ;
-- erreurs et warnings actionnables ;
-- tests unitaires de rapport ;
-- exemple CLI existant toujours reproductible.
+- commande CLI documentee pour valider rapidement config, layout et rapport ;
+- code de sortie non nul en erreur ;
+- sortie lisible ;
+- tests CLI et exemple existant passant.
 
 Verification minimale :
 
@@ -33,20 +31,9 @@ $env:PYTHONPATH = "src"
 python -m unittest discover -s tests
 ```
 
-## Missions suivantes si P1-M003 est terminee
+## Missions suivantes si P1-M004 est terminee
 
-### 2. P1-M004 - Ajouter une commande CLI de diagnostic
-
-Condition :
-
-- lancer seulement apres `P1-M003`.
-
-Objectif :
-
-- fournir une boucle courte pour valider config, layout et rapport ;
-- documenter une commande de diagnostic lisible et ses codes de sortie.
-
-### 3. P2-M001 - Formalize simple rectangular layout model
+### 2. P2-M001 - Formalize simple rectangular layout model
 
 Condition :
 

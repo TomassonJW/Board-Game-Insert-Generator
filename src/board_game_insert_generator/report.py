@@ -17,12 +17,33 @@ def layout_to_dict(config: InsertConfig, result: LayoutResult) -> dict[str, Any]
             "usable_height_mm": config.box.usable_height_mm,
             "lid_clearance_mm": config.box.lid_clearance_mm,
         },
+        "layout": asdict(config.layout),
         "tolerances": asdict(config.tolerances),
+        "defaults": asdict(config.defaults),
         "summary": {
+            "requested_module_count": len(config.modules),
+            "expanded_instance_count": len(result.cells),
             "cell_count": len(result.cells),
             "printable_body_count": len(result.printable_bodies),
+            "rotated_cell_count": sum(1 for cell in result.cells if cell.rotated),
+            "layout_footprint_mm": _dim(_layout_footprint(result)),
+            "max_printable_height_mm": _max_printable_height(result),
+            "warning_count": len(result.warnings),
             "warnings": list(result.warnings),
         },
+        "module_requests": [
+            {
+                "id": module.id,
+                "name": module.name,
+                "functional_type": module.functional_type.value,
+                "quantity": module.quantity,
+                "min_dimensions_mm": _dim(module.min_dimensions),
+                "desired_height_mm": _clean_float(module.desired_height_mm),
+                "priority": module.priority,
+                "allow_rotation": module.allow_rotation,
+            }
+            for module in config.modules
+        ],
         "cells": [
             {
                 "module_id": cell.module_id,
@@ -64,11 +85,33 @@ def layout_to_markdown(config: InsertConfig, result: LayoutResult) -> str:
         f"- Usable height: {config.box.usable_height_mm:.2f} mm",
         f"- Lid clearance: {config.box.lid_clearance_mm:.2f} mm",
         "",
+        "## Summary",
+        "",
+        f"- Layout strategy: `{config.layout.strategy}`",
+        f"- Requested modules: {len(config.modules)}",
+        f"- Generated instances: {len(result.cells)}",
+        f"- Printable bodies: {len(result.printable_bodies)}",
+        f"- Rotated cells: {sum(1 for cell in result.cells if cell.rotated)}",
+        f"- Layout footprint: {_format_dim(_layout_footprint(result))}",
+        f"- Max printable height: {_max_printable_height(result):.2f} mm",
+        "",
+        "## Tolerance profile",
+        "",
+        "| Setting | Value |",
+        "| --- | ---: |",
+        f"| Peripheral clearance | {config.tolerances.peripheral_clearance_mm:.2f} mm |",
+        f"| Module gap | {config.tolerances.module_gap_mm:.2f} mm |",
+        f"| Vertical lid clearance | {config.tolerances.vertical_lid_clearance_mm:.2f} mm |",
+        f"| Printer compensation | {config.tolerances.printer_compensation_mm:.2f} mm |",
+        "",
         "## Warnings",
         "",
     ]
-    for warning in result.warnings:
-        lines.append(f"- {warning}")
+    if result.warnings:
+        for warning in result.warnings:
+            lines.append(f"- {warning}")
+    else:
+        lines.append("- No warnings.")
 
     lines.extend(
         [
@@ -132,3 +175,19 @@ def _format_offsets(offsets: Any) -> str:
         f"y-{offsets.y_min:.2f}, y+{offsets.y_max:.2f}, "
         f"z-{offsets.z_min:.2f}, z+{offsets.z_max:.2f}"
     )
+
+
+def _layout_footprint(result: LayoutResult) -> Dimension3D:
+    if not result.cells:
+        return Dimension3D(x=0.0, y=0.0, z=0.0)
+    return Dimension3D(
+        x=max(cell.origin.x + cell.size.x for cell in result.cells),
+        y=max(cell.origin.y + cell.size.y for cell in result.cells),
+        z=max(cell.size.z for cell in result.cells),
+    )
+
+
+def _max_printable_height(result: LayoutResult) -> float:
+    if not result.printable_bodies:
+        return 0.0
+    return max(body.size.z for body in result.printable_bodies)
