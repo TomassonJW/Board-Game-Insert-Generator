@@ -15,7 +15,7 @@ Statut : `blocked`.
 Decision demandee :
 
 - lancer ou faire lancer le smoke test manuel Fusion 360 de `P4-M003` ;
-- confirmer si les composants, bodies, noms, origines et dimensions observees
+- confirmer si les sketches, bodies, noms, origines et dimensions observees
   correspondent a la CAD IR ;
 - documenter les ecarts eventuels avant toute mission Fusion suivante ;
 - autoriser explicitement une suite `P4-M004` si le perimetre Fusion doit etre
@@ -24,7 +24,7 @@ Decision demandee :
 Contexte :
 
 - `P4-M003` code une premiere generation minimale depuis `cad_ir_input.json` ;
-- l'add-in cree une esquisse de reference de boite et des blanks rectangulaires ;
+- l'add-in cree une esquisse de reference de boite et des blanks rectangulaires dans le composant racine ;
 - les tests hors Fusion couvrent le chargement CAD IR et le plan de generation ;
 - l'execution reelle dans Fusion 360 n'a pas encore ete realisee dans ce run ;
 - `adsk` reste interdit dans `src/board_game_insert_generator`.
@@ -34,11 +34,11 @@ Smoke test manuel attendu :
 1. Installer `fusion_addin/BoardGameInsertGenerator` dans le dossier AddIns local.
 2. Ouvrir ou creer un design Fusion vide.
 3. Lancer `Board Game Insert Generator` depuis `Utilities > Add-ins`.
-4. Verifier le message final : 1 reference outline et 2 blank bodies.
-5. Verifier les composants :
-   - `BGIG box reference - not printable` ;
-   - `cards-main-01 - Main cards` ;
-   - `dice-01 - Dice tray`.
+4. Verifier le message final : 1 reference outline, 2 blank bodies et creation dans le composant racine.
+5. Verifier les sketches dans le composant racine :
+   - `BGIG box reference - not printable outline` ;
+   - `cards-main-01 - Main cards footprint` ;
+   - `dice-01 - Dice tray footprint`.
 6. Verifier les bodies :
    - `cards-main-01 rectangular blank` ;
    - `dice-01 rectangular blank`.

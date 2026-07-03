@@ -165,6 +165,15 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIsInstance(manifest["description"], dict)
         self.assertIn("", manifest["description"])
 
+    def test_addin_entrypoint_uses_root_component_for_part_design_compatibility(self) -> None:
+        entrypoint_path = ROOT / "fusion_addin" / "BoardGameInsertGenerator" / "BoardGameInsertGenerator.py"
+        source = entrypoint_path.read_text(encoding="utf-8")
+
+        self.assertNotIn("addNewComponent", source)
+        self.assertIn("root_component.sketches.add", source)
+        self.assertIn("root_component.features.extrudeFeatures.addSimple", source)
+        self.assertIn("compatible with Part Design documents", source)
+
 
 def _cad_ir_payload() -> dict:
     config = load_config(ROOT / "examples" / "simple_box.json")

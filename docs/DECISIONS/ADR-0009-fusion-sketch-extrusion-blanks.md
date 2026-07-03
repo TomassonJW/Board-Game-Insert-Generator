@@ -2,7 +2,7 @@
 
 ## Statut
 
-Accepte
+Accepte, amende apres smoke test Part Design
 
 ## Date
 
@@ -22,18 +22,25 @@ La generation doit rester simple : une reference de boite et des blanks
 rectangulaires inspectables. Elle ne doit pas introduire cavites, couvercles,
 fillets, exports ou validation physique.
 
+Le premier smoke test manuel a montre que certains documents Fusion Part Design
+refusent la creation de plusieurs composants enfants. Le chemin P4-M003 doit donc
+fonctionner dans le composant racine.
+
 ## Options
 
-1. Creer des bodies par esquisse rectangulaire puis extrusion.
-2. Creer des bodies directement en B-Rep via `TemporaryBRepManager.createBox`.
-3. Reporter la generation reelle et rester au plan `planned_only`.
+1. Creer des bodies par esquisse rectangulaire puis extrusion dans le composant
+   racine.
+2. Creer un composant enfant par blank via `Occurrences.addNewComponent`.
+3. Creer des bodies directement en B-Rep via `TemporaryBRepManager.createBox`.
+4. Reporter la generation reelle et rester au plan `planned_only`.
 
 ## Decision
 
 Choisir l'option 1.
 
-L'adaptateur Fusion cree un composant par blank, place ce composant a l'origine
-`printable_origin_mm`, dessine un rectangle local aux dimensions
+L'adaptateur Fusion cree les sketches et bodies dans le composant racine pour
+rester compatible avec les documents Fusion Part Design. Chaque rectangle est
+dessine aux coordonnees scene `printable_origin_mm` et aux dimensions
 `printable_size_mm.x/y`, puis extrude selon `printable_size_mm.z`.
 
 La reference de boite est creee comme esquisse non imprimable, nommee
@@ -43,12 +50,17 @@ Les longueurs de sketch utilisent la conversion controlee millimetres vers
 centimetres internes Fusion. La profondeur d'extrusion utilise une expression
 explicite en millimetres.
 
+La creation d'un composant Fusion par module reste une option future, mais
+seulement apres gate et validation dans un document Assembly compatible.
+
 ## Consequences
 
 Effets positifs :
 
 - approche Fusion lisible et proche du flux utilisateur ;
-- noms de composants et bodies faciles a inspecter ;
+- compatibilite avec les documents Fusion Part Design limites a un seul composant ;
+- noms de sketches, features et bodies faciles a inspecter dans le composant
+  racine ;
 - pas de dependance supplementaire ;
 - la couche hors Fusion reste testable ;
 - la CAD IR reste la source unique des dimensions.
@@ -60,7 +72,8 @@ Effets negatifs et risques :
   Fusion ;
 - la reference de boite est une esquisse, pas encore un volume transparent ou un
   gabarit avance ;
-- la generation ne couvre pas encore cavites, fillets, shells ou exports.
+- la generation ne couvre pas encore cavites, fillets, shells ou exports ;
+- les composants enfants sont reportes a une phase Assembly explicite.
 
 ## Alternatives refusees
 
@@ -70,10 +83,15 @@ persistence et de base features plus larges que le besoin minimal.
 Le maintien en `planned_only` est refuse parce que la gate humaine a autorise la
 premiere generation exploitable minimale.
 
+La creation de composants enfants par `Occurrences.addNewComponent` est reportee
+parce qu'elle echoue dans les documents Fusion Part Design observes pendant le
+smoke test manuel.
+
 ## Suivi
 
 - `tests/test_fusion_skeleton.py` couvre le chargement CAD IR, le plan de
-  generation et la conversion d'unites hors Fusion.
+  generation, la conversion d'unites hors Fusion et l'absence de
+  `addNewComponent` dans le chemin P4-M003.
 - `fusion_addin/README.md` decrit la procedure de smoke test manuel.
 - `P4-M004` ou toute suite Fusion necessite une nouvelle gate humaine et doit
   partir du resultat manuel observe dans Fusion.

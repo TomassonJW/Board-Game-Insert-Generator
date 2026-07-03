@@ -12,8 +12,8 @@ Statut : `implemente` pour le contrat V0 de blanks rectangulaires, couvert par
 tests unitaires Python purs.
 
 La sortie Fusion concrete est maintenant codee pour des blanks rectangulaires
-minimaux, mais reste `manual validation required` tant qu'elle n'a pas ete lancee
-et inspectee dans Fusion 360.
+minimaux dans le composant racine, mais reste `manual validation required` tant
+qu'elle n'a pas ete lancee et inspectee dans Fusion 360.
 
 ## Frontieres
 
@@ -93,11 +93,12 @@ plan de generation Fusion. Ce plan copie :
 - `box_reference.origin_mm` et `box_reference.size_mm` pour une esquisse de
   reference non imprimable ;
 - `body.printable_origin_mm` et `body.printable_size_mm` pour les blanks ;
-- les noms de composants et bodies.
+- les noms de composants CAD IR, sketches, features et bodies Fusion.
 
 Fusion ne recalcule pas les cellules, offsets, roles de faces ou tolerances. La
-generation reelle reste limitee a des rectangles extrudes et ne produit aucun
-STL/3MF.
+generation reelle reste limitee a des rectangles extrudes dans le composant
+racine et ne produit aucun STL/3MF. P4-M003 ne cree pas de composants enfants
+Fusion, pour rester compatible avec les documents Part Design.
 
 ## Face roles et tolerances
 

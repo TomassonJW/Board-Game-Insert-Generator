@@ -325,7 +325,7 @@ commitee sans melanger plusieurs decisions structurantes.
 ### P4-M003 - Generer des blanks rectangulaires Fusion
 
 - Phase liee : Phase 4 - Generation Fusion 360 de blanks
-- Objectif : creer composants, corps rectangulaires, noms et rayons simples.
+- Objectif : creer une reference, des sketches et des corps rectangulaires nommes pour un smoke test Fusion minimal.
 - Livrable attendu : add-in Fusion capable de generer les blanks V0 depuis une
   CAD IR JSON locale.
 - Fichiers concernes : `fusion_addin/BoardGameInsertGenerator/`,
@@ -348,7 +348,7 @@ commitee sans melanger plusieurs decisions structurantes.
 - Phase liee : Phase 4 - Generation Fusion 360 de blanks
 - Objectif : executer le smoke test P4-M003 dans Fusion 360 et documenter le
   resultat observe.
-- Livrable attendu : log de validation manuelle avec composants, bodies,
+- Livrable attendu : log de validation manuelle avec sketches, bodies,
   dimensions mesurees, ecarts et decision OK/KO.
 - Fichiers probablement concernes : `docs/LOGS/`, `docs/STATUS.md`,
   `docs/NEXT_ACTIONS.md`, eventuellement `fusion_addin/README.md` si la procedure

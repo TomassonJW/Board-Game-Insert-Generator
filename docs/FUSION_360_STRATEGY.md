@@ -34,8 +34,8 @@ Responsabilites de l'adaptateur :
 
 - lire ou recevoir une CAD IR deja resolue ;
 - creer une boite de reference ;
-- creer un composant par module ;
-- nommer proprement les composants ;
+- creer d'abord des bodies nommes dans le composant racine pour le smoke test minimal ;
+- reserver la creation de composants enfants a une phase compatible Assembly ;
 - creer les esquisses et extrusions autorisees ;
 - appliquer des parametres utilisateurs Fusion si utile dans une phase future ;
 - exporter les modules en STL ou 3MF dans une phase ulterieure.
@@ -56,6 +56,11 @@ Il contient :
 Le squelette peut importer `adsk` uniquement dans le fichier d'entree Fusion. La
 couche testable et le coeur Python restent sans dependance Fusion.
 
+Le smoke test P4-M003 evite volontairement `Occurrences.addNewComponent` afin
+de rester compatible avec les documents Fusion Part Design qui n'acceptent qu'un
+seul composant. Les composants CAD IR sont donc materialises par des sketches,
+features et bodies nommes dans le composant racine.
+
 Depuis `P4-M003`, l'add-in code une premiere generation minimale :
 
 - detection d'un document Fusion actif ;
@@ -63,7 +68,7 @@ Depuis `P4-M003`, l'add-in code une premiere generation minimale :
 - chargement de `cad_ir_input.json` dans le dossier add-in ;
 - validation de la CAD IR serialisee ;
 - creation d'une esquisse de reference de boite non imprimable ;
-- creation de composants et bodies rectangulaires simples pour les blanks ;
+- creation de sketches et bodies rectangulaires simples dans le composant racine ;
 - statut `manual validation required` tant que Fusion 360 n'a pas ete lance et
   inspecte par Thomas.
 
@@ -76,7 +81,7 @@ Le moteur fournit maintenant une CAD IR V0 documentee dans
 La scene V0 contient :
 
 - boite de reference non imprimable ;
-- composants nommes ;
+- composants CAD IR nommes ;
 - corps imprimables rectangulaires ;
 - dimensions theoriques et dimensions imprimables ;
 - classifications de faces ;
@@ -92,7 +97,7 @@ recalculer layout ou tolerances.
 
 La premiere cible Fusion se limite a des blanks rectangulaires :
 
-- composants nommes ;
+- sketches, features et bodies nommes dans le composant racine ;
 - dimensions issues de `printable_origin_mm` et `printable_size_mm` ;
 - boite de reference sous forme d'esquisse non imprimable ;
 - aucun creusage avance ;
@@ -106,8 +111,8 @@ La premiere cible Fusion se limite a des blanks rectangulaires :
 Apres verification de la documentation officielle Autodesk, l'approche retenue
 est `sketch + extrusion` :
 
-- `Occurrences.addNewComponent` cree un composant par blank ;
-- `Sketches.add` cree une esquisse sur le plan XY du composant ;
+- `Design.rootComponent` fournit le composant racine utilise par le smoke test ;
+- `Sketches.add` cree une esquisse sur le plan XY du composant racine ;
 - `SketchLines.addTwoPointRectangle` cree l'empreinte rectangulaire ;
 - `ExtrudeFeatures.addSimple` cree le body avec `NewBodyFeatureOperation` ;
 - `ValueInput.createByString("... mm")` garde des longueurs explicites en
@@ -115,7 +120,7 @@ est `sketch + extrusion` :
 
 Liens de reference :
 
-- <https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/Occurrences_addNewComponent.htm>
+- <https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/Design_rootComponent.htm>
 - <https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/Sketches_add.htm>
 - <https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/SketchLines_addTwoPointRectangle.htm>
 - <https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/ExtrudeFeatures_addSimple.htm>
@@ -160,8 +165,8 @@ Tests hors Fusion :
 
 Verifications dans Fusion :
 
-- presence du composant de reference non imprimable ;
-- presence des composants de blanks ;
+- presence du sketch de reference non imprimable dans le composant racine ;
+- presence des bodies de blanks dans le composant racine ;
 - noms ;
 - dimensions ;
 - origines ;

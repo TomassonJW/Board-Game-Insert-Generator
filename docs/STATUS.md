@@ -91,7 +91,7 @@ planification CAD IR `planned_only`, sans creation de geometrie Fusion reelle.
 
 La mission `P4-M003` du 2026-07-03 code la premiere generation Fusion minimale
 depuis une CAD IR JSON locale. L'add-in cree une esquisse de reference de boite
-et des blanks rectangulaires par esquisse + extrusion. Cette sortie reste
+et des blanks rectangulaires par esquisse + extrusion dans le composant racine. Cette sortie reste
 `manual validation required` tant qu'elle n'a pas ete lancee et inspectee dans
 Fusion 360. Le manifeste d'add-in a ensuite ete corrige au format JSON attendu
 par Fusion pour permettre la decouverte locale.
@@ -109,7 +109,7 @@ faces des corps rectangulaires simples sont classees explicitement et leurs
 regles de tolerance appliquees sont exposees dans les rapports. Les profils
 d'impression explicites sont resolus et visibles. La representation intermediaire
 CAD est definie et testee. L'adaptateur Fusion isole sait charger une CAD IR
-locale et coder une premiere generation de blanks rectangulaires, sans recalculer
+locale et coder une premiere generation de blanks rectangulaires dans le composant racine, sans recalculer
 layout ou tolerances. La prochaine etape recommandee est le smoke test manuel
 Fusion 360 de `P4-M003`. Aucune suite Fusion ne doit commencer sans nouvelle
 validation humaine.
@@ -152,6 +152,7 @@ validation humaine.
 - Squelette d'adaptateur Fusion 360 isole et non generateur `P4-M002`.
 - Chargement CAD IR et plan de generation Fusion minimale testes hors Fusion P4-M003.
 - Manifeste Fusion JSON verifie par test hors Fusion.
+- Chemin Fusion P4-M003 compatible documents Part Design via composant racine.
 
 ## Experimental
 
@@ -208,7 +209,7 @@ python -m board_game_insert_generator examples/simple_box.json --format markdown
 
 Derniere verification pendant la mission `P4-M003` :
 
-- `python -m unittest discover -s tests` : OK, 62 tests passes.
+- `python -m unittest discover -s tests` : OK, 63 tests passes.
 - `python -m board_game_insert_generator examples/simple_box.json --format markdown` : OK.
 - `python -m board_game_insert_generator examples/simple_grid.json --format markdown` : OK.
 - `python -m board_game_insert_generator examples/simple_box.json --format json` : OK.

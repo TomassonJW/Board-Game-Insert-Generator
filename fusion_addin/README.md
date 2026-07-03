@@ -14,11 +14,11 @@ inspectee dans Fusion 360 par Thomas.
 
 Ce que l'add-in cree maintenant :
 
-- un composant de reference nomme comme non imprimable, avec une esquisse de
-  l'empreinte de boite ;
-- un composant par blank imprimable ;
+- une esquisse de reference de boite dans le composant racine, nommee comme non
+  imprimable ;
+- un sketch d'empreinte par blank dans le composant racine ;
 - un corps rectangulaire extrude par blank ;
-- des noms lisibles pour composants et bodies.
+- des noms lisibles pour sketches, features et bodies.
 
 Ce que l'add-in ne cree pas :
 
@@ -32,7 +32,7 @@ Ce que l'add-in ne cree pas :
 ## Structure
 
 - `BoardGameInsertGenerator/BoardGameInsertGenerator.manifest` : manifeste
-  d'add-in pour installation locale.
+  d'add-in JSON pour installation locale.
 - `BoardGameInsertGenerator/BoardGameInsertGenerator.py` : point d'entree Fusion
   avec `run(context)` et `stop(context)`.
 - `BoardGameInsertGenerator/fusion_skeleton.py` : logique testable hors Fusion
@@ -118,13 +118,14 @@ Procedure :
 3. Creer un nouveau design vide ou ouvrir un design de test.
 4. Verifier que `cad_ir_input.json` est present dans le dossier AddIns installe.
 5. Lancer `Board Game Insert Generator` depuis `Utilities > Add-ins`.
-6. Verifier le message final : il doit annoncer 1 reference outline et 2 blank
-   bodies.
-7. Dans le navigateur Fusion, verifier la presence de composants nommes :
-   - `BGIG box reference - not printable` ;
-   - `cards-main-01 - Main cards` ;
-   - `dice-01 - Dice tray`.
-8. Verifier les bodies :
+6. Verifier le message final : il doit annoncer 1 reference outline, 2 blank
+   bodies et une creation dans le composant racine.
+7. Dans le navigateur Fusion, verifier dans le composant racine la presence de
+   sketches nommes :
+   - `BGIG box reference - not printable outline` ;
+   - `cards-main-01 - Main cards footprint` ;
+   - `dice-01 - Dice tray footprint`.
+8. Verifier les bodies nommes :
    - `cards-main-01 rectangular blank` ;
    - `dice-01 rectangular blank`.
 9. Avec `Inspect > Measure`, verifier les dimensions attendues des blanks :
@@ -133,8 +134,10 @@ Procedure :
 10. Noter tout ecart, message d'erreur ou comportement Zero Doc dans un futur log
     de validation.
 
-Ce smoke test valide uniquement la creation CAD minimale dans Fusion. Il ne
-valide pas l'impression, les jeux physiques ou les exports.
+Ce smoke test valide uniquement la creation CAD minimale dans Fusion. Il utilise
+volontairement le composant racine pour rester compatible avec les documents
+Fusion Part Design qui refusent plusieurs composants enfants. Il ne valide pas
+l'impression, les jeux physiques ou les exports.
 
 ## Debug local hors Fusion
 
@@ -155,8 +158,9 @@ La conversion actuelle :
 
 - charge et valide une CAD IR locale ;
 - cree un plan de generation hors Fusion ;
-- cree une esquisse de reference de boite ;
-- cree des rectangles puis extrude des bodies simples pour les blanks ;
+- cree une esquisse de reference de boite dans le composant racine ;
+- cree des rectangles dans le composant racine puis extrude des bodies simples
+  pour les blanks ;
 - marque la validation Fusion comme manuelle.
 
 `P4-M004` ou toute mission suivante sur Fusion doit recevoir une nouvelle gate

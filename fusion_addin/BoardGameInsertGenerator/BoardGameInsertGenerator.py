@@ -83,6 +83,7 @@ def run(context) -> None:  # noqa: ANN001 - Fusion controls the signature.
         f"Project: {generation_plan.project_name}\n"
         f"Reference outlines: {result['reference_outlines']}\n"
         f"Blank bodies: {result['blank_bodies']}\n"
+        "Creation scope: root component, compatible with Part Design documents.\n"
         "Status: manual validation required in Fusion 360."
     )
 
@@ -117,60 +118,58 @@ def _generate_from_plan(design, plan: FusionGenerationPlan) -> dict[str, int]:  
 
 
 def _create_reference_outline(root_component, solid_plan: FusionSolidPlan) -> None:  # noqa: ANN001
-    component = _add_component_at(root_component, solid_plan)
-    sketch = component.sketches.add(component.xYConstructionPlane)
-    sketch.name = solid_plan.body_name
-    _add_local_rectangle(sketch, solid_plan)
+    _ensure_supported_z_origin(solid_plan)
+    sketch = root_component.sketches.add(root_component.xYConstructionPlane)
+    sketch.name = f"{solid_plan.component_name} outline"
+    _add_scene_rectangle(sketch, solid_plan)
 
 
 def _create_rectangular_blank(root_component, solid_plan: FusionSolidPlan) -> None:  # noqa: ANN001
-    component = _add_component_at(root_component, solid_plan)
-    sketch = component.sketches.add(component.xYConstructionPlane)
-    sketch.name = f"{solid_plan.body_name} footprint"
-    _add_local_rectangle(sketch, solid_plan)
+    _ensure_supported_z_origin(solid_plan)
+    sketch = root_component.sketches.add(root_component.xYConstructionPlane)
+    sketch.name = f"{solid_plan.component_name} footprint"
+    _add_scene_rectangle(sketch, solid_plan)
 
     if sketch.profiles.count < 1:
         raise RuntimeError(f"No closed profile was created for {solid_plan.body_name}.")
 
     profile = sketch.profiles.item(0)
     distance = adsk.core.ValueInput.createByString(f"{solid_plan.size_mm.z} mm")
-    extrude = component.features.extrudeFeatures.addSimple(
+    extrude = root_component.features.extrudeFeatures.addSimple(
         profile,
         distance,
         adsk.fusion.FeatureOperations.NewBodyFeatureOperation,
     )
     if extrude is None:
         raise RuntimeError(f"Fusion extrusion failed for {solid_plan.body_name}.")
+
+    extrude.name = f"{solid_plan.component_name} extrusion"
     if extrude.bodies.count > 0:
         extrude.bodies.item(0).name = solid_plan.body_name
 
 
-def _add_component_at(root_component, solid_plan: FusionSolidPlan):  # noqa: ANN001
-    transform = adsk.core.Matrix3D.create()
-    transform.translation = adsk.core.Vector3D.create(
+def _add_scene_rectangle(sketch, solid_plan: FusionSolidPlan) -> None:  # noqa: ANN001
+    start = adsk.core.Point3D.create(
         mm_to_cm(solid_plan.origin_mm.x),
         mm_to_cm(solid_plan.origin_mm.y),
-        mm_to_cm(solid_plan.origin_mm.z),
+        0,
     )
-    occurrence = root_component.occurrences.addNewComponent(transform)
-    if occurrence is None:
-        raise RuntimeError(f"Fusion component creation failed for {solid_plan.component_name}.")
-
-    component = occurrence.component
-    component.name = solid_plan.component_name
-    return component
-
-
-def _add_local_rectangle(sketch, solid_plan: FusionSolidPlan) -> None:  # noqa: ANN001
-    start = adsk.core.Point3D.create(0, 0, 0)
     end = adsk.core.Point3D.create(
-        mm_to_cm(solid_plan.size_mm.x),
-        mm_to_cm(solid_plan.size_mm.y),
+        mm_to_cm(solid_plan.origin_mm.x + solid_plan.size_mm.x),
+        mm_to_cm(solid_plan.origin_mm.y + solid_plan.size_mm.y),
         0,
     )
     lines = sketch.sketchCurves.sketchLines.addTwoPointRectangle(start, end)
     if lines is None:
         raise RuntimeError(f"Fusion rectangle sketch failed for {solid_plan.body_name}.")
+
+
+def _ensure_supported_z_origin(solid_plan: FusionSolidPlan) -> None:
+    if solid_plan.origin_mm.z != 0:
+        raise RuntimeError(
+            "P4-M003 root-component generation only supports Z origins at 0 mm. "
+            f"{solid_plan.body_name} has Z origin {solid_plan.origin_mm.z} mm."
+        )
 
 
 def _show_message(message: str) -> None:
