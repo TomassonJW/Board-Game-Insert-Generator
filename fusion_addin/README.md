@@ -99,6 +99,17 @@ La fixture fournie contient :
 Les origines et dimensions sont celles de la CAD IR, deja calculees par le coeur
 BGIG. Fusion ne recalcule ni layout, ni offsets, ni tolerances.
 
+Pour generer ce fichier depuis une configuration BGIG :
+
+```powershell
+$env:PYTHONPATH = "src"
+python -m board_game_insert_generator export-cad-ir examples/simple_box.json --output fusion_addin/BoardGameInsertGenerator/cad_ir_input.json
+```
+
+Pour une installation locale Fusion, copier ensuite le fichier genere dans le
+dossier `BoardGameInsertGenerator` installe, ou utiliser directement ce chemin
+d'installation comme cible de `--output`.
+
 ## Cas Zero Doc
 
 Fusion peut demarrer sans document actif. Le squelette detecte ce cas via
@@ -116,7 +127,8 @@ Procedure :
 1. Installer l'add-in avec la commande PowerShell ci-dessus.
 2. Ouvrir Fusion 360.
 3. Creer un nouveau design vide ou ouvrir un design de test.
-4. Verifier que `cad_ir_input.json` est present dans le dossier AddIns installe.
+4. Verifier que `cad_ir_input.json` est present dans le dossier AddIns installe,
+   ou le regenerer avec la commande `export-cad-ir` documentee plus haut.
 5. Lancer `Board Game Insert Generator` depuis `Utilities > Add-ins`.
 6. Verifier le message final : il doit annoncer 1 reference outline, 2 blank
    bodies et une creation dans le composant racine.
@@ -163,5 +175,5 @@ La conversion actuelle :
   pour les blanks ;
 - marque la validation Fusion comme manuelle.
 
-`P4-M004` ou toute mission suivante sur Fusion doit recevoir une nouvelle gate
-humaine avant d'elargir le perimetre.
+Toute mission suivante qui elargit le perimetre Fusion doit recevoir une
+nouvelle gate humaine avant implementation.

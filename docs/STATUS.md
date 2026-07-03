@@ -97,6 +97,12 @@ chemin Part Design a ete adapte au composant racine. Le smoke test manuel a
 confirme que l'add-in apparait, que le message final est OK, que les modules
 sont visibles et que les dimensions mesurees correspondent a la CAD IR.
 
+La mission `Export CAD IR CLI` du 2026-07-03 ajoute la commande
+`export-cad-ir`, capable de transformer une configuration BGIG en CAD IR JSON V0
+lisible et compatible avec le squelette Fusion existant. Cette commande ne
+modifie pas les dimensions, les tolerances ou la geometrie Fusion ; elle rend la
+fixture `cad_ir_input.json` regenerable depuis le moteur.
+
 ## Phase active
 
 Phase active : **Phase 4 - Generation Fusion minimale validee manuellement, prochaine gate Fusion requise**.
@@ -112,7 +118,9 @@ d'impression explicites sont resolus et visibles. La representation intermediair
 CAD est definie et testee. L'adaptateur Fusion isole sait charger une CAD IR
 locale et coder une premiere generation de blanks rectangulaires dans le
 composant racine, sans recalculer
-layout ou tolerances. La prochaine etape recommandee est une decision humaine sur le prochain perimetre Fusion. Aucune suite Fusion ne doit commencer sans nouvelle
+layout ou tolerances. La CLI `export-cad-ir` peut maintenant produire le fichier
+CAD IR JSON attendu par l'add-in depuis une configuration BGIG. La prochaine
+etape recommandee est une decision humaine sur le prochain perimetre Fusion. Aucune suite Fusion ne doit commencer sans nouvelle
 validation humaine.
 
 ## Implemente
@@ -154,6 +162,7 @@ validation humaine.
 - Chargement CAD IR et plan de generation Fusion minimale testes hors Fusion P4-M003.
 - Manifeste Fusion JSON verifie par test hors Fusion.
 - Chemin Fusion P4-M003 compatible documents Part Design via composant racine.
+- Commande CLI `export-cad-ir` pour generer une CAD IR JSON V0 depuis une configuration BGIG.
 - Smoke test CAD manuel P4-M003 valide dans Fusion : add-in visible, message OK,
   modules visibles et dimensions conformes a la fixture.
 
@@ -211,14 +220,15 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant la mission `P4-M003` :
+Derniere verification pendant la mission `Export CAD IR CLI` :
 
-- `python -m unittest discover -s tests` : OK, 63 tests passes.
+- `python -m unittest discover -s tests` : OK, 64 tests passes.
 - `python -m board_game_insert_generator examples/simple_box.json --format markdown` : OK.
-- `python -m board_game_insert_generator examples/simple_grid.json --format markdown` : OK.
 - `python -m board_game_insert_generator examples/simple_box.json --format json` : OK.
-- `git diff --check` : OK.
-- `rg -n "adsk" src/board_game_insert_generator` : OK, aucune occurrence.
+- `python -m board_game_insert_generator examples/simple_grid.json --format markdown` : OK.
+- `python -m board_game_insert_generator export-cad-ir examples/simple_box.json --output "$env:TEMP\bgig-cad-ir-input.json"` : OK, fichier `cad_ir.v0` genere avec 4 composants.
+- `git diff --check` : OK apres suppression d'une ligne vide finale en trop.
+- `rg -n "adsk" src/board_game_insert_generator` : OK, aucune occurrence dans le coeur Python.
 - Smoke test manuel Fusion P4-M003 : add-in visible, message OK, modules visibles
   et dimensions conformes a la fixture.
 

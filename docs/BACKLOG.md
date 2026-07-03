@@ -362,6 +362,24 @@ commitee sans melanger plusieurs decisions structurantes.
 - Gate humaine : satisfaite par validation humaine du 2026-07-03.
 - Statut : `done` par validation humaine du 2026-07-03.
 
+### P4-M005 - Exporter une CAD IR depuis la CLI
+
+- Phase liee : Phase 4 - Generation Fusion 360 de blanks
+- Objectif : produire un fichier CAD IR JSON V0 depuis une configuration BGIG,
+  sans dependre d'une fixture manuelle.
+- Livrable attendu : commande CLI documentee avec chemin de sortie configurable.
+- Fichiers concernes : `src/board_game_insert_generator/cli.py`, `tests/`,
+  `README.md`, `docs/CAD_IR_CONTRACT.md`, `fusion_addin/README.md`.
+- Criteres d'acceptation : `examples/simple_box.json` peut produire un
+  `cad_ir_input.json` compatible avec le squelette Fusion ; le coeur Python reste
+  sans `adsk` ; les tests automatises passent.
+- Tests ou verifications : suite unitaire, exemples CLI Markdown/JSON,
+  `git diff --check`, verification `adsk` hors coeur.
+- Dependances : P4-M003.
+- Gate humaine : mission explicitement autorisee le 2026-07-03 comme mission
+  unique, sans extension de geometrie Fusion.
+- Statut : `done`.
+
 ## Phase 5 - Cavites et receptacles
 
 ### P5-M001 - Modeliser les cavites simples

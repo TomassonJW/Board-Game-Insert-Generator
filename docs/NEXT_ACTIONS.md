@@ -28,11 +28,15 @@ Contexte :
   OK, que les modules/blanks sont visibles et que les dimensions mesurees sont
   conformes a la fixture ;
 - la validation physique par impression 3D n'est pas realisee ;
-- `adsk` reste interdit dans `src/board_game_insert_generator`.
+- `adsk` reste interdit dans `src/board_game_insert_generator` ;
+- la commande `export-cad-ir` permet maintenant de regenerer un
+  `cad_ir_input.json` depuis une configuration BGIG avant copie ou usage dans
+  l'add-in.
 
 Options possibles pour la suite, a valider explicitement :
 
-- Option 1 : ameliorer le chargement local de CAD IR et l'UX d'erreur de l'add-in.
+- Option 1 : ameliorer l'UX d'erreur et d'installation autour des CAD IR
+  exportees par CLI.
 - Option 2 : etudier une sortie Assembly avec composants enfants, separee du mode
   Part Design.
 - Option 3 : revenir au coeur Python pour cavites, modules composites ou qualite

@@ -12,8 +12,9 @@ Statut : `implemente` pour le contrat V0 de blanks rectangulaires, couvert par
 tests unitaires Python purs.
 
 La sortie Fusion concrete est maintenant codee pour des blanks rectangulaires
-minimaux dans le composant racine, mais reste `manual validation required` tant
-qu'elle n'a pas ete lancee et inspectee dans Fusion 360.
+minimaux dans le composant racine. Elle a ete lancee et mesuree pour la fixture
+P4-M003, mais toute nouvelle CAD IR exportee doit rester inspectee dans Fusion.
+Cela ne vaut pas validation d'impression reelle.
 
 ## Frontieres
 
@@ -52,6 +53,21 @@ La scene contient :
 - `parameters` : valeurs utiles au futur adaptateur ;
 - `components` : un composant par instance de module ;
 - `metadata` : projet, source, strategie de layout, profil d'impression et warnings.
+
+## Export CLI
+
+La commande `export-cad-ir` execute le coeur BGIG puis serialise la scene CAD IR
+V0 dans un JSON stable et lisible :
+
+```powershell
+$env:PYTHONPATH = "src"
+python -m board_game_insert_generator export-cad-ir examples/simple_box.json --output fusion_addin/BoardGameInsertGenerator/cad_ir_input.json
+```
+
+Le chemin de sortie est libre. Pour alimenter l'add-in Fusion installe, ecrire ou
+copier le fichier genere sous le nom `cad_ir_input.json` dans le dossier
+`BoardGameInsertGenerator` charge par Fusion. L'export ne modifie pas les valeurs
+de tolerance, ne recalcule pas dans Fusion et ne cree aucun STL/3MF.
 
 ## Composants et corps
 
@@ -124,6 +140,7 @@ Le contrat V0 est valide par tests unitaires :
 - serialization des classifications et tolerances ;
 - refus d'un layout incoherent sans corps imprimable correspondant ;
 - chargement d'une fixture CAD IR locale par le squelette Fusion ;
+- export CLI d'une CAD IR JSON depuis `examples/simple_box.json` ;
 - transformation en plan de generation hors Fusion.
 
 La validation automatisee ne couvre pas l'execution reelle dans Fusion 360, les
@@ -131,7 +148,8 @@ exports STL/3MF ou l'impression reelle.
 
 ## Gate suivante
 
-`P4-M003 - Generer des blanks rectangulaires Fusion` est code pour une fixture
-CAD IR locale et pour le contrat V0. La prochaine etape est une validation
-manuelle dans Fusion 360 avant d'elargir le perimetre Fusion ou de declarer le
-jalon CAD observe.
+`P4-M003 - Generer des blanks rectangulaires Fusion` est code et valide
+manuellement pour la fixture P4-M003. L'export CLI permet maintenant de produire
+une CAD IR depuis une configuration BGIG, mais toute extension Fusion au-dela des
+blanks rectangulaires ou tout export imprimable reste soumise a une nouvelle gate
+humaine.

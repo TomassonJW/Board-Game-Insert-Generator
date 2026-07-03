@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
+from board_game_insert_generator.cad_ir import CadIrError, build_blank_cad_scene
 from board_game_insert_generator.config_loader import ConfigError, load_config
 from board_game_insert_generator.layout import LayoutError, generate_basic_layout
 from board_game_insert_generator.report import layout_to_json, layout_to_markdown
@@ -15,6 +17,8 @@ def main(argv: list[str] | None = None) -> int:
     arguments = list(sys.argv[1:] if argv is None else argv)
     if arguments and arguments[0] == "diagnose":
         return _diagnose(arguments[1:])
+    if arguments and arguments[0] == "export-cad-ir":
+        return _export_cad_ir(arguments[1:])
     return _report(arguments)
 
 
@@ -103,6 +107,60 @@ def _diagnose(argv: list[str]) -> int:
     print("\n".join(lines))
     return 0
 
+
+def _export_cad_ir(argv: list[str]) -> int:
+    parser = argparse.ArgumentParser(
+        description="Export a CAD IR V0 JSON scene from a board game insert configuration."
+    )
+    parser.add_argument("config", help="Path to a JSON configuration file.")
+    parser.add_argument(
+        "--output",
+        "-o",
+        required=True,
+        help="Output CAD IR JSON file.",
+    )
+    args = parser.parse_args(argv)
+
+    try:
+        config = load_config(args.config)
+        result = generate_basic_layout(config)
+        scene = build_blank_cad_scene(config, result)
+    except ConfigError as exc:
+        _print_error("Configuration error", exc)
+        return 2
+    except ValidationError as exc:
+        _print_error("Validation error", exc)
+        return 2
+    except LayoutError as exc:
+        _print_error("Layout error", exc)
+        return 2
+    except ToleranceError as exc:
+        _print_error("Tolerance error", exc)
+        return 2
+    except CadIrError as exc:
+        _print_error("CAD IR error", exc)
+        return 2
+
+    output_path = Path(args.output)
+    try:
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(
+            json.dumps(scene.to_dict(), indent=2) + "\n",
+            encoding="utf-8",
+        )
+    except OSError as exc:
+        _print_error("Output error", exc)
+        return 2
+
+    lines = [
+        f"CAD IR export OK - {config.project_name}",
+        f"- Output: {output_path}",
+        f"- Schema: {scene.schema_version}",
+        f"- Components: {len(scene.components)}",
+        "- Fusion input target: fusion_addin/BoardGameInsertGenerator/cad_ir_input.json",
+    ]
+    print("\n".join(lines))
+    return 0
 
 def _print_error(title: str, exc: Exception) -> None:
     print(f"{title}: {exc}", file=sys.stderr)

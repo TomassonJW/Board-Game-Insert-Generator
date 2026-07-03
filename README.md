@@ -22,7 +22,9 @@ Le depot contient :
 - des tests unitaires hors Fusion 360 ;
 - une documentation de pilotage pour travailler mission par mission.
 
-Le depot ne genere pas encore de composants Fusion 360, STL ou 3MF.
+Le depot genere maintenant des blanks rectangulaires Fusion minimaux depuis une
+CAD IR JSON locale. Il ne genere pas encore de cavites, couvercles, fillets,
+exports STL/3MF ou pieces validees par impression reelle.
 
 Consulter d'abord :
 
@@ -87,6 +89,20 @@ Resultat attendu : code de sortie `0` si la configuration se charge, si le layou
 se genere et si les rapports Markdown/JSON peuvent etre produits. En erreur, la
 CLI retourne `2` avec une categorie lisible : configuration, validation, layout
 ou tolerance.
+
+Pour exporter une CAD IR JSON V0 utilisable par l'add-in Fusion :
+
+```powershell
+$env:PYTHONPATH = "src"
+python -m board_game_insert_generator export-cad-ir examples/simple_box.json --output fusion_addin/BoardGameInsertGenerator/cad_ir_input.json
+```
+
+Le fichier genere suit le contrat `cad_ir.v0` et contient la boite de reference,
+les blanks rectangulaires, les dimensions theoriques/imprimables, les roles de
+faces et les tolerances deja calculees par le coeur Python. Pour tester dans
+Fusion, copier ce `cad_ir_input.json` dans le dossier `BoardGameInsertGenerator`
+installe par Fusion, ou utiliser directement le chemin du dossier AddIns comme
+valeur de `--output`.
 
 ## Tests
 
