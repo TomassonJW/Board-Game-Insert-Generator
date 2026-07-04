@@ -100,6 +100,8 @@ Tests, cartes backlog ou gates humaines a preparer.
 
 - `ADR-0012-capability-driven-product-pilotage.md` - pilotage produit par
   capabilities, milestones, gates et validations.
+- `ADR-0013-fusion-rectangular-cavity-cuts.md` - coupes Fusion rectangulaires
+  simples par sketch et extrusion cut.
 
 ## Regles de maintenance
 

@@ -11,8 +11,10 @@ Depuis `P4-M003`, l'add-in contient une premiere generation minimale de blocs
 rectangulaires depuis une CAD IR JSON locale. La fixture P4-M003 a ete lancee,
 inspectee et mesuree dans Fusion 360. Depuis `P4-M004`, le chargement du fichier
 CAD IR est stabilise : l'add-in peut consommer `cad_ir_input.json` dans son
-dossier ou un chemin declare dans `cad_ir_path.txt`. Toute nouvelle CAD IR
-exportee doit encore etre inspectee dans Fusion avant d'etre consideree validee.
+dossier ou un chemin declare dans `cad_ir_path.txt`. Depuis `P6-M001`, l'add-in
+code aussi les cavites rectangulaires simples depuis `subtract_rectangular_cavity`.
+Cette generation P6 reste a inspecter manuellement dans Fusion avant d'etre
+consideree validee.
 
 Ce que l'add-in cree maintenant :
 
@@ -20,11 +22,13 @@ Ce que l'add-in cree maintenant :
   imprimable ;
 - un sketch d'empreinte par blank dans le composant racine ;
 - un corps rectangulaire extrude par blank ;
+- une coupe rectangulaire verticale par operation `subtract_rectangular_cavity` ;
 - des noms lisibles pour sketches, features et bodies.
 
 Ce que l'add-in ne cree pas :
 
-- aucune cavite ;
+- aucune encoche de doigt ou demi-lune ;
+- aucun fond arrondi ;
 - aucun couvercle ;
 - aucune charniere ;
 - aucun fillet/conge ;
@@ -126,6 +130,14 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator export-cad-ir examples/simple_box.json --output fusion_addin/BoardGameInsertGenerator/cad_ir_input.json
 ```
 
+Pour tester les cavites rectangulaires P6-M001, generer plutot une CAD IR de
+tray :
+
+```powershell
+$env:PYTHONPATH = "src"
+python -m board_game_insert_generator export-cad-ir examples/simple_tray.json --output $env:TEMP\bgig-simple-tray-cad-ir.json
+```
+
 Pour une installation locale Fusion, utiliser l'une des deux methodes :
 
 1. Copier ensuite le fichier genere dans le dossier `BoardGameInsertGenerator`
@@ -153,8 +165,8 @@ Procedure :
 4. Verifier que `cad_ir_input.json` est present dans le dossier AddIns installe,
    ou que `cad_ir_path.txt` pointe vers un JSON CAD IR exporte et existant.
 5. Lancer `Board Game Insert Generator` depuis `Utilities > Add-ins`.
-6. Verifier le message final : il doit annoncer 1 reference outline, 2 blank
-   bodies et une creation dans le composant racine.
+6. Verifier le message final : il doit annoncer le nombre de reference outlines,
+   blank bodies et rectangular cavity cuts crees dans le composant racine.
 7. Dans le navigateur Fusion, verifier dans le composant racine la presence de
    sketches nommes :
    - `BGIG box reference - not printable outline` ;
@@ -163,10 +175,17 @@ Procedure :
 8. Verifier les bodies nommes :
    - `cards-main-01 rectangular blank` ;
    - `dice-01 rectangular blank`.
-9. Avec `Inspect > Measure`, verifier les dimensions attendues des blanks :
+9. Avec `Inspect > Measure`, verifier les dimensions attendues des blanks P4 :
    - `cards-main-01` : `68.9 x 99.2 x 44.0 mm` ;
    - `dice-01` : `59.7 x 59.2 x 29.0 mm`.
-10. Noter tout ecart, message d'erreur ou comportement Zero Doc dans un futur log
+10. Pour le smoke test P6-M001, pointer `cad_ir_path.txt` vers la CAD IR generee
+    depuis `examples/simple_tray.json`, relancer l'add-in et verifier :
+    - message final : `Blank bodies: 1` et `Rectangular cavity cuts: 1` ;
+    - body cible : `token-tray-01 rectangular blank` ;
+    - footprint de cavite attendue : `62.0 x 52.0 mm` ;
+    - profondeur de coupe attendue : `20.0 mm` ;
+    - plancher conserve attendu : `3.0 mm`.
+11. Noter tout ecart, message d'erreur ou comportement Zero Doc dans un futur log
     de validation.
 
 Ce smoke test valide uniquement la creation CAD minimale dans Fusion. Il utilise
@@ -187,7 +206,7 @@ Les tests doivent rester independants de Fusion 360. Toute future logique qui ne
 necessite pas l'API Fusion doit d'abord vivre dans `fusion_skeleton.py` ou un
 module adjacent sans import `adsk`.
 
-## Frontiere P4-M004
+## Frontiere P6-M001
 
 La conversion actuelle stabilisee :
 
@@ -197,6 +216,7 @@ La conversion actuelle stabilisee :
 - cree une esquisse de reference de boite dans le composant racine ;
 - cree des rectangles dans le composant racine puis extrude des bodies simples
   pour les blanks ;
+- cree des coupes rectangulaires verticales simples pour `subtract_rectangular_cavity` ;
 - marque la validation Fusion comme manuelle.
 
 Toute mission suivante qui elargit le perimetre Fusion doit recevoir une

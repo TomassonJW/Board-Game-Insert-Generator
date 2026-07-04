@@ -104,9 +104,9 @@ La scene V0 contient :
 L'adaptateur Fusion convertit cette representation en operations CAO sans
 recalculer layout ou tolerances.
 
-## Premiere cible Fusion
+## Cible Fusion actuelle
 
-La premiere cible Fusion se limite a des blanks rectangulaires :
+La cible Fusion actuelle a commence par des blanks rectangulaires et ajoute maintenant les cavites rectangulaires simples :
 
 - sketches, features et bodies nommes dans le composant racine ;
 - dimensions issues de `printable_origin_mm` et `printable_size_mm` ;
@@ -114,12 +114,49 @@ La premiere cible Fusion se limite a des blanks rectangulaires :
 - aucun creusage avance execute dans Fusion ;
 - aucune encoche de doigt, demi-lune, aide de prise en main ou fond arrondi
   execute dans Fusion ;
-- les cavites P5 et leurs features ergonomiques P5-M004 peuvent etre presentes
-  dans la CAD IR mais restent `abstract_only` ;
+- les cavites rectangulaires simples P5 peuvent etre presentes dans la CAD IR
+  et sont executees par P6-M001 sous forme de cuts rectangulaires verticaux ;
+- les features ergonomiques P5-M004 restent `abstract_only` et non executees ;
 - aucun couvercle ;
 - aucun fillet/conge ;
 - aucun export STL/3MF ;
 - aucun algorithme d'optimisation nouveau.
+
+
+## Coupes rectangulaires P6-M001
+
+Depuis `P6-M001`, l'add-in peut executer l'operation CAD IR
+`subtract_rectangular_cavity` pour les cavites rectangulaires simples.
+
+Convention retenue :
+
+- Fusion consomme uniquement les dimensions deja resolues dans la CAD IR ;
+- la footprint X/Y de la coupe vient de `parameters.local_origin_mm.x/y` et
+  `parameters.size_mm.x/y` ;
+- la coupe commence sur le dessus du blank imprime (`printable_origin_mm.z + printable_size_mm.z`) et descend verticalement de `parameters.size_mm.z` ;
+- `parameters.local_origin_mm.z` est interprete par l'adaptateur comme garde de
+  plancher minimale demandee ;
+- la coupe est refusee si elle depasse le blank X/Y, si sa profondeur retire tout
+  le corps, ou si le plancher conserve est inferieur a `local_origin_mm.z` ;
+- les operations `describe_cavity_feature` restent ignorees par la generation
+  Fusion reelle.
+
+Choix API Fusion : `sketch + extrusion cut` avec `CutFeatureOperation`,
+`DistanceExtentDefinition`, `NegativeExtentDirection` et `participantBodies` pour
+limiter la coupe au body cible. Ce choix reste plus lisible et testable qu'un
+B-Rep direct pour des cavites rectangulaires simples.
+
+Validation : le code et le plan hors Fusion sont testes automatiquement, mais la
+creation et la mesure dans Fusion restent `manual validation required` tant que
+Thomas n'a pas execute le smoke test P6-M001.
+
+Liens de reference :
+
+- <https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/ExtrudeFeatures_createInput.htm>
+- <https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/FeatureOperations.htm>
+- <https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/ExtrudeFeatureInput_setOneSideExtent.htm>
+- <https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/DistanceExtentDefinition_create.htm>
+- <https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/ParticipantBodiesSample_Sample.htm>
 
 ## Vue compacte et vue eclatee
 
@@ -195,19 +232,23 @@ Tests hors Fusion :
 - plan de generation Fusion sans import `adsk` ;
 - resolution du fichier CAD IR et erreurs de chargement testees hors Fusion ;
 - conversion millimetres vers centimetres internes Fusion ;
-- compatibilite des CAD IR enrichies avec cavites abstraites, sans execution de
-  coupe Fusion.
+- compatibilite des CAD IR enrichies avec cavites et features abstraites ;
+- plan de coupes rectangulaires simples depuis `subtract_rectangular_cavity` ;
+- garde-fous hors Fusion pour debordement X/Y, profondeur impossible, plancher
+  insuffisant et body cible absent.
 
 Verifications dans Fusion :
 
 - presence du sketch de reference non imprimable dans le composant racine ;
 - presence des bodies de blanks dans le composant racine ;
-- absence de generation reelle pour `subtract_rectangular_cavity` et
-  `describe_cavity_feature` ;
+- presence de coupes reelles pour `subtract_rectangular_cavity` des cavites
+  rectangulaires simples ;
+- absence de generation reelle pour `describe_cavity_feature` ;
 - noms ;
 - dimensions ;
 - origines ;
-- absence de cavites, couvercles, fillets et exports ;
+- dimensions et positions des cavites rectangulaires simples ;
+- absence d'encoches, fonds arrondis, couvercles, fillets et exports ;
 - absence de recalcul metier dans l'adaptateur.
 
 ## Limitations attendues
@@ -225,7 +266,9 @@ toute integration Fusion 360 executable. La mission `P4-M001` a livre le contrat
 CAD-agnostic. La mission `P4-M002` ajoute un squelette d'adaptateur isole. La
 mission `P4-M003` code la premiere generation minimale de blanks rectangulaires.
 La mission de stabilisation P4-M004/P4-M006 rend le chemin CAD IR consommable par
-Fusion plus robuste sans ajouter de geometrie.
+Fusion plus robuste sans ajouter de geometrie. La mission `P6-M001` ajoute la
+premiere execution reelle limitee de cavites rectangulaires simples, encore sous
+validation manuelle Fusion.
 
 La fixture P4-M003 a ete validee manuellement dans Fusion. Toute nouvelle CAD IR
 exportee doit encore etre inspectee dans Fusion avant d'etre consideree validee,
@@ -242,7 +285,8 @@ Avant d'elargir la generation Fusion :
 - la validation manuelle P4-M003 est documentee, mais toute nouvelle CAD IR doit
   etre inspectee avant usage ;
 - aucune logique metier nouvelle ne doit etre prevue uniquement dans Fusion ;
-- toute execution reelle de cavite, extrusion cut ou boolean soustractif doit
+- toute execution reelle au-dela des cavites rectangulaires simples P6-M001,
+  notamment features ergonomiques, booleans complexes ou geometrie courbe, doit
   repasser par une gate humaine dediee ;
 - toute vue eclatee executable ou repositionnement CAD non trivial doit etre
   limite a une mission dediee et documentee.

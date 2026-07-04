@@ -150,20 +150,30 @@ cible asset-first et volumetrique. Elle ajoute une capability map, des strategie
 cibles pour assets, layers, solveur, accessibilite et vues eclatees, ainsi qu'une
 ADR de pilotage par capabilities. Aucun comportement moteur, aucune tolerance et
 aucune geometrie Fusion ne changent.
+
+La mission `P6-M001` du 2026-07-04 code la premiere generation Fusion reelle de
+cavites rectangulaires simples. L'add-in transforme les operations CAD IR
+`subtract_rectangular_cavity` en coupes rectangulaires verticales depuis le dessus
+du blank, limitees au body cible via `participantBodies`. Les features
+ergonomiques, fonds arrondis, fillets, booleans complexes et exports restent hors
+perimetre. La generation P6 est codee et testee hors Fusion, mais reste
+`manual validation required` tant que le smoke test Fusion n'a pas ete execute et
+mesure.
 ## Phase active
 
-Phase active : **Gate Phase 6 ou specification volumetrique Phase 8**.
+Phase active : **Validation manuelle P6-M001 ou specification volumetrique Phase 8**.
 
 Etat : le pipeline P4 reste stable pour les blanks rectangulaires Fusion. La
-vague P5 est terminee cote moteur Python pur, configuration, rapports et CAD IR :
-les cavites et features ergonomiques sont abstraites et exportables, mais non
-generees dans Fusion. La North Star cible maintenant un generateur volumetrique
-asset-first, pilote par capabilities.
+vague P5 est terminee cote moteur Python pur, configuration, rapports et CAD IR.
+P6-M001 code maintenant les cavites rectangulaires simples dans Fusion, mais la
+sortie doit encore etre inspectee et mesuree manuellement. La North Star cible un
+generateur volumetrique asset-first, pilote par capabilities.
 
-Prochaine decision : autoriser ou reporter `P6-M001 - Generer les cavites
-rectangulaires simples dans Fusion`. Si cette gate est reportee, la prochaine
-mission non gated recommandee est `P8-M001 - Specifier la grille volumetrique 3D
-et les layers`.
+Prochaine action : executer `P6-M001V - Valider manuellement les cavites
+rectangulaires Fusion` avec `examples/simple_tray.json`. Tant que cette validation
+n'est pas enregistree, ne pas lancer P6-M002 ni de nouvelle geometrie Fusion
+reelle. Si Fusion est volontairement reportee, la prochaine mission non gated
+recommandee reste `P8-M001 - Specifier la grille volumetrique 3D et les layers`.
 
 ## Implemente
 
@@ -215,6 +225,9 @@ et les layers`.
   `meeples` resolues depuis le profil actif et tracables via `clearance_source`.
 - Features ergonomiques abstraites de cavites P5-M004 chargees, validees,
   reportees et exportees dans la CAD IR par `describe_cavity_feature`.
+- Generation Fusion codee de cavites rectangulaires simples P6-M001 depuis
+  `subtract_rectangular_cavity`, avec coupe verticale limitee au body cible et
+  validation manuelle requise.
 - Pilotage produit par North Star, Product Pillars, Capability Map, milestones,
   epics, missions, gates et validations.
 - Roadmap 0-14 alignee avec la cible volumetrique asset-first.
@@ -230,9 +243,11 @@ et les layers`.
   sont pas encore detectes automatiquement par des modules composites.
 - Les `PrimitiveVolume`, `CompositeModule` et `Feature` existent comme concepts
   mais ne pilotent pas encore une generation complete.
-- Les cavites P5-M001/P5-M002/P5-M003 et les features ergonomiques P5-M004 sont
-  abstraites : elles ne sont pas encore coupees ni generees dans Fusion et ne
-  sont pas validees par impression.
+- Les features ergonomiques P5-M004 sont abstraites : elles ne sont pas encore
+  generees dans Fusion et ne sont pas validees par impression.
+- Les cavites rectangulaires P6-M001 sont codees dans Fusion mais restent a
+  valider manuellement par smoke test Fusion avant d'etre declarees
+  `fusion-validated`.
 - Les tolerances par defaut et les profils d'impression sont prudents mais non
   calibres sur impression.
 - Les dataclasses restent volontairement legeres ; les erreurs metier sont
@@ -247,9 +262,9 @@ et les layers`.
 ## Prevu
 
 - Strategie de layout `columns`.
-- Decision humaine sur le prochain perimetre Fusion apres stabilisation P4-M004/P4-M006.
-- Generation Fusion reelle de cavites, encoches de doigts, fonds arrondis,
-  fillets, conges, operations soustractives ou booleans, sous gate humaine.
+- Validation manuelle Fusion P6-M001 des cavites rectangulaires simples.
+- Generation Fusion reelle d'encoches de doigts, fonds arrondis, fillets,
+  conges, booleans complexes ou geometrie courbe, sous nouvelle gate humaine.
 - Modules composites en L/T.
 - Couvercles, rainures et mecanismes.
 - Surcouche esthetique.
@@ -285,18 +300,20 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant `P0-M009 - Realignement strategique produit/capabilities` :
+Derniere verification pendant `P6-M001 - Generer les cavites rectangulaires simples dans Fusion` :
 
-- `python -m unittest discover -s tests` : OK, 92 tests passes.
-- `python -m board_game_insert_generator examples\simple_box.json --format markdown --output $env:TEMP\bgig-simple_box.md` : OK.
-- `python -m board_game_insert_generator examples\simple_box.json --format json --output $env:TEMP\bgig-simple_box.json` : OK.
-- `python -m board_game_insert_generator export-cad-ir examples\simple_box.json --output $env:TEMP\bgig-simple_box-cad-ir.json` : OK, schema `cad_ir.v0`, 4 composants.
-- `python -m board_game_insert_generator examples\simple_grid.json --format markdown --output $env:TEMP\bgig-simple_grid.md` : OK.
-- `python -m board_game_insert_generator examples\simple_grid.json --format json --output $env:TEMP\bgig-simple_grid.json` : OK.
-- `python -m board_game_insert_generator export-cad-ir examples\simple_grid.json --output $env:TEMP\bgig-simple_grid-cad-ir.json` : OK, schema `cad_ir.v0`, 4 composants.
-- `python -m board_game_insert_generator examples\simple_finger_notch_tray.json --format markdown --output $env:TEMP\bgig-simple_finger_notch_tray.md` : OK.
-- `python -m board_game_insert_generator examples\simple_finger_notch_tray.json --format json --output $env:TEMP\bgig-simple_finger_notch_tray.json` : OK.
-- `python -m board_game_insert_generator export-cad-ir examples\simple_finger_notch_tray.json --output $env:TEMP\bgig-simple_finger_notch_tray-cad-ir.json` : OK, schema `cad_ir.v0`, 1 composant.
+- `python -m unittest discover -s tests` : OK, 96 tests passes.
+- `python -m board_game_insert_generator examples\simple_box.json --format markdown` : OK.
+- `python -m board_game_insert_generator examples\simple_box.json --format json` : OK.
+- `python -m board_game_insert_generator export-cad-ir examples\simple_box.json` : OK, schema `cad_ir.v0`, 4 composants.
+- `python -m board_game_insert_generator examples\simple_tray.json --format markdown/json` : OK.
+- `python -m board_game_insert_generator export-cad-ir examples\simple_tray.json` : OK, schema `cad_ir.v0`, 1 composant, 1 cavity cut planifiee.
+- `python -m board_game_insert_generator examples\simple_card_tray.json --format markdown/json` : OK.
+- `python -m board_game_insert_generator export-cad-ir examples\simple_card_tray.json` : OK, schema `cad_ir.v0`, 2 composants.
+- `python -m board_game_insert_generator examples\simple_open_tray.json --format markdown/json` : OK.
+- `python -m board_game_insert_generator export-cad-ir examples\simple_open_tray.json` : OK, schema `cad_ir.v0`, 3 composants.
+- `python -m board_game_insert_generator examples\simple_finger_notch_tray.json --format markdown/json` : OK.
+- `python -m board_game_insert_generator export-cad-ir examples\simple_finger_notch_tray.json` : OK, schema `cad_ir.v0`, 1 composant, feature ergonomique non executee.
 - `git diff --check` : OK.
 - `rg -n "adsk" src/board_game_insert_generator` : OK, aucune occurrence dans le coeur Python.
 

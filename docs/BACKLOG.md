@@ -7,7 +7,7 @@ doit indiquer au minimum : ID, titre, capability liee, milestone lie, objectif,
 livrable, criteres d'acceptation, tests, gate eventuelle et statut.
 
 Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
-`deferred`.
+`manual_validation_required`, `deferred`.
 
 ## Phase 0 - Fondation projet
 
@@ -168,7 +168,19 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Livrable : add-in Fusion limite aux cuts rectangulaires, fixture CAD IR, smoke test manuel.
 - Criteres d'acceptation : aucune logique metier dans Fusion, noms lisibles, dimensions controlees, absence STL/3MF.
 - Tests : unitaires hors Fusion, CLI export CAD IR, `rg -n "adsk" src/board_game_insert_generator`, smoke test manuel Fusion.
-- Gate : validation humaine obligatoire avant implementation.
+- Gate : validation humaine validee le 2026-07-04 pour les cuts rectangulaires simples uniquement.
+- Statut : `done` pour le code, `manual validation required` dans Fusion.
+
+
+### P6-M001V - Valider manuellement les cavites rectangulaires Fusion
+
+- Capability : C-FUSION-CAVITIES.
+- Milestone : M5 CAD cavities.
+- Objectif : lancer l'add-in P6-M001 dans Fusion avec une CAD IR de tray et mesurer blank, cavite et plancher conserve.
+- Livrable : log de validation manuelle Fusion avec captures ou mesures.
+- Criteres d'acceptation : message final OK, 1 blank, 1 cavity cut, dimensions et plancher conformes a la CAD IR.
+- Tests : smoke test manuel Fusion, aucune validation d'impression revendiquee.
+- Gate : action humaine Thomas.
 - Statut : `blocked`.
 
 ### P6-M002 - Etudier les features ergonomiques Fusion simples

@@ -18,43 +18,33 @@ structurant, authentification absente ou refus de push direct.
 
 ## Gate humaine active
 
-Statut : `blocked`.
+Statut : `manual_validation_required`.
 
-Decision demandee : autoriser, reporter ou recadrer `P6-M001 - Generer les
-cavites rectangulaires simples dans Fusion`.
+Action demandee : executer le smoke test manuel `P6-M001V - Valider les cavites
+rectangulaires Fusion`.
 
 Contexte :
 
-- North Star realignee vers un generateur volumetrique asset-first ;
-- `C-CAVITY` et `C-FEATURE` sont `implemented-cad-ir`, pas `implemented-fusion` ;
-- `C-FUSION-CAVITIES` et `C-FILLETS` restent `blocked` ;
-- les rapports Markdown/JSON et la CAD IR exposent `subtract_rectangular_cavity`
-  et `describe_cavity_feature` avec `fusion_generation: not_implemented` ;
-- l'add-in Fusion actuel reste limite aux blanks rectangulaires et a la lecture
-  CAD IR.
+- la gate humaine P6-M001 a autorise les cavites rectangulaires simples dans
+  Fusion ;
+- l'add-in code maintenant `subtract_rectangular_cavity` sous forme de coupe
+  rectangulaire verticale limitee au body cible ;
+- les features ergonomiques `describe_cavity_feature`, encoches, fonds arrondis,
+  fillets, couvercles et exports restent hors perimetre ;
+- le coeur Python reste sans `adsk` et Fusion ne recalcule pas layout,
+  tolerances ou clearances.
 
-Options :
+Validation attendue de l'humain :
 
-1. Autoriser `P6-M001` : generation Fusion limitee aux cavites rectangulaires
-   simples, sans encoche, fond arrondi, fillet, export STL/3MF ni recalcul
-   metier dans Fusion.
-2. Autoriser une ADR technique avant code Fusion : strategie de cuts, booleans,
-   robustesse et smoke test manuel.
-3. Reporter Fusion et continuer hors gate avec `P8-M001 - Specifier la grille
-   volumetrique 3D`.
-4. Autoriser directement encoches/fonds arrondis reels dans Fusion : option
-   deconseillee tant que les cuts rectangulaires ne sont pas stables.
+- generer une CAD IR depuis `examples/simple_tray.json` ;
+- la charger dans l'add-in via `cad_ir_path.txt` ou `cad_ir_input.json` ;
+- lancer l'add-in dans un design Fusion de test ;
+- verifier le message final, le blank, la cavite rectangulaire et le plancher
+  conserve ;
+- documenter les mesures avant toute mission Fusion suivante.
 
-Recommandation : option 1 si l'objectif est de prouver le prochain maillon
-Fusion, option 3 si l'objectif est de renforcer la conception volumetrique avant
-de toucher a la geometrie reelle.
-
-Validation attendue de l'humain pour P6-M001 :
-
-- type exact d'operation Fusion autorise ;
-- limites explicites sur booleans, encoches, fonds arrondis et fillets ;
-- fixture CAD IR a utiliser ;
-- procedure de smoke test manuel attendue dans Fusion 360.
+Tant que cette validation n'est pas enregistree, ne pas lancer P6-M002 ni de
+nouvelle geometrie Fusion reelle.
 
 ## Mission ready non gated si Fusion est reportee
 

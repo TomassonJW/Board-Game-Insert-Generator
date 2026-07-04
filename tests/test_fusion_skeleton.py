@@ -15,6 +15,7 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     DEFAULT_CAD_IR_INPUT_FILENAME,
     DOCUMENT_STATUS_READY,
     DOCUMENT_STATUS_ZERO_DOC,
+    CAVITY_CUT_OPERATION_KIND,
     FUSION_MANUAL_VALIDATION_REQUIRED,
     PLAN_STATUS_PLANNED_ONLY,
     FusionSkeletonError,
@@ -230,6 +231,48 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(mm_to_cm(1.0), 0.1)
         self.assertAlmostEqual(mm_to_cm(68.9), 6.89)
 
+
+    def test_builds_cavity_cut_plan_from_simple_tray_cad_ir(self) -> None:
+        payload = _cad_ir_payload_from_example("simple_tray.json")
+
+        plan = generation_plan_from_cad_ir(payload)
+
+        self.assertEqual(len(plan.blanks), 1)
+        self.assertEqual(len(plan.cavity_cuts), 1)
+        cut = plan.cavity_cuts[0]
+        self.assertEqual(cut.operation_kind, CAVITY_CUT_OPERATION_KIND)
+        self.assertEqual(cut.cavity_id, "token-pocket")
+        self.assertEqual(cut.target_body_id, "token-tray-01-body")
+        self.assertEqual(cut.cut_origin_mm.to_dict(), {"x": 4.8, "y": 4.8, "z": 23.0})
+        self.assertEqual(cut.cut_size_mm.to_dict(), {"x": 62.0, "y": 52.0, "z": 20.0})
+        self.assertEqual(cut.requested_local_origin_mm.to_dict(), {"x": 4.0, "y": 4.0, "z": 1.2})
+        self.assertAlmostEqual(cut.retained_floor_mm, 3.0)
+        self.assertEqual(cut.validation_status, FUSION_MANUAL_VALIDATION_REQUIRED)
+
+    def test_cavity_feature_operations_are_not_executed_as_fusion_cuts(self) -> None:
+        payload = _cad_ir_payload_from_example("simple_finger_notch_tray.json")
+
+        plan = generation_plan_from_cad_ir(payload)
+
+        self.assertEqual(len(plan.cavity_cuts), 1)
+        self.assertEqual(plan.cavity_cuts[0].cavity_id, "token-pocket")
+
+    def test_rejects_cavity_cut_that_exceeds_printable_blank_xy(self) -> None:
+        payload = _cad_ir_payload_from_example("simple_tray.json")
+        operation = payload["components"][0]["body"]["operations"][1]
+        operation["parameters"]["size_mm"]["x"] = 80.0
+
+        with self.assertRaisesRegex(FusionSkeletonError, "exceeds printable blank width"):
+            generation_plan_from_cad_ir(payload)
+
+    def test_rejects_cavity_cut_that_removes_the_requested_floor(self) -> None:
+        payload = _cad_ir_payload_from_example("simple_tray.json")
+        operation = payload["components"][0]["body"]["operations"][1]
+        operation["parameters"]["size_mm"]["z"] = 22.5
+
+        with self.assertRaisesRegex(FusionSkeletonError, "below CAD IR local_origin.z"):
+            generation_plan_from_cad_ir(payload)
+
     def test_addin_manifest_matches_current_fusion_contract(self) -> None:
         addin_dir = ROOT / "fusion_addin" / "BoardGameInsertGenerator"
         script_path = addin_dir / "BoardGameInsertGenerator.py"
@@ -256,6 +299,10 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertNotIn("addNewComponent", source)
         self.assertIn("root_component.sketches.add", source)
         self.assertIn("root_component.features.extrudeFeatures.addSimple", source)
+        self.assertIn("FeatureOperations.CutFeatureOperation", source)
+        self.assertIn("participantBodies", source)
+        self.assertIn("setOneSideExtent", source)
+        self.assertIn("NegativeExtentDirection", source)
         self.assertIn("compatible with Part Design documents", source)
         self.assertIn("resolve_cad_ir_input_path", source)
         self.assertIn("cad_ir_input_guidance", source)
@@ -263,7 +310,11 @@ class FusionSkeletonTests(unittest.TestCase):
 
 
 def _cad_ir_payload() -> dict:
-    config = load_config(ROOT / "examples" / "simple_box.json")
+    return _cad_ir_payload_from_example("simple_box.json")
+
+
+def _cad_ir_payload_from_example(filename: str) -> dict:
+    config = load_config(ROOT / "examples" / filename)
     layout = generate_basic_layout(config)
     return build_blank_cad_scene(config, layout).to_dict()
 

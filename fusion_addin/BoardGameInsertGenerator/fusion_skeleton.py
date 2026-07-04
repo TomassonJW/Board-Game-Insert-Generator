@@ -22,6 +22,8 @@ DOCUMENT_STATUS_READY = "ready"
 DOCUMENT_STATUS_ZERO_DOC = "zero_doc"
 
 PLAN_STATUS_PLANNED_ONLY = "planned_only"
+CAVITY_CUT_OPERATION_KIND = "subtract_rectangular_cavity"
+CAVITY_FEATURE_OPERATION_KIND = "describe_cavity_feature"
 FUSION_MANUAL_VALIDATION_REQUIRED = "manual_validation_required"
 
 
@@ -104,23 +106,59 @@ class FusionSolidPlan:
 
 
 @dataclass(frozen=True)
+class FusionCavityCutPlan:
+    """One top-open rectangular cavity cut to execute against a blank body."""
+
+    component_id: str
+    component_name: str
+    target_body_id: str
+    target_body_name: str
+    operation_id: str
+    cavity_id: str
+    cut_origin_mm: FusionVectorMm
+    cut_size_mm: FusionVectorMm
+    requested_local_origin_mm: FusionVectorMm
+    retained_floor_mm: float
+    operation_kind: str = CAVITY_CUT_OPERATION_KIND
+    validation_status: str = FUSION_MANUAL_VALIDATION_REQUIRED
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "component_id": self.component_id,
+            "component_name": self.component_name,
+            "target_body_id": self.target_body_id,
+            "target_body_name": self.target_body_name,
+            "operation_id": self.operation_id,
+            "operation_kind": self.operation_kind,
+            "cavity_id": self.cavity_id,
+            "cut_origin_mm": self.cut_origin_mm.to_dict(),
+            "cut_size_mm": self.cut_size_mm.to_dict(),
+            "requested_local_origin_mm": self.requested_local_origin_mm.to_dict(),
+            "retained_floor_mm": self.retained_floor_mm,
+            "validation_status": self.validation_status,
+        }
+
+
+@dataclass(frozen=True)
 class FusionGenerationPlan:
     """Pure-Python plan consumed by the Fusion API entry point."""
 
     project_name: str
     reference_box: FusionSolidPlan
     blanks: tuple[FusionSolidPlan, ...]
+    cavity_cuts: tuple[FusionCavityCutPlan, ...] = ()
     validation_status: str = FUSION_MANUAL_VALIDATION_REQUIRED
 
     @property
     def created_object_count(self) -> int:
-        return 1 + len(self.blanks)
+        return 1 + len(self.blanks) + len(self.cavity_cuts)
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "project_name": self.project_name,
             "reference_box": self.reference_box.to_dict(),
             "blanks": [blank.to_dict() for blank in self.blanks],
+            "cavity_cuts": [cut.to_dict() for cut in self.cavity_cuts],
             "validation_status": self.validation_status,
         }
 
@@ -377,6 +415,7 @@ def generation_plan_from_cad_ir(payload: Any) -> FusionGenerationPlan:
     )
 
     blanks: list[FusionSolidPlan] = []
+    cavity_cuts: list[FusionCavityCutPlan] = []
     for component in validated_payload["components"]:
         if not isinstance(component, dict):
             raise FusionSkeletonError("Each CAD IR component must be an object.")
@@ -394,7 +433,7 @@ def generation_plan_from_cad_ir(payload: Any) -> FusionGenerationPlan:
         body_kind = _required_text(body, "kind", f"component {component_id} body")
         if body_kind != "rectangular_blank":
             raise FusionSkeletonError(
-                f"CAD IR body kind {body_kind!r} is not supported by P4-M003."
+                f"CAD IR body kind {body_kind!r} is not supported by current Fusion generation."
             )
 
         operations = body.get("operations")
@@ -404,36 +443,134 @@ def generation_plan_from_cad_ir(payload: Any) -> FusionGenerationPlan:
             )
         operation = _single_rectangular_prism_operation(operations, component_id)
         body_id = _required_text(body, "id", f"component {component_id} body")
-        blanks.append(
-            FusionSolidPlan(
-                cad_id=body_id,
-                component_name=component_name,
-                body_name=_fusion_name(_optional_text(body, "name") or body_id),
-                origin_mm=_vector_from_payload(
-                    body,
-                    "printable_origin_mm",
-                    f"component {component_id} printable origin",
-                ),
-                size_mm=_vector_from_payload(
-                    body,
-                    "printable_size_mm",
-                    f"component {component_id} printable size",
-                ),
-                role="rectangular_blank",
-                printable=True,
-                operation_kind=_required_text(
-                    operation,
-                    "kind",
-                    f"component {component_id} operation",
-                ),
-            )
+        blank = FusionSolidPlan(
+            cad_id=body_id,
+            component_name=component_name,
+            body_name=_fusion_name(_optional_text(body, "name") or body_id),
+            origin_mm=_vector_from_payload(
+                body,
+                "printable_origin_mm",
+                f"component {component_id} printable origin",
+            ),
+            size_mm=_vector_from_payload(
+                body,
+                "printable_size_mm",
+                f"component {component_id} printable size",
+            ),
+            role="rectangular_blank",
+            printable=True,
+            operation_kind=_required_text(
+                operation,
+                "kind",
+                f"component {component_id} operation",
+            ),
         )
+        blanks.append(blank)
+        cavity_cuts.extend(_cavity_cut_plans(component_id, component_name, blank, operations))
 
     return FusionGenerationPlan(
         project_name=project_name,
         reference_box=reference_box,
         blanks=tuple(blanks),
+        cavity_cuts=tuple(cavity_cuts),
     )
+
+
+def _cavity_cut_plans(
+    component_id: str,
+    component_name: str,
+    blank: FusionSolidPlan,
+    operations: list[Any],
+) -> list[FusionCavityCutPlan]:
+    cut_plans: list[FusionCavityCutPlan] = []
+    for operation in operations:
+        if not isinstance(operation, dict):
+            raise FusionSkeletonError(
+                f"CAD IR body {blank.cad_id!r} operation must be an object."
+            )
+        operation_kind = operation.get("kind")
+        if operation_kind == CAVITY_FEATURE_OPERATION_KIND:
+            continue
+        if operation_kind != CAVITY_CUT_OPERATION_KIND:
+            continue
+
+        parameters = operation.get("parameters")
+        if not isinstance(parameters, dict):
+            raise FusionSkeletonError(
+                f"CAD IR cavity operation for body {blank.cad_id!r} must contain parameters."
+            )
+        if parameters.get("coordinate_frame") != "body.local":
+            raise FusionSkeletonError(
+                f"CAD IR cavity operation for body {blank.cad_id!r} must use body.local coordinates."
+            )
+
+        local_origin = _vector_from_payload(
+            parameters,
+            "local_origin_mm",
+            f"body {blank.cad_id} cavity local origin",
+        )
+        cavity_size = _positive_vector_from_payload(
+            parameters,
+            "size_mm",
+            f"body {blank.cad_id} cavity size",
+        )
+        cavity_id = _required_text(
+            parameters,
+            "cavity_id",
+            f"body {blank.cad_id} cavity operation",
+        )
+        _validate_cavity_cut_bounds(blank, local_origin, cavity_size, cavity_id)
+        retained_floor_mm = blank.size_mm.z - cavity_size.z
+        cut_plans.append(
+            FusionCavityCutPlan(
+                component_id=component_id,
+                component_name=component_name,
+                target_body_id=blank.cad_id,
+                target_body_name=blank.body_name,
+                operation_id=_required_text(
+                    operation,
+                    "id",
+                    f"body {blank.cad_id} cavity operation",
+                ),
+                cavity_id=cavity_id,
+                cut_origin_mm=FusionVectorMm(
+                    x=blank.origin_mm.x + local_origin.x,
+                    y=blank.origin_mm.y + local_origin.y,
+                    z=blank.origin_mm.z + blank.size_mm.z,
+                ),
+                cut_size_mm=cavity_size,
+                requested_local_origin_mm=local_origin,
+                retained_floor_mm=retained_floor_mm,
+            )
+        )
+    return cut_plans
+
+
+def _validate_cavity_cut_bounds(
+    blank: FusionSolidPlan,
+    local_origin: FusionVectorMm,
+    cavity_size: FusionVectorMm,
+    cavity_id: str,
+) -> None:
+    if local_origin.x + cavity_size.x > blank.size_mm.x:
+        raise FusionSkeletonError(
+            f"Cavity {cavity_id!r} exceeds printable blank width for {blank.body_name!r}."
+        )
+    if local_origin.y + cavity_size.y > blank.size_mm.y:
+        raise FusionSkeletonError(
+            f"Cavity {cavity_id!r} exceeds printable blank depth for {blank.body_name!r}."
+        )
+    if cavity_size.z >= blank.size_mm.z:
+        raise FusionSkeletonError(
+            f"Cavity {cavity_id!r} depth must be lower than printable blank height for {blank.body_name!r}."
+        )
+
+    retained_floor_mm = blank.size_mm.z - cavity_size.z
+    if retained_floor_mm < local_origin.z:
+        raise FusionSkeletonError(
+            f"Cavity {cavity_id!r} would leave {retained_floor_mm:.2f} mm of floor, "
+            f"below CAD IR local_origin.z {local_origin.z:.2f} mm."
+        )
 
 
 def mm_to_cm(value_mm: float) -> float:
@@ -454,7 +591,7 @@ def _single_rectangular_prism_operation(
     ]
     if len(rectangular_operations) != 1:
         raise FusionSkeletonError(
-            "P4-M003 expects exactly one create_rectangular_prism operation "
+            "Current Fusion generation expects exactly one create_rectangular_prism operation "
             f"for component {component_id!r}."
         )
     return rectangular_operations[0]
@@ -476,6 +613,22 @@ def _vector_from_payload(
     )
 
 
+def _positive_vector_from_payload(
+    source: dict[str, Any],
+    key: str,
+    label: str,
+) -> FusionVectorMm:
+    value = source.get(key)
+    if not isinstance(value, dict):
+        raise FusionSkeletonError(f"CAD IR {label} must be an object.")
+
+    return FusionVectorMm(
+        x=_required_positive_number(value, "x", label),
+        y=_required_positive_number(value, "y", label),
+        z=_required_positive_number(value, "z", label),
+    )
+
+
 def _first_path_value(path: Path) -> str | None:
     for line in path.read_text(encoding="utf-8").splitlines():
         value = line.strip()
@@ -491,6 +644,13 @@ def _required_number(source: dict[str, Any], key: str, label: str) -> float:
     number = float(value)
     if number < 0:
         raise FusionSkeletonError(f"CAD IR {label} {key} must be non-negative.")
+    return number
+
+
+def _required_positive_number(source: dict[str, Any], key: str, label: str) -> float:
+    number = _required_number(source, key, label)
+    if number <= 0:
+        raise FusionSkeletonError(f"CAD IR {label} {key} must be greater than zero.")
     return number
 
 

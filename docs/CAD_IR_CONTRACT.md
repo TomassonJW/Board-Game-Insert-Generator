@@ -12,9 +12,10 @@ Statut : `implemente` pour le contrat V0 de blanks rectangulaires, couvert par
 tests unitaires Python purs.
 
 La sortie Fusion concrete est maintenant codee pour des blanks rectangulaires
-minimaux dans le composant racine. Elle a ete lancee et mesuree pour la fixture
-P4-M003, mais toute nouvelle CAD IR exportee doit rester inspectee dans Fusion.
-Cela ne vaut pas validation d'impression reelle.
+minimaux et des cavites rectangulaires simples dans le composant racine. Les
+blanks P4-M003 ont ete lances et mesures dans Fusion. Les coupes de cavites
+P6-M001 sont codees mais restent a inspecter et mesurer manuellement dans
+Fusion. Cela ne vaut pas validation d'impression reelle.
 
 ## Frontieres
 
@@ -117,7 +118,7 @@ Pour chaque blank rectangulaire, l'operation principale est :
   rectangulaire depuis une origine locale et une taille deja validees par le
   moteur ;
 - `describe_cavity_feature` : decrire une future aide ergonomique de cavite,
-  comme une encoche de doigt, une demi-lune ou un fond arrondi, sans l'executer.
+  comme une encoche de doigt, une demi-lune ou un fond arrondi, sans l'executer dans Fusion.
 
 Les cavites sont aussi exposees dans `body.cavities` avec `status: abstract_only`,
 `fusion_generation: not_implemented` et `clearance_source`. Pour les cavites
@@ -174,9 +175,13 @@ Fusion ne recalcule pas les cellules, offsets, roles de faces ou tolerances. La
 generation reelle reste limitee a des rectangles extrudes dans le composant
 racine et ne produit aucun STL/3MF. La generation actuelle ne cree pas de
 composants enfants Fusion, pour rester compatible avec les documents Part Design.
-Si la CAD IR contient des operations `subtract_rectangular_cavity` ou
-`describe_cavity_feature`, l'adaptateur P4 les conserve comme donnees de
-planification mais ne les execute pas encore.
+Depuis `P6-M001`, si la CAD IR contient des operations
+`subtract_rectangular_cavity`, l'adaptateur construit des coupes rectangulaires
+simples : footprint locale X/Y, depart sur le dessus du blank, extrusion cut
+verticale descendante, et `participantBodies` limite au body cible. Il refuse les
+coupes qui debordent X/Y, retirent toute la hauteur ou violent le plancher minimal
+exprime par `local_origin_mm.z`. Les operations `describe_cavity_feature` restent
+planifiees seulement et ne sont pas executees.
 
 ## Face roles et tolerances
 
@@ -206,6 +211,8 @@ Le contrat V0 est valide par tests unitaires :
 - erreurs actionnables pour override vide, fichier absent et contrat CAD IR invalide ;
 - export CLI d'une CAD IR JSON depuis `examples/simple_box.json` ;
 - transformation en plan de generation hors Fusion ;
+- plan de coupes rectangulaires simples depuis `subtract_rectangular_cavity` ;
+- refus des coupes Fusion qui debordent X/Y ou qui suppriment le plancher requis ;
 - serialization de cavites rectangulaires abstraites et de l'operation
   `subtract_rectangular_cavity` depuis `examples/simple_tray.json` ;
 - serialization de features ergonomiques abstraites et des operations
@@ -223,8 +230,8 @@ Stabiliser le pipeline CAD IR vers Fusion`, autorisee par gate humaine sous le
 libelle `P4-M004`, stabilise le choix du fichier d'entree et les messages
 d'erreur Fusion.
 
-Toute extension Fusion au-dela du chargement, de la validation et des blanks
-rectangulaires, notamment la premiere execution reelle de
-`subtract_rectangular_cavity`, `describe_cavity_feature`, encoches, fonds
-arrondis, fillets, booleans, geometrie courbe reelle ou tout export imprimable,
-reste soumise a une nouvelle gate humaine.
+`P6-M001` execute maintenant les cavites rectangulaires simples depuis
+`subtract_rectangular_cavity`, sous validation manuelle Fusion. Toute extension
+Fusion au-dela de ces cuts rectangulaires, notamment `describe_cavity_feature`,
+encoches, fonds arrondis, fillets, booleans complexes, geometrie courbe reelle
+ou tout export imprimable, reste soumise a une nouvelle gate humaine.

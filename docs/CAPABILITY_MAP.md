@@ -73,7 +73,7 @@ Chaine de pilotage :
 | C-CAD-IR | CAD IR | CAD generation pipeline | `implemented-cad-ir` | M3 CAD pipeline | Gate si contrat incompatible |
 | C-FUSION-COMPACT | Fusion compact view | CAD generation pipeline | `fusion-validated` | M3 CAD pipeline | Gate pour nouvelles geometries |
 | C-FUSION-EXPLODED | Fusion exploded view | CAD generation pipeline | `designed` | M5 CAD inspection views | Validation Fusion manuelle |
-| C-FUSION-CAVITIES | Fusion cavities | CAD generation pipeline | `blocked` | M5 CAD cavities | Gate Fusion cuts obligatoire |
+| C-FUSION-CAVITIES | Fusion cavities | CAD generation pipeline | `implemented-fusion` | M5 CAD cavities | Validation Fusion manuelle P6-M001 |
 | C-FILLETS | Fillets and finger notches | CAD generation pipeline | `blocked` | M5 CAD ergonomic features | Gate Fusion curves/fillets |
 | C-SOLVER | Solver and scoring | Volumetric layout | `designed` | M10 Semi-automatic solver | Gate architecture si optimiseur majeur |
 | C-CALIBRATION | Calibration and print validation | Human validation gates | `designed` | M11 Physical validation | Impression reelle |

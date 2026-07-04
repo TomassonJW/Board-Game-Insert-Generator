@@ -183,7 +183,10 @@ minimal. Depuis P5-M002/P5-M003, les cavites `cards`, `sleeved_cards`,
 utilise alors la valeur de profil active correspondante et refuse une valeur
 explicite inferieure. Les des utilisent provisoirement `token_clearance_mm`
 tant qu'aucune calibration ne justifie un champ dedie. La cavite est transportee
-dans la CAD IR comme intention abstraite ; elle n'est pas encore coupee dans Fusion.
+dans la CAD IR. Depuis P6-M001, les cavites rectangulaires simples peuvent etre
+coupees dans Fusion par l'adaptateur, avec validation manuelle requise. Cette
+generation ne couvre pas les features ergonomiques, les arrondis ou les booleans
+complexes.
 
 Depuis P5-M004, une cavite peut aussi porter des `Feature` ergonomiques
 abstraites. Elles decrivent des aides locales, pas une geometrie Fusion reelle.
@@ -262,14 +265,18 @@ Implemente :
 - cavites rectangulaires simples abstraites dans la configuration, la validation,
   les rapports et la CAD IR ;
 - features ergonomiques abstraites de cavites dans la configuration, la
-  validation, les rapports et la CAD IR.
+  validation, les rapports et la CAD IR ;
+- generation Fusion codee de cavites rectangulaires simples depuis la CAD IR,
+  encore sous validation manuelle Fusion.
 
 Experimental :
 
 - detection automatique des roles `internal` et `welded` non exploitee par le
   layout ;
-- concepts `Cavity` et `Feature` presents et exportes comme intentions abstraites,
-  mais non generes dans Fusion ;
+- concepts `Feature` exportes comme intentions abstraites mais non generes dans
+  Fusion ;
+- cavites rectangulaires Fusion codees mais non encore validees manuellement pour
+  P6-M001 ;
 - `CompositeModule` present mais non exploite par le layout.
 
 Prevu :
@@ -279,7 +286,7 @@ Prevu :
 - layers et reservations ;
 - ordre de retrait et accessibilite ;
 - unions de primitives ;
-- coupes ;
+- coupes avancees ;
 - arrondis ;
 - chanfreins ;
 - sorties Fusion 360 ;
@@ -290,6 +297,7 @@ Prevu :
 - Une dimension negative ou nulle est invalide.
 - Une cavite ne doit pas casser les parois minimales.
 - Une feature P5-M004 est CAD-agnostic, locale a une cavite et non executable par Fusion.
+- Une coupe Fusion P6-M001 doit rester une soustraction rectangulaire verticale issue de la CAD IR.
 - Une operation Fusion future doit mapper un concept deja resolu, pas inventer un
   nouveau modele metier.
 - Les modules composites doivent conserver de la matiere continue sur leurs faces

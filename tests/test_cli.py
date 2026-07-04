@@ -66,7 +66,7 @@ class CliTests(unittest.TestCase):
             {"x": 68.9, "y": 99.2, "z": 44.0},
         )
 
-    def test_cli_exports_cad_ir_with_abstract_cavity_compatible_with_fusion_plan(self) -> None:
+    def test_cli_exports_cad_ir_with_rectangular_cavity_compatible_with_fusion_plan(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
             output_path = Path(temporary_directory) / "simple_tray_cad_ir.json"
             stdout = io.StringIO()
@@ -91,7 +91,9 @@ class CliTests(unittest.TestCase):
             payload["components"][0]["body"]["operations"][1]["kind"],
             "subtract_rectangular_cavity",
         )
-        self.assertEqual(plan.created_object_count, 2)
+        self.assertEqual(plan.created_object_count, 3)
+        self.assertEqual(len(plan.cavity_cuts), 1)
+        self.assertEqual(plan.cavity_cuts[0].cavity_id, "token-pocket")
         self.assertEqual(plan.blanks[0].body_name, "token-tray-01 rectangular blank")
 
     def test_cli_reports_configuration_error_category(self) -> None:
