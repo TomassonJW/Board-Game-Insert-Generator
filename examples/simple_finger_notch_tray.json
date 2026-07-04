@@ -1,0 +1,94 @@
+{
+  "project_name": "Simple tray with abstract ergonomic features V0",
+  "units": "mm",
+  "box": {
+    "inner_dimensions_mm": {
+      "x": 120,
+      "y": 90,
+      "z": 40
+    },
+    "usable_height_mm": 30,
+    "lid_clearance_mm": 6
+  },
+  "print_profile": "default",
+  "tolerances": {
+    "peripheral_clearance_mm": 0.8,
+    "module_gap_mm": 0.6,
+    "vertical_lid_clearance_mm": 1.0,
+    "token_clearance_mm": 0.6,
+    "printer_compensation_mm": 0.0
+  },
+  "defaults": {
+    "wall_thickness_mm": 1.2,
+    "floor_thickness_mm": 1.2,
+    "corner_radius_mm": 1.5
+  },
+  "layout": {
+    "strategy": "row_fill",
+    "allow_global_rotation": false
+  },
+  "modules": [
+    {
+      "id": "finger-notch-tray",
+      "name": "Token tray with abstract finger notch",
+      "functional_type": "tokens",
+      "min_dimensions_mm": {
+        "x": 70,
+        "y": 60
+      },
+      "height_mm": 24,
+      "priority": 100,
+      "allow_rotation": false,
+      "quantity": 1,
+      "comment": "P5-M004 ergonomic features are abstract only and not generated in Fusion yet.",
+      "cavities": [
+        {
+          "id": "token-pocket",
+          "functional_type": "tokens",
+          "origin_mm": {
+            "x": 4,
+            "y": 4,
+            "z": 1.2
+          },
+          "size_mm": {
+            "x": 62,
+            "y": 52,
+            "z": 20
+          },
+          "comment": "Rectangular open tray cavity intent; Fusion cutting is gated later.",
+          "features": [
+            {
+              "id": "front-half-moon-notch",
+              "kind": "half_moon_notch",
+              "placement": "front_center",
+              "position_mm": {
+                "x": 22,
+                "y": 0,
+                "z": 8
+              },
+              "size_mm": {
+                "x": 18,
+                "y": 4,
+                "z": 10
+              },
+              "radius_mm": 9,
+              "comment": "Abstract half-moon finger notch intent; no Fusion cut yet."
+            },
+            {
+              "id": "rounded-floor-intent",
+              "kind": "rounded_floor",
+              "placement": "cavity_floor",
+              "position_mm": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+              },
+              "radius_mm": 3,
+              "comment": "Abstract bottom radius intent; no fillet generated yet."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

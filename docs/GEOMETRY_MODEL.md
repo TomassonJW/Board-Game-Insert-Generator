@@ -45,8 +45,9 @@ Regle actuelle :
   tolerance ;
 - `FaceName`, `FaceRole` et `FaceClassification` portent les metadonnees de
   classification de faces ;
-- `PrimitiveVolume`, `CompositeModule`, `Cavity` et `Feature` existent comme
-  concepts, mais ne pilotent pas encore une generation complete.
+- `PrimitiveVolume` et `CompositeModule` existent comme concepts ;
+- `Cavity` et `Feature` pilotent maintenant des intentions abstraites validees,
+  reportees et exportees en CAD IR, sans generation Fusion reelle.
 
 La validation agregee reste dans `validation.py` afin de produire plusieurs
 messages d'erreur actionnables en une seule passe. Les constructeurs ne doivent
@@ -168,15 +169,39 @@ explicite inferieure. Les des utilisent provisoirement `token_clearance_mm`
 tant qu'aucune calibration ne justifie un champ dedie. La cavite est transportee
 dans la CAD IR comme intention abstraite ; elle n'est pas encore coupee dans Fusion.
 
+Depuis P5-M004, une cavite peut aussi porter des `Feature` ergonomiques
+abstraites. Elles decrivent des aides locales, pas une geometrie Fusion reelle.
+
 ### Feature
 
-Detail ajoute ou retire sur un corps imprimable.
+Feature abstraite associee a une cavite ou, plus tard, a un corps imprimable.
+Depuis P5-M004, les features implementees sont limitees aux intentions
+ergonomiques de cavites :
 
-Exemples :
+- `finger_notch` : encoche de doigt simple ;
+- `side_notch` : encoche laterale ;
+- `center_notch` : encoche centrale ;
+- `half_moon_notch` : encoche en demi-lune decrite abstraitement ;
+- `rounded_floor` : intention de fond arrondi ou rayon de fond ;
+- `grip_aid` : aide abstraite de prise en main.
 
-- encoche de doigt ;
+Chaque feature porte un identifiant, un kind, un placement humain, une position
+locale dans la cavite, une taille optionnelle, un rayon optionnel et un
+commentaire. Les encoches et aides de prise en main requierent une taille. Les
+demi-lunes et fonds arrondis requierent un rayon.
+
+Invariants P5-M004 :
+
+- la feature reste dans les dimensions locales de la cavite ;
+- le rayon reste abstrait et borne par la taille XY de la cavite ;
+- le statut reste `abstract_only` ;
+- `fusion_generation` reste `not_implemented` ;
+- aucune coupe, extrusion cut, boolean, fillet, conge ou geometrie courbe reelle
+  n'est generee dans Fusion.
+
+Exemples futurs hors perimetre P5-M004 :
+
 - chanfrein ;
-- arrondi ;
 - embossage ;
 - gravure ;
 - texte ;
@@ -219,13 +244,16 @@ Implemente :
 - regles de tolerance appliquees par role de face ;
 - representation conceptuelle des primitives et composites ;
 - cavites rectangulaires simples abstraites dans la configuration, la validation,
-  les rapports et la CAD IR.
+  les rapports et la CAD IR ;
+- features ergonomiques abstraites de cavites dans la configuration, la
+  validation, les rapports et la CAD IR.
 
 Experimental :
 
 - detection automatique des roles `internal` et `welded` non exploitee par le
   layout ;
-- concepts `Cavity` et `Feature` presents mais non generes ;
+- concepts `Cavity` et `Feature` presents et exportes comme intentions abstraites,
+  mais non generes dans Fusion ;
 - `CompositeModule` present mais non exploite par le layout.
 
 Prevu :
@@ -243,7 +271,7 @@ Prevu :
 
 - Une dimension negative ou nulle est invalide.
 - Une cavite ne doit pas casser les parois minimales.
-- Une feature est CAD-agnostic tant qu'elle reste dans le moteur.
+- Une feature P5-M004 est CAD-agnostic, locale a une cavite et non executable par Fusion.
 - Une operation Fusion future doit mapper un concept deja resolu, pas inventer un
   nouveau modele metier.
 - Les modules composites doivent conserver de la matiere continue sur leurs faces

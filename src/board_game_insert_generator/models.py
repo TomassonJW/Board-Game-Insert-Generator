@@ -8,7 +8,7 @@ constructor call.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 
 
@@ -20,6 +20,15 @@ class FunctionalType(str, Enum):
     DICE = "dice"
     FREE = "free"
     OTHER = "other"
+
+
+class FeatureKind(str, Enum):
+    FINGER_NOTCH = "finger_notch"
+    SIDE_NOTCH = "side_notch"
+    CENTER_NOTCH = "center_notch"
+    HALF_MOON_NOTCH = "half_moon_notch"
+    ROUNDED_FLOOR = "rounded_floor"
+    GRIP_AID = "grip_aid"
 
 
 LAYOUT_STRATEGY_ROW_FILL = "row_fill"
@@ -63,6 +72,19 @@ class Point3D:
     x: float
     y: float
     z: float = 0.0
+
+
+@dataclass(frozen=True)
+class Feature:
+    id: str
+    kind: FeatureKind
+    placement: str
+    position: Point3D
+    size: Dimension3D | None = None
+    radius_mm: float | None = None
+    comment: str = ""
+    status: str = "abstract_only"
+    fusion_generation: str = "not_implemented"
 
 
 @dataclass(frozen=True)
@@ -110,6 +132,7 @@ class Cavity:
     clearance_mm: float
     clearance_source: str = "explicit"
     comment: str = ""
+    features: tuple[Feature, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -164,12 +187,6 @@ class CompositeModule:
     primitive_volumes: tuple[PrimitiveVolume, ...]
     note: str = ""
 
-
-@dataclass(frozen=True)
-class Feature:
-    id: str
-    kind: str
-    parameters: dict[str, float | str | bool] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)

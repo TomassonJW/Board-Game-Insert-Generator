@@ -7,6 +7,8 @@ from board_game_insert_generator.models import (
     BoxSpec,
     Cavity,
     Dimension3D,
+    Feature,
+    FeatureKind,
     FunctionalType,
     GeometryDefaults,
     InsertConfig,
@@ -16,7 +18,6 @@ from board_game_insert_generator.models import (
     ToleranceProfile,
 )
 from board_game_insert_generator.validation import validate_config
-
 
 def _module(
     module_id: str = "cards",
@@ -36,7 +37,6 @@ def _module(
         quantity=quantity,
         cavities=cavities,
     )
-
 
 def _config(
     box: BoxSpec | None = None,
@@ -58,7 +58,6 @@ def _config(
         layout=layout or LayoutSettings(),
         modules=modules or (_module(),),
     )
-
 
 class ModelContractTests(unittest.TestCase):
     def test_valid_core_model_contract_has_no_validation_issues(self) -> None:
@@ -111,6 +110,123 @@ class ModelContractTests(unittest.TestCase):
         issues = validate_config(_config(modules=(module,)))
 
         self.assertEqual(issues, [])
+    def test_all_abstract_cavity_feature_kinds_can_be_represented(self) -> None:
+        features = (
+            Feature(
+                id="front-finger-notch",
+                kind=FeatureKind.FINGER_NOTCH,
+                placement="front_center",
+                position=Point3D(x=10.0, y=0.0, z=10.0),
+                size=Dimension3D(x=18.0, y=4.0, z=8.0),
+                radius_mm=7.0,
+            ),
+            Feature(
+                id="left-side-notch",
+                kind=FeatureKind.SIDE_NOTCH,
+                placement="left_side",
+                position=Point3D(x=0.0, y=20.0, z=10.0),
+                size=Dimension3D(x=4.0, y=18.0, z=8.0),
+            ),
+            Feature(
+                id="center-notch",
+                kind=FeatureKind.CENTER_NOTCH,
+                placement="center",
+                position=Point3D(x=40.0, y=38.0, z=10.0),
+                size=Dimension3D(x=20.0, y=4.0, z=8.0),
+            ),
+            Feature(
+                id="half-moon-notch",
+                kind=FeatureKind.HALF_MOON_NOTCH,
+                placement="front_center",
+                position=Point3D(x=60.0, y=0.0, z=10.0),
+                size=Dimension3D(x=18.0, y=4.0, z=8.0),
+                radius_mm=9.0,
+            ),
+            Feature(
+                id="rounded-floor-intent",
+                kind=FeatureKind.ROUNDED_FLOOR,
+                placement="cavity_floor",
+                position=Point3D(x=0.0, y=0.0, z=0.0),
+                radius_mm=3.0,
+            ),
+            Feature(
+                id="grip-aid",
+                kind=FeatureKind.GRIP_AID,
+                placement="right_side",
+                position=Point3D(x=80.0, y=30.0, z=8.0),
+                size=Dimension3D(x=10.0, y=20.0, z=4.0),
+            ),
+        )
+        cavity = Cavity(
+            id="token-pocket",
+            functional_type=FunctionalType.TOKENS,
+            origin=Point3D(x=5.0, y=5.0, z=1.2),
+            size=Dimension3D(x=100.0, y=80.0, z=28.0),
+            clearance_mm=0.6,
+            features=features,
+        )
+        module = _module(
+            module_id="ergonomic-token-tray",
+            height_mm=32.0,
+            min_dimensions=Dimension3D(x=110.0, y=90.0, z=32.0),
+            cavities=(cavity,),
+        )
+
+        issues = validate_config(_config(modules=(module,)))
+
+        self.assertEqual(issues, [])
+
+    def test_cavity_features_report_invalid_bounds_and_required_fields(self) -> None:
+        features = (
+            Feature(
+                id="",
+                kind=FeatureKind.FINGER_NOTCH,
+                placement="",
+                position=Point3D(x=-1.0, y=0.0, z=0.0),
+                status="planned",
+            ),
+            Feature(
+                id="bad-half-moon",
+                kind=FeatureKind.HALF_MOON_NOTCH,
+                placement="front_center",
+                position=Point3D(x=95.0, y=78.0, z=27.0),
+                size=Dimension3D(x=10.0, y=5.0, z=4.0),
+                fusion_generation="implemented",
+            ),
+            Feature(
+                id="bad-rounded-floor",
+                kind=FeatureKind.ROUNDED_FLOOR,
+                placement="cavity_floor",
+                position=Point3D(x=0.0, y=0.0, z=0.0),
+                radius_mm=60.0,
+            ),
+        )
+        cavity = Cavity(
+            id="token-pocket",
+            functional_type=FunctionalType.TOKENS,
+            origin=Point3D(x=5.0, y=5.0, z=1.2),
+            size=Dimension3D(x=100.0, y=80.0, z=28.0),
+            clearance_mm=0.6,
+            features=features,
+        )
+        module = _module(
+            module_id="bad-ergonomic-token-tray",
+            height_mm=32.0,
+            min_dimensions=Dimension3D(x=110.0, y=90.0, z=32.0),
+            cavities=(cavity,),
+        )
+
+        keys = _issue_keys(validate_config(_config(modules=(module,))))
+
+        self.assertIn(("modules[0].cavities[0].features[0].id", "EMPTY_ID"), keys)
+        self.assertIn(("modules[0].cavities[0].features[0].placement", "EMPTY_PLACEMENT"), keys)
+        self.assertIn(("modules[0].cavities[0].features[0].position_mm.x", "NEGATIVE_VALUE"), keys)
+        self.assertIn(("modules[0].cavities[0].features[0].status", "FEATURE_STATUS_UNSUPPORTED"), keys)
+        self.assertIn(("modules[0].cavities[0].features[0].size_mm", "CAVITY_FEATURE_SIZE_REQUIRED"), keys)
+        self.assertIn(("modules[0].cavities[0].features[1]", "CAVITY_FEATURE_OUTSIDE_CAVITY"), keys)
+        self.assertIn(("modules[0].cavities[0].features[1].radius_mm", "CAVITY_FEATURE_RADIUS_REQUIRED"), keys)
+        self.assertIn(("modules[0].cavities[0].features[1].fusion_generation", "FEATURE_FUSION_GENERATION_UNSUPPORTED"), keys)
+        self.assertIn(("modules[0].cavities[0].features[2].radius_mm", "CAVITY_FEATURE_RADIUS_TOO_LARGE"), keys)
 
     def test_cavity_contract_reports_invalid_walls_floor_and_bounds(self) -> None:
         cavity = Cavity(
@@ -135,7 +251,6 @@ class ModelContractTests(unittest.TestCase):
         self.assertIn(("modules[0].cavities[0]", "CAVITY_WALL_TOO_THIN"), keys)
         self.assertIn(("modules[0].cavities[0]", "CAVITY_FLOOR_TOO_THIN"), keys)
 
-
     def test_card_cavity_clearance_must_meet_active_profile_minimum(self) -> None:
         cavity = Cavity(
             id="tight-card-pocket",
@@ -156,7 +271,6 @@ class ModelContractTests(unittest.TestCase):
             ("modules[0].cavities[0].clearance_mm", "CARD_CAVITY_CLEARANCE_TOO_LOW"),
             _issue_keys(issues),
         )
-
 
     def test_open_receptacle_clearance_must_meet_active_profile_minimum(self) -> None:
         cavity = Cavity(
@@ -198,10 +312,8 @@ class ModelContractTests(unittest.TestCase):
         self.assertLess(body.size.y, cell.size.y)
         self.assertEqual(body.primitive_volumes[0].size, body.size)
 
-
 def _issue_keys(issues) -> set[tuple[str, str]]:
     return {(issue.field, issue.code) for issue in issues}
-
 
 if __name__ == "__main__":
     unittest.main()

@@ -132,7 +132,8 @@ Etat actuel :
 - rapport JSON ;
 - rapport Markdown ;
 - comparaison simple de strategies de layout dans les rapports ;
-- concepts de primitives, cavites et features deja nommes ;
+- concepts de primitives et cavites deja nommes ;
+- features ergonomiques abstraites associees aux cavites ;
 - contrat CAD IR V0 dans `src/board_game_insert_generator/cad_ir.py`, documente
   dans `docs/CAD_IR_CONTRACT.md`.
 
@@ -211,3 +212,5 @@ La verification dans Fusion 360 reste manuelle.
 - ADR-0007 : representation intermediaire CAD-agnostic.
 - ADR-0008 : frontiere du squelette d'adaptateur Fusion 360.
 - ADR-0009 : generation Fusion minimale par esquisse et extrusion.
+- ADR-0010 : cavites abstraites avant coupes Fusion.
+- ADR-0011 : features ergonomiques abstraites de cavites.

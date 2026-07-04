@@ -9,6 +9,8 @@ from board_game_insert_generator.models import (
     BoxSpec,
     Cavity,
     Dimension3D,
+    Feature,
+    FeatureKind,
     FunctionalType,
     GeometryDefaults,
     LAYOUT_STRATEGY_ROW_FILL,
@@ -22,7 +24,6 @@ from board_game_insert_generator.print_profiles import (
     PRINT_PROFILE_DEFAULT,
     resolve_print_profile,
 )
-
 
 ROOT_FIELDS = {"project_name", "units", "box", "print_profile", "tolerances", "defaults", "layout", "modules"}
 BOX_FIELDS = {"inner_dimensions_mm", "usable_height_mm", "lid_clearance_mm"}
@@ -38,12 +39,11 @@ MODULE_FIELDS = {
     "comment",
     "cavities",
 }
-CAVITY_FIELDS = {"id", "functional_type", "origin_mm", "size_mm", "clearance_mm", "comment"}
-
+CAVITY_FIELDS = {"id", "functional_type", "origin_mm", "size_mm", "clearance_mm", "comment", "features"}
+FEATURE_FIELDS = {"id", "kind", "placement", "position_mm", "size_mm", "radius_mm", "comment"}
 
 class ConfigError(ValueError):
     """Raised when a configuration file cannot be parsed."""
-
 
 def load_config(path: str | Path) -> InsertConfig:
     config_path = Path(path)
@@ -87,7 +87,6 @@ def load_config(path: str | Path) -> InsertConfig:
         source_path=str(config_path),
     )
 
-
 def _parse_box(raw: dict[str, Any]) -> BoxSpec:
     _reject_unknown_fields(raw, BOX_FIELDS, "box")
     dimensions = _parse_dimensions(
@@ -99,7 +98,6 @@ def _parse_box(raw: dict[str, Any]) -> BoxSpec:
         usable_height_mm=_float(raw, "usable_height_mm", "box.usable_height_mm"),
         lid_clearance_mm=_float(raw, "lid_clearance_mm", "box.lid_clearance_mm"),
     )
-
 
 def _parse_modules(raw_modules: Any, tolerances: ToleranceProfile) -> list[ModuleRequest]:
     if not isinstance(raw_modules, list):
@@ -143,10 +141,8 @@ def _parse_modules(raw_modules: Any, tolerances: ToleranceProfile) -> list[Modul
         )
     return parsed
 
-
 def _parse_functional_type(value: Any, index: int) -> FunctionalType:
     return _parse_functional_type_value(value, f"modules[{index}]")
-
 
 def _parse_cavities(
     raw_cavities: Any,
@@ -176,6 +172,7 @@ def _parse_cavities(
             functional_type,
             tolerances,
         )
+        features = tuple(_parse_features(raw.get("features", []), cavity_field))
         cavities.append(
             Cavity(
                 id=cavity_id,
@@ -191,10 +188,45 @@ def _parse_cavities(
                 clearance_mm=clearance_mm,
                 clearance_source=clearance_source,
                 comment=_optional_string(raw, "comment", cavity_field, default=""),
+                features=features,
             )
         )
     return cavities
 
+def _parse_features(raw_features: Any, cavity_field: str) -> list[Feature]:
+    if raw_features is None:
+        return []
+    if not isinstance(raw_features, list):
+        raise ConfigError(f"'{cavity_field}.features' must be a list.")
+
+    features: list[Feature] = []
+    for index, raw in enumerate(raw_features):
+        feature_field = f"{cavity_field}.features[{index}]"
+        if not isinstance(raw, dict):
+            raise ConfigError(f"{feature_field} must be an object.")
+        _reject_unknown_fields(raw, FEATURE_FIELDS, feature_field)
+        if "kind" not in raw:
+            raise ConfigError(f"Missing required field '{feature_field}.kind'.")
+
+        features.append(
+            Feature(
+                id=_optional_string(raw, "id", feature_field, default=f"feature-{index + 1}"),
+                kind=_parse_feature_kind_value(raw["kind"], feature_field),
+                placement=_optional_string(raw, "placement", feature_field, default="unspecified"),
+                position=_parse_point(
+                    _required_mapping(raw, "position_mm", f"{feature_field}.position_mm"),
+                    field_name=f"{feature_field}.position_mm",
+                ),
+                size=_optional_dimensions(raw.get("size_mm"), f"{feature_field}.size_mm"),
+                radius_mm=(
+                    _number_value(raw["radius_mm"], f"{feature_field}.radius_mm")
+                    if "radius_mm" in raw
+                    else None
+                ),
+                comment=_optional_string(raw, "comment", feature_field, default=""),
+            )
+        )
+    return features
 
 def _parse_cavity_clearance(
     raw: dict[str, Any],
@@ -210,7 +242,6 @@ def _parse_cavity_clearance(
         return profile_clearance
 
     raise ConfigError(f"Missing required field '{cavity_field}.clearance_mm'.")
-
 
 def _profile_cavity_clearance(
     functional_type: FunctionalType,
@@ -238,6 +269,15 @@ def _parse_functional_type_value(value: Any, field_path: str) -> FunctionalType:
             f"Allowed values: {allowed}."
         ) from exc
 
+def _parse_feature_kind_value(value: Any, field_path: str) -> FeatureKind:
+    try:
+        return FeatureKind(str(value))
+    except ValueError as exc:
+        allowed = ", ".join(item.value for item in FeatureKind)
+        raise ConfigError(
+            f"Unsupported feature kind for {field_path}: {value!r}. "
+            f"Allowed values: {allowed}."
+        ) from exc
 
 def _parse_tolerances(raw: Any, print_profile: str) -> ToleranceProfile:
     if raw is None:
@@ -257,7 +297,6 @@ def _parse_tolerances(raw: Any, print_profile: str) -> ToleranceProfile:
     except ValueError as exc:
         raise ConfigError(str(exc)) from exc
 
-
 def _parse_float_dataclass(cls: type[Any], raw: Any, field_name: str) -> Any:
     if raw is None:
         raw = {}
@@ -273,7 +312,6 @@ def _parse_float_dataclass(cls: type[Any], raw: Any, field_name: str) -> Any:
         if field.name in raw
     }
     return cls(**values)
-
 
 def _parse_layout(raw: Any) -> LayoutSettings:
     if raw is None:
@@ -294,7 +332,6 @@ def _parse_layout(raw: Any) -> LayoutSettings:
         ),
     )
 
-
 def _parse_point(raw: dict[str, Any], field_name: str) -> Point3D:
     _reject_unknown_fields(raw, {"x", "y", "z"}, field_name)
     return Point3D(
@@ -302,7 +339,6 @@ def _parse_point(raw: dict[str, Any], field_name: str) -> Point3D:
         y=_number(raw, "y", field_name),
         z=_number(raw, "z", field_name),
     )
-
 
 def _parse_dimensions(
     raw: dict[str, Any],
@@ -316,12 +352,17 @@ def _parse_dimensions(
         z=_number(raw, "z", field_name) if "z" in raw else _default_z(default_z, field_name),
     )
 
+def _optional_dimensions(value: Any, field_name: str) -> Dimension3D | None:
+    if value is None:
+        return None
+    if not isinstance(value, dict):
+        raise ConfigError(f"Missing or invalid object field '{field_name}'.")
+    return _parse_dimensions(value, field_name=field_name)
 
 def _default_z(default_z: float | None, field_name: str) -> float:
     if default_z is None:
         raise ConfigError(f"Missing required field '{field_name}.z'.")
     return float(default_z)
-
 
 def _required_mapping(raw: dict[str, Any], key: str, field_path: str) -> dict[str, Any]:
     value = raw.get(key)
@@ -329,22 +370,18 @@ def _required_mapping(raw: dict[str, Any], key: str, field_path: str) -> dict[st
         raise ConfigError(f"Missing or invalid object field '{field_path}'.")
     return value
 
-
 def _float(raw: dict[str, Any], key: str, field_path: str) -> float:
     if key not in raw:
         raise ConfigError(f"Missing required field '{field_path}'.")
     return _number_value(raw[key], field_path)
 
-
 def _number(raw: dict[str, Any], key: str, field_name: str) -> float:
     return _number_value(raw.get(key), f"{field_name}.{key}")
-
 
 def _number_value(value: Any, field_path: str) -> float:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise ConfigError(f"Field '{field_path}' must be a number.")
     return float(value)
-
 
 def _int(raw: dict[str, Any], key: str, field_name: str, default: int) -> int:
     if key not in raw:
@@ -354,7 +391,6 @@ def _int(raw: dict[str, Any], key: str, field_name: str, default: int) -> int:
         raise ConfigError(f"Field '{field_name}.{key}' must be an integer.")
     return value
 
-
 def _bool(raw: dict[str, Any], key: str, field_name: str, default: bool) -> bool:
     if key not in raw:
         return default
@@ -363,7 +399,6 @@ def _bool(raw: dict[str, Any], key: str, field_name: str, default: bool) -> bool
         raise ConfigError(f"Field '{field_name}.{key}' must be a boolean.")
     return value
 
-
 def _optional_string(raw: dict[str, Any], key: str, field_name: str, default: str) -> str:
     if key not in raw:
         return default
@@ -371,7 +406,6 @@ def _optional_string(raw: dict[str, Any], key: str, field_name: str, default: st
     if not isinstance(value, str):
         raise ConfigError(f"Field '{field_name}.{key}' must be a string.")
     return value
-
 
 def _reject_unknown_fields(raw: dict[str, Any], allowed: set[str], field_name: str) -> None:
     unknown = sorted(set(raw) - allowed)

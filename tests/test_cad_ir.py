@@ -6,6 +6,7 @@ from context import ROOT
 
 from board_game_insert_generator.cad_ir import (
     CAD_IR_SCHEMA_VERSION,
+    CAVITY_FEATURE_OPERATION_KIND,
     CAVITY_OPERATION_KIND,
     CadIrError,
     build_blank_cad_scene,
@@ -13,7 +14,6 @@ from board_game_insert_generator.cad_ir import (
 from board_game_insert_generator.config_loader import load_config
 from board_game_insert_generator.layout import generate_basic_layout
 from board_game_insert_generator.models import LayoutResult
-
 
 class CadIrTests(unittest.TestCase):
     def test_blank_scene_exposes_reference_box_components_and_units(self) -> None:
@@ -98,6 +98,32 @@ class CadIrTests(unittest.TestCase):
         self.assertEqual(cavity_operation["parameters"]["coordinate_frame"], "body.local")
         self.assertEqual(cavity_operation["parameters"]["fusion_generation"], "not_implemented")
 
+    def test_scene_serializes_abstract_cavity_feature_operations(self) -> None:
+        config = load_config(ROOT / "examples" / "simple_finger_notch_tray.json")
+        layout = generate_basic_layout(config)
+
+        body = build_blank_cad_scene(config, layout).to_dict()["components"][0]["body"]
+
+        cavity = body["cavities"][0]
+        self.assertEqual(cavity["features"][0]["id"], "front-half-moon-notch")
+        self.assertEqual(cavity["features"][0]["kind"], "half_moon_notch")
+        self.assertEqual(cavity["features"][0]["fusion_generation"], "not_implemented")
+        self.assertEqual(cavity["features"][1]["kind"], "rounded_floor")
+        operation_kinds = [operation["kind"] for operation in body["operations"]]
+        self.assertEqual(
+            operation_kinds,
+            [
+                "create_rectangular_prism",
+                CAVITY_OPERATION_KIND,
+                CAVITY_FEATURE_OPERATION_KIND,
+                CAVITY_FEATURE_OPERATION_KIND,
+            ],
+        )
+        feature_operation = body["operations"][2]
+        self.assertEqual(feature_operation["parameters"]["cavity_id"], "token-pocket")
+        self.assertEqual(feature_operation["parameters"]["feature_id"], "front-half-moon-notch")
+        self.assertEqual(feature_operation["parameters"]["coordinate_frame"], "cavity.local")
+        self.assertEqual(feature_operation["parameters"]["fusion_generation"], "not_implemented")
 
     def test_scene_serializes_card_cavity_profile_clearance_sources(self) -> None:
         config = load_config(ROOT / "examples" / "simple_card_tray.json")
@@ -113,7 +139,6 @@ class CadIrTests(unittest.TestCase):
         self.assertEqual(second_cavity["functional_type"], "sleeved_cards")
         self.assertEqual(second_cavity["clearance_mm"], 0.95)
         self.assertEqual(second_cavity["clearance_source"], "tolerances.sleeved_card_clearance_mm")
-
 
     def test_scene_serializes_open_receptacle_profile_clearance_sources(self) -> None:
         config = load_config(ROOT / "examples" / "simple_open_tray.json")
@@ -141,7 +166,6 @@ class CadIrTests(unittest.TestCase):
 
         with self.assertRaisesRegex(CadIrError, "Missing printable bodies"):
             build_blank_cad_scene(config, inconsistent)
-
 
 if __name__ == "__main__":
     unittest.main()

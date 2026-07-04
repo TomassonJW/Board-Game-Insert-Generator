@@ -17,7 +17,9 @@ Le loader V0 refuse les champs inconnus aux niveaux suivants :
 - `defaults` ;
 - `layout` ;
 - chaque entree de `modules` ;
-- chaque `modules[].min_dimensions_mm`.
+- chaque `modules[].min_dimensions_mm` ;
+- chaque `modules[].cavities` ;
+- chaque `modules[].cavities[].features`.
 
 Les types sont egalement verifies au chargement :
 
@@ -147,7 +149,9 @@ Champs reconnus :
   le module ;
 - `size_mm.x`, `size_mm.y`, `size_mm.z` : dimensions internes de la cavite ;
 - `clearance_mm` : jeu fonctionnel associe a la cavite. Obligatoire pour les cavites `free` et `other` ; optionnel pour `cards`, `sleeved_cards`, `tokens`, `dice` et `meeples`, ou il est resolu depuis le profil actif ;
-- `comment` : note humaine optionnelle.
+- `comment` : note humaine optionnelle ;
+- `features` : liste optionnelle de features ergonomiques abstraites associees a
+  la cavite.
 
 Validation P5-M001/P5-M002/P5-M003 :
 
@@ -158,7 +162,58 @@ Validation P5-M001/P5-M002/P5-M003 :
 - la cavite doit rester dans les dimensions externes du module ;
 - les parois X/Y doivent conserver `defaults.wall_thickness_mm` ;
 - le fond doit conserver `defaults.floor_thickness_mm` ;
-- la cavite reste abstraite et non validee par impression.
+- la cavite reste abstraite et non validee par impression ;
+- les features de cavite restent abstraites et ne sont pas generees dans Fusion.
+
+## `modules[].cavities[].features`
+
+Chaque feature de cavite est une intention ergonomique locale a une cavite. Elle
+prepare une future generation CAD sans l'autoriser encore.
+
+Champs reconnus :
+
+- `id` : identifiant stable de feature, optionnel mais recommande ;
+- `kind` : obligatoire, parmi `finger_notch`, `side_notch`, `center_notch`,
+  `half_moon_notch`, `rounded_floor` et `grip_aid` ;
+- `placement` : positionnement humain, par exemple `front_center`, `left_side`,
+  `center` ou `cavity_floor` ;
+- `position_mm.x`, `position_mm.y`, `position_mm.z` : position locale dans la
+  cavite ;
+- `size_mm.x`, `size_mm.y`, `size_mm.z` : taille abstraite de la feature,
+  requise pour `finger_notch`, `side_notch`, `center_notch`, `half_moon_notch`
+  et `grip_aid` ;
+- `radius_mm` : rayon abstrait, requis pour `half_moon_notch` et
+  `rounded_floor` ;
+- `comment` : note humaine optionnelle.
+
+Validation P5-M004 :
+
+- position non negative ;
+- taille strictement positive quand elle est presente ;
+- position plus taille dans les dimensions locales de la cavite ;
+- rayon strictement positif quand il est present ;
+- rayon limite a la moitie de la plus petite dimension XY de la cavite ;
+- statut implicite `abstract_only` et `fusion_generation: not_implemented` dans
+  les rapports et la CAD IR.
+
+Ces features ne creent pas de coupe, boolean, fillet, conge ou geometrie courbe
+reelle dans Fusion 360.
+
+Exemple :
+
+```json
+{
+  "id": "front-half-moon-notch",
+  "kind": "half_moon_notch",
+  "placement": "front_center",
+  "position_mm": { "x": 22, "y": 0, "z": 8 },
+  "size_mm": { "x": 18, "y": 4, "z": 10 },
+  "radius_mm": 9,
+  "comment": "Abstract half-moon finger notch intent; no Fusion cut yet."
+}
+```
+
+Voir `examples/simple_finger_notch_tray.json` pour un exemple complet.
 
 ## Exemple minimal
 

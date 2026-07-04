@@ -9,7 +9,6 @@ from board_game_insert_generator.config_loader import load_config
 from board_game_insert_generator.layout import generate_basic_layout
 from board_game_insert_generator.report import layout_to_json, layout_to_markdown
 
-
 class ReportTests(unittest.TestCase):
     def test_markdown_report_exposes_summary_and_tolerances(self) -> None:
         config = load_config(ROOT / "examples" / "simple_box.json")
@@ -54,6 +53,26 @@ class ReportTests(unittest.TestCase):
         self.assertEqual(body_cavity["local_origin_mm"], {"x": 4.0, "y": 4.0, "z": 1.2})
         self.assertEqual(body_cavity["status"], "abstract_only")
         self.assertEqual(body_cavity["clearance_source"], "explicit")
+    def test_reports_expose_abstract_cavity_features(self) -> None:
+        config = load_config(ROOT / "examples" / "simple_finger_notch_tray.json")
+        result = generate_basic_layout(config)
+
+        markdown = layout_to_markdown(config, result)
+        payload = json.loads(layout_to_json(config, result))
+
+        self.assertIn("## Planned cavity features", markdown)
+        self.assertIn("front-half-moon-notch | half_moon_notch | front_center", markdown)
+        self.assertIn("rounded-floor-intent | rounded_floor | cavity_floor", markdown)
+        self.assertIn("fusion=not_implemented", markdown)
+        self.assertEqual(payload["summary"]["planned_cavity_count"], 1)
+        self.assertEqual(payload["summary"]["planned_feature_count"], 2)
+        feature = payload["printable_bodies"][0]["planned_cavities"][0]["features"][0]
+        self.assertEqual(feature["kind"], "half_moon_notch")
+        self.assertEqual(feature["placement"], "front_center")
+        self.assertEqual(feature["size_mm"], {"x": 18.0, "y": 4.0, "z": 10.0})
+        self.assertEqual(feature["radius_mm"], 9.0)
+        self.assertEqual(feature["status"], "abstract_only")
+        self.assertEqual(feature["fusion_generation"], "not_implemented")
 
     def test_json_report_exposes_diagnostic_fields(self) -> None:
         config = load_config(ROOT / "examples" / "simple_box.json")
@@ -94,7 +113,6 @@ class ReportTests(unittest.TestCase):
         self.assertEqual(first_body["applied_tolerances"][5]["rule_id"], "functional_vertical_lid_clearance")
         self.assertEqual(len(report["module_requests"]), 3)
         self.assertEqual(report["module_requests"][0]["id"], "cards-main")
-
 
 if __name__ == "__main__":
     unittest.main()

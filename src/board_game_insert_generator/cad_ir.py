@@ -14,6 +14,7 @@ from board_game_insert_generator.models import (
     Cavity,
     Dimension3D,
     FaceClassification,
+    Feature,
     FaceToleranceApplication,
     InsertConfig,
     LayoutResult,
@@ -22,16 +23,14 @@ from board_game_insert_generator.models import (
     PrintableBody,
 )
 
-
 CAD_IR_SCHEMA_VERSION = "cad_ir.v0"
 CAD_IR_UNITS = "mm"
 CAD_IR_COORDINATE_SYSTEM = "right_handed_z_up_mm"
 CAVITY_OPERATION_KIND = "subtract_rectangular_cavity"
-
+CAVITY_FEATURE_OPERATION_KIND = "describe_cavity_feature"
 
 class CadIrError(ValueError):
     """Raised when resolved engine output cannot be represented as CAD IR."""
-
 
 @dataclass(frozen=True)
 class CadFrame:
@@ -52,7 +51,6 @@ class CadFrame:
             "handedness": self.handedness,
         }
 
-
 @dataclass(frozen=True)
 class CadParameter:
     id: str
@@ -70,7 +68,6 @@ class CadParameter:
             "description": self.description,
         }
 
-
 @dataclass(frozen=True)
 class CadOperation:
     id: str
@@ -85,7 +82,6 @@ class CadOperation:
             "target_id": self.target_id,
             "parameters": self.parameters,
         }
-
 
 @dataclass(frozen=True)
 class CadBoxReference:
@@ -105,7 +101,6 @@ class CadBoxReference:
             "role": "reference_box",
         }
 
-
 @dataclass(frozen=True)
 class CadFaceRecord:
     face: str
@@ -120,7 +115,6 @@ class CadFaceRecord:
             "reason": self.reason,
             "neighbor_instance_id": self.neighbor_instance_id,
         }
-
 
 @dataclass(frozen=True)
 class CadToleranceRecord:
@@ -143,6 +137,30 @@ class CadToleranceRecord:
             "reason": self.reason,
         }
 
+@dataclass(frozen=True)
+class CadFeature:
+    id: str
+    kind: str
+    placement: str
+    position: Point3D
+    size: Dimension3D | None
+    radius_mm: float | None
+    comment: str
+    status: str = "abstract_only"
+    fusion_generation: str = "not_implemented"
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "kind": self.kind,
+            "placement": self.placement,
+            "position_mm": _point_to_dict(self.position),
+            "size_mm": _dimension_to_dict(self.size) if self.size is not None else None,
+            "radius_mm": self.radius_mm,
+            "comment": self.comment,
+            "status": self.status,
+            "fusion_generation": self.fusion_generation,
+        }
 
 @dataclass(frozen=True)
 class CadCavity:
@@ -153,6 +171,7 @@ class CadCavity:
     clearance_mm: float
     clearance_source: str
     comment: str
+    features: tuple[CadFeature, ...]
     status: str = "abstract_only"
     fusion_generation: str = "not_implemented"
 
@@ -165,10 +184,10 @@ class CadCavity:
             "clearance_mm": self.clearance_mm,
             "clearance_source": self.clearance_source,
             "comment": self.comment,
+            "features": [feature.to_dict() for feature in self.features],
             "status": self.status,
             "fusion_generation": self.fusion_generation,
         }
-
 
 @dataclass(frozen=True)
 class CadBody:
@@ -201,7 +220,6 @@ class CadBody:
             "operations": [operation.to_dict() for operation in self.operations],
         }
 
-
 @dataclass(frozen=True)
 class CadComponent:
     id: str
@@ -223,7 +241,6 @@ class CadComponent:
             "metadata": self.metadata,
         }
 
-
 @dataclass(frozen=True)
 class CadSceneMetadata:
     project_name: str
@@ -240,7 +257,6 @@ class CadSceneMetadata:
             "print_profile": self.print_profile,
             "warnings": list(self.warnings),
         }
-
 
 @dataclass(frozen=True)
 class CadScene:
@@ -264,7 +280,6 @@ class CadScene:
             "components": [component.to_dict() for component in self.components],
             "metadata": self.metadata.to_dict(),
         }
-
 
 def build_blank_cad_scene(config: InsertConfig, layout: LayoutResult) -> CadScene:
     """Build the CAD IR contract for rectangular blanks and abstract cavities.
@@ -320,7 +335,6 @@ def build_blank_cad_scene(config: InsertConfig, layout: LayoutResult) -> CadScen
         ),
     )
 
-
 def _component_from_cell_and_body(cell, body: PrintableBody, module: ModuleRequest) -> CadComponent:
     component_id = f"component:{cell.instance_id}"
     body_name = f"{cell.instance_id} rectangular blank"
@@ -365,7 +379,6 @@ def _component_from_cell_and_body(cell, body: PrintableBody, module: ModuleReque
         },
     )
 
-
 def _cad_cavities(cavities: tuple[Cavity, ...]) -> tuple[CadCavity, ...]:
     return tuple(
         CadCavity(
@@ -376,32 +389,69 @@ def _cad_cavities(cavities: tuple[Cavity, ...]) -> tuple[CadCavity, ...]:
             clearance_mm=cavity.clearance_mm,
             clearance_source=cavity.clearance_source,
             comment=cavity.comment,
+            features=_cad_features(cavity.features),
         )
         for cavity in cavities
     )
 
+def _cad_features(features: tuple[Feature, ...]) -> tuple[CadFeature, ...]:
+    return tuple(
+        CadFeature(
+            id=feature.id,
+            kind=feature.kind.value,
+            placement=feature.placement,
+            position=feature.position,
+            size=feature.size,
+            radius_mm=feature.radius_mm,
+            comment=feature.comment,
+            status=feature.status,
+            fusion_generation=feature.fusion_generation,
+        )
+        for feature in features
+    )
 
 def _cavity_operations(body_id: str, cavities: tuple[Cavity, ...]) -> tuple[CadOperation, ...]:
-    return tuple(
-        CadOperation(
-            id=f"{body_id}:{cavity.id}:{CAVITY_OPERATION_KIND}",
-            kind=CAVITY_OPERATION_KIND,
-            target_id=body_id,
-            parameters={
-                "cavity_id": cavity.id,
-                "functional_type": cavity.functional_type.value,
-                "local_origin_mm": _point_to_dict(cavity.origin),
-                "size_mm": _dimension_to_dict(cavity.size),
-                "clearance_mm": cavity.clearance_mm,
-                "clearance_source": cavity.clearance_source,
-                "coordinate_frame": "body.local",
-                "execution_status": "abstract_only",
-                "fusion_generation": "not_implemented",
-            },
+    operations: list[CadOperation] = []
+    for cavity in cavities:
+        operations.append(
+            CadOperation(
+                id=f"{body_id}:{cavity.id}:{CAVITY_OPERATION_KIND}",
+                kind=CAVITY_OPERATION_KIND,
+                target_id=body_id,
+                parameters={
+                    "cavity_id": cavity.id,
+                    "functional_type": cavity.functional_type.value,
+                    "local_origin_mm": _point_to_dict(cavity.origin),
+                    "size_mm": _dimension_to_dict(cavity.size),
+                    "clearance_mm": cavity.clearance_mm,
+                    "clearance_source": cavity.clearance_source,
+                    "coordinate_frame": "body.local",
+                    "execution_status": "abstract_only",
+                    "fusion_generation": "not_implemented",
+                },
+            )
         )
-        for cavity in cavities
-    )
-
+        for feature in cavity.features:
+            operations.append(
+                CadOperation(
+                    id=f"{body_id}:{cavity.id}:{feature.id}:{CAVITY_FEATURE_OPERATION_KIND}",
+                    kind=CAVITY_FEATURE_OPERATION_KIND,
+                    target_id=body_id,
+                    parameters={
+                        "cavity_id": cavity.id,
+                        "feature_id": feature.id,
+                        "kind": feature.kind.value,
+                        "placement": feature.placement,
+                        "position_mm": _point_to_dict(feature.position),
+                        "size_mm": _dimension_to_dict(feature.size) if feature.size is not None else None,
+                        "radius_mm": feature.radius_mm,
+                        "coordinate_frame": "cavity.local",
+                        "execution_status": "abstract_only",
+                        "fusion_generation": "not_implemented",
+                    },
+                )
+            )
+    return tuple(operations)
 
 def _parameters_from_config(config: InsertConfig) -> tuple[CadParameter, ...]:
     defaults = config.defaults
@@ -417,7 +467,6 @@ def _parameters_from_config(config: InsertConfig) -> tuple[CadParameter, ...]:
         _parameter("printer_compensation_mm", tolerances.printer_compensation_mm, "tolerance", "Printer compensation."),
     )
 
-
 def _parameter(id: str, value: float, category: str, description: str) -> CadParameter:
     return CadParameter(
         id=id,
@@ -426,7 +475,6 @@ def _parameter(id: str, value: float, category: str, description: str) -> CadPar
         category=category,
         description=description,
     )
-
 
 def _face_records(classifications: tuple[FaceClassification, ...]) -> tuple[CadFaceRecord, ...]:
     return tuple(
@@ -438,7 +486,6 @@ def _face_records(classifications: tuple[FaceClassification, ...]) -> tuple[CadF
         )
         for classification in classifications
     )
-
 
 def _tolerance_records(
     applications: tuple[FaceToleranceApplication, ...],
@@ -456,10 +503,8 @@ def _tolerance_records(
         for application in applications
     )
 
-
 def _point_to_dict(point: Point3D) -> dict[str, float]:
     return {"x": point.x, "y": point.y, "z": point.z}
-
 
 def _dimension_to_dict(dimension: Dimension3D) -> dict[str, float]:
     return {"x": dimension.x, "y": dimension.y, "z": dimension.z}

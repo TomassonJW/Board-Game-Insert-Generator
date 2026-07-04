@@ -5,6 +5,8 @@ from dataclasses import asdict, dataclass
 from board_game_insert_generator.models import (
     Cavity,
     Dimension3D,
+    Feature,
+    FeatureKind,
     FunctionalType,
     IMPLEMENTED_LAYOUT_STRATEGIES,
     RESERVED_LAYOUT_STRATEGIES,
@@ -217,6 +219,112 @@ def _validate_module_cavities(
                     ),
                 )
             )
+
+        _validate_cavity_features(cavity.features, prefix, cavity.size, issues)
+
+
+def _validate_cavity_features(
+    features: tuple[Feature, ...],
+    cavity_field: str,
+    cavity_size: Dimension3D,
+    issues: list[ValidationIssue],
+) -> None:
+    seen_ids: set[str] = set()
+    size_required_kinds = {
+        FeatureKind.FINGER_NOTCH,
+        FeatureKind.SIDE_NOTCH,
+        FeatureKind.CENTER_NOTCH,
+        FeatureKind.HALF_MOON_NOTCH,
+        FeatureKind.GRIP_AID,
+    }
+    radius_required_kinds = {FeatureKind.HALF_MOON_NOTCH, FeatureKind.ROUNDED_FLOOR}
+
+    for index, feature in enumerate(features):
+        prefix = f"{cavity_field}.features[{index}]"
+        if not feature.id:
+            issues.append(_issue(f"{prefix}.id", "EMPTY_ID", "Feature id cannot be empty."))
+        if feature.id in seen_ids:
+            issues.append(_issue(f"{prefix}.id", "DUPLICATE_ID", f"Duplicate feature id '{feature.id}'."))
+        seen_ids.add(feature.id)
+
+        if not feature.placement:
+            issues.append(_issue(f"{prefix}.placement", "EMPTY_PLACEMENT", "Feature placement cannot be empty."))
+        if feature.status != "abstract_only":
+            issues.append(
+                _issue(
+                    f"{prefix}.status",
+                    "FEATURE_STATUS_UNSUPPORTED",
+                    "Cavity features must remain abstract_only in P5-M004.",
+                )
+            )
+        if feature.fusion_generation != "not_implemented":
+            issues.append(
+                _issue(
+                    f"{prefix}.fusion_generation",
+                    "FEATURE_FUSION_GENERATION_UNSUPPORTED",
+                    "Fusion generation for cavity features is gated and must be not_implemented.",
+                )
+            )
+
+        _validate_non_negative_number(feature.position.x, f"{prefix}.position_mm.x", issues)
+        _validate_non_negative_number(feature.position.y, f"{prefix}.position_mm.y", issues)
+        _validate_non_negative_number(feature.position.z, f"{prefix}.position_mm.z", issues)
+
+        if feature.size is None and feature.kind in size_required_kinds:
+            issues.append(
+                _issue(
+                    f"{prefix}.size_mm",
+                    "CAVITY_FEATURE_SIZE_REQUIRED",
+                    f"Feature kind '{feature.kind.value}' requires size_mm.",
+                )
+            )
+        if feature.size is not None:
+            _validate_positive_dimensions(feature.size, f"{prefix}.size_mm", issues)
+            if (
+                feature.position.x + feature.size.x > cavity_size.x
+                or feature.position.y + feature.size.y > cavity_size.y
+                or feature.position.z + feature.size.z > cavity_size.z
+            ):
+                issues.append(
+                    _issue(
+                        prefix,
+                        "CAVITY_FEATURE_OUTSIDE_CAVITY",
+                        "Feature position plus size must stay inside the cavity local dimensions.",
+                    )
+                )
+        elif (
+            feature.position.x > cavity_size.x
+            or feature.position.y > cavity_size.y
+            or feature.position.z > cavity_size.z
+        ):
+            issues.append(
+                _issue(
+                    prefix,
+                    "CAVITY_FEATURE_OUTSIDE_CAVITY",
+                    "Feature position must stay inside the cavity local dimensions.",
+                )
+            )
+
+        if feature.radius_mm is None and feature.kind in radius_required_kinds:
+            issues.append(
+                _issue(
+                    f"{prefix}.radius_mm",
+                    "CAVITY_FEATURE_RADIUS_REQUIRED",
+                    f"Feature kind '{feature.kind.value}' requires radius_mm.",
+                )
+            )
+        if feature.radius_mm is not None:
+            _validate_positive_number(feature.radius_mm, f"{prefix}.radius_mm", issues)
+            max_radius = min(cavity_size.x, cavity_size.y) / 2.0
+            if feature.radius_mm > max_radius:
+                issues.append(
+                    _issue(
+                        f"{prefix}.radius_mm",
+                        "CAVITY_FEATURE_RADIUS_TOO_LARGE",
+                        f"Feature radius must not exceed half the smallest cavity XY dimension ({max_radius:.2f} mm).",
+                    )
+                )
+
 
 
 def _minimum_profile_cavity_clearance(

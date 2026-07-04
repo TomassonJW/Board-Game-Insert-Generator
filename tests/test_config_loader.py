@@ -8,8 +8,7 @@ from pathlib import Path
 from context import ROOT
 
 from board_game_insert_generator.config_loader import ConfigError, load_config
-from board_game_insert_generator.models import FunctionalType
-
+from board_game_insert_generator.models import FeatureKind, FunctionalType
 
 class ConfigLoaderTests(unittest.TestCase):
     def test_load_simple_config(self) -> None:
@@ -34,6 +33,22 @@ class ConfigLoaderTests(unittest.TestCase):
         self.assertEqual(cavity.size.x, 62.0)
         self.assertEqual(cavity.clearance_mm, 0.6)
 
+    def test_loads_abstract_cavity_features(self) -> None:
+        config = load_config(ROOT / "examples" / "simple_finger_notch_tray.json")
+
+        cavity = config.modules[0].cavities[0]
+        self.assertEqual(len(cavity.features), 2)
+        notch = cavity.features[0]
+        rounded_floor = cavity.features[1]
+        self.assertEqual(notch.id, "front-half-moon-notch")
+        self.assertEqual(notch.kind, FeatureKind.HALF_MOON_NOTCH)
+        self.assertEqual(notch.placement, "front_center")
+        self.assertEqual(notch.position.x, 22.0)
+        self.assertEqual(notch.size.x, 18.0)
+        self.assertEqual(notch.radius_mm, 9.0)
+        self.assertEqual(rounded_floor.kind, FeatureKind.ROUNDED_FLOOR)
+        self.assertIsNone(rounded_floor.size)
+        self.assertEqual(rounded_floor.radius_mm, 3.0)
 
     def test_card_cavities_default_clearance_from_profile(self) -> None:
         config = load_config(ROOT / "examples" / "simple_card_tray.json")
@@ -47,7 +62,6 @@ class ConfigLoaderTests(unittest.TestCase):
         self.assertEqual(sleeved_cavity.functional_type, FunctionalType.SLEEVED_CARDS)
         self.assertEqual(sleeved_cavity.clearance_mm, 0.95)
         self.assertEqual(sleeved_cavity.clearance_source, "tolerances.sleeved_card_clearance_mm")
-
 
     def test_open_receptacles_default_clearance_from_profile(self) -> None:
         config = load_config(ROOT / "examples" / "simple_open_tray.json")
@@ -100,6 +114,28 @@ class ConfigLoaderTests(unittest.TestCase):
             ConfigError,
             r"Unknown field\(s\) in 'modules\[0\]\.cavities\[0\]': surprise",
         ):
+            _load_payload(payload)
+    def test_rejects_unknown_cavity_feature_kind(self) -> None:
+        payload = _simple_payload()
+        payload["modules"][0]["cavities"] = [
+            {
+                "id": "bad-pocket",
+                "origin_mm": {"x": 2, "y": 2, "z": 1.2},
+                "size_mm": {"x": 10, "y": 10, "z": 5},
+                "clearance_mm": 0.5,
+                "features": [
+                    {
+                        "id": "magic-notch",
+                        "kind": "magic_notch",
+                        "placement": "front_center",
+                        "position_mm": {"x": 1, "y": 0, "z": 1},
+                        "size_mm": {"x": 4, "y": 2, "z": 2},
+                    }
+                ],
+            }
+        ]
+
+        with self.assertRaisesRegex(ConfigError, "Unsupported feature kind"):
             _load_payload(payload)
 
     def test_rejects_missing_file(self) -> None:
@@ -182,17 +218,14 @@ class ConfigLoaderTests(unittest.TestCase):
         self.assertEqual(config.modules[0].id, "module-1")
         self.assertEqual(config.modules[0].name, "Module 1")
 
-
 def _simple_payload() -> dict:
     return json.loads((ROOT / "examples" / "simple_box.json").read_text(encoding="utf-8"))
-
 
 def _load_payload(payload: dict):
     with tempfile.TemporaryDirectory() as temporary_directory:
         path = Path(temporary_directory) / "config.json"
         path.write_text(json.dumps(payload), encoding="utf-8")
         return load_config(path)
-
 
 if __name__ == "__main__":
     unittest.main()

@@ -483,17 +483,44 @@ commitee sans melanger plusieurs decisions structurantes.
 - Dependances : P5-M001.
 - Statut : `done`.
 
-### P5-M004 - Ajouter encoches de doigts et fonds arrondis
+### P5-M004 - Decrire les encoches de doigts et fonds arrondis comme features abstraites
 
 - Phase liee : Phase 5 - Cavites et receptacles
-- Objectif : ameliorer l'ergonomie des cavites.
-- Livrable attendu : features abstraites pour finger notch et rounded floor.
-- Fichiers probablement concernes : `models.py`, adaptateur CAD futur,
-  `docs/GEOMETRY_MODEL.md`.
-- Criteres d'acceptation : les features sont CAD-agnostic ; Fusion pourra les
-  mapper plus tard.
-- Tests ou verifications : tests de serialization ou rapport.
+- Objectif : ameliorer l'ergonomie des cavites sans generation Fusion reelle.
+- Livrable attendu : features abstraites CAD-agnostic pour finger notch,
+  encoches laterales/centrales, demi-lunes, fonds arrondis et aides de prise en
+  main.
+- Fichiers concernes : `src/board_game_insert_generator/models.py`,
+  `config_loader.py`, `validation.py`, `report.py`, `cad_ir.py`, `tests/`,
+  `examples/simple_finger_notch_tray.json`, docs et ADR-0011.
+- Criteres d'acceptation : les features sont chargees, validees, reportees et
+  exportees dans la CAD IR avec `status: abstract_only` et
+  `fusion_generation: not_implemented` ; Fusion pourra les mapper plus tard
+  seulement apres une nouvelle gate humaine.
+- Tests ou verifications : suite unitaire complete, CLI Markdown/JSON/export CAD
+  IR sur exemples existants et nouvel exemple, `git diff --check`, verification
+  `adsk` hors coeur.
 - Dependances : P5-M002, P5-M003.
+- Gate humaine : validee explicitement le 2026-07-04 pour des features
+  abstraites CAD-agnostic uniquement.
+- Statut : `done`.
+
+### P5-M005 - Gate generation Fusion reelle de cavites et features
+
+- Phase liee : Phase 5 - Cavites et receptacles
+- Objectif : decider si et comment mapper les cavites et features abstraites vers
+  des operations Fusion reelles.
+- Livrable attendu : rapport de gate avant toute extrusion cut, boolean, fillet,
+  conge, encoche reelle, fond arrondi ou geometrie courbe.
+- Fichiers probablement concernes : `docs/NEXT_ACTIONS.md`,
+  `docs/FUSION_360_STRATEGY.md`, `fusion_addin/BoardGameInsertGenerator/` si la
+  gate est ensuite validee.
+- Criteres d'acceptation : etat du moteur, etat CAD IR, operation Fusion visee,
+  risques, strategie recommandee et procedure de smoke test manuel sont explicites.
+- Tests ou verifications : suite coeur Python et export CAD IR avant toute
+  implementation ; smoke test Fusion manuel seulement apres gate validee.
+- Dependances : P5-M004.
+- Gate humaine : obligatoire.
 - Statut : `blocked`.
 
 ## Phase 6 - Modules composites

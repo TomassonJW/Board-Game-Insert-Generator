@@ -93,6 +93,10 @@ Tests, cartes backlog ou gates humaines a preparer.
   d'adaptateur Fusion 360.
 - `ADR-0009-fusion-sketch-extrusion-blanks.md` - generation Fusion minimale par
   esquisse et extrusion.
+- `ADR-0010-abstract-cavities-before-fusion-cuts.md` - cavites abstraites avant
+  coupes Fusion.
+- `ADR-0011-abstract-cavity-features.md` - features ergonomiques abstraites de
+  cavites.
 
 ## Regles de maintenance
 

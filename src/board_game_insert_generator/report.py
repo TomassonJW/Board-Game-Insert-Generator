@@ -9,6 +9,7 @@ from board_game_insert_generator.models import (
     IMPLEMENTED_LAYOUT_STRATEGIES,
     Cavity,
     Dimension3D,
+    Feature,
     InsertConfig,
     LayoutResult,
     ModuleRequest,
@@ -17,7 +18,6 @@ from board_game_insert_generator.models import (
 from board_game_insert_generator.print_profiles import print_profile_label, print_profile_note
 from board_game_insert_generator.tolerance import ToleranceError
 from board_game_insert_generator.validation import ValidationError
-
 
 def layout_to_dict(config: InsertConfig, result: LayoutResult) -> dict[str, Any]:
     planned_cavities = _planned_cavities_by_instance(config, result)
@@ -44,6 +44,7 @@ def layout_to_dict(config: InsertConfig, result: LayoutResult) -> dict[str, Any]
             "cell_count": len(result.cells),
             "printable_body_count": len(result.printable_bodies),
             "planned_cavity_count": sum(len(entries) for entries in planned_cavities.values()),
+            "planned_feature_count": _planned_feature_count(planned_cavities),
             "rotated_cell_count": sum(1 for cell in result.cells if cell.rotated),
             "layout_footprint_mm": _dim(_layout_footprint(result)),
             "max_printable_height_mm": _max_printable_height(result),
@@ -116,14 +117,13 @@ def layout_to_dict(config: InsertConfig, result: LayoutResult) -> dict[str, Any]
         ],
     }
 
-
 def layout_to_json(config: InsertConfig, result: LayoutResult) -> str:
     return json.dumps(layout_to_dict(config, result), indent=2, ensure_ascii=False)
-
 
 def layout_to_markdown(config: InsertConfig, result: LayoutResult) -> str:
     planned_cavities = _planned_cavities_by_instance(config, result)
     planned_cavity_count = sum(len(entries) for entries in planned_cavities.values())
+    planned_feature_count = _planned_feature_count(planned_cavities)
     lines = [
         f"# Layout report - {config.project_name}",
         "",
@@ -140,6 +140,7 @@ def layout_to_markdown(config: InsertConfig, result: LayoutResult) -> str:
         f"- Generated instances: {len(result.cells)}",
         f"- Printable bodies: {len(result.printable_bodies)}",
         f"- Planned cavities: {planned_cavity_count}",
+        f"- Planned cavity features: {planned_feature_count}",
         f"- Rotated cells: {sum(1 for cell in result.cells if cell.rotated)}",
         f"- Layout footprint: {_format_dim(_layout_footprint(result))}",
         f"- Max printable height: {_max_printable_height(result):.2f} mm",
@@ -221,6 +222,24 @@ def layout_to_markdown(config: InsertConfig, result: LayoutResult) -> str:
     lines.extend(
         [
             "",
+            "## Planned cavity features",
+            "",
+        ]
+    )
+    if planned_feature_count:
+        lines.extend(
+            [
+                "| Instance | Cavity | Feature | Kind | Placement | Position | Size | Radius | Status |",
+                "| --- | --- | --- | --- | --- | ---: | ---: | ---: | --- |",
+                *_format_feature_rows(planned_cavities),
+            ]
+        )
+    else:
+        lines.append("- No planned cavity features.")
+
+    lines.extend(
+        [
+            "",
             "## Face classifications",
             "",
             "| Instance | Roles |",
@@ -249,21 +268,18 @@ def layout_to_markdown(config: InsertConfig, result: LayoutResult) -> str:
             "",
             "Cell size is the theoretical layout reservation. Printable size is the body after "
             "face-level tolerance offsets. Face classifications drive explicit tolerance rules. "
-            "Planned cavities are abstract engine/CAD IR intent only; Fusion does not cut them "
-            "yet in P5-M001. V0 does not guarantee an optimized layout or physically validated "
-            "tolerances.",
+            "Planned cavities and cavity features are abstract engine/CAD IR intent only; Fusion "
+            "does not cut cavities, generate notches or create rounded floors yet in P5-M004. V0 "
+            "does not guarantee an optimized layout or physically validated tolerances.",
         ]
     )
     return "\n".join(lines)
 
-
 def _dim(dimensions: Dimension3D) -> dict[str, float]:
     return {"x": _clean_float(dimensions.x), "y": _clean_float(dimensions.y), "z": _clean_float(dimensions.z)}
 
-
 def _point(point: Point3D) -> dict[str, float]:
     return {"x": _clean_float(point.x), "y": _clean_float(point.y), "z": _clean_float(point.z)}
-
 
 def _cavity_to_dict(cavity: Cavity) -> dict[str, Any]:
     return {
@@ -274,9 +290,22 @@ def _cavity_to_dict(cavity: Cavity) -> dict[str, Any]:
         "clearance_mm": _clean_float(cavity.clearance_mm),
         "clearance_source": cavity.clearance_source,
         "comment": cavity.comment,
+        "features": [_feature_to_dict(feature) for feature in cavity.features],
         "status": "abstract_only",
     }
 
+def _feature_to_dict(feature: Feature) -> dict[str, Any]:
+    return {
+        "id": feature.id,
+        "kind": feature.kind.value,
+        "placement": feature.placement,
+        "position_mm": _point(feature.position),
+        "size_mm": _dim(feature.size) if feature.size is not None else None,
+        "radius_mm": _clean_float(feature.radius_mm) if feature.radius_mm is not None else None,
+        "comment": feature.comment,
+        "status": feature.status,
+        "fusion_generation": feature.fusion_generation,
+    }
 
 def _planned_cavities_by_instance(
     config: InsertConfig,
@@ -289,18 +318,14 @@ def _planned_cavities_by_instance(
         planned[cell.instance_id] = module.cavities if module is not None else ()
     return planned
 
-
 def _clean_float(value: float) -> float:
     return round(value, 4)
-
 
 def _format_dim(dimensions: Dimension3D) -> str:
     return f"{dimensions.x:.2f} x {dimensions.y:.2f} x {dimensions.z:.2f} mm"
 
-
 def _format_point(point: Point3D) -> str:
     return f"({point.x:.2f}, {point.y:.2f}, {point.z:.2f})"
-
 
 def _format_offsets(offsets: Any) -> str:
     return (
@@ -309,6 +334,8 @@ def _format_offsets(offsets: Any) -> str:
         f"z-{offsets.z_min:.2f}, z+{offsets.z_max:.2f}"
     )
 
+def _planned_feature_count(planned_cavities: dict[str, tuple[Cavity, ...]]) -> int:
+    return sum(len(cavity.features) for cavities in planned_cavities.values() for cavity in cavities)
 
 def _format_cavity_rows(planned_cavities: dict[str, tuple[Cavity, ...]]) -> list[str]:
     rows: list[str] = []
@@ -327,6 +354,30 @@ def _format_cavity_rows(planned_cavities: dict[str, tuple[Cavity, ...]]) -> list
             )
     return rows
 
+def _format_feature_rows(planned_cavities: dict[str, tuple[Cavity, ...]]) -> list[str]:
+    rows: list[str] = []
+    for instance_id, cavities in planned_cavities.items():
+        for cavity in cavities:
+            for feature in cavity.features:
+                rows.append(
+                    "| "
+                    f"{instance_id} | "
+                    f"{cavity.id} | "
+                    f"{feature.id} | "
+                    f"{feature.kind.value} | "
+                    f"{feature.placement} | "
+                    f"{_format_point(feature.position)} | "
+                    f"{_format_optional_dim(feature.size)} | "
+                    f"{_format_optional_radius(feature)} | "
+                    f"{feature.status}; fusion={feature.fusion_generation} |"
+                )
+    return rows
+
+def _format_optional_dim(dimensions: Dimension3D | None) -> str:
+    return _format_dim(dimensions) if dimensions is not None else "n/a"
+
+def _format_optional_radius(feature: Feature) -> str:
+    return f"{feature.radius_mm:.2f} mm" if feature.radius_mm is not None else "n/a"
 
 def _format_face_roles(body: Any) -> str:
     roles = {
@@ -335,7 +386,6 @@ def _format_face_roles(body: Any) -> str:
     }
     ordered_faces = ("x_min", "x_max", "y_min", "y_max", "z_min", "z_max")
     return ", ".join(f"{face}: {roles.get(face, 'unknown')}" for face in ordered_faces)
-
 
 def _format_applied_tolerance_rows(body: Any) -> list[str]:
     return [
@@ -349,7 +399,6 @@ def _format_applied_tolerance_rows(body: Any) -> list[str]:
         for application in body.tolerance_applications
     ]
 
-
 def _layout_footprint(result: LayoutResult) -> Dimension3D:
     if not result.cells:
         return Dimension3D(x=0.0, y=0.0, z=0.0)
@@ -359,12 +408,10 @@ def _layout_footprint(result: LayoutResult) -> Dimension3D:
         z=max(cell.size.z for cell in result.cells),
     )
 
-
 def _max_printable_height(result: LayoutResult) -> float:
     if not result.printable_bodies:
         return 0.0
     return max(body.size.z for body in result.printable_bodies)
-
 
 def _layout_comparison(config: InsertConfig, current_result: LayoutResult) -> list[dict[str, Any]]:
     comparison: list[dict[str, Any]] = []
@@ -403,7 +450,6 @@ def _layout_comparison(config: InsertConfig, current_result: LayoutResult) -> li
         )
     return comparison
 
-
 def _format_comparison_rows(comparison: list[dict[str, Any]]) -> list[str]:
     rows: list[str] = []
     for entry in comparison:
@@ -426,13 +472,11 @@ def _format_comparison_rows(comparison: list[dict[str, Any]]) -> list[str]:
         )
     return rows
 
-
 def _occupation_percent(config: InsertConfig, footprint: Dimension3D) -> float:
     box_area = config.box.inner_dimensions.x * config.box.inner_dimensions.y
     if box_area <= 0:
         return 0.0
     return _clean_float((footprint.x * footprint.y / box_area) * 100.0)
-
 
 def _simple_layout_score(occupation_percent: float, warning_count: int) -> float:
     return _clean_float(max(0.0, 100.0 - occupation_percent - warning_count * 5.0))

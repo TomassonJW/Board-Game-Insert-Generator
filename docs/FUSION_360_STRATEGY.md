@@ -112,8 +112,10 @@ La premiere cible Fusion se limite a des blanks rectangulaires :
 - dimensions issues de `printable_origin_mm` et `printable_size_mm` ;
 - boite de reference sous forme d'esquisse non imprimable ;
 - aucun creusage avance execute dans Fusion ;
-- les cavites P5-M001 peuvent etre presentes dans la CAD IR mais restent
-  bstract_only ;
+- aucune encoche de doigt, demi-lune, aide de prise en main ou fond arrondi
+  execute dans Fusion ;
+- les cavites P5 et leurs features ergonomiques P5-M004 peuvent etre presentes
+  dans la CAD IR mais restent `abstract_only` ;
 - aucun couvercle ;
 - aucun fillet/conge ;
 - aucun export STL/3MF ;
@@ -183,6 +185,8 @@ Verifications dans Fusion :
 
 - presence du sketch de reference non imprimable dans le composant racine ;
 - presence des bodies de blanks dans le composant racine ;
+- absence de generation reelle pour `subtract_rectangular_cavity` et
+  `describe_cavity_feature` ;
 - noms ;
 - dimensions ;
 - origines ;
