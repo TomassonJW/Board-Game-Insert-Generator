@@ -1,251 +1,165 @@
 # Roadmap
 
-Cette roadmap decrit les phases macro jusqu'au produit fini. Le detail
-operationnel vit dans `docs/BACKLOG.md`; l'etat courant vit dans
-`docs/STATUS.md`.
+Cette roadmap decrit les phases macro jusqu'au produit cible. Le detail
+operationnel vit dans `docs/BACKLOG.md`, l'etat courant dans `docs/STATUS.md`,
+et la lecture par capabilities dans `docs/CAPABILITY_MAP.md`.
 
-## Phase 0 - Fondation projet
+## Phase 0 - Gouvernance, autonomie, qualite
 
-Objectif : rendre le depot autopilotable.
+Objectif : rendre le depot autopilotable, gate-aware et maintenable.
 
-Contenu :
+Capabilities liees : pilotage projet, gates, validation, integration Git autonome.
 
-- documentation de vision et produit ;
-- protocole Codex ;
-- protocole d'autonomie operatoire ;
-- boucle d'execution standard ;
-- gates humaines ;
-- matrice de validation ;
-- roles logiques d'agents ;
-- runbook humain ;
-- roadmap macro ;
-- backlog actionnable ;
-- statut projet ;
-- prochaines actions ;
-- garde-fou documentaire automatise ;
-- ADR et logs ;
-- regles qualite ;
-- templates GitHub.
-
-Criteres de reussite :
-
-- un futur agent peut reprendre sans contexte oral ;
-- les missions sont petites, testables et documentees ;
-- les decisions structurantes ont un emplacement clair ;
-- les gates humaines sont identifiees avant implementation ;
-- une boucle se limite a une mission `ready` ;
-- le depot indique ce qui est implemente, experimental, prevu et a valider par
-  impression reelle.
+Criteres de reussite : documents de controle presents, tests documentaires,
+ADR/logs, autonomie direct-to-main, selection par capability.
 
 ## Phase 1 - Moteur Python pur
 
-Objectif : stabiliser le coeur metier local, sans dependance Fusion 360.
+Objectif : stabiliser les value objects, le chargement JSON, la validation et les
+rapports hors Fusion.
 
-Contenu :
+Capabilities liees : C-BOX, C-MODULE, base C-CAD-IR.
 
-- modeles de donnees ;
-- chargement JSON ;
-- validation ;
-- dimensions en millimetres ;
-- rapports Markdown/JSON ;
-- CLI de diagnostic ;
-- tests unitaires.
+Criteres de reussite : une configuration locale valide produit un resultat
+reproductible et teste hors Fusion.
 
-Criteres de reussite :
+## Phase 2 - Layout 2D simple
 
-- une configuration locale valide produit un resultat reproductible ;
-- les erreurs sont actionnables ;
-- le moteur est importable et testable hors Fusion 360 ;
-- le contrat interne est documente.
+Objectif : placer des modules rectangulaires dans le plan XY avec strategies
+simples et comparaison explicable.
 
-## Phase 2 - Layout rectangulaire simple
+Capabilities liees : C-LAYOUT-2D.
 
-Objectif : produire des organisations rectangulaires comprehensibles pour jeux
-simples.
+Criteres de reussite : `row_fill` et `grid` fonctionnent, les cas impossibles
+sont refuses, les cellules theoriques restent distinctes des corps imprimables.
 
-Contenu :
+## Phase 3 - Tolerances, profils d'impression, clearances
 
-- decoupage en grille ;
-- strategies lignes et colonnes ;
-- cellules theoriques ;
-- modules imprimables rectangulaires ;
-- rotation controlee ;
-- comparaison simple de layouts.
+Objectif : appliquer les jeux selon roles de faces, profils d'impression et types
+de cavites.
 
-Criteres de reussite :
+Capabilities liees : C-MODULE, C-CAVITY, C-CALIBRATION.
 
-- le moteur peut proposer des layouts simples et deterministes ;
-- les cas impossibles sont detectes proprement ;
-- les cellules theoriques ne sont pas confondues avec les corps imprimables.
+Criteres de reussite : chaque offset et clearance expose sa source et ses limites
+de validation.
 
-## Phase 3 - Tolerances intelligentes
+## Phase 4 - CAD IR et pipeline Fusion minimal
 
-Objectif : appliquer les jeux selon le role de chaque face et le profil
-d'impression.
+Objectif : produire une CAD IR stable et generer des blanks rectangulaires
+inspectables dans Fusion.
 
-Contenu :
+Capabilities liees : C-CAD-IR, C-FUSION-COMPACT.
 
-- jeu peripherique ;
-- jeu inter-modules ;
-- faces exposees ;
-- faces internes ;
-- profils d'impression ;
-- marges fonctionnelles ;
-- protocole de calibration physique.
+Criteres de reussite : export CAD IR CLI, add-in isole, blanks mesures dans
+Fusion, coeur Python sans `adsk`.
 
-Criteres de reussite :
+## Phase 5 - Cavites, receptacles et features ergonomiques
 
-- chaque offset a une raison explicable ;
-- les rapports affichent les valeurs appliquees ;
-- les tolerances restent ajustables ;
-- les valeurs critiques sont marquees comme a valider par impression reelle.
+Objectif : decrire les cavites et aides ergonomiques cote moteur, rapports et CAD
+IR, sans generation Fusion reelle.
 
-## Phase 4 - Generation Fusion 360 de blanks
+Capabilities liees : C-CAVITY, C-FEATURE.
 
-Objectif : generer des composants Fusion 360 rectangulaires a partir du moteur.
+Criteres de reussite : cavites et features chargees, validees, reportees et
+exportees comme intentions abstraites.
 
-Contenu :
+## Phase 6 - Generation Fusion reelle des cavites et features simples
 
-- contrat de representation intermediaire CAD-agnostic ;
-- add-in ou script Fusion 360 ;
-- creation de composants ;
-- corps rectangulaires ;
-- parametres ;
-- rayons simples ;
-- export eventuel.
+Objectif : mapper progressivement `subtract_rectangular_cavity` puis certaines
+features vers des operations Fusion reelles controlees.
 
-Criteres de reussite :
+Capabilities liees : C-FUSION-CAVITIES, C-FILLETS.
 
-- une configuration valide produit des composants inspectables ;
-- Fusion ne recalcule ni layout ni tolerances ;
-- le coeur Python reste testable hors Fusion.
+Criteres de reussite : smoke tests Fusion manuels, aucune logique metier dans
+Fusion, aucune validation physique revendiquee.
 
-## Phase 5 - Cavites et receptacles
+Gate : obligatoire avant cuts, booleans, fillets, encoches ou fonds arrondis.
 
-Objectif : transformer les blanks en modules fonctionnels.
+## Phase 7 - Vue compacte / vue eclatee
 
-Contenu :
+Objectif : produire dans Fusion une vue compacte dans la boite et une vue eclatee
+ou repartie a plat pour inspection/export futur.
 
-- bacs a tokens ;
-- logements cartes ;
-- cartes sleevees ;
-- des ;
-- meeples ;
-- encoches de doigts ;
-- separateurs ;
-- fonds arrondis.
+Capabilities liees : C-FUSION-COMPACT, C-FUSION-EXPLODED.
 
-Criteres de reussite :
+Criteres de reussite : positions de vue issues du moteur ou de la CAD IR, noms
+stables, pas de changement dimensionnel.
 
-- les cavites respectent les parois minimales ;
-- chaque type fonctionnel a des clearances explicites ;
-- les premiers modules sont imprimables et documentes.
+## Phase 8 - Grille volumetrique 3D et etages
 
-## Phase 6 - Modules composites
+Objectif : raisonner en X/Y/Z, layers, volumes libres, support et empilement.
 
-Objectif : gerer les modules formes de plusieurs volumes soudes.
+Capabilities liees : C-GRID-3D, C-LAYERS, C-STACKING.
 
-Contenu :
+Criteres de reussite : representation pure Python testee, collisions X/Y/Z
+explicites, aucune promesse physique sans impression.
 
-- modules en L ;
-- modules en T ;
-- volumes soudes ;
-- gestion des faces internes ;
-- fusion geometrique ;
-- tolerances uniquement sur faces exposees.
+## Phase 9 - Assets, plateaux, boards, regles et reservations de couches
 
-Criteres de reussite :
+Objectif : passer d'un modele module-first a un modele asset-first avec
+reservations non imprimables.
 
-- un module composite ne recoit aucun jeu sur ses jonctions internes ;
-- les faces exposees restent tolerancees ;
-- les unions CAD sont inspectables.
+Capabilities liees : C-ASSET, C-RESERVATION.
 
-## Phase 7 - Couvercles et mecanismes
+Criteres de reussite : assets distincts des modules, dimensions approximatives
+signalees, reservations verticales et XY documentees.
 
-Objectif : ajouter des fermetures et interfaces fonctionnelles.
+## Phase 10 - Solveur semi-automatique et scoring
 
-Contenu :
+Objectif : proposer plusieurs variantes explicables et scorees.
 
-- couvercles poses ;
-- couvercles coulissants ;
-- rainures ;
-- charnieres simples ;
-- clips eventuels ;
-- jeux fonctionnels.
+Capabilities liees : C-SOLVER.
 
-Criteres de reussite :
+Criteres de reussite : scoring transparent, variantes refusees avec raison,
+aucune dependance lourde sans ADR/gate.
 
-- les mecanismes ont des tolerances dediees ;
-- les risques d'impression sont documentes ;
-- les pieces doivent etre validees physiquement avant statut stable.
+## Phase 11 - Modules composites et formes soudees
 
-## Phase 8 - Surcouche esthetique
+Objectif : representer et generer des modules en L/T ou volumes soudes avec faces
+internes sans jeu.
 
-Objectif : ajouter un langage visuel parametrique sans casser la fonction.
+Capabilities liees : C-COMPOSITE.
 
-Contenu :
+Criteres de reussite : primitives soudees, roles internal/welded fiables,
+generation CAD sous gate.
 
-- embossage ;
-- gravure ;
-- labels ;
-- textures ;
-- ajourages ;
-- motifs ;
-- coins stylises.
+## Phase 12 - Couvercles, mecanismes et empilement avance
 
-Criteres de reussite :
+Objectif : ajouter couvercles poses/coulissants, rainures, clips, charnieres et
+interfaces fonctionnelles.
 
-- les options esthetiques sont des features parametriques ;
-- elles peuvent etre activees/desactivees ;
-- elles respectent les contraintes d'epaisseur et d'impression.
+Capabilities liees : C-STACKING, futurs mecanismes.
 
-## Phase 9 - Assistant de conception
+Criteres de reussite : jeux fonctionnels dedies, gates impression, risques
+explicites.
 
-Objectif : aider l'utilisateur a passer des assets aux propositions de layout.
+## Phase 13 - Esthetique, embossage, gravure, textures, decorations
 
-Contenu :
+Objectif : ajouter un langage visuel parametrable sans casser la fonction.
 
-- description des assets ;
-- generation de propositions ;
-- scoring compacite ;
-- scoring ergonomie ;
-- scoring impression ;
-- scoring setup ;
-- variantes de layout.
+Capabilities liees : C-AESTHETIC.
 
-Criteres de reussite :
+Criteres de reussite : features esthetiques optionnelles, desactivables,
+compatibles epaisseur/impression.
 
-- les recommandations sont explicables ;
-- plusieurs variantes peuvent etre comparees ;
-- les hypotheses restent visibles.
+## Phase 14 - Calibration, impression reelle, packaging et beta utilisable
 
-## Phase 10 - Packaging produit
+Objectif : transformer les preuves abstraites/CAD en usage reel imprime et
+distribuable.
 
-Objectif : rendre l'outil utilisable, documente et distribuable.
+Capabilities liees : C-CALIBRATION et release.
 
-Contenu :
-
-- documentation utilisateur ;
-- exemples reels ;
-- presets ;
-- export ;
-- distribution ;
-- versioning ;
-- release stable.
-
-Criteres de reussite :
-
-- un utilisateur peut installer, lancer un exemple et comprendre les limites ;
-- les releases indiquent clairement ce qui est stable ou experimental ;
-- les exemples reels sont reproductibles.
+Criteres de reussite : protocoles de mesure, profils ajustes, exemples reels,
+versioning et packaging utilisateur.
 
 ## Regle de progression
 
-Une phase peut etre partiellement exploree avant la phase precedente si cela
-reduit un risque majeur, mais elle ne doit pas etre declaree terminee sans :
+Une phase peut etre exploree avant la precedente si elle reduit un risque majeur,
+mais elle ne doit pas etre declaree terminee sans :
 
-- tests pertinents ;
-- documentation a jour ;
+- capability liee mise a jour ;
+- tests ou validation documentaire ;
 - statut clair dans `docs/STATUS.md` ;
 - backlog mis a jour ;
-- limites explicites.
+- gates explicites ;
+- limites de validation visibles.

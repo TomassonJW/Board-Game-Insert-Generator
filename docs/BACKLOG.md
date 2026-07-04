@@ -1,722 +1,386 @@
 # Backlog
 
-Ce backlog decoupe la roadmap en missions courtes, actionnables et verifiables.
-Les statuts autorises sont : `todo`, `ready`, `in_progress`, `blocked`, `done`,
-`deferred`.
+Derniere mise a jour : 2026-07-04
 
-Une mission doit rester assez petite pour etre terminee, testee, documentee et
-commitee sans melanger plusieurs decisions structurantes.
+Le backlog transforme la North Star en missions atomiques. Chaque mission future
+doit indiquer au minimum : ID, titre, capability liee, milestone lie, objectif,
+livrable, criteres d'acceptation, tests, gate eventuelle et statut.
+
+Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
+`deferred`.
 
 ## Phase 0 - Fondation projet
 
 ### P0-M001 - Installer le systeme de pilotage projet
 
-- Phase liee : Phase 0 - Fondation projet
-- Objectif : creer le protocole Codex, la roadmap, le backlog, le statut, les
-  prochaines actions, les index ADR/logs et les templates GitHub.
-- Livrable attendu : documents de gouvernance utilisables par un futur agent.
-- Fichiers probablement concernes : `AGENTS.md`, `README.md`, `docs/*`,
-  `.github/*`.
-- Criteres d'acceptation : les documents obligatoires existent ; les prochaines
-  missions sont explicites ; les regles de mise a jour sont documentees.
-- Tests ou verifications : `python -m unittest discover -s tests`, `git diff
-  --check`.
-- Dependances : aucune.
+- Capability : pilotage projet.
+- Milestone : M1 Engine foundation.
+- Objectif : creer les docs de controle minimales.
+- Livrable : STATUS, ROADMAP, BACKLOG, NEXT_ACTIONS, ADR/logs.
+- Criteres d'acceptation : un agent peut reprendre le projet sans contexte oral.
+- Tests : inspection documentaire.
+- Gate : aucune.
 - Statut : `done`.
 
 ### P0-M002 - Ajouter une verification documentaire de base
 
-- Phase liee : Phase 0 - Fondation projet
-- Objectif : automatiser un controle simple des liens, fichiers obligatoires et
-  sections critiques.
-- Livrable attendu : script local ou test qui echoue si un fichier de pilotage
-  obligatoire manque.
-- Fichiers probablement concernes : `tests/`, `docs/QUALITY_RULES.md`,
-  `pyproject.toml`.
-- Criteres d'acceptation : la liste des fichiers critiques est testee ; le test
-  documente les manques avec un message lisible.
-- Tests ou verifications : test unitaire dedie et suite complete.
-- Dependances : P0-M001.
+- Capability : pilotage projet.
+- Milestone : M1 Engine foundation.
+- Objectif : verifier automatiquement les fichiers et sections de pilotage.
+- Livrable : tests documentaires dans la suite unitaire.
+- Criteres d'acceptation : absence de fichier de controle critique detectee par test.
+- Tests : `python -m unittest discover -s tests`.
+- Gate : aucune.
 - Statut : `done`.
 
 ### P0-M003 - Bootstrap autonomy protocol
 
-- Phase liee : Phase 0 - Fondation projet
-- Objectif : creer la couche d'autonomie operatoire permettant a Codex de
-  selectionner, executer, tester, documenter et committer une mission unique en
-  respectant les gates humaines.
-- Livrable attendu : protocole d'autonomie, boucle d'execution, gates humaines,
-  matrice de validation, roles agents, plan de sprint, runbook et log.
-- Fichiers probablement concernes : `AGENTS.md`, `docs/AUTONOMY_PROTOCOL.md`,
-  `docs/EXECUTION_LOOP.md`, `docs/HUMAN_GATES.md`,
-  `docs/VALIDATION_MATRIX.md`, `docs/AGENT_ROLES.md`,
-  `docs/SPRINT_PLAN.md`, `docs/AUTONOMY_RUNBOOK.md`, `docs/LOGS/`.
-- Criteres d'acceptation : les documents existent ; les gates sont explicites ;
-  `P0-M004` est creee comme mission de dry run ; le depot reste hors
-  developpement produit profond.
-- Tests ou verifications : suite unitaire, exemple CLI, `git diff --check`.
-- Dependances : P0-M001.
+- Capability : pilotage projet.
+- Milestone : M1 Engine foundation.
+- Objectif : decrire l'autonomie Codex et les arrets obligatoires.
+- Livrable : protocole d'autonomie, execution loop, gates et matrice.
+- Criteres d'acceptation : selection de mission et arrets lisibles.
+- Tests : inspection documentaire.
+- Gate : aucune.
 - Statut : `done`.
 
 ### P0-M004 - Dry-run autonomous mission selection
 
-- Phase liee : Phase 0 - Fondation projet
-- Objectif : executer une selection autonome a blanc pour verifier que Codex
-  choisit correctement la prochaine mission `ready` sans la demarrer.
-- Livrable attendu : rapport de dry-run indiquant fichiers lus, mission choisie,
-  dependances, gates, criteres d'acceptation et raison de non-execution.
-- Fichiers probablement concernes : `docs/NEXT_ACTIONS.md`,
-  `docs/BACKLOG.md`, `docs/STATUS.md`, `docs/LOGS/`.
-- Criteres d'acceptation : la mission selectionnee est justifiee ; aucune
-  implementation produit n'est faite ; les ambiguities de pilotage sont notees.
-- Tests ou verifications : relecture documentaire, `git diff --check`.
-- Dependances : P0-M003.
+- Capability : pilotage projet.
+- Milestone : M1 Engine foundation.
+- Objectif : tester la selection sans mutation produit.
+- Livrable : log de dry run.
+- Criteres d'acceptation : prochaine mission identifiee sans execution abusive.
+- Tests : inspection documentaire.
+- Gate : aucune.
 - Statut : `done`.
 
 ### P0-M005 - Stabiliser le format des ADR
 
-- Phase liee : Phase 0 - Fondation projet
-- Objectif : definir un template ADR utilisable pour les futures decisions.
-- Livrable attendu : modele ADR et index mis a jour.
-- Fichiers probablement concernes : `docs/DECISIONS/README.md`,
-  `docs/DECISIONS/ADR-*.md`.
-- Criteres d'acceptation : le template couvre contexte, options, decision,
-  consequences et alternatives refusees.
-- Tests ou verifications : relecture documentaire.
-- Dependances : P0-M001.
+- Capability : pilotage projet.
+- Milestone : M1 Engine foundation.
+- Objectif : rendre les decisions structurantes auditables.
+- Livrable : template ADR et index.
+- Criteres d'acceptation : ADR futures cadrables avec contexte/options/decision.
+- Tests : test documentaire.
+- Gate : aucune.
 - Statut : `done`.
 
 ### P0-M006 - Definir une nomenclature de versions et releases
 
-- Phase liee : Phase 0 - Fondation projet
-- Objectif : clarifier comment passer de V0 experimental a releases utilisables.
-- Livrable attendu : convention versioning et criteres de release.
-- Fichiers probablement concernes : `README.md`, `docs/STATUS.md`,
-  `docs/ROADMAP.md`.
-- Criteres d'acceptation : chaque version a une definition minimale ; les
-  conditions de release sont testables.
-- Tests ou verifications : relecture documentaire.
-- Dependances : P0-M001.
+- Capability : release future.
+- Milestone : M14 Usable beta.
+- Objectif : preparer une version utilisateur sans publication immediate.
+- Livrable : nomenclature de versions.
+- Criteres d'acceptation : statuts experimental/validated explicites.
+- Tests : inspection documentaire.
+- Gate : publication de release.
 - Statut : `todo`.
 
 ### P0-M007 - Activer l'integration Git autonome
 
-- Phase liee : Phase 0 - Fondation projet
-- Objectif : inscrire durablement que Codex gere les operations Git normales sans
-  validation humaine apres une mission reussie.
-- Livrable attendu : politique documentee dans les protocoles, gates, runbook,
-  statut, next actions, backlog et logs.
-- Fichiers concernes : `AGENTS.md`, `docs/AUTONOMY_PROTOCOL.md`,
-  `docs/EXECUTION_LOOP.md`, `docs/HUMAN_GATES.md`,
-  `docs/AUTONOMY_RUNBOOK.md`, `docs/STATUS.md`, `docs/NEXT_ACTIONS.md`,
-  `docs/BACKLOG.md`, `docs/LOGS/`.
-- Criteres d'acceptation : les operations Git standard ne sont plus presentees
-  comme gates ; les vraies gates produit et infrastructure restent explicites ;
-  les tests conditionnent l'integration.
-- Tests ou verifications : suite unitaire, `git diff --check`, verification
-  `adsk` hors coeur.
-- Dependances : P0-M003.
-- Gate humaine : decision explicitement validee le 2026-07-03.
+- Capability : pilotage projet.
+- Milestone : M1 Engine foundation.
+- Objectif : autoriser les operations Git normales apres mission reussie.
+- Livrable : docs d'autonomie Git.
+- Criteres d'acceptation : push/merge non gates si tests OK et aucun risque.
+- Tests : inspection documentaire.
+- Gate : decision humaine validee le 2026-07-03.
 - Statut : `done`.
 
 ### P0-M008 - Corriger l'integration autonome en direct-to-main
 
-- Phase liee : Phase 0 - Fondation projet
-- Objectif : remplacer la strategie PR par defaut par une integration autonome
-  directe dans `main` lorsque la branche est propre, testee et fast-forward.
-- Livrable attendu : politique `Direct-to-main autonomous integration` inscrite
-  dans les protocoles, gates, runbook, statut, next actions, backlog et logs.
-- Fichiers concernes : `AGENTS.md`, `docs/AUTONOMY_PROTOCOL.md`,
-  `docs/EXECUTION_LOOP.md`, `docs/HUMAN_GATES.md`,
-  `docs/AUTONOMY_RUNBOOK.md`, `docs/STATUS.md`, `docs/NEXT_ACTIONS.md`,
-  `docs/BACKLOG.md`, `docs/LOGS/`.
-- Criteres d'acceptation : les pull requests ne sont plus la voie normale ; le
-  push direct vers `origin/main` est obligatoire quand il est fast-forward et non
-  conflictuel ; les PR restent un repli pour protection, review, conflit,
-  divergence, risque ou authentification indisponible.
-- Tests ou verifications : suite unitaire, `git diff --check`, verification
-  `adsk` hors coeur.
-- Dependances : P0-M007.
-- Gate humaine : decision explicitement validee le 2026-07-03.
+- Capability : pilotage projet.
+- Milestone : M1 Engine foundation.
+- Objectif : rendre le direct-to-main obligatoire pour missions standards.
+- Livrable : AGENTS, protocoles et runbook mis a jour.
+- Criteres d'acceptation : PR non utilisee comme chemin normal.
+- Tests : inspection documentaire.
+- Gate : decision humaine validee le 2026-07-03.
 - Statut : `done`.
+
+### P0-M009 - Realigner North Star, capabilities et roadmap volumetrique
+
+- Capability : pilotage produit.
+- Milestone : M1 Engine foundation.
+- Objectif : aligner North Star, piliers, capability map, roadmap 0-14, gates et autonomie.
+- Livrable : documents strategiques, ADR et log de realignement.
+- Criteres d'acceptation : Codex choisit les futures missions par capability/milestone/gate/validation.
+- Tests : tests documentaires, CLI de non-regression et `git diff --check`.
+- Gate : changement de North Star valide par la demande humaine du 2026-07-04.
+- Statut : `done` apres integration de cette mission.
+
 ## Phase 1 - Moteur Python pur
 
-### P1-M001 - Consolidate core data models
+| Mission | Capability | Milestone | Statut |
+| --- | --- | --- | --- |
+| P1-M001 - Consolidate core data models | C-BOX, C-MODULE | M1 | `done` |
+| P1-M002 - Harden config loading and validation | C-BOX, C-MODULE | M1 | `done` |
+| P1-M003 - Improve CLI reporting | C-BOX, C-MODULE | M1 | `done` |
+| P1-M004 - Ajouter une commande CLI de diagnostic | C-BOX, C-MODULE | M1 | `done` |
 
-- Phase liee : Phase 1 - Moteur Python pur
-- Objectif : stabiliser `BoxSpec`, `ModuleRequest`, `ToleranceProfile`,
-  `Cell` et `PrintableBody` comme contrat interne.
-- Livrable attendu : modeles types, invariants documentes et tests de creation
-  valides/invalides.
-- Fichiers probablement concernes : `src/board_game_insert_generator/models.py`,
-  `tests/`, `docs/GEOMETRY_MODEL.md`.
-- Criteres d'acceptation : les unites sont explicitement en millimetres ; les
-  invariants non evidents sont testes ; les concepts sont alignes avec les docs.
-- Tests ou verifications : suite unitaire complete.
-- Dependances : P0-M001.
-- Statut : `done`.
+## Phase 2 - Layout 2D simple
 
-### P1-M002 - Harden config loading and validation
+| Mission | Capability | Milestone | Statut |
+| --- | --- | --- | --- |
+| P2-M001 - Formalize simple rectangular layout model | C-LAYOUT-2D | M2 | `done` |
+| P2-M002 - Cover row_fill edge cases | C-LAYOUT-2D | M2 | `done` |
+| P2-M003 - Ajouter une strategie grille explicite | C-LAYOUT-2D | M2 | `done` |
+| P2-M004 - Exporter un resume de layout comparatif | C-LAYOUT-2D | M2 | `done` |
 
-- Phase liee : Phase 1 - Moteur Python pur
-- Objectif : rendre le chargement et la validation plus precis, notamment pour
-  les champs inconnus, types invalides et cas limites.
-- Livrable attendu : loader JSON robuste avec tests d'erreurs.
-- Fichiers probablement concernes : `config_loader.py`, `tests/`,
-  `docs/CONFIG_SCHEMA.md`.
-- Criteres d'acceptation : chaque erreur majeure retourne un message actionnable
-  ; les exemples existants passent.
-- Tests ou verifications : tests unitaires loader et CLI.
-- Dependances : P1-M001.
-- Statut : `done`.
+## Phase 3 - Tolerances, profils d'impression, clearances
 
-### P1-M003 - Improve CLI reporting
+| Mission | Capability | Milestone | Statut |
+| --- | --- | --- | --- |
+| P3-M001 - Classify exposed, internal and functional faces | C-MODULE | M2 | `done` |
+| P3-M002 - Apply tolerance rules from face classification | C-MODULE | M2 | `done` |
+| P3-M003 - Ajouter des profils d'impression | C-CALIBRATION | M11 | `done` |
+| P3-M004 - Ajouter un protocole de calibration physique | C-CALIBRATION | M11 | `done` |
 
-- Phase liee : Phase 1 - Moteur Python pur
-- Objectif : rendre les rapports CLI plus utiles pour diagnostiquer validation,
-  layout, tolerances et warnings.
-- Livrable attendu : sortie Markdown/JSON plus structurante, lisible et
-  exploitable par un futur adaptateur.
-- Fichiers probablement concernes : `cli.py`, `report.py`, `validation.py`,
-  `tests/`, `README.md`.
-- Criteres d'acceptation : les erreurs et warnings sont actionnables ; le rapport
-  expose les valeurs importantes ; les exemples existants restent reproductibles.
-- Tests ou verifications : tests unitaires et execution d'exemple CLI.
-- Dependances : P1-M002.
-- Statut : `done`.
+## Phase 4 - CAD IR et pipeline Fusion minimal
 
-### P1-M004 - Ajouter une commande CLI de diagnostic
+| Mission | Capability | Milestone | Statut |
+| --- | --- | --- | --- |
+| P4-M000 - Prepare Fusion 360 integration gate report | C-CAD-IR | M3 | `done` |
+| P4-M001 - Definir le contrat de representation intermediaire CAD | C-CAD-IR | M3 | `done` |
+| P4-M002 - Creer un squelette d'adaptateur Fusion 360 | C-FUSION-COMPACT | M3 | `done` |
+| P4-M003 - Generer des blanks rectangulaires Fusion | C-FUSION-COMPACT | M3 | `done` |
+| P4-M004 - Valider manuellement la generation Fusion minimale | C-FUSION-COMPACT | M3 | `done` |
+| P4-M005 - Exporter une CAD IR depuis la CLI | C-CAD-IR | M3 | `done` |
+| P4-M006 - Stabiliser le pipeline CAD IR vers Fusion | C-FUSION-COMPACT | M3 | `done` |
 
-- Phase liee : Phase 1 - Moteur Python pur
-- Objectif : fournir une boucle courte pour valider config, layout et rapport.
-- Livrable attendu : commande CLI documentee avec sortie lisible.
-- Fichiers probablement concernes : `cli.py`, `README.md`, `tests/`.
-- Criteres d'acceptation : la commande retourne un code non nul en erreur ; la
-  documentation donne la commande et le resultat attendu.
-- Tests ou verifications : tests CLI et execution d'exemple.
-- Dependances : P1-M003.
-- Statut : `done`.
+## Phase 5 - Cavites, receptacles et features ergonomiques
 
-## Phase 2 - Layout rectangulaire simple
+| Mission | Capability | Milestone | Statut |
+| --- | --- | --- | --- |
+| P5-M001 - Modeliser les cavites simples | C-CAVITY | M4 | `done` |
+| P5-M002 - Ajouter logements de cartes et cartes sleevees | C-CAVITY | M4 | `done` |
+| P5-M003 - Ajouter bacs a tokens, des et meeples | C-CAVITY | M4 | `done` |
+| P5-M004 - Decrire les encoches de doigts et fonds arrondis comme features abstraites | C-FEATURE | M4 | `done` |
+| P5-M005 - Gate generation Fusion reelle de cavites et features | C-FUSION-CAVITIES, C-FILLETS | M5 | `blocked` |
+## Phase 6 - Generation Fusion reelle des cavites et features simples
 
-### P2-M001 - Formalize simple rectangular layout model
+### P6-M001 - Generer les cavites rectangulaires simples dans Fusion
 
-- Phase liee : Phase 2 - Layout rectangulaire simple
-- Objectif : formaliser le modele rectangulaire simple sans disperser la logique
-  de placement.
-- Livrable attendu : contrat interne pour `row_fill`, grille future et colonnes.
-- Fichiers probablement concernes : `layout.py`, `models.py`, `docs/ARCHITECTURE.md`.
-- Criteres d'acceptation : `row_fill` garde son comportement ; l'extension future
-  est documentee ; aucun couplage Fusion n'est introduit.
-- Tests ou verifications : tests layout existants et nouveaux cas de non-regression.
-- Dependances : P1-M001.
-- Statut : `done`.
-
-### P2-M002 - Cover row_fill edge cases
-
-- Phase liee : Phase 2 - Layout rectangulaire simple
-- Objectif : tester rotation, retour a la ligne, depassement et priorites.
-- Livrable attendu : tests exhaustifs des comportements V0.
-- Fichiers probablement concernes : `tests/test_layout_basic.py`, `layout.py`.
-- Criteres d'acceptation : les erreurs de placement sont previsibles ; les
-  priorites sont stables ; les rotations autorisees sont testees.
-- Tests ou verifications : suite unitaire complete.
-- Dependances : P2-M001.
-- Statut : `done`.
-
-### P2-M003 - Ajouter une strategie grille explicite
-
-- Phase liee : Phase 2 - Layout rectangulaire simple
-- Objectif : produire des cellules regulieres pour jeux simples.
-- Livrable attendu : strategie `grid` documentee et testee.
-- Fichiers probablement concernes : `layout.py`, `models.py`,
-  `docs/GEOMETRY_MODEL.md`, `examples/`.
-- Criteres d'acceptation : la grille refuse les dimensions impossibles ; les
-  cellules sont reproductibles ; un exemple montre l'usage.
-- Tests ou verifications : tests unitaires et rapport exemple.
-- Dependances : P2-M001.
-- Statut : `done`.
-
-### P2-M004 - Exporter un resume de layout comparatif
-
-- Phase liee : Phase 2 - Layout rectangulaire simple
-- Objectif : comparer plusieurs layouts simples avant generation CAD.
-- Livrable attendu : rapport listant strategie, occupation, warnings et score
-  basique.
-- Fichiers probablement concernes : `report.py`, `layout.py`, `tests/`.
-- Criteres d'acceptation : au moins deux strategies peuvent etre comparees ; le
-  score reste explicable.
-- Tests ou verifications : tests rapport et exemples.
-- Dependances : P2-M003.
-- Statut : `done`.
-
-## Phase 3 - Tolerances intelligentes
-
-### P3-M001 - Classify exposed, internal and functional faces
-
-- Phase liee : Phase 3 - Tolerances intelligentes
-- Objectif : separer faces exposees, voisines, internes, libres et
-  fonctionnelles.
-- Livrable attendu : modele de classification de faces teste.
-- Fichiers probablement concernes : `tolerance.py`, `models.py`,
-  `docs/TOLERANCE_MODEL.md`.
-- Criteres d'acceptation : chaque face a une raison d'offset ; les rapports
-  exposent les classifications.
-- Tests ou verifications : tests unitaires de voisinage et offsets.
-- Dependances : P2-M002.
-- Gate humaine : changement du modele de tolerance, validee pour preparation
-  sans modification dimensionnelle.
-- Statut : `done`.
-
-### P3-M002 - Apply tolerance rules from face classification
-
-- Phase liee : Phase 3 - Tolerances intelligentes
-- Objectif : appliquer les jeux selon la classification explicite des faces au
-  lieu d'une logique implicite difficile a expliquer.
-- Livrable attendu : calcul d'offsets fonde sur les roles de faces et rapports
-  indiquant les raisons d'application.
-- Fichiers probablement concernes : `tolerance.py`, `models.py`, `report.py`,
-  `tests/`, `docs/TOLERANCE_MODEL.md`.
-- Criteres d'acceptation : chaque offset expose sa raison ; les faces internes
-  de futurs modules composites ne recoivent pas de jeu ; les tests couvrent les
-  cas simples.
-- Tests ou verifications : tests unitaires de tolerance et exemple CLI.
-- Dependances : P3-M001.
-- Gate humaine : validee explicitement pour cette mission le 2026-07-03, sans
-  changement des valeurs de tolerance par defaut.
-- Statut : `done`.
-
-### P3-M003 - Ajouter des profils d'impression
-
-- Phase liee : Phase 3 - Tolerances intelligentes
-- Objectif : permettre des presets PLA/PETG/rapide/fin sans cacher les valeurs.
-- Livrable attendu : profils resolus en `ToleranceProfile` explicite.
-- Fichiers probablement concernes : `models.py`, `config_loader.py`,
-  `docs/TOLERANCE_MODEL.md`.
-- Criteres d'acceptation : un profil peut etre surcharge champ par champ ; le
-  rapport montre les valeurs finales.
-- Tests ou verifications : tests loader, validation et rapport.
-- Dependances : P3-M002.
-- Statut : `done`.
-
-### P3-M004 - Ajouter un protocole de calibration physique
-
-- Phase liee : Phase 3 - Tolerances intelligentes
-- Objectif : documenter comment valider les jeux par impression reelle.
-- Livrable attendu : guide de coupons de test et tableau de resultats.
-- Fichiers probablement concernes : `docs/QUALITY_RULES.md`,
-  `docs/TOLERANCE_MODEL.md`, `examples/`.
-- Criteres d'acceptation : le protocole distingue theorie, impression et
-  ajustements.
-- Tests ou verifications : relecture documentaire.
-- Dependances : P3-M003.
-- Statut : `done`.
-
-## Phase 4 - Generation Fusion 360 de blanks
-
-### P4-M000 - Prepare Fusion 360 integration gate report
-
-- Phase liee : Phase 4 - Generation Fusion 360 de blanks
-- Objectif : preparer le rapport de gate humaine avant toute integration Fusion
-  360 executable.
-- Livrable attendu : rapport indiquant etat du moteur Python pur, tests,
-  contrat intermediaire attendu, risques et perimetre exact de la premiere
-  integration.
-- Fichiers probablement concernes : `docs/FUSION_360_STRATEGY.md`,
-  `docs/HUMAN_GATES.md`, `docs/STATUS.md`, `docs/LOGS/`.
-- Criteres d'acceptation : aucune API Fusion n'est importee dans le coeur ; les
-  preconditions de demarrage sont verifiees ; la validation humaine attendue est
-  formulee explicitement.
-- Tests ou verifications : suite unitaire du coeur, relecture documentaire.
-- Dependances : P1-M003, P2-M002, P3-M002.
-- Statut : `done`.
-
-### P4-M001 - Definir le contrat de representation intermediaire CAD
-
-- Phase liee : Phase 4 - Generation Fusion 360 de blanks
-- Objectif : decrire les objets que l'adaptateur Fusion recevra.
-- Livrable attendu : modele de donnees CAD-agnostic documente.
-- Fichiers probablement concernes : `models.py`, `docs/ARCHITECTURE.md`,
-  `docs/FUSION_360_STRATEGY.md`.
-- Criteres d'acceptation : le contrat ne depend pas de `adsk` ; les blanks
-  rectangulaires sont representables.
-- Tests ou verifications : tests serialization si code ajoute.
-- Dependances : P1-M003, P3-M001.
-- Gate humaine : validee explicitement pour `P4-M001` le 2026-07-03.
-- Statut : `done`.
-
-### P4-M002 - Creer un squelette d'adaptateur Fusion 360
-
-- Phase liee : Phase 4 - Generation Fusion 360 de blanks
-- Objectif : isoler l'integration Fusion sans polluer le coeur Python.
-- Livrable attendu : repertoire d'adaptateur avec documentation d'installation.
-- Fichiers concernes : `fusion_addin/BoardGameInsertGenerator/`,
-  `docs/FUSION_360_STRATEGY.md`, `docs/CAD_IR_CONTRACT.md`, tests hors Fusion.
-- Criteres d'acceptation : le coeur Python reste importable sans Fusion ; le
-  squelette explique comment tester hors Fusion ; le cas Zero Doc est anticipe ;
-  aucune geometrie Fusion reelle n'est creee.
-- Tests ou verifications : suite coeur Python ; verification `adsk` hors coeur ;
-  tests du squelette hors Fusion.
-- Dependances : P4-M001.
-- Gate humaine : validee explicitement pour `P4-M002` le 2026-07-03, sans
-  generation de geometrie Fusion exploitable.
-- Statut : `done`.
-
-### P4-M003 - Generer des blanks rectangulaires Fusion
-
-- Phase liee : Phase 4 - Generation Fusion 360 de blanks
-- Objectif : creer une reference, des sketches et des corps rectangulaires nommes pour un smoke test Fusion minimal.
-- Livrable attendu : add-in Fusion capable de generer les blanks V0 depuis une
-  CAD IR JSON locale.
-- Fichiers concernes : `fusion_addin/BoardGameInsertGenerator/`,
-  `docs/FUSION_360_STRATEGY.md`, `docs/CAD_IR_CONTRACT.md`, tests hors Fusion.
-- Criteres d'acceptation : une CAD IR locale peut etre chargee ; l'add-in code
-  la creation d'une reference et de blanks rectangulaires ; aucun layout n'est
-  recalcule dans Fusion ; le cas Zero Doc reste gere explicitement ; aucun
-  export STL/3MF, aucune cavite, aucun couvercle et aucun fillet ne sont ajoutes.
-- Tests ou verifications : suite coeur Python ; tests hors Fusion du plan de
-  generation ; verification `adsk` hors coeur ; smoke test manuel Fusion a
-  realiser par Thomas.
-- Dependances : P4-M002.
-- Gate humaine : validee explicitement pour `P4-M003` le 2026-07-03, sans export
-  STL/3MF et sans validation physique.
-- Statut : `done` pour le code, les tests hors Fusion et le smoke test CAD
-  manuel dans Fusion ; dimensions conformes a la fixture ; impression reelle non
-  validee.
-
-### P4-M004 - Valider manuellement la generation Fusion minimale
-
-- Phase liee : Phase 4 - Generation Fusion 360 de blanks
-- Objectif : executer le smoke test P4-M003 dans Fusion 360 et documenter le
-  resultat observe.
-- Livrable attendu : log de validation manuelle avec sketches, bodies,
-  dimensions mesurees, ecarts et decision OK/KO.
-- Fichiers probablement concernes : `docs/LOGS/`, `docs/STATUS.md`,
-  `docs/NEXT_ACTIONS.md`, eventuellement `fusion_addin/README.md` si la procedure
-  doit etre corrigee.
-- Criteres d'acceptation : Thomas a lance l'add-in dans Fusion ; les sketches
-  et bodies sont visibles ; les dimensions mesurees sont conformes a la fixture ;
-  les limites restent distinctes de la validation d'impression reelle.
-- Tests ou verifications : smoke test manuel Fusion documente.
-- Dependances : P4-M003.
-- Gate humaine : satisfaite par validation humaine du 2026-07-03.
-- Statut : `done` par validation humaine du 2026-07-03.
-
-### P4-M005 - Exporter une CAD IR depuis la CLI
-
-- Phase liee : Phase 4 - Generation Fusion 360 de blanks
-- Objectif : produire un fichier CAD IR JSON V0 depuis une configuration BGIG,
-  sans dependre d'une fixture manuelle.
-- Livrable attendu : commande CLI documentee avec chemin de sortie configurable.
-- Fichiers concernes : `src/board_game_insert_generator/cli.py`, `tests/`,
-  `README.md`, `docs/CAD_IR_CONTRACT.md`, `fusion_addin/README.md`.
-- Criteres d'acceptation : `examples/simple_box.json` peut produire un
-  `cad_ir_input.json` compatible avec le squelette Fusion ; le coeur Python reste
-  sans `adsk` ; les tests automatises passent.
-- Tests ou verifications : suite unitaire, exemples CLI Markdown/JSON,
-  `git diff --check`, verification `adsk` hors coeur.
-- Dependances : P4-M003.
-- Gate humaine : mission explicitement autorisee le 2026-07-03 comme mission
-  unique, sans extension de geometrie Fusion.
-- Statut : `done`.
-
-### P4-M006 - Stabiliser le pipeline CAD IR vers Fusion
-
-- Phase liee : Phase 4 - Generation Fusion 360 de blanks
-- Objectif : fiabiliser la chaine configuration BGIG -> export CAD IR -> fichier
-  JSON -> add-in Fusion -> blanks rectangulaires minimaux.
-- Livrable attendu : chargement CAD IR configurable et documente, validations
-  d'entree plus explicites et erreurs Fusion actionnables.
-- Fichiers concernes : `fusion_addin/BoardGameInsertGenerator/`,
-  `docs/FUSION_360_STRATEGY.md`, `docs/CAD_IR_CONTRACT.md`, `README.md`, tests
-  hors Fusion et pilotage projet.
-- Criteres d'acceptation : `cad_ir_input.json` reste supporte ; `cad_ir_path.txt`
-  peut pointer vers un export CAD IR ; les erreurs de fichier absent, override
-  vide et contrat invalide sont testees ; aucune nouvelle geometrie Fusion n'est
-  ajoutee ; le coeur Python reste sans `adsk`.
-- Tests ou verifications : suite unitaire, exemples CLI Markdown/JSON, export
-  CAD IR CLI, `git diff --check`, verification `adsk` hors coeur.
-- Dependances : P4-M005.
-- Gate humaine : validee explicitement sous le libelle `P4-M004` le 2026-07-03,
-  sans cavite, fillet, export STL/3MF ni changement de tolerance.
-- Statut : `done`.
-
-## Phase 5 - Cavites et receptacles
-
-### P5-M001 - Modeliser les cavites simples
-
-- Phase liee : Phase 5 - Cavites et receptacles
-- Objectif : representer les volumes retires d'un module.
-- Livrable attendu : `Cavity` enrichi, documentation et tests.
-- Fichiers probablement concernes : `models.py`, `docs/GEOMETRY_MODEL.md`,
-  `tests/`.
-- Criteres d'acceptation : une cavite a dimensions, origine, type fonctionnel et
-  clearance ; elle ne rend pas les parois invalides.
-- Tests ou verifications : tests de validation et rapport.
-- Dependances : P4-M001.
-- Statut : `done`.
-
-### P5-M002 - Ajouter logements de cartes et cartes sleevees
-
-- Phase liee : Phase 5 - Cavites et receptacles
-- Objectif : generer les cavites de decks avec jeux specifiques.
-- Livrable attendu : receptecle cartes documente et testable.
-- Fichiers probablement concernes : `models.py`, `validation.py`, `tolerance.py`,
-  `docs/TOLERANCE_MODEL.md`.
-- Criteres d'acceptation : les cartes et cartes sleevees ont des jeux distincts ;
-  les parois minimales sont verifiees.
-- Tests ou verifications : tests unitaires et exemple de config.
-- Dependances : P5-M001.
-- Gate humaine : vague P5 moteur/CAD IR validee le 2026-07-04 ; generation Fusion reelle exclue.
-- Statut : `done`.
-
-### P5-M003 - Ajouter bacs a tokens, des et meeples
-
-- Phase liee : Phase 5 - Cavites et receptacles
-- Objectif : couvrir les receptacles ouverts simples.
-- Livrable attendu : primitives de cavites pour tokens/des/meeples.
-- Fichiers probablement concernes : `models.py`, `validation.py`, `examples/`,
-  docs.
-- Criteres d'acceptation : chaque type a un jeu explicite ; les warnings signalent
-  les formes irregulieres.
-- Tests ou verifications : tests et rapport exemple.
-- Dependances : P5-M001.
-- Statut : `done`.
-
-### P5-M004 - Decrire les encoches de doigts et fonds arrondis comme features abstraites
-
-- Phase liee : Phase 5 - Cavites et receptacles
-- Objectif : ameliorer l'ergonomie des cavites sans generation Fusion reelle.
-- Livrable attendu : features abstraites CAD-agnostic pour finger notch,
-  encoches laterales/centrales, demi-lunes, fonds arrondis et aides de prise en
-  main.
-- Fichiers concernes : `src/board_game_insert_generator/models.py`,
-  `config_loader.py`, `validation.py`, `report.py`, `cad_ir.py`, `tests/`,
-  `examples/simple_finger_notch_tray.json`, docs et ADR-0011.
-- Criteres d'acceptation : les features sont chargees, validees, reportees et
-  exportees dans la CAD IR avec `status: abstract_only` et
-  `fusion_generation: not_implemented` ; Fusion pourra les mapper plus tard
-  seulement apres une nouvelle gate humaine.
-- Tests ou verifications : suite unitaire complete, CLI Markdown/JSON/export CAD
-  IR sur exemples existants et nouvel exemple, `git diff --check`, verification
-  `adsk` hors coeur.
-- Dependances : P5-M002, P5-M003.
-- Gate humaine : validee explicitement le 2026-07-04 pour des features
-  abstraites CAD-agnostic uniquement.
-- Statut : `done`.
-
-### P5-M005 - Gate generation Fusion reelle de cavites et features
-
-- Phase liee : Phase 5 - Cavites et receptacles
-- Objectif : decider si et comment mapper les cavites et features abstraites vers
-  des operations Fusion reelles.
-- Livrable attendu : rapport de gate avant toute extrusion cut, boolean, fillet,
-  conge, encoche reelle, fond arrondi ou geometrie courbe.
-- Fichiers probablement concernes : `docs/NEXT_ACTIONS.md`,
-  `docs/FUSION_360_STRATEGY.md`, `fusion_addin/BoardGameInsertGenerator/` si la
-  gate est ensuite validee.
-- Criteres d'acceptation : etat du moteur, etat CAD IR, operation Fusion visee,
-  risques, strategie recommandee et procedure de smoke test manuel sont explicites.
-- Tests ou verifications : suite coeur Python et export CAD IR avant toute
-  implementation ; smoke test Fusion manuel seulement apres gate validee.
-- Dependances : P5-M004.
-- Gate humaine : obligatoire.
+- Capability : C-FUSION-CAVITIES.
+- Milestone : M5 CAD cavities.
+- Objectif : executer `subtract_rectangular_cavity` pour cavites rectangulaires simples.
+- Livrable : add-in Fusion limite aux cuts rectangulaires, fixture CAD IR, smoke test manuel.
+- Criteres d'acceptation : aucune logique metier dans Fusion, noms lisibles, dimensions controlees, absence STL/3MF.
+- Tests : unitaires hors Fusion, CLI export CAD IR, `rg -n "adsk" src/board_game_insert_generator`, smoke test manuel Fusion.
+- Gate : validation humaine obligatoire avant implementation.
 - Statut : `blocked`.
 
-## Phase 6 - Modules composites
+### P6-M002 - Etudier les features ergonomiques Fusion simples
 
-### P6-M001 - Representer les modules composites par primitives soudees
-
-- Phase liee : Phase 6 - Modules composites
-- Objectif : formaliser les modules en L, T et volumes multi-primitives.
-- Livrable attendu : representation interne et validation des primitives.
-- Fichiers probablement concernes : `models.py`, `validation.py`,
-  `docs/GEOMETRY_MODEL.md`.
-- Criteres d'acceptation : les primitives internes peuvent se toucher sans jeu ;
-  les overlaps invalides sont detectes.
-- Tests ou verifications : tests de validation geometrique.
-- Dependances : P3-M001.
+- Capability : C-FILLETS.
+- Milestone : M5 CAD ergonomic features.
+- Objectif : comparer encoche simple, demi-lune, fond arrondi, fillet et robustesse API.
+- Livrable : ADR technique et plan de smoke test, sans geometrie executable si non autorisee.
+- Criteres d'acceptation : options, risques, limites et ordre d'implementation clairs.
+- Tests : inspection documentaire.
+- Gate : obligatoire avant toute geometrie courbe reelle.
 - Statut : `todo`.
 
-### P6-M002 - Appliquer les tolerances uniquement aux faces exposees
+## Phase 7 - Vue compacte / vue eclatee
 
-- Phase liee : Phase 6 - Modules composites
-- Objectif : eviter les jeux internes dans les modules soudes.
-- Livrable attendu : algorithme d'exposition de faces.
-- Fichiers probablement concernes : `tolerance.py`, `models.py`, tests,
-  `docs/TOLERANCE_MODEL.md`.
-- Criteres d'acceptation : une jonction interne ne recoit aucun offset ; les faces
-  externes restent tolerancees.
-- Tests ou verifications : tests unitaires modules L/T.
-- Dependances : P6-M001.
+### P7-M001 - Ajouter une intention de vue eclatee dans la CAD IR
+
+- Capability : C-FUSION-EXPLODED, C-CAD-IR.
+- Milestone : M5 CAD inspection views.
+- Objectif : decrire positions de vue eclatee sans modifier la geometrie Fusion.
+- Livrable : contrat CAD IR additif et tests de serialisation.
+- Criteres d'acceptation : compatibilite `cad_ir.v0` preservÃ©e ou ADR si nouvelle version.
+- Tests : unitaires CAD IR, export CLI.
+- Gate : si contrat incompatible ou generation Fusion reelle.
 - Statut : `todo`.
 
-### P6-M003 - Generer les unions Fusion pour composites simples
+### P7-M002 - Generer une vue Fusion eclatee minimale
 
-- Phase liee : Phase 6 - Modules composites
-- Objectif : convertir les primitives composites en corps soudes.
-- Livrable attendu : generation Fusion de modules L/T simples.
-- Fichiers probablement concernes : adaptateur Fusion, exemples, docs.
-- Criteres d'acceptation : un module composite inspectable est genere ; les faces
-  internes ne creent pas de separation.
-- Tests ou verifications : tests coeur et verification Fusion documentee.
-- Dependances : P6-M002, P4-M003.
+- Capability : C-FUSION-EXPLODED.
+- Milestone : M5 CAD inspection views.
+- Objectif : creer une vue inspectable a plat depuis une CAD IR deja resolue.
+- Livrable : generation Fusion limitee aux blanks deja autorises.
+- Criteres d'acceptation : pas de recalcul, noms stables, smoke test manuel.
+- Tests : hors Fusion + smoke Fusion.
+- Gate : validation humaine si repositionnement CAD non trivial.
+- Statut : `blocked`.
+
+## Phase 8 - Grille volumetrique 3D et etages
+
+### P8-M001 - Specifier la grille volumetrique 3D et les layers
+
+- Capability : C-GRID-3D, C-LAYERS.
+- Milestone : M7 Volumetric planner.
+- Objectif : definir `VolumetricCell`, `Layer`, collisions X/Y/Z et volumes libres.
+- Livrable : specification pure Python/documentaire, invariants et tests documentaires.
+- Criteres d'acceptation : distinction claire entre cellule, corps imprimable, layer et reservation.
+- Tests : test documentaire, aucun changement dimensionnel.
+- Gate : architecture si le schema public executable change.
+- Statut : `ready_if_gate_deferred`.
+
+### P8-M002 - Prototyper la validation de collisions X/Y/Z hors solveur
+
+- Capability : C-GRID-3D.
+- Milestone : M7 Volumetric planner.
+- Objectif : refuser chevauchements volumetriques simples sans optimiser.
+- Livrable : fonctions pures et tests unitaires.
+- Criteres d'acceptation : collisions et limites de boite detectees.
+- Tests : unitaires.
+- Gate : aucune si API interne additive.
 - Statut : `todo`.
 
-## Phase 7 - Couvercles et mecanismes
+### P8-M003 - Representer empilement et supports abstraits
 
-### P7-M001 - Modeliser les couvercles poses
-
-- Phase liee : Phase 7 - Couvercles et mecanismes
-- Objectif : ajouter des couvercles simples avec jeu vertical.
-- Livrable attendu : modele de lid et contraintes fonctionnelles.
-- Fichiers probablement concernes : `models.py`, `validation.py`,
-  `docs/TOLERANCE_MODEL.md`.
-- Criteres d'acceptation : le jeu de couvercle est explicite ; le rapport separe
-  module et couvercle.
-- Tests ou verifications : tests de validation et rapport.
-- Dependances : P5-M001.
+- Capability : C-STACKING.
+- Milestone : M7 Volumetric planner.
+- Objectif : documenter support, charge, ordre d'empilement et surfaces porteuses.
+- Livrable : modele abstrait et rapports, sans validation physique.
+- Criteres d'acceptation : pas de promesse d'impression ni de resistance.
+- Tests : unitaires ou documentaires selon implementation.
+- Gate : impression reelle avant validation physique.
 - Statut : `todo`.
 
-### P7-M002 - Ajouter couvercles coulissants et rainures
+## Phase 9 - Assets, plateaux, boards, regles et reservations de couches
 
-- Phase liee : Phase 7 - Couvercles et mecanismes
-- Objectif : produire des interfaces fonctionnelles avec jeux dedies.
-- Livrable attendu : representation abstraite de rail/rainure/languette.
-- Fichiers probablement concernes : `models.py`, `tolerance.py`,
-  `docs/FUSION_360_STRATEGY.md`.
-- Criteres d'acceptation : les jeux de coulissement sont distincts des jeux de
-  module ; les parois minimales sont controlees.
-- Tests ou verifications : tests unitaires et prototype documente.
-- Dependances : P7-M001.
+### P9-M001 - Specifier le schema asset-first
+
+- Capability : C-ASSET, C-RESERVATION.
+- Milestone : M6 Asset-first project model.
+- Objectif : decrire assets, quantites, dimensions approximatives et reservations.
+- Livrable : schema cible et exemples non executes.
+- Criteres d'acceptation : modules et assets restent distincts.
+- Tests : test documentaire.
+- Gate : schema public si implementation loader.
 - Statut : `todo`.
 
-### P7-M003 - Explorer charnieres et clips simples
+### P9-M002 - Charger des assets JSON sans generation de modules
 
-- Phase liee : Phase 7 - Couvercles et mecanismes
-- Objectif : cadrer les mecanismes plus risques avant implementation.
-- Livrable attendu : ADR ou note de recherche avec options et risques.
-- Fichiers probablement concernes : `docs/DECISIONS/`, `docs/TOLERANCE_MODEL.md`.
-- Criteres d'acceptation : aucune implementation fragile n'est lancee sans
-  criteres d'impression.
-- Tests ou verifications : revue documentaire.
-- Dependances : P7-M002, P3-M003.
+- Capability : C-ASSET.
+- Milestone : M6 Asset-first project model.
+- Objectif : accepter des assets sans encore deriver de layout.
+- Livrable : loader/validation et rapports.
+- Criteres d'acceptation : aucune regression des exemples module-first.
+- Tests : unitaires + CLI.
+- Gate : si incompatibilite schema.
 - Statut : `todo`.
 
-## Phase 8 - Surcouche esthetique
+## Phase 10 - Solveur semi-automatique et scoring
 
-### P8-M001 - Definir le langage visuel parametrique
+### P10-M001 - Definir les criteres de scoring de variantes
 
-- Phase liee : Phase 8 - Surcouche esthetique
-- Objectif : separer fonction, ergonomie et decoration.
-- Livrable attendu : specification des labels, motifs, coins et ajourages.
-- Fichiers probablement concernes : `docs/PRODUCT_SPEC.md`,
-  `docs/GEOMETRY_MODEL.md`.
-- Criteres d'acceptation : les options esthetiques ne modifient pas les volumes
-  fonctionnels sans signalement.
-- Tests ou verifications : relecture documentaire.
-- Dependances : P5-M004.
+- Capability : C-SOLVER.
+- Milestone : M10 Semi-automatic solver.
+- Objectif : documenter compacite, accessibilite, nombre de modules, printability et setup.
+- Livrable : strategie et exemples de scoring, sans optimiseur lourd.
+- Criteres d'acceptation : scores explicables et non magiques.
+- Tests : documentaires.
+- Gate : dependance lourde si solveur externe.
 - Statut : `todo`.
 
-### P8-M002 - Ajouter texte, labels et gravure
+### P10-M002 - Enumerer quelques variantes simples hors solveur complet
 
-- Phase liee : Phase 8 - Surcouche esthetique
-- Objectif : permettre l'identification des modules.
-- Livrable attendu : features abstraites de texte/gravure/embossage.
-- Fichiers probablement concernes : `models.py`, adaptateur Fusion, docs.
-- Criteres d'acceptation : texte et profondeur sont parametres ; aucun label ne
-  casse la geometrie minimale.
-- Tests ou verifications : tests modele et verification Fusion future.
-- Dependances : P8-M001, P4-M003.
+- Capability : C-SOLVER.
+- Milestone : M10 Semi-automatic solver.
+- Objectif : comparer options deterministes simples.
+- Livrable : moteur pur et rapport comparatif.
+- Criteres d'acceptation : pas d'optimiseur opaque.
+- Tests : unitaires + CLI JSON/Markdown.
+- Gate : aucune si implementation simple.
 - Statut : `todo`.
 
-### P8-M003 - Ajouter textures, motifs et ajourages simples
+## Phase 11 - Modules composites et formes soudees
 
-- Phase liee : Phase 8 - Surcouche esthetique
-- Objectif : reduire filament ou donner un style parametrique.
-- Livrable attendu : representation CAD-agnostic des patterns autorises.
-- Fichiers probablement concernes : `models.py`, `docs/QUALITY_RULES.md`.
-- Criteres d'acceptation : les patterns respectent une epaisseur minimale ; ils
-  peuvent etre desactives.
-- Tests ou verifications : tests de validation.
-- Dependances : P8-M001.
+### P11-M001 - Representer les modules composites par primitives soudees
+
+- Capability : C-COMPOSITE.
+- Milestone : M9 Composite modules.
+- Objectif : decrire primitives soudees et faces internes sans jeu.
+- Livrable : modele pur, tests de faces internal/welded.
+- Criteres d'acceptation : aucun jeu inter-primitives soudees.
+- Tests : unitaires tolerance/faces.
+- Gate : modules composites.
 - Statut : `todo`.
 
-## Phase 9 - Assistant de conception
+### P11-M002 - Generer les unions Fusion pour composites simples
 
-### P9-M001 - Definir le modele d'assets utilisateur
+- Capability : C-COMPOSITE, C-FUSION-COMPACT.
+- Milestone : M9 Composite modules.
+- Objectif : creer une premiere union CAD simple depuis CAD IR.
+- Livrable : generation Fusion sous gate.
+- Criteres d'acceptation : smoke test manuel, aucune logique metier Fusion.
+- Tests : hors Fusion + Fusion manuel.
+- Gate : obligatoire.
+- Statut : `blocked`.
 
-- Phase liee : Phase 9 - Assistant de conception
-- Objectif : distinguer asset, intention, contrainte et module propose.
-- Livrable attendu : specification de donnees pour assets de jeu.
-- Fichiers probablement concernes : `docs/PRODUCT_SPEC.md`,
-  `docs/CONFIG_SCHEMA.md`, `models.py`.
-- Criteres d'acceptation : les assets ne sont pas confondus avec les modules ;
-  les intentions de setup sont representees.
-- Tests ou verifications : tests si modele code.
-- Dependances : P5-M003.
+## Phase 12 - Couvercles, mecanismes et empilement avance
+
+### P12-M001 - Modeliser les couvercles poses
+
+- Capability : C-STACKING, futurs mecanismes.
+- Milestone : M13 Advanced mechanisms.
+- Objectif : decrire couvercle simple, jeu vertical et contraintes de retrait.
+- Livrable : modele abstrait et tests.
+- Criteres d'acceptation : pas de mecanisme imprime declare valide.
+- Tests : unitaires/CLI.
+- Gate : mecanismes et impression reelle.
 - Statut : `todo`.
 
-### P9-M002 - Proposer plusieurs variantes de layout
+### P12-M002 - Ajouter couvercles coulissants, rainures, clips ou charnieres
 
-- Phase liee : Phase 9 - Assistant de conception
-- Objectif : generer des alternatives reproductibles.
-- Livrable attendu : moteur de variantes avec scoring simple.
-- Fichiers probablement concernes : `layout.py`, `report.py`, docs.
-- Criteres d'acceptation : chaque variante indique compacite, ergonomie,
-  imprimabilite et warnings.
-- Tests ou verifications : tests deterministes de scoring.
-- Dependances : P2-M004, P9-M001.
+- Capability : futurs mecanismes.
+- Milestone : M13 Advanced mechanisms.
+- Objectif : etudier puis implementer un mecanisme a la fois.
+- Livrable : ADR + mission limitee par mecanisme.
+- Criteres d'acceptation : validation physique requise.
+- Tests : unitaires + impression future.
+- Gate : obligatoire.
+- Statut : `blocked`.
+
+## Phase 13 - Esthetique, embossage, gravure, textures, decorations
+
+### P13-M001 - Definir le langage visuel parametrique
+
+- Capability : C-AESTHETIC.
+- Milestone : M12 Design language.
+- Objectif : cadrer labels, gravures, motifs et decoration sans casser la fonction.
+- Livrable : strategie esthetique et contraintes epaisseur/printability.
+- Criteres d'acceptation : couche optionnelle, desactivable et gate-aware.
+- Tests : inspection documentaire.
+- Gate : decision esthetique structurante.
 - Statut : `todo`.
 
-### P9-M003 - Ajouter une boucle d'assistance explicable
+### P13-M002 - Ajouter texte, labels et gravure abstraite
 
-- Phase liee : Phase 9 - Assistant de conception
-- Objectif : aider l'utilisateur a choisir sans boite noire.
-- Livrable attendu : rapport de recommendation et raisons de choix.
-- Fichiers probablement concernes : `report.py`, docs, future UI.
-- Criteres d'acceptation : chaque recommendation cite les contraintes utilisees
-  ; les hypotheses restent visibles.
-- Tests ou verifications : tests de rapport.
-- Dependances : P9-M002.
+- Capability : C-AESTHETIC, C-CAD-IR.
+- Milestone : M12 Design language.
+- Objectif : transporter l'intention de labels sans generation Fusion reelle.
+- Livrable : CAD IR additive et rapports.
+- Criteres d'acceptation : aucune geometrie Fusion sans gate.
+- Tests : unitaires CAD IR.
+- Gate : si generation CAD.
 - Statut : `todo`.
 
-## Phase 10 - Packaging produit
+## Phase 14 - Calibration, impression reelle, packaging et beta utilisable
 
-### P10-M001 - Creer des exemples reels complets
+### P14-M001 - Creer des exemples reels complets
 
-- Phase liee : Phase 10 - Packaging produit
-- Objectif : fournir des cas d'usage de bout en bout.
-- Livrable attendu : plusieurs configs documentees et rapports attendus.
-- Fichiers probablement concernes : `examples/`, `README.md`, docs.
-- Criteres d'acceptation : chaque exemple explique ses dimensions et limites ;
-  les rapports sont reproductibles.
-- Tests ou verifications : execution de tous les exemples.
-- Dependances : P5-M003, P4-M003.
+- Capability : C-CALIBRATION.
+- Milestone : M14 Usable beta.
+- Objectif : choisir un jeu reel et documenter une configuration complete.
+- Livrable : exemple, rapport, CAD IR, checklist Fusion et impression.
+- Criteres d'acceptation : limites et validations affichees, pas de promesse non testee.
+- Tests : CLI + Fusion/print selon gate.
+- Gate : impression reelle et release.
 - Statut : `todo`.
 
-### P10-M002 - Definir le processus de release stable
+### P14-M002 - Definir le processus de release stable
 
-- Phase liee : Phase 10 - Packaging produit
-- Objectif : rendre les versions distribuables.
-- Livrable attendu : checklist release, changelog et criteres de qualite.
-- Fichiers probablement concernes : `README.md`, `docs/QUALITY_RULES.md`,
-  fichiers GitHub.
-- Criteres d'acceptation : une release indique ce qui est implemente, experimental
-  et a valider par impression.
-- Tests ou verifications : checklist release executee.
-- Dependances : P0-M006.
-- Statut : `todo`.
-
-### P10-M003 - Preparer la distribution utilisateur
-
-- Phase liee : Phase 10 - Packaging produit
-- Objectif : permettre installation, usage et support reproductibles.
-- Livrable attendu : paquet Python ou distribution documentee, guide utilisateur
-  et support d'exemples.
-- Fichiers probablement concernes : `pyproject.toml`, `README.md`, docs.
-- Criteres d'acceptation : un utilisateur peut installer, lancer un exemple et
-  comprendre les limites.
-- Tests ou verifications : installation locale propre et suite complete.
-- Dependances : P10-M001, P10-M002.
+- Capability : release future.
+- Milestone : M14 Usable beta.
+- Objectif : cadrer versioning, changelog, packaging et distribution.
+- Livrable : checklist release.
+- Criteres d'acceptation : aucun statut stable sans preuves.
+- Tests : inspection documentaire.
+- Gate : publication de release.
 - Statut : `todo`.

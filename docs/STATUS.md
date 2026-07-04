@@ -144,17 +144,26 @@ configuration, validees contre les dimensions locales de cavite, exposees dans
 les rapports Markdown/JSON et transportees dans la CAD IR par
 `describe_cavity_feature`. Fusion ne les genere pas encore.
 
+La mission strategique `P0-M009` du 2026-07-04 realigne la North Star, la spec
+produit, la roadmap, l'architecture, l'autonomie et le backlog autour d'une
+cible asset-first et volumetrique. Elle ajoute une capability map, des strategies
+cibles pour assets, layers, solveur, accessibilite et vues eclatees, ainsi qu'une
+ADR de pilotage par capabilities. Aucun comportement moteur, aucune tolerance et
+aucune geometrie Fusion ne changent.
 ## Phase active
 
-Phase active : **Phase 5 - Cavites simples abstraites cote moteur et CAD IR**.
+Phase active : **Gate Phase 6 ou specification volumetrique Phase 8**.
 
 Etat : le pipeline P4 reste stable pour les blanks rectangulaires Fusion. La
-vague P5 est ouverte uniquement cote moteur Python pur, configuration, rapports
-et CAD IR. Les cavites simples, incluant les logements `cards`, `sleeved_cards`,
-`tokens`, `dice` et `meeples`, et leurs features ergonomiques P5-M004 sont des
-intentions abstraites validables et exportables ; elles ne sont pas encore
-generees dans Fusion. La prochaine etape recommandee est une gate avant toute
-generation Fusion soustractive, encoche reelle, fond arrondi, fillet ou boolean.
+vague P5 est terminee cote moteur Python pur, configuration, rapports et CAD IR :
+les cavites et features ergonomiques sont abstraites et exportables, mais non
+generees dans Fusion. La North Star cible maintenant un generateur volumetrique
+asset-first, pilote par capabilities.
+
+Prochaine decision : autoriser ou reporter `P6-M001 - Generer les cavites
+rectangulaires simples dans Fusion`. Si cette gate est reportee, la prochaine
+mission non gated recommandee est `P8-M001 - Specifier la grille volumetrique 3D
+et les layers`.
 
 ## Implemente
 
@@ -206,6 +215,9 @@ generation Fusion soustractive, encoche reelle, fond arrondi, fillet ou boolean.
   `meeples` resolues depuis le profil actif et tracables via `clearance_source`.
 - Features ergonomiques abstraites de cavites P5-M004 chargees, validees,
   reportees et exportees dans la CAD IR par `describe_cavity_feature`.
+- Pilotage produit par North Star, Product Pillars, Capability Map, milestones,
+  epics, missions, gates et validations.
+- Roadmap 0-14 alignee avec la cible volumetrique asset-first.
 - Smoke test CAD manuel P4-M003 valide dans Fusion : add-in visible, message OK,
   modules visibles et dimensions conformes a la fixture.
 
@@ -242,6 +254,10 @@ generation Fusion soustractive, encoche reelle, fond arrondi, fillet ou boolean.
 - Couvercles, rainures et mecanismes.
 - Surcouche esthetique.
 - Assistant de conception.
+- Modele asset-first.
+- Grille volumetrique 3D, layers, reservations et volumes libres.
+- Vue Fusion eclatee.
+- Solveur semi-automatique et scoring.
 - Packaging produit et exemples reels.
 
 ## A valider par impression reelle
@@ -269,7 +285,7 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant `P5-M004 - Features ergonomiques abstraites de cavites` :
+Derniere verification pendant `P0-M009 - Realignement strategique produit/capabilities` :
 
 - `python -m unittest discover -s tests` : OK, 92 tests passes.
 - `python -m board_game_insert_generator examples\simple_box.json --format markdown --output $env:TEMP\bgig-simple_box.md` : OK.
@@ -278,20 +294,12 @@ Derniere verification pendant `P5-M004 - Features ergonomiques abstraites de cav
 - `python -m board_game_insert_generator examples\simple_grid.json --format markdown --output $env:TEMP\bgig-simple_grid.md` : OK.
 - `python -m board_game_insert_generator examples\simple_grid.json --format json --output $env:TEMP\bgig-simple_grid.json` : OK.
 - `python -m board_game_insert_generator export-cad-ir examples\simple_grid.json --output $env:TEMP\bgig-simple_grid-cad-ir.json` : OK, schema `cad_ir.v0`, 4 composants.
-- `python -m board_game_insert_generator examples\simple_tray.json --format markdown --output $env:TEMP\bgig-simple_tray.md` : OK.
-- `python -m board_game_insert_generator examples\simple_tray.json --format json --output $env:TEMP\bgig-simple_tray.json` : OK.
-- `python -m board_game_insert_generator export-cad-ir examples\simple_tray.json --output $env:TEMP\bgig-simple_tray-cad-ir.json` : OK, schema `cad_ir.v0`, 1 composant.
-- `python -m board_game_insert_generator examples\simple_card_tray.json --format markdown --output $env:TEMP\bgig-simple_card_tray.md` : OK.
-- `python -m board_game_insert_generator examples\simple_card_tray.json --format json --output $env:TEMP\bgig-simple_card_tray.json` : OK.
-- `python -m board_game_insert_generator export-cad-ir examples\simple_card_tray.json --output $env:TEMP\bgig-simple_card_tray-cad-ir.json` : OK, schema `cad_ir.v0`, 2 composants.
-- `python -m board_game_insert_generator examples\simple_open_tray.json --format markdown --output $env:TEMP\bgig-simple_open_tray.md` : OK.
-- `python -m board_game_insert_generator examples\simple_open_tray.json --format json --output $env:TEMP\bgig-simple_open_tray.json` : OK.
-- `python -m board_game_insert_generator export-cad-ir examples\simple_open_tray.json --output $env:TEMP\bgig-simple_open_tray-cad-ir.json` : OK, schema `cad_ir.v0`, 3 composants.
-- `python -m board_game_insert_generator examples\simple_finger_notch_tray.json --format markdown --output $env:TEMP\bgig-simple_finger_notch_tray.md` : OK, features abstraites exposees.
-- `python -m board_game_insert_generator examples\simple_finger_notch_tray.json --format json --output $env:TEMP\bgig-simple_finger_notch_tray.json` : OK, `planned_feature_count` expose.
-- `python -m board_game_insert_generator export-cad-ir examples\simple_finger_notch_tray.json --output $env:TEMP\bgig-simple_finger_notch_tray-cad-ir.json` : OK, schema `cad_ir.v0`, 1 composant, operations `describe_cavity_feature` presentes.
+- `python -m board_game_insert_generator examples\simple_finger_notch_tray.json --format markdown --output $env:TEMP\bgig-simple_finger_notch_tray.md` : OK.
+- `python -m board_game_insert_generator examples\simple_finger_notch_tray.json --format json --output $env:TEMP\bgig-simple_finger_notch_tray.json` : OK.
+- `python -m board_game_insert_generator export-cad-ir examples\simple_finger_notch_tray.json --output $env:TEMP\bgig-simple_finger_notch_tray-cad-ir.json` : OK, schema `cad_ir.v0`, 1 composant.
 - `git diff --check` : OK.
 - `rg -n "adsk" src/board_game_insert_generator` : OK, aucune occurrence dans le coeur Python.
+
 ## Risques actifs
 
 - Le moteur a deja des concepts futurs dans `models.py`; il faut eviter de les

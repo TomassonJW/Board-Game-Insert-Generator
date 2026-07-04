@@ -25,11 +25,32 @@ L'architecture technique est pilotee avec :
 
 - `AGENTS.md` pour le protocole agent ;
 - `docs/STATUS.md` pour l'etat reel ;
+- `docs/NORTH_STAR.md` pour la direction produit long terme ;
+- `docs/CAPABILITY_MAP.md` pour relier piliers, capabilities, milestones, gates et validations ;
 - `docs/ROADMAP.md` pour les phases macro ;
 - `docs/BACKLOG.md` pour les missions ;
 - `docs/DECISIONS/` pour les ADR ;
 - `docs/LOGS/` pour les jalons et changements d'orientation.
 
+## Architecture Tracks
+
+La trajectoire produit est decoupee en tracks qui peuvent avancer par missions
+atomiques, sans melanger les niveaux de maturite :
+
+- `Product control plane` : North Star, capability map, roadmap, backlog, gates,
+  validation matrix, ADR et logs.
+- `Pure engine` : configuration, validation, layout, tolerances, cavites,
+  features, assets futurs et solveur futur.
+- `Volumetric model` : grille X/Y/Z, layers, reservations, volumes libres,
+  empilement, ordre de retrait et support.
+- `CAD IR` : contrat CAD-agnostic serialisable qui transporte les decisions du
+  moteur vers des adaptateurs.
+- `Fusion adapter` : sortie Fusion inspectable, sans recalcul metier.
+- `Physical validation` : calibration, smoke tests Fusion, impression reelle et
+  retours ergonomiques.
+
+Un track peut etre `designed` sans etre implemente. Le statut precis vit dans
+`docs/CAPABILITY_MAP.md`.
 ## Couches logicielles
 
 ### 1. Configuration
@@ -66,6 +87,7 @@ Concepts principaux :
 - `PrintableBody`
 - `Cavity`
 - `Feature`
+- futurs `Asset`, `Layer`, `Reservation`, `VolumetricCell` et `RemovalOrder`
 
 ### 3. Validation
 
@@ -140,6 +162,7 @@ Etat actuel :
 Etat cible :
 
 - operations geometriques abstraites ;
+- metadata de layers, reservations, ordre de retrait et vues compactes/eclatees ;
 - booleens conceptuels : union, cut, shell, fillet, chamfer ;
 - metadata de nommage ;
 - mapping vers Fusion 360.
@@ -186,6 +209,7 @@ Ces options ne doivent pas modifier le contrat du moteur pur.
 4. Generer des `Cell`.
 5. Appliquer les tolerances pour produire des `PrintableBody`.
 6. Generer un rapport Markdown ou JSON.
+7. Exporter une CAD IR JSON si demande par la CLI.
 
 ## Flux cible Fusion
 
@@ -200,6 +224,16 @@ Ces options ne doivent pas modifier le contrat du moteur pur.
 Le flux P4-M003 atteint les etapes 4 et 5 pour des blanks rectangulaires simples,
 mais il reste hors cavites, couvercles, fillets, exports et validation physique.
 La verification dans Fusion 360 reste manuelle.
+
+## Documents de strategie lies
+
+- `docs/CAPABILITY_MAP.md` : lecture de pilotage par capabilities.
+- `docs/VOLUMETRIC_LAYOUT_STRATEGY.md` : future grille X/Y/Z et layers.
+- `docs/ASSET_MODEL_STRATEGY.md` : passage asset-first.
+- `docs/SOLVER_STRATEGY.md` : solveur semi-automatique futur.
+- `docs/LAYER_AND_STACKING_MODEL.md` : empilement et etages.
+- `docs/ACCESSIBILITY_MODEL.md` : ordre de retrait et ergonomie.
+- `docs/EXPLODED_VIEW_STRATEGY.md` : vues compactes et eclatees.
 
 ## Decisions structurantes connues
 

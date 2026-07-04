@@ -98,6 +98,9 @@ Tests, cartes backlog ou gates humaines a preparer.
 - `ADR-0011-abstract-cavity-features.md` - features ergonomiques abstraites de
   cavites.
 
+- `ADR-0012-capability-driven-product-pilotage.md` - pilotage produit par
+  capabilities, milestones, gates et validations.
+
 ## Regles de maintenance
 
 - Ne reecris pas l'historique d'une ADR acceptee pour changer la decision.

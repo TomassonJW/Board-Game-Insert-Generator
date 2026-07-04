@@ -1,84 +1,86 @@
 # North Star
 
-Board Game Insert Generator vise a devenir un generateur semi-intelligent
-d'inserts parametriques pour boites de jeux de societe.
-
-La promesse long terme n'est pas de dessiner rapidement quelques boites
-rectangulaires. La promesse est de formaliser une logique robuste de conception
-parametrique, tolerancee, imprimable et explicable.
-
 ## Formulation courte
 
-Transformer des contraintes de rangement mesurees en geometries imprimables,
-modulaires, tolerancees, comprehensibles et iterables, sans enfermer la logique de
-conception dans Fusion 360.
+Transformer les assets reels, contraintes de boite et intentions d'usage d'un jeu
+de societe en systemes volumetriques modulaires imprimables, tolerancees,
+inspectables et iterables, sans enfermer la logique de conception dans Fusion 360.
 
-## Ambition produit
+## Vision longue
 
-Un utilisateur doit pouvoir decrire :
+BGIG doit devenir un generateur intelligent d'inserts modulaires parametrables
+pour jeux de societe. La cible n'est pas seulement de produire des petits trays
+rectangulaires : la cible est de concevoir un systeme de rangement complet dans
+le volume X/Y/Z de la boite.
 
-- les dimensions internes reelles de sa boite ;
-- les contraintes verticales liees au couvercle, aux plateaux, aux livrets et aux
-  regles ;
-- les assets a ranger : cartes, cartes sleevees, tokens, meeples, des, figurines
-  simples, sacs, livrets ;
-- ses intentions : setup rapide, rangement vertical, modules separables, maintien
-  en place, lisibilite, economie de filament ;
-- son profil d'impression : PLA standard, PETG, impression rapide, impression
-  fine, imprimante bien calibree ou non.
+Le moteur doit partir de donnees mesurables : dimensions internes, hauteur utile,
+assets, boards, livrets, plateaux, contraintes de couvercle, preferences
+d'accessibilite, tolerances et profil d'impression. Il doit ensuite produire des
+propositions explicables de modules imprimables, cavites, etages, reservations,
+volumes libres, ordre de retrait et sorties CAD.
 
-Le systeme doit ensuite produire une ou plusieurs propositions d'organisation,
-puis des corps imprimables coherents.
+## Product Pillars
+
+1. `Asset-first design` : decrire d'abord le materiel reel, puis deriver modules
+   et cavites quand c'est utile.
+2. `Volumetric layout` : raisonner sur tout le volume de la boite, pas seulement
+   sur une grille XY.
+3. `Modular printable bodies` : produire des corps imprimables nommes,
+   tolerancees, auditables et iterables.
+4. `Cavities and ergonomic features` : modeliser logements, aides de prise,
+   fonds arrondis et futures operations CAD sans confusion avec validation
+   physique.
+5. `CAD generation pipeline` : transporter les decisions du moteur vers Fusion
+   ou d'autres adaptateurs sans recalcul metier.
+6. `Human validation gates` : bloquer les decisions qui engagent la vision,
+   Fusion reelle, l'impression ou l'ergonomie.
+7. `Design language and aesthetics` : ajouter labels, gravures, textures et
+   style seulement apres la robustesse fonctionnelle.
 
 ## Definition du succes
 
-Le projet reussit quand :
+Le produit est sur la bonne trajectoire quand :
 
-- les donnees d'entree sont suffisamment simples pour un utilisateur motive ;
-- les decisions de layout et de tolerance sont visibles ;
-- les modules generes sont testables hors Fusion 360 ;
-- l'adaptateur Fusion 360 peut produire des composants inspectables ;
-- les impressions reelles permettent d'ajuster les profils ;
-- un futur agent peut continuer le travail sans reinventer la roadmap.
-
-## Philosophie
-
-Le coeur du projet doit rester un moteur de conception, pas un script Fusion 360.
-
-Fusion 360 est une cible de generation importante parce que son API Python permet
-de creer des composants parametriques, de les inspecter et de les exporter. Mais
-les decisions de layout, de tolerance et de validation doivent rester testables
-hors Fusion.
+- un utilisateur peut decrire les assets et contraintes d'un jeu reel ;
+- le moteur distingue assets, modules, cavites, features, layers et reservations ;
+- plusieurs propositions peuvent etre comparees avec raisons et limites ;
+- la CAD IR transporte les decisions sans perte ni recalcul dans Fusion ;
+- Fusion produit des vues inspectables compactes et, plus tard, eclatees ;
+- les tolerances et geometries critiques sont validees par impression reelle ;
+- un agent peut choisir une mission par capability, milestone, gate et validation.
 
 ## Ce que le projet doit apprendre a faire
 
-A court terme :
+### Court terme
 
-- calculer des volumes rectangulaires simples ;
-- appliquer des tolerances explicites ;
-- produire un rapport de layout lisible ;
-- preparer une sortie Fusion 360.
+- Stabiliser les cavites et features abstraites deja presentes.
+- Decider par gate la premiere generation Fusion reelle de cavites simples.
+- Garder les rapports et la CAD IR comme source d'audit.
 
-A moyen terme :
+### Moyen terme
 
-- creer des modules creuses ;
-- generer des bacs a tokens, logements de cartes, casiers a des et zones libres ;
-- ajouter des encoches de doigt, fonds arrondis, parois et separateurs ;
-- proposer plusieurs layouts simples.
+- Introduire un modele d'assets autonome.
+- Representer layers, reservations de boards/livrets et ordre de retrait.
+- Produire des vues Fusion compactes et eclatees sans recalcul metier.
+- Construire un premier raisonnement volumetrique X/Y/Z.
 
-A long terme :
+### Long terme
 
-- composer des modules en L, T ou formes composites ;
-- ajouter couvercles, rainures, languettes, charnieres et fermetures ;
-- integrer texte, embossage, gravure, pictogrammes, textures et ajourages ;
-- assister la conception par evaluation multi-criteres.
+- Proposer plusieurs variantes scorees et expliquees.
+- Gerer modules composites, empilement, supports, couvercles et mecanismes.
+- Ajouter une couche esthetique parametrable.
+- Fermer la boucle calibration -> impression -> ajustement de profils.
 
 ## Limites assumees
 
-Le projet ne pretend pas resoudre l'optimisation parfaite du rangement en V0. Il
-ne pretend pas non plus que des tolerances generiques suffisent pour toutes les
-imprimantes. Les valeurs par defaut doivent rester prudentes, visibles et
-ajustables.
+- Le solveur volumetrique 3D complet n'est pas implemente maintenant.
+- Les valeurs de tolerance restent experimentales tant qu'elles ne sont pas
+  validees par impression.
+- Une validation Fusion ne vaut pas validation physique.
+- Les generations de cavites, fillets, encoches, booleans, exports STL/3MF et
+  mecanismes restent soumises a gates humaines.
 
-Le vrai critere de qualite sera la capacite a passer progressivement du modele
-theorique a des objets imprimes verifiables.
+## Lien de pilotage
+
+La trajectoire est detaillee dans `docs/CAPABILITY_MAP.md`, puis declinee dans
+`docs/ROADMAP.md`, `docs/BACKLOG.md`, `docs/NEXT_ACTIONS.md` et les gates.

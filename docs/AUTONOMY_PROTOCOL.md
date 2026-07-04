@@ -17,6 +17,7 @@ validation humaine explicite.
 - Executer une seule mission a la fois.
 - Preferer un changement petit, teste, documente et commite.
 - Lire l'etat reel avant de choisir une mission.
+- Travailler par capability, milestone, gate et validation, pas seulement par prochain fichier a modifier.
 - Ne jamais confondre `ready`, `done`, `experimental`, `prevu` et `a valider par
   impression reelle`.
 - S'arreter si une gate humaine est atteinte.
@@ -31,6 +32,15 @@ Ordre de priorite :
 2. Premiere mission `ready` dans `docs/NEXT_ACTIONS.md`.
 3. Premiere mission `ready` dans `docs/BACKLOG.md`.
 
+Avant de selectionner une mission, Codex verifie :
+
+- quelle capability elle sert dans `docs/CAPABILITY_MAP.md` ;
+- a quel milestone utilisateur elle contribue ;
+- si elle rapproche de la North Star ;
+- si elle depend d'une capability encore `planned`, `blocked` ou `deferred` ;
+- si une gate humaine la bloque ;
+- quelle validation prouvera le resultat.
+
 Codex doit refuser de lancer une mission si :
 
 - son statut n'est pas `ready` ;
@@ -38,6 +48,7 @@ Codex doit refuser de lancer une mission si :
 - une gate humaine est ouverte ;
 - les criteres d'acceptation sont absents ou ambigus ;
 - la mission melange plusieurs changements structurants ;
+- la mission court-circuite une capability prerequisite ;
 - une mission precedente du meme run n'a pas encore ete testee, commitee et
   integree dans `main`, ou la limite de missions du run est atteinte.
 
@@ -50,6 +61,8 @@ Avant implementation, Codex verifie :
 
 - `AGENTS.md` ;
 - `docs/STATUS.md` ;
+- `docs/NORTH_STAR.md` ;
+- `docs/CAPABILITY_MAP.md` ;
 - `docs/ROADMAP.md` ;
 - `docs/NEXT_ACTIONS.md` ;
 - `docs/BACKLOG.md` ;
@@ -57,8 +70,20 @@ Avant implementation, Codex verifie :
 - les ADR pertinentes dans `docs/DECISIONS/` ;
 - les fichiers de code ou documentation directement concernes.
 
-Une mission est prete seulement si son objectif, ses livrables, ses dependances,
-ses criteres d'acceptation et ses verifications attendues sont actionnables.
+Une mission est prete seulement si son objectif, sa capability, son milestone,
+ses livrables, ses dependances, ses criteres d'acceptation et ses verifications
+attendues sont actionnables.
+
+## Pilotage par capabilities
+
+`docs/CAPABILITY_MAP.md` est le pont entre la North Star et le backlog. Il sert a
+savoir quelle capacite produit existe, laquelle est seulement decrite, laquelle
+est bloquee par gate, et quelle validation autorise le statut affiche.
+
+Apres une mission significative, Codex met a jour le statut d'une capability
+uniquement si la preuve correspondante existe : test code, test CLI, validation
+Fusion, validation impression ou inspection documentaire. Une capability peut
+etre `implemented-cad-ir` sans etre `implemented-fusion`.
 
 ## Execution
 
@@ -66,7 +91,7 @@ Codex execute la mission par petits changements :
 
 1. Cadrer le besoin reel.
 2. Lire les fichiers pertinents.
-3. Identifier les risques et gates possibles.
+3. Identifier capability, milestone, risques et gates possibles.
 4. Proposer un plan court si une decision structurante est en jeu.
 5. Attendre validation si une gate humaine est atteinte.
 6. Modifier le minimum de fichiers necessaires.
@@ -153,6 +178,8 @@ le compte rendu final et, si cela change l'etat reel, dans `docs/STATUS.md`.
 Apres une mission significative, Codex met a jour :
 
 - `docs/STATUS.md` ;
+- `docs/NORTH_STAR.md` ;
+- `docs/CAPABILITY_MAP.md` ;
 - `docs/NEXT_ACTIONS.md` ;
 - `docs/BACKLOG.md` ;
 - les documents de conception impactes ;
@@ -181,6 +208,7 @@ Codex s'arrete sans implementation si :
 
 - une gate humaine est atteinte ;
 - une dependance n'est pas satisfaite ;
+- la capability visee est bloquee ou prematuree ;
 - les tests echouent et la correction sortirait du scope ;
 - le diff attendu implique une refonte massive ;
 - une nouvelle dependance lourde semble necessaire ;

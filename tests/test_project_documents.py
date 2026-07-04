@@ -14,13 +14,24 @@ REQUIRED_PROJECT_FILES = (
     "docs/STATUS.md",
     "docs/NEXT_ACTIONS.md",
     "docs/BACKLOG.md",
+    "docs/NORTH_STAR.md",
+    "docs/PRODUCT_SPEC.md",
+    "docs/CAPABILITY_MAP.md",
     "docs/ROADMAP.md",
     "docs/ARCHITECTURE.md",
+    "docs/VOLUMETRIC_LAYOUT_STRATEGY.md",
+    "docs/ASSET_MODEL_STRATEGY.md",
+    "docs/SOLVER_STRATEGY.md",
+    "docs/LAYER_AND_STACKING_MODEL.md",
+    "docs/ACCESSIBILITY_MODEL.md",
+    "docs/EXPLODED_VIEW_STRATEGY.md",
     "docs/CALIBRATION_PROTOCOL.md",
     "docs/CAD_IR_CONTRACT.md",
     "docs/FUSION_360_GATE_REPORT.md",
+    "docs/FUSION_360_STRATEGY.md",
     "docs/QUALITY_RULES.md",
     "docs/DECISIONS/ADR-TEMPLATE.md",
+    "docs/DECISIONS/ADR-0012-capability-driven-product-pilotage.md",
     "docs/DECISIONS/README.md",
     "docs/LOGS/README.md",
 )
@@ -33,6 +44,7 @@ REQUIRED_SECTIONS = {
     ),
     "docs/AUTONOMY_PROTOCOL.md": (
         "## Selection de mission",
+        "## Pilotage par capabilities",
         "## Arrets obligatoires",
         "## Rapport final",
     ),
@@ -47,6 +59,7 @@ REQUIRED_SECTIONS = {
     ),
     "docs/VALIDATION_MATRIX.md": (
         "## Niveaux de validation",
+        "## Statuts de capability",
         "## Regles de statut",
     ),
     "docs/STATUS.md": (
@@ -61,14 +74,63 @@ REQUIRED_SECTIONS = {
     "docs/BACKLOG.md": (
         "## Phase 0 - Fondation projet",
         "### P0-M002 - Ajouter une verification documentaire de base",
+        "### P8-M001 - Specifier la grille volumetrique 3D et les layers",
+    ),
+    "docs/NORTH_STAR.md": (
+        "## Formulation courte",
+        "## Product Pillars",
+        "## Definition du succes",
+    ),
+    "docs/PRODUCT_SPEC.md": (
+        "## Produit cible",
+        "## Product Pillars et capabilities",
+    ),
+    "docs/CAPABILITY_MAP.md": (
+        "## Product Pillars",
+        "## Architecture Tracks",
+        "## Capabilities",
+        "## Milestones utilisateur",
+        "## Regle d'usage par Codex",
     ),
     "docs/ROADMAP.md": (
-        "## Phase 0 - Fondation projet",
+        "## Phase 0 - Gouvernance, autonomie, qualite",
+        "## Phase 14 - Calibration, impression reelle, packaging et beta utilisable",
         "## Regle de progression",
     ),
     "docs/ARCHITECTURE.md": (
         "## Frontieres non negociables",
+        "## Architecture Tracks",
         "## Couches logicielles",
+    ),
+    "docs/VOLUMETRIC_LAYOUT_STRATEGY.md": (
+        "## Objectif",
+        "## Concepts cibles",
+        "## Gates",
+    ),
+    "docs/ASSET_MODEL_STRATEGY.md": (
+        "## Objectif",
+        "## Concepts cibles",
+        "## Gates",
+    ),
+    "docs/SOLVER_STRATEGY.md": (
+        "## Objectif",
+        "## Strategie cible",
+        "## Gates",
+    ),
+    "docs/LAYER_AND_STACKING_MODEL.md": (
+        "## Objectif",
+        "## Concepts cibles",
+        "## Gates",
+    ),
+    "docs/ACCESSIBILITY_MODEL.md": (
+        "## Objectif",
+        "## Concepts cibles",
+        "## Gates",
+    ),
+    "docs/EXPLODED_VIEW_STRATEGY.md": (
+        "## Objectif",
+        "## Strategie cible",
+        "## Gates",
     ),
     "docs/CALIBRATION_PROTOCOL.md": (
         "## Objectif",
@@ -80,6 +142,7 @@ REQUIRED_SECTIONS = {
         "## Objectif",
         "## Scene V0",
         "## Operations abstraites",
+        "## Extensions cible sans incompatibilite",
         "## Gate suivante",
     ),
     "docs/FUSION_360_GATE_REPORT.md": (
@@ -87,6 +150,11 @@ REQUIRED_SECTIONS = {
         "## Etat actuel du moteur",
         "## Options techniques",
         "## Validation demandee",
+    ),
+    "docs/FUSION_360_STRATEGY.md": (
+        "## Decision centrale",
+        "## Vue compacte et vue eclatee",
+        "## Gates avant elargissement Fusion",
     ),
     "docs/QUALITY_RULES.md": (
         "## Regles de documentation",
@@ -98,6 +166,15 @@ REQUIRED_SECTIONS = {
         "## ADR existantes",
     ),
     "docs/DECISIONS/ADR-TEMPLATE.md": (
+        "## Statut",
+        "## Contexte",
+        "## Options",
+        "## Decision",
+        "## Consequences",
+        "## Alternatives refusees",
+        "## Suivi",
+    ),
+    "docs/DECISIONS/ADR-0012-capability-driven-product-pilotage.md": (
         "## Statut",
         "## Contexte",
         "## Options",

@@ -1,0 +1,108 @@
+# Capability Map
+
+## Objectif
+
+Ce document relie la North Star aux missions executables. Il evite que Codex
+choisisse une mission seulement parce qu'elle est proche techniquement : chaque
+mission doit servir une capability, un milestone et une validation claire.
+
+Chaine de pilotage :
+
+`North Star -> Product Pillars -> Capabilities -> Milestones -> Epics -> Missions -> Tasks -> Gates -> Validation`.
+
+## Statuts de capability
+
+- `planned` : cible decrite, non design detaille.
+- `designed` : contrat ou strategie documente, pas encore implemente.
+- `implemented-core` : implemente et teste dans le coeur Python pur.
+- `implemented-cad-ir` : transporte dans la CAD IR, sans generation CAD reelle.
+- `implemented-fusion` : genere par l'adaptateur Fusion, hors validation humaine.
+- `fusion-validated` : inspecte et mesure manuellement dans Fusion.
+- `print-validated` : imprime et mesure avec contexte documente.
+- `deferred` : volontairement reporte.
+- `blocked` : bloque par gate, dependance ou decision humaine.
+
+## Product Pillars
+
+| Pillar | Role produit | Documents de reference |
+| --- | --- | --- |
+| Asset-first design | Partir du materiel reel a ranger, pas seulement de modules manuels. | `docs/ASSET_MODEL_STRATEGY.md`, `docs/CONFIG_SCHEMA.md` |
+| Volumetric layout | Organiser tout le volume X/Y/Z de la boite, avec etages et reservations. | `docs/VOLUMETRIC_LAYOUT_STRATEGY.md`, `docs/LAYER_AND_STACKING_MODEL.md` |
+| Modular printable bodies | Produire des corps imprimables nommes, tolerancees et auditables. | `docs/GEOMETRY_MODEL.md`, `docs/TOLERANCE_MODEL.md` |
+| Cavities and ergonomic features | Decrire les logements, aides de prise, fonds arrondis et futures operations. | `docs/GEOMETRY_MODEL.md` |
+| CAD generation pipeline | Transporter les decisions moteur vers Fusion sans recalcul. | `docs/CAD_IR_CONTRACT.md`, `docs/FUSION_360_STRATEGY.md` |
+| Human validation gates | Bloquer les decisions physiques, Fusion reelle et changements de vision. | `docs/HUMAN_GATES.md`, `docs/VALIDATION_MATRIX.md` |
+| Design language and aesthetics | Ajouter labels, gravure, textures et style sans casser la fonction. | `docs/PRODUCT_SPEC.md` |
+
+## Architecture Tracks
+
+| Track | Role | Capabilities principales |
+| --- | --- | --- |
+| Product control plane | Gouvernance, autonomie, gates, validation et logs. | C-CALIBRATION, gates transverses |
+| Pure engine | Donnees, validation, layout, tolerances, cavites et assets. | C-BOX, C-MODULE, C-CAVITY, C-FEATURE, C-ASSET |
+| Volumetric model | X/Y/Z, layers, reservations, stacking, free volumes. | C-GRID-3D, C-LAYERS, C-RESERVATION, C-STACKING |
+| CAD IR | Contrat CAD-agnostic et serialisation. | C-CAD-IR |
+| Fusion adapter | Vues inspectables et operations CAD autorisees. | C-FUSION-COMPACT, C-FUSION-EXPLODED, C-FUSION-CAVITIES, C-FILLETS |
+| Physical product | Calibration, impression, ergonomie et beta utilisable. | C-CALIBRATION, C-ACCESS, C-AESTHETIC |
+
+## Epics de reference
+
+| Epic | Objectif | Phases principales |
+| --- | --- | --- |
+| E-GOV | Garder le depot autopilotable et gate-aware. | 0, 14 |
+| E-CORE | Maintenir un moteur pur testable hors Fusion. | 1, 2, 3, 5 |
+| E-CAD | Transporter et generer sans recalcul metier. | 4, 6, 7 |
+| E-VOLUME | Passer du placement 2D a l'organisation X/Y/Z. | 8, 9, 10 |
+| E-PHYSICAL | Fermer la boucle Fusion, impression, ergonomie. | 11, 12, 13, 14 |
+## Capabilities
+
+| ID | Capability | Pillar | Statut | Milestone cible | Gate principale |
+| --- | --- | --- | --- | --- | --- |
+| C-BOX | Box model | Asset-first design | `implemented-core` | M1 Engine foundation | Aucune active |
+| C-ASSET | Asset model | Asset-first design | `planned` | M6 Asset-first project model | Gate si schema public large |
+| C-MODULE | Module model | Modular printable bodies | `implemented-core` | M1 Engine foundation | Aucune active |
+| C-CAVITY | Cavity model | Cavities and ergonomic features | `implemented-cad-ir` | M4 Abstract cavities | Gate Fusion cuts |
+| C-FEATURE | Ergonomic feature model | Cavities and ergonomic features | `implemented-cad-ir` | M4 Abstract cavities | Gate Fusion features |
+| C-LAYOUT-2D | 2D layout | Volumetric layout | `implemented-core` | M2 Simple layout | Aucune active |
+| C-GRID-3D | 3D volumetric grid | Volumetric layout | `planned` | M7 Volumetric planner | Gate architecture si contrat change |
+| C-LAYERS | Layer / stage model | Volumetric layout | `designed` | M7 Volumetric planner | Gate architecture si empilement physique |
+| C-RESERVATION | Board / tray / lid reservation | Asset-first design | `planned` | M6 Asset-first project model | Gate si impact dimensions publiques |
+| C-ACCESS | Accessibility and removal order | Human validation gates | `designed` | M8 Ergonomic planner | Validation ergonomique humaine |
+| C-STACKING | Support / stacking rules | Volumetric layout | `planned` | M7 Volumetric planner | Gate impression reelle |
+| C-COMPOSITE | Composite modules | Modular printable bodies | `planned` | M9 Composite modules | Gate modules composites |
+| C-CAD-IR | CAD IR | CAD generation pipeline | `implemented-cad-ir` | M3 CAD pipeline | Gate si contrat incompatible |
+| C-FUSION-COMPACT | Fusion compact view | CAD generation pipeline | `fusion-validated` | M3 CAD pipeline | Gate pour nouvelles geometries |
+| C-FUSION-EXPLODED | Fusion exploded view | CAD generation pipeline | `designed` | M5 CAD inspection views | Validation Fusion manuelle |
+| C-FUSION-CAVITIES | Fusion cavities | CAD generation pipeline | `blocked` | M5 CAD cavities | Gate Fusion cuts obligatoire |
+| C-FILLETS | Fillets and finger notches | CAD generation pipeline | `blocked` | M5 CAD ergonomic features | Gate Fusion curves/fillets |
+| C-SOLVER | Solver and scoring | Volumetric layout | `designed` | M10 Semi-automatic solver | Gate architecture si optimiseur majeur |
+| C-CALIBRATION | Calibration and print validation | Human validation gates | `designed` | M11 Physical validation | Impression reelle |
+| C-AESTHETIC | Aesthetic layer | Design language and aesthetics | `planned` | M12 Design language | Gate esthetique structurante |
+
+## Milestones utilisateur
+
+| ID | Milestone | Definition de valeur | Capabilities principales |
+| --- | --- | --- | --- |
+| M1 Engine foundation | Une config locale produit un rapport teste hors Fusion. | C-BOX, C-MODULE |
+| M2 Simple layout | Des modules rectangulaires sont places en 2D avec tolerances explicites. | C-LAYOUT-2D |
+| M3 CAD pipeline | Une CAD IR exportee produit des blanks mesurables dans Fusion. | C-CAD-IR, C-FUSION-COMPACT |
+| M4 Abstract cavities | Les cavites et aides ergonomiques sont modelisees sans generation reelle. | C-CAVITY, C-FEATURE |
+| M5 CAD cavities | Fusion genere des cavites simples controlees par gate et smoke test. | C-FUSION-CAVITIES |
+| M6 Asset-first project model | L'utilisateur decrit les assets et reservations avant les modules. | C-ASSET, C-RESERVATION |
+| M7 Volumetric planner | Le moteur raisonne en X/Y/Z, etages, empilement et volumes libres. | C-GRID-3D, C-LAYERS, C-STACKING |
+| M8 Ergonomic planner | Le moteur expose accessibilite, ordre de retrait et aide de manipulation. | C-ACCESS, C-FEATURE |
+| M9 Composite modules | Les corps soudes et formes non rectangulaires simples sont representes. | C-COMPOSITE |
+| M10 Semi-automatic solver | Plusieurs propositions scorees sont comparees et expliquees. | C-SOLVER |
+| M11 Physical validation | Les tolerances et geometries critiques sont calibrees par impression. | C-CALIBRATION |
+| M12 Design language | Labels, gravures, motifs et decoration restent parametrables et surs. | C-AESTHETIC |
+| M13 Advanced mechanisms | Couvercles, rainures, clips et empilement avance restent gate-aware. | C-STACKING, futurs mecanismes |
+| M14 Usable beta | Un jeu reel peut etre documente, genere, imprime et ajuste. | C-CALIBRATION, C-AESTHETIC |
+
+## Regle d'usage par Codex
+
+Avant de selectionner une mission, Codex doit indiquer implicitement ou dans le
+pilotage : capability servie, milestone lie, dependances, gate et validation. Une
+mission `ready` qui ne sert aucune capability doit etre recadree avant execution.
+
+Apres chaque mission significative, Codex met a jour le statut des capabilities
+impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctuel.

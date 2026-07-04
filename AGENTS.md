@@ -14,6 +14,8 @@ Avant de proposer ou modifier quoi que ce soit, lis au minimum :
 - `docs/AUTONOMY_PROTOCOL.md`
 - `docs/HUMAN_GATES.md`
 - `docs/STATUS.md`
+- `docs/NORTH_STAR.md`
+- `docs/CAPABILITY_MAP.md`
 - `docs/ROADMAP.md`
 - `docs/BACKLOG.md`
 - `docs/NEXT_ACTIONS.md`
@@ -21,7 +23,7 @@ Avant de proposer ou modifier quoi que ce soit, lis au minimum :
 - les fichiers de code ou documentation directement concernes par la mission
 
 Ne pars jamais directement sur une implementation lourde sans verifier la mission
-active, son statut, ses dependances et ses criteres d'acceptation.
+active, la capability servie, son milestone, son statut, ses dependances et ses criteres d'acceptation.
 
 ## Priorite de travail
 
@@ -42,6 +44,8 @@ Regles obligatoires :
 - execute une seule mission a la fois ;
 - ne travaille jamais sur plusieurs missions a la fois ;
 - ne commence pas une mission dont les dependances ne sont pas terminees ;
+- verifie quelle capability et quel milestone la mission sert ;
+- refuse une mission prematuree par rapport aux capabilities manquantes ;
 - n'ignore jamais une gate humaine decrite dans `docs/HUMAN_GATES.md` ;
 - ne modifie jamais la North Star sans validation humaine explicite ;
 - prefere un changement petit, teste, documente et commite ;
@@ -108,10 +112,9 @@ ambigue que les docs ne resolvent pas.
   `src/board_game_insert_generator/`.
 - Fusion 360 est un adaptateur de sortie, pas le moteur de decision.
 - Toutes les dimensions metier sont en millimetres.
-- Distingue toujours cellule theorique, corps imprimable, cavite, feature,
-  tolerance, layout et export CAD.
-- Ne confonds jamais `implemente`, `prevu`, `experimental` et `a valider par
-  impression reelle`.
+- Distingue toujours asset, cellule theorique, corps imprimable, cavite, feature,
+  layer, reservation, tolerance, layout et export CAD.
+- Ne confonds jamais `implemente`, `prevu`, `experimental`, `fusion-validated`, `print-validated` et `a valider par impression reelle`.
 
 ## Cycle de mission
 
@@ -119,20 +122,22 @@ Pour toute mission non triviale :
 
 1. Comprendre l'objectif reel.
 2. Lire les documents et fichiers pertinents.
-3. Identifier les ambiguities, risques et decisions structurantes.
-4. Proposer un plan court si la mission change l'architecture ou le produit.
-5. Attendre validation si la decision est structurante ou irreversible.
-6. Implementer par petits changements.
-7. Ajouter ou adapter les tests utiles.
-8. Lancer les verifications disponibles.
-9. Relire le diff.
-10. Mettre a jour le pilotage projet.
+3. Identifier la capability, le milestone, les dependances et la validation cible.
+4. Identifier les ambiguities, risques et decisions structurantes.
+5. Proposer un plan court si la mission change l'architecture ou le produit.
+6. Attendre validation si la decision est structurante ou irreversible.
+7. Implementer par petits changements.
+8. Ajouter ou adapter les tests utiles.
+9. Lancer les verifications disponibles.
+10. Relire le diff.
+11. Mettre a jour le pilotage projet.
 
 ## Mise a jour documentaire obligatoire
 
 Apres toute mission significative :
 
 - mets a jour `docs/STATUS.md` avec l'etat reel ;
+- mets a jour `docs/CAPABILITY_MAP.md` si le statut d'une capability change ;
 - mets a jour `docs/NEXT_ACTIONS.md` avec les prochaines missions recommandees ;
 - mets a jour `docs/BACKLOG.md` si une tache est decouverte, terminee, bloquee ou
   redecoupee ;
@@ -153,6 +158,7 @@ Cree une ADR dans `docs/DECISIONS/` pour toute decision structurante, notamment 
 - strategie de tolerance ;
 - representation des modules composites ;
 - strategie de generation geometrique ;
+- pilotage par capabilities ou changement de methode d'autonomie ;
 - ajout d'une dependance majeure ;
 - changement de comportement public d'API, CLI ou format de fichier.
 
@@ -183,6 +189,8 @@ Utilise plutot les statuts suivants :
 
 - `implemente` : code present et tests automatises pertinents passes ;
 - `experimental` : code present mais comportement incomplet ou peu valide ;
+- `fusion-validated` : comportement observe et mesure dans Fusion 360 ;
+- `print-validated` : comportement imprime, mesure et documente ;
 - `prevu` : decrit dans la roadmap ou le backlog, non code ;
 - `a valider par impression reelle` : necessite un prototype physique.
 

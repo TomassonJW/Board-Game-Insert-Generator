@@ -121,6 +121,23 @@ La premiere cible Fusion se limite a des blanks rectangulaires :
 - aucun export STL/3MF ;
 - aucun algorithme d'optimisation nouveau.
 
+## Vue compacte et vue eclatee
+
+La strategie long terme distingue deux sorties Fusion inspectables :
+
+- `compact view` : modules places dans le repere de boite, utile pour verifier
+  encombrement, collisions et hauteur utile ;
+- `exploded view` : modules repartis a plat ou decales, utile pour inspection,
+  nommage, preparation d'exports futurs et documentation.
+
+La vue compacte existe aujourd'hui seulement pour les blanks rectangulaires
+simples. La vue eclatee est une intention documentee dans
+`docs/EXPLODED_VIEW_STRATEGY.md` ; elle ne doit pas etre generee sans mission et
+validation dediees.
+
+Fusion ne doit pas inventer les positions compactes ou eclatees. Elles devront
+venir du moteur ou de la CAD IR, afin que le layout, les tolerances et les
+metadonnees restent testables hors Fusion.
 ## Choix API Fusion P4-M003
 
 Apres verification de la documentation officielle Autodesk, l'approche retenue
@@ -226,4 +243,6 @@ Avant d'elargir la generation Fusion :
   etre inspectee avant usage ;
 - aucune logique metier nouvelle ne doit etre prevue uniquement dans Fusion ;
 - toute execution reelle de cavite, extrusion cut ou boolean soustractif doit
-  repasser par une gate humaine dediee.
+  repasser par une gate humaine dediee ;
+- toute vue eclatee executable ou repositionnement CAD non trivial doit etre
+  limite a une mission dediee et documentee.

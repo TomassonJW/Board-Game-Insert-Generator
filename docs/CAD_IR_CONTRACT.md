@@ -75,6 +75,21 @@ methodes sont supportees :
 L'export ne modifie pas les valeurs de tolerance, ne recalcule pas dans Fusion et
 ne cree aucun STL/3MF.
 
+## Extensions cible sans incompatibilite
+
+La North Star elargie demande que la CAD IR transporte plus tard des informations
+volumetriques sans forcer Fusion a recalculer :
+
+- assets sources et liens vers modules/cavites derives ;
+- layers et reservations de boards, livrets, plateaux ou couvercle ;
+- volumes libres et contraintes d'empilement ;
+- ordre de retrait et metadata d'accessibilite ;
+- intentions de vue compacte et de vue eclatee ;
+- scores et raisons de variantes quand un solveur existera.
+
+Ces extensions devront rester additives ou passer par une nouvelle version de
+schema. Elles ne doivent pas rendre une CAD IR `cad_ir.v0` existante invalide
+sans ADR et gate humaine.
 ## Composants et corps
 
 Chaque composant represente un module imprimable rectangulaire V0. Il contient :

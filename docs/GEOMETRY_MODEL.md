@@ -27,6 +27,21 @@ Cette separation evite de confondre organisation, impression et operations CAD.
 
 ## Concepts
 
+### Concepts volumetriques cibles
+
+La cible long terme ajoute des concepts encore majoritairement documentaires :
+
+- `Asset` : objet reel du jeu a ranger, mesure exactement ou approximativement.
+- `Reservation` : volume non imprimable reserve pour board, livret, plateau,
+  couvercle ou espace de retrait.
+- `Layer` : tranche de hauteur ou etage logique dans la boite.
+- `VolumetricCell` : reservation X/Y/Z, distincte d'un corps imprimable.
+- `FreeVolume` : volume restant disponible ou volontairement laisse libre.
+- `StackRule` : relation de support, empilement ou interdiction de charge.
+- `RemovalOrder` : ordre de retrait attendu pour eviter de bloquer l'acces.
+
+Ces concepts ne sont pas un solveur 3D implemente. Ils cadrent les futures
+missions de Phase 8 et Phase 9.
 ### Contrat des dataclasses Phase 1
 
 Les dataclasses du coeur Python sont des objets de valeur legers. Elles portent
@@ -69,6 +84,7 @@ Volume disponible apres prise en compte des contraintes non imprimables :
 
 En V0, cette notion est representee par les dimensions internes de boite et
 `usable_height_mm`.
+La cible volumetrique decrit aussi les layers, reservations et volumes libres dans `docs/VOLUMETRIC_LAYOUT_STRATEGY.md`.
 
 ### Cell
 
@@ -258,8 +274,10 @@ Experimental :
 
 Prevu :
 
-- cavites ;
-- features ;
+- modele d'assets ;
+- grille volumetrique 3D ;
+- layers et reservations ;
+- ordre de retrait et accessibilite ;
 - unions de primitives ;
 - coupes ;
 - arrondis ;

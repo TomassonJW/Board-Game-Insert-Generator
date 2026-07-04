@@ -3,60 +3,70 @@
 ## Produit cible
 
 Board Game Insert Generator est un outil local de conception parametrique pour
-produire des modules d'inserts de jeux de societe imprimables en 3D FDM.
+produire des systemes d'inserts modulaires de jeux de societe imprimables en 3D
+FDM.
 
 Le produit doit partir d'une description structuree d'une boite, de ses assets et
 des intentions de rangement, puis produire des propositions explicables :
 
-- layout theorique ;
+- decomposition du volume de boite ;
+- reservations pour boards, livrets, regles, plateaux ou couvercle ;
 - modules imprimables ;
+- cavites et features ergonomiques ;
 - tolerances explicites ;
 - rapport de validation ;
-- generation Fusion 360 dans une phase ulterieure ;
-- exports exploitables a terme pour impression.
+- CAD IR ;
+- generation Fusion 360 inspectable ;
+- exports imprimables dans une phase future.
 
 ## North Star operationnelle
 
-Transformer des contraintes de rangement mesurees en geometries imprimables,
-modulaires, tolerancees, comprehensibles et iterables, sans enfermer la logique de
-conception dans Fusion 360.
+Transformer les assets reels, contraintes de boite et intentions d'usage d'un jeu
+de societe en systemes volumetriques modulaires imprimables, tolerancees,
+inspectables et iterables, sans enfermer la logique de conception dans Fusion 360.
 
 ## Utilisateurs cibles
 
 ### Maker de jeux de societe
 
 Veut ranger un jeu rapidement, avec peu de code. Il accepte de mesurer la boite
-et les composants, mais attend des valeurs par defaut prudentes.
+et les composants, mais attend des valeurs par defaut prudentes et des rapports
+lisibles.
 
 ### Designer technique
 
-Veut controler les tolerances, les parois, les cavites, les couvercles et les
-exports. Il attend des rapports precis et des parametres reproductibles.
+Veut controler les tolerances, les parois, les cavites, les couvercles, les
+layers, les exports et les variantes.
 
 ### Developpeur ou agent Codex
 
-Veut etendre le moteur mission par mission, avec un backlog clair, des tests et
-une architecture qui garde Fusion 360 en adaptateur.
+Veut etendre le moteur mission par mission, via capabilities, milestones, gates,
+backlog et tests.
 
 ## Entrees produit
 
-Entrees V0/V1 :
+Entrees actuelles :
 
 - fichier JSON local ;
 - dimensions internes de boite ;
 - hauteur utile ;
-- tolerances ;
+- tolerances et profils d'impression ;
 - modules demandes ;
+- cavites simples ;
+- features ergonomiques abstraites de cavites ;
 - strategie de layout ;
 - exemples versionnes.
 
 Entrees futures :
 
-- CSV ;
-- Google Sheets ;
-- formulaire local ;
-- assistant de conception ;
-- presets par jeu ou type de composants.
+- assets a ranger avec dimensions exactes ou approximatives ;
+- volumes de contenance attendus ;
+- boards, livrets, regles et plateaux a reserver ;
+- contraintes de layers et empilement ;
+- preferences d'accessibilite et ordre de retrait ;
+- preferences de nombre de modules, ergonomie et setup ;
+- CSV, Google Sheets ou formulaire local ;
+- assistant de conception.
 
 ## Sorties produit
 
@@ -64,80 +74,73 @@ Sorties actuelles :
 
 - rapport Markdown ;
 - rapport JSON ;
-- cellules theoriques ;
-- corps imprimables rectangulaires simples.
+- cellules theoriques 2D ;
+- corps imprimables rectangulaires simples ;
+- CAD IR `cad_ir.v0` ;
+- blanks rectangulaires Fusion valides manuellement.
 
 Sorties futures :
 
-- composants Fusion 360 ;
-- exports STL ou 3MF ;
+- cavites Fusion reelles ;
+- vues compactes et vues eclatees ;
+- variantes de layout scorees ;
 - fiches de fabrication ;
-- variantes de layouts scorees ;
+- exports STL/3MF ;
 - documentation utilisateur par projet.
 
-## Capacites actuelles
+## Product Pillars et capabilities
 
-Etat actuel experimental :
+La liste de reference vit dans `docs/CAPABILITY_MAP.md`. Les piliers actifs sont :
 
-- chargement JSON ;
-- modeles Python types par dataclasses ;
-- validation de dimensions de base ;
-- layout `row_fill` deterministe ;
-- application de tolerances par face pour volumes rectangulaires ;
-- rapport Markdown/JSON ;
-- tests unitaires hors Fusion 360.
-
-Ces capacites sont utiles pour construire le socle, mais ne constituent pas encore
-un produit final imprimable.
-
-## Capacites attendues
-
-Le produit final doit couvrir :
-
-- modules rectangulaires simples ;
-- cavites pour cartes, cartes sleevees, tokens, meeples et des ;
-- modules composites en L/T ou volumes soudes ;
-- couvercles poses et coulissants ;
-- mecanismes simples avec jeux fonctionnels ;
-- labels, gravures, embossage et textures ;
-- assistant de layout avec scoring ;
-- integration Fusion 360 robuste ;
-- documentation utilisateur et exemples reels.
+- Asset-first design ;
+- Volumetric layout ;
+- Modular printable bodies ;
+- Cavities and ergonomic features ;
+- CAD generation pipeline ;
+- Human validation gates ;
+- Design language and aesthetics.
 
 ## Principes UX
 
 - Le mode simple doit rester rassurant pour un utilisateur non expert.
 - Les options avancees doivent exister sans surcharger l'entree minimale.
-- Les rapports doivent expliquer les choix, les dimensions et les limites.
-- Une valeur de tolerance doit etre visible et modifiable.
+- Les rapports doivent expliquer choix, dimensions, limites et validations.
+- Une valeur de tolerance doit etre visible, modifiable et reliee a sa source.
 - Le systeme ne doit pas pretendre qu'une impression sera parfaite sans test
   physique.
+- L'accessibilite et l'ordre de retrait comptent autant que la compacite.
 
 ## Non-objectifs immediats
 
-- Optimisation parfaite du rangement.
+- Solveur 3D complet.
 - Interface graphique complete.
 - Dependances SaaS obligatoires.
-- Generation directe STL/3MF avant stabilisation du modele geometrique.
+- Export STL/3MF avant stabilisation CAD et gate.
 - Fusion 360 comme dependance du coeur Python.
 - Garantie d'impression sans prototype.
+- Generation Fusion reelle de cavites, encoches ou fillets sans gate.
 
 ## Criteres de succes par maturite
 
 ### Fondation
 
-Un agent peut reprendre le depot, comprendre la mission active, lancer les tests
-et proposer le prochain increment sans contexte oral.
+Un agent peut reprendre le depot, comprendre la mission active, identifier la
+capability servie, lancer les tests et proposer le prochain increment.
 
 ### Moteur pur
 
-Une configuration locale produit des resultats validates, reproductibles et
-testes hors Fusion 360.
+Une configuration locale produit des resultats valides, reproductibles et testes
+hors Fusion 360.
 
-### CAD
+### Produit volumetrique abstrait
 
-Une configuration valide produit des composants Fusion 360 inspectables, nommes
-et dimensionnes correctement.
+Le moteur peut representer assets, modules, cavites, features, layers,
+reservations, volumes libres et ordre de retrait sans generation CAD reelle.
+
+### CAD inspectable
+
+Une configuration valide produit des composants Fusion inspectables, nommes et
+dimensionnes correctement, avec vue compacte puis vue eclatee.
 
 ### Produit imprimable
 
@@ -147,4 +150,4 @@ les tolerances et documenter les ecarts constates.
 ### Produit assiste
 
 Le systeme propose plusieurs layouts, explique les arbitrages et aide a choisir
-selon compacite, ergonomie, impression et setup.
+selon compacite, accessibilite, impression, setup et esthetique.

@@ -6,22 +6,25 @@ Cette boucle est le mode standard d'un run Codex autonome sur ce depot.
 
 1. Lire `AGENTS.md`.
 2. Lire `docs/STATUS.md`.
-3. Lire `docs/NEXT_ACTIONS.md`.
-4. Lire `docs/BACKLOG.md`.
-5. Identifier la premiere mission `ready` non bloquee et non gated.
-6. Verifier ses dependances.
-7. Creer une branche ou travailler dans un worktree si disponible.
-8. Executer exactement une mission atomique.
-9. Lancer les tests pertinents.
-10. Mettre a jour les docs impactees.
-11. Mettre a jour `docs/STATUS.md`.
-12. Mettre a jour `docs/NEXT_ACTIONS.md`.
-13. Mettre a jour `docs/BACKLOG.md` si de nouvelles taches apparaissent.
-14. Creer une ADR si une decision structurante a ete prise.
-15. Committer proprement.
-16. Integrer automatiquement dans `main` si les tests passent et qu'aucune gate
+3. Lire `docs/NORTH_STAR.md`.
+4. Lire `docs/CAPABILITY_MAP.md`.
+5. Lire `docs/NEXT_ACTIONS.md`.
+6. Lire `docs/BACKLOG.md`.
+7. Identifier la premiere mission `ready` non bloquee et non gated.
+8. Verifier sa capability, son milestone, ses dependances et sa validation cible.
+9. Creer une branche ou travailler dans un worktree si disponible.
+10. Executer exactement une mission atomique.
+11. Lancer les tests pertinents.
+12. Mettre a jour les docs impactees.
+13. Mettre a jour `docs/STATUS.md`.
+14. Mettre a jour `docs/CAPABILITY_MAP.md` si un statut de capability change.
+15. Mettre a jour `docs/NEXT_ACTIONS.md`.
+16. Mettre a jour `docs/BACKLOG.md` si de nouvelles taches apparaissent.
+17. Creer une ADR si une decision structurante a ete prise.
+18. Committer proprement.
+19. Integrer automatiquement dans `main` si les tests passent et qu'aucune gate
     n'est atteinte.
-17. Continuer sur une branche propre si le run autorise plusieurs missions, sinon
+20. Continuer sur une branche propre si le run autorise plusieurs missions, sinon
     s'arreter avec un rapport clair.
 
 ## Detail operationnel
@@ -30,7 +33,10 @@ Cette boucle est le mode standard d'un run Codex autonome sur ce depot.
 
 La lecture initiale doit etablir :
 
+- North Star et piliers concernes ;
 - phase active ;
+- capability visee ;
+- milestone utilisateur ;
 - mission recommandee ;
 - dependances ;
 - gates humaines possibles ;
@@ -47,6 +53,13 @@ Priorite :
 
 Codex ne doit pas choisir une mission plus interessante si une mission plus
 prioritaire est deja `ready`.
+
+Avant de valider le choix, Codex doit pouvoir formuler :
+
+- `Capability` : identifiant dans `docs/CAPABILITY_MAP.md` ;
+- `Milestone` : jalon utilisateur vise ;
+- `Gate` : aucune, ou gate humaine explicite ;
+- `Validation` : tests, CLI, Fusion manuel, impression ou inspection documentaire.
 
 ### 3. Branche ou worktree
 
@@ -66,6 +79,10 @@ des modifications non liees, s'arreter ou travailler autour sans les ecraser.
 Une mission atomique peut modifier plusieurs fichiers, mais elle doit garder un
 objectif coherent. Elle ne doit pas cumuler, par exemple, une refonte de modele,
 un changement de CLI et une preparation Fusion.
+
+Une mission ne doit pas faire passer une capability de `planned` a
+`implemented-fusion` en une seule etape si les jalons intermediaires ne sont pas
+testes et documentes.
 
 ### 5. Verifications
 
@@ -89,14 +106,23 @@ Verification de diff recommandee :
 git diff --check
 ```
 
+Verification Fusion boundary recommandee :
+
+```powershell
+rg -n "adsk" src/board_game_insert_generator
+```
+
 ### 6. Mise a jour du pilotage
 
 Mettre a jour les documents qui permettent au prochain agent de reprendre sans
 contexte oral :
 
 - statut reel ;
+- capability et milestone ;
 - prochaines actions ;
 - backlog ;
+- gates ;
+- validations disponibles ;
 - logs ;
 - ADR si necessaire.
 

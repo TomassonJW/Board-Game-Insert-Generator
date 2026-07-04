@@ -48,6 +48,24 @@ possible.
 }
 ```
 
+## Cible asset-first et volumetrique
+
+Le schema V0 reste `module-first` : le loader accepte `modules`, `cavities` et
+`features`, mais il n'accepte pas encore de champ racine `assets`, `layers`,
+`reservations` ou `solver`.
+
+La cible produit de Phase 8/9 introduira, sous gate si le schema public change :
+
+- `assets` : materiel reel a ranger, avec dimensions exactes ou approximatives ;
+- `reservations` : boards, livrets, plateaux, couvercle ou espace non imprimable ;
+- `layers` : contraintes de hauteur et etages ;
+- `accessibility` : ordre de retrait, zones de prise et contraintes de setup ;
+- `solver_preferences` : preferences de nombre de modules, compacite, ergonomie
+  et variantes.
+
+Ces champs sont documentes dans `docs/ASSET_MODEL_STRATEGY.md`,
+`docs/VOLUMETRIC_LAYOUT_STRATEGY.md`, `docs/LAYER_AND_STACKING_MODEL.md` et
+`docs/ACCESSIBILITY_MODEL.md`. Ils ne sont pas implementes dans le loader V0.
 ## `box`
 
 Champs obligatoires :

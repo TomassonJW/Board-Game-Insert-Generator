@@ -10,12 +10,30 @@ quel statut elle autorise.
 | Tests unitaires | Fonctions pures, invariants, cas limites locaux. | Ergonomie, Fusion, impression reelle. | Sortie de `python -m unittest discover -s tests`. | `implemente` pour le comportement teste. |
 | Tests CLI | Chargement, execution bout en bout locale, codes de sortie, rapports. | Validite CAD ou impression. | Commande CLI et sortie attendue. | `implemente` pour le flux CLI teste. |
 | Tests de non-regression | Stabilite de comportements deja acceptes. | Nouveaux cas non couverts. | Tests ajoutes ou existants passes. | Maintien du statut existant. |
-| Validation documentaire | Coherence entre docs, statut, backlog et ADR. | Exactitude physique ou execution code. | Relecture, checklist, futur test documentaire. | `prevu` ou pilotage coherent. |
-| Validation geometrique abstraite | Dimensions, cellules, corps imprimables, offsets. | Faisabilite CAD concrete. | Tests et rapports JSON/Markdown. | `implemente` ou `experimental` selon couverture. |
-| Validation Fusion 360 | Creation de composants inspectables dans Fusion. | Qualite d'impression reelle. | Rapport Fusion, captures ou notes, dimensions controlees. | `experimental` ou jalon Fusion accepte. |
-| Validation impression reelle | Ajustement physique, jeux, friction, assemblage. | Generalisation a toutes imprimantes. | Mesures, profil imprimante, filament, slicer, photos ou notes. | `a valider par impression reelle` puis stable localement si confirme. |
+| Validation documentaire | Coherence entre docs, statut, backlog, capability map et ADR. | Exactitude physique ou execution code. | Relecture, checklist, test documentaire. | `planned`, `designed` ou pilotage coherent. |
+| Validation geometrique abstraite | Dimensions, cellules, corps imprimables, offsets, CAD IR abstraite. | Faisabilite CAD concrete. | Tests et rapports JSON/Markdown. | `implemented-core`, `implemented-cad-ir` ou `experimental` selon couverture. |
+| Validation Fusion 360 | Creation de composants inspectables dans Fusion. | Qualite d'impression reelle. | Rapport Fusion, captures ou notes, dimensions controlees. | `implemented-fusion` ou `fusion-validated`. |
+| Validation impression reelle | Ajustement physique, jeux, friction, assemblage. | Generalisation a toutes imprimantes. | Mesures, profil imprimante, filament, slicer, photos ou notes. | `print-validated` localement, puis stabilisation si confirme. |
 | Validation ergonomique humaine | Lisibilite, manipulation, setup, comprehension utilisateur. | Correction algorithmique seule. | Retour humain structure ou checklist UX. | Amelioration UX documentee. |
 
+## Statuts de capability
+
+Les statuts de `docs/CAPABILITY_MAP.md` indiquent le niveau de maturite d'une
+capacite produit, pas seulement l'existence de code.
+
+- `planned` : capability identifiee mais non specifiee en detail.
+- `designed` : contrat ou strategie documentee, sans implementation complete.
+- `implemented-core` : moteur Python pur implemente et teste.
+- `implemented-cad-ir` : capability transportee dans la CAD IR avec tests.
+- `implemented-fusion` : adaptateur Fusion code pour cette capability, sans
+  validation manuelle complete.
+- `fusion-validated` : sortie observee et mesuree dans Fusion 360.
+- `print-validated` : sortie imprimee, mesuree et documentee.
+- `deferred` : capability volontairement repoussee.
+- `blocked` : gate humaine, dependance ou risque connu bloque l'execution.
+
+Une capability peut progresser par paliers. Par exemple une cavite peut etre
+`implemented-cad-ir` alors que la generation Fusion reste `blocked`.
 ## Categories de preuve
 
 ### Valide par code

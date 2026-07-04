@@ -4,7 +4,7 @@ Derniere mise a jour : 2026-07-04
 
 Ce fichier indique les prochaines missions recommandees. Il doit rester court,
 priorise et directement actionnable. Si aucune mission explicite n'est donnee,
-Codex doit choisir la premiere mission `ready` listee ici.
+Codex doit choisir la premiere mission `ready` listee ici, sauf gate humaine.
 
 ## Politique active - Integration Git autonome
 
@@ -20,50 +20,58 @@ structurant, authentification absente ou refus de push direct.
 
 Statut : `blocked`.
 
-Decision demandee : autoriser, reporter ou recadrer la premiere generation Fusion
-reelle des cavites et features abstraites P5.
+Decision demandee : autoriser, reporter ou recadrer `P6-M001 - Generer les
+cavites rectangulaires simples dans Fusion`.
 
 Contexte :
 
-- `P5-M001` modele les cavites rectangulaires simples abstraites ;
-- `P5-M002` specialise les clearances de logements `cards` et `sleeved_cards` ;
-- `P5-M003` specialise les receptacles ouverts `tokens`, `dice` et `meeples` ;
-- `P5-M004` decrit les encoches de doigts, encoches laterales/centrales,
-  demi-lunes, fonds arrondis et aides de prise en main comme features abstraites
-  CAD-agnostic ;
+- North Star realignee vers un generateur volumetrique asset-first ;
+- `C-CAVITY` et `C-FEATURE` sont `implemented-cad-ir`, pas `implemented-fusion` ;
+- `C-FUSION-CAVITIES` et `C-FILLETS` restent `blocked` ;
 - les rapports Markdown/JSON et la CAD IR exposent `subtract_rectangular_cavity`
   et `describe_cavity_feature` avec `fusion_generation: not_implemented` ;
-- l'add-in Fusion actuel doit rester limite aux blanks rectangulaires tant qu'une
-  nouvelle gate n'autorise pas les operations soustractives ou courbes reelles.
+- l'add-in Fusion actuel reste limite aux blanks rectangulaires et a la lecture
+  CAD IR.
 
 Options :
 
-1. Autoriser une mission Fusion limitee aux cavites rectangulaires simples par
-   sketch + extrusion cut/boolean, sans encoche ni fond arrondi.
-2. Autoriser une mission d'etude/ADR Fusion sur la strategie de cuts, booleans,
-   fillets et geometry robustness, sans generation executable.
-3. Reporter la generation Fusion reelle et poursuivre une mission moteur non
-   gated.
-4. Autoriser directement encoches/fonds arrondis reels dans Fusion : option plus
-   risquee, a cadrer fortement avant implementation.
+1. Autoriser `P6-M001` : generation Fusion limitee aux cavites rectangulaires
+   simples, sans encoche, fond arrondi, fillet, export STL/3MF ni recalcul
+   metier dans Fusion.
+2. Autoriser une ADR technique avant code Fusion : strategie de cuts, booleans,
+   robustesse et smoke test manuel.
+3. Reporter Fusion et continuer hors gate avec `P8-M001 - Specifier la grille
+   volumetrique 3D`.
+4. Autoriser directement encoches/fonds arrondis reels dans Fusion : option
+   deconseillee tant que les cuts rectangulaires ne sont pas stables.
 
-Recommandation : option 1 ou 2. Commencer par la generation Fusion reelle de
-cavites rectangulaires simples, ou par une ADR technique si le choix cut/boolean
-reste incertain. Ne pas commencer par les demi-lunes ou fonds arrondis reels tant
-que les cuts rectangulaires ne sont pas stables.
+Recommandation : option 1 si l'objectif est de prouver le prochain maillon
+Fusion, option 3 si l'objectif est de renforcer la conception volumetrique avant
+de toucher a la geometrie reelle.
 
-Validation attendue de l'humain :
+Validation attendue de l'humain pour P6-M001 :
 
-- perimetre Fusion autorise ;
-- types d'operations CAD autorisees ;
-- limites explicites sur encoches, fonds arrondis, fillets et booleans ;
+- type exact d'operation Fusion autorise ;
+- limites explicites sur booleans, encoches, fonds arrondis et fillets ;
+- fixture CAD IR a utiliser ;
 - procedure de smoke test manuel attendue dans Fusion 360.
 
-## Mission ready
+## Mission ready non gated si Fusion est reportee
 
-Aucune mission `ready` ne doit etre lancee tant que la gate Fusion reelle de
-cavites/features n'est pas tranchee ou qu'une autre mission explicitement non
-gated n'est pas selectionnee.
+Statut : `ready_if_gate_deferred`.
+
+`P8-M001 - Specifier la grille volumetrique 3D et les layers`.
+
+- Capability : `C-GRID-3D`, `C-LAYERS`.
+- Milestone : `M7 Volumetric planner`.
+- Objectif : definir le contrat pur Python de cellules X/Y/Z, layers,
+  reservations, volumes libres et collisions, sans solveur complet.
+- Gate : aucune si la mission reste documentaire/specification et ne modifie pas
+  le schema public executable.
+- Validation : tests documentaires, backlog/status/capability map mis a jour.
+
+Cette mission ne doit etre prise que si l'humain reporte explicitement la gate
+Fusion ou demande une mission non gated.
 
 ## Fin de chaque mission
 
