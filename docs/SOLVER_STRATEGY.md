@@ -10,6 +10,7 @@ pas devenir une boite noire ni remplacer les gates physiques.
 - `row_fill` et `grid` sont deterministes.
 - Le rapport contient un score simple de layout, non optimise.
 - Aucun optimiseur global, heuristique complexe ou dependance lourde n'est present.
+- P10-M002 expose une comparaison `variant_comparison` report-only entre strategies deterministes deja implementees.
 
 ## Strategie cible
 
@@ -80,3 +81,15 @@ Invariants P10-M001 :
 - aucune dependance lourde ;
 - un score futur doit etre auditables par raisons, pas seulement par nombre ;
 - une variante refusee devra exposer des raisons avant toute comparaison.
+## Comparaison report-only P10-M002
+
+P10-M002 ajoute une comparaison de variantes dans les rapports Markdown/JSON. Les
+variantes sont uniquement les strategies deterministes deja implementees :
+`layout:row_fill` et `layout:grid`.
+
+Le moteur ne cherche pas de nouvelles positions. Il regenere les layouts connus,
+calcule des sous-scores explicables et expose des raisons. Le statut des entrees
+est `explain_only` ou `rejected`.
+
+Ce n'est pas un solveur complet : aucune optimisation globale, aucun backtracking,
+aucune dependance externe et aucune generation Fusion ne sont ajoutes.

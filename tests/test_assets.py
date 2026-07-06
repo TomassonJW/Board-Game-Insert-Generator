@@ -37,6 +37,22 @@ class AssetModelTests(unittest.TestCase):
         self.assertEqual(payload["summary"]["asset_count"], 2)
         self.assertEqual(payload["assets"][0]["status"], "loaded_only")
 
+
+    def test_reports_deterministic_variant_comparison(self) -> None:
+        config = load_config(ROOT / "examples" / "simple_assets.json")
+        layout = generate_basic_layout(config)
+
+        markdown = layout_to_markdown(config, layout)
+        payload = json.loads(layout_to_json(config, layout))
+
+        self.assertIn("## Variant comparison", markdown)
+        self.assertIn("layout:row_fill", markdown)
+        self.assertIn("layout:grid", markdown)
+        variants = payload["variant_comparison"]
+        self.assertEqual([entry["variant_id"] for entry in variants], ["layout:row_fill", "layout:grid"])
+        self.assertEqual(variants[0]["status"], "explain_only")
+        self.assertIn("compactness", variants[0]["subscores"])
+        self.assertTrue(any("assets are loaded as metadata only" in reason for reason in variants[0]["reasons"]))
     def test_cad_ir_transports_assets_as_metadata_only(self) -> None:
         config = load_config(ROOT / "examples" / "simple_assets.json")
         layout = generate_basic_layout(config)

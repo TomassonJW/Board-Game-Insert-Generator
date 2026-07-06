@@ -75,7 +75,7 @@ Chaine de pilotage :
 | C-FUSION-EXPLODED | Fusion exploded view | CAD generation pipeline | `designed` | M5 CAD inspection views | Validation Fusion manuelle |
 | C-FUSION-CAVITIES | Fusion cavities | CAD generation pipeline | `fusion-validated` | M5 CAD cavities | Cavites rectangulaires validees Fusion, print-validated: false |
 | C-FILLETS | Fillets and finger notches | CAD generation pipeline | `fusion-validated` | M5 CAD ergonomic features | Encoche rectangulaire top-open validee Fusion, print-validated: false ; courbes/fillets bloques |
-| C-SOLVER | Solver and scoring | Volumetric layout | `designed` | M10 Semi-automatic solver | Scoring P10-M001 documente; gate architecture si optimiseur majeur |
+| C-SOLVER | Solver and scoring | Volumetric layout | `implemented-core` | M10 Semi-automatic solver | Variant comparison P10-M002 report-only; gate architecture si optimiseur majeur |
 | C-CALIBRATION | Calibration and print validation | Human validation gates | `designed` | M11 Physical validation | Impression reelle |
 | C-AESTHETIC | Aesthetic layer | Design language and aesthetics | `planned` | M12 Design language | Gate esthetique structurante |
 

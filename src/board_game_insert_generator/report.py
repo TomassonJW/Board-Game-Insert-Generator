@@ -56,6 +56,7 @@ def layout_to_dict(config: InsertConfig, result: LayoutResult) -> dict[str, Any]
             "warnings": list(result.warnings),
         },
         "layout_comparison": _layout_comparison(config, result),
+        "variant_comparison": _variant_comparison(config, result),
         "volumetric_grid": volumetric_summary.to_dict() if volumetric_summary is not None else None,
         "assets": [_asset_to_dict(asset) for asset in config.assets],
         "module_requests": [
@@ -166,6 +167,14 @@ def layout_to_markdown(config: InsertConfig, result: LayoutResult) -> str:
         "",
         *_format_volumetric_grid_section(volumetric_summary),
         *_format_assets_section(config),
+        "## Variant comparison",
+        "",
+        "Variants are deterministic report-only comparisons of already implemented layout strategies. They are not a global optimization proof.",
+        "",
+        "| Variant | Status | Total | Compact | Access | Reservations | Print | Setup | Confidence | Reasons |",
+        "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |",
+        *_format_variant_rows(_variant_comparison(config, result)),
+        "",
         "## Tolerance profile",
         "",
         f"- Print profile: `{config.print_profile}` ({print_profile_label(config.print_profile)})",
@@ -284,6 +293,126 @@ def layout_to_markdown(config: InsertConfig, result: LayoutResult) -> str:
         ]
     )
     return "\n".join(lines)
+def _variant_comparison(config: InsertConfig, current_result: LayoutResult) -> list[dict[str, Any]]:
+    variants: list[dict[str, Any]] = []
+    for entry in _layout_comparison(config, current_result):
+        strategy = entry["strategy"]
+        variant_id = f"layout:{strategy}"
+        if entry["status"] != "ok":
+            variants.append(
+                {
+                    "variant_id": variant_id,
+                    "strategy": strategy,
+                    "status": "rejected",
+                    "total_score": 0.0,
+                    "subscores": {},
+                    "reasons": [entry.get("error", "Variant could not be generated.")],
+                }
+            )
+            continue
+        subscores = _variant_subscores(config, entry)
+        total_score = _clean_float(sum(subscores.values()))
+        variants.append(
+            {
+                "variant_id": variant_id,
+                "strategy": strategy,
+                "status": "explain_only",
+                "total_score": total_score,
+                "subscores": subscores,
+                "reasons": _variant_reasons(config, entry),
+            }
+        )
+    return variants
+
+
+def _variant_subscores(config: InsertConfig, entry: dict[str, Any]) -> dict[str, float]:
+    occupation = float(entry.get("occupation_percent", 100.0))
+    cell_count = float(entry.get("cell_count", 0.0))
+    warning_count = float(entry.get("warning_count", 0.0))
+    return {
+        "compactness": _clean_float(max(0.0, 30.0 - occupation * 0.2 - warning_count * 2.0)),
+        "accessibility": _variant_accessibility_score(config),
+        "reservation_integrity": _variant_reservation_score(config),
+        "print_simplicity": _clean_float(max(0.0, 20.0 - cell_count * 1.5)),
+        "setup": _variant_setup_score(config),
+        "measurement_confidence": _variant_measurement_confidence_score(config),
+    }
+
+
+def _variant_accessibility_score(config: InsertConfig) -> float:
+    summary = build_volumetric_summary(config)
+    if summary is None:
+        return 10.0
+    if summary.to_dict()["removal_sequence"]:
+        return 20.0
+    return 12.0
+
+
+def _variant_reservation_score(config: InsertConfig) -> float:
+    grid = config.volumetric_grid
+    if grid is None:
+        return 10.0
+    if grid.zones:
+        return 20.0
+    return 12.0
+
+
+def _variant_setup_score(config: InsertConfig) -> float:
+    if any(asset.containment_intent.value in {"access_first", "reserve"} for asset in config.assets):
+        return 10.0
+    summary = build_volumetric_summary(config)
+    if summary is not None and summary.to_dict()["removal_sequence"]:
+        return 8.0
+    return 5.0
+
+
+def _variant_measurement_confidence_score(config: InsertConfig) -> float:
+    if not config.assets:
+        return 10.0
+    values = []
+    for asset in config.assets:
+        if asset.dimension_confidence.value == "exact":
+            values.append(10.0)
+        elif asset.dimension_confidence.value == "approximate":
+            values.append(6.0)
+        else:
+            values.append(3.0)
+    return _clean_float(sum(values) / len(values))
+
+
+def _variant_reasons(config: InsertConfig, entry: dict[str, Any]) -> list[str]:
+    reasons = [
+        f"Strategy {entry['strategy']} produced {entry.get('cell_count', 0)} cells.",
+        f"Layout occupation is {entry.get('occupation_percent', 0.0):.2f}% of box XY.",
+    ]
+    summary = build_volumetric_summary(config)
+    if summary is not None and summary.to_dict()["removal_sequence"]:
+        reasons.append("Declared removal sequence improves explainability but is not ergonomic validation.")
+    if config.assets:
+        reasons.append(f"{len(config.assets)} assets are loaded as metadata only, not converted into modules.")
+    if entry.get("warning_count", 0):
+        reasons.append(f"Variant has {entry['warning_count']} layout warnings.")
+    return reasons
+
+
+def _format_variant_rows(variants: list[dict[str, Any]]) -> list[str]:
+    rows: list[str] = []
+    for variant in variants:
+        subscores = variant.get("subscores", {})
+        rows.append(
+            "| "
+            f"{variant['variant_id']} | "
+            f"{variant['status']} | "
+            f"{variant['total_score']:.2f} | "
+            f"{subscores.get('compactness', 0.0):.2f} | "
+            f"{subscores.get('accessibility', 0.0):.2f} | "
+            f"{subscores.get('reservation_integrity', 0.0):.2f} | "
+            f"{subscores.get('print_simplicity', 0.0):.2f} | "
+            f"{subscores.get('setup', 0.0):.2f} | "
+            f"{subscores.get('measurement_confidence', 0.0):.2f} | "
+            f"{'; '.join(variant['reasons'])} |"
+        )
+    return rows
 
 def _format_volumetric_grid_section(summary: VolumetricSummary | None) -> list[str]:
     if summary is None:

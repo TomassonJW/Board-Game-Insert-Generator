@@ -209,6 +209,8 @@ La mission `P9-M002` charge maintenant `assets` depuis le JSON V0 comme donnees 
 
 La mission `P10-M001` definit les criteres de scoring de variantes dans `SOLVER_STRATEGY` : compacite, accessibilite, reservations, simplicite d'impression, setup et confiance de mesure. Aucun solveur, aucune variante automatique et aucune dependance lourde ne sont ajoutes.
 
+La mission `P10-M002` ajoute `variant_comparison` dans les rapports Markdown/JSON : comparaison report-only des strategies deterministes `row_fill` et `grid`, sous-scores explicables et raisons. Aucun optimiseur global, aucune nouvelle strategie de placement, aucune dependance lourde et aucune generation Fusion ne sont ajoutes.
+
 ## Phase active
 
 Phase active : **P8 volumetric planner abstrait / gate avant generation Fusion volumetrique**.
@@ -223,7 +225,7 @@ volumetrique declarative, layers, reservations, supports abstraits et metadata C
 La North Star cible un
 generateur volumetrique asset-first, pilote par capabilities.
 
-Prochaine action recommandee : `P10-M002` pour enumerer quelques variantes simples hors solveur complet, si cela reste deterministe et borne. Une nouvelle gate humaine est requise avant toute generation Fusion
+Prochaine action recommandee : `P10-M003` pour enrichir les raisons de variantes refusees, si cela reste report-only. Une nouvelle gate humaine est requise avant toute generation Fusion
 reelle liee a la grille 3D, aux layers, aux vues eclatees ou aux features
 avancees.
 
@@ -287,6 +289,7 @@ avancees.
 - Assets P9-M002 charges, valides, reportes et transportes en metadata CAD IR,
   sans generation de modules.
 - Criteres de scoring P10-M001 documentes, sans solveur executable.
+- Comparaison P10-M002 report-only de variantes deterministes existantes dans les rapports.
 - Generation Fusion de cavites rectangulaires simples P6-M001 depuis
   `subtract_rectangular_cavity`, avec coupe verticale limitee au body cible,
   `fusion-validated` et `print-validated: false`.
@@ -370,9 +373,9 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant `P10-M001 - Criteres de scoring de variantes` :
+Derniere verification pendant `P10-M002 - Variantes deterministes report-only` :
 
-- `python -m unittest discover -s tests` : OK, 127 tests passes.
+- `python -m unittest discover -s tests` : OK, 128 tests passes.
 - `python -m py_compile src\board_game_insert_generator\models.py src\board_game_insert_generator\config_loader.py src\board_game_insert_generator\validation.py src\board_game_insert_generator\volumetric.py src\board_game_insert_generator\report.py src\board_game_insert_generator\cad_ir.py` : OK.
 - `python -m board_game_insert_generator examples\simple_box.json --format markdown` : OK.
 - `python -m board_game_insert_generator examples\simple_box.json --format json` : OK.

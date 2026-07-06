@@ -317,10 +317,21 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Capability : C-SOLVER.
 - Milestone : M10 Semi-automatic solver.
 - Objectif : comparer options deterministes simples.
-- Livrable : moteur pur et rapport comparatif.
-- Criteres d'acceptation : pas d'optimiseur opaque.
+- Livrable : `variant_comparison` Markdown/JSON sur strategies deja implementees, avec sous-scores et raisons.
+- Criteres d'acceptation : pas d'optimiseur opaque, pas de nouvelle strategie de placement, pas de dependance lourde.
 - Tests : unitaires + CLI JSON/Markdown.
 - Gate : aucune si implementation simple.
+- Statut : `done`, `implemented-core`.
+
+### P10-M003 - Rapporter les variantes refusees avec raisons detaillees
+
+- Capability : C-SOLVER.
+- Milestone : M10 Semi-automatic solver.
+- Objectif : enrichir les cas `rejected` avec raisons structurees et references de contraintes.
+- Livrable : reporting et tests, sans nouveau solveur.
+- Criteres d'acceptation : raisons actionnables, pas d'optimiseur global.
+- Tests : unitaires + CLI JSON/Markdown.
+- Gate : aucune si report-only.
 - Statut : `ready`.
 ## Phase 11 - Modules composites et formes soudees
 
