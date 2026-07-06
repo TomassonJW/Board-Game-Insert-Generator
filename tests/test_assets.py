@@ -89,6 +89,11 @@ class AssetModelTests(unittest.TestCase):
         self.assertEqual(card_candidate["suggested_module"]["id"], "candidate-module:card-deck")
         self.assertEqual(card_candidate["suggested_module"]["functional_type"], "sleeved_cards")
         self.assertIn("candidate-module:card-deck", markdown)
+        self.assertIn("## Asset candidate variants", markdown)
+        self.assertEqual(payload["asset_candidate_variants"][0]["variant_id"], "asset-candidates:row_fill")
+        self.assertEqual(payload["asset_candidate_variants"][0]["status"], "recommended")
+        self.assertTrue(payload["asset_candidate_variants"][0]["placements"][0]["rotated"])
+        self.assertEqual(payload["recommended_asset_candidate_variant"]["variant_id"], "asset-candidates:row_fill")
 
     def test_cad_ir_transports_assets_and_candidates_as_metadata_only(self) -> None:
         config = load_config(ROOT / "examples" / "simple_assets.json")
@@ -99,6 +104,8 @@ class AssetModelTests(unittest.TestCase):
         self.assertEqual(payload["metadata"]["assets"][0]["id"], "main-board")
         self.assertEqual(payload["metadata"]["module_candidates"][1]["candidate_id"], "asset-candidate:card-deck")
         self.assertEqual(payload["metadata"]["module_candidates"][1]["status"], "candidate_only")
+        self.assertEqual(payload["metadata"]["asset_candidate_variants"][0]["status"], "recommended")
+        self.assertEqual(payload["metadata"]["recommended_asset_candidate_variant"]["variant_id"], "asset-candidates:row_fill")
         operation_kinds = [
             operation["kind"]
             for component in payload["components"]

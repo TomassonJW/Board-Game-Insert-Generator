@@ -134,5 +134,198 @@ def _suggested_module(
     }
 
 
+
+def build_asset_candidate_variants(config: InsertConfig) -> list[dict[str, Any]]:
+    candidates = build_module_candidates_from_assets(config)
+    printable_candidates = [candidate for candidate in candidates if candidate["status"] == "candidate_only"]
+    if not printable_candidates:
+        return [
+            {
+                "variant_id": "asset-candidates:row_fill",
+                "source": "module_candidates",
+                "status": "rejected",
+                "recommended": False,
+                "total_score": 0.0,
+                "subscores": {},
+                "placements": [],
+                "candidate_ids": [],
+                "reasons": ["No printable asset module candidates are available."],
+                "rejection_reasons": [
+                    _variant_rejection_reason(
+                        code="NO_CANDIDATES",
+                        category="assets",
+                        message="No candidate_only module candidates were produced from assets.",
+                        constraint_ref="assets",
+                        actionable="Add a storable asset with known dimensions or review reservation-only assets.",
+                    )
+                ],
+            }
+        ]
+
+    variant = _row_fill_asset_candidate_variant(config, printable_candidates)
+    return [variant]
+
+
+def recommended_asset_candidate_variant(variants: list[dict[str, Any]]) -> dict[str, Any] | None:
+    viable = [variant for variant in variants if variant["status"] != "rejected"]
+    if not viable:
+        return None
+    return max(viable, key=lambda variant: variant["total_score"])
+
+
+def _row_fill_asset_candidate_variant(
+    config: InsertConfig,
+    candidates: list[dict[str, Any]],
+) -> dict[str, Any]:
+    cursor_x = 0.0
+    cursor_y = 0.0
+    row_depth = 0.0
+    placements: list[dict[str, Any]] = []
+    box = config.box.inner_dimensions
+
+    for candidate in candidates:
+        size = candidate["suggested_module"]["min_dimensions_mm"]
+        oriented_size, rotated = _choose_candidate_orientation(size, box.x - cursor_x, box.x, box.y)
+        if oriented_size["x"] > box.x or oriented_size["y"] > box.y:
+            return _rejected_asset_candidate_variant(
+                candidate,
+                f"Candidate '{candidate['candidate_id']}' cannot fit inside the box in any allowed XY orientation.",
+                "DIMENSIONS_INCOMPATIBLE",
+                "modules[].min_dimensions_mm / box.inner_dimensions_mm",
+            )
+        if cursor_x > 0 and oriented_size["x"] > box.x - cursor_x:
+            cursor_x = 0.0
+            cursor_y += row_depth
+            row_depth = 0.0
+            oriented_size, rotated = _choose_candidate_orientation(size, box.x, box.x, box.y)
+        if cursor_y + oriented_size["y"] > box.y:
+            return _rejected_asset_candidate_variant(
+                candidate,
+                (
+                    f"Candidate '{candidate['candidate_id']}' row_fill placement needs Y up to "
+                    f"{cursor_y + oriented_size['y']:.2f} mm, box has {box.y:.2f} mm."
+                ),
+                "DOES_NOT_FIT",
+                "box.inner_dimensions_mm / module_candidates",
+            )
+        placements.append(
+            {
+                "candidate_id": candidate["candidate_id"],
+                "origin_mm": {"x": round(cursor_x, 4), "y": round(cursor_y, 4), "z": 0.0},
+                "size_mm": oriented_size,
+                "rotated": rotated,
+            }
+        )
+        cursor_x += oriented_size["x"]
+        row_depth = max(row_depth, oriented_size["y"])
+
+    footprint_x = max((placement["origin_mm"]["x"] + placement["size_mm"]["x"] for placement in placements), default=0.0)
+    footprint_y = max((placement["origin_mm"]["y"] + placement["size_mm"]["y"] for placement in placements), default=0.0)
+    occupation = (footprint_x * footprint_y / (box.x * box.y)) * 100.0 if box.x * box.y > 0 else 0.0
+    subscores = {
+        "compactness": round(max(0.0, 40.0 - occupation * 0.2), 4),
+        "asset_coverage": round(30.0 * (len(placements) / len(candidates)), 4),
+        "measurement_confidence": _candidate_measurement_score(candidates),
+        "simplicity": round(max(0.0, 20.0 - len(placements) * 2.0), 4),
+    }
+    total_score = round(sum(subscores.values()), 4)
+    return {
+        "variant_id": "asset-candidates:row_fill",
+        "source": "module_candidates",
+        "status": "recommended",
+        "recommended": True,
+        "total_score": total_score,
+        "subscores": subscores,
+        "placements": placements,
+        "footprint_mm": {"x": round(footprint_x, 4), "y": round(footprint_y, 4), "z": 0.0},
+        "occupation_percent": round(occupation, 4),
+        "candidate_ids": [candidate["candidate_id"] for candidate in candidates],
+        "reasons": [
+            "All printable asset module candidates fit with deterministic row_fill heuristic.",
+            "Variant is report-only and does not mutate config.modules or Fusion geometry.",
+        ],
+        "rejection_reasons": [],
+    }
+
+
+def _choose_candidate_orientation(
+    size: dict[str, float],
+    remaining_x: float,
+    max_x: float,
+    max_y: float,
+) -> tuple[dict[str, float], bool]:
+    normal = {"x": size["x"], "y": size["y"], "z": size["z"]}
+    rotated = {"x": size["y"], "y": size["x"], "z": size["z"]}
+    if normal["x"] <= remaining_x and normal["y"] <= max_y:
+        return normal, False
+    if rotated["x"] <= remaining_x and rotated["y"] <= max_y:
+        return rotated, True
+    if normal["x"] <= max_x and normal["y"] <= max_y:
+        return normal, False
+    if rotated["x"] <= max_x and rotated["y"] <= max_y:
+        return rotated, True
+    return normal, False
+
+
+def _candidate_measurement_score(candidates: list[dict[str, Any]]) -> float:
+    if not candidates:
+        return 0.0
+    values = []
+    for candidate in candidates:
+        confidence = candidate["dimension_confidence"]
+        if confidence == "exact":
+            values.append(10.0)
+        elif confidence == "approximate":
+            values.append(6.0)
+        else:
+            values.append(3.0)
+    return round(sum(values) / len(values), 4)
+
+
+def _rejected_asset_candidate_variant(
+    candidate: dict[str, Any],
+    message: str,
+    code: str,
+    constraint_ref: str,
+) -> dict[str, Any]:
+    return {
+        "variant_id": "asset-candidates:row_fill",
+        "source": "module_candidates",
+        "status": "rejected",
+        "recommended": False,
+        "total_score": 0.0,
+        "subscores": {},
+        "placements": [],
+        "candidate_ids": [candidate["candidate_id"]],
+        "reasons": [message],
+        "rejection_reasons": [
+            _variant_rejection_reason(
+                code=code,
+                category="fit",
+                message=message,
+                constraint_ref=constraint_ref,
+                actionable="Review asset dimensions, split the asset group, or keep using a manual module.",
+            )
+        ],
+    }
+
+
+def _variant_rejection_reason(
+    *,
+    code: str,
+    category: str,
+    message: str,
+    constraint_ref: str,
+    actionable: str,
+) -> dict[str, str]:
+    return {
+        "code": code,
+        "category": category,
+        "severity": "error",
+        "message": message,
+        "constraint_ref": constraint_ref,
+        "actionable": actionable,
+    }
+
 def _dimension_to_dict(dimension: Dimension3D) -> dict[str, float]:
     return {"x": round(dimension.x, 4), "y": round(dimension.y, 4), "z": round(dimension.z, 4)}

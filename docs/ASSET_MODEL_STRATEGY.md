@@ -109,3 +109,7 @@ Les dimensions proposees additionnent l'enveloppe asset, le clearance du profil
 actif et les defaults de paroi/plancher. Elles restent indicatives : elles ne
 creent pas de `ModuleRequest`, ne modifient pas le layout, ne creent pas de
 cavite et ne declenchent aucune generation Fusion.
+
+Depuis P10-M005, une variante `asset-candidates:row_fill` peut recommander un
+agencement simple de ces candidats. Cette recommandation reste report-only et ne
+remplace pas les modules manuels.

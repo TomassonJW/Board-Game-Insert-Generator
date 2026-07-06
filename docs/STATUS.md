@@ -215,6 +215,8 @@ La mission `P10-M003` enrichit les variantes `rejected` avec `rejection_reasons`
 
 La mission `P10-M004` produit `module_candidates` depuis les assets charges : candidats indicatifs, reservations seules ou blocages de dimensions. Ces candidats sont reportes et transportes en CAD IR metadata, sans modifier `modules`, sans layout automatique et sans Fusion.
 
+La mission `P10-M005` expose une variante recommandee `asset-candidates:row_fill` depuis les candidats imprimables quand ils tiennent dans la boite. Cette variante reste report-only, transportee en metadata CAD IR, sans mutation de `modules` et sans geometrie Fusion.
+
 ## Phase active
 
 Phase active : **P8 volumetric planner abstrait / gate avant generation Fusion volumetrique**.
@@ -229,7 +231,7 @@ volumetrique declarative, layers, reservations, supports abstraits et metadata C
 La North Star cible un
 generateur volumetrique asset-first, pilote par capabilities.
 
-Prochaine action recommandee : `P10-M005` pour generer une premiere variante simple depuis `module_candidates`, si cela reste deterministe, report-only et sans generation Fusion. Une nouvelle gate humaine est requise avant toute generation Fusion
+Prochaine action recommandee : `P10-M006` pour grouper deterministiquement des assets compatibles, si cela reste borne, explicable et sans generation Fusion. Une nouvelle gate humaine est requise avant toute generation Fusion
 reelle liee a la grille 3D, aux layers, aux vues eclatees ou aux features
 avancees.
 
@@ -294,6 +296,8 @@ avancees.
   sans generation de modules.
 - Candidats de modules P10-M004 derives des assets comme metadata report-only,
   sans mutation de `modules` ni placement automatique.
+- Variante recommandee P10-M005 depuis candidats assets, report-only et
+  transportee en metadata CAD IR.
 - Criteres de scoring P10-M001 documentes, sans solveur executable.
 - Comparaison P10-M002 report-only de variantes deterministes existantes dans les rapports.
 - Raisons de rejet P10-M003 structurees et actionnables pour les variantes non generables.
@@ -380,7 +384,7 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant `P10-M004 - Candidats de modules depuis assets` :
+Derniere verification pendant `P10-M005 - Variante recommandee depuis candidats assets` :
 
 - `python -m unittest discover -s tests` : OK, 130 tests passes.
 - `python -m py_compile src\board_game_insert_generator\asset_candidates.py src\board_game_insert_generator\report.py src\board_game_insert_generator\cad_ir.py tests\test_assets.py` : OK.

@@ -354,6 +354,17 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Criteres d'acceptation : variante recommandable ou rejetee avec raisons ; aucune generation Fusion et aucune mutation automatique de config.
 - Tests : unitaires + CLI Markdown/JSON/export CAD IR sur exemples assets.
 - Gate : stop si solveur complexe, backtracking, optimisation globale ou changement incompatible CAD IR devient necessaire.
+- Statut : `done`, `implemented-core`.
+
+### P10-M006 - Regrouper deterministiquement des assets compatibles
+
+- Capability : C-ASSET, C-SOLVER.
+- Milestone : M6 Asset-first project model / M10 Semi-automatic solver.
+- Objectif : grouper uniquement des assets compatibles par kind, intent et confiance de mesure, sans optimiser globalement.
+- Livrable : `module_candidates` enrichis avec groupes simples et raisons.
+- Criteres d'acceptation : regroupement borne, explicable et reversible ; aucun placement complexe ni Fusion.
+- Tests : unitaires + CLI Markdown/JSON/export CAD IR sur exemple assets dedie si necessaire.
+- Gate : stop si grouping heterogene complexe, solveur global ou changement incompatible du schema devient necessaire.
 - Statut : `ready`.
 
 ## Phase 11 - Modules composites et formes soudees

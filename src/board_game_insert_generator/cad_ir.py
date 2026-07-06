@@ -10,7 +10,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from board_game_insert_generator.asset_candidates import build_module_candidates_from_assets
+from board_game_insert_generator.asset_candidates import (
+    build_asset_candidate_variants,
+    build_module_candidates_from_assets,
+    recommended_asset_candidate_variant,
+)
 from board_game_insert_generator.feature_taxonomy import feature_taxonomy_to_dict
 from board_game_insert_generator.volumetric import build_volumetric_summary
 from board_game_insert_generator.models import (
@@ -255,6 +259,8 @@ class CadSceneMetadata:
     warnings: tuple[str, ...]
     assets: tuple[dict[str, Any], ...] = ()
     module_candidates: tuple[dict[str, Any], ...] = ()
+    asset_candidate_variants: tuple[dict[str, Any], ...] = ()
+    recommended_asset_candidate_variant: dict[str, Any] | None = None
     volumetric_grid: dict[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
@@ -266,6 +272,8 @@ class CadSceneMetadata:
             "warnings": list(self.warnings),
             "assets": list(self.assets),
             "module_candidates": list(self.module_candidates),
+            "asset_candidate_variants": list(self.asset_candidate_variants),
+            "recommended_asset_candidate_variant": self.recommended_asset_candidate_variant,
             "volumetric_grid": self.volumetric_grid,
         }
 
@@ -326,6 +334,8 @@ def build_blank_cad_scene(config: InsertConfig, layout: LayoutResult) -> CadScen
     )
     volumetric_summary = build_volumetric_summary(config)
     module_candidates = build_module_candidates_from_assets(config)
+    asset_candidate_variants = build_asset_candidate_variants(config)
+    recommended_asset_variant = recommended_asset_candidate_variant(asset_candidate_variants)
     return CadScene(
         schema_version=CAD_IR_SCHEMA_VERSION,
         units=CAD_IR_UNITS,
@@ -347,6 +357,8 @@ def build_blank_cad_scene(config: InsertConfig, layout: LayoutResult) -> CadScen
             warnings=layout.warnings,
             assets=tuple(_asset_metadata(asset) for asset in config.assets),
             module_candidates=tuple(module_candidates),
+            asset_candidate_variants=tuple(asset_candidate_variants),
+            recommended_asset_candidate_variant=recommended_asset_variant,
             volumetric_grid=volumetric_summary.to_dict() if volumetric_summary is not None else None,
         ),
     )

@@ -13,6 +13,7 @@ pas devenir une boite noire ni remplacer les gates physiques.
 - P10-M002 expose une comparaison `variant_comparison` report-only entre strategies deterministes deja implementees.
 - P10-M003 ajoute des raisons de rejet structurees et actionnables pour les variantes non generables.
 - P10-M004 ajoute des `module_candidates` deterministes depuis les assets, sans solveur global.
+- P10-M005 expose une variante `asset-candidates:row_fill` recommandee si elle rentre, toujours report-only.
 
 ## Strategie cible
 
@@ -129,3 +130,15 @@ aucune modification de `config.modules`.
 Leur role est de rendre visible la transition `assets -> besoins de contenance` :
 le rapport indique quels assets peuvent suggerer un module, lesquels restent de
 simples reservations et quelles dimensions sont seulement indicatives.
+
+
+## Variante recommandee P10-M005
+
+P10-M005 ajoute une variante determinee depuis les `module_candidates` :
+`asset-candidates:row_fill`. Elle utilise une heuristique row-fill bornee avec
+rotation XY simple si necessaire.
+
+La variante est `recommended` seulement si tous les candidats imprimables tiennent
+dans la boite. En cas d'echec, elle est `rejected` avec `rejection_reasons`. Elle
+ne cree aucun `ModuleRequest`, aucune cellule de layout reelle et aucune
+geometrie Fusion.

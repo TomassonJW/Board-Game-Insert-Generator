@@ -203,7 +203,10 @@ Depuis P8-M002, cette metadata inclut aussi `support_surfaces` et
 `removal_sequence`. Depuis P9-M002, `metadata.assets` transporte aussi les
 assets charges avec `status: loaded_only`. Depuis P10-M004,
 `metadata.module_candidates` transporte des propositions deterministes
-`candidate_only`, `reservation_only` ou `blocked`, sans creer de composants CAD. Ces donnees restent abstraites : elles indiquent les
+`candidate_only`, `reservation_only` ou `blocked`, sans creer de composants CAD.
+Depuis P10-M005, `metadata.asset_candidate_variants` et
+`metadata.recommended_asset_candidate_variant` exposent aussi la variante
+recommandee report-only. Ces donnees restent abstraites : elles indiquent les
 intentions de support, d'accessibilite et de retrait, mais ne creent aucune
 operation Fusion et ne valident aucune portance physique.
 
