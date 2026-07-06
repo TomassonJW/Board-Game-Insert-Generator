@@ -266,8 +266,9 @@ La validation automatisee ne couvre pas l'execution reelle dans Fusion 360, les
 exports STL/3MF ou l'impression reelle. Depuis P11-M001, elle couvre aussi le
 plan de modules asset-first positionnes par grille, y compris conversion X/Y/Z,
 collisions manifestes, sortie de boite et refus transportes. Depuis P7-M001,
-elle couvre aussi le plan d'occurrences compactes/eclatees liees, le mode `compact_only` et le
-rejet d'un mode de generation inconnu.
+elle couvre aussi le plan d'occurrences compactes/eclatees liees, le mode
+`compact_only`, le rejet d'un mode de generation inconnu et le message
+`assembly document required` pour les documents Part Design incompatibles.
 
 ## Gate suivante
 
@@ -282,8 +283,10 @@ d'erreur Fusion.
 `subtract_rectangular_cavity`, `P6-M002` execute les encoches simples de paroi
 depuis `describe_cavity_feature`, et `P11-M001` execute la vue compacte issue des
 placements grille asset-first. `P7-M001` code une vue eclatee basique corrigee comme
-occurrences liees d'un meme composant physique, encore `manual validation required`. Les
-chemins deja valides restent `print-validated: false`. Toute extension Fusion
+occurrences liees d'un meme composant physique. Le contexte Part Design
+incompatible echoue proprement avec `assembly document required`. La generation
+reste encore `manual validation required`. Les chemins deja valides restent
+`print-validated: false`. Toute extension Fusion
 au-dela de ces rectangles, notamment vue eclatee avancee, modules composites,
 fonds arrondis, fillets, booleans complexes, geometrie courbe reelle ou tout
 export imprimable, reste soumise a une nouvelle gate humaine.

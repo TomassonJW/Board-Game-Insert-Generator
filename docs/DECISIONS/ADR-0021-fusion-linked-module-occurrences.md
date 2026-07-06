@@ -69,8 +69,21 @@ Ajouter des positions exploded dans la CAD IR est reporte : la correction concer
 l'adaptateur Fusion et ne doit pas modifier le contrat CAD IR de maniere
 incompatible.
 
+
+## Amendement P7-M001V2 - Contexte document Fusion
+
+Le smoke test P7-M001V2 a confirme que les documents Fusion `Part Design`
+peuvent refuser la creation de composants enfants avec le message `Part Design
+documents can only contain one component`.
+
+Decision complementaire : ne pas revenir aux copies independantes et ne pas
+tenter de convertir automatiquement le document actif. L'add-in doit detecter
+ce cas et afficher `assembly document required`, en demandant d'ouvrir/creer un
+document Assembly-compatible ou d'ajouter le Part a une Assembly avant de
+relancer.
+
 ## Suivi
 
-- Smoke test humain P7-M001V2 requis.
+- Smoke test humain P7-M001V3 requis en document Assembly-compatible.
 - Nouvelle gate avant vue eclatee avancee, modules composites, exports ou
   geometrie Fusion plus ambitieuse.

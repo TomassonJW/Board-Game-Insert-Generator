@@ -250,14 +250,16 @@ Convention retenue :
 - aucun module composite, export, fillet, courbe ou solveur supplementaire n'est
   ajoute.
 
-Cette strategie peut necessiter un design Fusion compatible avec plusieurs
-composants/occurrences. Si Fusion affiche une erreur de document Part Design
-limite a un composant, creer ou ouvrir un design/assembly de test compatible et
-relancer l'add-in.
+Cette strategie exige un document Fusion compatible avec plusieurs
+composants/occurrences. Un document `Part Design` qui affiche `Part Design
+documents can only contain one component` est incompatible avec P7 linked
+occurrences. L'add-in intercepte ce cas et affiche `assembly document required`
+avec une action claire : ouvrir/creer un document Assembly-compatible ou ajouter
+le Part a une Assembly avant de relancer.
 
-Validation : le plan est teste hors Fusion. L'execution reelle reste
-`manual validation required` tant que Thomas n'a pas realise le smoke test
-P7-M001V2.
+Validation : le plan et le message d'erreur sont testes hors Fusion. L'execution
+reelle reste `manual validation required` tant que Thomas n'a pas realise le
+smoke test P7-M001V3 dans un document Assembly-compatible.
 
 ## Vue compacte et vue eclatee
 
@@ -270,7 +272,9 @@ La strategie long terme distingue deux sorties Fusion inspectables :
 
 La vue compacte existe pour les blanks rectangulaires simples et pour les
 modules asset-first places par grille. La vue eclatee basique existe maintenant
-comme occurrences liees d'inspection, mais reste a valider manuellement dans Fusion.
+comme occurrences liees d'inspection. Elle refuse proprement le contexte Part
+Design incompatible, mais reste a valider manuellement dans un document
+Assembly-compatible.
 
 Fusion ne doit pas inventer les positions compactes. Pour P7-M001 uniquement,
 l'add-in peut calculer une disposition eclatee de presentation a partir des

@@ -11,6 +11,7 @@ from board_game_insert_generator.cad_ir import build_blank_cad_scene
 from board_game_insert_generator.config_loader import load_config
 from board_game_insert_generator.layout import generate_basic_layout
 from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
+    ASSEMBLY_DOCUMENT_REQUIRED_STATUS,
     CAD_IR_PATH_OVERRIDE_FILENAME,
     DEFAULT_CAD_IR_INPUT_FILENAME,
     COMPACT_OCCURRENCE_ROLE,
@@ -35,9 +36,11 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     LINKED_OCCURRENCE_OPERATION_KIND,
     PLAN_STATUS_PLANNED_ONLY,
     FusionSkeletonError,
+    assembly_document_required_message,
     cad_ir_input_guidance,
     describe_document_state,
     generation_plan_from_cad_ir,
+    is_part_design_component_limit_error,
     load_cad_ir_json,
     mm_to_cm,
     planned_operations_from_cad_ir,
@@ -78,6 +81,27 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(state.status, DOCUMENT_STATUS_READY)
         self.assertEqual(state.document_name, "BGIG test design")
         self.assertIn("manual validation", state.message)
+
+    def test_detects_part_design_single_component_limit_error(self) -> None:
+        error = RuntimeError(
+            "3 : Failed to create component: Part Design documents can only contain "
+            "one component, please add this Part to an Assembly to add multiple components."
+        )
+
+        self.assertTrue(is_part_design_component_limit_error(error))
+        self.assertFalse(is_part_design_component_limit_error(RuntimeError("different Fusion error")))
+
+    def test_assembly_document_required_message_is_actionable(self) -> None:
+        message = assembly_document_required_message(
+            "Part Design documents can only contain one component"
+        )
+
+        self.assertIn(ASSEMBLY_DOCUMENT_REQUIRED_STATUS.replace("_", " "), message)
+        self.assertIn("one Fusion Component per physical BGIG module", message)
+        self.assertIn("Part Design", message)
+        self.assertIn("Assembly-compatible", message)
+        self.assertIn("add this Part to an Assembly", message)
+        self.assertIn("did not fall back to independent exploded body copies", message)
 
     def test_validates_minimal_cad_ir_contract(self) -> None:
         payload = _cad_ir_payload()
@@ -368,6 +392,8 @@ class FusionSkeletonTests(unittest.TestCase):
         plan = generation_plan_from_cad_ir(payload)
 
         self.assertEqual(plan.generation_mode, FUSION_GENERATION_MODE_COMPACT_AND_EXPLODED)
+        self.assertTrue(plan.requires_assembly_document)
+        self.assertTrue(plan.to_dict()["requires_assembly_document"])
         self.assertEqual(plan.module_component_count, 2)
         self.assertEqual(len(plan.compact_occurrences), 2)
         self.assertEqual(len(plan.exploded_occurrences), 2)
@@ -595,6 +621,9 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("Compact occurrences created", source)
         self.assertIn("Exploded occurrences created", source)
         self.assertIn("Linked exploded occurrences", source)
+        self.assertIn("FusionAssemblyDocumentRequiredError", source)
+        self.assertIn("Assembly-compatible Fusion document", source)
+        self.assertIn("assembly document required", source)
         self.assertIn("FeatureOperations.CutFeatureOperation", source)
         self.assertIn("participantBodies", source)
         self.assertIn("setOneSideExtent", source)

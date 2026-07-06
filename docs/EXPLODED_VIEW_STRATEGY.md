@@ -15,7 +15,8 @@ exports.
   de bodies.
 - La correction P7 remplace ces copies par deux occurrences liees d'un meme
   composant physique : une occurrence compacte et une occurrence eclatee.
-- La validation Fusion manuelle P7-M001V2 reste requise.
+- P7-M001V2 a bloque en document Part Design ; P7 affiche maintenant `assembly document required` dans ce contexte.
+- La validation Fusion manuelle P7-M001V3 en document Assembly-compatible reste requise.
 - Aucun export STL/3MF et aucune validation d'impression ne sont revendiques.
 
 ## Strategie P7 corrigee
@@ -26,6 +27,7 @@ metier.
 Invariants :
 
 - un module physique BGIG correspond a un unique `Component` Fusion ;
+- un document Part Design incompatible doit echouer proprement avec `assembly document required` ;
 - la geometrie rectangulaire, les cavites et les encoches supportees sont creees
   dans la definition de ce composant ;
 - la vue compacte est une occurrence de ce composant ;
@@ -73,6 +75,6 @@ Toute autre valeur est refusee avant generation.
 
 ## Gates
 
-- Smoke test humain P7-M001V2 avant statut `fusion-validated`.
+- Smoke test humain P7-M001V3 en document Assembly-compatible avant statut `fusion-validated`.
 - Nouvelle gate avant vue eclatee avancee, modules composites, export STL/3MF ou
   preparation d'impression.

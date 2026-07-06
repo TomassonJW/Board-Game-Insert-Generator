@@ -241,11 +241,14 @@ Procedure :
       `Y 0.0 mm`, `Z 0.0 mm` ;
     - dimensions attendues du module asset-first : `30.0 x 30.0 x 10.0 mm` ;
     - verifier que les occurrences compactes restent presentes et aux dimensions attendues.
-14. Pour le smoke test P7-M001V2, garder la meme CAD IR
+14. Pour le smoke test P7-M001V3, garder la meme CAD IR
     `examples/simple_asset_executable_plan.json`, laisser le mode par defaut
     `compact_and_exploded`, relancer l'add-in et verifier :
     - utiliser un design Fusion compatible avec plusieurs composants/occurrences ;
-    - message final : `Generation mode: compact_and_exploded`,
+    - si Fusion affiche `assembly document required`, le document actif est un
+      Part Design incompatible : creer/ouvrir un document Assembly-compatible ou
+      utiliser le workflow Fusion `add this Part to an Assembly`, puis relancer ;
+    - message final attendu dans le bon contexte : `Generation mode: compact_and_exploded`,
       `Module components planned: 2`, `Compact occurrences planned: 2`,
       `Exploded occurrences planned: 2`, `Module components created: 2`,
       `Compact occurrences created: 2`, `Exploded occurrences created: 2` et
@@ -276,10 +279,12 @@ Procedure :
     de validation.
 
 Ce smoke test valide uniquement la creation CAD minimale dans Fusion. Depuis la
-correction P7, la vue eclatee exige des composants/occurrences Fusion lies. Si un
-document Part Design refuse plusieurs composants, creer ou ouvrir un design de
-test compatible avec des composants/occurrences, puis relancer l'add-in. Il ne
-valide pas l'impression, les jeux physiques ou les exports.
+correction P7, la vue eclatee exige des composants/occurrences Fusion lies. Un
+document Part Design est non compatible avec cette vue liee : l'add-in doit
+afficher `assembly document required` et ne doit pas revenir aux copies
+independantes de bodies. Creer ou ouvrir un document Assembly-compatible, ou
+ajouter le Part a une Assembly avec le workflow Fusion, puis relancer l'add-in.
+Il ne valide pas l'impression, les jeux physiques ou les exports.
 
 ## Debug local hors Fusion
 

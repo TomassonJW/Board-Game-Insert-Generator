@@ -17,15 +17,18 @@ try:
         FUSION_EXTENT_POSITIVE,
         FUSION_SKETCH_PLANE_XZ,
         FUSION_SKETCH_PLANE_YZ,
+        FusionAssemblyDocumentRequiredError,
         FusionCavityCutPlan,
         FusionFingerNotchCutPlan,
         FusionGenerationPlan,
         FusionSkeletonError,
         FusionSolidPlan,
         FusionVectorMm,
+        assembly_document_required_message,
         cad_ir_input_guidance,
         describe_document_state,
         generation_plan_from_cad_ir,
+        is_part_design_component_limit_error,
         load_cad_ir_json,
         mm_to_cm,
         resolve_cad_ir_input_path,
@@ -38,15 +41,18 @@ except ImportError:  # pragma: no cover - Fusion may load the file as a script.
         FUSION_EXTENT_POSITIVE,
         FUSION_SKETCH_PLANE_XZ,
         FUSION_SKETCH_PLANE_YZ,
+        FusionAssemblyDocumentRequiredError,
         FusionCavityCutPlan,
         FusionFingerNotchCutPlan,
         FusionGenerationPlan,
         FusionSkeletonError,
         FusionSolidPlan,
         FusionVectorMm,
+        assembly_document_required_message,
         cad_ir_input_guidance,
         describe_document_state,
         generation_plan_from_cad_ir,
+        is_part_design_component_limit_error,
         load_cad_ir_json,
         mm_to_cm,
         resolve_cad_ir_input_path,
@@ -93,6 +99,13 @@ def run(context) -> None:  # noqa: ANN001 - Fusion controls the signature.
         generation_plan = generation_plan_from_cad_ir(payload, generation_mode=generation_mode)
         design = _active_design(_app)
         result = _generate_from_plan(design, generation_plan)
+    except FusionAssemblyDocumentRequiredError as exc:
+        _show_message(
+            "Board Game Insert Generator requires an Assembly-compatible Fusion document.\n"
+            f"{exc}\n\n"
+            "Status: assembly document required."
+        )
+        return
     except FusionSkeletonError as exc:
         _show_message(
             "Board Game Insert Generator CAD IR error:\n"
@@ -101,6 +114,13 @@ def run(context) -> None:  # noqa: ANN001 - Fusion controls the signature.
         )
         return
     except Exception as exc:  # pragma: no cover - Fusion runtime boundary.
+        if is_part_design_component_limit_error(exc):
+            _show_message(
+                "Board Game Insert Generator requires an Assembly-compatible Fusion document.\n"
+                f"{assembly_document_required_message(exc)}\n\n"
+                "Status: assembly document required."
+            )
+            return
         _show_message(f"Board Game Insert Generator Fusion error:\n{exc}")
         return
 
@@ -252,7 +272,14 @@ def _create_module_component_occurrence(
     occurrence_plan,  # noqa: ANN001
 ):
     transform = _matrix_for_origin(occurrence_plan.origin_mm)
-    occurrence = root_component.occurrences.addNewComponent(transform)
+    try:
+        occurrence = root_component.occurrences.addNewComponent(transform)
+    except Exception as exc:
+        if is_part_design_component_limit_error(exc):
+            raise FusionAssemblyDocumentRequiredError(
+                assembly_document_required_message(exc)
+            ) from exc
+        raise
     if occurrence is None:
         raise RuntimeError(
             "Fusion component creation failed. Use an assembly-capable Fusion design "
@@ -271,7 +298,14 @@ def _create_module_component_occurrence(
 
 def _create_linked_module_occurrence(root_component, module_component, occurrence_plan) -> None:  # noqa: ANN001
     transform = _matrix_for_origin(occurrence_plan.origin_mm)
-    occurrence = root_component.occurrences.addExistingComponent(module_component, transform)
+    try:
+        occurrence = root_component.occurrences.addExistingComponent(module_component, transform)
+    except Exception as exc:
+        if is_part_design_component_limit_error(exc):
+            raise FusionAssemblyDocumentRequiredError(
+                assembly_document_required_message(exc)
+            ) from exc
+        raise
     if occurrence is None:
         raise RuntimeError(
             f"Fusion linked exploded occurrence failed for {occurrence_plan.occurrence_name}."

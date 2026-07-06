@@ -29,6 +29,8 @@ DEFAULT_FUSION_GENERATION_MODE = FUSION_GENERATION_MODE_COMPACT_AND_EXPLODED
 
 DOCUMENT_STATUS_READY = "ready"
 DOCUMENT_STATUS_ZERO_DOC = "zero_doc"
+ASSEMBLY_DOCUMENT_REQUIRED_STATUS = "assembly_document_required"
+PART_DESIGN_SINGLE_COMPONENT_ERROR_TEXT = "Part Design documents can only contain one component"
 
 PLAN_STATUS_PLANNED_ONLY = "planned_only"
 CAVITY_CUT_OPERATION_KIND = "subtract_rectangular_cavity"
@@ -73,6 +75,10 @@ FUSION_MANUAL_VALIDATION_REQUIRED = "manual_validation_required"
 
 class FusionSkeletonError(ValueError):
     """Raised when a CAD IR payload cannot be consumed by the skeleton."""
+
+
+class FusionAssemblyDocumentRequiredError(FusionSkeletonError):
+    """Raised when linked occurrences require an Assembly-compatible document."""
 
 
 @dataclass(frozen=True)
@@ -328,6 +334,10 @@ class FusionGenerationPlan:
         )
 
     @property
+    def requires_assembly_document(self) -> bool:
+        return self.module_component_count > 0
+
+    @property
     def created_object_count(self) -> int:
         return (
             1
@@ -346,12 +356,43 @@ class FusionGenerationPlan:
             "compact_occurrences": [occurrence.to_dict() for occurrence in self.compact_occurrences],
             "exploded_occurrences": [occurrence.to_dict() for occurrence in self.exploded_occurrences],
             "linked_exploded_occurrences": self.linked_exploded_occurrences,
+            "requires_assembly_document": self.requires_assembly_document,
             "rejected_grid_modules": [module.to_dict() for module in self.rejected_grid_modules],
             "cavity_cuts": [cut.to_dict() for cut in self.cavity_cuts],
             "finger_notch_cuts": [cut.to_dict() for cut in self.finger_notch_cuts],
             "generation_mode": self.generation_mode,
             "validation_status": self.validation_status,
         }
+
+
+def is_part_design_component_limit_error(error: Any) -> bool:
+    """Return True when Fusion reports a Part Design single-component limit."""
+
+    return PART_DESIGN_SINGLE_COMPONENT_ERROR_TEXT in str(error)
+
+
+def assembly_document_required_message(original_error: Any | None = None) -> str:
+    """Build the actionable message shown when linked occurrences need Assembly."""
+
+    lines = [
+        "assembly document required",
+        (
+            "P7 linked occurrences use one Fusion Component per physical BGIG module, "
+            "with compact and exploded Occurrence instances of that same Component."
+        ),
+        (
+            "The active Fusion document rejected component creation. A Part Design "
+            "document is not compatible with this linked compact/exploded view."
+        ),
+        (
+            "Open or create an Assembly-compatible Fusion design, or use Fusion's "
+            "'add this Part to an Assembly' workflow, then run the add-in again."
+        ),
+        "BGIG did not fall back to independent exploded body copies.",
+    ]
+    if original_error is not None:
+        lines.append(f"Original Fusion error: {original_error}")
+    return "\n".join(lines)
 
 
 def describe_document_state(application: Any) -> FusionDocumentState:
