@@ -820,7 +820,8 @@ def _format_executable_asset_plan_section(plan: dict[str, Any]) -> list[str]:
             f"- Multi-layer generated modules: {summary.get('multi_layer_module_count', 0)}",
             f"- Generated modules with Z placement: {summary.get('z_placed_module_count', 0)}",
             f"- Generated module height variants: {summary.get('height_variant_count', 0)}",
-            "- Scope: pure Python abstract plan; no Fusion generation is changed.",
+            "- Scope: pure Python abstract plan; Fusion consumes printable body sizes from the CAD IR and does not recalculate sizing.",
+            "- Sizing: theoretical grid extent is placement occupancy; asset-fit size is inner content envelope; printable body size is the generated module body.",
             "",
             "### Generated modules",
             "",
@@ -830,8 +831,8 @@ def _format_executable_asset_plan_section(plan: dict[str, Any]) -> list[str]:
     if generated_modules:
         lines.extend(
             [
-                "| Module | Candidate | Assets | Dimensions | Status |",
-                "| --- | --- | --- | ---: | --- |",
+                "| Module | Candidate | Assets | Asset-fit size | Printable body size | Clearance | Status |",
+                "| --- | --- | --- | ---: | ---: | --- | --- |",
             ]
         )
         for module in generated_modules:
@@ -840,7 +841,9 @@ def _format_executable_asset_plan_section(plan: dict[str, Any]) -> list[str]:
                 f"{module['module_id']} | "
                 f"{module['candidate_id']} | "
                 f"{', '.join(module['source_asset_ids'])} | "
-                f"{_format_dict_dim(module['dimensions_mm'])} | "
+                f"{_format_dict_dim(module.get('asset_fit_size_mm') or module['inner_asset_envelope_mm'])} | "
+                f"{_format_dict_dim(module.get('printable_body_size_mm') or module['dimensions_mm'])} | "
+                f"{_format_clearance_applied(module.get('clearance_applied'))} | "
                 f"{module['status']} |"
             )
     else:
@@ -851,8 +854,8 @@ def _format_executable_asset_plan_section(plan: dict[str, Any]) -> list[str]:
     if placements:
         lines.extend(
             [
-                "| Module | Origin units | Size units | Origin mm | Size mm | Heuristic |",
-                "| --- | ---: | ---: | ---: | ---: | --- |",
+                "| Module | Origin units | Size units | Theoretical grid origin | Theoretical grid extent | Printable body origin | Printable body size | Heuristic |",
+                "| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |",
             ]
         )
         for placement in placements:
@@ -861,8 +864,10 @@ def _format_executable_asset_plan_section(plan: dict[str, Any]) -> list[str]:
                 f"{placement['module_id']} | "
                 f"{_format_dict_grid_point(placement['origin_units'])} | "
                 f"{_format_dict_grid_size(placement['size_units'])} | "
-                f"{_format_dict_dim(placement['origin_mm'])} | "
-                f"{_format_dict_dim(placement['size_mm'])} | "
+                f"{_format_dict_dim(placement.get('theoretical_grid_origin_mm') or placement['origin_mm'])} | "
+                f"{_format_dict_dim(placement.get('theoretical_grid_extent_mm') or placement['size_mm'])} | "
+                f"{_format_dict_dim(placement.get('printable_body_origin_mm') or placement['origin_mm'])} | "
+                f"{_format_dict_dim(placement.get('printable_body_size_mm') or placement['size_mm'])} | "
                 f"{placement['heuristic']} |"
             )
     else:
@@ -932,6 +937,20 @@ def _format_module_candidates_section(candidates: list[dict[str, Any]]) -> list[
 
 def _format_dict_dim(dimensions: dict[str, float]) -> str:
     return f"{dimensions['x']:.2f} x {dimensions['y']:.2f} x {dimensions['z']:.2f} mm"
+
+
+def _format_clearance_applied(clearance: Any) -> str:
+    if not isinstance(clearance, dict):
+        return "n/a"
+    internal = clearance.get("internal_asset_clearance_mm", "n/a")
+    source = clearance.get("internal_asset_clearance_source", "unknown")
+    peripheral = clearance.get("peripheral_clearance_mm", 0.0)
+    inter_module = clearance.get("inter_module_gap_mm", 0.0)
+    return (
+        f"asset {internal} mm ({source}); "
+        f"peripheral {peripheral} mm; inter-module {inter_module} mm"
+    )
+
 
 def _dim(dimensions: Dimension3D) -> dict[str, float]:
     return {"x": _clean_float(dimensions.x), "y": _clean_float(dimensions.y), "z": _clean_float(dimensions.z)}

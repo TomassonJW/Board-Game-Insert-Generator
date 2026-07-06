@@ -215,14 +215,28 @@ metadata avec `rejection_reasons` et `recommended_asset_candidate_variant: null`
 Depuis P10-M008, `metadata.executable_asset_plan` transporte aussi les modules
 generes abstraits, leurs placements grille X/Y/Z et leurs refus eventuels. Depuis
 P11-M001, l'adaptateur Fusion peut consommer cette metadata pour creer une vue
-compacte de bodies rectangulaires positionnes par `origin_mm` et `size_mm`. Le
-smoke test humain `P11-M001V` du 2026-07-06 valide ce chemin pour
-`simple_asset_executable_plan`. Depuis P11-M002, la meme metadata transporte la
-scene multi-layer `simple_multilayer_grid_scene` : `summary` inclut
-`multi_layer_module_count`, `z_placed_module_count` et `height_variant_count`, et
-chaque placement conserve `origin_units`, `size_units`, `origin_mm` et `size_mm`.
-Ces donnees ne valident aucune portance physique et ne doivent pas etre utilisees
-par Fusion pour recalculer le solveur.
+compacte de bodies rectangulaires positionnes par le moteur. Le smoke test humain
+`P11-M001V` du 2026-07-06 valide ce chemin pour `simple_asset_executable_plan`.
+Depuis P11-M002, la meme metadata transporte la scene multi-layer
+`simple_multilayer_grid_scene` : `summary` inclut `multi_layer_module_count`,
+`z_placed_module_count` et `height_variant_count`.
+
+Depuis P11-M003, les placements asset-first distinguent explicitement :
+
+- `origin_units` / `size_units` : occupation discrete dans la grille ;
+- `theoretical_grid_origin_mm` / `theoretical_grid_extent_mm` : reservation
+  theorique en millimetres correspondant aux unites de grille ;
+- `asset_fit_size_mm` : enveloppe asset avec clearance interne ;
+- `printable_body_origin_mm` / `printable_body_size_mm` : corps rectangulaire
+  imprimable que Fusion doit creer ;
+- `size_mm` : alias de `printable_body_size_mm` pour les placements generes ;
+- `grid_slack_mm` : marge visible entre span grille et body imprimable.
+
+Les adaptateurs CAD doivent utiliser `printable_body_size_mm` pour la geometrie
+reelle des modules asset-first generes. Ils peuvent afficher ou valider
+`theoretical_grid_extent_mm`, mais ne doivent pas l'extruder comme body si une
+taille imprimable est presente. Ces donnees ne valident aucune portance physique
+et ne doivent pas etre utilisees par Fusion pour recalculer le solveur.
 Cette metadata ne change pas `schema_version`, ne cree aucune operation Fusion et
 ne remplace pas les dimensions `theoretical_*` / `printable_*` des bodies. Un
 adaptateur CAD peut l'ignorer sans invalider la CAD IR V0.
@@ -270,7 +284,9 @@ exports STL/3MF ou l'impression reelle. Depuis P11-M001, elle couvre aussi le
 plan de modules asset-first positionnes par grille, y compris conversion X/Y/Z,
 collisions manifestes, sortie de boite et refus transportes. Depuis P11-M002,
 elle couvre les compteurs multi-layer, les placements Z et le plan d'occurrences
-liees sur `simple_multilayer_grid_scene`. Depuis P7-M001, elle couvre aussi le
+liees sur `simple_multilayer_grid_scene`. Depuis P11-M003, elle verrouille aussi
+la distinction entre span grille theorique, enveloppe asset-fit et taille de body
+imprimable consommee par Fusion. Depuis P7-M001, elle couvre aussi le
 plan d'occurrences compactes/eclatees liees, le mode `compact_only`, le rejet
 d'un mode de generation inconnu, le message `assembly document required` pour les
 documents Part Design incompatibles et la politique de non-renommage direct des
@@ -291,8 +307,10 @@ depuis `describe_cavity_feature`, et `P11-M001` execute la vue compacte issue de
 placements grille asset-first. `P7-M001` est validee comme vue eclatee basique
 par occurrences liees d'un meme composant physique. Le contexte Part Design
 incompatible echoue proprement avec `assembly document required`. `P11-M002` code
-la scene multi-layer compacte/eclatee et reste `manual validation required`. Les
-chemins deja valides restent `print-validated: false`. Toute extension Fusion
+la scene multi-layer compacte/eclatee. `P11-M003` corrige le sizing des modules
+asset-first generes et ajoute la commande UI Fusion minimale ; cette correction
+reste `manual validation required` dans Fusion. Les chemins deja valides restent
+`print-validated: false`. Toute extension Fusion
 au-dela de ces rectangles, notamment vue eclatee avancee, modules composites,
 fonds arrondis, fillets, booleans complexes, geometrie courbe reelle ou tout
 export imprimable, reste soumise a une nouvelle gate humaine.

@@ -168,11 +168,19 @@ class AssetModelTests(unittest.TestCase):
         generated = plan["generated_modules"][0]
         self.assertEqual(generated["source_asset_ids"], ["coin-tokens", "status-tokens"])
         self.assertEqual(generated["dimensions_mm"], {"x": 25.6, "y": 25.6, "z": 9.8})
+        self.assertEqual(generated["asset_fit_size_mm"], {"x": 23.2, "y": 23.2, "z": 8.6})
+        self.assertEqual(generated["printable_body_size_mm"], {"x": 25.6, "y": 25.6, "z": 9.8})
+        self.assertEqual(generated["clearance_applied"]["internal_asset_clearance_mm"], 0.6)
         placement = plan["placements"][0]
         self.assertEqual(placement["origin_units"], {"x": 1, "y": 0, "z": 0})
         self.assertEqual(placement["size_units"], {"x": 1, "y": 1, "z": 1})
         self.assertEqual(placement["origin_mm"], {"x": 30, "y": 0, "z": 0})
+        self.assertEqual(placement["size_mm"], {"x": 25.6, "y": 25.6, "z": 9.8})
+        self.assertEqual(placement["theoretical_grid_extent_mm"], {"x": 30, "y": 30, "z": 10})
+        self.assertEqual(placement["asset_fit_size_mm"], {"x": 23.2, "y": 23.2, "z": 8.6})
+        self.assertEqual(placement["printable_body_size_mm"], {"x": 25.6, "y": 25.6, "z": 9.8})
         self.assertIn("## Executable asset module plan", markdown)
+        self.assertIn("theoretical grid extent", markdown)
         self.assertIn("greedy_z_y_x_first_free_span", markdown)
         self.assertEqual(scene["metadata"]["executable_asset_plan"]["status"], "placed")
         self.assertEqual(scene["metadata"]["executable_asset_plan"]["placements"][0]["origin_units"], {"x": 1, "y": 0, "z": 0})
@@ -198,14 +206,18 @@ class AssetModelTests(unittest.TestCase):
             {"x": 1, "y": 0, "z": 0},
         )
         self.assertEqual(plan["placements"][0]["size_units"], {"x": 3, "y": 3, "z": 1})
-        self.assertEqual(plan["placements"][0]["size_mm"], {"x": 90, "y": 90, "z": 10})
+        self.assertEqual(plan["placements"][0]["size_mm"], {"x": 61.6, "y": 61.6, "z": 7.8})
+        self.assertEqual(plan["placements"][0]["theoretical_grid_extent_mm"], {"x": 90, "y": 90, "z": 10})
+        self.assertEqual(plan["placements"][0]["asset_fit_size_mm"], {"x": 59.2, "y": 59.2, "z": 6.6})
         self.assertEqual(
             plan["placements"][1]["origin_units"],
             {"x": 0, "y": 0, "z": 1},
         )
         self.assertEqual(plan["placements"][1]["size_units"], {"x": 2, "y": 2, "z": 2})
         self.assertEqual(plan["placements"][1]["origin_mm"], {"x": 0, "y": 0, "z": 10})
-        self.assertEqual(plan["placements"][1]["size_mm"], {"x": 60, "y": 60, "z": 20})
+        self.assertEqual(plan["placements"][1]["size_mm"], {"x": 37.6, "y": 37.6, "z": 17.8})
+        self.assertEqual(plan["placements"][1]["theoretical_grid_extent_mm"], {"x": 60, "y": 60, "z": 20})
+        self.assertEqual(plan["placements"][1]["printable_body_size_mm"], {"x": 37.6, "y": 37.6, "z": 17.8})
         self.assertIn("Multi-layer generated modules: 1", markdown)
         self.assertIn("Generated modules with Z placement: 1", markdown)
         self.assertEqual(

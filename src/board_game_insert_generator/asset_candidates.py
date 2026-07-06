@@ -404,8 +404,22 @@ def build_executable_asset_module_plan(config: InsertConfig) -> dict[str, Any]:
                 "origin_units": _grid_point_to_dict(origin),
                 "size_units": _grid_size_to_dict(size_units),
                 "origin_mm": _grid_origin_to_mm(origin, grid.unit_size_mm),
-                "size_mm": _grid_size_to_mm(size_units, grid.unit_size_mm),
-                "source_size_mm": module["dimensions_mm"],
+                "size_mm": dict(module["printable_body_size_mm"]),
+                "theoretical_grid_origin_mm": _grid_origin_to_mm(origin, grid.unit_size_mm),
+                "theoretical_grid_extent_mm": _grid_size_to_mm(size_units, grid.unit_size_mm),
+                "asset_fit_size_mm": dict(module["asset_fit_size_mm"]),
+                "printable_body_origin_mm": _grid_origin_to_mm(origin, grid.unit_size_mm),
+                "printable_body_size_mm": dict(module["printable_body_size_mm"]),
+                "source_size_mm": dict(module["printable_body_size_mm"]),
+                "grid_slack_mm": _dimension_delta(
+                    _grid_size_to_mm(size_units, grid.unit_size_mm),
+                    module["printable_body_size_mm"],
+                ),
+                "clearance_applied": dict(module["clearance_applied"]),
+                "sizing_policy": (
+                    "size_mm is the generated printable body envelope; "
+                    "theoretical_grid_extent_mm is the occupied grid span."
+                ),
                 "occupied_cells": len(cells),
                 "status": "placed",
                 "heuristic": "greedy_z_y_x_first_free_span",
@@ -595,6 +609,9 @@ def _variant_rejection_reason(
 
 def _generated_module_from_candidate(candidate: dict[str, Any]) -> dict[str, Any]:
     suggested = candidate["suggested_module"]
+    constraints = candidate.get("constraints", {})
+    dimensions_mm = dict(suggested["min_dimensions_mm"])
+    inner_asset_envelope_mm = dict(suggested["inner_asset_envelope_mm"])
     return {
         "module_id": f"generated:{suggested['id']}",
         "candidate_id": candidate["candidate_id"],
@@ -602,10 +619,25 @@ def _generated_module_from_candidate(candidate: dict[str, Any]) -> dict[str, Any
         "functional_type": suggested["functional_type"],
         "source_asset_ids": list(candidate["source_asset_ids"]),
         "contained_asset_count": candidate["quantity"]["count"],
-        "dimensions_mm": dict(suggested["min_dimensions_mm"]),
-        "inner_asset_envelope_mm": dict(suggested["inner_asset_envelope_mm"]),
+        "dimensions_mm": dimensions_mm,
+        "inner_asset_envelope_mm": inner_asset_envelope_mm,
+        "asset_fit_size_mm": inner_asset_envelope_mm,
+        "printable_body_size_mm": dimensions_mm,
+        "clearance_applied": {
+            "internal_asset_clearance_mm": constraints.get("clearance_mm", 0.0),
+            "internal_asset_clearance_source": constraints.get("clearance_source", "unknown"),
+            "wall_thickness_mm": constraints.get("wall_thickness_mm", 0.0),
+            "floor_thickness_mm": constraints.get("floor_thickness_mm", 0.0),
+            "peripheral_clearance_mm": 0.0,
+            "inter_module_gap_mm": 0.0,
+            "note": (
+                "Generated asset modules use asset-fit clearance plus wall/floor defaults. "
+                "Face-role peripheral and inter-module tolerance shrinking is not applied "
+                "to this asset-first grid plan yet."
+            ),
+        },
         "status": "generated_from_recommended_asset_variant",
-        "fusion_generation": "not_modified_by_this_plan",
+        "fusion_generation": "use_printable_body_size_mm",
     }
 
 
@@ -764,6 +796,13 @@ def _grid_size_to_mm(size: GridSize3D, unit_size_mm: Dimension3D) -> dict[str, f
         "x": round(size.x * unit_size_mm.x, 4),
         "y": round(size.y * unit_size_mm.y, 4),
         "z": round(size.z * unit_size_mm.z, 4),
+    }
+
+def _dimension_delta(outer: dict[str, float], inner: dict[str, float]) -> dict[str, float]:
+    return {
+        "x": round(outer["x"] - inner["x"], 4),
+        "y": round(outer["y"] - inner["y"], 4),
+        "z": round(outer["z"] - inner["z"], 4),
     }
 
 def _dimension_to_dict(dimension: Dimension3D) -> dict[str, float]:

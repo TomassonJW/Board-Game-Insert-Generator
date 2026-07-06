@@ -12,12 +12,15 @@ from pathlib import Path
 
 try:
     from .fusion_skeleton import (
+        DEFAULT_CAD_IR_INPUT_FILENAME,
+        DEFAULT_FUSION_GENERATION_MODE,
         DOCUMENT_STATUS_ZERO_DOC,
         FUSION_EXTENT_NEGATIVE,
         FUSION_EXTENT_POSITIVE,
         FUSION_SKETCH_PLANE_XZ,
         FUSION_SKETCH_PLANE_YZ,
         OCCURRENCE_NAME_POLICY_COMPONENT_SOURCE,
+        SUPPORTED_FUSION_GENERATION_MODES,
         FusionAssemblyDocumentRequiredError,
         FusionCavityCutPlan,
         FusionFingerNotchCutPlan,
@@ -26,8 +29,11 @@ try:
         FusionSolidPlan,
         FusionVectorMm,
         assembly_document_required_message,
+        build_fusion_command_request,
         cad_ir_input_guidance,
+        default_fusion_command_values,
         describe_document_state,
+        fusion_command_summary,
         generation_plan_from_cad_ir,
         is_part_design_component_limit_error,
         load_cad_ir_json,
@@ -37,12 +43,15 @@ try:
     )
 except ImportError:  # pragma: no cover - Fusion may load the file as a script.
     from fusion_skeleton import (  # type: ignore[no-redef]
+        DEFAULT_CAD_IR_INPUT_FILENAME,
+        DEFAULT_FUSION_GENERATION_MODE,
         DOCUMENT_STATUS_ZERO_DOC,
         FUSION_EXTENT_NEGATIVE,
         FUSION_EXTENT_POSITIVE,
         FUSION_SKETCH_PLANE_XZ,
         FUSION_SKETCH_PLANE_YZ,
         OCCURRENCE_NAME_POLICY_COMPONENT_SOURCE,
+        SUPPORTED_FUSION_GENERATION_MODES,
         FusionAssemblyDocumentRequiredError,
         FusionCavityCutPlan,
         FusionFingerNotchCutPlan,
@@ -51,8 +60,11 @@ except ImportError:  # pragma: no cover - Fusion may load the file as a script.
         FusionSolidPlan,
         FusionVectorMm,
         assembly_document_required_message,
+        build_fusion_command_request,
         cad_ir_input_guidance,
+        default_fusion_command_values,
         describe_document_state,
+        fusion_command_summary,
         generation_plan_from_cad_ir,
         is_part_design_component_limit_error,
         load_cad_ir_json,
@@ -69,8 +81,15 @@ except ImportError:  # pragma: no cover - exercised only outside Fusion.
 
 
 
+BGIG_COMMAND_ID = "board_game_insert_generator.generate_scene"
+BGIG_COMMAND_NAME = "Generate Board Game Insert"
+CAD_IR_PATH_INPUT_ID = "bgig_cad_ir_path"
+GENERATION_MODE_INPUT_ID = "bgig_generation_mode"
+SUMMARY_INPUT_ID = "bgig_command_summary"
+
 _app = None
 _ui = None
+_handlers = []
 
 
 def run(context) -> None:  # noqa: ANN001 - Fusion controls the signature.
@@ -94,40 +113,162 @@ def run(context) -> None:  # noqa: ANN001 - Fusion controls the signature.
         return
 
     try:
-        addin_dir = Path(__file__).resolve().parent
-        cad_ir_path = resolve_cad_ir_input_path(addin_dir)
-        generation_mode = resolve_generation_mode(addin_dir)
-        payload = load_cad_ir_json(cad_ir_path)
-        generation_plan = generation_plan_from_cad_ir(payload, generation_mode=generation_mode)
-        design = _active_design(_app)
-        result = _generate_from_plan(design, generation_plan)
-    except FusionAssemblyDocumentRequiredError as exc:
-        _show_message(
-            "Board Game Insert Generator requires an Assembly-compatible Fusion document.\n"
-            f"{exc}\n\n"
-            "Status: assembly document required."
-        )
-        return
+        _register_and_execute_command(Path(__file__).resolve().parent)
     except FusionSkeletonError as exc:
         _show_message(
-            "Board Game Insert Generator CAD IR error:\n"
+            "Board Game Insert Generator command setup error:\n"
             f"{exc}\n\n"
             f"{cad_ir_input_guidance(Path(__file__).resolve().parent)}"
         )
-        return
     except Exception as exc:  # pragma: no cover - Fusion runtime boundary.
-        if is_part_design_component_limit_error(exc):
-            _show_message(
-                "Board Game Insert Generator requires an Assembly-compatible Fusion document.\n"
-                f"{assembly_document_required_message(exc)}\n\n"
-                "Status: assembly document required."
-            )
-            return
-        _show_message(f"Board Game Insert Generator Fusion error:\n{exc}")
-        return
+        _show_message(f"Board Game Insert Generator Fusion command error:\n{exc}")
 
-    _show_message(
-        "Board Game Insert Generator generated compact and exploded CAD IR scene.\n"
+
+def stop(context) -> None:  # noqa: ANN001 - Fusion controls the signature.
+    """Fusion 360 add-in shutdown hook."""
+
+    global _handlers
+    if adsk is not None and _ui is not None:
+        command_definition = _ui.commandDefinitions.itemById(BGIG_COMMAND_ID)
+        if command_definition is not None:
+            command_definition.deleteMe()
+    _handlers = []
+    _show_message("Board Game Insert Generator adapter stopped.")
+
+
+if adsk is not None:
+    class _BgigCommandCreatedHandler(adsk.core.CommandCreatedEventHandler):  # type: ignore[misc]
+        def __init__(self, addin_dir: Path) -> None:
+            super().__init__()
+            self.addin_dir = addin_dir
+
+        def notify(self, args) -> None:  # noqa: ANN001 - Fusion event args.
+            try:
+                command = args.command
+                inputs = command.commandInputs
+                default_request = _safe_default_command_request(self.addin_dir)
+                inputs.addStringValueInput(
+                    CAD_IR_PATH_INPUT_ID,
+                    "CAD IR JSON path",
+                    str(default_request.cad_ir_path),
+                )
+                mode_input = inputs.addDropDownCommandInput(
+                    GENERATION_MODE_INPUT_ID,
+                    "Generation mode",
+                    adsk.core.DropDownStyles.TextListDropDownStyle,
+                )
+                for mode in SUPPORTED_FUSION_GENERATION_MODES:
+                    mode_input.listItems.add(mode, mode == default_request.generation_mode, "")
+                inputs.addTextBoxCommandInput(
+                    SUMMARY_INPUT_ID,
+                    "Summary",
+                    fusion_command_summary(default_request),
+                    5,
+                    True,
+                )
+                execute_handler = _BgigCommandExecuteHandler(self.addin_dir)
+                command.execute.add(execute_handler)
+                _handlers.append(execute_handler)
+            except Exception as exc:  # pragma: no cover - Fusion runtime boundary.
+                _show_message(f"Board Game Insert Generator command creation error:\n{exc}")
+
+
+    class _BgigCommandExecuteHandler(adsk.core.CommandEventHandler):  # type: ignore[misc]
+        def __init__(self, addin_dir: Path) -> None:
+            super().__init__()
+            self.addin_dir = addin_dir
+
+        def notify(self, args) -> None:  # noqa: ANN001 - Fusion event args.
+            try:
+                inputs = args.command.commandInputs
+                cad_ir_path_input = inputs.itemById(CAD_IR_PATH_INPUT_ID)
+                generation_mode_input = inputs.itemById(GENERATION_MODE_INPUT_ID)
+                request = build_fusion_command_request(
+                    getattr(cad_ir_path_input, "value", ""),
+                    _selected_generation_mode(generation_mode_input),
+                    self.addin_dir,
+                )
+                _show_message(_execute_generation_request(request))
+            except FusionAssemblyDocumentRequiredError as exc:
+                _show_message(
+                    "Board Game Insert Generator requires an Assembly-compatible Fusion document.\n"
+                    f"{exc}\n\n"
+                    "Status: assembly document required."
+                )
+            except FusionSkeletonError as exc:
+                _show_message(
+                    "Board Game Insert Generator CAD IR error:\n"
+                    f"{exc}\n\n"
+                    f"{cad_ir_input_guidance(self.addin_dir)}"
+                )
+            except Exception as exc:  # pragma: no cover - Fusion runtime boundary.
+                if is_part_design_component_limit_error(exc):
+                    _show_message(
+                        "Board Game Insert Generator requires an Assembly-compatible Fusion document.\n"
+                        f"{assembly_document_required_message(exc)}\n\n"
+                        "Status: assembly document required."
+                    )
+                    return
+                _show_message(f"Board Game Insert Generator Fusion error:\n{exc}")
+else:  # pragma: no cover - imported outside Fusion only.
+    class _BgigCommandCreatedHandler:  # type: ignore[no-redef]
+        pass
+
+    class _BgigCommandExecuteHandler:  # type: ignore[no-redef]
+        pass
+
+
+def _register_and_execute_command(addin_dir: Path) -> None:
+    command_definitions = _ui.commandDefinitions
+    command_definition = command_definitions.itemById(BGIG_COMMAND_ID)
+    if command_definition is None:
+        command_definition = command_definitions.addButtonDefinition(
+            BGIG_COMMAND_ID,
+            BGIG_COMMAND_NAME,
+            "Choose a BGIG CAD IR JSON file and generate the selected Fusion scene.",
+        )
+    created_handler = _BgigCommandCreatedHandler(addin_dir)
+    command_definition.commandCreated.add(created_handler)
+    _handlers.append(created_handler)
+    command_definition.execute()
+    adsk.autoTerminate(False)
+
+
+def _safe_default_command_request(addin_dir: Path):
+    try:
+        return default_fusion_command_values(addin_dir)
+    except FusionSkeletonError:
+        return build_fusion_command_request(
+            str(addin_dir / DEFAULT_CAD_IR_INPUT_FILENAME),
+            DEFAULT_FUSION_GENERATION_MODE,
+            addin_dir,
+        )
+
+
+def _selected_generation_mode(generation_mode_input) -> str:  # noqa: ANN001 - Fusion API object.
+    selected_item = getattr(generation_mode_input, "selectedItem", None)
+    selected_name = getattr(selected_item, "name", None)
+    return selected_name or DEFAULT_FUSION_GENERATION_MODE
+
+
+def _execute_generation_request(request) -> str:  # noqa: ANN001 - FusionCommandRequest kept testable in skeleton.
+    payload = load_cad_ir_json(request.cad_ir_path)
+    generation_plan = generation_plan_from_cad_ir(
+        payload,
+        generation_mode=request.generation_mode,
+    )
+    design = _active_design(_app)
+    result = _generate_from_plan(design, generation_plan)
+    return _generation_result_message(generation_plan, result, request.cad_ir_path)
+
+
+def _generation_result_message(
+    generation_plan: FusionGenerationPlan,
+    result: dict[str, int],
+    cad_ir_path: Path,
+) -> str:
+    return (
+        "Board Game Insert Generator generated CAD IR scene from command UI.\n"
         f"Project: {generation_plan.project_name}\n"
         f"Input CAD IR: {cad_ir_path}\n"
         f"Generation mode: {generation_plan.generation_mode}\n"
@@ -156,14 +297,9 @@ def run(context) -> None:  # noqa: ANN001 - Fusion controls the signature.
         "Compact placement source: CAD IR metadata.executable_asset_plan.\n"
         "Exploded placement source: linked occurrences on add-in deterministic inspection grid; dimensions from CAD IR.\n"
         "Creation scope: one Fusion component per BGIG module, compact/exploded occurrences linked.\n"
+        "Sizing source: printable_body_size_mm for generated asset modules; theoretical_grid_extent_mm remains occupancy metadata.\n"
         "Status: manual validation required in Fusion 360."
     )
-
-
-def stop(context) -> None:  # noqa: ANN001 - Fusion controls the signature.
-    """Fusion 360 add-in shutdown hook."""
-
-    _show_message("Board Game Insert Generator adapter stopped.")
 
 
 def _active_design(application):  # noqa: ANN001 - Fusion API object.

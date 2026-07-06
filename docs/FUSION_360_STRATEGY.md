@@ -128,8 +128,9 @@ La cible Fusion actuelle a commence par des blanks rectangulaires, ajoute les ca
 - aucun fillet/conge ;
 - aucun export STL/3MF ;
 - aucun algorithme d'optimisation nouveau.
-- depuis P11-M001, les modules generes par `metadata.executable_asset_plan` peuvent aussi etre crees comme modules rectangulaires positionnes par `origin_mm` / `size_mm` de placement grille.
+- depuis P11-M001, les modules generes par `metadata.executable_asset_plan` peuvent aussi etre crees comme modules rectangulaires positionnes par les placements grille.
 - depuis la correction P7-M001V, l'add-in cree la vue compacte et la vue eclatee comme occurrences liees d'un meme composant physique, espacees a droite de la boite pour inspection.
+- depuis P11-M003, l'add-in expose une commande UI minimale pour choisir le fichier CAD IR et le mode de generation, et utilise `printable_body_size_mm` pour les bodies asset-first generes quand ce champ est present.
 
 
 ## Coupes rectangulaires P6-M001
@@ -205,10 +206,15 @@ une CAD IR exportee depuis `examples/simple_asset_executable_plan.json`.
 Convention retenue :
 
 - le coeur Python decide les modules generes et leurs placements X/Y/Z ;
-- Fusion consomme seulement `generated_modules`, `placements`, `origin_mm`,
-  `size_mm`, `origin_units` et `size_units` ;
-- `origin_mm` devient l'origine scene du body Fusion ;
-- `size_mm` devient la taille du body rectangulaire cree ;
+- Fusion consomme seulement `generated_modules`, `placements` et leurs champs de
+  sizing deja resolus ;
+- `printable_body_origin_mm` devient l'origine scene du body Fusion quand present,
+  avec fallback sur `origin_mm` pour les anciennes CAD IR ;
+- `printable_body_size_mm` devient la taille du body rectangulaire cree quand
+  present, avec fallback sur `source_size_mm` puis `size_mm` pour les anciennes
+  CAD IR ;
+- `theoretical_grid_origin_mm` et `theoretical_grid_extent_mm` restent des
+  metadata d'occupation et de validation, pas des dimensions de body ;
 - les origines Z non nulles sont creees sur un plan XY decale ;
 - les garde-fous hors Fusion refusent placement absent ou mal forme, dimensions
   manquantes, span hors grille, body hors boite et collision manifeste ;
@@ -220,19 +226,21 @@ Convention retenue :
   ne sont ajoutes.
 
 Validation : les conversions et garde-fous sont testes hors Fusion. Le smoke test
-humain `P11-M001V` du 2026-07-06 valide dans Fusion le chargement de
+humain `P11-M001V` du 2026-07-06 a valide dans Fusion le chargement de
 `simple_asset_executable_plan`, le message attendu, la creation de deux bodies
 de blank dont un module asset-first positionne par grille, et les dimensions
-`30.0 x 30.0 x 10.0 mm` a la position `X 30.0 mm`, `Y 0.0 mm`, `Z 0.0 mm`
-comme conformes ou acceptables. Cette validation ne vaut pas validation
-d'impression 3D.
+alors attendues `30.0 x 30.0 x 10.0 mm` a la position `X 30.0 mm`, `Y 0.0 mm`,
+`Z 0.0 mm`. P11-M003 corrige ensuite l'ambiguite produit : `30 x 30 x 10 mm`
+est l'etendue theorique d'une cellule de grille, tandis que le body imprimable
+genere depuis les assets est `25.6 x 25.6 x 9.8 mm`. Cette correction requiert
+un nouveau smoke test Fusion et ne vaut pas validation d'impression 3D.
 
 ## Scene multi-layer depuis placements grille P11-M002
 
 P11-M002 etend le meme chemin sans recalcul Fusion : l'add-in consomme les
-placements `origin_units`, `size_units`, `origin_mm` et `size_mm` deja presents
-dans `metadata.executable_asset_plan` pour creer une scene compacte + eclatee ou
-plusieurs modules generes occupent des hauteurs et origines Z differentes.
+placements X/Y/Z deja presents dans `metadata.executable_asset_plan` pour creer
+une scene compacte + eclatee ou plusieurs modules generes occupent des hauteurs
+et origines Z differentes.
 
 Convention retenue :
 
@@ -241,6 +249,10 @@ Convention retenue :
   haut `2 x 2 x 2` place a `Z=1` ;
 - Fusion convertit uniquement les millimetres deja resolus en transforms
   d'occurrences ;
+- depuis P11-M003, les bodies multi-layer generes utilisent les dimensions
+  imprimables : le module bas attend `61.6 x 61.6 x 7.8 mm`, le module haut
+  attend `37.6 x 37.6 x 17.8 mm`, tandis que les spans grille restent
+  respectivement `90 x 90 x 10 mm` et `60 x 60 x 20 mm` ;
 - les compteurs `Multi-layer grid modules planned`, `Grid modules with Z
   placement` et `Grid module height variants` sont reportes dans le message ;
 - la vue compacte et la vue eclatee restent deux occurrences liees du meme
@@ -252,6 +264,29 @@ Validation : les plans et conversions sont testes hors Fusion. L'execution reell
 P11-M002 reste `manual validation required` tant que Thomas n'a pas lance le
 smoke test dans Fusion. Aucune validation d'impression 3D ou de portance n'est
 revendiquee.
+
+
+## Commande UI Fusion minimale P11-M003
+
+Depuis P11-M003, l'add-in n'impose plus de modifier manuellement
+`cad_ir_path.txt` ou `exploded_view_mode.txt` pour un usage courant. Au lancement,
+`run(context)` enregistre et execute une commande `Generate Board Game Insert`.
+La commande affiche :
+
+- un champ texte `CAD IR JSON path` ;
+- un choix de mode `compact_only` ou `compact_and_exploded` ;
+- un resume rappelant que Fusion consomme la CAD IR et ne recalcule pas layout,
+  clearances ou tolerances.
+
+Les anciens fichiers locaux restent supportes comme valeurs par defaut et comme
+fallback de compatibilite, mais la procedure utilisateur normale devient :
+exporter une CAD IR, lancer l'add-in, choisir le fichier et le mode, valider la
+commande. Cette UI reste minimale : elle ne modifie pas les assets, ne lit pas la
+configuration BGIG source et ne cree aucune nouvelle geometrie.
+
+Validation : les helpers de requete et de mode sont testes hors Fusion. La
+commande Fusion reelle reste `manual validation required` jusqu'au smoke test
+P11-M003V.
 
 ## Vue eclatee basique P7-M001
 

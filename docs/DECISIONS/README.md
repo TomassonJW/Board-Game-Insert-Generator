@@ -118,6 +118,8 @@ Tests, cartes backlog ou gates humaines a preparer.
   duplication d'inspection.
 - `ADR-0021-fusion-linked-module-occurrences.md` - correction P7 par composants
   physiques uniques et occurrences compactes/eclatees liees.
+- `ADR-0022-fusion-command-ui-and-asset-sizing.md` - commande UI Fusion minimale
+  et sizing asset-first explicite grille / asset-fit / printable.
 
 ## Regles de maintenance
 

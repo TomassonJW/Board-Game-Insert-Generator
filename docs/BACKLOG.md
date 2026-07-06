@@ -1,6 +1,6 @@
 # Backlog
 
-Derniere mise a jour : 2026-07-06
+Derniere mise a jour : 2026-07-07
 
 Le backlog transforme la North Star en missions atomiques. Chaque mission future
 doit indiquer au minimum : ID, titre, capability liee, milestone lie, objectif,
@@ -271,7 +271,7 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Criteres d'acceptation : un module bas, un module plus haut, un placement Z explicite, occurrences compactes/eclatees liees, Fusion sans recalcul de solveur/tolerance, coeur Python sans `adsk`.
 - Tests : unitaires hors Fusion, CLI Markdown/JSON/export CAD IR, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
 - Gate : validation humaine fournie le 2026-07-06 pour cette generation multi-layer bornee uniquement.
-- Statut : `done`, `implemented-fusion`, validation Fusion manuelle requise, `print-validated: false`.
+- Statut : `done`, `fusion-validated` pour la generation multi-layer, `print-validated: false`.
 
 ### P11-M002V - Valider manuellement la scene Fusion multi-layer
 
@@ -279,10 +279,33 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Milestone : M7 Volumetric planner / M5 CAD inspection views.
 - Objectif : lancer l'add-in avec la CAD IR exportee depuis `simple_multilayer_grid_scene` et verifier les modules multi-hauteurs en vue compacte/eclatee.
 - Livrable : validation humaine Fusion avec message, position Z, dimensions et verification des occurrences liees.
-- Criteres d'acceptation : message `Multi-layer grid modules planned: 1`, `Grid modules with Z placement: 1`, `Grid module height variants: 2`, compact/exploded visibles, module haut a `Z 10.0 mm`, taille `60.0 x 60.0 x 20.0 mm` conforme ou acceptable, occurrences liees, aucune validation d'impression revendiquee.
+- Criteres d'acceptation : message `Multi-layer grid modules planned: 1`, `Grid modules with Z placement: 1`, `Grid module height variants: 2`, compact/exploded visibles, module haut a `Z 10.0 mm`, occurrences liees, aucune validation d'impression revendiquee. La validation P11-M002V a signale une ambiguite dimensionnelle corrigee ensuite par P11-M003.
+- Tests : smoke test manuel Fusion, aucune validation d'impression revendiquee.
+- Gate : action humaine Thomas realisee le 2026-07-07.
+- Statut : `done`, `fusion-validated`, `print-validated: false`.
+
+### P11-M003 - Corriger le sizing asset-first et ajouter une commande UI Fusion minimale
+
+- Capability : C-FUSION-COMPACT, C-FUSION-EXPLODED, C-GRID-3D, C-CAD-IR, C-FUSION-UI.
+- Milestone : M7 Volumetric planner / M14 Usable beta.
+- Objectif : distinguer span grille, asset-fit et taille imprimable pour les modules asset-first generes, puis lancer la generation Fusion depuis une commande UI minimale.
+- Livrable : `theoretical_grid_extent_mm`, `asset_fit_size_mm`, `printable_body_size_mm`, rapports Markdown/JSON enrichis, add-in avec champ `CAD IR JSON path` et mode `compact_only` / `compact_and_exploded`, ADR et procedure de smoke test.
+- Criteres d'acceptation : Fusion ne recalcule pas le solveur ; les bodies asset-first utilisent la taille imprimable ; les spans grille restent visibles comme metadata ; l'utilisateur n'a plus a editer manuellement `cad_ir_path.txt` ou `exploded_view_mode.txt` pour le flux courant ; coeur Python sans `adsk`.
+- Tests : unitaires hors Fusion, CLI Markdown/JSON/export CAD IR sur exemples pertinents, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
+- Gate : validation humaine fournie le 2026-07-07 apres P11-M002V, limitee a sizing et UI minimale.
+- Statut : `done`, `implemented-fusion`, validation Fusion manuelle requise, `print-validated: false`.
+
+### P11-M003V - Valider manuellement la commande UI Fusion et le sizing asset-first
+
+- Capability : C-FUSION-UI, C-FUSION-COMPACT, C-FUSION-EXPLODED, C-GRID-3D.
+- Milestone : M14 Usable beta / M7 Volumetric planner.
+- Objectif : lancer l'add-in via la commande UI, choisir une CAD IR exportee et verifier les dimensions imprimables asset-first corrigees.
+- Livrable : validation humaine Fusion avec message, chemin choisi, mode choisi, dimensions et statut `print-validated: false`.
+- Criteres d'acceptation : commande `Generate Board Game Insert` visible, champ chemin utilisable, mode `compact_and_exploded` ou `compact_only` applique, `simple_asset_executable_plan` genere un module asset-first `25.6 x 25.6 x 9.8 mm`, `simple_multilayer_grid_scene` genere les modules `61.6 x 61.6 x 7.8 mm` et `37.6 x 37.6 x 17.8 mm`, spans grille visibles comme metadata/rapport, occurrences liees conservees.
 - Tests : smoke test manuel Fusion, aucune validation d'impression revendiquee.
 - Gate : action humaine requise.
 - Statut : `blocked`.
+
 ### P7-M002 - Generer une vue Fusion eclatee minimale
 
 - Capability : C-FUSION-EXPLODED.

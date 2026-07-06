@@ -92,6 +92,20 @@ class FusionDocumentState:
 
 
 @dataclass(frozen=True)
+class FusionCommandRequest:
+    """User-selected add-in command values, validated outside Fusion API classes."""
+
+    cad_ir_path: Path
+    generation_mode: str
+
+    def to_dict(self) -> dict[str, str]:
+        return {
+            "cad_ir_path": str(self.cad_ir_path),
+            "generation_mode": self.generation_mode,
+        }
+
+
+@dataclass(frozen=True)
 class FusionOperationPlan:
     """Non-executable plan item derived from one CAD IR operation."""
 
@@ -143,6 +157,12 @@ class FusionSolidPlan:
     validation_status: str = FUSION_MANUAL_VALIDATION_REQUIRED
     grid_origin_units: tuple[int, int, int] | None = None
     grid_size_units: tuple[int, int, int] | None = None
+    theoretical_grid_origin_mm: FusionVectorMm | None = None
+    theoretical_grid_extent_mm: FusionVectorMm | None = None
+    asset_fit_size_mm: FusionVectorMm | None = None
+    printable_body_size_mm: FusionVectorMm | None = None
+    clearance_applied: dict[str, Any] | None = None
+    sizing_policy: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         payload = {
@@ -160,6 +180,18 @@ class FusionSolidPlan:
             payload["grid_origin_units"] = _grid_units_tuple_to_dict(self.grid_origin_units)
         if self.grid_size_units is not None:
             payload["grid_size_units"] = _grid_units_tuple_to_dict(self.grid_size_units)
+        if self.theoretical_grid_origin_mm is not None:
+            payload["theoretical_grid_origin_mm"] = self.theoretical_grid_origin_mm.to_dict()
+        if self.theoretical_grid_extent_mm is not None:
+            payload["theoretical_grid_extent_mm"] = self.theoretical_grid_extent_mm.to_dict()
+        if self.asset_fit_size_mm is not None:
+            payload["asset_fit_size_mm"] = self.asset_fit_size_mm.to_dict()
+        if self.printable_body_size_mm is not None:
+            payload["printable_body_size_mm"] = self.printable_body_size_mm.to_dict()
+        if self.clearance_applied is not None:
+            payload["clearance_applied"] = dict(self.clearance_applied)
+        if self.sizing_policy is not None:
+            payload["sizing_policy"] = self.sizing_policy
         return payload
 
 
@@ -543,6 +575,68 @@ def cad_ir_input_guidance(addin_dir: str | Path) -> str:
                 "- Generate from BGIG: python -m board_game_insert_generator "
                 "export-cad-ir <config.json> --output <cad_ir_input.json>"
             ),
+        ]
+    )
+
+
+def build_fusion_command_request(
+    cad_ir_path_text: str,
+    generation_mode: str,
+    addin_dir: str | Path,
+) -> FusionCommandRequest:
+    """Validate command UI values without importing Fusion API types."""
+
+    raw_path = cad_ir_path_text.strip().strip('"')
+    if not raw_path:
+        raise FusionSkeletonError("CAD IR JSON path is required.")
+
+    configured_path = Path(raw_path).expanduser()
+    if not configured_path.is_absolute():
+        configured_path = Path(addin_dir) / configured_path
+    configured_path = configured_path.resolve()
+
+    if configured_path.is_dir():
+        raise FusionSkeletonError(f"CAD IR path points to a directory, not a JSON file: {configured_path}.")
+    if not configured_path.is_file():
+        raise FusionSkeletonError(f"CAD IR JSON file not found: {configured_path}.")
+
+    return FusionCommandRequest(
+        cad_ir_path=configured_path,
+        generation_mode=_validated_generation_mode(generation_mode),
+    )
+
+
+def default_fusion_command_values(addin_dir: str | Path) -> FusionCommandRequest:
+    """Return default command UI values from legacy local add-in files.
+
+    Broken local override files must not prevent the command UI from opening;
+    users can correct the path directly in the command input.
+    """
+
+    root = Path(addin_dir)
+    try:
+        cad_ir_path = resolve_cad_ir_input_path(root)
+    except FusionSkeletonError:
+        cad_ir_path = root / DEFAULT_CAD_IR_INPUT_FILENAME
+    try:
+        generation_mode = resolve_generation_mode(root)
+    except FusionSkeletonError:
+        generation_mode = DEFAULT_FUSION_GENERATION_MODE
+    return FusionCommandRequest(
+        cad_ir_path=cad_ir_path,
+        generation_mode=generation_mode,
+    )
+
+
+def fusion_command_summary(request: FusionCommandRequest) -> str:
+    """Return the short read-only summary displayed by the Fusion command."""
+
+    return "\n".join(
+        [
+            "BGIG will consume the selected CAD IR JSON only.",
+            f"CAD IR: {request.cad_ir_path}",
+            f"Generation mode: {request.generation_mode}",
+            "Fusion will not recalculate layout, clearances or tolerances.",
         ]
     )
 
@@ -952,23 +1046,67 @@ def _grid_positioned_asset_blanks_from_metadata(
         if grid_size_units is not None:
             _validate_grid_span(origin_units, size_units, grid_size_units, module_id)
 
-        origin_mm = _vector_from_payload(placement, "origin_mm", f"placement {module_id} origin_mm")
-        size_mm = _positive_vector_from_payload(placement, "size_mm", f"placement {module_id} size_mm")
-        source_size_mm = _positive_vector_from_payload(placement, "source_size_mm", f"placement {module_id} source_size_mm")
-        _validate_grid_blank_bounds(reference_box, origin_mm, size_mm, module_id)
-        _validate_source_size_inside_grid_size(source_size_mm, size_mm, module_id)
+        legacy_origin_mm = _vector_from_payload(placement, "origin_mm", f"placement {module_id} origin_mm")
+        legacy_size_mm = _positive_vector_from_payload(placement, "size_mm", f"placement {module_id} size_mm")
+        theoretical_grid_origin_mm = _optional_vector_from_payload(
+            placement,
+            "theoretical_grid_origin_mm",
+            f"placement {module_id} theoretical_grid_origin_mm",
+        ) or legacy_origin_mm
+        theoretical_grid_extent_mm = _optional_positive_vector_from_payload(
+            placement,
+            "theoretical_grid_extent_mm",
+            f"placement {module_id} theoretical_grid_extent_mm",
+        ) or legacy_size_mm
+        source_size_mm = _optional_positive_vector_from_payload(
+            placement,
+            "source_size_mm",
+            f"placement {module_id} source_size_mm",
+        ) or _positive_vector_from_payload(module, "dimensions_mm", f"generated module {module_id} dimensions_mm")
+        asset_fit_size_mm = _optional_positive_vector_from_payload(
+            placement,
+            "asset_fit_size_mm",
+            f"placement {module_id} asset_fit_size_mm",
+        ) or _optional_positive_vector_from_payload(
+            module,
+            "asset_fit_size_mm",
+            f"generated module {module_id} asset_fit_size_mm",
+        )
+        printable_body_origin_mm = _optional_vector_from_payload(
+            placement,
+            "printable_body_origin_mm",
+            f"placement {module_id} printable_body_origin_mm",
+        ) or legacy_origin_mm
+        printable_body_size_mm = _optional_positive_vector_from_payload(
+            placement,
+            "printable_body_size_mm",
+            f"placement {module_id} printable_body_size_mm",
+        ) or source_size_mm
+
+        _validate_grid_blank_bounds(reference_box, theoretical_grid_origin_mm, theoretical_grid_extent_mm, module_id)
+        _validate_grid_blank_bounds(reference_box, printable_body_origin_mm, printable_body_size_mm, module_id)
+        _validate_size_inside_size(source_size_mm, theoretical_grid_extent_mm, module_id, "source module", "grid span")
+        _validate_size_inside_size(printable_body_size_mm, theoretical_grid_extent_mm, module_id, "printable body", "grid span")
+        if asset_fit_size_mm is not None:
+            _validate_size_inside_size(asset_fit_size_mm, printable_body_size_mm, module_id, "asset-fit envelope", "printable body")
 
         blank = FusionSolidPlan(
             cad_id=_fusion_name(f"grid-placement:{module_id}"),
             component_name=_fusion_name(f"Grid placed {module.get('name') or module_id}"),
             body_name=_fusion_name(f"{module_id} grid positioned rectangular blank"),
-            origin_mm=origin_mm,
-            size_mm=size_mm,
+            origin_mm=printable_body_origin_mm,
+            size_mm=printable_body_size_mm,
             role="generated_asset_grid_blank",
             printable=True,
             operation_kind=GRID_PLACED_BLANK_OPERATION_KIND,
             grid_origin_units=origin_units,
             grid_size_units=size_units,
+            theoretical_grid_origin_mm=theoretical_grid_origin_mm,
+            theoretical_grid_extent_mm=theoretical_grid_extent_mm,
+            asset_fit_size_mm=asset_fit_size_mm,
+            printable_body_size_mm=printable_body_size_mm,
+            clearance_applied=placement.get("clearance_applied") if isinstance(placement.get("clearance_applied"), dict) else None,
+            sizing_policy=_optional_text(placement, "sizing_policy"),
         )
         collision = _first_colliding_solid(blank, occupied)
         if collision is not None:
@@ -1071,9 +1209,23 @@ def _validate_grid_blank_bounds(
 
 
 def _validate_source_size_inside_grid_size(source_size_mm: FusionVectorMm, grid_size_mm: FusionVectorMm, module_id: str) -> None:
-    if source_size_mm.x > grid_size_mm.x or source_size_mm.y > grid_size_mm.y or source_size_mm.z > grid_size_mm.z:
+    _validate_size_inside_size(source_size_mm, grid_size_mm, module_id, "source module", "grid span")
+
+
+def _validate_size_inside_size(
+    inner_size_mm: FusionVectorMm,
+    outer_size_mm: FusionVectorMm,
+    module_id: str,
+    inner_label: str,
+    outer_label: str,
+) -> None:
+    if (
+        inner_size_mm.x > outer_size_mm.x
+        or inner_size_mm.y > outer_size_mm.y
+        or inner_size_mm.z > outer_size_mm.z
+    ):
         raise FusionSkeletonError(
-            f"Grid placement for module {module_id!r} is smaller than its source module dimensions."
+            f"Grid placement for module {module_id!r} has {inner_label} larger than its {outer_label}."
         )
 
 
@@ -1639,6 +1791,40 @@ def _positive_vector_from_payload(
     if not isinstance(value, dict):
         raise FusionSkeletonError(f"CAD IR {label} must be an object.")
 
+    return FusionVectorMm(
+        x=_required_positive_number(value, "x", label),
+        y=_required_positive_number(value, "y", label),
+        z=_required_positive_number(value, "z", label),
+    )
+
+
+def _optional_vector_from_payload(
+    source: dict[str, Any],
+    key: str,
+    label: str,
+) -> FusionVectorMm | None:
+    value = source.get(key)
+    if value is None:
+        return None
+    if not isinstance(value, dict):
+        raise FusionSkeletonError(f"CAD IR {label} must be an object.")
+    return FusionVectorMm(
+        x=_required_number(value, "x", label),
+        y=_required_number(value, "y", label),
+        z=_required_number(value, "z", label),
+    )
+
+
+def _optional_positive_vector_from_payload(
+    source: dict[str, Any],
+    key: str,
+    label: str,
+) -> FusionVectorMm | None:
+    value = source.get(key)
+    if value is None:
+        return None
+    if not isinstance(value, dict):
+        raise FusionSkeletonError(f"CAD IR {label} must be an object.")
     return FusionVectorMm(
         x=_required_positive_number(value, "x", label),
         y=_required_positive_number(value, "y", label),

@@ -42,7 +42,7 @@ Chaine de pilotage :
 | Pure engine | Donnees, validation, layout, tolerances, cavites et assets. | C-BOX, C-MODULE, C-CAVITY, C-FEATURE, C-ASSET |
 | Volumetric model | X/Y/Z, layers, reservations, stacking, free volumes. | C-GRID-3D, C-LAYERS, C-RESERVATION, C-STACKING |
 | CAD IR | Contrat CAD-agnostic et serialisation. | C-CAD-IR |
-| Fusion adapter | Vues inspectables et operations CAD autorisees. | C-FUSION-COMPACT, C-FUSION-EXPLODED, C-FUSION-CAVITIES, C-FILLETS |
+| Fusion adapter | Vues inspectables, commande utilisateur minimale et operations CAD autorisees. | C-FUSION-COMPACT, C-FUSION-EXPLODED, C-FUSION-CAVITIES, C-FILLETS, C-FUSION-UI |
 | Physical product | Calibration, impression, ergonomie et beta utilisable. | C-CALIBRATION, C-ACCESS, C-AESTHETIC |
 
 ## Epics de reference
@@ -64,15 +64,16 @@ Chaine de pilotage :
 | C-CAVITY | Cavity model | Cavities and ergonomic features | `implemented-cad-ir` | M4 Abstract cavities | Gate Fusion cuts |
 | C-FEATURE | Ergonomic feature model | Cavities and ergonomic features | `implemented-cad-ir` | M4 Abstract cavities / M8 Ergonomic planner | Taxonomie P6-M003 implementee ; gate Fusion pour nouvelles geometries |
 | C-LAYOUT-2D | 2D layout | Volumetric layout | `implemented-core` | M2 Simple layout | Aucune active |
-| C-GRID-3D | 3D volumetric grid | Volumetric layout | `implemented-cad-ir` | M7 Volumetric planner | P8-M001 implemente le socle declaratif; P10-M008 utilise un placement greedy abstrait; P11-M001 est `fusion-validated` pour la consommation compacte des placements; P11-M002 code une scene Fusion multi-layer depuis placements X/Y/Z, validation Fusion manuelle requise, sans validation physique |
+| C-GRID-3D | 3D volumetric grid | Volumetric layout | `implemented-cad-ir` | M7 Volumetric planner | P8-M001 implemente le socle declaratif; P10-M008 utilise un placement greedy abstrait; P11-M001 est `fusion-validated` pour la consommation compacte des placements; P11-M002 est validee Fusion pour la scene multi-layer; P11-M003 corrige le sizing explicite grille / asset-fit / printable, validation Fusion UI requise, sans validation physique |
 | C-LAYERS | Layer / stage model | Volumetric layout | `implemented-cad-ir` | M7 Volumetric planner | Layers declaratifs P8-M001; gate impression avant support physique |
 | C-RESERVATION | Board / tray / lid reservation | Asset-first design | `implemented-cad-ir` | M6 Asset-first project model | Reservations abstraites P8-M002; gate si impact dimensions publiques ou generation Fusion |
 | C-ACCESS | Accessibility and removal order | Human validation gates | `implemented-cad-ir` | M8 Ergonomic planner | Removal order abstrait P8-M002; validation ergonomique humaine avant confort revendique |
 | C-STACKING | Support / stacking rules | Volumetric layout | `implemented-cad-ir` | M7 Volumetric planner | Support surfaces abstraites P8-M002; gate impression reelle |
 | C-COMPOSITE | Composite modules | Modular printable bodies | `planned` | M9 Composite modules | Gate modules composites |
 | C-CAD-IR | CAD IR | CAD generation pipeline | `implemented-cad-ir` | M3 CAD pipeline | Gate si contrat incompatible |
-| C-FUSION-COMPACT | Fusion compact view | CAD generation pipeline | `fusion-validated` | M3 CAD pipeline / M7 Volumetric planner | Blanks rectangulaires valides; vue compacte grille P11-M001 validee manuellement dans Fusion; P11-M002 code la scene compacte multi-layer, validation Fusion manuelle requise, print-validated: false |
-| C-FUSION-EXPLODED | Fusion exploded view | CAD generation pipeline | `fusion-validated` | M5 CAD inspection views | P7-M001V4 valide la vue eclatee basique par composants uniques et occurrences compactes/eclatees liees en document Assembly-compatible; Part Design est detecte comme incompatible; le renommage direct de `Occurrence.name` est evite; P11-M002 code une scene eclatee multi-layer a valider manuellement; print-validated: false |
+| C-FUSION-COMPACT | Fusion compact view | CAD generation pipeline | `fusion-validated` | M3 CAD pipeline / M7 Volumetric planner | Blanks rectangulaires valides; vue compacte grille P11-M001 validee manuellement dans Fusion; P11-M002 validee Fusion pour multi-layer; P11-M003 change les bodies asset-first vers `printable_body_size_mm`, validation Fusion UI requise, print-validated: false |
+| C-FUSION-EXPLODED | Fusion exploded view | CAD generation pipeline | `fusion-validated` | M5 CAD inspection views | P7-M001V4 valide la vue eclatee basique par composants uniques et occurrences compactes/eclatees liees en document Assembly-compatible; Part Design est detecte comme incompatible; le renommage direct de `Occurrence.name` est evite; P11-M002 valide une scene eclatee multi-layer; P11-M003 conserve les occurrences liees via commande UI, validation requise, print-validated: false |
+| C-FUSION-UI | Fusion command UI | CAD generation pipeline | `implemented-fusion` | M14 Usable beta | P11-M003 ajoute une commande Fusion minimale avec chemin CAD IR et mode compact/exploded; validation manuelle P11-M003V requise; pas d'UI produit complete |
 | C-FUSION-CAVITIES | Fusion cavities | CAD generation pipeline | `fusion-validated` | M5 CAD cavities | Cavites rectangulaires validees Fusion, print-validated: false |
 | C-FILLETS | Fillets and finger notches | CAD generation pipeline | `fusion-validated` | M5 CAD ergonomic features | Encoche rectangulaire top-open validee Fusion, print-validated: false ; courbes/fillets bloques |
 | C-SOLVER | Solver and scoring | Volumetric layout | `implemented-core` | M10 Semi-automatic solver | Variant comparison P10-M002 report-only; raisons de rejet structurees P10-M003; module_candidates P10-M004; variante recommandee P10-M005; grouping borne P10-M006; plan concret greedy P10-M008; gate architecture si optimiseur majeur |
@@ -96,7 +97,7 @@ Chaine de pilotage :
 | M11 Physical validation | Les tolerances et geometries critiques sont calibrees par impression. | C-CALIBRATION |
 | M12 Design language | Labels, gravures, motifs et decoration restent parametrables et surs. | C-AESTHETIC |
 | M13 Advanced mechanisms | Couvercles, rainures, clips et empilement avance restent gate-aware. | C-STACKING, futurs mecanismes |
-| M14 Usable beta | Un jeu reel peut etre documente, genere, imprime et ajuste. | C-CALIBRATION, C-AESTHETIC |
+| M14 Usable beta | Un jeu reel peut etre documente, genere, imprime et ajuste. | C-CALIBRATION, C-AESTHETIC, C-FUSION-UI |
 
 ## Regle d'usage par Codex
 

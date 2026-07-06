@@ -94,7 +94,7 @@ CAD IR uniquement ; aucune geometrie Fusion volumetrique n'est generee.
 
 P11-M001 branche les placements grille deja decides par le coeur Python sur la
 vue compacte Fusion. L'adaptateur consomme `metadata.executable_asset_plan` et
-cree uniquement des bodies rectangulaires positionnes par `origin_mm` / `size_mm`.
+cree uniquement des bodies rectangulaires positionnes par les champs deja resolus. Depuis P11-M003, les bodies asset-first utilisent `printable_body_origin_mm` / `printable_body_size_mm` quand presents ; `theoretical_grid_extent_mm` reste le span de grille et non une taille de body.
 Il ne cherche pas de nouveau placement et ne modifie pas la grille.
 
 Le smoke test humain `P11-M001V` du 2026-07-06 valide cette consommation compacte
@@ -112,7 +112,11 @@ L'exemple `simple_multilayer_grid_scene` verifie une configuration minimale :
 - un module genere plus haut occupe `size_units 2 x 2 x 2` a `origin_units (0, 0, 1)` ;
 - les rapports et `metadata.executable_asset_plan.summary` exposent
   `multi_layer_module_count`, `z_placed_module_count` et `height_variant_count` ;
-- l'adaptateur Fusion affiche les memes compteurs avant validation manuelle.
+- depuis P11-M003, le module bas a un body imprimable `61.6 x 61.6 x 7.8 mm`
+  dans un span grille `90 x 90 x 10 mm`, et le module haut a un body imprimable
+  `37.6 x 37.6 x 17.8 mm` dans un span grille `60 x 60 x 20 mm` ;
+- l'adaptateur Fusion affiche les memes compteurs et doit etre revalide via
+  P11-M003V pour le nouveau flux UI et le sizing corrige.
 
 Cette mission ne prouve pas la portance, l'ordre de retrait reel, la friction ou
 l'impression. Ces sujets restent gates par validation humaine/physique.

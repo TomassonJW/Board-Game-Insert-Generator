@@ -140,10 +140,28 @@ Depuis P10-M008, un asset candidat peut devenir un module genere abstrait dans
 geometrie Fusion. Elle relie :
 
 - `generated_modules` : modules derives de candidats, avec `source_asset_ids` ;
-- `placements` : positions X/Y/Z en unites de grille et dimensions millimetres
-  couvertes par la grille ;
+- `placements` : positions X/Y/Z en unites de grille, dimensions imprimables du
+  module genere et metadata separee de span grille ;
 - `rejected_modules` : refus actionnables, par exemple absence de grille ou span
   libre introuvable.
 
 `examples/simple_asset_executable_plan.json` montre deux assets tokens groupes
 puis places comme un module abstrait dans une cellule libre de la grille.
+
+Depuis P11-M003, le plan distingue explicitement les dimensions suivantes pour les
+modules asset-first generes :
+
+- `theoretical_grid_origin_mm` et `theoretical_grid_extent_mm` : reservation dans
+  la grille discrete X/Y/Z ;
+- `asset_fit_size_mm` : enveloppe utile de l'asset avec clearance interne ;
+- `printable_body_origin_mm` et `printable_body_size_mm` : corps rectangulaire
+  reel que l'adaptateur Fusion doit creer ;
+- `size_mm` reste un alias de `printable_body_size_mm` dans les placements du
+  plan executable ;
+- `grid_slack_mm` rend visible la marge entre span de grille et corps imprimable.
+
+Les exemples `simple_asset_executable_plan` et `simple_multilayer_grid_scene`
+ne doivent donc plus etre lus comme des fixtures dont les corps imprimables font
+necessairement toute la cellule. Le span `90 x 90 x 10 mm` de la scene
+multi-layer reste une occupation de grille ; le body imprimable correspondant est
+`61.6 x 61.6 x 7.8 mm`.

@@ -1,6 +1,6 @@
 # Status
 
-Derniere mise a jour : 2026-07-06
+Derniere mise a jour : 2026-07-07
 
 ## Etat global
 
@@ -229,10 +229,13 @@ La validation humaine `P11-M001V` confirmee le 2026-07-06 documente le smoke tes
 
 La mission `P7-M001` code une premiere vue eclatee Fusion basique. Le smoke test humain P7-M001V a valide la visibilite de la vue compacte/eclatee mais a refuse les copies independantes de bodies. Les corrections P7 creent maintenant un `Component` Fusion unique par module physique, une occurrence compacte et une occurrence eclatee liee du meme composant, detectent le contexte Part Design incompatible comme `assembly document required` et ne tentent plus de renommer directement `Occurrence.name`. La validation humaine `P7-M001V4` confirmee le 2026-07-06 valide dans un document Assembly-compatible le mode `compact_and_exploded`, les messages `Module components created: 2`, `Compact occurrences created: 2`, `Exploded occurrences created: 2`, `Linked exploded occurrences: yes`, `Occurrence direct rename attempted: no`, la presence des vues compacte/eclatee et le partage des composants sources par occurrences liees. Statut : `fusion-validated`, `print-validated: false`.
 
-La mission `P11-M002` code une premiere scene Fusion multi-layer depuis les placements grille X/Y/Z deja resolus par `metadata.executable_asset_plan`. L'exemple `simple_multilayer_grid_scene` produit un module genere bas, un module genere plus haut sur deux unites Z et un placement explicite a `Z=1`; le plan hors Fusion expose les compteurs multi-layer et l'add-in conserve la strategie `Component` source + occurrences compactes/eclatees liees. Statut : `implemented-fusion`, validation humaine Fusion `P11-M002V` requise, `print-validated: false`.
+La mission `P11-M002` code une premiere scene Fusion multi-layer depuis les placements grille X/Y/Z deja resolus par `metadata.executable_asset_plan`. L'exemple `simple_multilayer_grid_scene` produit un module genere bas, un module genere plus haut sur deux unites Z et un placement explicite a `Z=1`; le plan hors Fusion expose les compteurs multi-layer et l'add-in conserve la strategie `Component` source + occurrences compactes/eclatees liees. La validation humaine `P11-M002V` du 2026-07-07 confirme le lancement de l'add-in, le chargement CAD IR, le message conforme et la generation multi-layer visible. Statut : `fusion-validated`, `print-validated: false`.
+
+La mission `P11-M003` corrige l'ambiguite dimensionnelle observee apres P11-M002V : les modules asset-first generes distinguent maintenant span grille theorique, enveloppe asset-fit et taille imprimable. Fusion consomme `printable_body_size_mm` pour les bodies generes, tandis que `theoretical_grid_extent_mm` reste une metadata d'occupation. L'add-in expose aussi une premiere commande UI minimale `Generate Board Game Insert` avec champ `CAD IR JSON path` et choix `compact_only` / `compact_and_exploded`, sans rendre le coeur Python dependant de `adsk`. Statut : `implemented-fusion`, validation humaine Fusion `P11-M003V` requise, `print-validated: false`.
+
 ## Phase active
 
-Phase active : **P11-M002 scene Fusion multi-layer codee / smoke test humain requis**.
+Phase active : **P11-M003 UI Fusion minimale et sizing asset-first corriges / smoke test humain requis**.
 
 Etat : le pipeline P4 reste stable pour les blanks rectangulaires Fusion. La
 vague P5 est terminee cote moteur Python pur, configuration, rapports et CAD IR.
@@ -241,19 +244,22 @@ P6-M001 est `fusion-validated` pour les cavites rectangulaires simples, avec
 simples de paroi top-open, avec `print-validated: false`. P6-M003 est termine
 cote taxonomie abstraite CAD-agnostic. P8-M001 et P8-M002 sont termines cote grille
 volumetrique declarative, layers, reservations, supports abstraits et metadata CAD IR.
-P11-M001 est `fusion-validated` pour la vue compacte issue du plan asset-first
-et des placements grille X/Y/Z, avec `print-validated: false`. P7-M001 est
+P11-M001 est `fusion-validated` pour la vue compacte issue du plan asset-first,
+avec l'ancienne attente dimensionnelle documentee. P7-M001 est
 `fusion-validated` pour la vue eclatee basique par occurrences liees dans un
 document Assembly-compatible, avec `print-validated: false`. P11-M002 est
-`implemented-fusion` pour une scene compacte/eclatee multi-layer depuis placements
-X/Y/Z, avec validation Fusion manuelle requise. La North Star cible un
-generateur volumetrique asset-first, pilote par capabilities.
+`fusion-validated` pour une scene compacte/eclatee multi-layer depuis placements
+X/Y/Z. P11-M003 est `implemented-fusion` pour la commande UI minimale et le
+sizing asset-first explicite, avec validation Fusion manuelle requise. La North
+Star cible un generateur volumetrique asset-first, pilote par capabilities.
 
-Prochaine action recommandee : smoke test humain Fusion P11-M002V avec
-`simple_multilayer_grid_scene` avant toute vue volumetrique plus avancee, module
-composite, solveur plus automatique, export ou geometrie Fusion supplementaire.
-Une nouvelle gate humaine est requise avant toute extension au-dela des modules
-rectangulaires compactes/eclates multi-layer basiques.
+Prochaine action recommandee : smoke test humain Fusion P11-M003V avec
+`simple_asset_executable_plan` et `simple_multilayer_grid_scene` via la commande
+UI, avant toute UI plus complete, vue volumetrique plus avancee, module composite,
+solveur plus automatique, export ou geometrie Fusion supplementaire. Une nouvelle
+gate humaine est requise avant toute extension au-dela de cette commande minimale
+et des modules rectangulaires compactes/eclates multi-layer basiques.
+
 ## Implemente
 
 - Chargement de configurations JSON locales.
@@ -323,7 +329,13 @@ rectangulaires compactes/eclates multi-layer basiques.
 - Vue compacte Fusion P11-M001 depuis placements grille : `fusion-validated`,
   `print-validated: false`.
 - Scene Fusion multi-layer P11-M002 depuis placements grille X/Y/Z :
-  `implemented-fusion`, validation humaine Fusion requise, `print-validated: false`.
+  `fusion-validated`, `print-validated: false`.
+- Sizing explicite P11-M003 des modules asset-first generes : span grille
+  theorique, enveloppe asset-fit, taille de body imprimable et slack de grille
+  visibles dans rapports/JSON/CAD IR.
+- Commande UI Fusion minimale P11-M003 : champ `CAD IR JSON path`, mode
+  `compact_only` / `compact_and_exploded`, fichiers texte locaux conserves comme
+  fallback de compatibilite, validation Fusion manuelle requise.
 - Vue eclatee Fusion P7-M001 basique : composants physiques uniques avec
   occurrences compactes/eclatees liees, garde-fou `assembly document required`
   si le document actif est un Part Design incompatible, sans renommage direct de
@@ -369,9 +381,10 @@ rectangulaires compactes/eclates multi-layer basiques.
 - Le squelette Fusion P4-M002 est testable hors Fusion.
 - La generation Fusion P4-M003 est validee manuellement dans Fusion pour le
   chargement, le message final, l'apparition des modules et les dimensions de
-  la fixture. Depuis P4-M004/P4-M006, toute nouvelle CAD IR exportee peut etre
-  pointee par `cad_ir_path.txt`, mais doit encore etre inspectee dans Fusion.
-  Cela ne valide pas l'impression reelle.
+  la fixture. Depuis P11-M003, le flux courant passe par une commande UI de
+  selection CAD IR/mode ; les fichiers texte locaux restent un fallback. Toute
+  nouvelle CAD IR exportee doit encore etre inspectee dans Fusion. Cela ne
+  valide pas l'impression reelle.
 
 ## Prevu
 
@@ -414,13 +427,13 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant `P7-M001 - occurrence name guard` :
+Derniere verification pendant `P11-M003 - UI Fusion minimale et sizing asset-first` :
 
-- `python -m unittest discover -s tests` : OK, 146 tests passes.
-- CLI Markdown/JSON/export CAD IR : OK sur `simple_asset_executable_plan.json`, `simple_tray.json` et `simple_finger_notch_tray.json`.
-- `python -m board_game_insert_generator export-cad-ir examples/simple_asset_executable_plan.json --output <temp>/bgig-simple_asset_executable_plan-p7-v4-cad-ir.json` : OK, fichier CAD IR genere pour smoke test Fusion.
+- `python -m unittest discover -s tests` : OK, 152 tests passes.
+- CLI Markdown/JSON/export CAD IR : OK sur `simple_asset_executable_plan.json`, `simple_multilayer_grid_scene.json`, `simple_tray.json` et `simple_finger_notch_tray.json`.
 - `git diff --check` : OK.
 - `rg -n "adsk" src/board_game_insert_generator` : OK, aucune occurrence dans le coeur Python.
+- Validation Fusion reelle : requise via `P11-M003V`; non executee par Codex.
 ## Risques actifs
 
 - Le moteur a deja des concepts futurs dans `models.py`; il faut eviter de les

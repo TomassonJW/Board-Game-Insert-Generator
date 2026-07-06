@@ -38,8 +38,11 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     PLAN_STATUS_PLANNED_ONLY,
     FusionSkeletonError,
     assembly_document_required_message,
+    build_fusion_command_request,
     cad_ir_input_guidance,
+    default_fusion_command_values,
     describe_document_state,
+    fusion_command_summary,
     generation_plan_from_cad_ir,
     is_part_design_component_limit_error,
     load_cad_ir_json,
@@ -232,6 +235,42 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn(CAD_IR_PATH_OVERRIDE_FILENAME, guidance)
         self.assertIn("export-cad-ir", guidance)
 
+    def test_builds_fusion_command_request_from_ui_values(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            addin_dir = Path(temp_dir)
+            cad_ir_path = addin_dir / "scene.json"
+            cad_ir_path.write_text(json.dumps(_cad_ir_payload()), encoding="utf-8")
+
+            request = build_fusion_command_request(
+                "scene.json",
+                FUSION_GENERATION_MODE_COMPACT_ONLY,
+                addin_dir,
+            )
+
+        self.assertEqual(request.cad_ir_path.name, "scene.json")
+        self.assertEqual(request.generation_mode, FUSION_GENERATION_MODE_COMPACT_ONLY)
+        self.assertIn("Generation mode: compact_only", fusion_command_summary(request))
+
+    def test_rejects_fusion_command_request_without_existing_cad_ir(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            with self.assertRaisesRegex(FusionSkeletonError, "CAD IR JSON file not found"):
+                build_fusion_command_request(
+                    "missing.json",
+                    FUSION_GENERATION_MODE_COMPACT_ONLY,
+                    Path(temp_dir),
+                )
+
+    def test_default_fusion_command_values_keep_legacy_files_as_defaults(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            addin_dir = Path(temp_dir)
+            cad_ir_path = addin_dir / DEFAULT_CAD_IR_INPUT_FILENAME
+            cad_ir_path.write_text(json.dumps(_cad_ir_payload()), encoding="utf-8")
+
+            request = default_fusion_command_values(addin_dir)
+
+        self.assertEqual(request.cad_ir_path.name, DEFAULT_CAD_IR_INPUT_FILENAME)
+        self.assertEqual(request.generation_mode, FUSION_GENERATION_MODE_COMPACT_AND_EXPLODED)
+
     def test_resolves_default_generation_mode_to_compact_and_exploded(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             self.assertEqual(
@@ -371,8 +410,14 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(grid_blank.operation_kind, GRID_PLACED_BLANK_OPERATION_KIND)
         self.assertEqual(grid_blank.component_name, "Grid placed Grouped candidate for tokens")
         self.assertEqual(grid_blank.origin_mm.to_dict(), {"x": 30.0, "y": 0.0, "z": 0.0})
-        self.assertEqual(grid_blank.size_mm.to_dict(), {"x": 30.0, "y": 30.0, "z": 10.0})
+        self.assertEqual(grid_blank.size_mm.to_dict(), {"x": 25.6, "y": 25.6, "z": 9.8})
+        self.assertEqual(grid_blank.asset_fit_size_mm.to_dict(), {"x": 23.2, "y": 23.2, "z": 8.6})
+        self.assertEqual(grid_blank.theoretical_grid_extent_mm.to_dict(), {"x": 30.0, "y": 30.0, "z": 10.0})
         self.assertEqual(plan.to_dict()["grid_positioned_blanks"][0]["body_name"], grid_blank.body_name)
+        self.assertEqual(
+            plan.to_dict()["grid_positioned_blanks"][0]["theoretical_grid_extent_mm"],
+            {"x": 30.0, "y": 30.0, "z": 10.0},
+        )
 
 
     def test_grid_positioned_asset_blank_supports_z_layer_origin(self) -> None:
@@ -380,12 +425,14 @@ class FusionSkeletonTests(unittest.TestCase):
         placement = payload["metadata"]["executable_asset_plan"]["placements"][0]
         placement["origin_units"] = {"x": 1, "y": 0, "z": 1}
         placement["origin_mm"] = {"x": 30.0, "y": 0.0, "z": 10.0}
+        placement["theoretical_grid_origin_mm"] = {"x": 30.0, "y": 0.0, "z": 10.0}
+        placement["printable_body_origin_mm"] = {"x": 30.0, "y": 0.0, "z": 10.0}
 
         plan = generation_plan_from_cad_ir(payload)
 
         grid_blank = plan.grid_positioned_blanks[0]
         self.assertEqual(grid_blank.origin_mm.to_dict(), {"x": 30.0, "y": 0.0, "z": 10.0})
-        self.assertEqual(grid_blank.size_mm.to_dict(), {"x": 30.0, "y": 30.0, "z": 10.0})
+        self.assertEqual(grid_blank.size_mm.to_dict(), {"x": 25.6, "y": 25.6, "z": 9.8})
 
     def test_builds_multilayer_grid_scene_with_linked_occurrences(self) -> None:
         payload = _cad_ir_payload_from_example("simple_multilayer_grid_scene.json")
@@ -407,11 +454,13 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(low_blank.grid_origin_units, (1, 0, 0))
         self.assertEqual(low_blank.grid_size_units, (3, 3, 1))
         self.assertEqual(low_blank.origin_mm.to_dict(), {"x": 30.0, "y": 0.0, "z": 0.0})
-        self.assertEqual(low_blank.size_mm.to_dict(), {"x": 90.0, "y": 90.0, "z": 10.0})
+        self.assertEqual(low_blank.size_mm.to_dict(), {"x": 61.6, "y": 61.6, "z": 7.8})
+        self.assertEqual(low_blank.theoretical_grid_extent_mm.to_dict(), {"x": 90.0, "y": 90.0, "z": 10.0})
         self.assertEqual(high_blank.grid_origin_units, (0, 0, 1))
         self.assertEqual(high_blank.grid_size_units, (2, 2, 2))
         self.assertEqual(high_blank.origin_mm.to_dict(), {"x": 0.0, "y": 0.0, "z": 10.0})
-        self.assertEqual(high_blank.size_mm.to_dict(), {"x": 60.0, "y": 60.0, "z": 20.0})
+        self.assertEqual(high_blank.size_mm.to_dict(), {"x": 37.6, "y": 37.6, "z": 17.8})
+        self.assertEqual(high_blank.theoretical_grid_extent_mm.to_dict(), {"x": 60.0, "y": 60.0, "z": 20.0})
 
         high_compact = [
             occurrence
@@ -514,6 +563,8 @@ class FusionSkeletonTests(unittest.TestCase):
         payload = _cad_ir_payload_from_example("simple_asset_executable_plan.json")
         placement = payload["metadata"]["executable_asset_plan"]["placements"][0]
         placement["origin_mm"] = {"x": 0.0, "y": 0.0, "z": 0.0}
+        placement["theoretical_grid_origin_mm"] = {"x": 0.0, "y": 0.0, "z": 0.0}
+        placement["printable_body_origin_mm"] = {"x": 0.0, "y": 0.0, "z": 0.0}
         placement["origin_units"] = {"x": 0, "y": 0, "z": 0}
 
         with self.assertRaisesRegex(FusionSkeletonError, "collides"):
@@ -523,6 +574,8 @@ class FusionSkeletonTests(unittest.TestCase):
         payload = _cad_ir_payload_from_example("simple_asset_executable_plan.json")
         placement = payload["metadata"]["executable_asset_plan"]["placements"][0]
         placement["origin_mm"] = {"x": 120.0, "y": 0.0, "z": 0.0}
+        placement["theoretical_grid_origin_mm"] = {"x": 120.0, "y": 0.0, "z": 0.0}
+        placement["printable_body_origin_mm"] = {"x": 120.0, "y": 0.0, "z": 0.0}
         placement["origin_units"] = {"x": 4, "y": 0, "z": 0}
 
         with self.assertRaisesRegex(FusionSkeletonError, "exceeds volumetric grid|exceeds reference box"):
@@ -699,7 +752,12 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("grid_positioned_blanks", source)
         self.assertIn("compact_occurrences", source)
         self.assertIn("exploded_occurrences", source)
-        self.assertIn("generated compact and exploded", source)
+        self.assertIn("generated CAD IR scene from command UI", source)
+        self.assertIn("commandCreated", source)
+        self.assertIn("addStringValueInput", source)
+        self.assertIn("addDropDownCommandInput", source)
+        self.assertIn("build_fusion_command_request", source)
+        self.assertIn("CAD IR JSON path", source)
         self.assertIn("resolve_generation_mode", source)
         self.assertIn("_xy_plane_for_z", source)
         self.assertIn("Simple top-open finger notch cuts", source)

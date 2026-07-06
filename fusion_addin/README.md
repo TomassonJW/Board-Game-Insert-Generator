@@ -18,8 +18,9 @@ Depuis `P6-M002`, il code les encoches simples de paroi depuis
 `P11-M001`, il code aussi la vue compacte de modules asset-first positionnes par
 `metadata.executable_asset_plan`. Depuis la correction `P7-M001V`, il code aussi
 une vue eclatee basique par occurrences liees : un composant Fusion unique par
-module physique, une occurrence compacte et une occurrence eclatee, a tester
-manuellement dans Fusion avant validation.
+module physique, une occurrence compacte et une occurrence eclatee. Depuis
+`P11-M003`, l'add-in expose une commande UI minimale pour choisir le fichier CAD
+IR et le mode de generation sans modifier manuellement les fichiers texte locaux.
 
 Ce que l'add-in cree maintenant :
 
@@ -57,9 +58,9 @@ Ce que l'add-in ne cree pas :
 - `BoardGameInsertGenerator/cad_ir_input.json` : fixture CAD IR locale chargee
   par defaut par l'add-in.
 - `BoardGameInsertGenerator/cad_ir_path.txt` : fichier optionnel ignore par Git,
-  permettant de pointer vers une CAD IR JSON exportee ailleurs.
+  conserve comme valeur par defaut heritee pour pointer vers une CAD IR JSON exportee ailleurs.
 - `BoardGameInsertGenerator/exploded_view_mode.txt` : fichier optionnel ignore par
-  Git, permettant de choisir `compact_and_exploded` ou `compact_only`.
+  Git, conserve comme valeur par defaut heritee pour choisir `compact_and_exploded` ou `compact_only`.
 
 ## Installation locale
 
@@ -158,9 +159,11 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator export-cad-ir examples/simple_multilayer_grid_scene.json --output $env:TEMP\bgig-simple-multilayer-grid-scene.cad-ir.json
 ```
 
-Pointer ensuite `cad_ir_path.txt` vers ce fichier. Par defaut, P7-M001 genere
-aussi la vue eclatee basique par occurrences liees ; pour revenir au compact
-seul, creer `exploded_view_mode.txt` avec `compact_only`.
+Lancer ensuite l'add-in et renseigner ce chemin dans le champ `CAD IR JSON path`
+de la commande BGIG. Par defaut, P7-M001 genere aussi la vue eclatee basique par
+occurrences liees ; pour revenir au compact seul, choisir `compact_only` dans la
+liste `Generation mode`. Les fichiers `cad_ir_path.txt` et
+`exploded_view_mode.txt` restent supportes uniquement comme valeurs par defaut.
 
 Pour tester les cavites rectangulaires P6-M001, generer plutot une CAD IR de
 tray :
@@ -170,12 +173,11 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator export-cad-ir examples/simple_tray.json --output $env:TEMP\bgig-simple-tray-cad-ir.json
 ```
 
-Pour une installation locale Fusion, utiliser l'une des deux methodes :
-
-1. Copier ensuite le fichier genere dans le dossier `BoardGameInsertGenerator`
-   installe sous le nom `cad_ir_input.json`.
-2. Laisser le fichier genere ailleurs et ecrire son chemin dans
-   `cad_ir_path.txt`, place dans le dossier `BoardGameInsertGenerator` installe.
+Pour une installation locale Fusion, utiliser maintenant la methode UI : garder le
+fichier genere ou vous voulez, lancer l'add-in, puis coller son chemin dans
+`CAD IR JSON path`. Copier sous `cad_ir_input.json` ou renseigner
+`cad_ir_path.txt` reste possible comme fallback de compatibilite, mais ce n'est
+plus le flux utilisateur recommande.
 
 ## Cas Zero Doc
 
@@ -194,32 +196,34 @@ Procedure :
 1. Installer l'add-in avec la commande PowerShell ci-dessus.
 2. Ouvrir Fusion 360.
 3. Creer un nouveau design vide ou ouvrir un design de test.
-4. Verifier que `cad_ir_input.json` est present dans le dossier AddIns installe,
-   ou que `cad_ir_path.txt` pointe vers un JSON CAD IR exporte et existant.
+4. Exporter ou localiser le fichier CAD IR JSON a tester.
 5. Lancer `Board Game Insert Generator` depuis `Utilities > Add-ins`.
-6. Verifier le message final : il doit annoncer le nombre de reference outlines,
-   blank bodies et rectangular cavity cuts crees dans le composant racine.
-7. Dans le navigateur Fusion, verifier dans le composant racine la presence de
+6. Dans la commande `Generate Board Game Insert`, renseigner `CAD IR JSON path`,
+   choisir `compact_only` ou `compact_and_exploded`, puis valider.
+7. Verifier le message final : il doit annoncer le fichier CAD IR charge, le mode
+   de generation, les composants modules, occurrences, cuts et refus.
+8. Dans le navigateur Fusion, verifier dans le composant racine la presence de
    sketches nommes :
    - `BGIG box reference - not printable outline` ;
    - `cards-main-01 - Main cards footprint` ;
    - `dice-01 - Dice tray footprint`.
-8. Verifier les bodies nommes :
+9. Verifier les bodies nommes :
    - `cards-main-01 rectangular blank` ;
    - `dice-01 rectangular blank`.
-9. Avec `Inspect > Measure`, verifier les dimensions attendues des blanks P4 :
+10. Avec `Inspect > Measure`, verifier les dimensions attendues des blanks P4 :
    - `cards-main-01` : `68.9 x 99.2 x 44.0 mm` ;
    - `dice-01` : `59.7 x 59.2 x 29.0 mm`.
-10. Pour le smoke test P6-M001, pointer `cad_ir_path.txt` vers la CAD IR generee
-    depuis `examples/simple_tray.json`, relancer l'add-in et verifier :
+11. Pour le smoke test P6-M001, generer une CAD IR depuis
+    `examples/simple_tray.json`, lancer l'add-in, renseigner son chemin dans
+    `CAD IR JSON path`, choisir le mode voulu et verifier :
     - message final : `Blank bodies: 1` et `Rectangular cavity cuts: 1` ;
     - body cible : `token-tray-01 rectangular blank` ;
     - footprint de cavite attendue : `62.0 x 52.0 mm` ;
     - profondeur de coupe attendue : `20.0 mm` ;
     - plancher conserve attendu : `3.0 mm`.
-11. Pour le smoke test P6-M002, generer une CAD IR depuis
-    `examples/simple_finger_notch_tray.json`, pointer `cad_ir_path.txt` vers ce
-    fichier, relancer l'add-in et verifier :
+12. Pour le smoke test P6-M002, generer une CAD IR depuis
+    `examples/simple_finger_notch_tray.json`, lancer l'add-in, renseigner son
+    chemin dans `CAD IR JSON path`, choisir le mode voulu et verifier :
     - message final : `Blank bodies: 1`, `Rectangular cavity cuts: 1`,
       `Simple finger notch features planned: 1`, `Simple finger notch sketches: 1`,
       `Simple top-open finger notch cuts: 1` et `Finger notch topology: top-open rectangular wall cut` ;
@@ -236,9 +240,9 @@ Procedure :
     - cavite conservee : `62.0 x 52.0 x 20.0 mm`.
 
 13. Pour le smoke test compact P11-M001 avec le code courant, generer une CAD IR
-    depuis `examples/simple_asset_executable_plan.json`, pointer `cad_ir_path.txt`
-    vers ce fichier, mettre `exploded_view_mode.txt` a `compact_only`, relancer
-    l'add-in et verifier :
+    depuis `examples/simple_asset_executable_plan.json`, lancer l'add-in,
+    renseigner son chemin dans `CAD IR JSON path`, choisir `compact_only` et
+    verifier :
     - message final : `CAD IR module blanks planned: 1`,
       `Grid-positioned asset modules planned: 1`, `Module components planned: 2`,
       `Compact occurrences planned: 2`, `Exploded occurrences planned: 0`,
@@ -248,7 +252,7 @@ Procedure :
     - composant asset-first attendu : `Grid placed Grouped candidate for tokens` ;
     - occurrence compacte asset-first attendue a l'origine `X 30.0 mm`,
       `Y 0.0 mm`, `Z 0.0 mm` ;
-    - dimensions attendues du module asset-first : `30.0 x 30.0 x 10.0 mm` ;
+    - dimensions attendues du module asset-first : `25.6 x 25.6 x 9.8 mm` ;
     - verifier que les occurrences compactes restent presentes et aux dimensions attendues.
 14. Pour le smoke test P7-M001V4, garder la meme CAD IR
     `examples/simple_asset_executable_plan.json`, laisser le mode par defaut
@@ -277,7 +281,7 @@ Procedure :
       `Y 0.0 mm`, `Z 0.0 mm` ;
     - origine attendue de l'occurrence eclatee asset-first : `X 179.2 mm`,
       `Y 0.0 mm`, `Z 0.0 mm` ;
-    - dimensions attendues du module asset-first : `30.0 x 30.0 x 10.0 mm` ;
+    - dimensions attendues du module asset-first : `25.6 x 25.6 x 9.8 mm` ;
     - verifier dans le browser Fusion que l'occurrence compacte et l'occurrence
       eclatee d'un meme module referencent le meme composant source ;
     - modifier visuellement ou renommer un element dans la definition du composant
@@ -285,10 +289,10 @@ Procedure :
       definition ;
     - verifier que Fusion n'a pas cree de fillet, fond arrondi, module composite
       ou export STL/3MF.
-15. Pour le smoke test P11-M002V, generer une CAD IR depuis
-    `examples/simple_multilayer_grid_scene.json`, pointer `cad_ir_path.txt` vers
-    ce fichier, laisser le mode `compact_and_exploded`, relancer l'add-in dans
-    un document Assembly-compatible et verifier :
+15. Pour le smoke test P11-M003V multi-layer, generer une CAD IR depuis
+    `examples/simple_multilayer_grid_scene.json`, lancer l'add-in dans un
+    document Assembly-compatible, renseigner son chemin dans `CAD IR JSON path`,
+    choisir `compact_and_exploded` et verifier :
     - message final attendu : `Grid-positioned asset modules planned: 2`,
       `Multi-layer grid modules planned: 1`, `Grid modules with Z placement: 1`,
       `Grid module height variants: 2`, `Module components planned: 3`,
@@ -300,17 +304,21 @@ Procedure :
     - composants asset-first attendus : `Grid placed Candidate module for Flat token field`
       et `Grid placed Candidate module for Tall dice column` ;
     - module bas attendu : origine `X 30.0 mm`, `Y 0.0 mm`, `Z 0.0 mm`,
-      dimensions `90.0 x 90.0 x 10.0 mm` ;
+      dimensions imprimables `61.6 x 61.6 x 7.8 mm` ;
+    - span grille theorique du module bas : `90.0 x 90.0 x 10.0 mm` ;
     - module haut attendu : origine `X 0.0 mm`, `Y 0.0 mm`, `Z 10.0 mm`,
-      dimensions `60.0 x 60.0 x 20.0 mm` ;
+      dimensions imprimables `37.6 x 37.6 x 17.8 mm` ;
+    - span grille theorique du module haut : `60.0 x 60.0 x 20.0 mm` ;
     - occurrences compactes et eclatees visibles, liees aux memes composants
       sources ;
     - aucun solveur, module composite, fillet, geometrie courbe ou export STL/3MF.
 16. Noter tout ecart, message d'erreur ou comportement Zero Doc dans un futur log
     de validation.
 
-Ce smoke test valide uniquement la creation CAD minimale dans Fusion. Depuis la
-correction P7, la vue eclatee exige des composants/occurrences Fusion lies. Les
+Ce smoke test valide uniquement la creation CAD minimale dans Fusion. Depuis
+P11-M003, verifier aussi que les modules asset-first generes utilisent les tailles
+imprimables et non les spans grille bruts. Depuis la correction P7, la vue
+eclatee exige des composants/occurrences Fusion lies. Les
 noms lisibles sont portes par les composants sources et par le message de
 mapping ; l'add-in ne tente plus de renommer directement les occurrences. Un
 document Part Design est non compatible avec cette vue liee : l'add-in doit
