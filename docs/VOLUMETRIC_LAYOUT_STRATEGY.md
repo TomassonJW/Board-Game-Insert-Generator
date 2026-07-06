@@ -89,3 +89,14 @@ puis places par balayage deterministe `z/y/x` sur le premier span libre.
 Les cellules deja occupees par `module_placements`, `reserved` ou `forbidden`
 sont considerees indisponibles. Le placement produit des metadata de rapport et
 CAD IR uniquement ; aucune geometrie Fusion volumetrique n'est generee.
+
+## Consommation Fusion compacte P11-M001
+
+P11-M001 branche les placements grille deja decides par le coeur Python sur la
+vue compacte Fusion. L'adaptateur consomme `metadata.executable_asset_plan` et
+cree uniquement des bodies rectangulaires positionnes par `origin_mm` / `size_mm`.
+Il ne cherche pas de nouveau placement et ne modifie pas la grille.
+
+La validation Fusion manuelle reste obligatoire : cette mission code la generation
+compacte, mais ne valide ni l'empilement physique, ni l'impression, ni une vue
+eclatee.

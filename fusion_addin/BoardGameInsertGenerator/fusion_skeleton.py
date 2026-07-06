@@ -25,6 +25,7 @@ PLAN_STATUS_PLANNED_ONLY = "planned_only"
 CAVITY_CUT_OPERATION_KIND = "subtract_rectangular_cavity"
 CAVITY_FEATURE_OPERATION_KIND = "describe_cavity_feature"
 FINGER_NOTCH_CUT_OPERATION_KIND = "rectangular_finger_notch_cut"
+GRID_PLACED_BLANK_OPERATION_KIND = "create_grid_positioned_asset_blank"
 SUPPORTED_SIMPLE_FINGER_NOTCH_KINDS = (
     "finger_notch",
     "side_notch",
@@ -130,6 +131,28 @@ class FusionSolidPlan:
             "printable": self.printable,
             "operation_kind": self.operation_kind,
             "validation_status": self.validation_status,
+        }
+
+
+@dataclass(frozen=True)
+class FusionGridModuleRejection:
+    """One generated asset module refused before Fusion geometry creation."""
+
+    module_id: str | None
+    candidate_id: str | None
+    code: str
+    message: str
+    constraint_ref: str
+    actionable: str
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "module_id": self.module_id,
+            "candidate_id": self.candidate_id,
+            "code": self.code,
+            "message": self.message,
+            "constraint_ref": self.constraint_ref,
+            "actionable": self.actionable,
         }
 
 
@@ -240,19 +263,23 @@ class FusionGenerationPlan:
     project_name: str
     reference_box: FusionSolidPlan
     blanks: tuple[FusionSolidPlan, ...]
+    grid_positioned_blanks: tuple[FusionSolidPlan, ...] = ()
+    rejected_grid_modules: tuple[FusionGridModuleRejection, ...] = ()
     cavity_cuts: tuple[FusionCavityCutPlan, ...] = ()
     finger_notch_cuts: tuple[FusionFingerNotchCutPlan, ...] = ()
     validation_status: str = FUSION_MANUAL_VALIDATION_REQUIRED
 
     @property
     def created_object_count(self) -> int:
-        return 1 + len(self.blanks) + len(self.cavity_cuts) + len(self.finger_notch_cuts)
+        return 1 + len(self.blanks) + len(self.grid_positioned_blanks) + len(self.cavity_cuts) + len(self.finger_notch_cuts)
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "project_name": self.project_name,
             "reference_box": self.reference_box.to_dict(),
             "blanks": [blank.to_dict() for blank in self.blanks],
+            "grid_positioned_blanks": [blank.to_dict() for blank in self.grid_positioned_blanks],
+            "rejected_grid_modules": [module.to_dict() for module in self.rejected_grid_modules],
             "cavity_cuts": [cut.to_dict() for cut in self.cavity_cuts],
             "finger_notch_cuts": [cut.to_dict() for cut in self.finger_notch_cuts],
             "validation_status": self.validation_status,
@@ -568,12 +595,202 @@ def generation_plan_from_cad_ir(payload: Any) -> FusionGenerationPlan:
             _finger_notch_cut_plans(component_id, component_name, blank, body, operations)
         )
 
+    grid_positioned_blanks, rejected_grid_modules = _grid_positioned_asset_blanks_from_metadata(
+        metadata if isinstance(metadata, dict) else {},
+        reference_box,
+        blanks,
+    )
+
     return FusionGenerationPlan(
         project_name=project_name,
         reference_box=reference_box,
         blanks=tuple(blanks),
+        grid_positioned_blanks=tuple(grid_positioned_blanks),
+        rejected_grid_modules=tuple(rejected_grid_modules),
         cavity_cuts=tuple(cavity_cuts),
         finger_notch_cuts=tuple(finger_notch_cuts),
+    )
+
+
+
+def _grid_positioned_asset_blanks_from_metadata(
+    metadata: dict[str, Any],
+    reference_box: FusionSolidPlan,
+    existing_blanks: list[FusionSolidPlan],
+) -> tuple[list[FusionSolidPlan], list[FusionGridModuleRejection]]:
+    plan = metadata.get("executable_asset_plan")
+    if plan is None:
+        return [], []
+    if not isinstance(plan, dict):
+        raise FusionSkeletonError("CAD IR metadata.executable_asset_plan must be an object when present.")
+
+    generated_by_id = _generated_asset_modules_by_id(plan)
+    rejected = _rejected_grid_modules_from_plan(plan)
+    placements = plan.get("placements", [])
+    if not isinstance(placements, list):
+        raise FusionSkeletonError("CAD IR executable_asset_plan.placements must be a list.")
+
+    grid_metadata = metadata.get("volumetric_grid")
+    grid_size_units = _grid_size_units_from_metadata(grid_metadata) if grid_metadata is not None else None
+    occupied = list(existing_blanks)
+    grid_blanks: list[FusionSolidPlan] = []
+    for index, placement in enumerate(placements):
+        if not isinstance(placement, dict):
+            raise FusionSkeletonError(f"CAD IR executable_asset_plan.placements[{index}] must be an object.")
+        if placement.get("status") not in (None, "placed"):
+            continue
+
+        module_id = _required_text(placement, "module_id", f"executable_asset_plan placement[{index}]")
+        candidate_id = _required_text(placement, "candidate_id", f"executable_asset_plan placement[{index}]")
+        module = generated_by_id.get(module_id)
+        if module is None:
+            raise FusionSkeletonError(
+                f"Grid placement for module {module_id!r} has no matching generated module metadata."
+            )
+
+        origin_units = _grid_units_from_payload(placement, "origin_units", f"placement {module_id} origin_units")
+        size_units = _grid_units_from_payload(placement, "size_units", f"placement {module_id} size_units")
+        if grid_size_units is not None:
+            _validate_grid_span(origin_units, size_units, grid_size_units, module_id)
+
+        origin_mm = _vector_from_payload(placement, "origin_mm", f"placement {module_id} origin_mm")
+        size_mm = _positive_vector_from_payload(placement, "size_mm", f"placement {module_id} size_mm")
+        source_size_mm = _positive_vector_from_payload(placement, "source_size_mm", f"placement {module_id} source_size_mm")
+        _validate_grid_blank_bounds(reference_box, origin_mm, size_mm, module_id)
+        _validate_source_size_inside_grid_size(source_size_mm, size_mm, module_id)
+
+        blank = FusionSolidPlan(
+            cad_id=_fusion_name(f"grid-placement:{module_id}"),
+            component_name=_fusion_name(f"Grid placed {module.get('name') or module_id}"),
+            body_name=_fusion_name(f"{module_id} grid positioned rectangular blank"),
+            origin_mm=origin_mm,
+            size_mm=size_mm,
+            role="generated_asset_grid_blank",
+            printable=True,
+            operation_kind=GRID_PLACED_BLANK_OPERATION_KIND,
+        )
+        collision = _first_colliding_solid(blank, occupied)
+        if collision is not None:
+            raise FusionSkeletonError(
+                f"Grid placement for module {module_id!r} collides with {collision.body_name!r}."
+            )
+        occupied.append(blank)
+        grid_blanks.append(blank)
+
+    return grid_blanks, rejected
+
+
+def _generated_asset_modules_by_id(plan: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    generated_modules = plan.get("generated_modules", [])
+    if not isinstance(generated_modules, list):
+        raise FusionSkeletonError("CAD IR executable_asset_plan.generated_modules must be a list.")
+    modules: dict[str, dict[str, Any]] = {}
+    for index, module in enumerate(generated_modules):
+        if not isinstance(module, dict):
+            raise FusionSkeletonError(f"CAD IR executable_asset_plan.generated_modules[{index}] must be an object.")
+        module_id = _required_text(module, "module_id", f"generated module[{index}]")
+        modules[module_id] = module
+    return modules
+
+
+def _rejected_grid_modules_from_plan(plan: dict[str, Any]) -> list[FusionGridModuleRejection]:
+    rejected_payload = plan.get("rejected_modules", [])
+    if not isinstance(rejected_payload, list):
+        raise FusionSkeletonError("CAD IR executable_asset_plan.rejected_modules must be a list.")
+    rejected: list[FusionGridModuleRejection] = []
+    for index, entry in enumerate(rejected_payload):
+        if not isinstance(entry, dict):
+            raise FusionSkeletonError(f"CAD IR executable_asset_plan.rejected_modules[{index}] must be an object.")
+        rejected.append(
+            FusionGridModuleRejection(
+                module_id=_optional_text(entry, "module_id"),
+                candidate_id=_optional_text(entry, "candidate_id"),
+                code=_required_text(entry, "code", f"rejected module[{index}]"),
+                message=_required_text(entry, "message", f"rejected module[{index}]"),
+                constraint_ref=_required_text(entry, "constraint_ref", f"rejected module[{index}]"),
+                actionable=_required_text(entry, "actionable", f"rejected module[{index}]"),
+            )
+        )
+    return rejected
+
+
+def _grid_size_units_from_metadata(grid_metadata: Any) -> tuple[int, int, int]:
+    if not isinstance(grid_metadata, dict):
+        raise FusionSkeletonError("CAD IR metadata.volumetric_grid must be an object when present.")
+    size_units = grid_metadata.get("size_units")
+    if not isinstance(size_units, dict):
+        raise FusionSkeletonError("CAD IR metadata.volumetric_grid.size_units must be an object.")
+    return (
+        _required_positive_int(size_units, "x", "volumetric_grid.size_units"),
+        _required_positive_int(size_units, "y", "volumetric_grid.size_units"),
+        _required_positive_int(size_units, "z", "volumetric_grid.size_units"),
+    )
+
+
+def _grid_units_from_payload(source: dict[str, Any], key: str, label: str) -> tuple[int, int, int]:
+    value = source.get(key)
+    if not isinstance(value, dict):
+        raise FusionSkeletonError(f"CAD IR {label} must be an object.")
+    return (
+        _required_non_negative_int(value, "x", label),
+        _required_non_negative_int(value, "y", label),
+        _required_non_negative_int(value, "z", label),
+    )
+
+
+def _validate_grid_span(
+    origin_units: tuple[int, int, int],
+    size_units: tuple[int, int, int],
+    grid_size_units: tuple[int, int, int],
+    module_id: str,
+) -> None:
+    for axis_index, axis in enumerate(("x", "y", "z")):
+        if size_units[axis_index] <= 0:
+            raise FusionSkeletonError(f"Grid placement for module {module_id!r} has non-positive {axis} size.")
+        if origin_units[axis_index] + size_units[axis_index] > grid_size_units[axis_index]:
+            raise FusionSkeletonError(
+                f"Grid placement for module {module_id!r} exceeds volumetric grid on {axis}."
+            )
+
+
+def _validate_grid_blank_bounds(
+    reference_box: FusionSolidPlan,
+    origin_mm: FusionVectorMm,
+    size_mm: FusionVectorMm,
+    module_id: str,
+) -> None:
+    if origin_mm.x < reference_box.origin_mm.x or origin_mm.y < reference_box.origin_mm.y or origin_mm.z < reference_box.origin_mm.z:
+        raise FusionSkeletonError(f"Grid placement for module {module_id!r} starts outside the reference box.")
+    if origin_mm.x + size_mm.x > reference_box.origin_mm.x + reference_box.size_mm.x:
+        raise FusionSkeletonError(f"Grid placement for module {module_id!r} exceeds reference box width.")
+    if origin_mm.y + size_mm.y > reference_box.origin_mm.y + reference_box.size_mm.y:
+        raise FusionSkeletonError(f"Grid placement for module {module_id!r} exceeds reference box depth.")
+    if origin_mm.z + size_mm.z > reference_box.origin_mm.z + reference_box.size_mm.z:
+        raise FusionSkeletonError(f"Grid placement for module {module_id!r} exceeds reference box height.")
+
+
+def _validate_source_size_inside_grid_size(source_size_mm: FusionVectorMm, grid_size_mm: FusionVectorMm, module_id: str) -> None:
+    if source_size_mm.x > grid_size_mm.x or source_size_mm.y > grid_size_mm.y or source_size_mm.z > grid_size_mm.z:
+        raise FusionSkeletonError(
+            f"Grid placement for module {module_id!r} is smaller than its source module dimensions."
+        )
+
+
+def _first_colliding_solid(candidate: FusionSolidPlan, solids: list[FusionSolidPlan]) -> FusionSolidPlan | None:
+    for solid in solids:
+        if _solids_overlap(candidate, solid):
+            return solid
+    return None
+
+
+def _solids_overlap(left: FusionSolidPlan, right: FusionSolidPlan) -> bool:
+    return not (
+        left.origin_mm.x + left.size_mm.x <= right.origin_mm.x
+        or right.origin_mm.x + right.size_mm.x <= left.origin_mm.x
+        or left.origin_mm.y + left.size_mm.y <= right.origin_mm.y
+        or right.origin_mm.y + right.size_mm.y <= left.origin_mm.y
+        or left.origin_mm.z + left.size_mm.z <= right.origin_mm.z
+        or right.origin_mm.z + right.size_mm.z <= left.origin_mm.z
     )
 
 
@@ -1144,6 +1361,22 @@ def _required_number(source: dict[str, Any], key: str, label: str) -> float:
     if number < 0:
         raise FusionSkeletonError(f"CAD IR {label} {key} must be non-negative.")
     return number
+
+
+def _required_non_negative_int(source: dict[str, Any], key: str, label: str) -> int:
+    value = source.get(key)
+    if not isinstance(value, int) or isinstance(value, bool):
+        raise FusionSkeletonError(f"CAD IR {label} must contain integer {key}.")
+    if value < 0:
+        raise FusionSkeletonError(f"CAD IR {label} {key} must be non-negative.")
+    return value
+
+
+def _required_positive_int(source: dict[str, Any], key: str, label: str) -> int:
+    value = _required_non_negative_int(source, key, label)
+    if value <= 0:
+        raise FusionSkeletonError(f"CAD IR {label} {key} must be greater than zero.")
+    return value
 
 
 def _required_positive_number(source: dict[str, Any], key: str, label: str) -> float:

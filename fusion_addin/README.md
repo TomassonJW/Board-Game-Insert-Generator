@@ -14,9 +14,10 @@ CAD IR est stabilise : l'add-in peut consommer `cad_ir_input.json` dans son
 dossier ou un chemin declare dans `cad_ir_path.txt`. Depuis `P6-M001`, l'add-in
 code aussi les cavites rectangulaires simples depuis `subtract_rectangular_cavity`.
 Depuis `P6-M002`, il code les encoches simples de paroi depuis
-`describe_cavity_feature`, sous forme de coupes rectangulaires. Cette generation
-d'encoches reste a inspecter manuellement dans Fusion avant d'etre consideree
-validee.
+`describe_cavity_feature`, sous forme de coupes rectangulaires. Depuis
+`P11-M001`, il code aussi la vue compacte de modules asset-first positionnes par
+`metadata.executable_asset_plan`. Cette generation compacte reste a inspecter
+manuellement dans Fusion avant d'etre consideree validee.
 
 Ce que l'add-in cree maintenant :
 
@@ -26,6 +27,7 @@ Ce que l'add-in cree maintenant :
 - un corps rectangulaire extrude par blank ;
 - une coupe rectangulaire verticale par operation `subtract_rectangular_cavity` ;
 - une coupe rectangulaire de paroi par encoche simple supportee ;
+- un body rectangulaire par module asset-first place par grille, si la CAD IR contient `metadata.executable_asset_plan.placements` ;
 - des noms lisibles pour sketches, features et bodies.
 
 Ce que l'add-in ne cree pas :
@@ -133,6 +135,15 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator export-cad-ir examples/simple_box.json --output fusion_addin/BoardGameInsertGenerator/cad_ir_input.json
 ```
 
+Pour tester les placements grille P11-M001, generer une CAD IR asset-first :
+
+```powershell
+$env:PYTHONPATH = "src"
+python -m board_game_insert_generator export-cad-ir examples/simple_asset_executable_plan.json --output $env:TEMP\bgig-simple-asset-executable-plan.cad-ir.json
+```
+
+Pointer ensuite `cad_ir_path.txt` vers ce fichier.
+
 Pour tester les cavites rectangulaires P6-M001, generer plutot une CAD IR de
 tray :
 
@@ -205,7 +216,21 @@ Procedure :
     - profil top-open attendu : bas `Z 13.0 mm`, haut au-dessus du body `Z 24.0 mm` ;
     - taille de coupe CAD IR : `18.0 x 4.0 x 10.0 mm` ;
     - cavite conservee : `62.0 x 52.0 x 20.0 mm`.
-12. Noter tout ecart, message d'erreur ou comportement Zero Doc dans un futur log
+
+13. Pour le smoke test P11-M001, generer une CAD IR depuis
+    `examples/simple_asset_executable_plan.json`, pointer `cad_ir_path.txt` vers
+    ce fichier, relancer l'add-in et verifier :
+    - message final : `CAD IR module blanks planned: 1`,
+      `Grid-positioned asset modules planned: 1`, `Blank bodies: 2`,
+      `Grid-positioned module bodies: 1`, `Grid-positioned modules refused: 0` ;
+    - body manuel existant : `manual-reference-bin-01 rectangular blank` ;
+    - body asset-first attendu : `generated - asset-group-candidate - tokens - store - exact grid positioned rectangular blank` ;
+    - position attendue du body asset-first : origine `X 30.0 mm`, `Y 0.0 mm`,
+      `Z 0.0 mm` ;
+    - dimensions attendues du body asset-first : `30.0 x 30.0 x 10.0 mm` ;
+    - verifier que Fusion n'a pas cree de vue eclatee, fillet, fond arrondi,
+      module composite ou export STL/3MF.
+14. Noter tout ecart, message d'erreur ou comportement Zero Doc dans un futur log
     de validation.
 
 Ce smoke test valide uniquement la creation CAD minimale dans Fusion. Il utilise
@@ -238,6 +263,7 @@ La conversion actuelle stabilisee :
   pour les blanks ;
 - cree des coupes rectangulaires verticales simples pour `subtract_rectangular_cavity` ;
 - cree des coupes rectangulaires de paroi simples pour les encoches supportees ;
+- cree des bodies rectangulaires compacts pour les modules generes asset-first deja places par la CAD IR ;
 - marque la validation Fusion comme manuelle.
 
 Toute mission suivante qui elargit le perimetre Fusion, notamment vers demi-lunes

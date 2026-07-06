@@ -223,6 +223,8 @@ La mission `P10-M007` ajoute un exemple de variante asset-candidate rejetee par 
 
 La mission `P10-M008` produit maintenant un `executable_asset_plan` depuis la variante asset recommandee : modules generes abstraits, placement grille greedy X/Y/Z, dimensions couvertes en millimetres, score et refus actionnables. La sortie est exposee dans les rapports Markdown/JSON et dans `metadata.executable_asset_plan` CAD IR, sans modifier `modules` et sans generation Fusion.
 
+La mission `P11-M001` code la premiere vue compacte Fusion depuis `metadata.executable_asset_plan` : les modules asset-first generes sont crees comme bodies rectangulaires dans le composant racine, positionnes par `origin_mm` / `size_mm` des placements grille X/Y/Z. Les garde-fous hors Fusion couvrent dimensions manquantes, span hors grille, sortie de boite et collision manifeste. Statut : generation codee, `manual validation required` dans Fusion, `print-validated: false`.
+
 ## Phase active
 
 Phase active : **P8 volumetric planner abstrait / gate avant generation Fusion volumetrique**.
@@ -237,7 +239,7 @@ volumetrique declarative, layers, reservations, supports abstraits et metadata C
 La North Star cible un
 generateur volumetrique asset-first, pilote par capabilities.
 
-Prochaine action recommandee : gate humaine avant solveur plus automatique, backtracking, generation executable de modules ou nouvelle generation Fusion. Une nouvelle gate humaine est requise avant toute generation Fusion
+Prochaine action recommandee : smoke test humain Fusion P11-M001V avant toute nouvelle generation Fusion, vue eclatee, module composite, solveur plus automatique ou backtracking. Une nouvelle gate humaine est requise avant toute generation Fusion
 reelle liee a la grille 3D, aux layers, aux vues eclatees ou aux features
 avancees.
 
@@ -307,6 +309,7 @@ avancees.
 - Grouping P10-M006 borne des assets compatibles, expose par `source_asset_ids`.
 - Exemple P10-M007 de variante asset rejetee avec `rejection_reasons` structurees.
 - Plan executable P10-M008 depuis variante asset recommandee : modules generes abstraits, placement greedy grille et metadata CAD IR.
+- Vue compacte Fusion P11-M001 depuis placements grille : codee, a tester manuellement dans Fusion.
 - Criteres de scoring P10-M001 documentes, sans solveur executable.
 - Comparaison P10-M002 report-only de variantes deterministes existantes dans les rapports.
 - Raisons de rejet P10-M003 structurees et actionnables pour les variantes non generables.
@@ -393,10 +396,10 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant `P10-M008 - Plan concret asset-first et placement grille greedy` :
+Derniere verification pendant `P11-M001 - Vue compacte Fusion depuis placements grille` :
 
-- `python -m unittest discover -s tests` : OK, 133 tests passes.
-- CLI Markdown/JSON/export CAD IR : OK sur `examples/simple_box.json`, `examples/simple_tray.json`, `examples/simple_finger_notch_tray.json`, `examples/simple_3d_grid.json`, `examples/simple_3d_reservations.json`, `examples/simple_assets.json`, `examples/simple_asset_grouping.json`, `examples/simple_asset_rejected_variant.json` et `examples/simple_asset_executable_plan.json`.
+- `python -m unittest discover -s tests` : OK, 138 tests passes.
+- CLI Markdown/JSON/export CAD IR : OK sur les exemples minimaux requis, dont `simple_asset_executable_plan.json`.
 - `python -m board_game_insert_generator examples/simple_asset_executable_plan.json --format json` : OK, `executable_asset_plan.status = placed` et `placed_module_count = 1`.
 - `python -m board_game_insert_generator export-cad-ir examples/simple_asset_executable_plan.json --output tmp_validation/simple_asset_executable_plan.cad-ir.json` : OK, schema `cad_ir.v0`, metadata `executable_asset_plan`, 1 composant.
 - `git diff --check` : OK.

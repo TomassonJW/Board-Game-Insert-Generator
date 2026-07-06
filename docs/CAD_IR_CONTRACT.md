@@ -211,9 +211,11 @@ plusieurs `source_asset_ids` quand un grouping deterministe a ete applique.
 Depuis P10-M007, une variante rejetee peut aussi etre transportee dans cette
 metadata avec `rejection_reasons` et `recommended_asset_candidate_variant: null`.
 Depuis P10-M008, `metadata.executable_asset_plan` transporte aussi les modules
-generes abstraits, leurs placements grille X/Y/Z et leurs refus eventuels. Ces donnees restent abstraites : elles indiquent les
-intentions de support, d'accessibilite et de retrait, mais ne creent aucune
-operation Fusion et ne valident aucune portance physique.
+generes abstraits, leurs placements grille X/Y/Z et leurs refus eventuels. Depuis
+P11-M001, l'adaptateur Fusion peut consommer cette metadata pour creer une vue
+compacte de bodies rectangulaires positionnes par `origin_mm` et `size_mm`. Ces
+donnees ne valident aucune portance physique et ne doivent pas etre utilisees par
+Fusion pour recalculer le solveur.
 
 Cette metadata ne change pas `schema_version`, ne cree aucune operation Fusion et
 ne remplace pas les dimensions `theoretical_*` / `printable_*` des bodies. Un
@@ -258,7 +260,9 @@ Le contrat V0 est valide par tests unitaires :
   `describe_cavity_feature` depuis `examples/simple_finger_notch_tray.json`.
 
 La validation automatisee ne couvre pas l'execution reelle dans Fusion 360, les
-exports STL/3MF ou l'impression reelle.
+exports STL/3MF ou l'impression reelle. Depuis P11-M001, elle couvre aussi le
+plan de bodies asset-first positionnes par grille, y compris conversion X/Y/Z,
+collisions manifestes, sortie de boite et refus transportes.
 
 ## Gate suivante
 

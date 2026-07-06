@@ -229,6 +229,17 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Gate : si contrat incompatible ou generation Fusion reelle.
 - Statut : `todo`.
 
+### P11-M001 - Generer une vue compacte Fusion depuis placements grille
+
+- Capability : C-FUSION-COMPACT, C-GRID-3D, C-CAD-IR.
+- Milestone : M3 CAD pipeline / M7 Volumetric planner.
+- Objectif : consommer `metadata.executable_asset_plan` pour creer des modules rectangulaires positionnes X/Y/Z dans Fusion.
+- Livrable : add-in Fusion enrichi, plan hors Fusion teste, ADR, procedure de smoke test manuel.
+- Criteres d'acceptation : Fusion ne recalcule pas le solveur ; bodies positionnes par CAD IR ; coeur Python sans `adsk` ; validation manuelle requise.
+- Tests : unitaires hors Fusion, CLI/export CAD IR, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
+- Gate : validation humaine fournie le 2026-07-06 pour cette generation compacte uniquement.
+- Statut : `manual_validation_required`, generation codee.
+
 ### P7-M002 - Generer une vue Fusion eclatee minimale
 
 - Capability : C-FUSION-EXPLODED.
@@ -402,7 +413,7 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 
 ## Phase 11 - Modules composites et formes soudees
 
-### P11-M001 - Representer les modules composites par primitives soudees
+### P11-C001 - Representer les modules composites par primitives soudees
 
 - Capability : C-COMPOSITE.
 - Milestone : M9 Composite modules.
@@ -413,7 +424,7 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Gate : modules composites.
 - Statut : `todo`.
 
-### P11-M002 - Generer les unions Fusion pour composites simples
+### P11-C002 - Generer les unions Fusion pour composites simples
 
 - Capability : C-COMPOSITE, C-FUSION-COMPACT.
 - Milestone : M9 Composite modules.

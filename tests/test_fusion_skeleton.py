@@ -26,6 +26,7 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     FUSION_MANUAL_VALIDATION_REQUIRED,
     FUSION_SKETCH_PLANE_XZ,
     FUSION_SKETCH_PLANE_YZ,
+    GRID_PLACED_BLANK_OPERATION_KIND,
     PLAN_STATUS_PLANNED_ONLY,
     FusionSkeletonError,
     cad_ir_input_guidance,
@@ -293,6 +294,65 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(cut.feature_position_mm.to_dict(), {"x": 22.0, "y": 0.0, "z": 8.0})
         self.assertEqual(cut.geometry_approximation, "rectangular_bounding_cut")
 
+
+    def test_builds_grid_positioned_asset_blank_plan_from_executable_asset_plan(self) -> None:
+        payload = _cad_ir_payload_from_example("simple_asset_executable_plan.json")
+
+        plan = generation_plan_from_cad_ir(payload)
+
+        self.assertEqual(len(plan.blanks), 1)
+        self.assertEqual(len(plan.grid_positioned_blanks), 1)
+        self.assertEqual(len(plan.rejected_grid_modules), 0)
+        self.assertEqual(plan.created_object_count, 3)
+        grid_blank = plan.grid_positioned_blanks[0]
+        self.assertEqual(grid_blank.role, "generated_asset_grid_blank")
+        self.assertEqual(grid_blank.operation_kind, GRID_PLACED_BLANK_OPERATION_KIND)
+        self.assertEqual(grid_blank.component_name, "Grid placed Grouped candidate for tokens")
+        self.assertEqual(grid_blank.origin_mm.to_dict(), {"x": 30.0, "y": 0.0, "z": 0.0})
+        self.assertEqual(grid_blank.size_mm.to_dict(), {"x": 30.0, "y": 30.0, "z": 10.0})
+        self.assertEqual(plan.to_dict()["grid_positioned_blanks"][0]["body_name"], grid_blank.body_name)
+
+
+    def test_grid_positioned_asset_blank_supports_z_layer_origin(self) -> None:
+        payload = _cad_ir_payload_from_example("simple_asset_executable_plan.json")
+        placement = payload["metadata"]["executable_asset_plan"]["placements"][0]
+        placement["origin_units"] = {"x": 1, "y": 0, "z": 1}
+        placement["origin_mm"] = {"x": 30.0, "y": 0.0, "z": 10.0}
+
+        plan = generation_plan_from_cad_ir(payload)
+
+        grid_blank = plan.grid_positioned_blanks[0]
+        self.assertEqual(grid_blank.origin_mm.to_dict(), {"x": 30.0, "y": 0.0, "z": 10.0})
+        self.assertEqual(grid_blank.size_mm.to_dict(), {"x": 30.0, "y": 30.0, "z": 10.0})
+
+    def test_transports_refused_grid_modules_without_creating_grid_blank(self) -> None:
+        payload = _cad_ir_payload_from_example("simple_asset_grouping.json")
+
+        plan = generation_plan_from_cad_ir(payload)
+
+        self.assertEqual(len(plan.grid_positioned_blanks), 0)
+        self.assertEqual(len(plan.rejected_grid_modules), 1)
+        self.assertEqual(plan.rejected_grid_modules[0].code, "NO_VOLUMETRIC_GRID")
+        self.assertIn("volumetric_grid", plan.rejected_grid_modules[0].constraint_ref)
+
+    def test_rejects_grid_placement_collision_with_existing_blank(self) -> None:
+        payload = _cad_ir_payload_from_example("simple_asset_executable_plan.json")
+        placement = payload["metadata"]["executable_asset_plan"]["placements"][0]
+        placement["origin_mm"] = {"x": 0.0, "y": 0.0, "z": 0.0}
+        placement["origin_units"] = {"x": 0, "y": 0, "z": 0}
+
+        with self.assertRaisesRegex(FusionSkeletonError, "collides"):
+            generation_plan_from_cad_ir(payload)
+
+    def test_rejects_grid_placement_outside_reference_box(self) -> None:
+        payload = _cad_ir_payload_from_example("simple_asset_executable_plan.json")
+        placement = payload["metadata"]["executable_asset_plan"]["placements"][0]
+        placement["origin_mm"] = {"x": 120.0, "y": 0.0, "z": 0.0}
+        placement["origin_units"] = {"x": 4, "y": 0, "z": 0}
+
+        with self.assertRaisesRegex(FusionSkeletonError, "exceeds volumetric grid|exceeds reference box"):
+            generation_plan_from_cad_ir(payload)
+
     def test_rounded_floor_feature_is_not_executed_as_fusion_cut(self) -> None:
         payload = _cad_ir_payload_from_example("simple_finger_notch_tray.json")
 
@@ -450,6 +510,9 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("modelToSketchSpace", source)
         self.assertIn("finger_notch_features_planned", source)
         self.assertIn("finger_notch_cuts", source)
+        self.assertIn("grid_positioned_blanks", source)
+        self.assertIn("Grid-positioned module bodies", source)
+        self.assertIn("_xy_plane_for_z", source)
         self.assertIn("Simple top-open finger notch cuts", source)
         self.assertIn("top-open rectangular wall cut", source)
         self.assertIn("compatible with Part Design documents", source)

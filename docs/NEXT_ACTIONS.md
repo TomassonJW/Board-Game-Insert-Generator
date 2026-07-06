@@ -22,7 +22,8 @@ Statut : `required_before_next_fusion_geometry`.
 
 P8-M001/P8-M002 et P10-M008 sont termines dans le perimetre coeur Python pur,
 configuration, validation, rapports, placement grille abstrait et CAD IR metadata.
-Aucune geometrie Fusion volumetrique n'est generee.
+P11-M001 code la generation Fusion compacte depuis placements grille, mais attend
+le smoke test manuel Fusion avant statut `fusion-validated`.
 
 Action humaine requise avant toute mission qui genere reellement : grille 3D,
 layers, vue eclatee, demi-lune courbe, scoop interne, fillet/conge, fond arrondi,
@@ -30,10 +31,10 @@ geometrie courbe, module composite ou export STL/3MF dans Fusion.
 
 ## Mission ready non gated
 
-Aucune mission P10 non-gated supplementaire n'est recommandee apres `P10-M008`.
+Aucune mission non-gated supplementaire n'est recommandee apres `P11-M001` tant que le smoke test Fusion compact n'est pas valide.
 La boucle asset-first produit maintenant candidats, variante recommandee, plan de
-modules concret et placement grille greedy borne quand une `volumetric_grid` est
-declaree.
+modules concret, placement grille greedy borne et generation Fusion compacte
+codee pour ces placements.
 
 Prochaine action recommandee : preparer une gate si l'on veut passer a un solveur
 complexe, a du backtracking, a une optimisation globale, a des modules composites
@@ -44,6 +45,8 @@ ou a une generation Fusion volumetrique reelle.
 `P8-FUSION-GATE - Generation Fusion volumetrique ou vue 3D`.
 
 `P10-SOLVER-GATE - Solveur complexe, backtracking ou optimisation globale`.
+
+`P11-M001V - Smoke test humain Fusion de la vue compacte grille`.
 
 - Capability : `C-FUSION-COMPACT`, `C-FUSION-EXPLODED`, `C-GRID-3D`.
 - Objectif : choisir explicitement si et comment une grille/layer doit produire

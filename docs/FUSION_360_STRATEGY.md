@@ -124,6 +124,7 @@ La cible Fusion actuelle a commence par des blanks rectangulaires, ajoute les ca
 - aucun fillet/conge ;
 - aucun export STL/3MF ;
 - aucun algorithme d'optimisation nouveau.
+- depuis P11-M001, les modules generes par `metadata.executable_asset_plan` peuvent aussi etre crees comme bodies rectangulaires positionnes par `origin_mm` / `size_mm` de placement grille.
 
 
 ## Coupes rectangulaires P6-M001
@@ -190,6 +191,32 @@ smoke tests P6-M002V ont revele successivement un sketch sans cut, puis une
 fenetre fermee dans la paroi. Le smoke test humain apres `b27c2e7` valide une
 vraie encoche top-open reliee au bord superieur du tray. Cette validation couvre
 `top_open_rectangular_notch` uniquement, avec `print-validated: false`.
+
+## Vue compacte depuis placements grille P11-M001
+
+Depuis P11-M001, l'add-in peut consommer `metadata.executable_asset_plan` dans
+une CAD IR exportee depuis `examples/simple_asset_executable_plan.json`.
+
+Convention retenue :
+
+- le coeur Python decide les modules generes et leurs placements X/Y/Z ;
+- Fusion consomme seulement `generated_modules`, `placements`, `origin_mm`,
+  `size_mm`, `origin_units` et `size_units` ;
+- `origin_mm` devient l'origine scene du body Fusion ;
+- `size_mm` devient la taille du body rectangulaire cree ;
+- les origines Z non nulles sont creees sur un plan XY decale ;
+- les garde-fous hors Fusion refusent placement absent ou mal forme, dimensions
+  manquantes, span hors grille, body hors boite et collision manifeste ;
+- les refus deja presents dans `rejected_modules` sont reportes dans le plan et le
+  message Fusion, sans creer de body ;
+- les cavites rectangulaires et encoches top-open deja supportees restent
+  executees pour les composants CAD IR existants ;
+- aucune vue eclatee, aucun solveur, aucun module composite et aucun export STL/3MF
+  ne sont ajoutes.
+
+Validation : les conversions et garde-fous sont testes hors Fusion. L'execution
+reelle dans Fusion reste `manual validation required` tant que Thomas n'a pas
+lance le smoke test P11-M001.
 
 ## Vue compacte et vue eclatee
 
