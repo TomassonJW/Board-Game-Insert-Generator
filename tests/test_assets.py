@@ -133,6 +133,22 @@ class AssetModelTests(unittest.TestCase):
         self.assertEqual(scene["metadata"]["module_candidates"][0]["source_asset_ids"], ["coin-tokens", "status-tokens"])
         self.assertIn("asset-group-candidate", markdown)
 
+    def test_reports_rejected_asset_candidate_variant_with_reasons(self) -> None:
+        config = load_config(ROOT / "examples" / "simple_asset_rejected_variant.json")
+        layout = generate_basic_layout(config)
+
+        markdown = layout_to_markdown(config, layout)
+        payload = json.loads(layout_to_json(config, layout))
+        scene = build_blank_cad_scene(config, layout).to_dict()
+
+        variant = payload["asset_candidate_variants"][0]
+        self.assertEqual(variant["status"], "rejected")
+        self.assertFalse(variant["recommended"])
+        self.assertIn(variant["rejection_reasons"][0]["code"], {"DOES_NOT_FIT", "DIMENSIONS_INCOMPATIBLE"})
+        self.assertIsNone(payload["recommended_asset_candidate_variant"])
+        self.assertEqual(scene["metadata"]["asset_candidate_variants"][0]["status"], "rejected")
+        self.assertIn("Recommended variant: none", markdown)
+
     def test_rejects_unknown_asset_field(self) -> None:
         payload = _asset_payload()
         payload["assets"][0]["solver_hint"] = "not-yet"

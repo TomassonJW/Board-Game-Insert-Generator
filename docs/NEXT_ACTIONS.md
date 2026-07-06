@@ -30,14 +30,13 @@ geometrie courbe, module composite ou export STL/3MF dans Fusion.
 
 ## Mission ready non gated
 
-`P10-M007 - Couvrir une variante asset rejetee par dimensions`.
+Aucune mission P10 non-gated supplementaire n'est recommandee apres la vague
+P10-M003 a P10-M007. La boucle asset-first produit maintenant candidats, variante
+recommandee et variante rejetee avec raisons.
 
-- Capability : `C-SOLVER`.
-- Milestone : `M10 Semi-automatic solver`.
-- Objectif : ajouter un exemple et des tests ou une variante asset candidate est rejetee avec raison structuree, sans solveur complexe.
-- Gate : aucune si la mission reste additive et report-only ; stop si generation Fusion reelle, changement incompatible CAD IR ou solveur complexe devient necessaire.
-- Validation : tests unitaires, CLI Markdown/JSON/export CAD IR, `git diff
-  --check`, absence de `adsk` dans le coeur.
+Prochaine action recommandee : preparer une gate si l'on veut passer a un solveur
+plus automatique, a du backtracking, a une generation executable de modules ou a
+une generation Fusion.
 
 ## Mission bloquee par gate
 

@@ -376,7 +376,18 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Criteres d'acceptation : rejet explicite `DOES_NOT_FIT` ou `DIMENSIONS_INCOMPATIBLE`; aucune generation Fusion.
 - Tests : unitaires + CLI Markdown/JSON/export CAD IR sur le nouvel exemple.
 - Gate : aucune si report-only; stop si cela demande un solveur complexe.
-- Statut : `ready`.
+- Statut : `done`, `implemented-core`.
+
+### P10-GATE - Autoriser un solveur plus automatique
+
+- Capability : C-SOLVER.
+- Milestone : M10 Semi-automatic solver.
+- Objectif : decider si BGIG doit passer d'heuristiques report-only a un solveur plus automatique.
+- Livrable : rapport de gate avant optimisation globale, backtracking ou generation de modules executable.
+- Criteres d'acceptation : perimetre explicite, risques et validations attendues.
+- Tests : inspection documentaire.
+- Gate : architecture/produit obligatoire avant solveur complexe ou comportement automatique opaque.
+- Statut : `blocked`.
 
 ## Phase 11 - Modules composites et formes soudees
 

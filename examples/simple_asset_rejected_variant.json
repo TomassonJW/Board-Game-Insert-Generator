@@ -1,0 +1,43 @@
+{
+  "project_name": "Simple rejected asset variant V0",
+  "units": "mm",
+  "box": {
+    "inner_dimensions_mm": { "x": 80, "y": 60, "z": 35 },
+    "usable_height_mm": 25,
+    "lid_clearance_mm": 10
+  },
+  "print_profile": "default",
+  "defaults": {
+    "wall_thickness_mm": 1.2,
+    "floor_thickness_mm": 1.2,
+    "corner_radius_mm": 1.5
+  },
+  "layout": {
+    "strategy": "row_fill"
+  },
+  "assets": [
+    {
+      "id": "oversized-card-stack",
+      "name": "Oversized card stack",
+      "kind": "sleeved_cards",
+      "quantity": { "count": 80, "grouping": "deck" },
+      "dimensions_mm": { "x": 76, "y": 70, "z": 22 },
+      "dimension_confidence": "exact",
+      "containment_intent": "store",
+      "comment": "Candidate is intentionally too large for the box after clearance and wall padding."
+    }
+  ],
+  "modules": [
+    {
+      "id": "manual-small-bin",
+      "name": "Manual small bin",
+      "functional_type": "tokens",
+      "min_dimensions_mm": { "x": 30, "y": 25, "z": 15 },
+      "height_mm": 15,
+      "priority": 100,
+      "allow_rotation": true,
+      "quantity": 1,
+      "comment": "Manual module proves the rejected asset candidate does not block existing layouts."
+    }
+  ]
+}

@@ -150,3 +150,11 @@ geometrie Fusion.
 Le grouping P10-M006 est une preparation de candidats, pas une optimisation. Il
 regroupe seulement des assets strictement compatibles et laisse les reservations,
 assets avec `module_hint` et dimensions Z inconnues hors regroupement.
+
+
+## Rejet asset-candidate P10-M007
+
+P10-M007 ajoute un exemple ou la variante `asset-candidates:row_fill` est
+`rejected` parce que le candidat derive d'asset ne rentre pas dans la boite. Le
+rapport conserve `rejection_reasons` structurees et aucune recommandation n'est
+produite.

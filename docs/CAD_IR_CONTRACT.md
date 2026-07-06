@@ -207,7 +207,9 @@ assets charges avec `status: loaded_only`. Depuis P10-M004,
 Depuis P10-M005, `metadata.asset_candidate_variants` et
 `metadata.recommended_asset_candidate_variant` exposent aussi la variante
 recommandee report-only. Depuis P10-M006, les candidats peuvent referencer
-plusieurs `source_asset_ids` quand un grouping deterministe a ete applique. Ces donnees restent abstraites : elles indiquent les
+plusieurs `source_asset_ids` quand un grouping deterministe a ete applique.
+Depuis P10-M007, une variante rejetee peut aussi etre transportee dans cette
+metadata avec `rejection_reasons` et `recommended_asset_candidate_variant: null`. Ces donnees restent abstraites : elles indiquent les
 intentions de support, d'accessibilite et de retrait, mais ne creent aucune
 operation Fusion et ne valident aucune portance physique.
 

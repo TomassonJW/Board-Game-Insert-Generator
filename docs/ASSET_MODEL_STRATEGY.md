@@ -124,3 +124,10 @@ P10-M006 groupe uniquement des assets compatibles quand ils partagent `kind`,
 Le candidat groupe utilise la plus grande enveloppe source et la quantite totale
 des assets. Ce grouping reste reversible et report-only : il ne fusionne pas les
 assets sources, ne cree pas de module manuel et ne lance aucun placement complexe.
+
+
+## Exemple de rejet P10-M007
+
+`examples/simple_asset_rejected_variant.json` documente le cas ou un asset produit
+un candidat trop grand. Le layout manuel existant reste valide, mais la variante
+asset-candidate est rejetee avec raison structuree et sans variante recommandee.
