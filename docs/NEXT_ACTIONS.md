@@ -20,9 +20,9 @@ structurant, authentification absente ou refus de push direct.
 
 Statut : `required_before_next_fusion_geometry`.
 
-P8-M001 et P8-M002 sont termines dans le perimetre coeur Python pur,
-configuration, validation, rapports et CAD IR abstraite. Aucune geometrie Fusion
-volumetrique n'est generee.
+P8-M001/P8-M002 et P10-M008 sont termines dans le perimetre coeur Python pur,
+configuration, validation, rapports, placement grille abstrait et CAD IR metadata.
+Aucune geometrie Fusion volumetrique n'est generee.
 
 Action humaine requise avant toute mission qui genere reellement : grille 3D,
 layers, vue eclatee, demi-lune courbe, scoop interne, fillet/conge, fond arrondi,
@@ -30,17 +30,20 @@ geometrie courbe, module composite ou export STL/3MF dans Fusion.
 
 ## Mission ready non gated
 
-Aucune mission P10 non-gated supplementaire n'est recommandee apres la vague
-P10-M003 a P10-M007. La boucle asset-first produit maintenant candidats, variante
-recommandee et variante rejetee avec raisons.
+Aucune mission P10 non-gated supplementaire n'est recommandee apres `P10-M008`.
+La boucle asset-first produit maintenant candidats, variante recommandee, plan de
+modules concret et placement grille greedy borne quand une `volumetric_grid` est
+declaree.
 
 Prochaine action recommandee : preparer une gate si l'on veut passer a un solveur
-plus automatique, a du backtracking, a une generation executable de modules ou a
-une generation Fusion.
+complexe, a du backtracking, a une optimisation globale, a des modules composites
+ou a une generation Fusion volumetrique reelle.
 
 ## Mission bloquee par gate
 
 `P8-FUSION-GATE - Generation Fusion volumetrique ou vue 3D`.
+
+`P10-SOLVER-GATE - Solveur complexe, backtracking ou optimisation globale`.
 
 - Capability : `C-FUSION-COMPACT`, `C-FUSION-EXPLODED`, `C-GRID-3D`.
 - Objectif : choisir explicitement si et comment une grille/layer doit produire

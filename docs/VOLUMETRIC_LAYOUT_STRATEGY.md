@@ -78,3 +78,14 @@ solution. Les ajouts sont :
 Les surfaces de support sont `abstract_only` et `physical_validation:
 not_validated` dans les rapports/CAD IR. Elles ne prouvent pas la portance ou la
 qualite d'impression.
+
+## Placement greedy abstrait P10-M008
+
+P10-M008 introduit le premier usage executable de la grille par le coeur Python
+pur. Les modules generes depuis assets sont convertis en `GridSize3D` par
+arrondi superieur de leurs dimensions millimetres sur `volumetric_grid.unit_mm`,
+puis places par balayage deterministe `z/y/x` sur le premier span libre.
+
+Les cellules deja occupees par `module_placements`, `reserved` ou `forbidden`
+sont considerees indisponibles. Le placement produit des metadata de rapport et
+CAD IR uniquement ; aucune geometrie Fusion volumetrique n'est generee.

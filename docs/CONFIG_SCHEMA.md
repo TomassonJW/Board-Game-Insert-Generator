@@ -229,7 +229,9 @@ Validation P8-M001 :
 Ces surfaces sont des intentions abstraites. Elles ne prouvent ni resistance,
 ni portance, ni imprimabilite physique.
 
-Voir `examples/simple_3d_grid.json` et `examples/simple_3d_reservations.json`.
+Voir `examples/simple_3d_grid.json`, `examples/simple_3d_reservations.json` et `examples/simple_asset_executable_plan.json`.
+
+Depuis P10-M008, aucun nouveau champ de configuration n'est ajoute : le plan executable asset-first est derive des champs existants `assets`, `modules` et `volumetric_grid`.
 
 ## `modules`
 

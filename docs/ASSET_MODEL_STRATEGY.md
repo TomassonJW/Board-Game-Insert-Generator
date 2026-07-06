@@ -13,7 +13,8 @@ proposer des modules, cavites et reservations.
   free et other cote modules/cavites.
 - Les cavites peuvent representer des receptacles simples.
 - Les assets P9-M002 sont reportes et transportes en CAD IR metadata, sans deriver de module.
-- P10-M004 produit une synthese `module_candidates` deterministe depuis les assets, sans muter `modules` ni placer ces candidats.
+- P10-M004 produit une synthese `module_candidates` deterministe depuis les assets, sans muter `modules`.
+- P10-M008 produit un `executable_asset_plan` abstrait depuis la variante recommandee et le place dans la grille 3D si elle existe.
 
 ## Concepts cibles
 
@@ -131,3 +132,18 @@ assets sources, ne cree pas de module manuel et ne lance aucun placement complex
 `examples/simple_asset_rejected_variant.json` documente le cas ou un asset produit
 un candidat trop grand. Le layout manuel existant reste valide, mais la variante
 asset-candidate est rejetee avec raison structuree et sans variante recommandee.
+
+## Plan concret asset-first P10-M008
+
+Depuis P10-M008, un asset candidat peut devenir un module genere abstrait dans
+`executable_asset_plan`. Cette sortie ne modifie pas `modules` et ne cree pas de
+geometrie Fusion. Elle relie :
+
+- `generated_modules` : modules derives de candidats, avec `source_asset_ids` ;
+- `placements` : positions X/Y/Z en unites de grille et dimensions millimetres
+  couvertes par la grille ;
+- `rejected_modules` : refus actionnables, par exemple absence de grille ou span
+  libre introuvable.
+
+`examples/simple_asset_executable_plan.json` montre deux assets tokens groupes
+puis places comme un module abstrait dans une cellule libre de la grille.

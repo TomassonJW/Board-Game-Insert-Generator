@@ -15,6 +15,7 @@ pas devenir une boite noire ni remplacer les gates physiques.
 - P10-M004 ajoute des `module_candidates` deterministes depuis les assets, sans solveur global.
 - P10-M005 expose une variante `asset-candidates:row_fill` recommandee si elle rentre, toujours report-only.
 - P10-M006 groupe des assets compatibles avant generation de candidats, sans solveur complexe.
+- P10-M008 convertit la variante asset recommandee en `executable_asset_plan` avec placement grille greedy borne, sans backtracking ni optimisation globale.
 
 ## Strategie cible
 
@@ -158,3 +159,20 @@ P10-M007 ajoute un exemple ou la variante `asset-candidates:row_fill` est
 `rejected` parce que le candidat derive d'asset ne rentre pas dans la boite. Le
 rapport conserve `rejection_reasons` structurees et aucune recommandation n'est
 produite.
+
+## Plan executable borne P10-M008
+
+`P10-M008` fait passer la boucle asset-first de report-only a un premier plan
+concret, mais toujours deterministe et borne :
+
+1. lire la variante recommandee `asset-candidates:row_fill` ;
+2. creer des modules generes abstraits depuis les candidats imprimables ;
+3. si une `volumetric_grid` existe, convertir les dimensions millimetres en
+   unites par arrondi superieur ;
+4. placer chaque module par balayage greedy `z/y/x` sur le premier span libre ;
+5. refuser explicitement les modules sans grille ou sans span libre.
+
+Ce n'est pas un solveur global : il n'y a pas de backtracking, pas de recherche
+de meilleure permutation, pas de dependance externe et pas de generation Fusion.
+Le resultat est expose comme `executable_asset_plan` dans les rapports et la CAD
+IR metadata.

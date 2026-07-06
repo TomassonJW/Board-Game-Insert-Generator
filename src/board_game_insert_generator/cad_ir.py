@@ -12,6 +12,7 @@ from typing import Any
 
 from board_game_insert_generator.asset_candidates import (
     build_asset_candidate_variants,
+    build_executable_asset_module_plan,
     build_module_candidates_from_assets,
     recommended_asset_candidate_variant,
 )
@@ -261,6 +262,7 @@ class CadSceneMetadata:
     module_candidates: tuple[dict[str, Any], ...] = ()
     asset_candidate_variants: tuple[dict[str, Any], ...] = ()
     recommended_asset_candidate_variant: dict[str, Any] | None = None
+    executable_asset_plan: dict[str, Any] | None = None
     volumetric_grid: dict[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
@@ -274,6 +276,7 @@ class CadSceneMetadata:
             "module_candidates": list(self.module_candidates),
             "asset_candidate_variants": list(self.asset_candidate_variants),
             "recommended_asset_candidate_variant": self.recommended_asset_candidate_variant,
+            "executable_asset_plan": self.executable_asset_plan,
             "volumetric_grid": self.volumetric_grid,
         }
 
@@ -336,6 +339,7 @@ def build_blank_cad_scene(config: InsertConfig, layout: LayoutResult) -> CadScen
     module_candidates = build_module_candidates_from_assets(config)
     asset_candidate_variants = build_asset_candidate_variants(config)
     recommended_asset_variant = recommended_asset_candidate_variant(asset_candidate_variants)
+    executable_asset_plan = build_executable_asset_module_plan(config)
     return CadScene(
         schema_version=CAD_IR_SCHEMA_VERSION,
         units=CAD_IR_UNITS,
@@ -359,6 +363,7 @@ def build_blank_cad_scene(config: InsertConfig, layout: LayoutResult) -> CadScen
             module_candidates=tuple(module_candidates),
             asset_candidate_variants=tuple(asset_candidate_variants),
             recommended_asset_candidate_variant=recommended_asset_variant,
+            executable_asset_plan=executable_asset_plan,
             volumetric_grid=volumetric_summary.to_dict() if volumetric_summary is not None else None,
         ),
     )

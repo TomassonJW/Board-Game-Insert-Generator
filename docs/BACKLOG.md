@@ -378,12 +378,23 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Gate : aucune si report-only; stop si cela demande un solveur complexe.
 - Statut : `done`, `implemented-core`.
 
+### P10-M008 - Generer un plan concret asset-first et placement grille greedy
+
+- Capability : C-ASSET, C-SOLVER, C-GRID-3D, C-CAD-IR.
+- Milestone : M6 Asset-first project model / M7 Volumetric planner / M10 Semi-automatic solver.
+- Objectif : transformer la variante asset recommandee en modules generes abstraits puis les placer dans une grille 3D par heuristique greedy bornee.
+- Livrable : `executable_asset_plan` Markdown/JSON, metadata CAD IR additive, exemple `simple_asset_executable_plan.json` et tests.
+- Criteres d'acceptation : positions X/Y/Z en unites, dimensions millimetres derivees de la grille, refus actionnables, aucune generation Fusion reelle.
+- Tests : unitaires + CLI Markdown/JSON/export CAD IR sur exemples assets et grille.
+- Gate : stop si solveur complexe, backtracking, optimisation globale, schema incompatible ou generation Fusion devient necessaire.
+- Statut : `done`, `implemented-cad-ir`.
+
 ### P10-GATE - Autoriser un solveur plus automatique
 
 - Capability : C-SOLVER.
 - Milestone : M10 Semi-automatic solver.
-- Objectif : decider si BGIG doit passer d'heuristiques report-only a un solveur plus automatique.
-- Livrable : rapport de gate avant optimisation globale, backtracking ou generation de modules executable.
+- Objectif : decider si BGIG doit passer d'heuristiques bornees a un solveur plus automatique.
+- Livrable : rapport de gate avant optimisation globale, backtracking, modules composites ou generation Fusion reelle.
 - Criteres d'acceptation : perimetre explicite, risques et validations attendues.
 - Tests : inspection documentaire.
 - Gate : architecture/produit obligatoire avant solveur complexe ou comportement automatique opaque.

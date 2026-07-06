@@ -59,12 +59,12 @@ Chaine de pilotage :
 | ID | Capability | Pillar | Statut | Milestone cible | Gate principale |
 | --- | --- | --- | --- | --- | --- |
 | C-BOX | Box model | Asset-first design | `implemented-core` | M1 Engine foundation | Aucune active |
-| C-ASSET | Asset model | Asset-first design | `implemented-cad-ir` | M6 Asset-first project model | Assets charges/reportes P9-M002; module_candidates metadata P10-M004/P10-M005; grouping borne P10-M006; gate si derivation automatique executable ou schema incompatible |
+| C-ASSET | Asset model | Asset-first design | `implemented-cad-ir` | M6 Asset-first project model | Assets charges/reportes P9-M002; module_candidates metadata P10-M004/P10-M005; grouping borne P10-M006; plan executable borne P10-M008; gate si schema incompatible, solveur complexe ou Fusion |
 | C-MODULE | Module model | Modular printable bodies | `implemented-core` | M1 Engine foundation | Aucune active |
 | C-CAVITY | Cavity model | Cavities and ergonomic features | `implemented-cad-ir` | M4 Abstract cavities | Gate Fusion cuts |
 | C-FEATURE | Ergonomic feature model | Cavities and ergonomic features | `implemented-cad-ir` | M4 Abstract cavities / M8 Ergonomic planner | Taxonomie P6-M003 implementee ; gate Fusion pour nouvelles geometries |
 | C-LAYOUT-2D | 2D layout | Volumetric layout | `implemented-core` | M2 Simple layout | Aucune active |
-| C-GRID-3D | 3D volumetric grid | Volumetric layout | `implemented-cad-ir` | M7 Volumetric planner | P8-M001 implemente le socle declaratif; gate Fusion pour toute generation 3D |
+| C-GRID-3D | 3D volumetric grid | Volumetric layout | `implemented-cad-ir` | M7 Volumetric planner | P8-M001 implemente le socle declaratif; P10-M008 utilise un placement greedy abstrait; gate Fusion pour toute generation 3D reelle |
 | C-LAYERS | Layer / stage model | Volumetric layout | `implemented-cad-ir` | M7 Volumetric planner | Layers declaratifs P8-M001; gate impression avant support physique |
 | C-RESERVATION | Board / tray / lid reservation | Asset-first design | `implemented-cad-ir` | M6 Asset-first project model | Reservations abstraites P8-M002; gate si impact dimensions publiques ou generation Fusion |
 | C-ACCESS | Accessibility and removal order | Human validation gates | `implemented-cad-ir` | M8 Ergonomic planner | Removal order abstrait P8-M002; validation ergonomique humaine avant confort revendique |
@@ -75,7 +75,7 @@ Chaine de pilotage :
 | C-FUSION-EXPLODED | Fusion exploded view | CAD generation pipeline | `designed` | M5 CAD inspection views | Validation Fusion manuelle |
 | C-FUSION-CAVITIES | Fusion cavities | CAD generation pipeline | `fusion-validated` | M5 CAD cavities | Cavites rectangulaires validees Fusion, print-validated: false |
 | C-FILLETS | Fillets and finger notches | CAD generation pipeline | `fusion-validated` | M5 CAD ergonomic features | Encoche rectangulaire top-open validee Fusion, print-validated: false ; courbes/fillets bloques |
-| C-SOLVER | Solver and scoring | Volumetric layout | `implemented-core` | M10 Semi-automatic solver | Variant comparison P10-M002 report-only; raisons de rejet structurees P10-M003; module_candidates P10-M004; variante recommandee P10-M005; grouping borne P10-M006; gate architecture si optimiseur majeur |
+| C-SOLVER | Solver and scoring | Volumetric layout | `implemented-core` | M10 Semi-automatic solver | Variant comparison P10-M002 report-only; raisons de rejet structurees P10-M003; module_candidates P10-M004; variante recommandee P10-M005; grouping borne P10-M006; plan concret greedy P10-M008; gate architecture si optimiseur majeur |
 | C-CALIBRATION | Calibration and print validation | Human validation gates | `designed` | M11 Physical validation | Impression reelle |
 | C-AESTHETIC | Aesthetic layer | Design language and aesthetics | `planned` | M12 Design language | Gate esthetique structurante |
 

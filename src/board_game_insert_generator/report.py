@@ -6,6 +6,7 @@ from typing import Any
 
 from board_game_insert_generator.asset_candidates import (
     build_asset_candidate_variants,
+    build_executable_asset_module_plan,
     build_module_candidates_from_assets,
     recommended_asset_candidate_variant,
 )
@@ -32,6 +33,7 @@ def layout_to_dict(config: InsertConfig, result: LayoutResult) -> dict[str, Any]
     module_candidates = build_module_candidates_from_assets(config)
     asset_candidate_variants = build_asset_candidate_variants(config)
     recommended_asset_variant = recommended_asset_candidate_variant(asset_candidate_variants)
+    executable_asset_plan = build_executable_asset_module_plan(config)
     return {
         "project_name": config.project_name,
         "units": config.units,
@@ -55,6 +57,9 @@ def layout_to_dict(config: InsertConfig, result: LayoutResult) -> dict[str, Any]
             "module_candidate_count": len(module_candidates),
             "candidate_only_module_count": sum(1 for candidate in module_candidates if candidate["status"] == "candidate_only"),
             "asset_candidate_variant_count": len(asset_candidate_variants),
+            "generated_asset_module_count": executable_asset_plan["summary"]["generated_module_count"],
+            "placed_asset_module_count": executable_asset_plan["summary"]["placed_module_count"],
+            "rejected_asset_module_count": executable_asset_plan["summary"]["rejected_module_count"],
             "expanded_instance_count": len(result.cells),
             "cell_count": len(result.cells),
             "printable_body_count": len(result.printable_bodies),
@@ -73,6 +78,7 @@ def layout_to_dict(config: InsertConfig, result: LayoutResult) -> dict[str, Any]
         "module_candidates": module_candidates,
         "asset_candidate_variants": asset_candidate_variants,
         "recommended_asset_candidate_variant": recommended_asset_variant,
+        "executable_asset_plan": executable_asset_plan,
         "module_requests": [
             {
                 "id": module.id,
@@ -148,6 +154,7 @@ def layout_to_markdown(config: InsertConfig, result: LayoutResult) -> str:
     module_candidates = build_module_candidates_from_assets(config)
     asset_candidate_variants = build_asset_candidate_variants(config)
     recommended_asset_variant = recommended_asset_candidate_variant(asset_candidate_variants)
+    executable_asset_plan = build_executable_asset_module_plan(config)
     planned_cavity_count = sum(len(entries) for entries in planned_cavities.values())
     planned_feature_count = _planned_feature_count(planned_cavities)
     lines = [
@@ -165,6 +172,9 @@ def layout_to_markdown(config: InsertConfig, result: LayoutResult) -> str:
         f"- Requested modules: {len(config.modules)}",
         f"- Declared assets: {len(config.assets)}",
         f"- Module candidates from assets: {len(module_candidates)}",
+        f"- Generated asset modules: {executable_asset_plan['summary']['generated_module_count']}",
+        f"- Placed generated asset modules: {executable_asset_plan['summary']['placed_module_count']}",
+        f"- Rejected generated asset modules: {executable_asset_plan['summary']['rejected_module_count']}",
         f"- Generated instances: {len(result.cells)}",
         f"- Printable bodies: {len(result.printable_bodies)}",
         f"- Planned cavities: {planned_cavity_count}",
@@ -188,6 +198,7 @@ def layout_to_markdown(config: InsertConfig, result: LayoutResult) -> str:
         *_format_assets_section(config),
         *_format_module_candidates_section(module_candidates),
         *_format_asset_candidate_variants_section(asset_candidate_variants, recommended_asset_variant),
+        *_format_executable_asset_plan_section(executable_asset_plan),
         "## Variant comparison",
         "",
         "Variants are deterministic report-only comparisons of already implemented layout strategies. They are not a global optimization proof.",
@@ -796,6 +807,92 @@ def _format_asset_candidate_variants_section(
         )
     lines.append("")
     return lines
+
+
+def _format_executable_asset_plan_section(plan: dict[str, Any]) -> list[str]:
+    lines = ["## Executable asset module plan", ""]
+    lines.extend(
+        [
+            f"- Status: `{plan['status']}`",
+            f"- Source variant: `{plan['source_variant_id'] or 'none'}`",
+            f"- Score: {plan['score']:.2f}",
+            "- Scope: pure Python abstract plan; no Fusion generation is changed.",
+            "",
+            "### Generated modules",
+            "",
+        ]
+    )
+    generated_modules = plan.get("generated_modules", [])
+    if generated_modules:
+        lines.extend(
+            [
+                "| Module | Candidate | Assets | Dimensions | Status |",
+                "| --- | --- | --- | ---: | --- |",
+            ]
+        )
+        for module in generated_modules:
+            lines.append(
+                "| "
+                f"{module['module_id']} | "
+                f"{module['candidate_id']} | "
+                f"{', '.join(module['source_asset_ids'])} | "
+                f"{_format_dict_dim(module['dimensions_mm'])} | "
+                f"{module['status']} |"
+            )
+    else:
+        lines.append("- No generated asset modules.")
+
+    lines.extend(["", "### Grid placements", ""])
+    placements = plan.get("placements", [])
+    if placements:
+        lines.extend(
+            [
+                "| Module | Origin units | Size units | Origin mm | Size mm | Heuristic |",
+                "| --- | ---: | ---: | ---: | ---: | --- |",
+            ]
+        )
+        for placement in placements:
+            lines.append(
+                "| "
+                f"{placement['module_id']} | "
+                f"{_format_dict_grid_point(placement['origin_units'])} | "
+                f"{_format_dict_grid_size(placement['size_units'])} | "
+                f"{_format_dict_dim(placement['origin_mm'])} | "
+                f"{_format_dict_dim(placement['size_mm'])} | "
+                f"{placement['heuristic']} |"
+            )
+    else:
+        lines.append("- No generated asset module was placed in the grid.")
+
+    lines.extend(["", "### Rejected generated modules", ""])
+    rejected = plan.get("rejected_modules", [])
+    if rejected:
+        lines.extend(
+            [
+                "| Module | Code | Constraint | Action |",
+                "| --- | --- | --- | --- |",
+            ]
+        )
+        for rejection in rejected:
+            lines.append(
+                "| "
+                f"{rejection.get('module_id') or rejection.get('candidate_id') or 'n/a'} | "
+                f"{rejection['code']} | "
+                f"{rejection['constraint_ref']} | "
+                f"{rejection['actionable']} |"
+            )
+    else:
+        lines.append("- No generated asset modules rejected by the executable plan.")
+    lines.append("")
+    return lines
+
+
+def _format_dict_grid_point(point: dict[str, int]) -> str:
+    return f"({point['x']}, {point['y']}, {point['z']})"
+
+
+def _format_dict_grid_size(size: dict[str, int]) -> str:
+    return f"{size['x']} x {size['y']} x {size['z']}"
 
 def _format_module_candidates_section(candidates: list[dict[str, Any]]) -> list[str]:
     lines = ["## Module candidates from assets", ""]

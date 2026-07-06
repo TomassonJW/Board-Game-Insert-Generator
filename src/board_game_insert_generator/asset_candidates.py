@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from math import ceil
 from typing import Any
 
 from board_game_insert_generator.models import (
@@ -8,7 +9,17 @@ from board_game_insert_generator.models import (
     ContainmentIntent,
     Dimension3D,
     FunctionalType,
+    GridPoint3D,
+    GridSize3D,
     InsertConfig,
+)
+from board_game_insert_generator.volumetric import (
+    CELL_FORBIDDEN,
+    CELL_OCCUPIED,
+    CELL_RESERVED,
+    build_volumetric_summary,
+    span_cells,
+    span_fits_grid,
 )
 
 
@@ -284,6 +295,141 @@ def recommended_asset_candidate_variant(variants: list[dict[str, Any]]) -> dict[
     return max(viable, key=lambda variant: variant["total_score"])
 
 
+
+
+def build_executable_asset_module_plan(config: InsertConfig) -> dict[str, Any]:
+    """Convert the recommended asset variant into a bounded grid placement plan.
+
+    The plan is pure metadata for reports and CAD IR. It does not mutate
+    config.modules, does not recalculate tolerances, and does not authorize any
+    Fusion geometry generation.
+    """
+
+    candidates = build_module_candidates_from_assets(config)
+    variants = build_asset_candidate_variants(config)
+    recommended_variant = recommended_asset_candidate_variant(variants)
+    candidate_by_id = {candidate["candidate_id"]: candidate for candidate in candidates}
+
+    if recommended_variant is None:
+        return {
+            "plan_id": "asset-module-plan:recommended",
+            "source_variant_id": None,
+            "status": "rejected",
+            "score": 0.0,
+            "generated_modules": [],
+            "placements": [],
+            "rejected_modules": _plan_rejections_from_variants(variants),
+            "summary": _plan_summary(grid=None, generated_count=0, placed_count=0, rejected_count=0, placed_cell_count=0, free_cell_count_before_plan=None),
+            "reasons": ["No recommended asset candidate variant is available."],
+        }
+
+    generated_modules = [
+        _generated_module_from_candidate(candidate_by_id[candidate_id])
+        for candidate_id in recommended_variant.get("candidate_ids", ())
+        if candidate_id in candidate_by_id
+    ]
+
+    grid = config.volumetric_grid
+    if grid is None:
+        return {
+            "plan_id": "asset-module-plan:recommended",
+            "source_variant_id": recommended_variant["variant_id"],
+            "status": "planned_without_grid",
+            "score": recommended_variant["total_score"],
+            "generated_modules": generated_modules,
+            "placements": [],
+            "rejected_modules": [
+                _module_rejection(
+                    module["module_id"],
+                    module["candidate_id"],
+                    "NO_VOLUMETRIC_GRID",
+                    "No volumetric_grid is declared, so generated asset modules cannot receive X/Y/Z unit placement.",
+                    "volumetric_grid",
+                    "Declare a volumetric_grid to make the recommended asset variant executable.",
+                )
+                for module in generated_modules
+            ],
+            "summary": _plan_summary(
+                grid=None,
+                generated_count=len(generated_modules),
+                placed_count=0,
+                rejected_count=len(generated_modules),
+                placed_cell_count=0,
+                free_cell_count_before_plan=None,
+            ),
+            "reasons": [
+                "A recommended asset variant exists, but executable grid placement needs volumetric_grid.",
+                "Generated modules remain abstract metadata only.",
+            ],
+        }
+
+    occupied = _initial_occupied_cells(config)
+    free_cell_count_before_plan = _grid_cell_count(grid.size_units) - len(occupied)
+    placements: list[dict[str, Any]] = []
+    rejected_modules: list[dict[str, Any]] = []
+
+    for module in generated_modules:
+        size_units = _module_size_units(module["dimensions_mm"], grid.unit_size_mm)
+        origin = _first_free_origin(size_units, grid.size_units, occupied)
+        if origin is None:
+            rejected_modules.append(
+                _module_rejection(
+                    module["module_id"],
+                    module["candidate_id"],
+                    "DOES_NOT_FIT",
+                    (
+                        f"Generated module needs {_grid_size_to_dict(size_units)} units, but no free "
+                        "non-reserved span is available in the declared volumetric grid."
+                    ),
+                    "volumetric_grid.size_units / volumetric_grid.module_placements / volumetric_grid.zones",
+                    "Increase the grid, reduce/group assets differently, or move reserved/occupied spans.",
+                )
+            )
+            continue
+
+        cells = span_cells(origin, size_units)
+        occupied.update(cells)
+        placements.append(
+            {
+                "module_id": module["module_id"],
+                "candidate_id": module["candidate_id"],
+                "source_asset_ids": list(module["source_asset_ids"]),
+                "origin_units": _grid_point_to_dict(origin),
+                "size_units": _grid_size_to_dict(size_units),
+                "origin_mm": _grid_origin_to_mm(origin, grid.unit_size_mm),
+                "size_mm": _grid_size_to_mm(size_units, grid.unit_size_mm),
+                "source_size_mm": module["dimensions_mm"],
+                "occupied_cells": len(cells),
+                "status": "placed",
+                "heuristic": "greedy_z_y_x_first_free_span",
+            }
+        )
+
+    status = "placed" if placements and not rejected_modules else "partial" if placements else "rejected"
+    score = _plan_score(recommended_variant["total_score"], len(generated_modules), len(placements), len(rejected_modules))
+    return {
+        "plan_id": "asset-module-plan:recommended",
+        "source_variant_id": recommended_variant["variant_id"],
+        "status": status,
+        "score": score,
+        "generated_modules": generated_modules,
+        "placements": placements,
+        "rejected_modules": rejected_modules,
+        "summary": _plan_summary(
+            grid=grid,
+            generated_count=len(generated_modules),
+            placed_count=len(placements),
+            rejected_count=len(rejected_modules),
+            placed_cell_count=sum(placement["occupied_cells"] for placement in placements),
+            free_cell_count_before_plan=free_cell_count_before_plan,
+        ),
+        "reasons": [
+            "Recommended asset candidate variant was converted into generated module metadata.",
+            "Generated modules were placed with a bounded greedy grid scan; no backtracking or global optimization was used.",
+            "The plan is abstract CAD IR/report metadata and does not change Fusion generation.",
+        ],
+    }
+
 def _row_fill_asset_candidate_variant(
     config: InsertConfig,
     candidates: list[dict[str, Any]],
@@ -436,6 +582,156 @@ def _variant_rejection_reason(
         "message": message,
         "constraint_ref": constraint_ref,
         "actionable": actionable,
+    }
+
+
+def _generated_module_from_candidate(candidate: dict[str, Any]) -> dict[str, Any]:
+    suggested = candidate["suggested_module"]
+    return {
+        "module_id": f"generated:{suggested['id']}",
+        "candidate_id": candidate["candidate_id"],
+        "name": suggested["name"],
+        "functional_type": suggested["functional_type"],
+        "source_asset_ids": list(candidate["source_asset_ids"]),
+        "contained_asset_count": candidate["quantity"]["count"],
+        "dimensions_mm": dict(suggested["min_dimensions_mm"]),
+        "inner_asset_envelope_mm": dict(suggested["inner_asset_envelope_mm"]),
+        "status": "generated_from_recommended_asset_variant",
+        "fusion_generation": "not_modified_by_this_plan",
+    }
+
+
+def _initial_occupied_cells(config: InsertConfig) -> set[tuple[int, int, int]]:
+    summary = build_volumetric_summary(config)
+    if summary is None:
+        return set()
+    occupied_states = {CELL_OCCUPIED, CELL_RESERVED, CELL_FORBIDDEN}
+    return {
+        (cell.coordinate.x, cell.coordinate.y, cell.coordinate.z)
+        for cell in summary.cells
+        if cell.state in occupied_states
+    }
+
+
+def _module_size_units(dimensions_mm: dict[str, float], unit_size_mm: Dimension3D) -> GridSize3D:
+    return GridSize3D(
+        x=max(1, ceil(dimensions_mm["x"] / unit_size_mm.x)),
+        y=max(1, ceil(dimensions_mm["y"] / unit_size_mm.y)),
+        z=max(1, ceil(dimensions_mm["z"] / unit_size_mm.z)),
+    )
+
+
+def _first_free_origin(
+    size_units: GridSize3D,
+    grid_size: GridSize3D,
+    occupied: set[tuple[int, int, int]],
+) -> GridPoint3D | None:
+    for z in range(grid_size.z):
+        for y in range(grid_size.y):
+            for x in range(grid_size.x):
+                origin = GridPoint3D(x=x, y=y, z=z)
+                if not span_fits_grid(origin, size_units, grid_size):
+                    continue
+                if span_cells(origin, size_units).isdisjoint(occupied):
+                    return origin
+    return None
+
+
+def _plan_score(base_score: float, generated_count: int, placed_count: int, rejected_count: int) -> float:
+    if generated_count <= 0:
+        return 0.0
+    placement_ratio = placed_count / generated_count
+    penalty = rejected_count * 15.0
+    return round(max(0.0, base_score * placement_ratio - penalty), 4)
+
+
+def _plan_summary(
+    *,
+    grid,
+    generated_count: int,
+    placed_count: int,
+    rejected_count: int,
+    placed_cell_count: int,
+    free_cell_count_before_plan: int | None,
+) -> dict[str, Any]:
+    cell_volume = grid.unit_size_mm.x * grid.unit_size_mm.y * grid.unit_size_mm.z if grid is not None else 0.0
+    total_cells = grid.size_units.x * grid.size_units.y * grid.size_units.z if grid is not None else 0
+    placed_volume = placed_cell_count * cell_volume
+    return {
+        "generated_module_count": generated_count,
+        "placed_module_count": placed_count,
+        "rejected_module_count": rejected_count,
+        "grid_total_cell_count": total_cells,
+        "placed_cell_count": placed_cell_count,
+        "placed_cell_volume_mm3_approx": round(placed_volume, 4),
+        "free_cell_count_before_plan": free_cell_count_before_plan,
+    }
+
+
+
+def _grid_cell_count(size: GridSize3D) -> int:
+    return size.x * size.y * size.z
+
+def _module_rejection(
+    module_id: str,
+    candidate_id: str,
+    code: str,
+    message: str,
+    constraint_ref: str,
+    actionable: str,
+) -> dict[str, Any]:
+    return {
+        "module_id": module_id,
+        "candidate_id": candidate_id,
+        "code": code,
+        "category": "volumetric_placement",
+        "severity": "error",
+        "message": message,
+        "constraint_ref": constraint_ref,
+        "actionable": actionable,
+    }
+
+
+def _plan_rejections_from_variants(variants: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    rejections: list[dict[str, Any]] = []
+    for variant in variants:
+        for reason in variant.get("rejection_reasons", ()):
+            rejections.append(
+                {
+                    "module_id": None,
+                    "candidate_id": ",".join(variant.get("candidate_ids", ())) or None,
+                    "code": reason["code"],
+                    "category": reason["category"],
+                    "severity": reason["severity"],
+                    "message": reason["message"],
+                    "constraint_ref": reason["constraint_ref"],
+                    "actionable": reason["actionable"],
+                }
+            )
+    return rejections
+
+
+def _grid_point_to_dict(point: GridPoint3D) -> dict[str, int]:
+    return {"x": point.x, "y": point.y, "z": point.z}
+
+
+def _grid_size_to_dict(size: GridSize3D) -> dict[str, int]:
+    return {"x": size.x, "y": size.y, "z": size.z}
+
+
+def _grid_origin_to_mm(origin: GridPoint3D, unit_size_mm: Dimension3D) -> dict[str, float]:
+    return {
+        "x": round(origin.x * unit_size_mm.x, 4),
+        "y": round(origin.y * unit_size_mm.y, 4),
+        "z": round(origin.z * unit_size_mm.z, 4),
+    }
+
+
+def _grid_size_to_mm(size: GridSize3D, unit_size_mm: Dimension3D) -> dict[str, float]:
+    return {
+        "x": round(size.x * unit_size_mm.x, 4),
+        "y": round(size.y * unit_size_mm.y, 4),
+        "z": round(size.z * unit_size_mm.z, 4),
     }
 
 def _dimension_to_dict(dimension: Dimension3D) -> dict[str, float]:

@@ -1,0 +1,95 @@
+{
+  "project_name": "Simple executable asset plan V0",
+  "units": "mm",
+  "box": {
+    "inner_dimensions_mm": { "x": 120, "y": 90, "z": 40 },
+    "usable_height_mm": 30,
+    "lid_clearance_mm": 10
+  },
+  "print_profile": "default",
+  "defaults": {
+    "wall_thickness_mm": 1.2,
+    "floor_thickness_mm": 1.2,
+    "corner_radius_mm": 1.5
+  },
+  "layout": {
+    "strategy": "row_fill"
+  },
+  "assets": [
+    {
+      "id": "coin-tokens",
+      "name": "Coin tokens",
+      "kind": "tokens",
+      "quantity": { "count": 24, "grouping": "set" },
+      "dimensions_mm": { "x": 22, "y": 22, "z": 8 },
+      "dimension_confidence": "exact",
+      "containment_intent": "store",
+      "comment": "Compatible with status tokens for deterministic grouping and executable planning."
+    },
+    {
+      "id": "status-tokens",
+      "name": "Status tokens",
+      "kind": "tokens",
+      "quantity": { "count": 18, "grouping": "set" },
+      "dimensions_mm": { "x": 18, "y": 18, "z": 6 },
+      "dimension_confidence": "exact",
+      "containment_intent": "store",
+      "comment": "Compatible token asset; grouped candidate becomes one generated abstract module."
+    }
+  ],
+  "volumetric_grid": {
+    "unit_mm": { "x": 30, "y": 30, "z": 10 },
+    "size_units": { "x": 4, "y": 3, "z": 3 },
+    "comment": "P10 executable asset plan fixture; greedy placement remains pure Python metadata.",
+    "layers": [
+      {
+        "id": "bottom-modules",
+        "name": "Bottom printable module band",
+        "z_start": 0,
+        "z_count": 2,
+        "role": "printable_modules"
+      },
+      {
+        "id": "top-reservations",
+        "name": "Top non-printable reservation band",
+        "z_start": 2,
+        "z_count": 1,
+        "role": "future_board_rulebook_reservations"
+      }
+    ],
+    "module_placements": [
+      {
+        "id": "manual-reference-volume",
+        "module_id": "manual-reference-bin",
+        "instance_id": "manual-reference-bin-01",
+        "origin_units": { "x": 0, "y": 0, "z": 0 },
+        "size_units": { "x": 1, "y": 1, "z": 1 },
+        "layer_id": "bottom-modules",
+        "comment": "Existing declared module occupies the first cell so generated assets must use a later free span."
+      }
+    ],
+    "zones": [
+      {
+        "id": "board-reservation-band",
+        "kind": "reserved",
+        "purpose": "future_board_or_rulebook_reservation",
+        "origin_units": { "x": 0, "y": 0, "z": 2 },
+        "size_units": { "x": 4, "y": 3, "z": 1 },
+        "layer_id": "top-reservations"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "id": "manual-reference-bin",
+      "name": "Manual reference bin",
+      "functional_type": "tokens",
+      "min_dimensions_mm": { "x": 30, "y": 30, "z": 10 },
+      "height_mm": 10,
+      "priority": 100,
+      "allow_rotation": true,
+      "quantity": 1,
+      "comment": "Manual module kept to prove generated asset modules do not mutate config.modules."
+    }
+  ]
+}

@@ -149,6 +149,34 @@ class AssetModelTests(unittest.TestCase):
         self.assertEqual(scene["metadata"]["asset_candidate_variants"][0]["status"], "rejected")
         self.assertIn("Recommended variant: none", markdown)
 
+
+    def test_builds_executable_asset_plan_with_greedy_grid_placement(self) -> None:
+        config = load_config(ROOT / "examples" / "simple_asset_executable_plan.json")
+        layout = generate_basic_layout(config)
+
+        markdown = layout_to_markdown(config, layout)
+        payload = json.loads(layout_to_json(config, layout))
+        scene = build_blank_cad_scene(config, layout).to_dict()
+
+        self.assertEqual(len(config.modules), 1)
+        self.assertEqual(validate_config(config), [])
+        plan = payload["executable_asset_plan"]
+        self.assertEqual(plan["status"], "placed")
+        self.assertEqual(plan["summary"]["generated_module_count"], 1)
+        self.assertEqual(plan["summary"]["placed_module_count"], 1)
+        self.assertEqual(plan["summary"]["rejected_module_count"], 0)
+        generated = plan["generated_modules"][0]
+        self.assertEqual(generated["source_asset_ids"], ["coin-tokens", "status-tokens"])
+        self.assertEqual(generated["dimensions_mm"], {"x": 25.6, "y": 25.6, "z": 9.8})
+        placement = plan["placements"][0]
+        self.assertEqual(placement["origin_units"], {"x": 1, "y": 0, "z": 0})
+        self.assertEqual(placement["size_units"], {"x": 1, "y": 1, "z": 1})
+        self.assertEqual(placement["origin_mm"], {"x": 30, "y": 0, "z": 0})
+        self.assertIn("## Executable asset module plan", markdown)
+        self.assertIn("greedy_z_y_x_first_free_span", markdown)
+        self.assertEqual(scene["metadata"]["executable_asset_plan"]["status"], "placed")
+        self.assertEqual(scene["metadata"]["executable_asset_plan"]["placements"][0]["origin_units"], {"x": 1, "y": 0, "z": 0})
+
     def test_rejects_unknown_asset_field(self) -> None:
         payload = _asset_payload()
         payload["assets"][0]["solver_hint"] = "not-yet"
