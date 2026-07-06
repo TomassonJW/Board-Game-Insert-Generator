@@ -102,6 +102,8 @@ Tests, cartes backlog ou gates humaines a preparer.
   capabilities, milestones, gates et validations.
 - `ADR-0013-fusion-rectangular-cavity-cuts.md` - coupes Fusion rectangulaires
   simples par sketch et extrusion cut.
+- `ADR-0014-fusion-simple-finger-notch-cuts.md` - encoches de doigts simples
+  comme coupes rectangulaires Fusion issues de la CAD IR.
 
 ## Regles de maintenance
 

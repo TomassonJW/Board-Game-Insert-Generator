@@ -169,7 +169,7 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Criteres d'acceptation : aucune logique metier dans Fusion, noms lisibles, dimensions controlees, absence STL/3MF.
 - Tests : unitaires hors Fusion, CLI export CAD IR, `rg -n "adsk" src/board_game_insert_generator`, smoke test manuel Fusion.
 - Gate : validation humaine validee le 2026-07-04 pour les cuts rectangulaires simples uniquement.
-- Statut : `done` pour le code, `manual validation required` dans Fusion.
+- Statut : `done`, `fusion-validated` pour les cavites rectangulaires simples, `print-validated: false`.
 
 
 ### P6-M001V - Valider manuellement les cavites rectangulaires Fusion
@@ -180,19 +180,30 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Livrable : log de validation manuelle Fusion avec captures ou mesures.
 - Criteres d'acceptation : message final OK, 1 blank, 1 cavity cut, dimensions et plancher conformes a la CAD IR.
 - Tests : smoke test manuel Fusion, aucune validation d'impression revendiquee.
-- Gate : action humaine Thomas.
-- Statut : `blocked`.
+- Gate : action humaine Thomas realisee le 2026-07-04.
+- Statut : `done`, `fusion-validated`, `print-validated: false`.
 
-### P6-M002 - Etudier les features ergonomiques Fusion simples
+### P6-M002 - Generer les encoches de doigts simples dans Fusion
 
 - Capability : C-FILLETS.
 - Milestone : M5 CAD ergonomic features.
-- Objectif : comparer encoche simple, demi-lune, fond arrondi, fillet et robustesse API.
-- Livrable : ADR technique et plan de smoke test, sans geometrie executable si non autorisee.
-- Criteres d'acceptation : options, risques, limites et ordre d'implementation clairs.
-- Tests : inspection documentaire.
-- Gate : obligatoire avant toute geometrie courbe reelle.
-- Statut : `todo`.
+- Objectif : executer les features d'encoche de doigt simples deja transportees par `describe_cavity_feature`, sans fond arrondi ni fillet.
+- Livrable : add-in Fusion limite aux coupes d'encoches simples, tests hors Fusion, ADR et procedure de smoke test manuel.
+- Criteres d'acceptation : aucune logique metier dans Fusion, coupe limitee au body cible, dimensions issues de la CAD IR, features courbes non revendiquees comme courbes reelles, absence STL/3MF.
+- Tests : unitaires hors Fusion, CLI Markdown/JSON/export CAD IR sur `simple_tray` et `simple_finger_notch_tray`, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
+- Gate : validation humaine fournie le 2026-07-06 pour les encoches de doigts simples uniquement.
+- Statut : `done`, `implemented-fusion`, smoke test Fusion manuel requis, `print-validated: false`.
+
+### P6-M002V - Valider manuellement les encoches de doigts Fusion
+
+- Capability : C-FILLETS.
+- Milestone : M5 CAD ergonomic features.
+- Objectif : lancer l'add-in P6-M002 dans Fusion avec `examples/simple_finger_notch_tray.json` exporte en CAD IR, mesurer le blank, la cavite et la coupe d'encoche.
+- Livrable : log de validation manuelle Fusion avec mesures et statut explicite `print-validated: false` tant qu'aucune impression 3D n'est faite.
+- Criteres d'acceptation : message final avec `Simple finger notch cuts: 1`, coupe visible sur le body cible, dimensions conformes a la CAD IR, aucune geometrie courbe revendiquee.
+- Tests : smoke test manuel Fusion.
+- Gate : action humaine requise.
+- Statut : `blocked` par validation manuelle.
 
 ## Phase 7 - Vue compacte / vue eclatee
 

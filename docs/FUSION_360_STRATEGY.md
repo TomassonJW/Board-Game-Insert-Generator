@@ -106,17 +106,20 @@ recalculer layout ou tolerances.
 
 ## Cible Fusion actuelle
 
-La cible Fusion actuelle a commence par des blanks rectangulaires et ajoute maintenant les cavites rectangulaires simples :
+La cible Fusion actuelle a commence par des blanks rectangulaires, ajoute les cavites rectangulaires simples, puis les encoches frontales simples :
 
 - sketches, features et bodies nommes dans le composant racine ;
 - dimensions issues de `printable_origin_mm` et `printable_size_mm` ;
 - boite de reference sous forme d'esquisse non imprimable ;
 - aucun creusage avance execute dans Fusion ;
-- aucune encoche de doigt, demi-lune, aide de prise en main ou fond arrondi
-  execute dans Fusion ;
 - les cavites rectangulaires simples P5 peuvent etre presentes dans la CAD IR
   et sont executees par P6-M001 sous forme de cuts rectangulaires verticaux ;
-- les features ergonomiques P5-M004 restent `abstract_only` et non executees ;
+- les features d'encoche frontale simple P5-M004 sont executees par P6-M002 sous
+  forme de coupes rectangulaires de bounding box ;
+- les demi-lunes restent une intention abstraite, non une geometrie courbe
+  revendiquee ;
+- les fonds arrondis, aides avancees et fillets restent `abstract_only` et non
+  executes ;
 - aucun couvercle ;
 - aucun fillet/conge ;
 - aucun export STL/3MF ;
@@ -138,8 +141,8 @@ Convention retenue :
   plancher minimale demandee ;
 - la coupe est refusee si elle depasse le blank X/Y, si sa profondeur retire tout
   le corps, ou si le plancher conserve est inferieur a `local_origin_mm.z` ;
-- les operations `describe_cavity_feature` restent ignorees par la generation
-  Fusion reelle.
+- les operations `describe_cavity_feature` restent ignorees par P6-M001 ; P6-M002
+  n'execute que les encoches frontales simples sous forme rectangulaire.
 
 Choix API Fusion : `sketch + extrusion cut` avec `CutFeatureOperation`,
 `DistanceExtentDefinition`, `NegativeExtentDirection` et `participantBodies` pour
@@ -157,6 +160,28 @@ Liens de reference :
 - <https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/ExtrudeFeatureInput_setOneSideExtent.htm>
 - <https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/DistanceExtentDefinition_create.htm>
 - <https://help.autodesk.com/cloudhelp/ENU/Fusion-360-API/files/ParticipantBodiesSample_Sample.htm>
+
+## Encoches simples P6-M002
+
+Depuis `P6-M002`, l'add-in peut executer une partie des operations CAD IR
+`describe_cavity_feature` : les encoches frontales simples.
+
+Convention retenue :
+
+- les kinds acceptes sont `finger_notch`, `side_notch`, `center_notch` et
+  `half_moon_notch` quand le placement est frontal simple ;
+- la position, la taille et la cavite cible viennent uniquement de la CAD IR ;
+- `half_moon_notch` est executee comme une coupe rectangulaire de bounding box,
+  avec `geometry_approximation: rectangular_bounding_cut` ;
+- `rounded_floor`, fillets, conges, fonds arrondis et geometrie courbe reelle
+  restent non executes ;
+- la coupe est esquisse sur un plan XZ decale sur la face frontale puis extrudee
+  vers l'interieur avec `PositiveExtentDirection` ;
+- `participantBodies` limite la coupe au blank cible.
+
+Validation : les plans et garde-fous sont testes hors Fusion. La creation, la
+visibilite et la mesure de l'encoche dans Fusion restent `manual validation
+required` jusqu'au smoke test P6-M002V.
 
 ## Vue compacte et vue eclatee
 
@@ -235,7 +260,10 @@ Tests hors Fusion :
 - compatibilite des CAD IR enrichies avec cavites et features abstraites ;
 - plan de coupes rectangulaires simples depuis `subtract_rectangular_cavity` ;
 - garde-fous hors Fusion pour debordement X/Y, profondeur impossible, plancher
-  insuffisant et body cible absent.
+  insuffisant et body cible absent ;
+- plan de coupes d'encoches frontales simples depuis `describe_cavity_feature` ;
+- garde-fous hors Fusion pour cavite absente, placement unsupported, debordement
+  d'encoche et epaisseur frontale insuffisante.
 
 Verifications dans Fusion :
 
@@ -243,12 +271,13 @@ Verifications dans Fusion :
 - presence des bodies de blanks dans le composant racine ;
 - presence de coupes reelles pour `subtract_rectangular_cavity` des cavites
   rectangulaires simples ;
-- absence de generation reelle pour `describe_cavity_feature` ;
+- presence d'une coupe rectangulaire d'encoche frontale simple pour P6-M002 ;
+- absence de generation reelle pour fonds arrondis, fillets et geometrie courbe ;
 - noms ;
 - dimensions ;
 - origines ;
 - dimensions et positions des cavites rectangulaires simples ;
-- absence d'encoches, fonds arrondis, couvercles, fillets et exports ;
+- absence de fonds arrondis, couvercles, fillets et exports ;
 - absence de recalcul metier dans l'adaptateur.
 
 ## Limitations attendues

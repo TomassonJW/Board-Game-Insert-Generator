@@ -1,8 +1,9 @@
 """Fusion 360 add-in entry point for Board Game Insert Generator.
 
-P6-M001 creates rectangular blank bodies and simple top-open rectangular cavity
-cuts from a serialized CAD IR. Fusion consumes already resolved CAD IR dimensions
-and must not recalculate layout, cavities, clearances, or tolerances.
+P6-M002 creates rectangular blank bodies, top-open rectangular cavity cuts,
+and simple rectangular front finger-notch cuts from a serialized CAD IR. Fusion
+consumes already resolved CAD IR dimensions and must not recalculate layout,
+cavities, clearances, or tolerances.
 """
 
 from __future__ import annotations
@@ -13,6 +14,7 @@ try:
     from .fusion_skeleton import (
         DOCUMENT_STATUS_ZERO_DOC,
         FusionCavityCutPlan,
+        FusionFingerNotchCutPlan,
         FusionGenerationPlan,
         FusionSkeletonError,
         FusionSolidPlan,
@@ -27,6 +29,7 @@ except ImportError:  # pragma: no cover - Fusion may load the file as a script.
     from fusion_skeleton import (  # type: ignore[no-redef]
         DOCUMENT_STATUS_ZERO_DOC,
         FusionCavityCutPlan,
+        FusionFingerNotchCutPlan,
         FusionGenerationPlan,
         FusionSkeletonError,
         FusionSolidPlan,
@@ -95,6 +98,7 @@ def run(context) -> None:  # noqa: ANN001 - Fusion controls the signature.
         f"Reference outlines: {result['reference_outlines']}\n"
         f"Blank bodies: {result['blank_bodies']}\n"
         f"Rectangular cavity cuts: {result['cavity_cuts']}\n"
+        f"Simple finger notch cuts: {result['finger_notch_cuts']}\n"
         "Creation scope: root component, compatible with Part Design documents.\n"
         "Status: manual validation required in Fusion 360."
     )
@@ -136,10 +140,22 @@ def _generate_from_plan(design, plan: FusionGenerationPlan) -> dict[str, int]:  
         _create_rectangular_cavity_cut(root_component, cavity_cut, target_body)
         cavity_cut_count += 1
 
+    finger_notch_cut_count = 0
+    for notch_cut in plan.finger_notch_cuts:
+        target_body = created_bodies.get(notch_cut.target_body_id)
+        if target_body is None:
+            raise RuntimeError(
+                f"Finger notch {notch_cut.feature_id} targets unknown body "
+                f"{notch_cut.target_body_id}."
+            )
+        _create_rectangular_finger_notch_cut(root_component, notch_cut, target_body)
+        finger_notch_cut_count += 1
+
     return {
         "reference_outlines": 1,
         "blank_bodies": len(created_bodies),
         "cavity_cuts": cavity_cut_count,
+        "finger_notch_cuts": finger_notch_cut_count,
     }
 
 
@@ -224,10 +240,75 @@ def _create_rectangular_cavity_cut(root_component, cut_plan: FusionCavityCutPlan
     cut_feature.name = f"{cut_plan.component_name} {cut_plan.cavity_id} cavity cut"
 
 
+def _create_rectangular_finger_notch_cut(
+    root_component,  # noqa: ANN001
+    cut_plan: FusionFingerNotchCutPlan,
+    target_body,  # noqa: ANN001
+) -> None:
+    cut_plane = _create_offset_xz_plane(
+        root_component,
+        cut_plan.cut_origin_mm.y,
+        f"{cut_plan.component_name} {cut_plan.feature_id} finger notch cut plane",
+    )
+    sketch = root_component.sketches.add(cut_plane)
+    sketch.name = f"{cut_plan.component_name} {cut_plan.feature_id} finger notch footprint"
+    _add_scene_xz_rectangle_from_mm(
+        sketch,
+        cut_plan.cut_origin_mm.x,
+        cut_plan.cut_origin_mm.y,
+        cut_plan.cut_origin_mm.z,
+        cut_plan.cut_size_mm.x,
+        cut_plan.cut_size_mm.z,
+        cut_plan.feature_id,
+    )
+
+    if sketch.profiles.count < 1:
+        raise RuntimeError(f"No closed cut profile was created for {cut_plan.feature_id}.")
+
+    profile = sketch.profiles.item(0)
+    extrudes = root_component.features.extrudeFeatures
+    cut_input = extrudes.createInput(
+        profile,
+        adsk.fusion.FeatureOperations.CutFeatureOperation,
+    )
+    if cut_input is None:
+        raise RuntimeError(f"Fusion cut input failed for finger notch {cut_plan.feature_id}.")
+
+    distance = adsk.core.ValueInput.createByString(f"{cut_plan.cut_size_mm.y} mm")
+    extent = adsk.fusion.DistanceExtentDefinition.create(distance)
+    if extent is None:
+        raise RuntimeError(f"Fusion cut extent failed for finger notch {cut_plan.feature_id}.")
+    ok = cut_input.setOneSideExtent(
+        extent,
+        adsk.fusion.ExtentDirections.PositiveExtentDirection,
+    )
+    if not ok:
+        raise RuntimeError(f"Fusion cut distance failed for finger notch {cut_plan.feature_id}.")
+
+    cut_input.participantBodies = [target_body]
+    cut_feature = extrudes.add(cut_input)
+    if cut_feature is None:
+        raise RuntimeError(f"Fusion cut failed for finger notch {cut_plan.feature_id}.")
+    cut_feature.name = f"{cut_plan.component_name} {cut_plan.feature_id} finger notch cut"
+
+
 def _create_offset_xy_plane(root_component, offset_z_mm: float, name: str):  # noqa: ANN001
     plane_input = root_component.constructionPlanes.createInput()
     offset = adsk.core.ValueInput.createByString(f"{offset_z_mm} mm")
     ok = plane_input.setByOffset(root_component.xYConstructionPlane, offset)
+    if not ok:
+        raise RuntimeError(f"Fusion construction plane offset failed for {name}.")
+    plane = root_component.constructionPlanes.add(plane_input)
+    if plane is None:
+        raise RuntimeError(f"Fusion construction plane creation failed for {name}.")
+    plane.name = name
+    return plane
+
+
+def _create_offset_xz_plane(root_component, offset_y_mm: float, name: str):  # noqa: ANN001
+    plane_input = root_component.constructionPlanes.createInput()
+    offset = adsk.core.ValueInput.createByString(f"{offset_y_mm} mm")
+    ok = plane_input.setByOffset(root_component.xZConstructionPlane, offset)
     if not ok:
         raise RuntimeError(f"Fusion construction plane offset failed for {name}.")
     plane = root_component.constructionPlanes.add(plane_input)
@@ -269,6 +350,30 @@ def _add_scene_rectangle_from_mm(
     lines = sketch.sketchCurves.sketchLines.addTwoPointRectangle(start, end)
     if lines is None:
         raise RuntimeError(f"Fusion rectangle sketch failed for {label}.")
+
+
+def _add_scene_xz_rectangle_from_mm(
+    sketch,  # noqa: ANN001
+    origin_x_mm: float,
+    origin_y_mm: float,
+    origin_z_mm: float,
+    size_x_mm: float,
+    size_z_mm: float,
+    label: str,
+) -> None:
+    start = adsk.core.Point3D.create(
+        mm_to_cm(origin_x_mm),
+        mm_to_cm(origin_y_mm),
+        mm_to_cm(origin_z_mm),
+    )
+    end = adsk.core.Point3D.create(
+        mm_to_cm(origin_x_mm + size_x_mm),
+        mm_to_cm(origin_y_mm),
+        mm_to_cm(origin_z_mm + size_z_mm),
+    )
+    lines = sketch.sketchCurves.sketchLines.addTwoPointRectangle(start, end)
+    if lines is None:
+        raise RuntimeError(f"Fusion XZ rectangle sketch failed for {label}.")
 
 
 def _ensure_supported_z_origin(solid_plan: FusionSolidPlan) -> None:

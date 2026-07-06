@@ -24,6 +24,14 @@ DOCUMENT_STATUS_ZERO_DOC = "zero_doc"
 PLAN_STATUS_PLANNED_ONLY = "planned_only"
 CAVITY_CUT_OPERATION_KIND = "subtract_rectangular_cavity"
 CAVITY_FEATURE_OPERATION_KIND = "describe_cavity_feature"
+FINGER_NOTCH_CUT_OPERATION_KIND = "rectangular_finger_notch_cut"
+SUPPORTED_SIMPLE_FINGER_NOTCH_KINDS = (
+    "finger_notch",
+    "side_notch",
+    "center_notch",
+    "half_moon_notch",
+)
+SUPPORTED_FRONT_NOTCH_PLACEMENTS = ("front", "front_center")
 FUSION_MANUAL_VALIDATION_REQUIRED = "manual_validation_required"
 
 
@@ -140,6 +148,48 @@ class FusionCavityCutPlan:
 
 
 @dataclass(frozen=True)
+class FusionFingerNotchCutPlan:
+    """One simple rectangular access notch cut to execute against a blank body."""
+
+    component_id: str
+    component_name: str
+    target_body_id: str
+    target_body_name: str
+    operation_id: str
+    cavity_id: str
+    feature_id: str
+    source_feature_kind: str
+    placement: str
+    cut_origin_mm: FusionVectorMm
+    cut_size_mm: FusionVectorMm
+    cavity_local_origin_mm: FusionVectorMm
+    feature_position_mm: FusionVectorMm
+    operation_kind: str = FINGER_NOTCH_CUT_OPERATION_KIND
+    geometry_approximation: str = "rectangular_bounding_cut"
+    validation_status: str = FUSION_MANUAL_VALIDATION_REQUIRED
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "component_id": self.component_id,
+            "component_name": self.component_name,
+            "target_body_id": self.target_body_id,
+            "target_body_name": self.target_body_name,
+            "operation_id": self.operation_id,
+            "operation_kind": self.operation_kind,
+            "cavity_id": self.cavity_id,
+            "feature_id": self.feature_id,
+            "source_feature_kind": self.source_feature_kind,
+            "placement": self.placement,
+            "cut_origin_mm": self.cut_origin_mm.to_dict(),
+            "cut_size_mm": self.cut_size_mm.to_dict(),
+            "cavity_local_origin_mm": self.cavity_local_origin_mm.to_dict(),
+            "feature_position_mm": self.feature_position_mm.to_dict(),
+            "geometry_approximation": self.geometry_approximation,
+            "validation_status": self.validation_status,
+        }
+
+
+@dataclass(frozen=True)
 class FusionGenerationPlan:
     """Pure-Python plan consumed by the Fusion API entry point."""
 
@@ -147,11 +197,12 @@ class FusionGenerationPlan:
     reference_box: FusionSolidPlan
     blanks: tuple[FusionSolidPlan, ...]
     cavity_cuts: tuple[FusionCavityCutPlan, ...] = ()
+    finger_notch_cuts: tuple[FusionFingerNotchCutPlan, ...] = ()
     validation_status: str = FUSION_MANUAL_VALIDATION_REQUIRED
 
     @property
     def created_object_count(self) -> int:
-        return 1 + len(self.blanks) + len(self.cavity_cuts)
+        return 1 + len(self.blanks) + len(self.cavity_cuts) + len(self.finger_notch_cuts)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -159,6 +210,7 @@ class FusionGenerationPlan:
             "reference_box": self.reference_box.to_dict(),
             "blanks": [blank.to_dict() for blank in self.blanks],
             "cavity_cuts": [cut.to_dict() for cut in self.cavity_cuts],
+            "finger_notch_cuts": [cut.to_dict() for cut in self.finger_notch_cuts],
             "validation_status": self.validation_status,
         }
 
@@ -416,6 +468,7 @@ def generation_plan_from_cad_ir(payload: Any) -> FusionGenerationPlan:
 
     blanks: list[FusionSolidPlan] = []
     cavity_cuts: list[FusionCavityCutPlan] = []
+    finger_notch_cuts: list[FusionFingerNotchCutPlan] = []
     for component in validated_payload["components"]:
         if not isinstance(component, dict):
             raise FusionSkeletonError("Each CAD IR component must be an object.")
@@ -467,12 +520,16 @@ def generation_plan_from_cad_ir(payload: Any) -> FusionGenerationPlan:
         )
         blanks.append(blank)
         cavity_cuts.extend(_cavity_cut_plans(component_id, component_name, blank, operations))
+        finger_notch_cuts.extend(
+            _finger_notch_cut_plans(component_id, component_name, blank, body, operations)
+        )
 
     return FusionGenerationPlan(
         project_name=project_name,
         reference_box=reference_box,
         blanks=tuple(blanks),
         cavity_cuts=tuple(cavity_cuts),
+        finger_notch_cuts=tuple(finger_notch_cuts),
     )
 
 
@@ -570,6 +627,179 @@ def _validate_cavity_cut_bounds(
         raise FusionSkeletonError(
             f"Cavity {cavity_id!r} would leave {retained_floor_mm:.2f} mm of floor, "
             f"below CAD IR local_origin.z {local_origin.z:.2f} mm."
+        )
+
+
+def _finger_notch_cut_plans(
+    component_id: str,
+    component_name: str,
+    blank: FusionSolidPlan,
+    body: dict[str, Any],
+    operations: list[Any],
+) -> list[FusionFingerNotchCutPlan]:
+    cavities = _cavities_by_id(body, blank.cad_id)
+    cut_plans: list[FusionFingerNotchCutPlan] = []
+    for operation in operations:
+        if not isinstance(operation, dict):
+            raise FusionSkeletonError(
+                f"CAD IR body {blank.cad_id!r} operation must be an object."
+            )
+        if operation.get("kind") != CAVITY_FEATURE_OPERATION_KIND:
+            continue
+
+        parameters = operation.get("parameters")
+        if not isinstance(parameters, dict):
+            raise FusionSkeletonError(
+                f"CAD IR feature operation for body {blank.cad_id!r} must contain parameters."
+            )
+        feature_kind = _required_text(
+            parameters,
+            "kind",
+            f"body {blank.cad_id} cavity feature operation",
+        )
+        if feature_kind == "rounded_floor":
+            continue
+        if feature_kind not in SUPPORTED_SIMPLE_FINGER_NOTCH_KINDS:
+            continue
+        if parameters.get("coordinate_frame") != "cavity.local":
+            raise FusionSkeletonError(
+                f"CAD IR feature operation for body {blank.cad_id!r} must use cavity.local coordinates."
+            )
+
+        cavity_id = _required_text(
+            parameters,
+            "cavity_id",
+            f"body {blank.cad_id} cavity feature operation",
+        )
+        cavity = cavities.get(cavity_id)
+        if cavity is None:
+            raise FusionSkeletonError(
+                f"CAD IR feature references unknown cavity {cavity_id!r} for body {blank.cad_id!r}."
+            )
+        placement = _required_text(
+            parameters,
+            "placement",
+            f"body {blank.cad_id} cavity feature operation",
+        )
+        if placement not in SUPPORTED_FRONT_NOTCH_PLACEMENTS:
+            raise FusionSkeletonError(
+                f"Simple Fusion finger notch feature {parameters.get('feature_id')!r} uses unsupported placement {placement!r}."
+            )
+
+        feature_position = _vector_from_payload(
+            parameters,
+            "position_mm",
+            f"body {blank.cad_id} feature position",
+        )
+        feature_size = _positive_vector_from_payload(
+            parameters,
+            "size_mm",
+            f"body {blank.cad_id} feature size",
+        )
+        feature_id = _required_text(
+            parameters,
+            "feature_id",
+            f"body {blank.cad_id} cavity feature operation",
+        )
+        cavity_origin = _vector_from_payload(
+            cavity,
+            "local_origin_mm",
+            f"body {blank.cad_id} cavity {cavity_id} local origin",
+        )
+        cavity_size = _positive_vector_from_payload(
+            cavity,
+            "size_mm",
+            f"body {blank.cad_id} cavity {cavity_id} size",
+        )
+        _validate_front_finger_notch_bounds(
+            blank,
+            cavity_id,
+            feature_id,
+            cavity_origin,
+            cavity_size,
+            feature_position,
+            feature_size,
+        )
+        cut_plans.append(
+            FusionFingerNotchCutPlan(
+                component_id=component_id,
+                component_name=component_name,
+                target_body_id=blank.cad_id,
+                target_body_name=blank.body_name,
+                operation_id=_required_text(
+                    operation,
+                    "id",
+                    f"body {blank.cad_id} cavity feature operation",
+                ),
+                cavity_id=cavity_id,
+                feature_id=feature_id,
+                source_feature_kind=feature_kind,
+                placement=placement,
+                cut_origin_mm=FusionVectorMm(
+                    x=blank.origin_mm.x + cavity_origin.x + feature_position.x,
+                    y=blank.origin_mm.y + cavity_origin.y - feature_size.y,
+                    z=blank.origin_mm.z + cavity_origin.z + feature_position.z,
+                ),
+                cut_size_mm=feature_size,
+                cavity_local_origin_mm=cavity_origin,
+                feature_position_mm=feature_position,
+            )
+        )
+    return cut_plans
+
+
+def _cavities_by_id(body: dict[str, Any], body_id: str) -> dict[str, dict[str, Any]]:
+    cavities_payload = body.get("cavities", [])
+    if not isinstance(cavities_payload, list):
+        raise FusionSkeletonError(f"CAD IR body {body_id!r} cavities must be a list.")
+
+    cavities: dict[str, dict[str, Any]] = {}
+    for index, cavity in enumerate(cavities_payload):
+        if not isinstance(cavity, dict):
+            raise FusionSkeletonError(
+                f"CAD IR body {body_id!r} cavity[{index}] must be an object."
+            )
+        cavity_id = _required_text(cavity, "id", f"body {body_id} cavity")
+        cavities[cavity_id] = cavity
+    return cavities
+
+
+def _validate_front_finger_notch_bounds(
+    blank: FusionSolidPlan,
+    cavity_id: str,
+    feature_id: str,
+    cavity_origin: FusionVectorMm,
+    cavity_size: FusionVectorMm,
+    feature_position: FusionVectorMm,
+    feature_size: FusionVectorMm,
+) -> None:
+    if feature_position.y != 0:
+        raise FusionSkeletonError(
+            f"Finger notch {feature_id!r} for cavity {cavity_id!r} must start on the cavity front edge."
+        )
+    if feature_position.x < 0 or feature_position.z < 0:
+        raise FusionSkeletonError(
+            f"Finger notch {feature_id!r} must stay inside cavity {cavity_id!r}."
+        )
+    if feature_position.x + feature_size.x > cavity_size.x:
+        raise FusionSkeletonError(
+            f"Finger notch {feature_id!r} exceeds cavity {cavity_id!r} width."
+        )
+    if feature_position.z + feature_size.z > cavity_size.z:
+        raise FusionSkeletonError(
+            f"Finger notch {feature_id!r} exceeds cavity {cavity_id!r} height."
+        )
+    if feature_size.y > cavity_origin.y:
+        raise FusionSkeletonError(
+            f"Finger notch {feature_id!r} exceeds the front wall thickness before cavity {cavity_id!r}."
+        )
+    if cavity_origin.x + feature_position.x + feature_size.x > blank.size_mm.x:
+        raise FusionSkeletonError(
+            f"Finger notch {feature_id!r} exceeds printable blank width for {blank.body_name!r}."
+        )
+    if cavity_origin.z + feature_position.z + feature_size.z > blank.size_mm.z:
+        raise FusionSkeletonError(
+            f"Finger notch {feature_id!r} exceeds printable blank height for {blank.body_name!r}."
         )
 
 

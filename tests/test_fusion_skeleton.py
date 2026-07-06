@@ -16,6 +16,7 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     DOCUMENT_STATUS_READY,
     DOCUMENT_STATUS_ZERO_DOC,
     CAVITY_CUT_OPERATION_KIND,
+    FINGER_NOTCH_CUT_OPERATION_KIND,
     FUSION_MANUAL_VALIDATION_REQUIRED,
     PLAN_STATUS_PLANNED_ONLY,
     FusionSkeletonError,
@@ -249,13 +250,59 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertAlmostEqual(cut.retained_floor_mm, 3.0)
         self.assertEqual(cut.validation_status, FUSION_MANUAL_VALIDATION_REQUIRED)
 
-    def test_cavity_feature_operations_are_not_executed_as_fusion_cuts(self) -> None:
+    def test_builds_simple_finger_notch_cut_plan_from_cad_ir_feature(self) -> None:
         payload = _cad_ir_payload_from_example("simple_finger_notch_tray.json")
 
         plan = generation_plan_from_cad_ir(payload)
 
+        self.assertEqual(plan.created_object_count, 4)
         self.assertEqual(len(plan.cavity_cuts), 1)
         self.assertEqual(plan.cavity_cuts[0].cavity_id, "token-pocket")
+        self.assertEqual(len(plan.finger_notch_cuts), 1)
+        cut = plan.finger_notch_cuts[0]
+        self.assertEqual(cut.operation_kind, FINGER_NOTCH_CUT_OPERATION_KIND)
+        self.assertEqual(cut.feature_id, "front-half-moon-notch")
+        self.assertEqual(cut.source_feature_kind, "half_moon_notch")
+        self.assertEqual(cut.placement, "front_center")
+        self.assertEqual(cut.target_body_id, "finger-notch-tray-01-body")
+        self.assertAlmostEqual(cut.cut_origin_mm.x, 26.8)
+        self.assertAlmostEqual(cut.cut_origin_mm.y, 0.8)
+        self.assertAlmostEqual(cut.cut_origin_mm.z, 9.2)
+        self.assertEqual(cut.cut_size_mm.to_dict(), {"x": 18.0, "y": 4.0, "z": 10.0})
+        self.assertEqual(cut.cavity_local_origin_mm.to_dict(), {"x": 4.0, "y": 4.0, "z": 1.2})
+        self.assertEqual(cut.feature_position_mm.to_dict(), {"x": 22.0, "y": 0.0, "z": 8.0})
+        self.assertEqual(cut.geometry_approximation, "rectangular_bounding_cut")
+
+    def test_rounded_floor_feature_is_not_executed_as_fusion_cut(self) -> None:
+        payload = _cad_ir_payload_from_example("simple_finger_notch_tray.json")
+
+        plan = generation_plan_from_cad_ir(payload)
+
+        self.assertEqual([cut.feature_id for cut in plan.finger_notch_cuts], ["front-half-moon-notch"])
+
+    def test_rejects_finger_notch_with_unknown_cavity(self) -> None:
+        payload = _cad_ir_payload_from_example("simple_finger_notch_tray.json")
+        operation = payload["components"][0]["body"]["operations"][2]
+        operation["parameters"]["cavity_id"] = "missing-cavity"
+
+        with self.assertRaisesRegex(FusionSkeletonError, "unknown cavity"):
+            generation_plan_from_cad_ir(payload)
+
+    def test_rejects_finger_notch_that_exceeds_front_wall(self) -> None:
+        payload = _cad_ir_payload_from_example("simple_finger_notch_tray.json")
+        operation = payload["components"][0]["body"]["operations"][2]
+        operation["parameters"]["size_mm"]["y"] = 5.0
+
+        with self.assertRaisesRegex(FusionSkeletonError, "front wall thickness"):
+            generation_plan_from_cad_ir(payload)
+
+    def test_rejects_finger_notch_that_starts_outside_cavity(self) -> None:
+        payload = _cad_ir_payload_from_example("simple_finger_notch_tray.json")
+        operation = payload["components"][0]["body"]["operations"][2]
+        operation["parameters"]["position_mm"]["x"] = -1.0
+
+        with self.assertRaisesRegex(FusionSkeletonError, "must be non-negative"):
+            generation_plan_from_cad_ir(payload)
 
     def test_rejects_cavity_cut_that_exceeds_printable_blank_xy(self) -> None:
         payload = _cad_ir_payload_from_example("simple_tray.json")
@@ -303,6 +350,9 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("participantBodies", source)
         self.assertIn("setOneSideExtent", source)
         self.assertIn("NegativeExtentDirection", source)
+        self.assertIn("PositiveExtentDirection", source)
+        self.assertIn("xZConstructionPlane", source)
+        self.assertIn("finger_notch_cuts", source)
         self.assertIn("compatible with Part Design documents", source)
         self.assertIn("resolve_cad_ir_input_path", source)
         self.assertIn("cad_ir_input_guidance", source)

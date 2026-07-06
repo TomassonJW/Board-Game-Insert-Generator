@@ -1,6 +1,6 @@
 # Next Actions
 
-Derniere mise a jour : 2026-07-04
+Derniere mise a jour : 2026-07-06
 
 Ce fichier indique les prochaines missions recommandees. Il doit rester court,
 priorise et directement actionnable. Si aucune mission explicite n'est donnee,
@@ -20,31 +20,20 @@ structurant, authentification absente ou refus de push direct.
 
 Statut : `manual_validation_required`.
 
-Action demandee : executer le smoke test manuel `P6-M001V - Valider les cavites
-rectangulaires Fusion`.
+`P6-M002 - Generer les encoches de doigts simples dans Fusion` est code et doit
+maintenant etre valide manuellement dans Fusion avant tout elargissement.
 
-Contexte :
+Action humaine attendue : `P6-M002V - Valider manuellement les encoches de doigts
+Fusion`.
 
-- la gate humaine P6-M001 a autorise les cavites rectangulaires simples dans
-  Fusion ;
-- l'add-in code maintenant `subtract_rectangular_cavity` sous forme de coupe
-  rectangulaire verticale limitee au body cible ;
-- les features ergonomiques `describe_cavity_feature`, encoches, fonds arrondis,
-  fillets, couvercles et exports restent hors perimetre ;
-- le coeur Python reste sans `adsk` et Fusion ne recalcule pas layout,
-  tolerances ou clearances.
+Perimetre du smoke test :
 
-Validation attendue de l'humain :
-
-- generer une CAD IR depuis `examples/simple_tray.json` ;
-- la charger dans l'add-in via `cad_ir_path.txt` ou `cad_ir_input.json` ;
-- lancer l'add-in dans un design Fusion de test ;
-- verifier le message final, le blank, la cavite rectangulaire et le plancher
-  conserve ;
-- documenter les mesures avant toute mission Fusion suivante.
-
-Tant que cette validation n'est pas enregistree, ne pas lancer P6-M002 ni de
-nouvelle geometrie Fusion reelle.
+- exporter `examples/simple_finger_notch_tray.json` en CAD IR ;
+- pointer l'add-in Fusion vers cette CAD IR ;
+- verifier le message `Simple finger notch cuts: 1` ;
+- verifier que la coupe d'encoche frontale est visible sur le body cible ;
+- mesurer blank, cavite et encoche ;
+- conserver `print-validated: false` tant qu'aucune impression 3D n'a ete faite.
 
 ## Mission ready non gated si Fusion est reportee
 

@@ -4,7 +4,7 @@
   "id": "",
   "author": "BGIG",
   "description": {
-    "": "Board Game Insert Generator P4-M003: minimal rectangular blank generation from local CAD IR. Manual Fusion validation required."
+    "": "Board Game Insert Generator P6: rectangular blanks, cavity cuts and simple finger notch cuts from local CAD IR. Manual Fusion validation required."
   },
   "version": "0.1.1",
   "runOnStartup": false,
