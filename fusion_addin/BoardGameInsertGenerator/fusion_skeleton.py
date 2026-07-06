@@ -43,6 +43,7 @@ EXPLODED_VIEW_SPACING_MM = 10.0
 EXPLODED_VIEW_MAX_SOLID_COUNT = 200
 COMPACT_OCCURRENCE_ROLE = "compact_occurrence"
 EXPLODED_OCCURRENCE_ROLE = "exploded_occurrence"
+OCCURRENCE_NAME_POLICY_COMPONENT_SOURCE = "component_source_name_with_plan_role_mapping"
 SUPPORTED_SIMPLE_FINGER_NOTCH_KINDS = (
     "finger_notch",
     "side_notch",
@@ -157,7 +158,12 @@ class FusionSolidPlan:
 
 @dataclass(frozen=True)
 class FusionOccurrencePlan:
-    """One Fusion occurrence of a physical module component."""
+    """One Fusion occurrence of a physical module component.
+
+    ``occurrence_name`` is a planned report label only. The Fusion add-in must
+    not assign it to ``Occurrence.name`` because some Fusion contexts expose
+    occurrence names as read-only.
+    """
 
     occurrence_name: str
     component_id: str
@@ -172,11 +178,14 @@ class FusionOccurrencePlan:
     def to_dict(self) -> dict[str, Any]:
         return {
             "occurrence_name": self.occurrence_name,
+            "planned_occurrence_label": self.occurrence_name,
             "component_id": self.component_id,
             "source_body_id": self.source_body_id,
             "source_body_name": self.source_body_name,
             "origin_mm": self.origin_mm.to_dict(),
             "view_role": self.view_role,
+            "occurrence_name_policy": OCCURRENCE_NAME_POLICY_COMPONENT_SOURCE,
+            "direct_occurrence_rename": False,
             "operation_kind": self.operation_kind,
             "linked_component": self.linked_component,
             "validation_status": self.validation_status,

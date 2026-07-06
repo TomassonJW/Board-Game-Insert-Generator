@@ -245,7 +245,10 @@ Convention retenue :
 - l'occurrence compacte est positionnee selon l'origine CAD IR deja resolue ;
 - l'occurrence eclatee est creee via reference au meme composant et placee sur
   une grille 2D simple a droite de la boite ;
-- les noms d'occurrences recoivent `compact occurrence` ou `exploded occurrence` ;
+- les noms lisibles sont portes par les composants sources ;
+- les noms exacts d'occurrences dans le Browser peuvent etre generes par Fusion ;
+- l'add-in ne tente pas de renommer directement `Occurrence.name` ;
+- les roles compact/exploded sont explicites dans le plan hors Fusion et le message final ;
 - les dimensions restent celles de la CAD IR ;
 - aucun module composite, export, fillet, courbe ou solveur supplementaire n'est
   ajoute.
@@ -257,9 +260,12 @@ occurrences. L'add-in intercepte ce cas et affiche `assembly document required`
 avec une action claire : ouvrir/creer un document Assembly-compatible ou ajouter
 le Part a une Assembly avant de relancer.
 
-Validation : le plan et le message d'erreur sont testes hors Fusion. L'execution
-reelle reste `manual validation required` tant que Thomas n'a pas realise le
-smoke test P7-M001V3 dans un document Assembly-compatible.
+Validation : le plan, le message d'erreur et la politique de non-renommage
+direct des occurrences sont testes hors Fusion. P7-M001V3 a revele que certains
+contextes Fusion exposent `Occurrence.name` en lecture seule ; P7-M001V4 conserve
+les occurrences liees mais ne depend plus du renommage direct des occurrences.
+L'execution reelle reste `manual validation required` tant que Thomas n'a pas
+realise le smoke test P7-M001V4 dans un document Assembly-compatible.
 
 ## Vue compacte et vue eclatee
 

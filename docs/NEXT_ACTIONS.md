@@ -26,9 +26,11 @@ P11-M001 est `fusion-validated` pour la generation Fusion compacte depuis
 placements grille. P7-M001 code la generation Fusion eclatee basique corrigee
 par composants uniques et occurrences compactes/eclatees liees. P7-M001V2 a
 confirme que les documents Part Design sont incompatibles ; l'add-in affiche
-maintenant `assembly document required`. Le smoke test manuel Fusion P7-M001V3
-doit etre realise dans un document Assembly-compatible avant statut
-`fusion-validated`. L'impression 3D reste non validee.
+maintenant `assembly document required`. P7-M001V3 a confirme que le renommage
+direct de `Occurrence.name` peut echouer ; l'add-in ne tente plus ce renommage.
+Le smoke test manuel Fusion P7-M001V4 doit etre realise dans un document
+Assembly-compatible avant statut `fusion-validated`. L'impression 3D reste non
+validee.
 
 Action humaine requise avant toute mission qui genere reellement : grille 3D,
 layers, vue eclatee, demi-lune courbe, scoop interne, fillet/conge, fond arrondi,
@@ -37,7 +39,7 @@ geometrie courbe, module composite ou export STL/3MF dans Fusion.
 ## Mission ready non gated
 
 Aucune mission non-gated supplementaire n'est recommandee apres `P7-M001`
-tant que le smoke test Fusion P7-M001V3 des occurrences liees dans un document Assembly-compatible n'est pas valide.
+tant que le smoke test Fusion P7-M001V4 des occurrences liees dans un document Assembly-compatible n'est pas valide.
 La boucle asset-first produit maintenant candidats, variante recommandee, plan de
 modules concret, placement grille greedy borne, generation Fusion compacte
 validee et generation Fusion eclatee basique corrigee par occurrences liees pour inspection.
@@ -52,7 +54,7 @@ ou a une generation Fusion volumetrique reelle.
 
 `P10-SOLVER-GATE - Solveur complexe, backtracking ou optimisation globale`.
 
-`P7-M001V3 - Smoke test humain Fusion de la vue eclatee par occurrences liees dans un document Assembly-compatible`.
+`P7-M001V4 - Smoke test humain Fusion de la vue eclatee par occurrences liees, sans renommage direct d'occurrences, dans un document Assembly-compatible`.
 
 `P11-NEXT-GATE - Choisir le prochain elargissement produit apres vue compacte/eclatee`.
 

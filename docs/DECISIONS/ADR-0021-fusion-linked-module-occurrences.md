@@ -82,8 +82,21 @@ ce cas et afficher `assembly document required`, en demandant d'ouvrir/creer un
 document Assembly-compatible ou d'ajouter le Part a une Assembly avant de
 relancer.
 
+## Amendement P7-M001V3 - Nommage des occurrences
+
+Le smoke test P7-M001V3 a confirme que certains contextes Fusion exposent le nom
+visible d'une `Occurrence` comme une propriete non assignable, avec l'erreur
+`property '_get_name' of 'Occurrence' object has no setter`.
+
+Decision complementaire : conserver la strategie `Component` unique + occurrences
+liees, mais ne plus tenter de faire `occurrence.name = ...`. Les noms lisibles
+sont portes par les `Component`, bodies, sketches et features sources. Les roles
+compact/exploded restent explicites dans le plan hors Fusion et dans le message
+final de l'add-in. Le Browser Fusion peut afficher des noms d'occurrences generes
+ou suffixes automatiquement.
+
 ## Suivi
 
-- Smoke test humain P7-M001V3 requis en document Assembly-compatible.
+- Smoke test humain P7-M001V4 requis en document Assembly-compatible.
 - Nouvelle gate avant vue eclatee avancee, modules composites, exports ou
   geometrie Fusion plus ambitieuse.

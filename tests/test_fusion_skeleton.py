@@ -34,6 +34,7 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     FUSION_SKETCH_PLANE_YZ,
     GRID_PLACED_BLANK_OPERATION_KIND,
     LINKED_OCCURRENCE_OPERATION_KIND,
+    OCCURRENCE_NAME_POLICY_COMPONENT_SOURCE,
     PLAN_STATUS_PLANNED_ONLY,
     FusionSkeletonError,
     assembly_document_required_message,
@@ -420,8 +421,16 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertAlmostEqual(grid_exploded.origin_mm.x, 179.2)
         self.assertEqual(grid_exploded.origin_mm.y, 0.0)
         self.assertEqual(grid_exploded.origin_mm.z, 0.0)
-        self.assertEqual(plan.to_dict()["exploded_occurrences"][1]["operation_kind"], LINKED_OCCURRENCE_OPERATION_KIND)
-        self.assertTrue(plan.to_dict()["linked_exploded_occurrences"])
+        plan_dict = plan.to_dict()
+        exploded_occurrence_dict = plan_dict["exploded_occurrences"][0]
+        self.assertEqual(plan_dict["exploded_occurrences"][1]["operation_kind"], LINKED_OCCURRENCE_OPERATION_KIND)
+        self.assertEqual(exploded_occurrence_dict["planned_occurrence_label"], compact_exploded.occurrence_name)
+        self.assertEqual(
+            exploded_occurrence_dict["occurrence_name_policy"],
+            OCCURRENCE_NAME_POLICY_COMPONENT_SOURCE,
+        )
+        self.assertFalse(exploded_occurrence_dict["direct_occurrence_rename"])
+        self.assertTrue(plan_dict["linked_exploded_occurrences"])
 
     def test_compact_only_generation_mode_disables_exploded_view(self) -> None:
         payload = _cad_ir_payload_from_example("simple_asset_executable_plan.json")
@@ -617,10 +626,14 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("addNewComponent", source)
         self.assertIn("addExistingComponent", source)
         self.assertIn("transform2", source)
+        self.assertNotIn("occurrence.name =", source)
+        self.assertNotIn(".name = occurrence_plan.occurrence_name", source)
         self.assertIn("Module components created", source)
         self.assertIn("Compact occurrences created", source)
         self.assertIn("Exploded occurrences created", source)
         self.assertIn("Linked exploded occurrences", source)
+        self.assertIn("Occurrence direct rename attempted: no", source)
+        self.assertIn("Occurrence Browser names", source)
         self.assertIn("FusionAssemblyDocumentRequiredError", source)
         self.assertIn("Assembly-compatible Fusion document", source)
         self.assertIn("assembly document required", source)

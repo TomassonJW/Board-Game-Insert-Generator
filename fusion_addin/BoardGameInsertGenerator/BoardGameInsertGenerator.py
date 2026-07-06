@@ -17,6 +17,7 @@ try:
         FUSION_EXTENT_POSITIVE,
         FUSION_SKETCH_PLANE_XZ,
         FUSION_SKETCH_PLANE_YZ,
+        OCCURRENCE_NAME_POLICY_COMPONENT_SOURCE,
         FusionAssemblyDocumentRequiredError,
         FusionCavityCutPlan,
         FusionFingerNotchCutPlan,
@@ -41,6 +42,7 @@ except ImportError:  # pragma: no cover - Fusion may load the file as a script.
         FUSION_EXTENT_POSITIVE,
         FUSION_SKETCH_PLANE_XZ,
         FUSION_SKETCH_PLANE_YZ,
+        OCCURRENCE_NAME_POLICY_COMPONENT_SOURCE,
         FusionAssemblyDocumentRequiredError,
         FusionCavityCutPlan,
         FusionFingerNotchCutPlan,
@@ -139,6 +141,9 @@ def run(context) -> None:  # noqa: ANN001 - Fusion controls the signature.
         f"Compact occurrences created: {result['compact_occurrences_created']}\n"
         f"Exploded occurrences created: {result['exploded_occurrences_created']}\n"
         f"Linked exploded occurrences: {result['linked_exploded_occurrences']}\n"
+        "Occurrence direct rename attempted: no\n"
+        f"Occurrence naming policy: {OCCURRENCE_NAME_POLICY_COMPONENT_SOURCE}\n"
+        "Occurrence Browser names: Fusion-generated; BGIG source Component names and plan roles are authoritative.\n"
         f"Grid-positioned modules refused: {len(generation_plan.rejected_grid_modules)}\n"
         f"Rectangular cavity cuts: {result['cavity_cuts']}\n"
         f"Simple finger notch features planned: {result['finger_notch_features_planned']}\n"
@@ -285,7 +290,6 @@ def _create_module_component_occurrence(
             "Fusion component creation failed. Use an assembly-capable Fusion design "
             "for linked compact/exploded module occurrences."
         )
-    occurrence.name = occurrence_plan.occurrence_name
     _apply_occurrence_transform(occurrence, transform)
 
     module_component = occurrence.component
@@ -310,7 +314,6 @@ def _create_linked_module_occurrence(root_component, module_component, occurrenc
         raise RuntimeError(
             f"Fusion linked exploded occurrence failed for {occurrence_plan.occurrence_name}."
         )
-    occurrence.name = occurrence_plan.occurrence_name
     _apply_occurrence_transform(occurrence, transform)
 
 

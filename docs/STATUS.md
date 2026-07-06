@@ -227,7 +227,7 @@ La mission `P11-M001` code la premiere vue compacte Fusion depuis `metadata.exec
 
 La validation humaine `P11-M001V` confirmee le 2026-07-06 documente le smoke test Fusion : add-in recopie dans le dossier Fusion AddIns, CAD IR `simple_asset_executable_plan` chargee, message conforme (`CAD IR module blanks planned: 1`, `Grid-positioned asset modules planned: 1`, `Blank bodies: 2`, `Grid-positioned module bodies: 1`, `Grid-positioned modules refused: 0`), module asset-first positionne par la grille, position `X 30.0 mm`, `Y 0.0 mm`, `Z 0.0 mm` conforme ou acceptable, taille `30.0 x 30.0 x 10.0 mm` conforme ou acceptable. Statut : `fusion-validated`, `print-validated: false`.
 
-La mission `P7-M001` code une premiere vue eclatee Fusion basique. Le smoke test humain P7-M001V a valide la visibilite de la vue compacte/eclatee mais a refuse les copies independantes de bodies. La correction P7 cree maintenant un `Component` Fusion unique par module physique, une occurrence compacte et une occurrence eclatee liee du meme composant. Le smoke test P7-M001V2 a bloque dans un document Part Design incompatible avec plusieurs composants ; l'add-in detecte maintenant cette erreur et affiche `assembly document required`. Les dimensions viennent de la CAD IR, aucune tolerance ou placement compact n'est recalcule dans Fusion. Statut : garde-fou code, `manual validation required` dans un document Assembly-compatible, `print-validated: false`.
+La mission `P7-M001` code une premiere vue eclatee Fusion basique. Le smoke test humain P7-M001V a valide la visibilite de la vue compacte/eclatee mais a refuse les copies independantes de bodies. La correction P7 cree maintenant un `Component` Fusion unique par module physique, une occurrence compacte et une occurrence eclatee liee du meme composant. Le smoke test P7-M001V2 a bloque dans un document Part Design incompatible avec plusieurs composants ; l'add-in detecte maintenant cette erreur et affiche `assembly document required`. Le smoke test P7-M001V3 a ensuite bloque sur le renommage direct d'occurrence (`property '_get_name' of 'Occurrence' object has no setter`). La correction courante ne tente plus de faire `occurrence.name = ...` : les noms lisibles sont portes par les composants sources, et les roles compact/exploded sont exposes dans le plan et le message Fusion. Les dimensions viennent de la CAD IR, aucune tolerance ou placement compact n'est recalcule dans Fusion. Statut : garde-fous codes, `manual validation required` pour P7-M001V4 dans un document Assembly-compatible, `print-validated: false`.
 
 ## Phase active
 
@@ -243,11 +243,11 @@ volumetrique declarative, layers, reservations, supports abstraits et metadata C
 P11-M001 est `fusion-validated` pour la vue compacte issue du plan asset-first
 et des placements grille X/Y/Z, avec `print-validated: false`. P7-M001 est
 `implemented-fusion` pour une vue eclatee basique corrigee par occurrences liees, avec validation Fusion
-manuelle P7-M001V3 requise dans un document Assembly-compatible.
+manuelle P7-M001V4 requise dans un document Assembly-compatible.
 La North Star cible un
 generateur volumetrique asset-first, pilote par capabilities.
 
-Prochaine action recommandee : smoke test humain Fusion P7-M001V3 avant toute
+Prochaine action recommandee : smoke test humain Fusion P7-M001V4 avant toute
 nouvelle vue eclatee avancee, module composite, solveur plus automatique, export
 ou geometrie Fusion supplementaire. Une nouvelle gate humaine est requise avant
 toute extension au-dela des occurrences rectangulaires compactes/eclatees basiques.
@@ -323,7 +323,8 @@ toute extension au-dela des occurrences rectangulaires compactes/eclatees basiqu
 - Vue eclatee Fusion P7-M001 basique : corrigee comme composants physiques
   uniques avec occurrences compactes/eclatees liees, avec garde-fou
   `assembly document required` si le document actif est un Part Design
-  incompatible, `manual validation required`, `print-validated: false`.
+  incompatible, sans renommage direct de `Occurrence.name`,
+  `manual validation required`, `print-validated: false`.
 - Criteres de scoring P10-M001 documentes, sans solveur executable.
 - Comparaison P10-M002 report-only de variantes deterministes existantes dans les rapports.
 - Raisons de rejet P10-M003 structurees et actionnables pour les variantes non generables.
@@ -410,11 +411,11 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant `P7-M001 - assembly document required` :
+Derniere verification pendant `P7-M001 - occurrence name guard` :
 
 - `python -m unittest discover -s tests` : OK, 146 tests passes.
 - CLI Markdown/JSON/export CAD IR : OK sur `simple_asset_executable_plan.json`, `simple_tray.json` et `simple_finger_notch_tray.json`.
-- `python -m board_game_insert_generator export-cad-ir examples/simple_asset_executable_plan.json --output <temp>/bgig-simple_asset_executable_plan-p7-linked.cad-ir.json` : OK, fichier CAD IR genere pour smoke test Fusion.
+- `python -m board_game_insert_generator export-cad-ir examples/simple_asset_executable_plan.json --output <temp>/bgig-simple_asset_executable_plan-p7-v4-cad-ir.json` : OK, fichier CAD IR genere pour smoke test Fusion.
 - `git diff --check` : OK.
 - `rg -n "adsk" src/board_game_insert_generator` : OK, aucune occurrence dans le coeur Python.
 ## Risques actifs

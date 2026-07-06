@@ -224,18 +224,18 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Milestone : M5 CAD inspection views.
 - Objectif : conserver la vue compacte et creer une vue eclatee par occurrence liee du meme composant physique, espacee a plat pour inspection.
 - Livrable : mode add-in `compact_and_exploded`, composants Fusion uniques, occurrences compactes/eclatees liees, plan hors Fusion teste, ADR corrective, documentation et procedure de smoke test manuel.
-- Criteres d'acceptation : Fusion ne recalcule pas le solveur ; occurrences compactes/eclatees nommees ; occurrence eclatee liee au meme composant que l'occurrence compacte ; dimensions issues de la CAD IR ; coeur Python sans `adsk` ; validation manuelle requise.
+- Criteres d'acceptation : Fusion ne recalcule pas le solveur ; composants sources nommes lisiblement ; occurrences compactes/eclatees liees au meme composant sans renommage direct de `Occurrence.name` ; roles compact/exploded reportes dans le message ou le plan ; dimensions issues de la CAD IR ; coeur Python sans `adsk` ; validation manuelle requise.
 - Tests : unitaires hors Fusion, CLI/export CAD IR, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
 - Gate : validation humaine fournie le 2026-07-06 pour une vue eclatee basique uniquement.
-- Statut : `manual_validation_required`, correction occurrences liees et garde-fou Part Design/Assembly codees apres P7-M001V2 bloque.
+- Statut : `manual_validation_required`, correction occurrences liees, garde-fou Part Design/Assembly et non-renommage direct de `Occurrence.name` codes apres P7-M001V3 bloque.
 
-### P7-M001V3 - Valider manuellement la vue eclatee Fusion basique en document Assembly-compatible
+### P7-M001V4 - Valider manuellement la vue eclatee Fusion basique en document Assembly-compatible
 
 - Capability : C-FUSION-EXPLODED.
 - Milestone : M5 CAD inspection views.
-- Objectif : lancer l'add-in P7-M001 corrige dans un document Fusion Assembly-compatible avec `simple_asset_executable_plan` exporte en CAD IR et verifier que les occurrences compactes/eclatees referencent les memes composants.
+- Objectif : lancer l'add-in P7-M001 corrige dans un document Fusion Assembly-compatible avec `simple_asset_executable_plan` exporte en CAD IR et verifier que les occurrences compactes/eclatees referencent les memes composants sans exiger de noms exacts d'occurrences.
 - Livrable : validation humaine Fusion avec message, noms, espacement, dimensions observees et verification que compact/exploded sont deux occurrences du meme composant.
-- Criteres d'acceptation : vue compacte conservee, occurrences `exploded` visibles a droite de la boite, composants sources partages entre compact/exploded, dimensions conformes ou acceptables, message `assembly document required` si Part Design, aucun export STL/3MF.
+- Criteres d'acceptation : vue compacte conservee, occurrences `exploded` visibles a droite de la boite, composants sources partages entre compact/exploded, composants sources nommes lisiblement, message `Occurrence direct rename attempted: no`, dimensions conformes ou acceptables, message `assembly document required` si Part Design, aucun export STL/3MF.
 - Tests : smoke test manuel Fusion, aucune validation d'impression revendiquee.
 - Gate : action humaine requise.
 - Statut : `blocked`.

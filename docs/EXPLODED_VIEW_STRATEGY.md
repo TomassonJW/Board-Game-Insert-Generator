@@ -16,7 +16,9 @@ exports.
 - La correction P7 remplace ces copies par deux occurrences liees d'un meme
   composant physique : une occurrence compacte et une occurrence eclatee.
 - P7-M001V2 a bloque en document Part Design ; P7 affiche maintenant `assembly document required` dans ce contexte.
-- La validation Fusion manuelle P7-M001V3 en document Assembly-compatible reste requise.
+- P7-M001V3 a bloque sur le renommage direct des occurrences (`property '_get_name' of 'Occurrence' object has no setter`).
+- La correction P7-M001V4 ne tente plus de faire `occurrence.name = ...` ; les noms lisibles sont portes par les composants sources et le mapping compact/exploded dans le plan/message.
+- La validation Fusion manuelle P7-M001V4 en document Assembly-compatible reste requise.
 - Aucun export STL/3MF et aucune validation d'impression ne sont revendiques.
 
 ## Strategie P7 corrigee
@@ -37,8 +39,12 @@ Invariants :
   tolerances ;
 - les transforms d'occurrence utilisent les positions deja resolues ou la grille
   eclatee de presentation de l'add-in ;
-- les noms d'occurrences recoivent un suffixe lisible `compact occurrence` ou
-  `exploded occurrence` ;
+- les composants sources recoivent des noms lisibles ;
+- les noms exacts des occurrences dans le Browser Fusion peuvent etre generes
+  par Fusion et ne sont pas un critere de validation ;
+- l'add-in ne tente pas de renommer directement `Occurrence.name` ;
+- les roles compact/exploded restent explicites dans le plan hors Fusion et le
+  message final de l'add-in ;
 - aucune geometrie courbe, fillet, module composite ou export n'est ajoute.
 
 ## Mode local
@@ -75,6 +81,6 @@ Toute autre valeur est refusee avant generation.
 
 ## Gates
 
-- Smoke test humain P7-M001V3 en document Assembly-compatible avant statut `fusion-validated`.
+- Smoke test humain P7-M001V4 en document Assembly-compatible avant statut `fusion-validated`.
 - Nouvelle gate avant vue eclatee avancee, modules composites, export STL/3MF ou
   preparation d'impression.

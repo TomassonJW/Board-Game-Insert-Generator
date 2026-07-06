@@ -241,7 +241,7 @@ Procedure :
       `Y 0.0 mm`, `Z 0.0 mm` ;
     - dimensions attendues du module asset-first : `30.0 x 30.0 x 10.0 mm` ;
     - verifier que les occurrences compactes restent presentes et aux dimensions attendues.
-14. Pour le smoke test P7-M001V3, garder la meme CAD IR
+14. Pour le smoke test P7-M001V4, garder la meme CAD IR
     `examples/simple_asset_executable_plan.json`, laisser le mode par defaut
     `compact_and_exploded`, relancer l'add-in et verifier :
     - utiliser un design Fusion compatible avec plusieurs composants/occurrences ;
@@ -251,18 +251,19 @@ Procedure :
     - message final attendu dans le bon contexte : `Generation mode: compact_and_exploded`,
       `Module components planned: 2`, `Compact occurrences planned: 2`,
       `Exploded occurrences planned: 2`, `Module components created: 2`,
-      `Compact occurrences created: 2`, `Exploded occurrences created: 2` et
-      `Linked exploded occurrences: yes` ;
+      `Compact occurrences created: 2`, `Exploded occurrences created: 2`,
+      `Linked exploded occurrences: yes`, `Occurrence direct rename attempted: no`
+      et `Occurrence naming policy: component_source_name_with_plan_role_mapping` ;
     - deux composants modules sources attendus, nommes lisiblement, dont
       `manual-reference-bin-01 - Manual reference bin` et
       `Grid placed Grouped candidate for tokens` ;
-    - occurrence compacte manuelle :
-      `manual-reference-bin-01 rectangular blank compact occurrence` ;
-    - occurrence compacte asset-first :
-      `generated - asset-group-candidate - tokens - store - exact grid positioned rectangular blank compact occurrence` ;
-    - occurrences eclatees attendues :
-      - `manual-reference-bin-01 rectangular blank exploded occurrence` ;
-      - `generated - asset-group-candidate - tokens - store - exact grid positioned rectangular blank exploded occurrence` ;
+    - les noms exacts des occurrences dans le Browser Fusion ne sont pas un
+      critere : certains contextes Fusion exposent `Occurrence.name` en lecture
+      seule ;
+    - verifier plutot que les deux composants sources sont nommes lisiblement et
+      que le message indique la politique de mapping compact/exploded ;
+    - verifier que l'add-in n'a pas echoue avec
+      `property '_get_name' of 'Occurrence' object has no setter` ;
     - origine attendue de l'occurrence eclatee manuelle : `X 140.0 mm`,
       `Y 0.0 mm`, `Z 0.0 mm` ;
     - origine attendue de l'occurrence eclatee asset-first : `X 179.2 mm`,
@@ -279,7 +280,9 @@ Procedure :
     de validation.
 
 Ce smoke test valide uniquement la creation CAD minimale dans Fusion. Depuis la
-correction P7, la vue eclatee exige des composants/occurrences Fusion lies. Un
+correction P7, la vue eclatee exige des composants/occurrences Fusion lies. Les
+noms lisibles sont portes par les composants sources et par le message de
+mapping ; l'add-in ne tente plus de renommer directement les occurrences. Un
 document Part Design est non compatible avec cette vue liee : l'add-in doit
 afficher `assembly document required` et ne doit pas revenir aux copies
 independantes de bodies. Creer ou ouvrir un document Assembly-compatible, ou
