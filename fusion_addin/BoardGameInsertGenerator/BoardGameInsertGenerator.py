@@ -108,7 +108,8 @@ def run(context) -> None:  # noqa: ANN001 - Fusion controls the signature.
         f"Rectangular cavity cuts: {result['cavity_cuts']}\n"
         f"Simple finger notch features planned: {result['finger_notch_features_planned']}\n"
         f"Simple finger notch sketches: {result['finger_notch_sketches']}\n"
-        f"Simple finger notch cuts: {result['finger_notch_cuts']}\n"
+        f"Simple top-open finger notch cuts: {result['finger_notch_cuts']}\n"
+        "Finger notch topology: top-open rectangular wall cut.\n"
         "Creation scope: root component, compatible with Part Design documents.\n"
         "Status: manual validation required in Fusion 360."
     )

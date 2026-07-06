@@ -192,16 +192,18 @@ Procedure :
     `examples/simple_finger_notch_tray.json`, pointer `cad_ir_path.txt` vers ce
     fichier, relancer l'add-in et verifier :
     - message final : `Blank bodies: 1`, `Rectangular cavity cuts: 1`,
-      `Simple finger notch features planned: 1`, `Simple finger notch sketches: 1`
-      et `Simple finger notch cuts: 1` ;
+      `Simple finger notch features planned: 1`, `Simple finger notch sketches: 1`,
+      `Simple top-open finger notch cuts: 1` et `Finger notch topology: top-open rectangular wall cut` ;
     - body cible : `finger-notch-tray-01 rectangular blank` ;
     - feature attendue : `front-half-moon-notch`, executee comme coupe
       rectangulaire de bounding box dans la paroi frontale, pas comme demi-lune
       courbe ;
-    - verifier qu'il ne s'agit pas seulement d'un sketch visible dans le fond de
-      la cavite : une coupe volumique doit etre visible dans la paroi du tray ;
-    - position de coupe attendue : X `26.8 mm`, Y `0.8 mm`, Z `9.2 mm` ;
-    - taille de coupe attendue : `18.0 x 4.0 x 10.0 mm` ;
+    - verifier qu'il ne s'agit pas d'une fenetre fermee dans la paroi : la coupe
+      doit rejoindre le bord superieur du tray et former une morsure ouverte ;
+    - position XY de coupe attendue : X `26.8 mm`, Y `0.8 mm` ;
+    - profondeur verticale depuis le haut : `10.0 mm` ;
+    - profil top-open attendu : bas `Z 13.0 mm`, haut au-dessus du body `Z 24.0 mm` ;
+    - taille de coupe CAD IR : `18.0 x 4.0 x 10.0 mm` ;
     - cavite conservee : `62.0 x 52.0 x 20.0 mm`.
 12. Noter tout ecart, message d'erreur ou comportement Zero Doc dans un futur log
     de validation.

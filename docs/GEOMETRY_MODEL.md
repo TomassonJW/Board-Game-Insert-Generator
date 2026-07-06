@@ -218,9 +218,9 @@ Invariants P5-M004 :
 - le statut reste `abstract_only` ;
 - par defaut, `fusion_generation` reste `not_implemented` ;
 - P6-M002 autorise seulement le mapping des encoches simples de paroi vers une
-  coupe rectangulaire Fusion issue de la CAD IR ;
+  coupe rectangulaire Fusion top-open issue de la CAD IR ;
 - une `half_moon_notch` executee par P6-M002 reste une approximation
-  rectangulaire de bounding box, pas une demi-lune courbe reelle ;
+  rectangulaire top-open de bounding box, pas une demi-lune courbe reelle ;
 - aucune coupe courbe, fond arrondi, boolean complexe, fillet ou conge n'est
   genere dans Fusion.
 

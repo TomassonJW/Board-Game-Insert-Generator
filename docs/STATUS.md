@@ -176,7 +176,14 @@ Le premier smoke test humain `P6-M002V` a ete KO partiel : la feature etait lue,
 mais Fusion montrait seulement un sketch/profil mal place, sans vraie coupe
 volumique dans la paroi. Le correctif du 2026-07-06 convertit les points modele
 vers l'espace sketch via `modelToSketchSpace`, transporte explicitement paroi,
-plan et direction de cut, et requiert un nouveau smoke test Fusion.
+plan et direction de cut.
+
+Le second smoke test humain `P6-M002V` apres `3760abe` a confirme une coupe
+volumique, mais sous forme de fenetre rectangulaire fermee dans la paroi. Le
+correctif courant interprete `size_mm.z` comme `notch_depth_from_top_mm`, place le
+bas du profil a `body_top_z - notch_depth_from_top_mm` et fait depasser le haut
+du profil au-dessus du body pour produire une morsure top-open. Un nouveau smoke
+test Fusion reste requis.
 ## Phase active
 
 Phase active : **P6-M002V validation manuelle des encoches Fusion**.
@@ -184,16 +191,17 @@ Phase active : **P6-M002V validation manuelle des encoches Fusion**.
 Etat : le pipeline P4 reste stable pour les blanks rectangulaires Fusion. La
 vague P5 est terminee cote moteur Python pur, configuration, rapports et CAD IR.
 P6-M001 est `fusion-validated` pour les cavites rectangulaires simples, avec
-`print-validated: false`. P6-M002 est code et corrige apres KO partiel pour les
-encoches simples de paroi, mais reste `manual validation required` dans Fusion.
+`print-validated: false`. P6-M002 est code et corrige apres deux KO partiels pour
+les encoches simples de paroi top-open, mais reste `manual validation required`
+dans Fusion.
 La North Star cible un
 generateur volumetrique asset-first, pilote par capabilities.
 
 Prochaine action : lancer `P6-M002V - Valider manuellement les encoches de doigts
 Fusion` sur la CAD IR exportee depuis `examples/simple_finger_notch_tray.json`.
-Le test doit confirmer une vraie coupe volumique dans la paroi, pas seulement un
-sketch visible. Aucune geometrie de fond arrondi, fillet, export ou impression ne
-doit etre revendiquee.
+Le test doit confirmer une vraie morsure ouverte vers le haut de la paroi, pas
+un sketch visible et pas une fenetre fermee. Aucune geometrie de fond arrondi,
+fillet, export ou impression ne doit etre revendiquee.
 
 ## Implemente
 
@@ -249,9 +257,9 @@ doit etre revendiquee.
   `subtract_rectangular_cavity`, avec coupe verticale limitee au body cible,
   `fusion-validated` et `print-validated: false`.
 - Generation Fusion d'encoches de doigts simples P6-M002 depuis
-  `describe_cavity_feature`, comme coupes rectangulaires de paroi limitees au
-  body cible, avec correctif `modelToSketchSpace` et smoke test Fusion manuel
-  requis.
+  `describe_cavity_feature`, comme coupes rectangulaires de paroi top-open
+  limitees au body cible, avec correctifs `modelToSketchSpace` et profil depasse
+  au-dessus du body, smoke test Fusion manuel requis.
 - Pilotage produit par North Star, Product Pillars, Capability Map, milestones,
   epics, missions, gates et validations.
 - Roadmap 0-14 alignee avec la cible volumetrique asset-first.
@@ -273,8 +281,8 @@ doit etre revendiquee.
   generes.
 - Les cavites rectangulaires P6-M001 sont `fusion-validated`, mais non
   `print-validated`.
-- Les encoches de doigts simples P6-M002 sont codees et corrigees apres KO
-  partiel, mais encore `manual validation required` dans Fusion et non
+- Les encoches de doigts simples P6-M002 sont codees et corrigees apres deux KO
+  partiels, mais encore `manual validation required` dans Fusion et non
   `print-validated`.
 - Les tolerances par defaut et les profils d'impression sont prudents mais non
   calibres sur impression.
@@ -328,9 +336,10 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant `P6-M002 - Corriger les coupes d'encoches de doigts Fusion` :
+Derniere verification pendant `P6-M002 - Corriger les encoches top-open Fusion` :
 
-- `python -m unittest discover -s tests` : OK, 101 tests passes.
+- `python -m unittest discover -s tests` : OK, 102 tests passes.
+- `python -m unittest discover -s tests -p test_fusion_skeleton.py` : OK, 33 tests passes.
 - `python -m board_game_insert_generator examples\simple_tray.json --format markdown` : OK.
 - `python -m board_game_insert_generator examples\simple_tray.json --format json` : OK.
 - `python -m board_game_insert_generator export-cad-ir examples\simple_tray.json` : OK, schema `cad_ir.v0`, 1 composant.

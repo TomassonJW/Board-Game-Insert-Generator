@@ -173,6 +173,10 @@ Convention retenue :
 - la position, la taille et la cavite cible viennent uniquement de la CAD IR ;
 - `half_moon_notch` est executee comme une coupe rectangulaire de bounding box,
   avec `geometry_approximation: rectangular_bounding_cut` ;
+- pour ces fallbacks rectangulaires, `size_mm.z` est interprete comme
+  `notch_depth_from_top_mm` ;
+- le profil de coupe depasse le haut du body afin de produire une morsure ouverte
+  sur le rebord, pas une fenetre fermee ;
 - `rounded_floor`, fillets, conges, fonds arrondis et geometrie courbe reelle
   restent non executes ;
 - la coupe est esquisse sur un plan XZ ou YZ decale sur la paroi cible ;
@@ -181,11 +185,12 @@ Convention retenue :
 - l'extrusion utilise la direction positive ou negative selon la paroi cible ;
 - `participantBodies` limite la coupe au blank cible.
 
-Validation : les plans et garde-fous sont testes hors Fusion. Un premier smoke
-test P6-M002V a montre un sketch visible mais pas de coupe volumique correcte ;
-la correction impose maintenant de verifier dans Fusion les compteurs planned,
-sketches et cuts, puis la coupe reelle dans la paroi. La mesure reste `manual
-validation required` jusqu'au nouveau smoke test P6-M002V.
+Validation : les plans et garde-fous sont testes hors Fusion. Les deux premiers
+smoke tests P6-M002V ont revele successivement un sketch sans cut, puis une
+fenetre fermee dans la paroi. La correction courante impose de verifier dans
+Fusion les compteurs planned, sketches et cuts, puis une vraie encoche top-open
+reli?e au bord superieur du tray. La mesure reste `manual validation required`
+jusqu'au nouveau smoke test P6-M002V.
 
 ## Vue compacte et vue eclatee
 

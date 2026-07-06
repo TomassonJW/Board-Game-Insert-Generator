@@ -186,9 +186,11 @@ Depuis `P6-M002`, l'adaptateur peut aussi consommer les operations
 `describe_cavity_feature` pour les encoches simples de paroi. Les kinds
 `finger_notch`, `side_notch`, `center_notch` et `half_moon_notch` sont mappes en
 coupe rectangulaire quand le placement est frontal. Pour `half_moon_notch`, cette
-coupe est une approximation de bounding box ; la CAD IR conserve l'intention de
-demi-lune, mais Fusion ne cree pas encore de geometrie courbe. `rounded_floor`
-reste planifie seulement et non execute.
+coupe est une approximation de bounding box top-open ; la CAD IR conserve
+l'intention de demi-lune, mais Fusion ne cree pas encore de geometrie courbe.
+Dans l'adaptateur Fusion, `size_mm.z` est la profondeur depuis le haut du body,
+pas une hauteur de fenetre fermee. `rounded_floor` reste planifie seulement et
+non execute.
 
 ## Face roles et tolerances
 

@@ -280,10 +280,15 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(cut.target_body_id, "finger-notch-tray-01-body")
         self.assertAlmostEqual(cut.cut_origin_mm.x, 26.8)
         self.assertAlmostEqual(cut.cut_origin_mm.y, 0.8)
-        self.assertAlmostEqual(cut.cut_origin_mm.z, 9.2)
+        self.assertAlmostEqual(cut.cut_origin_mm.z, 13.0)
         self.assertEqual(cut.cut_size_mm.to_dict(), {"x": 18.0, "y": 4.0, "z": 10.0})
-        _assert_vector_almost_equal(self, cut.profile_start_mm, {"x": 26.8, "y": 0.8, "z": 9.2})
-        _assert_vector_almost_equal(self, cut.profile_end_mm, {"x": 44.8, "y": 0.8, "z": 19.2})
+        self.assertTrue(cut.top_open)
+        self.assertAlmostEqual(cut.notch_depth_from_top_mm, 10.0)
+        self.assertAlmostEqual(cut.profile_bottom_z_mm, 13.0)
+        self.assertAlmostEqual(cut.profile_top_z_mm, 24.0)
+        self.assertAlmostEqual(cut.top_open_overshoot_mm, 1.0)
+        _assert_vector_almost_equal(self, cut.profile_start_mm, {"x": 26.8, "y": 0.8, "z": 13.0})
+        _assert_vector_almost_equal(self, cut.profile_end_mm, {"x": 44.8, "y": 0.8, "z": 24.0})
         self.assertEqual(cut.cavity_local_origin_mm.to_dict(), {"x": 4.0, "y": 4.0, "z": 1.2})
         self.assertEqual(cut.feature_position_mm.to_dict(), {"x": 22.0, "y": 0.0, "z": 8.0})
         self.assertEqual(cut.geometry_approximation, "rectangular_bounding_cut")
@@ -304,8 +309,8 @@ class FusionSkeletonTests(unittest.TestCase):
                 FINGER_NOTCH_WALL_FRONT,
                 FUSION_SKETCH_PLANE_XZ,
                 FUSION_EXTENT_POSITIVE,
-                {"x": 26.8, "y": 0.8, "z": 9.2},
-                {"x": 44.8, "y": 0.8, "z": 19.2},
+                {"x": 26.8, "y": 0.8, "z": 13.0},
+                {"x": 44.8, "y": 0.8, "z": 24.0},
             ),
             (
                 "back_center",
@@ -314,8 +319,8 @@ class FusionSkeletonTests(unittest.TestCase):
                 FINGER_NOTCH_WALL_BACK,
                 FUSION_SKETCH_PLANE_XZ,
                 FUSION_EXTENT_NEGATIVE,
-                {"x": 26.8, "y": 60.0, "z": 9.2},
-                {"x": 44.8, "y": 60.0, "z": 19.2},
+                {"x": 26.8, "y": 60.0, "z": 13.0},
+                {"x": 44.8, "y": 60.0, "z": 24.0},
             ),
             (
                 "left_side",
@@ -324,8 +329,8 @@ class FusionSkeletonTests(unittest.TestCase):
                 FINGER_NOTCH_WALL_LEFT,
                 FUSION_SKETCH_PLANE_YZ,
                 FUSION_EXTENT_POSITIVE,
-                {"x": 0.8, "y": 21.8, "z": 9.2},
-                {"x": 0.8, "y": 39.8, "z": 19.2},
+                {"x": 0.8, "y": 21.8, "z": 13.0},
+                {"x": 0.8, "y": 39.8, "z": 24.0},
             ),
             (
                 "right_side",
@@ -334,8 +339,8 @@ class FusionSkeletonTests(unittest.TestCase):
                 FINGER_NOTCH_WALL_RIGHT,
                 FUSION_SKETCH_PLANE_YZ,
                 FUSION_EXTENT_NEGATIVE,
-                {"x": 70.0, "y": 21.8, "z": 9.2},
-                {"x": 70.0, "y": 39.8, "z": 19.2},
+                {"x": 70.0, "y": 21.8, "z": 13.0},
+                {"x": 70.0, "y": 39.8, "z": 24.0},
             ),
         ]
         for placement, position, size, wall, sketch_plane, direction, start, end in cases:
@@ -353,6 +358,11 @@ class FusionSkeletonTests(unittest.TestCase):
                 self.assertEqual(cut.wall, wall)
                 self.assertEqual(cut.sketch_plane, sketch_plane)
                 self.assertEqual(cut.extrude_direction, direction)
+                self.assertTrue(cut.top_open)
+                self.assertAlmostEqual(cut.notch_depth_from_top_mm, size["z"])
+                self.assertGreater(cut.profile_top_z_mm, cut.cut_origin_mm.z + cut.notch_depth_from_top_mm)
+                self.assertAlmostEqual(cut.profile_bottom_z_mm, 13.0)
+                self.assertAlmostEqual(cut.profile_top_z_mm, 24.0)
                 _assert_vector_almost_equal(self, cut.profile_start_mm, start)
                 _assert_vector_almost_equal(self, cut.profile_end_mm, end)
 
@@ -378,6 +388,14 @@ class FusionSkeletonTests(unittest.TestCase):
         operation["parameters"]["position_mm"]["x"] = -1.0
 
         with self.assertRaisesRegex(FusionSkeletonError, "must be non-negative"):
+            generation_plan_from_cad_ir(payload)
+
+    def test_rejects_top_open_finger_notch_below_cavity_floor(self) -> None:
+        payload = _cad_ir_payload_from_example("simple_finger_notch_tray.json")
+        operation = payload["components"][0]["body"]["operations"][2]
+        operation["parameters"]["size_mm"]["z"] = 22.0
+
+        with self.assertRaisesRegex(FusionSkeletonError, "top-open depth"):
             generation_plan_from_cad_ir(payload)
 
     def test_rejects_cavity_cut_that_exceeds_printable_blank_xy(self) -> None:
@@ -432,6 +450,8 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("modelToSketchSpace", source)
         self.assertIn("finger_notch_features_planned", source)
         self.assertIn("finger_notch_cuts", source)
+        self.assertIn("Simple top-open finger notch cuts", source)
+        self.assertIn("top-open rectangular wall cut", source)
         self.assertIn("compatible with Part Design documents", source)
         self.assertIn("resolve_cad_ir_input_path", source)
         self.assertIn("cad_ir_input_guidance", source)

@@ -192,7 +192,7 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Criteres d'acceptation : aucune logique metier dans Fusion, coupe limitee au body cible, dimensions issues de la CAD IR, features courbes non revendiquees comme courbes reelles, absence STL/3MF.
 - Tests : unitaires hors Fusion, CLI Markdown/JSON/export CAD IR sur `simple_tray` et `simple_finger_notch_tray`, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
 - Gate : validation humaine fournie le 2026-07-06 pour les encoches de doigts simples uniquement.
-- Statut : `done`, `implemented-fusion`, correctif KO partiel applique, smoke test Fusion manuel requis, `print-validated: false`.
+- Statut : `done`, `implemented-fusion`, correctifs KO partiels appliques dont top-open, smoke test Fusion manuel requis, `print-validated: false`.
 
 ### P6-M002V - Valider manuellement les encoches de doigts Fusion
 
@@ -200,10 +200,10 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Milestone : M5 CAD ergonomic features.
 - Objectif : lancer l'add-in P6-M002 dans Fusion avec `examples/simple_finger_notch_tray.json` exporte en CAD IR, mesurer le blank, la cavite et la coupe d'encoche.
 - Livrable : log de validation manuelle Fusion avec mesures et statut explicite `print-validated: false` tant qu'aucune impression 3D n'est faite.
-- Criteres d'acceptation : message final avec `Simple finger notch features planned: 1`, `Simple finger notch sketches: 1` et `Simple finger notch cuts: 1`, coupe volumique visible dans la paroi du body cible, dimensions conformes a la CAD IR, aucune geometrie courbe revendiquee.
+- Criteres d'acceptation : message final avec `Simple finger notch features planned: 1`, `Simple finger notch sketches: 1`, `Simple top-open finger notch cuts: 1` et `Finger notch topology: top-open rectangular wall cut`, morsure top-open visible dans la paroi du body cible, dimensions conformes a la CAD IR, aucune geometrie courbe revendiquee.
 - Tests : smoke test manuel Fusion.
 - Gate : action humaine requise.
-- Statut : `blocked` par nouvelle validation manuelle apres KO partiel corrige.
+- Statut : `blocked` par nouvelle validation manuelle apres KO partiels corriges.
 
 ## Phase 7 - Vue compacte / vue eclatee
 

@@ -26,6 +26,9 @@ rectangulaires issues directement de la CAD IR.
 - `half_moon_notch` reste une intention abstraite cote moteur ; Fusion cree
   seulement une coupe rectangulaire de bounding box, signalee par
   `geometry_approximation: rectangular_bounding_cut`.
+- Cette coupe rectangulaire doit etre top-open : `size_mm.z` represente la
+  profondeur depuis le haut du body et le profil depasse legerement au-dessus du
+  top pour eviter une fenetre fermee.
 - `rounded_floor` reste non execute.
 - Fusion consomme `position_mm`, `size_mm`, `cavity_id` et `placement` deja
   serialises en CAD IR. Fusion ne recalcule ni layout, ni tolerances, ni offset.
@@ -37,9 +40,9 @@ rectangulaires issues directement de la CAD IR.
 
 ## Consequences
 
-Le pipeline peut maintenant produire une aide de prise en main simple inspectable
-dans Fusion, mais cette aide n'est pas encore une demi-lune geometrique reelle.
-Elle doit etre presentee comme une coupe rectangulaire de paroi.
+Le pipeline peut produire une aide de prise en main simple inspectable dans
+Fusion, mais cette aide n'est pas encore une demi-lune geometrique reelle. Elle
+doit etre presentee comme une coupe rectangulaire top-open de paroi.
 
 La validation automatisee couvre la preparation, le plan de generation, les
 garde-fous et l'absence de dependance `adsk` dans le coeur Python. La creation et

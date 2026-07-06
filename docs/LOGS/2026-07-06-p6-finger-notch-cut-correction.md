@@ -44,3 +44,10 @@ smoke test manuel Fusion requis pour verifier qu'une vraie coupe volumique
 apparait dans la paroi du tray.
 
 `print-validated: false` reste inchangé.
+
+## Suite P6-M002V
+
+Le smoke test suivant a confirme que le cut volumique etait cree, mais sous forme
+de fenetre fermee. Cette correction reste utile pour le passage sketch -> cut,
+mais elle est completee par `2026-07-06-p6-top-open-finger-notch-correction.md`
+pour la topologie top-open.

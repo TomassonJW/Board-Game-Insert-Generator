@@ -39,6 +39,7 @@ FUSION_SKETCH_PLANE_XZ = "xz"
 FUSION_SKETCH_PLANE_YZ = "yz"
 FUSION_EXTENT_POSITIVE = "positive"
 FUSION_EXTENT_NEGATIVE = "negative"
+FINGER_NOTCH_TOP_OPEN_OVERSHOOT_MM = 1.0
 SUPPORTED_FINGER_NOTCH_PLACEMENT_WALLS = {
     "front": FINGER_NOTCH_WALL_FRONT,
     "front_center": FINGER_NOTCH_WALL_FRONT,
@@ -184,6 +185,11 @@ class FusionFingerNotchCutPlan:
     sketch_plane_offset_mm: float
     extrude_direction: str
     cut_depth_mm: float
+    top_open: bool
+    notch_depth_from_top_mm: float
+    profile_bottom_z_mm: float
+    profile_top_z_mm: float
+    top_open_overshoot_mm: float
     cut_origin_mm: FusionVectorMm
     cut_size_mm: FusionVectorMm
     profile_start_mm: FusionVectorMm
@@ -211,6 +217,11 @@ class FusionFingerNotchCutPlan:
             "sketch_plane_offset_mm": self.sketch_plane_offset_mm,
             "extrude_direction": self.extrude_direction,
             "cut_depth_mm": self.cut_depth_mm,
+            "top_open": self.top_open,
+            "notch_depth_from_top_mm": self.notch_depth_from_top_mm,
+            "profile_bottom_z_mm": self.profile_bottom_z_mm,
+            "profile_top_z_mm": self.profile_top_z_mm,
+            "top_open_overshoot_mm": self.top_open_overshoot_mm,
             "cut_origin_mm": self.cut_origin_mm.to_dict(),
             "cut_size_mm": self.cut_size_mm.to_dict(),
             "profile_start_mm": self.profile_start_mm.to_dict(),
@@ -775,6 +786,11 @@ def _finger_notch_cut_plans(
                 sketch_plane_offset_mm=geometry["sketch_plane_offset_mm"],
                 extrude_direction=geometry["extrude_direction"],
                 cut_depth_mm=geometry["cut_depth_mm"],
+                top_open=geometry["top_open"],
+                notch_depth_from_top_mm=geometry["notch_depth_from_top_mm"],
+                profile_bottom_z_mm=geometry["profile_bottom_z_mm"],
+                profile_top_z_mm=geometry["profile_top_z_mm"],
+                top_open_overshoot_mm=geometry["top_open_overshoot_mm"],
                 cut_origin_mm=geometry["cut_origin_mm"],
                 cut_size_mm=feature_size,
                 profile_start_mm=geometry["profile_start_mm"],
@@ -800,6 +816,21 @@ def _finger_notch_cut_geometry(
     feature_size: FusionVectorMm,
     wall: str,
 ) -> dict[str, Any]:
+    profile_bottom_z, profile_top_z = _top_open_notch_z_range(
+        blank,
+        cavity_id,
+        feature_id,
+        cavity_origin,
+        feature_size,
+    )
+    top_open_metadata = {
+        "top_open": True,
+        "notch_depth_from_top_mm": feature_size.z,
+        "profile_bottom_z_mm": profile_bottom_z,
+        "profile_top_z_mm": profile_top_z,
+        "top_open_overshoot_mm": FINGER_NOTCH_TOP_OPEN_OVERSHOOT_MM,
+    }
+
     if wall == FINGER_NOTCH_WALL_FRONT:
         _validate_front_or_back_finger_notch_bounds(
             blank,
@@ -814,19 +845,20 @@ def _finger_notch_cut_geometry(
         cut_origin = FusionVectorMm(
             x=blank.origin_mm.x + cavity_origin.x + feature_position.x,
             y=blank.origin_mm.y + cavity_origin.y - feature_size.y,
-            z=blank.origin_mm.z + cavity_origin.z + feature_position.z,
+            z=profile_bottom_z,
         )
         return {
+            **top_open_metadata,
             "sketch_plane": FUSION_SKETCH_PLANE_XZ,
             "sketch_plane_offset_mm": cut_origin.y,
             "extrude_direction": FUSION_EXTENT_POSITIVE,
             "cut_depth_mm": feature_size.y,
             "cut_origin_mm": cut_origin,
-            "profile_start_mm": FusionVectorMm(cut_origin.x, cut_origin.y, cut_origin.z),
+            "profile_start_mm": FusionVectorMm(cut_origin.x, cut_origin.y, profile_bottom_z),
             "profile_end_mm": FusionVectorMm(
                 cut_origin.x + feature_size.x,
                 cut_origin.y,
-                cut_origin.z + feature_size.z,
+                profile_top_z,
             ),
         }
 
@@ -844,20 +876,21 @@ def _finger_notch_cut_geometry(
         cut_origin = FusionVectorMm(
             x=blank.origin_mm.x + cavity_origin.x + feature_position.x,
             y=blank.origin_mm.y + cavity_origin.y + cavity_size.y,
-            z=blank.origin_mm.z + cavity_origin.z + feature_position.z,
+            z=profile_bottom_z,
         )
         plane_y = cut_origin.y + feature_size.y
         return {
+            **top_open_metadata,
             "sketch_plane": FUSION_SKETCH_PLANE_XZ,
             "sketch_plane_offset_mm": plane_y,
             "extrude_direction": FUSION_EXTENT_NEGATIVE,
             "cut_depth_mm": feature_size.y,
             "cut_origin_mm": cut_origin,
-            "profile_start_mm": FusionVectorMm(cut_origin.x, plane_y, cut_origin.z),
+            "profile_start_mm": FusionVectorMm(cut_origin.x, plane_y, profile_bottom_z),
             "profile_end_mm": FusionVectorMm(
                 cut_origin.x + feature_size.x,
                 plane_y,
-                cut_origin.z + feature_size.z,
+                profile_top_z,
             ),
         }
 
@@ -875,19 +908,20 @@ def _finger_notch_cut_geometry(
         cut_origin = FusionVectorMm(
             x=blank.origin_mm.x + cavity_origin.x - feature_size.x,
             y=blank.origin_mm.y + cavity_origin.y + feature_position.y,
-            z=blank.origin_mm.z + cavity_origin.z + feature_position.z,
+            z=profile_bottom_z,
         )
         return {
+            **top_open_metadata,
             "sketch_plane": FUSION_SKETCH_PLANE_YZ,
             "sketch_plane_offset_mm": cut_origin.x,
             "extrude_direction": FUSION_EXTENT_POSITIVE,
             "cut_depth_mm": feature_size.x,
             "cut_origin_mm": cut_origin,
-            "profile_start_mm": FusionVectorMm(cut_origin.x, cut_origin.y, cut_origin.z),
+            "profile_start_mm": FusionVectorMm(cut_origin.x, cut_origin.y, profile_bottom_z),
             "profile_end_mm": FusionVectorMm(
                 cut_origin.x,
                 cut_origin.y + feature_size.y,
-                cut_origin.z + feature_size.z,
+                profile_top_z,
             ),
         }
 
@@ -905,24 +939,42 @@ def _finger_notch_cut_geometry(
         cut_origin = FusionVectorMm(
             x=blank.origin_mm.x + cavity_origin.x + cavity_size.x,
             y=blank.origin_mm.y + cavity_origin.y + feature_position.y,
-            z=blank.origin_mm.z + cavity_origin.z + feature_position.z,
+            z=profile_bottom_z,
         )
         plane_x = cut_origin.x + feature_size.x
         return {
+            **top_open_metadata,
             "sketch_plane": FUSION_SKETCH_PLANE_YZ,
             "sketch_plane_offset_mm": plane_x,
             "extrude_direction": FUSION_EXTENT_NEGATIVE,
             "cut_depth_mm": feature_size.x,
             "cut_origin_mm": cut_origin,
-            "profile_start_mm": FusionVectorMm(plane_x, cut_origin.y, cut_origin.z),
+            "profile_start_mm": FusionVectorMm(plane_x, cut_origin.y, profile_bottom_z),
             "profile_end_mm": FusionVectorMm(
                 plane_x,
                 cut_origin.y + feature_size.y,
-                cut_origin.z + feature_size.z,
+                profile_top_z,
             ),
         }
 
     raise FusionSkeletonError(f"Unsupported finger notch wall {wall!r}.")
+
+
+def _top_open_notch_z_range(
+    blank: FusionSolidPlan,
+    cavity_id: str,
+    feature_id: str,
+    cavity_origin: FusionVectorMm,
+    feature_size: FusionVectorMm,
+) -> tuple[float, float]:
+    body_top_z = blank.origin_mm.z + blank.size_mm.z
+    cavity_floor_z = blank.origin_mm.z + cavity_origin.z
+    profile_bottom_z = body_top_z - feature_size.z
+    if profile_bottom_z < cavity_floor_z:
+        raise FusionSkeletonError(
+            f"Finger notch {feature_id!r} exceeds top-open depth before cavity {cavity_id!r} floor."
+        )
+    return profile_bottom_z, body_top_z + FINGER_NOTCH_TOP_OPEN_OVERSHOOT_MM
 
 
 def _cavities_by_id(body: dict[str, Any], body_id: str) -> dict[str, dict[str, Any]]:
@@ -954,10 +1006,6 @@ def _validate_front_or_back_finger_notch_bounds(
     if feature_position.x + feature_size.x > cavity_size.x:
         raise FusionSkeletonError(
             f"Finger notch {feature_id!r} exceeds cavity {cavity_id!r} width."
-        )
-    if feature_position.z + feature_size.z > cavity_size.z:
-        raise FusionSkeletonError(
-            f"Finger notch {feature_id!r} exceeds cavity {cavity_id!r} height."
         )
     if wall == FINGER_NOTCH_WALL_FRONT:
         if not _almost_equal_mm(feature_position.y, 0):
@@ -996,10 +1044,6 @@ def _validate_left_or_right_finger_notch_bounds(
     if feature_position.y + feature_size.y > cavity_size.y:
         raise FusionSkeletonError(
             f"Finger notch {feature_id!r} exceeds cavity {cavity_id!r} depth."
-        )
-    if feature_position.z + feature_size.z > cavity_size.z:
-        raise FusionSkeletonError(
-            f"Finger notch {feature_id!r} exceeds cavity {cavity_id!r} height."
         )
     if wall == FINGER_NOTCH_WALL_LEFT:
         if not _almost_equal_mm(feature_position.x, 0):
