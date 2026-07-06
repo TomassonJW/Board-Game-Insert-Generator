@@ -332,7 +332,19 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Criteres d'acceptation : raisons actionnables, pas d'optimiseur global.
 - Tests : unitaires + CLI JSON/Markdown.
 - Gate : aucune si report-only.
+- Statut : `done`, `implemented-core`.
+
+### P10-M004 - Generer des candidats de modules depuis assets simples
+
+- Capability : C-ASSET, C-SOLVER.
+- Milestone : M6 Asset-first project model / M10 Semi-automatic solver.
+- Objectif : produire une synthese deterministe `assets -> module_candidates` sans modifier `modules` ni lancer de solveur global.
+- Livrable : rapports Markdown/JSON, metadata CAD IR additive si compatible, exemple et tests.
+- Criteres d'acceptation : assets et modules restent distincts ; les candidats sont explicables, bornes et non generes dans Fusion.
+- Tests : unitaires + CLI Markdown/JSON/export CAD IR sur exemples assets.
+- Gate : stop si generation automatique de layout complexe, changement incompatible CAD IR ou geometrie Fusion reelle.
 - Statut : `ready`.
+
 ## Phase 11 - Modules composites et formes soudees
 
 ### P11-M001 - Representer les modules composites par primitives soudees

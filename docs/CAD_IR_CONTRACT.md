@@ -86,7 +86,7 @@ volumetriques sans forcer Fusion a recalculer :
 - volumes libres et contraintes d'empilement ;
 - ordre de retrait et metadata d'accessibilite ;
 - intentions de vue compacte et de vue eclatee ;
-- scores et raisons de variantes quand un solveur existera.
+- scores et raisons de variantes quand un solveur existera. Depuis P10-M003, les rapports JSON exposent deja des `rejection_reasons` structurees ; elles ne sont pas encore transportees comme metadata CAD IR dediee.
 
 Ces extensions devront rester additives ou passer par une nouvelle version de
 schema. Elles ne doivent pas rendre une CAD IR `cad_ir.v0` existante invalide

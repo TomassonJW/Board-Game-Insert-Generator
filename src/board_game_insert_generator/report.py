@@ -130,6 +130,7 @@ def layout_to_json(config: InsertConfig, result: LayoutResult) -> str:
 def layout_to_markdown(config: InsertConfig, result: LayoutResult) -> str:
     planned_cavities = _planned_cavities_by_instance(config, result)
     volumetric_summary = build_volumetric_summary(config)
+    variant_comparison = _variant_comparison(config, result)
     planned_cavity_count = sum(len(entries) for entries in planned_cavities.values())
     planned_feature_count = _planned_feature_count(planned_cavities)
     lines = [
@@ -173,8 +174,9 @@ def layout_to_markdown(config: InsertConfig, result: LayoutResult) -> str:
         "",
         "| Variant | Status | Total | Compact | Access | Reservations | Print | Setup | Confidence | Reasons |",
         "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |",
-        *_format_variant_rows(_variant_comparison(config, result)),
+        *_format_variant_rows(variant_comparison),
         "",
+        *_format_rejected_variant_reason_section(variant_comparison),
         "## Tolerance profile",
         "",
         f"- Print profile: `{config.print_profile}` ({print_profile_label(config.print_profile)})",
@@ -306,7 +308,8 @@ def _variant_comparison(config: InsertConfig, current_result: LayoutResult) -> l
                     "status": "rejected",
                     "total_score": 0.0,
                     "subscores": {},
-                    "reasons": [entry.get("error", "Variant could not be generated.")],
+                    "reasons": _variant_rejection_messages(entry),
+                    "rejection_reasons": _variant_rejection_reasons(entry),
                 }
             )
             continue
@@ -320,6 +323,7 @@ def _variant_comparison(config: InsertConfig, current_result: LayoutResult) -> l
                 "total_score": total_score,
                 "subscores": subscores,
                 "reasons": _variant_reasons(config, entry),
+                "rejection_reasons": [],
             }
         )
     return variants
@@ -395,6 +399,126 @@ def _variant_reasons(config: InsertConfig, entry: dict[str, Any]) -> list[str]:
     return reasons
 
 
+
+def _variant_rejection_messages(entry: dict[str, Any]) -> list[str]:
+    return [
+        f"{reason['code']}: {reason['message']} Action: {reason['actionable']}"
+        for reason in _variant_rejection_reasons(entry)
+    ]
+
+
+def _variant_rejection_reasons(entry: dict[str, Any]) -> list[dict[str, str]]:
+    error = str(entry.get("error") or "Variant could not be generated.")
+    lowered = error.lower()
+
+    if "needed y up to" in lowered or "span must stay inside" in lowered:
+        return [
+            _rejection_reason(
+                code="DOES_NOT_FIT",
+                category="fit",
+                message=error,
+                constraint_ref="box.inner_dimensions_mm / layout.strategy",
+                actionable="Reduce module footprint, split modules, increase box size, or choose another deterministic layout.",
+            )
+        ]
+    if "wider than the box" in lowered or "cannot fit in one" in lowered or "footprint cannot fit" in lowered:
+        return [
+            _rejection_reason(
+                code="DIMENSIONS_INCOMPATIBLE",
+                category="dimensions",
+                message=error,
+                constraint_ref="modules[].min_dimensions_mm / box.inner_dimensions_mm",
+                actionable="Check measured dimensions and allowed rotation before comparing variants.",
+            )
+        ]
+    if "collision" in lowered or "already used" in lowered:
+        return [
+            _rejection_reason(
+                code="COLLISION",
+                category="volumetric",
+                message=error,
+                constraint_ref="volumetric_grid.module_placements / volumetric_grid.zones",
+                actionable="Move or resize the conflicting volumetric span.",
+            )
+        ]
+    if "layer" in lowered and ("outside" in lowered or "overlap" in lowered):
+        return [
+            _rejection_reason(
+                code="LAYER_EXCEEDED",
+                category="volumetric",
+                message=error,
+                constraint_ref="volumetric_grid.layers",
+                actionable="Adjust layer z_start and z_count so every layer stays inside the grid without overlap.",
+            )
+        ]
+    if "support surface" in lowered or "support" in lowered:
+        return [
+            _rejection_reason(
+                code="SUPPORT_INSUFFICIENT",
+                category="support",
+                message=error,
+                constraint_ref="volumetric_grid.support_surfaces",
+                actionable="Declare a valid abstract support surface or remove the unsupported reference.",
+            )
+        ]
+    if "removal_order" in lowered or "access_direction" in lowered:
+        return [
+            _rejection_reason(
+                code="REMOVAL_ORDER_IMPOSSIBLE",
+                category="access",
+                message=error,
+                constraint_ref="volumetric_grid.*.removal_order / access_direction",
+                actionable="Give removable entries a unique positive order and an explicit access direction.",
+            )
+        ]
+    if "reservation" in lowered or "reserved" in lowered:
+        return [
+            _rejection_reason(
+                code="RESERVATION_VIOLATED",
+                category="reservation",
+                message=error,
+                constraint_ref="assets[].reservation_ref / volumetric_grid.zones",
+                actionable="Use an existing reservation id and keep printable placements outside reserved spans.",
+            )
+        ]
+    if "clearance" in lowered:
+        return [
+            _rejection_reason(
+                code="CLEARANCE_INSUFFICIENT",
+                category="clearance",
+                message=error,
+                constraint_ref="modules[].cavities[].clearance_mm / tolerances",
+                actionable="Increase cavity clearance or choose a profile whose minimum clearance matches the intent.",
+            )
+        ]
+
+    return [
+        _rejection_reason(
+            code="VARIANT_GENERATION_FAILED",
+            category="general",
+            message=error,
+            constraint_ref="layout.strategy",
+            actionable="Inspect the validation or layout error and adjust the input configuration.",
+        )
+    ]
+
+
+def _rejection_reason(
+    *,
+    code: str,
+    category: str,
+    message: str,
+    constraint_ref: str,
+    actionable: str,
+) -> dict[str, str]:
+    return {
+        "code": code,
+        "category": category,
+        "severity": "error",
+        "message": message,
+        "constraint_ref": constraint_ref,
+        "actionable": actionable,
+    }
 def _format_variant_rows(variants: list[dict[str, Any]]) -> list[str]:
     rows: list[str] = []
     for variant in variants:
@@ -414,6 +538,34 @@ def _format_variant_rows(variants: list[dict[str, Any]]) -> list[str]:
         )
     return rows
 
+
+def _format_rejected_variant_reason_section(variants: list[dict[str, Any]]) -> list[str]:
+    rejected = [
+        (variant, reason)
+        for variant in variants
+        for reason in variant.get("rejection_reasons", ())
+    ]
+    lines = ["### Rejected variant details", ""]
+    if not rejected:
+        return lines + ["- No rejected variants.", ""]
+
+    lines.extend(
+        [
+            "| Variant | Code | Category | Constraint | Action |",
+            "| --- | --- | --- | --- | --- |",
+        ]
+    )
+    for variant, reason in rejected:
+        lines.append(
+            "| "
+            f"{variant['variant_id']} | "
+            f"{reason['code']} | "
+            f"{reason['category']} | "
+            f"{reason['constraint_ref']} | "
+            f"{reason['actionable']} |"
+        )
+    lines.append("")
+    return lines
 def _format_volumetric_grid_section(summary: VolumetricSummary | None) -> list[str]:
     if summary is None:
         return []

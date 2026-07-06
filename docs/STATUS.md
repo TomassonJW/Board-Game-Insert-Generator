@@ -211,6 +211,8 @@ La mission `P10-M001` definit les criteres de scoring de variantes dans `SOLVER_
 
 La mission `P10-M002` ajoute `variant_comparison` dans les rapports Markdown/JSON : comparaison report-only des strategies deterministes `row_fill` et `grid`, sous-scores explicables et raisons. Aucun optimiseur global, aucune nouvelle strategie de placement, aucune dependance lourde et aucune generation Fusion ne sont ajoutes.
 
+La mission `P10-M003` enrichit les variantes `rejected` avec `rejection_reasons` structurees : code, categorie, severite, message source, reference de contrainte et action corrective. Elle reste report-only et ne cree ni nouveau solveur ni nouveau placement.
+
 ## Phase active
 
 Phase active : **P8 volumetric planner abstrait / gate avant generation Fusion volumetrique**.
@@ -225,7 +227,7 @@ volumetrique declarative, layers, reservations, supports abstraits et metadata C
 La North Star cible un
 generateur volumetrique asset-first, pilote par capabilities.
 
-Prochaine action recommandee : `P10-M003` pour enrichir les raisons de variantes refusees, si cela reste report-only. Une nouvelle gate humaine est requise avant toute generation Fusion
+Prochaine action recommandee : `P10-M004` pour produire une premiere synthese deterministe `assets -> module_candidates`, si cela reste report-only et sans generation Fusion. Une nouvelle gate humaine est requise avant toute generation Fusion
 reelle liee a la grille 3D, aux layers, aux vues eclatees ou aux features
 avancees.
 
@@ -290,6 +292,7 @@ avancees.
   sans generation de modules.
 - Criteres de scoring P10-M001 documentes, sans solveur executable.
 - Comparaison P10-M002 report-only de variantes deterministes existantes dans les rapports.
+- Raisons de rejet P10-M003 structurees et actionnables pour les variantes non generables.
 - Generation Fusion de cavites rectangulaires simples P6-M001 depuis
   `subtract_rectangular_cavity`, avec coupe verticale limitee au body cible,
   `fusion-validated` et `print-validated: false`.
@@ -373,28 +376,28 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant `P10-M002 - Variantes deterministes report-only` :
+Derniere verification pendant `P10-M003 - Raisons detaillees de variantes refusees` :
 
-- `python -m unittest discover -s tests` : OK, 128 tests passes.
-- `python -m py_compile src\board_game_insert_generator\models.py src\board_game_insert_generator\config_loader.py src\board_game_insert_generator\validation.py src\board_game_insert_generator\volumetric.py src\board_game_insert_generator\report.py src\board_game_insert_generator\cad_ir.py` : OK.
+- `python -m unittest discover -s tests` : OK, 129 tests passes.
+- `python -m py_compile src\board_game_insert_generator\report.py tests\test_assets.py` : OK.
 - `python -m board_game_insert_generator examples\simple_box.json --format markdown` : OK.
 - `python -m board_game_insert_generator examples\simple_box.json --format json` : OK.
-- `python -m board_game_insert_generator export-cad-ir examples\simple_box.json` : OK, schema `cad_ir.v0`, 4 composants.
+- `python -m board_game_insert_generator export-cad-ir examples\simple_box.json --output %TEMP%\bgig-cad-ir-validation\simple_box.cad-ir.json` : OK, schema `cad_ir.v0`, 4 composants.
 - `python -m board_game_insert_generator examples\simple_tray.json --format markdown` : OK.
 - `python -m board_game_insert_generator examples\simple_tray.json --format json` : OK.
-- `python -m board_game_insert_generator export-cad-ir examples\simple_tray.json` : OK, schema `cad_ir.v0`, 1 composant.
+- `python -m board_game_insert_generator export-cad-ir examples\simple_tray.json --output %TEMP%\bgig-cad-ir-validation\simple_tray.cad-ir.json` : OK, schema `cad_ir.v0`, 1 composant.
 - `python -m board_game_insert_generator examples\simple_finger_notch_tray.json --format markdown` : OK.
 - `python -m board_game_insert_generator examples\simple_finger_notch_tray.json --format json` : OK.
-- `python -m board_game_insert_generator export-cad-ir examples\simple_finger_notch_tray.json` : OK, schema `cad_ir.v0`, 1 composant.
+- `python -m board_game_insert_generator export-cad-ir examples\simple_finger_notch_tray.json --output %TEMP%\bgig-cad-ir-validation\simple_finger_notch_tray.cad-ir.json` : OK, schema `cad_ir.v0`, 1 composant.
 - `python -m board_game_insert_generator examples\simple_3d_grid.json --format markdown` : OK, section `Volumetric grid` exposee.
 - `python -m board_game_insert_generator examples\simple_3d_grid.json --format json` : OK, `volumetric_grid.free_cell_count = 18`.
-- `python -m board_game_insert_generator export-cad-ir examples\simple_3d_grid.json` : OK, schema `cad_ir.v0`, metadata `volumetric_grid`, 2 composants.
+- `python -m board_game_insert_generator export-cad-ir examples\simple_3d_grid.json --output %TEMP%\bgig-cad-ir-validation\simple_3d_grid.cad-ir.json` : OK, schema `cad_ir.v0`, metadata `volumetric_grid`, 2 composants.
 - `python -m board_game_insert_generator examples\simple_3d_reservations.json --format markdown` : OK, sections `Support surfaces` et `Removal sequence` exposees.
 - `python -m board_game_insert_generator examples\simple_3d_reservations.json --format json` : OK, `support_surfaces` et `removal_sequence` presents.
-- `python -m board_game_insert_generator export-cad-ir examples\simple_3d_reservations.json` : OK, schema `cad_ir.v0`, metadata `volumetric_grid.support_surfaces`, 2 composants.
+- `python -m board_game_insert_generator export-cad-ir examples\simple_3d_reservations.json --output %TEMP%\bgig-cad-ir-validation\simple_3d_reservations.cad-ir.json` : OK, schema `cad_ir.v0`, metadata `volumetric_grid.support_surfaces`, 2 composants.
 - `python -m board_game_insert_generator examples\simple_assets.json --format markdown` : OK, section `Assets` exposee.
 - `python -m board_game_insert_generator examples\simple_assets.json --format json` : OK, `summary.asset_count = 2`.
-- `python -m board_game_insert_generator export-cad-ir examples\simple_assets.json` : OK, schema `cad_ir.v0`, metadata `assets`, 2 composants.
+- `python -m board_game_insert_generator export-cad-ir examples\simple_assets.json --output %TEMP%\bgig-cad-ir-validation\simple_assets.cad-ir.json` : OK, schema `cad_ir.v0`, metadata `assets`, 2 composants.
 - `git diff --check` : OK.
 - `rg -n "adsk" src/board_game_insert_generator` : OK, aucune occurrence dans le coeur Python.
 

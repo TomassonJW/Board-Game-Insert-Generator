@@ -11,6 +11,7 @@ pas devenir une boite noire ni remplacer les gates physiques.
 - Le rapport contient un score simple de layout, non optimise.
 - Aucun optimiseur global, heuristique complexe ou dependance lourde n'est present.
 - P10-M002 expose une comparaison `variant_comparison` report-only entre strategies deterministes deja implementees.
+- P10-M003 ajoute des raisons de rejet structurees et actionnables pour les variantes non generables.
 
 ## Strategie cible
 
@@ -93,3 +94,26 @@ est `explain_only` ou `rejected`.
 
 Ce n'est pas un solveur complet : aucune optimisation globale, aucun backtracking,
 aucune dependance externe et aucune generation Fusion ne sont ajoutes.
+
+## Raisons detaillees de rejet P10-M003
+
+P10-M003 enrichit les variantes `rejected` avec `rejection_reasons`, en plus des
+raisons textuelles deja presentes. Chaque raison contient : `code`, `category`,
+`severity`, `message`, `constraint_ref` et `actionable`.
+
+Codes de rejet documentes pour le reporting report-only :
+
+| Code | Sens | Exemple de correction |
+| --- | --- | --- |
+| `DOES_NOT_FIT` | La variante ne rentre pas dans l'enveloppe disponible. | Reduire un module, changer de strategie deterministe ou agrandir la boite. |
+| `DIMENSIONS_INCOMPATIBLE` | Une dimension de module/asset est incompatible avec la boite ou l'orientation. | Verifier les mesures et la rotation autorisee. |
+| `COLLISION` | Des spans volumetriques declaratifs se chevauchent. | Deplacer ou redimensionner un placement ou une zone. |
+| `LAYER_EXCEEDED` | Un layer sort de la grille ou chevauche un autre layer. | Corriger `z_start` / `z_count`. |
+| `SUPPORT_INSUFFICIENT` | Une reference de support abstrait est absente ou incoherente. | Declarer une surface de support abstraite valide. |
+| `REMOVAL_ORDER_IMPOSSIBLE` | L'ordre de retrait ou la direction d'acces est incoherent. | Donner un ordre unique et une direction explicite. |
+| `RESERVATION_VIOLATED` | Une reservation attendue est absente ou violee. | Relier l'asset a une zone existante ou preserver le span reserve. |
+| `CLEARANCE_INSUFFICIENT` | Un jeu de cavite est inferieur au profil actif. | Augmenter le clearance ou changer de profil. |
+| `VARIANT_GENERATION_FAILED` | Rejet generique non classe. | Lire l'erreur source et corriger la configuration. |
+
+Cette taxonomie ne cree pas de nouveau solveur. Elle classe les erreurs de
+validation/layout deja disponibles pour rendre les refus exploitables.

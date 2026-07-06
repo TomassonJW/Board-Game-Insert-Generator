@@ -30,16 +30,15 @@ geometrie courbe, module composite ou export STL/3MF dans Fusion.
 
 ## Mission ready non gated
 
-`P10-M003 - Rapporter les variantes refusees avec raisons detaillees`.
+`P10-M004 - Generer des candidats de modules depuis assets simples`.
 
-- Capability : `C-SOLVER`.
-- Milestone : `M10 Semi-automatic solver`.
-- Objectif : enrichir les variantes `rejected` avec raisons structurees et
-  references de contraintes, sans nouveau solveur.
-- Gate : aucune si report-only ; stop si une nouvelle strategie de placement,
-  optimisation globale ou dependance lourde devient necessaire.
+- Capability : `C-ASSET`, `C-SOLVER`.
+- Milestone : `M6 Asset-first project model` / `M10 Semi-automatic solver`.
+- Objectif : produire une synthese deterministe `assets -> module_candidates`, sans modifier les modules manuels et sans solveur global.
+- Gate : aucune si la mission reste additive et report-only ; stop si generation Fusion reelle, changement incompatible CAD IR ou solveur complexe devient necessaire.
 - Validation : tests unitaires, CLI Markdown/JSON/export CAD IR, `git diff
   --check`, absence de `adsk` dans le coeur.
+
 ## Mission bloquee par gate
 
 `P8-FUSION-GATE - Generation Fusion volumetrique ou vue 3D`.

@@ -53,6 +53,23 @@ class AssetModelTests(unittest.TestCase):
         self.assertEqual(variants[0]["status"], "explain_only")
         self.assertIn("compactness", variants[0]["subscores"])
         self.assertTrue(any("assets are loaded as metadata only" in reason for reason in variants[0]["reasons"]))
+
+    def test_rejected_variants_include_structured_actionable_reasons(self) -> None:
+        config = _load_payload(_grid_rejection_payload())
+        layout = generate_basic_layout(config)
+
+        markdown = layout_to_markdown(config, layout)
+        payload = json.loads(layout_to_json(config, layout))
+
+        grid_variant = next(entry for entry in payload["variant_comparison"] if entry["variant_id"] == "layout:grid")
+        self.assertEqual(grid_variant["status"], "rejected")
+        self.assertEqual(grid_variant["rejection_reasons"][0]["code"], "DOES_NOT_FIT")
+        self.assertEqual(grid_variant["rejection_reasons"][0]["category"], "fit")
+        self.assertIn("box.inner_dimensions_mm", grid_variant["rejection_reasons"][0]["constraint_ref"])
+        self.assertIn("Reduce module footprint", grid_variant["rejection_reasons"][0]["actionable"])
+        self.assertIn("### Rejected variant details", markdown)
+        self.assertIn("DOES_NOT_FIT", markdown)
+
     def test_cad_ir_transports_assets_as_metadata_only(self) -> None:
         config = load_config(ROOT / "examples" / "simple_assets.json")
         layout = generate_basic_layout(config)
@@ -103,6 +120,34 @@ class AssetModelTests(unittest.TestCase):
 
 def _asset_payload() -> dict:
     return json.loads((ROOT / "examples" / "simple_assets.json").read_text(encoding="utf-8"))
+
+
+def _grid_rejection_payload() -> dict:
+    payload = json.loads((ROOT / "examples" / "simple_box.json").read_text(encoding="utf-8"))
+    payload["project_name"] = "Variant rejection fixture"
+    payload["box"]["inner_dimensions_mm"] = {"x": 100, "y": 80, "z": 50}
+    payload["box"]["usable_height_mm"] = 40
+    payload["box"]["lid_clearance_mm"] = 10
+    payload["modules"] = [
+        _fixture_module("wide-a", 60, 30, 100),
+        _fixture_module("narrow-a", 40, 30, 90),
+        _fixture_module("wide-b", 60, 30, 80),
+        _fixture_module("narrow-b", 40, 30, 70),
+    ]
+    return payload
+
+
+def _fixture_module(module_id: str, x: float, y: float, priority: int) -> dict:
+    return {
+        "id": module_id,
+        "name": module_id,
+        "functional_type": "tokens",
+        "min_dimensions_mm": {"x": x, "y": y},
+        "height_mm": 20,
+        "priority": priority,
+        "allow_rotation": False,
+        "quantity": 1,
+    }
 
 
 def _load_payload(payload: dict):
