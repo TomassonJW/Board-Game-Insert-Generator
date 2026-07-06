@@ -13,6 +13,10 @@ from pathlib import Path
 try:
     from .fusion_skeleton import (
         DOCUMENT_STATUS_ZERO_DOC,
+        FUSION_EXTENT_NEGATIVE,
+        FUSION_EXTENT_POSITIVE,
+        FUSION_SKETCH_PLANE_XZ,
+        FUSION_SKETCH_PLANE_YZ,
         FusionCavityCutPlan,
         FusionFingerNotchCutPlan,
         FusionGenerationPlan,
@@ -28,6 +32,10 @@ try:
 except ImportError:  # pragma: no cover - Fusion may load the file as a script.
     from fusion_skeleton import (  # type: ignore[no-redef]
         DOCUMENT_STATUS_ZERO_DOC,
+        FUSION_EXTENT_NEGATIVE,
+        FUSION_EXTENT_POSITIVE,
+        FUSION_SKETCH_PLANE_XZ,
+        FUSION_SKETCH_PLANE_YZ,
         FusionCavityCutPlan,
         FusionFingerNotchCutPlan,
         FusionGenerationPlan,
@@ -98,6 +106,8 @@ def run(context) -> None:  # noqa: ANN001 - Fusion controls the signature.
         f"Reference outlines: {result['reference_outlines']}\n"
         f"Blank bodies: {result['blank_bodies']}\n"
         f"Rectangular cavity cuts: {result['cavity_cuts']}\n"
+        f"Simple finger notch features planned: {result['finger_notch_features_planned']}\n"
+        f"Simple finger notch sketches: {result['finger_notch_sketches']}\n"
         f"Simple finger notch cuts: {result['finger_notch_cuts']}\n"
         "Creation scope: root component, compatible with Part Design documents.\n"
         "Status: manual validation required in Fusion 360."
@@ -140,6 +150,7 @@ def _generate_from_plan(design, plan: FusionGenerationPlan) -> dict[str, int]:  
         _create_rectangular_cavity_cut(root_component, cavity_cut, target_body)
         cavity_cut_count += 1
 
+    finger_notch_sketch_count = 0
     finger_notch_cut_count = 0
     for notch_cut in plan.finger_notch_cuts:
         target_body = created_bodies.get(notch_cut.target_body_id)
@@ -148,13 +159,16 @@ def _generate_from_plan(design, plan: FusionGenerationPlan) -> dict[str, int]:  
                 f"Finger notch {notch_cut.feature_id} targets unknown body "
                 f"{notch_cut.target_body_id}."
             )
-        _create_rectangular_finger_notch_cut(root_component, notch_cut, target_body)
-        finger_notch_cut_count += 1
+        result = _create_rectangular_finger_notch_cut(root_component, notch_cut, target_body)
+        finger_notch_sketch_count += result["sketches"]
+        finger_notch_cut_count += result["cuts"]
 
     return {
         "reference_outlines": 1,
         "blank_bodies": len(created_bodies),
         "cavity_cuts": cavity_cut_count,
+        "finger_notch_features_planned": len(plan.finger_notch_cuts),
+        "finger_notch_sketches": finger_notch_sketch_count,
         "finger_notch_cuts": finger_notch_cut_count,
     }
 
@@ -244,26 +258,19 @@ def _create_rectangular_finger_notch_cut(
     root_component,  # noqa: ANN001
     cut_plan: FusionFingerNotchCutPlan,
     target_body,  # noqa: ANN001
-) -> None:
-    cut_plane = _create_offset_xz_plane(
-        root_component,
-        cut_plan.cut_origin_mm.y,
-        f"{cut_plan.component_name} {cut_plan.feature_id} finger notch cut plane",
-    )
+) -> dict[str, int]:
+    cut_plane = _create_finger_notch_plane(root_component, cut_plan)
     sketch = root_component.sketches.add(cut_plane)
-    sketch.name = f"{cut_plan.component_name} {cut_plan.feature_id} finger notch footprint"
-    _add_scene_xz_rectangle_from_mm(
+    sketch.name = f"{cut_plan.component_name} {cut_plan.feature_id} finger notch wall footprint"
+    _add_model_space_rectangle_on_sketch(
         sketch,
-        cut_plan.cut_origin_mm.x,
-        cut_plan.cut_origin_mm.y,
-        cut_plan.cut_origin_mm.z,
-        cut_plan.cut_size_mm.x,
-        cut_plan.cut_size_mm.z,
+        cut_plan.profile_start_mm,
+        cut_plan.profile_end_mm,
         cut_plan.feature_id,
     )
 
     if sketch.profiles.count < 1:
-        raise RuntimeError(f"No closed cut profile was created for {cut_plan.feature_id}.")
+        raise RuntimeError(f"No closed wall cut profile was created for {cut_plan.feature_id}.")
 
     profile = sketch.profiles.item(0)
     extrudes = root_component.features.extrudeFeatures
@@ -274,13 +281,13 @@ def _create_rectangular_finger_notch_cut(
     if cut_input is None:
         raise RuntimeError(f"Fusion cut input failed for finger notch {cut_plan.feature_id}.")
 
-    distance = adsk.core.ValueInput.createByString(f"{cut_plan.cut_size_mm.y} mm")
+    distance = adsk.core.ValueInput.createByString(f"{cut_plan.cut_depth_mm} mm")
     extent = adsk.fusion.DistanceExtentDefinition.create(distance)
     if extent is None:
         raise RuntimeError(f"Fusion cut extent failed for finger notch {cut_plan.feature_id}.")
     ok = cut_input.setOneSideExtent(
         extent,
-        adsk.fusion.ExtentDirections.PositiveExtentDirection,
+        _fusion_extent_direction(cut_plan.extrude_direction),
     )
     if not ok:
         raise RuntimeError(f"Fusion cut distance failed for finger notch {cut_plan.feature_id}.")
@@ -289,7 +296,34 @@ def _create_rectangular_finger_notch_cut(
     cut_feature = extrudes.add(cut_input)
     if cut_feature is None:
         raise RuntimeError(f"Fusion cut failed for finger notch {cut_plan.feature_id}.")
-    cut_feature.name = f"{cut_plan.component_name} {cut_plan.feature_id} finger notch cut"
+    cut_feature.name = f"{cut_plan.component_name} {cut_plan.feature_id} finger notch wall cut"
+    return {"sketches": 1, "cuts": 1}
+
+
+def _create_finger_notch_plane(root_component, cut_plan: FusionFingerNotchCutPlan):  # noqa: ANN001
+    if cut_plan.sketch_plane == FUSION_SKETCH_PLANE_XZ:
+        return _create_offset_xz_plane(
+            root_component,
+            cut_plan.sketch_plane_offset_mm,
+            f"{cut_plan.component_name} {cut_plan.feature_id} finger notch XZ wall cut plane",
+        )
+    if cut_plan.sketch_plane == FUSION_SKETCH_PLANE_YZ:
+        return _create_offset_yz_plane(
+            root_component,
+            cut_plan.sketch_plane_offset_mm,
+            f"{cut_plan.component_name} {cut_plan.feature_id} finger notch YZ wall cut plane",
+        )
+    raise RuntimeError(
+        f"Unsupported finger notch sketch plane {cut_plan.sketch_plane!r} for {cut_plan.feature_id}."
+    )
+
+
+def _fusion_extent_direction(direction: str):  # noqa: ANN001
+    if direction == FUSION_EXTENT_POSITIVE:
+        return adsk.fusion.ExtentDirections.PositiveExtentDirection
+    if direction == FUSION_EXTENT_NEGATIVE:
+        return adsk.fusion.ExtentDirections.NegativeExtentDirection
+    raise RuntimeError(f"Unsupported Fusion extent direction {direction!r}.")
 
 
 def _create_offset_xy_plane(root_component, offset_z_mm: float, name: str):  # noqa: ANN001
@@ -309,6 +343,19 @@ def _create_offset_xz_plane(root_component, offset_y_mm: float, name: str):  # n
     plane_input = root_component.constructionPlanes.createInput()
     offset = adsk.core.ValueInput.createByString(f"{offset_y_mm} mm")
     ok = plane_input.setByOffset(root_component.xZConstructionPlane, offset)
+    if not ok:
+        raise RuntimeError(f"Fusion construction plane offset failed for {name}.")
+    plane = root_component.constructionPlanes.add(plane_input)
+    if plane is None:
+        raise RuntimeError(f"Fusion construction plane creation failed for {name}.")
+    plane.name = name
+    return plane
+
+
+def _create_offset_yz_plane(root_component, offset_x_mm: float, name: str):  # noqa: ANN001
+    plane_input = root_component.constructionPlanes.createInput()
+    offset = adsk.core.ValueInput.createByString(f"{offset_x_mm} mm")
+    ok = plane_input.setByOffset(root_component.yZConstructionPlane, offset)
     if not ok:
         raise RuntimeError(f"Fusion construction plane offset failed for {name}.")
     plane = root_component.constructionPlanes.add(plane_input)
@@ -352,28 +399,30 @@ def _add_scene_rectangle_from_mm(
         raise RuntimeError(f"Fusion rectangle sketch failed for {label}.")
 
 
-def _add_scene_xz_rectangle_from_mm(
+def _add_model_space_rectangle_on_sketch(
     sketch,  # noqa: ANN001
-    origin_x_mm: float,
-    origin_y_mm: float,
-    origin_z_mm: float,
-    size_x_mm: float,
-    size_z_mm: float,
+    start_mm,  # noqa: ANN001
+    end_mm,  # noqa: ANN001
     label: str,
 ) -> None:
-    start = adsk.core.Point3D.create(
-        mm_to_cm(origin_x_mm),
-        mm_to_cm(origin_y_mm),
-        mm_to_cm(origin_z_mm),
+    model_start = adsk.core.Point3D.create(
+        mm_to_cm(start_mm.x),
+        mm_to_cm(start_mm.y),
+        mm_to_cm(start_mm.z),
     )
-    end = adsk.core.Point3D.create(
-        mm_to_cm(origin_x_mm + size_x_mm),
-        mm_to_cm(origin_y_mm),
-        mm_to_cm(origin_z_mm + size_z_mm),
+    model_end = adsk.core.Point3D.create(
+        mm_to_cm(end_mm.x),
+        mm_to_cm(end_mm.y),
+        mm_to_cm(end_mm.z),
     )
+    start = sketch.modelToSketchSpace(model_start)
+    end = sketch.modelToSketchSpace(model_end)
+    if start is None or end is None:
+        raise RuntimeError(f"Fusion model-to-sketch conversion failed for {label}.")
+
     lines = sketch.sketchCurves.sketchLines.addTwoPointRectangle(start, end)
     if lines is None:
-        raise RuntimeError(f"Fusion XZ rectangle sketch failed for {label}.")
+        raise RuntimeError(f"Fusion wall rectangle sketch failed for {label}.")
 
 
 def _ensure_supported_z_origin(solid_plan: FusionSolidPlan) -> None:

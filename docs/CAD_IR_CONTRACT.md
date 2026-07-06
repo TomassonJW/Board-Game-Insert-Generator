@@ -183,7 +183,7 @@ coupes qui debordent X/Y, retirent toute la hauteur ou violent le plancher minim
 exprime par `local_origin_mm.z`.
 
 Depuis `P6-M002`, l'adaptateur peut aussi consommer les operations
-`describe_cavity_feature` pour les encoches frontales simples. Les kinds
+`describe_cavity_feature` pour les encoches simples de paroi. Les kinds
 `finger_notch`, `side_notch`, `center_notch` et `half_moon_notch` sont mappes en
 coupe rectangulaire quand le placement est frontal. Pour `half_moon_notch`, cette
 coupe est une approximation de bounding box ; la CAD IR conserve l'intention de
@@ -220,9 +220,9 @@ Le contrat V0 est valide par tests unitaires :
 - transformation en plan de generation hors Fusion ;
 - plan de coupes rectangulaires simples depuis `subtract_rectangular_cavity` ;
 - refus des coupes Fusion qui debordent X/Y ou qui suppriment le plancher requis ;
-- plan de coupes d'encoches frontales simples depuis `describe_cavity_feature` ;
+- plan de coupes d'encoches simples de paroi depuis `describe_cavity_feature` ;
 - refus des encoches qui ciblent une cavite absente, depassent la cavite ou
-  traversent plus que l'epaisseur frontale disponible ;
+  traversent plus que l'epaisseur de paroi disponible ;
 - serialization de cavites rectangulaires abstraites et de l'operation
   `subtract_rectangular_cavity` depuis `examples/simple_tray.json` ;
 - serialization de features ergonomiques abstraites et des operations
@@ -241,7 +241,7 @@ libelle `P4-M004`, stabilise le choix du fichier d'entree et les messages
 d'erreur Fusion.
 
 `P6-M001` execute les cavites rectangulaires simples depuis
-`subtract_rectangular_cavity` et `P6-M002` code les encoches frontales simples
+`subtract_rectangular_cavity` et `P6-M002` code les encoches simples de paroi
 depuis `describe_cavity_feature`. La gate active est le smoke test manuel
 `P6-M002V`. Toute extension Fusion au-dela de ces rectangles, notamment fonds
 arrondis, fillets, booleans complexes, geometrie courbe reelle ou tout export

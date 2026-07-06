@@ -190,7 +190,7 @@ complexes.
 
 Depuis P5-M004, une cavite peut aussi porter des `Feature` ergonomiques
 abstraites. Depuis P6-M002, une partie limitee de ces features peut etre consommee
-par l'adaptateur Fusion : les encoches frontales simples sont executees comme
+par l'adaptateur Fusion : les encoches simples de paroi sont executees comme
 coupes rectangulaires. Les autres features restent des intentions abstraites.
 
 ### Feature
@@ -217,7 +217,7 @@ Invariants P5-M004 :
 - le rayon reste abstrait et borne par la taille XY de la cavite ;
 - le statut reste `abstract_only` ;
 - par defaut, `fusion_generation` reste `not_implemented` ;
-- P6-M002 autorise seulement le mapping des encoches frontales simples vers une
+- P6-M002 autorise seulement le mapping des encoches simples de paroi vers une
   coupe rectangulaire Fusion issue de la CAD IR ;
 - une `half_moon_notch` executee par P6-M002 reste une approximation
   rectangulaire de bounding box, pas une demi-lune courbe reelle ;

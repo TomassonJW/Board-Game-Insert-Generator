@@ -17,7 +17,15 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     DOCUMENT_STATUS_ZERO_DOC,
     CAVITY_CUT_OPERATION_KIND,
     FINGER_NOTCH_CUT_OPERATION_KIND,
+    FINGER_NOTCH_WALL_BACK,
+    FINGER_NOTCH_WALL_FRONT,
+    FINGER_NOTCH_WALL_LEFT,
+    FINGER_NOTCH_WALL_RIGHT,
+    FUSION_EXTENT_NEGATIVE,
+    FUSION_EXTENT_POSITIVE,
     FUSION_MANUAL_VALIDATION_REQUIRED,
+    FUSION_SKETCH_PLANE_XZ,
+    FUSION_SKETCH_PLANE_YZ,
     PLAN_STATUS_PLANNED_ONLY,
     FusionSkeletonError,
     cad_ir_input_guidance,
@@ -264,11 +272,18 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(cut.feature_id, "front-half-moon-notch")
         self.assertEqual(cut.source_feature_kind, "half_moon_notch")
         self.assertEqual(cut.placement, "front_center")
+        self.assertEqual(cut.wall, FINGER_NOTCH_WALL_FRONT)
+        self.assertEqual(cut.sketch_plane, FUSION_SKETCH_PLANE_XZ)
+        self.assertAlmostEqual(cut.sketch_plane_offset_mm, 0.8)
+        self.assertEqual(cut.extrude_direction, FUSION_EXTENT_POSITIVE)
+        self.assertAlmostEqual(cut.cut_depth_mm, 4.0)
         self.assertEqual(cut.target_body_id, "finger-notch-tray-01-body")
         self.assertAlmostEqual(cut.cut_origin_mm.x, 26.8)
         self.assertAlmostEqual(cut.cut_origin_mm.y, 0.8)
         self.assertAlmostEqual(cut.cut_origin_mm.z, 9.2)
         self.assertEqual(cut.cut_size_mm.to_dict(), {"x": 18.0, "y": 4.0, "z": 10.0})
+        _assert_vector_almost_equal(self, cut.profile_start_mm, {"x": 26.8, "y": 0.8, "z": 9.2})
+        _assert_vector_almost_equal(self, cut.profile_end_mm, {"x": 44.8, "y": 0.8, "z": 19.2})
         self.assertEqual(cut.cavity_local_origin_mm.to_dict(), {"x": 4.0, "y": 4.0, "z": 1.2})
         self.assertEqual(cut.feature_position_mm.to_dict(), {"x": 22.0, "y": 0.0, "z": 8.0})
         self.assertEqual(cut.geometry_approximation, "rectangular_bounding_cut")
@@ -279,6 +294,67 @@ class FusionSkeletonTests(unittest.TestCase):
         plan = generation_plan_from_cad_ir(payload)
 
         self.assertEqual([cut.feature_id for cut in plan.finger_notch_cuts], ["front-half-moon-notch"])
+
+    def test_finger_notch_cut_plan_supports_each_wall_orientation(self) -> None:
+        cases = [
+            (
+                "front_center",
+                {"x": 22.0, "y": 0.0, "z": 8.0},
+                {"x": 18.0, "y": 4.0, "z": 10.0},
+                FINGER_NOTCH_WALL_FRONT,
+                FUSION_SKETCH_PLANE_XZ,
+                FUSION_EXTENT_POSITIVE,
+                {"x": 26.8, "y": 0.8, "z": 9.2},
+                {"x": 44.8, "y": 0.8, "z": 19.2},
+            ),
+            (
+                "back_center",
+                {"x": 22.0, "y": 48.8, "z": 8.0},
+                {"x": 18.0, "y": 3.2, "z": 10.0},
+                FINGER_NOTCH_WALL_BACK,
+                FUSION_SKETCH_PLANE_XZ,
+                FUSION_EXTENT_NEGATIVE,
+                {"x": 26.8, "y": 60.0, "z": 9.2},
+                {"x": 44.8, "y": 60.0, "z": 19.2},
+            ),
+            (
+                "left_side",
+                {"x": 0.0, "y": 17.0, "z": 8.0},
+                {"x": 4.0, "y": 18.0, "z": 10.0},
+                FINGER_NOTCH_WALL_LEFT,
+                FUSION_SKETCH_PLANE_YZ,
+                FUSION_EXTENT_POSITIVE,
+                {"x": 0.8, "y": 21.8, "z": 9.2},
+                {"x": 0.8, "y": 39.8, "z": 19.2},
+            ),
+            (
+                "right_side",
+                {"x": 58.8, "y": 17.0, "z": 8.0},
+                {"x": 3.2, "y": 18.0, "z": 10.0},
+                FINGER_NOTCH_WALL_RIGHT,
+                FUSION_SKETCH_PLANE_YZ,
+                FUSION_EXTENT_NEGATIVE,
+                {"x": 70.0, "y": 21.8, "z": 9.2},
+                {"x": 70.0, "y": 39.8, "z": 19.2},
+            ),
+        ]
+        for placement, position, size, wall, sketch_plane, direction, start, end in cases:
+            with self.subTest(placement=placement):
+                payload = _cad_ir_payload_from_example("simple_finger_notch_tray.json")
+                operation = payload["components"][0]["body"]["operations"][2]
+                operation["parameters"]["placement"] = placement
+                operation["parameters"]["position_mm"] = dict(position)
+                operation["parameters"]["size_mm"] = dict(size)
+
+                plan = generation_plan_from_cad_ir(payload)
+
+                self.assertEqual(len(plan.finger_notch_cuts), 1)
+                cut = plan.finger_notch_cuts[0]
+                self.assertEqual(cut.wall, wall)
+                self.assertEqual(cut.sketch_plane, sketch_plane)
+                self.assertEqual(cut.extrude_direction, direction)
+                _assert_vector_almost_equal(self, cut.profile_start_mm, start)
+                _assert_vector_almost_equal(self, cut.profile_end_mm, end)
 
     def test_rejects_finger_notch_with_unknown_cavity(self) -> None:
         payload = _cad_ir_payload_from_example("simple_finger_notch_tray.json")
@@ -352,11 +428,20 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("NegativeExtentDirection", source)
         self.assertIn("PositiveExtentDirection", source)
         self.assertIn("xZConstructionPlane", source)
+        self.assertIn("yZConstructionPlane", source)
+        self.assertIn("modelToSketchSpace", source)
+        self.assertIn("finger_notch_features_planned", source)
         self.assertIn("finger_notch_cuts", source)
         self.assertIn("compatible with Part Design documents", source)
         self.assertIn("resolve_cad_ir_input_path", source)
         self.assertIn("cad_ir_input_guidance", source)
         self.assertIn("Input CAD IR", source)
+
+
+def _assert_vector_almost_equal(test_case: unittest.TestCase, vector, expected: dict[str, float]) -> None:
+    test_case.assertAlmostEqual(vector.x, expected["x"])
+    test_case.assertAlmostEqual(vector.y, expected["y"])
+    test_case.assertAlmostEqual(vector.z, expected["z"])
 
 
 def _cad_ir_payload() -> dict:

@@ -13,7 +13,7 @@ inspectee et mesuree dans Fusion 360. Depuis `P4-M004`, le chargement du fichier
 CAD IR est stabilise : l'add-in peut consommer `cad_ir_input.json` dans son
 dossier ou un chemin declare dans `cad_ir_path.txt`. Depuis `P6-M001`, l'add-in
 code aussi les cavites rectangulaires simples depuis `subtract_rectangular_cavity`.
-Depuis `P6-M002`, il code les encoches frontales simples depuis
+Depuis `P6-M002`, il code les encoches simples de paroi depuis
 `describe_cavity_feature`, sous forme de coupes rectangulaires. Cette generation
 d'encoches reste a inspecter manuellement dans Fusion avant d'etre consideree
 validee.
@@ -25,7 +25,7 @@ Ce que l'add-in cree maintenant :
 - un sketch d'empreinte par blank dans le composant racine ;
 - un corps rectangulaire extrude par blank ;
 - une coupe rectangulaire verticale par operation `subtract_rectangular_cavity` ;
-- une coupe rectangulaire frontale par encoche simple supportee ;
+- une coupe rectangulaire de paroi par encoche simple supportee ;
 - des noms lisibles pour sketches, features et bodies.
 
 Ce que l'add-in ne cree pas :
@@ -191,11 +191,15 @@ Procedure :
 11. Pour le smoke test P6-M002, generer une CAD IR depuis
     `examples/simple_finger_notch_tray.json`, pointer `cad_ir_path.txt` vers ce
     fichier, relancer l'add-in et verifier :
-    - message final : `Blank bodies: 1`, `Rectangular cavity cuts: 1` et
-      `Simple finger notch cuts: 1` ;
+    - message final : `Blank bodies: 1`, `Rectangular cavity cuts: 1`,
+      `Simple finger notch features planned: 1`, `Simple finger notch sketches: 1`
+      et `Simple finger notch cuts: 1` ;
     - body cible : `finger-notch-tray-01 rectangular blank` ;
     - feature attendue : `front-half-moon-notch`, executee comme coupe
-      rectangulaire de bounding box, pas comme demi-lune courbe ;
+      rectangulaire de bounding box dans la paroi frontale, pas comme demi-lune
+      courbe ;
+    - verifier qu'il ne s'agit pas seulement d'un sketch visible dans le fond de
+      la cavite : une coupe volumique doit etre visible dans la paroi du tray ;
     - position de coupe attendue : X `26.8 mm`, Y `0.8 mm`, Z `9.2 mm` ;
     - taille de coupe attendue : `18.0 x 4.0 x 10.0 mm` ;
     - cavite conservee : `62.0 x 52.0 x 20.0 mm`.
@@ -231,7 +235,7 @@ La conversion actuelle stabilisee :
 - cree des rectangles dans le composant racine puis extrude des bodies simples
   pour les blanks ;
 - cree des coupes rectangulaires verticales simples pour `subtract_rectangular_cavity` ;
-- cree des coupes rectangulaires frontales simples pour les encoches supportees ;
+- cree des coupes rectangulaires de paroi simples pour les encoches supportees ;
 - marque la validation Fusion comme manuelle.
 
 Toute mission suivante qui elargit le perimetre Fusion, notamment vers demi-lunes

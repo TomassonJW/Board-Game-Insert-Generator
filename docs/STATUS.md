@@ -167,10 +167,16 @@ impression 3D n'a ete faite.
 
 La mission `P6-M002` du 2026-07-06 code la generation Fusion d'encoches de
 doigts simples depuis les operations CAD IR `describe_cavity_feature`. Les
-features frontales supportees sont transformees en coupes rectangulaires de
-bounding box limitees au body cible. Les demi-lunes restent une intention
-abstraite : aucune geometrie courbe, fond arrondi, fillet, export ou validation
-d'impression n'est revendiquee. Le smoke test Fusion P6-M002 reste requis.
+features supportees sont transformees en coupes rectangulaires de bounding box
+limitees au body cible. Les demi-lunes restent une intention abstraite : aucune
+geometrie courbe, fond arrondi, fillet, export ou validation d'impression n'est
+revendiquee.
+
+Le premier smoke test humain `P6-M002V` a ete KO partiel : la feature etait lue,
+mais Fusion montrait seulement un sketch/profil mal place, sans vraie coupe
+volumique dans la paroi. Le correctif du 2026-07-06 convertit les points modele
+vers l'espace sketch via `modelToSketchSpace`, transporte explicitement paroi,
+plan et direction de cut, et requiert un nouveau smoke test Fusion.
 ## Phase active
 
 Phase active : **P6-M002V validation manuelle des encoches Fusion**.
@@ -178,14 +184,16 @@ Phase active : **P6-M002V validation manuelle des encoches Fusion**.
 Etat : le pipeline P4 reste stable pour les blanks rectangulaires Fusion. La
 vague P5 est terminee cote moteur Python pur, configuration, rapports et CAD IR.
 P6-M001 est `fusion-validated` pour les cavites rectangulaires simples, avec
-`print-validated: false`. P6-M002 est code pour les encoches frontales simples,
-mais reste `manual validation required` dans Fusion. La North Star cible un
+`print-validated: false`. P6-M002 est code et corrige apres KO partiel pour les
+encoches simples de paroi, mais reste `manual validation required` dans Fusion.
+La North Star cible un
 generateur volumetrique asset-first, pilote par capabilities.
 
 Prochaine action : lancer `P6-M002V - Valider manuellement les encoches de doigts
 Fusion` sur la CAD IR exportee depuis `examples/simple_finger_notch_tray.json`.
-Aucune geometrie de fond arrondi, fillet, export ou impression ne doit etre
-revendiquee.
+Le test doit confirmer une vraie coupe volumique dans la paroi, pas seulement un
+sketch visible. Aucune geometrie de fond arrondi, fillet, export ou impression ne
+doit etre revendiquee.
 
 ## Implemente
 
@@ -241,8 +249,9 @@ revendiquee.
   `subtract_rectangular_cavity`, avec coupe verticale limitee au body cible,
   `fusion-validated` et `print-validated: false`.
 - Generation Fusion d'encoches de doigts simples P6-M002 depuis
-  `describe_cavity_feature`, comme coupes rectangulaires frontales limitees au
-  body cible, avec smoke test Fusion manuel requis.
+  `describe_cavity_feature`, comme coupes rectangulaires de paroi limitees au
+  body cible, avec correctif `modelToSketchSpace` et smoke test Fusion manuel
+  requis.
 - Pilotage produit par North Star, Product Pillars, Capability Map, milestones,
   epics, missions, gates et validations.
 - Roadmap 0-14 alignee avec la cible volumetrique asset-first.
@@ -259,13 +268,14 @@ revendiquee.
 - Les `PrimitiveVolume`, `CompositeModule` et `Feature` existent comme concepts
   mais ne pilotent pas encore une generation complete.
 - Les features ergonomiques P5-M004 restent abstraites dans le coeur ; seules les
-  encoches frontales simples sont mappees par P6-M002 en coupe rectangulaire
+  encoches simples de paroi sont mappees par P6-M002 en coupe rectangulaire
   Fusion. Les fonds arrondis, demi-lunes courbes reelles et fillets ne sont pas
   generes.
 - Les cavites rectangulaires P6-M001 sont `fusion-validated`, mais non
   `print-validated`.
-- Les encoches de doigts simples P6-M002 sont codees, mais encore
-  `manual validation required` dans Fusion et non `print-validated`.
+- Les encoches de doigts simples P6-M002 sont codees et corrigees apres KO
+  partiel, mais encore `manual validation required` dans Fusion et non
+  `print-validated`.
 - Les tolerances par defaut et les profils d'impression sont prudents mais non
   calibres sur impression.
 - Les dataclasses restent volontairement legeres ; les erreurs metier sont
@@ -318,17 +328,12 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant `P6-M002 - Generer les encoches de doigts simples dans Fusion` :
+Derniere verification pendant `P6-M002 - Corriger les coupes d'encoches de doigts Fusion` :
 
-- `python -m unittest discover -s tests` : OK, 100 tests passes.
-- `python -m board_game_insert_generator examples\simple_box.json --format markdown` : OK.
-- `python -m board_game_insert_generator examples\simple_box.json --format json` : OK.
+- `python -m unittest discover -s tests` : OK, 101 tests passes.
 - `python -m board_game_insert_generator examples\simple_tray.json --format markdown` : OK.
 - `python -m board_game_insert_generator examples\simple_tray.json --format json` : OK.
 - `python -m board_game_insert_generator export-cad-ir examples\simple_tray.json` : OK, schema `cad_ir.v0`, 1 composant.
-- `python -m board_game_insert_generator examples\simple_grid.json --format markdown` : OK.
-- `python -m board_game_insert_generator examples\simple_grid.json --format json` : OK.
-- `python -m board_game_insert_generator export-cad-ir examples\simple_grid.json` : OK, schema `cad_ir.v0`, 4 composants.
 - `python -m board_game_insert_generator examples\simple_finger_notch_tray.json --format markdown` : OK.
 - `python -m board_game_insert_generator examples\simple_finger_notch_tray.json --format json` : OK.
 - `python -m board_game_insert_generator export-cad-ir examples\simple_finger_notch_tray.json` : OK, schema `cad_ir.v0`, 1 composant, 1 feature d'encoche exportee.

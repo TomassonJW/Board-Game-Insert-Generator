@@ -18,11 +18,11 @@ geometrie courbe revendiquee, STL/3MF ou recalcul metier dans Fusion.
 
 ## Decision
 
-L'adaptateur Fusion execute les encoches simples frontales comme des coupes
+L'adaptateur Fusion execute les encoches simples de paroi comme des coupes
 rectangulaires issues directement de la CAD IR.
 
 - Les kinds supportes sont `finger_notch`, `side_notch`, `center_notch` et
-  `half_moon_notch` quand leur placement est frontal simple.
+  `half_moon_notch` quand leur placement cible une paroi simple.
 - `half_moon_notch` reste une intention abstraite cote moteur ; Fusion cree
   seulement une coupe rectangulaire de bounding box, signalee par
   `geometry_approximation: rectangular_bounding_cut`.
@@ -31,7 +31,7 @@ rectangulaires issues directement de la CAD IR.
   serialises en CAD IR. Fusion ne recalcule ni layout, ni tolerances, ni offset.
 - Les garde-fous hors Fusion refusent une encoche qui cible une cavite absente,
   deborde de la cavite, depasse la hauteur utile ou traverse plus que l'epaisseur
-  frontale disponible.
+  de paroi disponible.
 - L'execution reelle dans Fusion reste limitee au body cible via
   `participantBodies`.
 
@@ -39,7 +39,7 @@ rectangulaires issues directement de la CAD IR.
 
 Le pipeline peut maintenant produire une aide de prise en main simple inspectable
 dans Fusion, mais cette aide n'est pas encore une demi-lune geometrique reelle.
-Elle doit etre presentee comme une coupe rectangulaire frontale.
+Elle doit etre presentee comme une coupe rectangulaire de paroi.
 
 La validation automatisee couvre la preparation, le plan de generation, les
 garde-fous et l'absence de dependance `adsk` dans le coeur Python. La creation et

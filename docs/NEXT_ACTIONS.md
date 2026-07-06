@@ -20,8 +20,9 @@ structurant, authentification absente ou refus de push direct.
 
 Statut : `manual_validation_required`.
 
-`P6-M002 - Generer les encoches de doigts simples dans Fusion` est code et doit
-maintenant etre valide manuellement dans Fusion avant tout elargissement.
+`P6-M002 - Generer les encoches de doigts simples dans Fusion` est code et a
+recu un correctif apres KO partiel du premier smoke test. Il doit maintenant etre
+reteste manuellement dans Fusion avant tout elargissement.
 
 Action humaine attendue : `P6-M002V - Valider manuellement les encoches de doigts
 Fusion`.
@@ -30,8 +31,10 @@ Perimetre du smoke test :
 
 - exporter `examples/simple_finger_notch_tray.json` en CAD IR ;
 - pointer l'add-in Fusion vers cette CAD IR ;
-- verifier le message `Simple finger notch cuts: 1` ;
-- verifier que la coupe d'encoche frontale est visible sur le body cible ;
+- verifier le message `Simple finger notch features planned: 1`,
+  `Simple finger notch sketches: 1` et `Simple finger notch cuts: 1` ;
+- verifier que la coupe d'encoche frontale est une vraie coupe volumique dans la
+  paroi du body cible, pas seulement un sketch dans le fond de la cavite ;
 - mesurer blank, cavite et encoche ;
 - conserver `print-validated: false` tant qu'aucune impression 3D n'a ete faite.
 
