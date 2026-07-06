@@ -230,12 +230,13 @@ Depuis P11-M003, les placements asset-first distinguent explicitement :
 - `printable_body_origin_mm` / `printable_body_size_mm` : corps rectangulaire
   imprimable que Fusion doit creer ;
 - `size_mm` : alias de `printable_body_size_mm` pour les placements generes ;
+- `body_size_source` dans le plan Fusion hors CAD IR : source effective de sizing consommee par l'adaptateur ;
 - `grid_slack_mm` : marge visible entre span grille et body imprimable.
 
 Les adaptateurs CAD doivent utiliser `printable_body_size_mm` pour la geometrie
 reelle des modules asset-first generes. Ils peuvent afficher ou valider
 `theoretical_grid_extent_mm`, mais ne doivent pas l'extruder comme body si une
-taille imprimable est presente. Ces donnees ne valident aucune portance physique
+taille imprimable est presente. Pour les placements modernes qui declarent un span grille theorique, une taille `printable_body_size_mm` manquante est une erreur de contrat et doit etre refusee par l'adaptateur. Ces donnees ne valident aucune portance physique
 et ne doivent pas etre utilisees par Fusion pour recalculer le solveur.
 Cette metadata ne change pas `schema_version`, ne cree aucune operation Fusion et
 ne remplace pas les dimensions `theoretical_*` / `printable_*` des bodies. Un
@@ -286,7 +287,7 @@ collisions manifestes, sortie de boite et refus transportes. Depuis P11-M002,
 elle couvre les compteurs multi-layer, les placements Z et le plan d'occurrences
 liees sur `simple_multilayer_grid_scene`. Depuis P11-M003, elle verrouille aussi
 la distinction entre span grille theorique, enveloppe asset-fit et taille de body
-imprimable consommee par Fusion. Depuis P7-M001, elle couvre aussi le
+imprimable consommee par Fusion. Depuis P11-M003V2, elle couvre aussi le refus d'un placement grille moderne sans `printable_body_size_mm` et la presence du rapport Fusion `actual_fusion_body_bbox_mm`. Depuis P7-M001, elle couvre aussi le
 plan d'occurrences compactes/eclatees liees, le mode `compact_only`, le rejet
 d'un mode de generation inconnu, le message `assembly document required` pour les
 documents Part Design incompatibles et la politique de non-renommage direct des

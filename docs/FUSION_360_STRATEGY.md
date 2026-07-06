@@ -210,9 +210,9 @@ Convention retenue :
   sizing deja resolus ;
 - `printable_body_origin_mm` devient l'origine scene du body Fusion quand present,
   avec fallback sur `origin_mm` pour les anciennes CAD IR ;
-- `printable_body_size_mm` devient la taille du body rectangulaire cree quand
-  present, avec fallback sur `source_size_mm` puis `size_mm` pour les anciennes
-  CAD IR ;
+- `printable_body_size_mm` devient la taille du body rectangulaire cree pour les placements asset-first modernes ;
+- si un placement declare `theoretical_grid_extent_mm` mais ne fournit pas `printable_body_size_mm`, l'add-in refuse de generer le body au lieu d'utiliser silencieusement le span grille ;
+- le fallback `source_size_mm` / `size_mm` reste limite aux anciennes CAD IR qui ne declarent pas de span grille theorique ;
 - `theoretical_grid_origin_mm` et `theoretical_grid_extent_mm` restent des
   metadata d'occupation et de validation, pas des dimensions de body ;
 - les origines Z non nulles sont creees sur un plan XY decale ;
@@ -233,7 +233,7 @@ alors attendues `30.0 x 30.0 x 10.0 mm` a la position `X 30.0 mm`, `Y 0.0 mm`,
 `Z 0.0 mm`. P11-M003 corrige ensuite l'ambiguite produit : `30 x 30 x 10 mm`
 est l'etendue theorique d'une cellule de grille, tandis que le body imprimable
 genere depuis les assets est `25.6 x 25.6 x 9.8 mm`. Cette correction requiert
-un nouveau smoke test Fusion et ne vaut pas validation d'impression 3D.
+un nouveau smoke test Fusion et ne vaut pas validation d'impression 3D. Depuis P11-M003V2, le message final affiche aussi un `Body sizing report` avec span grille, taille imprimable prevue, bbox reelle Fusion et `size match yes/no`.
 
 ## Scene multi-layer depuis placements grille P11-M002
 
@@ -286,7 +286,7 @@ configuration BGIG source et ne cree aucune nouvelle geometrie.
 
 Validation : les helpers de requete et de mode sont testes hors Fusion. La
 commande Fusion reelle reste `manual validation required` jusqu'au smoke test
-P11-M003V.
+P11-M003V2. P11-M003V a ete KO partiel parce que les dimensions reelles des bodies n'etaient pas affichables/verifiables dans le message Fusion.
 
 ## Vue eclatee basique P7-M001
 

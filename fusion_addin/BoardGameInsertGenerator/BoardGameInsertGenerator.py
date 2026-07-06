@@ -264,9 +264,10 @@ def _execute_generation_request(request) -> str:  # noqa: ANN001 - FusionCommand
 
 def _generation_result_message(
     generation_plan: FusionGenerationPlan,
-    result: dict[str, int],
+    result: dict[str, object],
     cad_ir_path: Path,
 ) -> str:
+    body_size_report = _body_size_report_message(result.get("body_size_reports", []))
     return (
         "Board Game Insert Generator generated CAD IR scene from command UI.\n"
         f"Project: {generation_plan.project_name}\n"
@@ -298,6 +299,7 @@ def _generation_result_message(
         "Exploded placement source: linked occurrences on add-in deterministic inspection grid; dimensions from CAD IR.\n"
         "Creation scope: one Fusion component per BGIG module, compact/exploded occurrences linked.\n"
         "Sizing source: printable_body_size_mm for generated asset modules; theoretical_grid_extent_mm remains occupancy metadata.\n"
+        f"{body_size_report}"
         "Status: manual validation required in Fusion 360."
     )
 
@@ -313,7 +315,7 @@ def _active_design(application):  # noqa: ANN001 - Fusion API object.
     return design
 
 
-def _generate_from_plan(design, plan: FusionGenerationPlan) -> dict[str, int]:  # noqa: ANN001
+def _generate_from_plan(design, plan: FusionGenerationPlan) -> dict[str, object]:  # noqa: ANN001
     root_component = design.rootComponent
     _create_reference_outline(root_component, plan.reference_box)
 
@@ -378,6 +380,11 @@ def _generate_from_plan(design, plan: FusionGenerationPlan) -> dict[str, int]:  
         finger_notch_sketch_count += result["sketches"]
         finger_notch_cut_count += result["cuts"]
 
+    body_size_reports = [
+        _fusion_body_size_report(blank, created_bodies[blank.cad_id])
+        for blank in source_blanks
+    ]
+
     exploded_occurrence_count = 0
     for occurrence_plan in plan.exploded_occurrences:
         module_component = created_components.get(occurrence_plan.component_id)
@@ -399,7 +406,80 @@ def _generate_from_plan(design, plan: FusionGenerationPlan) -> dict[str, int]:  
         "finger_notch_features_planned": len(plan.finger_notch_cuts),
         "finger_notch_sketches": finger_notch_sketch_count,
         "finger_notch_cuts": finger_notch_cut_count,
+        "body_size_reports": body_size_reports,
     }
+
+
+def _fusion_body_size_report(solid_plan: FusionSolidPlan, body) -> dict[str, object]:  # noqa: ANN001
+    planned_size_mm = solid_plan.printable_body_size_mm or solid_plan.size_mm
+    actual_bbox_mm = _body_bounding_box_size_mm(body)
+    return {
+        "module_id": solid_plan.cad_id,
+        "body_name": solid_plan.body_name,
+        "body_size_source": solid_plan.body_size_source or ("printable_body_size_mm" if solid_plan.printable_body_size_mm else "size_mm"),
+        "grid_span_mm": _vector_to_optional_dict(solid_plan.theoretical_grid_extent_mm),
+        "asset_fit_size_mm": _vector_to_optional_dict(solid_plan.asset_fit_size_mm),
+        "printable_body_size_planned_mm": planned_size_mm.to_dict(),
+        "actual_fusion_body_bbox_mm": _vector_to_optional_dict(actual_bbox_mm),
+        "size_match": _vectors_match_mm(planned_size_mm, actual_bbox_mm) if actual_bbox_mm is not None else "unknown",
+    }
+
+
+def _body_bounding_box_size_mm(body) -> FusionVectorMm | None:  # noqa: ANN001
+    try:
+        bounding_box = body.boundingBox
+    except Exception:
+        return None
+    if bounding_box is None:
+        return None
+    return FusionVectorMm(
+        round((bounding_box.maxPoint.x - bounding_box.minPoint.x) * 10.0, 4),
+        round((bounding_box.maxPoint.y - bounding_box.minPoint.y) * 10.0, 4),
+        round((bounding_box.maxPoint.z - bounding_box.minPoint.z) * 10.0, 4),
+    )
+
+
+def _vectors_match_mm(expected: FusionVectorMm, actual: FusionVectorMm, tolerance_mm: float = 0.05) -> bool:
+    return (
+        abs(expected.x - actual.x) <= tolerance_mm
+        and abs(expected.y - actual.y) <= tolerance_mm
+        and abs(expected.z - actual.z) <= tolerance_mm
+    )
+
+
+def _vector_to_optional_dict(vector: FusionVectorMm | None) -> dict[str, float] | None:
+    return vector.to_dict() if vector is not None else None
+
+
+def _body_size_report_message(reports) -> str:  # noqa: ANN001
+    if not isinstance(reports, list) or not reports:
+        return ""
+    lines = ["Body sizing report:"]
+    for report in reports:
+        lines.append(
+            f"- {report.get('module_id')}: "
+            f"source {report.get('body_size_source')}; "
+            f"grid span {_format_size_mm(report.get('grid_span_mm'))}; "
+            f"asset fit {_format_size_mm(report.get('asset_fit_size_mm'))}; "
+            f"printable body planned {_format_size_mm(report.get('printable_body_size_planned_mm'))}; "
+            f"actual Fusion body bbox {_format_size_mm(report.get('actual_fusion_body_bbox_mm'))}; "
+            f"size match {_format_size_match(report.get('size_match'))}"
+        )
+    return "\n".join(lines) + "\n"
+
+
+def _format_size_mm(value) -> str:  # noqa: ANN001
+    if not isinstance(value, dict):
+        return "n/a"
+    return f"{value.get('x')} x {value.get('y')} x {value.get('z')} mm"
+
+
+def _format_size_match(value) -> str:  # noqa: ANN001
+    if value is True:
+        return "yes"
+    if value is False:
+        return "no"
+    return "unknown"
 
 
 def _create_reference_outline(root_component, solid_plan: FusionSolidPlan) -> None:  # noqa: ANN001

@@ -1,4 +1,4 @@
-﻿# 2026-07-07 - P11-M003 UI Fusion minimale et sizing asset-first
+# 2026-07-07 - P11-M003 UI Fusion minimale et sizing asset-first
 
 ## Mission
 
@@ -62,5 +62,27 @@ Tests automatises a relancer avant commit final : suite unittest complete, CLI
 Markdown/JSON/export CAD IR sur exemples demandes, `git diff --check` et absence
 `adsk` dans `src/board_game_insert_generator`.
 
-Statut : `implemented-fusion`, validation Fusion manuelle P11-M003V requise,
+Statut : `implemented-fusion`, validation Fusion manuelle P11-M003V2 requise,
+`print-validated: false`.
+
+## Correction P11-M003V2
+
+Le smoke test humain P11-M003V a ete KO partiel : la scene Fusion etait generee,
+mais le message ne rendait pas les dimensions effectives des bodies verifiables.
+Le risque produit etait de confondre visuellement `theoretical_grid_extent_mm`
+avec `printable_body_size_mm`.
+
+Correction appliquee :
+
+- le plan Fusion marque la source effective `body_size_source` ;
+- un placement grille moderne qui declare un span theorique mais omet
+  `printable_body_size_mm` est refuse au lieu d'utiliser silencieusement le span
+  grille ;
+- l'add-in lit la bounding box reelle des bodies Fusion apres creation et affiche
+  un `Body sizing report` : module, source, grid span, asset-fit, printable body
+  planned, actual Fusion body bbox et `size match yes/no` ;
+- la validation reste manuelle : P11-M003V2 doit confirmer dans Fusion que les
+  bboxes reelles correspondent aux tailles imprimables attendues.
+
+Statut : `implemented-fusion`, validation Fusion manuelle P11-M003V2 requise,
 `print-validated: false`.

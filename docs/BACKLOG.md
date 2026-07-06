@@ -293,7 +293,7 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Criteres d'acceptation : Fusion ne recalcule pas le solveur ; les bodies asset-first utilisent la taille imprimable ; les spans grille restent visibles comme metadata ; l'utilisateur n'a plus a editer manuellement `cad_ir_path.txt` ou `exploded_view_mode.txt` pour le flux courant ; coeur Python sans `adsk`.
 - Tests : unitaires hors Fusion, CLI Markdown/JSON/export CAD IR sur exemples pertinents, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
 - Gate : validation humaine fournie le 2026-07-07 apres P11-M002V, limitee a sizing et UI minimale.
-- Statut : `done`, `implemented-fusion`, validation Fusion manuelle requise, `print-validated: false`.
+- Statut : `done`, `implemented-fusion`, correction P11-M003V2 codee, validation Fusion manuelle requise, `print-validated: false`.
 
 ### P11-M003V - Valider manuellement la commande UI Fusion et le sizing asset-first
 
@@ -302,6 +302,17 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Objectif : lancer l'add-in via la commande UI, choisir une CAD IR exportee et verifier les dimensions imprimables asset-first corrigees.
 - Livrable : validation humaine Fusion avec message, chemin choisi, mode choisi, dimensions et statut `print-validated: false`.
 - Criteres d'acceptation : commande `Generate Board Game Insert` visible, champ chemin utilisable, mode `compact_and_exploded` ou `compact_only` applique, `simple_asset_executable_plan` genere un module asset-first `25.6 x 25.6 x 9.8 mm`, `simple_multilayer_grid_scene` genere les modules `61.6 x 61.6 x 7.8 mm` et `37.6 x 37.6 x 17.8 mm`, spans grille visibles comme metadata/rapport, occurrences liees conservees.
+- Tests : smoke test manuel Fusion, aucune validation d'impression revendiquee.
+- Gate : action humaine requise.
+- Statut : `done`, KO partiel : scene generee mais dimensions effectives non verifiables dans le message Fusion.
+
+### P11-M003V2 - Valider le rapport dimensionnel Fusion planned/actual
+
+- Capability : C-FUSION-UI, C-FUSION-COMPACT, C-GRID-3D.
+- Milestone : M14 Usable beta / M7 Volumetric planner.
+- Objectif : relancer la commande Fusion avec `simple_asset_executable_plan` et `simple_multilayer_grid_scene`, puis verifier que le message affiche pour chaque module `grid span`, `printable body planned`, `actual Fusion body bbox` et `size match yes`.
+- Livrable : validation humaine Fusion avec dimensions prevues/reelles et statut `print-validated: false`.
+- Criteres d'acceptation : Fusion utilise `printable_body_size_mm`; `theoretical_grid_extent_mm` reste metadata; `actual Fusion body bbox` correspond aux dimensions imprimables attendues; aucune nouvelle geometrie ou tolerance n'est ajoutee.
 - Tests : smoke test manuel Fusion, aucune validation d'impression revendiquee.
 - Gate : action humaine requise.
 - Statut : `blocked`.

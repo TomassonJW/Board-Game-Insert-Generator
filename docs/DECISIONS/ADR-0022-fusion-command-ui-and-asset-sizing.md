@@ -1,4 +1,4 @@
-﻿# ADR-0022 - Fusion command UI and explicit asset sizing
+# ADR-0022 - Fusion command UI and explicit asset sizing
 
 ## Statut
 
@@ -86,6 +86,6 @@ mission.
 
 ## Suivi
 
-- Smoke test humain `P11-M003V` requis dans Fusion.
+- Smoke test humain `P11-M003V2` requis dans Fusion.
 - Nouvelle gate avant UI produit plus complete, solveur plus automatique,
   modules composites, geometres courbes, fillets ou exports STL/3MF.

@@ -1,4 +1,4 @@
-﻿# Next Actions
+# Next Actions
 
 Derniere mise a jour : 2026-07-07
 
@@ -24,17 +24,17 @@ P11-M002V est validee humainement dans Fusion pour la scene multi-layer : add-in
 lance, CAD IR chargee, message conforme, vue compacte/eclatee generee et modules
 multi-layer visibles. `print-validated: false` reste explicite.
 
-P11-M003 est maintenant codee : le plan asset-first distingue span grille,
+P11-M003 est codee, mais le smoke test humain P11-M003V est KO partiel : le plan asset-first distingue span grille,
 asset-fit et taille imprimable, et l'add-in expose une commande UI minimale pour
 choisir le fichier CAD IR et le mode `compact_only` / `compact_and_exploded`.
-Cette mission change volontairement les dimensions de bodies asset-first attendues
+La correction P11-M003V2 ajoute un `Body sizing report` dans le message Fusion et refuse les placements grille modernes sans `printable_body_size_mm`. Cette mission change volontairement les dimensions de bodies asset-first attendues
 par rapport aux anciens smoke tests :
 
 - `simple_asset_executable_plan` : body asset-first attendu `25.6 x 25.6 x 9.8 mm`, span grille `30 x 30 x 10 mm` ;
 - `simple_multilayer_grid_scene` : body bas attendu `61.6 x 61.6 x 7.8 mm`, span grille `90 x 90 x 10 mm` ;
 - `simple_multilayer_grid_scene` : body haut attendu `37.6 x 37.6 x 17.8 mm`, span grille `60 x 60 x 20 mm`.
 
-Action humaine requise : smoke test Fusion `P11-M003V` avant toute nouvelle
+Action humaine requise : smoke test Fusion `P11-M003V2` avant toute nouvelle
 mission produit qui elargit l'UI, le solveur, les modules composites, la vue
 volumetrique, la geometrie courbe, les exports STL/3MF ou la preparation
 d'impression. L'impression 3D reste non validee.
@@ -42,7 +42,7 @@ d'impression. L'impression 3D reste non validee.
 ## Mission ready non gated
 
 Aucune mission non-gated supplementaire n'est recommandee apres `P11-M003` tant
-que le smoke test Fusion P11-M003V de la commande UI et du sizing asset-first
+que le smoke test Fusion P11-M003V2 de la commande UI, du sizing asset-first et du rapport bbox
 n'est pas valide. La boucle asset-first produit maintenant candidats, variante
 recommandee, plan de modules concret, placement grille greedy borne, generation
 Fusion compacte/eclatee liee, scene multi-layer et premiere commande utilisateur
@@ -50,7 +50,7 @@ Fusion minimale.
 
 ## Mission bloquee par gate
 
-`P11-M003V - Smoke test humain Fusion de la commande UI et du sizing asset-first`.
+`P11-M003V2 - Smoke test humain Fusion du sizing planned/actual et de la commande UI`.
 
 `P8-FUSION-GATE - Generation Fusion volumetrique ou vue 3D`.
 

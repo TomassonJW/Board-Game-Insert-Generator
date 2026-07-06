@@ -247,7 +247,9 @@ Procedure :
       `Grid-positioned asset modules planned: 1`, `Module components planned: 2`,
       `Compact occurrences planned: 2`, `Exploded occurrences planned: 0`,
       `Module components created: 2`, `Compact occurrences created: 2`,
-      `Exploded occurrences created: 0`, `Linked exploded occurrences: yes` ;
+      `Exploded occurrences created: 0`, `Linked exploded occurrences: yes`,
+      puis un bloc `Body sizing report` ;
+    - dans le bloc `Body sizing report`, verifier pour le module asset-first : `source printable_body_size_mm`, `grid span 30.0 x 30.0 x 10.0 mm`, `printable body planned 25.6 x 25.6 x 9.8 mm`, `actual Fusion body bbox 25.6 x 25.6 x 9.8 mm` ou tolerance mesure comparable, et `size match yes` ;
     - composant manuel existant : `manual-reference-bin-01 - Manual reference bin` ;
     - composant asset-first attendu : `Grid placed Grouped candidate for tokens` ;
     - occurrence compacte asset-first attendue a l'origine `X 30.0 mm`,
@@ -289,7 +291,7 @@ Procedure :
       definition ;
     - verifier que Fusion n'a pas cree de fillet, fond arrondi, module composite
       ou export STL/3MF.
-15. Pour le smoke test P11-M003V multi-layer, generer une CAD IR depuis
+15. Pour le smoke test P11-M003V2 multi-layer, generer une CAD IR depuis
     `examples/simple_multilayer_grid_scene.json`, lancer l'add-in dans un
     document Assembly-compatible, renseigner son chemin dans `CAD IR JSON path`,
     choisir `compact_and_exploded` et verifier :
@@ -299,16 +301,18 @@ Procedure :
       `Compact occurrences planned: 3`, `Exploded occurrences planned: 3`,
       `Module components created: 3`, `Compact occurrences created: 3`,
       `Exploded occurrences created: 3`, `Linked exploded occurrences: yes`,
-      `Occurrence direct rename attempted: no` ;
+      `Occurrence direct rename attempted: no`, puis un bloc `Body sizing report` ;
     - composant manuel attendu : `manual-reference-bin-01 - Manual reference bin` ;
     - composants asset-first attendus : `Grid placed Candidate module for Flat token field`
       et `Grid placed Candidate module for Tall dice column` ;
     - module bas attendu : origine `X 30.0 mm`, `Y 0.0 mm`, `Z 0.0 mm`,
       dimensions imprimables `61.6 x 61.6 x 7.8 mm` ;
     - span grille theorique du module bas : `90.0 x 90.0 x 10.0 mm` ;
+    - ligne `Body sizing report` du module bas : source `printable_body_size_mm`, `printable body planned 61.6 x 61.6 x 7.8 mm`, `actual Fusion body bbox` comparable et `size match yes` ;
     - module haut attendu : origine `X 0.0 mm`, `Y 0.0 mm`, `Z 10.0 mm`,
       dimensions imprimables `37.6 x 37.6 x 17.8 mm` ;
     - span grille theorique du module haut : `60.0 x 60.0 x 20.0 mm` ;
+    - ligne `Body sizing report` du module haut : source `printable_body_size_mm`, `printable body planned 37.6 x 37.6 x 17.8 mm`, `actual Fusion body bbox` comparable et `size match yes` ;
     - occurrences compactes et eclatees visibles, liees aux memes composants
       sources ;
     - aucun solveur, module composite, fillet, geometrie courbe ou export STL/3MF.
@@ -316,8 +320,8 @@ Procedure :
     de validation.
 
 Ce smoke test valide uniquement la creation CAD minimale dans Fusion. Depuis
-P11-M003, verifier aussi que les modules asset-first generes utilisent les tailles
-imprimables et non les spans grille bruts. Depuis la correction P7, la vue
+P11-M003V2, verifier aussi que les modules asset-first generes utilisent les tailles
+imprimables et non les spans grille bruts en lisant le bloc `Body sizing report` : `printable body planned` doit correspondre a `actual Fusion body bbox`, et `grid span` doit rester une metadata d'occupation. Depuis la correction P7, la vue
 eclatee exige des composants/occurrences Fusion lies. Les
 noms lisibles sont portes par les composants sources et par le message de
 mapping ; l'add-in ne tente plus de renommer directement les occurrences. Un

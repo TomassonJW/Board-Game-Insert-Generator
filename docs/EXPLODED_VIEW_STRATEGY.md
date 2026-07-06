@@ -20,7 +20,7 @@ exports.
 - La correction P7-M001V4 ne tente plus de faire `occurrence.name = ...` ; les noms lisibles sont portes par les composants sources et le mapping compact/exploded dans le plan/message.
 - La validation Fusion manuelle P7-M001V4 en document Assembly-compatible est confirmee le 2026-07-06 : compact/exploded sont des occurrences liees des memes composants sources, et l'add-in ne renomme pas directement les occurrences.
 - P11-M002 est validee humainement pour une premiere scene eclatee multi-layer depuis placements grille X/Y/Z.
-- P11-M003 conserve les occurrences liees et ajoute une commande UI minimale ; la validation Fusion P11-M003V reste requise pour le nouveau flux UI et le sizing asset-first corrige.
+- P11-M003 conserve les occurrences liees et ajoute une commande UI minimale ; la validation Fusion P11-M003V2 reste requise pour le nouveau flux UI et le sizing asset-first corrige.
 - Aucun export STL/3MF et aucune validation d'impression ne sont revendiques.
 
 ## Strategie P7 corrigee
@@ -83,6 +83,6 @@ Toute autre valeur est refusee avant generation.
 
 ## Gates
 
-- P7-M001V4 et P11-M002V sont validees humainement ; prochaine gate : smoke test P11-M003V pour la commande UI Fusion et le sizing asset-first corrige.
+- P7-M001V4 et P11-M002V sont validees humainement ; prochaine gate : smoke test P11-M003V2 pour la commande UI Fusion et le sizing asset-first corrige.
 - Nouvelle gate avant vue eclatee avancee, modules composites, export STL/3MF ou
   preparation d'impression.

@@ -161,6 +161,7 @@ class FusionSolidPlan:
     theoretical_grid_extent_mm: FusionVectorMm | None = None
     asset_fit_size_mm: FusionVectorMm | None = None
     printable_body_size_mm: FusionVectorMm | None = None
+    body_size_source: str | None = None
     clearance_applied: dict[str, Any] | None = None
     sizing_policy: str | None = None
 
@@ -188,6 +189,8 @@ class FusionSolidPlan:
             payload["asset_fit_size_mm"] = self.asset_fit_size_mm.to_dict()
         if self.printable_body_size_mm is not None:
             payload["printable_body_size_mm"] = self.printable_body_size_mm.to_dict()
+        if self.body_size_source is not None:
+            payload["body_size_source"] = self.body_size_source
         if self.clearance_applied is not None:
             payload["clearance_applied"] = dict(self.clearance_applied)
         if self.sizing_policy is not None:
@@ -1081,8 +1084,22 @@ def _grid_positioned_asset_blanks_from_metadata(
             placement,
             "printable_body_size_mm",
             f"placement {module_id} printable_body_size_mm",
-        ) or source_size_mm
-
+        ) or _optional_positive_vector_from_payload(
+            module,
+            "printable_body_size_mm",
+            f"generated module {module_id} printable_body_size_mm",
+        )
+        if printable_body_size_mm is None:
+            if "theoretical_grid_extent_mm" in placement or "theoretical_grid_origin_mm" in placement:
+                raise FusionSkeletonError(
+                    f"Grid placement for module {module_id!r} declares a theoretical grid span but "
+                    "does not provide printable_body_size_mm; refusing to size a Fusion body from "
+                    "the grid span."
+                )
+            printable_body_size_mm = source_size_mm
+            body_size_source = "legacy_source_size_mm"
+        else:
+            body_size_source = "printable_body_size_mm"
         _validate_grid_blank_bounds(reference_box, theoretical_grid_origin_mm, theoretical_grid_extent_mm, module_id)
         _validate_grid_blank_bounds(reference_box, printable_body_origin_mm, printable_body_size_mm, module_id)
         _validate_size_inside_size(source_size_mm, theoretical_grid_extent_mm, module_id, "source module", "grid span")
@@ -1105,6 +1122,7 @@ def _grid_positioned_asset_blanks_from_metadata(
             theoretical_grid_extent_mm=theoretical_grid_extent_mm,
             asset_fit_size_mm=asset_fit_size_mm,
             printable_body_size_mm=printable_body_size_mm,
+            body_size_source=body_size_source,
             clearance_applied=placement.get("clearance_applied") if isinstance(placement.get("clearance_applied"), dict) else None,
             sizing_policy=_optional_text(placement, "sizing_policy"),
         )

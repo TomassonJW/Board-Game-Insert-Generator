@@ -411,13 +411,28 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(grid_blank.component_name, "Grid placed Grouped candidate for tokens")
         self.assertEqual(grid_blank.origin_mm.to_dict(), {"x": 30.0, "y": 0.0, "z": 0.0})
         self.assertEqual(grid_blank.size_mm.to_dict(), {"x": 25.6, "y": 25.6, "z": 9.8})
+        self.assertEqual(grid_blank.printable_body_size_mm.to_dict(), {"x": 25.6, "y": 25.6, "z": 9.8})
+        self.assertEqual(grid_blank.body_size_source, "printable_body_size_mm")
+        self.assertNotEqual(grid_blank.size_mm.to_dict(), grid_blank.theoretical_grid_extent_mm.to_dict())
         self.assertEqual(grid_blank.asset_fit_size_mm.to_dict(), {"x": 23.2, "y": 23.2, "z": 8.6})
         self.assertEqual(grid_blank.theoretical_grid_extent_mm.to_dict(), {"x": 30.0, "y": 30.0, "z": 10.0})
         self.assertEqual(plan.to_dict()["grid_positioned_blanks"][0]["body_name"], grid_blank.body_name)
+        self.assertEqual(plan.to_dict()["grid_positioned_blanks"][0]["body_size_source"], "printable_body_size_mm")
         self.assertEqual(
             plan.to_dict()["grid_positioned_blanks"][0]["theoretical_grid_extent_mm"],
             {"x": 30.0, "y": 30.0, "z": 10.0},
         )
+
+
+    def test_rejects_modern_grid_placement_without_printable_body_size(self) -> None:
+        payload = _cad_ir_payload_from_example("simple_asset_executable_plan.json")
+        placement = payload["metadata"]["executable_asset_plan"]["placements"][0]
+        generated_module = payload["metadata"]["executable_asset_plan"]["generated_modules"][0]
+        placement.pop("printable_body_size_mm")
+        generated_module.pop("printable_body_size_mm")
+
+        with self.assertRaisesRegex(FusionSkeletonError, "does not provide printable_body_size_mm"):
+            generation_plan_from_cad_ir(payload)
 
 
     def test_grid_positioned_asset_blank_supports_z_layer_origin(self) -> None:
@@ -433,6 +448,9 @@ class FusionSkeletonTests(unittest.TestCase):
         grid_blank = plan.grid_positioned_blanks[0]
         self.assertEqual(grid_blank.origin_mm.to_dict(), {"x": 30.0, "y": 0.0, "z": 10.0})
         self.assertEqual(grid_blank.size_mm.to_dict(), {"x": 25.6, "y": 25.6, "z": 9.8})
+        self.assertEqual(grid_blank.printable_body_size_mm.to_dict(), {"x": 25.6, "y": 25.6, "z": 9.8})
+        self.assertEqual(grid_blank.body_size_source, "printable_body_size_mm")
+        self.assertNotEqual(grid_blank.size_mm.to_dict(), grid_blank.theoretical_grid_extent_mm.to_dict())
 
     def test_builds_multilayer_grid_scene_with_linked_occurrences(self) -> None:
         payload = _cad_ir_payload_from_example("simple_multilayer_grid_scene.json")
@@ -455,11 +473,15 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(low_blank.grid_size_units, (3, 3, 1))
         self.assertEqual(low_blank.origin_mm.to_dict(), {"x": 30.0, "y": 0.0, "z": 0.0})
         self.assertEqual(low_blank.size_mm.to_dict(), {"x": 61.6, "y": 61.6, "z": 7.8})
+        self.assertEqual(low_blank.printable_body_size_mm.to_dict(), {"x": 61.6, "y": 61.6, "z": 7.8})
+        self.assertEqual(low_blank.body_size_source, "printable_body_size_mm")
         self.assertEqual(low_blank.theoretical_grid_extent_mm.to_dict(), {"x": 90.0, "y": 90.0, "z": 10.0})
         self.assertEqual(high_blank.grid_origin_units, (0, 0, 1))
         self.assertEqual(high_blank.grid_size_units, (2, 2, 2))
         self.assertEqual(high_blank.origin_mm.to_dict(), {"x": 0.0, "y": 0.0, "z": 10.0})
         self.assertEqual(high_blank.size_mm.to_dict(), {"x": 37.6, "y": 37.6, "z": 17.8})
+        self.assertEqual(high_blank.printable_body_size_mm.to_dict(), {"x": 37.6, "y": 37.6, "z": 17.8})
+        self.assertEqual(high_blank.body_size_source, "printable_body_size_mm")
         self.assertEqual(high_blank.theoretical_grid_extent_mm.to_dict(), {"x": 60.0, "y": 60.0, "z": 20.0})
 
         high_compact = [
@@ -766,6 +788,12 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("resolve_cad_ir_input_path", source)
         self.assertIn("cad_ir_input_guidance", source)
         self.assertIn("Input CAD IR", source)
+        self.assertIn("Body sizing report", source)
+        self.assertIn("body.boundingBox", source)
+        self.assertIn("actual_fusion_body_bbox_mm", source)
+        self.assertIn("printable body planned", source)
+        self.assertIn("size match", source)
+        self.assertIn("printable_body_size_mm", source)
 
 
 def _assert_vector_almost_equal(test_case: unittest.TestCase, vector, expected: dict[str, float]) -> None:

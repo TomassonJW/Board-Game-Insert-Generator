@@ -231,11 +231,11 @@ La mission `P7-M001` code une premiere vue eclatee Fusion basique. Le smoke test
 
 La mission `P11-M002` code une premiere scene Fusion multi-layer depuis les placements grille X/Y/Z deja resolus par `metadata.executable_asset_plan`. L'exemple `simple_multilayer_grid_scene` produit un module genere bas, un module genere plus haut sur deux unites Z et un placement explicite a `Z=1`; le plan hors Fusion expose les compteurs multi-layer et l'add-in conserve la strategie `Component` source + occurrences compactes/eclatees liees. La validation humaine `P11-M002V` du 2026-07-07 confirme le lancement de l'add-in, le chargement CAD IR, le message conforme et la generation multi-layer visible. Statut : `fusion-validated`, `print-validated: false`.
 
-La mission `P11-M003` corrige l'ambiguite dimensionnelle observee apres P11-M002V : les modules asset-first generes distinguent maintenant span grille theorique, enveloppe asset-fit et taille imprimable. Fusion consomme `printable_body_size_mm` pour les bodies generes, tandis que `theoretical_grid_extent_mm` reste une metadata d'occupation. L'add-in expose aussi une premiere commande UI minimale `Generate Board Game Insert` avec champ `CAD IR JSON path` et choix `compact_only` / `compact_and_exploded`, sans rendre le coeur Python dependant de `adsk`. Statut : `implemented-fusion`, validation humaine Fusion `P11-M003V` requise, `print-validated: false`.
+La mission `P11-M003` corrige l'ambiguite dimensionnelle observee apres P11-M002V : les modules asset-first generes distinguent maintenant span grille theorique, enveloppe asset-fit et taille imprimable. Le smoke test humain `P11-M003V` a ete KO partiel : la scene etait generee, mais les dimensions effectives n'etaient pas clairement verifiables dans le message Fusion. La correction `P11-M003V2` refuse maintenant les placements grille modernes sans `printable_body_size_mm`, garde `theoretical_grid_extent_mm` comme metadata d'occupation et ajoute un `Body sizing report` avec taille imprimable prevue, bbox reelle Fusion et `size match`. Statut : `implemented-fusion`, validation humaine Fusion `P11-M003V2` requise, `print-validated: false`.
 
 ## Phase active
 
-Phase active : **P11-M003 UI Fusion minimale et sizing asset-first corriges / smoke test humain requis**.
+Phase active : **P11-M003V2 correction sizing Fusion planned/actual / smoke test humain requis**.
 
 Etat : le pipeline P4 reste stable pour les blanks rectangulaires Fusion. La
 vague P5 est terminee cote moteur Python pur, configuration, rapports et CAD IR.
@@ -250,10 +250,10 @@ avec l'ancienne attente dimensionnelle documentee. P7-M001 est
 document Assembly-compatible, avec `print-validated: false`. P11-M002 est
 `fusion-validated` pour une scene compacte/eclatee multi-layer depuis placements
 X/Y/Z. P11-M003 est `implemented-fusion` pour la commande UI minimale et le
-sizing asset-first explicite, avec validation Fusion manuelle requise. La North
+sizing asset-first explicite. P11-M003V2 ajoute le rapport bbox planned/actual et requiert validation Fusion manuelle. La North
 Star cible un generateur volumetrique asset-first, pilote par capabilities.
 
-Prochaine action recommandee : smoke test humain Fusion P11-M003V avec
+Prochaine action recommandee : smoke test humain Fusion P11-M003V2 avec
 `simple_asset_executable_plan` et `simple_multilayer_grid_scene` via la commande
 UI, avant toute UI plus complete, vue volumetrique plus avancee, module composite,
 solveur plus automatique, export ou geometrie Fusion supplementaire. Une nouvelle
@@ -330,9 +330,9 @@ et des modules rectangulaires compactes/eclates multi-layer basiques.
   `print-validated: false`.
 - Scene Fusion multi-layer P11-M002 depuis placements grille X/Y/Z :
   `fusion-validated`, `print-validated: false`.
-- Sizing explicite P11-M003 des modules asset-first generes : span grille
-  theorique, enveloppe asset-fit, taille de body imprimable et slack de grille
-  visibles dans rapports/JSON/CAD IR.
+- Sizing explicite P11-M003/P11-M003V2 des modules asset-first generes : span grille
+  theorique, enveloppe asset-fit, taille de body imprimable, source de sizing,
+  garde-fou anti-span-silencieux et slack de grille visibles dans rapports/JSON/CAD IR ou plan Fusion.
 - Commande UI Fusion minimale P11-M003 : champ `CAD IR JSON path`, mode
   `compact_only` / `compact_and_exploded`, fichiers texte locaux conserves comme
   fallback de compatibilite, validation Fusion manuelle requise.
@@ -427,13 +427,14 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant `P11-M003 - UI Fusion minimale et sizing asset-first` :
+Derniere verification pendant `P11-M003V2 - rapport dimensionnel Fusion planned/actual` :
 
-- `python -m unittest discover -s tests` : OK, 152 tests passes.
-- CLI Markdown/JSON/export CAD IR : OK sur `simple_asset_executable_plan.json`, `simple_multilayer_grid_scene.json`, `simple_tray.json` et `simple_finger_notch_tray.json`.
+- `python -m unittest discover -s tests` : OK, 153 tests passes.
+- CLI Markdown/JSON : OK sur `simple_asset_executable_plan.json`, `simple_multilayer_grid_scene.json`, `simple_tray.json`, `simple_finger_notch_tray.json` et `simple_box.json`.
+- Export CAD IR : OK sur `simple_asset_executable_plan.json` et `simple_multilayer_grid_scene.json`.
 - `git diff --check` : OK.
 - `rg -n "adsk" src/board_game_insert_generator` : OK, aucune occurrence dans le coeur Python.
-- Validation Fusion reelle : requise via `P11-M003V`; non executee par Codex.
+- Validation Fusion reelle : requise via `P11-M003V2`; non executee par Codex.
 ## Risques actifs
 
 - Le moteur a deja des concepts futurs dans `models.py`; il faut eviter de les
