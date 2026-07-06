@@ -109,6 +109,8 @@ Capabilities liees : C-ASSET, C-RESERVATION.
 Criteres de reussite : assets distincts des modules, dimensions approximatives
 signalees, reservations verticales et XY documentees.
 
+Statut P9-M001 : schema cible asset-first documente, non charge par le loader V0.
+
 ## Phase 10 - Solveur semi-automatique et scoring
 
 Objectif : proposer plusieurs variantes explicables et scorees.

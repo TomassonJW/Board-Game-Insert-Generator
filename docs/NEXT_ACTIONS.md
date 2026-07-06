@@ -30,16 +30,17 @@ geometrie courbe, module composite ou export STL/3MF dans Fusion.
 
 ## Mission ready non gated
 
-`P9-M001 - Specifier le schema asset-first`.
+`P9-M002 - Charger des assets JSON sans generation de modules`.
 
-- Capability : `C-ASSET`, `C-RESERVATION`.
+- Capability : `C-ASSET`.
 - Milestone : `M6 Asset-first project model`.
-- Objectif : decrire assets, quantites, dimensions approximatives et liens vers
-  reservations volumetriques, sans encore generer automatiquement des modules.
-- Gate : schema public large ou changement incompatible ; aucune si la mission
-  reste additive/documentaire ou chargeur strict borne.
-- Validation : tests unitaires/documentaires, CLI Markdown/JSON/export CAD IR sur
-  exemples existants et exemples assets si ajoutes.
+- Objectif : accepter un bloc racine `assets` strictement valide, sans deriver de
+  modules ni changer le layout.
+- Gate : stop si l'activation du schema impose un changement incompatible ; OK si
+  elle reste additive et refusee proprement quand invalide.
+- Validation : tests unitaires loader/validation, rapports si affichage ajoute,
+  CLI Markdown/JSON/export CAD IR sur exemples existants et nouvel exemple asset
+  si un exemple executable est ajoute.
 ## Mission bloquee par gate
 
 `P8-FUSION-GATE - Generation Fusion volumetrique ou vue 3D`.

@@ -59,7 +59,8 @@ Entrees actuelles :
 
 Entrees futures :
 
-- assets a ranger avec dimensions exactes ou approximatives ;
+- assets a ranger avec dimensions exactes ou approximatives ; P9-M001 en decrit
+  le schema cible sans encore l'activer dans le loader ;
 - volumes de contenance attendus ;
 - boards, livrets, regles et plateaux a reserver ;
 - contraintes de layers et empilement ;

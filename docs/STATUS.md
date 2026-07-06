@@ -203,6 +203,8 @@ volumetrique ne sont ajoutes.
 
 La mission `P8-M002` enrichit ce modele volumetrique avec reservations typees, ordre de retrait abstrait, directions d'acces et surfaces de support abstraites. Les rapports Markdown/JSON et `metadata.volumetric_grid` CAD IR exposent `support_surfaces` et `removal_sequence`, sans solveur automatique, sans nouvelle operation Fusion et sans validation physique de portance.
 
+La mission `P9-M001` specifie le schema cible asset-first : assets distincts des modules, quantites, dimensions exactes/approximatives, intentions de rangement et liens optionnels vers reservations volumetriques. Le loader V0 refuse encore `assets` ; aucune generation de module ou modification de layout n'est ajoutee.
+
 ## Phase active
 
 Phase active : **P8 volumetric planner abstrait / gate avant generation Fusion volumetrique**.
@@ -217,7 +219,7 @@ volumetrique declarative, layers, reservations, supports abstraits et metadata C
 La North Star cible un
 generateur volumetrique asset-first, pilote par capabilities.
 
-Prochaine action recommandee : `P9-M001` pour cadrer le schema asset-first et relier assets plats aux reservations, si la suite reste coeur Python pur et CAD-agnostic. Une nouvelle gate humaine est requise avant toute generation Fusion
+Prochaine action recommandee : `P9-M002` pour charger des assets JSON stricts sans generation de modules, si l'activation reste additive et CAD-agnostic. Une nouvelle gate humaine est requise avant toute generation Fusion
 reelle liee a la grille 3D, aux layers, aux vues eclatees ou aux features
 avancees.
 
@@ -277,6 +279,8 @@ avancees.
   cellules libres/occupees/reservees/interdites, rapports et metadata CAD IR.
 - Enrichissement P8-M002 des reservations typees, ordre de retrait, directions
   d'acces, surfaces de support abstraites, rapports et metadata CAD IR.
+- Schema cible P9-M001 asset-first documente, avec assets distincts des modules
+  et loader V0 encore inchange.
 - Generation Fusion de cavites rectangulaires simples P6-M001 depuis
   `subtract_rectangular_cavity`, avec coupe verticale limitee au body cible,
   `fusion-validated` et `print-validated: false`.
@@ -360,7 +364,7 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant `P8-M002 - Reservations, ordre de retrait et supports abstraits` :
+Derniere verification pendant `P9-M001 - Schema cible asset-first` :
 
 - `python -m unittest discover -s tests` : OK, 120 tests passes.
 - `python -m py_compile src\board_game_insert_generator\models.py src\board_game_insert_generator\config_loader.py src\board_game_insert_generator\validation.py src\board_game_insert_generator\volumetric.py src\board_game_insert_generator\report.py src\board_game_insert_generator\cad_ir.py` : OK.

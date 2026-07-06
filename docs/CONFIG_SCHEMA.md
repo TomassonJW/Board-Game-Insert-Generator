@@ -55,7 +55,7 @@ possible.
 
 Le schema V0 reste `module-first` : le loader accepte `modules`, `cavities`,
 `features` et le bloc optionnel `volumetric_grid`. Il n'accepte pas encore de
-champ racine `assets`, `reservations` independantes ou `solver`.
+champ racine `assets`, `reservations` independantes ou `solver` tant que P9-M002 n'est pas implemente.
 
 La cible produit de Phase 8/9 introduira, sous gate si le schema public change :
 
@@ -388,3 +388,23 @@ Approche prevue :
 3. Convertir chaque ligne en `ModuleRequest`.
 4. Generer un JSON canonique ou un `InsertConfig`.
 5. Reutiliser exactement le meme moteur.
+
+## Schema cible `assets` P9-M001 non charge
+
+Le bloc racine futur `assets` est specifie comme cible mais reste refuse par le
+loader V0 actuel. Il servira a decrire le materiel reel avant de deriver modules,
+cavites ou reservations.
+
+Champs cibles :
+
+- `assets[].id`, `name`, `kind` ;
+- `assets[].quantity.count`, `quantity.grouping` ;
+- `assets[].dimensions_mm.x/y/z` ;
+- `assets[].dimension_confidence` : `exact`, `approximate`, `unknown_z` ;
+- `assets[].containment_intent` ;
+- `assets[].reservation_ref` vers une zone volumetrique optionnelle ;
+- `assets[].module_hint` optionnel ;
+- `assets[].comment`.
+
+P9-M001 ne change pas le comportement du loader. P9-M002 devra choisir si ce
+schema devient chargeable et quelles validations sont appliquees.

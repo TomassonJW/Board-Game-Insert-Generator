@@ -282,11 +282,11 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Capability : C-ASSET, C-RESERVATION.
 - Milestone : M6 Asset-first project model.
 - Objectif : decrire assets, quantites, dimensions approximatives et reservations.
-- Livrable : schema cible et exemples non executes.
-- Criteres d'acceptation : modules et assets restent distincts.
-- Tests : test documentaire.
+- Livrable : schema cible documente dans `ASSET_MODEL_STRATEGY` et `CONFIG_SCHEMA`, exemple non executable, ADR et log.
+- Criteres d'acceptation : modules et assets restent distincts ; le loader V0 refuse encore `assets`.
+- Tests : test documentaire et non-regression CLI.
 - Gate : schema public si implementation loader.
-- Statut : `ready`.
+- Statut : `done`, `designed`.
 
 ### P9-M002 - Charger des assets JSON sans generation de modules
 
@@ -297,8 +297,7 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Criteres d'acceptation : aucune regression des exemples module-first.
 - Tests : unitaires + CLI.
 - Gate : si incompatibilite schema.
-- Statut : `todo`.
-
+- Statut : `ready`.
 ## Phase 10 - Solveur semi-automatique et scoring
 
 ### P10-M001 - Definir les criteres de scoring de variantes

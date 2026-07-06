@@ -110,6 +110,8 @@ Tests, cartes backlog ou gates humaines a preparer.
   volumetrique 3D.
 - `ADR-0017-volumetric-reservation-support-contract.md` - reservations typees,
   ordre de retrait et surfaces de support abstraites.
+- `ADR-0018-asset-first-schema-target.md` - schema cible asset-first documente
+  avant activation du loader.
 
 ## Regles de maintenance
 
