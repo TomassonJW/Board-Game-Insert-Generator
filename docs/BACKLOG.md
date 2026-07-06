@@ -192,7 +192,7 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Criteres d'acceptation : aucune logique metier dans Fusion, coupe limitee au body cible, dimensions issues de la CAD IR, features courbes non revendiquees comme courbes reelles, absence STL/3MF.
 - Tests : unitaires hors Fusion, CLI Markdown/JSON/export CAD IR sur `simple_tray` et `simple_finger_notch_tray`, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
 - Gate : validation humaine fournie le 2026-07-06 pour les encoches de doigts simples uniquement.
-- Statut : `done`, `implemented-fusion`, correctifs KO partiels appliques dont top-open, smoke test Fusion manuel requis, `print-validated: false`.
+- Statut : `done`, `fusion-validated` pour `top-open rectangular wall notch`, `print-validated: false`.
 
 ### P6-M002V - Valider manuellement les encoches de doigts Fusion
 
@@ -202,9 +202,20 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Livrable : log de validation manuelle Fusion avec mesures et statut explicite `print-validated: false` tant qu'aucune impression 3D n'est faite.
 - Criteres d'acceptation : message final avec `Simple finger notch features planned: 1`, `Simple finger notch sketches: 1`, `Simple top-open finger notch cuts: 1` et `Finger notch topology: top-open rectangular wall cut`, morsure top-open visible dans la paroi du body cible, dimensions conformes a la CAD IR, aucune geometrie courbe revendiquee.
 - Tests : smoke test manuel Fusion.
-- Gate : action humaine requise.
-- Statut : `blocked` par nouvelle validation manuelle apres KO partiels corriges.
+- Gate : action humaine Thomas realisee le 2026-07-06 apres `b27c2e7`.
+- Statut : `done`, `fusion-validated`, `print-validated: false`.
 
+
+### P6-M003 - Formaliser la taxonomie des encoches et aides de prise
+
+- Capability : C-FEATURE, C-FILLETS, C-ACCESS.
+- Milestone : M5 CAD ergonomic features / M8 Ergonomic planner.
+- Objectif : sortir du terme vague "encoche" et definir une taxonomie claire des aides de prise, sans nouvelle geometrie Fusion reelle.
+- Livrable : enums/modeles ou contrats coeur si necessaire, documentation de taxonomie, rapports/CAD IR clarifies, tests hors Fusion.
+- Criteres d'acceptation : distinction explicite entre `top_open_rectangular_notch`, `top_open_half_moon_notch`, `through_wall_window`, `blind_internal_thumb_scoop`, `side_relief_notch` et `dual_side_card_access`; statuts implemente/futur visibles; aucune nouvelle operation Fusion.
+- Tests : unitaires, CLI Markdown/JSON/export CAD IR sur `simple_tray` et `simple_finger_notch_tray`, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
+- Gate : aucune tant que la mission reste abstraite et CAD-agnostic; gate obligatoire avant generation Fusion reelle de courbes, scoops, fillets, fonds arrondis ou booleans avances.
+- Statut : `ready`.
 ## Phase 7 - Vue compacte / vue eclatee
 
 ### P7-M001 - Ajouter une intention de vue eclatee dans la CAD IR
@@ -213,7 +224,7 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Milestone : M5 CAD inspection views.
 - Objectif : decrire positions de vue eclatee sans modifier la geometrie Fusion.
 - Livrable : contrat CAD IR additif et tests de serialisation.
-- Criteres d'acceptation : compatibilite `cad_ir.v0` preservÃ©e ou ADR si nouvelle version.
+- Criteres d'acceptation : compatibilite `cad_ir.v0` preservee ou ADR si nouvelle version.
 - Tests : unitaires CAD IR, export CLI.
 - Gate : si contrat incompatible ou generation Fusion reelle.
 - Statut : `todo`.

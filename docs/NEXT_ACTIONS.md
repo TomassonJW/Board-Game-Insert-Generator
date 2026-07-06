@@ -18,29 +18,31 @@ structurant, authentification absente ou refus de push direct.
 
 ## Gate humaine active
 
-Statut : `manual_validation_required`.
+Statut : `none`.
 
-`P6-M002 - Generer les encoches de doigts simples dans Fusion` est code et a
-recu deux correctifs apres KO partiels : conversion sketch/cut puis topologie
-top-open. Il doit maintenant etre reteste manuellement dans Fusion avant tout
-elargissement.
+`P6-M002V - Valider manuellement les encoches de doigts Fusion` est valide apres
+le correctif `b27c2e7`. La version validee est une `top-open rectangular wall
+notch` : blank OK, cavite OK, message OK, encoche frontale ouverte vers le haut
+OK, pas de fenetre fermee. `print-validated: false` reste explicite.
 
-Action humaine attendue : `P6-M002V - Valider manuellement les encoches de doigts
-Fusion`.
+## Mission ready
 
-Perimetre du smoke test :
+Statut : `ready`.
 
-- exporter `examples/simple_finger_notch_tray.json` en CAD IR ;
-- pointer l'add-in Fusion vers cette CAD IR ;
-- verifier le message `Simple finger notch features planned: 1`,
-  `Simple finger notch sketches: 1`, `Simple top-open finger notch cuts: 1` et
-  `Finger notch topology: top-open rectangular wall cut` ;
-- verifier que la coupe d'encoche frontale est une vraie morsure top-open dans
-  la paroi du body cible, pas un sketch et pas une fenetre fermee ;
-- mesurer blank, cavite et encoche ;
-- conserver `print-validated: false` tant qu'aucune impression 3D n'a ete faite.
+`P6-M003 - Formaliser la taxonomie des encoches et aides de prise`.
 
-## Mission ready non gated si Fusion est reportee
+- Capability : `C-FEATURE`, `C-FILLETS`, `C-ACCESS`.
+- Milestone : `M5 CAD ergonomic features` / `M8 Ergonomic planner`.
+- Objectif : definir une taxonomie claire et parametree des aides de prise sans
+  nouvelle generation Fusion reelle.
+- Gate : aucune tant que la mission reste abstraite et CAD-agnostic.
+- Validation : tests unitaires, CLI Markdown/JSON/export CAD IR sur
+  `simple_tray` et `simple_finger_notch_tray`, `git diff --check`, absence
+  d'`adsk` dans `src/board_game_insert_generator`.
+- Arret obligatoire : toute generation Fusion de demi-lune courbe, scoop interne,
+  fillet/conge, fond arrondi, geometrie courbe, grille 3D ou module composite.
+
+## Mission ready non gated si P6-M003 est terminee et gate Fusion atteinte
 
 Statut : `ready_if_gate_deferred`.
 
@@ -53,9 +55,6 @@ Statut : `ready_if_gate_deferred`.
 - Gate : aucune si la mission reste documentaire/specification et ne modifie pas
   le schema public executable.
 - Validation : tests documentaires, backlog/status/capability map mis a jour.
-
-Cette mission ne doit etre prise que si l'humain reporte explicitement la gate
-Fusion ou demande une mission non gated.
 
 ## Fin de chaque mission
 

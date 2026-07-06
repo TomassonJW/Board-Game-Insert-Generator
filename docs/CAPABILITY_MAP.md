@@ -74,7 +74,7 @@ Chaine de pilotage :
 | C-FUSION-COMPACT | Fusion compact view | CAD generation pipeline | `fusion-validated` | M3 CAD pipeline | Gate pour nouvelles geometries |
 | C-FUSION-EXPLODED | Fusion exploded view | CAD generation pipeline | `designed` | M5 CAD inspection views | Validation Fusion manuelle |
 | C-FUSION-CAVITIES | Fusion cavities | CAD generation pipeline | `fusion-validated` | M5 CAD cavities | Cavites rectangulaires validees Fusion, print-validated: false |
-| C-FILLETS | Fillets and finger notches | CAD generation pipeline | `implemented-fusion` | M5 CAD ergonomic features | Correctif encoche simple code, nouveau smoke test Fusion requis ; courbes/fillets bloques |
+| C-FILLETS | Fillets and finger notches | CAD generation pipeline | `fusion-validated` | M5 CAD ergonomic features | Encoche rectangulaire top-open validee Fusion, print-validated: false ; courbes/fillets bloques |
 | C-SOLVER | Solver and scoring | Volumetric layout | `designed` | M10 Semi-automatic solver | Gate architecture si optimiseur majeur |
 | C-CALIBRATION | Calibration and print validation | Human validation gates | `designed` | M11 Physical validation | Impression reelle |
 | C-AESTHETIC | Aesthetic layer | Design language and aesthetics | `planned` | M12 Design language | Gate esthetique structurante |

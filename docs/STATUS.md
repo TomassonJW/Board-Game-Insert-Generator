@@ -182,26 +182,29 @@ Le second smoke test humain `P6-M002V` apres `3760abe` a confirme une coupe
 volumique, mais sous forme de fenetre rectangulaire fermee dans la paroi. Le
 correctif courant interprete `size_mm.z` comme `notch_depth_from_top_mm`, place le
 bas du profil a `body_top_z - notch_depth_from_top_mm` et fait depasser le haut
-du profil au-dessus du body pour produire une morsure top-open. Un nouveau smoke
-test Fusion reste requis.
+du profil au-dessus du body pour produire une morsure top-open. Le smoke test
+humain apres `b27c2e7` confirme le blank, la cavite, le message, la coupe
+top-open dans la paroi frontale et l'absence de fenetre fermee. Cette version
+est `fusion-validated` comme `top-open rectangular wall notch`.
+
+`print-validated: false` reste explicite : aucune impression 3D n'a ete faite.
 ## Phase active
 
-Phase active : **P6-M002V validation manuelle des encoches Fusion**.
+Phase active : **P6-M003 formalisation de la taxonomie des aides de prise**.
 
 Etat : le pipeline P4 reste stable pour les blanks rectangulaires Fusion. La
 vague P5 est terminee cote moteur Python pur, configuration, rapports et CAD IR.
 P6-M001 est `fusion-validated` pour les cavites rectangulaires simples, avec
-`print-validated: false`. P6-M002 est code et corrige apres deux KO partiels pour
-les encoches simples de paroi top-open, mais reste `manual validation required`
-dans Fusion.
+`print-validated: false`. P6-M002 est `fusion-validated` pour les encoches
+simples de paroi top-open, avec `print-validated: false`.
 La North Star cible un
 generateur volumetrique asset-first, pilote par capabilities.
 
-Prochaine action : lancer `P6-M002V - Valider manuellement les encoches de doigts
-Fusion` sur la CAD IR exportee depuis `examples/simple_finger_notch_tray.json`.
-Le test doit confirmer une vraie morsure ouverte vers le haut de la paroi, pas
-un sketch visible et pas une fenetre fermee. Aucune geometrie de fond arrondi,
-fillet, export ou impression ne doit etre revendiquee.
+Prochaine action : executer `P6-M003 - Formaliser la taxonomie des encoches et
+aides de prise`, sans nouvelle generation Fusion reelle. La prochaine vraie gate
+sera atteinte des qu'une mission demande une demi-lune courbe, un scoop interne,
+un fillet/conge, un fond arrondi, une geometrie courbe, une grille 3D ou un
+module composite genere dans Fusion.
 
 ## Implemente
 
@@ -259,7 +262,8 @@ fillet, export ou impression ne doit etre revendiquee.
 - Generation Fusion d'encoches de doigts simples P6-M002 depuis
   `describe_cavity_feature`, comme coupes rectangulaires de paroi top-open
   limitees au body cible, avec correctifs `modelToSketchSpace` et profil depasse
-  au-dessus du body, smoke test Fusion manuel requis.
+  au-dessus du body, `fusion-validated` comme `top-open rectangular wall notch` et
+  `print-validated: false`.
 - Pilotage produit par North Star, Product Pillars, Capability Map, milestones,
   epics, missions, gates et validations.
 - Roadmap 0-14 alignee avec la cible volumetrique asset-first.
@@ -281,9 +285,8 @@ fillet, export ou impression ne doit etre revendiquee.
   generes.
 - Les cavites rectangulaires P6-M001 sont `fusion-validated`, mais non
   `print-validated`.
-- Les encoches de doigts simples P6-M002 sont codees et corrigees apres deux KO
-  partiels, mais encore `manual validation required` dans Fusion et non
-  `print-validated`.
+- Les encoches de doigts simples P6-M002 sont `fusion-validated` comme coupes
+  rectangulaires de paroi top-open, mais non `print-validated`.
 - Les tolerances par defaut et les profils d'impression sont prudents mais non
   calibres sur impression.
 - Les dataclasses restent volontairement legeres ; les erreurs metier sont
@@ -298,7 +301,7 @@ fillet, export ou impression ne doit etre revendiquee.
 ## Prevu
 
 - Strategie de layout `columns`.
-- Validation manuelle Fusion P6-M002V des encoches de doigts simples.
+- Formalisation P6-M003 de la taxonomie des encoches et aides de prise.
 - Generation Fusion reelle de fonds arrondis, fillets, conges, booleans complexes
   ou geometrie courbe, sous nouvelle gate humaine.
 - Modules composites en L/T.
