@@ -8,7 +8,7 @@ from pathlib import Path
 from context import ROOT
 
 from board_game_insert_generator.config_loader import ConfigError, load_config
-from board_game_insert_generator.models import FeatureKind, FunctionalType
+from board_game_insert_generator.models import FeatureKind, FeatureTaxonomyKind, FunctionalType
 
 class ConfigLoaderTests(unittest.TestCase):
     def test_load_simple_config(self) -> None:
@@ -42,6 +42,7 @@ class ConfigLoaderTests(unittest.TestCase):
         rounded_floor = cavity.features[1]
         self.assertEqual(notch.id, "front-half-moon-notch")
         self.assertEqual(notch.kind, FeatureKind.HALF_MOON_NOTCH)
+        self.assertEqual(notch.taxonomy, FeatureTaxonomyKind.TOP_OPEN_HALF_MOON_NOTCH)
         self.assertEqual(notch.placement, "front_center")
         self.assertEqual(notch.position.x, 22.0)
         self.assertEqual(notch.size.x, 18.0)
@@ -138,6 +139,31 @@ class ConfigLoaderTests(unittest.TestCase):
         with self.assertRaisesRegex(ConfigError, "Unsupported feature kind"):
             _load_payload(payload)
 
+
+    def test_rejects_unknown_cavity_feature_taxonomy(self) -> None:
+        payload = _simple_payload()
+        payload["modules"][0]["cavities"] = [
+            {
+                "id": "bad-pocket",
+                "origin_mm": {"x": 2, "y": 2, "z": 1.2},
+                "size_mm": {"x": 10, "y": 10, "z": 5},
+                "clearance_mm": 0.5,
+                "features": [
+                    {
+                        "id": "magic-notch",
+                        "kind": "half_moon_notch",
+                        "taxonomy": "magic_notch_taxonomy",
+                        "placement": "front_center",
+                        "position_mm": {"x": 1, "y": 0, "z": 1},
+                        "size_mm": {"x": 4, "y": 2, "z": 2},
+                        "radius_mm": 2,
+                    }
+                ],
+            }
+        ]
+
+        with self.assertRaisesRegex(ConfigError, "Unsupported feature taxonomy"):
+            _load_payload(payload)
     def test_rejects_missing_file(self) -> None:
         with self.assertRaises(ConfigError):
             load_config(ROOT / "examples" / "missing.json")

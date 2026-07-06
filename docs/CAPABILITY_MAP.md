@@ -62,7 +62,7 @@ Chaine de pilotage :
 | C-ASSET | Asset model | Asset-first design | `planned` | M6 Asset-first project model | Gate si schema public large |
 | C-MODULE | Module model | Modular printable bodies | `implemented-core` | M1 Engine foundation | Aucune active |
 | C-CAVITY | Cavity model | Cavities and ergonomic features | `implemented-cad-ir` | M4 Abstract cavities | Gate Fusion cuts |
-| C-FEATURE | Ergonomic feature model | Cavities and ergonomic features | `implemented-cad-ir` | M4 Abstract cavities | Gate Fusion features |
+| C-FEATURE | Ergonomic feature model | Cavities and ergonomic features | `implemented-cad-ir` | M4 Abstract cavities / M8 Ergonomic planner | Taxonomie P6-M003 implementee ; gate Fusion pour nouvelles geometries |
 | C-LAYOUT-2D | 2D layout | Volumetric layout | `implemented-core` | M2 Simple layout | Aucune active |
 | C-GRID-3D | 3D volumetric grid | Volumetric layout | `planned` | M7 Volumetric planner | Gate architecture si contrat change |
 | C-LAYERS | Layer / stage model | Volumetric layout | `designed` | M7 Volumetric planner | Gate architecture si empilement physique |

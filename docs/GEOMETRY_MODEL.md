@@ -211,7 +211,20 @@ locale dans la cavite, une taille optionnelle, un rayon optionnel et un
 commentaire. Les encoches et aides de prise en main requierent une taille. Les
 demi-lunes et fonds arrondis requierent un rayon.
 
-Invariants P5-M004 :
+Taxonomie P6-M003 :
+
+- `top_open_rectangular_notch` : morsure rectangulaire ouverte par le haut,
+  `fusion-validated`, `print-validated: false` ;
+- `top_open_half_moon_notch` : intention de demi-lune courbe, fallback Fusion
+  rectangulaire top-open ;
+- `through_wall_window` : fenetre fermee, explicitement distincte d'une encoche
+  utilisable ;
+- `blind_internal_thumb_scoop` : creux interne non traversant avec peau externe
+  a preserver ;
+- `side_relief_notch` : degagement lateral pour cartes, tuiles ou assets plats ;
+- `dual_side_card_access` : acces bilateral a un paquet de cartes ou tuiles.
+
+Invariants P5-M004/P6-M003 :
 
 - la feature reste dans les dimensions locales de la cavite ;
 - le rayon reste abstrait et borne par la taille XY de la cavite ;
@@ -302,7 +315,7 @@ Prevu :
 
 - Une dimension negative ou nulle est invalide.
 - Une cavite ne doit pas casser les parois minimales.
-- Une feature P5-M004 est CAD-agnostic, locale a une cavite et non executable par Fusion.
+- Une feature P6-M003 est CAD-agnostic, locale a une cavite et porte une taxonomie resolue.
 - Une coupe Fusion P6-M001 doit rester une soustraction rectangulaire verticale issue de la CAD IR.
 - Une operation Fusion future doit mapper un concept deja resolu, pas inventer un
   nouveau modele metier.

@@ -24,19 +24,19 @@ Le depot contient :
 - une commande `export-cad-ir` pour produire une CAD IR JSON depuis une
   configuration BGIG ;
 - des cavites rectangulaires simples abstraites cote moteur, rapports et CAD IR ;
-- des features ergonomiques abstraites de cavites, comme encoches de doigts et
-  fonds arrondis intentionnels ;
+- des features ergonomiques de cavites avec taxonomie explicite, comme encoches
+  top-open, demi-lunes futures, fenetres de paroi, scoops et fonds arrondis
+  intentionnels ;
 - un add-in Fusion isole capable de charger cette CAD IR depuis
   `cad_ir_input.json` ou `cad_ir_path.txt`.
 
 Le depot couvre maintenant le pipeline minimal : configuration BGIG -> layout ->
 CAD IR JSON -> add-in Fusion -> blanks rectangulaires dans le composant racine.
 Fusion consomme les dimensions deja calculees par le coeur Python et ne
-recalcule ni layout, ni offsets, ni tolerances. Les cavites P5 et leurs features
-ergonomiques P5-M004 restent abstraites dans le moteur et la CAD IR : Fusion ne
-les coupe pas, ne genere pas d'encoches, ne cree pas de fonds arrondis et ne
-genere pas de couvercles, fillets, exports STL/3MF ou pieces validees par
-impression reelle.
+recalcule ni layout, ni offsets, ni tolerances. Les cavites rectangulaires
+simples et les encoches rectangulaires top-open sont les seules operations
+Fusion deja validees manuellement. Les demi-lunes courbes, scoops, fonds
+arrondis, fillets, exports STL/3MF et pieces imprimees restent non valides.
 
 Consulter d'abord :
 
@@ -102,8 +102,10 @@ et `meeples`, `clearance_mm` peut etre resolu depuis le profil actif et
 apparait avec `clearance_source`.
 
 Les features ergonomiques apparaissent dans les rapports et dans la CAD IR comme
-metadata abstraites et operations `describe_cavity_feature`. Elles ne sont pas
-executees par l'add-in Fusion actuel.
+metadata abstraites et operations `describe_cavity_feature`, avec une taxonomie
+resolue documentee dans `docs/FEATURE_TAXONOMY.md`. `top_open_rectangular_notch`
+est validee dans Fusion ; `top_open_half_moon_notch` conserve une intention
+courbe mais utilise encore un fallback rectangulaire top-open.
 
 Les rapports exposent un resume de diagnostic : strategie de layout, nombre de
 modules demandes, instances generees, corps imprimables, rotations, empreinte du
@@ -210,8 +212,9 @@ actions si necessaire, puis lancer les tests disponibles.
 ## Limites importantes
 
 - Le layout actuel est deterministe mais non optimise.
-- Les cavites sont decrites abstraitement, et les features ergonomiques de cavites
-  sont seulement des intentions non generees dans Fusion.
+- Les cavites rectangulaires simples et l'encoche rectangulaire top-open sont
+  validees dans Fusion, mais les autres features ergonomiques restent abstraites
+  ou futures.
 - Les couvercles, modules composites et mecanismes sont prevus mais non
   fonctionnels.
 - Les tolerances par defaut doivent etre validees par impression reelle.

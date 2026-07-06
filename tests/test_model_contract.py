@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import unittest
 
+from board_game_insert_generator.feature_taxonomy import feature_taxonomy_to_dict, resolve_feature_taxonomy
 from board_game_insert_generator.layout import generate_basic_layout
 from board_game_insert_generator.models import (
     BoxSpec,
@@ -9,6 +10,7 @@ from board_game_insert_generator.models import (
     Dimension3D,
     Feature,
     FeatureKind,
+    FeatureTaxonomyKind,
     FunctionalType,
     GeometryDefaults,
     InsertConfig,
@@ -228,6 +230,69 @@ class ModelContractTests(unittest.TestCase):
         self.assertIn(("modules[0].cavities[0].features[1].fusion_generation", "FEATURE_FUSION_GENERATION_UNSUPPORTED"), keys)
         self.assertIn(("modules[0].cavities[0].features[2].radius_mm", "CAVITY_FEATURE_RADIUS_TOO_LARGE"), keys)
 
+
+    def test_feature_taxonomy_distinguishes_notch_topologies_and_fallbacks(self) -> None:
+        half_moon = Feature(
+            id="front-half-moon",
+            kind=FeatureKind.HALF_MOON_NOTCH,
+            taxonomy=FeatureTaxonomyKind.TOP_OPEN_HALF_MOON_NOTCH,
+            placement="front_center",
+            position=Point3D(x=10.0, y=0.0, z=6.0),
+            size=Dimension3D(x=18.0, y=4.0, z=8.0),
+            radius_mm=9.0,
+        )
+        rectangular = Feature(
+            id="front-rect",
+            kind=FeatureKind.FINGER_NOTCH,
+            taxonomy=FeatureTaxonomyKind.TOP_OPEN_RECTANGULAR_NOTCH,
+            placement="front_center",
+            position=Point3D(x=10.0, y=0.0, z=6.0),
+            size=Dimension3D(x=18.0, y=4.0, z=8.0),
+        )
+        window = Feature(
+            id="wall-window",
+            kind=FeatureKind.FINGER_NOTCH,
+            taxonomy=FeatureTaxonomyKind.THROUGH_WALL_WINDOW,
+            placement="front_center",
+            position=Point3D(x=10.0, y=0.0, z=6.0),
+            size=Dimension3D(x=18.0, y=4.0, z=8.0),
+        )
+
+        half_moon_taxonomy = feature_taxonomy_to_dict(half_moon)
+        self.assertEqual(half_moon_taxonomy["taxonomy"], "top_open_half_moon_notch")
+        self.assertEqual(half_moon_taxonomy["fusion_fallback_taxonomy"], "top_open_rectangular_notch")
+        self.assertEqual(half_moon_taxonomy["fusion_status"], "abstract_profile_with_validated_rectangular_fallback")
+        self.assertEqual(resolve_feature_taxonomy(rectangular).fusion_status, "fusion-validated")
+        self.assertFalse(resolve_feature_taxonomy(window).opens_to_top)
+        self.assertTrue(resolve_feature_taxonomy(window).through_wall)
+
+    def test_feature_taxonomy_reports_incompatible_kind_pairings(self) -> None:
+        bad_feature = Feature(
+            id="bad-taxonomy",
+            kind=FeatureKind.ROUNDED_FLOOR,
+            taxonomy=FeatureTaxonomyKind.TOP_OPEN_RECTANGULAR_NOTCH,
+            placement="cavity_floor",
+            position=Point3D(x=0.0, y=0.0, z=0.0),
+            radius_mm=3.0,
+        )
+        cavity = Cavity(
+            id="token-pocket",
+            functional_type=FunctionalType.TOKENS,
+            origin=Point3D(x=5.0, y=5.0, z=1.2),
+            size=Dimension3D(x=100.0, y=80.0, z=28.0),
+            clearance_mm=0.6,
+            features=(bad_feature,),
+        )
+        module = _module(
+            module_id="bad-taxonomy-tray",
+            height_mm=32.0,
+            min_dimensions=Dimension3D(x=110.0, y=90.0, z=32.0),
+            cavities=(cavity,),
+        )
+
+        keys = _issue_keys(validate_config(_config(modules=(module,))))
+
+        self.assertIn(("modules[0].cavities[0].features[0].taxonomy", "FEATURE_TAXONOMY_INCOMPATIBLE"), keys)
     def test_cavity_contract_reports_invalid_walls_floor_and_bounds(self) -> None:
         cavity = Cavity(
             id="bad-pocket",

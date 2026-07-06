@@ -187,10 +187,9 @@ Convention retenue :
 
 Validation : les plans et garde-fous sont testes hors Fusion. Les deux premiers
 smoke tests P6-M002V ont revele successivement un sketch sans cut, puis une
-fenetre fermee dans la paroi. La correction courante impose de verifier dans
-Fusion les compteurs planned, sketches et cuts, puis une vraie encoche top-open
-reli?e au bord superieur du tray. La mesure reste `manual validation required`
-jusqu'au nouveau smoke test P6-M002V.
+fenetre fermee dans la paroi. Le smoke test humain apres `b27c2e7` valide une
+vraie encoche top-open reliee au bord superieur du tray. Cette validation couvre
+`top_open_rectangular_notch` uniquement, avec `print-validated: false`.
 
 ## Vue compacte et vue eclatee
 
@@ -280,7 +279,8 @@ Verifications dans Fusion :
 - presence des bodies de blanks dans le composant racine ;
 - presence de coupes reelles pour `subtract_rectangular_cavity` des cavites
   rectangulaires simples ;
-- presence d'une coupe rectangulaire d'encoche simple de paroi pour P6-M002 ;
+- presence d'une coupe rectangulaire d'encoche simple de paroi pour P6-M002,
+  validee comme `top_open_rectangular_notch` ;
 - absence de generation reelle pour fonds arrondis, fillets et geometrie courbe ;
 - noms ;
 - dimensions ;

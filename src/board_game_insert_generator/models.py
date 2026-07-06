@@ -31,6 +31,16 @@ class FeatureKind(str, Enum):
     GRIP_AID = "grip_aid"
 
 
+class FeatureTaxonomyKind(str, Enum):
+    TOP_OPEN_RECTANGULAR_NOTCH = "top_open_rectangular_notch"
+    TOP_OPEN_HALF_MOON_NOTCH = "top_open_half_moon_notch"
+    THROUGH_WALL_WINDOW = "through_wall_window"
+    BLIND_INTERNAL_THUMB_SCOOP = "blind_internal_thumb_scoop"
+    SIDE_RELIEF_NOTCH = "side_relief_notch"
+    DUAL_SIDE_CARD_ACCESS = "dual_side_card_access"
+    ROUNDED_FLOOR_INTENT = "rounded_floor_intent"
+
+
 LAYOUT_STRATEGY_ROW_FILL = "row_fill"
 LAYOUT_STRATEGY_GRID = "grid"
 LAYOUT_STRATEGY_COLUMNS = "columns"
@@ -85,6 +95,7 @@ class Feature:
     comment: str = ""
     status: str = "abstract_only"
     fusion_generation: str = "not_implemented"
+    taxonomy: FeatureTaxonomyKind | None = None
 
 
 @dataclass(frozen=True)

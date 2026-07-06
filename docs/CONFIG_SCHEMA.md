@@ -193,6 +193,11 @@ Champs reconnus :
 - `id` : identifiant stable de feature, optionnel mais recommande ;
 - `kind` : obligatoire, parmi `finger_notch`, `side_notch`, `center_notch`,
   `half_moon_notch`, `rounded_floor` et `grip_aid` ;
+- `taxonomy` : optionnel, parmi `top_open_rectangular_notch`,
+  `top_open_half_moon_notch`, `through_wall_window`,
+  `blind_internal_thumb_scoop`, `side_relief_notch`, `dual_side_card_access`
+  et `rounded_floor_intent`. Si absent, le moteur derive la taxonomie depuis
+  `kind` ;
 - `placement` : positionnement humain, par exemple `front_center`, `left_side`,
   `center` ou `cavity_floor` ;
 - `position_mm.x`, `position_mm.y`, `position_mm.z` : position locale dans la
@@ -204,7 +209,7 @@ Champs reconnus :
   `rounded_floor` ;
 - `comment` : note humaine optionnelle.
 
-Validation P5-M004 :
+Validation P5-M004/P6-M003 :
 
 - position non negative ;
 - taille strictement positive quand elle est presente ;
@@ -214,8 +219,10 @@ Validation P5-M004 :
 - statut implicite `abstract_only` et `fusion_generation: not_implemented` dans
   les rapports et la CAD IR.
 
-Ces features ne creent pas de coupe, boolean, fillet, conge ou geometrie courbe
-reelle dans Fusion 360.
+`top_open_rectangular_notch` est la seule aide de prise validee dans Fusion a ce
+stade. `top_open_half_moon_notch` reste une intention courbe avec fallback
+rectangulaire top-open. Les autres taxonomies ne creent pas de coupe, boolean,
+fillet, conge ou geometrie courbe reelle dans Fusion 360.
 
 Exemple :
 
@@ -223,6 +230,7 @@ Exemple :
 {
   "id": "front-half-moon-notch",
   "kind": "half_moon_notch",
+  "taxonomy": "top_open_half_moon_notch",
   "placement": "front_center",
   "position_mm": { "x": 22, "y": 0, "z": 8 },
   "size_mm": { "x": 18, "y": 4, "z": 10 },

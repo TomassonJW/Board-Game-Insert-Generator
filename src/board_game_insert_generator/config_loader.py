@@ -11,6 +11,7 @@ from board_game_insert_generator.models import (
     Dimension3D,
     Feature,
     FeatureKind,
+    FeatureTaxonomyKind,
     FunctionalType,
     GeometryDefaults,
     LAYOUT_STRATEGY_ROW_FILL,
@@ -40,7 +41,7 @@ MODULE_FIELDS = {
     "cavities",
 }
 CAVITY_FIELDS = {"id", "functional_type", "origin_mm", "size_mm", "clearance_mm", "comment", "features"}
-FEATURE_FIELDS = {"id", "kind", "placement", "position_mm", "size_mm", "radius_mm", "comment"}
+FEATURE_FIELDS = {"id", "kind", "taxonomy", "placement", "position_mm", "size_mm", "radius_mm", "comment"}
 
 class ConfigError(ValueError):
     """Raised when a configuration file cannot be parsed."""
@@ -224,6 +225,11 @@ def _parse_features(raw_features: Any, cavity_field: str) -> list[Feature]:
                     else None
                 ),
                 comment=_optional_string(raw, "comment", feature_field, default=""),
+                taxonomy=(
+                    _parse_feature_taxonomy_value(raw["taxonomy"], feature_field)
+                    if "taxonomy" in raw
+                    else None
+                ),
             )
         )
     return features
@@ -279,6 +285,16 @@ def _parse_feature_kind_value(value: Any, field_path: str) -> FeatureKind:
             f"Allowed values: {allowed}."
         ) from exc
 
+
+def _parse_feature_taxonomy_value(value: Any, field_path: str) -> FeatureTaxonomyKind:
+    try:
+        return FeatureTaxonomyKind(str(value))
+    except ValueError as exc:
+        allowed = ", ".join(item.value for item in FeatureTaxonomyKind)
+        raise ConfigError(
+            f"Unsupported feature taxonomy for {field_path}: {value!r}. "
+            f"Allowed values: {allowed}."
+        ) from exc
 def _parse_tolerances(raw: Any, print_profile: str) -> ToleranceProfile:
     if raw is None:
         raw = {}

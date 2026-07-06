@@ -188,23 +188,30 @@ top-open dans la paroi frontale et l'absence de fenetre fermee. Cette version
 est `fusion-validated` comme `top-open rectangular wall notch`.
 
 `print-validated: false` reste explicite : aucune impression 3D n'a ete faite.
+
+La mission `P6-M003` formalise une taxonomie CAD-agnostic des aides de prise :
+`top_open_rectangular_notch`, `top_open_half_moon_notch`, `through_wall_window`,
+`blind_internal_thumb_scoop`, `side_relief_notch`, `dual_side_card_access` et
+`rounded_floor_intent`. Les rapports et la CAD IR exposent cette taxonomie sans
+ajouter de nouvelle geometrie Fusion reelle.
+
 ## Phase active
 
-Phase active : **P6-M003 formalisation de la taxonomie des aides de prise**.
+Phase active : **Gate P6-M004 avant nouvelle generation Fusion avancee**.
 
 Etat : le pipeline P4 reste stable pour les blanks rectangulaires Fusion. La
 vague P5 est terminee cote moteur Python pur, configuration, rapports et CAD IR.
 P6-M001 est `fusion-validated` pour les cavites rectangulaires simples, avec
 `print-validated: false`. P6-M002 est `fusion-validated` pour les encoches
-simples de paroi top-open, avec `print-validated: false`.
+simples de paroi top-open, avec `print-validated: false`. P6-M003 est termine
+cote taxonomie abstraite CAD-agnostic.
 La North Star cible un
 generateur volumetrique asset-first, pilote par capabilities.
 
-Prochaine action : executer `P6-M003 - Formaliser la taxonomie des encoches et
-aides de prise`, sans nouvelle generation Fusion reelle. La prochaine vraie gate
-sera atteinte des qu'une mission demande une demi-lune courbe, un scoop interne,
-un fillet/conge, un fond arrondi, une geometrie courbe, une grille 3D ou un
-module composite genere dans Fusion.
+Prochaine action : gate humaine `P6-M004` si la suite vise une generation Fusion
+reelle d'aide de prise avancee. Sans validation humaine, la prochaine mission
+possible doit rester non-Fusion ou documentaire, par exemple `P8-M001` si la gate
+Fusion est explicitement reportee.
 
 ## Implemente
 
@@ -256,6 +263,8 @@ module composite genere dans Fusion.
   `meeples` resolues depuis le profil actif et tracables via `clearance_source`.
 - Features ergonomiques abstraites de cavites P5-M004 chargees, validees,
   reportees et exportees dans la CAD IR par `describe_cavity_feature`.
+- Taxonomie P6-M003 des aides de prise, exposee dans les rapports et la CAD IR,
+  avec validation des couples `kind` / `taxonomy`.
 - Generation Fusion de cavites rectangulaires simples P6-M001 depuis
   `subtract_rectangular_cavity`, avec coupe verticale limitee au body cible,
   `fusion-validated` et `print-validated: false`.
@@ -301,7 +310,6 @@ module composite genere dans Fusion.
 ## Prevu
 
 - Strategie de layout `columns`.
-- Formalisation P6-M003 de la taxonomie des encoches et aides de prise.
 - Generation Fusion reelle de fonds arrondis, fillets, conges, booleans complexes
   ou geometrie courbe, sous nouvelle gate humaine.
 - Modules composites en L/T.
@@ -339,17 +347,16 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant `P6-M002 - Corriger les encoches top-open Fusion` :
+Derniere verification pendant `P6-M003 - Formaliser la taxonomie des encoches et aides de prise` :
 
-- `python -m unittest discover -s tests` : OK, 102 tests passes.
-- `python -m unittest discover -s tests -p test_fusion_skeleton.py` : OK, 33 tests passes.
+- `python -m unittest discover -s tests` : OK, 105 tests passes.
+- `python -m py_compile src\board_game_insert_generator\models.py src\board_game_insert_generator\feature_taxonomy.py src\board_game_insert_generator\config_loader.py src\board_game_insert_generator\validation.py src\board_game_insert_generator\report.py src\board_game_insert_generator\cad_ir.py` : OK.
 - `python -m board_game_insert_generator examples\simple_tray.json --format markdown` : OK.
 - `python -m board_game_insert_generator examples\simple_tray.json --format json` : OK.
 - `python -m board_game_insert_generator export-cad-ir examples\simple_tray.json` : OK, schema `cad_ir.v0`, 1 composant.
-- `python -m board_game_insert_generator examples\simple_finger_notch_tray.json --format markdown` : OK.
-- `python -m board_game_insert_generator examples\simple_finger_notch_tray.json --format json` : OK.
-- `python -m board_game_insert_generator export-cad-ir examples\simple_finger_notch_tray.json` : OK, schema `cad_ir.v0`, 1 composant, 1 feature d'encoche exportee.
-- `python -m py_compile fusion_addin\BoardGameInsertGenerator\fusion_skeleton.py fusion_addin\BoardGameInsertGenerator\BoardGameInsertGenerator.py tests\test_fusion_skeleton.py` : OK.
+- `python -m board_game_insert_generator examples\simple_finger_notch_tray.json --format markdown` : OK, taxonomie exposee.
+- `python -m board_game_insert_generator examples\simple_finger_notch_tray.json --format json` : OK, taxonomie exposee.
+- `python -m board_game_insert_generator export-cad-ir examples\simple_finger_notch_tray.json` : OK, schema `cad_ir.v0`, taxonomie exposee dans les features et operations `describe_cavity_feature`.
 - `git diff --check` : OK.
 - `rg -n "adsk" src/board_game_insert_generator` : OK, aucune occurrence dans le coeur Python.
 

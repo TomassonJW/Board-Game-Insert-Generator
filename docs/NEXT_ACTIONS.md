@@ -18,31 +18,27 @@ structurant, authentification absente ou refus de push direct.
 
 ## Gate humaine active
 
-Statut : `none`.
+Statut : `required_before_next_fusion_geometry`.
 
-`P6-M002V - Valider manuellement les encoches de doigts Fusion` est valide apres
-le correctif `b27c2e7`. La version validee est une `top-open rectangular wall
-notch` : blank OK, cavite OK, message OK, encoche frontale ouverte vers le haut
-OK, pas de fenetre fermee. `print-validated: false` reste explicite.
+`P6-M003 - Formaliser la taxonomie des encoches et aides de prise` est termine.
+La taxonomie distingue les encoches top-open, demi-lunes futures, fenetres de
+paroi, scoops internes, degagements lateraux et acces bilateraux sans generer de
+nouvelle geometrie Fusion.
 
-## Mission ready
+Action humaine requise avant toute mission qui genere reellement : demi-lune
+courbe, scoop interne non traversant, fillet/conge, fond arrondi, geometrie
+courbe, grille 3D ou module composite dans Fusion.
 
-Statut : `ready`.
+## Mission bloquee par gate
 
-`P6-M003 - Formaliser la taxonomie des encoches et aides de prise`.
+`P6-M004 - Gate generation Fusion des aides de prise avancees`.
 
-- Capability : `C-FEATURE`, `C-FILLETS`, `C-ACCESS`.
-- Milestone : `M5 CAD ergonomic features` / `M8 Ergonomic planner`.
-- Objectif : definir une taxonomie claire et parametree des aides de prise sans
-  nouvelle generation Fusion reelle.
-- Gate : aucune tant que la mission reste abstraite et CAD-agnostic.
-- Validation : tests unitaires, CLI Markdown/JSON/export CAD IR sur
-  `simple_tray` et `simple_finger_notch_tray`, `git diff --check`, absence
-  d'`adsk` dans `src/board_game_insert_generator`.
-- Arret obligatoire : toute generation Fusion de demi-lune courbe, scoop interne,
-  fillet/conge, fond arrondi, geometrie courbe, grille 3D ou module composite.
+- Capability : `C-FILLETS`, `C-FEATURE`, `C-ACCESS`.
+- Objectif : choisir explicitement la prochaine operation Fusion reelle a tenter,
+  ses limites et son smoke test manuel.
+- Statut : `blocked` jusqu'a validation humaine.
 
-## Mission ready non gated si P6-M003 est terminee et gate Fusion atteinte
+## Mission ready non gated si la gate Fusion est reportee
 
 Statut : `ready_if_gate_deferred`.
 

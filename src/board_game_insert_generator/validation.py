@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 
+from board_game_insert_generator.feature_taxonomy import is_feature_taxonomy_compatible
 from board_game_insert_generator.models import (
     Cavity,
     Dimension3D,
@@ -249,6 +250,17 @@ def _validate_cavity_features(
 
         if not feature.placement:
             issues.append(_issue(f"{prefix}.placement", "EMPTY_PLACEMENT", "Feature placement cannot be empty."))
+        if feature.taxonomy is not None and not is_feature_taxonomy_compatible(feature.kind, feature.taxonomy):
+            issues.append(
+                _issue(
+                    f"{prefix}.taxonomy",
+                    "FEATURE_TAXONOMY_INCOMPATIBLE",
+                    (
+                        f"Feature taxonomy '{feature.taxonomy.value}' is not compatible "
+                        f"with kind '{feature.kind.value}'."
+                    ),
+                )
+            )
         if feature.status != "abstract_only":
             issues.append(
                 _issue(

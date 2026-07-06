@@ -60,6 +60,7 @@
             {
               "id": "front-half-moon-notch",
               "kind": "half_moon_notch",
+              "taxonomy": "top_open_half_moon_notch",
               "placement": "front_center",
               "position_mm": {
                 "x": 22,

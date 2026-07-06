@@ -61,9 +61,9 @@ class ReportTests(unittest.TestCase):
         payload = json.loads(layout_to_json(config, result))
 
         self.assertIn("## Planned cavity features", markdown)
-        self.assertIn("front-half-moon-notch | half_moon_notch | front_center", markdown)
+        self.assertIn("front-half-moon-notch | half_moon_notch | front_center | top_open_half_moon_notch", markdown)
         self.assertIn("rounded-floor-intent | rounded_floor | cavity_floor", markdown)
-        self.assertIn("fusion=not_implemented", markdown)
+        self.assertIn("fusion=abstract_profile_with_validated_rectangular_fallback", markdown)
         self.assertEqual(payload["summary"]["planned_cavity_count"], 1)
         self.assertEqual(payload["summary"]["planned_feature_count"], 2)
         feature = payload["printable_bodies"][0]["planned_cavities"][0]["features"][0]
@@ -73,6 +73,9 @@ class ReportTests(unittest.TestCase):
         self.assertEqual(feature["radius_mm"], 9.0)
         self.assertEqual(feature["status"], "abstract_only")
         self.assertEqual(feature["fusion_generation"], "not_implemented")
+        self.assertEqual(feature["taxonomy"]["taxonomy"], "top_open_half_moon_notch")
+        self.assertEqual(feature["taxonomy"]["fusion_fallback_taxonomy"], "top_open_rectangular_notch")
+        self.assertFalse(feature["taxonomy"]["print_validated"])
 
     def test_json_report_exposes_diagnostic_fields(self) -> None:
         config = load_config(ROOT / "examples" / "simple_box.json")

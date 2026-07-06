@@ -10,6 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from board_game_insert_generator.feature_taxonomy import feature_taxonomy_to_dict
 from board_game_insert_generator.models import (
     Cavity,
     Dimension3D,
@@ -148,6 +149,7 @@ class CadFeature:
     comment: str
     status: str = "abstract_only"
     fusion_generation: str = "not_implemented"
+    taxonomy: dict[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -160,6 +162,7 @@ class CadFeature:
             "comment": self.comment,
             "status": self.status,
             "fusion_generation": self.fusion_generation,
+            "taxonomy": self.taxonomy,
         }
 
 @dataclass(frozen=True)
@@ -406,6 +409,7 @@ def _cad_features(features: tuple[Feature, ...]) -> tuple[CadFeature, ...]:
             comment=feature.comment,
             status=feature.status,
             fusion_generation=feature.fusion_generation,
+            taxonomy=feature_taxonomy_to_dict(feature),
         )
         for feature in features
     )
@@ -442,6 +446,7 @@ def _cavity_operations(body_id: str, cavities: tuple[Cavity, ...]) -> tuple[CadO
                         "feature_id": feature.id,
                         "kind": feature.kind.value,
                         "placement": feature.placement,
+                        "taxonomy": feature_taxonomy_to_dict(feature),
                         "position_mm": _point_to_dict(feature.position),
                         "size_mm": _dimension_to_dict(feature.size) if feature.size is not None else None,
                         "radius_mm": feature.radius_mm,

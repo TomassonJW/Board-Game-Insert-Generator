@@ -108,6 +108,8 @@ class CadIrTests(unittest.TestCase):
         self.assertEqual(cavity["features"][0]["id"], "front-half-moon-notch")
         self.assertEqual(cavity["features"][0]["kind"], "half_moon_notch")
         self.assertEqual(cavity["features"][0]["fusion_generation"], "not_implemented")
+        self.assertEqual(cavity["features"][0]["taxonomy"]["taxonomy"], "top_open_half_moon_notch")
+        self.assertEqual(cavity["features"][0]["taxonomy"]["fusion_fallback_taxonomy"], "top_open_rectangular_notch")
         self.assertEqual(cavity["features"][1]["kind"], "rounded_floor")
         operation_kinds = [operation["kind"] for operation in body["operations"]]
         self.assertEqual(
@@ -124,6 +126,7 @@ class CadIrTests(unittest.TestCase):
         self.assertEqual(feature_operation["parameters"]["feature_id"], "front-half-moon-notch")
         self.assertEqual(feature_operation["parameters"]["coordinate_frame"], "cavity.local")
         self.assertEqual(feature_operation["parameters"]["fusion_generation"], "not_implemented")
+        self.assertEqual(feature_operation["parameters"]["taxonomy"]["taxonomy"], "top_open_half_moon_notch")
 
     def test_scene_serializes_card_cavity_profile_clearance_sources(self) -> None:
         config = load_config(ROOT / "examples" / "simple_card_tray.json")

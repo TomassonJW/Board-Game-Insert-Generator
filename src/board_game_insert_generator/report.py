@@ -4,6 +4,7 @@ import json
 from dataclasses import asdict, replace
 from typing import Any
 
+from board_game_insert_generator.feature_taxonomy import feature_taxonomy_to_dict, resolve_feature_taxonomy
 from board_game_insert_generator.layout import LayoutError, generate_basic_layout
 from board_game_insert_generator.models import (
     IMPLEMENTED_LAYOUT_STRATEGIES,
@@ -229,8 +230,8 @@ def layout_to_markdown(config: InsertConfig, result: LayoutResult) -> str:
     if planned_feature_count:
         lines.extend(
             [
-                "| Instance | Cavity | Feature | Kind | Placement | Position | Size | Radius | Status |",
-                "| --- | --- | --- | --- | --- | ---: | ---: | ---: | --- |",
+                "| Instance | Cavity | Feature | Kind | Placement | Taxonomy | Position | Size | Radius | Status |",
+                "| --- | --- | --- | --- | --- | --- | ---: | ---: | ---: | --- |",
                 *_format_feature_rows(planned_cavities),
             ]
         )
@@ -299,6 +300,7 @@ def _feature_to_dict(feature: Feature) -> dict[str, Any]:
         "id": feature.id,
         "kind": feature.kind.value,
         "placement": feature.placement,
+        "taxonomy": feature_taxonomy_to_dict(feature),
         "position_mm": _point(feature.position),
         "size_mm": _dim(feature.size) if feature.size is not None else None,
         "radius_mm": _clean_float(feature.radius_mm) if feature.radius_mm is not None else None,
@@ -366,10 +368,11 @@ def _format_feature_rows(planned_cavities: dict[str, tuple[Cavity, ...]]) -> lis
                     f"{feature.id} | "
                     f"{feature.kind.value} | "
                     f"{feature.placement} | "
+                    f"{resolve_feature_taxonomy(feature).taxonomy.value} | "
                     f"{_format_point(feature.position)} | "
                     f"{_format_optional_dim(feature.size)} | "
                     f"{_format_optional_radius(feature)} | "
-                    f"{feature.status}; fusion={feature.fusion_generation} |"
+                    f"{feature.status}; fusion={resolve_feature_taxonomy(feature).fusion_status} |"
                 )
     return rows
 
