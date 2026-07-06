@@ -108,6 +108,8 @@ Tests, cartes backlog ou gates humaines a preparer.
 - `ADR-0015-feature-taxonomy.md` - taxonomie CAD-agnostic des aides de prise.
 - `ADR-0016-volumetric-grid-contract.md` - contrat declaratif de grille
   volumetrique 3D.
+- `ADR-0017-volumetric-reservation-support-contract.md` - reservations typees,
+  ordre de retrait et surfaces de support abstraites.
 
 ## Regles de maintenance
 

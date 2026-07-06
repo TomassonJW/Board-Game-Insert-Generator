@@ -201,6 +201,8 @@ modules, zones reservees/interdites, validation de couverture utile, cellules
 libres et metadata CAD IR. Aucun solveur automatique et aucune generation Fusion
 volumetrique ne sont ajoutes.
 
+La mission `P8-M002` enrichit ce modele volumetrique avec reservations typees, ordre de retrait abstrait, directions d'acces et surfaces de support abstraites. Les rapports Markdown/JSON et `metadata.volumetric_grid` CAD IR exposent `support_surfaces` et `removal_sequence`, sans solveur automatique, sans nouvelle operation Fusion et sans validation physique de portance.
+
 ## Phase active
 
 Phase active : **P8 volumetric planner abstrait / gate avant generation Fusion volumetrique**.
@@ -210,13 +212,12 @@ vague P5 est terminee cote moteur Python pur, configuration, rapports et CAD IR.
 P6-M001 est `fusion-validated` pour les cavites rectangulaires simples, avec
 `print-validated: false`. P6-M002 est `fusion-validated` pour les encoches
 simples de paroi top-open, avec `print-validated: false`. P6-M003 est termine
-cote taxonomie abstraite CAD-agnostic. P8-M001 est termine cote grille
-volumetrique declarative, layers et metadata CAD IR.
+cote taxonomie abstraite CAD-agnostic. P8-M001 et P8-M002 sont termines cote grille
+volumetrique declarative, layers, reservations, supports abstraits et metadata CAD IR.
 La North Star cible un
 generateur volumetrique asset-first, pilote par capabilities.
 
-Prochaine action recommandee : `P8-M002` si la suite reste coeur Python pur et
-CAD-agnostic. Une nouvelle gate humaine est requise avant toute generation Fusion
+Prochaine action recommandee : `P9-M001` pour cadrer le schema asset-first et relier assets plats aux reservations, si la suite reste coeur Python pur et CAD-agnostic. Une nouvelle gate humaine est requise avant toute generation Fusion
 reelle liee a la grille 3D, aux layers, aux vues eclatees ou aux features
 avancees.
 
@@ -274,6 +275,8 @@ avancees.
   avec validation des couples `kind` / `taxonomy`.
 - Socle P8-M001 de grille volumetrique 3D declarative : config, validation,
   cellules libres/occupees/reservees/interdites, rapports et metadata CAD IR.
+- Enrichissement P8-M002 des reservations typees, ordre de retrait, directions
+  d'acces, surfaces de support abstraites, rapports et metadata CAD IR.
 - Generation Fusion de cavites rectangulaires simples P6-M001 depuis
   `subtract_rectangular_cavity`, avec coupe verticale limitee au body cible,
   `fusion-validated` et `print-validated: false`.
@@ -327,6 +330,7 @@ avancees.
 - Assistant de conception.
 - Modele asset-first.
 - Solveur volumetrique 3D et reservations derivees d'assets.
+- Modele asset-first reliant assets plats, boards, regles et reservations P8.
 - Vue Fusion eclatee.
 - Solveur semi-automatique et scoring.
 - Packaging produit et exemples reels.
@@ -356,9 +360,9 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant `P8-M001 - Socle de grille volumetrique 3D et layers` :
+Derniere verification pendant `P8-M002 - Reservations, ordre de retrait et supports abstraits` :
 
-- `python -m unittest discover -s tests` : OK, 114 tests passes.
+- `python -m unittest discover -s tests` : OK, 120 tests passes.
 - `python -m py_compile src\board_game_insert_generator\models.py src\board_game_insert_generator\config_loader.py src\board_game_insert_generator\validation.py src\board_game_insert_generator\volumetric.py src\board_game_insert_generator\report.py src\board_game_insert_generator\cad_ir.py` : OK.
 - `python -m board_game_insert_generator examples\simple_box.json --format markdown` : OK.
 - `python -m board_game_insert_generator examples\simple_box.json --format json` : OK.
@@ -372,6 +376,9 @@ Derniere verification pendant `P8-M001 - Socle de grille volumetrique 3D et laye
 - `python -m board_game_insert_generator examples\simple_3d_grid.json --format markdown` : OK, section `Volumetric grid` exposee.
 - `python -m board_game_insert_generator examples\simple_3d_grid.json --format json` : OK, `volumetric_grid.free_cell_count = 18`.
 - `python -m board_game_insert_generator export-cad-ir examples\simple_3d_grid.json` : OK, schema `cad_ir.v0`, metadata `volumetric_grid`, 2 composants.
+- `python -m board_game_insert_generator examples\simple_3d_reservations.json --format markdown` : OK, sections `Support surfaces` et `Removal sequence` exposees.
+- `python -m board_game_insert_generator examples\simple_3d_reservations.json --format json` : OK, `support_surfaces` et `removal_sequence` presents.
+- `python -m board_game_insert_generator export-cad-ir examples\simple_3d_reservations.json` : OK, schema `cad_ir.v0`, metadata `volumetric_grid.support_surfaces`, 2 composants.
 - `git diff --check` : OK.
 - `rg -n "adsk" src/board_game_insert_generator` : OK, aucune occurrence dans le coeur Python.
 

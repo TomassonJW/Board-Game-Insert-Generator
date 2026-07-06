@@ -9,6 +9,8 @@ pretendre encore a une validation physique.
 
 - P8-M001 charge des layers declaratifs dans `volumetric_grid.layers`.
 - Les modules peuvent declarer une occupation X/Y/Z par `module_placements`.
+- P8-M002 ajoute `support_surfaces`, `removal_order`, `access_direction`,
+  `reservation_kind` et `asset_kind` comme metadata abstraites.
 - Les boards, livrets et plateaux peuvent etre representes comme zones `reserved`, sans asset model complet.
 
 ## Concepts cibles
@@ -45,3 +47,13 @@ de support, de charge, de friction ou d'ordre de retrait.
 
 Toute interpretation physique d'un empilement reste experimentale tant qu'une
 impression et une mesure reelles n'ont pas ete faites.
+## Convention P8-M002
+
+Une surface de support P8-M002 est une declaration, pas une preuve physique. Elle
+peut etre portee par le fond de grille, un placement de module ou une zone. Elle
+indique une face, un span discret et une intention comme `abstract_support`.
+
+`removal_order` ordonne les placements et reservations amovibles. Une zone
+`forbidden` ne peut pas avoir d'ordre de retrait, car elle represente un espace a
+ne pas utiliser. Toute entree avec `removal_order` doit declarer une
+`access_direction` explicite.

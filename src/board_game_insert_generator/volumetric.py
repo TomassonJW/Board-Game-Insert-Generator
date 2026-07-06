@@ -1,4 +1,4 @@
-﻿"""Volumetric grid helpers for the pure Python engine.
+"""Volumetric grid helpers for the pure Python engine.
 
 P8-M001 deliberately does not solve placement. It validates and reports an
 explicit X/Y/Z grid declared by configuration so later missions can build a real
@@ -102,6 +102,11 @@ class VolumetricSummary:
                 for placement in self.grid.module_placements
             ],
             "zones": [_zone_to_dict(zone, self.grid.unit_size_mm) for zone in self.grid.zones],
+            "support_surfaces": [
+                _support_surface_to_dict(surface, self.grid.unit_size_mm)
+                for surface in self.grid.support_surfaces
+            ],
+            "removal_sequence": _removal_sequence_to_dict(self.grid),
             "cells": [cell.to_dict() for cell in self.cells],
             "comment": self.grid.comment,
         }
@@ -213,6 +218,9 @@ def _placement_to_dict(placement: VolumetricModulePlacement, unit_size) -> dict[
         "origin_mm": _grid_origin_to_mm(placement.origin_units, unit_size),
         "size_mm": _grid_size_to_mm(placement.size_units, unit_size),
         "layer_id": placement.layer_id,
+        "removal_order": placement.removal_order,
+        "access_direction": placement.access_direction,
+        "support_surface_id": placement.support_surface_id,
         "comment": placement.comment,
     }
 
@@ -227,9 +235,62 @@ def _zone_to_dict(zone: VolumetricZone, unit_size) -> dict[str, Any]:
         "origin_mm": _grid_origin_to_mm(zone.origin_units, unit_size),
         "size_mm": _grid_size_to_mm(zone.size_units, unit_size),
         "layer_id": zone.layer_id,
+        "reservation_kind": zone.reservation_kind,
+        "asset_kind": zone.asset_kind,
+        "removal_order": zone.removal_order,
+        "access_direction": zone.access_direction,
+        "support_surface_id": zone.support_surface_id,
         "comment": zone.comment,
     }
 
+
+def _support_surface_to_dict(surface, unit_size) -> dict[str, Any]:
+    return {
+        "id": surface.id,
+        "owner_type": surface.owner_type.value,
+        "owner_id": surface.owner_id,
+        "face": surface.face.value,
+        "origin_units": _grid_point_to_dict(surface.origin_units),
+        "size_units": _grid_size_to_dict(surface.size_units),
+        "origin_mm": _grid_origin_to_mm(surface.origin_units, unit_size),
+        "size_mm": _grid_size_to_mm(surface.size_units, unit_size),
+        "layer_id": surface.layer_id,
+        "purpose": surface.purpose,
+        "status": "abstract_only",
+        "physical_validation": "not_validated",
+        "comment": surface.comment,
+    }
+
+
+def _removal_sequence_to_dict(grid: VolumetricGrid) -> list[dict[str, Any]]:
+    entries: list[dict[str, Any]] = []
+    for placement in grid.module_placements:
+        if placement.removal_order is None:
+            continue
+        entries.append(
+            {
+                "order": placement.removal_order,
+                "target_id": placement.id,
+                "target_type": "module_placement",
+                "access_direction": placement.access_direction,
+                "support_surface_id": placement.support_surface_id,
+            }
+        )
+    for zone in grid.zones:
+        if zone.removal_order is None:
+            continue
+        entries.append(
+            {
+                "order": zone.removal_order,
+                "target_id": zone.id,
+                "target_type": f"zone:{zone.kind.value}",
+                "access_direction": zone.access_direction,
+                "support_surface_id": zone.support_surface_id,
+                "reservation_kind": zone.reservation_kind,
+                "asset_kind": zone.asset_kind,
+            }
+        )
+    return sorted(entries, key=lambda entry: entry["order"])
 
 def _grid_origin_to_mm(origin: GridPoint3D, unit_size) -> dict[str, float]:
     return {

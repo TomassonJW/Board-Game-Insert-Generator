@@ -66,9 +66,9 @@ Chaine de pilotage :
 | C-LAYOUT-2D | 2D layout | Volumetric layout | `implemented-core` | M2 Simple layout | Aucune active |
 | C-GRID-3D | 3D volumetric grid | Volumetric layout | `implemented-cad-ir` | M7 Volumetric planner | P8-M001 implemente le socle declaratif; gate Fusion pour toute generation 3D |
 | C-LAYERS | Layer / stage model | Volumetric layout | `implemented-cad-ir` | M7 Volumetric planner | Layers declaratifs P8-M001; gate impression avant support physique |
-| C-RESERVATION | Board / tray / lid reservation | Asset-first design | `planned` | M6 Asset-first project model | Gate si impact dimensions publiques |
-| C-ACCESS | Accessibility and removal order | Human validation gates | `designed` | M8 Ergonomic planner | Validation ergonomique humaine |
-| C-STACKING | Support / stacking rules | Volumetric layout | `planned` | M7 Volumetric planner | Gate impression reelle |
+| C-RESERVATION | Board / tray / lid reservation | Asset-first design | `implemented-cad-ir` | M6 Asset-first project model | Reservations abstraites P8-M002; gate si impact dimensions publiques ou generation Fusion |
+| C-ACCESS | Accessibility and removal order | Human validation gates | `implemented-cad-ir` | M8 Ergonomic planner | Removal order abstrait P8-M002; validation ergonomique humaine avant confort revendique |
+| C-STACKING | Support / stacking rules | Volumetric layout | `implemented-cad-ir` | M7 Volumetric planner | Support surfaces abstraites P8-M002; gate impression reelle |
 | C-COMPOSITE | Composite modules | Modular printable bodies | `planned` | M9 Composite modules | Gate modules composites |
 | C-CAD-IR | CAD IR | CAD generation pipeline | `implemented-cad-ir` | M3 CAD pipeline | Gate si contrat incompatible |
 | C-FUSION-COMPACT | Fusion compact view | CAD generation pipeline | `fusion-validated` | M3 CAD pipeline | Gate pour nouvelles geometries |

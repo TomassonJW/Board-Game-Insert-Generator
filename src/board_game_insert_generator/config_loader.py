@@ -22,9 +22,12 @@ from board_game_insert_generator.models import (
     ModuleRequest,
     Point3D,
     ToleranceProfile,
+    VolumetricFace,
     VolumetricGrid,
     VolumetricLayer,
     VolumetricModulePlacement,
+    VolumetricOwnerType,
+    VolumetricSupportSurface,
     VolumetricZone,
     VolumetricZoneKind,
 )
@@ -49,10 +52,11 @@ MODULE_FIELDS = {
 }
 CAVITY_FIELDS = {"id", "functional_type", "origin_mm", "size_mm", "clearance_mm", "comment", "features"}
 FEATURE_FIELDS = {"id", "kind", "taxonomy", "placement", "position_mm", "size_mm", "radius_mm", "comment"}
-VOLUMETRIC_GRID_FIELDS = {"unit_mm", "size_units", "layers", "module_placements", "zones", "comment"}
+VOLUMETRIC_GRID_FIELDS = {"unit_mm", "size_units", "layers", "module_placements", "zones", "support_surfaces", "comment"}
 VOLUMETRIC_LAYER_FIELDS = {"id", "name", "z_start", "z_count", "role", "comment"}
-VOLUMETRIC_PLACEMENT_FIELDS = {"id", "module_id", "instance_id", "origin_units", "size_units", "layer_id", "comment"}
-VOLUMETRIC_ZONE_FIELDS = {"id", "kind", "purpose", "origin_units", "size_units", "layer_id", "comment"}
+VOLUMETRIC_PLACEMENT_FIELDS = {"id", "module_id", "instance_id", "origin_units", "size_units", "layer_id", "removal_order", "access_direction", "support_surface_id", "comment"}
+VOLUMETRIC_ZONE_FIELDS = {"id", "kind", "purpose", "origin_units", "size_units", "layer_id", "reservation_kind", "asset_kind", "removal_order", "access_direction", "support_surface_id", "comment"}
+VOLUMETRIC_SUPPORT_SURFACE_FIELDS = {"id", "owner_type", "owner_id", "face", "origin_units", "size_units", "layer_id", "purpose", "comment"}
 
 class ConfigError(ValueError):
     """Raised when a configuration file cannot be parsed."""
@@ -120,6 +124,7 @@ def _parse_volumetric_grid(raw: Any) -> VolumetricGrid | None:
         layers=tuple(_parse_volumetric_layers(raw.get("layers", []))),
         module_placements=tuple(_parse_volumetric_module_placements(raw.get("module_placements", []))),
         zones=tuple(_parse_volumetric_zones(raw.get("zones", []))),
+        support_surfaces=tuple(_parse_volumetric_support_surfaces(raw.get("support_surfaces", []))),
         comment=_optional_string(raw, "comment", "volumetric_grid", default=""),
     )
 
@@ -178,6 +183,9 @@ def _parse_volumetric_module_placements(raw_placements: Any) -> list[VolumetricM
                     field_name=f"{field}.size_units",
                 ),
                 layer_id=_optional_nullable_string(raw, "layer_id", field),
+                removal_order=_optional_nullable_int(raw, "removal_order", field),
+                access_direction=_optional_string(raw, "access_direction", field, default="unspecified"),
+                support_surface_id=_optional_nullable_string(raw, "support_surface_id", field),
                 comment=_optional_string(raw, "comment", field, default=""),
             )
         )
@@ -210,11 +218,71 @@ def _parse_volumetric_zones(raw_zones: Any) -> list[VolumetricZone]:
                     field_name=f"{field}.size_units",
                 ),
                 layer_id=_optional_nullable_string(raw, "layer_id", field),
+                reservation_kind=_optional_string(raw, "reservation_kind", field, default="generic"),
+                asset_kind=_optional_string(raw, "asset_kind", field, default="unspecified"),
+                removal_order=_optional_nullable_int(raw, "removal_order", field),
+                access_direction=_optional_string(raw, "access_direction", field, default="unspecified"),
+                support_surface_id=_optional_nullable_string(raw, "support_surface_id", field),
                 comment=_optional_string(raw, "comment", field, default=""),
             )
         )
     return zones
 
+
+def _parse_volumetric_support_surfaces(raw_surfaces: Any) -> list[VolumetricSupportSurface]:
+    if raw_surfaces is None:
+        return []
+    if not isinstance(raw_surfaces, list):
+        raise ConfigError("'volumetric_grid.support_surfaces' must be a list.")
+
+    surfaces: list[VolumetricSupportSurface] = []
+    for index, raw in enumerate(raw_surfaces):
+        field = f"volumetric_grid.support_surfaces[{index}]"
+        if not isinstance(raw, dict):
+            raise ConfigError(f"{field} must be an object.")
+        _reject_unknown_fields(raw, VOLUMETRIC_SUPPORT_SURFACE_FIELDS, field)
+        surfaces.append(
+            VolumetricSupportSurface(
+                id=_optional_string(raw, "id", field, default=f"support-surface-{index + 1}"),
+                owner_type=_parse_volumetric_owner_type(raw.get("owner_type", "grid_floor"), field),
+                owner_id=_optional_string(raw, "owner_id", field, default="grid"),
+                face=_parse_volumetric_face(raw.get("face", "top"), field),
+                origin_units=_parse_grid_point(
+                    _required_mapping(raw, "origin_units", f"{field}.origin_units"),
+                    field_name=f"{field}.origin_units",
+                ),
+                size_units=_parse_grid_size(
+                    _required_mapping(raw, "size_units", f"{field}.size_units"),
+                    field_name=f"{field}.size_units",
+                ),
+                layer_id=_optional_nullable_string(raw, "layer_id", field),
+                purpose=_optional_string(raw, "purpose", field, default="abstract_support"),
+                comment=_optional_string(raw, "comment", field, default=""),
+            )
+        )
+    return surfaces
+
+
+def _parse_volumetric_owner_type(value: Any, field_path: str) -> VolumetricOwnerType:
+    try:
+        return VolumetricOwnerType(str(value))
+    except ValueError as exc:
+        allowed = ", ".join(item.value for item in VolumetricOwnerType)
+        raise ConfigError(
+            f"Unsupported volumetric support owner_type for {field_path}: {value!r}. "
+            f"Allowed values: {allowed}."
+        ) from exc
+
+
+def _parse_volumetric_face(value: Any, field_path: str) -> VolumetricFace:
+    try:
+        return VolumetricFace(str(value))
+    except ValueError as exc:
+        allowed = ", ".join(item.value for item in VolumetricFace)
+        raise ConfigError(
+            f"Unsupported volumetric support face for {field_path}: {value!r}. "
+            f"Allowed values: {allowed}."
+        ) from exc
 
 def _parse_volumetric_zone_kind(value: Any, field_path: str) -> VolumetricZoneKind:
     try:
@@ -586,6 +654,15 @@ def _optional_nullable_string(raw: dict[str, Any], key: str, field_name: str) ->
     value = raw[key]
     if not isinstance(value, str):
         raise ConfigError(f"Field '{field_name}.{key}' must be a string.")
+    return value
+
+
+def _optional_nullable_int(raw: dict[str, Any], key: str, field_name: str) -> int | None:
+    if key not in raw or raw[key] is None:
+        return None
+    value = raw[key]
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise ConfigError(f"Field '{field_name}.{key}' must be an integer or null.")
     return value
 
 def _optional_string(raw: dict[str, Any], key: str, field_name: str, default: str) -> str:

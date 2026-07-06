@@ -18,8 +18,12 @@ from board_game_insert_generator.models import (
     ToleranceProfile,
     VolumetricGrid,
     VolumetricModulePlacement,
+    VolumetricOwnerType,
     VolumetricZone,
 )
+
+
+ACCESS_DIRECTIONS = {"unspecified", "top", "front", "back", "left", "right", "any"}
 
 
 @dataclass(frozen=True)
@@ -166,6 +170,8 @@ def _validate_volumetric_grid(config: InsertConfig, issues: list[ValidationIssue
     module_ids = {module.id for module in config.modules}
     modules_by_id = {module.id: module for module in config.modules}
     occupied_cells: dict[tuple[int, int, int], tuple[str, str]] = {}
+    support_surface_ids = {surface.id for surface in grid.support_surfaces}
+    removal_orders: dict[int, tuple[str, str]] = {}
 
     seen_placement_ids: set[str] = set()
     for index, placement in enumerate(grid.module_placements):
@@ -190,6 +196,24 @@ def _validate_volumetric_grid(config: InsertConfig, issues: list[ValidationIssue
                     f"{prefix}.layer_id",
                     "VOLUMETRIC_UNKNOWN_LAYER",
                     f"Module placement references unknown layer '{placement.layer_id}'.",
+                )
+            )
+        _validate_access_direction(placement.access_direction, f"{prefix}.access_direction", issues)
+        _record_removal_order(placement.removal_order, placement.id, "module_placement", prefix, removal_orders, issues)
+        if placement.removal_order is not None and placement.access_direction == "unspecified":
+            issues.append(
+                _issue(
+                    f"{prefix}.access_direction",
+                    "VOLUMETRIC_ACCESS_DIRECTION_REQUIRED",
+                    "A placement with removal_order must declare an access_direction.",
+                )
+            )
+        if placement.support_surface_id is not None and placement.support_surface_id not in support_surface_ids:
+            issues.append(
+                _issue(
+                    f"{prefix}.support_surface_id",
+                    "VOLUMETRIC_UNKNOWN_SUPPORT_SURFACE",
+                    f"Module placement references unknown support surface '{placement.support_surface_id}'.",
                 )
             )
         if not span_fits_grid(placement.origin_units, placement.size_units, grid.size_units):
@@ -225,11 +249,127 @@ def _validate_volumetric_grid(config: InsertConfig, issues: list[ValidationIssue
                     f"Zone references unknown layer '{zone.layer_id}'.",
                 )
             )
+        if not zone.reservation_kind:
+            issues.append(_issue(f"{prefix}.reservation_kind", "EMPTY_VALUE", "Reservation kind cannot be empty."))
+        if not zone.asset_kind:
+            issues.append(_issue(f"{prefix}.asset_kind", "EMPTY_VALUE", "Asset kind cannot be empty."))
+        _validate_access_direction(zone.access_direction, f"{prefix}.access_direction", issues)
+        _record_removal_order(zone.removal_order, zone.id, f"zone:{zone.kind.value}", prefix, removal_orders, issues)
+        if zone.kind.value == "forbidden" and zone.removal_order is not None:
+            issues.append(
+                _issue(
+                    f"{prefix}.removal_order",
+                    "VOLUMETRIC_FORBIDDEN_ZONE_NOT_REMOVABLE",
+                    "Forbidden zones reserve unreachable space and cannot have a removal_order.",
+                )
+            )
+        if zone.removal_order is not None and zone.access_direction == "unspecified":
+            issues.append(
+                _issue(
+                    f"{prefix}.access_direction",
+                    "VOLUMETRIC_ACCESS_DIRECTION_REQUIRED",
+                    "A removable reservation must declare an access_direction.",
+                )
+            )
+        if zone.support_surface_id is not None and zone.support_surface_id not in support_surface_ids:
+            issues.append(
+                _issue(
+                    f"{prefix}.support_surface_id",
+                    "VOLUMETRIC_UNKNOWN_SUPPORT_SURFACE",
+                    f"Zone references unknown support surface '{zone.support_surface_id}'.",
+                )
+            )
         if not span_fits_grid(zone.origin_units, zone.size_units, grid.size_units):
             issues.append(_issue(prefix, "VOLUMETRIC_SPAN_OUTSIDE_GRID", "Zone span must stay inside the grid."))
         else:
             _record_span_cells(zone.id, f"zone:{zone.kind.value}", zone.origin_units, zone.size_units, occupied_cells, prefix, issues)
 
+    _validate_volumetric_support_surfaces(grid, layer_ids, issues)
+
+
+def _validate_volumetric_support_surfaces(
+    grid: VolumetricGrid,
+    layer_ids: set[str],
+    issues: list[ValidationIssue],
+) -> None:
+    seen_ids: set[str] = set()
+    placement_ids = {placement.id for placement in grid.module_placements}
+    zone_ids = {zone.id for zone in grid.zones}
+    for index, surface in enumerate(grid.support_surfaces):
+        prefix = f"volumetric_grid.support_surfaces[{index}]"
+        if not surface.id:
+            issues.append(_issue(f"{prefix}.id", "EMPTY_ID", "Support surface id cannot be empty."))
+        if surface.id in seen_ids:
+            issues.append(_issue(f"{prefix}.id", "DUPLICATE_ID", f"Duplicate support surface id '{surface.id}'."))
+        seen_ids.add(surface.id)
+        if surface.layer_id is not None and surface.layer_id not in layer_ids:
+            issues.append(
+                _issue(
+                    f"{prefix}.layer_id",
+                    "VOLUMETRIC_UNKNOWN_LAYER",
+                    f"Support surface references unknown layer '{surface.layer_id}'.",
+                )
+            )
+        if not span_fits_grid(surface.origin_units, surface.size_units, grid.size_units):
+            issues.append(_issue(prefix, "VOLUMETRIC_SPAN_OUTSIDE_GRID", "Support surface span must stay inside the grid."))
+        if not surface.owner_id:
+            issues.append(_issue(f"{prefix}.owner_id", "EMPTY_ID", "Support surface owner_id cannot be empty."))
+        if surface.owner_type == VolumetricOwnerType.MODULE_PLACEMENT and surface.owner_id not in placement_ids:
+            issues.append(
+                _issue(
+                    f"{prefix}.owner_id",
+                    "VOLUMETRIC_UNKNOWN_SUPPORT_OWNER",
+                    f"Support surface references unknown module placement '{surface.owner_id}'.",
+                )
+            )
+        if surface.owner_type == VolumetricOwnerType.ZONE and surface.owner_id not in zone_ids:
+            issues.append(
+                _issue(
+                    f"{prefix}.owner_id",
+                    "VOLUMETRIC_UNKNOWN_SUPPORT_OWNER",
+                    f"Support surface references unknown zone '{surface.owner_id}'.",
+                )
+            )
+        if surface.owner_type == VolumetricOwnerType.GRID_FLOOR and surface.owner_id != "grid":
+            issues.append(
+                _issue(
+                    f"{prefix}.owner_id",
+                    "VOLUMETRIC_GRID_FLOOR_OWNER_UNSUPPORTED",
+                    "Grid-floor support surfaces must use owner_id 'grid'.",
+                )
+            )
+
+
+def _validate_access_direction(direction: str, field: str, issues: list[ValidationIssue]) -> None:
+    if direction not in ACCESS_DIRECTIONS:
+        allowed = ", ".join(sorted(ACCESS_DIRECTIONS))
+        issues.append(_issue(field, "VOLUMETRIC_ACCESS_DIRECTION_UNSUPPORTED", f"Allowed access directions: {allowed}."))
+
+
+def _record_removal_order(
+    removal_order: int | None,
+    owner_id: str,
+    owner_type: str,
+    prefix: str,
+    removal_orders: dict[int, tuple[str, str]],
+    issues: list[ValidationIssue],
+) -> None:
+    if removal_order is None:
+        return
+    if removal_order <= 0:
+        issues.append(_issue(f"{prefix}.removal_order", "VOLUMETRIC_REMOVAL_ORDER_INVALID", "Removal order must be greater than zero."))
+        return
+    previous = removal_orders.get(removal_order)
+    if previous is not None:
+        issues.append(
+            _issue(
+                f"{prefix}.removal_order",
+                "VOLUMETRIC_REMOVAL_ORDER_DUPLICATE",
+                f"Removal order {removal_order} is already used by {previous[1]} '{previous[0]}'.",
+            )
+        )
+        return
+    removal_orders[removal_order] = (owner_id, owner_type)
 
 def _validate_grid_coverage(config: InsertConfig, grid: VolumetricGrid, issues: list[ValidationIssue]) -> None:
     coverage_x = grid.unit_size_mm.x * grid.size_units.x

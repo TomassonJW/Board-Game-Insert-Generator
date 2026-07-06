@@ -199,6 +199,11 @@ la configuration declare `volumetric_grid` : taille d'unite, nombre d'unites,
 coverage en millimetres, cells `free` / `occupied` / `reserved` / `forbidden`,
 layers, placements de modules, zones et volume libre approximatif.
 
+Depuis P8-M002, cette metadata inclut aussi `support_surfaces` et
+`removal_sequence`. Ces donnees restent abstraites : elles indiquent les
+intentions de support, d'accessibilite et de retrait, mais ne creent aucune
+operation Fusion et ne valident aucune portance physique.
+
 Cette metadata ne change pas `schema_version`, ne cree aucune operation Fusion et
 ne remplace pas les dimensions `theoretical_*` / `printable_*` des bodies. Un
 adaptateur CAD peut l'ignorer sans invalider la CAD IR V0.

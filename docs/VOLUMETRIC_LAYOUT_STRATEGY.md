@@ -12,6 +12,8 @@ libres, en empilement, en reservations de boards/livrets et en ordre de retrait.
 - Z sert surtout a verifier la hauteur du module et la hauteur utile.
 - Les cavites et features sont locales aux modules mais restent abstraites.
 - P8-M001 ajoute un socle declaratif `volumetric_grid` dans le coeur Python pur : unites X/Y/Z, size_units, layers, placements de modules, zones reservees/interdites et cellules libres reportees.
+- P8-M002 enrichit ce socle avec ordre de retrait abstrait, directions d'acces,
+  reservations typées et surfaces de support abstraites.
 - Aucun solveur volumetrique 3D n'est implemente.
 
 ## Concepts cibles
@@ -61,3 +63,18 @@ ou placer les modules. Il calcule :
 
 Les collisions simples entre placements, reservations et zones interdites sont
 refusees par la validation. Cela reste un controle declaratif, pas un solveur.
+## Enrichissement P8-M002
+
+P8-M002 garde le modele declaratif : la configuration dit ce qui occupe, reserve
+ou supporte une zone, mais le moteur ne cherche pas encore automatiquement une
+solution. Les ajouts sont :
+
+- `removal_order` sur placements et reservations amovibles ;
+- `access_direction` pour rendre l'ordre de retrait explicable ;
+- `reservation_kind` et `asset_kind` sur les zones reservees ;
+- `support_surfaces` pour decrire une intention de support portee par le fond de
+  boite, un placement de module ou une zone.
+
+Les surfaces de support sont `abstract_only` et `physical_validation:
+not_validated` dans les rapports/CAD IR. Elles ne prouvent pas la portance ou la
+qualite d'impression.

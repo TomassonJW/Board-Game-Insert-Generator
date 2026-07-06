@@ -9,8 +9,9 @@ la compacite.
 ## Etat actuel
 
 - Les features ergonomiques de cavites sont abstraites.
-- Aucun ordre de retrait ni score d'accessibilite n'est implemente.
-- Les rapports n'evaluent pas encore l'ergonomie humaine.
+- P8-M002 implemente un `removal_order` abstrait et une `access_direction` sur les placements et reservations volumetriques.
+- Les rapports exposent la sequence de retrait declaree, mais ne calculent pas encore de score ergonomique.
+- Les rapports n'evaluent pas encore le confort humain.
 
 ## Concepts cibles
 
@@ -28,9 +29,9 @@ la compacite.
 
 ## Prochaines missions possibles
 
-1. `P8-M005 - Specifier removal_order dans les rapports`.
-2. `P8-M006 - Ajouter des warnings d'accessibilite simples`.
-3. `P8-M007 - Relier grip features et ordre de retrait`.
+1. `P8-M003 - Ajouter des warnings d'accessibilite simples`.
+2. `P9-M001 - Relier assets plats et reservations de couches`.
+3. `P9-M002 - Charger des assets JSON sans generation de modules`.
 
 ## Gates
 

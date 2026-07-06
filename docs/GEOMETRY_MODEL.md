@@ -37,11 +37,12 @@ La cible long terme ajoute des concepts encore majoritairement documentaires :
 - `Layer` : tranche de hauteur ou etage logique dans la boite ; P8-M001 le charge depuis `volumetric_grid.layers`.
 - `VolumetricCell` : reservation X/Y/Z, distincte d'un corps imprimable ; P8-M001 expose les cellules `free`, `occupied`, `reserved` et `forbidden`.
 - `FreeVolume` : volume restant disponible ou volontairement laisse libre ; P8-M001 le calcule approximativement par nombre de cellules libres.
-- `StackRule` : relation de support, empilement ou interdiction de charge.
-- `RemovalOrder` : ordre de retrait attendu pour eviter de bloquer l'acces.
+- `StackRule` : relation de support, empilement ou interdiction de charge ; P8-M002 represente les premieres surfaces de support abstraites.
+- `RemovalOrder` : ordre de retrait attendu pour eviter de bloquer l'acces ; P8-M002 le reporte sur placements et reservations.
 
 Ces concepts ne constituent toujours pas un solveur 3D. P8-M001 implemente le
-socle declaratif et les controles simples, mais ne place pas automatiquement les
+socle declaratif et les controles simples, P8-M002 ajoute les metadata de
+support/retrait/accessibilite, mais le moteur ne place pas automatiquement les
 modules.
 ### Contrat des dataclasses Phase 1
 
@@ -317,7 +318,8 @@ Prevu :
 - Une dimension negative ou nulle est invalide.
 - Une cavite ne doit pas casser les parois minimales.
 - Une feature P6-M003 est CAD-agnostic, locale a une cavite et porte une taxonomie resolue.
-- Une grille P8-M001 est CAD-agnostic, declarative, discrete en X/Y/Z et ne genere aucune geometrie Fusion.
+- Une grille P8-M001/P8-M002 est CAD-agnostic, declarative, discrete en X/Y/Z et ne genere aucune geometrie Fusion.
+- Une surface de support P8-M002 est `abstract_only` et non validee physiquement.
 - Une coupe Fusion P6-M001 doit rester une soustraction rectangulaire verticale issue de la CAD IR.
 - Une operation Fusion future doit mapper un concept deja resolu, pas inventer un
   nouveau modele metier.

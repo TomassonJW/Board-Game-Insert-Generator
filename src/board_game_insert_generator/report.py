@@ -297,6 +297,8 @@ def _format_volumetric_grid_section(summary: VolumetricSummary | None) -> list[s
         f"- Forbidden cells: {summary.forbidden_cell_count}",
         f"- Free cells: {summary.free_cell_count}",
         f"- Approximate free volume: {summary.approximate_free_volume_mm3:.2f} mm^3",
+        f"- Support surfaces: {len(grid.support_surfaces)}",
+        f"- Removal sequence entries: {len(summary.to_dict()['removal_sequence'])}",
         "",
         "### Layers",
         "",
@@ -317,8 +319,8 @@ def _format_volumetric_grid_section(summary: VolumetricSummary | None) -> list[s
     if grid.module_placements:
         lines.extend(
             [
-                "| Placement | Module | Origin units | Size units | Layer |",
-                "| --- | --- | ---: | ---: | --- |",
+                "| Placement | Module | Origin units | Size units | Layer | Removal | Access | Support |",
+                "| --- | --- | ---: | ---: | --- | ---: | --- | --- |",
             ]
         )
         for placement in grid.module_placements:
@@ -328,7 +330,10 @@ def _format_volumetric_grid_section(summary: VolumetricSummary | None) -> list[s
                 f"{placement.module_id} | "
                 f"{_format_grid_point(placement.origin_units)} | "
                 f"{_format_grid_size(placement.size_units)} | "
-                f"{placement.layer_id or 'n/a'} |"
+                f"{placement.layer_id or 'n/a'} | "
+                f"{placement.removal_order if placement.removal_order is not None else 'n/a'} | "
+                f"{placement.access_direction} | "
+                f"{placement.support_surface_id or 'n/a'} |"
             )
     else:
         lines.append("- No module placements declared.")
@@ -337,8 +342,8 @@ def _format_volumetric_grid_section(summary: VolumetricSummary | None) -> list[s
     if grid.zones:
         lines.extend(
             [
-                "| Zone | Kind | Purpose | Origin units | Size units | Layer |",
-                "| --- | --- | --- | ---: | ---: | --- |",
+                "| Zone | Kind | Reservation | Asset | Purpose | Origin units | Size units | Layer | Removal | Access | Support |",
+                "| --- | --- | --- | --- | --- | ---: | ---: | --- | ---: | --- | --- |",
             ]
         )
         for zone in grid.zones:
@@ -346,13 +351,62 @@ def _format_volumetric_grid_section(summary: VolumetricSummary | None) -> list[s
                 "| "
                 f"{zone.id} | "
                 f"{zone.kind.value} | "
+                f"{zone.reservation_kind} | "
+                f"{zone.asset_kind} | "
                 f"{zone.purpose} | "
                 f"{_format_grid_point(zone.origin_units)} | "
                 f"{_format_grid_size(zone.size_units)} | "
-                f"{zone.layer_id or 'n/a'} |"
+                f"{zone.layer_id or 'n/a'} | "
+                f"{zone.removal_order if zone.removal_order is not None else 'n/a'} | "
+                f"{zone.access_direction} | "
+                f"{zone.support_surface_id or 'n/a'} |"
             )
     else:
         lines.append("- No reserved or forbidden zones declared.")
+
+    lines.extend(["", "### Support surfaces", ""])
+    if grid.support_surfaces:
+        lines.extend(
+            [
+                "| Surface | Owner | Face | Origin units | Size units | Layer | Purpose | Status |",
+                "| --- | --- | --- | ---: | ---: | --- | --- | --- |",
+            ]
+        )
+        for surface in grid.support_surfaces:
+            lines.append(
+                "| "
+                f"{surface.id} | "
+                f"{surface.owner_type.value}:{surface.owner_id} | "
+                f"{surface.face.value} | "
+                f"{_format_grid_point(surface.origin_units)} | "
+                f"{_format_grid_size(surface.size_units)} | "
+                f"{surface.layer_id or 'n/a'} | "
+                f"{surface.purpose} | "
+                "abstract_only; physical_validation=not_validated |"
+            )
+    else:
+        lines.append("- No support surfaces declared.")
+
+    removal_sequence = summary.to_dict()["removal_sequence"]
+    lines.extend(["", "### Removal sequence", ""])
+    if removal_sequence:
+        lines.extend(
+            [
+                "| Order | Target | Type | Access | Support |",
+                "| ---: | --- | --- | --- | --- |",
+            ]
+        )
+        for entry in removal_sequence:
+            lines.append(
+                "| "
+                f"{entry['order']} | "
+                f"{entry['target_id']} | "
+                f"{entry['target_type']} | "
+                f"{entry['access_direction']} | "
+                f"{entry['support_surface_id'] or 'n/a'} |"
+            )
+    else:
+        lines.append("- No removal sequence declared.")
     lines.append("")
     return lines
 

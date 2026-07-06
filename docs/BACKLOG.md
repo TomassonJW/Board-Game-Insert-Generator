@@ -258,11 +258,11 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Capability : C-LAYERS, C-RESERVATION, C-ACCESS.
 - Milestone : M7 Volumetric planner / M8 Ergonomic planner.
 - Objectif : enrichir le modele pur Python avec ordre de retrait, reservations verticales plus explicites et surfaces de support abstraites, sans solveur automatique ni Fusion.
-- Livrable : modeles et rapports CAD-agnostic, tests unitaires, docs de contrat.
+- Livrable : modeles et rapports CAD-agnostic, support_surfaces, removal_sequence, exemple `simple_3d_reservations.json`, tests unitaires, docs de contrat et ADR.
 - Criteres d'acceptation : aucune promesse de support physique, aucune generation Fusion, aucune dependance lourde.
 - Tests : unitaires, CLI Markdown/JSON/export CAD IR sur exemples pertinents.
 - Gate : aucune si additive et non physique ; gate impression avant validation de support.
-- Statut : `ready`.
+- Statut : `done`, `implemented-cad-ir`.
 
 ### P8-M003 - Representer empilement et supports abstraits
 
@@ -274,6 +274,7 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Tests : unitaires ou documentaires selon implementation.
 - Gate : impression reelle avant validation physique.
 - Statut : `todo`.
+
 ## Phase 9 - Assets, plateaux, boards, regles et reservations de couches
 
 ### P9-M001 - Specifier le schema asset-first
@@ -285,7 +286,7 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Criteres d'acceptation : modules et assets restent distincts.
 - Tests : test documentaire.
 - Gate : schema public si implementation loader.
-- Statut : `todo`.
+- Statut : `ready`.
 
 ### P9-M002 - Charger des assets JSON sans generation de modules
 

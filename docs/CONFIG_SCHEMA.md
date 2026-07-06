@@ -19,7 +19,9 @@ Le loader V0 refuse les champs inconnus aux niveaux suivants :
 - chaque entree de `modules` ;
 - chaque `modules[].min_dimensions_mm` ;
 - chaque `modules[].cavities` ;
-- chaque `modules[].cavities[].features`.
+- chaque `modules[].cavities[].features` ;
+- `volumetric_grid`, ses `layers`, `module_placements`, `zones` et
+  `support_surfaces`.
 
 Les types sont egalement verifies au chargement :
 
@@ -66,8 +68,10 @@ La cible produit de Phase 8/9 introduira, sous gate si le schema public change :
 
 Ces champs sont documentes dans `docs/ASSET_MODEL_STRATEGY.md`,
 `docs/VOLUMETRIC_LAYOUT_STRATEGY.md`, `docs/LAYER_AND_STACKING_MODEL.md` et
-`docs/ACCESSIBILITY_MODEL.md`. En P8-M001, seul `volumetric_grid` est implemente
-comme extension additive du loader V0.
+`docs/ACCESSIBILITY_MODEL.md`. En P8-M001/P8-M002, seul `volumetric_grid` est implemente
+comme extension additive du loader V0 : grille, layers, placements explicites,
+zones reservees/interdites, ordre de retrait abstrait et surfaces de support
+non validees physiquement.
 ## `box`
 
 Champs obligatoires :
@@ -151,6 +155,7 @@ Champs reconnus :
 - `layers` : liste optionnelle de bandes Z ;
 - `module_placements` : liste optionnelle d'occupations explicites de modules ;
 - `zones` : liste optionnelle de zones `reserved` ou `forbidden` ;
+- `support_surfaces` : liste optionnelle de surfaces de support abstraites ;
 - `comment` : note humaine optionnelle.
 
 Validation P8-M001 :
@@ -165,7 +170,9 @@ Validation P8-M001 :
 - les dimensions millimetres couvertes par un placement doivent etre au moins
   egales a la demande de module ;
 - les collisions entre placements, zones reservees et zones interdites sont
-  refusees.
+  refusees ;
+- P8-M002 valide les references de surfaces de support, les directions d'acces
+  et les ordres de retrait abstraits.
 
 ### `volumetric_grid.layers[]`
 
@@ -184,6 +191,10 @@ Validation P8-M001 :
 - `origin_units.x/y/z` : origine discrete ;
 - `size_units.x/y/z` : extension discrete ;
 - `layer_id` : layer optionnel ;
+- `removal_order` : ordre de retrait abstrait optionnel, entier strictement positif ;
+- `access_direction` : `top`, `front`, `back`, `left`, `right`, `any` ou
+  `unspecified` ; requis si `removal_order` est defini ;
+- `support_surface_id` : reference optionnelle vers une surface de support ;
 - `comment` : note optionnelle.
 
 ### `volumetric_grid.zones[]`
@@ -194,9 +205,30 @@ Validation P8-M001 :
 - `origin_units.x/y/z` : origine discrete ;
 - `size_units.x/y/z` : extension discrete ;
 - `layer_id` : layer optionnel ;
+- `reservation_kind` : classification documentaire, par exemple `flat_asset_layer` ;
+- `asset_kind` : type d'asset reserve, par exemple `board_or_rules` ;
+- `removal_order` : ordre de retrait abstrait optionnel, refuse sur les zones
+  `forbidden` ;
+- `access_direction` : direction d'acces declaree ;
+- `support_surface_id` : reference optionnelle vers une surface de support ;
 - `comment` : note optionnelle.
 
-Voir `examples/simple_3d_grid.json`.
+### `volumetric_grid.support_surfaces[]`
+
+- `id` : identifiant stable ;
+- `owner_type` : `grid_floor`, `module_placement` ou `zone` ;
+- `owner_id` : `grid` pour `grid_floor`, sinon id du placement ou de la zone ;
+- `face` : `top`, `bottom`, `front`, `back`, `left` ou `right` ;
+- `origin_units.x/y/z` : origine discrete de la surface ;
+- `size_units.x/y/z` : extension discrete ;
+- `layer_id` : layer optionnel ;
+- `purpose` : intention, par exemple `abstract_support` ;
+- `comment` : note optionnelle.
+
+Ces surfaces sont des intentions abstraites. Elles ne prouvent ni resistance,
+ni portance, ni imprimabilite physique.
+
+Voir `examples/simple_3d_grid.json` et `examples/simple_3d_reservations.json`.
 
 ## `modules`
 

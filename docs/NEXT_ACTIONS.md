@@ -20,9 +20,9 @@ structurant, authentification absente ou refus de push direct.
 
 Statut : `required_before_next_fusion_geometry`.
 
-P8-M001 est termine dans le perimetre coeur Python pur, configuration,
-validation, rapports et CAD IR abstraite. Aucune geometrie Fusion volumetrique
-n'est generee.
+P8-M001 et P8-M002 sont termines dans le perimetre coeur Python pur,
+configuration, validation, rapports et CAD IR abstraite. Aucune geometrie Fusion
+volumetrique n'est generee.
 
 Action humaine requise avant toute mission qui genere reellement : grille 3D,
 layers, vue eclatee, demi-lune courbe, scoop interne, fillet/conge, fond arrondi,
@@ -30,18 +30,16 @@ geometrie courbe, module composite ou export STL/3MF dans Fusion.
 
 ## Mission ready non gated
 
-`P8-M002 - Approfondir reservations, ordre de retrait et surfaces de support abstraites`.
+`P9-M001 - Specifier le schema asset-first`.
 
-- Capability : `C-LAYERS`, `C-RESERVATION`, `C-ACCESS`.
-- Milestone : `M7 Volumetric planner` / `M8 Ergonomic planner`.
-- Objectif : enrichir le modele pur Python avec ordre de retrait, reservations
-  verticales plus explicites et surfaces de support abstraites, sans solveur
-  automatique ni Fusion.
-- Gate : aucune si la mission reste additive, CAD-agnostic et sans promesse
-  physique.
-- Validation : tests unitaires, CLI Markdown/JSON/export CAD IR sur exemples
-  pertinents, docs de pilotage mises a jour.
-
+- Capability : `C-ASSET`, `C-RESERVATION`.
+- Milestone : `M6 Asset-first project model`.
+- Objectif : decrire assets, quantites, dimensions approximatives et liens vers
+  reservations volumetriques, sans encore generer automatiquement des modules.
+- Gate : schema public large ou changement incompatible ; aucune si la mission
+  reste additive/documentaire ou chargeur strict borne.
+- Validation : tests unitaires/documentaires, CLI Markdown/JSON/export CAD IR sur
+  exemples existants et exemples assets si ajoutes.
 ## Mission bloquee par gate
 
 `P8-FUSION-GATE - Generation Fusion volumetrique ou vue 3D`.

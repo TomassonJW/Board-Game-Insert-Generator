@@ -46,6 +46,21 @@ class VolumetricZoneKind(str, Enum):
     FORBIDDEN = "forbidden"
 
 
+class VolumetricOwnerType(str, Enum):
+    GRID_FLOOR = "grid_floor"
+    MODULE_PLACEMENT = "module_placement"
+    ZONE = "zone"
+
+
+class VolumetricFace(str, Enum):
+    TOP = "top"
+    BOTTOM = "bottom"
+    FRONT = "front"
+    BACK = "back"
+    LEFT = "left"
+    RIGHT = "right"
+
+
 LAYOUT_STRATEGY_ROW_FILL = "row_fill"
 LAYOUT_STRATEGY_GRID = "grid"
 LAYOUT_STRATEGY_COLUMNS = "columns"
@@ -171,6 +186,9 @@ class VolumetricModulePlacement:
     size_units: GridSize3D
     instance_id: str | None = None
     layer_id: str | None = None
+    removal_order: int | None = None
+    access_direction: str = "unspecified"
+    support_surface_id: str | None = None
     comment: str = ""
 
 
@@ -182,6 +200,24 @@ class VolumetricZone:
     origin_units: GridPoint3D
     size_units: GridSize3D
     layer_id: str | None = None
+    reservation_kind: str = "generic"
+    asset_kind: str = "unspecified"
+    removal_order: int | None = None
+    access_direction: str = "unspecified"
+    support_surface_id: str | None = None
+    comment: str = ""
+
+
+@dataclass(frozen=True)
+class VolumetricSupportSurface:
+    id: str
+    owner_type: VolumetricOwnerType
+    owner_id: str
+    face: VolumetricFace
+    origin_units: GridPoint3D
+    size_units: GridSize3D
+    layer_id: str | None = None
+    purpose: str = "abstract_support"
     comment: str = ""
 
 
@@ -192,6 +228,7 @@ class VolumetricGrid:
     layers: tuple[VolumetricLayer, ...] = ()
     module_placements: tuple[VolumetricModulePlacement, ...] = ()
     zones: tuple[VolumetricZone, ...] = ()
+    support_surfaces: tuple[VolumetricSupportSurface, ...] = ()
     comment: str = ""
 
 @dataclass(frozen=True)
