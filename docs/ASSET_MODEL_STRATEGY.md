@@ -13,6 +13,7 @@ proposer des modules, cavites et reservations.
   free et other cote modules/cavites.
 - Les cavites peuvent representer des receptacles simples.
 - Les assets P9-M002 sont reportes et transportes en CAD IR metadata, sans deriver de module.
+- P10-M004 produit une synthese `module_candidates` deterministe depuis les assets, sans muter `modules` ni placer ces candidats.
 
 ## Concepts cibles
 
@@ -92,3 +93,19 @@ Exemple non executable P9-M001 :
 - Une dimension approximative doit rester visible dans les rapports futurs.
 - Le loader V0 accepte `assets` a la racine depuis P9-M002, mais ne derive encore
   aucun module, layout ou cavity depuis ces assets.
+
+## Synthese module candidates P10-M004
+
+P10-M004 ajoute une sortie derivee et non executable : `module_candidates`.
+
+Un candidat de module est une proposition explicable issue d'un asset charge :
+
+- `status: candidate_only` pour un contenant imprimable possible ;
+- `status: reservation_only` pour un board, rulebook, tray ou asset avec intention `reserve` ;
+- `status: blocked` si une dimension critique, notamment Z, ne permet pas une
+  hauteur de candidat fiable.
+
+Les dimensions proposees additionnent l'enveloppe asset, le clearance du profil
+actif et les defaults de paroi/plancher. Elles restent indicatives : elles ne
+creent pas de `ModuleRequest`, ne modifient pas le layout, ne creent pas de
+cavite et ne declenchent aucune generation Fusion.

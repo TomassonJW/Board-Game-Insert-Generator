@@ -12,6 +12,7 @@ pas devenir une boite noire ni remplacer les gates physiques.
 - Aucun optimiseur global, heuristique complexe ou dependance lourde n'est present.
 - P10-M002 expose une comparaison `variant_comparison` report-only entre strategies deterministes deja implementees.
 - P10-M003 ajoute des raisons de rejet structurees et actionnables pour les variantes non generables.
+- P10-M004 ajoute des `module_candidates` deterministes depuis les assets, sans solveur global.
 
 ## Strategie cible
 
@@ -117,3 +118,14 @@ Codes de rejet documentes pour le reporting report-only :
 
 Cette taxonomie ne cree pas de nouveau solveur. Elle classe les erreurs de
 validation/layout deja disponibles pour rendre les refus exploitables.
+
+
+## Candidats de modules P10-M004
+
+Les `module_candidates` sont une entree de raisonnement pour les variantes futures.
+Ils restent hors solveur : aucune recherche de placement, aucun backtracking et
+aucune modification de `config.modules`.
+
+Leur role est de rendre visible la transition `assets -> besoins de contenance` :
+le rapport indique quels assets peuvent suggerer un module, lesquels restent de
+simples reservations et quelles dimensions sont seulement indicatives.

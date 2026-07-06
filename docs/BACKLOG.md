@@ -343,6 +343,17 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Criteres d'acceptation : assets et modules restent distincts ; les candidats sont explicables, bornes et non generes dans Fusion.
 - Tests : unitaires + CLI Markdown/JSON/export CAD IR sur exemples assets.
 - Gate : stop si generation automatique de layout complexe, changement incompatible CAD IR ou geometrie Fusion reelle.
+- Statut : `done`, `implemented-core`.
+
+### P10-M005 - Generer des variantes simples depuis candidats assets
+
+- Capability : C-SOLVER.
+- Milestone : M10 Semi-automatic solver.
+- Objectif : exposer une ou deux variantes deterministes simples construites depuis `module_candidates`, sans optimiseur global.
+- Livrable : rapports Markdown/JSON, tests et documentation de limites.
+- Criteres d'acceptation : variante recommandable ou rejetee avec raisons ; aucune generation Fusion et aucune mutation automatique de config.
+- Tests : unitaires + CLI Markdown/JSON/export CAD IR sur exemples assets.
+- Gate : stop si solveur complexe, backtracking, optimisation globale ou changement incompatible CAD IR devient necessaire.
 - Statut : `ready`.
 
 ## Phase 11 - Modules composites et formes soudees

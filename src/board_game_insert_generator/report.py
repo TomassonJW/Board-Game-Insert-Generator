@@ -4,6 +4,7 @@ import json
 from dataclasses import asdict, replace
 from typing import Any
 
+from board_game_insert_generator.asset_candidates import build_module_candidates_from_assets
 from board_game_insert_generator.feature_taxonomy import feature_taxonomy_to_dict, resolve_feature_taxonomy
 from board_game_insert_generator.layout import LayoutError, generate_basic_layout
 from board_game_insert_generator.models import (
@@ -24,6 +25,7 @@ from board_game_insert_generator.volumetric import VolumetricSummary, build_volu
 def layout_to_dict(config: InsertConfig, result: LayoutResult) -> dict[str, Any]:
     planned_cavities = _planned_cavities_by_instance(config, result)
     volumetric_summary = build_volumetric_summary(config)
+    module_candidates = build_module_candidates_from_assets(config)
     return {
         "project_name": config.project_name,
         "units": config.units,
@@ -44,6 +46,8 @@ def layout_to_dict(config: InsertConfig, result: LayoutResult) -> dict[str, Any]
         "summary": {
             "requested_module_count": len(config.modules),
             "asset_count": len(config.assets),
+            "module_candidate_count": len(module_candidates),
+            "candidate_only_module_count": sum(1 for candidate in module_candidates if candidate["status"] == "candidate_only"),
             "expanded_instance_count": len(result.cells),
             "cell_count": len(result.cells),
             "printable_body_count": len(result.printable_bodies),
@@ -59,6 +63,7 @@ def layout_to_dict(config: InsertConfig, result: LayoutResult) -> dict[str, Any]
         "variant_comparison": _variant_comparison(config, result),
         "volumetric_grid": volumetric_summary.to_dict() if volumetric_summary is not None else None,
         "assets": [_asset_to_dict(asset) for asset in config.assets],
+        "module_candidates": module_candidates,
         "module_requests": [
             {
                 "id": module.id,
@@ -131,6 +136,7 @@ def layout_to_markdown(config: InsertConfig, result: LayoutResult) -> str:
     planned_cavities = _planned_cavities_by_instance(config, result)
     volumetric_summary = build_volumetric_summary(config)
     variant_comparison = _variant_comparison(config, result)
+    module_candidates = build_module_candidates_from_assets(config)
     planned_cavity_count = sum(len(entries) for entries in planned_cavities.values())
     planned_feature_count = _planned_feature_count(planned_cavities)
     lines = [
@@ -147,6 +153,7 @@ def layout_to_markdown(config: InsertConfig, result: LayoutResult) -> str:
         f"- Layout strategy: `{config.layout.strategy}`",
         f"- Requested modules: {len(config.modules)}",
         f"- Declared assets: {len(config.assets)}",
+        f"- Module candidates from assets: {len(module_candidates)}",
         f"- Generated instances: {len(result.cells)}",
         f"- Printable bodies: {len(result.printable_bodies)}",
         f"- Planned cavities: {planned_cavity_count}",
@@ -168,6 +175,7 @@ def layout_to_markdown(config: InsertConfig, result: LayoutResult) -> str:
         "",
         *_format_volumetric_grid_section(volumetric_summary),
         *_format_assets_section(config),
+        *_format_module_candidates_section(module_candidates),
         "## Variant comparison",
         "",
         "Variants are deterministic report-only comparisons of already implemented layout strategies. They are not a global optimization proof.",
@@ -746,6 +754,42 @@ def _format_assets_section(config: InsertConfig) -> list[str]:
         )
     lines.append("")
     return lines
+
+
+def _format_module_candidates_section(candidates: list[dict[str, Any]]) -> list[str]:
+    lines = ["## Module candidates from assets", ""]
+    if not candidates:
+        return lines + ["- No module candidates derived from assets.", ""]
+
+    lines.extend(
+        [
+            "| Candidate | Status | Functional type | Suggested module | Dimensions | Reasons |",
+            "| --- | --- | --- | --- | ---: | --- |",
+        ]
+    )
+    for candidate in candidates:
+        suggested = candidate.get("suggested_module")
+        if suggested is None:
+            suggested_id = "n/a"
+            dimensions = "n/a"
+        else:
+            suggested_id = suggested["id"]
+            dimensions = _format_dict_dim(suggested["min_dimensions_mm"])
+        lines.append(
+            "| "
+            f"{candidate['candidate_id']} | "
+            f"{candidate['status']} | "
+            f"{candidate['functional_type']} | "
+            f"{suggested_id} | "
+            f"{dimensions} | "
+            f"{'; '.join(candidate['reasons'])} |"
+        )
+    lines.append("")
+    return lines
+
+
+def _format_dict_dim(dimensions: dict[str, float]) -> str:
+    return f"{dimensions['x']:.2f} x {dimensions['y']:.2f} x {dimensions['z']:.2f} mm"
 
 def _dim(dimensions: Dimension3D) -> dict[str, float]:
     return {"x": _clean_float(dimensions.x), "y": _clean_float(dimensions.y), "z": _clean_float(dimensions.z)}

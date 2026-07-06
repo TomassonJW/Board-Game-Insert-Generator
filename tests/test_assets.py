@@ -70,13 +70,35 @@ class AssetModelTests(unittest.TestCase):
         self.assertIn("### Rejected variant details", markdown)
         self.assertIn("DOES_NOT_FIT", markdown)
 
-    def test_cad_ir_transports_assets_as_metadata_only(self) -> None:
+    def test_reports_module_candidates_without_deriving_modules(self) -> None:
+        config = load_config(ROOT / "examples" / "simple_assets.json")
+        layout = generate_basic_layout(config)
+
+        markdown = layout_to_markdown(config, layout)
+        payload = json.loads(layout_to_json(config, layout))
+
+        self.assertIn("## Module candidates from assets", markdown)
+        self.assertEqual(payload["summary"]["module_candidate_count"], 2)
+        self.assertEqual(payload["summary"]["candidate_only_module_count"], 1)
+        self.assertEqual(len(config.modules), 2)
+        board_candidate = payload["module_candidates"][0]
+        card_candidate = payload["module_candidates"][1]
+        self.assertEqual(board_candidate["status"], "reservation_only")
+        self.assertIsNone(board_candidate["suggested_module"])
+        self.assertEqual(card_candidate["status"], "candidate_only")
+        self.assertEqual(card_candidate["suggested_module"]["id"], "candidate-module:card-deck")
+        self.assertEqual(card_candidate["suggested_module"]["functional_type"], "sleeved_cards")
+        self.assertIn("candidate-module:card-deck", markdown)
+
+    def test_cad_ir_transports_assets_and_candidates_as_metadata_only(self) -> None:
         config = load_config(ROOT / "examples" / "simple_assets.json")
         layout = generate_basic_layout(config)
 
         payload = build_blank_cad_scene(config, layout).to_dict()
 
         self.assertEqual(payload["metadata"]["assets"][0]["id"], "main-board")
+        self.assertEqual(payload["metadata"]["module_candidates"][1]["candidate_id"], "asset-candidate:card-deck")
+        self.assertEqual(payload["metadata"]["module_candidates"][1]["status"], "candidate_only")
         operation_kinds = [
             operation["kind"]
             for component in payload["components"]

@@ -394,7 +394,9 @@ Approche prevue :
 
 Le bloc racine `assets` est charge depuis P9-M002 comme donnees passives. Il
 sert a decrire le materiel reel avant de deriver modules, cavites ou
-reservations. Le moteur ne genere encore rien depuis ces assets.
+reservations. Depuis P10-M004, le moteur expose une synthese `module_candidates`
+dans les rapports et la CAD IR metadata, mais ne genere toujours aucun
+`modules[]` depuis ces assets.
 
 Champs cibles :
 

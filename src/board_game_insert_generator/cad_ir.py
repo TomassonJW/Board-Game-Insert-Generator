@@ -10,6 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from board_game_insert_generator.asset_candidates import build_module_candidates_from_assets
 from board_game_insert_generator.feature_taxonomy import feature_taxonomy_to_dict
 from board_game_insert_generator.volumetric import build_volumetric_summary
 from board_game_insert_generator.models import (
@@ -253,6 +254,7 @@ class CadSceneMetadata:
     print_profile: str
     warnings: tuple[str, ...]
     assets: tuple[dict[str, Any], ...] = ()
+    module_candidates: tuple[dict[str, Any], ...] = ()
     volumetric_grid: dict[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
@@ -263,6 +265,7 @@ class CadSceneMetadata:
             "print_profile": self.print_profile,
             "warnings": list(self.warnings),
             "assets": list(self.assets),
+            "module_candidates": list(self.module_candidates),
             "volumetric_grid": self.volumetric_grid,
         }
 
@@ -322,6 +325,7 @@ def build_blank_cad_scene(config: InsertConfig, layout: LayoutResult) -> CadScen
         for cell in layout.cells
     )
     volumetric_summary = build_volumetric_summary(config)
+    module_candidates = build_module_candidates_from_assets(config)
     return CadScene(
         schema_version=CAD_IR_SCHEMA_VERSION,
         units=CAD_IR_UNITS,
@@ -342,6 +346,7 @@ def build_blank_cad_scene(config: InsertConfig, layout: LayoutResult) -> CadScen
             print_profile=config.print_profile,
             warnings=layout.warnings,
             assets=tuple(_asset_metadata(asset) for asset in config.assets),
+            module_candidates=tuple(module_candidates),
             volumetric_grid=volumetric_summary.to_dict() if volumetric_summary is not None else None,
         ),
     )

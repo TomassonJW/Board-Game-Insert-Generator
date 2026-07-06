@@ -213,6 +213,8 @@ La mission `P10-M002` ajoute `variant_comparison` dans les rapports Markdown/JSO
 
 La mission `P10-M003` enrichit les variantes `rejected` avec `rejection_reasons` structurees : code, categorie, severite, message source, reference de contrainte et action corrective. Elle reste report-only et ne cree ni nouveau solveur ni nouveau placement.
 
+La mission `P10-M004` produit `module_candidates` depuis les assets charges : candidats indicatifs, reservations seules ou blocages de dimensions. Ces candidats sont reportes et transportes en CAD IR metadata, sans modifier `modules`, sans layout automatique et sans Fusion.
+
 ## Phase active
 
 Phase active : **P8 volumetric planner abstrait / gate avant generation Fusion volumetrique**.
@@ -227,7 +229,7 @@ volumetrique declarative, layers, reservations, supports abstraits et metadata C
 La North Star cible un
 generateur volumetrique asset-first, pilote par capabilities.
 
-Prochaine action recommandee : `P10-M004` pour produire une premiere synthese deterministe `assets -> module_candidates`, si cela reste report-only et sans generation Fusion. Une nouvelle gate humaine est requise avant toute generation Fusion
+Prochaine action recommandee : `P10-M005` pour generer une premiere variante simple depuis `module_candidates`, si cela reste deterministe, report-only et sans generation Fusion. Une nouvelle gate humaine est requise avant toute generation Fusion
 reelle liee a la grille 3D, aux layers, aux vues eclatees ou aux features
 avancees.
 
@@ -290,6 +292,8 @@ avancees.
 - Schema cible P9-M001 asset-first documente.
 - Assets P9-M002 charges, valides, reportes et transportes en metadata CAD IR,
   sans generation de modules.
+- Candidats de modules P10-M004 derives des assets comme metadata report-only,
+  sans mutation de `modules` ni placement automatique.
 - Criteres de scoring P10-M001 documentes, sans solveur executable.
 - Comparaison P10-M002 report-only de variantes deterministes existantes dans les rapports.
 - Raisons de rejet P10-M003 structurees et actionnables pour les variantes non generables.
@@ -376,10 +380,10 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant `P10-M003 - Raisons detaillees de variantes refusees` :
+Derniere verification pendant `P10-M004 - Candidats de modules depuis assets` :
 
-- `python -m unittest discover -s tests` : OK, 129 tests passes.
-- `python -m py_compile src\board_game_insert_generator\report.py tests\test_assets.py` : OK.
+- `python -m unittest discover -s tests` : OK, 130 tests passes.
+- `python -m py_compile src\board_game_insert_generator\asset_candidates.py src\board_game_insert_generator\report.py src\board_game_insert_generator\cad_ir.py tests\test_assets.py` : OK.
 - `python -m board_game_insert_generator examples\simple_box.json --format markdown` : OK.
 - `python -m board_game_insert_generator examples\simple_box.json --format json` : OK.
 - `python -m board_game_insert_generator export-cad-ir examples\simple_box.json --output %TEMP%\bgig-cad-ir-validation\simple_box.cad-ir.json` : OK, schema `cad_ir.v0`, 4 composants.
