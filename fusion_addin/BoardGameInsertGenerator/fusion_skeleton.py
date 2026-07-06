@@ -141,9 +141,11 @@ class FusionSolidPlan:
     printable: bool
     operation_kind: str
     validation_status: str = FUSION_MANUAL_VALIDATION_REQUIRED
+    grid_origin_units: tuple[int, int, int] | None = None
+    grid_size_units: tuple[int, int, int] | None = None
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        payload = {
             "cad_id": self.cad_id,
             "component_name": self.component_name,
             "body_name": self.body_name,
@@ -154,6 +156,11 @@ class FusionSolidPlan:
             "operation_kind": self.operation_kind,
             "validation_status": self.validation_status,
         }
+        if self.grid_origin_units is not None:
+            payload["grid_origin_units"] = _grid_units_tuple_to_dict(self.grid_origin_units)
+        if self.grid_size_units is not None:
+            payload["grid_size_units"] = _grid_units_tuple_to_dict(self.grid_size_units)
+        return payload
 
 
 @dataclass(frozen=True)
@@ -335,6 +342,27 @@ class FusionGenerationPlan:
         return len(self.blanks) + len(self.grid_positioned_blanks)
 
     @property
+    def multi_layer_grid_module_count(self) -> int:
+        return sum(
+            1
+            for blank in self.grid_positioned_blanks
+            if blank.grid_size_units is not None and blank.grid_size_units[2] > 1
+        )
+
+    @property
+    def grid_modules_with_z_placement_count(self) -> int:
+        return sum(
+            1
+            for blank in self.grid_positioned_blanks
+            if (blank.grid_origin_units is not None and blank.grid_origin_units[2] > 0)
+            or blank.origin_mm.z > self.reference_box.origin_mm.z
+        )
+
+    @property
+    def grid_module_height_variant_count(self) -> int:
+        return len({round(blank.size_mm.z, 4) for blank in self.grid_positioned_blanks})
+
+    @property
     def linked_exploded_occurrences(self) -> bool:
         component_ids = {blank.cad_id for blank in (*self.blanks, *self.grid_positioned_blanks)}
         return all(
@@ -362,6 +390,9 @@ class FusionGenerationPlan:
             "reference_box": self.reference_box.to_dict(),
             "blanks": [blank.to_dict() for blank in self.blanks],
             "grid_positioned_blanks": [blank.to_dict() for blank in self.grid_positioned_blanks],
+            "multi_layer_grid_modules": self.multi_layer_grid_module_count,
+            "grid_modules_with_z_placement": self.grid_modules_with_z_placement_count,
+            "grid_module_height_variants": self.grid_module_height_variant_count,
             "compact_occurrences": [occurrence.to_dict() for occurrence in self.compact_occurrences],
             "exploded_occurrences": [occurrence.to_dict() for occurrence in self.exploded_occurrences],
             "linked_exploded_occurrences": self.linked_exploded_occurrences,
@@ -372,6 +403,10 @@ class FusionGenerationPlan:
             "generation_mode": self.generation_mode,
             "validation_status": self.validation_status,
         }
+
+
+def _grid_units_tuple_to_dict(units: tuple[int, int, int]) -> dict[str, int]:
+    return {"x": units[0], "y": units[1], "z": units[2]}
 
 
 def is_part_design_component_limit_error(error: Any) -> bool:
@@ -932,6 +967,8 @@ def _grid_positioned_asset_blanks_from_metadata(
             role="generated_asset_grid_blank",
             printable=True,
             operation_kind=GRID_PLACED_BLANK_OPERATION_KIND,
+            grid_origin_units=origin_units,
+            grid_size_units=size_units,
         )
         collision = _first_colliding_solid(blank, occupied)
         if collision is not None:

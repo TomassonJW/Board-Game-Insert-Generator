@@ -227,6 +227,31 @@ de blank dont un module asset-first positionne par grille, et les dimensions
 comme conformes ou acceptables. Cette validation ne vaut pas validation
 d'impression 3D.
 
+## Scene multi-layer depuis placements grille P11-M002
+
+P11-M002 etend le meme chemin sans recalcul Fusion : l'add-in consomme les
+placements `origin_units`, `size_units`, `origin_mm` et `size_mm` deja presents
+dans `metadata.executable_asset_plan` pour creer une scene compacte + eclatee ou
+plusieurs modules generes occupent des hauteurs et origines Z differentes.
+
+Convention retenue :
+
+- l'exemple de smoke test est `examples/simple_multilayer_grid_scene.json` ;
+- le coeur Python produit un module bas `3 x 3 x 1` a `Z=0` et un module plus
+  haut `2 x 2 x 2` place a `Z=1` ;
+- Fusion convertit uniquement les millimetres deja resolus en transforms
+  d'occurrences ;
+- les compteurs `Multi-layer grid modules planned`, `Grid modules with Z
+  placement` et `Grid module height variants` sont reportes dans le message ;
+- la vue compacte et la vue eclatee restent deux occurrences liees du meme
+  `Component` source ;
+- aucun solveur, support physique, tolerance ou clearance n'est recalcule dans
+  Fusion.
+
+Validation : les plans et conversions sont testes hors Fusion. L'execution reelle
+P11-M002 reste `manual validation required` tant que Thomas n'a pas lance le
+smoke test dans Fusion. Aucune validation d'impression 3D ou de portance n'est
+revendiquee.
 
 ## Vue eclatee basique P7-M001
 
@@ -264,9 +289,10 @@ Validation : le plan, le message d'erreur et la politique de non-renommage
 direct des occurrences sont testes hors Fusion. P7-M001V3 a revele que certains
 contextes Fusion exposent `Occurrence.name` en lecture seule ; P7-M001V4 conserve
 les occurrences liees mais ne depend plus du renommage direct des occurrences.
-L'execution reelle reste `manual validation required` tant que Thomas n'a pas
-realise le smoke test P7-M001V4 dans un document Assembly-compatible.
-
+Le smoke test humain P7-M001V4 du 2026-07-06 valide dans un document
+Assembly-compatible la vue compacte/eclatee, les occurrences liees et l'absence
+de renommage direct d'occurrence. Cette validation ne vaut pas validation
+d'impression 3D.
 ## Vue compacte et vue eclatee
 
 La strategie long terme distingue deux sorties Fusion inspectables :
@@ -278,14 +304,15 @@ La strategie long terme distingue deux sorties Fusion inspectables :
 
 La vue compacte existe pour les blanks rectangulaires simples et pour les
 modules asset-first places par grille. La vue eclatee basique existe maintenant
-comme occurrences liees d'inspection. Elle refuse proprement le contexte Part
-Design incompatible, mais reste a valider manuellement dans un document
-Assembly-compatible.
+comme occurrences liees d'inspection et P7-M001V4 est validee dans un document
+Assembly-compatible. P11-M002 code une scene compacte/eclatee multi-layer depuis
+placements X/Y/Z ; cette extension reste a valider manuellement dans Fusion.
 
 Fusion ne doit pas inventer les positions compactes. Pour P7-M001 uniquement,
 l'add-in peut calculer une disposition eclatee de presentation a partir des
 volumes deja resolus dans la CAD IR ; cette disposition ne modifie pas le layout
 compact, les tolerances ou les decisions moteur.
+
 ## Choix API Fusion P4-M003
 
 Apres verification de la documentation officielle Autodesk, l'approche retenue

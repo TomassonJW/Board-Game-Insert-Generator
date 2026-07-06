@@ -387,6 +387,55 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(grid_blank.origin_mm.to_dict(), {"x": 30.0, "y": 0.0, "z": 10.0})
         self.assertEqual(grid_blank.size_mm.to_dict(), {"x": 30.0, "y": 30.0, "z": 10.0})
 
+    def test_builds_multilayer_grid_scene_with_linked_occurrences(self) -> None:
+        payload = _cad_ir_payload_from_example("simple_multilayer_grid_scene.json")
+
+        plan = generation_plan_from_cad_ir(payload)
+
+        self.assertEqual(len(plan.blanks), 1)
+        self.assertEqual(len(plan.grid_positioned_blanks), 2)
+        self.assertEqual(plan.module_component_count, 3)
+        self.assertEqual(plan.multi_layer_grid_module_count, 1)
+        self.assertEqual(plan.grid_modules_with_z_placement_count, 1)
+        self.assertEqual(plan.grid_module_height_variant_count, 2)
+        self.assertEqual(len(plan.compact_occurrences), 3)
+        self.assertEqual(len(plan.exploded_occurrences), 3)
+        self.assertTrue(plan.linked_exploded_occurrences)
+
+        low_blank = plan.grid_positioned_blanks[0]
+        high_blank = plan.grid_positioned_blanks[1]
+        self.assertEqual(low_blank.grid_origin_units, (1, 0, 0))
+        self.assertEqual(low_blank.grid_size_units, (3, 3, 1))
+        self.assertEqual(low_blank.origin_mm.to_dict(), {"x": 30.0, "y": 0.0, "z": 0.0})
+        self.assertEqual(low_blank.size_mm.to_dict(), {"x": 90.0, "y": 90.0, "z": 10.0})
+        self.assertEqual(high_blank.grid_origin_units, (0, 0, 1))
+        self.assertEqual(high_blank.grid_size_units, (2, 2, 2))
+        self.assertEqual(high_blank.origin_mm.to_dict(), {"x": 0.0, "y": 0.0, "z": 10.0})
+        self.assertEqual(high_blank.size_mm.to_dict(), {"x": 60.0, "y": 60.0, "z": 20.0})
+
+        high_compact = [
+            occurrence
+            for occurrence in plan.compact_occurrences
+            if occurrence.component_id == high_blank.cad_id
+        ][0]
+        high_exploded = [
+            occurrence
+            for occurrence in plan.exploded_occurrences
+            if occurrence.component_id == high_blank.cad_id
+        ][0]
+        self.assertEqual(high_compact.origin_mm.to_dict(), {"x": 0.0, "y": 0.0, "z": 10.0})
+        self.assertEqual(high_exploded.view_role, EXPLODED_OCCURRENCE_ROLE)
+        self.assertTrue(high_exploded.linked_component)
+
+        plan_dict = plan.to_dict()
+        self.assertEqual(plan_dict["multi_layer_grid_modules"], 1)
+        self.assertEqual(plan_dict["grid_modules_with_z_placement"], 1)
+        self.assertEqual(plan_dict["grid_module_height_variants"], 2)
+        self.assertEqual(
+            plan_dict["grid_positioned_blanks"][1]["grid_size_units"],
+            {"x": 2, "y": 2, "z": 2},
+        )
+
     def test_builds_basic_exploded_view_from_linked_compact_and_grid_occurrences(self) -> None:
         payload = _cad_ir_payload_from_example("simple_asset_executable_plan.json")
 

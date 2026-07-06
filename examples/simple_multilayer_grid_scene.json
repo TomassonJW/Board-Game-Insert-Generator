@@ -1,0 +1,85 @@
+{
+  "project_name": "Simple multilayer grid scene V0",
+  "units": "mm",
+  "box": {
+    "inner_dimensions_mm": { "x": 120, "y": 90, "z": 40 },
+    "usable_height_mm": 30,
+    "lid_clearance_mm": 10
+  },
+  "print_profile": "default",
+  "defaults": {
+    "wall_thickness_mm": 1.2,
+    "floor_thickness_mm": 1.2,
+    "corner_radius_mm": 1.5
+  },
+  "layout": {
+    "strategy": "row_fill"
+  },
+  "assets": [
+    {
+      "id": "flat-token-field",
+      "name": "Flat token field",
+      "kind": "tokens",
+      "quantity": { "count": 48, "grouping": "set" },
+      "dimensions_mm": { "x": 58, "y": 58, "z": 6 },
+      "dimension_confidence": "exact",
+      "containment_intent": "store",
+      "comment": "Large low asset module; after padding it occupies a 3 x 3 x 1 grid span on the lower layer."
+    },
+    {
+      "id": "tall-dice-column",
+      "name": "Tall dice column",
+      "kind": "dice",
+      "quantity": { "count": 12, "grouping": "set" },
+      "dimensions_mm": { "x": 34, "y": 34, "z": 16 },
+      "dimension_confidence": "exact",
+      "containment_intent": "store",
+      "comment": "Taller asset module; after padding it occupies two Z units and is forced above the lower layer by the greedy scan."
+    }
+  ],
+  "volumetric_grid": {
+    "unit_mm": { "x": 30, "y": 30, "z": 10 },
+    "size_units": { "x": 4, "y": 3, "z": 3 },
+    "comment": "P11-M002 fixture: executable asset plan creates one low module and one taller module placed on Z=1. Fusion consumes the resolved CAD IR only.",
+    "layers": [
+      {
+        "id": "bottom-modules",
+        "name": "Bottom printable layer",
+        "z_start": 0,
+        "z_count": 1,
+        "role": "printable_modules"
+      },
+      {
+        "id": "upper-modules",
+        "name": "Upper printable inspection layer",
+        "z_start": 1,
+        "z_count": 2,
+        "role": "printable_modules"
+      }
+    ],
+    "module_placements": [
+      {
+        "id": "manual-reference-volume",
+        "module_id": "manual-reference-bin",
+        "instance_id": "manual-reference-bin-01",
+        "origin_units": { "x": 0, "y": 0, "z": 0 },
+        "size_units": { "x": 1, "y": 1, "z": 1 },
+        "layer_id": "bottom-modules",
+        "comment": "Existing manual module reserves the first lower cell so generated assets prove collision-aware grid placement."
+      }
+    ]
+  },
+  "modules": [
+    {
+      "id": "manual-reference-bin",
+      "name": "Manual reference bin",
+      "functional_type": "tokens",
+      "min_dimensions_mm": { "x": 30, "y": 30, "z": 10 },
+      "height_mm": 10,
+      "priority": 100,
+      "allow_rotation": true,
+      "quantity": 1,
+      "comment": "Manual compact module retained to prove generated asset modules are additive metadata."
+    }
+  ]
+}

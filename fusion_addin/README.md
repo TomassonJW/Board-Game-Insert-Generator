@@ -32,6 +32,7 @@ Ce que l'add-in cree maintenant :
 - une coupe rectangulaire verticale par operation `subtract_rectangular_cavity`, dans le composant source ;
 - une coupe rectangulaire de paroi par encoche simple supportee, dans le composant source ;
 - un module asset-first place par grille, si la CAD IR contient `metadata.executable_asset_plan.placements` ;
+- des modules asset-first multi-layer, si les placements CAD IR resolus utilisent plusieurs hauteurs ou une origine Z non nulle ;
 - des noms lisibles pour composants, occurrences, sketches, features et bodies.
 
 Ce que l'add-in ne cree pas :
@@ -147,6 +148,14 @@ Pour tester les placements grille P11-M001, generer une CAD IR asset-first :
 ```powershell
 $env:PYTHONPATH = "src"
 python -m board_game_insert_generator export-cad-ir examples/simple_asset_executable_plan.json --output $env:TEMP\bgig-simple-asset-executable-plan.cad-ir.json
+```
+
+Pour tester la scene multi-layer P11-M002, generer une CAD IR asset-first avec
+placements Z explicites :
+
+```powershell
+$env:PYTHONPATH = "src"
+python -m board_game_insert_generator export-cad-ir examples/simple_multilayer_grid_scene.json --output $env:TEMP\bgig-simple-multilayer-grid-scene.cad-ir.json
 ```
 
 Pointer ensuite `cad_ir_path.txt` vers ce fichier. Par defaut, P7-M001 genere
@@ -276,7 +285,28 @@ Procedure :
       definition ;
     - verifier que Fusion n'a pas cree de fillet, fond arrondi, module composite
       ou export STL/3MF.
-15. Noter tout ecart, message d'erreur ou comportement Zero Doc dans un futur log
+15. Pour le smoke test P11-M002V, generer une CAD IR depuis
+    `examples/simple_multilayer_grid_scene.json`, pointer `cad_ir_path.txt` vers
+    ce fichier, laisser le mode `compact_and_exploded`, relancer l'add-in dans
+    un document Assembly-compatible et verifier :
+    - message final attendu : `Grid-positioned asset modules planned: 2`,
+      `Multi-layer grid modules planned: 1`, `Grid modules with Z placement: 1`,
+      `Grid module height variants: 2`, `Module components planned: 3`,
+      `Compact occurrences planned: 3`, `Exploded occurrences planned: 3`,
+      `Module components created: 3`, `Compact occurrences created: 3`,
+      `Exploded occurrences created: 3`, `Linked exploded occurrences: yes`,
+      `Occurrence direct rename attempted: no` ;
+    - composant manuel attendu : `manual-reference-bin-01 - Manual reference bin` ;
+    - composants asset-first attendus : `Grid placed Candidate module for Flat token field`
+      et `Grid placed Candidate module for Tall dice column` ;
+    - module bas attendu : origine `X 30.0 mm`, `Y 0.0 mm`, `Z 0.0 mm`,
+      dimensions `90.0 x 90.0 x 10.0 mm` ;
+    - module haut attendu : origine `X 0.0 mm`, `Y 0.0 mm`, `Z 10.0 mm`,
+      dimensions `60.0 x 60.0 x 20.0 mm` ;
+    - occurrences compactes et eclatees visibles, liees aux memes composants
+      sources ;
+    - aucun solveur, module composite, fillet, geometrie courbe ou export STL/3MF.
+16. Noter tout ecart, message d'erreur ou comportement Zero Doc dans un futur log
     de validation.
 
 Ce smoke test valide uniquement la creation CAD minimale dans Fusion. Depuis la

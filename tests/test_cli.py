@@ -105,6 +105,34 @@ class CliTests(unittest.TestCase):
         self.assertEqual(plan.cavity_cuts[0].cavity_id, "token-pocket")
         self.assertEqual(plan.blanks[0].body_name, "token-tray-01 rectangular blank")
 
+    def test_cli_exports_multilayer_cad_ir_compatible_with_fusion_plan(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            output_path = Path(temporary_directory) / "multilayer_cad_ir.json"
+            stdout = io.StringIO()
+
+            with redirect_stdout(stdout):
+                code = main(
+                    [
+                        "export-cad-ir",
+                        str(ROOT / "examples" / "simple_multilayer_grid_scene.json"),
+                        "--output",
+                        str(output_path),
+                    ]
+                )
+
+            payload = load_cad_ir_json(output_path)
+            plan = generation_plan_from_cad_ir(payload)
+
+        self.assertEqual(code, 0)
+        self.assertIn("CAD IR export OK - Simple multilayer grid scene V0", stdout.getvalue())
+        self.assertEqual(len(plan.grid_positioned_blanks), 2)
+        self.assertEqual(plan.multi_layer_grid_module_count, 1)
+        self.assertEqual(plan.grid_modules_with_z_placement_count, 1)
+        self.assertEqual(plan.grid_module_height_variant_count, 2)
+        self.assertEqual(len(plan.compact_occurrences), 3)
+        self.assertEqual(len(plan.exploded_occurrences), 3)
+        self.assertTrue(plan.linked_exploded_occurrences)
+
     def test_cli_reports_configuration_error_category(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
             path = Path(temporary_directory) / "config.json"

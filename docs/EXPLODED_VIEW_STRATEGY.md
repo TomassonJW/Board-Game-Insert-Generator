@@ -18,7 +18,8 @@ exports.
 - P7-M001V2 a bloque en document Part Design ; P7 affiche maintenant `assembly document required` dans ce contexte.
 - P7-M001V3 a bloque sur le renommage direct des occurrences (`property '_get_name' of 'Occurrence' object has no setter`).
 - La correction P7-M001V4 ne tente plus de faire `occurrence.name = ...` ; les noms lisibles sont portes par les composants sources et le mapping compact/exploded dans le plan/message.
-- La validation Fusion manuelle P7-M001V4 en document Assembly-compatible reste requise.
+- La validation Fusion manuelle P7-M001V4 en document Assembly-compatible est confirmee le 2026-07-06 : compact/exploded sont des occurrences liees des memes composants sources, et l'add-in ne renomme pas directement les occurrences.
+- P11-M002 code une premiere scene eclatee multi-layer depuis placements grille X/Y/Z ; elle reste a tester manuellement dans Fusion.
 - Aucun export STL/3MF et aucune validation d'impression ne sont revendiques.
 
 ## Strategie P7 corrigee
@@ -81,6 +82,6 @@ Toute autre valeur est refusee avant generation.
 
 ## Gates
 
-- Smoke test humain P7-M001V4 en document Assembly-compatible avant statut `fusion-validated`.
+- P7-M001V4 est validee humainement ; prochaine gate : smoke test P11-M002V pour la scene multi-layer compacte/eclatee.
 - Nouvelle gate avant vue eclatee avancee, modules composites, export STL/3MF ou
   preparation d'impression.

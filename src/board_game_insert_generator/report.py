@@ -811,11 +811,15 @@ def _format_asset_candidate_variants_section(
 
 def _format_executable_asset_plan_section(plan: dict[str, Any]) -> list[str]:
     lines = ["## Executable asset module plan", ""]
+    summary = plan.get("summary", {})
     lines.extend(
         [
             f"- Status: `{plan['status']}`",
             f"- Source variant: `{plan['source_variant_id'] or 'none'}`",
             f"- Score: {plan['score']:.2f}",
+            f"- Multi-layer generated modules: {summary.get('multi_layer_module_count', 0)}",
+            f"- Generated modules with Z placement: {summary.get('z_placed_module_count', 0)}",
+            f"- Generated module height variants: {summary.get('height_variant_count', 0)}",
             "- Scope: pure Python abstract plan; no Fusion generation is changed.",
             "",
             "### Generated modules",

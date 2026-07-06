@@ -100,3 +100,19 @@ Il ne cherche pas de nouveau placement et ne modifie pas la grille.
 Le smoke test humain `P11-M001V` du 2026-07-06 valide cette consommation compacte
 dans Fusion pour `simple_asset_executable_plan`. Cette validation ne valide ni
 l'empilement physique, ni l'impression, ni une vue eclatee.
+## Scene multi-layer Fusion P11-M002
+
+P11-M002 garde le meme principe que P11-M001 : le moteur Python pur decide la
+grille, les placements et les dimensions. Fusion consomme seulement la CAD IR et
+cree des occurrences compactes/eclatees liees.
+
+L'exemple `simple_multilayer_grid_scene` verifie une configuration minimale :
+
+- un module genere bas occupe `size_units 3 x 3 x 1` a `origin_units (1, 0, 0)` ;
+- un module genere plus haut occupe `size_units 2 x 2 x 2` a `origin_units (0, 0, 1)` ;
+- les rapports et `metadata.executable_asset_plan.summary` exposent
+  `multi_layer_module_count`, `z_placed_module_count` et `height_variant_count` ;
+- l'adaptateur Fusion affiche les memes compteurs avant validation manuelle.
+
+Cette mission ne prouve pas la portance, l'ordre de retrait reel, la friction ou
+l'impression. Ces sujets restent gates par validation humaine/physique.

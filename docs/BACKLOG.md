@@ -227,7 +227,7 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Criteres d'acceptation : Fusion ne recalcule pas le solveur ; composants sources nommes lisiblement ; occurrences compactes/eclatees liees au meme composant sans renommage direct de `Occurrence.name` ; roles compact/exploded reportes dans le message ou le plan ; dimensions issues de la CAD IR ; coeur Python sans `adsk` ; validation manuelle requise.
 - Tests : unitaires hors Fusion, CLI/export CAD IR, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
 - Gate : validation humaine fournie le 2026-07-06 pour une vue eclatee basique uniquement.
-- Statut : `manual_validation_required`, correction occurrences liees, garde-fou Part Design/Assembly et non-renommage direct de `Occurrence.name` codes apres P7-M001V3 bloque.
+- Statut : `done`, `fusion-validated`, `print-validated: false`.
 
 ### P7-M001V4 - Valider manuellement la vue eclatee Fusion basique en document Assembly-compatible
 
@@ -237,8 +237,8 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Livrable : validation humaine Fusion avec message, noms, espacement, dimensions observees et verification que compact/exploded sont deux occurrences du meme composant.
 - Criteres d'acceptation : vue compacte conservee, occurrences `exploded` visibles a droite de la boite, composants sources partages entre compact/exploded, composants sources nommes lisiblement, message `Occurrence direct rename attempted: no`, dimensions conformes ou acceptables, message `assembly document required` si Part Design, aucun export STL/3MF.
 - Tests : smoke test manuel Fusion, aucune validation d'impression revendiquee.
-- Gate : action humaine requise.
-- Statut : `blocked`.
+- Gate : action humaine Thomas realisee le 2026-07-06.
+- Statut : `done`, `fusion-validated`, `print-validated: false`.
 
 ### P11-M001 - Generer une vue compacte Fusion depuis placements grille
 
@@ -262,6 +262,27 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Gate : action humaine Thomas realisee le 2026-07-06.
 - Statut : `done`, `fusion-validated`, `print-validated: false`.
 
+### P11-M002 - Generer une scene Fusion multi-layer depuis placements grille X/Y/Z
+
+- Capability : C-FUSION-COMPACT, C-FUSION-EXPLODED, C-GRID-3D, C-CAD-IR.
+- Milestone : M7 Volumetric planner / M5 CAD inspection views.
+- Objectif : consommer une CAD IR asset-first avec placements grille X/Y/Z multi-layer pour creer une scene Fusion compacte + eclatee liee.
+- Livrable : exemple `simple_multilayer_grid_scene.json`, compteurs multi-layer dans rapports/plan Fusion, add-in affichant modules multi-layer et Z placements, tests hors Fusion et procedure de smoke test.
+- Criteres d'acceptation : un module bas, un module plus haut, un placement Z explicite, occurrences compactes/eclatees liees, Fusion sans recalcul de solveur/tolerance, coeur Python sans `adsk`.
+- Tests : unitaires hors Fusion, CLI Markdown/JSON/export CAD IR, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
+- Gate : validation humaine fournie le 2026-07-06 pour cette generation multi-layer bornee uniquement.
+- Statut : `done`, `implemented-fusion`, validation Fusion manuelle requise, `print-validated: false`.
+
+### P11-M002V - Valider manuellement la scene Fusion multi-layer
+
+- Capability : C-FUSION-COMPACT, C-FUSION-EXPLODED, C-GRID-3D, C-CAD-IR.
+- Milestone : M7 Volumetric planner / M5 CAD inspection views.
+- Objectif : lancer l'add-in avec la CAD IR exportee depuis `simple_multilayer_grid_scene` et verifier les modules multi-hauteurs en vue compacte/eclatee.
+- Livrable : validation humaine Fusion avec message, position Z, dimensions et verification des occurrences liees.
+- Criteres d'acceptation : message `Multi-layer grid modules planned: 1`, `Grid modules with Z placement: 1`, `Grid module height variants: 2`, compact/exploded visibles, module haut a `Z 10.0 mm`, taille `60.0 x 60.0 x 20.0 mm` conforme ou acceptable, occurrences liees, aucune validation d'impression revendiquee.
+- Tests : smoke test manuel Fusion, aucune validation d'impression revendiquee.
+- Gate : action humaine requise.
+- Statut : `blocked`.
 ### P7-M002 - Generer une vue Fusion eclatee minimale
 
 - Capability : C-FUSION-EXPLODED.

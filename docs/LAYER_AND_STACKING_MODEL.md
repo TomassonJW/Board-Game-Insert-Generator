@@ -57,3 +57,11 @@ indique une face, un span discret et une intention comme `abstract_support`.
 `forbidden` ne peut pas avoir d'ordre de retrait, car elle represente un espace a
 ne pas utiliser. Toute entree avec `removal_order` doit declarer une
 `access_direction` explicite.
+## Convention P11-M002
+
+P11-M002 utilise les layers comme repere d'inspection Fusion, pas comme preuve de
+portance. Un module asset-first peut etre place avec `origin_units.z > 0` et
+`size_units.z > 1` si le plan greedy l'a deja decide dans le coeur Python pur.
+Fusion affiche cette scene par occurrences liees, sans recalculer support, ordre de
+retrait, clearance ou tolerance. Le smoke test humain doit verifier les positions
+Z et les dimensions visibles ; l'impression reste non validee.

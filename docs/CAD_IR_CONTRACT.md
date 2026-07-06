@@ -217,9 +217,12 @@ generes abstraits, leurs placements grille X/Y/Z et leurs refus eventuels. Depui
 P11-M001, l'adaptateur Fusion peut consommer cette metadata pour creer une vue
 compacte de bodies rectangulaires positionnes par `origin_mm` et `size_mm`. Le
 smoke test humain `P11-M001V` du 2026-07-06 valide ce chemin pour
-`simple_asset_executable_plan`. Ces donnees ne valident aucune portance physique
-et ne doivent pas etre utilisees par Fusion pour recalculer le solveur.
-
+`simple_asset_executable_plan`. Depuis P11-M002, la meme metadata transporte la
+scene multi-layer `simple_multilayer_grid_scene` : `summary` inclut
+`multi_layer_module_count`, `z_placed_module_count` et `height_variant_count`, et
+chaque placement conserve `origin_units`, `size_units`, `origin_mm` et `size_mm`.
+Ces donnees ne valident aucune portance physique et ne doivent pas etre utilisees
+par Fusion pour recalculer le solveur.
 Cette metadata ne change pas `schema_version`, ne cree aucune operation Fusion et
 ne remplace pas les dimensions `theoretical_*` / `printable_*` des bodies. Un
 adaptateur CAD peut l'ignorer sans invalider la CAD IR V0.
@@ -265,10 +268,13 @@ Le contrat V0 est valide par tests unitaires :
 La validation automatisee ne couvre pas l'execution reelle dans Fusion 360, les
 exports STL/3MF ou l'impression reelle. Depuis P11-M001, elle couvre aussi le
 plan de modules asset-first positionnes par grille, y compris conversion X/Y/Z,
-collisions manifestes, sortie de boite et refus transportes. Depuis P7-M001,
-elle couvre aussi le plan d'occurrences compactes/eclatees liees, le mode
-`compact_only`, le rejet d'un mode de generation inconnu et le message
-`assembly document required` pour les documents Part Design incompatibles.
+collisions manifestes, sortie de boite et refus transportes. Depuis P11-M002,
+elle couvre les compteurs multi-layer, les placements Z et le plan d'occurrences
+liees sur `simple_multilayer_grid_scene`. Depuis P7-M001, elle couvre aussi le
+plan d'occurrences compactes/eclatees liees, le mode `compact_only`, le rejet
+d'un mode de generation inconnu, le message `assembly document required` pour les
+documents Part Design incompatibles et la politique de non-renommage direct des
+occurrences.
 
 ## Gate suivante
 
@@ -282,11 +288,11 @@ d'erreur Fusion.
 `P6-M001` execute les cavites rectangulaires simples depuis
 `subtract_rectangular_cavity`, `P6-M002` execute les encoches simples de paroi
 depuis `describe_cavity_feature`, et `P11-M001` execute la vue compacte issue des
-placements grille asset-first. `P7-M001` code une vue eclatee basique corrigee comme
-occurrences liees d'un meme composant physique. Le contexte Part Design
-incompatible echoue proprement avec `assembly document required`. La generation
-reste encore `manual validation required`. Les chemins deja valides restent
-`print-validated: false`. Toute extension Fusion
+placements grille asset-first. `P7-M001` est validee comme vue eclatee basique
+par occurrences liees d'un meme composant physique. Le contexte Part Design
+incompatible echoue proprement avec `assembly document required`. `P11-M002` code
+la scene multi-layer compacte/eclatee et reste `manual validation required`. Les
+chemins deja valides restent `print-validated: false`. Toute extension Fusion
 au-dela de ces rectangles, notamment vue eclatee avancee, modules composites,
 fonds arrondis, fillets, booleans complexes, geometrie courbe reelle ou tout
 export imprimable, reste soumise a une nouvelle gate humaine.

@@ -319,7 +319,14 @@ def build_executable_asset_module_plan(config: InsertConfig) -> dict[str, Any]:
             "generated_modules": [],
             "placements": [],
             "rejected_modules": _plan_rejections_from_variants(variants),
-            "summary": _plan_summary(grid=None, generated_count=0, placed_count=0, rejected_count=0, placed_cell_count=0, free_cell_count_before_plan=None),
+            "summary": _plan_summary(
+                grid=None,
+                generated_count=0,
+                placed_count=0,
+                rejected_count=0,
+                placed_cell_count=0,
+                free_cell_count_before_plan=None,
+            ),
             "reasons": ["No recommended asset candidate variant is available."],
         }
 
@@ -422,6 +429,7 @@ def build_executable_asset_module_plan(config: InsertConfig) -> dict[str, Any]:
             rejected_count=len(rejected_modules),
             placed_cell_count=sum(placement["occupied_cells"] for placement in placements),
             free_cell_count_before_plan=free_cell_count_before_plan,
+            placements=placements,
         ),
         "reasons": [
             "Recommended asset candidate variant was converted into generated module metadata.",
@@ -653,10 +661,12 @@ def _plan_summary(
     rejected_count: int,
     placed_cell_count: int,
     free_cell_count_before_plan: int | None,
+    placements: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     cell_volume = grid.unit_size_mm.x * grid.unit_size_mm.y * grid.unit_size_mm.z if grid is not None else 0.0
     total_cells = grid.size_units.x * grid.size_units.y * grid.size_units.z if grid is not None else 0
     placed_volume = placed_cell_count * cell_volume
+    placement_summary = _placement_layer_summary(placements or [])
     return {
         "generated_module_count": generated_count,
         "placed_module_count": placed_count,
@@ -665,9 +675,31 @@ def _plan_summary(
         "placed_cell_count": placed_cell_count,
         "placed_cell_volume_mm3_approx": round(placed_volume, 4),
         "free_cell_count_before_plan": free_cell_count_before_plan,
+        **placement_summary,
     }
 
 
+def _placement_layer_summary(placements: list[dict[str, Any]]) -> dict[str, Any]:
+    height_values = {
+        round(placement["size_mm"]["z"], 4)
+        for placement in placements
+        if isinstance(placement.get("size_mm"), dict)
+    }
+    return {
+        "multi_layer_module_count": sum(
+            1
+            for placement in placements
+            if isinstance(placement.get("size_units"), dict)
+            and placement["size_units"].get("z", 0) > 1
+        ),
+        "z_placed_module_count": sum(
+            1
+            for placement in placements
+            if isinstance(placement.get("origin_units"), dict)
+            and placement["origin_units"].get("z", 0) > 0
+        ),
+        "height_variant_count": len(height_values),
+    }
 
 def _grid_cell_count(size: GridSize3D) -> int:
     return size.x * size.y * size.z

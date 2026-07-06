@@ -20,33 +20,35 @@ structurant, authentification absente ou refus de push direct.
 
 Statut : `required_before_next_fusion_geometry`.
 
-P8-M001/P8-M002 et P10-M008 sont termines dans le perimetre coeur Python pur,
-configuration, validation, rapports, placement grille abstrait et CAD IR metadata.
-P11-M001 est `fusion-validated` pour la generation Fusion compacte depuis
-placements grille. P7-M001 code la generation Fusion eclatee basique corrigee
-par composants uniques et occurrences compactes/eclatees liees. P7-M001V2 a
-confirme que les documents Part Design sont incompatibles ; l'add-in affiche
-maintenant `assembly document required`. P7-M001V3 a confirme que le renommage
-direct de `Occurrence.name` peut echouer ; l'add-in ne tente plus ce renommage.
-Le smoke test manuel Fusion P7-M001V4 doit etre realise dans un document
-Assembly-compatible avant statut `fusion-validated`. L'impression 3D reste non
-validee.
+P7-M001V4 est validee humainement dans Fusion : document Assembly-compatible,
+mode `compact_and_exploded`, composants sources partages par occurrences
+compactes/eclatees, message `Linked exploded occurrences: yes` et aucun
+renommage direct d'occurrence. P7-M001 est donc `fusion-validated`, avec
+`print-validated: false`.
 
-Action humaine requise avant toute mission qui genere reellement : grille 3D,
-layers, vue eclatee, demi-lune courbe, scoop interne, fillet/conge, fond arrondi,
-geometrie courbe, module composite ou export STL/3MF dans Fusion.
+P11-M002 est codee : l'exemple `simple_multilayer_grid_scene` produit une scene
+Fusion compacte + eclatee depuis `metadata.executable_asset_plan`, avec un module
+bas, un module plus haut sur deux unites Z et un placement explicite a `Z=1`.
+L'add-in affiche les compteurs multi-layer et conserve la strategie `Component`
+source + occurrences compactes/eclatees liees.
+
+Action humaine requise : smoke test Fusion `P11-M002V` avant toute nouvelle
+mission qui genere reellement de la grille 3D, des layers, des modules composites,
+une vue eclatee avancee, de la geometrie courbe, des exports STL/3MF ou une
+preparation d'impression. L'impression 3D reste non validee.
 
 ## Mission ready non gated
 
-Aucune mission non-gated supplementaire n'est recommandee apres `P7-M001`
-tant que le smoke test Fusion P7-M001V4 des occurrences liees dans un document Assembly-compatible n'est pas valide.
-La boucle asset-first produit maintenant candidats, variante recommandee, plan de
-modules concret, placement grille greedy borne, generation Fusion compacte
-validee et generation Fusion eclatee basique corrigee par occurrences liees pour inspection.
+Aucune mission non-gated supplementaire n'est recommandee apres `P11-M002` tant
+que le smoke test Fusion P11-M002V de la scene multi-layer compacte/eclatee n'est
+pas valide. La boucle asset-first produit maintenant candidats, variante
+recommandee, plan de modules concret, placement grille greedy borne, generation
+Fusion compacte validee, vue eclatee basique validee et scene multi-layer codee.
 
-Prochaine action recommandee : preparer une gate si l'on veut passer a un solveur
-complexe, a du backtracking, a une optimisation globale, a des modules composites
-ou a une generation Fusion volumetrique reelle.
+Prochaine action recommandee : executer le smoke test humain P11-M002V, puis
+preparer une gate si l'on veut passer a un solveur complexe, a du backtracking,
+a une optimisation globale, a des modules composites ou a une generation Fusion
+volumetrique plus avancee.
 
 ## Mission bloquee par gate
 
@@ -54,9 +56,9 @@ ou a une generation Fusion volumetrique reelle.
 
 `P10-SOLVER-GATE - Solveur complexe, backtracking ou optimisation globale`.
 
-`P7-M001V4 - Smoke test humain Fusion de la vue eclatee par occurrences liees, sans renommage direct d'occurrences, dans un document Assembly-compatible`.
+`P11-M002V - Smoke test humain Fusion de la scene multi-layer compacte/eclatee depuis simple_multilayer_grid_scene`.
 
-`P11-NEXT-GATE - Choisir le prochain elargissement produit apres vue compacte/eclatee`.
+`P11-NEXT-GATE - Choisir le prochain elargissement produit apres scene compacte/eclatee multi-layer`.
 
 - Capability : `C-FUSION-EXPLODED`, `C-COMPOSITE`, `C-SOLVER`, `C-GRID-3D`,
   `C-CALIBRATION` selon l'option choisie.

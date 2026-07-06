@@ -177,6 +177,46 @@ class AssetModelTests(unittest.TestCase):
         self.assertEqual(scene["metadata"]["executable_asset_plan"]["status"], "placed")
         self.assertEqual(scene["metadata"]["executable_asset_plan"]["placements"][0]["origin_units"], {"x": 1, "y": 0, "z": 0})
 
+    def test_builds_multilayer_executable_asset_plan(self) -> None:
+        config = load_config(ROOT / "examples" / "simple_multilayer_grid_scene.json")
+        layout = generate_basic_layout(config)
+
+        markdown = layout_to_markdown(config, layout)
+        payload = json.loads(layout_to_json(config, layout))
+        scene = build_blank_cad_scene(config, layout).to_dict()
+
+        self.assertEqual(validate_config(config), [])
+        plan = payload["executable_asset_plan"]
+        self.assertEqual(plan["status"], "placed")
+        self.assertEqual(plan["summary"]["generated_module_count"], 2)
+        self.assertEqual(plan["summary"]["placed_module_count"], 2)
+        self.assertEqual(plan["summary"]["multi_layer_module_count"], 1)
+        self.assertEqual(plan["summary"]["z_placed_module_count"], 1)
+        self.assertEqual(plan["summary"]["height_variant_count"], 2)
+        self.assertEqual(
+            plan["placements"][0]["origin_units"],
+            {"x": 1, "y": 0, "z": 0},
+        )
+        self.assertEqual(plan["placements"][0]["size_units"], {"x": 3, "y": 3, "z": 1})
+        self.assertEqual(plan["placements"][0]["size_mm"], {"x": 90, "y": 90, "z": 10})
+        self.assertEqual(
+            plan["placements"][1]["origin_units"],
+            {"x": 0, "y": 0, "z": 1},
+        )
+        self.assertEqual(plan["placements"][1]["size_units"], {"x": 2, "y": 2, "z": 2})
+        self.assertEqual(plan["placements"][1]["origin_mm"], {"x": 0, "y": 0, "z": 10})
+        self.assertEqual(plan["placements"][1]["size_mm"], {"x": 60, "y": 60, "z": 20})
+        self.assertIn("Multi-layer generated modules: 1", markdown)
+        self.assertIn("Generated modules with Z placement: 1", markdown)
+        self.assertEqual(
+            scene["metadata"]["executable_asset_plan"]["summary"]["multi_layer_module_count"],
+            1,
+        )
+        self.assertEqual(
+            scene["metadata"]["executable_asset_plan"]["placements"][1]["origin_units"],
+            {"x": 0, "y": 0, "z": 1},
+        )
+
     def test_rejects_unknown_asset_field(self) -> None:
         payload = _asset_payload()
         payload["assets"][0]["solver_hint"] = "not-yet"
