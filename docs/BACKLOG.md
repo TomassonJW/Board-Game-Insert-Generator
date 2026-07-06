@@ -218,16 +218,27 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Statut : `ready`.
 ## Phase 7 - Vue compacte / vue eclatee
 
-### P7-M001 - Ajouter une intention de vue eclatee dans la CAD IR
+### P7-M001 - Generer une vue eclatee Fusion basique
 
 - Capability : C-FUSION-EXPLODED, C-CAD-IR.
 - Milestone : M5 CAD inspection views.
-- Objectif : decrire positions de vue eclatee sans modifier la geometrie Fusion.
-- Livrable : contrat CAD IR additif et tests de serialisation.
-- Criteres d'acceptation : compatibilite `cad_ir.v0` preservee ou ADR si nouvelle version.
-- Tests : unitaires CAD IR, export CLI.
-- Gate : si contrat incompatible ou generation Fusion reelle.
-- Statut : `todo`.
+- Objectif : conserver la vue compacte et creer une seconde representation rectangulaire espacee a plat pour inspection.
+- Livrable : mode add-in `compact_and_exploded`, plan hors Fusion teste, ADR, documentation et procedure de smoke test manuel.
+- Criteres d'acceptation : Fusion ne recalcule pas le solveur ; bodies `exploded` nommes ; dimensions issues de la CAD IR ; coeur Python sans `adsk` ; validation manuelle requise.
+- Tests : unitaires hors Fusion, CLI/export CAD IR, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
+- Gate : validation humaine fournie le 2026-07-06 pour une vue eclatee basique uniquement.
+- Statut : `manual_validation_required`, generation codee.
+
+### P7-M001V - Valider manuellement la vue eclatee Fusion basique
+
+- Capability : C-FUSION-EXPLODED.
+- Milestone : M5 CAD inspection views.
+- Objectif : lancer l'add-in P7-M001 dans Fusion avec `simple_asset_executable_plan` exporte en CAD IR et verifier les bodies `exploded`.
+- Livrable : validation humaine Fusion avec message, noms, espacement et dimensions observees.
+- Criteres d'acceptation : vue compacte conservee, bodies `exploded` visibles a droite de la boite, dimensions conformes ou acceptables, aucun export STL/3MF.
+- Tests : smoke test manuel Fusion, aucune validation d'impression revendiquee.
+- Gate : action humaine requise.
+- Statut : `blocked`.
 
 ### P11-M001 - Generer une vue compacte Fusion depuis placements grille
 

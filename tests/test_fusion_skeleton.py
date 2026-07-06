@@ -13,6 +13,8 @@ from board_game_insert_generator.layout import generate_basic_layout
 from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     CAD_IR_PATH_OVERRIDE_FILENAME,
     DEFAULT_CAD_IR_INPUT_FILENAME,
+    EXPLODED_BLANK_OPERATION_KIND,
+    EXPLODED_VIEW_MODE_FILENAME,
     DOCUMENT_STATUS_READY,
     DOCUMENT_STATUS_ZERO_DOC,
     CAVITY_CUT_OPERATION_KIND,
@@ -21,6 +23,8 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     FINGER_NOTCH_WALL_FRONT,
     FINGER_NOTCH_WALL_LEFT,
     FINGER_NOTCH_WALL_RIGHT,
+    FUSION_GENERATION_MODE_COMPACT_AND_EXPLODED,
+    FUSION_GENERATION_MODE_COMPACT_ONLY,
     FUSION_EXTENT_NEGATIVE,
     FUSION_EXTENT_POSITIVE,
     FUSION_MANUAL_VALIDATION_REQUIRED,
@@ -36,6 +40,7 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     mm_to_cm,
     planned_operations_from_cad_ir,
     resolve_cad_ir_input_path,
+    resolve_generation_mode,
     validate_cad_ir_payload,
 )
 
@@ -200,6 +205,31 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn(CAD_IR_PATH_OVERRIDE_FILENAME, guidance)
         self.assertIn("export-cad-ir", guidance)
 
+    def test_resolves_default_generation_mode_to_compact_and_exploded(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            self.assertEqual(
+                resolve_generation_mode(Path(temp_dir)),
+                FUSION_GENERATION_MODE_COMPACT_AND_EXPLODED,
+            )
+
+    def test_resolves_compact_only_generation_mode_override(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            addin_dir = Path(temp_dir)
+            (addin_dir / EXPLODED_VIEW_MODE_FILENAME).write_text("compact_only\n", encoding="utf-8")
+
+            self.assertEqual(
+                resolve_generation_mode(addin_dir),
+                FUSION_GENERATION_MODE_COMPACT_ONLY,
+            )
+
+    def test_rejects_unknown_generation_mode_override(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            addin_dir = Path(temp_dir)
+            (addin_dir / EXPLODED_VIEW_MODE_FILENAME).write_text("explode_everything\n", encoding="utf-8")
+
+            with self.assertRaisesRegex(FusionSkeletonError, "Unsupported Fusion generation mode"):
+                resolve_generation_mode(addin_dir)
+
     def test_builds_generation_plan_from_engine_cad_ir(self) -> None:
         payload = _cad_ir_payload()
 
@@ -223,10 +253,14 @@ class FusionSkeletonTests(unittest.TestCase):
         plan = generation_plan_from_cad_ir(load_cad_ir_json(fixture_path))
 
         self.assertEqual(plan.project_name, "BGIG Fusion smoke fixture")
-        self.assertEqual(plan.created_object_count, 3)
+        self.assertEqual(plan.created_object_count, 5)
         self.assertEqual([blank.body_name for blank in plan.blanks], [
             "cards-main-01 rectangular blank",
             "dice-01 rectangular blank",
+        ])
+        self.assertEqual([blank.body_name for blank in plan.exploded_blanks], [
+            "cards-main-01 rectangular blank exploded",
+            "dice-01 rectangular blank exploded",
         ])
 
     def test_rejects_generation_without_rectangular_prism_operation(self) -> None:
@@ -264,7 +298,7 @@ class FusionSkeletonTests(unittest.TestCase):
 
         plan = generation_plan_from_cad_ir(payload)
 
-        self.assertEqual(plan.created_object_count, 4)
+        self.assertEqual(plan.created_object_count, 5)
         self.assertEqual(len(plan.cavity_cuts), 1)
         self.assertEqual(plan.cavity_cuts[0].cavity_id, "token-pocket")
         self.assertEqual(len(plan.finger_notch_cuts), 1)
@@ -303,7 +337,7 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(len(plan.blanks), 1)
         self.assertEqual(len(plan.grid_positioned_blanks), 1)
         self.assertEqual(len(plan.rejected_grid_modules), 0)
-        self.assertEqual(plan.created_object_count, 3)
+        self.assertEqual(plan.created_object_count, 5)
         grid_blank = plan.grid_positioned_blanks[0]
         self.assertEqual(grid_blank.role, "generated_asset_grid_blank")
         self.assertEqual(grid_blank.operation_kind, GRID_PLACED_BLANK_OPERATION_KIND)
@@ -324,6 +358,49 @@ class FusionSkeletonTests(unittest.TestCase):
         grid_blank = plan.grid_positioned_blanks[0]
         self.assertEqual(grid_blank.origin_mm.to_dict(), {"x": 30.0, "y": 0.0, "z": 10.0})
         self.assertEqual(grid_blank.size_mm.to_dict(), {"x": 30.0, "y": 30.0, "z": 10.0})
+
+    def test_builds_basic_exploded_view_from_compact_and_grid_blanks(self) -> None:
+        payload = _cad_ir_payload_from_example("simple_asset_executable_plan.json")
+
+        plan = generation_plan_from_cad_ir(payload)
+
+        self.assertEqual(plan.generation_mode, FUSION_GENERATION_MODE_COMPACT_AND_EXPLODED)
+        self.assertEqual(len(plan.exploded_blanks), 2)
+        compact_exploded = plan.exploded_blanks[0]
+        grid_exploded = plan.exploded_blanks[1]
+        self.assertEqual(compact_exploded.role, "exploded_view_blank")
+        self.assertEqual(compact_exploded.operation_kind, EXPLODED_BLANK_OPERATION_KIND)
+        self.assertEqual(compact_exploded.body_name, "manual-reference-bin-01 rectangular blank exploded")
+        self.assertEqual(compact_exploded.origin_mm.to_dict(), {"x": 140.0, "y": 0.0, "z": 0.0})
+        self.assertEqual(compact_exploded.size_mm.to_dict(), {"x": 29.2, "y": 29.2, "z": 9.0})
+        self.assertEqual(
+            grid_exploded.body_name,
+            "generated - asset-group-candidate - tokens - store - exact grid positioned rectangular blank exploded",
+        )
+        self.assertAlmostEqual(grid_exploded.origin_mm.x, 179.2)
+        self.assertEqual(grid_exploded.origin_mm.y, 0.0)
+        self.assertEqual(grid_exploded.origin_mm.z, 0.0)
+        self.assertEqual(grid_exploded.size_mm.to_dict(), {"x": 30.0, "y": 30.0, "z": 10.0})
+        self.assertEqual(plan.to_dict()["exploded_blanks"][1]["operation_kind"], EXPLODED_BLANK_OPERATION_KIND)
+
+    def test_compact_only_generation_mode_disables_exploded_view(self) -> None:
+        payload = _cad_ir_payload_from_example("simple_asset_executable_plan.json")
+
+        plan = generation_plan_from_cad_ir(
+            payload,
+            generation_mode=FUSION_GENERATION_MODE_COMPACT_ONLY,
+        )
+
+        self.assertEqual(len(plan.blanks), 1)
+        self.assertEqual(len(plan.grid_positioned_blanks), 1)
+        self.assertEqual(len(plan.exploded_blanks), 0)
+        self.assertEqual(plan.created_object_count, 3)
+
+    def test_rejects_unknown_generation_mode_for_generation_plan(self) -> None:
+        payload = _cad_ir_payload_from_example("simple_asset_executable_plan.json")
+
+        with self.assertRaisesRegex(FusionSkeletonError, "Unsupported Fusion generation mode"):
+            generation_plan_from_cad_ir(payload, generation_mode="explode_everything")
 
     def test_transports_refused_grid_modules_without_creating_grid_blank(self) -> None:
         payload = _cad_ir_payload_from_example("simple_asset_grouping.json")
@@ -511,7 +588,11 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("finger_notch_features_planned", source)
         self.assertIn("finger_notch_cuts", source)
         self.assertIn("grid_positioned_blanks", source)
+        self.assertIn("exploded_blanks", source)
         self.assertIn("Grid-positioned module bodies", source)
+        self.assertIn("Exploded module bodies", source)
+        self.assertIn("generated compact and exploded", source)
+        self.assertIn("resolve_generation_mode", source)
         self.assertIn("_xy_plane_for_z", source)
         self.assertIn("Simple top-open finger notch cuts", source)
         self.assertIn("top-open rectangular wall cut", source)

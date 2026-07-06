@@ -17,6 +17,15 @@ SUPPORTED_CAD_IR_SCHEMA_VERSION = "cad_ir.v0"
 SUPPORTED_UNITS = "mm"
 DEFAULT_CAD_IR_INPUT_FILENAME = "cad_ir_input.json"
 CAD_IR_PATH_OVERRIDE_FILENAME = "cad_ir_path.txt"
+EXPLODED_VIEW_MODE_FILENAME = "exploded_view_mode.txt"
+
+FUSION_GENERATION_MODE_COMPACT_ONLY = "compact_only"
+FUSION_GENERATION_MODE_COMPACT_AND_EXPLODED = "compact_and_exploded"
+SUPPORTED_FUSION_GENERATION_MODES = (
+    FUSION_GENERATION_MODE_COMPACT_ONLY,
+    FUSION_GENERATION_MODE_COMPACT_AND_EXPLODED,
+)
+DEFAULT_FUSION_GENERATION_MODE = FUSION_GENERATION_MODE_COMPACT_AND_EXPLODED
 
 DOCUMENT_STATUS_READY = "ready"
 DOCUMENT_STATUS_ZERO_DOC = "zero_doc"
@@ -26,6 +35,10 @@ CAVITY_CUT_OPERATION_KIND = "subtract_rectangular_cavity"
 CAVITY_FEATURE_OPERATION_KIND = "describe_cavity_feature"
 FINGER_NOTCH_CUT_OPERATION_KIND = "rectangular_finger_notch_cut"
 GRID_PLACED_BLANK_OPERATION_KIND = "create_grid_positioned_asset_blank"
+EXPLODED_BLANK_OPERATION_KIND = "create_exploded_rectangular_blank"
+EXPLODED_VIEW_MARGIN_MM = 20.0
+EXPLODED_VIEW_SPACING_MM = 10.0
+EXPLODED_VIEW_MAX_SOLID_COUNT = 200
 SUPPORTED_SIMPLE_FINGER_NOTCH_KINDS = (
     "finger_notch",
     "side_notch",
@@ -264,14 +277,23 @@ class FusionGenerationPlan:
     reference_box: FusionSolidPlan
     blanks: tuple[FusionSolidPlan, ...]
     grid_positioned_blanks: tuple[FusionSolidPlan, ...] = ()
+    exploded_blanks: tuple[FusionSolidPlan, ...] = ()
     rejected_grid_modules: tuple[FusionGridModuleRejection, ...] = ()
     cavity_cuts: tuple[FusionCavityCutPlan, ...] = ()
     finger_notch_cuts: tuple[FusionFingerNotchCutPlan, ...] = ()
+    generation_mode: str = DEFAULT_FUSION_GENERATION_MODE
     validation_status: str = FUSION_MANUAL_VALIDATION_REQUIRED
 
     @property
     def created_object_count(self) -> int:
-        return 1 + len(self.blanks) + len(self.grid_positioned_blanks) + len(self.cavity_cuts) + len(self.finger_notch_cuts)
+        return (
+            1
+            + len(self.blanks)
+            + len(self.grid_positioned_blanks)
+            + len(self.exploded_blanks)
+            + len(self.cavity_cuts)
+            + len(self.finger_notch_cuts)
+        )
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -279,9 +301,11 @@ class FusionGenerationPlan:
             "reference_box": self.reference_box.to_dict(),
             "blanks": [blank.to_dict() for blank in self.blanks],
             "grid_positioned_blanks": [blank.to_dict() for blank in self.grid_positioned_blanks],
+            "exploded_blanks": [blank.to_dict() for blank in self.exploded_blanks],
             "rejected_grid_modules": [module.to_dict() for module in self.rejected_grid_modules],
             "cavity_cuts": [cut.to_dict() for cut in self.cavity_cuts],
             "finger_notch_cuts": [cut.to_dict() for cut in self.finger_notch_cuts],
+            "generation_mode": self.generation_mode,
             "validation_status": self.validation_status,
         }
 
@@ -503,7 +527,29 @@ def planned_operations_from_cad_ir(payload: Any) -> tuple[FusionOperationPlan, .
     return tuple(planned_operations)
 
 
-def generation_plan_from_cad_ir(payload: Any) -> FusionGenerationPlan:
+def resolve_generation_mode(
+    addin_dir: str | Path,
+    mode_filename: str = EXPLODED_VIEW_MODE_FILENAME,
+) -> str:
+    """Resolve the optional local Fusion generation mode."""
+
+    mode_path = Path(addin_dir) / mode_filename
+    if not mode_path.is_file():
+        return DEFAULT_FUSION_GENERATION_MODE
+
+    configured_mode = _first_path_value(mode_path)
+    if configured_mode is None:
+        raise FusionSkeletonError(
+            f"Fusion generation mode file is empty: {mode_path}. "
+            f"Delete it or use {DEFAULT_FUSION_GENERATION_MODE!r}."
+        )
+    return _validated_generation_mode(configured_mode)
+
+
+def generation_plan_from_cad_ir(
+    payload: Any,
+    generation_mode: str = DEFAULT_FUSION_GENERATION_MODE,
+) -> FusionGenerationPlan:
     """Build the first executable Fusion generation plan from CAD IR.
 
     The plan only copies resolved CAD IR dimensions. It never computes layout,
@@ -511,6 +557,7 @@ def generation_plan_from_cad_ir(payload: Any) -> FusionGenerationPlan:
     """
 
     validated_payload = validate_cad_ir_payload(payload)
+    generation_mode = _validated_generation_mode(generation_mode)
     metadata = validated_payload.get("metadata", {})
     project_name = (
         metadata.get("project_name")
@@ -600,16 +647,101 @@ def generation_plan_from_cad_ir(payload: Any) -> FusionGenerationPlan:
         reference_box,
         blanks,
     )
+    exploded_blanks = _exploded_view_blanks(
+        reference_box,
+        [*blanks, *grid_positioned_blanks],
+        generation_mode,
+    )
+    _validate_unique_body_names([*blanks, *grid_positioned_blanks, *exploded_blanks])
 
     return FusionGenerationPlan(
         project_name=project_name,
         reference_box=reference_box,
         blanks=tuple(blanks),
         grid_positioned_blanks=tuple(grid_positioned_blanks),
+        exploded_blanks=tuple(exploded_blanks),
         rejected_grid_modules=tuple(rejected_grid_modules),
         cavity_cuts=tuple(cavity_cuts),
         finger_notch_cuts=tuple(finger_notch_cuts),
+        generation_mode=generation_mode,
     )
+
+
+
+def _exploded_view_blanks(
+    reference_box: FusionSolidPlan,
+    source_blanks: list[FusionSolidPlan],
+    generation_mode: str,
+) -> list[FusionSolidPlan]:
+    if generation_mode == FUSION_GENERATION_MODE_COMPACT_ONLY:
+        return []
+    if generation_mode != FUSION_GENERATION_MODE_COMPACT_AND_EXPLODED:
+        raise FusionSkeletonError(f"Unsupported Fusion generation mode {generation_mode!r}.")
+    if len(source_blanks) > EXPLODED_VIEW_MAX_SOLID_COUNT:
+        raise FusionSkeletonError(
+            "Basic exploded view refuses more than "
+            f"{EXPLODED_VIEW_MAX_SOLID_COUNT} rectangular bodies."
+        )
+
+    row_width_limit = max(
+        reference_box.size_mm.x,
+        max((blank.size_mm.x for blank in source_blanks), default=0.0),
+    )
+    start_x = reference_box.origin_mm.x + reference_box.size_mm.x + EXPLODED_VIEW_MARGIN_MM
+    current_x = start_x
+    current_y = reference_box.origin_mm.y
+    row_height = 0.0
+    column = 0
+    exploded: list[FusionSolidPlan] = []
+
+    for source in source_blanks:
+        _validate_positive_solid_dimensions(source, f"exploded source {source.body_name}")
+        used_width = current_x - start_x
+        if column > 0 and used_width + source.size_mm.x > row_width_limit:
+            column = 0
+            current_x = start_x
+            current_y += row_height + EXPLODED_VIEW_SPACING_MM
+            row_height = 0.0
+
+        exploded.append(
+            FusionSolidPlan(
+                cad_id=_fusion_name(f"exploded:{source.cad_id}"),
+                component_name=_fusion_name(f"Exploded {source.component_name}"),
+                body_name=_fusion_name(f"{source.body_name} exploded"),
+                origin_mm=FusionVectorMm(current_x, current_y, reference_box.origin_mm.z),
+                size_mm=source.size_mm,
+                role="exploded_view_blank",
+                printable=source.printable,
+                operation_kind=EXPLODED_BLANK_OPERATION_KIND,
+            )
+        )
+        current_x += source.size_mm.x + EXPLODED_VIEW_SPACING_MM
+        row_height = max(row_height, source.size_mm.y)
+        column += 1
+
+    return exploded
+
+
+def _validated_generation_mode(mode: str) -> str:
+    if mode not in SUPPORTED_FUSION_GENERATION_MODES:
+        raise FusionSkeletonError(
+            f"Unsupported Fusion generation mode {mode!r}; expected one of "
+            f"{', '.join(SUPPORTED_FUSION_GENERATION_MODES)}."
+        )
+    return mode
+
+
+def _validate_unique_body_names(solids: list[FusionSolidPlan]) -> None:
+    seen: set[str] = set()
+    for solid in solids:
+        if solid.body_name in seen:
+            raise FusionSkeletonError(f"Fusion body name conflict: {solid.body_name!r}.")
+        seen.add(solid.body_name)
+
+
+def _validate_positive_solid_dimensions(solid: FusionSolidPlan, label: str) -> None:
+    if solid.size_mm.x <= 0 or solid.size_mm.y <= 0 or solid.size_mm.z <= 0:
+        raise FusionSkeletonError(f"CAD IR {label} dimensions must be greater than zero.")
 
 
 

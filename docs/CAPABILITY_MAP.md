@@ -72,7 +72,7 @@ Chaine de pilotage :
 | C-COMPOSITE | Composite modules | Modular printable bodies | `planned` | M9 Composite modules | Gate modules composites |
 | C-CAD-IR | CAD IR | CAD generation pipeline | `implemented-cad-ir` | M3 CAD pipeline | Gate si contrat incompatible |
 | C-FUSION-COMPACT | Fusion compact view | CAD generation pipeline | `fusion-validated` | M3 CAD pipeline / M7 Volumetric planner | Blanks rectangulaires valides; vue compacte grille P11-M001 validee manuellement dans Fusion, print-validated: false |
-| C-FUSION-EXPLODED | Fusion exploded view | CAD generation pipeline | `designed` | M5 CAD inspection views | Validation Fusion manuelle |
+| C-FUSION-EXPLODED | Fusion exploded view | CAD generation pipeline | `implemented-fusion` | M5 CAD inspection views | P7-M001 code une vue eclatee basique a tester manuellement dans Fusion; print-validated: false |
 | C-FUSION-CAVITIES | Fusion cavities | CAD generation pipeline | `fusion-validated` | M5 CAD cavities | Cavites rectangulaires validees Fusion, print-validated: false |
 | C-FILLETS | Fillets and finger notches | CAD generation pipeline | `fusion-validated` | M5 CAD ergonomic features | Encoche rectangulaire top-open validee Fusion, print-validated: false ; courbes/fillets bloques |
 | C-SOLVER | Solver and scoring | Volumetric layout | `implemented-core` | M10 Semi-automatic solver | Variant comparison P10-M002 report-only; raisons de rejet structurees P10-M003; module_candidates P10-M004; variante recommandee P10-M005; grouping borne P10-M006; plan concret greedy P10-M008; gate architecture si optimiseur majeur |

@@ -125,6 +125,7 @@ La cible Fusion actuelle a commence par des blanks rectangulaires, ajoute les ca
 - aucun export STL/3MF ;
 - aucun algorithme d'optimisation nouveau.
 - depuis P11-M001, les modules generes par `metadata.executable_asset_plan` peuvent aussi etre crees comme bodies rectangulaires positionnes par `origin_mm` / `size_mm` de placement grille.
+- depuis P7-M001, l'add-in peut creer une vue eclatee basique sous forme de copies rectangulaires `exploded`, espacees a droite de la boite pour inspection.
 
 
 ## Coupes rectangulaires P6-M001
@@ -222,6 +223,32 @@ de blank dont un module asset-first positionne par grille, et les dimensions
 comme conformes ou acceptables. Cette validation ne vaut pas validation
 d'impression 3D.
 
+
+## Vue eclatee basique P7-M001
+
+Depuis P7-M001, l'add-in peut creer une vue eclatee basique en plus de la vue
+compacte.
+
+Convention retenue :
+
+- le mode local par defaut est `compact_and_exploded` ;
+- un fichier optionnel `exploded_view_mode.txt` peut contenir `compact_only` pour
+  revenir au comportement compact seul ;
+- toute autre valeur de mode est refusee avant generation ;
+- les bodies eclates sont des copies rectangulaires des blanks CAD IR et des
+  modules asset-first places par grille ;
+- les noms de bodies recoivent le suffixe `exploded` ;
+- l'origine exploded est une grille 2D simple placee a droite de la boite, avec
+  marge et espacement fixes ;
+- les dimensions restent celles de la CAD IR ;
+- aucune cavite, encoche, courbe, fillet, module composite, export ou solveur
+  supplementaire n'est ajoute a la vue eclatee ;
+- la vue compacte existante reste generee.
+
+Validation : le plan est teste hors Fusion. L'execution reelle reste
+`manual validation required` tant que Thomas n'a pas realise le smoke test
+P7-M001V.
+
 ## Vue compacte et vue eclatee
 
 La strategie long terme distingue deux sorties Fusion inspectables :
@@ -231,14 +258,14 @@ La strategie long terme distingue deux sorties Fusion inspectables :
 - `exploded view` : modules repartis a plat ou decales, utile pour inspection,
   nommage, preparation d'exports futurs et documentation.
 
-La vue compacte existe aujourd'hui seulement pour les blanks rectangulaires
-simples. La vue eclatee est une intention documentee dans
-`docs/EXPLODED_VIEW_STRATEGY.md` ; elle ne doit pas etre generee sans mission et
-validation dediees.
+La vue compacte existe pour les blanks rectangulaires simples et pour les
+modules asset-first places par grille. La vue eclatee basique existe maintenant
+comme aide d'inspection, mais reste a valider manuellement dans Fusion.
 
-Fusion ne doit pas inventer les positions compactes ou eclatees. Elles devront
-venir du moteur ou de la CAD IR, afin que le layout, les tolerances et les
-metadonnees restent testables hors Fusion.
+Fusion ne doit pas inventer les positions compactes. Pour P7-M001 uniquement,
+l'add-in peut calculer une disposition eclatee de presentation a partir des
+volumes deja resolus dans la CAD IR ; cette disposition ne modifie pas le layout
+compact, les tolerances ou les decisions moteur.
 ## Choix API Fusion P4-M003
 
 Apres verification de la documentation officielle Autodesk, l'approche retenue

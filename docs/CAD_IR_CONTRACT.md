@@ -263,7 +263,9 @@ Le contrat V0 est valide par tests unitaires :
 La validation automatisee ne couvre pas l'execution reelle dans Fusion 360, les
 exports STL/3MF ou l'impression reelle. Depuis P11-M001, elle couvre aussi le
 plan de bodies asset-first positionnes par grille, y compris conversion X/Y/Z,
-collisions manifestes, sortie de boite et refus transportes.
+collisions manifestes, sortie de boite et refus transportes. Depuis P7-M001,
+elle couvre aussi le plan de bodies `exploded`, le mode `compact_only` et le
+rejet d'un mode de generation inconnu.
 
 ## Gate suivante
 
@@ -277,8 +279,9 @@ d'erreur Fusion.
 `P6-M001` execute les cavites rectangulaires simples depuis
 `subtract_rectangular_cavity`, `P6-M002` execute les encoches simples de paroi
 depuis `describe_cavity_feature`, et `P11-M001` execute la vue compacte issue des
-placements grille asset-first. Ces chemins sont `fusion-validated`, mais restent
-`print-validated: false`. Toute extension Fusion au-dela de ces rectangles,
-notamment vue eclatee, modules composites, fonds arrondis, fillets, booleans
-complexes, geometrie courbe reelle ou tout export imprimable, reste soumise a une
-nouvelle gate humaine.
+placements grille asset-first. `P7-M001` code une vue eclatee basique comme
+copies rectangulaires d'inspection, encore `manual validation required`. Les
+chemins deja valides restent `print-validated: false`. Toute extension Fusion
+au-dela de ces rectangles, notamment vue eclatee avancee, modules composites,
+fonds arrondis, fillets, booleans complexes, geometrie courbe reelle ou tout
+export imprimable, reste soumise a une nouvelle gate humaine.

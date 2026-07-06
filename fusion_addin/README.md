@@ -16,8 +16,9 @@ code aussi les cavites rectangulaires simples depuis `subtract_rectangular_cavit
 Depuis `P6-M002`, il code les encoches simples de paroi depuis
 `describe_cavity_feature`, sous forme de coupes rectangulaires. Depuis
 `P11-M001`, il code aussi la vue compacte de modules asset-first positionnes par
-`metadata.executable_asset_plan`. Cette generation compacte reste a inspecter
-manuellement dans Fusion avant d'etre consideree validee.
+`metadata.executable_asset_plan`. Depuis `P7-M001`, il code aussi une vue
+eclatee basique de copies rectangulaires `exploded`, a tester manuellement dans
+Fusion avant validation.
 
 Ce que l'add-in cree maintenant :
 
@@ -28,6 +29,7 @@ Ce que l'add-in cree maintenant :
 - une coupe rectangulaire verticale par operation `subtract_rectangular_cavity` ;
 - une coupe rectangulaire de paroi par encoche simple supportee ;
 - un body rectangulaire par module asset-first place par grille, si la CAD IR contient `metadata.executable_asset_plan.placements` ;
+- une copie rectangulaire `exploded` par blank/module place quand le mode `compact_and_exploded` est actif ;
 - des noms lisibles pour sketches, features et bodies.
 
 Ce que l'add-in ne cree pas :
@@ -53,6 +55,8 @@ Ce que l'add-in ne cree pas :
   par defaut par l'add-in.
 - `BoardGameInsertGenerator/cad_ir_path.txt` : fichier optionnel ignore par Git,
   permettant de pointer vers une CAD IR JSON exportee ailleurs.
+- `BoardGameInsertGenerator/exploded_view_mode.txt` : fichier optionnel ignore par
+  Git, permettant de choisir `compact_and_exploded` ou `compact_only`.
 
 ## Installation locale
 
@@ -64,6 +68,7 @@ BoardGameInsertGenerator/
   BoardGameInsertGenerator.manifest
   cad_ir_input.json
   cad_ir_path.txt  # optionnel, local
+  exploded_view_mode.txt  # optionnel, local
   fusion_skeleton.py
 ```
 
@@ -142,7 +147,9 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator export-cad-ir examples/simple_asset_executable_plan.json --output $env:TEMP\bgig-simple-asset-executable-plan.cad-ir.json
 ```
 
-Pointer ensuite `cad_ir_path.txt` vers ce fichier.
+Pointer ensuite `cad_ir_path.txt` vers ce fichier. Par defaut, P7-M001 genere
+aussi la vue eclatee basique ; pour revenir au compact seul, creer
+`exploded_view_mode.txt` avec `compact_only`.
 
 Pour tester les cavites rectangulaires P6-M001, generer plutot une CAD IR de
 tray :
@@ -228,9 +235,25 @@ Procedure :
     - position attendue du body asset-first : origine `X 30.0 mm`, `Y 0.0 mm`,
       `Z 0.0 mm` ;
     - dimensions attendues du body asset-first : `30.0 x 30.0 x 10.0 mm` ;
-    - verifier que Fusion n'a pas cree de vue eclatee, fillet, fond arrondi,
-      module composite ou export STL/3MF.
-14. Noter tout ecart, message d'erreur ou comportement Zero Doc dans un futur log
+    - verifier que les bodies compacts restent presents et aux dimensions attendues.
+14. Pour le smoke test P7-M001, garder la meme CAD IR
+    `examples/simple_asset_executable_plan.json`, laisser le mode par defaut
+    `compact_and_exploded`, relancer l'add-in et verifier :
+    - message final : `Generation mode: compact_and_exploded`,
+      `Exploded module bodies planned: 2` et `Exploded module bodies: 2` ;
+    - body compact manuel : `manual-reference-bin-01 rectangular blank` ;
+    - body compact asset-first : `generated - asset-group-candidate - tokens - store - exact grid positioned rectangular blank` ;
+    - bodies exploded attendus :
+      - `manual-reference-bin-01 rectangular blank exploded` ;
+      - `generated - asset-group-candidate - tokens - store - exact grid positioned rectangular blank exploded` ;
+    - origine attendue du premier body exploded : `X 140.0 mm`, `Y 0.0 mm`,
+      `Z 0.0 mm` ;
+    - origine attendue du body asset-first exploded : `X 179.2 mm`, `Y 0.0 mm`,
+      `Z 0.0 mm` ;
+    - dimensions attendues du body asset-first exploded : `30.0 x 30.0 x 10.0 mm` ;
+    - verifier que Fusion n'a pas cree de fillet, fond arrondi, module composite
+      ou export STL/3MF.
+15. Noter tout ecart, message d'erreur ou comportement Zero Doc dans un futur log
     de validation.
 
 Ce smoke test valide uniquement la creation CAD minimale dans Fusion. Il utilise
@@ -264,6 +287,7 @@ La conversion actuelle stabilisee :
 - cree des coupes rectangulaires verticales simples pour `subtract_rectangular_cavity` ;
 - cree des coupes rectangulaires de paroi simples pour les encoches supportees ;
 - cree des bodies rectangulaires compacts pour les modules generes asset-first deja places par la CAD IR ;
+- cree des copies rectangulaires `exploded` espacees pour inspection quand le mode le demande ;
 - marque la validation Fusion comme manuelle.
 
 Toute mission suivante qui elargit le perimetre Fusion, notamment vers demi-lunes

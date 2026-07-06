@@ -29,6 +29,7 @@ Thumbs.db
 
 # Fusion 360 / CAD generated artifacts
 fusion_addin/BoardGameInsertGenerator/cad_ir_path.txt
+fusion_addin/BoardGameInsertGenerator/exploded_view_mode.txt
 *.f3d
 *.f3z
 *.step

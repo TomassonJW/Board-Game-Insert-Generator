@@ -112,6 +112,10 @@ Tests, cartes backlog ou gates humaines a preparer.
   ordre de retrait et surfaces de support abstraites.
 - `ADR-0018-asset-first-schema-target.md` - schema cible asset-first documente
   avant activation du loader.
+- `ADR-0019-fusion-compact-grid-placement.md` - consommation Fusion compacte des
+  placements grille asset-first.
+- `ADR-0020-fusion-basic-exploded-view.md` - vue eclatee Fusion basique comme
+  duplication d'inspection.
 
 ## Regles de maintenance
 

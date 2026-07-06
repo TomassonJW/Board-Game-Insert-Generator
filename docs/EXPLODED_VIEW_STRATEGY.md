@@ -2,36 +2,71 @@
 
 ## Objectif
 
-Fusion devra a terme produire deux vues utiles : une vue compacte dans la boite et
-une vue eclatee ou repartie a plat pour inspecter, nommer, mesurer et exporter les
-modules.
+Fusion doit produire deux vues utiles : une vue compacte dans la boite et une vue
+eclatee ou repartie a plat pour inspecter, nommer, mesurer et preparer de futurs
+exports.
 
 ## Etat actuel
 
-- L'add-in Fusion genere des blanks rectangulaires dans le composant racine.
-- La CAD IR conserve les noms et dimensions deja resolus.
-- Aucune vue eclatee n'est generee.
+- La vue compacte P11-M001 est `fusion-validated` pour les modules asset-first
+  positionnes par grille X/Y/Z.
+- P7-M001 code une premiere vue eclatee basique dans l'add-in Fusion.
+- Cette vue eclatee duplique les bodies rectangulaires deja planifies et les
+  espace a droite de la boite sur une grille 2D deterministe.
+- La validation Fusion manuelle P7-M001V reste requise.
+- Aucun export STL/3MF et aucune validation d'impression ne sont revendiques.
 
-## Strategie cible
+## Strategie P7-M001
+
+La vue eclatee basique est une aide d'inspection, pas une nouvelle logique
+metier.
+
+Invariants :
+
+- la vue compacte reste generee ;
+- Fusion ne recalcule ni solveur, ni placements compacts, ni clearances, ni
+  tolerances ;
+- les dimensions exploded sont recopiees depuis la CAD IR ;
+- les bodies exploded recoivent un suffixe `exploded` ;
+- la disposition exploded est locale a l'add-in, deterministe et uniquement
+  visuelle ;
+- les cavites, encoches et features restent portees par la vue compacte supportee
+  existante ;
+- aucune geometrie courbe, fillet, module composite ou export n'est ajoute.
+
+## Mode local
+
+Par defaut, l'add-in utilise :
+
+```text
+compact_and_exploded
+```
+
+Un fichier optionnel local, ignore par Git, peut etre place dans le dossier de
+l'add-in :
+
+```text
+BoardGameInsertGenerator/exploded_view_mode.txt
+```
+
+Valeurs supportees :
+
+- `compact_and_exploded` : genere la vue compacte et la vue eclatee basique ;
+- `compact_only` : genere uniquement la vue compacte.
+
+Toute autre valeur est refusee avant generation.
+
+## Strategie cible future
 
 - `compact_view` : modules places selon le layout reel dans la boite.
-- `exploded_view` : modules separes avec espacement lisible, labels et axes stables.
-- `inspection_metadata` : liens entre module, asset, cavite, tolerance et operation.
+- `exploded_view` : modules separes avec espacement lisible, labels et axes
+  stables.
+- `inspection_metadata` : liens entre module, asset, cavite, tolerance et
+  operation.
 - `export_group` : future selection par module ou par layer.
-
-## Invariants
-
-- La vue eclatee ne doit pas modifier les dimensions ou tolerances.
-- Le moteur ou la CAD IR doivent fournir les positions de vue ; Fusion ne les invente pas.
-- Les exports STL/3MF restent bloques par gate.
-
-## Prochaines missions possibles
-
-1. `P7-M001 - Ajouter une intention de vue eclatee dans la CAD IR`.
-2. `P7-M002 - Generer une vue Fusion eclatee planned-only`.
-3. `P7-M003 - Generer une vue eclatee Fusion de blanks uniquement`.
 
 ## Gates
 
-- Gate Fusion si la vue cree de nouveaux composants, sketches ou bodies.
-- Gate export avant toute production STL/3MF.
+- Smoke test humain P7-M001V avant statut `fusion-validated`.
+- Nouvelle gate avant vue eclatee avancee, composants enfants Fusion, modules
+  composites, export STL/3MF ou preparation d'impression.

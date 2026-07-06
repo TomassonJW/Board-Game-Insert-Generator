@@ -1,10 +1,9 @@
 """Fusion 360 add-in entry point for Board Game Insert Generator.
 
-P11-M001 creates rectangular blank bodies, grid-positioned generated asset
-modules, top-open rectangular cavity cuts, and simple rectangular front
-finger-notch cuts from a serialized CAD IR. Fusion consumes already resolved CAD
-IR dimensions and must not recalculate layout, cavities, clearances, placements,
-or tolerances.
+P7-M001 creates compact rectangular blank bodies plus a basic exploded
+inspection view from a serialized CAD IR. Fusion consumes already resolved CAD IR
+dimensions and must not recalculate layout, cavities, clearances, placements, or
+tolerances.
 """
 
 from __future__ import annotations
@@ -29,6 +28,7 @@ try:
         load_cad_ir_json,
         mm_to_cm,
         resolve_cad_ir_input_path,
+        resolve_generation_mode,
     )
 except ImportError:  # pragma: no cover - Fusion may load the file as a script.
     from fusion_skeleton import (  # type: ignore[no-redef]
@@ -48,6 +48,7 @@ except ImportError:  # pragma: no cover - Fusion may load the file as a script.
         load_cad_ir_json,
         mm_to_cm,
         resolve_cad_ir_input_path,
+        resolve_generation_mode,
     )
 
 try:
@@ -85,8 +86,9 @@ def run(context) -> None:  # noqa: ANN001 - Fusion controls the signature.
     try:
         addin_dir = Path(__file__).resolve().parent
         cad_ir_path = resolve_cad_ir_input_path(addin_dir)
+        generation_mode = resolve_generation_mode(addin_dir)
         payload = load_cad_ir_json(cad_ir_path)
-        generation_plan = generation_plan_from_cad_ir(payload)
+        generation_plan = generation_plan_from_cad_ir(payload, generation_mode=generation_mode)
         design = _active_design(_app)
         result = _generate_from_plan(design, generation_plan)
     except FusionSkeletonError as exc:
@@ -101,14 +103,17 @@ def run(context) -> None:  # noqa: ANN001 - Fusion controls the signature.
         return
 
     _show_message(
-        "Board Game Insert Generator generated compact CAD IR scene.\n"
+        "Board Game Insert Generator generated compact and exploded CAD IR scene.\n"
         f"Project: {generation_plan.project_name}\n"
         f"Input CAD IR: {cad_ir_path}\n"
+        f"Generation mode: {generation_plan.generation_mode}\n"
         f"Reference outlines: {result['reference_outlines']}\n"
         f"CAD IR module blanks planned: {len(generation_plan.blanks)}\n"
         f"Grid-positioned asset modules planned: {len(generation_plan.grid_positioned_blanks)}\n"
+        f"Exploded module bodies planned: {len(generation_plan.exploded_blanks)}\n"
         f"Blank bodies: {result['blank_bodies']}\n"
         f"Grid-positioned module bodies: {result['grid_positioned_module_bodies']}\n"
+        f"Exploded module bodies: {result['exploded_module_bodies']}\n"
         f"Grid-positioned modules refused: {len(generation_plan.rejected_grid_modules)}\n"
         f"Rectangular cavity cuts: {result['cavity_cuts']}\n"
         f"Simple finger notch features planned: {result['finger_notch_features_planned']}\n"
@@ -116,6 +121,7 @@ def run(context) -> None:  # noqa: ANN001 - Fusion controls the signature.
         f"Simple top-open finger notch cuts: {result['finger_notch_cuts']}\n"
         "Finger notch topology: top-open rectangular wall cut.\n"
         "Compact placement source: CAD IR metadata.executable_asset_plan.\n"
+        "Exploded placement source: add-in deterministic inspection grid; dimensions from CAD IR.\n"
         "Creation scope: root component, compatible with Part Design documents.\n"
         "Status: manual validation required in Fusion 360."
     )
@@ -175,11 +181,18 @@ def _generate_from_plan(design, plan: FusionGenerationPlan) -> dict[str, int]:  
         finger_notch_sketch_count += result["sketches"]
         finger_notch_cut_count += result["cuts"]
 
+    exploded_body_count = 0
+    for blank in plan.exploded_blanks:
+        _create_rectangular_blank(root_component, blank)
+        exploded_body_count += 1
+
     return {
         "reference_outlines": 1,
         "blank_bodies": len(created_bodies),
         "cad_ir_module_blank_bodies": len(plan.blanks),
         "grid_positioned_module_bodies": grid_positioned_body_count,
+        "exploded_module_bodies": exploded_body_count,
+        "total_rectangular_bodies": len(created_bodies) + exploded_body_count,
         "cavity_cuts": cavity_cut_count,
         "finger_notch_features_planned": len(plan.finger_notch_cuts),
         "finger_notch_sketches": finger_notch_sketch_count,

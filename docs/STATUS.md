@@ -227,9 +227,11 @@ La mission `P11-M001` code la premiere vue compacte Fusion depuis `metadata.exec
 
 La validation humaine `P11-M001V` confirmee le 2026-07-06 documente le smoke test Fusion : add-in recopie dans le dossier Fusion AddIns, CAD IR `simple_asset_executable_plan` chargee, message conforme (`CAD IR module blanks planned: 1`, `Grid-positioned asset modules planned: 1`, `Blank bodies: 2`, `Grid-positioned module bodies: 1`, `Grid-positioned modules refused: 0`), module asset-first positionne par la grille, position `X 30.0 mm`, `Y 0.0 mm`, `Z 0.0 mm` conforme ou acceptable, taille `30.0 x 30.0 x 10.0 mm` conforme ou acceptable. Statut : `fusion-validated`, `print-validated: false`.
 
+La mission `P7-M001` code une premiere vue eclatee Fusion basique : l'add-in conserve la vue compacte et cree des copies rectangulaires `exploded` des blanks CAD IR et modules asset-first places, espacees a droite de la boite sur une grille 2D deterministe. Les dimensions viennent de la CAD IR, aucune tolerance ou placement compact n'est recalcule dans Fusion. Statut : generation codee, `manual validation required` dans Fusion, `print-validated: false`.
+
 ## Phase active
 
-Phase active : **P11 compact Fusion view validee / gate avant elargissement produit**.
+Phase active : **P7 vue eclatee Fusion codee / smoke test humain requis**.
 
 Etat : le pipeline P4 reste stable pour les blanks rectangulaires Fusion. La
 vague P5 est terminee cote moteur Python pur, configuration, rapports et CAD IR.
@@ -239,15 +241,16 @@ simples de paroi top-open, avec `print-validated: false`. P6-M003 est termine
 cote taxonomie abstraite CAD-agnostic. P8-M001 et P8-M002 sont termines cote grille
 volumetrique declarative, layers, reservations, supports abstraits et metadata CAD IR.
 P11-M001 est `fusion-validated` pour la vue compacte issue du plan asset-first
-et des placements grille X/Y/Z, avec `print-validated: false`.
+et des placements grille X/Y/Z, avec `print-validated: false`. P7-M001 est
+`implemented-fusion` pour une vue eclatee basique, avec validation Fusion
+manuelle requise.
 La North Star cible un
 generateur volumetrique asset-first, pilote par capabilities.
 
-Prochaine action recommandee : preparer une gate produit avant toute nouvelle
-generation Fusion reelle, vue eclatee, module composite, solveur plus automatique
-ou backtracking. Une nouvelle gate humaine est requise avant toute generation
-Fusion reelle liee a la grille 3D, aux layers, aux vues eclatees ou aux features
-avancees.
+Prochaine action recommandee : smoke test humain Fusion P7-M001V avant toute
+nouvelle vue eclatee avancee, module composite, solveur plus automatique, export
+ou geometrie Fusion supplementaire. Une nouvelle gate humaine est requise avant
+toute extension au-dela de la duplication rectangulaire exploded basique.
 
 ## Implemente
 
@@ -317,6 +320,8 @@ avancees.
 - Plan executable P10-M008 depuis variante asset recommandee : modules generes abstraits, placement greedy grille et metadata CAD IR.
 - Vue compacte Fusion P11-M001 depuis placements grille : `fusion-validated`,
   `print-validated: false`.
+- Vue eclatee Fusion P7-M001 basique : codee comme copies rectangulaires
+  `exploded`, `manual validation required`, `print-validated: false`.
 - Criteres de scoring P10-M001 documentes, sans solveur executable.
 - Comparaison P10-M002 report-only de variantes deterministes existantes dans les rapports.
 - Raisons de rejet P10-M003 structurees et actionnables pour les variantes non generables.
@@ -403,12 +408,11 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant `P11-M001 - Vue compacte Fusion depuis placements grille` :
+Derniere verification pendant `P7-M001 - Vue eclatee Fusion basique` :
 
-- `python -m unittest discover -s tests` : OK, 138 tests passes.
-- CLI Markdown/JSON/export CAD IR : OK sur les exemples minimaux requis, dont `simple_asset_executable_plan.json`.
-- `python -m board_game_insert_generator examples/simple_asset_executable_plan.json --format json` : OK, `executable_asset_plan.status = placed` et `placed_module_count = 1`.
-- `python -m board_game_insert_generator export-cad-ir examples/simple_asset_executable_plan.json --output tmp_validation/simple_asset_executable_plan.cad-ir.json` : OK, schema `cad_ir.v0`, metadata `executable_asset_plan`, 1 composant.
+- `python -m unittest discover -s tests` : OK, 144 tests passes.
+- CLI Markdown/JSON/export CAD IR : OK sur `simple_box.json`, `simple_tray.json`, `simple_finger_notch_tray.json`, `simple_3d_grid.json` et `simple_asset_executable_plan.json`.
+- `python -m board_game_insert_generator export-cad-ir examples/simple_asset_executable_plan.json --output <temp>/bgig-simple_asset_executable_plan-p7.cad-ir.json` : OK, fichier CAD IR genere pour smoke test Fusion.
 - `git diff --check` : OK.
 - `rg -n "adsk" src/board_game_insert_generator` : OK, aucune occurrence dans le coeur Python.
 
