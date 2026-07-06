@@ -1,6 +1,6 @@
 # Backlog
 
-Derniere mise a jour : 2026-07-04
+Derniere mise a jour : 2026-07-06
 
 Le backlog transforme la North Star en missions atomiques. Chaque mission future
 doit indiquer au minimum : ID, titre, capability liee, milestone lie, objectif,
@@ -235,10 +235,21 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Milestone : M3 CAD pipeline / M7 Volumetric planner.
 - Objectif : consommer `metadata.executable_asset_plan` pour creer des modules rectangulaires positionnes X/Y/Z dans Fusion.
 - Livrable : add-in Fusion enrichi, plan hors Fusion teste, ADR, procedure de smoke test manuel.
-- Criteres d'acceptation : Fusion ne recalcule pas le solveur ; bodies positionnes par CAD IR ; coeur Python sans `adsk` ; validation manuelle requise.
+- Criteres d'acceptation : Fusion ne recalcule pas le solveur ; bodies positionnes par CAD IR ; coeur Python sans `adsk` ; validation manuelle Fusion documentee.
 - Tests : unitaires hors Fusion, CLI/export CAD IR, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
 - Gate : validation humaine fournie le 2026-07-06 pour cette generation compacte uniquement.
-- Statut : `manual_validation_required`, generation codee.
+- Statut : `done`, `fusion-validated`, `print-validated: false`.
+
+### P11-M001V - Valider manuellement la vue compacte Fusion depuis placements grille
+
+- Capability : C-FUSION-COMPACT, C-GRID-3D, C-CAD-IR.
+- Milestone : M3 CAD pipeline / M7 Volumetric planner.
+- Objectif : lancer l'add-in P11-M001 dans Fusion avec `simple_asset_executable_plan` exporte en CAD IR et verifier le module asset-first positionne par grille.
+- Livrable : validation humaine Fusion avec message, position et dimensions observees.
+- Criteres d'acceptation : message conforme, `Grid-positioned module bodies: 1`, zero module refuse, position `X 30.0 mm`, `Y 0.0 mm`, `Z 0.0 mm` conforme ou acceptable, taille `30.0 x 30.0 x 10.0 mm` conforme ou acceptable.
+- Tests : smoke test manuel Fusion, aucune validation d'impression revendiquee.
+- Gate : action humaine Thomas realisee le 2026-07-06.
+- Statut : `done`, `fusion-validated`, `print-validated: false`.
 
 ### P7-M002 - Generer une vue Fusion eclatee minimale
 

@@ -213,9 +213,10 @@ metadata avec `rejection_reasons` et `recommended_asset_candidate_variant: null`
 Depuis P10-M008, `metadata.executable_asset_plan` transporte aussi les modules
 generes abstraits, leurs placements grille X/Y/Z et leurs refus eventuels. Depuis
 P11-M001, l'adaptateur Fusion peut consommer cette metadata pour creer une vue
-compacte de bodies rectangulaires positionnes par `origin_mm` et `size_mm`. Ces
-donnees ne valident aucune portance physique et ne doivent pas etre utilisees par
-Fusion pour recalculer le solveur.
+compacte de bodies rectangulaires positionnes par `origin_mm` et `size_mm`. Le
+smoke test humain `P11-M001V` du 2026-07-06 valide ce chemin pour
+`simple_asset_executable_plan`. Ces donnees ne valident aucune portance physique
+et ne doivent pas etre utilisees par Fusion pour recalculer le solveur.
 
 Cette metadata ne change pas `schema_version`, ne cree aucune operation Fusion et
 ne remplace pas les dimensions `theoretical_*` / `printable_*` des bodies. Un
@@ -274,8 +275,10 @@ libelle `P4-M004`, stabilise le choix du fichier d'entree et les messages
 d'erreur Fusion.
 
 `P6-M001` execute les cavites rectangulaires simples depuis
-`subtract_rectangular_cavity` et `P6-M002` code les encoches simples de paroi
-depuis `describe_cavity_feature`. La gate active est le smoke test manuel
-`P6-M002V`. Toute extension Fusion au-dela de ces rectangles, notamment fonds
-arrondis, fillets, booleans complexes, geometrie courbe reelle ou tout export
-imprimable, reste soumise a une nouvelle gate humaine.
+`subtract_rectangular_cavity`, `P6-M002` execute les encoches simples de paroi
+depuis `describe_cavity_feature`, et `P11-M001` execute la vue compacte issue des
+placements grille asset-first. Ces chemins sont `fusion-validated`, mais restent
+`print-validated: false`. Toute extension Fusion au-dela de ces rectangles,
+notamment vue eclatee, modules composites, fonds arrondis, fillets, booleans
+complexes, geometrie courbe reelle ou tout export imprimable, reste soumise a une
+nouvelle gate humaine.

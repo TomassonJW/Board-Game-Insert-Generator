@@ -214,9 +214,13 @@ Convention retenue :
 - aucune vue eclatee, aucun solveur, aucun module composite et aucun export STL/3MF
   ne sont ajoutes.
 
-Validation : les conversions et garde-fous sont testes hors Fusion. L'execution
-reelle dans Fusion reste `manual validation required` tant que Thomas n'a pas
-lance le smoke test P11-M001.
+Validation : les conversions et garde-fous sont testes hors Fusion. Le smoke test
+humain `P11-M001V` du 2026-07-06 valide dans Fusion le chargement de
+`simple_asset_executable_plan`, le message attendu, la creation de deux bodies
+de blank dont un module asset-first positionne par grille, et les dimensions
+`30.0 x 30.0 x 10.0 mm` a la position `X 30.0 mm`, `Y 0.0 mm`, `Z 0.0 mm`
+comme conformes ou acceptables. Cette validation ne vaut pas validation
+d'impression 3D.
 
 ## Vue compacte et vue eclatee
 

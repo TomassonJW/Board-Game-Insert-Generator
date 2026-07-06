@@ -22,8 +22,8 @@ Statut : `required_before_next_fusion_geometry`.
 
 P8-M001/P8-M002 et P10-M008 sont termines dans le perimetre coeur Python pur,
 configuration, validation, rapports, placement grille abstrait et CAD IR metadata.
-P11-M001 code la generation Fusion compacte depuis placements grille, mais attend
-le smoke test manuel Fusion avant statut `fusion-validated`.
+P11-M001 est `fusion-validated` pour la generation Fusion compacte depuis
+placements grille. L'impression 3D reste non validee.
 
 Action humaine requise avant toute mission qui genere reellement : grille 3D,
 layers, vue eclatee, demi-lune courbe, scoop interne, fillet/conge, fond arrondi,
@@ -31,10 +31,12 @@ geometrie courbe, module composite ou export STL/3MF dans Fusion.
 
 ## Mission ready non gated
 
-Aucune mission non-gated supplementaire n'est recommandee apres `P11-M001` tant que le smoke test Fusion compact n'est pas valide.
+Aucune mission non-gated supplementaire n'est recommandee apres la validation
+`P11-M001V` tant que la prochaine direction produit n'est pas explicitement
+choisie.
 La boucle asset-first produit maintenant candidats, variante recommandee, plan de
 modules concret, placement grille greedy borne et generation Fusion compacte
-codee pour ces placements.
+validee dans Fusion pour ces placements.
 
 Prochaine action recommandee : preparer une gate si l'on veut passer a un solveur
 complexe, a du backtracking, a une optimisation globale, a des modules composites
@@ -46,11 +48,13 @@ ou a une generation Fusion volumetrique reelle.
 
 `P10-SOLVER-GATE - Solveur complexe, backtracking ou optimisation globale`.
 
-`P11-M001V - Smoke test humain Fusion de la vue compacte grille`.
+`P11-NEXT-GATE - Choisir le prochain elargissement produit apres vue compacte`.
 
-- Capability : `C-FUSION-COMPACT`, `C-FUSION-EXPLODED`, `C-GRID-3D`.
-- Objectif : choisir explicitement si et comment une grille/layer doit produire
-  une vue Fusion reelle.
+- Capability : `C-FUSION-EXPLODED`, `C-COMPOSITE`, `C-SOLVER`, `C-GRID-3D`,
+  `C-CALIBRATION` selon l'option choisie.
+- Objectif : choisir explicitement la prochaine vague : vue eclatee, solveur plus
+  automatique, modules composites, generation volumetrique plus avancee ou
+  impression/calibration.
 - Statut : `blocked` jusqu'a validation humaine.
 
 ## Fin de chaque mission

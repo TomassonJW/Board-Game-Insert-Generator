@@ -97,6 +97,6 @@ vue compacte Fusion. L'adaptateur consomme `metadata.executable_asset_plan` et
 cree uniquement des bodies rectangulaires positionnes par `origin_mm` / `size_mm`.
 Il ne cherche pas de nouveau placement et ne modifie pas la grille.
 
-La validation Fusion manuelle reste obligatoire : cette mission code la generation
-compacte, mais ne valide ni l'empilement physique, ni l'impression, ni une vue
-eclatee.
+Le smoke test humain `P11-M001V` du 2026-07-06 valide cette consommation compacte
+dans Fusion pour `simple_asset_executable_plan`. Cette validation ne valide ni
+l'empilement physique, ni l'impression, ni une vue eclatee.

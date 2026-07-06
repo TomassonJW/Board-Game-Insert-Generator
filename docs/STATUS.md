@@ -1,6 +1,6 @@
 # Status
 
-Derniere mise a jour : 2026-07-04
+Derniere mise a jour : 2026-07-06
 
 ## Etat global
 
@@ -223,11 +223,13 @@ La mission `P10-M007` ajoute un exemple de variante asset-candidate rejetee par 
 
 La mission `P10-M008` produit maintenant un `executable_asset_plan` depuis la variante asset recommandee : modules generes abstraits, placement grille greedy X/Y/Z, dimensions couvertes en millimetres, score et refus actionnables. La sortie est exposee dans les rapports Markdown/JSON et dans `metadata.executable_asset_plan` CAD IR, sans modifier `modules` et sans generation Fusion.
 
-La mission `P11-M001` code la premiere vue compacte Fusion depuis `metadata.executable_asset_plan` : les modules asset-first generes sont crees comme bodies rectangulaires dans le composant racine, positionnes par `origin_mm` / `size_mm` des placements grille X/Y/Z. Les garde-fous hors Fusion couvrent dimensions manquantes, span hors grille, sortie de boite et collision manifeste. Statut : generation codee, `manual validation required` dans Fusion, `print-validated: false`.
+La mission `P11-M001` code la premiere vue compacte Fusion depuis `metadata.executable_asset_plan` : les modules asset-first generes sont crees comme bodies rectangulaires dans le composant racine, positionnes par `origin_mm` / `size_mm` des placements grille X/Y/Z. Les garde-fous hors Fusion couvrent dimensions manquantes, span hors grille, sortie de boite et collision manifeste.
+
+La validation humaine `P11-M001V` confirmee le 2026-07-06 documente le smoke test Fusion : add-in recopie dans le dossier Fusion AddIns, CAD IR `simple_asset_executable_plan` chargee, message conforme (`CAD IR module blanks planned: 1`, `Grid-positioned asset modules planned: 1`, `Blank bodies: 2`, `Grid-positioned module bodies: 1`, `Grid-positioned modules refused: 0`), module asset-first positionne par la grille, position `X 30.0 mm`, `Y 0.0 mm`, `Z 0.0 mm` conforme ou acceptable, taille `30.0 x 30.0 x 10.0 mm` conforme ou acceptable. Statut : `fusion-validated`, `print-validated: false`.
 
 ## Phase active
 
-Phase active : **P8 volumetric planner abstrait / gate avant generation Fusion volumetrique**.
+Phase active : **P11 compact Fusion view validee / gate avant elargissement produit**.
 
 Etat : le pipeline P4 reste stable pour les blanks rectangulaires Fusion. La
 vague P5 est terminee cote moteur Python pur, configuration, rapports et CAD IR.
@@ -236,11 +238,15 @@ P6-M001 est `fusion-validated` pour les cavites rectangulaires simples, avec
 simples de paroi top-open, avec `print-validated: false`. P6-M003 est termine
 cote taxonomie abstraite CAD-agnostic. P8-M001 et P8-M002 sont termines cote grille
 volumetrique declarative, layers, reservations, supports abstraits et metadata CAD IR.
+P11-M001 est `fusion-validated` pour la vue compacte issue du plan asset-first
+et des placements grille X/Y/Z, avec `print-validated: false`.
 La North Star cible un
 generateur volumetrique asset-first, pilote par capabilities.
 
-Prochaine action recommandee : smoke test humain Fusion P11-M001V avant toute nouvelle generation Fusion, vue eclatee, module composite, solveur plus automatique ou backtracking. Une nouvelle gate humaine est requise avant toute generation Fusion
-reelle liee a la grille 3D, aux layers, aux vues eclatees ou aux features
+Prochaine action recommandee : preparer une gate produit avant toute nouvelle
+generation Fusion reelle, vue eclatee, module composite, solveur plus automatique
+ou backtracking. Une nouvelle gate humaine est requise avant toute generation
+Fusion reelle liee a la grille 3D, aux layers, aux vues eclatees ou aux features
 avancees.
 
 ## Implemente
@@ -309,7 +315,8 @@ avancees.
 - Grouping P10-M006 borne des assets compatibles, expose par `source_asset_ids`.
 - Exemple P10-M007 de variante asset rejetee avec `rejection_reasons` structurees.
 - Plan executable P10-M008 depuis variante asset recommandee : modules generes abstraits, placement greedy grille et metadata CAD IR.
-- Vue compacte Fusion P11-M001 depuis placements grille : codee, a tester manuellement dans Fusion.
+- Vue compacte Fusion P11-M001 depuis placements grille : `fusion-validated`,
+  `print-validated: false`.
 - Criteres de scoring P10-M001 documentes, sans solveur executable.
 - Comparaison P10-M002 report-only de variantes deterministes existantes dans les rapports.
 - Raisons de rejet P10-M003 structurees et actionnables pour les variantes non generables.
