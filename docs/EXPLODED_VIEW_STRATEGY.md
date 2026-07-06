@@ -11,27 +11,32 @@ exports.
 - La vue compacte P11-M001 est `fusion-validated` pour les modules asset-first
   positionnes par grille X/Y/Z.
 - P7-M001 code une premiere vue eclatee basique dans l'add-in Fusion.
-- Cette vue eclatee duplique les bodies rectangulaires deja planifies et les
-  espace a droite de la boite sur une grille 2D deterministe.
-- La validation Fusion manuelle P7-M001V reste requise.
+- Le premier smoke test P7-M001V a refuse la strategie de copies independantes
+  de bodies.
+- La correction P7 remplace ces copies par deux occurrences liees d'un meme
+  composant physique : une occurrence compacte et une occurrence eclatee.
+- La validation Fusion manuelle P7-M001V2 reste requise.
 - Aucun export STL/3MF et aucune validation d'impression ne sont revendiques.
 
-## Strategie P7-M001
+## Strategie P7 corrigee
 
 La vue eclatee basique est une aide d'inspection, pas une nouvelle logique
 metier.
 
 Invariants :
 
-- la vue compacte reste generee ;
+- un module physique BGIG correspond a un unique `Component` Fusion ;
+- la geometrie rectangulaire, les cavites et les encoches supportees sont creees
+  dans la definition de ce composant ;
+- la vue compacte est une occurrence de ce composant ;
+- la vue eclatee est une autre occurrence du meme composant, creee via reference
+  au composant existant ;
 - Fusion ne recalcule ni solveur, ni placements compacts, ni clearances, ni
   tolerances ;
-- les dimensions exploded sont recopiees depuis la CAD IR ;
-- les bodies exploded recoivent un suffixe `exploded` ;
-- la disposition exploded est locale a l'add-in, deterministe et uniquement
-  visuelle ;
-- les cavites, encoches et features restent portees par la vue compacte supportee
-  existante ;
+- les transforms d'occurrence utilisent les positions deja resolues ou la grille
+  eclatee de presentation de l'add-in ;
+- les noms d'occurrences recoivent un suffixe lisible `compact occurrence` ou
+  `exploded occurrence` ;
 - aucune geometrie courbe, fillet, module composite ou export n'est ajoute.
 
 ## Mode local
@@ -58,8 +63,9 @@ Toute autre valeur est refusee avant generation.
 
 ## Strategie cible future
 
-- `compact_view` : modules places selon le layout reel dans la boite.
-- `exploded_view` : modules separes avec espacement lisible, labels et axes
+- `compact_view` : modules places dans le repere de boite, utile pour verifier
+  encombrement, collisions et hauteur utile.
+- `exploded_view` : occurrences separees avec espacement lisible, labels et axes
   stables.
 - `inspection_metadata` : liens entre module, asset, cavite, tolerance et
   operation.
@@ -67,6 +73,6 @@ Toute autre valeur est refusee avant generation.
 
 ## Gates
 
-- Smoke test humain P7-M001V avant statut `fusion-validated`.
-- Nouvelle gate avant vue eclatee avancee, composants enfants Fusion, modules
-  composites, export STL/3MF ou preparation d'impression.
+- Smoke test humain P7-M001V2 avant statut `fusion-validated`.
+- Nouvelle gate avant vue eclatee avancee, modules composites, export STL/3MF ou
+  preparation d'impression.

@@ -2,7 +2,7 @@
 
 ## Statut
 
-Accepte pour implementation, validation Fusion manuelle requise.
+Remplace par ADR-0021 apres KO partiel P7-M001V.
 
 ## Date
 
@@ -73,6 +73,8 @@ visuelle simple locale a l'add-in, tant qu'elle ne modifie pas le layout metier.
 
 ## Suivi
 
-- Smoke test humain P7-M001V requis.
+- Le smoke test humain P7-M001V a refuse partiellement les copies independantes de bodies.
+- ADR-0021 remplace cette strategie par des occurrences liees.
+- Smoke test humain P7-M001V2 requis.
 - Nouvelle gate avant vue eclatee avancee, exports, modules composites ou
   transformations Fusion plus ambitieuses.

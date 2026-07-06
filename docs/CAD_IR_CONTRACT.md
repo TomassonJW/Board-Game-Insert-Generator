@@ -172,9 +172,11 @@ Le plan copie :
 - les noms de composants CAD IR, sketches, features et bodies Fusion.
 
 Fusion ne recalcule pas les cellules, offsets, roles de faces ou tolerances. La
-generation reelle reste limitee a des rectangles extrudes dans le composant
-racine et ne produit aucun STL/3MF. La generation actuelle ne cree pas de
-composants enfants Fusion, pour rester compatible avec les documents Part Design.
+generation reelle reste limitee a des rectangles extrudes et ne produit aucun
+STL/3MF. Les chemins P4/P6/P11 historiques creaient des bodies dans le composant
+racine pour rester compatibles avec les documents Part Design ; la correction P7
+cree maintenant un `Component` Fusion par module physique afin de produire des
+occurrences compactes/eclatees liees.
 Depuis `P6-M001`, si la CAD IR contient des operations
 `subtract_rectangular_cavity`, l'adaptateur construit des coupes rectangulaires
 simples : footprint locale X/Y, depart sur le dessus du blank, extrusion cut
@@ -262,9 +264,9 @@ Le contrat V0 est valide par tests unitaires :
 
 La validation automatisee ne couvre pas l'execution reelle dans Fusion 360, les
 exports STL/3MF ou l'impression reelle. Depuis P11-M001, elle couvre aussi le
-plan de bodies asset-first positionnes par grille, y compris conversion X/Y/Z,
+plan de modules asset-first positionnes par grille, y compris conversion X/Y/Z,
 collisions manifestes, sortie de boite et refus transportes. Depuis P7-M001,
-elle couvre aussi le plan de bodies `exploded`, le mode `compact_only` et le
+elle couvre aussi le plan d'occurrences compactes/eclatees liees, le mode `compact_only` et le
 rejet d'un mode de generation inconnu.
 
 ## Gate suivante
@@ -279,8 +281,8 @@ d'erreur Fusion.
 `P6-M001` execute les cavites rectangulaires simples depuis
 `subtract_rectangular_cavity`, `P6-M002` execute les encoches simples de paroi
 depuis `describe_cavity_feature`, et `P11-M001` execute la vue compacte issue des
-placements grille asset-first. `P7-M001` code une vue eclatee basique comme
-copies rectangulaires d'inspection, encore `manual validation required`. Les
+placements grille asset-first. `P7-M001` code une vue eclatee basique corrigee comme
+occurrences liees d'un meme composant physique, encore `manual validation required`. Les
 chemins deja valides restent `print-validated: false`. Toute extension Fusion
 au-dela de ces rectangles, notamment vue eclatee avancee, modules composites,
 fonds arrondis, fillets, booleans complexes, geometrie courbe reelle ou tout

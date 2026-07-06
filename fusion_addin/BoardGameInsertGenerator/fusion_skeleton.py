@@ -35,10 +35,12 @@ CAVITY_CUT_OPERATION_KIND = "subtract_rectangular_cavity"
 CAVITY_FEATURE_OPERATION_KIND = "describe_cavity_feature"
 FINGER_NOTCH_CUT_OPERATION_KIND = "rectangular_finger_notch_cut"
 GRID_PLACED_BLANK_OPERATION_KIND = "create_grid_positioned_asset_blank"
-EXPLODED_BLANK_OPERATION_KIND = "create_exploded_rectangular_blank"
+LINKED_OCCURRENCE_OPERATION_KIND = "create_linked_component_occurrence"
 EXPLODED_VIEW_MARGIN_MM = 20.0
 EXPLODED_VIEW_SPACING_MM = 10.0
 EXPLODED_VIEW_MAX_SOLID_COUNT = 200
+COMPACT_OCCURRENCE_ROLE = "compact_occurrence"
+EXPLODED_OCCURRENCE_ROLE = "exploded_occurrence"
 SUPPORTED_SIMPLE_FINGER_NOTCH_KINDS = (
     "finger_notch",
     "side_notch",
@@ -143,6 +145,34 @@ class FusionSolidPlan:
             "role": self.role,
             "printable": self.printable,
             "operation_kind": self.operation_kind,
+            "validation_status": self.validation_status,
+        }
+
+
+@dataclass(frozen=True)
+class FusionOccurrencePlan:
+    """One Fusion occurrence of a physical module component."""
+
+    occurrence_name: str
+    component_id: str
+    source_body_id: str
+    source_body_name: str
+    origin_mm: FusionVectorMm
+    view_role: str
+    operation_kind: str = LINKED_OCCURRENCE_OPERATION_KIND
+    linked_component: bool = True
+    validation_status: str = FUSION_MANUAL_VALIDATION_REQUIRED
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "occurrence_name": self.occurrence_name,
+            "component_id": self.component_id,
+            "source_body_id": self.source_body_id,
+            "source_body_name": self.source_body_name,
+            "origin_mm": self.origin_mm.to_dict(),
+            "view_role": self.view_role,
+            "operation_kind": self.operation_kind,
+            "linked_component": self.linked_component,
             "validation_status": self.validation_status,
         }
 
@@ -277,7 +307,8 @@ class FusionGenerationPlan:
     reference_box: FusionSolidPlan
     blanks: tuple[FusionSolidPlan, ...]
     grid_positioned_blanks: tuple[FusionSolidPlan, ...] = ()
-    exploded_blanks: tuple[FusionSolidPlan, ...] = ()
+    compact_occurrences: tuple[FusionOccurrencePlan, ...] = ()
+    exploded_occurrences: tuple[FusionOccurrencePlan, ...] = ()
     rejected_grid_modules: tuple[FusionGridModuleRejection, ...] = ()
     cavity_cuts: tuple[FusionCavityCutPlan, ...] = ()
     finger_notch_cuts: tuple[FusionFingerNotchCutPlan, ...] = ()
@@ -285,12 +316,23 @@ class FusionGenerationPlan:
     validation_status: str = FUSION_MANUAL_VALIDATION_REQUIRED
 
     @property
+    def module_component_count(self) -> int:
+        return len(self.blanks) + len(self.grid_positioned_blanks)
+
+    @property
+    def linked_exploded_occurrences(self) -> bool:
+        component_ids = {blank.cad_id for blank in (*self.blanks, *self.grid_positioned_blanks)}
+        return all(
+            occurrence.linked_component and occurrence.component_id in component_ids
+            for occurrence in self.exploded_occurrences
+        )
+
+    @property
     def created_object_count(self) -> int:
         return (
             1
-            + len(self.blanks)
-            + len(self.grid_positioned_blanks)
-            + len(self.exploded_blanks)
+            + len(self.compact_occurrences)
+            + len(self.exploded_occurrences)
             + len(self.cavity_cuts)
             + len(self.finger_notch_cuts)
         )
@@ -301,7 +343,9 @@ class FusionGenerationPlan:
             "reference_box": self.reference_box.to_dict(),
             "blanks": [blank.to_dict() for blank in self.blanks],
             "grid_positioned_blanks": [blank.to_dict() for blank in self.grid_positioned_blanks],
-            "exploded_blanks": [blank.to_dict() for blank in self.exploded_blanks],
+            "compact_occurrences": [occurrence.to_dict() for occurrence in self.compact_occurrences],
+            "exploded_occurrences": [occurrence.to_dict() for occurrence in self.exploded_occurrences],
+            "linked_exploded_occurrences": self.linked_exploded_occurrences,
             "rejected_grid_modules": [module.to_dict() for module in self.rejected_grid_modules],
             "cavity_cuts": [cut.to_dict() for cut in self.cavity_cuts],
             "finger_notch_cuts": [cut.to_dict() for cut in self.finger_notch_cuts],
@@ -647,19 +691,23 @@ def generation_plan_from_cad_ir(
         reference_box,
         blanks,
     )
-    exploded_blanks = _exploded_view_blanks(
+    source_blanks = [*blanks, *grid_positioned_blanks]
+    compact_occurrences = _compact_occurrence_plans(source_blanks)
+    exploded_occurrences = _exploded_view_occurrences(
         reference_box,
-        [*blanks, *grid_positioned_blanks],
+        source_blanks,
         generation_mode,
     )
-    _validate_unique_body_names([*blanks, *grid_positioned_blanks, *exploded_blanks])
+    _validate_unique_body_names(source_blanks)
+    _validate_unique_occurrence_names([*compact_occurrences, *exploded_occurrences])
 
     return FusionGenerationPlan(
         project_name=project_name,
         reference_box=reference_box,
         blanks=tuple(blanks),
         grid_positioned_blanks=tuple(grid_positioned_blanks),
-        exploded_blanks=tuple(exploded_blanks),
+        compact_occurrences=tuple(compact_occurrences),
+        exploded_occurrences=tuple(exploded_occurrences),
         rejected_grid_modules=tuple(rejected_grid_modules),
         cavity_cuts=tuple(cavity_cuts),
         finger_notch_cuts=tuple(finger_notch_cuts),
@@ -668,11 +716,23 @@ def generation_plan_from_cad_ir(
 
 
 
-def _exploded_view_blanks(
+def _compact_occurrence_plans(source_blanks: list[FusionSolidPlan]) -> list[FusionOccurrencePlan]:
+    return [
+        _occurrence_plan_from_blank(
+            source,
+            origin_mm=source.origin_mm,
+            view_role=COMPACT_OCCURRENCE_ROLE,
+            suffix="compact occurrence",
+        )
+        for source in source_blanks
+    ]
+
+
+def _exploded_view_occurrences(
     reference_box: FusionSolidPlan,
     source_blanks: list[FusionSolidPlan],
     generation_mode: str,
-) -> list[FusionSolidPlan]:
+) -> list[FusionOccurrencePlan]:
     if generation_mode == FUSION_GENERATION_MODE_COMPACT_ONLY:
         return []
     if generation_mode != FUSION_GENERATION_MODE_COMPACT_AND_EXPLODED:
@@ -692,7 +752,7 @@ def _exploded_view_blanks(
     current_y = reference_box.origin_mm.y
     row_height = 0.0
     column = 0
-    exploded: list[FusionSolidPlan] = []
+    exploded: list[FusionOccurrencePlan] = []
 
     for source in source_blanks:
         _validate_positive_solid_dimensions(source, f"exploded source {source.body_name}")
@@ -704,15 +764,11 @@ def _exploded_view_blanks(
             row_height = 0.0
 
         exploded.append(
-            FusionSolidPlan(
-                cad_id=_fusion_name(f"exploded:{source.cad_id}"),
-                component_name=_fusion_name(f"Exploded {source.component_name}"),
-                body_name=_fusion_name(f"{source.body_name} exploded"),
+            _occurrence_plan_from_blank(
+                source,
                 origin_mm=FusionVectorMm(current_x, current_y, reference_box.origin_mm.z),
-                size_mm=source.size_mm,
-                role="exploded_view_blank",
-                printable=source.printable,
-                operation_kind=EXPLODED_BLANK_OPERATION_KIND,
+                view_role=EXPLODED_OCCURRENCE_ROLE,
+                suffix="exploded occurrence",
             )
         )
         current_x += source.size_mm.x + EXPLODED_VIEW_SPACING_MM
@@ -720,6 +776,22 @@ def _exploded_view_blanks(
         column += 1
 
     return exploded
+
+
+def _occurrence_plan_from_blank(
+    source: FusionSolidPlan,
+    origin_mm: FusionVectorMm,
+    view_role: str,
+    suffix: str,
+) -> FusionOccurrencePlan:
+    return FusionOccurrencePlan(
+        occurrence_name=_fusion_name(f"{source.body_name} {suffix}"),
+        component_id=source.cad_id,
+        source_body_id=source.cad_id,
+        source_body_name=source.body_name,
+        origin_mm=origin_mm,
+        view_role=view_role,
+    )
 
 
 def _validated_generation_mode(mode: str) -> str:
@@ -737,6 +809,16 @@ def _validate_unique_body_names(solids: list[FusionSolidPlan]) -> None:
         if solid.body_name in seen:
             raise FusionSkeletonError(f"Fusion body name conflict: {solid.body_name!r}.")
         seen.add(solid.body_name)
+
+
+def _validate_unique_occurrence_names(occurrences: list[FusionOccurrencePlan]) -> None:
+    seen: set[str] = set()
+    for occurrence in occurrences:
+        if occurrence.occurrence_name in seen:
+            raise FusionSkeletonError(
+                f"Fusion occurrence name conflict: {occurrence.occurrence_name!r}."
+            )
+        seen.add(occurrence.occurrence_name)
 
 
 def _validate_positive_solid_dimensions(solid: FusionSolidPlan, label: str) -> None:

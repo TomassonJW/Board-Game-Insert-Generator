@@ -13,7 +13,8 @@ from board_game_insert_generator.layout import generate_basic_layout
 from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     CAD_IR_PATH_OVERRIDE_FILENAME,
     DEFAULT_CAD_IR_INPUT_FILENAME,
-    EXPLODED_BLANK_OPERATION_KIND,
+    COMPACT_OCCURRENCE_ROLE,
+    EXPLODED_OCCURRENCE_ROLE,
     EXPLODED_VIEW_MODE_FILENAME,
     DOCUMENT_STATUS_READY,
     DOCUMENT_STATUS_ZERO_DOC,
@@ -31,6 +32,7 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     FUSION_SKETCH_PLANE_XZ,
     FUSION_SKETCH_PLANE_YZ,
     GRID_PLACED_BLANK_OPERATION_KIND,
+    LINKED_OCCURRENCE_OPERATION_KIND,
     PLAN_STATUS_PLANNED_ONLY,
     FusionSkeletonError,
     cad_ir_input_guidance,
@@ -258,10 +260,11 @@ class FusionSkeletonTests(unittest.TestCase):
             "cards-main-01 rectangular blank",
             "dice-01 rectangular blank",
         ])
-        self.assertEqual([blank.body_name for blank in plan.exploded_blanks], [
-            "cards-main-01 rectangular blank exploded",
-            "dice-01 rectangular blank exploded",
+        self.assertEqual([occurrence.occurrence_name for occurrence in plan.exploded_occurrences], [
+            "cards-main-01 rectangular blank exploded occurrence",
+            "dice-01 rectangular blank exploded occurrence",
         ])
+        self.assertTrue(plan.linked_exploded_occurrences)
 
     def test_rejects_generation_without_rectangular_prism_operation(self) -> None:
         payload = _cad_ir_payload()
@@ -359,29 +362,40 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(grid_blank.origin_mm.to_dict(), {"x": 30.0, "y": 0.0, "z": 10.0})
         self.assertEqual(grid_blank.size_mm.to_dict(), {"x": 30.0, "y": 30.0, "z": 10.0})
 
-    def test_builds_basic_exploded_view_from_compact_and_grid_blanks(self) -> None:
+    def test_builds_basic_exploded_view_from_linked_compact_and_grid_occurrences(self) -> None:
         payload = _cad_ir_payload_from_example("simple_asset_executable_plan.json")
 
         plan = generation_plan_from_cad_ir(payload)
 
         self.assertEqual(plan.generation_mode, FUSION_GENERATION_MODE_COMPACT_AND_EXPLODED)
-        self.assertEqual(len(plan.exploded_blanks), 2)
-        compact_exploded = plan.exploded_blanks[0]
-        grid_exploded = plan.exploded_blanks[1]
-        self.assertEqual(compact_exploded.role, "exploded_view_blank")
-        self.assertEqual(compact_exploded.operation_kind, EXPLODED_BLANK_OPERATION_KIND)
-        self.assertEqual(compact_exploded.body_name, "manual-reference-bin-01 rectangular blank exploded")
+        self.assertEqual(plan.module_component_count, 2)
+        self.assertEqual(len(plan.compact_occurrences), 2)
+        self.assertEqual(len(plan.exploded_occurrences), 2)
+        self.assertTrue(plan.linked_exploded_occurrences)
+
+        compact_occurrence = plan.compact_occurrences[0]
+        compact_exploded = plan.exploded_occurrences[0]
+        grid_exploded = plan.exploded_occurrences[1]
+
+        self.assertEqual(compact_occurrence.view_role, COMPACT_OCCURRENCE_ROLE)
+        self.assertEqual(compact_occurrence.component_id, "manual-reference-bin-01-body")
+        self.assertEqual(compact_occurrence.origin_mm.to_dict(), {"x": 0.8, "y": 0.8, "z": 0.0})
+        self.assertEqual(compact_exploded.view_role, EXPLODED_OCCURRENCE_ROLE)
+        self.assertEqual(compact_exploded.operation_kind, LINKED_OCCURRENCE_OPERATION_KIND)
+        self.assertTrue(compact_exploded.linked_component)
+        self.assertEqual(compact_exploded.component_id, compact_occurrence.component_id)
+        self.assertEqual(compact_exploded.source_body_id, "manual-reference-bin-01-body")
+        self.assertEqual(compact_exploded.occurrence_name, "manual-reference-bin-01 rectangular blank exploded occurrence")
         self.assertEqual(compact_exploded.origin_mm.to_dict(), {"x": 140.0, "y": 0.0, "z": 0.0})
-        self.assertEqual(compact_exploded.size_mm.to_dict(), {"x": 29.2, "y": 29.2, "z": 9.0})
         self.assertEqual(
-            grid_exploded.body_name,
-            "generated - asset-group-candidate - tokens - store - exact grid positioned rectangular blank exploded",
+            grid_exploded.occurrence_name,
+            "generated - asset-group-candidate - tokens - store - exact grid positioned rectangular blank exploded occurrence",
         )
         self.assertAlmostEqual(grid_exploded.origin_mm.x, 179.2)
         self.assertEqual(grid_exploded.origin_mm.y, 0.0)
         self.assertEqual(grid_exploded.origin_mm.z, 0.0)
-        self.assertEqual(grid_exploded.size_mm.to_dict(), {"x": 30.0, "y": 30.0, "z": 10.0})
-        self.assertEqual(plan.to_dict()["exploded_blanks"][1]["operation_kind"], EXPLODED_BLANK_OPERATION_KIND)
+        self.assertEqual(plan.to_dict()["exploded_occurrences"][1]["operation_kind"], LINKED_OCCURRENCE_OPERATION_KIND)
+        self.assertTrue(plan.to_dict()["linked_exploded_occurrences"])
 
     def test_compact_only_generation_mode_disables_exploded_view(self) -> None:
         payload = _cad_ir_payload_from_example("simple_asset_executable_plan.json")
@@ -393,7 +407,7 @@ class FusionSkeletonTests(unittest.TestCase):
 
         self.assertEqual(len(plan.blanks), 1)
         self.assertEqual(len(plan.grid_positioned_blanks), 1)
-        self.assertEqual(len(plan.exploded_blanks), 0)
+        self.assertEqual(len(plan.exploded_occurrences), 0)
         self.assertEqual(plan.created_object_count, 3)
 
     def test_rejects_unknown_generation_mode_for_generation_plan(self) -> None:
@@ -570,13 +584,17 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIsInstance(manifest["description"], dict)
         self.assertIn("", manifest["description"])
 
-    def test_addin_entrypoint_uses_root_component_for_part_design_compatibility(self) -> None:
+    def test_addin_entrypoint_uses_linked_component_occurrences(self) -> None:
         entrypoint_path = ROOT / "fusion_addin" / "BoardGameInsertGenerator" / "BoardGameInsertGenerator.py"
         source = entrypoint_path.read_text(encoding="utf-8")
 
-        self.assertNotIn("addNewComponent", source)
-        self.assertIn("root_component.sketches.add", source)
-        self.assertIn("root_component.features.extrudeFeatures.addSimple", source)
+        self.assertIn("addNewComponent", source)
+        self.assertIn("addExistingComponent", source)
+        self.assertIn("transform2", source)
+        self.assertIn("Module components created", source)
+        self.assertIn("Compact occurrences created", source)
+        self.assertIn("Exploded occurrences created", source)
+        self.assertIn("Linked exploded occurrences", source)
         self.assertIn("FeatureOperations.CutFeatureOperation", source)
         self.assertIn("participantBodies", source)
         self.assertIn("setOneSideExtent", source)
@@ -588,15 +606,14 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("finger_notch_features_planned", source)
         self.assertIn("finger_notch_cuts", source)
         self.assertIn("grid_positioned_blanks", source)
-        self.assertIn("exploded_blanks", source)
-        self.assertIn("Grid-positioned module bodies", source)
-        self.assertIn("Exploded module bodies", source)
+        self.assertIn("compact_occurrences", source)
+        self.assertIn("exploded_occurrences", source)
         self.assertIn("generated compact and exploded", source)
         self.assertIn("resolve_generation_mode", source)
         self.assertIn("_xy_plane_for_z", source)
         self.assertIn("Simple top-open finger notch cuts", source)
         self.assertIn("top-open rectangular wall cut", source)
-        self.assertIn("compatible with Part Design documents", source)
+        self.assertIn("one Fusion component per BGIG module", source)
         self.assertIn("resolve_cad_ir_input_path", source)
         self.assertIn("cad_ir_input_guidance", source)
         self.assertIn("Input CAD IR", source)

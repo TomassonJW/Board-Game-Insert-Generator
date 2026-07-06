@@ -56,7 +56,8 @@ class CliTests(unittest.TestCase):
         self.assertEqual(payload["schema_version"], "cad_ir.v0")
         self.assertEqual(payload["metadata"]["project_name"], "Simple square box V0")
         self.assertEqual(plan.created_object_count, 9)
-        self.assertEqual(len(plan.exploded_blanks), 4)
+        self.assertEqual(len(plan.exploded_occurrences), 4)
+        self.assertTrue(plan.linked_exploded_occurrences)
         self.assertEqual(
             plan.reference_box.component_name,
             "Box reference - not printable",
@@ -67,9 +68,10 @@ class CliTests(unittest.TestCase):
             {"x": 68.9, "y": 99.2, "z": 44.0},
         )
         self.assertEqual(
-            plan.exploded_blanks[0].body_name,
-            "cards-main-01 rectangular blank exploded",
+            plan.exploded_occurrences[0].occurrence_name,
+            "cards-main-01 rectangular blank exploded occurrence",
         )
+        self.assertEqual(plan.exploded_occurrences[0].component_id, plan.blanks[0].cad_id)
 
     def test_cli_exports_cad_ir_with_rectangular_cavity_compatible_with_fusion_plan(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
@@ -97,7 +99,8 @@ class CliTests(unittest.TestCase):
             "subtract_rectangular_cavity",
         )
         self.assertEqual(plan.created_object_count, 4)
-        self.assertEqual(len(plan.exploded_blanks), 1)
+        self.assertEqual(len(plan.exploded_occurrences), 1)
+        self.assertTrue(plan.linked_exploded_occurrences)
         self.assertEqual(len(plan.cavity_cuts), 1)
         self.assertEqual(plan.cavity_cuts[0].cavity_id, "token-pocket")
         self.assertEqual(plan.blanks[0].body_name, "token-tray-01 rectangular blank")

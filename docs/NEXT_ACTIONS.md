@@ -23,9 +23,10 @@ Statut : `required_before_next_fusion_geometry`.
 P8-M001/P8-M002 et P10-M008 sont termines dans le perimetre coeur Python pur,
 configuration, validation, rapports, placement grille abstrait et CAD IR metadata.
 P11-M001 est `fusion-validated` pour la generation Fusion compacte depuis
-placements grille. P7-M001 code la generation Fusion eclatee basique, mais attend
-le smoke test manuel Fusion avant statut `fusion-validated`. L'impression 3D
-reste non validee.
+placements grille. P7-M001 code la generation Fusion eclatee basique corrigee
+par composants uniques et occurrences compactes/eclatees liees, mais attend le
+smoke test manuel Fusion P7-M001V2 avant statut `fusion-validated`. L'impression
+3D reste non validee.
 
 Action humaine requise avant toute mission qui genere reellement : grille 3D,
 layers, vue eclatee, demi-lune courbe, scoop interne, fillet/conge, fond arrondi,
@@ -34,10 +35,10 @@ geometrie courbe, module composite ou export STL/3MF dans Fusion.
 ## Mission ready non gated
 
 Aucune mission non-gated supplementaire n'est recommandee apres `P7-M001`
-tant que le smoke test Fusion eclate n'est pas valide.
+tant que le smoke test Fusion P7-M001V2 des occurrences liees n'est pas valide.
 La boucle asset-first produit maintenant candidats, variante recommandee, plan de
 modules concret, placement grille greedy borne, generation Fusion compacte
-validee et generation Fusion eclatee basique codee pour inspection.
+validee et generation Fusion eclatee basique corrigee par occurrences liees pour inspection.
 
 Prochaine action recommandee : preparer une gate si l'on veut passer a un solveur
 complexe, a du backtracking, a une optimisation globale, a des modules composites
@@ -49,7 +50,7 @@ ou a une generation Fusion volumetrique reelle.
 
 `P10-SOLVER-GATE - Solveur complexe, backtracking ou optimisation globale`.
 
-`P7-M001V - Smoke test humain Fusion de la vue eclatee basique`.
+`P7-M001V2 - Smoke test humain Fusion de la vue eclatee par occurrences liees`.
 
 `P11-NEXT-GATE - Choisir le prochain elargissement produit apres vue compacte/eclatee`.
 

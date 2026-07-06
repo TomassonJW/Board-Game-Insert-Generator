@@ -62,16 +62,20 @@ de rester compatible avec les documents Fusion Part Design qui n'acceptent qu'un
 seul composant. Les composants CAD IR sont donc materialises par des sketches,
 features et bodies nommes dans le composant racine.
 
-Depuis `P4-M003`, l'add-in code une premiere generation minimale :
+Depuis `P4-M003`, l'add-in a code une premiere generation minimale :
 
 - detection d'un document Fusion actif ;
 - signalement explicite du cas Zero Doc ;
 - chargement de `cad_ir_input.json` dans le dossier add-in ;
 - validation de la CAD IR serialisee ;
 - creation d'une esquisse de reference de boite non imprimable ;
-- creation de sketches et bodies rectangulaires simples dans le composant racine ;
+- creation initiale de sketches et bodies rectangulaires simples dans le composant racine ;
 - statut `manual validation required` tant que Fusion 360 n'a pas ete lance et
   inspecte par Thomas.
+
+La correction P7-M001V change le chemin vue compacte/eclatee : les modules sont
+desormais des composants Fusion avec occurrences liees, car la vision produit
+refuse les copies independantes de bodies pour la vue eclatee.
 
 Depuis `P4-M004`, le pipeline d'entree est stabilise sans elargir la geometrie :
 
@@ -108,7 +112,7 @@ recalculer layout ou tolerances.
 
 La cible Fusion actuelle a commence par des blanks rectangulaires, ajoute les cavites rectangulaires simples, puis les encoches simples de paroi :
 
-- sketches, features et bodies nommes dans le composant racine ;
+- composants Fusion nommes pour les modules physiques, avec occurrences compactes/eclatees liees quand le mode P7 le demande ;
 - dimensions issues de `printable_origin_mm` et `printable_size_mm` ;
 - boite de reference sous forme d'esquisse non imprimable ;
 - aucun creusage avance execute dans Fusion ;
@@ -124,8 +128,8 @@ La cible Fusion actuelle a commence par des blanks rectangulaires, ajoute les ca
 - aucun fillet/conge ;
 - aucun export STL/3MF ;
 - aucun algorithme d'optimisation nouveau.
-- depuis P11-M001, les modules generes par `metadata.executable_asset_plan` peuvent aussi etre crees comme bodies rectangulaires positionnes par `origin_mm` / `size_mm` de placement grille.
-- depuis P7-M001, l'add-in peut creer une vue eclatee basique sous forme de copies rectangulaires `exploded`, espacees a droite de la boite pour inspection.
+- depuis P11-M001, les modules generes par `metadata.executable_asset_plan` peuvent aussi etre crees comme modules rectangulaires positionnes par `origin_mm` / `size_mm` de placement grille.
+- depuis la correction P7-M001V, l'add-in cree la vue compacte et la vue eclatee comme occurrences liees d'un meme composant physique, espacees a droite de la boite pour inspection.
 
 
 ## Coupes rectangulaires P6-M001
@@ -226,8 +230,8 @@ d'impression 3D.
 
 ## Vue eclatee basique P7-M001
 
-Depuis P7-M001, l'add-in peut creer une vue eclatee basique en plus de la vue
-compacte.
+Depuis la correction P7-M001V, l'add-in peut creer une vue eclatee basique en
+plus de la vue compacte sans dupliquer les bodies de maniere independante.
 
 Convention retenue :
 
@@ -235,19 +239,25 @@ Convention retenue :
 - un fichier optionnel `exploded_view_mode.txt` peut contenir `compact_only` pour
   revenir au comportement compact seul ;
 - toute autre valeur de mode est refusee avant generation ;
-- les bodies eclates sont des copies rectangulaires des blanks CAD IR et des
-  modules asset-first places par grille ;
-- les noms de bodies recoivent le suffixe `exploded` ;
-- l'origine exploded est une grille 2D simple placee a droite de la boite, avec
-  marge et espacement fixes ;
+- chaque module physique BGIG devient un unique `Component` Fusion ;
+- la geometrie rectangulaire, les cavites et les encoches top-open deja
+  supportees sont creees dans la definition du composant ;
+- l'occurrence compacte est positionnee selon l'origine CAD IR deja resolue ;
+- l'occurrence eclatee est creee via reference au meme composant et placee sur
+  une grille 2D simple a droite de la boite ;
+- les noms d'occurrences recoivent `compact occurrence` ou `exploded occurrence` ;
 - les dimensions restent celles de la CAD IR ;
-- aucune cavite, encoche, courbe, fillet, module composite, export ou solveur
-  supplementaire n'est ajoute a la vue eclatee ;
-- la vue compacte existante reste generee.
+- aucun module composite, export, fillet, courbe ou solveur supplementaire n'est
+  ajoute.
+
+Cette strategie peut necessiter un design Fusion compatible avec plusieurs
+composants/occurrences. Si Fusion affiche une erreur de document Part Design
+limite a un composant, creer ou ouvrir un design/assembly de test compatible et
+relancer l'add-in.
 
 Validation : le plan est teste hors Fusion. L'execution reelle reste
 `manual validation required` tant que Thomas n'a pas realise le smoke test
-P7-M001V.
+P7-M001V2.
 
 ## Vue compacte et vue eclatee
 
@@ -260,7 +270,7 @@ La strategie long terme distingue deux sorties Fusion inspectables :
 
 La vue compacte existe pour les blanks rectangulaires simples et pour les
 modules asset-first places par grille. La vue eclatee basique existe maintenant
-comme aide d'inspection, mais reste a valider manuellement dans Fusion.
+comme occurrences liees d'inspection, mais reste a valider manuellement dans Fusion.
 
 Fusion ne doit pas inventer les positions compactes. Pour P7-M001 uniquement,
 l'add-in peut calculer une disposition eclatee de presentation a partir des

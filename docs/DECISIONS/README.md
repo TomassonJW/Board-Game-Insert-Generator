@@ -116,6 +116,8 @@ Tests, cartes backlog ou gates humaines a preparer.
   placements grille asset-first.
 - `ADR-0020-fusion-basic-exploded-view.md` - vue eclatee Fusion basique comme
   duplication d'inspection.
+- `ADR-0021-fusion-linked-module-occurrences.md` - correction P7 par composants
+  physiques uniques et occurrences compactes/eclatees liees.
 
 ## Regles de maintenance
 

@@ -222,20 +222,20 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 
 - Capability : C-FUSION-EXPLODED, C-CAD-IR.
 - Milestone : M5 CAD inspection views.
-- Objectif : conserver la vue compacte et creer une seconde representation rectangulaire espacee a plat pour inspection.
-- Livrable : mode add-in `compact_and_exploded`, plan hors Fusion teste, ADR, documentation et procedure de smoke test manuel.
-- Criteres d'acceptation : Fusion ne recalcule pas le solveur ; bodies `exploded` nommes ; dimensions issues de la CAD IR ; coeur Python sans `adsk` ; validation manuelle requise.
+- Objectif : conserver la vue compacte et creer une vue eclatee par occurrence liee du meme composant physique, espacee a plat pour inspection.
+- Livrable : mode add-in `compact_and_exploded`, composants Fusion uniques, occurrences compactes/eclatees liees, plan hors Fusion teste, ADR corrective, documentation et procedure de smoke test manuel.
+- Criteres d'acceptation : Fusion ne recalcule pas le solveur ; occurrences compactes/eclatees nommees ; occurrence eclatee liee au meme composant que l'occurrence compacte ; dimensions issues de la CAD IR ; coeur Python sans `adsk` ; validation manuelle requise.
 - Tests : unitaires hors Fusion, CLI/export CAD IR, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
 - Gate : validation humaine fournie le 2026-07-06 pour une vue eclatee basique uniquement.
-- Statut : `manual_validation_required`, generation codee.
+- Statut : `manual_validation_required`, correction occurrences liees codee apres KO partiel P7-M001V.
 
 ### P7-M001V - Valider manuellement la vue eclatee Fusion basique
 
 - Capability : C-FUSION-EXPLODED.
 - Milestone : M5 CAD inspection views.
-- Objectif : lancer l'add-in P7-M001 dans Fusion avec `simple_asset_executable_plan` exporte en CAD IR et verifier les bodies `exploded`.
-- Livrable : validation humaine Fusion avec message, noms, espacement et dimensions observees.
-- Criteres d'acceptation : vue compacte conservee, bodies `exploded` visibles a droite de la boite, dimensions conformes ou acceptables, aucun export STL/3MF.
+- Objectif : lancer l'add-in P7-M001 corrige dans Fusion avec `simple_asset_executable_plan` exporte en CAD IR et verifier que les occurrences compactes/eclatees referencent les memes composants.
+- Livrable : validation humaine Fusion avec message, noms, espacement, dimensions observees et verification que compact/exploded sont deux occurrences du meme composant.
+- Criteres d'acceptation : vue compacte conservee, occurrences `exploded` visibles a droite de la boite, composants sources partages entre compact/exploded, dimensions conformes ou acceptables, aucun export STL/3MF.
 - Tests : smoke test manuel Fusion, aucune validation d'impression revendiquee.
 - Gate : action humaine requise.
 - Statut : `blocked`.
