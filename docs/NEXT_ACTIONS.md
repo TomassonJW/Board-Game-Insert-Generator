@@ -30,16 +30,16 @@ geometrie courbe, module composite ou export STL/3MF dans Fusion.
 
 ## Mission ready non gated
 
-`P10-M001 - Definir les criteres de scoring de variantes`.
+`P10-M002 - Enumerer quelques variantes simples hors solveur complet`.
 
 - Capability : `C-SOLVER`.
 - Milestone : `M10 Semi-automatic solver`.
-- Objectif : definir des criteres de scoring explicables pour futures variantes,
-  sans optimiseur global et sans placement automatique.
-- Gate : aucune si la mission reste documentaire/contractuelle ; stop si un
-  solveur complexe ou une optimisation globale devient necessaire.
-- Validation : tests documentaires, CLI de non-regression, `git diff --check`,
-  absence de `adsk` dans le coeur.
+- Objectif : comparer quelques variantes deterministes simples et explicables,
+  sans optimiseur global, sans dependance lourde et sans generation Fusion.
+- Gate : stop si une optimisation complexe, un solveur externe ou un changement
+  incompatible devient necessaire.
+- Validation : tests unitaires, rapports Markdown/JSON, CLI de non-regression,
+  `git diff --check`, absence de `adsk` dans le coeur.
 ## Mission bloquee par gate
 
 `P8-FUSION-GATE - Generation Fusion volumetrique ou vue 3D`.

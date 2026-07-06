@@ -207,6 +207,8 @@ La mission `P9-M001` specifie le schema cible asset-first : assets distincts des
 
 La mission `P9-M002` charge maintenant `assets` depuis le JSON V0 comme donnees passives : validation stricte, rapports Markdown/JSON, metadata CAD IR `assets`, exemple `simple_assets.json`. Aucun module, cavity, layout ou operation Fusion n'est derive depuis ces assets.
 
+La mission `P10-M001` definit les criteres de scoring de variantes dans `SOLVER_STRATEGY` : compacite, accessibilite, reservations, simplicite d'impression, setup et confiance de mesure. Aucun solveur, aucune variante automatique et aucune dependance lourde ne sont ajoutes.
+
 ## Phase active
 
 Phase active : **P8 volumetric planner abstrait / gate avant generation Fusion volumetrique**.
@@ -221,7 +223,7 @@ volumetrique declarative, layers, reservations, supports abstraits et metadata C
 La North Star cible un
 generateur volumetrique asset-first, pilote par capabilities.
 
-Prochaine action recommandee : `P10-M001` pour definir le scoring de variantes sans solveur complexe. Une nouvelle gate humaine est requise avant toute generation Fusion
+Prochaine action recommandee : `P10-M002` pour enumerer quelques variantes simples hors solveur complet, si cela reste deterministe et borne. Une nouvelle gate humaine est requise avant toute generation Fusion
 reelle liee a la grille 3D, aux layers, aux vues eclatees ou aux features
 avancees.
 
@@ -284,6 +286,7 @@ avancees.
 - Schema cible P9-M001 asset-first documente.
 - Assets P9-M002 charges, valides, reportes et transportes en metadata CAD IR,
   sans generation de modules.
+- Criteres de scoring P10-M001 documentes, sans solveur executable.
 - Generation Fusion de cavites rectangulaires simples P6-M001 depuis
   `subtract_rectangular_cavity`, avec coupe verticale limitee au body cible,
   `fusion-validated` et `print-validated: false`.
@@ -367,7 +370,7 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant `P9-M002 - Charger des assets JSON sans generation de modules` :
+Derniere verification pendant `P10-M001 - Criteres de scoring de variantes` :
 
 - `python -m unittest discover -s tests` : OK, 127 tests passes.
 - `python -m py_compile src\board_game_insert_generator\models.py src\board_game_insert_generator\config_loader.py src\board_game_insert_generator\validation.py src\board_game_insert_generator\volumetric.py src\board_game_insert_generator\report.py src\board_game_insert_generator\cad_ir.py` : OK.

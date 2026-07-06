@@ -36,3 +36,47 @@ pas devenir une boite noire ni remplacer les gates physiques.
 
 - Gate architecture avant ajout d'un solveur externe ou d'une dependance lourde.
 - Gate produit avant tout comportement automatique qui masque les hypotheses.
+
+## Criteres de scoring P10-M001
+
+P10-M001 definit un contrat de scoring, pas un solveur. Un futur score de variante
+doit rester decomposable en sous-scores lisibles :
+
+| Critere | Role | Exemple de mesure future |
+| --- | --- | --- |
+| Compacite XY/Z | Eviter le gaspillage de volume utile. | occupation, free cells, hauteur utilisee |
+| Accessibilite | Favoriser les retraits simples. | `removal_order`, `access_direction`, grip features |
+| Respect des reservations | Preserver boards, livrets, regles et zones interdites. | collisions refusees, reservations intactes |
+| Simplicite d'impression | Eviter trop de corps ou formes complexes. | nombre de modules, hauteurs, operations abstraites |
+| Setup table | Limiter les manipulations pendant la mise en place. | assets `access_first`, ordre de retrait |
+| Robustesse de mesure | Penaliser les dimensions approximatives critiques. | `dimension_confidence` |
+
+Format cible d'un score explicable :
+
+```json
+{
+  "variant_id": "variant-a",
+  "total_score": 82.5,
+  "subscores": {
+    "compactness": 20,
+    "accessibility": 18,
+    "reservation_integrity": 20,
+    "print_simplicity": 14,
+    "setup": 7,
+    "measurement_confidence": 3.5
+  },
+  "reasons": [
+    "Top board reservation is removed before card modules.",
+    "Two assets use approximate dimensions, so confidence is reduced."
+  ],
+  "status": "explain_only"
+}
+```
+
+Invariants P10-M001 :
+
+- aucun optimiseur global ;
+- aucune generation de variantes ;
+- aucune dependance lourde ;
+- un score futur doit etre auditables par raisons, pas seulement par nombre ;
+- une variante refusee devra exposer des raisons avant toute comparaison.

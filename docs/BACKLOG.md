@@ -283,7 +283,7 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Milestone : M6 Asset-first project model.
 - Objectif : decrire assets, quantites, dimensions approximatives et reservations.
 - Livrable : schema cible documente dans `ASSET_MODEL_STRATEGY` et `CONFIG_SCHEMA`, exemple non executable, ADR et log.
-- Criteres d'acceptation : modules et assets restent distincts ; le loader V0 refuse encore `assets`.
+- Criteres d'acceptation : modules et assets restent distincts ; P9-M001 ne modifie pas encore le loader.
 - Tests : test documentaire et non-regression CLI.
 - Gate : schema public si implementation loader.
 - Statut : `done`, `designed`.
@@ -298,6 +298,7 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Tests : unitaires + CLI.
 - Gate : si incompatibilite schema.
 - Statut : `done`, `implemented-cad-ir`.
+
 ## Phase 10 - Solveur semi-automatique et scoring
 
 ### P10-M001 - Definir les criteres de scoring de variantes
@@ -306,10 +307,10 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Milestone : M10 Semi-automatic solver.
 - Objectif : documenter compacite, accessibilite, nombre de modules, printability et setup.
 - Livrable : strategie et exemples de scoring, sans optimiseur lourd.
-- Criteres d'acceptation : scores explicables et non magiques.
-- Tests : documentaires.
+- Criteres d'acceptation : scores explicables et non magiques ; aucun solveur ni generation de variantes.
+- Tests : documentaires et CLI de non-regression.
 - Gate : dependance lourde si solveur externe.
-- Statut : `todo`.
+- Statut : `done`, `designed`.
 
 ### P10-M002 - Enumerer quelques variantes simples hors solveur complet
 
@@ -320,8 +321,7 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Criteres d'acceptation : pas d'optimiseur opaque.
 - Tests : unitaires + CLI JSON/Markdown.
 - Gate : aucune si implementation simple.
-- Statut : `todo`.
-
+- Statut : `ready`.
 ## Phase 11 - Modules composites et formes soudees
 
 ### P11-M001 - Representer les modules composites par primitives soudees
