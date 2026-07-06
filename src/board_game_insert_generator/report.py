@@ -19,9 +19,11 @@ from board_game_insert_generator.models import (
 from board_game_insert_generator.print_profiles import print_profile_label, print_profile_note
 from board_game_insert_generator.tolerance import ToleranceError
 from board_game_insert_generator.validation import ValidationError
+from board_game_insert_generator.volumetric import VolumetricSummary, build_volumetric_summary
 
 def layout_to_dict(config: InsertConfig, result: LayoutResult) -> dict[str, Any]:
     planned_cavities = _planned_cavities_by_instance(config, result)
+    volumetric_summary = build_volumetric_summary(config)
     return {
         "project_name": config.project_name,
         "units": config.units,
@@ -53,6 +55,7 @@ def layout_to_dict(config: InsertConfig, result: LayoutResult) -> dict[str, Any]
             "warnings": list(result.warnings),
         },
         "layout_comparison": _layout_comparison(config, result),
+        "volumetric_grid": volumetric_summary.to_dict() if volumetric_summary is not None else None,
         "module_requests": [
             {
                 "id": module.id,
@@ -123,6 +126,7 @@ def layout_to_json(config: InsertConfig, result: LayoutResult) -> str:
 
 def layout_to_markdown(config: InsertConfig, result: LayoutResult) -> str:
     planned_cavities = _planned_cavities_by_instance(config, result)
+    volumetric_summary = build_volumetric_summary(config)
     planned_cavity_count = sum(len(entries) for entries in planned_cavities.values())
     planned_feature_count = _planned_feature_count(planned_cavities)
     lines = [
@@ -157,6 +161,7 @@ def layout_to_markdown(config: InsertConfig, result: LayoutResult) -> str:
         "| --- | --- | ---: | ---: | ---: | ---: |",
         *_format_comparison_rows(_layout_comparison(config, result)),
         "",
+        *_format_volumetric_grid_section(volumetric_summary),
         "## Tolerance profile",
         "",
         f"- Print profile: `{config.print_profile}` ({print_profile_label(config.print_profile)})",
@@ -275,6 +280,89 @@ def layout_to_markdown(config: InsertConfig, result: LayoutResult) -> str:
         ]
     )
     return "\n".join(lines)
+
+def _format_volumetric_grid_section(summary: VolumetricSummary | None) -> list[str]:
+    if summary is None:
+        return []
+
+    grid = summary.grid
+    lines = [
+        "## Volumetric grid",
+        "",
+        f"- Unit size: {_format_dim(grid.unit_size_mm)}",
+        f"- Grid units: {grid.size_units.x} x {grid.size_units.y} x {grid.size_units.z}",
+        f"- Total cells: {summary.total_cell_count}",
+        f"- Occupied cells: {summary.occupied_cell_count}",
+        f"- Reserved cells: {summary.reserved_cell_count}",
+        f"- Forbidden cells: {summary.forbidden_cell_count}",
+        f"- Free cells: {summary.free_cell_count}",
+        f"- Approximate free volume: {summary.approximate_free_volume_mm3:.2f} mm^3",
+        "",
+        "### Layers",
+        "",
+    ]
+    if grid.layers:
+        lines.extend(
+            [
+                "| Layer | Z start | Z count | Role |",
+                "| --- | ---: | ---: | --- |",
+            ]
+        )
+        for layer in grid.layers:
+            lines.append(f"| {layer.id} | {layer.z_start} | {layer.z_count} | {layer.role} |")
+    else:
+        lines.append("- No layers declared.")
+
+    lines.extend(["", "### Module occupancy", ""])
+    if grid.module_placements:
+        lines.extend(
+            [
+                "| Placement | Module | Origin units | Size units | Layer |",
+                "| --- | --- | ---: | ---: | --- |",
+            ]
+        )
+        for placement in grid.module_placements:
+            lines.append(
+                "| "
+                f"{placement.id} | "
+                f"{placement.module_id} | "
+                f"{_format_grid_point(placement.origin_units)} | "
+                f"{_format_grid_size(placement.size_units)} | "
+                f"{placement.layer_id or 'n/a'} |"
+            )
+    else:
+        lines.append("- No module placements declared.")
+
+    lines.extend(["", "### Reserved and forbidden zones", ""])
+    if grid.zones:
+        lines.extend(
+            [
+                "| Zone | Kind | Purpose | Origin units | Size units | Layer |",
+                "| --- | --- | --- | ---: | ---: | --- |",
+            ]
+        )
+        for zone in grid.zones:
+            lines.append(
+                "| "
+                f"{zone.id} | "
+                f"{zone.kind.value} | "
+                f"{zone.purpose} | "
+                f"{_format_grid_point(zone.origin_units)} | "
+                f"{_format_grid_size(zone.size_units)} | "
+                f"{zone.layer_id or 'n/a'} |"
+            )
+    else:
+        lines.append("- No reserved or forbidden zones declared.")
+    lines.append("")
+    return lines
+
+
+def _format_grid_point(point: Any) -> str:
+    return f"({point.x}, {point.y}, {point.z})"
+
+
+def _format_grid_size(size: Any) -> str:
+    return f"{size.x} x {size.y} x {size.z}"
 
 def _dim(dimensions: Dimension3D) -> dict[str, float]:
     return {"x": _clean_float(dimensions.x), "y": _clean_float(dimensions.y), "z": _clean_float(dimensions.z)}

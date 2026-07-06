@@ -1,0 +1,100 @@
+{
+  "project_name": "Simple volumetric grid V0",
+  "units": "mm",
+  "box": {
+    "inner_dimensions_mm": { "x": 120, "y": 90, "z": 40 },
+    "usable_height_mm": 30,
+    "lid_clearance_mm": 10
+  },
+  "print_profile": "default",
+  "defaults": {
+    "wall_thickness_mm": 1.2,
+    "floor_thickness_mm": 1.2,
+    "corner_radius_mm": 1.5
+  },
+  "layout": {
+    "strategy": "row_fill"
+  },
+  "volumetric_grid": {
+    "unit_mm": { "x": 30, "y": 30, "z": 10 },
+    "size_units": { "x": 4, "y": 3, "z": 3 },
+    "comment": "P8-M001 explicit grid fixture; no volumetric solver and no Fusion generation.",
+    "layers": [
+      {
+        "id": "bottom-modules",
+        "name": "Bottom printable module band",
+        "z_start": 0,
+        "z_count": 2,
+        "role": "printable_modules"
+      },
+      {
+        "id": "top-reservations",
+        "name": "Top non-printable reservation band",
+        "z_start": 2,
+        "z_count": 1,
+        "role": "future_board_rulebook_reservations"
+      }
+    ],
+    "module_placements": [
+      {
+        "id": "cards-stack-volume",
+        "module_id": "cards-stack",
+        "instance_id": "cards-stack-01",
+        "origin_units": { "x": 0, "y": 0, "z": 0 },
+        "size_units": { "x": 2, "y": 1, "z": 2 },
+        "layer_id": "bottom-modules",
+        "comment": "One module occupying multiple grid units in X and Z."
+      },
+      {
+        "id": "token-bin-volume",
+        "module_id": "token-bin",
+        "instance_id": "token-bin-01",
+        "origin_units": { "x": 2, "y": 0, "z": 0 },
+        "size_units": { "x": 1, "y": 1, "z": 1 },
+        "layer_id": "bottom-modules"
+      }
+    ],
+    "zones": [
+      {
+        "id": "board-reservation-band",
+        "kind": "reserved",
+        "purpose": "future_board_or_rulebook_reservation",
+        "origin_units": { "x": 0, "y": 0, "z": 2 },
+        "size_units": { "x": 4, "y": 3, "z": 1 },
+        "layer_id": "top-reservations"
+      },
+      {
+        "id": "lid-finger-space",
+        "kind": "forbidden",
+        "purpose": "future_lid_or_removal_clearance",
+        "origin_units": { "x": 3, "y": 2, "z": 1 },
+        "size_units": { "x": 1, "y": 1, "z": 1 },
+        "layer_id": "bottom-modules"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "id": "cards-stack",
+      "name": "Tall card stack placeholder",
+      "functional_type": "sleeved_cards",
+      "min_dimensions_mm": { "x": 60, "y": 30, "z": 20 },
+      "height_mm": 20,
+      "priority": 100,
+      "allow_rotation": false,
+      "quantity": 1,
+      "comment": "P8 module explicitly mapped to a 2 x 1 x 2 grid span."
+    },
+    {
+      "id": "token-bin",
+      "name": "Small token bin placeholder",
+      "functional_type": "tokens",
+      "min_dimensions_mm": { "x": 30, "y": 30, "z": 10 },
+      "height_mm": 10,
+      "priority": 90,
+      "allow_rotation": false,
+      "quantity": 1,
+      "comment": "P8 single grid-cell module."
+    }
+  ]
+}

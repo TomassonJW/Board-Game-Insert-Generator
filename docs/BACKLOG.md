@@ -246,23 +246,23 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 
 - Capability : C-GRID-3D, C-LAYERS.
 - Milestone : M7 Volumetric planner.
-- Objectif : definir `VolumetricCell`, `Layer`, collisions X/Y/Z et volumes libres.
-- Livrable : specification pure Python/documentaire, invariants et tests documentaires.
-- Criteres d'acceptation : distinction claire entre cellule, corps imprimable, layer et reservation.
-- Tests : test documentaire, aucun changement dimensionnel.
-- Gate : architecture si le schema public executable change.
-- Statut : `ready_if_gate_deferred`.
+- Objectif : representer une grille X/Y/Z declarative, ses layers, placements explicites, zones reservees/interdites et volumes libres.
+- Livrable : modeles Python purs, bloc config `volumetric_grid`, validation, rapports Markdown/JSON, metadata CAD IR, exemple `simple_3d_grid.json`, ADR et tests.
+- Criteres d'acceptation : cellule, corps imprimable, layer et reservation restent distincts ; un module peut occuper plusieurs unites X/Y/Z ; aucun solveur ni Fusion.
+- Tests : unitaires, CLI Markdown/JSON/export CAD IR sur exemples existants et `simple_3d_grid`, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
+- Gate : validation humaine fournie le 2026-07-06 pour une extension schema additive et CAD-agnostic.
+- Statut : `done`, `implemented-cad-ir`.
 
-### P8-M002 - Prototyper la validation de collisions X/Y/Z hors solveur
+### P8-M002 - Approfondir reservations, ordre de retrait et surfaces de support abstraites
 
-- Capability : C-GRID-3D.
-- Milestone : M7 Volumetric planner.
-- Objectif : refuser chevauchements volumetriques simples sans optimiser.
-- Livrable : fonctions pures et tests unitaires.
-- Criteres d'acceptation : collisions et limites de boite detectees.
-- Tests : unitaires.
-- Gate : aucune si API interne additive.
-- Statut : `todo`.
+- Capability : C-LAYERS, C-RESERVATION, C-ACCESS.
+- Milestone : M7 Volumetric planner / M8 Ergonomic planner.
+- Objectif : enrichir le modele pur Python avec ordre de retrait, reservations verticales plus explicites et surfaces de support abstraites, sans solveur automatique ni Fusion.
+- Livrable : modeles et rapports CAD-agnostic, tests unitaires, docs de contrat.
+- Criteres d'acceptation : aucune promesse de support physique, aucune generation Fusion, aucune dependance lourde.
+- Tests : unitaires, CLI Markdown/JSON/export CAD IR sur exemples pertinents.
+- Gate : aucune si additive et non physique ; gate impression avant validation de support.
+- Statut : `ready`.
 
 ### P8-M003 - Representer empilement et supports abstraits
 
@@ -274,7 +274,6 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Tests : unitaires ou documentaires selon implementation.
 - Gate : impression reelle avant validation physique.
 - Statut : `todo`.
-
 ## Phase 9 - Assets, plateaux, boards, regles et reservations de couches
 
 ### P9-M001 - Specifier le schema asset-first

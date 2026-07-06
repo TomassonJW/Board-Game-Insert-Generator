@@ -7,9 +7,9 @@ pretendre encore a une validation physique.
 
 ## Etat actuel
 
-- Une seule hauteur utile est prise en compte.
-- Les modules ont une hauteur, mais pas d'etage ni d'ordre vertical.
-- Les boards, livrets et plateaux ne sont pas encore modelises comme reservations.
+- P8-M001 charge des layers declaratifs dans `volumetric_grid.layers`.
+- Les modules peuvent declarer une occupation X/Y/Z par `module_placements`.
+- Les boards, livrets et plateaux peuvent etre representes comme zones `reserved`, sans asset model complet.
 
 ## Concepts cibles
 
@@ -27,11 +27,21 @@ pretendre encore a une validation physique.
 
 ## Prochaines missions possibles
 
-1. `P8-M002 - Specifier les layers et reservations verticales`.
-2. `P8-M003 - Charger une fixture multi-layer sans solveur`.
+1. `P8-M002 - Approfondir reservations, ordre de retrait et surfaces de support abstraites`.
+2. `P8-M003 - Preparer une fixture multi-layer plus proche d'un jeu reel`.
 3. `P8-M004 - Rapporter l'ordre de retrait et les surfaces de support`.
 
 ## Gates
 
 - Gate impression reelle avant de valider une charge, un support ou une friction.
 - Gate Fusion si les layers declenchent une vue CAD nouvelle.
+
+## Convention P8-M001
+
+Un `Layer` P8-M001 est une bande de Z discretisee par `z_start` et `z_count`. Il
+porte un role documentaire comme `printable_modules` ou
+`future_board_rulebook_reservations`. Les layers ne creent pas encore de regles
+de support, de charge, de friction ou d'ordre de retrait.
+
+Toute interpretation physique d'un empilement reste experimentale tant qu'une
+impression et une mesure reelles n'ont pas ete faites.

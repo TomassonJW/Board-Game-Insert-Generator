@@ -64,8 +64,8 @@ Chaine de pilotage :
 | C-CAVITY | Cavity model | Cavities and ergonomic features | `implemented-cad-ir` | M4 Abstract cavities | Gate Fusion cuts |
 | C-FEATURE | Ergonomic feature model | Cavities and ergonomic features | `implemented-cad-ir` | M4 Abstract cavities / M8 Ergonomic planner | Taxonomie P6-M003 implementee ; gate Fusion pour nouvelles geometries |
 | C-LAYOUT-2D | 2D layout | Volumetric layout | `implemented-core` | M2 Simple layout | Aucune active |
-| C-GRID-3D | 3D volumetric grid | Volumetric layout | `planned` | M7 Volumetric planner | Gate architecture si contrat change |
-| C-LAYERS | Layer / stage model | Volumetric layout | `designed` | M7 Volumetric planner | Gate architecture si empilement physique |
+| C-GRID-3D | 3D volumetric grid | Volumetric layout | `implemented-cad-ir` | M7 Volumetric planner | P8-M001 implemente le socle declaratif; gate Fusion pour toute generation 3D |
+| C-LAYERS | Layer / stage model | Volumetric layout | `implemented-cad-ir` | M7 Volumetric planner | Layers declaratifs P8-M001; gate impression avant support physique |
 | C-RESERVATION | Board / tray / lid reservation | Asset-first design | `planned` | M6 Asset-first project model | Gate si impact dimensions publiques |
 | C-ACCESS | Accessibility and removal order | Human validation gates | `designed` | M8 Ergonomic planner | Validation ergonomique humaine |
 | C-STACKING | Support / stacking rules | Volumetric layout | `planned` | M7 Volumetric planner | Gate impression reelle |

@@ -3,16 +3,22 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 
 from board_game_insert_generator.feature_taxonomy import is_feature_taxonomy_compatible
+from board_game_insert_generator.volumetric import span_cells, span_fits_grid
 from board_game_insert_generator.models import (
     Cavity,
     Dimension3D,
     Feature,
     FeatureKind,
     FunctionalType,
+    GridPoint3D,
+    GridSize3D,
     IMPLEMENTED_LAYOUT_STRATEGIES,
     RESERVED_LAYOUT_STRATEGIES,
     InsertConfig,
     ToleranceProfile,
+    VolumetricGrid,
+    VolumetricModulePlacement,
+    VolumetricZone,
 )
 
 
@@ -123,6 +129,8 @@ def validate_config(config: InsertConfig) -> list[ValidationIssue]:
             issues,
         )
 
+    _validate_volumetric_grid(config, issues)
+
     if config.layout.strategy not in IMPLEMENTED_LAYOUT_STRATEGIES:
         implemented = ", ".join(f"'{strategy}'" for strategy in IMPLEMENTED_LAYOUT_STRATEGIES)
         message = f"V0 supports only these layout strategies: {implemented}."
@@ -144,6 +152,205 @@ def assert_valid_config(config: InsertConfig) -> None:
     if issues:
         raise ValidationError(issues)
 
+
+def _validate_volumetric_grid(config: InsertConfig, issues: list[ValidationIssue]) -> None:
+    grid = config.volumetric_grid
+    if grid is None:
+        return
+
+    _validate_positive_dimensions(grid.unit_size_mm, "volumetric_grid.unit_mm", issues)
+    _validate_positive_grid_size(grid.size_units, "volumetric_grid.size_units", issues)
+    _validate_grid_coverage(config, grid, issues)
+
+    layer_ids = _validate_volumetric_layers(grid, issues)
+    module_ids = {module.id for module in config.modules}
+    modules_by_id = {module.id: module for module in config.modules}
+    occupied_cells: dict[tuple[int, int, int], tuple[str, str]] = {}
+
+    seen_placement_ids: set[str] = set()
+    for index, placement in enumerate(grid.module_placements):
+        prefix = f"volumetric_grid.module_placements[{index}]"
+        if not placement.id:
+            issues.append(_issue(f"{prefix}.id", "EMPTY_ID", "Module placement id cannot be empty."))
+        if placement.id in seen_placement_ids:
+            issues.append(_issue(f"{prefix}.id", "DUPLICATE_ID", f"Duplicate module placement id '{placement.id}'."))
+        seen_placement_ids.add(placement.id)
+
+        if placement.module_id not in module_ids:
+            issues.append(
+                _issue(
+                    f"{prefix}.module_id",
+                    "VOLUMETRIC_UNKNOWN_MODULE",
+                    f"Module placement references unknown module '{placement.module_id}'.",
+                )
+            )
+        if placement.layer_id is not None and placement.layer_id not in layer_ids:
+            issues.append(
+                _issue(
+                    f"{prefix}.layer_id",
+                    "VOLUMETRIC_UNKNOWN_LAYER",
+                    f"Module placement references unknown layer '{placement.layer_id}'.",
+                )
+            )
+        if not span_fits_grid(placement.origin_units, placement.size_units, grid.size_units):
+            issues.append(_issue(prefix, "VOLUMETRIC_SPAN_OUTSIDE_GRID", "Module placement span must stay inside the grid."))
+        else:
+            _validate_module_placement_size(config, placement, prefix, issues)
+            _record_span_cells(placement.id, "module_placement", placement.origin_units, placement.size_units, occupied_cells, prefix, issues)
+
+        if placement.module_id in modules_by_id:
+            module = modules_by_id[placement.module_id]
+            if placement.instance_id is not None and not _instance_id_can_match(placement.instance_id, module.id, module.quantity):
+                issues.append(
+                    _issue(
+                        f"{prefix}.instance_id",
+                        "VOLUMETRIC_INSTANCE_ID_UNSUPPORTED",
+                        "Instance id must either be omitted or match the module quantity pattern '<module_id>-NN'.",
+                    )
+                )
+
+    seen_zone_ids: set[str] = set()
+    for index, zone in enumerate(grid.zones):
+        prefix = f"volumetric_grid.zones[{index}]"
+        if not zone.id:
+            issues.append(_issue(f"{prefix}.id", "EMPTY_ID", "Volumetric zone id cannot be empty."))
+        if zone.id in seen_zone_ids:
+            issues.append(_issue(f"{prefix}.id", "DUPLICATE_ID", f"Duplicate volumetric zone id '{zone.id}'."))
+        seen_zone_ids.add(zone.id)
+        if zone.layer_id is not None and zone.layer_id not in layer_ids:
+            issues.append(
+                _issue(
+                    f"{prefix}.layer_id",
+                    "VOLUMETRIC_UNKNOWN_LAYER",
+                    f"Zone references unknown layer '{zone.layer_id}'.",
+                )
+            )
+        if not span_fits_grid(zone.origin_units, zone.size_units, grid.size_units):
+            issues.append(_issue(prefix, "VOLUMETRIC_SPAN_OUTSIDE_GRID", "Zone span must stay inside the grid."))
+        else:
+            _record_span_cells(zone.id, f"zone:{zone.kind.value}", zone.origin_units, zone.size_units, occupied_cells, prefix, issues)
+
+
+def _validate_grid_coverage(config: InsertConfig, grid: VolumetricGrid, issues: list[ValidationIssue]) -> None:
+    coverage_x = grid.unit_size_mm.x * grid.size_units.x
+    coverage_y = grid.unit_size_mm.y * grid.size_units.y
+    coverage_z = grid.unit_size_mm.z * grid.size_units.z
+    if not _same_dimension(coverage_x, config.box.inner_dimensions.x):
+        issues.append(
+            _issue(
+                "volumetric_grid.size_units.x",
+                "VOLUMETRIC_GRID_COVERAGE_MISMATCH",
+                "Grid X units must cover the full box inner X dimension exactly in P8-M001.",
+            )
+        )
+    if not _same_dimension(coverage_y, config.box.inner_dimensions.y):
+        issues.append(
+            _issue(
+                "volumetric_grid.size_units.y",
+                "VOLUMETRIC_GRID_COVERAGE_MISMATCH",
+                "Grid Y units must cover the full box inner Y dimension exactly in P8-M001.",
+            )
+        )
+    if not _same_dimension(coverage_z, config.box.usable_height_mm):
+        issues.append(
+            _issue(
+                "volumetric_grid.size_units.z",
+                "VOLUMETRIC_GRID_COVERAGE_MISMATCH",
+                "Grid Z units must cover usable_height_mm exactly, not the full lid-reserved box height.",
+            )
+        )
+
+
+def _validate_volumetric_layers(grid: VolumetricGrid, issues: list[ValidationIssue]) -> set[str]:
+    layer_ids: set[str] = set()
+    occupied_z: dict[int, str] = {}
+    for index, layer in enumerate(grid.layers):
+        prefix = f"volumetric_grid.layers[{index}]"
+        if not layer.id:
+            issues.append(_issue(f"{prefix}.id", "EMPTY_ID", "Layer id cannot be empty."))
+        if layer.id in layer_ids:
+            issues.append(_issue(f"{prefix}.id", "DUPLICATE_ID", f"Duplicate layer id '{layer.id}'."))
+        layer_ids.add(layer.id)
+        _validate_non_negative_int(layer.z_start, f"{prefix}.z_start", issues)
+        _validate_positive_int(layer.z_count, f"{prefix}.z_count", issues)
+        if layer.z_start + layer.z_count > grid.size_units.z:
+            issues.append(_issue(prefix, "VOLUMETRIC_LAYER_OUTSIDE_GRID", "Layer Z span must stay inside the grid."))
+        for z in range(layer.z_start, layer.z_start + max(layer.z_count, 0)):
+            existing = occupied_z.get(z)
+            if existing is not None:
+                issues.append(
+                    _issue(prefix, "VOLUMETRIC_LAYER_OVERLAP", f"Layer overlaps Z unit {z} already used by '{existing}'.")
+                )
+            else:
+                occupied_z[z] = layer.id
+    return layer_ids
+
+
+def _validate_module_placement_size(
+    config: InsertConfig,
+    placement: VolumetricModulePlacement,
+    prefix: str,
+    issues: list[ValidationIssue],
+) -> None:
+    module = next((candidate for candidate in config.modules if candidate.id == placement.module_id), None)
+    if module is None:
+        return
+    span_x = placement.size_units.x * config.volumetric_grid.unit_size_mm.x  # type: ignore[union-attr]
+    span_y = placement.size_units.y * config.volumetric_grid.unit_size_mm.y  # type: ignore[union-attr]
+    span_z = placement.size_units.z * config.volumetric_grid.unit_size_mm.z  # type: ignore[union-attr]
+    if span_x < module.min_dimensions.x or span_y < module.min_dimensions.y or span_z < module.desired_height_mm:
+        issues.append(
+            _issue(
+                prefix,
+                "VOLUMETRIC_PLACEMENT_TOO_SMALL",
+                "Module placement units must translate to millimeter dimensions at least as large as the module request.",
+            )
+        )
+
+
+def _record_span_cells(
+    owner_id: str,
+    owner_type: str,
+    origin: GridPoint3D,
+    size: GridSize3D,
+    occupied_cells: dict[tuple[int, int, int], tuple[str, str]],
+    prefix: str,
+    issues: list[ValidationIssue],
+) -> None:
+    for cell in span_cells(origin, size):
+        previous = occupied_cells.get(cell)
+        if previous is not None:
+            issues.append(
+                _issue(
+                    prefix,
+                    "VOLUMETRIC_CELL_COLLISION",
+                    f"Cell {cell} is already used by {previous[1]} '{previous[0]}'.",
+                )
+            )
+        else:
+            occupied_cells[cell] = (owner_id, owner_type)
+
+
+def _validate_positive_grid_size(size: GridSize3D, field: str, issues: list[ValidationIssue]) -> None:
+    _validate_positive_int(size.x, f"{field}.x", issues)
+    _validate_positive_int(size.y, f"{field}.y", issues)
+    _validate_positive_int(size.z, f"{field}.z", issues)
+
+
+def _validate_non_negative_int(value: int, field: str, issues: list[ValidationIssue]) -> None:
+    if value < 0:
+        issues.append(_issue(field, "NEGATIVE_VALUE", "Value must be greater than or equal to zero."))
+
+
+def _same_dimension(left: float, right: float) -> bool:
+    return abs(left - right) < 1e-6
+
+
+def _instance_id_can_match(instance_id: str, module_id: str, quantity: int) -> bool:
+    prefix, separator, suffix = instance_id.rpartition("-")
+    if separator != "-" or prefix != module_id or not suffix.isdigit():
+        return False
+    return 1 <= int(suffix) <= quantity
 
 def _validate_module_cavities(
     cavities: tuple[Cavity, ...],

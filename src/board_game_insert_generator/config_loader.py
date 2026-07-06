@@ -14,19 +14,26 @@ from board_game_insert_generator.models import (
     FeatureTaxonomyKind,
     FunctionalType,
     GeometryDefaults,
+    GridPoint3D,
+    GridSize3D,
     LAYOUT_STRATEGY_ROW_FILL,
     InsertConfig,
     LayoutSettings,
     ModuleRequest,
     Point3D,
     ToleranceProfile,
+    VolumetricGrid,
+    VolumetricLayer,
+    VolumetricModulePlacement,
+    VolumetricZone,
+    VolumetricZoneKind,
 )
 from board_game_insert_generator.print_profiles import (
     PRINT_PROFILE_DEFAULT,
     resolve_print_profile,
 )
 
-ROOT_FIELDS = {"project_name", "units", "box", "print_profile", "tolerances", "defaults", "layout", "modules"}
+ROOT_FIELDS = {"project_name", "units", "box", "print_profile", "tolerances", "defaults", "layout", "modules", "volumetric_grid"}
 BOX_FIELDS = {"inner_dimensions_mm", "usable_height_mm", "lid_clearance_mm"}
 MODULE_FIELDS = {
     "id",
@@ -42,6 +49,10 @@ MODULE_FIELDS = {
 }
 CAVITY_FIELDS = {"id", "functional_type", "origin_mm", "size_mm", "clearance_mm", "comment", "features"}
 FEATURE_FIELDS = {"id", "kind", "taxonomy", "placement", "position_mm", "size_mm", "radius_mm", "comment"}
+VOLUMETRIC_GRID_FIELDS = {"unit_mm", "size_units", "layers", "module_placements", "zones", "comment"}
+VOLUMETRIC_LAYER_FIELDS = {"id", "name", "z_start", "z_count", "role", "comment"}
+VOLUMETRIC_PLACEMENT_FIELDS = {"id", "module_id", "instance_id", "origin_units", "size_units", "layer_id", "comment"}
+VOLUMETRIC_ZONE_FIELDS = {"id", "kind", "purpose", "origin_units", "size_units", "layer_id", "comment"}
 
 class ConfigError(ValueError):
     """Raised when a configuration file cannot be parsed."""
@@ -70,6 +81,7 @@ def load_config(path: str | Path) -> InsertConfig:
     defaults = _parse_float_dataclass(GeometryDefaults, raw.get("defaults", {}), "defaults")
     layout = _parse_layout(raw.get("layout", {}))
     modules = tuple(_parse_modules(raw.get("modules", []), tolerances))
+    volumetric_grid = _parse_volumetric_grid(raw.get("volumetric_grid"))
 
     return InsertConfig(
         project_name=_optional_string(
@@ -86,6 +98,150 @@ def load_config(path: str | Path) -> InsertConfig:
         modules=modules,
         print_profile=print_profile,
         source_path=str(config_path),
+        volumetric_grid=volumetric_grid,
+    )
+
+def _parse_volumetric_grid(raw: Any) -> VolumetricGrid | None:
+    if raw is None:
+        return None
+    if not isinstance(raw, dict):
+        raise ConfigError("'volumetric_grid' must be an object.")
+
+    _reject_unknown_fields(raw, VOLUMETRIC_GRID_FIELDS, "volumetric_grid")
+    return VolumetricGrid(
+        unit_size_mm=_parse_dimensions(
+            _required_mapping(raw, "unit_mm", "volumetric_grid.unit_mm"),
+            field_name="volumetric_grid.unit_mm",
+        ),
+        size_units=_parse_grid_size(
+            _required_mapping(raw, "size_units", "volumetric_grid.size_units"),
+            field_name="volumetric_grid.size_units",
+        ),
+        layers=tuple(_parse_volumetric_layers(raw.get("layers", []))),
+        module_placements=tuple(_parse_volumetric_module_placements(raw.get("module_placements", []))),
+        zones=tuple(_parse_volumetric_zones(raw.get("zones", []))),
+        comment=_optional_string(raw, "comment", "volumetric_grid", default=""),
+    )
+
+
+def _parse_volumetric_layers(raw_layers: Any) -> list[VolumetricLayer]:
+    if raw_layers is None:
+        return []
+    if not isinstance(raw_layers, list):
+        raise ConfigError("'volumetric_grid.layers' must be a list.")
+
+    layers: list[VolumetricLayer] = []
+    for index, raw in enumerate(raw_layers):
+        field = f"volumetric_grid.layers[{index}]"
+        if not isinstance(raw, dict):
+            raise ConfigError(f"{field} must be an object.")
+        _reject_unknown_fields(raw, VOLUMETRIC_LAYER_FIELDS, field)
+        layers.append(
+            VolumetricLayer(
+                id=_optional_string(raw, "id", field, default=f"layer-{index + 1}"),
+                name=_optional_string(raw, "name", field, default=f"Layer {index + 1}"),
+                z_start=_required_int(raw, "z_start", field),
+                z_count=_required_int(raw, "z_count", field),
+                role=_optional_string(raw, "role", field, default="unspecified"),
+                comment=_optional_string(raw, "comment", field, default=""),
+            )
+        )
+    return layers
+
+
+def _parse_volumetric_module_placements(raw_placements: Any) -> list[VolumetricModulePlacement]:
+    if raw_placements is None:
+        return []
+    if not isinstance(raw_placements, list):
+        raise ConfigError("'volumetric_grid.module_placements' must be a list.")
+
+    placements: list[VolumetricModulePlacement] = []
+    for index, raw in enumerate(raw_placements):
+        field = f"volumetric_grid.module_placements[{index}]"
+        if not isinstance(raw, dict):
+            raise ConfigError(f"{field} must be an object.")
+        _reject_unknown_fields(raw, VOLUMETRIC_PLACEMENT_FIELDS, field)
+        if "module_id" not in raw:
+            raise ConfigError(f"Missing required field '{field}.module_id'.")
+        instance_id = _optional_nullable_string(raw, "instance_id", field)
+        placements.append(
+            VolumetricModulePlacement(
+                id=_optional_string(raw, "id", field, default=f"module-placement-{index + 1}"),
+                module_id=_optional_string(raw, "module_id", field, default=""),
+                instance_id=instance_id,
+                origin_units=_parse_grid_point(
+                    _required_mapping(raw, "origin_units", f"{field}.origin_units"),
+                    field_name=f"{field}.origin_units",
+                ),
+                size_units=_parse_grid_size(
+                    _required_mapping(raw, "size_units", f"{field}.size_units"),
+                    field_name=f"{field}.size_units",
+                ),
+                layer_id=_optional_nullable_string(raw, "layer_id", field),
+                comment=_optional_string(raw, "comment", field, default=""),
+            )
+        )
+    return placements
+
+
+def _parse_volumetric_zones(raw_zones: Any) -> list[VolumetricZone]:
+    if raw_zones is None:
+        return []
+    if not isinstance(raw_zones, list):
+        raise ConfigError("'volumetric_grid.zones' must be a list.")
+
+    zones: list[VolumetricZone] = []
+    for index, raw in enumerate(raw_zones):
+        field = f"volumetric_grid.zones[{index}]"
+        if not isinstance(raw, dict):
+            raise ConfigError(f"{field} must be an object.")
+        _reject_unknown_fields(raw, VOLUMETRIC_ZONE_FIELDS, field)
+        zones.append(
+            VolumetricZone(
+                id=_optional_string(raw, "id", field, default=f"zone-{index + 1}"),
+                kind=_parse_volumetric_zone_kind(raw.get("kind", "reserved"), field),
+                purpose=_optional_string(raw, "purpose", field, default="unspecified"),
+                origin_units=_parse_grid_point(
+                    _required_mapping(raw, "origin_units", f"{field}.origin_units"),
+                    field_name=f"{field}.origin_units",
+                ),
+                size_units=_parse_grid_size(
+                    _required_mapping(raw, "size_units", f"{field}.size_units"),
+                    field_name=f"{field}.size_units",
+                ),
+                layer_id=_optional_nullable_string(raw, "layer_id", field),
+                comment=_optional_string(raw, "comment", field, default=""),
+            )
+        )
+    return zones
+
+
+def _parse_volumetric_zone_kind(value: Any, field_path: str) -> VolumetricZoneKind:
+    try:
+        return VolumetricZoneKind(str(value))
+    except ValueError as exc:
+        allowed = ", ".join(item.value for item in VolumetricZoneKind)
+        raise ConfigError(
+            f"Unsupported volumetric zone kind for {field_path}: {value!r}. "
+            f"Allowed values: {allowed}."
+        ) from exc
+
+
+def _parse_grid_point(raw: dict[str, Any], field_name: str) -> GridPoint3D:
+    _reject_unknown_fields(raw, {"x", "y", "z"}, field_name)
+    return GridPoint3D(
+        x=_required_int(raw, "x", field_name),
+        y=_required_int(raw, "y", field_name),
+        z=_required_int(raw, "z", field_name),
+    )
+
+
+def _parse_grid_size(raw: dict[str, Any], field_name: str) -> GridSize3D:
+    _reject_unknown_fields(raw, {"x", "y", "z"}, field_name)
+    return GridSize3D(
+        x=_required_int(raw, "x", field_name),
+        y=_required_int(raw, "y", field_name),
+        z=_required_int(raw, "z", field_name),
     )
 
 def _parse_box(raw: dict[str, Any]) -> BoxSpec:
@@ -413,6 +569,23 @@ def _bool(raw: dict[str, Any], key: str, field_name: str, default: bool) -> bool
     value = raw[key]
     if not isinstance(value, bool):
         raise ConfigError(f"Field '{field_name}.{key}' must be a boolean.")
+    return value
+
+def _required_int(raw: dict[str, Any], key: str, field_name: str) -> int:
+    if key not in raw:
+        raise ConfigError(f"Missing required field '{field_name}.{key}'.")
+    value = raw[key]
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise ConfigError(f"Field '{field_name}.{key}' must be an integer.")
+    return value
+
+
+def _optional_nullable_string(raw: dict[str, Any], key: str, field_name: str) -> str | None:
+    if key not in raw or raw[key] is None:
+        return None
+    value = raw[key]
+    if not isinstance(value, str):
+        raise ConfigError(f"Field '{field_name}.{key}' must be a string.")
     return value
 
 def _optional_string(raw: dict[str, Any], key: str, field_name: str, default: str) -> str:

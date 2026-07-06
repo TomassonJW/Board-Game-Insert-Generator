@@ -195,23 +195,30 @@ La mission `P6-M003` formalise une taxonomie CAD-agnostic des aides de prise :
 `rounded_floor_intent`. Les rapports et la CAD IR exposent cette taxonomie sans
 ajouter de nouvelle geometrie Fusion reelle.
 
+La mission `P8-M001` implemente le socle de grille volumetrique 3D dans le coeur
+Python pur : config `volumetric_grid`, unites X/Y/Z, layers, placements de
+modules, zones reservees/interdites, validation de couverture utile, cellules
+libres et metadata CAD IR. Aucun solveur automatique et aucune generation Fusion
+volumetrique ne sont ajoutes.
+
 ## Phase active
 
-Phase active : **Gate P6-M004 avant nouvelle generation Fusion avancee**.
+Phase active : **P8 volumetric planner abstrait / gate avant generation Fusion volumetrique**.
 
 Etat : le pipeline P4 reste stable pour les blanks rectangulaires Fusion. La
 vague P5 est terminee cote moteur Python pur, configuration, rapports et CAD IR.
 P6-M001 est `fusion-validated` pour les cavites rectangulaires simples, avec
 `print-validated: false`. P6-M002 est `fusion-validated` pour les encoches
 simples de paroi top-open, avec `print-validated: false`. P6-M003 est termine
-cote taxonomie abstraite CAD-agnostic.
+cote taxonomie abstraite CAD-agnostic. P8-M001 est termine cote grille
+volumetrique declarative, layers et metadata CAD IR.
 La North Star cible un
 generateur volumetrique asset-first, pilote par capabilities.
 
-Prochaine action : gate humaine `P6-M004` si la suite vise une generation Fusion
-reelle d'aide de prise avancee. Sans validation humaine, la prochaine mission
-possible doit rester non-Fusion ou documentaire, par exemple `P8-M001` si la gate
-Fusion est explicitement reportee.
+Prochaine action recommandee : `P8-M002` si la suite reste coeur Python pur et
+CAD-agnostic. Une nouvelle gate humaine est requise avant toute generation Fusion
+reelle liee a la grille 3D, aux layers, aux vues eclatees ou aux features
+avancees.
 
 ## Implemente
 
@@ -265,6 +272,8 @@ Fusion est explicitement reportee.
   reportees et exportees dans la CAD IR par `describe_cavity_feature`.
 - Taxonomie P6-M003 des aides de prise, exposee dans les rapports et la CAD IR,
   avec validation des couples `kind` / `taxonomy`.
+- Socle P8-M001 de grille volumetrique 3D declarative : config, validation,
+  cellules libres/occupees/reservees/interdites, rapports et metadata CAD IR.
 - Generation Fusion de cavites rectangulaires simples P6-M001 depuis
   `subtract_rectangular_cavity`, avec coupe verticale limitee au body cible,
   `fusion-validated` et `print-validated: false`.
@@ -317,7 +326,7 @@ Fusion est explicitement reportee.
 - Surcouche esthetique.
 - Assistant de conception.
 - Modele asset-first.
-- Grille volumetrique 3D, layers, reservations et volumes libres.
+- Solveur volumetrique 3D et reservations derivees d'assets.
 - Vue Fusion eclatee.
 - Solveur semi-automatique et scoring.
 - Packaging produit et exemples reels.
@@ -347,16 +356,22 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant `P6-M003 - Formaliser la taxonomie des encoches et aides de prise` :
+Derniere verification pendant `P8-M001 - Socle de grille volumetrique 3D et layers` :
 
-- `python -m unittest discover -s tests` : OK, 105 tests passes.
-- `python -m py_compile src\board_game_insert_generator\models.py src\board_game_insert_generator\feature_taxonomy.py src\board_game_insert_generator\config_loader.py src\board_game_insert_generator\validation.py src\board_game_insert_generator\report.py src\board_game_insert_generator\cad_ir.py` : OK.
+- `python -m unittest discover -s tests` : OK, 114 tests passes.
+- `python -m py_compile src\board_game_insert_generator\models.py src\board_game_insert_generator\config_loader.py src\board_game_insert_generator\validation.py src\board_game_insert_generator\volumetric.py src\board_game_insert_generator\report.py src\board_game_insert_generator\cad_ir.py` : OK.
+- `python -m board_game_insert_generator examples\simple_box.json --format markdown` : OK.
+- `python -m board_game_insert_generator examples\simple_box.json --format json` : OK.
+- `python -m board_game_insert_generator export-cad-ir examples\simple_box.json` : OK, schema `cad_ir.v0`, 4 composants.
 - `python -m board_game_insert_generator examples\simple_tray.json --format markdown` : OK.
 - `python -m board_game_insert_generator examples\simple_tray.json --format json` : OK.
 - `python -m board_game_insert_generator export-cad-ir examples\simple_tray.json` : OK, schema `cad_ir.v0`, 1 composant.
-- `python -m board_game_insert_generator examples\simple_finger_notch_tray.json --format markdown` : OK, taxonomie exposee.
-- `python -m board_game_insert_generator examples\simple_finger_notch_tray.json --format json` : OK, taxonomie exposee.
-- `python -m board_game_insert_generator export-cad-ir examples\simple_finger_notch_tray.json` : OK, schema `cad_ir.v0`, taxonomie exposee dans les features et operations `describe_cavity_feature`.
+- `python -m board_game_insert_generator examples\simple_finger_notch_tray.json --format markdown` : OK.
+- `python -m board_game_insert_generator examples\simple_finger_notch_tray.json --format json` : OK.
+- `python -m board_game_insert_generator export-cad-ir examples\simple_finger_notch_tray.json` : OK, schema `cad_ir.v0`, 1 composant.
+- `python -m board_game_insert_generator examples\simple_3d_grid.json --format markdown` : OK, section `Volumetric grid` exposee.
+- `python -m board_game_insert_generator examples\simple_3d_grid.json --format json` : OK, `volumetric_grid.free_cell_count = 18`.
+- `python -m board_game_insert_generator export-cad-ir examples\simple_3d_grid.json` : OK, schema `cad_ir.v0`, metadata `volumetric_grid`, 2 composants.
 - `git diff --check` : OK.
 - `rg -n "adsk" src/board_game_insert_generator` : OK, aucune occurrence dans le coeur Python.
 

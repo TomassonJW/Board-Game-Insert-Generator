@@ -27,6 +27,8 @@ Le depot contient :
 - des features ergonomiques de cavites avec taxonomie explicite, comme encoches
   top-open, demi-lunes futures, fenetres de paroi, scoops et fonds arrondis
   intentionnels ;
+- un socle de grille volumetrique 3D declarative, avec unites X/Y/Z, layers,
+  placements de modules, zones reservees/interdites et volume libre reporte ;
 - un add-in Fusion isole capable de charger cette CAD IR depuis
   `cad_ir_input.json` ou `cad_ir_path.txt`.
 
@@ -94,6 +96,8 @@ python -m board_game_insert_generator examples/simple_open_tray.json --format ma
 python -m board_game_insert_generator examples/simple_finger_notch_tray.json --format markdown
 python -m board_game_insert_generator export-cad-ir examples/simple_tray.json --output $env:TEMP\bgig-simple-tray-cad-ir.json
 python -m board_game_insert_generator export-cad-ir examples/simple_finger_notch_tray.json --output $env:TEMP\bgig-simple-finger-notch-cad-ir.json
+python -m board_game_insert_generator examples/simple_3d_grid.json --format markdown
+python -m board_game_insert_generator export-cad-ir examples/simple_3d_grid.json --output $env:TEMP\bgig-simple-3d-grid-cad-ir.json
 ```
 
 La cavite apparait dans les rapports et dans la CAD IR comme operation abstraite
@@ -110,7 +114,8 @@ courbe mais utilise encore un fallback rectangulaire top-open.
 Les rapports exposent un resume de diagnostic : strategie de layout, nombre de
 modules demandes, instances generees, corps imprimables, rotations, empreinte du
 layout, comparaison simple `row_fill` / `grid`, tolerances principales,
-cavites/features planifiees et warnings. Ces informations restent une validation
+cavites/features planifiees, grille volumetrique declaree, cellules libres et
+warnings. Ces informations restent une validation
 abstraite du moteur, pas une validation Fusion 360 ou impression 3D.
 
 Pour lancer un diagnostic court sans choisir un format de rapport :
@@ -218,9 +223,11 @@ actions si necessaire, puis lancer les tests disponibles.
 - Les couvercles, modules composites et mecanismes sont prevus mais non
   fonctionnels.
 - Les tolerances par defaut doivent etre validees par impression reelle.
-- Le comportement Fusion 360 implemente reste limite aux blanks rectangulaires
-  minimaux charges depuis une CAD IR JSON; aucune cavite, aucune encoche, aucun
-  fond arrondi, aucun fillet et aucun export STL/3MF ne sont implementes.
+- Le comportement Fusion 360 implemente reste limite aux blanks rectangulaires,
+  cavites rectangulaires simples et encoches rectangulaires top-open charges
+  depuis une CAD IR JSON. La grille 3D, les layers, les vues eclatees, les
+  fonds arrondis, les fillets et les exports STL/3MF ne sont pas generes dans
+  Fusion.
 
 ## Licence
 

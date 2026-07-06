@@ -192,6 +192,17 @@ Dans l'adaptateur Fusion, `size_mm.z` est la profondeur depuis le haut du body,
 pas une hauteur de fenetre fermee. `rounded_floor` reste planifie seulement et
 non execute.
 
+## Metadata de grille volumetrique
+
+Depuis P8-M001, `metadata.volumetric_grid` transporte une synthese additive quand
+la configuration declare `volumetric_grid` : taille d'unite, nombre d'unites,
+coverage en millimetres, cells `free` / `occupied` / `reserved` / `forbidden`,
+layers, placements de modules, zones et volume libre approximatif.
+
+Cette metadata ne change pas `schema_version`, ne cree aucune operation Fusion et
+ne remplace pas les dimensions `theoretical_*` / `printable_*` des bodies. Un
+adaptateur CAD peut l'ignorer sans invalider la CAD IR V0.
+
 ## Face roles et tolerances
 
 La scene transporte les donnees explicables de tolerance :

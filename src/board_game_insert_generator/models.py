@@ -41,6 +41,11 @@ class FeatureTaxonomyKind(str, Enum):
     ROUNDED_FLOOR_INTENT = "rounded_floor_intent"
 
 
+class VolumetricZoneKind(str, Enum):
+    RESERVED = "reserved"
+    FORBIDDEN = "forbidden"
+
+
 LAYOUT_STRATEGY_ROW_FILL = "row_fill"
 LAYOUT_STRATEGY_GRID = "grid"
 LAYOUT_STRATEGY_COLUMNS = "columns"
@@ -135,6 +140,61 @@ class LayoutSettings:
 
 
 @dataclass(frozen=True)
+class GridPoint3D:
+    x: int
+    y: int
+    z: int
+
+
+@dataclass(frozen=True)
+class GridSize3D:
+    x: int
+    y: int
+    z: int
+
+
+@dataclass(frozen=True)
+class VolumetricLayer:
+    id: str
+    name: str
+    z_start: int
+    z_count: int
+    role: str
+    comment: str = ""
+
+
+@dataclass(frozen=True)
+class VolumetricModulePlacement:
+    id: str
+    module_id: str
+    origin_units: GridPoint3D
+    size_units: GridSize3D
+    instance_id: str | None = None
+    layer_id: str | None = None
+    comment: str = ""
+
+
+@dataclass(frozen=True)
+class VolumetricZone:
+    id: str
+    kind: VolumetricZoneKind
+    purpose: str
+    origin_units: GridPoint3D
+    size_units: GridSize3D
+    layer_id: str | None = None
+    comment: str = ""
+
+
+@dataclass(frozen=True)
+class VolumetricGrid:
+    unit_size_mm: Dimension3D
+    size_units: GridSize3D
+    layers: tuple[VolumetricLayer, ...] = ()
+    module_placements: tuple[VolumetricModulePlacement, ...] = ()
+    zones: tuple[VolumetricZone, ...] = ()
+    comment: str = ""
+
+@dataclass(frozen=True)
 class Cavity:
     id: str
     functional_type: FunctionalType
@@ -171,6 +231,7 @@ class InsertConfig:
     modules: tuple[ModuleRequest, ...]
     print_profile: str = "default"
     source_path: str | None = None
+    volumetric_grid: VolumetricGrid | None = None
 
 
 @dataclass(frozen=True)

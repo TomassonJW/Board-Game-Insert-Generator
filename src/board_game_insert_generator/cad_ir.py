@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from board_game_insert_generator.feature_taxonomy import feature_taxonomy_to_dict
+from board_game_insert_generator.volumetric import build_volumetric_summary
 from board_game_insert_generator.models import (
     Cavity,
     Dimension3D,
@@ -251,6 +252,7 @@ class CadSceneMetadata:
     layout_strategy: str
     print_profile: str
     warnings: tuple[str, ...]
+    volumetric_grid: dict[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -259,6 +261,7 @@ class CadSceneMetadata:
             "layout_strategy": self.layout_strategy,
             "print_profile": self.print_profile,
             "warnings": list(self.warnings),
+            "volumetric_grid": self.volumetric_grid,
         }
 
 @dataclass(frozen=True)
@@ -316,6 +319,7 @@ def build_blank_cad_scene(config: InsertConfig, layout: LayoutResult) -> CadScen
         )
         for cell in layout.cells
     )
+    volumetric_summary = build_volumetric_summary(config)
     return CadScene(
         schema_version=CAD_IR_SCHEMA_VERSION,
         units=CAD_IR_UNITS,
@@ -335,6 +339,7 @@ def build_blank_cad_scene(config: InsertConfig, layout: LayoutResult) -> CadScen
             layout_strategy=config.layout.strategy,
             print_profile=config.print_profile,
             warnings=layout.warnings,
+            volumetric_grid=volumetric_summary.to_dict() if volumetric_summary is not None else None,
         ),
     )
 

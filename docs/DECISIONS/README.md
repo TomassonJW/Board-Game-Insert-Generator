@@ -105,6 +105,10 @@ Tests, cartes backlog ou gates humaines a preparer.
 - `ADR-0014-fusion-simple-finger-notch-cuts.md` - encoches de doigts simples
   comme coupes rectangulaires Fusion issues de la CAD IR.
 
+- `ADR-0015-feature-taxonomy.md` - taxonomie CAD-agnostic des aides de prise.
+- `ADR-0016-volumetric-grid-contract.md` - contrat declaratif de grille
+  volumetrique 3D.
+
 ## Regles de maintenance
 
 - Ne reecris pas l'historique d'une ADR acceptee pour changer la decision.

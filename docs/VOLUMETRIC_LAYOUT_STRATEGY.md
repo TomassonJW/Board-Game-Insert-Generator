@@ -11,11 +11,12 @@ libres, en empilement, en reservations de boards/livrets et en ordre de retrait.
 - `row_fill` et `grid` placent des cellules XY simples.
 - Z sert surtout a verifier la hauteur du module et la hauteur utile.
 - Les cavites et features sont locales aux modules mais restent abstraites.
+- P8-M001 ajoute un socle declaratif `volumetric_grid` dans le coeur Python pur : unites X/Y/Z, size_units, layers, placements de modules, zones reservees/interdites et cellules libres reportees.
 - Aucun solveur volumetrique 3D n'est implemente.
 
 ## Concepts cibles
 
-- `VolumetricCell` : unite ou reservation X/Y/Z dans la boite.
+- `VolumetricCell` : unite ou reservation X/Y/Z dans la boite, serialisee comme cellule `free`, `occupied`, `reserved` ou `forbidden` dans les rapports P8-M001.
 - `Layer` : tranche de hauteur avec regles de support et retrait.
 - `Reservation` : espace non imprime reserve a un board, livret, plateau ou vide fonctionnel.
 - `FreeVolume` : volume restant exploitable ou a documenter.
@@ -31,12 +32,32 @@ libres, en empilement, en reservations de boards/livrets et en ordre de retrait.
 
 ## Prochaines missions possibles
 
-1. `P8-M001 - Specifier le modele de grille volumetrique 3D` : docs/tests de contrat seulement.
-2. `P8-M002 - Representer les layers et reservations non imprimables` : modele pur, sans solveur.
-3. `P8-M003 - Valider les collisions X/Y/Z dans une fixture simple` : moteur pur.
+1. `P8-M001 - Specifier et implementer le socle de grille volumetrique 3D` : done, modele pur, config, validation, rapports et metadata CAD IR.
+2. `P8-M002 - Approfondir reservations, layers et ordre de retrait` : modele pur, sans solveur complet.
+3. `P8-M003 - Preparer les collisions X/Y/Z issues d'un futur planner` : moteur pur.
 
 ## Gates
 
 - Gate architecture si le format de configuration public change de maniere incompatible.
 - Gate impression reelle avant toute promesse de support/empilement physique.
 - Gate Fusion si une vue 3D volumetrique cree une geometrie nouvelle dans Fusion.
+
+## Socle P8-M001
+
+Le bloc racine optionnel `volumetric_grid` represente une grille discrete qui
+couvre exactement le volume utile : X/Y correspondent aux dimensions internes de
+boite, Z correspond a `usable_height_mm`. Cette convention garde la reservation
+sous couvercle hors grille utile.
+
+Le moteur accepte uniquement des placements explicites. Il ne cherche pas encore
+ou placer les modules. Il calcule :
+
+- nombre total de cellules ;
+- cellules occupees par module ;
+- cellules reservees ;
+- cellules interdites ;
+- cellules libres ;
+- volume libre approximatif en `mm^3`.
+
+Les collisions simples entre placements, reservations et zones interdites sont
+refusees par la validation. Cela reste un controle declaratif, pas un solveur.

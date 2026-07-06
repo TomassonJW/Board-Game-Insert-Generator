@@ -94,6 +94,10 @@ Capabilities liees : C-GRID-3D, C-LAYERS, C-STACKING.
 Criteres de reussite : representation pure Python testee, collisions X/Y/Z
 explicites, aucune promesse physique sans impression.
 
+Statut P8-M001 : socle declaratif implemente pour grille X/Y/Z, layers,
+placements explicites, zones reservees/interdites, rapports et metadata CAD IR.
+Aucun solveur automatique ni generation Fusion volumetrique.
+
 ## Phase 9 - Assets, plateaux, boards, regles et reservations de couches
 
 Objectif : passer d'un modele module-first a un modele asset-first avec

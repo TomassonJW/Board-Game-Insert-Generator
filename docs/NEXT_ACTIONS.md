@@ -20,37 +20,36 @@ structurant, authentification absente ou refus de push direct.
 
 Statut : `required_before_next_fusion_geometry`.
 
-`P6-M003 - Formaliser la taxonomie des encoches et aides de prise` est termine.
-La taxonomie distingue les encoches top-open, demi-lunes futures, fenetres de
-paroi, scoops internes, degagements lateraux et acces bilateraux sans generer de
-nouvelle geometrie Fusion.
+P8-M001 est termine dans le perimetre coeur Python pur, configuration,
+validation, rapports et CAD IR abstraite. Aucune geometrie Fusion volumetrique
+n'est generee.
 
-Action humaine requise avant toute mission qui genere reellement : demi-lune
-courbe, scoop interne non traversant, fillet/conge, fond arrondi, geometrie
-courbe, grille 3D ou module composite dans Fusion.
+Action humaine requise avant toute mission qui genere reellement : grille 3D,
+layers, vue eclatee, demi-lune courbe, scoop interne, fillet/conge, fond arrondi,
+geometrie courbe, module composite ou export STL/3MF dans Fusion.
+
+## Mission ready non gated
+
+`P8-M002 - Approfondir reservations, ordre de retrait et surfaces de support abstraites`.
+
+- Capability : `C-LAYERS`, `C-RESERVATION`, `C-ACCESS`.
+- Milestone : `M7 Volumetric planner` / `M8 Ergonomic planner`.
+- Objectif : enrichir le modele pur Python avec ordre de retrait, reservations
+  verticales plus explicites et surfaces de support abstraites, sans solveur
+  automatique ni Fusion.
+- Gate : aucune si la mission reste additive, CAD-agnostic et sans promesse
+  physique.
+- Validation : tests unitaires, CLI Markdown/JSON/export CAD IR sur exemples
+  pertinents, docs de pilotage mises a jour.
 
 ## Mission bloquee par gate
 
-`P6-M004 - Gate generation Fusion des aides de prise avancees`.
+`P8-FUSION-GATE - Generation Fusion volumetrique ou vue 3D`.
 
-- Capability : `C-FILLETS`, `C-FEATURE`, `C-ACCESS`.
-- Objectif : choisir explicitement la prochaine operation Fusion reelle a tenter,
-  ses limites et son smoke test manuel.
+- Capability : `C-FUSION-COMPACT`, `C-FUSION-EXPLODED`, `C-GRID-3D`.
+- Objectif : choisir explicitement si et comment une grille/layer doit produire
+  une vue Fusion reelle.
 - Statut : `blocked` jusqu'a validation humaine.
-
-## Mission ready non gated si la gate Fusion est reportee
-
-Statut : `ready_if_gate_deferred`.
-
-`P8-M001 - Specifier la grille volumetrique 3D et les layers`.
-
-- Capability : `C-GRID-3D`, `C-LAYERS`.
-- Milestone : `M7 Volumetric planner`.
-- Objectif : definir le contrat pur Python de cellules X/Y/Z, layers,
-  reservations, volumes libres et collisions, sans solveur complet.
-- Gate : aucune si la mission reste documentaire/specification et ne modifie pas
-  le schema public executable.
-- Validation : tests documentaires, backlog/status/capability map mis a jour.
 
 ## Fin de chaque mission
 

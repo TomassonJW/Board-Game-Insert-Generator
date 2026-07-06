@@ -34,14 +34,15 @@ La cible long terme ajoute des concepts encore majoritairement documentaires :
 - `Asset` : objet reel du jeu a ranger, mesure exactement ou approximativement.
 - `Reservation` : volume non imprimable reserve pour board, livret, plateau,
   couvercle ou espace de retrait.
-- `Layer` : tranche de hauteur ou etage logique dans la boite.
-- `VolumetricCell` : reservation X/Y/Z, distincte d'un corps imprimable.
-- `FreeVolume` : volume restant disponible ou volontairement laisse libre.
+- `Layer` : tranche de hauteur ou etage logique dans la boite ; P8-M001 le charge depuis `volumetric_grid.layers`.
+- `VolumetricCell` : reservation X/Y/Z, distincte d'un corps imprimable ; P8-M001 expose les cellules `free`, `occupied`, `reserved` et `forbidden`.
+- `FreeVolume` : volume restant disponible ou volontairement laisse libre ; P8-M001 le calcule approximativement par nombre de cellules libres.
 - `StackRule` : relation de support, empilement ou interdiction de charge.
 - `RemovalOrder` : ordre de retrait attendu pour eviter de bloquer l'acces.
 
-Ces concepts ne sont pas un solveur 3D implemente. Ils cadrent les futures
-missions de Phase 8 et Phase 9.
+Ces concepts ne constituent toujours pas un solveur 3D. P8-M001 implemente le
+socle declaratif et les controles simples, mais ne place pas automatiquement les
+modules.
 ### Contrat des dataclasses Phase 1
 
 Les dataclasses du coeur Python sont des objets de valeur legers. Elles portent
@@ -301,8 +302,8 @@ Experimental :
 Prevu :
 
 - modele d'assets ;
-- grille volumetrique 3D ;
-- layers et reservations ;
+- solveur volumetrique 3D ;
+- reservations derivees d'assets ;
 - ordre de retrait et accessibilite ;
 - unions de primitives ;
 - coupes avancees ;
@@ -316,6 +317,7 @@ Prevu :
 - Une dimension negative ou nulle est invalide.
 - Une cavite ne doit pas casser les parois minimales.
 - Une feature P6-M003 est CAD-agnostic, locale a une cavite et porte une taxonomie resolue.
+- Une grille P8-M001 est CAD-agnostic, declarative, discrete en X/Y/Z et ne genere aucune geometrie Fusion.
 - Une coupe Fusion P6-M001 doit rester une soustraction rectangulaire verticale issue de la CAD IR.
 - Une operation Fusion future doit mapper un concept deja resolu, pas inventer un
   nouveau modele metier.

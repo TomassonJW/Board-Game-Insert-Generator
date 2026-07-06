@@ -10,7 +10,7 @@ Toutes les dimensions sont en millimetres. Le champ `units` doit valoir `mm`.
 
 Le loader V0 refuse les champs inconnus aux niveaux suivants :
 
-- racine du document, incluant `print_profile` ;
+- racine du document, incluant `print_profile` et `volumetric_grid` ;
 - `box` ;
 - `box.inner_dimensions_mm` ;
 - `tolerances` ;
@@ -44,28 +44,30 @@ possible.
   "tolerances": {},
   "defaults": {},
   "layout": {},
+  "volumetric_grid": {},
   "modules": []
 }
 ```
 
 ## Cible asset-first et volumetrique
 
-Le schema V0 reste `module-first` : le loader accepte `modules`, `cavities` et
-`features`, mais il n'accepte pas encore de champ racine `assets`, `layers`,
-`reservations` ou `solver`.
+Le schema V0 reste `module-first` : le loader accepte `modules`, `cavities`,
+`features` et le bloc optionnel `volumetric_grid`. Il n'accepte pas encore de
+champ racine `assets`, `reservations` independantes ou `solver`.
 
 La cible produit de Phase 8/9 introduira, sous gate si le schema public change :
 
 - `assets` : materiel reel a ranger, avec dimensions exactes ou approximatives ;
-- `reservations` : boards, livrets, plateaux, couvercle ou espace non imprimable ;
-- `layers` : contraintes de hauteur et etages ;
+- `volumetric_grid.zones` : reservations ou zones interdites declaratives ;
+- `volumetric_grid.layers` : contraintes de hauteur et etages declaratifs ;
 - `accessibility` : ordre de retrait, zones de prise et contraintes de setup ;
 - `solver_preferences` : preferences de nombre de modules, compacite, ergonomie
   et variantes.
 
 Ces champs sont documentes dans `docs/ASSET_MODEL_STRATEGY.md`,
 `docs/VOLUMETRIC_LAYOUT_STRATEGY.md`, `docs/LAYER_AND_STACKING_MODEL.md` et
-`docs/ACCESSIBILITY_MODEL.md`. Ils ne sont pas implementes dans le loader V0.
+`docs/ACCESSIBILITY_MODEL.md`. En P8-M001, seul `volumetric_grid` est implemente
+comme extension additive du loader V0.
 ## `box`
 
 Champs obligatoires :
@@ -134,6 +136,67 @@ Champs reconnus :
 - `strategy` : `row_fill` ou `grid` en V0. L'identifiant `columns` est reserve
   dans le contrat interne, mais encore refuse par la validation.
 - `allow_global_rotation` : reserve pour evolution future.
+
+
+## `volumetric_grid`
+
+Champ optionnel racine introduit par P8-M001. Il decrit une grille X/Y/Z
+declarative dans le coeur Python pur. Il ne declenche aucun solveur automatique
+et aucune generation Fusion reelle.
+
+Champs reconnus :
+
+- `unit_mm.x`, `unit_mm.y`, `unit_mm.z` : dimensions d'une unite discrete ;
+- `size_units.x`, `size_units.y`, `size_units.z` : nombre d'unites dans la grille ;
+- `layers` : liste optionnelle de bandes Z ;
+- `module_placements` : liste optionnelle d'occupations explicites de modules ;
+- `zones` : liste optionnelle de zones `reserved` ou `forbidden` ;
+- `comment` : note humaine optionnelle.
+
+Validation P8-M001 :
+
+- `unit_mm` doit etre strictement positif ;
+- `size_units` doit etre strictement positif ;
+- `unit_mm.x * size_units.x` doit couvrir `box.inner_dimensions_mm.x` ;
+- `unit_mm.y * size_units.y` doit couvrir `box.inner_dimensions_mm.y` ;
+- `unit_mm.z * size_units.z` doit couvrir `box.usable_height_mm` ;
+- les layers, placements et zones doivent rester dans la grille ;
+- un placement de module doit referencer un module existant ;
+- les dimensions millimetres couvertes par un placement doivent etre au moins
+  egales a la demande de module ;
+- les collisions entre placements, zones reservees et zones interdites sont
+  refusees.
+
+### `volumetric_grid.layers[]`
+
+- `id` : identifiant stable ;
+- `name` : nom humain ;
+- `z_start` : index Z de depart ;
+- `z_count` : nombre d'unites Z ;
+- `role` : role documentaire ;
+- `comment` : note optionnelle.
+
+### `volumetric_grid.module_placements[]`
+
+- `id` : identifiant stable ;
+- `module_id` : module reference ;
+- `instance_id` : instance attendue optionnelle, par exemple `cards-stack-01` ;
+- `origin_units.x/y/z` : origine discrete ;
+- `size_units.x/y/z` : extension discrete ;
+- `layer_id` : layer optionnel ;
+- `comment` : note optionnelle.
+
+### `volumetric_grid.zones[]`
+
+- `id` : identifiant stable ;
+- `kind` : `reserved` ou `forbidden` ;
+- `purpose` : intention, par exemple `future_board_or_rulebook_reservation` ;
+- `origin_units.x/y/z` : origine discrete ;
+- `size_units.x/y/z` : extension discrete ;
+- `layer_id` : layer optionnel ;
+- `comment` : note optionnelle.
+
+Voir `examples/simple_3d_grid.json`.
 
 ## `modules`
 
