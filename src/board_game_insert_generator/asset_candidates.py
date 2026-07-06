@@ -29,8 +29,98 @@ def build_module_candidates_from_assets(config: InsertConfig) -> list[dict[str, 
     create layout cells and do not authorize any Fusion generation.
     """
 
-    return [_candidate_from_asset(config, asset) for asset in config.assets]
+    candidates: list[dict[str, Any]] = []
+    for group in _compatible_asset_groups(config.assets):
+        if len(group) == 1:
+            candidates.append(_candidate_from_asset(config, group[0]))
+        else:
+            candidates.append(_candidate_from_asset_group(config, group))
+    return candidates
 
+
+
+def _compatible_asset_groups(assets: tuple[Asset, ...]) -> list[list[Asset]]:
+    groups: list[list[Asset]] = []
+    grouped_indexes: set[int] = set()
+    for index, asset in enumerate(assets):
+        if index in grouped_indexes:
+            continue
+        if not _can_group_asset(asset):
+            groups.append([asset])
+            grouped_indexes.add(index)
+            continue
+        group = [asset]
+        grouped_indexes.add(index)
+        for other_index, other in enumerate(assets[index + 1 :], start=index + 1):
+            if other_index in grouped_indexes:
+                continue
+            if _asset_group_key(other) == _asset_group_key(asset) and _can_group_asset(other):
+                group.append(other)
+                grouped_indexes.add(other_index)
+        groups.append(group)
+    return groups
+
+
+def _can_group_asset(asset: Asset) -> bool:
+    return (
+        not _is_reservation_only(asset)
+        and not (asset.dimension_confidence.value == "unknown_z" and asset.dimensions.z <= 0)
+        and asset.reservation_ref is None
+        and asset.module_hint is None
+    )
+
+
+def _asset_group_key(asset: Asset) -> tuple[str, str, str]:
+    return (asset.kind.value, asset.containment_intent.value, asset.dimension_confidence.value)
+
+
+def _candidate_from_asset_group(config: InsertConfig, assets: list[Asset]) -> dict[str, Any]:
+    representative = assets[0]
+    clearance_mm, clearance_source = _asset_clearance(config, representative)
+    dimensions = Dimension3D(
+        x=max(asset.dimensions.x for asset in assets),
+        y=max(asset.dimensions.y for asset in assets),
+        z=max(asset.dimensions.z for asset in assets),
+    )
+    suggested_module = _suggested_module_from_values(
+        config=config,
+        candidate_id=f"asset-group-candidate:{representative.kind.value}:{representative.containment_intent.value}:{representative.dimension_confidence.value}",
+        name=f"Grouped candidate for {representative.kind.value}",
+        functional_type=_functional_type(representative),
+        dimensions=dimensions,
+        clearance_mm=clearance_mm,
+        clearance_source=clearance_source,
+    )
+    warnings = []
+    if representative.dimension_confidence.value != "exact":
+        warnings.append(
+            f"Grouped assets use {representative.dimension_confidence.value} dimensions; candidate dimensions need human review."
+        )
+    return {
+        "candidate_id": suggested_module["id"].replace("candidate-module:", "asset-group-candidate:"),
+        "source_asset_ids": [asset.id for asset in assets],
+        "status": "candidate_only",
+        "derivation": "asset_group_dimension_padding",
+        "functional_type": _functional_type(representative).value,
+        "containment_intent": representative.containment_intent.value,
+        "dimension_confidence": representative.dimension_confidence.value,
+        "quantity": {
+            "count": sum(asset.quantity.count for asset in assets),
+            "grouping": "grouped_assets",
+        },
+        "suggested_module": suggested_module,
+        "constraints": {
+            "clearance_mm": clearance_mm,
+            "clearance_source": clearance_source,
+            "wall_thickness_mm": config.defaults.wall_thickness_mm,
+            "floor_thickness_mm": config.defaults.floor_thickness_mm,
+        },
+        "reasons": [
+            "Compatible assets share kind, containment intent and dimension confidence.",
+            "Grouped candidate uses the largest source asset envelope plus profile/default padding.",
+        ],
+        "warnings": warnings,
+    }
 
 def _candidate_from_asset(config: InsertConfig, asset: Asset) -> dict[str, Any]:
     clearance_mm, clearance_source = _asset_clearance(config, asset)
@@ -111,12 +201,33 @@ def _suggested_module(
     clearance_mm: float,
     clearance_source: str,
 ) -> dict[str, Any]:
+    return _suggested_module_from_values(
+        config=config,
+        candidate_id=f"candidate-module:{asset.id}",
+        name=f"Candidate module for {asset.name}",
+        functional_type=_functional_type(asset),
+        dimensions=asset.dimensions,
+        clearance_mm=clearance_mm,
+        clearance_source=clearance_source,
+    )
+
+
+def _suggested_module_from_values(
+    *,
+    config: InsertConfig,
+    candidate_id: str,
+    name: str,
+    functional_type: FunctionalType,
+    dimensions: Dimension3D,
+    clearance_mm: float,
+    clearance_source: str,
+) -> dict[str, Any]:
     wall = config.defaults.wall_thickness_mm
     floor = config.defaults.floor_thickness_mm
     inner = Dimension3D(
-        x=asset.dimensions.x + clearance_mm * 2.0,
-        y=asset.dimensions.y + clearance_mm * 2.0,
-        z=asset.dimensions.z + clearance_mm,
+        x=dimensions.x + clearance_mm * 2.0,
+        y=dimensions.y + clearance_mm * 2.0,
+        z=dimensions.z + clearance_mm,
     )
     outer = Dimension3D(
         x=inner.x + wall * 2.0,
@@ -124,9 +235,9 @@ def _suggested_module(
         z=inner.z + floor,
     )
     return {
-        "id": f"candidate-module:{asset.id}",
-        "name": f"Candidate module for {asset.name}",
-        "functional_type": _functional_type(asset).value,
+        "id": candidate_id,
+        "name": name,
+        "functional_type": functional_type.value,
         "min_dimensions_mm": _dimension_to_dict(outer),
         "inner_asset_envelope_mm": _dimension_to_dict(inner),
         "clearance_source": clearance_source,

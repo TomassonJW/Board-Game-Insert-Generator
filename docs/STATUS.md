@@ -217,6 +217,8 @@ La mission `P10-M004` produit `module_candidates` depuis les assets charges : ca
 
 La mission `P10-M005` expose une variante recommandee `asset-candidates:row_fill` depuis les candidats imprimables quand ils tiennent dans la boite. Cette variante reste report-only, transportee en metadata CAD IR, sans mutation de `modules` et sans geometrie Fusion.
 
+La mission `P10-M006` groupe deterministiquement les assets compatibles par kind, intention et confiance de mesure. Les candidats groupes exposent plusieurs `source_asset_ids`, restent report-only et ne modifient pas la configuration source.
+
 ## Phase active
 
 Phase active : **P8 volumetric planner abstrait / gate avant generation Fusion volumetrique**.
@@ -231,7 +233,7 @@ volumetrique declarative, layers, reservations, supports abstraits et metadata C
 La North Star cible un
 generateur volumetrique asset-first, pilote par capabilities.
 
-Prochaine action recommandee : `P10-M006` pour grouper deterministiquement des assets compatibles, si cela reste borne, explicable et sans generation Fusion. Une nouvelle gate humaine est requise avant toute generation Fusion
+Prochaine action recommandee : `P10-M007` pour couvrir une variante asset rejetee par dimensions, si cela reste report-only. Une nouvelle gate humaine est requise avant toute generation Fusion
 reelle liee a la grille 3D, aux layers, aux vues eclatees ou aux features
 avancees.
 
@@ -298,6 +300,7 @@ avancees.
   sans mutation de `modules` ni placement automatique.
 - Variante recommandee P10-M005 depuis candidats assets, report-only et
   transportee en metadata CAD IR.
+- Grouping P10-M006 borne des assets compatibles, expose par `source_asset_ids`.
 - Criteres de scoring P10-M001 documentes, sans solveur executable.
 - Comparaison P10-M002 report-only de variantes deterministes existantes dans les rapports.
 - Raisons de rejet P10-M003 structurees et actionnables pour les variantes non generables.
@@ -384,9 +387,9 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant `P10-M005 - Variante recommandee depuis candidats assets` :
+Derniere verification pendant `P10-M006 - Grouping deterministe assets` :
 
-- `python -m unittest discover -s tests` : OK, 130 tests passes.
+- `python -m unittest discover -s tests` : OK, 131 tests passes.
 - `python -m py_compile src\board_game_insert_generator\asset_candidates.py src\board_game_insert_generator\report.py src\board_game_insert_generator\cad_ir.py tests\test_assets.py` : OK.
 - `python -m board_game_insert_generator examples\simple_box.json --format markdown` : OK.
 - `python -m board_game_insert_generator examples\simple_box.json --format json` : OK.
@@ -406,6 +409,9 @@ Derniere verification pendant `P10-M005 - Variante recommandee depuis candidats 
 - `python -m board_game_insert_generator examples\simple_assets.json --format markdown` : OK, section `Assets` exposee.
 - `python -m board_game_insert_generator examples\simple_assets.json --format json` : OK, `summary.asset_count = 2`.
 - `python -m board_game_insert_generator export-cad-ir examples\simple_assets.json --output %TEMP%\bgig-cad-ir-validation\simple_assets.cad-ir.json` : OK, schema `cad_ir.v0`, metadata `assets`, 2 composants.
+- `python -m board_game_insert_generator examples\simple_asset_grouping.json --format markdown` : OK, section `Module candidates from assets` exposee.
+- `python -m board_game_insert_generator examples\simple_asset_grouping.json --format json` : OK, `module_candidates[0].source_asset_ids` contient 2 assets.
+- `python -m board_game_insert_generator export-cad-ir examples\simple_asset_grouping.json --output %TEMP%\bgig-cad-ir-validation\simple_asset_grouping.cad-ir.json` : OK, schema `cad_ir.v0`, metadata `module_candidates`, 1 composant.
 - `git diff --check` : OK.
 - `rg -n "adsk" src/board_game_insert_generator` : OK, aucune occurrence dans le coeur Python.
 

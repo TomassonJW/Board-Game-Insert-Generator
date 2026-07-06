@@ -113,3 +113,14 @@ cavite et ne declenchent aucune generation Fusion.
 Depuis P10-M005, une variante `asset-candidates:row_fill` peut recommander un
 agencement simple de ces candidats. Cette recommandation reste report-only et ne
 remplace pas les modules manuels.
+
+
+## Grouping deterministe P10-M006
+
+P10-M006 groupe uniquement des assets compatibles quand ils partagent `kind`,
+`containment_intent` et `dimension_confidence`, sans `reservation_ref` ni
+`module_hint`.
+
+Le candidat groupe utilise la plus grande enveloppe source et la quantite totale
+des assets. Ce grouping reste reversible et report-only : il ne fusionne pas les
+assets sources, ne cree pas de module manuel et ne lance aucun placement complexe.

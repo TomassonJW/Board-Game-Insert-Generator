@@ -14,6 +14,7 @@ pas devenir une boite noire ni remplacer les gates physiques.
 - P10-M003 ajoute des raisons de rejet structurees et actionnables pour les variantes non generables.
 - P10-M004 ajoute des `module_candidates` deterministes depuis les assets, sans solveur global.
 - P10-M005 expose une variante `asset-candidates:row_fill` recommandee si elle rentre, toujours report-only.
+- P10-M006 groupe des assets compatibles avant generation de candidats, sans solveur complexe.
 
 ## Strategie cible
 
@@ -142,3 +143,10 @@ La variante est `recommended` seulement si tous les candidats imprimables tienne
 dans la boite. En cas d'echec, elle est `rejected` avec `rejection_reasons`. Elle
 ne cree aucun `ModuleRequest`, aucune cellule de layout reelle et aucune
 geometrie Fusion.
+
+
+## Grouping borne P10-M006
+
+Le grouping P10-M006 est une preparation de candidats, pas une optimisation. Il
+regroupe seulement des assets strictement compatibles et laisse les reservations,
+assets avec `module_hint` et dimensions Z inconnues hors regroupement.

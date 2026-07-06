@@ -1,0 +1,53 @@
+{
+  "project_name": "Simple asset grouping V0",
+  "units": "mm",
+  "box": {
+    "inner_dimensions_mm": { "x": 120, "y": 90, "z": 40 },
+    "usable_height_mm": 30,
+    "lid_clearance_mm": 10
+  },
+  "print_profile": "default",
+  "defaults": {
+    "wall_thickness_mm": 1.2,
+    "floor_thickness_mm": 1.2,
+    "corner_radius_mm": 1.5
+  },
+  "layout": {
+    "strategy": "row_fill"
+  },
+  "assets": [
+    {
+      "id": "coin-tokens",
+      "name": "Coin tokens",
+      "kind": "tokens",
+      "quantity": { "count": 24, "grouping": "set" },
+      "dimensions_mm": { "x": 22, "y": 22, "z": 8 },
+      "dimension_confidence": "exact",
+      "containment_intent": "store",
+      "comment": "Compatible with status tokens for deterministic grouping."
+    },
+    {
+      "id": "status-tokens",
+      "name": "Status tokens",
+      "kind": "tokens",
+      "quantity": { "count": 18, "grouping": "set" },
+      "dimensions_mm": { "x": 18, "y": 18, "z": 6 },
+      "dimension_confidence": "exact",
+      "containment_intent": "store",
+      "comment": "Compatible token asset; grouped candidate remains report-only."
+    }
+  ],
+  "modules": [
+    {
+      "id": "manual-reference-bin",
+      "name": "Manual reference bin",
+      "functional_type": "tokens",
+      "min_dimensions_mm": { "x": 40, "y": 35, "z": 18 },
+      "height_mm": 18,
+      "priority": 100,
+      "allow_rotation": true,
+      "quantity": 1,
+      "comment": "Manual module kept to prove grouping does not mutate modules."
+    }
+  ]
+}

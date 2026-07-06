@@ -365,6 +365,17 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Criteres d'acceptation : regroupement borne, explicable et reversible ; aucun placement complexe ni Fusion.
 - Tests : unitaires + CLI Markdown/JSON/export CAD IR sur exemple assets dedie si necessaire.
 - Gate : stop si grouping heterogene complexe, solveur global ou changement incompatible du schema devient necessaire.
+- Statut : `done`, `implemented-core`.
+
+### P10-M007 - Couvrir une variante asset rejetee par dimensions
+
+- Capability : C-SOLVER.
+- Milestone : M10 Semi-automatic solver.
+- Objectif : ajouter un exemple et des tests ou une variante asset candidate est rejetee avec raison structuree.
+- Livrable : exemple JSON, tests, rapports Markdown/JSON et CAD IR metadata.
+- Criteres d'acceptation : rejet explicite `DOES_NOT_FIT` ou `DIMENSIONS_INCOMPATIBLE`; aucune generation Fusion.
+- Tests : unitaires + CLI Markdown/JSON/export CAD IR sur le nouvel exemple.
+- Gate : aucune si report-only; stop si cela demande un solveur complexe.
 - Statut : `ready`.
 
 ## Phase 11 - Modules composites et formes soudees

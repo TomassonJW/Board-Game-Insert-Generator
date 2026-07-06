@@ -113,6 +113,26 @@ class AssetModelTests(unittest.TestCase):
         ]
         self.assertEqual(operation_kinds, ["create_rectangular_prism", "create_rectangular_prism"])
 
+    def test_groups_compatible_assets_into_report_only_candidate(self) -> None:
+        config = load_config(ROOT / "examples" / "simple_asset_grouping.json")
+        layout = generate_basic_layout(config)
+
+        markdown = layout_to_markdown(config, layout)
+        payload = json.loads(layout_to_json(config, layout))
+        scene = build_blank_cad_scene(config, layout).to_dict()
+
+        self.assertEqual(len(config.modules), 1)
+        self.assertEqual(payload["summary"]["module_candidate_count"], 1)
+        candidate = payload["module_candidates"][0]
+        self.assertEqual(candidate["derivation"], "asset_group_dimension_padding")
+        self.assertEqual(candidate["source_asset_ids"], ["coin-tokens", "status-tokens"])
+        self.assertEqual(candidate["quantity"], {"count": 42, "grouping": "grouped_assets"})
+        self.assertEqual(candidate["status"], "candidate_only")
+        self.assertIn("Compatible assets share kind", candidate["reasons"][0])
+        self.assertEqual(payload["asset_candidate_variants"][0]["status"], "recommended")
+        self.assertEqual(scene["metadata"]["module_candidates"][0]["source_asset_ids"], ["coin-tokens", "status-tokens"])
+        self.assertIn("asset-group-candidate", markdown)
+
     def test_rejects_unknown_asset_field(self) -> None:
         payload = _asset_payload()
         payload["assets"][0]["solver_hint"] = "not-yet"

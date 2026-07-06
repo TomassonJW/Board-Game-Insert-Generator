@@ -412,4 +412,5 @@ Champs cibles :
 Validation P9-M002 : ids uniques, quantite strictement positive, dimensions X/Y
 positives, Z positive sauf `dimension_confidence: unknown_z` ou Z peut valoir 0,
 `reservation_ref` vers une zone volumetrique existante si fourni, `module_hint`
-vers un module existant si fourni.
+vers un module existant si fourni. P10-M006 peut grouper des assets compatibles
+dans les rapports sans ajouter de nouveau champ de configuration.

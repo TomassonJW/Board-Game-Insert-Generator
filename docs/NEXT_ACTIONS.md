@@ -30,11 +30,11 @@ geometrie courbe, module composite ou export STL/3MF dans Fusion.
 
 ## Mission ready non gated
 
-`P10-M006 - Regrouper deterministiquement des assets compatibles`.
+`P10-M007 - Couvrir une variante asset rejetee par dimensions`.
 
-- Capability : `C-ASSET`, `C-SOLVER`.
-- Milestone : `M6 Asset-first project model` / `M10 Semi-automatic solver`.
-- Objectif : grouper uniquement des assets compatibles par kind, intent et confiance de mesure, sans optimisation globale.
+- Capability : `C-SOLVER`.
+- Milestone : `M10 Semi-automatic solver`.
+- Objectif : ajouter un exemple et des tests ou une variante asset candidate est rejetee avec raison structuree, sans solveur complexe.
 - Gate : aucune si la mission reste additive et report-only ; stop si generation Fusion reelle, changement incompatible CAD IR ou solveur complexe devient necessaire.
 - Validation : tests unitaires, CLI Markdown/JSON/export CAD IR, `git diff
   --check`, absence de `adsk` dans le coeur.
