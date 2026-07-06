@@ -30,17 +30,16 @@ geometrie courbe, module composite ou export STL/3MF dans Fusion.
 
 ## Mission ready non gated
 
-`P9-M002 - Charger des assets JSON sans generation de modules`.
+`P10-M001 - Definir les criteres de scoring de variantes`.
 
-- Capability : `C-ASSET`.
-- Milestone : `M6 Asset-first project model`.
-- Objectif : accepter un bloc racine `assets` strictement valide, sans deriver de
-  modules ni changer le layout.
-- Gate : stop si l'activation du schema impose un changement incompatible ; OK si
-  elle reste additive et refusee proprement quand invalide.
-- Validation : tests unitaires loader/validation, rapports si affichage ajoute,
-  CLI Markdown/JSON/export CAD IR sur exemples existants et nouvel exemple asset
-  si un exemple executable est ajoute.
+- Capability : `C-SOLVER`.
+- Milestone : `M10 Semi-automatic solver`.
+- Objectif : definir des criteres de scoring explicables pour futures variantes,
+  sans optimiseur global et sans placement automatique.
+- Gate : aucune si la mission reste documentaire/contractuelle ; stop si un
+  solveur complexe ou une optimisation globale devient necessaire.
+- Validation : tests documentaires, CLI de non-regression, `git diff --check`,
+  absence de `adsk` dans le coeur.
 ## Mission bloquee par gate
 
 `P8-FUSION-GATE - Generation Fusion volumetrique ou vue 3D`.

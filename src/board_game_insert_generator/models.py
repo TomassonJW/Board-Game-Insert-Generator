@@ -46,6 +46,34 @@ class VolumetricZoneKind(str, Enum):
     FORBIDDEN = "forbidden"
 
 
+class AssetKind(str, Enum):
+    CARDS = "cards"
+    SLEEVED_CARDS = "sleeved_cards"
+    TOKENS = "tokens"
+    DICE = "dice"
+    MEEPLES = "meeples"
+    BOARD = "board"
+    RULEBOOK = "rulebook"
+    TRAY = "tray"
+    MINIATURE = "miniature"
+    OTHER = "other"
+
+
+class DimensionConfidence(str, Enum):
+    EXACT = "exact"
+    APPROXIMATE = "approximate"
+    UNKNOWN_Z = "unknown_z"
+
+
+class ContainmentIntent(str, Enum):
+    STORE = "store"
+    SEPARATE = "separate"
+    PROTECT = "protect"
+    DISPLAY = "display"
+    RESERVE = "reserve"
+    ACCESS_FIRST = "access_first"
+
+
 class VolumetricOwnerType(str, Enum):
     GRID_FLOOR = "grid_floor"
     MODULE_PLACEMENT = "module_placement"
@@ -116,6 +144,26 @@ class Feature:
     status: str = "abstract_only"
     fusion_generation: str = "not_implemented"
     taxonomy: FeatureTaxonomyKind | None = None
+
+
+@dataclass(frozen=True)
+class AssetQuantity:
+    count: int
+    grouping: str = "single"
+
+
+@dataclass(frozen=True)
+class Asset:
+    id: str
+    name: str
+    kind: AssetKind
+    quantity: AssetQuantity
+    dimensions: Dimension3D
+    dimension_confidence: DimensionConfidence
+    containment_intent: ContainmentIntent
+    reservation_ref: str | None = None
+    module_hint: str | None = None
+    comment: str = ""
 
 
 @dataclass(frozen=True)
@@ -266,6 +314,7 @@ class InsertConfig:
     defaults: GeometryDefaults
     layout: LayoutSettings
     modules: tuple[ModuleRequest, ...]
+    assets: tuple[Asset, ...] = ()
     print_profile: str = "default"
     source_path: str | None = None
     volumetric_grid: VolumetricGrid | None = None

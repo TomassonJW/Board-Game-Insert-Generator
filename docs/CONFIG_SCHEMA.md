@@ -10,7 +10,7 @@ Toutes les dimensions sont en millimetres. Le champ `units` doit valoir `mm`.
 
 Le loader V0 refuse les champs inconnus aux niveaux suivants :
 
-- racine du document, incluant `print_profile` et `volumetric_grid` ;
+- racine du document, incluant `print_profile`, `assets` et `volumetric_grid` ;
 - `box` ;
 - `box.inner_dimensions_mm` ;
 - `tolerances` ;
@@ -46,6 +46,7 @@ possible.
   "tolerances": {},
   "defaults": {},
   "layout": {},
+  "assets": [],
   "volumetric_grid": {},
   "modules": []
 }
@@ -55,7 +56,7 @@ possible.
 
 Le schema V0 reste `module-first` : le loader accepte `modules`, `cavities`,
 `features` et le bloc optionnel `volumetric_grid`. Il n'accepte pas encore de
-champ racine `assets`, `reservations` independantes ou `solver` tant que P9-M002 n'est pas implemente.
+champ racine `reservations` independantes ou `solver`. Le champ racine `assets` est accepte depuis P9-M002 comme donnees passives.
 
 La cible produit de Phase 8/9 introduira, sous gate si le schema public change :
 
@@ -389,11 +390,11 @@ Approche prevue :
 4. Generer un JSON canonique ou un `InsertConfig`.
 5. Reutiliser exactement le meme moteur.
 
-## Schema cible `assets` P9-M001 non charge
+## `assets`
 
-Le bloc racine futur `assets` est specifie comme cible mais reste refuse par le
-loader V0 actuel. Il servira a decrire le materiel reel avant de deriver modules,
-cavites ou reservations.
+Le bloc racine `assets` est charge depuis P9-M002 comme donnees passives. Il
+sert a decrire le materiel reel avant de deriver modules, cavites ou
+reservations. Le moteur ne genere encore rien depuis ces assets.
 
 Champs cibles :
 
@@ -406,5 +407,7 @@ Champs cibles :
 - `assets[].module_hint` optionnel ;
 - `assets[].comment`.
 
-P9-M001 ne change pas le comportement du loader. P9-M002 devra choisir si ce
-schema devient chargeable et quelles validations sont appliquees.
+Validation P9-M002 : ids uniques, quantite strictement positive, dimensions X/Y
+positives, Z positive sauf `dimension_confidence: unknown_z` ou Z peut valoir 0,
+`reservation_ref` vers une zone volumetrique existante si fourni, `module_hint`
+vers un module existant si fourni.

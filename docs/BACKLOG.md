@@ -293,11 +293,11 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Capability : C-ASSET.
 - Milestone : M6 Asset-first project model.
 - Objectif : accepter des assets sans encore deriver de layout.
-- Livrable : loader/validation et rapports.
-- Criteres d'acceptation : aucune regression des exemples module-first.
+- Livrable : loader strict, validation, rapports Markdown/JSON, metadata CAD IR, exemple `simple_assets.json` et tests.
+- Criteres d'acceptation : aucune regression des exemples module-first ; aucun module derive automatiquement.
 - Tests : unitaires + CLI.
 - Gate : si incompatibilite schema.
-- Statut : `ready`.
+- Statut : `done`, `implemented-cad-ir`.
 ## Phase 10 - Solveur semi-automatique et scoring
 
 ### P10-M001 - Definir les criteres de scoring de variantes

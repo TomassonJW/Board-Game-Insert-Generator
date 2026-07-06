@@ -8,11 +8,11 @@ proposer des modules, cavites et reservations.
 
 ## Etat actuel
 
-- Le JSON V0 decrit surtout des modules demandes.
+- Le JSON V0 accepte maintenant `assets` comme donnees passives chargees et validees.
 - `functional_type` distingue cartes, cartes sleevees, tokens, meeples, des,
-  free et other.
-- Les cavites peuvent representer des receptacles simples, mais aucun modele
-  d'asset autonome n'existe encore.
+  free et other cote modules/cavites.
+- Les cavites peuvent representer des receptacles simples.
+- Les assets P9-M002 sont reportes et transportes en CAD IR metadata, sans deriver de module.
 
 ## Concepts cibles
 
@@ -42,7 +42,7 @@ proposer des modules, cavites et reservations.
 
 ## Contrat cible P9-M001
 
-P9-M001 specifie le schema asset-first cible sans l'activer dans le loader V0. Le
+P9-M001 specifie le schema asset-first cible. P9-M002 active son chargement strict dans le loader V0 sans generation de modules. Le
 bloc futur `assets` restera distinct de `modules` : il decrit le materiel reel,
 pas un corps imprimable ni une demande de module.
 
@@ -90,5 +90,5 @@ Exemple non executable P9-M001 :
 - Un asset n'est pas imprime directement.
 - Un asset peut etre reserve, contenu par une cavite ou suggerer un module futur.
 - Une dimension approximative doit rester visible dans les rapports futurs.
-- Le loader V0 refuse encore `assets` a la racine tant que P9-M002 n'est pas
-  implemente.
+- Le loader V0 accepte `assets` a la racine depuis P9-M002, mais ne derive encore
+  aucun module, layout ou cavity depuis ces assets.

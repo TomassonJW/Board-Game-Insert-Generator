@@ -7,6 +7,7 @@ from board_game_insert_generator.volumetric import span_cells, span_fits_grid
 from board_game_insert_generator.models import (
     Cavity,
     Dimension3D,
+    DimensionConfidence,
     Feature,
     FeatureKind,
     FunctionalType,
@@ -133,6 +134,7 @@ def validate_config(config: InsertConfig) -> list[ValidationIssue]:
             issues,
         )
 
+    _validate_assets(config, issues)
     _validate_volumetric_grid(config, issues)
 
     if config.layout.strategy not in IMPLEMENTED_LAYOUT_STRATEGIES:
@@ -156,6 +158,48 @@ def assert_valid_config(config: InsertConfig) -> None:
     if issues:
         raise ValidationError(issues)
 
+
+def _validate_assets(config: InsertConfig, issues: list[ValidationIssue]) -> None:
+    seen_ids: set[str] = set()
+    module_ids = {module.id for module in config.modules}
+    reservation_ids = set()
+    if config.volumetric_grid is not None:
+        reservation_ids = {zone.id for zone in config.volumetric_grid.zones}
+
+    for index, asset in enumerate(config.assets):
+        prefix = f"assets[{index}]"
+        if not asset.id:
+            issues.append(_issue(f"{prefix}.id", "EMPTY_ID", "Asset id cannot be empty."))
+        if asset.id in seen_ids:
+            issues.append(_issue(f"{prefix}.id", "DUPLICATE_ID", f"Duplicate asset id '{asset.id}'."))
+        seen_ids.add(asset.id)
+        if not asset.name:
+            issues.append(_issue(f"{prefix}.name", "EMPTY_VALUE", "Asset name cannot be empty."))
+        _validate_positive_int(asset.quantity.count, f"{prefix}.quantity.count", issues)
+        if not asset.quantity.grouping:
+            issues.append(_issue(f"{prefix}.quantity.grouping", "EMPTY_VALUE", "Asset quantity grouping cannot be empty."))
+        _validate_positive_number(asset.dimensions.x, f"{prefix}.dimensions_mm.x", issues)
+        _validate_positive_number(asset.dimensions.y, f"{prefix}.dimensions_mm.y", issues)
+        if asset.dimension_confidence == DimensionConfidence.UNKNOWN_Z:
+            _validate_non_negative_number(asset.dimensions.z, f"{prefix}.dimensions_mm.z", issues)
+        else:
+            _validate_positive_number(asset.dimensions.z, f"{prefix}.dimensions_mm.z", issues)
+        if asset.reservation_ref is not None and asset.reservation_ref not in reservation_ids:
+            issues.append(
+                _issue(
+                    f"{prefix}.reservation_ref",
+                    "ASSET_UNKNOWN_RESERVATION",
+                    f"Asset references unknown volumetric reservation '{asset.reservation_ref}'.",
+                )
+            )
+        if asset.module_hint is not None and asset.module_hint not in module_ids:
+            issues.append(
+                _issue(
+                    f"{prefix}.module_hint",
+                    "ASSET_UNKNOWN_MODULE_HINT",
+                    f"Asset references unknown module hint '{asset.module_hint}'.",
+                )
+            )
 
 def _validate_volumetric_grid(config: InsertConfig, issues: list[ValidationIssue]) -> None:
     grid = config.volumetric_grid

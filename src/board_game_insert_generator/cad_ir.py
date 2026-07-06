@@ -252,6 +252,7 @@ class CadSceneMetadata:
     layout_strategy: str
     print_profile: str
     warnings: tuple[str, ...]
+    assets: tuple[dict[str, Any], ...] = ()
     volumetric_grid: dict[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
@@ -261,6 +262,7 @@ class CadSceneMetadata:
             "layout_strategy": self.layout_strategy,
             "print_profile": self.print_profile,
             "warnings": list(self.warnings),
+            "assets": list(self.assets),
             "volumetric_grid": self.volumetric_grid,
         }
 
@@ -339,6 +341,7 @@ def build_blank_cad_scene(config: InsertConfig, layout: LayoutResult) -> CadScen
             layout_strategy=config.layout.strategy,
             print_profile=config.print_profile,
             warnings=layout.warnings,
+            assets=tuple(_asset_metadata(asset) for asset in config.assets),
             volumetric_grid=volumetric_summary.to_dict() if volumetric_summary is not None else None,
         ),
     )
@@ -462,6 +465,22 @@ def _cavity_operations(body_id: str, cavities: tuple[Cavity, ...]) -> tuple[CadO
                 )
             )
     return tuple(operations)
+def _asset_metadata(asset) -> dict[str, Any]:
+    return {
+        "id": asset.id,
+        "name": asset.name,
+        "kind": asset.kind.value,
+        "quantity": {
+            "count": asset.quantity.count,
+            "grouping": asset.quantity.grouping,
+        },
+        "dimensions_mm": _dimension_to_dict(asset.dimensions),
+        "dimension_confidence": asset.dimension_confidence.value,
+        "containment_intent": asset.containment_intent.value,
+        "reservation_ref": asset.reservation_ref,
+        "module_hint": asset.module_hint,
+        "status": "loaded_only",
+    }
 
 def _parameters_from_config(config: InsertConfig) -> tuple[CadParameter, ...]:
     defaults = config.defaults

@@ -205,6 +205,8 @@ La mission `P8-M002` enrichit ce modele volumetrique avec reservations typees, o
 
 La mission `P9-M001` specifie le schema cible asset-first : assets distincts des modules, quantites, dimensions exactes/approximatives, intentions de rangement et liens optionnels vers reservations volumetriques. Le loader V0 refuse encore `assets` ; aucune generation de module ou modification de layout n'est ajoutee.
 
+La mission `P9-M002` charge maintenant `assets` depuis le JSON V0 comme donnees passives : validation stricte, rapports Markdown/JSON, metadata CAD IR `assets`, exemple `simple_assets.json`. Aucun module, cavity, layout ou operation Fusion n'est derive depuis ces assets.
+
 ## Phase active
 
 Phase active : **P8 volumetric planner abstrait / gate avant generation Fusion volumetrique**.
@@ -219,7 +221,7 @@ volumetrique declarative, layers, reservations, supports abstraits et metadata C
 La North Star cible un
 generateur volumetrique asset-first, pilote par capabilities.
 
-Prochaine action recommandee : `P9-M002` pour charger des assets JSON stricts sans generation de modules, si l'activation reste additive et CAD-agnostic. Une nouvelle gate humaine est requise avant toute generation Fusion
+Prochaine action recommandee : `P10-M001` pour definir le scoring de variantes sans solveur complexe. Une nouvelle gate humaine est requise avant toute generation Fusion
 reelle liee a la grille 3D, aux layers, aux vues eclatees ou aux features
 avancees.
 
@@ -279,8 +281,9 @@ avancees.
   cellules libres/occupees/reservees/interdites, rapports et metadata CAD IR.
 - Enrichissement P8-M002 des reservations typees, ordre de retrait, directions
   d'acces, surfaces de support abstraites, rapports et metadata CAD IR.
-- Schema cible P9-M001 asset-first documente, avec assets distincts des modules
-  et loader V0 encore inchange.
+- Schema cible P9-M001 asset-first documente.
+- Assets P9-M002 charges, valides, reportes et transportes en metadata CAD IR,
+  sans generation de modules.
 - Generation Fusion de cavites rectangulaires simples P6-M001 depuis
   `subtract_rectangular_cavity`, avec coupe verticale limitee au body cible,
   `fusion-validated` et `print-validated: false`.
@@ -364,9 +367,9 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant `P9-M001 - Schema cible asset-first` :
+Derniere verification pendant `P9-M002 - Charger des assets JSON sans generation de modules` :
 
-- `python -m unittest discover -s tests` : OK, 120 tests passes.
+- `python -m unittest discover -s tests` : OK, 127 tests passes.
 - `python -m py_compile src\board_game_insert_generator\models.py src\board_game_insert_generator\config_loader.py src\board_game_insert_generator\validation.py src\board_game_insert_generator\volumetric.py src\board_game_insert_generator\report.py src\board_game_insert_generator\cad_ir.py` : OK.
 - `python -m board_game_insert_generator examples\simple_box.json --format markdown` : OK.
 - `python -m board_game_insert_generator examples\simple_box.json --format json` : OK.
@@ -383,6 +386,9 @@ Derniere verification pendant `P9-M001 - Schema cible asset-first` :
 - `python -m board_game_insert_generator examples\simple_3d_reservations.json --format markdown` : OK, sections `Support surfaces` et `Removal sequence` exposees.
 - `python -m board_game_insert_generator examples\simple_3d_reservations.json --format json` : OK, `support_surfaces` et `removal_sequence` presents.
 - `python -m board_game_insert_generator export-cad-ir examples\simple_3d_reservations.json` : OK, schema `cad_ir.v0`, metadata `volumetric_grid.support_surfaces`, 2 composants.
+- `python -m board_game_insert_generator examples\simple_assets.json --format markdown` : OK, section `Assets` exposee.
+- `python -m board_game_insert_generator examples\simple_assets.json --format json` : OK, `summary.asset_count = 2`.
+- `python -m board_game_insert_generator export-cad-ir examples\simple_assets.json` : OK, schema `cad_ir.v0`, metadata `assets`, 2 composants.
 - `git diff --check` : OK.
 - `rg -n "adsk" src/board_game_insert_generator` : OK, aucune occurrence dans le coeur Python.
 

@@ -53,7 +53,7 @@ La scene contient :
 - `box_reference` : boite de reference non imprimable ;
 - `parameters` : valeurs utiles au futur adaptateur ;
 - `components` : un composant par instance de module ;
-- `metadata` : projet, source, strategie de layout, profil d'impression et warnings.
+- `metadata` : projet, source, strategie de layout, profil d'impression, warnings et assets chargees.
 
 ## Export CLI
 
@@ -200,7 +200,8 @@ coverage en millimetres, cells `free` / `occupied` / `reserved` / `forbidden`,
 layers, placements de modules, zones et volume libre approximatif.
 
 Depuis P8-M002, cette metadata inclut aussi `support_surfaces` et
-`removal_sequence`. Ces donnees restent abstraites : elles indiquent les
+`removal_sequence`. Depuis P9-M002, `metadata.assets` transporte aussi les
+assets charges avec `status: loaded_only`. Ces donnees restent abstraites : elles indiquent les
 intentions de support, d'accessibilite et de retrait, mais ne creent aucune
 operation Fusion et ne valident aucune portance physique.
 

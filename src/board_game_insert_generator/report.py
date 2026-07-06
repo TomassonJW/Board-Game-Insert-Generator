@@ -43,6 +43,7 @@ def layout_to_dict(config: InsertConfig, result: LayoutResult) -> dict[str, Any]
         "defaults": asdict(config.defaults),
         "summary": {
             "requested_module_count": len(config.modules),
+            "asset_count": len(config.assets),
             "expanded_instance_count": len(result.cells),
             "cell_count": len(result.cells),
             "printable_body_count": len(result.printable_bodies),
@@ -56,6 +57,7 @@ def layout_to_dict(config: InsertConfig, result: LayoutResult) -> dict[str, Any]
         },
         "layout_comparison": _layout_comparison(config, result),
         "volumetric_grid": volumetric_summary.to_dict() if volumetric_summary is not None else None,
+        "assets": [_asset_to_dict(asset) for asset in config.assets],
         "module_requests": [
             {
                 "id": module.id,
@@ -142,6 +144,7 @@ def layout_to_markdown(config: InsertConfig, result: LayoutResult) -> str:
         "",
         f"- Layout strategy: `{config.layout.strategy}`",
         f"- Requested modules: {len(config.modules)}",
+        f"- Declared assets: {len(config.assets)}",
         f"- Generated instances: {len(result.cells)}",
         f"- Printable bodies: {len(result.printable_bodies)}",
         f"- Planned cavities: {planned_cavity_count}",
@@ -162,6 +165,7 @@ def layout_to_markdown(config: InsertConfig, result: LayoutResult) -> str:
         *_format_comparison_rows(_layout_comparison(config, result)),
         "",
         *_format_volumetric_grid_section(volumetric_summary),
+        *_format_assets_section(config),
         "## Tolerance profile",
         "",
         f"- Print profile: `{config.print_profile}` ({print_profile_label(config.print_profile)})",
@@ -417,6 +421,50 @@ def _format_grid_point(point: Any) -> str:
 
 def _format_grid_size(size: Any) -> str:
     return f"{size.x} x {size.y} x {size.z}"
+def _asset_to_dict(asset) -> dict[str, Any]:
+    return {
+        "id": asset.id,
+        "name": asset.name,
+        "kind": asset.kind.value,
+        "quantity": {
+            "count": asset.quantity.count,
+            "grouping": asset.quantity.grouping,
+        },
+        "dimensions_mm": _dim(asset.dimensions),
+        "dimension_confidence": asset.dimension_confidence.value,
+        "containment_intent": asset.containment_intent.value,
+        "reservation_ref": asset.reservation_ref,
+        "module_hint": asset.module_hint,
+        "comment": asset.comment,
+        "status": "loaded_only",
+    }
+
+
+def _format_assets_section(config: InsertConfig) -> list[str]:
+    lines = ["## Assets", ""]
+    if not config.assets:
+        return lines + ["- No assets declared.", ""]
+    lines.extend(
+        [
+            "| Asset | Kind | Quantity | Dimensions | Confidence | Intent | Reservation | Module hint | Status |",
+            "| --- | --- | ---: | ---: | --- | --- | --- | --- | --- |",
+        ]
+    )
+    for asset in config.assets:
+        lines.append(
+            "| "
+            f"{asset.id} | "
+            f"{asset.kind.value} | "
+            f"{asset.quantity.count} {asset.quantity.grouping} | "
+            f"{_format_dim(asset.dimensions)} | "
+            f"{asset.dimension_confidence.value} | "
+            f"{asset.containment_intent.value} | "
+            f"{asset.reservation_ref or 'n/a'} | "
+            f"{asset.module_hint or 'n/a'} | "
+            "loaded_only |"
+        )
+    lines.append("")
+    return lines
 
 def _dim(dimensions: Dimension3D) -> dict[str, float]:
     return {"x": _clean_float(dimensions.x), "y": _clean_float(dimensions.y), "z": _clean_float(dimensions.z)}

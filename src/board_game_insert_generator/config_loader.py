@@ -6,9 +6,14 @@ from pathlib import Path
 from typing import Any
 
 from board_game_insert_generator.models import (
+    Asset,
+    AssetKind,
+    AssetQuantity,
     BoxSpec,
     Cavity,
+    ContainmentIntent,
     Dimension3D,
+    DimensionConfidence,
     Feature,
     FeatureKind,
     FeatureTaxonomyKind,
@@ -36,7 +41,7 @@ from board_game_insert_generator.print_profiles import (
     resolve_print_profile,
 )
 
-ROOT_FIELDS = {"project_name", "units", "box", "print_profile", "tolerances", "defaults", "layout", "modules", "volumetric_grid"}
+ROOT_FIELDS = {"project_name", "units", "box", "print_profile", "tolerances", "defaults", "layout", "modules", "assets", "volumetric_grid"}
 BOX_FIELDS = {"inner_dimensions_mm", "usable_height_mm", "lid_clearance_mm"}
 MODULE_FIELDS = {
     "id",
@@ -52,6 +57,8 @@ MODULE_FIELDS = {
 }
 CAVITY_FIELDS = {"id", "functional_type", "origin_mm", "size_mm", "clearance_mm", "comment", "features"}
 FEATURE_FIELDS = {"id", "kind", "taxonomy", "placement", "position_mm", "size_mm", "radius_mm", "comment"}
+ASSET_FIELDS = {"id", "name", "kind", "quantity", "dimensions_mm", "dimension_confidence", "containment_intent", "reservation_ref", "module_hint", "comment"}
+ASSET_QUANTITY_FIELDS = {"count", "grouping"}
 VOLUMETRIC_GRID_FIELDS = {"unit_mm", "size_units", "layers", "module_placements", "zones", "support_surfaces", "comment"}
 VOLUMETRIC_LAYER_FIELDS = {"id", "name", "z_start", "z_count", "role", "comment"}
 VOLUMETRIC_PLACEMENT_FIELDS = {"id", "module_id", "instance_id", "origin_units", "size_units", "layer_id", "removal_order", "access_direction", "support_surface_id", "comment"}
@@ -85,6 +92,7 @@ def load_config(path: str | Path) -> InsertConfig:
     defaults = _parse_float_dataclass(GeometryDefaults, raw.get("defaults", {}), "defaults")
     layout = _parse_layout(raw.get("layout", {}))
     modules = tuple(_parse_modules(raw.get("modules", []), tolerances))
+    assets = tuple(_parse_assets(raw.get("assets", [])))
     volumetric_grid = _parse_volumetric_grid(raw.get("volumetric_grid"))
 
     return InsertConfig(
@@ -100,10 +108,87 @@ def load_config(path: str | Path) -> InsertConfig:
         defaults=defaults,
         layout=layout,
         modules=modules,
+        assets=assets,
         print_profile=print_profile,
         source_path=str(config_path),
         volumetric_grid=volumetric_grid,
     )
+
+def _parse_assets(raw_assets: Any) -> list[Asset]:
+    if raw_assets is None:
+        return []
+    if not isinstance(raw_assets, list):
+        raise ConfigError("'assets' must be a list.")
+
+    assets: list[Asset] = []
+    for index, raw in enumerate(raw_assets):
+        field = f"assets[{index}]"
+        if not isinstance(raw, dict):
+            raise ConfigError(f"{field} must be an object.")
+        _reject_unknown_fields(raw, ASSET_FIELDS, field)
+        asset_id = _optional_string(raw, "id", field, default=f"asset-{index + 1}")
+        assets.append(
+            Asset(
+                id=asset_id,
+                name=_optional_string(raw, "name", field, default=asset_id),
+                kind=_parse_asset_kind(raw.get("kind", "other"), field),
+                quantity=_parse_asset_quantity(raw.get("quantity", {}), field),
+                dimensions=_parse_asset_dimensions(raw.get("dimensions_mm"), f"{field}.dimensions_mm"),
+                dimension_confidence=_parse_dimension_confidence(raw.get("dimension_confidence", "approximate"), field),
+                containment_intent=_parse_containment_intent(raw.get("containment_intent", "store"), field),
+                reservation_ref=_optional_nullable_string(raw, "reservation_ref", field),
+                module_hint=_optional_nullable_string(raw, "module_hint", field),
+                comment=_optional_string(raw, "comment", field, default=""),
+            )
+        )
+    return assets
+
+
+def _parse_asset_quantity(raw: Any, field: str) -> AssetQuantity:
+    if raw is None:
+        raw = {}
+    if not isinstance(raw, dict):
+        raise ConfigError(f"'{field}.quantity' must be an object.")
+    _reject_unknown_fields(raw, ASSET_QUANTITY_FIELDS, f"{field}.quantity")
+    return AssetQuantity(
+        count=_int(raw, "count", f"{field}.quantity", default=1),
+        grouping=_optional_string(raw, "grouping", f"{field}.quantity", default="single"),
+    )
+
+
+def _parse_asset_dimensions(raw: Any, field_name: str) -> Dimension3D:
+    if not isinstance(raw, dict):
+        raise ConfigError(f"Missing or invalid object field '{field_name}'.")
+    _reject_unknown_fields(raw, {"x", "y", "z"}, field_name)
+    return Dimension3D(
+        x=_number(raw, "x", field_name),
+        y=_number(raw, "y", field_name),
+        z=_number_value(raw.get("z", 0.0), f"{field_name}.z"),
+    )
+
+
+def _parse_asset_kind(value: Any, field_path: str) -> AssetKind:
+    try:
+        return AssetKind(str(value))
+    except ValueError as exc:
+        allowed = ", ".join(item.value for item in AssetKind)
+        raise ConfigError(f"Unsupported asset kind for {field_path}: {value!r}. Allowed values: {allowed}.") from exc
+
+
+def _parse_dimension_confidence(value: Any, field_path: str) -> DimensionConfidence:
+    try:
+        return DimensionConfidence(str(value))
+    except ValueError as exc:
+        allowed = ", ".join(item.value for item in DimensionConfidence)
+        raise ConfigError(f"Unsupported dimension_confidence for {field_path}: {value!r}. Allowed values: {allowed}.") from exc
+
+
+def _parse_containment_intent(value: Any, field_path: str) -> ContainmentIntent:
+    try:
+        return ContainmentIntent(str(value))
+    except ValueError as exc:
+        allowed = ", ".join(item.value for item in ContainmentIntent)
+        raise ConfigError(f"Unsupported containment_intent for {field_path}: {value!r}. Allowed values: {allowed}.") from exc
 
 def _parse_volumetric_grid(raw: Any) -> VolumetricGrid | None:
     if raw is None:

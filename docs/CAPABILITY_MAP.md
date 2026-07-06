@@ -59,7 +59,7 @@ Chaine de pilotage :
 | ID | Capability | Pillar | Statut | Milestone cible | Gate principale |
 | --- | --- | --- | --- | --- | --- |
 | C-BOX | Box model | Asset-first design | `implemented-core` | M1 Engine foundation | Aucune active |
-| C-ASSET | Asset model | Asset-first design | `designed` | M6 Asset-first project model | Schema cible P9-M001; gate si activation loader incompatible |
+| C-ASSET | Asset model | Asset-first design | `implemented-cad-ir` | M6 Asset-first project model | Assets charges/reportes P9-M002; gate si derivation automatique ou schema incompatible |
 | C-MODULE | Module model | Modular printable bodies | `implemented-core` | M1 Engine foundation | Aucune active |
 | C-CAVITY | Cavity model | Cavities and ergonomic features | `implemented-cad-ir` | M4 Abstract cavities | Gate Fusion cuts |
 | C-FEATURE | Ergonomic feature model | Cavities and ergonomic features | `implemented-cad-ir` | M4 Abstract cavities / M8 Ergonomic planner | Taxonomie P6-M003 implementee ; gate Fusion pour nouvelles geometries |
