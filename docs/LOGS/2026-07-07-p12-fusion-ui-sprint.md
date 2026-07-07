@@ -144,3 +144,23 @@ Correction codee :
 Validation attendue : `P12-UI-M002V5` dans Fusion, centree sur compact_only,
 compact_and_exploded, generate anti-doublon, regenerate sans doublon,
 clear tagged-only et preservation des objets non BGIG.
+
+## P12-UI-M002V6 - ownership par scene racine unique
+
+Observation humaine : P12-UI-M002V5 continue a accumuler scenes, gabarits ou
+sketches. Le diagnostic produit change : ce n'est plus un bug d'occurrence, mais
+un probleme d'ownership Fusion.
+
+Correction codee :
+
+- nouveau contrat `bgig:role = scene_root` sur l'occurrence racine `BGIG Generated Scene` ;
+- tous les objets BGIG restent generes sous le `Component` de cette racine ;
+- `clear_bgig_scene` supprime d'abord les occurrences racines via `deleteMe()` ;
+- cleanup legacy limite aux objets explicitement tagues BGIG ;
+- `generate` refuse si une racine BGIG ou des objets BGIG tagues existent deja ;
+- `regenerate` refuse de generer si le clear laisse des objets BGIG tagues ;
+- ADR-0026 documente les invariants API Autodesk verifies et la decision.
+
+Validation attendue : `P12-UI-M002V6` dans Fusion, centree sur generate non
+cumulatif, regenerate repetable, clear complet, absence de BGIG hors racine et
+preservation des objets non BGIG.

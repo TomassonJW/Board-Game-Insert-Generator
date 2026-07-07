@@ -16,7 +16,9 @@ try:
     from .fusion_skeleton import (
         BGIG_ATTRIBUTE_GROUP,
         BGIG_ATTRIBUTE_KIND,
+        BGIG_ATTRIBUTE_ROLE_KEY,
         BGIG_ATTRIBUTE_VALUE,
+        BGIG_LEGACY_ATTRIBUTE_GROUPS,
         BGIG_ACTION_GUIDANCE,
         BGIG_CLEARABLE_ROLES,
         BGIG_CLEAR_SCOPE,
@@ -28,6 +30,7 @@ try:
         BGIG_GENERATED_CONFIG_FILENAME,
         BGIG_SCENE_ROOT_COMPONENT_NAME,
         BGIG_SCENE_ROOT_ROLE,
+        BGIG_SCENE_OWNERSHIP_POLICY,
         BGIG_COMPONENT_CREATION_POLICY,
         BGIG_SOURCE_HELPER_POLICY,
         BGIG_VISIBLE_OCCURRENCE_POLICY,
@@ -86,7 +89,9 @@ except ImportError:  # pragma: no cover - Fusion may load the file as a script.
     from fusion_skeleton import (  # type: ignore[no-redef]
         BGIG_ATTRIBUTE_GROUP,
         BGIG_ATTRIBUTE_KIND,
+        BGIG_ATTRIBUTE_ROLE_KEY,
         BGIG_ATTRIBUTE_VALUE,
+        BGIG_LEGACY_ATTRIBUTE_GROUPS,
         BGIG_ACTION_GUIDANCE,
         BGIG_CLEARABLE_ROLES,
         BGIG_CLEAR_SCOPE,
@@ -98,6 +103,7 @@ except ImportError:  # pragma: no cover - Fusion may load the file as a script.
         BGIG_GENERATED_CONFIG_FILENAME,
         BGIG_SCENE_ROOT_COMPONENT_NAME,
         BGIG_SCENE_ROOT_ROLE,
+        BGIG_SCENE_OWNERSHIP_POLICY,
         BGIG_COMPONENT_CREATION_POLICY,
         BGIG_SOURCE_HELPER_POLICY,
         BGIG_VISIBLE_OCCURRENCE_POLICY,
@@ -475,12 +481,13 @@ def _parameter_input_values(inputs) -> dict[str, str]:  # noqa: ANN001 - Fusion 
 def _execute_generation_request(request, addin_dir: Path) -> str:  # noqa: ANN001 - FusionCommandRequest kept testable in skeleton.
     design = _active_design(_app)
     scene_roots_before = _count_bgig_scene_roots(design)
+    bgig_objects_before = _count_bgig_tagged_objects(design)
     if request.action == FUSION_COMMAND_ACTION_CLEAR:
         clear_result = _clear_bgig_scene(design, scene_roots_before=scene_roots_before)
         return _clear_result_message(clear_result)
 
-    if request.action == FUSION_COMMAND_ACTION_GENERATE and scene_roots_before > 0:
-        return _generate_existing_scene_blocked_message(scene_roots_before)
+    if request.action == FUSION_COMMAND_ACTION_GENERATE and bgig_objects_before > 0:
+        return _generate_existing_scene_blocked_message(scene_roots_before, bgig_objects_before)
 
     cad_ir_path = request.cad_ir_path
     if request.source_kind == "config":
@@ -497,6 +504,12 @@ def _execute_generation_request(request, addin_dir: Path) -> str:  # noqa: ANN00
     clear_result = None
     if request.action == FUSION_COMMAND_ACTION_REGENERATE:
         clear_result = _clear_bgig_scene(design, scene_roots_before=scene_roots_before)
+        if clear_result["bgig_objects_remaining"] != 0:
+            raise FusionSkeletonError(
+                "Clear BGIG Scene did not remove all tagged BGIG objects. "
+                "Generation refused to avoid stacking duplicate Fusion geometry. "
+                f"Remaining BGIG objects: {clear_result['bgig_objects_remaining']}."
+            )
 
     result = _generate_from_plan(design, generation_plan)
     scene_roots_after = _count_bgig_scene_roots(design)
@@ -591,13 +604,14 @@ def _save_command_settings(addin_dir: Path, request, cad_ir_path: Path) -> bool:
         return False
 
 
-def _generate_existing_scene_blocked_message(scene_roots_before: int) -> str:
+def _generate_existing_scene_blocked_message(scene_roots_before: int, bgig_objects_before: int) -> str:
     return (
         "Board Game Insert Generator generate refused.\n"
         f"{BGIG_EXISTING_SCENE_MESSAGE}\n"
         f"Generate existing scene policy: {BGIG_GENERATE_EXISTING_SCENE_POLICY}\n"
-        f"BGIG scenes before: {scene_roots_before}\n"
-        f"BGIG scenes after: {scene_roots_before}\n"
+        f"BGIG scene roots before: {scene_roots_before}\n"
+        f"BGIG tagged objects before: {bgig_objects_before}\n"
+        f"BGIG scene roots after: {scene_roots_before}\n"
         "BGIG objects deleted: 0\n"
         "Non-BGIG objects preserved: yes\n"
         "Use Action = regenerate to replace the tagged BGIG scene, or "
@@ -610,17 +624,20 @@ def _clear_result_message(clear_result: dict[str, object]) -> str:
     return (
         "Board Game Insert Generator clear completed.\n"
         f"Clear scope: {clear_result['scope']}\n"
-        f"BGIG scenes before: {clear_result['scene_roots_before']}\n"
+        f"BGIG scene roots before: {clear_result['scene_roots_before']}\n"
+        f"BGIG scene roots found: {clear_result['scene_roots_found']}\n"
+        f"BGIG scene roots deleted: {clear_result['scene_roots_deleted']}\n"
         f"Tagged BGIG objects found: {clear_result['tagged_objects_found']}\n"
-        f"Tagged BGIG objects deleted: {clear_result['deleted_objects']}\n"
+        f"Legacy BGIG objects deleted: {clear_result['legacy_bgig_objects_deleted']}\n"
+        f"Tagged BGIG objects deleted total: {clear_result['deleted_objects']}\n"
         f"Tagged BGIG objects skipped: {clear_result['skipped_objects']}\n"
-        f"BGIG scenes after: {clear_result['scene_roots_after']}\n"
+        f"BGIG scene roots after: {clear_result['scene_roots_after']}\n"
+        f"BGIG objects remaining after clear: {clear_result['bgig_objects_remaining']}\n"
         f"Visible BGIG source/helper occurrences after clear: {clear_result['visible_source_helper_occurrences_after']}\n"
         f"Non-BGIG objects preserved: {clear_result['non_bgig_objects_preserved']}\n"
-        "Legacy untagged BGIG objects are not deleted to avoid removing user geometry.\n"
+        "Legacy untagged BGIG-looking objects are not deleted to avoid removing user geometry.\n"
         "Status: manual validation required in Fusion 360."
     )
-
 
 def _generation_result_message(
     generation_plan: FusionGenerationPlan,
@@ -638,10 +655,13 @@ def _generation_result_message(
     if clear_result is not None:
         clear_lines = (
             f"Regenerate clear scope: {clear_result['scope']}\n"
-            f"Regenerate BGIG scenes before clear: {clear_result['scene_roots_before']}\n"
-            f"Regenerate tagged BGIG objects deleted: {clear_result['deleted_objects']}\n"
+            f"Regenerate BGIG scene roots before clear: {clear_result['scene_roots_before']}\n"
+            f"Regenerate BGIG scene roots deleted: {clear_result['scene_roots_deleted']}\n"
+            f"Regenerate legacy BGIG objects deleted: {clear_result['legacy_bgig_objects_deleted']}\n"
+            f"Regenerate tagged BGIG objects deleted total: {clear_result['deleted_objects']}\n"
             f"Regenerate tagged BGIG objects skipped: {clear_result['skipped_objects']}\n"
-            f"Regenerate BGIG scenes after clear: {clear_result['scene_roots_after']}\n"
+            f"Regenerate BGIG scene roots after clear: {clear_result['scene_roots_after']}\n"
+            f"Regenerate BGIG objects remaining after clear: {clear_result['bgig_objects_remaining']}\n"
             f"Regenerate non-BGIG objects preserved: {clear_result['non_bgig_objects_preserved']}\n"
         )
     source_path = request.config_json_path if request.source_kind == "config" else cad_ir_path
@@ -660,7 +680,7 @@ def _generation_result_message(
         f"Parametric overrides: {', '.join(sorted(overrides)) if overrides else 'none'}\n"
         f"Generation mode: {generation_plan.generation_mode}\n"
         f"Reference outlines: {result['reference_outlines']}\n"
-        f"BGIG scenes before: {scene_roots_before}\n"
+        f"BGIG scene roots before: {scene_roots_before}\n"
         f"CAD IR module blanks planned: {len(generation_plan.blanks)}\n"
         f"Grid-positioned asset modules planned: {len(generation_plan.grid_positioned_blanks)}\n"
         f"Multi-layer grid modules planned: {generation_plan.multi_layer_grid_module_count}\n"
@@ -671,11 +691,12 @@ def _generation_result_message(
         f"Compact occurrences planned: {len(generation_plan.compact_occurrences)}\n"
         f"Exploded occurrences planned: {len(generation_plan.exploded_occurrences)}\n"
         f"BGIG scene roots created: {result['scene_roots_created']}\n"
-        f"BGIG scenes after: {scene_roots_after}\n"
+        f"BGIG scene roots after: {scene_roots_after}\n"
         f"Module components created: {result['module_components_created']}\n"
         f"Source components created: {result['source_components_created']}\n"
         f"Component creation policy: {BGIG_COMPONENT_CREATION_POLICY}\n"
         f"Source/helper policy: {BGIG_SOURCE_HELPER_POLICY}\n"
+        f"Scene ownership policy: {BGIG_SCENE_OWNERSHIP_POLICY}\n"
         f"Visible occurrence policy: {BGIG_VISIBLE_OCCURRENCE_POLICY}\n"
         f"Source/helper occurrences created: {result['source_helper_occurrences_created']}\n"
         f"Visible BGIG source/helper occurrences: {result['visible_source_helper_occurrences']}\n"
@@ -693,11 +714,7 @@ def _generation_result_message(
         f"Simple finger notch features planned: {result['finger_notch_features_planned']}\n"
         f"Simple finger notch sketches: {result['finger_notch_sketches']}\n"
         f"Simple top-open finger notch cuts: {result['finger_notch_cuts']}\n"
-        "Finger notch topology: top-open rectangular wall cut.\n"
-        "Compact placement source: CAD IR metadata.executable_asset_plan.\n"
-        "Exploded placement source: linked occurrences on add-in deterministic inspection grid; dimensions from CAD IR.\n"
-        "Creation scope: one Fusion component per BGIG module, compact/exploded occurrences linked.\n"
-        "Sizing source: printable_body_size_mm for generated asset modules; theoretical_grid_extent_mm remains occupancy metadata.\n"
+        f"Non-BGIG objects preserved: {result['non_bgig_objects_preserved']}\n"
         f"{clear_lines}"
         f"{module_mapping_report}"
         f"{body_size_report}"
@@ -706,49 +723,75 @@ def _generation_result_message(
         "Status: manual validation required in Fusion 360."
     )
 
-def _count_bgig_scene_roots(design) -> int:  # noqa: ANN001 - Fusion API object.
+def _bgig_attribute_groups() -> tuple[str, ...]:
+    return (BGIG_ATTRIBUTE_GROUP, *BGIG_LEGACY_ATTRIBUTE_GROUPS)
+
+
+def _find_bgig_attributes(design, group_name: str, attribute_name: str):  # noqa: ANN001 - Fusion API object.
     try:
-        attributes = design.findAttributes(BGIG_ATTRIBUTE_GROUP, BGIG_ATTRIBUTE_KIND)
+        return design.findAttributes(group_name, attribute_name)
     except Exception as exc:
         raise FusionSkeletonError(
-            "Fusion could not inspect BGIG attributes for scene detection. "
+            "Fusion could not inspect BGIG attributes for safe scene ownership. "
             "Generation refused to avoid duplicate or destructive behavior. "
             f"Original error: {exc}"
         ) from exc
 
-    scene_roots = set()
-    scene_root_components = set()
-    for index in range(getattr(attributes, "count", 0)):
-        attribute = attributes.item(index)
-        entity = getattr(attribute, "parent", None)
-        if entity is None:
-            continue
-        role = _bgig_entity_role(entity)
-        if role == BGIG_SCENE_ROOT_ROLE:
-            scene_roots.add(id(entity))
-        elif role == "scene_root_component":
-            scene_root_components.add(id(entity))
-    return len(scene_roots) if scene_roots else len(scene_root_components)
 
-
-def _count_visible_bgig_occurrences_by_role(design, roles: tuple[str, ...]) -> int:  # noqa: ANN001 - Fusion API object.
-    try:
-        attributes = design.findAttributes(BGIG_ATTRIBUTE_GROUP, BGIG_ATTRIBUTE_KIND)
-    except Exception:
-        return 0
-
-    visible = 0
+def _collect_bgig_tagged_entities(design) -> list[tuple[object, str | None]]:  # noqa: ANN001 - Fusion API object.
+    tagged_entities: list[tuple[object, str | None]] = []
     seen_entities = set()
-    for index in range(getattr(attributes, "count", 0)):
-        attribute = attributes.item(index)
-        entity = getattr(attribute, "parent", None)
-        if entity is None:
+    for group_name in _bgig_attribute_groups():
+        for attribute_name in (BGIG_ATTRIBUTE_ROLE_KEY, BGIG_ATTRIBUTE_KIND):
+            attributes = _find_bgig_attributes(design, group_name, attribute_name)
+            for index in range(getattr(attributes, "count", 0)):
+                attribute = attributes.item(index)
+                entity = getattr(attribute, "parent", None)
+                if entity is None:
+                    continue
+                entity_key = id(entity)
+                if entity_key in seen_entities:
+                    continue
+                role = _bgig_entity_role(entity)
+                generated_by = _bgig_entity_generated_by(entity)
+                if role is None and generated_by != BGIG_ATTRIBUTE_VALUE:
+                    continue
+                seen_entities.add(entity_key)
+                tagged_entities.append((entity, role))
+    return tagged_entities
+
+
+def _bgig_scene_root_occurrences(design) -> list[object]:  # noqa: ANN001 - Fusion API object.
+    roots = []
+    seen_entities = set()
+    for entity, role in _collect_bgig_tagged_entities(design):
+        if role not in (BGIG_SCENE_ROOT_ROLE, "scene_root_occurrence"):
+            continue
+        if getattr(entity, "deleteMe", None) is None:
             continue
         entity_key = id(entity)
         if entity_key in seen_entities:
             continue
         seen_entities.add(entity_key)
-        if _bgig_entity_role(entity) not in roles:
+        roots.append(entity)
+    return roots
+def _count_bgig_scene_roots(design) -> int:  # noqa: ANN001 - Fusion API object.
+    return len(_bgig_scene_root_occurrences(design))
+
+
+def _count_bgig_tagged_objects(design) -> int:  # noqa: ANN001 - Fusion API object.
+    return len(_collect_bgig_tagged_entities(design))
+
+
+def _count_visible_bgig_occurrences_by_role(design, roles: tuple[str, ...]) -> int:  # noqa: ANN001 - Fusion API object.
+    try:
+        tagged_entities = _collect_bgig_tagged_entities(design)
+    except Exception:
+        return 0
+
+    visible = 0
+    for entity, role in tagged_entities:
+        if role not in roles:
             continue
         if _bgig_entity_is_visible(entity):
             visible += 1
@@ -767,48 +810,37 @@ def _bgig_entity_is_visible(entity) -> bool:  # noqa: ANN001 - Fusion API object
     except Exception:
         return True
 
-def _clear_bgig_scene(design, scene_roots_before: int | None = None) -> dict[str, object]:  # noqa: ANN001 - Fusion API object.
-    try:
-        attributes = design.findAttributes(BGIG_ATTRIBUTE_GROUP, BGIG_ATTRIBUTE_KIND)
-    except Exception as exc:
-        raise FusionSkeletonError(
-            "Fusion could not inspect BGIG attributes for safe clear. "
-            "Clear BGIG Scene refused to avoid deleting user geometry. "
-            f"Original error: {exc}"
-        ) from exc
 
+def _clear_bgig_scene(design, scene_roots_before: int | None = None) -> dict[str, object]:  # noqa: ANN001 - Fusion API object.
     if scene_roots_before is None:
         scene_roots_before = _count_bgig_scene_roots(design)
 
-    found = getattr(attributes, "count", 0)
-    tagged_entities = []
-    seen_entities = set()
+    tagged_before = _collect_bgig_tagged_entities(design)
+    scene_roots = _bgig_scene_root_occurrences(design)
+    scene_roots_found = len(scene_roots)
+    scene_roots_deleted = 0
     skipped = 0
-    for index in range(found):
-        attribute = attributes.item(index)
-        entity = getattr(attribute, "parent", None)
-        if entity is None:
-            skipped += 1
-            continue
-        entity_key = id(entity)
-        if entity_key in seen_entities:
-            continue
-        seen_entities.add(entity_key)
-        role = _bgig_entity_role(entity)
-        if role not in BGIG_CLEARABLE_ROLES:
-            skipped += 1
-            continue
-        tagged_entities.append((entity, role))
+    deleted_root_ids = set()
 
-    deleted = 0
-    deleted_entities = set()
-    ordered_entities = sorted(
-        tagged_entities,
-        key=lambda item: 0 if item[1] == BGIG_SCENE_ROOT_ROLE else 1,
-    )
-    for entity, _role in ordered_entities:
-        entity_key = id(entity)
-        if entity_key in deleted_entities:
+    for scene_root in scene_roots:
+        delete_method = getattr(scene_root, "deleteMe", None)
+        if delete_method is None:
+            skipped += 1
+            continue
+        try:
+            delete_method()
+            scene_roots_deleted += 1
+            deleted_root_ids.add(id(scene_root))
+        except Exception:
+            skipped += 1
+
+    legacy_bgig_objects_deleted = 0
+    legacy_candidates = _collect_bgig_tagged_entities(design)
+    for entity, role in legacy_candidates:
+        if id(entity) in deleted_root_ids:
+            continue
+        if role not in BGIG_CLEARABLE_ROLES and _bgig_entity_generated_by(entity) != BGIG_ATTRIBUTE_VALUE:
+            skipped += 1
             continue
         delete_method = getattr(entity, "deleteMe", None)
         if delete_method is None:
@@ -816,21 +848,29 @@ def _clear_bgig_scene(design, scene_roots_before: int | None = None) -> dict[str
             continue
         try:
             delete_method()
-            deleted += 1
-            deleted_entities.add(entity_key)
+            legacy_bgig_objects_deleted += 1
         except Exception:
             skipped += 1
+
+    scene_roots_after = _count_bgig_scene_roots(design)
+    bgig_objects_remaining = _count_bgig_tagged_objects(design)
+    deleted_objects = scene_roots_deleted + legacy_bgig_objects_deleted
 
     return {
         "scope": BGIG_CLEAR_SCOPE,
         "scene_roots_before": scene_roots_before,
-        "tagged_objects_found": found,
-        "deleted_objects": deleted,
+        "scene_roots_found": scene_roots_found,
+        "scene_roots_deleted": scene_roots_deleted,
+        "tagged_objects_found": len(tagged_before),
+        "legacy_bgig_objects_deleted": legacy_bgig_objects_deleted,
+        "deleted_objects": deleted_objects,
         "skipped_objects": skipped,
-        "scene_roots_after": _count_bgig_scene_roots(design),
+        "scene_roots_after": scene_roots_after,
+        "bgig_objects_remaining": bgig_objects_remaining,
         "visible_source_helper_occurrences_after": 0,
         "non_bgig_objects_preserved": "yes",
     }
+
 
 def _tag_bgig_entity(entity, role: str) -> None:  # noqa: ANN001 - Fusion API object.
     attributes = getattr(entity, "attributes", None)
@@ -838,7 +878,7 @@ def _tag_bgig_entity(entity, role: str) -> None:  # noqa: ANN001 - Fusion API ob
         return
     try:
         attributes.add(BGIG_ATTRIBUTE_GROUP, BGIG_ATTRIBUTE_KIND, BGIG_ATTRIBUTE_VALUE)
-        attributes.add(BGIG_ATTRIBUTE_GROUP, "role", role)
+        attributes.add(BGIG_ATTRIBUTE_GROUP, BGIG_ATTRIBUTE_ROLE_KEY, role)
     except Exception:
         pass
 
@@ -847,12 +887,28 @@ def _bgig_entity_role(entity) -> str | None:  # noqa: ANN001 - Fusion API object
     attributes = getattr(entity, "attributes", None)
     if attributes is None:
         return None
-    try:
-        role_attribute = attributes.itemByName(BGIG_ATTRIBUTE_GROUP, "role")
-        return getattr(role_attribute, "value", None) if role_attribute is not None else None
-    except Exception:
-        return None
+    for group_name in _bgig_attribute_groups():
+        try:
+            role_attribute = attributes.itemByName(group_name, BGIG_ATTRIBUTE_ROLE_KEY)
+            if role_attribute is not None:
+                return getattr(role_attribute, "value", None)
+        except Exception:
+            continue
+    return None
 
+
+def _bgig_entity_generated_by(entity) -> str | None:  # noqa: ANN001 - Fusion API object.
+    attributes = getattr(entity, "attributes", None)
+    if attributes is None:
+        return None
+    for group_name in _bgig_attribute_groups():
+        try:
+            generated_by_attribute = attributes.itemByName(group_name, BGIG_ATTRIBUTE_KIND)
+            if generated_by_attribute is not None:
+                return getattr(generated_by_attribute, "value", None)
+        except Exception:
+            continue
+    return None
 def _active_design(application):  # noqa: ANN001 - Fusion API object.
     active_product = application.activeProduct if application else None
     if active_product is None:
@@ -882,7 +938,6 @@ def _create_bgig_scene_root(root_component):  # noqa: ANN001 - Fusion API object
     if component is None:
         raise RuntimeError("BGIG Generated Scene component is unavailable.")
     component.name = BGIG_SCENE_ROOT_COMPONENT_NAME
-    _tag_bgig_entity(component, "scene_root_component")
     return occurrence, component
 
 def _generate_from_plan(design, plan: FusionGenerationPlan) -> dict[str, object]:  # noqa: ANN001

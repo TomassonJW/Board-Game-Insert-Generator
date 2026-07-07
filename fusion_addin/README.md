@@ -213,7 +213,7 @@ explicitement desactive tant qu'un builder de config temporaire complet n'est pa
 code.
 
 
-### Correction P12-M002V5 - occurrence compacte initiale visible
+### Archive P12-M002V5 - occurrence compacte initiale visible, remplacee par P12-M002V6
 
 P12-M002V5 abandonne la strategie `source_helper hidden` qui rendait les bodies
 invisibles dans Fusion. L'occurrence initiale creee par `addNewComponent` est
@@ -242,7 +242,7 @@ les attributs BGIG, jamais les objets utilisateur non BGIG. Le message Fusion
 affiche `BGIG scenes before`, `BGIG objects deleted`, `BGIG scenes after` et
 `Non-BGIG objects preserved`.
 
-Procedure P12-M002V5 recommandee :
+Procedure P12-M002V5 archivee, ne plus utiliser pour validation :
 
 1. Copier l'add-in a jour dans le dossier Fusion AddIns.
 2. Ouvrir un document Fusion Assembly-compatible.
@@ -286,8 +286,7 @@ Procedure P12-M002V5 recommandee :
     les overrides vides ; si un override est renseigne, l'add-in doit refuser
     clairement au lieu de l'ignorer.
 
-Validation attendue : correction codee, validation Fusion manuelle P12-M002V5
-requise, `print-validated: false`.
+Validation P12-M002V5 refusee. Utiliser la procedure P12-UI-M002V6 ci-dessous.
 ## Cas Zero Doc
 
 Fusion peut demarrer sans document actif. Le squelette detecte ce cas via
@@ -476,3 +475,39 @@ La conversion actuelle stabilisee :
 Toute mission suivante qui elargit le perimetre Fusion, notamment vers demi-lunes
 courbes, fonds arrondis, fillets ou exports, doit recevoir une nouvelle gate
 humaine avant implementation.
+
+### Correction P12-M002V6 - ownership par scene racine unique
+
+P12-M002V6 remplace le nettoyage par objets disperses par un ownership Fusion
+unique : chaque generation cree une occurrence racine `BGIG Generated Scene`
+taguee `bgig:role = scene_root`. Tous les sketches, references, modules,
+occurrences compactes/eclatees, bodies et features BGIG doivent etre crees sous
+le `Component` de cette racine.
+
+Le flux attendu est :
+
+- `generate` refuse si une scene racine BGIG ou un objet BGIG tague existe deja ;
+- `regenerate` prepare la nouvelle generation, supprime les racines BGIG via
+  `deleteMe()`, verifie `BGIG objects remaining after clear: 0`, puis regenere ;
+- `clear_bgig_scene` supprime les racines BGIG et les objets legacy explicitement
+  tagues BGIG, sans toucher aux objets utilisateur non BGIG.
+
+Procedure P12-UI-M002V6 recommandee :
+
+1. Copier l'add-in a jour dans le dossier Fusion AddIns.
+2. Ouvrir un document Assembly-compatible propre.
+3. Creer un objet utilisateur non BGIG visible, par exemple un petit body ou
+   sketch de controle.
+4. Lancer `Board Game Insert Generator` puis ouvrir `Generate Board Game Insert`.
+5. Choisir `Input mode = config_file`, `BGIG config JSON path = examples/simple_asset_product_scene.json` et verifier le `BGIG project root`.
+6. Choisir `Action = generate`, `Generation mode = compact_only`, puis cliquer
+   `Run`.
+7. Verifier le message : `BGIG scene roots before: 0`, `BGIG scene roots created: 1`, `BGIG scene roots after: 1`, `Compact occurrences created: 1`, `Exploded occurrences created: 0`, `Legacy bodies created: 0`.
+8. Verifier dans le browser Fusion qu'il n'existe qu'une racine `BGIG Generated Scene` et qu'aucun sketch/gabarit BGIG n'est hors de cette racine.
+9. Relancer `Action = generate` : l'add-in doit refuser avec `BGIG scene already exists. Use regenerate or clear first.` et ne creer aucune nouvelle racine.
+10. Choisir `Action = regenerate`, cliquer `Run`, puis refaire `regenerate` une seconde fois. Apres chaque run : une seule racine BGIG, aucun doublon, objet non BGIG conserve.
+11. Choisir `Action = clear_bgig_scene`, cliquer `Run`. Verifier `BGIG scene roots deleted: 1`, `BGIG scene roots after: 0`, `BGIG objects remaining after clear: 0`, `Non-BGIG objects preserved: yes`.
+12. Refaire les etapes 6 a 11 en `Generation mode = compact_and_exploded`. Attendu : une racine BGIG, une occurrence compacte, une occurrence eclatee liee, aucun troisieme module cache ou superpose, clear final complet.
+
+Validation attendue : correction codee, validation Fusion manuelle P12-UI-M002V6
+requise, `print-validated: false`.

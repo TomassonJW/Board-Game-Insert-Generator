@@ -87,6 +87,16 @@ Toute autre valeur est refusee avant generation.
 
 ## Gates
 
-- P7-M001V4, P11-M002V et P11-M003V4 sont validees humainement ; prochaine gate : smoke test P12-UI-M002V5 pour verifier l occurrence compacte initiale visible.
+- P7-M001V4, P11-M002V et P11-M003V4 sont validees humainement ; prochaine gate : smoke test P12-UI-M002V6 pour verifier l ownership par scene racine unique.
 - Nouvelle gate avant vue eclatee avancee, modules composites, export STL/3MF ou
   preparation d'impression.
+
+## Correction P12-M002V6 - scene root ownership
+
+La vue compacte et la vue eclatee restent des occurrences liees. Elles sont
+maintenant toujours creees sous une occurrence racine BGIG unique taguee
+`bgig:role = scene_root`.
+
+`clear_bgig_scene` et `regenerate` suppriment cette occurrence racine via
+`deleteMe()` au lieu de poursuivre les occurrences compactes/eclatees une par
+une. Validation Fusion attendue : `P12-UI-M002V6`.

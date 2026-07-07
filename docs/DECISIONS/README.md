@@ -129,6 +129,8 @@ Tests, cartes backlog ou gates humaines a preparer.
 - ADR-0025-fusion-initial-occurrence-as-compact-view.md - occurrence
   initiale `addNewComponent` comme vue compacte officielle.
 
+- ADR-0026-fusion-generated-scene-root-ownership.md - occurrence racine unique taguee et suppression par `deleteMe()` pour la scene Fusion BGIG.
+
 ## Regles de maintenance
 
 - Ne reecris pas l'historique d'une ADR acceptee pour changer la decision.

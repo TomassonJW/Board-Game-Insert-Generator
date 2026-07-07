@@ -351,3 +351,12 @@ avant generation d'une CAD IR temporaire.
 Le fichier `bgig_ui_settings.json` est un fichier local d'add-in, hors contrat
 CAD IR. Il memorise des chemins utilisateur pour eviter de retaper project root
 et config a chaque generation.
+
+## Fusion scene ownership note
+
+La CAD IR ne porte pas la responsabilite de nettoyage de scene Fusion. Depuis
+P12-M002V6, l'add-in Fusion encapsule toute generation CAD IR dans une occurrence
+racine `BGIG Generated Scene` taguee `bgig:role = scene_root`.
+
+Cette strategie est additive cote adaptateur et ne change pas le contrat CAD IR
+V0 ni les dimensions exportees.

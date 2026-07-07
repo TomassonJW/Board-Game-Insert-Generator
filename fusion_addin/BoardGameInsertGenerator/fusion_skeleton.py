@@ -64,24 +64,28 @@ BGIG_GENERATED_CONFIG_FILENAME = "bgig_ui_generated_config.json"
 BGIG_GENERATED_CAD_IR_FILENAME = "bgig_ui_generated_cad_ir.json"
 BGIG_UI_SETTINGS_FILENAME = "bgig_ui_settings.json"
 BGIG_DEFAULT_DEV_PROJECT_ROOT = Path("C:/Users/janko/Documents/BGIG")
-BGIG_ATTRIBUTE_GROUP = "BGIG"
+BGIG_ATTRIBUTE_GROUP = "bgig"
+BGIG_LEGACY_ATTRIBUTE_GROUPS = ("BGIG",)
 BGIG_ATTRIBUTE_KIND = "generated_by"
+BGIG_ATTRIBUTE_ROLE_KEY = "role"
 BGIG_ATTRIBUTE_VALUE = "BoardGameInsertGenerator"
-BGIG_CLEAR_SCOPE = "tagged_bgig_objects_only"
+BGIG_CLEAR_SCOPE = "delete_scene_root_occurrence_then_legacy_bgig_only"
 BGIG_SCENE_ROOT_COMPONENT_NAME = "BGIG Generated Scene"
-BGIG_SCENE_ROOT_ROLE = "scene_root_occurrence"
+BGIG_SCENE_ROOT_ROLE = "scene_root"
+BGIG_SCENE_OWNERSHIP_POLICY = "single_tagged_scene_root_occurrence_deleteMe"
 BGIG_COMPONENT_CREATION_POLICY = "initial_addNewComponent_occurrence_is_compact"
 BGIG_SOURCE_HELPER_POLICY = "source_helper_occurrences_not_used"
 BGIG_VISIBLE_OCCURRENCE_POLICY = "compact_and_exploded_occurrences_only"
-BGIG_GENERATE_EXISTING_SCENE_POLICY = "generate_refuses_when_bgig_scene_exists"
+BGIG_GENERATE_EXISTING_SCENE_POLICY = "generate_refuses_when_bgig_scene_or_tagged_bgig_objects_exist"
 BGIG_EXISTING_SCENE_MESSAGE = "BGIG scene already exists. Use regenerate or clear first."
 BGIG_ACTION_GUIDANCE = (
-    "generate creates one new scene only when no BGIG scene exists; "
-    "regenerate validates, clears tagged BGIG objects, then creates one replacement scene; "
-    "clear_bgig_scene removes only tagged BGIG objects."
+    "generate creates one new scene only when no BGIG scene root or tagged BGIG objects exist; "
+    "regenerate validates, deletes tagged BGIG scene roots with deleteMe, clears legacy BGIG tags, "
+    "then creates one replacement scene; clear_bgig_scene deletes scene roots first and preserves non-BGIG objects."
 )
 BGIG_CLEARABLE_ROLES = (
     BGIG_SCENE_ROOT_ROLE,
+    "scene_root_occurrence",
     "reference_outline",
     "compact_occurrence",
     "exploded_occurrence",
@@ -933,6 +937,7 @@ def fusion_command_summary(request: FusionCommandRequest) -> str:
             f"Generate existing scene policy: {BGIG_GENERATE_EXISTING_SCENE_POLICY}",
             f"Component creation policy: {BGIG_COMPONENT_CREATION_POLICY}",
             f"Source/helper policy: {BGIG_SOURCE_HELPER_POLICY}",
+            f"Scene ownership policy: {BGIG_SCENE_OWNERSHIP_POLICY}",
             f"Visible occurrence policy: {BGIG_VISIBLE_OCCURRENCE_POLICY}",
             f"Action guidance: {BGIG_ACTION_GUIDANCE}",
             "Fusion will not recalculate layout, clearances or tolerances.",

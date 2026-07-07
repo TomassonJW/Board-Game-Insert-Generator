@@ -20,6 +20,7 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     BGIG_QUICK_PARAMETRIC_BOX_STATUS,
     BGIG_SCENE_ROOT_COMPONENT_NAME,
     BGIG_SCENE_ROOT_ROLE,
+    BGIG_SCENE_OWNERSHIP_POLICY,
     BGIG_COMPONENT_CREATION_POLICY,
     BGIG_SOURCE_HELPER_POLICY,
     BGIG_UI_SETTINGS_FILENAME,
@@ -1012,8 +1013,8 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("resolve_generation_mode", source)
         self.assertIn("_xy_plane_for_z", source)
         self.assertIn("Simple top-open finger notch cuts", source)
-        self.assertIn("top-open rectangular wall cut", source)
-        self.assertIn("one Fusion component per BGIG module", source)
+        self.assertIn("Simple top-open finger notch cuts", source)
+        self.assertIn("one Fusion component per physical BGIG module", source)
         self.assertIn("resolve_cad_ir_input_path", source)
         self.assertIn("cad_ir_input_guidance", source)
         self.assertIn("Input CAD IR", source)
@@ -1050,7 +1051,8 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("BGIG_GENERATED_CONFIG_FILENAME", source)
         self.assertIn("BGIG_GENERATED_CAD_IR_FILENAME", source)
         self.assertIn("_clear_bgig_scene", source)
-        self.assertIn("design.findAttributes", source)
+        self.assertIn("findAttributes", source)
+        self.assertIn("_find_bgig_attributes", source)
         self.assertIn("_tag_bgig_entity", source)
         self.assertIn("BGIG_CLEAR_SCOPE", source)
         self.assertIn("Print validation: false", source)
@@ -1062,6 +1064,7 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("BGIG_SCENE_ROOT_ROLE", source)
         self.assertIn("BGIG_COMPONENT_CREATION_POLICY", source)
         self.assertIn("BGIG_SOURCE_HELPER_POLICY", source)
+        self.assertIn("BGIG_SCENE_OWNERSHIP_POLICY", source)
         self.assertIn("BGIG_VISIBLE_OCCURRENCE_POLICY", source)
         self.assertIn("_create_module_component_occurrence", source)
         self.assertIn("def _create_module_component_occurrence", source)
@@ -1076,9 +1079,17 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("quick_parametric_box", source)
         self.assertIn("Config-file overrides only", source)
         self.assertIn("_count_bgig_scene_roots", source)
+        self.assertIn("_bgig_scene_root_occurrences", source)
+        self.assertIn("_count_bgig_tagged_objects", source)
+        self.assertIn("scene_roots_deleted", source)
+        self.assertIn("legacy_bgig_objects_deleted", source)
+        self.assertIn("bgig_objects_remaining", source)
+        self.assertIn("deleteMe()", source)
+        self.assertIn("BGIG_ATTRIBUTE_ROLE_KEY", source)
+        self.assertIn("BGIG_LEGACY_ATTRIBUTE_GROUPS", source)
         self.assertIn("_generate_existing_scene_blocked_message", source)
-        self.assertIn("BGIG scenes before", source)
-        self.assertIn("BGIG scenes after", source)
+        self.assertIn("BGIG scene roots before", source)
+        self.assertIn("BGIG scene roots after", source)
         self.assertIn("scene_roots_before", source)
         self.assertIn("scene_roots_after", source)
         self.assertIn("BGIG_EXISTING_SCENE_MESSAGE", source)
@@ -1088,14 +1099,15 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn(BGIG_GENERATE_EXISTING_SCENE_POLICY, skeleton_source)
         self.assertIn(BGIG_COMPONENT_CREATION_POLICY, skeleton_source)
         self.assertIn(BGIG_SOURCE_HELPER_POLICY, skeleton_source)
+        self.assertIn(BGIG_SCENE_OWNERSHIP_POLICY, skeleton_source)
         self.assertIn(BGIG_VISIBLE_OCCURRENCE_POLICY, skeleton_source)
         execute_block = source[
             source.index("def _execute_generation_request") : source.index("def _generate_cad_ir_from_config_request")
         ]
         self.assertIn("scene_roots_before = _count_bgig_scene_roots(design)", execute_block)
-        self.assertIn("request.action == FUSION_COMMAND_ACTION_GENERATE and scene_roots_before > 0", execute_block)
+        self.assertIn("request.action == FUSION_COMMAND_ACTION_GENERATE and bgig_objects_before > 0", execute_block)
         self.assertLess(
-            execute_block.index("request.action == FUSION_COMMAND_ACTION_GENERATE and scene_roots_before > 0"),
+            execute_block.index("request.action == FUSION_COMMAND_ACTION_GENERATE and bgig_objects_before > 0"),
             execute_block.index("cad_ir_path = request.cad_ir_path"),
         )
         self.assertLess(

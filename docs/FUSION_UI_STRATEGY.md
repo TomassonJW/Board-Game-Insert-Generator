@@ -168,3 +168,26 @@ seulement l'occurrence eclatee via `addExistingComponent`. Aucune occurrence
 source/helper n'est creee ou masquee.
 
 La validation Fusion attendue devient `P12-UI-M002V5`.
+
+### Correction P12-M002V6 - ownership par scene racine unique
+
+P12-M002V6 corrige le modele d'ownership Fusion apres KO de P12-UI-M002V5.
+Le chemin actif n'est plus un nettoyage par sous-objets disperses : chaque
+generation BGIG cree une occurrence racine unique `BGIG Generated Scene`, taguee
+`bgig:role = scene_root`, et tous les objets BGIG generes sont enfants du
+`Component` de cette occurrence.
+
+Regles actives :
+
+- `generate` refuse si une racine BGIG ou un objet BGIG tague existe deja ;
+- `regenerate` valide la nouvelle generation, supprime les racines BGIG via
+  `Occurrence.deleteMe()`, verifie que zero objet BGIG tague reste, puis regenere ;
+- `clear_bgig_scene` supprime les occurrences racines taguees, puis nettoie
+  seulement les objets legacy explicitement tagues BGIG ;
+- les objets utilisateur non BGIG ne sont jamais cibles ;
+- aucun sketch, gabarit, body ou feature BGIG ne doit etre cree hors du
+  `Component` de la racine `BGIG Generated Scene`.
+
+Le message Fusion doit afficher `BGIG scene roots before`, `BGIG scene roots
+created`, `BGIG scene roots deleted`, `BGIG scene roots after`, `BGIG objects
+remaining after clear` et `Non-BGIG objects preserved: yes`.
