@@ -293,7 +293,7 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Criteres d'acceptation : Fusion ne recalcule pas le solveur ; les bodies asset-first utilisent la taille imprimable ; les spans grille restent visibles comme metadata ; l'utilisateur n'a plus a editer manuellement `cad_ir_path.txt` ou `exploded_view_mode.txt` pour le flux courant ; coeur Python sans `adsk`.
 - Tests : unitaires hors Fusion, CLI Markdown/JSON/export CAD IR sur exemples pertinents, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
 - Gate : validation humaine fournie le 2026-07-07 apres P11-M002V, limitee a sizing et UI minimale.
-- Statut : `done`, `implemented-fusion`, corrections P11-M003V2/P11-M003V3 codees, validation Fusion manuelle requise, `print-validated: false`.
+- Statut : `done`, `implemented-fusion`, corrections P11-M003V2/P11-M003V3/P11-M003V4 codees, validation Fusion manuelle requise, `print-validated: false`.
 
 ### P11-M003V - Valider manuellement la commande UI Fusion et le sizing asset-first
 
@@ -324,6 +324,17 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Objectif : lancer l'add-in, ouvrir la boite de dialogue `Generate Board Game Insert`, renseigner `CAD IR JSON path`, choisir `compact_and_exploded`, generer la scene et verifier le `Body sizing report`.
 - Livrable : validation humaine Fusion avec commande visible, chemin choisi, mode choisi, dimensions prevues/reelles et statut `print-validated: false`.
 - Criteres d'acceptation : la generation normale passe par la commande UI sans modifier `cad_ir_path.txt` ni `exploded_view_mode.txt`; Fusion utilise `printable_body_size_mm`; `actual Fusion body bbox` correspond aux dimensions imprimables attendues; aucune nouvelle geometrie ou tolerance n'est ajoutee.
+- Tests : smoke test manuel Fusion, aucune validation d'impression revendiquee.
+- Gate : action humaine requise.
+- Statut : `blocked`, remplace par `P11-M003V4` apres KO sur ambiguite scene produit/fixture.
+
+### P11-M003V4 - Valider la scene produit asset-first non ambigue
+
+- Capability : C-FUSION-UI, C-FUSION-COMPACT, C-GRID-3D.
+- Milestone : M14 Usable beta / M7 Volumetric planner.
+- Objectif : lancer l'add-in avec `simple_asset_product_scene`, verifier un seul module asset-first, aucun blank legacy, le mapping source et le sizing planned/actual.
+- Livrable : validation humaine Fusion avec `Module source mapping`, `Body sizing report`, dimensions, origine et statut `print-validated: false`.
+- Criteres d'acceptation : aucune generation redondante non documentee ; source `asset_candidate`, placement `grid_placement`, assets contenus, clearances peripherique/inter-module et taille imprimable lisibles ; aucune nouvelle geometrie ou tolerance n'est ajoutee.
 - Tests : smoke test manuel Fusion, aucune validation d'impression revendiquee.
 - Gate : action humaine requise.
 - Statut : `blocked`.
@@ -482,7 +493,7 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Capability : C-ASSET, C-SOLVER, C-GRID-3D, C-CAD-IR.
 - Milestone : M6 Asset-first project model / M7 Volumetric planner / M10 Semi-automatic solver.
 - Objectif : transformer la variante asset recommandee en modules generes abstraits puis les placer dans une grille 3D par heuristique greedy bornee.
-- Livrable : `executable_asset_plan` Markdown/JSON, metadata CAD IR additive, exemple `simple_asset_executable_plan.json` et tests.
+- Livrable : `executable_asset_plan` Markdown/JSON, metadata CAD IR additive, exemple produit `simple_asset_product_scene.json`, fixture technique `simple_asset_executable_plan.json` et tests.
 - Criteres d'acceptation : positions X/Y/Z en unites, dimensions millimetres derivees de la grille, refus actionnables, aucune generation Fusion reelle.
 - Tests : unitaires + CLI Markdown/JSON/export CAD IR sur exemples assets et grille.
 - Gate : stop si solveur complexe, backtracking, optimisation globale, schema incompatible ou generation Fusion devient necessaire.

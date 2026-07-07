@@ -418,11 +418,39 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(grid_blank.theoretical_grid_extent_mm.to_dict(), {"x": 30.0, "y": 30.0, "z": 10.0})
         self.assertEqual(plan.to_dict()["grid_positioned_blanks"][0]["body_name"], grid_blank.body_name)
         self.assertEqual(plan.to_dict()["grid_positioned_blanks"][0]["body_size_source"], "printable_body_size_mm")
+        self.assertEqual(plan.to_dict()["grid_positioned_blanks"][0]["module_source"], "asset_candidate")
         self.assertEqual(
             plan.to_dict()["grid_positioned_blanks"][0]["theoretical_grid_extent_mm"],
             {"x": 30.0, "y": 30.0, "z": 10.0},
         )
 
+
+    def test_product_asset_scene_generates_single_sourced_grid_module(self) -> None:
+        payload = _cad_ir_payload_from_example("simple_asset_product_scene.json")
+
+        plan = generation_plan_from_cad_ir(payload)
+
+        self.assertEqual(len(plan.blanks), 0)
+        self.assertEqual(len(plan.grid_positioned_blanks), 1)
+        self.assertEqual(plan.module_component_count, 1)
+        self.assertEqual(len(plan.compact_occurrences), 1)
+        self.assertEqual(len(plan.exploded_occurrences), 1)
+        grid_blank = plan.grid_positioned_blanks[0]
+        self.assertEqual(grid_blank.module_source, "asset_candidate")
+        self.assertEqual(grid_blank.placement_source, "grid_placement")
+        self.assertEqual(grid_blank.source_asset_ids, ("coin-tokens", "status-tokens"))
+        self.assertEqual(grid_blank.candidate_id, "asset-group-candidate:tokens:store:exact")
+        self.assertEqual(grid_blank.origin_mm.to_dict(), {"x": 0.0, "y": 0.0, "z": 0.0})
+        self.assertEqual(grid_blank.size_mm.to_dict(), {"x": 25.6, "y": 25.6, "z": 9.8})
+        self.assertEqual(grid_blank.theoretical_grid_extent_mm.to_dict(), {"x": 30.0, "y": 30.0, "z": 10.0})
+        self.assertEqual(grid_blank.body_size_source, "printable_body_size_mm")
+        self.assertEqual(grid_blank.clearance_applied["peripheral_clearance_mm"], 0.0)
+        self.assertEqual(grid_blank.clearance_applied["inter_module_gap_mm"], 0.0)
+        plan_dict = plan.to_dict()
+        self.assertEqual(plan_dict["blanks"], [])
+        self.assertEqual(plan_dict["grid_positioned_blanks"][0]["module_source"], "asset_candidate")
+        self.assertEqual(plan_dict["grid_positioned_blanks"][0]["placement_source"], "grid_placement")
+        self.assertEqual(plan_dict["grid_positioned_blanks"][0]["source_asset_ids"], ["coin-tokens", "status-tokens"])
 
     def test_rejects_modern_grid_placement_without_printable_body_size(self) -> None:
         payload = _cad_ir_payload_from_example("simple_asset_executable_plan.json")
@@ -800,6 +828,9 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("_delete_command_definition", source)
         self.assertIn("command_definition.execute()", source)
         self.assertLess(source.index("adsk.autoTerminate(False)"), source.index("command_definition.execute()"))
+        self.assertIn("Module source mapping", source)
+        self.assertIn("module_source", source)
+        self.assertIn("placement_source", source)
         self.assertIn("Body sizing report", source)
         self.assertIn("body.boundingBox", source)
         self.assertIn("actual_fusion_body_bbox_mm", source)

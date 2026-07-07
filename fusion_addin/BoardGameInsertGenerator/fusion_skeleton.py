@@ -155,6 +155,10 @@ class FusionSolidPlan:
     printable: bool
     operation_kind: str
     validation_status: str = FUSION_MANUAL_VALIDATION_REQUIRED
+    module_source: str = "legacy_blank"
+    placement_source: str = "cad_ir_component"
+    source_asset_ids: tuple[str, ...] = ()
+    candidate_id: str | None = None
     grid_origin_units: tuple[int, int, int] | None = None
     grid_size_units: tuple[int, int, int] | None = None
     theoretical_grid_origin_mm: FusionVectorMm | None = None
@@ -176,7 +180,12 @@ class FusionSolidPlan:
             "printable": self.printable,
             "operation_kind": self.operation_kind,
             "validation_status": self.validation_status,
+            "module_source": self.module_source,
+            "placement_source": self.placement_source,
+            "source_asset_ids": list(self.source_asset_ids),
         }
+        if self.candidate_id is not None:
+            payload["candidate_id"] = self.candidate_id
         if self.grid_origin_units is not None:
             payload["grid_origin_units"] = _grid_units_tuple_to_dict(self.grid_origin_units)
         if self.grid_size_units is not None:
@@ -687,18 +696,30 @@ def validate_cad_ir_payload(payload: Any) -> dict[str, Any]:
     components = payload.get("components")
     if not isinstance(components, list):
         raise FusionSkeletonError("CAD IR payload must contain a components list.")
-    if not components:
-        raise FusionSkeletonError("CAD IR components list must contain at least one component.")
-    for index, component in enumerate(components):
-        if not isinstance(component, dict):
-            raise FusionSkeletonError(f"CAD IR components[{index}] must be an object.")
 
     metadata = payload.get("metadata")
     if metadata is not None and not isinstance(metadata, dict):
         raise FusionSkeletonError("CAD IR metadata must be an object when present.")
+    if not components and not _metadata_has_executable_asset_placements(metadata):
+        raise FusionSkeletonError(
+            "CAD IR components list must contain at least one component unless "
+            "metadata.executable_asset_plan.placements provides generated asset modules."
+        )
+    for index, component in enumerate(components):
+        if not isinstance(component, dict):
+            raise FusionSkeletonError(f"CAD IR components[{index}] must be an object.")
 
     return payload
 
+
+def _metadata_has_executable_asset_placements(metadata: Any) -> bool:
+    if not isinstance(metadata, dict):
+        return False
+    plan = metadata.get("executable_asset_plan")
+    if not isinstance(plan, dict):
+        return False
+    placements = plan.get("placements")
+    return isinstance(placements, list) and len(placements) > 0
 
 def planned_operations_from_cad_ir(payload: Any) -> tuple[FusionOperationPlan, ...]:
     """Convert CAD IR operations into a non-executable Fusion plan.
@@ -861,6 +882,10 @@ def generation_plan_from_cad_ir(
                 "kind",
                 f"component {component_id} operation",
             ),
+            module_source="legacy_blank",
+            placement_source="cad_ir_component",
+            clearance_applied=_clearance_summary_from_cad_body(body),
+            body_size_source="printable_size_mm",
         )
         blanks.append(blank)
         cavity_cuts.extend(_cavity_cut_plans(component_id, component_name, blank, operations))
@@ -1107,6 +1132,7 @@ def _grid_positioned_asset_blanks_from_metadata(
         if asset_fit_size_mm is not None:
             _validate_size_inside_size(asset_fit_size_mm, printable_body_size_mm, module_id, "asset-fit envelope", "printable body")
 
+        source_asset_ids = _text_list(module.get("source_asset_ids", []), f"generated module {module_id} source_asset_ids")
         blank = FusionSolidPlan(
             cad_id=_fusion_name(f"grid-placement:{module_id}"),
             component_name=_fusion_name(f"Grid placed {module.get('name') or module_id}"),
@@ -1123,6 +1149,10 @@ def _grid_positioned_asset_blanks_from_metadata(
             asset_fit_size_mm=asset_fit_size_mm,
             printable_body_size_mm=printable_body_size_mm,
             body_size_source=body_size_source,
+            module_source="asset_candidate",
+            placement_source="grid_placement",
+            source_asset_ids=tuple(source_asset_ids),
+            candidate_id=candidate_id,
             clearance_applied=placement.get("clearance_applied") if isinstance(placement.get("clearance_applied"), dict) else None,
             sizing_policy=_optional_text(placement, "sizing_policy"),
         )
@@ -1136,6 +1166,39 @@ def _grid_positioned_asset_blanks_from_metadata(
 
     return grid_blanks, rejected
 
+
+def _clearance_summary_from_cad_body(body: dict[str, Any]) -> dict[str, Any] | None:
+    applied_tolerances = body.get("applied_tolerances", [])
+    if not isinstance(applied_tolerances, list):
+        return None
+    return {
+        "peripheral_clearance_mm": _max_tolerance_offset_for_role(applied_tolerances, "peripheral"),
+        "inter_module_gap_mm": _max_tolerance_offset_for_role(applied_tolerances, "neighbor"),
+        "source": "cad_ir.applied_tolerances",
+    }
+
+
+def _max_tolerance_offset_for_role(applied_tolerances: list[Any], role: str) -> float:
+    offsets: list[float] = []
+    for entry in applied_tolerances:
+        if not isinstance(entry, dict) or entry.get("role") != role:
+            continue
+        try:
+            offsets.append(abs(float(entry.get("offset_mm", 0.0))))
+        except (TypeError, ValueError):
+            continue
+    return round(max(offsets, default=0.0), 4)
+
+
+def _text_list(value: Any, field_path: str) -> list[str]:
+    if not isinstance(value, list):
+        raise FusionSkeletonError(f"CAD IR {field_path} must be a list.")
+    texts: list[str] = []
+    for index, item in enumerate(value):
+        if not isinstance(item, str) or not item:
+            raise FusionSkeletonError(f"CAD IR {field_path}[{index}] must be a non-empty string.")
+        texts.append(item)
+    return texts
 
 def _generated_asset_modules_by_id(plan: dict[str, Any]) -> dict[str, dict[str, Any]]:
     generated_modules = plan.get("generated_modules", [])

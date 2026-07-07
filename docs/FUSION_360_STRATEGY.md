@@ -201,7 +201,9 @@ vraie encoche top-open reliee au bord superieur du tray. Cette validation couvre
 ## Vue compacte depuis placements grille P11-M001
 
 Depuis P11-M001, l'add-in peut consommer `metadata.executable_asset_plan` dans
-une CAD IR exportee depuis `examples/simple_asset_executable_plan.json`.
+une CAD IR exportee depuis un exemple asset-first. Depuis P11-M003V4,
+`examples/simple_asset_product_scene.json` est le smoke test produit principal :
+il ne declare aucun module manuel et ne genere aucun blank legacy. `simple_asset_executable_plan.json` reste une fixture technique de collision.
 
 Convention retenue :
 
@@ -211,6 +213,7 @@ Convention retenue :
 - `printable_body_origin_mm` devient l'origine scene du body Fusion quand present,
   avec fallback sur `origin_mm` pour les anciennes CAD IR ;
 - `printable_body_size_mm` devient la taille du body rectangulaire cree pour les placements asset-first modernes ;
+- `module_source`, `placement_source`, `source_asset_ids`, `candidate_id` et `clearance_applied` alimentent le rapport Fusion `Module source mapping` ;
 - si un placement declare `theoretical_grid_extent_mm` mais ne fournit pas `printable_body_size_mm`, l'add-in refuse de generer le body au lieu d'utiliser silencieusement le span grille ;
 - le fallback `source_size_mm` / `size_mm` reste limite aux anciennes CAD IR qui ne declarent pas de span grille theorique ;
 - `theoretical_grid_origin_mm` et `theoretical_grid_extent_mm` restent des
@@ -228,12 +231,15 @@ Convention retenue :
 Validation : les conversions et garde-fous sont testes hors Fusion. Le smoke test
 humain `P11-M001V` du 2026-07-06 a valide dans Fusion le chargement de
 `simple_asset_executable_plan`, le message attendu, la creation de deux bodies
-de blank dont un module asset-first positionne par grille, et les dimensions
-alors attendues `30.0 x 30.0 x 10.0 mm` a la position `X 30.0 mm`, `Y 0.0 mm`,
+dont un module asset-first positionne par grille, et les dimensions alors
+attendues `30.0 x 30.0 x 10.0 mm` a la position `X 30.0 mm`, `Y 0.0 mm`,
 `Z 0.0 mm`. P11-M003 corrige ensuite l'ambiguite produit : `30 x 30 x 10 mm`
 est l'etendue theorique d'une cellule de grille, tandis que le body imprimable
-genere depuis les assets est `25.6 x 25.6 x 9.8 mm`. Cette correction requiert
-un nouveau smoke test Fusion et ne vaut pas validation d'impression 3D. Depuis P11-M003V2, le message final affiche aussi un `Body sizing report` avec span grille, taille imprimable prevue, bbox reelle Fusion et `size match yes/no`.
+genere depuis les assets est `25.6 x 25.6 x 9.8 mm`. Depuis P11-M003V4,
+`simple_asset_product_scene` devient le smoke test produit non ambigu : un seul
+body asset-first, aucun blank legacy, source `asset_candidate` et placement
+`grid_placement`. Cette correction requiert un nouveau smoke test Fusion et ne
+vaut pas validation d'impression 3D. Depuis P11-M003V2, le message final affiche aussi un `Body sizing report` avec span grille, taille imprimable prevue, bbox reelle Fusion et `size match yes/no`. Depuis P11-M003V4, il affiche en plus `Module source mapping` : source du module, source de placement, assets contenus, vues compact/exploded, origine, span, taille imprimable et clearances peripherique/inter-module.
 
 ## Scene multi-layer depuis placements grille P11-M002
 
@@ -291,13 +297,13 @@ configuration BGIG source et ne cree aucune nouvelle geometrie.
 
 Validation : les helpers de requete et de mode sont testes hors Fusion. La
 commande Fusion reelle reste `manual validation required` jusqu'au smoke test
-P11-M003V3. P11-M003V a ete KO partiel parce que les dimensions reelles des
+P11-M003V4. P11-M003V a ete KO partiel parce que les dimensions reelles des
 bodies n'etaient pas affichables/verifiables dans le message Fusion. Le test
 humain suivant a ensuite montre que la commande UI n'etait pas visible ni
 exploitable ; P11-M003V3 corrige l'identifiant de commande Fusion, garde les
 handlers au niveau module pour eviter le garbage collection, conserve les
 fichiers texte uniquement comme fallback et nettoie commande/bouton dans
-`stop(context)`.
+`stop(context)`. P11-M003V3 a ensuite ete KO partiel cote produit parce que le smoke test utilisait une fixture melangeant blank legacy et module asset-first ; P11-M003V4 introduit `simple_asset_product_scene.json` et le rapport `Module source mapping`.
 
 ## Vue eclatee basique P7-M001
 

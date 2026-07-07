@@ -144,12 +144,14 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator export-cad-ir examples/simple_box.json --output fusion_addin/BoardGameInsertGenerator/cad_ir_input.json
 ```
 
-Pour tester les placements grille P11-M001, generer une CAD IR asset-first :
+Pour tester le flux produit asset-first P11-M003V4, generer une CAD IR sans blank legacy :
 
 ```powershell
 $env:PYTHONPATH = "src"
-python -m board_game_insert_generator export-cad-ir examples/simple_asset_executable_plan.json --output $env:TEMP\bgig-simple-asset-executable-plan.cad-ir.json
+python -m board_game_insert_generator export-cad-ir examples/simple_asset_product_scene.json --output $env:TEMP\bgig-simple-asset-product-scene.cad-ir.json
 ```
+
+`examples/simple_asset_executable_plan.json` reste une fixture technique : elle contient volontairement un module manuel/legacy qui occupe une cellule pour tester les collisions et ne doit pas servir de smoke test produit principal.
 
 Pour tester la scene multi-layer P11-M002, generer une CAD IR asset-first avec
 placements Z explicites :
@@ -247,38 +249,37 @@ Procedure :
     - taille de coupe CAD IR : `18.0 x 4.0 x 10.0 mm` ;
     - cavite conservee : `62.0 x 52.0 x 20.0 mm`.
 
-15. Pour le smoke test compact P11-M001 avec le code courant, generer une CAD IR
-    depuis `examples/simple_asset_executable_plan.json`, lancer l'add-in,
+15. Pour le smoke test compact produit P11-M003V4 avec le code courant, generer une CAD IR
+    depuis `examples/simple_asset_product_scene.json`, lancer l'add-in,
     renseigner son chemin dans `CAD IR JSON path`, choisir `compact_only` et
     verifier :
-    - message final : `CAD IR module blanks planned: 1`,
-      `Grid-positioned asset modules planned: 1`, `Module components planned: 2`,
-      `Compact occurrences planned: 2`, `Exploded occurrences planned: 0`,
-      `Module components created: 2`, `Compact occurrences created: 2`,
+    - message final : `CAD IR module blanks planned: 0`,
+      `Grid-positioned asset modules planned: 1`, `Module components planned: 1`,
+      `Compact occurrences planned: 1`, `Exploded occurrences planned: 0`,
+      `Module components created: 1`, `Compact occurrences created: 1`,
       `Exploded occurrences created: 0`, `Linked exploded occurrences: yes`,
-      puis un bloc `Body sizing report` ;
+      puis les blocs `Module source mapping` et `Body sizing report` ;
     - dans le bloc `Body sizing report`, verifier pour le module asset-first : `source printable_body_size_mm`, `grid span 30.0 x 30.0 x 10.0 mm`, `printable body planned 25.6 x 25.6 x 9.8 mm`, `actual Fusion body bbox 25.6 x 25.6 x 9.8 mm` ou tolerance mesure comparable, et `size match yes` ;
-    - composant manuel existant : `manual-reference-bin-01 - Manual reference bin` ;
+    - verifier qu'aucun composant manuel ou legacy blank n'est genere pour cette scene produit ;
     - composant asset-first attendu : `Grid placed Grouped candidate for tokens` ;
-    - occurrence compacte asset-first attendue a l'origine `X 30.0 mm`,
+    - occurrence compacte asset-first attendue a l'origine `X 0.0 mm`,
       `Y 0.0 mm`, `Z 0.0 mm` ;
     - dimensions attendues du module asset-first : `25.6 x 25.6 x 9.8 mm` ;
     - verifier que les occurrences compactes restent presentes et aux dimensions attendues.
-16. Pour le smoke test P7-M001V4, garder la meme CAD IR
-    `examples/simple_asset_executable_plan.json`, laisser le mode par defaut
+16. Pour le smoke test P7/P11 en vue eclatee produit, garder la meme CAD IR
+    `examples/simple_asset_product_scene.json`, laisser le mode par defaut
     `compact_and_exploded`, relancer l'add-in et verifier :
     - utiliser un design Fusion compatible avec plusieurs composants/occurrences ;
     - si Fusion affiche `assembly document required`, le document actif est un
       Part Design incompatible : creer/ouvrir un document Assembly-compatible ou
       utiliser le workflow Fusion `add this Part to an Assembly`, puis relancer ;
     - message final attendu dans le bon contexte : `Generation mode: compact_and_exploded`,
-      `Module components planned: 2`, `Compact occurrences planned: 2`,
-      `Exploded occurrences planned: 2`, `Module components created: 2`,
-      `Compact occurrences created: 2`, `Exploded occurrences created: 2`,
+      `Module components planned: 1`, `Compact occurrences planned: 1`,
+      `Exploded occurrences planned: 1`, `Module components created: 1`,
+      `Compact occurrences created: 1`, `Exploded occurrences created: 1`,
       `Linked exploded occurrences: yes`, `Occurrence direct rename attempted: no`
       et `Occurrence naming policy: component_source_name_with_plan_role_mapping` ;
-    - deux composants modules sources attendus, nommes lisiblement, dont
-      `manual-reference-bin-01 - Manual reference bin` et
+    - un seul composant module source attendu, nomme lisiblement :
       `Grid placed Grouped candidate for tokens` ;
     - les noms exacts des occurrences dans le Browser Fusion ne sont pas un
       critere : certains contextes Fusion exposent `Occurrence.name` en lecture
@@ -287,9 +288,7 @@ Procedure :
       que le message indique la politique de mapping compact/exploded ;
     - verifier que l'add-in n'a pas echoue avec
       `property '_get_name' of 'Occurrence' object has no setter` ;
-    - origine attendue de l'occurrence eclatee manuelle : `X 140.0 mm`,
-      `Y 0.0 mm`, `Z 0.0 mm` ;
-    - origine attendue de l'occurrence eclatee asset-first : `X 179.2 mm`,
+    - origine attendue de l'occurrence eclatee asset-first : `X 140.0 mm`,
       `Y 0.0 mm`, `Z 0.0 mm` ;
     - dimensions attendues du module asset-first : `25.6 x 25.6 x 9.8 mm` ;
     - verifier dans le browser Fusion que l'occurrence compacte et l'occurrence
@@ -328,7 +327,7 @@ Procedure :
     de validation.
 
 Ce smoke test valide uniquement la creation CAD minimale dans Fusion. Depuis
-P11-M003V3, verifier aussi que le flux normal passe par la boite de dialogue
+P11-M003V4, verifier aussi que le flux produit normal passe par `simple_asset_product_scene.json`, la boite de dialogue
 `Generate Board Game Insert`, sans modifier `cad_ir_path.txt` ni
 `exploded_view_mode.txt`, et que les modules asset-first generes utilisent les
 tailles imprimables et non les spans grille bruts en lisant le bloc

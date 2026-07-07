@@ -229,9 +229,9 @@ Validation P8-M001 :
 Ces surfaces sont des intentions abstraites. Elles ne prouvent ni resistance,
 ni portance, ni imprimabilite physique.
 
-Voir `examples/simple_3d_grid.json`, `examples/simple_3d_reservations.json` et `examples/simple_asset_executable_plan.json`.
+Voir `examples/simple_3d_grid.json`, `examples/simple_3d_reservations.json`, `examples/simple_asset_product_scene.json` et `examples/simple_asset_executable_plan.json`.
 
-Depuis P10-M008, aucun nouveau champ de configuration n'est ajoute : le plan executable asset-first est derive des champs existants `assets`, `modules` et `volumetric_grid`.
+Depuis P10-M008, aucun nouveau champ de configuration n'est ajoute : le plan executable asset-first est derive des champs existants `assets`, `modules` et `volumetric_grid`. Depuis P11-M003V4, un exemple produit asset-first peut declarer `modules: []` : dans ce cas, seuls les modules generes depuis `assets` sont exportes vers `metadata.executable_asset_plan`, sans blank legacy issu de `components`. `simple_asset_executable_plan.json` reste une fixture technique avec module manuel declare.
 
 ## `modules`
 

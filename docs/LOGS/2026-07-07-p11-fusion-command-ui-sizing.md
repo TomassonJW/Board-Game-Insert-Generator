@@ -111,3 +111,27 @@ Correction appliquee :
 
 Statut : `implemented-fusion`, validation Fusion manuelle P11-M003V3 requise,
 `print-validated: false`.
+
+## Correction P11-M003V4
+
+Le smoke test humain P11-M003V3 a ete KO partiel cote produit : la scene generee
+melangeait un blank legacy issu de `components` et un module asset-first issu de
+`metadata.executable_asset_plan`, ce qui rendait le resultat ambigu.
+
+Correction appliquee :
+
+- ajout de `examples/simple_asset_product_scene.json`, exemple produit sans
+  module manuel et sans blank legacy ;
+- `examples/simple_asset_executable_plan.json` est documente comme fixture
+  technique de collision/occupation ;
+- le plan asset-first expose `module_source: asset_candidate` et
+  `placement_source: grid_placement` ;
+- le plan Fusion expose aussi `legacy_blank` / `cad_ir_component` pour les
+  anciens blanks, afin de distinguer clairement les familles de bodies ;
+- le message Fusion ajoute `Module source mapping` avec assets, candidate,
+  roles compact/exploded, origine, span grille, taille imprimable et clearances ;
+- une CAD IR produit sans `components` est acceptee si
+  `metadata.executable_asset_plan.placements` fournit les modules generes.
+
+Statut : `implemented-fusion`, validation Fusion manuelle P11-M003V4 requise,
+`print-validated: false`.

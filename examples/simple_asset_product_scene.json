@@ -1,5 +1,5 @@
 {
-  "project_name": "Simple executable asset plan fixture V0",
+  "project_name": "Simple asset product scene V0",
   "units": "mm",
   "box": {
     "inner_dimensions_mm": { "x": 120, "y": 90, "z": 40 },
@@ -24,7 +24,7 @@
       "dimensions_mm": { "x": 22, "y": 22, "z": 8 },
       "dimension_confidence": "exact",
       "containment_intent": "store",
-      "comment": "Compatible with status tokens for deterministic grouping and executable planning."
+      "comment": "Product-scene asset; grouped with status tokens into one generated module."
     },
     {
       "id": "status-tokens",
@@ -34,13 +34,13 @@
       "dimensions_mm": { "x": 18, "y": 18, "z": 6 },
       "dimension_confidence": "exact",
       "containment_intent": "store",
-      "comment": "Compatible token asset; grouped candidate becomes one generated abstract module."
+      "comment": "Compatible token asset; no manual module or legacy blank is declared in this product example."
     }
   ],
   "volumetric_grid": {
     "unit_mm": { "x": 30, "y": 30, "z": 10 },
     "size_units": { "x": 4, "y": 3, "z": 3 },
-    "comment": "Technical fixture: a manual module intentionally occupies the first cell so generated assets prove collision-aware grid placement. Use simple_asset_product_scene.json for the user-facing smoke test.",
+    "comment": "Product scene: generated asset modules are the only printable modules; no manual fixture module is declared.",
     "layers": [
       {
         "id": "bottom-modules",
@@ -57,17 +57,6 @@
         "role": "future_board_rulebook_reservations"
       }
     ],
-    "module_placements": [
-      {
-        "id": "manual-reference-volume",
-        "module_id": "manual-reference-bin",
-        "instance_id": "manual-reference-bin-01",
-        "origin_units": { "x": 0, "y": 0, "z": 0 },
-        "size_units": { "x": 1, "y": 1, "z": 1 },
-        "layer_id": "bottom-modules",
-        "comment": "Fixture-only declared module occupies the first cell so generated assets must use a later free span."
-      }
-    ],
     "zones": [
       {
         "id": "board-reservation-band",
@@ -79,17 +68,5 @@
       }
     ]
   },
-  "modules": [
-    {
-      "id": "manual-reference-bin",
-      "name": "Manual reference bin",
-      "functional_type": "tokens",
-      "min_dimensions_mm": { "x": 30, "y": 30, "z": 10 },
-      "height_mm": 10,
-      "priority": 100,
-      "allow_rotation": true,
-      "quantity": 1,
-      "comment": "Fixture-only manual module kept to prove generated asset modules do not mutate config.modules. It is not part of the simple product-scene smoke test."
-    }
-  ]
+  "modules": []
 }

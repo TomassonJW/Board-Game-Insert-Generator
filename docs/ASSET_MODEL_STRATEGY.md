@@ -145,8 +145,7 @@ geometrie Fusion. Elle relie :
 - `rejected_modules` : refus actionnables, par exemple absence de grille ou span
   libre introuvable.
 
-`examples/simple_asset_executable_plan.json` montre deux assets tokens groupes
-puis places comme un module abstrait dans une cellule libre de la grille.
+`examples/simple_asset_product_scene.json` montre le flux produit lisible : deux assets tokens groupes puis places comme un seul module abstrait dans une cellule libre, sans module manuel ni blank legacy. `examples/simple_asset_executable_plan.json` reste une fixture technique : elle declare volontairement un module manuel pour occuper une cellule et tester que le placement greedy evite les collisions.
 
 Depuis P11-M003, le plan distingue explicitement les dimensions suivantes pour les
 modules asset-first generes :
@@ -160,8 +159,8 @@ modules asset-first generes :
   plan executable ;
 - `grid_slack_mm` rend visible la marge entre span de grille et corps imprimable.
 
-Les exemples `simple_asset_executable_plan` et `simple_multilayer_grid_scene`
-ne doivent donc plus etre lus comme des fixtures dont les corps imprimables font
+Les exemples `simple_asset_product_scene`, `simple_asset_executable_plan` et `simple_multilayer_grid_scene`
+ne doivent donc plus etre lus comme des scenes dont les corps imprimables font
 necessairement toute la cellule. Le span `90 x 90 x 10 mm` de la scene
 multi-layer reste une occupation de grille ; le body imprimable correspondant est
 `61.6 x 61.6 x 7.8 mm`.

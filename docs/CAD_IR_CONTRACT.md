@@ -230,6 +230,9 @@ Depuis P11-M003, les placements asset-first distinguent explicitement :
 - `printable_body_origin_mm` / `printable_body_size_mm` : corps rectangulaire
   imprimable que Fusion doit creer ;
 - `size_mm` : alias de `printable_body_size_mm` pour les placements generes ;
+- `module_source` : `asset_candidate` pour les modules generes depuis assets, `legacy_blank` pour les anciens components CAD IR ;
+- `placement_source` : `grid_placement` pour les placements X/Y/Z resolus, `cad_ir_component` pour les blanks legacy ;
+- `source_asset_ids` et `candidate_id` : mapping produit permettant de relier le body Fusion aux assets source ;
 - `body_size_source` dans le plan Fusion hors CAD IR : source effective de sizing consommee par l'adaptateur ;
 - `grid_slack_mm` : marge visible entre span grille et body imprimable.
 
@@ -238,6 +241,8 @@ reelle des modules asset-first generes. Ils peuvent afficher ou valider
 `theoretical_grid_extent_mm`, mais ne doivent pas l'extruder comme body si une
 taille imprimable est presente. Pour les placements modernes qui declarent un span grille theorique, une taille `printable_body_size_mm` manquante est une erreur de contrat et doit etre refusee par l'adaptateur. Ces donnees ne valident aucune portance physique
 et ne doivent pas etre utilisees par Fusion pour recalculer le solveur.
+Depuis P11-M003V4, une scene produit asset-first peut avoir `components: []` si `metadata.executable_asset_plan.placements` contient les modules generes a creer. Cette forme evite de melanger un blank legacy avec un module asset-first dans le smoke test produit. Les fixtures techniques peuvent encore combiner `components` et `executable_asset_plan` pour tester collisions et compatibilite.
+
 Cette metadata ne change pas `schema_version`, ne cree aucune operation Fusion et
 ne remplace pas les dimensions `theoretical_*` / `printable_*` des bodies. Un
 adaptateur CAD peut l'ignorer sans invalider la CAD IR V0.

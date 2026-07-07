@@ -831,14 +831,15 @@ def _format_executable_asset_plan_section(plan: dict[str, Any]) -> list[str]:
     if generated_modules:
         lines.extend(
             [
-                "| Module | Candidate | Assets | Asset-fit size | Printable body size | Clearance | Status |",
-                "| --- | --- | --- | ---: | ---: | --- | --- |",
+                "| Module | Source | Candidate | Assets | Asset-fit size | Printable body size | Clearance | Status |",
+                "| --- | --- | --- | --- | ---: | ---: | --- | --- |",
             ]
         )
         for module in generated_modules:
             lines.append(
                 "| "
                 f"{module['module_id']} | "
+                f"{module.get('module_source', 'asset_candidate')} | "
                 f"{module['candidate_id']} | "
                 f"{', '.join(module['source_asset_ids'])} | "
                 f"{_format_dict_dim(module.get('asset_fit_size_mm') or module['inner_asset_envelope_mm'])} | "
@@ -854,20 +855,23 @@ def _format_executable_asset_plan_section(plan: dict[str, Any]) -> list[str]:
     if placements:
         lines.extend(
             [
-                "| Module | Origin units | Size units | Theoretical grid origin | Theoretical grid extent | Printable body origin | Printable body size | Heuristic |",
-                "| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |",
+                "| Module | Source | Assets | Origin units | Size units | Theoretical grid origin | Theoretical grid extent | Printable body origin | Printable body size | Clearance | Heuristic |",
+                "| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- |",
             ]
         )
         for placement in placements:
             lines.append(
                 "| "
                 f"{placement['module_id']} | "
+                f"{placement.get('module_source', 'asset_candidate')} / {placement.get('placement_source', 'grid_placement')} | "
+                f"{', '.join(placement.get('source_asset_ids', [])) or 'n/a'} | "
                 f"{_format_dict_grid_point(placement['origin_units'])} | "
                 f"{_format_dict_grid_size(placement['size_units'])} | "
                 f"{_format_dict_dim(placement.get('theoretical_grid_origin_mm') or placement['origin_mm'])} | "
                 f"{_format_dict_dim(placement.get('theoretical_grid_extent_mm') or placement['size_mm'])} | "
                 f"{_format_dict_dim(placement.get('printable_body_origin_mm') or placement['origin_mm'])} | "
                 f"{_format_dict_dim(placement.get('printable_body_size_mm') or placement['size_mm'])} | "
+                f"{_format_clearance_applied(placement.get('clearance_applied'))} | "
                 f"{placement['heuristic']} |"
             )
     else:

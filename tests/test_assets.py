@@ -185,6 +185,40 @@ class AssetModelTests(unittest.TestCase):
         self.assertEqual(scene["metadata"]["executable_asset_plan"]["status"], "placed")
         self.assertEqual(scene["metadata"]["executable_asset_plan"]["placements"][0]["origin_units"], {"x": 1, "y": 0, "z": 0})
 
+    def test_product_asset_scene_has_no_manual_legacy_blank(self) -> None:
+        config = load_config(ROOT / "examples" / "simple_asset_product_scene.json")
+        layout = generate_basic_layout(config)
+
+        markdown = layout_to_markdown(config, layout)
+        payload = json.loads(layout_to_json(config, layout))
+        scene = build_blank_cad_scene(config, layout).to_dict()
+
+        self.assertEqual(len(config.modules), 0)
+        self.assertEqual(validate_config(config), [])
+        self.assertEqual(payload["summary"]["requested_module_count"], 0)
+        self.assertEqual(payload["summary"]["printable_body_count"], 0)
+        self.assertEqual(scene["components"], [])
+        plan = payload["executable_asset_plan"]
+        self.assertEqual(plan["status"], "placed")
+        self.assertEqual(plan["summary"]["generated_module_count"], 1)
+        self.assertEqual(plan["summary"]["placed_module_count"], 1)
+        self.assertEqual(plan["summary"]["rejected_module_count"], 0)
+        generated = plan["generated_modules"][0]
+        self.assertEqual(generated["module_source"], "asset_candidate")
+        self.assertEqual(generated["source_asset_ids"], ["coin-tokens", "status-tokens"])
+        placement = plan["placements"][0]
+        self.assertEqual(placement["module_source"], "asset_candidate")
+        self.assertEqual(placement["placement_source"], "grid_placement")
+        self.assertEqual(placement["origin_units"], {"x": 0, "y": 0, "z": 0})
+        self.assertEqual(placement["origin_mm"], {"x": 0, "y": 0, "z": 0})
+        self.assertEqual(placement["theoretical_grid_extent_mm"], {"x": 30, "y": 30, "z": 10})
+        self.assertEqual(placement["printable_body_size_mm"], {"x": 25.6, "y": 25.6, "z": 9.8})
+        self.assertEqual(placement["clearance_applied"]["peripheral_clearance_mm"], 0.0)
+        self.assertEqual(placement["clearance_applied"]["inter_module_gap_mm"], 0.0)
+        self.assertIn("| Module | Source | Candidate | Assets |", markdown)
+        self.assertIn("asset_candidate / grid_placement", markdown)
+        self.assertEqual(scene["metadata"]["executable_asset_plan"]["placements"][0]["module_source"], "asset_candidate")
+
     def test_builds_multilayer_executable_asset_plan(self) -> None:
         config = load_config(ROOT / "examples" / "simple_multilayer_grid_scene.json")
         layout = generate_basic_layout(config)

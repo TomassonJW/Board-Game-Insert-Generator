@@ -141,7 +141,7 @@ Le fichier genere suit le contrat `cad_ir.v0` et contient la boite de reference,
 les blanks rectangulaires, les dimensions theoriques/imprimables, les roles de
 faces et les tolerances deja calculees par le coeur Python.
 
-Deux methodes sont supportees pour alimenter l'add-in Fusion installe :
+Le flux utilisateur recommande est la commande Fusion `Generate Board Game Insert`, qui demande le chemin CAD IR et le mode `compact_only` / `compact_and_exploded`. Deux methodes fallback restent supportees pour alimenter l'add-in Fusion installe :
 
 1. Copier ou generer le fichier sous le nom `cad_ir_input.json` dans le dossier
    `BoardGameInsertGenerator` charge par Fusion.

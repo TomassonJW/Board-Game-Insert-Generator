@@ -400,6 +400,8 @@ def build_executable_asset_module_plan(config: InsertConfig) -> dict[str, Any]:
             {
                 "module_id": module["module_id"],
                 "candidate_id": module["candidate_id"],
+                "module_source": "asset_candidate",
+                "placement_source": "grid_placement",
                 "source_asset_ids": list(module["source_asset_ids"]),
                 "origin_units": _grid_point_to_dict(origin),
                 "size_units": _grid_size_to_dict(size_units),
@@ -615,6 +617,7 @@ def _generated_module_from_candidate(candidate: dict[str, Any]) -> dict[str, Any
     return {
         "module_id": f"generated:{suggested['id']}",
         "candidate_id": candidate["candidate_id"],
+        "module_source": "asset_candidate",
         "name": suggested["name"],
         "functional_type": suggested["functional_type"],
         "source_asset_ids": list(candidate["source_asset_ids"]),

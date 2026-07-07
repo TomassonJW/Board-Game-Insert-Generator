@@ -334,6 +334,7 @@ def _generation_result_message(
     cad_ir_path: Path,
 ) -> str:
     body_size_report = _body_size_report_message(result.get("body_size_reports", []))
+    module_mapping_report = _module_mapping_report_message(generation_plan)
     return (
         "Board Game Insert Generator generated CAD IR scene from command UI.\n"
         f"Project: {generation_plan.project_name}\n"
@@ -365,6 +366,7 @@ def _generation_result_message(
         "Exploded placement source: linked occurrences on add-in deterministic inspection grid; dimensions from CAD IR.\n"
         "Creation scope: one Fusion component per BGIG module, compact/exploded occurrences linked.\n"
         "Sizing source: printable_body_size_mm for generated asset modules; theoretical_grid_extent_mm remains occupancy metadata.\n"
+        f"{module_mapping_report}"
         f"{body_size_report}"
         "Status: manual validation required in Fusion 360."
     )
@@ -517,6 +519,38 @@ def _vector_to_optional_dict(vector: FusionVectorMm | None) -> dict[str, float] 
     return vector.to_dict() if vector is not None else None
 
 
+def _module_mapping_report_message(generation_plan: FusionGenerationPlan) -> str:
+    source_blanks = [*generation_plan.blanks, *generation_plan.grid_positioned_blanks]
+    if not source_blanks:
+        return "Module source mapping: none\n"
+    compact_ids = {occurrence.component_id for occurrence in generation_plan.compact_occurrences}
+    exploded_ids = {occurrence.component_id for occurrence in generation_plan.exploded_occurrences}
+    lines = ["Module source mapping:"]
+    for blank in source_blanks:
+        view_roles = []
+        if blank.cad_id in compact_ids:
+            view_roles.append("compact")
+        if blank.cad_id in exploded_ids:
+            view_roles.append("exploded")
+        clearance = blank.clearance_applied or {}
+        assets = ", ".join(blank.source_asset_ids) if blank.source_asset_ids else "n/a"
+        candidate = blank.candidate_id or "n/a"
+        lines.append(
+            f"- {blank.cad_id}: "
+            f"source {blank.module_source}; "
+            f"placement {blank.placement_source}; "
+            f"assets {assets}; "
+            f"candidate {candidate}; "
+            f"views {'/'.join(view_roles) if view_roles else 'none'}; "
+            f"origin {_format_size_mm(blank.origin_mm.to_dict())}; "
+            f"grid span {_format_size_mm(_vector_to_optional_dict(blank.theoretical_grid_extent_mm))}; "
+            f"printable body {_format_size_mm((blank.printable_body_size_mm or blank.size_mm).to_dict())}; "
+            f"peripheral clearance {_format_clearance_value(clearance.get('peripheral_clearance_mm'))}; "
+            f"inter-module clearance {_format_clearance_value(clearance.get('inter_module_gap_mm'))}; "
+            f"size source {blank.body_size_source or 'size_mm'}"
+        )
+    return "\n".join(lines) + "\n"
+
 def _body_size_report_message(reports) -> str:  # noqa: ANN001
     if not isinstance(reports, list) or not reports:
         return ""
@@ -539,6 +573,11 @@ def _format_size_mm(value) -> str:  # noqa: ANN001
         return "n/a"
     return f"{value.get('x')} x {value.get('y')} x {value.get('z')} mm"
 
+
+def _format_clearance_value(value) -> str:  # noqa: ANN001
+    if isinstance(value, (int, float)):
+        return f"{value} mm"
+    return "n/a"
 
 def _format_size_match(value) -> str:  # noqa: ANN001
     if value is True:
