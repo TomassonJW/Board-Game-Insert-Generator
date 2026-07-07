@@ -293,7 +293,7 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Criteres d'acceptation : Fusion ne recalcule pas le solveur ; les bodies asset-first utilisent la taille imprimable ; les spans grille restent visibles comme metadata ; l'utilisateur n'a plus a editer manuellement `cad_ir_path.txt` ou `exploded_view_mode.txt` pour le flux courant ; coeur Python sans `adsk`.
 - Tests : unitaires hors Fusion, CLI Markdown/JSON/export CAD IR sur exemples pertinents, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
 - Gate : validation humaine fournie le 2026-07-07 apres P11-M002V, limitee a sizing et UI minimale.
-- Statut : `done`, `implemented-fusion`, correction P11-M003V2 codee, validation Fusion manuelle requise, `print-validated: false`.
+- Statut : `done`, `implemented-fusion`, corrections P11-M003V2/P11-M003V3 codees, validation Fusion manuelle requise, `print-validated: false`.
 
 ### P11-M003V - Valider manuellement la commande UI Fusion et le sizing asset-first
 
@@ -313,6 +313,17 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Objectif : relancer la commande Fusion avec `simple_asset_executable_plan` et `simple_multilayer_grid_scene`, puis verifier que le message affiche pour chaque module `grid span`, `printable body planned`, `actual Fusion body bbox` et `size match yes`.
 - Livrable : validation humaine Fusion avec dimensions prevues/reelles et statut `print-validated: false`.
 - Criteres d'acceptation : Fusion utilise `printable_body_size_mm`; `theoretical_grid_extent_mm` reste metadata; `actual Fusion body bbox` correspond aux dimensions imprimables attendues; aucune nouvelle geometrie ou tolerance n'est ajoutee.
+- Tests : smoke test manuel Fusion, aucune validation d'impression revendiquee.
+- Gate : action humaine requise.
+- Statut : `blocked`, remplace par `P11-M003V3` apres KO sur commande UI visible.
+
+### P11-M003V3 - Valider la commande UI Fusion visible et le rapport planned/actual
+
+- Capability : C-FUSION-UI, C-FUSION-COMPACT, C-GRID-3D.
+- Milestone : M14 Usable beta / M7 Volumetric planner.
+- Objectif : lancer l'add-in, ouvrir la boite de dialogue `Generate Board Game Insert`, renseigner `CAD IR JSON path`, choisir `compact_and_exploded`, generer la scene et verifier le `Body sizing report`.
+- Livrable : validation humaine Fusion avec commande visible, chemin choisi, mode choisi, dimensions prevues/reelles et statut `print-validated: false`.
+- Criteres d'acceptation : la generation normale passe par la commande UI sans modifier `cad_ir_path.txt` ni `exploded_view_mode.txt`; Fusion utilise `printable_body_size_mm`; `actual Fusion body bbox` correspond aux dimensions imprimables attendues; aucune nouvelle geometrie ou tolerance n'est ajoutee.
 - Tests : smoke test manuel Fusion, aucune validation d'impression revendiquee.
 - Gate : action humaine requise.
 - Statut : `blocked`.

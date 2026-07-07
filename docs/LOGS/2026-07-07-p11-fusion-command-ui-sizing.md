@@ -86,3 +86,28 @@ Correction appliquee :
 
 Statut : `implemented-fusion`, validation Fusion manuelle P11-M003V2 requise,
 `print-validated: false`.
+
+## Correction P11-M003V3
+
+Le smoke test humain suivant a ete KO : l'add-in se lancait, mais aucune commande
+UI exploitable n'etait visible, aucune boite de dialogue
+`Generate Board Game Insert` n'apparaissait et le flux normal ressemblait encore
+au fallback par fichiers texte.
+
+Correction appliquee :
+
+- l'identifiant Fusion de la commande utilise maintenant uniquement underscores,
+  ce qui respecte la contrainte API des command ids ;
+- `run(context)` cree toujours une `ButtonDefinition`, cable `commandCreated`,
+  conserve les handlers au niveau module et execute la commande pour ouvrir la
+  boite de dialogue ;
+- l'add-in tente aussi d'ajouter un bouton `Generate Board Game Insert` dans
+  `Design workspace > Utilities > Add-Ins` ;
+- `stop(context)` nettoie le bouton toolbar et les definitions de commande
+  nouvelle et legacy ;
+- les fichiers `cad_ir_path.txt` et `exploded_view_mode.txt` restent fallback,
+  mais le smoke test P11-M003V3 doit passer par le champ `CAD IR JSON path` et
+  le choix `compact_only` / `compact_and_exploded`.
+
+Statut : `implemented-fusion`, validation Fusion manuelle P11-M003V3 requise,
+`print-validated: false`.

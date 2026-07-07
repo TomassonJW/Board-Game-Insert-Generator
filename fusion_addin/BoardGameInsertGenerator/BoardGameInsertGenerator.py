@@ -81,11 +81,19 @@ except ImportError:  # pragma: no cover - exercised only outside Fusion.
 
 
 
-BGIG_COMMAND_ID = "board_game_insert_generator.generate_scene"
+BGIG_LEGACY_COMMAND_ID = "board_game_insert_generator.generate_scene"
+BGIG_COMMAND_ID = "board_game_insert_generator_generate_scene"
 BGIG_COMMAND_NAME = "Generate Board Game Insert"
 CAD_IR_PATH_INPUT_ID = "bgig_cad_ir_path"
 GENERATION_MODE_INPUT_ID = "bgig_generation_mode"
 SUMMARY_INPUT_ID = "bgig_command_summary"
+BGIG_TOOLBAR_WORKSPACE_ID = "FusionSolidEnvironment"
+BGIG_TOOLBAR_PANEL_IDS = (
+    "SolidScriptsAddinsPanel",
+    "SolidAddinsPanel",
+    "ToolsTabAddinsPanel",
+)
+BGIG_TOOLBAR_LOCATION = "Design workspace > Utilities > Add-Ins"
 
 _app = None
 _ui = None
@@ -129,12 +137,11 @@ def stop(context) -> None:  # noqa: ANN001 - Fusion controls the signature.
 
     global _handlers
     if adsk is not None and _ui is not None:
-        command_definition = _ui.commandDefinitions.itemById(BGIG_COMMAND_ID)
-        if command_definition is not None:
-            command_definition.deleteMe()
+        _delete_command_control(BGIG_COMMAND_ID)
+        _delete_command_definition(BGIG_COMMAND_ID)
+        _delete_command_definition(BGIG_LEGACY_COMMAND_ID)
     _handlers = []
     _show_message("Board Game Insert Generator adapter stopped.")
-
 
 if adsk is not None:
     class _BgigCommandCreatedHandler(adsk.core.CommandCreatedEventHandler):  # type: ignore[misc]
@@ -145,6 +152,10 @@ if adsk is not None:
         def notify(self, args) -> None:  # noqa: ANN001 - Fusion event args.
             try:
                 command = args.command
+                try:
+                    command.okButtonText = "Generate"
+                except Exception:
+                    pass
                 inputs = command.commandInputs
                 default_request = _safe_default_command_request(self.addin_dir)
                 inputs.addStringValueInput(
@@ -220,19 +231,74 @@ else:  # pragma: no cover - imported outside Fusion only.
 
 def _register_and_execute_command(addin_dir: Path) -> None:
     command_definitions = _ui.commandDefinitions
-    command_definition = command_definitions.itemById(BGIG_COMMAND_ID)
+    _delete_command_control(BGIG_COMMAND_ID)
+    _delete_command_definition(BGIG_COMMAND_ID)
+    _delete_command_definition(BGIG_LEGACY_COMMAND_ID)
+    command_definition = command_definitions.addButtonDefinition(
+        BGIG_COMMAND_ID,
+        BGIG_COMMAND_NAME,
+        "Choose a BGIG CAD IR JSON file and generate the selected Fusion scene.",
+    )
     if command_definition is None:
-        command_definition = command_definitions.addButtonDefinition(
-            BGIG_COMMAND_ID,
-            BGIG_COMMAND_NAME,
-            "Choose a BGIG CAD IR JSON file and generate the selected Fusion scene.",
-        )
+        raise FusionSkeletonError("Fusion command definition creation failed for Generate Board Game Insert.")
+
     created_handler = _BgigCommandCreatedHandler(addin_dir)
     command_definition.commandCreated.add(created_handler)
     _handlers.append(created_handler)
-    command_definition.execute()
+    _add_toolbar_button(command_definition)
     adsk.autoTerminate(False)
+    if not command_definition.execute():
+        raise FusionSkeletonError(
+            "Fusion refused to open the Generate Board Game Insert command dialog. "
+            f"Use the toolbar button at {BGIG_TOOLBAR_LOCATION} if it is visible, then retry."
+        )
 
+
+def _add_toolbar_button(command_definition) -> bool:  # noqa: ANN001 - Fusion API object.
+    panel = _find_toolbar_panel()
+    if panel is None:
+        return False
+    controls = panel.controls
+    control = controls.itemById(BGIG_COMMAND_ID)
+    if control is None:
+        control = controls.addCommand(command_definition)
+    if control is None:
+        return False
+    try:
+        control.isVisible = True
+    except Exception:
+        pass
+    try:
+        control.isPromoted = True
+    except Exception:
+        pass
+    return True
+
+
+def _find_toolbar_panel():  # noqa: ANN001 - Fusion API object.
+    workspace = _ui.workspaces.itemById(BGIG_TOOLBAR_WORKSPACE_ID)
+    if workspace is None:
+        return None
+    for panel_id in BGIG_TOOLBAR_PANEL_IDS:
+        panel = workspace.toolbarPanels.itemById(panel_id)
+        if panel is not None:
+            return panel
+    return None
+
+
+def _delete_command_control(command_id: str) -> None:
+    panel = _find_toolbar_panel()
+    if panel is None:
+        return
+    control = panel.controls.itemById(command_id)
+    if control is not None:
+        control.deleteMe()
+
+
+def _delete_command_definition(command_id: str) -> None:
+    command_definition = _ui.commandDefinitions.itemById(command_id)
+    if command_definition is not None:
+        command_definition.deleteMe()
 
 def _safe_default_command_request(addin_dir: Path):
     try:

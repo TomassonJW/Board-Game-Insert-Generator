@@ -46,6 +46,12 @@ L'add-in enregistre une commande Fusion `Generate Board Game Insert` qui expose 
 
 Les fichiers `cad_ir_path.txt` et `exploded_view_mode.txt` restent supportes
 comme valeurs par defaut heritees, mais ne sont plus le flux utilisateur normal.
+Depuis la correction P11-M003V3, l'identifiant Fusion de la commande utilise
+uniquement lettres, chiffres et underscores (`board_game_insert_generator_generate_scene`).
+`run(context)` ajoute le bouton au panneau `Design workspace > Utilities > Add-Ins`
+quand le panneau est disponible, conserve les handlers dans une liste globale,
+puis execute la commande pour afficher la boite de dialogue. `stop(context)`
+supprime le bouton et les definitions de commande connues.
 
 Pour les placements asset-first, `size_mm` devient l'alias de la taille de corps
 imprimable generee. Les spans de grille sont transportes separement par
@@ -86,6 +92,6 @@ mission.
 
 ## Suivi
 
-- Smoke test humain `P11-M003V2` requis dans Fusion.
+- Smoke test humain `P11-M003V3` requis dans Fusion.
 - Nouvelle gate avant UI produit plus complete, solveur plus automatique,
   modules composites, geometres courbes, fillets ou exports STL/3MF.

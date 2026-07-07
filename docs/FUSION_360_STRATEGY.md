@@ -269,8 +269,13 @@ revendiquee.
 ## Commande UI Fusion minimale P11-M003
 
 Depuis P11-M003, l'add-in n'impose plus de modifier manuellement
-`cad_ir_path.txt` ou `exploded_view_mode.txt` pour un usage courant. Au lancement,
-`run(context)` enregistre et execute une commande `Generate Board Game Insert`.
+`cad_ir_path.txt` ou `exploded_view_mode.txt` pour un usage courant. Depuis la
+correction P11-M003V3, `run(context)` enregistre une vraie commande Fusion
+`Generate Board Game Insert`, l'ajoute quand possible au panneau
+`Design workspace > Utilities > Add-Ins`, puis execute la commande pour ouvrir
+la boite de dialogue. `run(context)` ne lance plus directement une generation de
+scene sans passer par cette commande UI.
+
 La commande affiche :
 
 - un champ texte `CAD IR JSON path` ;
@@ -286,7 +291,13 @@ configuration BGIG source et ne cree aucune nouvelle geometrie.
 
 Validation : les helpers de requete et de mode sont testes hors Fusion. La
 commande Fusion reelle reste `manual validation required` jusqu'au smoke test
-P11-M003V2. P11-M003V a ete KO partiel parce que les dimensions reelles des bodies n'etaient pas affichables/verifiables dans le message Fusion.
+P11-M003V3. P11-M003V a ete KO partiel parce que les dimensions reelles des
+bodies n'etaient pas affichables/verifiables dans le message Fusion. Le test
+humain suivant a ensuite montre que la commande UI n'etait pas visible ni
+exploitable ; P11-M003V3 corrige l'identifiant de commande Fusion, garde les
+handlers au niveau module pour eviter le garbage collection, conserve les
+fichiers texte uniquement comme fallback et nettoie commande/bouton dans
+`stop(context)`.
 
 ## Vue eclatee basique P7-M001
 
