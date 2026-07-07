@@ -12,6 +12,12 @@ from pathlib import Path
 
 try:
     from .fusion_skeleton import (
+        BGIG_COMMAND_NAME,
+        BGIG_COMMAND_TOOLTIP,
+        BGIG_TOOLBAR_LOCATION,
+        BGIG_TOOLBAR_PANEL_IDS,
+        BGIG_TOOLBAR_WORKSPACE_ID,
+        BGIG_UI_REOPEN_POLICY,
         DEFAULT_CAD_IR_INPUT_FILENAME,
         DEFAULT_FUSION_GENERATION_MODE,
         DOCUMENT_STATUS_ZERO_DOC,
@@ -43,6 +49,12 @@ try:
     )
 except ImportError:  # pragma: no cover - Fusion may load the file as a script.
     from fusion_skeleton import (  # type: ignore[no-redef]
+        BGIG_COMMAND_NAME,
+        BGIG_COMMAND_TOOLTIP,
+        BGIG_TOOLBAR_LOCATION,
+        BGIG_TOOLBAR_PANEL_IDS,
+        BGIG_TOOLBAR_WORKSPACE_ID,
+        BGIG_UI_REOPEN_POLICY,
         DEFAULT_CAD_IR_INPUT_FILENAME,
         DEFAULT_FUSION_GENERATION_MODE,
         DOCUMENT_STATUS_ZERO_DOC,
@@ -83,17 +95,9 @@ except ImportError:  # pragma: no cover - exercised only outside Fusion.
 
 BGIG_LEGACY_COMMAND_ID = "board_game_insert_generator.generate_scene"
 BGIG_COMMAND_ID = "board_game_insert_generator_generate_scene"
-BGIG_COMMAND_NAME = "Generate Board Game Insert"
 CAD_IR_PATH_INPUT_ID = "bgig_cad_ir_path"
 GENERATION_MODE_INPUT_ID = "bgig_generation_mode"
 SUMMARY_INPUT_ID = "bgig_command_summary"
-BGIG_TOOLBAR_WORKSPACE_ID = "FusionSolidEnvironment"
-BGIG_TOOLBAR_PANEL_IDS = (
-    "SolidScriptsAddinsPanel",
-    "SolidAddinsPanel",
-    "ToolsTabAddinsPanel",
-)
-BGIG_TOOLBAR_LOCATION = "Design workspace > Utilities > Add-Ins"
 
 _app = None
 _ui = None
@@ -237,7 +241,7 @@ def _register_and_execute_command(addin_dir: Path) -> None:
     command_definition = command_definitions.addButtonDefinition(
         BGIG_COMMAND_ID,
         BGIG_COMMAND_NAME,
-        "Choose a BGIG CAD IR JSON file and generate the selected Fusion scene.",
+        BGIG_COMMAND_TOOLTIP,
     )
     if command_definition is None:
         raise FusionSkeletonError("Fusion command definition creation failed for Generate Board Game Insert.")
@@ -250,7 +254,7 @@ def _register_and_execute_command(addin_dir: Path) -> None:
     if not command_definition.execute():
         raise FusionSkeletonError(
             "Fusion refused to open the Generate Board Game Insert command dialog. "
-            f"Use the toolbar button at {BGIG_TOOLBAR_LOCATION} if it is visible, then retry."
+            f"Use the toolbar button at {BGIG_TOOLBAR_LOCATION} to reopen BGIG without restarting the add-in, then retry."
         )
 
 
@@ -368,6 +372,7 @@ def _generation_result_message(
         "Sizing source: printable_body_size_mm for generated asset modules; theoretical_grid_extent_mm remains occupancy metadata.\n"
         f"{module_mapping_report}"
         f"{body_size_report}"
+        f"UI reopen policy: {BGIG_UI_REOPEN_POLICY}.\n"
         "Status: manual validation required in Fusion 360."
     )
 

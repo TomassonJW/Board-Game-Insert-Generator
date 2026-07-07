@@ -485,3 +485,17 @@ Avant d'elargir la generation Fusion :
   repasser par une gate humaine dediee ;
 - toute vue eclatee executable ou repositionnement CAD non trivial doit etre
   limite a une mission dediee et documentee.
+
+## UI Fusion P12
+
+P12-M001 stabilise le lancement UI sans changer la geometrie : la commande `Generate Board Game Insert` reste la commande principale, mais le bouton toolbar dans `Design workspace > Utilities > Add-Ins` devient le point de reouverture attendu si la boite de dialogue se ferme ou perd le focus.
+
+Strategie : `toolbar_button_reopens_command_without_addin_restart`.
+
+Invariants :
+
+- Fusion consomme toujours une CAD IR deja resolue ;
+- Fusion ne recalcule pas layout, solveur, clearances ou tolerances ;
+- `cad_ir_path.txt` et `exploded_view_mode.txt` restent des defaults/fallbacks ;
+- la palette persistante HTML reste une option future, documentee dans `docs/FUSION_UI_STRATEGY.md` ;
+- P12-M001 ne cree aucune nouvelle geometrie et ne valide aucune impression 3D.

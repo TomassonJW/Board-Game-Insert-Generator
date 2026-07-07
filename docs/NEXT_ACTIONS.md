@@ -18,17 +18,15 @@ structurant, authentification absente ou refus de push direct.
 
 ## Gate humaine active
 
-Statut : `required_before_next_product_expansion`.
+Statut : `manual_validation_required`.
 
-P11-M003V4 est validee humainement dans Fusion apres le commit `134863c` : add-in recopie, commande UI `Generate Board Game Insert`, chargement de `simple_asset_product_scene`, mode `compact_and_exploded`, generation OK, zero blank legacy, un module asset-first, occurrences compactes/eclatees liees, `Module source mapping`, `Body sizing report`, bbox Fusion comparable et `size match yes`. `print-validated: false` reste explicite.
+La gate `P11-NEXT-GATE` est validee pour un sprint P12-UI limite a l'interface Fusion, aux parametres de generation et a la regeneration par relance. `P12-M001` implemente le premier increment : bouton toolbar `Generate Board Game Insert` relancable dans `Design workspace > Utilities > Add-Ins`, commande classique conservee et fichiers texte locaux limites aux defaults/fallbacks.
 
-Action humaine requise : `P11-NEXT-GATE` avant toute nouvelle mission produit qui elargit l'UI, le solveur, les modules composites, la vue volumetrique, la geometrie courbe, les exports STL/3MF ou la preparation d'impression/calibration.
+Action humaine requise : smoke test Fusion `P12-M001V` avant de declarer ce lancement UI `fusion-validated` et avant de passer a une palette persistante ou a un flux de generation depuis config BGIG.
 
 ## Mission ready non gated
 
-Aucune mission non-gated supplementaire n'est recommandee apres la validation `P11-M003V4`. La boucle asset-first produit maintenant candidats, variante recommandee, plan de modules concret, placement grille greedy borne, generation Fusion compacte/eclatee liee, scene multi-layer, commande utilisateur minimale et smoke test produit non ambigu valide dans Fusion.
-
-La prochaine action est une gate produit : choisir explicitement la prochaine vague avant d'elargir le perimetre.
+Aucune mission non-gated supplementaire n'est recommandee tant que le smoke test `P12-M001V` du bouton toolbar relancable n'est pas realise. La prochaine extension P12 potentielle est une palette persistante ou une regeneration plus riche, mais elle doit attendre cette validation ou un choix explicite de continuer en experimental.
 
 ## Mission bloquee par gate
 
@@ -36,7 +34,7 @@ La prochaine action est une gate produit : choisir explicitement la prochaine va
 
 `P10-SOLVER-GATE - Solveur complexe, backtracking ou optimisation globale`.
 
-`P11-NEXT-GATE - Choisir le prochain elargissement produit apres UI Fusion minimale et sizing corrige`.
+`P12-M001V - Valider manuellement le bouton toolbar Fusion relancable`.
 
 - Capability : `C-FUSION-UI`, `C-FUSION-EXPLODED`, `C-COMPOSITE`, `C-SOLVER`,
   `C-GRID-3D`, `C-CALIBRATION` selon l'option choisie.

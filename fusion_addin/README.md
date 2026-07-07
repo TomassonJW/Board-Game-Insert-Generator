@@ -161,10 +161,7 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator export-cad-ir examples/simple_multilayer_grid_scene.json --output $env:TEMP\bgig-simple-multilayer-grid-scene.cad-ir.json
 ```
 
-Lancer ensuite l'add-in. Depuis P11-M003V3, Fusion doit ouvrir directement la
-commande `Generate Board Game Insert`. Si le bouton toolbar est visible, il
-apparait dans `Design workspace > Utilities > Add-Ins` et peut aussi etre clique
-manuellement. Renseigner le chemin dans le champ `CAD IR JSON path` de la
+Lancer ensuite l'add-in. Depuis P12-M001, Fusion doit ouvrir directement la commande `Generate Board Game Insert` et garder un bouton relancable dans `Design workspace > Utilities > Add-Ins`. Si la boite de dialogue perd le focus, est fermee ou devient difficile a retrouver, cliquer ce bouton pour rouvrir BGIG sans redemarrer l'add-in. Renseigner le chemin dans le champ `CAD IR JSON path` de la
 commande BGIG. Par defaut, P7-M001 genere aussi la vue eclatee basique par
 occurrences liees ; pour revenir au compact seul, choisir `compact_only` dans la
 liste `Generation mode`. Les fichiers `cad_ir_path.txt` et
@@ -203,27 +200,23 @@ Procedure :
 3. Creer un nouveau design vide ou ouvrir un design de test.
 4. Exporter ou localiser le fichier CAD IR JSON a tester.
 5. Lancer `Board Game Insert Generator` depuis `Utilities > Add-ins`.
-6. Verifier qu'une boite de dialogue `Generate Board Game Insert` s'ouvre. Si
-   elle ne s'ouvre pas automatiquement, cliquer le bouton
-   `Generate Board Game Insert` dans `Design workspace > Utilities > Add-Ins`.
-7. Dans cette commande, verifier la presence du champ `CAD IR JSON path` et du
-   choix `Generation mode` (`compact_only` / `compact_and_exploded`).
-8. Renseigner `CAD IR JSON path`,
-   choisir `compact_only` ou `compact_and_exploded`, puis valider.
-9. Verifier le message final : il doit annoncer le fichier CAD IR charge, le mode
-   de generation, les composants modules, occurrences, cuts et refus.
-10. Dans le navigateur Fusion, verifier dans le composant racine la presence de
+6. Verifier qu'une boite de dialogue `Generate Board Game Insert` s'ouvre et qu'un bouton du meme nom est disponible dans `Design workspace > Utilities > Add-Ins`.
+7. Fermer ou defocaliser la boite de dialogue, puis cliquer le bouton toolbar `Generate Board Game Insert` pour verifier que BGIG se rouvre sans redemarrer l'add-in.
+8. Dans cette commande, verifier la presence du champ `CAD IR JSON path` et du choix `Generation mode` (`compact_only` / `compact_and_exploded`).
+9. Renseigner `CAD IR JSON path`, choisir `compact_only` ou `compact_and_exploded`, puis valider.
+10. Verifier le message final : il doit annoncer le fichier CAD IR charge, le mode de generation, les composants modules, occurrences, cuts, refus et `UI reopen policy: toolbar_button_reopens_command_without_addin_restart`.
+11. Dans le navigateur Fusion, verifier dans le composant racine la presence de
    sketches nommes :
    - `BGIG box reference - not printable outline` ;
    - `cards-main-01 - Main cards footprint` ;
    - `dice-01 - Dice tray footprint`.
-11. Verifier les bodies nommes :
+12. Verifier les bodies nommes :
    - `cards-main-01 rectangular blank` ;
    - `dice-01 rectangular blank`.
-12. Avec `Inspect > Measure`, verifier les dimensions attendues des blanks P4 :
+13. Avec `Inspect > Measure`, verifier les dimensions attendues des blanks P4 :
    - `cards-main-01` : `68.9 x 99.2 x 44.0 mm` ;
    - `dice-01` : `59.7 x 59.2 x 29.0 mm`.
-13. Pour le smoke test P6-M001, generer une CAD IR depuis
+14. Pour le smoke test P6-M001, generer une CAD IR depuis
     `examples/simple_tray.json`, lancer l'add-in, renseigner son chemin dans
     `CAD IR JSON path`, choisir le mode voulu et verifier :
     - message final : `Blank bodies: 1` et `Rectangular cavity cuts: 1` ;
@@ -231,7 +224,7 @@ Procedure :
     - footprint de cavite attendue : `62.0 x 52.0 mm` ;
     - profondeur de coupe attendue : `20.0 mm` ;
     - plancher conserve attendu : `3.0 mm`.
-14. Pour le smoke test P6-M002, generer une CAD IR depuis
+15. Pour le smoke test P6-M002, generer une CAD IR depuis
     `examples/simple_finger_notch_tray.json`, lancer l'add-in, renseigner son
     chemin dans `CAD IR JSON path`, choisir le mode voulu et verifier :
     - message final : `Blank bodies: 1`, `Rectangular cavity cuts: 1`,
@@ -249,7 +242,7 @@ Procedure :
     - taille de coupe CAD IR : `18.0 x 4.0 x 10.0 mm` ;
     - cavite conservee : `62.0 x 52.0 x 20.0 mm`.
 
-15. Pour le smoke test compact produit P11-M003V4 avec le code courant, generer une CAD IR
+16. Pour le smoke test compact produit P11-M003V4 avec le code courant, generer une CAD IR
     depuis `examples/simple_asset_product_scene.json`, lancer l'add-in,
     renseigner son chemin dans `CAD IR JSON path`, choisir `compact_only` et
     verifier :
@@ -266,7 +259,7 @@ Procedure :
       `Y 0.0 mm`, `Z 0.0 mm` ;
     - dimensions attendues du module asset-first : `25.6 x 25.6 x 9.8 mm` ;
     - verifier que les occurrences compactes restent presentes et aux dimensions attendues.
-16. Pour le smoke test P7/P11 en vue eclatee produit, garder la meme CAD IR
+17. Pour le smoke test P7/P11 en vue eclatee produit, garder la meme CAD IR
     `examples/simple_asset_product_scene.json`, laisser le mode par defaut
     `compact_and_exploded`, relancer l'add-in et verifier :
     - utiliser un design Fusion compatible avec plusieurs composants/occurrences ;
@@ -284,7 +277,7 @@ Procedure :
     - les noms exacts des occurrences dans le Browser Fusion ne sont pas un
       critere : certains contextes Fusion exposent `Occurrence.name` en lecture
       seule ;
-    - verifier plutot que les deux composants sources sont nommes lisiblement et
+    - verifier plutot que le composant source est nomme lisiblement et
       que le message indique la politique de mapping compact/exploded ;
     - verifier que l'add-in n'a pas echoue avec
       `property '_get_name' of 'Occurrence' object has no setter` ;
@@ -298,7 +291,7 @@ Procedure :
       definition ;
     - verifier que Fusion n'a pas cree de fillet, fond arrondi, module composite
       ou export STL/3MF.
-17. Pour le smoke test P11-M003V3 multi-layer, generer une CAD IR depuis
+18. Pour le smoke test P11-M003V3 multi-layer, generer une CAD IR depuis
     `examples/simple_multilayer_grid_scene.json`, lancer l'add-in dans un
     document Assembly-compatible, renseigner son chemin dans `CAD IR JSON path`,
     choisir `compact_and_exploded` et verifier :
@@ -323,7 +316,7 @@ Procedure :
     - occurrences compactes et eclatees visibles, liees aux memes composants
       sources ;
     - aucun solveur, module composite, fillet, geometrie courbe ou export STL/3MF.
-18. Noter tout ecart, message d'erreur ou comportement Zero Doc dans un futur log
+19. Noter tout ecart, message d'erreur ou comportement Zero Doc dans un futur log
     de validation.
 
 Ce smoke test valide uniquement la creation CAD minimale dans Fusion. Depuis

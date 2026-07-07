@@ -320,3 +320,9 @@ reste `manual validation required` dans Fusion. Les chemins deja valides restent
 au-dela de ces rectangles, notamment vue eclatee avancee, modules composites,
 fonds arrondis, fillets, booleans complexes, geometrie courbe reelle ou tout
 export imprimable, reste soumise a une nouvelle gate humaine.
+
+## Note P12-M001 - UI Fusion sans changement de contrat
+
+P12-M001 modifie uniquement le lancement UI Fusion : bouton toolbar relancable, commande `Generate Board Game Insert` et documentation de regeneration par relance. Le contrat CAD IR V0 ne change pas.
+
+Une CAD IR reste la source unique de generation Fusion. L'add-in ne doit pas deduire ou recalculer les placements, dimensions, tolerances ou clearances depuis l'UI.

@@ -12,6 +12,11 @@ from board_game_insert_generator.config_loader import load_config
 from board_game_insert_generator.layout import generate_basic_layout
 from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     ASSEMBLY_DOCUMENT_REQUIRED_STATUS,
+    BGIG_COMMAND_NAME,
+    BGIG_TOOLBAR_LOCATION,
+    BGIG_TOOLBAR_PANEL_IDS,
+    BGIG_TOOLBAR_WORKSPACE_ID,
+    BGIG_UI_REOPEN_POLICY,
     CAD_IR_PATH_OVERRIDE_FILENAME,
     DEFAULT_CAD_IR_INPUT_FILENAME,
     COMPACT_OCCURRENCE_ROLE,
@@ -43,6 +48,7 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     default_fusion_command_values,
     describe_document_state,
     fusion_command_summary,
+    fusion_ui_launch_plan,
     generation_plan_from_cad_ir,
     is_part_design_component_limit_error,
     load_cad_ir_json,
@@ -235,6 +241,19 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn(CAD_IR_PATH_OVERRIDE_FILENAME, guidance)
         self.assertIn("export-cad-ir", guidance)
 
+    def test_describes_reopenable_toolbar_launch_plan(self) -> None:
+        plan = fusion_ui_launch_plan()
+        payload = plan.to_dict()
+
+        self.assertEqual(plan.command_name, BGIG_COMMAND_NAME)
+        self.assertEqual(plan.toolbar_workspace_id, BGIG_TOOLBAR_WORKSPACE_ID)
+        self.assertEqual(plan.toolbar_location, BGIG_TOOLBAR_LOCATION)
+        self.assertEqual(plan.reopen_policy, BGIG_UI_REOPEN_POLICY)
+        self.assertTrue(plan.opens_dialog_on_run)
+        self.assertTrue(plan.legacy_files_are_defaults_only)
+        self.assertIn("SolidScriptsAddinsPanel", BGIG_TOOLBAR_PANEL_IDS)
+        self.assertIn("Utilities", payload["toolbar_location"])
+        self.assertEqual(payload["toolbar_panel_ids"], list(BGIG_TOOLBAR_PANEL_IDS))
     def test_builds_fusion_command_request_from_ui_values(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             addin_dir = Path(temp_dir)
@@ -837,6 +856,8 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("printable body planned", source)
         self.assertIn("size match", source)
         self.assertIn("printable_body_size_mm", source)
+        self.assertIn("UI reopen policy", source)
+        self.assertIn("BGIG_UI_REOPEN_POLICY", source)
 
 
 def _assert_vector_almost_equal(test_case: unittest.TestCase, vector, expected: dict[str, float]) -> None:

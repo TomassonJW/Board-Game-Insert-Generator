@@ -26,6 +26,18 @@ SUPPORTED_FUSION_GENERATION_MODES = (
     FUSION_GENERATION_MODE_COMPACT_AND_EXPLODED,
 )
 DEFAULT_FUSION_GENERATION_MODE = FUSION_GENERATION_MODE_COMPACT_AND_EXPLODED
+BGIG_TOOLBAR_WORKSPACE_ID = "FusionSolidEnvironment"
+BGIG_TOOLBAR_PANEL_IDS = (
+    "SolidScriptsAddinsPanel",
+    "SolidAddinsPanel",
+    "ToolsTabAddinsPanel",
+)
+BGIG_TOOLBAR_LOCATION = "Design workspace > Utilities > Add-Ins"
+BGIG_COMMAND_NAME = "Generate Board Game Insert"
+BGIG_COMMAND_TOOLTIP = (
+    "Open BGIG, choose a CAD IR JSON file and generate the selected Fusion scene."
+)
+BGIG_UI_REOPEN_POLICY = "toolbar_button_reopens_command_without_addin_restart"
 
 DOCUMENT_STATUS_READY = "ready"
 DOCUMENT_STATUS_ZERO_DOC = "zero_doc"
@@ -102,6 +114,32 @@ class FusionCommandRequest:
         return {
             "cad_ir_path": str(self.cad_ir_path),
             "generation_mode": self.generation_mode,
+        }
+
+
+@dataclass(frozen=True)
+class FusionUiLaunchPlan:
+    """Testable description of the Fusion UI launch strategy."""
+
+    command_name: str = BGIG_COMMAND_NAME
+    toolbar_workspace_id: str = BGIG_TOOLBAR_WORKSPACE_ID
+    toolbar_panel_ids: tuple[str, ...] = BGIG_TOOLBAR_PANEL_IDS
+    toolbar_location: str = BGIG_TOOLBAR_LOCATION
+    tooltip: str = BGIG_COMMAND_TOOLTIP
+    reopen_policy: str = BGIG_UI_REOPEN_POLICY
+    opens_dialog_on_run: bool = True
+    legacy_files_are_defaults_only: bool = True
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "command_name": self.command_name,
+            "toolbar_workspace_id": self.toolbar_workspace_id,
+            "toolbar_panel_ids": list(self.toolbar_panel_ids),
+            "toolbar_location": self.toolbar_location,
+            "tooltip": self.tooltip,
+            "reopen_policy": self.reopen_policy,
+            "opens_dialog_on_run": self.opens_dialog_on_run,
+            "legacy_files_are_defaults_only": self.legacy_files_are_defaults_only,
         }
 
 
@@ -651,6 +689,12 @@ def fusion_command_summary(request: FusionCommandRequest) -> str:
             "Fusion will not recalculate layout, clearances or tolerances.",
         ]
     )
+
+
+def fusion_ui_launch_plan() -> FusionUiLaunchPlan:
+    """Return the supported P12 launch strategy for the Fusion add-in UI."""
+
+    return FusionUiLaunchPlan()
 
 
 def load_cad_ir_json(path: str | Path) -> dict[str, Any]:
