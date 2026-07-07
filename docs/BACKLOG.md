@@ -293,7 +293,7 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Criteres d'acceptation : Fusion ne recalcule pas le solveur ; les bodies asset-first utilisent la taille imprimable ; les spans grille restent visibles comme metadata ; l'utilisateur n'a plus a editer manuellement `cad_ir_path.txt` ou `exploded_view_mode.txt` pour le flux courant ; coeur Python sans `adsk`.
 - Tests : unitaires hors Fusion, CLI Markdown/JSON/export CAD IR sur exemples pertinents, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
 - Gate : validation humaine fournie le 2026-07-07 apres P11-M002V, limitee a sizing et UI minimale.
-- Statut : `done`, `implemented-fusion`, corrections P11-M003V2/P11-M003V3/P11-M003V4 codees, validation Fusion manuelle requise, `print-validated: false`.
+- Statut : `done`, `fusion-validated`, corrections P11-M003V2/P11-M003V3/P11-M003V4 codees et validees humainement dans Fusion, `print-validated: false`.
 
 ### P11-M003V - Valider manuellement la commande UI Fusion et le sizing asset-first
 
@@ -336,8 +336,8 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Livrable : validation humaine Fusion avec `Module source mapping`, `Body sizing report`, dimensions, origine et statut `print-validated: false`.
 - Criteres d'acceptation : aucune generation redondante non documentee ; source `asset_candidate`, placement `grid_placement`, assets contenus, clearances peripherique/inter-module et taille imprimable lisibles ; aucune nouvelle geometrie ou tolerance n'est ajoutee.
 - Tests : smoke test manuel Fusion, aucune validation d'impression revendiquee.
-- Gate : action humaine requise.
-- Statut : `blocked`.
+- Gate : action humaine Thomas realisee le 2026-07-07 apres le commit `134863c`.
+- Statut : `done`, `fusion-validated`, `print-validated: false`.
 
 ### P7-M002 - Generer une vue Fusion eclatee minimale
 

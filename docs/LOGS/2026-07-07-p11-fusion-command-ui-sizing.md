@@ -135,3 +135,20 @@ Correction appliquee :
 
 Statut : `implemented-fusion`, validation Fusion manuelle P11-M003V4 requise,
 `print-validated: false`.
+## Validation P11-M003V4
+
+Validation humaine Fusion confirmee apres le commit `134863c` :
+
+- add-in recopie depuis le repo vers le dossier Fusion AddIns : OK ;
+- commande UI `Generate Board Game Insert` utilisee : OK ;
+- CAD IR `simple_asset_product_scene` chargee depuis l'UI : OK ;
+- mode `compact_and_exploded` selectionne : OK ;
+- generation Fusion : OK ;
+- `CAD IR module blanks planned: 0`, `Grid-positioned asset modules planned: 1`, `Module components created: 1`, `Compact occurrences created: 1`, `Exploded occurrences created: 1` : OK ;
+- aucun blank legacy / module manuel parasite : OK ;
+- `Module source mapping` present avec source `asset_candidate` et placement `grid_placement` : OK ;
+- `Body sizing report` present, printable planned environ `25.6 x 25.6 x 9.8 mm`, bbox Fusion comparable et `size match yes` : OK ;
+- vue compacte et vue eclatee liees : OK ;
+- impression 3D : non validee.
+
+Statut : `fusion-validated`, `print-validated: false`. Prochaine action : gate produit `P11-NEXT-GATE` avant tout elargissement.

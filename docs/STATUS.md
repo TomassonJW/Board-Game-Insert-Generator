@@ -231,11 +231,11 @@ La mission `P7-M001` code une premiere vue eclatee Fusion basique. Le smoke test
 
 La mission `P11-M002` code une premiere scene Fusion multi-layer depuis les placements grille X/Y/Z deja resolus par `metadata.executable_asset_plan`. L'exemple `simple_multilayer_grid_scene` produit un module genere bas, un module genere plus haut sur deux unites Z et un placement explicite a `Z=1`; le plan hors Fusion expose les compteurs multi-layer et l'add-in conserve la strategie `Component` source + occurrences compactes/eclatees liees. La validation humaine `P11-M002V` du 2026-07-07 confirme le lancement de l'add-in, le chargement CAD IR, le message conforme et la generation multi-layer visible. Statut : `fusion-validated`, `print-validated: false`.
 
-La mission `P11-M003` corrige l'ambiguite dimensionnelle observee apres P11-M002V : les modules asset-first generes distinguent maintenant span grille theorique, enveloppe asset-fit et taille imprimable. Le smoke test humain `P11-M003V` a ete KO partiel : la scene etait generee, mais les dimensions effectives n'etaient pas clairement verifiables dans le message Fusion. La correction `P11-M003V2` refuse les placements grille modernes sans `printable_body_size_mm`, garde `theoretical_grid_extent_mm` comme metadata d'occupation et ajoute un `Body sizing report`. La correction `P11-M003V3` cree une commande `Generate Board Game Insert` visible. Le smoke test humain P11-M003V3 a ensuite ete KO partiel cote produit parce que la fixture melangeait blank legacy et module asset-first ; la correction `P11-M003V4` ajoute `simple_asset_product_scene.json`, explicite `module_source` / `placement_source` et ajoute `Module source mapping` au message Fusion. Statut : `implemented-fusion`, validation humaine Fusion `P11-M003V4` requise, `print-validated: false`.
+La mission `P11-M003` corrige l'ambiguite dimensionnelle observee apres P11-M002V : les modules asset-first generes distinguent maintenant span grille theorique, enveloppe asset-fit et taille imprimable. Le smoke test humain `P11-M003V` a ete KO partiel : la scene etait generee, mais les dimensions effectives n'etaient pas clairement verifiables dans le message Fusion. La correction `P11-M003V2` refuse les placements grille modernes sans `printable_body_size_mm`, garde `theoretical_grid_extent_mm` comme metadata d'occupation et ajoute un `Body sizing report`. La correction `P11-M003V3` cree une commande `Generate Board Game Insert` visible. Le smoke test humain P11-M003V3 a ensuite ete KO partiel cote produit parce que la fixture melangeait blank legacy et module asset-first ; la correction `P11-M003V4` ajoute `simple_asset_product_scene.json`, explicite `module_source` / `placement_source` et ajoute `Module source mapping` au message Fusion. La validation humaine `P11-M003V4` confirmee le 2026-07-07 apres le commit `134863c` valide l'add-in recopie, la commande UI, le chargement de `simple_asset_product_scene`, le mode `compact_and_exploded`, un seul module asset-first, zero blank legacy, les occurrences compactes/eclatees liees, le `Module source mapping`, le `Body sizing report`, `printable_body_size_mm` environ `25.6 x 25.6 x 9.8 mm`, bbox Fusion comparable et `size match yes`. Statut : `fusion-validated`, `print-validated: false`.
 
 ## Phase active
 
-Phase active : **P11-M003V4 clarification scene produit asset-first / smoke test humain requis**.
+Phase active : **P11-NEXT-GATE choix du prochain elargissement produit / gate humaine requise**.
 
 Etat : le pipeline P4 reste stable pour les blanks rectangulaires Fusion. La
 vague P5 est terminee cote moteur Python pur, configuration, rapports et CAD IR.
@@ -249,15 +249,10 @@ avec l'ancienne attente dimensionnelle documentee. P7-M001 est
 `fusion-validated` pour la vue eclatee basique par occurrences liees dans un
 document Assembly-compatible, avec `print-validated: false`. P11-M002 est
 `fusion-validated` pour une scene compacte/eclatee multi-layer depuis placements
-X/Y/Z. P11-M003 est `implemented-fusion` pour la commande UI minimale et le
-sizing asset-first explicite. P11-M003V2 ajoute le rapport bbox planned/actual ; P11-M003V3 corrige l'affichage de la vraie commande UI ; P11-M003V4 clarifie la scene produit et requiert validation Fusion manuelle. La North
+X/Y/Z. P11-M003 est usion-validated pour la commande UI minimale, le sizing asset-first explicite, la scene produit non ambigue, le mapping source et les occurrences compactes/eclatees liees. P11-M003V2 ajoute le rapport bbox planned/actual ; P11-M003V3 corrige l'affichage de la vraie commande UI ; P11-M003V4 valide le flux UI produit avec simple_asset_product_scene. La North
 Star cible un generateur volumetrique asset-first, pilote par capabilities.
 
-Prochaine action recommandee : smoke test humain Fusion P11-M003V4 avec
-`simple_asset_product_scene` via la commande UI visible `Generate Board Game Insert`, avant toute UI plus complete, vue volumetrique plus avancee, module composite,
-solveur plus automatique, export ou geometrie Fusion supplementaire. Une nouvelle
-gate humaine est requise avant toute extension au-dela de cette commande minimale
-et des modules rectangulaires compactes/eclates multi-layer basiques.
+Prochaine action recommandee : decision humaine `P11-NEXT-GATE` pour choisir le prochain elargissement produit : UI plus complete, vue volumetrique plus avancee, modules composites, solveur plus automatique, export, preparation impression/calibration ou nouvelle geometrie Fusion. Aucune mission produit non-gated n'est recommandee avant cette decision.
 
 ## Implemente
 
@@ -335,7 +330,7 @@ et des modules rectangulaires compactes/eclates multi-layer basiques.
 - Commande UI Fusion minimale P11-M003/P11-M003V3 : champ `CAD IR JSON path`, mode
   `compact_only` / `compact_and_exploded`, command id Fusion valide, ouverture
   immediate du dialogue au lancement, bouton toolbar optionnel, fichiers texte
-  locaux conserves comme fallback de compatibilite, validation Fusion manuelle requise.
+  locaux conserves comme fallback de compatibilite, `fusion-validated`, `print-validated: false`.
 - Vue eclatee Fusion P7-M001 basique : composants physiques uniques avec
   occurrences compactes/eclatees liees, garde-fou `assembly document required`
   si le document actif est un Part Design incompatible, sans renommage direct de
@@ -434,7 +429,7 @@ Derniere verification pendant `P11-M003V4 - scene produit asset-first non ambigu
 - Export CAD IR : OK sur `simple_asset_product_scene.json`, `simple_asset_executable_plan.json` et `simple_multilayer_grid_scene.json`.
 - `git diff --check` : OK.
 - `rg -n "adsk" src/board_game_insert_generator` : OK, aucune occurrence dans le coeur Python.
-- Validation Fusion reelle : requise via `P11-M003V4`; non executee par Codex.
+- Validation Fusion reelle : `P11-M003V4` confirmee humainement le 2026-07-07 apres le commit `134863c`; impression 3D non validee.
 
 ## Risques actifs
 

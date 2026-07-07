@@ -20,42 +20,17 @@ structurant, authentification absente ou refus de push direct.
 
 Statut : `required_before_next_product_expansion`.
 
-P11-M002V est validee humainement dans Fusion pour la scene multi-layer : add-in
-lance, CAD IR chargee, message conforme, vue compacte/eclatee generee et modules
-multi-layer visibles. `print-validated: false` reste explicite.
+P11-M003V4 est validee humainement dans Fusion apres le commit `134863c` : add-in recopie, commande UI `Generate Board Game Insert`, chargement de `simple_asset_product_scene`, mode `compact_and_exploded`, generation OK, zero blank legacy, un module asset-first, occurrences compactes/eclatees liees, `Module source mapping`, `Body sizing report`, bbox Fusion comparable et `size match yes`. `print-validated: false` reste explicite.
 
-P11-M003 est codee, mais les validations humaines ont revele deux ecarts :
-P11-M003V a montre que les dimensions effectives n'etaient pas verifiables dans
-le message Fusion, puis le smoke test suivant a montre que la vraie commande UI
-n'etait pas visible/exploitable. La correction P11-M003V2 ajoute un
-`Body sizing report` et refuse les placements grille modernes sans
-`printable_body_size_mm`. La correction P11-M003V3 cree une vraie commande
-Fusion `Generate Board Game Insert` avec champ `CAD IR JSON path`, choix
-`compact_only` / `compact_and_exploded`, handlers conserves et ouverture
-immediate du dialogue. Cette mission change volontairement les dimensions de
-bodies asset-first attendues par rapport aux anciens smoke tests :
-
-- `simple_asset_product_scene` : un seul body asset-first attendu `25.6 x 25.6 x 9.8 mm`, span grille `30 x 30 x 10 mm`, aucun blank legacy ;
-- `simple_multilayer_grid_scene` : body bas attendu `61.6 x 61.6 x 7.8 mm`, span grille `90 x 90 x 10 mm` ;
-- `simple_multilayer_grid_scene` : body haut attendu `37.6 x 37.6 x 17.8 mm`, span grille `60 x 60 x 20 mm`.
-
-Action humaine requise : smoke test Fusion `P11-M003V4` avant toute nouvelle
-mission produit qui elargit l'UI, le solveur, les modules composites, la vue
-volumetrique, la geometrie courbe, les exports STL/3MF ou la preparation
-d'impression. L'impression 3D reste non validee.
+Action humaine requise : `P11-NEXT-GATE` avant toute nouvelle mission produit qui elargit l'UI, le solveur, les modules composites, la vue volumetrique, la geometrie courbe, les exports STL/3MF ou la preparation d'impression/calibration.
 
 ## Mission ready non gated
 
-Aucune mission non-gated supplementaire n'est recommandee apres `P11-M003` tant
-que le smoke test Fusion P11-M003V4 de la scene produit, de la commande UI visible, du mapping source et du rapport bbox
-n'est pas valide. La boucle asset-first produit maintenant candidats, variante
-recommandee, plan de modules concret, placement grille greedy borne, generation
-Fusion compacte/eclatee liee, scene multi-layer et premiere commande utilisateur
-Fusion minimale.
+Aucune mission non-gated supplementaire n'est recommandee apres la validation `P11-M003V4`. La boucle asset-first produit maintenant candidats, variante recommandee, plan de modules concret, placement grille greedy borne, generation Fusion compacte/eclatee liee, scene multi-layer, commande utilisateur minimale et smoke test produit non ambigu valide dans Fusion.
+
+La prochaine action est une gate produit : choisir explicitement la prochaine vague avant d'elargir le perimetre.
 
 ## Mission bloquee par gate
-
-`P11-M003V4 - Smoke test humain Fusion de la scene produit asset-first non ambigue`.
 
 `P8-FUSION-GATE - Generation Fusion volumetrique ou vue 3D`.
 
