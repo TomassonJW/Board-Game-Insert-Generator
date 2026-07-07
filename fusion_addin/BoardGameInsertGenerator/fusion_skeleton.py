@@ -70,8 +70,8 @@ BGIG_ATTRIBUTE_VALUE = "BoardGameInsertGenerator"
 BGIG_CLEAR_SCOPE = "tagged_bgig_objects_only"
 BGIG_SCENE_ROOT_COMPONENT_NAME = "BGIG Generated Scene"
 BGIG_SCENE_ROOT_ROLE = "scene_root_occurrence"
-BGIG_SOURCE_HELPER_OCCURRENCE_ROLE = "source_helper_occurrence"
-BGIG_SOURCE_HELPER_VISIBILITY_POLICY = "source_helper_occurrence_hidden"
+BGIG_COMPONENT_CREATION_POLICY = "initial_addNewComponent_occurrence_is_compact"
+BGIG_SOURCE_HELPER_POLICY = "source_helper_occurrences_not_used"
 BGIG_VISIBLE_OCCURRENCE_POLICY = "compact_and_exploded_occurrences_only"
 BGIG_GENERATE_EXISTING_SCENE_POLICY = "generate_refuses_when_bgig_scene_exists"
 BGIG_EXISTING_SCENE_MESSAGE = "BGIG scene already exists. Use regenerate or clear first."
@@ -82,7 +82,6 @@ BGIG_ACTION_GUIDANCE = (
 )
 BGIG_CLEARABLE_ROLES = (
     BGIG_SCENE_ROOT_ROLE,
-    BGIG_SOURCE_HELPER_OCCURRENCE_ROLE,
     "reference_outline",
     "compact_occurrence",
     "exploded_occurrence",
@@ -932,7 +931,8 @@ def fusion_command_summary(request: FusionCommandRequest) -> str:
             f"Quick parametric box: {BGIG_QUICK_PARAMETRIC_BOX_STATUS}",
             f"Clear scope: {BGIG_CLEAR_SCOPE}",
             f"Generate existing scene policy: {BGIG_GENERATE_EXISTING_SCENE_POLICY}",
-            f"Source/helper visibility policy: {BGIG_SOURCE_HELPER_VISIBILITY_POLICY}",
+            f"Component creation policy: {BGIG_COMPONENT_CREATION_POLICY}",
+            f"Source/helper policy: {BGIG_SOURCE_HELPER_POLICY}",
             f"Visible occurrence policy: {BGIG_VISIBLE_OCCURRENCE_POLICY}",
             f"Action guidance: {BGIG_ACTION_GUIDANCE}",
             "Fusion will not recalculate layout, clearances or tolerances.",

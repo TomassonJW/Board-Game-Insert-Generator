@@ -156,21 +156,15 @@ le meme document. La correction P12-M002V3 rend la politique explicite :
 
 La validation Fusion attendue devient `P12-UI-M002V3`.
 
-## Correction P12-M002V4 - occurrences source cachees
+## Correction P12-M002V5 - occurrence compacte initiale visible
 
 Statut : `implemented-fusion`, validation Fusion manuelle requise,
 `print-validated: false`.
 
-Le smoke test P12-UI-M002V3 a montre des instances visibles parasites malgre le
-guard anti-doublon de scene. La correction P12-M002V4 change la strategie de
-creation des modules Fusion sans changer la CAD IR ni la geometrie :
+Le smoke test P12-UI-M002V4 a montre que la strategie source/helper cachee
+cassait la visibilite des bodies. La correction P12-M002V5 utilise l'occurrence
+initiale `addNewComponent` comme occurrence compacte visible officielle et cree
+seulement l'occurrence eclatee via `addExistingComponent`. Aucune occurrence
+source/helper n'est creee ou masquee.
 
-- `addNewComponent` cree maintenant une occurrence source/helper ;
-- cette occurrence helper est taguee `source_helper_occurrence` puis cachee ;
-- l'occurrence compacte visible est creee explicitement via `addExistingComponent` ;
-- l'occurrence eclatee visible est creee via `addExistingComponent` uniquement en
-  mode `compact_and_exploded` ;
-- le message Fusion expose les occurrences visibles attendues/reelles, les
-  helpers visibles et `Legacy bodies created: 0`.
-
-La validation Fusion attendue devient `P12-UI-M002V4`.
+La validation Fusion attendue devient `P12-UI-M002V5`.

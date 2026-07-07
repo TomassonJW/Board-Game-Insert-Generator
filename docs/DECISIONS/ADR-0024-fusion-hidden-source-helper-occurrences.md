@@ -2,7 +2,7 @@
 
 ## Statut
 
-Accepte pour implementation, validation Fusion manuelle requise.
+Remplacee par ADR-0025 apres KO critique P12-UI-M002V4.
 
 ## Date
 
@@ -81,3 +81,9 @@ copies mortes independantes.
   `clear_bgig_scene`.
 - Gate separee avant toute nouvelle geometrie Fusion, export STL/3MF ou
   changement de solveur.
+
+## Remplacement
+
+Le smoke test P12-UI-M002V4 a montre que masquer l'occurrence source/helper
+rendait les bodies utiles invisibles dans Fusion. Cette strategie est abandonnee
+et remplacee par `ADR-0025-fusion-initial-occurrence-as-compact-view.md`.

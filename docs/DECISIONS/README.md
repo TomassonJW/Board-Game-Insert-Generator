@@ -124,8 +124,10 @@ Tests, cartes backlog ou gates humaines a preparer.
 - ADR-0023-fusion-parametric-command-and-safe-clear.md - commande Fusion
   parametrique V0, generation config vers CAD IR temporaire et nettoyage par
   attributs BGIG.
-- ADR-0024-fusion-hidden-source-helper-occurrences.md - composants sources Fusion
-  via occurrences helpers cachees et occurrences compactes/eclatees visibles.
+- ADR-0024-fusion-hidden-source-helper-occurrences.md - decision remplacee apres KO
+  critique P12-UI-M002V4.
+- ADR-0025-fusion-initial-occurrence-as-compact-view.md - occurrence
+  initiale `addNewComponent` comme vue compacte officielle.
 
 ## Regles de maintenance
 

@@ -123,3 +123,24 @@ Correction codee :
 Validation attendue : `P12-UI-M002V4` dans Fusion, centree sur compact_only,
 compact_and_exploded, absence d'occurrence source visible, regenerate sans
 doublon et clear tagged-only.
+
+## P12-UI-M002V5 - occurrence compacte initiale visible
+
+Observation humaine : P12-UI-M002V4 a rendu les bodies utiles invisibles dans
+Fusion. La strategie source/helper cachee est abandonnee.
+
+Correction codee :
+
+- l'occurrence initiale creee par `addNewComponent` devient l'occurrence compacte
+  visible officielle ;
+- la geometrie du module est creee dans le `Component` de cette occurrence ;
+- l'occurrence eclatee est creee via `addExistingComponent` uniquement en mode
+  `compact_and_exploded` ;
+- aucune occurrence source/helper n'est creee ou masquee ;
+- le message Fusion attend `Source/helper occurrences created: 0`, les
+  occurrences visibles attendues/reelles et `Legacy bodies created: 0` ;
+- ADR-0025 remplace ADR-0024 pour documenter la strategie officielle.
+
+Validation attendue : `P12-UI-M002V5` dans Fusion, centree sur compact_only,
+compact_and_exploded, generate anti-doublon, regenerate sans doublon,
+clear tagged-only et preservation des objets non BGIG.

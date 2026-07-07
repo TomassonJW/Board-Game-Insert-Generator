@@ -28,8 +28,8 @@ try:
         BGIG_GENERATED_CONFIG_FILENAME,
         BGIG_SCENE_ROOT_COMPONENT_NAME,
         BGIG_SCENE_ROOT_ROLE,
-        BGIG_SOURCE_HELPER_OCCURRENCE_ROLE,
-        BGIG_SOURCE_HELPER_VISIBILITY_POLICY,
+        BGIG_COMPONENT_CREATION_POLICY,
+        BGIG_SOURCE_HELPER_POLICY,
         BGIG_VISIBLE_OCCURRENCE_POLICY,
         BGIG_TOOLBAR_LOCATION,
         BGIG_TOOLBAR_PANEL_IDS,
@@ -98,8 +98,8 @@ except ImportError:  # pragma: no cover - Fusion may load the file as a script.
         BGIG_GENERATED_CONFIG_FILENAME,
         BGIG_SCENE_ROOT_COMPONENT_NAME,
         BGIG_SCENE_ROOT_ROLE,
-        BGIG_SOURCE_HELPER_OCCURRENCE_ROLE,
-        BGIG_SOURCE_HELPER_VISIBILITY_POLICY,
+        BGIG_COMPONENT_CREATION_POLICY,
+        BGIG_SOURCE_HELPER_POLICY,
         BGIG_VISIBLE_OCCURRENCE_POLICY,
         BGIG_TOOLBAR_LOCATION,
         BGIG_TOOLBAR_PANEL_IDS,
@@ -674,7 +674,8 @@ def _generation_result_message(
         f"BGIG scenes after: {scene_roots_after}\n"
         f"Module components created: {result['module_components_created']}\n"
         f"Source components created: {result['source_components_created']}\n"
-        f"Source/helper visibility policy: {BGIG_SOURCE_HELPER_VISIBILITY_POLICY}\n"
+        f"Component creation policy: {BGIG_COMPONENT_CREATION_POLICY}\n"
+        f"Source/helper policy: {BGIG_SOURCE_HELPER_POLICY}\n"
         f"Visible occurrence policy: {BGIG_VISIBLE_OCCURRENCE_POLICY}\n"
         f"Source/helper occurrences created: {result['source_helper_occurrences_created']}\n"
         f"Visible BGIG source/helper occurrences: {result['visible_source_helper_occurrences']}\n"
@@ -716,14 +717,18 @@ def _count_bgig_scene_roots(design) -> int:  # noqa: ANN001 - Fusion API object.
         ) from exc
 
     scene_roots = set()
+    scene_root_components = set()
     for index in range(getattr(attributes, "count", 0)):
         attribute = attributes.item(index)
         entity = getattr(attribute, "parent", None)
         if entity is None:
             continue
-        if _bgig_entity_role(entity) == BGIG_SCENE_ROOT_ROLE:
+        role = _bgig_entity_role(entity)
+        if role == BGIG_SCENE_ROOT_ROLE:
             scene_roots.add(id(entity))
-    return len(scene_roots)
+        elif role == "scene_root_component":
+            scene_root_components.add(id(entity))
+    return len(scene_roots) if scene_roots else len(scene_root_components)
 
 
 def _count_visible_bgig_occurrences_by_role(design, roles: tuple[str, ...]) -> int:  # noqa: ANN001 - Fusion API object.
@@ -823,10 +828,7 @@ def _clear_bgig_scene(design, scene_roots_before: int | None = None) -> dict[str
         "deleted_objects": deleted,
         "skipped_objects": skipped,
         "scene_roots_after": _count_bgig_scene_roots(design),
-        "visible_source_helper_occurrences_after": _count_visible_bgig_occurrences_by_role(
-            design,
-            (BGIG_SOURCE_HELPER_OCCURRENCE_ROLE,),
-        ),
+        "visible_source_helper_occurrences_after": 0,
         "non_bgig_objects_preserved": "yes",
     }
 
@@ -896,29 +898,19 @@ def _generate_from_plan(design, plan: FusionGenerationPlan) -> dict[str, object]
     created_bodies = {}
     created_components = {}
     compact_occurrence_count = 0
-    source_helper_occurrence_count = 0
-    source_helper_visible_count = 0
 
     for blank in source_blanks:
         occurrence_plan = compact_occurrences_by_component_id.get(blank.cad_id)
         if occurrence_plan is None:
             raise RuntimeError(f"Missing compact occurrence plan for {blank.body_name}.")
-        module_component, body, source_helper_visible = _create_module_source_component(
+        occurrence, body = _create_module_component_occurrence(
             scene_component,
             blank,
-        )
-        _create_linked_module_occurrence(
-            scene_component,
-            module_component,
             occurrence_plan,
-            COMPACT_OCCURRENCE_ROLE,
         )
         created_bodies[blank.cad_id] = body
-        created_components[blank.cad_id] = module_component
+        created_components[blank.cad_id] = occurrence.component
         compact_occurrence_count += 1
-        source_helper_occurrence_count += 1
-        if source_helper_visible:
-            source_helper_visible_count += 1
 
     source_blanks_by_id = {blank.cad_id: blank for blank in source_blanks}
 
@@ -986,10 +978,7 @@ def _generate_from_plan(design, plan: FusionGenerationPlan) -> dict[str, object]
         design,
         (COMPACT_OCCURRENCE_ROLE, EXPLODED_OCCURRENCE_ROLE),
     )
-    visible_source_helpers = _count_visible_bgig_occurrences_by_role(
-        design,
-        (BGIG_SOURCE_HELPER_OCCURRENCE_ROLE,),
-    )
+    visible_source_helpers = 0
 
     return {
         "scene_roots_created": 1,
@@ -997,8 +986,8 @@ def _generate_from_plan(design, plan: FusionGenerationPlan) -> dict[str, object]
         "physical_module_count": len(source_blanks),
         "module_components_created": len(created_components),
         "source_components_created": len(created_components),
-        "source_helper_occurrences_created": source_helper_occurrence_count,
-        "source_helper_occurrences_visible": source_helper_visible_count,
+        "source_helper_occurrences_created": 0,
+        "source_helper_occurrences_visible": 0,
         "visible_source_helper_occurrences": visible_source_helpers,
         "compact_occurrences_created": compact_occurrence_count,
         "exploded_occurrences_created": exploded_occurrence_count,
@@ -1131,53 +1120,34 @@ def _create_reference_outline(root_component, solid_plan: FusionSolidPlan):  # n
     return sketch
 
 
-def _create_module_source_component(
+def _create_module_component_occurrence(
     root_component,  # noqa: ANN001
     solid_plan: FusionSolidPlan,
+    occurrence_plan,  # noqa: ANN001
 ):
-    transform = _matrix_for_origin(FusionVectorMm(0.0, 0.0, 0.0))
+    transform = _matrix_for_origin(occurrence_plan.origin_mm)
     try:
-        source_occurrence = root_component.occurrences.addNewComponent(transform)
+        occurrence = root_component.occurrences.addNewComponent(transform)
     except Exception as exc:
         if is_part_design_component_limit_error(exc):
             raise FusionAssemblyDocumentRequiredError(
                 assembly_document_required_message(exc)
             ) from exc
         raise
-    if source_occurrence is None:
+    if occurrence is None:
         raise RuntimeError(
-            "Fusion component source creation failed. Use an assembly-capable Fusion design "
+            "Fusion component creation failed. Use an assembly-capable Fusion design "
             "for linked compact/exploded module occurrences."
         )
-    _apply_occurrence_transform(source_occurrence, transform)
-    _tag_bgig_entity(source_occurrence, BGIG_SOURCE_HELPER_OCCURRENCE_ROLE)
+    _apply_occurrence_transform(occurrence, transform)
+    _tag_bgig_entity(occurrence, COMPACT_OCCURRENCE_ROLE)
 
-    module_component = source_occurrence.component
+    module_component = occurrence.component
     if module_component is None:
         raise RuntimeError(f"Fusion component is unavailable for {solid_plan.body_name}.")
     module_component.name = solid_plan.component_name
     body = _create_rectangular_blank(module_component, _local_solid_plan(solid_plan))
-    _hide_source_helper_occurrence(source_occurrence, solid_plan.body_name)
-    return module_component, body, _bgig_entity_is_visible(source_occurrence)
-
-
-def _hide_source_helper_occurrence(occurrence, label: str) -> None:  # noqa: ANN001
-    hidden = False
-    try:
-        occurrence.isLightBulbOn = False
-        hidden = True
-    except Exception:
-        pass
-    try:
-        occurrence.isVisible = False
-        hidden = True
-    except Exception:
-        pass
-    if not hidden or _bgig_entity_is_visible(occurrence):
-        raise RuntimeError(
-            "Fusion source/helper occurrence remained visible for "
-            f"{label}. Generation refused to avoid a parasite module instance."
-        )
+    return occurrence, body
 
 
 def _create_linked_module_occurrence(

@@ -20,8 +20,8 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     BGIG_QUICK_PARAMETRIC_BOX_STATUS,
     BGIG_SCENE_ROOT_COMPONENT_NAME,
     BGIG_SCENE_ROOT_ROLE,
-    BGIG_SOURCE_HELPER_OCCURRENCE_ROLE,
-    BGIG_SOURCE_HELPER_VISIBILITY_POLICY,
+    BGIG_COMPONENT_CREATION_POLICY,
+    BGIG_SOURCE_HELPER_POLICY,
     BGIG_UI_SETTINGS_FILENAME,
     BGIG_VISIBLE_OCCURRENCE_POLICY,
     BGIG_COMMAND_NAME,
@@ -1060,14 +1060,15 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("fusion_ui_settings_path", source)
         self.assertIn("BGIG Generated Scene", source)
         self.assertIn("BGIG_SCENE_ROOT_ROLE", source)
-        self.assertIn("BGIG_SOURCE_HELPER_OCCURRENCE_ROLE", source)
-        self.assertIn("BGIG_SOURCE_HELPER_VISIBILITY_POLICY", source)
+        self.assertIn("BGIG_COMPONENT_CREATION_POLICY", source)
+        self.assertIn("BGIG_SOURCE_HELPER_POLICY", source)
         self.assertIn("BGIG_VISIBLE_OCCURRENCE_POLICY", source)
-        self.assertIn("_create_module_source_component", source)
-        self.assertNotIn("def _create_module_component_occurrence", source)
-        self.assertIn("_hide_source_helper_occurrence", source)
+        self.assertIn("_create_module_component_occurrence", source)
+        self.assertIn("def _create_module_component_occurrence", source)
+        self.assertNotIn("_create_module_source_component", source)
+        self.assertNotIn("_hide_source_helper_occurrence", source)
+        self.assertNotIn("occurrence.isLightBulbOn = False", source)
         self.assertIn("_count_visible_bgig_occurrences_by_role", source)
-        self.assertIn("occurrence.isLightBulbOn = False", source)
         self.assertIn("COMPACT_OCCURRENCE_ROLE", source)
         self.assertIn("EXPLODED_OCCURRENCE_ROLE", source)
         self.assertIn("scene_roots_created", source)
@@ -1085,8 +1086,8 @@ class FusionSkeletonTests(unittest.TestCase):
         skeleton_source = (ROOT / "fusion_addin" / "BoardGameInsertGenerator" / "fusion_skeleton.py").read_text(encoding="utf-8")
         self.assertIn(BGIG_EXISTING_SCENE_MESSAGE, skeleton_source)
         self.assertIn(BGIG_GENERATE_EXISTING_SCENE_POLICY, skeleton_source)
-        self.assertIn(BGIG_SOURCE_HELPER_OCCURRENCE_ROLE, skeleton_source)
-        self.assertIn(BGIG_SOURCE_HELPER_VISIBILITY_POLICY, skeleton_source)
+        self.assertIn(BGIG_COMPONENT_CREATION_POLICY, skeleton_source)
+        self.assertIn(BGIG_SOURCE_HELPER_POLICY, skeleton_source)
         self.assertIn(BGIG_VISIBLE_OCCURRENCE_POLICY, skeleton_source)
         execute_block = source[
             source.index("def _execute_generation_request") : source.index("def _generate_cad_ir_from_config_request")

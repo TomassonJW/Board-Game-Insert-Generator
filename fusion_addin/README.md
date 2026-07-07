@@ -213,18 +213,20 @@ explicitement desactive tant qu'un builder de config temporaire complet n'est pa
 code.
 
 
-### Correction P12-M002V4 - occurrences visibles exactes
+### Correction P12-M002V5 - occurrence compacte initiale visible
 
-P12-M002V4 corrige la creation des composants modules : l'occurrence initiale
-creee par `addNewComponent` devient une occurrence helper cachee. Les vues
-visibles sont ensuite creees explicitement avec `addExistingComponent` : une
-occurrence `compact_occurrence` en `compact_only`, puis une occurrence
-`exploded_occurrence` supplementaire en `compact_and_exploded`.
+P12-M002V5 abandonne la strategie `source_helper hidden` qui rendait les bodies
+invisibles dans Fusion. L'occurrence initiale creee par `addNewComponent` est
+maintenant l'occurrence compacte visible officielle. La geometrie du module est
+creee dans le `Component` de cette occurrence compacte. En mode
+`compact_and_exploded`, l'occurrence eclatee est creee ensuite via
+`addExistingComponent` et reference le meme `Component`.
 
 Le message Fusion doit afficher :
 
 - `Physical module count` ;
 - `Source components created` ;
+- `Source/helper occurrences created: 0` ;
 - `Compact occurrences created` ;
 - `Exploded occurrences created` ;
 - `Visible BGIG occurrences expected` ;
@@ -240,7 +242,7 @@ les attributs BGIG, jamais les objets utilisateur non BGIG. Le message Fusion
 affiche `BGIG scenes before`, `BGIG objects deleted`, `BGIG scenes after` et
 `Non-BGIG objects preserved`.
 
-Procedure P12-M002V4 recommandee :
+Procedure P12-M002V5 recommandee :
 
 1. Copier l'add-in a jour dans le dossier Fusion AddIns.
 2. Ouvrir un document Fusion Assembly-compatible.
@@ -284,7 +286,7 @@ Procedure P12-M002V4 recommandee :
     les overrides vides ; si un override est renseigne, l'add-in doit refuser
     clairement au lieu de l'ignorer.
 
-Validation attendue : correction codee, validation Fusion manuelle P12-M002V4
+Validation attendue : correction codee, validation Fusion manuelle P12-M002V5
 requise, `print-validated: false`.
 ## Cas Zero Doc
 

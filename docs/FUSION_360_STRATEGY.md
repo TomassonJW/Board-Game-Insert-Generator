@@ -575,3 +575,20 @@ Regles :
 - aucun body legacy independant ne doit etre cree ;
 - `clear_bgig_scene` doit supprimer les racines, helpers, occurrences compactes
   et occurrences eclatees BGIG tagues, sans cibler les objets non BGIG.
+
+### Correction P12-M002V5 - Occurrence initiale compacte officielle
+
+P12-M002V5 abandonne la strategie source/helper cachee de P12-M002V4, car elle
+rendait les bodies modules invisibles dans Fusion.
+
+Regles retenues :
+
+- `addNewComponent` cree l'occurrence compacte visible officielle ;
+- la geometrie rectangulaire, les cavites et les features deja supportees sont
+  creees dans le `Component` de cette occurrence ;
+- en mode `compact_and_exploded`, `addExistingComponent` cree une occurrence
+  eclatee liee au meme `Component` ;
+- aucune occurrence source/helper n'est creee ou masquee ;
+- `compact_only` doit donner N occurrences compactes visibles pour N modules ;
+- `compact_and_exploded` doit donner N compactes + N eclatees visibles ;
+- `clear_bgig_scene` et `regenerate` restent limites aux objets BGIG tagues.
