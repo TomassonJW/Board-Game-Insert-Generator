@@ -235,9 +235,11 @@ La mission `P11-M003` corrige l'ambiguite dimensionnelle observee apres P11-M002
 
 La mission `P12-M001` code un lancement UI Fusion relancable par bouton toolbar : les constantes de commande et d'emplacement sont centralisees dans le squelette testable, le message de generation expose la politique `toolbar_button_reopens_command_without_addin_restart`, et la documentation indique comment rouvrir BGIG sans redemarrer l'add-in. La validation humaine `P12-M001V` confirmee le 2026-07-07 apres le commit `a12ef42` valide la commande visible, le bouton dans `Design workspace > Utilities > Add-Ins`, la reouverture sans redemarrage, le chargement UI de `simple_asset_product_scene`, le mode `compact_and_exploded`, la generation Fusion, le `Body sizing report`, les occurrences liees et la ligne `UI reopen policy`. Statut : `fusion-validated`, `print-validated: false`.
 
+La mission `P12-M002+` code une premiere UI Fusion parametrique V0. La commande `Generate Board Game Insert` expose maintenant une action `generate`, `regenerate` ou `clear_bgig_scene`, un chemin CAD IR, un chemin config BGIG optionnel, une racine projet optionnelle, le mode compact/eclate, les principaux champs de boite/grille/epaisseurs/clearances/profil et un flux config -> CAD IR temporaire. `Clear BGIG Scene` supprime uniquement les objets BGIG tagues par les generations P12-M002+. Statut : `implemented-fusion`, validation Fusion manuelle requise, `print-validated: false`.
+
 ## Phase active
 
-Phase active : **P12-NEXT-GATE choix de la prochaine extension UI / gate humaine requise**.
+Phase active : **P12-UI-M002V validation humaine de l'UI parametrique V0 / gate de smoke test**.
 
 Etat : le pipeline P4 reste stable pour les blanks rectangulaires Fusion. La
 vague P5 est terminee cote moteur Python pur, configuration, rapports et CAD IR.
@@ -254,7 +256,7 @@ document Assembly-compatible, avec `print-validated: false`. P11-M002 est
 X/Y/Z. P11-M003 est `fusion-validated` pour la commande UI minimale, le sizing asset-first explicite, la scene produit non ambigue, le mapping source et les occurrences compactes/eclatees liees. P11-M003V2 ajoute le rapport bbox planned/actual ; P11-M003V3 corrige l'affichage de la vraie commande UI ; P11-M003V4 valide le flux UI produit avec `simple_asset_product_scene`. La North
 Star cible un generateur volumetrique asset-first, pilote par capabilities.
 
-Prochaine action recommandee : decision humaine `P12-NEXT-GATE` avant palette persistante HTML, generation depuis config BGIG, nettoyage automatique de scene, parametres avances ou regeneration plus ambitieuse.
+Prochaine action recommandee : smoke test humain `P12-UI-M002V` dans Fusion avant toute nouvelle extension UI, palette persistante, UI assets complete, solveur plus automatique ou nouvelle geometrie Fusion.
 
 ## Implemente
 
@@ -333,6 +335,7 @@ Prochaine action recommandee : decision humaine `P12-NEXT-GATE` avant palette pe
   `compact_only` / `compact_and_exploded`, command id Fusion valide, ouverture
   immediate du dialogue au lancement, bouton toolbar optionnel, fichiers texte
   locaux conserves comme fallback de compatibilite, `fusion-validated`, `print-validated: false`.
+- UI Fusion parametrique P12-M002+ : action `generate` / `regenerate` / `clear_bgig_scene`, config JSON -> CAD IR temporaire, overrides boite/grille/tolerances principaux et nettoyage par objets BGIG tagues, `implemented-fusion`, validation Fusion manuelle requise, `print-validated: false`.
 - Vue eclatee Fusion P7-M001 basique : composants physiques uniques avec
   occurrences compactes/eclatees liees, garde-fou `assembly document required`
   si le document actif est un Part Design incompatible, sans renommage direct de
@@ -424,14 +427,15 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant `P12-M001V - validation toolbar Fusion relancable` :
+Derniere verification pendant `P12-M002+ - UI Fusion parametrique V0` :
 
-- `python -m unittest discover -s tests` : OK, 155 tests passes.
+- `python -m unittest discover -s tests` : OK, 161 tests passes.
 - CLI Markdown/JSON : OK sur `simple_asset_product_scene.json`, `simple_asset_executable_plan.json`, `simple_multilayer_grid_scene.json`, `simple_tray.json`, `simple_finger_notch_tray.json` et `simple_box.json`.
-- Export CAD IR : OK sur `simple_asset_product_scene.json`, `simple_asset_executable_plan.json` et `simple_multilayer_grid_scene.json`.
+- `python -m py_compile fusion_addin/BoardGameInsertGenerator/BoardGameInsertGenerator.py fusion_addin/BoardGameInsertGenerator/fusion_skeleton.py` : OK.
+- Export CAD IR : OK sur `simple_asset_product_scene.json`, `simple_asset_executable_plan.json`, `simple_multilayer_grid_scene.json`, `simple_tray.json`, `simple_finger_notch_tray.json` et `simple_box.json`.
 - `git diff --check` : OK.
 - `rg -n "adsk" src/board_game_insert_generator` : OK, aucune occurrence dans le coeur Python.
-- Validation Fusion reelle : `P12-M001V` confirmee humainement le 2026-07-07 apres le commit `a12ef42`; impression 3D non validee.
+- Validation Fusion reelle : `P12-UI-M002V` requise. P12-M002+ est codee et testee hors Fusion ; impression 3D non validee.
 
 ## Risques actifs
 

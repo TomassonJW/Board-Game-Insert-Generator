@@ -499,3 +499,27 @@ Invariants :
 - `cad_ir_path.txt` et `exploded_view_mode.txt` restent des defaults/fallbacks ;
 - la palette persistante HTML reste une option future, documentee dans `docs/FUSION_UI_STRATEGY.md` ;
 - P12-M001 ne cree aucune nouvelle geometrie et ne valide aucune impression 3D.
+
+## UI Fusion P12-M002+ - Commande parametrique V0
+
+P12-M002+ etend la commande Fusion existante sans changer la geometrie generee.
+La strategie retenue est une commande classique enrichie, pas une palette HTML
+persistante.
+
+La commande expose maintenant `Action`, `CAD IR JSON path`, `BGIG config JSON
+path`, `BGIG project root`, `Generation mode` et des champs V0 de boite, grille,
+epaisseurs, clearances et profil d'impression. Quand une config est fournie,
+l'add-in genere une config temporaire puis une CAD IR temporaire en important le
+coeur Python pur depuis `<BGIG project root>/src`. Cette importation reste cote
+add-in ; le coeur `src/board_game_insert_generator` ne depend toujours pas de
+`adsk`.
+
+Invariants :
+
+- Fusion consomme toujours une CAD IR resolue avant generation ;
+- Fusion ne recalcule pas layout, solveur, clearances ou tolerances ;
+- les champs UI sont des overrides de config existante, pas une UI assets complete ;
+- `Regenerate` nettoie seulement les objets BGIG tagues puis regenere ;
+- `Clear BGIG Scene` refuse de supprimer les objets non tagues ;
+- les geometries, dimensions et statuts physiques existants ne changent pas ;
+- validation Fusion manuelle requise, `print-validated: false`.

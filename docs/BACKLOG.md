@@ -558,16 +558,27 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Gate : action humaine Thomas realisee le 2026-07-07 apres le commit `a12ef42`.
 - Statut : `done`, `fusion-validated`, `print-validated: false`.
 
-### P12-UI-M002 - Evaluer une palette persistante BGIG
+### P12-UI-M002+ - UI Fusion parametrique V0
 
 - Capability : C-FUSION-UI.
 - Milestone : M14 Usable beta.
-- Objectif : determiner si une palette persistante HTML est faisable sans architecture trop large.
-- Livrable : prototype limite ou rapport de gate avec options toolbar command, command dialog amelioree, palette persistante HTML ou UI externe future.
-- Criteres d'acceptation : ne pas casser le flux commande ; handlers conserves ; stop propre ; aucune nouvelle geometrie.
-- Tests : hors Fusion si implementation, smoke Fusion manuel si codee.
-- Gate : stopper si l'API palette ou HTML/JS impose une architecture trop large.
-- Statut : `blocked` jusqu'a validation humaine `P12-NEXT-GATE`.
+- Objectif : faire evoluer la commande Fusion relancable vers une premiere UI parametrique V0 sans palette HTML large ni nouvelle geometrie.
+- Livrable : champs CAD IR/config/projet, overrides boite/grille/epaisseurs/clearances/profil, actions `generate`, `regenerate`, `clear_bgig_scene`, config temporaire -> CAD IR temporaire, tagging BGIG pour nettoyage conservateur, tests hors Fusion, ADR et documentation.
+- Criteres d'acceptation : le mode CAD IR direct reste fonctionnel ; le mode config peut generer une CAD IR temporaire si le repo BGIG est accessible ; regenerate nettoie uniquement les objets BGIG tagues ; clear refuse de supprimer les objets non tagues ; coeur Python sans `adsk` ; validation Fusion manuelle requise.
+- Tests : unitaires hors Fusion, py_compile add-in, CLI Markdown/JSON/export CAD IR exemples P12, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
+- Gate : validation humaine fournie le 2026-07-07 pour P12-UI-M002+ ; smoke test Fusion requis avant `fusion-validated`.
+- Statut : `done`, `implemented-fusion`, `manual_validation_required`, `print-validated: false`.
+
+### P12-UI-M002V - Valider manuellement l'UI Fusion parametrique V0
+
+- Capability : C-FUSION-UI.
+- Milestone : M14 Usable beta.
+- Objectif : lancer l'add-in dans Fusion et verifier le flux UI P12-M002+.
+- Livrable : validation humaine Fusion avec generation depuis CAD IR, generation depuis config, regenerate, clear et verification que les objets non BGIG ne sont pas supprimes.
+- Criteres d'acceptation : commande visible ; champs `CAD IR JSON path`, `BGIG config JSON path`, `BGIG project root`, action, mode et parametres visibles ; `generate` fonctionne ; `regenerate` nettoie/recree les objets BGIG tagues ; `clear_bgig_scene` supprime uniquement les objets tagues ; message final affiche source, action, overrides, `Body sizing report` et `Print validation: false`.
+- Tests : smoke test manuel Fusion, aucune validation d'impression revendiquee.
+- Gate : action humaine requise.
+- Statut : `manual_validation_required`.
 ## Phase 12 - Couvercles, mecanismes et empilement avance
 
 ### P12-M001 - Modeliser les couvercles poses

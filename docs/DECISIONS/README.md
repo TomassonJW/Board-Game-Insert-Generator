@@ -121,6 +121,9 @@ Tests, cartes backlog ou gates humaines a preparer.
 - `ADR-0022-fusion-command-ui-and-asset-sizing.md` - commande UI Fusion minimale
   et sizing asset-first explicite grille / asset-fit / printable.
 
+- ADR-0023-fusion-parametric-command-and-safe-clear.md - commande Fusion
+  parametrique V0, generation config vers CAD IR temporaire et nettoyage par
+  attributs BGIG.
 ## Regles de maintenance
 
 - Ne reecris pas l'historique d'une ADR acceptee pour changer la decision.

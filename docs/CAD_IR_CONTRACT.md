@@ -326,3 +326,17 @@ export imprimable, reste soumise a une nouvelle gate humaine.
 P12-M001 modifie uniquement le lancement UI Fusion : bouton toolbar relancable, commande `Generate Board Game Insert` et documentation de regeneration par relance. Le contrat CAD IR V0 ne change pas.
 
 Une CAD IR reste la source unique de generation Fusion. L'add-in ne doit pas deduire ou recalculer les placements, dimensions, tolerances ou clearances depuis l'UI.
+
+## Note P12-M002+ - UI config vers CAD IR temporaire
+
+P12-M002+ ne change pas `schema_version` et ne modifie pas le contrat CAD IR V0.
+L'add-in Fusion peut maintenant recevoir une config BGIG JSON depuis la commande
+UI, appliquer des overrides V0, ecrire `bgig_ui_generated_config.json`, generer
+`bgig_ui_generated_cad_ir.json` avec le coeur Python pur, puis consommer cette
+CAD IR comme les exports CLI existants.
+
+Cette couche reste un mode d'entree utilisateur. La CAD IR demeure la source de
+verite pour la generation Fusion : l'adaptateur ne recalcule ni layout, ni
+placements, ni clearances, ni tolerances. Les objets Fusion crees par P12-M002+
+portent des attributs BGIG pour permettre un nettoyage conservateur ; ces
+attributs ne font pas partie du contrat CAD IR.

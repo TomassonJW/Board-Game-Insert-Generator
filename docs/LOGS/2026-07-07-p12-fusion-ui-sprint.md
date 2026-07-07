@@ -37,3 +37,27 @@ Validation humaine Fusion confirmee apres le commit `a12ef42` :
 - impression 3D : non validee.
 
 Statut : `fusion-validated`, `print-validated: false`. Prochaine action : gate produit avant palette persistante, generation depuis config BGIG, nettoyage automatique ou regeneration plus ambitieuse.
+
+## P12-UI-M002+ - UI Fusion parametrique V0
+
+Mission : etendre la commande Fusion relancable vers une premiere UI parametrique
+V0, sans nouvelle geometrie Fusion et sans palette HTML persistante.
+
+Changements :
+
+- ajout de l'action `generate`, `regenerate` et `clear_bgig_scene` ;
+- ajout des champs `BGIG config JSON path` et `BGIG project root` ;
+- ajout d'overrides UI pour dimensions de boite, grille, epaisseurs, clearances
+  principales et profil d'impression ;
+- generation d'une config temporaire puis d'une CAD IR temporaire quand une
+  config BGIG est fournie ;
+- import du coeur Python pur uniquement via `<project root>/src` cote add-in ;
+- tagging des objets BGIG crees et nettoyage limite aux objets tagues ;
+- ADR-0023 pour documenter la strategie et les limites.
+
+Statut : `implemented-fusion`, validation Fusion manuelle requise,
+`print-validated: false`.
+
+Validation attendue : `P12-UI-M002V` doit confirmer dans Fusion la visibilite des
+champs, le flux CAD IR direct, le flux config -> CAD IR temporaire, `Regenerate`,
+`Clear BGIG Scene` et la preservation des objets non BGIG.

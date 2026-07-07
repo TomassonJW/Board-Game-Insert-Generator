@@ -18,30 +18,36 @@ structurant, authentification absente ou refus de push direct.
 
 ## Gate humaine active
 
-Statut : `required_before_next_product_expansion`.
+Statut : `manual_validation_required`.
 
-La validation humaine `P12-M001V` est confirmee apres le commit `a12ef42` : commande visible, bouton toolbar visible dans `Design workspace > Utilities > Add-Ins`, reouverture sans redemarrer l'add-in, generation `simple_asset_product_scene` via UI, `Body sizing report`, occurrences liees et `UI reopen policy` presents. `print-validated: false` reste explicite.
+La gate humaine `P12-NEXT-GATE` a ete levee pour lancer `P12-UI-M002+` vers une
+UI Fusion parametrique V0. La mission code une commande Fusion enrichie avec
+source CAD IR, source config BGIG, overrides parametriques, actions `generate`,
+`regenerate` et `clear_bgig_scene`, generation CAD IR temporaire et nettoyage
+conservateur des objets BGIG tagues.
 
-Action humaine requise : `P12-NEXT-GATE` avant toute extension vers palette persistante HTML, generation depuis config BGIG, nettoyage automatique de scene, parametres avances ou regeneration plus ambitieuse.
+Action humaine requise : `P12-UI-M002V` smoke test Fusion avant toute nouvelle
+extension produit.
 
 ## Mission ready non gated
 
-Aucune mission non-gated supplementaire n'est recommandee apres la validation `P12-M001V`. La prochaine action est une gate produit : choisir explicitement le prochain increment UI avant d'elargir le perimetre.
+Aucune mission non-gated supplementaire n'est recommandee apres P12-M002+. La
+prochaine action est une validation humaine Fusion.
 
 ## Mission bloquee par gate
+
+`P12-UI-M002V - Valider l'UI Fusion parametrique V0`.
+
+- Capability : `C-FUSION-UI`.
+- Milestone : M14 Usable beta.
+- Objectif : lancer l'add-in dans Fusion, verifier les champs parametriques,
+  tester `generate`, `regenerate`, `clear_bgig_scene`, le mode config -> CAD IR
+  temporaire et la preservation des objets non BGIG.
+- Statut : `manual_validation_required`.
 
 `P8-FUSION-GATE - Generation Fusion volumetrique ou vue 3D`.
 
 `P10-SOLVER-GATE - Solveur complexe, backtracking ou optimisation globale`.
-
-`P12-NEXT-GATE - Choisir la prochaine extension UI Fusion`.
-
-- Capability : `C-FUSION-UI`, `C-FUSION-EXPLODED`, `C-COMPOSITE`, `C-SOLVER`,
-  `C-GRID-3D`, `C-CALIBRATION` selon l'option choisie.
-- Objectif : choisir explicitement la prochaine vague : UI produit plus complete,
-  solveur plus automatique, modules composites, generation volumetrique plus
-  avancee, export ou impression/calibration.
-- Statut : `blocked` jusqu'a validation humaine.
 
 ## Fin de chaque mission
 

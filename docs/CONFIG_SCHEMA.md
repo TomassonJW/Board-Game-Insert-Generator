@@ -416,3 +416,22 @@ positives, Z positive sauf `dimension_confidence: unknown_z` ou Z peut valoir 0,
 `reservation_ref` vers une zone volumetrique existante si fourni, `module_hint`
 vers un module existant si fourni. P10-M006 peut grouper des assets compatibles
 dans les rapports sans ajouter de nouveau champ de configuration.
+## Overrides UI Fusion P12-M002+
+
+La commande Fusion P12-M002+ peut appliquer des overrides temporaires sur une
+configuration BGIG avant de generer une CAD IR temporaire. Ces champs ne changent
+pas le schema JSON public : ils mappent vers des champs deja existants.
+
+Mapping V0 :
+
+- `box_inner_x_mm`, `box_inner_y_mm`, `box_inner_z_mm` -> `box.inner_dimensions_mm.x/y/z` ;
+- `grid_units_x`, `grid_units_y`, `grid_units_z` -> `volumetric_grid.size_units.x/y/z` ;
+- `wall_thickness_mm` -> `defaults.wall_thickness_mm` ;
+- `floor_thickness_mm` -> `defaults.floor_thickness_mm` ;
+- `peripheral_clearance_mm` -> `tolerances.peripheral_clearance_mm` ;
+- `module_gap_mm` -> `tolerances.module_gap_mm` ;
+- `print_profile` -> champ racine `print_profile`.
+
+Les overrides de grille exigent que la config contienne deja `volumetric_grid`.
+La commande Fusion ne cree pas encore une config asset-first complete depuis
+zero et ne modifie pas les valeurs de tolerance par defaut du moteur.

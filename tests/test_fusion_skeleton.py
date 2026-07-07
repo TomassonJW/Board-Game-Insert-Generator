@@ -12,6 +12,7 @@ from board_game_insert_generator.config_loader import load_config
 from board_game_insert_generator.layout import generate_basic_layout
 from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     ASSEMBLY_DOCUMENT_REQUIRED_STATUS,
+    BGIG_CLEAR_SCOPE,
     BGIG_COMMAND_NAME,
     BGIG_TOOLBAR_LOCATION,
     BGIG_TOOLBAR_PANEL_IDS,
@@ -30,6 +31,9 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     FINGER_NOTCH_WALL_FRONT,
     FINGER_NOTCH_WALL_LEFT,
     FINGER_NOTCH_WALL_RIGHT,
+    FUSION_COMMAND_ACTION_CLEAR,
+    FUSION_COMMAND_ACTION_GENERATE,
+    FUSION_COMMAND_ACTION_REGENERATE,
     FUSION_GENERATION_MODE_COMPACT_AND_EXPLODED,
     FUSION_GENERATION_MODE_COMPACT_ONLY,
     FUSION_EXTENT_NEGATIVE,
@@ -40,12 +44,15 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     GRID_PLACED_BLANK_OPERATION_KIND,
     LINKED_OCCURRENCE_OPERATION_KIND,
     OCCURRENCE_NAME_POLICY_COMPONENT_SOURCE,
+    P12_PARAMETRIC_FIELD_DEFAULTS,
     PLAN_STATUS_PLANNED_ONLY,
     FusionSkeletonError,
+    apply_parametric_overrides_to_config_payload,
     assembly_document_required_message,
     build_fusion_command_request,
     cad_ir_input_guidance,
     default_fusion_command_values,
+    detect_bgig_project_root,
     describe_document_state,
     fusion_command_summary,
     fusion_ui_launch_plan,
@@ -53,6 +60,7 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     is_part_design_component_limit_error,
     load_cad_ir_json,
     mm_to_cm,
+    parse_parametric_overrides,
     planned_operations_from_cad_ir,
     resolve_cad_ir_input_path,
     resolve_generation_mode,
@@ -251,9 +259,18 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(plan.reopen_policy, BGIG_UI_REOPEN_POLICY)
         self.assertTrue(plan.opens_dialog_on_run)
         self.assertTrue(plan.legacy_files_are_defaults_only)
+        self.assertTrue(plan.config_input_supported)
+        self.assertEqual(plan.clear_scope, BGIG_CLEAR_SCOPE)
+        self.assertIn(FUSION_COMMAND_ACTION_GENERATE, plan.command_actions)
+        self.assertIn(FUSION_COMMAND_ACTION_REGENERATE, plan.command_actions)
+        self.assertIn(FUSION_COMMAND_ACTION_CLEAR, plan.command_actions)
+        self.assertIn("box_inner_x_mm", plan.parametric_fields)
+        self.assertIn("grid_units_z", plan.parametric_fields)
         self.assertIn("SolidScriptsAddinsPanel", BGIG_TOOLBAR_PANEL_IDS)
         self.assertIn("Utilities", payload["toolbar_location"])
         self.assertEqual(payload["toolbar_panel_ids"], list(BGIG_TOOLBAR_PANEL_IDS))
+        self.assertEqual(payload["clear_scope"], BGIG_CLEAR_SCOPE)
+
     def test_builds_fusion_command_request_from_ui_values(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             addin_dir = Path(temp_dir)
@@ -268,8 +285,84 @@ class FusionSkeletonTests(unittest.TestCase):
 
         self.assertEqual(request.cad_ir_path.name, "scene.json")
         self.assertEqual(request.generation_mode, FUSION_GENERATION_MODE_COMPACT_ONLY)
+        self.assertEqual(request.action, FUSION_COMMAND_ACTION_GENERATE)
+        self.assertEqual(request.source_kind, "cad_ir")
         self.assertIn("Generation mode: compact_only", fusion_command_summary(request))
 
+    def test_builds_config_source_request_with_project_root_detection(self) -> None:
+        config_path = ROOT / "examples" / "simple_asset_product_scene.json"
+
+        request = build_fusion_command_request(
+            "",
+            FUSION_GENERATION_MODE_COMPACT_AND_EXPLODED,
+            ROOT / "fusion_addin" / "BoardGameInsertGenerator",
+            config_json_path_text=str(config_path),
+            parameter_values={"box_inner_x_mm": "121.5", "grid_units_z": "2"},
+        )
+
+        self.assertIsNone(request.cad_ir_path)
+        self.assertEqual(request.config_json_path, config_path.resolve())
+        self.assertEqual(request.project_root, ROOT)
+        self.assertEqual(request.source_kind, "config")
+        self.assertEqual(request.parameter_overrides["box_inner_x_mm"], 121.5)
+        self.assertEqual(request.parameter_overrides["grid_units_z"], 2)
+        self.assertIn("Source: BGIG config JSON", fusion_command_summary(request))
+
+    def test_builds_clear_request_without_requiring_input_file(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            request = build_fusion_command_request(
+                "",
+                FUSION_GENERATION_MODE_COMPACT_ONLY,
+                Path(temp_dir),
+                action=FUSION_COMMAND_ACTION_CLEAR,
+            )
+
+        self.assertIsNone(request.cad_ir_path)
+        self.assertEqual(request.action, FUSION_COMMAND_ACTION_CLEAR)
+        self.assertEqual(request.source_kind, "clear_only")
+        self.assertIn("Clear tagged BGIG scene objects", fusion_command_summary(request))
+
+    def test_parses_and_applies_p12_parametric_config_overrides(self) -> None:
+        payload = json.loads((ROOT / "examples" / "simple_asset_product_scene.json").read_text(encoding="utf-8"))
+        overrides = parse_parametric_overrides(
+            {
+                **P12_PARAMETRIC_FIELD_DEFAULTS,
+                "box_inner_x_mm": "122.5",
+                "box_inner_y_mm": "91,5",
+                "grid_units_x": "5",
+                "wall_thickness_mm": "1.4",
+                "floor_thickness_mm": "1.6",
+                "peripheral_clearance_mm": "0.9",
+                "module_gap_mm": "0.7",
+                "print_profile": "fine_detail",
+            }
+        )
+
+        updated = apply_parametric_overrides_to_config_payload(payload, overrides)
+
+        self.assertEqual(updated["box"]["inner_dimensions_mm"]["x"], 122.5)
+        self.assertEqual(updated["box"]["inner_dimensions_mm"]["y"], 91.5)
+        self.assertEqual(updated["volumetric_grid"]["size_units"]["x"], 5)
+        self.assertEqual(updated["defaults"]["wall_thickness_mm"], 1.4)
+        self.assertEqual(updated["defaults"]["floor_thickness_mm"], 1.6)
+        self.assertEqual(updated["tolerances"]["peripheral_clearance_mm"], 0.9)
+        self.assertEqual(updated["tolerances"]["module_gap_mm"], 0.7)
+        self.assertEqual(updated["print_profile"], "fine_detail")
+        self.assertNotEqual(payload["box"]["inner_dimensions_mm"]["x"], 122.5)
+
+    def test_rejects_grid_override_without_volumetric_grid(self) -> None:
+        payload = json.loads((ROOT / "examples" / "simple_tray.json").read_text(encoding="utf-8"))
+
+        with self.assertRaisesRegex(FusionSkeletonError, "volumetric_grid"):
+            apply_parametric_overrides_to_config_payload(payload, {"grid_units_x": 4})
+
+    def test_detects_bgig_project_root_from_config_path(self) -> None:
+        detected = detect_bgig_project_root(
+            ROOT / "examples" / "simple_asset_product_scene.json",
+            ROOT / "fusion_addin" / "BoardGameInsertGenerator",
+        )
+
+        self.assertEqual(detected, ROOT)
     def test_rejects_fusion_command_request_without_existing_cad_ir(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             with self.assertRaisesRegex(FusionSkeletonError, "CAD IR JSON file not found"):
@@ -595,6 +688,7 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(
             exploded_occurrence_dict["occurrence_name_policy"],
             OCCURRENCE_NAME_POLICY_COMPONENT_SOURCE,
+    P12_PARAMETRIC_FIELD_DEFAULTS,
         )
         self.assertFalse(exploded_occurrence_dict["direct_occurrence_rename"])
         self.assertTrue(plan_dict["linked_exploded_occurrences"])
@@ -858,8 +952,27 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("printable_body_size_mm", source)
         self.assertIn("UI reopen policy", source)
         self.assertIn("BGIG_UI_REOPEN_POLICY", source)
-
-
+        self.assertIn("BGIG config JSON path", source)
+        self.assertIn("BGIG project root", source)
+        self.assertIn("Action", source)
+        self.assertIn("FUSION_COMMAND_ACTION_REGENERATE", source)
+        self.assertIn("FUSION_COMMAND_ACTION_CLEAR", source)
+        self.assertIn("P12_PARAMETRIC_FIELD_LABELS", source)
+        self.assertIn("apply_parametric_overrides_to_config_payload", source)
+        self.assertIn("BGIG_GENERATED_CONFIG_FILENAME", source)
+        self.assertIn("BGIG_GENERATED_CAD_IR_FILENAME", source)
+        self.assertIn("_clear_bgig_scene", source)
+        self.assertIn("design.findAttributes", source)
+        self.assertIn("_tag_bgig_entity", source)
+        self.assertIn("BGIG_CLEAR_SCOPE", source)
+        self.assertIn("Print validation: false", source)
+        execute_block = source[
+            source.index("def _execute_generation_request") : source.index("def _generate_cad_ir_from_config_request")
+        ]
+        self.assertLess(
+            execute_block.index("generation_plan = generation_plan_from_cad_ir"),
+            execute_block.index("if request.action == FUSION_COMMAND_ACTION_REGENERATE:"),
+        )
 def _assert_vector_almost_equal(test_case: unittest.TestCase, vector, expected: dict[str, float]) -> None:
     test_case.assertAlmostEqual(vector.x, expected["x"])
     test_case.assertAlmostEqual(vector.y, expected["y"])
