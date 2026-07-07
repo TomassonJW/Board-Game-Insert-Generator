@@ -17,8 +17,11 @@ try:
         BGIG_ATTRIBUTE_GROUP,
         BGIG_ATTRIBUTE_KIND,
         BGIG_ATTRIBUTE_VALUE,
+        BGIG_ACTION_GUIDANCE,
         BGIG_CLEARABLE_ROLES,
         BGIG_CLEAR_SCOPE,
+        BGIG_EXISTING_SCENE_MESSAGE,
+        BGIG_GENERATE_EXISTING_SCENE_POLICY,
         BGIG_COMMAND_NAME,
         BGIG_COMMAND_TOOLTIP,
         BGIG_GENERATED_CAD_IR_FILENAME,
@@ -38,6 +41,7 @@ try:
         FUSION_INPUT_MODE_CONFIG_FILE,
         FUSION_INPUT_MODE_QUICK_PARAMETRIC_BOX,
         FUSION_COMMAND_ACTION_CLEAR,
+        FUSION_COMMAND_ACTION_GENERATE,
         FUSION_COMMAND_ACTION_REGENERATE,
         FUSION_EXTENT_NEGATIVE,
         FUSION_EXTENT_POSITIVE,
@@ -78,8 +82,11 @@ except ImportError:  # pragma: no cover - Fusion may load the file as a script.
         BGIG_ATTRIBUTE_GROUP,
         BGIG_ATTRIBUTE_KIND,
         BGIG_ATTRIBUTE_VALUE,
+        BGIG_ACTION_GUIDANCE,
         BGIG_CLEARABLE_ROLES,
         BGIG_CLEAR_SCOPE,
+        BGIG_EXISTING_SCENE_MESSAGE,
+        BGIG_GENERATE_EXISTING_SCENE_POLICY,
         BGIG_COMMAND_NAME,
         BGIG_COMMAND_TOOLTIP,
         BGIG_GENERATED_CAD_IR_FILENAME,
@@ -99,6 +106,7 @@ except ImportError:  # pragma: no cover - Fusion may load the file as a script.
         FUSION_INPUT_MODE_CONFIG_FILE,
         FUSION_INPUT_MODE_QUICK_PARAMETRIC_BOX,
         FUSION_COMMAND_ACTION_CLEAR,
+        FUSION_COMMAND_ACTION_GENERATE,
         FUSION_COMMAND_ACTION_REGENERATE,
         FUSION_EXTENT_NEGATIVE,
         FUSION_EXTENT_POSITIVE,
@@ -229,6 +237,13 @@ if adsk is not None:
                     FUSION_COMMAND_ACTION_CLEAR,
                 ):
                     action_input.listItems.add(action, action == default_request.action, "")
+                inputs.addTextBoxCommandInput(
+                    "bgig_action_guidance",
+                    "Action safety",
+                    BGIG_ACTION_GUIDANCE,
+                    3,
+                    True,
+                )
                 input_mode = inputs.addDropDownCommandInput(
                     INPUT_MODE_INPUT_ID,
                     "Input mode",
@@ -449,9 +464,13 @@ def _parameter_input_values(inputs) -> dict[str, str]:  # noqa: ANN001 - Fusion 
 
 def _execute_generation_request(request, addin_dir: Path) -> str:  # noqa: ANN001 - FusionCommandRequest kept testable in skeleton.
     design = _active_design(_app)
+    scene_roots_before = _count_bgig_scene_roots(design)
     if request.action == FUSION_COMMAND_ACTION_CLEAR:
-        clear_result = _clear_bgig_scene(design)
+        clear_result = _clear_bgig_scene(design, scene_roots_before=scene_roots_before)
         return _clear_result_message(clear_result)
+
+    if request.action == FUSION_COMMAND_ACTION_GENERATE and scene_roots_before > 0:
+        return _generate_existing_scene_blocked_message(scene_roots_before)
 
     cad_ir_path = request.cad_ir_path
     if request.source_kind == "config":
@@ -467,11 +486,21 @@ def _execute_generation_request(request, addin_dir: Path) -> str:  # noqa: ANN00
 
     clear_result = None
     if request.action == FUSION_COMMAND_ACTION_REGENERATE:
-        clear_result = _clear_bgig_scene(design)
+        clear_result = _clear_bgig_scene(design, scene_roots_before=scene_roots_before)
 
     result = _generate_from_plan(design, generation_plan)
+    scene_roots_after = _count_bgig_scene_roots(design)
     settings_saved = _save_command_settings(addin_dir, request, cad_ir_path)
-    return _generation_result_message(generation_plan, result, cad_ir_path, request, clear_result, settings_saved)
+    return _generation_result_message(
+        generation_plan,
+        result,
+        cad_ir_path,
+        request,
+        scene_roots_before,
+        scene_roots_after,
+        clear_result,
+        settings_saved,
+    )
 
 
 def _generate_cad_ir_from_config_request(request, addin_dir: Path) -> Path:  # noqa: ANN001
@@ -552,13 +581,30 @@ def _save_command_settings(addin_dir: Path, request, cad_ir_path: Path) -> bool:
         return False
 
 
+def _generate_existing_scene_blocked_message(scene_roots_before: int) -> str:
+    return (
+        "Board Game Insert Generator generate refused.\n"
+        f"{BGIG_EXISTING_SCENE_MESSAGE}\n"
+        f"Generate existing scene policy: {BGIG_GENERATE_EXISTING_SCENE_POLICY}\n"
+        f"BGIG scenes before: {scene_roots_before}\n"
+        f"BGIG scenes after: {scene_roots_before}\n"
+        "BGIG objects deleted: 0\n"
+        "Non-BGIG objects preserved: yes\n"
+        "Use Action = regenerate to replace the tagged BGIG scene, or "
+        "Action = clear_bgig_scene to remove it first.\n"
+        "Status: manual validation required in Fusion 360."
+    )
+
+
 def _clear_result_message(clear_result: dict[str, object]) -> str:
     return (
         "Board Game Insert Generator clear completed.\n"
         f"Clear scope: {clear_result['scope']}\n"
+        f"BGIG scenes before: {clear_result['scene_roots_before']}\n"
         f"Tagged BGIG objects found: {clear_result['tagged_objects_found']}\n"
         f"Tagged BGIG objects deleted: {clear_result['deleted_objects']}\n"
         f"Tagged BGIG objects skipped: {clear_result['skipped_objects']}\n"
+        f"BGIG scenes after: {clear_result['scene_roots_after']}\n"
         f"Non-BGIG objects preserved: {clear_result['non_bgig_objects_preserved']}\n"
         "Legacy untagged BGIG objects are not deleted to avoid removing user geometry.\n"
         "Status: manual validation required in Fusion 360."
@@ -570,6 +616,8 @@ def _generation_result_message(
     result: dict[str, object],
     cad_ir_path: Path,
     request,
+    scene_roots_before: int,
+    scene_roots_after: int,
     clear_result: dict[str, object] | None = None,
     settings_saved: bool = False,
 ) -> str:
@@ -579,8 +627,10 @@ def _generation_result_message(
     if clear_result is not None:
         clear_lines = (
             f"Regenerate clear scope: {clear_result['scope']}\n"
+            f"Regenerate BGIG scenes before clear: {clear_result['scene_roots_before']}\n"
             f"Regenerate tagged BGIG objects deleted: {clear_result['deleted_objects']}\n"
             f"Regenerate tagged BGIG objects skipped: {clear_result['skipped_objects']}\n"
+            f"Regenerate BGIG scenes after clear: {clear_result['scene_roots_after']}\n"
             f"Regenerate non-BGIG objects preserved: {clear_result['non_bgig_objects_preserved']}\n"
         )
     source_path = request.config_json_path if request.source_kind == "config" else cad_ir_path
@@ -599,6 +649,7 @@ def _generation_result_message(
         f"Parametric overrides: {', '.join(sorted(overrides)) if overrides else 'none'}\n"
         f"Generation mode: {generation_plan.generation_mode}\n"
         f"Reference outlines: {result['reference_outlines']}\n"
+        f"BGIG scenes before: {scene_roots_before}\n"
         f"CAD IR module blanks planned: {len(generation_plan.blanks)}\n"
         f"Grid-positioned asset modules planned: {len(generation_plan.grid_positioned_blanks)}\n"
         f"Multi-layer grid modules planned: {generation_plan.multi_layer_grid_module_count}\n"
@@ -608,6 +659,7 @@ def _generation_result_message(
         f"Compact occurrences planned: {len(generation_plan.compact_occurrences)}\n"
         f"Exploded occurrences planned: {len(generation_plan.exploded_occurrences)}\n"
         f"BGIG scene roots created: {result['scene_roots_created']}\n"
+        f"BGIG scenes after: {scene_roots_after}\n"
         f"Module components created: {result['module_components_created']}\n"
         f"Compact occurrences created: {result['compact_occurrences_created']}\n"
         f"Exploded occurrences created: {result['exploded_occurrences_created']}\n"
@@ -633,7 +685,28 @@ def _generation_result_message(
         "Status: manual validation required in Fusion 360."
     )
 
-def _clear_bgig_scene(design) -> dict[str, object]:  # noqa: ANN001 - Fusion API object.
+def _count_bgig_scene_roots(design) -> int:  # noqa: ANN001 - Fusion API object.
+    try:
+        attributes = design.findAttributes(BGIG_ATTRIBUTE_GROUP, BGIG_ATTRIBUTE_KIND)
+    except Exception as exc:
+        raise FusionSkeletonError(
+            "Fusion could not inspect BGIG attributes for scene detection. "
+            "Generation refused to avoid duplicate or destructive behavior. "
+            f"Original error: {exc}"
+        ) from exc
+
+    scene_roots = set()
+    for index in range(getattr(attributes, "count", 0)):
+        attribute = attributes.item(index)
+        entity = getattr(attribute, "parent", None)
+        if entity is None:
+            continue
+        if _bgig_entity_role(entity) == BGIG_SCENE_ROOT_ROLE:
+            scene_roots.add(id(entity))
+    return len(scene_roots)
+
+
+def _clear_bgig_scene(design, scene_roots_before: int | None = None) -> dict[str, object]:  # noqa: ANN001 - Fusion API object.
     try:
         attributes = design.findAttributes(BGIG_ATTRIBUTE_GROUP, BGIG_ATTRIBUTE_KIND)
     except Exception as exc:
@@ -642,6 +715,9 @@ def _clear_bgig_scene(design) -> dict[str, object]:  # noqa: ANN001 - Fusion API
             "Clear BGIG Scene refused to avoid deleting user geometry. "
             f"Original error: {exc}"
         ) from exc
+
+    if scene_roots_before is None:
+        scene_roots_before = _count_bgig_scene_roots(design)
 
     found = getattr(attributes, "count", 0)
     tagged_entities = []
@@ -686,9 +762,11 @@ def _clear_bgig_scene(design) -> dict[str, object]:  # noqa: ANN001 - Fusion API
 
     return {
         "scope": BGIG_CLEAR_SCOPE,
+        "scene_roots_before": scene_roots_before,
         "tagged_objects_found": found,
         "deleted_objects": deleted,
         "skipped_objects": skipped,
+        "scene_roots_after": _count_bgig_scene_roots(design),
         "non_bgig_objects_preserved": "yes",
     }
 

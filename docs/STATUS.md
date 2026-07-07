@@ -235,11 +235,11 @@ La mission `P11-M003` corrige l'ambiguite dimensionnelle observee apres P11-M002
 
 La mission `P12-M001` code un lancement UI Fusion relancable par bouton toolbar : les constantes de commande et d'emplacement sont centralisees dans le squelette testable, le message de generation expose la politique `toolbar_button_reopens_command_without_addin_restart`, et la documentation indique comment rouvrir BGIG sans redemarrer l'add-in. La validation humaine `P12-M001V` confirmee le 2026-07-07 apres le commit `a12ef42` valide la commande visible, le bouton dans `Design workspace > Utilities > Add-Ins`, la reouverture sans redemarrage, le chargement UI de `simple_asset_product_scene`, le mode `compact_and_exploded`, la generation Fusion, le `Body sizing report`, les occurrences liees et la ligne `UI reopen policy`. Statut : `fusion-validated`, `print-validated: false`.
 
-La correction `P12-M002V2` stabilise l UI Fusion parametrique V0 apres KO partiel humain : modes `cad_ir_file` / `config_file` / `quick_parametric_box (disabled)`, project root auto-detecte ou memorise, settings local `bgig_ui_settings.json`, overrides actifs seulement en `config_file`, generation sous racine taguee `BGIG Generated Scene`, `regenerate` sans doublons attendu et `clear_bgig_scene` tagged-only. Statut : `implemented-fusion`, validation Fusion manuelle P12-UI-M002V2 requise, `print-validated: false`.
+La correction `P12-M002V3` stabilise l UI Fusion parametrique V0 apres deux KO partiels humains : modes `cad_ir_file` / `config_file` / `quick_parametric_box (disabled)`, project root auto-detecte ou memorise, settings local `bgig_ui_settings.json`, overrides actifs seulement en `config_file`, generation sous racine taguee `BGIG Generated Scene`, `generate` refuse une scene BGIG deja presente, `regenerate` remplace sans doublons attendu et `clear_bgig_scene` reste tagged-only. Statut : `implemented-fusion`, validation Fusion manuelle P12-UI-M002V3 requise, `print-validated: false`.
 
 ## Phase active
 
-Phase active : **P12-UI-M002V2 validation humaine de l UI parametrique V0 corrigee / gate de smoke test**.
+Phase active : **P12-UI-M002V3 validation humaine generate/regenerate/clear non cumulatifs / gate de smoke test**.
 
 Etat : le pipeline P4 reste stable pour les blanks rectangulaires Fusion. La
 vague P5 est terminee cote moteur Python pur, configuration, rapports et CAD IR.
@@ -256,7 +256,7 @@ document Assembly-compatible, avec `print-validated: false`. P11-M002 est
 X/Y/Z. P11-M003 est `fusion-validated` pour la commande UI minimale, le sizing asset-first explicite, la scene produit non ambigue, le mapping source et les occurrences compactes/eclatees liees. P11-M003V2 ajoute le rapport bbox planned/actual ; P11-M003V3 corrige l'affichage de la vraie commande UI ; P11-M003V4 valide le flux UI produit avec `simple_asset_product_scene`. La North
 Star cible un generateur volumetrique asset-first, pilote par capabilities.
 
-Prochaine action recommandee : smoke test humain `P12-UI-M002V2` dans Fusion avant toute nouvelle extension UI, palette persistante, UI assets complete, solveur plus automatique ou nouvelle geometrie Fusion.
+Prochaine action recommandee : smoke test humain `P12-UI-M002V3` dans Fusion avant toute nouvelle extension UI, palette persistante, UI assets complete, solveur plus automatique ou nouvelle geometrie Fusion.
 
 ## Implemente
 
@@ -335,7 +335,7 @@ Prochaine action recommandee : smoke test humain `P12-UI-M002V2` dans Fusion ava
   `compact_only` / `compact_and_exploded`, command id Fusion valide, ouverture
   immediate du dialogue au lancement, bouton toolbar optionnel, fichiers texte
   locaux conserves comme fallback de compatibilite, `fusion-validated`, `print-validated: false`.
-- UI Fusion parametrique P12-M002V2 : modes explicites, root auto-detecte/memorise, config JSON -> CAD IR temporaire, overrides config-only, scene racine taguee, `regenerate` sans doublons attendu et `clear_bgig_scene` tagged-only, `implemented-fusion`, validation Fusion manuelle requise, `print-validated: false`.
+- UI Fusion parametrique P12-M002V3 : modes explicites, root auto-detecte/memorise, config JSON -> CAD IR temporaire, overrides config-only, scene racine taguee, `generate` refuse les doublons, `regenerate` remplace sans doublons attendu et `clear_bgig_scene` tagged-only, `implemented-fusion`, validation Fusion manuelle requise, `print-validated: false`.
 - Vue eclatee Fusion P7-M001 basique : composants physiques uniques avec
   occurrences compactes/eclatees liees, garde-fou `assembly document required`
   si le document actif est un Part Design incompatible, sans renommage direct de
@@ -427,7 +427,7 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant `P12-M002V2 - Correction UI Fusion parametrique V0` :
+Derniere verification pendant `P12-M002V3 - Correction generate/regenerate/clear non cumulatifs` :
 
 - `python -m unittest discover -s tests` : OK, 165 tests passes.
 - `python -m py_compile fusion_addin/BoardGameInsertGenerator/BoardGameInsertGenerator.py` : OK.
@@ -436,7 +436,7 @@ Derniere verification pendant `P12-M002V2 - Correction UI Fusion parametrique V0
 - Export CAD IR : OK sur `simple_asset_product_scene.json`, `simple_asset_executable_plan.json`, `simple_multilayer_grid_scene.json`, `simple_tray.json` et `simple_finger_notch_tray.json`.
 - `git diff --check` : OK.
 - `rg -n "adsk" src/board_game_insert_generator` : OK, aucune occurrence dans le coeur Python.
-- Validation Fusion reelle : `P12-UI-M002V2` requise. P12-M002V2 est codee et testee hors Fusion ; impression 3D non validee.
+- Validation Fusion reelle : `P12-UI-M002V3` requise. P12-M002V3 est codee et testee hors Fusion ; impression 3D non validee.
 ## Risques actifs
 
 - Le moteur a deja des concepts futurs dans `models.py`; il faut eviter de les

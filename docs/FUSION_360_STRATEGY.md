@@ -540,3 +540,20 @@ chargement.
 Le project root BGIG est auto-detecte ou memorise localement ; le mode CAD IR
 direct reste supporte. Les overrides UI sont appliques seulement au flux
 `config_file`.
+
+### Correction P12-M002V3 - Generate refuse les doublons
+
+P12-M002V3 conserve la geometrie Fusion existante et ne change pas la CAD IR.
+La correction porte uniquement sur la securite d'action de la commande Fusion :
+
+- l'add-in compte les racines BGIG taguees avant generation ;
+- `generate` cree une scene seulement si aucune scene BGIG n'existe deja ;
+- si une scene existe, `generate` refuse avec un message actionnable demandant
+  `regenerate` ou `clear_bgig_scene` ;
+- `regenerate` reste le chemin officiel pour remplacer une scene BGIG existante ;
+- `clear_bgig_scene` reste le chemin officiel pour supprimer explicitement la
+  scene BGIG ;
+- les objets non BGIG ne sont pas cibles par le clear.
+
+Cette correction evite l'accumulation silencieuse de scenes BGIG dans un document
+Fusion et rend le smoke test P12 centre sur generate/regenerate/clear.

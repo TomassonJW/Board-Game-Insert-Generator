@@ -70,6 +70,13 @@ BGIG_ATTRIBUTE_VALUE = "BoardGameInsertGenerator"
 BGIG_CLEAR_SCOPE = "tagged_bgig_objects_only"
 BGIG_SCENE_ROOT_COMPONENT_NAME = "BGIG Generated Scene"
 BGIG_SCENE_ROOT_ROLE = "scene_root_occurrence"
+BGIG_GENERATE_EXISTING_SCENE_POLICY = "generate_refuses_when_bgig_scene_exists"
+BGIG_EXISTING_SCENE_MESSAGE = "BGIG scene already exists. Use regenerate or clear first."
+BGIG_ACTION_GUIDANCE = (
+    "generate creates one new scene only when no BGIG scene exists; "
+    "regenerate validates, clears tagged BGIG objects, then creates one replacement scene; "
+    "clear_bgig_scene removes only tagged BGIG objects."
+)
 BGIG_CLEARABLE_ROLES = (
     BGIG_SCENE_ROOT_ROLE,
     "reference_outline",
@@ -920,6 +927,8 @@ def fusion_command_summary(request: FusionCommandRequest) -> str:
             f"Parametric fields status: {BGIG_PARAMETRIC_FIELDS_STATUS}",
             f"Quick parametric box: {BGIG_QUICK_PARAMETRIC_BOX_STATUS}",
             f"Clear scope: {BGIG_CLEAR_SCOPE}",
+            f"Generate existing scene policy: {BGIG_GENERATE_EXISTING_SCENE_POLICY}",
+            f"Action guidance: {BGIG_ACTION_GUIDANCE}",
             "Fusion will not recalculate layout, clearances or tolerances.",
         ]
     )

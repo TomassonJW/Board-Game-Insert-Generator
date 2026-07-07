@@ -83,3 +83,21 @@ Correction codee :
   des objets non BGIG.
 
 Validation attendue : `P12-UI-M002V2` dans Fusion.
+
+## P12-UI-M002V3 - generate non cumulatif
+
+Observation humaine : `generate` fonctionnait mais pouvait accumuler plusieurs
+scenes BGIG si l'utilisateur cliquait plusieurs fois. La correction rend le flux
+non cumulatif :
+
+- comptage des racines BGIG taguees avant action ;
+- `generate` refuse si une scene BGIG existe deja ;
+- message explicite `BGIG scene already exists. Use regenerate or clear first.` ;
+- `regenerate` conserve le chemin valider -> clear tagged-only -> regenerer ;
+- `clear_bgig_scene` affiche les scenes avant/apres et preserve les objets non
+  BGIG ;
+- ajout d'un texte `Action safety` dans la commande Fusion ;
+- tests hors Fusion mis a jour pour verrouiller le guard et les messages.
+
+Validation attendue : `P12-UI-M002V3` dans Fusion, centree sur generate sans
+doublon, regenerate sans doublon, clear visible et objet non BGIG preserve.

@@ -134,3 +134,24 @@ La correction P12-M002V2 fixe la strategie :
   objets utilisateur non BGIG.
 
 La validation Fusion attendue devient `P12-UI-M002V2`.
+
+## Correction P12-M002V3 - generate non cumulatif
+
+Statut : `implemented-fusion`, validation Fusion manuelle requise,
+`print-validated: false`.
+
+Le smoke test P12-UI-M002V2 a refuse partiellement le comportement car l'action
+`generate` permettait encore d'empiler silencieusement plusieurs scenes BGIG dans
+le meme document. La correction P12-M002V3 rend la politique explicite :
+
+- `generate` compte les racines BGIG taguees avant execution ;
+- si aucune scene BGIG n'existe, `generate` cree une seule nouvelle scene ;
+- si une scene BGIG existe deja, `generate` refuse sans creer de doublon et
+  affiche `BGIG scene already exists. Use regenerate or clear first.` ;
+- `regenerate` valide la nouvelle generation, nettoie uniquement les objets BGIG
+  tagues, puis cree une scene de remplacement ;
+- `clear_bgig_scene` reste le chemin explicite de suppression de la scene BGIG ;
+- les messages Fusion affichent `BGIG scenes before`, `BGIG objects deleted`,
+  `BGIG scenes after` et `Non-BGIG objects preserved`.
+
+La validation Fusion attendue devient `P12-UI-M002V3`.

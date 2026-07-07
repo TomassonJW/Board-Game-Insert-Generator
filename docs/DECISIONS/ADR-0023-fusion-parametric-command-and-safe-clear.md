@@ -107,3 +107,19 @@ Decision corrective :
 
 Cette revision ne change ni la geometrie generee, ni le contrat CAD IR, ni les
 valeurs de tolerance par defaut.
+
+## Revision P12-M002V3
+
+Le smoke test P12-UI-M002V2 a montre que `generate` pouvait encore accumuler des
+scenes BGIG si l'utilisateur relancait l'action plusieurs fois.
+
+Decision corrective :
+
+- `generate` n'est pas une action d'empilement ;
+- `generate` doit refuser si une racine BGIG taguee existe deja ;
+- le message doit demander explicitement `regenerate` ou `clear_bgig_scene` ;
+- `regenerate` reste le seul chemin normal pour remplacer une scene BGIG ;
+- aucun objet utilisateur non BGIG ne doit etre supprime.
+
+Une action future d'empilement, par exemple `add_new_scene`, devra etre explicite
+et gatee separement si le produit en a besoin.

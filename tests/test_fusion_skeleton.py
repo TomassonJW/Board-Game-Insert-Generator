@@ -12,7 +12,10 @@ from board_game_insert_generator.config_loader import load_config
 from board_game_insert_generator.layout import generate_basic_layout
 from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     ASSEMBLY_DOCUMENT_REQUIRED_STATUS,
+    BGIG_ACTION_GUIDANCE,
     BGIG_CLEAR_SCOPE,
+    BGIG_EXISTING_SCENE_MESSAGE,
+    BGIG_GENERATE_EXISTING_SCENE_POLICY,
     BGIG_PARAMETRIC_FIELDS_STATUS,
     BGIG_QUICK_PARAMETRIC_BOX_STATUS,
     BGIG_SCENE_ROOT_COMPONENT_NAME,
@@ -331,7 +334,10 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIsNone(request.cad_ir_path)
         self.assertEqual(request.action, FUSION_COMMAND_ACTION_CLEAR)
         self.assertEqual(request.source_kind, "clear_only")
-        self.assertIn("Clear tagged BGIG scene objects", fusion_command_summary(request))
+        summary = fusion_command_summary(request)
+        self.assertIn("Clear tagged BGIG scene objects", summary)
+        self.assertIn(BGIG_GENERATE_EXISTING_SCENE_POLICY, summary)
+        self.assertIn(BGIG_ACTION_GUIDANCE, summary)
 
     def test_parses_and_applies_p12_parametric_config_overrides(self) -> None:
         payload = json.loads((ROOT / "examples" / "simple_asset_product_scene.json").read_text(encoding="utf-8"))
@@ -1048,9 +1054,26 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("non_bgig_objects_preserved", source)
         self.assertIn("quick_parametric_box", source)
         self.assertIn("Config-file overrides only", source)
+        self.assertIn("_count_bgig_scene_roots", source)
+        self.assertIn("_generate_existing_scene_blocked_message", source)
+        self.assertIn("BGIG scenes before", source)
+        self.assertIn("BGIG scenes after", source)
+        self.assertIn("scene_roots_before", source)
+        self.assertIn("scene_roots_after", source)
+        self.assertIn("BGIG_EXISTING_SCENE_MESSAGE", source)
+        self.assertIn("BGIG_GENERATE_EXISTING_SCENE_POLICY", source)
+        skeleton_source = (ROOT / "fusion_addin" / "BoardGameInsertGenerator" / "fusion_skeleton.py").read_text(encoding="utf-8")
+        self.assertIn(BGIG_EXISTING_SCENE_MESSAGE, skeleton_source)
+        self.assertIn(BGIG_GENERATE_EXISTING_SCENE_POLICY, skeleton_source)
         execute_block = source[
             source.index("def _execute_generation_request") : source.index("def _generate_cad_ir_from_config_request")
         ]
+        self.assertIn("scene_roots_before = _count_bgig_scene_roots(design)", execute_block)
+        self.assertIn("request.action == FUSION_COMMAND_ACTION_GENERATE and scene_roots_before > 0", execute_block)
+        self.assertLess(
+            execute_block.index("request.action == FUSION_COMMAND_ACTION_GENERATE and scene_roots_before > 0"),
+            execute_block.index("cad_ir_path = request.cad_ir_path"),
+        )
         self.assertLess(
             execute_block.index("generation_plan = generation_plan_from_cad_ir"),
             execute_block.index("if request.action == FUSION_COMMAND_ACTION_REGENERATE:"),

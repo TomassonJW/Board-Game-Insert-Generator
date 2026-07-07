@@ -20,7 +20,7 @@ Depuis `P6-M002`, il code les encoches simples de paroi depuis
 une vue eclatee basique par occurrences liees : un composant Fusion unique par
 module physique, une occurrence compacte et une occurrence eclatee. Depuis
 `P11-M003`, l'add-in expose une commande UI minimale pour choisir le fichier CAD
-IR et le mode de generation sans modifier manuellement les fichiers texte locaux. Depuis `P12-M002V2`, la commande expose aussi des champs parametriques V0, un flux config BGIG vers CAD IR temporaire, `Regenerate` et `Clear BGIG Scene`.
+IR et le mode de generation sans modifier manuellement les fichiers texte locaux. Depuis `P12-M002V3`, la commande expose aussi des champs parametriques V0, un flux config BGIG vers CAD IR temporaire, `generate` non cumulatif, `Regenerate` et `Clear BGIG Scene`.
 
 Ce que l'add-in cree maintenant :
 
@@ -187,7 +187,7 @@ plus le flux utilisateur recommande.
 
 ## UI parametrique V0
 
-Depuis P12-M002V2, le flux principal reste la commande Fusion
+Depuis P12-M002V3, le flux principal reste la commande Fusion
 `Generate Board Game Insert`, avec des modes explicites :
 
 - `Action` : `generate`, `regenerate` ou `clear_bgig_scene` ;
@@ -212,13 +212,16 @@ rejetes en mode `cad_ir_file` pour eviter une UI decorative. Le mode
 explicitement desactive tant qu'un builder de config temporaire complet n'est pas
 code.
 
-Depuis P12-M002V2, chaque generation cree une occurrence racine taguee
-`BGIG Generated Scene`. `Regenerate` planifie d'abord la nouvelle generation,
-supprime cette scene BGIG taguee si le plan est valide, puis regenere. `Clear
-BGIG Scene` supprime uniquement les objets portant les attributs BGIG, jamais les
-objets utilisateur non BGIG.
+Depuis P12-M002V3, chaque generation cree une occurrence racine taguee
+`BGIG Generated Scene`. `generate` refuse maintenant de creer une nouvelle scene
+si une scene BGIG taguee existe deja dans le document. `regenerate` planifie
+d'abord la nouvelle generation, supprime cette scene BGIG taguee si le plan est
+valide, puis regenere. `clear_bgig_scene` supprime uniquement les objets portant
+les attributs BGIG, jamais les objets utilisateur non BGIG. Le message Fusion
+affiche `BGIG scenes before`, `BGIG objects deleted`, `BGIG scenes after` et
+`Non-BGIG objects preserved`.
 
-Procedure P12-M002V2 recommandee :
+Procedure P12-M002V3 recommandee :
 
 1. Copier l'add-in a jour dans le dossier Fusion AddIns.
 2. Ouvrir un document Fusion Assembly-compatible.
@@ -237,19 +240,25 @@ Procedure P12-M002V2 recommandee :
 9. Laisser les overrides vides ou modifier un override simple, par exemple
    `peripheral_clearance_mm`, puis cliquer `Run`.
 10. Verifier le message final : `Input mode used`, `Project root`, `Config path`,
-    `Input CAD IR`, `BGIG scene roots created`, `Module source mapping`, `Body
-    sizing report`, `Print validation: false`.
-11. Relancer la commande depuis le bouton toolbar, choisir `Action = regenerate`
-    et verifier qu'il n'y a pas de doublons : une seule scene BGIG compacte et
-    une seule zone eclatee doivent rester apres regeneration.
-12. Relancer la commande, choisir `Action = clear_bgig_scene`, cliquer `Run`, puis
-    verifier que la scene BGIG disparait et que l'objet utilisateur non BGIG est
-    preserve.
-13. Tester `Input mode = cad_ir_file` avec un fichier CAD IR existant. Laisser
+    `Input CAD IR`, `BGIG scenes before: 0`, `BGIG scene roots created: 1`,
+    `BGIG scenes after: 1`, `Module source mapping`, `Body sizing report`,
+    `Print validation: false`.
+11. Relancer la commande avec `Action = generate`. L'add-in doit refuser sans
+    creer de doublon et afficher `BGIG scene already exists. Use regenerate or
+    clear first.` avec `BGIG scenes before` et `BGIG scenes after` inchanges.
+12. Relancer la commande depuis le bouton toolbar, choisir `Action = regenerate`
+    deux fois et verifier qu'il n'y a pas de doublons : une seule scene BGIG
+    compacte et une seule zone eclatee doivent rester apres chaque regeneration.
+    Le message doit afficher les scenes detectees avant, les objets BGIG
+    supprimes, les objets non BGIG preserves et les scenes apres generation.
+13. Relancer la commande, choisir `Action = clear_bgig_scene`, cliquer `Run`, puis
+    verifier que la scene BGIG disparait, que `BGIG scenes after: 0` est affiche
+    et que l'objet utilisateur non BGIG est preserve.
+14. Tester `Input mode = cad_ir_file` avec un fichier CAD IR existant. Laisser
     les overrides vides ; si un override est renseigne, l'add-in doit refuser
     clairement au lieu de l'ignorer.
 
-Validation attendue : correction codee, validation Fusion manuelle P12-M002V2
+Validation attendue : correction codee, validation Fusion manuelle P12-M002V3
 requise, `print-validated: false`.
 ## Cas Zero Doc
 
