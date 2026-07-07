@@ -269,3 +269,11 @@ le rapport standard `inspect_bgig_scene` :
 - les entites deja taguees sont exclues de `BGIG-looking untagged entities` ;
 - le rapport standard est court, avec un echantillon limite et des compteurs par
   type d'entite.
+
+Validation Fusion P12-UI-M002V7 apres correction registry inspect :
+
+- inspect avant generation : `BGIG scene roots total: 0`, `Tagged BGIG unique entities: 0`, `BGIG-looking untagged entities: 0`, `Inconsistencies: none` ;
+- generate `config_file` sur `simple_asset_product_scene` : `BGIG scene roots created: 1`, `Registry validation: ok`, `Visible BGIG occurrences actual: 1`, `Legacy bodies created: 0`, `Body sizing report`, `size match yes` ;
+- inspect apres generation : `BGIG scene roots total: 1`, `BGIG scene root occurrences: 1`, entites taguees non redondantes, zero faux positif, `Inconsistencies: none` ;
+- regenerate : ancienne racine supprimee, nouvelle scene creee proprement, pas de doublon/stacking, objets non BGIG preserves ;
+- clear : racine supprimee, `BGIG objects remaining after clear: 0`, objets non BGIG preserves.

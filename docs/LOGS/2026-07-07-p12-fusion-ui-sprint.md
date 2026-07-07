@@ -179,3 +179,14 @@ preservation des objets non BGIG.
 - Impression 3D : non validee.
 - Probleme restant observe : rapport inspect trop verbeux, scene roots total trompeur, repetitions d'entites taguees et faux positifs `BGIG-looking untagged`.
 - Correction : reporting inspect deduplique par cle stable, separation attributs trouves / entites uniques, scene roots limitees aux occurrences racines BGIG, compteurs par type et rapport standard court.
+
+## P12-UI-M002V7 validation Fusion finale apres correction registry inspect
+
+- Validation humaine : OK apres recopie de l'add-in dans Fusion AddIns et usage d'un document Assembly-compatible.
+- Inspect avant generation : `BGIG scene roots total: 0`, `Tagged BGIG unique entities: 0`, `BGIG-looking untagged entities: 0`, `Inconsistencies: none`.
+- Generate `config_file` : `simple_asset_product_scene` generee, `BGIG scene roots before: 0`, `BGIG scene roots created: 1`, `BGIG scene roots after: 1`, `Registry validation: ok`, `Visible BGIG occurrences expected: 1`, `Visible BGIG occurrences actual: 1`, `Legacy bodies created: 0`, `Body sizing report`, `size match yes`.
+- Inspect apres generation : une racine BGIG, une occurrence racine BGIG, entites taguees non redondantes, zero `BGIG-looking untagged`, `Inconsistencies: none`.
+- Regenerate : racine precedente supprimee, nouvelle scene creee proprement, pas de doublon/stacking, objets non BGIG preserves.
+- Clear : racine BGIG supprimee, `BGIG objects remaining after clear: 0`, objets non BGIG preserves.
+- Statut : `fusion-validated`, `print-validated: false`.
+- Prochaine etape : stop sur gate produit avant toute nouvelle extension.
