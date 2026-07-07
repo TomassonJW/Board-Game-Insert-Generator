@@ -98,6 +98,107 @@ class _FakeApplication:
         self.activeDocument = active_document
 
 
+class _FakeAttribute:
+    def __init__(self, group: str, name: str, value: str, parent) -> None:
+        self.group = group
+        self.name = name
+        self.value = value
+        self.parent = parent
+
+
+class _FakeAttributeCollection:
+    def __init__(self, owner) -> None:
+        self.owner = owner
+        self._attributes: list[_FakeAttribute] = []
+
+    def add(self, group: str, name: str, value: str):
+        existing = self.itemByName(group, name)
+        if existing is not None:
+            existing.value = value
+            return existing
+        attribute = _FakeAttribute(group, name, value, self.owner)
+        self._attributes.append(attribute)
+        return attribute
+
+    def itemByName(self, group: str, name: str):
+        for attribute in self._attributes:
+            if attribute.group == group and attribute.name == name:
+                return attribute
+        return None
+
+
+class _FakeFusionEntity:
+    def __init__(self, name: str, token: str) -> None:
+        self.name = name
+        self.entityToken = token
+        self.attributes = _FakeAttributeCollection(self)
+        self.isVisible = True
+        self.isLightBulbOn = True
+
+
+class _FakeOccurrence(_FakeFusionEntity):
+    def __init__(self, name: str, token: str, component=None) -> None:
+        super().__init__(name, token)
+        self.component = component
+        self.deleted = False
+
+    def deleteMe(self):
+        self.deleted = True
+        return True
+
+
+class _FakeComponent(_FakeFusionEntity):
+    def __init__(self, name: str, token: str) -> None:
+        super().__init__(name, token)
+        self.occurrences = _FakeCollection([])
+        self.bRepBodies = _FakeCollection([])
+        self.sketches = _FakeCollection([])
+        self.features = _FakeFeatures([])
+
+
+class _FakeBody(_FakeFusionEntity):
+    pass
+
+
+class _FakeSketch(_FakeFusionEntity):
+    pass
+
+
+class _FakeExtrudeFeature(_FakeFusionEntity):
+    pass
+
+
+class _FakeFeatures:
+    def __init__(self, extrudes: list[object]) -> None:
+        self.extrudeFeatures = _FakeCollection(extrudes)
+
+
+class _FakeCollection:
+    def __init__(self, items: list[object]) -> None:
+        self._items = items
+        self.count = len(items)
+
+    def item(self, index: int):
+        return self._items[index]
+
+    def __iter__(self):
+        return iter(self._items)
+
+
+class _FakeDesignForRegistry:
+    def __init__(self, root_component: _FakeComponent, entities: list[_FakeFusionEntity]) -> None:
+        self.rootComponent = root_component
+        self.entities = entities
+
+    def findAttributes(self, group: str, name: str):
+        found = []
+        for entity in self.entities:
+            for attribute in entity.attributes._attributes:
+                if attribute.group == group and (name == "" or attribute.name == name):
+                    found.append(attribute)
+        return _FakeCollection(found)
+
+
 class FusionSkeletonTests(unittest.TestCase):
     def test_describes_zero_doc_when_application_is_unavailable(self) -> None:
         state = describe_document_state(None)
@@ -380,15 +481,71 @@ class FusionSkeletonTests(unittest.TestCase):
                 "tagged_bgig_entities": 0,
                 "bgig_name_like_untagged_entities": 1,
                 "name_like_untagged_lines": ["- type=Body; name=BGIG orphan body"],
-                "inconsistency_lines": ["- object BGIG visible/name-like without bgig attribute"],
+                "inconsistency_lines": ["- BGIG-looking visible/name-like entity without bgig attribute"],
             }
         )
 
         self.assertIn("Action: inspect_bgig_scene", message)
         self.assertIn("Read-only: yes", message)
-        self.assertIn("Tagged BGIG entities detail", message)
+        self.assertIn("Tagged BGIG unique entities sample", message)
         self.assertIn("BGIG-looking untagged entities", message)
-        self.assertIn("object BGIG visible/name-like without bgig attribute", message)
+        self.assertIn("BGIG-looking visible/name-like entity without bgig attribute", message)
+
+    def test_bgig_registry_inspection_deduplicates_entities_and_scene_roots(self) -> None:
+        root_component = _FakeComponent("Root", "component-root")
+        scene_component = _FakeComponent("BGIG Generated Scene", "component-scene")
+        scene_occurrence = _FakeOccurrence("BGIG Generated Scene:1", "occurrence-scene", scene_component)
+        module_component = _FakeComponent("Grid placed tokens", "component-module")
+        module_occurrence = _FakeOccurrence("Grid placed tokens:1", "occurrence-module", module_component)
+        module_body = _FakeBody("BGIG token module body", "body-module")
+        module_sketch = _FakeSketch("BGIG token module footprint", "sketch-module")
+        module_feature = _FakeExtrudeFeature("BGIG token module extrusion", "feature-module")
+        root_component.occurrences = _FakeCollection([scene_occurrence])
+        scene_component.occurrences = _FakeCollection([module_occurrence])
+        module_component.bRepBodies = _FakeCollection([module_body])
+        module_component.sketches = _FakeCollection([module_sketch])
+        module_component.features = _FakeFeatures([module_feature])
+
+        tagged = [
+            (scene_occurrence, "scene_root", None),
+            (scene_component, "scene_root_component", None),
+            (module_component, "module_component", "module-tokens"),
+            (module_occurrence, "compact_occurrence", "module-tokens"),
+            (module_body, "module_body", "module-tokens"),
+            (module_sketch, "module_sketch", "module-tokens"),
+            (module_feature, "module_extrude", "module-tokens"),
+        ]
+        for entity, role, module_id in tagged:
+            fusion_entrypoint._tag_bgig_entity_direct(entity, role, scene_id="scene-001", module_id=module_id)
+            entity.attributes.add("bgig", "extra_test_attribute", "duplicate-proof")
+
+        design = _FakeDesignForRegistry(
+            root_component,
+            [root_component, scene_occurrence, scene_component, module_component, module_occurrence, module_body, module_sketch, module_feature],
+        )
+        registry = fusion_entrypoint.BgigFusionRegistry(design)
+
+        inspection = registry.inspect()
+        message = fusion_entrypoint._inspection_result_message(inspection)
+
+        self.assertEqual(inspection["root_occurrences_count"], 1)
+        self.assertEqual(inspection["scene_roots_by_name"], 1)
+        self.assertEqual(inspection["scene_roots_by_attribute"], 1)
+        self.assertEqual(inspection["bgig_scene_roots_total"], 1)
+        self.assertEqual(inspection["bgig_scene_root_occurrences"], 1)
+        self.assertEqual(inspection["tagged_bgig_unique_entities"], 7)
+        self.assertGreater(inspection["tagged_bgig_attributes_found"], inspection["tagged_bgig_unique_entities"])
+        self.assertEqual(inspection["bgig_name_like_untagged_entities"], 0)
+        self.assertEqual(inspection["occurrences_tagged"], 2)
+        self.assertEqual(inspection["components_tagged"], 2)
+        self.assertEqual(inspection["bodies_tagged"], 1)
+        self.assertEqual(inspection["sketches_tagged"], 1)
+        self.assertEqual(inspection["features_tagged"], 1)
+        self.assertIn("- none", inspection["inconsistency_lines"])
+        self.assertIn("BGIG scene roots total: 1", message)
+        self.assertIn("Tagged BGIG unique entities: 7", message)
+        self.assertIn("BGIG-looking untagged entities: 0", message)
+        self.assertIn("Inconsistencies:\n- none", message)
 
     def test_parses_and_applies_p12_parametric_config_overrides(self) -> None:
         payload = json.loads((ROOT / "examples" / "simple_asset_product_scene.json").read_text(encoding="utf-8"))
@@ -1148,7 +1305,9 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("BGIG scene roots before", source)
         self.assertIn("BGIG scene roots after", source)
         self.assertIn("BGIG-looking untagged entities", source)
-        self.assertIn("Tagged BGIG entities detail", source)
+        self.assertIn("Tagged BGIG unique entities sample", source)
+        self.assertIn("Tagged BGIG unique entities", source)
+        self.assertIn("BGIG scene root occurrences", source)
         self.assertIn("Registry validation", source)
         self.assertIn("scene_roots_before", source)
         self.assertIn("scene_roots_after", source)

@@ -567,7 +567,7 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Criteres d'acceptation : le mode CAD IR direct reste fonctionnel ; le mode config peut generer une CAD IR temporaire si le repo BGIG est accessible ; regenerate nettoie uniquement les objets BGIG tagues ; clear refuse de supprimer les objets non tagues ; coeur Python sans `adsk` ; validation Fusion manuelle requise.
 - Tests : unitaires hors Fusion, py_compile add-in, CLI Markdown/JSON/export CAD IR exemples P12, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
 - Gate : validation humaine fournie le 2026-07-07 pour P12-UI-M002+ ; smoke test Fusion requis avant `fusion-validated`.
-- Statut : `done`, `implemented-fusion`, correction P12-M002V7 codee, `manual_validation_required`, `print-validated: false`.
+- Statut : `done`, `fusion-validated` fonctionnellement apres P12-UI-M002V7, reporting inspect deduplique code, `print-validated: false`.
 
 ### P12-UI-M002V7 - Valider registry BGIG et inspect read-only
 
@@ -577,8 +577,8 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Livrable : validation humaine Fusion avec generation depuis CAD IR, generation depuis config, regenerate, clear et verification que les objets non BGIG ne sont pas supprimes.
 - Criteres d'acceptation : commande visible ; `compact_only` cree 1 racine BGIG et N occurrences compactes ; `compact_and_exploded` cree 1 racine BGIG, N compactes et N eclatees liees ; aucun helper source ; `Legacy bodies created: 0` ; second `generate` refuse sans doublon ; deux `regenerate` gardent exactement 1 racine BGIG ; `clear_bgig_scene` affiche `BGIG scene roots deleted`, `BGIG objects remaining after clear: 0` et preserve les objets non BGIG ; message final affiche source, action, scene roots before/created/deleted/after, suppressions, `Body sizing report` et `Print validation: false`.
 - Tests : smoke test manuel Fusion, aucune validation d'impression revendiquee.
-- Gate : action humaine requise.
-- Statut : `manual_validation_required`, apres KO critique P12-UI-M002V6 et correction P12-M002V7 codee.
+- Gate : action humaine Thomas realisee pour la validation fonctionnelle P12-UI-M002V7. Smoke test court recommande apres correction du reporting inspect.
+- Statut : `done`, `fusion-validated` fonctionnellement, reporting inspect deduplique code, `print-validated: false`.
 ## Phase 12 - Couvercles, mecanismes et empilement avance
 
 ### P12-M001 - Modeliser les couvercles poses

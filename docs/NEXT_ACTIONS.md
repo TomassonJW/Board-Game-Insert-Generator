@@ -18,7 +18,7 @@ structurant, authentification absente ou refus de push direct.
 
 ## Gate humaine active
 
-Statut : `manual_validation_required`.
+Statut : `manual_validation_required` pour la prochaine extension produit ; P12-UI-M002V7 est validee fonctionnellement.
 
 La gate humaine `P12-NEXT-GATE` a ete levee pour lancer `P12-UI-M002+` vers une
 UI Fusion parametrique V0. La mission code une commande Fusion enrichie avec
@@ -26,25 +26,20 @@ source CAD IR, source config BGIG, overrides parametriques, actions `generate`,
 `regenerate` et `clear_bgig_scene`, generation CAD IR temporaire et nettoyage
 conservateur des objets BGIG tagues.
 
-Action humaine requise : `P12-UI-M002V7` smoke test Fusion avant toute nouvelle
-extension produit.
+Action humaine recommandee : smoke test court du reporting `inspect_bgig_scene` corrige avant toute nouvelle extension produit.
 
 ## Mission ready non gated
 
-Aucune mission non-gated supplementaire n'est recommandee apres P12-M002+. La
-prochaine action est une validation humaine Fusion.
+Aucune mission non-gated supplementaire n'est recommandee apres la correction du reporting inspect. La prochaine action est un smoke test humain court du rapport `inspect_bgig_scene`.
 
 ## Mission bloquee par gate
 
-`P12-UI-M002V7 - Valider registry BGIG et inspect read-only`.
+`P12-UI-M002V7R - Verifier le reporting inspect BGIG deduplique`.
 
 - Capability : `C-FUSION-UI`.
 - Milestone : M14 Usable beta.
-- Objectif : lancer l'add-in dans Fusion, verifier `compact_only` et
-  `compact_and_exploded`, action `inspect_bgig_scene`, une seule racine `BGIG Generated Scene`, tagging
-  `scene_id`/`role`/`module_id`, le refus de `generate`, `regenerate` sans
-  doublon, `clear_bgig_scene` complet et la preservation des objets non BGIG.
-- Statut : `manual_validation_required`, apres correction P12-M002V7 codee.
+- Objectif : verifier que le rapport standard `inspect_bgig_scene` affiche une seule racine BGIG reelle, des entites taguees uniques, zero faux positif `BGIG-looking untagged` quand les objets sont tagues, puis que `generate`/`regenerate`/`clear` restent fonctionnels.
+- Statut : `manual_validation_recommended`, apres validation fonctionnelle P12-UI-M002V7 et correction reporting codee.
 
 `P8-FUSION-GATE - Generation Fusion volumetrique ou vue 3D`.
 

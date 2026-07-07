@@ -237,11 +237,11 @@ La mission `P12-M001` code un lancement UI Fusion relancable par bouton toolbar 
 
 La correction `P12-M002V6` a ete refusee en smoke test Fusion : les objets BGIG visibles n etaient pas retrouves par le tagging, `generate`/`regenerate` empilaient des doublons, `clear_bgig_scene` ne supprimait rien et le reporting pouvait lever `non_bgig_objects_preserved`.
 
-La correction `P12-M002V7` stabilise l UI Fusion parametrique V0 apres KO P12-UI-M002V6 : modes `cad_ir_file` / `config_file` / `quick_parametric_box (disabled)`, project root auto-detecte ou memorise, settings local `bgig_ui_settings.json`, overrides actifs seulement en `config_file`, generation encapsulee sous une occurrence racine unique `BGIG Generated Scene` taguee `bgig:role = scene_root`, `generate` refuse toute scene ou objet BGIG tague deja present, `regenerate` valide puis supprime la racine par `deleteMe()` avant regeneration, et `clear_bgig_scene` doit ramener `BGIG objects remaining after clear` a `0` sans toucher aux objets non BGIG. Statut : `implemented-fusion`, validation Fusion manuelle P12-UI-M002V7 requise, `print-validated: false`.
+La correction `P12-M002V7` stabilise l UI Fusion parametrique V0 apres KO P12-UI-M002V6 : modes `cad_ir_file` / `config_file` / `quick_parametric_box (disabled)`, project root auto-detecte ou memorise, settings local `bgig_ui_settings.json`, overrides actifs seulement en `config_file`, generation encapsulee sous une occurrence racine unique `BGIG Generated Scene` taguee `bgig:role = scene_root`, `generate` refuse toute scene ou objet BGIG tague deja present, `regenerate` valide puis supprime la racine par `deleteMe()` avant regeneration, et `clear_bgig_scene` ramene `BGIG objects remaining after clear` a `0` sans toucher aux objets non BGIG. Validation humaine P12-UI-M002V7 confirmee : `inspect_bgig_scene`, `generate`, anti-doublon, `regenerate`, `compact_only`, `compact_and_exploded`, `clear_bgig_scene` et preservation non-BGIG fonctionnent. Statut : `fusion-validated`, `print-validated: false`. Le reporting standard `inspect_bgig_scene` a ensuite ete simplifie pour dedupliquer les entites, compter une seule racine BGIG reelle et supprimer les faux positifs BGIG-looking.
 
 ## Phase active
 
-Phase active : **P12-UI-M002V7 validation humaine registry/inspect Fusion / gate de smoke test**.
+Phase active : **P12-UI-M002V7 validee fonctionnellement / reporting inspect corrige a smoke-tester**.
 
 Etat : le pipeline P4 reste stable pour les blanks rectangulaires Fusion. La
 vague P5 est terminee cote moteur Python pur, configuration, rapports et CAD IR.
@@ -258,7 +258,7 @@ document Assembly-compatible, avec `print-validated: false`. P11-M002 est
 X/Y/Z. P11-M003 est `fusion-validated` pour la commande UI minimale, le sizing asset-first explicite, la scene produit non ambigue, le mapping source et les occurrences compactes/eclatees liees. P11-M003V2 ajoute le rapport bbox planned/actual ; P11-M003V3 corrige l'affichage de la vraie commande UI ; P11-M003V4 valide le flux UI produit avec `simple_asset_product_scene`. La North
 Star cible un generateur volumetrique asset-first, pilote par capabilities.
 
-Prochaine action recommandee : smoke test humain `P12-UI-M002V7` dans Fusion avant toute nouvelle extension UI, palette persistante, UI assets complete, solveur plus automatique ou nouvelle geometrie Fusion.
+Prochaine action recommandee : smoke test court du reporting `inspect_bgig_scene` corrige avant toute nouvelle extension UI, palette persistante, UI assets complete, solveur plus automatique ou nouvelle geometrie Fusion.
 
 ## Implemente
 
@@ -342,7 +342,7 @@ Prochaine action recommandee : smoke test humain `P12-UI-M002V7` dans Fusion ava
 - Registry Fusion unique `BgigFusionRegistry` responsable de `scene_id`, tagging, recherche d attributs, inspection, clear et validation post-generation.
 - Tagging immediat des roles `scene_root`, `scene_root_component`, `box_reference`, `compact_occurrence`, `exploded_occurrence`, `module_component`, `module_body`, sketches et cuts supportes.
 - `generate` refuse les scenes existantes trouvees par tag ou nom BGIG ; `regenerate` clear puis revalide exactement une scene ; `clear_bgig_scene` preserve les objets non BGIG.
-- UI Fusion parametrique P12-M002V7 : modes explicites, root auto-detecte/memorise, config JSON -> CAD IR temporaire, overrides config-only, scene racine taguee, `generate` refuse les doublons, occurrence racine unique taguee `bgig:role = scene_root`, suppression par `deleteMe()`, occurrence compacte initiale visible, occurrence eclatee liee via `addExistingComponent`, `regenerate` remplace sans doublons attendu et `clear_bgig_scene` supprime la racine, `implemented-fusion`, validation Fusion manuelle requise, `print-validated: false`.
+- UI Fusion parametrique P12-M002V7 : modes explicites, root auto-detecte/memorise, config JSON -> CAD IR temporaire, overrides config-only, scene racine taguee, `generate` refuse les doublons, occurrence racine unique taguee `bgig:role = scene_root`, suppression par `deleteMe()`, occurrence compacte initiale visible, occurrence eclatee liee via `addExistingComponent`, `regenerate` remplace sans doublons et `clear_bgig_scene` supprime la racine, `fusion-validated`, reporting inspect standard deduplique, `print-validated: false`.
 - Vue eclatee Fusion P7-M001 basique : composants physiques uniques avec
   occurrences compactes/eclatees liees, garde-fou `assembly document required`
   si le document actif est un Part Design incompatible, sans renommage direct de
@@ -436,14 +436,14 @@ python -m board_game_insert_generator examples/simple_box.json --format markdown
 
 Derniere verification pendant `P12-M002V7 - Registry BGIG et inspect read-only` :
 
-- `python -m unittest discover -s tests` : OK, 168 tests passes.
+- `python -m unittest discover -s tests` : OK, 169 tests passes.
 - `python -m py_compile fusion_addin/BoardGameInsertGenerator/BoardGameInsertGenerator.py` : OK.
 - `python -m py_compile fusion_addin/BoardGameInsertGenerator/fusion_skeleton.py` : OK.
 - CLI Markdown/JSON : OK sur `simple_asset_product_scene.json`, `simple_asset_executable_plan.json`, `simple_multilayer_grid_scene.json`, `simple_tray.json` et `simple_finger_notch_tray.json`.
 - Export CAD IR : OK sur `simple_asset_product_scene.json`, `simple_asset_executable_plan.json`, `simple_multilayer_grid_scene.json`, `simple_tray.json` et `simple_finger_notch_tray.json`.
 - `git diff --check` : OK.
 - `rg -n "adsk" src/board_game_insert_generator` : OK, aucune occurrence dans le coeur Python.
-- Validation Fusion reelle : `P12-UI-M002V7` requise. P12-M002V7 est codee et testee hors Fusion ; impression 3D non validee.
+- Validation Fusion reelle : `P12-UI-M002V7` fonctionnelle confirmee. Reporting inspect deduplique code et teste hors Fusion ; smoke test court recommande. Impression 3D non validee.
 ## Risques actifs
 
 - Le moteur a deja des concepts futurs dans `models.py`; il faut eviter de les

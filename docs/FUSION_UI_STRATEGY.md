@@ -250,3 +250,22 @@ Smoke test P12-UI-M002V7 :
 Si `inspect_bgig_scene` voit un objet BGIG par nom mais sans attribut, copier le
 rapport complet : c'est maintenant le diagnostic primaire pour corriger le niveau
 exact de creation/tagging Fusion.
+
+## P12-M002V7R - reporting inspect BGIG deduplique
+
+La validation humaine `P12-UI-M002V7` confirme le fonctionnement Fusion de
+`inspect_bgig_scene`, `generate`, l'anti-doublon, `regenerate`, `compact_only`,
+`compact_and_exploded`, `clear_bgig_scene` et la preservation des objets non
+BGIG. L'impression 3D reste non validee.
+
+La correction courante ne change pas la generation ni la geometrie. Elle corrige
+le rapport standard `inspect_bgig_scene` :
+
+- les attributs BGIG trouves sont distingues des entites BGIG uniques ;
+- une meme entite portant plusieurs attributs n'est plus repetee ;
+- `scene_root_component`, `box_reference`, `module_component`, bodies, sketches
+  et features ne sont plus comptes comme scene roots ;
+- `BGIG scene roots total` compte uniquement les occurrences racines BGIG ;
+- les entites deja taguees sont exclues de `BGIG-looking untagged entities` ;
+- le rapport standard est court, avec un echantillon limite et des compteurs par
+  type d'entite.

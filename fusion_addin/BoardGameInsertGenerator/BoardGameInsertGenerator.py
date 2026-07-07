@@ -654,35 +654,48 @@ def _generate_existing_scene_blocked_message(
 
 
 def _inspection_result_message(inspection: dict[str, object]) -> str:
-    tagged_lines = "\n".join(str(line) for line in inspection.get("tagged_entity_lines", [])) or "- none"
-    name_like_lines = "\n".join(str(line) for line in inspection.get("name_like_untagged_lines", [])) or "- none"
-    inconsistencies = "\n".join(str(line) for line in inspection.get("inconsistency_lines", [])) or "- none"
+    tagged_lines = _limited_report_lines(inspection.get("tagged_entity_lines", []), limit=10)
+    name_like_lines = _limited_report_lines(inspection.get("name_like_untagged_lines", []), limit=8)
+    inconsistencies = _limited_report_lines(inspection.get("inconsistency_lines", []), limit=8)
     return (
         "Board Game Insert Generator scene inspection.\n"
         "Action: inspect_bgig_scene\n"
         "Read-only: yes\n"
-        f"Root occurrences: {inspection.get('root_occurrences_count', 0)}\n"
+        f"Root occurrences visible: {inspection.get('root_occurrences_count', 0)}\n"
         f"Root occurrence names: {inspection.get('root_occurrence_names', 'none')}\n"
-        f"Components: {inspection.get('components_count', 0)}\n"
-        f"Component names: {inspection.get('component_names', 'none')}\n"
-        f"Bodies: {inspection.get('bodies_count', 0)}\n"
-        f"Body names: {inspection.get('body_names', 'none')}\n"
-        f"Sketches: {inspection.get('sketches_count', 0)}\n"
-        f"Sketch names: {inspection.get('sketch_names', 'none')}\n"
+        f"BGIG scene root occurrences: {inspection.get('bgig_scene_root_occurrences', 0)}\n"
         f"BGIG Generated Scene by name: {inspection.get('scene_roots_by_name', 0)}\n"
-        f"BGIG Generated Scene by attribute: {inspection.get('scene_roots_by_attribute', 0)}\n"
+        f"BGIG Generated Scene by scene_root attribute: {inspection.get('scene_roots_by_attribute', 0)}\n"
         f"BGIG scene roots total: {inspection.get('bgig_scene_roots_total', 0)}\n"
-        f"Tagged BGIG entities: {inspection.get('tagged_bgig_entities', 0)}\n"
+        f"Tagged BGIG attributes found: {inspection.get('tagged_bgig_attributes_found', 0)}\n"
+        f"Tagged BGIG unique entities: {inspection.get('tagged_bgig_unique_entities', inspection.get('tagged_bgig_entities', 0))}\n"
+        f"Occurrences tagged: {inspection.get('occurrences_tagged', 0)}\n"
+        f"Components tagged: {inspection.get('components_tagged', 0)}\n"
+        f"Bodies tagged: {inspection.get('bodies_tagged', 0)}\n"
+        f"Sketches tagged: {inspection.get('sketches_tagged', 0)}\n"
+        f"Features tagged: {inspection.get('features_tagged', 0)}\n"
+        f"Tagged roles: {inspection.get('role_count_summary', 'none')}\n"
         f"BGIG-looking untagged entities: {inspection.get('bgig_name_like_untagged_entities', 0)}\n"
-        "Tagged BGIG entities detail:\n"
+        "Tagged BGIG unique entities sample:\n"
         f"{tagged_lines}\n"
-        "BGIG-looking untagged entities detail:\n"
+        "BGIG-looking untagged entities sample:\n"
         f"{name_like_lines}\n"
         "Inconsistencies:\n"
         f"{inconsistencies}\n"
         f"Registry validation status: {inspection.get('registry_status', 'inspect_only')}\n"
         "Status: manual validation required in Fusion 360."
     )
+
+
+def _limited_report_lines(lines, limit: int = 10) -> str:  # noqa: ANN001
+    if not isinstance(lines, list) or not lines:
+        return "- none"
+    rendered = [str(line) for line in lines[:limit]]
+    remaining = len(lines) - len(rendered)
+    if remaining > 0:
+        rendered.append(f"- ... {remaining} more omitted from standard report")
+    return "\n".join(rendered)
+
 
 def _clear_result_message(clear_result: dict[str, object]) -> str:
     return (
@@ -871,48 +884,65 @@ class BgigFusionRegistry:
 
     def inspect(self) -> dict[str, object]:
         root_occurrences = self.root_occurrences()
+        all_occurrences = self.all_occurrences()
         components = self.components()
         bodies = self.bodies(components)
         sketches = self.sketches(components)
+        features = self.features(components)
         tagged_entities = self.tagged_entities()
-        scene_roots_by_attribute = self.scene_root_occurrences_by_attribute(tagged_entities)
+        scene_roots_by_attribute = self.scene_root_occurrences_by_attribute(root_occurrences)
         scene_roots_by_name = self.scene_root_occurrences_by_name(root_occurrences)
         scene_roots = self._unique_entities([*scene_roots_by_attribute, *scene_roots_by_name])
-        tagged_ids = {id(entity) for entity, _role in tagged_entities}
+        tagged_keys = {self.entity_key(entity) for entity, _role in tagged_entities}
+        candidate_entities = self._unique_entities([*root_occurrences, *components, *bodies, *sketches, *features])
         name_like = [
             entity
-            for entity in [*root_occurrences, *components, *bodies, *sketches]
-            if id(entity) not in tagged_ids and _looks_like_bgig_name(entity)
+            for entity in candidate_entities
+            if self.entity_key(entity) not in tagged_keys
+            and not self.has_bgig_attribute(entity)
+            and _looks_like_bgig_name(entity)
         ]
+        role_counts = self.role_counts(tagged_entities)
+        type_counts = self.type_counts(tagged_entities)
         tagged_lines = [self.entity_report_line(entity, role) for entity, role in tagged_entities]
         name_like_lines = [self.entity_report_line(entity, None) for entity in name_like]
         inconsistencies: list[str] = []
         if name_like:
-            inconsistencies.append("- object BGIG visible/name-like without bgig attribute")
+            inconsistencies.append("- BGIG-looking visible/name-like entity without bgig attribute")
         if scene_roots_by_name and not scene_roots_by_attribute:
-            inconsistencies.append("- BGIG Generated Scene found by name but not by attribute")
+            inconsistencies.append("- BGIG Generated Scene found by name but not by scene_root attribute")
         if not scene_roots and tagged_entities:
-            inconsistencies.append("- tagged BGIG entities exist but no scene root was found")
-        tagged_roles = {role for _entity, role in tagged_entities}
-        if COMPACT_OCCURRENCE_ROLE not in tagged_roles and tagged_entities:
-            inconsistencies.append("- no compact occurrence tag found among BGIG entities")
+            inconsistencies.append("- tagged BGIG entities exist but no root occurrence was found")
         if not inconsistencies:
             inconsistencies.append("- none")
 
         return {
             "root_occurrences_count": len(root_occurrences),
             "root_occurrence_names": _join_names(root_occurrences),
+            "all_occurrences_count": len(all_occurrences),
             "components_count": len(components),
             "component_names": _join_names(components),
             "bodies_count": len(bodies),
             "body_names": _join_names(bodies),
             "sketches_count": len(sketches),
             "sketch_names": _join_names(sketches),
+            "features_count": len(features),
+            "feature_names": _join_names(features),
             "scene_roots_by_name": len(scene_roots_by_name),
             "scene_roots_by_attribute": len(scene_roots_by_attribute),
             "bgig_scene_roots_total": len(scene_roots),
+            "bgig_scene_root_occurrences": len(scene_roots),
             "tagged_bgig_entities": len(tagged_entities),
+            "tagged_bgig_unique_entities": len(tagged_entities),
+            "tagged_bgig_attributes_found": self.bgig_attribute_count(),
             "bgig_name_like_untagged_entities": len(name_like),
+            "occurrences_tagged": type_counts.get("occurrence", 0),
+            "components_tagged": type_counts.get("component", 0),
+            "bodies_tagged": type_counts.get("body", 0),
+            "sketches_tagged": type_counts.get("sketch", 0),
+            "features_tagged": type_counts.get("feature", 0),
+            "role_count_summary": _format_counts(role_counts),
+            "type_count_summary": _format_counts(type_counts),
             "tagged_entity_lines": tagged_lines,
             "name_like_untagged_lines": name_like_lines,
             "inconsistency_lines": inconsistencies,
@@ -924,9 +954,10 @@ class BgigFusionRegistry:
         if scene_roots_before is None:
             scene_roots_before = int(before["bgig_scene_roots_total"])
         tagged_before = self.tagged_entities()
+        root_occurrences = self.root_occurrences()
         scene_roots = self._unique_entities([
-            *self.scene_root_occurrences_by_attribute(tagged_before),
-            *self.scene_root_occurrences_by_name(self.root_occurrences()),
+            *self.scene_root_occurrences_by_attribute(root_occurrences),
+            *self.scene_root_occurrences_by_name(root_occurrences),
         ])
         scene_roots_deleted = 0
         skipped = 0
@@ -985,7 +1016,7 @@ class BgigFusionRegistry:
                 entity = getattr(attribute, "parent", None)
                 if entity is None:
                     continue
-                entity_key = id(entity)
+                entity_key = self.entity_key(entity)
                 if entity_key in seen_entities:
                     continue
                 role = self.role(entity)
@@ -1028,8 +1059,13 @@ class BgigFusionRegistry:
     def all_occurrences(self) -> list[object]:
         all_occurrences: list[object] = []
         stack = list(self.root_occurrences())
+        seen = set()
         while stack:
             occurrence = stack.pop(0)
+            key = self.entity_key(occurrence)
+            if key in seen:
+                continue
+            seen.add(key)
             all_occurrences.append(occurrence)
             component = getattr(occurrence, "component", None)
             child_occurrences = getattr(component, "occurrences", None)
@@ -1040,19 +1076,28 @@ class BgigFusionRegistry:
         bodies: list[object] = []
         for component in components:
             bodies.extend(_iter_fusion_collection(getattr(component, "bRepBodies", None)))
-        return bodies
+        return self._unique_entities(bodies)
 
     def sketches(self, components: list[object]) -> list[object]:
         sketches: list[object] = []
         for component in components:
             sketches.extend(_iter_fusion_collection(getattr(component, "sketches", None)))
-        return sketches
+        return self._unique_entities(sketches)
 
-    def scene_root_occurrences_by_attribute(self, tagged_entities: list[tuple[object, str | None]]) -> list[object]:
+    def features(self, components: list[object]) -> list[object]:
+        features: list[object] = []
+        for component in components:
+            component_features = getattr(component, "features", None)
+            if component_features is None:
+                continue
+            features.extend(_iter_fusion_collection(getattr(component_features, "extrudeFeatures", None)))
+        return self._unique_entities(features)
+
+    def scene_root_occurrences_by_attribute(self, root_occurrences: list[object]) -> list[object]:
         return [
-            entity
-            for entity, role in tagged_entities
-            if role in (BGIG_SCENE_ROOT_ROLE, "scene_root_occurrence") and getattr(entity, "deleteMe", None) is not None
+            occurrence
+            for occurrence in root_occurrences
+            if self.role(occurrence) in (BGIG_SCENE_ROOT_ROLE, "scene_root_occurrence")
         ]
 
     def scene_root_occurrences_by_name(self, root_occurrences: list[object]) -> list[object]:
@@ -1060,7 +1105,30 @@ class BgigFusionRegistry:
         for occurrence in root_occurrences:
             if _strict_bgig_scene_root_name(occurrence):
                 roots.append(occurrence)
-        return roots
+        return self._unique_entities(roots)
+
+    def bgig_attribute_count(self) -> int:
+        return sum(len(self.find_attributes(group_name, "")) for group_name in _bgig_attribute_groups())
+
+    def has_bgig_attribute(self, entity) -> bool:  # noqa: ANN001
+        return self.role(entity) is not None or self.generated_by(entity) == BGIG_ATTRIBUTE_VALUE
+
+    def role_counts(self, tagged_entities: list[tuple[object, str | None]]) -> dict[str, int]:
+        counts: dict[str, int] = {}
+        for _entity, role in tagged_entities:
+            key = role or "unknown"
+            counts[key] = counts.get(key, 0) + 1
+        return counts
+
+    def type_counts(self, tagged_entities: list[tuple[object, str | None]]) -> dict[str, int]:
+        counts: dict[str, int] = {}
+        for entity, _role in tagged_entities:
+            key = _bgig_entity_category(entity)
+            counts[key] = counts.get(key, 0) + 1
+        return counts
+
+    def entity_key(self, entity) -> str:  # noqa: ANN001
+        return _stable_entity_key(entity)
 
     def role(self, entity) -> str | None:  # noqa: ANN001
         return _bgig_attribute_value(entity, BGIG_ATTRIBUTE_ROLE_KEY)
@@ -1089,7 +1157,7 @@ class BgigFusionRegistry:
         unique = []
         seen = set()
         for entity in entities:
-            key = id(entity)
+            key = self.entity_key(entity)
             if key in seen:
                 continue
             seen.add(key)
@@ -1112,6 +1180,55 @@ def _iter_fusion_collection(collection) -> list[object]:  # noqa: ANN001
         return []
 
 
+def _stable_entity_key(entity) -> str:  # noqa: ANN001
+    if entity is None:
+        return "none"
+    for attribute_name in ("entityToken", "tempId", "id"):
+        try:
+            value = getattr(entity, attribute_name, None)
+            if value not in (None, ""):
+                return f"{attribute_name}:{value}"
+        except Exception:
+            pass
+    component = getattr(entity, "component", None)
+    parent_component = getattr(entity, "parentComponent", None)
+    assembly_context = getattr(entity, "assemblyContext", None)
+    context = _safe_entity_name(component) or _safe_entity_name(parent_component) or _safe_entity_name(assembly_context)
+    return f"{_bgig_entity_category(entity)}:{_fusion_entity_type(entity)}:{context}:{_safe_entity_name(entity)}"
+
+
+def _bgig_entity_category(entity) -> str:  # noqa: ANN001
+    type_text = _fusion_entity_type(entity).lower()
+    if "occurrence" in type_text:
+        return "occurrence"
+    if "component" in type_text:
+        return "component"
+    if "body" in type_text or "brep" in type_text:
+        return "body"
+    if "sketch" in type_text:
+        return "sketch"
+    if "feature" in type_text or "extrude" in type_text:
+        return "feature"
+    role = _bgig_entity_role(entity)
+    if role in (COMPACT_OCCURRENCE_ROLE, EXPLODED_OCCURRENCE_ROLE, BGIG_SCENE_ROOT_ROLE, "scene_root_occurrence"):
+        return "occurrence"
+    if role in ("scene_root_component", "module_component"):
+        return "component"
+    if role == "module_body":
+        return "body"
+    if (role and role.endswith("_sketch")) or role in {"box_reference", "reference_outline"}:
+        return "sketch"
+    if (role and role.endswith("_cut")) or role == "module_extrude":
+        return "feature"
+    return "other"
+
+
+def _format_counts(counts: dict[str, int]) -> str:
+    if not counts:
+        return "none"
+    return ", ".join(f"{key}={counts[key]}" for key in sorted(counts))
+
+
 def _find_bgig_attributes(design, group_name: str, attribute_name: str):  # noqa: ANN001 - Fusion API object.
     return BgigFusionRegistry(design).find_attributes(group_name, attribute_name)
 
@@ -1122,10 +1239,10 @@ def _collect_bgig_tagged_entities(design) -> list[tuple[object, str | None]]:  #
 
 def _bgig_scene_root_occurrences(design) -> list[object]:  # noqa: ANN001 - Fusion API object.
     registry = BgigFusionRegistry(design)
-    tagged = registry.tagged_entities()
+    root_occurrences = registry.root_occurrences()
     return registry._unique_entities([
-        *registry.scene_root_occurrences_by_attribute(tagged),
-        *registry.scene_root_occurrences_by_name(registry.root_occurrences()),
+        *registry.scene_root_occurrences_by_attribute(root_occurrences),
+        *registry.scene_root_occurrences_by_name(root_occurrences),
     ])
 
 

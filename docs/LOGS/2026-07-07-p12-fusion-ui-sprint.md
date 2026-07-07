@@ -172,3 +172,10 @@ preservation des objets non BGIG.
 - Correction : ajout de l'action UI read-only `inspect_bgig_scene`, introduction de `BgigFusionRegistry`, tagging centralise avec `scene_id`, `role`, `module_id`, recherche par `Design.findAttributes("bgig", "")`, fallback strict par nom `BGIG Generated Scene`, validation post-generation obligatoire.
 - Geometrie Fusion : inchangee ; aucune nouvelle feature produit, aucun solveur, aucune tolerance modifiee.
 - Validation : tests hors Fusion requis puis smoke test humain P12-UI-M002V7.
+
+## P12-UI-M002V7 validation + correction reporting inspect
+
+- Validation humaine : `inspect_bgig_scene`, `generate`, anti-doublon, `regenerate`, `compact_only`, `compact_and_exploded`, `clear_bgig_scene` et preservation non-BGIG OK.
+- Impression 3D : non validee.
+- Probleme restant observe : rapport inspect trop verbeux, scene roots total trompeur, repetitions d'entites taguees et faux positifs `BGIG-looking untagged`.
+- Correction : reporting inspect deduplique par cle stable, separation attributs trouves / entites uniques, scene roots limitees aux occurrences racines BGIG, compteurs par type et rapport standard court.
