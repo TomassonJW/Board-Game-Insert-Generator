@@ -18,19 +18,13 @@ structurant, authentification absente ou refus de push direct.
 
 ## Gate humaine active
 
-Statut : `manual_validation_required` pour la prochaine extension produit ; P12-UI-M002V7 est `fusion-validated`.
+Statut : `manual_validation_required` pour `P12-M003V` ; P12-M003 est code et doit etre valide dans Fusion.
 
-La gate humaine `P12-NEXT-GATE` a ete levee pour lancer `P12-UI-M002+` vers une
-UI Fusion parametrique V0. La mission code une commande Fusion enrichie avec
-source CAD IR, source config BGIG, overrides parametriques, actions `generate`,
-`regenerate` et `clear_bgig_scene`, generation CAD IR temporaire et nettoyage
-conservateur des objets BGIG tagues.
-
-Action humaine recommandee : decision produit explicite avant toute extension UI, palette persistante, UI assets complete, solveur plus automatique ou nouvelle geometrie Fusion.
+La gate humaine `P12-M003` a ete levee et la mission code le mode `quick_parametric_box` fonctionnel. Action humaine recommandee : realiser le smoke test Fusion P12-M003V avant toute nouvelle extension produit.
 
 ## Mission ready non gated
 
-Aucune mission non-gated supplementaire n'est recommandee apres la validation Fusion P12-UI-M002V7. Stopper sur gate produit avant la prochaine extension.
+Aucune mission non-gated supplementaire n'est recommandee avant validation Fusion P12-M003V. Stopper sur gate produit apres cette mission.
 
 ## Mission bloquee par gate
 

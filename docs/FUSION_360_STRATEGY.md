@@ -1,4 +1,4 @@
-# Fusion 360 Strategy
+﻿# Fusion 360 Strategy
 
 ## Decision centrale
 
@@ -701,3 +701,10 @@ Validation Fusion P12-UI-M002V7 apres correction registry inspect :
 - inspect apres generation : `BGIG scene roots total: 1`, `BGIG scene root occurrences: 1`, entites taguees non redondantes, zero faux positif, `Inconsistencies: none` ;
 - regenerate : ancienne racine supprimee, nouvelle scene creee proprement, pas de doublon/stacking, objets non BGIG preserves ;
 - clear : racine supprimee, `BGIG objects remaining after clear: 0`, objets non BGIG preserves.
+## P12-M003 - quick_parametric_box fonctionnel
+
+`quick_parametric_box` est code comme un flux UI borne et CAD-agnostic : Fusion lit les champs de commande, construit une CAD IR temporaire minimale, puis reutilise le pipeline existant de generation CAD IR. Le mode genere une scene V0 simple avec une boite de reference et un module rectangulaire imprimable derive d'une cellule de grille.
+
+Ce mode ne lance pas de solveur assets, ne change pas les tolerances par defaut et ne genere aucune nouvelle geometrie avancee. Il expose dans le message Fusion les valeurs saisies, la taille theorique de cellule, la taille imprimable planifiee, le `Body sizing report` et `Print validation: false`.
+
+Statut : `implemented-fusion`, validation Fusion manuelle `P12-M003V` requise avant `fusion-validated`.

@@ -1,4 +1,4 @@
-# CAD IR Contract
+﻿# CAD IR Contract
 
 ## Objectif
 
@@ -345,8 +345,7 @@ attributs ne font pas partie du contrat CAD IR.
 
 P12-M002V2 ne change pas `schema_version` et ne modifie pas la CAD IR V0.
 L'add-in expose des modes d'entree UI : `cad_ir_file`, `config_file` et
-`quick_parametric_box` desactive. Seul `config_file` peut appliquer des overrides
-avant generation d'une CAD IR temporaire.
+`quick_parametric_box` fonctionnel. `config_file` peut appliquer des overrides avant generation d'une CAD IR temporaire depuis le coeur Python ; `quick_parametric_box` construit une CAD IR temporaire minimale directement depuis les champs UI, sans changer `schema_version`.
 
 Le fichier `bgig_ui_settings.json` est un fichier local d'add-in, hors contrat
 CAD IR. Il memorise des chemins utilisateur pour eviter de retaper project root
@@ -360,3 +359,15 @@ racine `BGIG Generated Scene` taguee `bgig:role = scene_root`.
 
 Cette strategie est additive cote adaptateur et ne change pas le contrat CAD IR
 V0 ni les dimensions exportees.
+### Note P12-M003 - CAD IR temporaire quick_parametric_box
+
+P12-M003 ne change pas `schema_version`. Le mode Fusion `quick_parametric_box` produit une CAD IR V0 temporaire locale avec :
+
+- une boite de reference non imprimable ;
+- un composant `quick-parametric-module` ;
+- un corps `rectangular_blank` ;
+- `theoretical_size_mm` issu d'une cellule de grille ;
+- `printable_size_mm` issu des clearances et de l'epaisseur de fond ;
+- metadata `quick_parametric_box` listant boite, grille, epaisseurs, clearances, profil et `print_validation: false`.
+
+Fusion consomme cette CAD IR et ne recalcule pas le layout, les clearances ou les tolerances.

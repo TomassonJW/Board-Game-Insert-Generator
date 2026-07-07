@@ -15,12 +15,28 @@ from board_game_insert_generator.validation import ValidationError
 
 def main(argv: list[str] | None = None) -> int:
     arguments = list(sys.argv[1:] if argv is None else argv)
+    if arguments and arguments[0] in {"-h", "--help"}:
+        _print_top_level_help()
+        return 0
     if arguments and arguments[0] == "diagnose":
         return _diagnose(arguments[1:])
     if arguments and arguments[0] == "export-cad-ir":
         return _export_cad_ir(arguments[1:])
     return _report(arguments)
 
+
+
+def _print_top_level_help() -> None:
+    print(
+        "Board Game Insert Generator CLI\n"
+        "\n"
+        "Usage:\n"
+        "  python -m board_game_insert_generator CONFIG --format markdown|json [--output PATH]\n"
+        "  python -m board_game_insert_generator diagnose CONFIG\n"
+        "  python -m board_game_insert_generator export-cad-ir CONFIG --output PATH\n"
+        "\n"
+        "CAD IR export is a subcommand named export-cad-ir; it is not an --export-cad-ir option."
+    )
 
 def _report(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(

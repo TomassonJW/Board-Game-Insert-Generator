@@ -118,15 +118,14 @@ parametriques pouvaient sembler decoratifs.
 La correction P12-M002V2 fixe la strategie :
 
 - `Input mode` est explicite : `cad_ir_file`, `config_file`,
-  `quick_parametric_box (disabled)` ;
+  `quick_parametric_box` ;
 - `config_file` est le flux utilisateur par defaut quand le repo BGIG est detecte ;
 - le project root est resolu via champ UI, `BGIG_PROJECT_ROOT`, auto-detection,
   puis `C:\Users\janko\Documents\BGIG` en dev mode ;
 - les chemins valides sont memorises dans `bgig_ui_settings.json` local a l'add-in ;
 - les champs parametriques sont des overrides `config_file` uniquement et sont
   rejetes en `cad_ir_file` ;
-- `quick_parametric_box` reste visible comme cible produit, mais desactive tant
-  qu'il n'existe pas de builder de config complet ;
+- `quick_parametric_box` etait visible comme cible produit mais non fonctionnel dans P12-M002V2 ; depuis P12-M003, il est actif via CAD IR temporaire minimale ;
 - chaque generation cree une racine Fusion taguee `BGIG Generated Scene` ;
 - `regenerate` planifie d'abord la generation, supprime l'ancienne scene BGIG
   taguee seulement si le plan est valide, puis regenere ;
@@ -277,3 +276,10 @@ Validation Fusion P12-UI-M002V7 apres correction registry inspect :
 - inspect apres generation : `BGIG scene roots total: 1`, `BGIG scene root occurrences: 1`, entites taguees non redondantes, zero faux positif, `Inconsistencies: none` ;
 - regenerate : ancienne racine supprimee, nouvelle scene creee proprement, pas de doublon/stacking, objets non BGIG preserves ;
 - clear : racine supprimee, `BGIG objects remaining after clear: 0`, objets non BGIG preserves.
+## P12-M003 - quick_parametric_box fonctionnel
+
+`quick_parametric_box` est code comme un flux UI borne et CAD-agnostic : Fusion lit les champs de commande, construit une CAD IR temporaire minimale, puis reutilise le pipeline existant de generation CAD IR. Le mode genere une scene V0 simple avec une boite de reference et un module rectangulaire imprimable derive d'une cellule de grille.
+
+Ce mode ne lance pas de solveur assets, ne change pas les tolerances par defaut et ne genere aucune nouvelle geometrie avancee. Il expose dans le message Fusion les valeurs saisies, la taille theorique de cellule, la taille imprimable planifiee, le `Body sizing report` et `Print validation: false`.
+
+Statut : `implemented-fusion`, validation Fusion manuelle `P12-M003V` requise avant `fusion-validated`.

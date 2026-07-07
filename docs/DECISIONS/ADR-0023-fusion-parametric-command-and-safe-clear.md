@@ -1,4 +1,4 @@
-# ADR-0023 - Fusion parametric command and safe clear
+﻿# ADR-0023 - Fusion parametric command and safe clear
 
 ## Statut
 
@@ -123,3 +123,9 @@ Decision corrective :
 
 Une action future d'empilement, par exemple `add_new_scene`, devra etre explicite
 et gatee separement si le produit en a besoin.
+
+## Revision P12-M003
+
+La gate humaine P12-M003 leve la restriction `quick_parametric_box` visible mais desactive. Le mode devient fonctionnel de maniere bornee : il construit une CAD IR temporaire minimale directement depuis les champs UI et reutilise le pipeline Fusion CAD IR existant.
+
+Cette revision ne change pas le contrat CAD IR V0, ne modifie pas les valeurs de tolerance par defaut, ne lance pas de solveur assets et ne revendique aucune validation d'impression. La validation Fusion manuelle `P12-M003V` reste obligatoire avant de passer la capability en `fusion-validated` pour ce mode.

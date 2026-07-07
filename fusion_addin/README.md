@@ -1,4 +1,4 @@
-# Fusion Add-in Skeleton
+﻿# Fusion Add-in Skeleton
 
 ## Statut
 
@@ -191,7 +191,7 @@ Depuis P12-M002V3, le flux principal reste la commande Fusion
 `Generate Board Game Insert`, avec des modes explicites :
 
 - `Action` : `generate`, `regenerate` ou `clear_bgig_scene` ;
-- `Input mode` : `cad_ir_file`, `config_file`, ou `quick_parametric_box (disabled)` ;
+- `Input mode` : `cad_ir_file`, `config_file`, ou `quick_parametric_box` ;
 - `CAD IR JSON path (cad_ir_file)` pour charger une CAD IR existante ;
 - `BGIG config JSON path (config_file)` pour generer une CAD IR temporaire depuis une config ;
 - `BGIG project root (auto/memorized, optional)` ;
@@ -208,9 +208,7 @@ memorises dans `bgig_ui_settings.json` dans le dossier de l'add-in.
 
 Les champs numeriques sont de vrais overrides de la config choisie. Ils sont
 rejetes en mode `cad_ir_file` pour eviter une UI decorative. Le mode
-`quick_parametric_box` reste visible comme cible produit, mais il est
-explicitement desactive tant qu'un builder de config temporaire complet n'est pas
-code.
+`quick_parametric_box` est fonctionnel depuis P12-M003. Il construit une CAD IR temporaire minimale directement depuis les champs UI et genere un module rectangulaire V0. Il ne remplace pas encore une UI assets complete et ne valide aucune impression 3D.
 
 
 ### Archive P12-M002V5 - occurrence compacte initiale visible, remplacee par P12-M002V6
@@ -589,3 +587,37 @@ le rapport standard `inspect_bgig_scene` :
 - les entites deja taguees sont exclues de `BGIG-looking untagged entities` ;
 - le rapport standard est court, avec un echantillon limite et des compteurs par
   type d'entite.
+
+## P12-M003 - quick_parametric_box fonctionnel
+
+Le mode `quick_parametric_box` permet de generer une scene V0 sans fichier de config BGIG. L'utilisateur renseigne les dimensions internes de boite, les unites de grille X/Y/Z, les epaisseurs, clearances et le profil d'impression. L'add-in cree alors une CAD IR temporaire locale `bgig_ui_generated_cad_ir.json`, puis la consomme comme les autres flux CAD IR.
+
+Champs requis pour ce mode :
+
+- `box_inner_x_mm`, `box_inner_y_mm`, `box_inner_z_mm` ;
+- `grid_units_x`, `grid_units_y`, `grid_units_z` ;
+- `wall_thickness_mm`, `floor_thickness_mm` ;
+- `peripheral_clearance_mm`, `inter_module_clearance_mm` ;
+- `print_profile` optionnel.
+
+Procedure smoke test P12-M003V :
+
+1. Copier l'add-in a jour dans le dossier Fusion AddIns.
+2. Ouvrir un document Fusion Assembly-compatible propre.
+3. Lancer `BoardGameInsertGenerator` puis la commande `Generate Board Game Insert`.
+4. Choisir `Action = generate`, `Input mode = quick_parametric_box` et `Generation mode = compact_only`.
+5. Renseigner par exemple : `box_inner_x_mm = 120`, `box_inner_y_mm = 80`, `box_inner_z_mm = 30`, `grid_units_x = 4`, `grid_units_y = 4`, `grid_units_z = 3`, `wall_thickness_mm = 1.2`, `floor_thickness_mm = 1.2`, `peripheral_clearance_mm = 0.4`, `inter_module_clearance_mm = 0.3`, `print_profile = draft`.
+6. Valider la commande.
+7. Attendu : generation OK, `Input mode used: quick_parametric_box`, `temporary_cad_ir_created: yes`, valeurs UI listees, `Body sizing report`, `Print validation: false`.
+8. Changer une valeur visible, par exemple `box_inner_x_mm` ou `peripheral_clearance_mm`, puis lancer `Action = regenerate`.
+9. Attendu : l'ancienne scene BGIG est supprimee, la nouvelle scene reflete les nouvelles dimensions, aucun objet non BGIG n'est supprime.
+10. Lancer `Action = clear_bgig_scene`, puis `inspect_bgig_scene`.
+11. Attendu : `BGIG objects remaining after clear: 0` et aucune validation d'impression revendiquee.
+
+La commande CLI d'export CAD IR reste une sous-commande :
+
+```powershell
+python -m board_game_insert_generator export-cad-ir examples/simple_asset_product_scene.json --output fusion_addin/BoardGameInsertGenerator/cad_ir_input.json
+```
+
+Il n'existe pas d'option `--export-cad-ir`.

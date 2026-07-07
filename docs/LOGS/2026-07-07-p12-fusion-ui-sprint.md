@@ -190,3 +190,10 @@ preservation des objets non BGIG.
 - Clear : racine BGIG supprimee, `BGIG objects remaining after clear: 0`, objets non BGIG preserves.
 - Statut : `fusion-validated`, `print-validated: false`.
 - Prochaine etape : stop sur gate produit avant toute nouvelle extension.
+## P12-M003 - quick_parametric_box fonctionnel
+
+- Gate humaine P12-M003 validee.
+- Mission codee : le mode `quick_parametric_box` de la commande Fusion construit une CAD IR temporaire minimale depuis les champs UI puis reutilise le pipeline CAD IR existant.
+- Champs requis : dimensions internes de boite, unites de grille X/Y/Z, epaisseurs, clearances peripherique/inter-module et profil d'impression optionnel.
+- Le mode reste borne a une scene V0 simple : boite de reference et module rectangulaire. Pas de nouvelle geometrie avancee, pas de solveur, pas de changement de tolerances par defaut.
+- Validation attendue : smoke test humain P12-M003V dans Fusion. Impression 3D non validee.

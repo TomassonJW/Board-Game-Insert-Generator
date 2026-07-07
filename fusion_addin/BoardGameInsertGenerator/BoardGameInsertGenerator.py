@@ -78,12 +78,14 @@ try:
         apply_parametric_overrides_to_config_payload,
         assembly_document_required_message,
         build_fusion_command_request,
+        build_quick_parametric_box_cad_ir_payload,
         cad_ir_input_guidance,
         default_fusion_command_values,
         default_fusion_ui_settings,
         describe_document_state,
         fusion_command_summary,
         fusion_ui_settings_path,
+        quick_parametric_box_summary,
         generation_plan_from_cad_ir,
         is_part_design_component_limit_error,
         load_cad_ir_json,
@@ -156,12 +158,14 @@ except ImportError:  # pragma: no cover - Fusion may load the file as a script.
         apply_parametric_overrides_to_config_payload,
         assembly_document_required_message,
         build_fusion_command_request,
+        build_quick_parametric_box_cad_ir_payload,
         cad_ir_input_guidance,
         default_fusion_command_values,
         default_fusion_ui_settings,
         describe_document_state,
         fusion_command_summary,
         fusion_ui_settings_path,
+        quick_parametric_box_summary,
         generation_plan_from_cad_ir,
         is_part_design_component_limit_error,
         load_cad_ir_json,
@@ -308,7 +312,7 @@ if adsk is not None:
                     "bgig_parametric_status",
                     "Parametric fields",
                     (
-                        "Config-file overrides only. They are rejected in cad_ir_file mode. "
+                        "Active in config_file and quick_parametric_box modes. They are rejected in cad_ir_file mode. "
                         f"quick_parametric_box: {BGIG_QUICK_PARAMETRIC_BOX_STATUS}."
                     ),
                     3,
@@ -317,7 +321,7 @@ if adsk is not None:
                 for parameter_id, label in P12_PARAMETRIC_FIELD_LABELS.items():
                     inputs.addStringValueInput(
                         _parameter_input_id(parameter_id),
-                        f"{label} (config_file override)",
+                        f"{label} (config_file override / quick box value)",
                         P12_PARAMETRIC_FIELD_DEFAULTS[parameter_id],
                     )
                 inputs.addTextBoxCommandInput(
@@ -515,8 +519,11 @@ def _execute_generation_request(request, addin_dir: Path) -> str:  # noqa: ANN00
         )
 
     cad_ir_path = request.cad_ir_path
+    quick_parametric_payload = None
     if request.source_kind == "config":
         cad_ir_path = _generate_cad_ir_from_config_request(request, addin_dir)
+    elif request.source_kind == "quick_parametric_box":
+        cad_ir_path, quick_parametric_payload = _generate_cad_ir_from_quick_parametric_box_request(request, addin_dir)
     if cad_ir_path is None:
         raise FusionSkeletonError("No CAD IR path is available for generation.")
 
@@ -552,7 +559,19 @@ def _execute_generation_request(request, addin_dir: Path) -> str:  # noqa: ANN00
         scene_roots_after,
         clear_result,
         settings_saved,
+        quick_parametric_payload,
     )
+
+
+def _generate_cad_ir_from_quick_parametric_box_request(request, addin_dir: Path):  # noqa: ANN001
+    payload = build_quick_parametric_box_cad_ir_payload(request.parameter_overrides or {})
+    cad_ir_path = addin_dir / BGIG_GENERATED_CAD_IR_FILENAME
+    cad_ir_path.write_text(
+        json.dumps(payload, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    return cad_ir_path, payload
+
 
 def _generate_cad_ir_from_config_request(request, addin_dir: Path) -> Path:  # noqa: ANN001
     if request.config_json_path is None:
@@ -725,10 +744,12 @@ def _generation_result_message(
     scene_roots_after: int,
     clear_result: dict[str, object] | None = None,
     settings_saved: bool = False,
+    quick_parametric_payload: dict[str, object] | None = None,
 ) -> str:
     result = _stable_generation_result(result)
     body_size_report = _body_size_report_message(result.get("body_size_reports", []))
     module_mapping_report = _module_mapping_report_message(generation_plan)
+    quick_parametric_report = quick_parametric_box_summary(quick_parametric_payload) if request.source_kind == "quick_parametric_box" else ""
     clear_lines = ""
     if clear_result is not None:
         clear_lines = (
@@ -757,6 +778,7 @@ def _generation_result_message(
         f"UI settings saved: {'yes' if settings_saved else 'no'}\n"
         f"Parametric overrides: {', '.join(sorted(overrides)) if overrides else 'none'}\n"
         f"Generation mode: {generation_plan.generation_mode}\n"
+        f"{quick_parametric_report}"
         f"Reference outlines: {result['reference_outlines']}\n"
         f"BGIG scene roots before: {scene_roots_before}\n"
         f"CAD IR module blanks planned: {len(generation_plan.blanks)}\n"

@@ -97,8 +97,8 @@ BGIG_CLEARABLE_ROLES = (
     "compact_occurrence",
     "exploded_occurrence",
 )
-BGIG_PARAMETRIC_FIELDS_STATUS = "config_file_only"
-BGIG_QUICK_PARAMETRIC_BOX_STATUS = "disabled_until_config_builder_contract"
+BGIG_PARAMETRIC_FIELDS_STATUS = "config_file_and_quick_parametric_box"
+BGIG_QUICK_PARAMETRIC_BOX_STATUS = "enabled_generates_temporary_cad_ir_from_dialog_fields"
 
 P12_PARAMETRIC_FIELD_DEFAULTS = {
     "box_inner_x_mm": "",
@@ -110,7 +110,7 @@ P12_PARAMETRIC_FIELD_DEFAULTS = {
     "wall_thickness_mm": "",
     "floor_thickness_mm": "",
     "peripheral_clearance_mm": "",
-    "module_gap_mm": "",
+    "inter_module_clearance_mm": "",
     "print_profile": "",
 }
 P12_PARAMETRIC_FIELD_LABELS = {
@@ -123,7 +123,7 @@ P12_PARAMETRIC_FIELD_LABELS = {
     "wall_thickness_mm": "Wall thickness mm",
     "floor_thickness_mm": "Floor thickness mm",
     "peripheral_clearance_mm": "Peripheral clearance mm",
-    "module_gap_mm": "Inter-module clearance mm",
+    "inter_module_clearance_mm": "Inter-module clearance mm",
     "print_profile": "Print profile",
 }
 
@@ -790,9 +790,13 @@ def build_fusion_command_request(
         )
 
     if validated_input_mode == FUSION_INPUT_MODE_QUICK_PARAMETRIC_BOX:
-        raise FusionSkeletonError(
-            "quick_parametric_box is visible as a product mode but is disabled in this build. "
-            "Use config_file with a BGIG config JSON and real config overrides."
+        return FusionCommandRequest(
+            cad_ir_path=None,
+            generation_mode=validated_mode,
+            action=validated_action,
+            input_mode=validated_input_mode,
+            parameter_overrides=parameter_overrides,
+            source_kind="quick_parametric_box",
         )
 
     if validated_input_mode == FUSION_INPUT_MODE_CONFIG_FILE:
@@ -820,8 +824,8 @@ def build_fusion_command_request(
 
     if parameter_overrides:
         raise FusionSkeletonError(
-            "Parametric override fields are active only in config_file mode. "
-            "Switch Input mode to config_file or leave all override fields blank."
+            "Parametric override fields are active only in config_file or quick_parametric_box mode. "
+            "Switch Input mode to config_file, quick_parametric_box, or leave all override fields blank."
         )
     cad_ir_path = _resolve_optional_json_path(
         cad_ir_path_text,
@@ -937,6 +941,9 @@ def fusion_command_summary(request: FusionCommandRequest) -> str:
     elif request.source_kind == "inspect_only":
         source = "Inspect BGIG scene ownership"
         source_path = None
+    elif request.source_kind == "quick_parametric_box":
+        source = "Quick parametric box UI fields"
+        source_path = None
 
     overrides = request.parameter_overrides or {}
     override_summary = ", ".join(sorted(overrides)) if overrides else "none"
@@ -977,7 +984,7 @@ def parse_parametric_overrides(values: dict[str, str]) -> dict[str, Any]:
             overrides[key] = value
         elif key.startswith("grid_units_"):
             overrides[key] = _parse_positive_int(value, key)
-        elif key in {"peripheral_clearance_mm", "module_gap_mm"}:
+        elif key in {"peripheral_clearance_mm", "inter_module_clearance_mm"}:
             overrides[key] = _parse_non_negative_float(value, key)
         else:
             overrides[key] = _parse_positive_float(value, key)
@@ -1037,7 +1044,7 @@ def apply_parametric_overrides_to_config_payload(
 
     tolerance_keys = {
         "peripheral_clearance_mm": "peripheral_clearance_mm",
-        "module_gap_mm": "module_gap_mm",
+        "inter_module_clearance_mm": "module_gap_mm",
     }
     if any(key in overrides for key in tolerance_keys):
         tolerances = _ensure_config_object(updated, "tolerances")
@@ -1048,6 +1055,206 @@ def apply_parametric_overrides_to_config_payload(
     return updated
 
 
+def build_quick_parametric_box_cad_ir_payload(overrides: dict[str, Any]) -> dict[str, Any]:
+    """Build a minimal CAD IR scene directly from quick_parametric_box UI fields."""
+
+    required = (
+        "box_inner_x_mm",
+        "box_inner_y_mm",
+        "box_inner_z_mm",
+        "grid_units_x",
+        "grid_units_y",
+        "grid_units_z",
+        "wall_thickness_mm",
+        "floor_thickness_mm",
+        "peripheral_clearance_mm",
+        "inter_module_clearance_mm",
+    )
+    missing = [field for field in required if field not in overrides]
+    if missing:
+        raise FusionSkeletonError(
+            "quick_parametric_box requires these filled fields: " + ", ".join(missing) + "."
+        )
+    print_profile = str(overrides.get("print_profile") or "default").strip() or "default"
+    box_x = float(overrides["box_inner_x_mm"])
+    box_y = float(overrides["box_inner_y_mm"])
+    box_z = float(overrides["box_inner_z_mm"])
+    grid_x = int(overrides["grid_units_x"])
+    grid_y = int(overrides["grid_units_y"])
+    grid_z = int(overrides["grid_units_z"])
+    wall = float(overrides["wall_thickness_mm"])
+    floor = float(overrides["floor_thickness_mm"])
+    peripheral = float(overrides["peripheral_clearance_mm"])
+    inter_module = float(overrides["inter_module_clearance_mm"])
+    cell_x = round(box_x / grid_x, 4)
+    cell_y = round(box_y / grid_y, 4)
+    cell_z = round(box_z / grid_z, 4)
+    printable_x = _quick_printable_dimension(cell_x, peripheral, inter_module, "X")
+    printable_y = _quick_printable_dimension(cell_y, peripheral, inter_module, "Y")
+    printable_z = _quick_printable_height(cell_z, floor)
+    asset_fit_x = max(round(printable_x - (2 * wall), 4), 0.1)
+    asset_fit_y = max(round(printable_y - (2 * wall), 4), 0.1)
+    asset_fit_z = max(round(printable_z - floor, 4), 0.1)
+    clearances = {
+        "peripheral_clearance_mm": peripheral,
+        "inter_module_gap_mm": inter_module,
+        "wall_thickness_mm": wall,
+        "floor_thickness_mm": floor,
+        "note": "quick_parametric_box V0 creates one printable module from one grid cell; Fusion consumes this CAD IR without recalculating layout or tolerances.",
+    }
+    return {
+        "schema_version": SUPPORTED_CAD_IR_SCHEMA_VERSION,
+        "units": SUPPORTED_UNITS,
+        "coordinate_system": "right_handed_z_up_mm",
+        "frame": {"origin_mm": _vector_payload(0.0, 0.0, 0.0)},
+        "box_reference": {
+            "id": "quick-parametric-box-reference",
+            "name": "Quick parametric box reference - not printable",
+            "origin_mm": _vector_payload(0.0, 0.0, 0.0),
+            "size_mm": _vector_payload(box_x, box_y, box_z),
+            "printable": False,
+        },
+        "parameters": [
+            _parameter_payload("box_inner_x_mm", box_x, "ui", "Quick box inner X."),
+            _parameter_payload("box_inner_y_mm", box_y, "ui", "Quick box inner Y."),
+            _parameter_payload("box_inner_z_mm", box_z, "ui", "Quick box inner Z."),
+            _parameter_payload("grid_units_x", grid_x, "ui", "Quick grid X units."),
+            _parameter_payload("grid_units_y", grid_y, "ui", "Quick grid Y units."),
+            _parameter_payload("grid_units_z", grid_z, "ui", "Quick grid Z units."),
+            _parameter_payload("wall_thickness_mm", wall, "ui", "Quick wall thickness."),
+            _parameter_payload("floor_thickness_mm", floor, "ui", "Quick floor thickness."),
+            _parameter_payload("peripheral_clearance_mm", peripheral, "ui", "Quick peripheral clearance."),
+            _parameter_payload("inter_module_clearance_mm", inter_module, "ui", "Quick inter-module clearance."),
+        ],
+        "components": [
+            {
+                "id": "component:quick-parametric-module",
+                "name": "Quick parametric module",
+                "module_id": "quick-parametric-module",
+                "instance_id": "quick-parametric-module-01",
+                "functional_type": "quick_parametric_box",
+                "body": {
+                    "id": "body:quick-parametric-module",
+                    "name": "Quick parametric module body",
+                    "kind": "rectangular_blank",
+                    "theoretical_origin_mm": _vector_payload(0.0, 0.0, 0.0),
+                    "theoretical_size_mm": _vector_payload(cell_x, cell_y, cell_z),
+                    "printable_origin_mm": _vector_payload(peripheral, peripheral, 0.0),
+                    "printable_size_mm": _vector_payload(printable_x, printable_y, printable_z),
+                    "clearance_applied": clearances,
+                    "operations": [
+                        {
+                            "id": "operation:create-quick-parametric-module",
+                            "kind": "create_rectangular_prism",
+                            "parameters": {
+                                "source": "quick_parametric_box",
+                                "theoretical_grid_extent_mm": _vector_payload(cell_x, cell_y, cell_z),
+                                "printable_body_size_mm": _vector_payload(printable_x, printable_y, printable_z),
+                            },
+                        }
+                    ],
+                },
+                "metadata": {
+                    "source": "quick_parametric_box",
+                    "print_profile": print_profile,
+                    "grid_origin_units": _grid_units_tuple_to_dict((0, 0, 0)),
+                    "grid_size_units": _grid_units_tuple_to_dict((1, 1, 1)),
+                    "theoretical_grid_extent_mm": _vector_payload(cell_x, cell_y, cell_z),
+                    "asset_fit_size_mm": _vector_payload(asset_fit_x, asset_fit_y, asset_fit_z),
+                    "printable_body_size_mm": _vector_payload(printable_x, printable_y, printable_z),
+                    "clearance_applied": clearances,
+                },
+            }
+        ],
+        "metadata": {
+            "project_name": "Quick parametric box",
+            "source": "quick_parametric_box",
+            "print_profile": print_profile,
+            "quick_parametric_box": {
+                "box_inner_mm": _vector_payload(box_x, box_y, box_z),
+                "grid_units": _grid_units_tuple_to_dict((grid_x, grid_y, grid_z)),
+                "grid_unit_mm": _vector_payload(cell_x, cell_y, cell_z),
+                "wall_thickness_mm": wall,
+                "floor_thickness_mm": floor,
+                "peripheral_clearance_mm": peripheral,
+                "inter_module_clearance_mm": inter_module,
+                "theoretical_grid_extent_mm": _vector_payload(cell_x, cell_y, cell_z),
+                "asset_fit_size_mm": _vector_payload(asset_fit_x, asset_fit_y, asset_fit_z),
+                "printable_body_size_mm": _vector_payload(printable_x, printable_y, printable_z),
+                "generation_scope": "one_module_one_grid_cell_v0",
+                "print_validation": False,
+            },
+            "warnings": [
+                "quick_parametric_box V0 creates one simple rectangular module for Fusion smoke testing.",
+                "No physical print validation is implied.",
+            ],
+        },
+    }
+
+
+def quick_parametric_box_summary(payload: dict[str, Any] | None) -> str:
+    """Return concise report lines for a quick_parametric_box CAD IR payload."""
+
+    if not isinstance(payload, dict):
+        return "Quick parametric box: n/a\n"
+    metadata = payload.get("metadata")
+    quick = metadata.get("quick_parametric_box") if isinstance(metadata, dict) else None
+    if not isinstance(quick, dict):
+        return "Quick parametric box: n/a\n"
+    return "".join(
+        [
+            "Quick parametric box inputs:\n",
+            f"- box_inner_mm: {_format_vector_payload(quick.get('box_inner_mm'))}\n",
+            f"- grid_units: {_format_grid_units_payload(quick.get('grid_units'))}\n",
+            f"- grid_unit_mm: {_format_vector_payload(quick.get('grid_unit_mm'))}\n",
+            f"- wall_thickness_mm: {quick.get('wall_thickness_mm')}\n",
+            f"- floor_thickness_mm: {quick.get('floor_thickness_mm')}\n",
+            f"- peripheral_clearance_mm: {quick.get('peripheral_clearance_mm')}\n",
+            f"- inter_module_clearance_mm: {quick.get('inter_module_clearance_mm')}\n",
+            f"- print_profile: {metadata.get('print_profile', 'default') if isinstance(metadata, dict) else 'default'}\n",
+            f"- theoretical_grid_extent_mm: {_format_vector_payload(quick.get('theoretical_grid_extent_mm'))}\n",
+            f"- printable_body_size_mm: {_format_vector_payload(quick.get('printable_body_size_mm'))}\n",
+            "- temporary_cad_ir_created: yes\n",
+        ]
+    )
+
+
+def _quick_printable_dimension(cell_size_mm: float, peripheral_clearance_mm: float, inter_module_clearance_mm: float, axis: str) -> float:
+    printable = cell_size_mm - (2 * peripheral_clearance_mm) - inter_module_clearance_mm
+    if printable <= 0:
+        raise FusionSkeletonError(
+            f"quick_parametric_box {axis} printable size must remain positive after peripheral and inter-module clearances."
+        )
+    return round(printable, 4)
+
+
+def _quick_printable_height(cell_size_mm: float, floor_thickness_mm: float) -> float:
+    printable = cell_size_mm - floor_thickness_mm
+    if printable <= 0:
+        raise FusionSkeletonError(
+            "quick_parametric_box Z printable size must remain positive after floor thickness."
+        )
+    return round(printable, 4)
+
+
+def _vector_payload(x: float, y: float, z: float) -> dict[str, float]:
+    return {"x": round(float(x), 4), "y": round(float(y), 4), "z": round(float(z), 4)}
+
+
+def _parameter_payload(name: str, value: float | int, source: str, description: str) -> dict[str, Any]:
+    return {"name": name, "value": value, "source": source, "description": description}
+
+
+def _format_vector_payload(value: Any) -> str:
+    if not isinstance(value, dict):
+        return "n/a"
+    return f"{value.get('x')} x {value.get('y')} x {value.get('z')} mm"
+
+
+def _format_grid_units_payload(value: Any) -> str:
+    if not isinstance(value, dict):
+        return "n/a"
+    return f"{value.get('x')} x {value.get('y')} x {value.get('z')}"
 def resolve_bgig_project_root(
     project_root_text: str,
     config_path: Path,

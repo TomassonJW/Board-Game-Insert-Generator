@@ -67,6 +67,7 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     apply_parametric_overrides_to_config_payload,
     assembly_document_required_message,
     build_fusion_command_request,
+    build_quick_parametric_box_cad_ir_payload,
     cad_ir_input_guidance,
     default_fusion_command_values,
     default_fusion_ui_settings,
@@ -82,6 +83,7 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     mm_to_cm,
     parse_parametric_overrides,
     planned_operations_from_cad_ir,
+    quick_parametric_box_summary,
     resolve_cad_ir_input_path,
     resolve_generation_mode,
     validate_cad_ir_payload,
@@ -558,7 +560,7 @@ class FusionSkeletonTests(unittest.TestCase):
                 "wall_thickness_mm": "1.4",
                 "floor_thickness_mm": "1.6",
                 "peripheral_clearance_mm": "0.9",
-                "module_gap_mm": "0.7",
+                "inter_module_clearance_mm": "0.7",
                 "print_profile": "fine_detail",
             }
         )
@@ -586,7 +588,7 @@ class FusionSkeletonTests(unittest.TestCase):
             cad_ir_path = addin_dir / "scene.json"
             cad_ir_path.write_text(json.dumps(_cad_ir_payload()), encoding="utf-8")
 
-            with self.assertRaisesRegex(FusionSkeletonError, "config_file mode"):
+            with self.assertRaisesRegex(FusionSkeletonError, "config_file or quick_parametric_box mode"):
                 build_fusion_command_request(
                     "scene.json",
                     FUSION_GENERATION_MODE_COMPACT_ONLY,
@@ -595,16 +597,54 @@ class FusionSkeletonTests(unittest.TestCase):
                     input_mode=FUSION_INPUT_MODE_CAD_IR_FILE,
                 )
 
-    def test_rejects_quick_parametric_box_until_real_builder_exists(self) -> None:
+    def test_builds_quick_parametric_box_request_and_cad_ir_payload(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
-            with self.assertRaisesRegex(FusionSkeletonError, "quick_parametric_box"):
-                build_fusion_command_request(
-                    "",
-                    FUSION_GENERATION_MODE_COMPACT_AND_EXPLODED,
-                    Path(temp_dir),
-                    parameter_values={"box_inner_x_mm": "120"},
-                    input_mode=FUSION_INPUT_MODE_QUICK_PARAMETRIC_BOX,
-                )
+            overrides = {
+                **P12_PARAMETRIC_FIELD_DEFAULTS,
+                "box_inner_x_mm": "120",
+                "box_inner_y_mm": "80",
+                "box_inner_z_mm": "30",
+                "grid_units_x": "4",
+                "grid_units_y": "4",
+                "grid_units_z": "3",
+                "wall_thickness_mm": "1.2",
+                "floor_thickness_mm": "1.2",
+                "peripheral_clearance_mm": "0.4",
+                "inter_module_clearance_mm": "0.3",
+                "print_profile": "draft",
+            }
+            request = build_fusion_command_request(
+                "",
+                FUSION_GENERATION_MODE_COMPACT_ONLY,
+                Path(temp_dir),
+                parameter_values=overrides,
+                input_mode=FUSION_INPUT_MODE_QUICK_PARAMETRIC_BOX,
+            )
+
+        self.assertEqual(request.source_kind, "quick_parametric_box")
+        self.assertEqual(request.generation_mode, FUSION_GENERATION_MODE_COMPACT_ONLY)
+        self.assertEqual(request.parameter_overrides["inter_module_clearance_mm"], 0.3)
+        self.assertIn("Source: Quick parametric box UI fields", fusion_command_summary(request))
+
+        payload = build_quick_parametric_box_cad_ir_payload(request.parameter_overrides)
+        validated = validate_cad_ir_payload(payload)
+        quick = validated["metadata"]["quick_parametric_box"]
+        self.assertEqual(quick["box_inner_mm"], {"x": 120.0, "y": 80.0, "z": 30.0})
+        self.assertEqual(quick["grid_units"], {"x": 4, "y": 4, "z": 3})
+        self.assertEqual(quick["grid_unit_mm"], {"x": 30.0, "y": 20.0, "z": 10.0})
+        self.assertEqual(quick["printable_body_size_mm"], {"x": 28.9, "y": 18.9, "z": 8.8})
+        body = validated["components"][0]["body"]
+        self.assertEqual(body["printable_origin_mm"], {"x": 0.4, "y": 0.4, "z": 0.0})
+        self.assertEqual(body["printable_size_mm"], {"x": 28.9, "y": 18.9, "z": 8.8})
+        plan = generation_plan_from_cad_ir(validated, FUSION_GENERATION_MODE_COMPACT_ONLY)
+        self.assertEqual(len(plan.blanks), 1)
+        self.assertEqual(len(plan.compact_occurrences), 1)
+        self.assertEqual(len(plan.exploded_occurrences), 0)
+        self.assertIn("temporary_cad_ir_created: yes", quick_parametric_box_summary(validated))
+
+    def test_quick_parametric_box_rejects_missing_required_fields(self) -> None:
+        with self.assertRaisesRegex(FusionSkeletonError, "requires these filled fields"):
+            build_quick_parametric_box_cad_ir_payload({"box_inner_x_mm": 120})
 
     def test_default_ui_settings_reads_local_settings_file(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -1291,7 +1331,7 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("scene_roots_created", source)
         self.assertIn("non_bgig_objects_preserved", source)
         self.assertIn("quick_parametric_box", source)
-        self.assertIn("Config-file overrides only", source)
+        self.assertIn("Active in config_file and quick_parametric_box modes", source)
         self.assertIn("_count_bgig_scene_roots", source)
         self.assertIn("_bgig_scene_root_occurrences", source)
         self.assertIn("_count_bgig_tagged_objects", source)

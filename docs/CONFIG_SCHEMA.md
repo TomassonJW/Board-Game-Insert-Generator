@@ -442,3 +442,15 @@ Les champs UI P12 sont connectes uniquement au mode `config_file`. En mode
 `cad_ir_file`, tout override renseigne doit etre refuse plutot qu'ignore. Le mode
 `quick_parametric_box` reste desactive jusqu'a la definition d'un builder de
 configuration temporaire complet.
+
+### Note P12-M003 - quick_parametric_box UI
+
+Le mode Fusion `quick_parametric_box` n'ajoute pas encore de nouveau format de configuration JSON. Les champs UI requis sont convertis en CAD IR temporaire dans l'add-in :
+
+- `box_inner_x_mm`, `box_inner_y_mm`, `box_inner_z_mm` -> boite de reference non imprimable ;
+- `grid_units_x`, `grid_units_y`, `grid_units_z` -> taille theorique de cellule ;
+- `wall_thickness_mm`, `floor_thickness_mm` -> metadata et calcul de hauteur imprimable V0 ;
+- `peripheral_clearance_mm`, `inter_module_clearance_mm` -> offsets explicites du module V0 ;
+- `print_profile` -> metadata du profil.
+
+La commande CLI d'export reste `python -m board_game_insert_generator export-cad-ir ... --output ...`; `--export-cad-ir` n'est pas une option CLI.

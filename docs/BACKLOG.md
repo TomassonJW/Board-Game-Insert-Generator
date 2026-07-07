@@ -579,6 +579,28 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Tests : smoke test manuel Fusion, aucune validation d'impression revendiquee.
 - Gate : action humaine Thomas realisee pour la validation Fusion P12-UI-M002V7 apres correction registry inspect. Inspect avant generation, generate, inspect apres generation, regenerate et clear sont valides ; ownership racine BGIG et reporting deduplique valides ; impression 3D non validee.
 - Statut : `done`, `fusion-validated`, `print-validated: false`.
+
+### P12-M003 - quick_parametric_box fonctionnel
+
+- Capability : C-FUSION-UI.
+- Milestone : M14 Usable beta.
+- Objectif : rendre le mode `quick_parametric_box` de la commande Fusion exploitable sans fichier de config BGIG.
+- Livrable : builder CAD IR temporaire depuis champs UI, rapport Fusion des valeurs saisies, tests hors Fusion, documentation et smoke test P12-M003V.
+- Criteres d'acceptation : generation via `quick_parametric_box`, `generate`/`regenerate`/`clear_bgig_scene` conserves, `Body sizing report`, `Print validation: false`, coeur Python sans `adsk`.
+- Tests : unitaires hors Fusion, py_compile add-in, CLI Markdown/JSON/export CAD IR exemples P12, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
+- Gate : smoke test humain Fusion P12-M003V requis avant `fusion-validated`.
+- Statut : `done`, `implemented-fusion`, `manual_validation_required`, `print-validated: false`.
+
+### P12-M003V - Valider quick_parametric_box dans Fusion
+
+- Capability : C-FUSION-UI.
+- Milestone : M14 Usable beta.
+- Objectif : verifier dans Fusion que les champs UI quick changent bien la scene generee.
+- Livrable : validation humaine avec generate, regenerate, clear et rapport de sizing.
+- Criteres d'acceptation : mode `quick_parametric_box` visible et actif, CAD IR temporaire creee, scene V0 generee, changements de valeurs visibles apres regenerate, clear propre, aucune validation d'impression revendiquee.
+- Tests : smoke test manuel Fusion.
+- Gate : action humaine requise.
+- Statut : `manual_validation_required`.
 ## Phase 12 - Couvercles, mecanismes et empilement avance
 
 ### P12-M001 - Modeliser les couvercles poses

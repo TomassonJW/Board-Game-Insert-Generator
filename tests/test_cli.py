@@ -17,6 +17,16 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
 
 
 class CliTests(unittest.TestCase):
+    def test_cli_root_help_lists_export_cad_ir_subcommand(self) -> None:
+        stdout = io.StringIO()
+
+        with redirect_stdout(stdout):
+            code = main(["--help"])
+
+        output = stdout.getvalue()
+        self.assertEqual(code, 0)
+        self.assertIn("export-cad-ir CONFIG --output PATH", output)
+        self.assertIn("not an --export-cad-ir option", output)
     def test_cli_diagnose_reports_ok(self) -> None:
         stdout = io.StringIO()
 
