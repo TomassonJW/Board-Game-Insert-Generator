@@ -124,6 +124,9 @@ Tests, cartes backlog ou gates humaines a preparer.
 - ADR-0023-fusion-parametric-command-and-safe-clear.md - commande Fusion
   parametrique V0, generation config vers CAD IR temporaire et nettoyage par
   attributs BGIG.
+- ADR-0024-fusion-hidden-source-helper-occurrences.md - composants sources Fusion
+  via occurrences helpers cachees et occurrences compactes/eclatees visibles.
+
 ## Regles de maintenance
 
 - Ne reecris pas l'historique d'une ADR acceptee pour changer la decision.

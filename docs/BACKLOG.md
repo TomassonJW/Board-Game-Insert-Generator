@@ -567,18 +567,18 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Criteres d'acceptation : le mode CAD IR direct reste fonctionnel ; le mode config peut generer une CAD IR temporaire si le repo BGIG est accessible ; regenerate nettoie uniquement les objets BGIG tagues ; clear refuse de supprimer les objets non tagues ; coeur Python sans `adsk` ; validation Fusion manuelle requise.
 - Tests : unitaires hors Fusion, py_compile add-in, CLI Markdown/JSON/export CAD IR exemples P12, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
 - Gate : validation humaine fournie le 2026-07-07 pour P12-UI-M002+ ; smoke test Fusion requis avant `fusion-validated`.
-- Statut : `done`, `implemented-fusion`, correction P12-M002V3 codee, `manual_validation_required`, `print-validated: false`.
+- Statut : `done`, `implemented-fusion`, correction P12-M002V4 codee, `manual_validation_required`, `print-validated: false`.
 
-### P12-UI-M002V3 - Valider generate/regenerate/clear non cumulatifs
+### P12-UI-M002V4 - Valider occurrences visibles exactes
 
 - Capability : C-FUSION-UI.
 - Milestone : M14 Usable beta.
-- Objectif : lancer l'add-in dans Fusion et verifier le flux UI P12-M002V3 : `generate` refuse une scene BGIG existante, `regenerate` remplace sans doublon, `clear_bgig_scene` reste visible, l'objet non BGIG est preserve, root/config sont memorises et les champs restent non decoratifs.
+- Objectif : lancer l'add-in dans Fusion et verifier le flux UI P12-M002V4 : `compact_only` affiche seulement les occurrences compactes, `compact_and_exploded` affiche seulement compact + exploded, aucune occurrence source/helper n'est visible, `generate` refuse une scene BGIG existante, `regenerate` remplace sans doublon, `clear_bgig_scene` reste visible et l'objet non BGIG est preserve.
 - Livrable : validation humaine Fusion avec generation depuis CAD IR, generation depuis config, regenerate, clear et verification que les objets non BGIG ne sont pas supprimes.
-- Criteres d'acceptation : commande visible ; champs `CAD IR JSON path`, `BGIG config JSON path`, `BGIG project root`, action, mode et parametres visibles ; premier `generate` fonctionne ; second `generate` refuse sans doublon ; `regenerate` nettoie/recree les objets BGIG tagues sans cumul ; `clear_bgig_scene` supprime uniquement les objets tagues ; message final affiche source, action, scenes BGIG before/after, suppressions, preservation non BGIG, `Body sizing report` et `Print validation: false`.
+- Criteres d'acceptation : commande visible ; `compact_only` affiche N occurrences compactes et 0 exploded ; `compact_and_exploded` affiche N compactes et N eclatees ; `Visible BGIG source/helper occurrences: 0` ; `Legacy bodies created: 0` ; second `generate` refuse sans doublon ; `regenerate` nettoie/recree les objets BGIG tagues sans cumul ; `clear_bgig_scene` supprime uniquement les objets tagues ; message final affiche source, action, scenes BGIG before/after, suppressions, preservation non BGIG, `Body sizing report` et `Print validation: false`.
 - Tests : smoke test manuel Fusion, aucune validation d'impression revendiquee.
 - Gate : action humaine requise.
-- Statut : `manual_validation_required`, apres KO partiel P12-UI-M002V2 et correction P12-M002V3 codee.
+- Statut : `manual_validation_required`, apres KO P12-UI-M002V3 et correction P12-M002V4 codee.
 ## Phase 12 - Couvercles, mecanismes et empilement avance
 
 ### P12-M001 - Modeliser les couvercles poses

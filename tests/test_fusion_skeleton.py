@@ -20,7 +20,10 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     BGIG_QUICK_PARAMETRIC_BOX_STATUS,
     BGIG_SCENE_ROOT_COMPONENT_NAME,
     BGIG_SCENE_ROOT_ROLE,
+    BGIG_SOURCE_HELPER_OCCURRENCE_ROLE,
+    BGIG_SOURCE_HELPER_VISIBILITY_POLICY,
     BGIG_UI_SETTINGS_FILENAME,
+    BGIG_VISIBLE_OCCURRENCE_POLICY,
     BGIG_COMMAND_NAME,
     BGIG_TOOLBAR_LOCATION,
     BGIG_TOOLBAR_PANEL_IDS,
@@ -972,8 +975,15 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertNotIn("occurrence.name =", source)
         self.assertNotIn(".name = occurrence_plan.occurrence_name", source)
         self.assertIn("Module components created", source)
+        self.assertIn("Physical module count", source)
+        self.assertIn("Source components created", source)
+        self.assertIn("Source/helper occurrences created", source)
+        self.assertIn("Visible BGIG source/helper occurrences", source)
         self.assertIn("Compact occurrences created", source)
         self.assertIn("Exploded occurrences created", source)
+        self.assertIn("Visible BGIG occurrences expected", source)
+        self.assertIn("Visible BGIG occurrences actual", source)
+        self.assertIn("Legacy bodies created", source)
         self.assertIn("Linked exploded occurrences", source)
         self.assertIn("Occurrence direct rename attempted: no", source)
         self.assertIn("Occurrence Browser names", source)
@@ -1050,6 +1060,16 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("fusion_ui_settings_path", source)
         self.assertIn("BGIG Generated Scene", source)
         self.assertIn("BGIG_SCENE_ROOT_ROLE", source)
+        self.assertIn("BGIG_SOURCE_HELPER_OCCURRENCE_ROLE", source)
+        self.assertIn("BGIG_SOURCE_HELPER_VISIBILITY_POLICY", source)
+        self.assertIn("BGIG_VISIBLE_OCCURRENCE_POLICY", source)
+        self.assertIn("_create_module_source_component", source)
+        self.assertNotIn("def _create_module_component_occurrence", source)
+        self.assertIn("_hide_source_helper_occurrence", source)
+        self.assertIn("_count_visible_bgig_occurrences_by_role", source)
+        self.assertIn("occurrence.isLightBulbOn = False", source)
+        self.assertIn("COMPACT_OCCURRENCE_ROLE", source)
+        self.assertIn("EXPLODED_OCCURRENCE_ROLE", source)
         self.assertIn("scene_roots_created", source)
         self.assertIn("non_bgig_objects_preserved", source)
         self.assertIn("quick_parametric_box", source)
@@ -1065,6 +1085,9 @@ class FusionSkeletonTests(unittest.TestCase):
         skeleton_source = (ROOT / "fusion_addin" / "BoardGameInsertGenerator" / "fusion_skeleton.py").read_text(encoding="utf-8")
         self.assertIn(BGIG_EXISTING_SCENE_MESSAGE, skeleton_source)
         self.assertIn(BGIG_GENERATE_EXISTING_SCENE_POLICY, skeleton_source)
+        self.assertIn(BGIG_SOURCE_HELPER_OCCURRENCE_ROLE, skeleton_source)
+        self.assertIn(BGIG_SOURCE_HELPER_VISIBILITY_POLICY, skeleton_source)
+        self.assertIn(BGIG_VISIBLE_OCCURRENCE_POLICY, skeleton_source)
         execute_block = source[
             source.index("def _execute_generation_request") : source.index("def _generate_cad_ir_from_config_request")
         ]

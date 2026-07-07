@@ -557,3 +557,21 @@ La correction porte uniquement sur la securite d'action de la commande Fusion :
 
 Cette correction evite l'accumulation silencieuse de scenes BGIG dans un document
 Fusion et rend le smoke test P12 centre sur generate/regenerate/clear.
+
+### Correction P12-M002V4 - Occurrences visibles exactes
+
+P12-M002V4 conserve les composants lies et ne revient pas aux copies
+independantes. La correction porte sur le role de l'occurrence initiale Fusion :
+`addNewComponent` sert uniquement a creer le composant source, via une occurrence
+helper cachee. Les occurrences visibles compactes et eclatees sont creees ensuite
+avec `addExistingComponent`.
+
+Regles :
+
+- `compact_only` : N modules physiques donnent N occurrences compactes visibles ;
+- `compact_and_exploded` : N modules physiques donnent N occurrences compactes et
+  N occurrences eclatees visibles ;
+- les helpers source doivent rester invisibles ;
+- aucun body legacy independant ne doit etre cree ;
+- `clear_bgig_scene` doit supprimer les racines, helpers, occurrences compactes
+  et occurrences eclatees BGIG tagues, sans cibler les objets non BGIG.

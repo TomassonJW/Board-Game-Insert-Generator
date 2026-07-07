@@ -101,3 +101,25 @@ non cumulatif :
 
 Validation attendue : `P12-UI-M002V3` dans Fusion, centree sur generate sans
 doublon, regenerate sans doublon, clear visible et objet non BGIG preserve.
+
+## P12-UI-M002V4 - occurrences visibles exactes
+
+Observation humaine : P12-UI-M002V3 refusait bien certains doublons de scene,
+mais Fusion montrait encore des instances superposees. L'hypothese retenue est
+que l'occurrence initiale creee par `addNewComponent` restait visible comme
+source parasite.
+
+Correction codee :
+
+- creation d'une occurrence source/helper taguee `source_helper_occurrence` ;
+- masquage obligatoire de cette occurrence helper ;
+- creation explicite de l'occurrence compacte via `addExistingComponent` ;
+- creation explicite de l'occurrence eclatee via `addExistingComponent` en mode
+  `compact_and_exploded` ;
+- message Fusion enrichi : physical module count, source components, compact,
+  exploded, visible expected/actual, helpers visibles et legacy bodies ;
+- ADR-0024 ajoutee pour figer la strategie.
+
+Validation attendue : `P12-UI-M002V4` dans Fusion, centree sur compact_only,
+compact_and_exploded, absence d'occurrence source visible, regenerate sans
+doublon et clear tagged-only.

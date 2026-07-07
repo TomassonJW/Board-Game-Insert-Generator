@@ -28,10 +28,14 @@ try:
         BGIG_GENERATED_CONFIG_FILENAME,
         BGIG_SCENE_ROOT_COMPONENT_NAME,
         BGIG_SCENE_ROOT_ROLE,
+        BGIG_SOURCE_HELPER_OCCURRENCE_ROLE,
+        BGIG_SOURCE_HELPER_VISIBILITY_POLICY,
+        BGIG_VISIBLE_OCCURRENCE_POLICY,
         BGIG_TOOLBAR_LOCATION,
         BGIG_TOOLBAR_PANEL_IDS,
         BGIG_TOOLBAR_WORKSPACE_ID,
         BGIG_UI_REOPEN_POLICY,
+        COMPACT_OCCURRENCE_ROLE,
         DEFAULT_CAD_IR_INPUT_FILENAME,
         DEFAULT_FUSION_COMMAND_ACTION,
         DEFAULT_FUSION_INPUT_MODE,
@@ -43,6 +47,7 @@ try:
         FUSION_COMMAND_ACTION_CLEAR,
         FUSION_COMMAND_ACTION_GENERATE,
         FUSION_COMMAND_ACTION_REGENERATE,
+        EXPLODED_OCCURRENCE_ROLE,
         FUSION_EXTENT_NEGATIVE,
         FUSION_EXTENT_POSITIVE,
         FUSION_SKETCH_PLANE_XZ,
@@ -93,10 +98,14 @@ except ImportError:  # pragma: no cover - Fusion may load the file as a script.
         BGIG_GENERATED_CONFIG_FILENAME,
         BGIG_SCENE_ROOT_COMPONENT_NAME,
         BGIG_SCENE_ROOT_ROLE,
+        BGIG_SOURCE_HELPER_OCCURRENCE_ROLE,
+        BGIG_SOURCE_HELPER_VISIBILITY_POLICY,
+        BGIG_VISIBLE_OCCURRENCE_POLICY,
         BGIG_TOOLBAR_LOCATION,
         BGIG_TOOLBAR_PANEL_IDS,
         BGIG_TOOLBAR_WORKSPACE_ID,
         BGIG_UI_REOPEN_POLICY,
+        COMPACT_OCCURRENCE_ROLE,
         DEFAULT_CAD_IR_INPUT_FILENAME,
         DEFAULT_FUSION_COMMAND_ACTION,
         DEFAULT_FUSION_INPUT_MODE,
@@ -108,6 +117,7 @@ except ImportError:  # pragma: no cover - Fusion may load the file as a script.
         FUSION_COMMAND_ACTION_CLEAR,
         FUSION_COMMAND_ACTION_GENERATE,
         FUSION_COMMAND_ACTION_REGENERATE,
+        EXPLODED_OCCURRENCE_ROLE,
         FUSION_EXTENT_NEGATIVE,
         FUSION_EXTENT_POSITIVE,
         FUSION_SKETCH_PLANE_XZ,
@@ -605,6 +615,7 @@ def _clear_result_message(clear_result: dict[str, object]) -> str:
         f"Tagged BGIG objects deleted: {clear_result['deleted_objects']}\n"
         f"Tagged BGIG objects skipped: {clear_result['skipped_objects']}\n"
         f"BGIG scenes after: {clear_result['scene_roots_after']}\n"
+        f"Visible BGIG source/helper occurrences after clear: {clear_result['visible_source_helper_occurrences_after']}\n"
         f"Non-BGIG objects preserved: {clear_result['non_bgig_objects_preserved']}\n"
         "Legacy untagged BGIG objects are not deleted to avoid removing user geometry.\n"
         "Status: manual validation required in Fusion 360."
@@ -656,13 +667,22 @@ def _generation_result_message(
         f"Grid modules with Z placement: {generation_plan.grid_modules_with_z_placement_count}\n"
         f"Grid module height variants: {generation_plan.grid_module_height_variant_count}\n"
         f"Module components planned: {generation_plan.module_component_count}\n"
+        f"Physical module count: {result['physical_module_count']}\n"
         f"Compact occurrences planned: {len(generation_plan.compact_occurrences)}\n"
         f"Exploded occurrences planned: {len(generation_plan.exploded_occurrences)}\n"
         f"BGIG scene roots created: {result['scene_roots_created']}\n"
         f"BGIG scenes after: {scene_roots_after}\n"
         f"Module components created: {result['module_components_created']}\n"
+        f"Source components created: {result['source_components_created']}\n"
+        f"Source/helper visibility policy: {BGIG_SOURCE_HELPER_VISIBILITY_POLICY}\n"
+        f"Visible occurrence policy: {BGIG_VISIBLE_OCCURRENCE_POLICY}\n"
+        f"Source/helper occurrences created: {result['source_helper_occurrences_created']}\n"
+        f"Visible BGIG source/helper occurrences: {result['visible_source_helper_occurrences']}\n"
         f"Compact occurrences created: {result['compact_occurrences_created']}\n"
         f"Exploded occurrences created: {result['exploded_occurrences_created']}\n"
+        f"Visible BGIG occurrences expected: {result['visible_bgig_occurrences_expected']}\n"
+        f"Visible BGIG occurrences actual: {result['visible_bgig_occurrences_actual']}\n"
+        f"Legacy bodies created: {result['legacy_bodies_created']}\n"
         f"Linked exploded occurrences: {result['linked_exploded_occurrences']}\n"
         "Occurrence direct rename attempted: no\n"
         f"Occurrence naming policy: {OCCURRENCE_NAME_POLICY_COMPONENT_SOURCE}\n"
@@ -705,6 +725,42 @@ def _count_bgig_scene_roots(design) -> int:  # noqa: ANN001 - Fusion API object.
             scene_roots.add(id(entity))
     return len(scene_roots)
 
+
+def _count_visible_bgig_occurrences_by_role(design, roles: tuple[str, ...]) -> int:  # noqa: ANN001 - Fusion API object.
+    try:
+        attributes = design.findAttributes(BGIG_ATTRIBUTE_GROUP, BGIG_ATTRIBUTE_KIND)
+    except Exception:
+        return 0
+
+    visible = 0
+    seen_entities = set()
+    for index in range(getattr(attributes, "count", 0)):
+        attribute = attributes.item(index)
+        entity = getattr(attribute, "parent", None)
+        if entity is None:
+            continue
+        entity_key = id(entity)
+        if entity_key in seen_entities:
+            continue
+        seen_entities.add(entity_key)
+        if _bgig_entity_role(entity) not in roles:
+            continue
+        if _bgig_entity_is_visible(entity):
+            visible += 1
+    return visible
+
+
+def _bgig_entity_is_visible(entity) -> bool:  # noqa: ANN001 - Fusion API object.
+    try:
+        light_bulb = getattr(entity, "isLightBulbOn")
+        if light_bulb is False:
+            return False
+    except Exception:
+        pass
+    try:
+        return bool(getattr(entity, "isVisible"))
+    except Exception:
+        return True
 
 def _clear_bgig_scene(design, scene_roots_before: int | None = None) -> dict[str, object]:  # noqa: ANN001 - Fusion API object.
     try:
@@ -767,6 +823,10 @@ def _clear_bgig_scene(design, scene_roots_before: int | None = None) -> dict[str
         "deleted_objects": deleted,
         "skipped_objects": skipped,
         "scene_roots_after": _count_bgig_scene_roots(design),
+        "visible_source_helper_occurrences_after": _count_visible_bgig_occurrences_by_role(
+            design,
+            (BGIG_SOURCE_HELPER_OCCURRENCE_ROLE,),
+        ),
         "non_bgig_objects_preserved": "yes",
     }
 
@@ -836,19 +896,29 @@ def _generate_from_plan(design, plan: FusionGenerationPlan) -> dict[str, object]
     created_bodies = {}
     created_components = {}
     compact_occurrence_count = 0
+    source_helper_occurrence_count = 0
+    source_helper_visible_count = 0
 
     for blank in source_blanks:
         occurrence_plan = compact_occurrences_by_component_id.get(blank.cad_id)
         if occurrence_plan is None:
             raise RuntimeError(f"Missing compact occurrence plan for {blank.body_name}.")
-        occurrence, body = _create_module_component_occurrence(
+        module_component, body, source_helper_visible = _create_module_source_component(
             scene_component,
             blank,
+        )
+        _create_linked_module_occurrence(
+            scene_component,
+            module_component,
             occurrence_plan,
+            COMPACT_OCCURRENCE_ROLE,
         )
         created_bodies[blank.cad_id] = body
-        created_components[blank.cad_id] = occurrence.component
+        created_components[blank.cad_id] = module_component
         compact_occurrence_count += 1
+        source_helper_occurrence_count += 1
+        if source_helper_visible:
+            source_helper_visible_count += 1
 
     source_blanks_by_id = {blank.cad_id: blank for blank in source_blanks}
 
@@ -903,15 +973,38 @@ def _generate_from_plan(design, plan: FusionGenerationPlan) -> dict[str, object]
                 f"Exploded occurrence {occurrence_plan.occurrence_name!r} targets unknown "
                 f"component {occurrence_plan.component_id!r}."
             )
-        _create_linked_module_occurrence(scene_component, module_component, occurrence_plan)
+        _create_linked_module_occurrence(
+            scene_component,
+            module_component,
+            occurrence_plan,
+            EXPLODED_OCCURRENCE_ROLE,
+        )
         exploded_occurrence_count += 1
+
+    visible_occurrences_expected = compact_occurrence_count + exploded_occurrence_count
+    visible_occurrences_actual = _count_visible_bgig_occurrences_by_role(
+        design,
+        (COMPACT_OCCURRENCE_ROLE, EXPLODED_OCCURRENCE_ROLE),
+    )
+    visible_source_helpers = _count_visible_bgig_occurrences_by_role(
+        design,
+        (BGIG_SOURCE_HELPER_OCCURRENCE_ROLE,),
+    )
 
     return {
         "scene_roots_created": 1,
         "reference_outlines": 1,
+        "physical_module_count": len(source_blanks),
         "module_components_created": len(created_components),
+        "source_components_created": len(created_components),
+        "source_helper_occurrences_created": source_helper_occurrence_count,
+        "source_helper_occurrences_visible": source_helper_visible_count,
+        "visible_source_helper_occurrences": visible_source_helpers,
         "compact_occurrences_created": compact_occurrence_count,
         "exploded_occurrences_created": exploded_occurrence_count,
+        "visible_bgig_occurrences_expected": visible_occurrences_expected,
+        "visible_bgig_occurrences_actual": visible_occurrences_actual,
+        "legacy_bodies_created": 0,
         "linked_exploded_occurrences": "yes" if plan.linked_exploded_occurrences else "no",
         "cavity_cuts": cavity_cut_count,
         "finger_notch_features_planned": len(plan.finger_notch_cuts),
@@ -1038,37 +1131,61 @@ def _create_reference_outline(root_component, solid_plan: FusionSolidPlan):  # n
     return sketch
 
 
-def _create_module_component_occurrence(
+def _create_module_source_component(
     root_component,  # noqa: ANN001
     solid_plan: FusionSolidPlan,
-    occurrence_plan,  # noqa: ANN001
 ):
-    transform = _matrix_for_origin(occurrence_plan.origin_mm)
+    transform = _matrix_for_origin(FusionVectorMm(0.0, 0.0, 0.0))
     try:
-        occurrence = root_component.occurrences.addNewComponent(transform)
+        source_occurrence = root_component.occurrences.addNewComponent(transform)
     except Exception as exc:
         if is_part_design_component_limit_error(exc):
             raise FusionAssemblyDocumentRequiredError(
                 assembly_document_required_message(exc)
             ) from exc
         raise
-    if occurrence is None:
+    if source_occurrence is None:
         raise RuntimeError(
-            "Fusion component creation failed. Use an assembly-capable Fusion design "
+            "Fusion component source creation failed. Use an assembly-capable Fusion design "
             "for linked compact/exploded module occurrences."
         )
-    _apply_occurrence_transform(occurrence, transform)
-    _tag_bgig_entity(occurrence, "compact_occurrence")
+    _apply_occurrence_transform(source_occurrence, transform)
+    _tag_bgig_entity(source_occurrence, BGIG_SOURCE_HELPER_OCCURRENCE_ROLE)
 
-    module_component = occurrence.component
+    module_component = source_occurrence.component
     if module_component is None:
         raise RuntimeError(f"Fusion component is unavailable for {solid_plan.body_name}.")
     module_component.name = solid_plan.component_name
     body = _create_rectangular_blank(module_component, _local_solid_plan(solid_plan))
-    return occurrence, body
+    _hide_source_helper_occurrence(source_occurrence, solid_plan.body_name)
+    return module_component, body, _bgig_entity_is_visible(source_occurrence)
 
 
-def _create_linked_module_occurrence(scene_component, module_component, occurrence_plan) -> None:  # noqa: ANN001
+def _hide_source_helper_occurrence(occurrence, label: str) -> None:  # noqa: ANN001
+    hidden = False
+    try:
+        occurrence.isLightBulbOn = False
+        hidden = True
+    except Exception:
+        pass
+    try:
+        occurrence.isVisible = False
+        hidden = True
+    except Exception:
+        pass
+    if not hidden or _bgig_entity_is_visible(occurrence):
+        raise RuntimeError(
+            "Fusion source/helper occurrence remained visible for "
+            f"{label}. Generation refused to avoid a parasite module instance."
+        )
+
+
+def _create_linked_module_occurrence(
+    scene_component,  # noqa: ANN001
+    module_component,  # noqa: ANN001
+    occurrence_plan,  # noqa: ANN001
+    occurrence_role: str,
+):
     transform = _matrix_for_origin(occurrence_plan.origin_mm)
     try:
         occurrence = scene_component.occurrences.addExistingComponent(module_component, transform)
@@ -1080,11 +1197,11 @@ def _create_linked_module_occurrence(scene_component, module_component, occurren
         raise
     if occurrence is None:
         raise RuntimeError(
-            f"Fusion linked exploded occurrence failed for {occurrence_plan.occurrence_name}."
+            f"Fusion linked occurrence failed for {occurrence_plan.occurrence_name}."
         )
     _apply_occurrence_transform(occurrence, transform)
-    _tag_bgig_entity(occurrence, "exploded_occurrence")
-
+    _tag_bgig_entity(occurrence, occurrence_role)
+    return occurrence
 
 def _create_rectangular_blank(target_component, solid_plan: FusionSolidPlan):  # noqa: ANN001
     sketch_plane = _xy_plane_for_z(target_component, solid_plan.origin_mm.z, f"{solid_plan.component_name} footprint plane")

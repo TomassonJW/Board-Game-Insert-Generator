@@ -20,7 +20,8 @@ exports.
 - La correction P7-M001V4 ne tente plus de faire `occurrence.name = ...` ; les noms lisibles sont portes par les composants sources et le mapping compact/exploded dans le plan/message.
 - La validation Fusion manuelle P7-M001V4 en document Assembly-compatible est confirmee le 2026-07-06 : compact/exploded sont des occurrences liees des memes composants sources, et l'add-in ne renomme pas directement les occurrences.
 - P11-M002 est validee humainement pour une premiere scene eclatee multi-layer depuis placements grille X/Y/Z.
-- P11-M003 conserve les occurrences liees et ajoute une commande UI minimale ; la validation Fusion P11-M003V2 reste requise pour le nouveau flux UI et le sizing asset-first corrige.
+- P11-M003 conserve les occurrences liees et ajoute une commande UI minimale ; la validation Fusion P11-M003V4 a valide le flux UI et le sizing asset-first clarifie.
+- P12-M002V4 precise la strategie P7 : l'occurrence initiale Fusion est une source/helper cachee ; seules les occurrences compactes et eclatees planifiees doivent etre visibles.
 - Aucun export STL/3MF et aucune validation d'impression ne sont revendiques.
 
 ## Strategie P7 corrigee
@@ -34,7 +35,8 @@ Invariants :
 - un document Part Design incompatible doit echouer proprement avec `assembly document required` ;
 - la geometrie rectangulaire, les cavites et les encoches supportees sont creees
   dans la definition de ce composant ;
-- la vue compacte est une occurrence de ce composant ;
+- l'occurrence source/helper utilisee pour definir le composant est cachee ;
+- la vue compacte est une occurrence visible de ce composant ;
 - la vue eclatee est une autre occurrence du meme composant, creee via reference
   au composant existant ;
 - Fusion ne recalcule ni solveur, ni placements compacts, ni clearances, ni
@@ -45,8 +47,10 @@ Invariants :
 - les noms exacts des occurrences dans le Browser Fusion peuvent etre generes
   par Fusion et ne sont pas un critere de validation ;
 - l'add-in ne tente pas de renommer directement `Occurrence.name` ;
-- les roles compact/exploded restent explicites dans le plan hors Fusion et le
-  message final de l'add-in ;
+- les roles source/helper, compact et exploded restent explicites dans le plan
+  hors Fusion et le message final de l'add-in ;
+- le message final doit afficher les occurrences visibles attendues/reelles et
+  `Visible BGIG source/helper occurrences: 0` ;
 - aucune geometrie courbe, fillet, module composite ou export n'est ajoute.
 
 ## Mode local
@@ -83,6 +87,6 @@ Toute autre valeur est refusee avant generation.
 
 ## Gates
 
-- P7-M001V4 et P11-M002V sont validees humainement ; prochaine gate : smoke test P11-M003V2 pour la commande UI Fusion et le sizing asset-first corrige.
+- P7-M001V4, P11-M002V et P11-M003V4 sont validees humainement ; prochaine gate : smoke test P12-UI-M002V4 pour verifier les occurrences visibles exactes.
 - Nouvelle gate avant vue eclatee avancee, modules composites, export STL/3MF ou
   preparation d'impression.
