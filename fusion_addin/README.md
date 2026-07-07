@@ -20,7 +20,7 @@ Depuis `P6-M002`, il code les encoches simples de paroi depuis
 une vue eclatee basique par occurrences liees : un composant Fusion unique par
 module physique, une occurrence compacte et une occurrence eclatee. Depuis
 `P11-M003`, l'add-in expose une commande UI minimale pour choisir le fichier CAD
-IR et le mode de generation sans modifier manuellement les fichiers texte locaux. Depuis `P12-M002+`, la commande expose aussi des champs parametriques V0, un flux config BGIG vers CAD IR temporaire, `Regenerate` et `Clear BGIG Scene`.
+IR et le mode de generation sans modifier manuellement les fichiers texte locaux. Depuis `P12-M002V2`, la commande expose aussi des champs parametriques V0, un flux config BGIG vers CAD IR temporaire, `Regenerate` et `Clear BGIG Scene`.
 
 Ce que l'add-in cree maintenant :
 
@@ -187,49 +187,70 @@ plus le flux utilisateur recommande.
 
 ## UI parametrique V0
 
-Depuis P12-M002+, le flux principal reste la commande Fusion
-`Generate Board Game Insert`, mais elle expose maintenant :
+Depuis P12-M002V2, le flux principal reste la commande Fusion
+`Generate Board Game Insert`, avec des modes explicites :
 
 - `Action` : `generate`, `regenerate` ou `clear_bgig_scene` ;
-- `CAD IR JSON path` pour charger une CAD IR existante ;
-- `BGIG config JSON path` pour generer une CAD IR temporaire depuis une config ;
-- `BGIG project root` si l'add-in ne detecte pas automatiquement le repo BGIG ;
+- `Input mode` : `cad_ir_file`, `config_file`, ou `quick_parametric_box (disabled)` ;
+- `CAD IR JSON path (cad_ir_file)` pour charger une CAD IR existante ;
+- `BGIG config JSON path (config_file)` pour generer une CAD IR temporaire depuis une config ;
+- `BGIG project root (auto/memorized, optional)` ;
 - `Generation mode` : `compact_only` ou `compact_and_exploded` ;
-- champs V0 de boite, grille, epaisseurs, clearances et profil d'impression.
+- champs V0 de boite, grille, epaisseurs, clearances et profil d'impression,
+  marques comme overrides `config_file`.
 
 Le mode config ajoute seulement `<BGIG project root>/src` au `sys.path` cote
-add-in Fusion. Le coeur Python reste sans import `adsk`. Les champs numeriques
-sont des overrides de la config choisie ; ils ne creent pas encore une config
-asset-first complete depuis zero.
+add-in Fusion. Le coeur Python reste sans import `adsk`. Le project root est
+resolu dans cet ordre : champ UI si renseigne, variable `BGIG_PROJECT_ROOT`,
+auto-detection depuis la config ou l'add-in, puis dev root
+`C:\Users\janko\Documents\BGIG` si present. Les derniers chemins valides sont
+memorises dans `bgig_ui_settings.json` dans le dossier de l'add-in.
 
-`Regenerate` nettoie d'abord les objets BGIG tagues par les generations
-P12-M002+, puis regenere la scene. `Clear BGIG Scene` supprime uniquement les
-objets qui portent les attributs BGIG. Les objets utilisateur et les anciennes
-geometries BGIG non taguees ne sont pas supprimes automatiquement.
+Les champs numeriques sont de vrais overrides de la config choisie. Ils sont
+rejetes en mode `cad_ir_file` pour eviter une UI decorative. Le mode
+`quick_parametric_box` reste visible comme cible produit, mais il est
+explicitement desactive tant qu'un builder de config temporaire complet n'est pas
+code.
 
-Procedure P12-M002V recommandee :
+Depuis P12-M002V2, chaque generation cree une occurrence racine taguee
+`BGIG Generated Scene`. `Regenerate` planifie d'abord la nouvelle generation,
+supprime cette scene BGIG taguee si le plan est valide, puis regenere. `Clear
+BGIG Scene` supprime uniquement les objets portant les attributs BGIG, jamais les
+objets utilisateur non BGIG.
+
+Procedure P12-M002V2 recommandee :
 
 1. Copier l'add-in a jour dans le dossier Fusion AddIns.
 2. Ouvrir un document Fusion Assembly-compatible.
-3. Lancer `Board Game Insert Generator`.
-4. Verifier que la commande `Generate Board Game Insert` s'ouvre.
-5. Choisir `Action = generate`.
-6. Renseigner soit `CAD IR JSON path`, soit `BGIG config JSON path`.
-7. Si le mode config ne detecte pas le repo, renseigner `BGIG project root` avec
-   le dossier contenant `src/board_game_insert_generator`.
-8. Choisir `compact_and_exploded`.
-9. Laisser les champs parametriques vides pour tester la config telle quelle, ou
-   modifier un override simple, par exemple `peripheral_clearance_mm`.
-10. Cliquer `Run` et verifier le message final : `Source used`, `Action`,
-    `Parametric overrides`, `Module source mapping`, `Body sizing report`,
-    `Print validation: false`.
+3. Creer un objet utilisateur simple non BGIG dans la scene, par exemple un petit
+   sketch ou body de test.
+4. Lancer `Board Game Insert Generator`.
+5. Verifier que la commande `Generate Board Game Insert` s'ouvre avec `Action`,
+   `Input mode`, `CAD IR JSON path`, `BGIG config JSON path` et `Clear BGIG
+   Scene` visible via `Action = clear_bgig_scene`.
+6. Choisir `Input mode = config_file` et verifier que `BGIG config JSON path` est
+   pre-rempli avec `examples/simple_asset_product_scene.json` ou le dernier
+   chemin memorise.
+7. Verifier que `BGIG project root` est pre-rempli ou laisser vide si
+   auto-detecte. Ne le retaper que si le message d'erreur le demande.
+8. Choisir `Action = generate` et `Generation mode = compact_and_exploded`.
+9. Laisser les overrides vides ou modifier un override simple, par exemple
+   `peripheral_clearance_mm`, puis cliquer `Run`.
+10. Verifier le message final : `Input mode used`, `Project root`, `Config path`,
+    `Input CAD IR`, `BGIG scene roots created`, `Module source mapping`, `Body
+    sizing report`, `Print validation: false`.
 11. Relancer la commande depuis le bouton toolbar, choisir `Action = regenerate`
-    et verifier que les objets BGIG tagues sont nettoyes puis recrees.
-12. Relancer la commande, choisir `Action = clear_bgig_scene` et verifier que
-    seuls les objets BGIG tagues disparaissent.
+    et verifier qu'il n'y a pas de doublons : une seule scene BGIG compacte et
+    une seule zone eclatee doivent rester apres regeneration.
+12. Relancer la commande, choisir `Action = clear_bgig_scene`, cliquer `Run`, puis
+    verifier que la scene BGIG disparait et que l'objet utilisateur non BGIG est
+    preserve.
+13. Tester `Input mode = cad_ir_file` avec un fichier CAD IR existant. Laisser
+    les overrides vides ; si un override est renseigne, l'add-in doit refuser
+    clairement au lieu de l'ignorer.
 
-Validation attendue : generation codee, validation Fusion manuelle requise,
-`print-validated: false`.
+Validation attendue : correction codee, validation Fusion manuelle P12-M002V2
+requise, `print-validated: false`.
 ## Cas Zero Doc
 
 Fusion peut demarrer sans document actif. Le squelette detecte ce cas via

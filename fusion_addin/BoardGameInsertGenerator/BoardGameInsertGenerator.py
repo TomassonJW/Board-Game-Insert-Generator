@@ -17,19 +17,26 @@ try:
         BGIG_ATTRIBUTE_GROUP,
         BGIG_ATTRIBUTE_KIND,
         BGIG_ATTRIBUTE_VALUE,
+        BGIG_CLEARABLE_ROLES,
         BGIG_CLEAR_SCOPE,
         BGIG_COMMAND_NAME,
         BGIG_COMMAND_TOOLTIP,
         BGIG_GENERATED_CAD_IR_FILENAME,
         BGIG_GENERATED_CONFIG_FILENAME,
+        BGIG_SCENE_ROOT_COMPONENT_NAME,
+        BGIG_SCENE_ROOT_ROLE,
         BGIG_TOOLBAR_LOCATION,
         BGIG_TOOLBAR_PANEL_IDS,
         BGIG_TOOLBAR_WORKSPACE_ID,
         BGIG_UI_REOPEN_POLICY,
         DEFAULT_CAD_IR_INPUT_FILENAME,
         DEFAULT_FUSION_COMMAND_ACTION,
+        DEFAULT_FUSION_INPUT_MODE,
         DEFAULT_FUSION_GENERATION_MODE,
         DOCUMENT_STATUS_ZERO_DOC,
+        FUSION_INPUT_MODE_CAD_IR_FILE,
+        FUSION_INPUT_MODE_CONFIG_FILE,
+        FUSION_INPUT_MODE_QUICK_PARAMETRIC_BOX,
         FUSION_COMMAND_ACTION_CLEAR,
         FUSION_COMMAND_ACTION_REGENERATE,
         FUSION_EXTENT_NEGATIVE,
@@ -38,8 +45,11 @@ try:
         FUSION_SKETCH_PLANE_YZ,
         OCCURRENCE_NAME_POLICY_COMPONENT_SOURCE,
         P12_PARAMETRIC_FIELD_DEFAULTS,
+        BGIG_PARAMETRIC_FIELDS_STATUS,
+        BGIG_QUICK_PARAMETRIC_BOX_STATUS,
         P12_PARAMETRIC_FIELD_LABELS,
         SUPPORTED_FUSION_GENERATION_MODES,
+        SUPPORTED_FUSION_INPUT_MODES,
         FusionAssemblyDocumentRequiredError,
         FusionCavityCutPlan,
         FusionFingerNotchCutPlan,
@@ -52,8 +62,10 @@ try:
         build_fusion_command_request,
         cad_ir_input_guidance,
         default_fusion_command_values,
+        default_fusion_ui_settings,
         describe_document_state,
         fusion_command_summary,
+        fusion_ui_settings_path,
         generation_plan_from_cad_ir,
         is_part_design_component_limit_error,
         load_cad_ir_json,
@@ -66,19 +78,26 @@ except ImportError:  # pragma: no cover - Fusion may load the file as a script.
         BGIG_ATTRIBUTE_GROUP,
         BGIG_ATTRIBUTE_KIND,
         BGIG_ATTRIBUTE_VALUE,
+        BGIG_CLEARABLE_ROLES,
         BGIG_CLEAR_SCOPE,
         BGIG_COMMAND_NAME,
         BGIG_COMMAND_TOOLTIP,
         BGIG_GENERATED_CAD_IR_FILENAME,
         BGIG_GENERATED_CONFIG_FILENAME,
+        BGIG_SCENE_ROOT_COMPONENT_NAME,
+        BGIG_SCENE_ROOT_ROLE,
         BGIG_TOOLBAR_LOCATION,
         BGIG_TOOLBAR_PANEL_IDS,
         BGIG_TOOLBAR_WORKSPACE_ID,
         BGIG_UI_REOPEN_POLICY,
         DEFAULT_CAD_IR_INPUT_FILENAME,
         DEFAULT_FUSION_COMMAND_ACTION,
+        DEFAULT_FUSION_INPUT_MODE,
         DEFAULT_FUSION_GENERATION_MODE,
         DOCUMENT_STATUS_ZERO_DOC,
+        FUSION_INPUT_MODE_CAD_IR_FILE,
+        FUSION_INPUT_MODE_CONFIG_FILE,
+        FUSION_INPUT_MODE_QUICK_PARAMETRIC_BOX,
         FUSION_COMMAND_ACTION_CLEAR,
         FUSION_COMMAND_ACTION_REGENERATE,
         FUSION_EXTENT_NEGATIVE,
@@ -87,8 +106,11 @@ except ImportError:  # pragma: no cover - Fusion may load the file as a script.
         FUSION_SKETCH_PLANE_YZ,
         OCCURRENCE_NAME_POLICY_COMPONENT_SOURCE,
         P12_PARAMETRIC_FIELD_DEFAULTS,
+        BGIG_PARAMETRIC_FIELDS_STATUS,
+        BGIG_QUICK_PARAMETRIC_BOX_STATUS,
         P12_PARAMETRIC_FIELD_LABELS,
         SUPPORTED_FUSION_GENERATION_MODES,
+        SUPPORTED_FUSION_INPUT_MODES,
         FusionAssemblyDocumentRequiredError,
         FusionCavityCutPlan,
         FusionFingerNotchCutPlan,
@@ -101,8 +123,10 @@ except ImportError:  # pragma: no cover - Fusion may load the file as a script.
         build_fusion_command_request,
         cad_ir_input_guidance,
         default_fusion_command_values,
+        default_fusion_ui_settings,
         describe_document_state,
         fusion_command_summary,
+        fusion_ui_settings_path,
         generation_plan_from_cad_ir,
         is_part_design_component_limit_error,
         load_cad_ir_json,
@@ -122,6 +146,7 @@ except ImportError:  # pragma: no cover - exercised only outside Fusion.
 BGIG_LEGACY_COMMAND_ID = "board_game_insert_generator.generate_scene"
 BGIG_COMMAND_ID = "board_game_insert_generator_generate_scene"
 ACTION_INPUT_ID = "bgig_command_action"
+INPUT_MODE_INPUT_ID = "bgig_input_mode"
 CAD_IR_PATH_INPUT_ID = "bgig_cad_ir_path"
 CONFIG_JSON_PATH_INPUT_ID = "bgig_config_json_path"
 PROJECT_ROOT_INPUT_ID = "bgig_project_root"
@@ -191,6 +216,7 @@ if adsk is not None:
                 except Exception:
                     pass
                 inputs = command.commandInputs
+                defaults = default_fusion_ui_settings(self.addin_dir)
                 default_request = _safe_default_command_request(self.addin_dir)
                 action_input = inputs.addDropDownCommandInput(
                     ACTION_INPUT_ID,
@@ -203,20 +229,30 @@ if adsk is not None:
                     FUSION_COMMAND_ACTION_CLEAR,
                 ):
                     action_input.listItems.add(action, action == default_request.action, "")
+                input_mode = inputs.addDropDownCommandInput(
+                    INPUT_MODE_INPUT_ID,
+                    "Input mode",
+                    adsk.core.DropDownStyles.TextListDropDownStyle,
+                )
+                for mode in SUPPORTED_FUSION_INPUT_MODES:
+                    label = mode
+                    if mode == FUSION_INPUT_MODE_QUICK_PARAMETRIC_BOX:
+                        label = f"{mode} (disabled)"
+                    input_mode.listItems.add(label, mode == default_request.input_mode, "")
                 inputs.addStringValueInput(
                     CAD_IR_PATH_INPUT_ID,
-                    "CAD IR JSON path",
-                    str(default_request.cad_ir_path or ""),
+                    "CAD IR JSON path (cad_ir_file)",
+                    defaults.get("cad_ir_path", str(default_request.cad_ir_path or "")),
                 )
                 inputs.addStringValueInput(
                     CONFIG_JSON_PATH_INPUT_ID,
-                    "BGIG config JSON path",
-                    "",
+                    "BGIG config JSON path (config_file)",
+                    defaults.get("config_json_path", ""),
                 )
                 inputs.addStringValueInput(
                     PROJECT_ROOT_INPUT_ID,
-                    "BGIG project root",
-                    "",
+                    "BGIG project root (auto/memorized, optional)",
+                    defaults.get("project_root", ""),
                 )
                 mode_input = inputs.addDropDownCommandInput(
                     GENERATION_MODE_INPUT_ID,
@@ -225,17 +261,27 @@ if adsk is not None:
                 )
                 for mode in SUPPORTED_FUSION_GENERATION_MODES:
                     mode_input.listItems.add(mode, mode == default_request.generation_mode, "")
+                inputs.addTextBoxCommandInput(
+                    "bgig_parametric_status",
+                    "Parametric fields",
+                    (
+                        "Config-file overrides only. They are rejected in cad_ir_file mode. "
+                        f"quick_parametric_box: {BGIG_QUICK_PARAMETRIC_BOX_STATUS}."
+                    ),
+                    3,
+                    True,
+                )
                 for parameter_id, label in P12_PARAMETRIC_FIELD_LABELS.items():
                     inputs.addStringValueInput(
                         _parameter_input_id(parameter_id),
-                        label,
+                        f"{label} (config_file override)",
                         P12_PARAMETRIC_FIELD_DEFAULTS[parameter_id],
                     )
                 inputs.addTextBoxCommandInput(
                     SUMMARY_INPUT_ID,
                     "Summary",
                     fusion_command_summary(default_request),
-                    8,
+                    10,
                     True,
                 )
                 execute_handler = _BgigCommandExecuteHandler(self.addin_dir)
@@ -258,6 +304,7 @@ if adsk is not None:
                 project_root_input = inputs.itemById(PROJECT_ROOT_INPUT_ID)
                 generation_mode_input = inputs.itemById(GENERATION_MODE_INPUT_ID)
                 action_input = inputs.itemById(ACTION_INPUT_ID)
+                input_mode_input = inputs.itemById(INPUT_MODE_INPUT_ID)
                 request = build_fusion_command_request(
                     getattr(cad_ir_path_input, "value", ""),
                     _selected_dropdown_value(generation_mode_input, DEFAULT_FUSION_GENERATION_MODE),
@@ -266,6 +313,7 @@ if adsk is not None:
                     config_json_path_text=getattr(config_path_input, "value", ""),
                     project_root_text=getattr(project_root_input, "value", ""),
                     parameter_values=_parameter_input_values(inputs),
+                    input_mode=_selected_dropdown_value(input_mode_input, DEFAULT_FUSION_INPUT_MODE),
                 )
                 _show_message(_execute_generation_request(request, self.addin_dir))
             except FusionAssemblyDocumentRequiredError as exc:
@@ -386,6 +434,8 @@ def _parameter_input_id(parameter_id: str) -> str:
 def _selected_dropdown_value(dropdown_input, default_value: str) -> str:  # noqa: ANN001 - Fusion API object.
     selected_item = getattr(dropdown_input, "selectedItem", None)
     selected_name = getattr(selected_item, "name", None)
+    if isinstance(selected_name, str) and selected_name.endswith(" (disabled)"):
+        selected_name = selected_name[: -len(" (disabled)")]
     return selected_name or default_value
 
 
@@ -420,7 +470,8 @@ def _execute_generation_request(request, addin_dir: Path) -> str:  # noqa: ANN00
         clear_result = _clear_bgig_scene(design)
 
     result = _generate_from_plan(design, generation_plan)
-    return _generation_result_message(generation_plan, result, cad_ir_path, request, clear_result)
+    settings_saved = _save_command_settings(addin_dir, request, cad_ir_path)
+    return _generation_result_message(generation_plan, result, cad_ir_path, request, clear_result, settings_saved)
 
 
 def _generate_cad_ir_from_config_request(request, addin_dir: Path) -> Path:  # noqa: ANN001
@@ -481,6 +532,25 @@ def _ensure_bgig_engine_on_path(project_root: Path) -> None:
     if src_text not in sys.path:
         sys.path.insert(0, src_text)
 
+def _save_command_settings(addin_dir: Path, request, cad_ir_path: Path) -> bool:  # noqa: ANN001
+    settings = {
+        "input_mode": request.input_mode,
+        "generation_mode": request.generation_mode,
+        "cad_ir_path": str(cad_ir_path),
+    }
+    if request.config_json_path is not None:
+        settings["config_json_path"] = str(request.config_json_path)
+    if request.project_root is not None:
+        settings["project_root"] = str(request.project_root)
+    try:
+        fusion_ui_settings_path(addin_dir).write_text(
+            json.dumps(settings, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        return True
+    except OSError:
+        return False
+
 
 def _clear_result_message(clear_result: dict[str, object]) -> str:
     return (
@@ -489,6 +559,7 @@ def _clear_result_message(clear_result: dict[str, object]) -> str:
         f"Tagged BGIG objects found: {clear_result['tagged_objects_found']}\n"
         f"Tagged BGIG objects deleted: {clear_result['deleted_objects']}\n"
         f"Tagged BGIG objects skipped: {clear_result['skipped_objects']}\n"
+        f"Non-BGIG objects preserved: {clear_result['non_bgig_objects_preserved']}\n"
         "Legacy untagged BGIG objects are not deleted to avoid removing user geometry.\n"
         "Status: manual validation required in Fusion 360."
     )
@@ -500,6 +571,7 @@ def _generation_result_message(
     cad_ir_path: Path,
     request,
     clear_result: dict[str, object] | None = None,
+    settings_saved: bool = False,
 ) -> str:
     body_size_report = _body_size_report_message(result.get("body_size_reports", []))
     module_mapping_report = _module_mapping_report_message(generation_plan)
@@ -509,6 +581,7 @@ def _generation_result_message(
             f"Regenerate clear scope: {clear_result['scope']}\n"
             f"Regenerate tagged BGIG objects deleted: {clear_result['deleted_objects']}\n"
             f"Regenerate tagged BGIG objects skipped: {clear_result['skipped_objects']}\n"
+            f"Regenerate non-BGIG objects preserved: {clear_result['non_bgig_objects_preserved']}\n"
         )
     source_path = request.config_json_path if request.source_kind == "config" else cad_ir_path
     overrides = request.parameter_overrides or {}
@@ -516,9 +589,13 @@ def _generation_result_message(
         "Board Game Insert Generator generated CAD IR scene from command UI.\n"
         f"Project: {generation_plan.project_name}\n"
         f"Action: {request.action}\n"
+        f"Input mode used: {request.input_mode}\n"
         f"Source used: {request.source_kind}\n"
+        f"Project root: {request.project_root if request.project_root is not None else 'not required'}\n"
+        f"Config path: {request.config_json_path if request.config_json_path is not None else 'n/a'}\n"
         f"Source path: {source_path}\n"
         f"Input CAD IR: {cad_ir_path}\n"
+        f"UI settings saved: {'yes' if settings_saved else 'no'}\n"
         f"Parametric overrides: {', '.join(sorted(overrides)) if overrides else 'none'}\n"
         f"Generation mode: {generation_plan.generation_mode}\n"
         f"Reference outlines: {result['reference_outlines']}\n"
@@ -530,6 +607,7 @@ def _generation_result_message(
         f"Module components planned: {generation_plan.module_component_count}\n"
         f"Compact occurrences planned: {len(generation_plan.compact_occurrences)}\n"
         f"Exploded occurrences planned: {len(generation_plan.exploded_occurrences)}\n"
+        f"BGIG scene roots created: {result['scene_roots_created']}\n"
         f"Module components created: {result['module_components_created']}\n"
         f"Compact occurrences created: {result['compact_occurrences_created']}\n"
         f"Exploded occurrences created: {result['exploded_occurrences_created']}\n"
@@ -566,9 +644,9 @@ def _clear_bgig_scene(design) -> dict[str, object]:  # noqa: ANN001 - Fusion API
         ) from exc
 
     found = getattr(attributes, "count", 0)
-    deleted = 0
-    skipped = 0
+    tagged_entities = []
     seen_entities = set()
+    skipped = 0
     for index in range(found):
         attribute = attributes.item(index)
         entity = getattr(attribute, "parent", None)
@@ -580,8 +658,20 @@ def _clear_bgig_scene(design) -> dict[str, object]:  # noqa: ANN001 - Fusion API
             continue
         seen_entities.add(entity_key)
         role = _bgig_entity_role(entity)
-        if role not in {"reference_outline", "compact_occurrence", "exploded_occurrence"}:
+        if role not in BGIG_CLEARABLE_ROLES:
             skipped += 1
+            continue
+        tagged_entities.append((entity, role))
+
+    deleted = 0
+    deleted_entities = set()
+    ordered_entities = sorted(
+        tagged_entities,
+        key=lambda item: 0 if item[1] == BGIG_SCENE_ROOT_ROLE else 1,
+    )
+    for entity, _role in ordered_entities:
+        entity_key = id(entity)
+        if entity_key in deleted_entities:
             continue
         delete_method = getattr(entity, "deleteMe", None)
         if delete_method is None:
@@ -590,15 +680,17 @@ def _clear_bgig_scene(design) -> dict[str, object]:  # noqa: ANN001 - Fusion API
         try:
             delete_method()
             deleted += 1
+            deleted_entities.add(entity_key)
         except Exception:
             skipped += 1
+
     return {
         "scope": BGIG_CLEAR_SCOPE,
         "tagged_objects_found": found,
         "deleted_objects": deleted,
         "skipped_objects": skipped,
+        "non_bgig_objects_preserved": "yes",
     }
-
 
 def _tag_bgig_entity(entity, role: str) -> None:  # noqa: ANN001 - Fusion API object.
     attributes = getattr(entity, "attributes", None)
@@ -632,9 +724,31 @@ def _active_design(application):  # noqa: ANN001 - Fusion API object.
     return design
 
 
+def _create_bgig_scene_root(root_component):  # noqa: ANN001 - Fusion API object.
+    transform = _matrix_for_origin(FusionVectorMm(0.0, 0.0, 0.0))
+    try:
+        occurrence = root_component.occurrences.addNewComponent(transform)
+    except Exception as exc:
+        if is_part_design_component_limit_error(exc):
+            raise FusionAssemblyDocumentRequiredError(
+                assembly_document_required_message(exc)
+            ) from exc
+        raise
+    if occurrence is None:
+        raise RuntimeError("Fusion component creation failed for BGIG Generated Scene.")
+    _apply_occurrence_transform(occurrence, transform)
+    _tag_bgig_entity(occurrence, BGIG_SCENE_ROOT_ROLE)
+    component = occurrence.component
+    if component is None:
+        raise RuntimeError("BGIG Generated Scene component is unavailable.")
+    component.name = BGIG_SCENE_ROOT_COMPONENT_NAME
+    _tag_bgig_entity(component, "scene_root_component")
+    return occurrence, component
+
 def _generate_from_plan(design, plan: FusionGenerationPlan) -> dict[str, object]:  # noqa: ANN001
     root_component = design.rootComponent
-    reference_outline = _create_reference_outline(root_component, plan.reference_box)
+    _scene_occurrence, scene_component = _create_bgig_scene_root(root_component)
+    reference_outline = _create_reference_outline(scene_component, plan.reference_box)
     _tag_bgig_entity(reference_outline, "reference_outline")
 
     source_blanks = [*plan.blanks, *plan.grid_positioned_blanks]
@@ -650,7 +764,7 @@ def _generate_from_plan(design, plan: FusionGenerationPlan) -> dict[str, object]
         if occurrence_plan is None:
             raise RuntimeError(f"Missing compact occurrence plan for {blank.body_name}.")
         occurrence, body = _create_module_component_occurrence(
-            root_component,
+            scene_component,
             blank,
             occurrence_plan,
         )
@@ -711,10 +825,11 @@ def _generate_from_plan(design, plan: FusionGenerationPlan) -> dict[str, object]
                 f"Exploded occurrence {occurrence_plan.occurrence_name!r} targets unknown "
                 f"component {occurrence_plan.component_id!r}."
             )
-        _create_linked_module_occurrence(root_component, module_component, occurrence_plan)
+        _create_linked_module_occurrence(scene_component, module_component, occurrence_plan)
         exploded_occurrence_count += 1
 
     return {
+        "scene_roots_created": 1,
         "reference_outlines": 1,
         "module_components_created": len(created_components),
         "compact_occurrences_created": compact_occurrence_count,
@@ -726,7 +841,6 @@ def _generate_from_plan(design, plan: FusionGenerationPlan) -> dict[str, object]
         "finger_notch_cuts": finger_notch_cut_count,
         "body_size_reports": body_size_reports,
     }
-
 
 def _fusion_body_size_report(solid_plan: FusionSolidPlan, body) -> dict[str, object]:  # noqa: ANN001
     planned_size_mm = solid_plan.printable_body_size_mm or solid_plan.size_mm
@@ -876,10 +990,10 @@ def _create_module_component_occurrence(
     return occurrence, body
 
 
-def _create_linked_module_occurrence(root_component, module_component, occurrence_plan) -> None:  # noqa: ANN001
+def _create_linked_module_occurrence(scene_component, module_component, occurrence_plan) -> None:  # noqa: ANN001
     transform = _matrix_for_origin(occurrence_plan.origin_mm)
     try:
-        occurrence = root_component.occurrences.addExistingComponent(module_component, transform)
+        occurrence = scene_component.occurrences.addExistingComponent(module_component, transform)
     except Exception as exc:
         if is_part_design_component_limit_error(exc):
             raise FusionAssemblyDocumentRequiredError(

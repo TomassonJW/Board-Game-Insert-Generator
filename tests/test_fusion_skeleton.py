@@ -13,6 +13,11 @@ from board_game_insert_generator.layout import generate_basic_layout
 from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     ASSEMBLY_DOCUMENT_REQUIRED_STATUS,
     BGIG_CLEAR_SCOPE,
+    BGIG_PARAMETRIC_FIELDS_STATUS,
+    BGIG_QUICK_PARAMETRIC_BOX_STATUS,
+    BGIG_SCENE_ROOT_COMPONENT_NAME,
+    BGIG_SCENE_ROOT_ROLE,
+    BGIG_UI_SETTINGS_FILENAME,
     BGIG_COMMAND_NAME,
     BGIG_TOOLBAR_LOCATION,
     BGIG_TOOLBAR_PANEL_IDS,
@@ -34,6 +39,9 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     FUSION_COMMAND_ACTION_CLEAR,
     FUSION_COMMAND_ACTION_GENERATE,
     FUSION_COMMAND_ACTION_REGENERATE,
+    FUSION_INPUT_MODE_CAD_IR_FILE,
+    FUSION_INPUT_MODE_CONFIG_FILE,
+    FUSION_INPUT_MODE_QUICK_PARAMETRIC_BOX,
     FUSION_GENERATION_MODE_COMPACT_AND_EXPLODED,
     FUSION_GENERATION_MODE_COMPACT_ONLY,
     FUSION_EXTENT_NEGATIVE,
@@ -52,13 +60,16 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     build_fusion_command_request,
     cad_ir_input_guidance,
     default_fusion_command_values,
+    default_fusion_ui_settings,
     detect_bgig_project_root,
     describe_document_state,
     fusion_command_summary,
+    fusion_ui_settings_path,
     fusion_ui_launch_plan,
     generation_plan_from_cad_ir,
     is_part_design_component_limit_error,
     load_cad_ir_json,
+    load_fusion_ui_settings,
     mm_to_cm,
     parse_parametric_overrides,
     planned_operations_from_cad_ir,
@@ -355,6 +366,52 @@ class FusionSkeletonTests(unittest.TestCase):
 
         with self.assertRaisesRegex(FusionSkeletonError, "volumetric_grid"):
             apply_parametric_overrides_to_config_payload(payload, {"grid_units_x": 4})
+    def test_rejects_parametric_overrides_in_cad_ir_mode(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            addin_dir = Path(temp_dir)
+            cad_ir_path = addin_dir / "scene.json"
+            cad_ir_path.write_text(json.dumps(_cad_ir_payload()), encoding="utf-8")
+
+            with self.assertRaisesRegex(FusionSkeletonError, "config_file mode"):
+                build_fusion_command_request(
+                    "scene.json",
+                    FUSION_GENERATION_MODE_COMPACT_ONLY,
+                    addin_dir,
+                    parameter_values={"box_inner_x_mm": "120"},
+                    input_mode=FUSION_INPUT_MODE_CAD_IR_FILE,
+                )
+
+    def test_rejects_quick_parametric_box_until_real_builder_exists(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            with self.assertRaisesRegex(FusionSkeletonError, "quick_parametric_box"):
+                build_fusion_command_request(
+                    "",
+                    FUSION_GENERATION_MODE_COMPACT_AND_EXPLODED,
+                    Path(temp_dir),
+                    parameter_values={"box_inner_x_mm": "120"},
+                    input_mode=FUSION_INPUT_MODE_QUICK_PARAMETRIC_BOX,
+                )
+
+    def test_default_ui_settings_reads_local_settings_file(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            addin_dir = Path(temp_dir)
+            settings_path = addin_dir / BGIG_UI_SETTINGS_FILENAME
+            settings_path.write_text(
+                json.dumps(
+                    {
+                        "config_json_path": str(ROOT / "examples" / "simple_tray.json"),
+                        "project_root": str(ROOT),
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            settings = default_fusion_ui_settings(addin_dir)
+
+        self.assertEqual(settings["input_mode"], FUSION_INPUT_MODE_CONFIG_FILE)
+        self.assertEqual(Path(settings["config_json_path"]), (ROOT / "examples" / "simple_tray.json").resolve())
+        self.assertEqual(Path(settings["project_root"]), ROOT)
+        self.assertEqual(Path(settings["settings_path"]).name, BGIG_UI_SETTINGS_FILENAME)
 
     def test_detects_bgig_project_root_from_config_path(self) -> None:
         detected = detect_bgig_project_root(
@@ -372,14 +429,29 @@ class FusionSkeletonTests(unittest.TestCase):
                     Path(temp_dir),
                 )
 
-    def test_default_fusion_command_values_keep_legacy_files_as_defaults(self) -> None:
+    def test_default_fusion_command_values_prefill_product_config_when_root_is_detected(self) -> None:
+        request = default_fusion_command_values(ROOT / "fusion_addin" / "BoardGameInsertGenerator")
+
+        self.assertEqual(request.input_mode, FUSION_INPUT_MODE_CONFIG_FILE)
+        self.assertEqual(request.source_kind, "config")
+        self.assertEqual(request.config_json_path, (ROOT / "examples" / "simple_asset_product_scene.json").resolve())
+        self.assertEqual(request.project_root, ROOT)
+        self.assertEqual(request.generation_mode, FUSION_GENERATION_MODE_COMPACT_AND_EXPLODED)
+
+    def test_builds_explicit_cad_ir_file_mode_request(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             addin_dir = Path(temp_dir)
             cad_ir_path = addin_dir / DEFAULT_CAD_IR_INPUT_FILENAME
             cad_ir_path.write_text(json.dumps(_cad_ir_payload()), encoding="utf-8")
 
-            request = default_fusion_command_values(addin_dir)
+            request = build_fusion_command_request(
+                str(cad_ir_path),
+                FUSION_GENERATION_MODE_COMPACT_AND_EXPLODED,
+                addin_dir,
+                input_mode=FUSION_INPUT_MODE_CAD_IR_FILE,
+            )
 
+        self.assertEqual(request.input_mode, FUSION_INPUT_MODE_CAD_IR_FILE)
         self.assertEqual(request.cad_ir_path.name, DEFAULT_CAD_IR_INPUT_FILENAME)
         self.assertEqual(request.generation_mode, FUSION_GENERATION_MODE_COMPACT_AND_EXPLODED)
 
@@ -966,6 +1038,16 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("_tag_bgig_entity", source)
         self.assertIn("BGIG_CLEAR_SCOPE", source)
         self.assertIn("Print validation: false", source)
+        self.assertIn("Input mode", source)
+        self.assertIn("SUPPORTED_FUSION_INPUT_MODES", source)
+        self.assertIn("default_fusion_ui_settings", source)
+        self.assertIn("fusion_ui_settings_path", source)
+        self.assertIn("BGIG Generated Scene", source)
+        self.assertIn("BGIG_SCENE_ROOT_ROLE", source)
+        self.assertIn("scene_roots_created", source)
+        self.assertIn("non_bgig_objects_preserved", source)
+        self.assertIn("quick_parametric_box", source)
+        self.assertIn("Config-file overrides only", source)
         execute_block = source[
             source.index("def _execute_generation_request") : source.index("def _generate_cad_ir_from_config_request")
         ]

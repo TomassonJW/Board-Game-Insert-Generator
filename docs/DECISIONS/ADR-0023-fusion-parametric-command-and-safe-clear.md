@@ -88,3 +88,22 @@ pas assez les manipulations externes.
 - Nouvelle gate avant UI assets complete, palette persistante large, solveur plus
   automatique, nouvelle geometrie Fusion, exports STL/3MF ou validation
   d'impression.
+## Revision P12-M002V2
+
+Le smoke test P12-M002V a montre que le tagging objet par objet n'etait pas assez
+robuste pour `regenerate`, et que l'UI exposait trop de champs sans modes assez
+clairs.
+
+Decision corrective :
+
+- ajouter un `Input mode` explicite ;
+- utiliser `config_file` comme flux pre-rempli quand BGIG est detecte ;
+- memoriser les derniers chemins valides dans `bgig_ui_settings.json` ;
+- refuser les overrides en mode `cad_ir_file` ;
+- garder `quick_parametric_box` visible mais desactive ;
+- creer une racine Fusion taguee `BGIG Generated Scene` pour chaque generation ;
+- faire de `Clear BGIG Scene` et `Regenerate` des operations de suppression
+  taguee uniquement, preserves des objets non BGIG.
+
+Cette revision ne change ni la geometrie generee, ni le contrat CAD IR, ni les
+valeurs de tolerance par defaut.

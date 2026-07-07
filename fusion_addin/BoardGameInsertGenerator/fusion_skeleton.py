@@ -8,6 +8,7 @@ boundary checks in normal Python.
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -49,12 +50,34 @@ SUPPORTED_FUSION_COMMAND_ACTIONS = (
 )
 DEFAULT_FUSION_COMMAND_ACTION = FUSION_COMMAND_ACTION_GENERATE
 
+FUSION_INPUT_MODE_CAD_IR_FILE = "cad_ir_file"
+FUSION_INPUT_MODE_CONFIG_FILE = "config_file"
+FUSION_INPUT_MODE_QUICK_PARAMETRIC_BOX = "quick_parametric_box"
+SUPPORTED_FUSION_INPUT_MODES = (
+    FUSION_INPUT_MODE_CAD_IR_FILE,
+    FUSION_INPUT_MODE_CONFIG_FILE,
+    FUSION_INPUT_MODE_QUICK_PARAMETRIC_BOX,
+)
+DEFAULT_FUSION_INPUT_MODE = FUSION_INPUT_MODE_CONFIG_FILE
+
 BGIG_GENERATED_CONFIG_FILENAME = "bgig_ui_generated_config.json"
 BGIG_GENERATED_CAD_IR_FILENAME = "bgig_ui_generated_cad_ir.json"
+BGIG_UI_SETTINGS_FILENAME = "bgig_ui_settings.json"
+BGIG_DEFAULT_DEV_PROJECT_ROOT = Path("C:/Users/janko/Documents/BGIG")
 BGIG_ATTRIBUTE_GROUP = "BGIG"
 BGIG_ATTRIBUTE_KIND = "generated_by"
 BGIG_ATTRIBUTE_VALUE = "BoardGameInsertGenerator"
 BGIG_CLEAR_SCOPE = "tagged_bgig_objects_only"
+BGIG_SCENE_ROOT_COMPONENT_NAME = "BGIG Generated Scene"
+BGIG_SCENE_ROOT_ROLE = "scene_root_occurrence"
+BGIG_CLEARABLE_ROLES = (
+    BGIG_SCENE_ROOT_ROLE,
+    "reference_outline",
+    "compact_occurrence",
+    "exploded_occurrence",
+)
+BGIG_PARAMETRIC_FIELDS_STATUS = "config_file_only"
+BGIG_QUICK_PARAMETRIC_BOX_STATUS = "disabled_until_config_builder_contract"
 
 P12_PARAMETRIC_FIELD_DEFAULTS = {
     "box_inner_x_mm": "",
@@ -154,10 +177,12 @@ class FusionCommandRequest:
     cad_ir_path: Path | None
     generation_mode: str
     action: str = DEFAULT_FUSION_COMMAND_ACTION
+    input_mode: str = DEFAULT_FUSION_INPUT_MODE
     config_json_path: Path | None = None
     project_root: Path | None = None
     parameter_overrides: dict[str, Any] | None = None
     source_kind: str = "cad_ir"
+    quick_parametric_status: str = BGIG_QUICK_PARAMETRIC_BOX_STATUS
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -166,8 +191,10 @@ class FusionCommandRequest:
             "project_root": str(self.project_root) if self.project_root is not None else None,
             "generation_mode": self.generation_mode,
             "action": self.action,
+            "input_mode": self.input_mode,
             "parameter_overrides": dict(self.parameter_overrides or {}),
             "source_kind": self.source_kind,
+            "quick_parametric_status": self.quick_parametric_status,
         }
 
 @dataclass(frozen=True)
@@ -183,9 +210,12 @@ class FusionUiLaunchPlan:
     opens_dialog_on_run: bool = True
     legacy_files_are_defaults_only: bool = True
     command_actions: tuple[str, ...] = SUPPORTED_FUSION_COMMAND_ACTIONS
+    input_modes: tuple[str, ...] = SUPPORTED_FUSION_INPUT_MODES
     parametric_fields: tuple[str, ...] = tuple(P12_PARAMETRIC_FIELD_DEFAULTS)
     config_input_supported: bool = True
     clear_scope: str = BGIG_CLEAR_SCOPE
+    parametric_fields_status: str = BGIG_PARAMETRIC_FIELDS_STATUS
+    quick_parametric_box_status: str = BGIG_QUICK_PARAMETRIC_BOX_STATUS
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -198,9 +228,12 @@ class FusionUiLaunchPlan:
             "opens_dialog_on_run": self.opens_dialog_on_run,
             "legacy_files_are_defaults_only": self.legacy_files_are_defaults_only,
             "command_actions": list(self.command_actions),
+            "input_modes": list(self.input_modes),
             "parametric_fields": list(self.parametric_fields),
             "config_input_supported": self.config_input_supported,
             "clear_scope": self.clear_scope,
+            "parametric_fields_status": self.parametric_fields_status,
+            "quick_parametric_box_status": self.quick_parametric_box_status,
         }
 
 
@@ -702,12 +735,18 @@ def build_fusion_command_request(
     config_json_path_text: str = "",
     project_root_text: str = "",
     parameter_values: dict[str, str] | None = None,
+    input_mode: str = "",
 ) -> FusionCommandRequest:
     """Validate command UI values without importing Fusion API types."""
 
     root = Path(addin_dir)
     validated_action = _validated_command_action(action)
     validated_mode = _validated_generation_mode(generation_mode)
+    validated_input_mode = _validated_input_mode(
+        input_mode,
+        cad_ir_path_text,
+        config_json_path_text,
+    )
     parameter_overrides = parse_parametric_overrides(parameter_values or {})
 
     if validated_action == FUSION_COMMAND_ACTION_CLEAR:
@@ -715,67 +754,143 @@ def build_fusion_command_request(
             cad_ir_path=None,
             generation_mode=validated_mode,
             action=validated_action,
+            input_mode=validated_input_mode,
             parameter_overrides=parameter_overrides,
             source_kind="clear_only",
         )
 
-    config_path = _resolve_optional_json_path(
-        config_json_path_text,
-        root,
-        "BGIG config JSON",
-    )
-    if config_path is not None:
+    if validated_input_mode == FUSION_INPUT_MODE_QUICK_PARAMETRIC_BOX:
+        raise FusionSkeletonError(
+            "quick_parametric_box is visible as a product mode but is disabled in this build. "
+            "Use config_file with a BGIG config JSON and real config overrides."
+        )
+
+    if validated_input_mode == FUSION_INPUT_MODE_CONFIG_FILE:
+        config_path = _resolve_optional_json_path(
+            config_json_path_text,
+            root,
+            "BGIG config JSON",
+        )
+        if config_path is None:
+            raise FusionSkeletonError(
+                "BGIG config JSON path is required in config_file mode. "
+                "Select a config file or switch Input mode to cad_ir_file."
+            )
         project_root = resolve_bgig_project_root(project_root_text, config_path, root)
         return FusionCommandRequest(
             cad_ir_path=None,
             generation_mode=validated_mode,
             action=validated_action,
+            input_mode=validated_input_mode,
             config_json_path=config_path,
             project_root=project_root,
             parameter_overrides=parameter_overrides,
             source_kind="config",
         )
 
+    if parameter_overrides:
+        raise FusionSkeletonError(
+            "Parametric override fields are active only in config_file mode. "
+            "Switch Input mode to config_file or leave all override fields blank."
+        )
     cad_ir_path = _resolve_optional_json_path(
         cad_ir_path_text,
         root,
         "CAD IR JSON",
     )
     if cad_ir_path is None:
-        raise FusionSkeletonError("CAD IR JSON path or BGIG config JSON path is required.")
+        raise FusionSkeletonError(
+            "CAD IR JSON path is required in cad_ir_file mode. "
+            "Select a CAD IR file or switch Input mode to config_file."
+        )
 
     return FusionCommandRequest(
         cad_ir_path=cad_ir_path,
         generation_mode=validated_mode,
         action=validated_action,
+        input_mode=validated_input_mode,
         parameter_overrides=parameter_overrides,
         source_kind="cad_ir",
     )
 
 
 def default_fusion_command_values(addin_dir: str | Path) -> FusionCommandRequest:
-    """Return default command UI values from legacy local add-in files.
+    """Return default command UI values from settings, dev auto-detection and legacy files."""
 
-    Broken local override files must not prevent the command UI from opening;
-    users can correct the path directly in the command input.
-    """
+    defaults = default_fusion_ui_settings(addin_dir)
+    return build_fusion_command_request(
+        defaults.get("cad_ir_path", ""),
+        defaults.get("generation_mode", DEFAULT_FUSION_GENERATION_MODE),
+        addin_dir,
+        action=defaults.get("action", DEFAULT_FUSION_COMMAND_ACTION),
+        config_json_path_text=defaults.get("config_json_path", ""),
+        project_root_text=defaults.get("project_root", ""),
+        parameter_values={},
+        input_mode=defaults.get("input_mode", DEFAULT_FUSION_INPUT_MODE),
+    )
+
+
+def default_fusion_ui_settings(addin_dir: str | Path) -> dict[str, str]:
+    """Return UI defaults without requiring manual developer paths every run."""
 
     root = Path(addin_dir)
-    try:
-        cad_ir_path = resolve_cad_ir_input_path(root)
-    except FusionSkeletonError:
-        cad_ir_path = root / DEFAULT_CAD_IR_INPUT_FILENAME
+    saved = load_fusion_ui_settings(root)
+    project_root = _valid_project_root_or_none(saved.get("project_root", ""))
+    config_path = _valid_existing_file_or_none(saved.get("config_json_path", ""))
+    cad_ir_path = _valid_existing_file_or_none(saved.get("cad_ir_path", ""))
+
+    if project_root is None and config_path is not None:
+        project_root = detect_bgig_project_root(config_path, root)
+    if project_root is None:
+        project_root = _env_project_root_or_none()
+    if project_root is None:
+        project_root = _valid_project_root_or_none(BGIG_DEFAULT_DEV_PROJECT_ROOT)
+
+    if config_path is None and project_root is not None:
+        example_path = project_root / "examples" / "simple_asset_product_scene.json"
+        if example_path.is_file():
+            config_path = example_path.resolve()
+
+    if cad_ir_path is None:
+        try:
+            cad_ir_path = resolve_cad_ir_input_path(root)
+        except FusionSkeletonError:
+            cad_ir_path = root / DEFAULT_CAD_IR_INPUT_FILENAME
+
     try:
         generation_mode = resolve_generation_mode(root)
     except FusionSkeletonError:
         generation_mode = DEFAULT_FUSION_GENERATION_MODE
-    return FusionCommandRequest(
-        cad_ir_path=cad_ir_path,
-        generation_mode=generation_mode,
-        action=DEFAULT_FUSION_COMMAND_ACTION,
-        parameter_overrides={},
-        source_kind="cad_ir",
-    )
+
+    input_mode = FUSION_INPUT_MODE_CONFIG_FILE if config_path is not None else FUSION_INPUT_MODE_CAD_IR_FILE
+    return {
+        "action": DEFAULT_FUSION_COMMAND_ACTION,
+        "input_mode": input_mode,
+        "cad_ir_path": str(cad_ir_path) if cad_ir_path is not None else "",
+        "config_json_path": str(config_path) if config_path is not None else "",
+        "project_root": str(project_root) if project_root is not None else "",
+        "generation_mode": generation_mode,
+        "settings_path": str(fusion_ui_settings_path(root)),
+        "parametric_fields_status": BGIG_PARAMETRIC_FIELDS_STATUS,
+        "quick_parametric_box_status": BGIG_QUICK_PARAMETRIC_BOX_STATUS,
+    }
+
+
+def fusion_ui_settings_path(addin_dir: str | Path) -> Path:
+    return Path(addin_dir) / BGIG_UI_SETTINGS_FILENAME
+
+
+def load_fusion_ui_settings(addin_dir: str | Path) -> dict[str, str]:
+    path = fusion_ui_settings_path(addin_dir)
+    if not path.is_file():
+        return {}
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    if not isinstance(payload, dict):
+        return {}
+    return {str(key): str(value) for key, value in payload.items() if value is not None}
 
 
 def fusion_command_summary(request: FusionCommandRequest) -> str:
@@ -794,17 +909,20 @@ def fusion_command_summary(request: FusionCommandRequest) -> str:
     override_summary = ", ".join(sorted(overrides)) if overrides else "none"
     return "\n".join(
         [
-            "BGIG command UI V0 uses CAD IR directly or generates a temporary CAD IR from a BGIG config.",
+            "BGIG command UI V0 uses explicit input modes: cad_ir_file, config_file, quick_parametric_box.",
             f"Action: {request.action}",
+            f"Input mode: {request.input_mode}",
             f"Source: {source}",
             f"Source path: {source_path if source_path is not None else 'n/a'}",
+            f"Project root: {request.project_root if request.project_root is not None else 'auto/not required'}",
             f"Generation mode: {request.generation_mode}",
             f"Parametric overrides: {override_summary}",
+            f"Parametric fields status: {BGIG_PARAMETRIC_FIELDS_STATUS}",
+            f"Quick parametric box: {BGIG_QUICK_PARAMETRIC_BOX_STATUS}",
             f"Clear scope: {BGIG_CLEAR_SCOPE}",
             "Fusion will not recalculate layout, clearances or tolerances.",
         ]
     )
-
 
 def parse_parametric_overrides(values: dict[str, str]) -> dict[str, Any]:
     """Parse optional P12 UI fields into config override values."""
@@ -898,18 +1016,22 @@ def resolve_bgig_project_root(
 ) -> Path:
     """Resolve the project root used to import the pure BGIG engine from Fusion."""
 
-    raw_root = project_root_text.strip().strip('"')
-    if raw_root:
-        configured_root = Path(raw_root).expanduser()
-        if not configured_root.is_absolute():
-            configured_root = Path(addin_dir) / configured_root
-        return _validated_bgig_project_root(configured_root.resolve())
+    explicit_root = _path_text_or_none(project_root_text)
+    if explicit_root is not None:
+        if not explicit_root.is_absolute():
+            explicit_root = Path(addin_dir) / explicit_root
+        return _validated_bgig_project_root(explicit_root.resolve())
+
+    environment_root = _env_project_root_or_none()
+    if environment_root is not None:
+        return environment_root
 
     detected = detect_bgig_project_root(config_path, addin_dir)
     if detected is None:
         raise FusionSkeletonError(
-            "BGIG project root is required to generate CAD IR from config. "
-            "Set the UI field to the repo folder containing src/board_game_insert_generator."
+            "BGIG project root could not be auto-detected. "
+            "Set BGIG_PROJECT_ROOT or use the advanced UI field with the repo folder "
+            "containing src/board_game_insert_generator."
         )
     return detected
 
@@ -917,13 +1039,59 @@ def resolve_bgig_project_root(
 def detect_bgig_project_root(config_path: Path, addin_dir: str | Path) -> Path | None:
     """Find a repo root containing src/board_game_insert_generator."""
 
-    for candidate in [config_path, Path(addin_dir)]:
+    candidates: list[Path] = []
+    env_root = _env_project_root_or_none()
+    if env_root is not None:
+        candidates.append(env_root)
+    candidates.extend([config_path, Path(addin_dir), BGIG_DEFAULT_DEV_PROJECT_ROOT])
+    for candidate in candidates:
         for parent in [candidate, *candidate.parents]:
-            src_dir = parent / "src" / "board_game_insert_generator"
-            if src_dir.is_dir():
-                return parent.resolve()
+            valid = _valid_project_root_or_none(parent)
+            if valid is not None:
+                return valid
     return None
 
+
+def _env_project_root_or_none() -> Path | None:
+    return _valid_project_root_or_none(os.environ.get("BGIG_PROJECT_ROOT", ""))
+
+
+def _valid_project_root_or_none(value: str | Path) -> Path | None:
+    if value is None:
+        return None
+    try:
+        path = Path(value).expanduser()
+    except TypeError:
+        return None
+    if not str(path).strip():
+        return None
+    try:
+        resolved = path.resolve()
+    except OSError:
+        return None
+    src_dir = resolved / "src" / "board_game_insert_generator"
+    return resolved if src_dir.is_dir() else None
+
+
+def _valid_existing_file_or_none(value: str | Path) -> Path | None:
+    if value is None:
+        return None
+    try:
+        path = Path(value).expanduser()
+    except TypeError:
+        return None
+    if not str(path).strip():
+        return None
+    try:
+        resolved = path.resolve()
+    except OSError:
+        return None
+    return resolved if resolved.is_file() else None
+
+
+def _path_text_or_none(value: str) -> Path | None:
+    raw = str(value or "").strip().strip('"')
+    return Path(raw).expanduser() if raw else None
 
 def _resolve_optional_json_path(path_text: str, addin_dir: Path, label: str) -> Path | None:
     raw_path = path_text.strip().strip('"')
@@ -994,6 +1162,18 @@ def _validated_command_action(action: str) -> str:
     if action not in SUPPORTED_FUSION_COMMAND_ACTIONS:
         raise FusionSkeletonError(f"Unsupported Fusion command action {action!r}.")
     return action
+
+def _validated_input_mode(input_mode: str, cad_ir_path_text: str, config_json_path_text: str) -> str:
+    requested = str(input_mode or "").strip()
+    if not requested:
+        requested = (
+            FUSION_INPUT_MODE_CONFIG_FILE
+            if str(config_json_path_text or "").strip()
+            else FUSION_INPUT_MODE_CAD_IR_FILE
+        )
+    if requested not in SUPPORTED_FUSION_INPUT_MODES:
+        raise FusionSkeletonError(f"Unsupported Fusion input mode {requested!r}.")
+    return requested
 
 def fusion_ui_launch_plan() -> FusionUiLaunchPlan:
     """Return the supported P12 launch strategy for the Fusion add-in UI."""

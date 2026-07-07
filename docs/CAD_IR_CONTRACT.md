@@ -340,3 +340,14 @@ verite pour la generation Fusion : l'adaptateur ne recalcule ni layout, ni
 placements, ni clearances, ni tolerances. Les objets Fusion crees par P12-M002+
 portent des attributs BGIG pour permettre un nettoyage conservateur ; ces
 attributs ne font pas partie du contrat CAD IR.
+
+### Note P12-M002V2 - Modes UI et settings locaux
+
+P12-M002V2 ne change pas `schema_version` et ne modifie pas la CAD IR V0.
+L'add-in expose des modes d'entree UI : `cad_ir_file`, `config_file` et
+`quick_parametric_box` desactive. Seul `config_file` peut appliquer des overrides
+avant generation d'une CAD IR temporaire.
+
+Le fichier `bgig_ui_settings.json` est un fichier local d'add-in, hors contrat
+CAD IR. Il memorise des chemins utilisateur pour eviter de retaper project root
+et config a chaque generation.

@@ -26,7 +26,7 @@ source CAD IR, source config BGIG, overrides parametriques, actions `generate`,
 `regenerate` et `clear_bgig_scene`, generation CAD IR temporaire et nettoyage
 conservateur des objets BGIG tagues.
 
-Action humaine requise : `P12-UI-M002V` smoke test Fusion avant toute nouvelle
+Action humaine requise : `P12-UI-M002V2` smoke test Fusion avant toute nouvelle
 extension produit.
 
 ## Mission ready non gated
@@ -36,7 +36,7 @@ prochaine action est une validation humaine Fusion.
 
 ## Mission bloquee par gate
 
-`P12-UI-M002V - Valider l'UI Fusion parametrique V0`.
+`P12-UI-M002V2 - Valider l UI Fusion parametrique V0 corrigee`.
 
 - Capability : `C-FUSION-UI`.
 - Milestone : M14 Usable beta.

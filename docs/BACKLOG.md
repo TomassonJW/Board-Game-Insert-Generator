@@ -567,18 +567,18 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Criteres d'acceptation : le mode CAD IR direct reste fonctionnel ; le mode config peut generer une CAD IR temporaire si le repo BGIG est accessible ; regenerate nettoie uniquement les objets BGIG tagues ; clear refuse de supprimer les objets non tagues ; coeur Python sans `adsk` ; validation Fusion manuelle requise.
 - Tests : unitaires hors Fusion, py_compile add-in, CLI Markdown/JSON/export CAD IR exemples P12, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
 - Gate : validation humaine fournie le 2026-07-07 pour P12-UI-M002+ ; smoke test Fusion requis avant `fusion-validated`.
-- Statut : `done`, `implemented-fusion`, `manual_validation_required`, `print-validated: false`.
+- Statut : `done`, `implemented-fusion`, correction P12-M002V2 codee, `manual_validation_required`, `print-validated: false`.
 
-### P12-UI-M002V - Valider manuellement l'UI Fusion parametrique V0
+### P12-UI-M002V2 - Valider manuellement l UI Fusion parametrique V0 corrigee
 
 - Capability : C-FUSION-UI.
 - Milestone : M14 Usable beta.
-- Objectif : lancer l'add-in dans Fusion et verifier le flux UI P12-M002+.
+- Objectif : lancer l'add-in dans Fusion et verifier le flux UI P12-M002V2 : generate, regenerate sans doublons, clear visible, objet non BGIG preserve, root/config memorises et champs non decoratifs.
 - Livrable : validation humaine Fusion avec generation depuis CAD IR, generation depuis config, regenerate, clear et verification que les objets non BGIG ne sont pas supprimes.
 - Criteres d'acceptation : commande visible ; champs `CAD IR JSON path`, `BGIG config JSON path`, `BGIG project root`, action, mode et parametres visibles ; `generate` fonctionne ; `regenerate` nettoie/recree les objets BGIG tagues ; `clear_bgig_scene` supprime uniquement les objets tagues ; message final affiche source, action, overrides, `Body sizing report` et `Print validation: false`.
 - Tests : smoke test manuel Fusion, aucune validation d'impression revendiquee.
 - Gate : action humaine requise.
-- Statut : `manual_validation_required`.
+- Statut : `manual_validation_required`, apres KO partiel P12-UI-M002V2.
 ## Phase 12 - Couvercles, mecanismes et empilement avance
 
 ### P12-M001 - Modeliser les couvercles poses

@@ -105,3 +105,32 @@ supprimes automatiquement.
 - Pas d'export STL/3MF.
 - Pas de validation d'impression 3D.
 - Validation Fusion manuelle requise pour P12-M002+.
+## Correction P12-M002V2 - UI utilisable
+
+Statut : `implemented-fusion`, validation Fusion manuelle requise,
+`print-validated: false`.
+
+Le smoke test P12-M002V a refuse la premiere version parce que `regenerate`
+pouvait accumuler des doublons, que `Clear BGIG Scene` n'etait pas assez lisible,
+que le project root et la config etaient trop manuels, et que les champs
+parametriques pouvaient sembler decoratifs.
+
+La correction P12-M002V2 fixe la strategie :
+
+- `Input mode` est explicite : `cad_ir_file`, `config_file`,
+  `quick_parametric_box (disabled)` ;
+- `config_file` est le flux utilisateur par defaut quand le repo BGIG est detecte ;
+- le project root est resolu via champ UI, `BGIG_PROJECT_ROOT`, auto-detection,
+  puis `C:\Users\janko\Documents\BGIG` en dev mode ;
+- les chemins valides sont memorises dans `bgig_ui_settings.json` local a l'add-in ;
+- les champs parametriques sont des overrides `config_file` uniquement et sont
+  rejetes en `cad_ir_file` ;
+- `quick_parametric_box` reste visible comme cible produit, mais desactive tant
+  qu'il n'existe pas de builder de config complet ;
+- chaque generation cree une racine Fusion taguee `BGIG Generated Scene` ;
+- `regenerate` planifie d'abord la generation, supprime l'ancienne scene BGIG
+  taguee seulement si le plan est valide, puis regenere ;
+- `clear_bgig_scene` supprime uniquement les objets BGIG tagues et preserve les
+  objets utilisateur non BGIG.
+
+La validation Fusion attendue devient `P12-UI-M002V2`.

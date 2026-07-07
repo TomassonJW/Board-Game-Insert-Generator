@@ -61,3 +61,25 @@ Statut : `implemented-fusion`, validation Fusion manuelle requise,
 Validation attendue : `P12-UI-M002V` doit confirmer dans Fusion la visibilite des
 champs, le flux CAD IR direct, le flux config -> CAD IR temporaire, `Regenerate`,
 `Clear BGIG Scene` et la preservation des objets non BGIG.
+
+## P12-UI-M002V2 - Correction UI utilisable
+
+Retour humain P12-UI-M002V : KO partiel. La commande existait, mais
+`regenerate` accumulait des doublons, `Clear BGIG Scene` n'etait pas assez clair,
+le project root et la config etaient trop manuels et les champs parametriques
+semblaient non connectes.
+
+Correction codee :
+
+- modes UI explicites `cad_ir_file`, `config_file`, `quick_parametric_box` ;
+- `quick_parametric_box` visible mais desactive ;
+- project root auto-detecte via champ, `BGIG_PROJECT_ROOT`, config/add-in ou
+  `C:\Users\janko\Documents\BGIG` ;
+- settings local `bgig_ui_settings.json` pour memoriser config/root/CAD IR ;
+- overrides refuses en `cad_ir_file` ;
+- generation sous racine taguee `BGIG Generated Scene` ;
+- clear/regenerate limites aux objets BGIG tagues ;
+- reporting enrichi avec input mode, root, config, scene roots et preservation
+  des objets non BGIG.
+
+Validation attendue : `P12-UI-M002V2` dans Fusion.

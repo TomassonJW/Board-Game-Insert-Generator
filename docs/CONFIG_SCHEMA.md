@@ -435,3 +435,10 @@ Mapping V0 :
 Les overrides de grille exigent que la config contienne deja `volumetric_grid`.
 La commande Fusion ne cree pas encore une config asset-first complete depuis
 zero et ne modifie pas les valeurs de tolerance par defaut du moteur.
+
+### Note P12-M002V2 - Overrides connectes a config_file uniquement
+
+Les champs UI P12 sont connectes uniquement au mode `config_file`. En mode
+`cad_ir_file`, tout override renseigne doit etre refuse plutot qu'ignore. Le mode
+`quick_parametric_box` reste desactive jusqu'a la definition d'un builder de
+configuration temporaire complet.

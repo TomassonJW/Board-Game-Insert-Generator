@@ -523,3 +523,20 @@ Invariants :
 - `Clear BGIG Scene` refuse de supprimer les objets non tagues ;
 - les geometries, dimensions et statuts physiques existants ne changent pas ;
 - validation Fusion manuelle requise, `print-validated: false`.
+
+### Correction P12-M002V2 - Clear et regenerate utilisables
+
+P12-M002V2 conserve la geometrie Fusion existante, mais change le conteneur de
+scene : chaque generation cree une occurrence racine taguee `BGIG Generated
+Scene`. Les composants de modules, occurrences compactes/eclatees, sketches et
+cuts restent issus de la CAD IR deja resolue.
+
+`Clear BGIG Scene` et `Regenerate` utilisent les attributs BGIG pour supprimer
+uniquement les objets BGIG. Les objets utilisateur non tagues doivent rester
+presents apres clear. `Regenerate` planifie et valide la nouvelle CAD IR avant de
+nettoyer l'ancienne scene, pour eviter une suppression suivie d'un echec de
+chargement.
+
+Le project root BGIG est auto-detecte ou memorise localement ; le mode CAD IR
+direct reste supporte. Les overrides UI sont appliques seulement au flux
+`config_file`.
