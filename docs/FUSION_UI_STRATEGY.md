@@ -191,3 +191,62 @@ Regles actives :
 Le message Fusion doit afficher `BGIG scene roots before`, `BGIG scene roots
 created`, `BGIG scene roots deleted`, `BGIG scene roots after`, `BGIG objects
 remaining after clear` et `Non-BGIG objects preserved: yes`.
+
+## Correction P12-M002V7 - registry BGIG et inspect read-only
+
+Statut : code hors Fusion implemente, validation Fusion manuelle requise.
+
+Le smoke test P12-M002V6 a ete refuse : Fusion creait des objets visibles, mais
+BGIG ne les retrouvait pas ensuite. P12-M002V7 ajoute un registry interne unique
+et une action `inspect_bgig_scene` dans le menu Action.
+
+Action `inspect_bgig_scene` :
+
+- ne genere rien ;
+- ne supprime rien ;
+- liste les occurrences root, components, bodies et sketches ;
+- liste les entites avec attribut group `bgig` ;
+- affiche `role`, `scene_id`, `module_id`, parent/context et visibilite quand
+  disponibles ;
+- signale les objets dont le nom ressemble a BGIG mais sans attribut BGIG.
+
+Smoke test P12-UI-M002V7 :
+
+1. Copier l'add-in a jour depuis le repo vers le dossier Fusion AddIns.
+2. Ouvrir un document Fusion Assembly-compatible propre.
+3. Creer un petit objet utilisateur non BGIG pour verifier la preservation.
+4. Lancer `BoardGameInsertGenerator`.
+5. Choisir Action = `inspect_bgig_scene`, puis Run.
+   - Attendu : `BGIG scene roots total: 0`.
+   - Attendu : l'objet utilisateur peut etre visible dans les compteurs globaux,
+     mais il ne doit pas apparaitre comme entite taguee BGIG.
+6. Choisir Action = `generate`, Input mode = `config_file`, config
+   `examples/simple_asset_product_scene.json`, mode `compact_only`, puis Run.
+   - Attendu : pas d'erreur Python.
+   - Attendu : `BGIG scene roots created: 1`.
+   - Attendu : `Registry validation: ok` ou diagnostic actionnable.
+   - Attendu : un module visible.
+7. Relancer Action = `inspect_bgig_scene`.
+   - Attendu : `BGIG scene roots total: 1`.
+   - Attendu : occurrence racine `scene_root`, occurrence compacte
+     `compact_occurrence`, component `module_component`, body `module_body` et
+     box reference tagues avec `scene_id`.
+   - Attendu : aucune incoherence critique.
+8. Relancer Action = `generate` sans clear.
+   - Attendu : refus propre, aucun doublon cree.
+9. Lancer Action = `regenerate` deux fois.
+   - Attendu : toujours exactement une scene BGIG, aucun doublon visuel.
+10. Lancer Action = `clear_bgig_scene`.
+    - Attendu : `BGIG scene roots deleted: 1`.
+    - Attendu : `BGIG objects remaining after clear: 0`.
+    - Attendu : objet utilisateur non BGIG preserve.
+11. Relancer Action = `inspect_bgig_scene`.
+    - Attendu : `BGIG scene roots total: 0`.
+    - Attendu : objet utilisateur non BGIG toujours present.
+12. Refaire generate/regenerate/clear avec `compact_and_exploded`.
+    - Attendu : une occurrence compacte et une occurrence eclatee liees, toujours
+      sous une seule scene BGIG.
+
+Si `inspect_bgig_scene` voit un objet BGIG par nom mais sans attribut, copier le
+rapport complet : c'est maintenant le diagnostic primaire pour corriger le niveau
+exact de creation/tagging Fusion.

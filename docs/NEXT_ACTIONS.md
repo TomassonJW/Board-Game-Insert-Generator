@@ -26,7 +26,7 @@ source CAD IR, source config BGIG, overrides parametriques, actions `generate`,
 `regenerate` et `clear_bgig_scene`, generation CAD IR temporaire et nettoyage
 conservateur des objets BGIG tagues.
 
-Action humaine requise : `P12-UI-M002V6` smoke test Fusion avant toute nouvelle
+Action humaine requise : `P12-UI-M002V7` smoke test Fusion avant toute nouvelle
 extension produit.
 
 ## Mission ready non gated
@@ -36,15 +36,15 @@ prochaine action est une validation humaine Fusion.
 
 ## Mission bloquee par gate
 
-`P12-UI-M002V6 - Valider ownership par scene racine unique`.
+`P12-UI-M002V7 - Valider registry BGIG et inspect read-only`.
 
 - Capability : `C-FUSION-UI`.
 - Milestone : M14 Usable beta.
 - Objectif : lancer l'add-in dans Fusion, verifier `compact_only` et
-  `compact_and_exploded`, une seule racine `BGIG Generated Scene`, aucun objet
-  BGIG hors racine, le refus de `generate`, `regenerate` sans doublon,
-  `clear_bgig_scene` complet et la preservation des objets non BGIG.
-- Statut : `manual_validation_required`, apres correction P12-M002V6 codee.
+  `compact_and_exploded`, action `inspect_bgig_scene`, une seule racine `BGIG Generated Scene`, tagging
+  `scene_id`/`role`/`module_id`, le refus de `generate`, `regenerate` sans
+  doublon, `clear_bgig_scene` complet et la preservation des objets non BGIG.
+- Statut : `manual_validation_required`, apres correction P12-M002V7 codee.
 
 `P8-FUSION-GATE - Generation Fusion volumetrique ou vue 3D`.
 

@@ -164,3 +164,11 @@ Correction codee :
 Validation attendue : `P12-UI-M002V6` dans Fusion, centree sur generate non
 cumulatif, regenerate repetable, clear complet, absence de BGIG hors racine et
 preservation des objets non BGIG.
+
+## P12-UI-M002V7 - Correction registry BGIG et inspection read-only
+
+- Validation humaine P12-UI-M002V6 : KO critique.
+- Cause observee : objets BGIG visibles dans Fusion mais non retrouves par la logique de tagging/recherche ; `generate` et `regenerate` creaient des doublons ; `clear_bgig_scene` rapportait zero objet ; un chemin de reporting levait `non_bgig_objects_preserved`.
+- Correction : ajout de l'action UI read-only `inspect_bgig_scene`, introduction de `BgigFusionRegistry`, tagging centralise avec `scene_id`, `role`, `module_id`, recherche par `Design.findAttributes("bgig", "")`, fallback strict par nom `BGIG Generated Scene`, validation post-generation obligatoire.
+- Geometrie Fusion : inchangee ; aucune nouvelle feature produit, aucun solveur, aucune tolerance modifiee.
+- Validation : tests hors Fusion requis puis smoke test humain P12-UI-M002V7.

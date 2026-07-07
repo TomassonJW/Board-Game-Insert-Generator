@@ -87,7 +87,7 @@ Toute autre valeur est refusee avant generation.
 
 ## Gates
 
-- P7-M001V4, P11-M002V et P11-M003V4 sont validees humainement ; prochaine gate : smoke test P12-UI-M002V6 pour verifier l ownership par scene racine unique.
+- P7-M001V4, P11-M002V et P11-M003V4 sont validees humainement ; prochaine gate : smoke test P12-UI-M002V7 pour verifier inspect_bgig_scene, le registry BGIG, regenerate et clear sans doublon.
 - Nouvelle gate avant vue eclatee avancee, modules composites, export STL/3MF ou
   preparation d'impression.
 
@@ -100,3 +100,15 @@ maintenant toujours creees sous une occurrence racine BGIG unique taguee
 `clear_bgig_scene` et `regenerate` suppriment cette occurrence racine via
 `deleteMe()` au lieu de poursuivre les occurrences compactes/eclatees une par
 une. Validation Fusion attendue : `P12-UI-M002V6`.
+
+## P12-M002V7 - registry BGIG et inspect read-only
+
+La vue eclatee conserve la strategie component unique + occurrences liees. La
+correction P12-M002V7 ne change pas la geometrie eclatee : elle impose seulement
+que les occurrences compactes/eclatees soient taguees via le registry BGIG avec
+`scene_id`, `role` et `module_id`, puis inspectables par l'action
+`inspect_bgig_scene`.
+
+La validation Fusion attendue doit confirmer que `compact_and_exploded` ne cree
+qu'une scene BGIG et que `clear_bgig_scene` supprime cette scene sans toucher aux
+objets non BGIG.

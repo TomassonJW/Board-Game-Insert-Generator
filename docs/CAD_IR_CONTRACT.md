@@ -355,7 +355,7 @@ et config a chaque generation.
 ## Fusion scene ownership note
 
 La CAD IR ne porte pas la responsabilite de nettoyage de scene Fusion. Depuis
-P12-M002V6, l'add-in Fusion encapsule toute generation CAD IR dans une occurrence
+P12-M002V7, l'add-in Fusion encapsule toute generation CAD IR dans une occurrence
 racine `BGIG Generated Scene` taguee `bgig:role = scene_root`.
 
 Cette strategie est additive cote adaptateur et ne change pas le contrat CAD IR

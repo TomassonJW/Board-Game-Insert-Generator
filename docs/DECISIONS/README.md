@@ -131,6 +131,8 @@ Tests, cartes backlog ou gates humaines a preparer.
 
 - ADR-0026-fusion-generated-scene-root-ownership.md - occurrence racine unique taguee et suppression par `deleteMe()` pour la scene Fusion BGIG.
 
+- [ADR-0027 - Registry Fusion BGIG et inspection read-only](ADR-0027-fusion-bgig-registry-and-inspection.md)
+
 ## Regles de maintenance
 
 - Ne reecris pas l'historique d'une ADR acceptee pour changer la decision.

@@ -10,6 +10,7 @@ from context import ROOT
 from board_game_insert_generator.cad_ir import build_blank_cad_scene
 from board_game_insert_generator.config_loader import load_config
 from board_game_insert_generator.layout import generate_basic_layout
+from fusion_addin.BoardGameInsertGenerator import BoardGameInsertGenerator as fusion_entrypoint
 from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     ASSEMBLY_DOCUMENT_REQUIRED_STATUS,
     BGIG_ACTION_GUIDANCE,
@@ -45,6 +46,7 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     FINGER_NOTCH_WALL_RIGHT,
     FUSION_COMMAND_ACTION_CLEAR,
     FUSION_COMMAND_ACTION_GENERATE,
+    FUSION_COMMAND_ACTION_INSPECT,
     FUSION_COMMAND_ACTION_REGENERATE,
     FUSION_INPUT_MODE_CAD_IR_FILE,
     FUSION_INPUT_MODE_CONFIG_FILE,
@@ -282,6 +284,7 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn(FUSION_COMMAND_ACTION_GENERATE, plan.command_actions)
         self.assertIn(FUSION_COMMAND_ACTION_REGENERATE, plan.command_actions)
         self.assertIn(FUSION_COMMAND_ACTION_CLEAR, plan.command_actions)
+        self.assertIn(FUSION_COMMAND_ACTION_INSPECT, plan.command_actions)
         self.assertIn("box_inner_x_mm", plan.parametric_fields)
         self.assertIn("grid_units_z", plan.parametric_fields)
         self.assertIn("SolidScriptsAddinsPanel", BGIG_TOOLBAR_PANEL_IDS)
@@ -342,6 +345,50 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("Clear tagged BGIG scene objects", summary)
         self.assertIn(BGIG_GENERATE_EXISTING_SCENE_POLICY, summary)
         self.assertIn(BGIG_ACTION_GUIDANCE, summary)
+
+    def test_builds_inspect_request_without_requiring_input_file(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            request = build_fusion_command_request(
+                "",
+                FUSION_GENERATION_MODE_COMPACT_ONLY,
+                Path(temp_dir),
+                action=FUSION_COMMAND_ACTION_INSPECT,
+            )
+
+        self.assertIsNone(request.cad_ir_path)
+        self.assertEqual(request.action, FUSION_COMMAND_ACTION_INSPECT)
+        self.assertEqual(request.source_kind, "inspect_only")
+        self.assertIn("inspect_bgig_scene", fusion_command_summary(request))
+
+    def test_fusion_reporting_messages_tolerate_partial_dictionaries(self) -> None:
+        clear_message = fusion_entrypoint._clear_result_message({})
+        self.assertIn("BGIG objects remaining after clear: 0", clear_message)
+        self.assertIn("Non-BGIG objects preserved: yes", clear_message)
+
+        stable = fusion_entrypoint._stable_generation_result({"scene_roots_created": 1})
+        self.assertEqual(stable["non_bgig_objects_preserved"], "yes")
+        self.assertEqual(stable["registry_validation_status"], "not_run")
+
+    def test_inspection_message_is_read_only_and_copiable(self) -> None:
+        message = fusion_entrypoint._inspection_result_message(
+            {
+                "root_occurrences_count": 0,
+                "components_count": 1,
+                "bodies_count": 1,
+                "sketches_count": 0,
+                "bgig_scene_roots_total": 0,
+                "tagged_bgig_entities": 0,
+                "bgig_name_like_untagged_entities": 1,
+                "name_like_untagged_lines": ["- type=Body; name=BGIG orphan body"],
+                "inconsistency_lines": ["- object BGIG visible/name-like without bgig attribute"],
+            }
+        )
+
+        self.assertIn("Action: inspect_bgig_scene", message)
+        self.assertIn("Read-only: yes", message)
+        self.assertIn("Tagged BGIG entities detail", message)
+        self.assertIn("BGIG-looking untagged entities", message)
+        self.assertIn("object BGIG visible/name-like without bgig attribute", message)
 
     def test_parses_and_applies_p12_parametric_config_overrides(self) -> None:
         payload = json.loads((ROOT / "examples" / "simple_asset_product_scene.json").read_text(encoding="utf-8"))
@@ -1046,6 +1093,16 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("Action", source)
         self.assertIn("FUSION_COMMAND_ACTION_REGENERATE", source)
         self.assertIn("FUSION_COMMAND_ACTION_CLEAR", source)
+        self.assertIn("FUSION_COMMAND_ACTION_INSPECT", source)
+        self.assertIn("inspect_bgig_scene", source)
+        self.assertIn("class BgigFusionRegistry", source)
+        self.assertIn("def inspect", source)
+        self.assertIn("def clear", source)
+        self.assertIn("registry.create_scene_id", source)
+        self.assertIn("BGIG_ATTRIBUTE_SCENE_ID_KEY", source)
+        self.assertIn("BGIG_ATTRIBUTE_MODULE_ID_KEY", source)
+        self.assertIn("_stable_generation_result", source)
+        self.assertIn("BGIG generation failed registry validation", source)
         self.assertIn("P12_PARAMETRIC_FIELD_LABELS", source)
         self.assertIn("apply_parametric_overrides_to_config_payload", source)
         self.assertIn("BGIG_GENERATED_CONFIG_FILENAME", source)
@@ -1090,6 +1147,9 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("_generate_existing_scene_blocked_message", source)
         self.assertIn("BGIG scene roots before", source)
         self.assertIn("BGIG scene roots after", source)
+        self.assertIn("BGIG-looking untagged entities", source)
+        self.assertIn("Tagged BGIG entities detail", source)
+        self.assertIn("Registry validation", source)
         self.assertIn("scene_roots_before", source)
         self.assertIn("scene_roots_after", source)
         self.assertIn("BGIG_EXISTING_SCENE_MESSAGE", source)
@@ -1104,10 +1164,13 @@ class FusionSkeletonTests(unittest.TestCase):
         execute_block = source[
             source.index("def _execute_generation_request") : source.index("def _generate_cad_ir_from_config_request")
         ]
-        self.assertIn("scene_roots_before = _count_bgig_scene_roots(design)", execute_block)
-        self.assertIn("request.action == FUSION_COMMAND_ACTION_GENERATE and bgig_objects_before > 0", execute_block)
+        self.assertIn("registry = BgigFusionRegistry(design)", execute_block)
+        self.assertIn("inspection_before = registry.inspect()", execute_block)
+        self.assertIn("scene_roots_before = int(inspection_before", execute_block)
+        self.assertIn("request.action == FUSION_COMMAND_ACTION_INSPECT", execute_block)
+        self.assertIn("request.action == FUSION_COMMAND_ACTION_GENERATE and (", execute_block)
         self.assertLess(
-            execute_block.index("request.action == FUSION_COMMAND_ACTION_GENERATE and bgig_objects_before > 0"),
+            execute_block.index("request.action == FUSION_COMMAND_ACTION_GENERATE and ("),
             execute_block.index("cad_ir_path = request.cad_ir_path"),
         )
         self.assertLess(

@@ -43,10 +43,12 @@ BGIG_UI_REOPEN_POLICY = "toolbar_button_reopens_command_without_addin_restart"
 FUSION_COMMAND_ACTION_GENERATE = "generate"
 FUSION_COMMAND_ACTION_REGENERATE = "regenerate"
 FUSION_COMMAND_ACTION_CLEAR = "clear_bgig_scene"
+FUSION_COMMAND_ACTION_INSPECT = "inspect_bgig_scene"
 SUPPORTED_FUSION_COMMAND_ACTIONS = (
     FUSION_COMMAND_ACTION_GENERATE,
     FUSION_COMMAND_ACTION_REGENERATE,
     FUSION_COMMAND_ACTION_CLEAR,
+    FUSION_COMMAND_ACTION_INSPECT,
 )
 DEFAULT_FUSION_COMMAND_ACTION = FUSION_COMMAND_ACTION_GENERATE
 
@@ -68,8 +70,12 @@ BGIG_ATTRIBUTE_GROUP = "bgig"
 BGIG_LEGACY_ATTRIBUTE_GROUPS = ("BGIG",)
 BGIG_ATTRIBUTE_KIND = "generated_by"
 BGIG_ATTRIBUTE_ROLE_KEY = "role"
+BGIG_ATTRIBUTE_SCENE_ID_KEY = "scene_id"
+BGIG_ATTRIBUTE_MODULE_ID_KEY = "module_id"
+BGIG_ATTRIBUTE_VERSION_KEY = "version"
+BGIG_ATTRIBUTE_VERSION_VALUE = "p12-ui-m002v7"
 BGIG_ATTRIBUTE_VALUE = "BoardGameInsertGenerator"
-BGIG_CLEAR_SCOPE = "delete_scene_root_occurrence_then_legacy_bgig_only"
+BGIG_CLEAR_SCOPE = "registry_scene_root_deleteMe_then_strict_bgig_legacy_cleanup"
 BGIG_SCENE_ROOT_COMPONENT_NAME = "BGIG Generated Scene"
 BGIG_SCENE_ROOT_ROLE = "scene_root"
 BGIG_SCENE_OWNERSHIP_POLICY = "single_tagged_scene_root_occurrence_deleteMe"
@@ -81,7 +87,8 @@ BGIG_EXISTING_SCENE_MESSAGE = "BGIG scene already exists. Use regenerate or clea
 BGIG_ACTION_GUIDANCE = (
     "generate creates one new scene only when no BGIG scene root or tagged BGIG objects exist; "
     "regenerate validates, deletes tagged BGIG scene roots with deleteMe, clears legacy BGIG tags, "
-    "then creates one replacement scene; clear_bgig_scene deletes scene roots first and preserves non-BGIG objects."
+    "then creates one replacement scene; clear_bgig_scene deletes scene roots first and preserves non-BGIG objects; "
+    "inspect_bgig_scene reports Fusion ownership without creating or deleting geometry."
 )
 BGIG_CLEARABLE_ROLES = (
     BGIG_SCENE_ROOT_ROLE,
@@ -772,6 +779,15 @@ def build_fusion_command_request(
             parameter_overrides=parameter_overrides,
             source_kind="clear_only",
         )
+    if validated_action == FUSION_COMMAND_ACTION_INSPECT:
+        return FusionCommandRequest(
+            cad_ir_path=None,
+            generation_mode=validated_mode,
+            action=validated_action,
+            input_mode=validated_input_mode,
+            parameter_overrides=parameter_overrides,
+            source_kind="inspect_only",
+        )
 
     if validated_input_mode == FUSION_INPUT_MODE_QUICK_PARAMETRIC_BOX:
         raise FusionSkeletonError(
@@ -917,6 +933,9 @@ def fusion_command_summary(request: FusionCommandRequest) -> str:
         source_path = request.config_json_path
     elif request.source_kind == "clear_only":
         source = "Clear tagged BGIG scene objects"
+        source_path = None
+    elif request.source_kind == "inspect_only":
+        source = "Inspect BGIG scene ownership"
         source_path = None
 
     overrides = request.parameter_overrides or {}
