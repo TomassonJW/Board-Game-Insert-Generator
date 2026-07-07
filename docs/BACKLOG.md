@@ -545,7 +545,7 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Criteres d'acceptation : `run(context)` ouvre encore la commande au premier lancement ; le bouton `Generate Board Game Insert` est ajoute dans `Design workspace > Utilities > Add-Ins` ; cliquer le bouton rouvre la commande ; les fichiers `cad_ir_path.txt` et `exploded_view_mode.txt` restent seulement des defaults/fallbacks ; coeur Python sans `adsk`.
 - Tests : unitaires hors Fusion, py_compile add-in, CLI/export CAD IR exemples P12, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
 - Gate : validation humaine fournie pour sprint P12-UI ; smoke test Fusion requis avant `fusion-validated`.
-- Statut : `done`, `implemented-fusion`, validation Fusion `P12-M001V` requise, `print-validated: false`.
+- Statut : `done`, `fusion-validated`, `print-validated: false`.
 
 ### P12-UI-M001V - Valider manuellement le bouton toolbar relancable
 
@@ -555,8 +555,8 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Livrable : validation humaine Fusion avec emplacement observe, reouverture et generation depuis UI.
 - Criteres d'acceptation : bouton visible, commande rouvrable, champ `CAD IR JSON path`, choix de mode, generation `simple_asset_product_scene`, `Body sizing report` conserve, vues compact/exploded liees conservees.
 - Tests : smoke test manuel Fusion, aucune validation d'impression revendiquee.
-- Gate : action humaine requise.
-- Statut : `manual_validation_required`.
+- Gate : action humaine Thomas realisee le 2026-07-07 apres le commit `a12ef42`.
+- Statut : `done`, `fusion-validated`, `print-validated: false`.
 
 ### P12-UI-M002 - Evaluer une palette persistante BGIG
 
@@ -567,7 +567,7 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Criteres d'acceptation : ne pas casser le flux commande ; handlers conserves ; stop propre ; aucune nouvelle geometrie.
 - Tests : hors Fusion si implementation, smoke Fusion manuel si codee.
 - Gate : stopper si l'API palette ou HTML/JS impose une architecture trop large.
-- Statut : `blocked` jusqu'a P12-UI-M001V.
+- Statut : `blocked` jusqu'a validation humaine `P12-NEXT-GATE`.
 ## Phase 12 - Couvercles, mecanismes et empilement avance
 
 ### P12-M001 - Modeliser les couvercles poses

@@ -10,7 +10,7 @@ La priorite est volontairement pragmatique : stabiliser d'abord un bouton Fusion
 
 ## Strategie retenue P12-M001
 
-Statut : `implemented-fusion`, validation Fusion manuelle requise.
+Statut : `fusion-validated`, `print-validated: false`.
 
 La premiere strategie officielle est `toolbar_button_reopens_command_without_addin_restart` :
 
@@ -40,7 +40,7 @@ Mode futur : l'utilisateur choisit une configuration BGIG JSON et l'add-in gener
 
 ## Regeneration V0
 
-P12-M001 ne nettoie pas encore la scene. La regeneration V0 consiste a rouvrir la commande via le bouton toolbar et relancer la generation avec le meme fichier CAD IR ou un fichier modifie.
+P12-M001 valide le principe de reouverture UI par bouton toolbar. La regeneration V0 consiste a rouvrir la commande via ce bouton et relancer la generation avec le meme fichier CAD IR ou un fichier modifie.
 
 Tant que le nettoyage n'est pas code, le smoke test doit utiliser un document vide ou supprimer manuellement les objets BGIG avant regeneration.
 

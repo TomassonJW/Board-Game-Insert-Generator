@@ -18,15 +18,15 @@ structurant, authentification absente ou refus de push direct.
 
 ## Gate humaine active
 
-Statut : `manual_validation_required`.
+Statut : `required_before_next_product_expansion`.
 
-La gate `P11-NEXT-GATE` est validee pour un sprint P12-UI limite a l'interface Fusion, aux parametres de generation et a la regeneration par relance. `P12-M001` implemente le premier increment : bouton toolbar `Generate Board Game Insert` relancable dans `Design workspace > Utilities > Add-Ins`, commande classique conservee et fichiers texte locaux limites aux defaults/fallbacks.
+La validation humaine `P12-M001V` est confirmee apres le commit `a12ef42` : commande visible, bouton toolbar visible dans `Design workspace > Utilities > Add-Ins`, reouverture sans redemarrer l'add-in, generation `simple_asset_product_scene` via UI, `Body sizing report`, occurrences liees et `UI reopen policy` presents. `print-validated: false` reste explicite.
 
-Action humaine requise : smoke test Fusion `P12-M001V` avant de declarer ce lancement UI `fusion-validated` et avant de passer a une palette persistante ou a un flux de generation depuis config BGIG.
+Action humaine requise : `P12-NEXT-GATE` avant toute extension vers palette persistante HTML, generation depuis config BGIG, nettoyage automatique de scene, parametres avances ou regeneration plus ambitieuse.
 
 ## Mission ready non gated
 
-Aucune mission non-gated supplementaire n'est recommandee tant que le smoke test `P12-M001V` du bouton toolbar relancable n'est pas realise. La prochaine extension P12 potentielle est une palette persistante ou une regeneration plus riche, mais elle doit attendre cette validation ou un choix explicite de continuer en experimental.
+Aucune mission non-gated supplementaire n'est recommandee apres la validation `P12-M001V`. La prochaine action est une gate produit : choisir explicitement le prochain increment UI avant d'elargir le perimetre.
 
 ## Mission bloquee par gate
 
@@ -34,7 +34,7 @@ Aucune mission non-gated supplementaire n'est recommandee tant que le smoke test
 
 `P10-SOLVER-GATE - Solveur complexe, backtracking ou optimisation globale`.
 
-`P12-M001V - Valider manuellement le bouton toolbar Fusion relancable`.
+`P12-NEXT-GATE - Choisir la prochaine extension UI Fusion`.
 
 - Capability : `C-FUSION-UI`, `C-FUSION-EXPLODED`, `C-COMPOSITE`, `C-SOLVER`,
   `C-GRID-3D`, `C-CALIBRATION` selon l'option choisie.

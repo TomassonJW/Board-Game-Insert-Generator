@@ -233,11 +233,11 @@ La mission `P11-M002` code une premiere scene Fusion multi-layer depuis les plac
 
 La mission `P11-M003` corrige l'ambiguite dimensionnelle observee apres P11-M002V : les modules asset-first generes distinguent maintenant span grille theorique, enveloppe asset-fit et taille imprimable. Le smoke test humain `P11-M003V` a ete KO partiel : la scene etait generee, mais les dimensions effectives n'etaient pas clairement verifiables dans le message Fusion. La correction `P11-M003V2` refuse les placements grille modernes sans `printable_body_size_mm`, garde `theoretical_grid_extent_mm` comme metadata d'occupation et ajoute un `Body sizing report`. La correction `P11-M003V3` cree une commande `Generate Board Game Insert` visible. Le smoke test humain P11-M003V3 a ensuite ete KO partiel cote produit parce que la fixture melangeait blank legacy et module asset-first ; la correction `P11-M003V4` ajoute `simple_asset_product_scene.json`, explicite `module_source` / `placement_source` et ajoute `Module source mapping` au message Fusion. La validation humaine `P11-M003V4` confirmee le 2026-07-07 apres le commit `134863c` valide l'add-in recopie, la commande UI, le chargement de `simple_asset_product_scene`, le mode `compact_and_exploded`, un seul module asset-first, zero blank legacy, les occurrences compactes/eclatees liees, le `Module source mapping`, le `Body sizing report`, `printable_body_size_mm` environ `25.6 x 25.6 x 9.8 mm`, bbox Fusion comparable et `size match yes`. Statut : `fusion-validated`, `print-validated: false`.
 
-La mission `P12-M001` code un lancement UI Fusion relancable par bouton toolbar : les constantes de commande et d'emplacement sont centralisees dans le squelette testable, le message de generation expose la politique `toolbar_button_reopens_command_without_addin_restart`, et la documentation indique comment rouvrir BGIG sans redemarrer l'add-in. Statut : `implemented-fusion`, validation humaine Fusion P12-M001 requise, `print-validated: false`.
+La mission `P12-M001` code un lancement UI Fusion relancable par bouton toolbar : les constantes de commande et d'emplacement sont centralisees dans le squelette testable, le message de generation expose la politique `toolbar_button_reopens_command_without_addin_restart`, et la documentation indique comment rouvrir BGIG sans redemarrer l'add-in. La validation humaine `P12-M001V` confirmee le 2026-07-07 apres le commit `a12ef42` valide la commande visible, le bouton dans `Design workspace > Utilities > Add-Ins`, la reouverture sans redemarrage, le chargement UI de `simple_asset_product_scene`, le mode `compact_and_exploded`, la generation Fusion, le `Body sizing report`, les occurrences liees et la ligne `UI reopen policy`. Statut : `fusion-validated`, `print-validated: false`.
 
 ## Phase active
 
-Phase active : **P12-M001 toolbar Fusion relancable / smoke test humain requis**.
+Phase active : **P12-NEXT-GATE choix de la prochaine extension UI / gate humaine requise**.
 
 Etat : le pipeline P4 reste stable pour les blanks rectangulaires Fusion. La
 vague P5 est terminee cote moteur Python pur, configuration, rapports et CAD IR.
@@ -254,7 +254,7 @@ document Assembly-compatible, avec `print-validated: false`. P11-M002 est
 X/Y/Z. P11-M003 est `fusion-validated` pour la commande UI minimale, le sizing asset-first explicite, la scene produit non ambigue, le mapping source et les occurrences compactes/eclatees liees. P11-M003V2 ajoute le rapport bbox planned/actual ; P11-M003V3 corrige l'affichage de la vraie commande UI ; P11-M003V4 valide le flux UI produit avec `simple_asset_product_scene`. La North
 Star cible un generateur volumetrique asset-first, pilote par capabilities.
 
-Prochaine action recommandee : smoke test humain `P12-M001V` du bouton toolbar `Generate Board Game Insert` dans `Design workspace > Utilities > Add-Ins`, avant palette persistante HTML, generation depuis config BGIG, nettoyage automatique de scene ou parametres avances.
+Prochaine action recommandee : decision humaine `P12-NEXT-GATE` avant palette persistante HTML, generation depuis config BGIG, nettoyage automatique de scene, parametres avances ou regeneration plus ambitieuse.
 
 ## Implemente
 
@@ -424,14 +424,14 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant `P12-M001 - toolbar Fusion relancable` :
+Derniere verification pendant `P12-M001V - validation toolbar Fusion relancable` :
 
 - `python -m unittest discover -s tests` : OK, 155 tests passes.
 - CLI Markdown/JSON : OK sur `simple_asset_product_scene.json`, `simple_asset_executable_plan.json`, `simple_multilayer_grid_scene.json`, `simple_tray.json`, `simple_finger_notch_tray.json` et `simple_box.json`.
 - Export CAD IR : OK sur `simple_asset_product_scene.json`, `simple_asset_executable_plan.json` et `simple_multilayer_grid_scene.json`.
 - `git diff --check` : OK.
 - `rg -n "adsk" src/board_game_insert_generator` : OK, aucune occurrence dans le coeur Python.
-- Validation Fusion reelle : `P12-M001V` requise pour verifier le bouton toolbar relancable ; derniere validation Fusion confirmee reste `P11-M003V4`; impression 3D non validee.
+- Validation Fusion reelle : `P12-M001V` confirmee humainement le 2026-07-07 apres le commit `a12ef42`; impression 3D non validee.
 
 ## Risques actifs
 
