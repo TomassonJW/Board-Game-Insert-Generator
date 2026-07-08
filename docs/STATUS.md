@@ -510,4 +510,14 @@ P13-ASSET-M002 ajoute un sizing count-aware V0 pour `tokens`, `dice`, `meeples` 
 
 Cote Fusion, `quick_asset_box` reporte `count_aware_storage_sizing: yes|partial|no`, diagnostics `asset_sizing` et `module_candidate_sizing`, `declared_capacity_guarantee = heuristic_envelope_only_not_physical_cavity`, et cree un sketch debug non imprimable `asset-fit debug outline` sur les modules asset candidates. `asset_items_visualized: no`, `asset_cavities_generated: no` et `Print validation: false` restent vrais.
 
-Statut : `implemented`, tests automatises a executer/valider dans la mission. Gate humaine suivante : `P13-ASSET-M002V` dans Fusion 360. Aucune validation d'impression 3D.
+Statut : `fusion-validated-v0` apres validation humaine Fusion du 2026-07-09 sur `357bfc1`. P13-ASSET-M002V confirme `generate`, `regenerate`, `clear_bgig_scene`, registry OK, preservation des objets non-BGIG, module count-aware qui change de taille quand `count` change, diagnostics `capacity_per_stack`, `pile_count`, `declared_capacity`, `asset_fit`, `module_size`, metadata/report `storage_sizing`, warnings cavites non generees et capacite heuristique non print-validee. Aucune validation d'impression 3D.
+
+## P13-ASSET-M002V - Validation Fusion count-aware
+
+Validation humaine Fusion confirmee le 2026-07-09 sur `357bfc1`.
+
+Resultats observes : add-in reinstalle par scripts Codex, document Fusion Assembly-compatible, `quick_asset_box` charge avec assets pre-remplis, `generate` OK, `count_aware_storage_sizing: yes`, `sizing_scope: count_aware_stacked_rectangular_piles_v0`, `asset_debug_visualization: yes`, diagnostics de piles/capacite/taille presents, `Body sizing report`, `Registry validation: ok`, `Print validation: false`.
+
+Test count-aware valide : avec `coin-tokens,tokens,40,18,16,2,loose` et `status-tokens,tokens,23,10,35,2,loose`, module `50.0 x 39.0 x 48.0`; apres modification de `coin-tokens` a `80`, `regenerate` produit `68.0 x 39.0 x 56.0`. La taille, les piles, la capacite declaree et le grid span changent avec `count`.
+
+Limites maintenues : assets individuels non visualises, cavites/logements non generes, pas de solveur global, pas d'optimisation avancee, capacite heuristique non garantie physiquement, aucune impression 3D validee.

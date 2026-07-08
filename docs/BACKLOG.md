@@ -664,8 +664,8 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Livrable : regles count-aware bornees, diagnostics de capacite, eventuellement enveloppe/asset debug non imprimable.
 - Criteres d'acceptation : le rapport peut dire combien d items sont effectivement contenus ou refuses; aucun module ne suggere une capacite non prouvee.
 - Tests : unitaires assets -> candidates -> executable plan, py_compile add-in, smoke Fusion prepare.
-- Gate : decision produit requise apres validation `P13-M001V`; ne pas lancer sans autorisation humaine explicite.
-- Statut : `ready-gated`.
+- Gate : decision produit validee avant implementation; validation Fusion `P13-ASSET-M002V` confirmee le 2026-07-09 sur `357bfc1`.
+- Statut : `done`, `fusion-validated-v0`, `print-validated: false`.
 
 ## Phase 12 - Couvercles, mecanismes et empilement avance
 
@@ -744,5 +744,21 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Capability : C-ASSET, C-SOLVER, C-FUSION-UI.
 - Milestone : M14 Usable beta.
 - Livrable : sizing count-aware V0 pour tokens/dice/meeples/generic, diagnostics de capacite, metadata `storage_sizing`, sketch debug asset-fit non imprimable, script smoke count-aware.
-- Statut : `implemented`, en attente de validation humaine Fusion `P13-ASSET-M002V`.
-- Limites : pas d'assets Fusion individuels, pas de cavites/logements, pas de solveur global, cartes en hauteur totale de paquet, capacite heuristique non print-validee.
+- Statut : `done`, `fusion-validated-v0` apres validation humaine Fusion `P13-ASSET-M002V` le 2026-07-09 sur `357bfc1`.
+- Limites : pas d'assets Fusion individuels, pas de cavites/logements, pas de solveur global, cartes en hauteur totale de paquet, capacite heuristique non print-validee, aucune impression 3D validee.
+
+### P13-ASSET-M002V - Valider le sizing count-aware dans Fusion
+
+- Capability : C-ASSET, C-SOLVER, C-FUSION-UI.
+- Milestone : M14 Usable beta.
+- Livrable : smoke test humain Fusion confirmant `quick_asset_box`, sizing count-aware, diagnostics, debug visual, regenerate/clear et registry.
+- Validation : confirmee le 2026-07-09 sur `357bfc1`.
+- Statut : `done`, `fusion-validated-v0`, `print-validated: false`.
+
+### P13-ASSET-M003-GATE - Autoriser la prochaine etape asset-first
+
+- Capability : C-ASSET, C-FUSION-UI, C-FUSION-CAVITIES ou C-SOLVER selon decision.
+- Milestone : M14 Usable beta.
+- Objectif : decider si la prochaine mission traite les cavites/logements asset-first, la visualisation d'items/proxies, l'UI assets avancee ou le maintien du scope V0.
+- Gate : decision humaine produit requise.
+- Statut : `ready-gated`.

@@ -1,6 +1,6 @@
 # Next Actions
 
-Derniere mise a jour : 2026-07-08
+Derniere mise a jour : 2026-07-09
 
 Ce fichier indique les prochaines missions recommandees. Il doit rester court,
 priorise et directement actionnable. Si aucune mission explicite n'est donnee,
@@ -18,15 +18,15 @@ structurant, authentification absente ou refus de push direct.
 
 ## Gate humaine active
 
-`P13-ASSET-M002V - Valider le sizing count-aware et le debug visuel asset dans Fusion`.
+`P13-ASSET-M003-GATE - Autoriser la prochaine etape asset-first apres enveloppe count-aware`.
 
-Statut : gate Fusion active. P13-ASSET-M002 est implemente et doit etre valide humainement dans Fusion 360 avant toute nouvelle mission produit asset-first. Le smoke doit confirmer le cas `quick_asset_box` count-aware, les diagnostics de piles/capacite, le sketch debug asset-fit non imprimable, `regenerate` sans doublon et `clear_bgig_scene` preservant les objets non-BGIG.
+Statut : gate produit active. `P13-ASSET-M002V` est validee humainement comme premier sizing count-aware V0 pour assets simples, avec debug visuel d'enveloppe et limitations explicites. La prochaine decision produit doit choisir si BGIG avance vers des cavites/logements asset-first reels, une visualisation d'items/proxies plus detaillee, ou une amelioration UI assets, sans introduire de solveur global premature.
 
-Decision attendue : validation humaine Fusion ou retour KO precis. Aucune impression 3D n'est attendue dans cette gate.
+Decision attendue : autoriser une mission bornee post-M002, ou confirmer que les cavites/logements, assets individuels, UI assets avancee, solveur global et impression restent reportes.
 
 ## Mission ready non gated
 
-Aucune mission produit non-gated supplementaire n'est recommandee avant `P13-ASSET-M002V`.
+Aucune mission produit non-gated supplementaire n'est recommandee avant decision humaine sur `P13-ASSET-M003-GATE`.
 
 ## Regle operationnelle Fusion
 
