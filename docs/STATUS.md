@@ -434,11 +434,12 @@ Prochaine action recommandee : stopper sur gate produit avant toute extension st
 
 La mission `P13-M001 - quick_asset_box UI V0` ajoute un premier flux asset-first directement depuis la commande Fusion classique. Le nouveau mode `quick_asset_box` reste distinct de `cad_ir_file`, `config_file` et `quick_parametric_box`.
 
-Comportement implemente : champ texte editable `Assets (quick_asset_box)` au format `asset_id,type,count,x_mm,y_mm,z_mm,fit`, entrees separees par `;` ou saut de ligne, types V0 `tokens`, `dice`, `meeples`, `cards`, `sleeved_cards`, `generic`, persistance dans `bgig_ui_settings.json`, generation d'une config temporaire stricte, conversion par le pipeline existant `assets -> module_candidates -> recommended variant -> executable_asset_plan -> CAD IR -> Fusion`, puis reporting Fusion des assets lus/refuses, candidats, variante recommandee, modules generes/places/refuses, sizing report et `Print validation: false`.
+Comportement implemente : champ texte editable `Assets (quick_asset_box)` au format `asset_id,type,count,x_mm,y_mm,z_mm,fit`, entrees separees par `;` ou saut de ligne, types V0 `tokens`, `dice`, `meeples`, `cards`, `sleeved_cards`, `generic`, persistance dans `bgig_ui_settings.json`, generation d'une config temporaire stricte, conversion par le pipeline existant `assets -> module_candidates -> recommended variant -> executable_asset_plan -> CAD IR -> Fusion`, puis reporting Fusion des assets lus/refuses, candidats, variante recommandee, modules generes/places/refuses, sizing report, statut explicite `asset_items_visualized: no`, `asset_cavities_generated: no`, `count_aware_storage_sizing: no` et `Print validation: false`.
 
-Limites : pas de tableau assets avance, pas de palette HTML persistante, pas de solveur complexe, pas de nouvelle geometrie Fusion, pas d'export STL/3MF, pas de validation d'impression. Le profil UI `draft` est conserve dans les settings et mappe vers le profil moteur existant `fast_draft` seulement pour la config temporaire `quick_asset_box`.
+Limites : pas de tableau assets avance, pas de palette HTML persistante, pas de solveur complexe, pas de cavites/logements assets, pas d'assets Fusion individuels, pas d'export STL/3MF, pas de validation d'impression. Le `count` est lu, persiste et reporte, mais P13-M001 V0 ne l'utilise pas encore pour multiplier footprint, hauteur, nombre de modules ou cavites : le sizing reste une enveloppe representative du plus grand asset du groupe plus clearances/murs/plancher. Un repere visuel minimal de volume boite est ajoute via outlines XY bas/haut non imprimables. Le profil UI `draft` est conserve dans les settings et mappe vers le profil moteur existant `fast_draft` seulement pour la config temporaire `quick_asset_box`.
 
-Statut : `implemented-fusion`, gate humaine `P13-M001V` requise avant de declarer `fusion-validated`. Premier essai P13-M001V KO a l ouverture de la commande Fusion par constante UI manquante `QUICK_ASSET_BOX_ASSETS_INPUT_ID`; correction appliquee avec test de regression AST et add-in reinstalle.
+Statut : `implemented-fusion`, gate humaine `P13-M001V` requise avant de declarer `fusion-validated`. Premier essai P13-M001V KO a l ouverture de la commande Fusion par constante UI manquante `QUICK_ASSET_BOX_ASSETS_INPUT_ID`; correction appliquee avec test de regression AST et add-in reinstalle. Deuxieme essai P13-M001V KO partiel apres `859bc7b` : generation fonctionnelle mais V0 trompeuse sur le count et les assets non visualises; correction appliquee pour rendre le reporting honnete, expliciter les limites bloquantes et ajouter les outlines bas/haut du volume boite.
+
 ## Tests et verifications connus
 
 Commande de test principale :
@@ -455,15 +456,15 @@ $env:PYTHONPATH = "src"
 python -m board_game_insert_generator examples/simple_box.json --format markdown
 ```
 
-Derniere verification pendant `P13-M001 - quick_asset_box UI V0` :
+Derniere verification pendant `P13-M001 - quick_asset_box UI V0 / correction P13-M001V KO partiel` :
 
-- `python -m unittest discover -s tests` : OK, 180 tests passes apres correction P13-M001V KO.
+- `python -m unittest discover -s tests` : OK, 180 tests passes apres correction P13-M001V KO partiel.
 - `python -m py_compile fusion_addin/BoardGameInsertGenerator/BoardGameInsertGenerator.py fusion_addin/BoardGameInsertGenerator/fusion_skeleton.py` : OK.
 - CLI Markdown/JSON : OK sur `simple_asset_product_scene.json`, `simple_asset_executable_plan.json`, `simple_multilayer_grid_scene.json`, `simple_tray.json` et `simple_finger_notch_tray.json`.
 - Export CAD IR : OK sur `simple_asset_product_scene.json`, `simple_asset_executable_plan.json`, `simple_multilayer_grid_scene.json`, `simple_tray.json` et `simple_finger_notch_tray.json`.
-- `scripts/fusion/prepare_quick_asset_test.ps1 -DryRun` : OK.
+- `scripts/fusion/prepare_quick_asset_test.ps1 -DryRun` : OK, actions Fusion mises a jour avec diagnostics V0 honnetes.
 - `scripts/fusion/prepare_quick_asset_test.ps1` : OK, add-in corrige reinstalle et settings `quick_asset_box` ecrits.
-- `scripts/fusion/check_installed_addin.ps1` : OK avec marqueurs P13 renforces.
+- `scripts/fusion/check_installed_addin.ps1` : OK avec marqueurs P13 renforces, incluant diagnostics non count-aware.
 - `git diff --check` : OK.
 - `rg -n "adsk" src/board_game_insert_generator` : OK, aucune occurrence dans le coeur Python.
 - Validation Fusion reelle : `P13-M001V` requise. Impression 3D non validee.

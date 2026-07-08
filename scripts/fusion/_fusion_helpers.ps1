@@ -71,20 +71,27 @@ function Assert-BgigFusionAddinMarkers {
             "quick_asset_box",
             "QUICK_ASSET_BOX_ASSETS_INPUT_ID",
             "Assets (quick_asset_box)",
+            "asset_items_visualized",
+            "asset_cavities_generated",
+            "count_aware_storage_sizing",
             "inspect_bgig_scene",
             "bgig_ui_settings.json"
         )
     )
 
     $entrypoint = Join-Path $AddinPath "BoardGameInsertGenerator.py"
+    $skeleton = Join-Path $AddinPath "fusion_skeleton.py"
     if (-not (Test-Path -LiteralPath $entrypoint -PathType Leaf)) {
         throw "Fusion add-in entrypoint missing: $entrypoint"
     }
+    if (-not (Test-Path -LiteralPath $skeleton -PathType Leaf)) {
+        throw "Fusion add-in skeleton missing: $skeleton"
+    }
 
-    $text = Get-Content -LiteralPath $entrypoint -Raw -Encoding UTF8
+    $text = (Get-Content -LiteralPath $entrypoint -Raw -Encoding UTF8) + "`n" + (Get-Content -LiteralPath $skeleton -Raw -Encoding UTF8)
     foreach ($marker in $Markers) {
         if ($text -notlike "*$marker*") {
-            throw "Installed add-in marker missing in BoardGameInsertGenerator.py: $marker"
+            throw "Installed add-in marker missing: $marker"
         }
     }
 }

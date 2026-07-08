@@ -890,6 +890,7 @@ def _generation_result_message(
         f"{quick_parametric_report}"
         f"{quick_asset_report}"
         f"Reference outlines: {result['reference_outlines']}\n"
+        f"Reference outline policy: {result.get('reference_outline_policy', 'single_xy_outline')}\n"
         f"BGIG scene roots before: {scene_roots_before}\n"
         f"CAD IR module blanks planned: {len(generation_plan.blanks)}\n"
         f"Grid-positioned asset modules planned: {len(generation_plan.grid_positioned_blanks)}\n"
@@ -1557,8 +1558,9 @@ def _create_bgig_scene_root(root_component, registry: BgigFusionRegistry, scene_
 def _generate_from_plan(design, plan: FusionGenerationPlan, registry: BgigFusionRegistry, scene_id: str) -> dict[str, object]:  # noqa: ANN001
     root_component = design.rootComponent
     _scene_occurrence, scene_component = _create_bgig_scene_root(root_component, registry, scene_id)
-    reference_outline = _create_reference_outline(scene_component, plan.reference_box)
-    _tag_bgig_entity(reference_outline, "box_reference", scene_id=scene_id, registry=registry)
+    reference_outlines = _create_reference_box_outlines(scene_component, plan.reference_box)
+    for reference_outline in reference_outlines:
+        _tag_bgig_entity(reference_outline, "box_reference", scene_id=scene_id, registry=registry)
 
     source_blanks = [*plan.blanks, *plan.grid_positioned_blanks]
     compact_occurrences_by_component_id = {
@@ -1660,7 +1662,8 @@ def _generate_from_plan(design, plan: FusionGenerationPlan, registry: BgigFusion
     return {
         "scene_id": scene_id,
         "scene_roots_created": 1,
-        "reference_outlines": 1,
+        "reference_outlines": len(reference_outlines),
+        "reference_outline_policy": "bottom_and_top_box_xy_outlines",
         "physical_module_count": len(source_blanks),
         "module_components_created": len(created_components),
         "source_components_created": len(created_components),
@@ -1790,11 +1793,18 @@ def _format_size_match(value) -> str:  # noqa: ANN001
     return "unknown"
 
 
-def _create_reference_outline(root_component, solid_plan: FusionSolidPlan):  # noqa: ANN001
+def _create_reference_box_outlines(root_component, solid_plan: FusionSolidPlan) -> list:  # noqa: ANN001
     if solid_plan.origin_mm.z != 0:
         raise RuntimeError("Reference box outline must stay on Z origin 0 mm.")
-    sketch = root_component.sketches.add(root_component.xYConstructionPlane)
-    sketch.name = f"{solid_plan.component_name} outline"
+    bottom = _create_reference_outline_at_z(root_component, solid_plan, 0.0, "bottom")
+    top = _create_reference_outline_at_z(root_component, solid_plan, solid_plan.size_mm.z, "top")
+    return [bottom, top]
+
+
+def _create_reference_outline_at_z(root_component, solid_plan: FusionSolidPlan, z_mm: float, label: str):  # noqa: ANN001
+    sketch_plane = _xy_plane_for_z(root_component, z_mm, f"{solid_plan.component_name} {label} outline plane")
+    sketch = root_component.sketches.add(sketch_plane)
+    sketch.name = f"{solid_plan.component_name} {label} outline"
     _add_scene_rectangle(sketch, solid_plan)
     return sketch
 

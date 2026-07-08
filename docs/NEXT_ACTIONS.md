@@ -20,9 +20,9 @@ structurant, authentification absente ou refus de push direct.
 
 `P13-M001V - Valider quick_asset_box dans Fusion`.
 
-Statut : action humaine requise dans Fusion 360. Codex a implemente `quick_asset_box` et prepare le script `scripts/fusion/prepare_quick_asset_test.ps1`. La mission ne doit pas etre declaree `fusion-validated` avant smoke test humain.
+Statut : action humaine requise dans Fusion 360. Codex a implemente `quick_asset_box`, corrige le KO d ouverture, puis corrige le KO partiel de lisibilite produit en rendant la V0 explicite : assets non visualises, cavites non generees, sizing non count-aware. La mission ne doit pas etre declaree `fusion-validated` avant smoke test humain.
 
-Smoke attendu : ouvrir un document Assembly-compatible, ouvrir BGIG, confirmer `Input mode = quick_asset_box`, verifier les valeurs rehydratees et le champ assets, lancer `generate`, verifier assets lus, candidats, module(s) places, `Body sizing report`, registry OK et `Print validation: false`, rouvrir BGIG, modifier un asset ou une dimension, lancer `regenerate`, verifier absence de doublon, puis `clear_bgig_scene` en preservant les objets non-BGIG.
+Smoke attendu : ouvrir un document Assembly-compatible, ouvrir BGIG, confirmer `Input mode = quick_asset_box`, verifier les valeurs rehydratees et le champ assets, lancer `generate`, verifier assets lus, candidats, module(s) places, `asset_items_visualized: no`, `asset_cavities_generated: no`, `count_aware_storage_sizing: no`, les diagnostics `asset_sizing`/`module_candidate_sizing`, le repere de volume boite par outlines bas/haut, `Body sizing report`, registry OK et `Print validation: false`, rouvrir BGIG, modifier un asset ou une dimension, lancer `regenerate`, verifier absence de doublon, puis `clear_bgig_scene` en preservant les objets non-BGIG.
 
 ## Mission ready non gated
 
@@ -41,7 +41,7 @@ Fusion restantes a Thomas.
 
 `P10-SOLVER-GATE - Solveur complexe, backtracking ou optimisation globale`.
 
-Palette persistante HTML, UI assets avancee/tableau, solveur plus automatique, nouvelle geometrie Fusion, export imprimable et validation d'impression restent gates.
+Palette persistante HTML, UI assets avancee/tableau, sizing count-aware reel, solveur plus automatique, cavites/logements assets, nouvelle geometrie Fusion produit, export imprimable et validation d'impression restent gates ou missions separees.
 
 ## Fin de chaque mission
 

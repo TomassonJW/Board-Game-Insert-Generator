@@ -1437,8 +1437,19 @@ def quick_asset_box_metadata(
     metadata = cad_ir_payload.get("metadata", {}) if isinstance(cad_ir_payload, dict) else {}
     executable_plan = metadata.get("executable_asset_plan", {}) if isinstance(metadata, dict) else {}
     recommended_variant = metadata.get("recommended_asset_candidate_variant") if isinstance(metadata, dict) else None
+    module_candidates = metadata.get("module_candidates", []) if isinstance(metadata, dict) else []
     grid = config_payload.get("volumetric_grid", {}) if isinstance(config_payload, dict) else {}
     box = config_payload.get("box", {}) if isinstance(config_payload, dict) else {}
+    asset_sizing_diagnostics = _quick_asset_box_asset_sizing_diagnostics(
+        parse_report["accepted_assets"],
+        module_candidates,
+    )
+    module_sizing_diagnostics = _quick_asset_box_module_sizing_diagnostics(module_candidates)
+    count_warning = (
+        "quick_asset_box V0 reads and reports asset count, but generated module sizing is "
+        "representative-envelope only; count is not multiplied into footprint, height, "
+        "module count or cavity count."
+    )
     return {
         "input_format": parse_report["input_format"],
         "supported_types": parse_report["supported_types"],
@@ -1460,10 +1471,87 @@ def quick_asset_box_metadata(
         "generated_module_count": executable_plan.get("summary", {}).get("generated_module_count") if isinstance(executable_plan, dict) else 0,
         "placed_module_count": executable_plan.get("summary", {}).get("placed_module_count") if isinstance(executable_plan, dict) else 0,
         "rejected_module_count": executable_plan.get("summary", {}).get("rejected_module_count") if isinstance(executable_plan, dict) else 0,
+        "asset_items_visualized": False,
+        "asset_cavities_generated": False,
+        "count_aware_storage_sizing": False,
+        "storage_sizing_scope": "representative_asset_envelope_only",
+        "asset_sizing_diagnostics": asset_sizing_diagnostics,
+        "module_candidate_sizing_diagnostics": module_sizing_diagnostics,
+        "warnings": [count_warning],
         "temporary_config_created": True,
         "temporary_cad_ir_created": isinstance(cad_ir_payload, dict),
         "print_validation": False,
     }
+
+
+def _quick_asset_box_asset_sizing_diagnostics(
+    accepted_assets: list[dict[str, Any]],
+    module_candidates: Any,
+) -> list[dict[str, Any]]:
+    candidates = module_candidates if isinstance(module_candidates, list) else []
+    asset_to_candidate: dict[str, dict[str, Any]] = {}
+    for candidate in candidates:
+        if not isinstance(candidate, dict):
+            continue
+        for asset_id in candidate.get("source_asset_ids", []):
+            asset_to_candidate[str(asset_id)] = candidate
+
+    diagnostics: list[dict[str, Any]] = []
+    for asset in accepted_assets:
+        asset_id = str(asset.get("id", ""))
+        candidate = asset_to_candidate.get(asset_id, {})
+        count = asset.get("quantity", {}).get("count")
+        warning = None
+        if isinstance(count, int) and count > 1:
+            warning = "count is read and reported, but not used to expand generated module dimensions in P13-M001 V0."
+        diagnostics.append(
+            {
+                "asset_id": asset_id,
+                "candidate_id": candidate.get("candidate_id") if isinstance(candidate, dict) else None,
+                "count_read": count,
+                "dimensions_read_mm": asset.get("dimensions_mm"),
+                "contribution": "dimensions_only_for_representative_group_envelope",
+                "count_used_for_sizing": False,
+                "warning": warning,
+            }
+        )
+    return diagnostics
+
+
+def _quick_asset_box_module_sizing_diagnostics(module_candidates: Any) -> list[dict[str, Any]]:
+    candidates = module_candidates if isinstance(module_candidates, list) else []
+    diagnostics: list[dict[str, Any]] = []
+    for candidate in candidates:
+        if not isinstance(candidate, dict):
+            continue
+        suggested = candidate.get("suggested_module")
+        if not isinstance(suggested, dict):
+            continue
+        quantity = candidate.get("quantity", {}) if isinstance(candidate.get("quantity"), dict) else {}
+        constraints = candidate.get("constraints", {}) if isinstance(candidate.get("constraints"), dict) else {}
+        count = quantity.get("count")
+        warning = None
+        if isinstance(count, int) and count > 1:
+            warning = "module is a representative candidate and does not claim storage capacity for all asset quantities."
+        diagnostics.append(
+            {
+                "candidate_id": candidate.get("candidate_id"),
+                "source_asset_ids": candidate.get("source_asset_ids", []),
+                "count_read": count,
+                "module_size_mm": suggested.get("min_dimensions_mm"),
+                "asset_fit_size_mm": suggested.get("inner_asset_envelope_mm"),
+                "clearance_mm": constraints.get("clearance_mm"),
+                "wall_thickness_mm": constraints.get("wall_thickness_mm"),
+                "floor_thickness_mm": constraints.get("floor_thickness_mm"),
+                "reason": (
+                    "largest source asset envelope plus asset clearance, wall thickness and floor thickness; "
+                    "count is not multiplied into footprint, height or module count"
+                ),
+                "count_used_for_sizing": False,
+                "warning": warning,
+            }
+        )
+    return diagnostics
 
 
 def quick_asset_box_summary(payload: dict[str, Any] | None) -> str:
@@ -1489,6 +1577,10 @@ def quick_asset_box_summary(payload: dict[str, Any] | None) -> str:
         f"- print_profile: {quick.get('print_profile')}",
         f"- assets_read: {quick.get('accepted_asset_count')}",
         f"- assets_refused: {quick.get('rejected_asset_count')}",
+        f"- asset_items_visualized: {'yes' if quick.get('asset_items_visualized') else 'no'}",
+        f"- asset_cavities_generated: {'yes' if quick.get('asset_cavities_generated') else 'no'}",
+        f"- count_aware_storage_sizing: {'yes' if quick.get('count_aware_storage_sizing') else 'no'}",
+        f"- sizing_scope: {quick.get('storage_sizing_scope')}",
     ]
     for asset in quick.get("accepted_assets", []):
         lines.append(
@@ -1497,8 +1589,39 @@ def quick_asset_box_summary(payload: dict[str, Any] | None) -> str:
             f"size {_format_vector_payload(asset.get('dimensions_mm'))} "
             f"fit {asset.get('comment', '').replace('quick_asset_box V0 fit=', '').replace('; generic maps to core kind other.', '')}"
         )
+    for diagnostic in quick.get("asset_sizing_diagnostics", []):
+        warning = diagnostic.get("warning")
+        warning_text = f"; warning {warning}" if warning else ""
+        lines.append(
+            "- asset_sizing: "
+            f"{diagnostic.get('asset_id')} count_read {diagnostic.get('count_read')}; "
+            f"dimensions_read {_format_vector_payload(diagnostic.get('dimensions_read_mm'))}; "
+            f"candidate {diagnostic.get('candidate_id') or 'n/a'}; "
+            f"contribution {diagnostic.get('contribution')}; "
+            f"count_used_for_sizing {'yes' if diagnostic.get('count_used_for_sizing') else 'no'}"
+            f"{warning_text}"
+        )
     for rejected in quick.get("rejected_assets", []):
         lines.append(f"- refused: {rejected.get('entry')} -> {rejected.get('reason')}")
+    for warning in quick.get("warnings", []):
+        lines.append(f"- warning: {warning}")
+    for diagnostic in quick.get("module_candidate_sizing_diagnostics", []):
+        source_assets = ", ".join(str(asset_id) for asset_id in diagnostic.get("source_asset_ids", [])) or "n/a"
+        warning = diagnostic.get("warning")
+        warning_text = f"; warning {warning}" if warning else ""
+        lines.append(
+            "- module_candidate_sizing: "
+            f"{diagnostic.get('candidate_id')} source_assets {source_assets}; "
+            f"count_read {diagnostic.get('count_read')}; "
+            f"asset_fit {_format_vector_payload(diagnostic.get('asset_fit_size_mm'))}; "
+            f"module_size {_format_vector_payload(diagnostic.get('module_size_mm'))}; "
+            f"clearance {diagnostic.get('clearance_mm')} mm; "
+            f"wall {diagnostic.get('wall_thickness_mm')} mm; "
+            f"floor {diagnostic.get('floor_thickness_mm')} mm; "
+            f"reason {diagnostic.get('reason')}; "
+            f"count_used_for_sizing {'yes' if diagnostic.get('count_used_for_sizing') else 'no'}"
+            f"{warning_text}"
+        )
     lines.extend(
         [
             f"- module_candidates_generated: {quick.get('module_candidate_count')}",

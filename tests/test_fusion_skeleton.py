@@ -713,14 +713,33 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(config_payload["project_name"], "Quick asset box")
         self.assertEqual(len(config_payload["assets"]), 2)
         self.assertEqual(config_payload["volumetric_grid"]["unit_mm"], {"x": 30.0, "y": 20.0, "z": 10.0})
-        self.assertEqual(scene["metadata"]["quick_asset_box"]["accepted_asset_count"], 2)
-        self.assertEqual(scene["metadata"]["quick_asset_box"]["module_candidate_count"], 1)
-        self.assertEqual(scene["metadata"]["quick_asset_box"]["placed_module_count"], 1)
+        quick_metadata = scene["metadata"]["quick_asset_box"]
+        self.assertEqual(quick_metadata["accepted_asset_count"], 2)
+        self.assertEqual(quick_metadata["module_candidate_count"], 1)
+        self.assertEqual(quick_metadata["placed_module_count"], 1)
+        self.assertFalse(quick_metadata["asset_items_visualized"])
+        self.assertFalse(quick_metadata["asset_cavities_generated"])
+        self.assertFalse(quick_metadata["count_aware_storage_sizing"])
+        self.assertEqual(quick_metadata["storage_sizing_scope"], "representative_asset_envelope_only")
+        self.assertEqual(len(quick_metadata["asset_sizing_diagnostics"]), 2)
+        self.assertFalse(quick_metadata["asset_sizing_diagnostics"][0]["count_used_for_sizing"])
+        self.assertEqual(len(quick_metadata["module_candidate_sizing_diagnostics"]), 1)
+        self.assertFalse(quick_metadata["module_candidate_sizing_diagnostics"][0]["count_used_for_sizing"])
+        self.assertEqual(
+            quick_metadata["module_candidate_sizing_diagnostics"][0]["module_size_mm"],
+            {"x": 24.0, "y": 24.0, "z": 4.0},
+        )
         plan = generation_plan_from_cad_ir(validate_cad_ir_payload(scene), FUSION_GENERATION_MODE_COMPACT_ONLY)
         self.assertEqual(len(plan.grid_positioned_blanks), 1)
         summary = quick_asset_box_summary(scene)
         self.assertIn("Quick asset box inputs", summary)
         self.assertIn("assets_read: 2", summary)
+        self.assertIn("asset_items_visualized: no", summary)
+        self.assertIn("asset_cavities_generated: no", summary)
+        self.assertIn("count_aware_storage_sizing: no", summary)
+        self.assertIn("count_used_for_sizing no", summary)
+        self.assertIn("module_size 24.0 x 24.0 x 4.0 mm", summary)
+        self.assertIn("does not claim storage capacity for all asset quantities", summary)
         self.assertIn("module_candidates_generated: 1", summary)
         self.assertIn("placed_asset_modules: 1", summary)
 
@@ -1699,6 +1718,12 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn('request.source_kind == "quick_asset_box"', execute_block)
         self.assertIn("_generate_cad_ir_from_quick_asset_box_request", execute_block)
         self.assertIn("quick_asset_box_summary", source)
+        self.assertIn("asset_items_visualized", skeleton_source)
+        self.assertIn("asset_cavities_generated", skeleton_source)
+        self.assertIn("count_aware_storage_sizing", skeleton_source)
+        self.assertIn("bottom_and_top_box_xy_outlines", source)
+        self.assertIn("_create_reference_box_outlines", source)
+        self.assertIn("Reference outline policy", source)
         self.assertLess(
             execute_block.index("generation_plan = generation_plan_from_cad_ir"),
             execute_block.index("if request.action == FUSION_COMMAND_ACTION_REGENERATE:"),

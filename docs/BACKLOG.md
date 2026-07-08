@@ -642,7 +642,7 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Milestone : M14 Usable beta.
 - Objectif : permettre une premiere saisie d'assets simples depuis la commande Fusion sans ecrire de JSON a la main.
 - Livrable : mode `quick_asset_box`, champ texte assets, config temporaire stricte, reuse du pipeline assets existant, reporting Fusion, persistance settings, script de smoke test.
-- Criteres d'acceptation : assets lus/refuses reportes, candidats modules visibles, variante recommandee visible, modules places via CAD IR existante, generate/regenerate/clear conserves, coeur Python sans `adsk`.
+- Criteres d'acceptation : assets lus/refuses reportes, candidats modules visibles, variante recommandee visible, modules places via CAD IR existante, limites V0 explicites (`asset_items_visualized: no`, `asset_cavities_generated: no`, `count_aware_storage_sizing: no`), generate/regenerate/clear conserves, coeur Python sans `adsk`.
 - Tests : unitaires Fusion skeleton, py_compile, suite complete, CLI Markdown/JSON/export CAD IR exemples P13/P12, dry-run et preparation smoke Fusion.
 - Gate : validation humaine Fusion `P13-M001V` requise.
 - Statut : `done`, `implemented-fusion`, `print-validated: false`, `fusion-validated` en attente.
@@ -655,6 +655,18 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Livrable : smoke test humain Fusion.
 - Gate : action humaine requise.
 - Statut : `ready-gated`.
+
+### P13-M002 - Count-aware asset storage sizing et debug visuel
+
+- Capability : C-ASSET, C-SOLVER, C-FUSION-UI.
+- Milestone : M14 Usable beta.
+- Objectif : transformer le `count` asset en capacite de stockage lisible et verifier si un asset group doit produire un module plus grand, plusieurs modules ou un refus explicite.
+- Livrable : regles count-aware bornees, diagnostics de capacite, eventuellement enveloppe/asset debug non imprimable.
+- Criteres d'acceptation : le rapport peut dire combien d items sont effectivement contenus ou refuses; aucun module ne suggere une capacite non prouvee.
+- Tests : unitaires assets -> candidates -> executable plan, py_compile add-in, smoke Fusion prepare.
+- Gate : apres validation ou refus explicite de `P13-M001V`; pas a lancer dans la correction P13-M001.
+- Statut : `todo-gated`.
+
 ## Phase 12 - Couvercles, mecanismes et empilement avance
 
 ### P12-M001 - Modeliser les couvercles poses
