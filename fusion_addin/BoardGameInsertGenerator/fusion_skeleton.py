@@ -872,6 +872,7 @@ def default_fusion_ui_settings(addin_dir: str | Path) -> dict[str, str]:
 
     root = Path(addin_dir)
     saved = load_fusion_ui_settings(root)
+    settings_path = fusion_ui_settings_path(root)
     project_root = _valid_project_root_or_none(saved.get("project_root", ""))
     config_path = _valid_existing_file_or_none(saved.get("config_json_path", ""))
     cad_ir_path = _valid_existing_file_or_none(saved.get("cad_ir_path", ""))
@@ -917,7 +918,11 @@ def default_fusion_ui_settings(addin_dir: str | Path) -> dict[str, str]:
         "config_json_path": str(config_path) if config_path is not None else "",
         "project_root": str(project_root) if project_root is not None else "",
         "generation_mode": generation_mode,
-        "settings_path": str(fusion_ui_settings_path(root)),
+        "settings_path": str(settings_path),
+        "settings_loaded": "yes" if saved else "no",
+        "loaded_input_mode": input_mode,
+        "loaded_action": action,
+        "loaded_generation_mode": generation_mode,
         "parametric_fields_status": BGIG_PARAMETRIC_FIELDS_STATUS,
         "quick_parametric_box_status": BGIG_QUICK_PARAMETRIC_BOX_STATUS,
     }
@@ -944,12 +949,33 @@ def load_fusion_ui_settings(addin_dir: str | Path) -> dict[str, str]:
     if not path.is_file():
         return {}
     try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
+        payload = json.loads(path.read_text(encoding="utf-8-sig"))
     except (OSError, json.JSONDecodeError):
         return {}
     if not isinstance(payload, dict):
         return {}
     return {str(key): str(value) for key, value in payload.items() if value is not None}
+
+
+def fusion_ui_settings_summary(settings: dict[str, str]) -> str:
+    quick_values = parametric_values_from_ui_settings(settings)
+    quick_box_values = (
+        f"box {quick_values['box_inner_x_mm']} x {quick_values['box_inner_y_mm']} x {quick_values['box_inner_z_mm']}; "
+        f"grid {quick_values['grid_units_x']} x {quick_values['grid_units_y']} x {quick_values['grid_units_z']}; "
+        f"wall {quick_values['wall_thickness_mm']}; floor {quick_values['floor_thickness_mm']}; "
+        f"clearances {quick_values['peripheral_clearance_mm']} / {quick_values['inter_module_clearance_mm']}; "
+        f"profile {quick_values['print_profile']}"
+    )
+    return "\n".join(
+        [
+            f"UI settings path: {settings.get('settings_path', '')}",
+            f"UI settings loaded: {settings.get('settings_loaded', 'no')}",
+            f"Loaded input mode: {settings.get('loaded_input_mode', settings.get('input_mode', ''))}",
+            f"Loaded action: {settings.get('loaded_action', settings.get('action', ''))}",
+            f"Loaded generation mode: {settings.get('loaded_generation_mode', settings.get('generation_mode', ''))}",
+            f"Loaded quick box values: {quick_box_values}",
+        ]
+    )
 
 
 def fusion_command_summary(request: FusionCommandRequest) -> str:

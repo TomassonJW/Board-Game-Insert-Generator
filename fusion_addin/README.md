@@ -132,6 +132,8 @@ scripts/fusion/prepare_quick_parametric_test.ps1
 Ces scripts acceptent `-DryRun` pour verifier les chemins sans modifier
 `%APPDATA%`.
 
+Les scripts ecrivent `bgig_ui_settings.json` en UTF-8 sans BOM. Dans la commande Fusion, le bloc `UI settings` doit afficher le chemin lu, `UI settings loaded: yes` et les valeurs chargees avant le smoke test.
+
 ## CAD IR locale
 
 Par defaut, l'add-in charge le fichier suivant dans son propre dossier :

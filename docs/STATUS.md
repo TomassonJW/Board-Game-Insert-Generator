@@ -250,6 +250,8 @@ La mission `P12-M004` du 2026-07-08 ameliore la persistance et la rehydratation 
 
 La mission d'automatisation locale du 2026-07-08 ajoute `scripts/fusion/` pour installer l'add-in courant, verifier l'installation, preparer des smoke tests CAD IR depuis config et precharger le smoke test `quick_parametric_box`. Codex doit desormais utiliser ces scripts pour preparer les gates Fusion et fournir a Thomas uniquement les actions restantes dans Fusion, sauf blocage d'ecriture AppData.
 
+Le premier smoke test humain `P12-M004V` apres `c6cba19` est KO : l'UI Fusion ne montrait pas les valeurs preparees. Cause identifiee : `bgig_ui_settings.json` etait ecrit par PowerShell en UTF-8 avec BOM, puis refuse silencieusement par `json.loads()` lu en `utf-8`. La correction lit les settings en `utf-8-sig`, ecrit les settings sans BOM et ajoute un diagnostic visible `UI settings` dans la commande. Statut : correction codee, revalidation Fusion `P12-M004V` requise.
+
 Etat : le pipeline P4 reste stable pour les blanks rectangulaires Fusion. La
 vague P5 est terminee cote moteur Python pur, configuration, rapports et CAD IR.
 P6-M001 est `fusion-validated` pour les cavites rectangulaires simples, avec
@@ -265,7 +267,7 @@ document Assembly-compatible, avec `print-validated: false`. P11-M002 est
 X/Y/Z. P11-M003 est `fusion-validated` pour la commande UI minimale, le sizing asset-first explicite, la scene produit non ambigue, le mapping source et les occurrences compactes/eclatees liees. P11-M003V2 ajoute le rapport bbox planned/actual ; P11-M003V3 corrige l'affichage de la vraie commande UI ; P11-M003V4 valide le flux UI produit avec `simple_asset_product_scene`. La North
 Star cible un generateur volumetrique asset-first, pilote par capabilities.
 
-Prochaine action recommandee : realiser le smoke test humain `P12-M004V` dans Fusion avec l'add-in prepare par `scripts/fusion/prepare_quick_parametric_test.ps1`, avant toute autre mission produit. Stopper ensuite sur gate produit avant palette persistante, UI assets complete, solveur plus automatique, nouvelle geometrie Fusion, export imprimable ou validation d'impression.
+Prochaine action recommandee : relancer le smoke test humain `P12-M004V` dans Fusion avec l'add-in corrige prepare par `scripts/fusion/prepare_quick_parametric_test.ps1`; verifier d'abord dans le bloc UI `UI settings loaded: yes` et les valeurs quick box chargees, avant toute autre mission produit. Stopper ensuite sur gate produit avant palette persistante, UI assets complete, solveur plus automatique, nouvelle geometrie Fusion, export imprimable ou validation d'impression.
 
 ## Implemente
 

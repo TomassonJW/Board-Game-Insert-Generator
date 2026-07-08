@@ -339,3 +339,16 @@ Depuis la mission de preparation P12-M004V, Codex doit utiliser
 La procedure humaine commence donc dans Fusion, pas dans PowerShell, sauf si
 l'ecriture AppData est bloquee. La reference operationnelle est
 `docs/FUSION_SMOKE_TEST_AUTOMATION.md`.
+### Correction P12-M004V - settings PowerShell UTF-8 BOM
+
+Le premier smoke test P12-M004V apres automatisation a ete KO : l'UI ne montrait
+pas les valeurs preparees. La cause racine etait l'encodage du fichier
+`bgig_ui_settings.json` ecrit par PowerShell avec BOM UTF-8, alors que le loader
+Python le lisait en `utf-8` avant `json.loads()`.
+
+Correction : le loader lit maintenant les settings avec `utf-8-sig`, les scripts
+PowerShell ecrivent en UTF-8 sans BOM, et la commande Fusion affiche un bloc
+`UI settings` indiquant le chemin lu, `UI settings loaded`, le mode, l'action, le
+mode de generation et les valeurs quick box chargees.
+
+P12-M004V doit verifier ce bloc avant de lancer `generate` ou `regenerate`.

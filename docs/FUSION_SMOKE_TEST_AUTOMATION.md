@@ -89,6 +89,8 @@ Local AppData write blocked. Use Local/Handoff or approve filesystem write.
 Dans ce cas, Codex ne doit pas pretendre que l'add-in est installe et ne doit pas
 continuer vers une validation Fusion.
 
+Les settings UI doivent etre ecrits en UTF-8 sans BOM. Le loader Python accepte aussi les fichiers UTF-8 avec BOM via `utf-8-sig`, mais les scripts doivent rester sans BOM pour eviter les regressions Windows PowerShell.
+
 ## P12-M004V
 
 Le smoke test courant se prepare par :
@@ -101,13 +103,14 @@ Actions restantes dans Fusion :
 
 1. Ouvrir Fusion 360 et un document Assembly-compatible.
 2. Lancer `BoardGameInsertGenerator` ou cliquer `Generate Board Game Insert`.
-3. Verifier `Input mode = quick_parametric_box` et `Action = generate`.
-4. Generer, rouvrir BGIG, verifier que toutes les valeurs sont restaurees.
-5. Changer `box_inner_x_mm` a `160`, passer en `Action = regenerate`, lancer.
-6. Verifier que la scene est remplacee sans doublon.
-7. Rouvrir BGIG et verifier que `160` est toujours present.
-8. Lancer `clear_bgig_scene`.
-9. Verifier que les objets non BGIG sont preserves.
+3. Verifier dans le bloc `UI settings` : `UI settings loaded: yes`, `Loaded input mode: quick_parametric_box`, `Loaded generation mode: compact_only` et les valeurs quick box `120 x 80 x 30`, `4 x 4 x 3`, `1.2`, `0.4 / 0.3`, `draft`.
+4. Verifier `Input mode = quick_parametric_box` et `Action = generate` ou `regenerate` si une scene BGIG existe deja.
+5. Generer, rouvrir BGIG, verifier que toutes les valeurs sont restaurees.
+6. Changer `box_inner_x_mm` a `160`, passer en `Action = regenerate`, lancer.
+7. Verifier que la scene est remplacee sans doublon.
+8. Rouvrir BGIG et verifier que `160` est toujours present.
+9. Lancer `clear_bgig_scene`.
+10. Verifier que les objets non BGIG sont preserves.
 
 Statut attendu apres preparation : `manual_validation_required`, car seule
 l'execution dans Fusion valide le comportement reel.

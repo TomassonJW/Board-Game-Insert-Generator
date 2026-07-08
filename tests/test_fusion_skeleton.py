@@ -74,6 +74,7 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     detect_bgig_project_root,
     describe_document_state,
     fusion_command_summary,
+    fusion_ui_settings_summary,
     fusion_ui_settings_path,
     fusion_ui_launch_plan,
     generation_plan_from_cad_ir,
@@ -671,6 +672,46 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(Path(settings["config_json_path"]), (ROOT / "examples" / "simple_tray.json").resolve())
         self.assertEqual(Path(settings["project_root"]), ROOT)
         self.assertEqual(Path(settings["settings_path"]).name, BGIG_UI_SETTINGS_FILENAME)
+
+    def test_default_ui_settings_reads_utf8_bom_settings_file(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            addin_dir = Path(temp_dir)
+            values = {
+                "action": FUSION_COMMAND_ACTION_GENERATE,
+                "input_mode": FUSION_INPUT_MODE_QUICK_PARAMETRIC_BOX,
+                "generation_mode": FUSION_GENERATION_MODE_COMPACT_ONLY,
+                "project_root": str(ROOT),
+                "box_inner_x_mm": "120",
+                "box_inner_y_mm": "80",
+                "box_inner_z_mm": "30",
+                "grid_units_x": "4",
+                "grid_units_y": "4",
+                "grid_units_z": "3",
+                "wall_thickness_mm": "1.2",
+                "floor_thickness_mm": "1.2",
+                "peripheral_clearance_mm": "0.4",
+                "inter_module_clearance_mm": "0.3",
+                "print_profile": "draft",
+            }
+            (addin_dir / BGIG_UI_SETTINGS_FILENAME).write_text(json.dumps(values), encoding="utf-8-sig")
+
+            raw_settings = load_fusion_ui_settings(addin_dir)
+            settings = default_fusion_ui_settings(addin_dir)
+            request = default_fusion_command_values(addin_dir)
+            summary = fusion_ui_settings_summary(settings)
+
+        self.assertEqual(raw_settings["input_mode"], FUSION_INPUT_MODE_QUICK_PARAMETRIC_BOX)
+        self.assertEqual(settings["settings_loaded"], "yes")
+        self.assertEqual(settings["loaded_input_mode"], FUSION_INPUT_MODE_QUICK_PARAMETRIC_BOX)
+        self.assertEqual(settings["loaded_action"], FUSION_COMMAND_ACTION_GENERATE)
+        self.assertEqual(settings["loaded_generation_mode"], FUSION_GENERATION_MODE_COMPACT_ONLY)
+        self.assertEqual(settings["box_inner_x_mm"], "120")
+        self.assertEqual(request.input_mode, FUSION_INPUT_MODE_QUICK_PARAMETRIC_BOX)
+        self.assertEqual(request.generation_mode, FUSION_GENERATION_MODE_COMPACT_ONLY)
+        self.assertEqual(request.parameter_values["print_profile"], "draft")
+        self.assertIn("UI settings loaded: yes", summary)
+        self.assertIn("Loaded input mode: quick_parametric_box", summary)
+        self.assertIn("box 120 x 80 x 30", summary)
 
     def test_default_ui_settings_rehydrates_quick_parametric_box_fields(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -1384,6 +1425,9 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("BGIG_UI_REOPEN_POLICY", source)
         self.assertIn("BGIG config JSON path", source)
         self.assertIn("BGIG project root", source)
+        self.assertIn("bgig_ui_settings_status", source)
+        self.assertIn("UI settings", source)
+        self.assertIn("fusion_ui_settings_summary", source)
         self.assertIn("Action", source)
         self.assertIn("FUSION_COMMAND_ACTION_REGENERATE", source)
         self.assertIn("FUSION_COMMAND_ACTION_CLEAR", source)

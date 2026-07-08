@@ -156,7 +156,8 @@ function Write-BgigFusionUiSettings {
     }
 
     try {
-        $json + [Environment]::NewLine | Set-Content -LiteralPath $settingsPath -Encoding UTF8
+        $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
+        [System.IO.File]::WriteAllText($settingsPath, $json + [Environment]::NewLine, $utf8NoBom)
     }
     catch [System.UnauthorizedAccessException] {
         Write-Error $script:BgigAppDataBlockedMessage

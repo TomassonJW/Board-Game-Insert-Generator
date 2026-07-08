@@ -622,7 +622,7 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Criteres d acceptation : aucune ressaisie complete requise, scene remplacee sans doublon, derniere valeur visible, registry OK, objets non BGIG preserves, aucune validation d impression revendiquee.
 - Tests : smoke test manuel Fusion.
 - Gate : action humaine requise.
-- Statut : `manual_validation_required`.
+- Statut : `manual_validation_required`; premier essai KO apres `c6cba19` car le settings PowerShell UTF-8 BOM etait ignore par le loader Python ; correction settings sans BOM / lecture `utf-8-sig` codee, revalidation requise.
 ### P12-M004A - Automatiser la preparation des smoke tests Fusion
 
 - Capability : C-FUSION-UI, pilotage projet.

@@ -86,6 +86,7 @@ try:
         describe_document_state,
         parametric_values_from_ui_settings,
         fusion_command_summary,
+        fusion_ui_settings_summary,
         fusion_ui_settings_path,
         quick_parametric_box_summary,
         generation_plan_from_cad_ir,
@@ -168,6 +169,7 @@ except ImportError:  # pragma: no cover - Fusion may load the file as a script.
         describe_document_state,
         parametric_values_from_ui_settings,
         fusion_command_summary,
+        fusion_ui_settings_summary,
         fusion_ui_settings_path,
         quick_parametric_box_summary,
         generation_plan_from_cad_ir,
@@ -329,6 +331,13 @@ if adsk is not None:
                         f"{label} (config_file override / quick box value)",
                         defaults.get(parameter_id, P12_PARAMETRIC_FIELD_DEFAULTS[parameter_id]),
                     )
+                inputs.addTextBoxCommandInput(
+                    "bgig_ui_settings_status",
+                    "UI settings",
+                    fusion_ui_settings_summary(defaults),
+                    6,
+                    True,
+                )
                 inputs.addTextBoxCommandInput(
                     SUMMARY_INPUT_ID,
                     "Summary",
