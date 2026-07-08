@@ -112,6 +112,17 @@ Verification Fusion boundary recommandee :
 rg -n "adsk" src/board_game_insert_generator
 ```
 
+Pour une gate Fusion, Codex prepare aussi le smoke test localement avec les
+scripts `scripts/fusion/` :
+
+- `install_addin.ps1` pour copier l'add-in courant ;
+- `prepare_smoke_test.ps1` pour un flux CAD IR depuis config ;
+- `prepare_quick_parametric_test.ps1` pour le flux `quick_parametric_box` ;
+- `check_installed_addin.ps1` pour verifier l'installation.
+
+Ces commandes sont executees par Codex. Thomas ne recoit des commandes
+PowerShell a lancer lui-meme qu'en cas de blocage d'infrastructure, notamment si
+`%APPDATA%` est inaccessible en ecriture.
 ### 6. Mise a jour du pilotage
 
 Mettre a jour les documents qui permettent au prochain agent de reprendre sans

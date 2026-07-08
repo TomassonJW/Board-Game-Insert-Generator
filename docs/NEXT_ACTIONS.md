@@ -24,8 +24,14 @@ La gate humaine P12-M004 a ete validee pour ameliorer la persistance des champs 
 
 ## Mission ready non gated
 
-Aucune mission produit non-gated supplementaire n'est recommandee avant validation Fusion P12-M004V. Action humaine recommandee : smoke test de rehydratation `quick_parametric_box`, modification d une valeur, `regenerate`, reouverture et `clear_bgig_scene` avec preservation non-BGIG.
+Aucune mission produit non-gated supplementaire n'est recommandee avant validation Fusion P12-M004V. La preparation locale doit passer par `scripts/fusion/prepare_quick_parametric_test.ps1`. Action humaine restante : smoke test dans Fusion de rehydratation `quick_parametric_box`, modification d une valeur, `regenerate`, reouverture et `clear_bgig_scene` avec preservation non-BGIG.
 
+## Regle operationnelle Fusion
+
+Pour toute future gate Fusion, Codex prepare automatiquement le smoke test avec
+`scripts/fusion/`, installe l'add-in si les permissions AppData le permettent,
+genere les CAD IR temporaires necessaires et fournit uniquement les actions
+Fusion restantes a Thomas.
 ## Mission bloquee par gate
 
 

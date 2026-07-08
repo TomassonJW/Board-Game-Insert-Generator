@@ -1,4 +1,4 @@
-﻿# Fusion 360 Strategy
+# Fusion 360 Strategy
 
 ## Decision centrale
 
@@ -409,6 +409,17 @@ $env:PYTHONPATH = "src"
 python -m unittest discover -s tests -p test_fusion_skeleton.py
 ```
 
+## Preparation automatisee des smoke tests
+
+Les smoke tests Fusion restent des validations humaines, mais leur preparation
+locale est automatisee dans `scripts/fusion/`.
+
+Codex doit installer l'add-in courant, generer les CAD IR temporaires utiles,
+ecrire les settings UI et verifier l'installation quand les permissions locales
+le permettent. Si l'ecriture dans `%APPDATA%` est bloquee, Codex doit rapporter
+le blocage et ne pas pretendre que l'add-in est installe.
+
+Reference : `docs/FUSION_SMOKE_TEST_AUTOMATION.md`.
 ## Strategie de test
 
 Tests hors Fusion :

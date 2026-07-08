@@ -173,6 +173,24 @@ python -m board_game_insert_generator examples/simple_box.json --format markdown
 Si une validation ne peut pas etre lancee, Codex doit documenter la raison dans
 le compte rendu final et, si cela change l'etat reel, dans `docs/STATUS.md`.
 
+## Preparation des gates Fusion
+
+Les validations Fusion restent humaines, mais leur preparation est une
+responsabilite Codex.
+
+Pour toute gate Fusion future, Codex doit lancer les scripts disponibles dans
+`scripts/fusion/` pour preparer l'environnement local : installation de l'add-in,
+generation des CAD IR temporaires si necessaire, ecriture des settings UI et
+verification des marqueurs installes. Le rapport final doit donner uniquement les
+actions restantes dans Fusion.
+
+Si Codex ne peut pas ecrire dans `%APPDATA%`, il doit s'arreter avec :
+
+```text
+Local AppData write blocked. Use Local/Handoff or approve filesystem write.
+```
+
+et ne pas presenter la validation Fusion comme prete.
 ## Documentation de fin de mission
 
 Apres une mission significative, Codex met a jour :

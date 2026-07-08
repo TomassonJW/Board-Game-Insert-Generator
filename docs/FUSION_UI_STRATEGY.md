@@ -324,3 +324,18 @@ Smoke test P12-M004V attendu : ouvrir BGIG, choisir `quick_parametric_box`, sais
 rouvrir, verifier la rehydratation, changer `box_inner_x_mm` a `160`, lancer
 `regenerate`, verifier le remplacement sans doublon, rouvrir et verifier `160`,
 puis lancer `clear_bgig_scene` en confirmant la preservation des objets non BGIG.
+## Automatisation locale des smoke tests Fusion
+
+Depuis la mission de preparation P12-M004V, Codex doit utiliser
+`scripts/fusion/` pour preparer les validations Fusion :
+
+- `install_addin.ps1` copie l'add-in courant dans le dossier Fusion AddIns ;
+- `prepare_smoke_test.ps1` exporte une CAD IR depuis une config et pre-remplit
+  les settings UI ;
+- `prepare_quick_parametric_test.ps1` pre-remplit le workflow
+  `quick_parametric_box` ;
+- `check_installed_addin.ps1` verifie les marqueurs de l'add-in installe.
+
+La procedure humaine commence donc dans Fusion, pas dans PowerShell, sauf si
+l'ecriture AppData est bloquee. La reference operationnelle est
+`docs/FUSION_SMOKE_TEST_AUTOMATION.md`.

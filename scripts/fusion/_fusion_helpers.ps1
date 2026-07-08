@@ -1,0 +1,198 @@
+Set-StrictMode -Version Latest
+
+$script:BgigAddinName = "BoardGameInsertGenerator"
+$script:BgigAddinRelativePath = Join-Path "fusion_addin" $script:BgigAddinName
+$script:BgigDefaultFusionAddinsRoot = Join-Path $env:APPDATA "Autodesk\Autodesk Fusion 360\API\AddIns"
+$script:BgigAppDataBlockedMessage = "Local AppData write blocked. Use Local/Handoff or approve filesystem write."
+
+function Resolve-BgigRepoRoot {
+    param(
+        [string] $RepoRoot
+    )
+
+    if ($RepoRoot) {
+        $candidate = Resolve-Path -LiteralPath $RepoRoot -ErrorAction Stop
+        return $candidate.Path
+    }
+
+    $candidate = Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..\..") -ErrorAction Stop
+    $root = $candidate.Path
+    $addinPath = Join-Path $root $script:BgigAddinRelativePath
+    if (-not (Test-Path -LiteralPath $addinPath -PathType Container)) {
+        throw "BGIG repo root could not be resolved from script path. Missing: $addinPath"
+    }
+    return $root
+}
+
+function Get-BgigAddinSourcePath {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $RepoRoot
+    )
+
+    $source = Join-Path $RepoRoot $script:BgigAddinRelativePath
+    if (-not (Test-Path -LiteralPath $source -PathType Container)) {
+        throw "Fusion add-in source folder not found: $source"
+    }
+    return (Resolve-Path -LiteralPath $source -ErrorAction Stop).Path
+}
+
+function Get-BgigFusionAddinTargetPath {
+    param(
+        [string] $TargetPath
+    )
+
+    if ($TargetPath) {
+        return $TargetPath
+    }
+    return Join-Path $script:BgigDefaultFusionAddinsRoot $script:BgigAddinName
+}
+
+function Get-BgigCurrentCommit {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $RepoRoot
+    )
+
+    $commit = (& git -C $RepoRoot rev-parse --short HEAD 2>$null)
+    if ($LASTEXITCODE -ne 0 -or -not $commit) {
+        return "unknown"
+    }
+    return ($commit | Select-Object -First 1).Trim()
+}
+
+function Assert-BgigFusionAddinMarkers {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $AddinPath,
+        [string[]] $Markers = @(
+            "Generate Board Game Insert",
+            "quick_parametric_box",
+            "inspect_bgig_scene",
+            "bgig_ui_settings.json"
+        )
+    )
+
+    $entrypoint = Join-Path $AddinPath "BoardGameInsertGenerator.py"
+    if (-not (Test-Path -LiteralPath $entrypoint -PathType Leaf)) {
+        throw "Fusion add-in entrypoint missing: $entrypoint"
+    }
+
+    $text = Get-Content -LiteralPath $entrypoint -Raw -Encoding UTF8
+    foreach ($marker in $Markers) {
+        if ($text -notlike "*$marker*") {
+            throw "Installed add-in marker missing in BoardGameInsertGenerator.py: $marker"
+        }
+    }
+}
+
+function Assert-BgigTargetUnderAppData {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $TargetPath
+    )
+
+    $appDataRoot = [System.IO.Path]::GetFullPath($env:APPDATA)
+    $fullTarget = [System.IO.Path]::GetFullPath($TargetPath)
+    if (-not $fullTarget.StartsWith($appDataRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw "Refusing to install outside APPDATA. Target: $fullTarget"
+    }
+    if ([System.IO.Path]::GetFileName($fullTarget) -ne $script:BgigAddinName) {
+        throw "Refusing to install to a folder not named $($script:BgigAddinName): $fullTarget"
+    }
+}
+
+function Copy-BgigFusionAddin {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $SourcePath,
+        [Parameter(Mandatory = $true)]
+        [string] $TargetPath,
+        [switch] $DryRun
+    )
+
+    Assert-BgigTargetUnderAppData -TargetPath $TargetPath
+    $parent = Split-Path -Parent $TargetPath
+
+    if ($DryRun) {
+        Write-Output "Dry run: would remove installed add-in: $TargetPath"
+        Write-Output "Dry run: would copy add-in from: $SourcePath"
+        Write-Output "Dry run: would copy add-in to: $TargetPath"
+        return
+    }
+
+    try {
+        New-Item -ItemType Directory -Force -Path $parent | Out-Null
+        if (Test-Path -LiteralPath $TargetPath) {
+            Remove-Item -LiteralPath $TargetPath -Recurse -Force
+        }
+        Copy-Item -LiteralPath $SourcePath -Destination $parent -Recurse -Force
+    }
+    catch [System.UnauthorizedAccessException] {
+        Write-Error $script:BgigAppDataBlockedMessage
+        exit 20
+    }
+    catch [System.IO.IOException] {
+        Write-Error "$($script:BgigAppDataBlockedMessage) Details: $($_.Exception.Message)"
+        exit 20
+    }
+}
+
+function Write-BgigFusionUiSettings {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $TargetPath,
+        [Parameter(Mandatory = $true)]
+        [hashtable] $Settings,
+        [switch] $DryRun
+    )
+
+    $settingsPath = Join-Path $TargetPath "bgig_ui_settings.json"
+    $json = $Settings | ConvertTo-Json -Depth 6
+    if ($DryRun) {
+        Write-Output "Dry run: would write UI settings: $settingsPath"
+        Write-Output $json
+        return
+    }
+
+    try {
+        $json + [Environment]::NewLine | Set-Content -LiteralPath $settingsPath -Encoding UTF8
+    }
+    catch [System.UnauthorizedAccessException] {
+        Write-Error $script:BgigAppDataBlockedMessage
+        exit 20
+    }
+    catch [System.IO.IOException] {
+        Write-Error "$($script:BgigAppDataBlockedMessage) Details: $($_.Exception.Message)"
+        exit 20
+    }
+}
+
+function Export-BgigCadIr {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $RepoRoot,
+        [Parameter(Mandatory = $true)]
+        [string] $ConfigPath,
+        [Parameter(Mandatory = $true)]
+        [string] $OutputPath,
+        [switch] $DryRun
+    )
+
+    if (-not (Test-Path -LiteralPath $ConfigPath -PathType Leaf)) {
+        throw "Config file not found: $ConfigPath"
+    }
+
+    if ($DryRun) {
+        Write-Output "Dry run: would export CAD IR:"
+        Write-Output "  Config: $ConfigPath"
+        Write-Output "  Output: $OutputPath"
+        return
+    }
+
+    $env:PYTHONPATH = Join-Path $RepoRoot "src"
+    & python -m board_game_insert_generator export-cad-ir $ConfigPath --output $OutputPath
+    if ($LASTEXITCODE -ne 0) {
+        throw "CAD IR export failed for config: $ConfigPath"
+    }
+}

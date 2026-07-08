@@ -623,6 +623,16 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Tests : smoke test manuel Fusion.
 - Gate : action humaine requise.
 - Statut : `manual_validation_required`.
+### P12-M004A - Automatiser la preparation des smoke tests Fusion
+
+- Capability : C-FUSION-UI, pilotage projet.
+- Milestone : M14 Usable beta.
+- Objectif : supprimer les commandes PowerShell repetitives de la charge humaine avant les validations Fusion.
+- Livrable : scripts `scripts/fusion/` pour installer/verifier l'add-in, preparer un smoke test CAD IR depuis config et precharger le smoke test `quick_parametric_box`, plus documentation durable.
+- Criteres d acceptation : Codex peut preparer P12-M004V depuis le repo, detecte un blocage AppData sans pretendre installer, et ne fournit a Thomas que les actions Fusion restantes.
+- Tests : unitaires, py_compile add-in, dry-run scripts, execution reelle si permissions AppData disponibles, `git diff --check`, absence `adsk` dans le coeur Python.
+- Gate : gate humaine validee le 2026-07-08 pour automatisation locale.
+- Statut : `done` apres integration, sans validation produit Fusion.
 ## Phase 12 - Couvercles, mecanismes et empilement avance
 
 ### P12-M001 - Modeliser les couvercles poses

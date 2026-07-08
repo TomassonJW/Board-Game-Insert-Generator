@@ -1,4 +1,4 @@
-﻿# Fusion Add-in Skeleton
+# Fusion Add-in Skeleton
 
 ## Statut
 
@@ -65,6 +65,8 @@ Ce que l'add-in ne cree pas :
   genere par l'UI quand `BGIG config JSON path` est utilise.
 - `BoardGameInsertGenerator/bgig_ui_generated_cad_ir.json` : CAD IR temporaire
   consommee par Fusion dans le flux config.
+- `BoardGameInsertGenerator/bgig_ui_settings.json` : settings UI locaux generes
+  ou mis a jour par l'add-in et par les scripts de preparation.
 
 ## Installation locale
 
@@ -108,6 +110,27 @@ exact `BoardGameInsertGenerator`, pas son parent `fusion_addin` ni le dossier
 Puis redemarrer Fusion 360 ou ouvrir `Utilities > Add-ins`, afficher `All scripts
 and add-ins` ou filtrer `Add-ins`, selectionner `BoardGameInsertGenerator` et
 lancer l'add-in.
+
+Depuis l'automatisation de preparation P12-M004V, l'installation locale recommandee passe par :
+
+```powershell
+scripts/fusion/install_addin.ps1
+```
+
+Pour preparer un smoke test CAD IR depuis config :
+
+```powershell
+scripts/fusion/prepare_smoke_test.ps1 -ConfigPath examples/simple_asset_product_scene.json -GenerationMode compact_only
+```
+
+Pour preparer le smoke test `quick_parametric_box` courant :
+
+```powershell
+scripts/fusion/prepare_quick_parametric_test.ps1
+```
+
+Ces scripts acceptent `-DryRun` pour verifier les chemins sans modifier
+`%APPDATA%`.
 
 ## CAD IR locale
 
@@ -207,7 +230,9 @@ auto-detection depuis la config ou l'add-in, puis dev root
 memorises dans `bgig_ui_settings.json` dans le dossier de l'add-in.
 
 Les champs numeriques sont de vrais overrides de la config choisie. Ils sont
-rejetes en mode `cad_ir_file` pour eviter une UI decorative. Le mode
+actifs en `config_file` et `quick_parametric_box`. En mode `cad_ir_file`, les
+valeurs persistantes restent visibles mais sont ignorees afin qu'une saisie
+precedente ne bloque pas le chargement direct d'une CAD IR. Le mode
 `quick_parametric_box` est fonctionnel depuis P12-M003. Il construit une CAD IR temporaire minimale directement depuis les champs UI et genere un module rectangulaire V0. Il ne remplace pas encore une UI assets complete et ne valide aucune impression 3D.
 
 

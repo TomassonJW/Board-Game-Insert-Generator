@@ -194,6 +194,28 @@ Utilise plutot les statuts suivants :
 - `prevu` : decrit dans la roadmap ou le backlog, non code ;
 - `a valider par impression reelle` : necessite un prototype physique.
 
+## Gates Fusion et preparation locale
+
+Pour toute future gate Fusion, Codex prepare automatiquement le smoke test quand
+l'environnement local le permet :
+
+- verifier le commit courant ;
+- generer les CAD IR temporaires requises ;
+- installer l'add-in courant via les scripts `scripts/fusion/` ;
+- ecrire les settings UI locaux utiles ;
+- verifier les marqueurs de l'add-in installe ;
+- fournir a Thomas uniquement les actions restantes dans Fusion.
+
+Thomas ne doit pas recevoir de blocs PowerShell a executer manuellement sauf
+blocage d'infrastructure. Si l'ecriture dans `%APPDATA%` est bloquee, Codex doit
+rapporter exactement :
+
+```text
+Local AppData write blocked. Use Local/Handoff or approve filesystem write.
+```
+
+Dans ce cas, Codex ne pretend pas que l'installation est faite et ne continue pas
+vers une validation Fusion.
 ## Regles de scope
 
 - Ne cree pas de dependance lourde, service externe, framework structurant,
