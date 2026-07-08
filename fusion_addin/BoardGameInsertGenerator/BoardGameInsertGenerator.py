@@ -53,6 +53,7 @@ try:
         FUSION_INPUT_MODE_CAD_IR_FILE,
         FUSION_INPUT_MODE_CONFIG_FILE,
         FUSION_INPUT_MODE_QUICK_PARAMETRIC_BOX,
+        FUSION_INPUT_MODE_QUICK_ASSET_BOX,
         FUSION_COMMAND_ACTION_CLEAR,
         FUSION_COMMAND_ACTION_GENERATE,
         FUSION_COMMAND_ACTION_INSPECT,
@@ -66,6 +67,9 @@ try:
         P12_PARAMETRIC_FIELD_DEFAULTS,
         BGIG_PARAMETRIC_FIELDS_STATUS,
         BGIG_QUICK_PARAMETRIC_BOX_STATUS,
+        BGIG_QUICK_ASSET_BOX_DEFAULT_ASSETS,
+        BGIG_QUICK_ASSET_BOX_FIELD,
+        BGIG_QUICK_ASSET_BOX_STATUS,
         P12_PARAMETRIC_FIELD_LABELS,
         SUPPORTED_FUSION_GENERATION_MODES,
         SUPPORTED_FUSION_INPUT_MODES,
@@ -80,6 +84,7 @@ try:
         assembly_document_required_message,
         build_fusion_command_request,
         build_quick_parametric_box_cad_ir_payload,
+        build_quick_asset_box_config_payload,
         cad_ir_input_guidance,
         default_fusion_command_values,
         default_fusion_ui_settings,
@@ -89,6 +94,8 @@ try:
         fusion_ui_settings_summary,
         fusion_ui_settings_path,
         quick_parametric_box_summary,
+        quick_asset_box_metadata,
+        quick_asset_box_summary,
         generation_plan_from_cad_ir,
         is_part_design_component_limit_error,
         load_cad_ir_json,
@@ -136,6 +143,7 @@ except ImportError:  # pragma: no cover - Fusion may load the file as a script.
         FUSION_INPUT_MODE_CAD_IR_FILE,
         FUSION_INPUT_MODE_CONFIG_FILE,
         FUSION_INPUT_MODE_QUICK_PARAMETRIC_BOX,
+        FUSION_INPUT_MODE_QUICK_ASSET_BOX,
         FUSION_COMMAND_ACTION_CLEAR,
         FUSION_COMMAND_ACTION_GENERATE,
         FUSION_COMMAND_ACTION_INSPECT,
@@ -149,6 +157,9 @@ except ImportError:  # pragma: no cover - Fusion may load the file as a script.
         P12_PARAMETRIC_FIELD_DEFAULTS,
         BGIG_PARAMETRIC_FIELDS_STATUS,
         BGIG_QUICK_PARAMETRIC_BOX_STATUS,
+        BGIG_QUICK_ASSET_BOX_DEFAULT_ASSETS,
+        BGIG_QUICK_ASSET_BOX_FIELD,
+        BGIG_QUICK_ASSET_BOX_STATUS,
         P12_PARAMETRIC_FIELD_LABELS,
         SUPPORTED_FUSION_GENERATION_MODES,
         SUPPORTED_FUSION_INPUT_MODES,
@@ -163,6 +174,7 @@ except ImportError:  # pragma: no cover - Fusion may load the file as a script.
         assembly_document_required_message,
         build_fusion_command_request,
         build_quick_parametric_box_cad_ir_payload,
+        build_quick_asset_box_config_payload,
         cad_ir_input_guidance,
         default_fusion_command_values,
         default_fusion_ui_settings,
@@ -172,6 +184,8 @@ except ImportError:  # pragma: no cover - Fusion may load the file as a script.
         fusion_ui_settings_summary,
         fusion_ui_settings_path,
         quick_parametric_box_summary,
+        quick_asset_box_metadata,
+        quick_asset_box_summary,
         generation_plan_from_cad_ir,
         is_part_design_component_limit_error,
         load_cad_ir_json,
@@ -319,11 +333,19 @@ if adsk is not None:
                     "Parametric fields",
                     (
                         "Saved in bgig_ui_settings.json and restored when BGIG is reopened. "
-                        "Active in config_file and quick_parametric_box modes; ignored in cad_ir_file mode. "
-                        f"quick_parametric_box: {BGIG_QUICK_PARAMETRIC_BOX_STATUS}."
+                        "Active in config_file, quick_parametric_box and quick_asset_box modes; ignored in cad_ir_file mode. "
+                        f"quick_parametric_box: {BGIG_QUICK_PARAMETRIC_BOX_STATUS}. "
+                        f"quick_asset_box: {BGIG_QUICK_ASSET_BOX_STATUS}."
                     ),
                     3,
                     True,
+                )
+                inputs.addTextBoxCommandInput(
+                    QUICK_ASSET_BOX_ASSETS_INPUT_ID,
+                    "Assets (quick_asset_box)",
+                    defaults.get(BGIG_QUICK_ASSET_BOX_FIELD, BGIG_QUICK_ASSET_BOX_DEFAULT_ASSETS),
+                    5,
+                    False,
                 )
                 for parameter_id, label in P12_PARAMETRIC_FIELD_LABELS.items():
                     inputs.addStringValueInput(
@@ -366,6 +388,7 @@ if adsk is not None:
                 generation_mode_input = inputs.itemById(GENERATION_MODE_INPUT_ID)
                 action_input = inputs.itemById(ACTION_INPUT_ID)
                 input_mode_input = inputs.itemById(INPUT_MODE_INPUT_ID)
+                quick_asset_input = inputs.itemById(QUICK_ASSET_BOX_ASSETS_INPUT_ID)
                 request = build_fusion_command_request(
                     getattr(cad_ir_path_input, "value", ""),
                     _selected_dropdown_value(generation_mode_input, DEFAULT_FUSION_GENERATION_MODE),
@@ -375,6 +398,7 @@ if adsk is not None:
                     project_root_text=getattr(project_root_input, "value", ""),
                     parameter_values=_parameter_input_values(inputs),
                     input_mode=_selected_dropdown_value(input_mode_input, DEFAULT_FUSION_INPUT_MODE),
+                    quick_asset_box_assets_text=getattr(quick_asset_input, "text", getattr(quick_asset_input, "formattedText", "")),
                 )
                 _show_message(_execute_generation_request(request, self.addin_dir))
             except FusionAssemblyDocumentRequiredError as exc:
@@ -543,12 +567,13 @@ def _execute_generation_request(request, addin_dir: Path) -> str:  # noqa: ANN00
 
     cad_ir_path = request.cad_ir_path
     quick_parametric_payload = None
-    if request.source_kind == "config":
-        cad_ir_path = _generate_cad_ir_from_config_request(request, addin_dir)
+    quick_asset_payload = None
+    if request.source_kind == "config":        cad_ir_path = _generate_cad_ir_from_config_request(request, addin_dir)
     elif request.source_kind == "quick_parametric_box":
         cad_ir_path, quick_parametric_payload = _generate_cad_ir_from_quick_parametric_box_request(request, addin_dir)
-    if cad_ir_path is None:
-        raise FusionSkeletonError("No CAD IR path is available for generation.")
+    elif request.source_kind == "quick_asset_box":
+        cad_ir_path, quick_asset_payload = _generate_cad_ir_from_quick_asset_box_request(request, addin_dir)
+    if cad_ir_path is None:        raise FusionSkeletonError("No CAD IR path is available for generation.")
 
     payload = load_cad_ir_json(cad_ir_path)
     generation_plan = generation_plan_from_cad_ir(
@@ -583,11 +608,58 @@ def _execute_generation_request(request, addin_dir: Path) -> str:  # noqa: ANN00
         clear_result,
         settings_saved,
         quick_parametric_payload,
+        quick_asset_payload,
     )
-
 
 def _generate_cad_ir_from_quick_parametric_box_request(request, addin_dir: Path):  # noqa: ANN001
     payload = build_quick_parametric_box_cad_ir_payload(request.parameter_overrides or {})
+    cad_ir_path = addin_dir / BGIG_GENERATED_CAD_IR_FILENAME
+    cad_ir_path.write_text(
+        json.dumps(payload, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    return cad_ir_path, payload
+
+def _generate_cad_ir_from_quick_asset_box_request(request, addin_dir: Path):  # noqa: ANN001
+    if request.project_root is None:
+        raise FusionSkeletonError("BGIG project root is required for quick_asset_box generation.")
+    _ensure_bgig_engine_on_path(request.project_root)
+    try:
+        from board_game_insert_generator.cad_ir import build_blank_cad_scene
+        from board_game_insert_generator.config_loader import load_config
+        from board_game_insert_generator.layout import generate_basic_layout
+    except Exception as exc:  # pragma: no cover - depends on Fusion Python path.
+        raise FusionSkeletonError(
+            "Could not import the pure BGIG engine from BGIG project root. "
+            f"Project root: {request.project_root}. Original error: {exc}"
+        ) from exc
+
+    temp_config_payload = build_quick_asset_box_config_payload(
+        request.parameter_overrides or {},
+        request.quick_asset_box_assets_text,
+    )
+    temp_config_path = addin_dir / BGIG_GENERATED_CONFIG_FILENAME
+    temp_config_path.write_text(
+        json.dumps(temp_config_payload, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+    try:
+        config = load_config(temp_config_path)
+        layout = generate_basic_layout(config)
+        scene = build_blank_cad_scene(config, layout)
+        payload = scene.to_dict()
+        payload.setdefault("metadata", {})["quick_asset_box"] = quick_asset_box_metadata(
+            temp_config_payload,
+            request.quick_asset_box_assets_text,
+            payload,
+        )
+    except Exception as exc:
+        raise FusionSkeletonError(
+            "quick_asset_box config-to-CAD-IR generation failed. "
+            f"Temporary config: {temp_config_path}. Original error: {exc}"
+        ) from exc
+
     cad_ir_path = addin_dir / BGIG_GENERATED_CAD_IR_FILENAME
     cad_ir_path.write_text(
         json.dumps(payload, indent=2) + "\n",
@@ -672,6 +744,7 @@ def _save_command_settings(addin_dir: Path, request, cad_ir_path: Path | None = 
         settings["config_json_path"] = str(request.config_json_path)
     if request.project_root is not None:
         settings["project_root"] = str(request.project_root)
+    settings[BGIG_QUICK_ASSET_BOX_FIELD] = str(getattr(request, "quick_asset_box_assets_text", "") or "").strip()
     for key, value in parametric_values_from_ui_settings(request.parameter_values or {}).items():
         settings[key] = value
     try:
@@ -778,11 +851,13 @@ def _generation_result_message(
     clear_result: dict[str, object] | None = None,
     settings_saved: bool = False,
     quick_parametric_payload: dict[str, object] | None = None,
+    quick_asset_payload: dict[str, object] | None = None,
 ) -> str:
     result = _stable_generation_result(result)
     body_size_report = _body_size_report_message(result.get("body_size_reports", []))
     module_mapping_report = _module_mapping_report_message(generation_plan)
     quick_parametric_report = quick_parametric_box_summary(quick_parametric_payload) if request.source_kind == "quick_parametric_box" else ""
+    quick_asset_report = quick_asset_box_summary(quick_asset_payload) if request.source_kind == "quick_asset_box" else ""
     clear_lines = ""
     if clear_result is not None:
         clear_lines = (
@@ -812,6 +887,7 @@ def _generation_result_message(
         f"Parametric overrides: {', '.join(sorted(overrides)) if overrides else 'none'}\n"
         f"Generation mode: {generation_plan.generation_mode}\n"
         f"{quick_parametric_report}"
+        f"{quick_asset_report}"
         f"Reference outlines: {result['reference_outlines']}\n"
         f"BGIG scene roots before: {scene_roots_before}\n"
         f"CAD IR module blanks planned: {len(generation_plan.blanks)}\n"

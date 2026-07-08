@@ -18,13 +18,15 @@ structurant, authentification absente ou refus de push direct.
 
 ## Gate humaine active
 
-Statut : aucune mission produit non-gated active. `P12-M004V` est validee humainement dans Fusion apres `ab488dc`.
+`P13-M001V - Valider quick_asset_box dans Fusion`.
 
-La gate humaine P12-M004 a ete validee et le smoke test P12-M004V confirme la persistance des champs UI, la rehydratation, `generate`, `regenerate`, `clear_bgig_scene` et la preservation non-BGIG. Impression 3D non validee.
+Statut : action humaine requise dans Fusion 360. Codex a implemente `quick_asset_box` et prepare le script `scripts/fusion/prepare_quick_asset_test.ps1`. La mission ne doit pas etre declaree `fusion-validated` avant smoke test humain.
+
+Smoke attendu : ouvrir un document Assembly-compatible, ouvrir BGIG, confirmer `Input mode = quick_asset_box`, verifier les valeurs rehydratees et le champ assets, lancer `generate`, verifier assets lus, candidats, module(s) places, `Body sizing report`, registry OK et `Print validation: false`, rouvrir BGIG, modifier un asset ou une dimension, lancer `regenerate`, verifier absence de doublon, puis `clear_bgig_scene` en preservant les objets non-BGIG.
 
 ## Mission ready non gated
 
-Aucune mission produit non-gated supplementaire n'est recommandee dans ce run. Prochaine action : gate produit explicite avant palette persistante, UI assets complete, solveur plus automatique, nouvelle geometrie Fusion, export imprimable ou validation d'impression.
+Aucune mission produit non-gated supplementaire n'est recommandee avant validation humaine `P13-M001V`.
 
 ## Regle operationnelle Fusion
 
@@ -32,12 +34,14 @@ Pour toute future gate Fusion, Codex prepare automatiquement le smoke test avec
 `scripts/fusion/`, installe l'add-in si les permissions AppData le permettent,
 genere les CAD IR temporaires necessaires et fournit uniquement les actions
 Fusion restantes a Thomas.
-## Mission bloquee par gate
 
+## Mission bloquee par gate
 
 `P8-FUSION-GATE - Generation Fusion volumetrique ou vue 3D`.
 
 `P10-SOLVER-GATE - Solveur complexe, backtracking ou optimisation globale`.
+
+Palette persistante HTML, UI assets avancee/tableau, solveur plus automatique, nouvelle geometrie Fusion, export imprimable et validation d'impression restent gates.
 
 ## Fin de chaque mission
 

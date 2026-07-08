@@ -55,10 +55,12 @@ DEFAULT_FUSION_COMMAND_ACTION = FUSION_COMMAND_ACTION_GENERATE
 FUSION_INPUT_MODE_CAD_IR_FILE = "cad_ir_file"
 FUSION_INPUT_MODE_CONFIG_FILE = "config_file"
 FUSION_INPUT_MODE_QUICK_PARAMETRIC_BOX = "quick_parametric_box"
+FUSION_INPUT_MODE_QUICK_ASSET_BOX = "quick_asset_box"
 SUPPORTED_FUSION_INPUT_MODES = (
     FUSION_INPUT_MODE_CAD_IR_FILE,
     FUSION_INPUT_MODE_CONFIG_FILE,
     FUSION_INPUT_MODE_QUICK_PARAMETRIC_BOX,
+    FUSION_INPUT_MODE_QUICK_ASSET_BOX,
 )
 DEFAULT_FUSION_INPUT_MODE = FUSION_INPUT_MODE_CONFIG_FILE
 
@@ -97,8 +99,22 @@ BGIG_CLEARABLE_ROLES = (
     "compact_occurrence",
     "exploded_occurrence",
 )
-BGIG_PARAMETRIC_FIELDS_STATUS = "config_file_and_quick_parametric_box"
+BGIG_PARAMETRIC_FIELDS_STATUS = "config_file_quick_parametric_box_and_quick_asset_box"
 BGIG_QUICK_PARAMETRIC_BOX_STATUS = "enabled_generates_temporary_cad_ir_from_dialog_fields"
+BGIG_QUICK_ASSET_BOX_STATUS = "enabled_generates_temporary_config_and_cad_ir_from_dialog_assets"
+BGIG_QUICK_ASSET_BOX_FIELD = "quick_asset_box_assets_text"
+BGIG_QUICK_ASSET_BOX_DEFAULT_ASSETS = (
+    "coin-tokens,tokens,30,20,20,2,loose; "
+    "status-tokens,tokens,20,18,18,2,loose"
+)
+BGIG_QUICK_ASSET_BOX_SUPPORTED_TYPES = (
+    "tokens",
+    "dice",
+    "meeples",
+    "cards",
+    "sleeved_cards",
+    "generic",
+)
 
 P12_PARAMETRIC_FIELD_DEFAULTS = {
     "box_inner_x_mm": "",
@@ -205,6 +221,7 @@ class FusionCommandRequest:
     parameter_values: dict[str, str] | None = None
     source_kind: str = "cad_ir"
     quick_parametric_status: str = BGIG_QUICK_PARAMETRIC_BOX_STATUS
+    quick_asset_box_assets_text: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -218,6 +235,7 @@ class FusionCommandRequest:
             "parameter_values": dict(self.parameter_values or {}),
             "source_kind": self.source_kind,
             "quick_parametric_status": self.quick_parametric_status,
+            "quick_asset_box_assets_text": self.quick_asset_box_assets_text,
         }
 
 @dataclass(frozen=True)
@@ -239,7 +257,7 @@ class FusionUiLaunchPlan:
     clear_scope: str = BGIG_CLEAR_SCOPE
     parametric_fields_status: str = BGIG_PARAMETRIC_FIELDS_STATUS
     quick_parametric_box_status: str = BGIG_QUICK_PARAMETRIC_BOX_STATUS
-
+    quick_asset_box_status: str = BGIG_QUICK_ASSET_BOX_STATUS
     def to_dict(self) -> dict[str, Any]:
         return {
             "command_name": self.command_name,
@@ -759,6 +777,7 @@ def build_fusion_command_request(
     project_root_text: str = "",
     parameter_values: dict[str, str] | None = None,
     input_mode: str = "",
+    quick_asset_box_assets_text: str = "",
 ) -> FusionCommandRequest:
     """Validate command UI values without importing Fusion API types."""
 
@@ -805,6 +824,19 @@ def build_fusion_command_request(
             source_kind="quick_parametric_box",
         )
 
+    if validated_input_mode == FUSION_INPUT_MODE_QUICK_ASSET_BOX:
+        project_root = resolve_quick_asset_box_project_root(project_root_text, root)
+        return FusionCommandRequest(
+            cad_ir_path=None,
+            generation_mode=validated_mode,
+            action=validated_action,
+            input_mode=validated_input_mode,
+            project_root=project_root,
+            parameter_overrides=parameter_overrides,
+            parameter_values=raw_parameter_values,
+            source_kind="quick_asset_box",
+            quick_asset_box_assets_text=str(quick_asset_box_assets_text or "").strip(),
+        )
     if validated_input_mode == FUSION_INPUT_MODE_CONFIG_FILE:
         config_path = _resolve_optional_json_path(
             config_json_path_text,
@@ -864,8 +896,8 @@ def default_fusion_command_values(addin_dir: str | Path) -> FusionCommandRequest
         project_root_text=defaults.get("project_root", ""),
         parameter_values=parametric_values_from_ui_settings(defaults),
         input_mode=defaults.get("input_mode", DEFAULT_FUSION_INPUT_MODE),
+        quick_asset_box_assets_text=defaults.get(BGIG_QUICK_ASSET_BOX_FIELD, BGIG_QUICK_ASSET_BOX_DEFAULT_ASSETS),
     )
-
 
 def default_fusion_ui_settings(addin_dir: str | Path) -> dict[str, str]:
     """Return UI defaults without requiring manual developer paths every run."""
@@ -925,6 +957,8 @@ def default_fusion_ui_settings(addin_dir: str | Path) -> dict[str, str]:
         "loaded_generation_mode": generation_mode,
         "parametric_fields_status": BGIG_PARAMETRIC_FIELDS_STATUS,
         "quick_parametric_box_status": BGIG_QUICK_PARAMETRIC_BOX_STATUS,
+        "quick_asset_box_status": BGIG_QUICK_ASSET_BOX_STATUS,
+        BGIG_QUICK_ASSET_BOX_FIELD: str(saved.get(BGIG_QUICK_ASSET_BOX_FIELD, BGIG_QUICK_ASSET_BOX_DEFAULT_ASSETS)).strip(),
     }
     for key, value in parametric_values_from_ui_settings(saved).items():
         settings[key] = value
@@ -974,6 +1008,7 @@ def fusion_ui_settings_summary(settings: dict[str, str]) -> str:
             f"Loaded action: {settings.get('loaded_action', settings.get('action', ''))}",
             f"Loaded generation mode: {settings.get('loaded_generation_mode', settings.get('generation_mode', ''))}",
             f"Loaded quick box values: {quick_box_values}",
+            f"Loaded quick asset text: {settings.get(BGIG_QUICK_ASSET_BOX_FIELD, BGIG_QUICK_ASSET_BOX_DEFAULT_ASSETS)}",
         ]
     )
 
@@ -1000,7 +1035,7 @@ def fusion_command_summary(request: FusionCommandRequest) -> str:
     override_summary = ", ".join(sorted(overrides)) if overrides else "none"
     return "\n".join(
         [
-            "BGIG command UI V0 uses explicit input modes: cad_ir_file, config_file, quick_parametric_box.",
+            "BGIG command UI V0 uses explicit input modes: cad_ir_file, config_file, quick_parametric_box, quick_asset_box.",
             f"Action: {request.action}",
             f"Input mode: {request.input_mode}",
             f"Source: {source}",
@@ -1010,6 +1045,7 @@ def fusion_command_summary(request: FusionCommandRequest) -> str:
             f"Parametric overrides: {override_summary}",
             f"Parametric fields status: {BGIG_PARAMETRIC_FIELDS_STATUS}",
             f"Quick parametric box: {BGIG_QUICK_PARAMETRIC_BOX_STATUS}",
+            f"Quick asset box: {BGIG_QUICK_ASSET_BOX_STATUS}",
             f"Clear scope: {BGIG_CLEAR_SCOPE}",
             f"Generate existing scene policy: {BGIG_GENERATE_EXISTING_SCENE_POLICY}",
             f"Component creation policy: {BGIG_COMPONENT_CREATION_POLICY}",
@@ -1278,6 +1314,249 @@ def _quick_printable_dimension(cell_size_mm: float, peripheral_clearance_mm: flo
         )
     return round(printable, 4)
 
+def build_quick_asset_box_config_payload(overrides: dict[str, Any], assets_text: str) -> dict[str, Any]:
+    """Build a temporary BGIG config from quick_asset_box UI fields."""
+
+    required = (
+        "box_inner_x_mm",
+        "box_inner_y_mm",
+        "box_inner_z_mm",
+        "grid_units_x",
+        "grid_units_y",
+        "grid_units_z",
+        "wall_thickness_mm",
+        "floor_thickness_mm",
+        "peripheral_clearance_mm",
+        "inter_module_clearance_mm",
+    )
+    missing = [field for field in required if field not in overrides]
+    if missing:
+        raise FusionSkeletonError(
+            "quick_asset_box requires these filled fields: " + ", ".join(missing) + "."
+        )
+
+    report = parse_quick_asset_box_assets_text(assets_text)
+    accepted_assets = report["accepted_assets"]
+    if not accepted_assets:
+        rejected = report["rejected_assets"]
+        reasons = "; ".join(item["reason"] for item in rejected[:3]) if rejected else "no assets were entered"
+        raise FusionSkeletonError(
+            "quick_asset_box requires at least one valid asset entry. "
+            f"Format: asset_id,type,count,x_mm,y_mm,z_mm,fit. Rejection summary: {reasons}."
+        )
+
+    print_profile = _quick_asset_box_config_print_profile(overrides.get("print_profile"))
+    box_x = float(overrides["box_inner_x_mm"])
+    box_y = float(overrides["box_inner_y_mm"])
+    box_z = float(overrides["box_inner_z_mm"])
+    grid_x = int(overrides["grid_units_x"])
+    grid_y = int(overrides["grid_units_y"])
+    grid_z = int(overrides["grid_units_z"])
+    wall = float(overrides["wall_thickness_mm"])
+    floor = float(overrides["floor_thickness_mm"])
+    peripheral = float(overrides["peripheral_clearance_mm"])
+    inter_module = float(overrides["inter_module_clearance_mm"])
+
+    return {
+        "project_name": "Quick asset box",
+        "units": SUPPORTED_UNITS,
+        "box": {
+            "inner_dimensions_mm": _vector_payload(box_x, box_y, box_z),
+            "usable_height_mm": box_z,
+            "lid_clearance_mm": 0.0,
+        },
+        "print_profile": print_profile,
+        "tolerances": {
+            "peripheral_clearance_mm": peripheral,
+            "module_gap_mm": inter_module,
+        },
+        "defaults": {
+            "wall_thickness_mm": wall,
+            "floor_thickness_mm": floor,
+            "corner_radius_mm": 1.5,
+        },
+        "layout": {"strategy": "row_fill"},
+        "assets": accepted_assets,
+        "volumetric_grid": {
+            "unit_mm": _vector_payload(box_x / grid_x, box_y / grid_y, box_z / grid_z),
+            "size_units": _grid_units_tuple_to_dict((grid_x, grid_y, grid_z)),
+            "comment": "quick_asset_box V0 temporary grid generated from Fusion command UI fields.",
+        },
+        "modules": [],
+    }
+
+
+def parse_quick_asset_box_assets_text(assets_text: str) -> dict[str, Any]:
+    """Parse quick_asset_box compact asset entries without Fusion API dependencies."""
+
+    accepted_assets: list[dict[str, Any]] = []
+    rejected_assets: list[dict[str, str]] = []
+    normalized = str(assets_text or "").replace("\r", "\n").replace(";", "\n")
+    entries = [entry.strip() for entry in normalized.split("\n") if entry.strip()]
+    for entry in entries:
+        parts = [part.strip() for part in entry.split(",")]
+        if len(parts) != 7:
+            rejected_assets.append(
+                {
+                    "entry": entry,
+                    "reason": "expected 7 comma-separated fields: asset_id,type,count,x_mm,y_mm,z_mm,fit",
+                }
+            )
+            continue
+        asset_id, asset_type, count_text, x_text, y_text, z_text, fit_text = parts
+        try:
+            accepted_assets.append(
+                _quick_asset_payload_from_fields(
+                    asset_id,
+                    asset_type,
+                    count_text,
+                    x_text,
+                    y_text,
+                    z_text,
+                    fit_text,
+                )
+            )
+        except FusionSkeletonError as exc:
+            rejected_assets.append({"entry": entry, "reason": str(exc)})
+    return {
+        "accepted_assets": accepted_assets,
+        "rejected_assets": rejected_assets,
+        "input_format": "asset_id,type,count,x_mm,y_mm,z_mm,fit; entries separated by semicolon or newline",
+        "supported_types": list(BGIG_QUICK_ASSET_BOX_SUPPORTED_TYPES),
+    }
+
+
+def quick_asset_box_metadata(
+    config_payload: dict[str, Any],
+    assets_text: str,
+    cad_ir_payload: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Build report metadata for the quick_asset_box Fusion message."""
+
+    parse_report = parse_quick_asset_box_assets_text(assets_text)
+    metadata = cad_ir_payload.get("metadata", {}) if isinstance(cad_ir_payload, dict) else {}
+    executable_plan = metadata.get("executable_asset_plan", {}) if isinstance(metadata, dict) else {}
+    recommended_variant = metadata.get("recommended_asset_candidate_variant") if isinstance(metadata, dict) else None
+    grid = config_payload.get("volumetric_grid", {}) if isinstance(config_payload, dict) else {}
+    box = config_payload.get("box", {}) if isinstance(config_payload, dict) else {}
+    return {
+        "input_format": parse_report["input_format"],
+        "supported_types": parse_report["supported_types"],
+        "accepted_assets": parse_report["accepted_assets"],
+        "rejected_assets": parse_report["rejected_assets"],
+        "accepted_asset_count": len(parse_report["accepted_assets"]),
+        "rejected_asset_count": len(parse_report["rejected_assets"]),
+        "box_inner_mm": box.get("inner_dimensions_mm"),
+        "grid_units": grid.get("size_units"),
+        "grid_unit_mm": grid.get("unit_mm"),
+        "print_profile": config_payload.get("print_profile"),
+        "wall_thickness_mm": config_payload.get("defaults", {}).get("wall_thickness_mm"),
+        "floor_thickness_mm": config_payload.get("defaults", {}).get("floor_thickness_mm"),
+        "peripheral_clearance_mm": config_payload.get("tolerances", {}).get("peripheral_clearance_mm"),
+        "inter_module_clearance_mm": config_payload.get("tolerances", {}).get("module_gap_mm"),
+        "module_candidate_count": len(metadata.get("module_candidates", [])) if isinstance(metadata, dict) else 0,
+        "recommended_variant_id": recommended_variant.get("variant_id") if isinstance(recommended_variant, dict) else None,
+        "executable_plan_status": executable_plan.get("status") if isinstance(executable_plan, dict) else None,
+        "generated_module_count": executable_plan.get("summary", {}).get("generated_module_count") if isinstance(executable_plan, dict) else 0,
+        "placed_module_count": executable_plan.get("summary", {}).get("placed_module_count") if isinstance(executable_plan, dict) else 0,
+        "rejected_module_count": executable_plan.get("summary", {}).get("rejected_module_count") if isinstance(executable_plan, dict) else 0,
+        "temporary_config_created": True,
+        "temporary_cad_ir_created": isinstance(cad_ir_payload, dict),
+        "print_validation": False,
+    }
+
+
+def quick_asset_box_summary(payload: dict[str, Any] | None) -> str:
+    """Return concise report lines for a quick_asset_box CAD IR payload."""
+
+    if not isinstance(payload, dict):
+        return "Quick asset box: n/a\n"
+    metadata = payload.get("metadata")
+    quick = metadata.get("quick_asset_box") if isinstance(metadata, dict) else None
+    if not isinstance(quick, dict):
+        return "Quick asset box: n/a\n"
+    lines = [
+        "Quick asset box inputs:",
+        f"- input_format: {quick.get('input_format')}",
+        f"- supported_types: {', '.join(quick.get('supported_types', []))}",
+        f"- box_inner_mm: {_format_vector_payload(quick.get('box_inner_mm'))}",
+        f"- grid_units: {_format_grid_units_payload(quick.get('grid_units'))}",
+        f"- grid_unit_mm: {_format_vector_payload(quick.get('grid_unit_mm'))}",
+        f"- wall_thickness_mm: {quick.get('wall_thickness_mm')}",
+        f"- floor_thickness_mm: {quick.get('floor_thickness_mm')}",
+        f"- peripheral_clearance_mm: {quick.get('peripheral_clearance_mm')}",
+        f"- inter_module_clearance_mm: {quick.get('inter_module_clearance_mm')}",
+        f"- print_profile: {quick.get('print_profile')}",
+        f"- assets_read: {quick.get('accepted_asset_count')}",
+        f"- assets_refused: {quick.get('rejected_asset_count')}",
+    ]
+    for asset in quick.get("accepted_assets", []):
+        lines.append(
+            "- asset: "
+            f"{asset.get('id')} type {asset.get('kind')} count {asset.get('quantity', {}).get('count')} "
+            f"size {_format_vector_payload(asset.get('dimensions_mm'))} "
+            f"fit {asset.get('comment', '').replace('quick_asset_box V0 fit=', '').replace('; generic maps to core kind other.', '')}"
+        )
+    for rejected in quick.get("rejected_assets", []):
+        lines.append(f"- refused: {rejected.get('entry')} -> {rejected.get('reason')}")
+    lines.extend(
+        [
+            f"- module_candidates_generated: {quick.get('module_candidate_count')}",
+            f"- recommended_variant: {quick.get('recommended_variant_id') or 'none'}",
+            f"- executable_plan_status: {quick.get('executable_plan_status') or 'none'}",
+            f"- generated_asset_modules: {quick.get('generated_module_count')}",
+            f"- placed_asset_modules: {quick.get('placed_module_count')}",
+            f"- rejected_asset_modules: {quick.get('rejected_module_count')}",
+            f"- temporary_config_created: {'yes' if quick.get('temporary_config_created') else 'no'}",
+            f"- temporary_cad_ir_created: {'yes' if quick.get('temporary_cad_ir_created') else 'no'}",
+        ]
+    )
+    return "\n".join(lines) + "\n"
+
+
+def _quick_asset_box_config_print_profile(value: Any) -> str:
+    requested = str(value or "default").strip() or "default"
+    if requested == "draft":
+        return "fast_draft"
+    return requested
+def _quick_asset_payload_from_fields(
+    asset_id: str,
+    asset_type: str,
+    count_text: str,
+    x_text: str,
+    y_text: str,
+    z_text: str,
+    fit_text: str,
+) -> dict[str, Any]:
+    normalized_id = str(asset_id or "").strip()
+    if not normalized_id:
+        raise FusionSkeletonError("asset_id is required.")
+    normalized_type = str(asset_type or "").strip().lower()
+    if normalized_type not in BGIG_QUICK_ASSET_BOX_SUPPORTED_TYPES:
+        raise FusionSkeletonError(
+            "unsupported asset type "
+            f"{asset_type!r}; supported types: {', '.join(BGIG_QUICK_ASSET_BOX_SUPPORTED_TYPES)}."
+        )
+    core_kind = "other" if normalized_type == "generic" else normalized_type
+    count = _parse_positive_int(str(count_text), "quick_asset_box asset count")
+    x = _parse_positive_float(str(x_text), "quick_asset_box asset x_mm")
+    y = _parse_positive_float(str(y_text), "quick_asset_box asset y_mm")
+    z = _parse_positive_float(str(z_text), "quick_asset_box asset z_mm")
+    fit = str(fit_text or "").strip().lower()
+    fit_to_confidence = {"exact": "exact", "loose": "approximate", "approximate": "approximate"}
+    if fit not in fit_to_confidence:
+        raise FusionSkeletonError("fit must be exact, loose or approximate.")
+    comment_suffix = "; generic maps to core kind other." if normalized_type == "generic" else ""
+    return {
+        "id": normalized_id,
+        "name": normalized_id.replace("-", " ").replace("_", " ").title(),
+        "kind": core_kind,
+        "quantity": {"count": count, "grouping": "set" if count > 1 else "single"},
+        "dimensions_mm": _vector_payload(x, y, z),
+        "dimension_confidence": fit_to_confidence[fit],
+        "containment_intent": "store",
+        "comment": f"quick_asset_box V0 fit={fit}{comment_suffix}",
+    }
 
 def _quick_printable_height(cell_size_mm: float, floor_thickness_mm: float) -> float:
     printable = cell_size_mm - floor_thickness_mm
@@ -1306,6 +1585,31 @@ def _format_grid_units_payload(value: Any) -> str:
     if not isinstance(value, dict):
         return "n/a"
     return f"{value.get('x')} x {value.get('y')} x {value.get('z')}"
+def resolve_quick_asset_box_project_root(project_root_text: str, addin_dir: str | Path) -> Path:
+    """Resolve the project root required by quick_asset_box temporary config generation."""
+
+    explicit_root = _path_text_or_none(project_root_text)
+    if explicit_root is not None:
+        if not explicit_root.is_absolute():
+            explicit_root = Path(addin_dir) / explicit_root
+        return _validated_bgig_project_root(explicit_root.resolve())
+
+    environment_root = _env_project_root_or_none()
+    if environment_root is not None:
+        return environment_root
+
+    default_root = _valid_project_root_or_none(BGIG_DEFAULT_DEV_PROJECT_ROOT)
+    if default_root is not None:
+        return default_root
+
+    addin_root = detect_bgig_project_root(Path(addin_dir), addin_dir)
+    if addin_root is not None:
+        return addin_root
+
+    raise FusionSkeletonError(
+        "BGIG project root is required in quick_asset_box mode. "
+        "Set BGIG_PROJECT_ROOT or use the BGIG project root UI field."
+    )
 def resolve_bgig_project_root(
     project_root_text: str,
     config_path: Path,

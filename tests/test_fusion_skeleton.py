@@ -19,6 +19,8 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     BGIG_GENERATE_EXISTING_SCENE_POLICY,
     BGIG_PARAMETRIC_FIELDS_STATUS,
     BGIG_QUICK_PARAMETRIC_BOX_STATUS,
+    BGIG_QUICK_ASSET_BOX_DEFAULT_ASSETS,
+    BGIG_QUICK_ASSET_BOX_FIELD,
     BGIG_SCENE_ROOT_COMPONENT_NAME,
     BGIG_SCENE_ROOT_ROLE,
     BGIG_SCENE_OWNERSHIP_POLICY,
@@ -51,6 +53,7 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     FUSION_INPUT_MODE_CAD_IR_FILE,
     FUSION_INPUT_MODE_CONFIG_FILE,
     FUSION_INPUT_MODE_QUICK_PARAMETRIC_BOX,
+    FUSION_INPUT_MODE_QUICK_ASSET_BOX,
     FUSION_GENERATION_MODE_COMPACT_AND_EXPLODED,
     FUSION_GENERATION_MODE_COMPACT_ONLY,
     FUSION_EXTENT_NEGATIVE,
@@ -68,6 +71,7 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     assembly_document_required_message,
     build_fusion_command_request,
     build_quick_parametric_box_cad_ir_payload,
+    build_quick_asset_box_config_payload,
     cad_ir_input_guidance,
     default_fusion_command_values,
     default_fusion_ui_settings,
@@ -84,8 +88,11 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     parametric_values_from_ui_settings,
     mm_to_cm,
     parse_parametric_overrides,
+    parse_quick_asset_box_assets_text,
     planned_operations_from_cad_ir,
     quick_parametric_box_summary,
+    quick_asset_box_metadata,
+    quick_asset_box_summary,
     resolve_cad_ir_input_path,
     resolve_generation_mode,
     validate_cad_ir_payload,
@@ -648,6 +655,91 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(len(plan.exploded_occurrences), 0)
         self.assertIn("temporary_cad_ir_created: yes", quick_parametric_box_summary(validated))
 
+
+    def test_parses_quick_asset_box_text_with_partial_rejections(self) -> None:
+        report = parse_quick_asset_box_assets_text(
+            "coin-tokens,tokens,30,20,20,2,loose; bad-entry; cards,cards,60,63,88,25,exact"
+        )
+
+        self.assertEqual(len(report["accepted_assets"]), 2)
+        self.assertEqual(report["accepted_assets"][0]["kind"], "tokens")
+        self.assertEqual(report["accepted_assets"][0]["dimension_confidence"], "approximate")
+        self.assertEqual(report["accepted_assets"][1]["kind"], "cards")
+        self.assertEqual(report["accepted_assets"][1]["dimension_confidence"], "exact")
+        self.assertEqual(len(report["rejected_assets"]), 1)
+        self.assertIn("expected 7 comma-separated fields", report["rejected_assets"][0]["reason"])
+
+    def test_builds_quick_asset_box_request_config_and_cad_ir_payload(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            overrides = {
+                **P12_PARAMETRIC_FIELD_DEFAULTS,
+                "box_inner_x_mm": "120",
+                "box_inner_y_mm": "80",
+                "box_inner_z_mm": "30",
+                "grid_units_x": "4",
+                "grid_units_y": "4",
+                "grid_units_z": "3",
+                "wall_thickness_mm": "1.2",
+                "floor_thickness_mm": "1.2",
+                "peripheral_clearance_mm": "0.4",
+                "inter_module_clearance_mm": "0.3",
+                "print_profile": "draft",
+            }
+            assets_text = "coin-tokens,tokens,30,20,20,2,loose; status-tokens,tokens,20,18,18,2,loose"
+            request = build_fusion_command_request(
+                "",
+                FUSION_GENERATION_MODE_COMPACT_ONLY,
+                Path(temp_dir),
+                project_root_text=str(ROOT),
+                parameter_values=overrides,
+                input_mode=FUSION_INPUT_MODE_QUICK_ASSET_BOX,
+                quick_asset_box_assets_text=assets_text,
+            )
+            config_payload = build_quick_asset_box_config_payload(request.parameter_overrides, request.quick_asset_box_assets_text)
+            config_path = Path(temp_dir) / "quick_asset_box_config.json"
+            config_path.write_text(json.dumps(config_payload), encoding="utf-8")
+            config = load_config(config_path)
+            layout = generate_basic_layout(config)
+            scene = build_blank_cad_scene(config, layout).to_dict()
+            scene["metadata"]["quick_asset_box"] = quick_asset_box_metadata(
+                config_payload,
+                request.quick_asset_box_assets_text,
+                scene,
+            )
+
+        self.assertEqual(request.source_kind, "quick_asset_box")
+        self.assertEqual(request.project_root, ROOT)
+        self.assertEqual(config_payload["project_name"], "Quick asset box")
+        self.assertEqual(len(config_payload["assets"]), 2)
+        self.assertEqual(config_payload["volumetric_grid"]["unit_mm"], {"x": 30.0, "y": 20.0, "z": 10.0})
+        self.assertEqual(scene["metadata"]["quick_asset_box"]["accepted_asset_count"], 2)
+        self.assertEqual(scene["metadata"]["quick_asset_box"]["module_candidate_count"], 1)
+        self.assertEqual(scene["metadata"]["quick_asset_box"]["placed_module_count"], 1)
+        plan = generation_plan_from_cad_ir(validate_cad_ir_payload(scene), FUSION_GENERATION_MODE_COMPACT_ONLY)
+        self.assertEqual(len(plan.grid_positioned_blanks), 1)
+        summary = quick_asset_box_summary(scene)
+        self.assertIn("Quick asset box inputs", summary)
+        self.assertIn("assets_read: 2", summary)
+        self.assertIn("module_candidates_generated: 1", summary)
+        self.assertIn("placed_asset_modules: 1", summary)
+
+    def test_quick_asset_box_rejects_when_no_valid_assets_remain(self) -> None:
+        with self.assertRaisesRegex(FusionSkeletonError, "at least one valid asset"):
+            build_quick_asset_box_config_payload(
+                {
+                    "box_inner_x_mm": 120,
+                    "box_inner_y_mm": 80,
+                    "box_inner_z_mm": 30,
+                    "grid_units_x": 4,
+                    "grid_units_y": 4,
+                    "grid_units_z": 3,
+                    "wall_thickness_mm": 1.2,
+                    "floor_thickness_mm": 1.2,
+                    "peripheral_clearance_mm": 0.4,
+                    "inter_module_clearance_mm": 0.3,
+                },
+                "bad-entry",
+            )
     def test_quick_parametric_box_rejects_missing_required_fields(self) -> None:
         with self.assertRaisesRegex(FusionSkeletonError, "requires these filled fields"):
             build_quick_parametric_box_cad_ir_payload({"box_inner_x_mm": 120})
@@ -805,6 +897,76 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(Path(saved["project_root"]), ROOT)
         self.assertEqual(parametric_values_from_ui_settings(saved), values)
 
+
+    def test_default_ui_settings_rehydrates_quick_asset_box_fields(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            addin_dir = Path(temp_dir)
+            assets_text = "coin-tokens,tokens,30,20,20,2,loose; status-tokens,tokens,20,18,18,2,loose"
+            values = {
+                "action": FUSION_COMMAND_ACTION_REGENERATE,
+                "input_mode": FUSION_INPUT_MODE_QUICK_ASSET_BOX,
+                "generation_mode": FUSION_GENERATION_MODE_COMPACT_ONLY,
+                "project_root": str(ROOT),
+                BGIG_QUICK_ASSET_BOX_FIELD: assets_text,
+                "box_inner_x_mm": "120",
+                "box_inner_y_mm": "80",
+                "box_inner_z_mm": "30",
+                "grid_units_x": "4",
+                "grid_units_y": "4",
+                "grid_units_z": "3",
+                "wall_thickness_mm": "1.2",
+                "floor_thickness_mm": "1.2",
+                "peripheral_clearance_mm": "0.4",
+                "inter_module_clearance_mm": "0.3",
+                "print_profile": "draft",
+            }
+            (addin_dir / BGIG_UI_SETTINGS_FILENAME).write_text(json.dumps(values), encoding="utf-8")
+
+            settings = default_fusion_ui_settings(addin_dir)
+            request = default_fusion_command_values(addin_dir)
+            summary = fusion_ui_settings_summary(settings)
+
+        self.assertEqual(settings["input_mode"], FUSION_INPUT_MODE_QUICK_ASSET_BOX)
+        self.assertEqual(settings[BGIG_QUICK_ASSET_BOX_FIELD], assets_text)
+        self.assertEqual(request.source_kind, "quick_asset_box")
+        self.assertEqual(request.quick_asset_box_assets_text, assets_text)
+        self.assertIn("Loaded quick asset text", summary)
+        self.assertIn("coin-tokens", summary)
+
+    def test_save_command_settings_preserves_quick_asset_text(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            addin_dir = Path(temp_dir)
+            values = {
+                "box_inner_x_mm": "120",
+                "box_inner_y_mm": "80",
+                "box_inner_z_mm": "30",
+                "grid_units_x": "4",
+                "grid_units_y": "4",
+                "grid_units_z": "3",
+                "wall_thickness_mm": "1.2",
+                "floor_thickness_mm": "1.2",
+                "peripheral_clearance_mm": "0.4",
+                "inter_module_clearance_mm": "0.3",
+                "print_profile": "draft",
+            }
+            assets_text = "coin-tokens,tokens,30,20,20,2,loose"
+            request = build_fusion_command_request(
+                "",
+                FUSION_GENERATION_MODE_COMPACT_ONLY,
+                addin_dir,
+                project_root_text=str(ROOT),
+                parameter_values=values,
+                input_mode=FUSION_INPUT_MODE_QUICK_ASSET_BOX,
+                quick_asset_box_assets_text=assets_text,
+            )
+            generated_cad_ir = addin_dir / "bgig_ui_generated_cad_ir.json"
+
+            saved_ok = fusion_entrypoint._save_command_settings(addin_dir, request, generated_cad_ir)
+            saved = load_fusion_ui_settings(addin_dir)
+
+        self.assertTrue(saved_ok)
+        self.assertEqual(saved["input_mode"], FUSION_INPUT_MODE_QUICK_ASSET_BOX)
+        self.assertEqual(saved[BGIG_QUICK_ASSET_BOX_FIELD], assets_text)
     def test_detects_bgig_project_root_from_config_path(self) -> None:
         detected = detect_bgig_project_root(
             ROOT / "examples" / "simple_asset_product_scene.json",
@@ -1472,7 +1634,7 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("scene_roots_created", source)
         self.assertIn("non_bgig_objects_preserved", source)
         self.assertIn("quick_parametric_box", source)
-        self.assertIn("Active in config_file and quick_parametric_box modes", source)
+        self.assertIn("Active in config_file, quick_parametric_box and quick_asset_box modes", source)
         self.assertIn("_count_bgig_scene_roots", source)
         self.assertIn("_bgig_scene_root_occurrences", source)
         self.assertIn("_count_bgig_tagged_objects", source)
@@ -1513,6 +1675,9 @@ class FusionSkeletonTests(unittest.TestCase):
             execute_block.index("request.action == FUSION_COMMAND_ACTION_GENERATE and ("),
             execute_block.index("cad_ir_path = request.cad_ir_path"),
         )
+        self.assertIn('request.source_kind == "quick_asset_box"', execute_block)
+        self.assertIn("_generate_cad_ir_from_quick_asset_box_request", execute_block)
+        self.assertIn("quick_asset_box_summary", source)
         self.assertLess(
             execute_block.index("generation_plan = generation_plan_from_cad_ir"),
             execute_block.index("if request.action == FUSION_COMMAND_ACTION_REGENERATE:"),

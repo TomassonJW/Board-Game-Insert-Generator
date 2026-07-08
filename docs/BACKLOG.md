@@ -634,6 +634,27 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Tests : unitaires, py_compile add-in, dry-run scripts, execution reelle si permissions AppData disponibles, `git diff --check`, absence `adsk` dans le coeur Python.
 - Gate : gate humaine validee le 2026-07-08 pour automatisation locale.
 - Statut : `done` apres integration, sans validation produit Fusion.
+## Sprint P13 - Asset input UI V0
+
+### P13-M001 - quick_asset_box UI V0
+
+- Capability : C-ASSET, C-FUSION-UI, C-SOLVER.
+- Milestone : M14 Usable beta.
+- Objectif : permettre une premiere saisie d'assets simples depuis la commande Fusion sans ecrire de JSON a la main.
+- Livrable : mode `quick_asset_box`, champ texte assets, config temporaire stricte, reuse du pipeline assets existant, reporting Fusion, persistance settings, script de smoke test.
+- Criteres d'acceptation : assets lus/refuses reportes, candidats modules visibles, variante recommandee visible, modules places via CAD IR existante, generate/regenerate/clear conserves, coeur Python sans `adsk`.
+- Tests : unitaires Fusion skeleton, py_compile, suite complete, CLI Markdown/JSON/export CAD IR exemples P13/P12, dry-run et preparation smoke Fusion.
+- Gate : validation humaine Fusion `P13-M001V` requise.
+- Statut : `done`, `implemented-fusion`, `print-validated: false`, `fusion-validated` en attente.
+
+### P13-M001V - Valider quick_asset_box dans Fusion
+
+- Capability : C-ASSET, C-FUSION-UI.
+- Milestone : M14 Usable beta.
+- Objectif : verifier dans Fusion que `quick_asset_box` lit les assets, genere un ou plusieurs modules asset-first, persiste le texte assets et conserve regenerate/clear sans doublon.
+- Livrable : smoke test humain Fusion.
+- Gate : action humaine requise.
+- Statut : `ready-gated`.
 ## Phase 12 - Couvercles, mecanismes et empilement avance
 
 ### P12-M001 - Modeliser les couvercles poses

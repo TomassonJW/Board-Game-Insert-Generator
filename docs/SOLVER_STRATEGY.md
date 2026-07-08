@@ -176,3 +176,7 @@ Ce n'est pas un solveur global : il n'y a pas de backtracking, pas de recherche
 de meilleure permutation, pas de dependance externe et pas de generation Fusion.
 Le resultat est expose comme `executable_asset_plan` dans les rapports et la CAD
 IR metadata.
+
+## P13-M001 - Reuse quick_asset_box
+
+`quick_asset_box` ne change pas la strategie solveur. Il transforme une saisie UI en config temporaire, puis reutilise le pipeline borne existant : `module_candidates`, variante recommandee deterministe et `executable_asset_plan` greedy grille X/Y/Z. Aucun backtracking, aucune optimisation globale et aucun nouveau score ne sont ajoutes.

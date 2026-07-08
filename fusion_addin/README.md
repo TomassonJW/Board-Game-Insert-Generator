@@ -648,3 +648,21 @@ python -m board_game_insert_generator export-cad-ir examples/simple_asset_produc
 ```
 
 Il n'existe pas d'option `--export-cad-ir`.
+
+## P13 quick_asset_box smoke test
+
+`quick_asset_box` permet une premiere saisie asset-first depuis la commande Fusion classique. Format du champ assets :
+
+`asset_id,type,count,x_mm,y_mm,z_mm,fit`
+
+Exemple prepare par script :
+
+`coin-tokens,tokens,30,20,20,2,loose; status-tokens,tokens,20,18,18,2,loose`
+
+Preparation automatique :
+
+```powershell
+scripts/fusion/prepare_quick_asset_test.ps1
+```
+
+Le script installe l'add-in et ecrit `bgig_ui_settings.json` avec `input_mode = quick_asset_box`. Action humaine restante : ouvrir Fusion, lancer BGIG, verifier les settings rehydrates, generer, verifier le rapport `Quick asset box inputs`, rouvrir, modifier un asset ou une dimension, lancer `regenerate`, puis `clear_bgig_scene`.

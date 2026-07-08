@@ -170,3 +170,7 @@ mais elle ne doit pas etre declaree terminee sans :
 - backlog mis a jour ;
 - gates explicites ;
 - limites de validation visibles.
+
+## Update 2026-07-08 - P13 Asset input UI V0
+
+P13-M001 ajoute un premier mode Fusion `quick_asset_box` pour saisir des assets simples depuis la commande Fusion, generer une config temporaire et reutiliser le pipeline asset-first existant. Cette avancee sert M14 Usable beta, sans palette persistante, sans solveur complexe et sans validation d'impression. Gate active : `P13-M001V`.

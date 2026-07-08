@@ -352,3 +352,15 @@ PowerShell ecrivent en UTF-8 sans BOM, et la commande Fusion affiche un bloc
 mode de generation et les valeurs quick box chargees.
 
 P12-M004V doit verifier ce bloc avant de lancer `generate` ou `regenerate`.
+
+## P13-M001 - quick_asset_box UI V0
+
+`quick_asset_box` est un mode de commande Fusion classique, pas une palette persistante. Le champ `Assets (quick_asset_box)` accepte une saisie compacte :
+
+`asset_id,type,count,x_mm,y_mm,z_mm,fit`
+
+Les entrees sont separees par `;` ou par saut de ligne. Les types UI V0 sont `tokens`, `dice`, `meeples`, `cards`, `sleeved_cards`, `generic`; `generic` est mappe vers le kind coeur `other`. Le champ `fit` accepte `exact`, `loose` ou `approximate`; `loose` est transporte comme `dimension_confidence = approximate`.
+
+La commande genere une config temporaire BGIG stricte depuis les champs boite/grille/parois/clearances/profil et `assets[]`, puis reutilise le pipeline existant : assets charges, `module_candidates`, variante recommandee, `executable_asset_plan`, CAD IR et generation Fusion. Les assets invalides sont refuses dans le rapport sans bloquer si au moins un asset valide reste.
+
+Limites : pas de tableau avance, pas de palette HTML, pas de solveur complexe, pas de nouvelle geometrie Fusion, pas de validation d'impression.

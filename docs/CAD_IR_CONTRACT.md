@@ -1,4 +1,4 @@
-﻿# CAD IR Contract
+# CAD IR Contract
 
 ## Objectif
 
@@ -385,3 +385,7 @@ champs de commande Fusion entre deux ouvertures. Ce fichier reste local a
 l'add-in, hors contrat CAD IR, et ne change pas `schema_version`. Les adaptateurs
 CAD doivent continuer a consommer la CAD IR deja resolue sans recalculer layout,
 clearances ou tolerances.
+
+## P13-M001 - Metadata quick_asset_box
+
+La CAD IR V0 reste additive. Quand la source Fusion est `quick_asset_box`, l'addin ajoute `metadata.quick_asset_box` au payload genere par le moteur. Ce bloc reporte le format UI, les assets acceptes/refuses, les dimensions boite/grille, les compteurs de candidats, la variante recommandee et le resume `executable_asset_plan`. Il ne remplace pas `metadata.assets`, `metadata.module_candidates`, `metadata.recommended_asset_candidate_variant` ni `metadata.executable_asset_plan`.

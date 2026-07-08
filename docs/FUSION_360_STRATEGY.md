@@ -735,3 +735,7 @@ commande Fusion : les champs utilisateur sont sauvegardes dans
 `regenerate` est preferee si le registry detecte deja une scene BGIG. Le statut
 reste `implemented-fusion` tant que le smoke test humain P12-M004V n'a pas valide
 ce workflow dans Fusion.
+
+## P13-M001 - quick_asset_box source mode
+
+L'adaptateur Fusion accepte maintenant `quick_asset_box` comme source UI. Ce mode genere d'abord une config temporaire puis une CAD IR via le moteur pur; Fusion consomme ensuite la CAD IR comme pour les autres modes et ne recalcule ni layout, ni tolerances, ni placement. Le registry, l'ownership racine, `generate`, `regenerate`, `clear_bgig_scene` et `inspect_bgig_scene` restent les mecanismes de scene autorises.

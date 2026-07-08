@@ -462,3 +462,9 @@ configuration BGIG. Elle memorise seulement les derniers champs de la commande
 Fusion pour eviter la ressaisie : input mode, action, generation mode, chemins et
 champs parametriques P12. Les configurations JSON restent validees par le loader
 V0 existant.
+
+## P13-M001 - Config temporaire quick_asset_box
+
+`quick_asset_box` ne modifie pas le schema JSON public. La commande Fusion fabrique une config temporaire conforme au schema existant avec `box`, `print_profile`, `tolerances`, `defaults`, `layout`, `assets`, `volumetric_grid` et `modules: []`.
+
+Format UI V0 : `asset_id,type,count,x_mm,y_mm,z_mm,fit`, entrees separees par `;` ou saut de ligne. `generic` est mappe vers `assets[].kind = other`. `fit=exact` devient `dimension_confidence=exact`; `fit=loose` ou `fit=approximate` deviennent `dimension_confidence=approximate`.
