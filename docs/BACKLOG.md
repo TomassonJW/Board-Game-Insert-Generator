@@ -588,8 +588,8 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Livrable : builder CAD IR temporaire depuis champs UI, rapport Fusion des valeurs saisies, tests hors Fusion, documentation et smoke test P12-M003V.
 - Criteres d'acceptation : generation via `quick_parametric_box`, `generate`/`regenerate`/`clear_bgig_scene` conserves, `Body sizing report`, `Print validation: false`, coeur Python sans `adsk`.
 - Tests : unitaires hors Fusion, py_compile add-in, CLI Markdown/JSON/export CAD IR exemples P12, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
-- Gate : smoke test humain Fusion P12-M003V requis avant `fusion-validated`.
-- Statut : `done`, `implemented-fusion`, `manual_validation_required`, `print-validated: false`.
+- Gate : smoke test humain Fusion P12-M003V realise le 2026-07-08.
+- Statut : `done`, `fusion-validated`, `print-validated: false`.
 
 ### P12-M003V - Valider quick_parametric_box dans Fusion
 
@@ -599,8 +599,8 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Livrable : validation humaine avec generate, regenerate, clear et rapport de sizing.
 - Criteres d'acceptation : mode `quick_parametric_box` visible et actif, CAD IR temporaire creee, scene V0 generee, changements de valeurs visibles apres regenerate, clear propre, aucune validation d'impression revendiquee.
 - Tests : smoke test manuel Fusion.
-- Gate : action humaine requise.
-- Statut : `manual_validation_required`.
+- Gate : action humaine Thomas realisee le 2026-07-08 pour le flux `generate` en `quick_parametric_box` / `compact_only`.
+- Statut : `done`, `fusion-validated`, `print-validated: false`.
 ## Phase 12 - Couvercles, mecanismes et empilement avance
 
 ### P12-M001 - Modeliser les couvercles poses

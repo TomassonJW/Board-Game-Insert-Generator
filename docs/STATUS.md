@@ -1,6 +1,6 @@
 # Status
 
-Derniere mise a jour : 2026-07-07
+Derniere mise a jour : 2026-07-08
 
 ## Etat global
 
@@ -241,8 +241,10 @@ La correction `P12-M002V7` stabilise l UI Fusion parametrique V0 apres KO P12-UI
 
 ## Phase active
 
-Phase active : **P12-M003 quick_parametric_box code / validation Fusion manuelle P12-M003V requise**.
-La mission `P12-M003` du 2026-07-07 rend le mode Fusion `quick_parametric_box` fonctionnel. La commande UI peut maintenant generer une CAD IR temporaire minimale depuis les champs de boite, grille, epaisseurs, clearances et profil, puis reutiliser le pipeline Fusion existant pour creer une scene V0. Le mode reste borne : une boite de reference, un module rectangulaire simple, aucune nouvelle geometrie avancee, aucune modification de tolerance par defaut et aucune validation d'impression revendiquee. Statut : `implemented-fusion`, validation humaine Fusion `P12-M003V` requise, `print-validated: false`.
+Phase active : **P12-M003V quick_parametric_box valide Fusion / stop sur prochaine gate produit**.
+La mission `P12-M003` du 2026-07-07 rend le mode Fusion `quick_parametric_box` fonctionnel. La commande UI peut maintenant generer une CAD IR temporaire minimale depuis les champs de boite, grille, epaisseurs, clearances et profil, puis reutiliser le pipeline Fusion existant pour creer une scene V0. Le mode reste borne : une boite de reference, un module rectangulaire simple, aucune nouvelle geometrie avancee, aucune modification de tolerance par defaut et aucune validation d'impression revendiquee.
+
+La validation humaine `P12-M003V` du 2026-07-08 confirme dans Fusion le mode `quick_parametric_box` en `compact_only` : CAD IR temporaire creee, scene racine BGIG creee, registry valide, zero objet BGIG non tague, une occurrence compacte visible, aucun legacy body, rapport de sizing conforme avec `printable_body_size_mm` `28.9 x 18.9 x 8.8 mm` et bbox Fusion reelle identique, `size match yes`. Statut : `fusion-validated`, `print-validated: false`.
 
 Etat : le pipeline P4 reste stable pour les blanks rectangulaires Fusion. La
 vague P5 est terminee cote moteur Python pur, configuration, rapports et CAD IR.
@@ -259,7 +261,7 @@ document Assembly-compatible, avec `print-validated: false`. P11-M002 est
 X/Y/Z. P11-M003 est `fusion-validated` pour la commande UI minimale, le sizing asset-first explicite, la scene produit non ambigue, le mapping source et les occurrences compactes/eclatees liees. P11-M003V2 ajoute le rapport bbox planned/actual ; P11-M003V3 corrige l'affichage de la vraie commande UI ; P11-M003V4 valide le flux UI produit avec `simple_asset_product_scene`. La North
 Star cible un generateur volumetrique asset-first, pilote par capabilities.
 
-Prochaine action recommandee : stopper sur la prochaine gate produit avant toute extension UI, palette persistante, UI assets complete, solveur plus automatique ou nouvelle geometrie Fusion.
+Prochaine action recommandee : stopper sur la prochaine gate produit avant toute extension UI, palette persistante, UI assets complete, solveur plus automatique, nouvelle geometrie Fusion, export imprimable ou validation d'impression.
 
 ## Implemente
 
@@ -344,6 +346,7 @@ Prochaine action recommandee : stopper sur la prochaine gate produit avant toute
 - Tagging immediat des roles `scene_root`, `scene_root_component`, `box_reference`, `compact_occurrence`, `exploded_occurrence`, `module_component`, `module_body`, sketches et cuts supportes.
 - `generate` refuse les scenes existantes trouvees par tag ou nom BGIG ; `regenerate` clear puis revalide exactement une scene ; `clear_bgig_scene` preserve les objets non BGIG.
 - UI Fusion parametrique P12-M002V7 : modes explicites, root auto-detecte/memorise, config JSON -> CAD IR temporaire, overrides config-only, scene racine taguee, `generate` refuse les doublons, occurrence racine unique taguee `bgig:role = scene_root`, suppression par `deleteMe()`, occurrence compacte initiale visible, occurrence eclatee liee via `addExistingComponent`, `regenerate` remplace sans doublons, `clear_bgig_scene` supprime la racine, reporting inspect standard deduplique et valide Fusion avant/apres generation/clear, `fusion-validated`, `print-validated: false`.
+- UI Fusion `quick_parametric_box` P12-M003 : CAD IR temporaire minimale depuis champs Fusion, generation `compact_only` validee dans Fusion avec registry OK, occurrence compacte visible, bbox reelle conforme au body imprimable planifie et `print-validated: false`.
 - Vue eclatee Fusion P7-M001 basique : composants physiques uniques avec
   occurrences compactes/eclatees liees, garde-fou `assembly document required`
   si le document actif est un Part Design incompatible, sans renommage direct de

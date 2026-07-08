@@ -371,3 +371,9 @@ P12-M003 ne change pas `schema_version`. Le mode Fusion `quick_parametric_box` p
 - metadata `quick_parametric_box` listant boite, grille, epaisseurs, clearances, profil et `print_validation: false`.
 
 Fusion consomme cette CAD IR et ne recalcule pas le layout, les clearances ou les tolerances.
+
+Validation Fusion `P12-M003V` du 2026-07-08 : une CAD IR temporaire
+`quick_parametric_box` produite par l'add-in a genere une scene V0 en
+`compact_only`, avec registry BGIG valide et bbox Fusion reelle conforme au body
+imprimable planifie. Cette validation ne change pas `schema_version` et ne vaut
+pas validation d'impression.

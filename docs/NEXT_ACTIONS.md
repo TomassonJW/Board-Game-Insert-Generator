@@ -1,6 +1,6 @@
 # Next Actions
 
-Derniere mise a jour : 2026-07-07
+Derniere mise a jour : 2026-07-08
 
 Ce fichier indique les prochaines missions recommandees. Il doit rester court,
 priorise et directement actionnable. Si aucune mission explicite n'est donnee,
@@ -18,13 +18,13 @@ structurant, authentification absente ou refus de push direct.
 
 ## Gate humaine active
 
-Statut : `manual_validation_required` pour `P12-M003V` ; P12-M003 est code et doit etre valide dans Fusion.
+Statut : aucune gate de validation P12-M003V active.
 
-La gate humaine `P12-M003` a ete levee et la mission code le mode `quick_parametric_box` fonctionnel. Action humaine recommandee : realiser le smoke test Fusion P12-M003V avant toute nouvelle extension produit.
+La validation humaine `P12-M003V` du 2026-07-08 confirme le mode Fusion `quick_parametric_box` en `compact_only` : CAD IR temporaire creee, registry OK, une occurrence compacte visible, bbox Fusion conforme au body imprimable planifie et `Print validation: false`.
 
 ## Mission ready non gated
 
-Aucune mission non-gated supplementaire n'est recommandee avant validation Fusion P12-M003V. Stopper sur gate produit apres cette mission.
+Aucune mission produit non-gated supplementaire n'est recommandee apres P12-M003V. Stopper sur gate produit avant palette persistante, UI assets complete, solveur plus automatique, nouvelle geometrie Fusion, export imprimable ou validation d'impression.
 
 ## Mission bloquee par gate
 

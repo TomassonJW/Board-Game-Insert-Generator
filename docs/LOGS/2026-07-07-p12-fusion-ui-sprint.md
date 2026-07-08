@@ -197,3 +197,22 @@ preservation des objets non BGIG.
 - Champs requis : dimensions internes de boite, unites de grille X/Y/Z, epaisseurs, clearances peripherique/inter-module et profil d'impression optionnel.
 - Le mode reste borne a une scene V0 simple : boite de reference et module rectangulaire. Pas de nouvelle geometrie avancee, pas de solveur, pas de changement de tolerances par defaut.
 - Validation attendue : smoke test humain P12-M003V dans Fusion. Impression 3D non validee.
+
+## Validation P12-M003V - quick_parametric_box
+
+Validation humaine Fusion confirmee le 2026-07-08 :
+
+- action `generate`, input mode `quick_parametric_box`, generation mode `compact_only` ;
+- CAD IR temporaire creee et consommee depuis le dossier local de l'add-in ;
+- champs rapides pris en compte : boite `120.0 x 80.0 x 30.0 mm`, grille `4 x 4 x 3`, unite `30.0 x 20.0 x 10.0 mm`, profil `draft` ;
+- body imprimable planifie `28.9 x 18.9 x 8.8 mm` ;
+- `BGIG scene roots before: 0`, `BGIG scene roots created: 1`, `BGIG scene roots after: 1` ;
+- `Registry validation: ok`, zero entite BGIG-looking non taguee ;
+- une occurrence compacte visible, zero occurrence eclatee en `compact_only`, zero legacy body ;
+- `Body sizing report` conforme : bbox Fusion reelle `28.9 x 18.9 x 8.8 mm`, `size match yes` ;
+- `Non-BGIG objects preserved: yes` ;
+- impression 3D non validee.
+
+Statut : `fusion-validated`, `print-validated: false`. Prochaine etape : stop
+sur gate produit avant toute extension UI, nouvelle geometrie Fusion, solveur,
+export imprimable ou validation d'impression.

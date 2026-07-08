@@ -707,4 +707,10 @@ Validation Fusion P12-UI-M002V7 apres correction registry inspect :
 
 Ce mode ne lance pas de solveur assets, ne change pas les tolerances par defaut et ne genere aucune nouvelle geometrie avancee. Il expose dans le message Fusion les valeurs saisies, la taille theorique de cellule, la taille imprimable planifiee, le `Body sizing report` et `Print validation: false`.
 
-Statut : `implemented-fusion`, validation Fusion manuelle `P12-M003V` requise avant `fusion-validated`.
+Statut : `fusion-validated`, `print-validated: false`.
+
+La validation humaine `P12-M003V` du 2026-07-08 confirme le flux `generate` en
+mode `quick_parametric_box` / `compact_only` : CAD IR temporaire creee, scene
+racine BGIG creee, registry `ok`, une occurrence compacte visible, aucun legacy
+body, bbox Fusion reelle identique au body imprimable planifie
+`28.9 x 18.9 x 8.8 mm`, et `Print validation: false`.
