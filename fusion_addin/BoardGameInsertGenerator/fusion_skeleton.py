@@ -202,6 +202,7 @@ class FusionCommandRequest:
     config_json_path: Path | None = None
     project_root: Path | None = None
     parameter_overrides: dict[str, Any] | None = None
+    parameter_values: dict[str, str] | None = None
     source_kind: str = "cad_ir"
     quick_parametric_status: str = BGIG_QUICK_PARAMETRIC_BOX_STATUS
 
@@ -214,6 +215,7 @@ class FusionCommandRequest:
             "action": self.action,
             "input_mode": self.input_mode,
             "parameter_overrides": dict(self.parameter_overrides or {}),
+            "parameter_values": dict(self.parameter_values or {}),
             "source_kind": self.source_kind,
             "quick_parametric_status": self.quick_parametric_status,
         }
@@ -768,7 +770,8 @@ def build_fusion_command_request(
         cad_ir_path_text,
         config_json_path_text,
     )
-    parameter_overrides = parse_parametric_overrides(parameter_values or {})
+    raw_parameter_values = parametric_values_from_ui_settings(parameter_values or {})
+    parameter_overrides = parse_parametric_overrides(raw_parameter_values)
 
     if validated_action == FUSION_COMMAND_ACTION_CLEAR:
         return FusionCommandRequest(
@@ -777,6 +780,7 @@ def build_fusion_command_request(
             action=validated_action,
             input_mode=validated_input_mode,
             parameter_overrides=parameter_overrides,
+            parameter_values=raw_parameter_values,
             source_kind="clear_only",
         )
     if validated_action == FUSION_COMMAND_ACTION_INSPECT:
@@ -786,6 +790,7 @@ def build_fusion_command_request(
             action=validated_action,
             input_mode=validated_input_mode,
             parameter_overrides=parameter_overrides,
+            parameter_values=raw_parameter_values,
             source_kind="inspect_only",
         )
 
@@ -796,6 +801,7 @@ def build_fusion_command_request(
             action=validated_action,
             input_mode=validated_input_mode,
             parameter_overrides=parameter_overrides,
+            parameter_values=raw_parameter_values,
             source_kind="quick_parametric_box",
         )
 
@@ -819,14 +825,10 @@ def build_fusion_command_request(
             config_json_path=config_path,
             project_root=project_root,
             parameter_overrides=parameter_overrides,
+            parameter_values=raw_parameter_values,
             source_kind="config",
         )
 
-    if parameter_overrides:
-        raise FusionSkeletonError(
-            "Parametric override fields are active only in config_file or quick_parametric_box mode. "
-            "Switch Input mode to config_file, quick_parametric_box, or leave all override fields blank."
-        )
     cad_ir_path = _resolve_optional_json_path(
         cad_ir_path_text,
         root,
@@ -843,7 +845,8 @@ def build_fusion_command_request(
         generation_mode=validated_mode,
         action=validated_action,
         input_mode=validated_input_mode,
-        parameter_overrides=parameter_overrides,
+        parameter_overrides={},
+        parameter_values=raw_parameter_values,
         source_kind="cad_ir",
     )
 
@@ -859,7 +862,7 @@ def default_fusion_command_values(addin_dir: str | Path) -> FusionCommandRequest
         action=defaults.get("action", DEFAULT_FUSION_COMMAND_ACTION),
         config_json_path_text=defaults.get("config_json_path", ""),
         project_root_text=defaults.get("project_root", ""),
-        parameter_values={},
+        parameter_values=parametric_values_from_ui_settings(defaults),
         input_mode=defaults.get("input_mode", DEFAULT_FUSION_INPUT_MODE),
     )
 
@@ -891,14 +894,24 @@ def default_fusion_ui_settings(addin_dir: str | Path) -> dict[str, str]:
         except FusionSkeletonError:
             cad_ir_path = root / DEFAULT_CAD_IR_INPUT_FILENAME
 
-    try:
-        generation_mode = resolve_generation_mode(root)
-    except FusionSkeletonError:
-        generation_mode = DEFAULT_FUSION_GENERATION_MODE
+    generation_mode = saved.get("generation_mode", "")
+    if generation_mode not in SUPPORTED_FUSION_GENERATION_MODES:
+        try:
+            generation_mode = resolve_generation_mode(root)
+        except FusionSkeletonError:
+            generation_mode = DEFAULT_FUSION_GENERATION_MODE
 
-    input_mode = FUSION_INPUT_MODE_CONFIG_FILE if config_path is not None else FUSION_INPUT_MODE_CAD_IR_FILE
-    return {
-        "action": DEFAULT_FUSION_COMMAND_ACTION,
+    detected_input_mode = FUSION_INPUT_MODE_CONFIG_FILE if config_path is not None else FUSION_INPUT_MODE_CAD_IR_FILE
+    input_mode = saved.get("input_mode", "")
+    if input_mode not in SUPPORTED_FUSION_INPUT_MODES:
+        input_mode = detected_input_mode
+
+    action = saved.get("action", "")
+    if action not in SUPPORTED_FUSION_COMMAND_ACTIONS:
+        action = DEFAULT_FUSION_COMMAND_ACTION
+
+    settings = {
+        "action": action,
         "input_mode": input_mode,
         "cad_ir_path": str(cad_ir_path) if cad_ir_path is not None else "",
         "config_json_path": str(config_path) if config_path is not None else "",
@@ -907,6 +920,18 @@ def default_fusion_ui_settings(addin_dir: str | Path) -> dict[str, str]:
         "settings_path": str(fusion_ui_settings_path(root)),
         "parametric_fields_status": BGIG_PARAMETRIC_FIELDS_STATUS,
         "quick_parametric_box_status": BGIG_QUICK_PARAMETRIC_BOX_STATUS,
+    }
+    for key, value in parametric_values_from_ui_settings(saved).items():
+        settings[key] = value
+    return settings
+
+
+def parametric_values_from_ui_settings(settings: dict[str, Any]) -> dict[str, str]:
+    """Return all P12 UI field values as display-ready strings."""
+
+    return {
+        key: str(settings.get(key, default)).strip()
+        for key, default in P12_PARAMETRIC_FIELD_DEFAULTS.items()
     }
 
 

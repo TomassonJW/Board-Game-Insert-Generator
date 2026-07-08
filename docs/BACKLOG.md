@@ -601,6 +601,28 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Tests : smoke test manuel Fusion.
 - Gate : action humaine Thomas realisee le 2026-07-08 pour le flux `generate` en `quick_parametric_box` / `compact_only`.
 - Statut : `done`, `fusion-validated`, `print-validated: false`.
+
+### P12-M004 - Persistance des champs UI et regeneration confortable
+
+- Capability : C-FUSION-UI.
+- Milestone : M14 Usable beta.
+- Objectif : rendre la commande Fusion plus confortable pour iterer sur des parametres sans ressaisie apres fermeture/reouverture.
+- Livrable : persistance `bgig_ui_settings.json` de l action, input mode, generation mode, chemins CAD IR/config/root et champs parametriques P12 ; rehydratation dans `commandCreated` ; champs `quick_parametric_box` pre-remplis ; action `regenerate` preferee si une scene BGIG existe deja ; documentation et smoke test P12-M004V.
+- Criteres d acceptation : valeurs retrouvees apres generation et reouverture, modification d une seule valeur puis `regenerate`, remplacement sans doublon, derniere valeur retrouvee a la reouverture, `clear_bgig_scene` preserve les objets non BGIG, coeur Python sans `adsk`.
+- Tests : unitaires hors Fusion, py_compile add-in, CLI Markdown/JSON/export CAD IR exemples P12, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
+- Gate : validation humaine Fusion P12-M004V requise avant `fusion-validated`.
+- Statut : `done`, `implemented-fusion`, `manual_validation_required`, `print-validated: false`.
+
+### P12-M004V - Valider persistance UI et regeneration confortable dans Fusion
+
+- Capability : C-FUSION-UI.
+- Milestone : M14 Usable beta.
+- Objectif : verifier dans Fusion que les valeurs `quick_parametric_box` sont restaurees apres reouverture, qu une valeur modifiee est conservee apres `regenerate`, et que `clear_bgig_scene` preserve les objets non BGIG.
+- Livrable : validation humaine avec generate, reouverture, rehydratation, modification `box_inner_x_mm = 160`, regenerate, reouverture, clear et rapport registry.
+- Criteres d acceptation : aucune ressaisie complete requise, scene remplacee sans doublon, derniere valeur visible, registry OK, objets non BGIG preserves, aucune validation d impression revendiquee.
+- Tests : smoke test manuel Fusion.
+- Gate : action humaine requise.
+- Statut : `manual_validation_required`.
 ## Phase 12 - Couvercles, mecanismes et empilement avance
 
 ### P12-M001 - Modeliser les couvercles poses

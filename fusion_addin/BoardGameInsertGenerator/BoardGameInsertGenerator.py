@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 import sys
 import uuid
+from dataclasses import replace
 from pathlib import Path
 
 try:
@@ -83,12 +84,14 @@ try:
         default_fusion_command_values,
         default_fusion_ui_settings,
         describe_document_state,
+        parametric_values_from_ui_settings,
         fusion_command_summary,
         fusion_ui_settings_path,
         quick_parametric_box_summary,
         generation_plan_from_cad_ir,
         is_part_design_component_limit_error,
         load_cad_ir_json,
+        load_fusion_ui_settings,
         mm_to_cm,
         resolve_cad_ir_input_path,
         resolve_generation_mode,
@@ -163,12 +166,14 @@ except ImportError:  # pragma: no cover - Fusion may load the file as a script.
         default_fusion_command_values,
         default_fusion_ui_settings,
         describe_document_state,
+        parametric_values_from_ui_settings,
         fusion_command_summary,
         fusion_ui_settings_path,
         quick_parametric_box_summary,
         generation_plan_from_cad_ir,
         is_part_design_component_limit_error,
         load_cad_ir_json,
+        load_fusion_ui_settings,
         mm_to_cm,
         resolve_cad_ir_input_path,
         resolve_generation_mode,
@@ -257,6 +262,8 @@ if adsk is not None:
                 inputs = command.commandInputs
                 defaults = default_fusion_ui_settings(self.addin_dir)
                 default_request = _safe_default_command_request(self.addin_dir)
+                if _active_bgig_scene_exists():
+                    default_request = replace(default_request, action=FUSION_COMMAND_ACTION_REGENERATE)
                 action_input = inputs.addDropDownCommandInput(
                     ACTION_INPUT_ID,
                     "Action",
@@ -282,10 +289,7 @@ if adsk is not None:
                     adsk.core.DropDownStyles.TextListDropDownStyle,
                 )
                 for mode in SUPPORTED_FUSION_INPUT_MODES:
-                    label = mode
-                    if mode == FUSION_INPUT_MODE_QUICK_PARAMETRIC_BOX:
-                        label = f"{mode} (disabled)"
-                    input_mode.listItems.add(label, mode == default_request.input_mode, "")
+                    input_mode.listItems.add(mode, mode == default_request.input_mode, "")
                 inputs.addStringValueInput(
                     CAD_IR_PATH_INPUT_ID,
                     "CAD IR JSON path (cad_ir_file)",
@@ -312,7 +316,8 @@ if adsk is not None:
                     "bgig_parametric_status",
                     "Parametric fields",
                     (
-                        "Active in config_file and quick_parametric_box modes. They are rejected in cad_ir_file mode. "
+                        "Saved in bgig_ui_settings.json and restored when BGIG is reopened. "
+                        "Active in config_file and quick_parametric_box modes; ignored in cad_ir_file mode. "
                         f"quick_parametric_box: {BGIG_QUICK_PARAMETRIC_BOX_STATUS}."
                     ),
                     3,
@@ -322,7 +327,7 @@ if adsk is not None:
                     inputs.addStringValueInput(
                         _parameter_input_id(parameter_id),
                         f"{label} (config_file override / quick box value)",
-                        P12_PARAMETRIC_FIELD_DEFAULTS[parameter_id],
+                        defaults.get(parameter_id, P12_PARAMETRIC_FIELD_DEFAULTS[parameter_id]),
                     )
                 inputs.addTextBoxCommandInput(
                     SUMMARY_INPUT_ID,
@@ -472,6 +477,15 @@ def _safe_default_command_request(addin_dir: Path):
             DEFAULT_FUSION_GENERATION_MODE,
             addin_dir,
         )
+
+
+def _active_bgig_scene_exists() -> bool:
+    try:
+        design = _active_design(_app)
+        inspection = BgigFusionRegistry(design).inspect()
+    except Exception:
+        return False
+    return int(inspection.get("bgig_scene_roots_total", 0)) > 0
 
 
 def _parameter_input_id(parameter_id: str) -> str:
@@ -631,16 +645,26 @@ def _ensure_bgig_engine_on_path(project_root: Path) -> None:
     if src_text not in sys.path:
         sys.path.insert(0, src_text)
 
-def _save_command_settings(addin_dir: Path, request, cad_ir_path: Path) -> bool:  # noqa: ANN001
-    settings = {
-        "input_mode": request.input_mode,
-        "generation_mode": request.generation_mode,
-        "cad_ir_path": str(cad_ir_path),
-    }
+def _save_command_settings(addin_dir: Path, request, cad_ir_path: Path | None = None) -> bool:  # noqa: ANN001
+    settings = load_fusion_ui_settings(addin_dir)
+    settings.update(
+        {
+            "action": request.action,
+            "input_mode": request.input_mode,
+            "generation_mode": request.generation_mode,
+        }
+    )
+    if request.cad_ir_path is not None:
+        settings["cad_ir_path"] = str(request.cad_ir_path)
+    elif cad_ir_path is not None:
+        settings.setdefault("cad_ir_path", str(cad_ir_path))
+        settings["generated_cad_ir_path"] = str(cad_ir_path)
     if request.config_json_path is not None:
         settings["config_json_path"] = str(request.config_json_path)
     if request.project_root is not None:
         settings["project_root"] = str(request.project_root)
+    for key, value in parametric_values_from_ui_settings(request.parameter_values or {}).items():
+        settings[key] = value
     try:
         fusion_ui_settings_path(addin_dir).write_text(
             json.dumps(settings, indent=2) + "\n",

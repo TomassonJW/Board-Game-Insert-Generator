@@ -377,3 +377,11 @@ Validation Fusion `P12-M003V` du 2026-07-08 : une CAD IR temporaire
 `compact_only`, avec registry BGIG valide et bbox Fusion reelle conforme au body
 imprimable planifie. Cette validation ne change pas `schema_version` et ne vaut
 pas validation d'impression.
+
+### Note P12-M004 - Settings UI hors contrat CAD IR
+
+P12-M004 etend la persistance locale `bgig_ui_settings.json` pour restaurer les
+champs de commande Fusion entre deux ouvertures. Ce fichier reste local a
+l'add-in, hors contrat CAD IR, et ne change pas `schema_version`. Les adaptateurs
+CAD doivent continuer a consommer la CAD IR deja resolue sans recalculer layout,
+clearances ou tolerances.

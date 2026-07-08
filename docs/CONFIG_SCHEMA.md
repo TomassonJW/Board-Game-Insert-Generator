@@ -454,3 +454,11 @@ Le mode Fusion `quick_parametric_box` n'ajoute pas encore de nouveau format de c
 - `print_profile` -> metadata du profil.
 
 La commande CLI d'export reste `python -m board_game_insert_generator export-cad-ir ... --output ...`; `--export-cad-ir` n'est pas une option CLI.
+
+### Note P12-M004 - Persistance UI hors schema JSON
+
+La persistance P12-M004 de `bgig_ui_settings.json` ne modifie pas le schema de
+configuration BGIG. Elle memorise seulement les derniers champs de la commande
+Fusion pour eviter la ressaisie : input mode, action, generation mode, chemins et
+champs parametriques P12. Les configurations JSON restent validees par le loader
+V0 existant.

@@ -129,3 +129,24 @@ et gatee separement si le produit en a besoin.
 La gate humaine P12-M003 leve la restriction `quick_parametric_box` visible mais desactive. Le mode devient fonctionnel de maniere bornee : il construit une CAD IR temporaire minimale directement depuis les champs UI et reutilise le pipeline Fusion CAD IR existant.
 
 Cette revision ne change pas le contrat CAD IR V0, ne modifie pas les valeurs de tolerance par defaut, ne lance pas de solveur assets et ne revendique aucune validation d'impression. La validation Fusion manuelle `P12-M003V` reste obligatoire avant de passer la capability en `fusion-validated` pour ce mode.
+
+## Revision P12-M004
+
+La gate humaine P12-M004 autorise une amelioration UX bornee de la commande
+Fusion classique : persister et rehydrater les champs utilisateur via
+`bgig_ui_settings.json`, sans passer a une palette HTML persistante.
+
+Decision corrective :
+
+- sauvegarder action, input mode, generation mode, chemins CAD IR/config/root et
+  tous les champs parametriques P12 ;
+- rehydrater ces valeurs dans `commandCreated` ;
+- pre-remplir `quick_parametric_box` avec les dernieres valeurs utilisees ;
+- conserver les derniers chemins utiles pour `config_file` et `cad_ir_file` ;
+- ignorer les champs parametriques persistants en `cad_ir_file` au lieu de
+  refuser la commande ;
+- preferer `Action = regenerate` si le registry detecte deja une scene BGIG.
+
+Cette revision ne change ni le contrat CAD IR, ni la geometrie Fusion, ni les
+valeurs de tolerance par defaut, ni le coeur Python pur. Une palette persistante
+reste une option future separee et gatee.

@@ -18,13 +18,13 @@ structurant, authentification absente ou refus de push direct.
 
 ## Gate humaine active
 
-Statut : aucune gate de validation P12-M003V active.
+Statut : `manual_validation_required` pour `P12-M004V` ; P12-M004 est code et doit etre valide dans Fusion.
 
-La validation humaine `P12-M003V` du 2026-07-08 confirme le mode Fusion `quick_parametric_box` en `compact_only` : CAD IR temporaire creee, registry OK, une occurrence compacte visible, bbox Fusion conforme au body imprimable planifie et `Print validation: false`.
+La gate humaine P12-M004 a ete validee pour ameliorer la persistance des champs UI et le workflow de regeneration, sans palette persistante, sans nouvelle geometrie, sans solveur et sans export imprimable.
 
 ## Mission ready non gated
 
-Aucune mission produit non-gated supplementaire n'est recommandee apres P12-M003V. Stopper sur gate produit avant palette persistante, UI assets complete, solveur plus automatique, nouvelle geometrie Fusion, export imprimable ou validation d'impression.
+Aucune mission produit non-gated supplementaire n'est recommandee avant validation Fusion P12-M004V. Action humaine recommandee : smoke test de rehydratation `quick_parametric_box`, modification d une valeur, `regenerate`, reouverture et `clear_bgig_scene` avec preservation non-BGIG.
 
 ## Mission bloquee par gate
 

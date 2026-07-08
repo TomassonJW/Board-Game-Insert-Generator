@@ -80,6 +80,7 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     is_part_design_component_limit_error,
     load_cad_ir_json,
     load_fusion_ui_settings,
+    parametric_values_from_ui_settings,
     mm_to_cm,
     parse_parametric_overrides,
     planned_operations_from_cad_ir,
@@ -582,20 +583,24 @@ class FusionSkeletonTests(unittest.TestCase):
 
         with self.assertRaisesRegex(FusionSkeletonError, "volumetric_grid"):
             apply_parametric_overrides_to_config_payload(payload, {"grid_units_x": 4})
-    def test_rejects_parametric_overrides_in_cad_ir_mode(self) -> None:
+    def test_ignores_parametric_overrides_in_cad_ir_mode(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             addin_dir = Path(temp_dir)
             cad_ir_path = addin_dir / "scene.json"
             cad_ir_path.write_text(json.dumps(_cad_ir_payload()), encoding="utf-8")
 
-            with self.assertRaisesRegex(FusionSkeletonError, "config_file or quick_parametric_box mode"):
-                build_fusion_command_request(
-                    "scene.json",
-                    FUSION_GENERATION_MODE_COMPACT_ONLY,
-                    addin_dir,
-                    parameter_values={"box_inner_x_mm": "120"},
-                    input_mode=FUSION_INPUT_MODE_CAD_IR_FILE,
-                )
+            request = build_fusion_command_request(
+                "scene.json",
+                FUSION_GENERATION_MODE_COMPACT_ONLY,
+                addin_dir,
+                parameter_values={"box_inner_x_mm": "120"},
+                input_mode=FUSION_INPUT_MODE_CAD_IR_FILE,
+            )
+
+        self.assertEqual(request.input_mode, FUSION_INPUT_MODE_CAD_IR_FILE)
+        self.assertEqual(request.source_kind, "cad_ir")
+        self.assertEqual(request.parameter_overrides, {})
+        self.assertEqual(request.parameter_values["box_inner_x_mm"], "120")
 
     def test_builds_quick_parametric_box_request_and_cad_ir_payload(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -666,6 +671,98 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(Path(settings["config_json_path"]), (ROOT / "examples" / "simple_tray.json").resolve())
         self.assertEqual(Path(settings["project_root"]), ROOT)
         self.assertEqual(Path(settings["settings_path"]).name, BGIG_UI_SETTINGS_FILENAME)
+
+    def test_default_ui_settings_rehydrates_quick_parametric_box_fields(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            addin_dir = Path(temp_dir)
+            cad_ir_path = addin_dir / DEFAULT_CAD_IR_INPUT_FILENAME
+            cad_ir_path.write_text(json.dumps(_cad_ir_payload()), encoding="utf-8")
+            values = {
+                "action": FUSION_COMMAND_ACTION_REGENERATE,
+                "input_mode": FUSION_INPUT_MODE_QUICK_PARAMETRIC_BOX,
+                "generation_mode": FUSION_GENERATION_MODE_COMPACT_ONLY,
+                "cad_ir_path": str(cad_ir_path),
+                "config_json_path": str(ROOT / "examples" / "simple_asset_product_scene.json"),
+                "project_root": str(ROOT),
+                "box_inner_x_mm": "160",
+                "box_inner_y_mm": "80",
+                "box_inner_z_mm": "30",
+                "grid_units_x": "4",
+                "grid_units_y": "4",
+                "grid_units_z": "3",
+                "wall_thickness_mm": "1.2",
+                "floor_thickness_mm": "1.2",
+                "peripheral_clearance_mm": "0.4",
+                "inter_module_clearance_mm": "0.3",
+                "print_profile": "draft",
+            }
+            (addin_dir / BGIG_UI_SETTINGS_FILENAME).write_text(json.dumps(values), encoding="utf-8")
+
+            settings = default_fusion_ui_settings(addin_dir)
+            request = default_fusion_command_values(addin_dir)
+
+        self.assertEqual(settings["input_mode"], FUSION_INPUT_MODE_QUICK_PARAMETRIC_BOX)
+        self.assertEqual(settings["action"], FUSION_COMMAND_ACTION_REGENERATE)
+        self.assertEqual(settings["box_inner_x_mm"], "160")
+        self.assertEqual(settings["print_profile"], "draft")
+        self.assertEqual(request.input_mode, FUSION_INPUT_MODE_QUICK_PARAMETRIC_BOX)
+        self.assertEqual(request.action, FUSION_COMMAND_ACTION_REGENERATE)
+        self.assertEqual(request.generation_mode, FUSION_GENERATION_MODE_COMPACT_ONLY)
+        self.assertEqual(request.parameter_values["box_inner_x_mm"], "160")
+        self.assertEqual(request.parameter_overrides["box_inner_x_mm"], 160.0)
+        self.assertEqual(request.parameter_overrides["print_profile"], "draft")
+
+    def test_save_command_settings_preserves_paths_and_all_ui_fields(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            addin_dir = Path(temp_dir)
+            cad_ir_path = addin_dir / "last-user-cad-ir.json"
+            cad_ir_path.write_text(json.dumps(_cad_ir_payload()), encoding="utf-8")
+            config_path = ROOT / "examples" / "simple_asset_product_scene.json"
+            (addin_dir / BGIG_UI_SETTINGS_FILENAME).write_text(
+                json.dumps(
+                    {
+                        "cad_ir_path": str(cad_ir_path),
+                        "config_json_path": str(config_path),
+                        "project_root": str(ROOT),
+                    }
+                ),
+                encoding="utf-8",
+            )
+            values = {
+                "box_inner_x_mm": "160",
+                "box_inner_y_mm": "80",
+                "box_inner_z_mm": "30",
+                "grid_units_x": "4",
+                "grid_units_y": "4",
+                "grid_units_z": "3",
+                "wall_thickness_mm": "1.2",
+                "floor_thickness_mm": "1.2",
+                "peripheral_clearance_mm": "0.4",
+                "inter_module_clearance_mm": "0.3",
+                "print_profile": "draft",
+            }
+            request = build_fusion_command_request(
+                "",
+                FUSION_GENERATION_MODE_COMPACT_ONLY,
+                addin_dir,
+                action=FUSION_COMMAND_ACTION_REGENERATE,
+                parameter_values=values,
+                input_mode=FUSION_INPUT_MODE_QUICK_PARAMETRIC_BOX,
+            )
+            generated_cad_ir = addin_dir / "bgig_ui_generated_cad_ir.json"
+
+            saved_ok = fusion_entrypoint._save_command_settings(addin_dir, request, generated_cad_ir)
+            saved = load_fusion_ui_settings(addin_dir)
+
+        self.assertTrue(saved_ok)
+        self.assertEqual(saved["action"], FUSION_COMMAND_ACTION_REGENERATE)
+        self.assertEqual(saved["input_mode"], FUSION_INPUT_MODE_QUICK_PARAMETRIC_BOX)
+        self.assertEqual(saved["generation_mode"], FUSION_GENERATION_MODE_COMPACT_ONLY)
+        self.assertEqual(Path(saved["cad_ir_path"]), cad_ir_path)
+        self.assertEqual(Path(saved["generated_cad_ir_path"]), generated_cad_ir)
+        self.assertEqual(Path(saved["config_json_path"]), config_path)
+        self.assertEqual(Path(saved["project_root"]), ROOT)
+        self.assertEqual(parametric_values_from_ui_settings(saved), values)
 
     def test_detects_bgig_project_root_from_config_path(self) -> None:
         detected = detect_bgig_project_root(

@@ -714,3 +714,13 @@ mode `quick_parametric_box` / `compact_only` : CAD IR temporaire creee, scene
 racine BGIG creee, registry `ok`, une occurrence compacte visible, aucun legacy
 body, bbox Fusion reelle identique au body imprimable planifie
 `28.9 x 18.9 x 8.8 mm`, et `Print validation: false`.
+
+## Note P12-M004 - Persistance de commande UI
+
+P12-M004 ne change pas la generation CAD, le contrat CAD IR, les tolerances, les
+operations Fusion ni le modele de scene. La modification concerne uniquement la
+commande Fusion : les champs utilisateur sont sauvegardes dans
+`bgig_ui_settings.json`, rehydrates au prochain `commandCreated`, et l'action
+`regenerate` est preferee si le registry detecte deja une scene BGIG. Le statut
+reste `implemented-fusion` tant que le smoke test humain P12-M004V n'a pas valide
+ce workflow dans Fusion.

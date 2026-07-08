@@ -296,3 +296,31 @@ Validation Fusion `P12-M003V` du 2026-07-08 :
 - une occurrence compacte visible, aucun legacy body ;
 - bbox Fusion reelle `28.9 x 18.9 x 8.8 mm`, `size match yes` ;
 - aucune validation d'impression 3D.
+
+## P12-M004 - Persistance UI et regeneration confortable
+
+Statut : `implemented-fusion`, validation Fusion manuelle `P12-M004V` requise,
+`print-validated: false`.
+
+P12-M004 conserve la strategie de commande Fusion classique. Aucune palette HTML
+persistante n'est implementee. La commande sauvegarde maintenant dans
+`bgig_ui_settings.json` : action, input mode, generation mode, chemins CAD IR,
+config JSON et project root, ainsi que tous les champs parametriques P12.
+
+A la prochaine ouverture de `Generate Board Game Insert`, `commandCreated`
+rehydrate ces valeurs. Le mode `quick_parametric_box` retrouve donc les dernieres
+dimensions de boite, unites de grille, epaisseurs, clearances et profil. Les
+modes `config_file` et `cad_ir_file` retrouvent leurs derniers chemins utiles.
+
+Les champs parametriques restent actifs uniquement en `config_file` et
+`quick_parametric_box`. En `cad_ir_file`, ils sont affiches comme valeurs
+persistantes mais ignores, afin qu'une saisie quick precedente ne casse pas le
+chargement direct d'une CAD IR. Si une scene BGIG est deja presente dans le
+document, l'ouverture de la commande prefere `Action = regenerate` pour guider
+l'utilisateur vers le remplacement sans doublon.
+
+Smoke test P12-M004V attendu : ouvrir BGIG, choisir `quick_parametric_box`, saisir
+`120 x 80 x 30`, grille `4 x 4 x 3`, epaisseurs, clearances et profil, generer,
+rouvrir, verifier la rehydratation, changer `box_inner_x_mm` a `160`, lancer
+`regenerate`, verifier le remplacement sans doublon, rouvrir et verifier `160`,
+puis lancer `clear_bgig_scene` en confirmant la preservation des objets non BGIG.
