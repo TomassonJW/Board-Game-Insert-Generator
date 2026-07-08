@@ -74,6 +74,8 @@ function Assert-BgigFusionAddinMarkers {
             "asset_items_visualized",
             "asset_cavities_generated",
             "count_aware_storage_sizing",
+            "asset_debug_visualization",
+            "stacked_rectangular_piles_v0",
             "inspect_bgig_scene",
             "bgig_ui_settings.json"
         )

@@ -133,6 +133,7 @@ Tests, cartes backlog ou gates humaines a preparer.
 
 - [ADR-0027 - Registry Fusion BGIG et inspection read-only](ADR-0027-fusion-bgig-registry-and-inspection.md)
 - [ADR-0028 - Fusion quick_asset_box input V0](ADR-0028-fusion-quick-asset-input-v0.md)
+- [ADR-0029 - Count-aware asset storage sizing V0](ADR-0029-count-aware-asset-storage-sizing-v0.md)
 
 ## Regles de maintenance
 

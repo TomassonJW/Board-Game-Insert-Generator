@@ -891,6 +891,7 @@ def _generation_result_message(
         f"{quick_asset_report}"
         f"Reference outlines: {result['reference_outlines']}\n"
         f"Reference outline policy: {result.get('reference_outline_policy', 'single_xy_outline')}\n"
+        f"Asset debug visualizations: {result.get('asset_debug_visualizations', 0)}\n"
         f"BGIG scene roots before: {scene_roots_before}\n"
         f"CAD IR module blanks planned: {len(generation_plan.blanks)}\n"
         f"Grid-positioned asset modules planned: {len(generation_plan.grid_positioned_blanks)}\n"
@@ -945,6 +946,7 @@ def _stable_generation_result(result: dict[str, object]) -> dict[str, object]:
         "scene_id": "unknown",
         "scene_roots_created": 0,
         "reference_outlines": 0,
+        "asset_debug_visualizations": 0,
         "physical_module_count": 0,
         "module_components_created": 0,
         "source_components_created": 0,
@@ -1569,12 +1571,13 @@ def _generate_from_plan(design, plan: FusionGenerationPlan, registry: BgigFusion
     created_bodies = {}
     created_components = {}
     compact_occurrence_count = 0
+    asset_debug_visualization_count = 0
 
     for blank in source_blanks:
         occurrence_plan = compact_occurrences_by_component_id.get(blank.cad_id)
         if occurrence_plan is None:
             raise RuntimeError(f"Missing compact occurrence plan for {blank.body_name}.")
-        occurrence, body = _create_module_component_occurrence(
+        occurrence, body, asset_debug_count = _create_module_component_occurrence(
             scene_component,
             blank,
             occurrence_plan,
@@ -1582,6 +1585,7 @@ def _generate_from_plan(design, plan: FusionGenerationPlan, registry: BgigFusion
             scene_id,
         )
         created_bodies[blank.cad_id] = body
+        asset_debug_visualization_count += asset_debug_count
         created_components[blank.cad_id] = occurrence.component
         compact_occurrence_count += 1
 
@@ -1664,6 +1668,7 @@ def _generate_from_plan(design, plan: FusionGenerationPlan, registry: BgigFusion
         "scene_roots_created": 1,
         "reference_outlines": len(reference_outlines),
         "reference_outline_policy": "bottom_and_top_box_xy_outlines",
+        "asset_debug_visualizations": asset_debug_visualization_count,
         "physical_module_count": len(source_blanks),
         "module_components_created": len(created_components),
         "source_components_created": len(created_components),
@@ -1857,7 +1862,50 @@ def _create_module_component_occurrence(
         scene_id=scene_id,
         module_id=solid_plan.cad_id,
     )
-    return occurrence, body
+    asset_debug_count = _create_asset_fit_debug_outline(
+        module_component,
+        solid_plan,
+        registry=registry,
+        scene_id=scene_id,
+        module_id=solid_plan.cad_id,
+    )
+    return occurrence, body, asset_debug_count
+
+
+def _create_asset_fit_debug_outline(
+    target_component,  # noqa: ANN001
+    solid_plan: FusionSolidPlan,
+    registry: BgigFusionRegistry | None = None,
+    scene_id: str | None = None,
+    module_id: str | None = None,
+) -> int:
+    if solid_plan.module_source != "asset_candidate" or solid_plan.asset_fit_size_mm is None:
+        return 0
+    clearance = solid_plan.clearance_applied or {}
+    origin_x = float(clearance.get("wall_thickness_mm", 0.0) or 0.0)
+    origin_y = float(clearance.get("wall_thickness_mm", 0.0) or 0.0)
+    if origin_x + solid_plan.asset_fit_size_mm.x > solid_plan.size_mm.x:
+        origin_x = 0.0
+    if origin_y + solid_plan.asset_fit_size_mm.y > solid_plan.size_mm.y:
+        origin_y = 0.0
+    sketch_plane = _xy_plane_for_z(
+        target_component,
+        solid_plan.size_mm.z,
+        f"{solid_plan.component_name} asset-fit debug plane",
+    )
+    sketch = target_component.sketches.add(sketch_plane)
+    sketch.name = f"{solid_plan.component_name} asset-fit debug outline"
+    if registry is not None:
+        _tag_bgig_entity(sketch, "asset_debug_sketch", scene_id=scene_id, module_id=module_id, registry=registry)
+    _add_scene_rectangle_from_mm(
+        sketch,
+        origin_x,
+        origin_y,
+        solid_plan.asset_fit_size_mm.x,
+        solid_plan.asset_fit_size_mm.y,
+        f"{solid_plan.component_name} asset-fit debug outline",
+    )
+    return 1
 
 
 def _create_linked_module_occurrence(

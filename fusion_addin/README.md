@@ -666,3 +666,9 @@ scripts/fusion/prepare_quick_asset_test.ps1
 ```
 
 Le script installe l'add-in et ecrit `bgig_ui_settings.json` avec `input_mode = quick_asset_box`. Action humaine restante : ouvrir Fusion, lancer BGIG, verifier les settings rehydrates, generer, verifier le rapport `Quick asset box inputs`, rouvrir, modifier un asset ou une dimension, lancer `regenerate`, puis `clear_bgig_scene`.
+
+### P13-ASSET-M002 count-aware smoke values
+
+Le script `scripts/fusion/prepare_quick_asset_test.ps1` prepare maintenant le cas count-aware : boite `130 x 50 x 60`, grille `4 x 4 x 3`, assets `coin-tokens,tokens,40,18,16,2,loose; status-tokens,tokens,23,10,35,2,loose`.
+
+Le smoke Fusion doit verifier `count_aware_storage_sizing: yes`, `asset_debug_visualization: yes`, diagnostics `capacity_per_stack`, `pile_count`, `declared_capacity`, `asset_fit`, `module_size`, et confirmer que le module n'est plus l'ancienne enveloppe representative `22 x 39 x 4`. `asset_items_visualized` et `asset_cavities_generated` restent `no`.

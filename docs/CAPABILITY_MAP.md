@@ -107,3 +107,9 @@ mission `ready` qui ne sert aucune capability doit etre recadree avant execution
 
 Apres chaque mission significative, Codex met a jour le statut des capabilities
 impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctuel.
+
+## P13-ASSET-M002 capability update
+
+- C-ASSET : `implemented` pour sizing count-aware V0 tokens/dice/meeples/generic, cartes en semantique paquet total explicite, capacite heuristique non print-validee.
+- C-SOLVER : `implemented-v0` pour heuristique bornee sans backtracking ; refus explicite si enveloppe impossible.
+- C-FUSION-UI : `implemented` pour reporting count-aware et sketch debug asset-fit non imprimable ; gate Fusion `P13-ASSET-M002V` active.

@@ -389,3 +389,9 @@ clearances ou tolerances.
 ## P13-M001 - Metadata quick_asset_box
 
 La CAD IR V0 reste additive. Quand la source Fusion est `quick_asset_box`, l'addin ajoute `metadata.quick_asset_box` au payload genere par le moteur. Ce bloc reporte le format UI, les assets acceptes/refuses, les dimensions boite/grille, les compteurs de candidats, la variante recommandee et le resume `executable_asset_plan`. Il ne remplace pas `metadata.assets`, `metadata.module_candidates`, `metadata.recommended_asset_candidate_variant` ni `metadata.executable_asset_plan`.
+
+## P13-ASSET-M002 - Metadata storage_sizing
+
+Les candidats asset-first, modules generes et placements peuvent porter une metadata additive `storage_sizing`. Elle est informative et stable pour le reporting : `policy`, `derivation`, `count_aware_storage_sizing`, `z_mm_semantics`, `total_count_read`, `declared_capacity_count`, `declared_capacity_guarantee`, `asset_diagnostics`, `pile_layout`, `content_footprint_mm`, `asset_fit_size_mm`, `module_size_mm` et `warnings`.
+
+Cette metadata ne remplace pas les champs CAD IR existants (`dimensions_mm`, `asset_fit_size_mm`, `printable_body_size_mm`, placements grille). Fusion consomme toujours la geometrie existante et ajoute seulement un sketch debug non imprimable pour l'enveloppe asset-fit.

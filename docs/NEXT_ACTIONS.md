@@ -18,15 +18,15 @@ structurant, authentification absente ou refus de push direct.
 
 ## Gate humaine active
 
-`P13-ASSET-M002 - Autoriser le sizing count-aware et le debug visuel asset`.
+`P13-ASSET-M002V - Valider le sizing count-aware et le debug visuel asset dans Fusion`.
 
-Statut : gate produit active. `P13-M001V` est validee humainement comme V0 honnete, mais les limites confirmees ouvrent une decision produit avant implementation : traiter ou non le `count` comme capacite de stockage reelle, definir jusqu'ou visualiser les assets, et cadrer les cavites/logements sans ajouter de solveur complexe premature.
+Statut : gate Fusion active. P13-ASSET-M002 est implemente et doit etre valide humainement dans Fusion 360 avant toute nouvelle mission produit asset-first. Le smoke doit confirmer le cas `quick_asset_box` count-aware, les diagnostics de piles/capacite, le sketch debug asset-fit non imprimable, `regenerate` sans doublon et `clear_bgig_scene` preservant les objets non-BGIG.
 
-Decision attendue : autoriser une mission bornee de sizing count-aware/reporting capacite, ou reporter cette capacite et rester sur le proxy asset-first V0.
+Decision attendue : validation humaine Fusion ou retour KO precis. Aucune impression 3D n'est attendue dans cette gate.
 
 ## Mission ready non gated
 
-Aucune mission produit non-gated supplementaire n'est recommandee avant decision humaine sur `P13-ASSET-M002`.
+Aucune mission produit non-gated supplementaire n'est recommandee avant `P13-ASSET-M002V`.
 
 ## Regle operationnelle Fusion
 
@@ -41,7 +41,7 @@ Fusion restantes a Thomas.
 
 `P10-SOLVER-GATE - Solveur complexe, backtracking ou optimisation globale`.
 
-Palette persistante HTML, UI assets avancee/tableau, sizing count-aware reel, solveur plus automatique, cavites/logements assets, nouvelle geometrie Fusion produit, export imprimable et validation d'impression restent gates ou missions separees. P13-M001V ne valide pas ces capacites.
+Palette persistante HTML, UI assets avancee/tableau, solveur plus automatique, cavites/logements assets, assets individuels Fusion, nouvelle geometrie produit complexe, export imprimable et validation d'impression restent gates ou missions separees. P13-ASSET-M002 ne valide qu'une enveloppe count-aware heuristique et un sketch debug non imprimable.
 
 ## Fin de chaque mission
 

@@ -503,3 +503,11 @@ Mettre a jour ce fichier apres toute mission significative, notamment si :
 - une verification passe ou echoue ;
 - une hypothese devient une decision ;
 - une limite est decouverte.
+
+## P13-ASSET-M002 - Count-aware storage sizing implemente
+
+P13-ASSET-M002 ajoute un sizing count-aware V0 pour `tokens`, `dice`, `meeples` et `generic`. Le moteur utilise `count` pour calculer capacite par pile, nombre de piles XY, enveloppe asset-fit, taille module finale, et refuse proprement les cas qui ne tiennent pas dans la boite/grille. Les cartes et cartes sleevees gardent `z_mm` comme hauteur totale de paquet, avec `count` reporte mais non multiplie.
+
+Cote Fusion, `quick_asset_box` reporte `count_aware_storage_sizing: yes|partial|no`, diagnostics `asset_sizing` et `module_candidate_sizing`, `declared_capacity_guarantee = heuristic_envelope_only_not_physical_cavity`, et cree un sketch debug non imprimable `asset-fit debug outline` sur les modules asset candidates. `asset_items_visualized: no`, `asset_cavities_generated: no` et `Print validation: false` restent vrais.
+
+Statut : `implemented`, tests automatises a executer/valider dans la mission. Gate humaine suivante : `P13-ASSET-M002V` dans Fusion 360. Aucune validation d'impression 3D.

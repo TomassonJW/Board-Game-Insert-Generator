@@ -468,3 +468,9 @@ V0 existant.
 `quick_asset_box` ne modifie pas le schema JSON public. La commande Fusion fabrique une config temporaire conforme au schema existant avec `box`, `print_profile`, `tolerances`, `defaults`, `layout`, `assets`, `volumetric_grid` et `modules: []`.
 
 Format UI V0 : `asset_id,type,count,x_mm,y_mm,z_mm,fit`, entrees separees par `;` ou saut de ligne. `generic` est mappe vers `assets[].kind = other`. `fit=exact` devient `dimension_confidence=exact`; `fit=loose` ou `fit=approximate` deviennent `dimension_confidence=approximate`.
+
+## P13-ASSET-M002 - Semantique count/z pour quick_asset_box
+
+Le schema JSON public ne change pas. Dans les configs temporaires `quick_asset_box`, `count` influence maintenant le sizing pour `tokens`, `dice`, `meeples` et `generic`, avec `z_mm` interprete comme epaisseur unitaire d'un item.
+
+Pour `cards` et `sleeved_cards`, `z_mm` est interprete comme hauteur totale du paquet/deck fourni ; `count` est reporte mais non multiplie. Cette limitation est volontaire et doit rester visible dans le reporting tant qu'un modele cartes plus fin n'est pas valide.

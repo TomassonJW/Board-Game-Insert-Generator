@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from math import ceil
+from math import ceil, floor
 from typing import Any
 
 from board_game_insert_generator.models import (
@@ -31,6 +31,8 @@ _FUNCTIONAL_TYPE_BY_ASSET_KIND = {
     AssetKind.DICE: FunctionalType.DICE,
     AssetKind.MEEPLES: FunctionalType.MEEPLES,
 }
+_COUNT_AWARE_STACK_KINDS = {AssetKind.TOKENS, AssetKind.DICE, AssetKind.MEEPLES, AssetKind.OTHER}
+_TOTAL_STACK_Z_KINDS = {AssetKind.CARDS, AssetKind.SLEEVED_CARDS}
 
 
 def build_module_candidates_from_assets(config: InsertConfig) -> list[dict[str, Any]]:
@@ -88,30 +90,26 @@ def _asset_group_key(asset: Asset) -> tuple[str, str, str]:
 def _candidate_from_asset_group(config: InsertConfig, assets: list[Asset]) -> dict[str, Any]:
     representative = assets[0]
     clearance_mm, clearance_source = _asset_clearance(config, representative)
-    dimensions = Dimension3D(
-        x=max(asset.dimensions.x for asset in assets),
-        y=max(asset.dimensions.y for asset in assets),
-        z=max(asset.dimensions.z for asset in assets),
-    )
-    suggested_module = _suggested_module_from_values(
+    suggested_module = _suggested_module_for_assets(
         config=config,
         candidate_id=f"asset-group-candidate:{representative.kind.value}:{representative.containment_intent.value}:{representative.dimension_confidence.value}",
         name=f"Grouped candidate for {representative.kind.value}",
         functional_type=_functional_type(representative),
-        dimensions=dimensions,
+        assets=assets,
         clearance_mm=clearance_mm,
         clearance_source=clearance_source,
     )
-    warnings = []
+    warnings = list(suggested_module.get("warnings", []))
     if representative.dimension_confidence.value != "exact":
         warnings.append(
             f"Grouped assets use {representative.dimension_confidence.value} dimensions; candidate dimensions need human review."
         )
+    storage_sizing = suggested_module.get("storage_sizing", {})
     return {
         "candidate_id": suggested_module["id"].replace("candidate-module:", "asset-group-candidate:"),
         "source_asset_ids": [asset.id for asset in assets],
         "status": "candidate_only",
-        "derivation": "asset_group_dimension_padding",
+        "derivation": storage_sizing.get("derivation", "asset_group_dimension_padding"),
         "functional_type": _functional_type(representative).value,
         "containment_intent": representative.containment_intent.value,
         "dimension_confidence": representative.dimension_confidence.value,
@@ -128,10 +126,11 @@ def _candidate_from_asset_group(config: InsertConfig, assets: list[Asset]) -> di
         },
         "reasons": [
             "Compatible assets share kind, containment intent and dimension confidence.",
-            "Grouped candidate uses the largest source asset envelope plus profile/default padding.",
+            *suggested_module.get("sizing_reasons", []),
         ],
         "warnings": warnings,
     }
+
 
 def _candidate_from_asset(config: InsertConfig, asset: Asset) -> dict[str, Any]:
     clearance_mm, clearance_source = _asset_clearance(config, asset)
@@ -159,13 +158,15 @@ def _candidate_from_asset(config: InsertConfig, asset: Asset) -> dict[str, Any]:
         reasons.append("Asset Z dimension is unknown; candidate height cannot be derived safely.")
     else:
         suggested_module = _suggested_module(config, asset, clearance_mm, clearance_source)
-        reasons.append("Candidate dimensions are derived from asset dimensions, profile clearance and geometry defaults.")
+        reasons.extend(suggested_module.get("sizing_reasons", []))
+        warnings.extend(suggested_module.get("warnings", []))
 
+    storage_sizing = suggested_module.get("storage_sizing", {}) if suggested_module is not None else {}
     return {
         "candidate_id": f"asset-candidate:{asset.id}",
         "source_asset_ids": [asset.id],
         "status": status,
-        "derivation": "asset_dimension_padding",
+        "derivation": storage_sizing.get("derivation", "asset_dimension_padding"),
         "functional_type": _functional_type(asset).value,
         "containment_intent": asset.containment_intent.value,
         "dimension_confidence": asset.dimension_confidence.value,
@@ -206,18 +207,279 @@ def _asset_clearance(config: InsertConfig, asset: Asset) -> tuple[float, str]:
     return 0.0, "none"
 
 
+
+def _suggested_module_for_assets(
+    *,
+    config: InsertConfig,
+    candidate_id: str,
+    name: str,
+    functional_type: FunctionalType,
+    assets: list[Asset],
+    clearance_mm: float,
+    clearance_source: str,
+) -> dict[str, Any]:
+    kind = assets[0].kind if assets else AssetKind.OTHER
+    if assets and all(asset.kind in _COUNT_AWARE_STACK_KINDS for asset in assets):
+        return _count_aware_stacked_module_from_assets(
+            config=config,
+            candidate_id=candidate_id,
+            name=name,
+            functional_type=functional_type,
+            assets=assets,
+            clearance_mm=clearance_mm,
+            clearance_source=clearance_source,
+        )
+
+    dimensions = Dimension3D(
+        x=max(asset.dimensions.x for asset in assets),
+        y=max(asset.dimensions.y for asset in assets),
+        z=max(asset.dimensions.z for asset in assets),
+    )
+    suggested = _suggested_module_from_values(
+        config=config,
+        candidate_id=candidate_id,
+        name=name,
+        functional_type=functional_type,
+        dimensions=dimensions,
+        clearance_mm=clearance_mm,
+        clearance_source=clearance_source,
+    )
+    if kind in _TOTAL_STACK_Z_KINDS:
+        z_semantics = "total_stack_height_mm"
+        reasons = [
+            "Cards use z_mm as total provided stack height in P13-ASSET-M002; count is reported but not multiplied.",
+            "Candidate dimensions are derived from card stack dimensions, profile clearance and geometry defaults.",
+        ]
+        warnings = [
+            "Card count is not multiplied into z_mm; provide deck/package height as z_mm for cards and sleeved_cards."
+        ] if sum(asset.quantity.count for asset in assets) > 1 else []
+    else:
+        z_semantics = "representative_asset_height_mm"
+        reasons = ["Candidate dimensions are derived from asset dimensions, profile clearance and geometry defaults."]
+        warnings = []
+    suggested["storage_sizing"] = {
+        "policy": "total_stack_z_v0" if kind in _TOTAL_STACK_Z_KINDS else "representative_asset_envelope_v0",
+        "derivation": "asset_total_stack_z_padding" if kind in _TOTAL_STACK_Z_KINDS else "asset_dimension_padding",
+        "count_aware_applied": False,
+        "count_aware_storage_sizing": "partial" if kind in _TOTAL_STACK_Z_KINDS else "no",
+        "z_mm_semantics": z_semantics,
+        "total_count_read": sum(asset.quantity.count for asset in assets),
+        "declared_capacity_guarantee": "not_guaranteed",
+        "asset_diagnostics": [
+            {
+                "asset_id": asset.id,
+                "count_read": asset.quantity.count,
+                "dimensions_read_mm": _dimension_to_dict(asset.dimensions),
+                "count_used_for_sizing": False,
+                "z_mm_semantics": z_semantics,
+                "warning": warnings[0] if warnings else None,
+            }
+            for asset in assets
+        ],
+        "warnings": warnings,
+    }
+    suggested["sizing_reasons"] = reasons
+    suggested["warnings"] = warnings
+    return suggested
+
+
+def _count_aware_stacked_module_from_assets(
+    *,
+    config: InsertConfig,
+    candidate_id: str,
+    name: str,
+    functional_type: FunctionalType,
+    assets: list[Asset],
+    clearance_mm: float,
+    clearance_source: str,
+) -> dict[str, Any]:
+    wall = config.defaults.wall_thickness_mm
+    floor = config.defaults.floor_thickness_mm
+    max_fit_height = _count_aware_max_asset_fit_height(config, floor)
+    max_content_width = max(0.0, config.box.inner_dimensions.x - wall * 2.0 - clearance_mm * 2.0)
+    pile_rectangles: list[dict[str, Any]] = []
+    diagnostics: list[dict[str, Any]] = []
+    warnings: list[str] = []
+
+    for asset in assets:
+        diagnostic = _count_aware_asset_stack_diagnostic(asset, clearance_mm, max_fit_height)
+        diagnostics.append(diagnostic)
+        warning = diagnostic.get("warning")
+        if warning:
+            warnings.append(str(warning))
+        for pile_index in range(int(diagnostic["pile_count"])):
+            pile_rectangles.append(
+                {
+                    "asset_id": asset.id,
+                    "pile_index": pile_index + 1,
+                    "x": asset.dimensions.x,
+                    "y": asset.dimensions.y,
+                }
+            )
+
+    packed = _pack_count_aware_piles(pile_rectangles, max_content_width)
+    if not packed["fits_width"]:
+        warnings.append(
+            "Count-aware pile layout exceeds the available module content width; downstream row/grid placement must reject or report the overflow."
+        )
+    content_x = packed["content_size_mm"]["x"]
+    content_y = packed["content_size_mm"]["y"]
+    stack_height = max((diagnostic["stack_height_mm"] for diagnostic in diagnostics), default=0.0)
+    inner = Dimension3D(
+        x=content_x + clearance_mm * 2.0,
+        y=content_y + clearance_mm * 2.0,
+        z=stack_height + clearance_mm,
+    )
+    outer = Dimension3D(
+        x=inner.x + wall * 2.0,
+        y=inner.y + wall * 2.0,
+        z=inner.z + floor,
+    )
+    total_count = sum(asset.quantity.count for asset in assets)
+    declared_capacity = sum(int(diagnostic["declared_capacity_count"]) for diagnostic in diagnostics)
+    storage_sizing = {
+        "policy": "stacked_rectangular_piles_v0",
+        "derivation": "count_aware_stacked_asset_piles",
+        "count_aware_applied": True,
+        "count_aware_storage_sizing": "yes",
+        "z_mm_semantics": "unit_item_thickness_for_tokens_dice_meeples_generic",
+        "max_asset_fit_height_mm": round(max_fit_height, 4),
+        "total_count_read": total_count,
+        "declared_capacity_count": declared_capacity,
+        "declared_capacity_guarantee": "heuristic_envelope_only_not_physical_cavity",
+        "asset_diagnostics": diagnostics,
+        "pile_layout": packed["pile_layout"],
+        "content_footprint_mm": packed["content_size_mm"],
+        "asset_fit_size_mm": _dimension_to_dict(inner),
+        "module_size_mm": _dimension_to_dict(outer),
+        "warnings": warnings,
+    }
+    return {
+        "id": candidate_id,
+        "name": name,
+        "functional_type": functional_type.value,
+        "min_dimensions_mm": _dimension_to_dict(outer),
+        "inner_asset_envelope_mm": _dimension_to_dict(inner),
+        "clearance_source": clearance_source,
+        "status": "candidate_only_not_placed",
+        "storage_sizing": storage_sizing,
+        "sizing_reasons": [
+            "Count-aware V0 treats each asset item as a rectangular stackable proxy.",
+            "Items are split into vertical piles using the usable height, then pile footprints are row-packed in XY without backtracking.",
+        ],
+        "warnings": warnings,
+    }
+
+
+def _count_aware_max_asset_fit_height(config: InsertConfig, floor_thickness_mm: float) -> float:
+    usable_height = min(config.box.usable_height_mm, config.box.inner_dimensions.z)
+    if config.volumetric_grid is not None:
+        free_z_span = _max_free_contiguous_z_span(config)
+        if free_z_span > 0:
+            usable_height = min(usable_height, free_z_span * config.volumetric_grid.unit_size_mm.z)
+    return round(max(0.0, usable_height - floor_thickness_mm), 4)
+
+
+def _max_free_contiguous_z_span(config: InsertConfig) -> int:
+    grid = config.volumetric_grid
+    if grid is None:
+        return 0
+    occupied = _initial_occupied_cells(config)
+    max_span = 0
+    for x in range(grid.size_units.x):
+        for y in range(grid.size_units.y):
+            current = 0
+            for z in range(grid.size_units.z):
+                if (x, y, z) in occupied:
+                    current = 0
+                    continue
+                current += 1
+                max_span = max(max_span, current)
+    return max_span
+
+
+def _count_aware_asset_stack_diagnostic(asset: Asset, clearance_mm: float, max_fit_height_mm: float) -> dict[str, Any]:
+    usable_stack_height = max_fit_height_mm - clearance_mm
+    if usable_stack_height <= 0:
+        capacity_per_stack = 1
+        warning = "No positive stack height remains after clearance; using one item per pile and expecting placement rejection if too tall."
+    else:
+        capacity_per_stack = max(1, floor(usable_stack_height / asset.dimensions.z))
+        warning = None
+    pile_count = max(1, ceil(asset.quantity.count / capacity_per_stack))
+    items_per_pile = max(1, ceil(asset.quantity.count / pile_count))
+    stack_height = round(items_per_pile * asset.dimensions.z, 4)
+    if stack_height + clearance_mm > max_fit_height_mm:
+        warning = "Computed stack height exceeds usable asset-fit height; generated module may be rejected by box/grid constraints."
+    return {
+        "asset_id": asset.id,
+        "count_read": asset.quantity.count,
+        "dimensions_read_mm": _dimension_to_dict(asset.dimensions),
+        "count_used_for_sizing": True,
+        "capacity_per_stack": capacity_per_stack,
+        "pile_count": pile_count,
+        "items_per_pile": items_per_pile,
+        "declared_capacity_count": pile_count * capacity_per_stack,
+        "stack_height_mm": stack_height,
+        "pile_footprint_mm": {"x": asset.dimensions.x, "y": asset.dimensions.y},
+        "z_mm_semantics": "unit_item_thickness",
+        "warning": warning,
+    }
+
+
+def _pack_count_aware_piles(piles: list[dict[str, Any]], max_width_mm: float) -> dict[str, Any]:
+    if not piles:
+        return {"fits_width": True, "content_size_mm": {"x": 0.0, "y": 0.0, "z": 0.0}, "pile_layout": []}
+
+    row_x = 0.0
+    row_y = 0.0
+    row_depth = 0.0
+    content_x = 0.0
+    fits_width = max_width_mm > 0
+    layout: list[dict[str, Any]] = []
+    for pile in sorted(piles, key=lambda item: (-item["y"], -item["x"], str(item["asset_id"]), int(item["pile_index"]))):
+        width = float(pile["x"])
+        depth = float(pile["y"])
+        rotated = False
+        if width > max_width_mm and depth <= max_width_mm:
+            width, depth = depth, width
+            rotated = True
+        if width > max_width_mm:
+            fits_width = False
+        if row_x > 0 and row_x + width > max_width_mm:
+            row_y += row_depth
+            row_x = 0.0
+            row_depth = 0.0
+        layout.append(
+            {
+                "asset_id": pile["asset_id"],
+                "pile_index": pile["pile_index"],
+                "origin_mm": {"x": round(row_x, 4), "y": round(row_y, 4), "z": 0.0},
+                "size_mm": {"x": round(width, 4), "y": round(depth, 4), "z": 0.0},
+                "rotated": rotated,
+            }
+        )
+        row_x += width
+        row_depth = max(row_depth, depth)
+        content_x = max(content_x, row_x)
+    content_y = row_y + row_depth
+    return {
+        "fits_width": fits_width,
+        "content_size_mm": {"x": round(content_x, 4), "y": round(content_y, 4), "z": 0.0},
+        "pile_layout": layout,
+    }
 def _suggested_module(
     config: InsertConfig,
     asset: Asset,
     clearance_mm: float,
     clearance_source: str,
 ) -> dict[str, Any]:
-    return _suggested_module_from_values(
+    return _suggested_module_for_assets(
         config=config,
         candidate_id=f"candidate-module:{asset.id}",
         name=f"Candidate module for {asset.name}",
         functional_type=_functional_type(asset),
-        dimensions=asset.dimensions,
+        assets=[asset],
         clearance_mm=clearance_mm,
         clearance_source=clearance_source,
     )
@@ -410,6 +672,7 @@ def build_executable_asset_module_plan(config: InsertConfig) -> dict[str, Any]:
                 "theoretical_grid_origin_mm": _grid_origin_to_mm(origin, grid.unit_size_mm),
                 "theoretical_grid_extent_mm": _grid_size_to_mm(size_units, grid.unit_size_mm),
                 "asset_fit_size_mm": dict(module["asset_fit_size_mm"]),
+                "storage_sizing": dict(module.get("storage_sizing", {})),
                 "printable_body_origin_mm": _grid_origin_to_mm(origin, grid.unit_size_mm),
                 "printable_body_size_mm": dict(module["printable_body_size_mm"]),
                 "source_size_mm": dict(module["printable_body_size_mm"]),
@@ -626,6 +889,7 @@ def _generated_module_from_candidate(candidate: dict[str, Any]) -> dict[str, Any
         "inner_asset_envelope_mm": inner_asset_envelope_mm,
         "asset_fit_size_mm": inner_asset_envelope_mm,
         "printable_body_size_mm": dimensions_mm,
+        "storage_sizing": dict(suggested.get("storage_sizing", {})),
         "clearance_applied": {
             "internal_asset_clearance_mm": constraints.get("clearance_mm", 0.0),
             "internal_asset_clearance_source": constraints.get("clearance_source", "unknown"),

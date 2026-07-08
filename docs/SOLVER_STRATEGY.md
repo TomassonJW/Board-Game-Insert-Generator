@@ -180,3 +180,9 @@ IR metadata.
 ## P13-M001 - Reuse quick_asset_box
 
 `quick_asset_box` ne change pas la strategie solveur. Il transforme une saisie UI en config temporaire, puis reutilise le pipeline borne existant : `module_candidates`, variante recommandee deterministe et `executable_asset_plan` greedy grille X/Y/Z. Aucun backtracking, aucune optimisation globale et aucun nouveau score ne sont ajoutes.
+
+## P13-ASSET-M002 - Heuristique count-aware bornee
+
+Le sizing count-aware n'introduit pas de solveur global. L'algorithme est volontairement borne : hauteur maximale derivee de la boite et de la plus grande plage Z libre de la grille, capacite par pile par division entiere, nombre de piles par plafond, puis row-packing XY deterministe des piles. Si l'enveloppe issue de cette heuristique ne rentre pas dans la boite/grille, la variante est refusee avec diagnostic au lieu de promettre une capacite.
+
+Aucun backtracking, optimisation globale, score multi-variante lourd ou generation de cavites n'est ajoute en P13-ASSET-M002.

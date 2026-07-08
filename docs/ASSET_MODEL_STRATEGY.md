@@ -176,3 +176,11 @@ Les entrees sont separees par `;` ou par saut de ligne. Les types UI V0 sont `to
 La commande genere une config temporaire BGIG stricte depuis les champs boite/grille/parois/clearances/profil et `assets[]`, puis reutilise le pipeline existant : assets charges, `module_candidates`, variante recommandee, `executable_asset_plan`, CAD IR et generation Fusion. Les assets invalides sont refuses dans le rapport sans bloquer si au moins un asset valide reste.
 
 Limites : pas de tableau avance, pas de palette HTML, pas de solveur complexe, pas de nouvelle geometrie Fusion, pas de validation d'impression.
+
+## P13-ASSET-M002 - Count-aware storage sizing V0
+
+Pour `tokens`, `dice`, `meeples` et `generic`, le sizing V0 traite chaque asset comme un item rectangulaire `x_mm x y_mm x z_mm`. `count` est maintenant utilise pour calculer une capacite deterministe : capacite par pile selon la hauteur utile, nombre de piles necessaires, empilement uniforme par pile, puis packing XY simple des piles sans backtracking.
+
+La sortie reste une enveloppe de rangement, pas une cavite physique : `declared_capacity_guarantee = heuristic_envelope_only_not_physical_cavity`. Les vrais items Fusion ne sont pas generes et les logements ne sont pas coupes.
+
+Pour `cards` et `sleeved_cards`, `z_mm` reste interprete comme hauteur totale fournie du paquet/deck. `count` est reporte mais non multiplie, avec warning explicite. Cela evite de melanger silencieusement epaisseur unitaire et epaisseur totale.

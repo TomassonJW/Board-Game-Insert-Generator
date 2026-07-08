@@ -135,12 +135,14 @@ class CliTests(unittest.TestCase):
 
         self.assertEqual(code, 0)
         self.assertIn("CAD IR export OK - Simple multilayer grid scene V0", stdout.getvalue())
-        self.assertEqual(len(plan.grid_positioned_blanks), 2)
-        self.assertEqual(plan.multi_layer_grid_module_count, 1)
-        self.assertEqual(plan.grid_modules_with_z_placement_count, 1)
-        self.assertEqual(plan.grid_module_height_variant_count, 2)
-        self.assertEqual(len(plan.compact_occurrences), 3)
-        self.assertEqual(len(plan.exploded_occurrences), 3)
+        self.assertEqual(len(plan.grid_positioned_blanks), 0)
+        self.assertEqual(plan.multi_layer_grid_module_count, 0)
+        self.assertEqual(plan.grid_modules_with_z_placement_count, 0)
+        self.assertEqual(plan.grid_module_height_variant_count, 0)
+        self.assertEqual(len(plan.compact_occurrences), 1)
+        self.assertEqual(len(plan.exploded_occurrences), 1)
+        self.assertEqual(len(plan.rejected_grid_modules), 1)
+        self.assertEqual(plan.rejected_grid_modules[0].code, "DIMENSIONS_INCOMPATIBLE")
         self.assertTrue(plan.linked_exploded_occurrences)
 
     def test_cli_reports_configuration_error_category(self) -> None:

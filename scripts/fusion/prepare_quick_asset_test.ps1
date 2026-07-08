@@ -3,7 +3,7 @@ param(
     [string] $TargetPath,
     [ValidateSet("compact_only", "compact_and_exploded")]
     [string] $GenerationMode = "compact_only",
-    [string] $AssetsText = "coin-tokens,tokens,30,20,20,2,loose; status-tokens,tokens,20,18,18,2,loose",
+    [string] $AssetsText = "coin-tokens,tokens,40,18,16,2,loose; status-tokens,tokens,23,10,35,2,loose",
     [switch] $DryRun
 )
 
@@ -31,9 +31,9 @@ $settings = @{
     input_mode = "quick_asset_box"
     generation_mode = $GenerationMode
     project_root = $root
-    box_inner_x_mm = "120"
-    box_inner_y_mm = "80"
-    box_inner_z_mm = "30"
+    box_inner_x_mm = "130"
+    box_inner_y_mm = "50"
+    box_inner_z_mm = "60"
     grid_units_x = "4"
     grid_units_y = "4"
     grid_units_z = "3"
@@ -49,7 +49,7 @@ Write-BgigFusionUiSettings -TargetPath $target -Settings $settings -DryRun:$DryR
 Write-Output ""
 Write-Output "Recommended P13 quick asset values:"
 Write-Output "- input_mode: quick_asset_box"
-Write-Output "- box_inner_mm: 120 x 80 x 30"
+Write-Output "- box_inner_mm: 130 x 50 x 60"
 Write-Output "- grid_units: 4 x 4 x 3"
 Write-Output "- wall_thickness_mm: 1.2"
 Write-Output "- floor_thickness_mm: 1.2"
@@ -65,7 +65,7 @@ Write-Output "3. In the UI settings block, confirm UI settings loaded: yes."
 Write-Output "4. Confirm Loaded input mode = quick_asset_box and Loaded generation mode = $GenerationMode."
 Write-Output "5. Confirm the Assets (quick_asset_box) field contains the prepared assets."
 Write-Output "6. Confirm Action = generate, or regenerate if a BGIG scene already exists."
-Write-Output "7. Run generation and verify Quick asset box inputs, assets_read, asset_items_visualized: no, asset_cavities_generated: no, count_aware_storage_sizing: no, asset_sizing/module_candidate_sizing diagnostics, Reference outline policy: bottom_and_top_box_xy_outlines, Body sizing report, Registry validation: ok, and Print validation: false."
+Write-Output "7. Run generation and verify Quick asset box inputs, assets_read, asset_items_visualized: no, asset_cavities_generated: no, count_aware_storage_sizing: yes, asset_debug_visualization: yes, asset_sizing capacity_per_stack/pile_count diagnostics, module_candidate_sizing declared_capacity and module_size not 22 x 39 x 4, Reference outline policy: bottom_and_top_box_xy_outlines, Body sizing report, Registry validation: ok, and Print validation: false."
 Write-Output "8. Reopen BGIG and confirm the asset text is still present."
 Write-Output "9. Modify one asset or dimension, set Action = regenerate, run, and verify the scene is replaced without duplicates."
 Write-Output "10. Run clear_bgig_scene and verify non-BGIG objects are preserved."

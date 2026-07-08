@@ -738,3 +738,11 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Tests : inspection documentaire.
 - Gate : publication de release.
 - Statut : `todo`.
+
+### P13-ASSET-M002 - Count-aware storage sizing et debug visuel asset
+
+- Capability : C-ASSET, C-SOLVER, C-FUSION-UI.
+- Milestone : M14 Usable beta.
+- Livrable : sizing count-aware V0 pour tokens/dice/meeples/generic, diagnostics de capacite, metadata `storage_sizing`, sketch debug asset-fit non imprimable, script smoke count-aware.
+- Statut : `implemented`, en attente de validation humaine Fusion `P13-ASSET-M002V`.
+- Limites : pas d'assets Fusion individuels, pas de cavites/logements, pas de solveur global, cartes en hauteur totale de paquet, capacite heuristique non print-validee.

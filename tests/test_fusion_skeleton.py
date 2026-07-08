@@ -719,16 +719,23 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(quick_metadata["placed_module_count"], 1)
         self.assertFalse(quick_metadata["asset_items_visualized"])
         self.assertFalse(quick_metadata["asset_cavities_generated"])
-        self.assertFalse(quick_metadata["count_aware_storage_sizing"])
-        self.assertEqual(quick_metadata["storage_sizing_scope"], "representative_asset_envelope_only")
+        self.assertEqual(quick_metadata["count_aware_storage_sizing"], "yes")
+        self.assertEqual(quick_metadata["storage_sizing_scope"], "count_aware_stacked_rectangular_piles_v0")
+        self.assertTrue(quick_metadata["asset_debug_visualization"])
+        self.assertEqual(quick_metadata["asset_debug_visualization_scope"], "asset_fit_envelope_sketch_only_non_printable")
         self.assertEqual(len(quick_metadata["asset_sizing_diagnostics"]), 2)
-        self.assertFalse(quick_metadata["asset_sizing_diagnostics"][0]["count_used_for_sizing"])
+        self.assertTrue(quick_metadata["asset_sizing_diagnostics"][0]["count_used_for_sizing"])
+        self.assertEqual(quick_metadata["asset_sizing_diagnostics"][0]["capacity_per_stack"], 14)
+        self.assertEqual(quick_metadata["asset_sizing_diagnostics"][0]["pile_count"], 3)
+        self.assertEqual(quick_metadata["asset_sizing_diagnostics"][1]["pile_count"], 2)
         self.assertEqual(len(quick_metadata["module_candidate_sizing_diagnostics"]), 1)
-        self.assertFalse(quick_metadata["module_candidate_sizing_diagnostics"][0]["count_used_for_sizing"])
-        self.assertEqual(
-            quick_metadata["module_candidate_sizing_diagnostics"][0]["module_size_mm"],
-            {"x": 24.0, "y": 24.0, "z": 4.0},
-        )
+        module_diagnostic = quick_metadata["module_candidate_sizing_diagnostics"][0]
+        self.assertTrue(module_diagnostic["count_used_for_sizing"])
+        self.assertEqual(module_diagnostic["count_aware_storage_sizing"], "yes")
+        self.assertEqual(module_diagnostic["policy"], "stacked_rectangular_piles_v0")
+        self.assertEqual(module_diagnostic["declared_capacity_count"], 70)
+        self.assertEqual(module_diagnostic["module_size_mm"], {"x": 100.0, "y": 24.0, "z": 22.0})
+        self.assertEqual(module_diagnostic["asset_fit_size_mm"], {"x": 97.6, "y": 21.6, "z": 20.8})
         plan = generation_plan_from_cad_ir(validate_cad_ir_payload(scene), FUSION_GENERATION_MODE_COMPACT_ONLY)
         self.assertEqual(len(plan.grid_positioned_blanks), 1)
         summary = quick_asset_box_summary(scene)
@@ -736,10 +743,12 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("assets_read: 2", summary)
         self.assertIn("asset_items_visualized: no", summary)
         self.assertIn("asset_cavities_generated: no", summary)
-        self.assertIn("count_aware_storage_sizing: no", summary)
-        self.assertIn("count_used_for_sizing no", summary)
-        self.assertIn("module_size 24.0 x 24.0 x 4.0 mm", summary)
-        self.assertIn("does not claim storage capacity for all asset quantities", summary)
+        self.assertIn("count_aware_storage_sizing: yes", summary)
+        self.assertIn("asset_debug_visualization: yes", summary)
+        self.assertIn("capacity_per_stack 14", summary)
+        self.assertIn("pile_count 3", summary)
+        self.assertIn("module_size 100.0 x 24.0 x 22.0 mm", summary)
+        self.assertIn("asset_cavities_generated remains no", summary)
         self.assertIn("module_candidates_generated: 1", summary)
         self.assertIn("placed_asset_modules: 1", summary)
 
@@ -1155,31 +1164,31 @@ class FusionSkeletonTests(unittest.TestCase):
 
 
     def test_builds_grid_positioned_asset_blank_plan_from_executable_asset_plan(self) -> None:
-        payload = _cad_ir_payload_from_example("simple_asset_executable_plan.json")
+        payload = _cad_ir_payload_from_example("simple_asset_product_scene.json")
 
         plan = generation_plan_from_cad_ir(payload)
 
-        self.assertEqual(len(plan.blanks), 1)
+        self.assertEqual(len(plan.blanks), 0)
         self.assertEqual(len(plan.grid_positioned_blanks), 1)
         self.assertEqual(len(plan.rejected_grid_modules), 0)
-        self.assertEqual(plan.created_object_count, 5)
+        self.assertEqual(plan.created_object_count, 3)
         grid_blank = plan.grid_positioned_blanks[0]
         self.assertEqual(grid_blank.role, "generated_asset_grid_blank")
         self.assertEqual(grid_blank.operation_kind, GRID_PLACED_BLANK_OPERATION_KIND)
         self.assertEqual(grid_blank.component_name, "Grid placed Grouped candidate for tokens")
-        self.assertEqual(grid_blank.origin_mm.to_dict(), {"x": 30.0, "y": 0.0, "z": 0.0})
-        self.assertEqual(grid_blank.size_mm.to_dict(), {"x": 25.6, "y": 25.6, "z": 9.8})
-        self.assertEqual(grid_blank.printable_body_size_mm.to_dict(), {"x": 25.6, "y": 25.6, "z": 9.8})
+        self.assertEqual(grid_blank.origin_mm.to_dict(), {"x": 0.0, "y": 0.0, "z": 0.0})
+        self.assertEqual(grid_blank.size_mm.to_dict(), {"x": 119.6, "y": 87.6, "z": 19.8})
+        self.assertEqual(grid_blank.printable_body_size_mm.to_dict(), {"x": 119.6, "y": 87.6, "z": 19.8})
         self.assertEqual(grid_blank.body_size_source, "printable_body_size_mm")
         self.assertNotEqual(grid_blank.size_mm.to_dict(), grid_blank.theoretical_grid_extent_mm.to_dict())
-        self.assertEqual(grid_blank.asset_fit_size_mm.to_dict(), {"x": 23.2, "y": 23.2, "z": 8.6})
-        self.assertEqual(grid_blank.theoretical_grid_extent_mm.to_dict(), {"x": 30.0, "y": 30.0, "z": 10.0})
+        self.assertEqual(grid_blank.asset_fit_size_mm.to_dict(), {"x": 117.2, "y": 85.2, "z": 18.6})
+        self.assertEqual(grid_blank.theoretical_grid_extent_mm.to_dict(), {"x": 120.0, "y": 90.0, "z": 20.0})
         self.assertEqual(plan.to_dict()["grid_positioned_blanks"][0]["body_name"], grid_blank.body_name)
         self.assertEqual(plan.to_dict()["grid_positioned_blanks"][0]["body_size_source"], "printable_body_size_mm")
         self.assertEqual(plan.to_dict()["grid_positioned_blanks"][0]["module_source"], "asset_candidate")
         self.assertEqual(
             plan.to_dict()["grid_positioned_blanks"][0]["theoretical_grid_extent_mm"],
-            {"x": 30.0, "y": 30.0, "z": 10.0},
+            {"x": 120.0, "y": 90.0, "z": 20.0},
         )
 
 
@@ -1199,8 +1208,8 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(grid_blank.source_asset_ids, ("coin-tokens", "status-tokens"))
         self.assertEqual(grid_blank.candidate_id, "asset-group-candidate:tokens:store:exact")
         self.assertEqual(grid_blank.origin_mm.to_dict(), {"x": 0.0, "y": 0.0, "z": 0.0})
-        self.assertEqual(grid_blank.size_mm.to_dict(), {"x": 25.6, "y": 25.6, "z": 9.8})
-        self.assertEqual(grid_blank.theoretical_grid_extent_mm.to_dict(), {"x": 30.0, "y": 30.0, "z": 10.0})
+        self.assertEqual(grid_blank.size_mm.to_dict(), {"x": 119.6, "y": 87.6, "z": 19.8})
+        self.assertEqual(grid_blank.theoretical_grid_extent_mm.to_dict(), {"x": 120.0, "y": 90.0, "z": 20.0})
         self.assertEqual(grid_blank.body_size_source, "printable_body_size_mm")
         self.assertEqual(grid_blank.clearance_applied["peripheral_clearance_mm"], 0.0)
         self.assertEqual(grid_blank.clearance_applied["inter_module_gap_mm"], 0.0)
@@ -1211,7 +1220,7 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(plan_dict["grid_positioned_blanks"][0]["source_asset_ids"], ["coin-tokens", "status-tokens"])
 
     def test_rejects_modern_grid_placement_without_printable_body_size(self) -> None:
-        payload = _cad_ir_payload_from_example("simple_asset_executable_plan.json")
+        payload = _cad_ir_payload_from_example("simple_asset_product_scene.json")
         placement = payload["metadata"]["executable_asset_plan"]["placements"][0]
         generated_module = payload["metadata"]["executable_asset_plan"]["generated_modules"][0]
         placement.pop("printable_body_size_mm")
@@ -1222,79 +1231,46 @@ class FusionSkeletonTests(unittest.TestCase):
 
 
     def test_grid_positioned_asset_blank_supports_z_layer_origin(self) -> None:
-        payload = _cad_ir_payload_from_example("simple_asset_executable_plan.json")
+        payload = _cad_ir_payload_from_example("simple_asset_product_scene.json")
         placement = payload["metadata"]["executable_asset_plan"]["placements"][0]
-        placement["origin_units"] = {"x": 1, "y": 0, "z": 1}
-        placement["origin_mm"] = {"x": 30.0, "y": 0.0, "z": 10.0}
-        placement["theoretical_grid_origin_mm"] = {"x": 30.0, "y": 0.0, "z": 10.0}
-        placement["printable_body_origin_mm"] = {"x": 30.0, "y": 0.0, "z": 10.0}
+        placement["origin_units"] = {"x": 0, "y": 0, "z": 1}
+        placement["origin_mm"] = {"x": 0.0, "y": 0.0, "z": 10.0}
+        placement["theoretical_grid_origin_mm"] = {"x": 0.0, "y": 0.0, "z": 10.0}
+        placement["printable_body_origin_mm"] = {"x": 0.0, "y": 0.0, "z": 10.0}
 
         plan = generation_plan_from_cad_ir(payload)
 
         grid_blank = plan.grid_positioned_blanks[0]
-        self.assertEqual(grid_blank.origin_mm.to_dict(), {"x": 30.0, "y": 0.0, "z": 10.0})
-        self.assertEqual(grid_blank.size_mm.to_dict(), {"x": 25.6, "y": 25.6, "z": 9.8})
-        self.assertEqual(grid_blank.printable_body_size_mm.to_dict(), {"x": 25.6, "y": 25.6, "z": 9.8})
+        self.assertEqual(grid_blank.origin_mm.to_dict(), {"x": 0.0, "y": 0.0, "z": 10.0})
+        self.assertEqual(grid_blank.size_mm.to_dict(), {"x": 119.6, "y": 87.6, "z": 19.8})
+        self.assertEqual(grid_blank.printable_body_size_mm.to_dict(), {"x": 119.6, "y": 87.6, "z": 19.8})
         self.assertEqual(grid_blank.body_size_source, "printable_body_size_mm")
         self.assertNotEqual(grid_blank.size_mm.to_dict(), grid_blank.theoretical_grid_extent_mm.to_dict())
 
-    def test_builds_multilayer_grid_scene_with_linked_occurrences(self) -> None:
+    def test_transports_count_aware_multilayer_grid_rejection(self) -> None:
         payload = _cad_ir_payload_from_example("simple_multilayer_grid_scene.json")
 
         plan = generation_plan_from_cad_ir(payload)
 
         self.assertEqual(len(plan.blanks), 1)
-        self.assertEqual(len(plan.grid_positioned_blanks), 2)
-        self.assertEqual(plan.module_component_count, 3)
-        self.assertEqual(plan.multi_layer_grid_module_count, 1)
-        self.assertEqual(plan.grid_modules_with_z_placement_count, 1)
-        self.assertEqual(plan.grid_module_height_variant_count, 2)
-        self.assertEqual(len(plan.compact_occurrences), 3)
-        self.assertEqual(len(plan.exploded_occurrences), 3)
-        self.assertTrue(plan.linked_exploded_occurrences)
-
-        low_blank = plan.grid_positioned_blanks[0]
-        high_blank = plan.grid_positioned_blanks[1]
-        self.assertEqual(low_blank.grid_origin_units, (1, 0, 0))
-        self.assertEqual(low_blank.grid_size_units, (3, 3, 1))
-        self.assertEqual(low_blank.origin_mm.to_dict(), {"x": 30.0, "y": 0.0, "z": 0.0})
-        self.assertEqual(low_blank.size_mm.to_dict(), {"x": 61.6, "y": 61.6, "z": 7.8})
-        self.assertEqual(low_blank.printable_body_size_mm.to_dict(), {"x": 61.6, "y": 61.6, "z": 7.8})
-        self.assertEqual(low_blank.body_size_source, "printable_body_size_mm")
-        self.assertEqual(low_blank.theoretical_grid_extent_mm.to_dict(), {"x": 90.0, "y": 90.0, "z": 10.0})
-        self.assertEqual(high_blank.grid_origin_units, (0, 0, 1))
-        self.assertEqual(high_blank.grid_size_units, (2, 2, 2))
-        self.assertEqual(high_blank.origin_mm.to_dict(), {"x": 0.0, "y": 0.0, "z": 10.0})
-        self.assertEqual(high_blank.size_mm.to_dict(), {"x": 37.6, "y": 37.6, "z": 17.8})
-        self.assertEqual(high_blank.printable_body_size_mm.to_dict(), {"x": 37.6, "y": 37.6, "z": 17.8})
-        self.assertEqual(high_blank.body_size_source, "printable_body_size_mm")
-        self.assertEqual(high_blank.theoretical_grid_extent_mm.to_dict(), {"x": 60.0, "y": 60.0, "z": 20.0})
-
-        high_compact = [
-            occurrence
-            for occurrence in plan.compact_occurrences
-            if occurrence.component_id == high_blank.cad_id
-        ][0]
-        high_exploded = [
-            occurrence
-            for occurrence in plan.exploded_occurrences
-            if occurrence.component_id == high_blank.cad_id
-        ][0]
-        self.assertEqual(high_compact.origin_mm.to_dict(), {"x": 0.0, "y": 0.0, "z": 10.0})
-        self.assertEqual(high_exploded.view_role, EXPLODED_OCCURRENCE_ROLE)
-        self.assertTrue(high_exploded.linked_component)
-
+        self.assertEqual(len(plan.grid_positioned_blanks), 0)
+        self.assertEqual(plan.module_component_count, 1)
+        self.assertEqual(plan.multi_layer_grid_module_count, 0)
+        self.assertEqual(plan.grid_modules_with_z_placement_count, 0)
+        self.assertEqual(plan.grid_module_height_variant_count, 0)
+        self.assertEqual(len(plan.compact_occurrences), 1)
+        self.assertEqual(len(plan.exploded_occurrences), 1)
+        self.assertEqual(len(plan.rejected_grid_modules), 1)
+        self.assertEqual(plan.rejected_grid_modules[0].code, "DIMENSIONS_INCOMPATIBLE")
+        self.assertIn("cannot fit inside the box", plan.rejected_grid_modules[0].message)
         plan_dict = plan.to_dict()
-        self.assertEqual(plan_dict["multi_layer_grid_modules"], 1)
-        self.assertEqual(plan_dict["grid_modules_with_z_placement"], 1)
-        self.assertEqual(plan_dict["grid_module_height_variants"], 2)
-        self.assertEqual(
-            plan_dict["grid_positioned_blanks"][1]["grid_size_units"],
-            {"x": 2, "y": 2, "z": 2},
-        )
+        self.assertEqual(plan_dict["multi_layer_grid_modules"], 0)
+        self.assertEqual(plan_dict["grid_modules_with_z_placement"], 0)
+        self.assertEqual(plan_dict["grid_module_height_variants"], 0)
+        self.assertEqual(plan_dict["rejected_grid_modules"][0]["code"], "DIMENSIONS_INCOMPATIBLE")
 
     def test_builds_basic_exploded_view_from_linked_compact_and_grid_occurrences(self) -> None:
-        payload = _cad_ir_payload_from_example("simple_asset_executable_plan.json")
+        payload = _asset_product_payload_with_manual_blank()
 
         plan = generation_plan_from_cad_ir(payload)
 
@@ -1311,21 +1287,21 @@ class FusionSkeletonTests(unittest.TestCase):
         grid_exploded = plan.exploded_occurrences[1]
 
         self.assertEqual(compact_occurrence.view_role, COMPACT_OCCURRENCE_ROLE)
-        self.assertEqual(compact_occurrence.component_id, "manual-reference-bin-01-body")
-        self.assertEqual(compact_occurrence.origin_mm.to_dict(), {"x": 0.8, "y": 0.8, "z": 0.0})
+        self.assertEqual(compact_occurrence.component_id, "manual-debug-reference-body")
+        self.assertEqual(compact_occurrence.origin_mm.to_dict(), {"x": 0.0, "y": 0.0, "z": 25.0})
         self.assertEqual(compact_exploded.view_role, EXPLODED_OCCURRENCE_ROLE)
         self.assertEqual(compact_exploded.operation_kind, LINKED_OCCURRENCE_OPERATION_KIND)
         self.assertTrue(compact_exploded.linked_component)
         self.assertEqual(compact_exploded.component_id, compact_occurrence.component_id)
-        self.assertEqual(compact_exploded.source_body_id, "manual-reference-bin-01-body")
-        self.assertEqual(compact_exploded.occurrence_name, "manual-reference-bin-01 rectangular blank exploded occurrence")
+        self.assertEqual(compact_exploded.source_body_id, "manual-debug-reference-body")
+        self.assertEqual(compact_exploded.occurrence_name, "manual-debug-reference rectangular blank exploded occurrence")
         self.assertEqual(compact_exploded.origin_mm.to_dict(), {"x": 140.0, "y": 0.0, "z": 0.0})
         self.assertEqual(
             grid_exploded.occurrence_name,
             "generated - asset-group-candidate - tokens - store - exact grid positioned rectangular blank exploded occurrence",
         )
-        self.assertAlmostEqual(grid_exploded.origin_mm.x, 179.2)
-        self.assertEqual(grid_exploded.origin_mm.y, 0.0)
+        self.assertAlmostEqual(grid_exploded.origin_mm.x, 140.0)
+        self.assertEqual(grid_exploded.origin_mm.y, 20.0)
         self.assertEqual(grid_exploded.origin_mm.z, 0.0)
         plan_dict = plan.to_dict()
         exploded_occurrence_dict = plan_dict["exploded_occurrences"][0]
@@ -1334,26 +1310,25 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(
             exploded_occurrence_dict["occurrence_name_policy"],
             OCCURRENCE_NAME_POLICY_COMPONENT_SOURCE,
-    P12_PARAMETRIC_FIELD_DEFAULTS,
         )
         self.assertFalse(exploded_occurrence_dict["direct_occurrence_rename"])
         self.assertTrue(plan_dict["linked_exploded_occurrences"])
 
     def test_compact_only_generation_mode_disables_exploded_view(self) -> None:
-        payload = _cad_ir_payload_from_example("simple_asset_executable_plan.json")
+        payload = _cad_ir_payload_from_example("simple_asset_product_scene.json")
 
         plan = generation_plan_from_cad_ir(
             payload,
             generation_mode=FUSION_GENERATION_MODE_COMPACT_ONLY,
         )
 
-        self.assertEqual(len(plan.blanks), 1)
+        self.assertEqual(len(plan.blanks), 0)
         self.assertEqual(len(plan.grid_positioned_blanks), 1)
         self.assertEqual(len(plan.exploded_occurrences), 0)
-        self.assertEqual(plan.created_object_count, 3)
+        self.assertEqual(plan.created_object_count, 2)
 
     def test_rejects_unknown_generation_mode_for_generation_plan(self) -> None:
-        payload = _cad_ir_payload_from_example("simple_asset_executable_plan.json")
+        payload = _cad_ir_payload_from_example("simple_asset_product_scene.json")
 
         with self.assertRaisesRegex(FusionSkeletonError, "Unsupported Fusion generation mode"):
             generation_plan_from_cad_ir(payload, generation_mode="explode_everything")
@@ -1369,7 +1344,9 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("volumetric_grid", plan.rejected_grid_modules[0].constraint_ref)
 
     def test_rejects_grid_placement_collision_with_existing_blank(self) -> None:
-        payload = _cad_ir_payload_from_example("simple_asset_executable_plan.json")
+        payload = _asset_product_payload_with_manual_blank()
+        payload["components"][0]["body"]["theoretical_origin_mm"] = {"x": 0.0, "y": 0.0, "z": 0.0}
+        payload["components"][0]["body"]["printable_origin_mm"] = {"x": 0.0, "y": 0.0, "z": 0.0}
         placement = payload["metadata"]["executable_asset_plan"]["placements"][0]
         placement["origin_mm"] = {"x": 0.0, "y": 0.0, "z": 0.0}
         placement["theoretical_grid_origin_mm"] = {"x": 0.0, "y": 0.0, "z": 0.0}
@@ -1380,7 +1357,7 @@ class FusionSkeletonTests(unittest.TestCase):
             generation_plan_from_cad_ir(payload)
 
     def test_rejects_grid_placement_outside_reference_box(self) -> None:
-        payload = _cad_ir_payload_from_example("simple_asset_executable_plan.json")
+        payload = _cad_ir_payload_from_example("simple_asset_product_scene.json")
         placement = payload["metadata"]["executable_asset_plan"]["placements"][0]
         placement["origin_mm"] = {"x": 120.0, "y": 0.0, "z": 0.0}
         placement["theoretical_grid_origin_mm"] = {"x": 120.0, "y": 0.0, "z": 0.0}
@@ -1742,6 +1719,36 @@ def _cad_ir_payload_from_example(filename: str) -> dict:
     config = load_config(ROOT / "examples" / filename)
     layout = generate_basic_layout(config)
     return build_blank_cad_scene(config, layout).to_dict()
+
+
+def _asset_product_payload_with_manual_blank() -> dict:
+    payload = _cad_ir_payload_from_example("simple_asset_product_scene.json")
+    payload.setdefault("components", []).append(
+        {
+            "id": "component:manual-debug-reference",
+            "name": "manual-debug-reference",
+            "module_id": "manual-debug-reference",
+            "instance_id": "manual-debug-reference-01",
+            "functional_type": "utility",
+            "body": {
+                "id": "manual-debug-reference-body",
+                "name": "manual-debug-reference rectangular blank",
+                "kind": "rectangular_blank",
+                "theoretical_origin_mm": {"x": 0.0, "y": 0.0, "z": 25.0},
+                "theoretical_size_mm": {"x": 10.0, "y": 10.0, "z": 5.0},
+                "printable_origin_mm": {"x": 0.0, "y": 0.0, "z": 25.0},
+                "printable_size_mm": {"x": 10.0, "y": 10.0, "z": 5.0},
+                "operations": [
+                    {
+                        "id": "operation:create-manual-debug-reference",
+                        "kind": "create_rectangular_prism",
+                        "parameters": {"source": "test_manual_blank"},
+                    }
+                ],
+            },
+        }
+    )
+    return payload
 
 
 if __name__ == "__main__":

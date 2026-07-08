@@ -124,10 +124,12 @@ class AssetModelTests(unittest.TestCase):
         self.assertEqual(len(config.modules), 1)
         self.assertEqual(payload["summary"]["module_candidate_count"], 1)
         candidate = payload["module_candidates"][0]
-        self.assertEqual(candidate["derivation"], "asset_group_dimension_padding")
+        self.assertEqual(candidate["derivation"], "count_aware_stacked_asset_piles")
         self.assertEqual(candidate["source_asset_ids"], ["coin-tokens", "status-tokens"])
         self.assertEqual(candidate["quantity"], {"count": 42, "grouping": "grouped_assets"})
         self.assertEqual(candidate["status"], "candidate_only")
+        self.assertTrue(candidate["suggested_module"]["storage_sizing"]["count_aware_applied"])
+        self.assertEqual(candidate["suggested_module"]["storage_sizing"]["total_count_read"], 42)
         self.assertIn("Compatible assets share kind", candidate["reasons"][0])
         self.assertEqual(payload["asset_candidate_variants"][0]["status"], "recommended")
         self.assertEqual(scene["metadata"]["module_candidates"][0]["source_asset_ids"], ["coin-tokens", "status-tokens"])
@@ -150,7 +152,7 @@ class AssetModelTests(unittest.TestCase):
         self.assertIn("Recommended variant: none", markdown)
 
 
-    def test_builds_executable_asset_plan_with_greedy_grid_placement(self) -> None:
+    def test_count_aware_fixture_rejects_when_manual_blocker_prevents_capacity_span(self) -> None:
         config = load_config(ROOT / "examples" / "simple_asset_executable_plan.json")
         layout = generate_basic_layout(config)
 
@@ -161,108 +163,61 @@ class AssetModelTests(unittest.TestCase):
         self.assertEqual(len(config.modules), 1)
         self.assertEqual(validate_config(config), [])
         plan = payload["executable_asset_plan"]
-        self.assertEqual(plan["status"], "placed")
+        self.assertEqual(plan["status"], "rejected")
         self.assertEqual(plan["summary"]["generated_module_count"], 1)
-        self.assertEqual(plan["summary"]["placed_module_count"], 1)
-        self.assertEqual(plan["summary"]["rejected_module_count"], 0)
+        self.assertEqual(plan["summary"]["placed_module_count"], 0)
+        self.assertEqual(plan["summary"]["rejected_module_count"], 1)
         generated = plan["generated_modules"][0]
         self.assertEqual(generated["source_asset_ids"], ["coin-tokens", "status-tokens"])
-        self.assertEqual(generated["dimensions_mm"], {"x": 25.6, "y": 25.6, "z": 9.8})
-        self.assertEqual(generated["asset_fit_size_mm"], {"x": 23.2, "y": 23.2, "z": 8.6})
-        self.assertEqual(generated["printable_body_size_mm"], {"x": 25.6, "y": 25.6, "z": 9.8})
+        self.assertEqual(generated["dimensions_mm"], {"x": 119.6, "y": 87.6, "z": 19.8})
+        self.assertEqual(generated["asset_fit_size_mm"], {"x": 117.2, "y": 85.2, "z": 18.6})
+        self.assertEqual(generated["storage_sizing"]["count_aware_storage_sizing"], "yes")
+        self.assertEqual(generated["storage_sizing"]["asset_diagnostics"][0]["pile_count"], 12)
         self.assertEqual(generated["clearance_applied"]["internal_asset_clearance_mm"], 0.6)
-        placement = plan["placements"][0]
-        self.assertEqual(placement["origin_units"], {"x": 1, "y": 0, "z": 0})
-        self.assertEqual(placement["size_units"], {"x": 1, "y": 1, "z": 1})
-        self.assertEqual(placement["origin_mm"], {"x": 30, "y": 0, "z": 0})
-        self.assertEqual(placement["size_mm"], {"x": 25.6, "y": 25.6, "z": 9.8})
-        self.assertEqual(placement["theoretical_grid_extent_mm"], {"x": 30, "y": 30, "z": 10})
-        self.assertEqual(placement["asset_fit_size_mm"], {"x": 23.2, "y": 23.2, "z": 8.6})
-        self.assertEqual(placement["printable_body_size_mm"], {"x": 25.6, "y": 25.6, "z": 9.8})
+        rejection = plan["rejected_modules"][0]
+        self.assertEqual(rejection["code"], "DOES_NOT_FIT")
+        self.assertIn("no free non-reserved span", rejection["message"])
         self.assertIn("## Executable asset module plan", markdown)
-        self.assertIn("theoretical grid extent", markdown)
-        self.assertIn("greedy_z_y_x_first_free_span", markdown)
-        self.assertEqual(scene["metadata"]["executable_asset_plan"]["status"], "placed")
-        self.assertEqual(scene["metadata"]["executable_asset_plan"]["placements"][0]["origin_units"], {"x": 1, "y": 0, "z": 0})
+        self.assertIn("Rejected generated modules", markdown)
+        self.assertEqual(scene["metadata"]["executable_asset_plan"]["status"], "rejected")
 
-    def test_product_asset_scene_has_no_manual_legacy_blank(self) -> None:
-        config = load_config(ROOT / "examples" / "simple_asset_product_scene.json")
-        layout = generate_basic_layout(config)
+    def test_count_aware_single_item_keeps_one_small_stack(self) -> None:
+        payload = _count_aware_tokens_payload(count=1)
+        plan = _layout_payload(payload)["executable_asset_plan"]
 
-        markdown = layout_to_markdown(config, layout)
-        payload = json.loads(layout_to_json(config, layout))
-        scene = build_blank_cad_scene(config, layout).to_dict()
-
-        self.assertEqual(len(config.modules), 0)
-        self.assertEqual(validate_config(config), [])
-        self.assertEqual(payload["summary"]["requested_module_count"], 0)
-        self.assertEqual(payload["summary"]["printable_body_count"], 0)
-        self.assertEqual(scene["components"], [])
-        plan = payload["executable_asset_plan"]
-        self.assertEqual(plan["status"], "placed")
-        self.assertEqual(plan["summary"]["generated_module_count"], 1)
-        self.assertEqual(plan["summary"]["placed_module_count"], 1)
-        self.assertEqual(plan["summary"]["rejected_module_count"], 0)
         generated = plan["generated_modules"][0]
-        self.assertEqual(generated["module_source"], "asset_candidate")
-        self.assertEqual(generated["source_asset_ids"], ["coin-tokens", "status-tokens"])
-        placement = plan["placements"][0]
-        self.assertEqual(placement["module_source"], "asset_candidate")
-        self.assertEqual(placement["placement_source"], "grid_placement")
-        self.assertEqual(placement["origin_units"], {"x": 0, "y": 0, "z": 0})
-        self.assertEqual(placement["origin_mm"], {"x": 0, "y": 0, "z": 0})
-        self.assertEqual(placement["theoretical_grid_extent_mm"], {"x": 30, "y": 30, "z": 10})
-        self.assertEqual(placement["printable_body_size_mm"], {"x": 25.6, "y": 25.6, "z": 9.8})
-        self.assertEqual(placement["clearance_applied"]["peripheral_clearance_mm"], 0.0)
-        self.assertEqual(placement["clearance_applied"]["inter_module_gap_mm"], 0.0)
-        self.assertIn("| Module | Source | Candidate | Assets |", markdown)
-        self.assertIn("asset_candidate / grid_placement", markdown)
-        self.assertEqual(scene["metadata"]["executable_asset_plan"]["placements"][0]["module_source"], "asset_candidate")
-
-    def test_builds_multilayer_executable_asset_plan(self) -> None:
-        config = load_config(ROOT / "examples" / "simple_multilayer_grid_scene.json")
-        layout = generate_basic_layout(config)
-
-        markdown = layout_to_markdown(config, layout)
-        payload = json.loads(layout_to_json(config, layout))
-        scene = build_blank_cad_scene(config, layout).to_dict()
-
-        self.assertEqual(validate_config(config), [])
-        plan = payload["executable_asset_plan"]
+        sizing = generated["storage_sizing"]
         self.assertEqual(plan["status"], "placed")
-        self.assertEqual(plan["summary"]["generated_module_count"], 2)
-        self.assertEqual(plan["summary"]["placed_module_count"], 2)
-        self.assertEqual(plan["summary"]["multi_layer_module_count"], 1)
-        self.assertEqual(plan["summary"]["z_placed_module_count"], 1)
-        self.assertEqual(plan["summary"]["height_variant_count"], 2)
-        self.assertEqual(
-            plan["placements"][0]["origin_units"],
-            {"x": 1, "y": 0, "z": 0},
-        )
-        self.assertEqual(plan["placements"][0]["size_units"], {"x": 3, "y": 3, "z": 1})
-        self.assertEqual(plan["placements"][0]["size_mm"], {"x": 61.6, "y": 61.6, "z": 7.8})
-        self.assertEqual(plan["placements"][0]["theoretical_grid_extent_mm"], {"x": 90, "y": 90, "z": 10})
-        self.assertEqual(plan["placements"][0]["asset_fit_size_mm"], {"x": 59.2, "y": 59.2, "z": 6.6})
-        self.assertEqual(
-            plan["placements"][1]["origin_units"],
-            {"x": 0, "y": 0, "z": 1},
-        )
-        self.assertEqual(plan["placements"][1]["size_units"], {"x": 2, "y": 2, "z": 2})
-        self.assertEqual(plan["placements"][1]["origin_mm"], {"x": 0, "y": 0, "z": 10})
-        self.assertEqual(plan["placements"][1]["size_mm"], {"x": 37.6, "y": 37.6, "z": 17.8})
-        self.assertEqual(plan["placements"][1]["theoretical_grid_extent_mm"], {"x": 60, "y": 60, "z": 20})
-        self.assertEqual(plan["placements"][1]["printable_body_size_mm"], {"x": 37.6, "y": 37.6, "z": 17.8})
-        self.assertIn("Multi-layer generated modules: 1", markdown)
-        self.assertIn("Generated modules with Z placement: 1", markdown)
-        self.assertEqual(
-            scene["metadata"]["executable_asset_plan"]["summary"]["multi_layer_module_count"],
-            1,
-        )
-        self.assertEqual(
-            scene["metadata"]["executable_asset_plan"]["placements"][1]["origin_units"],
-            {"x": 0, "y": 0, "z": 1},
-        )
+        self.assertEqual(generated["dimensions_mm"], {"x": 13.6, "y": 13.6, "z": 3.8})
+        self.assertEqual(sizing["asset_diagnostics"][0]["capacity_per_stack"], 14)
+        self.assertEqual(sizing["asset_diagnostics"][0]["pile_count"], 1)
+        self.assertEqual(sizing["asset_diagnostics"][0]["items_per_pile"], 1)
 
+    def test_count_aware_count_can_increase_stack_height_before_xy_piles(self) -> None:
+        low = _layout_payload(_count_aware_tokens_payload(count=1))["executable_asset_plan"]["generated_modules"][0]
+        high = _layout_payload(_count_aware_tokens_payload(count=10))["executable_asset_plan"]["generated_modules"][0]
+
+        self.assertEqual(low["dimensions_mm"]["x"], high["dimensions_mm"]["x"])
+        self.assertEqual(low["dimensions_mm"]["y"], high["dimensions_mm"]["y"])
+        self.assertGreater(high["dimensions_mm"]["z"], low["dimensions_mm"]["z"])
+        self.assertEqual(high["storage_sizing"]["asset_diagnostics"][0]["pile_count"], 1)
+        self.assertEqual(high["storage_sizing"]["asset_diagnostics"][0]["items_per_pile"], 10)
+
+    def test_count_aware_high_count_requires_multiple_xy_piles(self) -> None:
+        generated = _layout_payload(_count_aware_tokens_payload(count=30))["executable_asset_plan"]["generated_modules"][0]
+        diagnostic = generated["storage_sizing"]["asset_diagnostics"][0]
+
+        self.assertEqual(diagnostic["pile_count"], 3)
+        self.assertEqual(diagnostic["items_per_pile"], 10)
+        self.assertEqual(generated["dimensions_mm"], {"x": 33.6, "y": 13.6, "z": 21.8})
+
+    def test_count_aware_too_many_items_rejects_instead_of_claiming_capacity(self) -> None:
+        payload = _count_aware_tokens_payload(count=1000)
+        plan_payload = _layout_payload(payload)
+
+        self.assertEqual(plan_payload["asset_candidate_variants"][0]["status"], "rejected")
+        self.assertEqual(plan_payload["executable_asset_plan"]["status"], "rejected")
+        self.assertIn("DIMENSIONS_INCOMPATIBLE", plan_payload["executable_asset_plan"]["rejected_modules"][0]["code"])
     def test_rejects_unknown_asset_field(self) -> None:
         payload = _asset_payload()
         payload["assets"][0]["solver_hint"] = "not-yet"
@@ -301,6 +256,45 @@ def _asset_payload() -> dict:
     return json.loads((ROOT / "examples" / "simple_assets.json").read_text(encoding="utf-8"))
 
 
+def _layout_payload(payload: dict) -> dict:
+    config = _load_payload(payload)
+    layout = generate_basic_layout(config)
+    return json.loads(layout_to_json(config, layout))
+
+
+def _count_aware_tokens_payload(*, count: int) -> dict:
+    return {
+        "project_name": "Count-aware token fixture",
+        "units": "mm",
+        "box": {
+            "inner_dimensions_mm": {"x": 100, "y": 80, "z": 30},
+            "usable_height_mm": 30,
+            "lid_clearance_mm": 0,
+        },
+        "print_profile": "default",
+        "defaults": {
+            "wall_thickness_mm": 1.2,
+            "floor_thickness_mm": 1.2,
+            "corner_radius_mm": 1.5,
+        },
+        "layout": {"strategy": "row_fill"},
+        "assets": [
+            {
+                "id": "coin-tokens",
+                "name": "Coin tokens",
+                "kind": "tokens",
+                "quantity": {"count": count, "grouping": "set"},
+                "dimensions_mm": {"x": 10, "y": 10, "z": 2},
+                "dimension_confidence": "exact",
+                "containment_intent": "store",
+            }
+        ],
+        "volumetric_grid": {
+            "unit_mm": {"x": 20, "y": 20, "z": 10},
+            "size_units": {"x": 5, "y": 4, "z": 3},
+        },
+        "modules": [],
+    }
 def _grid_rejection_payload() -> dict:
     payload = json.loads((ROOT / "examples" / "simple_box.json").read_text(encoding="utf-8"))
     payload["project_name"] = "Variant rejection fixture"

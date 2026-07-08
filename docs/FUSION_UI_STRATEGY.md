@@ -364,3 +364,9 @@ Les entrees sont separees par `;` ou par saut de ligne. Les types UI V0 sont `to
 La commande genere une config temporaire BGIG stricte depuis les champs boite/grille/parois/clearances/profil et `assets[]`, puis reutilise le pipeline existant : assets charges, `module_candidates`, variante recommandee, `executable_asset_plan`, CAD IR et generation Fusion. Les assets invalides sont refuses dans le rapport sans bloquer si au moins un asset valide reste.
 
 Limites : pas de tableau avance, pas de palette HTML, pas de solveur complexe, pas de nouvelle geometrie Fusion, pas de validation d'impression.
+
+## P13-ASSET-M002 - Reporting et debug visuel count-aware
+
+`quick_asset_box` reste une commande Fusion classique. Le rapport affiche maintenant `count_aware_storage_sizing: yes|partial|no`, `asset_debug_visualization: yes/no`, les capacites par pile, nombres de piles, enveloppe `asset_fit`, taille module et garantie de capacite.
+
+Le debug visuel Fusion est minimal et non imprimable : un sketch `asset-fit debug outline` est cree sur le haut du module asset candidate pour montrer l'enveloppe XY retenue. Les assets individuels ne sont pas dessines et `asset_cavities_generated` reste `no`.
