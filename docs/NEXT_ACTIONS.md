@@ -18,15 +18,15 @@ structurant, authentification absente ou refus de push direct.
 
 ## Gate humaine active
 
-`P13-M001V - Valider quick_asset_box dans Fusion`.
+`P13-ASSET-M002 - Autoriser le sizing count-aware et le debug visuel asset`.
 
-Statut : action humaine requise dans Fusion 360. Codex a implemente `quick_asset_box`, corrige le KO d ouverture, puis corrige le KO partiel de lisibilite produit en rendant la V0 explicite : assets non visualises, cavites non generees, sizing non count-aware. La mission ne doit pas etre declaree `fusion-validated` avant smoke test humain.
+Statut : gate produit active. `P13-M001V` est validee humainement comme V0 honnete, mais les limites confirmees ouvrent une decision produit avant implementation : traiter ou non le `count` comme capacite de stockage reelle, definir jusqu'ou visualiser les assets, et cadrer les cavites/logements sans ajouter de solveur complexe premature.
 
-Smoke attendu : ouvrir un document Assembly-compatible, ouvrir BGIG, confirmer `Input mode = quick_asset_box`, verifier les valeurs rehydratees et le champ assets, lancer `generate`, verifier assets lus, candidats, module(s) places, `asset_items_visualized: no`, `asset_cavities_generated: no`, `count_aware_storage_sizing: no`, les diagnostics `asset_sizing`/`module_candidate_sizing`, le repere de volume boite par outlines bas/haut, `Body sizing report`, registry OK et `Print validation: false`, rouvrir BGIG, modifier un asset ou une dimension, lancer `regenerate`, verifier absence de doublon, puis `clear_bgig_scene` en preservant les objets non-BGIG.
+Decision attendue : autoriser une mission bornee de sizing count-aware/reporting capacite, ou reporter cette capacite et rester sur le proxy asset-first V0.
 
 ## Mission ready non gated
 
-Aucune mission produit non-gated supplementaire n'est recommandee avant validation humaine `P13-M001V`.
+Aucune mission produit non-gated supplementaire n'est recommandee avant decision humaine sur `P13-ASSET-M002`.
 
 ## Regle operationnelle Fusion
 
@@ -41,7 +41,7 @@ Fusion restantes a Thomas.
 
 `P10-SOLVER-GATE - Solveur complexe, backtracking ou optimisation globale`.
 
-Palette persistante HTML, UI assets avancee/tableau, sizing count-aware reel, solveur plus automatique, cavites/logements assets, nouvelle geometrie Fusion produit, export imprimable et validation d'impression restent gates ou missions separees.
+Palette persistante HTML, UI assets avancee/tableau, sizing count-aware reel, solveur plus automatique, cavites/logements assets, nouvelle geometrie Fusion produit, export imprimable et validation d'impression restent gates ou missions separees. P13-M001V ne valide pas ces capacites.
 
 ## Fin de chaque mission
 

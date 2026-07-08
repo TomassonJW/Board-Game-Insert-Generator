@@ -438,7 +438,7 @@ Comportement implemente : champ texte editable `Assets (quick_asset_box)` au for
 
 Limites : pas de tableau assets avance, pas de palette HTML persistante, pas de solveur complexe, pas de cavites/logements assets, pas d'assets Fusion individuels, pas d'export STL/3MF, pas de validation d'impression. Le `count` est lu, persiste et reporte, mais P13-M001 V0 ne l'utilise pas encore pour multiplier footprint, hauteur, nombre de modules ou cavites : le sizing reste une enveloppe representative du plus grand asset du groupe plus clearances/murs/plancher. Un repere visuel minimal de volume boite est ajoute via outlines XY bas/haut non imprimables. Le profil UI `draft` est conserve dans les settings et mappe vers le profil moteur existant `fast_draft` seulement pour la config temporaire `quick_asset_box`.
 
-Statut : `implemented-fusion`, gate humaine `P13-M001V` requise avant de declarer `fusion-validated`. Premier essai P13-M001V KO a l ouverture de la commande Fusion par constante UI manquante `QUICK_ASSET_BOX_ASSETS_INPUT_ID`; correction appliquee avec test de regression AST et add-in reinstalle. Deuxieme essai P13-M001V KO partiel apres `859bc7b` : generation fonctionnelle mais V0 trompeuse sur le count et les assets non visualises; correction appliquee pour rendre le reporting honnete, expliciter les limites bloquantes et ajouter les outlines bas/haut du volume boite.
+Statut : `fusion-validated-v0` pour `P13-M001V` apres validation humaine Fusion du 2026-07-08 sur `bec0352`. Le mode `quick_asset_box` est valide comme UI asset-first V0 honnete : ouverture commande, champ assets persiste/prefilled, generate/regenerate/clear, module proxy asset-first, diagnostics de limites, registry OK et preservation des objets non-BGIG. Limites non validees et non implementees : assets individuels non visualises, cavites/logements non generes, sizing non count-aware, aucune garantie de capacite reelle, aucune impression 3D validee. Historique : premier essai P13-M001V KO a l ouverture par constante UI manquante `QUICK_ASSET_BOX_ASSETS_INPUT_ID`; deuxieme essai KO partiel apres `859bc7b` par reporting V0 trop trompeur; correction `bec0352` validee humainement.
 
 ## Tests et verifications connus
 
@@ -467,7 +467,8 @@ Derniere verification pendant `P13-M001 - quick_asset_box UI V0 / correction P13
 - `scripts/fusion/check_installed_addin.ps1` : OK avec marqueurs P13 renforces, incluant diagnostics non count-aware.
 - `git diff --check` : OK.
 - `rg -n "adsk" src/board_game_insert_generator` : OK, aucune occurrence dans le coeur Python.
-- Validation Fusion reelle : `P13-M001V` requise. Impression 3D non validee.
+- Validation Fusion reelle : `P13-M001V` OK le 2026-07-08 apres correction `bec0352`, comme V0 honnete avec limites explicites. Impression 3D non validee.
+
 Derniere verification pendant `P12-M002V7 - Registry BGIG et inspect read-only` :
 
 - `python -m unittest discover -s tests` : OK, 169 tests passes.
