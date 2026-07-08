@@ -1,6 +1,6 @@
 # Status
 
-Derniere mise a jour : 2026-07-08
+Derniere mise a jour : 2026-07-09
 
 ## Etat global
 
@@ -534,4 +534,17 @@ Limites maintenues : assets individuels non visualises, pas de cavites par pile,
 
 Verifications realisees pendant P13-ASSET-M003 : suite unitaire complete OK (`185 tests`), `py_compile` add-in OK, CLI Markdown/JSON/export CAD IR OK sur les exemples P12/P13 pertinents, `prepare_quick_asset_test.ps1 -DryRun` OK, `prepare_quick_asset_test.ps1` OK avec add-in installe, `check_installed_addin.ps1` OK, `git diff --check` OK, `rg -n "adsk" src/board_game_insert_generator` sans occurrence.
 
-Statut : `implemented`, `manual_validation_required` pour `P13-ASSET-M003V`, `print-validated: false`.
+Statut : `fusion-validated-v0` apres validation humaine Fusion `P13-ASSET-M003V` confirmee le 2026-07-09 sur `04dfdb6`, `print-validated: false`.
+
+
+## P13-ASSET-M003V - Validation Fusion asset-fit cavity V0
+
+Validation humaine Fusion confirmee le 2026-07-09 sur `04dfdb6`.
+
+Resultats observes : add-in reinstalle par scripts Codex, document Fusion Assembly-compatible, `quick_asset_box` charge avec champ assets pre-rempli, `generate` OK, module exterieur count-aware genere, vraie cavite rectangulaire top-open coupee dans le body et non limitee a un sketch.
+
+Le rapport valide `count_aware_storage_sizing: yes`, `asset_cavities_generated: yes`, `asset_cavity_policy: single_asset_fit_rectangular_cavity_v0`, `asset_fit_cavities_planned: 1`, `Asset-fit cavities generated: 1`, `Rectangular cavity cuts: 1`, module environ `50.0 x 39.0 x 48.0 mm`, cavite environ `47.6 x 36.6 x 46.8 mm`, fond restant `1.2 mm`, murs attendus `1.2 mm`, `asset_items_visualized: no`, `Body sizing report`, `Registry validation: ok` et `Print validation: false`.
+
+Regenerate valide : modification d'un count ou d'une dimension, module + cavite recalcules sans doublon. Clear final valide : `clear_bgig_scene` fonctionne et preserve les objets non-BGIG.
+
+Limites maintenues : assets individuels non visualises, cavites par pile/item non generees, pas de solveur global, pas d'optimisation avancee, capacite encore heuristique, aucune impression 3D validee.

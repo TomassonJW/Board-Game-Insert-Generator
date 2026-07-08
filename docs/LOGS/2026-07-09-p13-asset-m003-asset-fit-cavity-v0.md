@@ -22,7 +22,7 @@ Implementer la premiere cavite asset-first V0 depuis l'enveloppe count-aware `as
 
 ## Gate suivante
 
-`P13-ASSET-M003V` : validation humaine Fusion obligatoire avant mission produit suivante.
+`P13-ASSET-M003V` : validation humaine Fusion obligatoire avant mission produit suivante. Validation confirmee le 2026-07-09 ; la gate active suivante est `P13-ASSET-M004-GATE`.
 
 ## Verifications
 
@@ -34,3 +34,7 @@ Implementer la premiere cavite asset-first V0 depuis l'enveloppe count-aware `as
 - `scripts/fusion/check_installed_addin.ps1` : OK.
 - `git diff --check` : OK.
 - `rg -n "adsk" src/board_game_insert_generator` : aucune occurrence.
+
+## Validation Fusion
+
+`P13-ASSET-M003V` validee humainement le 2026-07-09 sur `04dfdb6`. La cavite asset-fit globale est visible comme vraie coupe top-open dans le body, regenerate et clear sont valides, `print-validated: false` reste explicite.

@@ -1,6 +1,6 @@
 # Backlog
 
-Derniere mise a jour : 2026-07-07
+Derniere mise a jour : 2026-07-09
 
 Le backlog transforme la North Star en missions atomiques. Chaque mission future
 doit indiquer au minimum : ID, titre, capability liee, milestone lie, objectif,
@@ -771,8 +771,8 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Livrable : metadata `asset_fit_cavity`, conversion en `FusionCavityCutPlan`, reporting `asset_cavity_policy`, compteurs planned/generated, diagnostics fond/murs, scripts smoke M003.
 - Criteres d'acceptation : module count-aware conserve, cavite top-open reelle correspondant a `asset_fit`, fond et murs coherents avec wall/floor, pas de cavites par pile, pas d'assets individuels, regenerate/clear conserves, coeur Python sans `adsk`.
 - Tests : unitaires assets et Fusion skeleton, py_compile add-in, CLI Markdown/JSON/export CAD IR, scripts Fusion dry-run/reel, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
-- Gate : validation humaine Fusion `P13-ASSET-M003V` requise avant mission suivante.
-- Statut : `done`, `manual_validation_required`, `print-validated: false`.
+- Gate : validation humaine Fusion `P13-ASSET-M003V` realisee le 2026-07-09 sur `04dfdb6`.
+- Statut : `done`, `fusion-validated-v0`, `print-validated: false`.
 
 ### P13-ASSET-M003V - Valider la cavite asset-fit globale dans Fusion
 
@@ -781,5 +781,15 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Objectif : verifier dans Fusion que `quick_asset_box` genere un module count-aware creuse par une cavite rectangulaire asset-fit globale.
 - Livrable : smoke test humain Fusion avec generate, regenerate, clear et rapport.
 - Criteres d'acceptation : `asset_cavities_generated: yes`, `asset_cavity_policy: single_asset_fit_rectangular_cavity_v0`, cavite visible, fond/murs reportes, assets individuels non visualises, pas de doublon apres regenerate, non-BGIG preserve, `Print validation: false`.
-- Gate : action humaine Thomas requise.
-- Statut : `manual_validation_required`.
+- Gate : action humaine Thomas realisee le 2026-07-09.
+- Statut : `done`, `fusion-validated-v0`, `print-validated: false`.
+
+
+### P13-ASSET-M004-GATE - Decider la prochaine etape asset-first
+
+- Capability : C-ASSET, C-FUSION-CAVITIES, C-FUSION-UI, C-SOLVER ou C-CALIBRATION selon decision.
+- Milestone : M14 Usable beta / M5 CAD cavities / M10 Solver / M11 Physical validation selon decision.
+- Objectif : choisir la prochaine mission apres validation de la cavite asset-fit globale V0.
+- Options candidates : cavites par pile/item, visualisation/proxies d'assets, sizing capacitaire plus garanti, traitement cartes/decks, UI assets avancee/tableau, calibration/impression, ou maintien du scope V0.
+- Gate : decision humaine produit requise avant toute mission produit suivante.
+- Statut : `ready-gated`.
