@@ -927,6 +927,9 @@ def _generation_result_message(
         "Occurrence Browser names: Fusion-generated; BGIG source Component names and plan roles are authoritative.\n"
         f"Grid-positioned modules refused: {len(generation_plan.rejected_grid_modules)}\n"
         f"Rectangular cavity cuts: {result['cavity_cuts']}\n"
+        f"Asset cavity policy: {result['asset_cavity_policy']}\n"
+        f"Asset-fit cavities planned: {result['asset_fit_cavities_planned']}\n"
+        f"Asset-fit cavities generated: {result['asset_fit_cavities_generated']}\n"
         f"Simple finger notch features planned: {result['finger_notch_features_planned']}\n"
         f"Simple finger notch sketches: {result['finger_notch_sketches']}\n"
         f"Simple top-open finger notch cuts: {result['finger_notch_cuts']}\n"
@@ -960,6 +963,9 @@ def _stable_generation_result(result: dict[str, object]) -> dict[str, object]:
         "legacy_bodies_created": 0,
         "linked_exploded_occurrences": "no",
         "cavity_cuts": 0,
+        "asset_cavity_policy": "none",
+        "asset_fit_cavities_planned": 0,
+        "asset_fit_cavities_generated": 0,
         "finger_notch_features_planned": 0,
         "finger_notch_sketches": 0,
         "finger_notch_cuts": 0,
@@ -1591,6 +1597,10 @@ def _generate_from_plan(design, plan: FusionGenerationPlan, registry: BgigFusion
 
     source_blanks_by_id = {blank.cad_id: blank for blank in source_blanks}
 
+    asset_fit_cavity_cuts_planned = sum(
+        1 for cavity_cut in plan.cavity_cuts if getattr(cavity_cut, "cavity_source", "") == "asset_fit_cavity"
+    )
+    asset_fit_cavity_cuts_generated = 0
     cavity_cut_count = 0
     for cavity_cut in plan.cavity_cuts:
         target_body = created_bodies.get(cavity_cut.target_body_id)
@@ -1610,6 +1620,8 @@ def _generate_from_plan(design, plan: FusionGenerationPlan, registry: BgigFusion
             scene_id,
         )
         cavity_cut_count += 1
+        if getattr(cavity_cut, "cavity_source", "") == "asset_fit_cavity":
+            asset_fit_cavity_cuts_generated += 1
 
     finger_notch_sketch_count = 0
     finger_notch_cut_count = 0
@@ -1682,6 +1694,9 @@ def _generate_from_plan(design, plan: FusionGenerationPlan, registry: BgigFusion
         "legacy_bodies_created": 0,
         "linked_exploded_occurrences": "yes" if plan.linked_exploded_occurrences else "no",
         "cavity_cuts": cavity_cut_count,
+        "asset_cavity_policy": "single_asset_fit_rectangular_cavity_v0" if asset_fit_cavity_cuts_planned else "none",
+        "asset_fit_cavities_planned": asset_fit_cavity_cuts_planned,
+        "asset_fit_cavities_generated": asset_fit_cavity_cuts_generated,
         "finger_notch_features_planned": len(plan.finger_notch_cuts),
         "finger_notch_sketches": finger_notch_sketch_count,
         "finger_notch_cuts": finger_notch_cut_count,

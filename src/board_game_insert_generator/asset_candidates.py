@@ -33,6 +33,13 @@ _FUNCTIONAL_TYPE_BY_ASSET_KIND = {
 }
 _COUNT_AWARE_STACK_KINDS = {AssetKind.TOKENS, AssetKind.DICE, AssetKind.MEEPLES, AssetKind.OTHER}
 _TOTAL_STACK_Z_KINDS = {AssetKind.CARDS, AssetKind.SLEEVED_CARDS}
+_ASSET_FIT_CAVITY_SUPPORTED_FUNCTIONAL_TYPES = {
+    FunctionalType.TOKENS.value,
+    FunctionalType.DICE.value,
+    FunctionalType.MEEPLES.value,
+    FunctionalType.OTHER.value,
+}
+_ASSET_FIT_CAVITY_POLICY = "single_asset_fit_rectangular_cavity_v0"
 
 
 def build_module_candidates_from_assets(config: InsertConfig) -> list[dict[str, Any]]:
@@ -673,6 +680,7 @@ def build_executable_asset_module_plan(config: InsertConfig) -> dict[str, Any]:
                 "theoretical_grid_extent_mm": _grid_size_to_mm(size_units, grid.unit_size_mm),
                 "asset_fit_size_mm": dict(module["asset_fit_size_mm"]),
                 "storage_sizing": dict(module.get("storage_sizing", {})),
+                "asset_fit_cavity": dict(module.get("asset_fit_cavity", {})),
                 "printable_body_origin_mm": _grid_origin_to_mm(origin, grid.unit_size_mm),
                 "printable_body_size_mm": dict(module["printable_body_size_mm"]),
                 "source_size_mm": dict(module["printable_body_size_mm"]),
@@ -877,8 +885,22 @@ def _generated_module_from_candidate(candidate: dict[str, Any]) -> dict[str, Any
     constraints = candidate.get("constraints", {})
     dimensions_mm = dict(suggested["min_dimensions_mm"])
     inner_asset_envelope_mm = dict(suggested["inner_asset_envelope_mm"])
+    module_id = f"generated:{suggested['id']}"
+    clearance_applied = {
+        "internal_asset_clearance_mm": constraints.get("clearance_mm", 0.0),
+        "internal_asset_clearance_source": constraints.get("clearance_source", "unknown"),
+        "wall_thickness_mm": constraints.get("wall_thickness_mm", 0.0),
+        "floor_thickness_mm": constraints.get("floor_thickness_mm", 0.0),
+        "peripheral_clearance_mm": 0.0,
+        "inter_module_gap_mm": 0.0,
+        "note": (
+            "Generated asset modules use asset-fit clearance plus wall/floor defaults. "
+            "Face-role peripheral and inter-module tolerance shrinking is not applied "
+            "to this asset-first grid plan yet."
+        ),
+    }
     return {
-        "module_id": f"generated:{suggested['id']}",
+        "module_id": module_id,
         "candidate_id": candidate["candidate_id"],
         "module_source": "asset_candidate",
         "name": suggested["name"],
@@ -890,21 +912,95 @@ def _generated_module_from_candidate(candidate: dict[str, Any]) -> dict[str, Any
         "asset_fit_size_mm": inner_asset_envelope_mm,
         "printable_body_size_mm": dimensions_mm,
         "storage_sizing": dict(suggested.get("storage_sizing", {})),
-        "clearance_applied": {
-            "internal_asset_clearance_mm": constraints.get("clearance_mm", 0.0),
-            "internal_asset_clearance_source": constraints.get("clearance_source", "unknown"),
-            "wall_thickness_mm": constraints.get("wall_thickness_mm", 0.0),
-            "floor_thickness_mm": constraints.get("floor_thickness_mm", 0.0),
-            "peripheral_clearance_mm": 0.0,
-            "inter_module_gap_mm": 0.0,
-            "note": (
-                "Generated asset modules use asset-fit clearance plus wall/floor defaults. "
-                "Face-role peripheral and inter-module tolerance shrinking is not applied "
-                "to this asset-first grid plan yet."
-            ),
-        },
+        "asset_fit_cavity": _asset_fit_cavity_payload(
+            module_id=module_id,
+            functional_type=suggested["functional_type"],
+            asset_fit_size_mm=inner_asset_envelope_mm,
+            module_size_mm=dimensions_mm,
+            clearance_applied=clearance_applied,
+        ),
+        "clearance_applied": clearance_applied,
         "status": "generated_from_recommended_asset_variant",
         "fusion_generation": "use_printable_body_size_mm",
+    }
+
+
+def _asset_fit_cavity_payload(
+    *,
+    module_id: str,
+    functional_type: str,
+    asset_fit_size_mm: dict[str, float],
+    module_size_mm: dict[str, float],
+    clearance_applied: dict[str, Any],
+) -> dict[str, Any]:
+    wall = float(clearance_applied.get("wall_thickness_mm", 0.0) or 0.0)
+    floor = float(clearance_applied.get("floor_thickness_mm", 0.0) or 0.0)
+    base = {
+        "id": "asset-fit-cavity",
+        "policy": _ASSET_FIT_CAVITY_POLICY,
+        "module_id": module_id,
+        "functional_type": functional_type,
+        "item_cavity_policy": "no_individual_item_or_pile_cavities_v0",
+        "asset_items_visualized": False,
+        "fusion_generation": "subtract_rectangular_cavity",
+        "operation_kind": "subtract_rectangular_cavity",
+        "coordinate_frame": "body.local",
+    }
+    if functional_type not in _ASSET_FIT_CAVITY_SUPPORTED_FUNCTIONAL_TYPES:
+        return {
+            **base,
+            "status": "refused",
+            "code": "UNSUPPORTED_ASSET_CAVITY_TYPE",
+            "reason": f"Asset-fit cavity V0 supports tokens/dice/meeples/generic, got {functional_type}.",
+        }
+    if wall <= 0 or floor <= 0:
+        return {
+            **base,
+            "status": "refused",
+            "code": "MISSING_WALL_OR_FLOOR_THICKNESS",
+            "reason": "Asset-fit cavity requires positive wall_thickness_mm and floor_thickness_mm.",
+        }
+    local_origin = {"x": round(wall, 4), "y": round(wall, 4), "z": round(floor, 4)}
+    retained_floor = round(module_size_mm["z"] - asset_fit_size_mm["z"], 4)
+    expected_walls = {
+        "x_min": round(local_origin["x"], 4),
+        "x_max": round(module_size_mm["x"] - local_origin["x"] - asset_fit_size_mm["x"], 4),
+        "y_min": round(local_origin["y"], 4),
+        "y_max": round(module_size_mm["y"] - local_origin["y"] - asset_fit_size_mm["y"], 4),
+    }
+    errors: list[str] = []
+    if local_origin["x"] + asset_fit_size_mm["x"] > module_size_mm["x"]:
+        errors.append("asset_fit.x exceeds module width after wall offset")
+    if local_origin["y"] + asset_fit_size_mm["y"] > module_size_mm["y"]:
+        errors.append("asset_fit.y exceeds module depth after wall offset")
+    if asset_fit_size_mm["z"] >= module_size_mm["z"]:
+        errors.append("asset_fit.z must be lower than module height")
+    if retained_floor < floor:
+        errors.append(f"retained floor {retained_floor:.4f} mm is below floor_thickness_mm {floor:.4f} mm")
+    too_thin = [name for name, value in expected_walls.items() if value < wall - 0.0001]
+    if too_thin:
+        errors.append("wall thinner than wall_thickness_mm: " + ", ".join(too_thin))
+    if errors:
+        return {
+            **base,
+            "status": "refused",
+            "code": "ASSET_FIT_CAVITY_INVALID_BOUNDS",
+            "reason": "; ".join(errors),
+            "local_origin_mm": local_origin,
+            "size_mm": dict(asset_fit_size_mm),
+            "retained_floor_mm": retained_floor,
+            "expected_walls_mm": expected_walls,
+        }
+    return {
+        **base,
+        "status": "planned",
+        "local_origin_mm": local_origin,
+        "size_mm": dict(asset_fit_size_mm),
+        "retained_floor_mm": retained_floor,
+        "expected_floor_mm": round(floor, 4),
+        "expected_walls_mm": expected_walls,
+        "clearance_source": clearance_applied.get("internal_asset_clearance_source", "unknown"),
+        "warning": "Single asset-fit cavity only; individual asset items and piles are not cut in P13-ASSET-M003.",
     }
 
 

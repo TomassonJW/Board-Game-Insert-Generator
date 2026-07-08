@@ -395,3 +395,25 @@ La CAD IR V0 reste additive. Quand la source Fusion est `quick_asset_box`, l'add
 Les candidats asset-first, modules generes et placements peuvent porter une metadata additive `storage_sizing`. Elle est informative et stable pour le reporting : `policy`, `derivation`, `count_aware_storage_sizing`, `z_mm_semantics`, `total_count_read`, `declared_capacity_count`, `declared_capacity_guarantee`, `asset_diagnostics`, `pile_layout`, `content_footprint_mm`, `asset_fit_size_mm`, `module_size_mm` et `warnings`.
 
 Cette metadata ne remplace pas les champs CAD IR existants (`dimensions_mm`, `asset_fit_size_mm`, `printable_body_size_mm`, placements grille). Fusion consomme toujours la geometrie existante et ajoute seulement un sketch debug non imprimable pour l'enveloppe asset-fit.
+
+## P13-ASSET-M003 - Metadata asset_fit_cavity
+
+Les modules issus de `metadata.executable_asset_plan.generated_modules` peuvent transporter une metadata additive `asset_fit_cavity`. Les placements recopient cette metadata pour que l'adaptateur Fusion puisse la consommer sans recalculer le moteur.
+
+Payload planifie V0 :
+
+```json
+{
+  "id": "asset-fit-cavity",
+  "status": "planned",
+  "policy": "single_asset_fit_rectangular_cavity_v0",
+  "operation_kind": "subtract_rectangular_cavity",
+  "coordinate_frame": "body.local",
+  "local_origin_mm": {"x": 1.2, "y": 1.2, "z": 1.2},
+  "size_mm": {"x": 47.6, "y": 36.6, "z": 46.8},
+  "retained_floor_mm": 1.2,
+  "expected_walls_mm": {"x_min": 1.2, "x_max": 1.2, "y_min": 1.2, "y_max": 1.2}
+}
+```
+
+Si la cavite est impossible ou hors scope, le payload reste transportable avec `status: refused`, `code` et `reason`. Fusion ignore les cavites refusees et refuse les cavites planifiees invalides qui depassent le module ou ne conservent pas le fond demande.

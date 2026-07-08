@@ -18,15 +18,15 @@ structurant, authentification absente ou refus de push direct.
 
 ## Gate humaine active
 
-`P13-ASSET-M003-GATE - Autoriser la prochaine etape asset-first apres enveloppe count-aware`.
+`P13-ASSET-M003V - Valider dans Fusion la cavite asset-fit globale V0`.
 
-Statut : gate produit active. `P13-ASSET-M002V` est validee humainement comme premier sizing count-aware V0 pour assets simples, avec debug visuel d'enveloppe et limitations explicites. La prochaine decision produit doit choisir si BGIG avance vers des cavites/logements asset-first reels, une visualisation d'items/proxies plus detaillee, ou une amelioration UI assets, sans introduire de solveur global premature.
+Statut : gate Fusion active. `P13-ASSET-M003` est implementee et doit etre validee humainement dans Fusion avant toute mission produit suivante.
 
-Decision attendue : autoriser une mission bornee post-M002, ou confirmer que les cavites/logements, assets individuels, UI assets avancee, solveur global et impression restent reportes.
+Validation attendue : ouvrir Fusion avec un document Assembly-compatible, lancer BGIG en `quick_asset_box`, generer le cas count-aware prepare, verifier le module exterieur `50.0 x 39.0 x 48.0`, la cavite rectangulaire reelle `47.6 x 36.6 x 46.8 mm`, `asset_cavities_generated: yes`, `asset_cavity_policy: single_asset_fit_rectangular_cavity_v0`, fond/murs attendus, regenerate sans doublon, clear preservant les objets non-BGIG et `Print validation: false`.
 
 ## Mission ready non gated
 
-Aucune mission produit non-gated supplementaire n'est recommandee avant decision humaine sur `P13-ASSET-M003-GATE`.
+Aucune mission produit non-gated supplementaire n'est recommandee avant validation humaine `P13-ASSET-M003V`.
 
 ## Regle operationnelle Fusion
 
@@ -41,7 +41,7 @@ Fusion restantes a Thomas.
 
 `P10-SOLVER-GATE - Solveur complexe, backtracking ou optimisation globale`.
 
-Palette persistante HTML, UI assets avancee/tableau, solveur plus automatique, cavites/logements assets, assets individuels Fusion, nouvelle geometrie produit complexe, export imprimable et validation d'impression restent gates ou missions separees. P13-ASSET-M002 ne valide qu'une enveloppe count-aware heuristique et un sketch debug non imprimable.
+Palette persistante HTML, UI assets avancee/tableau, solveur plus automatique, cavites par pile/logements detailles, assets individuels Fusion, nouvelle geometrie produit complexe, export imprimable et validation d'impression restent gates ou missions separees. P13-ASSET-M003 ne valide qu'une cavite rectangulaire globale asset-fit V0, en attente de validation Fusion.
 
 ## Fin de chaque mission
 

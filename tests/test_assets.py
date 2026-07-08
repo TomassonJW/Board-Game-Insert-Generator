@@ -174,6 +174,14 @@ class AssetModelTests(unittest.TestCase):
         self.assertEqual(generated["storage_sizing"]["count_aware_storage_sizing"], "yes")
         self.assertEqual(generated["storage_sizing"]["asset_diagnostics"][0]["pile_count"], 12)
         self.assertEqual(generated["clearance_applied"]["internal_asset_clearance_mm"], 0.6)
+        cavity = generated["asset_fit_cavity"]
+        self.assertEqual(cavity["status"], "planned")
+        self.assertEqual(cavity["policy"], "single_asset_fit_rectangular_cavity_v0")
+        self.assertEqual(cavity["operation_kind"], "subtract_rectangular_cavity")
+        self.assertEqual(cavity["local_origin_mm"], {"x": 1.2, "y": 1.2, "z": 1.2})
+        self.assertEqual(cavity["size_mm"], {"x": 117.2, "y": 85.2, "z": 18.6})
+        self.assertEqual(cavity["retained_floor_mm"], 1.2)
+        self.assertEqual(cavity["expected_walls_mm"], {"x_min": 1.2, "x_max": 1.2, "y_min": 1.2, "y_max": 1.2})
         rejection = plan["rejected_modules"][0]
         self.assertEqual(rejection["code"], "DOES_NOT_FIT")
         self.assertIn("no free non-reserved span", rejection["message"])
@@ -189,6 +197,9 @@ class AssetModelTests(unittest.TestCase):
         sizing = generated["storage_sizing"]
         self.assertEqual(plan["status"], "placed")
         self.assertEqual(generated["dimensions_mm"], {"x": 13.6, "y": 13.6, "z": 3.8})
+        self.assertEqual(generated["asset_fit_cavity"]["status"], "planned")
+        self.assertEqual(generated["asset_fit_cavity"]["size_mm"], generated["asset_fit_size_mm"])
+        self.assertEqual(generated["asset_fit_cavity"]["retained_floor_mm"], 1.2)
         self.assertEqual(sizing["asset_diagnostics"][0]["capacity_per_stack"], 14)
         self.assertEqual(sizing["asset_diagnostics"][0]["pile_count"], 1)
         self.assertEqual(sizing["asset_diagnostics"][0]["items_per_pile"], 1)
@@ -200,6 +211,7 @@ class AssetModelTests(unittest.TestCase):
         self.assertEqual(low["dimensions_mm"]["x"], high["dimensions_mm"]["x"])
         self.assertEqual(low["dimensions_mm"]["y"], high["dimensions_mm"]["y"])
         self.assertGreater(high["dimensions_mm"]["z"], low["dimensions_mm"]["z"])
+        self.assertGreater(high["asset_fit_cavity"]["size_mm"]["z"], low["asset_fit_cavity"]["size_mm"]["z"])
         self.assertEqual(high["storage_sizing"]["asset_diagnostics"][0]["pile_count"], 1)
         self.assertEqual(high["storage_sizing"]["asset_diagnostics"][0]["items_per_pile"], 10)
 
@@ -210,6 +222,21 @@ class AssetModelTests(unittest.TestCase):
         self.assertEqual(diagnostic["pile_count"], 3)
         self.assertEqual(diagnostic["items_per_pile"], 10)
         self.assertEqual(generated["dimensions_mm"], {"x": 33.6, "y": 13.6, "z": 21.8})
+        self.assertEqual(generated["asset_fit_cavity"]["size_mm"], {"x": 31.2, "y": 11.2, "z": 20.6})
+
+    def test_asset_fit_cavity_refuses_card_stack_v0(self) -> None:
+        payload = _count_aware_tokens_payload(count=60)
+        payload["assets"][0]["kind"] = "cards"
+        payload["assets"][0]["dimensions_mm"] = {"x": 63, "y": 88, "z": 20}
+        payload["box"]["inner_dimensions_mm"] = {"x": 140, "y": 95, "z": 30}
+        payload["box"]["usable_height_mm"] = 30
+        payload["volumetric_grid"] = {"unit_mm": {"x": 70, "y": 95, "z": 30}, "size_units": {"x": 2, "y": 1, "z": 1}}
+        generated = _layout_payload(payload)["executable_asset_plan"]["generated_modules"][0]
+
+        cavity = generated["asset_fit_cavity"]
+        self.assertEqual(cavity["status"], "refused")
+        self.assertEqual(cavity["code"], "UNSUPPORTED_ASSET_CAVITY_TYPE")
+        self.assertIn("supports tokens/dice/meeples/generic", cavity["reason"])
 
     def test_count_aware_too_many_items_rejects_instead_of_claiming_capacity(self) -> None:
         payload = _count_aware_tokens_payload(count=1000)

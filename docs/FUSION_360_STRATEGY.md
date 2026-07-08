@@ -739,3 +739,11 @@ ce workflow dans Fusion.
 ## P13-M001 - quick_asset_box source mode
 
 L'adaptateur Fusion accepte maintenant `quick_asset_box` comme source UI. Ce mode genere d'abord une config temporaire puis une CAD IR via le moteur pur; Fusion consomme ensuite la CAD IR comme pour les autres modes et ne recalcule ni layout, ni tolerances, ni placement. Le registry, l'ownership racine, `generate`, `regenerate`, `clear_bgig_scene` et `inspect_bgig_scene` restent les mecanismes de scene autorises.
+
+## P13-ASSET-M003 - Cavite asset-fit globale
+
+Fusion ne recalcule toujours ni layout, ni tolerances, ni sizing. L'adaptateur lit `metadata.executable_asset_plan.generated_modules[].asset_fit_cavity` / `placements[].asset_fit_cavity` et convertit uniquement les payloads `status: planned` en `FusionCavityCutPlan` de source `asset_fit_cavity`.
+
+La coupe Fusion reutilise l'operation rectangulaire existante `subtract_rectangular_cavity`, limitee au body cible. Le rapport distingue les cavites CAD IR classiques et les cavites asset-fit avec `asset_cavity_policy`, `asset_fit_cavities_planned` et `asset_fit_cavities_generated`.
+
+Limites maintenues : pas de cavites par pile, pas d'assets individuels, pas de fillets, pas d'export imprimable, pas de validation d'impression.

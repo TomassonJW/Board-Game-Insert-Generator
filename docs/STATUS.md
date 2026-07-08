@@ -521,3 +521,17 @@ Resultats observes : add-in reinstalle par scripts Codex, document Fusion Assemb
 Test count-aware valide : avec `coin-tokens,tokens,40,18,16,2,loose` et `status-tokens,tokens,23,10,35,2,loose`, module `50.0 x 39.0 x 48.0`; apres modification de `coin-tokens` a `80`, `regenerate` produit `68.0 x 39.0 x 56.0`. La taille, les piles, la capacite declaree et le grid span changent avec `count`.
 
 Limites maintenues : assets individuels non visualises, cavites/logements non generes, pas de solveur global, pas d'optimisation avancee, capacite heuristique non garantie physiquement, aucune impression 3D validee.
+
+## P13-ASSET-M003 - Asset-fit cavity V0 implemente
+
+P13-ASSET-M003 ajoute la premiere cavite asset-first reelle pour `quick_asset_box`. Le moteur attache aux modules `executable_asset_plan` une metadata `asset_fit_cavity` planifiee ou refusee. L'adaptateur Fusion consomme cette metadata pour creer une coupe rectangulaire top-open globale via le mecanisme existant `subtract_rectangular_cavity`.
+
+Strategie retenue : `single_asset_fit_rectangular_cavity_v0`, origine locale alignee sur `wall_thickness_mm`, fond conserve `floor_thickness_mm`, taille de cavite egale a `asset_fit_size_mm`. Les types supportes sont `tokens`, `dice`, `meeples`, `generic`; les cartes restent refusees pour cette cavite V0.
+
+Pour le smoke M003 prepare, le cas `coin-tokens,tokens,40,18,16,2,loose` + `status-tokens,tokens,23,10,35,2,loose` produit un module `50.0 x 39.0 x 48.0` et une cavite `47.6 x 36.6 x 46.8 mm`, avec fond `1.2 mm` et murs attendus `1.2 mm`.
+
+Limites maintenues : assets individuels non visualises, pas de cavites par pile, pas de solveur global, pas d'optimisation avancee, capacite heuristique non garantie physiquement, aucune impression 3D validee.
+
+Verifications realisees pendant P13-ASSET-M003 : suite unitaire complete OK (`185 tests`), `py_compile` add-in OK, CLI Markdown/JSON/export CAD IR OK sur les exemples P12/P13 pertinents, `prepare_quick_asset_test.ps1 -DryRun` OK, `prepare_quick_asset_test.ps1` OK avec add-in installe, `check_installed_addin.ps1` OK, `git diff --check` OK, `rg -n "adsk" src/board_game_insert_generator` sans occurrence.
+
+Statut : `implemented`, `manual_validation_required` pour `P13-ASSET-M003V`, `print-validated: false`.

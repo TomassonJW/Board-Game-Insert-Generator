@@ -184,3 +184,11 @@ Pour `tokens`, `dice`, `meeples` et `generic`, le sizing V0 traite chaque asset 
 La sortie reste une enveloppe de rangement, pas une cavite physique : `declared_capacity_guarantee = heuristic_envelope_only_not_physical_cavity`. Les vrais items Fusion ne sont pas generes et les logements ne sont pas coupes.
 
 Pour `cards` et `sleeved_cards`, `z_mm` reste interprete comme hauteur totale fournie du paquet/deck. `count` est reporte mais non multiplie, avec warning explicite. Cela evite de melanger silencieusement epaisseur unitaire et epaisseur totale.
+
+## P13-ASSET-M003 - Asset-fit cavity V0
+
+Le premier logement asset-first reel reste volontairement simple : pour chaque module asset candidate place, BGIG cree une seule cavite rectangulaire globale issue de l'enveloppe `asset_fit`. La politique est `single_asset_fit_rectangular_cavity_v0`.
+
+Regle V0 : origine locale `wall_thickness_mm x wall_thickness_mm x floor_thickness_mm`, taille `asset_fit_size_mm`, fond conserve egal a `floor_thickness_mm` et murs attendus au moins egaux a `wall_thickness_mm`. Cette cavite n'est pas un solveur de rangement : elle ne cree pas de logements par pile, ne visualise pas les assets individuels et ne garantit pas physiquement la capacite declaree.
+
+Types supportes pour la cavite V0 : `tokens`, `dice`, `meeples`, `generic`. Les cartes et cartes sleevees gardent une semantique de paquet total et refusent la cavite asset-fit M003 tant qu'un logement carte dedie n'est pas specifie.

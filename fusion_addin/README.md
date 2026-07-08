@@ -672,3 +672,9 @@ Le script installe l'add-in et ecrit `bgig_ui_settings.json` avec `input_mode = 
 Le script `scripts/fusion/prepare_quick_asset_test.ps1` prepare maintenant le cas count-aware : boite `130 x 50 x 60`, grille `4 x 4 x 3`, assets `coin-tokens,tokens,40,18,16,2,loose; status-tokens,tokens,23,10,35,2,loose`.
 
 Le smoke Fusion doit verifier `count_aware_storage_sizing: yes`, `asset_debug_visualization: yes`, diagnostics `capacity_per_stack`, `pile_count`, `declared_capacity`, `asset_fit`, `module_size`, et confirmer que le module n'est plus l'ancienne enveloppe representative `22 x 39 x 4`. `asset_items_visualized` et `asset_cavities_generated` restent `no`.
+
+### P13-ASSET-M003 asset-fit cavity smoke values
+
+Le script `scripts/fusion/prepare_quick_asset_test.ps1` prepare maintenant le smoke test M003 : box `130 x 50 x 60`, grid `4 x 4 x 3`, assets `coin-tokens,tokens,40,18,16,2,loose; status-tokens,tokens,23,10,35,2,loose`.
+
+Le smoke Fusion doit verifier que le module count-aware `50.0 x 39.0 x 48.0` est creuse par une cavite asset-fit globale `47.6 x 36.6 x 46.8 mm`, avec fond restant `1.2 mm`, murs attendus `1.2 mm`, `asset_cavities_generated: yes`, `asset_cavity_policy: single_asset_fit_rectangular_cavity_v0`, `asset_items_visualized: no` et `Print validation: false`.

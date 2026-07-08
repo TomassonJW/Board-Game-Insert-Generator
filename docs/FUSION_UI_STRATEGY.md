@@ -370,3 +370,9 @@ Limites : pas de tableau avance, pas de palette HTML, pas de solveur complexe, p
 `quick_asset_box` reste une commande Fusion classique. Le rapport affiche maintenant `count_aware_storage_sizing: yes|partial|no`, `asset_debug_visualization: yes/no`, les capacites par pile, nombres de piles, enveloppe `asset_fit`, taille module et garantie de capacite.
 
 Le debug visuel Fusion est minimal et non imprimable : un sketch `asset-fit debug outline` est cree sur le haut du module asset candidate pour montrer l'enveloppe XY retenue. Les assets individuels ne sont pas dessines et `asset_cavities_generated` reste `no`.
+
+## P13-ASSET-M003 - Smoke quick_asset_box avec cavite
+
+`quick_asset_box` reste la commande Fusion classique. Le smoke test M003 prepare le meme cas count-aware que M002 (`130 x 50 x 60`, grille `4 x 4 x 3`, assets tokens `40` et `23`) mais attend maintenant une coupe reelle : `asset_cavities_generated: yes`, `asset_cavity_policy: single_asset_fit_rectangular_cavity_v0`, une cavite asset-fit planifiee/generee, dimensions de cavite, fond restant et murs attendus.
+
+Le rapport doit encore afficher `asset_items_visualized: no`, l'absence de cavites individuelles par item/pile et `Print validation: false`.
