@@ -610,8 +610,8 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Livrable : persistance `bgig_ui_settings.json` de l action, input mode, generation mode, chemins CAD IR/config/root et champs parametriques P12 ; rehydratation dans `commandCreated` ; champs `quick_parametric_box` pre-remplis ; action `regenerate` preferee si une scene BGIG existe deja ; documentation et smoke test P12-M004V.
 - Criteres d acceptation : valeurs retrouvees apres generation et reouverture, modification d une seule valeur puis `regenerate`, remplacement sans doublon, derniere valeur retrouvee a la reouverture, `clear_bgig_scene` preserve les objets non BGIG, coeur Python sans `adsk`.
 - Tests : unitaires hors Fusion, py_compile add-in, CLI Markdown/JSON/export CAD IR exemples P12, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
-- Gate : validation humaine Fusion P12-M004V requise avant `fusion-validated`.
-- Statut : `done`, `implemented-fusion`, `manual_validation_required`, `print-validated: false`.
+- Gate : validation humaine Fusion P12-M004V realisee le 2026-07-08 apres `ab488dc`.
+- Statut : `done`, `fusion-validated`, `print-validated: false`.
 
 ### P12-M004V - Valider persistance UI et regeneration confortable dans Fusion
 
@@ -622,7 +622,8 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Criteres d acceptation : aucune ressaisie complete requise, scene remplacee sans doublon, derniere valeur visible, registry OK, objets non BGIG preserves, aucune validation d impression revendiquee.
 - Tests : smoke test manuel Fusion.
 - Gate : action humaine requise.
-- Statut : `manual_validation_required`; premier essai KO apres `c6cba19` car le settings PowerShell UTF-8 BOM etait ignore par le loader Python ; correction settings sans BOM / lecture `utf-8-sig` codee, revalidation requise.
+- Statut : `done`, `fusion-validated` apres smoke test humain confirme le 2026-07-08 sur `ab488dc`; premier essai KO apres `c6cba19` documente et corrige par settings sans BOM / lecture `utf-8-sig`; `print-validated: false`.
+
 ### P12-M004A - Automatiser la preparation des smoke tests Fusion
 
 - Capability : C-FUSION-UI, pilotage projet.

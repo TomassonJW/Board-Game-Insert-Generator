@@ -18,13 +18,13 @@ structurant, authentification absente ou refus de push direct.
 
 ## Gate humaine active
 
-Statut : `manual_validation_required` pour `P12-M004V` ; P12-M004 est code et doit etre valide dans Fusion.
+Statut : aucune mission produit non-gated active. `P12-M004V` est validee humainement dans Fusion apres `ab488dc`.
 
-La gate humaine P12-M004 a ete validee pour ameliorer la persistance des champs UI et le workflow de regeneration, sans palette persistante, sans nouvelle geometrie, sans solveur et sans export imprimable.
+La gate humaine P12-M004 a ete validee et le smoke test P12-M004V confirme la persistance des champs UI, la rehydratation, `generate`, `regenerate`, `clear_bgig_scene` et la preservation non-BGIG. Impression 3D non validee.
 
 ## Mission ready non gated
 
-Aucune mission produit non-gated supplementaire n'est recommandee avant validation Fusion P12-M004V. La preparation locale doit passer par `scripts/fusion/prepare_quick_parametric_test.ps1`. Action humaine restante : ouvrir Fusion, verifier le bloc UI `UI settings loaded: yes`, `Loaded input mode: quick_parametric_box`, les valeurs quick box chargees, puis smoke test de rehydratation, modification d une valeur, `regenerate`, reouverture et `clear_bgig_scene` avec preservation non-BGIG.
+Aucune mission produit non-gated supplementaire n'est recommandee dans ce run. Prochaine action : gate produit explicite avant palette persistante, UI assets complete, solveur plus automatique, nouvelle geometrie Fusion, export imprimable ou validation d'impression.
 
 ## Regle operationnelle Fusion
 
