@@ -68,6 +68,9 @@ function Assert-BgigFusionAddinMarkers {
         [string[]] $Markers = @(
             "Generate Board Game Insert",
             "quick_parametric_box",
+            "quick_asset_box",
+            "QUICK_ASSET_BOX_ASSETS_INPUT_ID",
+            "Assets (quick_asset_box)",
             "inspect_bgig_scene",
             "bgig_ui_settings.json"
         )

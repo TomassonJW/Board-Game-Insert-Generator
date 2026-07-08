@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import json
 import tempfile
 import unittest
@@ -1510,6 +1511,26 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIsInstance(manifest["description"], dict)
         self.assertIn("", manifest["description"])
 
+    def test_addin_entrypoint_defines_all_ui_input_ids_it_references(self) -> None:
+        source = (ROOT / "fusion_addin" / "BoardGameInsertGenerator" / "BoardGameInsertGenerator.py").read_text(encoding="utf-8")
+        tree = ast.parse(source)
+        defined_ids: set[str] = set()
+        for node in tree.body:
+            if isinstance(node, ast.Assign):
+                for target in node.targets:
+                    if isinstance(target, ast.Name) and target.id.endswith("_INPUT_ID"):
+                        defined_ids.add(target.id)
+            elif isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name) and node.target.id.endswith("_INPUT_ID"):
+                defined_ids.add(node.target.id)
+        referenced_ids = {
+            node.id
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Name) and isinstance(node.ctx, ast.Load) and node.id.endswith("_INPUT_ID")
+        }
+
+        self.assertFalse(referenced_ids - defined_ids, f"Undefined UI input IDs: {sorted(referenced_ids - defined_ids)}")
+        self.assertIn("QUICK_ASSET_BOX_ASSETS_INPUT_ID", defined_ids)
+        self.assertIn("Assets (quick_asset_box)", source)
     def test_addin_entrypoint_uses_linked_component_occurrences(self) -> None:
         entrypoint_path = ROOT / "fusion_addin" / "BoardGameInsertGenerator" / "BoardGameInsertGenerator.py"
         source = entrypoint_path.read_text(encoding="utf-8")

@@ -438,7 +438,7 @@ Comportement implemente : champ texte editable `Assets (quick_asset_box)` au for
 
 Limites : pas de tableau assets avance, pas de palette HTML persistante, pas de solveur complexe, pas de nouvelle geometrie Fusion, pas d'export STL/3MF, pas de validation d'impression. Le profil UI `draft` est conserve dans les settings et mappe vers le profil moteur existant `fast_draft` seulement pour la config temporaire `quick_asset_box`.
 
-Statut : `implemented-fusion`, gate humaine `P13-M001V` requise avant de declarer `fusion-validated`.
+Statut : `implemented-fusion`, gate humaine `P13-M001V` requise avant de declarer `fusion-validated`. Premier essai P13-M001V KO a l ouverture de la commande Fusion par constante UI manquante `QUICK_ASSET_BOX_ASSETS_INPUT_ID`; correction appliquee avec test de regression AST et add-in reinstalle.
 ## Tests et verifications connus
 
 Commande de test principale :
@@ -457,12 +457,13 @@ python -m board_game_insert_generator examples/simple_box.json --format markdown
 
 Derniere verification pendant `P13-M001 - quick_asset_box UI V0` :
 
-- `python -m unittest discover -s tests` : OK, 179 tests passes.
+- `python -m unittest discover -s tests` : OK, 180 tests passes apres correction P13-M001V KO.
 - `python -m py_compile fusion_addin/BoardGameInsertGenerator/BoardGameInsertGenerator.py fusion_addin/BoardGameInsertGenerator/fusion_skeleton.py` : OK.
 - CLI Markdown/JSON : OK sur `simple_asset_product_scene.json`, `simple_asset_executable_plan.json`, `simple_multilayer_grid_scene.json`, `simple_tray.json` et `simple_finger_notch_tray.json`.
 - Export CAD IR : OK sur `simple_asset_product_scene.json`, `simple_asset_executable_plan.json`, `simple_multilayer_grid_scene.json`, `simple_tray.json` et `simple_finger_notch_tray.json`.
 - `scripts/fusion/prepare_quick_asset_test.ps1 -DryRun` : OK.
-- `scripts/fusion/prepare_quick_asset_test.ps1` : OK, add-in installe et settings `quick_asset_box` ecrits.
+- `scripts/fusion/prepare_quick_asset_test.ps1` : OK, add-in corrige reinstalle et settings `quick_asset_box` ecrits.
+- `scripts/fusion/check_installed_addin.ps1` : OK avec marqueurs P13 renforces.
 - `git diff --check` : OK.
 - `rg -n "adsk" src/board_game_insert_generator` : OK, aucune occurrence dans le coeur Python.
 - Validation Fusion reelle : `P13-M001V` requise. Impression 3D non validee.

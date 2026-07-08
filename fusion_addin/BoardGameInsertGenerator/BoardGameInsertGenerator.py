@@ -212,6 +212,7 @@ CONFIG_JSON_PATH_INPUT_ID = "bgig_config_json_path"
 PROJECT_ROOT_INPUT_ID = "bgig_project_root"
 GENERATION_MODE_INPUT_ID = "bgig_generation_mode"
 SUMMARY_INPUT_ID = "bgig_command_summary"
+QUICK_ASSET_BOX_ASSETS_INPUT_ID = "bgig_quick_asset_box_assets"
 PARAMETER_INPUT_PREFIX = "bgig_param_"
 
 _app = None
