@@ -680,4 +680,12 @@ P15-M004 clarifie que la grille `quick_asset_box` reste une lattice de placement
 
 Le body Fusion continue d'utiliser `printable_body_size_mm` ; `theoretical_grid_extent_mm` est un span de reservation/occupation, pas une taille de body a extruder. Le resume `quick_asset_box`, `Module source mapping` et `Body sizing report` exposent cette difference pour eviter une interpretation trompeuse de la grille.
 
-La prochaine mission P15-M005 doit preparer le preset smoke P15 realiste et installer l'add-in/settings pour validation humaine Fusion.
+## P15-M005 - Preset smoke P15 realiste
+
+Statut : `gate-prepared`, validation humaine Fusion `P15-TRAY-SEMANTICS-ALIGNMENT-SPRINT-V` requise, `print-validated: false`.
+
+P15-M005 ajoute le preset `p15_tray_semantics` et le met par defaut dans `scripts/fusion/prepare_quick_asset_test.ps1`. Le scenario prepare : box `220 x 160 x 60`, grid `8 x 5 x 3`, `max_stack_height_mm = 18`, assets `coin-tokens`, `status-tokens`, `dice-set`, `wood-meeples` et `cubes`.
+
+Validation automatique locale : le preset lit 5 assets, genere 4 candidats/modules places, planifie 5 compartiments et 5 encoches, et produit des modules bas : tokens `132.8 x 22.0 x 18.0 mm`, dice `132.0 x 20.0 x 18.0 mm`, meeples `112.8 x 16.8 x 18.4 mm`, cubes `98.4 x 10.4 x 17.2 mm`. Le rapport attendu expose `flat_tray`, `stack_height_policy`, `max_stack_height_mm`, `grid_semantics: placement_reservation_lattice_v0`, `body_snap_to_grid: no`, printability report et `Print validation: false`.
+
+Gate humaine active : ouvrir Fusion, verifier les settings precharges, generer, verifier que les modules ne deviennent pas des tours hautes, modifier `count` ou `max_stack_height_mm`, lancer `regenerate` sans doublon, puis `clear_bgig_scene` avec preservation non-BGIG.

@@ -3,8 +3,8 @@ param(
     [string] $TargetPath,
     [ValidateSet("compact_only", "compact_and_exploded")]
     [string] $GenerationMode = "compact_only",
-    [ValidateSet("p14_complete", "tokens", "dice_meeples_generic", "cards_tokens")]
-    [string] $Preset = "p14_complete",
+    [ValidateSet("p15_tray_semantics", "p14_complete", "tokens", "dice_meeples_generic", "cards_tokens")]
+    [string] $Preset = "p15_tray_semantics",
     [string] $AssetsText,
     [switch] $DryRun
 )
@@ -24,6 +24,11 @@ if ($null -eq $presetConfig) {
 if (-not $AssetsText) {
     $AssetsText = $presetConfig.assets_text
 }
+$maxStackHeight = ""
+if ($presetConfig.PSObject.Properties.Name -contains "max_stack_height_mm") {
+    $maxStackHeight = "$($presetConfig.max_stack_height_mm)"
+}
+$displayMaxStackHeight = if ($maxStackHeight) { $maxStackHeight } else { "default" }
 
 Write-Output "BGIG quick asset Fusion smoke test preparation"
 Write-Output "Repo root: $root"
@@ -55,11 +60,12 @@ $settings = @{
     inter_module_clearance_mm = "0.3"
     print_profile = "draft"
     quick_asset_box_assets_text = $AssetsText
+    quick_asset_box_max_stack_height_mm = $maxStackHeight
 }
 Write-BgigFusionUiSettings -TargetPath $target -Settings $settings -DryRun:$DryRun
 
 Write-Output ""
-Write-Output "Recommended P14 quick asset gate preset values:"
+Write-Output "Recommended P15 quick asset gate preset values:"
 Write-Output "- input_mode: quick_asset_box"
 Write-Output "- preset: $Preset"
 Write-Output "- box_inner_mm: $($presetConfig.box_inner_mm.x) x $($presetConfig.box_inner_mm.y) x $($presetConfig.box_inner_mm.z)"
@@ -69,6 +75,7 @@ Write-Output "- floor_thickness_mm: 1.2"
 Write-Output "- peripheral_clearance_mm: 0.4"
 Write-Output "- inter_module_clearance_mm: 0.3"
 Write-Output "- print_profile: draft (quick_asset_box temporary config maps this UI alias to engine profile fast_draft)"
+Write-Output "- max_stack_height_mm: $displayMaxStackHeight"
 Write-Output "- assets: $AssetsText"
 Write-Output "- preset notes: $($presetConfig.notes)"
 Write-Output ""
@@ -78,10 +85,11 @@ Write-Output "2. Run BoardGameInsertGenerator or click Generate Board Game Inser
 Write-Output "3. In the UI settings block, confirm UI settings loaded: yes."
 Write-Output "4. Confirm Loaded input mode = quick_asset_box and Loaded generation mode = $GenerationMode."
 Write-Output "5. Confirm the Assets (quick_asset_box) field contains the prepared assets."
-Write-Output "6. Confirm Action = generate, or regenerate if a BGIG scene already exists."
-Write-Output "7. Run generation and verify Quick asset box inputs, assets_read, asset_items_visualized: no, asset_cavities_generated: yes, asset_cavity_policy: per_source_asset_rectangular_compartments_v0, asset_compartments_generated: yes, asset_access_features_generated: yes, count_aware_storage_sizing: yes, asset_debug_visualization: yes, Body sizing report, Registry validation: ok, and Print validation: false."
-Write-Output "8. Preset-specific focus: $($presetConfig.smoke_focus)"
-Write-Output "9. Reopen BGIG and confirm the asset text is still present."
-Write-Output "10. Modify one asset or dimension, set Action = regenerate, run, and verify the scene is replaced without duplicates."
-Write-Output "11. Run clear_bgig_scene and verify non-BGIG objects are preserved."
+Write-Output "6. Confirm Max stack height mm is $displayMaxStackHeight."
+Write-Output "7. Confirm Action = generate, or regenerate if a BGIG scene already exists."
+Write-Output "8. Run generation and verify Quick asset box inputs, assets_read, storage_orientation flat_tray, stack_height_policy flat_tray_max_stack_height_v0, max_stack_height_mm, stack_height_used_mm, xy_expansion_used, z_expansion_used, grid_semantics: placement_reservation_lattice_v0, body_snap_to_grid: no, asset_cavities_generated: yes, asset_cavity_policy: per_source_asset_rectangular_compartments_v0, asset_compartments_generated: yes, asset_access_features_generated: yes, printability_checked: yes, Body sizing report, Registry validation: ok, and Print validation: false."
+Write-Output "9. Preset-specific focus: $($presetConfig.smoke_focus)"
+Write-Output "10. Reopen BGIG and confirm the asset text and max stack height are still present."
+Write-Output "11. Modify count or max_stack_height_mm, set Action = regenerate, run, and verify the scene is replaced without duplicates and sizing changes."
+Write-Output "12. Run clear_bgig_scene and verify non-BGIG objects are preserved."
 Write-Output "Prepared quick asset test: $(-not $DryRun)"

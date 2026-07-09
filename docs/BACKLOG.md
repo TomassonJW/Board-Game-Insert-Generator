@@ -935,4 +935,6 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 
 - Capability : C-FUSION-UI, C-QUALITY.
 - Objectif : preparer un preset Fusion P15 realiste et bas, puis installer l'add-in et les settings.
-- Statut : `ready`.
+- Livrable : preset `p15_tray_semantics`, script `prepare_quick_asset_test.ps1` par defaut sur P15, settings `quick_asset_box` avec `max_stack_height_mm = 18`, documentation de smoke.
+- Tests : unittest, py_compile add-in, CLI Markdown/JSON/export CAD IR, DryRun script P15, installation add-in, check installed add-in, `git diff --check`, `rg adsk`.
+- Statut : `gate-prepared`, validation humaine Fusion P15 requise, `print-validated: false`.

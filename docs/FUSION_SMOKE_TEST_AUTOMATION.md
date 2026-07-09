@@ -132,3 +132,21 @@ Le script installe l'add-in courant et ecrit `bgig_ui_settings.json` avec `input
 - `wood-meeples,meeples,20,12,12,18,loose`.
 
 Ce scenario doit valider les apports P14 : 5 assets lus, plusieurs candidats modules, groupe tokens a 3 sources avec layout `deterministic_shelf_by_source_asset_v0`, rapports `printability_report_v0`, aide inline `quick_asset_box`, presets de smoke, regeneration sans doublon, clear preserve non-BGIG. Il ne valide toujours pas l'impression 3D.
+
+## P15-TRAY-SEMANTICS-ALIGNMENT-SPRINT-V
+
+La gate P15 se prepare avec le preset par defaut `p15_tray_semantics` :
+
+```powershell
+scripts/fusion/prepare_quick_asset_test.ps1 -Preset p15_tray_semantics
+```
+
+Le script installe l'add-in courant et ecrit `bgig_ui_settings.json` avec `input_mode = quick_asset_box`, generation `compact_only`, box `220 x 160 x 60`, grid `8 x 5 x 3`, `quick_asset_box_max_stack_height_mm = 18` et assets :
+
+- `coin-tokens,tokens,40,18,16,2,loose` ;
+- `status-tokens,tokens,24,12,18,2,loose` ;
+- `dice-set,dice,8,16,16,16,loose` ;
+- `wood-meeples,meeples,18,12,12,8,loose` ;
+- `cubes,generic,24,8,8,8,loose`.
+
+Ce scenario doit valider les apports P15 : modules bas en `flat_tray`, `max_stack_height_mm` visible et persiste, sizing qui s'etale en XY avant Z, semantique grid explicite (`placement_reservation_lattice_v0`, `body_snap_to_grid: no`), compartiments/encoches V0, printability report, regenerate sans doublon et clear preserve non-BGIG. Il ne valide toujours pas l'impression 3D.

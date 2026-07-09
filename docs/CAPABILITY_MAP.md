@@ -196,3 +196,9 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 - C-GRID-3D : `implemented-reporting` pour semantique explicite `placement_reservation_lattice_v0`, span reserve distinct du body imprimable, et `body_snap_to_grid: no`.
 - C-FUSION-UI : resume `quick_asset_box`, `Module source mapping` et `Body sizing report` exposent la difference grid span / printable body.
 - C-QUALITY : tests couvrent metadata placements, plan Fusion et summary lisible.
+
+## P15-M005 capability update
+
+- C-FUSION-UI : `gate-prepared` pour preset `p15_tray_semantics` par defaut, settings `quick_asset_box` et `max_stack_height_mm = 18`.
+- C-ASSET : scenario 5 assets bas couvrant tokens, dice, meeples et generic sans towers hautes par defaut.
+- C-QUALITY : smoke P15 documente et automatisable via `prepare_quick_asset_test.ps1 -Preset p15_tray_semantics` puis validation humaine Fusion.

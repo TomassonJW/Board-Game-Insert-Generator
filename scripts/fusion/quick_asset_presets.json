@@ -3,35 +3,84 @@
   "presets": {
     "p14_complete": {
       "label": "P14 complete 5-asset tray smoke scenario",
-      "box_inner_mm": { "x": 220, "y": 160, "z": 96 },
-      "grid_units": { "x": 8, "y": 5, "z": 4 },
+      "box_inner_mm": {
+        "x": 220,
+        "y": 160,
+        "z": 96
+      },
+      "grid_units": {
+        "x": 8,
+        "y": 5,
+        "z": 4
+      },
       "assets_text": "coin-tokens,tokens,36,18,16,2,loose; status-tokens,tokens,24,12,18,2,loose; damage-tokens,tokens,18,20,20,2,loose; dice-set,dice,12,16,16,16,loose; wood-meeples,meeples,20,12,12,18,loose",
       "notes": "Default P14 gate scenario. Three compatible token sources exercise robust multi-asset compartment layout; dice and meeples exercise mixed quick_asset_box presets without a global solver.",
       "smoke_focus": "5 assets read, 3 generated asset modules, token module with 3 source compartments using deterministic_shelf_by_source_asset_v0, printability_report_v0, regenerate without duplicates"
     },
     "tokens": {
       "label": "Two token sources, count-aware compartments and access notches",
-      "box_inner_mm": { "x": 130, "y": 50, "z": 60 },
-      "grid_units": { "x": 4, "y": 4, "z": 3 },
+      "box_inner_mm": {
+        "x": 130,
+        "y": 50,
+        "z": 60
+      },
+      "grid_units": {
+        "x": 4,
+        "y": 4,
+        "z": 3
+      },
       "assets_text": "coin-tokens,tokens,40,18,16,2,loose; status-tokens,tokens,23,10,35,2,loose",
       "notes": "Baseline P13/P14 token tray smoke case.",
       "smoke_focus": "two token compartments, internal wall, two top-open rectangular access notches"
     },
     "dice_meeples_generic": {
       "label": "Mixed dice, meeples and generic parts",
-      "box_inner_mm": { "x": 180, "y": 120, "z": 72 },
-      "grid_units": { "x": 6, "y": 4, "z": 3 },
+      "box_inner_mm": {
+        "x": 180,
+        "y": 120,
+        "z": 72
+      },
+      "grid_units": {
+        "x": 6,
+        "y": 4,
+        "z": 3
+      },
       "assets_text": "dice-set,dice,12,16,16,16,loose; wood-meeples,meeples,24,12,12,18,loose; cubes,generic,30,8,8,8,loose",
       "notes": "Mixed source types exercise multiple generated asset candidates without a solver.",
       "smoke_focus": "multiple asset candidates, count-aware sizing, clear warnings that no global optimization is performed"
     },
     "cards_tokens": {
       "label": "Sleeved card deck plus token source",
-      "box_inner_mm": { "x": 160, "y": 120, "z": 72 },
-      "grid_units": { "x": 5, "y": 4, "z": 3 },
+      "box_inner_mm": {
+        "x": 160,
+        "y": 120,
+        "z": 72
+      },
+      "grid_units": {
+        "x": 5,
+        "y": 4,
+        "z": 3
+      },
       "assets_text": "main-deck,sleeved_cards,1,66,91,22,loose; coin-tokens,tokens,30,20,20,2,loose",
       "notes": "For cards and sleeved_cards, z_mm is the total deck height; count is reported, not multiplied.",
       "smoke_focus": "card deck z-height semantics, token count-aware sizing, report limitations visible"
+    },
+    "p15_tray_semantics": {
+      "label": "P15 tray semantics 5-asset low tray smoke scenario",
+      "box_inner_mm": {
+        "x": 220,
+        "y": 160,
+        "z": 60
+      },
+      "grid_units": {
+        "x": 8,
+        "y": 5,
+        "z": 3
+      },
+      "max_stack_height_mm": 18,
+      "assets_text": "coin-tokens,tokens,40,18,16,2,loose; status-tokens,tokens,24,12,18,2,loose; dice-set,dice,8,16,16,16,loose; wood-meeples,meeples,18,12,12,8,loose; cubes,generic,24,8,8,8,loose",
+      "notes": "Default P15 semantics gate scenario. Five assets exercise flat_tray stack caps, XY expansion before Z, grid reservation reporting, compartments, access notches and printability warnings without a global solver.",
+      "smoke_focus": "5 assets read, low flat_tray modules, max_stack_height_mm reported, grid_semantics placement_reservation_lattice_v0, body_snap_to_grid no, compartments/access notches, printability_report_v0, regenerate without duplicates"
     }
   }
 }

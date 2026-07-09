@@ -1778,12 +1778,13 @@ class FusionSkeletonTests(unittest.TestCase):
         script_source = (ROOT / "scripts" / "fusion" / "prepare_quick_asset_test.ps1").read_text(encoding="utf-8-sig")
 
         self.assertEqual(catalog["schema"], "bgig.quick_asset_presets.v0")
-        self.assertIn('[string] $Preset = "p14_complete"', script_source)
-        self.assertIn('ValidateSet("p14_complete", "tokens", "dice_meeples_generic", "cards_tokens")', script_source)
+        self.assertIn('[string] $Preset = "p15_tray_semantics"', script_source)
+        self.assertIn('ValidateSet("p15_tray_semantics", "p14_complete", "tokens", "dice_meeples_generic", "cards_tokens")', script_source)
         self.assertEqual(
             set(catalog["presets"]),
-            {"p14_complete", "tokens", "dice_meeples_generic", "cards_tokens"},
+            {"p15_tray_semantics", "p14_complete", "tokens", "dice_meeples_generic", "cards_tokens"},
         )
+        self.assertEqual(catalog["presets"]["p15_tray_semantics"]["max_stack_height_mm"], 18)
         for preset_name, preset in catalog["presets"].items():
             overrides = {
                 "box_inner_x_mm": str(preset["box_inner_mm"]["x"]),
@@ -1803,9 +1804,18 @@ class FusionSkeletonTests(unittest.TestCase):
             self.assertGreater(len(asset_report["accepted_assets"]), 0, preset_name)
             self.assertEqual(asset_report["rejected_assets"], [], preset_name)
 
-            config_payload = build_quick_asset_box_config_payload(overrides, preset["assets_text"])
+            config_payload = build_quick_asset_box_config_payload(
+                overrides,
+                preset["assets_text"],
+                str(preset.get("max_stack_height_mm", "")),
+            )
             self.assertEqual(config_payload["modules"], [], preset_name)
             self.assertGreater(len(config_payload["assets"]), 0, preset_name)
+            if "max_stack_height_mm" in preset:
+                self.assertTrue(
+                    any(asset.get("max_stack_height_mm") == float(preset["max_stack_height_mm"]) for asset in config_payload["assets"]),
+                    preset_name,
+                )
             self.assertEqual(
                 config_payload["box"]["inner_dimensions_mm"]["x"],
                 float(preset["box_inner_mm"]["x"]),

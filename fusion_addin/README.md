@@ -700,3 +700,7 @@ Le smoke P14 doit verifier que la commande affiche `Quick asset format and units
 ### P14-USABLE-ASSET-TRAY-M004 quick_asset_box presets
 
 Le script `scripts/fusion/prepare_quick_asset_test.ps1` accepte `-Preset p14_complete`, `-Preset tokens`, `-Preset dice_meeples_generic` et `-Preset cards_tokens`. Le catalogue est `scripts/fusion/quick_asset_presets.json`. `p14_complete` est le preset par defaut pour la gate P14 : 5 assets, box `220 x 160 x 96`, grid `8 x 5 x 4`. `-AssetsText` reste prioritaire pour un cas manuel. Le smoke Fusion doit verifier que le preset choisi hydrate bien `bgig_ui_settings.json`, que le champ `Assets (quick_asset_box)` est pre-rempli, et que le rapport reste explicite sur les limites non print-validees.
+
+### P15-TRAY-SEMANTICS-ALIGNMENT-SPRINT-V smoke preset
+
+`prepare_quick_asset_test.ps1` prepare maintenant par defaut `p15_tray_semantics` : box `220 x 160 x 60`, grid `8 x 5 x 3`, `max_stack_height_mm = 18`, assets `coin-tokens`, `status-tokens`, `dice-set`, `wood-meeples` et `cubes`. Le smoke Fusion doit verifier `flat_tray`, `stack_height_policy`, `max_stack_height_mm`, `grid_semantics: placement_reservation_lattice_v0`, `body_snap_to_grid: no`, compartiments/encoches, printability report, regenerate sans doublon et clear preservant les objets non-BGIG.

@@ -414,3 +414,7 @@ Le message de generation expose la politique de rangement : `storage_orientation
 Le rapport `quick_asset_box` affiche maintenant `grid_semantics: placement_reservation_lattice_v0`, `body_snap_to_grid: no`, `grid_span_is_reserved_space: yes` et `body_size_may_be_smaller_than_grid_span: yes`. Le `Module source mapping` et le `Body sizing report` repetent cette distinction : le span grille reserve des cellules, tandis que le body Fusion est dimensionne par `printable_body_size_mm`.
 
 Cette mission ne change pas la geometrie et n'ajoute pas de visualisation de cellules. Elle rend seulement le comportement lisible pour la gate P15.
+
+## P15-M005 - Preset smoke P15
+
+`prepare_quick_asset_test.ps1` utilise maintenant `p15_tray_semantics` par defaut. Ce preset prepare une box `220 x 160 x 60`, une grille `8 x 5 x 3`, `max_stack_height_mm = 18` et cinq assets mixtes. L'objectif UX de gate est de verifier dans Fusion que les champs sont pre-remplis, que `max_stack_height_mm` est persiste, et que le rapport explique `flat_tray`, `stack_height_policy` et la semantique grid.
