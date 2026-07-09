@@ -152,6 +152,8 @@ PLAN_STATUS_PLANNED_ONLY = "planned_only"
 CAVITY_CUT_OPERATION_KIND = "subtract_rectangular_cavity"
 ASSET_FIT_CAVITY_POLICY = "single_asset_fit_rectangular_cavity_v0"
 ASSET_COMPARTMENT_CAVITY_POLICY = "per_source_asset_rectangular_compartments_v0"
+ASSET_ACCESS_POLICY = "per_compartment_top_open_rectangular_notch_v0"
+ASSET_ACCESS_FEATURE_KIND = "asset_access_notch"
 CAVITY_FEATURE_OPERATION_KIND = "describe_cavity_feature"
 FINGER_NOTCH_CUT_OPERATION_KIND = "rectangular_finger_notch_cut"
 GRID_PLACED_BLANK_OPERATION_KIND = "create_grid_positioned_asset_blank"
@@ -1458,6 +1460,9 @@ def quick_asset_box_metadata(
     module_sizing_diagnostics = _quick_asset_box_module_sizing_diagnostics(module_candidates)
     storage_sizing_status = _quick_asset_box_count_aware_status(module_sizing_diagnostics)
     asset_cavity_diagnostics = _quick_asset_box_asset_cavity_diagnostics(executable_plan)
+    asset_access_diagnostics = _quick_asset_box_asset_access_diagnostics(executable_plan)
+    asset_access_notches_planned = sum(1 for diagnostic in asset_access_diagnostics if diagnostic.get("status") == "planned")
+    asset_access_notches_refused = sum(1 for diagnostic in asset_access_diagnostics if diagnostic.get("status") == "refused")
     asset_fit_cavities_planned = sum(1 for diagnostic in asset_cavity_diagnostics if diagnostic.get("status") == "planned")
     asset_fit_cavities_refused = sum(1 for diagnostic in asset_cavity_diagnostics if diagnostic.get("status") == "refused")
     asset_compartment_cavities_planned = sum(
@@ -1503,6 +1508,12 @@ def quick_asset_box_metadata(
         "asset_compartment_cavities_planned": asset_compartment_cavities_planned,
         "asset_compartment_cavities_refused": asset_compartment_cavities_refused,
         "asset_compartment_debug_outlines": asset_compartment_cavities_planned > 0,
+        "asset_access_features_generated": asset_access_notches_planned > 0,
+        "asset_access_policy": ASSET_ACCESS_POLICY if asset_access_diagnostics else "none",
+        "asset_access_notches_planned": asset_access_notches_planned,
+        "asset_access_notches_generated": asset_access_notches_planned,
+        "asset_access_notches_refused": asset_access_notches_refused,
+        "asset_access_diagnostics": asset_access_diagnostics,
         "asset_cavity_diagnostics": asset_cavity_diagnostics,
         "count_aware_storage_sizing": storage_sizing_status,
         "storage_sizing_scope": "count_aware_stacked_rectangular_piles_v0" if storage_sizing_status == "yes" else "partial_or_representative_asset_envelope_v0",
@@ -1558,6 +1569,50 @@ def _quick_asset_box_asset_sizing_diagnostics(
         )
     return diagnostics
 
+
+def _quick_asset_box_asset_access_diagnostics(executable_plan: Any) -> list[dict[str, Any]]:
+    if not isinstance(executable_plan, dict):
+        return []
+    generated_modules = executable_plan.get("generated_modules", [])
+    if not isinstance(generated_modules, list):
+        return []
+    diagnostics: list[dict[str, Any]] = []
+    for module in generated_modules:
+        if not isinstance(module, dict):
+            continue
+        cavity = module.get("asset_fit_cavity")
+        if not isinstance(cavity, dict):
+            continue
+        compartments = cavity.get("compartments") if cavity.get("policy") == ASSET_COMPARTMENT_CAVITY_POLICY else None
+        if not isinstance(compartments, list):
+            continue
+        for compartment in compartments:
+            if not isinstance(compartment, dict):
+                continue
+            notch = compartment.get("asset_access_notch")
+            if not isinstance(notch, dict):
+                continue
+            diagnostics.append(
+                {
+                    "module_id": module.get("module_id"),
+                    "candidate_id": module.get("candidate_id"),
+                    "asset_id": compartment.get("asset_id") or notch.get("asset_id"),
+                    "compartment_id": compartment.get("id") or notch.get("compartment_id"),
+                    "status": notch.get("status"),
+                    "notch_generated": bool(notch.get("notch_generated")),
+                    "policy": notch.get("policy") or cavity.get("asset_access_policy"),
+                    "target_wall": notch.get("target_wall"),
+                    "placement": notch.get("placement"),
+                    "width_mm": notch.get("width_mm"),
+                    "depth_from_top_mm": notch.get("depth_from_top_mm"),
+                    "target_wall_thickness_mm": notch.get("target_wall_thickness_mm"),
+                    "position_mm": notch.get("position_mm"),
+                    "size_mm": notch.get("size_mm"),
+                    "reason": notch.get("reason"),
+                    "warning": notch.get("warning"),
+                }
+            )
+    return diagnostics
 
 def _quick_asset_box_asset_cavity_diagnostics(executable_plan: Any) -> list[dict[str, Any]]:
     if not isinstance(executable_plan, dict):
@@ -1793,6 +1848,11 @@ def quick_asset_box_summary(payload: dict[str, Any] | None) -> str:
         f"- asset_compartment_cavities_planned: {quick.get('asset_compartment_cavities_planned', 0)}",
         f"- asset_compartment_cavities_refused: {quick.get('asset_compartment_cavities_refused', 0)}",
         f"- asset_compartment_debug_outlines: {'yes' if quick.get('asset_compartment_debug_outlines') else 'no'}",
+        f"- asset_access_features_generated: {'yes' if quick.get('asset_access_features_generated') else 'no'}",
+        f"- asset_access_policy: {quick.get('asset_access_policy') or 'none'}",
+        f"- asset_access_notches_planned: {quick.get('asset_access_notches_planned', 0)}",
+        f"- asset_access_notches_generated: {quick.get('asset_access_notches_generated', 0)}",
+        f"- asset_access_notches_refused: {quick.get('asset_access_notches_refused', 0)}",
         f"- count_aware_storage_sizing: {quick.get('count_aware_storage_sizing') or 'no'}",
         f"- sizing_scope: {quick.get('storage_sizing_scope')}",
         f"- asset_debug_visualization: {'yes' if quick.get('asset_debug_visualization') else 'no'}",
@@ -1852,6 +1912,20 @@ def quick_asset_box_summary(payload: dict[str, Any] | None) -> str:
             f"item_cavities {diagnostic.get('item_cavity_policy') or 'n/a'}; "
             f"items_visualized {'yes' if diagnostic.get('asset_items_visualized') else 'no'}; "
             f"reason {diagnostic.get('reason') or diagnostic.get('warning') or 'n/a'}"
+        )
+    for diagnostic in quick.get("asset_access_diagnostics", []):
+        warning = diagnostic.get("warning") or diagnostic.get("reason") or "n/a"
+        lines.append(
+            "- asset_access_notch: "
+            f"asset {diagnostic.get('asset_id') or 'n/a'}; "
+            f"compartment {diagnostic.get('compartment_id') or 'n/a'}; "
+            f"generated {'yes' if diagnostic.get('notch_generated') else 'no'}; "
+            f"width {diagnostic.get('width_mm') if diagnostic.get('width_mm') is not None else 'n/a'} mm; "
+            f"depth_from_top {diagnostic.get('depth_from_top_mm') if diagnostic.get('depth_from_top_mm') is not None else 'n/a'} mm; "
+            f"target_wall {diagnostic.get('target_wall') or 'n/a'}; "
+            f"position {_format_vector_payload(diagnostic.get('position_mm'))}; "
+            f"bbox {_format_vector_payload(diagnostic.get('size_mm'))}; "
+            f"reason {warning}"
         )
     for warning in quick.get("warnings", []):
         lines.append(f"- warning: {warning}")
@@ -2405,6 +2479,7 @@ def generation_plan_from_cad_ir(
         blanks,
     )
     cavity_cuts.extend(_asset_fit_cavity_cut_plans(grid_positioned_blanks))
+    finger_notch_cuts.extend(_asset_access_notch_cut_plans(grid_positioned_blanks))
     source_blanks = [*blanks, *grid_positioned_blanks]
     compact_occurrences = _compact_occurrence_plans(source_blanks)
     exploded_occurrences = _exploded_view_occurrences(
@@ -2946,6 +3021,107 @@ def _asset_cavity_cut_plan_from_payload(
         cavity_source=cavity_source,
         policy=policy,
     )
+
+def _asset_access_notch_cut_plans(blanks: list[FusionSolidPlan]) -> list[FusionFingerNotchCutPlan]:
+    cut_plans: list[FusionFingerNotchCutPlan] = []
+    for blank in blanks:
+        payload = blank.asset_fit_cavity
+        if not isinstance(payload, dict):
+            continue
+        if payload.get("status") != "planned" or payload.get("policy") != ASSET_COMPARTMENT_CAVITY_POLICY:
+            continue
+        compartments = payload.get("compartments")
+        if not isinstance(compartments, list):
+            continue
+        for index, compartment in enumerate(compartments):
+            if not isinstance(compartment, dict):
+                raise FusionSkeletonError(
+                    f"Asset access notch for {blank.body_name!r} compartment[{index}] must reference an object compartment."
+                )
+            notch = compartment.get("asset_access_notch")
+            if notch is None:
+                continue
+            if not isinstance(notch, dict):
+                raise FusionSkeletonError(
+                    f"Asset access notch for {blank.body_name!r} compartment[{index}] must be an object."
+                )
+            status = str(notch.get("status") or "").strip()
+            if status == "refused":
+                continue
+            if status != "planned":
+                raise FusionSkeletonError(
+                    f"Asset access notch for {blank.body_name!r} has unsupported status {status!r}."
+                )
+            if notch.get("policy") != ASSET_ACCESS_POLICY:
+                raise FusionSkeletonError(
+                    f"Asset access notch for {blank.body_name!r} uses unsupported policy {notch.get('policy')!r}."
+                )
+            if notch.get("target_wall") != FINGER_NOTCH_WALL_FRONT:
+                raise FusionSkeletonError(
+                    f"Asset access notch for {blank.body_name!r} must target the front wall in V0."
+                )
+            cavity_id = _required_text(compartment, "id", f"asset access compartment for {blank.body_name}")
+            feature_id = _required_text(notch, "id", f"asset access notch for {blank.body_name}")
+            cavity_origin = _vector_from_payload(
+                compartment,
+                "local_origin_mm",
+                f"asset access compartment {cavity_id} local origin",
+            )
+            cavity_size = _positive_vector_from_payload(
+                compartment,
+                "size_mm",
+                f"asset access compartment {cavity_id} size",
+            )
+            feature_position = _vector_from_payload(
+                notch,
+                "position_mm",
+                f"asset access notch {feature_id} position",
+            )
+            feature_size = _positive_vector_from_payload(
+                notch,
+                "size_mm",
+                f"asset access notch {feature_id} size",
+            )
+            geometry = _finger_notch_cut_geometry(
+                blank,
+                cavity_id,
+                feature_id,
+                cavity_origin,
+                cavity_size,
+                feature_position,
+                feature_size,
+                FINGER_NOTCH_WALL_FRONT,
+            )
+            cut_plans.append(
+                FusionFingerNotchCutPlan(
+                    component_id=blank.cad_id,
+                    component_name=blank.component_name,
+                    target_body_id=blank.cad_id,
+                    target_body_name=blank.body_name,
+                    operation_id=f"{blank.cad_id}:{feature_id}:asset_access_notch",
+                    cavity_id=cavity_id,
+                    feature_id=feature_id,
+                    source_feature_kind=ASSET_ACCESS_FEATURE_KIND,
+                    placement=str(notch.get("placement") or "front_center"),
+                    wall=FINGER_NOTCH_WALL_FRONT,
+                    sketch_plane=geometry["sketch_plane"],
+                    sketch_plane_offset_mm=geometry["sketch_plane_offset_mm"],
+                    extrude_direction=geometry["extrude_direction"],
+                    cut_depth_mm=geometry["cut_depth_mm"],
+                    top_open=geometry["top_open"],
+                    notch_depth_from_top_mm=geometry["notch_depth_from_top_mm"],
+                    profile_bottom_z_mm=geometry["profile_bottom_z_mm"],
+                    profile_top_z_mm=geometry["profile_top_z_mm"],
+                    top_open_overshoot_mm=geometry["top_open_overshoot_mm"],
+                    cut_origin_mm=geometry["cut_origin_mm"],
+                    cut_size_mm=feature_size,
+                    profile_start_mm=geometry["profile_start_mm"],
+                    profile_end_mm=geometry["profile_end_mm"],
+                    cavity_local_origin_mm=cavity_origin,
+                    feature_position_mm=feature_position,
+                )
+            )
+    return cut_plans
 
 def _cavity_cut_plans(
     component_id: str,

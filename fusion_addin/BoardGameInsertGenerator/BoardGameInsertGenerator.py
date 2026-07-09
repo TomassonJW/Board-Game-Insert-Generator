@@ -932,6 +932,11 @@ def _generation_result_message(
         f"Asset-fit cavities generated: {result['asset_fit_cavities_generated']}\n"
         f"Asset compartment cavities planned: {result['asset_compartment_cavities_planned']}\n"
         f"Asset compartment cavities generated: {result['asset_compartment_cavities_generated']}\n"
+        f"Asset access features generated: {result['asset_access_features_generated']}\n"
+        f"Asset access policy: {result['asset_access_policy']}\n"
+        f"Asset access notches planned: {result['asset_access_notches_planned']}\n"
+        f"Asset access notches generated: {result['asset_access_notches_generated']}\n"
+        f"Asset access notches refused: {result['asset_access_notches_refused']}\n"
         f"Simple finger notch features planned: {result['finger_notch_features_planned']}\n"
         f"Simple finger notch sketches: {result['finger_notch_sketches']}\n"
         f"Simple top-open finger notch cuts: {result['finger_notch_cuts']}\n"
@@ -970,6 +975,11 @@ def _stable_generation_result(result: dict[str, object]) -> dict[str, object]:
         "asset_fit_cavities_generated": 0,
         "asset_compartment_cavities_planned": 0,
         "asset_compartment_cavities_generated": 0,
+        "asset_access_features_generated": "no",
+        "asset_access_policy": "none",
+        "asset_access_notches_planned": 0,
+        "asset_access_notches_generated": 0,
+        "asset_access_notches_refused": 0,
         "finger_notch_features_planned": 0,
         "finger_notch_sketches": 0,
         "finger_notch_cuts": 0,
@@ -1638,8 +1648,12 @@ def _generate_from_plan(design, plan: FusionGenerationPlan, registry: BgigFusion
         if getattr(cavity_cut, "cavity_source", "") == "asset_compartment_cavity":
             asset_compartment_cavity_cuts_generated += 1
 
+    asset_access_notch_cuts_planned = sum(
+        1 for notch_cut in plan.finger_notch_cuts if getattr(notch_cut, "source_feature_kind", "") == "asset_access_notch"
+    )
     finger_notch_sketch_count = 0
     finger_notch_cut_count = 0
+    asset_access_notch_cut_count = 0
     for notch_cut in plan.finger_notch_cuts:
         target_body = created_bodies.get(notch_cut.target_body_id)
         target_component = created_components.get(notch_cut.target_body_id)
@@ -1659,6 +1673,8 @@ def _generate_from_plan(design, plan: FusionGenerationPlan, registry: BgigFusion
         )
         finger_notch_sketch_count += result["sketches"]
         finger_notch_cut_count += result["cuts"]
+        if getattr(notch_cut, "source_feature_kind", "") == "asset_access_notch":
+            asset_access_notch_cut_count += result["cuts"]
 
     body_size_reports = [
         _fusion_body_size_report(blank, created_bodies[blank.cad_id])
@@ -1714,6 +1730,11 @@ def _generate_from_plan(design, plan: FusionGenerationPlan, registry: BgigFusion
         "asset_fit_cavities_generated": asset_fit_cavity_cuts_generated,
         "asset_compartment_cavities_planned": asset_compartment_cavity_cuts_planned,
         "asset_compartment_cavities_generated": asset_compartment_cavity_cuts_generated,
+        "asset_access_features_generated": "yes" if asset_access_notch_cut_count > 0 else "no",
+        "asset_access_policy": "per_compartment_top_open_rectangular_notch_v0" if asset_access_notch_cuts_planned > 0 else "none",
+        "asset_access_notches_planned": asset_access_notch_cuts_planned,
+        "asset_access_notches_generated": asset_access_notch_cut_count,
+        "asset_access_notches_refused": 0,
         "finger_notch_features_planned": len(plan.finger_notch_cuts),
         "finger_notch_sketches": finger_notch_sketch_count,
         "finger_notch_cuts": finger_notch_cut_count,

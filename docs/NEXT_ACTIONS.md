@@ -18,15 +18,13 @@ structurant, authentification absente ou refus de push direct.
 
 ## Gate humaine active
 
-`P13-ASSET-M005-GATE - Decider la prochaine etape apres compartiments asset-specific V0`.
+`P13-ASSET-M005V - Valider les encoches d'acces par compartiment dans Fusion`.
 
-Statut : gate produit active. `P13-ASSET-M004V` est validee humainement comme premiere generation de compartiments asset-specific V0 : module exterieur count-aware + deux cavites rectangulaires top-open separees par asset source, regenerate/clear valides, registry OK, `print-validated: false`.
-
-Decision attendue : choisir explicitement la prochaine mission bornee. Options candidates : dette UI/UX `quick_asset_box` (formats, unites, sections, presets, aide), visualisation/proxies d'assets, cavites par pile/item, sizing capacitaire plus garanti, traitement cartes/decks, solveur/optimisation, fillets/conges, export imprimable ou protocole d'impression.
+Statut : gate Fusion active. `P13-ASSET-M005` est implemente hors Fusion et le smoke test local doit etre prepare par Codex. La validation humaine doit confirmer que le flux `quick_asset_box` genere le module count-aware, les compartiments asset-specific et les encoches rectangulaires top-open reelles par compartiment supporte, sans doublon apres `regenerate`, avec `clear_bgig_scene` preservant les objets non-BGIG et `Print validation: false`.
 
 ## Mission ready non gated
 
-Aucune mission produit non-gated supplementaire n'est recommandee avant decision humaine sur `P13-ASSET-M005-GATE`.
+Aucune mission produit non-gated supplementaire n'est recommandee avant validation humaine `P13-ASSET-M005V` ou nouvelle decision explicite.
 
 ## Regle operationnelle Fusion
 
@@ -41,7 +39,7 @@ Fusion restantes a Thomas.
 
 `P10-SOLVER-GATE - Solveur complexe, backtracking ou optimisation globale`.
 
-Palette persistante HTML, UI assets avancee/tableau, solveur plus automatique, cavites par pile/logements detailles, assets individuels Fusion, nouvelle geometrie produit complexe, export imprimable et validation d'impression restent gates ou missions separees. P13-ASSET-M004V valide seulement des compartiments rectangulaires par asset source, sans assets individuels, sans cavites par pile/item, sans capacite physique garantie ni impression 3D. La dette UX `quick_asset_box` est documentee et gatee pour une mission separee.
+Palette persistante HTML, UI assets avancee/tableau, solveur plus automatique, cavites par pile/logements detailles, assets individuels Fusion, nouvelle geometrie produit complexe, export imprimable et validation d'impression restent gates ou missions separees. P13-ASSET-M005 implemente seulement des encoches rectangulaires top-open V0 par compartiment supporte, sans courbes, fillets, garanties physiques ni impression 3D.
 
 ## Fin de chaque mission
 

@@ -79,6 +79,8 @@ function Assert-BgigFusionAddinMarkers {
             "asset_fit_cavities_generated",
             "asset_compartment_cavities_planned",
             "asset_compartment_debug_outlines",
+            "per_compartment_top_open_rectangular_notch_v0",
+            "asset_access_notches_planned",
             "count_aware_storage_sizing",
             "asset_debug_visualization",
             "stacked_rectangular_piles_v0",

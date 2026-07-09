@@ -747,3 +747,15 @@ Fusion ne recalcule toujours ni layout, ni tolerances, ni sizing. L'adaptateur l
 La coupe Fusion reutilise l'operation rectangulaire existante `subtract_rectangular_cavity`, limitee au body cible. Le rapport distingue les cavites CAD IR classiques et les cavites asset-fit avec `asset_cavity_policy`, `asset_fit_cavities_planned` et `asset_fit_cavities_generated`.
 
 Limites maintenues : pas de cavites par pile, pas d'assets individuels, pas de fillets, pas d'export imprimable, pas de validation d'impression.
+
+## P13-ASSET-M004 - Compartiments asset-specific
+
+L'adaptateur Fusion lit `asset_fit_cavity.policy = per_source_asset_rectangular_compartments_v0` et convertit chaque entree `compartments[]` planifiee en coupe `FusionCavityCutPlan` de source `asset_compartment_cavity`. Fusion ne recalcule ni layout, ni sizing, ni tolerances.
+
+## P13-ASSET-M005 - Encoches d'acces par compartiment
+
+L'adaptateur Fusion lit `compartments[].asset_access_notch`. Les notches `status: planned` et `policy: per_compartment_top_open_rectangular_notch_v0` deviennent des `FusionFingerNotchCutPlan` avec `source_feature_kind = asset_access_notch`.
+
+L'execution reutilise la coupe rectangulaire top-open deja validee pour les encoches simples : sketch sur plan XZ du mur avant, profil depassant legerement le haut du body, extrusion cut limitee au body cible via `participantBodies`. Les notches refusees ne sont pas executees. Les demi-lunes, courbes, scoops, fillets, conges et exports imprimables restent hors scope.
+
+Statut courant : implemente hors Fusion, validation humaine `P13-ASSET-M005V` requise. `print-validated: false`.

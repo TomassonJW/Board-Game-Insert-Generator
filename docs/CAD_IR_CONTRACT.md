@@ -417,3 +417,36 @@ Payload planifie V0 :
 ```
 
 Si la cavite est impossible ou hors scope, le payload reste transportable avec `status: refused`, `code` et `reason`. Fusion ignore les cavites refusees et refuse les cavites planifiees invalides qui depassent le module ou ne conservent pas le fond demande.
+
+## P13-ASSET-M004 - Metadata per-source compartments
+
+La metadata `asset_fit_cavity` peut porter `policy: per_source_asset_rectangular_compartments_v0` et une liste `compartments[]`. Chaque compartiment expose `id`, `asset_id`, `source_asset_ids`, `local_origin_mm`, `size_mm`, `retained_floor_mm`, `expected_walls_mm`, diagnostics de count-aware sizing et `operation_kind: subtract_rectangular_cavity`.
+
+Fusion consomme ces compartiments comme coupes rectangulaires top-open independantes, sans recalculer le layout.
+
+## P13-ASSET-M005 - Metadata asset_access_notch
+
+Chaque compartiment peut porter un objet `asset_access_notch` :
+
+```json
+{
+  "id": "asset-access-notch:coin-tokens",
+  "status": "planned",
+  "policy": "per_compartment_top_open_rectangular_notch_v0",
+  "asset_id": "coin-tokens",
+  "compartment_id": "asset-compartment:coin-tokens",
+  "target_wall": "front",
+  "placement": "front_center",
+  "coordinate_frame": "compartment.local",
+  "operation_kind": "rectangular_finger_notch_cut",
+  "width_mm": 18.0,
+  "depth_from_top_mm": 10.0,
+  "target_wall_thickness_mm": 1.2,
+  "position_mm": {"x": 9.8, "y": 0.0, "z": 0.0},
+  "size_mm": {"x": 18.0, "y": 1.2, "z": 10.0},
+  "bbox_size_mm": {"x": 18.0, "y": 1.2, "z": 10.0},
+  "reason": "Compartment touches the module front wall and has enough width/height for a rectangular top-open access notch V0."
+}
+```
+
+Un refus reste serialise avec `status: refused`, `notch_generated: false` et `reason`. Les notches sont additives : elles ne changent pas `schema_version`, ne remplacent pas les operations CAD IR classiques et ne valident pas l'impression.

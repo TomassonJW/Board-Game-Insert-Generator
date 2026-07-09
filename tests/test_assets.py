@@ -233,6 +233,69 @@ class AssetModelTests(unittest.TestCase):
         self.assertEqual(generated["dimensions_mm"], {"x": 33.6, "y": 13.6, "z": 21.8})
         self.assertEqual(generated["asset_fit_cavity"]["compartments"][0]["size_mm"], {"x": 31.2, "y": 11.2, "z": 20.6})
 
+    def test_asset_compartments_plan_front_access_notches_for_smoke_case(self) -> None:
+        payload = _count_aware_tokens_payload(count=40)
+        payload["project_name"] = "P13 M005 access notch smoke fixture"
+        payload["box"]["inner_dimensions_mm"] = {"x": 130, "y": 50, "z": 60}
+        payload["box"]["usable_height_mm"] = 60
+        payload["volumetric_grid"] = {
+            "unit_mm": {"x": 32.5, "y": 12.5, "z": 20},
+            "size_units": {"x": 4, "y": 4, "z": 3},
+        }
+        payload["assets"] = [
+            {
+                "id": "coin-tokens",
+                "name": "Coin tokens",
+                "kind": "tokens",
+                "quantity": {"count": 40, "grouping": "set"},
+                "dimensions_mm": {"x": 18, "y": 16, "z": 2},
+                "dimension_confidence": "exact",
+                "containment_intent": "store",
+            },
+            {
+                "id": "status-tokens",
+                "name": "Status tokens",
+                "kind": "tokens",
+                "quantity": {"count": 23, "grouping": "set"},
+                "dimensions_mm": {"x": 10, "y": 35, "z": 2},
+                "dimension_confidence": "exact",
+                "containment_intent": "store",
+            },
+        ]
+        generated = _layout_payload(payload)["executable_asset_plan"]["generated_modules"][0]
+        cavity = generated["asset_fit_cavity"]
+
+        self.assertEqual(cavity["asset_access_policy"], "per_compartment_top_open_rectangular_notch_v0")
+        self.assertTrue(cavity["asset_access_features_generated"])
+        self.assertEqual(cavity["asset_access_notches_planned"], 2)
+        self.assertEqual(cavity["asset_access_notches_refused"], 0)
+        notches = [compartment["asset_access_notch"] for compartment in cavity["compartments"]]
+        self.assertEqual([notch["asset_id"] for notch in notches], ["coin-tokens", "status-tokens"])
+        self.assertEqual([notch["compartment_id"] for notch in notches], ["asset-compartment:coin-tokens", "asset-compartment:status-tokens"])
+        self.assertEqual([notch["status"] for notch in notches], ["planned", "planned"])
+        self.assertEqual([notch["target_wall"] for notch in notches], ["front", "front"])
+        self.assertEqual(notches[0]["width_mm"], 18.0)
+        self.assertEqual(notches[0]["depth_from_top_mm"], 10.0)
+        self.assertEqual(notches[0]["size_mm"], {"x": 18.0, "y": 1.2, "z": 10.0})
+        self.assertEqual(notches[1]["width_mm"], 8.8)
+        self.assertEqual(notches[1]["depth_from_top_mm"], 10.0)
+        self.assertLess(notches[0]["depth_from_top_mm"], cavity["compartments"][0]["size_mm"]["z"])
+        self.assertLess(notches[1]["depth_from_top_mm"], cavity["compartments"][1]["size_mm"]["z"])
+
+    def test_asset_access_notch_refuses_too_narrow_compartment(self) -> None:
+        payload = _count_aware_tokens_payload(count=1)
+        payload["assets"][0]["dimensions_mm"] = {"x": 3, "y": 10, "z": 2}
+        generated = _layout_payload(payload)["executable_asset_plan"]["generated_modules"][0]
+        cavity = generated["asset_fit_cavity"]
+        notch = cavity["compartments"][0]["asset_access_notch"]
+
+        self.assertEqual(cavity["asset_access_notches_planned"], 0)
+        self.assertEqual(cavity["asset_access_notches_refused"], 1)
+        self.assertEqual(notch["status"], "refused")
+        self.assertFalse(notch["notch_generated"])
+        self.assertIn("too narrow", notch["reason"])
+        self.assertEqual(notch["asset_id"], "coin-tokens")
+        self.assertEqual(notch["compartment_id"], "asset-compartment:coin-tokens")
     def test_asset_fit_cavity_refuses_card_stack_v0(self) -> None:
         payload = _count_aware_tokens_payload(count=60)
         payload["assets"][0]["kind"] = "cards"

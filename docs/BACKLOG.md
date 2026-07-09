@@ -823,4 +823,25 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Options candidates : dette UI/UX `quick_asset_box`, visualisation/proxies d'assets, cavites par pile/item, sizing capacitaire plus garanti, traitement cartes/decks, solveur/optimisation, fillets/conges, export imprimable, calibration/impression ou maintien du scope V0.
 - Dette UX a prendre en compte : les champs assets, formats, unites, effets de `count`, dimensions, grille, murs, fond et clearances restent difficiles a comprendre pour un humain.
 - Gate : decision humaine produit requise avant toute mission produit suivante.
-- Statut : `ready-gated`.
+- Statut : `done`, decision humaine recue le 2026-07-09 pour lancer `P13-ASSET-M005 - Per-compartment access notches V0`.
+
+### P13-ASSET-M005 - Per-compartment access notches V0
+
+- Capability : C-ASSET, C-ACCESS, C-FUSION-UI, C-FILLETS.
+- Milestone : M14 Usable beta / M8 Ergonomic planner / M5 CAD ergonomic features.
+- Objectif : ajouter une encoche d'acces rectangulaire top-open par compartiment asset-source supporte.
+- Livrable : policy `per_compartment_top_open_rectangular_notch_v0`, payload `asset_access_notch`, conversion en `FusionFingerNotchCutPlan`, reporting `asset_access_*`, tests et smoke script.
+- Criteres d'acceptation : deux encoches pour le smoke M005 si geometriquement possible, refus explicite si trop etroit ou non adjacent au mur avant, fond et parois preserves, regenerate/clear conserves, coeur Python sans `adsk`.
+- Tests : unitaires assets et Fusion skeleton, py_compile add-in, CLI Markdown/JSON/export CAD IR, scripts Fusion dry-run/reel, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
+- Gate : validation humaine Fusion `P13-ASSET-M005V` requise.
+- Statut : `manual_validation_required`, implemente hors Fusion, `print-validated: false`.
+
+### P13-ASSET-M005V - Valider les encoches d'acces par compartiment dans Fusion
+
+- Capability : C-ASSET, C-ACCESS, C-FUSION-UI, C-FILLETS.
+- Milestone : M14 Usable beta / M8 Ergonomic planner.
+- Objectif : verifier dans Fusion que `quick_asset_box` genere de vraies coupes d'encoche top-open par compartiment supporte, sans casser le fond ni la paroi interne.
+- Livrable : smoke test humain Fusion avec generate, regenerate, clear et rapport.
+- Criteres d'acceptation : `asset_access_features_generated`, `asset_access_policy: per_compartment_top_open_rectangular_notch_v0`, compteurs planned/generated/refused, encoches visibles comme coupes reelles, registry OK, non-BGIG preserve, `Print validation: false`.
+- Gate : action humaine Thomas requise.
+- Statut : `manual_validation_required`.

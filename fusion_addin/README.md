@@ -678,3 +678,13 @@ Le smoke Fusion doit verifier `count_aware_storage_sizing: yes`, `asset_debug_vi
 Le script `scripts/fusion/prepare_quick_asset_test.ps1` prepare maintenant le smoke test M003 : box `130 x 50 x 60`, grid `4 x 4 x 3`, assets `coin-tokens,tokens,40,18,16,2,loose; status-tokens,tokens,23,10,35,2,loose`.
 
 Le smoke Fusion doit verifier que le module count-aware `50.0 x 39.0 x 48.0` est creuse par une cavite asset-fit globale `47.6 x 36.6 x 46.8 mm`, avec fond restant `1.2 mm`, murs attendus `1.2 mm`, `asset_cavities_generated: yes`, `asset_cavity_policy: single_asset_fit_rectangular_cavity_v0`, `asset_items_visualized: no` et `Print validation: false`.
+
+### P13-ASSET-M004 asset-specific compartment smoke values
+
+Le script `scripts/fusion/prepare_quick_asset_test.ps1` prepare le cas `130 x 50 x 60`, grille `4 x 4 x 3`, assets `coin-tokens,tokens,40,18,16,2,loose; status-tokens,tokens,23,10,35,2,loose`. Le smoke M004 attend deux vraies cavites rectangulaires top-open par asset source, une paroi interne, `asset_compartment_cavities_generated: 2`, `Registry validation: ok` et `Print validation: false`.
+
+### P13-ASSET-M005 per-compartment access notch smoke values
+
+Le meme script prepare maintenant le smoke M005. Le rapport doit afficher `asset_access_features_generated: yes`, `asset_access_policy: per_compartment_top_open_rectangular_notch_v0`, `asset_access_notches_planned: 2`, `asset_access_notches_generated: 2` et `asset_access_notches_refused: 0` sur le cas recommande.
+
+Dans Fusion, verifier que les encoches sont de vraies coupes rectangulaires top-open sur le mur avant, pas seulement des sketches, et que la paroi interne ainsi que le fond restent presents. Les assets individuels, cavites par pile/item, fillets/conges et exports STL/3MF restent non generes.

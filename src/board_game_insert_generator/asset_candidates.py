@@ -41,6 +41,11 @@ _ASSET_FIT_CAVITY_SUPPORTED_FUNCTIONAL_TYPES = {
 }
 _ASSET_FIT_CAVITY_POLICY = "single_asset_fit_rectangular_cavity_v0"
 _ASSET_COMPARTMENT_CAVITY_POLICY = "per_source_asset_rectangular_compartments_v0"
+_ASSET_ACCESS_POLICY = "per_compartment_top_open_rectangular_notch_v0"
+_ASSET_ACCESS_TARGET_NOTCH_WIDTH_MM = 18.0
+_ASSET_ACCESS_MIN_NOTCH_WIDTH_MM = 6.0
+_ASSET_ACCESS_TARGET_DEPTH_FROM_TOP_MM = 10.0
+_ASSET_ACCESS_MIN_DEPTH_FROM_TOP_MM = 4.0
 
 
 def build_module_candidates_from_assets(config: InsertConfig) -> list[dict[str, Any]]:
@@ -1157,6 +1162,96 @@ def _asset_cavity_payload(
     }
 
 
+def _asset_access_notch_payload(
+    *,
+    compartment: dict[str, Any],
+    wall_mm: float,
+    floor_mm: float,
+) -> dict[str, Any]:
+    compartment_id = str(compartment.get("id") or "unknown-compartment")
+    asset_id = str(compartment.get("asset_id") or "unknown-asset")
+    origin = compartment.get("local_origin_mm", {})
+    size = compartment.get("size_mm", {})
+    base = {
+        "id": f"asset-access-notch:{asset_id}",
+        "policy": _ASSET_ACCESS_POLICY,
+        "asset_id": asset_id,
+        "compartment_id": compartment_id,
+        "target_wall": "front",
+        "placement": "front_center",
+        "coordinate_frame": "compartment.local",
+        "operation_kind": "rectangular_finger_notch_cut",
+        "retained_floor_mm": round(floor_mm, 4),
+    }
+    try:
+        origin_y = float(origin.get("y", 0.0))
+        cavity_width = float(size.get("x", 0.0))
+        cavity_height = float(size.get("z", 0.0))
+    except (TypeError, ValueError):
+        return {
+            **base,
+            "status": "refused",
+            "notch_generated": False,
+            "reason": "Compartment origin/size are not numeric enough to place an access notch.",
+        }
+
+    if origin_y > wall_mm + 0.0001:
+        return {
+            **base,
+            "status": "refused",
+            "notch_generated": False,
+            "reason": "Compartment is not adjacent to the module front wall; V0 refuses to cut through another compartment or internal wall.",
+        }
+    if origin_y <= 0:
+        return {
+            **base,
+            "status": "refused",
+            "notch_generated": False,
+            "reason": "Front wall thickness is not positive, so a safe access notch cut cannot be planned.",
+        }
+
+    side_margin_mm = max(wall_mm, 0.0)
+    available_width = cavity_width - side_margin_mm * 2.0
+    if available_width < _ASSET_ACCESS_MIN_NOTCH_WIDTH_MM:
+        return {
+            **base,
+            "status": "refused",
+            "notch_generated": False,
+            "width_mm": round(max(available_width, 0.0), 4),
+            "reason": (
+                f"Compartment is too narrow for access notch V0: available width {available_width:.2f} mm "
+                f"is below {_ASSET_ACCESS_MIN_NOTCH_WIDTH_MM:.2f} mm after side margins."
+            ),
+        }
+    if cavity_height < _ASSET_ACCESS_MIN_DEPTH_FROM_TOP_MM:
+        return {
+            **base,
+            "status": "refused",
+            "notch_generated": False,
+            "depth_from_top_mm": round(max(cavity_height, 0.0), 4),
+            "reason": (
+                f"Compartment is too shallow for access notch V0: depth {cavity_height:.2f} mm "
+                f"is below {_ASSET_ACCESS_MIN_DEPTH_FROM_TOP_MM:.2f} mm."
+            ),
+        }
+
+    width_mm = round(min(_ASSET_ACCESS_TARGET_NOTCH_WIDTH_MM, available_width), 4)
+    depth_from_top_mm = round(min(_ASSET_ACCESS_TARGET_DEPTH_FROM_TOP_MM, cavity_height), 4)
+    position_x = round((cavity_width - width_mm) / 2.0, 4)
+    cut_depth_mm = round(origin_y, 4)
+    return {
+        **base,
+        "status": "planned",
+        "notch_generated": True,
+        "width_mm": width_mm,
+        "depth_from_top_mm": depth_from_top_mm,
+        "target_wall_thickness_mm": cut_depth_mm,
+        "position_mm": {"x": position_x, "y": 0.0, "z": 0.0},
+        "size_mm": {"x": width_mm, "y": cut_depth_mm, "z": depth_from_top_mm},
+        "bbox_size_mm": {"x": width_mm, "y": cut_depth_mm, "z": depth_from_top_mm},
+        "reason": "Compartment touches the module front wall and has enough width/height for a rectangular top-open access notch V0.",
+    }
+
 def _asset_compartment_cavity_payload(
     *,
     module_id: str,
@@ -1222,6 +1317,11 @@ def _asset_compartment_cavity_payload(
         compartment["retained_floor_mm"] = retained_floor
         compartment["expected_floor_mm"] = round(floor, 4)
         compartment["expected_walls_mm"] = expected_walls
+        compartment["asset_access_notch"] = _asset_access_notch_payload(
+            compartment=compartment,
+            wall_mm=wall,
+            floor_mm=floor,
+        )
         if float(origin.get("x", 0.0)) + float(size.get("x", 0.0)) > module_size_mm["x"]:
             errors.append(f"{compartment.get('id', 'unknown')} exceeds module width")
         if float(origin.get("y", 0.0)) + float(size.get("y", 0.0)) > module_size_mm["y"]:
@@ -1238,6 +1338,18 @@ def _asset_compartment_cavity_payload(
             "reason": "; ".join(errors),
             "compartments": compartments,
         }
+    asset_access_notches_planned = sum(
+        1
+        for compartment in compartments
+        if isinstance(compartment.get("asset_access_notch"), dict)
+        and compartment["asset_access_notch"].get("status") == "planned"
+    )
+    asset_access_notches_refused = sum(
+        1
+        for compartment in compartments
+        if isinstance(compartment.get("asset_access_notch"), dict)
+        and compartment["asset_access_notch"].get("status") == "refused"
+    )
     return {
         **base,
         "status": "planned",
@@ -1246,6 +1358,10 @@ def _asset_compartment_cavity_payload(
         "asset_compartment_cavities_planned": len(compartments),
         "asset_fit_size_mm": dict(layout.get("asset_fit_size_mm", {})),
         "internal_wall_thickness_mm": round(wall, 4),
+        "asset_access_policy": _ASSET_ACCESS_POLICY,
+        "asset_access_features_generated": asset_access_notches_planned > 0,
+        "asset_access_notches_planned": asset_access_notches_planned,
+        "asset_access_notches_refused": asset_access_notches_refused,
         "compartments": compartments,
         "clearance_source": clearance_applied.get("internal_asset_clearance_source", "unknown"),
         "warning": "Per-source asset compartments V0; individual asset items and piles are not cut.",

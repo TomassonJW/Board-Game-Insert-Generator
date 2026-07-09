@@ -16,6 +16,7 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     ASSEMBLY_DOCUMENT_REQUIRED_STATUS,
     ASSET_FIT_CAVITY_POLICY,
     ASSET_COMPARTMENT_CAVITY_POLICY,
+    ASSET_ACCESS_POLICY,
     BGIG_ACTION_GUIDANCE,
     BGIG_CLEAR_SCOPE,
     BGIG_EXISTING_SCENE_MESSAGE,
@@ -728,6 +729,15 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(quick_metadata["asset_compartment_cavities_planned"], 2)
         self.assertEqual(quick_metadata["asset_compartment_cavities_refused"], 0)
         self.assertTrue(quick_metadata["asset_compartment_debug_outlines"])
+        self.assertTrue(quick_metadata["asset_access_features_generated"])
+        self.assertEqual(quick_metadata["asset_access_policy"], ASSET_ACCESS_POLICY)
+        self.assertEqual(quick_metadata["asset_access_notches_planned"], 2)
+        self.assertEqual(quick_metadata["asset_access_notches_generated"], 2)
+        self.assertEqual(quick_metadata["asset_access_notches_refused"], 0)
+        self.assertEqual(len(quick_metadata["asset_access_diagnostics"]), 2)
+        self.assertEqual(quick_metadata["asset_access_diagnostics"][0]["asset_id"], "coin-tokens")
+        self.assertEqual(quick_metadata["asset_access_diagnostics"][0]["target_wall"], "front")
+        self.assertEqual(quick_metadata["asset_access_diagnostics"][0]["depth_from_top_mm"], 10.0)
         self.assertEqual(quick_metadata["count_aware_storage_sizing"], "yes")
         self.assertEqual(quick_metadata["storage_sizing_scope"], "count_aware_stacked_rectangular_piles_v0")
         self.assertTrue(quick_metadata["asset_debug_visualization"])
@@ -756,6 +766,12 @@ class FusionSkeletonTests(unittest.TestCase):
         plan = generation_plan_from_cad_ir(validate_cad_ir_payload(scene), FUSION_GENERATION_MODE_COMPACT_ONLY)
         self.assertEqual(len(plan.grid_positioned_blanks), 1)
         self.assertEqual(len(plan.cavity_cuts), 2)
+        self.assertEqual(len(plan.finger_notch_cuts), 2)
+        access_cut = plan.finger_notch_cuts[0]
+        self.assertEqual(access_cut.source_feature_kind, "asset_access_notch")
+        self.assertEqual(access_cut.wall, FINGER_NOTCH_WALL_FRONT)
+        self.assertEqual(access_cut.notch_depth_from_top_mm, 10.0)
+        self.assertGreater(access_cut.profile_bottom_z_mm, access_cut.cavity_local_origin_mm.z)
         cut = plan.cavity_cuts[0]
         self.assertEqual(cut.cavity_source, "asset_compartment_cavity")
         self.assertEqual(cut.policy, ASSET_COMPARTMENT_CAVITY_POLICY)
@@ -772,6 +788,12 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("asset_compartments_generated: yes", summary)
         self.assertIn("asset_compartment_cavities_planned: 2", summary)
         self.assertIn("asset_compartment_debug_outlines: yes", summary)
+        self.assertIn("asset_access_features_generated: yes", summary)
+        self.assertIn("asset_access_policy: per_compartment_top_open_rectangular_notch_v0", summary)
+        self.assertIn("asset_access_notches_planned: 2", summary)
+        self.assertIn("asset_access_notches_generated: 2", summary)
+        self.assertIn("asset_access_notch: asset coin-tokens", summary)
+        self.assertIn("target_wall front", summary)
         self.assertIn("count_aware_storage_sizing: yes", summary)
         self.assertIn("asset_debug_visualization: yes", summary)
         self.assertIn("capacity_per_stack 14", summary)
@@ -1203,8 +1225,10 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(len(plan.blanks), 0)
         self.assertEqual(len(plan.grid_positioned_blanks), 1)
         self.assertEqual(len(plan.rejected_grid_modules), 0)
-        self.assertEqual(plan.created_object_count, 5)
+        self.assertEqual(plan.created_object_count, 6)
         self.assertEqual(len(plan.cavity_cuts), 2)
+        self.assertEqual(len(plan.finger_notch_cuts), 1)
+        self.assertEqual(plan.finger_notch_cuts[0].source_feature_kind, "asset_access_notch")
         cut = plan.cavity_cuts[0]
         self.assertEqual(cut.cavity_source, "asset_compartment_cavity")
         self.assertEqual(cut.policy, ASSET_COMPARTMENT_CAVITY_POLICY)
@@ -1369,7 +1393,7 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(len(plan.grid_positioned_blanks), 1)
         self.assertEqual(len(plan.exploded_occurrences), 0)
         self.assertEqual(len(plan.cavity_cuts), 2)
-        self.assertEqual(plan.created_object_count, 4)
+        self.assertEqual(plan.created_object_count, 5)
 
     def test_skips_refused_asset_fit_cavity_without_cutting_grid_blank(self) -> None:
         payload = _cad_ir_payload_from_example("simple_asset_product_scene.json")

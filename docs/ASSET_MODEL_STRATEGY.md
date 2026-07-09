@@ -192,3 +192,17 @@ Le premier logement asset-first reel reste volontairement simple : pour chaque m
 Regle V0 : origine locale `wall_thickness_mm x wall_thickness_mm x floor_thickness_mm`, taille `asset_fit_size_mm`, fond conserve egal a `floor_thickness_mm` et murs attendus au moins egaux a `wall_thickness_mm`. Cette cavite n'est pas un solveur de rangement : elle ne cree pas de logements par pile, ne visualise pas les assets individuels et ne garantit pas physiquement la capacite declaree.
 
 Types supportes pour la cavite V0 : `tokens`, `dice`, `meeples`, `generic`. Les cartes et cartes sleevees gardent une semantique de paquet total et refusent la cavite asset-fit M003 tant qu'un logement carte dedie n'est pas specifie.
+
+## P13-ASSET-M004 - Compartiments par asset source
+
+Le flux `quick_asset_box` peut maintenant transformer un module count-aware en compartiments rectangulaires top-open par asset source. La policy active est `per_source_asset_rectangular_compartments_v0`.
+
+Chaque compartiment reste une approximation V0 : il represente l'enveloppe de stockage de l'asset source, pas les items individuels ni les piles detaillees. Le payload reporte l'asset id, les dimensions lues, le count, la capacite heuristique, l'origine locale, la taille de cavite, le fond conserve et les murs attendus.
+
+## P13-ASSET-M005 - Encoche d'acces par compartiment V0
+
+P13-ASSET-M005 ajoute une premiere ergonomie d'acces pour les compartiments asset-specific. La policy est `per_compartment_top_open_rectangular_notch_v0`.
+
+Regle V0 : au plus une encoche rectangulaire top-open par compartiment, sur le mur avant du module (`-Y`), centree dans la largeur utile du compartiment. Le moteur planifie l'encoche uniquement si le compartiment touche le mur avant externe, si la largeur restante apres marges laterales atteint 6.0 mm et si la profondeur verticale utile atteint 4.0 mm. La cible nominale est 18.0 mm de largeur et 10.0 mm de profondeur depuis le haut, bornee par la taille du compartiment.
+
+Si un compartiment n'est pas adjacent au mur avant, est trop etroit ou trop bas, l'encoche est refusee avec `status: refused` et une raison explicite. Les assets individuels, cavites par pile/item, courbes, scoops, fillets et garanties d'impression restent hors scope.

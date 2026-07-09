@@ -376,3 +376,13 @@ Le debug visuel Fusion est minimal et non imprimable : un sketch `asset-fit debu
 `quick_asset_box` reste la commande Fusion classique. Le smoke test M003 prepare le meme cas count-aware que M002 (`130 x 50 x 60`, grille `4 x 4 x 3`, assets tokens `40` et `23`) mais attend maintenant une coupe reelle : `asset_cavities_generated: yes`, `asset_cavity_policy: single_asset_fit_rectangular_cavity_v0`, une cavite asset-fit planifiee/generee, dimensions de cavite, fond restant et murs attendus.
 
 Le rapport doit encore afficher `asset_items_visualized: no`, l'absence de cavites individuelles par item/pile et `Print validation: false`.
+
+## P13-ASSET-M004 - Smoke quick_asset_box avec compartiments
+
+Le smoke quick_asset_box utilise le cas `130 x 50 x 60`, grille `4 x 4 x 3`, assets `coin-tokens,tokens,40,18,16,2,loose; status-tokens,tokens,23,10,35,2,loose`. Il doit montrer deux compartiments rectangulaires top-open par asset source, `asset_cavity_policy: per_source_asset_rectangular_compartments_v0`, `asset_compartment_cavities_planned: 2`, `asset_compartment_cavities_generated: 2`, debug outlines et `Print validation: false`.
+
+## P13-ASSET-M005 - Smoke quick_asset_box avec encoches d'acces
+
+Le meme smoke prepare maintenant les encoches d'acces V0. Le rapport attendu ajoute `asset_access_features_generated`, `asset_access_policy: per_compartment_top_open_rectangular_notch_v0`, `asset_access_notches_planned`, `asset_access_notches_generated` et `asset_access_notches_refused`.
+
+Validation humaine attendue : verifier dans Fusion que chaque compartiment supporte possede une vraie coupe rectangulaire top-open sur le mur avant, que la paroi interne et le fond restent presents, puis verifier `regenerate` sans doublon et `clear_bgig_scene` avec preservation des objets non-BGIG.

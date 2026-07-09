@@ -580,3 +580,17 @@ Regenerate valide : modification d'un asset ou d'une dimension, module + compart
 Limites explicitement non validees : UX encore peu claire, champs assets difficiles a comprendre, pas d'onglets/sections/presets ergonomiques, assets individuels non visualises, cavites par pile/item non generees, pas de solveur global, pas d'optimisation avancee, pas de fillets/conges, pas d'export STL/3MF, capacite encore heuristique, aucune impression 3D validee.
 
 Dette UX enregistree : l'interface `quick_asset_box` fonctionne mais reste peu comprehensible pour un humain. Une future mission UI/UX devra clarifier les champs, formats, unites, effets de `count`, dimensions, grille, murs, fond et clearances. Cette dette n'est pas traitee dans P13-ASSET-M004V.
+
+## P13-ASSET-M005 - Per-compartment access notches V0 implemente
+
+P13-ASSET-M005 ajoute une premiere aide de prise par compartiment asset-specific. La policy active est `per_compartment_top_open_rectangular_notch_v0`.
+
+Comportement implemente : chaque compartiment `per_source_asset_rectangular_compartments_v0` peut porter un `asset_access_notch`. La regle V0 place une encoche rectangulaire top-open sur le mur avant du module (`-Y`), centree sur la largeur utile du compartiment. La largeur cible est `18.0 mm`, avec refus sous `6.0 mm` disponible apres marges laterales ; la profondeur cible depuis le haut est `10.0 mm`, avec refus sous `4.0 mm`. Les compartiments non adjacents au mur avant externe sont refuses pour eviter de couper a travers un autre compartiment ou une paroi interne.
+
+Cote Fusion, les notches planifiees sont converties en `FusionFingerNotchCutPlan` avec `source_feature_kind = asset_access_notch` et reutilisent la coupe rectangulaire top-open existante. Le rapport ajoute `asset_access_features_generated`, `asset_access_policy`, `asset_access_notches_planned`, `asset_access_notches_generated`, `asset_access_notches_refused` et les diagnostics par asset/compartiment.
+
+Smoke prepare : avec `coin-tokens,tokens,40,18,16,2,loose` et `status-tokens,tokens,23,10,35,2,loose`, le module attendu reste environ `52.8 x 39.0 x 48.0 mm`, avec deux compartiments et deux encoches d'acces planifiees sur le mur avant. Les notches attendues sont des coupes rectangulaires top-open reelles, pas seulement des sketches.
+
+Limites maintenues : assets individuels non visualises, cavites par pile/item non generees, pas de solveur global, pas d'optimisation avancee, pas de courbes/demi-lunes/scoops, pas de fillets/conges, pas d'export STL/3MF, aucune impression 3D validee.
+
+Statut : `implemented-fusion`, validation humaine Fusion `P13-ASSET-M005V` requise, `print-validated: false`.
