@@ -15,6 +15,7 @@ from fusion_addin.BoardGameInsertGenerator import BoardGameInsertGenerator as fu
 from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     ASSEMBLY_DOCUMENT_REQUIRED_STATUS,
     ASSET_FIT_CAVITY_POLICY,
+    ASSET_COMPARTMENT_CAVITY_POLICY,
     BGIG_ACTION_GUIDANCE,
     BGIG_CLEAR_SCOPE,
     BGIG_EXISTING_SCENE_MESSAGE,
@@ -720,9 +721,13 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(quick_metadata["placed_module_count"], 1)
         self.assertFalse(quick_metadata["asset_items_visualized"])
         self.assertTrue(quick_metadata["asset_cavities_generated"])
-        self.assertEqual(quick_metadata["asset_cavity_policy"], ASSET_FIT_CAVITY_POLICY)
-        self.assertEqual(quick_metadata["asset_fit_cavities_planned"], 1)
+        self.assertEqual(quick_metadata["asset_cavity_policy"], ASSET_COMPARTMENT_CAVITY_POLICY)
+        self.assertEqual(quick_metadata["asset_fit_cavities_planned"], 2)
         self.assertEqual(quick_metadata["asset_fit_cavities_refused"], 0)
+        self.assertTrue(quick_metadata["asset_compartments_generated"])
+        self.assertEqual(quick_metadata["asset_compartment_cavities_planned"], 2)
+        self.assertEqual(quick_metadata["asset_compartment_cavities_refused"], 0)
+        self.assertTrue(quick_metadata["asset_compartment_debug_outlines"])
         self.assertEqual(quick_metadata["count_aware_storage_sizing"], "yes")
         self.assertEqual(quick_metadata["storage_sizing_scope"], "count_aware_stacked_rectangular_piles_v0")
         self.assertTrue(quick_metadata["asset_debug_visualization"])
@@ -738,21 +743,23 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(module_diagnostic["count_aware_storage_sizing"], "yes")
         self.assertEqual(module_diagnostic["policy"], "stacked_rectangular_piles_v0")
         self.assertEqual(module_diagnostic["declared_capacity_count"], 70)
-        self.assertEqual(module_diagnostic["module_size_mm"], {"x": 100.0, "y": 24.0, "z": 22.0})
-        self.assertEqual(module_diagnostic["asset_fit_size_mm"], {"x": 97.6, "y": 21.6, "z": 20.8})
+        self.assertEqual(module_diagnostic["module_size_mm"], {"x": 102.8, "y": 24.0, "z": 22.0})
+        self.assertEqual(module_diagnostic["asset_fit_size_mm"], {"x": 100.4, "y": 21.6, "z": 20.8})
+        self.assertEqual(len(quick_metadata["asset_cavity_diagnostics"]), 2)
         cavity_diagnostic = quick_metadata["asset_cavity_diagnostics"][0]
         self.assertEqual(cavity_diagnostic["status"], "planned")
-        self.assertEqual(cavity_diagnostic["policy"], ASSET_FIT_CAVITY_POLICY)
-        self.assertEqual(cavity_diagnostic["size_mm"], {"x": 97.6, "y": 21.6, "z": 20.8})
+        self.assertEqual(cavity_diagnostic["policy"], ASSET_COMPARTMENT_CAVITY_POLICY)
+        self.assertEqual(cavity_diagnostic["asset_id"], "coin-tokens")
+        self.assertEqual(cavity_diagnostic["size_mm"], {"x": 61.6, "y": 21.6, "z": 20.8})
         self.assertEqual(cavity_diagnostic["retained_floor_mm"], 1.2)
-        self.assertEqual(cavity_diagnostic["expected_walls_mm"], {"x_min": 1.2, "x_max": 1.2, "y_min": 1.2, "y_max": 1.2})
+        self.assertEqual(cavity_diagnostic["expected_walls_mm"], {"x_min": 1.2, "x_max": 40.0, "y_min": 1.2, "y_max": 1.2})
         plan = generation_plan_from_cad_ir(validate_cad_ir_payload(scene), FUSION_GENERATION_MODE_COMPACT_ONLY)
         self.assertEqual(len(plan.grid_positioned_blanks), 1)
-        self.assertEqual(len(plan.cavity_cuts), 1)
+        self.assertEqual(len(plan.cavity_cuts), 2)
         cut = plan.cavity_cuts[0]
-        self.assertEqual(cut.cavity_source, "asset_fit_cavity")
-        self.assertEqual(cut.policy, ASSET_FIT_CAVITY_POLICY)
-        self.assertEqual(cut.cut_size_mm.to_dict(), {"x": 97.6, "y": 21.6, "z": 20.8})
+        self.assertEqual(cut.cavity_source, "asset_compartment_cavity")
+        self.assertEqual(cut.policy, ASSET_COMPARTMENT_CAVITY_POLICY)
+        self.assertEqual(cut.cut_size_mm.to_dict(), {"x": 61.6, "y": 21.6, "z": 20.8})
         self.assertEqual(cut.requested_local_origin_mm.to_dict(), {"x": 1.2, "y": 1.2, "z": 1.2})
         self.assertAlmostEqual(cut.retained_floor_mm, 1.2)
         summary = quick_asset_box_summary(scene)
@@ -760,14 +767,18 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("assets_read: 2", summary)
         self.assertIn("asset_items_visualized: no", summary)
         self.assertIn("asset_cavities_generated: yes", summary)
-        self.assertIn("asset_cavity_policy: single_asset_fit_rectangular_cavity_v0", summary)
-        self.assertIn("asset_fit_cavities_planned: 1", summary)
+        self.assertIn("asset_cavity_policy: per_source_asset_rectangular_compartments_v0", summary)
+        self.assertIn("asset_fit_cavities_planned: 2", summary)
+        self.assertIn("asset_compartments_generated: yes", summary)
+        self.assertIn("asset_compartment_cavities_planned: 2", summary)
+        self.assertIn("asset_compartment_debug_outlines: yes", summary)
         self.assertIn("count_aware_storage_sizing: yes", summary)
         self.assertIn("asset_debug_visualization: yes", summary)
         self.assertIn("capacity_per_stack 14", summary)
         self.assertIn("pile_count 3", summary)
-        self.assertIn("module_size 100.0 x 24.0 x 22.0 mm", summary)
+        self.assertIn("module_size 102.8 x 24.0 x 22.0 mm", summary)
         self.assertIn("asset_cavity: generated:asset-group-candidate:tokens:store:approximate", summary)
+        self.assertIn("asset coin-tokens", summary)
         self.assertIn("retained_floor 1.2 mm", summary)
         self.assertIn("individual item and pile cavities remain not generated", summary)
         self.assertIn("module_candidates_generated: 1", summary)
@@ -1192,13 +1203,13 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(len(plan.blanks), 0)
         self.assertEqual(len(plan.grid_positioned_blanks), 1)
         self.assertEqual(len(plan.rejected_grid_modules), 0)
-        self.assertEqual(plan.created_object_count, 4)
-        self.assertEqual(len(plan.cavity_cuts), 1)
+        self.assertEqual(plan.created_object_count, 5)
+        self.assertEqual(len(plan.cavity_cuts), 2)
         cut = plan.cavity_cuts[0]
-        self.assertEqual(cut.cavity_source, "asset_fit_cavity")
-        self.assertEqual(cut.policy, ASSET_FIT_CAVITY_POLICY)
-        self.assertEqual(cut.cavity_id, "asset-fit-cavity")
-        self.assertEqual(cut.cut_size_mm.to_dict(), {"x": 117.2, "y": 85.2, "z": 18.6})
+        self.assertEqual(cut.cavity_source, "asset_compartment_cavity")
+        self.assertEqual(cut.policy, ASSET_COMPARTMENT_CAVITY_POLICY)
+        self.assertEqual(cut.cavity_id, "asset-compartment:coin-tokens")
+        self.assertEqual(cut.cut_size_mm.to_dict(), {"x": 111.2, "y": 67.2, "z": 18.6})
         self.assertEqual(cut.requested_local_origin_mm.to_dict(), {"x": 1.2, "y": 1.2, "z": 1.2})
         self.assertAlmostEqual(cut.retained_floor_mm, 1.2)
         grid_blank = plan.grid_positioned_blanks[0]
@@ -1206,17 +1217,17 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(grid_blank.operation_kind, GRID_PLACED_BLANK_OPERATION_KIND)
         self.assertEqual(grid_blank.component_name, "Grid placed Grouped candidate for tokens")
         self.assertEqual(grid_blank.origin_mm.to_dict(), {"x": 0.0, "y": 0.0, "z": 0.0})
-        self.assertEqual(grid_blank.size_mm.to_dict(), {"x": 119.6, "y": 87.6, "z": 19.8})
-        self.assertEqual(grid_blank.printable_body_size_mm.to_dict(), {"x": 119.6, "y": 87.6, "z": 19.8})
+        self.assertEqual(grid_blank.size_mm.to_dict(), {"x": 113.6, "y": 90.0, "z": 19.8})
+        self.assertEqual(grid_blank.printable_body_size_mm.to_dict(), {"x": 113.6, "y": 90.0, "z": 19.8})
         self.assertEqual(grid_blank.body_size_source, "printable_body_size_mm")
         self.assertNotEqual(grid_blank.size_mm.to_dict(), grid_blank.theoretical_grid_extent_mm.to_dict())
-        self.assertEqual(grid_blank.asset_fit_size_mm.to_dict(), {"x": 117.2, "y": 85.2, "z": 18.6})
+        self.assertEqual(grid_blank.asset_fit_size_mm.to_dict(), {"x": 111.2, "y": 87.6, "z": 18.6})
         self.assertEqual(grid_blank.theoretical_grid_extent_mm.to_dict(), {"x": 120.0, "y": 90.0, "z": 20.0})
         self.assertEqual(plan.to_dict()["grid_positioned_blanks"][0]["body_name"], grid_blank.body_name)
         self.assertEqual(plan.to_dict()["grid_positioned_blanks"][0]["body_size_source"], "printable_body_size_mm")
         self.assertEqual(plan.to_dict()["grid_positioned_blanks"][0]["module_source"], "asset_candidate")
-        self.assertEqual(plan.to_dict()["grid_positioned_blanks"][0]["asset_fit_cavity"]["policy"], ASSET_FIT_CAVITY_POLICY)
-        self.assertEqual(plan.to_dict()["cavity_cuts"][0]["cavity_source"], "asset_fit_cavity")
+        self.assertEqual(plan.to_dict()["grid_positioned_blanks"][0]["asset_fit_cavity"]["policy"], ASSET_COMPARTMENT_CAVITY_POLICY)
+        self.assertEqual(plan.to_dict()["cavity_cuts"][0]["cavity_source"], "asset_compartment_cavity")
         self.assertEqual(
             plan.to_dict()["grid_positioned_blanks"][0]["theoretical_grid_extent_mm"],
             {"x": 120.0, "y": 90.0, "z": 20.0},
@@ -1233,14 +1244,14 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(plan.module_component_count, 1)
         self.assertEqual(len(plan.compact_occurrences), 1)
         self.assertEqual(len(plan.exploded_occurrences), 1)
-        self.assertEqual(len(plan.cavity_cuts), 1)
+        self.assertEqual(len(plan.cavity_cuts), 2)
         grid_blank = plan.grid_positioned_blanks[0]
         self.assertEqual(grid_blank.module_source, "asset_candidate")
         self.assertEqual(grid_blank.placement_source, "grid_placement")
         self.assertEqual(grid_blank.source_asset_ids, ("coin-tokens", "status-tokens"))
         self.assertEqual(grid_blank.candidate_id, "asset-group-candidate:tokens:store:exact")
         self.assertEqual(grid_blank.origin_mm.to_dict(), {"x": 0.0, "y": 0.0, "z": 0.0})
-        self.assertEqual(grid_blank.size_mm.to_dict(), {"x": 119.6, "y": 87.6, "z": 19.8})
+        self.assertEqual(grid_blank.size_mm.to_dict(), {"x": 113.6, "y": 90.0, "z": 19.8})
         self.assertEqual(grid_blank.theoretical_grid_extent_mm.to_dict(), {"x": 120.0, "y": 90.0, "z": 20.0})
         self.assertEqual(grid_blank.body_size_source, "printable_body_size_mm")
         self.assertEqual(grid_blank.clearance_applied["peripheral_clearance_mm"], 0.0)
@@ -1274,8 +1285,8 @@ class FusionSkeletonTests(unittest.TestCase):
 
         grid_blank = plan.grid_positioned_blanks[0]
         self.assertEqual(grid_blank.origin_mm.to_dict(), {"x": 0.0, "y": 0.0, "z": 10.0})
-        self.assertEqual(grid_blank.size_mm.to_dict(), {"x": 119.6, "y": 87.6, "z": 19.8})
-        self.assertEqual(grid_blank.printable_body_size_mm.to_dict(), {"x": 119.6, "y": 87.6, "z": 19.8})
+        self.assertEqual(grid_blank.size_mm.to_dict(), {"x": 113.6, "y": 90.0, "z": 19.8})
+        self.assertEqual(grid_blank.printable_body_size_mm.to_dict(), {"x": 113.6, "y": 90.0, "z": 19.8})
         self.assertEqual(grid_blank.body_size_source, "printable_body_size_mm")
         self.assertNotEqual(grid_blank.size_mm.to_dict(), grid_blank.theoretical_grid_extent_mm.to_dict())
 
@@ -1357,8 +1368,8 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(len(plan.blanks), 0)
         self.assertEqual(len(plan.grid_positioned_blanks), 1)
         self.assertEqual(len(plan.exploded_occurrences), 0)
-        self.assertEqual(len(plan.cavity_cuts), 1)
-        self.assertEqual(plan.created_object_count, 3)
+        self.assertEqual(len(plan.cavity_cuts), 2)
+        self.assertEqual(plan.created_object_count, 4)
 
     def test_skips_refused_asset_fit_cavity_without_cutting_grid_blank(self) -> None:
         payload = _cad_ir_payload_from_example("simple_asset_product_scene.json")
@@ -1381,7 +1392,7 @@ class FusionSkeletonTests(unittest.TestCase):
     def test_rejects_asset_fit_cavity_that_exceeds_grid_blank(self) -> None:
         payload = _cad_ir_payload_from_example("simple_asset_product_scene.json")
         cavity = payload["metadata"]["executable_asset_plan"]["placements"][0]["asset_fit_cavity"]
-        cavity["size_mm"]["x"] = 200.0
+        cavity["compartments"][0]["size_mm"]["x"] = 200.0
 
         with self.assertRaisesRegex(FusionSkeletonError, "exceeds printable blank width"):
             generation_plan_from_cad_ir(payload)

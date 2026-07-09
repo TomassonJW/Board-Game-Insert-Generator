@@ -135,6 +135,7 @@ Tests, cartes backlog ou gates humaines a preparer.
 - [ADR-0028 - Fusion quick_asset_box input V0](ADR-0028-fusion-quick-asset-input-v0.md)
 - [ADR-0029 - Count-aware asset storage sizing V0](ADR-0029-count-aware-asset-storage-sizing-v0.md)
 - [ADR-0030 - Asset-fit cavity V0](ADR-0030-asset-fit-cavity-v0.md)
+- [ADR-0031 - Asset-specific compartments V0](ADR-0031-asset-specific-compartments-v0.md)
 
 ## Regles de maintenance
 

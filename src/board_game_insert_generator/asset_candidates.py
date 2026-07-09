@@ -40,6 +40,7 @@ _ASSET_FIT_CAVITY_SUPPORTED_FUNCTIONAL_TYPES = {
     FunctionalType.OTHER.value,
 }
 _ASSET_FIT_CAVITY_POLICY = "single_asset_fit_rectangular_cavity_v0"
+_ASSET_COMPARTMENT_CAVITY_POLICY = "per_source_asset_rectangular_compartments_v0"
 
 
 def build_module_candidates_from_assets(config: InsertConfig) -> list[dict[str, Any]]:
@@ -304,6 +305,8 @@ def _count_aware_stacked_module_from_assets(
     floor = config.defaults.floor_thickness_mm
     max_fit_height = _count_aware_max_asset_fit_height(config, floor)
     max_content_width = max(0.0, config.box.inner_dimensions.x - wall * 2.0 - clearance_mm * 2.0)
+    max_asset_fit_width = max(0.0, config.box.inner_dimensions.x - wall * 2.0)
+    max_asset_fit_depth = max(0.0, config.box.inner_dimensions.y - wall * 2.0)
     pile_rectangles: list[dict[str, Any]] = []
     diagnostics: list[dict[str, Any]] = []
     warnings: list[str] = []
@@ -329,14 +332,32 @@ def _count_aware_stacked_module_from_assets(
         warnings.append(
             "Count-aware pile layout exceeds the available module content width; downstream row/grid placement must reject or report the overflow."
         )
-    content_x = packed["content_size_mm"]["x"]
-    content_y = packed["content_size_mm"]["y"]
-    stack_height = max((diagnostic["stack_height_mm"] for diagnostic in diagnostics), default=0.0)
-    inner = Dimension3D(
-        x=content_x + clearance_mm * 2.0,
-        y=content_y + clearance_mm * 2.0,
-        z=stack_height + clearance_mm,
+    compartment_layout = _count_aware_compartment_layout(
+        assets=assets,
+        diagnostics=diagnostics,
+        wall_mm=wall,
+        floor_mm=floor,
+        clearance_mm=clearance_mm,
+        max_content_width_mm=max_content_width,
+        max_asset_fit_width_mm=max_asset_fit_width,
+        max_asset_fit_depth_mm=max_asset_fit_depth,
     )
+    if compartment_layout["status"] == "planned":
+        content_x = compartment_layout["asset_fit_size_mm"]["x"]
+        content_y = compartment_layout["asset_fit_size_mm"]["y"]
+        stack_height = compartment_layout["asset_fit_size_mm"]["z"]
+        inner = Dimension3D(x=content_x, y=content_y, z=stack_height)
+    else:
+        content_x = packed["content_size_mm"]["x"]
+        content_y = packed["content_size_mm"]["y"]
+        stack_height = max((diagnostic["stack_height_mm"] for diagnostic in diagnostics), default=0.0)
+        if compartment_layout.get("reason"):
+            warnings.append(str(compartment_layout["reason"]))
+        inner = Dimension3D(
+            x=content_x + clearance_mm * 2.0,
+            y=content_y + clearance_mm * 2.0,
+            z=stack_height + clearance_mm,
+        )
     outer = Dimension3D(
         x=inner.x + wall * 2.0,
         y=inner.y + wall * 2.0,
@@ -356,6 +377,7 @@ def _count_aware_stacked_module_from_assets(
         "declared_capacity_guarantee": "heuristic_envelope_only_not_physical_cavity",
         "asset_diagnostics": diagnostics,
         "pile_layout": packed["pile_layout"],
+        "asset_compartment_layout": compartment_layout,
         "content_footprint_mm": packed["content_size_mm"],
         "asset_fit_size_mm": _dimension_to_dict(inner),
         "module_size_mm": _dimension_to_dict(outer),
@@ -475,6 +497,181 @@ def _pack_count_aware_piles(piles: list[dict[str, Any]], max_width_mm: float) ->
         "content_size_mm": {"x": round(content_x, 4), "y": round(content_y, 4), "z": 0.0},
         "pile_layout": layout,
     }
+
+
+def _count_aware_compartment_layout(
+    *,
+    assets: list[Asset],
+    diagnostics: list[dict[str, Any]],
+    wall_mm: float,
+    floor_mm: float,
+    clearance_mm: float,
+    max_content_width_mm: float,
+    max_asset_fit_width_mm: float,
+    max_asset_fit_depth_mm: float,
+) -> dict[str, Any]:
+    if not assets:
+        return {"status": "refused", "reason": "No assets available for per-source compartments."}
+    if wall_mm <= 0 or floor_mm <= 0:
+        return {
+            "status": "refused",
+            "reason": "Per-source compartments require positive wall_thickness_mm and floor_thickness_mm.",
+        }
+
+    diagnostics_by_asset = {str(item.get("asset_id")): item for item in diagnostics}
+    compartments: list[dict[str, Any]] = []
+    cursor_x = 0.0
+    max_y = 0.0
+    max_z = 0.0
+    warnings: list[str] = []
+    for index, asset in enumerate(assets):
+        diagnostic = diagnostics_by_asset.get(asset.id)
+        if diagnostic is None:
+            return {
+                "status": "refused",
+                "reason": f"Missing count-aware sizing diagnostic for asset {asset.id}.",
+            }
+        pile_rectangles = [
+            {
+                "asset_id": asset.id,
+                "pile_index": pile_index + 1,
+                "x": asset.dimensions.x,
+                "y": asset.dimensions.y,
+            }
+            for pile_index in range(int(diagnostic["pile_count"]))
+        ]
+        packed = _pack_count_aware_piles(pile_rectangles, max_content_width_mm)
+        if not packed["fits_width"]:
+            warnings.append(f"Asset {asset.id} compartment pile layout exceeds available content width.")
+        content_size = packed["content_size_mm"]
+        size = {
+            "x": round(content_size["x"] + clearance_mm * 2.0, 4),
+            "y": round(content_size["y"] + clearance_mm * 2.0, 4),
+            "z": round(float(diagnostic["stack_height_mm"]) + clearance_mm, 4),
+        }
+        local_origin = {
+            "x": round(wall_mm + cursor_x, 4),
+            "y": round(wall_mm, 4),
+            "z": round(floor_mm, 4),
+        }
+        compartments.append(
+            {
+                "id": f"asset-compartment:{asset.id}",
+                "asset_id": asset.id,
+                "source_asset_ids": [asset.id],
+                "count_read": diagnostic["count_read"],
+                "dimensions_read_mm": dict(diagnostic["dimensions_read_mm"]),
+                "count_used_for_sizing": True,
+                "capacity_per_stack": diagnostic["capacity_per_stack"],
+                "pile_count": diagnostic["pile_count"],
+                "items_per_pile": diagnostic["items_per_pile"],
+                "declared_capacity_count": diagnostic["declared_capacity_count"],
+                "pile_layout": packed["pile_layout"],
+                "pile_footprint_mm": dict(diagnostic["pile_footprint_mm"]),
+                "local_origin_mm": local_origin,
+                "size_mm": size,
+                "retained_floor_mm": round(floor_mm, 4),
+                "expected_floor_mm": round(floor_mm, 4),
+                "expected_walls_mm": {},
+                "internal_wall_thickness_mm": round(wall_mm, 4) if index > 0 else 0.0,
+                "operation_kind": "subtract_rectangular_cavity",
+                "warning": diagnostic.get("warning"),
+            }
+        )
+        cursor_x += size["x"] + wall_mm
+        max_y = max(max_y, size["y"])
+        max_z = max(max_z, size["z"])
+
+    row_layout = _asset_compartment_oriented_layout(compartments, wall_mm, axis="x")
+    column_layout = _asset_compartment_oriented_layout(compartments, wall_mm, axis="y")
+    row_fits = row_layout["asset_fit_size_mm"]["x"] <= max_asset_fit_width_mm and row_layout["asset_fit_size_mm"]["y"] <= max_asset_fit_depth_mm
+    column_fits = column_layout["asset_fit_size_mm"]["x"] <= max_asset_fit_width_mm and column_layout["asset_fit_size_mm"]["y"] <= max_asset_fit_depth_mm
+    if row_fits and column_fits:
+        row_area = row_layout["asset_fit_size_mm"]["x"] * row_layout["asset_fit_size_mm"]["y"]
+        column_area = column_layout["asset_fit_size_mm"]["x"] * column_layout["asset_fit_size_mm"]["y"]
+        layout = row_layout if row_area <= column_area else column_layout
+    elif row_fits:
+        layout = row_layout
+    elif column_fits:
+        layout = column_layout
+    else:
+        warnings.append(
+            "Per-source compartments exceed box XY asset-fit limits in both deterministic row and column layouts; downstream placement must reject."
+        )
+        layout = row_layout
+
+    return {
+        "status": "planned",
+        "policy": _ASSET_COMPARTMENT_CAVITY_POLICY,
+        "layout_strategy": layout["layout_strategy"],
+        "compartment_count": len(compartments),
+        "internal_wall_thickness_mm": round(wall_mm, 4),
+        "asset_fit_size_mm": layout["asset_fit_size_mm"],
+        "compartments": layout["compartments"],
+        "warnings": warnings,
+    }
+
+
+def _asset_compartment_oriented_layout(
+    compartments: list[dict[str, Any]],
+    wall_mm: float,
+    *,
+    axis: str,
+) -> dict[str, Any]:
+    laid_out = []
+    cursor = 0.0
+    max_cross = 0.0
+    max_z = 0.0
+    for index, source in enumerate(compartments):
+        compartment = dict(source)
+        size = dict(compartment["size_mm"])
+        if axis == "x":
+            origin = {"x": round(wall_mm + cursor, 4), "y": round(wall_mm, 4), "z": round(compartment["local_origin_mm"]["z"], 4)}
+            cursor += size["x"] + wall_mm
+            max_cross = max(max_cross, size["y"])
+            if index > 0:
+                compartment["wall_role_x_min"] = "internal_wall"
+            if index < len(compartments) - 1:
+                compartment["wall_role_x_max"] = "internal_wall"
+            compartment.pop("wall_role_y_min", None)
+            compartment.pop("wall_role_y_max", None)
+        else:
+            origin = {"x": round(wall_mm, 4), "y": round(wall_mm + cursor, 4), "z": round(compartment["local_origin_mm"]["z"], 4)}
+            cursor += size["y"] + wall_mm
+            max_cross = max(max_cross, size["x"])
+            if index > 0:
+                compartment["wall_role_y_min"] = "internal_wall"
+            if index < len(compartments) - 1:
+                compartment["wall_role_y_max"] = "internal_wall"
+            compartment.pop("wall_role_x_min", None)
+            compartment.pop("wall_role_x_max", None)
+        compartment["local_origin_mm"] = origin
+        laid_out.append(compartment)
+        max_z = max(max_z, size["z"])
+
+    if laid_out:
+        cursor -= wall_mm
+    if axis == "x":
+        asset_fit_size = {"x": round(cursor, 4), "y": round(max_cross, 4), "z": round(max_z, 4)}
+    else:
+        asset_fit_size = {"x": round(max_cross, 4), "y": round(cursor, 4), "z": round(max_z, 4)}
+
+    for compartment in laid_out:
+        origin = compartment["local_origin_mm"]
+        size = compartment["size_mm"]
+        compartment["expected_walls_mm"] = {
+            "x_min": round(origin["x"], 4),
+            "x_max": round(wall_mm + asset_fit_size["x"] - (origin["x"] - wall_mm) - size["x"], 4),
+            "y_min": round(origin["y"], 4),
+            "y_max": round(wall_mm + asset_fit_size["y"] - (origin["y"] - wall_mm) - size["y"], 4),
+        }
+
+    return {
+        "layout_strategy": "deterministic_single_row_by_source_asset_v0" if axis == "x" else "deterministic_single_column_by_source_asset_v0",
+        "asset_fit_size_mm": asset_fit_size,
+        "compartments": laid_out,
+    }
+
 def _suggested_module(
     config: InsertConfig,
     asset: Asset,
@@ -912,18 +1109,147 @@ def _generated_module_from_candidate(candidate: dict[str, Any]) -> dict[str, Any
         "asset_fit_size_mm": inner_asset_envelope_mm,
         "printable_body_size_mm": dimensions_mm,
         "storage_sizing": dict(suggested.get("storage_sizing", {})),
-        "asset_fit_cavity": _asset_fit_cavity_payload(
+        "asset_fit_cavity": _asset_cavity_payload(
             module_id=module_id,
             functional_type=suggested["functional_type"],
             asset_fit_size_mm=inner_asset_envelope_mm,
             module_size_mm=dimensions_mm,
             clearance_applied=clearance_applied,
+            storage_sizing=suggested.get("storage_sizing", {}),
         ),
         "clearance_applied": clearance_applied,
         "status": "generated_from_recommended_asset_variant",
         "fusion_generation": "use_printable_body_size_mm",
     }
 
+
+
+
+def _asset_cavity_payload(
+    *,
+    module_id: str,
+    functional_type: str,
+    asset_fit_size_mm: dict[str, float],
+    module_size_mm: dict[str, float],
+    clearance_applied: dict[str, Any],
+    storage_sizing: dict[str, Any],
+) -> dict[str, Any]:
+    compartment_payload = _asset_compartment_cavity_payload(
+        module_id=module_id,
+        functional_type=functional_type,
+        module_size_mm=module_size_mm,
+        clearance_applied=clearance_applied,
+        storage_sizing=storage_sizing,
+    )
+    if compartment_payload.get("status") == "planned":
+        return compartment_payload
+    fallback = _asset_fit_cavity_payload(
+        module_id=module_id,
+        functional_type=functional_type,
+        asset_fit_size_mm=asset_fit_size_mm,
+        module_size_mm=module_size_mm,
+        clearance_applied=clearance_applied,
+    )
+    return {
+        **fallback,
+        "fallback_from_policy": _ASSET_COMPARTMENT_CAVITY_POLICY,
+        "fallback_reason": compartment_payload.get("reason") or compartment_payload.get("code") or "Per-source compartments were not available.",
+    }
+
+
+def _asset_compartment_cavity_payload(
+    *,
+    module_id: str,
+    functional_type: str,
+    module_size_mm: dict[str, float],
+    clearance_applied: dict[str, Any],
+    storage_sizing: dict[str, Any],
+) -> dict[str, Any]:
+    wall = float(clearance_applied.get("wall_thickness_mm", 0.0) or 0.0)
+    floor = float(clearance_applied.get("floor_thickness_mm", 0.0) or 0.0)
+    base = {
+        "id": "asset-source-compartments",
+        "policy": _ASSET_COMPARTMENT_CAVITY_POLICY,
+        "module_id": module_id,
+        "functional_type": functional_type,
+        "item_cavity_policy": "no_individual_item_or_pile_cavities_v0",
+        "asset_items_visualized": False,
+        "asset_compartments_generated": True,
+        "fusion_generation": "subtract_rectangular_cavity",
+        "operation_kind": "subtract_rectangular_cavity",
+        "coordinate_frame": "body.local",
+    }
+    if functional_type not in _ASSET_FIT_CAVITY_SUPPORTED_FUNCTIONAL_TYPES:
+        return {
+            **base,
+            "status": "refused",
+            "code": "UNSUPPORTED_ASSET_COMPARTMENT_TYPE",
+            "reason": f"Per-source compartment cavity V0 supports tokens/dice/meeples/generic, got {functional_type}.",
+        }
+    layout = storage_sizing.get("asset_compartment_layout") if isinstance(storage_sizing, dict) else None
+    if not isinstance(layout, dict) or layout.get("status") != "planned":
+        return {
+            **base,
+            "status": "refused",
+            "code": "ASSET_COMPARTMENT_LAYOUT_UNAVAILABLE",
+            "reason": "Count-aware per-source compartment layout is unavailable for this generated module.",
+        }
+    compartments = [dict(item) for item in layout.get("compartments", []) if isinstance(item, dict)]
+    if not compartments:
+        return {
+            **base,
+            "status": "refused",
+            "code": "ASSET_COMPARTMENT_LAYOUT_EMPTY",
+            "reason": "Count-aware per-source compartment layout produced no compartments.",
+        }
+    errors: list[str] = []
+    for compartment in compartments:
+        origin = compartment.get("local_origin_mm", {})
+        size = compartment.get("size_mm", {})
+        if not isinstance(origin, dict) or not isinstance(size, dict):
+            errors.append(f"{compartment.get('id', 'unknown')} missing local_origin_mm or size_mm")
+            continue
+        size = dict(size)
+        size["z"] = round(module_size_mm["z"] - floor, 4)
+        compartment["size_mm"] = size
+        retained_floor = round(module_size_mm["z"] - float(size.get("z", 0.0)), 4)
+        expected_walls = {
+            "x_min": round(float(origin.get("x", 0.0)), 4),
+            "x_max": round(module_size_mm["x"] - float(origin.get("x", 0.0)) - float(size.get("x", 0.0)), 4),
+            "y_min": round(float(origin.get("y", 0.0)), 4),
+            "y_max": round(module_size_mm["y"] - float(origin.get("y", 0.0)) - float(size.get("y", 0.0)), 4),
+        }
+        compartment["retained_floor_mm"] = retained_floor
+        compartment["expected_floor_mm"] = round(floor, 4)
+        compartment["expected_walls_mm"] = expected_walls
+        if float(origin.get("x", 0.0)) + float(size.get("x", 0.0)) > module_size_mm["x"]:
+            errors.append(f"{compartment.get('id', 'unknown')} exceeds module width")
+        if float(origin.get("y", 0.0)) + float(size.get("y", 0.0)) > module_size_mm["y"]:
+            errors.append(f"{compartment.get('id', 'unknown')} exceeds module depth")
+        if float(size.get("z", 0.0)) >= module_size_mm["z"]:
+            errors.append(f"{compartment.get('id', 'unknown')} must be lower than module height")
+        if retained_floor < floor:
+            errors.append(f"{compartment.get('id', 'unknown')} retained floor {retained_floor:.4f} mm is below floor_thickness_mm {floor:.4f} mm")
+    if errors:
+        return {
+            **base,
+            "status": "refused",
+            "code": "ASSET_COMPARTMENT_CAVITY_INVALID_BOUNDS",
+            "reason": "; ".join(errors),
+            "compartments": compartments,
+        }
+    return {
+        **base,
+        "status": "planned",
+        "layout_strategy": layout.get("layout_strategy", "deterministic_single_row_by_source_asset_v0"),
+        "compartment_count": len(compartments),
+        "asset_compartment_cavities_planned": len(compartments),
+        "asset_fit_size_mm": dict(layout.get("asset_fit_size_mm", {})),
+        "internal_wall_thickness_mm": round(wall, 4),
+        "compartments": compartments,
+        "clearance_source": clearance_applied.get("internal_asset_clearance_source", "unknown"),
+        "warning": "Per-source asset compartments V0; individual asset items and piles are not cut.",
+    }
 
 def _asset_fit_cavity_payload(
     *,

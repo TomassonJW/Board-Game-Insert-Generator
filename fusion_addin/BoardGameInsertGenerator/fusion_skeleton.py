@@ -151,6 +151,7 @@ PART_DESIGN_SINGLE_COMPONENT_ERROR_TEXT = "Part Design documents can only contai
 PLAN_STATUS_PLANNED_ONLY = "planned_only"
 CAVITY_CUT_OPERATION_KIND = "subtract_rectangular_cavity"
 ASSET_FIT_CAVITY_POLICY = "single_asset_fit_rectangular_cavity_v0"
+ASSET_COMPARTMENT_CAVITY_POLICY = "per_source_asset_rectangular_compartments_v0"
 CAVITY_FEATURE_OPERATION_KIND = "describe_cavity_feature"
 FINGER_NOTCH_CUT_OPERATION_KIND = "rectangular_finger_notch_cut"
 GRID_PLACED_BLANK_OPERATION_KIND = "create_grid_positioned_asset_blank"
@@ -1459,6 +1460,18 @@ def quick_asset_box_metadata(
     asset_cavity_diagnostics = _quick_asset_box_asset_cavity_diagnostics(executable_plan)
     asset_fit_cavities_planned = sum(1 for diagnostic in asset_cavity_diagnostics if diagnostic.get("status") == "planned")
     asset_fit_cavities_refused = sum(1 for diagnostic in asset_cavity_diagnostics if diagnostic.get("status") == "refused")
+    asset_compartment_cavities_planned = sum(
+        1
+        for diagnostic in asset_cavity_diagnostics
+        if diagnostic.get("status") == "planned" and diagnostic.get("policy") == ASSET_COMPARTMENT_CAVITY_POLICY
+    )
+    asset_compartment_cavities_refused = sum(
+        1
+        for diagnostic in asset_cavity_diagnostics
+        if diagnostic.get("status") == "refused" and diagnostic.get("policy") == ASSET_COMPARTMENT_CAVITY_POLICY
+    )
+    cavity_policies = [str(diagnostic.get("policy")) for diagnostic in asset_cavity_diagnostics if diagnostic.get("status") == "planned"]
+    asset_cavity_policy = cavity_policies[0] if cavity_policies else "none"
     warnings = _quick_asset_box_storage_warnings(module_sizing_diagnostics, asset_cavity_diagnostics)
     return {
         "input_format": parse_report["input_format"],
@@ -1483,9 +1496,13 @@ def quick_asset_box_metadata(
         "rejected_module_count": executable_plan.get("summary", {}).get("rejected_module_count") if isinstance(executable_plan, dict) else 0,
         "asset_items_visualized": False,
         "asset_cavities_generated": asset_fit_cavities_planned > 0,
-        "asset_cavity_policy": ASSET_FIT_CAVITY_POLICY if asset_fit_cavities_planned else "none",
+        "asset_cavity_policy": asset_cavity_policy,
         "asset_fit_cavities_planned": asset_fit_cavities_planned,
         "asset_fit_cavities_refused": asset_fit_cavities_refused,
+        "asset_compartments_generated": asset_compartment_cavities_planned > 0,
+        "asset_compartment_cavities_planned": asset_compartment_cavities_planned,
+        "asset_compartment_cavities_refused": asset_compartment_cavities_refused,
+        "asset_compartment_debug_outlines": asset_compartment_cavities_planned > 0,
         "asset_cavity_diagnostics": asset_cavity_diagnostics,
         "count_aware_storage_sizing": storage_sizing_status,
         "storage_sizing_scope": "count_aware_stacked_rectangular_piles_v0" if storage_sizing_status == "yes" else "partial_or_representative_asset_envelope_v0",
@@ -1556,15 +1573,53 @@ def _quick_asset_box_asset_cavity_diagnostics(executable_plan: Any) -> list[dict
         if not isinstance(cavity, dict):
             continue
         status = str(cavity.get("status") or "unknown")
+        source_asset_ids = list(module.get("source_asset_ids", [])) if isinstance(module.get("source_asset_ids"), list) else []
+        if cavity.get("policy") == ASSET_COMPARTMENT_CAVITY_POLICY and isinstance(cavity.get("compartments"), list):
+            for compartment in cavity["compartments"]:
+                if not isinstance(compartment, dict):
+                    continue
+                diagnostics.append(
+                    {
+                        "module_id": module.get("module_id"),
+                        "candidate_id": module.get("candidate_id"),
+                        "source_asset_ids": list(compartment.get("source_asset_ids", [])) or source_asset_ids,
+                        "asset_id": compartment.get("asset_id"),
+                        "status": status,
+                        "policy": cavity.get("policy"),
+                        "operation_kind": compartment.get("operation_kind") or cavity.get("operation_kind"),
+                        "coordinate_frame": cavity.get("coordinate_frame"),
+                        "cavity_id": compartment.get("id"),
+                        "size_mm": compartment.get("size_mm"),
+                        "local_origin_mm": compartment.get("local_origin_mm"),
+                        "retained_floor_mm": compartment.get("retained_floor_mm"),
+                        "expected_floor_mm": compartment.get("expected_floor_mm"),
+                        "expected_walls_mm": compartment.get("expected_walls_mm"),
+                        "internal_wall_thickness_mm": compartment.get("internal_wall_thickness_mm"),
+                        "count_read": compartment.get("count_read"),
+                        "dimensions_read_mm": compartment.get("dimensions_read_mm"),
+                        "capacity_per_stack": compartment.get("capacity_per_stack"),
+                        "pile_count": compartment.get("pile_count"),
+                        "items_per_pile": compartment.get("items_per_pile"),
+                        "declared_capacity_count": compartment.get("declared_capacity_count"),
+                        "item_cavity_policy": cavity.get("item_cavity_policy"),
+                        "asset_items_visualized": cavity.get("asset_items_visualized", False),
+                        "asset_compartment": True,
+                        "reason": cavity.get("reason"),
+                        "code": cavity.get("code"),
+                        "warning": compartment.get("warning") or cavity.get("warning"),
+                    }
+                )
+            continue
         diagnostics.append(
             {
                 "module_id": module.get("module_id"),
                 "candidate_id": module.get("candidate_id"),
-                "source_asset_ids": list(module.get("source_asset_ids", [])) if isinstance(module.get("source_asset_ids"), list) else [],
+                "source_asset_ids": source_asset_ids,
                 "status": status,
                 "policy": cavity.get("policy"),
                 "operation_kind": cavity.get("operation_kind"),
                 "coordinate_frame": cavity.get("coordinate_frame"),
+                "cavity_id": cavity.get("id"),
                 "size_mm": cavity.get("size_mm"),
                 "local_origin_mm": cavity.get("local_origin_mm"),
                 "retained_floor_mm": cavity.get("retained_floor_mm"),
@@ -1680,8 +1735,19 @@ def _quick_asset_box_storage_warnings(
 ) -> list[str]:
     cavity_diagnostics = asset_cavity_diagnostics or []
     planned_cavities = sum(1 for diagnostic in cavity_diagnostics if diagnostic.get("status") == "planned")
+    policies = {str(diagnostic.get("policy") or "") for diagnostic in cavity_diagnostics}
+    if ASSET_COMPARTMENT_CAVITY_POLICY in policies:
+        cavity_warning = (
+            "per-source asset compartment V0 generates one top-open rectangular cavity per source asset when planned; "
+            "individual item and pile cavities remain not generated."
+        )
+    else:
+        cavity_warning = (
+            "asset-fit cavity V0 generates one global top-open rectangular cavity per generated asset module; "
+            "individual item and pile cavities remain not generated."
+        )
     warnings: list[str] = [
-        "asset-fit cavity V0 generates one global top-open rectangular cavity per generated asset module; individual item and pile cavities remain not generated.",
+        cavity_warning,
         "declared capacity is a deterministic rectangular envelope heuristic, not a print-validated containment guarantee.",
     ]
     if planned_cavities == 0:
@@ -1723,6 +1789,10 @@ def quick_asset_box_summary(payload: dict[str, Any] | None) -> str:
         f"- asset_cavity_policy: {quick.get('asset_cavity_policy') or 'none'}",
         f"- asset_fit_cavities_planned: {quick.get('asset_fit_cavities_planned', 0)}",
         f"- asset_fit_cavities_refused: {quick.get('asset_fit_cavities_refused', 0)}",
+        f"- asset_compartments_generated: {'yes' if quick.get('asset_compartments_generated') else 'no'}",
+        f"- asset_compartment_cavities_planned: {quick.get('asset_compartment_cavities_planned', 0)}",
+        f"- asset_compartment_cavities_refused: {quick.get('asset_compartment_cavities_refused', 0)}",
+        f"- asset_compartment_debug_outlines: {'yes' if quick.get('asset_compartment_debug_outlines') else 'no'}",
         f"- count_aware_storage_sizing: {quick.get('count_aware_storage_sizing') or 'no'}",
         f"- sizing_scope: {quick.get('storage_sizing_scope')}",
         f"- asset_debug_visualization: {'yes' if quick.get('asset_debug_visualization') else 'no'}",
@@ -1758,17 +1828,27 @@ def quick_asset_box_summary(payload: dict[str, Any] | None) -> str:
         lines.append(f"- refused: {rejected.get('entry')} -> {rejected.get('reason')}")
     for diagnostic in quick.get("asset_cavity_diagnostics", []):
         source_assets = ", ".join(str(asset_id) for asset_id in diagnostic.get("source_asset_ids", [])) or "n/a"
+        asset_part = f"asset {diagnostic.get('asset_id')}; " if diagnostic.get("asset_id") else ""
+        count_part = (
+            f"count {diagnostic.get('count_read')}; declared_capacity {diagnostic.get('declared_capacity_count')}; "
+            f"capacity_per_stack {diagnostic.get('capacity_per_stack')}; pile_count {diagnostic.get('pile_count')}; "
+            if diagnostic.get("asset_compartment")
+            else ""
+        )
         lines.append(
             "- asset_cavity: "
-            f"{diagnostic.get('module_id')} source_assets {source_assets}; "
+            f"{diagnostic.get('module_id')} {asset_part}source_assets {source_assets}; "
             f"status {diagnostic.get('status')}; "
             f"policy {diagnostic.get('policy') or 'n/a'}; "
             f"operation {diagnostic.get('operation_kind') or 'n/a'}; "
+            f"cavity_id {diagnostic.get('cavity_id') or 'n/a'}; "
+            f"{count_part}"
             f"size {_format_vector_payload(diagnostic.get('size_mm'))}; "
             f"local_origin {_format_vector_payload(diagnostic.get('local_origin_mm'))}; "
             f"retained_floor {diagnostic.get('retained_floor_mm') if diagnostic.get('retained_floor_mm') is not None else 'n/a'} mm; "
             f"expected_floor {diagnostic.get('expected_floor_mm') if diagnostic.get('expected_floor_mm') is not None else 'n/a'} mm; "
             f"expected_walls {diagnostic.get('expected_walls_mm') or 'n/a'}; "
+            f"internal_wall {diagnostic.get('internal_wall_thickness_mm') if diagnostic.get('internal_wall_thickness_mm') is not None else 'n/a'} mm; "
             f"item_cavities {diagnostic.get('item_cavity_policy') or 'n/a'}; "
             f"items_visualized {'yes' if diagnostic.get('asset_items_visualized') else 'no'}; "
             f"reason {diagnostic.get('reason') or diagnostic.get('warning') or 'n/a'}"
@@ -2786,50 +2866,86 @@ def _asset_fit_cavity_cut_plans(blanks: list[FusionSolidPlan]) -> list[FusionCav
                 f"Asset-fit cavity for {blank.body_name!r} has unsupported status {status!r}."
             )
         policy = str(payload.get("policy") or "")
-        if policy != ASSET_FIT_CAVITY_POLICY:
-            raise FusionSkeletonError(
-                f"Asset-fit cavity for {blank.body_name!r} uses unsupported policy {policy!r}."
-            )
         if payload.get("coordinate_frame") != "body.local":
             raise FusionSkeletonError(
                 f"Asset-fit cavity for {blank.body_name!r} must use body.local coordinates."
             )
-
-        cavity_id = _required_text(payload, "id", f"asset-fit cavity for {blank.body_name}")
-        local_origin = _vector_from_payload(
-            payload,
-            "local_origin_mm",
-            f"asset-fit cavity {cavity_id} local origin",
-        )
-        cavity_size = _positive_vector_from_payload(
-            payload,
-            "size_mm",
-            f"asset-fit cavity {cavity_id} size",
-        )
-        _validate_cavity_cut_bounds(blank, local_origin, cavity_size, cavity_id)
-        retained_floor_mm = blank.size_mm.z - cavity_size.z
+        if policy == ASSET_COMPARTMENT_CAVITY_POLICY:
+            compartments = payload.get("compartments")
+            if not isinstance(compartments, list) or not compartments:
+                raise FusionSkeletonError(
+                    f"Asset compartment cavity for {blank.body_name!r} must declare non-empty compartments."
+                )
+            for index, compartment in enumerate(compartments):
+                if not isinstance(compartment, dict):
+                    raise FusionSkeletonError(
+                        f"Asset compartment cavity for {blank.body_name!r} compartment[{index}] must be an object."
+                    )
+                cut_plans.append(
+                    _asset_cavity_cut_plan_from_payload(
+                        blank,
+                        compartment,
+                        policy=policy,
+                        cavity_source="asset_compartment_cavity",
+                        label="asset compartment cavity",
+                    )
+                )
+            continue
+        if policy != ASSET_FIT_CAVITY_POLICY:
+            raise FusionSkeletonError(
+                f"Asset-fit cavity for {blank.body_name!r} uses unsupported policy {policy!r}."
+            )
         cut_plans.append(
-            FusionCavityCutPlan(
-                component_id=blank.cad_id,
-                component_name=blank.component_name,
-                target_body_id=blank.cad_id,
-                target_body_name=blank.body_name,
-                operation_id=f"{blank.cad_id}:{cavity_id}:subtract_rectangular_cavity",
-                cavity_id=cavity_id,
-                cut_origin_mm=FusionVectorMm(
-                    x=blank.origin_mm.x + local_origin.x,
-                    y=blank.origin_mm.y + local_origin.y,
-                    z=blank.origin_mm.z + blank.size_mm.z,
-                ),
-                cut_size_mm=cavity_size,
-                requested_local_origin_mm=local_origin,
-                retained_floor_mm=retained_floor_mm,
-                cavity_source="asset_fit_cavity",
+            _asset_cavity_cut_plan_from_payload(
+                blank,
+                payload,
                 policy=policy,
+                cavity_source="asset_fit_cavity",
+                label="asset-fit cavity",
             )
         )
     return cut_plans
 
+
+def _asset_cavity_cut_plan_from_payload(
+    blank: FusionSolidPlan,
+    payload: dict[str, Any],
+    *,
+    policy: str,
+    cavity_source: str,
+    label: str,
+) -> FusionCavityCutPlan:
+    cavity_id = _required_text(payload, "id", f"{label} for {blank.body_name}")
+    local_origin = _vector_from_payload(
+        payload,
+        "local_origin_mm",
+        f"{label} {cavity_id} local origin",
+    )
+    cavity_size = _positive_vector_from_payload(
+        payload,
+        "size_mm",
+        f"{label} {cavity_id} size",
+    )
+    _validate_cavity_cut_bounds(blank, local_origin, cavity_size, cavity_id)
+    retained_floor_mm = blank.size_mm.z - cavity_size.z
+    return FusionCavityCutPlan(
+        component_id=blank.cad_id,
+        component_name=blank.component_name,
+        target_body_id=blank.cad_id,
+        target_body_name=blank.body_name,
+        operation_id=f"{blank.cad_id}:{cavity_id}:subtract_rectangular_cavity",
+        cavity_id=cavity_id,
+        cut_origin_mm=FusionVectorMm(
+            x=blank.origin_mm.x + local_origin.x,
+            y=blank.origin_mm.y + local_origin.y,
+            z=blank.origin_mm.z + blank.size_mm.z,
+        ),
+        cut_size_mm=cavity_size,
+        requested_local_origin_mm=local_origin,
+        retained_floor_mm=retained_floor_mm,
+        cavity_source=cavity_source,
+        policy=policy,
+    )
 
 def _cavity_cut_plans(
     component_id: str,

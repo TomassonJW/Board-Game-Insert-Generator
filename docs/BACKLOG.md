@@ -787,9 +787,29 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 
 ### P13-ASSET-M004-GATE - Decider la prochaine etape asset-first
 
-- Capability : C-ASSET, C-FUSION-CAVITIES, C-FUSION-UI, C-SOLVER ou C-CALIBRATION selon decision.
-- Milestone : M14 Usable beta / M5 CAD cavities / M10 Solver / M11 Physical validation selon decision.
+- Capability : C-ASSET, C-FUSION-CAVITIES, C-FUSION-UI.
+- Milestone : M14 Usable beta / M5 CAD cavities.
 - Objectif : choisir la prochaine mission apres validation de la cavite asset-fit globale V0.
-- Options candidates : cavites par pile/item, visualisation/proxies d'assets, sizing capacitaire plus garanti, traitement cartes/decks, UI assets avancee/tableau, calibration/impression, ou maintien du scope V0.
-- Gate : decision humaine produit requise avant toute mission produit suivante.
+- Gate : decision humaine produit recue le 2026-07-09 pour lancer `P13-ASSET-M004 - Asset-specific compartments V0`.
+- Statut : `done`.
+
+### P13-ASSET-M004 - Asset-specific compartments V0
+
+- Capability : C-ASSET, C-FUSION-CAVITIES, C-FUSION-UI.
+- Milestone : M14 Usable beta / M5 CAD cavities.
+- Objectif : remplacer la cavite globale asset-fit par des compartiments rectangulaires par asset source quand c'est possible.
+- Livrable : policy `per_source_asset_rectangular_compartments_v0`, payload de compartiments, plusieurs `FusionCavityCutPlan`, reporting par asset, outlines debug de compartiments, scripts smoke M004.
+- Criteres d'acceptation : au moins deux compartiments pour deux assets tokens du smoke, fond commun coherent, mur interne reporte, regenerate/clear conserves, refus explicite si un layout ne tient pas, coeur Python sans `adsk`.
+- Tests : unitaires assets et Fusion skeleton, py_compile add-in, CLI Markdown/JSON/export CAD IR, scripts Fusion dry-run/reel, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
+- Gate : validation humaine Fusion `P13-ASSET-M004V` requise.
+- Statut : `implemented`, `fusion-validation-pending`, `print-validated: false`.
+
+### P13-ASSET-M004V - Valider les compartiments asset-specific dans Fusion
+
+- Capability : C-ASSET, C-FUSION-CAVITIES, C-FUSION-UI.
+- Milestone : M14 Usable beta / M5 CAD cavities.
+- Objectif : verifier dans Fusion que `quick_asset_box` genere plusieurs cavites rectangulaires top-open correspondant aux assets sources.
+- Livrable : smoke test humain Fusion avec generate, regenerate, clear et rapport.
+- Criteres d'acceptation : `asset_cavity_policy: per_source_asset_rectangular_compartments_v0`, `asset_compartments_generated: yes`, deux cavites visibles pour les assets du smoke, mur interne visible/report?, `Rectangular cavity cuts: 2`, registry OK, non-BGIG preserve, `Print validation: false`.
+- Gate : action humaine Thomas requise.
 - Statut : `ready-gated`.

@@ -930,6 +930,8 @@ def _generation_result_message(
         f"Asset cavity policy: {result['asset_cavity_policy']}\n"
         f"Asset-fit cavities planned: {result['asset_fit_cavities_planned']}\n"
         f"Asset-fit cavities generated: {result['asset_fit_cavities_generated']}\n"
+        f"Asset compartment cavities planned: {result['asset_compartment_cavities_planned']}\n"
+        f"Asset compartment cavities generated: {result['asset_compartment_cavities_generated']}\n"
         f"Simple finger notch features planned: {result['finger_notch_features_planned']}\n"
         f"Simple finger notch sketches: {result['finger_notch_sketches']}\n"
         f"Simple top-open finger notch cuts: {result['finger_notch_cuts']}\n"
@@ -966,6 +968,8 @@ def _stable_generation_result(result: dict[str, object]) -> dict[str, object]:
         "asset_cavity_policy": "none",
         "asset_fit_cavities_planned": 0,
         "asset_fit_cavities_generated": 0,
+        "asset_compartment_cavities_planned": 0,
+        "asset_compartment_cavities_generated": 0,
         "finger_notch_features_planned": 0,
         "finger_notch_sketches": 0,
         "finger_notch_cuts": 0,
@@ -1598,9 +1602,18 @@ def _generate_from_plan(design, plan: FusionGenerationPlan, registry: BgigFusion
     source_blanks_by_id = {blank.cad_id: blank for blank in source_blanks}
 
     asset_fit_cavity_cuts_planned = sum(
-        1 for cavity_cut in plan.cavity_cuts if getattr(cavity_cut, "cavity_source", "") == "asset_fit_cavity"
+        1 for cavity_cut in plan.cavity_cuts if getattr(cavity_cut, "cavity_source", "") in {"asset_fit_cavity", "asset_compartment_cavity"}
     )
+    asset_compartment_cavity_cuts_planned = sum(
+        1 for cavity_cut in plan.cavity_cuts if getattr(cavity_cut, "cavity_source", "") == "asset_compartment_cavity"
+    )
+    planned_asset_cavity_policies = [
+        str(getattr(cavity_cut, "policy", "") or "")
+        for cavity_cut in plan.cavity_cuts
+        if getattr(cavity_cut, "cavity_source", "") in {"asset_fit_cavity", "asset_compartment_cavity"}
+    ]
     asset_fit_cavity_cuts_generated = 0
+    asset_compartment_cavity_cuts_generated = 0
     cavity_cut_count = 0
     for cavity_cut in plan.cavity_cuts:
         target_body = created_bodies.get(cavity_cut.target_body_id)
@@ -1620,8 +1633,10 @@ def _generate_from_plan(design, plan: FusionGenerationPlan, registry: BgigFusion
             scene_id,
         )
         cavity_cut_count += 1
-        if getattr(cavity_cut, "cavity_source", "") == "asset_fit_cavity":
+        if getattr(cavity_cut, "cavity_source", "") in {"asset_fit_cavity", "asset_compartment_cavity"}:
             asset_fit_cavity_cuts_generated += 1
+        if getattr(cavity_cut, "cavity_source", "") == "asset_compartment_cavity":
+            asset_compartment_cavity_cuts_generated += 1
 
     finger_notch_sketch_count = 0
     finger_notch_cut_count = 0
@@ -1694,9 +1709,11 @@ def _generate_from_plan(design, plan: FusionGenerationPlan, registry: BgigFusion
         "legacy_bodies_created": 0,
         "linked_exploded_occurrences": "yes" if plan.linked_exploded_occurrences else "no",
         "cavity_cuts": cavity_cut_count,
-        "asset_cavity_policy": "single_asset_fit_rectangular_cavity_v0" if asset_fit_cavity_cuts_planned else "none",
+        "asset_cavity_policy": planned_asset_cavity_policies[0] if planned_asset_cavity_policies else "none",
         "asset_fit_cavities_planned": asset_fit_cavity_cuts_planned,
         "asset_fit_cavities_generated": asset_fit_cavity_cuts_generated,
+        "asset_compartment_cavities_planned": asset_compartment_cavity_cuts_planned,
+        "asset_compartment_cavities_generated": asset_compartment_cavity_cuts_generated,
         "finger_notch_features_planned": len(plan.finger_notch_cuts),
         "finger_notch_sketches": finger_notch_sketch_count,
         "finger_notch_cuts": finger_notch_cut_count,
@@ -1920,6 +1937,28 @@ def _create_asset_fit_debug_outline(
         solid_plan.asset_fit_size_mm.y,
         f"{solid_plan.component_name} asset-fit debug outline",
     )
+    payload = solid_plan.asset_fit_cavity
+    if isinstance(payload, dict) and payload.get("policy") == "per_source_asset_rectangular_compartments_v0":
+        compartments = payload.get("compartments")
+        if isinstance(compartments, list):
+            for compartment in compartments:
+                if not isinstance(compartment, dict):
+                    continue
+                local_origin = compartment.get("local_origin_mm")
+                size = compartment.get("size_mm")
+                if not isinstance(local_origin, dict) or not isinstance(size, dict):
+                    continue
+                try:
+                    _add_scene_rectangle_from_mm(
+                        sketch,
+                        float(local_origin.get("x", 0.0)),
+                        float(local_origin.get("y", 0.0)),
+                        float(size.get("x", 0.0)),
+                        float(size.get("y", 0.0)),
+                        str(compartment.get("id") or "asset-compartment"),
+                    )
+                except Exception:
+                    continue
     return 1
 
 

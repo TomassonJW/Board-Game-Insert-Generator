@@ -548,3 +548,18 @@ Le rapport valide `count_aware_storage_sizing: yes`, `asset_cavities_generated: 
 Regenerate valide : modification d'un count ou d'une dimension, module + cavite recalcules sans doublon. Clear final valide : `clear_bgig_scene` fonctionne et preserve les objets non-BGIG.
 
 Limites maintenues : assets individuels non visualises, cavites par pile/item non generees, pas de solveur global, pas d'optimisation avancee, capacite encore heuristique, aucune impression 3D validee.
+
+
+## P13-ASSET-M004 - Asset-specific compartments V0 implemente
+
+P13-ASSET-M004 remplace, pour les assets count-aware supportes, la cavite globale M003 par des compartiments rectangulaires top-open par asset source dans le meme module exterieur. La policy active est `per_source_asset_rectangular_compartments_v0`.
+
+Comportement implemente : le moteur conserve le sizing count-aware, calcule un compartiment par asset source, choisit deterministiquement une orientation simple ligne X ou colonne Y selon le fit, puis l'adaptateur Fusion cree une coupe `subtract_rectangular_cavity` par compartiment. Les coupes conservent un fond commun `floor_thickness_mm`; le mur interne minimal est `wall_thickness_mm`. Le debug sketch asset-fit affiche aussi les outlines de compartiments non imprimables.
+
+Reporting ajoute : `asset_compartments_generated`, `asset_compartment_cavities_planned`, `asset_compartment_cavities_refused`, `asset_compartment_debug_outlines`, diagnostics par asset (`asset_id`, `count_read`, dimensions, `capacity_per_stack`, `pile_count`, `declared_capacity`, origine locale, taille cavite, fond et murs attendus). `asset_fit_cavities_planned/generated` reste un compteur compatible des coupes asset-first, incluant les compartiments.
+
+Smoke prepare : avec `coin-tokens,tokens,40,18,16,2,loose` et `status-tokens,tokens,23,10,35,2,loose`, le module attendu est environ `52.8 x 39.0 x 48.0 mm`, avec deux cavites environ `37.6 x 17.6 x 46.8 mm` et `11.6 x 36.6 x 46.8 mm`, fond `1.2 mm`, mur interne `1.2 mm`, `Registry validation: ok` attendu et `Print validation: false`.
+
+Limites maintenues : assets individuels non visualises, cavites par pile/item non generees, pas de solveur global, pas d'optimisation avancee, pas de fillets/conges, pas d'export STL/3MF, aucune impression 3D validee.
+
+Statut : `implemented`, gate humaine Fusion `P13-ASSET-M004V` active.
