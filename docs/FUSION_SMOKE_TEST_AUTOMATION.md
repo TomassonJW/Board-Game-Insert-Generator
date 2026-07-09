@@ -114,3 +114,21 @@ Actions restantes dans Fusion :
 
 Statut attendu apres preparation : `manual_validation_required`, car seule
 l'execution dans Fusion valide le comportement reel.
+
+## P14-USABLE-ASSET-TRAY-SPRINT-V
+
+La gate P14 se prepare avec le preset riche par defaut :
+
+```powershell
+scripts/fusion/prepare_quick_asset_test.ps1 -Preset p14_complete
+```
+
+Le script installe l'add-in courant et ecrit `bgig_ui_settings.json` avec `input_mode = quick_asset_box`, generation `compact_only`, box `220 x 160 x 96`, grid `8 x 5 x 4` et assets :
+
+- `coin-tokens,tokens,36,18,16,2,loose` ;
+- `status-tokens,tokens,24,12,18,2,loose` ;
+- `damage-tokens,tokens,18,20,20,2,loose` ;
+- `dice-set,dice,12,16,16,16,loose` ;
+- `wood-meeples,meeples,20,12,12,18,loose`.
+
+Ce scenario doit valider les apports P14 : 5 assets lus, plusieurs candidats modules, groupe tokens a 3 sources avec layout `deterministic_shelf_by_source_asset_v0`, rapports `printability_report_v0`, aide inline `quick_asset_box`, presets de smoke, regeneration sans doublon, clear preserve non-BGIG. Il ne valide toujours pas l'impression 3D.

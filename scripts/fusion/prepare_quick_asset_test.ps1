@@ -3,8 +3,8 @@ param(
     [string] $TargetPath,
     [ValidateSet("compact_only", "compact_and_exploded")]
     [string] $GenerationMode = "compact_only",
-    [ValidateSet("tokens", "dice_meeples_generic", "cards_tokens")]
-    [string] $Preset = "tokens",
+    [ValidateSet("p14_complete", "tokens", "dice_meeples_generic", "cards_tokens")]
+    [string] $Preset = "p14_complete",
     [string] $AssetsText,
     [switch] $DryRun
 )
@@ -59,7 +59,7 @@ $settings = @{
 Write-BgigFusionUiSettings -TargetPath $target -Settings $settings -DryRun:$DryRun
 
 Write-Output ""
-Write-Output "Recommended P14 quick asset preset values:"
+Write-Output "Recommended P14 quick asset gate preset values:"
 Write-Output "- input_mode: quick_asset_box"
 Write-Output "- preset: $Preset"
 Write-Output "- box_inner_mm: $($presetConfig.box_inner_mm.x) x $($presetConfig.box_inner_mm.y) x $($presetConfig.box_inner_mm.z)"

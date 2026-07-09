@@ -32,11 +32,11 @@ Mission interne terminee : `P14-USABLE-ASSET-TRAY-M003 - UX quick_asset_box V0 p
 
 Mission interne terminee : `P14-USABLE-ASSET-TRAY-M004 - Presets et scenarios quick asset`, `implemented-smoke-prep`, tests automatises OK, validation Fusion sprint P14 requise, `print-validated: false`.
 
-Mission interne terminee : `P14-USABLE-ASSET-TRAY-M005 - Preparation gate Fusion sprint P14`, add-in installe localement, settings `quick_asset_box` preset `tokens` ecrits, marqueurs installes OK, validation Fusion humaine requise.
+Mission interne corrigee : `P14-USABLE-ASSET-TRAY-M005 - Preparation gate Fusion sprint P14`, add-in a reinstaller localement avec settings `quick_asset_box` preset `p14_complete`, marqueurs installes a verifier, validation Fusion humaine requise.
 
 ## Mission ready non gated
 
-Le sprint P14 est pret pour validation humaine Fusion `P14-USABLE-ASSET-TRAY-SPRINT-V`. Ne pas lancer de nouvelle mission produit avant retour humain.
+Le sprint P14 doit etre revalide dans Fusion avec le preset riche `p14_complete`. Ne pas lancer de nouvelle mission produit avant retour humain.
 
 ## Regle operationnelle Fusion
 

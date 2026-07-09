@@ -1,6 +1,14 @@
 {
   "schema": "bgig.quick_asset_presets.v0",
   "presets": {
+    "p14_complete": {
+      "label": "P14 complete 5-asset tray smoke scenario",
+      "box_inner_mm": { "x": 220, "y": 160, "z": 96 },
+      "grid_units": { "x": 8, "y": 5, "z": 4 },
+      "assets_text": "coin-tokens,tokens,36,18,16,2,loose; status-tokens,tokens,24,12,18,2,loose; damage-tokens,tokens,18,20,20,2,loose; dice-set,dice,12,16,16,16,loose; wood-meeples,meeples,20,12,12,18,loose",
+      "notes": "Default P14 gate scenario. Three compatible token sources exercise robust multi-asset compartment layout; dice and meeples exercise mixed quick_asset_box presets without a global solver.",
+      "smoke_focus": "5 assets read, 3 generated asset modules, token module with 3 source compartments using deterministic_shelf_by_source_asset_v0, printability_report_v0, regenerate without duplicates"
+    },
     "tokens": {
       "label": "Two token sources, count-aware compartments and access notches",
       "box_inner_mm": { "x": 130, "y": 50, "z": 60 },

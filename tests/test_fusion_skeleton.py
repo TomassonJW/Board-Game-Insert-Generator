@@ -1661,11 +1661,14 @@ class FusionSkeletonTests(unittest.TestCase):
     def test_quick_asset_fusion_smoke_presets_are_valid_configs(self) -> None:
         catalog_path = ROOT / "scripts" / "fusion" / "quick_asset_presets.json"
         catalog = json.loads(catalog_path.read_text(encoding="utf-8-sig"))
+        script_source = (ROOT / "scripts" / "fusion" / "prepare_quick_asset_test.ps1").read_text(encoding="utf-8-sig")
 
         self.assertEqual(catalog["schema"], "bgig.quick_asset_presets.v0")
+        self.assertIn('[string] $Preset = "p14_complete"', script_source)
+        self.assertIn('ValidateSet("p14_complete", "tokens", "dice_meeples_generic", "cards_tokens")', script_source)
         self.assertEqual(
             set(catalog["presets"]),
-            {"tokens", "dice_meeples_generic", "cards_tokens"},
+            {"p14_complete", "tokens", "dice_meeples_generic", "cards_tokens"},
         )
         for preset_name, preset in catalog["presets"].items():
             overrides = {
