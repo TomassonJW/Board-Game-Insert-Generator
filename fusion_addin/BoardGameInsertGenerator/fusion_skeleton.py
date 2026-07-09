@@ -1461,6 +1461,7 @@ def quick_asset_box_metadata(
     storage_sizing_status = _quick_asset_box_count_aware_status(module_sizing_diagnostics)
     asset_cavity_diagnostics = _quick_asset_box_asset_cavity_diagnostics(executable_plan)
     asset_access_diagnostics = _quick_asset_box_asset_access_diagnostics(executable_plan)
+    printability_reports = _quick_asset_box_printability_reports(executable_plan)
     asset_access_notches_planned = sum(1 for diagnostic in asset_access_diagnostics if diagnostic.get("status") == "planned")
     asset_access_notches_refused = sum(1 for diagnostic in asset_access_diagnostics if diagnostic.get("status") == "refused")
     asset_fit_cavities_planned = sum(1 for diagnostic in asset_cavity_diagnostics if diagnostic.get("status") == "planned")
@@ -1478,6 +1479,12 @@ def quick_asset_box_metadata(
     cavity_policies = [str(diagnostic.get("policy")) for diagnostic in asset_cavity_diagnostics if diagnostic.get("status") == "planned"]
     asset_cavity_policy = cavity_policies[0] if cavity_policies else "none"
     warnings = _quick_asset_box_storage_warnings(module_sizing_diagnostics, asset_cavity_diagnostics)
+    printability_warnings = [
+        str(warning)
+        for report in printability_reports
+        for warning in report.get("warnings", [])
+        if warning
+    ]
     return {
         "input_format": parse_report["input_format"],
         "supported_types": parse_report["supported_types"],
@@ -1515,6 +1522,10 @@ def quick_asset_box_metadata(
         "asset_access_notches_refused": asset_access_notches_refused,
         "asset_access_diagnostics": asset_access_diagnostics,
         "asset_cavity_diagnostics": asset_cavity_diagnostics,
+        "printability_report_v0": printability_reports,
+        "printability_checked": "yes" if printability_reports else "no",
+        "printability_validated_by_print": "no",
+        "printability_warnings": printability_warnings,
         "count_aware_storage_sizing": storage_sizing_status,
         "storage_sizing_scope": "count_aware_stacked_rectangular_piles_v0" if storage_sizing_status == "yes" else "partial_or_representative_asset_envelope_v0",
         "asset_debug_visualization": storage_sizing_status in {"yes", "partial"},
@@ -1613,6 +1624,21 @@ def _quick_asset_box_asset_access_diagnostics(executable_plan: Any) -> list[dict
                 }
             )
     return diagnostics
+
+def _quick_asset_box_printability_reports(executable_plan: Any) -> list[dict[str, Any]]:
+    if not isinstance(executable_plan, dict):
+        return []
+    generated_modules = executable_plan.get("generated_modules", [])
+    if not isinstance(generated_modules, list):
+        return []
+    reports: list[dict[str, Any]] = []
+    for module in generated_modules:
+        if not isinstance(module, dict):
+            continue
+        report = module.get("printability_report_v0")
+        if isinstance(report, dict):
+            reports.append(report)
+    return reports
 
 def _quick_asset_box_asset_cavity_diagnostics(executable_plan: Any) -> list[dict[str, Any]]:
     if not isinstance(executable_plan, dict):
@@ -1857,6 +1883,8 @@ def quick_asset_box_summary(payload: dict[str, Any] | None) -> str:
         f"- sizing_scope: {quick.get('storage_sizing_scope')}",
         f"- asset_debug_visualization: {'yes' if quick.get('asset_debug_visualization') else 'no'}",
         f"- asset_debug_visualization_scope: {quick.get('asset_debug_visualization_scope')}",
+        f"- printability_checked: {quick.get('printability_checked') or 'no'}",
+        f"- printability_validated_by_print: {quick.get('printability_validated_by_print') or 'no'}",
     ]
     for asset in quick.get("accepted_assets", []):
         lines.append(
@@ -1927,6 +1955,19 @@ def quick_asset_box_summary(payload: dict[str, Any] | None) -> str:
             f"bbox {_format_vector_payload(diagnostic.get('size_mm'))}; "
             f"reason {warning}"
         )
+    for report in quick.get("printability_report_v0", []):
+        lines.append(
+            "- printability_report_v0: "
+            f"module {report.get('module_id')}; "
+            f"min_external_wall {report.get('min_external_wall_mm') if report.get('min_external_wall_mm') is not None else 'n/a'} mm; "
+            f"min_internal_wall {report.get('min_internal_wall_mm') if report.get('min_internal_wall_mm') is not None else 'n/a'} mm; "
+            f"min_floor {report.get('min_retained_floor_mm') if report.get('min_retained_floor_mm') is not None else 'n/a'} mm; "
+            f"max_cavity_depth {report.get('max_cavity_depth_mm')} mm; "
+            f"max_notch_depth {report.get('max_notch_depth_from_top_mm')} mm; "
+            f"validated_by_print {report.get('printability_validated_by_print') or 'no'}"
+        )
+        for warning in report.get("warnings", []):
+            lines.append(f"- printability_warning: {warning}")
     for warning in quick.get("warnings", []):
         lines.append(f"- warning: {warning}")
     for diagnostic in quick.get("module_candidate_sizing_diagnostics", []):

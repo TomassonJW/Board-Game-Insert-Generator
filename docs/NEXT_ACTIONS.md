@@ -26,11 +26,13 @@ Aucune gate humaine active pendant les missions automatisables du sprint P14 exp
 
 Mission interne terminee : `P14-USABLE-ASSET-TRAY-M001 - Robustifier le layout multi-assets`, `implemented-core`, tests automatises OK, validation Fusion sprint P14 requise, `print-validated: false`.
 
-Mission interne suivante : `P14-USABLE-ASSET-TRAY-M002 - Printability safety report V0`.
+Mission interne terminee : `P14-USABLE-ASSET-TRAY-M002 - Printability safety report V0`, `implemented-core`, tests automatises OK, validation Fusion sprint P14 requise, `print-validated: false`.
+
+Mission interne suivante : `P14-USABLE-ASSET-TRAY-M003 - UX quick_asset_box V0 plus lisible`.
 
 ## Mission ready non gated
 
-`P14-USABLE-ASSET-TRAY-M002 - Printability safety report V0` est la prochaine mission interne autorisee du sprint P14.
+`P14-USABLE-ASSET-TRAY-M003 - UX quick_asset_box V0 plus lisible` est la prochaine mission interne autorisee du sprint P14.
 
 ## Regle operationnelle Fusion
 

@@ -327,6 +327,17 @@ class AssetModelTests(unittest.TestCase):
         self.assertEqual(cavity["compartments"][0]["wall_role_x_max"], "internal_wall")
         self.assertEqual(cavity["compartments"][1]["wall_role_x_min"], "internal_wall")
         self.assertEqual(cavity["asset_access_notches_refused"], 0)
+        report = generated["printability_report_v0"]
+        self.assertEqual(report["policy"], "printability_report_v0")
+        self.assertEqual(report["printability_checked"], "yes")
+        self.assertEqual(report["printability_validated_by_print"], "no")
+        self.assertEqual(report["min_external_wall_mm"], 1.2)
+        self.assertEqual(report["min_internal_wall_mm"], 1.2)
+        self.assertEqual(report["min_retained_floor_mm"], 1.2)
+        self.assertEqual(report["max_cavity_depth_mm"], 46.6)
+        self.assertEqual(report["max_notch_depth_from_top_mm"], 10.0)
+        self.assertFalse(report["validated_by_print"])
+        self.assertIn("no physical print validation", report["warnings"][0])
 
     def test_multi_asset_compartments_reject_when_no_layout_fits(self) -> None:
         payload = _multi_asset_tokens_payload(asset_count=4, box_inner_mm=(75, 45, 55), grid_units=(3, 3, 2))

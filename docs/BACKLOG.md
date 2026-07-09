@@ -871,4 +871,12 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Milestone : M14 Usable beta / M11 Physical validation.
 - Objectif : ajouter un rapport de securite imprimable V0 sans revendiquer de validation physique.
 - Livrable : `printability_report_v0`, checks murs externes/parois internes/fond/profondeur cavite/profondeur encoche, warnings fragilite, `printability_checked: yes`, `printability_validated_by_print: no`.
+- Statut : `done`, `implemented-core`, validation Fusion sprint P14 requise, `print-validated: false`.
+
+### P14-USABLE-ASSET-TRAY-M003 - UX quick_asset_box V0 plus lisible
+
+- Capability : C-FUSION-UI, C-ASSET.
+- Milestone : M14 Usable beta.
+- Objectif : rendre la commande Fusion classique `quick_asset_box` plus comprehensible sans palette HTML.
+- Livrable : sections/labels/aide courte, exemple inline, rappel des unites et explication de count/x/y/z/walls/floor/clearances, persistance conservee.
 - Statut : `ready`, mission interne suivante du sprint P14.

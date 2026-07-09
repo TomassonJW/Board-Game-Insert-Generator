@@ -688,3 +688,7 @@ Le script `scripts/fusion/prepare_quick_asset_test.ps1` prepare le cas `130 x 50
 Le meme script prepare maintenant le smoke M005. Le rapport doit afficher `asset_access_features_generated: yes`, `asset_access_policy: per_compartment_top_open_rectangular_notch_v0`, `asset_access_notches_planned: 2`, `asset_access_notches_generated: 2` et `asset_access_notches_refused: 0` sur le cas recommande.
 
 Dans Fusion, verifier que les encoches sont de vraies coupes rectangulaires top-open sur le mur avant, pas seulement des sketches, et que la paroi interne ainsi que le fond restent presents. Les assets individuels, cavites par pile/item, fillets/conges et exports STL/3MF restent non generes.
+
+### P14-USABLE-ASSET-TRAY-M002 printability report smoke markers
+
+Le smoke P14 doit verifier dans le message `quick_asset_box` : `printability_checked: yes`, `printability_validated_by_print: no`, au moins une ligne `printability_report_v0`, les murs/fond reportes, les profondeurs de cavite/encoche et un warning indiquant qu'aucune validation physique n'a ete faite.

@@ -212,3 +212,7 @@ Si un compartiment n'est pas adjacent au mur avant, est trop etroit ou trop bas,
 Le layout de compartiments `per_source_asset_rectangular_compartments_v0` supporte maintenant plusieurs assets compatibles dans un module asset-first unique avec trois strategies deterministes bornees : ligne, colonne, puis shelf multi-rang. Le shelf layout garde l'ordre source des assets, ajoute des parois internes entre compartiments voisins, reporte les roles de murs internes et choisit la plus petite enveloppe XY qui tient dans la boite.
 
 Si aucun layout ne tient dans `box.inner_dimensions_mm` apres murs externes, le moteur refuse explicitement avec `ASSET_COMPARTMENTS_DO_NOT_FIT` et `layout_attempts`. BGIG ne retombe plus silencieusement vers une cavite globale quand les compartiments asset-specific sont requis mais impossibles.
+
+## P14-USABLE-ASSET-TRAY-M002 - Printability report V0
+
+Les modules asset-first generes portent maintenant `printability_report_v0`. Ce rapport inspecte les dimensions moteur deja calculees pour les murs, parois internes, fond, cavites et encoches. Il est strictement informatif : `printability_checked: yes` signifie que les seuils geometriques ont ete reportes, tandis que `printability_validated_by_print: no` reste obligatoire tant qu'aucun prototype physique n'est imprime et mesure.

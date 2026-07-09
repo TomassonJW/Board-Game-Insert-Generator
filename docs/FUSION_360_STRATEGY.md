@@ -763,3 +763,7 @@ Statut courant : implemente hors Fusion, validation humaine `P13-ASSET-M005V` re
 ## P14-USABLE-ASSET-TRAY-M001 - Layout multi-assets consomme par Fusion
 
 Fusion continue a ne recalculer ni layout, ni sizing, ni tolerances. Pour P14-USABLE-ASSET-TRAY-M001, l'adaptateur consomme seulement les compartiments deja resolus par le moteur, y compris `layout_strategy: deterministic_shelf_by_source_asset_v0` quand elle apparait. Les cavites refusees avec `fallback_suppressed: true` restent report-only et ne doivent produire aucune coupe.
+
+## P14-USABLE-ASSET-TRAY-M002 - Reporting printability dans Fusion
+
+Fusion lit `printability_report_v0` depuis la CAD IR et l'affiche dans le rapport `quick_asset_box`. L'adaptateur ne recalculera pas les murs, fonds, cavites ou encoches. `printability_validated_by_print: no` doit rester visible jusqu'a une validation physique separee.

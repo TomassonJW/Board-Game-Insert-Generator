@@ -150,3 +150,9 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 - C-SOLVER : heuristique deterministe bornee, sans backtracking ni optimisation globale.
 - C-FUSION-UI : benefice attendu dans `quick_asset_box`, mais validation Fusion P14 reste requise.
 - Limites : pas de cavites par pile/item, pas d'assets individuels, pas d'impression validee.
+
+## P14-USABLE-ASSET-TRAY-M002 capability update
+
+- C-CALIBRATION : `implemented-core` pour rapport geometrique `printability_report_v0`, sans validation physique.
+- C-ASSET : modules asset-first enrichis avec checks murs/fond/cavite/encoche.
+- C-FUSION-UI : reporting `quick_asset_box` expose `printability_checked: yes` et `printability_validated_by_print: no`.

@@ -390,3 +390,7 @@ Validation humaine attendue : verifier dans Fusion que chaque compartiment suppo
 ## P14-USABLE-ASSET-TRAY-M001 - UX attendue du layout multi-assets
 
 `quick_asset_box` peut maintenant produire un module asset-first avec plusieurs compartiments asset-specific dans des scenarios 3+ assets, quand le layout row/column/shelf tient dans la boite. L'UI Fusion classique reste une commande, pas une palette persistante. La validation humaine P14 devra verifier que les rapports exposent clairement la strategie de layout et les refus eventuels, sans pretendre a une validation d'impression.
+
+## P14-USABLE-ASSET-TRAY-M002 - Printability dans le message quick_asset_box
+
+Le rapport Fusion `quick_asset_box` affiche maintenant `printability_checked: yes`, `printability_validated_by_print: no`, un resume `printability_report_v0` par module et les `printability_warning`. Cette UI reste une commande Fusion classique et le rapport ne remplace pas une impression de test.

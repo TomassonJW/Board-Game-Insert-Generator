@@ -1034,6 +1034,7 @@ def build_executable_asset_module_plan(config: InsertConfig) -> dict[str, Any]:
                 "asset_fit_size_mm": dict(module["asset_fit_size_mm"]),
                 "storage_sizing": dict(module.get("storage_sizing", {})),
                 "asset_fit_cavity": dict(module.get("asset_fit_cavity", {})),
+                "printability_report_v0": dict(module.get("printability_report_v0", {})),
                 "printable_body_origin_mm": _grid_origin_to_mm(origin, grid.unit_size_mm),
                 "printable_body_size_mm": dict(module["printable_body_size_mm"]),
                 "source_size_mm": dict(module["printable_body_size_mm"]),
@@ -1252,6 +1253,20 @@ def _generated_module_from_candidate(candidate: dict[str, Any]) -> dict[str, Any
             "to this asset-first grid plan yet."
         ),
     }
+    asset_fit_cavity = _asset_cavity_payload(
+        module_id=module_id,
+        functional_type=suggested["functional_type"],
+        asset_fit_size_mm=inner_asset_envelope_mm,
+        module_size_mm=dimensions_mm,
+        clearance_applied=clearance_applied,
+        storage_sizing=suggested.get("storage_sizing", {}),
+    )
+    printability_report = _printability_report_v0(
+        module_id=module_id,
+        module_size_mm=dimensions_mm,
+        clearance_applied=clearance_applied,
+        asset_fit_cavity=asset_fit_cavity,
+    )
     return {
         "module_id": module_id,
         "candidate_id": candidate["candidate_id"],
@@ -1265,14 +1280,8 @@ def _generated_module_from_candidate(candidate: dict[str, Any]) -> dict[str, Any
         "asset_fit_size_mm": inner_asset_envelope_mm,
         "printable_body_size_mm": dimensions_mm,
         "storage_sizing": dict(suggested.get("storage_sizing", {})),
-        "asset_fit_cavity": _asset_cavity_payload(
-            module_id=module_id,
-            functional_type=suggested["functional_type"],
-            asset_fit_size_mm=inner_asset_envelope_mm,
-            module_size_mm=dimensions_mm,
-            clearance_applied=clearance_applied,
-            storage_sizing=suggested.get("storage_sizing", {}),
-        ),
+        "asset_fit_cavity": asset_fit_cavity,
+        "printability_report_v0": printability_report,
         "clearance_applied": clearance_applied,
         "status": "generated_from_recommended_asset_variant",
         "fusion_generation": "use_printable_body_size_mm",
@@ -1280,6 +1289,107 @@ def _generated_module_from_candidate(candidate: dict[str, Any]) -> dict[str, Any
 
 
 
+
+def _printability_report_v0(
+    *,
+    module_id: str,
+    module_size_mm: dict[str, float],
+    clearance_applied: dict[str, Any],
+    asset_fit_cavity: dict[str, Any],
+) -> dict[str, Any]:
+    wall = _safe_float(clearance_applied.get("wall_thickness_mm"), 0.0)
+    floor = _safe_float(clearance_applied.get("floor_thickness_mm"), 0.0)
+    module_height = _safe_float(module_size_mm.get("z"), 0.0)
+    checks: list[dict[str, Any]] = []
+    warnings: list[str] = []
+    wall_values: list[float] = []
+    floor_values: list[float] = []
+    cavity_depths: list[float] = []
+    notch_depths: list[float] = []
+
+    for cavity in _printability_cavity_items(asset_fit_cavity):
+        expected_walls = cavity.get("expected_walls_mm") if isinstance(cavity.get("expected_walls_mm"), dict) else {}
+        cavity_wall_values = [_safe_float(value, 0.0) for value in expected_walls.values()]
+        cavity_wall_values = [value for value in cavity_wall_values if value > 0]
+        wall_values.extend(cavity_wall_values)
+        retained_floor = _safe_float(cavity.get("retained_floor_mm"), 0.0)
+        if retained_floor > 0:
+            floor_values.append(retained_floor)
+        size = cavity.get("size_mm") if isinstance(cavity.get("size_mm"), dict) else {}
+        cavity_depth = _safe_float(size.get("z"), 0.0)
+        if cavity_depth > 0:
+            cavity_depths.append(cavity_depth)
+        notch = cavity.get("asset_access_notch") if isinstance(cavity.get("asset_access_notch"), dict) else {}
+        notch_depth = _safe_float(notch.get("depth_from_top_mm"), 0.0)
+        if notch_depth > 0:
+            notch_depths.append(notch_depth)
+        checks.append(
+            {
+                "cavity_id": cavity.get("id") or asset_fit_cavity.get("id"),
+                "asset_id": cavity.get("asset_id"),
+                "min_wall_mm": min(cavity_wall_values) if cavity_wall_values else None,
+                "retained_floor_mm": retained_floor if retained_floor > 0 else None,
+                "cavity_depth_mm": cavity_depth if cavity_depth > 0 else None,
+                "notch_depth_from_top_mm": notch_depth if notch_depth > 0 else None,
+                "status": cavity.get("status") or asset_fit_cavity.get("status"),
+            }
+        )
+
+    internal_wall = _safe_float(asset_fit_cavity.get("internal_wall_thickness_mm"), 0.0)
+    min_external_wall = min(wall_values) if wall_values else None
+    min_floor = min(floor_values) if floor_values else None
+    max_cavity_depth = max(cavity_depths) if cavity_depths else 0.0
+    max_notch_depth = max(notch_depths) if notch_depths else 0.0
+    if min_external_wall is not None and min_external_wall + 0.0001 < wall:
+        warnings.append(f"External wall below requested wall thickness: {min_external_wall:.2f} mm < {wall:.2f} mm.")
+    if internal_wall > 0 and internal_wall + 0.0001 < wall:
+        warnings.append(f"Internal wall below requested wall thickness: {internal_wall:.2f} mm < {wall:.2f} mm.")
+    if min_floor is not None and min_floor + 0.0001 < floor:
+        warnings.append(f"Retained floor below requested floor thickness: {min_floor:.2f} mm < {floor:.2f} mm.")
+    if max_cavity_depth >= module_height and module_height > 0:
+        warnings.append("Cavity depth removes the full module height; this should be refused before Fusion cutting.")
+    if max_notch_depth > max(0.0, module_height - floor) * 0.8 and max_notch_depth > 0:
+        warnings.append("Access notch depth is large relative to usable module height; inspect fragility before printing.")
+    if module_height > 60.0:
+        warnings.append("Module height exceeds 60 mm; tall thin walls may be fragile and need human print review.")
+    if asset_fit_cavity.get("status") != "planned":
+        warnings.append("Asset cavity is not planned; printability checks are report-only for this refused geometry.")
+    warnings.append("Heuristic printability report only; no physical print validation has been performed.")
+
+    return {
+        "policy": "printability_report_v0",
+        "printability_checked": "yes",
+        "printability_validated_by_print": "no",
+        "validated_by_print": False,
+        "module_id": module_id,
+        "module_size_mm": dict(module_size_mm),
+        "thresholds_mm": {
+            "min_external_wall_mm": round(wall, 4),
+            "min_internal_wall_mm": round(wall, 4),
+            "min_floor_mm": round(floor, 4),
+            "tall_module_warning_height_mm": 60.0,
+        },
+        "min_external_wall_mm": round(min_external_wall, 4) if min_external_wall is not None else None,
+        "min_internal_wall_mm": round(internal_wall, 4) if internal_wall > 0 else None,
+        "min_retained_floor_mm": round(min_floor, 4) if min_floor is not None else None,
+        "max_cavity_depth_mm": round(max_cavity_depth, 4),
+        "max_notch_depth_from_top_mm": round(max_notch_depth, 4),
+        "checks": checks,
+        "warnings": warnings,
+    }
+
+
+def _printability_cavity_items(asset_fit_cavity: dict[str, Any]) -> list[dict[str, Any]]:
+    if isinstance(asset_fit_cavity.get("compartments"), list):
+        return [dict(item) for item in asset_fit_cavity["compartments"] if isinstance(item, dict)]
+    return [asset_fit_cavity]
+
+
+def _safe_float(value: Any, default: float) -> float:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
 
 def _asset_cavity_payload(
     *,

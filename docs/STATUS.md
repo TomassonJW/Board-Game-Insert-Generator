@@ -618,3 +618,11 @@ P14-USABLE-ASSET-TRAY-M001 ajoute un layout deterministe plus robuste pour les c
 Si aucun layout de compartiments ne tient dans l'enveloppe XY utile, le moteur retourne `ASSET_COMPARTMENTS_DO_NOT_FIT` et conserve les tentatives de layout dans `layout_attempts`. Le fallback vers une grande cavite asset-fit unique est supprime quand un layout de compartiments requis est refuse, pour eviter un resultat Fusion trompeur.
 
 Limites : pas de solveur global, pas de backtracking, pas d'optimisation avancee, pas de cavites par pile/item, pas de visualisation d'items individuels, aucune validation Fusion P14 ni impression 3D encore realisee.
+
+## P14-USABLE-ASSET-TRAY-M002 - Printability safety report V0
+
+Statut : `implemented-core`, validation Fusion sprint P14 requise, `print-validated: false`.
+
+P14-M002 ajoute `printability_report_v0` aux modules asset-first generes et aux placements CAD IR. Le rapport verifie les dimensions deja resolues par le moteur : murs externes minimum, paroi interne minimum, fond conserve, profondeur maximale de cavite, profondeur maximale d'encoche et hauteur de module. Il expose `printability_checked: yes` et `printability_validated_by_print: no`.
+
+Le rapport reste volontairement heuristique et report-only : il ne change aucune tolerance par defaut, ne valide aucune impression physique et ne remplace pas une calibration reelle. Le message `quick_asset_box` affiche maintenant les lignes printability et les warnings associes.
