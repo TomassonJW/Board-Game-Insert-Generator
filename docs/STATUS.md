@@ -593,4 +593,18 @@ Smoke prepare : avec `coin-tokens,tokens,40,18,16,2,loose` et `status-tokens,tok
 
 Limites maintenues : assets individuels non visualises, cavites par pile/item non generees, pas de solveur global, pas d'optimisation avancee, pas de courbes/demi-lunes/scoops, pas de fillets/conges, pas d'export STL/3MF, aucune impression 3D validee.
 
-Statut : `implemented-fusion`, validation humaine Fusion `P13-ASSET-M005V` requise, `print-validated: false`.
+Statut : `fusion-validated-v0` apres validation humaine Fusion `P13-ASSET-M005V` confirmee le 2026-07-09 sur `baa7cf9`, `print-validated: false`.
+
+## P13-ASSET-M005V - Validation Fusion access notches par compartiment
+
+Validation humaine Fusion confirmee le 2026-07-09 sur `baa7cf9`.
+
+Resultats observes : add-in reinstalle par scripts Codex, document Fusion Assembly-compatible, `quick_asset_box` charge avec champ assets pre-rempli, `generate` OK, module exterieur count-aware genere et compartiments asset-specific generes.
+
+Le rapport valide `asset_cavity_policy: per_source_asset_rectangular_compartments_v0`, deux vraies cavites rectangulaires top-open, paroi interne presente, fond conserve, `asset_access_policy: per_compartment_top_open_rectangular_notch_v0`, `asset_access_features_generated`, `asset_access_notches_planned`, `asset_access_notches_generated`, `Registry validation: ok` et `Print validation: false`.
+
+Observation Fusion validee : deux encoches top-open frontales reelles sont coupees dans le body, ne sont pas seulement des sketches, ne detruisent ni la paroi interne ni le fond. Regenerate valide : modification d'un count ou d'une dimension, module + compartiments + encoches recalcules sans doublon. Clear final valide : `clear_bgig_scene` fonctionne et preserve les objets non-BGIG.
+
+Limites explicitement non validees : UX encore peu claire, assets individuels non visualises, cavites par pile/item non generees, pas de demi-lunes, pas de courbes/scoops, pas de fillets/conges, pas d'export STL/3MF, capacite encore heuristique, aucune impression 3D validee.
+
+Dette UX enregistree : l'interface `quick_asset_box` reste difficile a comprendre. Une future mission UI/UX devra clarifier champs, unites, effets de `count`, grille, walls, floor, clearances, modes et politiques.

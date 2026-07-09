@@ -833,8 +833,8 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Livrable : policy `per_compartment_top_open_rectangular_notch_v0`, payload `asset_access_notch`, conversion en `FusionFingerNotchCutPlan`, reporting `asset_access_*`, tests et smoke script.
 - Criteres d'acceptation : deux encoches pour le smoke M005 si geometriquement possible, refus explicite si trop etroit ou non adjacent au mur avant, fond et parois preserves, regenerate/clear conserves, coeur Python sans `adsk`.
 - Tests : unitaires assets et Fusion skeleton, py_compile add-in, CLI Markdown/JSON/export CAD IR, scripts Fusion dry-run/reel, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
-- Gate : validation humaine Fusion `P13-ASSET-M005V` requise.
-- Statut : `manual_validation_required`, implemente hors Fusion, `print-validated: false`.
+- Gate : validation humaine Fusion `P13-ASSET-M005V` realisee le 2026-07-09 sur `baa7cf9`.
+- Statut : `done`, `fusion-validated-v0`, `print-validated: false`.
 
 ### P13-ASSET-M005V - Valider les encoches d'acces par compartiment dans Fusion
 
@@ -843,5 +843,15 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Objectif : verifier dans Fusion que `quick_asset_box` genere de vraies coupes d'encoche top-open par compartiment supporte, sans casser le fond ni la paroi interne.
 - Livrable : smoke test humain Fusion avec generate, regenerate, clear et rapport.
 - Criteres d'acceptation : `asset_access_features_generated`, `asset_access_policy: per_compartment_top_open_rectangular_notch_v0`, compteurs planned/generated/refused, encoches visibles comme coupes reelles, registry OK, non-BGIG preserve, `Print validation: false`.
-- Gate : action humaine Thomas requise.
-- Statut : `manual_validation_required`.
+- Gate : action humaine Thomas realisee le 2026-07-09.
+- Statut : `done`, validation Fusion V0 confirmee sur `baa7cf9`, `print-validated: false`.
+
+### P13-ASSET-M006-GATE - Decider la prochaine etape apres access notches par compartiment
+
+- Capability : C-ASSET, C-ACCESS, C-FUSION-UI, C-SOLVER, C-CALIBRATION ou C-FILLETS selon decision.
+- Milestone : M14 Usable beta / M8 Ergonomic planner / M10 Solver / M11 Physical validation selon decision.
+- Objectif : choisir la prochaine mission apres validation des encoches d'acces V0 par compartiment.
+- Options candidates : dette UI/UX `quick_asset_box`, visualisation/proxies d'assets, cavites par pile/item, sizing capacitaire plus garanti, traitement cartes/decks, solveur/optimisation, export imprimable, calibration/impression ou maintien du scope V0.
+- Dette UX a prendre en compte : les champs, unites, effets de `count`, grille, walls, floor, clearances, modes et politiques restent difficiles a comprendre pour un humain.
+- Gate : decision humaine produit requise avant toute mission produit suivante.
+- Statut : `ready-gated`.
