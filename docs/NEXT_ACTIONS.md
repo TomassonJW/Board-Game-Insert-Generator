@@ -18,7 +18,7 @@ structurant, authentification absente ou refus de push direct.
 
 ## Gate humaine active
 
-Aucune gate humaine active apres validation Fusion `P16-ERGONOMIC-2D-TRAY-PACKING-SPRINT-V` confirmee le 2026-07-09 sur `a75688e`.
+Gate humaine active : `P17-PRINTABLE-EXPORT-AND-PREPRINT-SPRINT-V`. La preparation locale est faite avec le preset `p17_printable_export`; Thomas doit valider dans Fusion avant toute nouvelle mission produit.
 
 ## Sprint actif
 
@@ -36,11 +36,11 @@ Mission interne terminee : P17-M004 - Printability blockers V0, statuts/issues/e
 
 Mission interne terminee : P17-M005 - Calibration coupon / preprint check V0, protocole preprint et exemple JSON ajoutes.
 
-Mission interne ready : P17-M006 - Preparation gate Fusion P17.
+Mission interne terminee : P17-M006 - Preparation gate Fusion P17, preset `p17_printable_export`, add-in installe et settings Fusion ecrits.
 
 ## Mission ready non gated
 
-`P17-M006 - Preparation gate Fusion P17`.
+Aucune mission ready non gated tant que `P17-PRINTABLE-EXPORT-AND-PREPRINT-SPRINT-V` n'est pas validee humainement dans Fusion.
 
 ## Regle operationnelle Fusion
 

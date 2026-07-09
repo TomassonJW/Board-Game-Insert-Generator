@@ -1075,5 +1075,6 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 
 - Capability : C-FUSION-EXPORT, C-QUALITY.
 - Objectif : preparer le smoke Fusion export avec preset `p17_printable_export`, add-in installe, dossier export, manifeste et actions Fusion restantes.
+- Livrable : `scripts/fusion/prepare_quick_asset_test.ps1 -Preset p17_printable_export`, preset riche 5 assets, marqueurs d'installation export/manifeste et settings Fusion ecrits.
 - Gate : validation humaine Fusion P17 ; aucune impression 3D validee.
-- Statut : `ready`.
+- Statut : `done`, `gate-prepared`, `human-validation-required`.

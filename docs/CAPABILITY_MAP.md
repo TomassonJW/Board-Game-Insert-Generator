@@ -307,3 +307,9 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 - C-CALIBRATION : statut `protocol-ready` pour protocole preprint V0 et fiche JSON remplissable.
 - C-QUALITY : la validation preprint part du manifeste export et des issues printability, sans changer les tolerances.
 - Gate : aucune impression physique validee ; `print_validated: false` maintenu.
+
+## P17-M006 capability update
+
+- C-FUSION-EXPORT : `gate-prepared` pour validation Fusion P17 avec preset `p17_printable_export` et action `export_printables`.
+- C-QUALITY : preparation couvre manifestes JSON/Markdown, refus non-printables, `printability_export_allowed` et `print_validated: false`.
+- Gate : validation humaine Fusion P17 active ; aucune impression physique validee.

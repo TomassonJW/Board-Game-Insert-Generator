@@ -172,15 +172,29 @@ Ce scenario doit valider les apports P16 : `tray_packing_policy: flat_tray_2d_v0
 
 ## P17-PRINTABLE-EXPORT-AND-PREPRINT-SPRINT-V
 
-La gate P17 devra reutiliser le scenario riche P16 ou un preset dedie `p17_printable_export` quand il existera. La preparation locale devra installer l'add-in, charger `quick_asset_box`, preparer un dossier export dedie et laisser a Thomas uniquement les actions Fusion.
+La gate P17 se prepare avec le preset dedie `p17_printable_export` :
 
-Smoke cible apres implementation :
+```powershell
+scripts/fusion/prepare_quick_asset_test.ps1 -Preset p17_printable_export
+```
+
+Le script installe l'add-in courant et ecrit `bgig_ui_settings.json` avec `input_mode = quick_asset_box`, action initiale `generate`, generation `compact_only`, box `240 x 170 x 60`, grid `8 x 5 x 3`, `quick_asset_box_max_stack_height_mm = 18`, `quick_asset_box_target_aspect_ratio = 1.4`, `quick_asset_box_max_module_length_mm = 70` et assets :
+
+- `coin-tokens,tokens,48,10,10,2,loose` ;
+- `status-tokens,tokens,36,10,10,2,loose` ;
+- `damage-tokens,tokens,24,14,12,2,loose` ;
+- `dice-set,dice,8,16,16,16,loose` ;
+- `wood-meeples,meeples,18,12,12,8,loose`.
+
+Smoke cible :
 
 1. Ouvrir Fusion 360 et un document Assembly-compatible.
-2. Generer la scene `quick_asset_box` P17.
-3. Lancer `export_printables`.
-4. Verifier que seuls les modules BGIG imprimables compact sont exportes.
-5. Verifier que references, outlines, sketches debug, helpers, source occurrences, vues eclatees et objets non-BGIG sont exclus.
-6. Verifier la presence de `bgig_export_manifest.json`, `bgig_export_manifest.md`, des compteurs export/refus et `print_validated: false`.
+2. Ouvrir BGIG et confirmer `UI settings loaded: yes`, `Input mode = quick_asset_box`, preset P17 et champs persistants.
+3. Lancer `generate` et verifier scene riche P16/P17 : 5 assets, `flat_tray_2d_v0`, compartments, access notches, `printability_checked: yes`, `printability_export_allowed`, `Registry validation: ok`, `Print validation: false`.
+4. Rouvrir BGIG, choisir `Action = export_printables`, lancer.
+5. Verifier `export_policy: fusion_only_stl_per_printable_module_v0`, STL exportes, `printable_modules_exported`, `refused_modules`, `bgig_export_manifest.json`, `bgig_export_manifest.md` et `print_validated: false`.
+6. Verifier que references, outlines, sketches debug, helpers, source occurrences, vues eclatees et objets non-BGIG ne sont pas exportes comme STL imprimables.
+7. Ouvrir le manifeste JSON et verifier `schema_version: bgig.export_manifest.v0`, assets/modules, fichiers exportes, warnings/issues et `printability_validated_by_print: no`.
+8. Lancer `clear_bgig_scene` et verifier que les objets non-BGIG sont preserves.
 
 Cette gate ne valide pas l'impression physique.

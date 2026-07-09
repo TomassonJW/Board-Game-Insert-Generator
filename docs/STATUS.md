@@ -819,3 +819,10 @@ Regle V0 : les murs/fonds sous minimum et une cavite supprimant toute la hauteur
 Statut : `protocol-ready`. Le sprint P17 ne cree pas encore de geometrie coupon Fusion ; P17-M005 ajoute plutot `docs/PREPRINT_CHECK_PROTOCOL.md` et `examples/preprint_check_v0.json` pour cadrer une future session preprint a partir du dossier export, des STL et des manifestes.
 
 Le protocole conserve `print_validated: false` et distingue `not_printed`, `printed_unmeasured`, `measured_local_ok`, `measured_local_ko` et `retest_required`. Prochaine mission ready : `P17-M006 - Gate Fusion P17 export complet`.
+
+
+### P17-M006 - Gate Fusion P17 export complet
+
+Statut : `gate-prepared`, `human-validation-required`. Le preset `p17_printable_export` prepare le scenario riche 5 assets valide en P16 puis ajoute le focus export : action `export_printables`, STL V0 par body `module_body`, manifestes `bgig_export_manifest.json` / `bgig_export_manifest.md`, refus des entites non imprimables et `print_validated: false`.
+
+Preparation locale : add-in installe dans AppData via `scripts/fusion/prepare_quick_asset_test.ps1 -Preset p17_printable_export`, settings UI ecrits en `quick_asset_box`, action initiale `generate`. La suite est une gate humaine Fusion ; aucune impression physique n'est validee.

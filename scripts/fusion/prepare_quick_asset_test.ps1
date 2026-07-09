@@ -3,8 +3,8 @@ param(
     [string] $TargetPath,
     [ValidateSet("compact_only", "compact_and_exploded")]
     [string] $GenerationMode = "compact_only",
-    [ValidateSet("p16_ergonomic_tray_packing", "p15_tray_semantics", "p14_complete", "tokens", "dice_meeples_generic", "cards_tokens")]
-    [string] $Preset = "p16_ergonomic_tray_packing",
+    [ValidateSet("p17_printable_export", "p16_ergonomic_tray_packing", "p15_tray_semantics", "p14_complete", "tokens", "dice_meeples_generic", "cards_tokens")]
+    [string] $Preset = "p17_printable_export",
     [string] $AssetsText,
     [switch] $DryRun
 )
@@ -77,7 +77,7 @@ $settings = @{
 Write-BgigFusionUiSettings -TargetPath $target -Settings $settings -DryRun:$DryRun
 
 Write-Output ""
-Write-Output "Recommended P16 quick asset gate preset values:"
+Write-Output "Recommended quick asset gate preset values:"
 Write-Output "- input_mode: quick_asset_box"
 Write-Output "- preset: $Preset"
 Write-Output "- box_inner_mm: $($presetConfig.box_inner_mm.x) x $($presetConfig.box_inner_mm.y) x $($presetConfig.box_inner_mm.z)"
@@ -101,9 +101,10 @@ Write-Output "4. Confirm Loaded input mode = quick_asset_box and Loaded generati
 Write-Output "5. Confirm the Assets (quick_asset_box) field contains the prepared assets."
 Write-Output "6. Confirm Max stack height mm is $displayMaxStackHeight, Target aspect ratio is $displayTargetAspectRatio, and Max module length mm is $displayMaxModuleLength."
 Write-Output "7. Confirm Action = generate, or regenerate if a BGIG scene already exists."
-Write-Output "8. Run generation and verify Quick asset box inputs, assets_read, storage_orientation flat_tray, stack_height_policy flat_tray_max_stack_height_v0, max_stack_height_mm, target_aspect_ratio, max_module_length_mm, tray_packing_policy: flat_tray_2d_v0, pile_grid_columns, pile_grid_rows, linear_layout_avoided, grid_semantics: placement_reservation_lattice_v0, body_snap_to_grid: no, asset_cavities_generated: yes, asset_cavity_policy: per_source_asset_rectangular_compartments_v0, asset_compartments_generated: yes, asset_access_features_generated: yes, printability_checked: yes, Body sizing report, Registry validation: ok, and Print validation: false."
+Write-Output "8. Run generation and verify Quick asset box inputs, assets_read, storage_orientation flat_tray, stack_height_policy flat_tray_max_stack_height_v0, max_stack_height_mm, target_aspect_ratio, max_module_length_mm, tray_packing_policy: flat_tray_2d_v0, pile_grid_columns, pile_grid_rows, linear_layout_avoided, grid_semantics: placement_reservation_lattice_v0, body_snap_to_grid: no, asset_cavities_generated: yes, asset_cavity_policy: per_source_asset_rectangular_compartments_v0, asset_compartments_generated: yes, asset_access_features_generated: yes, printability_checked: yes, printability_export_allowed, Body sizing report, Registry validation: ok, and Print validation: false."
 Write-Output "9. Preset-specific focus: $($presetConfig.smoke_focus)"
 Write-Output "10. Reopen BGIG and confirm the asset text, max stack height, target aspect ratio, and max module length are still present."
 Write-Output "11. Modify count, max_stack_height_mm, target_aspect_ratio, or max_module_length_mm, set Action = regenerate, run, and verify the scene is replaced without duplicates and sizing changes."
-Write-Output "12. Run clear_bgig_scene and verify non-BGIG objects are preserved."
+Write-Output "12. Reopen BGIG, set Action = export_printables, run, and verify export_policy fusion_only_stl_per_printable_module_v0, exported STL files, bgig_export_manifest.json, bgig_export_manifest.md, refused non-printable BGIG entities, and print_validated: false."
+Write-Output "13. Run clear_bgig_scene and verify non-BGIG objects are preserved."
 Write-Output "Prepared quick asset test: $(-not $DryRun)"

@@ -1,6 +1,25 @@
 {
   "schema": "bgig.quick_asset_presets.v0",
   "presets": {
+    "p17_printable_export": {
+      "label": "P17 printable export and preprint smoke scenario",
+      "box_inner_mm": {
+        "x": 240,
+        "y": 170,
+        "z": 60
+      },
+      "grid_units": {
+        "x": 8,
+        "y": 5,
+        "z": 3
+      },
+      "max_stack_height_mm": 18,
+      "target_aspect_ratio": 1.4,
+      "max_module_length_mm": 70,
+      "assets_text": "coin-tokens,tokens,48,10,10,2,loose; status-tokens,tokens,36,10,10,2,loose; damage-tokens,tokens,24,14,12,2,loose; dice-set,dice,8,16,16,16,loose; wood-meeples,meeples,18,12,12,8,loose",
+      "notes": "Default P17 export gate scenario. It reuses the validated rich P16 tray shape, then adds the export_printables and manifest checks required by the preprint sprint.",
+      "smoke_focus": "generate rich quick_asset_box scene, then export_printables STL V0, bgig_export_manifest.json, bgig_export_manifest.md, refused non-printable entities, printability_export_allowed, and print_validated false"
+    },
     "p14_complete": {
       "label": "P14 complete 5-asset tray smoke scenario",
       "box_inner_mm": {

@@ -99,6 +99,9 @@ function Assert-BgigFusionAddinMarkers {
             "inspect_bgig_scene",
             "export_printables",
             "fusion_only_stl_per_printable_module_v0",
+            "bgig_export_manifest.json",
+            "bgig_export_manifest.md",
+            "printability_export_allowed",
             "print_validated: false",
             "bgig_ui_settings.json"
         )

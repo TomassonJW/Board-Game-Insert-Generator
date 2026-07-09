@@ -469,3 +469,7 @@ Le message `export_printables` affiche maintenant les chemins `manifest_json` et
 ## P17-M004 - Printability blockers dans UI
 
 Le resume `quick_asset_box` affiche maintenant `printability_status` et `printability_export_allowed` en plus des warnings historiques. Cela rend visible si un export technique est autorise par les checks heuristiques V0, sans transformer ce statut en validation d'impression.
+
+## P17-M006 - Gate export/preprint preparee
+
+Le workflow UI reste une commande Fusion classique, pas une palette persistante. La preparation P17 ecrit les settings `quick_asset_box` avec le preset `p17_printable_export` et laisse l'action initiale sur `generate`. Apres generation, l'utilisateur rouvre BGIG, choisit `export_printables`, puis valide les STL, manifestes, refus non-printables et `print_validated: false`.

@@ -2007,18 +2007,22 @@ class FusionSkeletonTests(unittest.TestCase):
         script_source = (ROOT / "scripts" / "fusion" / "prepare_quick_asset_test.ps1").read_text(encoding="utf-8-sig")
 
         self.assertEqual(catalog["schema"], "bgig.quick_asset_presets.v0")
-        self.assertIn('[string] $Preset = "p16_ergonomic_tray_packing"', script_source)
-        self.assertIn('ValidateSet("p16_ergonomic_tray_packing", "p15_tray_semantics", "p14_complete", "tokens", "dice_meeples_generic", "cards_tokens")', script_source)
+        self.assertIn('[string] $Preset = "p17_printable_export"', script_source)
+        self.assertIn('ValidateSet("p17_printable_export", "p16_ergonomic_tray_packing", "p15_tray_semantics", "p14_complete", "tokens", "dice_meeples_generic", "cards_tokens")', script_source)
         self.assertIn("quick_asset_box_target_aspect_ratio", script_source)
         self.assertIn("quick_asset_box_max_module_length_mm", script_source)
         self.assertEqual(
             set(catalog["presets"]),
-            {"p16_ergonomic_tray_packing", "p15_tray_semantics", "p14_complete", "tokens", "dice_meeples_generic", "cards_tokens"},
+            {"p17_printable_export", "p16_ergonomic_tray_packing", "p15_tray_semantics", "p14_complete", "tokens", "dice_meeples_generic", "cards_tokens"},
         )
         self.assertEqual(catalog["presets"]["p15_tray_semantics"]["max_stack_height_mm"], 18)
         self.assertEqual(catalog["presets"]["p16_ergonomic_tray_packing"]["max_stack_height_mm"], 18)
         self.assertEqual(catalog["presets"]["p16_ergonomic_tray_packing"]["target_aspect_ratio"], 1.4)
         self.assertEqual(catalog["presets"]["p16_ergonomic_tray_packing"]["max_module_length_mm"], 70)
+        self.assertEqual(catalog["presets"]["p17_printable_export"]["max_stack_height_mm"], 18)
+        self.assertEqual(catalog["presets"]["p17_printable_export"]["target_aspect_ratio"], 1.4)
+        self.assertEqual(catalog["presets"]["p17_printable_export"]["max_module_length_mm"], 70)
+        self.assertIn("export_printables", catalog["presets"]["p17_printable_export"]["smoke_focus"])
         for preset_name, preset in catalog["presets"].items():
             overrides = {
                 "box_inner_x_mm": str(preset["box_inner_mm"]["x"]),
@@ -2075,7 +2079,7 @@ class FusionSkeletonTests(unittest.TestCase):
                 report = generate_basic_layout(config)
             payload = json.loads(layout_to_json(config, report))
             self.assertGreaterEqual(payload["summary"]["module_candidate_count"], 1, preset_name)
-            if preset_name == "p16_ergonomic_tray_packing":
+            if preset_name in {"p16_ergonomic_tray_packing", "p17_printable_export"}:
                 generated = payload["executable_asset_plan"]["generated_modules"][0]
                 sizing = generated["storage_sizing"]
                 self.assertEqual(sizing["tray_packing_policy"], "flat_tray_2d_v0")
