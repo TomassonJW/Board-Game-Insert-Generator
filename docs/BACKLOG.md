@@ -911,13 +911,15 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 
 - Capability : C-ASSET.
 - Objectif : introduire `storage_orientation` et rendre `flat_tray` defaut pour tokens/dice/meeples/generic.
-- Statut : `ready`.
+- Livrable : champs JSON additifs `assets[].storage_orientation` et `assets[].max_stack_height_mm`, defaults de pile par type, `vertical_stack` explicite, diagnostics `storage_sizing` enrichis.
+- Tests : unitaires assets couvrant defaut `flat_tray`, legacy `vertical_stack`, override `max_stack_height_mm`, validation loader/schema.
+- Statut : `done`, `implemented-core`, validation Fusion P15 non encore realisee, `print-validated: false`.
 
 ### P15-M003 - max_stack_height_mm et reporting stack policy
 
 - Capability : C-ASSET, C-FUSION-UI.
-- Objectif : ajouter une hauteur de pile maximale simple et reporter la politique de stack.
-- Statut : `planned`.
+- Objectif : exposer la hauteur de pile maximale et la politique de stack dans `quick_asset_box`, la persistance UI et le resume Fusion.
+- Statut : `ready`.
 
 ### P15-M004 - Grid semantics report V0
 

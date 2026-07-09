@@ -178,3 +178,9 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 - C-ASSET : `specified` pour semantique tray V0 via ADR-0033.
 - C-QUALITY : `done-docs` pour audit z/count/grid/grouping.
 - Validation : documentaire seulement, aucun changement moteur, aucune validation Fusion ou impression.
+## P15-M002 capability update
+
+- C-ASSET : `implemented-core` additionnel pour `storage_orientation` (`auto`, `flat_tray`, `vertical_stack`) et `max_stack_height_mm` additifs dans le modele assets.
+- C-SOLVER : heuristique count-aware inchangee en nature, mais le defaut tokens/dice/meeples/generic privilegie maintenant un plateau bas borne plutot que l'utilisation implicite de toute la hauteur disponible.
+- C-FUSION-UI : prochain travail requis P15-M003 pour exposer/persister la politique de stack dans `quick_asset_box` et le rapport Fusion.
+- Validation : tests automatises moteur OK, aucune validation Fusion ni impression reelle.

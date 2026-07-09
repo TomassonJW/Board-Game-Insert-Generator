@@ -24,6 +24,7 @@
       "dimensions_mm": { "x": 22, "y": 22, "z": 8 },
       "dimension_confidence": "exact",
       "containment_intent": "store",
+      "storage_orientation": "vertical_stack",
       "comment": "Compatible with status tokens for deterministic grouping and executable planning."
     },
     {
@@ -34,6 +35,7 @@
       "dimensions_mm": { "x": 18, "y": 18, "z": 6 },
       "dimension_confidence": "exact",
       "containment_intent": "store",
+      "storage_orientation": "vertical_stack",
       "comment": "Compatible token asset; grouped candidate becomes one generated abstract module."
     }
   ],

@@ -5,6 +5,7 @@ from dataclasses import asdict, dataclass
 from board_game_insert_generator.feature_taxonomy import is_feature_taxonomy_compatible
 from board_game_insert_generator.volumetric import span_cells, span_fits_grid
 from board_game_insert_generator.models import (
+    AssetStorageOrientation,
     Cavity,
     Dimension3D,
     DimensionConfidence,
@@ -25,6 +26,7 @@ from board_game_insert_generator.models import (
 
 
 ACCESS_DIRECTIONS = {"unspecified", "top", "front", "back", "left", "right", "any"}
+ASSET_STORAGE_ORIENTATIONS = {item.value for item in AssetStorageOrientation}
 
 
 @dataclass(frozen=True)
@@ -184,6 +186,18 @@ def _validate_assets(config: InsertConfig, issues: list[ValidationIssue]) -> Non
             _validate_non_negative_number(asset.dimensions.z, f"{prefix}.dimensions_mm.z", issues)
         else:
             _validate_positive_number(asset.dimensions.z, f"{prefix}.dimensions_mm.z", issues)
+        storage_orientation = getattr(asset.storage_orientation, "value", asset.storage_orientation)
+        if storage_orientation not in ASSET_STORAGE_ORIENTATIONS:
+            allowed = ", ".join(sorted(ASSET_STORAGE_ORIENTATIONS))
+            issues.append(
+                _issue(
+                    f"{prefix}.storage_orientation",
+                    "ASSET_STORAGE_ORIENTATION_UNSUPPORTED",
+                    f"Allowed storage orientations: {allowed}.",
+                )
+            )
+        if asset.max_stack_height_mm is not None:
+            _validate_positive_number(asset.max_stack_height_mm, f"{prefix}.max_stack_height_mm", issues)
         if asset.reservation_ref is not None and asset.reservation_ref not in reservation_ids:
             issues.append(
                 _issue(

@@ -6,6 +6,7 @@ from typing import Any
 from board_game_insert_generator.models import (
     Asset,
     AssetKind,
+    AssetStorageOrientation,
     ContainmentIntent,
     Dimension3D,
     FunctionalType,
@@ -32,6 +33,12 @@ _FUNCTIONAL_TYPE_BY_ASSET_KIND = {
     AssetKind.MEEPLES: FunctionalType.MEEPLES,
 }
 _COUNT_AWARE_STACK_KINDS = {AssetKind.TOKENS, AssetKind.DICE, AssetKind.MEEPLES, AssetKind.OTHER}
+_FLAT_TRAY_DEFAULT_MAX_STACK_HEIGHT_MM = {
+    AssetKind.TOKENS: 12.0,
+    AssetKind.DICE: 20.0,
+    AssetKind.MEEPLES: 24.0,
+    AssetKind.OTHER: 16.0,
+}
 _TOTAL_STACK_Z_KINDS = {AssetKind.CARDS, AssetKind.SLEEVED_CARDS}
 _ASSET_FIT_CAVITY_SUPPORTED_FUNCTIONAL_TYPES = {
     FunctionalType.TOKENS.value,
@@ -96,8 +103,13 @@ def _can_group_asset(asset: Asset) -> bool:
     )
 
 
-def _asset_group_key(asset: Asset) -> tuple[str, str, str]:
-    return (asset.kind.value, asset.containment_intent.value, asset.dimension_confidence.value)
+def _asset_group_key(asset: Asset) -> tuple[str, str, str, str]:
+    return (
+        asset.kind.value,
+        asset.containment_intent.value,
+        asset.dimension_confidence.value,
+        _storage_orientation_group_key(asset),
+    )
 
 
 def _candidate_from_asset_group(config: InsertConfig, assets: list[Asset]) -> dict[str, Any]:
@@ -220,6 +232,58 @@ def _asset_clearance(config: InsertConfig, asset: Asset) -> tuple[float, str]:
     return 0.0, "none"
 
 
+def _storage_orientation_value(asset: Asset) -> str:
+    return str(getattr(asset.storage_orientation, "value", asset.storage_orientation) or AssetStorageOrientation.AUTO.value)
+
+
+def _resolved_storage_orientation(asset: Asset) -> str:
+    orientation = _storage_orientation_value(asset)
+    if asset.kind not in _COUNT_AWARE_STACK_KINDS:
+        return "not_applicable"
+    if orientation == AssetStorageOrientation.VERTICAL_STACK.value:
+        return AssetStorageOrientation.VERTICAL_STACK.value
+    return AssetStorageOrientation.FLAT_TRAY.value
+
+
+def _storage_orientation_group_key(asset: Asset) -> str:
+    return _resolved_storage_orientation(asset) if asset.kind in _COUNT_AWARE_STACK_KINDS else "not_applicable"
+
+
+def _count_aware_stack_height_policy(
+    asset: Asset,
+    available_asset_fit_height_mm: float,
+) -> dict[str, Any]:
+    available = round(max(0.0, available_asset_fit_height_mm), 4)
+    orientation = _resolved_storage_orientation(asset)
+    configured = asset.max_stack_height_mm if asset.max_stack_height_mm is not None and asset.max_stack_height_mm > 0 else None
+    if orientation == AssetStorageOrientation.VERTICAL_STACK.value:
+        return {
+            "storage_orientation": AssetStorageOrientation.VERTICAL_STACK.value,
+            "stack_height_policy": "vertical_stack_available_height_v0",
+            "available_asset_fit_height_mm": available,
+            "requested_max_stack_height_mm": available,
+            "max_stack_height_mm": available,
+            "max_stack_height_source": "available_asset_fit_height",
+            "max_stack_height_clamped_by_available_height": "no",
+        }
+
+    default_max = _FLAT_TRAY_DEFAULT_MAX_STACK_HEIGHT_MM.get(
+        asset.kind,
+        _FLAT_TRAY_DEFAULT_MAX_STACK_HEIGHT_MM[AssetKind.OTHER],
+    )
+    requested = float(configured if configured is not None else default_max)
+    clamped = min(requested, available) if available > 0 else 0.0
+    return {
+        "storage_orientation": AssetStorageOrientation.FLAT_TRAY.value,
+        "stack_height_policy": "flat_tray_max_stack_height_v0",
+        "available_asset_fit_height_mm": available,
+        "requested_max_stack_height_mm": round(requested, 4),
+        "max_stack_height_mm": round(clamped, 4),
+        "max_stack_height_source": "asset.max_stack_height_mm" if configured is not None else f"default_by_kind:{asset.kind.value}",
+        "max_stack_height_clamped_by_available_height": "yes" if clamped < requested else "no",
+    }
+
+
 
 def _suggested_module_for_assets(
     *,
@@ -308,7 +372,7 @@ def _count_aware_stacked_module_from_assets(
 ) -> dict[str, Any]:
     wall = config.defaults.wall_thickness_mm
     floor = config.defaults.floor_thickness_mm
-    max_fit_height = _count_aware_max_asset_fit_height(config, floor)
+    available_fit_height = _count_aware_max_asset_fit_height(config, floor)
     max_content_width = max(0.0, config.box.inner_dimensions.x - wall * 2.0 - clearance_mm * 2.0)
     max_asset_fit_width = max(0.0, config.box.inner_dimensions.x - wall * 2.0)
     max_asset_fit_depth = max(0.0, config.box.inner_dimensions.y - wall * 2.0)
@@ -317,7 +381,8 @@ def _count_aware_stacked_module_from_assets(
     warnings: list[str] = []
 
     for asset in assets:
-        diagnostic = _count_aware_asset_stack_diagnostic(asset, clearance_mm, max_fit_height)
+        stack_policy = _count_aware_stack_height_policy(asset, available_fit_height)
+        diagnostic = _count_aware_asset_stack_diagnostic(asset, clearance_mm, stack_policy)
         diagnostics.append(diagnostic)
         warning = diagnostic.get("warning")
         if warning:
@@ -370,13 +435,28 @@ def _count_aware_stacked_module_from_assets(
     )
     total_count = sum(asset.quantity.count for asset in assets)
     declared_capacity = sum(int(diagnostic["declared_capacity_count"]) for diagnostic in diagnostics)
+    orientation_values = sorted({str(diagnostic.get("storage_orientation")) for diagnostic in diagnostics})
+    policy_values = sorted({str(diagnostic.get("stack_height_policy")) for diagnostic in diagnostics})
     storage_sizing = {
         "policy": "stacked_rectangular_piles_v0",
         "derivation": "count_aware_stacked_asset_piles",
+        "sizing_scope": "count_aware_tray_storage_rectangular_piles_v0",
         "count_aware_applied": True,
         "count_aware_storage_sizing": "yes",
+        "storage_orientation": orientation_values[0] if len(orientation_values) == 1 else "mixed",
+        "storage_orientations": orientation_values,
+        "stack_height_policy": policy_values[0] if len(policy_values) == 1 else "mixed",
+        "stack_height_policies": policy_values,
         "z_mm_semantics": "unit_item_thickness_for_tokens_dice_meeples_generic",
-        "max_asset_fit_height_mm": round(max_fit_height, 4),
+        "available_asset_fit_height_mm": round(available_fit_height, 4),
+        "max_asset_fit_height_mm": round(available_fit_height, 4),
+        "max_stack_height_mm": max((float(diagnostic.get("max_stack_height_mm", 0.0)) for diagnostic in diagnostics), default=0.0),
+        "max_stack_height_by_asset_mm": {
+            str(diagnostic.get("asset_id")): diagnostic.get("max_stack_height_mm") for diagnostic in diagnostics
+        },
+        "stack_height_used_mm": max((float(diagnostic.get("stack_height_used_mm", 0.0)) for diagnostic in diagnostics), default=0.0),
+        "xy_expansion_used": "yes" if any(diagnostic.get("xy_expansion_used") == "yes" for diagnostic in diagnostics) else "no",
+        "z_expansion_used": "yes" if any(diagnostic.get("z_expansion_used") == "yes" for diagnostic in diagnostics) else "no",
         "total_count_read": total_count,
         "declared_capacity_count": declared_capacity,
         "declared_capacity_guarantee": "heuristic_envelope_only_not_physical_cavity",
@@ -399,7 +479,8 @@ def _count_aware_stacked_module_from_assets(
         "storage_sizing": storage_sizing,
         "sizing_reasons": [
             "Count-aware V0 treats each asset item as a rectangular stackable proxy.",
-            "Items are split into vertical piles using the usable height, then pile footprints are row-packed in XY without backtracking.",
+            "P15 flat_tray limits stack height by max_stack_height_mm before additional count becomes XY piles; vertical_stack keeps the old available-height behavior only when explicit.",
+            "Pile footprints are row-packed in XY without backtracking or global optimization.",
         ],
         "warnings": warnings,
     }
@@ -432,8 +513,13 @@ def _max_free_contiguous_z_span(config: InsertConfig) -> int:
     return max_span
 
 
-def _count_aware_asset_stack_diagnostic(asset: Asset, clearance_mm: float, max_fit_height_mm: float) -> dict[str, Any]:
-    usable_stack_height = max_fit_height_mm - clearance_mm
+def _count_aware_asset_stack_diagnostic(
+    asset: Asset,
+    clearance_mm: float,
+    stack_policy: dict[str, Any],
+) -> dict[str, Any]:
+    max_stack_height_mm = float(stack_policy.get("max_stack_height_mm", 0.0) or 0.0)
+    usable_stack_height = max_stack_height_mm - clearance_mm
     if usable_stack_height <= 0:
         capacity_per_stack = 1
         warning = "No positive stack height remains after clearance; using one item per pile and expecting placement rejection if too tall."
@@ -443,18 +529,30 @@ def _count_aware_asset_stack_diagnostic(asset: Asset, clearance_mm: float, max_f
     pile_count = max(1, ceil(asset.quantity.count / capacity_per_stack))
     items_per_pile = max(1, ceil(asset.quantity.count / pile_count))
     stack_height = round(items_per_pile * asset.dimensions.z, 4)
-    if stack_height + clearance_mm > max_fit_height_mm:
-        warning = "Computed stack height exceeds usable asset-fit height; generated module may be rejected by box/grid constraints."
+    if stack_height + clearance_mm > max_stack_height_mm:
+        warning = "Computed stack height exceeds max stack height; generated module may be rejected by box/grid constraints."
+    xy_expansion_used = "yes" if pile_count > 1 else "no"
+    z_expansion_used = "yes" if items_per_pile > 1 else "no"
     return {
         "asset_id": asset.id,
         "count_read": asset.quantity.count,
         "dimensions_read_mm": _dimension_to_dict(asset.dimensions),
         "count_used_for_sizing": True,
+        "storage_orientation": stack_policy.get("storage_orientation"),
+        "stack_height_policy": stack_policy.get("stack_height_policy"),
+        "available_asset_fit_height_mm": stack_policy.get("available_asset_fit_height_mm"),
+        "requested_max_stack_height_mm": stack_policy.get("requested_max_stack_height_mm"),
+        "max_stack_height_mm": stack_policy.get("max_stack_height_mm"),
+        "max_stack_height_source": stack_policy.get("max_stack_height_source"),
+        "max_stack_height_clamped_by_available_height": stack_policy.get("max_stack_height_clamped_by_available_height"),
         "capacity_per_stack": capacity_per_stack,
         "pile_count": pile_count,
         "items_per_pile": items_per_pile,
         "declared_capacity_count": pile_count * capacity_per_stack,
         "stack_height_mm": stack_height,
+        "stack_height_used_mm": stack_height,
+        "xy_expansion_used": xy_expansion_used,
+        "z_expansion_used": z_expansion_used,
         "pile_footprint_mm": {"x": asset.dimensions.x, "y": asset.dimensions.y},
         "z_mm_semantics": "unit_item_thickness",
         "warning": warning,
@@ -567,6 +665,12 @@ def _count_aware_compartment_layout(
                 "count_read": diagnostic["count_read"],
                 "dimensions_read_mm": dict(diagnostic["dimensions_read_mm"]),
                 "count_used_for_sizing": True,
+                "storage_orientation": diagnostic.get("storage_orientation"),
+                "stack_height_policy": diagnostic.get("stack_height_policy"),
+                "max_stack_height_mm": diagnostic.get("max_stack_height_mm"),
+                "stack_height_used_mm": diagnostic.get("stack_height_used_mm"),
+                "xy_expansion_used": diagnostic.get("xy_expansion_used"),
+                "z_expansion_used": diagnostic.get("z_expansion_used"),
                 "capacity_per_stack": diagnostic["capacity_per_stack"],
                 "pile_count": diagnostic["pile_count"],
                 "items_per_pile": diagnostic["items_per_pile"],

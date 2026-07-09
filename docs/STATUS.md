@@ -652,3 +652,14 @@ Statut : sprint lance apres refus de validation usable P14. P14 est techniquemen
 Statut : `done-docs`, ADR acceptee `docs/DECISIONS/ADR-0033-tray-semantics-v0.md`, pas de changement moteur.
 
 Decision : `tokens`, `dice`, `meeples` et `generic` gardent `z_mm` comme dimension unitaire, mais le defaut produit devient `storage_orientation = flat_tray` avec `max_stack_height_mm`. `vertical_stack` conserve l'ancien comportement uniquement en mode explicite. La grille est documentee comme `placement_reservation_lattice_v0`, pas comme taille physique de body.
+## P15-M002 - storage_orientation flat_tray V0
+
+Statut : `implemented-core`, tests assets cibles OK, validation Fusion non encore realisee, `print-validated: false`.
+
+P15-M002 introduit les champs additifs `assets[].storage_orientation` (`auto`, `flat_tray`, `vertical_stack`) et `assets[].max_stack_height_mm`. Pour `tokens`, `dice`, `meeples` et `generic`, `auto` se resout maintenant en `flat_tray` : le moteur garde `z_mm` comme epaisseur unitaire, mais limite la hauteur de pile par un plafond produit avant de creer plus de piles XY. Defaults moteur : tokens `12.0 mm`, dice `20.0 mm`, meeples `24.0 mm`, generic `16.0 mm`.
+
+`vertical_stack` conserve explicitement l'ancien comportement qui utilise la hauteur disponible de la boite/grille. Les fixtures historiques a tokens epais `simple_asset_grouping.json` et `simple_asset_executable_plan.json` le declarent maintenant explicitement pour rester des tests legacy, tandis que les nouveaux tests P15 prouvent le defaut `flat_tray`.
+
+Exemple teste : 30 tokens `10 x 10 x 2 mm` passent de `33.6 x 13.6 x 21.8 mm` en `vertical_stack` a `63.6 x 13.6 x 11.8 mm` en `flat_tray`. Avec `max_stack_height_mm = 6`, le meme cas devient `93.6 x 23.6 x 5.8 mm`.
+
+Metadata/reporting moteur : `storage_sizing` transporte `storage_orientation`, `stack_height_policy`, `available_asset_fit_height_mm`, `max_stack_height_mm`, `stack_height_used_mm`, `xy_expansion_used` et `z_expansion_used`. La prochaine mission P15-M003 doit exposer ces champs clairement dans la commande Fusion `quick_asset_box` et les settings.

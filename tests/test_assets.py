@@ -206,32 +206,65 @@ class AssetModelTests(unittest.TestCase):
         self.assertEqual(generated["asset_fit_cavity"]["compartment_count"], 1)
         self.assertEqual(generated["asset_fit_cavity"]["compartments"][0]["size_mm"], generated["asset_fit_size_mm"])
         self.assertEqual(generated["asset_fit_cavity"]["compartments"][0]["retained_floor_mm"], 1.2)
-        self.assertEqual(sizing["asset_diagnostics"][0]["capacity_per_stack"], 14)
-        self.assertEqual(sizing["asset_diagnostics"][0]["pile_count"], 1)
-        self.assertEqual(sizing["asset_diagnostics"][0]["items_per_pile"], 1)
+        diagnostic = sizing["asset_diagnostics"][0]
+        self.assertEqual(sizing["storage_orientation"], "flat_tray")
+        self.assertEqual(sizing["stack_height_policy"], "flat_tray_max_stack_height_v0")
+        self.assertEqual(diagnostic["capacity_per_stack"], 5)
+        self.assertEqual(diagnostic["pile_count"], 1)
+        self.assertEqual(diagnostic["items_per_pile"], 1)
+        self.assertEqual(diagnostic["max_stack_height_mm"], 12.0)
+        self.assertEqual(diagnostic["xy_expansion_used"], "no")
+        self.assertEqual(diagnostic["z_expansion_used"], "no")
 
-    def test_count_aware_count_can_increase_stack_height_before_xy_piles(self) -> None:
+    def test_count_aware_flat_tray_caps_stack_and_expands_xy(self) -> None:
         low = _layout_payload(_count_aware_tokens_payload(count=1))["executable_asset_plan"]["generated_modules"][0]
         high = _layout_payload(_count_aware_tokens_payload(count=10))["executable_asset_plan"]["generated_modules"][0]
+        diagnostic = high["storage_sizing"]["asset_diagnostics"][0]
 
-        self.assertEqual(low["dimensions_mm"]["x"], high["dimensions_mm"]["x"])
-        self.assertEqual(low["dimensions_mm"]["y"], high["dimensions_mm"]["y"])
-        self.assertGreater(high["dimensions_mm"]["z"], low["dimensions_mm"]["z"])
-        self.assertGreater(
-            high["asset_fit_cavity"]["compartments"][0]["size_mm"]["z"],
-            low["asset_fit_cavity"]["compartments"][0]["size_mm"]["z"],
-        )
-        self.assertEqual(high["storage_sizing"]["asset_diagnostics"][0]["pile_count"], 1)
-        self.assertEqual(high["storage_sizing"]["asset_diagnostics"][0]["items_per_pile"], 10)
+        self.assertGreater(high["dimensions_mm"]["x"], low["dimensions_mm"]["x"])
+        self.assertEqual(high["dimensions_mm"]["y"], low["dimensions_mm"]["y"])
+        self.assertLess(high["dimensions_mm"]["z"], 12.0)
+        self.assertEqual(diagnostic["storage_orientation"], "flat_tray")
+        self.assertEqual(diagnostic["capacity_per_stack"], 5)
+        self.assertEqual(diagnostic["pile_count"], 2)
+        self.assertEqual(diagnostic["items_per_pile"], 5)
+        self.assertEqual(diagnostic["xy_expansion_used"], "yes")
+        self.assertEqual(diagnostic["z_expansion_used"], "yes")
 
-    def test_count_aware_high_count_requires_multiple_xy_piles(self) -> None:
+    def test_count_aware_high_count_requires_more_flat_tray_xy_piles(self) -> None:
         generated = _layout_payload(_count_aware_tokens_payload(count=30))["executable_asset_plan"]["generated_modules"][0]
         diagnostic = generated["storage_sizing"]["asset_diagnostics"][0]
 
+        self.assertEqual(diagnostic["pile_count"], 6)
+        self.assertEqual(diagnostic["items_per_pile"], 5)
+        self.assertEqual(generated["dimensions_mm"], {"x": 63.6, "y": 13.6, "z": 11.8})
+        self.assertEqual(generated["asset_fit_cavity"]["compartments"][0]["size_mm"], {"x": 61.2, "y": 11.2, "z": 10.6})
+
+    def test_vertical_stack_explicit_preserves_legacy_available_height_behavior(self) -> None:
+        payload = _count_aware_tokens_payload(count=30)
+        payload["assets"][0]["storage_orientation"] = "vertical_stack"
+        generated = _layout_payload(payload)["executable_asset_plan"]["generated_modules"][0]
+        diagnostic = generated["storage_sizing"]["asset_diagnostics"][0]
+
+        self.assertEqual(diagnostic["storage_orientation"], "vertical_stack")
+        self.assertEqual(diagnostic["stack_height_policy"], "vertical_stack_available_height_v0")
+        self.assertEqual(diagnostic["capacity_per_stack"], 14)
         self.assertEqual(diagnostic["pile_count"], 3)
         self.assertEqual(diagnostic["items_per_pile"], 10)
         self.assertEqual(generated["dimensions_mm"], {"x": 33.6, "y": 13.6, "z": 21.8})
-        self.assertEqual(generated["asset_fit_cavity"]["compartments"][0]["size_mm"], {"x": 31.2, "y": 11.2, "z": 20.6})
+
+    def test_max_stack_height_mm_override_reduces_stack_height_and_expands_xy(self) -> None:
+        payload = _count_aware_tokens_payload(count=30)
+        payload["assets"][0]["max_stack_height_mm"] = 6
+        generated = _layout_payload(payload)["executable_asset_plan"]["generated_modules"][0]
+        diagnostic = generated["storage_sizing"]["asset_diagnostics"][0]
+
+        self.assertEqual(diagnostic["storage_orientation"], "flat_tray")
+        self.assertEqual(diagnostic["max_stack_height_mm"], 6.0)
+        self.assertEqual(diagnostic["capacity_per_stack"], 2)
+        self.assertEqual(diagnostic["pile_count"], 15)
+        self.assertEqual(diagnostic["items_per_pile"], 2)
+        self.assertEqual(generated["dimensions_mm"], {"x": 93.6, "y": 23.6, "z": 5.8})
 
     def test_asset_compartments_plan_front_access_notches_for_smoke_case(self) -> None:
         payload = _count_aware_tokens_payload(count=40)
@@ -262,6 +295,9 @@ class AssetModelTests(unittest.TestCase):
                 "containment_intent": "store",
             },
         ]
+        for asset in payload["assets"]:
+            asset["storage_orientation"] = "vertical_stack"
+
         generated = _layout_payload(payload)["executable_asset_plan"]["generated_modules"][0]
         cavity = generated["asset_fit_cavity"]
 
@@ -308,10 +344,10 @@ class AssetModelTests(unittest.TestCase):
         self.assertEqual(cavity["compartment_count"], 3)
         self.assertEqual(cavity["asset_compartment_cavities_planned"], 3)
         self.assertEqual([item["asset_id"] for item in cavity["compartments"]], ["coin-tokens", "status-tokens", "wound-tokens"])
-        self.assertEqual(generated["dimensions_mm"], {"x": 68.4, "y": 38.6, "z": 47.8})
-        self.assertEqual(cavity["asset_fit_size_mm"], {"x": 66.0, "y": 36.2, "z": 46.6})
+        self.assertEqual(generated["dimensions_mm"], {"x": 147.6, "y": 57.0, "z": 11.8})
+        self.assertEqual(cavity["asset_fit_size_mm"], {"x": 145.2, "y": 54.6, "z": 10.6})
         self.assertTrue(cavity["compartments"][1]["expected_walls_mm"]["x_min"] > 0)
-        self.assertEqual(cavity["asset_access_notches_planned"], 3)
+        self.assertEqual(cavity["asset_access_notches_planned"], 1)
 
     def test_multi_asset_compartments_support_four_assets_with_internal_walls(self) -> None:
         payload = _multi_asset_tokens_payload(asset_count=4)
@@ -322,11 +358,11 @@ class AssetModelTests(unittest.TestCase):
         self.assertEqual(cavity["layout_strategy"], "deterministic_shelf_by_source_asset_v0")
         self.assertEqual(cavity["compartment_count"], 4)
         self.assertEqual(cavity["asset_compartment_cavities_planned"], 4)
-        self.assertEqual(generated["dimensions_mm"], {"x": 82.8, "y": 38.6, "z": 47.8})
-        self.assertEqual(cavity["asset_fit_size_mm"], {"x": 80.4, "y": 36.2, "z": 46.6})
-        self.assertEqual(cavity["compartments"][0]["wall_role_x_max"], "internal_wall")
-        self.assertEqual(cavity["compartments"][1]["wall_role_x_min"], "internal_wall")
-        self.assertEqual(cavity["asset_access_notches_refused"], 0)
+        self.assertEqual(generated["dimensions_mm"], {"x": 147.6, "y": 57.0, "z": 11.8})
+        self.assertEqual(cavity["asset_fit_size_mm"], {"x": 145.2, "y": 54.6, "z": 10.6})
+        self.assertEqual(cavity["compartments"][0]["wall_role_y_max"], "internal_wall")
+        self.assertEqual(cavity["compartments"][1]["wall_role_y_min"], "internal_wall")
+        self.assertEqual(cavity["asset_access_notches_refused"], 3)
         report = generated["printability_report_v0"]
         self.assertEqual(report["policy"], "printability_report_v0")
         self.assertEqual(report["printability_checked"], "yes")
@@ -334,10 +370,10 @@ class AssetModelTests(unittest.TestCase):
         self.assertEqual(report["min_external_wall_mm"], 1.2)
         self.assertEqual(report["min_internal_wall_mm"], 1.2)
         self.assertEqual(report["min_retained_floor_mm"], 1.2)
-        self.assertEqual(report["max_cavity_depth_mm"], 46.6)
+        self.assertEqual(report["max_cavity_depth_mm"], 10.6)
         self.assertEqual(report["max_notch_depth_from_top_mm"], 10.0)
         self.assertFalse(report["validated_by_print"])
-        self.assertIn("no physical print validation", report["warnings"][0])
+        self.assertTrue(any("no physical print validation" in warning for warning in report["warnings"]))
 
     def test_multi_asset_compartments_reject_when_no_layout_fits(self) -> None:
         payload = _multi_asset_tokens_payload(asset_count=4, box_inner_mm=(75, 45, 55), grid_units=(3, 3, 2))
@@ -368,6 +404,30 @@ class AssetModelTests(unittest.TestCase):
         self.assertEqual(plan_payload["asset_candidate_variants"][0]["status"], "rejected")
         self.assertEqual(plan_payload["executable_asset_plan"]["status"], "rejected")
         self.assertIn("DIMENSIONS_INCOMPATIBLE", plan_payload["executable_asset_plan"]["rejected_modules"][0]["code"])
+    def test_loads_asset_storage_orientation_and_max_stack_height(self) -> None:
+        payload = _count_aware_tokens_payload(count=12)
+        payload["assets"][0]["storage_orientation"] = "vertical_stack"
+        payload["assets"][0]["max_stack_height_mm"] = 18
+
+        config = _load_payload(payload)
+
+        self.assertEqual(config.assets[0].storage_orientation.value, "vertical_stack")
+        self.assertEqual(config.assets[0].max_stack_height_mm, 18.0)
+        self.assertEqual(validate_config(config), [])
+
+    def test_rejects_invalid_asset_storage_orientation(self) -> None:
+        payload = _count_aware_tokens_payload(count=12)
+        payload["assets"][0]["storage_orientation"] = "sideways"
+
+        with self.assertRaisesRegex(ConfigError, "Unsupported storage_orientation"):
+            _load_payload(payload)
+
+    def test_validation_reports_invalid_asset_max_stack_height(self) -> None:
+        payload = _count_aware_tokens_payload(count=12)
+        payload["assets"][0]["max_stack_height_mm"] = 0
+        config = _load_payload(payload)
+
+        self.assertIn(("assets[0].max_stack_height_mm", "NOT_POSITIVE"), _issue_keys(validate_config(config)))
     def test_rejects_unknown_asset_field(self) -> None:
         payload = _asset_payload()
         payload["assets"][0]["solver_hint"] = "not-yet"

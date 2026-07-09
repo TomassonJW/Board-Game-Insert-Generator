@@ -392,9 +392,10 @@ La CAD IR V0 reste additive. Quand la source Fusion est `quick_asset_box`, l'add
 
 ## P13-ASSET-M002 - Metadata storage_sizing
 
-Les candidats asset-first, modules generes et placements peuvent porter une metadata additive `storage_sizing`. Elle est informative et stable pour le reporting : `policy`, `derivation`, `count_aware_storage_sizing`, `z_mm_semantics`, `total_count_read`, `declared_capacity_count`, `declared_capacity_guarantee`, `asset_diagnostics`, `pile_layout`, `content_footprint_mm`, `asset_fit_size_mm`, `module_size_mm` et `warnings`.
+Les candidats asset-first, modules generes et placements peuvent porter une metadata additive `storage_sizing`. Elle est informative et stable pour le reporting : `policy`, `derivation`, `count_aware_storage_sizing`, `storage_orientation`, `stack_height_policy`, `z_mm_semantics`, `available_asset_fit_height_mm`, `max_stack_height_mm`, `stack_height_used_mm`, `xy_expansion_used`, `z_expansion_used`, `total_count_read`, `declared_capacity_count`, `declared_capacity_guarantee`, `asset_diagnostics`, `pile_layout`, `content_footprint_mm`, `asset_fit_size_mm`, `module_size_mm` et `warnings`.
 
 Cette metadata ne remplace pas les champs CAD IR existants (`dimensions_mm`, `asset_fit_size_mm`, `printable_body_size_mm`, placements grille). Fusion consomme toujours la geometrie existante et ajoute seulement un sketch debug non imprimable pour l'enveloppe asset-fit.
+Depuis P15-M002, les diagnostics par asset ajoutent aussi `requested_max_stack_height_mm`, `max_stack_height_source`, `capacity_per_stack`, `items_per_pile` et la resolution de `storage_orientation`. `flat_tray` est le defaut resolu pour tokens/dice/meeples/generic ; `vertical_stack` signale explicitement le comportement legacy base sur la hauteur disponible.
 
 ## P13-ASSET-M003 - Metadata asset_fit_cavity
 

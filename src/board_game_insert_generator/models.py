@@ -74,6 +74,12 @@ class ContainmentIntent(str, Enum):
     ACCESS_FIRST = "access_first"
 
 
+class AssetStorageOrientation(str, Enum):
+    AUTO = "auto"
+    FLAT_TRAY = "flat_tray"
+    VERTICAL_STACK = "vertical_stack"
+
+
 class VolumetricOwnerType(str, Enum):
     GRID_FLOOR = "grid_floor"
     MODULE_PLACEMENT = "module_placement"
@@ -163,6 +169,8 @@ class Asset:
     containment_intent: ContainmentIntent
     reservation_ref: str | None = None
     module_hint: str | None = None
+    storage_orientation: AssetStorageOrientation = AssetStorageOrientation.AUTO
+    max_stack_height_mm: float | None = None
     comment: str = ""
 
 

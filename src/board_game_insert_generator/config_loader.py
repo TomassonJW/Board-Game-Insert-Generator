@@ -9,6 +9,7 @@ from board_game_insert_generator.models import (
     Asset,
     AssetKind,
     AssetQuantity,
+    AssetStorageOrientation,
     BoxSpec,
     Cavity,
     ContainmentIntent,
@@ -57,7 +58,7 @@ MODULE_FIELDS = {
 }
 CAVITY_FIELDS = {"id", "functional_type", "origin_mm", "size_mm", "clearance_mm", "comment", "features"}
 FEATURE_FIELDS = {"id", "kind", "taxonomy", "placement", "position_mm", "size_mm", "radius_mm", "comment"}
-ASSET_FIELDS = {"id", "name", "kind", "quantity", "dimensions_mm", "dimension_confidence", "containment_intent", "reservation_ref", "module_hint", "comment"}
+ASSET_FIELDS = {"id", "name", "kind", "quantity", "dimensions_mm", "dimension_confidence", "containment_intent", "reservation_ref", "module_hint", "storage_orientation", "max_stack_height_mm", "comment"}
 ASSET_QUANTITY_FIELDS = {"count", "grouping"}
 VOLUMETRIC_GRID_FIELDS = {"unit_mm", "size_units", "layers", "module_placements", "zones", "support_surfaces", "comment"}
 VOLUMETRIC_LAYER_FIELDS = {"id", "name", "z_start", "z_count", "role", "comment"}
@@ -138,6 +139,8 @@ def _parse_assets(raw_assets: Any) -> list[Asset]:
                 containment_intent=_parse_containment_intent(raw.get("containment_intent", "store"), field),
                 reservation_ref=_optional_nullable_string(raw, "reservation_ref", field),
                 module_hint=_optional_nullable_string(raw, "module_hint", field),
+                storage_orientation=_parse_asset_storage_orientation(raw.get("storage_orientation", "auto"), field),
+                max_stack_height_mm=_optional_nullable_number(raw, "max_stack_height_mm", field),
                 comment=_optional_string(raw, "comment", field, default=""),
             )
         )
@@ -189,6 +192,15 @@ def _parse_containment_intent(value: Any, field_path: str) -> ContainmentIntent:
     except ValueError as exc:
         allowed = ", ".join(item.value for item in ContainmentIntent)
         raise ConfigError(f"Unsupported containment_intent for {field_path}: {value!r}. Allowed values: {allowed}.") from exc
+
+
+def _parse_asset_storage_orientation(value: Any, field_path: str) -> AssetStorageOrientation:
+    try:
+        return AssetStorageOrientation(str(value))
+    except ValueError as exc:
+        allowed = ", ".join(item.value for item in AssetStorageOrientation)
+        raise ConfigError(f"Unsupported storage_orientation for {field_path}: {value!r}. Allowed values: {allowed}.") from exc
+
 
 def _parse_volumetric_grid(raw: Any) -> VolumetricGrid | None:
     if raw is None:
@@ -749,6 +761,13 @@ def _optional_nullable_int(raw: dict[str, Any], key: str, field_name: str) -> in
     if isinstance(value, bool) or not isinstance(value, int):
         raise ConfigError(f"Field '{field_name}.{key}' must be an integer or null.")
     return value
+
+
+def _optional_nullable_number(raw: dict[str, Any], key: str, field_name: str) -> float | None:
+    if key not in raw or raw[key] is None:
+        return None
+    return _number_value(raw[key], f"{field_name}.{key}")
+
 
 def _optional_string(raw: dict[str, Any], key: str, field_name: str, default: str) -> str:
     if key not in raw:

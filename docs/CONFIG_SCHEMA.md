@@ -409,13 +409,16 @@ Champs cibles :
 - `assets[].containment_intent` ;
 - `assets[].reservation_ref` vers une zone volumetrique optionnelle ;
 - `assets[].module_hint` optionnel ;
+- `assets[].storage_orientation` optionnel : `auto`, `flat_tray` ou `vertical_stack` ;
+- `assets[].max_stack_height_mm` optionnel : hauteur maximale de pile pour les assets count-aware ;
 - `assets[].comment`.
 
 Validation P9-M002 : ids uniques, quantite strictement positive, dimensions X/Y
 positives, Z positive sauf `dimension_confidence: unknown_z` ou Z peut valoir 0,
 `reservation_ref` vers une zone volumetrique existante si fourni, `module_hint`
-vers un module existant si fourni. P10-M006 peut grouper des assets compatibles
-dans les rapports sans ajouter de nouveau champ de configuration.
+vers un module existant si fourni. `storage_orientation` doit appartenir aux valeurs supportees et `max_stack_height_mm`, si fourni, doit etre strictement positif. P10-M006 peut grouper des assets compatibles dans les rapports sans ajouter de nouveau champ de configuration.
+
+Depuis P15-M002, `tokens`, `dice`, `meeples` et `generic` resolvent `storage_orientation: auto` vers `flat_tray`. Ce mode garde `z_mm` comme epaisseur unitaire mais limite la pile par `max_stack_height_mm` ou par les defaults moteur : tokens `12.0`, dice `20.0`, meeples `24.0`, generic `16.0`. `vertical_stack` est le mode explicite pour conserver l'ancien comportement qui utilise la hauteur disponible de la boite/grille.
 ## Overrides UI Fusion P12-M002+
 
 La commande Fusion P12-M002+ peut appliquer des overrides temporaires sur une
@@ -471,6 +474,6 @@ Format UI V0 : `asset_id,type,count,x_mm,y_mm,z_mm,fit`, entrees separees par `;
 
 ## P13-ASSET-M002 - Semantique count/z pour quick_asset_box
 
-Le schema JSON public ne change pas. Dans les configs temporaires `quick_asset_box`, `count` influence maintenant le sizing pour `tokens`, `dice`, `meeples` et `generic`, avec `z_mm` interprete comme epaisseur unitaire d'un item.
+Depuis P15-M002, le schema JSON public accepte aussi les champs additifs `assets[].storage_orientation` et `assets[].max_stack_height_mm`. Dans les configs temporaires `quick_asset_box`, `count` influence le sizing pour `tokens`, `dice`, `meeples` et `generic`, avec `z_mm` interprete comme epaisseur unitaire d'un item.
 
 Pour `cards` et `sleeved_cards`, `z_mm` est interprete comme hauteur totale du paquet/deck fourni ; `count` est reporte mais non multiplie. Cette limitation est volontaire et doit rester visible dans le reporting tant qu'un modele cartes plus fin n'est pas valide.
