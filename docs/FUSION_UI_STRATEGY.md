@@ -464,3 +464,8 @@ Le message utilisateur affiche le dossier export, le format STL, les modules det
 ## P17-M003 - Rapport manifestes export
 
 Le message `export_printables` affiche maintenant les chemins `manifest_json` et `manifest_markdown`. Ces fichiers sont crees automatiquement dans le dossier export. L'utilisateur ne doit pas les interpreter comme validation d'impression : ils documentent seulement ce qui a ete exporte, refuse et averti.
+
+
+## P17-M004 - Printability blockers dans UI
+
+Le resume `quick_asset_box` affiche maintenant `printability_status` et `printability_export_allowed` en plus des warnings historiques. Cela rend visible si un export technique est autorise par les checks heuristiques V0, sans transformer ce statut en validation d'impression.

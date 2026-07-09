@@ -1575,6 +1575,8 @@ def quick_asset_box_metadata(
         for warning in report.get("warnings", [])
         if warning
     ]
+    printability_status = _quick_asset_box_printability_status(printability_reports)
+    printability_export_allowed = all(bool(report.get("printability_export_allowed", False)) for report in printability_reports) if printability_reports else False
     return {
         "input_format": parse_report["input_format"],
         "supported_types": parse_report["supported_types"],
@@ -1622,6 +1624,8 @@ def quick_asset_box_metadata(
         "printability_report_v0": printability_reports,
         "printability_checked": "yes" if printability_reports else "no",
         "printability_validated_by_print": "no",
+        "printability_status": printability_status,
+        "printability_export_allowed": "yes" if printability_export_allowed else "no",
         "printability_warnings": printability_warnings,
         "count_aware_storage_sizing": storage_sizing_status,
         "storage_sizing_scope": _quick_asset_box_storage_sizing_scope(module_sizing_diagnostics, storage_sizing_status),
@@ -1752,6 +1756,20 @@ def _quick_asset_box_printability_reports(executable_plan: Any) -> list[dict[str
         if isinstance(report, dict):
             reports.append(report)
     return reports
+
+
+def _quick_asset_box_printability_status(reports: list[dict[str, Any]]) -> str:
+    if not reports:
+        return "not_checked"
+    statuses = {str(report.get("printability_status", "warning")) for report in reports}
+    if "blocked" in statuses:
+        return "blocked"
+    if "warning" in statuses:
+        return "warning"
+    if statuses == {"ok"}:
+        return "ok"
+    return "warning"
+
 
 def _quick_asset_box_asset_cavity_diagnostics(executable_plan: Any) -> list[dict[str, Any]]:
     if not isinstance(executable_plan, dict):
@@ -2059,6 +2077,8 @@ def quick_asset_box_summary(payload: dict[str, Any] | None) -> str:
         f"- asset_debug_visualization_scope: {quick.get('asset_debug_visualization_scope')}",
         f"- printability_checked: {quick.get('printability_checked') or 'no'}",
         f"- printability_validated_by_print: {quick.get('printability_validated_by_print') or 'no'}",
+        f"- printability_status: {quick.get('printability_status') or 'not_checked'}",
+        f"- printability_export_allowed: {quick.get('printability_export_allowed') or 'no'}",
     ]
     for asset in quick.get("accepted_assets", []):
         lines.append(
@@ -2158,6 +2178,8 @@ def quick_asset_box_summary(payload: dict[str, Any] | None) -> str:
             f"min_floor {report.get('min_retained_floor_mm') if report.get('min_retained_floor_mm') is not None else 'n/a'} mm; "
             f"max_cavity_depth {report.get('max_cavity_depth_mm')} mm; "
             f"max_notch_depth {report.get('max_notch_depth_from_top_mm')} mm; "
+            f"status {report.get('printability_status') or 'warning'}; "
+            f"export_allowed {'yes' if report.get('printability_export_allowed') else 'no'}; "
             f"validated_by_print {report.get('printability_validated_by_print') or 'no'}"
         )
         for warning in report.get("warnings", []):

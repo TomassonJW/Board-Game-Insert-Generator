@@ -805,3 +805,10 @@ Prochaine mission ready : `P17-M003 - Export manifest V0`.
 Statut : `implemented-fusion-unvalidated`. L'action `export_printables` ecrit maintenant `bgig_export_manifest.json` et `bgig_export_manifest.md` dans le dossier export. Le JSON expose `schema_version: bgig.export_manifest.v0`, politique export, format, timestamp, statut, settings UI, source CAD IR si disponible, assets, modules, fichiers exportes, refus, warnings et `print_validated: false`.
 
 Limite : le manifeste est un artefact d'audit preprint. Il ne prouve pas la printability physique, ne remplace pas la gate Fusion et ne valide aucune impression. Prochaine mission ready : `P17-M004 - Printability blockers V0`.
+
+
+### P17-M004 - Printability blockers V0
+
+Statut : `implemented-core-fusion-reporting`. `printability_report_v0` expose maintenant `printability_status`, `printability_export_allowed`, `issue_counts` et `issues[]` avec severites `warning`/`blocker`. Les anciens `warnings[]` restent presents pour compatibilite.
+
+Regle V0 : les murs/fonds sous minimum et une cavite supprimant toute la hauteur deviennent des blockers et desactivent `printability_export_allowed`; la profondeur d'encoche importante, les modules hauts, cavites non planifiees et l'absence de validation physique restent des warnings. Le resume Fusion `quick_asset_box` affiche `printability_status` et `printability_export_allowed`. Prochaine mission ready : `P17-M005 - Calibration coupon / preprint check V0`.

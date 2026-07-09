@@ -32,15 +32,15 @@ Mission interne terminee : P17-M002 - Action Fusion `export_printables`, impleme
 
 Mission interne terminee : P17-M003 - Export manifest V0, manifestes JSON/Markdown V0 produits par `export_printables`.
 
-Mission interne ready : P17-M004 - Printability blockers V0.
+Mission interne terminee : P17-M004 - Printability blockers V0, statuts/issues/export_allowed ajoutes.
 
-Mission interne suivante : P17-M005 - Calibration coupon / preprint check V0.
+Mission interne ready : P17-M005 - Calibration coupon / preprint check V0.
 
 Mission interne suivante : P17-M006 - Preparation gate Fusion P17.
 
 ## Mission ready non gated
 
-`P17-M004 - Printability blockers V0`.
+`P17-M005 - Calibration coupon / preprint check V0`.
 
 ## Regle operationnelle Fusion
 

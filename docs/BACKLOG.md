@@ -1061,13 +1061,14 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 
 - Capability : C-CALIBRATION, C-QUALITY.
 - Objectif : enrichir `printability_report_v0` avec severites info/warning/blocker, `printability_status` et `printability_export_allowed`.
-- Statut : `ready`.
+- Livrable : `issues[]`, `issue_counts`, `printability_status`, `printability_export_allowed` dans `printability_report_v0`, propagation dans le resume Fusion `quick_asset_box`.
+- Statut : `done`, `implemented-core-fusion-reporting`.
 
 ### P17-M005 - Calibration coupon / preprint check V0
 
 - Capability : C-CALIBRATION.
 - Objectif : preparer un coupon/protocole preprint sans validation physique ni promesse ready-to-print.
-- Statut : `todo`.
+- Statut : `ready`.
 
 ### P17-M006 - Gate Fusion P17 export complet
 

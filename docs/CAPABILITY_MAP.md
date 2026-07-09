@@ -293,3 +293,10 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 - C-QUALITY : statut `implemented-fusion-unvalidated` pour manifeste export JSON/Markdown V0.
 - C-FUSION-EXPORT : `export_printables` renseigne chemins manifeste et fichiers exportes dans le rapport Fusion.
 - C-CALIBRATION : le manifeste garde `print_validated: false` et warnings preprint ; aucune impression physique validee.
+
+
+## P17-M004 capability update
+
+- C-CALIBRATION : statut `implemented-core-fusion-reporting` pour blockers/warnings printability V0.
+- C-QUALITY : `printability_report_v0` contient `issues[]`, `issue_counts`, `printability_status`, `printability_export_allowed`.
+- C-FUSION-UI : `quick_asset_box` affiche statut printability et export allowed ; `print_validated: false` reste obligatoire.

@@ -1627,6 +1627,12 @@ def _printability_report_v0(
     module_height = _safe_float(module_size_mm.get("z"), 0.0)
     checks: list[dict[str, Any]] = []
     warnings: list[str] = []
+    issues: list[dict[str, str]] = []
+
+    def add_issue(severity: str, code: str, message: str) -> None:
+        issues.append({"severity": severity, "code": code, "message": message})
+        if severity in {"warning", "blocker"}:
+            warnings.append(message)
     wall_values: list[float] = []
     floor_values: list[float] = []
     cavity_depths: list[float] = []
@@ -1666,26 +1672,32 @@ def _printability_report_v0(
     max_cavity_depth = max(cavity_depths) if cavity_depths else 0.0
     max_notch_depth = max(notch_depths) if notch_depths else 0.0
     if min_external_wall is not None and min_external_wall + 0.0001 < wall:
-        warnings.append(f"External wall below requested wall thickness: {min_external_wall:.2f} mm < {wall:.2f} mm.")
+        add_issue("blocker", "EXTERNAL_WALL_BELOW_MINIMUM", f"External wall below requested wall thickness: {min_external_wall:.2f} mm < {wall:.2f} mm.")
     if internal_wall > 0 and internal_wall + 0.0001 < wall:
-        warnings.append(f"Internal wall below requested wall thickness: {internal_wall:.2f} mm < {wall:.2f} mm.")
+        add_issue("blocker", "INTERNAL_WALL_BELOW_MINIMUM", f"Internal wall below requested wall thickness: {internal_wall:.2f} mm < {wall:.2f} mm.")
     if min_floor is not None and min_floor + 0.0001 < floor:
-        warnings.append(f"Retained floor below requested floor thickness: {min_floor:.2f} mm < {floor:.2f} mm.")
+        add_issue("blocker", "FLOOR_BELOW_MINIMUM", f"Retained floor below requested floor thickness: {min_floor:.2f} mm < {floor:.2f} mm.")
     if max_cavity_depth >= module_height and module_height > 0:
-        warnings.append("Cavity depth removes the full module height; this should be refused before Fusion cutting.")
+        add_issue("blocker", "CAVITY_REMOVES_FULL_HEIGHT", "Cavity depth removes the full module height; this should be refused before Fusion cutting.")
     if max_notch_depth > max(0.0, module_height - floor) * 0.8 and max_notch_depth > 0:
-        warnings.append("Access notch depth is large relative to usable module height; inspect fragility before printing.")
+        add_issue("warning", "DEEP_ACCESS_NOTCH", "Access notch depth is large relative to usable module height; inspect fragility before printing.")
     if module_height > 60.0:
-        warnings.append("Module height exceeds 60 mm; tall thin walls may be fragile and need human print review.")
+        add_issue("warning", "TALL_MODULE_REVIEW", "Module height exceeds 60 mm; tall thin walls may be fragile and need human print review.")
     if asset_fit_cavity.get("status") != "planned":
-        warnings.append("Asset cavity is not planned; printability checks are report-only for this refused geometry.")
-    warnings.append("Heuristic printability report only; no physical print validation has been performed.")
+        add_issue("warning", "ASSET_CAVITY_NOT_PLANNED", "Asset cavity is not planned; printability checks are report-only for this refused geometry.")
+    add_issue("warning", "NO_PHYSICAL_PRINT_VALIDATION", "Heuristic printability report only; no physical print validation has been performed.")
+    blocker_count = sum(1 for issue in issues if issue["severity"] == "blocker")
+    warning_count = sum(1 for issue in issues if issue["severity"] == "warning")
+    printability_status = "blocked" if blocker_count else ("warning" if warning_count else "ok")
 
     return {
         "policy": "printability_report_v0",
         "printability_checked": "yes",
         "printability_validated_by_print": "no",
         "validated_by_print": False,
+        "printability_status": printability_status,
+        "printability_export_allowed": blocker_count == 0,
+        "issue_counts": {"blocker": blocker_count, "warning": warning_count},
         "module_id": module_id,
         "module_size_mm": dict(module_size_mm),
         "thresholds_mm": {
@@ -1700,6 +1712,7 @@ def _printability_report_v0(
         "max_cavity_depth_mm": round(max_cavity_depth, 4),
         "max_notch_depth_from_top_mm": round(max_notch_depth, 4),
         "checks": checks,
+        "issues": issues,
         "warnings": warnings,
     }
 

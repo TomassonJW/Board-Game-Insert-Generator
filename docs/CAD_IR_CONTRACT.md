@@ -466,7 +466,7 @@ Si le layout multi-assets ne tient pas, `asset_compartment_layout` peut porter `
 
 ## P14-USABLE-ASSET-TRAY-M002 - Metadata printability_report_v0
 
-Les entrees `metadata.executable_asset_plan.generated_modules[]` et `placements[]` peuvent transporter `printability_report_v0`. Le bloc est additif et contient `printability_checked`, `printability_validated_by_print`, `thresholds_mm`, `min_external_wall_mm`, `min_internal_wall_mm`, `min_retained_floor_mm`, `max_cavity_depth_mm`, `max_notch_depth_from_top_mm`, `checks[]` et `warnings[]`.
+Les entrees `metadata.executable_asset_plan.generated_modules[]` et `placements[]` peuvent transporter `printability_report_v0`. Le bloc est additif et contient `printability_checked`, `printability_validated_by_print`, `printability_status`, `printability_export_allowed`, `issue_counts`, `thresholds_mm`, `min_external_wall_mm`, `min_internal_wall_mm`, `min_retained_floor_mm`, `max_cavity_depth_mm`, `max_notch_depth_from_top_mm`, `checks[]`, `issues[]` et `warnings[]`.
 
 Cette metadata ne change pas `schema_version`, ne modifie pas les tolerances et ne vaut pas validation d'impression.
 
