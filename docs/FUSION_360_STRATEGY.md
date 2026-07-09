@@ -776,3 +776,12 @@ Fusion continue a ne recalculer ni packing, ni layout, ni tolerances. Pour P16, 
 Les coupes Fusion restent les primitives deja validees : cavites rectangulaires top-open par source asset et encoches rectangulaires top-open par compartiment. P16 ne cree pas de cavite par pile, ne visualise pas les items individuels, n'ajoute pas de solveur dans l'add-in et ne change pas le contrat de scene BGIG. Le rapport `quick_asset_box` doit rendre visibles les diagnostics P16 afin que la gate humaine puisse verifier que les modules ne restent pas en longues barres 1D quand un packing 2D raisonnable est possible.
 
 La preparation de gate Fusion P16 utilise le preset `p16_ergonomic_tray_packing` et conserve `Print validation: false` jusqu'a une impression reelle separee.
+
+
+## P17-PRINTABLE-EXPORT-AND-PREPRINT-SPRINT - Export Fusion-only
+
+P17 autorise une premiere boucle d'export imprimable, mais uniquement depuis l'adaptateur Fusion. Le coeur Python et la CAD IR ne doivent pas importer `adsk`, ne doivent pas produire de STL/3MF et ne doivent pas pretendre representer la geometrie finale coupee dans Fusion.
+
+La cible V0 est STL par module imprimable compact. L'action Fusion future doit filtrer via le registry BGIG et exclure explicitement les objets utilisateur, racines de scene, references/outlines, sketches debug, helpers/source occurrences et vues eclatees par defaut. Les exports doivent etre accompagnes d'un manifeste JSON/Markdown et conserver `print_validated: false`.
+
+Si l'API Fusion ne permet pas d'exporter de facon fiable un module/body cible sans inclure de geometrie non imprimable, la mission d'implementation doit s'arreter sur gate technique.

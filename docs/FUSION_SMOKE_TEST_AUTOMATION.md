@@ -168,3 +168,19 @@ Le script installe l'add-in courant et ecrit `bgig_ui_settings.json` avec `input
 - `wood-meeples,meeples,18,12,12,8,loose`.
 
 Ce scenario doit valider les apports P16 : `tray_packing_policy: flat_tray_2d_v0`, `pile_grid_columns`, `pile_grid_rows`, `target_aspect_ratio`, `max_module_length_mm`, `linear_layout_avoided`, compartiments et encoches V0 conserves, regenerate sans doublon et clear preserve non-BGIG. Il ne valide toujours pas l'impression 3D.
+
+
+## P17-PRINTABLE-EXPORT-AND-PREPRINT-SPRINT-V
+
+La gate P17 devra reutiliser le scenario riche P16 ou un preset dedie `p17_printable_export` quand il existera. La preparation locale devra installer l'add-in, charger `quick_asset_box`, preparer un dossier export dedie et laisser a Thomas uniquement les actions Fusion.
+
+Smoke cible apres implementation :
+
+1. Ouvrir Fusion 360 et un document Assembly-compatible.
+2. Generer la scene `quick_asset_box` P17.
+3. Lancer `export_printables`.
+4. Verifier que seuls les modules BGIG imprimables compact sont exportes.
+5. Verifier que references, outlines, sketches debug, helpers, source occurrences, vues eclatees et objets non-BGIG sont exclus.
+6. Verifier la presence de `bgig_export_manifest.json`, `bgig_export_manifest.md`, des compteurs export/refus et `print_validated: false`.
+
+Cette gate ne valide pas l'impression physique.

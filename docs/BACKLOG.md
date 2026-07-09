@@ -1038,15 +1038,16 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 
 - Capability : C-FUSION-EXPORT, C-QUALITY, C-CALIBRATION.
 - Objectif : definir le contrat d'export V0 : formats, modules exportables, exclusions, nommage, dossier de sortie, manifestes, refus et `print-validated: false`.
-- Livrable : ADR dediee export/preprint et docs strategie.
-- Statut : `ready`.
+- Livrable : `docs/DECISIONS/ADR-0035-printable-export-preprint-v0.md` et docs strategie.
+- Decision : export Fusion-only, STL par module en V0, manifeste JSON/Markdown, refus explicites, `print_validated: false`.
+- Statut : `done-docs`.
 
 ### P17-M002 - Action Fusion export_printables
 
 - Capability : C-FUSION-EXPORT.
 - Objectif : ajouter une action Fusion classique qui exporte les modules imprimables BGIG si l'API Fusion le permet de facon fiable.
 - Gate : stop technique si export par module non fiable.
-- Statut : `todo`.
+- Statut : `ready`.
 
 ### P17-M003 - Export manifest V0
 

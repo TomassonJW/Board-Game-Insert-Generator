@@ -271,3 +271,11 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 - C-QUALITY : manifeste export JSON/Markdown, nommage deterministe, dossier de sortie et audit des modules refuses.
 - C-CALIBRATION : printability blockers V0 et preparation preprint/coupon sans validation physique.
 - Gate : validation humaine Fusion P17 avant tout statut `fusion-validated-v0` d'export ; `print-validated: false` conserve.
+
+
+## P17-M001 capability update
+
+- P17-M001 : `ADR-0035` accepte le contrat export/preprint V0.
+- C-FUSION-EXPORT : statut `planned-contract`, export Fusion-only, STL par module V0, 3MF reporte sauf API simple.
+- C-QUALITY : manifeste JSON/Markdown requis, noms deterministes, refus explicites.
+- C-CALIBRATION : `print_validated: false` obligatoire ; aucune impression physique validee.

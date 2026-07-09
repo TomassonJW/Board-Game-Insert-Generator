@@ -484,3 +484,10 @@ La CAD IR reste additive. P16 enrichit `storage_sizing`, `asset_diagnostics`, `a
 Ces champs sont informatifs et ne remplacent pas les tailles existantes (`asset_fit_size_mm`, `module_size_mm`, `printable_body_size_mm`, placements grille). Fusion consomme toujours les operations et dimensions resolues par le moteur. Les refus ou warnings doivent rester reportables sans changer `schema_version`.
 
 P16 ne valide pas l'impression 3D, ne cree pas de geometrie par item individuel et ne rend pas le coeur Python dependant de Fusion.
+
+
+## P17-PRINTABLE-EXPORT-AND-PREPRINT-SPRINT - Hors contrat CAD IR V0
+
+L'export STL/3MF P17 n'etend pas la CAD IR V0. La CAD IR reste le contrat d'intention et de transport vers Fusion ; l'export imprimable est une responsabilite de l'adaptateur Fusion apres creation de la geometrie reelle.
+
+Le coeur Python peut continuer a fournir les metadonnees necessaires au manifeste via `metadata`, mais il ne doit pas creer de fichier imprimable et ne doit pas importer `adsk`. Les manifestes d'export P17 reference la CAD IR, les settings et la scene Fusion, mais ne deviennent pas une nouvelle `schema_version` CAD IR.

@@ -445,3 +445,10 @@ Le rapport `quick_asset_box` affiche les valeurs globales et repete `tray_packin
 ## P16-M005 - Preset smoke P16
 
 `prepare_quick_asset_test.ps1` utilise maintenant `p16_ergonomic_tray_packing` par defaut. Le preset charge cinq assets, une box `240 x 170 x 60`, une grille `8 x 5 x 3`, `max_stack_height_mm = 18`, `target_aspect_ratio = 1.4` et `max_module_length_mm = 70`. L'objectif est de valider visuellement et textuellement le passage de `flat_tray_linear_v0` a `flat_tray_2d_v0` sans nouvelle geometrie produit.
+
+
+## P17-M001 - Workflow UI export/preprint V0
+
+P17 garde la commande Fusion classique. La future action `export_printables` doit etre presentee comme une action separee de `generate`, `regenerate`, `inspect_bgig_scene` et `clear_bgig_scene`. Elle doit exporter la scene BGIG courante seulement si des modules imprimables sont detectes, puis afficher le dossier, les fichiers, les modules refuses et `print_validated: false`.
+
+Cette action ne doit pas fermer la dette UX generale : pas de palette HTML, pas de tableau assets avance, pas de promesse `ready to print`. Le message doit rester honnete : export technique prepare pour preprint, validation physique toujours requise.

@@ -26,9 +26,9 @@ Aucune gate humaine active apres validation Fusion `P16-ERGONOMIC-2D-TRAY-PACKIN
 
 Mission interne terminee : P16 validation - `fusion-validated-v0`, export/print toujours non valide physiquement.
 
-Mission interne ready : P17-M001 - ADR export/preprint V0.
+Mission interne terminee : P17-M001 - ADR export/preprint V0, `ADR-0035` acceptee.
 
-Mission interne suivante : P17-M002 - Action Fusion `export_printables`.
+Mission interne ready : P17-M002 - Action Fusion `export_printables`.
 
 Mission interne suivante : P17-M003 - Export manifest V0.
 
@@ -40,7 +40,7 @@ Mission interne suivante : P17-M006 - Preparation gate Fusion P17.
 
 ## Mission ready non gated
 
-`P17-M001 - ADR export/preprint V0`.
+`P17-M002 - Action Fusion export_printables`.
 
 ## Regle operationnelle Fusion
 

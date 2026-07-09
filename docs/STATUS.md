@@ -781,4 +781,11 @@ Limites maintenues : packing encore heuristique, pas de solveur global, pas d'op
 
 Statut : sprint lance apres validation humaine P16. Objectif : definir puis implementer une premiere chaine V0 de pre-impression : export de modules imprimables, manifeste export, dossier de sortie propre, rapport printability plus actionnable et preparation d'un pack imprimable sans pretendre a une validation physique.
 
-Garde-fous : export depuis Fusion uniquement si l'API est fiable, pas d'export des objets non-BGIG, references, debug sketches/outlines ou helpers/source occurrences, `print-validated: false` obligatoire, aucune promesse `ready to print` absolue. Premiere mission ready : `P17-M001 - ADR export/preprint V0`.
+Garde-fous : export depuis Fusion uniquement si l'API est fiable, pas d'export des objets non-BGIG, references, debug sketches/outlines ou helpers/source occurrences, `print-validated: false` obligatoire, aucune promesse `ready to print` absolue. `P17-M001` est terminee ; prochaine mission ready : `P17-M002 - Action Fusion export_printables`.
+
+
+### P17-M001 - ADR export/preprint V0
+
+Statut : `done-docs`. `ADR-0035-printable-export-preprint-v0.md` fixe le contrat V0 : export Fusion-only, cible STL par module, 3MF reporte sauf API simple, exclusion stricte des objets non-BGIG/references/debug/helpers/source/exploded par defaut, noms deterministes, manifeste JSON/Markdown et `print_validated: false` obligatoire.
+
+Prochaine mission ready : `P17-M002 - Action Fusion export_printables`. Cette mission doit implementer l'action seulement si l'API Fusion permet un export fiable par module ; sinon elle doit declarer une gate technique plutot que simuler un export.
