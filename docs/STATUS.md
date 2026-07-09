@@ -789,3 +789,12 @@ Garde-fous : export depuis Fusion uniquement si l'API est fiable, pas d'export d
 Statut : `done-docs`. `ADR-0035-printable-export-preprint-v0.md` fixe le contrat V0 : export Fusion-only, cible STL par module, 3MF reporte sauf API simple, exclusion stricte des objets non-BGIG/references/debug/helpers/source/exploded par defaut, noms deterministes, manifeste JSON/Markdown et `print_validated: false` obligatoire.
 
 Prochaine mission ready : `P17-M002 - Action Fusion export_printables`. Cette mission doit implementer l'action seulement si l'API Fusion permet un export fiable par module ; sinon elle doit declarer une gate technique plutot que simuler un export.
+
+
+### P17-M002 - Action Fusion export_printables
+
+Statut : `implemented-fusion-unvalidated`. La commande Fusion classique accepte maintenant l'action `export_printables`. Elle inspecte la scene BGIG courante, exige exactement une racine BGIG, collecte seulement les bodies tagues `bgig:role = module_body`, exporte chacun en STL via `design.exportManager.createSTLExportOptions(...)/execute(...)`, puis affiche un rapport avec compteurs, fichiers exportes, refus, `manifest_json: not generated in P17-M002`, `manifest_markdown: not generated in P17-M002` et `print_validated: false`.
+
+Exclusions V0 : scene roots, scene root components, occurrences compactes/eclatees, references/outlines, sketches debug, features/cuts et objets non-BGIG ne sont pas exportes directement. Ils sont soit ignores, soit listes comme refuses avec raison. Si `design.exportManager` est indisponible ou si Fusion refuse l'export STL, le rapport passe en `technical_gate`/`partial_or_failed` au lieu de simuler une reussite.
+
+Prochaine mission ready : `P17-M003 - Export manifest V0`.

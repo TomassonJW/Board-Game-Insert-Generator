@@ -785,3 +785,10 @@ P17 autorise une premiere boucle d'export imprimable, mais uniquement depuis l'a
 La cible V0 est STL par module imprimable compact. L'action Fusion future doit filtrer via le registry BGIG et exclure explicitement les objets utilisateur, racines de scene, references/outlines, sketches debug, helpers/source occurrences et vues eclatees par defaut. Les exports doivent etre accompagnes d'un manifeste JSON/Markdown et conserver `print_validated: false`.
 
 Si l'API Fusion ne permet pas d'exporter de facon fiable un module/body cible sans inclure de geometrie non imprimable, la mission d'implementation doit s'arreter sur gate technique.
+
+
+## P17-M002 - Action export_printables
+
+L'adaptateur Fusion ajoute l'action `export_printables`. Elle ne regenere pas la scene et ne lit pas de nouvelle CAD IR : elle inspecte la scene BGIG active, refuse l'export si la scene racine n'est pas unique, puis selectionne uniquement les `module_body` tagues BGIG comme geometries STL.
+
+La selection est volontairement stricte pour P17 V0 : les components, occurrences, scene roots, references, sketches debug, features/cuts, vues eclatees et objets non-BGIG ne sont pas exportes directement. L'API Fusion utilisee est `design.exportManager.createSTLExportOptions(body, filename)` puis `execute(options)`. Un echec d'API devient un rapport `technical_gate` ou `partial_or_failed`, pas une reussite silencieuse.

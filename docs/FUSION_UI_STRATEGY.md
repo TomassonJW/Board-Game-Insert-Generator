@@ -452,3 +452,10 @@ Le rapport `quick_asset_box` affiche les valeurs globales et repete `tray_packin
 P17 garde la commande Fusion classique. La future action `export_printables` doit etre presentee comme une action separee de `generate`, `regenerate`, `inspect_bgig_scene` et `clear_bgig_scene`. Elle doit exporter la scene BGIG courante seulement si des modules imprimables sont detectes, puis afficher le dossier, les fichiers, les modules refuses et `print_validated: false`.
 
 Cette action ne doit pas fermer la dette UX generale : pas de palette HTML, pas de tableau assets avance, pas de promesse `ready to print`. Le message doit rester honnete : export technique prepare pour preprint, validation physique toujours requise.
+
+
+## P17-M002 - Action UI export_printables
+
+L'action `export_printables` est ajoutee a la liste Action de la commande Fusion classique. Elle ne depend pas du mode d'entree selectionne et ne requiert pas de chemin CAD IR/config, car elle agit sur la scene BGIG deja generee dans le document Fusion courant.
+
+Le message utilisateur affiche le dossier export, le format STL, les modules detectes/exportes/refuses, les chemins de fichiers et `print_validated: false`. Les manifestes complets restent une mission separee P17-M003.

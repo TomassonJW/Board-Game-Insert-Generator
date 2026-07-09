@@ -57,6 +57,7 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     FUSION_COMMAND_ACTION_CLEAR,
     FUSION_COMMAND_ACTION_GENERATE,
     FUSION_COMMAND_ACTION_INSPECT,
+    FUSION_COMMAND_ACTION_EXPORT_PRINTABLES,
     FUSION_COMMAND_ACTION_REGENERATE,
     FUSION_INPUT_MODE_CAD_IR_FILE,
     FUSION_INPUT_MODE_CONFIG_FILE,
@@ -98,6 +99,8 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     parse_parametric_overrides,
     parse_quick_asset_box_assets_text,
     planned_operations_from_cad_ir,
+    printable_export_filename,
+    printable_export_result_summary,
     quick_parametric_box_summary,
     quick_asset_box_metadata,
     quick_asset_box_summary,
@@ -216,6 +219,29 @@ class _FakeDesignForRegistry:
                 if attribute.group == group and (name == "" or attribute.name == name):
                     found.append(attribute)
         return _FakeCollection(found)
+
+
+class _FakeStlExportOptions:
+    def __init__(self, geometry, filename: str) -> None:
+        self.geometry = geometry
+        self.filename = filename
+        self.sendToPrintUtility = True
+        self.isBinaryFormat = False
+
+
+class _FakeExportManager:
+    def __init__(self) -> None:
+        self.created_options: list[_FakeStlExportOptions] = []
+        self.executed_options: list[_FakeStlExportOptions] = []
+
+    def createSTLExportOptions(self, geometry, filename: str):
+        options = _FakeStlExportOptions(geometry, filename)
+        self.created_options.append(options)
+        return options
+
+    def execute(self, options) -> bool:
+        self.executed_options.append(options)
+        return True
 
 
 class FusionSkeletonTests(unittest.TestCase):
@@ -405,12 +431,47 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn(FUSION_COMMAND_ACTION_REGENERATE, plan.command_actions)
         self.assertIn(FUSION_COMMAND_ACTION_CLEAR, plan.command_actions)
         self.assertIn(FUSION_COMMAND_ACTION_INSPECT, plan.command_actions)
+        self.assertIn(FUSION_COMMAND_ACTION_EXPORT_PRINTABLES, plan.command_actions)
         self.assertIn("box_inner_x_mm", plan.parametric_fields)
         self.assertIn("grid_units_z", plan.parametric_fields)
         self.assertIn("SolidScriptsAddinsPanel", BGIG_TOOLBAR_PANEL_IDS)
         self.assertIn("Utilities", payload["toolbar_location"])
         self.assertEqual(payload["toolbar_panel_ids"], list(BGIG_TOOLBAR_PANEL_IDS))
         self.assertEqual(payload["clear_scope"], BGIG_CLEAR_SCOPE)
+
+    def test_builds_export_printables_request_without_source_file(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            request = build_fusion_command_request(
+                "",
+                FUSION_GENERATION_MODE_COMPACT_ONLY,
+                Path(temp_dir),
+                action=FUSION_COMMAND_ACTION_EXPORT_PRINTABLES,
+                input_mode=FUSION_INPUT_MODE_CAD_IR_FILE,
+            )
+
+        self.assertEqual(request.action, FUSION_COMMAND_ACTION_EXPORT_PRINTABLES)
+        self.assertEqual(request.source_kind, "export_printables_only")
+        self.assertIsNone(request.cad_ir_path)
+
+    def test_printable_export_filename_and_summary_are_deterministic(self) -> None:
+        filename = printable_export_filename(3, "generated:asset-group/tokens", "module_body")
+
+        self.assertEqual(filename, "03-generated-asset-group-tokens-module-body.stl")
+        summary = printable_export_result_summary(
+            {
+                "export_directory": "C:/tmp/bgig-export",
+                "printable_modules_detected": 1,
+                "printable_modules_exported": 1,
+                "printable_modules_refused": 0,
+                "exported_files": ["C:/tmp/bgig-export/01-module-module-body.stl"],
+                "refused_modules": [],
+                "status": "exported",
+            }
+        )
+
+        self.assertIn("Action: export_printables", summary)
+        self.assertIn("printable_modules_exported: 1", summary)
+        self.assertIn("print_validated: false", summary)
 
     def test_builds_fusion_command_request_from_ui_values(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -565,6 +626,59 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("Tagged BGIG unique entities: 7", message)
         self.assertIn("BGIG-looking untagged entities: 0", message)
         self.assertIn("Inconsistencies:\n- none", message)
+
+    def test_export_printables_exports_only_tagged_module_bodies(self) -> None:
+        root_component = _FakeComponent("Root", "component-root")
+        scene_component = _FakeComponent("BGIG Generated Scene", "component-scene")
+        scene_occurrence = _FakeOccurrence("BGIG Generated Scene:1", "occurrence-scene", scene_component)
+        module_component = _FakeComponent("Grid placed tokens", "component-module")
+        module_occurrence = _FakeOccurrence("Grid placed tokens:1", "occurrence-module", module_component)
+        module_body = _FakeBody("BGIG token module body", "body-module")
+        module_sketch = _FakeSketch("asset-fit debug outline", "sketch-module")
+        root_component.occurrences = _FakeCollection([scene_occurrence])
+        scene_component.occurrences = _FakeCollection([module_occurrence])
+        module_component.bRepBodies = _FakeCollection([module_body])
+        module_component.sketches = _FakeCollection([module_sketch])
+
+        for entity, role, module_id in [
+            (scene_occurrence, "scene_root", None),
+            (scene_component, "scene_root_component", None),
+            (module_component, "module_component", "module-tokens"),
+            (module_occurrence, "compact_occurrence", "module-tokens"),
+            (module_body, "module_body", "module-tokens"),
+            (module_sketch, "module_sketch", "module-tokens"),
+        ]:
+            fusion_entrypoint._tag_bgig_entity_direct(entity, role, scene_id="scene-001", module_id=module_id)
+
+        design = _FakeDesignForRegistry(
+            root_component,
+            [root_component, scene_occurrence, scene_component, module_component, module_occurrence, module_body, module_sketch],
+        )
+        design.exportManager = _FakeExportManager()
+        registry = fusion_entrypoint.BgigFusionRegistry(design)
+        original_export_dir = fusion_entrypoint._default_printable_export_dir
+        with tempfile.TemporaryDirectory() as temp_dir:
+            fusion_entrypoint._default_printable_export_dir = lambda _addin, _registry, _targets: Path(temp_dir) / "exports"
+            try:
+                result = fusion_entrypoint._export_printables_from_scene(
+                    design,
+                    registry,
+                    Path(temp_dir),
+                    registry.inspect(),
+                )
+            finally:
+                fusion_entrypoint._default_printable_export_dir = original_export_dir
+
+        self.assertEqual(result["status"], "exported")
+        self.assertEqual(result["printable_modules_detected"], 1)
+        self.assertEqual(result["printable_modules_exported"], 1)
+        self.assertEqual(len(design.exportManager.executed_options), 1)
+        self.assertIs(design.exportManager.executed_options[0].geometry, module_body)
+        self.assertTrue(design.exportManager.executed_options[0].filename.endswith("01-module-tokens-module-body.stl"))
+        refused_roles = {item["role"] for item in result["refused_modules"]}
+        self.assertIn("scene_root", refused_roles)
+        self.assertIn("compact_occurrence", refused_roles)
+        self.assertIn("module_sketch", refused_roles)
 
     def test_parses_and_applies_p12_parametric_config_overrides(self) -> None:
         payload = json.loads((ROOT / "examples" / "simple_asset_product_scene.json").read_text(encoding="utf-8"))

@@ -279,3 +279,10 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 - C-FUSION-EXPORT : statut `planned-contract`, export Fusion-only, STL par module V0, 3MF reporte sauf API simple.
 - C-QUALITY : manifeste JSON/Markdown requis, noms deterministes, refus explicites.
 - C-CALIBRATION : `print_validated: false` obligatoire ; aucune impression physique validee.
+
+
+## P17-M002 capability update
+
+- C-FUSION-EXPORT : statut `implemented-fusion-unvalidated` pour action `export_printables` STL V0 par `module_body` tague BGIG.
+- C-QUALITY : rapport export avec compteurs, chemins et refus ; manifeste complet reporte a P17-M003.
+- C-CALIBRATION : `print_validated: false` maintenu ; aucune impression physique validee.

@@ -44,11 +44,13 @@ FUSION_COMMAND_ACTION_GENERATE = "generate"
 FUSION_COMMAND_ACTION_REGENERATE = "regenerate"
 FUSION_COMMAND_ACTION_CLEAR = "clear_bgig_scene"
 FUSION_COMMAND_ACTION_INSPECT = "inspect_bgig_scene"
+FUSION_COMMAND_ACTION_EXPORT_PRINTABLES = "export_printables"
 SUPPORTED_FUSION_COMMAND_ACTIONS = (
     FUSION_COMMAND_ACTION_GENERATE,
     FUSION_COMMAND_ACTION_REGENERATE,
     FUSION_COMMAND_ACTION_CLEAR,
     FUSION_COMMAND_ACTION_INSPECT,
+    FUSION_COMMAND_ACTION_EXPORT_PRINTABLES,
 )
 DEFAULT_FUSION_COMMAND_ACTION = FUSION_COMMAND_ACTION_GENERATE
 
@@ -90,7 +92,8 @@ BGIG_ACTION_GUIDANCE = (
     "generate creates one new scene only when no BGIG scene root or tagged BGIG objects exist; "
     "regenerate validates, deletes tagged BGIG scene roots with deleteMe, clears legacy BGIG tags, "
     "then creates one replacement scene; clear_bgig_scene deletes scene roots first and preserves non-BGIG objects; "
-    "inspect_bgig_scene reports Fusion ownership without creating or deleting geometry."
+    "inspect_bgig_scene reports Fusion ownership without creating or deleting geometry; "
+    "export_printables exports only tagged BGIG printable module bodies and keeps print_validated false."
 )
 BGIG_CLEARABLE_ROLES = (
     BGIG_SCENE_ROOT_ROLE,
@@ -210,6 +213,11 @@ SUPPORTED_FINGER_NOTCH_PLACEMENT_WALLS = {
     "right_center": FINGER_NOTCH_WALL_RIGHT,
 }
 FUSION_MANUAL_VALIDATION_REQUIRED = "manual_validation_required"
+BGIG_EXPORT_FORMAT_STL = "stl"
+BGIG_EXPORT_POLICY = "fusion_only_stl_per_printable_module_v0"
+BGIG_EXPORT_PRINT_VALIDATED = "false"
+BGIG_EXPORT_MANIFEST_JSON_FILENAME = "bgig_export_manifest.json"
+BGIG_EXPORT_MANIFEST_MARKDOWN_FILENAME = "bgig_export_manifest.md"
 
 
 class FusionSkeletonError(ValueError):
@@ -866,6 +874,16 @@ def build_fusion_command_request(
             parameter_overrides=parameter_overrides,
             parameter_values=raw_parameter_values,
             source_kind="inspect_only",
+        )
+    if validated_action == FUSION_COMMAND_ACTION_EXPORT_PRINTABLES:
+        return FusionCommandRequest(
+            cad_ir_path=None,
+            generation_mode=validated_mode,
+            action=validated_action,
+            input_mode=validated_input_mode,
+            parameter_overrides=parameter_overrides,
+            parameter_values=raw_parameter_values,
+            source_kind="export_printables_only",
         )
 
     if validated_input_mode == FUSION_INPUT_MODE_QUICK_PARAMETRIC_BOX:
@@ -2871,6 +2889,69 @@ def _occurrence_plan_from_blank(
         view_role=view_role,
     )
 
+
+
+def safe_export_slug(value: str, fallback: str = "bgig-module") -> str:
+    """Return a deterministic filesystem-safe slug for Fusion export filenames."""
+
+    raw = str(value or "").strip().lower()
+    pieces: list[str] = []
+    previous_dash = False
+    for character in raw:
+        if character.isalnum():
+            pieces.append(character)
+            previous_dash = False
+        elif not previous_dash:
+            pieces.append("-")
+            previous_dash = True
+    slug = "".join(pieces).strip("-")
+    return slug or fallback
+
+
+def printable_export_filename(index: int, module_id: str, role: str, extension: str = BGIG_EXPORT_FORMAT_STL) -> str:
+    """Build the deterministic STL filename required by ADR-0035."""
+
+    ordinal = max(1, int(index))
+    module_slug = safe_export_slug(module_id)
+    role_slug = safe_export_slug(role, fallback="printable")
+    extension_slug = safe_export_slug(extension, fallback=BGIG_EXPORT_FORMAT_STL)
+    return f"{ordinal:02d}-{module_slug}-{role_slug}.{extension_slug}"
+
+
+def printable_export_result_summary(result: dict[str, Any]) -> str:
+    """Build a compact report for the Fusion export_printables action."""
+
+    exported_files = result.get("exported_files", [])
+    refused = result.get("refused_modules", [])
+    lines = [
+        "Board Game Insert Generator printable export report.",
+        "Action: export_printables",
+        f"export_policy: {result.get('export_policy', BGIG_EXPORT_POLICY)}",
+        f"export_format: {result.get('export_format', BGIG_EXPORT_FORMAT_STL)}",
+        f"export_directory: {result.get('export_directory', 'n/a')}",
+        f"printable_modules_detected: {result.get('printable_modules_detected', 0)}",
+        f"printable_modules_exported: {result.get('printable_modules_exported', 0)}",
+        f"printable_modules_refused: {result.get('printable_modules_refused', 0)}",
+        f"manifest_json: {result.get('manifest_json', 'not generated in P17-M002')}",
+        f"manifest_markdown: {result.get('manifest_markdown', 'not generated in P17-M002')}",
+        "print_validated: false",
+    ]
+    if exported_files:
+        lines.append("Exported files:")
+        for path in exported_files:
+            lines.append(f"- {path}")
+    if refused:
+        lines.append("Refused modules/entities:")
+        for item in refused:
+            if isinstance(item, dict):
+                name = item.get("name") or item.get("module_id") or "unknown"
+                role = item.get("role", "n/a")
+                reason = item.get("reason", "refused")
+                lines.append(f"- {name}; role {role}; reason {reason}")
+            else:
+                lines.append(f"- {item}")
+    lines.append(f"Status: {result.get('status', FUSION_MANUAL_VALIDATION_REQUIRED)}")
+    return "\n".join(lines) + "\n"
 
 def _validated_generation_mode(mode: str) -> str:
     if mode not in SUPPORTED_FUSION_GENERATION_MODES:

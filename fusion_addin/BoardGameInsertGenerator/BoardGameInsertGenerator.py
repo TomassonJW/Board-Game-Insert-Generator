@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 import sys
 import uuid
+from datetime import datetime, timezone
 from dataclasses import replace
 from pathlib import Path
 
@@ -57,7 +58,10 @@ try:
         FUSION_COMMAND_ACTION_CLEAR,
         FUSION_COMMAND_ACTION_GENERATE,
         FUSION_COMMAND_ACTION_INSPECT,
+        FUSION_COMMAND_ACTION_EXPORT_PRINTABLES,
         FUSION_COMMAND_ACTION_REGENERATE,
+        BGIG_EXPORT_FORMAT_STL,
+        BGIG_EXPORT_POLICY,
         EXPLODED_OCCURRENCE_ROLE,
         FUSION_EXTENT_NEGATIVE,
         FUSION_EXTENT_POSITIVE,
@@ -102,6 +106,8 @@ try:
         quick_parametric_box_summary,
         quick_asset_box_metadata,
         quick_asset_box_summary,
+        printable_export_filename,
+        printable_export_result_summary,
         generation_plan_from_cad_ir,
         is_part_design_component_limit_error,
         load_cad_ir_json,
@@ -153,7 +159,10 @@ except ImportError:  # pragma: no cover - Fusion may load the file as a script.
         FUSION_COMMAND_ACTION_CLEAR,
         FUSION_COMMAND_ACTION_GENERATE,
         FUSION_COMMAND_ACTION_INSPECT,
+        FUSION_COMMAND_ACTION_EXPORT_PRINTABLES,
         FUSION_COMMAND_ACTION_REGENERATE,
+        BGIG_EXPORT_FORMAT_STL,
+        BGIG_EXPORT_POLICY,
         EXPLODED_OCCURRENCE_ROLE,
         FUSION_EXTENT_NEGATIVE,
         FUSION_EXTENT_POSITIVE,
@@ -198,6 +207,8 @@ except ImportError:  # pragma: no cover - Fusion may load the file as a script.
         quick_parametric_box_summary,
         quick_asset_box_metadata,
         quick_asset_box_summary,
+        printable_export_filename,
+        printable_export_result_summary,
         generation_plan_from_cad_ir,
         is_part_design_component_limit_error,
         load_cad_ir_json,
@@ -306,6 +317,7 @@ if adsk is not None:
                     FUSION_COMMAND_ACTION_REGENERATE,
                     FUSION_COMMAND_ACTION_CLEAR,
                     FUSION_COMMAND_ACTION_INSPECT,
+                    FUSION_COMMAND_ACTION_EXPORT_PRINTABLES,
                 ):
                     action_input.listItems.add(action, action == default_request.action, "")
                 inputs.addTextBoxCommandInput(
@@ -614,6 +626,10 @@ def _execute_generation_request(request, addin_dir: Path) -> str:  # noqa: ANN00
         clear_result = registry.clear(scene_roots_before=scene_roots_before)
         return _clear_result_message(clear_result)
 
+    if request.action == FUSION_COMMAND_ACTION_EXPORT_PRINTABLES:
+        export_result = _export_printables_from_scene(design, registry, addin_dir, inspection_before)
+        return printable_export_result_summary(export_result)
+
     if request.action == FUSION_COMMAND_ACTION_GENERATE and (
         scene_roots_before > 0 or bgig_objects_before > 0 or bgig_named_before > 0
     ):
@@ -668,6 +684,152 @@ def _execute_generation_request(request, addin_dir: Path) -> str:  # noqa: ANN00
         quick_parametric_payload,
         quick_asset_payload,
     )
+
+
+def _export_printables_from_scene(design, registry: BgigFusionRegistry, addin_dir: Path, inspection: dict[str, object]) -> dict[str, object]:  # noqa: ANN001
+    targets, refused = _collect_printable_export_targets(registry)
+    scene_roots = int(inspection.get("bgig_scene_roots_total", 0))
+    if scene_roots != 1:
+        refused.append(
+            {
+                "name": "BGIG scene",
+                "role": "scene_root",
+                "reason": f"export requires exactly one BGIG scene root; found {scene_roots}",
+            }
+        )
+        return _printable_export_result("blocked", addin_dir, targets, [], refused)
+
+    if not targets:
+        return _printable_export_result("no_exportable_modules", addin_dir, targets, [], refused)
+
+    export_manager = getattr(design, "exportManager", None)
+    if export_manager is None:
+        refused.append(
+            {
+                "name": "Fusion export manager",
+                "role": "technical_gate",
+                "reason": "design.exportManager is unavailable; STL export cannot be verified in this Fusion runtime",
+            }
+        )
+        return _printable_export_result("technical_gate", addin_dir, targets, [], refused)
+
+    export_dir = _default_printable_export_dir(addin_dir, registry, targets)
+    export_dir.mkdir(parents=True, exist_ok=True)
+    exported_files: list[str] = []
+    for index, target in enumerate(targets, start=1):
+        filename = printable_export_filename(index, str(target["module_id"]), str(target["role"]))
+        output_path = export_dir / filename
+        try:
+            options = export_manager.createSTLExportOptions(target["entity"], str(output_path))
+            if options is None:
+                raise FusionSkeletonError("createSTLExportOptions returned null")
+            try:
+                options.sendToPrintUtility = False
+            except Exception:
+                pass
+            try:
+                options.isBinaryFormat = True
+            except Exception:
+                pass
+            exported = export_manager.execute(options)
+            if exported is False:
+                raise FusionSkeletonError("ExportManager.execute returned false")
+            exported_files.append(str(output_path))
+        except Exception as exc:
+            refused.append(
+                {
+                    "name": target["name"],
+                    "role": target["role"],
+                    "module_id": target["module_id"],
+                    "reason": f"STL export failed: {exc}",
+                }
+            )
+
+    status = "exported" if exported_files and len(exported_files) == len(targets) else "partial_or_failed"
+    return _printable_export_result(status, export_dir, targets, exported_files, refused)
+
+
+def _collect_printable_export_targets(registry: BgigFusionRegistry) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
+    targets: list[dict[str, object]] = []
+    refused: list[dict[str, object]] = []
+    seen = set()
+    for entity, role in registry.tagged_entities():
+        module_id = registry.module_id(entity) or "unassigned-module"
+        name = _safe_entity_name(entity) or module_id
+        if role == "module_body":
+            key = registry.entity_key(entity)
+            if key in seen:
+                continue
+            seen.add(key)
+            targets.append(
+                {
+                    "entity": entity,
+                    "name": name,
+                    "role": role,
+                    "module_id": module_id,
+                    "reason": "tagged BGIG module body selected for STL export",
+                }
+            )
+            continue
+        refused_reason = _non_exportable_role_reason(role)
+        if refused_reason:
+            refused.append(
+                {
+                    "name": name,
+                    "role": role or "n/a",
+                    "module_id": module_id,
+                    "reason": refused_reason,
+                }
+            )
+    return targets, refused
+
+
+def _non_exportable_role_reason(role: str | None) -> str | None:
+    if role in {"module_component", COMPACT_OCCURRENCE_ROLE}:
+        return "not exported directly; P17-M002 exports tagged module_body geometry only"
+    if role == EXPLODED_OCCURRENCE_ROLE:
+        return "exploded view occurrence excluded from printable export V0"
+    if role in {BGIG_SCENE_ROOT_ROLE, "scene_root_occurrence", "scene_root_component"}:
+        return "scene ownership entity excluded from printable export"
+    if role in {"box_reference", "reference_outline"} or (role and role.endswith("_sketch")):
+        return "reference or debug sketch excluded from printable export"
+    if role == "module_extrude" or (role and role.endswith("_cut")):
+        return "feature history object excluded from printable export"
+    return None
+
+
+def _default_printable_export_dir(addin_dir: Path, registry: BgigFusionRegistry, targets: list[dict[str, object]]) -> Path:
+    scene_id = "bgig-scene"
+    for target in targets:
+        entity = target.get("entity")
+        if entity is not None:
+            scene_id = registry.scene_id(entity) or scene_id
+            break
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    return Path.home() / "Documents" / "BGIG" / "exports" / f"{scene_id}-{timestamp}"
+
+
+def _printable_export_result(
+    status: str,
+    export_dir: Path,
+    targets: list[dict[str, object]],
+    exported_files: list[str],
+    refused: list[dict[str, object]],
+) -> dict[str, object]:
+    return {
+        "status": status,
+        "export_policy": BGIG_EXPORT_POLICY,
+        "export_format": BGIG_EXPORT_FORMAT_STL,
+        "export_directory": str(export_dir),
+        "printable_modules_detected": len(targets),
+        "printable_modules_exported": len(exported_files),
+        "printable_modules_refused": len(refused),
+        "exported_files": exported_files,
+        "refused_modules": refused,
+        "manifest_json": "not generated in P17-M002",
+        "manifest_markdown": "not generated in P17-M002",
+        "print_validated": False,
+    }
 
 def _generate_cad_ir_from_quick_parametric_box_request(request, addin_dir: Path):  # noqa: ANN001
     payload = build_quick_parametric_box_cad_ir_payload(request.parameter_overrides or {})

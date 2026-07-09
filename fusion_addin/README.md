@@ -708,3 +708,10 @@ Le script `scripts/fusion/prepare_quick_asset_test.ps1` accepte `-Preset p14_com
 ## P16 ergonomic tray packing smoke preset
 
 `prepare_quick_asset_test.ps1` prepare maintenant par defaut `p16_ergonomic_tray_packing` : box `240 x 170 x 60`, grid `8 x 5 x 3`, `max_stack_height_mm = 18`, `target_aspect_ratio = 1.4`, `max_module_length_mm = 70`, assets `coin-tokens`, `status-tokens`, `damage-tokens`, `dice-set` et `wood-meeples`. Le smoke Fusion doit verifier `tray_packing_policy: flat_tray_2d_v0`, `pile_grid_columns`, `pile_grid_rows`, `linear_layout_avoided`, compartiments/encoches, printability report, regenerate sans doublon et clear preservant les objets non-BGIG.
+
+
+## P17-M002 - export_printables
+
+La commande Fusion classique inclut l'action `export_printables`. Elle exporte en STL V0 uniquement les bodies tagues BGIG `module_body` de la scene courante. Les references, sketches debug, helpers, sources, scene roots, occurrences compactes/eclatees et objets non-BGIG sont exclus ou refuses avec raison.
+
+Le rapport affiche `print_validated: false`. Les manifestes JSON/Markdown complets seront ajoutes par P17-M003 ; P17-M002 ne valide pas l'impression physique.

@@ -1046,14 +1046,15 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 
 - Capability : C-FUSION-EXPORT.
 - Objectif : ajouter une action Fusion classique qui exporte les modules imprimables BGIG si l'API Fusion le permet de facon fiable.
-- Gate : stop technique si export par module non fiable.
-- Statut : `ready`.
+- Livrable : action `export_printables`, export STL par `module_body` tague BGIG, refus explicites des entites non imprimables, rapport export, `print_validated: false`.
+- Limite : manifeste JSON/Markdown reporte a P17-M003 ; validation Fusion humaine requise avant statut `fusion-validated`.
+- Statut : `done`, `implemented-fusion-unvalidated`.
 
 ### P17-M003 - Export manifest V0
 
 - Capability : C-FUSION-EXPORT, C-QUALITY.
 - Objectif : produire `bgig_export_manifest.json` et si utile un Markdown resumant scene, commit, settings, assets, modules, dimensions, features, printability et warnings.
-- Statut : `todo`.
+- Statut : `ready`.
 
 ### P17-M004 - Printability blockers V0
 

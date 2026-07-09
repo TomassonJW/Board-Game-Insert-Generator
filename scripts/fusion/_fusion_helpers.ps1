@@ -97,6 +97,9 @@ function Assert-BgigFusionAddinMarkers {
             "asset_debug_visualization",
             "stacked_rectangular_piles_v0",
             "inspect_bgig_scene",
+            "export_printables",
+            "fusion_only_stl_per_printable_module_v0",
+            "print_validated: false",
             "bgig_ui_settings.json"
         )
     )

@@ -28,9 +28,9 @@ Mission interne terminee : P16 validation - `fusion-validated-v0`, export/print 
 
 Mission interne terminee : P17-M001 - ADR export/preprint V0, `ADR-0035` acceptee.
 
-Mission interne ready : P17-M002 - Action Fusion `export_printables`.
+Mission interne terminee : P17-M002 - Action Fusion `export_printables`, implementation STL V0 non encore validee dans Fusion.
 
-Mission interne suivante : P17-M003 - Export manifest V0.
+Mission interne ready : P17-M003 - Export manifest V0.
 
 Mission interne suivante : P17-M004 - Printability blockers V0.
 
@@ -40,7 +40,7 @@ Mission interne suivante : P17-M006 - Preparation gate Fusion P17.
 
 ## Mission ready non gated
 
-`P17-M002 - Action Fusion export_printables`.
+`P17-M003 - Export manifest V0`.
 
 ## Regle operationnelle Fusion
 
