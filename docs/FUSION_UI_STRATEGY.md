@@ -459,3 +459,8 @@ Cette action ne doit pas fermer la dette UX generale : pas de palette HTML, pas 
 L'action `export_printables` est ajoutee a la liste Action de la commande Fusion classique. Elle ne depend pas du mode d'entree selectionne et ne requiert pas de chemin CAD IR/config, car elle agit sur la scene BGIG deja generee dans le document Fusion courant.
 
 Le message utilisateur affiche le dossier export, le format STL, les modules detectes/exportes/refuses, les chemins de fichiers et `print_validated: false`. Les manifestes complets restent une mission separee P17-M003.
+
+
+## P17-M003 - Rapport manifestes export
+
+Le message `export_printables` affiche maintenant les chemins `manifest_json` et `manifest_markdown`. Ces fichiers sont crees automatiquement dans le dossier export. L'utilisateur ne doit pas les interpreter comme validation d'impression : ils documentent seulement ce qui a ete exporte, refuse et averti.

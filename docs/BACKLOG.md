@@ -1054,13 +1054,14 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 
 - Capability : C-FUSION-EXPORT, C-QUALITY.
 - Objectif : produire `bgig_export_manifest.json` et si utile un Markdown resumant scene, commit, settings, assets, modules, dimensions, features, printability et warnings.
-- Statut : `ready`.
+- Livrable : `bgig_export_manifest.json` et `bgig_export_manifest.md` ecrits dans le dossier export par `export_printables`, avec settings, source CAD IR si disponible, assets/modules, fichiers exportes, refus, warnings et `print_validated: false`.
+- Statut : `done`, `implemented-fusion-unvalidated`.
 
 ### P17-M004 - Printability blockers V0
 
 - Capability : C-CALIBRATION, C-QUALITY.
 - Objectif : enrichir `printability_report_v0` avec severites info/warning/blocker, `printability_status` et `printability_export_allowed`.
-- Statut : `todo`.
+- Statut : `ready`.
 
 ### P17-M005 - Calibration coupon / preprint check V0
 

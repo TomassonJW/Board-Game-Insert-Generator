@@ -2932,8 +2932,8 @@ def printable_export_result_summary(result: dict[str, Any]) -> str:
         f"printable_modules_detected: {result.get('printable_modules_detected', 0)}",
         f"printable_modules_exported: {result.get('printable_modules_exported', 0)}",
         f"printable_modules_refused: {result.get('printable_modules_refused', 0)}",
-        f"manifest_json: {result.get('manifest_json', 'not generated in P17-M002')}",
-        f"manifest_markdown: {result.get('manifest_markdown', 'not generated in P17-M002')}",
+        f"manifest_json: {result.get('manifest_json', 'not generated')}",
+        f"manifest_markdown: {result.get('manifest_markdown', 'not generated')}",
         "print_validated: false",
     ]
     if exported_files:

@@ -62,6 +62,8 @@ try:
         FUSION_COMMAND_ACTION_REGENERATE,
         BGIG_EXPORT_FORMAT_STL,
         BGIG_EXPORT_POLICY,
+        BGIG_EXPORT_MANIFEST_JSON_FILENAME,
+        BGIG_EXPORT_MANIFEST_MARKDOWN_FILENAME,
         EXPLODED_OCCURRENCE_ROLE,
         FUSION_EXTENT_NEGATIVE,
         FUSION_EXTENT_POSITIVE,
@@ -163,6 +165,8 @@ except ImportError:  # pragma: no cover - Fusion may load the file as a script.
         FUSION_COMMAND_ACTION_REGENERATE,
         BGIG_EXPORT_FORMAT_STL,
         BGIG_EXPORT_POLICY,
+        BGIG_EXPORT_MANIFEST_JSON_FILENAME,
+        BGIG_EXPORT_MANIFEST_MARKDOWN_FILENAME,
         EXPLODED_OCCURRENCE_ROLE,
         FUSION_EXTENT_NEGATIVE,
         FUSION_EXTENT_POSITIVE,
@@ -697,10 +701,14 @@ def _export_printables_from_scene(design, registry: BgigFusionRegistry, addin_di
                 "reason": f"export requires exactly one BGIG scene root; found {scene_roots}",
             }
         )
-        return _printable_export_result("blocked", addin_dir, targets, [], refused)
+        return _printable_export_result("blocked", addin_dir, targets, [], refused, [])
+
+    export_dir = _default_printable_export_dir(addin_dir, registry, targets)
+    export_dir.mkdir(parents=True, exist_ok=True)
 
     if not targets:
-        return _printable_export_result("no_exportable_modules", addin_dir, targets, [], refused)
+        result = _printable_export_result("no_exportable_modules", export_dir, targets, [], refused, [])
+        return _write_printable_export_manifest(export_dir, result, addin_dir)
 
     export_manager = getattr(design, "exportManager", None)
     if export_manager is None:
@@ -711,11 +719,11 @@ def _export_printables_from_scene(design, registry: BgigFusionRegistry, addin_di
                 "reason": "design.exportManager is unavailable; STL export cannot be verified in this Fusion runtime",
             }
         )
-        return _printable_export_result("technical_gate", addin_dir, targets, [], refused)
+        result = _printable_export_result("technical_gate", export_dir, targets, [], refused, [])
+        return _write_printable_export_manifest(export_dir, result, addin_dir)
 
-    export_dir = _default_printable_export_dir(addin_dir, registry, targets)
-    export_dir.mkdir(parents=True, exist_ok=True)
     exported_files: list[str] = []
+    exported_modules: list[dict[str, object]] = []
     for index, target in enumerate(targets, start=1):
         filename = printable_export_filename(index, str(target["module_id"]), str(target["role"]))
         output_path = export_dir / filename
@@ -735,6 +743,14 @@ def _export_printables_from_scene(design, registry: BgigFusionRegistry, addin_di
             if exported is False:
                 raise FusionSkeletonError("ExportManager.execute returned false")
             exported_files.append(str(output_path))
+            exported_modules.append(
+                {
+                    "module_id": target["module_id"],
+                    "name": target["name"],
+                    "role": target["role"],
+                    "file": str(output_path),
+                }
+            )
         except Exception as exc:
             refused.append(
                 {
@@ -746,7 +762,8 @@ def _export_printables_from_scene(design, registry: BgigFusionRegistry, addin_di
             )
 
     status = "exported" if exported_files and len(exported_files) == len(targets) else "partial_or_failed"
-    return _printable_export_result(status, export_dir, targets, exported_files, refused)
+    result = _printable_export_result(status, export_dir, targets, exported_files, refused, exported_modules)
+    return _write_printable_export_manifest(export_dir, result, addin_dir)
 
 
 def _collect_printable_export_targets(registry: BgigFusionRegistry) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
@@ -815,6 +832,7 @@ def _printable_export_result(
     targets: list[dict[str, object]],
     exported_files: list[str],
     refused: list[dict[str, object]],
+    exported_modules: list[dict[str, object]],
 ) -> dict[str, object]:
     return {
         "status": status,
@@ -825,11 +843,131 @@ def _printable_export_result(
         "printable_modules_exported": len(exported_files),
         "printable_modules_refused": len(refused),
         "exported_files": exported_files,
+        "exported_modules": exported_modules,
         "refused_modules": refused,
-        "manifest_json": "not generated in P17-M002",
-        "manifest_markdown": "not generated in P17-M002",
+        "manifest_json": "not generated",
+        "manifest_markdown": "not generated",
         "print_validated": False,
     }
+
+
+def _write_printable_export_manifest(export_dir: Path, result: dict[str, object], addin_dir: Path) -> dict[str, object]:
+    manifest_json = export_dir / BGIG_EXPORT_MANIFEST_JSON_FILENAME
+    manifest_markdown = export_dir / BGIG_EXPORT_MANIFEST_MARKDOWN_FILENAME
+    settings = load_fusion_ui_settings(addin_dir)
+    cad_ir_payload = _load_export_cad_ir_payload(settings)
+    manifest = _printable_export_manifest_payload(result, settings, cad_ir_payload)
+    manifest_json.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    manifest_markdown.write_text(_printable_export_manifest_markdown(manifest), encoding="utf-8")
+    updated = dict(result)
+    updated["manifest_json"] = str(manifest_json)
+    updated["manifest_markdown"] = str(manifest_markdown)
+    return updated
+
+
+def _load_export_cad_ir_payload(settings: dict[str, str]) -> dict[str, object] | None:
+    for key in ("generated_cad_ir_path", "cad_ir_path"):
+        value = str(settings.get(key, "")).strip()
+        if not value:
+            continue
+        path = Path(value)
+        if not path.is_file():
+            continue
+        try:
+            return load_cad_ir_json(path)
+        except Exception:
+            return None
+    return None
+
+
+def _printable_export_manifest_payload(
+    result: dict[str, object],
+    settings: dict[str, str],
+    cad_ir_payload: dict[str, object] | None,
+) -> dict[str, object]:
+    metadata = cad_ir_payload.get("metadata", {}) if isinstance(cad_ir_payload, dict) else {}
+    executable_plan = metadata.get("executable_asset_plan", {}) if isinstance(metadata, dict) else {}
+    quick_asset = metadata.get("quick_asset_box", {}) if isinstance(metadata, dict) else {}
+    return {
+        "schema_version": "bgig.export_manifest.v0",
+        "export_policy": result.get("export_policy", BGIG_EXPORT_POLICY),
+        "export_format": result.get("export_format", BGIG_EXPORT_FORMAT_STL),
+        "timestamp_utc": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "status": result.get("status", "unknown"),
+        "print_validated": False,
+        "printability_validated_by_print": "no",
+        "export_directory": result.get("export_directory", ""),
+        "manifest_json": result.get("manifest_json", ""),
+        "manifest_markdown": result.get("manifest_markdown", ""),
+        "settings": {
+            "input_mode": settings.get("input_mode", ""),
+            "action": settings.get("action", ""),
+            "generation_mode": settings.get("generation_mode", ""),
+            "project_root": settings.get("project_root", ""),
+            "cad_ir_path": settings.get("cad_ir_path", ""),
+            "generated_cad_ir_path": settings.get("generated_cad_ir_path", ""),
+        },
+        "source": {
+            "project_name": cad_ir_payload.get("project_name", "") if isinstance(cad_ir_payload, dict) else "",
+            "schema_version": cad_ir_payload.get("schema_version", "") if isinstance(cad_ir_payload, dict) else "",
+            "units": cad_ir_payload.get("units", "") if isinstance(cad_ir_payload, dict) else "",
+            "box": cad_ir_payload.get("box", {}) if isinstance(cad_ir_payload, dict) else {},
+            "volumetric_grid": cad_ir_payload.get("volumetric_grid", {}) if isinstance(cad_ir_payload, dict) else {},
+            "quick_asset_box": quick_asset,
+        },
+        "assets": metadata.get("assets", []) if isinstance(metadata, dict) else [],
+        "modules": executable_plan.get("generated_modules", []) if isinstance(executable_plan, dict) else [],
+        "summary": {
+            "printable_modules_detected": result.get("printable_modules_detected", 0),
+            "printable_modules_exported": result.get("printable_modules_exported", 0),
+            "printable_modules_refused": result.get("printable_modules_refused", 0),
+        },
+        "exported_modules": result.get("exported_modules", []),
+        "exported_files": result.get("exported_files", []),
+        "refused_modules": result.get("refused_modules", []),
+        "warnings": [
+            "Export manifest V0 is a preprint audit artifact, not physical print validation.",
+            "print_validated remains false until a real printed prototype is measured.",
+        ],
+    }
+
+
+def _printable_export_manifest_markdown(manifest: dict[str, object]) -> str:
+    summary = manifest.get("summary", {}) if isinstance(manifest.get("summary"), dict) else {}
+    lines = [
+        "# BGIG Export Manifest V0",
+        "",
+        f"- Status: `{manifest.get('status', 'unknown')}`",
+        f"- Export policy: `{manifest.get('export_policy', BGIG_EXPORT_POLICY)}`",
+        f"- Export format: `{manifest.get('export_format', BGIG_EXPORT_FORMAT_STL)}`",
+        f"- Export directory: `{manifest.get('export_directory', '')}`",
+        "- Print validated: `false`",
+        f"- Printable modules detected: {summary.get('printable_modules_detected', 0)}",
+        f"- Printable modules exported: {summary.get('printable_modules_exported', 0)}",
+        f"- Printable modules refused: {summary.get('printable_modules_refused', 0)}",
+        "",
+        "## Exported files",
+    ]
+    exported_files = manifest.get("exported_files", [])
+    if isinstance(exported_files, list) and exported_files:
+        lines.extend(f"- `{path}`" for path in exported_files)
+    else:
+        lines.append("- none")
+    lines.extend(["", "## Refusals"])
+    refused = manifest.get("refused_modules", [])
+    if isinstance(refused, list) and refused:
+        for item in refused:
+            if isinstance(item, dict):
+                lines.append(f"- `{item.get('name', 'unknown')}` role `{item.get('role', 'n/a')}`: {item.get('reason', 'refused')}")
+            else:
+                lines.append(f"- {item}")
+    else:
+        lines.append("- none")
+    lines.extend(["", "## Warnings"])
+    warnings = manifest.get("warnings", [])
+    if isinstance(warnings, list):
+        lines.extend(f"- {warning}" for warning in warnings)
+    return "\n".join(lines) + "\n"
 
 def _generate_cad_ir_from_quick_parametric_box_request(request, addin_dir: Path):  # noqa: ANN001
     payload = build_quick_parametric_box_cad_ir_payload(request.parameter_overrides or {})

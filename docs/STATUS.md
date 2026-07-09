@@ -793,8 +793,15 @@ Prochaine mission ready : `P17-M002 - Action Fusion export_printables`. Cette mi
 
 ### P17-M002 - Action Fusion export_printables
 
-Statut : `implemented-fusion-unvalidated`. La commande Fusion classique accepte maintenant l'action `export_printables`. Elle inspecte la scene BGIG courante, exige exactement une racine BGIG, collecte seulement les bodies tagues `bgig:role = module_body`, exporte chacun en STL via `design.exportManager.createSTLExportOptions(...)/execute(...)`, puis affiche un rapport avec compteurs, fichiers exportes, refus, `manifest_json: not generated in P17-M002`, `manifest_markdown: not generated in P17-M002` et `print_validated: false`.
+Statut : `implemented-fusion-unvalidated`. La commande Fusion classique accepte maintenant l'action `export_printables`. Elle inspecte la scene BGIG courante, exige exactement une racine BGIG, collecte seulement les bodies tagues `bgig:role = module_body`, exporte chacun en STL via `design.exportManager.createSTLExportOptions(...)/execute(...)`, puis affiche un rapport avec compteurs, fichiers exportes, refus, `manifest_json`, `manifest_markdown` et `print_validated: false`.
 
 Exclusions V0 : scene roots, scene root components, occurrences compactes/eclatees, references/outlines, sketches debug, features/cuts et objets non-BGIG ne sont pas exportes directement. Ils sont soit ignores, soit listes comme refuses avec raison. Si `design.exportManager` est indisponible ou si Fusion refuse l'export STL, le rapport passe en `technical_gate`/`partial_or_failed` au lieu de simuler une reussite.
 
 Prochaine mission ready : `P17-M003 - Export manifest V0`.
+
+
+### P17-M003 - Export manifest V0
+
+Statut : `implemented-fusion-unvalidated`. L'action `export_printables` ecrit maintenant `bgig_export_manifest.json` et `bgig_export_manifest.md` dans le dossier export. Le JSON expose `schema_version: bgig.export_manifest.v0`, politique export, format, timestamp, statut, settings UI, source CAD IR si disponible, assets, modules, fichiers exportes, refus, warnings et `print_validated: false`.
+
+Limite : le manifeste est un artefact d'audit preprint. Il ne prouve pas la printability physique, ne remplace pas la gate Fusion et ne valide aucune impression. Prochaine mission ready : `P17-M004 - Printability blockers V0`.

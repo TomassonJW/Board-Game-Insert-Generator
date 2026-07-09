@@ -657,21 +657,29 @@ class FusionSkeletonTests(unittest.TestCase):
         design.exportManager = _FakeExportManager()
         registry = fusion_entrypoint.BgigFusionRegistry(design)
         original_export_dir = fusion_entrypoint._default_printable_export_dir
-        with tempfile.TemporaryDirectory() as temp_dir:
-            fusion_entrypoint._default_printable_export_dir = lambda _addin, _registry, _targets: Path(temp_dir) / "exports"
-            try:
-                result = fusion_entrypoint._export_printables_from_scene(
-                    design,
-                    registry,
-                    Path(temp_dir),
-                    registry.inspect(),
-                )
-            finally:
-                fusion_entrypoint._default_printable_export_dir = original_export_dir
+        temp_dir = tempfile.TemporaryDirectory()
+        self.addCleanup(temp_dir.cleanup)
+        fusion_entrypoint._default_printable_export_dir = lambda _addin, _registry, _targets: Path(temp_dir.name) / "exports"
+        try:
+            result = fusion_entrypoint._export_printables_from_scene(
+                design,
+                registry,
+                Path(temp_dir.name),
+                registry.inspect(),
+            )
+        finally:
+            fusion_entrypoint._default_printable_export_dir = original_export_dir
 
         self.assertEqual(result["status"], "exported")
         self.assertEqual(result["printable_modules_detected"], 1)
         self.assertEqual(result["printable_modules_exported"], 1)
+        self.assertTrue(Path(result["manifest_json"]).is_file())
+        self.assertTrue(Path(result["manifest_markdown"]).is_file())
+        manifest = json.loads(Path(result["manifest_json"]).read_text(encoding="utf-8"))
+        self.assertEqual(manifest["schema_version"], "bgig.export_manifest.v0")
+        self.assertFalse(manifest["print_validated"])
+        self.assertEqual(manifest["summary"]["printable_modules_exported"], 1)
+        self.assertIn("print validation", Path(result["manifest_markdown"]).read_text(encoding="utf-8").lower())
         self.assertEqual(len(design.exportManager.executed_options), 1)
         self.assertIs(design.exportManager.executed_options[0].geometry, module_body)
         self.assertTrue(design.exportManager.executed_options[0].filename.endswith("01-module-tokens-module-body.stl"))

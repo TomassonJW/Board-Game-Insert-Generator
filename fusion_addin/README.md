@@ -714,4 +714,4 @@ Le script `scripts/fusion/prepare_quick_asset_test.ps1` accepte `-Preset p14_com
 
 La commande Fusion classique inclut l'action `export_printables`. Elle exporte en STL V0 uniquement les bodies tagues BGIG `module_body` de la scene courante. Les references, sketches debug, helpers, sources, scene roots, occurrences compactes/eclatees et objets non-BGIG sont exclus ou refuses avec raison.
 
-Le rapport affiche `print_validated: false`. Les manifestes JSON/Markdown complets seront ajoutes par P17-M003 ; P17-M002 ne valide pas l'impression physique.
+Le rapport affiche `print_validated: false`. Depuis P17-M003, `bgig_export_manifest.json` et `bgig_export_manifest.md` sont ecrits dans le dossier export. Cela ne valide pas l'impression physique.

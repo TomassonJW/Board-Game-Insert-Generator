@@ -792,3 +792,10 @@ Si l'API Fusion ne permet pas d'exporter de facon fiable un module/body cible sa
 L'adaptateur Fusion ajoute l'action `export_printables`. Elle ne regenere pas la scene et ne lit pas de nouvelle CAD IR : elle inspecte la scene BGIG active, refuse l'export si la scene racine n'est pas unique, puis selectionne uniquement les `module_body` tagues BGIG comme geometries STL.
 
 La selection est volontairement stricte pour P17 V0 : les components, occurrences, scene roots, references, sketches debug, features/cuts, vues eclatees et objets non-BGIG ne sont pas exportes directement. L'API Fusion utilisee est `design.exportManager.createSTLExportOptions(body, filename)` puis `execute(options)`. Un echec d'API devient un rapport `technical_gate` ou `partial_or_failed`, pas une reussite silencieuse.
+
+
+## P17-M003 - Export manifest V0
+
+Apres l'export STL, l'adaptateur Fusion ecrit `bgig_export_manifest.json` et `bgig_export_manifest.md` dans le dossier export. Le manifeste est derive du resultat d'export, des settings UI locaux et de la CAD IR generee ou chargee quand le chemin est disponible.
+
+Le manifeste reste un contrat d'audit preprint : il ne change pas la CAD IR, ne relance pas le solveur, ne modifie pas les tolerances et conserve `print_validated: false`.
