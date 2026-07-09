@@ -146,3 +146,5 @@ Tests, cartes backlog ou gates humaines a preparer.
 - Lie la carte backlog concernee quand c'est utile.
 - Ne cree pas d'ADR pour une micro-implementation reversible sans decision
   structurante ; documente plutot dans le log de mission.
+
+- `ADR-0033-tray-semantics-v0.md` - Semantique V0 z/count/grid/grouping pour bacs asset-first utilisables.

@@ -643,3 +643,12 @@ P14-M004 ajoute un catalogue local `scripts/fusion/quick_asset_presets.json` et 
 Statut : `gate-prepared-corrected`, preparation gate corrigee pour utiliser le preset riche `p14_complete`, validation humaine Fusion `P14-USABLE-ASSET-TRAY-SPRINT-V` requise, `print-validated: false`.
 
 La premiere preparation utilisait `tokens`, trop proche de P13-ASSET-M005 pour valider le sprint P14. La correction de gate prepare maintenant `p14_complete` : box `220 x 160 x 96`, grid `8 x 5 x 4`, assets `coin-tokens`, `status-tokens`, `damage-tokens`, `dice-set` et `wood-meeples`. Le smoke Fusion doit verifier le sprint P14 complet : layout multi-assets 3 sources tokens avec shelf layout, presets, printability report V0, aide inline quick_asset_box, regeneration sans doublon, clear preserve non-BGIG, et absence de validation impression 3D.
+## P15-TRAY-SEMANTICS-ALIGNMENT-SPRINT
+
+Statut : sprint lance apres refus de validation usable P14. P14 est techniquement fonctionnel, mais le sizing par defaut cree des modules trop hauts pour les assets itemises. Objectif P15 : clarifier et corriger les semantiques `z_mm`, `count`, `grid`, groupement et mode de rangement sans solveur global ni nouvelle geometrie complexe.
+
+## P15-M001 - Audit semantique z/grid/grouping
+
+Statut : `done-docs`, ADR acceptee `docs/DECISIONS/ADR-0033-tray-semantics-v0.md`, pas de changement moteur.
+
+Decision : `tokens`, `dice`, `meeples` et `generic` gardent `z_mm` comme dimension unitaire, mais le defaut produit devient `storage_orientation = flat_tray` avec `max_stack_height_mm`. `vertical_stack` conserve l'ancien comportement uniquement en mode explicite. La grille est documentee comme `placement_reservation_lattice_v0`, pas comme taille physique de body.

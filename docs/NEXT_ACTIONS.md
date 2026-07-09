@@ -18,7 +18,7 @@ structurant, authentification absente ou refus de push direct.
 
 ## Gate humaine active
 
-Gate humaine active : `P14-USABLE-ASSET-TRAY-SPRINT-V`.
+Aucune gate humaine active pendant les missions automatisables du sprint `P15-TRAY-SEMANTICS-ALIGNMENT-SPRINT` explicitement autorise. Validation Fusion attendue apres preparation P15.
 
 ## Sprint actif
 
@@ -36,7 +36,7 @@ Mission interne corrigee : `P14-USABLE-ASSET-TRAY-M005 - Preparation gate Fusion
 
 ## Mission ready non gated
 
-Le sprint P14 doit etre revalide dans Fusion avec le preset riche `p14_complete`. Ne pas lancer de nouvelle mission produit avant retour humain.
+Mission interne suivante : `P15-M002 - storage_orientation flat_tray V0`.
 
 ## Regle operationnelle Fusion
 
@@ -58,3 +58,4 @@ Palette persistante HTML, UI assets avancee/tableau, solveur plus automatique, c
 Appliquer la politique active `direct-to-main` : tests complets, commit propre,
 integration directe dans `main`, push vers `origin/main`, puis reprise depuis
 `origin/main` si aucune vraie gate humaine n'est atteinte.
+Mission interne terminee : `P15-M001 - Audit semantique z/grid/grouping`, ADR-0033 acceptee, pas de changement moteur.

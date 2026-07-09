@@ -896,3 +896,37 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Objectif : preparer un smoke test Fusion global du sprint P14 avec add-in installe, settings presets et criteres observables.
 - Livrable : script smoke pret, marqueurs installes verifies, rapport d'actions Fusion restantes.
 - Statut : `done`, preparation gate corrigee avec preset `p14_complete`, validation humaine Fusion sprint P14 requise.
+
+## P15 - Tray semantics alignment sprint
+
+### P15-M001 - Audit semantique z/grid/grouping
+
+- Capability : C-ASSET, C-QUALITY.
+- Milestone : M14 Usable beta / P15 semantics alignment.
+- Objectif : documenter la semantique actuelle de `z_mm`, `count`, grid, body, cavity et grouping.
+- Livrable : ADR-0033.
+- Statut : `done`.
+
+### P15-M002 - storage_orientation flat_tray V0
+
+- Capability : C-ASSET.
+- Objectif : introduire `storage_orientation` et rendre `flat_tray` defaut pour tokens/dice/meeples/generic.
+- Statut : `ready`.
+
+### P15-M003 - max_stack_height_mm et reporting stack policy
+
+- Capability : C-ASSET, C-FUSION-UI.
+- Objectif : ajouter une hauteur de pile maximale simple et reporter la politique de stack.
+- Statut : `planned`.
+
+### P15-M004 - Grid semantics report V0
+
+- Capability : C-ASSET, C-FUSION-UI.
+- Objectif : expliciter grid span vs body size dans reports/CAD IR/Fusion summary.
+- Statut : `planned`.
+
+### P15-M005 - Preset smoke P15 realiste
+
+- Capability : C-FUSION-UI, C-QUALITY.
+- Objectif : preparer un preset Fusion P15 realiste et bas, puis installer l'add-in et les settings.
+- Statut : `planned`.

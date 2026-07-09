@@ -173,3 +173,8 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 - C-ASSET : scenario tokens P14 pret pour validation humaine, presets alternatifs disponibles mais non Fusion-valides.
 - C-QUALITY : marqueurs d'add-in installes verifies par script.
 - Validation : tests automatises OK, gate humaine Fusion active, aucune impression reelle validee.
+## P15-M001 capability update
+
+- C-ASSET : `specified` pour semantique tray V0 via ADR-0033.
+- C-QUALITY : `done-docs` pour audit z/count/grid/grouping.
+- Validation : documentaire seulement, aucun changement moteur, aucune validation Fusion ou impression.
