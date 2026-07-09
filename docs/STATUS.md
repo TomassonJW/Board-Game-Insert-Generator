@@ -745,3 +745,13 @@ P16-M004 rend le packing 2D exploitable depuis la commande Fusion classique `qui
 Le resume Fusion affiche maintenant explicitement `target_aspect_ratio`, `max_module_length_mm`, `tray_packing_policy`, `pile_grid_columns`, `pile_grid_rows` et `linear_layout_avoided` dans les diagnostics asset, module, cavite et access notch. Le schema JSON public accepte les deux champs additifs optionnels sur `assets[]`; les valeurs non positives sont refusees par validation.
 
 Limites maintenues : pas de solveur global, pas de backtracking, pas de nouvelle geometrie, pas de cavites par pile/item, pas de visualisation individuelle des assets et aucune validation d'impression.
+
+## P16-M005 - Preset smoke P16 ergonomique
+
+Statut : `implemented-smoke-prep`, tests automatises OK, validation Fusion P16 non encore realisee, `print-validated: false`.
+
+Le script `scripts/fusion/prepare_quick_asset_test.ps1` utilise maintenant `p16_ergonomic_tray_packing` par defaut. Ce preset prepare une box `240 x 170 x 60`, une grille `8 x 5 x 3`, `max_stack_height_mm = 18`, `target_aspect_ratio = 1.4`, `max_module_length_mm = 70` et cinq assets : `coin-tokens`, `status-tokens`, `damage-tokens`, `dice-set`, `wood-meeples`.
+
+Assets exacts : `coin-tokens,tokens,48,10,10,2,loose; status-tokens,tokens,36,10,10,2,loose; damage-tokens,tokens,24,14,12,2,loose; dice-set,dice,8,16,16,16,loose; wood-meeples,meeples,18,12,12,8,loose`.
+
+Objectif de gate : verifier dans Fusion que le rapport expose `flat_tray_2d_v0`, des `pile_grid_columns` / `pile_grid_rows` multi-ranges, `linear_layout_avoided`, les champs P16 rehydrates, les compartiments/encoches existants, `printability_checked: yes`, `Registry validation: ok` et `Print validation: false`.

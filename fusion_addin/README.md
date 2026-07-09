@@ -704,3 +704,7 @@ Le script `scripts/fusion/prepare_quick_asset_test.ps1` accepte `-Preset p14_com
 ### P15-TRAY-SEMANTICS-ALIGNMENT-SPRINT-V smoke preset
 
 `prepare_quick_asset_test.ps1` prepare maintenant par defaut `p15_tray_semantics` : box `220 x 160 x 60`, grid `8 x 5 x 3`, `max_stack_height_mm = 18`, assets `coin-tokens`, `status-tokens`, `dice-set`, `wood-meeples` et `cubes`. Le smoke Fusion doit verifier `flat_tray`, `stack_height_policy`, `max_stack_height_mm`, `grid_semantics: placement_reservation_lattice_v0`, `body_snap_to_grid: no`, compartiments/encoches, printability report, regenerate sans doublon et clear preservant les objets non-BGIG.
+
+## P16 ergonomic tray packing smoke preset
+
+`prepare_quick_asset_test.ps1` prepare maintenant par defaut `p16_ergonomic_tray_packing` : box `240 x 170 x 60`, grid `8 x 5 x 3`, `max_stack_height_mm = 18`, `target_aspect_ratio = 1.4`, `max_module_length_mm = 70`, assets `coin-tokens`, `status-tokens`, `damage-tokens`, `dice-set` et `wood-meeples`. Le smoke Fusion doit verifier `tray_packing_policy: flat_tray_2d_v0`, `pile_grid_columns`, `pile_grid_rows`, `linear_layout_avoided`, compartiments/encoches, printability report, regenerate sans doublon et clear preservant les objets non-BGIG.

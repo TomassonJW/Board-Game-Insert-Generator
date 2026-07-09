@@ -1879,13 +1879,18 @@ class FusionSkeletonTests(unittest.TestCase):
         script_source = (ROOT / "scripts" / "fusion" / "prepare_quick_asset_test.ps1").read_text(encoding="utf-8-sig")
 
         self.assertEqual(catalog["schema"], "bgig.quick_asset_presets.v0")
-        self.assertIn('[string] $Preset = "p15_tray_semantics"', script_source)
-        self.assertIn('ValidateSet("p15_tray_semantics", "p14_complete", "tokens", "dice_meeples_generic", "cards_tokens")', script_source)
+        self.assertIn('[string] $Preset = "p16_ergonomic_tray_packing"', script_source)
+        self.assertIn('ValidateSet("p16_ergonomic_tray_packing", "p15_tray_semantics", "p14_complete", "tokens", "dice_meeples_generic", "cards_tokens")', script_source)
+        self.assertIn("quick_asset_box_target_aspect_ratio", script_source)
+        self.assertIn("quick_asset_box_max_module_length_mm", script_source)
         self.assertEqual(
             set(catalog["presets"]),
-            {"p15_tray_semantics", "p14_complete", "tokens", "dice_meeples_generic", "cards_tokens"},
+            {"p16_ergonomic_tray_packing", "p15_tray_semantics", "p14_complete", "tokens", "dice_meeples_generic", "cards_tokens"},
         )
         self.assertEqual(catalog["presets"]["p15_tray_semantics"]["max_stack_height_mm"], 18)
+        self.assertEqual(catalog["presets"]["p16_ergonomic_tray_packing"]["max_stack_height_mm"], 18)
+        self.assertEqual(catalog["presets"]["p16_ergonomic_tray_packing"]["target_aspect_ratio"], 1.4)
+        self.assertEqual(catalog["presets"]["p16_ergonomic_tray_packing"]["max_module_length_mm"], 70)
         for preset_name, preset in catalog["presets"].items():
             overrides = {
                 "box_inner_x_mm": str(preset["box_inner_mm"]["x"]),
@@ -1909,12 +1914,24 @@ class FusionSkeletonTests(unittest.TestCase):
                 overrides,
                 preset["assets_text"],
                 str(preset.get("max_stack_height_mm", "")),
+                str(preset.get("target_aspect_ratio", "")),
+                str(preset.get("max_module_length_mm", "")),
             )
             self.assertEqual(config_payload["modules"], [], preset_name)
             self.assertGreater(len(config_payload["assets"]), 0, preset_name)
             if "max_stack_height_mm" in preset:
                 self.assertTrue(
                     any(asset.get("max_stack_height_mm") == float(preset["max_stack_height_mm"]) for asset in config_payload["assets"]),
+                    preset_name,
+                )
+            if "target_aspect_ratio" in preset:
+                self.assertTrue(
+                    any(asset.get("target_aspect_ratio") == float(preset["target_aspect_ratio"]) for asset in config_payload["assets"]),
+                    preset_name,
+                )
+            if "max_module_length_mm" in preset:
+                self.assertTrue(
+                    any(asset.get("max_module_length_mm") == float(preset["max_module_length_mm"]) for asset in config_payload["assets"]),
                     preset_name,
                 )
             self.assertEqual(
@@ -1930,6 +1947,14 @@ class FusionSkeletonTests(unittest.TestCase):
                 report = generate_basic_layout(config)
             payload = json.loads(layout_to_json(config, report))
             self.assertGreaterEqual(payload["summary"]["module_candidate_count"], 1, preset_name)
+            if preset_name == "p16_ergonomic_tray_packing":
+                generated = payload["executable_asset_plan"]["generated_modules"][0]
+                sizing = generated["storage_sizing"]
+                self.assertEqual(sizing["tray_packing_policy"], "flat_tray_2d_v0")
+                self.assertEqual(sizing["target_aspect_ratio"], 1.4)
+                self.assertEqual(sizing["max_module_length_mm"], 70.0)
+                self.assertGreaterEqual(sizing["pile_grid_rows"], 2)
+                self.assertEqual(sizing["linear_layout_avoided"], "yes")
 
     def test_addin_entrypoint_uses_linked_component_occurrences(self) -> None:
         entrypoint_path = ROOT / "fusion_addin" / "BoardGameInsertGenerator" / "BoardGameInsertGenerator.py"

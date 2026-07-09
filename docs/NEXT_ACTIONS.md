@@ -32,13 +32,13 @@ Mission interne terminee : P16-M003 - Aligner compartiments, cavites et notches 
 
 Mission interne terminee : P16-M004 - Clarifier UI et reporting P16, champs optionnels `target_aspect_ratio` / `max_module_length_mm` et resume Fusion enrichi.
 
-Mission interne ready : P16-M005 - Preset P16 realiste.
+Mission interne terminee : P16-M005 - Preset P16 realiste, preset `p16_ergonomic_tray_packing` par defaut du script smoke.
 
-Mission interne suivante : P16-M006 - Preparation gate Fusion P16.
+Mission interne ready : P16-M006 - Preparation gate Fusion P16.
 
 ## Mission ready non gated
 
-`P16-M005 - Preset P16 realiste`.
+`P16-M006 - Preparation gate Fusion P16`.
 
 ## Regle operationnelle Fusion
 

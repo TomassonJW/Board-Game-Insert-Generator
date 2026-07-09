@@ -986,7 +986,8 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 
 - Capability : C-FUSION-UI, C-QUALITY.
 - Objectif : ajouter `p16_ergonomic_tray_packing` et en faire le preset par defaut de gate P16.
-- Statut : `todo`.
+- Livrable : preset 5 assets avec box `240 x 170 x 60`, grille `8 x 5 x 3`, `max_stack_height_mm = 18`, `target_aspect_ratio = 1.4`, `max_module_length_mm = 70`, script smoke par defaut sur P16.
+- Statut : `done`.
 
 ### P16-M006 - Preparation gate Fusion P16
 
@@ -1015,3 +1016,8 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 
 - Livrable : `assets[].target_aspect_ratio` et `assets[].max_module_length_mm` additifs, champs UI globaux optionnels persistants pour `quick_asset_box`, resume Fusion exposant politique, grille locale et evitement du layout lineaire.
 - Statut : `done`, `implemented-fusion-ui`, validation Fusion P16 encore requise.
+
+### P16-M005 - Preset smoke P16 realiste
+
+- Livrable : catalogue `quick_asset_presets.json` enrichi avec `p16_ergonomic_tray_packing`, script `prepare_quick_asset_test.ps1` par defaut sur P16, settings `quick_asset_box` incluant les champs P16.
+- Statut : `done`, `implemented-smoke-prep`, validation Fusion P16 encore requise.

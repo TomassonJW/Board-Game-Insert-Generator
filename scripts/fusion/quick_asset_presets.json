@@ -81,6 +81,25 @@
       "assets_text": "coin-tokens,tokens,40,18,16,2,loose; status-tokens,tokens,24,12,18,2,loose; dice-set,dice,8,16,16,16,loose; wood-meeples,meeples,18,12,12,8,loose; cubes,generic,24,8,8,8,loose",
       "notes": "Default P15 semantics gate scenario. Five assets exercise flat_tray stack caps, XY expansion before Z, grid reservation reporting, compartments, access notches and printability warnings without a global solver.",
       "smoke_focus": "5 assets read, low flat_tray modules, max_stack_height_mm reported, grid_semantics placement_reservation_lattice_v0, body_snap_to_grid no, compartments/access notches, printability_report_v0, regenerate without duplicates"
+    },
+    "p16_ergonomic_tray_packing": {
+      "label": "P16 ergonomic 2D tray packing smoke scenario",
+      "box_inner_mm": {
+        "x": 240,
+        "y": 170,
+        "z": 60
+      },
+      "grid_units": {
+        "x": 8,
+        "y": 5,
+        "z": 3
+      },
+      "max_stack_height_mm": 18,
+      "target_aspect_ratio": 1.4,
+      "max_module_length_mm": 70,
+      "assets_text": "coin-tokens,tokens,48,10,10,2,loose; status-tokens,tokens,36,10,10,2,loose; damage-tokens,tokens,24,14,12,2,loose; dice-set,dice,8,16,16,16,loose; wood-meeples,meeples,18,12,12,8,loose",
+      "notes": "Default P16 gate scenario. Five assets exercise flat_tray_2d_v0 with multi-row pile grids, target aspect ratio, max module length reporting, compartments, access notches and printability warnings without a global solver.",
+      "smoke_focus": "flat_tray_2d_v0 visible, pile_grid_columns and pile_grid_rows reported, target_aspect_ratio 1.4, max_module_length_mm 70, linear_layout_avoided yes for token compartments, regenerate without duplicates"
     }
   }
 }

@@ -441,3 +441,7 @@ Le rapport metadata `quick_asset_box` transporte maintenant la politique de pack
 La commande Fusion classique `quick_asset_box` expose maintenant deux champs optionnels supplementaires : `Target aspect ratio (quick_asset_box, optional)` et `Max module length mm (quick_asset_box, optional)`. Ils sont sauvegardes dans `bgig_ui_settings.json`, rehydrates a la reouverture, puis appliques aux assets itemises simples de la config temporaire.
 
 Le rapport `quick_asset_box` affiche les valeurs globales et repete `tray_packing_policy`, `pile_grid_columns`, `pile_grid_rows`, `target_aspect_ratio`, `max_module_length_mm` et `linear_layout_avoided` dans les lignes `asset_sizing`, `asset_cavity`, `asset_access_notch` et `module_candidate_sizing`. L'UI reste une commande Fusion classique, pas une palette persistante.
+
+## P16-M005 - Preset smoke P16
+
+`prepare_quick_asset_test.ps1` utilise maintenant `p16_ergonomic_tray_packing` par defaut. Le preset charge cinq assets, une box `240 x 170 x 60`, une grille `8 x 5 x 3`, `max_stack_height_mm = 18`, `target_aspect_ratio = 1.4` et `max_module_length_mm = 70`. L'objectif est de valider visuellement et textuellement le passage de `flat_tray_linear_v0` a `flat_tray_2d_v0` sans nouvelle geometrie produit.

@@ -243,3 +243,10 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 - C-ASSET : schema additif `assets[].target_aspect_ratio` et `assets[].max_module_length_mm`, appliques au packing `flat_tray_2d_v0` des assets simples.
 - C-QUALITY : tests de regression ajoutes pour parsing/validation, influence du packing, persistance UI et resume Fusion.
 - Validation : tests automatises OK ; validation Fusion P16 reste a faire ; `print-validated: false`.
+
+## P16-M005 capability update
+
+- C-FUSION-UI : `implemented-smoke-prep` pour preset par defaut `p16_ergonomic_tray_packing` et settings quick_asset_box incluant `target_aspect_ratio` / `max_module_length_mm`.
+- C-ASSET : scenario 5 assets oriente validation ergonomique du packing `flat_tray_2d_v0`, sans nouvelle geometrie.
+- C-QUALITY : catalogue de presets teste comme configs valides ; preparation gate Fusion attendue en P16-M006.
+- Validation : tests automatises OK ; validation Fusion P16 reste a faire ; `print-validated: false`.

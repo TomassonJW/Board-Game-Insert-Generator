@@ -150,3 +150,21 @@ Le script installe l'add-in courant et ecrit `bgig_ui_settings.json` avec `input
 - `cubes,generic,24,8,8,8,loose`.
 
 Ce scenario doit valider les apports P15 : modules bas en `flat_tray`, `max_stack_height_mm` visible et persiste, sizing qui s'etale en XY avant Z, semantique grid explicite (`placement_reservation_lattice_v0`, `body_snap_to_grid: no`), compartiments/encoches V0, printability report, regenerate sans doublon et clear preserve non-BGIG. Il ne valide toujours pas l'impression 3D.
+
+## P16-ERGONOMIC-2D-TRAY-PACKING-SPRINT-V
+
+La gate P16 se prepare avec le preset par defaut `p16_ergonomic_tray_packing` :
+
+```powershell
+scripts/fusion/prepare_quick_asset_test.ps1 -Preset p16_ergonomic_tray_packing
+```
+
+Le script installe l'add-in courant et ecrit `bgig_ui_settings.json` avec `input_mode = quick_asset_box`, generation `compact_only`, box `240 x 170 x 60`, grid `8 x 5 x 3`, `quick_asset_box_max_stack_height_mm = 18`, `quick_asset_box_target_aspect_ratio = 1.4`, `quick_asset_box_max_module_length_mm = 70` et assets :
+
+- `coin-tokens,tokens,48,10,10,2,loose` ;
+- `status-tokens,tokens,36,10,10,2,loose` ;
+- `damage-tokens,tokens,24,14,12,2,loose` ;
+- `dice-set,dice,8,16,16,16,loose` ;
+- `wood-meeples,meeples,18,12,12,8,loose`.
+
+Ce scenario doit valider les apports P16 : `tray_packing_policy: flat_tray_2d_v0`, `pile_grid_columns`, `pile_grid_rows`, `target_aspect_ratio`, `max_module_length_mm`, `linear_layout_avoided`, compartiments et encoches V0 conserves, regenerate sans doublon et clear preserve non-BGIG. Il ne valide toujours pas l'impression 3D.
