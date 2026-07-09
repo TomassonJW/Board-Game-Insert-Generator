@@ -18,27 +18,29 @@ structurant, authentification absente ou refus de push direct.
 
 ## Gate humaine active
 
-Gate humaine active : validation Fusion `P16-ERGONOMIC-2D-TRAY-PACKING-SPRINT-V`. Codex doit s'arreter apres preparation locale de l'add-in et des settings P16.
+Aucune gate humaine active apres validation Fusion `P16-ERGONOMIC-2D-TRAY-PACKING-SPRINT-V` confirmee le 2026-07-09 sur `a75688e`.
 
 ## Sprint actif
 
-`P16-ERGONOMIC-2D-TRAY-PACKING-SPRINT` est lance explicitement le 2026-07-09 apres validation P15.
+`P17-PRINTABLE-EXPORT-AND-PREPRINT-SPRINT` est lance explicitement le 2026-07-09 apres validation P16.
 
-Mission interne terminee : P16-M001 - Documenter la strategie flat_tray_2d, ADR-0034 acceptee, pas de changement moteur.
+Mission interne terminee : P16 validation - `fusion-validated-v0`, export/print toujours non valide physiquement.
 
-Mission interne terminee : P16-M002 - Implementer packing 2D V0 des piles, heuristique deterministe `flat_tray_2d_v0`, tests automatises OK.
+Mission interne ready : P17-M001 - ADR export/preprint V0.
 
-Mission interne terminee : P16-M003 - Aligner compartiments, cavites et notches sur le packing 2D, diagnostics Fusion enrichis.
+Mission interne suivante : P17-M002 - Action Fusion `export_printables`.
 
-Mission interne terminee : P16-M004 - Clarifier UI et reporting P16, champs optionnels `target_aspect_ratio` / `max_module_length_mm` et resume Fusion enrichi.
+Mission interne suivante : P17-M003 - Export manifest V0.
 
-Mission interne terminee : P16-M005 - Preset P16 realiste, preset `p16_ergonomic_tray_packing` par defaut du script smoke.
+Mission interne suivante : P17-M004 - Printability blockers V0.
 
-Mission interne terminee : P16-M006 - Preparation gate Fusion P16, add-in/settings a preparer localement puis validation humaine requise.
+Mission interne suivante : P17-M005 - Calibration coupon / preprint check V0.
+
+Mission interne suivante : P17-M006 - Preparation gate Fusion P17.
 
 ## Mission ready non gated
 
-Aucune. Gate humaine Fusion P16 active.
+`P17-M001 - ADR export/preprint V0`.
 
 ## Regle operationnelle Fusion
 
@@ -53,7 +55,7 @@ Fusion restantes a Thomas.
 
 `P10-SOLVER-GATE - Solveur complexe, backtracking ou optimisation globale`.
 
-Palette persistante HTML, UI assets avancee/tableau, solveur global, cavites par pile/logements detailles, assets individuels Fusion, nouvelle geometrie produit complexe, export imprimable et validation d'impression restent gates ou missions separees.
+Palette persistante HTML, UI assets avancee/tableau, solveur global, cavites par pile/logements detailles, assets individuels Fusion, nouvelle geometrie produit complexe et validation d'impression restent gates ou missions separees. P17 autorise seulement l'export/preprint V0 sans validation physique.
 
 ## Fin de chaque mission
 

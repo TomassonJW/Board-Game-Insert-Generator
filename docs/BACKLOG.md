@@ -1026,3 +1026,49 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 
 - Livrable : procedure locale `prepare_quick_asset_test.ps1 -Preset p16_ergonomic_tray_packing`, marqueurs add-in P16 verifies par `check_installed_addin.ps1`, actions Fusion restantes documentees.
 - Statut : `done`, `gate-prepared`, validation humaine Fusion active.
+
+
+### P16-ERGONOMIC-2D-TRAY-PACKING-SPRINT-V - Validation Fusion
+
+- Resultat : `quick_asset_box`, preset `p16_ergonomic_tray_packing`, `flat_tray_2d_v0`, grille locale de piles, target ratio, max module length, compartiments, encoches, regenerate et clear valides.
+- Limites : packing heuristique, UX perfectible, export/preprint non encore valide, aucune impression 3D validee.
+- Statut : `done`, `fusion-validated-v0`, `print-validated: false`.
+
+### P17-M001 - ADR export/preprint V0
+
+- Capability : C-FUSION-EXPORT, C-QUALITY, C-CALIBRATION.
+- Objectif : definir le contrat d'export V0 : formats, modules exportables, exclusions, nommage, dossier de sortie, manifestes, refus et `print-validated: false`.
+- Livrable : ADR dediee export/preprint et docs strategie.
+- Statut : `ready`.
+
+### P17-M002 - Action Fusion export_printables
+
+- Capability : C-FUSION-EXPORT.
+- Objectif : ajouter une action Fusion classique qui exporte les modules imprimables BGIG si l'API Fusion le permet de facon fiable.
+- Gate : stop technique si export par module non fiable.
+- Statut : `todo`.
+
+### P17-M003 - Export manifest V0
+
+- Capability : C-FUSION-EXPORT, C-QUALITY.
+- Objectif : produire `bgig_export_manifest.json` et si utile un Markdown resumant scene, commit, settings, assets, modules, dimensions, features, printability et warnings.
+- Statut : `todo`.
+
+### P17-M004 - Printability blockers V0
+
+- Capability : C-CALIBRATION, C-QUALITY.
+- Objectif : enrichir `printability_report_v0` avec severites info/warning/blocker, `printability_status` et `printability_export_allowed`.
+- Statut : `todo`.
+
+### P17-M005 - Calibration coupon / preprint check V0
+
+- Capability : C-CALIBRATION.
+- Objectif : preparer un coupon/protocole preprint sans validation physique ni promesse ready-to-print.
+- Statut : `todo`.
+
+### P17-M006 - Gate Fusion P17 export complet
+
+- Capability : C-FUSION-EXPORT, C-QUALITY.
+- Objectif : preparer le smoke Fusion export avec preset `p17_printable_export`, add-in installe, dossier export, manifeste et actions Fusion restantes.
+- Gate : validation humaine Fusion P17 ; aucune impression 3D validee.
+- Statut : `todo`.

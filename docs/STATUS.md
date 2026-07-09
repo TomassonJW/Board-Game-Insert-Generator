@@ -763,3 +763,22 @@ Statut : `gate-prepared`, validation humaine Fusion `P16-ERGONOMIC-2D-TRAY-PACKI
 La gate P16 doit utiliser le preset `p16_ergonomic_tray_packing`, mode `quick_asset_box`, action `generate` ou `regenerate` si une scene BGIG existe deja, generation `compact_only`, box `240 x 170 x 60`, grid `8 x 5 x 3`, `max_stack_height_mm = 18`, `target_aspect_ratio = 1.4`, `max_module_length_mm = 70`.
 
 Validation attendue : `tray_packing_policy: flat_tray_2d_v0`, `pile_grid_columns`, `pile_grid_rows`, `target_aspect_ratio`, `max_module_length_mm`, `linear_layout_avoided`, compartiments et encoches V0 conserves, regenerate sans doublon, clear preserve non-BGIG, `Registry validation: ok`, `Print validation: false`.
+
+
+## P16-ERGONOMIC-2D-TRAY-PACKING-SPRINT-V - Validation Fusion
+
+Statut : `fusion-validated-v0` apres validation humaine Fusion du 2026-07-09 sur `a75688e`, `print-validated: false`.
+
+Resultats valides : add-in reinstalle par les scripts Codex, document Fusion Assembly-compatible, settings UI charges, mode `quick_asset_box`, preset `p16_ergonomic_tray_packing`, box `240 x 170 x 60`, grid `8 x 5 x 3`, `Max stack height mm = 18`, `Target aspect ratio = 1.4`, `Max module length mm = 70` et assets pre-remplis.
+
+Le smoke Fusion valide `generate`, `tray_packing_policy: flat_tray_2d_v0`, `pile_grid_columns`, `pile_grid_rows`, `target_aspect_ratio`, `max_module_length_mm`, `linear_layout_avoided: yes`, modules non reduits a des barres 1D quand un packing 2D raisonnable est possible, module tokens compact et compartimente, des en `4 x 2`, meeples en `3 x 3`, modules generes/places, compartiments asset-specific, encoches top-open quand possible, registry OK, regenerate sans doublon et clear preserve non-BGIG.
+
+Reporting valide : `grid_semantics: placement_reservation_lattice_v0`, `body_snap_to_grid: no`, grid span de reservation distinct de la taille physique du body, `printability_report_v0`, `printability_checked: yes`, `printability_validated_by_print: no`, warnings printability lisibles et `Print validation: false`.
+
+Limites maintenues : packing encore heuristique, pas de solveur global, pas d'optimisation avancee, encoches primitives, UX perfectible, pas de palette HTML, pas de tableau assets avance, pas d'export STL/3MF valide, pas de fillets/conges, pas de courbes/demi-lunes/scoops, pas de visualisation individuelle des items, aucune impression 3D validee.
+
+## P17-PRINTABLE-EXPORT-AND-PREPRINT-SPRINT
+
+Statut : sprint lance apres validation humaine P16. Objectif : definir puis implementer une premiere chaine V0 de pre-impression : export de modules imprimables, manifeste export, dossier de sortie propre, rapport printability plus actionnable et preparation d'un pack imprimable sans pretendre a une validation physique.
+
+Garde-fous : export depuis Fusion uniquement si l'API est fiable, pas d'export des objets non-BGIG, references, debug sketches/outlines ou helpers/source occurrences, `print-validated: false` obligatoire, aucune promesse `ready to print` absolue. Premiere mission ready : `P17-M001 - ADR export/preprint V0`.

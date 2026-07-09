@@ -256,3 +256,18 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 - C-FUSION-UI : `gate-prepared` pour validation Fusion P16 avec preset `p16_ergonomic_tray_packing` et settings UI P16.
 - C-QUALITY : scripts Fusion de preparation et verification add-in couvrent les marqueurs `quick_asset_box`, `target_aspect_ratio`, `max_module_length_mm` et diagnostics P16.
 - Gate : validation humaine Fusion P16 active ; aucune impression reelle validee.
+
+
+## P16 validation capability update
+
+- C-ASSET : `fusion-validated-v0` pour `flat_tray_2d_v0` sur assets simples, piles organisees en colonnes/rangees et modules moins lineaires.
+- C-FUSION-UI : validation Fusion du preset `p16_ergonomic_tray_packing`, persistance des champs P16, generate/regenerate/clear et reporting `linear_layout_avoided`.
+- C-FUSION-CAVITIES / C-ACCESS : compartiments asset-specific et encoches top-open conserves avec les enveloppes 2D.
+- Limite active : P17 doit traiter export/preprint ; aucune impression 3D validee.
+
+## P17 capability target
+
+- C-FUSION-EXPORT : nouvelle cible pour exporter des modules imprimables BGIG depuis Fusion, avec exclusions explicites des references/debug/helpers/non-BGIG.
+- C-QUALITY : manifeste export JSON/Markdown, nommage deterministe, dossier de sortie et audit des modules refuses.
+- C-CALIBRATION : printability blockers V0 et preparation preprint/coupon sans validation physique.
+- Gate : validation humaine Fusion P17 avant tout statut `fusion-validated-v0` d'export ; `print-validated: false` conserve.
