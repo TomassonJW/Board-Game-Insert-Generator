@@ -18,7 +18,7 @@ structurant, authentification absente ou refus de push direct.
 
 ## Gate humaine active
 
-Aucune gate humaine active apres validation Fusion `P15-TRAY-SEMANTICS-ALIGNMENT-SPRINT-V` confirmee le 2026-07-09 sur `648eba9`.
+Gate humaine active : validation Fusion `P16-ERGONOMIC-2D-TRAY-PACKING-SPRINT-V`. Codex doit s'arreter apres preparation locale de l'add-in et des settings P16.
 
 ## Sprint actif
 
@@ -34,11 +34,11 @@ Mission interne terminee : P16-M004 - Clarifier UI et reporting P16, champs opti
 
 Mission interne terminee : P16-M005 - Preset P16 realiste, preset `p16_ergonomic_tray_packing` par defaut du script smoke.
 
-Mission interne ready : P16-M006 - Preparation gate Fusion P16.
+Mission interne terminee : P16-M006 - Preparation gate Fusion P16, add-in/settings a preparer localement puis validation humaine requise.
 
 ## Mission ready non gated
 
-`P16-M006 - Preparation gate Fusion P16`.
+Aucune. Gate humaine Fusion P16 active.
 
 ## Regle operationnelle Fusion
 

@@ -755,3 +755,11 @@ Le script `scripts/fusion/prepare_quick_asset_test.ps1` utilise maintenant `p16_
 Assets exacts : `coin-tokens,tokens,48,10,10,2,loose; status-tokens,tokens,36,10,10,2,loose; damage-tokens,tokens,24,14,12,2,loose; dice-set,dice,8,16,16,16,loose; wood-meeples,meeples,18,12,12,8,loose`.
 
 Objectif de gate : verifier dans Fusion que le rapport expose `flat_tray_2d_v0`, des `pile_grid_columns` / `pile_grid_rows` multi-ranges, `linear_layout_avoided`, les champs P16 rehydrates, les compartiments/encoches existants, `printability_checked: yes`, `Registry validation: ok` et `Print validation: false`.
+
+## P16-M006 - Preparation gate Fusion P16
+
+Statut : `gate-prepared`, validation humaine Fusion `P16-ERGONOMIC-2D-TRAY-PACKING-SPRINT-V` requise, `print-validated: false`.
+
+La gate P16 doit utiliser le preset `p16_ergonomic_tray_packing`, mode `quick_asset_box`, action `generate` ou `regenerate` si une scene BGIG existe deja, generation `compact_only`, box `240 x 170 x 60`, grid `8 x 5 x 3`, `max_stack_height_mm = 18`, `target_aspect_ratio = 1.4`, `max_module_length_mm = 70`.
+
+Validation attendue : `tray_packing_policy: flat_tray_2d_v0`, `pile_grid_columns`, `pile_grid_rows`, `target_aspect_ratio`, `max_module_length_mm`, `linear_layout_avoided`, compartiments et encoches V0 conserves, regenerate sans doublon, clear preserve non-BGIG, `Registry validation: ok`, `Print validation: false`.

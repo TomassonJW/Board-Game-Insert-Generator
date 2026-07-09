@@ -250,3 +250,9 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 - C-ASSET : scenario 5 assets oriente validation ergonomique du packing `flat_tray_2d_v0`, sans nouvelle geometrie.
 - C-QUALITY : catalogue de presets teste comme configs valides ; preparation gate Fusion attendue en P16-M006.
 - Validation : tests automatises OK ; validation Fusion P16 reste a faire ; `print-validated: false`.
+
+## P16-M006 capability update
+
+- C-FUSION-UI : `gate-prepared` pour validation Fusion P16 avec preset `p16_ergonomic_tray_packing` et settings UI P16.
+- C-QUALITY : scripts Fusion de preparation et verification add-in couvrent les marqueurs `quick_asset_box`, `target_aspect_ratio`, `max_module_length_mm` et diagnostics P16.
+- Gate : validation humaine Fusion P16 active ; aucune impression reelle validee.

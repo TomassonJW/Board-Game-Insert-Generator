@@ -994,7 +994,7 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Capability : C-FUSION-UI, C-QUALITY.
 - Objectif : installer l'add-in, ecrire les settings P16, verifier les marqueurs et fournir les actions Fusion restantes.
 - Gate : validation humaine Fusion P16.
-- Statut : `todo`.
+- Statut : `done`, gate humaine active.
 
 ### P16-M001 - Strategie flat_tray_2d documentee
 
@@ -1021,3 +1021,8 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 
 - Livrable : catalogue `quick_asset_presets.json` enrichi avec `p16_ergonomic_tray_packing`, script `prepare_quick_asset_test.ps1` par defaut sur P16, settings `quick_asset_box` incluant les champs P16.
 - Statut : `done`, `implemented-smoke-prep`, validation Fusion P16 encore requise.
+
+### P16-M006 - Gate Fusion P16 preparee
+
+- Livrable : procedure locale `prepare_quick_asset_test.ps1 -Preset p16_ergonomic_tray_packing`, marqueurs add-in P16 verifies par `check_installed_addin.ps1`, actions Fusion restantes documentees.
+- Statut : `done`, `gate-prepared`, validation humaine Fusion active.
