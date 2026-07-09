@@ -11,6 +11,7 @@ from context import ROOT
 from board_game_insert_generator.cad_ir import build_blank_cad_scene
 from board_game_insert_generator.config_loader import load_config
 from board_game_insert_generator.layout import generate_basic_layout
+from board_game_insert_generator.report import layout_to_json
 from fusion_addin.BoardGameInsertGenerator import BoardGameInsertGenerator as fusion_entrypoint
 from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     ASSEMBLY_DOCUMENT_REQUIRED_STATUS,
@@ -1656,6 +1657,51 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("box inner size, mm", entrypoint_source)
         self.assertEqual(fusion_entrypoint._ui_parameter_label("grid_units_x", "Grid units X"), "Grid units X (grid cell count)")
         self.assertEqual(fusion_entrypoint._ui_parameter_label("print_profile", "Print profile"), "Print profile (default, draft or fine)")
+
+    def test_quick_asset_fusion_smoke_presets_are_valid_configs(self) -> None:
+        catalog_path = ROOT / "scripts" / "fusion" / "quick_asset_presets.json"
+        catalog = json.loads(catalog_path.read_text(encoding="utf-8-sig"))
+
+        self.assertEqual(catalog["schema"], "bgig.quick_asset_presets.v0")
+        self.assertEqual(
+            set(catalog["presets"]),
+            {"tokens", "dice_meeples_generic", "cards_tokens"},
+        )
+        for preset_name, preset in catalog["presets"].items():
+            overrides = {
+                "box_inner_x_mm": str(preset["box_inner_mm"]["x"]),
+                "box_inner_y_mm": str(preset["box_inner_mm"]["y"]),
+                "box_inner_z_mm": str(preset["box_inner_mm"]["z"]),
+                "grid_units_x": str(preset["grid_units"]["x"]),
+                "grid_units_y": str(preset["grid_units"]["y"]),
+                "grid_units_z": str(preset["grid_units"]["z"]),
+                "wall_thickness_mm": "1.2",
+                "floor_thickness_mm": "1.2",
+                "peripheral_clearance_mm": "0.4",
+                "inter_module_clearance_mm": "0.3",
+                "print_profile": "draft",
+            }
+
+            asset_report = parse_quick_asset_box_assets_text(preset["assets_text"])
+            self.assertGreater(len(asset_report["accepted_assets"]), 0, preset_name)
+            self.assertEqual(asset_report["rejected_assets"], [], preset_name)
+
+            config_payload = build_quick_asset_box_config_payload(overrides, preset["assets_text"])
+            self.assertEqual(config_payload["modules"], [], preset_name)
+            self.assertGreater(len(config_payload["assets"]), 0, preset_name)
+            self.assertEqual(
+                config_payload["box"]["inner_dimensions_mm"]["x"],
+                float(preset["box_inner_mm"]["x"]),
+                preset_name,
+            )
+            self.assertIn("volumetric_grid", config_payload, preset_name)
+            with tempfile.TemporaryDirectory() as temp_dir:
+                config_path = Path(temp_dir) / f"{preset_name}.json"
+                config_path.write_text(json.dumps(config_payload), encoding="utf-8")
+                config = load_config(config_path)
+                report = generate_basic_layout(config)
+            payload = json.loads(layout_to_json(config, report))
+            self.assertGreaterEqual(payload["summary"]["module_candidate_count"], 1, preset_name)
 
     def test_addin_entrypoint_uses_linked_component_occurrences(self) -> None:
         entrypoint_path = ROOT / "fusion_addin" / "BoardGameInsertGenerator" / "BoardGameInsertGenerator.py"

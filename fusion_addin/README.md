@@ -696,3 +696,7 @@ Le smoke P14 doit verifier dans le message `quick_asset_box` : `printability_che
 ### P14-USABLE-ASSET-TRAY-M003 quick_asset_box UX markers
 
 Le smoke P14 doit verifier que la commande affiche `Quick asset format and units`, le format `asset_id,type,count,x_mm,y_mm,z_mm,fit`, l'exemple `coin-tokens,tokens,30,20,20,2,loose`, et des labels indiquant les unites pour boite, grille, murs, fond et clearances.
+
+### P14-USABLE-ASSET-TRAY-M004 quick_asset_box presets
+
+Le script `scripts/fusion/prepare_quick_asset_test.ps1` accepte `-Preset tokens`, `-Preset dice_meeples_generic` et `-Preset cards_tokens`. Le catalogue est `scripts/fusion/quick_asset_presets.json`. `-AssetsText` reste prioritaire pour un cas manuel. Le smoke Fusion doit verifier que le preset choisi hydrate bien `bgig_ui_settings.json`, que le champ `Assets (quick_asset_box)` est pre-rempli, et que le rapport reste explicite sur les limites non print-validees.

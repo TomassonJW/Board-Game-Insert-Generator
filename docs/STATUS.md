@@ -632,3 +632,9 @@ Le rapport reste volontairement heuristique et report-only : il ne change aucune
 Statut : `implemented-fusion-ui`, validation Fusion sprint P14 requise, `print-validated: false`.
 
 P14-M003 ameliore la commande Fusion classique sans palette HTML : ajout d'un bloc visible `Quick asset format and units`, exemple inline `coin-tokens,tokens,30,20,20,2,loose`, rappel du format `asset_id,type,count,x_mm,y_mm,z_mm,fit`, explication de `count`, des dimensions en mm, de la semantique cartes/decks et des valeurs `fit`. Les champs parametriques affichent maintenant des labels contextualises pour boite, grille, murs, fond, clearances et profil d'impression. La persistance existante reste inchangee.
+
+## P14-USABLE-ASSET-TRAY-M004 - Presets et scenarios quick asset
+
+Statut : `implemented-smoke-prep`, tests automatises OK, validation Fusion sprint P14 requise, `print-validated: false`.
+
+P14-M004 ajoute un catalogue local `scripts/fusion/quick_asset_presets.json` et un parametre `-Preset` a `scripts/fusion/prepare_quick_asset_test.ps1`. Les presets disponibles sont `tokens`, `dice_meeples_generic` et `cards_tokens`. Le preset par defaut reste compatible avec le smoke tokens P13/P14 existant, `-AssetsText` reste un override manuel, et aucun comportement de geometrie produit n'est modifie.

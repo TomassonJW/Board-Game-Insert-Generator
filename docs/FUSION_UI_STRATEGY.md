@@ -398,3 +398,7 @@ Le rapport Fusion `quick_asset_box` affiche maintenant `printability_checked: ye
 ## P14-USABLE-ASSET-TRAY-M003 - Aide inline quick_asset_box
 
 La commande Fusion classique affiche maintenant une aide courte avant le champ `Assets (quick_asset_box)` : format, exemple, unites, role de `count`, semantique `x/y/z`, cas cards/sleeved_cards et valeurs `fit`. Les champs boite/grille/murs/fond/clearances ont des labels plus explicites. Aucune palette HTML n'est introduite.
+
+## P14-USABLE-ASSET-TRAY-M004 - Presets quick_asset_box
+
+Le script `scripts/fusion/prepare_quick_asset_test.ps1` accepte maintenant `-Preset tokens`, `-Preset dice_meeples_generic` et `-Preset cards_tokens`. Les presets sont stockes dans `scripts/fusion/quick_asset_presets.json`, ecrivent les dimensions de boite/grille et le champ `Assets (quick_asset_box)` dans `bgig_ui_settings.json`, et gardent `-AssetsText` comme override manuel. Cette mission prepare les smoke tests ; elle n'ajoute pas de tableau avance ni de palette persistante.

@@ -887,4 +887,12 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Milestone : M14 Usable beta.
 - Objectif : permettre de charger rapidement des cas types `quick_asset_box` sans tableau avance.
 - Livrable : presets tokens, dice/meeples/generic, eventuellement cards+tokens si la semantique reste claire, scripts smoke/documentation mis a jour.
+- Statut : `done`, `implemented-smoke-prep`, validation Fusion sprint P14 requise, `print-validated: false`.
+
+### P14-USABLE-ASSET-TRAY-M005 - Preparation gate Fusion sprint P14
+
+- Capability : C-FUSION-UI, C-ASSET, C-QUALITY.
+- Milestone : M14 Usable beta.
+- Objectif : preparer un smoke test Fusion global du sprint P14 avec add-in installe, settings presets et criteres observables.
+- Livrable : script smoke pret, marqueurs installes verifies, rapport d'actions Fusion restantes.
 - Statut : `ready`, mission interne suivante du sprint P14.

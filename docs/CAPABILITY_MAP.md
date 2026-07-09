@@ -161,3 +161,9 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 
 - C-FUSION-UI : `implemented-fusion-ui` pour aide inline `quick_asset_box`, exemple de saisie, rappel des unites et labels parametriques plus lisibles.
 - C-ASSET : UX de saisie asset-first plus explicite, sans changement de schema ni palette HTML.
+
+## P14-USABLE-ASSET-TRAY-M004 capability update
+
+- C-FUSION-UI : `implemented-smoke-prep` pour presets de preparation `quick_asset_box` via script Fusion.
+- C-ASSET : scenarios V0 tokens, dice/meeples/generic et cards+tokens documentes comme entrees de smoke test, sans nouveau solveur ni nouvelle geometrie.
+- Validation : tests automatises OK, validation Fusion sprint P14 requise, aucune impression reelle validee.
