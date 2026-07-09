@@ -895,4 +895,4 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Milestone : M14 Usable beta.
 - Objectif : preparer un smoke test Fusion global du sprint P14 avec add-in installe, settings presets et criteres observables.
 - Livrable : script smoke pret, marqueurs installes verifies, rapport d'actions Fusion restantes.
-- Statut : `ready`, mission interne suivante du sprint P14.
+- Statut : `done`, preparation locale effectuee, validation humaine Fusion sprint P14 requise.

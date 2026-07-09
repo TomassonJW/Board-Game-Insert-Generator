@@ -167,3 +167,9 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 - C-FUSION-UI : `implemented-smoke-prep` pour presets de preparation `quick_asset_box` via script Fusion.
 - C-ASSET : scenarios V0 tokens, dice/meeples/generic et cards+tokens documentes comme entrees de smoke test, sans nouveau solveur ni nouvelle geometrie.
 - Validation : tests automatises OK, validation Fusion sprint P14 requise, aucune impression reelle validee.
+## P14-USABLE-ASSET-TRAY-M005 capability update
+
+- C-FUSION-UI : `gate-prepared` pour la validation Fusion sprint P14 avec add-in installe et settings `quick_asset_box` precharges.
+- C-ASSET : scenario tokens P14 pret pour validation humaine, presets alternatifs disponibles mais non Fusion-valides.
+- C-QUALITY : marqueurs d'add-in installes verifies par script.
+- Validation : tests automatises OK, gate humaine Fusion active, aucune impression reelle validee.

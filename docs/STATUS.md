@@ -638,3 +638,8 @@ P14-M003 ameliore la commande Fusion classique sans palette HTML : ajout d'un bl
 Statut : `implemented-smoke-prep`, tests automatises OK, validation Fusion sprint P14 requise, `print-validated: false`.
 
 P14-M004 ajoute un catalogue local `scripts/fusion/quick_asset_presets.json` et un parametre `-Preset` a `scripts/fusion/prepare_quick_asset_test.ps1`. Les presets disponibles sont `tokens`, `dice_meeples_generic` et `cards_tokens`. Le preset par defaut reste compatible avec le smoke tokens P13/P14 existant, `-AssetsText` reste un override manuel, et aucun comportement de geometrie produit n'est modifie.
+## P14-USABLE-ASSET-TRAY-M005 - Preparation gate Fusion sprint P14
+
+Statut : `gate-prepared`, add-in installe localement, settings `quick_asset_box` preset `tokens` ecrits, marqueurs installes OK, validation humaine Fusion `P14-USABLE-ASSET-TRAY-SPRINT-V` requise, `print-validated: false`.
+
+Preparation executee avec `scripts/fusion/prepare_quick_asset_test.ps1 -Preset tokens`, puis `scripts/fusion/check_installed_addin.ps1`. Le smoke Fusion doit verifier le sprint P14 complet : layout multi-assets, printability report V0, aide inline quick_asset_box, presets de preparation, regeneration sans doublon, clear preserve non-BGIG, et absence de validation impression 3D.

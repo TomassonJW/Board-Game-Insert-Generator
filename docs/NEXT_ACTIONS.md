@@ -18,7 +18,7 @@ structurant, authentification absente ou refus de push direct.
 
 ## Gate humaine active
 
-Aucune gate humaine active pendant les missions automatisables du sprint P14 explicitement autorise. La prochaine validation humaine attendue reste la validation Fusion finale `P14-USABLE-ASSET-TRAY-SPRINT-V` apres preparation locale.
+Gate humaine active : `P14-USABLE-ASSET-TRAY-SPRINT-V`.
 
 ## Sprint actif
 
@@ -32,11 +32,11 @@ Mission interne terminee : `P14-USABLE-ASSET-TRAY-M003 - UX quick_asset_box V0 p
 
 Mission interne terminee : `P14-USABLE-ASSET-TRAY-M004 - Presets et scenarios quick asset`, `implemented-smoke-prep`, tests automatises OK, validation Fusion sprint P14 requise, `print-validated: false`.
 
-Mission interne suivante : `P14-USABLE-ASSET-TRAY-M005 - Preparation gate Fusion sprint P14`.
+Mission interne terminee : `P14-USABLE-ASSET-TRAY-M005 - Preparation gate Fusion sprint P14`, add-in installe localement, settings `quick_asset_box` preset `tokens` ecrits, marqueurs installes OK, validation Fusion humaine requise.
 
 ## Mission ready non gated
 
-`P14-USABLE-ASSET-TRAY-M005 - Preparation gate Fusion sprint P14` est la prochaine mission interne autorisee du sprint P14.
+Le sprint P14 est pret pour validation humaine Fusion `P14-USABLE-ASSET-TRAY-SPRINT-V`. Ne pas lancer de nouvelle mission produit avant retour humain.
 
 ## Regle operationnelle Fusion
 
