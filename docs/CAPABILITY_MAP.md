@@ -202,3 +202,17 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 - C-FUSION-UI : `gate-prepared` pour preset `p15_tray_semantics` par defaut, settings `quick_asset_box` et `max_stack_height_mm = 18`.
 - C-ASSET : scenario 5 assets bas couvrant tokens, dice, meeples et generic sans towers hautes par defaut.
 - C-QUALITY : smoke P15 documente et automatisable via `prepare_quick_asset_test.ps1 -Preset p15_tray_semantics` puis validation humaine Fusion.
+
+## P15 validation capability update
+
+- C-ASSET : `fusion-validated-v0` pour le realignement semantique P15 : `z_mm` et `count` clarifies, `flat_tray` par defaut pour assets simples, `max_stack_height_mm` expose et pris en compte, expansion XY avant Z.
+- C-GRID-3D : `fusion-validated-v0` pour le reporting de grille comme `placement_reservation_lattice_v0`, `body_snap_to_grid: no` et span reserve distinct du body imprimable.
+- C-FUSION-UI : validation Fusion du preset `p15_tray_semantics`, persistance UI, generate/regenerate/clear, compartiments/encoches et reporting P15.
+- Limite active : P16 doit corriger le layout `flat_tray_linear_v0` trop allonge en X ; aucune impression 3D validee.
+
+## P16 capability target
+
+- C-ASSET : cible `flat_tray_2d_v0` pour assets simples, avec piles organisees en colonnes/rangees.
+- C-SOLVER : heuristique deterministe bornee, sans solveur global, backtracking ni optimisation avancee.
+- C-FUSION-UI : reporting attendu `tray_packing_policy`, `pile_grid_columns`, `pile_grid_rows`, `target_aspect_ratio`, `max_module_length_mm`, warnings si 2D impossible.
+- Gate : validation humaine Fusion P16 avant statut `fusion-validated-v0`; `print-validated: false` conserve.

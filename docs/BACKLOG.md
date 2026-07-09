@@ -938,3 +938,58 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Livrable : preset `p15_tray_semantics`, script `prepare_quick_asset_test.ps1` par defaut sur P15, settings `quick_asset_box` avec `max_stack_height_mm = 18`, documentation de smoke.
 - Tests : unittest, py_compile add-in, CLI Markdown/JSON/export CAD IR, DryRun script P15, installation add-in, check installed add-in, `git diff --check`, `rg adsk`.
 - Statut : `gate-prepared`, validation humaine Fusion P15 requise, `print-validated: false`.
+
+## P15 Validation Fusion et transition P16
+
+### P15-TRAY-SEMANTICS-ALIGNMENT-SPRINT-V - Valider le realignement semantique tray
+
+- Capability : C-ASSET, C-FUSION-UI, C-QUALITY.
+- Milestone : M14 Usable beta.
+- Validation : confirmee humainement dans Fusion le 2026-07-09 sur `648eba9`.
+- Resultat : `quick_asset_box`, preset `p15_tray_semantics`, `flat_tray`, `max_stack_height_mm`, semantique grid, compartiments, encoches, regenerate et clear valides.
+- Limites : packing 2D ergonomique non valide, optimisation avancee absente, UX perfectible, `print-validated: false`.
+- Statut : `done`, `fusion-validated-v0`, `print-validated: false`.
+
+### P16-M001 - Documenter la strategie flat_tray_2d
+
+- Capability : C-ASSET, C-SOLVER, C-QUALITY.
+- Milestone : M14 Usable beta / M10 Semi-automatic solver borne.
+- Objectif : definir `flat_tray_linear_v0`, `flat_tray_2d_v0`, `vertical_stack`, `pile_count`, `items_per_pile`, `pile_grid_columns`, `pile_grid_rows`, `target_aspect_ratio`, `max_module_length_mm`, `max_stack_height_mm` et la semantique grid.
+- Livrable : ADR dediee packing 2D, mises a jour docs strategie.
+- Tests : inspection documentaire, suite unitaire, `git diff --check`.
+- Gate : aucune tant que la mission reste documentaire et additive.
+- Statut : `ready`.
+
+### P16-M002 - Implementer packing 2D V0 des piles
+
+- Capability : C-ASSET, C-SOLVER.
+- Milestone : M14 Usable beta.
+- Objectif : remplacer le layout `flat_tray` lineaire par une organisation 2D deterministe pour tokens/dice/meeples/generic.
+- Livrable : heuristique `flat_tray_2d_v0`, diagnostics de piles, tests count/ratio/longueur.
+- Gate : aucune si pas de solveur global, pas de backtracking et schema additif.
+- Statut : `todo`.
+
+### P16-M003 - Aligner compartiments, cavites et notches sur le packing 2D
+
+- Capability : C-ASSET, C-FUSION-CAVITIES, C-ACCESS.
+- Objectif : faire suivre les enveloppes `asset_fit`, compartiments et notches par le nouveau packing 2D sans cavites par item.
+- Statut : `todo`.
+
+### P16-M004 - Clarifier UI et reporting P16
+
+- Capability : C-FUSION-UI, C-ASSET.
+- Objectif : exposer/reporting `tray_packing_policy`, `pile_grid_columns`, `pile_grid_rows`, `target_aspect_ratio`, `max_module_length_mm` et warning si layout lineaire inevitable.
+- Statut : `todo`.
+
+### P16-M005 - Preset P16 realiste
+
+- Capability : C-FUSION-UI, C-QUALITY.
+- Objectif : ajouter `p16_ergonomic_tray_packing` et en faire le preset par defaut de gate P16.
+- Statut : `todo`.
+
+### P16-M006 - Preparation gate Fusion P16
+
+- Capability : C-FUSION-UI, C-QUALITY.
+- Objectif : installer l'add-in, ecrire les settings P16, verifier les marqueurs et fournir les actions Fusion restantes.
+- Gate : validation humaine Fusion P16.
+- Statut : `todo`.

@@ -689,3 +689,23 @@ P15-M005 ajoute le preset `p15_tray_semantics` et le met par defaut dans `script
 Validation automatique locale : le preset lit 5 assets, genere 4 candidats/modules places, planifie 5 compartiments et 5 encoches, et produit des modules bas : tokens `132.8 x 22.0 x 18.0 mm`, dice `132.0 x 20.0 x 18.0 mm`, meeples `112.8 x 16.8 x 18.4 mm`, cubes `98.4 x 10.4 x 17.2 mm`. Le rapport attendu expose `flat_tray`, `stack_height_policy`, `max_stack_height_mm`, `grid_semantics: placement_reservation_lattice_v0`, `body_snap_to_grid: no`, printability report et `Print validation: false`.
 
 Gate humaine active : ouvrir Fusion, verifier les settings precharges, generer, verifier que les modules ne deviennent pas des tours hautes, modifier `count` ou `max_stack_height_mm`, lancer `regenerate` sans doublon, puis `clear_bgig_scene` avec preservation non-BGIG.
+
+## P15-TRAY-SEMANTICS-ALIGNMENT-SPRINT-V - Validation Fusion
+
+Validation humaine Fusion confirmee le 2026-07-09 sur le commit `648eba9`.
+
+Resultats observes : add-in reinstalle par scripts Codex, document Fusion Assembly-compatible, settings UI charges, mode `quick_asset_box`, preset `p15_tray_semantics`, box `220 x 160 x 60`, grid `8 x 5 x 3` et `Max stack height mm = 18` rehydrates correctement. `generate`, `regenerate` et `clear_bgig_scene` fonctionnent ; regenerate remplace sans doublon ; les objets non-BGIG sont preserves.
+
+P15 est valide comme realignement semantique asset-first : `z_mm` et `count` sont clarifies, `flat_tray` devient le defaut pour les assets simples, `max_stack_height_mm` est expose et pris en compte, l'expansion XY precede l'expansion Z, et la grille est reportee comme `placement_reservation_lattice_v0` avec `body_snap_to_grid: no`. Les modules ne deviennent plus automatiquement des tours hautes et restent autour de 17-18 mm dans le smoke P15.
+
+Limites maintenues : `print-validated: false`, pas de packing 2D ergonomique, pas d'optimisation avancee, encoches primitives, UX encore perfectible, pas d'export STL/3MF, pas de fillets/conges, pas de visualisation individuelle des items.
+
+Dette produit ouverte pour P16 : le layout `flat_tray` V0 etale encore les piles principalement en ligne X, ce qui produit des modules longs peu ergonomiques. Le sprint suivant doit introduire un packing 2D de piles/compartiments avec ratio cible, longueur maximale, lignes/colonnes et reporting explicite.
+
+## P16-ERGONOMIC-2D-TRAY-PACKING-SPRINT
+
+Statut : sprint lance apres validation humaine P15. Objectif : remplacer le comportement `flat_tray` lineaire par une heuristique deterministe `flat_tray_2d_v0` pour les assets simples (`tokens`, `dice`, `meeples`, `generic`), sans solveur global, backtracking ni nouvelle geometrie complexe.
+
+Cible produit : organiser les piles en colonnes/rangees, limiter les longues barres X, conserver des modules bas, maintenir compartiments/encoches V0, expliciter `pile_grid_columns`, `pile_grid_rows`, `target_aspect_ratio`, `max_module_length_mm` et les warnings si un layout 2D raisonnable ne tient pas.
+
+Gate attendue : validation Fusion `P16-ERGONOMIC-2D-TRAY-PACKING-SPRINT-V` apres preparation d'un preset `p16_ergonomic_tray_packing`. `Print validation: false` reste obligatoire.
