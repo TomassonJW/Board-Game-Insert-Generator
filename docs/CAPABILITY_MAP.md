@@ -156,3 +156,8 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 - C-CALIBRATION : `implemented-core` pour rapport geometrique `printability_report_v0`, sans validation physique.
 - C-ASSET : modules asset-first enrichis avec checks murs/fond/cavite/encoche.
 - C-FUSION-UI : reporting `quick_asset_box` expose `printability_checked: yes` et `printability_validated_by_print: no`.
+
+## P14-USABLE-ASSET-TRAY-M003 capability update
+
+- C-FUSION-UI : `implemented-fusion-ui` pour aide inline `quick_asset_box`, exemple de saisie, rappel des unites et labels parametriques plus lisibles.
+- C-ASSET : UX de saisie asset-first plus explicite, sans changement de schema ni palette HTML.

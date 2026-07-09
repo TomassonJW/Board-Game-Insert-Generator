@@ -69,6 +69,9 @@ try:
         BGIG_QUICK_PARAMETRIC_BOX_STATUS,
         BGIG_QUICK_ASSET_BOX_DEFAULT_ASSETS,
         BGIG_QUICK_ASSET_BOX_FIELD,
+        BGIG_PARAMETRIC_FIELD_HELP_TEXT,
+        BGIG_QUICK_ASSET_BOX_HELP_TITLE,
+        BGIG_QUICK_ASSET_BOX_HELP_TEXT,
         BGIG_QUICK_ASSET_BOX_STATUS,
         P12_PARAMETRIC_FIELD_LABELS,
         SUPPORTED_FUSION_GENERATION_MODES,
@@ -159,6 +162,9 @@ except ImportError:  # pragma: no cover - Fusion may load the file as a script.
         BGIG_QUICK_PARAMETRIC_BOX_STATUS,
         BGIG_QUICK_ASSET_BOX_DEFAULT_ASSETS,
         BGIG_QUICK_ASSET_BOX_FIELD,
+        BGIG_PARAMETRIC_FIELD_HELP_TEXT,
+        BGIG_QUICK_ASSET_BOX_HELP_TITLE,
+        BGIG_QUICK_ASSET_BOX_HELP_TEXT,
         BGIG_QUICK_ASSET_BOX_STATUS,
         P12_PARAMETRIC_FIELD_LABELS,
         SUPPORTED_FUSION_GENERATION_MODES,
@@ -331,27 +337,35 @@ if adsk is not None:
                     mode_input.listItems.add(mode, mode == default_request.generation_mode, "")
                 inputs.addTextBoxCommandInput(
                     "bgig_parametric_status",
-                    "Parametric fields",
+                    "Mode and field guide",
                     (
                         "Saved in bgig_ui_settings.json and restored when BGIG is reopened. "
                         "Active in config_file, quick_parametric_box and quick_asset_box modes; ignored in cad_ir_file mode. "
                         f"quick_parametric_box: {BGIG_QUICK_PARAMETRIC_BOX_STATUS}. "
-                        f"quick_asset_box: {BGIG_QUICK_ASSET_BOX_STATUS}."
+                        f"quick_asset_box: {BGIG_QUICK_ASSET_BOX_STATUS}. "
+                        f"{BGIG_PARAMETRIC_FIELD_HELP_TEXT}"
                     ),
-                    3,
+                    5,
+                    True,
+                )
+                inputs.addTextBoxCommandInput(
+                    "bgig_quick_asset_box_help",
+                    BGIG_QUICK_ASSET_BOX_HELP_TITLE,
+                    BGIG_QUICK_ASSET_BOX_HELP_TEXT,
+                    4,
                     True,
                 )
                 inputs.addTextBoxCommandInput(
                     QUICK_ASSET_BOX_ASSETS_INPUT_ID,
                     "Assets (quick_asset_box)",
                     defaults.get(BGIG_QUICK_ASSET_BOX_FIELD, BGIG_QUICK_ASSET_BOX_DEFAULT_ASSETS),
-                    5,
+                    6,
                     False,
                 )
                 for parameter_id, label in P12_PARAMETRIC_FIELD_LABELS.items():
                     inputs.addStringValueInput(
                         _parameter_input_id(parameter_id),
-                        f"{label} (config_file override / quick box value)",
+                        _ui_parameter_label(parameter_id, label),
                         defaults.get(parameter_id, P12_PARAMETRIC_FIELD_DEFAULTS[parameter_id]),
                     )
                 inputs.addTextBoxCommandInput(
@@ -522,6 +536,19 @@ def _active_bgig_scene_exists() -> bool:
     return int(inspection.get("bgig_scene_roots_total", 0)) > 0
 
 
+
+def _ui_parameter_label(parameter_id: str, label: str) -> str:
+    if parameter_id.startswith("box_inner_"):
+        return f"{label} (box inner size, mm)"
+    if parameter_id.startswith("grid_units_"):
+        return f"{label} (grid cell count)"
+    if parameter_id in {"wall_thickness_mm", "floor_thickness_mm"}:
+        return f"{label} (printable wall/floor, mm)"
+    if parameter_id in {"peripheral_clearance_mm", "inter_module_clearance_mm"}:
+        return f"{label} (clearance, mm)"
+    if parameter_id == "print_profile":
+        return f"{label} (default, draft or fine)"
+    return f"{label} (config_file override / quick box value)"
 def _parameter_input_id(parameter_id: str) -> str:
     return f"{PARAMETER_INPUT_PREFIX}{parameter_id}"
 

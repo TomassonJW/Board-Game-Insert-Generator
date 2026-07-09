@@ -626,3 +626,9 @@ Statut : `implemented-core`, validation Fusion sprint P14 requise, `print-valida
 P14-M002 ajoute `printability_report_v0` aux modules asset-first generes et aux placements CAD IR. Le rapport verifie les dimensions deja resolues par le moteur : murs externes minimum, paroi interne minimum, fond conserve, profondeur maximale de cavite, profondeur maximale d'encoche et hauteur de module. Il expose `printability_checked: yes` et `printability_validated_by_print: no`.
 
 Le rapport reste volontairement heuristique et report-only : il ne change aucune tolerance par defaut, ne valide aucune impression physique et ne remplace pas une calibration reelle. Le message `quick_asset_box` affiche maintenant les lignes printability et les warnings associes.
+
+## P14-USABLE-ASSET-TRAY-M003 - UX quick_asset_box V0 plus lisible
+
+Statut : `implemented-fusion-ui`, validation Fusion sprint P14 requise, `print-validated: false`.
+
+P14-M003 ameliore la commande Fusion classique sans palette HTML : ajout d'un bloc visible `Quick asset format and units`, exemple inline `coin-tokens,tokens,30,20,20,2,loose`, rappel du format `asset_id,type,count,x_mm,y_mm,z_mm,fit`, explication de `count`, des dimensions en mm, de la semantique cartes/decks et des valeurs `fit`. Les champs parametriques affichent maintenant des labels contextualises pour boite, grille, murs, fond, clearances et profil d'impression. La persistance existante reste inchangee.

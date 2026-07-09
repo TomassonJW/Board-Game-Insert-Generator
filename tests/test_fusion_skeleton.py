@@ -1635,6 +1635,28 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertFalse(referenced_ids - defined_ids, f"Undefined UI input IDs: {sorted(referenced_ids - defined_ids)}")
         self.assertIn("QUICK_ASSET_BOX_ASSETS_INPUT_ID", defined_ids)
         self.assertIn("Assets (quick_asset_box)", source)
+        self.assertIn("BGIG_QUICK_ASSET_BOX_HELP_TEXT", source)
+        self.assertIn("BGIG_QUICK_ASSET_BOX_HELP_TITLE", source)
+        self.assertIn("Mode and field guide", source)
+        self.assertIn("_ui_parameter_label", source)
+
+    def test_quick_asset_box_ui_help_text_is_human_readable(self) -> None:
+        source = (ROOT / "fusion_addin" / "BoardGameInsertGenerator" / "fusion_skeleton.py").read_text(encoding="utf-8")
+        entrypoint_source = (ROOT / "fusion_addin" / "BoardGameInsertGenerator" / "BoardGameInsertGenerator.py").read_text(encoding="utf-8")
+
+        self.assertIn("Quick asset format and units", source)
+        self.assertIn("Format: asset_id,type,count,x_mm,y_mm,z_mm,fit", source)
+        self.assertIn("Example: coin-tokens,tokens,30,20,20,2,loose", source)
+        self.assertIn("count = number of items", source)
+        self.assertIn("For cards/sleeved_cards, z_mm is the total deck height", source)
+        self.assertIn("Box fields are inner dimensions in mm", source)
+        self.assertIn("Grid units split the box", source)
+        self.assertIn("BGIG_QUICK_ASSET_BOX_HELP_TEXT", entrypoint_source)
+        self.assertIn("bgig_quick_asset_box_help", entrypoint_source)
+        self.assertIn("box inner size, mm", entrypoint_source)
+        self.assertEqual(fusion_entrypoint._ui_parameter_label("grid_units_x", "Grid units X"), "Grid units X (grid cell count)")
+        self.assertEqual(fusion_entrypoint._ui_parameter_label("print_profile", "Print profile"), "Print profile (default, draft or fine)")
+
     def test_addin_entrypoint_uses_linked_component_occurrences(self) -> None:
         entrypoint_path = ROOT / "fusion_addin" / "BoardGameInsertGenerator" / "BoardGameInsertGenerator.py"
         source = entrypoint_path.read_text(encoding="utf-8")

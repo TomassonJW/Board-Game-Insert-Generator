@@ -394,3 +394,7 @@ Validation humaine attendue : verifier dans Fusion que chaque compartiment suppo
 ## P14-USABLE-ASSET-TRAY-M002 - Printability dans le message quick_asset_box
 
 Le rapport Fusion `quick_asset_box` affiche maintenant `printability_checked: yes`, `printability_validated_by_print: no`, un resume `printability_report_v0` par module et les `printability_warning`. Cette UI reste une commande Fusion classique et le rapport ne remplace pas une impression de test.
+
+## P14-USABLE-ASSET-TRAY-M003 - Aide inline quick_asset_box
+
+La commande Fusion classique affiche maintenant une aide courte avant le champ `Assets (quick_asset_box)` : format, exemple, unites, role de `count`, semantique `x/y/z`, cas cards/sleeved_cards et valeurs `fit`. Les champs boite/grille/murs/fond/clearances ont des labels plus explicites. Aucune palette HTML n'est introduite.

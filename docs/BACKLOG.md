@@ -879,4 +879,12 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Milestone : M14 Usable beta.
 - Objectif : rendre la commande Fusion classique `quick_asset_box` plus comprehensible sans palette HTML.
 - Livrable : sections/labels/aide courte, exemple inline, rappel des unites et explication de count/x/y/z/walls/floor/clearances, persistance conservee.
+- Statut : `done`, `implemented-fusion-ui`, validation Fusion sprint P14 requise, `print-validated: false`.
+
+### P14-USABLE-ASSET-TRAY-M004 - Presets et scenarios quick asset
+
+- Capability : C-FUSION-UI, C-ASSET.
+- Milestone : M14 Usable beta.
+- Objectif : permettre de charger rapidement des cas types `quick_asset_box` sans tableau avance.
+- Livrable : presets tokens, dice/meeples/generic, eventuellement cards+tokens si la semantique reste claire, scripts smoke/documentation mis a jour.
 - Statut : `ready`, mission interne suivante du sprint P14.

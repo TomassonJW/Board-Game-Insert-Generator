@@ -28,11 +28,13 @@ Mission interne terminee : `P14-USABLE-ASSET-TRAY-M001 - Robustifier le layout m
 
 Mission interne terminee : `P14-USABLE-ASSET-TRAY-M002 - Printability safety report V0`, `implemented-core`, tests automatises OK, validation Fusion sprint P14 requise, `print-validated: false`.
 
-Mission interne suivante : `P14-USABLE-ASSET-TRAY-M003 - UX quick_asset_box V0 plus lisible`.
+Mission interne terminee : `P14-USABLE-ASSET-TRAY-M003 - UX quick_asset_box V0 plus lisible`, `implemented-fusion-ui`, tests automatises OK, validation Fusion sprint P14 requise, `print-validated: false`.
+
+Mission interne suivante : `P14-USABLE-ASSET-TRAY-M004 - Presets et scenarios quick asset`.
 
 ## Mission ready non gated
 
-`P14-USABLE-ASSET-TRAY-M003 - UX quick_asset_box V0 plus lisible` est la prochaine mission interne autorisee du sprint P14.
+`P14-USABLE-ASSET-TRAY-M004 - Presets et scenarios quick asset` est la prochaine mission interne autorisee du sprint P14.
 
 ## Regle operationnelle Fusion
 

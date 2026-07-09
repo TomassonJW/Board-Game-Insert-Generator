@@ -107,6 +107,19 @@ BGIG_QUICK_ASSET_BOX_DEFAULT_ASSETS = (
     "coin-tokens,tokens,30,20,20,2,loose; "
     "status-tokens,tokens,20,18,18,2,loose"
 )
+BGIG_QUICK_ASSET_BOX_HELP_TITLE = "Quick asset format and units"
+BGIG_QUICK_ASSET_BOX_HELP_TEXT = (
+    "Use one asset per line or separate assets with ';'. Format: asset_id,type,count,x_mm,y_mm,z_mm,fit. "
+    "Example: coin-tokens,tokens,30,20,20,2,loose. "
+    "count = number of items; x/y/z = one item size in mm for tokens/dice/meeples/generic. "
+    "For cards/sleeved_cards, z_mm is the total deck height. "
+    "fit accepts exact, loose or approximate."
+)
+BGIG_PARAMETRIC_FIELD_HELP_TEXT = (
+    "Box fields are inner dimensions in mm. Grid units split the box into X/Y/Z placement cells. "
+    "Wall/floor/clearance fields are millimeters. print_profile accepts default, draft or fine. "
+    "These fields are saved and restored; cad_ir_file ignores them."
+)
 BGIG_QUICK_ASSET_BOX_SUPPORTED_TYPES = (
     "tokens",
     "dice",

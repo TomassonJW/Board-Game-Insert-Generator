@@ -692,3 +692,7 @@ Dans Fusion, verifier que les encoches sont de vraies coupes rectangulaires top-
 ### P14-USABLE-ASSET-TRAY-M002 printability report smoke markers
 
 Le smoke P14 doit verifier dans le message `quick_asset_box` : `printability_checked: yes`, `printability_validated_by_print: no`, au moins une ligne `printability_report_v0`, les murs/fond reportes, les profondeurs de cavite/encoche et un warning indiquant qu'aucune validation physique n'a ete faite.
+
+### P14-USABLE-ASSET-TRAY-M003 quick_asset_box UX markers
+
+Le smoke P14 doit verifier que la commande affiche `Quick asset format and units`, le format `asset_id,type,count,x_mm,y_mm,z_mm,fit`, l'exemple `coin-tokens,tokens,30,20,20,2,loose`, et des labels indiquant les unites pour boite, grille, murs, fond et clearances.
