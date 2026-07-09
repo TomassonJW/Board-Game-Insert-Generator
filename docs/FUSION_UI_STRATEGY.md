@@ -431,3 +431,7 @@ La commande Fusion classique `quick_asset_box` doit rester le support de P16. La
 - warnings si un module reste long parce que le packing 2D ne tient pas.
 
 Aucune palette HTML, aucun tableau asset avance et aucune nouvelle geometrie complexe ne sont introduits par cette strategie.
+
+## P16-M003 - Diagnostics de cavites et notches lies au packing 2D
+
+Le rapport metadata `quick_asset_box` transporte maintenant la politique de packing 2D jusque dans les diagnostics de cavites et d'encoches. Cela permet de verifier que chaque compartiment et chaque notch provient bien de l'enveloppe `flat_tray_2d_v0` retenue, sans visualiser les items individuels ni generer de cavites par pile.

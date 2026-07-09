@@ -28,9 +28,9 @@ Mission interne terminee : P16-M001 - Documenter la strategie flat_tray_2d, ADR-
 
 Mission interne terminee : P16-M002 - Implementer packing 2D V0 des piles, heuristique deterministe `flat_tray_2d_v0`, tests automatises OK.
 
-Mission interne ready : P16-M003 - Aligner compartiments, cavites et notches sur le packing 2D.
+Mission interne terminee : P16-M003 - Aligner compartiments, cavites et notches sur le packing 2D, diagnostics Fusion enrichis.
 
-Mission interne suivante : P16-M004 - Clarifier UI et reporting P16.
+Mission interne ready : P16-M004 - Clarifier UI et reporting P16.
 
 Mission interne suivante : P16-M005 - Preset P16 realiste.
 
@@ -38,7 +38,7 @@ Mission interne suivante : P16-M006 - Preparation gate Fusion P16.
 
 ## Mission ready non gated
 
-`P16-M003 - Aligner compartiments, cavites et notches sur le packing 2D`.
+`P16-M004 - Clarifier UI et reporting P16`.
 
 ## Regle operationnelle Fusion
 

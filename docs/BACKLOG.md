@@ -1004,3 +1004,8 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 
 - Livrable : heuristique `flat_tray_2d_v0`, diagnostics de piles, tests tokens/dice/cubes/max stack et non-regression `vertical_stack`.
 - Statut : `done`, `implemented-core`, validation Fusion P16 encore requise.
+
+### P16-M003 - Diagnostics compartiments/cavites/notches alignes
+
+- Livrable : diagnostics Fusion enrichis pour relier cavites et notches au packing 2D.
+- Statut : `done`, `implemented-reporting`, validation Fusion P16 encore requise.

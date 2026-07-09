@@ -727,3 +727,11 @@ P16-M002 remplace le packing interne `flat_tray_linear_v0` par `flat_tray_2d_v0`
 Exemples testes : 30 tokens `10 x 10 x 2` avec stack max par defaut passent de l'ancien module P15 `63.6 x 13.6 x 11.8` a `33.6 x 23.6 x 11.8` en `3 x 2` piles ; avec `max_stack_height_mm = 6`, le module passe de `93.6 x 23.6 x 5.8` a `53.6 x 33.6 x 5.8` en `5 x 3` piles. 8 des de 16 mm sont testes en `4 x 2`, et 12 piles de cubes en `4 x 3`.
 
 Metadata ajoutee : `tray_packing_policy`, `target_aspect_ratio`, `max_module_length_mm`, `pile_grid_columns`, `pile_grid_rows`, `linear_layout_avoided` sur `storage_sizing`, diagnostics par asset et compartiments. Compartiments, cavites et notches utilisent deja les nouvelles enveloppes, sans cavite par item.
+
+## P16-M003 - Diagnostics cavites/notches alignes sur packing 2D
+
+Statut : `implemented-reporting`, tests Fusion skeleton cibles OK, validation Fusion P16 non encore realisee, `print-validated: false`.
+
+Les compartiments, cavites rectangulaires top-open et access notches suivent deja les enveloppes `flat_tray_2d_v0` produites par P16-M002. P16-M003 rend ce lien explicite dans les diagnostics Fusion : `asset_sizing_diagnostics`, `asset_cavity_diagnostics`, `asset_access_diagnostics` et `module_candidate_sizing_diagnostics` transportent maintenant `tray_packing_policy`, `pile_grid_columns`, `pile_grid_rows`, `target_aspect_ratio`, `max_module_length_mm` et `linear_layout_avoided` quand disponibles.
+
+Aucune cavite par item ou par pile n'est ajoutee. Les notches restent rectangulaires top-open et non destructives selon les regles P13/P14 existantes.

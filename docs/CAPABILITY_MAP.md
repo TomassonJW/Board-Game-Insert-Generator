@@ -230,3 +230,9 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 - C-SOLVER : heuristique locale deterministe implementee sans backtracking ni solveur global.
 - C-FUSION-CAVITIES / C-ACCESS : compartiments, cavites rectangulaires et notches suivent les nouvelles enveloppes asset-fit, sans cavite par item.
 - Validation : tests automatises OK ; validation Fusion P16 reste a faire ; `print-validated: false`.
+
+## P16-M003 capability update
+
+- C-FUSION-CAVITIES : diagnostics de cavites enrichis avec la grille locale de piles source.
+- C-ACCESS : diagnostics d'encoches enrichis avec la politique `flat_tray_2d_v0` du compartiment.
+- C-FUSION-UI : metadata quick_asset_box prete pour reporting P16 detaille ; affichage textuel final attendu en P16-M004.
