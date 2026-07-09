@@ -435,3 +435,9 @@ Aucune palette HTML, aucun tableau asset avance et aucune nouvelle geometrie com
 ## P16-M003 - Diagnostics de cavites et notches lies au packing 2D
 
 Le rapport metadata `quick_asset_box` transporte maintenant la politique de packing 2D jusque dans les diagnostics de cavites et d'encoches. Cela permet de verifier que chaque compartiment et chaque notch provient bien de l'enveloppe `flat_tray_2d_v0` retenue, sans visualiser les items individuels ni generer de cavites par pile.
+
+## P16-M004 - UI et resume du packing 2D
+
+La commande Fusion classique `quick_asset_box` expose maintenant deux champs optionnels supplementaires : `Target aspect ratio (quick_asset_box, optional)` et `Max module length mm (quick_asset_box, optional)`. Ils sont sauvegardes dans `bgig_ui_settings.json`, rehydrates a la reouverture, puis appliques aux assets itemises simples de la config temporaire.
+
+Le rapport `quick_asset_box` affiche les valeurs globales et repete `tray_packing_policy`, `pile_grid_columns`, `pile_grid_rows`, `target_aspect_ratio`, `max_module_length_mm` et `linear_layout_avoided` dans les lignes `asset_sizing`, `asset_cavity`, `asset_access_notch` et `module_candidate_sizing`. L'UI reste une commande Fusion classique, pas une palette persistante.

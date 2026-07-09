@@ -735,3 +735,13 @@ Statut : `implemented-reporting`, tests Fusion skeleton cibles OK, validation Fu
 Les compartiments, cavites rectangulaires top-open et access notches suivent deja les enveloppes `flat_tray_2d_v0` produites par P16-M002. P16-M003 rend ce lien explicite dans les diagnostics Fusion : `asset_sizing_diagnostics`, `asset_cavity_diagnostics`, `asset_access_diagnostics` et `module_candidate_sizing_diagnostics` transportent maintenant `tray_packing_policy`, `pile_grid_columns`, `pile_grid_rows`, `target_aspect_ratio`, `max_module_length_mm` et `linear_layout_avoided` quand disponibles.
 
 Aucune cavite par item ou par pile n'est ajoutee. Les notches restent rectangulaires top-open et non destructives selon les regles P13/P14 existantes.
+
+## P16-M004 - UI et reporting P16 clarifies
+
+Statut : `implemented-fusion-ui`, tests automatises OK, validation Fusion P16 non encore realisee, `print-validated: false`.
+
+P16-M004 rend le packing 2D exploitable depuis la commande Fusion classique `quick_asset_box`. Deux champs optionnels sont ajoutes et persistes dans `bgig_ui_settings.json` : `Target aspect ratio (quick_asset_box, optional)` et `Max module length mm (quick_asset_box, optional)`. Ils alimentent la config temporaire sous `assets[].target_aspect_ratio` et `assets[].max_module_length_mm` pour les assets itemises simples, sans toucher aux cards/sleeved_cards.
+
+Le resume Fusion affiche maintenant explicitement `target_aspect_ratio`, `max_module_length_mm`, `tray_packing_policy`, `pile_grid_columns`, `pile_grid_rows` et `linear_layout_avoided` dans les diagnostics asset, module, cavite et access notch. Le schema JSON public accepte les deux champs additifs optionnels sur `assets[]`; les valeurs non positives sont refusees par validation.
+
+Limites maintenues : pas de solveur global, pas de backtracking, pas de nouvelle geometrie, pas de cavites par pile/item, pas de visualisation individuelle des assets et aucune validation d'impression.

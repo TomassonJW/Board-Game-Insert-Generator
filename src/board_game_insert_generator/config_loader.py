@@ -58,7 +58,22 @@ MODULE_FIELDS = {
 }
 CAVITY_FIELDS = {"id", "functional_type", "origin_mm", "size_mm", "clearance_mm", "comment", "features"}
 FEATURE_FIELDS = {"id", "kind", "taxonomy", "placement", "position_mm", "size_mm", "radius_mm", "comment"}
-ASSET_FIELDS = {"id", "name", "kind", "quantity", "dimensions_mm", "dimension_confidence", "containment_intent", "reservation_ref", "module_hint", "storage_orientation", "max_stack_height_mm", "comment"}
+ASSET_FIELDS = {
+    "id",
+    "name",
+    "kind",
+    "quantity",
+    "dimensions_mm",
+    "dimension_confidence",
+    "containment_intent",
+    "reservation_ref",
+    "module_hint",
+    "storage_orientation",
+    "max_stack_height_mm",
+    "target_aspect_ratio",
+    "max_module_length_mm",
+    "comment",
+}
 ASSET_QUANTITY_FIELDS = {"count", "grouping"}
 VOLUMETRIC_GRID_FIELDS = {"unit_mm", "size_units", "layers", "module_placements", "zones", "support_surfaces", "comment"}
 VOLUMETRIC_LAYER_FIELDS = {"id", "name", "z_start", "z_count", "role", "comment"}
@@ -141,6 +156,8 @@ def _parse_assets(raw_assets: Any) -> list[Asset]:
                 module_hint=_optional_nullable_string(raw, "module_hint", field),
                 storage_orientation=_parse_asset_storage_orientation(raw.get("storage_orientation", "auto"), field),
                 max_stack_height_mm=_optional_nullable_number(raw, "max_stack_height_mm", field),
+                target_aspect_ratio=_optional_nullable_number(raw, "target_aspect_ratio", field),
+                max_module_length_mm=_optional_nullable_number(raw, "max_module_length_mm", field),
                 comment=_optional_string(raw, "comment", field, default=""),
             )
         )

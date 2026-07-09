@@ -261,6 +261,23 @@ class AssetModelTests(unittest.TestCase):
         self.assertEqual(compartment["pile_grid_columns"], 3)
         self.assertEqual(compartment["pile_grid_rows"], 2)
 
+    def test_tray_packing_overrides_target_ratio_and_max_module_length(self) -> None:
+        payload = _count_aware_tokens_payload(count=30)
+        payload["assets"][0]["max_stack_height_mm"] = 6
+        payload["assets"][0]["target_aspect_ratio"] = 1.0
+        payload["assets"][0]["max_module_length_mm"] = 40
+
+        generated = _layout_payload(payload)["executable_asset_plan"]["generated_modules"][0]
+        sizing = generated["storage_sizing"]
+        diagnostic = sizing["asset_diagnostics"][0]
+
+        self.assertEqual(diagnostic["target_aspect_ratio"], 1.0)
+        self.assertEqual(diagnostic["max_module_length_mm"], 40)
+        self.assertEqual(sizing["target_aspect_ratio"], 1.0)
+        self.assertEqual(sizing["max_module_length_mm"], 40.0)
+        self.assertLessEqual(generated["dimensions_mm"]["x"], 42.4)
+        self.assertGreaterEqual(sizing["pile_grid_rows"], 4)
+
     def test_vertical_stack_explicit_preserves_legacy_available_height_behavior(self) -> None:
         payload = _count_aware_tokens_payload(count=30)
         payload["assets"][0]["storage_orientation"] = "vertical_stack"
@@ -474,11 +491,15 @@ class AssetModelTests(unittest.TestCase):
         payload = _count_aware_tokens_payload(count=12)
         payload["assets"][0]["storage_orientation"] = "vertical_stack"
         payload["assets"][0]["max_stack_height_mm"] = 18
+        payload["assets"][0]["target_aspect_ratio"] = 1.25
+        payload["assets"][0]["max_module_length_mm"] = 72
 
         config = _load_payload(payload)
 
         self.assertEqual(config.assets[0].storage_orientation.value, "vertical_stack")
         self.assertEqual(config.assets[0].max_stack_height_mm, 18.0)
+        self.assertEqual(config.assets[0].target_aspect_ratio, 1.25)
+        self.assertEqual(config.assets[0].max_module_length_mm, 72.0)
         self.assertEqual(validate_config(config), [])
 
     def test_rejects_invalid_asset_storage_orientation(self) -> None:
@@ -494,6 +515,16 @@ class AssetModelTests(unittest.TestCase):
         config = _load_payload(payload)
 
         self.assertIn(("assets[0].max_stack_height_mm", "NOT_POSITIVE"), _issue_keys(validate_config(config)))
+
+    def test_validation_reports_invalid_tray_packing_overrides(self) -> None:
+        payload = _count_aware_tokens_payload(count=12)
+        payload["assets"][0]["target_aspect_ratio"] = 0
+        payload["assets"][0]["max_module_length_mm"] = -1
+        config = _load_payload(payload)
+
+        keys = _issue_keys(validate_config(config))
+        self.assertIn(("assets[0].target_aspect_ratio", "NOT_POSITIVE"), keys)
+        self.assertIn(("assets[0].max_module_length_mm", "NOT_POSITIVE"), keys)
     def test_rejects_unknown_asset_field(self) -> None:
         payload = _asset_payload()
         payload["assets"][0]["solver_hint"] = "not-yet"

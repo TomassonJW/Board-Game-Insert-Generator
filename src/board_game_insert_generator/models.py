@@ -171,6 +171,8 @@ class Asset:
     module_hint: str | None = None
     storage_orientation: AssetStorageOrientation = AssetStorageOrientation.AUTO
     max_stack_height_mm: float | None = None
+    target_aspect_ratio: float | None = None
+    max_module_length_mm: float | None = None
     comment: str = ""
 
 

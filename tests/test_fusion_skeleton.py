@@ -27,6 +27,8 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     BGIG_QUICK_ASSET_BOX_DEFAULT_ASSETS,
     BGIG_QUICK_ASSET_BOX_FIELD,
     BGIG_QUICK_ASSET_BOX_MAX_STACK_HEIGHT_FIELD,
+    BGIG_QUICK_ASSET_BOX_TARGET_ASPECT_RATIO_FIELD,
+    BGIG_QUICK_ASSET_BOX_MAX_MODULE_LENGTH_FIELD,
     BGIG_SCENE_ROOT_COMPONENT_NAME,
     BGIG_SCENE_ROOT_ROLE,
     BGIG_SCENE_OWNERSHIP_POLICY,
@@ -894,6 +896,8 @@ class FusionSkeletonTests(unittest.TestCase):
                 input_mode=FUSION_INPUT_MODE_QUICK_ASSET_BOX,
                 quick_asset_box_assets_text=assets_text,
                 quick_asset_box_max_stack_height_mm="6",
+                quick_asset_box_target_aspect_ratio="1.0",
+                quick_asset_box_max_module_length_mm="40",
             )
             config_payload = build_quick_asset_box_config_payload(
                 request.parameter_overrides,
@@ -934,6 +938,71 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("pile_count 15", summary)
         self.assertIn("module_size 104.0 x 102.0 x 6.0 mm", summary)
         self.assertIn("stack_height_used_mm 4.0", summary)
+
+    def test_quick_asset_box_tray_packing_overrides_are_persisted_and_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            overrides = {
+                **P12_PARAMETRIC_FIELD_DEFAULTS,
+                "box_inner_x_mm": "120",
+                "box_inner_y_mm": "80",
+                "box_inner_z_mm": "30",
+                "grid_units_x": "4",
+                "grid_units_y": "4",
+                "grid_units_z": "3",
+                "wall_thickness_mm": "1.2",
+                "floor_thickness_mm": "1.2",
+                "peripheral_clearance_mm": "0.4",
+                "inter_module_clearance_mm": "0.3",
+                "print_profile": "draft",
+            }
+            assets_text = "coin-tokens,tokens,30,20,20,2,loose"
+            request = build_fusion_command_request(
+                "",
+                FUSION_GENERATION_MODE_COMPACT_ONLY,
+                Path(temp_dir),
+                project_root_text=str(ROOT),
+                parameter_values=overrides,
+                input_mode=FUSION_INPUT_MODE_QUICK_ASSET_BOX,
+                quick_asset_box_assets_text=assets_text,
+                quick_asset_box_max_stack_height_mm="6",
+                quick_asset_box_target_aspect_ratio="1.0",
+                quick_asset_box_max_module_length_mm="40",
+            )
+            config_payload = build_quick_asset_box_config_payload(
+                request.parameter_overrides,
+                request.quick_asset_box_assets_text,
+                request.quick_asset_box_max_stack_height_mm,
+                request.quick_asset_box_target_aspect_ratio,
+                request.quick_asset_box_max_module_length_mm,
+            )
+            config_path = Path(temp_dir) / "quick_asset_box_config.json"
+            config_path.write_text(json.dumps(config_payload), encoding="utf-8")
+            config = load_config(config_path)
+            layout = generate_basic_layout(config)
+            scene = build_blank_cad_scene(config, layout).to_dict()
+            scene["metadata"]["quick_asset_box"] = quick_asset_box_metadata(
+                config_payload,
+                request.quick_asset_box_assets_text,
+                scene,
+            )
+
+        self.assertEqual(request.quick_asset_box_target_aspect_ratio, "1.0")
+        self.assertEqual(request.quick_asset_box_max_module_length_mm, "40")
+        self.assertEqual(config_payload["assets"][0]["target_aspect_ratio"], 1.0)
+        self.assertEqual(config_payload["assets"][0]["max_module_length_mm"], 40.0)
+        quick_metadata = scene["metadata"]["quick_asset_box"]
+        self.assertEqual(quick_metadata["target_aspect_ratio"], 1.0)
+        self.assertEqual(quick_metadata["max_module_length_mm"], 40.0)
+        module_diagnostic = quick_metadata["module_candidate_sizing_diagnostics"][0]
+        self.assertEqual(module_diagnostic["target_aspect_ratio"], 1.0)
+        self.assertEqual(module_diagnostic["max_module_length_mm"], 40.0)
+        summary = quick_asset_box_summary(scene)
+        self.assertIn("target_aspect_ratio: 1.0", summary)
+        self.assertIn("max_module_length_mm: 40.0", summary)
+        self.assertIn("tray_packing_policy flat_tray_2d_v0", summary)
+        self.assertIn("pile_grid_columns", summary)
+        self.assertIn("pile_grid_rows", summary)
+        self.assertIn("linear_layout_avoided", summary)
 
     def test_quick_asset_box_rejects_when_no_valid_assets_remain(self) -> None:
         with self.assertRaisesRegex(FusionSkeletonError, "at least one valid asset"):
@@ -1121,6 +1190,8 @@ class FusionSkeletonTests(unittest.TestCase):
                 "project_root": str(ROOT),
                 BGIG_QUICK_ASSET_BOX_FIELD: assets_text,
                 BGIG_QUICK_ASSET_BOX_MAX_STACK_HEIGHT_FIELD: "6",
+                BGIG_QUICK_ASSET_BOX_TARGET_ASPECT_RATIO_FIELD: "1.0",
+                BGIG_QUICK_ASSET_BOX_MAX_MODULE_LENGTH_FIELD: "40",
                 "box_inner_x_mm": "120",
                 "box_inner_y_mm": "80",
                 "box_inner_z_mm": "30",
@@ -1142,10 +1213,16 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(settings["input_mode"], FUSION_INPUT_MODE_QUICK_ASSET_BOX)
         self.assertEqual(settings[BGIG_QUICK_ASSET_BOX_FIELD], assets_text)
         self.assertEqual(settings[BGIG_QUICK_ASSET_BOX_MAX_STACK_HEIGHT_FIELD], "6")
+        self.assertEqual(settings[BGIG_QUICK_ASSET_BOX_TARGET_ASPECT_RATIO_FIELD], "1.0")
+        self.assertEqual(settings[BGIG_QUICK_ASSET_BOX_MAX_MODULE_LENGTH_FIELD], "40")
         self.assertEqual(request.source_kind, "quick_asset_box")
         self.assertEqual(request.quick_asset_box_assets_text, assets_text)
         self.assertEqual(request.quick_asset_box_max_stack_height_mm, "6")
+        self.assertEqual(request.quick_asset_box_target_aspect_ratio, "1.0")
+        self.assertEqual(request.quick_asset_box_max_module_length_mm, "40")
         self.assertIn("Loaded quick asset max stack height mm: 6", summary)
+        self.assertIn("Loaded quick asset target aspect ratio: 1.0", summary)
+        self.assertIn("Loaded quick asset max module length mm: 40", summary)
         self.assertIn("Loaded quick asset text", summary)
         self.assertIn("coin-tokens", summary)
 
@@ -1175,6 +1252,8 @@ class FusionSkeletonTests(unittest.TestCase):
                 input_mode=FUSION_INPUT_MODE_QUICK_ASSET_BOX,
                 quick_asset_box_assets_text=assets_text,
                 quick_asset_box_max_stack_height_mm="6",
+                quick_asset_box_target_aspect_ratio="1.0",
+                quick_asset_box_max_module_length_mm="40",
             )
             generated_cad_ir = addin_dir / "bgig_ui_generated_cad_ir.json"
 
@@ -1185,6 +1264,9 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(saved["input_mode"], FUSION_INPUT_MODE_QUICK_ASSET_BOX)
         self.assertEqual(saved[BGIG_QUICK_ASSET_BOX_FIELD], assets_text)
         self.assertEqual(saved[BGIG_QUICK_ASSET_BOX_MAX_STACK_HEIGHT_FIELD], "6")
+        self.assertEqual(saved[BGIG_QUICK_ASSET_BOX_TARGET_ASPECT_RATIO_FIELD], "1.0")
+        self.assertEqual(saved[BGIG_QUICK_ASSET_BOX_MAX_MODULE_LENGTH_FIELD], "40")
+
     def test_detects_bgig_project_root_from_config_path(self) -> None:
         detected = detect_bgig_project_root(
             ROOT / "examples" / "simple_asset_product_scene.json",
@@ -1762,8 +1844,12 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertFalse(referenced_ids - defined_ids, f"Undefined UI input IDs: {sorted(referenced_ids - defined_ids)}")
         self.assertIn("QUICK_ASSET_BOX_ASSETS_INPUT_ID", defined_ids)
         self.assertIn("QUICK_ASSET_BOX_MAX_STACK_HEIGHT_INPUT_ID", defined_ids)
+        self.assertIn("QUICK_ASSET_BOX_TARGET_ASPECT_RATIO_INPUT_ID", defined_ids)
+        self.assertIn("QUICK_ASSET_BOX_MAX_MODULE_LENGTH_INPUT_ID", defined_ids)
         self.assertIn("Assets (quick_asset_box)", source)
         self.assertIn("Max stack height mm (quick_asset_box, optional)", source)
+        self.assertIn("Target aspect ratio (quick_asset_box, optional)", source)
+        self.assertIn("Max module length mm (quick_asset_box, optional)", source)
         self.assertIn("BGIG_QUICK_ASSET_BOX_HELP_TEXT", source)
         self.assertIn("BGIG_QUICK_ASSET_BOX_HELP_TITLE", source)
         self.assertIn("Mode and field guide", source)

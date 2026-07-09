@@ -198,6 +198,10 @@ def _validate_assets(config: InsertConfig, issues: list[ValidationIssue]) -> Non
             )
         if asset.max_stack_height_mm is not None:
             _validate_positive_number(asset.max_stack_height_mm, f"{prefix}.max_stack_height_mm", issues)
+        if asset.target_aspect_ratio is not None:
+            _validate_positive_number(asset.target_aspect_ratio, f"{prefix}.target_aspect_ratio", issues)
+        if asset.max_module_length_mm is not None:
+            _validate_positive_number(asset.max_module_length_mm, f"{prefix}.max_module_length_mm", issues)
         if asset.reservation_ref is not None and asset.reservation_ref not in reservation_ids:
             issues.append(
                 _issue(

@@ -236,3 +236,10 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 - C-FUSION-CAVITIES : diagnostics de cavites enrichis avec la grille locale de piles source.
 - C-ACCESS : diagnostics d'encoches enrichis avec la politique `flat_tray_2d_v0` du compartiment.
 - C-FUSION-UI : metadata quick_asset_box prete pour reporting P16 detaille ; affichage textuel final attendu en P16-M004.
+
+## P16-M004 capability update
+
+- C-FUSION-UI : `implemented-fusion-ui` pour champs optionnels persistants `Target aspect ratio` et `Max module length mm` dans `quick_asset_box`, avec rehydratation settings.
+- C-ASSET : schema additif `assets[].target_aspect_ratio` et `assets[].max_module_length_mm`, appliques au packing `flat_tray_2d_v0` des assets simples.
+- C-QUALITY : tests de regression ajoutes pour parsing/validation, influence du packing, persistance UI et resume Fusion.
+- Validation : tests automatises OK ; validation Fusion P16 reste a faire ; `print-validated: false`.

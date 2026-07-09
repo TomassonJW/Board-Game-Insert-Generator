@@ -412,6 +412,8 @@ def _count_aware_stacked_module_from_assets(
         max_content_width,
         max_depth_mm=max_content_depth,
         packing_policy=packing_policy,
+        target_aspect_ratio=_count_aware_target_aspect_ratio(diagnostics),
+        max_module_length_mm=_count_aware_max_module_length_mm(diagnostics),
     )
     if not packed["fits_width"]:
         warnings.append(
@@ -575,6 +577,8 @@ def _count_aware_asset_stack_diagnostic(
         "xy_expansion_used": xy_expansion_used,
         "z_expansion_used": z_expansion_used,
         "pile_footprint_mm": {"x": asset.dimensions.x, "y": asset.dimensions.y},
+        "target_aspect_ratio": asset.target_aspect_ratio,
+        "max_module_length_mm": asset.max_module_length_mm,
         "z_mm_semantics": "unit_item_thickness",
         "warning": warning,
     }
@@ -584,6 +588,29 @@ def _count_aware_pile_packing_policy(diagnostics: list[dict[str, Any]]) -> str:
     if diagnostics and all(item.get("storage_orientation") == AssetStorageOrientation.FLAT_TRAY.value for item in diagnostics):
         return "flat_tray_2d_v0"
     return "flat_tray_linear_v0"
+
+
+def _count_aware_target_aspect_ratio(diagnostics: list[dict[str, Any]]) -> float:
+    values = [
+        float(item["target_aspect_ratio"])
+        for item in diagnostics
+        if item.get("target_aspect_ratio") is not None and float(item["target_aspect_ratio"]) > 0
+    ]
+    if not values:
+        return 1.6
+    unique = sorted(set(round(value, 4) for value in values))
+    return float(unique[0]) if len(unique) == 1 else 1.6
+
+
+def _count_aware_max_module_length_mm(diagnostics: list[dict[str, Any]]) -> float | None:
+    values = [
+        float(item["max_module_length_mm"])
+        for item in diagnostics
+        if item.get("max_module_length_mm") is not None and float(item["max_module_length_mm"]) > 0
+    ]
+    if not values:
+        return None
+    return min(values)
 
 
 def _pack_count_aware_piles(
@@ -817,6 +844,8 @@ def _count_aware_compartment_layout(
             max_content_width_mm,
             max_depth_mm=max_asset_fit_depth_mm - clearance_mm * 2.0,
             packing_policy=_count_aware_pile_packing_policy([diagnostic]),
+            target_aspect_ratio=_count_aware_target_aspect_ratio([diagnostic]),
+            max_module_length_mm=_count_aware_max_module_length_mm([diagnostic]),
         )
         if not packed["fits_width"]:
             warnings.append(f"Asset {asset.id} compartment pile layout exceeds available content width.")

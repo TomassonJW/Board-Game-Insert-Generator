@@ -958,7 +958,7 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Livrable : ADR dediee packing 2D, mises a jour docs strategie.
 - Tests : inspection documentaire, suite unitaire, `git diff --check`.
 - Gate : aucune tant que la mission reste documentaire et additive.
-- Statut : `ready`.
+- Statut : `done-docs`.
 
 ### P16-M002 - Implementer packing 2D V0 des piles
 
@@ -967,19 +967,20 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Objectif : remplacer le layout `flat_tray` lineaire par une organisation 2D deterministe pour tokens/dice/meeples/generic.
 - Livrable : heuristique `flat_tray_2d_v0`, diagnostics de piles, tests count/ratio/longueur.
 - Gate : aucune si pas de solveur global, pas de backtracking et schema additif.
-- Statut : `todo`.
+- Statut : `done`.
 
 ### P16-M003 - Aligner compartiments, cavites et notches sur le packing 2D
 
 - Capability : C-ASSET, C-FUSION-CAVITIES, C-ACCESS.
 - Objectif : faire suivre les enveloppes `asset_fit`, compartiments et notches par le nouveau packing 2D sans cavites par item.
-- Statut : `todo`.
+- Statut : `done`.
 
 ### P16-M004 - Clarifier UI et reporting P16
 
 - Capability : C-FUSION-UI, C-ASSET.
 - Objectif : exposer/reporting `tray_packing_policy`, `pile_grid_columns`, `pile_grid_rows`, `target_aspect_ratio`, `max_module_length_mm` et warning si layout lineaire inevitable.
-- Statut : `todo`.
+- Livrable : champs UI optionnels persistants `Target aspect ratio` / `Max module length mm`, schema assets additif, resume Fusion enrichi.
+- Statut : `done`.
 
 ### P16-M005 - Preset P16 realiste
 
@@ -1009,3 +1010,8 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 
 - Livrable : diagnostics Fusion enrichis pour relier cavites et notches au packing 2D.
 - Statut : `done`, `implemented-reporting`, validation Fusion P16 encore requise.
+
+### P16-M004 - UI et reporting P16 clarifies
+
+- Livrable : `assets[].target_aspect_ratio` et `assets[].max_module_length_mm` additifs, champs UI globaux optionnels persistants pour `quick_asset_box`, resume Fusion exposant politique, grille locale et evitement du layout lineaire.
+- Statut : `done`, `implemented-fusion-ui`, validation Fusion P16 encore requise.
