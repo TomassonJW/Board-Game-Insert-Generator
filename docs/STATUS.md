@@ -562,4 +562,21 @@ Smoke prepare : avec `coin-tokens,tokens,40,18,16,2,loose` et `status-tokens,tok
 
 Limites maintenues : assets individuels non visualises, cavites par pile/item non generees, pas de solveur global, pas d'optimisation avancee, pas de fillets/conges, pas d'export STL/3MF, aucune impression 3D validee.
 
-Statut : `implemented`, gate humaine Fusion `P13-ASSET-M004V` active.
+Statut : `fusion-validated-v0` apres validation humaine Fusion `P13-ASSET-M004V` confirmee le 2026-07-09 sur `9e050ba`, `print-validated: false`.
+
+
+## P13-ASSET-M004V - Validation Fusion compartiments asset-specific V0
+
+Validation humaine Fusion confirmee le 2026-07-09 sur `9e050ba`.
+
+Resultats observes : add-in reinstalle par scripts Codex, document Fusion Assembly-compatible, `UI settings loaded: yes`, `quick_asset_box` charge avec champ assets pre-rempli, `generate` OK, module exterieur count-aware genere.
+
+Le rapport valide `asset_cavity_policy: per_source_asset_rectangular_compartments_v0`, `asset_compartments_generated: yes`, `asset_compartment_cavities_planned: 2`, `asset_compartment_cavities_generated: 2`, `Rectangular cavity cuts: 2`, `Body sizing report`, `Registry validation: ok` et `Print validation: false`.
+
+Observation Fusion validee : deux vraies cavites rectangulaires top-open sont coupees dans le body, correspondent aux assets sources `coin-tokens` et `status-tokens`, sont separees par une paroi interne et ne sont pas seulement des sketches. Les debug outlines de compartiments sont visibles. Dimensions observees coherentes : module environ `52.8 x 39.0 x 48.0 mm`, cavite `coin-tokens` environ `37.6 x 17.6 x 46.8 mm`, cavite `status-tokens` environ `11.6 x 36.6 x 46.8 mm`, fond restant `1.2 mm`.
+
+Regenerate valide : modification d'un asset ou d'une dimension, module + compartiments recalcules sans doublon. Clear final valide : `clear_bgig_scene` fonctionne et preserve les objets non-BGIG.
+
+Limites explicitement non validees : UX encore peu claire, champs assets difficiles a comprendre, pas d'onglets/sections/presets ergonomiques, assets individuels non visualises, cavites par pile/item non generees, pas de solveur global, pas d'optimisation avancee, pas de fillets/conges, pas d'export STL/3MF, capacite encore heuristique, aucune impression 3D validee.
+
+Dette UX enregistree : l'interface `quick_asset_box` fonctionne mais reste peu comprehensible pour un humain. Une future mission UI/UX devra clarifier les champs, formats, unites, effets de `count`, dimensions, grille, murs, fond et clearances. Cette dette n'est pas traitee dans P13-ASSET-M004V.

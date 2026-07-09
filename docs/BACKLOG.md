@@ -801,8 +801,8 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Livrable : policy `per_source_asset_rectangular_compartments_v0`, payload de compartiments, plusieurs `FusionCavityCutPlan`, reporting par asset, outlines debug de compartiments, scripts smoke M004.
 - Criteres d'acceptation : au moins deux compartiments pour deux assets tokens du smoke, fond commun coherent, mur interne reporte, regenerate/clear conserves, refus explicite si un layout ne tient pas, coeur Python sans `adsk`.
 - Tests : unitaires assets et Fusion skeleton, py_compile add-in, CLI Markdown/JSON/export CAD IR, scripts Fusion dry-run/reel, `git diff --check`, `rg -n "adsk" src/board_game_insert_generator`.
-- Gate : validation humaine Fusion `P13-ASSET-M004V` requise.
-- Statut : `implemented`, `fusion-validation-pending`, `print-validated: false`.
+- Gate : validation humaine Fusion `P13-ASSET-M004V` realisee le 2026-07-09 sur `9e050ba`.
+- Statut : `done`, `fusion-validated-v0`, `print-validated: false`.
 
 ### P13-ASSET-M004V - Valider les compartiments asset-specific dans Fusion
 
@@ -810,6 +810,17 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Milestone : M14 Usable beta / M5 CAD cavities.
 - Objectif : verifier dans Fusion que `quick_asset_box` genere plusieurs cavites rectangulaires top-open correspondant aux assets sources.
 - Livrable : smoke test humain Fusion avec generate, regenerate, clear et rapport.
-- Criteres d'acceptation : `asset_cavity_policy: per_source_asset_rectangular_compartments_v0`, `asset_compartments_generated: yes`, deux cavites visibles pour les assets du smoke, mur interne visible/report?, `Rectangular cavity cuts: 2`, registry OK, non-BGIG preserve, `Print validation: false`.
-- Gate : action humaine Thomas requise.
+- Criteres d'acceptation : `asset_cavity_policy: per_source_asset_rectangular_compartments_v0`, `asset_compartments_generated: yes`, deux cavites visibles pour les assets du smoke, mur interne visible/reporte, `Rectangular cavity cuts: 2`, registry OK, non-BGIG preserve, `Print validation: false`.
+- Gate : action humaine Thomas realisee le 2026-07-09.
+- Statut : `done`, `fusion-validated-v0`, `print-validated: false`.
+
+
+### P13-ASSET-M005-GATE - Decider la prochaine etape apres compartiments asset-specific V0
+
+- Capability : C-ASSET, C-FUSION-CAVITIES, C-FUSION-UI, C-SOLVER, C-CALIBRATION ou C-FILLETS selon decision.
+- Milestone : M14 Usable beta / M5 CAD cavities / M10 Solver / M11 Physical validation selon decision.
+- Objectif : choisir la prochaine mission apres validation des compartiments asset-specific V0.
+- Options candidates : dette UI/UX `quick_asset_box`, visualisation/proxies d'assets, cavites par pile/item, sizing capacitaire plus garanti, traitement cartes/decks, solveur/optimisation, fillets/conges, export imprimable, calibration/impression ou maintien du scope V0.
+- Dette UX a prendre en compte : les champs assets, formats, unites, effets de `count`, dimensions, grille, murs, fond et clearances restent difficiles a comprendre pour un humain.
+- Gate : decision humaine produit requise avant toute mission produit suivante.
 - Statut : `ready-gated`.
