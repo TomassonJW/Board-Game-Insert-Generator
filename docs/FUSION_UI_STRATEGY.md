@@ -408,3 +408,9 @@ Le script `scripts/fusion/prepare_quick_asset_test.ps1` accepte maintenant `-Pre
 La commande Fusion classique `quick_asset_box` affiche maintenant un champ optionnel `Max stack height mm (quick_asset_box, optional)`. Vide, les defaults moteur `flat_tray` par type restent actifs. Renseigne, le champ est sauvegarde dans `bgig_ui_settings.json`, rehydrate a la reouverture et applique a la config temporaire sous `assets[].max_stack_height_mm` pour tokens/dice/meeples/generic.
 
 Le message de generation expose la politique de rangement : `storage_orientation`, `stack_height_policy`, `max_stack_height_mm`, `stack_height_used_mm`, `xy_expansion_used` et `z_expansion_used` par asset et par candidat module. Cela prepare la validation P15 sans ajouter de palette HTML ni de tableau assets avance.
+
+## P15-M004 - Semantique grid dans le rapport Fusion
+
+Le rapport `quick_asset_box` affiche maintenant `grid_semantics: placement_reservation_lattice_v0`, `body_snap_to_grid: no`, `grid_span_is_reserved_space: yes` et `body_size_may_be_smaller_than_grid_span: yes`. Le `Module source mapping` et le `Body sizing report` repetent cette distinction : le span grille reserve des cellules, tandis que le body Fusion est dimensionne par `printable_body_size_mm`.
+
+Cette mission ne change pas la geometrie et n'ajoute pas de visualisation de cellules. Elle rend seulement le comportement lisible pour la gate P15.

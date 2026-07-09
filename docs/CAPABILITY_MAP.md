@@ -190,3 +190,9 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 - C-FUSION-UI : `implemented-fusion-ui` pour champ optionnel persiste, rehydratation settings et reporting stack policy ; validation Fusion P15 reste a faire.
 - C-QUALITY : regression ajoutee contre constantes UI manquantes et contre sizing `max_stack_height_mm = 6`.
 - Validation : tests automatises moteur OK, aucune validation Fusion ni impression reelle.
+
+## P15-M004 capability update
+
+- C-GRID-3D : `implemented-reporting` pour semantique explicite `placement_reservation_lattice_v0`, span reserve distinct du body imprimable, et `body_snap_to_grid: no`.
+- C-FUSION-UI : resume `quick_asset_box`, `Module source mapping` et `Body sizing report` exposent la difference grid span / printable body.
+- C-QUALITY : tests couvrent metadata placements, plan Fusion et summary lisible.

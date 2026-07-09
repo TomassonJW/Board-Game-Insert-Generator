@@ -927,10 +927,12 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 
 - Capability : C-ASSET, C-FUSION-UI.
 - Objectif : expliciter grid span vs body size dans reports/CAD IR/Fusion summary.
-- Statut : `ready`.
+- Livrable : metadata de placements et rapports Fusion avec `grid_semantics`, `body_snap_to_grid`, `grid_span_is_reserved_space`, `body_size_may_be_smaller_than_grid_span`.
+- Tests : unitaires assets et Fusion skeleton couvrant summary, placements, plan Fusion et resume `quick_asset_box`.
+- Statut : `done`, `implemented-reporting`, validation Fusion P15 non encore realisee, `print-validated: false`.
 
 ### P15-M005 - Preset smoke P15 realiste
 
 - Capability : C-FUSION-UI, C-QUALITY.
 - Objectif : preparer un preset Fusion P15 realiste et bas, puis installer l'add-in et les settings.
-- Statut : `planned`.
+- Statut : `ready`.

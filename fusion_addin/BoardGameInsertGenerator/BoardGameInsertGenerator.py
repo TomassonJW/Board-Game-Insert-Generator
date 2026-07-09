@@ -1790,6 +1790,10 @@ def _fusion_body_size_report(solid_plan: FusionSolidPlan, body) -> dict[str, obj
         "module_id": solid_plan.cad_id,
         "body_name": solid_plan.body_name,
         "body_size_source": solid_plan.body_size_source or ("printable_body_size_mm" if solid_plan.printable_body_size_mm else "size_mm"),
+        "grid_semantics": solid_plan.grid_semantics,
+        "body_snap_to_grid": solid_plan.body_snap_to_grid,
+        "grid_span_is_reserved_space": solid_plan.grid_span_is_reserved_space,
+        "body_size_may_be_smaller_than_grid_span": solid_plan.body_size_may_be_smaller_than_grid_span,
         "grid_span_mm": _vector_to_optional_dict(solid_plan.theoretical_grid_extent_mm),
         "asset_fit_size_mm": _vector_to_optional_dict(solid_plan.asset_fit_size_mm),
         "printable_body_size_planned_mm": planned_size_mm.to_dict(),
@@ -1849,6 +1853,10 @@ def _module_mapping_report_message(generation_plan: FusionGenerationPlan) -> str
             f"views {'/'.join(view_roles) if view_roles else 'none'}; "
             f"origin {_format_size_mm(blank.origin_mm.to_dict())}; "
             f"grid span {_format_size_mm(_vector_to_optional_dict(blank.theoretical_grid_extent_mm))}; "
+            f"grid semantics {blank.grid_semantics or 'n/a'}; "
+            f"body snap to grid {blank.body_snap_to_grid or 'n/a'}; "
+            f"grid span reserved {blank.grid_span_is_reserved_space or 'n/a'}; "
+            f"body may be smaller than grid span {blank.body_size_may_be_smaller_than_grid_span or 'n/a'}; "
             f"printable body {_format_size_mm((blank.printable_body_size_mm or blank.size_mm).to_dict())}; "
             f"peripheral clearance {_format_clearance_value(clearance.get('peripheral_clearance_mm'))}; "
             f"inter-module clearance {_format_clearance_value(clearance.get('inter_module_gap_mm'))}; "
@@ -1865,6 +1873,10 @@ def _body_size_report_message(reports) -> str:  # noqa: ANN001
             f"- {report.get('module_id')}: "
             f"source {report.get('body_size_source')}; "
             f"grid span {_format_size_mm(report.get('grid_span_mm'))}; "
+            f"grid semantics {report.get('grid_semantics') or 'n/a'}; "
+            f"body snap to grid {report.get('body_snap_to_grid') or 'n/a'}; "
+            f"grid span reserved {report.get('grid_span_is_reserved_space') or 'n/a'}; "
+            f"body may be smaller than grid span {report.get('body_size_may_be_smaller_than_grid_span') or 'n/a'}; "
             f"asset fit {_format_size_mm(report.get('asset_fit_size_mm'))}; "
             f"printable body planned {_format_size_mm(report.get('printable_body_size_planned_mm'))}; "
             f"actual Fusion body bbox {_format_size_mm(report.get('actual_fusion_body_bbox_mm'))}; "

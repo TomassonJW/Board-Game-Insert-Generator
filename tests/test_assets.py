@@ -200,6 +200,18 @@ class AssetModelTests(unittest.TestCase):
         generated = plan["generated_modules"][0]
         sizing = generated["storage_sizing"]
         self.assertEqual(plan["status"], "placed")
+        self.assertEqual(plan["summary"]["grid_semantics"], "placement_reservation_lattice_v0")
+        self.assertEqual(plan["summary"]["body_snap_to_grid"], "no")
+        self.assertEqual(plan["summary"]["grid_span_is_reserved_space"], "yes")
+        self.assertEqual(plan["summary"]["body_size_may_be_smaller_than_grid_span"], "yes")
+        placement = plan["placements"][0]
+        self.assertEqual(placement["grid_semantics"], "placement_reservation_lattice_v0")
+        self.assertEqual(placement["body_snap_to_grid"], "no")
+        self.assertEqual(placement["grid_span_is_reserved_space"], "yes")
+        self.assertEqual(placement["body_size_may_be_smaller_than_grid_span"], "yes")
+        self.assertEqual(placement["size_mm"], generated["printable_body_size_mm"])
+        self.assertNotEqual(placement["size_mm"], placement["theoretical_grid_extent_mm"])
+        self.assertIn("not a body snap size", placement["sizing_policy"])
         self.assertEqual(generated["dimensions_mm"], {"x": 13.6, "y": 13.6, "z": 3.8})
         self.assertEqual(generated["asset_fit_cavity"]["status"], "planned")
         self.assertEqual(generated["asset_fit_cavity"]["policy"], "per_source_asset_rectangular_compartments_v0")

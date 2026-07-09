@@ -234,7 +234,11 @@ Depuis P11-M003, les placements asset-first distinguent explicitement :
 - `placement_source` : `grid_placement` pour les placements X/Y/Z resolus, `cad_ir_component` pour les blanks legacy ;
 - `source_asset_ids` et `candidate_id` : mapping produit permettant de relier le body Fusion aux assets source ;
 - `body_size_source` dans le plan Fusion hors CAD IR : source effective de sizing consommee par l'adaptateur ;
-- `grid_slack_mm` : marge visible entre span grille et body imprimable.
+- `grid_slack_mm` : marge visible entre span grille et body imprimable ;
+- `grid_semantics: placement_reservation_lattice_v0` : la grille reserve des cellules de placement ;
+- `body_snap_to_grid: no` : le body n'est pas force a la taille exacte du span ;
+- `grid_span_is_reserved_space: yes` : le span reste une reservation/occupation ;
+- `body_size_may_be_smaller_than_grid_span: yes` : le body imprimable peut etre plus petit que le span theorique.
 
 Les adaptateurs CAD doivent utiliser `printable_body_size_mm` pour la geometrie
 reelle des modules asset-first generes. Ils peuvent afficher ou valider

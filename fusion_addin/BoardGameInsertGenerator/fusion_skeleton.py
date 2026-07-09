@@ -362,6 +362,11 @@ class FusionSolidPlan:
     body_size_source: str | None = None
     clearance_applied: dict[str, Any] | None = None
     sizing_policy: str | None = None
+    grid_semantics: str | None = None
+    body_snap_to_grid: str | None = None
+    grid_span_is_reserved_space: str | None = None
+    body_size_may_be_smaller_than_grid_span: str | None = None
+    grid_body_relationship: str | None = None
     asset_fit_cavity: dict[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
@@ -399,6 +404,16 @@ class FusionSolidPlan:
             payload["clearance_applied"] = dict(self.clearance_applied)
         if self.sizing_policy is not None:
             payload["sizing_policy"] = self.sizing_policy
+        if self.grid_semantics is not None:
+            payload["grid_semantics"] = self.grid_semantics
+        if self.body_snap_to_grid is not None:
+            payload["body_snap_to_grid"] = self.body_snap_to_grid
+        if self.grid_span_is_reserved_space is not None:
+            payload["grid_span_is_reserved_space"] = self.grid_span_is_reserved_space
+        if self.body_size_may_be_smaller_than_grid_span is not None:
+            payload["body_size_may_be_smaller_than_grid_span"] = self.body_size_may_be_smaller_than_grid_span
+        if self.grid_body_relationship is not None:
+            payload["grid_body_relationship"] = self.grid_body_relationship
         if self.asset_fit_cavity is not None:
             payload["asset_fit_cavity"] = dict(self.asset_fit_cavity)
         return payload
@@ -1482,6 +1497,7 @@ def quick_asset_box_metadata(
     module_candidates = metadata.get("module_candidates", []) if isinstance(metadata, dict) else []
     grid = config_payload.get("volumetric_grid", {}) if isinstance(config_payload, dict) else {}
     box = config_payload.get("box", {}) if isinstance(config_payload, dict) else {}
+    plan_summary = executable_plan.get("summary", {}) if isinstance(executable_plan, dict) else {}
     configured_max_stack_height = _quick_asset_box_configured_max_stack_height(config_payload)
     asset_sizing_diagnostics = _quick_asset_box_asset_sizing_diagnostics(
         parse_report["accepted_assets"],
@@ -1525,6 +1541,10 @@ def quick_asset_box_metadata(
         "box_inner_mm": box.get("inner_dimensions_mm"),
         "grid_units": grid.get("size_units"),
         "grid_unit_mm": grid.get("unit_mm"),
+        "grid_semantics": plan_summary.get("grid_semantics"),
+        "body_snap_to_grid": plan_summary.get("body_snap_to_grid"),
+        "grid_span_is_reserved_space": plan_summary.get("grid_span_is_reserved_space"),
+        "body_size_may_be_smaller_than_grid_span": plan_summary.get("body_size_may_be_smaller_than_grid_span"),
         "print_profile": config_payload.get("print_profile"),
         "max_stack_height_mm": configured_max_stack_height,
         "wall_thickness_mm": config_payload.get("defaults", {}).get("wall_thickness_mm"),
@@ -1937,6 +1957,10 @@ def quick_asset_box_summary(payload: dict[str, Any] | None) -> str:
         f"- box_inner_mm: {_format_vector_payload(quick.get('box_inner_mm'))}",
         f"- grid_units: {_format_grid_units_payload(quick.get('grid_units'))}",
         f"- grid_unit_mm: {_format_vector_payload(quick.get('grid_unit_mm'))}",
+        f"- grid_semantics: {quick.get('grid_semantics') or 'n/a'}",
+        f"- body_snap_to_grid: {quick.get('body_snap_to_grid') or 'n/a'}",
+        f"- grid_span_is_reserved_space: {quick.get('grid_span_is_reserved_space') or 'n/a'}",
+        f"- body_size_may_be_smaller_than_grid_span: {quick.get('body_size_may_be_smaller_than_grid_span') or 'n/a'}",
         f"- wall_thickness_mm: {quick.get('wall_thickness_mm')}",
         f"- floor_thickness_mm: {quick.get('floor_thickness_mm')}",
         f"- peripheral_clearance_mm: {quick.get('peripheral_clearance_mm')}",
@@ -2903,6 +2927,14 @@ def _grid_positioned_asset_blanks_from_metadata(
             candidate_id=candidate_id,
             clearance_applied=placement.get("clearance_applied") if isinstance(placement.get("clearance_applied"), dict) else None,
             sizing_policy=_optional_text(placement, "sizing_policy"),
+            grid_semantics=_optional_text(placement, "grid_semantics"),
+            body_snap_to_grid=_optional_text(placement, "body_snap_to_grid"),
+            grid_span_is_reserved_space=_optional_text(placement, "grid_span_is_reserved_space"),
+            body_size_may_be_smaller_than_grid_span=_optional_text(
+                placement,
+                "body_size_may_be_smaller_than_grid_span",
+            ),
+            grid_body_relationship=_optional_text(placement, "grid_body_relationship"),
             asset_fit_cavity=asset_fit_cavity,
         )
         collision = _first_colliding_solid(blank, occupied)

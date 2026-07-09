@@ -94,7 +94,7 @@ CAD IR uniquement ; aucune geometrie Fusion volumetrique n'est generee.
 
 P11-M001 branche les placements grille deja decides par le coeur Python sur la
 vue compacte Fusion. L'adaptateur consomme `metadata.executable_asset_plan` et
-cree uniquement des bodies rectangulaires positionnes par les champs deja resolus. Depuis P11-M003, les bodies asset-first utilisent `printable_body_origin_mm` / `printable_body_size_mm` quand presents ; depuis P11-M003V2, un placement grille moderne sans `printable_body_size_mm` est refuse. Depuis P11-M003V4, les placements portent aussi `module_source`, `placement_source`, `source_asset_ids` et clearances explicites pour distinguer scene produit, fixture technique et blank legacy. `theoretical_grid_extent_mm` reste le span de grille et non une taille de body.
+cree uniquement des bodies rectangulaires positionnes par les champs deja resolus. Depuis P11-M003, les bodies asset-first utilisent `printable_body_origin_mm` / `printable_body_size_mm` quand presents ; depuis P11-M003V2, un placement grille moderne sans `printable_body_size_mm` est refuse. Depuis P11-M003V4, les placements portent aussi `module_source`, `placement_source`, `source_asset_ids` et clearances explicites pour distinguer scene produit, fixture technique et blank legacy. `theoretical_grid_extent_mm` reste le span de grille et non une taille de body. Depuis P15-M004, cette convention est marquee explicitement par `grid_semantics: placement_reservation_lattice_v0`, `body_snap_to_grid: no`, `grid_span_is_reserved_space: yes` et `body_size_may_be_smaller_than_grid_span: yes`.
 Il ne cherche pas de nouveau placement et ne modifie pas la grille.
 
 Le smoke test humain `P11-M001V` du 2026-07-06 valide cette consommation compacte

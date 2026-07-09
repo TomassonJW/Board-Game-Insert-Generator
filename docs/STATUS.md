@@ -672,4 +672,12 @@ P15-M003 expose dans la commande Fusion classique un champ global optionnel `Max
 
 Le rapport `quick_asset_box` affiche maintenant `max_stack_height_mm`, `storage_orientation`, `stack_height_policy`, `max_stack_height_mm`, `stack_height_used_mm`, `xy_expansion_used` et `z_expansion_used` par asset et par candidat module. Exemple teste : le scenario deux tokens avec override `6 mm` produit un module `112.0 x 100.0 x 6.0 mm`, `capacity_per_stack 2`, `pile_count 15` pour `coin-tokens`, au lieu d'utiliser la pile par defaut `12 mm`.
 
-La prochaine mission P15-M004 doit clarifier la semantique grid/reservation dans les metadata et le resume Fusion.
+## P15-M004 - Grid semantics report V0
+
+Statut : `implemented-reporting`, tests assets et Fusion skeleton cibles OK, validation Fusion P15 non encore realisee, `print-validated: false`.
+
+P15-M004 clarifie que la grille `quick_asset_box` reste une lattice de placement/reservation. Les placements asset-first et le plan Fusion reportent maintenant `grid_semantics: placement_reservation_lattice_v0`, `body_snap_to_grid: no`, `grid_span_is_reserved_space: yes` et `body_size_may_be_smaller_than_grid_span: yes`.
+
+Le body Fusion continue d'utiliser `printable_body_size_mm` ; `theoretical_grid_extent_mm` est un span de reservation/occupation, pas une taille de body a extruder. Le resume `quick_asset_box`, `Module source mapping` et `Body sizing report` exposent cette difference pour eviter une interpretation trompeuse de la grille.
+
+La prochaine mission P15-M005 doit preparer le preset smoke P15 realiste et installer l'add-in/settings pour validation humaine Fusion.

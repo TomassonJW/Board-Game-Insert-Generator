@@ -53,6 +53,14 @@ _ASSET_ACCESS_TARGET_NOTCH_WIDTH_MM = 18.0
 _ASSET_ACCESS_MIN_NOTCH_WIDTH_MM = 6.0
 _ASSET_ACCESS_TARGET_DEPTH_FROM_TOP_MM = 10.0
 _ASSET_ACCESS_MIN_DEPTH_FROM_TOP_MM = 4.0
+_GRID_SEMANTICS = "placement_reservation_lattice_v0"
+_BODY_SNAP_TO_GRID = "no"
+_GRID_SPAN_IS_RESERVED_SPACE = "yes"
+_BODY_SIZE_MAY_BE_SMALLER_THAN_GRID_SPAN = "yes"
+_GRID_BODY_RELATIONSHIP = (
+    "Grid span reserves placement cells; printable body uses resolved module size "
+    "and may be smaller than theoretical grid extent."
+)
 
 
 def build_module_candidates_from_assets(config: InsertConfig) -> list[dict[str, Any]]:
@@ -1135,6 +1143,11 @@ def build_executable_asset_module_plan(config: InsertConfig) -> dict[str, Any]:
                 "size_mm": dict(module["printable_body_size_mm"]),
                 "theoretical_grid_origin_mm": _grid_origin_to_mm(origin, grid.unit_size_mm),
                 "theoretical_grid_extent_mm": _grid_size_to_mm(size_units, grid.unit_size_mm),
+                "grid_semantics": _GRID_SEMANTICS,
+                "body_snap_to_grid": _BODY_SNAP_TO_GRID,
+                "grid_span_is_reserved_space": _GRID_SPAN_IS_RESERVED_SPACE,
+                "body_size_may_be_smaller_than_grid_span": _BODY_SIZE_MAY_BE_SMALLER_THAN_GRID_SPAN,
+                "grid_body_relationship": _GRID_BODY_RELATIONSHIP,
                 "asset_fit_size_mm": dict(module["asset_fit_size_mm"]),
                 "storage_sizing": dict(module.get("storage_sizing", {})),
                 "asset_fit_cavity": dict(module.get("asset_fit_cavity", {})),
@@ -1149,7 +1162,8 @@ def build_executable_asset_module_plan(config: InsertConfig) -> dict[str, Any]:
                 "clearance_applied": dict(module["clearance_applied"]),
                 "sizing_policy": (
                     "size_mm is the generated printable body envelope; "
-                    "theoretical_grid_extent_mm is the occupied grid span."
+                    "theoretical_grid_extent_mm is the occupied placement reservation grid span, "
+                    "not a body snap size."
                 ),
                 "occupied_cells": len(cells),
                 "status": "placed",
@@ -1888,6 +1902,12 @@ def _plan_summary(
         "placed_cell_count": placed_cell_count,
         "placed_cell_volume_mm3_approx": round(placed_volume, 4),
         "free_cell_count_before_plan": free_cell_count_before_plan,
+        "grid_semantics": _GRID_SEMANTICS if grid is not None else "not_applicable",
+        "body_snap_to_grid": _BODY_SNAP_TO_GRID if grid is not None else "not_applicable",
+        "grid_span_is_reserved_space": _GRID_SPAN_IS_RESERVED_SPACE if grid is not None else "not_applicable",
+        "body_size_may_be_smaller_than_grid_span": (
+            _BODY_SIZE_MAY_BE_SMALLER_THAN_GRID_SPAN if grid is not None else "not_applicable"
+        ),
         **placement_summary,
     }
 
