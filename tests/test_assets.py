@@ -249,8 +249,17 @@ class AssetModelTests(unittest.TestCase):
 
         self.assertEqual(diagnostic["pile_count"], 6)
         self.assertEqual(diagnostic["items_per_pile"], 5)
-        self.assertEqual(generated["dimensions_mm"], {"x": 63.6, "y": 13.6, "z": 11.8})
-        self.assertEqual(generated["asset_fit_cavity"]["compartments"][0]["size_mm"], {"x": 61.2, "y": 11.2, "z": 10.6})
+        sizing = generated["storage_sizing"]
+        compartment = generated["asset_fit_cavity"]["compartments"][0]
+
+        self.assertEqual(generated["dimensions_mm"], {"x": 33.6, "y": 23.6, "z": 11.8})
+        self.assertEqual(generated["asset_fit_cavity"]["compartments"][0]["size_mm"], {"x": 31.2, "y": 21.2, "z": 10.6})
+        self.assertEqual(sizing["tray_packing_policy"], "flat_tray_2d_v0")
+        self.assertEqual(sizing["pile_grid_columns"], 3)
+        self.assertEqual(sizing["pile_grid_rows"], 2)
+        self.assertEqual(sizing["linear_layout_avoided"], "yes")
+        self.assertEqual(compartment["pile_grid_columns"], 3)
+        self.assertEqual(compartment["pile_grid_rows"], 2)
 
     def test_vertical_stack_explicit_preserves_legacy_available_height_behavior(self) -> None:
         payload = _count_aware_tokens_payload(count=30)
@@ -276,7 +285,51 @@ class AssetModelTests(unittest.TestCase):
         self.assertEqual(diagnostic["capacity_per_stack"], 2)
         self.assertEqual(diagnostic["pile_count"], 15)
         self.assertEqual(diagnostic["items_per_pile"], 2)
-        self.assertEqual(generated["dimensions_mm"], {"x": 93.6, "y": 23.6, "z": 5.8})
+        self.assertEqual(generated["dimensions_mm"], {"x": 53.6, "y": 33.6, "z": 5.8})
+        self.assertEqual(generated["storage_sizing"]["pile_grid_columns"], 5)
+        self.assertEqual(generated["storage_sizing"]["pile_grid_rows"], 3)
+        self.assertEqual(generated["storage_sizing"]["linear_layout_avoided"], "yes")
+
+
+    def test_flat_tray_2d_packs_eight_dice_as_four_by_two(self) -> None:
+        payload = _count_aware_tokens_payload(count=8)
+        payload["assets"][0]["kind"] = "dice"
+        payload["assets"][0]["id"] = "dice-set"
+        payload["assets"][0]["dimensions_mm"] = {"x": 16, "y": 16, "z": 16}
+        payload["assets"][0]["max_stack_height_mm"] = 18
+        payload["box"]["inner_dimensions_mm"] = {"x": 220, "y": 160, "z": 60}
+        payload["box"]["usable_height_mm"] = 60
+        payload["volumetric_grid"] = {"unit_mm": {"x": 27.5, "y": 32, "z": 20}, "size_units": {"x": 8, "y": 5, "z": 3}}
+
+        generated = _layout_payload(payload)["executable_asset_plan"]["generated_modules"][0]
+        sizing = generated["storage_sizing"]
+
+        self.assertEqual(sizing["tray_packing_policy"], "flat_tray_2d_v0")
+        self.assertEqual(sizing["pile_grid_columns"], 4)
+        self.assertEqual(sizing["pile_grid_rows"], 2)
+        self.assertEqual(sizing["linear_layout_avoided"], "yes")
+        self.assertLess(generated["dimensions_mm"]["x"], 132.0)
+
+    def test_flat_tray_2d_packs_twelve_cube_piles_as_four_by_three(self) -> None:
+        payload = _count_aware_tokens_payload(count=24)
+        payload["assets"][0]["kind"] = "other"
+        payload["assets"][0]["id"] = "cubes"
+        payload["assets"][0]["dimensions_mm"] = {"x": 8, "y": 8, "z": 8}
+        payload["assets"][0]["max_stack_height_mm"] = 18
+        payload["box"]["inner_dimensions_mm"] = {"x": 220, "y": 160, "z": 60}
+        payload["box"]["usable_height_mm"] = 60
+        payload["volumetric_grid"] = {"unit_mm": {"x": 27.5, "y": 32, "z": 20}, "size_units": {"x": 8, "y": 5, "z": 3}}
+
+        generated = _layout_payload(payload)["executable_asset_plan"]["generated_modules"][0]
+        sizing = generated["storage_sizing"]
+        diagnostic = sizing["asset_diagnostics"][0]
+
+        self.assertEqual(diagnostic["capacity_per_stack"], 2)
+        self.assertEqual(diagnostic["pile_count"], 12)
+        self.assertEqual(sizing["pile_grid_columns"], 4)
+        self.assertEqual(sizing["pile_grid_rows"], 3)
+        self.assertEqual(sizing["linear_layout_avoided"], "yes")
+        self.assertLess(generated["dimensions_mm"]["x"], 98.4)
 
     def test_asset_compartments_plan_front_access_notches_for_smoke_case(self) -> None:
         payload = _count_aware_tokens_payload(count=40)
@@ -356,10 +409,10 @@ class AssetModelTests(unittest.TestCase):
         self.assertEqual(cavity["compartment_count"], 3)
         self.assertEqual(cavity["asset_compartment_cavities_planned"], 3)
         self.assertEqual([item["asset_id"] for item in cavity["compartments"]], ["coin-tokens", "status-tokens", "wound-tokens"])
-        self.assertEqual(generated["dimensions_mm"], {"x": 147.6, "y": 57.0, "z": 11.8})
-        self.assertEqual(cavity["asset_fit_size_mm"], {"x": 145.2, "y": 54.6, "z": 10.6})
+        self.assertEqual(generated["dimensions_mm"], {"x": 144.4, "y": 45.6, "z": 11.8})
+        self.assertEqual(cavity["asset_fit_size_mm"], {"x": 142.0, "y": 43.2, "z": 10.6})
         self.assertTrue(cavity["compartments"][1]["expected_walls_mm"]["x_min"] > 0)
-        self.assertEqual(cavity["asset_access_notches_planned"], 1)
+        self.assertEqual(cavity["asset_access_notches_planned"], 3)
 
     def test_multi_asset_compartments_support_four_assets_with_internal_walls(self) -> None:
         payload = _multi_asset_tokens_payload(asset_count=4)
@@ -370,11 +423,12 @@ class AssetModelTests(unittest.TestCase):
         self.assertEqual(cavity["layout_strategy"], "deterministic_shelf_by_source_asset_v0")
         self.assertEqual(cavity["compartment_count"], 4)
         self.assertEqual(cavity["asset_compartment_cavities_planned"], 4)
-        self.assertEqual(generated["dimensions_mm"], {"x": 147.6, "y": 57.0, "z": 11.8})
-        self.assertEqual(cavity["asset_fit_size_mm"], {"x": 145.2, "y": 54.6, "z": 10.6})
-        self.assertEqual(cavity["compartments"][0]["wall_role_y_max"], "internal_wall")
-        self.assertEqual(cavity["compartments"][1]["wall_role_y_min"], "internal_wall")
-        self.assertEqual(cavity["asset_access_notches_refused"], 3)
+        self.assertEqual(generated["dimensions_mm"], {"x": 158.8, "y": 45.6, "z": 11.8})
+        self.assertEqual(cavity["asset_fit_size_mm"], {"x": 156.4, "y": 43.2, "z": 10.6})
+        self.assertEqual(cavity["compartments"][0]["wall_role_x_max"], "internal_wall")
+        self.assertEqual(cavity["compartments"][1]["wall_role_x_min"], "internal_wall")
+        self.assertEqual(cavity["asset_access_notches_planned"], 4)
+        self.assertEqual(cavity["asset_access_notches_refused"], 0)
         report = generated["printability_report_v0"]
         self.assertEqual(report["policy"], "printability_report_v0")
         self.assertEqual(report["printability_checked"], "yes")

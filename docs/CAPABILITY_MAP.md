@@ -223,3 +223,10 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 - C-SOLVER : strategie heuristique locale documentee, sans solveur global, backtracking ni dependance externe.
 - C-FUSION-UI : reporting P16 cible defini, notamment `tray_packing_policy`, `pile_grid_columns`, `pile_grid_rows`, `target_aspect_ratio`, `max_module_length_mm` et warnings de fallback.
 - Validation : documentaire seulement ; implementation moteur attendue en P16-M002 ; aucune validation Fusion ou impression.
+
+## P16-M002 capability update
+
+- C-ASSET : `implemented-core` pour `flat_tray_2d_v0` sur tokens/dice/meeples/generic, diagnostics de grille locale de piles et dimensions module moins lineaires.
+- C-SOLVER : heuristique locale deterministe implementee sans backtracking ni solveur global.
+- C-FUSION-CAVITIES / C-ACCESS : compartiments, cavites rectangulaires et notches suivent les nouvelles enveloppes asset-fit, sans cavite par item.
+- Validation : tests automatises OK ; validation Fusion P16 reste a faire ; `print-validated: false`.

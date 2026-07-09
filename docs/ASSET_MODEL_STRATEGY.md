@@ -233,3 +233,9 @@ Terminologie retenue :
 - `max_stack_height_mm` : plafond de hauteur de pile deja expose par P15.
 
 Pour `tokens`, `dice`, `meeples` et `generic`, le defaut cible est `flat_tray_2d_v0`. Les cartes gardent leur semantique de deck/paquet total. Les cavites restent des enveloppes rectangulaires par asset source, pas des logements individuels par pile ou item.
+
+## P16-M002 - Packing 2D moteur
+
+Le moteur implemente maintenant `flat_tray_2d_v0` pour les assets simples en orientation `flat_tray`. La grille locale de piles est calculee apres la capacite verticale : `items_per_pile`, `pile_count`, puis `pile_grid_columns` et `pile_grid_rows`.
+
+Les diagnostics `storage_sizing`, asset et compartiment transportent `tray_packing_policy`, `target_aspect_ratio`, `max_module_length_mm`, `linear_layout_avoided` et les dimensions de footprint. Les cavites restent rectangulaires par source asset et suivent l'enveloppe 2D resultante ; aucune cavite par item ou pile n'est creee.

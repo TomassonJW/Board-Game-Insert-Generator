@@ -200,3 +200,9 @@ Ce qui est autorise :
 - refus ou warning si `max_module_length_mm` ou la boite/grille rendent le resultat impossible.
 
 Ce qui reste interdit : solveur global, backtracking, permutation optimale de modules, dependance d'optimisation, cavites par item, visualisation de chaque asset individuel.
+
+## P16-M002 - Implementation flat_tray_2d V0
+
+L'heuristique `flat_tray_2d_v0` est locale au sizing d'un asset ou groupe d'assets. Elle choisit une grille de piles deterministe en enumerant les colonnes possibles, en minimisant d'abord les cases vides puis l'ecart au `target_aspect_ratio`.
+
+Cette implementation ne change pas le placement global des modules dans la grille volumetrique : le `executable_asset_plan` continue d'utiliser le placement greedy borne existant. Il n'y a toujours pas de backtracking ni d'optimisation globale.

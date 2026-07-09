@@ -382,6 +382,7 @@ def _count_aware_stacked_module_from_assets(
     floor = config.defaults.floor_thickness_mm
     available_fit_height = _count_aware_max_asset_fit_height(config, floor)
     max_content_width = max(0.0, config.box.inner_dimensions.x - wall * 2.0 - clearance_mm * 2.0)
+    max_content_depth = max(0.0, config.box.inner_dimensions.y - wall * 2.0 - clearance_mm * 2.0)
     max_asset_fit_width = max(0.0, config.box.inner_dimensions.x - wall * 2.0)
     max_asset_fit_depth = max(0.0, config.box.inner_dimensions.y - wall * 2.0)
     pile_rectangles: list[dict[str, Any]] = []
@@ -405,7 +406,13 @@ def _count_aware_stacked_module_from_assets(
                 }
             )
 
-    packed = _pack_count_aware_piles(pile_rectangles, max_content_width)
+    packing_policy = _count_aware_pile_packing_policy(diagnostics)
+    packed = _pack_count_aware_piles(
+        pile_rectangles,
+        max_content_width,
+        max_depth_mm=max_content_depth,
+        packing_policy=packing_policy,
+    )
     if not packed["fits_width"]:
         warnings.append(
             "Count-aware pile layout exceeds the available module content width; downstream row/grid placement must reject or report the overflow."
@@ -469,6 +476,12 @@ def _count_aware_stacked_module_from_assets(
         "declared_capacity_count": declared_capacity,
         "declared_capacity_guarantee": "heuristic_envelope_only_not_physical_cavity",
         "asset_diagnostics": diagnostics,
+        "tray_packing_policy": packed["tray_packing_policy"],
+        "target_aspect_ratio": packed["target_aspect_ratio"],
+        "max_module_length_mm": packed["max_module_length_mm"],
+        "pile_grid_columns": packed["pile_grid_columns"],
+        "pile_grid_rows": packed["pile_grid_rows"],
+        "linear_layout_avoided": packed["linear_layout_avoided"],
         "pile_layout": packed["pile_layout"],
         "asset_compartment_layout": compartment_layout,
         "content_footprint_mm": packed["content_size_mm"],
@@ -488,7 +501,7 @@ def _count_aware_stacked_module_from_assets(
         "sizing_reasons": [
             "Count-aware V0 treats each asset item as a rectangular stackable proxy.",
             "P15 flat_tray limits stack height by max_stack_height_mm before additional count becomes XY piles; vertical_stack keeps the old available-height behavior only when explicit.",
-            "Pile footprints are row-packed in XY without backtracking or global optimization.",
+            "Pile footprints use flat_tray_2d_v0 for flat trays and keep row packing for explicit vertical_stack legacy behavior, without backtracking or global optimization.",
         ],
         "warnings": warnings,
     }
@@ -567,10 +580,104 @@ def _count_aware_asset_stack_diagnostic(
     }
 
 
-def _pack_count_aware_piles(piles: list[dict[str, Any]], max_width_mm: float) -> dict[str, Any]:
-    if not piles:
-        return {"fits_width": True, "content_size_mm": {"x": 0.0, "y": 0.0, "z": 0.0}, "pile_layout": []}
+def _count_aware_pile_packing_policy(diagnostics: list[dict[str, Any]]) -> str:
+    if diagnostics and all(item.get("storage_orientation") == AssetStorageOrientation.FLAT_TRAY.value for item in diagnostics):
+        return "flat_tray_2d_v0"
+    return "flat_tray_linear_v0"
 
+
+def _pack_count_aware_piles(
+    piles: list[dict[str, Any]],
+    max_width_mm: float,
+    *,
+    max_depth_mm: float = 0.0,
+    packing_policy: str = "flat_tray_2d_v0",
+    target_aspect_ratio: float = 1.6,
+    max_module_length_mm: float | None = None,
+) -> dict[str, Any]:
+    if not piles:
+        return {
+            "fits_width": True,
+            "content_size_mm": {"x": 0.0, "y": 0.0, "z": 0.0},
+            "pile_layout": [],
+            "tray_packing_policy": packing_policy,
+            "target_aspect_ratio": round(target_aspect_ratio, 4),
+            "max_module_length_mm": round(max_module_length_mm or max_width_mm, 4),
+            "pile_grid_columns": 0,
+            "pile_grid_rows": 0,
+            "linear_layout_avoided": "no",
+        }
+
+    if packing_policy != "flat_tray_2d_v0":
+        return _pack_count_aware_piles_linear(
+            piles,
+            max_width_mm,
+            packing_policy=packing_policy,
+            target_aspect_ratio=target_aspect_ratio,
+            max_module_length_mm=max_module_length_mm,
+        )
+
+    normalized = _normalized_piles_for_packing(piles, max_width_mm)
+    max_pile_width = max(float(pile["x"]) for pile in normalized)
+    max_pile_depth = max(float(pile["y"]) for pile in normalized)
+    max_length = float(max_module_length_mm) if max_module_length_mm is not None else max_width_mm
+    if max_depth_mm > 0:
+        max_length = min(max_length, max_depth_mm * target_aspect_ratio)
+    max_length = max(max_pile_width, max_length)
+    columns, rows = _choose_flat_tray_2d_grid(
+        pile_count=len(normalized),
+        pile_width_mm=max_pile_width,
+        pile_depth_mm=max_pile_depth,
+        max_width_mm=max_width_mm,
+        max_depth_mm=max_depth_mm,
+        max_module_length_mm=max_length,
+        target_aspect_ratio=target_aspect_ratio,
+    )
+
+    layout: list[dict[str, Any]] = []
+    content_x = 0.0
+    content_y = 0.0
+    for index, pile in enumerate(normalized):
+        column = index % columns
+        row = index // columns
+        origin_x = column * max_pile_width
+        origin_y = row * max_pile_depth
+        layout.append(
+            {
+                "asset_id": pile["asset_id"],
+                "pile_index": pile["pile_index"],
+                "origin_mm": {"x": round(origin_x, 4), "y": round(origin_y, 4), "z": 0.0},
+                "size_mm": {"x": round(float(pile["x"]), 4), "y": round(float(pile["y"]), 4), "z": 0.0},
+                "rotated": bool(pile.get("rotated", False)),
+            }
+        )
+        content_x = max(content_x, origin_x + float(pile["x"]))
+        content_y = max(content_y, origin_y + float(pile["y"]))
+
+    fits_width = max_width_mm > 0 and content_x <= max_width_mm
+    fits_depth = max_depth_mm <= 0 or content_y <= max_depth_mm
+    linear_layout_avoided = "yes" if rows > 1 and len(normalized) > columns else "no"
+    return {
+        "fits_width": fits_width and fits_depth,
+        "content_size_mm": {"x": round(content_x, 4), "y": round(content_y, 4), "z": 0.0},
+        "pile_layout": layout,
+        "tray_packing_policy": "flat_tray_2d_v0",
+        "target_aspect_ratio": round(target_aspect_ratio, 4),
+        "max_module_length_mm": round(max_length, 4),
+        "pile_grid_columns": columns,
+        "pile_grid_rows": rows,
+        "linear_layout_avoided": linear_layout_avoided,
+    }
+
+
+def _pack_count_aware_piles_linear(
+    piles: list[dict[str, Any]],
+    max_width_mm: float,
+    *,
+    packing_policy: str,
+    target_aspect_ratio: float,
+    max_module_length_mm: float | None,
+) -> dict[str, Any]:
     row_x = 0.0
     row_y = 0.0
     row_depth = 0.0
@@ -607,7 +714,61 @@ def _pack_count_aware_piles(piles: list[dict[str, Any]], max_width_mm: float) ->
         "fits_width": fits_width,
         "content_size_mm": {"x": round(content_x, 4), "y": round(content_y, 4), "z": 0.0},
         "pile_layout": layout,
+        "tray_packing_policy": packing_policy,
+        "target_aspect_ratio": round(target_aspect_ratio, 4),
+        "max_module_length_mm": round(max_module_length_mm or max_width_mm, 4),
+        "pile_grid_columns": len(layout),
+        "pile_grid_rows": 1 if layout else 0,
+        "linear_layout_avoided": "no",
     }
+
+
+def _normalized_piles_for_packing(piles: list[dict[str, Any]], max_width_mm: float) -> list[dict[str, Any]]:
+    normalized: list[dict[str, Any]] = []
+    for pile in sorted(piles, key=lambda item: (str(item["asset_id"]), int(item["pile_index"]))):
+        width = float(pile["x"])
+        depth = float(pile["y"])
+        rotated = False
+        if max_width_mm > 0 and width > max_width_mm and depth <= max_width_mm:
+            width, depth = depth, width
+            rotated = True
+        normalized.append({"asset_id": pile["asset_id"], "pile_index": pile["pile_index"], "x": width, "y": depth, "rotated": rotated})
+    return normalized
+
+
+def _choose_flat_tray_2d_grid(
+    *,
+    pile_count: int,
+    pile_width_mm: float,
+    pile_depth_mm: float,
+    max_width_mm: float,
+    max_depth_mm: float,
+    max_module_length_mm: float,
+    target_aspect_ratio: float,
+) -> tuple[int, int]:
+    best: tuple[float, float, float, int, int, int] | None = None
+    for columns in range(1, pile_count + 1):
+        rows = ceil(pile_count / columns)
+        width = columns * pile_width_mm
+        depth = rows * pile_depth_mm
+        empty_slots = columns * rows - pile_count
+        fits_width = max_width_mm <= 0 or width <= max_width_mm
+        fits_depth = max_depth_mm <= 0 or depth <= max_depth_mm
+        fits_length = width <= max_module_length_mm
+        if not (fits_width and fits_depth and fits_length):
+            continue
+        ratio = width / depth if depth > 0 else target_aspect_ratio
+        score = (empty_slots, abs(ratio - target_aspect_ratio), width, depth, columns, rows)
+        if best is None or score < best:
+            best = score
+    if best is not None:
+        return best[4], best[5]
+
+    constrained_columns = pile_count
+    if pile_width_mm > 0 and max_width_mm > 0:
+        constrained_columns = max(1, min(pile_count, floor(max_width_mm / pile_width_mm)))
+    rows = ceil(pile_count / constrained_columns)
+    return constrained_columns, rows
 
 
 def _count_aware_compartment_layout(
@@ -651,9 +812,20 @@ def _count_aware_compartment_layout(
             }
             for pile_index in range(int(diagnostic["pile_count"]))
         ]
-        packed = _pack_count_aware_piles(pile_rectangles, max_content_width_mm)
+        packed = _pack_count_aware_piles(
+            pile_rectangles,
+            max_content_width_mm,
+            max_depth_mm=max_asset_fit_depth_mm - clearance_mm * 2.0,
+            packing_policy=_count_aware_pile_packing_policy([diagnostic]),
+        )
         if not packed["fits_width"]:
             warnings.append(f"Asset {asset.id} compartment pile layout exceeds available content width.")
+        diagnostic["tray_packing_policy"] = packed["tray_packing_policy"]
+        diagnostic["target_aspect_ratio"] = packed["target_aspect_ratio"]
+        diagnostic["max_module_length_mm"] = packed["max_module_length_mm"]
+        diagnostic["pile_grid_columns"] = packed["pile_grid_columns"]
+        diagnostic["pile_grid_rows"] = packed["pile_grid_rows"]
+        diagnostic["linear_layout_avoided"] = packed["linear_layout_avoided"]
         content_size = packed["content_size_mm"]
         size = {
             "x": round(content_size["x"] + clearance_mm * 2.0, 4),
@@ -683,6 +855,12 @@ def _count_aware_compartment_layout(
                 "pile_count": diagnostic["pile_count"],
                 "items_per_pile": diagnostic["items_per_pile"],
                 "declared_capacity_count": diagnostic["declared_capacity_count"],
+                "tray_packing_policy": packed["tray_packing_policy"],
+                "target_aspect_ratio": packed["target_aspect_ratio"],
+                "max_module_length_mm": packed["max_module_length_mm"],
+                "pile_grid_columns": packed["pile_grid_columns"],
+                "pile_grid_rows": packed["pile_grid_rows"],
+                "linear_layout_avoided": packed["linear_layout_avoided"],
                 "pile_layout": packed["pile_layout"],
                 "pile_footprint_mm": dict(diagnostic["pile_footprint_mm"]),
                 "local_origin_mm": local_origin,

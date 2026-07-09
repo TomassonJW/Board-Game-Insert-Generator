@@ -999,3 +999,8 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Livrable : ADR-0034 et docs strategie mises a jour.
 - Decision : `flat_tray_2d_v0` devient la cible par defaut pour assets simples ; `flat_tray_linear_v0` reste le nom de l'ancien comportement ; `vertical_stack` reste explicite.
 - Statut : `done-docs`.
+
+### P16-M002 - Packing 2D V0 des piles implemente
+
+- Livrable : heuristique `flat_tray_2d_v0`, diagnostics de piles, tests tokens/dice/cubes/max stack et non-regression `vertical_stack`.
+- Statut : `done`, `implemented-core`, validation Fusion P16 encore requise.

@@ -717,3 +717,13 @@ Statut : `done-docs`, ADR acceptee `docs/DECISIONS/ADR-0034-flat-tray-2d-packing
 Decision : `flat_tray_linear_v0` nomme l'ancien comportement P15 qui etale les piles surtout sur une ligne X. `flat_tray_2d_v0` devient la cible par defaut pour `tokens`, `dice`, `meeples` et `generic` : calcul de `items_per_pile`, `pile_count`, puis repartition en `pile_grid_columns` x `pile_grid_rows` selon un ratio cible et une longueur maximale souple, sans solveur global ni backtracking.
 
 La grille globale reste une lattice de reservation (`placement_reservation_lattice_v0`) et le body ne snap pas physiquement a la grille (`body_snap_to_grid: no`). `vertical_stack` reste un mode explicite/legacy, pas le defaut.
+
+## P16-M002 - Packing 2D V0 des piles implemente
+
+Statut : `implemented-core`, tests assets et suite complete OK, validation Fusion P16 non encore realisee, `print-validated: false`.
+
+P16-M002 remplace le packing interne `flat_tray_linear_v0` par `flat_tray_2d_v0` pour les assets simples en `flat_tray`. Le moteur calcule toujours `capacity_per_stack`, `pile_count` et `items_per_pile`, puis choisit une grille locale `pile_grid_columns x pile_grid_rows` selon un ratio cible `1.6` et une longueur maximale heuristique. `vertical_stack` conserve le packing lineaire legacy.
+
+Exemples testes : 30 tokens `10 x 10 x 2` avec stack max par defaut passent de l'ancien module P15 `63.6 x 13.6 x 11.8` a `33.6 x 23.6 x 11.8` en `3 x 2` piles ; avec `max_stack_height_mm = 6`, le module passe de `93.6 x 23.6 x 5.8` a `53.6 x 33.6 x 5.8` en `5 x 3` piles. 8 des de 16 mm sont testes en `4 x 2`, et 12 piles de cubes en `4 x 3`.
+
+Metadata ajoutee : `tray_packing_policy`, `target_aspect_ratio`, `max_module_length_mm`, `pile_grid_columns`, `pile_grid_rows`, `linear_layout_avoided` sur `storage_sizing`, diagnostics par asset et compartiments. Compartiments, cavites et notches utilisent deja les nouvelles enveloppes, sans cavite par item.

@@ -26,9 +26,9 @@ Aucune gate humaine active apres validation Fusion `P15-TRAY-SEMANTICS-ALIGNMENT
 
 Mission interne terminee : P16-M001 - Documenter la strategie flat_tray_2d, ADR-0034 acceptee, pas de changement moteur.
 
-Mission interne ready : P16-M002 - Implementer packing 2D V0 des piles, heuristique deterministe pour tokens/dice/meeples/generic sans solveur global.
+Mission interne terminee : P16-M002 - Implementer packing 2D V0 des piles, heuristique deterministe `flat_tray_2d_v0`, tests automatises OK.
 
-Mission interne suivante : P16-M003 - Aligner compartiments, cavites et notches sur le packing 2D.
+Mission interne ready : P16-M003 - Aligner compartiments, cavites et notches sur le packing 2D.
 
 Mission interne suivante : P16-M004 - Clarifier UI et reporting P16.
 
@@ -38,7 +38,7 @@ Mission interne suivante : P16-M006 - Preparation gate Fusion P16.
 
 ## Mission ready non gated
 
-`P16-M002 - Implementer packing 2D V0 des piles`.
+`P16-M003 - Aligner compartiments, cavites et notches sur le packing 2D`.
 
 ## Regle operationnelle Fusion
 
