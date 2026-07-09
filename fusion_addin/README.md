@@ -707,7 +707,7 @@ Le script `scripts/fusion/prepare_quick_asset_test.ps1` accepte `-Preset p14_com
 
 ## P16 ergonomic tray packing smoke preset
 
-`prepare_quick_asset_test.ps1` prepare maintenant par defaut `p16_ergonomic_tray_packing` : box `240 x 170 x 60`, grid `8 x 5 x 3`, `max_stack_height_mm = 18`, `target_aspect_ratio = 1.4`, `max_module_length_mm = 70`, assets `coin-tokens`, `status-tokens`, `damage-tokens`, `dice-set` et `wood-meeples`. Le smoke Fusion doit verifier `tray_packing_policy: flat_tray_2d_v0`, `pile_grid_columns`, `pile_grid_rows`, `linear_layout_avoided`, compartiments/encoches, printability report, regenerate sans doublon et clear preservant les objets non-BGIG.
+`prepare_quick_asset_test.ps1` prepare le preset `p16_ergonomic_tray_packing` : box `240 x 170 x 60`, grid `8 x 5 x 3`, `max_stack_height_mm = 18`, `target_aspect_ratio = 1.4`, `max_module_length_mm = 70`, assets `coin-tokens`, `status-tokens`, `damage-tokens`, `dice-set` et `wood-meeples`. Le smoke Fusion doit verifier `tray_packing_policy: flat_tray_2d_v0`, `pile_grid_columns`, `pile_grid_rows`, `linear_layout_avoided`, compartiments/encoches, printability report, regenerate sans doublon et clear preservant les objets non-BGIG.
 
 
 ## P17-M002 - export_printables
@@ -715,3 +715,9 @@ Le script `scripts/fusion/prepare_quick_asset_test.ps1` accepte `-Preset p14_com
 La commande Fusion classique inclut l'action `export_printables`. Elle exporte en STL V0 uniquement les bodies tagues BGIG `module_body` de la scene courante. Les references, sketches debug, helpers, sources, scene roots, occurrences compactes/eclatees et objets non-BGIG sont exclus ou refuses avec raison.
 
 Le rapport affiche `print_validated: false`. Depuis P17-M003, `bgig_export_manifest.json` et `bgig_export_manifest.md` sont ecrits dans le dossier export. Cela ne valide pas l'impression physique.
+
+## P17-M006 - Gate export/preprint
+
+Le script `scripts/fusion/prepare_quick_asset_test.ps1` prepare maintenant par defaut le preset `p17_printable_export` : box `240 x 170 x 60`, grid `8 x 5 x 3`, `max_stack_height_mm = 18`, `target_aspect_ratio = 1.4`, `max_module_length_mm = 70`, assets `coin-tokens`, `status-tokens`, `damage-tokens`, `dice-set` et `wood-meeples`.
+
+Workflow de gate : generer la scene `quick_asset_box`, rouvrir BGIG, choisir `export_printables`, puis verifier les STL, `bgig_export_manifest.json`, `bgig_export_manifest.md`, les refus d'entites non imprimables et `print_validated: false`. Cette gate ne valide pas l'impression physique.

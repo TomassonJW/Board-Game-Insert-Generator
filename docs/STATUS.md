@@ -781,14 +781,14 @@ Limites maintenues : packing encore heuristique, pas de solveur global, pas d'op
 
 Statut : sprint lance apres validation humaine P16. Objectif : definir puis implementer une premiere chaine V0 de pre-impression : export de modules imprimables, manifeste export, dossier de sortie propre, rapport printability plus actionnable et preparation d'un pack imprimable sans pretendre a une validation physique.
 
-Garde-fous : export depuis Fusion uniquement si l'API est fiable, pas d'export des objets non-BGIG, references, debug sketches/outlines ou helpers/source occurrences, `print-validated: false` obligatoire, aucune promesse `ready to print` absolue. `P17-M001` est terminee ; prochaine mission ready : `P17-M002 - Action Fusion export_printables`.
+Garde-fous : export depuis Fusion uniquement si l'API est fiable, pas d'export des objets non-BGIG, references, debug sketches/outlines ou helpers/source occurrences, `print-validated: false` obligatoire, aucune promesse `ready to print` absolue. P17-M001 a ouvert le sprint ; P17-M006 prepare maintenant la gate humaine export/preprint.
 
 
 ### P17-M001 - ADR export/preprint V0
 
 Statut : `done-docs`. `ADR-0035-printable-export-preprint-v0.md` fixe le contrat V0 : export Fusion-only, cible STL par module, 3MF reporte sauf API simple, exclusion stricte des objets non-BGIG/references/debug/helpers/source/exploded par defaut, noms deterministes, manifeste JSON/Markdown et `print_validated: false` obligatoire.
 
-Prochaine mission ready : `P17-M002 - Action Fusion export_printables`. Cette mission doit implementer l'action seulement si l'API Fusion permet un export fiable par module ; sinon elle doit declarer une gate technique plutot que simuler un export.
+Suite realisee : P17-M002 a implemente `export_printables` sans simuler de succes si l'API Fusion refuse l'export.
 
 
 ### P17-M002 - Action Fusion export_printables
@@ -797,28 +797,28 @@ Statut : `implemented-fusion-unvalidated`. La commande Fusion classique accepte 
 
 Exclusions V0 : scene roots, scene root components, occurrences compactes/eclatees, references/outlines, sketches debug, features/cuts et objets non-BGIG ne sont pas exportes directement. Ils sont soit ignores, soit listes comme refuses avec raison. Si `design.exportManager` est indisponible ou si Fusion refuse l'export STL, le rapport passe en `technical_gate`/`partial_or_failed` au lieu de simuler une reussite.
 
-Prochaine mission ready : `P17-M003 - Export manifest V0`.
+Suite realisee : P17-M003 a ajoute les manifestes export.
 
 
 ### P17-M003 - Export manifest V0
 
 Statut : `implemented-fusion-unvalidated`. L'action `export_printables` ecrit maintenant `bgig_export_manifest.json` et `bgig_export_manifest.md` dans le dossier export. Le JSON expose `schema_version: bgig.export_manifest.v0`, politique export, format, timestamp, statut, settings UI, source CAD IR si disponible, assets, modules, fichiers exportes, refus, warnings et `print_validated: false`.
 
-Limite : le manifeste est un artefact d'audit preprint. Il ne prouve pas la printability physique, ne remplace pas la gate Fusion et ne valide aucune impression. Prochaine mission ready : `P17-M004 - Printability blockers V0`.
+Limite : le manifeste est un artefact d'audit preprint. Il ne prouve pas la printability physique, ne remplace pas la gate Fusion et ne valide aucune impression. Suite realisee : P17-M004 a ajoute les blockers printability.
 
 
 ### P17-M004 - Printability blockers V0
 
 Statut : `implemented-core-fusion-reporting`. `printability_report_v0` expose maintenant `printability_status`, `printability_export_allowed`, `issue_counts` et `issues[]` avec severites `warning`/`blocker`. Les anciens `warnings[]` restent presents pour compatibilite.
 
-Regle V0 : les murs/fonds sous minimum et une cavite supprimant toute la hauteur deviennent des blockers et desactivent `printability_export_allowed`; la profondeur d'encoche importante, les modules hauts, cavites non planifiees et l'absence de validation physique restent des warnings. Le resume Fusion `quick_asset_box` affiche `printability_status` et `printability_export_allowed`. Prochaine mission ready : `P17-M005 - Calibration coupon / preprint check V0`.
+Regle V0 : les murs/fonds sous minimum et une cavite supprimant toute la hauteur deviennent des blockers et desactivent `printability_export_allowed`; la profondeur d'encoche importante, les modules hauts, cavites non planifiees et l'absence de validation physique restent des warnings. Le resume Fusion `quick_asset_box` affiche `printability_status` et `printability_export_allowed`. Suite realisee : P17-M005 a ajoute le protocole preprint.
 
 
 ### P17-M005 - Calibration coupon / preprint check V0
 
 Statut : `protocol-ready`. Le sprint P17 ne cree pas encore de geometrie coupon Fusion ; P17-M005 ajoute plutot `docs/PREPRINT_CHECK_PROTOCOL.md` et `examples/preprint_check_v0.json` pour cadrer une future session preprint a partir du dossier export, des STL et des manifestes.
 
-Le protocole conserve `print_validated: false` et distingue `not_printed`, `printed_unmeasured`, `measured_local_ok`, `measured_local_ko` et `retest_required`. Prochaine mission ready : `P17-M006 - Gate Fusion P17 export complet`.
+Le protocole conserve `print_validated: false` et distingue `not_printed`, `printed_unmeasured`, `measured_local_ok`, `measured_local_ko` et `retest_required`. Suite realisee : P17-M006 prepare la gate Fusion P17 export complet.
 
 
 ### P17-M006 - Gate Fusion P17 export complet

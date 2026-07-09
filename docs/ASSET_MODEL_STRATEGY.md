@@ -239,3 +239,9 @@ Pour `tokens`, `dice`, `meeples` et `generic`, le defaut cible est `flat_tray_2d
 Le moteur implemente maintenant `flat_tray_2d_v0` pour les assets simples en orientation `flat_tray`. La grille locale de piles est calculee apres la capacite verticale : `items_per_pile`, `pile_count`, puis `pile_grid_columns` et `pile_grid_rows`.
 
 Les diagnostics `storage_sizing`, asset et compartiment transportent `tray_packing_policy`, `target_aspect_ratio`, `max_module_length_mm`, `linear_layout_avoided` et les dimensions de footprint. Les cavites restent rectangulaires par source asset et suivent l'enveloppe 2D resultante ; aucune cavite par item ou pile n'est creee.
+
+## P17 - Export/preprint boundary
+
+P17 ne change pas le modele asset-first : les assets, piles, compartiments, encoches et rapports `storage_sizing` restent produits par le coeur Python pur. Le sprint ajoute une boucle export/preprint cote adaptateur Fusion : export STL des `module_body` BGIG, manifeste JSON/Markdown et protocole preprint.
+
+Frontiere maintenue : le coeur `src/board_game_insert_generator` ne produit pas de STL/3MF, n'importe pas `adsk` et ne pretend pas valider l'impression physique. Les champs `printability_report_v0`, `printability_export_allowed` et `printability_validated_by_print: no` servent a documenter l'export technique et les risques avant une future validation mesuree.
