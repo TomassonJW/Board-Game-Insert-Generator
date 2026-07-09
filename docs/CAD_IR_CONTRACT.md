@@ -469,3 +469,18 @@ Si le layout multi-assets ne tient pas, `asset_compartment_layout` peut porter `
 Les entrees `metadata.executable_asset_plan.generated_modules[]` et `placements[]` peuvent transporter `printability_report_v0`. Le bloc est additif et contient `printability_checked`, `printability_validated_by_print`, `thresholds_mm`, `min_external_wall_mm`, `min_internal_wall_mm`, `min_retained_floor_mm`, `max_cavity_depth_mm`, `max_notch_depth_from_top_mm`, `checks[]` et `warnings[]`.
 
 Cette metadata ne change pas `schema_version`, ne modifie pas les tolerances et ne vaut pas validation d'impression.
+
+
+## P16-ERGONOMIC-2D-TRAY-PACKING-SPRINT - Metadata packing 2D
+
+La CAD IR reste additive. P16 enrichit `storage_sizing`, `asset_diagnostics`, `asset_compartment_layout.compartments[]`, `asset_fit_cavity.compartments[]`, `asset_access_notch` et `metadata.quick_asset_box` avec les champs suivants quand ils sont disponibles :
+
+- `tray_packing_policy` : `flat_tray_2d_v0` pour le nouveau comportement par defaut des assets simples, `flat_tray_linear_v0` pour le comportement legacy/fallback ;
+- `target_aspect_ratio` : ratio cible largeur/profondeur utilise par l'heuristique locale ;
+- `max_module_length_mm` : longueur maximale souple utilisee pour eviter une seule longue rangee ;
+- `pile_grid_columns` et `pile_grid_rows` : grille locale de piles retenue ;
+- `linear_layout_avoided` : `yes` si une grille multi-ranges remplace une ligne 1D, sinon `no`.
+
+Ces champs sont informatifs et ne remplacent pas les tailles existantes (`asset_fit_size_mm`, `module_size_mm`, `printable_body_size_mm`, placements grille). Fusion consomme toujours les operations et dimensions resolues par le moteur. Les refus ou warnings doivent rester reportables sans changer `schema_version`.
+
+P16 ne valide pas l'impression 3D, ne cree pas de geometrie par item individuel et ne rend pas le coeur Python dependant de Fusion.

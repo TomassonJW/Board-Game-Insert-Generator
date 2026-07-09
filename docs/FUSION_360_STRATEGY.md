@@ -767,3 +767,12 @@ Fusion continue a ne recalculer ni layout, ni sizing, ni tolerances. Pour P14-US
 ## P14-USABLE-ASSET-TRAY-M002 - Reporting printability dans Fusion
 
 Fusion lit `printability_report_v0` depuis la CAD IR et l'affiche dans le rapport `quick_asset_box`. L'adaptateur ne recalculera pas les murs, fonds, cavites ou encoches. `printability_validated_by_print: no` doit rester visible jusqu'a une validation physique separee.
+
+
+## P16-ERGONOMIC-2D-TRAY-PACKING-SPRINT - Consommation Fusion
+
+Fusion continue a ne recalculer ni packing, ni layout, ni tolerances. Pour P16, l'adaptateur consomme les dimensions et metadata resolues par le moteur : `tray_packing_policy`, `pile_grid_columns`, `pile_grid_rows`, `target_aspect_ratio`, `max_module_length_mm`, `linear_layout_avoided`, `asset_fit_size_mm`, compartiments, cavites et notches.
+
+Les coupes Fusion restent les primitives deja validees : cavites rectangulaires top-open par source asset et encoches rectangulaires top-open par compartiment. P16 ne cree pas de cavite par pile, ne visualise pas les items individuels, n'ajoute pas de solveur dans l'add-in et ne change pas le contrat de scene BGIG. Le rapport `quick_asset_box` doit rendre visibles les diagnostics P16 afin que la gate humaine puisse verifier que les modules ne restent pas en longues barres 1D quand un packing 2D raisonnable est possible.
+
+La preparation de gate Fusion P16 utilise le preset `p16_ergonomic_tray_packing` et conserve `Print validation: false` jusqu'a une impression reelle separee.

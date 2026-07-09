@@ -10,3 +10,5 @@ Procedure locale attendue :
 - verification du preset, des champs P16 rehydrates, du rapport `flat_tray_2d_v0`, de la regeneration sans doublon et du clear preserve non-BGIG.
 
 Gate active : validation humaine Fusion P16. `Print validation: false` reste obligatoire.
+
+Audit final : `FUSION_360_STRATEGY` et `CAD_IR_CONTRACT` documentent la consommation/metadata P16 sans recalcul Fusion ni changement de schema.
