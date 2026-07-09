@@ -919,13 +919,15 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 
 - Capability : C-ASSET, C-FUSION-UI.
 - Objectif : exposer la hauteur de pile maximale et la politique de stack dans `quick_asset_box`, la persistance UI et le resume Fusion.
-- Statut : `ready`.
+- Livrable : champ global optionnel `Max stack height mm (quick_asset_box, optional)`, settings `quick_asset_box_max_stack_height_mm`, config temporaire enrichie avec `assets[].max_stack_height_mm`, reporting stack policy.
+- Tests : unitaires Fusion skeleton couvrant rehydratation, sauvegarde, override `6 mm`, dimensions module plus basses et regression constantes UI.
+- Statut : `done`, `implemented-fusion-ui`, validation Fusion P15 non encore realisee, `print-validated: false`.
 
 ### P15-M004 - Grid semantics report V0
 
 - Capability : C-ASSET, C-FUSION-UI.
 - Objectif : expliciter grid span vs body size dans reports/CAD IR/Fusion summary.
-- Statut : `planned`.
+- Statut : `ready`.
 
 ### P15-M005 - Preset smoke P15 realiste
 

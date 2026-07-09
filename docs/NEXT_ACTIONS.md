@@ -36,7 +36,7 @@ Mission interne corrigee : `P14-USABLE-ASSET-TRAY-M005 - Preparation gate Fusion
 
 ## Mission ready non gated
 
-Mission interne suivante : `P15-M003 - max_stack_height_mm et reporting stack policy`.
+Mission interne suivante : `P15-M004 - Grid semantics report V0`.
 
 ## Regle operationnelle Fusion
 
@@ -60,3 +60,4 @@ integration directe dans `main`, push vers `origin/main`, puis reprise depuis
 `origin/main` si aucune vraie gate humaine n'est atteinte.
 Mission interne terminee : `P15-M001 - Audit semantique z/grid/grouping`, ADR-0033 acceptee, pas de changement moteur.
 Mission interne terminee : `P15-M002 - storage_orientation flat_tray V0`, moteur core implemente, `auto` -> `flat_tray` pour tokens/dice/meeples/generic, `vertical_stack` explicite conserve, champs JSON additifs `storage_orientation` et `max_stack_height_mm`, tests assets OK.
+Mission interne terminee : `P15-M003 - max_stack_height_mm et reporting stack policy`, champ UI global optionnel persiste pour `quick_asset_box`, config temporaire applique `max_stack_height_mm`, resume Fusion expose `storage_orientation`, `stack_height_policy`, `max_stack_height_mm`, `stack_height_used_mm`, `xy_expansion_used` et `z_expansion_used`.

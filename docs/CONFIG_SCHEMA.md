@@ -474,6 +474,6 @@ Format UI V0 : `asset_id,type,count,x_mm,y_mm,z_mm,fit`, entrees separees par `;
 
 ## P13-ASSET-M002 - Semantique count/z pour quick_asset_box
 
-Depuis P15-M002, le schema JSON public accepte aussi les champs additifs `assets[].storage_orientation` et `assets[].max_stack_height_mm`. Dans les configs temporaires `quick_asset_box`, `count` influence le sizing pour `tokens`, `dice`, `meeples` et `generic`, avec `z_mm` interprete comme epaisseur unitaire d'un item.
+Depuis P15-M002, le schema JSON public accepte aussi les champs additifs `assets[].storage_orientation` et `assets[].max_stack_height_mm`. Dans les configs temporaires `quick_asset_box`, `count` influence le sizing pour `tokens`, `dice`, `meeples` et `generic`, avec `z_mm` interprete comme epaisseur unitaire d'un item. Depuis P15-M003, la commande Fusion classique peut renseigner un `max_stack_height_mm` global optionnel ; il est applique dans la config temporaire sous `assets[].max_stack_height_mm` pour les assets itemises supportes et laisse les cards/sleeved_cards avec leur semantique de deck total.
 
 Pour `cards` et `sleeved_cards`, `z_mm` est interprete comme hauteur totale du paquet/deck fourni ; `count` est reporte mais non multiplie. Cette limitation est volontaire et doit rester visible dans le reporting tant qu'un modele cartes plus fin n'est pas valide.

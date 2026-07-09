@@ -397,6 +397,8 @@ Les candidats asset-first, modules generes et placements peuvent porter une meta
 Cette metadata ne remplace pas les champs CAD IR existants (`dimensions_mm`, `asset_fit_size_mm`, `printable_body_size_mm`, placements grille). Fusion consomme toujours la geometrie existante et ajoute seulement un sketch debug non imprimable pour l'enveloppe asset-fit.
 Depuis P15-M002, les diagnostics par asset ajoutent aussi `requested_max_stack_height_mm`, `max_stack_height_source`, `capacity_per_stack`, `items_per_pile` et la resolution de `storage_orientation`. `flat_tray` est le defaut resolu pour tokens/dice/meeples/generic ; `vertical_stack` signale explicitement le comportement legacy base sur la hauteur disponible.
 
+Depuis P15-M003, `metadata.quick_asset_box` relaie ces informations dans les diagnostics de rapport : `max_stack_height_mm`, `storage_orientation`, `stack_height_policy`, `stack_height_used_mm`, `xy_expansion_used` et `z_expansion_used` sont visibles par asset et par candidat module pour expliquer pourquoi un plateau s'etale en XY ou monte en Z.
+
 ## P13-ASSET-M003 - Metadata asset_fit_cavity
 
 Les modules issus de `metadata.executable_asset_plan.generated_modules` peuvent transporter une metadata additive `asset_fit_cavity`. Les placements recopient cette metadata pour que l'adaptateur Fusion puisse la consommer sans recalculer le moteur.

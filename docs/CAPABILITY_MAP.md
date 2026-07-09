@@ -182,5 +182,11 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 
 - C-ASSET : `implemented-core` additionnel pour `storage_orientation` (`auto`, `flat_tray`, `vertical_stack`) et `max_stack_height_mm` additifs dans le modele assets.
 - C-SOLVER : heuristique count-aware inchangee en nature, mais le defaut tokens/dice/meeples/generic privilegie maintenant un plateau bas borne plutot que l'utilisation implicite de toute la hauteur disponible.
-- C-FUSION-UI : prochain travail requis P15-M003 pour exposer/persister la politique de stack dans `quick_asset_box` et le rapport Fusion.
+- C-FUSION-UI : P15-M003 expose et persiste `quick_asset_box_max_stack_height_mm` dans la commande Fusion classique ; le resume `quick_asset_box` reporte `storage_orientation`, `stack_height_policy`, `max_stack_height_mm`, `stack_height_used_mm`, `xy_expansion_used` et `z_expansion_used`.
+
+## P15-M003 capability update
+
+- C-ASSET : `implemented-core` exploite maintenant l'override global `quick_asset_box` en `assets[].max_stack_height_mm` dans la config temporaire.
+- C-FUSION-UI : `implemented-fusion-ui` pour champ optionnel persiste, rehydratation settings et reporting stack policy ; validation Fusion P15 reste a faire.
+- C-QUALITY : regression ajoutee contre constantes UI manquantes et contre sizing `max_stack_height_mm = 6`.
 - Validation : tests automatises moteur OK, aucune validation Fusion ni impression reelle.

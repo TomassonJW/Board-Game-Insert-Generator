@@ -662,4 +662,14 @@ P15-M002 introduit les champs additifs `assets[].storage_orientation` (`auto`, `
 
 Exemple teste : 30 tokens `10 x 10 x 2 mm` passent de `33.6 x 13.6 x 21.8 mm` en `vertical_stack` a `63.6 x 13.6 x 11.8 mm` en `flat_tray`. Avec `max_stack_height_mm = 6`, le meme cas devient `93.6 x 23.6 x 5.8 mm`.
 
-Metadata/reporting moteur : `storage_sizing` transporte `storage_orientation`, `stack_height_policy`, `available_asset_fit_height_mm`, `max_stack_height_mm`, `stack_height_used_mm`, `xy_expansion_used` et `z_expansion_used`. La prochaine mission P15-M003 doit exposer ces champs clairement dans la commande Fusion `quick_asset_box` et les settings.
+Metadata/reporting moteur : `storage_sizing` transporte `storage_orientation`, `stack_height_policy`, `available_asset_fit_height_mm`, `max_stack_height_mm`, `stack_height_used_mm`, `xy_expansion_used` et `z_expansion_used`.
+
+## P15-M003 - max_stack_height_mm et reporting stack policy
+
+Statut : `implemented-fusion-ui`, tests Fusion skeleton cibles OK, validation Fusion P15 non encore realisee, `print-validated: false`.
+
+P15-M003 expose dans la commande Fusion classique un champ global optionnel `Max stack height mm (quick_asset_box, optional)`. Vide, le moteur garde les defaults `flat_tray` par type. Renseigne, ce champ est sauvegarde dans `bgig_ui_settings.json` sous `quick_asset_box_max_stack_height_mm`, rehydrate a la reouverture, puis applique `assets[].max_stack_height_mm` aux assets temporaires `quick_asset_box` hors cards/sleeved_cards.
+
+Le rapport `quick_asset_box` affiche maintenant `max_stack_height_mm`, `storage_orientation`, `stack_height_policy`, `max_stack_height_mm`, `stack_height_used_mm`, `xy_expansion_used` et `z_expansion_used` par asset et par candidat module. Exemple teste : le scenario deux tokens avec override `6 mm` produit un module `112.0 x 100.0 x 6.0 mm`, `capacity_per_stack 2`, `pile_count 15` pour `coin-tokens`, au lieu d'utiliser la pile par defaut `12 mm`.
+
+La prochaine mission P15-M004 doit clarifier la semantique grid/reservation dans les metadata et le resume Fusion.

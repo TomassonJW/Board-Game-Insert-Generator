@@ -26,6 +26,7 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     BGIG_QUICK_PARAMETRIC_BOX_STATUS,
     BGIG_QUICK_ASSET_BOX_DEFAULT_ASSETS,
     BGIG_QUICK_ASSET_BOX_FIELD,
+    BGIG_QUICK_ASSET_BOX_MAX_STACK_HEIGHT_FIELD,
     BGIG_SCENE_ROOT_COMPONENT_NAME,
     BGIG_SCENE_ROOT_ROLE,
     BGIG_SCENE_OWNERSHIP_POLICY,
@@ -749,19 +750,33 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(printability["min_retained_floor_mm"], 1.2)
         self.assertTrue(any("no physical print validation" in warning for warning in printability["warnings"]))
         self.assertEqual(quick_metadata["count_aware_storage_sizing"], "yes")
-        self.assertEqual(quick_metadata["storage_sizing_scope"], "count_aware_stacked_rectangular_piles_v0")
+        self.assertEqual(quick_metadata["storage_sizing_scope"], "count_aware_tray_storage_rectangular_piles_v0")
         self.assertTrue(quick_metadata["asset_debug_visualization"])
         self.assertEqual(quick_metadata["asset_debug_visualization_scope"], "asset_fit_envelope_sketch_only_non_printable")
+        self.assertIsNone(quick_metadata["max_stack_height_mm"])
         self.assertEqual(len(quick_metadata["asset_sizing_diagnostics"]), 2)
         self.assertTrue(quick_metadata["asset_sizing_diagnostics"][0]["count_used_for_sizing"])
         self.assertEqual(quick_metadata["asset_sizing_diagnostics"][0]["capacity_per_stack"], 5)
         self.assertEqual(quick_metadata["asset_sizing_diagnostics"][0]["pile_count"], 6)
+        self.assertEqual(quick_metadata["asset_sizing_diagnostics"][0]["storage_orientation"], "flat_tray")
+        self.assertEqual(quick_metadata["asset_sizing_diagnostics"][0]["stack_height_policy"], "flat_tray_max_stack_height_v0")
+        self.assertEqual(quick_metadata["asset_sizing_diagnostics"][0]["max_stack_height_mm"], 12.0)
+        self.assertEqual(quick_metadata["asset_sizing_diagnostics"][0]["stack_height_used_mm"], 10.0)
+        self.assertEqual(quick_metadata["asset_sizing_diagnostics"][0]["xy_expansion_used"], "yes")
+        self.assertEqual(quick_metadata["asset_sizing_diagnostics"][0]["z_expansion_used"], "yes")
         self.assertEqual(quick_metadata["asset_sizing_diagnostics"][1]["pile_count"], 4)
         self.assertEqual(len(quick_metadata["module_candidate_sizing_diagnostics"]), 1)
         module_diagnostic = quick_metadata["module_candidate_sizing_diagnostics"][0]
         self.assertTrue(module_diagnostic["count_used_for_sizing"])
         self.assertEqual(module_diagnostic["count_aware_storage_sizing"], "yes")
         self.assertEqual(module_diagnostic["policy"], "stacked_rectangular_piles_v0")
+        self.assertEqual(module_diagnostic["sizing_scope"], "count_aware_tray_storage_rectangular_piles_v0")
+        self.assertEqual(module_diagnostic["storage_orientation"], "flat_tray")
+        self.assertEqual(module_diagnostic["stack_height_policy"], "flat_tray_max_stack_height_v0")
+        self.assertEqual(module_diagnostic["max_stack_height_mm"], 12.0)
+        self.assertEqual(module_diagnostic["stack_height_used_mm"], 10.0)
+        self.assertEqual(module_diagnostic["xy_expansion_used"], "yes")
+        self.assertEqual(module_diagnostic["z_expansion_used"], "yes")
         self.assertEqual(module_diagnostic["declared_capacity_count"], 50)
         self.assertEqual(module_diagnostic["module_size_mm"], {"x": 104.0, "y": 64.8, "z": 12.0})
         self.assertEqual(module_diagnostic["asset_fit_size_mm"], {"x": 101.6, "y": 62.4, "z": 10.8})
@@ -807,6 +822,13 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("target_wall front", summary)
         self.assertIn("count_aware_storage_sizing: yes", summary)
         self.assertIn("asset_debug_visualization: yes", summary)
+        self.assertIn("max_stack_height_mm: default", summary)
+        self.assertIn("storage_orientation flat_tray", summary)
+        self.assertIn("stack_height_policy flat_tray_max_stack_height_v0", summary)
+        self.assertIn("max_stack_height_mm 12.0", summary)
+        self.assertIn("stack_height_used_mm 10.0", summary)
+        self.assertIn("xy_expansion_used yes", summary)
+        self.assertIn("z_expansion_used yes", summary)
         self.assertIn("printability_checked: yes", summary)
         self.assertIn("printability_validated_by_print: no", summary)
         self.assertIn("printability_report_v0:", summary)
@@ -821,6 +843,74 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("individual item and pile cavities remain not generated", summary)
         self.assertIn("module_candidates_generated: 1", summary)
         self.assertIn("placed_asset_modules: 1", summary)
+
+
+    def test_quick_asset_box_max_stack_height_override_is_persisted_and_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            overrides = {
+                **P12_PARAMETRIC_FIELD_DEFAULTS,
+                "box_inner_x_mm": "120",
+                "box_inner_y_mm": "80",
+                "box_inner_z_mm": "30",
+                "grid_units_x": "4",
+                "grid_units_y": "4",
+                "grid_units_z": "3",
+                "wall_thickness_mm": "1.2",
+                "floor_thickness_mm": "1.2",
+                "peripheral_clearance_mm": "0.4",
+                "inter_module_clearance_mm": "0.3",
+                "print_profile": "draft",
+            }
+            assets_text = "coin-tokens,tokens,30,20,20,2,loose; status-tokens,tokens,20,18,18,2,loose"
+            request = build_fusion_command_request(
+                "",
+                FUSION_GENERATION_MODE_COMPACT_ONLY,
+                Path(temp_dir),
+                project_root_text=str(ROOT),
+                parameter_values=overrides,
+                input_mode=FUSION_INPUT_MODE_QUICK_ASSET_BOX,
+                quick_asset_box_assets_text=assets_text,
+                quick_asset_box_max_stack_height_mm="6",
+            )
+            config_payload = build_quick_asset_box_config_payload(
+                request.parameter_overrides,
+                request.quick_asset_box_assets_text,
+                request.quick_asset_box_max_stack_height_mm,
+            )
+            config_path = Path(temp_dir) / "quick_asset_box_config.json"
+            config_path.write_text(json.dumps(config_payload), encoding="utf-8")
+            config = load_config(config_path)
+            layout = generate_basic_layout(config)
+            scene = build_blank_cad_scene(config, layout).to_dict()
+            scene["metadata"]["quick_asset_box"] = quick_asset_box_metadata(
+                config_payload,
+                request.quick_asset_box_assets_text,
+                scene,
+            )
+
+        self.assertEqual(request.quick_asset_box_max_stack_height_mm, "6")
+        self.assertEqual(config_payload["assets"][0]["max_stack_height_mm"], 6.0)
+        self.assertEqual(config_payload["assets"][1]["max_stack_height_mm"], 6.0)
+        quick_metadata = scene["metadata"]["quick_asset_box"]
+        self.assertEqual(quick_metadata["max_stack_height_mm"], 6.0)
+        asset_diagnostic = quick_metadata["asset_sizing_diagnostics"][0]
+        self.assertEqual(asset_diagnostic["capacity_per_stack"], 2)
+        self.assertEqual(asset_diagnostic["pile_count"], 15)
+        self.assertEqual(asset_diagnostic["max_stack_height_mm"], 6.0)
+        self.assertEqual(asset_diagnostic["stack_height_used_mm"], 4.0)
+        self.assertEqual(asset_diagnostic["xy_expansion_used"], "yes")
+        self.assertEqual(asset_diagnostic["z_expansion_used"], "yes")
+        module_diagnostic = quick_metadata["module_candidate_sizing_diagnostics"][0]
+        self.assertEqual(module_diagnostic["module_size_mm"], {"x": 112.0, "y": 100.0, "z": 6.0})
+        self.assertEqual(module_diagnostic["asset_fit_size_mm"], {"x": 109.6, "y": 97.6, "z": 4.8})
+        self.assertEqual(module_diagnostic["max_stack_height_mm"], 6.0)
+        self.assertEqual(module_diagnostic["stack_height_used_mm"], 4.0)
+        summary = quick_asset_box_summary(scene)
+        self.assertIn("max_stack_height_mm: 6.0", summary)
+        self.assertIn("capacity_per_stack 2", summary)
+        self.assertIn("pile_count 15", summary)
+        self.assertIn("module_size 112.0 x 100.0 x 6.0 mm", summary)
+        self.assertIn("stack_height_used_mm 4.0", summary)
 
     def test_quick_asset_box_rejects_when_no_valid_assets_remain(self) -> None:
         with self.assertRaisesRegex(FusionSkeletonError, "at least one valid asset"):
@@ -1007,6 +1097,7 @@ class FusionSkeletonTests(unittest.TestCase):
                 "generation_mode": FUSION_GENERATION_MODE_COMPACT_ONLY,
                 "project_root": str(ROOT),
                 BGIG_QUICK_ASSET_BOX_FIELD: assets_text,
+                BGIG_QUICK_ASSET_BOX_MAX_STACK_HEIGHT_FIELD: "6",
                 "box_inner_x_mm": "120",
                 "box_inner_y_mm": "80",
                 "box_inner_z_mm": "30",
@@ -1027,8 +1118,11 @@ class FusionSkeletonTests(unittest.TestCase):
 
         self.assertEqual(settings["input_mode"], FUSION_INPUT_MODE_QUICK_ASSET_BOX)
         self.assertEqual(settings[BGIG_QUICK_ASSET_BOX_FIELD], assets_text)
+        self.assertEqual(settings[BGIG_QUICK_ASSET_BOX_MAX_STACK_HEIGHT_FIELD], "6")
         self.assertEqual(request.source_kind, "quick_asset_box")
         self.assertEqual(request.quick_asset_box_assets_text, assets_text)
+        self.assertEqual(request.quick_asset_box_max_stack_height_mm, "6")
+        self.assertIn("Loaded quick asset max stack height mm: 6", summary)
         self.assertIn("Loaded quick asset text", summary)
         self.assertIn("coin-tokens", summary)
 
@@ -1057,6 +1151,7 @@ class FusionSkeletonTests(unittest.TestCase):
                 parameter_values=values,
                 input_mode=FUSION_INPUT_MODE_QUICK_ASSET_BOX,
                 quick_asset_box_assets_text=assets_text,
+                quick_asset_box_max_stack_height_mm="6",
             )
             generated_cad_ir = addin_dir / "bgig_ui_generated_cad_ir.json"
 
@@ -1066,6 +1161,7 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertTrue(saved_ok)
         self.assertEqual(saved["input_mode"], FUSION_INPUT_MODE_QUICK_ASSET_BOX)
         self.assertEqual(saved[BGIG_QUICK_ASSET_BOX_FIELD], assets_text)
+        self.assertEqual(saved[BGIG_QUICK_ASSET_BOX_MAX_STACK_HEIGHT_FIELD], "6")
     def test_detects_bgig_project_root_from_config_path(self) -> None:
         detected = detect_bgig_project_root(
             ROOT / "examples" / "simple_asset_product_scene.json",
@@ -1636,7 +1732,9 @@ class FusionSkeletonTests(unittest.TestCase):
 
         self.assertFalse(referenced_ids - defined_ids, f"Undefined UI input IDs: {sorted(referenced_ids - defined_ids)}")
         self.assertIn("QUICK_ASSET_BOX_ASSETS_INPUT_ID", defined_ids)
+        self.assertIn("QUICK_ASSET_BOX_MAX_STACK_HEIGHT_INPUT_ID", defined_ids)
         self.assertIn("Assets (quick_asset_box)", source)
+        self.assertIn("Max stack height mm (quick_asset_box, optional)", source)
         self.assertIn("BGIG_QUICK_ASSET_BOX_HELP_TEXT", source)
         self.assertIn("BGIG_QUICK_ASSET_BOX_HELP_TITLE", source)
         self.assertIn("Mode and field guide", source)
@@ -1651,6 +1749,7 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("Example: coin-tokens,tokens,30,20,20,2,loose", source)
         self.assertIn("count = number of items", source)
         self.assertIn("For cards/sleeved_cards, z_mm is the total deck height", source)
+        self.assertIn("Optional max stack height limits token/dice/meeple/generic pile height", source)
         self.assertIn("Box fields are inner dimensions in mm", source)
         self.assertIn("Grid units split the box", source)
         self.assertIn("BGIG_QUICK_ASSET_BOX_HELP_TEXT", entrypoint_source)

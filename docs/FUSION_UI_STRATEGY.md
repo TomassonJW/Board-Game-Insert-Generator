@@ -402,3 +402,9 @@ La commande Fusion classique affiche maintenant une aide courte avant le champ `
 ## P14-USABLE-ASSET-TRAY-M004 - Presets quick_asset_box
 
 Le script `scripts/fusion/prepare_quick_asset_test.ps1` accepte maintenant `-Preset p14_complete`, `-Preset tokens`, `-Preset dice_meeples_generic` et `-Preset cards_tokens`. Les presets sont stockes dans `scripts/fusion/quick_asset_presets.json`, ecrivent les dimensions de boite/grille et le champ `Assets (quick_asset_box)` dans `bgig_ui_settings.json`, et gardent `-AssetsText` comme override manuel. Pour la gate P14, le preset par defaut est `p14_complete` afin de charger 5 assets et de tester un layout multi-assets plus representatif. Cette mission prepare les smoke tests ; elle n'ajoute pas de tableau avance ni de palette persistante.
+
+## P15-M003 - Champ max stack height et reporting stack policy
+
+La commande Fusion classique `quick_asset_box` affiche maintenant un champ optionnel `Max stack height mm (quick_asset_box, optional)`. Vide, les defaults moteur `flat_tray` par type restent actifs. Renseigne, le champ est sauvegarde dans `bgig_ui_settings.json`, rehydrate a la reouverture et applique a la config temporaire sous `assets[].max_stack_height_mm` pour tokens/dice/meeples/generic.
+
+Le message de generation expose la politique de rangement : `storage_orientation`, `stack_height_policy`, `max_stack_height_mm`, `stack_height_used_mm`, `xy_expansion_used` et `z_expansion_used` par asset et par candidat module. Cela prepare la validation P15 sans ajouter de palette HTML ni de tableau assets avance.

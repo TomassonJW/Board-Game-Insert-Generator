@@ -69,6 +69,7 @@ try:
         BGIG_QUICK_PARAMETRIC_BOX_STATUS,
         BGIG_QUICK_ASSET_BOX_DEFAULT_ASSETS,
         BGIG_QUICK_ASSET_BOX_FIELD,
+        BGIG_QUICK_ASSET_BOX_MAX_STACK_HEIGHT_FIELD,
         BGIG_PARAMETRIC_FIELD_HELP_TEXT,
         BGIG_QUICK_ASSET_BOX_HELP_TITLE,
         BGIG_QUICK_ASSET_BOX_HELP_TEXT,
@@ -162,6 +163,7 @@ except ImportError:  # pragma: no cover - Fusion may load the file as a script.
         BGIG_QUICK_PARAMETRIC_BOX_STATUS,
         BGIG_QUICK_ASSET_BOX_DEFAULT_ASSETS,
         BGIG_QUICK_ASSET_BOX_FIELD,
+        BGIG_QUICK_ASSET_BOX_MAX_STACK_HEIGHT_FIELD,
         BGIG_PARAMETRIC_FIELD_HELP_TEXT,
         BGIG_QUICK_ASSET_BOX_HELP_TITLE,
         BGIG_QUICK_ASSET_BOX_HELP_TEXT,
@@ -218,6 +220,7 @@ CONFIG_JSON_PATH_INPUT_ID = "bgig_config_json_path"
 PROJECT_ROOT_INPUT_ID = "bgig_project_root"
 GENERATION_MODE_INPUT_ID = "bgig_generation_mode"
 SUMMARY_INPUT_ID = "bgig_command_summary"
+QUICK_ASSET_BOX_MAX_STACK_HEIGHT_INPUT_ID = "bgig_quick_asset_box_max_stack_height"
 QUICK_ASSET_BOX_ASSETS_INPUT_ID = "bgig_quick_asset_box_assets"
 PARAMETER_INPUT_PREFIX = "bgig_param_"
 
@@ -355,6 +358,11 @@ if adsk is not None:
                     4,
                     True,
                 )
+                inputs.addStringValueInput(
+                    QUICK_ASSET_BOX_MAX_STACK_HEIGHT_INPUT_ID,
+                    "Max stack height mm (quick_asset_box, optional)",
+                    defaults.get(BGIG_QUICK_ASSET_BOX_MAX_STACK_HEIGHT_FIELD, ""),
+                )
                 inputs.addTextBoxCommandInput(
                     QUICK_ASSET_BOX_ASSETS_INPUT_ID,
                     "Assets (quick_asset_box)",
@@ -404,6 +412,7 @@ if adsk is not None:
                 action_input = inputs.itemById(ACTION_INPUT_ID)
                 input_mode_input = inputs.itemById(INPUT_MODE_INPUT_ID)
                 quick_asset_input = inputs.itemById(QUICK_ASSET_BOX_ASSETS_INPUT_ID)
+                quick_asset_max_stack_input = inputs.itemById(QUICK_ASSET_BOX_MAX_STACK_HEIGHT_INPUT_ID)
                 request = build_fusion_command_request(
                     getattr(cad_ir_path_input, "value", ""),
                     _selected_dropdown_value(generation_mode_input, DEFAULT_FUSION_GENERATION_MODE),
@@ -414,6 +423,7 @@ if adsk is not None:
                     parameter_values=_parameter_input_values(inputs),
                     input_mode=_selected_dropdown_value(input_mode_input, DEFAULT_FUSION_INPUT_MODE),
                     quick_asset_box_assets_text=getattr(quick_asset_input, "text", getattr(quick_asset_input, "formattedText", "")),
+                    quick_asset_box_max_stack_height_mm=getattr(quick_asset_max_stack_input, "value", ""),
                 )
                 _show_message(_execute_generation_request(request, self.addin_dir))
             except FusionAssemblyDocumentRequiredError as exc:
@@ -665,6 +675,7 @@ def _generate_cad_ir_from_quick_asset_box_request(request, addin_dir: Path):  # 
     temp_config_payload = build_quick_asset_box_config_payload(
         request.parameter_overrides or {},
         request.quick_asset_box_assets_text,
+        getattr(request, "quick_asset_box_max_stack_height_mm", ""),
     )
     temp_config_path = addin_dir / BGIG_GENERATED_CONFIG_FILENAME
     temp_config_path.write_text(
@@ -773,6 +784,9 @@ def _save_command_settings(addin_dir: Path, request, cad_ir_path: Path | None = 
     if request.project_root is not None:
         settings["project_root"] = str(request.project_root)
     settings[BGIG_QUICK_ASSET_BOX_FIELD] = str(getattr(request, "quick_asset_box_assets_text", "") or "").strip()
+    settings[BGIG_QUICK_ASSET_BOX_MAX_STACK_HEIGHT_FIELD] = str(
+        getattr(request, "quick_asset_box_max_stack_height_mm", "") or ""
+    ).strip()
     for key, value in parametric_values_from_ui_settings(request.parameter_values or {}).items():
         settings[key] = value
     try:

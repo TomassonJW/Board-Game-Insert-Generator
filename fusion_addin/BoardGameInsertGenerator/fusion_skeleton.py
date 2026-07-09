@@ -103,6 +103,7 @@ BGIG_PARAMETRIC_FIELDS_STATUS = "config_file_quick_parametric_box_and_quick_asse
 BGIG_QUICK_PARAMETRIC_BOX_STATUS = "enabled_generates_temporary_cad_ir_from_dialog_fields"
 BGIG_QUICK_ASSET_BOX_STATUS = "enabled_generates_temporary_config_and_cad_ir_from_dialog_assets"
 BGIG_QUICK_ASSET_BOX_FIELD = "quick_asset_box_assets_text"
+BGIG_QUICK_ASSET_BOX_MAX_STACK_HEIGHT_FIELD = "quick_asset_box_max_stack_height_mm"
 BGIG_QUICK_ASSET_BOX_DEFAULT_ASSETS = (
     "coin-tokens,tokens,30,20,20,2,loose; "
     "status-tokens,tokens,20,18,18,2,loose"
@@ -113,6 +114,7 @@ BGIG_QUICK_ASSET_BOX_HELP_TEXT = (
     "Example: coin-tokens,tokens,30,20,20,2,loose. "
     "count = number of items; x/y/z = one item size in mm for tokens/dice/meeples/generic. "
     "For cards/sleeved_cards, z_mm is the total deck height. "
+    "Optional max stack height limits token/dice/meeple/generic pile height and expands in XY first. "
     "fit accepts exact, loose or approximate."
 )
 BGIG_PARAMETRIC_FIELD_HELP_TEXT = (
@@ -239,6 +241,7 @@ class FusionCommandRequest:
     source_kind: str = "cad_ir"
     quick_parametric_status: str = BGIG_QUICK_PARAMETRIC_BOX_STATUS
     quick_asset_box_assets_text: str = ""
+    quick_asset_box_max_stack_height_mm: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -253,6 +256,7 @@ class FusionCommandRequest:
             "source_kind": self.source_kind,
             "quick_parametric_status": self.quick_parametric_status,
             "quick_asset_box_assets_text": self.quick_asset_box_assets_text,
+            "quick_asset_box_max_stack_height_mm": self.quick_asset_box_max_stack_height_mm,
         }
 
 @dataclass(frozen=True)
@@ -804,6 +808,7 @@ def build_fusion_command_request(
     parameter_values: dict[str, str] | None = None,
     input_mode: str = "",
     quick_asset_box_assets_text: str = "",
+    quick_asset_box_max_stack_height_mm: str = "",
 ) -> FusionCommandRequest:
     """Validate command UI values without importing Fusion API types."""
 
@@ -862,6 +867,7 @@ def build_fusion_command_request(
             parameter_values=raw_parameter_values,
             source_kind="quick_asset_box",
             quick_asset_box_assets_text=str(quick_asset_box_assets_text or "").strip(),
+            quick_asset_box_max_stack_height_mm=str(quick_asset_box_max_stack_height_mm or "").strip(),
         )
     if validated_input_mode == FUSION_INPUT_MODE_CONFIG_FILE:
         config_path = _resolve_optional_json_path(
@@ -923,6 +929,7 @@ def default_fusion_command_values(addin_dir: str | Path) -> FusionCommandRequest
         parameter_values=parametric_values_from_ui_settings(defaults),
         input_mode=defaults.get("input_mode", DEFAULT_FUSION_INPUT_MODE),
         quick_asset_box_assets_text=defaults.get(BGIG_QUICK_ASSET_BOX_FIELD, BGIG_QUICK_ASSET_BOX_DEFAULT_ASSETS),
+        quick_asset_box_max_stack_height_mm=defaults.get(BGIG_QUICK_ASSET_BOX_MAX_STACK_HEIGHT_FIELD, ""),
     )
 
 def default_fusion_ui_settings(addin_dir: str | Path) -> dict[str, str]:
@@ -985,6 +992,7 @@ def default_fusion_ui_settings(addin_dir: str | Path) -> dict[str, str]:
         "quick_parametric_box_status": BGIG_QUICK_PARAMETRIC_BOX_STATUS,
         "quick_asset_box_status": BGIG_QUICK_ASSET_BOX_STATUS,
         BGIG_QUICK_ASSET_BOX_FIELD: str(saved.get(BGIG_QUICK_ASSET_BOX_FIELD, BGIG_QUICK_ASSET_BOX_DEFAULT_ASSETS)).strip(),
+        BGIG_QUICK_ASSET_BOX_MAX_STACK_HEIGHT_FIELD: str(saved.get(BGIG_QUICK_ASSET_BOX_MAX_STACK_HEIGHT_FIELD, "")).strip(),
     }
     for key, value in parametric_values_from_ui_settings(saved).items():
         settings[key] = value
@@ -1034,6 +1042,7 @@ def fusion_ui_settings_summary(settings: dict[str, str]) -> str:
             f"Loaded action: {settings.get('loaded_action', settings.get('action', ''))}",
             f"Loaded generation mode: {settings.get('loaded_generation_mode', settings.get('generation_mode', ''))}",
             f"Loaded quick box values: {quick_box_values}",
+            f"Loaded quick asset max stack height mm: {settings.get(BGIG_QUICK_ASSET_BOX_MAX_STACK_HEIGHT_FIELD, '') or 'default'}",
             f"Loaded quick asset text: {settings.get(BGIG_QUICK_ASSET_BOX_FIELD, BGIG_QUICK_ASSET_BOX_DEFAULT_ASSETS)}",
         ]
     )
@@ -1340,7 +1349,11 @@ def _quick_printable_dimension(cell_size_mm: float, peripheral_clearance_mm: flo
         )
     return round(printable, 4)
 
-def build_quick_asset_box_config_payload(overrides: dict[str, Any], assets_text: str) -> dict[str, Any]:
+def build_quick_asset_box_config_payload(
+    overrides: dict[str, Any],
+    assets_text: str,
+    max_stack_height_mm_text: str = "",
+) -> dict[str, Any]:
     """Build a temporary BGIG config from quick_asset_box UI fields."""
 
     required = (
@@ -1362,7 +1375,10 @@ def build_quick_asset_box_config_payload(overrides: dict[str, Any], assets_text:
         )
 
     report = parse_quick_asset_box_assets_text(assets_text)
-    accepted_assets = report["accepted_assets"]
+    accepted_assets = _apply_quick_asset_box_stack_height(
+        report["accepted_assets"],
+        max_stack_height_mm_text,
+    )
     if not accepted_assets:
         rejected = report["rejected_assets"]
         reasons = "; ".join(item["reason"] for item in rejected[:3]) if rejected else "no assets were entered"
@@ -1466,6 +1482,7 @@ def quick_asset_box_metadata(
     module_candidates = metadata.get("module_candidates", []) if isinstance(metadata, dict) else []
     grid = config_payload.get("volumetric_grid", {}) if isinstance(config_payload, dict) else {}
     box = config_payload.get("box", {}) if isinstance(config_payload, dict) else {}
+    configured_max_stack_height = _quick_asset_box_configured_max_stack_height(config_payload)
     asset_sizing_diagnostics = _quick_asset_box_asset_sizing_diagnostics(
         parse_report["accepted_assets"],
         module_candidates,
@@ -1509,6 +1526,7 @@ def quick_asset_box_metadata(
         "grid_units": grid.get("size_units"),
         "grid_unit_mm": grid.get("unit_mm"),
         "print_profile": config_payload.get("print_profile"),
+        "max_stack_height_mm": configured_max_stack_height,
         "wall_thickness_mm": config_payload.get("defaults", {}).get("wall_thickness_mm"),
         "floor_thickness_mm": config_payload.get("defaults", {}).get("floor_thickness_mm"),
         "peripheral_clearance_mm": config_payload.get("tolerances", {}).get("peripheral_clearance_mm"),
@@ -1540,7 +1558,7 @@ def quick_asset_box_metadata(
         "printability_validated_by_print": "no",
         "printability_warnings": printability_warnings,
         "count_aware_storage_sizing": storage_sizing_status,
-        "storage_sizing_scope": "count_aware_stacked_rectangular_piles_v0" if storage_sizing_status == "yes" else "partial_or_representative_asset_envelope_v0",
+        "storage_sizing_scope": _quick_asset_box_storage_sizing_scope(module_sizing_diagnostics, storage_sizing_status),
         "asset_debug_visualization": storage_sizing_status in {"yes", "partial"},
         "asset_debug_visualization_scope": "asset_fit_envelope_sketch_only_non_printable" if storage_sizing_status in {"yes", "partial"} else "none",
         "asset_sizing_diagnostics": asset_sizing_diagnostics,
@@ -1585,6 +1603,12 @@ def _quick_asset_box_asset_sizing_diagnostics(
                 "items_per_pile": asset_storage.get("items_per_pile") if asset_storage else None,
                 "declared_capacity_count": asset_storage.get("declared_capacity_count") if asset_storage else None,
                 "stack_height_mm": asset_storage.get("stack_height_mm") if asset_storage else None,
+                "storage_orientation": asset_storage.get("storage_orientation") if asset_storage else None,
+                "stack_height_policy": asset_storage.get("stack_height_policy") if asset_storage else None,
+                "max_stack_height_mm": asset_storage.get("max_stack_height_mm") if asset_storage else None,
+                "stack_height_used_mm": asset_storage.get("stack_height_used_mm") if asset_storage else None,
+                "xy_expansion_used": asset_storage.get("xy_expansion_used") if asset_storage else None,
+                "z_expansion_used": asset_storage.get("z_expansion_used") if asset_storage else None,
                 "z_mm_semantics": asset_storage.get("z_mm_semantics") if asset_storage else None,
                 "asset_fit_size_mm": storage_sizing.get("asset_fit_size_mm") if isinstance(storage_sizing, dict) else None,
                 "module_size_mm": storage_sizing.get("module_size_mm") if isinstance(storage_sizing, dict) else None,
@@ -1760,6 +1784,14 @@ def _quick_asset_box_module_sizing_diagnostics(module_candidates: Any) -> list[d
                 "declared_capacity_count": storage_sizing.get("declared_capacity_count"),
                 "declared_capacity_guarantee": storage_sizing.get("declared_capacity_guarantee", "not_guaranteed"),
                 "content_footprint_mm": storage_sizing.get("content_footprint_mm"),
+                "sizing_scope": storage_sizing.get("sizing_scope"),
+                "storage_orientation": storage_sizing.get("storage_orientation"),
+                "storage_orientations": storage_sizing.get("storage_orientations"),
+                "stack_height_policy": storage_sizing.get("stack_height_policy"),
+                "max_stack_height_mm": storage_sizing.get("max_stack_height_mm"),
+                "stack_height_used_mm": storage_sizing.get("stack_height_used_mm"),
+                "xy_expansion_used": storage_sizing.get("xy_expansion_used"),
+                "z_expansion_used": storage_sizing.get("z_expansion_used"),
                 "max_asset_fit_height_mm": storage_sizing.get("max_asset_fit_height_mm"),
                 "z_mm_semantics": storage_sizing.get("z_mm_semantics"),
                 "reason": _module_sizing_reason(storage_sizing),
@@ -1786,6 +1818,11 @@ def _asset_sizing_contribution(storage_sizing: Any) -> str:
         return "unknown"
     policy = str(storage_sizing.get("policy") or "")
     if policy == "stacked_rectangular_piles_v0":
+        stack_policy = str(storage_sizing.get("stack_height_policy") or "")
+        if stack_policy == "flat_tray_max_stack_height_v0":
+            return "count_aware_flat_tray_xy_pile_envelope_capped_by_max_stack_height"
+        if stack_policy == "vertical_stack_available_height_v0":
+            return "count_aware_vertical_stack_height_and_xy_pile_envelope"
         return "count_aware_stack_height_and_xy_pile_envelope"
     if policy == "total_stack_z_v0":
         return "provided_card_stack_envelope_count_reported_not_multiplied"
@@ -1797,6 +1834,17 @@ def _module_sizing_reason(storage_sizing: Any) -> str:
         return "metadata unavailable"
     policy = str(storage_sizing.get("policy") or "")
     if policy == "stacked_rectangular_piles_v0":
+        stack_policy = str(storage_sizing.get("stack_height_policy") or "")
+        if stack_policy == "flat_tray_max_stack_height_v0":
+            return (
+                "flat_tray caps useful stack height, expands remaining count into XY piles first, "
+                "then asset clearance, wall thickness and floor thickness are added"
+            )
+        if stack_policy == "vertical_stack_available_height_v0":
+            return (
+                "vertical_stack explicitly stacks up to available asset-fit height before adding XY piles, "
+                "then asset clearance, wall thickness and floor thickness are added"
+            )
         return (
             "unit items are stacked up to max asset-fit height, remaining quantity becomes XY piles, "
             "then asset clearance, wall thickness and floor thickness are added"
@@ -1821,6 +1869,24 @@ def _quick_asset_box_count_aware_status(module_diagnostics: list[dict[str, Any]]
     if "yes" in statuses or "partial" in statuses:
         return "partial"
     return "no"
+
+
+def _quick_asset_box_storage_sizing_scope(
+    module_diagnostics: list[dict[str, Any]],
+    storage_sizing_status: str,
+) -> str:
+    scopes = {
+        str(diagnostic.get("sizing_scope") or "")
+        for diagnostic in module_diagnostics
+        if diagnostic.get("sizing_scope")
+    }
+    if len(scopes) == 1:
+        return scopes.pop()
+    if scopes:
+        return "mixed_storage_sizing_scopes_v0"
+    if storage_sizing_status == "yes":
+        return "count_aware_stacked_rectangular_piles_v0"
+    return "partial_or_representative_asset_envelope_v0"
 
 
 def _quick_asset_box_storage_warnings(
@@ -1876,6 +1942,7 @@ def quick_asset_box_summary(payload: dict[str, Any] | None) -> str:
         f"- peripheral_clearance_mm: {quick.get('peripheral_clearance_mm')}",
         f"- inter_module_clearance_mm: {quick.get('inter_module_clearance_mm')}",
         f"- print_profile: {quick.get('print_profile')}",
+        f"- max_stack_height_mm: {quick.get('max_stack_height_mm') if quick.get('max_stack_height_mm') is not None else 'default'}",
         f"- assets_read: {quick.get('accepted_asset_count')}",
         f"- assets_refused: {quick.get('rejected_asset_count')}",
         f"- asset_items_visualized: {'yes' if quick.get('asset_items_visualized') else 'no'}",
@@ -1919,6 +1986,12 @@ def quick_asset_box_summary(payload: dict[str, Any] | None) -> str:
             f"pile_count {diagnostic.get('pile_count') if diagnostic.get('pile_count') is not None else 'n/a'}; "
             f"items_per_pile {diagnostic.get('items_per_pile') if diagnostic.get('items_per_pile') is not None else 'n/a'}; "
             f"declared_capacity {diagnostic.get('declared_capacity_count') if diagnostic.get('declared_capacity_count') is not None else 'n/a'}; "
+            f"storage_orientation {diagnostic.get('storage_orientation') or 'n/a'}; "
+            f"stack_height_policy {diagnostic.get('stack_height_policy') or 'n/a'}; "
+            f"max_stack_height_mm {diagnostic.get('max_stack_height_mm') if diagnostic.get('max_stack_height_mm') is not None else 'n/a'}; "
+            f"stack_height_used_mm {diagnostic.get('stack_height_used_mm') if diagnostic.get('stack_height_used_mm') is not None else 'n/a'}; "
+            f"xy_expansion_used {diagnostic.get('xy_expansion_used') if diagnostic.get('xy_expansion_used') is not None else 'n/a'}; "
+            f"z_expansion_used {diagnostic.get('z_expansion_used') if diagnostic.get('z_expansion_used') is not None else 'n/a'}; "
             f"asset_fit {_format_vector_payload(diagnostic.get('asset_fit_size_mm'))}; "
             f"module_size {_format_vector_payload(diagnostic.get('module_size_mm'))}; "
             f"z_semantics {diagnostic.get('z_mm_semantics') or 'n/a'}; "
@@ -1996,6 +2069,12 @@ def quick_asset_box_summary(payload: dict[str, Any] | None) -> str:
             f"content_footprint {_format_vector_payload(diagnostic.get('content_footprint_mm'))}; "
             f"declared_capacity {diagnostic.get('declared_capacity_count') if diagnostic.get('declared_capacity_count') is not None else 'n/a'}; "
             f"capacity_guarantee {diagnostic.get('declared_capacity_guarantee')}; "
+            f"storage_orientation {diagnostic.get('storage_orientation') or 'n/a'}; "
+            f"stack_height_policy {diagnostic.get('stack_height_policy') or 'n/a'}; "
+            f"max_stack_height_mm {diagnostic.get('max_stack_height_mm') if diagnostic.get('max_stack_height_mm') is not None else 'n/a'}; "
+            f"stack_height_used_mm {diagnostic.get('stack_height_used_mm') if diagnostic.get('stack_height_used_mm') is not None else 'n/a'}; "
+            f"xy_expansion_used {diagnostic.get('xy_expansion_used') if diagnostic.get('xy_expansion_used') is not None else 'n/a'}; "
+            f"z_expansion_used {diagnostic.get('z_expansion_used') if diagnostic.get('z_expansion_used') is not None else 'n/a'}; "
             f"policy {diagnostic.get('policy') or 'n/a'}; "
             f"formula {diagnostic.get('formula') or 'n/a'}; "
             f"clearance {diagnostic.get('clearance_mm')} mm; "
@@ -2018,6 +2097,38 @@ def quick_asset_box_summary(payload: dict[str, Any] | None) -> str:
         ]
     )
     return "\n".join(lines) + "\n"
+
+def _apply_quick_asset_box_stack_height(
+    accepted_assets: list[dict[str, Any]],
+    max_stack_height_mm_text: str,
+) -> list[dict[str, Any]]:
+    value = str(max_stack_height_mm_text or "").strip()
+    if not value:
+        return accepted_assets
+    max_stack_height = _parse_positive_float(value, "quick_asset_box max_stack_height_mm")
+    adjusted_assets: list[dict[str, Any]] = []
+    for asset in accepted_assets:
+        adjusted = dict(asset)
+        kind = str(adjusted.get("kind") or "")
+        if kind not in {"cards", "sleeved_cards"}:
+            adjusted["max_stack_height_mm"] = max_stack_height
+        adjusted_assets.append(adjusted)
+    return adjusted_assets
+
+
+def _quick_asset_box_configured_max_stack_height(config_payload: dict[str, Any]) -> float | str | None:
+    assets = config_payload.get("assets", []) if isinstance(config_payload, dict) else []
+    values = {
+        float(asset.get("max_stack_height_mm"))
+        for asset in assets
+        if isinstance(asset, dict) and asset.get("max_stack_height_mm") is not None
+    }
+    if not values:
+        return None
+    if len(values) == 1:
+        return values.pop()
+    return "mixed"
+
 
 def _quick_asset_box_config_print_profile(value: Any) -> str:
     requested = str(value or "default").strip() or "default"
