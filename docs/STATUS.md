@@ -812,3 +812,10 @@ Limite : le manifeste est un artefact d'audit preprint. Il ne prouve pas la prin
 Statut : `implemented-core-fusion-reporting`. `printability_report_v0` expose maintenant `printability_status`, `printability_export_allowed`, `issue_counts` et `issues[]` avec severites `warning`/`blocker`. Les anciens `warnings[]` restent presents pour compatibilite.
 
 Regle V0 : les murs/fonds sous minimum et une cavite supprimant toute la hauteur deviennent des blockers et desactivent `printability_export_allowed`; la profondeur d'encoche importante, les modules hauts, cavites non planifiees et l'absence de validation physique restent des warnings. Le resume Fusion `quick_asset_box` affiche `printability_status` et `printability_export_allowed`. Prochaine mission ready : `P17-M005 - Calibration coupon / preprint check V0`.
+
+
+### P17-M005 - Calibration coupon / preprint check V0
+
+Statut : `protocol-ready`. Le sprint P17 ne cree pas encore de geometrie coupon Fusion ; P17-M005 ajoute plutot `docs/PREPRINT_CHECK_PROTOCOL.md` et `examples/preprint_check_v0.json` pour cadrer une future session preprint a partir du dossier export, des STL et des manifestes.
+
+Le protocole conserve `print_validated: false` et distingue `not_printed`, `printed_unmeasured`, `measured_local_ok`, `measured_local_ko` et `retest_required`. Prochaine mission ready : `P17-M006 - Gate Fusion P17 export complet`.

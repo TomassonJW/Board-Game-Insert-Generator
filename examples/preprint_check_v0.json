@@ -1,0 +1,48 @@
+{
+  "schema_version": "bgig.preprint_check.v0",
+  "status": "not_printed",
+  "print_validated": false,
+  "export_manifest_json": "path/to/bgig_export_manifest.json",
+  "export_manifest_markdown": "path/to/bgig_export_manifest.md",
+  "printer_context": {
+    "printer": "",
+    "filament": "PLA",
+    "nozzle_mm": 0.4,
+    "layer_height_mm": 0.2,
+    "slicer": "",
+    "slicer_profile": ""
+  },
+  "software_profile": {
+    "bgig_print_profile": "draft",
+    "overrides": {}
+  },
+  "modules": [
+    {
+      "module_id": "module-id-from-manifest",
+      "stl_path": "path/to/module.stl",
+      "printability_export_allowed": true,
+      "printability_status": "warning",
+      "pre_slice_check": "pending",
+      "measurements_mm": {
+        "external_x": null,
+        "external_y": null,
+        "external_z": null,
+        "min_external_wall": null,
+        "min_internal_wall": null,
+        "floor": null,
+        "main_cavity_x": null,
+        "main_cavity_y": null,
+        "main_cavity_depth": null,
+        "notch_width": null,
+        "notch_depth": null
+      },
+      "asset_fit_result": "not_tested",
+      "notes": ""
+    }
+  ],
+  "conclusion": {
+    "result": "not_printed",
+    "blocking_observations": [],
+    "recommended_next_action": "Run Fusion P17 gate before physical print validation."
+  }
+}

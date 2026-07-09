@@ -1068,11 +1068,12 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 
 - Capability : C-CALIBRATION.
 - Objectif : preparer un coupon/protocole preprint sans validation physique ni promesse ready-to-print.
-- Statut : `ready`.
+- Livrable : `docs/PREPRINT_CHECK_PROTOCOL.md` et `examples/preprint_check_v0.json`. Pas de geometrie coupon Fusion ajoutee en V0.
+- Statut : `done`, `protocol-ready`.
 
 ### P17-M006 - Gate Fusion P17 export complet
 
 - Capability : C-FUSION-EXPORT, C-QUALITY.
 - Objectif : preparer le smoke Fusion export avec preset `p17_printable_export`, add-in installe, dossier export, manifeste et actions Fusion restantes.
 - Gate : validation humaine Fusion P17 ; aucune impression 3D validee.
-- Statut : `todo`.
+- Statut : `ready`.

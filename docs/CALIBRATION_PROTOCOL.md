@@ -91,3 +91,9 @@ Ce protocole prepare les gates suivantes :
 - premier export STL/3MF ;
 - premiere generation Fusion exploitable ;
 - passage aux mecanismes de couvercle, charniere ou clip.
+
+## P17 preprint check V0
+
+P17 ajoute un protocole intermediaire avant calibration physique complete : `docs/PREPRINT_CHECK_PROTOCOL.md`. Il part d'un dossier `export_printables`, du manifeste JSON/Markdown et des STL exportes. Le statut reste `print_validated: false` tant qu'aucune impression mesuree n'est documentee.
+
+Exemple de fiche remplissable : `examples/preprint_check_v0.json`.

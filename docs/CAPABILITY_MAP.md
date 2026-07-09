@@ -300,3 +300,10 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 - C-CALIBRATION : statut `implemented-core-fusion-reporting` pour blockers/warnings printability V0.
 - C-QUALITY : `printability_report_v0` contient `issues[]`, `issue_counts`, `printability_status`, `printability_export_allowed`.
 - C-FUSION-UI : `quick_asset_box` affiche statut printability et export allowed ; `print_validated: false` reste obligatoire.
+
+
+## P17-M005 capability update
+
+- C-CALIBRATION : statut `protocol-ready` pour protocole preprint V0 et fiche JSON remplissable.
+- C-QUALITY : la validation preprint part du manifeste export et des issues printability, sans changer les tolerances.
+- Gate : aucune impression physique validee ; `print_validated: false` maintenu.
