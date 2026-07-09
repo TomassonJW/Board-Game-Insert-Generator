@@ -216,3 +216,10 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 - C-SOLVER : heuristique deterministe bornee, sans solveur global, backtracking ni optimisation avancee.
 - C-FUSION-UI : reporting attendu `tray_packing_policy`, `pile_grid_columns`, `pile_grid_rows`, `target_aspect_ratio`, `max_module_length_mm`, warnings si 2D impossible.
 - Gate : validation humaine Fusion P16 avant statut `fusion-validated-v0`; `print-validated: false` conserve.
+
+## P16-M001 capability update
+
+- C-ASSET : `specified` pour `flat_tray_2d_v0`, grille locale de piles et distinction explicite avec `flat_tray_linear_v0`.
+- C-SOLVER : strategie heuristique locale documentee, sans solveur global, backtracking ni dependance externe.
+- C-FUSION-UI : reporting P16 cible defini, notamment `tray_packing_policy`, `pile_grid_columns`, `pile_grid_rows`, `target_aspect_ratio`, `max_module_length_mm` et warnings de fallback.
+- Validation : documentaire seulement ; implementation moteur attendue en P16-M002 ; aucune validation Fusion ou impression.

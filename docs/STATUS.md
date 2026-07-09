@@ -709,3 +709,11 @@ Statut : sprint lance apres validation humaine P15. Objectif : remplacer le comp
 Cible produit : organiser les piles en colonnes/rangees, limiter les longues barres X, conserver des modules bas, maintenir compartiments/encoches V0, expliciter `pile_grid_columns`, `pile_grid_rows`, `target_aspect_ratio`, `max_module_length_mm` et les warnings si un layout 2D raisonnable ne tient pas.
 
 Gate attendue : validation Fusion `P16-ERGONOMIC-2D-TRAY-PACKING-SPRINT-V` apres preparation d'un preset `p16_ergonomic_tray_packing`. `Print validation: false` reste obligatoire.
+
+## P16-M001 - Strategie flat_tray_2d documentee
+
+Statut : `done-docs`, ADR acceptee `docs/DECISIONS/ADR-0034-flat-tray-2d-packing-v0.md`, pas de changement moteur.
+
+Decision : `flat_tray_linear_v0` nomme l'ancien comportement P15 qui etale les piles surtout sur une ligne X. `flat_tray_2d_v0` devient la cible par defaut pour `tokens`, `dice`, `meeples` et `generic` : calcul de `items_per_pile`, `pile_count`, puis repartition en `pile_grid_columns` x `pile_grid_rows` selon un ratio cible et une longueur maximale souple, sans solveur global ni backtracking.
+
+La grille globale reste une lattice de reservation (`placement_reservation_lattice_v0`) et le body ne snap pas physiquement a la grille (`body_snap_to_grid: no`). `vertical_stack` reste un mode explicite/legacy, pas le defaut.

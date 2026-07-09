@@ -418,3 +418,16 @@ Cette mission ne change pas la geometrie et n'ajoute pas de visualisation de cel
 ## P15-M005 - Preset smoke P15
 
 `prepare_quick_asset_test.ps1` utilise maintenant `p15_tray_semantics` par defaut. Ce preset prepare une box `220 x 160 x 60`, une grille `8 x 5 x 3`, `max_stack_height_mm = 18` et cinq assets mixtes. L'objectif UX de gate est de verifier dans Fusion que les champs sont pre-remplis, que `max_stack_height_mm` est persiste, et que le rapport explique `flat_tray`, `stack_height_policy` et la semantique grid.
+
+## P16-M001 - Reporting attendu du packing 2D
+
+La commande Fusion classique `quick_asset_box` doit rester le support de P16. La future implementation doit rendre visibles dans le rapport :
+
+- `tray_packing_policy: flat_tray_2d_v0` ;
+- `pile_grid_columns` et `pile_grid_rows` ;
+- `target_aspect_ratio` ;
+- `max_module_length_mm` ;
+- `linear_layout_avoided: yes/no` ;
+- warnings si un module reste long parce que le packing 2D ne tient pas.
+
+Aucune palette HTML, aucun tableau asset avance et aucune nouvelle geometrie complexe ne sont introduits par cette strategie.

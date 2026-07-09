@@ -993,3 +993,9 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Objectif : installer l'add-in, ecrire les settings P16, verifier les marqueurs et fournir les actions Fusion restantes.
 - Gate : validation humaine Fusion P16.
 - Statut : `todo`.
+
+### P16-M001 - Strategie flat_tray_2d documentee
+
+- Livrable : ADR-0034 et docs strategie mises a jour.
+- Decision : `flat_tray_2d_v0` devient la cible par defaut pour assets simples ; `flat_tray_linear_v0` reste le nom de l'ancien comportement ; `vertical_stack` reste explicite.
+- Statut : `done-docs`.

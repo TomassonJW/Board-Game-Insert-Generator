@@ -24,21 +24,21 @@ Aucune gate humaine active apres validation Fusion `P15-TRAY-SEMANTICS-ALIGNMENT
 
 `P16-ERGONOMIC-2D-TRAY-PACKING-SPRINT` est lance explicitement le 2026-07-09 apres validation P15.
 
-Mission interne ready : `P16-M001 - Documenter la strategie flat_tray_2d`, ADR et docs. Objectif : definir `flat_tray_linear_v0`, `flat_tray_2d_v0`, `vertical_stack`, `pile_count`, `items_per_pile`, `pile_grid_columns`, `pile_grid_rows`, `target_aspect_ratio`, `max_module_length_mm`, `max_stack_height_mm` et la grille comme `placement_reservation_lattice_v0`.
+Mission interne terminee : P16-M001 - Documenter la strategie flat_tray_2d, ADR-0034 acceptee, pas de changement moteur.
 
-Mission interne suivante : `P16-M002 - Implementer packing 2D V0 des piles`, heuristique deterministe pour tokens/dice/meeples/generic sans solveur global.
+Mission interne ready : P16-M002 - Implementer packing 2D V0 des piles, heuristique deterministe pour tokens/dice/meeples/generic sans solveur global.
 
-Mission interne suivante : `P16-M003 - Aligner compartiments, cavites et notches sur le packing 2D`.
+Mission interne suivante : P16-M003 - Aligner compartiments, cavites et notches sur le packing 2D.
 
-Mission interne suivante : `P16-M004 - Clarifier UI et reporting P16`.
+Mission interne suivante : P16-M004 - Clarifier UI et reporting P16.
 
-Mission interne suivante : `P16-M005 - Preset P16 realiste`.
+Mission interne suivante : P16-M005 - Preset P16 realiste.
 
-Mission interne suivante : `P16-M006 - Preparation gate Fusion P16`.
+Mission interne suivante : P16-M006 - Preparation gate Fusion P16.
 
 ## Mission ready non gated
 
-`P16-M001 - Documenter la strategie flat_tray_2d`.
+`P16-M002 - Implementer packing 2D V0 des piles`.
 
 ## Regle operationnelle Fusion
 

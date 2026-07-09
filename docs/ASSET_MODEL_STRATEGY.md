@@ -216,3 +216,20 @@ Si aucun layout ne tient dans `box.inner_dimensions_mm` apres murs externes, le 
 ## P14-USABLE-ASSET-TRAY-M002 - Printability report V0
 
 Les modules asset-first generes portent maintenant `printability_report_v0`. Ce rapport inspecte les dimensions moteur deja calculees pour les murs, parois internes, fond, cavites et encoches. Il est strictement informatif : `printability_checked: yes` signifie que les seuils geometriques ont ete reportes, tandis que `printability_validated_by_print: no` reste obligatoire tant qu'aucun prototype physique n'est imprime et mesure.
+
+## P16-M001 - Strategie flat_tray_2d V0
+
+P16 formalise la dette ouverte par P15 : `flat_tray` ne doit pas seulement eviter les tours hautes, il doit aussi eviter les longues barres X quand une organisation 2D raisonnable est possible.
+
+Terminologie retenue :
+
+- `flat_tray_linear_v0` : comportement P15, piles basses mais souvent en ligne unique ;
+- `flat_tray_2d_v0` : nouvelle cible, piles basses reparties en colonnes/rangees ;
+- `items_per_pile` : capacite verticale d'une pile selon `max_stack_height_mm` ;
+- `pile_count` : nombre de piles requises par `count` ;
+- `pile_grid_columns` / `pile_grid_rows` : grille locale de piles dans l'enveloppe asset-fit ;
+- `target_aspect_ratio` : ratio cible pour eviter les modules trop longs ;
+- `max_module_length_mm` : limite souple de longueur module ;
+- `max_stack_height_mm` : plafond de hauteur de pile deja expose par P15.
+
+Pour `tokens`, `dice`, `meeples` et `generic`, le defaut cible est `flat_tray_2d_v0`. Les cartes gardent leur semantique de deck/paquet total. Les cavites restent des enveloppes rectangulaires par asset source, pas des logements individuels par pile ou item.

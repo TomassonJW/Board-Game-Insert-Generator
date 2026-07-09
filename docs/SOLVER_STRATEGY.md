@@ -186,3 +186,17 @@ IR metadata.
 Le sizing count-aware n'introduit pas de solveur global. L'algorithme est volontairement borne : hauteur maximale derivee de la boite et de la plus grande plage Z libre de la grille, capacite par pile par division entiere, nombre de piles par plafond, puis row-packing XY deterministe des piles. Si l'enveloppe issue de cette heuristique ne rentre pas dans la boite/grille, la variante est refusee avec diagnostic au lieu de promettre une capacite.
 
 Aucun backtracking, optimisation globale, score multi-variante lourd ou generation de cavites n'est ajoute en P13-ASSET-M002.
+
+## P16-M001 - Heuristique flat_tray_2d V0
+
+P16 autorise une heuristique locale de packing 2D des piles, sans changer la nature du solveur BGIG.
+
+Ce qui est autorise :
+
+- calcul deterministe de `items_per_pile` depuis `max_stack_height_mm` et `z_mm` ;
+- calcul de `pile_count` depuis `count` ;
+- choix local de `pile_grid_columns` et `pile_grid_rows` pour approcher `target_aspect_ratio` ;
+- preference pour une organisation 2D quand elle reduit une longue ligne X ;
+- refus ou warning si `max_module_length_mm` ou la boite/grille rendent le resultat impossible.
+
+Ce qui reste interdit : solveur global, backtracking, permutation optimale de modules, dependance d'optimisation, cavites par item, visualisation de chaque asset individuel.
