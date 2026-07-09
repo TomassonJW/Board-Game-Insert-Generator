@@ -589,21 +589,58 @@ def _count_aware_compartment_layout(
 
     row_layout = _asset_compartment_oriented_layout(compartments, wall_mm, axis="x")
     column_layout = _asset_compartment_oriented_layout(compartments, wall_mm, axis="y")
-    row_fits = row_layout["asset_fit_size_mm"]["x"] <= max_asset_fit_width_mm and row_layout["asset_fit_size_mm"]["y"] <= max_asset_fit_depth_mm
-    column_fits = column_layout["asset_fit_size_mm"]["x"] <= max_asset_fit_width_mm and column_layout["asset_fit_size_mm"]["y"] <= max_asset_fit_depth_mm
-    if row_fits and column_fits:
-        row_area = row_layout["asset_fit_size_mm"]["x"] * row_layout["asset_fit_size_mm"]["y"]
-        column_area = column_layout["asset_fit_size_mm"]["x"] * column_layout["asset_fit_size_mm"]["y"]
-        layout = row_layout if row_area <= column_area else column_layout
-    elif row_fits:
-        layout = row_layout
-    elif column_fits:
-        layout = column_layout
-    else:
-        warnings.append(
-            "Per-source compartments exceed box XY asset-fit limits in both deterministic row and column layouts; downstream placement must reject."
+    shelf_layout = _asset_compartment_shelf_layout(
+        compartments,
+        wall_mm,
+        max_asset_fit_width_mm=max_asset_fit_width_mm,
+        max_asset_fit_depth_mm=max_asset_fit_depth_mm,
+    )
+    candidate_layouts = [row_layout, column_layout]
+    if shelf_layout["status"] == "planned":
+        candidate_layouts.append(shelf_layout)
+    fitting_layouts = [
+        layout
+        for layout in candidate_layouts
+        if _asset_compartment_layout_fits(
+            layout,
+            max_asset_fit_width_mm=max_asset_fit_width_mm,
+            max_asset_fit_depth_mm=max_asset_fit_depth_mm,
         )
-        layout = row_layout
+    ]
+    if fitting_layouts:
+        layout = min(
+            fitting_layouts,
+            key=lambda item: (
+                item["asset_fit_size_mm"]["x"] * item["asset_fit_size_mm"]["y"],
+                item["asset_fit_size_mm"]["y"],
+                item["layout_strategy"],
+            ),
+        )
+    else:
+        attempts = [
+            {
+                "layout_strategy": layout["layout_strategy"],
+                "asset_fit_size_mm": layout.get("asset_fit_size_mm", {}),
+                "status": layout.get("status", "planned"),
+                "reason": layout.get("reason"),
+            }
+            for layout in [row_layout, column_layout, shelf_layout]
+        ]
+        return {
+            "status": "refused",
+            "code": "ASSET_COMPARTMENTS_DO_NOT_FIT",
+            "reason": (
+                "Per-source compartments do not fit the available box XY asset-fit envelope "
+                "with deterministic row, column or shelf layouts."
+            ),
+            "policy": _ASSET_COMPARTMENT_CAVITY_POLICY,
+            "max_asset_fit_size_mm": {
+                "x": round(max_asset_fit_width_mm, 4),
+                "y": round(max_asset_fit_depth_mm, 4),
+            },
+            "layout_attempts": attempts,
+            "warnings": warnings,
+        }
 
     return {
         "status": "planned",
@@ -672,10 +709,124 @@ def _asset_compartment_oriented_layout(
         }
 
     return {
+        "status": "planned",
         "layout_strategy": "deterministic_single_row_by_source_asset_v0" if axis == "x" else "deterministic_single_column_by_source_asset_v0",
         "asset_fit_size_mm": asset_fit_size,
         "compartments": laid_out,
     }
+
+
+def _asset_compartment_shelf_layout(
+    compartments: list[dict[str, Any]],
+    wall_mm: float,
+    *,
+    max_asset_fit_width_mm: float,
+    max_asset_fit_depth_mm: float,
+) -> dict[str, Any]:
+    laid_out: list[dict[str, Any]] = []
+    rows: list[list[int]] = []
+    row: list[int] = []
+    cursor_x = 0.0
+    cursor_y = 0.0
+    row_depth = 0.0
+    max_x = 0.0
+    max_z = 0.0
+
+    for source in compartments:
+        size = dict(source["size_mm"])
+        if size["x"] > max_asset_fit_width_mm or size["y"] > max_asset_fit_depth_mm:
+            return {
+                "status": "refused",
+                "layout_strategy": "deterministic_shelf_by_source_asset_v0",
+                "asset_fit_size_mm": {"x": round(size["x"], 4), "y": round(size["y"], 4), "z": round(size["z"], 4)},
+                "reason": f"Compartment {source.get('id', 'unknown')} is larger than the available asset-fit envelope.",
+                "compartments": [],
+            }
+        if row and cursor_x + size["x"] > max_asset_fit_width_mm:
+            rows.append(row)
+            cursor_y += row_depth + wall_mm
+            cursor_x = 0.0
+            row_depth = 0.0
+            row = []
+        if cursor_y + size["y"] > max_asset_fit_depth_mm:
+            return {
+                "status": "refused",
+                "layout_strategy": "deterministic_shelf_by_source_asset_v0",
+                "asset_fit_size_mm": {
+                    "x": round(max(max_x, cursor_x + size["x"]), 4),
+                    "y": round(cursor_y + size["y"], 4),
+                    "z": round(max(max_z, size["z"]), 4),
+                },
+                "reason": f"Compartment {source.get('id', 'unknown')} exceeds available depth in shelf layout.",
+                "compartments": laid_out,
+            }
+        compartment = dict(source)
+        compartment["local_origin_mm"] = {
+            "x": round(wall_mm + cursor_x, 4),
+            "y": round(wall_mm + cursor_y, 4),
+            "z": round(compartment["local_origin_mm"]["z"], 4),
+        }
+        laid_out.append(compartment)
+        row.append(len(laid_out) - 1)
+        cursor_x += size["x"] + wall_mm
+        row_depth = max(row_depth, size["y"])
+        max_x = max(max_x, cursor_x - wall_mm)
+        max_z = max(max_z, size["z"])
+
+    if row:
+        rows.append(row)
+    asset_fit_size = {"x": round(max_x, 4), "y": round(cursor_y + row_depth, 4), "z": round(max_z, 4)}
+
+    index_to_row: dict[int, int] = {}
+    for row_index, row_items in enumerate(rows):
+        for item_index in row_items:
+            index_to_row[item_index] = row_index
+
+    for item_index, compartment in enumerate(laid_out):
+        origin = compartment["local_origin_mm"]
+        size = compartment["size_mm"]
+        row_index = index_to_row[item_index]
+        row_items = rows[row_index]
+        position_in_row = row_items.index(item_index)
+        if position_in_row > 0:
+            compartment["wall_role_x_min"] = "internal_wall"
+        if position_in_row < len(row_items) - 1:
+            compartment["wall_role_x_max"] = "internal_wall"
+        if row_index > 0:
+            compartment["wall_role_y_min"] = "internal_wall"
+        if row_index < len(rows) - 1:
+            compartment["wall_role_y_max"] = "internal_wall"
+        compartment["expected_walls_mm"] = {
+            "x_min": round(origin["x"], 4),
+            "x_max": round(wall_mm + asset_fit_size["x"] - (origin["x"] - wall_mm) - size["x"], 4),
+            "y_min": round(origin["y"], 4),
+            "y_max": round(wall_mm + asset_fit_size["y"] - (origin["y"] - wall_mm) - size["y"], 4),
+        }
+
+    return {
+        "status": "planned",
+        "layout_strategy": "deterministic_shelf_by_source_asset_v0",
+        "asset_fit_size_mm": asset_fit_size,
+        "compartments": laid_out,
+    }
+
+
+def _asset_compartment_layout_fits(
+    layout: dict[str, Any],
+    *,
+    max_asset_fit_width_mm: float,
+    max_asset_fit_depth_mm: float,
+) -> bool:
+    size = layout.get("asset_fit_size_mm", {})
+    try:
+        return (
+            layout.get("status", "planned") == "planned"
+            and float(size.get("x", 0.0)) <= max_asset_fit_width_mm
+            and float(size.get("y", 0.0)) <= max_asset_fit_depth_mm
+        )
+    except (TypeError, ValueError):
+        return False
+
 
 def _suggested_module(
     config: InsertConfig,
@@ -1148,6 +1299,17 @@ def _asset_cavity_payload(
     )
     if compartment_payload.get("status") == "planned":
         return compartment_payload
+    layout = storage_sizing.get("asset_compartment_layout") if isinstance(storage_sizing, dict) else None
+    if isinstance(layout, dict) and layout.get("status") == "refused":
+        return {
+            **compartment_payload,
+            "fallback_suppressed": True,
+            "fallback_suppressed_reason": (
+                "Per-source asset compartments were required but refused; BGIG does not fall back "
+                "to a single misleading asset-fit cavity."
+            ),
+            "layout_refusal": layout,
+        }
     fallback = _asset_fit_cavity_payload(
         module_id=module_id,
         functional_type=functional_type,

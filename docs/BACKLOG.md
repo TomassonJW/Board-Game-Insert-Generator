@@ -855,3 +855,20 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Dette UX a prendre en compte : les champs, unites, effets de `count`, grille, walls, floor, clearances, modes et politiques restent difficiles a comprendre pour un humain.
 - Gate : decision humaine produit requise avant toute mission produit suivante.
 - Statut : `ready-gated`.
+
+### P14-USABLE-ASSET-TRAY-M001 - Robustifier le layout multi-assets quick_asset_box
+
+- Capability : C-ASSET, C-FUSION-UI, C-SOLVER.
+- Milestone : M14 Usable beta.
+- Objectif : supporter proprement plusieurs compartiments asset-specific pour 3 a 5 assets compatibles dans `quick_asset_box`.
+- Livrable : strategies row/column/shelf deterministes, refus `ASSET_COMPARTMENTS_DO_NOT_FIT`, suppression du fallback trompeur vers grande cavite globale si les compartiments requis ne tiennent pas.
+- Tests : unitaires 2 assets existants, nouveaux tests 3 et 4 assets, rejet explicite si dimensions incompatibles.
+- Statut : `done`, `implemented-core`, validation Fusion sprint P14 requise, `print-validated: false`.
+
+### P14-USABLE-ASSET-TRAY-M002 - Printability safety report V0
+
+- Capability : C-CALIBRATION, C-ASSET, C-FUSION-UI.
+- Milestone : M14 Usable beta / M11 Physical validation.
+- Objectif : ajouter un rapport de securite imprimable V0 sans revendiquer de validation physique.
+- Livrable : `printability_report_v0`, checks murs externes/parois internes/fond/profondeur cavite/profondeur encoche, warnings fragilite, `printability_checked: yes`, `printability_validated_by_print: no`.
+- Statut : `ready`, mission interne suivante du sprint P14.

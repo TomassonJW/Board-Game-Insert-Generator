@@ -608,3 +608,13 @@ Observation Fusion validee : deux encoches top-open frontales reelles sont coupe
 Limites explicitement non validees : UX encore peu claire, assets individuels non visualises, cavites par pile/item non generees, pas de demi-lunes, pas de courbes/scoops, pas de fillets/conges, pas d'export STL/3MF, capacite encore heuristique, aucune impression 3D validee.
 
 Dette UX enregistree : l'interface `quick_asset_box` reste difficile a comprendre. Une future mission UI/UX devra clarifier champs, unites, effets de `count`, grille, walls, floor, clearances, modes et politiques.
+
+## P14-USABLE-ASSET-TRAY-M001 - Layout multi-assets quick_asset_box
+
+Statut : `implemented-core`, validation Fusion sprint P14 requise, `print-validated: false`.
+
+P14-USABLE-ASSET-TRAY-M001 ajoute un layout deterministe plus robuste pour les compartiments asset-specific issus de `quick_asset_box`. Le moteur essaye maintenant les strategies `deterministic_single_row_by_source_asset_v0`, `deterministic_single_column_by_source_asset_v0`, puis `deterministic_shelf_by_source_asset_v0`. La strategie shelf permet de supporter proprement des cas 3 et 4 assets compatibles dans un module count-aware unique, avec compartiments separes, parois internes reportees et encoches frontales planifiees pour les compartiments touches par le mur avant.
+
+Si aucun layout de compartiments ne tient dans l'enveloppe XY utile, le moteur retourne `ASSET_COMPARTMENTS_DO_NOT_FIT` et conserve les tentatives de layout dans `layout_attempts`. Le fallback vers une grande cavite asset-fit unique est supprime quand un layout de compartiments requis est refuse, pour eviter un resultat Fusion trompeur.
+
+Limites : pas de solveur global, pas de backtracking, pas d'optimisation avancee, pas de cavites par pile/item, pas de visualisation d'items individuels, aucune validation Fusion P14 ni impression 3D encore realisee.

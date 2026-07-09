@@ -759,3 +759,7 @@ L'adaptateur Fusion lit `compartments[].asset_access_notch`. Les notches `status
 L'execution reutilise la coupe rectangulaire top-open deja validee pour les encoches simples : sketch sur plan XZ du mur avant, profil depassant legerement le haut du body, extrusion cut limitee au body cible via `participantBodies`. Les notches refusees ne sont pas executees. Les demi-lunes, courbes, scoops, fillets, conges et exports imprimables restent hors scope.
 
 Statut courant : implemente hors Fusion, validation humaine `P13-ASSET-M005V` requise. `print-validated: false`.
+
+## P14-USABLE-ASSET-TRAY-M001 - Layout multi-assets consomme par Fusion
+
+Fusion continue a ne recalculer ni layout, ni sizing, ni tolerances. Pour P14-USABLE-ASSET-TRAY-M001, l'adaptateur consomme seulement les compartiments deja resolus par le moteur, y compris `layout_strategy: deterministic_shelf_by_source_asset_v0` quand elle apparait. Les cavites refusees avec `fallback_suppressed: true` restent report-only et ne doivent produire aucune coupe.

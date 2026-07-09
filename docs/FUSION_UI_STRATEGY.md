@@ -386,3 +386,7 @@ Le smoke quick_asset_box utilise le cas `130 x 50 x 60`, grille `4 x 4 x 3`, ass
 Le meme smoke prepare maintenant les encoches d'acces V0. Le rapport attendu ajoute `asset_access_features_generated`, `asset_access_policy: per_compartment_top_open_rectangular_notch_v0`, `asset_access_notches_planned`, `asset_access_notches_generated` et `asset_access_notches_refused`.
 
 Validation humaine attendue : verifier dans Fusion que chaque compartiment supporte possede une vraie coupe rectangulaire top-open sur le mur avant, que la paroi interne et le fond restent presents, puis verifier `regenerate` sans doublon et `clear_bgig_scene` avec preservation des objets non-BGIG.
+
+## P14-USABLE-ASSET-TRAY-M001 - UX attendue du layout multi-assets
+
+`quick_asset_box` peut maintenant produire un module asset-first avec plusieurs compartiments asset-specific dans des scenarios 3+ assets, quand le layout row/column/shelf tient dans la boite. L'UI Fusion classique reste une commande, pas une palette persistante. La validation humaine P14 devra verifier que les rapports exposent clairement la strategie de layout et les refus eventuels, sans pretendre a une validation d'impression.

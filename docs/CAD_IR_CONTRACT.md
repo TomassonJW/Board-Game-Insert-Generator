@@ -450,3 +450,9 @@ Chaque compartiment peut porter un objet `asset_access_notch` :
 ```
 
 Un refus reste serialise avec `status: refused`, `notch_generated: false` et `reason`. Les notches sont additives : elles ne changent pas `schema_version`, ne remplacent pas les operations CAD IR classiques et ne valident pas l'impression.
+
+## P14-USABLE-ASSET-TRAY-M001 - Metadata layout multi-assets
+
+La metadata `asset_fit_cavity` pour `per_source_asset_rectangular_compartments_v0` peut exposer `layout_strategy: deterministic_shelf_by_source_asset_v0` en plus des strategies row/column existantes. Les compartiments gardent `local_origin_mm`, `size_mm`, `expected_walls_mm`, `internal_wall_thickness_mm` et les roles optionnels `wall_role_*` pour documenter les parois internes.
+
+Si le layout multi-assets ne tient pas, `asset_compartment_layout` peut porter `status: refused`, `code: ASSET_COMPARTMENTS_DO_NOT_FIT`, `layout_attempts` et `max_asset_fit_size_mm`. Dans ce cas, l'asset-fit cavity finale peut rester refusee avec `fallback_suppressed: true`; Fusion doit ignorer cette cavite refusee au lieu de creer une grande cavite globale trompeuse.

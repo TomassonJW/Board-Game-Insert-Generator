@@ -143,3 +143,10 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 - C-FILLETS : reuse Fusion valide des coupes rectangulaires top-open, sans demi-lunes, courbes, scoops, fillets ou conges.
 - C-FUSION-UI : `quick_asset_box` valide Fusion avec reporting `asset_access_*`, regenerate sans doublon et clear preservant les objets non-BGIG.
 - Gate active suivante : `P13-ASSET-M006-GATE`; aucune validation d'impression.
+
+## P14-USABLE-ASSET-TRAY-M001 capability update
+
+- C-ASSET : `implemented-core` additionnel pour layout multi-assets row/column/shelf avec refus explicite si les compartiments ne tiennent pas.
+- C-SOLVER : heuristique deterministe bornee, sans backtracking ni optimisation globale.
+- C-FUSION-UI : benefice attendu dans `quick_asset_box`, mais validation Fusion P14 reste requise.
+- Limites : pas de cavites par pile/item, pas d'assets individuels, pas d'impression validee.

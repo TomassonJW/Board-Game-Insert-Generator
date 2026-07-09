@@ -206,3 +206,9 @@ P13-ASSET-M005 ajoute une premiere ergonomie d'acces pour les compartiments asse
 Regle V0 : au plus une encoche rectangulaire top-open par compartiment, sur le mur avant du module (`-Y`), centree dans la largeur utile du compartiment. Le moteur planifie l'encoche uniquement si le compartiment touche le mur avant externe, si la largeur restante apres marges laterales atteint 6.0 mm et si la profondeur verticale utile atteint 4.0 mm. La cible nominale est 18.0 mm de largeur et 10.0 mm de profondeur depuis le haut, bornee par la taille du compartiment.
 
 Si un compartiment n'est pas adjacent au mur avant, est trop etroit ou trop bas, l'encoche est refusee avec `status: refused` et une raison explicite. Les assets individuels, cavites par pile/item, courbes, scoops, fillets et garanties d'impression restent hors scope.
+
+## P14-USABLE-ASSET-TRAY-M001 - Layout multi-assets robuste V0
+
+Le layout de compartiments `per_source_asset_rectangular_compartments_v0` supporte maintenant plusieurs assets compatibles dans un module asset-first unique avec trois strategies deterministes bornees : ligne, colonne, puis shelf multi-rang. Le shelf layout garde l'ordre source des assets, ajoute des parois internes entre compartiments voisins, reporte les roles de murs internes et choisit la plus petite enveloppe XY qui tient dans la boite.
+
+Si aucun layout ne tient dans `box.inner_dimensions_mm` apres murs externes, le moteur refuse explicitement avec `ASSET_COMPARTMENTS_DO_NOT_FIT` et `layout_attempts`. BGIG ne retombe plus silencieusement vers une cavite globale quand les compartiments asset-specific sont requis mais impossibles.

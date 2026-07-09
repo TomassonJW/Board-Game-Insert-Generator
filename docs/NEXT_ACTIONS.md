@@ -18,15 +18,19 @@ structurant, authentification absente ou refus de push direct.
 
 ## Gate humaine active
 
-`P13-ASSET-M006-GATE - Decider la prochaine etape apres access notches par compartiment`.
+Aucune gate humaine active pendant les missions automatisables du sprint P14 explicitement autorise. La prochaine validation humaine attendue reste la validation Fusion finale `P14-USABLE-ASSET-TRAY-SPRINT-V` apres preparation locale.
 
-Statut : gate produit active. `P13-ASSET-M005V` est validee humainement comme premiere generation d'aides d'acces V0 par compartiment : module exterieur count-aware, compartiments asset-specific et encoches rectangulaires top-open frontales. Generate, regenerate, clear, registry et preservation non-BGIG sont valides. `print-validated: false`.
+## Sprint actif
 
-Decision attendue : choisir explicitement la prochaine mission bornee. Options candidates : dette UI/UX `quick_asset_box` (formats, unites, sections, presets, aide), visualisation/proxies d'assets, cavites par pile/item, sizing capacitaire plus garanti, traitement cartes/decks, solveur/optimisation, export imprimable, calibration/impression ou maintien du scope V0.
+`P14-USABLE-ASSET-TRAY-SPRINT` est lance explicitement le 2026-07-09 apres preflight post-crash OK.
+
+Mission interne terminee : `P14-USABLE-ASSET-TRAY-M001 - Robustifier le layout multi-assets`, `implemented-core`, tests automatises OK, validation Fusion sprint P14 requise, `print-validated: false`.
+
+Mission interne suivante : `P14-USABLE-ASSET-TRAY-M002 - Printability safety report V0`.
 
 ## Mission ready non gated
 
-Aucune mission produit non-gated supplementaire n'est recommandee avant decision humaine sur `P13-ASSET-M006-GATE`.
+`P14-USABLE-ASSET-TRAY-M002 - Printability safety report V0` est la prochaine mission interne autorisee du sprint P14.
 
 ## Regle operationnelle Fusion
 

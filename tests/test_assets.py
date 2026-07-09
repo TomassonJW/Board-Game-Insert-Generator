@@ -296,6 +296,46 @@ class AssetModelTests(unittest.TestCase):
         self.assertIn("too narrow", notch["reason"])
         self.assertEqual(notch["asset_id"], "coin-tokens")
         self.assertEqual(notch["compartment_id"], "asset-compartment:coin-tokens")
+
+    def test_multi_asset_compartments_support_three_assets_with_shelf_layout(self) -> None:
+        payload = _multi_asset_tokens_payload(asset_count=3)
+        generated = _layout_payload(payload)["executable_asset_plan"]["generated_modules"][0]
+        cavity = generated["asset_fit_cavity"]
+
+        self.assertEqual(cavity["status"], "planned")
+        self.assertEqual(cavity["policy"], "per_source_asset_rectangular_compartments_v0")
+        self.assertEqual(cavity["layout_strategy"], "deterministic_shelf_by_source_asset_v0")
+        self.assertEqual(cavity["compartment_count"], 3)
+        self.assertEqual(cavity["asset_compartment_cavities_planned"], 3)
+        self.assertEqual([item["asset_id"] for item in cavity["compartments"]], ["coin-tokens", "status-tokens", "wound-tokens"])
+        self.assertEqual(generated["dimensions_mm"], {"x": 68.4, "y": 38.6, "z": 47.8})
+        self.assertEqual(cavity["asset_fit_size_mm"], {"x": 66.0, "y": 36.2, "z": 46.6})
+        self.assertTrue(cavity["compartments"][1]["expected_walls_mm"]["x_min"] > 0)
+        self.assertEqual(cavity["asset_access_notches_planned"], 3)
+
+    def test_multi_asset_compartments_support_four_assets_with_internal_walls(self) -> None:
+        payload = _multi_asset_tokens_payload(asset_count=4)
+        generated = _layout_payload(payload)["executable_asset_plan"]["generated_modules"][0]
+        cavity = generated["asset_fit_cavity"]
+
+        self.assertEqual(cavity["status"], "planned")
+        self.assertEqual(cavity["layout_strategy"], "deterministic_shelf_by_source_asset_v0")
+        self.assertEqual(cavity["compartment_count"], 4)
+        self.assertEqual(cavity["asset_compartment_cavities_planned"], 4)
+        self.assertEqual(generated["dimensions_mm"], {"x": 82.8, "y": 38.6, "z": 47.8})
+        self.assertEqual(cavity["asset_fit_size_mm"], {"x": 80.4, "y": 36.2, "z": 46.6})
+        self.assertEqual(cavity["compartments"][0]["wall_role_x_max"], "internal_wall")
+        self.assertEqual(cavity["compartments"][1]["wall_role_x_min"], "internal_wall")
+        self.assertEqual(cavity["asset_access_notches_refused"], 0)
+
+    def test_multi_asset_compartments_reject_when_no_layout_fits(self) -> None:
+        payload = _multi_asset_tokens_payload(asset_count=4, box_inner_mm=(75, 45, 55), grid_units=(3, 3, 2))
+        plan_payload = _layout_payload(payload)
+
+        self.assertEqual(plan_payload["asset_candidate_variants"][0]["status"], "rejected")
+        self.assertEqual(plan_payload["asset_candidate_variants"][0]["rejection_reasons"][0]["code"], "DIMENSIONS_INCOMPATIBLE")
+        self.assertEqual(plan_payload["executable_asset_plan"]["status"], "rejected")
+        self.assertEqual(plan_payload["executable_asset_plan"]["generated_modules"], [])
     def test_asset_fit_cavity_refuses_card_stack_v0(self) -> None:
         payload = _count_aware_tokens_payload(count=60)
         payload["assets"][0]["kind"] = "cards"
@@ -355,6 +395,79 @@ def _asset_payload() -> dict:
     return json.loads((ROOT / "examples" / "simple_assets.json").read_text(encoding="utf-8"))
 
 
+
+def _multi_asset_tokens_payload(*, asset_count: int, box_inner_mm=(180, 120, 55), grid_units=(6, 4, 3)) -> dict:
+    assets = [
+        {
+            "id": "coin-tokens",
+            "name": "Coin tokens",
+            "kind": "tokens",
+            "quantity": {"count": 40, "grouping": "set"},
+            "dimensions_mm": {"x": 18, "y": 16, "z": 2},
+            "dimension_confidence": "exact",
+            "containment_intent": "store",
+        },
+        {
+            "id": "status-tokens",
+            "name": "Status tokens",
+            "kind": "tokens",
+            "quantity": {"count": 23, "grouping": "set"},
+            "dimensions_mm": {"x": 10, "y": 35, "z": 2},
+            "dimension_confidence": "exact",
+            "containment_intent": "store",
+        },
+        {
+            "id": "wound-tokens",
+            "name": "Wound tokens",
+            "kind": "tokens",
+            "quantity": {"count": 15, "grouping": "set"},
+            "dimensions_mm": {"x": 14, "y": 14, "z": 2},
+            "dimension_confidence": "exact",
+            "containment_intent": "store",
+        },
+        {
+            "id": "bonus-tokens",
+            "name": "Bonus tokens",
+            "kind": "tokens",
+            "quantity": {"count": 12, "grouping": "set"},
+            "dimensions_mm": {"x": 12, "y": 12, "z": 2},
+            "dimension_confidence": "exact",
+            "containment_intent": "store",
+        },
+        {
+            "id": "small-tokens",
+            "name": "Small tokens",
+            "kind": "tokens",
+            "quantity": {"count": 18, "grouping": "set"},
+            "dimensions_mm": {"x": 8, "y": 8, "z": 2},
+            "dimension_confidence": "exact",
+            "containment_intent": "store",
+        },
+    ]
+    box_x, box_y, box_z = box_inner_mm
+    grid_x, grid_y, grid_z = grid_units
+    return {
+        "project_name": "P14 multi asset layout fixture",
+        "units": "mm",
+        "box": {
+            "inner_dimensions_mm": {"x": box_x, "y": box_y, "z": box_z},
+            "usable_height_mm": box_z,
+            "lid_clearance_mm": 0,
+        },
+        "print_profile": "default",
+        "defaults": {
+            "wall_thickness_mm": 1.2,
+            "floor_thickness_mm": 1.2,
+            "corner_radius_mm": 1.5,
+        },
+        "layout": {"strategy": "row_fill"},
+        "assets": assets[:asset_count],
+        "volumetric_grid": {
+            "unit_mm": {"x": box_x / grid_x, "y": box_y / grid_y, "z": box_z / grid_z},
+            "size_units": {"x": grid_x, "y": grid_y, "z": grid_z},
+        },
+        "modules": [],
+    }
 def _layout_payload(payload: dict) -> dict:
     config = _load_payload(payload)
     layout = generate_basic_layout(config)
