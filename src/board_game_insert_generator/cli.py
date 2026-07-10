@@ -8,6 +8,16 @@ from pathlib import Path
 from board_game_insert_generator.box_fill import analyze_box_fill_plan, box_fill_plan_to_dict
 from board_game_insert_generator.box_fill_solver import BoxFillCandidate, BoxFillSolveRequest, format_box_fill_solution_markdown, render_box_fill_solution_svg, solve_box_fill_greedy
 from board_game_insert_generator.box_fill_solver_io import load_box_fill_solve_request
+from board_game_insert_generator.box_fill_variants import (
+    BoxFillVariantRequest,
+    SUPPORTED_POLICY_IDS,
+    format_variant_portfolio_markdown,
+    generate_box_fill_variants,
+    render_variant_portfolio_html,
+    selected_variant_to_dict,
+    standard_preference_profile,
+    variant_portfolio_to_dict,
+)
 from board_game_insert_generator.models import Dimension3D
 from board_game_insert_generator.cad_ir import CadIrError, build_blank_cad_scene
 from board_game_insert_generator.config_loader import ConfigError, load_config
@@ -40,6 +50,12 @@ def main(argv: list[str] | None = None) -> int:
         return _report_box_fill_solution(arguments[1:])
     if arguments and arguments[0] == "export-box-fill-solution":
         return _export_box_fill_solution(arguments[1:])
+    if arguments and arguments[0] == "report-box-fill-variants":
+        return _report_box_fill_variants(arguments[1:])
+    if arguments and arguments[0] == "render-box-fill-variant-dashboard":
+        return _render_box_fill_variant_dashboard(arguments[1:])
+    if arguments and arguments[0] == "export-box-fill-variant":
+        return _export_box_fill_variant(arguments[1:])
     return _report(arguments)
 
 
@@ -55,6 +71,9 @@ def _print_top_level_help() -> None:
         "  python -m board_game_insert_generator validate-box-fill CONFIG [--format text|json]\n"
         "  python -m board_game_insert_generator report-box-fill CONFIG --format markdown|json [--output PATH]\n"
         "  python -m board_game_insert_generator export-box-fill-plan CONFIG --output PATH\n"
+        "  python -m board_game_insert_generator report-box-fill-variants REQUEST --format markdown|json|html [--output PATH]\n"
+        "  python -m board_game_insert_generator render-box-fill-variant-dashboard REQUEST --output PATH\n"
+        "  python -m board_game_insert_generator export-box-fill-variant REQUEST --variant recommended|ID --output PATH [--cad-ir-output PATH]\n"
         "\n"
         "CAD IR export is a subcommand named export-cad-ir; it is not an --export-cad-ir option."
     )
@@ -367,3 +386,113 @@ def _export_box_fill_solution(argv: list[str]) -> int:
         scene["metadata"]["box_fill_solution"] = payload
         Path(args.cad_ir_output).write_text(json.dumps(scene, indent=2) + "\n", encoding="utf-8")
     return 0 if result.status == "solved" else 2
+
+
+def _variant_portfolio_from_args(args):
+    solve_request = load_box_fill_solve_request(args.request)
+    policies = tuple(args.policy) if args.policy else SUPPORTED_POLICY_IDS
+    return generate_box_fill_variants(
+        BoxFillVariantRequest(
+            solve_request=solve_request,
+            preference=standard_preference_profile(args.preference),
+            policies=policies,
+            max_variants=args.max_variants,
+        )
+    )
+
+
+def _add_variant_arguments(parser: argparse.ArgumentParser, *, include_variant: bool = False) -> None:
+    parser.add_argument(
+        "--preference",
+        default="balanced",
+        help="P21 profile: balanced, compact, accessible or print_simple.",
+    )
+    parser.add_argument(
+        "--policy",
+        action="append",
+        choices=SUPPORTED_POLICY_IDS,
+        help="Repeat to restrict the bounded P21 policy set.",
+    )
+    parser.add_argument("--max-variants", type=int, default=5)
+    if include_variant:
+        parser.add_argument(
+            "--variant",
+            default="recommended",
+            help="Variant id from report-box-fill-variants, or recommended.",
+        )
+
+
+def _report_box_fill_variants(argv: list[str]) -> int:
+    parser = argparse.ArgumentParser(
+        description="Compare bounded deterministic P21 BoxFill variants from a file-backed P20 request."
+    )
+    parser.add_argument("request")
+    parser.add_argument("--format", choices=("markdown", "json", "html"), default="markdown")
+    parser.add_argument("--output")
+    _add_variant_arguments(parser)
+    args = parser.parse_args(argv)
+    try:
+        portfolio = _variant_portfolio_from_args(args)
+    except (ConfigError, ValueError) as exc:
+        _print_error("BoxFill variant portfolio error", exc)
+        return 2
+    if args.format == "json":
+        value = json.dumps(variant_portfolio_to_dict(portfolio), indent=2)
+    elif args.format == "html":
+        value = render_variant_portfolio_html(portfolio)
+    else:
+        value = format_variant_portfolio_markdown(portfolio)
+    if args.output:
+        Path(args.output).write_text(value + ("" if args.format == "html" else "\n"), encoding="utf-8")
+    else:
+        print(value)
+    return 0 if portfolio.recommended_variant_id is not None else 2
+
+
+def _render_box_fill_variant_dashboard(argv: list[str]) -> int:
+    parser = argparse.ArgumentParser(
+        description="Render a static self-contained P21 comparison dashboard; it stores no UI state."
+    )
+    parser.add_argument("request")
+    parser.add_argument("--output", required=True)
+    parser.add_argument("--layer")
+    _add_variant_arguments(parser)
+    args = parser.parse_args(argv)
+    try:
+        portfolio = _variant_portfolio_from_args(args)
+    except (ConfigError, ValueError) as exc:
+        _print_error("BoxFill variant dashboard error", exc)
+        return 2
+    Path(args.output).write_text(render_variant_portfolio_html(portfolio, args.layer), encoding="utf-8")
+    return 0 if portfolio.recommended_variant_id is not None else 2
+
+
+def _export_box_fill_variant(argv: list[str]) -> int:
+    parser = argparse.ArgumentParser(
+        description="Export an explicit P21 variant selection and optional CAD IR metadata without materializing Fusion."
+    )
+    parser.add_argument("request")
+    parser.add_argument("--output", required=True)
+    parser.add_argument("--cad-ir-output")
+    _add_variant_arguments(parser, include_variant=True)
+    args = parser.parse_args(argv)
+    try:
+        portfolio = _variant_portfolio_from_args(args)
+        selection = selected_variant_to_dict(portfolio, args.variant)
+    except (ConfigError, ValueError) as exc:
+        _print_error("BoxFill variant export error", exc)
+        return 2
+    payload = {
+        "portfolio": variant_portfolio_to_dict(portfolio),
+        "selection": selection,
+    }
+    Path(args.output).write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    if args.cad_ir_output:
+        raw = json.loads(Path(args.request).read_text(encoding="utf-8"))
+        config = load_config(Path(args.request).parent / raw["source_config"])
+        scene = build_blank_cad_scene(config, generate_basic_layout(config)).to_dict()
+        scene["metadata"]["box_fill_variant_portfolio"] = payload["portfolio"]
+        scene["metadata"]["box_fill_variant_selection"] = selection
+        scene["metadata"]["box_fill_solution"] = selection["variant"]["solution"]
+        Path(args.cad_ir_output).write_text(json.dumps(scene, indent=2) + "\n", encoding="utf-8")
+    return 0

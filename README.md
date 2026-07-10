@@ -246,3 +246,15 @@ python -m board_game_insert_generator export-box-fill-plan examples/box_fill_val
 ## P20 completion - 2026-07-10
 
 Statut : `done`, `implemented-core`, `implemented-cli`, `implemented-cad-ir-metadata`. Le moteur `box_fill_greedy_2d.v0` produit un nouveau BoxFillPlan sans muter la source, respecte locks, modules manuels, reservations et layers, supporte la rotation XY 90 degres et expose diagnostics, digest, metrics, rapports JSON/Markdown, preview SVG et metadata CAD IR. Aucun backtracking, solveur global, UI persistante, geometrie Fusion ou validation d impression n est ajoute. P21 reste gate et recommande les variantes/scoring.
+## P21 - Comparer et selectionner un plan de boite
+
+Le portefeuille P21 reste dans le moteur Python : il compare quelques policies deterministes, explique les scores et ne modifie jamais le plan source. Il ne garantit pas l ergonomie ou l impression.
+
+```powershell
+$env:PYTHONPATH = "src"
+python -m board_game_insert_generator report-box-fill-variants examples/p21/portfolio.json --format markdown
+python -m board_game_insert_generator render-box-fill-variant-dashboard examples/p21/portfolio.json --output tmp/p21-dashboard.html
+python -m board_game_insert_generator export-box-fill-variant examples/p21/portfolio.json --output tmp/p21-selection.json --cad-ir-output tmp/p21-selected-cad-ir.json
+```
+
+Le dernier export transporte une selection explicite et son portefeuille dans les metadata CAD IR ; Fusion ne recalcule ni ne materialise encore ce plan.

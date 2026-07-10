@@ -1205,3 +1205,21 @@ Statut : `done`, `implemented-core`, `implemented-cli`, `implemented-cad-ir-meta
 ## P20 product acceptance - 2026-07-10
 
 Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est accepte comme premier placement automatique deterministe de BoxFillPlan. Il reste hors Fusion, sans solveur global ni validation d impression (`print_validated: false`). La gate P21 variants est levee; ADR-0036 UI reste distincte.
+## P21-BOX-FILL-VARIANT-PORTFOLIO-SPRINT
+
+- Capability : C-SOLVER, C-PRODUCT-VISION, C-CAD-IR.
+- Milestone : M10 Semi-automatic solver.
+- Objectif : comparer un portefeuille borne de placements P20 sans introduire de solveur global ou d UI persistante.
+- Livrables : `box_fill_variants.v0`, profiles de preference, deduplication, Pareto, Markdown/JSON/HTML statique, selection explicite, metadata CAD IR, fixture et tests.
+- Gate : P21 etait autorise par l acceptation P20 ; aucune nouvelle gate franchie.
+- Statut : `done`, `implemented-core`, `implemented-cli`, `implemented-cad-ir-metadata`, `print-validated: false`.
+
+## P22-M001 - Rapport de gate pour la premiere surface UX persistante
+
+- Capability : C-FUSION-UI, C-PRODUCT-VISION.
+- Milestone : M14 Usable beta.
+- Objectif : comparer avec preuves la palette Fusion et l app locale de composition, proposer une surface initiale, son contrat de projet et son plan de retrait sans code UI.
+- Livrable : rapport de gate ADR-0036, option recommandee, limites, perimetre de spike et criteres d acceptation.
+- Dependances : P21 termine.
+- Gate : aucune tant que le lot reste documentaire ; la decision humaine de surface est obligatoire avant toute implementation persistante.
+- Statut : `ready`.

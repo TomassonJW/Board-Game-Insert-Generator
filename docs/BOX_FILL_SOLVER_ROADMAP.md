@@ -29,3 +29,6 @@ P19 est complet contre son contrat autorise : cellules libres AABB exactes (`exa
 ## P20 completion - 2026-07-10
 
 Statut : `done`, `implemented-core`, `implemented-cli`, `implemented-cad-ir-metadata`. Le moteur `box_fill_greedy_2d.v0` produit un nouveau BoxFillPlan sans muter la source, respecte locks, modules manuels, reservations et layers, supporte la rotation XY 90 degres et expose diagnostics, digest, metrics, rapports JSON/Markdown, preview SVG et metadata CAD IR. Aucun backtracking, solveur global, UI persistante, geometrie Fusion ou validation d impression n est ajoute. P21 reste gate et recommande les variantes/scoring.
+## Etat apres P21
+
+`box_fill_v3_variant_generation` est implemente dans son scope borne : policies deterministes, portfolios dedupliques, Pareto, sous-scores, preference, preview statique et selection explicite. Les policies restent des heuristiques d ordre de candidats ; elles ne constituent ni une recherche exhaustive ni une preuve ergonomique. L etape suivante est `box_fill_v4_interactive_editor`, mais sa surface persistante reste bloquee par la gate ADR-0036.

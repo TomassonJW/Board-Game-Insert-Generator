@@ -396,3 +396,8 @@ Statut : `done`, `implemented-core`, `implemented-cli`, `implemented-cad-ir-meta
 ## P20 product acceptance - 2026-07-10
 
 Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est accepte comme premier placement automatique deterministe de BoxFillPlan. Il reste hors Fusion, sans solveur global ni validation d impression (`print_validated: false`). La gate P21 variants est levee; ADR-0036 UI reste distincte.
+## P21 variant portfolio update
+
+- C-SOLVER : `implemented-core` pour un portefeuille borne P21 de policies deterministes, deduplication geometrique, front Pareto, sous-scores et recommandation explicable sans recherche globale.
+- C-PRODUCT-VISION : `implemented-cad-ir-metadata` pour la selection explicite d'une variante ; la CAD IR transporte la selection et ne recalcule pas le layout.
+- C-FUSION-UI : inchange. Le dashboard P21 est un artefact HTML statique hors Fusion, pas une palette ni une app persistante.

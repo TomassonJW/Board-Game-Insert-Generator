@@ -1,0 +1,24 @@
+{
+  "schema_version": "box_fill_solve_request.v0",
+  "source_config": "../p20/base.json",
+  "candidates": [
+    {
+      "module_id": "wide-tray",
+      "name": "Wide tray",
+      "size_mm": {"x": 60, "y": 30, "z": 10},
+      "allowed_layers": ["base"]
+    },
+    {
+      "module_id": "square-tray",
+      "name": "Square tray",
+      "size_mm": {"x": 30, "y": 30, "z": 10},
+      "allowed_layers": ["base"]
+    },
+    {
+      "module_id": "small-tray",
+      "name": "Small tray",
+      "size_mm": {"x": 20, "y": 30, "z": 10},
+      "allowed_layers": ["base"]
+    }
+  ]
+}

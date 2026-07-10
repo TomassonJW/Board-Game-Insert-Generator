@@ -1,8 +1,8 @@
-# Resume State
+﻿# Resume State
 
-- Branche de reprise : `main`, dernier commit `3cb924d add P21 deterministic variant portfolio core`.
-- P19 et P20 sont acceptes et integres.
-- P21 core est integre : contrat portefeuille, policies bornees, deduplication, preference et recommendation deterministe.
-- Prochaine phase autonome : exporter le portefeuille en JSON/Markdown, dashboard HTML/SVG, selection de variante et metadata CAD IR, puis fixtures P21 et tests.
+- Branche de mission : `codex/p21-portfolio-delivery`.
+- P19 et P20 sont acceptes et integres ; P21 est termine et pret a etre integre apres validation complete.
+- P21 livre le portefeuille, les preferences, la recommandation, les sorties Markdown/JSON/HTML, la selection et les metadata CAD IR sans UI persistante ni Fusion materialise.
+- Prochaine mission apres integration : `P22-M001`, rapport documentaire de gate ADR-0036 pour choisir la premiere surface UX persistante.
 - Verification : `$env:PYTHONPATH="src"; python -m unittest discover -s tests`.
-- Aucun travail non committe, stash ou worktree P21 a recuperer.
+- Aucun travail non committe, stash ou worktree precedent a recuperer avant cette mission.
