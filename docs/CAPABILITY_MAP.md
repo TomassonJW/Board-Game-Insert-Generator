@@ -79,7 +79,7 @@ Chaine de pilotage :
 | C-SOLVER | Solver and scoring | Volumetric layout | `implemented-core` | M10 Semi-automatic solver | Variant comparison P10-M002 report-only; raisons de rejet structurees P10-M003; module_candidates P10-M004; variante recommandee P10-M005; grouping borne P10-M006; plan concret greedy P10-M008; P13-M001 reutilise ce pipeline sans backtracking ni optimisation globale; P13-ASSET-M002/P13-ASSET-M002V valide une heuristique count-aware bornee pour piles/footprint/refus explicite sans solveur global; gate architecture si optimiseur majeur |
 | C-CALIBRATION | Calibration and print validation | Human validation gates | `designed` | M11 Physical validation | Impression reelle |
 | C-AESTHETIC | Aesthetic layer | Design language and aesthetics | `planned` | M12 Design language | Gate esthetique structurante |
-| C-PRODUCT-VISION | Product composition model | Product control plane | `designed` | P18 product rebase | Audit P18; gate before executable architecture |
+| C-PRODUCT-VISION | Product composition model | Product control plane | `implemented-cad-ir` | P19 BoxFillPlan V0 | P19 plan manuel valide, reporte et transporte sans Fusion source de verite; P20 greedy reste gate |
 
 ## Milestones utilisateur
 
@@ -376,3 +376,8 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 - C-PRODUCT-VISION : le plan manuel est maintenant lisible et exportable comme contrat JSON/Markdown/CAD IR metadata.
 - C-CAD-IR : `implemented-cad-ir-metadata` pour BoxFillPlan; aucune operation CAD/Fusion n'est derivee du plan manuel.
 - C-FUSION-UI : inchangée; Fusion reste adaptateur futur et ne recalcule pas le plan.
+## P19-M005 capability update
+
+- C-PRODUCT-VISION : `implemented-cad-ir` pour BoxFillPlan V0, valide et transporte en metadata CAD IR sans Fusion comme source de verite.
+- C-GRID-3D / C-LAYERS / C-RESERVATION : P19 valide l'occupation volumetrique manuelle et les collisions dans le moteur pur; le placement automatique reste non implemente.
+- C-SOLVER : prochaine etape recommandee `box_fill_v1_greedy_2d`, bloquee par gate produit; aucun solveur global n'est autorise.

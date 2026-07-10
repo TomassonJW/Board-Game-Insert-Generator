@@ -890,3 +890,10 @@ Limites : aucun solveur, regions libres exactes, score de variantes, support phy
 Statut : `implemented-core`, `implemented-cad-ir-metadata`. Les rapports Markdown/JSON exposent `box_fill_plan` avec box derivee, assets, layers, reservations, modules manuels, allocations, compartiments/features references, coverage, validation et FreeVolume aggregate. La CAD IR transporte le meme contrat en `metadata.box_fill_plan`, sans creer de composant, operation, cut ou visualisation Fusion.
 
 Limites : la CAD IR est un transport inspectable; Fusion ne consomme pas encore ce plan. Aucun solveur, variante automatique, region libre exacte, palette ou nouvelle geometrie n'est ajoute.
+## P19-BOX-FILL-MANUAL-MODULES-SPRINT - Cloture
+
+Statut : `done`, `implemented-core`, `implemented-cad-ir-metadata`. P19 fournit la premiere source de verite executable d'une boite complete : `box_fill_plan.v0`, BoxFillBox derivee, assets existants, layers, reservations non imprimables, modules manuels, allocations explicites, references Cavity/Feature, coverage, validation 3D et FreeVolume aggregate. Les rapports et la CAD IR exposent ce plan sans le recalculer ni le materialiser dans Fusion.
+
+Preuves : 223 tests automatises, fixture `examples/box_fill_manual_v0.json`, sorties CLI Markdown/JSON/CAD IR et metadata inspectable. P19 n'est ni une validation Fusion de BoxFillPlan, ni une impression physique, ni un solveur, ni une UI persistante.
+
+Prochaine gate : acceptation humaine de `P20-BOX-FILL-GREEDY-2D-SPRINT` decrit dans `docs/P20_RECOMMENDATION.md`. La gate palette/app ADR-0036 reste distincte.

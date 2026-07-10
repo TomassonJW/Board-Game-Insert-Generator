@@ -1179,3 +1179,14 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Capability : C-PRODUCT-VISION, C-SOLVER.
 - Objectif : consolider les preuves P19 et proposer la prochaine gate sans lancer le placement greedy ou une UI persistante.
 - Statut : `ready`.
+### P19-M005 - Cloture de sprint et prochaine gate - Resultat
+
+- Resultat : sprint P19 complet; contrat executable, validation, coverage, FreeVolume aggregate, rapports et CAD IR metadata livres dans le moteur pur.
+- Statut : `done`.
+
+### P20-BOX-FILL-GREEDY-2D-SPRINT
+
+- Capability : C-PRODUCT-VISION, C-SOLVER, C-GRID-3D, C-LAYERS, C-RESERVATION.
+- Objectif : placement XY deterministe par layer des modules/candidats non verrouilles dans un BoxFillPlan valide.
+- Gate : autorisation humaine explicite requise; `docs/P20_RECOMMENDATION.md` fixe le scope borne.
+- Statut : `ready-gated`.

@@ -20,6 +20,6 @@ Passer de l'heuristique locale actuelle a des `BoxFillPlan` explicables, sans sa
 - Les reservations et le retrait passent avant l'optimisation de compacite.
 - Une validation Fusion prouve une materialisation, une impression reelle seule prouve la physique.
 
-## Recommandation immediate
+## Etat apres P19
 
-Commencer par `box_fill_v0_manual_modules`. Il est le plus petit increment qui rend la boite complete observable, permet un editeur futur et fournit les fixtures necessaires au greedy puis aux variantes. `box_fill_v1+` restent gates tant que le modele et l'UX n'ont pas ete valides humainement.
+`box_fill_v0_manual_modules` est termine : P19 a livre le BoxFillPlan manuel, sa validation et son transport CAD IR metadata. La prochaine etape recommandee est `box_fill_v1_greedy_2d`, mais elle reste bloquee par une gate produit explicite car elle introduit la premiere source de positions semi-automatique. Elle ne doit pas etre confondue avec un solveur global, une palette ou une variante scoree.

@@ -27,3 +27,8 @@ Une fixture avec 2-4 modules et une reservation doit produire un plan sans colli
 ## Human gate
 
 Valider P19-A et accepter l'extension additive du modele/contrat `BoxFillPlan` avant implementation. La gate UX ADR-0036 reste ouverte pour toute palette/app.
+
+
+## Outcome 2026-07-10
+
+La gate P19-A a ete acceptee et le sprint est termine : ox_fill_plan.v0 est implemente, valide dans le moteur pur, expose dans Markdown/JSON et transporte sous metadata.box_fill_plan de la CAD IR. Le resultat ne lance aucun solveur, aucune palette/app ni materialisation Fusion. La suite recommandee est documentee dans docs/P20_RECOMMENDATION.md et reste gatee.

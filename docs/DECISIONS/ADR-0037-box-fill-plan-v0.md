@@ -83,3 +83,7 @@ P19 calcule un `FreeVolume` aggregate : volume total de la boite moins modules e
 - P19-M002 implemente les dataclasses et le loader additif.
 - P19-M003 implemente la validation, coverage et FreeVolume aggregate.
 - Toute projection Fusion de `BoxFillPlan` exige une mission et une gate distinctes.
+
+## Outcome
+
+P19 a implemente le contrat comme bloc optionnel, versionne et retrocompatible dans le moteur pur. Les rapports et la CAD IR le transportent sans que Fusion devienne source de verite. Le placement automatique et toute projection Fusion restent des sujets ulterieurs gates.

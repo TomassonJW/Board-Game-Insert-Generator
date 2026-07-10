@@ -152,3 +152,4 @@ Tests, cartes backlog ou gates humaines a preparer.
 - ADR-0035-printable-export-preprint-v0.md - Export imprimable Fusion-only et manifeste preprint V0.
 
 - ADR-0036-ux-architecture-roadmap.md - Roadmap UX: commande Fusion dev, palette/app sous gate.
+- ADR-0037-box-fill-plan-v0.md - Contrat executable, versionne et CAD-agnostic du BoxFillPlan manuel P19.
