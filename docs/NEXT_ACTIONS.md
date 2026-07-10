@@ -40,7 +40,7 @@ Mission interne terminee : P17-M006 - Validation Fusion export/preprint, STL par
 
 ## Mission ready non gated
 
-`P18-M005 - ADR architecture UX` est ready. Il doit comparer commande Fusion, palette, app locale et hybride, puis preparer la gate humaine avant implementation.
+`P18-M006 - Preparer la recommandation P19` est ready. Il doit recommander un increment executable mais ne doit pas l'implementer.
 
 ## Regle operationnelle Fusion
 

@@ -854,3 +854,7 @@ Statut : done-docs. VOLUMETRIC_PRODUCT_MODEL.md separe explicitement la boite, a
 ## P18-M004 - Roadmap solver/box fill
 
 Statut : done-docs. BOX_FILL_SOLVER_ROADMAP.md separe six niveaux, recommande ox_fill_v0_manual_modules et interdit de sauter directement au solveur global.
+
+## P18-M005 - ADR architecture UX
+
+Statut : done-docs, ADR-0036 Propose. CommandInputs Fusion reste dev/smoke; toute palette persistante ou app locale/web exige une gate humaine avant implementation.

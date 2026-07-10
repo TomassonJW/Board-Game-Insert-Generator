@@ -150,3 +150,5 @@ Tests, cartes backlog ou gates humaines a preparer.
 - `ADR-0033-tray-semantics-v0.md` - Semantique V0 z/count/grid/grouping pour bacs asset-first utilisables.
 - ADR-0034-flat-tray-2d-packing-v0.md - Packing 2D ergonomique des piles flat tray V0.
 - ADR-0035-printable-export-preprint-v0.md - Export imprimable Fusion-only et manifeste preprint V0.
+
+- ADR-0036-ux-architecture-roadmap.md - Roadmap UX: commande Fusion dev, palette/app sous gate.

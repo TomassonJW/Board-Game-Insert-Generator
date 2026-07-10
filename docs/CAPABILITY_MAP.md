@@ -341,3 +341,8 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 
 - C-SOLVER : roadmap en six etapes acceptee comme trajectoire documentaire; aucun solveur global n'est implemente.
 - C-PRODUCT-VISION : ox_fill_v0_manual_modules est recommande comme premier increment verificable.
+
+## P18-M005 capability update
+
+- C-FUSION-UI : ADR-0036 propose de conserver CommandInputs pour dev/smoke; palette ou app restent bloquees par gate humaine.
+- C-PRODUCT-VISION : la future UX consomme BoxFillPlan, pas une structure Fusion parallele.
