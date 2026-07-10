@@ -1,8 +1,8 @@
 # Resume State
 
-- Branche active : `codex/p21-variants-core`.
-- Base : `9896d0d record P20 product acceptance`.
-- Travail preserve : `src/board_game_insert_generator/box_fill_variants.py` non committe.
-- Etat : P21 core a tester, documenter et integrer avant les interfaces portfolio.
-- Commande de verification : `$env:PYTHONPATH="src"; python -m unittest discover -s tests`.
-- Aucun travail P21 dans un autre worktree ou stash.
+- Branche de reprise : `main`, dernier commit `3cb924d add P21 deterministic variant portfolio core`.
+- P19 et P20 sont acceptes et integres.
+- P21 core est integre : contrat portefeuille, policies bornees, deduplication, preference et recommendation deterministe.
+- Prochaine phase autonome : exporter le portefeuille en JSON/Markdown, dashboard HTML/SVG, selection de variante et metadata CAD IR, puis fixtures P21 et tests.
+- Verification : `$env:PYTHONPATH="src"; python -m unittest discover -s tests`.
+- Aucun travail non committe, stash ou worktree P21 a recuperer.
