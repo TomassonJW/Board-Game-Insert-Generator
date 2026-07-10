@@ -1,0 +1,18 @@
+{
+    "schema_version":  "box_fill_solve_request.v0",
+    "source_config":  "base.json",
+    "candidates":  [
+                       {
+                           "allowed_layers":  [
+                                                  "base"
+                                              ],
+                           "size_mm":  {
+                                           "y":  20,
+                                           "z":  10,
+                                           "x":  30
+                                       },
+                           "name":  "Tokens",
+                           "module_id":  "tokens"
+                       }
+                   ]
+}

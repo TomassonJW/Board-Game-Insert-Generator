@@ -105,7 +105,7 @@ def solve_box_fill_greedy(request: BoxFillSolveRequest) -> BoxFillSolveResult:
     solved = replace(plan, id=f"{plan.id}:greedy-2d", modules=tuple(placed_modules), allocations=tuple(allocations), metadata={**plan.metadata, "solver_policy": request.policy, "solver_version": request.solver_version, "source_plan_id": plan.id})
     analysis = analyze_box_fill_plan(solved)
     status = "solved" if not diagnostics and analysis.valid else "partial" if placements else "blocked"
-    metrics = {**analysis.metrics, "candidates_count": len(ordered), "locked_modules_count": sum(1 for module in plan.modules if module.locked), "manual_modules_count": sum(1 for module in plan.modules if module.manual), "auto_placed_count": len(placements), "auto_refused_count": len(diagnostics), "rotation_count": sum(1 for placement in placements if placement.orientation == "rotated_90_z"), "layers_used": sorted({placement.layer_id for placement in placements}), "free_regions_count": len(analysis.free_volume.regions), "largest_free_region_mm3": max((item.volume_mm3 for item in analysis.free_volume.regions), default=0.0)}
+    metrics = {**analysis.metrics, "candidates_count": len(ordered), "locked_modules_count": sum(1 for module in plan.modules if module.locked), "manual_modules_count": sum(1 for module in plan.modules if module.manual), "auto_placed_count": len(placements), "auto_refused_count": len(diagnostics), "rotation_count": sum(1 for placement in placements if placement.orientation == "rotated_90_z"), "layers_used": sorted({placement.layer_id for placement in placements}), "free_regions_count": len(analysis.free_volume.regions), "largest_free_region_mm3": max((item.volume_mm3 for item in analysis.free_volume.regions), default=0.0), "fragmentation_proxy": len(analysis.free_volume.regions), "bounding_footprint_by_layer": _footprints_by_layer(solved)}
     digest_payload = {"policy": request.policy, "order": [candidate.module_id for candidate in ordered], "placements": [placement.to_dict() for placement in placements], "diagnostics": [diagnostic.to_dict() for diagnostic in diagnostics]}
     digest = sha256(json.dumps(digest_payload, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
     return BoxFillSolveResult(plan.id, request.policy, request.solver_version, status, solved, tuple(candidate.module_id for candidate in ordered), tuple(placements), tuple(diagnostics), metrics, digest)
@@ -172,3 +172,21 @@ def render_box_fill_solution_svg(result: BoxFillSolveResult, layer_id: str | Non
             pieces.append(f'<rect x="{module.origin.x}" y="{height - module.origin.y - module.size.y}" width="{module.size.x}" height="{module.size.y}" fill="{fill}" stroke="#111827"/><text x="{module.origin.x + 1}" y="{height - module.origin.y - 2}" font-size="4">{module.id}</text>')
     pieces.append(f'<text x="2" y="6" font-size="4">{result.status} | {selected} | {result.solver_result_digest[:12]}</text></svg>')
     return "".join(pieces)
+
+
+def _footprints_by_layer(plan: BoxFillPlan) -> dict[str, dict[str, float]]:
+    result = {}
+    for layer in plan.layers:
+        modules = [module for module in plan.modules if module.layer_id == layer.id]
+        if modules:
+            result[layer.id] = {"x_mm": max(module.origin.x + module.size.x for module in modules) - min(module.origin.x for module in modules), "y_mm": max(module.origin.y + module.size.y for module in modules) - min(module.origin.y for module in modules)}
+    return result
+
+
+def format_box_fill_solution_markdown(result: BoxFillSolveResult) -> str:
+    lines = ["# BoxFill greedy solution", "", f"- Source plan: `{result.source_plan_id}`", f"- Policy: `{result.policy}` ({result.solver_version})", f"- Status: `{result.status}`", f"- Deterministic digest: `{result.solver_result_digest}`", f"- Candidate order: {', '.join(result.candidate_order) or 'none'}", f"- Locked/manual/auto placed/refused: {result.metrics['locked_modules_count']} / {result.metrics['manual_modules_count']} / {result.metrics['auto_placed_count']} / {result.metrics['auto_refused_count']}", f"- Rotations: {result.metrics['rotation_count']}", f"- Free regions: {result.metrics['free_regions_count']}", "", "## Automatic placements", ""]
+    lines.extend([f"- `{item.module_id}` at ({item.origin.x:.2f}, {item.origin.y:.2f}, {item.origin.z:.2f}) on `{item.layer_id}` ({item.orientation})" for item in result.placements] or ["- None."])
+    lines.extend(["", "## Refusals", ""])
+    lines.extend([f"- `{item.module_id}` `{item.code}`: {item.message} Action: {item.corrective_action}" for item in result.diagnostics] or ["- None."])
+    lines.extend(["", "## Greedy limits", "", "- No backtracking, global optimization, variant scoring, Fusion materialization or print validation.", ""])
+    return "\n".join(lines)

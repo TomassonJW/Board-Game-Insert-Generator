@@ -6,7 +6,8 @@ import sys
 from pathlib import Path
 
 from board_game_insert_generator.box_fill import analyze_box_fill_plan, box_fill_plan_to_dict
-from board_game_insert_generator.box_fill_solver import BoxFillCandidate, BoxFillSolveRequest, render_box_fill_solution_svg, solve_box_fill_greedy
+from board_game_insert_generator.box_fill_solver import BoxFillCandidate, BoxFillSolveRequest, format_box_fill_solution_markdown, render_box_fill_solution_svg, solve_box_fill_greedy
+from board_game_insert_generator.box_fill_solver_io import load_box_fill_solve_request
 from board_game_insert_generator.models import Dimension3D
 from board_game_insert_generator.cad_ir import CadIrError, build_blank_cad_scene
 from board_game_insert_generator.config_loader import ConfigError, load_config
@@ -35,6 +36,10 @@ def main(argv: list[str] | None = None) -> int:
         return _solve_box_fill_greedy(arguments[1:])
     if arguments and arguments[0] == "render-box-fill-preview":
         return _render_box_fill_preview(arguments[1:])
+    if arguments and arguments[0] == "report-box-fill-solution":
+        return _report_box_fill_solution(arguments[1:])
+    if arguments and arguments[0] == "export-box-fill-solution":
+        return _export_box_fill_solution(arguments[1:])
     return _report(arguments)
 
 
@@ -319,4 +324,46 @@ def _render_box_fill_preview(argv: list[str]) -> int:
         _print_error("BoxFill preview error", exc)
         return 2
     Path(args.output).write_text(render_box_fill_solution_svg(result, args.layer), encoding="utf-8")
+    return 0 if result.status == "solved" else 2
+
+
+def _solution_from_request(path: str):
+    return solve_box_fill_greedy(load_box_fill_solve_request(path))
+
+
+def _report_box_fill_solution(argv: list[str]) -> int:
+    parser = argparse.ArgumentParser(description="Report a file-backed BoxFill greedy solution.")
+    parser.add_argument("request")
+    parser.add_argument("--format", choices=("markdown", "json"), default="markdown")
+    parser.add_argument("--output")
+    args = parser.parse_args(argv)
+    try:
+        result = _solution_from_request(args.request)
+    except (ConfigError, ValueError) as exc:
+        _print_error("BoxFill solution error", exc); return 2
+    value = json.dumps({**result.to_dict(), "solved_plan": box_fill_plan_to_dict(result.solved_plan)}, indent=2) if args.format == "json" else format_box_fill_solution_markdown(result)
+    if args.output: Path(args.output).write_text(value + "\n", encoding="utf-8")
+    else: print(value)
+    return 0 if result.status == "solved" else 2
+
+
+def _export_box_fill_solution(argv: list[str]) -> int:
+    parser = argparse.ArgumentParser(description="Export solved BoxFillPlan and CAD IR metadata-ready result JSON.")
+    parser.add_argument("request")
+    parser.add_argument("--output", required=True)
+    parser.add_argument("--cad-ir-output")
+    args = parser.parse_args(argv)
+    try:
+        result = _solution_from_request(args.request)
+    except (ConfigError, ValueError) as exc:
+        _print_error("BoxFill solution error", exc)
+        return 2
+    payload = {**result.to_dict(), "solved_plan": box_fill_plan_to_dict(result.solved_plan)}
+    Path(args.output).write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    if args.cad_ir_output:
+        raw = json.loads(Path(args.request).read_text(encoding="utf-8"))
+        config = load_config(Path(args.request).parent / raw["source_config"])
+        scene = build_blank_cad_scene(config, generate_basic_layout(config)).to_dict()
+        scene["metadata"]["box_fill_solution"] = payload
+        Path(args.cad_ir_output).write_text(json.dumps(scene, indent=2) + "\n", encoding="utf-8")
     return 0 if result.status == "solved" else 2

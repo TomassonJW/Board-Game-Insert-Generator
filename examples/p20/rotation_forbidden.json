@@ -1,0 +1,19 @@
+{
+    "schema_version":  "box_fill_solve_request.v0",
+    "source_config":  "rotation_base.json",
+    "candidates":  [
+                       {
+                           "allowed_layers":  [
+                                                  "base"
+                                              ],
+                           "size_mm":  {
+                                           "y":  20,
+                                           "z":  10,
+                                           "x":  30
+                                       },
+                           "name":  "Forbidden",
+                           "module_id":  "forbidden",
+                           "allow_xy_rotation":  false
+                       }
+                   ]
+}

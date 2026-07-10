@@ -1,0 +1,18 @@
+{
+    "schema_version":  "box_fill_solve_request.v0",
+    "source_config":  "../box_fill_valid_v0.json",
+    "candidates":  [
+                       {
+                           "allowed_layers":  [
+                                                  "base-layer"
+                                              ],
+                           "size_mm":  {
+                                           "y":  10,
+                                           "z":  10,
+                                           "x":  10
+                                       },
+                           "name":  "Token",
+                           "module_id":  "token-auto"
+                       }
+                   ]
+}

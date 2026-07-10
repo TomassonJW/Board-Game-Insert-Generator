@@ -1,0 +1,18 @@
+{
+    "schema_version":  "box_fill_solve_request.v0",
+    "source_config":  "blocked_base.json",
+    "candidates":  [
+                       {
+                           "allowed_layers":  [
+                                                  "base"
+                                              ],
+                           "size_mm":  {
+                                           "y":  10,
+                                           "z":  10,
+                                           "x":  10
+                                       },
+                           "name":  "Blocked",
+                           "module_id":  "blocked"
+                       }
+                   ]
+}

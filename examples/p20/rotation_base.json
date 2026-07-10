@@ -1,0 +1,1 @@
+{"project_name":"P20 rotation","units":"mm","box":{"inner_dimensions_mm":{"x":20,"y":30,"z":20},"usable_height_mm":20,"lid_clearance_mm":0},"layout":{"strategy":"row_fill"},"assets":[],"box_fill_plan":{"schema_version":"box_fill_plan.v0","id":"p20-rotation","layers":[{"id":"base","origin_z_mm":0,"height_mm":20,"role":"storage"}],"reservations":[],"modules":[],"allocations":[]}}
