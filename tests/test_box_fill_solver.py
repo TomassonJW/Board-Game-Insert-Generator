@@ -1,7 +1,7 @@
 from __future__ import annotations
 import unittest
 from context import ROOT
-from board_game_insert_generator.box_fill_solver import BoxFillCandidate, BoxFillSolveRequest, solve_box_fill_greedy
+from board_game_insert_generator.box_fill_solver import BoxFillCandidate, BoxFillSolveRequest, render_box_fill_solution_svg, solve_box_fill_greedy
 from board_game_insert_generator.config_loader import load_config
 from board_game_insert_generator.models import Dimension3D
 
@@ -22,5 +22,13 @@ class GreedyBoxFillTests(unittest.TestCase):
         result = solve_box_fill_greedy(BoxFillSolveRequest(config.box_fill_plan, (BoxFillCandidate('too-tall', 'Too tall', Dimension3D(10, 10, 50), allowed_layer_ids=('base-layer',)),)))
         self.assertEqual(result.status, 'blocked')
         self.assertEqual(result.diagnostics[0].code, 'no_layer_with_sufficient_height')
+
+    def test_svg_preview_contains_auto_module(self):
+        config = load_config(ROOT / 'examples' / 'box_fill_valid_v0.json')
+        assert config.box_fill_plan is not None
+        result = solve_box_fill_greedy(BoxFillSolveRequest(config.box_fill_plan, (BoxFillCandidate('auto-svg', 'Auto svg', Dimension3D(10, 10, 10), allowed_layer_ids=('base-layer',)),)))
+        preview = render_box_fill_solution_svg(result)
+        self.assertIn('<svg', preview)
+        self.assertIn('auto-svg', preview)
 
 if __name__ == '__main__': unittest.main()

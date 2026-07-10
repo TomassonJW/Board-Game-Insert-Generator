@@ -155,3 +155,20 @@ def _diagnostic(candidate, code, category, message, layers, orientations, action
 
 def _point(point: Point3D) -> dict[str, float]: return {"x": point.x, "y": point.y, "z": point.z}
 def _size(size: Dimension3D) -> dict[str, float]: return {"x": size.x, "y": size.y, "z": size.z}
+
+
+def render_box_fill_solution_svg(result: BoxFillSolveResult, layer_id: str | None = None) -> str:
+    """Render a deterministic static SVG preview of one solved layer."""
+    plan = result.solved_plan
+    selected = layer_id or (plan.layers[0].id if plan.layers else "")
+    width, height = plan.box.inner_dimensions.x, plan.box.inner_dimensions.y
+    pieces = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" role="img"><rect width="{width}" height="{height}" fill="white" stroke="black"/>']
+    for reservation in plan.reservations:
+        if reservation.layer_id == selected:
+            pieces.append(f'<rect x="{reservation.origin.x}" y="{height - reservation.origin.y - reservation.size.y}" width="{reservation.size.x}" height="{reservation.size.y}" fill="#d1d5db" stroke="#374151"/><title>{reservation.id}</title>')
+    for module in plan.modules:
+        if module.layer_id == selected:
+            fill = "#93c5fd" if module.metadata.get("auto_placed") else "#fcd34d"
+            pieces.append(f'<rect x="{module.origin.x}" y="{height - module.origin.y - module.size.y}" width="{module.size.x}" height="{module.size.y}" fill="{fill}" stroke="#111827"/><text x="{module.origin.x + 1}" y="{height - module.origin.y - 2}" font-size="4">{module.id}</text>')
+    pieces.append(f'<text x="2" y="6" font-size="4">{result.status} | {selected} | {result.solver_result_digest[:12]}</text></svg>')
+    return "".join(pieces)

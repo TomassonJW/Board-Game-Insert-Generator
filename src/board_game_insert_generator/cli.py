@@ -6,6 +6,8 @@ import sys
 from pathlib import Path
 
 from board_game_insert_generator.box_fill import analyze_box_fill_plan, box_fill_plan_to_dict
+from board_game_insert_generator.box_fill_solver import BoxFillCandidate, BoxFillSolveRequest, render_box_fill_solution_svg, solve_box_fill_greedy
+from board_game_insert_generator.models import Dimension3D
 from board_game_insert_generator.cad_ir import CadIrError, build_blank_cad_scene
 from board_game_insert_generator.config_loader import ConfigError, load_config
 from board_game_insert_generator.layout import LayoutError, generate_basic_layout
@@ -29,6 +31,10 @@ def main(argv: list[str] | None = None) -> int:
         return _report_box_fill(arguments[1:])
     if arguments and arguments[0] == "export-box-fill-plan":
         return _export_box_fill_plan(arguments[1:])
+    if arguments and arguments[0] == "solve-box-fill-greedy":
+        return _solve_box_fill_greedy(arguments[1:])
+    if arguments and arguments[0] == "render-box-fill-preview":
+        return _render_box_fill_preview(arguments[1:])
     return _report(arguments)
 
 
@@ -262,3 +268,55 @@ def _export_box_fill_plan(argv: list[str]) -> int:
     output_path.write_text(json.dumps(box_fill_plan_to_dict(config.box_fill_plan), indent=2) + "\n", encoding="utf-8")
     print(f"BoxFillPlan export OK - {config.box_fill_plan.id}\n- Output: {output_path}")
     return 0
+
+
+def _parse_candidate(value: str) -> BoxFillCandidate:
+    fields = value.split(":")
+    if len(fields) not in (5, 6, 7):
+        raise ConfigError("Candidate must be ID:NAME:X:Y:Z[:LAYER][:rotate].")
+    module_id, name, x, y, z = fields[:5]
+    layer = () if len(fields) < 6 or not fields[5] else (fields[5],)
+    rotate = len(fields) == 7 and fields[6].lower() in {"rotate", "true", "yes"}
+    try:
+        size = Dimension3D(float(x), float(y), float(z))
+    except ValueError as exc:
+        raise ConfigError("Candidate dimensions must be numeric.") from exc
+    return BoxFillCandidate(module_id, name, size, allowed_layer_ids=layer, allow_xy_rotation=rotate)
+
+
+def _solve_box_fill_greedy(argv: list[str]) -> int:
+    parser = argparse.ArgumentParser(description="Solve explicit BoxFillPlan candidates with deterministic greedy 2D placement.")
+    parser.add_argument("config")
+    parser.add_argument("--candidate", action="append", required=True, help="ID:NAME:X:Y:Z[:LAYER][:rotate], repeatable.")
+    parser.add_argument("--output")
+    args = parser.parse_args(argv)
+    try:
+        config = _require_box_fill_config(args.config)
+        result = solve_box_fill_greedy(BoxFillSolveRequest(config.box_fill_plan, tuple(_parse_candidate(value) for value in args.candidate)))
+    except (ConfigError, ValueError) as exc:
+        _print_error("BoxFill solver error", exc)
+        return 2
+    payload = {**result.to_dict(), "solved_plan": box_fill_plan_to_dict(result.solved_plan)}
+    serialized = json.dumps(payload, indent=2)
+    if args.output:
+        Path(args.output).write_text(serialized + "\n", encoding="utf-8")
+    else:
+        print(serialized)
+    return 0 if result.status == "solved" else 2
+
+
+def _render_box_fill_preview(argv: list[str]) -> int:
+    parser = argparse.ArgumentParser(description="Render a static SVG preview from a greedy BoxFill solve.")
+    parser.add_argument("config")
+    parser.add_argument("--candidate", action="append", required=True)
+    parser.add_argument("--output", required=True)
+    parser.add_argument("--layer")
+    args = parser.parse_args(argv)
+    try:
+        config = _require_box_fill_config(args.config)
+        result = solve_box_fill_greedy(BoxFillSolveRequest(config.box_fill_plan, tuple(_parse_candidate(value) for value in args.candidate)))
+    except (ConfigError, ValueError) as exc:
+        _print_error("BoxFill preview error", exc)
+        return 2
+    Path(args.output).write_text(render_box_fill_solution_svg(result, args.layer), encoding="utf-8")
+    return 0 if result.status == "solved" else 2
