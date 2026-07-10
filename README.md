@@ -258,3 +258,28 @@ python -m board_game_insert_generator export-box-fill-variant examples/p21/portf
 ```
 
 Le dernier export transporte une selection explicite et son portefeuille dans les metadata CAD IR ; Fusion ne recalcule ni ne materialise encore ce plan.
+## BGIG Studio local (P23)
+
+Le premier parcours utilisateur local couvre la boite, les assets, les reservations, les propositions P21, la selection et l export de la decision. Il reste hors Fusion : aucun clic dans le Studio ne cree de geometrie CAD ni ne pretend valider une impression.
+
+Prerequis supplementaire : Node.js compatible avec Vite (20.19+ ou 22.12+). Installer une fois les dependances frontend, puis demarrer les deux services loopback :
+
+```powershell
+Set-Location frontend
+npm install
+Set-Location ..
+.\scripts\start_local_composer.ps1
+```
+
+Ouvrir ensuite `http://127.0.0.1:5173`. L interface communique uniquement avec `http://127.0.0.1:8001`, importe et telecharge les projets depuis le navigateur, et exporte une selection explicite avec sa CAD IR metadata-ready. Pour arreter les processus demarres par le script :
+
+```powershell
+.\scripts\stop_local_composer.ps1
+```
+
+Pour lancer seulement l API locale, sans l interface Vite :
+
+```powershell
+$env:PYTHONPATH = "src"
+python -m board_game_insert_generator serve-local-composer --port 8001
+```

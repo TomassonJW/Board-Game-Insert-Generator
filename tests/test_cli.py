@@ -26,6 +26,7 @@ class CliTests(unittest.TestCase):
         output = stdout.getvalue()
         self.assertEqual(code, 0)
         self.assertIn("export-cad-ir CONFIG --output PATH", output)
+        self.assertIn("serve-local-composer", output)
         self.assertIn("not an --export-cad-ir option", output)
     def test_cli_diagnose_reports_ok(self) -> None:
         stdout = io.StringIO()

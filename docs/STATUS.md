@@ -924,3 +924,14 @@ Limites : aucun backtracking, solveur global, recherche exhaustive, UI persistan
 Statut : `done-docs`, gate humaine active.
 
 Le rapport `docs/P22_UX_SURFACE_GATE_REPORT.md` compare commande Fusion, palette Fusion, app locale et trajectoire hybride. Il recommande une app locale de conception comme surface principale et Fusion comme adaptateur CAD/export, mais n autorise aucune implementation : le choix de surface et de stack reste une decision humaine explicite selon ADR-0036.
+## P23 - Local Composer
+
+Statut : `done`, `implemented-local-ui`, `implemented-loopback-adapter`, `print-validated: false`.
+
+La validation humaine D du 2026-07-10 est appliquee par ADR-0040. `frontend/` apporte une interface React/TypeScript/Vite claire et progressive : dimensions utiles de la boite, inventaire des assets, reservations non imprimables, modules candidats, preference, comparaison P21, selection, verrouillage local et telechargement de la decision. L interface ne recalcule pas le placement : elle appelle `local_composer.py`, qui reconstruit les contrats moteurs existants, execute P21 et produit une CAD IR `cad_ir.v0` avec selection explicite.
+
+Securite et frontieres : l API est standard-library, liee a `127.0.0.1`/`localhost`, limite les requetes JSON et n autorise CORS que depuis les deux origines Vite locales. Les projets sont importes et exportes par le navigateur ; aucune ecriture arbitraire de fichier, persistence distante, cloud, authentification ou materialisation Fusion n est introduite.
+
+Preuves locales : tests `test_local_composer.py` (draft deterministe, export, erreurs de schema, HTTP/CORS), build React/Vite et recette loopback `starter -> portefeuille -> selection -> CAD IR` passes. La recette visuelle automatisee par navigateur n a pas pu etre executee car le runtime navigateur local a ete bloque par le sandbox Windows avant ouverture ; cela ne remet pas en cause les preuves HTTP/build mais reste une verification visuelle a refaire dans un environnement navigateur disponible.
+
+Limites : les scores restent des proxies P21, une impression/ergonomie physique n est pas validee, Fusion ne consomme pas encore la selection P23 et le draft V0 ne propose pas encore une edition UX complete des allocations multi-assets. Prochaine mission ready : `P24-M001 - Qualite du projet local`.

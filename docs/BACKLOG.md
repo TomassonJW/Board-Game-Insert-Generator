@@ -348,7 +348,7 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Criteres d'acceptation : pas de recalcul, noms stables, smoke test manuel.
 - Tests : hors Fusion + smoke Fusion.
 - Gate : validation humaine si repositionnement CAD non trivial.
-- Statut : `blocked`.
+- Statut : `done`, `implemented-local-ui`, `implemented-loopback-adapter`, `print-validated: false`.
 
 ## Phase 8 - Grille volumetrique 3D et etages
 
@@ -508,7 +508,7 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Criteres d'acceptation : perimetre explicite, risques et validations attendues.
 - Tests : inspection documentaire.
 - Gate : architecture/produit obligatoire avant solveur complexe ou comportement automatique opaque.
-- Statut : `blocked`.
+- Statut : `done`, `implemented-local-ui`, `implemented-loopback-adapter`, `print-validated: false`.
 
 ## Phase 11 - Modules composites et formes soudees
 
@@ -532,7 +532,7 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Criteres d'acceptation : smoke test manuel, aucune logique metier Fusion.
 - Tests : hors Fusion + Fusion manuel.
 - Gate : obligatoire.
-- Statut : `blocked`.
+- Statut : `done`, `implemented-local-ui`, `implemented-loopback-adapter`, `print-validated: false`.
 
 ## Phase P12-UI - Interface Fusion utilisable
 
@@ -689,7 +689,7 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Criteres d'acceptation : validation physique requise.
 - Tests : unitaires + impression future.
 - Gate : obligatoire.
-- Statut : `blocked`.
+- Statut : `done`, `implemented-local-ui`, `implemented-loopback-adapter`, `print-validated: false`.
 
 ## Phase 13 - Esthetique, embossage, gravure, textures, decorations
 
@@ -1236,4 +1236,19 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - Objectif : livrer le premier parcours local boite/assets/intentions/propositions/selection/export, sans materialisation Fusion.
 - Dependances : P22-M001 et validation humaine explicite de la surface/stack.
 - Gate : ADR-0036 et ajout de dependances UI majeures.
-- Statut : `blocked`.
+- Statut : `done`, `implemented-local-ui`, `implemented-loopback-adapter`, `print-validated: false`.
+### P23-M001 - Resultat
+
+- Livrables : ADR-0040, draft versionne `bgig.local_composer.v0`, adaptateur Python loopback limite a localhost, interface React/Vite, scripts de lancement/arret, selection et CAD IR metadata-ready telechargees par le navigateur.
+- Preuves : tests Python de contrat/HTTP, build TypeScript/Vite, recette loopback starter -> portefeuille -> selection -> export -> preflight CORS.
+- Limites : pas de persistence serveur, pas de collaboration, pas de materialisation Fusion, pas de validation ergonomique ou d impression.
+
+### P24-M001 - Qualite du projet local
+
+- Capability : C-PRODUCT-VISION, C-ASSET, C-QUALITY.
+- Milestone : M14 Usable beta.
+- Objectif : rendre l edition locale plus fiable pour un non-expert : allocations multi-assets explicites, erreurs de draft actionnables et import/export plus robustes.
+- Dependances : P23-M001 termine.
+- Hors scope : nouveau solveur, persistence serveur, cloud, collaboration, Fusion ou export imprimable.
+- Gate : aucune nouvelle gate architecturale si le contrat `bgig.local_composer.v0` reste retrocompatible ; ADR obligatoire si le format change de maniere incompatible.
+- Statut : `ready`.

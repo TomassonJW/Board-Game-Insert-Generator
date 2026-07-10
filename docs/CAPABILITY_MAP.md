@@ -405,3 +405,11 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 
 - C-FUSION-UI : aucun changement executable. La commande Fusion reste `fusion-validated` pour smoke/export ; une palette persistante reste bloquee.
 - C-PRODUCT-VISION : trajectoire recommandee documentee vers une app locale de conception + adaptateur Fusion, sans validation d architecture executable.
+## P23 local composer update
+
+- C-PRODUCT-VISION : `implemented-local-ui` pour un parcours local versionne `bgig.local_composer.v0`, de la boite a la selection explicite, sans seconde logique de placement.
+- C-ASSET : les assets, dimensions et intentions sont editables localement et convertis vers les contrats moteurs ; l edition multi-assets par module reste P24.
+- C-SOLVER : P20/P21 sont appeles par l adaptateur Python ; l UI ne duplique ni solveur ni score.
+- C-CAD-IR : `implemented-cad-ir-metadata` pour l export d une selection P21 explicite ; aucune materialisation n est autorisee.
+- C-FUSION-UI : inchangee. Fusion reste l adaptateur futur et la commande actuelle conserve son role de smoke/export.
+- C-QUALITY : contrat HTTP loopback, validation stricte du draft, CORS borne et build frontend couverts ; inspection visuelle navigateur a rejouer lorsque le runtime local est disponible.

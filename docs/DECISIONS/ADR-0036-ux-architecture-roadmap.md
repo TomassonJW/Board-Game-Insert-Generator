@@ -79,3 +79,8 @@ La validation strategique du 2026-07-10 accepte cette direction : le moteur Pyth
 
 - P18-M006 a recommande P19; la validation strategique du 2026-07-10 autorise `P19-BOX-FILL-MANUAL-MODULES-SPRINT` et l'extension additive `BoxFillPlan`.
 - Gate humaine restante : choisir et autoriser la premiere surface persistante avant toute palette Fusion ou app locale/web.
+
+
+## Outcome P22 - 2026-07-10
+
+La validation humaine D approuve autorise P23 : une app locale de conception avec adaptateur Python local ; Fusion reste adapteur CAD/export. ADR-0040 fixe le contrat de la premiere tranche. Les gates Fusion de materialisation et impression physique restent distinctes.

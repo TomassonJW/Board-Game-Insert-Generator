@@ -22,6 +22,7 @@ from board_game_insert_generator.models import Dimension3D
 from board_game_insert_generator.cad_ir import CadIrError, build_blank_cad_scene
 from board_game_insert_generator.config_loader import ConfigError, load_config
 from board_game_insert_generator.layout import LayoutError, generate_basic_layout
+from board_game_insert_generator.local_composer import main as run_local_composer
 from board_game_insert_generator.report import layout_to_json, layout_to_markdown
 from board_game_insert_generator.tolerance import ToleranceError
 from board_game_insert_generator.validation import ValidationError
@@ -56,6 +57,8 @@ def main(argv: list[str] | None = None) -> int:
         return _render_box_fill_variant_dashboard(arguments[1:])
     if arguments and arguments[0] == "export-box-fill-variant":
         return _export_box_fill_variant(arguments[1:])
+    if arguments and arguments[0] == "serve-local-composer":
+        return run_local_composer(arguments[1:])
     return _report(arguments)
 
 
@@ -74,6 +77,7 @@ def _print_top_level_help() -> None:
         "  python -m board_game_insert_generator report-box-fill-variants REQUEST --format markdown|json|html [--output PATH]\n"
         "  python -m board_game_insert_generator render-box-fill-variant-dashboard REQUEST --output PATH\n"
         "  python -m board_game_insert_generator export-box-fill-variant REQUEST --variant recommended|ID --output PATH [--cad-ir-output PATH]\n"
+        "  python -m board_game_insert_generator serve-local-composer [--host 127.0.0.1] [--port 8001]\n"
         "\n"
         "CAD IR export is a subcommand named export-cad-ir; it is not an --export-cad-ir option."
     )

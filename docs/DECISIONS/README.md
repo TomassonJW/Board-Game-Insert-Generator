@@ -153,3 +153,7 @@ Tests, cartes backlog ou gates humaines a preparer.
 
 - ADR-0036-ux-architecture-roadmap.md - Roadmap UX: commande Fusion dev, palette/app sous gate.
 - ADR-0037-box-fill-plan-v0.md - Contrat executable, versionne et CAD-agnostic du BoxFillPlan manuel P19.
+
+- ADR-0038-box-fill-greedy-2d-v0.md - Placement greedy 2D borne P20.
+- ADR-0039-box-fill-variants-v0.md - Portefeuille de variantes deterministes P21.
+- ADR-0040-local-composer-loopback-adapter.md - App locale React/Vite et adaptateur Python loopback P23.

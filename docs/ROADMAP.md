@@ -191,3 +191,6 @@ Statut : `done`, `implemented-core`, `implemented-cli`, `implemented-cad-ir-meta
 ## P22 UX surface gate - 2026-07-10
 
 Statut : `done-docs`, gate ADR-0036 active. Le rapport `docs/P22_UX_SURFACE_GATE_REPORT.md` recommande une app locale de conception avec Fusion comme adaptateur CAD/export. La trajectoire et le scope P23 sont documentes, mais aucune UI persistante, dependance majeure ou materialisation Fusion de selection n est autorisee sans validation humaine explicite.
+## P23 local composer - 2026-07-10
+
+Statut : `done`, `implemented-local-ui`, `implemented-loopback-adapter`, `print-validated: false`. La validation humaine de l option D est materialisee par ADR-0040 : une app React/Vite locale pilote un adaptateur Python loopback qui convertit un draft versionne en contrats moteur P20/P21 et en CAD IR metadata-ready. Le parcours boite -> assets -> reservations -> variantes -> selection -> export est utilisable sans Fusion. Aucune logique de solveur n est dupliquee dans TypeScript, aucune persistence serveur, materialisation Fusion ou validation d impression n est ajoutee. Prochaine mission : P24-M001, qualite des editions locales et erreurs actionnables.

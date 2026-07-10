@@ -1,4 +1,4 @@
-﻿# Next Actions
+# Next Actions
 
 Derniere mise a jour : 2026-07-10
 
@@ -8,19 +8,17 @@ Statut : `active`. Les missions non gatees restent testees, committeees puis int
 
 ## Etat courant
 
-P19, P20 et P21 sont termines dans le moteur Python pur. P22 est termine comme rapport de gate : une UX persistante est necessaire pour atteindre le parcours produit cible, mais son choix engage l architecture et les dependances.
+P19, P20 et P21 sont termines dans le moteur Python pur. P22 est accepte et P23 livre le premier parcours local executable : boite -> assets -> contraintes -> variantes -> selection -> export. Fusion reste un adaptateur CAD/export futur.
 
 ## Gate humaine active
 
-La validation attendue est dans `docs/P22_UX_SURFACE_GATE_REPORT.md`.
+- L option D a ete approuvee le 2026-07-10 : React/Vite local + adaptateur Python loopback, formalises par ADR-0040.
+- Toute materialisation Fusion d une selection P23 reste une gate distincte.
+- Une impression, un slicer ou une promesse ergonomique physique restent des gates physiques distinctes.
 
-- Recommandation : D, app locale de conception + Fusion adaptateur CAD/export.
-- Validation demandee : autoriser ou non ce chemin et la stack locale moderne proposee, ou choisir B/C/reporter.
-- Limite : aucune palette, app, dependance UI majeure ou materialisation Fusion de la selection ne doit commencer avant reponse explicite.
+## Premiere mission ready
 
-## Mission suivante apres validation
-
-`P23-M001 - Spike app locale de composition` : parcours boite -> assets -> intentions/reservations -> P21 variants -> selection/export local, sans generation Fusion automatique.
+`P24-M001 - Qualite du projet local` : rendre l edition des allocations multi-assets, les erreurs de saisie et la recuperation de projet plus explicites, sans ajouter de moteur, de materialisation Fusion ou de persistence serveur.
 
 ## Hors scope maintenu
 
