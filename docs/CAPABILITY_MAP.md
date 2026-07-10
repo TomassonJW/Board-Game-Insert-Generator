@@ -371,3 +371,8 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 - C-PRODUCT-VISION : `implemented-core` pour la validation d'un plan manuel de boite complete et le FreeVolume aggregate explicable.
 - C-RESERVATION / C-GRID-3D : bornes et collisions 3D sont verifiees dans le volume utile, sans redefinition de `volumetric_grid`.
 - C-ASSET : couverture de quantite explicite; non-couverture et sur-allocation sont refusees avec des messages actionnables.
+## P19-M004 capability update
+
+- C-PRODUCT-VISION : le plan manuel est maintenant lisible et exportable comme contrat JSON/Markdown/CAD IR metadata.
+- C-CAD-IR : `implemented-cad-ir-metadata` pour BoxFillPlan; aucune operation CAD/Fusion n'est derivee du plan manuel.
+- C-FUSION-UI : inchangée; Fusion reste adaptateur futur et ne recalcule pas le plan.

@@ -10,6 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from board_game_insert_generator.box_fill import box_fill_plan_to_dict
 from board_game_insert_generator.asset_candidates import (
     build_asset_candidate_variants,
     build_executable_asset_module_plan,
@@ -264,6 +265,7 @@ class CadSceneMetadata:
     recommended_asset_candidate_variant: dict[str, Any] | None = None
     executable_asset_plan: dict[str, Any] | None = None
     volumetric_grid: dict[str, Any] | None = None
+    box_fill_plan: dict[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -278,6 +280,7 @@ class CadSceneMetadata:
             "recommended_asset_candidate_variant": self.recommended_asset_candidate_variant,
             "executable_asset_plan": self.executable_asset_plan,
             "volumetric_grid": self.volumetric_grid,
+            "box_fill_plan": self.box_fill_plan,
         }
 
 @dataclass(frozen=True)
@@ -365,6 +368,7 @@ def build_blank_cad_scene(config: InsertConfig, layout: LayoutResult) -> CadScen
             recommended_asset_candidate_variant=recommended_asset_variant,
             executable_asset_plan=executable_asset_plan,
             volumetric_grid=volumetric_summary.to_dict() if volumetric_summary is not None else None,
+            box_fill_plan=box_fill_plan_to_dict(config.box_fill_plan) if config.box_fill_plan is not None else None,
         ),
     )
 

@@ -4,6 +4,7 @@ import json
 from dataclasses import asdict, replace
 from typing import Any
 
+from board_game_insert_generator.box_fill import box_fill_plan_to_dict
 from board_game_insert_generator.asset_candidates import (
     build_asset_candidate_variants,
     build_executable_asset_module_plan,
@@ -34,6 +35,7 @@ def layout_to_dict(config: InsertConfig, result: LayoutResult) -> dict[str, Any]
     asset_candidate_variants = build_asset_candidate_variants(config)
     recommended_asset_variant = recommended_asset_candidate_variant(asset_candidate_variants)
     executable_asset_plan = build_executable_asset_module_plan(config)
+    box_fill_plan = box_fill_plan_to_dict(config.box_fill_plan) if config.box_fill_plan is not None else None
     return {
         "project_name": config.project_name,
         "units": config.units,
@@ -74,6 +76,7 @@ def layout_to_dict(config: InsertConfig, result: LayoutResult) -> dict[str, Any]
         "layout_comparison": _layout_comparison(config, result),
         "variant_comparison": _variant_comparison(config, result),
         "volumetric_grid": volumetric_summary.to_dict() if volumetric_summary is not None else None,
+        "box_fill_plan": box_fill_plan,
         "assets": [_asset_to_dict(asset) for asset in config.assets],
         "module_candidates": module_candidates,
         "asset_candidate_variants": asset_candidate_variants,
@@ -155,6 +158,7 @@ def layout_to_markdown(config: InsertConfig, result: LayoutResult) -> str:
     asset_candidate_variants = build_asset_candidate_variants(config)
     recommended_asset_variant = recommended_asset_candidate_variant(asset_candidate_variants)
     executable_asset_plan = build_executable_asset_module_plan(config)
+    box_fill_plan = box_fill_plan_to_dict(config.box_fill_plan) if config.box_fill_plan is not None else None
     planned_cavity_count = sum(len(entries) for entries in planned_cavities.values())
     planned_feature_count = _planned_feature_count(planned_cavities)
     lines = [
@@ -195,6 +199,7 @@ def layout_to_markdown(config: InsertConfig, result: LayoutResult) -> str:
         *_format_comparison_rows(_layout_comparison(config, result)),
         "",
         *_format_volumetric_grid_section(volumetric_summary),
+        *_format_box_fill_plan_section(box_fill_plan),
         *_format_assets_section(config),
         *_format_module_candidates_section(module_candidates),
         *_format_asset_candidate_variants_section(asset_candidate_variants, recommended_asset_variant),
@@ -727,6 +732,43 @@ def _format_volumetric_grid_section(summary: VolumetricSummary | None) -> list[s
     return lines
 
 
+def _format_box_fill_plan_section(plan: dict[str, Any] | None) -> list[str]:
+    lines = ["## Box fill plan", ""]
+    if plan is None:
+        return lines + ["- No BoxFillPlan declared.", ""]
+    validation = plan["validation"]
+    free_volume = plan["free_volumes"][0]
+    lines.extend(
+        [
+            f"- Schema: `{plan['schema_version']}`",
+            f"- Plan id: `{plan['id']}`",
+            f"- Status: `{validation['status']}`",
+            f"- Manual modules: {len(plan['modules'])}",
+            f"- Reservations: {len(plan['reservations'])}",
+            f"- Layers: {len(plan['layers'])}",
+            f"- Aggregate free volume: {free_volume['total_free_volume_mm3']:.2f} mm3",
+            f"- Free volume qualification: `{free_volume['qualification']}` ({free_volume['reason']})",
+            "",
+            "### Asset coverage",
+            "",
+            "| Asset | Declared | Allocated | Unallocated | Over-allocated | Status |",
+            "| --- | ---: | ---: | ---: | ---: | --- |",
+        ]
+    )
+    for entry in plan["coverage"]:
+        lines.append(
+            "| "
+            f"{entry['asset_id']} | {entry['declared_quantity']} | {entry['allocated_quantity']} | "
+            f"{entry['unallocated_quantity']} | {entry['over_allocated_quantity']} | {entry['status']} |"
+        )
+    lines.extend(["", "### BoxFillPlan validation", ""])
+    if validation["issues"]:
+        for issue in validation["issues"]:
+            lines.append(f"- `{issue['code']}` {issue['field']}: {issue['message']}")
+    else:
+        lines.append("- No BoxFillPlan validation issues.")
+    lines.append("")
+    return lines
 def _format_grid_point(point: Any) -> str:
     return f"({point.x}, {point.y}, {point.z})"
 

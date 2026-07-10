@@ -885,3 +885,8 @@ Limite : ce lot ne valide pas encore limites, collisions, references, coverage n
 Statut : `implemented-core`. `validate_config` raccorde `BoxFillPlan` a une analyse pure : limites du volume utile, dimensions, IDs, layers, collisions modules/reservations, exception d'overlap mutuelle explicite, references, allocations et coverage. Les assets non couverts et sur-alloues sont des erreurs actionnables. `FreeVolume` calcule le volume total libre par soustraction des modules et reservations declares, avec qualification `aggregate_only` et sans pretendre connaitre les regions libres utilisables.
 
 Limites : aucun solveur, regions libres exactes, score de variantes, support physique ou projection Fusion n'est ajoute.
+## P19-M004 - Rapports et transport CAD IR BoxFillPlan
+
+Statut : `implemented-core`, `implemented-cad-ir-metadata`. Les rapports Markdown/JSON exposent `box_fill_plan` avec box derivee, assets, layers, reservations, modules manuels, allocations, compartiments/features references, coverage, validation et FreeVolume aggregate. La CAD IR transporte le meme contrat en `metadata.box_fill_plan`, sans creer de composant, operation, cut ou visualisation Fusion.
+
+Limites : la CAD IR est un transport inspectable; Fusion ne consomme pas encore ce plan. Aucun solveur, variante automatique, region libre exacte, palette ou nouvelle geometrie n'est ajoute.

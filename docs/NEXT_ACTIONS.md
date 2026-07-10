@@ -40,7 +40,7 @@ Mission interne terminee : P17-M006 - Validation Fusion export/preprint, STL par
 
 ## Mission active autorisee
 
-`P19-M003` termine : BoxFillPlan valide volumes, collisions, references, coverage et FreeVolume aggregate. Mission active : `P19-M004`, rapports Markdown/JSON et metadata CAD IR du plan, sans materialisation Fusion. Aucun solveur, palette/app, changement Fusion ou tolerance.
+`P19-M004` termine : BoxFillPlan est expose dans Markdown/JSON et metadata CAD IR, sans materialisation Fusion. Mission active : `P19-M005`, cloture du sprint et recommandation de la prochaine gate. Aucun solveur, palette/app, changement Fusion ou tolerance.
 
 ## Regle operationnelle Fusion
 

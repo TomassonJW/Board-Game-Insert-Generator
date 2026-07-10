@@ -1169,3 +1169,13 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Capability : C-PRODUCT-VISION, C-QUALITY, C-CAD-IR.
 - Objectif : exposer le plan, validation, coverage et FreeVolume en Markdown/JSON et metadata CAD IR sans materialisation Fusion.
 - Statut : `ready`.
+### P19-M004 - Rapports et transport CAD IR BoxFillPlan - Resultat
+
+- Livrables : sections Markdown/JSON `box_fill_plan`, metadata `cad_ir.v0`, tests de non-materialisation Fusion.
+- Statut : `done`, `implemented-core`, `implemented-cad-ir-metadata`.
+
+### P19-M005 - Cloture de sprint et prochaine gate
+
+- Capability : C-PRODUCT-VISION, C-SOLVER.
+- Objectif : consolider les preuves P19 et proposer la prochaine gate sans lancer le placement greedy ou une UI persistante.
+- Statut : `ready`.

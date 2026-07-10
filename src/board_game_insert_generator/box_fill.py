@@ -261,6 +261,132 @@ def _asset_coverage(plan: BoxFillPlan) -> tuple[AssetCoverage, ...]:
     return tuple(result)
 
 
+def box_fill_plan_to_dict(plan: BoxFillPlan) -> dict[str, object]:
+    analysis = analyze_box_fill_plan(plan).to_dict()
+    return {
+        "schema_version": plan.schema_version,
+        "id": plan.id,
+        "box": {
+            "id": plan.box.id,
+            "inner_dimensions_mm": _dimension_to_dict(plan.box.inner_dimensions),
+            "origin_mm": _point_to_dict(plan.box.origin),
+            "usable_height_mm": plan.box.usable_height_mm,
+            "lid_clearance_mm": plan.box.lid_clearance_mm,
+            "units": plan.box.units,
+            "orientation": plan.box.orientation,
+        },
+        "assets": [
+            {
+                "id": asset.id,
+                "name": asset.name,
+                "kind": asset.kind.value,
+                "quantity": asset.quantity.count,
+                "dimensions_mm": _dimension_to_dict(asset.dimensions),
+            }
+            for asset in plan.assets
+        ],
+        "layers": [
+            {
+                "id": layer.id,
+                "origin_z_mm": layer.origin_z_mm,
+                "height_mm": layer.height_mm,
+                "role": layer.role,
+                "removal_order": layer.removal_order,
+                "support_reservation_ids": list(layer.support_reservation_ids),
+                "module_ids": list(layer.module_ids),
+                "comment": layer.comment,
+                "metadata": layer.metadata,
+            }
+            for layer in plan.layers
+        ],
+        "reservations": [
+            {
+                "id": reservation.id,
+                "kind": reservation.kind.value,
+                "origin_mm": _point_to_dict(reservation.origin),
+                "size_mm": _dimension_to_dict(reservation.size),
+                "layer_id": reservation.layer_id,
+                "removal_order": reservation.removal_order,
+                "allow_overlap": reservation.allow_overlap,
+                "printable": False,
+                "source": reservation.source,
+                "comment": reservation.comment,
+                "metadata": reservation.metadata,
+            }
+            for reservation in plan.reservations
+        ],
+        "modules": [
+            {
+                "id": module.id,
+                "name": module.name,
+                "origin_mm": _point_to_dict(module.origin),
+                "size_mm": _dimension_to_dict(module.size),
+                "orientation": module.orientation,
+                "locked": module.locked,
+                "manual": module.manual,
+                "printable": module.printable,
+                "layer_id": module.layer_id,
+                "source": module.source,
+                "compartment_ids": list(module.compartment_ids),
+                "access_feature_ids": list(module.access_feature_ids),
+                "comment": module.comment,
+                "metadata": module.metadata,
+            }
+            for module in plan.modules
+        ],
+        "allocations": [
+            {
+                "asset_id": allocation.asset_id,
+                "quantity": allocation.quantity,
+                "module_id": allocation.module_id,
+                "compartment_id": allocation.compartment_id,
+                "source": allocation.source,
+                "intent": allocation.intent,
+                "coverage_status": allocation.coverage_status,
+            }
+            for allocation in plan.allocations
+        ],
+        "compartments": [
+            {
+                "id": compartment.id,
+                "functional_type": compartment.functional_type.value,
+                "origin_mm": _point_to_dict(compartment.origin),
+                "size_mm": _dimension_to_dict(compartment.size),
+                "clearance_mm": compartment.clearance_mm,
+                "clearance_source": compartment.clearance_source,
+                "comment": compartment.comment,
+            }
+            for compartment in plan.compartments
+        ],
+        "access_features": [
+            {
+                "id": feature.id,
+                "kind": feature.kind.value,
+                "placement": feature.placement,
+                "position_mm": _point_to_dict(feature.position),
+                "size_mm": _dimension_to_dict(feature.size) if feature.size is not None else None,
+                "radius_mm": feature.radius_mm,
+                "taxonomy": feature.taxonomy.value if feature.taxonomy is not None else None,
+                "comment": feature.comment,
+            }
+            for feature in plan.access_features
+        ],
+        "coverage": analysis["coverage"],
+        "free_volumes": [analysis["free_volume"]],
+        "validation": analysis["validation"],
+        "warnings": analysis["warnings"],
+        "metadata": plan.metadata,
+    }
+
+
+def _point_to_dict(point: Point3D) -> dict[str, float]:
+    return {"x": point.x, "y": point.y, "z": point.z}
+
+
+def _dimension_to_dict(dimension: Dimension3D | None) -> dict[str, float] | None:
+    if dimension is None:
+        return None
+    return {"x": dimension.x, "y": dimension.y, "z": dimension.z}
 def _positive(size: Dimension3D) -> bool:
     return size.x > 0.0 and size.y > 0.0 and size.z > 0.0
 
