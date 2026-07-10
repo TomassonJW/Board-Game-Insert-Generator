@@ -1,6 +1,6 @@
 # Fusion Smoke Test Automation
 
-Derniere mise a jour : 2026-07-08
+Derniere mise a jour : 2026-07-11
 
 ## Objectif
 
@@ -198,3 +198,12 @@ Smoke cible :
 8. Lancer `clear_bgig_scene` et verifier que les objets non-BGIG sont preserves.
 
 Cette gate ne valide pas l'impression physique.
+## P28 - Selection locale P21 vers Fusion
+
+La preparation P28 utilise une selection explicite du Studio local, pas une config JSON asset-first :
+
+```powershell
+scripts/fusion/prepare_local_composer_selection_test.ps1 -StarterId mixed-box
+```
+
+Le script exporte dans `%TEMP%` la CAD IR et la selection correspondante, installe l add-in, puis precharge `input_mode = cad_ir_file`, `action = generate` et le chemin CAD IR. Il ne lance pas Fusion. Le smoke humain doit confirmer les trois enveloppes selectionnees, sans les confondre avec des bacs finis ; `Print validation: false` reste obligatoire. Le protocole detaille est dans `docs/P28_FUSION_SELECTION_SMOKE.md`.

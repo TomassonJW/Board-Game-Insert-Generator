@@ -208,3 +208,7 @@ Statut : `done`, `implemented-local-ui`, `implemented-validation`, `print-valida
 ## P27 proposal explanations - 2026-07-10
 
 Statut : `done`, `implemented-local-ui`, `print-validated: false`. Les sorties P21 sont traduites en intention, cas de choix, compromis et sous-scores lisibles, avec trace moteur progressive. Aucun calcul P21 ne change. Le prochain jalon est P28, gate humaine obligatoire avant materialisation Fusion d une selection explicite.
+
+## P28 Fusion selection bridge - 2026-07-11
+
+Statut : `implemented-cad-ir-selection-bridge`, `manual_validation_required`, `print-validated: false`. La selection locale P21 devient une liste de composants CAD IR `rectangular_blank` que l add-in Fusion existant sait deja lire. Les dimensions et positions sont copiees depuis le plan resolu ; aucun score, placement, tolerance, cavite ou paroi n est invente. Le smoke Fusion humain est la prochaine preuve requise avant toute declaration `fusion-validated`.

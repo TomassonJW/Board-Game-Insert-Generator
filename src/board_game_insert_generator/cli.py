@@ -22,7 +22,12 @@ from board_game_insert_generator.models import Dimension3D
 from board_game_insert_generator.cad_ir import CadIrError, build_blank_cad_scene
 from board_game_insert_generator.config_loader import ConfigError, load_config
 from board_game_insert_generator.layout import LayoutError, generate_basic_layout
-from board_game_insert_generator.local_composer import main as run_local_composer
+from board_game_insert_generator.local_composer import (
+    LocalComposerError,
+    export_from_draft,
+    main as run_local_composer,
+    starter_catalog,
+)
 from board_game_insert_generator.report import layout_to_json, layout_to_markdown
 from board_game_insert_generator.tolerance import ToleranceError
 from board_game_insert_generator.validation import ValidationError
@@ -57,6 +62,8 @@ def main(argv: list[str] | None = None) -> int:
         return _render_box_fill_variant_dashboard(arguments[1:])
     if arguments and arguments[0] == "export-box-fill-variant":
         return _export_box_fill_variant(arguments[1:])
+    if arguments and arguments[0] == "export-local-composer-selection":
+        return _export_local_composer_selection(arguments[1:])
     if arguments and arguments[0] == "serve-local-composer":
         return run_local_composer(arguments[1:])
     return _report(arguments)
@@ -77,6 +84,7 @@ def _print_top_level_help() -> None:
         "  python -m board_game_insert_generator report-box-fill-variants REQUEST --format markdown|json|html [--output PATH]\n"
         "  python -m board_game_insert_generator render-box-fill-variant-dashboard REQUEST --output PATH\n"
         "  python -m board_game_insert_generator export-box-fill-variant REQUEST --variant recommended|ID --output PATH [--cad-ir-output PATH]\n"
+        "  python -m board_game_insert_generator export-local-composer-selection --starter ID --output PATH [--selection-output PATH] [--variant recommended|ID]\n"
         "  python -m board_game_insert_generator serve-local-composer [--host 127.0.0.1] [--port 8001]\n"
         "\n"
         "CAD IR export is a subcommand named export-cad-ir; it is not an --export-cad-ir option."
@@ -470,6 +478,57 @@ def _render_box_fill_variant_dashboard(argv: list[str]) -> int:
     Path(args.output).write_text(render_variant_portfolio_html(portfolio, args.layer), encoding="utf-8")
     return 0 if portfolio.recommended_variant_id is not None else 2
 
+
+def _export_local_composer_selection(argv: list[str]) -> int:
+    parser = argparse.ArgumentParser(
+        description="Export a selected local composer starter as Fusion-consumable rectangular-blank CAD IR."
+    )
+    parser.add_argument(
+        "--starter",
+        default="mixed-box",
+        choices=[starter["id"] for starter in starter_catalog()],
+        help="Built-in local starter to export.",
+    )
+    parser.add_argument("--output", required=True, help="Output CAD IR JSON file.")
+    parser.add_argument(
+        "--selection-output",
+        help="Optional output file for the explicit P21 selection JSON.",
+    )
+    parser.add_argument(
+        "--variant",
+        default="recommended",
+        help="Variant id from the starter portfolio, or recommended.",
+    )
+    args = parser.parse_args(argv)
+
+    starter = next(starter for starter in starter_catalog() if starter["id"] == args.starter)
+    try:
+        bundle = export_from_draft(starter["draft"], args.variant)
+    except (LocalComposerError, ValueError) as exc:
+        _print_error("Local composer export error", exc)
+        return 2
+
+    output_path = Path(args.output)
+    try:
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(bundle["cad_ir"], indent=2) + "\n", encoding="utf-8")
+        if args.selection_output:
+            selection_path = Path(args.selection_output)
+            selection_path.parent.mkdir(parents=True, exist_ok=True)
+            selection_path.write_text(json.dumps(bundle["selection"], indent=2) + "\n", encoding="utf-8")
+    except OSError as exc:
+        _print_error("Output error", exc)
+        return 2
+
+    print(
+        "Local composer selection export OK\n"
+        f"- Starter: {args.starter}\n"
+        f"- Variant: {bundle['selection']['selected_variant_id']}\n"
+        f"- Output: {output_path}\n"
+        f"- Components: {len(bundle['cad_ir']['components'])}\n"
+        "- Geometry: rectangular blanks only; Fusion and print validation remain pending."
+    )
+    return 0
 
 def _export_box_fill_variant(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(

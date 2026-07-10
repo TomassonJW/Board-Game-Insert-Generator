@@ -26,7 +26,12 @@ from board_game_insert_generator.box_fill_variants import (
     standard_preference_profile,
     variant_portfolio_to_dict,
 )
-from board_game_insert_generator.cad_ir import build_blank_cad_scene
+from board_game_insert_generator.cad_ir import (
+    CadBody,
+    CadComponent,
+    CadOperation,
+    build_blank_cad_scene,
+)
 from board_game_insert_generator.layout import generate_basic_layout
 from board_game_insert_generator.models import (
     BOX_FILL_PLAN_SCHEMA_V0,
@@ -202,7 +207,7 @@ def portfolio_from_draft(raw_draft: object) -> dict[str, object]:
 
 
 def export_from_draft(raw_draft: object, variant_id: str | None = None) -> dict[str, object]:
-    """Return selection JSON and metadata-bearing CAD IR without Fusion execution."""
+    """Export one explicit P21 selection as Fusion-consumable CAD IR, without Fusion execution."""
 
     config, candidates, preference, policies = _draft_to_engine(raw_draft)
     assert config.box_fill_plan is not None
@@ -218,24 +223,101 @@ def export_from_draft(raw_draft: object, variant_id: str | None = None) -> dict[
     selection = selected_variant_to_dict(portfolio, variant_id)
     scene_config = replace(config, box_fill_plan=selected_variant.result.solved_plan)
     scene = build_blank_cad_scene(scene_config, generate_basic_layout(scene_config)).to_dict()
+    scene["components"] = _selection_bridge_components(
+        selected_variant.result.solved_plan,
+        selected_variant.id,
+    )
     scene["metadata"]["box_fill_variant_portfolio"] = portfolio_payload
     scene["metadata"]["box_fill_variant_selection"] = selection
     scene["metadata"]["box_fill_solution"] = selection["variant"]["solution"]
     scene["metadata"]["local_composer"] = {
         "schema_version": LOCAL_COMPOSER_SCHEMA_V0,
-        "materialization_status": "not_authorized",
-        "reason": "P23 exports an explicit engine decision; Fusion materialization remains a separate gate.",
+        "materialization_status": "prepared_for_fusion_smoke",
+        "selection_bridge": "p28_selected_module_blank.v0",
+        "geometry_status": "rectangular_blanks_only",
+        "print_validation_status": "not_validated",
+        "reason": (
+            "P28 turns the selected BoxFill modules into explicit rectangular blanks; "
+            "the Fusion smoke and physical print remain unobserved."
+        ),
     }
     return {
         "schema_version": LOCAL_COMPOSER_EXPORT_SCHEMA_V0,
         "selection": selection,
         "cad_ir": scene,
         "limits": [
-            "The export is metadata-ready only; no Fusion operation was executed.",
+            "The CAD IR contains one rectangular blank per selected module; it does not define finished tray cavities or walls.",
+            "No Fusion operation was executed by this export.",
             "P21 scores are proxies and do not prove ergonomics or printability.",
             "No physical print or slicer validation is included.",
         ],
     }
+
+
+def _selection_bridge_components(
+    solved_plan: BoxFillPlan,
+    selected_variant_id: str,
+) -> list[dict[str, object]]:
+    """Materialize resolved BoxFill envelopes through the existing CAD IR blank contract.
+
+    The bridge copies only already-solved origins and dimensions. It does not
+    derive cavities, walls, tolerances, or a second placement decision.
+    """
+
+    components: list[dict[str, object]] = []
+    for index, module in enumerate(solved_plan.modules):
+        if not module.printable:
+            continue
+        instance_id = f"selection:{selected_variant_id}:{module.id}"
+        body_id = f"body:{instance_id}"
+        component = CadComponent(
+            id=f"component:{instance_id}",
+            name=f"Selection - {module.name}",
+            module_id=module.id,
+            instance_id=instance_id,
+            functional_type="box_fill_selected_module",
+            body=CadBody(
+                id=body_id,
+                name=f"{module.name} selected module blank",
+                kind="rectangular_blank",
+                source_cell_instance_id=instance_id,
+                theoretical_origin=module.origin,
+                theoretical_size=module.size,
+                printable_origin=module.origin,
+                printable_size=module.size,
+                cavities=(),
+                face_classifications=(),
+                applied_tolerances=(),
+                operations=(
+                    CadOperation(
+                        id=f"{body_id}:create_rectangular_prism",
+                        kind="create_rectangular_prism",
+                        target_id=body_id,
+                        parameters={
+                            "origin_source": "printable_origin_mm",
+                            "size_source": "printable_size_mm",
+                            "coordinate_frame": "scene.frame",
+                        },
+                    ),
+                ),
+            ),
+            metadata={
+                "label": module.name,
+                "source_index": index,
+                "source": module.source,
+                "layer_id": module.layer_id,
+                "orientation": module.orientation,
+                "selected_variant_id": selected_variant_id,
+                "selection_bridge": "p28_selected_module_blank.v0",
+                "geometry_status": "rectangular_blanks_only",
+            },
+        )
+        components.append(component.to_dict())
+    if not components:
+        raise LocalComposerError(
+            "The selected variant has no printable modules to materialize for Fusion."
+        )
+    return components
 
 
 def _draft_to_engine(

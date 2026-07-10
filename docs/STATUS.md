@@ -969,3 +969,11 @@ Statut : `done`, `implemented-local-ui`, `print-validated: false`.
 Les cartes P21 presentent desormais une intention lisible, le cas dans lequel choisir la variante, le compromis a surveiller et une explication courte de chaque sous-score. Les raisons techniques brutes restent accessibles par divulgation progressive pour les utilisateurs experts et dans les exports, mais ne sont plus le premier message pour un debutant. Les policies, scores, recommendation et solveur restent strictement inchanges.
 
 Preuves : build Vite et verification TypeScript des cinq policies bornees, des explications de scores et du fallback. Inspection navigateur toujours a rejouer hors sandbox Windows. La prochaine etape n est pas autonome : `P28-GATE`, materialisation Fusion d une selection, exige une validation humaine et un smoke Fusion reel.
+
+## P28 - Pont Fusion de selection locale
+
+Statut : `implemented-cad-ir-selection-bridge`, `manual_validation_required`, `print-validated: false`.
+
+La gate de scope P28 est approuvee le 2026-07-11. L export local convertit a present la variante P21 selectionnee en composants CAD IR `rectangular_blank` explicites, un par module imprimable, en recopiant strictement ses origines et dimensions resolues. Fusion consomme ce contrat existant sans connaitre P21, sans recalcul de placement ni modification de tolerance.
+
+Preuves hors Fusion : les tests Local Composer et CLI chargent la scene dans `generation_plan_from_cad_ir`; l export reel `mixed-box` produit trois composants et un plan de trois blanks. Le preparateur `scripts/fusion/prepare_local_composer_selection_test.ps1` passe en dry run. L observation Fusion reste obligatoire avant tout statut `fusion-validated`; aucune cavite, paroi, ergonomie, slicer ou impression n est validee.

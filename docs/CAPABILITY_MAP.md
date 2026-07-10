@@ -439,3 +439,11 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - C-SOLVER : presentation plus lisible des policies et sous-scores existants ; aucun changement de score, ordre ou recommendation.
 - C-QUALITY : textes explicatifs bornes et fallback verifies par test TypeScript.
 - C-FUSION-UI / C-CAD-IR : inchanges ; P28 reste une gate humaine avant toute materialisation Fusion de selection.
+
+## P28 local composer selection bridge update
+
+- C-CAD-IR : `implemented-selection-bridge` pour la projection explicite d une selection P21 en composants CAD IR standards, avec trace de variante et sans nouvelle geometrie metier.
+- C-FUSION-UI : `manual-validation-required` : le pipeline add-in existant peut consommer les blanks P28, mais la scene doit etre observee humainement dans Fusion.
+- C-PRODUCT-VISION : le Studio conserve une selection explicite et le moteur Python reste source de verite ; aucun calcul ne migre vers Fusion.
+- C-QUALITY : tests de contrat local/CLI et dry run de preparation Fusion couvrent le raccord hors Fusion.
+- C-PRINT / C-ERGONOMICS : inchanges, `print-validated: false` ; les envelopes P28 ne sont pas des bacs finis.

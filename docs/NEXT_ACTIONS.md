@@ -1,6 +1,6 @@
 # Next Actions
 
-Derniere mise a jour : 2026-07-10
+Derniere mise a jour : 2026-07-11
 
 ## Politique active - Integration Git autonome
 
@@ -8,26 +8,30 @@ Statut : `active` pour les missions non gatees. Les missions Fusion et physiques
 
 ## Etat courant
 
-P19 a P21 donnent les contrats et propositions moteur. P22 a P27 livrent une surface locale testable : composition, import/export, allocations, demarrage guide, preparation et explication des compromis. Fusion reste un adaptateur CAD/export futur.
+P19 a P21 fournissent les contrats et propositions moteur. P22 a P27 fournissent le Studio local. P28 relie maintenant une selection P21 explicite a la CAD IR standard attendue par Fusion, sous la forme prudente d enveloppes rectangulaires. Le moteur Python reste la source de verite.
 
 ## Gate humaine active
 
-`P28-GATE - Materialiser une selection locale dans Fusion` est maintenant la seule prochaine etape utile, mais elle est bloquee par une vraie validation humaine :
+La decision de scope P28 est approuvee. La seule gate active est l observation reelle dans Fusion :
 
-- autoriser ou non un scope borne qui charge une CAD IR de selection P21 dans le pipeline Fusion existant ;
-- conserver le moteur Python comme source de verite, sans recalcul Fusion ;
-- accepter qu un smoke test humain Fusion soit obligatoire avant tout statut `fusion-validated` ;
-- ne pas franchir la gate impression, slicer ou export imprimable automatique.
+- le pont produit exactement les trois volumes selectionnes du starter de smoke ;
+- Codex prepare l add-in et les settings locaux ;
+- Thomas execute `Run` dans Fusion et confirme ou infirme la scene ;
+- aucun statut `fusion-validated` ou `print-validated` n est permis avant ce retour humain.
+
+Le protocole et les mesures attendues sont dans `docs/P28_FUSION_SELECTION_SMOKE.md`.
 
 ## Hors scope maintenu
 
 - Aucun solveur global, backtracking, optimisation opaque ou IA non evaluee.
 - Fusion ne devient jamais source de verite du plan.
+- Les volumes P28 ne sont pas des bacs finis : pas de cavites, parois, encoches ou tolerances nouvelles.
 - Aucune validation d impression, de slicer ou d ergonomie reelle n est revendiquee.
 
-## Reprise apres validation
+## Prochaine action
 
-Si P28 est autorisee, preparer le smoke local, installer l add-in via les scripts existants, generer une CAD IR de selection et ne laisser a Thomas que les actions observables dans Fusion.
+Terminer `P28-GATE` par le smoke humain Fusion prepare par `scripts/fusion/prepare_local_composer_selection_test.ps1`. Apres un resultat `OK` documente, choisir une seule prochaine mission `ready` qui etend la geometrie sans franchir la gate impression.
+
 ## Fin de chaque mission
 
-Appliquer direct-to-main pour tout lot non gate : tests pertinents, `git diff --check`, commit atomique, integration et push de `main`. Pour P28, arreter avant toute mutation Fusion jusqu a validation humaine explicite.
+Appliquer direct-to-main pour tout lot non gate : tests pertinents, `git diff --check`, commit atomique, integration et push de `main`. Pour P28, arreter avant toute declaration `fusion-validated` jusqu au retour humain.

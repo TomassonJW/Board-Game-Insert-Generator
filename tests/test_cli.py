@@ -26,6 +26,7 @@ class CliTests(unittest.TestCase):
         output = stdout.getvalue()
         self.assertEqual(code, 0)
         self.assertIn("export-cad-ir CONFIG --output PATH", output)
+        self.assertIn("export-local-composer-selection", output)
         self.assertIn("serve-local-composer", output)
         self.assertIn("not an --export-cad-ir option", output)
     def test_cli_diagnose_reports_ok(self) -> None:
@@ -84,6 +85,41 @@ class CliTests(unittest.TestCase):
         )
         self.assertEqual(plan.exploded_occurrences[0].component_id, plan.blanks[0].cad_id)
 
+    def test_cli_exports_local_composer_selection_compatible_with_fusion_plan(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            output_path = Path(temporary_directory) / "local_composer_selection.cad-ir.json"
+            selection_path = Path(temporary_directory) / "local_composer_selection.json"
+            stdout = io.StringIO()
+
+            with redirect_stdout(stdout):
+                code = main(
+                    [
+                        "export-local-composer-selection",
+                        "--starter",
+                        "mixed-box",
+                        "--output",
+                        str(output_path),
+                        "--selection-output",
+                        str(selection_path),
+                    ]
+                )
+
+            payload = load_cad_ir_json(output_path)
+            plan = generation_plan_from_cad_ir(payload)
+            selection = json.loads(selection_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(code, 0)
+        self.assertIn("Local composer selection export OK", stdout.getvalue())
+        self.assertEqual(
+            payload["metadata"]["local_composer"]["geometry_status"],
+            "rectangular_blanks_only",
+        )
+        self.assertEqual(len(payload["components"]), 3)
+        self.assertEqual(len(plan.blanks), 3)
+        self.assertEqual(
+            selection["selected_variant_id"],
+            payload["metadata"]["box_fill_variant_selection"]["selected_variant_id"],
+        )
     def test_cli_exports_cad_ir_with_rectangular_cavity_compatible_with_fusion_plan(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
             output_path = Path(temporary_directory) / "simple_tray_cad_ir.json"

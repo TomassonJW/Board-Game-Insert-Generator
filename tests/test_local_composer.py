@@ -15,6 +15,7 @@ from board_game_insert_generator.local_composer import (
     starter_catalog,
     starter_draft,
 )
+from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import generation_plan_from_cad_ir
 
 
 class LocalComposerTests(unittest.TestCase):
@@ -34,7 +35,7 @@ class LocalComposerTests(unittest.TestCase):
         self.assertEqual([starter["id"] for starter in starters], ["mixed-box", "card-game", "board-game"])
         self.assertTrue(all(portfolio_from_draft(starter["draft"])["recommended_variant_id"] for starter in starters))
 
-    def test_export_carries_an_explicit_selection_in_cad_ir_without_materialization(self) -> None:
+    def test_export_materializes_the_explicit_selection_as_fusion_consumable_blanks(self) -> None:
         bundle = export_from_draft(starter_draft())
 
         self.assertEqual(bundle["schema_version"], LOCAL_COMPOSER_EXPORT_SCHEMA_V0)
@@ -42,12 +43,25 @@ class LocalComposerTests(unittest.TestCase):
         self.assertIn("box_fill_variant_selection", bundle["cad_ir"]["metadata"])
         self.assertEqual(
             bundle["cad_ir"]["metadata"]["local_composer"]["materialization_status"],
-            "not_authorized",
+            "prepared_for_fusion_smoke",
         )
         self.assertEqual(
             bundle["selection"]["selected_variant_id"],
             bundle["cad_ir"]["metadata"]["box_fill_variant_selection"]["selected_variant_id"],
         )
+        modules = bundle["selection"]["variant"]["solution"]["solved_plan"]["modules"]
+        components = bundle["cad_ir"]["components"]
+        self.assertEqual(len(components), len(modules))
+        self.assertEqual(
+            [component["module_id"] for component in components],
+            [module["id"] for module in modules],
+        )
+        self.assertTrue(
+            all(component["body"]["kind"] == "rectangular_blank" for component in components)
+        )
+        plan = generation_plan_from_cad_ir(bundle["cad_ir"])
+        self.assertEqual(len(plan.blanks), len(modules))
+        self.assertEqual(plan.blanks[0].origin_mm.to_dict(), modules[0]["origin_mm"])
 
     def test_rejects_unknown_layer_before_engine_execution(self) -> None:
         draft = starter_draft()

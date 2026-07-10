@@ -157,3 +157,4 @@ Tests, cartes backlog ou gates humaines a preparer.
 - ADR-0038-box-fill-greedy-2d-v0.md - Placement greedy 2D borne P20.
 - ADR-0039-box-fill-variants-v0.md - Portefeuille de variantes deterministes P21.
 - ADR-0040-local-composer-loopback-adapter.md - App locale React/Vite et adaptateur Python loopback P23.
+- ADR-0041-local-composer-selection-cad-ir-bridge.md - Pont CAD IR de la selection locale P21 vers Fusion P28.

@@ -1,6 +1,6 @@
 # Backlog
 
-Derniere mise a jour : 2026-07-10
+Derniere mise a jour : 2026-07-11
 
 Le backlog transforme la North Star en missions atomiques. Chaque mission future
 doit indiquer au minimum : ID, titre, capability liee, milestone lie, objectif,
@@ -1310,8 +1310,10 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 
 - Capability : C-FUSION-UI, C-CAD-IR, C-PRODUCT-VISION.
 - Milestone : M14 Usable beta.
-- Objectif : decider si une selection P21 explicite peut etre preparee puis chargee dans le pipeline Fusion existant, avec smoke test humain.
-- Dependances : P23 a P27 termines ; CAD IR selectionnee deja exportable sans materialisation.
-- Hors scope : nouveau solveur, changement de tolerance, export imprimable automatique, validation d impression, cloud ou Fusion comme source de verite.
-- Gate : validation humaine obligatoire avant toute implementation ou execution Fusion de la selection ; ADR-0040 et HUMAN_GATES imposent cette pause.
-- Statut : `ready-gated`.
+- Objectif : relier une selection P21 explicite au pipeline Fusion existant avec smoke humain, sans faire de Fusion une source de verite.
+- Dependances : P23 a P27 termines ; approbation humaine de scope recue le 2026-07-11.
+- Livrables : ADR-0041, composants CAD IR `rectangular_blank` traces, commande `export-local-composer-selection`, preparateur Fusion et protocole P28.
+- Preuves : tests Local Composer/CLI avec plan Fusion hors API, export reel de trois modules et dry run du preparateur.
+- Hors scope : nouveau solveur, changement de tolerance, cavites/parois finies, export imprimable automatique, validation d impression, cloud ou Fusion comme source de verite.
+- Gate : observation humaine Fusion obligatoire ; aucune declaration `fusion-validated` ou `print-validated` avant retour humain.
+- Statut : `implemented-cad-ir-selection-bridge`, `manual_validation_required`, `print-validated: false`.
