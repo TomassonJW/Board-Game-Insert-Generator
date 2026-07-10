@@ -401,3 +401,7 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - C-SOLVER : `implemented-core` pour un portefeuille borne P21 de policies deterministes, deduplication geometrique, front Pareto, sous-scores et recommandation explicable sans recherche globale.
 - C-PRODUCT-VISION : `implemented-cad-ir-metadata` pour la selection explicite d'une variante ; la CAD IR transporte la selection et ne recalcule pas le layout.
 - C-FUSION-UI : inchange. Le dashboard P21 est un artefact HTML statique hors Fusion, pas une palette ni une app persistante.
+## P22 UX surface gate update
+
+- C-FUSION-UI : aucun changement executable. La commande Fusion reste `fusion-validated` pour smoke/export ; une palette persistante reste bloquee.
+- C-PRODUCT-VISION : trajectoire recommandee documentee vers une app locale de conception + adaptateur Fusion, sans validation d architecture executable.

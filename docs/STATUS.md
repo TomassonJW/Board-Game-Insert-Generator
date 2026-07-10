@@ -919,3 +919,8 @@ Statut : `done`, `implemented-core`, `implemented-cli`, `implemented-cad-ir-meta
 P21 livre `box_fill_variants.v0` : un portefeuille borne de policies P20 deterministes, deduplique par geometrie, avec sous-scores exposes, front Pareto, profils de preference transparents et recommandation uniquement parmi les variantes `solved`. Les sorties sont lisibles en Markdown/JSON, comparables dans un tableau HTML statique autonome, et exportables sous forme de selection explicite avec metadata CAD IR. La fixture `examples/p21/portfolio.json` prouve plusieurs layouts reproductibles.
 
 Limites : aucun backtracking, solveur global, recherche exhaustive, UI persistante, materialisation Fusion, validation ergonomique ou impression reelle. La prochaine etape produit reste la gate ADR-0036 de choix de surface persistante.
+## P22 - Gate de surface UX persistante
+
+Statut : `done-docs`, gate humaine active.
+
+Le rapport `docs/P22_UX_SURFACE_GATE_REPORT.md` compare commande Fusion, palette Fusion, app locale et trajectoire hybride. Il recommande une app locale de conception comme surface principale et Fusion comme adaptateur CAD/export, mais n autorise aucune implementation : le choix de surface et de stack reste une decision humaine explicite selon ADR-0036.

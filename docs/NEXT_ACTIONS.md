@@ -1,37 +1,33 @@
-# Next Actions
+﻿# Next Actions
 
 Derniere mise a jour : 2026-07-10
 
 ## Politique active - Integration Git autonome
 
-Statut : `active`. Apres chaque mission, tests pertinents, diff propre, commit atomique, integration directe dans `main` et push vers `origin/main`.
+Statut : `active`. Les missions non gatees restent testees, committeees puis integrees directement dans `main`.
 
 ## Etat courant
 
-P19, P20 et P21 sont termines dans le moteur Python pur. BGIG sait maintenant verifier un plan manuel de boite, produire un placement greedy XY borne, comparer un portefeuille de variantes deterministes et exporter une selection explicite avec metadata CAD IR. Le dashboard P21 est un artefact HTML statique de comparaison, pas l UX persistante finale.
-
-## Mission ready suivante
-
-`P22-M001 - Rapport de gate pour la premiere surface UX persistante` : comparer palette Fusion et app locale de composition, recommander un premier spike et documenter son contrat sans ecrire de surface persistante.
-
-- Capability : C-FUSION-UI, C-PRODUCT-VISION.
-- Milestone : M14 Usable beta.
-- Validation : rapport de gate ADR-0036 lisible, options, recommandation, risques, perimetre exact et criteres d acceptation.
-- Gate : aucune pour le rapport documentaire ; une decision humaine explicite reste obligatoire avant implementation de palette ou d app.
+P19, P20 et P21 sont termines dans le moteur Python pur. P22 est termine comme rapport de gate : une UX persistante est necessaire pour atteindre le parcours produit cible, mais son choix engage l architecture et les dependances.
 
 ## Gate humaine active
 
-- ADR-0036 : choisir et autoriser la premiere surface UX persistante avant implementation.
-- Premiere materialisation Fusion du plan selectionne : gate distincte.
-- Premiere impression 3D et calibration physique : gate distincte.
+La validation attendue est dans `docs/P22_UX_SURFACE_GATE_REPORT.md`.
+
+- Recommandation : D, app locale de conception + Fusion adaptateur CAD/export.
+- Validation demandee : autoriser ou non ce chemin et la stack locale moderne proposee, ou choisir B/C/reporter.
+- Limite : aucune palette, app, dependance UI majeure ou materialisation Fusion de la selection ne doit commencer avant reponse explicite.
+
+## Mission suivante apres validation
+
+`P23-M001 - Spike app locale de composition` : parcours boite -> assets -> intentions/reservations -> P21 variants -> selection/export local, sans generation Fusion automatique.
 
 ## Hors scope maintenu
 
 - Aucun solveur global, backtracking, optimisation opaque ou IA non evaluee.
-- Aucune UI persistante, palette Fusion ou app locale/web avant la gate ADR-0036.
-- Fusion ne devient jamais source de verite du plan ; l impression reste non validee.
-
+- Fusion ne devient jamais source de verite du plan.
+- Aucune validation d impression, de slicer ou d ergonomie reelle n est revendiquee.
 
 ## Fin de chaque mission
 
-Appliquer la politique direct-to-main : lancer les tests pertinents, verifier git diff --check, committer un scope atomique, integrer dans main, pousser vers origin/main, puis repartir d une branche propre avant la mission suivante.
+Appliquer direct-to-main : tests pertinents, `git diff --check`, commit atomique, integration et push de `main`, puis reprise propre.

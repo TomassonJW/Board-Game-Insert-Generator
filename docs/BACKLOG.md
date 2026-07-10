@@ -1223,3 +1223,17 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - Dependances : P21 termine.
 - Gate : aucune tant que le lot reste documentaire ; la decision humaine de surface est obligatoire avant toute implementation persistante.
 - Statut : `ready`.
+### P22-M001 - Rapport de gate UX persistante - Resultat
+
+- Livrable : `docs/P22_UX_SURFACE_GATE_REPORT.md`.
+- Resultat : options comparees, recommandation D hybride et scope P23 borne sans implementation.
+- Statut : `done-docs`; gate ADR-0036 active.
+
+### P23-M001 - Spike app locale de composition
+
+- Capability : C-PRODUCT-VISION, C-FUSION-UI, C-SOLVER.
+- Milestone : M14 Usable beta.
+- Objectif : livrer le premier parcours local boite/assets/intentions/propositions/selection/export, sans materialisation Fusion.
+- Dependances : P22-M001 et validation humaine explicite de la surface/stack.
+- Gate : ADR-0036 et ajout de dependances UI majeures.
+- Statut : `blocked`.
