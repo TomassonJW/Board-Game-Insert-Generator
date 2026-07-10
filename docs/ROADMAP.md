@@ -200,3 +200,7 @@ Statut : `done`, `implemented-local-ui`, `implemented-validation`, `print-valida
 ## P25 guided starters - 2026-07-10
 
 Statut : `done`, `implemented-local-ui`, `implemented-loopback-adapter`, `print-validated: false`. Le Studio presente trois drafts V0 locaux et verifies pour demarrer un jeu de cartes, une boite mixte ou une boite avec plateau. Chaque modele traverse l adaptateur Python et P21 ; aucun catalogue distant, compte, stockage serveur, IA ou nouveau solveur n est ajoute. P26 doit rendre les mesures et limites visibles avant generation.
+
+## P26 generation readiness - 2026-07-10
+
+Statut : `done`, `implemented-local-ui`, `implemented-validation`, `print-validated: false`. Le Studio derive un resume novice de la saisie locale : assets, allocations, candidats, reservations, layers et corrections. Il ne recalcule pas P21 et ne promet aucune validation physique. P27 doit rendre les compromis des sorties P21 encore plus lisibles sans modifier leur calcul.

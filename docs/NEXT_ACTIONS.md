@@ -8,7 +8,7 @@ Statut : `active`. Les missions non gatees restent testees, committeees puis int
 
 ## Etat courant
 
-P19 a P21 donnent les contrats et propositions moteur. P22 a P25 livrent une surface locale testable : composition, export explicite, import robuste, allocations multi-assets et demarrage guide par drafts V0 locaux. Fusion reste un adaptateur CAD/export futur.
+P19 a P21 donnent les contrats et propositions moteur. P22 a P26 livrent une surface locale testable : composition, export explicite, import robuste, allocations multi-assets, demarrage guide et resume de preparation. Fusion reste un adaptateur CAD/export futur.
 
 ## Gate humaine active
 
@@ -18,7 +18,7 @@ P19 a P21 donnent les contrats et propositions moteur. P22 a P25 livrent une sur
 
 ## Premiere mission ready
 
-`P26-M001 - Resume de preparation avant generation` : donner a un debutant une lecture claire des mesures, allocations et limites avant toute proposition, sans creer une nouvelle logique de decision.
+`P27-M001 - Explication des compromis de proposition` : traduire les sorties P21 existantes en choix lisibles, sans modifier le moteur.
 
 ## Hors scope maintenu
 

@@ -86,3 +86,21 @@ table { width: 100%; min-width: 820px; border-collapse: collapse; } th { padding
 .starter-highlights { display: flex; flex-wrap: wrap; gap: 6px; margin: auto 0 14px; }
 .starter-highlights span { padding: 4px 7px; border-radius: 999px; color: #4a56aa; background: #edf0ff; font-size: .69rem; font-weight: 750; }
 @media (max-width: 880px) { .starter-grid { grid-template-columns: 1fr; }.starter-gallery { padding: 22px; }.starter-gallery-heading { flex-direction: column; } }
+.readiness-panel { margin-top: 26px; padding: 26px 30px; border: 1px solid #dbe3ef; border-radius: 18px; background: #fff; box-shadow: 0 10px 26px rgba(33, 51, 86, .045); }
+.readiness-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 22px; }
+.readiness-heading h2 { margin: 0; color: #172645; font-size: 1.4rem; letter-spacing: -.035em; }
+.readiness-heading p:not(.eyebrow) { max-width: 680px; margin: 8px 0 0; color: #68758d; line-height: 1.5; }
+.readiness-badge { flex: none; padding: 7px 10px; border-radius: 999px; font-size: .75rem; font-weight: 800; white-space: nowrap; }
+.readiness-badge.ready { color: #1f6a50; background: #e8f8ef; }
+.readiness-badge.needs-attention { color: #9a5f11; background: #fff2d9; }
+.readiness-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0 12px; }
+.readiness-grid > div { display: grid; gap: 4px; padding: 13px; border: 1px solid #e1e7f0; border-radius: 11px; background: #fafcff; }
+.readiness-grid span { color: #74819a; font-size: .69rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.readiness-grid strong { color: #253555; font-size: 1.05rem; }
+.readiness-grid small { color: #70809a; line-height: 1.35; }
+.readiness-alert, .readiness-ok { display: grid; gap: 7px; padding: 13px 14px; border-radius: 10px; font-size: .86rem; }
+.readiness-alert { border: 1px solid #f0d29a; color: #80510f; background: #fff9eb; }
+.readiness-alert ul { display: grid; gap: 4px; margin: 0; padding-left: 18px; }
+.readiness-ok { color: #27674f; background: #effaf4; }
+.readiness-limit { margin: 13px 0 0; color: #76839b; font-size: .78rem; line-height: 1.45; }
+@media (max-width: 700px) { .readiness-panel { padding: 22px; }.readiness-heading { flex-direction: column; }.readiness-grid { grid-template-columns: 1fr; }.readiness-badge { white-space: normal; } }

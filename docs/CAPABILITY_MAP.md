@@ -426,3 +426,9 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - C-ASSET : les templates expliquent des cas cartes, jetons, des et reservation plateau avec des dimensions ajustables.
 - C-QUALITY : catalogue borne, drafts V0 resolus par P21 et route loopback CORS couverts par tests et recette HTTP.
 - C-SOLVER / C-CAD-IR / C-FUSION-UI : inchanges ; les templates sont des entrees du moteur existant, pas une nouvelle logique de decision.
+
+## P26 generation readiness update
+
+- C-PRODUCT-VISION : `implemented-local-ui` pour une lecture novice de ce qui est pret avant toute proposition.
+- C-QUALITY : `implemented-validation` pour un resume derive des erreurs et allocations existantes, avec verification comportementale TypeScript.
+- C-SOLVER / C-CAD-IR / C-FUSION-UI : inchanges ; P26 ne modifie aucune policy, score, projection ou operation CAD.

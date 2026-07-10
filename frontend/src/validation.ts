@@ -13,6 +13,16 @@ export interface DraftIssue {
   path: string
   message: string
 }
+export interface DraftReadiness {
+  issues: DraftIssue[]
+  asset_count: number
+  allocated_asset_count: number
+  unallocated_asset_names: string[]
+  candidate_count: number
+  reservation_count: number
+  fixed_module_count: number
+  layer_count: number
+}
 
 export function validateDraft(draft: ComposerDraft): DraftIssue[] {
   const issues: DraftIssue[] = []
@@ -53,6 +63,21 @@ export function validateDraft(draft: ComposerDraft): DraftIssue[] {
   }
 
   return issues
+}
+export function summarizeDraft(draft: ComposerDraft): DraftReadiness {
+  const allocatedAssetIds = new Set(draft.candidates.flatMap((candidate) => candidate.asset_ids))
+  return {
+    issues: validateDraft(draft),
+    asset_count: draft.assets.length,
+    allocated_asset_count: allocatedAssetIds.size,
+    unallocated_asset_names: draft.manual_modules.length
+      ? []
+      : draft.assets.filter((asset) => !allocatedAssetIds.has(asset.id)).map((asset) => asset.name),
+    candidate_count: draft.candidates.length,
+    reservation_count: draft.reservations.length,
+    fixed_module_count: draft.manual_modules.length,
+    layer_count: draft.layers.length,
+  }
 }
 
 export function isComposerDraft(value: unknown): value is ComposerDraft {

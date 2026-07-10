@@ -953,3 +953,11 @@ Le Studio propose trois points de depart locaux : boite mixte, jeu de cartes et 
 Preuves : les trois drafts passent par P21 avec une recommandation, les tests Python couvrent le catalogue et l endpoint, la recette HTTP verifie catalogue, CORS, UI servie et generation. Le runtime navigateur de recette est bloque par le sandbox Windows avant ouverture, donc l inspection visuelle reste a rejouer ailleurs.
 
 Limites : ces modeles sont des hypotheses locales a mesurer et ajuster ; aucune bibliotheque partagee, sauvegarde serveur, Fusion, impression ou ergonomie physique n est validee. Prochaine mission ready : `P26-M001 - Resume de preparation avant generation`.
+
+## P26 - Resume de preparation avant generation
+
+Statut : `done`, `implemented-local-ui`, `implemented-validation`, `print-validated: false`.
+
+Avant de lancer P21, le Studio affiche maintenant un resume derive du draft : nombre d assets, allocations candidates, modules, reservations, layers et corrections restantes. Un etat pret ou a completer est explicite et la section rappelle que cette lecture ne remplace ni le moteur, ni une mesure reelle, ni une validation d impression, d ergonomie ou Fusion.
+
+Preuves : build Vite et verification comportementale TypeScript pour un draft pret puis une allocation manquante. Le resume utilise `validateDraft` et ne cree aucun score ou placement nouveau. Inspection navigateur toujours a rejouer hors sandbox Windows. Prochaine mission ready : `P27-M001 - Explication des compromis de proposition`.

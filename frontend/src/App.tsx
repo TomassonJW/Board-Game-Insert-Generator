@@ -1,6 +1,6 @@
 import { type ChangeEvent, useEffect, useMemo, useState } from 'react'
 import { ApiError, createExport, generatePortfolio, loadStarters } from './api'
-import { isComposerDraft, type DraftIssue, validateDraft } from './validation'
+import { isComposerDraft, type DraftIssue, summarizeDraft, validateDraft } from './validation'
 import type {
   AssetDraft,
   CandidateDraft,
@@ -58,6 +58,8 @@ export default function App() {
     }
     return owners
   }, [draft])
+
+  const readiness = useMemo(() => draft ? summarizeDraft(draft) : undefined, [draft])
 
   async function handleGenerate() {
     if (!draft) return
@@ -188,7 +190,7 @@ export default function App() {
     }
   }
 
-  if (!draft) {
+  if (!draft || !readiness) {
     return <main className="loading-shell"><div className="loading-card"><span className="orb" /><p>{error ?? 'Connexion au moteur local…'}</p></div></main>
   }
 
@@ -266,7 +268,7 @@ export default function App() {
         {draft.manual_modules.length > 0 && <div className="lock-strip"><strong>{draft.manual_modules.length} module(s) verrouillé(s)</strong><span>Ils restent des obstacles fixes pour toute future génération.</span><button className="text-button" onClick={() => updateDraft((current) => ({ ...current, manual_modules: [] }))}>Déverrouiller tout</button></div>}
       </section>
 
-      <section id="proposals" className="panel proposals-panel">
+      <section className="readiness-panel" aria-label="Resume de preparation"><div className="readiness-heading"><div><p className="eyebrow">Avant de generer</p><h2>{'Verifie la pr\u00e9paration du projet'}</h2><p>Ce resume relit ta saisie. Il ne remplace ni le moteur, ni une mesure reelle, ni un test d impression.</p></div><span className={`readiness-badge ${readiness.issues.length ? 'needs-attention' : 'ready'}`}>{readiness.issues.length ? `${readiness.issues.length} point(s) \u00e0 corriger` : 'Pret a explorer'}</span></div><div className="readiness-grid"><div><span>Contenu</span><strong>{readiness.asset_count} asset(s)</strong><small>{readiness.allocated_asset_count}/{readiness.asset_count} associe(s) aux candidats</small></div><div><span>Modules</span><strong>{readiness.candidate_count} candidat(s)</strong><small>{readiness.fixed_module_count} verrouille(s)</small></div><div><span>Contraintes</span><strong>{readiness.reservation_count} reservation(s)</strong><small>{readiness.layer_count} layer(s) declares</small></div></div>{readiness.issues.length > 0 ? <div className="readiness-alert"><strong>{'A completer avant le moteur'}</strong><ul>{readiness.issues.slice(0, 3).map((issue, index) => <li key={`${issue.path}-${index}`}>{issue.path} : {issue.message}</li>)}</ul>{readiness.issues.length > 3 && <small>{`Et ${readiness.issues.length - 3} autre(s) point(s) dans la liste de corrections.`}</small>}</div> : <div className="readiness-ok"><strong>{'Saisie coherente pour demander des propositions'}</strong><span>{readiness.unallocated_asset_names.length ? `Assets encore sans candidat : ${readiness.unallocated_asset_names.join(', ')}` : 'Les assets declaratifs sont associes a des modules candidats.'}</span></div>}<p className="readiness-limit">Les propositions P21 restent des compromis explicables : elles ne valident pas une impression, l ergonomie ou Fusion.</p></section>      <section id="proposals" className="panel proposals-panel">
         <div className="panel-heading"><div><p className="eyebrow">04 · décider en confiance</p><h2>Compare les propositions</h2><p>Les scores restent des proxies. Chaque proposition est déterministe, inspectable et ne contient aucune recherche opaque.</p></div><div className="preference"><label>Priorité personnelle<select value={draft.preference} onChange={(event) => updateDraft((current) => ({ ...current, preference: event.target.value as ComposerDraft['preference'] }))}><option value="balanced">Équilibre</option><option value="compact">Compacité</option><option value="accessible">Accès</option><option value="print_simple">Simplicité d’impression</option></select></label></div></div>
         {!portfolio && <div className="empty-state"><div className="empty-illustration">✦</div><h3>Prêt à explorer</h3><p>Génère des propositions pour voir la boîte, les réservations et les compromis.</p><button className="button primary" onClick={() => void handleGenerate()} disabled={busy}>Générer maintenant</button></div>}
         {portfolio && <><div className="portfolio-summary"><span>{portfolio.variants.length} variantes</span><span>·</span><span>Préférence : {preferenceLabel(portfolio.preference.id)}</span><span>·</span><code>{portfolio.portfolio_digest.slice(0, 12)}</code></div><div className="variant-grid">{portfolio.variants.map((variant) => <VariantCard key={variant.id} variant={variant} active={selectedVariantId === variant.id} onSelect={() => setSelectedVariantId(variant.id)} />)}</div>

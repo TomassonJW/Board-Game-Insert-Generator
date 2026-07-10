@@ -1282,4 +1282,20 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - Dependances : P25-M001 termine.
 - Hors scope : moteur de recommendation nouveau, optimisation globale, Fusion, export imprimable, cloud ou donnees utilisateur.
 - Gate : aucune si le resume derive seulement du draft local et des sorties moteur existantes ; ADR requise si une nouvelle logique de decision est introduite.
+- Statut : `done`, `implemented-local-ui`, `implemented-validation`, `print-validated: false`.
+
+### P26-M001 - Resultat
+
+- Livrables : resume derive du draft et de la prevalidation existante, compteurs assets/modules/contraintes et rappel visible des limites P21.
+- Preuves : verification comportementale TypeScript et build Vite passent.
+- Decision : aucun calcul de score ou de placement n est ajoute ; le resume ne fait que lire les contrats locaux existants.
+
+### P27-M001 - Explication des compromis de proposition
+
+- Capability : C-PRODUCT-VISION, C-SOLVER, C-QUALITY.
+- Milestone : M14 Usable beta.
+- Objectif : rendre les policies P21, leurs scores et la selection recommandee compréhensibles pour un novice, sans changer les scores ni la recommendation.
+- Dependances : P26-M001 termine.
+- Hors scope : nouveau score, IA, solveur, modele de preference, Fusion, export imprimable ou validation physique.
+- Gate : aucune si le travail reste une presentation des sorties P21 existantes ; ADR requise si la decision moteur change.
 - Statut : `ready`.
