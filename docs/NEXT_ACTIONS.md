@@ -40,7 +40,7 @@ Mission interne terminee : P17-M006 - Validation Fusion export/preprint, STL par
 
 ## Mission ready non gated
 
-`P18-M002 - Redefinir l'UX cible premium` est ready. Il doit produire un flux utilisateur cible et des frontieres explicites entre commande Fusion, palette future et application future.
+`P18-M003 - Definir le modele produit volumetrique cible` est ready. Il doit fixer les objets `BoxFillPlan`, `ModulePlan`, reservations et variantes avant toute implementation.
 
 ## Regle operationnelle Fusion
 

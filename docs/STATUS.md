@@ -842,3 +842,7 @@ P17 valide une chaine technique export/preprint V0, pas le produit cible ni une 
 Statut : `done-docs`. `docs/VISION_GAP_ANALYSIS.md` confirme que la North Star reste valide : BGIG dispose d'une fondation asset-first/Fusion/preprint solide, mais le produit actuel reste un atelier de generation de bacs et non un concepteur de rangement complet.
 
 Dette prioritaire : `quick_asset_box` est une commande de test/developpement, la grille est une lattice de reservation et le placement greedy n'est pas un solveur de remplissage. P18 recadre donc les prochains travaux comme architecture produit : plan de boite, intentions, modules, reservations, variantes et UX de composition. Aucun moteur, schema public ou comportement Fusion n'est modifie.
+
+## P18-M002 - UX produit cible
+
+Statut : done-docs. UX_PRODUCT_VISION.md definit six ecrans de la boite a l'export et confirme que la commande Fusion classique reste un outil de smoke/dev, non l'UX finale.

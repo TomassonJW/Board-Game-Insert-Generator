@@ -326,3 +326,8 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 - C-PRODUCT-VISION : `designed` par l'audit d'ecart; la boite complete, les intentions, reservations, variantes et l'edition de layout sont identifies comme le prochain niveau de produit.
 - C-FUSION-UI : son statut d'adaptateur valide reste inchange; `quick_asset_box` est explicitement une UI de test/developpement, non l'UX finale.
 - C-SOLVER / C-GRID-3D : les heuristiques locales et la lattice de reservation restent valides comme fondation, mais ne sont pas un remplissage intelligent global.
+
+## P18-M002 capability update
+
+- C-FUSION-UI : UX cible definie; commande classique = dev/smoke, palette persistante/app = prochaines surfaces possibles sous gate.
+- C-ASSET / C-SOLVER : inventaire et variantes deviennent les objets UX principaux, sans changement de code.
