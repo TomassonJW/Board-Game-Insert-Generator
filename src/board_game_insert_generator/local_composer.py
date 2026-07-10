@@ -103,6 +103,89 @@ def starter_draft() -> dict[str, object]:
     }
 
 
+def starter_catalog() -> list[dict[str, object]]:
+    """Return bounded local-only project starters; no remote library is involved."""
+
+    mixed = starter_draft()
+    card_game = {
+        "schema_version": LOCAL_COMPOSER_SCHEMA_V0,
+        "project_name": "Mon jeu de cartes",
+        "box": {
+            "inner_dimensions_mm": {"x": 190.0, "y": 130.0, "z": 55.0},
+            "usable_height_mm": 51.0,
+            "lid_clearance_mm": 2.0,
+        },
+        "assets": [
+            _starter_asset("cards", "Cartes", "cards", 110, 64.0, 89.0, 24.0, "protect"),
+            _starter_asset("tokens", "Marqueurs", "tokens", 40, 18.0, 18.0, 5.0, "store"),
+        ],
+        "layers": [{"id": "base", "origin_z_mm": 0.0, "height_mm": 51.0, "role": "storage"}],
+        "reservations": [],
+        "manual_modules": [],
+        "candidates": [
+            _starter_candidate("card-tray", "Bac cartes", 76.0, 100.0, 30.0, "base", ["cards"]),
+            _starter_candidate("token-tray", "Bac marqueurs", 60.0, 50.0, 20.0, "base", ["tokens"]),
+        ],
+        "preference": "accessible",
+    }
+    board_game = {
+        "schema_version": LOCAL_COMPOSER_SCHEMA_V0,
+        "project_name": "Ma boite avec plateau",
+        "box": {
+            "inner_dimensions_mm": {"x": 280.0, "y": 200.0, "z": 70.0},
+            "usable_height_mm": 66.0,
+            "lid_clearance_mm": 2.0,
+        },
+        "assets": [
+            _starter_asset("cards", "Cartes", "cards", 90, 64.0, 89.0, 22.0, "protect"),
+            _starter_asset("tokens", "Jetons", "tokens", 100, 18.0, 18.0, 5.0, "store"),
+            _starter_asset("dice", "Des", "dice", 12, 16.0, 16.0, 16.0, "store"),
+        ],
+        "layers": [
+            {"id": "base", "origin_z_mm": 0.0, "height_mm": 42.0, "role": "storage"},
+            {"id": "top", "origin_z_mm": 42.0, "height_mm": 24.0, "role": "board"},
+        ],
+        "reservations": [
+            {
+                "id": "board",
+                "kind": "board",
+                "origin_mm": {"x": 0.0, "y": 0.0, "z": 42.0},
+                "size_mm": {"x": 280.0, "y": 200.0, "z": 20.0},
+                "layer_id": "top",
+            }
+        ],
+        "manual_modules": [],
+        "candidates": [
+            _starter_candidate("card-tray", "Bac cartes", 80.0, 110.0, 30.0, "base", ["cards"]),
+            _starter_candidate("token-tray", "Bac jetons", 70.0, 70.0, 24.0, "base", ["tokens"]),
+            _starter_candidate("dice-tray", "Bac des", 55.0, 55.0, 24.0, "base", ["dice"]),
+        ],
+        "preference": "balanced",
+    }
+    return [
+        {
+            "id": "mixed-box",
+            "title": "Boite mixte",
+            "description": "Cartes, jetons, des et livret dans une boite classique.",
+            "highlights": ["Cartes", "Jetons", "Livret"],
+            "draft": mixed,
+        },
+        {
+            "id": "card-game",
+            "title": "Jeu de cartes",
+            "description": "Un point de depart compact pour un deck et ses marqueurs.",
+            "highlights": ["Cartes", "Petit volume", "Sans reservation"],
+            "draft": card_game,
+        },
+        {
+            "id": "board-game",
+            "title": "Plateau et accessoires",
+            "description": "Une grande boite avec plateau protege et bacs de base.",
+            "highlights": ["Plateau", "Cartes", "Des"],
+            "draft": board_game,
+        },
+    ]
+
 def portfolio_from_draft(raw_draft: object) -> dict[str, object]:
     """Build P21 output from a UI draft without mutating it or writing files."""
 
@@ -467,6 +550,8 @@ class LocalComposerRequestHandler(BaseHTTPRequestHandler):
             self._send_json(HTTPStatus.OK, {"status": "ok", "schema_version": LOCAL_COMPOSER_SCHEMA_V0})
         elif route == "/api/starter":
             self._send_json(HTTPStatus.OK, {"draft": starter_draft()})
+        elif route == "/api/starters":
+            self._send_json(HTTPStatus.OK, {"starters": starter_catalog()})
         else:
             self._send_error(HTTPStatus.NOT_FOUND, "NOT_FOUND", "Unknown local composer route.")
 

@@ -71,6 +71,13 @@ export interface ComposerDraft {
   candidates: CandidateDraft[]
   preference: 'balanced' | 'compact' | 'accessible' | 'print_simple'
 }
+export interface StarterTemplate {
+  id: string
+  title: string
+  description: string
+  highlights: string[]
+  draft: ComposerDraft
+}
 
 export interface EngineModule {
   id: string

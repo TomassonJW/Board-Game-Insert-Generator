@@ -944,3 +944,12 @@ Le Studio local accepte maintenant une selection explicite de plusieurs assets p
 Le moteur reste la source de verite : la prevalidation est une aide ergonomique qui ne recalcule ni score ni placement. Le contrat `bgig.local_composer.v0` est inchange. Preuves : build Vite, verification comportementale du module TypeScript et regression Python qui confirme les allocations multi-assets dans le plan P21 resolu.
 
 Limites : l inspection navigateur reste a rejouer dans un runtime non bloque par le sandbox Windows ; les templates de demarrage, la persistence avancee, Fusion et les validations physiques restent hors P24. Prochaine mission ready : `P25-M001 - Demarrage guide par modele de jeu`.
+## P25 - Demarrage guide par modele de jeu
+
+Statut : `done`, `implemented-local-ui`, `implemented-loopback-adapter`, `print-validated: false`.
+
+Le Studio propose trois points de depart locaux : boite mixte, jeu de cartes et boite avec plateau. Chaque carte explique le cas vise et charge un draft V0 independant en memoire ; le projet courant reste exportable par le navigateur et aucun catalogue distant n est consulte. L endpoint loopback `/api/starters` reste borne a localhost et expose le meme contrat de draft que l edition manuelle.
+
+Preuves : les trois drafts passent par P21 avec une recommandation, les tests Python couvrent le catalogue et l endpoint, la recette HTTP verifie catalogue, CORS, UI servie et generation. Le runtime navigateur de recette est bloque par le sandbox Windows avant ouverture, donc l inspection visuelle reste a rejouer ailleurs.
+
+Limites : ces modeles sont des hypotheses locales a mesurer et ajuster ; aucune bibliotheque partagee, sauvegarde serveur, Fusion, impression ou ergonomie physique n est validee. Prochaine mission ready : `P26-M001 - Resume de preparation avant generation`.

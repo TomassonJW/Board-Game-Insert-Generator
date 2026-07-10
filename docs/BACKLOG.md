@@ -1266,4 +1266,20 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - Dependances : P24-M001 termine.
 - Hors scope : cloud, compte utilisateur, collaboration, persistence serveur, Fusion, export imprimable ou IA generative.
 - Gate : aucune si les templates restent des drafts V0 locaux et versionnes ; ADR requise si une bibliotheque distante ou un format incompatible est introduit.
+- Statut : `done`, `implemented-local-ui`, `implemented-loopback-adapter`, `print-validated: false`.
+
+### P25-M001 - Resultat
+
+- Livrables : catalogue local borne de trois drafts V0, endpoint loopback `/api/starters`, cartes de demarrage dans le Studio et chargement explicite en memoire.
+- Preuves : chaque modele produit une recommandation P21 ; tests Python et recette HTTP/CORS locale passent.
+- Decision : aucun catalogue distant, compte, telemetrie, IA, persistence serveur ou schema incompatible.
+
+### P26-M001 - Resume de preparation avant generation
+
+- Capability : C-PRODUCT-VISION, C-QUALITY, C-SOLVER.
+- Milestone : M14 Usable beta.
+- Objectif : rendre les mesures, allocations, contraintes et limites P21 visibles dans un resume novice avant la generation, sans nouveau score ni solveur.
+- Dependances : P25-M001 termine.
+- Hors scope : moteur de recommendation nouveau, optimisation globale, Fusion, export imprimable, cloud ou donnees utilisateur.
+- Gate : aucune si le resume derive seulement du draft local et des sorties moteur existantes ; ADR requise si une nouvelle logique de decision est introduite.
 - Statut : `ready`.

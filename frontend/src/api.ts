@@ -1,4 +1,4 @@
-import type { ComposerDraft, ExportBundle, Portfolio } from './types'
+import type { ComposerDraft, ExportBundle, Portfolio, StarterTemplate } from './types'
 
 const apiBase = import.meta.env.VITE_BGIG_API_URL ?? 'http://127.0.0.1:8001/api'
 
@@ -20,9 +20,9 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   return payload as T
 }
 
-export async function loadStarter(): Promise<ComposerDraft> {
-  const result = await request<{ draft: ComposerDraft }>('/starter')
-  return result.draft
+export async function loadStarters(): Promise<StarterTemplate[]> {
+  const result = await request<{ starters: StarterTemplate[] }>('/starters')
+  return result.starters
 }
 
 export async function generatePortfolio(draft: ComposerDraft): Promise<Portfolio> {

@@ -197,3 +197,6 @@ Statut : `done`, `implemented-local-ui`, `implemented-loopback-adapter`, `print-
 ## P24 project quality - 2026-07-10
 
 Statut : `done`, `implemented-local-ui`, `implemented-validation`, `print-validated: false`. L app locale permet une allocation explicite de plusieurs assets par module et intercepte les erreurs de draft avant l appel moteur. L import est structurellement filtre, le moteur reste autoritaire et le schema V0 reste compatible. P25 doit rendre le demarrage plus guide avec des templates locaux, sans cloud ni nouveau solveur.
+## P25 guided starters - 2026-07-10
+
+Statut : `done`, `implemented-local-ui`, `implemented-loopback-adapter`, `print-validated: false`. Le Studio presente trois drafts V0 locaux et verifies pour demarrer un jeu de cartes, une boite mixte ou une boite avec plateau. Chaque modele traverse l adaptateur Python et P21 ; aucun catalogue distant, compte, stockage serveur, IA ou nouveau solveur n est ajoute. P26 doit rendre les mesures et limites visibles avant generation.

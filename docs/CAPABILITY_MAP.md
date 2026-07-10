@@ -419,3 +419,10 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - C-ASSET : `implemented-local-ui` pour plusieurs assets explicitement associes a un module ; doublons et assets inconnus sont signales avant moteur.
 - C-QUALITY : `implemented-validation` pour import structurel, prevalidation pure TypeScript, build frontend et regression moteur multi-assets.
 - C-SOLVER / C-CAD-IR / C-FUSION-UI : inchanges ; P24 ne modifie ni placement, ni projection CAD, ni Fusion.
+
+## P25 guided starters update
+
+- C-PRODUCT-VISION : `implemented-local-ui` pour trois points de depart explicites et remplaçables, sans imposer un JSON brut au premier usage.
+- C-ASSET : les templates expliquent des cas cartes, jetons, des et reservation plateau avec des dimensions ajustables.
+- C-QUALITY : catalogue borne, drafts V0 resolus par P21 et route loopback CORS couverts par tests et recette HTTP.
+- C-SOLVER / C-CAD-IR / C-FUSION-UI : inchanges ; les templates sont des entrees du moteur existant, pas une nouvelle logique de decision.

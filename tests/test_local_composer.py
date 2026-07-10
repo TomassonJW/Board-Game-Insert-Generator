@@ -12,6 +12,7 @@ from board_game_insert_generator.local_composer import (
     create_local_composer_server,
     export_from_draft,
     portfolio_from_draft,
+    starter_catalog,
     starter_draft,
 )
 
@@ -26,6 +27,12 @@ class LocalComposerTests(unittest.TestCase):
         self.assertIsNotNone(first["recommended_variant_id"])
         self.assertTrue(first["variants"])
         self.assertTrue(all(item["status"] == "solved" for item in first["variants"]))
+
+    def test_starter_catalog_contains_solved_local_examples(self) -> None:
+        starters = starter_catalog()
+
+        self.assertEqual([starter["id"] for starter in starters], ["mixed-box", "card-game", "board-game"])
+        self.assertTrue(all(portfolio_from_draft(starter["draft"])["recommended_variant_id"] for starter in starters))
 
     def test_export_carries_an_explicit_selection_in_cad_ir_without_materialization(self) -> None:
         bundle = export_from_draft(starter_draft())
@@ -78,6 +85,12 @@ class LocalComposerTests(unittest.TestCase):
             self.assertEqual(response.status, 200)
             self.assertEqual(response.getheader("Access-Control-Allow-Origin"), "http://127.0.0.1:5173")
             self.assertEqual(health["schema_version"], LOCAL_COMPOSER_SCHEMA_V0)
+
+            connection.request("GET", "/api/starters")
+            response = connection.getresponse()
+            starters = json.loads(response.read())
+            self.assertEqual(response.status, 200)
+            self.assertEqual(len(starters["starters"]), 3)
 
             payload = json.dumps(starter_draft()).encode("utf-8")
             connection.request(

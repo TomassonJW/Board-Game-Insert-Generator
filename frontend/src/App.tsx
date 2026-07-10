@@ -1,5 +1,5 @@
 import { type ChangeEvent, useEffect, useMemo, useState } from 'react'
-import { ApiError, createExport, generatePortfolio, loadStarter } from './api'
+import { ApiError, createExport, generatePortfolio, loadStarters } from './api'
 import { isComposerDraft, type DraftIssue, validateDraft } from './validation'
 import type {
   AssetDraft,
@@ -9,6 +9,7 @@ import type {
   EngineModule,
   Portfolio,
   ReservationDraft,
+  StarterTemplate,
   Variant,
 } from './types'
 
@@ -31,12 +32,16 @@ export default function App() {
   const [message, setMessage] = useState('Chargement du projet de départ…')
   const [error, setError] = useState<string>()
   const [issues, setIssues] = useState<DraftIssue[]>([])
+  const [starters, setStarters] = useState<StarterTemplate[]>([])
+  const [showStarterPicker, setShowStarterPicker] = useState(false)
 
   useEffect(() => {
-    void loadStarter()
-      .then((value) => {
-        setDraft(value)
-        setMessage('Projet de départ chargé. Modifie les données, puis génère des propositions.')
+    void loadStarters()
+      .then((catalog) => {
+        if (!catalog.length) throw new Error('Aucun modele local est disponible.')
+        setStarters(catalog)
+        setDraft(cloneDraft(catalog[0].draft))
+        setMessage('Projet de depart charge. Modifie les donnees, puis genere des propositions.')
       })
       .catch((reason: unknown) => setError(formatError(reason)))
   }, [])
@@ -99,6 +104,16 @@ export default function App() {
     setPortfolio(undefined)
     setSelectedVariantId(undefined)
     setIssues([])
+  }
+
+  function chooseStarter(starter: StarterTemplate) {
+    setDraft(cloneDraft(starter.draft))
+    setPortfolio(undefined)
+    setSelectedVariantId(undefined)
+    setIssues([])
+    setError(undefined)
+    setShowStarterPicker(false)
+    setMessage(`Modele \u00ab ${starter.title} \u00bb charge. Ajuste les mesures reelles avant de generer.`)
   }
 
   function updateAsset(index: number, update: Partial<AssetDraft>) {
@@ -182,11 +197,14 @@ export default function App() {
       <header className="topbar">
         <div className="brand"><span className="brand-mark">B</span><span>BGIG <strong>Studio</strong></span></div>
         <div className="topbar-actions">
+          <button className="button secondary" onClick={() => setShowStarterPicker((visible) => !visible)} disabled={!starters.length}>{'Choisir un mod\u00e8le'}</button>
           <label className="button secondary"><span>Importer un projet</span><input type="file" accept="application/json" onChange={importDraft} /></label>
           <button className="button secondary" onClick={() => downloadJson(`${safeFileName(draft.project_name)}-draft.json`, draft)}>Sauvegarder le projet</button>
           <button className="button primary" onClick={() => void handleGenerate()} disabled={busy}>Générer les propositions</button>
         </div>
       </header>
+
+      {showStarterPicker && <section className="starter-gallery" aria-label="Modeles de demarrage"><div className="starter-gallery-heading"><div><p className="eyebrow">Choisir un point de depart</p><h2>{'Pars d un mod\u00e8le, puis mesure ta vraie bo\u00eete'}</h2><p>Chaque modele est local, modifiable et reste une hypothese a verifier dans ta boite.</p></div><button className="text-button" onClick={() => setShowStarterPicker(false)}>Fermer</button></div><div className="starter-grid">{starters.map((starter) => <article key={starter.id} className="starter-card"><h3>{starter.title}</h3><p>{starter.description}</p><div className="starter-highlights">{starter.highlights.map((highlight) => <span key={highlight}>{highlight}</span>)}</div><button className="button secondary" onClick={() => chooseStarter(starter)}>{'Utiliser ce mod\u00e8le'}</button></article>)}</div></section>}
 
       <section className="hero">
         <div>
@@ -308,6 +326,10 @@ function TextInput({ value, onChange }: { value: string; onChange: (value: strin
 
 function NumberInput({ value, onChange }: { value: number; onChange: (value: number) => void }) {
   return <input type="number" min="0" step="0.1" value={Number.isFinite(value) ? value : 0} onChange={(event) => onChange(Number(event.target.value))} />
+}
+
+function cloneDraft(draft: ComposerDraft): ComposerDraft {
+  return JSON.parse(JSON.stringify(draft)) as ComposerDraft
 }
 
 function newAsset(index: number): AssetDraft {
