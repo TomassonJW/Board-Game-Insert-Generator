@@ -95,7 +95,18 @@ def solve_box_fill_greedy(request: BoxFillSolveRequest) -> BoxFillSolveResult:
             continue
         placement = _first_placement(plan, placed_modules, candidate, layers, orientations)
         if placement is None:
-            code = "no_layer_with_sufficient_height" if not any(candidate.size.z <= layer.height_mm for layer in plan.layers if layer.id in layers) else "no_free_rectangle_fits"
+            if candidate.size.x > plan.box.inner_dimensions.x and candidate.size.y > plan.box.inner_dimensions.y:
+                code = "module_larger_than_box"
+            elif not any(candidate.size.z <= layer.height_mm for layer in plan.layers if layer.id in layers):
+                code = "no_layer_with_sufficient_height"
+            elif not candidate.allow_xy_rotation and _first_placement(plan, placed_modules, candidate, layers, (("rotated_90_z", Dimension3D(candidate.size.y, candidate.size.x, candidate.size.z)),)) is not None:
+                code = "rotation_required_but_forbidden"
+            elif plan.reservations:
+                code = "blocked_by_reservation"
+            elif any(module.locked for module in placed_modules):
+                code = "blocked_by_locked_module"
+            else:
+                code = "no_free_rectangle_fits"
             diagnostics.append(_diagnostic(candidate, code, "placement", "No valid deterministic AABB position was found without moving locked/manual modules or reservations.", layers, tuple(name for name, _ in orientations), "Choose a compatible layer, reduce the candidate footprint, allow XY rotation, or free space."))
             continue
         placed_modules.append(BoxFillModule(candidate.module_id, candidate.name, placement.origin, placement.size, orientation=placement.orientation, locked=False, manual=False, printable=True, layer_id=placement.layer_id, source=candidate.source, metadata={**candidate.metadata, "solver_policy": request.policy, "auto_placed": True}))
