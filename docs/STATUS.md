@@ -909,3 +909,6 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P19 est 
 ## P20 completion - 2026-07-10
 
 Statut : `done`, `implemented-core`, `implemented-cli`, `implemented-cad-ir-metadata`. Le moteur `box_fill_greedy_2d.v0` produit un nouveau BoxFillPlan sans muter la source, respecte locks, modules manuels, reservations et layers, supporte la rotation XY 90 degres et expose diagnostics, digest, metrics, rapports JSON/Markdown, preview SVG et metadata CAD IR. Aucun backtracking, solveur global, UI persistante, geometrie Fusion ou validation d impression n est ajoute. P21 reste gate et recommande les variantes/scoring.
+## P20 product acceptance - 2026-07-10
+
+Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est accepte comme premier placement automatique deterministe de BoxFillPlan. Il reste hors Fusion, sans solveur global ni validation d impression (`print_validated: false`). La gate P21 variants est levee; ADR-0036 UI reste distincte.
