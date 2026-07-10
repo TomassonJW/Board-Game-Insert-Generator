@@ -4,21 +4,20 @@ Derniere mise a jour : 2026-07-10
 
 ## Politique active - Integration Git autonome
 
-Statut : `active`. Les missions non gatees restent testees, committeees puis integrees directement dans `main`.
+Statut : `active` pour les missions non gatees. Les missions Fusion et physiques restent soumises aux gates documentees.
 
 ## Etat courant
 
-P19 a P21 donnent les contrats et propositions moteur. P22 a P26 livrent une surface locale testable : composition, export explicite, import robuste, allocations multi-assets, demarrage guide et resume de preparation. Fusion reste un adaptateur CAD/export futur.
+P19 a P21 donnent les contrats et propositions moteur. P22 a P27 livrent une surface locale testable : composition, import/export, allocations, demarrage guide, preparation et explication des compromis. Fusion reste un adaptateur CAD/export futur.
 
 ## Gate humaine active
 
-- L option D est approuvee : React/Vite local + adaptateur Python loopback, formalises par ADR-0040.
-- Toute materialisation Fusion d une selection locale reste une gate distincte.
-- Une impression, un slicer ou une promesse ergonomique physique restent des gates physiques distinctes.
+`P28-GATE - Materialiser une selection locale dans Fusion` est maintenant la seule prochaine etape utile, mais elle est bloquee par une vraie validation humaine :
 
-## Premiere mission ready
-
-`P27-M001 - Explication des compromis de proposition` : traduire les sorties P21 existantes en choix lisibles, sans modifier le moteur.
+- autoriser ou non un scope borne qui charge une CAD IR de selection P21 dans le pipeline Fusion existant ;
+- conserver le moteur Python comme source de verite, sans recalcul Fusion ;
+- accepter qu un smoke test humain Fusion soit obligatoire avant tout statut `fusion-validated` ;
+- ne pas franchir la gate impression, slicer ou export imprimable automatique.
 
 ## Hors scope maintenu
 
@@ -26,6 +25,9 @@ P19 a P21 donnent les contrats et propositions moteur. P22 a P26 livrent une sur
 - Fusion ne devient jamais source de verite du plan.
 - Aucune validation d impression, de slicer ou d ergonomie reelle n est revendiquee.
 
+## Reprise apres validation
+
+Si P28 est autorisee, preparer le smoke local, installer l add-in via les scripts existants, generer une CAD IR de selection et ne laisser a Thomas que les actions observables dans Fusion.
 ## Fin de chaque mission
 
-Appliquer direct-to-main : tests pertinents, `git diff --check`, commit atomique, integration et push de `main`, puis reprise propre.
+Appliquer direct-to-main pour tout lot non gate : tests pertinents, `git diff --check`, commit atomique, integration et push de `main`. Pour P28, arreter avant toute mutation Fusion jusqu a validation humaine explicite.

@@ -961,3 +961,11 @@ Statut : `done`, `implemented-local-ui`, `implemented-validation`, `print-valida
 Avant de lancer P21, le Studio affiche maintenant un resume derive du draft : nombre d assets, allocations candidates, modules, reservations, layers et corrections restantes. Un etat pret ou a completer est explicite et la section rappelle que cette lecture ne remplace ni le moteur, ni une mesure reelle, ni une validation d impression, d ergonomie ou Fusion.
 
 Preuves : build Vite et verification comportementale TypeScript pour un draft pret puis une allocation manquante. Le resume utilise `validateDraft` et ne cree aucun score ou placement nouveau. Inspection navigateur toujours a rejouer hors sandbox Windows. Prochaine mission ready : `P27-M001 - Explication des compromis de proposition`.
+
+## P27 - Explication des compromis de proposition
+
+Statut : `done`, `implemented-local-ui`, `print-validated: false`.
+
+Les cartes P21 presentent desormais une intention lisible, le cas dans lequel choisir la variante, le compromis a surveiller et une explication courte de chaque sous-score. Les raisons techniques brutes restent accessibles par divulgation progressive pour les utilisateurs experts et dans les exports, mais ne sont plus le premier message pour un debutant. Les policies, scores, recommendation et solveur restent strictement inchanges.
+
+Preuves : build Vite et verification TypeScript des cinq policies bornees, des explications de scores et du fallback. Inspection navigateur toujours a rejouer hors sandbox Windows. La prochaine etape n est pas autonome : `P28-GATE`, materialisation Fusion d une selection, exige une validation humaine et un smoke Fusion reel.

@@ -204,3 +204,7 @@ Statut : `done`, `implemented-local-ui`, `implemented-loopback-adapter`, `print-
 ## P26 generation readiness - 2026-07-10
 
 Statut : `done`, `implemented-local-ui`, `implemented-validation`, `print-validated: false`. Le Studio derive un resume novice de la saisie locale : assets, allocations, candidats, reservations, layers et corrections. Il ne recalcule pas P21 et ne promet aucune validation physique. P27 doit rendre les compromis des sorties P21 encore plus lisibles sans modifier leur calcul.
+
+## P27 proposal explanations - 2026-07-10
+
+Statut : `done`, `implemented-local-ui`, `print-validated: false`. Les sorties P21 sont traduites en intention, cas de choix, compromis et sous-scores lisibles, avec trace moteur progressive. Aucun calcul P21 ne change. Le prochain jalon est P28, gate humaine obligatoire avant materialisation Fusion d une selection explicite.

@@ -1,6 +1,7 @@
 import { type ChangeEvent, useEffect, useMemo, useState } from 'react'
 import { ApiError, createExport, generatePortfolio, loadStarters } from './api'
 import { isComposerDraft, type DraftIssue, summarizeDraft, validateDraft } from './validation'
+import { proposalExplanation, scoreExplanation } from './proposal_copy'
 import type {
   AssetDraft,
   CandidateDraft,
@@ -284,7 +285,8 @@ export default function App() {
 }
 
 function VariantCard({ variant, active, onSelect }: { variant: Variant; active: boolean; onSelect: () => void }) {
-  return <article className={`variant-card ${active ? 'active' : ''}`}><div className="variant-card-header"><div><span className={`pill ${variant.recommended ? 'recommended' : ''}`}>{variant.recommended ? 'Recommandée' : variant.pareto ? 'Pareto' : 'Alternative'}</span><h3>{policyLabel(variant.policy_id)}</h3></div><button className="select-button" onClick={onSelect}>{active ? 'Sélectionnée' : 'Choisir'}</button></div><LayoutPreview variant={variant} /><div className="score-line"><strong>{formatScore(variant.weighted_score)}</strong><span>score pondéré</span></div><div className="score-grid">{Object.entries(variant.subscores).map(([key, score]) => <div key={key}><span>{scoreLabels[key] ?? key}</span><meter min="0" max="1" value={score} /><b>{formatScore(score)}</b></div>)}</div><p className="reason">{variant.reasons[0]}</p></article>
+  const explanation = proposalExplanation(variant.policy_id)
+  return <article className={`variant-card ${active ? 'active' : ''}`}><div className="variant-card-header"><div><span className={`pill ${variant.recommended ? 'recommended' : ''}`}>{variant.recommended ? 'Recommand\u00e9e' : variant.pareto ? 'Pareto' : 'Alternative'}</span><h3>{explanation.title}</h3></div><button className="select-button" onClick={onSelect}>{active ? 'Selectionn\u00e9e' : 'Choisir'}</button></div><p className="variant-intent">{explanation.intent}</p><LayoutPreview variant={variant} /><div className="variant-advice"><div><strong>{'A choisir si'}</strong><span>{explanation.choose_if}</span></div><div><strong>{'A surveiller'}</strong><span>{explanation.watch_for}</span></div></div><div className="score-line"><strong>{formatScore(variant.weighted_score)}</strong><span>score selon ta preference</span></div><div className="score-grid">{Object.entries(variant.subscores).map(([key, score]) => <div key={key}><span>{scoreLabels[key] ?? key}</span><small>{scoreExplanation(key)}</small><meter min="0" max="1" value={score} /><b>{formatScore(score)}</b></div>)}</div><details className="engine-note"><summary>Trace technique du moteur</summary><ul>{variant.reasons.map((reason) => <li key={reason}>{reason}</li>)}</ul></details></article>
 }
 
 function LayoutPreview({ variant }: { variant: Variant }) {
@@ -372,7 +374,6 @@ function formatError(reason: unknown) {
   }
   return reason instanceof Error ? reason.message : 'Une erreur inconnue est survenue.'
 }
-function policyLabel(policy: string) { return ({ compact_origin: 'Volume compact', preserve_large_free_region: 'Grand espace libre', accessibility_front: 'Accès frontal', minimal_rotation: 'Rotation minimale', balanced_footprint: 'Empreinte équilibrée' } as Record<string, string>)[policy] ?? policy }
 function preferenceLabel(preference: string) { return ({ balanced: 'Équilibre', compact: 'Compacité', accessible: 'Accès', print_simple: 'Simplicité d’impression' } as Record<string, string>)[preference] ?? preference }
 function kindLabel(kind: AssetDraft['kind']) { return ({ cards: 'Cartes', tokens: 'Jetons', dice: 'Dés', meeples: 'Meeples', other: 'Autre' } as Record<AssetDraft['kind'], string>)[kind] }
 const assetKinds: AssetDraft['kind'][] = ['cards', 'tokens', 'dice', 'meeples', 'other']

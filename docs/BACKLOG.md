@@ -1298,4 +1298,20 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - Dependances : P26-M001 termine.
 - Hors scope : nouveau score, IA, solveur, modele de preference, Fusion, export imprimable ou validation physique.
 - Gate : aucune si le travail reste une presentation des sorties P21 existantes ; ADR requise si la decision moteur change.
-- Statut : `ready`.
+- Statut : `done`, `implemented-local-ui`, `print-validated: false`.
+
+### P27-M001 - Resultat
+
+- Livrables : explications locales de chaque policy P21, aide par sous-score, conseil de choix, compromis et trace technique progressive.
+- Preuves : build Vite et verification comportementale du catalogue de textes/fallbacks.
+- Decision : aucune policy, aucun score, aucune recommendation ou sortie moteur n est modifiee.
+
+### P28-GATE - Materialiser une selection locale dans Fusion
+
+- Capability : C-FUSION-UI, C-CAD-IR, C-PRODUCT-VISION.
+- Milestone : M14 Usable beta.
+- Objectif : decider si une selection P21 explicite peut etre preparee puis chargee dans le pipeline Fusion existant, avec smoke test humain.
+- Dependances : P23 a P27 termines ; CAD IR selectionnee deja exportable sans materialisation.
+- Hors scope : nouveau solveur, changement de tolerance, export imprimable automatique, validation d impression, cloud ou Fusion comme source de verite.
+- Gate : validation humaine obligatoire avant toute implementation ou execution Fusion de la selection ; ADR-0040 et HUMAN_GATES imposent cette pause.
+- Statut : `ready-gated`.

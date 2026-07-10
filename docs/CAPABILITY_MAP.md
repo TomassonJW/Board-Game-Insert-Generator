@@ -432,3 +432,10 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - C-PRODUCT-VISION : `implemented-local-ui` pour une lecture novice de ce qui est pret avant toute proposition.
 - C-QUALITY : `implemented-validation` pour un resume derive des erreurs et allocations existantes, avec verification comportementale TypeScript.
 - C-SOLVER / C-CAD-IR / C-FUSION-UI : inchanges ; P26 ne modifie aucune policy, score, projection ou operation CAD.
+
+## P27 proposal explanations update
+
+- C-PRODUCT-VISION : `implemented-local-ui` pour une comparaison novice des compromis P21 sans masquer la trace technique.
+- C-SOLVER : presentation plus lisible des policies et sous-scores existants ; aucun changement de score, ordre ou recommendation.
+- C-QUALITY : textes explicatifs bornes et fallback verifies par test TypeScript.
+- C-FUSION-UI / C-CAD-IR : inchanges ; P28 reste une gate humaine avant toute materialisation Fusion de selection.
