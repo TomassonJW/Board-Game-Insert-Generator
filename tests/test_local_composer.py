@@ -49,6 +49,22 @@ class LocalComposerTests(unittest.TestCase):
         with self.assertRaisesRegex(LocalComposerError, "known layer"):
             portfolio_from_draft(draft)
 
+    def test_supports_explicit_multi_asset_allocation_in_one_candidate(self) -> None:
+        draft = starter_draft()
+        cards_and_tokens = dict(draft["candidates"][0])
+        cards_and_tokens["asset_ids"] = ["cards", "tokens"]
+        draft["candidates"] = [cards_and_tokens, draft["candidates"][2]]
+
+        portfolio = portfolio_from_draft(draft)
+
+        self.assertIsNotNone(portfolio["recommended_variant_id"])
+        allocation_ids = {
+            allocation["asset_id"]
+            for allocation in portfolio["variants"][0]["solution"]["solved_plan"]["allocations"]
+            if allocation["module_id"] == "card-tray"
+        }
+        self.assertEqual(allocation_ids, {"cards", "tokens"})
+
     def test_loopback_api_serves_only_the_local_composer_contract(self) -> None:
         server = create_local_composer_server(port=0)
         thread = threading.Thread(target=server.serve_forever, daemon=True)

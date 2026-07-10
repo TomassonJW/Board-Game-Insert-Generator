@@ -66,3 +66,12 @@ table { width: 100%; min-width: 820px; border-collapse: collapse; } th { padding
 
 @media (max-width: 880px) { .app-shell { padding: 0 16px 38px; }.topbar { padding: 13px 0; align-items: flex-start; }.topbar-actions { justify-content: flex-start; }.hero { min-height: 0; padding: 33px 26px; align-items: flex-start; flex-direction: column; }.hero-status { white-space: normal; }.split-panel, .constraint-columns { grid-template-columns: 1fr; gap: 24px; }.form-grid { grid-template-columns: repeat(2, 1fr); }.field.wide { grid-column: span 2; }.panel-heading, .export-panel { align-items: flex-start; flex-direction: column; }.compact-top { grid-template-columns: minmax(90px, 1fr) 105px 95px 28px; }.candidate-details { grid-template-columns: 1fr; } }
 @media (max-width: 560px) { .topbar { flex-direction: column; }.topbar-actions { width: 100%; }.button { flex: 1; text-align: center; }.hero { border-radius: 17px; }.panel { padding: 22px 17px; border-radius: 15px; }.form-grid { grid-template-columns: 1fr; }.field.wide { grid-column: auto; }.journey { gap: 11px; }.compact-top { grid-template-columns: 1fr 1fr 28px; }.compact-top .check { grid-column: span 2; }.dimension-editor { grid-template-columns: 60px repeat(3, 1fr); }.export-actions { justify-content: stretch; width: 100%; }.export-actions .button { width: 100%; }.variant-grid { grid-template-columns: 1fr; } }
+.issue-list { display: grid; gap: 6px; margin: 0; padding-left: 18px; }
+.issue-list b { color: #6e1725; }
+.asset-picker { display: grid; gap: 6px; padding: 9px; border: 1px solid #e0e6ef; border-radius: 8px; background: #fff; }
+.asset-picker-heading { display: flex; justify-content: space-between; gap: 8px; color: #53617c; font-size: .74rem; font-weight: 750; }
+.asset-picker-heading small { color: #77849a; font-weight: 600; }
+.asset-option { display: flex; align-items: center; gap: 7px; color: #3d4d6b; font-size: .78rem; }
+.asset-option input { width: auto; }
+.asset-option small { margin-left: auto; color: #9a6b2a; font-size: .69rem; }
+.asset-option.assigned-elsewhere { color: #77849a; }

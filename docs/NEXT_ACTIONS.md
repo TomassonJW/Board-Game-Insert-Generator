@@ -8,17 +8,17 @@ Statut : `active`. Les missions non gatees restent testees, committeees puis int
 
 ## Etat courant
 
-P19, P20 et P21 sont termines dans le moteur Python pur. P22 est accepte et P23 livre le premier parcours local executable : boite -> assets -> contraintes -> variantes -> selection -> export. Fusion reste un adaptateur CAD/export futur.
+P19 a P21 donnent les contrats et propositions moteur. P22 a P24 livrent une surface locale testable : composition, export explicite, import robuste, prevalidation et allocations multi-assets. Fusion reste un adaptateur CAD/export futur.
 
 ## Gate humaine active
 
-- L option D a ete approuvee le 2026-07-10 : React/Vite local + adaptateur Python loopback, formalises par ADR-0040.
-- Toute materialisation Fusion d une selection P23 reste une gate distincte.
+- L option D est approuvee : React/Vite local + adaptateur Python loopback, formalises par ADR-0040.
+- Toute materialisation Fusion d une selection locale reste une gate distincte.
 - Une impression, un slicer ou une promesse ergonomique physique restent des gates physiques distinctes.
 
 ## Premiere mission ready
 
-`P24-M001 - Qualite du projet local` : rendre l edition des allocations multi-assets, les erreurs de saisie et la recuperation de projet plus explicites, sans ajouter de moteur, de materialisation Fusion ou de persistence serveur.
+`P25-M001 - Demarrage guide par modele de jeu` : offrir plusieurs points de depart locaux lisibles afin qu un debutant puisse se projeter sans manipuler un JSON brut.
 
 ## Hors scope maintenu
 

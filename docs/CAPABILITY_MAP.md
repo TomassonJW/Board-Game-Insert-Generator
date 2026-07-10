@@ -413,3 +413,9 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - C-CAD-IR : `implemented-cad-ir-metadata` pour l export d une selection P21 explicite ; aucune materialisation n est autorisee.
 - C-FUSION-UI : inchangee. Fusion reste l adaptateur futur et la commande actuelle conserve son role de smoke/export.
 - C-QUALITY : contrat HTTP loopback, validation stricte du draft, CORS borne et build frontend couverts ; inspection visuelle navigateur a rejouer lorsque le runtime local est disponible.
+## P24 project quality update
+
+- C-PRODUCT-VISION : `implemented-local-ui` pour une edition qui explique les erreurs avant generation, sans seconde logique de planification.
+- C-ASSET : `implemented-local-ui` pour plusieurs assets explicitement associes a un module ; doublons et assets inconnus sont signales avant moteur.
+- C-QUALITY : `implemented-validation` pour import structurel, prevalidation pure TypeScript, build frontend et regression moteur multi-assets.
+- C-SOLVER / C-CAD-IR / C-FUSION-UI : inchanges ; P24 ne modifie ni placement, ni projection CAD, ni Fusion.

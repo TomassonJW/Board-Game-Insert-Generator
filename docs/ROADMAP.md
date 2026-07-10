@@ -194,3 +194,6 @@ Statut : `done-docs`, gate ADR-0036 active. Le rapport `docs/P22_UX_SURFACE_GATE
 ## P23 local composer - 2026-07-10
 
 Statut : `done`, `implemented-local-ui`, `implemented-loopback-adapter`, `print-validated: false`. La validation humaine de l option D est materialisee par ADR-0040 : une app React/Vite locale pilote un adaptateur Python loopback qui convertit un draft versionne en contrats moteur P20/P21 et en CAD IR metadata-ready. Le parcours boite -> assets -> reservations -> variantes -> selection -> export est utilisable sans Fusion. Aucune logique de solveur n est dupliquee dans TypeScript, aucune persistence serveur, materialisation Fusion ou validation d impression n est ajoutee. Prochaine mission : P24-M001, qualite des editions locales et erreurs actionnables.
+## P24 project quality - 2026-07-10
+
+Statut : `done`, `implemented-local-ui`, `implemented-validation`, `print-validated: false`. L app locale permet une allocation explicite de plusieurs assets par module et intercepte les erreurs de draft avant l appel moteur. L import est structurellement filtre, le moteur reste autoritaire et le schema V0 reste compatible. P25 doit rendre le demarrage plus guide avec des templates locaux, sans cloud ni nouveau solveur.

@@ -1251,4 +1251,19 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - Dependances : P23-M001 termine.
 - Hors scope : nouveau solveur, persistence serveur, cloud, collaboration, Fusion ou export imprimable.
 - Gate : aucune nouvelle gate architecturale si le contrat `bgig.local_composer.v0` reste retrocompatible ; ADR obligatoire si le format change de maniere incompatible.
+- Statut : `done`, `implemented-local-ui`, `implemented-validation`, `print-validated: false`.
+### P24-M001 - Resultat
+
+- Livrables : prevalidation pure TypeScript, import structurel, liste d erreurs actionnables, associations multi-assets par checkboxes et blocage visuel des doublons.
+- Preuves : build Vite, verification comportementale isolee du module TypeScript et test Python de serialisation multi-assets dans le portefeuille P21.
+- Decision : aucun changement du schema `bgig.local_composer.v0`, du moteur ou de l architecture ; la prevalidation reste une aide UI et le moteur reste autoritaire.
+
+### P25-M001 - Demarrage guide par modele de jeu
+
+- Capability : C-PRODUCT-VISION, C-ASSET, C-QUALITY.
+- Milestone : M14 Usable beta.
+- Objectif : proposer des points de depart locaux comprehensibles (cartes, jeu mixte, boite avec plateau), sans base distante ni nouveau solveur.
+- Dependances : P24-M001 termine.
+- Hors scope : cloud, compte utilisateur, collaboration, persistence serveur, Fusion, export imprimable ou IA generative.
+- Gate : aucune si les templates restent des drafts V0 locaux et versionnes ; ADR requise si une bibliotheque distante ou un format incompatible est introduit.
 - Statut : `ready`.

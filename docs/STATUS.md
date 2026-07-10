@@ -935,3 +935,12 @@ Securite et frontieres : l API est standard-library, liee a `127.0.0.1`/`localho
 Preuves locales : tests `test_local_composer.py` (draft deterministe, export, erreurs de schema, HTTP/CORS), build React/Vite et recette loopback `starter -> portefeuille -> selection -> CAD IR` passes. La recette visuelle automatisee par navigateur n a pas pu etre executee car le runtime navigateur local a ete bloque par le sandbox Windows avant ouverture ; cela ne remet pas en cause les preuves HTTP/build mais reste une verification visuelle a refaire dans un environnement navigateur disponible.
 
 Limites : les scores restent des proxies P21, une impression/ergonomie physique n est pas validee, Fusion ne consomme pas encore la selection P23 et le draft V0 ne propose pas encore une edition UX complete des allocations multi-assets. Prochaine mission ready : `P24-M001 - Qualite du projet local`.
+## P24 - Qualite du projet local
+
+Statut : `done`, `implemented-local-ui`, `implemented-validation`, `print-validated: false`.
+
+Le Studio local accepte maintenant une selection explicite de plusieurs assets par module candidat. Une allocation deja choisie dans un autre module est lisible et bloquee dans l interface. Avant chaque generation, une prevalidation pure TypeScript affiche les erreurs actionnables : dimensions, quantites, layers, IDs, enums, allocations absentes, inconnues ou dupliquees. L import refuse les fichiers qui ne respectent pas la structure V0 avant de les afficher, puis liste les corrections metier restantes.
+
+Le moteur reste la source de verite : la prevalidation est une aide ergonomique qui ne recalcule ni score ni placement. Le contrat `bgig.local_composer.v0` est inchange. Preuves : build Vite, verification comportementale du module TypeScript et regression Python qui confirme les allocations multi-assets dans le plan P21 resolu.
+
+Limites : l inspection navigateur reste a rejouer dans un runtime non bloque par le sandbox Windows ; les templates de demarrage, la persistence avancee, Fusion et les validations physiques restent hors P24. Prochaine mission ready : `P25-M001 - Demarrage guide par modele de jeu`.

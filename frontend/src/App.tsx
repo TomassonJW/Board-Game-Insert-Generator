@@ -1,5 +1,6 @@
 import { type ChangeEvent, useEffect, useMemo, useState } from 'react'
 import { ApiError, createExport, generatePortfolio, loadStarter } from './api'
+import { isComposerDraft, type DraftIssue, validateDraft } from './validation'
 import type {
   AssetDraft,
   CandidateDraft,
@@ -29,6 +30,7 @@ export default function App() {
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('Chargement du projet de départ…')
   const [error, setError] = useState<string>()
+  const [issues, setIssues] = useState<DraftIssue[]>([])
 
   useEffect(() => {
     void loadStarter()
@@ -44,19 +46,31 @@ export default function App() {
     [portfolio, selectedVariantId],
   )
 
+  const assetOwners = useMemo(() => {
+    const owners: Record<string, string[]> = {}
+    for (const candidate of draft?.candidates ?? []) {
+      for (const assetId of candidate.asset_ids) owners[assetId] = [...(owners[assetId] ?? []), candidate.id]
+    }
+    return owners
+  }, [draft])
+
   async function handleGenerate() {
     if (!draft) return
+    const localIssues = validateDraft(draft)
+    if (localIssues.length) {
+      setIssues(localIssues)
+      setError(undefined)
+      setMessage(`${localIssues.length} point(s) sont \u00e0 corriger avant de demander des propositions au moteur.`)
+      return
+    }
     setBusy(true)
     setError(undefined)
+    setIssues([])
     try {
       const result = await generatePortfolio(draft)
       setPortfolio(result)
       setSelectedVariantId(result.recommended_variant_id ?? undefined)
-      setMessage(
-        result.recommended_variant_id
-          ? `${result.variants.length} propositions comparées. La recommandation est prête à être inspectée.`
-          : 'Aucune proposition complète : lis les raisons de refus et ajuste les contraintes.',
-      )
+      setMessage(result.recommended_variant_id ? `${result.variants.length} propositions compar\u00e9es. La recommandation est pr\u00eate \u00e0 \u00eatre inspect\u00e9e.` : 'Aucune proposition compl\u00e8te : lis les raisons de refus et ajuste les contraintes.')
     } catch (reason) {
       setError(formatError(reason))
     } finally {
@@ -84,6 +98,7 @@ export default function App() {
     setDraft((current) => (current ? mutator(current) : current))
     setPortfolio(undefined)
     setSelectedVariantId(undefined)
+    setIssues([])
   }
 
   function updateAsset(index: number, update: Partial<AssetDraft>) {
@@ -142,14 +157,14 @@ export default function App() {
     const file = event.target.files?.[0]
     if (!file) return
     try {
-      const incoming = JSON.parse(await file.text()) as ComposerDraft
-      if (incoming.schema_version !== 'bgig.local_composer.v0') {
-        throw new Error('Ce fichier n’est pas un projet BGIG Local Composer V0.')
-      }
+      const incoming = JSON.parse(await file.text()) as unknown
+      if (!isComposerDraft(incoming)) throw new Error('Ce fichier ne respecte pas la structure du projet BGIG Local Composer V0.')
+      const importedIssues = validateDraft(incoming)
       setDraft(incoming)
       setPortfolio(undefined)
       setSelectedVariantId(undefined)
-      setMessage(`Projet « ${incoming.project_name} » importé. Génère les propositions pour le vérifier.`)
+      setIssues(importedIssues)
+      setMessage(importedIssues.length ? `Projet \u00ab ${incoming.project_name} \u00bb import\u00e9 : corrige ${importedIssues.length} point(s) avant la g\u00e9n\u00e9ration.` : `Projet \u00ab ${incoming.project_name} \u00bb import\u00e9. G\u00e9n\u00e8re les propositions pour le v\u00e9rifier.`)
       setError(undefined)
     } catch (reason) {
       setError(formatError(reason))
@@ -182,8 +197,9 @@ export default function App() {
         <div className="hero-status"><span className="status-dot" /> Moteur local connecté · mm · hors Fusion</div>
       </section>
 
-      {error && <section className="notice error"><strong>À corriger</strong><span>{error}</span></section>}
-      <section className="notice"><strong>État</strong><span>{message}</span></section>
+      {error && <section className="notice error" aria-live="assertive"><strong>{'\u00c0 corriger'}</strong><span>{error}</span></section>}
+      {issues.length > 0 && <section className="notice error" aria-live="polite"><strong>{'\u00c0 compl\u00e9ter'}</strong><ul className="issue-list">{issues.map((issue, index) => <li key={`${issue.path}-${index}`}><b>{issue.path}</b> {'\u2014'} {issue.message}</li>)}</ul></section>}
+      <section className="notice" aria-live="polite"><strong>{'\u00c9tat'}</strong><span>{message}</span></section>
 
       <nav className="journey" aria-label="Parcours de conception">
         <a href="#box">01 <span>Boîte</span></a><a href="#assets">02 <span>Contenu</span></a><a href="#constraints">03 <span>Contraintes</span></a><a href="#proposals">04 <span>Propositions</span></a><a href="#export">05 <span>Exporter</span></a>
@@ -226,7 +242,7 @@ export default function App() {
           </div>
           <div className="subpanel"><div className="subpanel-heading"><h3>Modules candidats</h3><button className="text-button" onClick={() => updateDraft((current) => ({ ...current, candidates: [...current.candidates, newCandidate(current.candidates.length + 1, current.layers[0]?.id ?? 'base')] }))}>+ Ajouter</button></div>
             {draft.candidates.length === 0 && <p className="empty-copy">Aucun candidat actif. Une proposition verrouillée peut être exportée telle quelle.</p>}
-            {draft.candidates.map((candidate, index) => <CandidateEditor key={candidate.id} candidate={candidate} assets={draft.assets} layers={draft.layers.map((layer) => layer.id)} onChange={(update) => updateCandidate(index, update)} onDimensionChange={(axis, value) => updateCandidateDimension(index, axis, value)} onDelete={() => updateDraft((current) => ({ ...current, candidates: current.candidates.filter((_, position) => position !== index) }))} />)}
+            {draft.candidates.map((candidate, index) => <CandidateEditor key={candidate.id} candidate={candidate} assets={draft.assets} assetOwners={assetOwners} layers={draft.layers.map((layer) => layer.id)} onChange={(update) => updateCandidate(index, update)} onDimensionChange={(axis, value) => updateCandidateDimension(index, axis, value)} onDelete={() => updateDraft((current) => ({ ...current, candidates: current.candidates.filter((_, position) => position !== index) }))} />)}
           </div>
         </div>
         {draft.manual_modules.length > 0 && <div className="lock-strip"><strong>{draft.manual_modules.length} module(s) verrouillé(s)</strong><span>Ils restent des obstacles fixes pour toute future génération.</span><button className="text-button" onClick={() => updateDraft((current) => ({ ...current, manual_modules: [] }))}>Déverrouiller tout</button></div>}
@@ -265,9 +281,13 @@ function ReservationEditor({ reservation, layers, onChange, onDelete }: { reserv
   return <div className="compact-editor"><div className="compact-top"><TextInput value={reservation.id} onChange={(value) => onChange({ id: value })} /><select value={reservation.kind} onChange={(event) => onChange({ kind: event.target.value as ReservationDraft['kind'] })}><option value="rulebook">Livret</option><option value="board">Plateau</option><option value="existing_tray">Bac existant</option><option value="generic">Réserve</option></select><select value={reservation.layer_id} onChange={(event) => onChange({ layer_id: event.target.value })}>{layers.map((layer) => <option key={layer}>{layer}</option>)}</select><button className="icon-button" aria-label="Supprimer la réservation" onClick={onDelete}>×</button></div><DimensionEditor label="Origine" value={reservation.origin_mm} onChange={(value) => onChange({ origin_mm: value })} /><DimensionEditor label="Taille" value={reservation.size_mm} onChange={(value) => onChange({ size_mm: value })} /></div>
 }
 
-function CandidateEditor({ candidate, assets, layers, onChange, onDimensionChange, onDelete }: { candidate: CandidateDraft; assets: AssetDraft[]; layers: string[]; onChange: (update: Partial<CandidateDraft>) => void; onDimensionChange: (axis: keyof Dimension, value: number) => void; onDelete: () => void }) {
-  const primaryAsset = candidate.asset_ids[0] ?? ''
-  return <div className="compact-editor"><div className="compact-top"><TextInput value={candidate.name} onChange={(value) => onChange({ name: value })} /><select value={candidate.allowed_layers[0] ?? ''} onChange={(event) => onChange({ allowed_layers: [event.target.value] })}>{layers.map((layer) => <option key={layer}>{layer}</option>)}</select><label className="check"><input type="checkbox" checked={candidate.allow_xy_rotation} onChange={(event) => onChange({ allow_xy_rotation: event.target.checked })} /> Rotation</label><button className="icon-button" aria-label="Supprimer le module candidat" onClick={onDelete}>×</button></div><div className="candidate-details"><DimensionEditor label="Dimensions" value={candidate.size_mm} onChange={(value) => { onDimensionChange('x', value.x); onDimensionChange('y', value.y); onDimensionChange('z', value.z) }} /><label className="inline-field">Asset associé<select value={primaryAsset} onChange={(event) => onChange({ asset_ids: event.target.value ? [event.target.value] : [] })}><option value="">Aucun (warning visible)</option>{assets.map((asset) => <option key={asset.id} value={asset.id}>{asset.name}</option>)}</select></label></div></div>
+function CandidateEditor({ candidate, assets, assetOwners, layers, onChange, onDimensionChange, onDelete }: { candidate: CandidateDraft; assets: AssetDraft[]; assetOwners: Record<string, string[]>; layers: string[]; onChange: (update: Partial<CandidateDraft>) => void; onDimensionChange: (axis: keyof Dimension, value: number) => void; onDelete: () => void }) {
+  function toggleAsset(assetId: string, checked: boolean) {
+    const assetIds = checked ? Array.from(new Set([...candidate.asset_ids, assetId])) : candidate.asset_ids.filter((current) => current !== assetId)
+    onChange({ asset_ids: assetIds })
+  }
+
+  return <div className="compact-editor"><div className="compact-top"><TextInput value={candidate.name} onChange={(value) => onChange({ name: value })} /><select value={candidate.allowed_layers[0] ?? ''} onChange={(event) => onChange({ allowed_layers: [event.target.value] })}>{layers.map((layer) => <option key={layer}>{layer}</option>)}</select><label className="check"><input type="checkbox" checked={candidate.allow_xy_rotation} onChange={(event) => onChange({ allow_xy_rotation: event.target.checked })} /> Rotation</label><button className="icon-button" aria-label="Supprimer le module candidat" onClick={onDelete}>×</button></div><div className="candidate-details"><DimensionEditor label="Dimensions" value={candidate.size_mm} onChange={(value) => { onDimensionChange('x', value.x); onDimensionChange('y', value.y); onDimensionChange('z', value.z) }} /><div className="asset-picker"><div className="asset-picker-heading"><span>{'Assets associ\u00e9s'}</span><small>{candidate.asset_ids.length ? `${candidate.asset_ids.length} s\u00e9lectionn\u00e9(s)` : 'Aucun asset'}</small></div>{assets.map((asset) => { const checked = candidate.asset_ids.includes(asset.id); const usedByOther = (assetOwners[asset.id] ?? []).some((ownerId) => ownerId !== candidate.id); return <label key={asset.id} className={`asset-option ${usedByOther ? 'assigned-elsewhere' : ''}`}><input type="checkbox" checked={checked} disabled={usedByOther && !checked} onChange={(event) => toggleAsset(asset.id, event.target.checked)} /><span>{asset.name}</span>{usedByOther && !checked && <small>{'D\u00e9j\u00e0 affect\u00e9 ailleurs'}</small>}</label> })}</div></div></div>
 }
 
 function DimensionEditor({ label, value, onChange }: { label: string; value: Dimension | { x: number; y: number; z: number }; onChange: (value: Dimension) => void }) {
@@ -321,7 +341,13 @@ function safeFileName(value: string) {
 }
 
 function formatScore(value: number) { return `${Math.round(value * 100)}%` }
-function formatError(reason: unknown) { return reason instanceof ApiError || reason instanceof Error ? reason.message : 'Une erreur inconnue est survenue.' }
+function formatError(reason: unknown) {
+  if (reason instanceof ApiError) {
+    if (reason.code === 'DRAFT_INVALID') return `Le moteur a trouve un point a corriger : ${reason.message}`
+    if (reason.code === 'ENGINE_REJECTED') return `Le moteur refuse ce projet : ${reason.message}`
+  }
+  return reason instanceof Error ? reason.message : 'Une erreur inconnue est survenue.'
+}
 function policyLabel(policy: string) { return ({ compact_origin: 'Volume compact', preserve_large_free_region: 'Grand espace libre', accessibility_front: 'Accès frontal', minimal_rotation: 'Rotation minimale', balanced_footprint: 'Empreinte équilibrée' } as Record<string, string>)[policy] ?? policy }
 function preferenceLabel(preference: string) { return ({ balanced: 'Équilibre', compact: 'Compacité', accessible: 'Accès', print_simple: 'Simplicité d’impression' } as Record<string, string>)[preference] ?? preference }
 function kindLabel(kind: AssetDraft['kind']) { return ({ cards: 'Cartes', tokens: 'Jetons', dice: 'Dés', meeples: 'Meeples', other: 'Autre' } as Record<AssetDraft['kind'], string>)[kind] }
