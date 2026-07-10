@@ -18,7 +18,7 @@ structurant, authentification absente ou refus de push direct.
 
 ## Gate humaine active
 
-Aucune gate humaine active pour le travail documentaire `P18-VISION-UX-VOLUMETRIC-REBASE-SPRINT` explicitement autorise. Une nouvelle gate sera requise avant toute implementation de palette persistante, app externe ou solveur global.
+Gate humaine active : accepter P19-BOX-FILL-MANUAL-MODULES-SPRINT et l'extension additive BoxFillPlan. ADR-0036 reste Propose : choisir la future surface persistante avant toute palette/app.
 
 ## Sprint actif
 
@@ -40,7 +40,7 @@ Mission interne terminee : P17-M006 - Validation Fusion export/preprint, STL par
 
 ## Mission ready non gated
 
-`P18-M006 - Preparer la recommandation P19` est ready. Il doit recommander un increment executable mais ne doit pas l'implementer.
+Aucune mission implementation ready: P19-A est recommande mais bloque par gate humaine produit/architecture.
 
 ## Regle operationnelle Fusion
 

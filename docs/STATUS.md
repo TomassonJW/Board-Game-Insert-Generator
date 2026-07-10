@@ -858,3 +858,7 @@ Statut : done-docs. BOX_FILL_SOLVER_ROADMAP.md separe six niveaux, recommande o
 ## P18-M005 - ADR architecture UX
 
 Statut : done-docs, ADR-0036 Propose. CommandInputs Fusion reste dev/smoke; toute palette persistante ou app locale/web exige une gate humaine avant implementation.
+
+## P18-M006 - Recommandation P19
+
+Statut : done-docs. P19 recommande est P19-BOX-FILL-MANUAL-MODULES-SPRINT: premier BoxFillPlan manuel, valide par collisions, reservations, couverture et volume libre. P19 est bloque par gate humaine avant toute extension de modele executable.

@@ -346,3 +346,8 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 
 - C-FUSION-UI : ADR-0036 propose de conserver CommandInputs pour dev/smoke; palette ou app restent bloquees par gate humaine.
 - C-PRODUCT-VISION : la future UX consomme BoxFillPlan, pas une structure Fusion parallele.
+
+## P18-M006 capability update
+
+- C-PRODUCT-VISION : P19-A est recommande pour rendre BoxFillPlan verificable avant palette ou solveur global.
+- Gate : extension additive de modele/schema P19 et choix UX ADR-0036 attendent validation humaine.

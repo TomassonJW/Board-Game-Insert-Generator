@@ -1100,3 +1100,17 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Livrable : `docs/UX_PRODUCT_VISION.md`.
 - Gate : aucune pour le contrat documentaire; gate architecture avant implementation UI lourde.
 - Statut : `ready`.
+
+### P18-M006 - Preparer la recommandation P19
+
+- Livrable : `docs/P19_RECOMMENDATION.md`.
+- Decision : recommander P19-A, plan manuel de boite avant palette ou solveur global.
+- Statut : `done-docs`.
+
+### P19-BOX-FILL-MANUAL-MODULES-SPRINT
+
+- Capability : C-PRODUCT-VISION, C-GRID-3D, C-LAYERS, C-RESERVATION, C-SOLVER.
+- Objectif : rendre un `BoxFillPlan` manuel executable dans le moteur pur avec modules, positions, reservations, collisions, couverture et `FreeVolume`.
+- Dependances : contrats P18-M001 a P18-M004.
+- Gate : validation humaine explicite de l'extension de modele/schema; ADR-0036 reste une gate separee pour toute UI persistante.
+- Statut : `ready-gated`.
