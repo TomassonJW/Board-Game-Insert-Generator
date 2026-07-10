@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 
+from board_game_insert_generator.box_fill import validate_box_fill_plan
 from board_game_insert_generator.feature_taxonomy import is_feature_taxonomy_compatible
 from board_game_insert_generator.volumetric import span_cells, span_fits_grid
 from board_game_insert_generator.models import (
@@ -138,6 +139,7 @@ def validate_config(config: InsertConfig) -> list[ValidationIssue]:
 
     _validate_assets(config, issues)
     _validate_volumetric_grid(config, issues)
+    _validate_box_fill_plan(config, issues)
 
     if config.layout.strategy not in IMPLEMENTED_LAYOUT_STRATEGIES:
         implemented = ", ".join(f"'{strategy}'" for strategy in IMPLEMENTED_LAYOUT_STRATEGIES)
@@ -219,6 +221,12 @@ def _validate_assets(config: InsertConfig, issues: list[ValidationIssue]) -> Non
                 )
             )
 
+def _validate_box_fill_plan(config: InsertConfig, issues: list[ValidationIssue]) -> None:
+    plan = config.box_fill_plan
+    if plan is None:
+        return
+    for issue in validate_box_fill_plan(plan):
+        issues.append(_issue(f"box_fill_plan.{issue.field}", issue.code, issue.message))
 def _validate_volumetric_grid(config: InsertConfig, issues: list[ValidationIssue]) -> None:
     grid = config.volumetric_grid
     if grid is None:

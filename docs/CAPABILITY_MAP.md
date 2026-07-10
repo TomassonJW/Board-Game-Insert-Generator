@@ -366,3 +366,8 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 - C-PRODUCT-VISION : `implemented-core` pour le chargement versionne et retrocompatible de `box_fill_plan.v0` dans le moteur pur.
 - C-ASSET : les allocations sont explicites et ne peuvent pas etre deduites d'une simple apparition d'asset dans un module.
 - C-FUSION-UI : aucun comportement Fusion, palette ou UI persistante n'est ajoute.
+## P19-M003 capability update
+
+- C-PRODUCT-VISION : `implemented-core` pour la validation d'un plan manuel de boite complete et le FreeVolume aggregate explicable.
+- C-RESERVATION / C-GRID-3D : bornes et collisions 3D sont verifiees dans le volume utile, sans redefinition de `volumetric_grid`.
+- C-ASSET : couverture de quantite explicite; non-couverture et sur-allocation sont refusees avec des messages actionnables.

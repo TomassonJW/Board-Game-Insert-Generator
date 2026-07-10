@@ -880,3 +880,8 @@ Statut : `done`. ADR-0037 accepte `box_fill_plan.v0` comme extension optionnelle
 Statut : `implemented-core`. Le coeur Python charge maintenant le bloc optionnel `box_fill_plan.v0` dans des dataclasses pures : BoxFillBox derive de la boite existante, modules manuels, reservations, layers, allocations explicites et references vers `Cavity`/`Feature` existants. Les JSON historiques restent inchanges lorsque le bloc est absent. La fixture `examples/box_fill_manual_v0.json` et les tests couvrent chargement, schema et retrocompatibilite.
 
 Limite : ce lot ne valide pas encore limites, collisions, references, coverage ni FreeVolume; ces analyses sont le prochain lot P19-M003.
+## P19-M003 - Validation, coverage et FreeVolume aggregate
+
+Statut : `implemented-core`. `validate_config` raccorde `BoxFillPlan` a une analyse pure : limites du volume utile, dimensions, IDs, layers, collisions modules/reservations, exception d'overlap mutuelle explicite, references, allocations et coverage. Les assets non couverts et sur-alloues sont des erreurs actionnables. `FreeVolume` calcule le volume total libre par soustraction des modules et reservations declares, avec qualification `aggregate_only` et sans pretendre connaitre les regions libres utilisables.
+
+Limites : aucun solveur, regions libres exactes, score de variantes, support physique ou projection Fusion n'est ajoute.

@@ -494,3 +494,6 @@ Champs V0 :
 - `access_features[]` : reutilisent le contrat existant `Feature`.
 
 P19-M002 charge strictement les types et les champs inconnus. Les invariants de volume, collisions, references, coverage et volume libre sont implementes dans P19-M003 ; ce chargement seul ne pretend pas valider un plan physique ou Fusion.
+### Validation P19-M003
+
+Le loader charge la structure; `validate_config` verifie ensuite les IDs, dimensions, limites dans la hauteur utile, layers, collisions module/module et module/reservation, collisions reservation/reservation (autorisees seulement si les deux reservations portent `allow_overlap: true`), references et allocations. Chaque asset doit etre couvert a hauteur de son `quantity.count`; une quantite manquante ou excedentaire est une erreur. Le `FreeVolume` V0 est un agregat de volume, pas une decomposition de regions libres.

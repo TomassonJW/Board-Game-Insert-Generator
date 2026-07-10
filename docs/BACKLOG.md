@@ -1159,3 +1159,13 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Capability : C-PRODUCT-VISION, C-QUALITY, C-RESERVATION.
 - Objectif : valider limites, collisions, IDs/references/allocation, couverture par asset et volume libre aggregate de `BoxFillPlan`.
 - Statut : `ready`.
+### P19-M003 - Validation, coverage et FreeVolume aggregate - Resultat
+
+- Livrables : `box_fill.py`, raccordement `validate_config`, coverage explicite, FreeVolume aggregate et regressions de collisions/references.
+- Statut : `done`, `implemented-core`.
+
+### P19-M004 - Rapports et transport CAD IR BoxFillPlan
+
+- Capability : C-PRODUCT-VISION, C-QUALITY, C-CAD-IR.
+- Objectif : exposer le plan, validation, coverage et FreeVolume en Markdown/JSON et metadata CAD IR sans materialisation Fusion.
+- Statut : `ready`.
