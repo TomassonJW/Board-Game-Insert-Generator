@@ -23,3 +23,6 @@ Passer de l'heuristique locale actuelle a des `BoxFillPlan` explicables, sans sa
 ## Etat apres P19
 
 `box_fill_v0_manual_modules` est termine : P19 a livre le BoxFillPlan manuel, sa validation et son transport CAD IR metadata. La prochaine etape recommandee est `box_fill_v1_greedy_2d`, mais elle reste bloquee par une gate produit explicite car elle introduit la premiere source de positions semi-automatique. Elle ne doit pas etre confondue avec un solveur global, une palette ou une variante scoree.
+## P19 completion addendum
+
+P19 est complet contre son contrat autorise : cellules libres AABB exactes (`exact_aabb_cells_v0`), conservation de volume, diagnostics structures, coverage par asset, CLI `validate-box-fill` / `report-box-fill` / `export-box-fill-plan`, fixtures valide et invalides, bridge explicite `derived_from_executable_asset_plan` et transport CAD IR metadata. Les cellules decrivent le residuel et ne constituent pas un placement automatique. P20 greedy reste bloque par gate humaine ; Fusion ne recalcule ni ne materialise ce plan.

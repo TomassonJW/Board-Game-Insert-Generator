@@ -232,3 +232,14 @@ actions si necessaire, puis lancer les tests disponibles.
 ## Licence
 
 Licence a definir avant publication ou distribution large.
+
+## BoxFillPlan CLI (P19)
+
+```powershell
+$env:PYTHONPATH = "src"
+python -m board_game_insert_generator validate-box-fill examples/box_fill_valid_v0.json
+python -m board_game_insert_generator report-box-fill examples/box_fill_valid_v0.json --format markdown
+python -m board_game_insert_generator export-box-fill-plan examples/box_fill_valid_v0.json --output $env:TEMP/bgig-box-fill-plan.json
+```
+
+`validate-box-fill` returns `0` only for a plan without validation issues and `2` for a conflict, bounds violation or incomplete coverage. The command stays pure Python; the CAD IR transport remains metadata only.

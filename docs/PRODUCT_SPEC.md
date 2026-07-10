@@ -156,3 +156,7 @@ selon compacite, accessibilite, impression, setup et esthetique.
 ## Update P18 - Produit cible operationnel
 
 Le produit cible est un BoxFillPlan editable: inventaire asset-first, intentions, reservations, layers, modules, volumes libres et variantes scorees. La commande Fusion actuelle reste une interface de developpement; la UX premium est decrite dans docs/UX_PRODUCT_VISION.md.
+
+## P19 completion addendum
+
+P19 est complet contre son contrat autorise : cellules libres AABB exactes (`exact_aabb_cells_v0`), conservation de volume, diagnostics structures, coverage par asset, CLI `validate-box-fill` / `report-box-fill` / `export-box-fill-plan`, fixtures valide et invalides, bridge explicite `derived_from_executable_asset_plan` et transport CAD IR metadata. Les cellules decrivent le residuel et ne constituent pas un placement automatique. P20 greedy reste bloque par gate humaine ; Fusion ne recalcule ni ne materialise ce plan.

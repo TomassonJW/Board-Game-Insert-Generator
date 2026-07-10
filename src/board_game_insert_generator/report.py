@@ -746,7 +746,8 @@ def _format_box_fill_plan_section(plan: dict[str, Any] | None) -> list[str]:
             f"- Manual modules: {len(plan['modules'])}",
             f"- Reservations: {len(plan['reservations'])}",
             f"- Layers: {len(plan['layers'])}",
-            f"- Aggregate free volume: {free_volume['total_free_volume_mm3']:.2f} mm3",
+            f"- Exact free volume: {free_volume['total_free_volume_mm3']:.2f} mm3",
+            f"- Free regions: {len(free_volume['regions'])}",
             f"- Free volume qualification: `{free_volume['qualification']}` ({free_volume['reason']})",
             "",
             "### Asset coverage",
@@ -764,7 +765,7 @@ def _format_box_fill_plan_section(plan: dict[str, Any] | None) -> list[str]:
     lines.extend(["", "### BoxFillPlan validation", ""])
     if validation["issues"]:
         for issue in validation["issues"]:
-            lines.append(f"- `{issue['code']}` {issue['field']}: {issue['message']}")
+            lines.append(f"- `{issue['severity']}` `{issue['code']}` {issue['field']}: {issue['message']} Action: {issue['corrective_action']}")
     else:
         lines.append("- No BoxFillPlan validation issues.")
     lines.append("")

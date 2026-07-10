@@ -5,6 +5,7 @@ import json
 import sys
 from pathlib import Path
 
+from board_game_insert_generator.box_fill import analyze_box_fill_plan, box_fill_plan_to_dict
 from board_game_insert_generator.cad_ir import CadIrError, build_blank_cad_scene
 from board_game_insert_generator.config_loader import ConfigError, load_config
 from board_game_insert_generator.layout import LayoutError, generate_basic_layout
@@ -22,6 +23,12 @@ def main(argv: list[str] | None = None) -> int:
         return _diagnose(arguments[1:])
     if arguments and arguments[0] == "export-cad-ir":
         return _export_cad_ir(arguments[1:])
+    if arguments and arguments[0] == "validate-box-fill":
+        return _validate_box_fill(arguments[1:])
+    if arguments and arguments[0] == "report-box-fill":
+        return _report_box_fill(arguments[1:])
+    if arguments and arguments[0] == "export-box-fill-plan":
+        return _export_box_fill_plan(arguments[1:])
     return _report(arguments)
 
 
@@ -34,9 +41,13 @@ def _print_top_level_help() -> None:
         "  python -m board_game_insert_generator CONFIG --format markdown|json [--output PATH]\n"
         "  python -m board_game_insert_generator diagnose CONFIG\n"
         "  python -m board_game_insert_generator export-cad-ir CONFIG --output PATH\n"
+        "  python -m board_game_insert_generator validate-box-fill CONFIG [--format text|json]\n"
+        "  python -m board_game_insert_generator report-box-fill CONFIG --format markdown|json [--output PATH]\n"
+        "  python -m board_game_insert_generator export-box-fill-plan CONFIG --output PATH\n"
         "\n"
         "CAD IR export is a subcommand named export-cad-ir; it is not an --export-cad-ir option."
     )
+
 
 def _report(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(
@@ -180,3 +191,74 @@ def _export_cad_ir(argv: list[str]) -> int:
 
 def _print_error(title: str, exc: Exception) -> None:
     print(f"{title}: {exc}", file=sys.stderr)
+
+
+def _require_box_fill_config(config_path: str):
+    config = load_config(config_path)
+    if config.box_fill_plan is None:
+        raise ConfigError("Configuration does not declare a box_fill_plan.")
+    return config
+
+
+def _validate_box_fill(argv: list[str]) -> int:
+    parser = argparse.ArgumentParser(description="Validate a BoxFillPlan V0 without running a solver.")
+    parser.add_argument("config", help="Path to a JSON configuration containing box_fill_plan.")
+    parser.add_argument("--format", choices=("text", "json"), default="text")
+    args = parser.parse_args(argv)
+    try:
+        config = _require_box_fill_config(args.config)
+        analysis = analyze_box_fill_plan(config.box_fill_plan)
+    except ConfigError as exc:
+        _print_error("Configuration error", exc)
+        return 2
+    payload = analysis.to_dict()
+    if args.format == "json":
+        print(json.dumps(payload, indent=2))
+    else:
+        print(f"BoxFillPlan validation {'OK' if not analysis.issues else 'FAILED'} - {config.box_fill_plan.id}")
+        print(f"- Exact free volume: {analysis.free_volume.total_free_volume_mm3:.2f} mm3")
+        print(f"- Free regions: {len(analysis.free_volume.regions)}")
+        for issue in analysis.issues:
+            print(f"- {issue.severity} {issue.code}: {issue.message} Action: {issue.corrective_action}")
+    return 0 if not analysis.issues else 2
+
+
+def _report_box_fill(argv: list[str]) -> int:
+    parser = argparse.ArgumentParser(description="Render a BoxFillPlan report through the standard report contract.")
+    parser.add_argument("config", help="Path to a JSON configuration containing box_fill_plan.")
+    parser.add_argument("--format", choices=("markdown", "json"), default="markdown")
+    parser.add_argument("--output", help="Optional output file.")
+    args = parser.parse_args(argv)
+    try:
+        config = _require_box_fill_config(args.config)
+        result = generate_basic_layout(config)
+        report = layout_to_json(config, result) if args.format == "json" else layout_to_markdown(config, result)
+    except (ConfigError, ValidationError, LayoutError, ToleranceError) as exc:
+        _print_error("BoxFillPlan report error", exc)
+        return 2
+    if args.output:
+        Path(args.output).write_text(report + "\n", encoding="utf-8")
+    else:
+        print(report)
+    return 0
+
+
+def _export_box_fill_plan(argv: list[str]) -> int:
+    parser = argparse.ArgumentParser(description="Export the stable BoxFillPlan V0 JSON contract.")
+    parser.add_argument("config", help="Path to a JSON configuration containing box_fill_plan.")
+    parser.add_argument("--output", "-o", required=True, help="Output BoxFillPlan JSON file.")
+    args = parser.parse_args(argv)
+    try:
+        config = _require_box_fill_config(args.config)
+        analysis = analyze_box_fill_plan(config.box_fill_plan)
+    except ConfigError as exc:
+        _print_error("Configuration error", exc)
+        return 2
+    if analysis.issues:
+        _print_error("BoxFillPlan validation error", ValueError("Cannot export an invalid BoxFillPlan; run validate-box-fill for diagnostics."))
+        return 2
+    output_path = Path(args.output)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(json.dumps(box_fill_plan_to_dict(config.box_fill_plan), indent=2) + "\n", encoding="utf-8")
+    print(f"BoxFillPlan export OK - {config.box_fill_plan.id}\n- Output: {output_path}")
+    return 0

@@ -897,3 +897,6 @@ Statut : `done`, `implemented-core`, `implemented-cad-ir-metadata`. P19 fournit 
 Preuves : 223 tests automatises, fixture `examples/box_fill_manual_v0.json`, sorties CLI Markdown/JSON/CAD IR et metadata inspectable. P19 n'est ni une validation Fusion de BoxFillPlan, ni une impression physique, ni un solveur, ni une UI persistante.
 
 Prochaine gate : acceptation humaine de `P20-BOX-FILL-GREEDY-2D-SPRINT` decrit dans `docs/P20_RECOMMENDATION.md`. La gate palette/app ADR-0036 reste distincte.
+## P19 completion addendum
+
+P19 est complet contre son contrat autorise : cellules libres AABB exactes (`exact_aabb_cells_v0`), conservation de volume, diagnostics structures, coverage par asset, CLI `validate-box-fill` / `report-box-fill` / `export-box-fill-plan`, fixtures valide et invalides, bridge explicite `derived_from_executable_asset_plan` et transport CAD IR metadata. Les cellules decrivent le residuel et ne constituent pas un placement automatique. P20 greedy reste bloque par gate humaine ; Fusion ne recalcule ni ne materialise ce plan.

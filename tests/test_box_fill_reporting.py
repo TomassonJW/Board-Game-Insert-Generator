@@ -24,7 +24,7 @@ class BoxFillPlanReportingTests(unittest.TestCase):
         self.assertEqual(plan["box"]["id"], "demo-game-box")
         self.assertEqual(plan["coverage"][0]["status"], "covered")
         self.assertEqual(plan["free_volumes"][0]["total_free_volume_mm3"], 205325.0)
-        self.assertEqual(plan["free_volumes"][0]["qualification"], "aggregate_only")
+        self.assertEqual(plan["free_volumes"][0]["qualification"], "exact_aabb_cells_v0")
         self.assertEqual(plan["validation"]["status"], "valid")
 
     def test_markdown_report_exposes_manual_plan_without_claiming_solver(self) -> None:
@@ -34,7 +34,7 @@ class BoxFillPlanReportingTests(unittest.TestCase):
         self.assertIn("- Manual modules: 2", markdown)
         self.assertIn("### Asset coverage", markdown)
         self.assertIn("coin-tokens | 30 | 30 | 0 | 0 | covered", markdown)
-        self.assertIn("aggregate_only", markdown)
+        self.assertIn("exact_aabb_cells_v0", markdown)
 
     def test_cad_ir_transports_plan_as_metadata_without_components(self) -> None:
         payload = build_blank_cad_scene(self.config, self.layout).to_dict()

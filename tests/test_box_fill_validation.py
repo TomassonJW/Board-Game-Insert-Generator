@@ -24,7 +24,7 @@ class BoxFillPlanValidationTests(unittest.TestCase):
         self.assertEqual(validate_config(config), [])
         self.assertEqual([entry.status for entry in analysis.coverage], ["covered", "covered"])
         self.assertEqual(analysis.free_volume.total_free_volume_mm3, 205325.0)
-        self.assertEqual(analysis.free_volume.qualification, "aggregate_only")
+        self.assertEqual(analysis.free_volume.qualification, "exact_aabb_cells_v0")
 
     def test_rejects_module_collision(self) -> None:
         payload = _payload()

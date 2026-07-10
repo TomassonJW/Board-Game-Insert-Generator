@@ -1,0 +1,30 @@
+{
+  "project_name": "BoxFill P19 valid fixture",
+  "units": "mm",
+  "box": {"inner_dimensions_mm": {"x": 120.0, "y": 80.0, "z": 40.0}, "usable_height_mm": 38.0, "lid_clearance_mm": 2.0},
+  "layout": {"strategy": "row_fill"},
+  "assets": [
+    {"id": "coin-tokens", "name": "Coin tokens", "kind": "tokens", "quantity": {"count": 30, "grouping": "loose"}, "dimensions_mm": {"x": 20.0, "y": 20.0, "z": 2.0}, "dimension_confidence": "exact", "containment_intent": "store"},
+    {"id": "wooden-dice", "name": "Wooden dice", "kind": "dice", "quantity": {"count": 2, "grouping": "loose"}, "dimensions_mm": {"x": 16.0, "y": 16.0, "z": 16.0}, "dimension_confidence": "exact", "containment_intent": "access_first"},
+    {"id": "wooden-meeples", "name": "Wooden meeples", "kind": "meeples", "quantity": {"count": 6, "grouping": "loose"}, "dimensions_mm": {"x": 16.0, "y": 12.0, "z": 10.0}, "dimension_confidence": "exact", "containment_intent": "store"}
+  ],
+  "box_fill_plan": {
+    "schema_version": "box_fill_plan.v0",
+    "id": "p19-valid-manual",
+    "box_id": "p19-game-box",
+    "layers": [{"id": "base-layer", "origin_z_mm": 0.0, "height_mm": 38.0, "role": "storage", "module_ids": ["coin-tray", "dice-tray", "meeple-tray"]}],
+    "reservations": [{"id": "rulebook-slot", "kind": "rulebook", "origin_mm": {"x": 0.0, "y": 65.0, "z": 0.0}, "size_mm": {"x": 120.0, "y": 15.0, "z": 4.0}, "layer_id": "base-layer"}],
+    "modules": [
+      {"id": "coin-tray", "name": "Coin tray", "origin_mm": {"x": 0.0, "y": 0.0, "z": 0.0}, "size_mm": {"x": 45.0, "y": 50.0, "z": 20.0}, "locked": true, "layer_id": "base-layer"},
+      {"id": "dice-tray", "name": "Dice tray", "origin_mm": {"x": 45.0, "y": 0.0, "z": 0.0}, "size_mm": {"x": 35.0, "y": 50.0, "z": 25.0}, "layer_id": "base-layer"},
+      {"id": "meeple-tray", "name": "Meeple tray", "origin_mm": {"x": 80.0, "y": 0.0, "z": 0.0}, "size_mm": {"x": 40.0, "y": 50.0, "z": 18.0}, "layer_id": "base-layer"}
+    ],
+    "allocations": [
+      {"asset_id": "coin-tokens", "quantity": 30, "module_id": "coin-tray"},
+      {"asset_id": "wooden-dice", "quantity": 3, "module_id": "dice-tray"},
+      {"asset_id": "wooden-meeples", "quantity": 6, "module_id": "meeple-tray"}
+    ],
+    "metadata": {"authoring_mode": "manual", "scope": "P19"}
+  }
+}
+

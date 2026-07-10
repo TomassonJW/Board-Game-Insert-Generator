@@ -491,3 +491,7 @@ P16 ne valide pas l'impression 3D, ne cree pas de geometrie par item individuel 
 L'export STL/3MF P17 n'etend pas la CAD IR V0. La CAD IR reste le contrat d'intention et de transport vers Fusion ; l'export imprimable est une responsabilite de l'adaptateur Fusion apres creation de la geometrie reelle.
 
 Le coeur Python peut continuer a fournir les metadonnees necessaires au manifeste via `metadata`, mais il ne doit pas creer de fichier imprimable et ne doit pas importer `adsk`. Les manifestes d'export P17 reference la CAD IR, les settings et la scene Fusion, mais ne deviennent pas une nouvelle `schema_version` CAD IR.
+
+## P19 completion addendum
+
+P19 est complet contre son contrat autorise : cellules libres AABB exactes (`exact_aabb_cells_v0`), conservation de volume, diagnostics structures, coverage par asset, CLI `validate-box-fill` / `report-box-fill` / `export-box-fill-plan`, fixtures valide et invalides, bridge explicite `derived_from_executable_asset_plan` et transport CAD IR metadata. Les cellules decrivent le residuel et ne constituent pas un placement automatique. P20 greedy reste bloque par gate humaine ; Fusion ne recalcule ni ne materialise ce plan.

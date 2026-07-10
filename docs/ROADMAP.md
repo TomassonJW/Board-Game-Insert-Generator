@@ -178,3 +178,7 @@ P13-M001 ajoute un premier mode Fusion `quick_asset_box` pour saisir des assets 
 ## Update 2026-07-10 - P18 product rebase
 
 La trajectoire produit est recadree par docs/VISION_GAP_ANALYSIS.md, docs/VOLUMETRIC_PRODUCT_MODEL.md et docs/BOX_FILL_SOLVER_ROADMAP.md. Le prochain increment recommande est le plan manuel de boite complete, avant palette persistante ou solveur global.
+
+## P19 completion addendum
+
+P19 est complet contre son contrat autorise : cellules libres AABB exactes (`exact_aabb_cells_v0`), conservation de volume, diagnostics structures, coverage par asset, CLI `validate-box-fill` / `report-box-fill` / `export-box-fill-plan`, fixtures valide et invalides, bridge explicite `derived_from_executable_asset_plan` et transport CAD IR metadata. Les cellules decrivent le residuel et ne constituent pas un placement automatique. P20 greedy reste bloque par gate humaine ; Fusion ne recalcule ni ne materialise ce plan.

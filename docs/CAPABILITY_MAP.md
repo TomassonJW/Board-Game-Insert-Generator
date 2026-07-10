@@ -375,9 +375,12 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 
 - C-PRODUCT-VISION : le plan manuel est maintenant lisible et exportable comme contrat JSON/Markdown/CAD IR metadata.
 - C-CAD-IR : `implemented-cad-ir-metadata` pour BoxFillPlan; aucune operation CAD/Fusion n'est derivee du plan manuel.
-- C-FUSION-UI : inchangée; Fusion reste adaptateur futur et ne recalcule pas le plan.
+- C-FUSION-UI : inchangÃ©e; Fusion reste adaptateur futur et ne recalcule pas le plan.
 ## P19-M005 capability update
 
 - C-PRODUCT-VISION : `implemented-cad-ir` pour BoxFillPlan V0, valide et transporte en metadata CAD IR sans Fusion comme source de verite.
 - C-GRID-3D / C-LAYERS / C-RESERVATION : P19 valide l'occupation volumetrique manuelle et les collisions dans le moteur pur; le placement automatique reste non implemente.
 - C-SOLVER : prochaine etape recommandee `box_fill_v1_greedy_2d`, bloquee par gate produit; aucun solveur global n'est autorise.
+## P19 completion addendum
+
+P19 est complet contre son contrat autorise : cellules libres AABB exactes (`exact_aabb_cells_v0`), conservation de volume, diagnostics structures, coverage par asset, CLI `validate-box-fill` / `report-box-fill` / `export-box-fill-plan`, fixtures valide et invalides, bridge explicite `derived_from_executable_asset_plan` et transport CAD IR metadata. Les cellules decrivent le residuel et ne constituent pas un placement automatique. P20 greedy reste bloque par gate humaine ; Fusion ne recalcule ni ne materialise ce plan.

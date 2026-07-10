@@ -248,3 +248,7 @@ La verification dans Fusion 360 reste manuelle.
 - ADR-0009 : generation Fusion minimale par esquisse et extrusion.
 - ADR-0010 : cavites abstraites avant coupes Fusion.
 - ADR-0011 : features ergonomiques abstraites de cavites.
+
+## P19 completion addendum
+
+P19 est complet contre son contrat autorise : cellules libres AABB exactes (`exact_aabb_cells_v0`), conservation de volume, diagnostics structures, coverage par asset, CLI `validate-box-fill` / `report-box-fill` / `export-box-fill-plan`, fixtures valide et invalides, bridge explicite `derived_from_executable_asset_plan` et transport CAD IR metadata. Les cellules decrivent le residuel et ne constituent pas un placement automatique. P20 greedy reste bloque par gate humaine ; Fusion ne recalcule ni ne materialise ce plan.
