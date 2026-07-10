@@ -40,7 +40,7 @@ Mission interne terminee : P17-M006 - Validation Fusion export/preprint, STL par
 
 ## Mission active autorisee
 
-`P19-BOX-FILL-MANUAL-MODULES-SPRINT` : construire le premier `BoxFillPlan` V0 manuel, CAD-agnostic et executable dans le moteur pur. Criteres : modules/reservations/layers/allocation explicites, validations de limites et collisions, couverture asset mesurable, volume libre et rapports Markdown/JSON/CAD IR. Aucun solveur, palette/app, changement Fusion ou tolerance.
+`P19-M001` termine : ADR-0037 fixe `box_fill_plan.v0`. Mission active : `P19-M002`, modeles et chargement additif purs. Le sprint conserve les criteres modules/reservations/layers/allocation explicites, validation, couverture, volume libre et rapports, sans solveur, palette/app, changement Fusion ou tolerance.
 
 ## Regle operationnelle Fusion
 

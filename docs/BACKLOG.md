@@ -1137,3 +1137,15 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Resultat : livrables P18 acceptes; `BoxFillPlan` autorise comme extension additive, versionnee, CAD-agnostic et retrocompatible.
 - Limite : aucune palette, app, dependance UI lourde ou changement Fusion n'est autorise par cette validation.
 - Statut : `done`, `accepted`.
+### P19-M001 - Contrat BoxFillPlan V0
+
+- Capability : C-PRODUCT-VISION, C-GRID-3D, C-LAYERS, C-RESERVATION.
+- Livrable : `docs/DECISIONS/ADR-0037-box-fill-plan-v0.md`.
+- Decision : `box_fill_plan.v0` est optionnel, versionne, CAD-agnostic et ne remplace aucun pipeline existant.
+- Statut : `done`.
+
+### P19-M002 - Modeles et chargement additif
+
+- Capability : C-PRODUCT-VISION.
+- Objectif : charger les reservations, layers, modules et allocations dans des dataclasses pures sans comportement Fusion.
+- Statut : `ready`.

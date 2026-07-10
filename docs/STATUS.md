@@ -872,3 +872,6 @@ ADR-0036 est acceptee comme direction de roadmap, sans autoriser de palette, d'a
 ## P19-BOX-FILL-MANUAL-MODULES-SPRINT
 
 Statut : `authorized`. Le sprint doit produire dans le moteur Python pur un plan de boite manuel, verifiable et explicable. Il n'autorise ni solveur automatique, ni palette/app, ni nouvelle geometrie Fusion, ni changement de tolerance.
+## P19-M001 - Contrat BoxFillPlan V0
+
+Statut : `done`. ADR-0037 accepte `box_fill_plan.v0` comme extension optionnelle et CAD-agnostic. Le contrat verrouille les allocations explicites, reservations, layers, modules manuels, coverage et FreeVolume aggregate; Fusion reste une projection future. Suite autorisee : P19-M002, modeles et loader purs.
