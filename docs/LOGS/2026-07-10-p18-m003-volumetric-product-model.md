@@ -1,0 +1,1 @@
+# 2026-07-10 - P18-M003 volumetric product model`n`nContrat CAD-agnostic: `BoxFillPlan` relie assets, intentions, reservations, layers, modules, volumes libres et variantes. Aucun schema executable ne change.

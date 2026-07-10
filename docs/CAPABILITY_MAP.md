@@ -331,3 +331,8 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 
 - C-FUSION-UI : UX cible definie; commande classique = dev/smoke, palette persistante/app = prochaines surfaces possibles sous gate.
 - C-ASSET / C-SOLVER : inventaire et variantes deviennent les objets UX principaux, sans changement de code.
+
+## P18-M003 capability update
+
+- C-PRODUCT-VISION : contrat GameBox a ExportPackage defini; BoxFillPlan devient la future source de verite CAD-agnostic.
+- C-GRID-3D / C-LAYERS / C-RESERVATION : leurs concepts existants sont conserves et raccordes au modele produit cible.

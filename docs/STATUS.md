@@ -846,3 +846,7 @@ Dette prioritaire : `quick_asset_box` est une commande de test/developpement, la
 ## P18-M002 - UX produit cible
 
 Statut : done-docs. UX_PRODUCT_VISION.md definit six ecrans de la boite a l'export et confirme que la commande Fusion classique reste un outil de smoke/dev, non l'UX finale.
+
+## P18-M003 - Modele produit volumetrique cible
+
+Statut : done-docs. VOLUMETRIC_PRODUCT_MODEL.md separe explicitement la boite, assets, intentions, reservations, layers, modules, compartiments, variantes, volumes libres et export. Fusion reste une projection.
