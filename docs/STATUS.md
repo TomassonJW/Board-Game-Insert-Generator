@@ -903,3 +903,6 @@ P19 est complet contre son contrat autorise : cellules libres AABB exactes (`exa
 ## P19-M007 - Completion des metriques de rapport
 
 Statut : `done`. Les sorties JSON et Markdown exposent maintenant les volumes modules, reservations et libres par layer, les taux occupation/reservation et la couverture item-level. Les cellules libres restent exactes et descriptives; aucun solveur P20 n'est introduit.
+## P19 product acceptance - 2026-07-10
+
+Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P19 est accepte comme contrat executable BoxFillPlan manuel : validation volumetrique, coverage item-level, cellules libres AABB, metrics par layer, CLI, fixtures, bridge et metadata CAD IR. Il reste hors Fusion, sans solveur automatique et sans validation d'impression (`print_validated: false`). La gate P20 greedy 2D est levee ; la gate ADR-0036 palette/app reste distincte.

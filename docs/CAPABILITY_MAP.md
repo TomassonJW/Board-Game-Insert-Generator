@@ -375,7 +375,7 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 
 - C-PRODUCT-VISION : le plan manuel est maintenant lisible et exportable comme contrat JSON/Markdown/CAD IR metadata.
 - C-CAD-IR : `implemented-cad-ir-metadata` pour BoxFillPlan; aucune operation CAD/Fusion n'est derivee du plan manuel.
-- C-FUSION-UI : inchangÃƒÂ©e; Fusion reste adaptateur futur et ne recalcule pas le plan.
+- C-FUSION-UI : inchangÃƒÆ’Ã‚Â©e; Fusion reste adaptateur futur et ne recalcule pas le plan.
 ## P19-M005 capability update
 
 - C-PRODUCT-VISION : `implemented-cad-ir` pour BoxFillPlan V0, valide et transporte en metadata CAD IR sans Fusion comme source de verite.
@@ -387,3 +387,6 @@ P19 est complet contre son contrat autorise : cellules libres AABB exactes (`exa
 ## P19-M007 - Completion des metriques de rapport
 
 Statut : `done`. Les sorties JSON et Markdown exposent maintenant les volumes modules, reservations et libres par layer, les taux occupation/reservation et la couverture item-level. Les cellules libres restent exactes et descriptives; aucun solveur P20 n'est introduit.
+## P19 product acceptance - 2026-07-10
+
+Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P19 est accepte comme contrat executable BoxFillPlan manuel : validation volumetrique, coverage item-level, cellules libres AABB, metrics par layer, CLI, fixtures, bridge et metadata CAD IR. Il reste hors Fusion, sans solveur automatique et sans validation d'impression (`print_validated: false`). La gate P20 greedy 2D est levee ; la gate ADR-0036 palette/app reste distincte.
