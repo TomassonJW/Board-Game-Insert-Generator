@@ -351,3 +351,9 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 
 - C-PRODUCT-VISION : P19-A est recommande pour rendre BoxFillPlan verificable avant palette ou solveur global.
 - Gate : extension additive de modele/schema P19 et choix UX ADR-0036 attendent validation humaine.
+
+## P18 strategic validation capability update
+
+- C-PRODUCT-VISION : `authorized-implementation` pour `box_fill_v0_manual_modules`; `BoxFillPlan` peut devenir le contrat executable CAD-agnostic du moteur pur.
+- C-FUSION-UI : ADR-0036 est `accepted-roadmap`; CommandInputs reste dev/smoke, et palette/app restent bloquees avant une gate d'implementation specifique.
+- C-SOLVER : aucun solveur global n'est autorise par P19; le prochain increment est manuel, deterministe et explicable.

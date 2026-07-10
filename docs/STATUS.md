@@ -862,3 +862,13 @@ Statut : done-docs, ADR-0036 Propose. CommandInputs Fusion reste dev/smoke; tout
 ## P18-M006 - Recommandation P19
 
 Statut : `done-docs`. P19 recommande est `P19-BOX-FILL-MANUAL-MODULES-SPRINT`: premier `BoxFillPlan` manuel, valide par collisions, reservations, couverture et volume libre. P19 est bloque par gate humaine avant toute extension de modele executable.
+
+## P18-VISION-UX-VOLUMETRIC-REBASE-SPRINT - Validation strategique
+
+Statut : `accepted` le 2026-07-10. Les livrables P18 sont acceptes : audit d'ecart, UX cible, modele volumetrique, roadmap solver, ADR-0036 et recommandation P19. La North Star reste le rangement complet dans le volume X/Y/Z de la boite; la commande Fusion classique reste une surface de dev, smoke, compatibilite et actions CAD/export, jamais l'UX finale.
+
+ADR-0036 est acceptee comme direction de roadmap, sans autoriser de palette, d'app ni de dependance UI lourde. L'extension additive, versionnee, CAD-agnostic et retrocompatible de `BoxFillPlan` est autorisee pour P19. La premiere surface persistante reste une gate humaine distincte.
+
+## P19-BOX-FILL-MANUAL-MODULES-SPRINT
+
+Statut : `authorized`. Le sprint doit produire dans le moteur Python pur un plan de boite manuel, verifiable et explicable. Il n'autorise ni solveur automatique, ni palette/app, ni nouvelle geometrie Fusion, ni changement de tolerance.

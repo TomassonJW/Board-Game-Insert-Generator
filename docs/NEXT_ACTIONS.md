@@ -18,11 +18,11 @@ structurant, authentification absente ou refus de push direct.
 
 ## Gate humaine active
 
-Gate humaine active : accepter P19-BOX-FILL-MANUAL-MODULES-SPRINT et l'extension additive BoxFillPlan. ADR-0036 reste Propose : choisir la future surface persistante avant toute palette/app.
+Gate humaine P19 levee le 2026-07-10 : `P19-BOX-FILL-MANUAL-MODULES-SPRINT` et l'extension additive `BoxFillPlan` sont autorises. ADR-0036 est acceptee pour la roadmap, mais la gate de choix/implementation d'une surface persistante reste active avant toute palette/app.
 
 ## Sprint actif
 
-`P18-VISION-UX-VOLUMETRIC-REBASE-SPRINT` est lance explicitement le 2026-07-10 apres validation humaine P17. Il est borne a la vision produit, l'UX cible, le contrat volumetrique, la roadmap solver et l'ADR UX; il n'autorise ni palette, ni solveur global, ni nouvelle geometrie.
+`P18-VISION-UX-VOLUMETRIC-REBASE-SPRINT` est accepte strategiquement le 2026-07-10. Il confirme le moteur pur + commande Fusion de controle a court terme et une UI persistante seulement apres stabilisation de `BoxFillPlan`; aucune palette/app n'est autorisee dans P19.
 
 Mission interne terminee : P16 validation - `fusion-validated-v0`, export/print toujours non valide physiquement.
 
@@ -38,9 +38,9 @@ Mission interne terminee : P17-M005 - Calibration coupon / preprint check V0, pr
 
 Mission interne terminee : P17-M006 - Validation Fusion export/preprint, STL par module BGIG, manifestes, exclusions registry et clear post-export valides; `print-validated: false` maintenu.
 
-## Mission ready non gated
+## Mission active autorisee
 
-Aucune mission implementation ready: P19-A est recommande mais bloque par gate humaine produit/architecture.
+`P19-BOX-FILL-MANUAL-MODULES-SPRINT` : construire le premier `BoxFillPlan` V0 manuel, CAD-agnostic et executable dans le moteur pur. Criteres : modules/reservations/layers/allocation explicites, validations de limites et collisions, couverture asset mesurable, volume libre et rapports Markdown/JSON/CAD IR. Aucun solveur, palette/app, changement Fusion ou tolerance.
 
 ## Regle operationnelle Fusion
 

@@ -854,7 +854,7 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Options candidates : dette UI/UX `quick_asset_box`, visualisation/proxies d'assets, cavites par pile/item, sizing capacitaire plus garanti, traitement cartes/decks, solveur/optimisation, export imprimable, calibration/impression ou maintien du scope V0.
 - Dette UX a prendre en compte : les champs, unites, effets de `count`, grille, walls, floor, clearances, modes et politiques restent difficiles a comprendre pour un humain.
 - Gate : decision humaine produit requise avant toute mission produit suivante.
-- Statut : `ready-gated`.
+- Statut : `authorized-in-progress`.
 
 ### P14-USABLE-ASSET-TRAY-M001 - Robustifier le layout multi-assets quick_asset_box
 
@@ -1112,8 +1112,8 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Capability : C-PRODUCT-VISION, C-GRID-3D, C-LAYERS, C-RESERVATION, C-SOLVER.
 - Objectif : rendre un `BoxFillPlan` manuel executable dans le moteur pur avec modules, positions, reservations, collisions, couverture et `FreeVolume`.
 - Dependances : contrats P18-M001 a P18-M004.
-- Gate : validation humaine explicite de l'extension de modele/schema; ADR-0036 reste une gate separee pour toute UI persistante.
-- Statut : `ready-gated`.
+- Gate : validation humaine explicite de l'extension de modele/schema recue le 2026-07-10. ADR-0036 est acceptee pour la roadmap; une gate separee subsiste avant toute UI persistante.
+- Statut : `authorized-in-progress`.
 
 ### P18-M003 - Definir le modele produit volumetrique cible
 
@@ -1130,4 +1130,10 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 
 - Livrable : `docs/DECISIONS/ADR-0036-ux-architecture-roadmap.md`.
 - Decision : commande Fusion = dev/smoke; UI persistante sous gate; app locale/web direction moyen terme.
-- Statut : `done-docs`, ADR `Propose`, gate humaine avant implementation UI lourde.
+- Statut : `accepted-roadmap`; ADR acceptee pour direction, gate humaine maintenue avant implementation UI lourde.
+
+### P18-VISION-UX-VOLUMETRIC-REBASE-SPRINT - Validation strategique
+
+- Resultat : livrables P18 acceptes; `BoxFillPlan` autorise comme extension additive, versionnee, CAD-agnostic et retrocompatible.
+- Limite : aucune palette, app, dependance UI lourde ou changement Fusion n'est autorise par cette validation.
+- Statut : `done`, `accepted`.

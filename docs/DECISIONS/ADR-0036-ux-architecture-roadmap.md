@@ -2,7 +2,7 @@
 
 ## Statut
 
-Propose - gate humaine requise avant implementation UI lourde.
+Accepted for roadmap - implementation still gated.
 
 ## Date
 
@@ -42,13 +42,15 @@ La commande Fusion classique est validee pour generer, inspecter, regenerer, cle
 - Inconvenients : deux surfaces a relier via contrat projet/CAD IR.
 - Compatibilite MVP : cible strategique, plus couteuse a initier.
 
-## Decision proposee
+## Decision
 
 Court terme : la commande Fusion classique reste obligatoire pour smoke tests, compatibilite et actions CAD/export. Elle ne portera pas l'UX finale.
 
 Prochain MVP UX : prototyper une palette Fusion persistante ou une UI externe apres validation humaine du contrat `BoxFillPlan` et d'un premier flux utilisateur. Moyen terme : converger vers une app locale/web pour la composition, Fusion restant adaptateur CAD/export.
 
 Cette ADR n'autorise ni palette, ni app, ni dependance web, ni changement du moteur. Elle exige une gate humaine de choix de surface avant implementation.
+
+La validation strategique du 2026-07-10 accepte cette direction : le moteur Python pur et la commande Fusion de controle restent le court terme, puis une surface persistante pourra etre prototypee apres stabilisation de `BoxFillPlan`. L'app locale/web reste la direction recommandee a moyen terme. Cette acceptation ne leve pas la gate d'implementation d'une palette ou d'une app.
 
 ## Consequences
 
@@ -75,5 +77,5 @@ Cette ADR n'autorise ni palette, ni app, ni dependance web, ni changement du mot
 
 ## Suivi
 
-- P18-M006 doit proposer P19, sans l'implementer.
-- Gate humaine : accepter/refuser la direction UX et choisir le moment de la premiere surface persistante.
+- P18-M006 a recommande P19; la validation strategique du 2026-07-10 autorise `P19-BOX-FILL-MANUAL-MODULES-SPRINT` et l'extension additive `BoxFillPlan`.
+- Gate humaine restante : choisir et autoriser la premiere surface persistante avant toute palette Fusion ou app locale/web.
