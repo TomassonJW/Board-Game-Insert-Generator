@@ -312,4 +312,10 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 
 - C-FUSION-EXPORT : `gate-prepared` pour validation Fusion P17 avec preset `p17_printable_export` et action `export_printables`.
 - C-QUALITY : preparation couvre manifestes JSON/Markdown, refus non-printables, `printability_export_allowed` et `print_validated: false`.
-- Gate : validation humaine Fusion P17 active ; aucune impression physique validee.
+- Gate : validation humaine Fusion P17 confirmee le 2026-07-10 ; aucune impression physique validee.
+## P17 validation capability update
+
+- C-FUSION-EXPORT : `fusion-validated-v0` pour l'export Fusion-only STL par `module_body` BGIG, avec registry et exclusions fonctionnellement verifies dans Fusion.
+- C-QUALITY : `fusion-validated-v0` pour les manifestes export JSON/Markdown et le reporting preprint V0; ils restent des traces d'audit, non des preuves physiques.
+- C-CALIBRATION : le protocole preprint est exploitable apres export, mais `print-validated: false` reste obligatoire.
+- Limite active : P17 valide une chaine technique export/preprint, pas une garantie d'impression ni le produit de remplissage volumetrique cible.

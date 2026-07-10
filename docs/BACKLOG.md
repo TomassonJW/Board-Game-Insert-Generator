@@ -1,6 +1,6 @@
 # Backlog
 
-Derniere mise a jour : 2026-07-09
+Derniere mise a jour : 2026-07-10
 
 Le backlog transforme la North Star en missions atomiques. Chaque mission future
 doit indiquer au minimum : ID, titre, capability liee, milestone lie, objectif,
@@ -1076,5 +1076,19 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Capability : C-FUSION-EXPORT, C-QUALITY.
 - Objectif : preparer le smoke Fusion export avec preset `p17_printable_export`, add-in installe, dossier export, manifeste et actions Fusion restantes.
 - Livrable : `scripts/fusion/prepare_quick_asset_test.ps1 -Preset p17_printable_export`, preset riche 5 assets, marqueurs d'installation export/manifeste et settings Fusion ecrits.
-- Gate : validation humaine Fusion P17 ; aucune impression 3D validee.
-- Statut : `done`, `gate-prepared`, `human-validation-required`.
+- Gate : validation humaine Fusion P17 confirmee le 2026-07-10 ; aucune impression 3D validee.
+- Statut : `done`, `fusion-validated-v0`, `print-validated: false`.
+
+### P17-PRINTABLE-EXPORT-AND-PREPRINT-SPRINT-V - Validation Fusion
+
+- Resultat : preset `p17_printable_export`, generation asset-first, compartiments, encoches, `export_printables`, STL par module BGIG imprimable, manifestes JSON/Markdown, exclusion des non-BGIG/references/debug/helpers et clear post-export valides.
+- Limites : aucune impression physique, slicer, materiau, mesure dimensionnelle ou garantie `ready to print` validee.
+- Statut : `done`, `fusion-validated-v0`, `print-validated: false`.
+
+### P18-M001 - Audit de l'ecart vision vs etat reel
+
+- Capability : C-PRODUCT-VISION, C-FUSION-UI, C-SOLVER, C-GRID-3D.
+- Objectif : expliciter l'ecart entre la fondation asset-first/Fusion actuelle et le produit cible de remplissage volumetrique, variantes et UX premium.
+- Livrable : `docs/VISION_GAP_ANALYSIS.md` et mises a jour de pilotage.
+- Gate : aucune tant que le travail reste documentaire et ne modifie pas la North Star ni l'architecture executable.
+- Statut : `ready`.

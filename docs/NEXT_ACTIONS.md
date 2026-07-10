@@ -1,6 +1,6 @@
 # Next Actions
 
-Derniere mise a jour : 2026-07-09
+Derniere mise a jour : 2026-07-10
 
 Ce fichier indique les prochaines missions recommandees. Il doit rester court,
 priorise et directement actionnable. Si aucune mission explicite n'est donnee,
@@ -18,11 +18,11 @@ structurant, authentification absente ou refus de push direct.
 
 ## Gate humaine active
 
-Gate humaine active : `P17-PRINTABLE-EXPORT-AND-PREPRINT-SPRINT-V`. La preparation locale est faite avec le preset `p17_printable_export`; Thomas doit valider dans Fusion avant toute nouvelle mission produit.
+Aucune gate humaine active pour le travail documentaire `P18-VISION-UX-VOLUMETRIC-REBASE-SPRINT` explicitement autorise. Une nouvelle gate sera requise avant toute implementation de palette persistante, app externe ou solveur global.
 
 ## Sprint actif
 
-`P17-PRINTABLE-EXPORT-AND-PREPRINT-SPRINT` est lance explicitement le 2026-07-09 apres validation P16.
+`P18-VISION-UX-VOLUMETRIC-REBASE-SPRINT` est lance explicitement le 2026-07-10 apres validation humaine P17. Il est borne a la vision produit, l'UX cible, le contrat volumetrique, la roadmap solver et l'ADR UX; il n'autorise ni palette, ni solveur global, ni nouvelle geometrie.
 
 Mission interne terminee : P16 validation - `fusion-validated-v0`, export/print toujours non valide physiquement.
 
@@ -36,11 +36,11 @@ Mission interne terminee : P17-M004 - Printability blockers V0, statuts/issues/e
 
 Mission interne terminee : P17-M005 - Calibration coupon / preprint check V0, protocole preprint et exemple JSON ajoutes.
 
-Mission interne terminee : P17-M006 - Preparation gate Fusion P17, preset `p17_printable_export`, add-in installe et settings Fusion ecrits.
+Mission interne terminee : P17-M006 - Validation Fusion export/preprint, STL par module BGIG, manifestes, exclusions registry et clear post-export valides; `print-validated: false` maintenu.
 
 ## Mission ready non gated
 
-Aucune mission ready non gated tant que `P17-PRINTABLE-EXPORT-AND-PREPRINT-SPRINT-V` n'est pas validee humainement dans Fusion.
+`P18-M001 - Audit de l'ecart vision vs etat reel` est ready. Il est documentaire et doit etre committe/integre avant les autres missions internes P18.
 
 ## Regle operationnelle Fusion
 
@@ -55,7 +55,7 @@ Fusion restantes a Thomas.
 
 `P10-SOLVER-GATE - Solveur complexe, backtracking ou optimisation globale`.
 
-Palette persistante HTML, UI assets avancee/tableau, solveur global, cavites par pile/logements detailles, assets individuels Fusion, nouvelle geometrie produit complexe et validation d'impression restent gates ou missions separees. P17 autorise seulement l'export/preprint V0 sans validation physique.
+Palette persistante HTML, UI assets avancee/tableau, solveur global, cavites par pile/logements detailles, assets individuels Fusion, nouvelle geometrie produit complexe et validation d'impression restent gates ou missions separees. P17 valide seulement l'export/preprint V0 sans validation physique.
 
 ## Fin de chaque mission
 

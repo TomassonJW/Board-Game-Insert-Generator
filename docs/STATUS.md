@@ -1,6 +1,6 @@
 # Status
 
-Derniere mise a jour : 2026-07-09
+Derniere mise a jour : 2026-07-10
 
 ## Etat global
 
@@ -823,6 +823,16 @@ Le protocole conserve `print_validated: false` et distingue `not_printed`, `prin
 
 ### P17-M006 - Gate Fusion P17 export complet
 
-Statut : `gate-prepared`, `human-validation-required`. Le preset `p17_printable_export` prepare le scenario riche 5 assets valide en P16 puis ajoute le focus export : action `export_printables`, STL V0 par body `module_body`, manifestes `bgig_export_manifest.json` / `bgig_export_manifest.md`, refus des entites non imprimables et `print_validated: false`.
+Statut : `done`, `fusion-validated-v0`, `print-validated: false`. Le preset `p17_printable_export` prepare le scenario riche 5 assets valide en P16 puis ajoute le focus export : action `export_printables`, STL V0 par body `module_body`, manifestes `bgig_export_manifest.json` / `bgig_export_manifest.md`, refus des entites non imprimables et `print_validated: false`.
 
-Preparation locale : add-in installe dans AppData via `scripts/fusion/prepare_quick_asset_test.ps1 -Preset p17_printable_export`, settings UI ecrits en `quick_asset_box`, action initiale `generate`. La suite est une gate humaine Fusion ; aucune impression physique n'est validee.
+Preparation locale : add-in installe dans AppData via `scripts/fusion/prepare_quick_asset_test.ps1 -Preset p17_printable_export`, settings UI ecrits en `quick_asset_box`, action initiale `generate`.
+
+## P17-PRINTABLE-EXPORT-AND-PREPRINT-SPRINT-V - Validation Fusion
+
+Statut : `fusion-validated-v0` apres validation humaine Fusion du 2026-07-10 sur le commit `5d99d36`, `print-validated: false`.
+
+Le smoke test confirme dans un document Fusion Assembly-compatible que les settings du preset `p17_printable_export` sont charges, que `quick_asset_box` genere les modules, compartiments et encoches V0, puis que l'action `export_printables` ecrit un STL par module BGIG imprimable et les manifestes `bgig_export_manifest.json` / `bgig_export_manifest.md` dans un dossier d'export dedie.
+
+Le filtre export est valide fonctionnellement : objets non-BGIG, racines, references/outlines, sketches de debug, helpers, sources et vues eclatees ne sont pas exportes. Les manifestes tracent scene, assets, modules, dimensions, warnings et statut print. `clear_bgig_scene` reste fonctionnel apres export et preserve les objets non-BGIG.
+
+P17 valide une chaine technique export/preprint V0, pas le produit cible ni une promesse d'impression. Aucune impression 3D physique, validation slicer, validation materiau, validation dimensionnelle reelle ou garantie `ready to print` n'est revendiquee.
