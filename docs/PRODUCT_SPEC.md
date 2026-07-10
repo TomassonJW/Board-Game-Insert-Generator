@@ -152,3 +152,7 @@ les tolerances et documenter les ecarts constates.
 
 Le systeme propose plusieurs layouts, explique les arbitrages et aide a choisir
 selon compacite, accessibilite, impression, setup et esthetique.
+
+## Update P18 - Produit cible operationnel
+
+Le produit cible est un BoxFillPlan editable: inventaire asset-first, intentions, reservations, layers, modules, volumes libres et variantes scorees. La commande Fusion actuelle reste une interface de developpement; la UX premium est decrite dans docs/UX_PRODUCT_VISION.md.

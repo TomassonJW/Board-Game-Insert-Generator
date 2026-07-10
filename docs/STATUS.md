@@ -850,3 +850,7 @@ Statut : done-docs. UX_PRODUCT_VISION.md definit six ecrans de la boite a l'expo
 ## P18-M003 - Modele produit volumetrique cible
 
 Statut : done-docs. VOLUMETRIC_PRODUCT_MODEL.md separe explicitement la boite, assets, intentions, reservations, layers, modules, compartiments, variantes, volumes libres et export. Fusion reste une projection.
+
+## P18-M004 - Roadmap solver/box fill
+
+Statut : done-docs. BOX_FILL_SOLVER_ROADMAP.md separe six niveaux, recommande ox_fill_v0_manual_modules et interdit de sauter directement au solveur global.

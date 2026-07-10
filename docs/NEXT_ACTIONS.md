@@ -40,7 +40,7 @@ Mission interne terminee : P17-M006 - Validation Fusion export/preprint, STL par
 
 ## Mission ready non gated
 
-`P18-M004 - Roadmap solver et box fill` est ready. Il doit decouper les etapes manuelles, greedy, layers, variantes et editeur sans les implementer.
+`P18-M005 - ADR architecture UX` est ready. Il doit comparer commande Fusion, palette, app locale et hybride, puis preparer la gate humaine avant implementation.
 
 ## Regle operationnelle Fusion
 

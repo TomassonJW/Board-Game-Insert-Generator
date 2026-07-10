@@ -336,3 +336,8 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 
 - C-PRODUCT-VISION : contrat GameBox a ExportPackage defini; BoxFillPlan devient la future source de verite CAD-agnostic.
 - C-GRID-3D / C-LAYERS / C-RESERVATION : leurs concepts existants sont conserves et raccordes au modele produit cible.
+
+## P18-M004 capability update
+
+- C-SOLVER : roadmap en six etapes acceptee comme trajectoire documentaire; aucun solveur global n'est implemente.
+- C-PRODUCT-VISION : ox_fill_v0_manual_modules est recommande comme premier increment verificable.
