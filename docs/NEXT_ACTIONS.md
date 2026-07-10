@@ -40,7 +40,7 @@ Mission interne terminee : P17-M006 - Validation Fusion export/preprint, STL par
 
 ## Mission ready non gated
 
-`P18-M001 - Audit de l'ecart vision vs etat reel` est ready. Il est documentaire et doit etre committe/integre avant les autres missions internes P18.
+`P18-M002 - Redefinir l'UX cible premium` est ready. Il doit produire un flux utilisateur cible et des frontieres explicites entre commande Fusion, palette future et application future.
 
 ## Regle operationnelle Fusion
 

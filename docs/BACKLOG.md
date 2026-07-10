@@ -1091,4 +1091,12 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Objectif : expliciter l'ecart entre la fondation asset-first/Fusion actuelle et le produit cible de remplissage volumetrique, variantes et UX premium.
 - Livrable : `docs/VISION_GAP_ANALYSIS.md` et mises a jour de pilotage.
 - Gate : aucune tant que le travail reste documentaire et ne modifie pas la North Star ni l'architecture executable.
+- Statut : `done-docs`.
+
+### P18-M002 - Redefinir l'UX cible premium
+
+- Capability : C-FUSION-UI, C-ASSET, C-SOLVER.
+- Objectif : decrire un parcours premium de la boite a l'export, sans implementation UI.
+- Livrable : `docs/UX_PRODUCT_VISION.md`.
+- Gate : aucune pour le contrat documentaire; gate architecture avant implementation UI lourde.
 - Statut : `ready`.

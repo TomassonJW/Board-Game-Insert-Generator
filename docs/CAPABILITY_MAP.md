@@ -79,6 +79,7 @@ Chaine de pilotage :
 | C-SOLVER | Solver and scoring | Volumetric layout | `implemented-core` | M10 Semi-automatic solver | Variant comparison P10-M002 report-only; raisons de rejet structurees P10-M003; module_candidates P10-M004; variante recommandee P10-M005; grouping borne P10-M006; plan concret greedy P10-M008; P13-M001 reutilise ce pipeline sans backtracking ni optimisation globale; P13-ASSET-M002/P13-ASSET-M002V valide une heuristique count-aware bornee pour piles/footprint/refus explicite sans solveur global; gate architecture si optimiseur majeur |
 | C-CALIBRATION | Calibration and print validation | Human validation gates | `designed` | M11 Physical validation | Impression reelle |
 | C-AESTHETIC | Aesthetic layer | Design language and aesthetics | `planned` | M12 Design language | Gate esthetique structurante |
+| C-PRODUCT-VISION | Product composition model | Product control plane | `designed` | P18 product rebase | Audit P18; gate before executable architecture |
 
 ## Milestones utilisateur
 
@@ -319,3 +320,9 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 - C-QUALITY : `fusion-validated-v0` pour les manifestes export JSON/Markdown et le reporting preprint V0; ils restent des traces d'audit, non des preuves physiques.
 - C-CALIBRATION : le protocole preprint est exploitable apres export, mais `print-validated: false` reste obligatoire.
 - Limite active : P17 valide une chaine technique export/preprint, pas une garantie d'impression ni le produit de remplissage volumetrique cible.
+
+## P18-M001 capability update
+
+- C-PRODUCT-VISION : `designed` par l'audit d'ecart; la boite complete, les intentions, reservations, variantes et l'edition de layout sont identifies comme le prochain niveau de produit.
+- C-FUSION-UI : son statut d'adaptateur valide reste inchange; `quick_asset_box` est explicitement une UI de test/developpement, non l'UX finale.
+- C-SOLVER / C-GRID-3D : les heuristiques locales et la lattice de reservation restent valides comme fondation, mais ne sont pas un remplissage intelligent global.

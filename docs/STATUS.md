@@ -836,3 +836,9 @@ Le smoke test confirme dans un document Fusion Assembly-compatible que les setti
 Le filtre export est valide fonctionnellement : objets non-BGIG, racines, references/outlines, sketches de debug, helpers, sources et vues eclatees ne sont pas exportes. Les manifestes tracent scene, assets, modules, dimensions, warnings et statut print. `clear_bgig_scene` reste fonctionnel apres export et preserve les objets non-BGIG.
 
 P17 valide une chaine technique export/preprint V0, pas le produit cible ni une promesse d'impression. Aucune impression 3D physique, validation slicer, validation materiau, validation dimensionnelle reelle ou garantie `ready to print` n'est revendiquee.
+
+## P18-M001 - Audit vision versus etat reel
+
+Statut : `done-docs`. `docs/VISION_GAP_ANALYSIS.md` confirme que la North Star reste valide : BGIG dispose d'une fondation asset-first/Fusion/preprint solide, mais le produit actuel reste un atelier de generation de bacs et non un concepteur de rangement complet.
+
+Dette prioritaire : `quick_asset_box` est une commande de test/developpement, la grille est une lattice de reservation et le placement greedy n'est pas un solveur de remplissage. P18 recadre donc les prochains travaux comme architecture produit : plan de boite, intentions, modules, reservations, variantes et UX de composition. Aucun moteur, schema public ou comportement Fusion n'est modifie.
