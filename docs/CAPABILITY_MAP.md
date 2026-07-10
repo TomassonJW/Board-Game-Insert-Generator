@@ -443,7 +443,13 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 ## P28 local composer selection bridge update
 
 - C-CAD-IR : `implemented-selection-bridge` pour la projection explicite d une selection P21 en composants CAD IR standards, avec trace de variante et sans nouvelle geometrie metier.
-- C-FUSION-UI : `manual-validation-required` : le pipeline add-in existant peut consommer les blanks P28, mais la scene doit etre observee humainement dans Fusion.
+- C-FUSION-UI : `technical-path-observed`, `product-ux-rejected` : le pipeline add-in consomme les blanks P28, mais le dialogue et le resultat ne sont pas acceptables comme experience produit ; P31/P32 les remplacent.
 - C-PRODUCT-VISION : le Studio conserve une selection explicite et le moteur Python reste source de verite ; aucun calcul ne migre vers Fusion.
 - C-QUALITY : tests de contrat local/CLI et dry run de preparation Fusion couvrent le raccord hors Fusion.
 - C-PRINT / C-ERGONOMICS : inchanges, `print-validated: false` ; les envelopes P28 ne sont pas des bacs finis.
+## P29 premium product recovery update
+
+- C-PRODUCT-VISION : `accepted-product-direction` pour Studio principal, palette Fusion secondaire et progression vers geometrie fonctionnelle avant esthetique.
+- C-FUSION-UI : la commande CommandInputs reste `fusion-validated` comme outil expert/smoke, mais elle est retiree de la cible UX produit ; la palette P32 est prevue sous gate Fusion.
+- C-CAD-IR : P28 reste `implemented-selection-bridge` uniquement ; il ne prouve pas une projection de bac fonctionnel.
+- C-AESTHETIC / C-STACKING : formes, labels et mecanismes sont inclus dans le plan mais restent `planned` / `experimental` jusqu aux gates P33-P35.

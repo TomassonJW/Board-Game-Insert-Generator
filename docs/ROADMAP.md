@@ -211,4 +211,7 @@ Statut : `done`, `implemented-local-ui`, `print-validated: false`. Les sorties P
 
 ## P28 Fusion selection bridge - 2026-07-11
 
-Statut : `implemented-cad-ir-selection-bridge`, `manual_validation_required`, `print-validated: false`. La selection locale P21 devient une liste de composants CAD IR `rectangular_blank` que l add-in Fusion existant sait deja lire. Les dimensions et positions sont copiees depuis le plan resolu ; aucun score, placement, tolerance, cavite ou paroi n est invente. Le smoke Fusion humain est la prochaine preuve requise avant toute declaration `fusion-validated`.
+Statut : `implemented-cad-ir-selection-bridge`, `technical-path-observed`, `product-ux-rejected`, `print-validated: false`. La selection locale P21 devient une liste de composants CAD IR `rectangular_blank` que l add-in Fusion existant sait deja lire. Les dimensions et positions sont copiees depuis le plan resolu ; aucun score, placement, tolerance, cavite ou paroi n est invente. Le retour humain P28 rejette ce resultat comme experience produit ; P31 doit le remplacer par de vrais bacs avant toute nouvelle preuve Fusion.
+## P29 product recovery - 2026-07-11
+
+Statut : `done-docs`, `accepted-product-direction`. La trajectoire premium est maintenant explicite : Studio local principal, palette Fusion secondaire, previews vivantes, projection des selections vers de vrais bacs, puis forme, esthetique, mecanismes et validation physique. Le raccord P28 de simples blanks est conserve comme preuve technique mais rejete comme resultat produit. P30 attend la validation de la direction visuelle avant implementation.

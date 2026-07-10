@@ -1316,4 +1316,21 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - Preuves : tests Local Composer/CLI avec plan Fusion hors API, export reel de trois modules et dry run du preparateur.
 - Hors scope : nouveau solveur, changement de tolerance, cavites/parois finies, export imprimable automatique, validation d impression, cloud ou Fusion comme source de verite.
 - Gate : observation humaine Fusion obligatoire ; aucune declaration `fusion-validated` ou `print-validated` avant retour humain.
-- Statut : `implemented-cad-ir-selection-bridge`, `manual_validation_required`, `print-validated: false`.
+- Statut : `implemented-cad-ir-selection-bridge`, `technical-path-observed`, `product-ux-rejected`, `print-validated: false`.
+### P29-M001 - Redressement produit et plan d execution premium
+
+- Capability : C-PRODUCT-VISION, C-FUSION-UI, C-CAD-IR.
+- Milestone : M14 Usable beta.
+- Objectif : requalifier P28, fixer Studio principal / palette Fusion secondaire et rendre la trajectoire vers bacs, parametres live, esthetique, mecanismes et validation physique executable.
+- Livrables : ADR-0042, `PREMIUM_PRODUCT_EXECUTION_PLAN.md`, gate P30 et mises a jour de pilotage.
+- Gate : aucune pour la documentation ; le choix visuel P30 reste humain avant code UI.
+- Statut : `done-docs`, `accepted-product-direction`.
+
+### P30-GATE - Direction visuelle et interaction principale
+
+- Capability : C-PRODUCT-VISION, C-FUSION-UI, C-AESTHETIC.
+- Milestone : M14 Usable beta.
+- Objectif : valider la direction `Atelier de rangement` avant la refonte Studio : boite centrale, etapes progressives, cartes de decision, parametres de forme visibles et expert replie.
+- Livrable : `docs/P30_VISUAL_DIRECTION_GATE.md`.
+- Gate : decision esthetique structurante obligatoire.
+- Statut : `ready-gated`.

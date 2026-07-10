@@ -2,7 +2,7 @@
 
 ## Statut
 
-`manual_validation_required` — le pont CAD IR est implemente et teste hors Fusion. La scene Fusion et l impression ne sont pas encore validees.
+`technical-path-observed`, `product-ux-rejected` — le pont CAD IR a ete observe, mais son message et ses blocs ne constituent pas une experience produit acceptable. La scene ne devient pas `fusion-validated` et l impression reste non validee.
 
 ## Objet du test
 
@@ -40,3 +40,10 @@ Le script exporte les fichiers temporaires dans `%TEMP%`, installe l add-in cour
 - Les trois volumes selectionnes sont presents sans doublon.
 - Aucun objet ne se presente comme un bac final ou un STL valide.
 - Aucun statut `fusion-validated` ou `print-validated` n est applique avant le retour humain.
+## Requalification P29
+
+Le retour utilisateur du 2026-07-11 rejette ce smoke comme demonstration produit :
+le dialogue est technique et les trois enveloppes ne sont pas des bacs. Le
+protocole est conserve comme preuve de raccord CAD IR seulement. P31 doit le
+remplacer par une projection de geometrie fonctionnelle avant toute nouvelle
+gate Fusion utilisateur.

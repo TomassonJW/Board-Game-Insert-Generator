@@ -158,3 +158,4 @@ Tests, cartes backlog ou gates humaines a preparer.
 - ADR-0039-box-fill-variants-v0.md - Portefeuille de variantes deterministes P21.
 - ADR-0040-local-composer-loopback-adapter.md - App locale React/Vite et adaptateur Python loopback P23.
 - ADR-0041-local-composer-selection-cad-ir-bridge.md - Pont CAD IR de la selection locale P21 vers Fusion P28.
+- ADR-0042-studio-primary-fusion-palette-secondary.md - Studio produit principal et palette Fusion secondaire.

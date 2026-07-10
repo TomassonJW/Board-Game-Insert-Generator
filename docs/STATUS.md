@@ -972,8 +972,15 @@ Preuves : build Vite et verification TypeScript des cinq policies bornees, des e
 
 ## P28 - Pont Fusion de selection locale
 
-Statut : `implemented-cad-ir-selection-bridge`, `manual_validation_required`, `print-validated: false`.
+Statut : `implemented-cad-ir-selection-bridge`, `technical-path-observed`, `product-ux-rejected`, `print-validated: false`.
 
 La gate de scope P28 est approuvee le 2026-07-11. L export local convertit a present la variante P21 selectionnee en composants CAD IR `rectangular_blank` explicites, un par module imprimable, en recopiant strictement ses origines et dimensions resolues. Fusion consomme ce contrat existant sans connaitre P21, sans recalcul de placement ni modification de tolerance.
 
-Preuves hors Fusion : les tests Local Composer et CLI chargent la scene dans `generation_plan_from_cad_ir`; l export reel `mixed-box` produit trois composants et un plan de trois blanks. Le preparateur `scripts/fusion/prepare_local_composer_selection_test.ps1` passe en dry run. L observation Fusion reste obligatoire avant tout statut `fusion-validated`; aucune cavite, paroi, ergonomie, slicer ou impression n est validee.
+Preuves hors Fusion : les tests Local Composer et CLI chargent la scene dans `generation_plan_from_cad_ir`; l export reel `mixed-box` produit trois composants et un plan de trois blanks. Le retour utilisateur observe le chemin mais rejette le message et les blocs comme experience produit. P28 ne recoit donc pas `fusion-validated` et P31 doit apporter parois, fond et logements avant une nouvelle validation Fusion ; aucune ergonomie, slicer ou impression n est validee.
+## P29 - Redressement produit et UX premium
+
+Statut : `done-docs`, `accepted-product-direction`, `print-validated: false`.
+
+Le retour humain de P28 confirme que le raccord CAD IR genere bien un artefact technique mais echoue comme experience produit : dialogue Fusion technique en anglais, telemetrie brute et simples enveloppes sans bacs fonctionnels. P28 est donc requalifie `KO produit/UX`, sans annuler ses preuves de raccord.
+
+L objectif actif accepte ADR-0042 : Studio principal, palette Fusion secondaire, vrais bacs avant esthetique, parametres vivants et mecanismes prepares sous gates physiques. `docs/PREMIUM_PRODUCT_EXECUTION_PLAN.md` decoupe la trajectoire P29 a P35. La prochaine gate est P30, direction visuelle `Atelier de rangement`; aucune refonte visuelle n est codee avant sa validation.

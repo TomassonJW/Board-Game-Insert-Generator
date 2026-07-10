@@ -8,30 +8,25 @@ Statut : `active` pour les missions non gatees. Les missions Fusion et physiques
 
 ## Etat courant
 
-P19 a P21 fournissent les contrats et propositions moteur. P22 a P27 fournissent le Studio local. P28 relie maintenant une selection P21 explicite a la CAD IR standard attendue par Fusion, sous la forme prudente d enveloppes rectangulaires. Le moteur Python reste la source de verite.
+L objectif actif replace BGIG sur sa trajectoire premium. P19 a P21 fournissent le moteur de planification, P23 a P27 le Studio local, P28 un raccord CAD IR technique. Le raccord P28 est requalifie `KO produit/UX` : il ne doit plus etre presente comme une generation d insert utilisable.
+
+ADR-0042 fixe la surface cible : Studio principal pour concevoir et visualiser ; palette Fusion secondaire pour materialiser, inspecter et exporter. Le plan complet est `docs/PREMIUM_PRODUCT_EXECUTION_PLAN.md`.
 
 ## Gate humaine active
 
-La decision de scope P28 est approuvee. La seule gate active est l observation reelle dans Fusion :
-
-- le pont produit exactement les trois volumes selectionnes du starter de smoke ;
-- Codex prepare l add-in et les settings locaux ;
-- Thomas execute `Run` dans Fusion et confirme ou infirme la scene ;
-- aucun statut `fusion-validated` ou `print-validated` n est permis avant ce retour humain.
-
-Le protocole et les mesures attendues sont dans `docs/P28_FUSION_SELECTION_SMOKE.md`.
+`P30-GATE - Direction visuelle et interaction principale` est la prochaine gate reelle. Le choix demande est documente dans `docs/P30_VISUAL_DIRECTION_GATE.md` : valider ou ajuster la direction `Atelier de rangement` avant de coder la refonte visuelle du Studio.
 
 ## Hors scope maintenu
 
-- Aucun solveur global, backtracking, optimisation opaque ou IA non evaluee.
 - Fusion ne devient jamais source de verite du plan.
-- Les volumes P28 ne sont pas des bacs finis : pas de cavites, parois, encoches ou tolerances nouvelles.
-- Aucune validation d impression, de slicer ou d ergonomie reelle n est revendiquee.
+- P28 reste une preuve de raccord technique, pas une geometrie de bac fini.
+- Aucun couvercle, clip, charniere ou mecanisme ne sera declare fonctionnel avant gate et impression reelle.
+- Aucun statut `print-validated` ne sera utilise sans prototype mesure.
 
 ## Prochaine action
 
-Terminer `P28-GATE` par le smoke humain Fusion prepare par `scripts/fusion/prepare_local_composer_selection_test.ps1`. Apres un resultat `OK` documente, choisir une seule prochaine mission `ready` qui etend la geometrie sans franchir la gate impression.
+Apres validation P30, executer `P30-M001` : premier flux Studio novice et apercu de boite vivant. P31 ne commencera qu apres une strategie documentee de projection vers de vrais bacs.
 
 ## Fin de chaque mission
 
-Appliquer direct-to-main pour tout lot non gate : tests pertinents, `git diff --check`, commit atomique, integration et push de `main`. Pour P28, arreter avant toute declaration `fusion-validated` jusqu au retour humain.
+Appliquer direct-to-main pour tout lot non gate : tests pertinents, `git diff --check`, commit atomique, integration et push de `main`.
