@@ -33,6 +33,7 @@ class BoxFillPlanCompletionTests(unittest.TestCase):
             free.occupied_module_volume_mm3 + free.occupied_reservation_volume_mm3 + free.total_free_volume_mm3,
         )
         self.assertEqual(analysis.metrics["coverage_ratio"], 1.0)
+        self.assertEqual(analysis.metrics["volumes_by_layer"]["base-layer"]["free_volume_mm3"], free.total_free_volume_mm3)
 
     def test_invalid_fixtures_expose_actionable_codes(self) -> None:
         expected = {

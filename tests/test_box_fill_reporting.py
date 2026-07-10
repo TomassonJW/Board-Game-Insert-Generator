@@ -35,6 +35,8 @@ class BoxFillPlanReportingTests(unittest.TestCase):
         self.assertIn("### Asset coverage", markdown)
         self.assertIn("coin-tokens | 30 | 30 | 0 | 0 | covered", markdown)
         self.assertIn("exact_aabb_cells_v0", markdown)
+        self.assertIn("### Free volumes by layer", markdown)
+        self.assertIn("Occupancy ratio", markdown)
 
     def test_cad_ir_transports_plan_as_metadata_without_components(self) -> None:
         payload = build_blank_cad_scene(self.config, self.layout).to_dict()

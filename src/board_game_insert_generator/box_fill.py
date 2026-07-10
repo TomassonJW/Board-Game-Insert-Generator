@@ -155,7 +155,7 @@ def analyze_box_fill_plan(plan: BoxFillPlan) -> BoxFillAnalysis:
         ),
         regions=tuple(regions),
     )
-    covered_items = sum(entry.declared_quantity for entry in coverage if entry.status == "covered")
+    covered_items = sum(min(entry.allocated_quantity, entry.declared_quantity) for entry in coverage)
     total_items = sum(entry.declared_quantity for entry in coverage)
     metrics = {
         "asset_types_count": len(plan.assets),
@@ -173,6 +173,7 @@ def analyze_box_fill_plan(plan: BoxFillPlan) -> BoxFillAnalysis:
         "total_free_volume_mm3": total_free_volume,
         "occupancy_ratio": ((occupied_module_volume + occupied_reservation_volume) / total_box_volume) if total_box_volume else 0.0,
         "reservation_ratio": (occupied_reservation_volume / total_box_volume) if total_box_volume else 0.0,
+        "volumes_by_layer": _volumes_by_layer(plan, regions),
     }
     return BoxFillAnalysis(coverage=coverage, free_volume=free_volume, issues=issues, metrics=metrics)
 
@@ -364,6 +365,20 @@ def derive_box_fill_plan_from_executable_asset_plan(config: Any, executable_plan
         metadata={"source": "derived_from_executable_asset_plan", "bridge_warnings": ["Reservations, manual locks, compartments and access features were not inferred.", "Only placed executable modules were converted; rejected modules remain uncovered."]},
     )
 
+
+def _volumes_by_layer(plan: BoxFillPlan, regions: list[FreeRegion]) -> dict[str, dict[str, float]]:
+    result: dict[str, dict[str, float]] = {
+        layer.id: {"module_volume_mm3": 0.0, "reservation_volume_mm3": 0.0, "free_volume_mm3": 0.0}
+        for layer in plan.layers
+    }
+    result["unassigned"] = {"module_volume_mm3": 0.0, "reservation_volume_mm3": 0.0, "free_volume_mm3": 0.0}
+    for module in plan.modules:
+        result.get(module.layer_id or "unassigned", result["unassigned"])["module_volume_mm3"] += _volume(module.size)
+    for reservation in plan.reservations:
+        result.get(reservation.layer_id or "unassigned", result["unassigned"])["reservation_volume_mm3"] += _volume(reservation.size)
+    for region in regions:
+        result.get(region.layer_id or "unassigned", result["unassigned"])["free_volume_mm3"] += region.volume_mm3
+    return {key: value for key, value in result.items() if key != "unassigned" or any(value.values())}
 
 def _decompose_free_regions(plan: BoxFillPlan) -> tuple[list[FreeRegion], float, float]:
     x_cuts = {plan.box.origin.x, plan.box.origin.x + plan.box.inner_dimensions.x}

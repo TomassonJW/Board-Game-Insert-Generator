@@ -738,6 +738,7 @@ def _format_box_fill_plan_section(plan: dict[str, Any] | None) -> list[str]:
         return lines + ["- No BoxFillPlan declared.", ""]
     validation = plan["validation"]
     free_volume = plan["free_volumes"][0]
+    metrics = plan.get("metrics", {})
     lines.extend(
         [
             f"- Schema: `{plan['schema_version']}`",
@@ -749,13 +750,24 @@ def _format_box_fill_plan_section(plan: dict[str, Any] | None) -> list[str]:
             f"- Exact free volume: {free_volume['total_free_volume_mm3']:.2f} mm3",
             f"- Free regions: {len(free_volume['regions'])}",
             f"- Free volume qualification: `{free_volume['qualification']}` ({free_volume['reason']})",
+            f"- Module volume: {metrics.get('occupied_module_volume_mm3', 0.0):.2f} mm3",
+            f"- Reservation volume: {metrics.get('occupied_reservation_volume_mm3', 0.0):.2f} mm3",
+            f"- Occupancy ratio: {metrics.get('occupancy_ratio', 0.0):.2%}",
+            f"- Reservation ratio: {metrics.get('reservation_ratio', 0.0):.2%}",
+            f"- Item coverage: {metrics.get('covered_item_count', 0)} / {metrics.get('total_item_count', 0)} ({metrics.get('coverage_ratio', 0.0):.2%})",
             "",
-            "### Asset coverage",
+            "### Free volumes by layer",
             "",
-            "| Asset | Declared | Allocated | Unallocated | Over-allocated | Status |",
-            "| --- | ---: | ---: | ---: | ---: | --- |",
+            "| Layer | Module volume | Reservation volume | Free volume |",
+            "| --- | ---: | ---: | ---: |",
         ]
     )
+    for layer_id, volumes in metrics.get("volumes_by_layer", {}).items():
+        lines.append(
+            f"| {layer_id} | {volumes['module_volume_mm3']:.2f} | "
+            f"{volumes['reservation_volume_mm3']:.2f} | {volumes['free_volume_mm3']:.2f} |"
+        )
+    lines.extend(["", "### Asset coverage", "", "| Asset | Declared | Allocated | Unallocated | Over-allocated | Status |", "| --- | ---: | ---: | ---: | ---: | --- |"])
     for entry in plan["coverage"]:
         lines.append(
             "| "
@@ -770,6 +782,8 @@ def _format_box_fill_plan_section(plan: dict[str, Any] | None) -> list[str]:
         lines.append("- No BoxFillPlan validation issues.")
     lines.append("")
     return lines
+
+
 def _format_grid_point(point: Any) -> str:
     return f"({point.x}, {point.y}, {point.z})"
 
