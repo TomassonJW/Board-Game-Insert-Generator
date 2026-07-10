@@ -1,0 +1,96 @@
+{
+  "project_name": "Manual Box Fill V0",
+  "units": "mm",
+  "box": {
+    "inner_dimensions_mm": {"x": 120.0, "y": 80.0, "z": 40.0},
+    "usable_height_mm": 38.0,
+    "lid_clearance_mm": 2.0
+  },
+  "assets": [
+    {
+      "id": "coin-tokens",
+      "name": "Coin tokens",
+      "kind": "tokens",
+      "quantity": {"count": 30, "grouping": "loose"},
+      "dimensions_mm": {"x": 20.0, "y": 20.0, "z": 2.0},
+      "dimension_confidence": "exact",
+      "containment_intent": "store"
+    },
+    {
+      "id": "wooden-dice",
+      "name": "Wooden dice",
+      "kind": "dice",
+      "quantity": {"count": 2, "grouping": "loose"},
+      "dimensions_mm": {"x": 16.0, "y": 16.0, "z": 16.0},
+      "dimension_confidence": "exact",
+      "containment_intent": "access_first"
+    }
+  ],
+  "box_fill_plan": {
+    "schema_version": "box_fill_plan.v0",
+    "id": "manual-demo",
+    "box_id": "demo-game-box",
+    "layers": [
+      {
+        "id": "base-layer",
+        "origin_z_mm": 0.0,
+        "height_mm": 38.0,
+        "role": "storage",
+        "support_reservation_ids": ["rulebook-slot"],
+        "module_ids": ["coin-tray", "dice-tray"]
+      }
+    ],
+    "reservations": [
+      {
+        "id": "rulebook-slot",
+        "kind": "rulebook",
+        "origin_mm": {"x": 0.0, "y": 60.0, "z": 0.0},
+        "size_mm": {"x": 120.0, "y": 20.0, "z": 4.0},
+        "layer_id": "base-layer",
+        "source": "manual"
+      }
+    ],
+    "modules": [
+      {
+        "id": "coin-tray",
+        "name": "Coin tray",
+        "origin_mm": {"x": 0.0, "y": 0.0, "z": 0.0},
+        "size_mm": {"x": 55.0, "y": 55.0, "z": 20.0},
+        "locked": true,
+        "layer_id": "base-layer",
+        "compartment_ids": ["coin-compartment"],
+        "access_feature_ids": ["coin-notch"]
+      },
+      {
+        "id": "dice-tray",
+        "name": "Dice tray",
+        "origin_mm": {"x": 55.0, "y": 0.0, "z": 0.0},
+        "size_mm": {"x": 65.0, "y": 55.0, "z": 25.0},
+        "layer_id": "base-layer"
+      }
+    ],
+    "allocations": [
+      {"asset_id": "coin-tokens", "quantity": 30, "module_id": "coin-tray", "compartment_id": "coin-compartment"},
+      {"asset_id": "wooden-dice", "quantity": 2, "module_id": "dice-tray"}
+    ],
+    "compartments": [
+      {
+        "id": "coin-compartment",
+        "functional_type": "tokens",
+        "origin_mm": {"x": 1.2, "y": 1.2, "z": 1.2},
+        "size_mm": {"x": 52.6, "y": 52.6, "z": 18.8},
+        "clearance_mm": 0.6
+      }
+    ],
+    "access_features": [
+      {
+        "id": "coin-notch",
+        "kind": "finger_notch",
+        "placement": "front",
+        "position_mm": {"x": 27.5, "y": 0.0, "z": 18.0},
+        "size_mm": {"x": 20.0, "y": 4.0, "z": 8.0}
+      }
+    ],
+    "metadata": {"authoring_mode": "manual", "scope": "P19"}
+  }
+}

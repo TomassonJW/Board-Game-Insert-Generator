@@ -361,3 +361,8 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 
 - C-PRODUCT-VISION : contrat `box_fill_plan.v0` accepte via ADR-0037; l'implementation peut commencer comme extension additive du moteur pur.
 - C-GRID-3D / C-LAYERS / C-RESERVATION : les contrats existants seront adoptes par references et non remplaces.
+## P19-M002 capability update
+
+- C-PRODUCT-VISION : `implemented-core` pour le chargement versionne et retrocompatible de `box_fill_plan.v0` dans le moteur pur.
+- C-ASSET : les allocations sont explicites et ne peuvent pas etre deduites d'une simple apparition d'asset dans un module.
+- C-FUSION-UI : aucun comportement Fusion, palette ou UI persistante n'est ajoute.

@@ -477,3 +477,20 @@ Format UI V0 : `asset_id,type,count,x_mm,y_mm,z_mm,fit`, entrees separees par `;
 Depuis P15-M002, le schema JSON public accepte aussi les champs additifs `assets[].storage_orientation` et `assets[].max_stack_height_mm`. Depuis P16-M004, il accepte aussi `assets[].target_aspect_ratio` et `assets[].max_module_length_mm` comme nombres strictement positifs optionnels pour piloter le packing local `flat_tray_2d_v0`. Dans les configs temporaires `quick_asset_box`, `count` influence le sizing pour `tokens`, `dice`, `meeples` et `generic`, avec `z_mm` interprete comme epaisseur unitaire d'un item. Depuis P15-M003, la commande Fusion classique peut renseigner un `max_stack_height_mm` global optionnel ; depuis P16-M004, elle peut aussi renseigner un ratio cible et une longueur maximale globale. Ces champs sont appliques aux assets itemises supportes et laissent les cards/sleeved_cards avec leur semantique de deck total.
 
 Pour `cards` et `sleeved_cards`, `z_mm` est interprete comme hauteur totale du paquet/deck fourni ; `count` est reporte mais non multiplie. Cette limitation est volontaire et doit rester visible dans le reporting tant qu'un modele cartes plus fin n'est pas valide.
+
+## `box_fill_plan`
+
+Depuis P19-M002, le champ racine optionnel `box_fill_plan` est charge comme extension additive `box_fill_plan.v0`. Son absence conserve le comportement historique. La boite et les assets du plan sont derives de `box` et `assets` deja charges : le bloc ne duplique donc pas leurs dimensions ni leur inventaire.
+
+Champs V0 :
+
+- `schema_version` : obligatoire, exactement `box_fill_plan.v0` ;
+- `id`, `box_id`, `metadata` : identite et notes libres ;
+- `layers[]` : `id`, `origin_z_mm`, `height_mm`, role, ordre de retrait et references declaratives ;
+- `reservations[]` : volume non imprimable, kind `board`, `rulebook`, `lid_clearance`, `existing_tray`, `non_printable_volume` ou `generic`, origine et taille mm ;
+- `modules[]` : module manuel, origine/taille mm, orientation, locks, printable, layer et references de compartiments/features ;
+- `allocations[]` : `asset_id`, `quantity`, `module_id`, compartment optionnel, source, intention et statut declare ;
+- `compartments[]` : reutilisent le contrat existant `Cavity` ;
+- `access_features[]` : reutilisent le contrat existant `Feature`.
+
+P19-M002 charge strictement les types et les champs inconnus. Les invariants de volume, collisions, references, coverage et volume libre sont implementes dans P19-M003 ; ce chargement seul ne pretend pas valider un plan physique ou Fusion.

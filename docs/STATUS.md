@@ -875,3 +875,8 @@ Statut : `authorized`. Le sprint doit produire dans le moteur Python pur un plan
 ## P19-M001 - Contrat BoxFillPlan V0
 
 Statut : `done`. ADR-0037 accepte `box_fill_plan.v0` comme extension optionnelle et CAD-agnostic. Le contrat verrouille les allocations explicites, reservations, layers, modules manuels, coverage et FreeVolume aggregate; Fusion reste une projection future. Suite autorisee : P19-M002, modeles et loader purs.
+## P19-M002 - Modeles et chargement additif
+
+Statut : `implemented-core`. Le coeur Python charge maintenant le bloc optionnel `box_fill_plan.v0` dans des dataclasses pures : BoxFillBox derive de la boite existante, modules manuels, reservations, layers, allocations explicites et references vers `Cavity`/`Feature` existants. Les JSON historiques restent inchanges lorsque le bloc est absent. La fixture `examples/box_fill_manual_v0.json` et les tests couvrent chargement, schema et retrocompatibilite.
+
+Limite : ce lot ne valide pas encore limites, collisions, references, coverage ni FreeVolume; ces analyses sont le prochain lot P19-M003.

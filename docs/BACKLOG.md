@@ -1149,3 +1149,13 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Capability : C-PRODUCT-VISION.
 - Objectif : charger les reservations, layers, modules et allocations dans des dataclasses pures sans comportement Fusion.
 - Statut : `ready`.
+### P19-M002 - Modeles et chargement additif - Resultat
+
+- Livrables : dataclasses pures dans `models.py`, loader strict `box_fill_plan.v0`, fixture `examples/box_fill_manual_v0.json`, tests de regression.
+- Statut : `done`, `implemented-core`.
+
+### P19-M003 - Validation, coverage et FreeVolume aggregate
+
+- Capability : C-PRODUCT-VISION, C-QUALITY, C-RESERVATION.
+- Objectif : valider limites, collisions, IDs/references/allocation, couverture par asset et volume libre aggregate de `BoxFillPlan`.
+- Statut : `ready`.

@@ -40,7 +40,7 @@ Mission interne terminee : P17-M006 - Validation Fusion export/preprint, STL par
 
 ## Mission active autorisee
 
-`P19-M001` termine : ADR-0037 fixe `box_fill_plan.v0`. Mission active : `P19-M002`, modeles et chargement additif purs. Le sprint conserve les criteres modules/reservations/layers/allocation explicites, validation, couverture, volume libre et rapports, sans solveur, palette/app, changement Fusion ou tolerance.
+`P19-M002` termine : `box_fill_plan.v0` est charge dans le coeur pur et les JSON historiques restent compatibles. Mission active : `P19-M003`, validations de volumes/references/collisions, coverage et FreeVolume aggregate. Aucun solveur, palette/app, changement Fusion ou tolerance.
 
 ## Regle operationnelle Fusion
 

@@ -7,10 +7,18 @@ from typing import Any
 
 from board_game_insert_generator.models import (
     Asset,
+    AssetAllocation,
     AssetKind,
     AssetQuantity,
     AssetStorageOrientation,
     BoxSpec,
+    BOX_FILL_PLAN_SCHEMA_V0,
+    BoxFillBox,
+    BoxFillLayer,
+    BoxFillModule,
+    BoxFillPlan,
+    BoxFillReservation,
+    BoxFillReservationKind,
     Cavity,
     ContainmentIntent,
     Dimension3D,
@@ -42,7 +50,7 @@ from board_game_insert_generator.print_profiles import (
     resolve_print_profile,
 )
 
-ROOT_FIELDS = {"project_name", "units", "box", "print_profile", "tolerances", "defaults", "layout", "modules", "assets", "volumetric_grid"}
+ROOT_FIELDS = {"project_name", "units", "box", "print_profile", "tolerances", "defaults", "layout", "modules", "assets", "volumetric_grid", "box_fill_plan"}
 BOX_FIELDS = {"inner_dimensions_mm", "usable_height_mm", "lid_clearance_mm"}
 MODULE_FIELDS = {
     "id",
@@ -80,6 +88,11 @@ VOLUMETRIC_LAYER_FIELDS = {"id", "name", "z_start", "z_count", "role", "comment"
 VOLUMETRIC_PLACEMENT_FIELDS = {"id", "module_id", "instance_id", "origin_units", "size_units", "layer_id", "removal_order", "access_direction", "support_surface_id", "comment"}
 VOLUMETRIC_ZONE_FIELDS = {"id", "kind", "purpose", "origin_units", "size_units", "layer_id", "reservation_kind", "asset_kind", "removal_order", "access_direction", "support_surface_id", "comment"}
 VOLUMETRIC_SUPPORT_SURFACE_FIELDS = {"id", "owner_type", "owner_id", "face", "origin_units", "size_units", "layer_id", "purpose", "comment"}
+BOX_FILL_PLAN_FIELDS = {"schema_version", "id", "box_id", "layers", "reservations", "modules", "allocations", "compartments", "access_features", "metadata"}
+BOX_FILL_LAYER_FIELDS = {"id", "origin_z_mm", "height_mm", "role", "removal_order", "support_reservation_ids", "module_ids", "comment", "metadata"}
+BOX_FILL_RESERVATION_FIELDS = {"id", "kind", "origin_mm", "size_mm", "layer_id", "removal_order", "allow_overlap", "source", "comment", "metadata"}
+BOX_FILL_MODULE_FIELDS = {"id", "name", "origin_mm", "size_mm", "orientation", "locked", "manual", "printable", "layer_id", "source", "compartment_ids", "access_feature_ids", "comment", "metadata"}
+BOX_FILL_ALLOCATION_FIELDS = {"asset_id", "quantity", "module_id", "compartment_id", "source", "intent", "coverage_status"}
 
 class ConfigError(ValueError):
     """Raised when a configuration file cannot be parsed."""
@@ -110,6 +123,7 @@ def load_config(path: str | Path) -> InsertConfig:
     modules = tuple(_parse_modules(raw.get("modules", []), tolerances))
     assets = tuple(_parse_assets(raw.get("assets", [])))
     volumetric_grid = _parse_volumetric_grid(raw.get("volumetric_grid"))
+    box_fill_plan = _parse_box_fill_plan(raw.get("box_fill_plan"), box, assets, units, tolerances)
 
     return InsertConfig(
         project_name=_optional_string(
@@ -128,8 +142,201 @@ def load_config(path: str | Path) -> InsertConfig:
         print_profile=print_profile,
         source_path=str(config_path),
         volumetric_grid=volumetric_grid,
+        box_fill_plan=box_fill_plan,
     )
 
+def _parse_box_fill_plan(
+    raw: Any,
+    box: BoxSpec,
+    assets: tuple[Asset, ...],
+    units: str,
+    tolerances: ToleranceProfile,
+) -> BoxFillPlan | None:
+    if raw is None:
+        return None
+    if not isinstance(raw, dict):
+        raise ConfigError("'box_fill_plan' must be an object.")
+    _reject_unknown_fields(raw, BOX_FILL_PLAN_FIELDS, "box_fill_plan")
+    schema_version = _optional_string(raw, "schema_version", "box_fill_plan", default="")
+    if schema_version != BOX_FILL_PLAN_SCHEMA_V0:
+        raise ConfigError(
+            f"Unsupported box_fill_plan.schema_version {schema_version!r}. "
+            f"Expected {BOX_FILL_PLAN_SCHEMA_V0!r}."
+        )
+    return BoxFillPlan(
+        schema_version=schema_version,
+        id=_optional_string(raw, "id", "box_fill_plan", default="box-fill-plan"),
+        box=BoxFillBox(
+            id=_optional_string(raw, "box_id", "box_fill_plan", default="game-box"),
+            inner_dimensions=box.inner_dimensions,
+            origin=Point3D(x=0.0, y=0.0, z=0.0),
+            usable_height_mm=box.usable_height_mm,
+            lid_clearance_mm=box.lid_clearance_mm,
+            units=units,
+        ),
+        assets=assets,
+        layers=tuple(_parse_box_fill_layers(raw.get("layers", []))),
+        reservations=tuple(_parse_box_fill_reservations(raw.get("reservations", []))),
+        modules=tuple(_parse_box_fill_modules(raw.get("modules", []))),
+        allocations=tuple(_parse_box_fill_allocations(raw.get("allocations", []))),
+        compartments=tuple(
+            _parse_cavities(
+                raw.get("compartments", []),
+                "box_fill_plan",
+                FunctionalType.OTHER,
+                tolerances,
+                collection_key="compartments",
+            )
+        ),
+        access_features=tuple(
+            _parse_features(
+                raw.get("access_features", []),
+                "box_fill_plan",
+                collection_key="access_features",
+            )
+        ),
+        metadata=_parse_metadata(raw.get("metadata"), "box_fill_plan.metadata"),
+    )
+
+
+def _parse_box_fill_layers(raw_layers: Any) -> list[BoxFillLayer]:
+    if raw_layers is None:
+        return []
+    if not isinstance(raw_layers, list):
+        raise ConfigError("'box_fill_plan.layers' must be a list.")
+    layers: list[BoxFillLayer] = []
+    for index, raw in enumerate(raw_layers):
+        field = f"box_fill_plan.layers[{index}]"
+        if not isinstance(raw, dict):
+            raise ConfigError(f"{field} must be an object.")
+        _reject_unknown_fields(raw, BOX_FILL_LAYER_FIELDS, field)
+        layers.append(
+            BoxFillLayer(
+                id=_optional_string(raw, "id", field, default=f"layer-{index + 1}"),
+                origin_z_mm=_number(raw, "origin_z_mm", field),
+                height_mm=_number(raw, "height_mm", field),
+                role=_optional_string(raw, "role", field, default="unspecified"),
+                removal_order=_optional_nullable_int(raw, "removal_order", field),
+                support_reservation_ids=tuple(_parse_string_list(raw.get("support_reservation_ids", []), f"{field}.support_reservation_ids")),
+                module_ids=tuple(_parse_string_list(raw.get("module_ids", []), f"{field}.module_ids")),
+                comment=_optional_string(raw, "comment", field, default=""),
+                metadata=_parse_metadata(raw.get("metadata"), f"{field}.metadata"),
+            )
+        )
+    return layers
+
+
+def _parse_box_fill_reservations(raw_reservations: Any) -> list[BoxFillReservation]:
+    if raw_reservations is None:
+        return []
+    if not isinstance(raw_reservations, list):
+        raise ConfigError("'box_fill_plan.reservations' must be a list.")
+    reservations: list[BoxFillReservation] = []
+    for index, raw in enumerate(raw_reservations):
+        field = f"box_fill_plan.reservations[{index}]"
+        if not isinstance(raw, dict):
+            raise ConfigError(f"{field} must be an object.")
+        _reject_unknown_fields(raw, BOX_FILL_RESERVATION_FIELDS, field)
+        reservations.append(
+            BoxFillReservation(
+                id=_optional_string(raw, "id", field, default=f"reservation-{index + 1}"),
+                kind=_parse_box_fill_reservation_kind(raw.get("kind", "generic"), field),
+                origin=_parse_point(_required_mapping(raw, "origin_mm", f"{field}.origin_mm"), f"{field}.origin_mm"),
+                size=_parse_dimensions(_required_mapping(raw, "size_mm", f"{field}.size_mm"), f"{field}.size_mm"),
+                layer_id=_optional_nullable_string(raw, "layer_id", field),
+                removal_order=_optional_nullable_int(raw, "removal_order", field),
+                allow_overlap=_bool(raw, "allow_overlap", field, default=False),
+                source=_optional_string(raw, "source", field, default="manual"),
+                comment=_optional_string(raw, "comment", field, default=""),
+                metadata=_parse_metadata(raw.get("metadata"), f"{field}.metadata"),
+            )
+        )
+    return reservations
+
+
+def _parse_box_fill_modules(raw_modules: Any) -> list[BoxFillModule]:
+    if raw_modules is None:
+        return []
+    if not isinstance(raw_modules, list):
+        raise ConfigError("'box_fill_plan.modules' must be a list.")
+    modules: list[BoxFillModule] = []
+    for index, raw in enumerate(raw_modules):
+        field = f"box_fill_plan.modules[{index}]"
+        if not isinstance(raw, dict):
+            raise ConfigError(f"{field} must be an object.")
+        _reject_unknown_fields(raw, BOX_FILL_MODULE_FIELDS, field)
+        module_id = _optional_string(raw, "id", field, default=f"box-fill-module-{index + 1}")
+        modules.append(
+            BoxFillModule(
+                id=module_id,
+                name=_optional_string(raw, "name", field, default=module_id),
+                origin=_parse_point(_required_mapping(raw, "origin_mm", f"{field}.origin_mm"), f"{field}.origin_mm"),
+                size=_parse_dimensions(_required_mapping(raw, "size_mm", f"{field}.size_mm"), f"{field}.size_mm"),
+                orientation=_optional_string(raw, "orientation", field, default="xy"),
+                locked=_bool(raw, "locked", field, default=False),
+                manual=_bool(raw, "manual", field, default=True),
+                printable=_bool(raw, "printable", field, default=True),
+                layer_id=_optional_nullable_string(raw, "layer_id", field),
+                source=_optional_string(raw, "source", field, default="manual"),
+                compartment_ids=tuple(_parse_string_list(raw.get("compartment_ids", []), f"{field}.compartment_ids")),
+                access_feature_ids=tuple(_parse_string_list(raw.get("access_feature_ids", []), f"{field}.access_feature_ids")),
+                comment=_optional_string(raw, "comment", field, default=""),
+                metadata=_parse_metadata(raw.get("metadata"), f"{field}.metadata"),
+            )
+        )
+    return modules
+
+
+def _parse_box_fill_allocations(raw_allocations: Any) -> list[AssetAllocation]:
+    if raw_allocations is None:
+        return []
+    if not isinstance(raw_allocations, list):
+        raise ConfigError("'box_fill_plan.allocations' must be a list.")
+    allocations: list[AssetAllocation] = []
+    for index, raw in enumerate(raw_allocations):
+        field = f"box_fill_plan.allocations[{index}]"
+        if not isinstance(raw, dict):
+            raise ConfigError(f"{field} must be an object.")
+        _reject_unknown_fields(raw, BOX_FILL_ALLOCATION_FIELDS, field)
+        allocations.append(
+            AssetAllocation(
+                asset_id=_optional_string(raw, "asset_id", field, default=""),
+                quantity=_required_int(raw, "quantity", field),
+                module_id=_optional_string(raw, "module_id", field, default=""),
+                compartment_id=_optional_nullable_string(raw, "compartment_id", field),
+                source=_optional_string(raw, "source", field, default="manual"),
+                intent=_optional_string(raw, "intent", field, default="store"),
+                coverage_status=_optional_string(raw, "coverage_status", field, default="declared"),
+            )
+        )
+    return allocations
+
+
+def _parse_box_fill_reservation_kind(value: Any, field_path: str) -> BoxFillReservationKind:
+    try:
+        return BoxFillReservationKind(str(value))
+    except ValueError as exc:
+        allowed = ", ".join(item.value for item in BoxFillReservationKind)
+        raise ConfigError(
+            f"Unsupported box_fill_plan reservation kind for {field_path}: {value!r}. "
+            f"Allowed values: {allowed}."
+        ) from exc
+
+
+def _parse_string_list(raw: Any, field_name: str) -> list[str]:
+    if raw is None:
+        return []
+    if not isinstance(raw, list) or not all(isinstance(value, str) for value in raw):
+        raise ConfigError(f"'{field_name}' must be a list of strings.")
+    return list(raw)
+
+
+def _parse_metadata(raw: Any, field_name: str) -> dict[str, object]:
+    if raw is None:
+        return {}
+    if not isinstance(raw, dict):
+        raise ConfigError(f"'{field_name}' must be an object.")
+    return dict(raw)
 def _parse_assets(raw_assets: Any) -> list[Asset]:
     if raw_assets is None:
         return []
@@ -488,15 +695,16 @@ def _parse_cavities(
     module_field: str,
     module_functional_type: FunctionalType,
     tolerances: ToleranceProfile,
+    collection_key: str = 'cavities',
 ) -> list[Cavity]:
     if raw_cavities is None:
         return []
     if not isinstance(raw_cavities, list):
-        raise ConfigError(f"'{module_field}.cavities' must be a list.")
+        raise ConfigError(f"'{module_field}.{collection_key}' must be a list.")
 
     cavities: list[Cavity] = []
     for index, raw in enumerate(raw_cavities):
-        cavity_field = f"{module_field}.cavities[{index}]"
+        cavity_field = f"{module_field}.{collection_key}[{index}]"
         if not isinstance(raw, dict):
             raise ConfigError(f"{cavity_field} must be an object.")
         _reject_unknown_fields(raw, CAVITY_FIELDS, cavity_field)
@@ -532,15 +740,15 @@ def _parse_cavities(
         )
     return cavities
 
-def _parse_features(raw_features: Any, cavity_field: str) -> list[Feature]:
+def _parse_features(raw_features: Any, cavity_field: str, collection_key: str = "features") -> list[Feature]:
     if raw_features is None:
         return []
     if not isinstance(raw_features, list):
-        raise ConfigError(f"'{cavity_field}.features' must be a list.")
+        raise ConfigError(f"'{cavity_field}.{collection_key}' must be a list.")
 
     features: list[Feature] = []
     for index, raw in enumerate(raw_features):
-        feature_field = f"{cavity_field}.features[{index}]"
+        feature_field = f"{cavity_field}.{collection_key}[{index}]"
         if not isinstance(raw, dict):
             raise ConfigError(f"{feature_field} must be an object.")
         _reject_unknown_fields(raw, FEATURE_FIELDS, feature_field)

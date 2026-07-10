@@ -8,7 +8,7 @@ constructor call.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 
 
@@ -44,6 +44,16 @@ class FeatureTaxonomyKind(str, Enum):
 class VolumetricZoneKind(str, Enum):
     RESERVED = "reserved"
     FORBIDDEN = "forbidden"
+BOX_FILL_PLAN_SCHEMA_V0 = "box_fill_plan.v0"
+
+
+class BoxFillReservationKind(str, Enum):
+    BOARD = "board"
+    RULEBOOK = "rulebook"
+    LID_CLEARANCE = "lid_clearance"
+    EXISTING_TRAY = "existing_tray"
+    NON_PRINTABLE_VOLUME = "non_printable_volume"
+    GENERIC = "generic"
 
 
 class AssetKind(str, Enum):
@@ -290,6 +300,87 @@ class VolumetricGrid:
     comment: str = ""
 
 @dataclass(frozen=True)
+class BoxFillBox:
+    id: str
+    inner_dimensions: Dimension3D
+    origin: Point3D
+    usable_height_mm: float
+    lid_clearance_mm: float
+    units: str
+    orientation: str = "x_right_y_back_z_up"
+
+
+@dataclass(frozen=True)
+class AssetAllocation:
+    asset_id: str
+    quantity: int
+    module_id: str
+    compartment_id: str | None = None
+    source: str = "manual"
+    intent: str = "store"
+    coverage_status: str = "declared"
+
+
+@dataclass(frozen=True)
+class BoxFillReservation:
+    id: str
+    kind: BoxFillReservationKind
+    origin: Point3D
+    size: Dimension3D
+    layer_id: str | None = None
+    removal_order: int | None = None
+    allow_overlap: bool = False
+    source: str = "manual"
+    comment: str = ""
+    metadata: dict[str, object] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class BoxFillLayer:
+    id: str
+    origin_z_mm: float
+    height_mm: float
+    role: str
+    removal_order: int | None = None
+    support_reservation_ids: tuple[str, ...] = ()
+    module_ids: tuple[str, ...] = ()
+    comment: str = ""
+    metadata: dict[str, object] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class BoxFillModule:
+    id: str
+    name: str
+    origin: Point3D
+    size: Dimension3D
+    orientation: str = "xy"
+    locked: bool = False
+    manual: bool = True
+    printable: bool = True
+    layer_id: str | None = None
+    source: str = "manual"
+    compartment_ids: tuple[str, ...] = ()
+    access_feature_ids: tuple[str, ...] = ()
+    comment: str = ""
+    metadata: dict[str, object] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class BoxFillPlan:
+    schema_version: str
+    id: str
+    box: BoxFillBox
+    assets: tuple[Asset, ...]
+    reservations: tuple[BoxFillReservation, ...] = ()
+    layers: tuple[BoxFillLayer, ...] = ()
+    modules: tuple[BoxFillModule, ...] = ()
+    allocations: tuple[AssetAllocation, ...] = ()
+    compartments: tuple["Cavity", ...] = ()
+    access_features: tuple[Feature, ...] = ()
+    metadata: dict[str, object] = field(default_factory=dict)
+
+@dataclass(frozen=True)
 class Cavity:
     id: str
     functional_type: FunctionalType
@@ -328,6 +419,7 @@ class InsertConfig:
     print_profile: str = "default"
     source_path: str | None = None
     volumetric_grid: VolumetricGrid | None = None
+    box_fill_plan: BoxFillPlan | None = None
 
 
 @dataclass(frozen=True)
