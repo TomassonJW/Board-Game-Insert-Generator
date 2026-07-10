@@ -861,4 +861,4 @@ Statut : done-docs, ADR-0036 Propose. CommandInputs Fusion reste dev/smoke; tout
 
 ## P18-M006 - Recommandation P19
 
-Statut : done-docs. P19 recommande est P19-BOX-FILL-MANUAL-MODULES-SPRINT: premier BoxFillPlan manuel, valide par collisions, reservations, couverture et volume libre. P19 est bloque par gate humaine avant toute extension de modele executable.
+Statut : `done-docs`. P19 recommande est `P19-BOX-FILL-MANUAL-MODULES-SPRINT`: premier `BoxFillPlan` manuel, valide par collisions, reservations, couverture et volume libre. P19 est bloque par gate humaine avant toute extension de modele executable.

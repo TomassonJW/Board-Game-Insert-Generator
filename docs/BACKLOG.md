@@ -1114,3 +1114,20 @@ Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
 - Dependances : contrats P18-M001 a P18-M004.
 - Gate : validation humaine explicite de l'extension de modele/schema; ADR-0036 reste une gate separee pour toute UI persistante.
 - Statut : `ready-gated`.
+
+### P18-M003 - Definir le modele produit volumetrique cible
+
+- Livrable : `docs/VOLUMETRIC_PRODUCT_MODEL.md`, contrat CAD-agnostic `GameBox` a `ExportPackage`.
+- Statut : `done-docs`.
+
+### P18-M004 - Roadmap solver et box fill
+
+- Livrable : `docs/BOX_FILL_SOLVER_ROADMAP.md`, trajectoire V0 manuel a V5 assistant.
+- Decision : recommander `box_fill_v0_manual_modules` avant greedy/variantes.
+- Statut : `done-docs`.
+
+### P18-M005 - ADR architecture UX
+
+- Livrable : `docs/DECISIONS/ADR-0036-ux-architecture-roadmap.md`.
+- Decision : commande Fusion = dev/smoke; UI persistante sous gate; app locale/web direction moyen terme.
+- Statut : `done-docs`, ADR `Propose`, gate humaine avant implementation UI lourde.
