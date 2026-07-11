@@ -122,6 +122,34 @@ class CliTests(unittest.TestCase):
             selection["selected_variant_id"],
             payload["metadata"]["box_fill_variant_selection"]["selected_variant_id"],
         )
+
+    def test_cli_exports_a_sliding_lid_coupon_for_fusion_smoke(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            output_path = Path(temporary_directory) / "sliding_lid_coupon.cad-ir.json"
+            stdout = io.StringIO()
+
+            with redirect_stdout(stdout):
+                code = main(
+                    [
+                        "export-local-composer-selection",
+                        "--starter",
+                        "mixed-box",
+                        "--mechanism",
+                        "sliding_lid",
+                        "--output",
+                        str(output_path),
+                    ]
+                )
+
+            payload = load_cad_ir_json(output_path)
+            plan = generation_plan_from_cad_ir(payload)
+
+        self.assertEqual(code, 0)
+        self.assertIn("Mechanism: sliding_lid", stdout.getvalue())
+        self.assertIn("Coupon: prepared_for_fusion_smoke", stdout.getvalue())
+        self.assertEqual(payload["metadata"]["mechanism_coupon"]["piece_count"], 2)
+        self.assertEqual(len(plan.additive_prism_joins), 2)
+
     def test_cli_exports_cad_ir_with_rectangular_cavity_compatible_with_fusion_plan(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
             output_path = Path(temporary_directory) / "simple_tray_cad_ir.json"

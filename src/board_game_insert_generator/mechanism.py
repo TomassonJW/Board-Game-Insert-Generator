@@ -8,6 +8,9 @@ from typing import Any, Mapping
 
 MECHANISM_SCHEMA_V0 = "bgig.mechanism.v0"
 SLIDING_LID_POLICY_V0 = "sliding_lid_experimental_v0"
+SLIDING_LID_CAD_POLICY_V0 = "sliding_lid_external_rail_coupon_v0"
+RAIL_JOIN_OPERATION_KIND = "join_rectangular_prism"
+RAIL_JOIN_OVERLAP_MM = 0.1
 
 DEFAULT_MECHANISM_V0: dict[str, object] = {
     "schema_version": MECHANISM_SCHEMA_V0,
@@ -117,6 +120,64 @@ def sliding_lid_readiness(module_id: str, size_mm: Mapping[str, object], mechani
     }
 
 
+def sliding_lid_coupon_geometry(
+    module_id: str,
+    tray_origin_mm: Mapping[str, object],
+    tray_size_mm: Mapping[str, object],
+    mechanism: Mapping[str, object],
+) -> dict[str, object] | None:
+    """Resolve one two-piece external-rail coupon without changing the tray plan.
+
+    The cap uses a rectangular plate plus two downward side rails. The rails
+    are joined to the cap in Fusion; they are not separate printable pieces.
+    This deliberately produces a coupon beside the selected layout, not lids
+    for every packed tray in the game box.
+    """
+
+    normalized = normalize_mechanism(dict(mechanism))
+    readiness = sliding_lid_readiness(module_id, tray_size_mm, normalized)
+    if readiness["status"] != "planned_for_coupon":
+        return None
+    origin = _origin(tray_origin_mm, module_id)
+    size = _size(tray_size_mm, module_id)
+    axis = str(normalized["slide_axis"])
+    cross_axis = "y" if axis == "x" else "x"
+    rail = float(normalized["rail_height_mm"])
+    clearance = float(normalized["rail_clearance_mm"])
+    lid_thickness = float(normalized["lid_thickness_mm"])
+    offset = rail + clearance
+    lid_origin = dict(origin)
+    lid_origin[cross_axis] -= offset
+    lid_origin["z"] += size["z"]
+    lid_size = dict(size)
+    lid_size[cross_axis] += 2 * offset
+    lid_size["z"] = lid_thickness
+    rail_size = {
+        axis: lid_size[axis],
+        cross_axis: rail,
+        "z": rail + RAIL_JOIN_OVERLAP_MM,
+    }
+    first_origin = {"x": 0.0, "y": 0.0, "z": -rail}
+    second_origin = dict(first_origin)
+    second_origin[cross_axis] = lid_size[cross_axis] - rail
+    return {
+        "policy": SLIDING_LID_CAD_POLICY_V0,
+        "module_id": module_id,
+        "slide_axis": axis,
+        "piece_count": 2,
+        "tray_origin_mm": origin,
+        "lid": {
+            "origin_mm": lid_origin,
+            "base_slab_size_mm": lid_size,
+            "travel_end_overlap_mm": float(normalized["end_overlap_mm"]),
+            "rail_clearance_mm": clearance,
+            "rail_join_overlap_mm": RAIL_JOIN_OVERLAP_MM,
+            "rails": [
+                {"id": "rail-a", "local_origin_mm": first_origin, "size_mm": rail_size},
+                {"id": "rail-b", "local_origin_mm": second_origin, "size_mm": rail_size},
+            ],
+        },
+    }
 def _size(raw: Mapping[str, object], module_id: str) -> dict[str, float]:
     values: dict[str, float] = {}
     for axis in ("x", "y", "z"):
@@ -127,6 +188,14 @@ def _size(raw: Mapping[str, object], module_id: str) -> dict[str, float]:
     return values
 
 
+def _origin(raw: Mapping[str, object], module_id: str) -> dict[str, float]:
+    values: dict[str, float] = {}
+    for axis in ("x", "y", "z"):
+        value = raw.get(axis)
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            raise MechanismError(f"module {module_id} origin_mm.{axis} must be a number.")
+        values[axis] = float(value)
+    return values
 def _reject_unknown(raw: Mapping[str, object], allowed: set[str], field: str) -> None:
     unknown = sorted(set(raw) - allowed)
     if unknown:

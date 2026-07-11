@@ -17,7 +17,14 @@ from typing import Any
 from urllib.parse import urlsplit
 
 from board_game_insert_generator.appearance import AppearanceError, default_appearance, normalize_appearance
-from board_game_insert_generator.mechanism import MechanismError, default_mechanism, normalize_mechanism, sliding_lid_readiness
+from board_game_insert_generator.mechanism import (
+    RAIL_JOIN_OPERATION_KIND,
+    MechanismError,
+    default_mechanism,
+    normalize_mechanism,
+    sliding_lid_coupon_geometry,
+    sliding_lid_readiness,
+)
 
 from board_game_insert_generator.box_fill_solver import BoxFillCandidate, BoxFillSolveRequest
 from board_game_insert_generator.box_fill_variants import (
@@ -248,24 +255,33 @@ def export_from_draft(raw_draft: object, variant_id: str | None = None) -> dict[
     ]
     scene_config = replace(config, box_fill_plan=selected_variant.result.solved_plan)
     scene = build_blank_cad_scene(scene_config, generate_basic_layout(scene_config)).to_dict()
-    scene["components"] = _selection_bridge_components(
+    components, mechanism_coupon = _selection_bridge_components(
         selected_variant.result.solved_plan,
         selected_variant.id,
         config.defaults,
+        mechanism,
+        config.box.inner_dimensions,
     )
+    scene["components"] = components
     scene["metadata"]["box_fill_variant_portfolio"] = portfolio_payload
     scene["metadata"]["box_fill_variant_selection"] = selection
     scene["metadata"]["box_fill_solution"] = selection["variant"]["solution"]
     scene["metadata"]["appearance"] = appearance
     scene["metadata"]["mechanism"] = mechanism
     scene["metadata"]["mechanism_readiness"] = mechanism_readiness
+    scene["metadata"]["mechanism_coupon"] = mechanism_coupon
     scene["metadata"]["local_composer"] = {
         "schema_version": LOCAL_COMPOSER_SCHEMA_V0,
         "materialization_status": "prepared_open_top_trays_for_fusion_smoke",
         "selection_bridge": "p31_open_top_tray_from_selected_module.v0",
         "geometry_status": "open_top_tray_candidates",
         "appearance_status": "stored_for_preview_only_not_materialized",
-        "mechanism_status": "experimental_contract_not_materialized",
+        "mechanism_status": (
+            "coupon_prepared_for_fusion_smoke"
+            if mechanism_coupon["status"] == "prepared_for_fusion_smoke"
+            else "experimental_contract_not_materialized"
+        ),
+        "mechanism_coupon_status": mechanism_coupon["status"],
         "print_validation_status": "not_validated",
         "reason": (
             "P31 turns each selected BoxFill module into an explicit open-top tray "
@@ -279,10 +295,12 @@ def export_from_draft(raw_draft: object, variant_id: str | None = None) -> dict[
         "appearance": appearance,
         "mechanism": mechanism,
         "mechanism_readiness": mechanism_readiness,
+        "mechanism_coupon": mechanism_coupon,
         "cad_ir": scene,
         "limits": [
             "The CAD IR contains one open-top tray candidate per selected module, with one generic cavity and retained walls/floor.",
             "No Fusion operation was executed by this export.",
+            "A requested sliding lid adds one separate two-piece coupon; Fusion must still confirm the joins.",
             "P21 scores are proxies and do not prove ergonomics or printability.",
             "No physical print or slicer validation is included.",
         ],
@@ -293,8 +311,10 @@ def _selection_bridge_components(
     solved_plan: BoxFillPlan,
     selected_variant_id: str,
     defaults: GeometryDefaults,
-) -> list[dict[str, object]]:
-    """Materialize resolved BoxFill envelopes as open-top trays in CAD IR."""
+    mechanism: dict[str, object],
+    box_size: Dimension3D,
+) -> tuple[list[dict[str, object]], dict[str, object]]:
+    """Materialize selected trays and one optional external-rail coupon."""
 
     components: list[dict[str, object]] = []
     for index, module in enumerate(solved_plan.modules):
@@ -366,8 +386,186 @@ def _selection_bridge_components(
         raise LocalComposerError(
             "The selected variant has no printable modules to materialize for Fusion."
         )
-    return components
+    coupon_components, coupon_metadata = _sliding_lid_coupon_components(
+        solved_plan,
+        selected_variant_id,
+        defaults,
+        mechanism,
+        box_size,
+    )
+    components.extend(coupon_components)
+    return components, coupon_metadata
 
+
+def _sliding_lid_coupon_components(
+    solved_plan: BoxFillPlan,
+    selected_variant_id: str,
+    defaults: GeometryDefaults,
+    mechanism: dict[str, object],
+    box_size: Dimension3D,
+) -> tuple[list[dict[str, object]], dict[str, object]]:
+    """Build one separate coupon so a lid cannot collide with the packed layout."""
+
+    if mechanism["kind"] != "sliding_lid":
+        return [], {"status": "not_requested", "materialization_status": "not_materialized"}
+    source_module = next(
+        (
+            module
+            for module in solved_plan.modules
+            if module.printable
+            and sliding_lid_readiness(
+                module.id,
+                {"x": module.size.x, "y": module.size.y, "z": module.size.z},
+                mechanism,
+            )["status"] == "planned_for_coupon"
+        ),
+        None,
+    )
+    if source_module is None:
+        return [], {
+            "status": "refused",
+            "materialization_status": "not_materialized",
+            "reason": "No selected module is large enough for the sliding-lid coupon.",
+        }
+
+    coupon_origin = Point3D(box_size.x + 20.0, 20.0, 0.0)
+    coupon_module = replace(
+        source_module,
+        id=f"{source_module.id}:sliding-lid-coupon-tray",
+        name=f"{source_module.name} sliding-lid coupon tray",
+        origin=coupon_origin,
+    )
+    geometry = sliding_lid_coupon_geometry(
+        source_module.id,
+        {"x": coupon_origin.x, "y": coupon_origin.y, "z": coupon_origin.z},
+        {"x": source_module.size.x, "y": source_module.size.y, "z": source_module.size.z},
+        mechanism,
+    )
+    if geometry is None:
+        raise LocalComposerError("P34_SLIDING_LID_COUPON_NOT_FEASIBLE: readiness changed unexpectedly.")
+
+    tray_instance_id = f"coupon:{selected_variant_id}:{source_module.id}:tray"
+    tray_body_id = f"body:{tray_instance_id}"
+    cavity, cavity_operation = _open_top_tray_cavity(coupon_module, tray_body_id, defaults)
+    source_asset_ids = sorted(
+        {
+            allocation.asset_id
+            for allocation in solved_plan.allocations
+            if allocation.module_id == source_module.id
+        }
+    )
+    tray_component = CadComponent(
+        id=f"component:{tray_instance_id}",
+        name=f"Coupon - {source_module.name} tray",
+        module_id=source_module.id,
+        instance_id=tray_instance_id,
+        functional_type="sliding_lid_coupon_tray",
+        body=CadBody(
+            id=tray_body_id,
+            name=f"{source_module.name} coupon tray",
+            kind="rectangular_blank",
+            source_cell_instance_id=tray_instance_id,
+            theoretical_origin=coupon_module.origin,
+            theoretical_size=coupon_module.size,
+            printable_origin=coupon_module.origin,
+            printable_size=coupon_module.size,
+            cavities=(cavity,),
+            face_classifications=(),
+            applied_tolerances=(),
+            operations=(
+                CadOperation(
+                    id=f"{tray_body_id}:create_rectangular_prism",
+                    kind="create_rectangular_prism",
+                    target_id=tray_body_id,
+                    parameters={
+                        "origin_source": "printable_origin_mm",
+                        "size_source": "printable_size_mm",
+                        "coordinate_frame": "scene.frame",
+                    },
+                ),
+                cavity_operation,
+            ),
+        ),
+        metadata={
+            "coupon": True,
+            "coupon_policy": geometry["policy"],
+            "source_module_id": source_module.id,
+            "source_asset_ids": source_asset_ids,
+            "geometry_status": "sliding_lid_coupon_tray_candidate",
+        },
+    )
+    lid = geometry["lid"]
+    lid_origin = Point3D(**lid["origin_mm"])
+    lid_size = Dimension3D(**lid["base_slab_size_mm"])
+    lid_instance_id = f"coupon:{selected_variant_id}:{source_module.id}:lid"
+    lid_body_id = f"body:{lid_instance_id}"
+    rail_operations = tuple(
+        CadOperation(
+            id=f"{lid_body_id}:{rail['id']}:{RAIL_JOIN_OPERATION_KIND}",
+            kind=RAIL_JOIN_OPERATION_KIND,
+            target_id=lid_body_id,
+            parameters={
+                "coordinate_frame": "body.local",
+                "local_origin_mm": rail["local_origin_mm"],
+                "size_mm": rail["size_mm"],
+                "mechanism_policy": geometry["policy"],
+                "join_overlap_mm": lid["rail_join_overlap_mm"],
+            },
+        )
+        for rail in lid["rails"]
+    )
+    lid_component = CadComponent(
+        id=f"component:{lid_instance_id}",
+        name=f"Coupon - {source_module.name} sliding lid",
+        module_id=source_module.id,
+        instance_id=lid_instance_id,
+        functional_type="sliding_lid_coupon_cap",
+        body=CadBody(
+            id=lid_body_id,
+            name=f"{source_module.name} coupon sliding lid",
+            kind="rectangular_blank",
+            source_cell_instance_id=lid_instance_id,
+            theoretical_origin=lid_origin,
+            theoretical_size=lid_size,
+            printable_origin=lid_origin,
+            printable_size=lid_size,
+            cavities=(),
+            face_classifications=(),
+            applied_tolerances=(),
+            operations=(
+                CadOperation(
+                    id=f"{lid_body_id}:create_rectangular_prism",
+                    kind="create_rectangular_prism",
+                    target_id=lid_body_id,
+                    parameters={
+                        "origin_source": "printable_origin_mm",
+                        "size_source": "printable_size_mm",
+                        "coordinate_frame": "scene.frame",
+                    },
+                ),
+                *rail_operations,
+            ),
+        ),
+        metadata={
+            "coupon": True,
+            "coupon_policy": geometry["policy"],
+            "source_module_id": source_module.id,
+            "source_asset_ids": source_asset_ids,
+            "slide_axis": geometry["slide_axis"],
+            "travel_end_overlap_mm": lid["travel_end_overlap_mm"],
+            "rail_clearance_mm": lid["rail_clearance_mm"],
+            "rail_join_overlap_mm": lid["rail_join_overlap_mm"],
+            "geometry_status": "sliding_lid_coupon_cap_candidate",
+        },
+    )
+    return [tray_component.to_dict(), lid_component.to_dict()], {
+        "status": "prepared_for_fusion_smoke",
+        "materialization_status": "two_piece_coupon_cad_ir",
+        "policy": geometry["policy"],
+        "source_module_id": source_module.id,
+        "component_ids": [tray_component.id, lid_component.id],
+        "piece_count": geometry["piece_count"],
+    }
 
 def _open_top_tray_cavity(
     module: BoxFillModule,

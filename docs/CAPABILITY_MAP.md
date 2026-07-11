@@ -496,10 +496,11 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - C-QUALITY : bornes et enums valides, digest P21 invariant, build Studio OK ; `browser-inspection-pending` dans le sandbox Windows.
 - C-PRINT : inchange, `print-validated: false`.
 
-## P34 sliding lid contract
+## P34 sliding lid coupon
 
-- C-STACKING / futur mecanisme : experimental-contract pour le coulissant choisi ; les rails/capot restent non materialises.
-- C-PRODUCT-VISION : le Studio sauvegarde et explique le choix sans modifier le solveur, le digest ou la selection.
-- C-CAD-IR : metadata et readiness par module sont transportees, sans operation CAD nouvelle.
+- C-STACKING / futur mecanisme : implemented-cad-ir-coupon pour un seul coupon coulissant a deux pieces, hors boite.
+- C-CAD-IR : le capot porte deux operations join_rectangular_prism, bornees au body local.
+- C-FUSION-UI : implemented-fusion-adapter, usion-smoke-required ; le rapport annonce les rails jointes.
+- C-PRODUCT-VISION : le Studio sauvegarde le choix sans modifier solveur, digest ou selection.
 - C-CALIBRATION : un coupon imprime et mesure reste obligatoire avant toute qualification physique.
-- C-AESTHETIC : l apercu reste une intention ; aucune finition Fusion n est declaree.
+- C-AESTHETIC : aucun style ou finition Fusion supplementaire n est declare.

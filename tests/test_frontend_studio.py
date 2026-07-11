@@ -38,7 +38,7 @@ class FrontendStudioContractTests(unittest.TestCase):
             "Couvercle coulissant",
             "Essai requis",
             "Jeu de glisse",
-            "Aucun rail ni capot n est cree dans Fusion",
+            "Le dossier technique prepare un coupon",
         ):
             self.assertIn(label, self.source)
         self.assertIn("MechanismEditor", self.source)

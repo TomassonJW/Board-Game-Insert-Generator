@@ -188,7 +188,7 @@ class LocalComposerTests(unittest.TestCase):
         self.assertEqual(bundle["cad_ir"]["metadata"]["mechanism"], draft["mechanism"])
         self.assertEqual(
             bundle["cad_ir"]["metadata"]["local_composer"]["mechanism_status"],
-            "experimental_contract_not_materialized",
+            "coupon_prepared_for_fusion_smoke",
         )
         self.assertTrue(bundle["mechanism_readiness"])
         self.assertTrue(
@@ -204,6 +204,29 @@ class LocalComposerTests(unittest.TestCase):
 
         with self.assertRaisesRegex(LocalComposerError, "rail_clearance_mm"):
             portfolio_from_draft(draft)
+
+    def test_sliding_lid_adds_one_two_piece_coupon_outside_the_packed_layout(self) -> None:
+        draft = starter_draft()
+        draft["mechanism"]["kind"] = "sliding_lid"
+
+        bundle = export_from_draft(draft)
+        coupon = bundle["mechanism_coupon"]
+        plan = generation_plan_from_cad_ir(bundle["cad_ir"])
+
+        self.assertEqual(coupon["status"], "prepared_for_fusion_smoke")
+        self.assertEqual(coupon["materialization_status"], "two_piece_coupon_cad_ir")
+        self.assertEqual(coupon["piece_count"], 2)
+        coupon_components = [
+            component for component in bundle["cad_ir"]["components"] if component["metadata"].get("coupon")
+        ]
+        self.assertEqual(len(coupon_components), 2)
+        lid = next(component for component in coupon_components if component["functional_type"] == "sliding_lid_coupon_cap")
+        self.assertEqual(
+            [operation["kind"] for operation in lid["body"]["operations"]],
+            ["create_rectangular_prism", "join_rectangular_prism", "join_rectangular_prism"],
+        )
+        self.assertEqual(len(plan.additive_prism_joins), 2)
+        self.assertEqual(len(plan.blanks), len(bundle["cad_ir"]["components"]))
 
 if __name__ == "__main__":
     unittest.main()

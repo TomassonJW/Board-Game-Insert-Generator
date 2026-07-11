@@ -171,6 +171,7 @@ PART_DESIGN_SINGLE_COMPONENT_ERROR_TEXT = "Part Design documents can only contai
 
 PLAN_STATUS_PLANNED_ONLY = "planned_only"
 CAVITY_CUT_OPERATION_KIND = "subtract_rectangular_cavity"
+ADDITIVE_PRISM_JOIN_OPERATION_KIND = "join_rectangular_prism"
 ASSET_FIT_CAVITY_POLICY = "single_asset_fit_rectangular_cavity_v0"
 ASSET_COMPARTMENT_CAVITY_POLICY = "per_source_asset_rectangular_compartments_v0"
 ASSET_ACCESS_POLICY = "per_compartment_top_open_rectangular_notch_v0"
@@ -433,6 +434,36 @@ class FusionSolidPlan:
             payload["asset_fit_cavity"] = dict(self.asset_fit_cavity)
         return payload
 
+@dataclass(frozen=True)
+class FusionAdditivePrismPlan:
+    """One rectangular prism joined to an existing module body."""
+
+    component_id: str
+    component_name: str
+    target_body_id: str
+    target_body_name: str
+    operation_id: str
+    local_origin_mm: FusionVectorMm
+    size_mm: FusionVectorMm
+    policy: str | None = None
+    operation_kind: str = ADDITIVE_PRISM_JOIN_OPERATION_KIND
+    validation_status: str = FUSION_MANUAL_VALIDATION_REQUIRED
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = {
+            "component_id": self.component_id,
+            "component_name": self.component_name,
+            "target_body_id": self.target_body_id,
+            "target_body_name": self.target_body_name,
+            "operation_id": self.operation_id,
+            "operation_kind": self.operation_kind,
+            "local_origin_mm": self.local_origin_mm.to_dict(),
+            "size_mm": self.size_mm.to_dict(),
+            "validation_status": self.validation_status,
+        }
+        if self.policy is not None:
+            payload["policy"] = self.policy
+        return payload
 
 @dataclass(frozen=True)
 class FusionOccurrencePlan:
@@ -610,6 +641,7 @@ class FusionGenerationPlan:
     exploded_occurrences: tuple[FusionOccurrencePlan, ...] = ()
     rejected_grid_modules: tuple[FusionGridModuleRejection, ...] = ()
     cavity_cuts: tuple[FusionCavityCutPlan, ...] = ()
+    additive_prism_joins: tuple[FusionAdditivePrismPlan, ...] = ()
     finger_notch_cuts: tuple[FusionFingerNotchCutPlan, ...] = ()
     generation_mode: str = DEFAULT_FUSION_GENERATION_MODE
     validation_status: str = FUSION_MANUAL_VALIDATION_REQUIRED
@@ -658,6 +690,7 @@ class FusionGenerationPlan:
             + len(self.compact_occurrences)
             + len(self.exploded_occurrences)
             + len(self.cavity_cuts)
+            + len(self.additive_prism_joins)
             + len(self.finger_notch_cuts)
         )
 
@@ -676,6 +709,7 @@ class FusionGenerationPlan:
             "requires_assembly_document": self.requires_assembly_document,
             "rejected_grid_modules": [module.to_dict() for module in self.rejected_grid_modules],
             "cavity_cuts": [cut.to_dict() for cut in self.cavity_cuts],
+            "additive_prism_joins": [join.to_dict() for join in self.additive_prism_joins],
             "finger_notch_cuts": [cut.to_dict() for cut in self.finger_notch_cuts],
             "generation_mode": self.generation_mode,
             "validation_status": self.validation_status,
@@ -2742,6 +2776,7 @@ def generation_plan_from_cad_ir(
 
     blanks: list[FusionSolidPlan] = []
     cavity_cuts: list[FusionCavityCutPlan] = []
+    additive_prism_joins: list[FusionAdditivePrismPlan] = []
     finger_notch_cuts: list[FusionFingerNotchCutPlan] = []
     for component in validated_payload["components"]:
         if not isinstance(component, dict):
@@ -2797,6 +2832,9 @@ def generation_plan_from_cad_ir(
             body_size_source="printable_size_mm",
         )
         blanks.append(blank)
+        additive_prism_joins.extend(
+            _additive_prism_join_plans(component_id, component_name, blank, operations)
+        )
         cavity_cuts.extend(_cavity_cut_plans(component_id, component_name, blank, operations))
         finger_notch_cuts.extend(
             _finger_notch_cut_plans(component_id, component_name, blank, body, operations)
@@ -2828,6 +2866,7 @@ def generation_plan_from_cad_ir(
         exploded_occurrences=tuple(exploded_occurrences),
         rejected_grid_modules=tuple(rejected_grid_modules),
         cavity_cuts=tuple(cavity_cuts),
+        additive_prism_joins=tuple(additive_prism_joins),
         finger_notch_cuts=tuple(finger_notch_cuts),
         generation_mode=generation_mode,
     )
@@ -3523,6 +3562,66 @@ def _asset_access_notch_cut_plans(blanks: list[FusionSolidPlan]) -> list[FusionF
             )
     return cut_plans
 
+def _additive_prism_join_plans(
+    component_id: str,
+    component_name: str,
+    blank: FusionSolidPlan,
+    operations: list[Any],
+) -> list[FusionAdditivePrismPlan]:
+    joins: list[FusionAdditivePrismPlan] = []
+    for operation in operations:
+        if not isinstance(operation, dict) or operation.get("kind") != ADDITIVE_PRISM_JOIN_OPERATION_KIND:
+            continue
+        parameters = operation.get("parameters")
+        if not isinstance(parameters, dict):
+            raise FusionSkeletonError(
+                f"CAD IR additive prism operation for body {blank.cad_id!r} must contain parameters."
+            )
+        if parameters.get("coordinate_frame") != "body.local":
+            raise FusionSkeletonError(
+                f"CAD IR additive prism operation for body {blank.cad_id!r} must use body.local coordinates."
+            )
+        local_origin = _signed_vector_from_payload(
+            parameters, "local_origin_mm", f"body {blank.cad_id} additive prism local origin"
+        )
+        size = _positive_vector_from_payload(
+            parameters, "size_mm", f"body {blank.cad_id} additive prism size"
+        )
+        _validate_additive_prism_join_bounds(blank, local_origin, size)
+        joins.append(
+            FusionAdditivePrismPlan(
+                component_id=component_id,
+                component_name=component_name,
+                target_body_id=blank.cad_id,
+                target_body_name=blank.body_name,
+                operation_id=_required_text(
+                    operation, "id", f"body {blank.cad_id} additive prism operation"
+                ),
+                local_origin_mm=local_origin,
+                size_mm=size,
+                policy=_optional_text(parameters, "mechanism_policy"),
+            )
+        )
+    return joins
+
+
+def _validate_additive_prism_join_bounds(
+    blank: FusionSolidPlan,
+    local_origin: FusionVectorMm,
+    size: FusionVectorMm,
+) -> None:
+    if local_origin.x < 0 or local_origin.y < 0:
+        raise FusionSkeletonError(
+            f"Additive prism for {blank.body_name!r} must stay within the base slab XY envelope."
+        )
+    if local_origin.x + size.x > blank.size_mm.x or local_origin.y + size.y > blank.size_mm.y:
+        raise FusionSkeletonError(
+            f"Additive prism for {blank.body_name!r} exceeds the base slab XY envelope."
+        )
+    if local_origin.z >= blank.size_mm.z or local_origin.z + size.z <= 0:
+        raise FusionSkeletonError(
+            f"Additive prism for {blank.body_name!r} must overlap the base slab in Z."
+        )
 def _cavity_cut_plans(
     component_id: str,
     component_name: str,
@@ -4058,6 +4157,21 @@ def _vector_from_payload(
     )
 
 
+def _signed_vector_from_payload(
+    source: dict[str, Any],
+    key: str,
+    label: str,
+) -> FusionVectorMm:
+    value = source.get(key)
+    if not isinstance(value, dict):
+        raise FusionSkeletonError(f"CAD IR {label} must be an object.")
+    values: dict[str, float] = {}
+    for axis in ("x", "y", "z"):
+        raw = value.get(axis)
+        if isinstance(raw, bool) or not isinstance(raw, (int, float)):
+            raise FusionSkeletonError(f"CAD IR {label} {axis} must be numeric.")
+        values[axis] = float(raw)
+    return FusionVectorMm(**values)
 def _positive_vector_from_payload(
     source: dict[str, Any],
     key: str,

@@ -8,6 +8,7 @@ from board_game_insert_generator.mechanism import (
     default_mechanism,
     normalize_mechanism,
     sliding_lid_readiness,
+    sliding_lid_coupon_geometry,
 )
 
 
@@ -65,6 +66,38 @@ class MechanismTests(unittest.TestCase):
         self.assertEqual(readiness["status"], "not_requested")
         self.assertEqual(readiness["physical_validation"], "required")
 
+
+    def test_resolves_a_two_piece_coupon_with_joined_side_rails(self) -> None:
+        mechanism = default_mechanism()
+        mechanism["kind"] = "sliding_lid"
+
+        coupon = sliding_lid_coupon_geometry(
+            "tray",
+            {"x": 100, "y": 40, "z": 20},
+            {"x": 60, "y": 30, "z": 18},
+            mechanism,
+        )
+
+        self.assertIsNotNone(coupon)
+        assert coupon is not None
+        self.assertEqual(coupon["piece_count"], 2)
+        self.assertEqual(coupon["policy"], "sliding_lid_external_rail_coupon_v0")
+        lid = coupon["lid"]
+        self.assertEqual(lid["origin_mm"], {"x": 100.0, "y": 38.5, "z": 38.0})
+        self.assertEqual(lid["base_slab_size_mm"], {"x": 60.0, "y": 33.0, "z": 1.2})
+        self.assertEqual(len(lid["rails"]), 2)
+        self.assertEqual(lid["rails"][0]["local_origin_mm"], {"x": 0.0, "y": 0.0, "z": -1.2})
+        self.assertEqual(lid["rails"][1]["local_origin_mm"]["y"], 31.8)
+
+    def test_does_not_resolve_geometry_for_an_incompatible_module(self) -> None:
+        mechanism = default_mechanism()
+        mechanism["kind"] = "sliding_lid"
+
+        coupon = sliding_lid_coupon_geometry(
+            "short", {"x": 0, "y": 0, "z": 0}, {"x": 20, "y": 30, "z": 18}, mechanism
+        )
+
+        self.assertIsNone(coupon)
 
 if __name__ == "__main__":
     unittest.main()

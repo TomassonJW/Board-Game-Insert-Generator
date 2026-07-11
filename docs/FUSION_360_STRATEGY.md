@@ -799,3 +799,8 @@ La selection est volontairement stricte pour P17 V0 : les components, occurrence
 Apres l'export STL, l'adaptateur Fusion ecrit `bgig_export_manifest.json` et `bgig_export_manifest.md` dans le dossier export. Le manifeste est derive du resultat d'export, des settings UI locaux et de la CAD IR generee ou chargee quand le chemin est disponible.
 
 Le manifeste reste un contrat d'audit preprint : il ne change pas la CAD IR, ne relance pas le solveur, ne modifie pas les tolerances et conserve `print_validated: false`.
+
+
+## P34 - Coupon coulissant a deux pieces
+
+L adaptateur Fusion consomme join_rectangular_prism uniquement pour joindre deux glissieres rectangulaires au capot du coupon P34. Chaque join reste dans l enveloppe XY de la plaque et la recouvre en Z ; Fusion ne derive aucune dimension ni tolerance. Le coupon est genere a cote de la boite et ne modifie pas les bacs ranges. Le premier smoke doit verifier le capot unique et ses deux rails ; print-validated: false reste obligatoire.

@@ -1415,4 +1415,5 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - Objectif : materialiser un bac, deux rails simples et un capot separe selon ADR-0045, sans changer le solveur ni les tolerances globales.
 - Dependances : P34-M001 termine et integre.
 - Gate : smoke Fusion humain obligatoire avant toute qualification Fusion ; impression et mesure restent necessaires.
-- Statut : `ready` apres integration P34-M001.
+- Livrables : `join_rectangular_prism`, capot unique a deux rails, coupon hors boite, CLI/preset Fusion et smoke P34.
+- Statut : `done`, `implemented-cad-ir-coupon`, `implemented-fusion-adapter`, `fusion-smoke-required`, `print-validated: false`.

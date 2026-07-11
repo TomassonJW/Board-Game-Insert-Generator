@@ -1030,10 +1030,12 @@ Le Studio propose maintenant une carte `Finition vivante` dans l etape finale : 
 
 Le contrat est volontairement non destructif : P21 garde exactement le meme digest, les dimensions, placements, tolerances, murs, fond et cavites ne changent pas, et la CAD IR porte `stored_for_preview_only_not_materialized`. Le navigateur automatise ne peut pas se connecter dans ce sandbox Windows ; build Vite et tests de contrat sont OK. Prochaine vraie gate : P34, choix du premier mecanisme et validation physique cible avant toute geometrie de couvercle ou clip.
 
-## P34 - Contrat de couvercle coulissant V0
+## P34 - Coupon coulissant a deux pieces
 
-Statut : `accepted-gate`, `experimental-contract`, `implemented-studio-preview`, `implemented-cad-ir-metadata`, `print-validated: false`.
+Statut : `accepted-gate`, `experimental-contract`, `implemented-cad-ir-coupon`, `implemented-fusion-adapter`, `fusion-smoke-required`, `print-validated: false`.
 
-Le choix humain C du 2026-07-11 retient le couvercle coulissant. P34-M001 ajoute le contrat `bgig.mechanism.v0`, ses bornes locales, les refus de modules trop petits, le transport Local Composer/CAD IR et un panneau Studio clair. Le plan P21, son digest, les dimensions de bac ouvert, les tolerances globales et les operations Fusion ne changent pas.
+Le choix humain C du 2026-07-11 retient le couvercle coulissant. P34-M001 ajoute le contrat `bgig.mechanism.v0`, ses bornes locales, les refus de modules trop petits, le transport Local Composer/CAD IR et un panneau Studio clair. Le plan P21, son digest, les dimensions de bac ouvert et les tolerances globales ne changent pas.
 
-Les rails et le capot restent non materialises : le statut `experimental_contract_not_materialized` est porte par l export. Prochaine mission : P34-M002, coupon CAD IR a deux pieces puis smoke Fusion ; l impression reelle et les mesures sont toujours obligatoires avant toute promesse physique.
+P34-M002 ajoute un seul coupon place a cote de la boite pour le premier module compatible : un bac ouvert et un capot. Le capot est une piece unique, composee d une plaque et de deux glissieres laterales jointes par `join_rectangular_prism`. L adaptateur Fusion consomme cette primitive additive avec des bornes XY et un recouvrement Z obligatoire. Aucun statut physique n est revendique.
+
+Le smoke Fusion est prepare par `P34_SLIDING_LID_FUSION_SMOKE.md`. Il doit confirmer deux glissieres jointes au capot et `Joined cap rails: 2`. Seulement apres ce retour, P35 pourra demander l impression et les mesures de glisse.

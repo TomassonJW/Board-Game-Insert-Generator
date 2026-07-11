@@ -30,16 +30,18 @@ Un module trop court est refuse avec `SLIDING_LID_MODULE_TOO_SHORT`. Un module
 trop etroit est refuse avec `SLIDING_LID_MODULE_TOO_NARROW`. Sinon son statut
 est `planned_for_coupon` et sa validation physique reste obligatoire.
 
-## Limite volontaire de P34-M001
+## Coupon materialise en P34-M002
 
-Les rails et le capot ne sont pas encore materialises dans la CAD IR ni dans
-Fusion. `experimental_contract_not_materialized` est donc le seul statut
-honnete. Ces chiffres sont locaux au mecanisme et ne changent pas les defaults
+Quand au moins un module est compatible, l export ajoute un seul coupon a cote de la boite : un bac ouvert et un capot. Le capot est une plaque avec deux glissieres laterales descendantes jointes par join_rectangular_prism. Il reste distinct des bacs ranges et ne couvre pas encore chaque module du jeu.
+
+## Limite passee de P34-M001
+
+Avant P34-M002, les rails et le capot ne sont pas materialises. `experimental_contract_not_materialized` reste le statut honnete quand aucun coupon ne peut etre prepare. Ces chiffres sont locaux au mecanisme et ne changent pas les defaults
 de tolerance du projet.
 
 ## Suite de validation
 
-1. P34-M002 : deux corps CAD IR et rails simples, puis smoke Fusion humain.
+1. P34-M002 : implemente hors Fusion ; smoke Fusion humain requis via `P34_SLIDING_LID_FUSION_SMOKE.md`.
 2. P35 : coupon imprime avec rail, capot et jeu choisi ; mesure de glisse,
    effort, jeu lateral, deformation et hauteur reelle.
 3. Seulement apres retour humain, qualifier les valeurs utilisees pour le

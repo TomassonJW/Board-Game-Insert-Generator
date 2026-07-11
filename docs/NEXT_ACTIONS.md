@@ -8,23 +8,22 @@ Statut : `active` pour les missions non gatees. Les missions Fusion et physiques
 
 ## Etat courant
 
-P31 et P32 sont `fusion-validated`. P33 rend l'apparence vivante dans le Studio. Le choix humain P34 est recu : le premier mecanisme est le **couvercle coulissant**. P34-M001 livre son contrat experimental, son apercu Studio et son transport metadata, sans geometrie de rail ni capot.
-
-Le Studio reste la surface principale. Fusion reste la surface secondaire de materialisation, inspection et export prevue par ADR-0042.
+P31 et P32 sont `fusion-validated`. P33 rend l'apparence vivante dans le Studio. P34-M001 sauvegarde le contrat de couvercle coulissant. P34-M002 produit maintenant un coupon CAD distinct : un bac et un capot avec deux glissieres jointes, sans modifier les bacs ranges ni le plan P21.
 
 ## Gate humaine active
 
-Aucune gate produit n'est ouverte pour P34-M002 : le mecanisme choisi est explicite dans ADR-0045. La prochaine vraie validation humaine sera le smoke Fusion apres materialisation, puis l'impression et la mesure du coupon.
+Le smoke Fusion P34 est pret et attend seulement une observation humaine. La validation demandee est simple : le capot doit etre une piece unique avec deux glissieres, et le rapport Fusion doit annoncer `Joined cap rails: 2` tout en gardant `Print validation: false`.
 
 ## Hors scope maintenu
 
 - Fusion ne devient jamais source de verite du plan.
 - Aucun statut `print-validated` ne sera utilise sans prototype mesure.
-- P34-M001 n'a cree aucun rail, capot, rainure, clip ou charniere.
+- Le coupon ne couvre pas encore tous les bacs de la boite.
+- Clips, charnieres, aimants et changements de tolerance globale restent hors scope.
 
 ## Prochaine action
 
-P34-M002 : generer un coupon coulissant a deux pieces dans la CAD IR, avec rails simples derives de `bgig.mechanism.v0`, puis preparer le smoke Fusion. La mission devra conserver les refus P34-M001 et ne changera ni le solveur ni les tolerances globales.
+Executer le smoke prepare par `P34_SLIDING_LID_FUSION_SMOKE.md`. Retour attendu : `P34 Fusion OK` ou `P34 Fusion KO` avec le symptome observe. Apres OK Fusion, P35 preparera le coupon imprime et son protocole de mesures.
 
 ## Fin de chaque mission
 

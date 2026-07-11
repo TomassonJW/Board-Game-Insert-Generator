@@ -163,3 +163,5 @@ Tests, cartes backlog ou gates humaines a preparer.
 
 - ADR-0044-removable-lid-contract-v0.md - proposition de couvercle pose non retenue.
 - ADR-0045-sliding-lid-contract-v0.md - premier mecanisme ferme : coulissant experimental sous coupon.
+
+- ADR-0046-additive-prism-join-for-sliding-lid-coupon.md - join rectangulaire borne pour les rails du coupon coulissant.

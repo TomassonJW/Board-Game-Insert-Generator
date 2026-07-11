@@ -84,7 +84,7 @@ def _print_top_level_help() -> None:
         "  python -m board_game_insert_generator report-box-fill-variants REQUEST --format markdown|json|html [--output PATH]\n"
         "  python -m board_game_insert_generator render-box-fill-variant-dashboard REQUEST --output PATH\n"
         "  python -m board_game_insert_generator export-box-fill-variant REQUEST --variant recommended|ID --output PATH [--cad-ir-output PATH]\n"
-        "  python -m board_game_insert_generator export-local-composer-selection --starter ID --output PATH [--selection-output PATH] [--variant recommended|ID]\n"
+        "  python -m board_game_insert_generator export-local-composer-selection --starter ID --output PATH [--selection-output PATH] [--variant recommended|ID] [--mechanism none|sliding_lid]\n"
         "  python -m board_game_insert_generator serve-local-composer [--host 127.0.0.1] [--port 8001]\n"
         "\n"
         "CAD IR export is a subcommand named export-cad-ir; it is not an --export-cad-ir option."
@@ -499,11 +499,19 @@ def _export_local_composer_selection(argv: list[str]) -> int:
         default="recommended",
         help="Variant id from the starter portfolio, or recommended.",
     )
+    parser.add_argument(
+        "--mechanism",
+        choices=("none", "sliding_lid"),
+        default="none",
+        help="Optional P34 mechanism contract to include without changing the P21 layout.",
+    )
     args = parser.parse_args(argv)
 
     starter = next(starter for starter in starter_catalog() if starter["id"] == args.starter)
+    draft = json.loads(json.dumps(starter["draft"]))
+    draft["mechanism"]["kind"] = args.mechanism
     try:
-        bundle = export_from_draft(starter["draft"], args.variant)
+        bundle = export_from_draft(draft, args.variant)
     except (LocalComposerError, ValueError) as exc:
         _print_error("Local composer export error", exc)
         return 2
@@ -526,7 +534,9 @@ def _export_local_composer_selection(argv: list[str]) -> int:
         f"- Variant: {bundle['selection']['selected_variant_id']}\n"
         f"- Output: {output_path}\n"
         f"- Components: {len(bundle['cad_ir']['components'])}\n"
-        "- Geometry: open-top tray candidates with walls, floor and one generic cavity each; Fusion and print validation remain pending."
+        f"- Mechanism: {args.mechanism}\n"
+        f"- Coupon: {bundle['mechanism_coupon']['status']}\n"
+        "- Geometry: open-top tray candidates; a requested sliding lid adds one separate two-piece coupon. Fusion and print validation remain pending."
     )
     return 0
 

@@ -86,6 +86,7 @@ try:
         SUPPORTED_FUSION_GENERATION_MODES,
         SUPPORTED_FUSION_INPUT_MODES,
         FusionAssemblyDocumentRequiredError,
+        FusionAdditivePrismPlan,
         FusionCavityCutPlan,
         FusionFingerNotchCutPlan,
         FusionGenerationPlan,
@@ -189,6 +190,7 @@ except ImportError:  # pragma: no cover - Fusion may load the file as a script.
         SUPPORTED_FUSION_GENERATION_MODES,
         SUPPORTED_FUSION_INPUT_MODES,
         FusionAssemblyDocumentRequiredError,
+        FusionAdditivePrismPlan,
         FusionCavityCutPlan,
         FusionFingerNotchCutPlan,
         FusionGenerationPlan,
@@ -1449,6 +1451,7 @@ def _generation_result_message(
         "Occurrence Browser names: Fusion-generated; BGIG source Component names and plan roles are authoritative.\n"
         f"Grid-positioned modules refused: {len(generation_plan.rejected_grid_modules)}\n"
         f"Rectangular cavity cuts: {result['cavity_cuts']}\n"
+        f"Joined cap rails: {result.get('joined_rectangular_prisms', 0)}\n"
         f"Asset cavity policy: {result['asset_cavity_policy']}\n"
         f"Asset-fit cavities planned: {result['asset_fit_cavities_planned']}\n"
         f"Asset-fit cavities generated: {result['asset_fit_cavities_generated']}\n"
@@ -1492,6 +1495,7 @@ def _stable_generation_result(result: dict[str, object]) -> dict[str, object]:
         "legacy_bodies_created": 0,
         "linked_exploded_occurrences": "no",
         "cavity_cuts": 0,
+        "joined_rectangular_prisms": 0,
         "asset_cavity_policy": "none",
         "asset_fit_cavities_planned": 0,
         "asset_fit_cavities_generated": 0,
@@ -2133,6 +2137,24 @@ def _generate_from_plan(design, plan: FusionGenerationPlan, registry: BgigFusion
 
     source_blanks_by_id = {blank.cad_id: blank for blank in source_blanks}
 
+    additive_prism_join_count = 0
+    for join_plan in plan.additive_prism_joins:
+        target_body = created_bodies.get(join_plan.target_body_id)
+        target_component = created_components.get(join_plan.target_body_id)
+        if target_body is None or target_component is None:
+            raise RuntimeError(
+                f"Additive prism {join_plan.operation_id} targets unknown body "
+                f"{join_plan.target_body_id}."
+            )
+        _create_joined_rectangular_prism(
+            target_component,
+            join_plan,
+            target_body,
+            registry,
+            scene_id,
+        )
+        additive_prism_join_count += 1
+
     asset_fit_cavity_cuts_planned = sum(
         1 for cavity_cut in plan.cavity_cuts if getattr(cavity_cut, "cavity_source", "") in {"asset_fit_cavity", "asset_compartment_cavity"}
     )
@@ -2247,6 +2269,7 @@ def _generate_from_plan(design, plan: FusionGenerationPlan, registry: BgigFusion
         "legacy_bodies_created": 0,
         "linked_exploded_occurrences": "yes" if plan.linked_exploded_occurrences else "no",
         "cavity_cuts": cavity_cut_count,
+        "joined_rectangular_prisms": additive_prism_join_count,
         "asset_cavity_policy": planned_asset_cavity_policies[0] if planned_asset_cavity_policies else "none",
         "asset_fit_cavities_planned": asset_fit_cavity_cuts_planned,
         "asset_fit_cavities_generated": asset_fit_cavity_cuts_generated,
@@ -2579,6 +2602,65 @@ def _create_rectangular_blank(target_component, solid_plan: FusionSolidPlan, reg
         _tag_bgig_entity(extrude, "module_extrude", scene_id=scene_id, module_id=module_id, registry=registry)
     return body
 
+
+def _create_joined_rectangular_prism(
+    target_component,  # noqa: ANN001
+    join_plan: FusionAdditivePrismPlan,
+    target_body,  # noqa: ANN001
+    registry: BgigFusionRegistry | None = None,
+    scene_id: str | None = None,
+) -> None:
+    plane = _create_offset_xy_plane(
+        target_component,
+        join_plan.local_origin_mm.z,
+        f"{join_plan.component_name} {join_plan.operation_id} additive prism plane",
+    )
+    sketch = target_component.sketches.add(plane)
+    sketch.name = f"{join_plan.component_name} {join_plan.operation_id} additive prism footprint"
+    if registry is not None:
+        _tag_bgig_entity(
+            sketch,
+            "mechanism_rail_sketch",
+            scene_id=scene_id,
+            module_id=join_plan.target_body_id,
+            registry=registry,
+        )
+    _add_scene_rectangle_from_mm(
+        sketch,
+        join_plan.local_origin_mm.x,
+        join_plan.local_origin_mm.y,
+        join_plan.size_mm.x,
+        join_plan.size_mm.y,
+        join_plan.operation_id,
+    )
+    if sketch.profiles.count < 1:
+        raise RuntimeError(f"No closed additive profile was created for {join_plan.operation_id}.")
+    extrudes = target_component.features.extrudeFeatures
+    join_input = extrudes.createInput(
+        sketch.profiles.item(0),
+        adsk.fusion.FeatureOperations.JoinFeatureOperation,
+    )
+    if join_input is None:
+        raise RuntimeError(f"Fusion join input failed for {join_plan.operation_id}.")
+    distance = adsk.core.ValueInput.createByString(f"{join_plan.size_mm.z} mm")
+    extent = adsk.fusion.DistanceExtentDefinition.create(distance)
+    if extent is None:
+        raise RuntimeError(f"Fusion join extent failed for {join_plan.operation_id}.")
+    if not join_input.setOneSideExtent(extent, adsk.fusion.ExtentDirections.PositiveExtentDirection):
+        raise RuntimeError(f"Fusion join distance failed for {join_plan.operation_id}.")
+    join_input.participantBodies = [target_body]
+    feature = extrudes.add(join_input)
+    if feature is None:
+        raise RuntimeError(f"Fusion join failed for {join_plan.operation_id}.")
+    feature.name = f"{join_plan.component_name} {join_plan.operation_id} joined rail"
+    if registry is not None:
+        _tag_bgig_entity(
+            feature,
+            "mechanism_rail_join",
+            scene_id=scene_id,
+            module_id=join_plan.target_body_id,
+            registry=registry,
+        )
 
 def _create_rectangular_cavity_cut(
     target_component,  # noqa: ANN001
