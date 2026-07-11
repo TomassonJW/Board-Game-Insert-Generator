@@ -496,8 +496,10 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - C-QUALITY : bornes et enums valides, digest P21 invariant, build Studio OK ; `browser-inspection-pending` dans le sandbox Windows.
 - C-PRINT : inchange, `print-validated: false`.
 
-## P34 mechanism gate
+## P34 sliding lid contract
 
-- C-STACKING / futur mecanisme : `waiting-human-decision` ; aucun couvercle, rail, clip ou charniere n est encore implemente.
-- C-CALIBRATION : la premiere fermeture requerra un coupon imprime et des mesures avant toute qualification physique.
-- C-AESTHETIC : P33 ne materialise pas une apparence ; P34 doit garder cette frontiere explicite.
+- C-STACKING / futur mecanisme : experimental-contract pour le coulissant choisi ; les rails/capot restent non materialises.
+- C-PRODUCT-VISION : le Studio sauvegarde et explique le choix sans modifier le solveur, le digest ou la selection.
+- C-CAD-IR : metadata et readiness par module sont transportees, sans operation CAD nouvelle.
+- C-CALIBRATION : un coupon imprime et mesure reste obligatoire avant toute qualification physique.
+- C-AESTHETIC : l apercu reste une intention ; aucune finition Fusion n est declaree.

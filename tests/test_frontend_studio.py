@@ -33,6 +33,16 @@ class FrontendStudioContractTests(unittest.TestCase):
         self.assertIn("appearance-${draft.appearance.visual.theme}", self.source)
         self.assertIn("PreviewModule", self.source)
 
+    def test_p34_sliding_lid_controls_are_saved_as_an_experimental_intention(self) -> None:
+        for label in (
+            "Couvercle coulissant",
+            "Essai requis",
+            "Jeu de glisse",
+            "Aucun rail ni capot n est cree dans Fusion",
+        ):
+            self.assertIn(label, self.source)
+        self.assertIn("MechanismEditor", self.source)
+        self.assertIn("mechanism-preview-pill", self.source)
     def test_technical_export_stays_in_expert_mode_and_describes_p31_honestly(self) -> None:
         self.assertIn("Mode expert : télécharger le dossier de préparation", self.source)
         self.assertIn("bacs ouverts à vérifier dans Fusion", self.source)

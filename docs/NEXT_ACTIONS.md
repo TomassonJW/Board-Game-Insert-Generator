@@ -8,23 +8,23 @@ Statut : `active` pour les missions non gatees. Les missions Fusion et physiques
 
 ## Etat courant
 
-P31 et P32 sont `fusion-validated` : les bacs ouverts et la palette Fusion secondaire sont observes. P33 est integre : les apercus de forme et d esthetique sont disponibles dans le Studio sans effet sur les dimensions, Fusion ou l impression.
+P31 et P32 sont `fusion-validated`. P33 rend l'apparence vivante dans le Studio. Le choix humain P34 est recu : le premier mecanisme est le **couvercle coulissant**. P34-M001 livre son contrat experimental, son apercu Studio et son transport metadata, sans geometrie de rail ni capot.
 
 Le Studio reste la surface principale. Fusion reste la surface secondaire de materialisation, inspection et export prevue par ADR-0042.
 
 ## Gate humaine active
 
-P34 est `waiting-human-decision` : le premier mecanisme impose un choix humain et un futur prototype imprime.
+Aucune gate produit n'est ouverte pour P34-M002 : le mecanisme choisi est explicite dans ADR-0045. La prochaine vraie validation humaine sera le smoke Fusion apres materialisation, puis l'impression et la mesure du coupon.
 
 ## Hors scope maintenu
 
 - Fusion ne devient jamais source de verite du plan.
 - Aucun statut `print-validated` ne sera utilise sans prototype mesure.
-- Les couvercles, mecanismes, jeux physiques et validations d impression restent hors scope tant que P34 n est pas approuve.
+- P34-M001 n'a cree aucun rail, capot, rainure, clip ou charniere.
 
 ## Prochaine action
 
-P34-GATE : choisir le premier mecanisme. Recommandation : couvercle pose amovible V0. Repondre `P34 couvercle pose approuve` ou choisir A, C ou D dans `docs/P34_MECHANISM_GATE.md`.
+P34-M002 : generer un coupon coulissant a deux pieces dans la CAD IR, avec rails simples derives de `bgig.mechanism.v0`, puis preparer le smoke Fusion. La mission devra conserver les refus P34-M001 et ne changera ni le solveur ni les tolerances globales.
 
 ## Fin de chaque mission
 

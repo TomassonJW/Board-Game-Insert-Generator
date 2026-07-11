@@ -1393,7 +1393,26 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - Capability : futur mecanisme, C-STACKING, C-AESTHETIC, C-CALIBRATION.
 - Milestone : M13 Advanced mechanisms / M14 Usable beta.
 - Objectif : choisir le premier mecanisme ferme autorise avant toute CAD IR, Fusion ou promesse d impression.
-- Livrables de gate : `P34_MECHANISM_GATE.md`, ADR-0044 proposee et protocole cible.
-- Recommandation : couvercle pose amovible V0, sans clip ni charniere.
+- Livrables de gate : `P34_MECHANISM_GATE.md`, ADR-0044/0045 et protocole cible.
+- Decision humaine : C, couvercle coulissant, le 2026-07-11.
 - Gate : validation humaine explicite obligatoire.
 - Statut : `waiting-human-decision`.
+
+### P34-M001 - Contrat experimental du couvercle coulissant
+
+- Capability : C-STACKING, C-AESTHETIC, C-CALIBRATION, C-PRODUCT-VISION.
+- Milestone : M13 Advanced mechanisms / M14 Usable beta.
+- Objectif : sauvegarder, borner et rendre lisible le coulissant sans materialiser de geometrie.
+- Livrables : ADR-0045, `SLIDING_LID_CONTRACT.md`, `bgig.mechanism.v0`, refus par module, transport Local Composer et Studio.
+- Preuves : tests Python, tests Studio, TypeScript/Vite ; digest P21 invariant.
+- Limite : rails/capot non materialises, `print-validated: false`.
+- Statut : `done`, `experimental-contract`.
+
+### P34-M002 - Coupon CAD IR coulissant a deux pieces
+
+- Capability : C-STACKING, C-CAD-IR, C-FUSION-UI, C-CALIBRATION.
+- Milestone : M13 Advanced mechanisms.
+- Objectif : materialiser un bac, deux rails simples et un capot separe selon ADR-0045, sans changer le solveur ni les tolerances globales.
+- Dependances : P34-M001 termine et integre.
+- Gate : smoke Fusion humain obligatoire avant toute qualification Fusion ; impression et mesure restent necessaires.
+- Statut : `ready` apres integration P34-M001.

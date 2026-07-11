@@ -160,3 +160,6 @@ Tests, cartes backlog ou gates humaines a preparer.
 - ADR-0041-local-composer-selection-cad-ir-bridge.md - Pont CAD IR de la selection locale P21 vers Fusion P28.
 - ADR-0042-studio-primary-fusion-palette-secondary.md - Studio produit principal et palette Fusion secondaire.
 - ADR-0043-open-top-trays-from-p21-selection.md - Proposition de bacs ouverts depuis une selection P21 (P31-GATE).
+
+- ADR-0044-removable-lid-contract-v0.md - proposition de couvercle pose non retenue.
+- ADR-0045-sliding-lid-contract-v0.md - premier mecanisme ferme : coulissant experimental sous coupon.

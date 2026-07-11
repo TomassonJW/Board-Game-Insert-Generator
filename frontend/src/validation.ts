@@ -83,6 +83,7 @@ export function summarizeDraft(draft: ComposerDraft): DraftReadiness {
 export function isComposerDraft(value: unknown): value is ComposerDraft {
   if (!isRecord(value) || value.schema_version !== 'bgig.local_composer.v0' || typeof value.project_name !== 'string' || !isBox(value.box)) return false
   return (value.appearance === undefined || isAppearance(value.appearance))
+    && (value.mechanism === undefined || isMechanism(value.mechanism))
     && Array.isArray(value.assets) && value.assets.every(isAsset)
     && Array.isArray(value.layers) && value.layers.every(isLayer)
     && Array.isArray(value.reservations) && value.reservations.every(isReservation)
@@ -198,3 +199,11 @@ function isAppearance(value: unknown) {
     && ['none', 'module_name', 'module_name_and_role'].includes(String(value.visual.label_mode)) && ['quiet', 'bold'].includes(String(value.visual.typography))
 }
 function isPreference(value: unknown): value is ComposerDraft['preference'] { return value === 'balanced' || value === 'compact' || value === 'accessible' || value === 'print_simple' }
+
+function isMechanism(value: unknown) {
+  return isRecord(value) && value.schema_version === 'bgig.mechanism.v0'
+    && ['none', 'sliding_lid'].includes(String(value.kind))
+    && ['x', 'y'].includes(String(value.slide_axis))
+    && isNumber(value.lid_thickness_mm) && isNumber(value.rail_height_mm)
+    && isNumber(value.rail_clearance_mm) && isNumber(value.end_overlap_mm)
+}

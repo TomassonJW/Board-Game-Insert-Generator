@@ -236,6 +236,6 @@ Statut : `done`, `fusion-validated`, `print-validated: false`. Retour humain `P3
 
 Statut : `implemented-studio-preview`, `browser-inspection-pending`, `print-validated: false`. Le projet transporte maintenant une apparence versionnee V0 : theme, labels, typographie, coins, biseau et prise symbolique. Le Studio la rend vivante sans modifier le solveur ni la geometrie de fabrication. Les finitions Fusion restent explicitement non materialisees. P34 doit passer une gate humaine avant de representer un couvercle, une rainure ou un clip.
 
-## P34 mechanism gate - 2026-07-11
+## P34 sliding lid contract - 2026-07-11
 
-Statut : `waiting-human-decision`. Le rapport P34 compare bac ouvert, couvercle pose, coulissant et clip/charniere. La recommandation est un couvercle pose amovible V0, sans verrouillage. Aucun mecanisme ne sera code avant validation explicite puis prototype imprime mesure.
+Statut : ccepted-gate, experimental-contract, implemented-studio-preview, implemented-cad-ir-metadata, print-validated: false. Le choix humain C retient le couvercle coulissant. P34-M001 livre son contrat versionne, son apercu et ses refus par module sans rails, capot, operation Fusion ou changement de tolerance. P34-M002 preparera un coupon CAD IR a deux pieces et le smoke Fusion ; le prototype imprime mesure reste obligatoire.

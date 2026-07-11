@@ -1030,8 +1030,10 @@ Le Studio propose maintenant une carte `Finition vivante` dans l etape finale : 
 
 Le contrat est volontairement non destructif : P21 garde exactement le meme digest, les dimensions, placements, tolerances, murs, fond et cavites ne changent pas, et la CAD IR porte `stored_for_preview_only_not_materialized`. Le navigateur automatise ne peut pas se connecter dans ce sandbox Windows ; build Vite et tests de contrat sont OK. Prochaine vraie gate : P34, choix du premier mecanisme et validation physique cible avant toute geometrie de couvercle ou clip.
 
-## P34-GATE - Premier mecanisme
+## P34 - Contrat de couvercle coulissant V0
 
-Statut : `waiting-human-decision`.
+Statut : `accepted-gate`, `experimental-contract`, `implemented-studio-preview`, `implemented-cad-ir-metadata`, `print-validated: false`.
 
-P34 ne peut pas etre automatisee au dela du rapport : un mecanisme engage des jeux et une validation physique. La recommandation est un couvercle pose amovible, sans clip, comme premier mecanisme experimental. Il est plus simple a tester et moins trompeur qu un coulissant ou une charniere. Le choix humain attendu est dans `docs/P34_MECHANISM_GATE.md`.
+Le choix humain C du 2026-07-11 retient le couvercle coulissant. P34-M001 ajoute le contrat `bgig.mechanism.v0`, ses bornes locales, les refus de modules trop petits, le transport Local Composer/CAD IR et un panneau Studio clair. Le plan P21, son digest, les dimensions de bac ouvert, les tolerances globales et les operations Fusion ne changent pas.
+
+Les rails et le capot restent non materialises : le statut `experimental_contract_not_materialized` est porte par l export. Prochaine mission : P34-M002, coupon CAD IR a deux pieces puis smoke Fusion ; l impression reelle et les mesures sont toujours obligatoires avant toute promesse physique.

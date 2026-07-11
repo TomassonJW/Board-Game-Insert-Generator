@@ -70,6 +70,15 @@ export interface AppearanceDraft {
     typography: 'quiet' | 'bold'
   }
 }
+export interface MechanismDraft {
+  schema_version: 'bgig.mechanism.v0'
+  kind: 'none' | 'sliding_lid'
+  slide_axis: 'x' | 'y'
+  lid_thickness_mm: number
+  rail_height_mm: number
+  rail_clearance_mm: number
+  end_overlap_mm: number
+}
 export interface ComposerDraft {
   schema_version: 'bgig.local_composer.v0'
   project_name: string
@@ -85,6 +94,7 @@ export interface ComposerDraft {
   candidates: CandidateDraft[]
   preference: 'balanced' | 'compact' | 'accessible' | 'print_simple'
   appearance: AppearanceDraft
+  mechanism: MechanismDraft
 }
 export interface StarterTemplate {
   id: string
@@ -149,8 +159,10 @@ export interface Portfolio {
 
 export interface ExportBundle {
   schema_version: 'bgig.local_composer_export.v0'
-  selection: { selected_variant_id: string; selected_by: string; variant: Variant; appearance?: AppearanceDraft }
+  selection: { selected_variant_id: string; selected_by: string; variant: Variant; appearance?: AppearanceDraft; mechanism?: MechanismDraft }
   cad_ir: Record<string, unknown>
   limits: string[]
   appearance?: AppearanceDraft
+  mechanism?: MechanismDraft
+  mechanism_readiness?: Array<Record<string, unknown>>
 }

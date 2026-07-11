@@ -175,5 +175,35 @@ class LocalComposerTests(unittest.TestCase):
             thread.join(timeout=3)
 
 
+    def test_mechanism_is_transport_only_and_does_not_change_layout(self) -> None:
+        draft = starter_draft()
+        baseline_digest = portfolio_from_draft(draft)["portfolio_digest"]
+        draft["mechanism"]["kind"] = "sliding_lid"
+
+        bundle = export_from_draft(draft)
+
+        self.assertEqual(portfolio_from_draft(draft)["portfolio_digest"], baseline_digest)
+        self.assertEqual(bundle["mechanism"], draft["mechanism"])
+        self.assertEqual(bundle["selection"]["mechanism"], draft["mechanism"])
+        self.assertEqual(bundle["cad_ir"]["metadata"]["mechanism"], draft["mechanism"])
+        self.assertEqual(
+            bundle["cad_ir"]["metadata"]["local_composer"]["mechanism_status"],
+            "experimental_contract_not_materialized",
+        )
+        self.assertTrue(bundle["mechanism_readiness"])
+        self.assertTrue(
+            all(
+                item["status"] in {"planned_for_coupon", "refused"}
+                for item in bundle["mechanism_readiness"]
+            )
+        )
+
+    def test_rejects_an_invalid_mechanism_as_a_draft_error(self) -> None:
+        draft = starter_draft()
+        draft["mechanism"]["rail_clearance_mm"] = 0.7
+
+        with self.assertRaisesRegex(LocalComposerError, "rail_clearance_mm"):
+            portfolio_from_draft(draft)
+
 if __name__ == "__main__":
     unittest.main()

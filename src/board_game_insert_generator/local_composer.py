@@ -17,6 +17,7 @@ from typing import Any
 from urllib.parse import urlsplit
 
 from board_game_insert_generator.appearance import AppearanceError, default_appearance, normalize_appearance
+from board_game_insert_generator.mechanism import MechanismError, default_mechanism, normalize_mechanism, sliding_lid_readiness
 
 from board_game_insert_generator.box_fill_solver import BoxFillCandidate, BoxFillSolveRequest
 from board_game_insert_generator.box_fill_variants import (
@@ -111,6 +112,7 @@ def starter_draft() -> dict[str, object]:
         ],
         "preference": "balanced",
         "appearance": default_appearance(),
+        "mechanism": default_mechanism(),
     }
 
 
@@ -139,6 +141,7 @@ def starter_catalog() -> list[dict[str, object]]:
         ],
         "preference": "accessible",
         "appearance": default_appearance(),
+        "mechanism": default_mechanism(),
     }
     board_game = {
         "schema_version": LOCAL_COMPOSER_SCHEMA_V0,
@@ -174,6 +177,7 @@ def starter_catalog() -> list[dict[str, object]]:
         ],
         "preference": "balanced",
         "appearance": default_appearance(),
+        "mechanism": default_mechanism(),
     }
     return [
         {
@@ -230,7 +234,18 @@ def export_from_draft(raw_draft: object, variant_id: str | None = None) -> dict[
     selected_variant = select_box_fill_variant(portfolio, variant_id)
     selection = selected_variant_to_dict(portfolio, variant_id)
     appearance = config.box_fill_plan.metadata["appearance"]
+    mechanism = config.box_fill_plan.metadata["mechanism"]
     selection["appearance"] = appearance
+    selection["mechanism"] = mechanism
+    mechanism_readiness = [
+        sliding_lid_readiness(
+            module.id,
+            {"x": module.size.x, "y": module.size.y, "z": module.size.z},
+            mechanism,
+        )
+        for module in selected_variant.result.solved_plan.modules
+        if module.printable
+    ]
     scene_config = replace(config, box_fill_plan=selected_variant.result.solved_plan)
     scene = build_blank_cad_scene(scene_config, generate_basic_layout(scene_config)).to_dict()
     scene["components"] = _selection_bridge_components(
@@ -242,12 +257,15 @@ def export_from_draft(raw_draft: object, variant_id: str | None = None) -> dict[
     scene["metadata"]["box_fill_variant_selection"] = selection
     scene["metadata"]["box_fill_solution"] = selection["variant"]["solution"]
     scene["metadata"]["appearance"] = appearance
+    scene["metadata"]["mechanism"] = mechanism
+    scene["metadata"]["mechanism_readiness"] = mechanism_readiness
     scene["metadata"]["local_composer"] = {
         "schema_version": LOCAL_COMPOSER_SCHEMA_V0,
         "materialization_status": "prepared_open_top_trays_for_fusion_smoke",
         "selection_bridge": "p31_open_top_tray_from_selected_module.v0",
         "geometry_status": "open_top_tray_candidates",
         "appearance_status": "stored_for_preview_only_not_materialized",
+        "mechanism_status": "experimental_contract_not_materialized",
         "print_validation_status": "not_validated",
         "reason": (
             "P31 turns each selected BoxFill module into an explicit open-top tray "
@@ -259,6 +277,8 @@ def export_from_draft(raw_draft: object, variant_id: str | None = None) -> dict[
         "schema_version": LOCAL_COMPOSER_EXPORT_SCHEMA_V0,
         "selection": selection,
         "appearance": appearance,
+        "mechanism": mechanism,
+        "mechanism_readiness": mechanism_readiness,
         "cad_ir": scene,
         "limits": [
             "The CAD IR contains one open-top tray candidate per selected module, with one generic cavity and retained walls/floor.",
@@ -418,6 +438,7 @@ def _draft_to_engine(
             "preference",
             "policies",
             "appearance",
+            "mechanism",
         },
         "draft",
     )
@@ -448,6 +469,10 @@ def _draft_to_engine(
         appearance = normalize_appearance(draft.get("appearance"))
     except AppearanceError as exc:
         raise LocalComposerError(str(exc)) from exc
+    try:
+        mechanism = normalize_mechanism(draft.get("mechanism"))
+    except MechanismError as exc:
+        raise LocalComposerError(str(exc)) from exc
     standard_preference_profile(preference)
     policies_raw = draft.get("policies")
     policies = SUPPORTED_POLICY_IDS if policies_raw is None else tuple(
@@ -477,6 +502,7 @@ def _draft_to_engine(
             "schema_version": LOCAL_COMPOSER_SCHEMA_V0,
             "ui_warning": "The draft is the interaction model; the engine contracts remain authoritative.",
             "appearance": appearance,
+            "mechanism": mechanism,
         },
     )
     config = InsertConfig(

@@ -1,46 +1,37 @@
 # P34-GATE - Premier mecanisme de couvercle
 
-## Declencheur
+## Decision humaine recue
 
-P31 a valide de vrais bacs ouverts dans Fusion. P33 a rendu forme et style visibles, sans creer de geometrie de finition. Un couvercle, une rainure, un clip ou une charniere ajoute des jeux physiques, des surfaces de frottement et des risques de casse : il serait faux de les choisir ou les annoncer sans validation humaine et sans prototype imprime.
+Le 2026-07-11, le choix C est approuve : **couvercle coulissant**.
 
-## Etat actuel
+## Etat honnete au moment de la decision
 
-- Bacs P31 : parois, fond et cavite ouverte ; aucun couvercle.
-- Valeurs existantes : parois et fond de 1.2 mm pour le smoke ; elles ne sont pas encore calibrees par impression.
-- P33 : une apparence peut suggerer une forme, mais aucune forme de mecanisme ne passe dans Fusion.
-- Fusion et l export savent generer et exporter des bodies simples ; aucune geometrie de rainure, clip ou charniere n existe.
+- Les bacs ouverts P31 sont observes dans Fusion ; aucune impression ne les valide encore.
+- Un coulissant ajoute rails, frottement, poussiere, deformation et jeu XY.
+- Les parois et le fond actuels ne sont pas recalibres par cette decision.
 - `print-validated: false` reste obligatoire.
 
-## Options
+## Perimetre accepte pour P34
 
-| Option | Ce que voit l utilisateur | Interet | Risques et cout |
-| --- | --- | --- | --- |
-| A - Pas de couvercle | Bac ouvert, eventuellement retenu par la boite | Le plus simple, acces immediat | Ne protege pas le contenu hors de la boite |
-| B - Couvercle pose | Un capot amovible qui se pose sur le bac, sans clip | Protection et empilage, faible complexite, echec non destructif | Demande jeu lateral et hauteur disponible a mesurer |
-| C - Couvercle coulissant | Un capot qui glisse dans deux rails | Aspect premium et fermeture nette | Frottement, poussiere, deformations et tolerance XY sensibles |
-| D - Clip ou charniere | Fermeture solidaire du bac | Usage autonome hors boite | Flexion, fatigue, materiau et orientation d impression rendent le premier prototype risque |
+1. Le Studio peut sauvegarder le choix `sliding_lid` et le rendre lisible.
+2. Le coeur peut verifier des dimensions minimales et refuser un module incompatible.
+3. L'export peut transporter le contrat et les avertissements sans modifier le plan P21.
+4. Aucun rail, capot, rainure ou operation Fusion n'est ajoute dans P34-M001.
 
-## Recommandation
+## Contrat retenu
 
-Retenir **B - couvercle pose amovible V0**, exclusivement comme contrat experimental puis coupon imprime.
+ADR-0045 et `SLIDING_LID_CONTRACT.md` definissent le contrat `bgig.mechanism.v0`.
+Les valeurs de rail et de jeu sont experimentales, locales au mecanisme et ne
+changent pas les tolerances globales.
 
-Il donne une valeur claire sans supposer qu un clip va survivre. Il se compose de deux pieces separees : un bac et un capot, sans charniere ni verrou. Le futur contrat devra reserver la hauteur, declarer un jeu de couvercle independant des tolerances existantes, refuser les bacs trop bas et marquer tout resultat `a valider par impression reelle`.
+## Etapes suivantes
 
-## Ce que Codex fera apres validation
+1. P34-M002 : materialiser un coupon CAD IR a deux pieces, puis l'observer dans Fusion.
+2. P35 : imprimer et mesurer la glisse avant toute promesse de fermeture fiable.
 
-1. Ecrire l ADR acceptee et le contrat `removable_lid_v0`.
-2. Ajouter les contraintes abstraites et les refus explicites, sans changer les defaults de tolerance.
-3. Generer un petit coupon bac + capot dans la CAD IR, puis verifier Fusion.
-4. Preparer un protocole d impression et de mesures avant toute promesse produit.
+## Hors scope maintenu
 
-## Hors scope apres validation
-
-- pas de clip, aimant, charniere, glissiere, vis, mousse ou quincaillerie ;
-- pas de modification globale des valeurs de tolerance ;
-- pas de declaration `print-validated` avant mesures reelles ;
-- pas de Fusion comme source de calcul.
-
-## Validation demandee
-
-Reponds simplement : **`P34 couvercle pose approuve`** pour lancer ce chemin, ou indique l option A, C ou D si tu veux une autre priorite.
+- clips, charnieres, aimants, quincaillerie et mousse ;
+- modification globale des tolerances ;
+- statut `print-validated` avant mesures reelles ;
+- Fusion comme source de calcul.

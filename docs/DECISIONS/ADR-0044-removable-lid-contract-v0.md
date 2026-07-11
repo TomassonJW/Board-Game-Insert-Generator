@@ -2,7 +2,7 @@
 
 ## Statut
 
-`proposed` - en attente de la validation P34.
+`not-retained` - option B non retenue : le choix humain du 2026-07-11 est C, couvercle coulissant. Voir ADR-0045.
 
 ## Contexte
 
@@ -31,3 +31,7 @@ Choisir le couvercle pose amovible V0 : une seconde piece qui couvre le bac et s
 ## Consequences
 
 Cette option est plus robuste et plus facile a expliquer qu un rail ou un clip, mais elle ne garantit ni tenue en transport ni ajustement avant une mesure reelle. Les mecanismes coulissants, clips et charnieres restent hors scope.
+
+## Issue
+
+La proposition reste archivee comme comparaison initiale. Elle est remplacee par ADR-0045, sans implementation du couvercle pose.
