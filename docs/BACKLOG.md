@@ -1369,3 +1369,11 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - Gate : observation humaine Fusion P32 obligatoire avant `fusion-validated`.
 - Hors scope : nouveau solveur, edition de projet dans Fusion, compartiments asset-specific, formes, couvercles, mecanismes et impression.
 - Statut : `implemented-fusion-palette`, `fusion-smoke-required`, `print-validated: false`.
+
+### P32 Fusion smoke - Validation humaine
+
+- Retour humain : `P32 Fusion OK`.
+- Preuve : palette `BGIG - Atelier de rangement` observee dans Fusion apres installation automatique, avec le chemin secondaire de previsualisation, mise a jour, export et recours expert.
+- Decision : P32 devient `fusion-validated`; la commande historique reste un recours expert, non la surface produit.
+- Limite : cette preuve ne valide ni l ajustement des assets, ni le slicer, ni une impression physique.
+- Statut : `done`, `fusion-validated`, `print-validated: false`.

@@ -1013,3 +1013,11 @@ Statut : `implemented-fusion-palette`, `fusion-smoke-required`, `print-validated
 L ouverture normale de l add-in montre maintenant `BGIG - Atelier de rangement`, une petite palette locale en francais. Elle resume trois choses utiles : le design recu, la scene Fusion et le statut de fabrication. Elle propose seulement `Previsualiser`, `Mettre a jour la scene`, `Exporter les bacs` et un acces volontaire aux reglages experts. Les chemins CAD, diagnostics bruts et le formulaire CommandInputs ne sont plus la premiere experience.
 
 Le bridge ne recalcule rien : il relit l inspection de scene et reutilise les actions existantes de generation/regeneration/export. La palette affiche explicitement que la geometrie a ete observee dans Fusion mais que l impression ne reste pas validee. Preuves hors Fusion : 87 tests Fusion hors API, `python -m py_compile` et `git diff --check` OK. Prochaine action : P32-GATE, smoke humain de la palette dans Fusion.
+
+## P32 Fusion smoke - Validation humaine
+
+Retour humain : `P32 Fusion OK`.
+
+La palette secondaire `BGIG - Atelier de rangement` est acceptee dans Fusion. Elle remplace bien le formulaire technique comme ouverture normale et conserve le formulaire historique comme recours expert. Le smoke couvre la lecture simple du design et de la scene, les actions de previsualisation/mise a jour/export et la lisibilite du statut de fabrication. P32 est donc `fusion-validated`.
+
+Limites maintenues : aucune promesse de fit asset-specific, de slicer ou d impression. Prochaine mission autonome : P33, forme et esthetique parametriques dans le Studio.

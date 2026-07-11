@@ -481,3 +481,9 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - C-PRODUCT-VISION : Studio reste la source du parcours ; la palette ne modifie ni projet, ni solveur, ni tolerances et replie le dialogue CommandInputs en mode expert.
 - C-QUALITY : tests de contrat du bridge et statut fabrication honnete (`impression non validee`) passent hors Fusion.
 - C-PRINT : inchange, `print-validated: false` ; P32 ne remplace pas une impression mesuree.
+
+## P32 Fusion palette smoke validation
+
+- C-FUSION-UI : `fusion-validated` pour la palette `Atelier de rangement`, sa lecture de scene et son bridge vers les actions existantes de mise a jour/export, selon retour humain `P32 Fusion OK` du 2026-07-11.
+- C-PRODUCT-VISION : la palette est acceptee comme surface secondaire ; le Studio reste la surface de conception et la commande technique reste repliee en expert.
+- C-PRINT : inchange, `print-validated: false` ; P32 ne valide ni fit physique, ni impression.

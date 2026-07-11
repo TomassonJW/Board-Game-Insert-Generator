@@ -227,3 +227,7 @@ Statut : `implemented-cad-ir-open-top-trays`, `fusion-validated`, `print-validat
 ## P32 Fusion palette - 2026-07-11
 
 Statut : `implemented-fusion-palette`, `fusion-smoke-required`, `print-validated: false`. La palette locale `Atelier de rangement` devient l ouverture normale de l add-in. Elle garde Fusion dans son role secondaire : lire le design deja prepare, inspecter la scene, appliquer une mise a jour explicite et exporter. Le dialogue CommandInputs demeure disponible uniquement sous `Reglages experts`. Les tests hors Fusion sont passes ; la validation P32 attend une observation humaine de la palette et de son bridge.
+
+## P32 Fusion palette smoke - 2026-07-11
+
+Statut : `done`, `fusion-validated`, `print-validated: false`. Retour humain `P32 Fusion OK`. La palette concise est acceptee comme surface Fusion secondaire pour previsualiser, mettre a jour et exporter une scene deja resolue. Le dialogue CommandInputs reste un recours expert. P33 peut maintenant implementer les premiers reglages de forme et d esthetique dans le Studio, sans transformer Fusion en outil de conception.

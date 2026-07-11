@@ -14,7 +14,7 @@ Le Studio reste la surface principale. Fusion devient maintenant la surface seco
 
 ## Gate humaine active
 
-P32-GATE est maintenant ouverte : la palette est codee et testee hors Fusion. Une courte observation humaine dans Fusion est necessaire avant de la qualifier fusion-validated.
+P32 est `fusion-validated` : le smoke humain Fusion est accepte le 2026-07-11. La palette peut rejoindre `main`; P33 devient la prochaine mission autonome.
 
 ## Hors scope maintenu
 
@@ -24,7 +24,7 @@ P32-GATE est maintenant ouverte : la palette est codee et testee hors Fusion. Un
 
 ## Prochaine action
 
-Executer P32-GATE : observer la palette dans Fusion, verifier les trois etats lisibles et les actions Previsualiser, Mettre a jour et Exporter. Repondre simplement P32 Fusion OK ou P32 Fusion KO.
+Executer P33-M001 : introduire les premiers tokens de forme et d esthetique parametriques, avec preview Studio non destructif et contraintes de fabrication visibles.
 
 ## Fin de chaque mission
 

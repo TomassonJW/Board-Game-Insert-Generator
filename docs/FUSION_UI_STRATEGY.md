@@ -480,3 +480,9 @@ Statut : `implemented-fusion-palette`, smoke humain P32 requis, `print-validated
 La restriction historique sur la palette est levee par ADR-0042 et la direction produit acceptee : au lancement, l add-in ouvre une petite palette HTML locale `BGIG - Atelier de rangement` au lieu du formulaire CommandInputs. Elle ne contient pas de chemin CAD ni de policy brute. Elle montre le design recu, l etat de scene et le statut fabrication, puis propose `Previsualiser`, `Mettre a jour la scene`, `Exporter les bacs` et `Reglages experts`.
 
 Le pont reste borne : HTML envoie une action Fusion, l add-in relit le registre ou reutilise les actions existantes, puis renvoie un resume JSON. Aucun calcul de layout, clearance, tolerance ou geometrie metier ne passe dans la palette. La commande historique est conservee comme recours expert et pour les diagnostics. La palette reste `fusion-smoke-required` tant qu elle n est pas observee dans une session Fusion reelle.
+
+## P32 smoke Fusion accepte
+
+Statut : `fusion-validated`, `print-validated: false`.
+
+Le retour humain `P32 Fusion OK` du 2026-07-11 accepte la premiere palette secondaire. La palette est donc le point d entree normal de l add-in; le dialogue CommandInputs demeure le mode expert/secours. Cette validation couvre la surface et son bridge d actions, pas la fabrication physique.
