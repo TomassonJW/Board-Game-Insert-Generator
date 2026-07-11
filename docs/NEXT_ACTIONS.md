@@ -8,9 +8,9 @@ Statut : `active` pour les missions non gatees. Les missions Fusion et physiques
 
 ## Etat courant
 
-P31 est `fusion-validated` pour le smoke `mixed-box` : trois bacs ouverts issus d une selection P21 ont ete observes dans Fusion, chacun avec parois, fond et cavite top-open. Cette preuve ne valide ni l ajustement des assets, ni l impression.
+P31 et P32 sont `fusion-validated` : les bacs ouverts et la palette Fusion secondaire sont observes. P33 est integre : les apercus de forme et d esthetique sont disponibles dans le Studio sans effet sur les dimensions, Fusion ou l impression.
 
-Le Studio reste la surface principale. Fusion devient maintenant la surface secondaire de materialisation, inspection et export prevue par ADR-0042.
+Le Studio reste la surface principale. Fusion reste la surface secondaire de materialisation, inspection et export prevue par ADR-0042.
 
 ## Gate humaine active
 
