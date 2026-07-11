@@ -459,3 +459,9 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - C-QUALITY : build TypeScript/Vite, test de contrat frontend et services locaux HTTP OK ; `browser-inspection-pending` car le sandbox Windows bloque la connexion de recette avant ouverture.
 - C-CAD-IR / C-FUSION-UI : le telechargement P28 demeure cache dans le mode expert et explicitement non productif ; aucune nouvelle scene Fusion, cavite ou promesse de bac n est ajoutee.
 - C-PRINT / C-ERGONOMICS : `print-validated: false` ; l interface expose le chemin de fabrication mais ne valide aucune etape physique.
+## P31 functional tray gate update
+
+- C-CAD-IR / C-CAVITY : strategie proposee `open_top_tray_from_selected_module.v0`, non implementee ; elle reutilise le corps rectangulaire et la cavite top-open existants.
+- C-FUSION-UI : aucune mutation P31 avant validation ; le smoke humain de cavite P21 restera requis apres code.
+- C-PRODUCT-VISION : le prochain resultat cible est un bac ouvert vrai, jamais un blank P28 promu comme produit.
+- C-PRINT : `print-validated: false` maintenu.

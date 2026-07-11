@@ -1344,3 +1344,12 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - Limite : la recette navigateur automatisee ne peut pas s ouvrir dans cet environnement a cause du sandbox Windows ; elle reste a rejouer sans que cela soit confondu avec une validation d impression.
 - Hors scope : bacs physiques, parois, cavites, tolerances nouvelles, palette Fusion, couvercles, mecanismes et impression.
 - Statut : `implemented-local-ui`, `browser-inspection-pending`, `print-validated: false`.
+### P31-GATE - Strategie de bacs fonctionnels
+
+- Capability : C-CAD-IR, C-CAVITY, C-FUSION-UI, C-PRODUCT-VISION.
+- Milestone : M14 Usable beta.
+- Objectif : choisir la premiere projection selection P21 -> bac ouvert fonctionnel, sans nouvelle logique de placement ni nouvelle tolerance.
+- Livrables : `P31_FUNCTIONAL_TRAY_GATE.md`, ADR-0043 proposee, invariants, options et preuves avant Fusion.
+- Recommandation : un bac ouvert par module avec cavite `free` top-open, parois/fond existants et refus structure des enveloppes trop petites.
+- Gate : validation humaine explicite `P31 approuve` avant implementation.
+- Statut : `ready-gated`.

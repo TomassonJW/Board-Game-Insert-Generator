@@ -218,3 +218,6 @@ Statut : `done-docs`, `accepted-product-direction`. La trajectoire premium est m
 ## P30 living Studio - 2026-07-11
 
 Statut : `implemented-local-ui`, `browser-inspection-pending`, `print-validated: false`. La direction `Atelier de rangement` est implementee : parcours progressif, boite centrale mise a jour en direct, propositions explicables, controles experts replis et etat de fabrication lisible. Le moteur, le schema V0 et la frontiere Fusion ne changent pas. P31 reste une gate : choisir la strategie de vrais bacs avant de remplacer les blanks P28.
+## P31 functional tray gate - 2026-07-11
+
+Statut : `ready-gated`, ADR-0043 `proposed`. Le premier bac recommande conserve exactement l enveloppe P21 et retire une cavite unique ouverte par le haut avec parois et fond issus des defaults existants. Ce scope ne change ni score, ni placement, ni tolerance ; il reporte compartiments, encoches, formes et mecanismes. La prochaine action necessite `P31 approuve`.

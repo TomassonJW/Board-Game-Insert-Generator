@@ -993,3 +993,8 @@ La direction visuelle `Atelier de rangement` approuvee le 2026-07-11 est mainten
 Preuves : build TypeScript/Vite, test de contrat frontend P30, suite Python complete (248 tests), API loopback et UI locale repondent en HTTP 200. La connexion de recette navigateur a echoue avant ouverture a cause du sandbox Windows (`apply deny-read ACLs`) ; l inspection visuelle automatisee reste donc a rejouer dans un environnement navigateur disponible.
 
 Limites : l apercu est une carte de rangement, pas une geometrie de bac. Il ne valide ni parois, ni fond, ni logement, ni Fusion, ni slicer, ni impression. Prochaine gate : P31, strategie de projection vers de vrais bacs.
+## P31 - Gate bacs fonctionnels
+
+Statut : `ready-gated`, ADR-0043 `proposed`.
+
+Le rapport P31 reutilise les contrats deja existants : P21 fournit l enveloppe resolue, CAD IR connait les cavites, et l adaptateur Fusion sait planifier des coupes rectangulaires top-open. La recommandation est volontairement petite : un bac ouvert par module selectionne, sans compartiment asset-specific, encoche, changement de tolerance ou calcul Fusion. La validation `P31 approuve` est requise avant le code.
