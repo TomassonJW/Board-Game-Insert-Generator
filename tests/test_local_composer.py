@@ -35,6 +35,32 @@ class LocalComposerTests(unittest.TestCase):
         self.assertEqual([starter["id"] for starter in starters], ["mixed-box", "card-game", "board-game"])
         self.assertTrue(all(portfolio_from_draft(starter["draft"])["recommended_variant_id"] for starter in starters))
 
+    def test_export_preserves_appearance_without_changing_the_solved_layout(self) -> None:
+        draft = starter_draft()
+        baseline_digest = portfolio_from_draft(draft)["portfolio_digest"]
+        self.assertEqual(draft["appearance"]["schema_version"], "bgig.appearance.v0")
+        draft["appearance"]["shape"]["corner_style"] = "chamfered"
+        draft["appearance"]["shape"]["chamfer_mm"] = 4.0
+        draft["appearance"]["visual"]["theme"] = "graphite"
+
+        bundle = export_from_draft(draft)
+
+        self.assertEqual(portfolio_from_draft(draft)["portfolio_digest"], baseline_digest)
+        self.assertEqual(bundle["appearance"], draft["appearance"])
+        self.assertEqual(bundle["selection"]["appearance"], draft["appearance"])
+        self.assertEqual(bundle["cad_ir"]["metadata"]["appearance"], draft["appearance"])
+        self.assertEqual(
+            bundle["cad_ir"]["metadata"]["local_composer"]["appearance_status"],
+            "stored_for_preview_only_not_materialized",
+        )
+
+    def test_rejects_an_invalid_appearance_as_a_draft_error(self) -> None:
+        draft = starter_draft()
+        draft["appearance"]["visual"]["theme"] = "neon"
+
+        with self.assertRaisesRegex(LocalComposerError, "theme"):
+            portfolio_from_draft(draft)
+
     def test_export_materializes_the_explicit_selection_as_open_top_trays(self) -> None:
         bundle = export_from_draft(starter_draft())
 

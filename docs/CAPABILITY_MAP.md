@@ -487,3 +487,11 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - C-FUSION-UI : `fusion-validated` pour la palette `Atelier de rangement`, sa lecture de scene et son bridge vers les actions existantes de mise a jour/export, selon retour humain `P32 Fusion OK` du 2026-07-11.
 - C-PRODUCT-VISION : la palette est acceptee comme surface secondaire ; le Studio reste la surface de conception et la commande technique reste repliee en expert.
 - C-PRINT : inchange, `print-validated: false` ; P32 ne valide ni fit physique, ni impression.
+
+## P33 form and appearance update
+
+- C-AESTHETIC : `implemented-studio-preview` pour `bgig.appearance.v0`, themes, labels et intentions de forme sauvegardes et visibles dans le Studio ; aucune finition physique ou Fusion n est declaree.
+- C-PRODUCT-VISION : l apercu est non destructif : le plan P21, dimensions, placement et tolerances restent inchanges et les anciens projets recoivent le style par defaut.
+- C-CAD-IR : la preference est transportee comme metadata `stored_for_preview_only_not_materialized`, sans operation CAD nouvelle.
+- C-QUALITY : bornes et enums valides, digest P21 invariant, build Studio OK ; `browser-inspection-pending` dans le sandbox Windows.
+- C-PRINT : inchange, `print-validated: false`.

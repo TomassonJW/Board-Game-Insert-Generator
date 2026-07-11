@@ -16,6 +16,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any
 from urllib.parse import urlsplit
 
+from board_game_insert_generator.appearance import AppearanceError, default_appearance, normalize_appearance
+
 from board_game_insert_generator.box_fill_solver import BoxFillCandidate, BoxFillSolveRequest
 from board_game_insert_generator.box_fill_variants import (
     BoxFillVariantRequest,
@@ -108,6 +110,7 @@ def starter_draft() -> dict[str, object]:
             _starter_candidate("dice-tray", "Bac des", 48.0, 48.0, 24.0, "base", ["dice"]),
         ],
         "preference": "balanced",
+        "appearance": default_appearance(),
     }
 
 
@@ -135,6 +138,7 @@ def starter_catalog() -> list[dict[str, object]]:
             _starter_candidate("token-tray", "Bac marqueurs", 60.0, 50.0, 20.0, "base", ["tokens"]),
         ],
         "preference": "accessible",
+        "appearance": default_appearance(),
     }
     board_game = {
         "schema_version": LOCAL_COMPOSER_SCHEMA_V0,
@@ -169,6 +173,7 @@ def starter_catalog() -> list[dict[str, object]]:
             _starter_candidate("dice-tray", "Bac des", 55.0, 55.0, 24.0, "base", ["dice"]),
         ],
         "preference": "balanced",
+        "appearance": default_appearance(),
     }
     return [
         {
@@ -224,6 +229,8 @@ def export_from_draft(raw_draft: object, variant_id: str | None = None) -> dict[
     portfolio_payload = variant_portfolio_to_dict(portfolio)
     selected_variant = select_box_fill_variant(portfolio, variant_id)
     selection = selected_variant_to_dict(portfolio, variant_id)
+    appearance = config.box_fill_plan.metadata["appearance"]
+    selection["appearance"] = appearance
     scene_config = replace(config, box_fill_plan=selected_variant.result.solved_plan)
     scene = build_blank_cad_scene(scene_config, generate_basic_layout(scene_config)).to_dict()
     scene["components"] = _selection_bridge_components(
@@ -234,11 +241,13 @@ def export_from_draft(raw_draft: object, variant_id: str | None = None) -> dict[
     scene["metadata"]["box_fill_variant_portfolio"] = portfolio_payload
     scene["metadata"]["box_fill_variant_selection"] = selection
     scene["metadata"]["box_fill_solution"] = selection["variant"]["solution"]
+    scene["metadata"]["appearance"] = appearance
     scene["metadata"]["local_composer"] = {
         "schema_version": LOCAL_COMPOSER_SCHEMA_V0,
         "materialization_status": "prepared_open_top_trays_for_fusion_smoke",
         "selection_bridge": "p31_open_top_tray_from_selected_module.v0",
         "geometry_status": "open_top_tray_candidates",
+        "appearance_status": "stored_for_preview_only_not_materialized",
         "print_validation_status": "not_validated",
         "reason": (
             "P31 turns each selected BoxFill module into an explicit open-top tray "
@@ -249,6 +258,7 @@ def export_from_draft(raw_draft: object, variant_id: str | None = None) -> dict[
     return {
         "schema_version": LOCAL_COMPOSER_EXPORT_SCHEMA_V0,
         "selection": selection,
+        "appearance": appearance,
         "cad_ir": scene,
         "limits": [
             "The CAD IR contains one open-top tray candidate per selected module, with one generic cavity and retained walls/floor.",
@@ -407,6 +417,7 @@ def _draft_to_engine(
             "candidates",
             "preference",
             "policies",
+            "appearance",
         },
         "draft",
     )
@@ -433,6 +444,10 @@ def _draft_to_engine(
         {module.id for module in manual_modules},
     )
     preference = _optional_string(draft, "preference", "draft", "balanced")
+    try:
+        appearance = normalize_appearance(draft.get("appearance"))
+    except AppearanceError as exc:
+        raise LocalComposerError(str(exc)) from exc
     standard_preference_profile(preference)
     policies_raw = draft.get("policies")
     policies = SUPPORTED_POLICY_IDS if policies_raw is None else tuple(
@@ -461,6 +476,7 @@ def _draft_to_engine(
             "source": "local_composer",
             "schema_version": LOCAL_COMPOSER_SCHEMA_V0,
             "ui_warning": "The draft is the interaction model; the engine contracts remain authoritative.",
+            "appearance": appearance,
         },
     )
     config = InsertConfig(

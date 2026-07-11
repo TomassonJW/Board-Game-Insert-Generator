@@ -24,7 +24,7 @@ P32 est `fusion-validated` : le smoke humain Fusion est accepte le 2026-07-11. L
 
 ## Prochaine action
 
-Executer P33-M001 : introduire les premiers tokens de forme et d esthetique parametriques, avec preview Studio non destructif et contraintes de fabrication visibles.
+P33-M001 est implemente en apercu Studio. La prochaine etape est P34-GATE : choisir le premier mecanisme autorise et son protocole de validation physique avant code.
 
 ## Fin de chaque mission
 

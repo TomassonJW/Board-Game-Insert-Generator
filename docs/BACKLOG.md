@@ -1377,3 +1377,13 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - Decision : P32 devient `fusion-validated`; la commande historique reste un recours expert, non la surface produit.
 - Limite : cette preuve ne valide ni l ajustement des assets, ni le slicer, ni une impression physique.
 - Statut : `done`, `fusion-validated`, `print-validated: false`.
+
+### P33-M001 - Forme et apparence parametriques V0
+
+- Capability : C-AESTHETIC, C-PRODUCT-VISION, C-QUALITY.
+- Milestone : M12 Design language / M14 Usable beta.
+- Objectif : rendre les choix de forme et d apparence visibles, sauvegardes et transportes sans modifier le moteur de placement ni presenter une finition d apercu comme imprimable.
+- Livrables : contrat `APPEARANCE_CONTRACT.md`, champ `appearance` versionne, validation Python, themes Studio, coins/biseaux/prises/labels de preview, compatibilite des anciens projets et metadata CAD IR non executable.
+- Preuves : tests Python de bornes, transport et absence d effet sur le digest P21 ; test de contrat frontend ; TypeScript/Vite build.
+- Limite : la recette visuelle automatisee ne peut pas se connecter dans ce sandbox Windows ; aucune geometrie de finition n est materialisee dans Fusion.
+- Statut : `implemented-studio-preview`, `browser-inspection-pending`, `print-validated: false`.

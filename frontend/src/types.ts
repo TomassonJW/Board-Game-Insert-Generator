@@ -56,6 +56,20 @@ export interface CandidateDraft {
   asset_ids: string[]
 }
 
+export interface AppearanceDraft {
+  schema_version: 'bgig.appearance.v0'
+  shape: {
+    corner_style: 'rounded' | 'straight' | 'chamfered'
+    corner_radius_mm: number
+    chamfer_mm: number
+    notch_style: 'none' | 'front_scoop' | 'thumb_notch'
+  }
+  visual: {
+    theme: 'atelier' | 'graphite' | 'playful'
+    label_mode: 'none' | 'module_name' | 'module_name_and_role'
+    typography: 'quiet' | 'bold'
+  }
+}
 export interface ComposerDraft {
   schema_version: 'bgig.local_composer.v0'
   project_name: string
@@ -70,6 +84,7 @@ export interface ComposerDraft {
   manual_modules: ManualModuleDraft[]
   candidates: CandidateDraft[]
   preference: 'balanced' | 'compact' | 'accessible' | 'print_simple'
+  appearance: AppearanceDraft
 }
 export interface StarterTemplate {
   id: string
@@ -134,7 +149,8 @@ export interface Portfolio {
 
 export interface ExportBundle {
   schema_version: 'bgig.local_composer_export.v0'
-  selection: { selected_variant_id: string; selected_by: string; variant: Variant }
+  selection: { selected_variant_id: string; selected_by: string; variant: Variant; appearance?: AppearanceDraft }
   cad_ir: Record<string, unknown>
   limits: string[]
+  appearance?: AppearanceDraft
 }

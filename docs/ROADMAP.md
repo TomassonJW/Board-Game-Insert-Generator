@@ -231,3 +231,7 @@ Statut : `implemented-fusion-palette`, `fusion-smoke-required`, `print-validated
 ## P32 Fusion palette smoke - 2026-07-11
 
 Statut : `done`, `fusion-validated`, `print-validated: false`. Retour humain `P32 Fusion OK`. La palette concise est acceptee comme surface Fusion secondaire pour previsualiser, mettre a jour et exporter une scene deja resolue. Le dialogue CommandInputs reste un recours expert. P33 peut maintenant implementer les premiers reglages de forme et d esthetique dans le Studio, sans transformer Fusion en outil de conception.
+
+## P33 forme et apparence - 2026-07-11
+
+Statut : `implemented-studio-preview`, `browser-inspection-pending`, `print-validated: false`. Le projet transporte maintenant une apparence versionnee V0 : theme, labels, typographie, coins, biseau et prise symbolique. Le Studio la rend vivante sans modifier le solveur ni la geometrie de fabrication. Les finitions Fusion restent explicitement non materialisees. P34 doit passer une gate humaine avant de representer un couvercle, une rainure ou un clip.

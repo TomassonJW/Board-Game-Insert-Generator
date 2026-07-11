@@ -82,7 +82,8 @@ export function summarizeDraft(draft: ComposerDraft): DraftReadiness {
 
 export function isComposerDraft(value: unknown): value is ComposerDraft {
   if (!isRecord(value) || value.schema_version !== 'bgig.local_composer.v0' || typeof value.project_name !== 'string' || !isBox(value.box)) return false
-  return Array.isArray(value.assets) && value.assets.every(isAsset)
+  return (value.appearance === undefined || isAppearance(value.appearance))
+    && Array.isArray(value.assets) && value.assets.every(isAsset)
     && Array.isArray(value.layers) && value.layers.every(isLayer)
     && Array.isArray(value.reservations) && value.reservations.every(isReservation)
     && Array.isArray(value.manual_modules) && value.manual_modules.every(isManualModule)
@@ -189,4 +190,11 @@ function isLayer(value: unknown): value is LayerDraft { return isRecord(value) &
 function isReservation(value: unknown): value is ReservationDraft { return isRecord(value) && isString(value.id) && isString(value.kind) && isPoint(value.origin_mm) && isDimension(value.size_mm) && isString(value.layer_id) }
 function isManualModule(value: unknown): value is ManualModuleDraft { return isRecord(value) && isString(value.id) && isString(value.name) && isPoint(value.origin_mm) && isDimension(value.size_mm) && isString(value.layer_id) && typeof value.locked === 'boolean' }
 function isCandidate(value: unknown): value is CandidateDraft { return isRecord(value) && isString(value.id) && isString(value.name) && isDimension(value.size_mm) && Array.isArray(value.allowed_layers) && value.allowed_layers.every(isString) && typeof value.allow_xy_rotation === 'boolean' && isNumber(value.priority) && Array.isArray(value.asset_ids) && value.asset_ids.every(isString) }
+function isAppearance(value: unknown) {
+  return isRecord(value) && value.schema_version === 'bgig.appearance.v0'
+    && isRecord(value.shape) && ['rounded', 'straight', 'chamfered'].includes(String(value.shape.corner_style))
+    && isNumber(value.shape.corner_radius_mm) && isNumber(value.shape.chamfer_mm) && ['none', 'front_scoop', 'thumb_notch'].includes(String(value.shape.notch_style))
+    && isRecord(value.visual) && ['atelier', 'graphite', 'playful'].includes(String(value.visual.theme))
+    && ['none', 'module_name', 'module_name_and_role'].includes(String(value.visual.label_mode)) && ['quiet', 'bold'].includes(String(value.visual.typography))
+}
 function isPreference(value: unknown): value is ComposerDraft['preference'] { return value === 'balanced' || value === 'compact' || value === 'accessible' || value === 'print_simple' }

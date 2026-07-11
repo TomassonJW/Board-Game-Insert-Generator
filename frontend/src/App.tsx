@@ -3,6 +3,7 @@ import { ApiError, createExport, generatePortfolio, loadStarters } from './api'
 import { isComposerDraft, type DraftIssue, summarizeDraft, validateDraft } from './validation'
 import { proposalExplanation, scoreExplanation } from './proposal_copy'
 import type {
+  AppearanceDraft,
   AssetDraft,
   CandidateDraft,
   ComposerDraft,
@@ -35,6 +36,11 @@ const scoreLabels: Record<string, string> = {
 
 const defaultDimension = (): Dimension => ({ x: 30, y: 30, z: 20 })
 
+const defaultAppearance = (): AppearanceDraft => ({
+  schema_version: 'bgig.appearance.v0',
+  shape: { corner_style: 'rounded', corner_radius_mm: 3, chamfer_mm: 1.5, notch_style: 'none' },
+  visual: { theme: 'atelier', label_mode: 'module_name', typography: 'quiet' },
+})
 export default function App() {
   const [draft, setDraft] = useState<ComposerDraft>()
   const [portfolio, setPortfolio] = useState<Portfolio>()
@@ -52,7 +58,7 @@ export default function App() {
       .then((catalog) => {
         if (!catalog.length) throw new Error('Aucun modèle local n’est disponible.')
         setStarters(catalog)
-        setDraft(cloneDraft(catalog[0].draft))
+        setDraft(withAppearance(cloneDraft(catalog[0].draft)))
         setMessage('Projet de départ chargé. Commence par vérifier les mesures de la boîte.')
       })
       .catch((reason: unknown) => setError(formatError(reason)))
@@ -124,8 +130,13 @@ export default function App() {
     setIssues([])
   }
 
+
+  function updateAppearance(next: AppearanceDraft) {
+    setDraft((current) => current ? { ...current, appearance: next } : current)
+    setMessage('Aperçu de forme et de style actualisé. L organisation et les dimensions restent inchangées.')
+  }
   function chooseStarter(starter: StarterTemplate) {
-    setDraft(cloneDraft(starter.draft))
+    setDraft(withAppearance(cloneDraft(starter.draft)))
     setPortfolio(undefined)
     setSelectedVariantId(undefined)
     setActiveStep('box')
@@ -192,8 +203,9 @@ export default function App() {
     try {
       const incoming = JSON.parse(await file.text()) as unknown
       if (!isComposerDraft(incoming)) throw new Error('Ce fichier ne correspond pas à un projet BGIG Studio compatible.')
-      const importedIssues = validateDraft(incoming)
-      setDraft(incoming)
+      const normalizedIncoming = withAppearance(incoming)
+      const importedIssues = validateDraft(normalizedIncoming)
+      setDraft(normalizedIncoming)
       setPortfolio(undefined)
       setSelectedVariantId(undefined)
       setActiveStep('box')
@@ -214,7 +226,7 @@ export default function App() {
   }
 
   return (
-    <main className="app-shell">
+    <main className={`app-shell appearance-${draft.appearance.visual.theme}`}>
       <header className="topbar">
         <div className="brand"><span className="brand-mark">B</span><span>BGIG <strong>Studio</strong></span></div>
         <div className="topbar-actions">
@@ -254,18 +266,37 @@ export default function App() {
           {activeStep === 'organisation' && <section className="editor-card"><div className="card-intro"><h3>Garde visibles les contraintes qui comptent</h3><p>La plupart des jeux démarrent avec un modèle et quelques mesures. Les réglages ci-dessous servent lorsque tu dois protéger un livret, un plateau ou contrôler précisément les emplacements.</p></div><details className="expert-disclosure"><summary><span>Réservations fixes</span><small>Livret, plateau, bac existant…</small></summary><div className="disclosure-content"><div className="subpanel-heading"><p>Ces volumes ne seront pas déplacés par les propositions.</p><button className="text-button" onClick={() => updateDraft((current) => ({ ...current, reservations: [...current.reservations, newReservation(current.reservations.length + 1, current.layers[0]?.id ?? 'base')] }))}>+ Ajouter une réservation</button></div>{draft.reservations.length === 0 && <p className="empty-copy">Aucune réservation : la boîte est entièrement disponible.</p>}{draft.reservations.map((reservation, index) => <ReservationEditor key={reservation.id} reservation={reservation} layers={draft.layers.map((layer) => layer.id)} onChange={(update) => updateReservation(index, update)} onDelete={() => updateDraft((current) => ({ ...current, reservations: current.reservations.filter((_, position) => position !== index) }))} />)}</div></details><details className="expert-disclosure"><summary><span>Réglages des bacs envisagés</span><small>Pour guider le moteur, pas pour dessiner une pièce.</small></summary><div className="disclosure-content"><div className="subpanel-heading"><p>Un candidat décrit l’encombrement souhaité d’un futur bac.</p><button className="text-button" onClick={() => updateDraft((current) => ({ ...current, candidates: [...current.candidates, newCandidate(current.candidates.length + 1, current.layers[0]?.id ?? 'base')] }))}>+ Ajouter un bac envisagé</button></div>{draft.candidates.length === 0 && <p className="empty-copy">Aucun réglage avancé. Une décision conservée apparaîtra ici comme position fixe.</p>}{draft.candidates.map((candidate, index) => <CandidateEditor key={candidate.id} candidate={candidate} assets={draft.assets} assetOwners={assetOwners} layers={draft.layers.map((layer) => layer.id)} onChange={(update) => updateCandidate(index, update)} onDimensionChange={(axis, value) => updateCandidateDimension(index, axis, value)} onDelete={() => updateDraft((current) => ({ ...current, candidates: current.candidates.filter((_, position) => position !== index) }))} />)}</div></details>{draft.manual_modules.length > 0 && <div className="lock-strip"><strong>{draft.manual_modules.length} position(s) conservée(s)</strong><span>Elles restent fixes pour la prochaine recherche.</span><button className="text-button" onClick={() => updateDraft((current) => ({ ...current, manual_modules: [] }))}>Tout libérer</button></div>}<div className="step-actions"><button className="button primary" onClick={() => void handleGenerate()} disabled={busy}>{busy ? 'Recherche…' : 'Voir les idées possibles'}</button></div></section>}
 
           {activeStep === 'proposals' && <section className="editor-card"><div className="card-heading"><div><h3>Choisis un compromis, pas une boîte noire</h3><p>Chaque idée explique ce qu’elle privilégie. Les scores aident à comparer ; ils ne remplacent ni une mesure réelle, ni une impression.</p></div><label className="preference">Ce qui compte le plus<select value={draft.preference} onChange={(event) => updateDraft((current) => ({ ...current, preference: event.target.value as ComposerDraft['preference'] }))}><option value="balanced">Un bon équilibre</option><option value="compact">Prendre le moins de place</option><option value="accessible">Accéder facilement au matériel</option><option value="print_simple">Rester simple à fabriquer</option></select></label></div>{!portfolio && <div className="empty-state"><div className="empty-illustration">✦</div><h3>Prêt à comparer</h3><p>Quand tes mesures sont cohérentes, le moteur peut te proposer plusieurs organisations.</p><button className="button primary" onClick={() => void handleGenerate()} disabled={busy}>{busy ? 'Recherche…' : 'Explorer les idées'}</button></div>}{portfolio && <><div className="portfolio-summary"><span>{portfolio.variants.length} idées comparées</span><span>·</span><span>Priorité : {preferenceLabel(portfolio.preference.id)}</span></div><div className="variant-grid">{portfolio.variants.map((variant) => <VariantCard key={variant.id} variant={variant} active={selectedVariantId === variant.id} onSelect={() => { setSelectedVariantId(variant.id); setActiveStep('prepare') }} />)}</div><details className="limits"><summary>Ce que ces idées ne valident pas encore</summary><ul>{portfolio.limits.map((limit) => <li key={limit}>{limit}</li>)}</ul></details></>}</section>}
-          {activeStep === 'prepare' && <section className="editor-card prepare-card"><div className="card-intro"><h3>{selectedVariant ? 'Ton organisation est choisie' : 'Choisis d’abord une idée'}</h3><p>{selectedVariant ? `« ${proposalExplanation(selectedVariant.policy_id).title} » est retenue. Tu peux l’enregistrer comme décision, le téléchargement prépare des bacs ouverts à vérifier dans Fusion.` : 'Reviens à l’étape “Les idées” pour sélectionner une organisation.'}</p></div><div className="manufacturing-path" aria-label="Étapes de fabrication"><div className="active"><span>1</span><strong>À explorer</strong><small>Organisation numérique choisie</small></div><div><span>2</span><strong>À vérifier dans Fusion</strong><small>Après la génération de vrais bacs</small></div><div><span>3</span><strong>À imprimer et mesurer</strong><small>Validation physique nécessaire</small></div></div>{selectedVariant && <div className="prepare-actions"><button className="button secondary" disabled={busy} onClick={lockSelectedProposal}>Conserver cette organisation</button><button className="button primary" onClick={() => downloadJson(`${safeFileName(draft.project_name)}-projet.json`, draft)}>Sauvegarder le projet</button></div>}<details className="technical-download"><summary>Mode expert : télécharger le dossier de préparation</summary><p>Ce téléchargement contient les bacs ouverts et leur dossier technique. Il ne lance aucune scène Fusion et ne valide ni impression ni mesure.</p><button className="button quiet" disabled={!selectedVariant || busy} onClick={() => void handleExport()}>Télécharger le dossier technique</button></details></section>}
+          {activeStep === 'prepare' && <section className="editor-card prepare-card"><div className="card-intro"><h3>{selectedVariant ? 'Ton organisation est choisie' : 'Choisis d’abord une idée'}</h3><p>{selectedVariant ? `« ${proposalExplanation(selectedVariant.policy_id).title} » est retenue. Tu peux l’enregistrer comme décision, le téléchargement prépare des bacs ouverts à vérifier dans Fusion.` : 'Reviens à l’étape “Les idées” pour sélectionner une organisation.'}</p></div><div className="manufacturing-path" aria-label="Étapes de fabrication"><div className="active"><span>1</span><strong>À explorer</strong><small>Organisation numérique choisie</small></div><div><span>2</span><strong>À vérifier dans Fusion</strong><small>Après la génération de vrais bacs</small></div><div><span>3</span><strong>À imprimer et mesurer</strong><small>Validation physique nécessaire</small></div></div><AppearanceEditor appearance={draft.appearance} onChange={updateAppearance} />{selectedVariant && <div className="prepare-actions"><button className="button secondary" disabled={busy} onClick={lockSelectedProposal}>Conserver cette organisation</button><button className="button primary" onClick={() => downloadJson(`${safeFileName(draft.project_name)}-projet.json`, draft)}>Sauvegarder le projet</button></div>}<details className="technical-download"><summary>Mode expert : télécharger le dossier de préparation</summary><p>Ce téléchargement contient les bacs ouverts et leur dossier technique. Il ne lance aucune scène Fusion et ne valide ni impression ni mesure.</p><button className="button quiet" disabled={!selectedVariant || busy} onClick={() => void handleExport()}>Télécharger le dossier technique</button></details></section>}
         </section>
       </section>
     </main>
   )
 }
 
+function AppearanceEditor({ appearance, onChange }: { appearance: AppearanceDraft; onChange: (next: AppearanceDraft) => void }) {
+  const updateShape = (update: Partial<AppearanceDraft['shape']>) => onChange({ ...appearance, shape: { ...appearance.shape, ...update } })
+  const updateVisual = (update: Partial<AppearanceDraft['visual']>) => onChange({ ...appearance, visual: { ...appearance.visual, ...update } })
+  return <section className="appearance-editor" aria-label="Forme et style"><div className="appearance-heading"><div><p className="eyebrow">Finition vivante</p><h3>Donne un style à tes bacs</h3><p>Ces choix changent l aperçu et se sauvegardent avec le projet. Ils ne changent pas encore la géométrie Fusion ni les dimensions à imprimer.</p></div><span className="preview-tag">Aperçu uniquement</span></div><div className="appearance-grid"><label className="field"><span>Coins</span><select value={appearance.shape.corner_style} onChange={(event) => updateShape({ corner_style: event.target.value as AppearanceDraft['shape']['corner_style'] })}><option value="rounded">Arrondis</option><option value="straight">Droits</option><option value="chamfered">Biseautés</option></select></label><NumberField label="Rayon d aperçu" value={appearance.shape.corner_radius_mm} suffix="mm" onChange={(value) => updateShape({ corner_radius_mm: clamp(value, 0, 12) })} /><NumberField label="Biseau d aperçu" value={appearance.shape.chamfer_mm} suffix="mm" onChange={(value) => updateShape({ chamfer_mm: clamp(value, 0, 6) })} /><label className="field"><span>Prise visuelle</span><select value={appearance.shape.notch_style} onChange={(event) => updateShape({ notch_style: event.target.value as AppearanceDraft['shape']['notch_style'] })}><option value="none">Aucune</option><option value="front_scoop">Échancrure douce</option><option value="thumb_notch">Passe-doigt</option></select></label><label className="field"><span>Ambiance</span><select value={appearance.visual.theme} onChange={(event) => updateVisual({ theme: event.target.value as AppearanceDraft['visual']['theme'] })}><option value="atelier">Atelier calme</option><option value="graphite">Graphite</option><option value="playful">Jeu coloré</option></select></label><label className="field"><span>Étiquettes</span><select value={appearance.visual.label_mode} onChange={(event) => updateVisual({ label_mode: event.target.value as AppearanceDraft['visual']['label_mode'] })}><option value="none">Aucune</option><option value="module_name">Nom du bac</option><option value="module_name_and_role">Nom et role</option></select></label><label className="field"><span>Typographie</span><select value={appearance.visual.typography} onChange={(event) => updateVisual({ typography: event.target.value as AppearanceDraft['visual']['typography'] })}><option value="quiet">Sobre</option><option value="bold">Affirmée</option></select></label></div><div className="appearance-guard"><strong>Ce qui est protege</strong><span>Le plan, les tolérances, les murs et le fond ne bougent pas. Les formes imprimées viendront seulement après contraintes et validation physique.</span></div></section>
+}
+
+type PreviewModuleData = Pick<EngineModule, 'id' | 'name' | 'origin_mm' | 'size_mm' | 'locked'>
+function PreviewModule({ module, viewHeight, appearance }: { module: PreviewModuleData; viewHeight: number; appearance: AppearanceDraft }) {
+  const x = module.origin_mm.x
+  const y = viewHeight - module.origin_mm.y - module.size_mm.y
+  const width = module.size_mm.x
+  const height = module.size_mm.y
+  const radius = appearance.shape.corner_style === 'rounded' ? Math.min(appearance.shape.corner_radius_mm, width / 4, height / 4) : 0
+  const cut = Math.min(appearance.shape.chamfer_mm, width / 4, height / 4)
+  const moduleClass = `module-fill ${module.locked ? 'locked' : ''} ${appearance.shape.corner_style}`
+  const notchRadius = Math.min(width, height) * .11
+  return <g><>{appearance.shape.corner_style === 'chamfered' ? <path className={moduleClass} d={`M ${x + cut} ${y} H ${x + width - cut} L ${x + width} ${y + cut} V ${y + height - cut} L ${x + width - cut} ${y + height} H ${x + cut} L ${x} ${y + height - cut} V ${y + cut} Z`} /> : <rect x={x} y={y} width={width} height={height} rx={radius} className={moduleClass} />}</>{appearance.shape.notch_style !== 'none' && <path className={`preview-notch ${appearance.shape.notch_style}`} d={`M ${x + width / 2 - notchRadius} ${y + height} Q ${x + width / 2} ${y + height - notchRadius} ${x + width / 2 + notchRadius} ${y + height}`} />}{appearance.visual.label_mode !== 'none' && <text className={`appearance-label ${appearance.visual.typography}`} x={x + 3} y={y + height - 4}>{module.name}{appearance.visual.label_mode === 'module_name_and_role' && <tspan x={x + 3} dy="8">bac</tspan>}</text>}</g>
+}
 function ManufacturingStatus({ selectedVariant }: { selectedVariant?: Variant }) {
   return <div className="manufacturing-status"><span className="status-dot" /><div><strong>{selectedVariant ? 'À explorer' : 'Projet en préparation'}</strong><small>{selectedVariant ? 'Des bacs ouverts peuvent être préparés, puis vérifiés dans Fusion.' : 'Ajoute les mesures pour commencer.'}</small></div></div>
 }
 
 function StudioBoxPreview({ draft, selectedVariant, readiness }: { draft: ComposerDraft; selectedVariant?: Variant; readiness: ReturnType<typeof summarizeDraft> }) {
+  const appearance = draft.appearance
   const width = Math.max(1, draft.box.inner_dimensions_mm.x)
   const depth = Math.max(1, draft.box.inner_dimensions_mm.y)
   const plan = selectedVariant?.solution.solved_plan
@@ -274,7 +305,7 @@ function StudioBoxPreview({ draft, selectedVariant, readiness }: { draft: Compos
   const capacity = Math.max(0, width * depth * Math.max(0, draft.box.usable_height_mm))
   const listedVolume = draft.assets.reduce((sum, asset) => sum + Math.max(0, asset.dimensions_mm.x * asset.dimensions_mm.y * asset.dimensions_mm.z * asset.quantity.count), 0)
   const estimatedFill = capacity > 0 ? Math.min(100, Math.round((listedVolume / capacity) * 100)) : 0
-  return <aside className="box-preview-panel" aria-label="Aperçu vivant de la boîte"><div className="preview-heading"><div><p className="eyebrow">Vue vivante</p><h2>Ta boîte, maintenant</h2></div><span className="preview-tag">Plan 2D</span></div><div className="box-canvas"><svg viewBox={`0 0 ${width} ${depth}`} role="img" aria-label="Vue de dessus de la boîte"><rect width={width} height={depth} className="box-fill" />{reservations.map((entry) => <rect key={entry.id} x={entry.origin_mm.x} y={depth - entry.origin_mm.y - entry.size_mm.y} width={entry.size_mm.x} height={entry.size_mm.y} className="reservation-fill" />)}{modules.map((module) => <g key={module.id}><rect x={module.origin_mm.x} y={depth - module.origin_mm.y - module.size_mm.y} width={module.size_mm.x} height={module.size_mm.y} rx={Math.min(module.size_mm.x, module.size_mm.y) * .04} className={module.locked ? 'module-fill locked' : 'module-fill'} /><text x={module.origin_mm.x + 3} y={depth - module.origin_mm.y - 4}>{module.name}</text></g>)}</svg>{modules.length === 0 && <div className="canvas-empty"><span>+</span><p>Les emplacements apparaîtront ici quand tu choisiras une idée.</p></div>}</div><div className="preview-legend"><span><i className="legend-reservation" />À garder libre</span><span><i className="legend-module" />Organisation choisie</span></div><div className="preview-metrics"><div><span>Espace utile</span><strong>{formatVolume(capacity)}</strong><small>{formatDimension(draft.box.inner_dimensions_mm)}</small></div><div><span>Contenu déclaré</span><strong>{draft.assets.length} élément{draft.assets.length > 1 ? 's' : ''}</strong><small>{estimatedFill}% du volume estimé</small></div><div><span>Préparation</span><strong>{readiness.issues.length ? 'À compléter' : 'Prêt à explorer'}</strong><small>{readiness.reservation_count} zone(s) protégée(s)</small></div></div><p className="preview-disclaimer">Cet aperçu reste une carte de rangement. Son export prépare des bacs ouverts ; Fusion puis une impression réelle restent à vérifier.</p></aside>
+  return <aside className={`box-preview-panel appearance-preview ${appearance.shape.corner_style}`} aria-label="Aperçu vivant de la boîte"><div className="preview-heading"><div><p className="eyebrow">Vue vivante</p><h2>Ta boîte, maintenant</h2></div><span className="preview-tag">Plan 2D</span></div><div className="box-canvas"><svg viewBox={`0 0 ${width} ${depth}`} role="img" aria-label="Vue de dessus de la boîte"><rect width={width} height={depth} className="box-fill" />{reservations.map((entry) => <rect key={entry.id} x={entry.origin_mm.x} y={depth - entry.origin_mm.y - entry.size_mm.y} width={entry.size_mm.x} height={entry.size_mm.y} className="reservation-fill" />)}{modules.map((module) => <PreviewModule key={module.id} module={module} viewHeight={depth} appearance={appearance} />)}</svg>{modules.length === 0 && <div className="canvas-empty"><span>+</span><p>Les emplacements apparaîtront ici quand tu choisiras une idée.</p></div>}</div><div className="preview-legend"><span><i className="legend-reservation" />À garder libre</span><span><i className="legend-module" />Organisation choisie</span></div><div className="appearance-summary"><span>Forme : {appearanceLabel(appearance.shape.corner_style)}</span><span>Finition : {appearanceLabel(appearance.shape.notch_style)}</span><span>Labels : {appearanceLabel(appearance.visual.label_mode)}</span></div><div className="preview-metrics"><div><span>Espace utile</span><strong>{formatVolume(capacity)}</strong><small>{formatDimension(draft.box.inner_dimensions_mm)}</small></div><div><span>Contenu déclaré</span><strong>{draft.assets.length} élément{draft.assets.length > 1 ? 's' : ''}</strong><small>{estimatedFill}% du volume estimé</small></div><div><span>Préparation</span><strong>{readiness.issues.length ? 'À compléter' : 'Prêt à explorer'}</strong><small>{readiness.reservation_count} zone(s) protégée(s)</small></div></div><p className="preview-disclaimer">Cet aperçu reste une carte de rangement. Son export prépare des bacs ouverts ; Fusion puis une impression réelle restent à vérifier.</p></aside>
 }
 function VariantCard({ variant, active, onSelect }: { variant: Variant; active: boolean; onSelect: () => void }) {
   const explanation = proposalExplanation(variant.policy_id)
@@ -323,6 +354,9 @@ function NumberInput({ value, onChange }: { value: number; onChange: (value: num
   return <input type="number" min="0" step="0.1" value={Number.isFinite(value) ? value : 0} onChange={(event) => onChange(Number(event.target.value))} />
 }
 
+function withAppearance(draft: ComposerDraft): ComposerDraft {
+  return { ...draft, appearance: draft.appearance ?? defaultAppearance() }
+}
 function cloneDraft(draft: ComposerDraft): ComposerDraft {
   return JSON.parse(JSON.stringify(draft)) as ComposerDraft
 }
@@ -367,6 +401,8 @@ function formatError(reason: unknown) {
   }
   return reason instanceof Error ? reason.message : 'Une erreur inconnue est survenue.'
 }
+function clamp(value: number, minimum: number, maximum: number) { return Math.min(maximum, Math.max(minimum, value)) }
+function appearanceLabel(value: string) { return ({ rounded: 'arrondis', straight: 'droite', chamfered: 'biseautée', none: 'aucune', front_scoop: 'echancrure douce', thumb_notch: 'passe-doigt', module_name: 'nom du bac', module_name_and_role: 'nom et role' } as Record<string, string>)[value] ?? value }
 function preferenceLabel(preference: string) { return ({ balanced: 'Un bon équilibre', compact: 'Compacité', accessible: 'Accès facile', print_simple: 'Simplicité de fabrication' } as Record<string, string>)[preference] ?? preference }
 function kindLabel(kind: AssetDraft['kind']) { return ({ cards: 'Cartes', tokens: 'Jetons', dice: 'Dés', meeples: 'Figurines', other: 'Autre' } as Record<AssetDraft['kind'], string>)[kind] }
 const assetKinds: AssetDraft['kind'][] = ['cards', 'tokens', 'dice', 'meeples', 'other']
