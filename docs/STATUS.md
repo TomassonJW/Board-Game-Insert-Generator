@@ -1,6 +1,6 @@
 # Status
 
-Derniere mise a jour : 2026-07-10
+Derniere mise a jour : 2026-07-11
 
 ## Etat global
 
@@ -983,4 +983,13 @@ Statut : `done-docs`, `accepted-product-direction`, `print-validated: false`.
 
 Le retour humain de P28 confirme que le raccord CAD IR genere bien un artefact technique mais echoue comme experience produit : dialogue Fusion technique en anglais, telemetrie brute et simples enveloppes sans bacs fonctionnels. P28 est donc requalifie `KO produit/UX`, sans annuler ses preuves de raccord.
 
-L objectif actif accepte ADR-0042 : Studio principal, palette Fusion secondaire, vrais bacs avant esthetique, parametres vivants et mecanismes prepares sous gates physiques. `docs/PREMIUM_PRODUCT_EXECUTION_PLAN.md` decoupe la trajectoire P29 a P35. La prochaine gate est P30, direction visuelle `Atelier de rangement`; aucune refonte visuelle n est codee avant sa validation.
+L objectif actif accepte ADR-0042 : Studio principal, palette Fusion secondaire, vrais bacs avant esthetique, parametres vivants et mecanismes prepares sous gates physiques. `docs/PREMIUM_PRODUCT_EXECUTION_PLAN.md` decoupe la trajectoire P29 a P35. La direction P30 est maintenant implementee ; la prochaine gate est P31, strategie de vrais bacs.
+## P30 - Studio vivant et parcours novice
+
+Statut : `implemented-local-ui`, `browser-inspection-pending`, `print-validated: false`.
+
+La direction visuelle `Atelier de rangement` approuvee le 2026-07-11 est maintenant materialisee dans le Studio local. La boite est l element central : ses dimensions, sa capacite indicative, ses reservations et les positions connues se mettent a jour immediatement. Le parcours est reduit a cinq etapes simples (boite, contenu, organisation, idees, suite) ; les reservations, candidats et le telechargement technique restent explicitement en mode expert. Les statuts `A explorer`, `A verifier dans Fusion` et `A imprimer et mesurer` ne sont plus caches dans une telemetrie brute.
+
+Preuves : build TypeScript/Vite, test de contrat frontend P30, suite Python complete (248 tests), API loopback et UI locale repondent en HTTP 200. La connexion de recette navigateur a echoue avant ouverture a cause du sandbox Windows (`apply deny-read ACLs`) ; l inspection visuelle automatisee reste donc a rejouer dans un environnement navigateur disponible.
+
+Limites : l apercu est une carte de rangement, pas une geometrie de bac. Il ne valide ni parois, ni fond, ni logement, ni Fusion, ni slicer, ni impression. Prochaine gate : P31, strategie de projection vers de vrais bacs.

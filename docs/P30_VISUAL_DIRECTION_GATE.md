@@ -38,3 +38,6 @@ palette Fusion reprend ce langage mais se limite a la scene et a l export.
 Valider cette direction `Atelier de rangement` comme base visuelle P30. Les
 nuances de marque (couleurs, ton, iconographie) pourront etre ajustees dans les
 maquettes sans redefinir l architecture.
+## Resultat
+
+Direction approuvee le 2026-07-11 et implementee par P30-M001. La verification visuelle automatisee reste `browser-inspection-pending` car le sandbox Windows bloque la connexion navigateur avant ouverture ; aucune validation physique n est impliquee.

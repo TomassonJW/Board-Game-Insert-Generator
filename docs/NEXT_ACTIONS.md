@@ -10,11 +10,11 @@ Statut : `active` pour les missions non gatees. Les missions Fusion et physiques
 
 L objectif actif replace BGIG sur sa trajectoire premium. P19 a P21 fournissent le moteur de planification, P23 a P27 le Studio local, P28 un raccord CAD IR technique. Le raccord P28 est requalifie `KO produit/UX` : il ne doit plus etre presente comme une generation d insert utilisable.
 
-ADR-0042 fixe la surface cible : Studio principal pour concevoir et visualiser ; palette Fusion secondaire pour materialiser, inspecter et exporter. Le plan complet est `docs/PREMIUM_PRODUCT_EXECUTION_PLAN.md`.
+P30 materialise ADR-0042 : le Studio est la surface principale avec une boite visuelle vivante, un parcours en cinq etapes et un mode expert progressif. La palette Fusion reste une surface secondaire prevue par P32. Le plan complet est `docs/PREMIUM_PRODUCT_EXECUTION_PLAN.md`.
 
 ## Gate humaine active
 
-`P30-GATE - Direction visuelle et interaction principale` est la prochaine gate reelle. Le choix demande est documente dans `docs/P30_VISUAL_DIRECTION_GATE.md` : valider ou ajuster la direction `Atelier de rangement` avant de coder la refonte visuelle du Studio.
+`P31-GATE - Strategie de bacs fonctionnels` est la prochaine gate reelle. P31 doit choisir puis documenter la projection des modules selectionnes vers de vrais bacs (parois, fond, logements et prise), avant toute nouvelle materialisation Fusion.
 
 ## Hors scope maintenu
 
@@ -25,7 +25,7 @@ ADR-0042 fixe la surface cible : Studio principal pour concevoir et visualiser ;
 
 ## Prochaine action
 
-Apres validation P30, executer `P30-M001` : premier flux Studio novice et apercu de boite vivant. P31 ne commencera qu apres une strategie documentee de projection vers de vrais bacs.
+Preparer le rapport `P31-GATE` : options de projection vers des bacs fonctionnels, invariants de parois/fond/logements, tests moteur/CAD IR et perimetre de la premiere preuve Fusion. Aucun code P31 ne commencera avant cette validation humaine.
 
 ## Fin de chaque mission
 

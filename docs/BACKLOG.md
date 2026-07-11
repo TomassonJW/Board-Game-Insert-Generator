@@ -1333,4 +1333,14 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - Objectif : valider la direction `Atelier de rangement` avant la refonte Studio : boite centrale, etapes progressives, cartes de decision, parametres de forme visibles et expert replie.
 - Livrable : `docs/P30_VISUAL_DIRECTION_GATE.md`.
 - Gate : decision esthetique structurante obligatoire.
-- Statut : `ready-gated`.
+- Statut : `accepted`, direction `Atelier de rangement` approuvee le 2026-07-11.
+### P30-M001 - Studio vivant et parcours novice
+
+- Capability : C-PRODUCT-VISION, C-QUALITY.
+- Milestone : M14 Usable beta.
+- Objectif : rendre le Studio principal progressif, lisible et visuel sans modifier le moteur ni presenter les envelopes P28 comme des bacs.
+- Livrables : parcours en cinq etapes, apercu 2D de boite mis a jour a chaque modification, vue de preparation/fabrication, reglages experts replis, export technique explicitement expert et tests de contrat frontend.
+- Preuves : build TypeScript/Vite, 248 tests Python, services loopback UI/API en HTTP 200 et test de contrat `test_frontend_studio.py`.
+- Limite : la recette navigateur automatisee ne peut pas s ouvrir dans cet environnement a cause du sandbox Windows ; elle reste a rejouer sans que cela soit confondu avec une validation d impression.
+- Hors scope : bacs physiques, parois, cavites, tolerances nouvelles, palette Fusion, couvercles, mecanismes et impression.
+- Statut : `implemented-local-ui`, `browser-inspection-pending`, `print-validated: false`.

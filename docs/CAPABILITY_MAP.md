@@ -453,3 +453,9 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - C-FUSION-UI : la commande CommandInputs reste `fusion-validated` comme outil expert/smoke, mais elle est retiree de la cible UX produit ; la palette P32 est prevue sous gate Fusion.
 - C-CAD-IR : P28 reste `implemented-selection-bridge` uniquement ; il ne prouve pas une projection de bac fonctionnel.
 - C-AESTHETIC / C-STACKING : formes, labels et mecanismes sont inclus dans le plan mais restent `planned` / `experimental` jusqu aux gates P33-P35.
+## P30 living Studio update
+
+- C-PRODUCT-VISION : `implemented-local-ui` pour un parcours principal en cinq etapes, une boite visuelle centrale et un langage sans jargon dans le flux novice.
+- C-QUALITY : build TypeScript/Vite, test de contrat frontend et services locaux HTTP OK ; `browser-inspection-pending` car le sandbox Windows bloque la connexion de recette avant ouverture.
+- C-CAD-IR / C-FUSION-UI : le telechargement P28 demeure cache dans le mode expert et explicitement non productif ; aucune nouvelle scene Fusion, cavite ou promesse de bac n est ajoutee.
+- C-PRINT / C-ERGONOMICS : `print-validated: false` ; l interface expose le chemin de fabrication mais ne valide aucune etape physique.
