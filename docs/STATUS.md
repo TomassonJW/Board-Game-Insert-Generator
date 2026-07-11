@@ -1029,3 +1029,9 @@ Statut : `implemented-studio-preview`, `browser-inspection-pending`, `print-vali
 Le Studio propose maintenant une carte `Finition vivante` dans l etape finale : coins arrondis/droits/biseautes, rayon et biseau d apercu, prise symbolique, ambiance, labels et typographie. Chaque changement est immediat dans la vue de boite, persiste avec le projet et voyage dans la selection puis les metadata CAD IR sous `bgig.appearance.v0`.
 
 Le contrat est volontairement non destructif : P21 garde exactement le meme digest, les dimensions, placements, tolerances, murs, fond et cavites ne changent pas, et la CAD IR porte `stored_for_preview_only_not_materialized`. Le navigateur automatise ne peut pas se connecter dans ce sandbox Windows ; build Vite et tests de contrat sont OK. Prochaine vraie gate : P34, choix du premier mecanisme et validation physique cible avant toute geometrie de couvercle ou clip.
+
+## P34-GATE - Premier mecanisme
+
+Statut : `waiting-human-decision`.
+
+P34 ne peut pas etre automatisee au dela du rapport : un mecanisme engage des jeux et une validation physique. La recommandation est un couvercle pose amovible, sans clip, comme premier mecanisme experimental. Il est plus simple a tester et moins trompeur qu un coulissant ou une charniere. Le choix humain attendu est dans `docs/P34_MECHANISM_GATE.md`.

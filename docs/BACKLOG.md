@@ -1387,3 +1387,13 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - Preuves : tests Python de bornes, transport et absence d effet sur le digest P21 ; test de contrat frontend ; TypeScript/Vite build.
 - Limite : la recette visuelle automatisee ne peut pas se connecter dans ce sandbox Windows ; aucune geometrie de finition n est materialisee dans Fusion.
 - Statut : `implemented-studio-preview`, `browser-inspection-pending`, `print-validated: false`.
+
+### P34-GATE - Premier mecanisme et validation physique
+
+- Capability : futur mecanisme, C-STACKING, C-AESTHETIC, C-CALIBRATION.
+- Milestone : M13 Advanced mechanisms / M14 Usable beta.
+- Objectif : choisir le premier mecanisme ferme autorise avant toute CAD IR, Fusion ou promesse d impression.
+- Livrables de gate : `P34_MECHANISM_GATE.md`, ADR-0044 proposee et protocole cible.
+- Recommandation : couvercle pose amovible V0, sans clip ni charniere.
+- Gate : validation humaine explicite obligatoire.
+- Statut : `waiting-human-decision`.

@@ -14,17 +14,17 @@ Le Studio reste la surface principale. Fusion devient maintenant la surface seco
 
 ## Gate humaine active
 
-P32 est `fusion-validated` : le smoke humain Fusion est accepte le 2026-07-11. La palette peut rejoindre `main`; P33 devient la prochaine mission autonome.
+P34 est `waiting-human-decision` : le premier mecanisme impose un choix humain et un futur prototype imprime.
 
 ## Hors scope maintenu
 
 - Fusion ne devient jamais source de verite du plan.
 - Aucun statut `print-validated` ne sera utilise sans prototype mesure.
-- Les compartiments asset-specific, formes, couvercles et mecanismes restent hors P32.
+- Les couvercles, mecanismes, jeux physiques et validations d impression restent hors scope tant que P34 n est pas approuve.
 
 ## Prochaine action
 
-P33-M001 est implemente en apercu Studio. La prochaine etape est P34-GATE : choisir le premier mecanisme autorise et son protocole de validation physique avant code.
+P34-GATE : choisir le premier mecanisme. Recommandation : couvercle pose amovible V0. Repondre `P34 couvercle pose approuve` ou choisir A, C ou D dans `docs/P34_MECHANISM_GATE.md`.
 
 ## Fin de chaque mission
 

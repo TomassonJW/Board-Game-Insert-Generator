@@ -495,3 +495,9 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - C-CAD-IR : la preference est transportee comme metadata `stored_for_preview_only_not_materialized`, sans operation CAD nouvelle.
 - C-QUALITY : bornes et enums valides, digest P21 invariant, build Studio OK ; `browser-inspection-pending` dans le sandbox Windows.
 - C-PRINT : inchange, `print-validated: false`.
+
+## P34 mechanism gate
+
+- C-STACKING / futur mecanisme : `waiting-human-decision` ; aucun couvercle, rail, clip ou charniere n est encore implemente.
+- C-CALIBRATION : la premiere fermeture requerra un coupon imprime et des mesures avant toute qualification physique.
+- C-AESTHETIC : P33 ne materialise pas une apparence ; P34 doit garder cette frontiere explicite.
