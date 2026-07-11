@@ -34,3 +34,7 @@ Repondre simplement avec l un des deux formats :
 
 `fusion-validated` ne sera accorde qu apres ce retour. `print-validated` reste
 faux jusqu a une impression et des mesures reelles.
+
+## Resultat humain
+
+`P31 Fusion OK` recu le 2026-07-11. Les trois bacs ouverts sont observes. Le smoke est `fusion-validated`; aucune validation d impression n est deduite.

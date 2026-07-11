@@ -8,22 +8,23 @@ Statut : `active` pour les missions non gatees. Les missions Fusion et physiques
 
 ## Etat courant
 
-P31 remplace les blocks P28 par de vrais bacs ouverts dans la CAD IR : une enveloppe P21, quatre parois, un fond conserve et une cavite unique ouverte en haut. Le Studio les decrit comme `a verifier dans Fusion`, jamais comme imprimes ou valides.
+P31 est `fusion-validated` pour le smoke `mixed-box` : trois bacs ouverts issus d une selection P21 ont ete observes dans Fusion, chacun avec parois, fond et cavite top-open. Cette preuve ne valide ni l ajustement des assets, ni l impression.
+
+Le Studio reste la surface principale. Fusion devient maintenant la surface secondaire de materialisation, inspection et export prevue par ADR-0042.
 
 ## Gate humaine active
 
-`P31-FUSION-SMOKE - Premiere cavite issue d une selection P21` est maintenant la seule gate active. Le protocole est `docs/P31_FUSION_OPEN_TRAY_SMOKE.md`. Codex prepare l add-in et la scene apres integration ; Thomas devra seulement ouvrir Fusion, lancer BGIG et constater les trois bacs.
+Aucune gate de conception n est ouverte pour P32 : la direction Studio/palette est deja acceptee. Un smoke humain Fusion sera demande seulement apres construction de la premiere palette.
 
 ## Hors scope maintenu
 
 - Fusion ne devient jamais source de verite du plan.
-- Aucun score, placement ou tolerance existante ne change.
-- Aucun compartiment multi-assets, encoche, arrondi, couvercle, clip ou charniere n est ajoute.
 - Aucun statut `print-validated` ne sera utilise sans prototype mesure.
+- Les compartiments asset-specific, formes, couvercles et mecanismes restent hors P32.
 
 ## Prochaine action
 
-Apres retour `P31 Fusion OK` ou `P31 Fusion KO`, qualifier le comportement Fusion. En cas de OK, la suite autonome est P32 : palette Fusion secondaire claire et concise.
+Executer P32-M001 : palette Fusion secondaire en francais, resume clair du design recu, statut de fabrication lisible et diagnostics experts replis.
 
 ## Fin de chaque mission
 

@@ -471,3 +471,7 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - C-FUSION-UI : `fusion-smoke-required` ; le plan Fusion hors API contient une coupe par bac mais aucune scene P31 n est encore observee.
 - C-PRODUCT-VISION : le Studio et la CLI nomment des bacs ouverts a verifier dans Fusion, sans promesse asset-specific ni imprimable.
 - C-PRINT / C-ERGONOMICS : `print-validated: false` maintenu.
+## P31 Fusion smoke validation
+
+- C-FUSION-UI / C-CAVITY : `fusion-validated` pour les trois bacs ouverts P31 du smoke `mixed-box` observes par Thomas le 2026-07-11.
+- C-PRINT / C-ERGONOMICS : inchanges, `print-validated: false` ; le smoke ne couvre ni fit asset-specific ni impression.
