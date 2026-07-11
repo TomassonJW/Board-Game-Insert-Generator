@@ -1006,3 +1006,10 @@ Preuves : tests de projection et de refus, plan Fusion hors API avec trois cavit
 ## P31 Fusion smoke - Validation humaine
 
 Retour humain : `P31 Fusion OK`. Les trois bacs ouverts `mixed-box` sont observes dans Fusion avec parois, fond et cavite ouverte. Cette validation couvre le chemin selection P21 -> CAD IR -> coupes Fusion pour le smoke P31 uniquement. L ajustement des assets, les compartiments, le slicer et l impression restent non valides.
+## P32 - Palette Fusion secondaire
+
+Statut : `implemented-fusion-palette`, `fusion-smoke-required`, `print-validated: false`.
+
+L ouverture normale de l add-in montre maintenant `BGIG - Atelier de rangement`, une petite palette locale en francais. Elle resume trois choses utiles : le design recu, la scene Fusion et le statut de fabrication. Elle propose seulement `Previsualiser`, `Mettre a jour la scene`, `Exporter les bacs` et un acces volontaire aux reglages experts. Les chemins CAD, diagnostics bruts et le formulaire CommandInputs ne sont plus la premiere experience.
+
+Le bridge ne recalcule rien : il relit l inspection de scene et reutilise les actions existantes de generation/regeneration/export. La palette affiche explicitement que la geometrie a ete observee dans Fusion mais que l impression ne reste pas validee. Preuves hors Fusion : 87 tests Fusion hors API, `python -m py_compile` et `git diff --check` OK. Prochaine action : P32-GATE, smoke humain de la palette dans Fusion.

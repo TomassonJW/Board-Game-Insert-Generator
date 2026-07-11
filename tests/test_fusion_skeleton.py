@@ -5,6 +5,8 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
 
 from context import ROOT
 
@@ -245,6 +247,50 @@ class _FakeExportManager:
 
 
 class FusionSkeletonTests(unittest.TestCase):
+    def test_palette_contract_is_local_french_and_uses_the_fusion_bridge(self) -> None:
+        addin_dir = ROOT / "fusion_addin" / "BoardGameInsertGenerator"
+        source = (addin_dir / "BoardGameInsertGenerator.py").read_text(encoding="utf-8")
+        markup = (addin_dir / "palette.html").read_text(encoding="utf-8")
+
+        self.assertIn("_register_command_and_show_palette", source)
+        self.assertIn("palettes.add", source)
+        self.assertIn("incomingFromHTML", source)
+        self.assertIn("sendInfoToHTML", source)
+        self.assertIn("Atelier de rangement", markup)
+        self.assertIn("Previsualiser", markup)
+        self.assertIn("Mettre a jour la scene", markup)
+        self.assertIn("Exporter les bacs", markup)
+        self.assertIn("Reglages experts", markup)
+        self.assertIn("adsk.fusionSendData", markup)
+        self.assertIn("fusionJavaScriptHandler", markup)
+        smoke_script = (ROOT / "scripts" / "fusion" / "prepare_p32_palette_test.ps1").read_text(encoding="utf-8")
+        self.assertIn("Atelier de rangement", smoke_script)
+        self.assertIn("Previsualiser", smoke_script)
+        self.assertIn("Reglages experts", smoke_script)
+        self.assertIn("P32 Fusion OK", smoke_script)
+
+    def test_palette_state_keeps_the_print_status_honest(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            cad_ir_path = Path(temp_dir) / "selection.cad-ir.json"
+            cad_ir_path.write_text("{}", encoding="utf-8")
+            request = SimpleNamespace(cad_ir_path=cad_ir_path)
+            inspection = {
+                "bgig_scene_roots_total": 1,
+                "bodies_tagged": 3,
+                "bgig_name_like_untagged_entities": 0,
+            }
+            with patch.object(fusion_entrypoint, "_safe_default_command_request", return_value=request), patch.object(
+                fusion_entrypoint, "_active_design", return_value=object()
+            ), patch.object(fusion_entrypoint, "BgigFusionRegistry") as registry:
+                registry.return_value.inspect.return_value = inspection
+                state = fusion_entrypoint._palette_state(Path(temp_dir), notice="Scene actualisee.")
+
+        self.assertEqual(state["source_status"], "Design recu")
+        self.assertEqual(state["scene_status"], "Bacs visibles dans Fusion")
+        self.assertIn("3 corps", state["scene_detail"])
+        self.assertIn("impression non validee", state["manufacturing_status"])
+        self.assertEqual(state["notice"], "Scene actualisee.")
+
     def test_describes_zero_doc_when_application_is_unavailable(self) -> None:
         state = describe_document_state(None)
 
@@ -2151,7 +2197,10 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("_delete_command_control", source)
         self.assertIn("_delete_command_definition", source)
         self.assertIn("command_definition.execute()", source)
-        self.assertLess(source.index("adsk.autoTerminate(False)"), source.index("command_definition.execute()"))
+        self.assertIn('_register_command_and_show_palette', source)
+        self.assertIn('_ensure_palette(addin_dir)', source)
+        self.assertIn('if action == "expert"', source)
+        self.assertLess(source.index("adsk.autoTerminate(False)"), source.index("_ensure_palette(addin_dir)"))
         self.assertIn("Module source mapping", source)
         self.assertIn("module_source", source)
         self.assertIn("placement_source", source)

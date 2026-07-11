@@ -232,6 +232,11 @@ except ImportError:  # pragma: no cover - exercised only outside Fusion.
 
 BGIG_LEGACY_COMMAND_ID = "board_game_insert_generator.generate_scene"
 BGIG_COMMAND_ID = "board_game_insert_generator_generate_scene"
+BGIG_PALETTE_ID = "board_game_insert_generator_palette"
+BGIG_PALETTE_TITLE = "BGIG - Atelier de rangement"
+BGIG_PALETTE_HTML_FILENAME = "palette.html"
+BGIG_PALETTE_STATE_ACTION = "bgig_palette_state"
+BGIG_PALETTE_NOTICE_ACTION = "bgig_palette_notice"
 ACTION_INPUT_ID = "bgig_command_action"
 INPUT_MODE_INPUT_ID = "bgig_input_mode"
 CAD_IR_PATH_INPUT_ID = "bgig_cad_ir_path"
@@ -271,7 +276,7 @@ def run(context) -> None:  # noqa: ANN001 - Fusion controls the signature.
         return
 
     try:
-        _register_and_execute_command(Path(__file__).resolve().parent)
+        _register_command_and_show_palette(Path(__file__).resolve().parent)
     except FusionSkeletonError as exc:
         _show_message(
             "Board Game Insert Generator command setup error:\n"
@@ -287,6 +292,7 @@ def stop(context) -> None:  # noqa: ANN001 - Fusion controls the signature.
 
     global _handlers
     if adsk is not None and _ui is not None:
+        _delete_palette()
         _delete_command_control(BGIG_COMMAND_ID)
         _delete_command_definition(BGIG_COMMAND_ID)
         _delete_command_definition(BGIG_LEGACY_COMMAND_ID)
@@ -483,6 +489,57 @@ if adsk is not None:
                     )
                     return
                 _show_message(f"Board Game Insert Generator Fusion error:\n{exc}")
+
+
+    class _BgigPaletteIncomingHandler(adsk.core.HTMLEventHandler):  # type: ignore[misc]
+        """Keeps the small product palette connected to the existing Fusion adapter."""
+
+        def __init__(self, addin_dir: Path, palette) -> None:  # noqa: ANN001 - Fusion API object.
+            super().__init__()
+            self.addin_dir = addin_dir
+            self.palette = palette
+
+        def notify(self, args) -> None:  # noqa: ANN001 - Fusion event args.
+            action = str(getattr(args, "action", ""))
+            try:
+                if action == "refresh" or action == "preview":
+                    _publish_palette_state(self.palette, self.addin_dir, "Vue Fusion actualisee.")
+                    return
+                if action == "expert":
+                    command_definition = _ui.commandDefinitions.itemById(BGIG_COMMAND_ID)
+                    if command_definition is None or not command_definition.execute():
+                        raise FusionSkeletonError("Fusion could not open the expert settings dialog.")
+                    _publish_palette_notice(
+                        self.palette,
+                        "Les reglages experts sont ouverts. Ils restent un outil de secours : le Studio est la surface de conception.",
+                    )
+                    return
+                if action == "update":
+                    request = _safe_default_command_request(self.addin_dir)
+                    request = replace(
+                        request,
+                        action=FUSION_COMMAND_ACTION_REGENERATE if _active_bgig_scene_exists() else FUSION_COMMAND_ACTION_GENERATE,
+                    )
+                    _execute_generation_request(request, self.addin_dir)
+                    _publish_palette_state(
+                        self.palette,
+                        self.addin_dir,
+                        "Scene Fusion mise a jour. Verifie les bacs dans la zone de travail avant export.",
+                    )
+                    return
+                if action == "export":
+                    request = replace(_safe_default_command_request(self.addin_dir), action=FUSION_COMMAND_ACTION_EXPORT_PRINTABLES)
+                    result = _execute_generation_request(request, self.addin_dir)
+                    _publish_palette_state(self.palette, self.addin_dir, _palette_export_notice(result))
+                    return
+                _publish_palette_notice(self.palette, "Action inconnue. Actualise la palette ou ouvre les reglages experts.")
+            except Exception as exc:  # pragma: no cover - Fusion runtime boundary.
+                _publish_palette_state(
+                    self.palette,
+                    self.addin_dir,
+                    "L action n a pas abouti. Ouvre les reglages experts pour le detail technique.",
+                    technical_detail=str(exc),
+                )
 else:  # pragma: no cover - imported outside Fusion only.
     class _BgigCommandCreatedHandler:  # type: ignore[no-redef]
         pass
@@ -490,8 +547,10 @@ else:  # pragma: no cover - imported outside Fusion only.
     class _BgigCommandExecuteHandler:  # type: ignore[no-redef]
         pass
 
+    class _BgigPaletteIncomingHandler:  # type: ignore[no-redef]
+        pass
 
-def _register_and_execute_command(addin_dir: Path) -> None:
+def _register_command_and_show_palette(addin_dir: Path) -> None:
     command_definitions = _ui.commandDefinitions
     _delete_command_control(BGIG_COMMAND_ID)
     _delete_command_definition(BGIG_COMMAND_ID)
@@ -509,12 +568,106 @@ def _register_and_execute_command(addin_dir: Path) -> None:
     _handlers.append(created_handler)
     _add_toolbar_button(command_definition)
     adsk.autoTerminate(False)
-    if not command_definition.execute():
-        raise FusionSkeletonError(
-            "Fusion refused to open the Generate Board Game Insert command dialog. "
-            f"Use the toolbar button at {BGIG_TOOLBAR_LOCATION} to reopen BGIG without restarting the add-in, then retry."
-        )
+    _ensure_palette(addin_dir)
 
+
+def _ensure_palette(addin_dir: Path):  # noqa: ANN001 - Fusion API object.
+    palette = _ui.palettes.itemById(BGIG_PALETTE_ID)
+    if palette is None:
+        html_path = addin_dir / BGIG_PALETTE_HTML_FILENAME
+        if not html_path.is_file():
+            raise FusionSkeletonError(f"Fusion palette file is missing: {html_path}")
+        palette = _ui.palettes.add(
+            BGIG_PALETTE_ID,
+            BGIG_PALETTE_TITLE,
+            html_path.resolve().as_uri(),
+            True,
+            True,
+            True,
+            360,
+            640,
+        )
+        if palette is None:
+            raise FusionSkeletonError("Fusion palette creation failed.")
+        incoming_handler = _BgigPaletteIncomingHandler(addin_dir, palette)
+        palette.incomingFromHTML.add(incoming_handler)
+        _handlers.append(incoming_handler)
+    try:
+        palette.isVisible = True
+    except Exception:
+        pass
+    return palette
+
+
+def _delete_palette() -> None:
+    palette = _ui.palettes.itemById(BGIG_PALETTE_ID)
+    if palette is not None:
+        palette.deleteMe()
+
+
+def _publish_palette_state(palette, addin_dir: Path, notice: str = "", technical_detail: str = "") -> None:  # noqa: ANN001
+    payload = _palette_state(addin_dir, notice=notice, technical_detail=technical_detail)
+    palette.sendInfoToHTML(BGIG_PALETTE_STATE_ACTION, json.dumps(payload, ensure_ascii=False))
+
+
+def _publish_palette_notice(palette, notice: str) -> None:  # noqa: ANN001
+    palette.sendInfoToHTML(BGIG_PALETTE_NOTICE_ACTION, json.dumps({"notice": notice}, ensure_ascii=False))
+
+
+def _palette_state(addin_dir: Path, notice: str = "", technical_detail: str = "") -> dict[str, object]:
+    """Returns a concise, product-facing state; raw diagnostics remain optional."""
+
+    request = _safe_default_command_request(addin_dir)
+    source_ready = bool(request.cad_ir_path and request.cad_ir_path.is_file())
+    inspection: dict[str, object] = {}
+    inspection_error = ""
+    try:
+        inspection = BgigFusionRegistry(_active_design(_app)).inspect()
+    except Exception as exc:
+        inspection_error = str(exc)
+
+    scene_roots = int(inspection.get("bgig_scene_roots_total", 0))
+    modules = int(inspection.get("bodies_tagged", 0))
+    warnings: list[str] = []
+    if not source_ready:
+        warnings.append("Aucun design BGIG pret a appliquer. Reviens au Studio ou ouvre les reglages experts.")
+    if inspection_error:
+        warnings.append("Fusion ne peut pas encore lire la scene active. Ouvre ou cree un design Fusion.")
+    elif scene_roots > 1:
+        warnings.append("Plusieurs scenes BGIG sont presentes. Utilise les reglages experts avant toute mise a jour.")
+    elif int(inspection.get("bgig_name_like_untagged_entities", 0)) > 0:
+        warnings.append("Des objets BGIG anciens ou non identifies existent. Le detail est disponible en mode expert.")
+
+    if scene_roots == 1:
+        scene_status = "Bacs visibles dans Fusion"
+        scene_detail = f"{modules} corps de bac reconnus dans la scene actuelle."
+    elif scene_roots > 1:
+        scene_status = "Scene a verifier"
+        scene_detail = "La mise a jour est bloquee tant que les scenes existantes ne sont pas clarifiees."
+    else:
+        scene_status = "Pret a materialiser"
+        scene_detail = "Aucune scene BGIG n est encore presente dans ce document."
+
+    return {
+        "source_status": "Design recu" if source_ready else "Design manquant",
+        "source_detail": "Le plan venant du Studio est pret a etre applique." if source_ready else "La palette ne fabrique pas de plan toute seule.",
+        "scene_status": scene_status,
+        "scene_detail": scene_detail,
+        "manufacturing_status": "Geometrie Fusion verifiee — impression non validee",
+        "manufacturing_detail": "Les bacs ouverts sont observes dans Fusion. L ajustement reel et l impression restent a mesurer.",
+        "warnings": warnings,
+        "notice": notice,
+        "technical_detail": technical_detail or inspection_error,
+        "expert_available": True,
+    }
+
+
+def _palette_export_notice(result: str) -> str:
+    if "Export status: exported" in result:
+        return "Export termine. Le manifeste indique les fichiers prepares et ce qui reste a verifier dans le slicer."
+    if "Export status: no_exportable_modules" in result:
+        return "Aucun bac exportable n a ete trouve. Verifie la scene Fusion avant de relancer l export."
+    return "Export a verifier. Le detail technique est disponible dans les reglages experts."
 
 def _add_toolbar_button(command_definition) -> bool:  # noqa: ANN001 - Fusion API object.
     panel = _find_toolbar_panel()

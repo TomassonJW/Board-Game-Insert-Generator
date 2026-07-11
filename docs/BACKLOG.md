@@ -1359,3 +1359,13 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - Preuves : 249 tests Python, build frontend, export `mixed-box` avec trois bacs et trois coupes dans le plan Fusion hors API.
 - Limites : aucun smoke Fusion observe, aucune validation physique ou asset-specific.
 - Statut : `implemented-cad-ir-open-top-trays`, `fusion-validated`, `print-validated: false`.
+### P32-M001 - Palette Fusion secondaire concise
+
+- Capability : C-FUSION-UI, C-PRODUCT-VISION, C-QUALITY.
+- Milestone : M14 Usable beta.
+- Objectif : remplacer l ouverture normale du gros dialogue technique par une palette Fusion courte en francais, sans deplacer le moteur ni dupliquer le Studio.
+- Livrables : `palette.html` locale, bridge Fusion HTML, resume design/scene/fabrication, actions `Previsualiser`, `Mettre a jour la scene`, `Exporter les bacs`, acces aux reglages experts et preparateur de smoke P32.
+- Preuves hors Fusion : 87 tests Fusion hors API, `py_compile`, bridge HTML teste par contrat et statut d impression explicitement non valide.
+- Gate : observation humaine Fusion P32 obligatoire avant `fusion-validated`.
+- Hors scope : nouveau solveur, edition de projet dans Fusion, compartiments asset-specific, formes, couvercles, mecanismes et impression.
+- Statut : `implemented-fusion-palette`, `fusion-smoke-required`, `print-validated: false`.

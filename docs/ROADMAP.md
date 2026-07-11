@@ -224,3 +224,6 @@ Statut : `implemented-cad-ir-open-top-trays`, `fusion-validated`, `print-validat
 ## P31 open-top trays - 2026-07-11
 
 Statut : `implemented-cad-ir-open-top-trays`, `fusion-validated`, `print-validated: false`. Les selections Studio/P21 exportent maintenant de vrais bacs ouverts avec parois, fond et cavite unique. Les compromis P21, defaults, Fusion comme adaptateur et limites de fabrication restent explicites. Le smoke Fusion P31 est accepte ; P32 peut construire la palette Fusion secondaire.
+## P32 Fusion palette - 2026-07-11
+
+Statut : `implemented-fusion-palette`, `fusion-smoke-required`, `print-validated: false`. La palette locale `Atelier de rangement` devient l ouverture normale de l add-in. Elle garde Fusion dans son role secondaire : lire le design deja prepare, inspecter la scene, appliquer une mise a jour explicite et exporter. Le dialogue CommandInputs demeure disponible uniquement sous `Reglages experts`. Les tests hors Fusion sont passes ; la validation P32 attend une observation humaine de la palette et de son bridge.

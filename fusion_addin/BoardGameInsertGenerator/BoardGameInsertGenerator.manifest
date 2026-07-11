@@ -4,9 +4,9 @@
   "id": "",
   "author": "BGIG",
   "description": {
-    "": "Board Game Insert Generator P6: rectangular blanks, cavity cuts and simple finger notch cuts from local CAD IR. Manual Fusion validation required."
+    "": "Board Game Insert Generator: concise French Fusion palette for inspecting, updating and exporting already-resolved tray geometry. Manual Fusion validation required."
   },
-  "version": "0.1.1",
+  "version": "0.1.2",
   "runOnStartup": false,
   "supportedOS": "windows|mac",
   "editEnabled": true

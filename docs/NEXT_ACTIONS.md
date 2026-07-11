@@ -14,7 +14,7 @@ Le Studio reste la surface principale. Fusion devient maintenant la surface seco
 
 ## Gate humaine active
 
-Aucune gate de conception n est ouverte pour P32 : la direction Studio/palette est deja acceptee. Un smoke humain Fusion sera demande seulement apres construction de la premiere palette.
+P32-GATE est maintenant ouverte : la palette est codee et testee hors Fusion. Une courte observation humaine dans Fusion est necessaire avant de la qualifier fusion-validated.
 
 ## Hors scope maintenu
 
@@ -24,7 +24,7 @@ Aucune gate de conception n est ouverte pour P32 : la direction Studio/palette e
 
 ## Prochaine action
 
-Executer P32-M001 : palette Fusion secondaire en francais, resume clair du design recu, statut de fabrication lisible et diagnostics experts replis.
+Executer P32-GATE : observer la palette dans Fusion, verifier les trois etats lisibles et les actions Previsualiser, Mettre a jour et Exporter. Repondre simplement P32 Fusion OK ou P32 Fusion KO.
 
 ## Fin de chaque mission
 

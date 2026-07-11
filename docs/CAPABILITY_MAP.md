@@ -475,3 +475,9 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 
 - C-FUSION-UI / C-CAVITY : `fusion-validated` pour les trois bacs ouverts P31 du smoke `mixed-box` observes par Thomas le 2026-07-11.
 - C-PRINT / C-ERGONOMICS : inchanges, `print-validated: false` ; le smoke ne couvre ni fit asset-specific ni impression.
+## P32 Fusion palette update
+
+- C-FUSION-UI : `implemented-fusion-palette`, `fusion-smoke-required` pour une palette HTML locale en francais, avec resume design/scene/fabrication, bridge `incomingFromHTML` et actions de preview, mise a jour et export.
+- C-PRODUCT-VISION : Studio reste la source du parcours ; la palette ne modifie ni projet, ni solveur, ni tolerances et replie le dialogue CommandInputs en mode expert.
+- C-QUALITY : tests de contrat du bridge et statut fabrication honnete (`impression non validee`) passent hors Fusion.
+- C-PRINT : inchange, `print-validated: false` ; P32 ne remplace pas une impression mesuree.
