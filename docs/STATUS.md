@@ -995,6 +995,11 @@ Preuves : build TypeScript/Vite, test de contrat frontend P30, suite Python comp
 Limites : l apercu est une carte de rangement, pas une geometrie de bac. Il ne valide ni parois, ni fond, ni logement, ni Fusion, ni slicer, ni impression. Prochaine gate : P31, strategie de projection vers de vrais bacs.
 ## P31 - Gate bacs fonctionnels
 
-Statut : `ready-gated`, ADR-0043 `proposed`.
+Statut : `implemented-cad-ir-open-top-trays`, `fusion-smoke-required`, `print-validated: false`.
 
-Le rapport P31 reutilise les contrats deja existants : P21 fournit l enveloppe resolue, CAD IR connait les cavites, et l adaptateur Fusion sait planifier des coupes rectangulaires top-open. La recommandation est volontairement petite : un bac ouvert par module selectionne, sans compartiment asset-specific, encoche, changement de tolerance ou calcul Fusion. La validation `P31 approuve` est requise avant le code.
+Le rapport P31 reutilise les contrats deja existants : P21 fournit l enveloppe resolue, CAD IR connait les cavites, et l adaptateur Fusion sait planifier des coupes rectangulaires top-open. La recommandation est volontairement petite : un bac ouvert par module selectionne, sans compartiment asset-specific, encoche, changement de tolerance ou calcul Fusion. P31 est approuve et le code est livre ; la validation Fusion reste obligatoire avant toute qualification Fusion.
+## P31-M001 - Bacs ouverts depuis une selection P21
+
+La selection locale transforme chaque module imprimable en bac ouvert : enveloppe P21 conservee, parois de 1.2 mm, fond de 1.2 mm et cavite `free` top-open. La CAD IR porte une operation `subtract_rectangular_cavity`, une trace des assets associes et un statut `planned_for_fusion_smoke`. Les modules trop petits sont refuses avec `P31_TRAY_CAVITY_NOT_FEASIBLE`.
+
+Preuves : tests de projection et de refus, plan Fusion hors API avec trois cavites pour `mixed-box`, CLI P31, suite complete de 249 tests et build Studio. Limites : aucune scene Fusion n a encore ete observee, aucune capacite asset-specific, encoche, forme ou impression n est validee. Prochaine gate : smoke Fusion P31.

@@ -465,3 +465,9 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - C-FUSION-UI : aucune mutation P31 avant validation ; le smoke humain de cavite P21 restera requis apres code.
 - C-PRODUCT-VISION : le prochain resultat cible est un bac ouvert vrai, jamais un blank P28 promu comme produit.
 - C-PRINT : `print-validated: false` maintenu.
+## P31 open-top tray update
+
+- C-CAD-IR / C-CAVITY : `implemented-cad-ir-open-top-trays` pour une cavite `free` top-open par module P21, avec parois/fond existants, metadata de tracabilite et refus structure des envelopes impossibles.
+- C-FUSION-UI : `fusion-smoke-required` ; le plan Fusion hors API contient une coupe par bac mais aucune scene P31 n est encore observee.
+- C-PRODUCT-VISION : le Studio et la CLI nomment des bacs ouverts a verifier dans Fusion, sans promesse asset-specific ni imprimable.
+- C-PRINT / C-ERGONOMICS : `print-validated: false` maintenu.

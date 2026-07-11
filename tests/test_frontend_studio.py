@@ -20,9 +20,9 @@ class FrontendStudioContractTests(unittest.TestCase):
         for label in ("À explorer", "À vérifier dans Fusion", "À imprimer et mesurer"):
             self.assertIn(label, self.source)
 
-    def test_technical_export_stays_in_expert_mode(self) -> None:
+    def test_technical_export_stays_in_expert_mode_and_describes_p31_honestly(self) -> None:
         self.assertIn("Mode expert : télécharger le dossier de préparation", self.source)
-        self.assertIn("aucune scène Fusion et aucune pièce imprimable", self.source)
+        self.assertIn("bacs ouverts à vérifier dans Fusion", self.source)
 
 
 if __name__ == "__main__":

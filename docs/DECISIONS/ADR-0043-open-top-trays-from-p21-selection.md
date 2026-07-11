@@ -2,7 +2,7 @@
 
 ## Statut
 
-Propose - en attente de P31-GATE.
+Accepte par validation humaine explicite P31 le 2026-07-11.
 
 ## Date
 
@@ -21,7 +21,7 @@ Fusion top-open, mais la selection locale ne les emploie pas encore.
 2. Des compartiments asset-specific des le premier pas.
 3. Une geometrie decidee dans Fusion.
 
-## Decision proposee
+## Decision
 
 Retenir l option 1 : conserver l enveloppe P21, creer une cavite ouverte en
 haut a partir des epaisseurs existantes de paroi et de fond, refuser les
@@ -46,4 +46,4 @@ comme tracabilite non normative.
 ## Suivi
 
 Le rapport `docs/P31_FUNCTIONAL_TRAY_GATE.md` porte les invariants, preuves et
-validation attendus. Cette ADR ne devient acceptee qu apres reponse humaine.
+validation attendus. P31 est approuve ; l implementation doit preparer le smoke Fusion sans declarer de validation physique.

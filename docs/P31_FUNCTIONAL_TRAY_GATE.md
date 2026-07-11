@@ -100,3 +100,7 @@ encoche, aucun arrondi et aucun mecanisme ne sont introduits.
 Valider l option A comme scope P31. La reponse `P31 approuve` autorise la
 projection vers des bacs ouverts fonctionnels et ses tests, mais pas encore une
 declaration `fusion-validated` ou `print-validated`.
+
+## Resultat
+
+Option A approuvee le 2026-07-11 et implementee par P31-M001 : chaque module selectionne produit une cavite `free` ouverte en haut avec parois et fond existants. La prochaine gate est le smoke Fusion documente dans `P31_FUSION_OPEN_TRAY_SMOKE.md`.

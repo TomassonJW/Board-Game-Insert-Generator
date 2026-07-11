@@ -1349,7 +1349,13 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - Capability : C-CAD-IR, C-CAVITY, C-FUSION-UI, C-PRODUCT-VISION.
 - Milestone : M14 Usable beta.
 - Objectif : choisir la premiere projection selection P21 -> bac ouvert fonctionnel, sans nouvelle logique de placement ni nouvelle tolerance.
-- Livrables : `P31_FUNCTIONAL_TRAY_GATE.md`, ADR-0043 proposee, invariants, options et preuves avant Fusion.
-- Recommandation : un bac ouvert par module avec cavite `free` top-open, parois/fond existants et refus structure des enveloppes trop petites.
-- Gate : validation humaine explicite `P31 approuve` avant implementation.
-- Statut : `ready-gated`.
+- Livrables : `P31_FUNCTIONAL_TRAY_GATE.md`, ADR-0043 acceptee, invariants, options et preuves avant Fusion.
+- Decision : un bac ouvert par module avec cavite `free` top-open, parois/fond existants et refus structure des enveloppes trop petites.
+- Gate : smoke Fusion humain P31 obligatoire avant toute qualification Fusion.
+- Statut : `implemented-cad-ir-open-top-trays`, `fusion-smoke-required`, `print-validated: false`.
+### P31-M001 - Resultat
+
+- Livrables : projection `open_top_tray_from_selected_module.v0`, cavite top-open par module, diagnostics d enveloppe impossible, messages Studio/CLI et preparateur Fusion actualises.
+- Preuves : 249 tests Python, build frontend, export `mixed-box` avec trois bacs et trois coupes dans le plan Fusion hors API.
+- Limites : aucun smoke Fusion observe, aucune validation physique ou asset-specific.
+- Statut : `implemented-cad-ir-open-top-trays`, `fusion-smoke-required`, `print-validated: false`.

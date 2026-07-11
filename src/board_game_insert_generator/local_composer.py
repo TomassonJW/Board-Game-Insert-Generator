@@ -27,7 +27,9 @@ from board_game_insert_generator.box_fill_variants import (
     variant_portfolio_to_dict,
 )
 from board_game_insert_generator.cad_ir import (
+    CAVITY_OPERATION_KIND,
     CadBody,
+    CadCavity,
     CadComponent,
     CadOperation,
     build_blank_cad_scene,
@@ -51,6 +53,7 @@ from board_game_insert_generator.models import (
     Dimension3D,
     DimensionConfidence,
     GeometryDefaults,
+    FunctionalType,
     InsertConfig,
     LayoutSettings,
     Point3D,
@@ -226,19 +229,21 @@ def export_from_draft(raw_draft: object, variant_id: str | None = None) -> dict[
     scene["components"] = _selection_bridge_components(
         selected_variant.result.solved_plan,
         selected_variant.id,
+        config.defaults,
     )
     scene["metadata"]["box_fill_variant_portfolio"] = portfolio_payload
     scene["metadata"]["box_fill_variant_selection"] = selection
     scene["metadata"]["box_fill_solution"] = selection["variant"]["solution"]
     scene["metadata"]["local_composer"] = {
         "schema_version": LOCAL_COMPOSER_SCHEMA_V0,
-        "materialization_status": "prepared_for_fusion_smoke",
-        "selection_bridge": "p28_selected_module_blank.v0",
-        "geometry_status": "rectangular_blanks_only",
+        "materialization_status": "prepared_open_top_trays_for_fusion_smoke",
+        "selection_bridge": "p31_open_top_tray_from_selected_module.v0",
+        "geometry_status": "open_top_tray_candidates",
         "print_validation_status": "not_validated",
         "reason": (
-            "P28 turns the selected BoxFill modules into explicit rectangular blanks; "
-            "the Fusion smoke and physical print remain unobserved."
+            "P31 turns each selected BoxFill module into an explicit open-top tray "
+            "with walls, a retained floor, and one generic cavity; the Fusion smoke "
+            "and physical print remain unobserved."
         ),
     }
     return {
@@ -246,7 +251,7 @@ def export_from_draft(raw_draft: object, variant_id: str | None = None) -> dict[
         "selection": selection,
         "cad_ir": scene,
         "limits": [
-            "The CAD IR contains one rectangular blank per selected module; it does not define finished tray cavities or walls.",
+            "The CAD IR contains one open-top tray candidate per selected module, with one generic cavity and retained walls/floor.",
             "No Fusion operation was executed by this export.",
             "P21 scores are proxies and do not prove ergonomics or printability.",
             "No physical print or slicer validation is included.",
@@ -257,12 +262,9 @@ def export_from_draft(raw_draft: object, variant_id: str | None = None) -> dict[
 def _selection_bridge_components(
     solved_plan: BoxFillPlan,
     selected_variant_id: str,
+    defaults: GeometryDefaults,
 ) -> list[dict[str, object]]:
-    """Materialize resolved BoxFill envelopes through the existing CAD IR blank contract.
-
-    The bridge copies only already-solved origins and dimensions. It does not
-    derive cavities, walls, tolerances, or a second placement decision.
-    """
+    """Materialize resolved BoxFill envelopes as open-top trays in CAD IR."""
 
     components: list[dict[str, object]] = []
     for index, module in enumerate(solved_plan.modules):
@@ -270,22 +272,30 @@ def _selection_bridge_components(
             continue
         instance_id = f"selection:{selected_variant_id}:{module.id}"
         body_id = f"body:{instance_id}"
+        cavity, cavity_operation = _open_top_tray_cavity(module, body_id, defaults)
+        source_asset_ids = sorted(
+            {
+                allocation.asset_id
+                for allocation in solved_plan.allocations
+                if allocation.module_id == module.id
+            }
+        )
         component = CadComponent(
             id=f"component:{instance_id}",
-            name=f"Selection - {module.name}",
+            name=f"Selection - {module.name} open tray",
             module_id=module.id,
             instance_id=instance_id,
-            functional_type="box_fill_selected_module",
+            functional_type="box_fill_selected_open_top_tray",
             body=CadBody(
                 id=body_id,
-                name=f"{module.name} selected module blank",
+                name=f"{module.name} selected open-top tray",
                 kind="rectangular_blank",
                 source_cell_instance_id=instance_id,
                 theoretical_origin=module.origin,
                 theoretical_size=module.size,
                 printable_origin=module.origin,
                 printable_size=module.size,
-                cavities=(),
+                cavities=(cavity,),
                 face_classifications=(),
                 applied_tolerances=(),
                 operations=(
@@ -299,6 +309,7 @@ def _selection_bridge_components(
                             "coordinate_frame": "scene.frame",
                         },
                     ),
+                    cavity_operation,
                 ),
             ),
             metadata={
@@ -308,8 +319,16 @@ def _selection_bridge_components(
                 "layer_id": module.layer_id,
                 "orientation": module.orientation,
                 "selected_variant_id": selected_variant_id,
-                "selection_bridge": "p28_selected_module_blank.v0",
-                "geometry_status": "rectangular_blanks_only",
+                "selection_bridge": "p31_open_top_tray_from_selected_module.v0",
+                "geometry_status": "open_top_tray_candidate",
+                "source_asset_ids": source_asset_ids,
+                "tray_projection": {
+                    "policy": "open_top_tray_from_selected_module.v0",
+                    "wall_thickness_mm": defaults.wall_thickness_mm,
+                    "floor_thickness_mm": defaults.floor_thickness_mm,
+                    "cavity_id": cavity.id,
+                    "cavity_size_mm": {"x": cavity.size.x, "y": cavity.size.y, "z": cavity.size.z},
+                },
             },
         )
         components.append(component.to_dict())
@@ -319,6 +338,57 @@ def _selection_bridge_components(
         )
     return components
 
+
+def _open_top_tray_cavity(
+    module: BoxFillModule,
+    body_id: str,
+    defaults: GeometryDefaults,
+) -> tuple[CadCavity, CadOperation]:
+    """Derive one generic top-open cavity without asset-specific fit claims."""
+
+    wall = defaults.wall_thickness_mm
+    floor = defaults.floor_thickness_mm
+    cavity_size = Dimension3D(
+        x=module.size.x - (2 * wall),
+        y=module.size.y - (2 * wall),
+        z=module.size.z - floor,
+    )
+    if min(cavity_size.x, cavity_size.y, cavity_size.z) <= 0:
+        raise LocalComposerError(
+            "P31_TRAY_CAVITY_NOT_FEASIBLE: selected module "
+            f"{module.id!r} cannot retain {wall:.2f} mm walls and a {floor:.2f} mm floor."
+        )
+
+    cavity_id = f"{module.id}:open-top-cavity"
+    cavity = CadCavity(
+        id=cavity_id,
+        functional_type=FunctionalType.FREE.value,
+        local_origin=Point3D(x=wall, y=wall, z=floor),
+        size=cavity_size,
+        clearance_mm=0.0,
+        clearance_source="p31_open_top_tray_no_asset_fit_clearance",
+        comment="P31 generic open-top tray cavity; source assets remain traceability only.",
+        features=(),
+        status="planned_for_fusion_smoke",
+        fusion_generation="planned_for_fusion_smoke",
+    )
+    operation = CadOperation(
+        id=f"{body_id}:{cavity_id}:{CAVITY_OPERATION_KIND}",
+        kind=CAVITY_OPERATION_KIND,
+        target_id=body_id,
+        parameters={
+            "cavity_id": cavity_id,
+            "functional_type": FunctionalType.FREE.value,
+            "local_origin_mm": {"x": wall, "y": wall, "z": floor},
+            "size_mm": {"x": cavity_size.x, "y": cavity_size.y, "z": cavity_size.z},
+            "clearance_mm": 0.0,
+            "clearance_source": "p31_open_top_tray_no_asset_fit_clearance",
+            "coordinate_frame": "body.local",
+            "execution_status": "planned_for_fusion_smoke",
+            "fusion_generation": "planned_for_fusion_smoke",
+        },
+    )
+    return cavity, operation
 
 def _draft_to_engine(
     raw_draft: object,

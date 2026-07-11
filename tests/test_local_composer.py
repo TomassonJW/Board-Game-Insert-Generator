@@ -35,7 +35,7 @@ class LocalComposerTests(unittest.TestCase):
         self.assertEqual([starter["id"] for starter in starters], ["mixed-box", "card-game", "board-game"])
         self.assertTrue(all(portfolio_from_draft(starter["draft"])["recommended_variant_id"] for starter in starters))
 
-    def test_export_materializes_the_explicit_selection_as_fusion_consumable_blanks(self) -> None:
+    def test_export_materializes_the_explicit_selection_as_open_top_trays(self) -> None:
         bundle = export_from_draft(starter_draft())
 
         self.assertEqual(bundle["schema_version"], LOCAL_COMPOSER_EXPORT_SCHEMA_V0)
@@ -43,7 +43,7 @@ class LocalComposerTests(unittest.TestCase):
         self.assertIn("box_fill_variant_selection", bundle["cad_ir"]["metadata"])
         self.assertEqual(
             bundle["cad_ir"]["metadata"]["local_composer"]["materialization_status"],
-            "prepared_for_fusion_smoke",
+            "prepared_open_top_trays_for_fusion_smoke",
         )
         self.assertEqual(
             bundle["selection"]["selected_variant_id"],
@@ -56,13 +56,34 @@ class LocalComposerTests(unittest.TestCase):
             [component["module_id"] for component in components],
             [module["id"] for module in modules],
         )
-        self.assertTrue(
-            all(component["body"]["kind"] == "rectangular_blank" for component in components)
-        )
+        self.assertTrue(all(component["body"]["kind"] == "rectangular_blank" for component in components))
+        self.assertTrue(all(component["metadata"]["geometry_status"] == "open_top_tray_candidate" for component in components))
+        for component, module in zip(components, modules):
+            body = component["body"]
+            self.assertEqual(len(body["cavities"]), 1)
+            cavity = body["cavities"][0]
+            self.assertEqual(cavity["functional_type"], "free")
+            self.assertEqual(cavity["local_origin_mm"], {"x": 1.2, "y": 1.2, "z": 1.2})
+            self.assertEqual(cavity["size_mm"]["x"], module["size_mm"]["x"] - 2.4)
+            self.assertEqual(cavity["size_mm"]["y"], module["size_mm"]["y"] - 2.4)
+            self.assertEqual(cavity["size_mm"]["z"], module["size_mm"]["z"] - 1.2)
+            self.assertEqual(
+                [operation["kind"] for operation in body["operations"]],
+                ["create_rectangular_prism", "subtract_rectangular_cavity"],
+            )
         plan = generation_plan_from_cad_ir(bundle["cad_ir"])
         self.assertEqual(len(plan.blanks), len(modules))
+        self.assertEqual(len(plan.cavity_cuts), len(modules))
+        for cut in plan.cavity_cuts:
+            self.assertAlmostEqual(cut.retained_floor_mm, 1.2)
         self.assertEqual(plan.blanks[0].origin_mm.to_dict(), modules[0]["origin_mm"])
 
+    def test_export_refuses_a_selected_module_that_cannot_retain_walls_and_floor(self) -> None:
+        draft = starter_draft()
+        draft["candidates"][0]["size_mm"] = {"x": 2.4, "y": 50, "z": 20}
+
+        with self.assertRaisesRegex(LocalComposerError, "P31_TRAY_CAVITY_NOT_FEASIBLE"):
+            export_from_draft(draft)
     def test_rejects_unknown_layer_before_engine_execution(self) -> None:
         draft = starter_draft()
         draft["candidates"][0]["allowed_layers"] = ["missing"]

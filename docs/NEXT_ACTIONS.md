@@ -8,24 +8,22 @@ Statut : `active` pour les missions non gatees. Les missions Fusion et physiques
 
 ## Etat courant
 
-P30 est integre : le Studio est la surface principale, avec une boite visuelle vivante, cinq etapes progressives et un mode expert explicite. P28 reste une preuve de raccord technique seulement ; ses blocs ne sont pas des bacs.
-
-ADR-0042 fixe Studio principal / palette Fusion secondaire. ADR-0043 est maintenant proposee pour le premier passage vers des bacs ouverts fonctionnels depuis une selection P21.
+P31 remplace les blocks P28 par de vrais bacs ouverts dans la CAD IR : une enveloppe P21, quatre parois, un fond conserve et une cavite unique ouverte en haut. Le Studio les decrit comme `a verifier dans Fusion`, jamais comme imprimes ou valides.
 
 ## Gate humaine active
 
-`P31-GATE - Strategie de bacs fonctionnels` est preparee dans `docs/P31_FUNCTIONAL_TRAY_GATE.md`. Elle recommande un bac ouvert par module P21 : parois et fond issus des defaults existants, cavite unique top-open, refus structure si une cavite positive ne tient pas.
+`P31-FUSION-SMOKE - Premiere cavite issue d une selection P21` est maintenant la seule gate active. Le protocole est `docs/P31_FUSION_OPEN_TRAY_SMOKE.md`. Codex prepare l add-in et la scene apres integration ; Thomas devra seulement ouvrir Fusion, lancer BGIG et constater les trois bacs.
 
 ## Hors scope maintenu
 
 - Fusion ne devient jamais source de verite du plan.
-- Aucun score, placement ou tolerance existante ne change en P31.
-- Aucun compartiment multi-assets, encoche, arrondi, couvercle, clip ou charniere ne sera ajoute dans ce premier pas.
-- Aucun statut `fusion-validated` ou `print-validated` ne sera utilise sans preuve correspondante.
+- Aucun score, placement ou tolerance existante ne change.
+- Aucun compartiment multi-assets, encoche, arrondi, couvercle, clip ou charniere n est ajoute.
+- Aucun statut `print-validated` ne sera utilise sans prototype mesure.
 
 ## Prochaine action
 
-Attendre `P31 approuve`. Ensuite seulement, implementer `open_top_tray_from_selected_module.v0`, ses tests moteur/CAD IR et la preparation du smoke Fusion de cavites.
+Apres retour `P31 Fusion OK` ou `P31 Fusion KO`, qualifier le comportement Fusion. En cas de OK, la suite autonome est P32 : palette Fusion secondaire claire et concise.
 
 ## Fin de chaque mission
 

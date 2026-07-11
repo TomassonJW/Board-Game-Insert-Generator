@@ -112,10 +112,12 @@ class CliTests(unittest.TestCase):
         self.assertIn("Local composer selection export OK", stdout.getvalue())
         self.assertEqual(
             payload["metadata"]["local_composer"]["geometry_status"],
-            "rectangular_blanks_only",
+            "open_top_tray_candidates",
         )
         self.assertEqual(len(payload["components"]), 3)
         self.assertEqual(len(plan.blanks), 3)
+        self.assertEqual(len(plan.cavity_cuts), 3)
+        self.assertIn("open-top tray candidates", stdout.getvalue())
         self.assertEqual(
             selection["selected_variant_id"],
             payload["metadata"]["box_fill_variant_selection"]["selected_variant_id"],

@@ -481,7 +481,7 @@ def _render_box_fill_variant_dashboard(argv: list[str]) -> int:
 
 def _export_local_composer_selection(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(
-        description="Export a selected local composer starter as Fusion-consumable rectangular-blank CAD IR."
+        description="Export a selected local composer starter as Fusion-consumable open-top tray CAD IR."
     )
     parser.add_argument(
         "--starter",
@@ -526,7 +526,7 @@ def _export_local_composer_selection(argv: list[str]) -> int:
         f"- Variant: {bundle['selection']['selected_variant_id']}\n"
         f"- Output: {output_path}\n"
         f"- Components: {len(bundle['cad_ir']['components'])}\n"
-        "- Geometry: rectangular blanks only; Fusion and print validation remain pending."
+        "- Geometry: open-top tray candidates with walls, floor and one generic cavity each; Fusion and print validation remain pending."
     )
     return 0
 
