@@ -572,3 +572,10 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
   build Studio sont verifies ; aucune validation Fusion ou impression.
 - C-SOLVER : P41 reste responsable du placement X/Y/Z, du support continu et du
   volume restant.
+
+## P41 global closure update
+
+- C-SOLVER : implemented-core pour placement X/Y/Z, collisions et conservation de volume.
+- C-RESERVATION : pile superieure placee comme reservation non imprimable.
+- C-QUALITY : 50 bacs, 72 familles, 25 plats, remplissages exacts et API testes.
+- C-FUSION : reste P42.

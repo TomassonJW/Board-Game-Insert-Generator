@@ -1477,7 +1477,7 @@ impose les dependances de release suivantes.
   technique, un bac creux, un separateur ou un remplissage plein.
 - Validation : conservation du volume, absence de collision, benchmarks de
   grande cardinalite et diagnostics d'arret.
-- Statut : `ready-after-p40`.
+- Statut : `done`, `implemented-core`, `implemented-loopback-adapter`, `implemented-local-ui`.
 
 ### P42 - Geometrie fonctionnelle V0.1
 

@@ -174,3 +174,4 @@ Tests, cartes backlog ou gates humaines a preparer.
   avant le solveur global de boite.
 - ADR-0050-flat-stack-reservation-before-global-placement.md - reservation de la
   pile superieure avant le placement global.
+- ADR-0051-global-volume-closure-plan-v1.md - plan de fermeture de volume global V0.1.

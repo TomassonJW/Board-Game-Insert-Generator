@@ -18,7 +18,7 @@ de support qui devra etre resolu au placement global.
 
 ## Prochaine mission prete
 
-`P41 - Solveur de fermeture du volume`.
+`P42 - Geometrie fonctionnelle V0.1`.
 
 Resultat attendu : placer bacs et reservation de pile dans X/Y/Z, appliquer le
 jeu global et qualifier chaque volume restant sans collision ni depassement.

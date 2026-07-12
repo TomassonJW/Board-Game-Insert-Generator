@@ -41,10 +41,10 @@ class FrontendStudioContractTests(unittest.TestCase):
             self.assertNotIn(legacy_concept, self.source)
 
     def test_build_reserves_and_explains_containers_and_upper_stack(self) -> None:
-        for marker in ("reserveFlatStack", "buildPlan", "DerivationResult", "Bacs et pile supérieure préparés"):
+        for marker in ("solveVolume", "buildPlan", "DerivationResult", "Toute la boîte est planifiée"):
             self.assertIn(marker, self.source)
-        self.assertIn("/project-v1/reserve-flat-stack", self.api)
-        self.assertIn("Hauteur laissée aux bacs", self.source)
+        self.assertIn("/project-v1/solve-volume", self.api)
+        self.assertIn("région(s) restante(s) classée(s)", self.source)
         self.assertNotIn("Le prochain lot calcule automatiquement les bacs", self.source)
 
     def test_client_validation_covers_groups_flats_and_fill_elements(self) -> None:

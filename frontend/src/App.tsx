@@ -1,5 +1,5 @@
 import { type ChangeEvent, useEffect, useMemo, useState } from 'react'
-import { ApiError, loadProjectV1Starter, normalizeProjectV1, reserveFlatStack } from './api'
+import { ApiError, loadProjectV1Starter, normalizeProjectV1, solveVolume } from './api'
 import type {
   ContainerGroupDraft,
   FillElementDraft,
@@ -9,7 +9,7 @@ import type {
   ProjectV1Draft,
 } from './project_v1'
 import { type ProjectIssue, validateProjectV1 } from './project_v1_validation'
-import type { FlatStackReservationPlan } from './flat_stack_reservation'
+import type { VolumeClosurePlan } from './volume_closure'
 import type { Dimension } from './types'
 
 const shapeOptions: Array<{ value: ProjectShapeKind; label: string }> = [
@@ -43,7 +43,7 @@ export default function App() {
   const [message, setMessage] = useState('Préparation de ton projet…')
   const [error, setError] = useState<string>()
   const [attemptedBuild, setAttemptedBuild] = useState(false)
-  const [buildPlan, setBuildPlan] = useState<FlatStackReservationPlan>()
+  const [buildPlan, setBuildPlan] = useState<VolumeClosurePlan>()
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
@@ -172,11 +172,11 @@ export default function App() {
     setBusy(true)
     setError(undefined)
     try {
-      const result = await reserveFlatStack(project)
+      const result = await solveVolume(project)
       setBuildPlan(result)
-      setMessage(result.summary.status === 'blocked'
+      setMessage(result.summary.status === 'impossible'
         ? 'BGIG a trouvé un bac qui ne peut pas tenir avec ces mesures. Corrige le blocage indiqué, puis relance le calcul.'
-        : `${result.summary.ready_container_count} bac(s) et la pile supérieure sont réservés. La prochaine étape placera tout le volume de la boîte.`)
+        : `${result.summary.placed_container_count} bac(s) et la pile supérieure sont réservés. La prochaine étape placera tout le volume de la boîte.`)
     } catch (reason) {
       setError(formatError(reason))
     } finally {
@@ -290,11 +290,9 @@ function FillElementRow({ element, groups, onChange, onDelete }: { element: Fill
   return <article className="fill-row"><TextField label="Nom" value={element.name} onChange={(name) => onChange({ name })} /><label className="field"><span>Type</span><select value={element.kind} onChange={(event) => onChange({ kind: event.target.value as FillElementDraft['kind'] })}>{Object.entries(fillKindLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label><label className="field"><span>Taille</span><select value={element.mode} onChange={(event) => onChange({ mode: event.target.value as FillElementDraft['mode'], dimensions_mm: event.target.value === 'auto' ? null : { x: 10, y: 10, z: 10 } })}><option value="auto">À calculer</option><option value="exact">Je donne les mesures</option></select></label><label className="field"><span>Bac associé</span><select value={element.container_group_id ?? ''} onChange={(event) => onChange({ container_group_id: event.target.value || null })}><option value="">Dans toute la boîte</option>{groups.map((group) => <option key={group.id} value={group.id}>{group.name}</option>)}</select></label>{element.dimensions_mm && <div className="fill-dimensions"><DimensionFields labels={['Largeur', 'Profondeur', 'Hauteur']} value={element.dimensions_mm} onChange={(axis, value) => onChange({ dimensions_mm: { ...element.dimensions_mm!, [axis]: value } })} /></div>}<button className="delete-button" aria-label={`Supprimer ${element.name}`} onClick={onDelete}>×</button></article>
 }
 
-function DerivationResult({ plan }: { plan: FlatStackReservationPlan }) {
-  const blocked = plan.summary.status === 'blocked'
-  const containers = plan.container_plan.containers
-  const flatStack = plan.flat_stack
-  return <section className={`derivation-result ${blocked ? 'blocked' : 'ready'}`} aria-live="polite"><header><div><p className="eyebrow">Plan préparé</p><h2>{blocked ? 'Une mesure est à ajuster' : 'Bacs et pile supérieure préparés'}</h2><p>{blocked ? 'Un bac ou la pile de plateaux ne tient pas dans la boîte. Les mesures ci-dessous expliquent quoi corriger.' : 'Les bacs ont été recalculés sous les plateaux et livrets. Le placement complet arrive juste après.'}</p></div><span>{plan.summary.ready_container_count} bac(s) prêts</span></header>{containers.map((container) => <article key={container.container_group_id} className="derived-container"><div><strong>{container.container_name}</strong><span>{container.compartments.length ? `${container.compartments.length} logement(s)` : 'À dimensionner avec le remplissage'}</span></div><b>{container.outer_dimensions_mm ? formatDimension(container.outer_dimensions_mm) : 'À calculer plus tard'}</b>{container.compartments.map((compartment) => <small key={compartment.id}>{compartment.content_name} : {compartment.quantity.declared_count} pièce(s), {compartment.quantity.pile_count} pile(s)</small>)}{container.blockers.map((blocker) => <p className="derivation-blocker" key={blocker}>{blocker}</p>)}</article>)}{flatStack.status !== 'not_required' && <article className="flat-stack-result"><div><strong>Plateaux et livrets au-dessus</strong><span>{flatStack.items.length} famille(s), {plan.summary.flat_copy_count} élément(s)</span></div><b>{flatStack.reservation_size_mm ? formatDimension(flatStack.reservation_size_mm) : 'À calculer'}</b><p>Hauteur laissée aux bacs : {formatMillimeters(flatStack.storage_height_mm)}.</p><small>{supportLabel(plan.support_requirement.status)} — {plan.support_requirement.note}</small></article>}<p className="derivation-next">Prochaine étape automatique : placer les bacs, compléter le volume et garantir le support réel des plateaux.</p></section>
+function DerivationResult({ plan }: { plan: VolumeClosurePlan }) {
+  const blocked = plan.summary.status === 'impossible'
+  return <section className={`derivation-result ${blocked ? 'blocked' : 'ready'}`} aria-live="polite"><header><div><p className="eyebrow">Plan complet</p><h2>{blocked ? 'Le volume ne peut pas encore être fermé' : 'Toute la boîte est planifiée'}</h2><p>{blocked ? 'Les blocages ci-dessous indiquent quoi modifier.' : 'Les bacs et la pile sont placés. Chaque volume restant est classé avant la génération CAD.'}</p></div><span>{plan.summary.placed_container_count} bac(s) placés</span></header>{plan.placements.map((item) => <article key={item.id} className="derived-container"><div><strong>{item.name}</strong><span>Position : {formatDimension(item.origin_mm)}</span></div><b>{formatDimension(item.size_mm)}</b></article>)}<article className="flat-stack-result"><div><strong>Vérifications</strong><span>{plan.summary.classified_free_region_count} région(s) restante(s) classée(s)</span></div><b>{plan.validation.volume_conserved ? 'Volume cohérent' : 'Volume incohérent'}</b><p>{plan.support.note}</p><small>{plan.summary.hollow_fill_candidate_count} volume(s) creux proposés ; {plan.summary.solid_fill_candidate_count} volume(s) plein(s) demandé(s).</small></article>{plan.blockers.map((blocker) => <p className="derivation-blocker" key={blocker}>{blocker}</p>)}<p className="derivation-next">Étape suivante automatique : matérialiser ce plan en CAD puis dans Fusion.</p></section>
 }
 function ProjectPreview({ project, metrics }: { project: ProjectV1Draft; metrics: ReturnType<typeof projectMetrics> }) {
   const width = Math.max(project.box.inner_dimensions_mm.x, 1)
@@ -354,7 +352,6 @@ function projectMetrics(project: ProjectV1Draft) {
 }
 
 function formatMillimeters(value: number) { return `${Math.round(value * 10) / 10} mm` }
-function supportLabel(status: FlatStackReservationPlan['support_requirement']['status']) { return ({ not_required: 'Pas de support supérieur à prévoir', blocked: 'Support bloqué', area_budget_sufficient_pending_placement: 'Surface totale suffisante à confirmer', support_extension_required: 'Support à compléter' } as Record<FlatStackReservationPlan['support_requirement']['status'], string>)[status] }
 function formatDimension(value: Dimension) { return `${formatMillimeters(value.x)} × ${formatMillimeters(value.y)} × ${formatMillimeters(value.z)}` }
 function formatVolume(value: number) { return `${Math.round(value / 1000).toLocaleString('fr-FR')} cm³` }
 function safeFileName(value: string) { return value.trim().toLowerCase().replace(/[^a-z0-9]+/gi, '-').replace(/(^-|-$)/g, '') || 'bgig' }

@@ -79,6 +79,22 @@ class ProjectV1ApiTests(unittest.TestCase):
         self.assertTrue(result["source"]["migrated"])
         self.assertIn(result["summary"]["status"], {"ready_for_p41", "blocked"})
 
+    def test_solves_the_complete_volume_from_a_migratable_project(self) -> None:
+        payload = json.dumps(starter_draft()).encode("utf-8")
+        self.connection.request(
+            "POST",
+            "/api/project-v1/solve-volume",
+            body=payload,
+            headers={"Content-Type": "application/json", "Content-Length": str(len(payload))},
+        )
+        response = self.connection.getresponse()
+        result = json.loads(response.read())
+
+        self.assertEqual(response.status, 200)
+        self.assertEqual(result["schema_version"], "bgig.volume_closure.v1")
+        self.assertTrue(result["source"]["migrated"])
+        self.assertIn(result["summary"]["status"], {"constructed_plan", "impossible"})
+
     def test_rejects_invalid_v1_project_with_a_draft_error(self) -> None:
         invalid = {"schema_version": PROJECT_SCHEMA_V1}
         payload = json.dumps(invalid).encode("utf-8")

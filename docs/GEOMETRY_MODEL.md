@@ -339,3 +339,6 @@ La pile plateaux/livrets est une `Reservation` non imprimable : son empreinte et
 sa hauteur diminuent le volume de stockage disponible. Son support est une
 contrainte de placement, pas une feature geometrique ou un corps imprimable.
 P41 devra prouver la continuite de cette surface apres placement.
+## P41 - Regions libres
+
+Chaque region libre exacte est classee comme jeu technique ou candidat de remplissage avant toute materialisation CAD.

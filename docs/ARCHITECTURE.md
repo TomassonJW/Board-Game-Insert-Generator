@@ -268,3 +268,6 @@ et n importe aucune API Fusion. ADR-0049 fixe cette frontiere.
 plateaux/livrets, derive la hauteur restante et demande a P39 des bacs sous cette
 contrainte. Il transmet une exigence de support a P41 sans produire de geometrie
 ni declarer un support physique valide. ADR-0050 fixe ce contrat.
+## P41 - Fermeture globale
+
+olume_closure.py place les bacs et reservations, classifie les regions libres et reste un moteur Python pur. P42 seul produit le CAD IR/Fusion.

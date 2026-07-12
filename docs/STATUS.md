@@ -1133,3 +1133,7 @@ Aucun statut Fusion ou impression n est revendique.
 
 Prochaine mission : P41, placement global, support continu et fermeture du
 volume.
+
+## P41 - Fermeture de volume
+
+Statut : done, plan global place, regions classees, collisions et conservation verifiees. Preuves : 300 tests et recette locale OK. Prochaine mission : P42 CAD IR/Fusion.
