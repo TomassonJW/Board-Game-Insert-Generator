@@ -1558,7 +1558,7 @@ impose les dependances de release suivantes.
   exterieures verrouillees et preference parois/fond en mode avance.
 - Acceptation : modifier l enveloppe finale ne modifie jamais les dimensions ou
   positions locales des cavites sans recalcul explicite de leur arrangement.
-- Statut : `ready`.
+- Statut : `done`, `implemented-core`, `implemented-loopback-adapter`, `print-validated: false`.
 
 ### P56 - Implementation de l editeur premium complet
 
@@ -1570,7 +1570,7 @@ impose les dependances de release suivantes.
   avance, textes UTF-8 corrects et tests d interactions reelles.
 - Acceptation : les projets vide, simple, multi-bacs, avec plateaux et grande
   cardinalite se saisissent sans JSON et sans dialogue Fusion technique.
-- Statut : `blocked-by-P55`.
+- Statut : `ready`.
 
 ### P57 - Solveur de partition et expansion des bacs
 

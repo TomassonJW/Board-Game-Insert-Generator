@@ -1217,3 +1217,27 @@ runtimes de controle Windows echouent avant connexion ; P56 ne pourra pas etre
 qualifie produit sans preuve visuelle du frontend reel.
 
 Prochaine mission : P55, contrat executable cavite/minimum/final.
+
+## P55 - Contrat executable cavites fixes / enveloppes extensibles
+
+Statut : done, implemented-core, implemented-loopback-adapter,
+print-validated: false.
+
+Le schema bgig.project.v1 accepte desormais, par groupe de bac, les axes
+extensibles, les dimensions exterieures verrouillees et la preference de surplus.
+Ces champs sont additifs : les projets P37 et les migrations P23 recoivent des
+valeurs par defaut compatibles.
+
+Le module pur expandable_envelope produit le contrat
+bgig.expandable_envelope_contract.v1. Il fige les dimensions et origines locales
+des cavites P39 dans le repere de l enveloppe minimale, distingue enveloppe
+minimale et finale, trace le surplus X/Y autour du repere et le surplus Z sous ce
+repere, puis refuse minimum depasse, axe interdit, verrou incoherent ou limite de
+boite depassee. Aucun corps automatique, placement global, CAD ou calcul Fusion
+n est produit. La route locale POST /api/project-v1/derive-envelopes expose ce
+rapport.
+
+Preuves : 321 tests Python passent, dont formes rond/carre/rectangle/cartes/
+cube/pion/custom, quantites, plusieurs cavites par groupe, migration additive,
+immutabilite du cavity_layout, contraintes, erreurs et API HTTP. P56 est la
+prochaine mission ready ; P57 reste responsable de la partition conjointe.

@@ -21,6 +21,7 @@ FILL_ELEMENT_KINDS = frozenset({"hollow", "solid", "separator"})
 FILL_MODES = frozenset({"auto", "exact"})
 MEASUREMENT_CONFIDENCE = frozenset({"exact", "approximate"})
 SOLVER_PREFERENCES = frozenset({"balanced", "compact", "accessible", "print_simple"})
+SURPLUS_PREFERENCES = frozenset({"balanced", "walls", "floor"})
 
 
 class ProjectContractError(ValueError):
@@ -279,7 +280,14 @@ def _validate_container_groups(values: list[object]) -> list[dict[str, object]]:
     for index, value in enumerate(values):
         field = f"project.container_groups[{index}]"
         raw = _mapping(value, field)
-        _reject_unknown(raw, {"id", "name", "wall_thickness_mm", "floor_thickness_mm"}, field)
+        _reject_unknown(
+            raw,
+            {
+                "id", "name", "wall_thickness_mm", "floor_thickness_mm",
+                "expansion_axes", "locked_outer_dimensions_mm", "surplus_preference",
+            },
+            field,
+        )
         group_id = _required_text(raw, "id", field)
         if group_id in ids:
             raise ProjectContractError(f"{field}.id duplicates '{group_id}'.")
@@ -290,9 +298,42 @@ def _validate_container_groups(values: list[object]) -> list[dict[str, object]]:
                 "name": _required_text(raw, "name", field),
                 "wall_thickness_mm": _optional_positive_number(raw.get("wall_thickness_mm"), field),
                 "floor_thickness_mm": _optional_positive_number(raw.get("floor_thickness_mm"), field),
+                "expansion_axes": _validate_expansion_axes(raw.get("expansion_axes"), field),
+                "locked_outer_dimensions_mm": _validate_locked_dimensions(
+                    raw.get("locked_outer_dimensions_mm"), field
+                ),
+                "surplus_preference": _optional_enum(
+                    raw.get("surplus_preference"), SURPLUS_PREFERENCES, "balanced",
+                    f"{field}.surplus_preference",
+                ),
             }
         )
     return result
+
+
+def _validate_expansion_axes(value: object, field: str) -> dict[str, bool]:
+    if value is None:
+        return {"x": True, "y": True, "z": True}
+    raw = _mapping(value, f"{field}.expansion_axes")
+    _reject_unknown(raw, {"x", "y", "z"}, f"{field}.expansion_axes")
+    result: dict[str, bool] = {}
+    for axis in ("x", "y", "z"):
+        axis_value = raw.get(axis, True)
+        if not isinstance(axis_value, bool):
+            raise ProjectContractError(f"{field}.expansion_axes.{axis} must be a boolean.")
+        result[axis] = axis_value
+    return result
+
+
+def _validate_locked_dimensions(value: object, field: str) -> dict[str, float | None]:
+    if value is None:
+        return {"x": None, "y": None, "z": None}
+    raw = _mapping(value, f"{field}.locked_outer_dimensions_mm")
+    _reject_unknown(raw, {"x", "y", "z"}, f"{field}.locked_outer_dimensions_mm")
+    return {
+        axis: _optional_positive_number(raw.get(axis), f"{field}.locked_outer_dimensions_mm")
+        for axis in ("x", "y", "z")
+    }
 
 
 def _validate_contents(values: list[object], group_ids: set[str]) -> list[dict[str, object]]:

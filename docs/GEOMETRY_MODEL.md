@@ -369,3 +369,15 @@ Invariants :
 
 La CAD IR transporte minimum, final, cavites et repartition du surplus. Fusion ne
 recalcule aucune de ces decisions.
+
+## P55 - Repere stable des cavites et enveloppes extensibles
+
+Une cavite P55 est exprimee dans le repere minimum_outer_envelope.local. Son
+origine locale, ses dimensions et son jeu sont figes par la derivation P39.
+L enveloppe finale contient ce repere sans le deformer : le surplus X/Y est
+distribue autour de lui et le surplus Z sous lui.
+
+La translation du repere minimal dans l enveloppe finale est reportee separement
+par minimum_envelope_origin_in_final_mm. Cette translation ne constitue pas un
+recalcul de l arrangement local. P57 choisira conjointement enveloppes finales et
+placements ; P59 materialisera ensuite exactement ce plan.

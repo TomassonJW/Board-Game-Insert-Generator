@@ -63,6 +63,23 @@ class ProjectV1ApiTests(unittest.TestCase):
         self.assertGreaterEqual(result["summary"]["requested_container_count"], 1)
         self.assertIn(result["summary"]["status"], {"ready_for_p40", "blocked"})
 
+    def test_exposes_the_p55_expandable_envelope_contract(self) -> None:
+        payload = json.dumps(starter_draft()).encode("utf-8")
+        self.connection.request(
+            "POST",
+            "/api/project-v1/derive-envelopes",
+            body=payload,
+            headers={"Content-Type": "application/json", "Content-Length": str(len(payload))},
+        )
+        response = self.connection.getresponse()
+        result = json.loads(response.read())
+
+        self.assertEqual(response.status, 200)
+        self.assertEqual(result["schema_version"], "bgig.expandable_envelope_contract.v1")
+        self.assertEqual(result["summary"]["automatic_body_count"], 0)
+        self.assertGreaterEqual(result["summary"]["fixed_cavity_count"], 1)
+        self.assertIn(result["summary"]["status"], {"ready_for_p56", "blocked"})
+
     def test_reserves_the_upper_flat_stack_from_a_migratable_project(self) -> None:
         payload = json.dumps(starter_draft()).encode("utf-8")
         self.connection.request(

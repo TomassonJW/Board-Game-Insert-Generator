@@ -26,6 +26,10 @@ from board_game_insert_generator.mechanism import (
     sliding_lid_readiness,
 )
 from board_game_insert_generator.container_derivation import derive_container_plan
+from board_game_insert_generator.expandable_envelope import (
+    ExpandableEnvelopeError,
+    derive_expandable_envelope_contract,
+)
 from board_game_insert_generator.flat_stack_reservation import derive_flat_stack_reservation
 from board_game_insert_generator.volume_closure import solve_project_volume
 from board_game_insert_generator.volume_cad import build_functional_cad
@@ -241,6 +245,24 @@ def derive_containers_v1(raw_project: object) -> dict[str, object]:
     try:
         return derive_container_plan(raw_project)
     except ProjectContractError as exc:
+        raise LocalComposerError(str(exc)) from exc
+
+
+def derive_expandable_envelopes_v1(raw_request: object) -> dict[str, object]:
+    """Return the P55 fixed-cavity and expandable-envelope contract."""
+
+    request = _mapping(raw_request, "request")
+    if "project" in request:
+        project = request["project"]
+        proposals = request.get("final_outer_dimensions_by_group")
+    else:
+        project = raw_request
+        proposals = None
+    try:
+        return derive_expandable_envelope_contract(
+            project, final_outer_dimensions_by_group=proposals
+        )
+    except (ProjectContractError, ExpandableEnvelopeError) as exc:
         raise LocalComposerError(str(exc)) from exc
 
 
@@ -1033,6 +1055,8 @@ class LocalComposerRequestHandler(BaseHTTPRequestHandler):
                 self._send_json(HTTPStatus.OK, normalize_project_v1(payload))
             elif route == "/api/project-v1/derive-containers":
                 self._send_json(HTTPStatus.OK, derive_containers_v1(payload))
+            elif route == "/api/project-v1/derive-envelopes":
+                self._send_json(HTTPStatus.OK, derive_expandable_envelopes_v1(payload))
             elif route == "/api/project-v1/reserve-flat-stack":
                 self._send_json(HTTPStatus.OK, reserve_flat_stack_v1(payload))
             elif route == "/api/project-v1/solve-volume":

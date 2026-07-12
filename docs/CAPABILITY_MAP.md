@@ -636,3 +636,16 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
   Fusion modifiee.
 - C-ASSET / C-RESERVATION / C-MODULE : composants et champs UX specifies ; le
   contrat executable reste P55.
+
+## P55 executable expandable-envelope update
+
+- C-ASSET / C-CAVITY : implemented-core pour les sept formes V0.1, leurs jeux,
+  quantites et cavites calibrees conservees dans un repere local stable.
+- C-MODULE : implemented-core pour la distinction minimum_outer_envelope /
+  final_outer_envelope, les axes extensibles, verrous et preferences de surplus.
+- C-QUALITY : invariant cavity_layout immuable pendant l expansion, zero corps
+  automatique, erreurs actionnables, migration additive et API testes.
+- C-SOLVER / C-RESERVATION : P57 reste responsable de la partition globale,
+  des jeux entre bacs, alignements et support de pile.
+- C-CAD-IR / C-FUSION-UI : inchanges ; aucune validation Fusion ou impression
+  n est revendiquee.
