@@ -262,3 +262,9 @@ Le flux V0.1 est maintenant : `bgig.project.v1` ->
 P41 -> CAD IR/Fusion P42. `container_derivation.py` est un module Python pur :
 il dimensionne les bacs et logements requis, mais ne les place pas dans la boite
 et n importe aucune API Fusion. ADR-0049 fixe cette frontiere.
+## P40 - Reservation de pile superieure
+
+`flat_stack_reservation.py` est un module pur entre P39 et P41. Il reserve les
+plateaux/livrets, derive la hauteur restante et demande a P39 des bacs sous cette
+contrainte. Il transmet une exigence de support a P41 sans produire de geometrie
+ni declarer un support physique valide. ADR-0050 fixe ce contrat.

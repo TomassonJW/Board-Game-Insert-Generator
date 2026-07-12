@@ -1465,8 +1465,10 @@ impose les dependances de release suivantes.
 - Dependances : P39.
 - Objectif : reserver quantites, empreintes, hauteur et support au-dessus de tous
   les bacs sans depassement.
-- Validation : tests X/Y/Z, piles heterogenes et cas impossibles.
-- Statut : `ready-after-p39`.
+- Validation : tests de hauteur, empreinte, ordre, pile vide, debordements,
+  support explicable, recalcul des bacs, API locale et build Studio.
+- Statut : `done`, `implemented-core`, `implemented-loopback-adapter`,
+  `implemented-local-ui`.
 
 ### P41 - Solveur de fermeture du volume
 
@@ -1475,7 +1477,7 @@ impose les dependances de release suivantes.
   technique, un bac creux, un separateur ou un remplissage plein.
 - Validation : conservation du volume, absence de collision, benchmarks de
   grande cardinalite et diagnostics d'arret.
-- Statut : `blocked-by-p40`.
+- Statut : `ready-after-p40`.
 
 ### P42 - Geometrie fonctionnelle V0.1
 

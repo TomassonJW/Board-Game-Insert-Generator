@@ -172,3 +172,5 @@ Tests, cartes backlog ou gates humaines a preparer.
 
 - ADR-0049-derived-container-plan-before-box-solver.md - plan de bacs derive
   avant le solveur global de boite.
+- ADR-0050-flat-stack-reservation-before-global-placement.md - reservation de la
+  pile superieure avant le placement global.

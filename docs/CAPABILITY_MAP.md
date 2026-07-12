@@ -14,11 +14,11 @@ couvercles. Jusqu'a P43, seules les capacites ci-dessous sont des blockers actif
 
 | Blocker V0.1 | Etat reel | Prochaine preuve |
 | --- | --- | --- |
-| Saisie user-first sans objets moteur | implemented-local-ui | P40, reservation superieure |
-| Regroupement `Bac cible` | implemented-core et local-ui | P40, hauteur disponible |
-| Derivation des bacs et logements | implemented-core et local-ui | P40, pile superieure |
-| Pile plateaux/livrets superieure | reservation abstraite seulement | P40 |
-| Parois par bac et jeu commun | derives par bac ; jeu inter-bacs P41 | P40/P41 |
+| Saisie user-first sans objets moteur | implemented-local-ui | P41, placement complet |
+| Regroupement `Bac cible` | implemented-core et local-ui | P41, placement global |
+| Derivation des bacs et logements | implemented-core et local-ui | P41, volume complet |
+| Pile plateaux/livrets superieure | implemented-core et local-ui | P41, support continu |
+| Parois par bac et jeu commun | derives par bac ; jeu inter-bacs P41 | P41 |
 | Affectation de tout le volume | FreeVolume descriptif seulement | P41 |
 | Geometrie fonctionnelle complete | bacs ouverts generiques | P42 |
 | Parcours V0.1 accepte | absent | P43 |
@@ -561,3 +561,14 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
   API loopback et build Studio ; aucune validation Fusion ou impression.
 - C-RESERVATION et C-SOLVER : toujours P40 et P41 ; P39 ne place aucun bac et
   n applique pas le jeu entre bacs.
+
+## P40 upper flat-stack update
+
+- C-RESERVATION : `implemented-core` pour la pile superieure, son ordre,
+  empreinte, hauteur et reservation non imprimable.
+- C-MODULE : les bacs P39 sont recalcules sous la hauteur restante.
+- C-ACCESS : l ordre de pile est explicite ; le support physique reste P41.
+- C-QUALITY : piles vides/heterogenes, debordements, support, API loopback et
+  build Studio sont verifies ; aucune validation Fusion ou impression.
+- C-SOLVER : P41 reste responsable du placement X/Y/Z, du support continu et du
+  volume restant.

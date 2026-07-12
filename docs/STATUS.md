@@ -1114,3 +1114,22 @@ P40 reste responsable de la pile des plateaux et livrets. P41 reste responsable
 du placement global, du jeu entre bacs et du remplissage de volume.
 
 Prochaine mission : P40, pile superieure de plateaux et livrets.
+
+## P40 - Pile superieure plateaux et livrets
+
+Statut : `done`, `implemented-core`, `implemented-loopback-adapter`,
+`implemented-local-ui`, `print-validated: false`.
+
+La pile des plateaux/livrets est maintenant une reservation non imprimable : son
+ordre, son empreinte, son epaisseur totale et la hauteur restante sont calcules.
+Les bacs sont recalcules sous cette hauteur. Le resultat annonce un support a
+completer ou une aire candidate suffisante a confirmer ; il ne promet pas de
+support continu avant P41.
+
+Preuves : 293 tests Python passent, le build TypeScript/Vite passe et la recette
+locale reelle reserve 191.2 x 141.2 x 5.6 mm pour un plateau et un livret, laisse
+50.4 mm aux bacs et retourne `support_extension_required` de facon explicable.
+Aucun statut Fusion ou impression n est revendique.
+
+Prochaine mission : P41, placement global, support continu et fermeture du
+volume.

@@ -333,3 +333,9 @@ jeu autour des pieces, les cloisons internes, les parois externes et le fond.
 Elles ne constituent pas encore une cavite materialisee. Les formes non
 rectangulaires sont representees par une enveloppe rectangulaire sure en V0.1 ;
 les formes ergonomiques restent V0.2.
+## P40 - Reservation de pile superieure
+
+La pile plateaux/livrets est une `Reservation` non imprimable : son empreinte et
+sa hauteur diminuent le volume de stockage disponible. Son support est une
+contrainte de placement, pas une feature geometrique ou un corps imprimable.
+P41 devra prouver la continuite de cette surface apres placement.

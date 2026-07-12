@@ -195,3 +195,8 @@ P39 applique `content_clearance_mm` de chaque famille, ou le jeu global de
 contenu, dans le logement derive. `layout_clearance_mm` reste volontairement
 absent de ce calcul : ce jeu est entre bacs et sera applique une seule fois par
 P41 lors du placement global.
+## P40 - Jeu autour de la pile superieure
+
+P40 applique `layout_clearance_mm` autour de l empreinte de pile et une fois sous
+la pile, entre les plateaux/livrets et les bacs. La marge sous couvercle reste
+integree a `usable_height_mm` et n est pas ajoutee une seconde fois.

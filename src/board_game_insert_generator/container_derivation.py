@@ -15,7 +15,9 @@ from board_game_insert_generator.project_v1 import ProjectNormalization, normali
 CONTAINER_DERIVATION_SCHEMA_V1 = "bgig.container_derivation.v1"
 
 
-def derive_container_plan(raw_project: object) -> dict[str, object]:
+def derive_container_plan(
+    raw_project: object, *, max_container_height_mm: float | None = None
+) -> dict[str, object]:
     """Derive preliminary container sizes without mutating the user project.
 
     The result is deliberately useful even when a requested container is too
@@ -37,6 +39,8 @@ def derive_container_plan(raw_project: object) -> dict[str, object]:
 
     box_inner = _dimension(box["inner_dimensions_mm"])
     usable_height_mm = min(float(box["usable_height_mm"]), box_inner["z"])
+    if max_container_height_mm is not None:
+        usable_height_mm = min(usable_height_mm, float(max_container_height_mm))
     containers = [
         _derive_container(
             group=group,
@@ -67,6 +71,9 @@ def derive_container_plan(raw_project: object) -> dict[str, object]:
         "box_limits_mm": {
             "inner_dimensions_mm": box_inner,
             "usable_height_mm": _round(usable_height_mm),
+            "container_height_limit_mm": (
+                None if max_container_height_mm is None else _round(float(max_container_height_mm))
+            ),
         },
         "containers": containers,
         "summary": {
@@ -80,7 +87,11 @@ def derive_container_plan(raw_project: object) -> dict[str, object]:
             "preliminary_outer_volume_mm3": _round(
                 sum(_volume(_mapping(container["outer_dimensions_mm"])) for container in ready)
             ),
-            "next_step": "P40 must reserve the upper flat-item stack before final box placement.",
+            "next_step": (
+                "P40 must reserve the upper flat-item stack before final box placement."
+                if max_container_height_mm is None
+                else "P41 must place the height-constrained containers and close the remaining volume."
+            ),
         },
         "blockers": blockers,
         "limitations": [

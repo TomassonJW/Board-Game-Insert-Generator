@@ -156,3 +156,10 @@ input:focus, select:focus { border-color: #4caa81; background: #fff; box-shadow:
 .derivation-blocker { grid-column: 1 / -1; margin: 4px 0 0; padding: 8px 10px; border-radius: 9px; color: #9b4237; background: #fff0eb; font-size: .74rem; line-height: 1.4; }
 .derivation-next { margin: 0; color: #587165; font-size: .75rem; line-height: 1.45; }
 @media (max-width: 600px) { .derivation-result > header, .derived-container { grid-template-columns: 1fr; } .derived-container > b { white-space: normal; } }
+.flat-stack-result { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 5px 16px; padding: 14px; border: 1px solid #d9e7e0; border-radius: 12px; background: linear-gradient(135deg, #f7fbf6, #eef7f0); }
+.flat-stack-result > div { display: grid; gap: 3px; }
+.flat-stack-result strong { color: #2b503f; font-size: .9rem; }
+.flat-stack-result div span, .flat-stack-result small, .flat-stack-result p { color: #647a6c; font-size: .74rem; line-height: 1.42; }
+.flat-stack-result > b { align-self: start; color: #1d6749; font-size: .82rem; white-space: nowrap; }
+.flat-stack-result p, .flat-stack-result small { grid-column: 1 / -1; margin: 3px 0 0; }
+@media (max-width: 600px) { .flat-stack-result { grid-template-columns: 1fr; } .flat-stack-result > b { white-space: normal; } }

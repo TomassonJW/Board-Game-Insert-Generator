@@ -40,10 +40,11 @@ class FrontendStudioContractTests(unittest.TestCase):
         for legacy_concept in ("CandidateEditor", "ReservationEditor", "allowed_layers", "manual_modules"):
             self.assertNotIn(legacy_concept, self.source)
 
-    def test_build_requests_and_explains_the_derived_container_plan(self) -> None:
-        for marker in ("deriveContainers", "containerPlan", "DerivationResult", "Dimensions calculées"):
+    def test_build_reserves_and_explains_containers_and_upper_stack(self) -> None:
+        for marker in ("reserveFlatStack", "buildPlan", "DerivationResult", "Bacs et pile supérieure préparés"):
             self.assertIn(marker, self.source)
-        self.assertIn("/project-v1/derive-containers", self.api)
+        self.assertIn("/project-v1/reserve-flat-stack", self.api)
+        self.assertIn("Hauteur laissée aux bacs", self.source)
         self.assertNotIn("Le prochain lot calcule automatiquement les bacs", self.source)
 
     def test_client_validation_covers_groups_flats_and_fill_elements(self) -> None:
