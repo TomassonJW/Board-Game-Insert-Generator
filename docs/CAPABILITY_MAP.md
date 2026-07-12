@@ -525,3 +525,16 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - C-PRODUCT-VISION : le Studio sauvegarde le choix sans modifier solveur, digest ou selection.
 - C-CALIBRATION : un coupon imprime et mesure reste obligatoire avant toute qualification physique.
 - C-AESTHETIC : aucun style ou finition Fusion supplementaire n est declare.
+
+## P37 project V1 update
+
+- C-PRODUCT-VISION : `implemented-core` pour le contrat utilisateur
+  `bgig.project.v1`, distinct des candidats/layers moteur et migrable depuis P23.
+- C-ASSET : `implemented-core` pour les lignes forme/quantite/bac cible ; les
+  logements et tailles de bacs restent P39.
+- C-RESERVATION : `implemented-core` pour les plateaux/livrets quantifies comme
+  elements plats ; la pile superieure reste P40.
+- C-QUALITY : validation stricte, migration non destructive, API loopback et cas
+  72 pieces / 50 bacs / 25 elements plats testes.
+- C-AESTHETIC et mecanismes : options conservees mais `deferred` jusqu'aux
+  releases correspondantes.

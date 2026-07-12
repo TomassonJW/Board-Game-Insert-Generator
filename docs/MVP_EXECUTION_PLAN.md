@@ -17,7 +17,7 @@ V0.2 et V0.3 restent `deferred`.
 | P40 | Plateaux et livrets tiennent au-dessus | Pile superieure, hauteur et supports ajustes | Tests X/Y/Z et depassements |
 | P41 | Tout le volume est affecte | Solveur volumetrique borne, residus, bacs vides/pleins/separateurs | Conservation du volume et cas grande cardinalite |
 | P42 | Le resultat est un insert fonctionnel | CAD IR/Fusion des bacs, logements, supports et remplissages V0.1 | Tests CAD IR puis smoke Fusion prepare |
-| P43 | MVP V0.1 accepte | Parcours complet, jeu temoin, export et limites | Recette humaine UI + Fusion ; print reste distinct |
+| P43 | MVP V0.1 accepte | Parcours complet, jeu temoin, export et limites | Tests UI automatiques + observation Fusion ; print reste distinct |
 
 ## Detail des missions
 
@@ -82,11 +82,11 @@ V0.2 et V0.3 restent `deferred`.
 
 ### P43 - Gate V0.1
 
-Le MVP est accepte quand un utilisateur peut partir d'un projet vide, saisir un
-jeu temoin, construire une solution complete, comprendre les refus, ouvrir le
-resultat dans Fusion et exporter les corps. Cette gate ne transforme pas une
-preuve Fusion en preuve d'impression. Une campagne physique peut suivre en
-V0.1.x sans bloquer l'existence du MVP logiciel.
+Le MVP est accepte quand les tests prouvent qu'un projet vide peut etre saisi,
+construit, explique et exporte, puis qu'un smoke humain Fusion confirme la scene
+du jeu temoin. Cette gate ne transforme pas une preuve Fusion en preuve
+d'impression. Une campagne physique peut suivre en V0.1.x sans bloquer
+l'existence du MVP logiciel.
 
 ## Chemin V0.2, bloque jusqu'a P43
 

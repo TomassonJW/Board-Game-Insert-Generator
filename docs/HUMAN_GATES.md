@@ -15,6 +15,17 @@ Quand une gate est atteinte, Codex doit :
 5. Donner une recommandation argumentee si possible.
 6. Attendre une validation humaine explicite.
 
+## Delegation active pour l objectif MVP V0.1
+
+Thomas a explicitement delegue toutes les decisions produit, architecture,
+documentation, Git et integration necessaires a l objectif V0.1. Pour ce run,
+Codex ne demande donc pas de validation de parcours UI, de schema, de backlog ou
+de release interne : ces points sont verifies par tests et preuves de runtime.
+
+La seule validation humaine active avant la fin du MVP est l observation dans
+Fusion d un smoke prepare automatiquement. Les gates physiques d impression et
+les gates des V0.2/V0.3 restent hors de ce run.
+
 ## Operations Git standard
 
 Les operations Git standard ne sont pas des gates humaines depuis la decision du
@@ -60,7 +71,7 @@ merge, si un conflit reel apparait ou si une action risque de perdre du travail.
 
 | Gate | Condition minimale | Ce qui reste humain | Effet |
 | --- | --- | --- | --- |
-| P43 - Acceptation V0.1 | Parcours vide -> saisie -> solution complete -> Fusion/export, couverture et volume verifies | Recette de comprehension UI et observation Fusion du jeu temoin | Autorise seulement alors le demarrage V0.2 |
+| P43 - Acceptation V0.1 | Parcours vide -> saisie -> solution complete -> Fusion/export, couverture et volume verifies | Observation Fusion du jeu temoin uniquement ; le parcours UI est verifie automatiquement | Autorise seulement alors le demarrage V0.2 |
 | P46 - Acceptation V0.2 | Formes et ergonomie materialisees, contraintes de paroi et volume recalculees | Evaluation visuelle/ergonomique et observation Fusion | Autorise seulement alors le demarrage V0.3 |
 | P50 - Validation V0.3 | Deux familles de couvercles conformes au contrat, coupons prepares | Impressions, mesures, glisse/tenue et interpretation | Autorise la qualification physique des mecanismes |
 

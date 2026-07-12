@@ -12,30 +12,30 @@ ADR-0047.
 
 ## Derniere mission terminee
 
-`P36 - Rebase vision, audit et chemin critique` : vision, audit, ADR et plan de
-releases verifies.
+`P37 - Contrat projet V0.1 et migration` : `bgig.project.v1` represente la
+boite, les pieces, les bacs partages, les plateaux/livrets et les remplissages.
+Les projets P23 sont migrables sans perte ; les routes locales V1 et les tests
+sont prets.
 
 ## Prochaine mission prete
 
-`P37 - Contrat projet V0.1 et migration`.
+`P38 - Tables dynamiques et parcours user-first`.
 
-Resultat attendu : le projet sait representer des groupes de bacs choisis depuis
-les lignes de pieces, un tableau de plateaux/livrets, des remplissages, un jeu
-commun et une epaisseur de paroi par bac, tout en rechargeant les anciens drafts.
+Resultat attendu : le Studio utilise `bgig.project.v1`, montre seulement boite,
+pieces, plateaux/livrets et construction, permet de choisir un `Bac cible` par
+ligne et masque candidats, layers, apparence et couvercles hors du parcours V0.1.
 
 ## Ce qui n'est plus demande a Thomas
 
-Le smoke P34 n'est plus une action active. Le coupon a rails exterieurs ne
-correspond pas au couvercle coulissant canonique et les couvercles appartiennent
-a la V0.3, apres acceptation de la V0.1 puis de la V0.2.
+Aucune revue UI, Git, GitHub, schema ou backlog. Le smoke P34 reste archive. La
+seule intervention humaine de ce run sera une observation Fusion preparee apres
+la geometrie V0.1 complete.
 
 ## Gate humaine active
 
-Aucun pour P36 puis P37. La prochaine validation humaine produit obligatoire est
-P43, apres livraison du parcours V0.1 complet. Des recettes UI intermediaires
-peuvent etre preparees automatiquement ; si une observation humaine devient
-indispensable, le rapport indiquera exactement l'ecran, l'action et le resultat
-OK/KO attendus.
+Aucune avant le smoke Fusion V0.1 de P42/P43. Codex prepare automatiquement la
+scene, l'add-in et les reglages locaux ; Thomas recevra seulement les actions
+restantes dans Fusion et le resultat visible attendu.
 
 ## Fin de chaque mission
 

@@ -1054,3 +1054,22 @@ coulissant canonique et son smoke Fusion n'est plus demande. Aucun statut de cod
 ou test existant n'est efface, mais ces lots sont `superseded-for-product`.
 
 La vision, ADR-0047, l'audit et le plan P36-P50 sont alignes. La prochaine mission codee est P37, contrat projet V0.1 et migration compatible.
+
+## P37 - Contrat projet V0.1 et migration
+
+Statut : `done`, `implemented-core`, `implemented-loopback-adapter`,
+`print-validated: false`.
+
+`bgig.project.v1` est maintenant le contrat de projet user-first : boite,
+reglages de jeu/parois, lignes de pieces avec `container_group_id`, groupes de
+bacs, elements plats quantifies et remplissages. Le normaliseur migre les drafts
+`bgig.local_composer.v0` sans les muter, conserve les donnees techniques dans un
+snapshot et reporte apparence/couvercle comme options inactives. Les routes
+`/api/project-v1/starter` et `/api/project-v1/normalize` sont disponibles pour
+P38.
+
+Preuves : tests du contrat, migration P23, API loopback et cardinalite 72/50/25
+passent ; build TypeScript/Vite passe. Le portfolio P21 et l export restent
+volontairement sur P23 tant que P39 ne derive pas les bacs V1.
+
+Prochaine mission : P38, reconstruction du Studio autour du contrat V1.

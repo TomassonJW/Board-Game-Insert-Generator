@@ -1438,7 +1438,7 @@ impose les dependances de release suivantes.
 - Objectif : groupes de bacs, elements plats, remplissages, jeu global et parois
   par bac dans un schema additif.
 - Validation : tests de schema, migration et compatibilite des projets P23/P33/P34.
-- Statut : `ready-after-p36`.
+- Statut : `done`, contrat V1, migration locale, API et build verifies.
 
 ### P38 - Tables dynamiques et parcours user-first
 
@@ -1447,7 +1447,7 @@ impose les dependances de release suivantes.
   insert`, sans jargon moteur dans le parcours principal.
 - Validation : tests TypeScript et recette navigateur sur ajout/suppression,
   formes, groupes, imports et erreurs.
-- Statut : `blocked-by-p37`.
+- Statut : `ready-after-p37`.
 
 ### P39 - Derivation des bacs et logements
 
@@ -1486,8 +1486,8 @@ impose les dependances de release suivantes.
 
 - Dependances : P42.
 - Objectif : recette complete sur projet vide et jeu temoin reel.
-- Gate : comprehension UI et observation Fusion humaines ; impression physique
-  tracee separement.
+- Gate : observation Fusion humaine uniquement ; parcours UI couvert par tests
+  automatises, impression physique tracee separement.
 - Statut : `blocked-by-p42`.
 
 ### P44 a P46 - V0.2 formes et ergonomie

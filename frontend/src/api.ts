@@ -1,4 +1,5 @@
 import type { ComposerDraft, ExportBundle, Portfolio, StarterTemplate } from './types'
+import type { ProjectNormalization, ProjectV1Draft } from './project_v1'
 
 const apiBase = import.meta.env.VITE_BGIG_API_URL ?? 'http://127.0.0.1:8001/api'
 
@@ -23,6 +24,18 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 export async function loadStarters(): Promise<StarterTemplate[]> {
   const result = await request<{ starters: StarterTemplate[] }>('/starters')
   return result.starters
+}
+
+export async function loadProjectV1Starter(): Promise<ProjectV1Draft> {
+  const result = await request<{ project: ProjectV1Draft }>('/project-v1/starter')
+  return result.project
+}
+
+export async function normalizeProjectV1(project: ProjectV1Draft | ComposerDraft): Promise<ProjectNormalization> {
+  return request<ProjectNormalization>('/project-v1/normalize', {
+    method: 'POST',
+    body: JSON.stringify(project),
+  })
 }
 
 export async function generatePortfolio(draft: ComposerDraft): Promise<Portfolio> {

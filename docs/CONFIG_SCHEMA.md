@@ -1,5 +1,13 @@
 # Configuration Schema V0
 
+## Contrat Studio V0.1
+
+Le Studio V0.1 utilise `bgig.project.v1`, documente dans
+`docs/PROJECT_V1_CONTRACT.md`. Ce contrat utilisateur est distinct de la
+configuration moteur V0 ci-dessous : il parle de pieces, bacs partages,
+plateaux/livrets et remplissages. Il est normalise vers des contrats moteur
+uniquement apres derivation des bacs, sans dependance Fusion.
+
 ## Format
 
 Le format V0 est JSON pour rester local, lisible et simple a valider.

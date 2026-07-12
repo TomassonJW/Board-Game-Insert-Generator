@@ -25,6 +25,12 @@ from board_game_insert_generator.mechanism import (
     sliding_lid_coupon_geometry,
     sliding_lid_readiness,
 )
+from board_game_insert_generator.project_v1 import (
+    PROJECT_SCHEMA_V1,
+    ProjectContractError,
+    blank_project_v1,
+    normalize_project_draft,
+)
 
 from board_game_insert_generator.box_fill_solver import BoxFillCandidate, BoxFillSolveRequest
 from board_game_insert_generator.box_fill_variants import (
@@ -209,6 +215,21 @@ def starter_catalog() -> list[dict[str, object]]:
             "draft": board_game,
         },
     ]
+
+def starter_project_v1() -> dict[str, object]:
+    """Return the blank user-first project consumed by the V0.1 Studio."""
+
+    return blank_project_v1()
+
+
+def normalize_project_v1(raw_project: object) -> dict[str, object]:
+    """Validate a V0.1 project or migrate a legacy Studio project without I/O."""
+
+    try:
+        return normalize_project_draft(raw_project).to_dict()
+    except ProjectContractError as exc:
+        raise LocalComposerError(str(exc)) from exc
+
 
 def portfolio_from_draft(raw_draft: object) -> dict[str, object]:
     """Build P21 output from a UI draft without mutating it or writing files."""
@@ -939,11 +960,20 @@ class LocalComposerRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:  # noqa: N802
         route = urlsplit(self.path).path
         if route == "/api/health":
-            self._send_json(HTTPStatus.OK, {"status": "ok", "schema_version": LOCAL_COMPOSER_SCHEMA_V0})
+            self._send_json(
+                HTTPStatus.OK,
+                {
+                    "status": "ok",
+                    "schema_version": LOCAL_COMPOSER_SCHEMA_V0,
+                    "project_schema_version": PROJECT_SCHEMA_V1,
+                },
+            )
         elif route == "/api/starter":
             self._send_json(HTTPStatus.OK, {"draft": starter_draft()})
         elif route == "/api/starters":
             self._send_json(HTTPStatus.OK, {"starters": starter_catalog()})
+        elif route == "/api/project-v1/starter":
+            self._send_json(HTTPStatus.OK, {"project": starter_project_v1()})
         else:
             self._send_error(HTTPStatus.NOT_FOUND, "NOT_FOUND", "Unknown local composer route.")
 
@@ -959,6 +989,8 @@ class LocalComposerRequestHandler(BaseHTTPRequestHandler):
                     HTTPStatus.OK,
                     export_from_draft(request.get("draft"), _optional_nullable_string(request, "variant_id", "request")),
                 )
+            elif route == "/api/project-v1/normalize":
+                self._send_json(HTTPStatus.OK, normalize_project_v1(payload))
             else:
                 self._send_error(HTTPStatus.NOT_FOUND, "NOT_FOUND", "Unknown local composer route.")
         except LocalComposerError as exc:
