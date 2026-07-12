@@ -243,6 +243,9 @@ BGIG_PALETTE_STATE_ACTION = "bgig_palette_state"
 BGIG_PALETTE_NOTICE_ACTION = "bgig_palette_notice"
 BGIG_PALETTE_PROJECT_ACTION = "bgig_palette_project"
 BGIG_PALETTE_PROJECT_RESPONSE_ACTION = "bgig_palette_project_response"
+BGIG_PALETTE_TRANSPORT_RESPONSE_ACTION = "response"
+BGIG_PALETTE_DEFAULT_WIDTH = 1120
+BGIG_PALETTE_DEFAULT_HEIGHT = 760
 ACTION_INPUT_ID = "bgig_command_action"
 INPUT_MODE_INPUT_ID = "bgig_input_mode"
 CAD_IR_PATH_INPUT_ID = "bgig_cad_ir_path"
@@ -507,7 +510,13 @@ if adsk is not None:
 
         def notify(self, args) -> None:  # noqa: ANN001 - Fusion event args.
             action = str(getattr(args, "action", ""))
+            if _is_palette_transport_response(action):
+                return
             try:
+                try:
+                    args.returnData = "OK"
+                except Exception:
+                    pass
                 if action == BGIG_PALETTE_PROJECT_ACTION:
                     raw_request = json.loads(str(getattr(args, "data", "{}") or "{}"))
                     try:
@@ -616,8 +625,8 @@ def _ensure_palette(addin_dir: Path):  # noqa: ANN001 - Fusion API object.
             True,
             True,
             True,
-            360,
-            640,
+            BGIG_PALETTE_DEFAULT_WIDTH,
+            BGIG_PALETTE_DEFAULT_HEIGHT,
         )
         if palette is None:
             raise FusionSkeletonError("Fusion palette creation failed.")
@@ -625,6 +634,10 @@ def _ensure_palette(addin_dir: Path):  # noqa: ANN001 - Fusion API object.
         palette.incomingFromHTML.add(incoming_handler)
         _handlers.append(incoming_handler)
     try:
+        if int(getattr(palette, "width", 0)) < BGIG_PALETTE_DEFAULT_WIDTH:
+            palette.width = BGIG_PALETTE_DEFAULT_WIDTH
+        if int(getattr(palette, "height", 0)) < BGIG_PALETTE_DEFAULT_HEIGHT:
+            palette.height = BGIG_PALETTE_DEFAULT_HEIGHT
         palette.isVisible = True
     except Exception:
         pass
@@ -659,6 +672,12 @@ def _handle_palette_project_request(
     except ImportError:  # pragma: no cover - Fusion may load the add-in as a script.
         from palette_project import handle_palette_request  # type: ignore[no-redef]
     return handle_palette_request(raw_request, addin_dir, project_root)
+
+
+def _is_palette_transport_response(action: str) -> bool:
+    """Ignore the asynchronous acknowledgement emitted by Fusion QT."""
+
+    return action == BGIG_PALETTE_TRANSPORT_RESPONSE_ACTION
 
 
 def _synchronize_palette_cad_response(

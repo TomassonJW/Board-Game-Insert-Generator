@@ -1387,3 +1387,21 @@ verifie le runtime Fusion-only, ecrit le fixture comme projet courant et marque
 le commit installe. Les preuves hors Fusion confirment 2 corps, 3 cavites, zero
 automatique et 2 occurrences compactes. L observation Fusion et l export reel
 restent la gate humaine active.
+## P60 - Correctif bridge palette QT 0.1.7
+
+Statut : `implemented`, `automated-validated`, `fusion-retest-required`,
+`print-validated: false`.
+
+Le premier retour humain P60 valide la qualite visuelle de la palette mais
+observe que les actions projet expirent apres 8 secondes et que Fusion affiche
+`Action inconnue`. La cause est le retour asynchrone `response` emis par le
+navigateur QT apres chaque `sendInfoToHTML`. Le handler le traitait comme une
+nouvelle action utilisateur et renvoyait une notification, creant une boucle de
+transport.
+
+Le patch ignore desormais uniquement l action technique `response`, acquitte
+les vraies actions HTML avec `returnData = OK` et conserve tous les routages
+produit. La palette utilise aussi une taille initiale/minimale 1120 x 760, sans
+reduire une taille utilisateur plus grande. Trois tests de transport verrouillent
+le rebond QT, l ordre du garde-fou et les dimensions. Une nouvelle observation
+Fusion reste requise avant d accepter P60.

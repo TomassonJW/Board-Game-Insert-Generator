@@ -847,3 +847,10 @@ existante, regenerate ne supprime que les entites BGIG, inspect est en lecture
 seule, clear preserve les objets utilisateur et export cible les bodies
 imprimables tagues. Une partition impossible n appelle jamais l API Fusion.
 P59 est implemente mais reste `fusion-validated: false` jusqu au smoke P60.
+## P60 - Transport asynchrone de la palette QT
+
+Dans le navigateur QT de Fusion, `sendInfoToHTML` est asynchrone et son retour
+revient sur `incomingFromHTML` avec l action reservee `response`. Cette action
+est un accuse de transport, pas une commande produit. Le handler doit l ignorer
+sans appeler de nouveau `sendInfoToHTML`, sinon il cree une boucle. Les actions
+utilisateur continuent a etre acquittees via `HTMLEventArgs.returnData`.

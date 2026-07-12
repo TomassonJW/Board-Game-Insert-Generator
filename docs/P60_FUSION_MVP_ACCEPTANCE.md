@@ -29,7 +29,7 @@ Preuves attendues avant ouverture de Fusion :
 - partition construite : 2 corps finaux, 0 complement, 0 automatique ;
 - CAD IR : 2 composants, 3 cavites top-open, digest deterministe ;
 - plan Fusion hors API : 2 occurrences compactes, aucune occurrence eclatee ;
-- installateur : manifeste 0.1.6 et `partition_cad.py` package.
+- installateur : manifeste 0.1.7 et `partition_cad.py` package.
 
 ## Checklist humaine Fusion
 
