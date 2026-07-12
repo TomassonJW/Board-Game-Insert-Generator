@@ -1198,3 +1198,22 @@ P39 reste reutilisable pour les cavites et minima. P40 reste reutilisable pour l
 pile superieure. La strategie P41/P42 `free region -> automatic filler` est
 `superseded-for-product`. ADR-0054, le contrat V0.1 et P54-P60 portent la reprise.
 Aucun code fonctionnel n est modifie par P53.
+
+## P54 - Architecture UX de l editeur premium
+
+Statut : `done-docs`, `implemented-reference`, `visual-runtime-pending`,
+`print-validated: false`.
+
+P54 fournit une specification complete et un prototype HTML haute fidelite : rail
+projet, travail central, apercu permanent, tableaux assets et plateaux/livrets,
+cartes de bacs, fabrication, etats de chargement/erreur/calcul/resultat, mode
+simple/avance, responsive et accessibilite. La reference explique clairement que
+les cavites restent calibrees et que BGIG ne cree aucun corps automatique.
+
+Preuves : test P54 sur sections obligatoires, invariants ADR-0054, structure HTML,
+breakpoints et absence de sequences d encodage connues. Le prototype repond en
+HTTP 200. L inspection graphique automatisee reste indisponible car les deux
+runtimes de controle Windows echouent avant connexion ; P56 ne pourra pas etre
+qualifie produit sans preuve visuelle du frontend reel.
+
+Prochaine mission : P55, contrat executable cavite/minimum/final.

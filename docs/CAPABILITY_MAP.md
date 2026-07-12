@@ -625,3 +625,14 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
   `superseded-for-product`; P59 materialisera seulement le plan final.
 - C-AESTHETIC / C-STACKING : toujours `deferred` jusqu a P60.
 - C-PRINT : `print-validated: false` maintenu.
+
+## P54 premium editor UX reference update
+
+- C-PRODUCT-VISION : `implemented-reference` pour le parcours complet de l
+  editeur premium, du projet vide au resultat.
+- C-QUALITY : test de contrat sur couverture, invariant zero corps automatique,
+  responsive et encodage ; inspection visuelle runtime encore manquante.
+- C-FUSION-UI : role de passerelle secondaire confirme, aucune implementation
+  Fusion modifiee.
+- C-ASSET / C-RESERVATION / C-MODULE : composants et champs UX specifies ; le
+  contrat executable reste P55.

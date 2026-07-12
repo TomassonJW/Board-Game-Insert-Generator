@@ -1544,7 +1544,7 @@ impose les dependances de release suivantes.
   saisie/erreur/calcul/resultat, langage courant et criteres responsive/accessibles.
 - Acceptation : debutant lisible par defaut, controles experts accessibles sans
   changer d outil, aucune notion moteur dans le parcours principal.
-- Statut : `ready`.
+- Statut : `done-docs`, `implemented-reference`, `visual-runtime-pending`.
 
 ### P55 - Contrat executable des cavites et contraintes d expansion
 
@@ -1558,7 +1558,7 @@ impose les dependances de release suivantes.
   exterieures verrouillees et preference parois/fond en mode avance.
 - Acceptation : modifier l enveloppe finale ne modifie jamais les dimensions ou
   positions locales des cavites sans recalcul explicite de leur arrangement.
-- Statut : `blocked-by-P54`.
+- Statut : `ready`.
 
 ### P56 - Implementation de l editeur premium complet
 

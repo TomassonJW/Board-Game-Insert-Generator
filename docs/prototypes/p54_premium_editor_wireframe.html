@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BGIG - Prototype editeur premium P54</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #17243a;
+      background: #f3f1ed;
+      --ink: #17243a;
+      --muted: #687386;
+      --line: #dedbd4;
+      --paper: #fffefb;
+      --paper-2: #faf8f4;
+      --navy: #18364c;
+      --teal: #147d78;
+      --coral: #e46f51;
+      --coral-dark: #c95539;
+      --amber: #d99a36;
+      --success: #257759;
+      --danger: #aa493e;
+      --shadow: 0 12px 34px rgba(32, 45, 58, .08);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; min-height: 100vh; background: linear-gradient(135deg, #f6f4f0, #efede8); }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    .prototype-note { padding: 8px 18px; color: #70452d; background: #fff0d8; border-bottom: 1px solid #ead3af; font-size: 12px; text-align: center; }
+    .shell { display: grid; grid-template-columns: 216px minmax(600px, 1fr) 360px; min-height: calc(100vh - 34px); }
+    .rail { position: sticky; top: 0; height: calc(100vh - 34px); padding: 24px 18px; border-right: 1px solid var(--line); background: rgba(249, 247, 242, .96); }
+    .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 28px; font-weight: 800; letter-spacing: -.03em; }
+    .brand-mark { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 11px; color: white; background: var(--navy); box-shadow: 0 8px 18px rgba(24, 54, 76, .2); }
+    .project-meta { margin-bottom: 24px; padding: 13px; border: 1px solid var(--line); border-radius: 14px; background: var(--paper); }
+    .project-meta strong, .project-meta small { display: block; }
+    .project-meta strong { font-size: 13px; }
+    .project-meta small { margin-top: 5px; color: var(--success); font-size: 11px; }
+    nav { display: grid; gap: 5px; }
+    nav a { display: grid; grid-template-columns: 28px 1fr auto; align-items: center; gap: 9px; padding: 9px; border-radius: 11px; color: #526074; font-size: 12px; font-weight: 700; text-decoration: none; }
+    nav a.active { color: var(--ink); background: #e9ece9; }
+    nav i { display: grid; width: 25px; height: 25px; place-items: center; border-radius: 8px; color: #607083; background: #eeece7; font-size: 10px; font-style: normal; }
+    nav a.active i { color: white; background: var(--teal); }
+    nav b { width: 7px; height: 7px; border-radius: 50%; background: #b9c0c5; }
+    nav b.done { background: var(--success); }
+    nav b.todo { background: var(--amber); }
+    .rail-footer { position: absolute; right: 18px; bottom: 18px; left: 18px; color: var(--muted); font-size: 11px; line-height: 1.45; }
+    .work { padding: 22px clamp(22px, 3vw, 46px) 110px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 22px; }
+    .topbar h1 { margin: 0; font-size: 26px; letter-spacing: -.045em; }
+    .topbar p { margin: 5px 0 0; color: var(--muted); font-size: 13px; }
+    .actions { display: flex; gap: 8px; }
+    .btn { min-height: 40px; padding: 0 14px; border: 1px solid transparent; border-radius: 11px; color: var(--ink); background: white; font-size: 12px; font-weight: 800; }
+    .btn.outline { border-color: var(--line); }
+    .btn.primary { color: white; background: var(--coral); box-shadow: 0 8px 18px rgba(228, 111, 81, .22); }
+    .btn.primary:hover { background: var(--coral-dark); }
+    .btn.link { padding: 0 8px; color: var(--teal); background: transparent; }
+    .section { margin-bottom: 16px; padding: 22px; border: 1px solid var(--line); border-radius: 20px; background: var(--paper); box-shadow: var(--shadow); }
+    .section-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 18px; }
+    .section-head h2 { margin: 0; font-size: 18px; letter-spacing: -.035em; }
+    .section-head p { margin: 5px 0 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .badge { display: inline-flex; align-items: center; min-height: 25px; padding: 0 9px; border-radius: 999px; color: #1f6954; background: #e6f3ed; font-size: 10px; font-weight: 850; white-space: nowrap; }
+    .fields { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+    label { display: grid; gap: 6px; color: #596779; font-size: 11px; font-weight: 750; }
+    label.wide { grid-column: span 2; }
+    input, select { width: 100%; min-width: 0; height: 40px; padding: 0 10px; border: 1px solid #d9d7d1; border-radius: 10px; color: var(--ink); background: #fff; outline: none; }
+    input:focus, select:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(20, 125, 120, .12); }
+    .unit { position: relative; }
+    .unit input { padding-right: 34px; }
+    .unit span { position: absolute; top: 12px; right: 10px; color: #8b929d; font-size: 10px; font-weight: 700; }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 13px; }
+    table { width: 100%; min-width: 860px; border-collapse: collapse; }
+    th { padding: 10px; color: #798392; background: #f5f3ef; font-size: 9px; letter-spacing: .08em; text-align: left; text-transform: uppercase; }
+    td { padding: 9px; border-top: 1px solid #ebe8e2; vertical-align: top; }
+    td input, td select { height: 36px; font-size: 11px; }
+    .dims { display: grid; grid-template-columns: repeat(3, 64px); gap: 5px; }
+    .icon-btn { width: 36px; height: 36px; border: 0; border-radius: 9px; color: #687486; background: #f4f2ee; font-weight: 900; }
+    .icon-btn.danger { color: var(--danger); }
+    .section-footer { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 14px; }
+    .helper { color: var(--muted); font-size: 11px; line-height: 1.45; }
+    .container-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .container-card { padding: 15px; border: 1px solid #d9dfe0; border-radius: 15px; background: linear-gradient(145deg, #fff, #f8faf9); }
+    .container-title { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .container-title strong { font-size: 13px; }
+    .container-title span { color: var(--teal); font-size: 10px; font-weight: 850; }
+    .chips { display: flex; flex-wrap: wrap; gap: 5px; margin: 10px 0 13px; }
+    .chip { padding: 5px 7px; border-radius: 999px; color: #4f5c6d; background: #efede8; font-size: 9px; font-weight: 750; }
+    .mini-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 7px; }
+    .metric { padding: 9px; border-radius: 10px; background: #f3f5f3; }
+    .metric small, .metric strong { display: block; }
+    .metric small { color: var(--muted); font-size: 9px; }
+    .metric strong { margin-top: 3px; font-size: 11px; }
+    details { margin-top: 13px; padding-top: 12px; border-top: 1px solid #e8e6e1; }
+    summary { color: var(--teal); cursor: pointer; font-size: 11px; font-weight: 850; }
+    .advanced-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 9px; margin-top: 12px; }
+    .advanced-grid label { font-size: 10px; }
+    .advanced-grid input, .advanced-grid select { height: 36px; font-size: 10px; }
+    .buildbar { position: fixed; z-index: 5; right: 360px; bottom: 0; left: 216px; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 14px 38px; border-top: 1px solid #d8d5cf; background: rgba(255, 254, 251, .94); backdrop-filter: blur(16px); }
+    .buildbar strong, .buildbar small { display: block; }
+    .buildbar strong { font-size: 13px; }
+    .buildbar small { margin-top: 3px; color: var(--muted); font-size: 10px; }
+    .preview { position: sticky; top: 0; height: calc(100vh - 34px); overflow-y: auto; padding: 22px; border-left: 1px solid var(--line); background: #edeae4; }
+    .preview h2 { margin: 0; font-size: 17px; letter-spacing: -.035em; }
+    .preview > p { margin: 5px 0 16px; color: var(--muted); font-size: 11px; }
+    .preview-card { margin-bottom: 12px; padding: 15px; border: 1px solid #d8d5ce; border-radius: 17px; background: var(--paper); box-shadow: 0 9px 22px rgba(27, 38, 49, .06); }
+    .box { position: relative; aspect-ratio: 1.35; margin-top: 12px; overflow: hidden; border: 3px solid var(--navy); border-radius: 10px; background: #f3f1ec; }
+    .tray { position: absolute; border: 2px solid rgba(23, 36, 58, .5); border-radius: 6px; }
+    .tray-a { top: 3%; left: 3%; width: 54%; height: 61%; background: #b8d9d0; }
+    .tray-b { top: 3%; right: 3%; width: 37%; height: 61%; background: #f3c8b9; }
+    .tray-c { right: 3%; bottom: 3%; left: 3%; height: 28%; background: #d8d1ed; }
+    .cavity { position: absolute; border: 1px dashed rgba(24, 54, 76, .75); border-radius: 5px; background: rgba(255, 255, 255, .48); }
+    .tray-a .cavity:nth-child(1) { top: 18%; left: 12%; width: 31%; height: 38%; border-radius: 50%; }
+    .tray-a .cavity:nth-child(2) { top: 18%; right: 12%; width: 31%; height: 38%; border-radius: 50%; }
+    .tray-b .cavity { top: 15%; right: 18%; left: 18%; height: 48%; }
+    .tray-c .cavity { top: 18%; right: 12%; bottom: 18%; left: 12%; }
+    .legend { display: grid; gap: 7px; margin-top: 12px; }
+    .legend-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--muted); font-size: 10px; }
+    .legend-row span:first-child { display: inline-flex; align-items: center; gap: 6px; }
+    .swatch { width: 9px; height: 9px; border-radius: 3px; background: var(--teal); }
+    .summary { display: grid; gap: 9px; }
+    .summary-row { display: flex; justify-content: space-between; gap: 12px; font-size: 11px; }
+    .summary-row span { color: var(--muted); }
+    .summary-row strong { color: var(--ink); }
+    .success { padding: 10px; border-radius: 10px; color: #1b654b; background: #e7f4ed; font-size: 10px; font-weight: 800; }
+    .height { display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: end; }
+    .height-bar { display: flex; flex-direction: column-reverse; height: 120px; overflow: hidden; border: 2px solid var(--navy); border-radius: 8px; }
+    .storage { height: 82%; background: repeating-linear-gradient(135deg, #b8d9d0, #b8d9d0 10px, #cce3dc 10px, #cce3dc 20px); }
+    .flats { height: 18%; background: repeating-linear-gradient(0deg, #edc373, #edc373 5px, #f7d999 5px, #f7d999 8px); }
+    .height-copy { color: var(--muted); font-size: 10px; line-height: 1.5; }
+    .height-copy strong { display: block; color: var(--ink); font-size: 12px; }
+    @media (max-width: 1180px) {
+      .shell { grid-template-columns: 84px minmax(0, 1fr); }
+      .rail { width: 84px; padding: 20px 12px; }
+      .brand span:last-child, .project-meta, nav span, nav b, .rail-footer { display: none; }
+      nav a { grid-template-columns: 1fr; justify-items: center; }
+      .preview { position: static; grid-column: 2; height: auto; border-top: 1px solid var(--line); border-left: 0; }
+      .buildbar { right: 0; left: 84px; }
+    }
+    @media (max-width: 760px) {
+      .shell { display: block; }
+      .rail { position: static; width: auto; height: auto; padding: 12px 16px; border-right: 0; border-bottom: 1px solid var(--line); }
+      .brand { margin-bottom: 10px; }
+      .brand span:last-child { display: inline; }
+      nav { display: flex; overflow-x: auto; }
+      nav a { flex: none; }
+      .work { padding: 18px 14px 110px; }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .fields, .container-grid { grid-template-columns: 1fr; }
+      label.wide { grid-column: auto; }
+      .buildbar { right: 0; left: 0; padding: 12px 14px; }
+      .preview { grid-column: auto; padding: 18px 14px 90px; }
+      .section { padding: 17px; border-radius: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="prototype-note">Prototype P54 - donnees d exemple, aucune geometrie n est generee depuis cette page</div>
+  <div class="shell">
+    <aside class="rail">
+      <div class="brand"><span class="brand-mark">B</span><span>BGIG Studio</span></div>
+      <div class="project-meta"><strong>Ma boite de jeu</strong><small>Enregistre localement</small></div>
+      <nav aria-label="Etapes du projet">
+        <a href="#box"><i>1</i><span>Boite</span><b class="done"></b></a>
+        <a href="#assets" class="active"><i>2</i><span>Assets</span><b class="todo"></b></a>
+        <a href="#flats"><i>3</i><span>Plateaux</span><b class="done"></b></a>
+        <a href="#containers"><i>4</i><span>Bacs</span><b class="done"></b></a>
+        <a href="#settings"><i>5</i><span>Fabrication</span><b class="done"></b></a>
+        <a href="#result"><i>6</i><span>Resultat</span><b></b></a>
+      </nav>
+      <div class="rail-footer">Mode simple<br>Les reglages avances restent disponibles dans chaque section.</div>
+    </aside>
+
+    <main class="work">
+      <header class="topbar">
+        <div><h1>Compose ton insert</h1><p>Renseigne le jeu. BGIG calcule les cavites puis agrandit les bacs pour remplir la boite.</p></div>
+        <div class="actions"><button class="btn outline">Importer</button><button class="btn outline">Sauvegarder</button></div>
+      </header>
+
+      <section class="section" id="box">
+        <div class="section-head"><div><h2>Boite</h2><p>Mesure uniquement l espace interieur reellement disponible.</p></div><span class="badge">Pret</span></div>
+        <div class="fields">
+          <label class="wide">Nom du projet<input value="Ma boite de jeu"></label>
+          <label>Largeur interieure<div class="unit"><input value="295"><span>mm</span></div></label>
+          <label>Profondeur interieure<div class="unit"><input value="295"><span>mm</span></div></label>
+          <label>Hauteur utile<div class="unit"><input value="72"><span>mm</span></div></label>
+          <label>Jeu contre la boite<div class="unit"><input value="0.8"><span>mm</span></div></label>
+        </div>
+      </section>
+
+      <section class="section" id="assets">
+        <div class="section-head"><div><h2>Assets a ranger</h2><p>Une ligne par famille. Le bac cible indique ce qui doit rester ensemble.</p></div><span class="badge">2 familles</span></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Asset</th><th>Forme</th><th>Mesures</th><th>Quantite</th><th>Bac cible</th><th>Jeu</th><th></th></tr></thead>
+            <tbody>
+              <tr><td><input value="Jetons credit"></td><td><select><option>Rond</option></select></td><td><div class="dims"><input value="22"><input value="22"><input value="2"></div></td><td><input value="40"></td><td><select><option>Bac Jetons</option></select></td><td><select><option>General</option></select></td><td><button class="icon-btn danger">x</button></td></tr>
+              <tr><td><input value="Cartes action"></td><td><select><option>Cartes</option></select></td><td><div class="dims"><input value="63"><input value="88"><input value="24"></div></td><td><input value="1"></td><td><select><option>Bac Cartes</option></select></td><td><select><option>0.6 mm</option></select></td><td><button class="icon-btn danger">x</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="section-footer"><span class="helper">Rond, carre et cube synchronisent automatiquement leurs cotes.</span><button class="btn primary">+ Ajouter un asset</button></div>
+      </section>
+
+      <section class="section" id="flats">
+        <div class="section-head"><div><h2>Plateaux et livrets</h2><p>Ils seront reserves au-dessus des bacs dans cet ordre.</p></div><span class="badge">6 mm reserves</span></div>
+        <div class="table-wrap"><table><thead><tr><th>Element</th><th>Type</th><th>Mesures</th><th>Quantite</th><th>Ordre</th><th></th></tr></thead><tbody><tr><td><input value="Plateau principal"></td><td><select><option>Plateau</option></select></td><td><div class="dims"><input value="285"><input value="285"><input value="3"></div></td><td><input value="2"></td><td><input value="1"></td><td><button class="icon-btn danger">x</button></td></tr></tbody></table></div>
+        <div class="section-footer"><span class="helper">66 mm restent disponibles pour les bacs.</span><button class="btn outline">+ Ajouter un plateau ou livret</button></div>
+      </section>
+
+      <section class="section" id="containers">
+        <div class="section-head"><div><h2>Bacs demandes</h2><p>Les cavites restent calibrees. Ces enveloppes pourront grandir pour remplir la boite.</p></div><span class="badge">3 corps finaux</span></div>
+        <div class="container-grid">
+          <article class="container-card"><div class="container-title"><strong>Bac Jetons</strong><span>Extensible XYZ</span></div><div class="chips"><span class="chip">Jetons credit</span><span class="chip">2 cavites</span></div><div class="mini-metrics"><div class="metric"><small>Minimum</small><strong>54 x 104 x 22 mm</strong></div><div class="metric"><small>Paroi / fond min.</small><strong>1.6 / 1.6 mm</strong></div></div><details><summary>Reglages avances du bac</summary><div class="advanced-grid"><label>Axes extensibles<select><option>X, Y et Z</option></select></label><label>Repartition<select><option>Equilibree</option></select></label></div></details></article>
+          <article class="container-card"><div class="container-title"><strong>Bac Cartes</strong><span>Extensible XYZ</span></div><div class="chips"><span class="chip">Cartes action</span><span class="chip">1 cavite</span></div><div class="mini-metrics"><div class="metric"><small>Minimum</small><strong>67 x 92 x 28 mm</strong></div><div class="metric"><small>Paroi / fond min.</small><strong>1.6 / 1.6 mm</strong></div></div><details><summary>Reglages avances du bac</summary><div class="advanced-grid"><label>Axes extensibles<select><option>X, Y et Z</option></select></label><label>Repartition<select><option>Plus de fond</option></select></label></div></details></article>
+        </div>
+        <div class="section-footer"><span class="helper">BGIG ne cree jamais de bac de remplissage automatiquement.</span><button class="btn link">+ Ajouter un element sans asset</button></div>
+      </section>
+
+      <section class="section" id="settings">
+        <div class="section-head"><div><h2>Fabrication</h2><p>Valeurs minimales globales. Les surcharges par bac restent visibles.</p></div><span class="badge">Experimental</span></div>
+        <div class="fields"><label>Jeu autour des assets<div class="unit"><input value="0.6"><span>mm</span></div></label><label>Paroi minimale<div class="unit"><input value="1.6"><span>mm</span></div></label><label>Fond minimal<div class="unit"><input value="1.6"><span>mm</span></div></label><label>Jeu entre bacs<div class="unit"><input value="0.6"><span>mm</span></div></label></div>
+        <details><summary>Afficher tous les reglages avances</summary><div class="advanced-grid"><label>Repartition du surplus<select><option>Equilibree</option></select></label><label>Temps de recherche<select><option>Standard</option></select></label></div></details>
+      </section>
+    </main>
+
+    <aside class="preview">
+      <h2>Ta boite</h2><p>Apercu de saisie - le plan final apparaitra apres calcul.</p>
+      <section class="preview-card"><span class="badge">Apercu de saisie</span><div class="box"><div class="tray tray-a"><i class="cavity"></i><i class="cavity"></i></div><div class="tray tray-b"><i class="cavity"></i></div><div class="tray tray-c"><i class="cavity"></i></div></div><div class="legend"><div class="legend-row"><span><i class="swatch"></i>Bacs demandes</span><strong>3</strong></div><div class="legend-row"><span><i class="swatch" style="background:#fff;border:1px dashed #18364c"></i>Cavites calibrees</span><strong>4</strong></div></div></section>
+      <section class="preview-card"><div class="height"><div class="height-bar"><div class="storage"></div><div class="flats"></div></div><div class="height-copy"><strong>72 mm au total</strong>6 mm de plateaux<br>66 mm pour les bacs<br>0 depassement</div></div></section>
+      <section class="preview-card summary"><div class="summary-row"><span>Assets</span><strong>2 familles</strong></div><div class="summary-row"><span>Bacs demandes</span><strong>3</strong></div><div class="summary-row"><span>Complements manuels</span><strong>0</strong></div><div class="success">Aucun corps automatique ne sera cree</div></section>
+    </aside>
+
+    <footer class="buildbar"><div><strong>Projet coherent</strong><small>Les cavites sont pretes a etre calculees.</small></div><button class="btn primary">Construire mon insert</button></footer>
+  </div>
+</body>
+</html>
