@@ -278,3 +278,17 @@ normalise et le plan complet, mais ne refait ni placement ni tolerance. Elle
 cree les corps rectangulaires, leurs coupes de logements et les remplissages
 retenus. L adaptateur Fusion lit seulement cette scene. ADR-0052 interdit toute
 logique de solveur ou de dimensionnement dans Fusion.
+
+## Pipeline V0.1 corrige par ADR-0054
+
+Le pipeline de decision est strictement sequentiel :
+
+`projet utilisateur -> cavites calibrees -> enveloppes minimales -> reservation
+plateaux/livrets -> partition et enveloppes finales -> apercu Studio -> CAD IR ->
+Fusion`.
+
+Le solveur de partition est la seule couche qui peut choisir les dimensions
+exterieures finales. L editeur ne dessine pas les bacs a la main, la CAD IR ne
+complete pas le plan et Fusion ne cree aucun remplissage. Les anciennes regions
+libres P41 restent des donnees de diagnostic et de conservation, jamais une liste
+de corps a imprimer.

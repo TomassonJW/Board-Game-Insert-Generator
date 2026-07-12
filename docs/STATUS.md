@@ -1180,6 +1180,21 @@ restants ne sont pas justifies comme bacs utiles.
 
 Le depot conserve P37 a P42 comme fondations testees : contrat, derivation,
 reservation, controle de volume, CAD IR et adapter Fusion. Elles ne sont plus
-qualifiees comme parcours V0.1 accepte. P52 documente la reprise et P53 a P58
-ferment successivement acces, saisie, resultat, planification utile, CAD/Fusion
-et acceptance. V0.2 et V0.3 restent bloques.
+qualifiees comme parcours V0.1 accepte. P52 documente la reprise et P53 a P60
+ferment successivement semantique, editeur, cavites, partition, resultat,
+CAD/Fusion et acceptance. V0.2 et V0.3 restent bloques.
+
+## P53 - Clarification cavites fixes / enveloppes extensibles
+
+Statut : `done-docs`, `accepted-product-semantics`, `implementation-required`.
+
+La clarification humaine du 2026-07-12 rejette tout remplissage automatique du
+volume par de petits corps. Les assets et leurs quantites calibrent les cavites.
+Apres reservation des plateaux/livrets, les enveloppes exterieures des bacs
+demandes s agrandissent pour occuper le volume imprimable ; le surplus devient
+de la matiere dans les parois et les fonds.
+
+P39 reste reutilisable pour les cavites et minima. P40 reste reutilisable pour la
+pile superieure. La strategie P41/P42 `free region -> automatic filler` est
+`superseded-for-product`. ADR-0054, le contrat V0.1 et P54-P60 portent la reprise.
+Aucun code fonctionnel n est modifie par P53.

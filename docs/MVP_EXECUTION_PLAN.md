@@ -84,7 +84,7 @@ V0.2 et V0.3 restent `deferred`.
 
 P43 a d abord ete defini comme une gate MVP, mais le retour produit du
 2026-07-12 a etabli que son smoke ne couvre que la scene geometrique. La sortie
-MVP est transferee a P58 : le contrat complet doit etre vert avant un smoke
+MVP est transferee a P60 : le contrat complet doit etre vert avant un smoke
 Fusion de la scene finale. Une campagne physique reste distincte et
 `print-validated: false` reste obligatoire.
 
@@ -92,7 +92,7 @@ Resultat historique : le jeu temoin de 20 pieces CAD et 19 cavites a recu le
 retour `Fusion P43 OK`. Cette preuve est conservee comme
 `fusion-validated-geometry-only`, jamais comme acceptation V0.1.
 
-## Chemin V0.2, bloque jusqu'a P43
+## Chemin V0.2, bloque jusqu'a P60
 
 | Lot | Resultat |
 | --- | --- |
@@ -131,16 +131,20 @@ cachee dans un rapport technique.
 ## Reprise corrective V0.1 apres P43
 
 P43 est reouvert par ADR-0053 : son smoke valide une scene geometrique, pas le
-MVP produit. La sortie V0.1 est desormais P58 et suit ce chemin strict :
+MVP produit. ADR-0054 corrige ensuite la semantique de volume : les cavites sont
+calibrees, les enveloppes exterieures des bacs sont extensibles et aucun corps de
+remplissage automatique n est autorise. La sortie V0.1 est P60 :
 
 | Lot | Resultat | Preuve de sortie |
 | --- | --- | --- |
 | P52 | Audit, contrat d acceptance et statuts corriges | Documents coherents avec vision, code et retour humain |
-| P53 | Surface principale claire et palette non bloquante | Contrat de navigation, bridge repondant ou erreur lisible |
-| P54 | Saisie Studio vraiment utilisable | Tests d interaction sur tableaux, validations et encodage |
-| P55 | Resultat visible avant Fusion | Apercu derive du plan resolu et explications humaines |
-| P56 | Volume restant utile | Extensions/complements justifies, pas de residus imprimes sans role |
-| P57 | CAD/Fusion fidele | Correspondance plan/CAD, fixture qualite, preparation reproductible |
-| P58 | MVP V0.1 accepte | Sept scenarios verts puis smoke Fusion humain unique |
+| P53 | Cavites fixes / enveloppes extensibles | ADR-0054, vision et invariants coherents |
+| P54 | Architecture UX premium | Wireframe, composants, etats, mode simple/avance |
+| P55 | Contrat executable cavite/minimum/final | Schema, migration et tests de non-deformation des cavites |
+| P56 | Editeur premium complet | Tests d interaction sur toutes les saisies et validations |
+| P57 | Partition et expansion des bacs | Zero corps automatique, couverture et diagnostics |
+| P58 | Resultat premium fidele | Apercu issu du plan, surplus parois/fond explique |
+| P59 | CAD/Fusion fidele | Correspondance plan/CAD, palette non bloquante |
+| P60 | MVP V0.1 accepte | Scenarios verts puis smoke Fusion humain unique |
 
-Les lots P44 a P50 restent hors chemin tant que P58 n est pas accepte.
+Les lots P44 a P50 restent hors chemin tant que P60 n est pas accepte.

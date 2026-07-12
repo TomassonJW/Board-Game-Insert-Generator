@@ -339,14 +339,33 @@ La pile plateaux/livrets est une `Reservation` non imprimable : son empreinte et
 sa hauteur diminuent le volume de stockage disponible. Son support est une
 contrainte de placement, pas une feature geometrique ou un corps imprimable.
 P41 devra prouver la continuite de cette surface apres placement.
-## P41 - Regions libres
+## P41/P42 - Comportement historique rejete
 
-Chaque region libre exacte est classee comme jeu technique ou candidat de remplissage avant toute materialisation CAD.
-## P42 - Corps fonctionnels issus du volume
+P41 decompose le volume libre et P42 peut materialiser certaines regions en bacs
+vides automatiques. Ce comportement reste dans le code comme fondation
+experimentale, mais il est `superseded-for-product` par ADR-0054. Une cellule
+libre n est jamais un corps imprimable par nature.
 
-Un bac P42 est un parallelepipede imprimable avec une cavite top-open par
-logement P39. Les cloisons sont la matiere conservee entre ces cavites. La
-rotation XY du bac transforme aussi les coordonnees locales de chaque logement.
-Les bacs vides automatiques sont inset du jeu commun ; s ils ne gardent plus les
-parois minimales, ils restent un jeu technique explicite. Les dimensions
-rectangulaires, parois et fonds V0.1 restent la reference avant les formes V0.2.
+## P53 - Cavite calibree et enveloppe exterieure extensible
+
+Chaque bac distingue obligatoirement :
+
+- `cavity_envelopes` : volumes utiles calibres depuis assets, quantites et jeux ;
+- `minimum_outer_envelope` : borne basse incluant cavites, cloisons, parois et
+  fond minimaux ;
+- `final_outer_envelope` : dimensions et position choisies par le solveur global ;
+- `absorbed_material` : surplus entre minimum et final, reparti autour et sous
+  les cavites.
+
+Invariants :
+
+- les cavites gardent leurs dimensions pendant l expansion de l enveloppe ;
+- le surplus X/Y reste de la matiere autour des cavites ;
+- le surplus Z reste sous les cavites, sauf contrainte explicite differente ;
+- chaque enveloppe finale reste un parallelepipede V0.1 constructible ;
+- le nombre de corps provient des groupes et complements explicites, jamais des
+  regions libres ;
+- les jeux contre la boite et entre bacs sont des vides techniques.
+
+La CAD IR transporte minimum, final, cavites et repartition du surplus. Fusion ne
+recalcule aucune de ces decisions.

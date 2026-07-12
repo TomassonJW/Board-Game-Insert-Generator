@@ -1495,13 +1495,13 @@ impose les dependances de release suivantes.
 
 ### P43 - Gate V0.1 rouverte
 
-- Dependances : P42, puis P52 a P57.
+- Dependances historiques : P42. Reprise : P52 a P59.
 - Etat historique : une scene Fusion de 20 pieces et 19 cavites a ete observee
   le 2026-07-12 (`Fusion P43 OK`). Cette preuve reste valide pour la geometrie
   du jeu temoin, pas pour la conformite produit.
 - Statut : `reopened`, `fusion-validated-geometry-only`,
   `product-mvp-rejected`, `print-validated: false`.
-- Sortie : remplacee par P58, selon `docs/MVP_V01_ACCEPTANCE_CONTRACT.md`.
+- Sortie : remplacee par P60, selon `docs/MVP_V01_ACCEPTANCE_CONTRACT.md`.
 
 ### P51 - Fusion de residus automatiques
 
@@ -1519,82 +1519,114 @@ impose les dependances de release suivantes.
 - Validation : documents relus contre la vision canonique et le code actuel.
 - Statut : `done-docs`.
 
-### P53 - Surface principale et reference UX
+### P53 - Contrat cavites fixes et enveloppes extensibles
 
-- Capability : C-PRODUCT-VISION, C-FUSION-UI, C-QUALITY.
+- Capability : C-PRODUCT-VISION, C-SOLVER, C-CAVITY, C-QUALITY.
 - Dependances : P52.
-- Objectif : rendre inequivoque le parcours `ouvrir le Studio -> saisir ->
-  construire -> examiner -> ouvrir Fusion`, avec une palette Fusion qui affiche
-  un etat ou une erreur exploitable, jamais un chargement infini.
-- Livrables : contrat de navigation, reference visuelle de la surface principale,
-  etat de secours palette et tests de bridge repondant/reponse absente.
-- Acceptation : depuis Fusion, aucune personne ne peut croire que la palette est
-  l editeur complet ; elle peut rejoindre le Studio en une action explicite.
-- Statut : `waiting-human-product-readback`.
+- Objectif : verrouiller que les assets dimensionnent les cavites tandis que les
+  enveloppes exterieures des bacs absorbent le volume disponible.
+- Livrables : ADR-0054, vision canonique, modele geometrique, contrat MVP et
+  backlog alignes ; interdiction de tout corps automatique.
+- Acceptation : un asset minuscule dans un bac unique produit une petite cavite
+  calibree dans une grande enveloppe, jamais une cavite geante ni des micro-bacs.
+- Statut : `done-docs`.
 
-### P54 - Saisie Studio reelle et lisible
+### P54 - Architecture UX de l editeur premium
 
-- Capability : C-ASSET, C-RESERVATION, C-PRODUCT-VISION, C-QUALITY.
-- Dependances : P53 accepte.
-- Objectif : rendre les tableaux de boite, pieces, bacs, plateaux/livrets,
-  complements et reglages effectivement utilisables, lisibles et sans texte mal
-  encode.
-- Livrables : edition dynamique sans limite metier, validations localisees,
-  demarrage clair, interactions accessibles et tests de comportement UI.
-- Acceptation : les scenarios 1, 5, 6 et 7 du contrat V0.1 se font sans JSON ni
-  vocabulaire moteur.
-- Statut : `blocked-by-P53`.
+- Capability : C-PRODUCT-VISION, C-QUALITY, C-FUSION-UI.
+- Dependances : P53.
+- Objectif : definir l ecran complet, la hierarchie visuelle, la navigation et
+  la divulgation progressive des parametres avant refonte frontend.
+- Contenu obligatoire : boite, tableau dynamique des assets, bac cible, tableau
+  plateaux/livrets, cartes de bacs, complements explicites, tolerances, parois,
+  fonds, preferences d expansion, sauvegarde et construction.
+- Livrables : wireframe de reference, inventaire de composants, etats vide/
+  saisie/erreur/calcul/resultat, langage courant et criteres responsive/accessibles.
+- Acceptation : debutant lisible par defaut, controles experts accessibles sans
+  changer d outil, aucune notion moteur dans le parcours principal.
+- Statut : `ready`.
 
-### P55 - Espace resultat et apercu resolu
+### P55 - Contrat executable des cavites et contraintes d expansion
 
-- Capability : C-PRODUCT-VISION, C-QUALITY, C-SOLVER.
+- Capability : C-ASSET, C-CAVITY, C-MODULE, C-QUALITY.
 - Dependances : P54.
-- Objectif : montrer avant Fusion le plan calcule reel, les bacs, leur contenu,
-  la pile superieure, les complements et les raisons de chaque choix.
-- Livrables : apercu derive des placements resolus, liste humaine des corps,
-  statut construit/partiel/impossible et actions modifier/accepter/Fusion.
-- Acceptation : aucun dessin indicatif ne peut etre pris pour le plan final.
+- Objectif : separer dans le coeur pur cavite calibree, enveloppe minimale,
+  enveloppe finale et contraintes de repartition du surplus.
+- Livrables : schema additif, migration, modele pur, invariants, rapports et tests
+  rond/carre/rectangle/cartes/cube/pion/custom, groupes et quantites.
+- Parametres : jeux asset, paroi/fond minimaux, axes extensibles, dimensions
+  exterieures verrouillees et preference parois/fond en mode avance.
+- Acceptation : modifier l enveloppe finale ne modifie jamais les dimensions ou
+  positions locales des cavites sans recalcul explicite de leur arrangement.
 - Statut : `blocked-by-P54`.
 
-### P56 - Planification utile du volume restant
+### P56 - Implementation de l editeur premium complet
 
-- Capability : C-SOLVER, C-RESERVATION, C-QUALITY.
+- Capability : C-PRODUCT-VISION, C-ASSET, C-RESERVATION, C-QUALITY.
 - Dependances : P55.
-- Objectif : remplacer la materialisation cellule par cellule par une recherche
-  de bacs utiles, extensions, supports et complements justifies.
-- Livrables : politique de priorite, score explicable, seuils derives des
-  contraintes physiques, raisons visibles et regressions des sept scenarios.
-- Acceptation : une piece automatique existe pour une fonction lisible ; un
-  residu non justifiable reste un jeu technique classe, jamais un petit bac
-  imprime par defaut.
+- Objectif : implementer l editeur P54 sur le vrai contrat P55, avec sauvegarde,
+  import, validation locale et tableaux sans limite metier arbitraire.
+- Livrables : interface responsive, composants reutilisables, mode simple/
+  avance, textes UTF-8 corrects et tests d interactions reelles.
+- Acceptation : les projets vide, simple, multi-bacs, avec plateaux et grande
+  cardinalite se saisissent sans JSON et sans dialogue Fusion technique.
 - Statut : `blocked-by-P55`.
 
-### P57 - CAD/Fusion fidele au plan accepte
+### P57 - Solveur de partition et expansion des bacs
 
-- Capability : C-CAD-IR, C-CAVITY, C-FUSION-UI, C-QUALITY.
+- Capability : C-SOLVER, C-RESERVATION, C-MODULE, C-QUALITY.
 - Dependances : P56.
-- Objectif : materialiser exclusivement les corps retenus par le plan utile et
-  verifier le bridge palette, les noms, les cavites et l absence de doublons.
-- Livrables : CAD IR tracee, tests de correspondance plan/CAD, fixture de
-  reference qualite produit et preparation Fusion reproductible.
-- Acceptation : Fusion affiche le meme plan que le Studio, avec un etat non
-  bloque et sans composants residuels inexplicables.
+- Objectif : partitionner le volume sous les plateaux entre les seuls bacs et
+  complements explicitement demandes, puis absorber le surplus dans leurs
+  parois et fonds.
+- Livrables : recherche bornee X/Y/Z, alignements, support de pile, score de
+  simplicite, diagnostics et tests 1 bac / N bacs / grande cardinalite.
+- Invariants : nombre de corps final = groupes constructibles + complements
+  explicites ; aucun `automatic filler`; jeux externes conserves comme vides.
+- Acceptation : aucune region de grille ne devient un corps ; une solution
+  impossible est expliquee au lieu de generer des lamelles ou micro-volumes.
 - Statut : `blocked-by-P56`.
 
-### P58 - Nouvelle acceptance MVP V0.1
+### P58 - Resultat premium et apercu du vrai plan
+
+- Capability : C-PRODUCT-VISION, C-SOLVER, C-QUALITY.
+- Dependances : P57.
+- Objectif : montrer avant Fusion le plan resolu reel et permettre de comprendre
+  comment chaque bac absorbe le volume.
+- Livrables : vue dessus/coupe issue des placements, liste des bacs et contenus,
+  cavite/minimum/final, surplus parois/fond, pile superieure, alertes et actions
+  modifier/recalculer/accepter.
+- Acceptation : l apercu correspond exactement au plan moteur et ne dessine
+  jamais des colonnes indicatives ou des corps inexistants.
+- Statut : `blocked-by-P57`.
+
+### P59 - Materialisation CAD/Fusion et passerelle Studio
+
+- Capability : C-CAD-IR, C-CAVITY, C-FUSION-UI, C-QUALITY.
+- Dependances : P58.
+- Objectif : materialiser les enveloppes finales, soustraire les cavites fixes et
+  rendre la palette Fusion fiable comme passerelle de controle/export.
+- Livrables : correspondance plan/CAD, noms et metadata, zero doublon, palette
+  avec etat ou erreur explicite et acces clair au Studio.
+- Acceptation : Fusion contient exactement les corps demandes, aux dimensions du
+  plan accepte, sans micro-remplissage et sans `Chargement...` permanent.
+- Statut : `blocked-by-P58`.
+
+### P60 - Nouvelle acceptance MVP V0.1
 
 - Capability : C-QUALITY, C-PRODUCT-VISION, C-FUSION-UI.
-- Dependances : P57.
-- Objectif : executer les sept scenarios du contrat, les tests de comportement,
-  le build et un smoke Fusion de la scene finale.
+- Dependances : P59.
+- Objectif : executer les scenarios du contrat, les tests de comportement, le
+  build, les invariants de partition et un smoke Fusion de la scene finale.
 - Gate : observation Fusion humaine unique, apres preuves UI et resultat deja
   obtenues automatiquement.
-- Acceptation : les six axes de `docs/MVP_V01_ACCEPTANCE_CONTRACT.md` sont tous
-  verts ; `print-validated: false` reste honnete.
-- Statut : `blocked-by-P57`.
+- Acceptation : editeur premium complet, cavites calibrees, volume absorbe par
+  les bacs demandes, zero corps automatique et scene Fusion fidele ;
+  `print-validated: false` reste honnete.
+- Statut : `blocked-by-P59`.
 ### P44 a P46 - V0.2 formes et ergonomie
 
-- Dependances : P58 accepte.
+- Dependances : P60 accepte.
 - Scope : arrondis, chanfreins, encoches et fonds faciles a vider, avec impact
   reel sur volume, parois et fabrication.
 - Statut : `deferred-until-v0.1`.

@@ -4,40 +4,41 @@ Derniere mise a jour : 2026-07-12
 
 ## Version active
 
-`V0.1 - MVP reouvert : reprise qualite produit`.
+`V0.1 - MVP reouvert : editeur premium et solveur d enveloppes extensibles`.
 
-La vision canonique reste `docs/CANONICAL_PRODUCT_VISION.md`. L audit de realite
-est `docs/MVP_V01_REALITY_AUDIT.md` et le contrat de sortie est
-`docs/MVP_V01_ACCEPTANCE_CONTRACT.md`. ADR-0053 remplace la lecture trop large
-de P43 : une scene Fusion observee ne vaut pas acceptance produit.
+La vision canonique est `docs/CANONICAL_PRODUCT_VISION.md`. ADR-0053 retire la
+fausse acceptance P43. ADR-0054 fixe la semantique centrale : les assets
+calibrent les cavites ; les enveloppes des bacs demandes absorbent le volume
+restant dans leurs parois et fonds ; aucun micro-remplissage automatique.
 
 ## Derniere mission terminee
 
-`P52 - Remise a plat V0.1` : retrait du faux statut `MVP accepte`, audit des
-ecarts, contrat d acceptation testable et backlog de reprise. Aucun code
-fonctionnel n a ete ajoute dans ce lot documentaire.
+`P53 - Contrat cavites fixes et enveloppes extensibles` : vision, geometrie,
+contrat MVP et backlog corriges. P39/P40 restent reutilisables ; la strategie de
+residus automatiques P41/P42 est obsolete pour le produit.
 
-## Prochaine decision necessaire
+## Prochaine mission prete
 
-`P53 - Surface principale et reference UX` est volontairement en attente d une
-courte relecture produit. Le point a confirmer est simple : le Studio local est
-la surface complete de saisie et de resultat ; Fusion materialise et exporte,
-mais ne devient pas un second editeur incomplet. La palette Fusion doit permettre
-d ouvrir ou retrouver clairement le Studio et ne jamais rester sur Chargement.
+`P54 - Architecture UX de l editeur premium`.
+
+Resultat attendu : une reference visuelle et interactionnelle complete avant le
+code frontend. Elle couvre toutes les saisies demandees, le mode simple et les
+parametres avances, les etats du parcours et la passerelle Fusion. Aucune nouvelle
+question de surface n est demandee : l editeur premium est l interface produit
+complete ; Fusion materialise, controle et exporte.
 
 ## Releases bloquees
 
-P43 est reouvert. P44 a P50 restent bloques : aucun arrondi, encoche ou couvercle
-ne doit etre implemente avant la nouvelle acceptance V0.1.
+P44 a P50 restent bloques jusqu a P60 : aucune esthetique V0.2 ni couvercle V0.3
+avant l acceptance du comportement V0.1 corrige.
 
 ## Gate humaine active
 
-Aucune nouvelle preuve Fusion n est demandee maintenant. La prochaine gate Fusion
-arrivera uniquement apres P57, sur la scene finale choisie ; l UI et la qualite
-du resultat doivent etre prouvees avant.
+Aucune gate active maintenant. Le prochain retour humain obligatoire sera le
+smoke Fusion P60, une fois l editeur, le solveur, le resultat et la CAD deja
+prouves automatiquement.
 
 ## Fin de chaque mission
 
 Tests pertinents, `git diff --check`, commit atomique, integration directe dans
-`main`, push, puis selection de la mission suivante seulement si elle ferme un
-critere du contrat V0.1.
+`main`, push, puis mission suivante seulement si ses dependances sont terminees.

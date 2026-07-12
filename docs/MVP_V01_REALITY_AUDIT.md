@@ -75,13 +75,13 @@ P42/P43 ont confondu trois niveaux distincts :
    Fusion ;
 2. parcours Studio visuellement teste, lisible et sans texte mal encode ;
 3. apercu et resultat issus du vrai plan resolu, pas d un dessin indicatif ;
-4. objectif de rangement utile : extension de bacs, choix de complements,
-   limitation et justification des volumes automatiques ;
+4. remplacement complet des volumes automatiques : les cavites restent calibrees
+   et les enveloppes des bacs demandes absorbent tout le surplus ;
 5. nouvelle acceptance V0.1 fondee sur des scenarios produit, puis un smoke
    Fusion de la scene effectivement choisie.
 
 ## Consequence de pilotage
 
-P43 est reouvert. P44 a P50 restent bloques. P51 est absorbe dans la reprise
-complete de la qualite des resultats : corriger uniquement la fusion de cellules
-ne suffirait pas.
+P43 est reouvert. P44 a P50 restent bloques. ADR-0054 rejette les corps
+automatiques : P54 a P60 reconstruisent l editeur, le solveur, le resultat et la
+materialisation sur le modele cavites fixes / enveloppes extensibles.

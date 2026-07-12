@@ -39,7 +39,7 @@ Ce smoke ne valide qu une scene Fusion. Il ne vaut pas acceptance du MVP logicie
 
 - le smoke ne prouve pas la resistance, l ajustement des vraies pieces ou la
   qualite d impression ;
-- V0.2 formes/ergonomie et V0.3 couvercles restent bloques jusqu a P58,
+- V0.2 formes/ergonomie et V0.3 couvercles restent bloques jusqu a P60,
   puis a P46 ;
 - toute erreur Fusion visible doit etre corrigee avant acceptation.
 
@@ -55,12 +55,13 @@ Le 2026-07-12, Thomas a confirme : `Fusion P43 OK`.
 
 Le smoke Fusion est accepte pour la geometrie du jeu temoin uniquement. Il est
 `fusion-validated-geometry-only`. Le MVP V0.1 reste reouvert et
-`product-mvp-rejected` jusqu a P58 ; `print-validated: false` reste obligatoire.
+`product-mvp-rejected` jusqu a P60 ; `print-validated: false` reste obligatoire.
 
 ## Suivi de reprise
 
 La scene P43 contient 20 pieces, dont 15 remplissages automatiques residuels.
 Ils sont corrects pour le volume et les collisions, mais leur fragmentation et la
 palette bloquee sur `Chargement...` montrent que la qualite produit n est pas
-acceptee. P51 est absorbe par P56 ; P58 demandera un nouveau smoke Fusion de la
-scene finale retenue.
+acceptee. ADR-0054 rejette ces quinze corps automatiques. P57 remplacera leur
+generation par l expansion des bacs demandes ; P60 demandera un nouveau smoke
+Fusion de la scene finale retenue.

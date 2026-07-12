@@ -10,20 +10,21 @@ mission doit servir une capability, un milestone et une validation claire.
 
 La carte ne constitue plus a elle seule un ordre d'execution. ADR-0047 impose le
 chemin critique suivant : V0.1 fonctionnelle, puis V0.2 ergonomique, puis V0.3
-couvercles. Jusqu'a P43, seules les capacites ci-dessous sont des blockers actifs.
+couvercles. Jusqu'a P60, seules les capacites du chemin V0.1 corrige sont des blockers actifs.
 
 | Blocker V0.1 | Etat reel | Prochaine preuve |
 | --- | --- | --- |
-| Saisie user-first sans objets moteur | implemented-local-ui | P41, placement complet |
-| Regroupement `Bac cible` | implemented-core et local-ui | P41, placement global |
-| Derivation des bacs et logements | implemented-core et local-ui | P41, volume complet |
-| Pile plateaux/livrets superieure | implemented-core et local-ui | P41, support continu |
-| Parois par bac et jeu commun | derives par bac ; jeu inter-bacs P41 | P41 |
-| Affectation de tout le volume | FreeVolume descriptif seulement | P41 |
-| Geometrie fonctionnelle complete | bacs ouverts generiques | P42 |
-| Parcours V0.1 accepte | non accepte | P58 |
-
-`C-AESTHETIC` est `deferred` jusqu'a P58. Les mecanismes/couvercles sont
+| Editeur premium complet | code partiel, UX non acceptee | P54 puis P56 |
+| Tableau assets et regroupement `Bac cible` | contrat/core reutilisables | P55/P56 |
+| Cavites calibrees par forme, quantite et jeu | P39 reutilisable | P55 |
+| Pile plateaux/livrets | P40 reutilisable | P57 |
+| Parois/fonds minimaux et tolerances | partiellement implementes | P55 |
+| Enveloppes exterieures extensibles | absent | P55/P57 |
+| Partition complete sans corps automatique | absent | P57 |
+| Resultat et apercu issus du vrai plan | absent | P58 |
+| CAD/Fusion fidele et palette fiable | historique non conforme | P59 |
+| Parcours V0.1 accepte | non accepte | P60 |
+`C-AESTHETIC` est `deferred` jusqu'a P60. Les mecanismes/couvercles sont
 `deferred` jusqu'a P46. Les paragraphes historiques P33/P34 ci-dessous decrivent
 du code existant, pas un statut de release acquis.
 
@@ -396,7 +397,7 @@ impactees dans ce document ou dans `docs/STATUS.md` si le changement est ponctue
 
 - C-PRODUCT-VISION : le plan manuel est maintenant lisible et exportable comme contrat JSON/Markdown/CAD IR metadata.
 - C-CAD-IR : `implemented-cad-ir-metadata` pour BoxFillPlan; aucune operation CAD/Fusion n'est derivee du plan manuel.
-- C-FUSION-UI : inchangÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©e; Fusion reste adaptateur futur et ne recalcule pas le plan.
+- C-FUSION-UI : inchangee ; Fusion reste adaptateur futur et ne recalcule pas le plan.
 ## P19-M005 capability update
 
 - C-PRODUCT-VISION : `implemented-cad-ir` pour BoxFillPlan V0, valide et transporte en metadata CAD IR sans Fusion comme source de verite.
@@ -588,7 +589,7 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
   API mais aucune execution Fusion P42 n est encore observee.
 - C-PRODUCT-VISION : le Studio construit une geometrie fonctionnelle et explique
   les blocages ou jeux techniques sans exposer le jargon CAD dans le parcours.
-- C-AESTHETIC / C-STACKING : restent `deferred` jusqu aux gates P43 puis P46.
+- C-AESTHETIC / C-STACKING : restent `deferred` jusqu aux gates P60 puis P46.
 - C-PRINT : `print-validated: false` maintenu.
 
 ## P43 historical Fusion update
@@ -609,4 +610,18 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - C-SOLVER / C-QUALITY : conservation de volume et absence de collision sont
   `implemented-core`; une liste de residus de grille n est pas une qualite de
   rangement acceptee. P56 doit apporter utilite et justification.
+- C-PRINT : `print-validated: false` maintenu.
+
+## P53 fixed-cavity expandable-envelope update
+
+- C-PRODUCT-VISION : `accepted-product-semantics` pour l editeur premium complet
+  et le remplissage par expansion des bacs demandes.
+- C-CAVITY : les enveloppes calibrees P39 restent `implemented-core` comme bornes
+  utiles a preserver.
+- C-MODULE / C-SOLVER : `redesign-required` pour distinguer enveloppe minimale et
+  finale, puis partitionner le volume sans corps automatique.
+- C-RESERVATION : la pile superieure P40 reste `implemented-core`.
+- C-CAD-IR / C-FUSION-UI : l ancien chemin de remplissages automatiques est
+  `superseded-for-product`; P59 materialisera seulement le plan final.
+- C-AESTHETIC / C-STACKING : toujours `deferred` jusqu a P60.
 - C-PRINT : `print-validated: false` maintenu.

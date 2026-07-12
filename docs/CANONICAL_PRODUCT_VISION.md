@@ -31,6 +31,19 @@ apparaitre dans le parcours principal.
 
 ## V0.1 - MVP fonctionnel complet
 
+### 0. Editeur premium complet
+
+Le produit presente un editeur unique, beau, fluide et comprehensible. Il permet
+de renseigner tout le projet sans JSON, sans jargon moteur et sans passer par un
+formulaire technique Fusion. Depuis Fusion, la palette conduit clairement vers
+cet editeur puis affiche l etat de la materialisation et de l export.
+
+Le parcours novice montre les reglages essentiels au bon moment. Un mode avance
+ouvre progressivement un maximum de controle : jeux globaux et par bac, jeux des
+assets, epaisseurs minimales de paroi et de fond, priorites de repartition du
+surplus, dimensions verrouillees, ordre des plateaux/livrets et diagnostics. Les
+modifications mettent a jour les controles et l apercu sans perdre la saisie.
+
 ### 1. Mesurer la boite principale
 
 L'ecran principal demande en langage courant :
@@ -78,9 +91,13 @@ l'utilisateur peut nommer le bac et surcharger l'epaisseur minimale de paroi.
 Par defaut, le fond reprend la meme epaisseur minimale ; un reglage expert peut
 les dissocier plus tard sans changer le parcours novice.
 
-Le moteur derive les dimensions internes depuis les pieces et leurs quantites,
-puis cherche les dimensions externes et la position du bac dans la boite. Il ne
-demande pas a l'utilisateur de dessiner manuellement un `module candidat`.
+Le moteur derive les cavites calibrees et les dimensions exterieures minimales
+depuis les pieces, leurs quantites et leurs jeux. Ces dimensions minimales ne
+sont pas les dimensions finales du bac. Le solveur agrandit ensuite l enveloppe
+exterieure du bac pour participer au remplissage complet de la boite, sans
+agrandir les cavites. Le surplus devient de la matiere dans les parois autour des
+cavites et dans le fond sous les cavites. Il ne demande pas a l utilisateur de
+dessiner manuellement un `module candidat`.
 
 ### 4. Ajouter plateaux et livrets
 
@@ -102,19 +119,23 @@ doivent former un support coherent sous les plateaux et livrets, avec des
 encastrements ou retraits correspondant aux empreintes reelles lorsqu'ils sont
 necessaires. Une reservation n'est jamais un bac imprimable.
 
-### 5. Completer les volumes restants
+### 5. Absorber le volume dans les bacs demandes
 
-Le plan peut contenir des elements de remplissage explicites :
+Apres reservation des plateaux/livrets et des jeux obligatoires, les bacs demandes
+se partagent tout le volume imprimable restant. Les cavites restent calibrees sur
+les assets. Les enveloppes exterieures grandissent pour former une partition
+simple et complete : surplus X/Y dans les parois, surplus Z sous les cavites dans
+les fonds.
 
-- `Bac vide` : volume creux, utile et imprimable ;
-- `Remplissage plein` : volume massif volontaire ;
-- `Separateur` : paroi ou volume mince de structuration.
+Le moteur ne cree aucun bac de remplissage automatique. Un `Bac vide`, un
+`Remplissage plein` ou un `Separateur` existe uniquement si l utilisateur l ajoute
+explicitement dans l editeur. Ces elements explicites participent alors a la
+partition comme les autres corps demandes.
 
-Ils peuvent etre demandes par l'utilisateur ou proposes par le moteur pour
-fermer un residu. Le choix par defaut doit privilegier la piece imprimable la
-plus legere et la plus utile ; un bloc plein n'est jamais choisi silencieusement
-si un bac creux ou un ajustement de dimensions suffit.
-
+Un projet avec un seul bac peut donc remplir presque toute la boite avec un seul
+grand corps et une petite cavite calibree. Un projet avec plusieurs bacs repartit
+le volume entre eux. Les seuls vides externes autorises sont les jeux demandes
+entre les bacs, contre la boite et sous le couvercle.
 ### 6. Construire
 
 Le bouton principal s'appelle `Construire mon insert`. Il lance, dans cet ordre :
@@ -123,8 +144,8 @@ Le bouton principal s'appelle `Construire mon insert`. Il lance, dans cet ordre 
 2. creation des groupes de bacs ;
 3. calcul des logements et de leur capacite ;
 4. reservation de la pile plateaux/livrets ;
-5. recherche de dimensions et positions des bacs dans X/Y/Z ;
-6. qualification et traitement du volume restant ;
+5. partition du volume entre les bacs demandes et calcul de leurs enveloppes finales ;
+6. repartition du surplus dans les parois et fonds sans modifier les cavites ;
 7. controle des parois, jeux, collisions, couverture et hauteur totale ;
 8. production d'une ou plusieurs solutions expliquees ;
 9. materialisation CAD/Fusion de la solution choisie.
@@ -142,14 +163,18 @@ Un plan V0.1 est complet seulement si :
 - chaque bac respecte ses parois et son fond minimaux ;
 - le meme jeu minimal est respecte entre bacs et contre la boite ;
 - aucune collision ni sortie de boite n'existe ;
-- chaque region externe restante est classee comme jeu technique, reservation,
-  bac, bac vide, separateur ou remplissage plein ;
+- chaque corps imprimable correspond a un bac demande par un groupe d assets ou
+  a un complement ajoute explicitement ;
+- aucun corps automatique n est cree depuis une region libre du solveur ;
+- l union des enveloppes finales, des reservations et des jeux techniques couvre
+  exactement le volume disponible ;
 - la somme des hauteurs, couvercles exclus en V0.1, ne depasse jamais la boite ;
 - le resultat indique clairement `construit`, `partiel` ou `impossible`.
 
-"Rempli" signifie donc qu'aucun espace n'est oublie. Cela ne signifie pas que
-tout le volume est transforme en plastique : l'interieur utile des bacs et les
-jeux necessaires restent volontairement vides.
+"Rempli" signifie que les bacs demandes occupent tout le volume imprimable par
+leurs enveloppes exterieures. Les cavites utiles et les jeux necessaires restent
+vides ; le surplus est absorbe par la matiere des parois et des fonds, pas par des
+micro-boites ajoutees.
 
 ### 8. Cardinalite et limites honnetes
 

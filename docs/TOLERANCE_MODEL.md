@@ -200,3 +200,21 @@ P41 lors du placement global.
 P40 applique `layout_clearance_mm` autour de l empreinte de pile et une fois sous
 la pile, entre les plateaux/livrets et les bacs. La marge sous couvercle reste
 integree a `usable_height_mm` et n est pas ajoutee une seconde fois.
+## P53 - Epaisseurs minimales et epaisseurs finales
+
+Les epaisseurs de paroi et de fond saisies dans l editeur sont des minima de
+fabrication. Elles servent a construire `minimum_outer_envelope`. Elles ne sont
+pas des valeurs finales quand le bac doit absorber du volume.
+
+L expansion de `final_outer_envelope` ajoute de la matiere apres application des
+jeux de cavite et des jeux externes. Elle ne modifie jamais :
+
+- le jeu autour des assets ;
+- le jeu total entre deux bacs ;
+- le jeu peripherique contre la boite ;
+- la marge sous couvercle.
+
+Les jeux restent du vide et ne sont pas absorbes. Le surplus de matiere est
+trace separement pour chaque face et pour le fond, afin que le mode avance puisse
+plus tard verrouiller ou ponderer sa repartition sans changer les valeurs de
+tolerance.

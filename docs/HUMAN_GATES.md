@@ -71,12 +71,12 @@ merge, si un conflit reel apparait ou si une action risque de perdre du travail.
 
 | Gate | Condition minimale | Ce qui reste humain | Effet |
 | --- | --- | --- | --- |
-| P58 - Acceptation V0.1 reprise | Les six axes du contrat V0.1 sont verifies : parcours vide -> saisie -> resultat utile -> CAD/Fusion, couverture et volume | Observation Fusion de la scene finale uniquement ; UI et resultat sont deja prouves par des tests de comportement | Autorise seulement alors le demarrage V0.2 |
+| P60 - Acceptation V0.1 reprise | Editeur complet, cavites calibrees, enveloppes extensibles, partition sans corps automatique et CAD/Fusion fidele | Observation Fusion de la scene finale uniquement ; UI et resultat sont deja prouves par des tests de comportement | Autorise seulement alors le demarrage V0.2 |
 | P46 - Acceptation V0.2 | Formes et ergonomie materialisees, contraintes de paroi et volume recalculees | Evaluation visuelle/ergonomique et observation Fusion | Autorise seulement alors le demarrage V0.3 |
 | P50 - Validation V0.3 | Deux familles de couvercles conformes au contrat, coupons prepares | Impressions, mesures, glisse/tenue et interpretation | Autorise la qualification physique des mecanismes |
 
 Le smoke P34 n'est plus une gate active : le coupon ne correspond pas au
-mecanisme coulissant canonique et la V0.3 est bloquee par P43 puis P46.
+mecanisme coulissant canonique et la V0.3 est bloquee par P60 puis P46.
 
 ## Format minimal d'un rapport de gate
 

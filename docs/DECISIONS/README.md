@@ -178,3 +178,5 @@ Tests, cartes backlog ou gates humaines a preparer.
 - ADR-0052-functional-volume-cad-materialization-v1.md - materialisation CAD fonctionnelle P42 du plan V0.1.
 
 - ADR-0053-product-conformance-before-v01-acceptance.md - conformite produit obligatoire avant acceptance V0.1.
+
+- ADR-0054-fixed-cavities-expandable-container-envelopes.md - cavites calibrees, enveloppes extensibles et aucun corps automatique.

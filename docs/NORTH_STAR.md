@@ -52,8 +52,17 @@ volumes libres, ordre de retrait et sorties CAD.
    Fusion reelle, l'impression ou l'ergonomie.
 7. `Design language and aesthetics` : ajouter labels, gravures, textures et
    style seulement apres la robustesse fonctionnelle.
-8. `Complete volume accounting` : chaque region utile est un bac, une
-   reservation, un remplissage ou un jeu technique voulu ; aucun vide oublie.
+8. `Complete volume accounting` : les cavites restent calibrees et les
+   enveloppes des bacs demandes absorbent le volume imprimable restant ; aucun
+   corps automatique ni vide oublie.
+
+## Invariant V0.1 de remplissage
+
+Les assets dimensionnent les cavites, jamais le volume exterieur final des bacs.
+Apres reservation des plateaux/livrets et des jeux techniques, les enveloppes des
+bacs demandes sont agrandies pour occuper tout le volume imprimable. Le surplus
+devient de la matiere dans les parois et fonds. Aucun micro-bac, bloc ou
+separateur n est invente par le moteur.
 
 ## Definition du succes
 
