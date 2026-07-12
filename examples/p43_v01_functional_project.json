@@ -1,0 +1,90 @@
+{
+  "schema_version": "bgig.project.v1",
+  "project_name": "Jeu temoin MVP V0.1",
+  "box": {
+    "inner_dimensions_mm": {"x": 220.0, "y": 160.0, "z": 65.0},
+    "usable_height_mm": 61.0,
+    "lid_clearance_mm": 2.0
+  },
+  "layout": {
+    "layout_clearance_mm": 0.6,
+    "default_wall_thickness_mm": 1.2,
+    "default_floor_thickness_mm": 1.2,
+    "default_content_clearance_mm": 0.6
+  },
+  "contents": [
+    {
+      "id": "cards",
+      "name": "Paquet de cartes",
+      "shape_kind": "cards",
+      "dimensions_mm": {"x": 63.0, "y": 88.0, "z": 18.0},
+      "quantity": 100,
+      "container_group_id": "cards",
+      "content_clearance_mm": null,
+      "measurement_confidence": "exact"
+    },
+    {
+      "id": "tokens",
+      "name": "Jetons ronds",
+      "shape_kind": "round",
+      "dimensions_mm": {"x": 14.0, "y": 14.0, "z": 3.0},
+      "quantity": 72,
+      "container_group_id": "tokens",
+      "content_clearance_mm": null,
+      "measurement_confidence": "exact"
+    },
+    {
+      "id": "dice",
+      "name": "Des",
+      "shape_kind": "cube",
+      "dimensions_mm": {"x": 16.0, "y": 16.0, "z": 16.0},
+      "quantity": 4,
+      "container_group_id": "dice",
+      "content_clearance_mm": null,
+      "measurement_confidence": "exact"
+    }
+  ],
+  "container_groups": [
+    {"id": "cards", "name": "Bac cartes", "wall_thickness_mm": null, "floor_thickness_mm": null},
+    {"id": "tokens", "name": "Bac jetons", "wall_thickness_mm": null, "floor_thickness_mm": null},
+    {"id": "dice", "name": "Bac des", "wall_thickness_mm": null, "floor_thickness_mm": null}
+  ],
+  "flat_items": [
+    {
+      "id": "board",
+      "name": "Plateau principal",
+      "kind": "board",
+      "dimensions_mm": {"x": 210.0, "y": 150.0, "z": 2.0},
+      "quantity": 1,
+      "stack_order": 0
+    },
+    {
+      "id": "rules",
+      "name": "Livret de regles",
+      "kind": "rulebook",
+      "dimensions_mm": {"x": 200.0, "y": 140.0, "z": 2.0},
+      "quantity": 1,
+      "stack_order": 1
+    }
+  ],
+  "fill_elements": [
+    {
+      "id": "spare",
+      "name": "Bac vide exact",
+      "kind": "hollow",
+      "mode": "exact",
+      "dimensions_mm": {"x": 24.0, "y": 24.0, "z": 56.4},
+      "container_group_id": null
+    },
+    {
+      "id": "separator",
+      "name": "Separateur exact",
+      "kind": "separator",
+      "mode": "exact",
+      "dimensions_mm": {"x": 3.0, "y": 35.0, "z": 12.0},
+      "container_group_id": null
+    }
+  ],
+  "solver_preference": "balanced",
+  "deferred_features": {"appearance": null, "mechanism": null}
+}
