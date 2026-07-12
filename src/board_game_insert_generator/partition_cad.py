@@ -275,6 +275,9 @@ def _transformed_cavity(
     cavity_origin = _dimension(cavity["local_origin_mm"], "cavity.local_origin_mm")
     cavity_size = _dimension(cavity["inner_dimensions_mm"], "cavity.inner_dimensions_mm")
     local = {axis: minimum_origin[axis] + cavity_origin[axis] for axis in ("x", "y", "z")}
+    # P55 keeps cavity dimensions fixed while P57 assigns all Z surplus below.
+    # Every storage cavity must therefore stay open on the final top face.
+    local["z"] = final_local["z"] - cavity_size["z"]
     if rotation == 0:
         return _rounded(local), _rounded(cavity_size)
     if rotation == 90:

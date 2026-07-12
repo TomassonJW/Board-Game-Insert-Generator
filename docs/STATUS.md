@@ -1370,3 +1370,20 @@ valides. Le packaging exige `partition_cad.py` et le manifeste passe en 0.1.6.
 
 Limite : aucune observation de cette scene P59 dans Fusion n est encore
 revendiquee. P60 est desormais la seule gate active avant acceptation V0.1.
+## P60 - Preparation de la gate Fusion-only
+
+Statut : `prepared-in-repository`, `automated-evidence-green`,
+`human-fusion-observation-required`, `print-validated: false`.
+
+Le fixture `p60_mvp_project.json` couvre deux bacs, trois cavites de hauteurs
+differentes, un livret et zero complement. Sa preparation a detecte puis corrige
+un defaut P59 : le surplus Z etait place sous l enveloppe par P57, mais une
+cavite courte gardait son ancien fond et devenait fermee. P59 recale maintenant
+chaque cavite sur la face superieure finale sans changer ses dimensions ; un
+test multi-hauteurs verrouille cet invariant.
+
+Le script `prepare_p60_mvp_acceptance.ps1` installe l add-in du commit courant,
+verifie le runtime Fusion-only, ecrit le fixture comme projet courant et marque
+le commit installe. Les preuves hors Fusion confirment 2 corps, 3 cavites, zero
+automatique et 2 occurrences compactes. L observation Fusion et l export reel
+restent la gate humaine active.

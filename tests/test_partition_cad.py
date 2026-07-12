@@ -64,6 +64,21 @@ class PartitionCadTests(unittest.TestCase):
                 self.assertEqual(size["z"], cavity["inner_dimensions_mm"]["z"])
                 self.assertAlmostEqual(origin["z"] + size["z"], body_size["z"])
 
+    def test_multiple_cavity_heights_remain_open_on_the_final_top(self) -> None:
+        value = project(1)
+        value["contents"] = [
+            {"id": "low", "name": "Bas", "shape_kind": "square", "dimensions_mm": {"x": 18.0, "y": 18.0, "z": 2.0}, "quantity": 2, "container_group_id": "g0", "content_clearance_mm": None, "measurement_confidence": "exact"},
+            {"id": "high", "name": "Haut", "shape_kind": "cube", "dimensions_mm": {"x": 12.0, "y": 12.0, "z": 12.0}, "quantity": 4, "container_group_id": "g0", "content_clearance_mm": None, "measurement_confidence": "exact"},
+        ]
+        result = build_partition_cad(value)
+        body = result["cad_ir"]["components"][0]["body"]
+
+        self.assertGreater(len(body["cavities"]), 1)
+        for cavity in body["cavities"]:
+            self.assertAlmostEqual(
+                cavity["local_origin_mm"]["z"] + cavity["size_mm"]["z"],
+                body["printable_size_mm"]["z"],
+            )
     def test_metadata_proves_zero_automatic_or_free_region_body(self) -> None:
         result = build_partition_cad(project(2))
         metadata = result["cad_ir"]["metadata"]

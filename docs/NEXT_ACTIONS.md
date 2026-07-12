@@ -37,8 +37,10 @@ P44 a P50 restent bloques jusqu a l acceptation humaine P60.
 
 ## Gate humaine active
 
-P60 uniquement. Codex doit installer et verifier l add-in local, preparer les
-donnees du smoke et ne fournir a Thomas que les actions restantes dans Fusion.
+P60 uniquement. Le contrat est `docs/P60_FUSION_MVP_ACCEPTANCE.md` et le
+preparateur est `scripts/fusion/prepare_p60_mvp_acceptance.ps1`. Codex doit
+installer et verifier l add-in exact puis ne fournir a Thomas que les actions
+restantes dans Fusion.
 
 ## Fin de chaque mission
 
