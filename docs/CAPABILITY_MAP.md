@@ -724,9 +724,9 @@ comme experience acceptee. Les blockers V0.1 actifs deviennent :
 
 | Blocker V0.1 revise | Etat reel | Prochaine preuve |
 | --- | --- | --- |
-| Etat source/derive/solve/materialise | propose ADR-0056 | P61 |
-| Diagnostics discrets et parcours progressif | propose ADR-0060 | P61/P65 |
-| Catalogue et orientations de rangement | propose ADR-0058 | P62 |
+| Etat source/derive/solve/materialise | implemente et teste dans la palette 0.1.10 | observation P66 |
+| Diagnostics discrets et parcours progressif | socle P61 implemente ; finition P65 | P65 |
+| Catalogue et orientations de rangement | ADR-0058 acceptee | P62 |
 | Reservations superieures localisees | P40 global a remplacer, ADR-0057 proposee | P63 |
 | Placement multi-etages Z | contrats historiques presents, solveur actif absent | P64 |
 | Surplus pondere et Auto/Cible/Fixe | partage egal P57 insuffisant | P64 |
@@ -737,3 +737,15 @@ comme experience acceptee. Les blockers V0.1 actifs deviennent :
 blockers de convergence. Les implementations P40/P57 restent historiques et
 testees, mais sont `superseded-for-product` pour la semantique cible. Les formes
 de cavite V0.2 restent differees apres P66.
+
+## P61 reactive palette update
+
+- C-FUSION-UI : `implemented-reactive-state`, parcours et barre d actions P61,
+  densites Compact/Detaille et details locaux sans mode avance global.
+- C-PROJECT : digest source Python, derives recalcules apres debounce, ancien
+  plan conserve comme obsolete et scene materialisee distincte.
+- C-QUALITY : inspect sain silencieux, rapport brut replie, codes moteur retires
+  du premier niveau et plan obsolete non materialisable.
+- Validation : tests automatises verts ; observation Fusion reportee a P66,
+  `print-validated: false`.
+- Prochaine capability : C-ASSET par P62, ADR-0058 acceptee.

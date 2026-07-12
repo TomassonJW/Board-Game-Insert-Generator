@@ -308,3 +308,10 @@ Le nouveau chemin critique est strictement sequentiel :
 P61-P65 ne deviennent pas `ready` avant acceptation des ADR structurelles qui
 les concernent. Aucune dependance de solveur externe, valeur de tolerance ou
 forme ergonomique V0.2 n est ajoutee par ce rebase.
+
+## P61 implemente - 2026-07-12
+
+Le package Fusion 0.1.10 implemente les etats source/derive/solve/materialise,
+l invalidation explicable, l ancien Apercu grise, les diagnostics techniques
+replies, le parcours renomme et les densites Compact/Detaille. Il ne modifie ni
+le solveur P57, ni les reservations P40, ni les tolerances. P62 devient ready.

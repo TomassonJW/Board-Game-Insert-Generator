@@ -2,8 +2,9 @@
 
 ## Statut
 
-Proposee le 2026-07-12 apres la revue produit P60. Elle remplacerait ADR-0050
-si elle est acceptee.
+Acceptee le 2026-07-12 par validation humaine explicite : `GO` pour avancer
+vers le MVP. Elle remplace ADR-0050 pour la cible produit ; P63 portera son
+implementation.
 
 ## Date
 

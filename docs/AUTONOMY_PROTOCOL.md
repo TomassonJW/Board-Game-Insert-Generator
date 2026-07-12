@@ -30,9 +30,9 @@ validation humaine explicite.
 
 ### Verrou de chemin critique des releases
 
-Depuis ADR-0047, la selection par capability est subordonnee a l'ordre des
-releases. Tant que P60 n'a pas accepte la V0.1, seules les missions P52 a P60 qui
-ferment le contrat V0.1 corrige peuvent etre `ready`. Tant que P46 n'a pas accepte la
+Depuis ADR-0047 et le rebase P60-R, la selection par capability est subordonnee
+a l ordre des releases. Tant que P66 n a pas accepte la V0.1, seules les missions
+P61 a P66 du chemin revise peuvent etre `ready`. Tant que P46 n a pas accepte la
 V0.2, aucune mission couvercle V0.3 ne peut etre `ready`.
 
 Une gate humaine qui choisit une option d'une version ulterieure n'en change pas

@@ -7,6 +7,7 @@ derivation and atomic local persistence.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
@@ -169,6 +170,13 @@ def _response(
         "request_id": request_id,
         "status": status,
         "project": deepcopy(project),
+        "project_digest": _project_digest(project),
+        "lifecycle": {
+            "source": "current" if project is not None else "invalid",
+            "derived": "current" if envelopes is not None and flat_stack is not None else "pending",
+            "solved": "current" if partition is not None else "not_computed",
+            "materialized": "cad_ready" if cad_build is not None else "not_materialized",
+        },
         "creation_presets": deepcopy(creation_presets),
         "envelopes": deepcopy(envelopes),
         "flat_stack": deepcopy(flat_stack),
@@ -181,6 +189,15 @@ def _response(
         "migrated": migrated,
         "export_path": export_path,
     }
+
+
+def _project_digest(project: dict[str, object] | None) -> str:
+    """Return a stable source digest without moving business logic to the palette."""
+
+    if project is None:
+        return ""
+    canonical = json.dumps(project, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
 def _export_project(addin_dir: Path, project: dict[str, object]) -> Path:

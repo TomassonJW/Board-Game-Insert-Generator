@@ -149,7 +149,7 @@ function Assert-BgigPaletteProjectRuntime {
         }
     }
     $palette = Get-Content -LiteralPath (Join-Path $AddinPath "palette.html") -Raw -Encoding UTF8
-    foreach ($marker in @("bgig.palette.request.v1", "1. Boite", "6. Resultat", "materialize_project", "regenerate_project", "bgig_palette_ready", "Demarrage rapide", "Bloc plein / cale", "final (auto si vide)")) {
+    foreach ($marker in @("bgig.palette.request.v1", "1. Boite", "6. Apercu", "materialize_project", "regenerate_project", "bgig_palette_ready", "Demarrage rapide", "Corps explicites", "final (auto si vide)", "technical-drawer", "solvedStale")) {
         if ($palette -notlike "*$marker*") {
             throw "Installed P56 palette marker missing: $marker"
         }

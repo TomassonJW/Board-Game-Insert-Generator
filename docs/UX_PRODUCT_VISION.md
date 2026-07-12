@@ -44,7 +44,7 @@ Checklist de proposition choisie, blockers printability, fichiers STL V0, manife
 - Toute proposition explique ce qu'elle contient, ce qu'elle reserve, ce qui reste libre et pourquoi elle gagne/perd.
 - Toute action destructive ou exportable preserve le registry BGIG et les objets utilisateur.
 
-## Cible proposee apres revue P60
+## Cible acceptee apres revue P60
 
 La surface MVP reste exclusivement la palette Fusion. Le parcours recommande
 est Boite, Plateaux et livrets, Elements du jeu, Conteneurs, Reglages, Apercu.
@@ -55,4 +55,4 @@ Un inspect sain est silencieux. Un diagnostic technique est tronque dans un
 tiroir `Voir plus`, jamais affiche comme message principal. Une edition garde
 les sources modifiables, recalcule les derives et marque l ancien plan obsolete
 sans regenerer Fusion. Les codes moteur, digests et milestones restent hors du
-premier niveau. Cette cible depend d ADR-0056 et ADR-0060.
+premier niveau. Cette cible est gouvernee par ADR-0056 et ADR-0060 acceptees.

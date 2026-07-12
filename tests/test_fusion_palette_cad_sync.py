@@ -48,6 +48,7 @@ class FusionPaletteCadSyncTests(unittest.TestCase):
 
         self.assertEqual(result["scene_status"], "synchronized")
         self.assertEqual(result["scene_result"], "generated")
+        self.assertEqual(result["lifecycle"]["materialized"], "current")
         self.assertEqual(payload["schema_version"], "cad_ir.v0")
         self.assertEqual(request.action, FUSION_COMMAND_ACTION_GENERATE)
         self.assertEqual(request.generation_mode, FUSION_GENERATION_MODE_COMPACT_ONLY)
@@ -64,6 +65,7 @@ class FusionPaletteCadSyncTests(unittest.TestCase):
 
         self.assertEqual(result["scene_status"], "blocked")
         self.assertIn("generate refused", result["scene_result"])
+        self.assertEqual(result["lifecycle"]["materialized"], "blocked")
     def test_regenerate_uses_owned_scene_replacement_action(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir, patch.object(
             entrypoint, "_execute_generation_request", return_value="regenerated"
@@ -96,6 +98,7 @@ class FusionPaletteCadSyncTests(unittest.TestCase):
         self.assertEqual(result["request_id"], "abc")
         self.assertEqual(result["status"], "bridge_error")
         self.assertEqual(result["scene_status"], "error")
+        self.assertEqual(result["lifecycle"]["materialized"], "error")
         self.assertIn("boom", result["errors"][0])
 
 

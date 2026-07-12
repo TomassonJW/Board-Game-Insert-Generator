@@ -56,10 +56,11 @@ class FusionOnlyAlignmentTests(unittest.TestCase):
         self.assertIn("BGIG dans Fusion 360", markup)
         self.assertIn("bgig.palette.request.v1", markup)
 
-    def test_next_action_does_not_merge_the_abandoned_web_branch(self) -> None:
+    def test_next_action_advances_the_revised_fusion_only_mvp(self) -> None:
         actions = self.read("docs/NEXT_ACTIONS.md")
-        self.assertIn("P59 - materialisation CAD", actions)
-        self.assertIn("P60 - acceptance du vrai MVP", actions)
+        self.assertIn("P61 - etat reactif", actions)
+        self.assertIn("P62 - catalogue d elements", actions)
+        self.assertIn("P66", actions)
         self.assertNotIn("codex/p56-premium-editor", actions)
         self.assertNotIn("inspection visuelle runtime du frontend reel", actions)
 

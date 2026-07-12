@@ -8,7 +8,7 @@ Statut produit : **MVP V0.1 reouvert ; fondations techniques presentes, conformi
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P60-R documente la revue produit KO. P60 reste une base technique utile ; P61-P65 sont bloques par la revue des ADR-0056 a ADR-0060 et P66 devient la future gate V0.1.
+Phase active : P61 implemente l etat reactif et l architecture de palette ; P62 devient la prochaine mission ready du chemin V0.1 revise.
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -1480,3 +1480,27 @@ modifie dans P60-R.
 La prochaine action est une revue humaine des cinq ADR. Apres acceptation, P61
 ouvre le plus petit lot d implementation : etat reactif, diagnostics discrets
 et architecture de palette. La sortie V0.1 est transferee a P66.
+
+## P61 - Etat reactif et architecture de palette Fusion
+
+Statut : `implemented`, `automated-validated`, `fusion-retest-required`,
+`print-validated: false`.
+
+Le GO humain accepte ADR-0056 a ADR-0060. Le package 0.1.10 supprime le mode
+avance global, ordonne le parcours Boite -> Plateaux et livrets -> Elements du
+jeu -> Conteneurs -> Reglages -> Apercu et installe une barre d actions en trois
+zones. Les listes Elements et Conteneurs offrent les densites Compact/Detaille.
+
+Le bridge Python retourne un digest source stable et les etats source, derive,
+solve et materialise. Apres edition, la palette recalcule les minima apres 350
+ms, conserve l ancien Apercu grise, marque la proposition a recalculer et refuse
+Materialiser/Regenerer tant que le plan est obsolete. Aucune scene Fusion n est
+modifiee automatiquement.
+
+L inspection saine du demarrage reste silencieuse : le rapport complet est
+place dans Details techniques et n alimente plus le message global. Les codes
+P57, digests et statuts moteur ont quitte le premier niveau de l Apercu.
+
+Preuves : 33 tests palette/bridge, controle syntaxique Node et suite complete
+389 tests OK. Aucune validation Fusion ou impression n est
+revendiquee. P62 est la prochaine mission ready.

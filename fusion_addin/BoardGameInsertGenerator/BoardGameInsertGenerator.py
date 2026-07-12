@@ -578,7 +578,7 @@ if adsk is not None:
                 if action in {"refresh", "preview", "inspect"}:
                     request = replace(_safe_default_command_request(self.addin_dir), action=FUSION_COMMAND_ACTION_INSPECT)
                     result = _execute_generation_request(request, self.addin_dir)
-                    _publish_palette_state(self.palette, self.addin_dir, result)
+                    _publish_palette_state(self.palette, self.addin_dir, technical_detail=result)
                     return
                 if action == "clear":
                     request = replace(_safe_default_command_request(self.addin_dir), action=FUSION_COMMAND_ACTION_CLEAR)
@@ -744,6 +744,9 @@ def _synchronize_palette_cad_response(
     if cad_build.get("status") != "ready_for_fusion" or not isinstance(cad_build.get("cad_ir"), dict):
         synchronized["scene_status"] = "blocked"
         synchronized["scene_result"] = "La partition ne peut pas etre materialisee dans Fusion."
+        lifecycle = dict(synchronized.get("lifecycle") or {})
+        lifecycle["materialized"] = "blocked"
+        synchronized["lifecycle"] = lifecycle
         return synchronized
 
     cad_ir_path = addin_dir / BGIG_GENERATED_CAD_IR_FILENAME
@@ -769,6 +772,9 @@ def _synchronize_palette_cad_response(
         and BGIG_EXISTING_SCENE_MESSAGE in str(synchronized["scene_result"])
         else "synchronized"
     )
+    lifecycle = dict(synchronized.get("lifecycle") or {})
+    lifecycle["materialized"] = "current" if synchronized["scene_status"] == "synchronized" else "blocked"
+    synchronized["lifecycle"] = lifecycle
     synchronized["cad_ir_path"] = str(cad_ir_path)
     return synchronized
 
@@ -780,6 +786,8 @@ def _palette_project_bridge_error_response(raw_request: object, exc: Exception) 
         "request_id": request_id,
         "status": "bridge_error",
         "project": None,
+        "project_digest": "",
+        "lifecycle": {"source": "invalid", "derived": "invalid", "solved": "invalid", "materialized": "error"},
         "envelopes": None,
         "flat_stack": None,
         "partition": None,

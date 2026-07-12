@@ -145,7 +145,7 @@ Statut : `done`, `implemented-core`, `implemented-cli`, `implemented-cad-ir-meta
 - Une erreur de bridge doit retourner une reponse versionnee et actionnable.
 - `implemented` ne vaut ni `fusion-validated`, ni `print-validated`.
 
-## Regles produit proposees apres revue P60
+## Regles produit acceptees apres revue P60
 
 - Un inspect sain au demarrage ne produit aucun message global.
 - Aucun enum, digest, milestone ou nom de moteur ne doit apparaitre au premier niveau utilisateur.

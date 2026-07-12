@@ -55,9 +55,15 @@ class FusionPaletteQtTransportTests(unittest.TestCase):
             icon = ADDIN / "resources" / name
             self.assertTrue(icon.is_file())
             ET.parse(icon)
+    def test_inspection_report_is_sent_only_as_collapsed_technical_detail(self) -> None:
+        inspect_block = self.source[self.source.index('if action in {"refresh", "preview", "inspect"}') :]
+        inspect_block = inspect_block[: inspect_block.index('if action == "clear"')]
+        self.assertIn("technical_detail=result", inspect_block)
+        self.assertNotIn("self.addin_dir, result)", inspect_block)
+
     def test_manifest_identifies_the_bootstrap_and_launcher_fix(self) -> None:
         manifest = json.loads((ADDIN / "BoardGameInsertGenerator.manifest").read_text(encoding="utf-8"))
-        self.assertEqual(manifest["version"], "0.1.9")
+        self.assertEqual(manifest["version"], "0.1.10")
     def test_palette_opens_at_a_product_sized_minimum(self) -> None:
         self.assertEqual(entrypoint.BGIG_PALETTE_DEFAULT_WIDTH, 1280)
         self.assertEqual(entrypoint.BGIG_PALETTE_DEFAULT_HEIGHT, 1100)

@@ -864,3 +864,14 @@ la reception cote Python declenche le chargement versionne.
 Le bouton Utilities suit le Palette Sample Autodesk : une commande sans inputs
 attache un execute handler qui rend la palette visible. Il n ouvre aucun
 CommandInputs metier. Le `resourceFolder` fournit les SVG 16/32 px du bouton.
+
+## P61 - Etat reactif et diagnostics progressifs
+
+La palette 0.1.10 distingue source, derives, proposition et scene materialisee.
+Les derives sont recalcules par le bridge Python apres edition ; JavaScript ne
+recalcule aucune decision metier. Une proposition obsolete reste visible mais
+ne peut pas etre materialisee ou regeneree.
+
+L action inspect transmet le rapport complet uniquement comme detail technique.
+Un inspect sain ne produit plus de notification globale. La scene Fusion reste
+une projection explicite et aucune edition ne la modifie automatiquement.

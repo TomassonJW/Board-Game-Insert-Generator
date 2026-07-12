@@ -2,8 +2,8 @@
 
 ## Statut
 
-Proposee le 2026-07-12 apres la revue produit P60. Validation humaine requise
-avant P61.
+Acceptee le 2026-07-12 par validation humaine explicite : `GO` pour avancer
+vers le MVP. P61 peut implementer ce contrat par increment borne.
 
 ## Date
 

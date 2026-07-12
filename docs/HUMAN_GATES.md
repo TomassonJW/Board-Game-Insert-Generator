@@ -23,10 +23,10 @@ structurantes de modele produit, de reservation et de solveur. Conformement au
 protocole, Codex documente les options mais ne reprend pas le runtime avant une
 validation humaine explicite des ADR proposees.
 
-La revue P60 a rouvert une gate d architecture produit avant toute reprise du
-runtime : accepter, modifier ou refuser ADR-0056 a ADR-0060. Apres cette gate,
-la validation humaine finale reste l observation P66 dans Fusion d un smoke
-prepare automatiquement.
+Le GO humain du 2026-07-12 accepte ADR-0056 a ADR-0060 et ferme la gate
+d architecture P60-R. P61 a P65 peuvent avancer sequentiellement selon leurs
+dependances. La validation humaine finale reste l observation P66 dans Fusion
+d un smoke prepare automatiquement.
 Le produit observe est l add-in Fusion-only et sa palette embarquee ; aucun
 Studio web ne participe a cette gate. Les gates physiques d impression et
 les gates des V0.2/V0.3 restent hors de ce run.
@@ -77,7 +77,7 @@ merge, si un conflit reel apparait ou si une action risque de perdre du travail.
 | Gate | Condition minimale | Ce qui reste humain | Effet |
 | --- | --- | --- | --- |
 | P60 - Base technique V0.1 | Parcours palette -> calcul -> apercu -> materialisation observe | Revue produit du parcours | Revue KO ; ne debloque pas V0.2 |
-| ADR-0056 a ADR-0060 - Rebase produit | Alternatives, consequences et validations P61-P65 documentees | Accepter, modifier ou refuser les contrats structurants | Autorise seulement les lots d implementation acceptes |
+| ADR-0056 a ADR-0060 - Rebase produit | Alternatives, consequences et validations P61-P65 documentees | Acceptees par GO humain le 2026-07-12 | P61-P65 autorises sequentiellement |
 | P66 - Acceptation V0.1 revisee Fusion-only | Etat reactif, plateaux encastres, orientations, multi-etages, conteneurs/reglages/apercu integres et scene sure | Observation Fusion du parcours complet, regeneration/export et absence de fuite technique | Autorise seulement alors le demarrage V0.2 |
 | P46 - Acceptation V0.2 | Formes et ergonomie materialisees, contraintes de paroi et volume recalculees | Evaluation visuelle/ergonomique et observation Fusion | Autorise seulement alors le demarrage V0.3 |
 | P50 - Validation V0.3 | Deux familles de couvercles conformes au contrat, coupons prepares | Impressions, mesures, glisse/tenue et interpretation | Autorise la qualification physique des mecanismes |

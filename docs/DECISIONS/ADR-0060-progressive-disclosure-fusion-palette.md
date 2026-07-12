@@ -2,8 +2,8 @@
 
 ## Statut
 
-Proposee le 2026-07-12 apres la revue produit P60. Validation humaine requise
-avant P61 et P65.
+Acceptee le 2026-07-12 par validation humaine explicite : `GO` pour avancer
+vers le MVP. P61 puis P65 portent son implementation progressive.
 
 ## Date
 

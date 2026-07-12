@@ -4,62 +4,51 @@ Derniere mise a jour : 2026-07-12
 
 ## Version active
 
-V0.1 - vrai MVP Fusion-only selon ADR-0055.
+V0.1 - vrai MVP Fusion-only selon ADR-0055 et rebase P60-R accepte.
 
 ## Derniere mission terminee
 
-P60-R - realignement documentaire apres revue produit dans Fusion. P59 et le
-runtime P60 0.1.9 restent une base technique utile, pas une acceptance produit.
+P61 - etat reactif et architecture de palette, package 0.1.10.
 
-Historique conserve : P59 - materialisation CAD et synchronisation de scene est
-implementee ; P60 - acceptance du vrai MVP a ete refusee par la revue produit.
+## Derniere preuve automatisee
 
-## Derniere preuve humaine
-
-Le parcours charge, calcule, affiche un Apercu utile et materialise dans Fusion.
-La revue refuse cependant l acceptance P60 : diagnostic brut intrusif, editions
-non reactives, pile globale de plateaux et absence de solveur multi-etages.
+La palette distingue saisie, minima, proposition et scene Fusion. Une edition
+recalcule les derives, conserve l ancien Apercu comme obsolete et bloque sa
+materialisation. Le rapport inspect complet reste dans Details techniques.
+Les tests palette/bridge et la suite complete sont verts ; aucune validation
+Fusion ou impression n est revendiquee.
 
 ## Mission courante
 
-P60-R - contrats et pilotage du MVP revise. Aucun code de production n est
-autorise par cette mission.
-
-Livrables documentaires :
-
-- rapport `docs/P60_PRODUCT_FEEDBACK_REALIGNMENT.md` ;
-- ADR-0056 a ADR-0060 proposees ;
-- chemin critique P61-P66 et gates de release realignes.
+Aucune mission en cours. P61 est integree avant selection de la suite.
 
 ## Prochaine action prete
 
-Relire et accepter, modifier ou refuser les cinq ADR proposees :
+P62 - catalogue d elements et orientations de rangement.
 
-1. ADR-0056 : etat reactif et priorite des contraintes ;
-2. ADR-0057 : plateaux/livrets encastres depuis le dessus ;
-3. ADR-0058 : catalogue local et orientations ;
-4. ADR-0059 : solveur volumetrique borne par etages ;
-5. ADR-0060 : divulgation progressive dans la palette Fusion.
+Scope borne :
 
-## Mission suivante apres acceptation des ADR
+1. formats de cartes locaux et dimensions resolues visibles ;
+2. sleevees / non sleevees ;
+3. orientations a plat, debout grand cote, debout petit cote et automatique ;
+4. presets personnels locaux, versionnes et exportables ;
+5. migration additive et tests coeur/palette.
 
-P61 - etat reactif et architecture de palette.
+## Mission suivante apres P62
 
-P61 sera borne aux diagnostics discrets, aux etats source/derive/solve/
-materialise, a l invalidation explicable et a l architecture d information. Le
-solveur Z reste P64.
+P63 - reservations superieures encastrees, selon ADR-0057 acceptee.
 
 ## Releases bloquees
 
-P61-P65 sont bloques par la revue des ADR. P44 a P50 restent bloques jusqu a
-l acceptation humaine P66. P47 a P50 restent aussi bloques jusqu a
-l acceptation de P46.
+P63 depend de P62 ; P64 depend de P63 ; P65 depend de P64. P44 a P50 restent
+bloques jusqu a l acceptation humaine P66. P47 a P50 restent aussi bloques
+jusqu a l acceptation de P46.
 
 ## Gate humaine active
 
-Gate d architecture ADR-0056 a ADR-0060. Aucun nouveau smoke Fusion n est demande
-avant implementation de P61-P65. La future gate produit devient P66 et sera
-preparee automatiquement.
+Aucune gate avant P66 tant que P62-P65 restent dans les ADR acceptees et
+n introduisent ni dependance lourde ni changement de tolerance. P66 demandera
+une observation Fusion preparee automatiquement.
 
 ## Fin de chaque mission
 

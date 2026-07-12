@@ -1686,17 +1686,17 @@ impose les dependances de release suivantes.
   listes compactes/detaillees, barre persistante et tiroir technique.
 - Acceptation : inspect sain silencieux ; aucune scene Fusion ne change sans
   action ; les transitions et le DOM sont testes.
-- Statut : `blocked-by-architecture-gate`.
+- Statut : `done`, `implemented`, `automated-validated`, `fusion-retest-required`.
 
 ### P62 - Catalogue d elements et orientations
 
 - Capability : C-ASSET, C-CAVITY, C-FUSION-UI.
-- Dependances : P61 et acceptation ADR-0058.
+- Dependances : P61 integre et ADR-0058 acceptee.
 - Objectif : formats nommes, sleeves, orientations a plat/debout/auto et presets
   personnels locaux sans masquer les dimensions resolues.
 - Acceptation : surcharge explicite prioritaire, aller-retour preset et impact
   d orientation verifies dans le coeur et la palette.
-- Statut : `planned`.
+- Statut : `ready`.
 
 ### P63 - Reservations superieures encastrees
 

@@ -39,6 +39,9 @@ class FusionPaletteProjectTests(unittest.TestCase):
         self.assertEqual(response["schema"], PALETTE_RESPONSE_SCHEMA)
         self.assertEqual(response["status"], "ready")
         self.assertEqual(response["project"]["schema_version"], "bgig.project.v1")
+        self.assertEqual(len(response["project_digest"]), 64)
+        self.assertEqual(response["lifecycle"]["source"], "current")
+        self.assertEqual(response["lifecycle"]["derived"], "pending")
 
     def test_save_is_atomic_and_load_restores_the_normalized_project(self) -> None:
         project = blank_project_v1()
@@ -82,6 +85,9 @@ class FusionPaletteProjectTests(unittest.TestCase):
         self.assertEqual(response["partition"]["summary"]["automatic_body_count"], 0)
         self.assertEqual(response["result_view"]["source_plan_digest"], response["partition"]["plan_digest"])
         self.assertTrue(response["result_view"]["invariants"]["derived_from_real_placements"])
+        self.assertEqual(response["lifecycle"]["derived"], "current")
+        self.assertEqual(response["lifecycle"]["solved"], "current")
+        self.assertEqual(response["lifecycle"]["materialized"], "not_materialized")
         self.assertFalse(response["saved"])
     def test_materialize_and_regenerate_return_the_same_real_cad_build(self) -> None:
         project = blank_project_v1()

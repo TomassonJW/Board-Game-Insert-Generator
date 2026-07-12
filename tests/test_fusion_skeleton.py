@@ -257,7 +257,7 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("incomingFromHTML", source)
         self.assertIn("sendInfoToHTML", source)
         self.assertIn("Atelier de rangement", markup)
-        for label in ("Boite", "Pieces", "Plateaux", "Bacs", "Fabrication", "Resultat"):
+        for label in ("Boite", "Plateaux et livrets", "Elements du jeu", "Conteneurs", "Reglages", "Apercu"):
             self.assertIn(label, markup)
         self.assertIn("Verifier", markup)
         self.assertIn("Sauvegarder", markup)
