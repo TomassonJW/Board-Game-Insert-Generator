@@ -1,4 +1,4 @@
-# Gate report - P43 acceptation du MVP V0.1 dans Fusion
+# Gate report - P43 smoke Fusion V0.1 (gate rouverte)
 
 ## Declencheur
 
@@ -33,13 +33,13 @@ qui ne peut pas etre automatisee est leur observation dans Fusion.
 ## Recommandation
 
 Confirmer `Fusion P43 OK` si la scene correspond aux quatre points ci-dessus.
-Ce statut accepte le MVP logiciel V0.1, mais ne valide pas une impression 3D.
+Ce smoke ne valide qu une scene Fusion. Il ne vaut pas acceptance du MVP logiciel ni validation d impression.
 
 ## Risques et limites
 
 - le smoke ne prouve pas la resistance, l ajustement des vraies pieces ou la
   qualite d impression ;
-- V0.2 formes/ergonomie et V0.3 couvercles restent bloquee jusqu a cette gate,
+- V0.2 formes/ergonomie et V0.3 couvercles restent bloques jusqu a P58,
   puis a P46 ;
 - toute erreur Fusion visible doit etre corrigee avant acceptation.
 
@@ -51,15 +51,16 @@ Retour humain unique : `Fusion P43 OK`, ou le texte/capture de l ecart observe.
 
 Le 2026-07-12, Thomas a confirme : `Fusion P43 OK`.
 
-## Decision
+## Decision corrigee
 
-Le smoke Fusion est accepte. Le MVP logiciel V0.1 est `fusion-validated` ; il
-reste `print-validated: false` tant qu aucune impression et mesure physique n a
-ete conduite.
+Le smoke Fusion est accepte pour la geometrie du jeu temoin uniquement. Il est
+`fusion-validated-geometry-only`. Le MVP V0.1 reste reouvert et
+`product-mvp-rejected` jusqu a P58 ; `print-validated: false` reste obligatoire.
 
-## Suivi produit non bloquant
+## Suivi de reprise
 
 La scene P43 contient 20 pieces, dont 15 remplissages automatiques residuels.
-Ils sont corrects pour le volume et les collisions, mais leur fragmentation est
-une dette de lisibilite produit. P51 V0.1.1 la traite sans remettre en cause
-l acceptation du MVP ; un nouveau smoke Fusion sera requis si la geometrie change.
+Ils sont corrects pour le volume et les collisions, mais leur fragmentation et la
+palette bloquee sur `Chargement...` montrent que la qualite produit n est pas
+acceptee. P51 est absorbe par P56 ; P58 demandera un nouveau smoke Fusion de la
+scene finale retenue.

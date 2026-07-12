@@ -21,9 +21,9 @@ couvercles. Jusqu'a P43, seules les capacites ci-dessous sont des blockers actif
 | Parois par bac et jeu commun | derives par bac ; jeu inter-bacs P41 | P41 |
 | Affectation de tout le volume | FreeVolume descriptif seulement | P41 |
 | Geometrie fonctionnelle complete | bacs ouverts generiques | P42 |
-| Parcours V0.1 accepte | absent | P43 |
+| Parcours V0.1 accepte | non accepte | P58 |
 
-`C-AESTHETIC` est `deferred` jusqu'a P43. Les mecanismes/couvercles sont
+`C-AESTHETIC` est `deferred` jusqu'a P58. Les mecanismes/couvercles sont
 `deferred` jusqu'a P46. Les paragraphes historiques P33/P34 ci-dessous decrivent
 du code existant, pas un statut de release acquis.
 
@@ -591,14 +591,22 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - C-AESTHETIC / C-STACKING : restent `deferred` jusqu aux gates P43 puis P46.
 - C-PRINT : `print-validated: false` maintenu.
 
-## P43 MVP acceptance update
+## P43 historical Fusion update
 
-- C-FUSION-UI / C-CAD-IR / C-CAVITY : `fusion-validated` pour la scene
-  fonctionnelle V0.1 du jeu temoin observee le 2026-07-12 (`Fusion P43 OK`).
-- C-PRODUCT-VISION : `implemented-local-ui` pour le Studio principal ; la
-  palette Fusion reste une surface secondaire et n a pas ete redessinee par
-  P42/P43.
-- C-SOLVER / C-QUALITY : conservation de volume et absence de collision restent
-  couvertes ; la fragmentation des 15 remplissages automatiques residuels est
-  une dette produit suivie par P51 V0.1.1, non une preuve de defaut volumetrique.
+- C-FUSION-UI / C-CAD-IR / C-CAVITY : `fusion-validated-geometry-only` pour la
+  scene fonctionnelle du jeu temoin observee le 2026-07-12 (`Fusion P43 OK`).
+- C-PRODUCT-VISION : aucune acceptance MVP n est deduite de ce smoke ; le Studio
+  reste la surface principale et sa conformite runtime/visuelle reste a prouver.
+- C-SOLVER / C-QUALITY : le nombre de composants du jeu temoin ne qualifie pas
+  leur utilite ; la planification des residus est reprise en P56.
+- C-PRINT : `print-validated: false` maintenu.
+## Correction P43 - conformite produit reouverte
+
+- C-FUSION-UI : `fusion-validated-geometry-only` pour le jeu temoin P43 ; la
+  palette observee bloquee sur `Chargement...` est `product-ux-rejected`.
+- C-PRODUCT-VISION : le Studio reste la surface principale par ADR-0042, mais
+  son ergonomie runtime/visuelle n est pas encore validee.
+- C-SOLVER / C-QUALITY : conservation de volume et absence de collision sont
+  `implemented-core`; une liste de residus de grille n est pas une qualite de
+  rangement acceptee. P56 doit apporter utilite et justification.
 - C-PRINT : `print-validated: false` maintenu.

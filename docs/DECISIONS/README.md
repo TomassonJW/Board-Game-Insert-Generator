@@ -176,3 +176,5 @@ Tests, cartes backlog ou gates humaines a preparer.
   pile superieure avant le placement global.
 - ADR-0051-global-volume-closure-plan-v1.md - plan de fermeture de volume global V0.1.
 - ADR-0052-functional-volume-cad-materialization-v1.md - materialisation CAD fonctionnelle P42 du plan V0.1.
+
+- ADR-0053-product-conformance-before-v01-acceptance.md - conformite produit obligatoire avant acceptance V0.1.

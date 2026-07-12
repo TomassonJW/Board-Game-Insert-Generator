@@ -4,37 +4,40 @@ Derniere mise a jour : 2026-07-12
 
 ## Version active
 
-`V0.1 - MVP fonctionnel accepte dans Fusion`.
+`V0.1 - MVP reouvert : reprise qualite produit`.
 
-La vision canonique est `docs/CANONICAL_PRODUCT_VISION.md`. Le chemin executable
-est `docs/MVP_EXECUTION_PLAN.md`. L ordre V0.1 -> V0.2 -> V0.3 est verrouille par
-ADR-0047.
+La vision canonique reste `docs/CANONICAL_PRODUCT_VISION.md`. L audit de realite
+est `docs/MVP_V01_REALITY_AUDIT.md` et le contrat de sortie est
+`docs/MVP_V01_ACCEPTANCE_CONTRACT.md`. ADR-0053 remplace la lecture trop large
+de P43 : une scene Fusion observee ne vaut pas acceptance produit.
 
 ## Derniere mission terminee
 
-`P43 - Acceptation MVP V0.1` : le jeu temoin fonctionnel a ete prepare avec
-20 pieces CAD et 19 cavites, puis confirme dans Fusion par le retour humain
-`Fusion P43 OK` du 2026-07-12. Le MVP logiciel V0.1 est donc accepte dans
-Fusion ; l impression 3D reste a valider separement.
+`P52 - Remise a plat V0.1` : retrait du faux statut `MVP accepte`, audit des
+ecarts, contrat d acceptation testable et backlog de reprise. Aucun code
+fonctionnel n a ete ajoute dans ce lot documentaire.
 
-## Suite recommandee, non lancee
+## Prochaine decision necessaire
 
-`P51 - Qualite des volumes de complement V0.1.1` : reduire les remplissages
-automatiques peu utiles et rendre leur lecture Fusion plus claire, sans casser
-la conservation de volume ni le parcours Studio. C est le suivi direct du
-retour produit P43 ; ce lot n est pas bloquant pour l acceptation du MVP et
-reouvrira un smoke Fusion seulement s il change la geometrie.
+`P53 - Surface principale et reference UX` est volontairement en attente d une
+courte relecture produit. Le point a confirmer est simple : le Studio local est
+la surface complete de saisie et de resultat ; Fusion materialise et exporte,
+mais ne devient pas un second editeur incomplet. La palette Fusion doit permettre
+d ouvrir ou retrouver clairement le Studio et ne jamais rester sur Chargement.
 
-`P44 - Contrat de formes et ergonomie V0.2` est maintenant autorise par la
-roadmap, mais il n est pas demarre : aucun arrondi, encoche ou couvercle ne doit
-etre ajoute par anticipation.
+## Releases bloquees
+
+P43 est reouvert. P44 a P50 restent bloques : aucun arrondi, encoche ou couvercle
+ne doit etre implemente avant la nouvelle acceptance V0.1.
 
 ## Gate humaine active
 
-Aucune gate humaine active pour le MVP V0.1 accepte. Une nouvelle observation
-Fusion ne sera demandee que par un lot qui modifie effectivement la scene CAD.
+Aucune nouvelle preuve Fusion n est demandee maintenant. La prochaine gate Fusion
+arrivera uniquement apres P57, sur la scene finale choisie ; l UI et la qualite
+du resultat doivent etre prouvees avant.
+
 ## Fin de chaque mission
 
 Tests pertinents, `git diff --check`, commit atomique, integration directe dans
-`main`, push, puis selection de la mission suivante seulement si elle est dans le
-chemin critique de la version active.
+`main`, push, puis selection de la mission suivante seulement si elle ferme un
+critere du contrat V0.1.

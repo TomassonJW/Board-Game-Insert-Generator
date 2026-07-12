@@ -4,7 +4,7 @@ Derniere mise a jour : 2026-07-12
 
 ## Etat global
 
-Statut produit : **MVP V0.1 fonctionnel accepte dans Fusion ; impression non validee**.
+Statut produit : **MVP V0.1 reouvert ; fondations techniques presentes, conformite produit non acceptee**.
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -1165,20 +1165,21 @@ jamais une forme en L. Le jeu temoin passe de 111 a 20 pieces CAD. L export
 `export-project-v1-cad` accepte les JSON UTF-8 avec BOM Windows.
 
 Preuves : test anti-fragmentation, scene P43 relue par l adaptateur compact,
-validation des tests P42 et de l export BOM. Le statut Fusion reste a observer.
+validation des tests P42 et de l export BOM. La geometrie P43 a ensuite ete observee ; son acceptance produit est reouverte.
 
-## P43 - Acceptation Fusion du MVP V0.1
+## P43 - Correction de l acceptance MVP V0.1
 
-Statut : `done`, `fusion-validated`, `print-validated: false`.
+Statut : `reopened`, `fusion-validated-geometry-only`,
+`product-mvp-rejected`, `print-validated: false`.
 
-Le jeu temoin P43 a ete prepare automatiquement avec 20 pieces CAD et
-19 cavites, puis confirme dans Fusion par le retour humain `Fusion P43 OK` du
-2026-07-12. Le MVP logiciel V0.1 est accepte : saisie du projet, construction,
-explication, export et scene fonctionnelle Fusion sont couverts. Cette preuve ne
-valide ni impression, ni ajustement physique, ni slicer.
+Le retour `Fusion P43 OK` du 2026-07-12 reste une preuve que le jeu temoin
+preparation peut etre observe dans Fusion. Il ne prouve pas le MVP produit : la
+palette affiche `Chargement...` sans solution de secours, la saisie Studio n a
+pas de preuve visuelle/runtime suffisante et les 15 complements automatiques
+restants ne sont pas justifies comme bacs utiles.
 
-Retour produit consigne : P42/P43 n ont pas redessine la palette Fusion, qui
-reste une surface secondaire. Les 15 remplissages automatiques residuels sont
-valides pour le volume et les collisions, mais restent trop fragmentes pour une
-lecture produit elegante. P51 V0.1.1 est le suivi non bloquant de cette qualite
-de resultat ; P44 V0.2 peut commencer apres une nouvelle decision de priorite.
+Le depot conserve P37 a P42 comme fondations testees : contrat, derivation,
+reservation, controle de volume, CAD IR et adapter Fusion. Elles ne sont plus
+qualifiees comme parcours V0.1 accepte. P52 documente la reprise et P53 a P58
+ferment successivement acces, saisie, resultat, planification utile, CAD/Fusion
+et acceptance. V0.2 et V0.3 restent bloques.

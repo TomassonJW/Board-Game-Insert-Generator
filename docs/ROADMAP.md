@@ -9,17 +9,17 @@ et la lecture par capabilities dans `docs/CAPABILITY_MAP.md`.
 Les phases historiques ci-dessous decrivent les briques construites, pas l'ordre
 des prochaines missions. ADR-0047 et `docs/MVP_EXECUTION_PLAN.md` imposent :
 
-1. P36-P43 : V0.1 fonctionnelle complete ;
+1. P36-P42 puis P52-P58 : V0.1 fonctionnelle complete ;
 2. P44-P46 : V0.2 formes et ergonomie ;
 3. P47-P50 : V0.3 couvercles et calibration.
 
-Aucune mission P44+ ne peut devenir `ready` avant P43. Aucune mission P47+ ne
+Aucune mission P44+ ne peut devenir `ready` avant P58. Aucune mission P47+ ne
 peut devenir `ready` avant P46. Les explorations P33/P34 sont archivees et ne
 valent pas acceptation de V0.2/V0.3.
 
-P43 est accepte dans Fusion le 2026-07-12. P51 V0.1.1 suit de facon non
-bloquante la lisibilite des volumes automatiques residuels ; P44 V0.2 est
-desormais autorise mais non demarre.
+P43 est reouvert le 2026-07-12 : la scene Fusion historique reste observee,
+mais le MVP produit n est pas accepte. P52 a P58 reforment le chemin critique
+V0.1 ; P44 V0.2 et P47 V0.3 restent bloques jusqu a P58.
 
 ## Phase 0 - Gouvernance, autonomie, qualite
 

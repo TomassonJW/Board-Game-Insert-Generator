@@ -17,7 +17,7 @@ V0.2 et V0.3 restent `deferred`.
 | P40 | Plateaux et livrets tiennent au-dessus | Pile superieure, hauteur et supports ajustes | Tests X/Y/Z et depassements |
 | P41 | Tout le volume est affecte | Solveur volumetrique borne, residus, bacs vides/pleins/separateurs | Conservation du volume et cas grande cardinalite |
 | P42 | Le resultat est un insert fonctionnel | CAD IR/Fusion des bacs, logements, supports et remplissages V0.1 | Tests CAD IR puis smoke Fusion prepare |
-| P43 | MVP V0.1 accepte | Parcours complet, jeu temoin, export et limites | Tests UI automatiques + observation Fusion ; print reste distinct |
+| P43 | Smoke Fusion historique | Scene geometrique du jeu temoin | Observation Fusion ; ne vaut pas acceptance produit |
 
 ## Detail des missions
 
@@ -82,15 +82,15 @@ V0.2 et V0.3 restent `deferred`.
 
 ### P43 - Gate V0.1
 
-Le MVP est accepte quand les tests prouvent qu'un projet vide peut etre saisi,
-construit, explique et exporte, puis qu'un smoke humain Fusion confirme la scene
-du jeu temoin. Cette gate ne transforme pas une preuve Fusion en preuve
-d'impression. Une campagne physique peut suivre en V0.1.x sans bloquer
-l'existence du MVP logiciel.
-
-Resultat : le 2026-07-12, le jeu temoin de 20 pieces CAD et 19 cavites a recu le
-retour humain `Fusion P43 OK`. Le MVP logiciel V0.1 est accepte dans Fusion ;
+P43 a d abord ete defini comme une gate MVP, mais le retour produit du
+2026-07-12 a etabli que son smoke ne couvre que la scene geometrique. La sortie
+MVP est transferee a P58 : le contrat complet doit etre vert avant un smoke
+Fusion de la scene finale. Une campagne physique reste distincte et
 `print-validated: false` reste obligatoire.
+
+Resultat historique : le jeu temoin de 20 pieces CAD et 19 cavites a recu le
+retour `Fusion P43 OK`. Cette preuve est conservee comme
+`fusion-validated-geometry-only`, jamais comme acceptation V0.1.
 
 ## Chemin V0.2, bloque jusqu'a P43
 
@@ -127,3 +127,20 @@ le nouveau contrat.
 
 Chaque risque doit produire un test, un diagnostic ou une gate, jamais une note
 cachee dans un rapport technique.
+
+## Reprise corrective V0.1 apres P43
+
+P43 est reouvert par ADR-0053 : son smoke valide une scene geometrique, pas le
+MVP produit. La sortie V0.1 est desormais P58 et suit ce chemin strict :
+
+| Lot | Resultat | Preuve de sortie |
+| --- | --- | --- |
+| P52 | Audit, contrat d acceptance et statuts corriges | Documents coherents avec vision, code et retour humain |
+| P53 | Surface principale claire et palette non bloquante | Contrat de navigation, bridge repondant ou erreur lisible |
+| P54 | Saisie Studio vraiment utilisable | Tests d interaction sur tableaux, validations et encodage |
+| P55 | Resultat visible avant Fusion | Apercu derive du plan resolu et explications humaines |
+| P56 | Volume restant utile | Extensions/complements justifies, pas de residus imprimes sans role |
+| P57 | CAD/Fusion fidele | Correspondance plan/CAD, fixture qualite, preparation reproductible |
+| P58 | MVP V0.1 accepte | Sept scenarios verts puis smoke Fusion humain unique |
+
+Les lots P44 a P50 restent hors chemin tant que P58 n est pas accepte.
