@@ -8,7 +8,7 @@ Statut produit : **MVP V0.1 reouvert ; fondations techniques presentes, conformi
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P57 implemente, P58 ready ; smoke visuel P56 non observe.
+Phase active : P58 implemente, P59 ready ; validation visuelle finale reservee a P60.
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -1319,3 +1319,26 @@ attendant P59.
 Preuves ciblees : 9 tests solveur, 7 tests bridge, 5 tests DOM et 87 tests Fusion
 historiques. Le solveur est borne et explicable, mais ne revendique pas
 l optimalite mathematique globale. P58 est ready.
+
+## P58 - Resultat reel dans la palette Fusion
+
+Statut : implemented, automated-validated, fusion-validated: false,
+print-validated: false.
+
+Le module pur partition_result_view.py transforme une partition P57 construite
+en bgig.partition_result_view.v1 sans modifier le plan. Il fournit une vue dessus
+orthographique, une coupe X/Z declaree au centre Y, les corps, cavites, pile
+plate, supports et details utilisateur. Les rotations 0/90 transforment les
+cavites depuis leur repere P55 vers le monde de facon testee.
+
+La palette affiche exclusivement ce modele : SVG au viewBox millimetrique,
+noms des bacs et contenus, positions, dimensions monde, minimum/final, surplus,
+rotation, complements, pile, couverture de support, digest et zero corps
+automatique. Une partition impossible n affiche aucun dessin. Une modification
+invalide le resultat ; sauvegarde et export sans modification le conservent.
+Materialiser dans Fusion reste explicitement desactive jusqu a P59.
+
+Preuves ciblees : 5 tests de projection, 4 contrats palette resultat, 7 tests
+bridge, 5 tests DOM et 87 tests Fusion historiques. La syntaxe JavaScript passe.
+Le controle visuel Fusion n est pas revendique ; la gate complete reste P60.
+P59 est ready.

@@ -58,8 +58,8 @@ class FusionOnlyAlignmentTests(unittest.TestCase):
 
     def test_next_action_does_not_merge_the_abandoned_web_branch(self) -> None:
         actions = self.read("docs/NEXT_ACTIONS.md")
-        self.assertIn("P57 - solveur de partition", actions)
-        self.assertIn("P58 - Resultat premium", actions)
+        self.assertIn("P58 - resultat reel", actions)
+        self.assertIn("P59 - Materialisation CAD", actions)
         self.assertNotIn("codex/p56-premium-editor", actions)
         self.assertNotIn("inspection visuelle runtime du frontend reel", actions)
 

@@ -125,3 +125,11 @@ Statut : `done`, `implemented-core`, `implemented-cli`, `implemented-cad-ir-meta
 - Une impossibilite doit fournir code, message, reference et action corrective.
 - Le solveur borne peut scorer des candidats, mais ne doit jamais revendiquer une optimalite globale.
 - Le plan P57 ne constitue ni une CAD IR, ni une validation Fusion, ni une validation d impression.
+## Regles P58 de resultat
+
+- Une vue geometrique doit citer le digest du plan P57 dont elle derive.
+- Les primitives SVG utilisent les bornes monde et cavites transformees par Python.
+- Une partition impossible ne doit jamais etre dessinee comme une solution.
+- Toute modification du projet invalide le dernier resultat ; une sauvegarde sans modification ne l invalide pas.
+- Les noms utilisateur accompagnent les identifiants stables dans le resultat.
+- Le rendu P58 ne vaut ni CAD IR, ni validation Fusion, ni validation d impression.

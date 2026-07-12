@@ -8,31 +8,30 @@ V0.1 - vrai MVP Fusion-only selon ADR-0055.
 
 ## Derniere mission terminee
 
-P57 - solveur de partition et expansion conjointe.
+P58 - resultat reel dans la palette Fusion.
 
-Le coeur pur produit bgig.partition_plan.v1 depuis bgig.project.v1, P40 et P55.
-Il place uniquement les bacs demandes et complements exacts explicites, remplit
-le volume imprimable hors jeux techniques, revalide les enveloppes finales et
-maintient automatic_body_count a zero. Les impossibilites indiquent une action
-corrective. La palette declenche ce calcul sans logique metier JavaScript.
+Le coeur pur produit bgig.partition_result_view.v1 depuis le plan P57. La palette
+affiche deux SVG au repere millimetrique, corps, cavites, contenus, minima,
+enveloppes finales, surplus, positions, pile, supports, complements, digest et
+zero corps automatique. Une solution impossible n est jamais dessinee et toute
+modification rend le resultat obsolete.
 
-Preuves : 9 tests solveur, 7 tests bridge, 5 tests DOM, 87 tests Fusion
-historiques, grande cardinalite 50 bacs et determinisme par digest. Aucun CAD,
+Preuves : 5 tests projection, 4 tests palette resultat, 7 tests bridge, 5 tests
+DOM, 87 tests Fusion historiques et syntaxe JavaScript valide. Aucun CAD,
 statut fusion-validated ou print-validated n est revendique.
 
 ## Prochaine mission prete
 
-P58 - Resultat premium dans la palette Fusion.
+P59 - Materialisation CAD et synchronisation de scene.
 
-Resultat attendu : afficher le plan P57 reel, ses bacs/contenus, cavites,
-enveloppes minimale/finale, surplus, positions, pile, supports, complements,
-alertes, vue dessus et coupe derivees des placements. Le resultat devient
-obsolete apres toute modification et aucune illustration indicative n est
-presentee comme solution.
+Resultat attendu : convertir exclusivement le plan P57 courant en CAD IR,
+materialiser les enveloppes finales, soustraire les cavites fixes, synchroniser
+la scene sans doublon, conserver les objets non-BGIG et activer generate,
+regenerate, inspect, clear et export depuis la palette. Aucun filler historique.
 
 ## Releases bloquees
 
-P59 depend de P58. P44 a P50 restent bloques jusqu a P60.
+P60 depend de P59. P44 a P50 restent bloques jusqu a P60.
 
 ## Gate humaine active
 

@@ -160,6 +160,7 @@ def solve_partition_plan(raw_project: object) -> dict[str, object]:
         )
 
     envelope_by_group = {str(item["container_group_id"]): item for item in _mappings(validated_envelopes["containers"])}
+    content_names = {str(item["id"]): str(item["name"]) for item in _mappings(project["contents"])}
     placements: list[dict[str, object]] = []
     for placement in _mappings(chosen["placements"]):
         final = deepcopy(placement)
@@ -170,6 +171,7 @@ def solve_partition_plan(raw_project: object) -> dict[str, object]:
             final["surplus_distribution_mm"] = deepcopy(contract["surplus_distribution_mm"])
             final["minimum_envelope_origin_in_final_mm"] = deepcopy(contract["minimum_envelope_origin_in_final_mm"])
             final["source_content_ids"] = [str(cavity["content_id"]) for cavity in _mappings(contract["cavity_layout"])]
+            final["source_contents"] = [{"id": content_id, "name": content_names[content_id]} for content_id in final["source_content_ids"]]
         placements.append(final)
 
     validation = _validate_placements(placements, box, storage_height, clearance)

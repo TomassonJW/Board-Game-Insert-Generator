@@ -499,3 +499,12 @@ calcule ni layout, ni cavite, ni tolerance, ni CAD.
 La commande classique reste le mode expert, diagnostic et secours. Les sections
 historiques qui disent palette future ou Studio principal sont supersedees par
 ADR-0055 et docs/FUSION_ONLY_MVP_CONTRACT.md.
+
+## P58 - Resultat moteur dans la palette principale
+
+La vue Resultat utilise bgig.partition_result_view.v1 et non une illustration.
+Elle montre la vue dessus, la coupe centrale, les corps et cavites, les noms de
+contenus, le surplus, la pile, les supports, le digest et l invariant zero corps
+automatique. Impossible n affiche aucun SVG de solution. Modifier invalide le
+plan ; sauvegarder sans modification le conserve. L action de materialisation
+reste desactivee jusqu a P59.

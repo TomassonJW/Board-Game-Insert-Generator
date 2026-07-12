@@ -673,3 +673,11 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - C-QUALITY : `automatic_body_count = 0`, jeux non materialises, diagnostics actionnables, aucune optimalite globale revendiquee.
 - C-FUSION-UI : `implemented-bridge`, action solve_project et synthese construit/impossible ; rendu geometrique complet reste P58.
 - C-CAD-IR : inchange, P59 seul materialisera le plan.
+
+## P58 real partition result update
+
+- C-FUSION-UI : `implemented-result`, vue dessus, coupe X/Z, details corps/contenus, pile, supports, diagnostics et actions modifier/recalculer.
+- C-SOLVER : plan P57 affiche par digest sans recalcul JavaScript ; impossible et obsolete sont des etats explicites.
+- C-CAVITY / C-MODULE : projections derivees des repères P55 et placements P57, rotations 0/90 testees.
+- C-QUALITY : `indicative_geometry: false`, zero corps automatique visible, aucune solution impossible dessinee.
+- C-CAD-IR : P59 devient `ready`; materialisation reste desactivee dans la palette P58.

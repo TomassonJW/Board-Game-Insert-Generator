@@ -1598,7 +1598,8 @@ impose les dependances de release suivantes.
   materialiser.
 - Acceptation : aucun dessin indicatif n est presente comme solution ; le
   resultat montre zero corps automatique et devient obsolete apres modification.
-- Statut : ready.
+- Statut : `implemented`, `automated-validated`, `fusion-validated: false`, `print-validated: false`.
+- Preuves : bgig.partition_result_view.v1, 5 tests projections, 4 tests palette, bridge et syntaxe JavaScript. Le controle visuel Fusion reste reserve a la gate P60.
 
 ### P59 - Materialisation CAD et synchronisation de scene
 
@@ -1610,7 +1611,7 @@ impose les dependances de release suivantes.
   inspect/clear/export, zero doublon et preservation non-BGIG.
 - Acceptation : Fusion contient exactement les corps du plan courant, sans
   micro-remplissage ; la palette affiche scene synchronisee ou erreur avec retry.
-- Statut : blocked-by-P58.
+- Statut : ready.
 
 ### P60 - Acceptance du vrai MVP V0.1 Fusion-only
 

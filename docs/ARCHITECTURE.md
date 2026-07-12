@@ -303,3 +303,12 @@ exterieures finales. L editeur ne dessine pas les bacs a la main, la CAD IR ne
 complete pas le plan et Fusion ne cree aucun remplissage. Les anciennes regions
 libres P41 restent des donnees de diagnostic et de conservation, jamais une liste
 de corps a imprimer.
+
+## P58 - Projection de resultat
+
+`partition_result_view.py` est une couche pure et en lecture seule entre
+`bgig.partition_plan.v1` et la palette. Elle projette les placements reels en
+vue dessus et en coupe X/Z, transforme les cavites locales P55 selon la rotation
+P57 et transporte details, pile et supports. Elle ne genere pas de CAD IR et ne
+peut pas dessiner une partition non construite. Le JavaScript applique seulement
+les primitives SVG deja exprimees en millimetres.

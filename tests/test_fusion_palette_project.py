@@ -80,6 +80,8 @@ class FusionPaletteProjectTests(unittest.TestCase):
             response = handle_palette_request(request("solve_project", project=project), ADDIN, ROOT)
         self.assertEqual(response["partition"]["summary"]["status"], "constructed")
         self.assertEqual(response["partition"]["summary"]["automatic_body_count"], 0)
+        self.assertEqual(response["result_view"]["source_plan_digest"], response["partition"]["plan_digest"])
+        self.assertTrue(response["result_view"]["invariants"]["derived_from_real_placements"])
         self.assertFalse(response["saved"])
     def test_invalid_project_returns_an_actionable_response_without_overwriting_saved_data(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir, patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}):
