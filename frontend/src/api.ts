@@ -2,6 +2,7 @@ import type { ComposerDraft, ExportBundle, Portfolio, StarterTemplate } from './
 import type { ContainerDerivationPlan } from './container_derivation'
 import type { FlatStackReservationPlan } from './flat_stack_reservation'
 import type { VolumeClosurePlan } from './volume_closure'
+import type { FunctionalCadBuild } from './volume_cad'
 import type { ProjectNormalization, ProjectV1Draft } from './project_v1'
 
 const apiBase = import.meta.env.VITE_BGIG_API_URL ?? 'http://127.0.0.1:8001/api'
@@ -62,6 +63,12 @@ export async function solveVolume(project: ProjectV1Draft): Promise<VolumeClosur
   })
 }
 
+export async function buildFunctionalCad(project: ProjectV1Draft): Promise<FunctionalCadBuild> {
+  return request<FunctionalCadBuild>('/project-v1/build-cad', {
+    method: 'POST',
+    body: JSON.stringify(project),
+  })
+}
 export async function generatePortfolio(draft: ComposerDraft): Promise<Portfolio> {
   const result = await request<{ portfolio: Portfolio }>('/portfolio', {
     method: 'POST',

@@ -95,6 +95,23 @@ class ProjectV1ApiTests(unittest.TestCase):
         self.assertTrue(result["source"]["migrated"])
         self.assertIn(result["summary"]["status"], {"constructed_plan", "impossible"})
 
+    def test_builds_functional_cad_from_a_migratable_project(self) -> None:
+        payload = json.dumps(starter_draft()).encode("utf-8")
+        self.connection.request(
+            "POST",
+            "/api/project-v1/build-cad",
+            body=payload,
+            headers={"Content-Type": "application/json", "Content-Length": str(len(payload))},
+        )
+        response = self.connection.getresponse()
+        result = json.loads(response.read())
+
+        self.assertEqual(response.status, 200)
+        self.assertEqual(result["schema_version"], "bgig.functional_cad_build.v1")
+        self.assertIn(result["status"], {"planned_for_fusion_smoke", "impossible"})
+        self.assertIn("volume_plan", result)
+        if result["status"] == "planned_for_fusion_smoke":
+            self.assertEqual(result["cad_ir"]["schema_version"], "cad_ir.v0")
     def test_rejects_invalid_v1_project_with_a_draft_error(self) -> None:
         invalid = {"schema_version": PROJECT_SCHEMA_V1}
         payload = json.dumps(invalid).encode("utf-8")

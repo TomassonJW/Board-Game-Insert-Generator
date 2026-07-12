@@ -1484,8 +1484,14 @@ impose les dependances de release suivantes.
 - Dependances : P41.
 - Objectif : materialiser bacs, logements, supports et remplissages resolus,
   sans apparence V0.2 ni couvercles V0.3.
-- Validation : tests CAD IR/Fusion hors API puis smoke Fusion humain prepare.
-- Statut : `blocked-by-p41`.
+- Validation : CAD IR pure, adaptateur Fusion hors API, API/CLI Studio, build
+  TypeScript et test compact 50 bacs / 72 familles / 25 elements plats.
+- Resultat : `bgig.functional_cad_build.v1`, route `build-cad`, commande
+  `export-project-v1-cad`, bacs ouverts par logement, remplissages exacts et
+  regions automatiques expliquees comme jeu technique si les parois ne tiennent
+  pas.
+- Statut : `done`, `implemented-core`, `implemented-loopback-adapter`,
+  `implemented-local-ui`, `implemented-cad-ir`, `fusion-smoke-required`.
 
 ### P43 - Acceptation MVP V0.1
 
@@ -1493,8 +1499,7 @@ impose les dependances de release suivantes.
 - Objectif : recette complete sur projet vide et jeu temoin reel.
 - Gate : observation Fusion humaine uniquement ; parcours UI couvert par tests
   automatises, impression physique tracee separement.
-- Statut : `blocked-by-p42`.
-
+- Statut : `ready`, `waiting-human-fusion-smoke`.
 ### P44 a P46 - V0.2 formes et ergonomie
 
 - Dependances : P43 accepte.

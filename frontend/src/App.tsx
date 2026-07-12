@@ -1,5 +1,5 @@
 import { type ChangeEvent, useEffect, useMemo, useState } from 'react'
-import { ApiError, loadProjectV1Starter, normalizeProjectV1, solveVolume } from './api'
+import { ApiError, buildFunctionalCad, loadProjectV1Starter, normalizeProjectV1 } from './api'
 import type {
   ContainerGroupDraft,
   FillElementDraft,
@@ -10,6 +10,7 @@ import type {
 } from './project_v1'
 import { type ProjectIssue, validateProjectV1 } from './project_v1_validation'
 import type { VolumeClosurePlan } from './volume_closure'
+import type { FunctionalCadBuild } from './volume_cad'
 import type { Dimension } from './types'
 
 const shapeOptions: Array<{ value: ProjectShapeKind; label: string }> = [
@@ -44,6 +45,7 @@ export default function App() {
   const [error, setError] = useState<string>()
   const [attemptedBuild, setAttemptedBuild] = useState(false)
   const [buildPlan, setBuildPlan] = useState<VolumeClosurePlan>()
+  const [cadBuild, setCadBuild] = useState<FunctionalCadBuild>()
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
@@ -63,6 +65,7 @@ export default function App() {
     setError(undefined)
     setAttemptedBuild(false)
     setBuildPlan(undefined)
+    setCadBuild(undefined)
   }
 
   function addContent() {
@@ -151,6 +154,7 @@ export default function App() {
       setProject(normalized.project)
       setAttemptedBuild(false)
       setBuildPlan(undefined)
+      setCadBuild(undefined)
       setError(undefined)
       setMessage(normalized.migrated
         ? 'Ton ancien projet a été converti. Vérifie les bacs, plateaux et réglages avant de continuer.'
@@ -166,24 +170,24 @@ export default function App() {
     if (!project) return
     setAttemptedBuild(true)
     if (issues.length) {
-      setMessage(`${issues.length} point(s) sont à compléter avant de construire l’insert.`)
+      setMessage(`${issues.length} point(s) sont a completer avant de construire l insert.`)
       return
     }
     setBusy(true)
     setError(undefined)
     try {
-      const result = await solveVolume(project)
-      setBuildPlan(result)
-      setMessage(result.summary.status === 'impossible'
-        ? 'BGIG a trouvé un bac qui ne peut pas tenir avec ces mesures. Corrige le blocage indiqué, puis relance le calcul.'
-        : `${result.summary.placed_container_count} bac(s) et la pile supérieure sont réservés. La prochaine étape placera tout le volume de la boîte.`)
+      const result = await buildFunctionalCad(project)
+      setCadBuild(result)
+      setBuildPlan(result.volume_plan)
+      setMessage(result.status === 'impossible'
+        ? 'BGIG ne peut pas fabriquer cet insert avec ces mesures. Corrige les blocages indiques, puis relance la construction.'
+        : `${result.materialization.component_count} piece(s) fonctionnelle(s) sont pretes pour la verification dans Fusion.`)
     } catch (reason) {
       setError(formatError(reason))
     } finally {
       setBusy(false)
     }
   }
-
   if (!project || !metrics) {
     return <main className="loading-shell"><div className="loading-card"><span className="loading-dot" /><p>{error ?? 'Connexion à ton projet local…'}</p></div></main>
   }
@@ -264,8 +268,8 @@ export default function App() {
             </div>
           </Section>
 
-          <section className="build-panel"><div><p className="eyebrow">Prêt quand tu l’es</p><h2>Construire mon insert</h2><p>Le moteur dimensionne les bacs sous les plateaux et livrets, puis indique la hauteur restante. Le placement et le remplissage complet suivent ensuite.</p></div><button className="build-button" onClick={handleBuild} disabled={busy}>{busy ? 'Calcul des bacs…' : <>Calculer mon insert <span>→</span></>}</button></section>
-          {buildPlan && <DerivationResult plan={buildPlan} />}
+          <section className="build-panel"><div><p className="eyebrow">Pret quand tu l es</p><h2>Construire mon insert</h2><p>BGIG calcule les bacs, la pile haute, les espaces restants, puis prepare la geometrie fonctionnelle pour Fusion.</p></div><button className="build-button" onClick={handleBuild} disabled={busy}>{busy ? 'Construction en cours...' : <>Construire mon insert <span>-&gt;</span></>}</button></section>
+          {buildPlan && <DerivationResult plan={buildPlan} build={cadBuild} />}
         </div>
 
         <aside className="preview-column"><ProjectPreview project={project} metrics={metrics} /><section className="summary-card"><p className="eyebrow">Ce que BGIG voit</p><div className="summary-line"><span>Pièces à ranger</span><strong>{metrics.itemCount}</strong></div><div className="summary-line"><span>Bacs demandés</span><strong>{metrics.groupCount}</strong></div><div className="summary-line"><span>Hauteur plateaux/livrets</span><strong>{formatMillimeters(metrics.flatHeight)}</strong></div><div className="summary-line"><span>Volume intérieur</span><strong>{formatVolume(metrics.volume)}</strong></div></section><section className="tip-card"><strong>À retenir</strong><p>La vue est un plan de saisie, pas une fausse promesse de placement. Le moteur calculera les dimensions et positions réelles des bacs au moment de la construction.</p></section></aside>
@@ -290,10 +294,12 @@ function FillElementRow({ element, groups, onChange, onDelete }: { element: Fill
   return <article className="fill-row"><TextField label="Nom" value={element.name} onChange={(name) => onChange({ name })} /><label className="field"><span>Type</span><select value={element.kind} onChange={(event) => onChange({ kind: event.target.value as FillElementDraft['kind'] })}>{Object.entries(fillKindLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label><label className="field"><span>Taille</span><select value={element.mode} onChange={(event) => onChange({ mode: event.target.value as FillElementDraft['mode'], dimensions_mm: event.target.value === 'auto' ? null : { x: 10, y: 10, z: 10 } })}><option value="auto">À calculer</option><option value="exact">Je donne les mesures</option></select></label><label className="field"><span>Bac associé</span><select value={element.container_group_id ?? ''} onChange={(event) => onChange({ container_group_id: event.target.value || null })}><option value="">Dans toute la boîte</option>{groups.map((group) => <option key={group.id} value={group.id}>{group.name}</option>)}</select></label>{element.dimensions_mm && <div className="fill-dimensions"><DimensionFields labels={['Largeur', 'Profondeur', 'Hauteur']} value={element.dimensions_mm} onChange={(axis, value) => onChange({ dimensions_mm: { ...element.dimensions_mm!, [axis]: value } })} /></div>}<button className="delete-button" aria-label={`Supprimer ${element.name}`} onClick={onDelete}>×</button></article>
 }
 
-function DerivationResult({ plan }: { plan: VolumeClosurePlan }) {
-  const blocked = plan.summary.status === 'impossible'
-  return <section className={`derivation-result ${blocked ? 'blocked' : 'ready'}`} aria-live="polite"><header><div><p className="eyebrow">Plan complet</p><h2>{blocked ? 'Le volume ne peut pas encore être fermé' : 'Toute la boîte est planifiée'}</h2><p>{blocked ? 'Les blocages ci-dessous indiquent quoi modifier.' : 'Les bacs et la pile sont placés. Chaque volume restant est classé avant la génération CAD.'}</p></div><span>{plan.summary.placed_container_count} bac(s) placés</span></header>{plan.placements.map((item) => <article key={item.id} className="derived-container"><div><strong>{item.name}</strong><span>Position : {formatDimension(item.origin_mm)}</span></div><b>{formatDimension(item.size_mm)}</b></article>)}<article className="flat-stack-result"><div><strong>Vérifications</strong><span>{plan.summary.classified_free_region_count} région(s) restante(s) classée(s)</span></div><b>{plan.validation.volume_conserved ? 'Volume cohérent' : 'Volume incohérent'}</b><p>{plan.support.note}</p><small>{plan.summary.hollow_fill_candidate_count} volume(s) creux proposés ; {plan.summary.solid_fill_candidate_count} volume(s) plein(s) demandé(s).</small></article>{plan.blockers.map((blocker) => <p className="derivation-blocker" key={blocker}>{blocker}</p>)}<p className="derivation-next">Étape suivante automatique : matérialiser ce plan en CAD puis dans Fusion.</p></section>
+function DerivationResult({ plan, build }: { plan: VolumeClosurePlan; build?: FunctionalCadBuild }) {
+  const blocked = plan.summary.status === 'impossible' || build?.status === 'impossible'
+  const geometryReady = build?.status === 'planned_for_fusion_smoke'
+  return <section className={`derivation-result ${blocked ? 'blocked' : 'ready'}`} aria-live="polite"><header><div><p className="eyebrow">Plan complet</p><h2>{blocked ? 'L insert ne peut pas encore etre construit' : 'Toute la boite est planifiee'}</h2><p>{blocked ? 'Les blocages ci-dessous indiquent quoi modifier.' : 'Les bacs, les supports et les espaces restants sont maintenant traduits en pieces fonctionnelles.'}</p></div><span>{plan.summary.placed_container_count} bac(s) places</span></header>{plan.placements.map((item) => <article key={item.id} className="derived-container"><div><strong>{item.name}</strong><span>Position : {formatDimension(item.origin_mm)}</span></div><b>{formatDimension(item.size_mm)}</b></article>)}<article className="flat-stack-result"><div><strong>Verifications</strong><span>{plan.summary.classified_free_region_count} region(s) restante(s) classee(s)</span></div><b>{plan.validation.volume_conserved ? 'Volume coherent' : 'Volume incoherent'}</b><p>{plan.support.note}</p><small>{plan.summary.hollow_fill_candidate_count} volume(s) creux proposes ; {plan.summary.solid_fill_candidate_count} volume(s) plein(s) demandes.</small></article>{build && <article className="flat-stack-result"><div><strong>Geometrie pour Fusion</strong><span>{build.materialization.component_count} piece(s) prete(s)</span></div><b>{geometryReady ? 'Prete a verifier' : 'A corriger'}</b>{geometryReady ? <p>Les parois, fonds et logements ont ete prepares. Fusion doit encore les afficher : ce n est pas une validation d impression.</p> : <p>La geometrie n a pas ete produite. Corrige les blocages ci-dessous sans reduire les parois minimales.</p>}{build.materialization.skipped_regions.length > 0 && <small>{build.materialization.skipped_regions.length} petit(s) espace(s) restent du jeu technique pour conserver les parois minimales.</small>}</article>}{[...plan.blockers, ...(build?.blockers ?? [])].map((blocker) => <p className="derivation-blocker" key={blocker}>{blocker}</p>)}<p className="derivation-next">{geometryReady ? 'Etape suivante : verifier la scene preparee dans Fusion.' : 'Corrige les mesures indiquees, puis relance la construction.'}</p></section>
 }
+
 function ProjectPreview({ project, metrics }: { project: ProjectV1Draft; metrics: ReturnType<typeof projectMetrics> }) {
   const width = Math.max(project.box.inner_dimensions_mm.x, 1)
   const depth = Math.max(project.box.inner_dimensions_mm.y, 1)

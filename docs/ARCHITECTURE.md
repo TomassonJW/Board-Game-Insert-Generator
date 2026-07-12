@@ -271,3 +271,10 @@ ni declarer un support physique valide. ADR-0050 fixe ce contrat.
 ## P41 - Fermeture globale
 
 olume_closure.py place les bacs et reservations, classifie les regions libres et reste un moteur Python pur. P42 seul produit le CAD IR/Fusion.
+## P42 - Materialisation fonctionnelle V0.1
+
+`volume_cad.py` est une couche pure entre P41 et la CAD IR. Elle relit le projet
+normalise et le plan complet, mais ne refait ni placement ni tolerance. Elle
+cree les corps rectangulaires, leurs coupes de logements et les remplissages
+retenus. L adaptateur Fusion lit seulement cette scene. ADR-0052 interdit toute
+logique de solveur ou de dimensionnement dans Fusion.

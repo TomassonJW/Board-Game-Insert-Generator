@@ -342,3 +342,11 @@ P41 devra prouver la continuite de cette surface apres placement.
 ## P41 - Regions libres
 
 Chaque region libre exacte est classee comme jeu technique ou candidat de remplissage avant toute materialisation CAD.
+## P42 - Corps fonctionnels issus du volume
+
+Un bac P42 est un parallelepipede imprimable avec une cavite top-open par
+logement P39. Les cloisons sont la matiere conservee entre ces cavites. La
+rotation XY du bac transforme aussi les coordonnees locales de chaque logement.
+Les bacs vides automatiques sont inset du jeu commun ; s ils ne gardent plus les
+parois minimales, ils restent un jeu technique explicite. Les dimensions
+rectangulaires, parois et fonds V0.1 restent la reference avant les formes V0.2.

@@ -1137,3 +1137,22 @@ volume.
 ## P41 - Fermeture de volume
 
 Statut : done, plan global place, regions classees, collisions et conservation verifiees. Preuves : 300 tests et recette locale OK. Prochaine mission : P42 CAD IR/Fusion.
+## P42 - Geometrie fonctionnelle V0.1
+
+Statut : `done`, `implemented-core`, `implemented-loopback-adapter`,
+`implemented-local-ui`, `implemented-cad-ir`, `fusion-smoke-required`,
+`print-validated: false`.
+
+Le bouton `Construire mon insert` construit maintenant le plan P41 et transforme
+ce plan en bacs ouverts, logements par famille, supports et remplissages. Un bac
+vide exact qui ne conserve pas ses parois ou son fond est refuse clairement. Une
+petite region automatique qui ne peut pas garder ces epaisseurs reste du jeu
+technique explique, jamais une piece fragilisee en silence.
+
+Preuves : tests CAD IR, route locale, commande d export reproductible, lecture
+par l adaptateur Fusion hors API, test compact 50 bacs / 72 familles / 25
+elements plats et build TypeScript/Vite. Aucun statut Fusion ou impression n est
+revendique.
+
+Prochaine mission : P43, preparation puis observation humaine Fusion du jeu
+temoin uniquement.

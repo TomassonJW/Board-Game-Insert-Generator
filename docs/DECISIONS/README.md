@@ -175,3 +175,4 @@ Tests, cartes backlog ou gates humaines a preparer.
 - ADR-0050-flat-stack-reservation-before-global-placement.md - reservation de la
   pile superieure avant le placement global.
 - ADR-0051-global-volume-closure-plan-v1.md - plan de fermeture de volume global V0.1.
+- ADR-0052-functional-volume-cad-materialization-v1.md - materialisation CAD fonctionnelle P42 du plan V0.1.

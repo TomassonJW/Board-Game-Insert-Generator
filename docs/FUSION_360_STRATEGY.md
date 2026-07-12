@@ -804,3 +804,12 @@ Le manifeste reste un contrat d'audit preprint : il ne change pas la CAD IR, ne 
 ## P34 - Coupon coulissant a deux pieces
 
 L adaptateur Fusion consomme join_rectangular_prism uniquement pour joindre deux glissieres rectangulaires au capot du coupon P34. Chaque join reste dans l enveloppe XY de la plaque et la recouvre en Z ; Fusion ne derive aucune dimension ni tolerance. Le coupon est genere a cote de la boite et ne modifie pas les bacs ranges. Le premier smoke doit verifier le capot unique et ses deux rails ; print-validated: false reste obligatoire.
+## P42 - Scene fonctionnelle V0.1 prete au smoke
+
+L add-in consomme `cad_ir.v0` produit par `build_functional_cad()` : un blank
+rectangulaire par piece imprimable et une operation
+`subtract_rectangular_cavity` par logement ou bac vide. Le mode `compact_only`
+est la reference pour les projets a forte cardinalite. Fusion ne recalcule ni les
+positions, ni les parois, ni les jeux ; P43 doit seulement observer la scene et
+signaler tout ecart visible. Aucun export STL ou statut d impression n est
+inclus dans P42.

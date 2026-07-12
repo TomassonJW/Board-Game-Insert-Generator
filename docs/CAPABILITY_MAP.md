@@ -579,3 +579,14 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - C-RESERVATION : pile superieure placee comme reservation non imprimable.
 - C-QUALITY : 50 bacs, 72 familles, 25 plats, remplissages exacts et API testes.
 - C-FUSION : reste P42.
+## P42 functional CAD update
+
+- C-CAD-IR / C-CAVITY : `implemented-cad-ir` pour les bacs V0.1 ouverts, un
+  logement top-open par famille, les remplissages demandes et les supports
+  conservant parois et fond minimaux.
+- C-FUSION-UI : `fusion-smoke-required` ; la scene est lue par l adaptateur hors
+  API mais aucune execution Fusion P42 n est encore observee.
+- C-PRODUCT-VISION : le Studio construit une geometrie fonctionnelle et explique
+  les blocages ou jeux techniques sans exposer le jargon CAD dans le parcours.
+- C-AESTHETIC / C-STACKING : restent `deferred` jusqu aux gates P43 puis P46.
+- C-PRINT : `print-validated: false` maintenu.

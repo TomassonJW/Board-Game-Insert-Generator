@@ -40,12 +40,13 @@ class FrontendStudioContractTests(unittest.TestCase):
         for legacy_concept in ("CandidateEditor", "ReservationEditor", "allowed_layers", "manual_modules"):
             self.assertNotIn(legacy_concept, self.source)
 
-    def test_build_reserves_and_explains_containers_and_upper_stack(self) -> None:
-        for marker in ("solveVolume", "buildPlan", "DerivationResult", "Toute la boîte est planifiée"):
+    def test_build_constructs_functional_geometry_and_explains_the_next_step(self) -> None:
+        for marker in ("buildFunctionalCad", "cadBuild", "DerivationResult", "Geometrie pour Fusion"):
             self.assertIn(marker, self.source)
-        self.assertIn("/project-v1/solve-volume", self.api)
-        self.assertIn("région(s) restante(s) classée(s)", self.source)
-        self.assertNotIn("Le prochain lot calcule automatiquement les bacs", self.source)
+        self.assertIn("/project-v1/build-cad", self.api)
+        self.assertIn("piece(s) fonctionnelle(s)", self.source)
+        self.assertIn("region(s) restante(s) classee(s)", self.source)
+        self.assertNotIn("Le placement et le remplissage complet suivent ensuite.", self.source)
 
     def test_client_validation_covers_groups_flats_and_fill_elements(self) -> None:
         for marker in ("validateProjectV1", "container_groups", "flat_items", "fill_elements", "layout_clearance_mm"):

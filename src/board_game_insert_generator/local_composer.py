@@ -28,6 +28,7 @@ from board_game_insert_generator.mechanism import (
 from board_game_insert_generator.container_derivation import derive_container_plan
 from board_game_insert_generator.flat_stack_reservation import derive_flat_stack_reservation
 from board_game_insert_generator.volume_closure import solve_project_volume
+from board_game_insert_generator.volume_cad import build_functional_cad
 from board_game_insert_generator.project_v1 import (
     PROJECT_SCHEMA_V1,
     ProjectContractError,
@@ -257,6 +258,15 @@ def solve_project_volume_v1(raw_project: object) -> dict[str, object]:
 
     try:
         return solve_project_volume(raw_project)
+    except ProjectContractError as exc:
+        raise LocalComposerError(str(exc)) from exc
+
+
+def build_functional_cad_v1(raw_project: object) -> dict[str, object]:
+    """Return the P42 functional CAD scene for a V1 or migratable legacy project."""
+
+    try:
+        return build_functional_cad(raw_project)
     except ProjectContractError as exc:
         raise LocalComposerError(str(exc)) from exc
 
@@ -1027,6 +1037,8 @@ class LocalComposerRequestHandler(BaseHTTPRequestHandler):
                 self._send_json(HTTPStatus.OK, reserve_flat_stack_v1(payload))
             elif route == "/api/project-v1/solve-volume":
                 self._send_json(HTTPStatus.OK, solve_project_volume_v1(payload))
+            elif route == "/api/project-v1/build-cad":
+                self._send_json(HTTPStatus.OK, build_functional_cad_v1(payload))
             else:
                 self._send_error(HTTPStatus.NOT_FOUND, "NOT_FOUND", "Unknown local composer route.")
         except LocalComposerError as exc:

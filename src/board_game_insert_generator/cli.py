@@ -22,6 +22,7 @@ from board_game_insert_generator.models import Dimension3D
 from board_game_insert_generator.cad_ir import CadIrError, build_blank_cad_scene
 from board_game_insert_generator.config_loader import ConfigError, load_config
 from board_game_insert_generator.layout import LayoutError, generate_basic_layout
+from board_game_insert_generator.volume_cad import build_functional_cad
 from board_game_insert_generator.local_composer import (
     LocalComposerError,
     export_from_draft,
@@ -42,6 +43,8 @@ def main(argv: list[str] | None = None) -> int:
         return _diagnose(arguments[1:])
     if arguments and arguments[0] == "export-cad-ir":
         return _export_cad_ir(arguments[1:])
+    if arguments and arguments[0] == "export-project-v1-cad":
+        return _export_project_v1_cad(arguments[1:])
     if arguments and arguments[0] == "validate-box-fill":
         return _validate_box_fill(arguments[1:])
     if arguments and arguments[0] == "report-box-fill":
@@ -78,6 +81,7 @@ def _print_top_level_help() -> None:
         "  python -m board_game_insert_generator CONFIG --format markdown|json [--output PATH]\n"
         "  python -m board_game_insert_generator diagnose CONFIG\n"
         "  python -m board_game_insert_generator export-cad-ir CONFIG --output PATH\n"
+        "  python -m board_game_insert_generator export-project-v1-cad PROJECT --output PATH\n"
         "  python -m board_game_insert_generator validate-box-fill CONFIG [--format text|json]\n"
         "  python -m board_game_insert_generator report-box-fill CONFIG --format markdown|json [--output PATH]\n"
         "  python -m board_game_insert_generator export-box-fill-plan CONFIG --output PATH\n"
@@ -229,6 +233,56 @@ def _export_cad_ir(argv: list[str]) -> int:
         "- Fusion input target: fusion_addin/BoardGameInsertGenerator/cad_ir_input.json",
     ]
     print("\n".join(lines))
+    return 0
+
+
+def _export_project_v1_cad(argv: list[str]) -> int:
+    parser = argparse.ArgumentParser(
+        description="Export the resolved V0.1 functional CAD IR from a user project JSON file."
+    )
+    parser.add_argument("project", help="Path to a bgig.project.v1 or migratable legacy project JSON file.")
+    parser.add_argument("--output", "-o", required=True, help="Output CAD IR JSON file.")
+    args = parser.parse_args(argv)
+
+    try:
+        raw_project = json.loads(Path(args.project).read_text(encoding="utf-8"))
+        result = build_functional_cad(raw_project)
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
+        _print_error("Project CAD export error", exc)
+        return 2
+
+    if result["status"] != "planned_for_fusion_smoke":
+        blockers = result.get("blockers", [])
+        for blocker in blockers:
+            print(f"- {blocker}", file=sys.stderr)
+        print("Project CAD export error: the V0.1 project is not constructible.", file=sys.stderr)
+        return 2
+
+    cad_ir = result["cad_ir"]
+    if not isinstance(cad_ir, dict):
+        print("Project CAD export error: no CAD IR was produced.", file=sys.stderr)
+        return 2
+    output_path = Path(args.output)
+    try:
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(cad_ir, indent=2) + "\n", encoding="utf-8")
+    except OSError as exc:
+        _print_error("Output error", exc)
+        return 2
+
+    materialization = result["materialization"]
+    print(
+        "\n".join(
+            [
+                f"Functional CAD export OK - {result['project_name']}",
+                f"- Output: {output_path}",
+                f"- Schema: {cad_ir['schema_version']}",
+                f"- Functional pieces: {materialization['component_count']}",
+                f"- Cavities: {materialization['cavity_count']}",
+                "- Fusion status: prepared for smoke; not yet observed in Fusion.",
+            ]
+        )
+    )
     return 0
 
 def _print_error(title: str, exc: Exception) -> None:
