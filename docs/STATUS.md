@@ -1156,3 +1156,13 @@ revendique.
 
 Prochaine mission : P43, preparation puis observation humaine Fusion du jeu
 temoin uniquement.
+## P42a - Regroupement des remplissages automatiques
+
+Le preflight P43 a montre que la decomposition exacte P41 pouvait produire trop
+de petits bacs automatiques dans Fusion. P42 fusionne maintenant uniquement les
+cellules libres compatibles et contigues, conserve leur provenance et ne fusionne
+jamais une forme en L. Le jeu temoin passe de 111 a 20 pieces CAD. L export
+`export-project-v1-cad` accepte les JSON UTF-8 avec BOM Windows.
+
+Preuves : test anti-fragmentation, scene P43 relue par l adaptateur compact,
+validation des tests P42 et de l export BOM. Le statut Fusion reste a observer.

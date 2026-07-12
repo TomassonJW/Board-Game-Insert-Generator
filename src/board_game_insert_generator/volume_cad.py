@@ -201,16 +201,14 @@ def _materialize(project: dict[str, object], volume_plan: dict[str, object]) -> 
             blockers.append(str(error))
 
     skipped_regions: list[dict[str, object]] = []
-    for region_value in _values(volume_plan["free_regions"]):
-        region = _mapping(region_value)
+    for region in _merged_automatic_regions(_values(volume_plan["free_regions"])):
         classification = str(region["classification"])
-        if classification == "technical_clearance":
-            continue
         candidate = _inset_automatic_region(region, clearance)
         if candidate is None:
             skipped_regions.append(
                 {
                     "region_id": region["id"],
+                    "source_region_ids": region["source_region_ids"],
                     "classification": classification,
                     "reason": "The common clearance leaves no printable automatic body in this region.",
                 }
@@ -220,7 +218,12 @@ def _materialize(project: dict[str, object], volume_plan: dict[str, object]) -> 
             components.append(_automatic_fill_component(region, candidate, layout))
         except FunctionalCadBuildError as error:
             skipped_regions.append(
-                {"region_id": region["id"], "classification": classification, "reason": str(error)}
+                {
+                    "region_id": region["id"],
+                    "source_region_ids": region["source_region_ids"],
+                    "classification": classification,
+                    "reason": str(error),
+                }
             )
 
     if not components and not blockers:
@@ -305,6 +308,113 @@ def _exact_fill_component(fill: dict[str, object], layout: dict[str, object]) ->
     )
 
 
+def _merged_automatic_regions(region_values: list[object]) -> list[dict[str, object]]:
+    """Coalesce compatible free cells before creating useful filler bodies.
+
+    P41 deliberately emits an exact grid decomposition for volume accounting.
+    Those cells are not a useful printable-piece list: a single empty area can
+    otherwise become dozens of tiny trays.  This deterministic pass joins only
+    face-adjacent cells of the same product meaning and keeps their provenance.
+    """
+
+    candidates: list[dict[str, object]] = []
+    for value in region_values:
+        region = _mapping(value)
+        classification = str(region["classification"])
+        if classification == "technical_clearance":
+            continue
+        candidates.append(
+            {
+                "id": str(region["id"]),
+                "source_region_ids": [str(region["id"])],
+                "classification": classification,
+                "origin_mm": _dimension(region["origin_mm"]),
+                "size_mm": _dimension(region["size_mm"]),
+                "requested_fill_id": region["requested_fill_id"],
+            }
+        )
+
+    # Repeating X/Y/Z passes lets a merge on one axis unlock a larger, still
+    # rectangular merge on the following axis without treating an L-shape as a
+    # single invalid prism.
+    for _ in range(3):
+        before = len(candidates)
+        for axis in ("x", "y", "z"):
+            candidates = _merge_regions_along_axis(candidates, axis)
+        if len(candidates) == before:
+            break
+
+    result: list[dict[str, object]] = []
+    for index, candidate in enumerate(
+        sorted(candidates, key=lambda item: (str(item["classification"]), _region_sort_key(item))),
+        start=1,
+    ):
+        result.append(
+            {
+                **candidate,
+                "id": f"auto:{index}",
+                "source_region_ids": sorted(str(value) for value in _values(candidate["source_region_ids"])),
+                "origin_mm": _rounded_dimension(_dimension(candidate["origin_mm"])),
+                "size_mm": _rounded_dimension(_dimension(candidate["size_mm"])),
+            }
+        )
+    return result
+
+
+def _merge_regions_along_axis(candidates: list[dict[str, object]], axis: str) -> list[dict[str, object]]:
+    other_axes = tuple(value for value in ("x", "y", "z") if value != axis)
+    grouped: dict[tuple[object, ...], list[dict[str, object]]] = {}
+    for candidate in candidates:
+        origin = _dimension(candidate["origin_mm"])
+        size = _dimension(candidate["size_mm"])
+        key = (
+            candidate["classification"],
+            candidate["requested_fill_id"],
+            *(origin[item] for item in other_axes),
+            *(size[item] for item in other_axes),
+        )
+        grouped.setdefault(key, []).append(candidate)
+
+    merged: list[dict[str, object]] = []
+    for group in grouped.values():
+        current: dict[str, object] | None = None
+        for candidate in sorted(group, key=lambda item: _dimension(item["origin_mm"])[axis]):
+            if current is None:
+                current = _copy_region_candidate(candidate)
+                continue
+            current_origin = _dimension(current["origin_mm"])
+            current_size = _dimension(current["size_mm"])
+            candidate_origin = _dimension(candidate["origin_mm"])
+            candidate_size = _dimension(candidate["size_mm"])
+            if abs(current_origin[axis] + current_size[axis] - candidate_origin[axis]) <= 0.0001:
+                current_size[axis] = _round(current_size[axis] + candidate_size[axis])
+                current["size_mm"] = current_size
+                current["source_region_ids"] = [
+                    *_values(current["source_region_ids"]),
+                    *_values(candidate["source_region_ids"]),
+                ]
+            else:
+                merged.append(current)
+                current = _copy_region_candidate(candidate)
+        if current is not None:
+            merged.append(current)
+    return merged
+
+
+def _copy_region_candidate(candidate: dict[str, object]) -> dict[str, object]:
+    return {
+        **candidate,
+        "source_region_ids": list(_values(candidate["source_region_ids"])),
+        "origin_mm": _dimension(candidate["origin_mm"]),
+        "size_mm": _dimension(candidate["size_mm"]),
+    }
+
+
+def _region_sort_key(candidate: dict[str, object]) -> tuple[float, float, float, float, float, float]:
+    origin = _dimension(candidate["origin_mm"])
+    size = _dimension(candidate["size_mm"])
+    return (origin["z"], origin["y"], origin["x"], size["z"], size["y"], size["x"])
+
 def _automatic_fill_component(region: dict[str, object], candidate: dict[str, dict[str, float]], layout: dict[str, object]) -> CadComponent:
     classification = str(region["classification"])
     fill_kind = "solid" if classification == "solid_fill_requested" else "hollow"
@@ -319,7 +429,7 @@ def _automatic_fill_component(region: dict[str, object], candidate: dict[str, di
         layout=layout,
         metadata={
             "source": "p42_automatic_residual_fill_v1",
-            "source_region_id": region["id"],
+            "source_region_ids": region["source_region_ids"],
             "source_classification": classification,
             "support_role": "upper_flat_stack" if classification == "support_hollow_fill_candidate" else None,
             "requested_fill_id": region["requested_fill_id"],
@@ -538,6 +648,9 @@ def _point_dict(value: Point3D) -> dict[str, float]:
 def _dimension_dict(value: Dimension3D) -> dict[str, float]:
     return {"x": value.x, "y": value.y, "z": value.z}
 
+
+def _rounded_dimension(value: dict[str, float]) -> dict[str, float]:
+    return {axis: _round(value[axis]) for axis in ("x", "y", "z")}
 
 def _round(value: float) -> float:
     return round(float(value), 4)

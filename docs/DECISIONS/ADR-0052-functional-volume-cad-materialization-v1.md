@@ -40,7 +40,7 @@ une scene `cad_ir.v0` :
 - les bacs vides et supports automatiques qui conservent les parois minimales ;
 - les remplissages pleins et separateurs demandes.
 
-Le jeu commun est conserve autour des regions automatiques. Une region
+Les cellules automatiques compatibles sont d abord fusionnees de maniere deterministe, puis le jeu commun est conserve autour des regions resultantes. Une region
 automatique trop petite apres ce retrait reste un jeu technique explique. A
 l inverse, un bac vide exact demande par l utilisateur est refuse si ses parois
 ou son fond minimaux ne tiennent pas : BGIG ne le rend jamais plus fin en

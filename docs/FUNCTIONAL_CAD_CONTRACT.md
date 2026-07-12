@@ -37,11 +37,15 @@ les epaisseurs minimales.
    des corps separes.
 4. Les remplissages exacts conserves par P41 sont materialises dans leur forme
    demandee : bac vide, plein ou separateur.
-5. Les regions automatiques sont reduites du jeu commun avant materialisation.
-   Une region qui ne garde plus de volume utile est classee comme jeu technique.
-6. Un support sous plateau peut toucher volontairement la reservation en haut ;
+5. Les cellules automatiques compatibles sont fusionnees de maniere deterministe
+   avant materialisation. Seules des cellules de meme sens produit, partageant
+   une face complete, deviennent un meme parallelepipede ; leur provenance reste
+   transportee dans la CAD IR.
+6. Les regions automatiques sont ensuite reduites du jeu commun. Une region qui
+   ne garde plus de volume utile est classee comme jeu technique.
+7. Un support sous plateau peut toucher volontairement la reservation en haut ;
    cela represente une surface de pose, pas une collision.
-7. Aucun arrondi, chanfrein, encoche, label, finition, couvercle ou mecanisme
+8. Aucun arrondi, chanfrein, encoche, label, finition, couvercle ou mecanisme
    n est genere dans cette version.
 
 ## Surface publique

@@ -83,6 +83,21 @@ class VolumeCadTests(unittest.TestCase):
         self.assertIn("trop petit", " ".join(result["blockers"]))
 
 
+    def test_coalesces_automatic_free_regions_before_materialization(self) -> None:
+        result = build_functional_cad(_project())
+
+        source_regions = [
+            region for region in result["volume_plan"]["free_regions"]
+            if region["classification"] != "technical_clearance"
+        ]
+        automatic_components = [
+            component for component in result["cad_ir"]["components"]
+            if component["metadata"].get("source") == "p42_automatic_residual_fill_v1"
+        ]
+        self.assertLess(len(automatic_components), len(source_regions))
+        self.assertTrue(
+            any(len(component["metadata"]["source_region_ids"]) > 1 for component in automatic_components)
+        )
     def test_supports_high_cardinality_in_compact_fusion_mode(self) -> None:
         project = blank_project_v1()
         project["box"] = {"inner_dimensions_mm": {"x": 800.0, "y": 800.0, "z": 120.0}, "usable_height_mm": 116.0, "lid_clearance_mm": 2.0}

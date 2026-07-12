@@ -245,7 +245,7 @@ def _export_project_v1_cad(argv: list[str]) -> int:
     args = parser.parse_args(argv)
 
     try:
-        raw_project = json.loads(Path(args.project).read_text(encoding="utf-8"))
+        raw_project = json.loads(Path(args.project).read_text(encoding="utf-8-sig"))
         result = build_functional_cad(raw_project)
     except (OSError, json.JSONDecodeError, ValueError) as exc:
         _print_error("Project CAD export error", exc)

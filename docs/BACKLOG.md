@@ -1487,7 +1487,7 @@ impose les dependances de release suivantes.
 - Validation : CAD IR pure, adaptateur Fusion hors API, API/CLI Studio, build
   TypeScript et test compact 50 bacs / 72 familles / 25 elements plats.
 - Resultat : `bgig.functional_cad_build.v1`, route `build-cad`, commande
-  `export-project-v1-cad`, bacs ouverts par logement, remplissages exacts et
+  `export-project-v1-cad`, bacs ouverts par logement, remplissages exacts, cellules automatiques regroupees et
   regions automatiques expliquees comme jeu technique si les parois ne tiennent
   pas.
 - Statut : `done`, `implemented-core`, `implemented-loopback-adapter`,

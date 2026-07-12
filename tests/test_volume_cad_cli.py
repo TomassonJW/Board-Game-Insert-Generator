@@ -34,7 +34,7 @@ class VolumeCadCliTests(unittest.TestCase):
             root = Path(temporary_directory)
             project_path = root / "project.json"
             output_path = root / "functional.cad-ir.json"
-            project_path.write_text(json.dumps(_project()), encoding="utf-8")
+            project_path.write_text(json.dumps(_project()), encoding="utf-8-sig")
             stdout = StringIO()
 
             with redirect_stdout(stdout):
