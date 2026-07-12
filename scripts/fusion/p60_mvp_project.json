@@ -1,6 +1,6 @@
 {
   "schema_version": "bgig.project.v1",
-  "project_name": "P60 - MVP Fusion-only",
+  "project_name": "P60 - MVP Fusion-only 0.1.9",
   "box": {
     "inner_dimensions_mm": {"x": 240.0, "y": 180.0, "z": 70.0},
     "usable_height_mm": 66.0,
@@ -18,13 +18,15 @@
     {"id": "cards", "name": "Cartes sleevées", "shape_kind": "cards", "dimensions_mm": {"x": 68.0, "y": 94.0, "z": 28.0}, "quantity": 1, "container_group_id": "cards-tray", "content_clearance_mm": null, "measurement_confidence": "exact"}
   ],
   "container_groups": [
-    {"id": "tokens", "name": "Bac jetons", "wall_thickness_mm": null, "floor_thickness_mm": null, "expansion_axes": {"x": true, "y": true, "z": true}, "locked_outer_dimensions_mm": {"x": null, "y": null, "z": null}, "surplus_preference": "balanced"},
+    {"id": "tokens", "name": "Bac jetons", "wall_thickness_mm": null, "floor_thickness_mm": null, "expansion_axes": {"x": true, "y": true, "z": true}, "locked_outer_dimensions_mm": {"x": 80.0, "y": null, "z": null}, "surplus_preference": "balanced"},
     {"id": "cards-tray", "name": "Bac cartes", "wall_thickness_mm": null, "floor_thickness_mm": null, "expansion_axes": {"x": true, "y": true, "z": true}, "locked_outer_dimensions_mm": {"x": null, "y": null, "z": null}, "surplus_preference": "balanced"}
   ],
   "flat_items": [
     {"id": "rulebook", "name": "Livret de regles", "kind": "rulebook", "dimensions_mm": {"x": 210.0, "y": 150.0, "z": 2.0}, "quantity": 1, "stack_order": 1}
   ],
-  "fill_elements": [],
+  "fill_elements": [
+    {"id": "solid-strip", "name": "Cale pleine avant", "kind": "solid", "mode": "exact", "dimensions_mm": {"x": 20.0, "y": 238.8, "z": 63.4}, "container_group_id": null}
+  ],
   "solver_preference": "balanced",
   "deferred_features": {"appearance": null, "mechanism": null}
 }

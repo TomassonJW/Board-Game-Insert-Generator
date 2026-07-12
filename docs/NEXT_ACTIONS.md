@@ -34,13 +34,13 @@ Livrables implementes :
 
 ## Prochaine action prete
 
-Installer le commit 0.1.9 exact puis rejouer P60 dans Fusion :
+Installer le commit 0.1.9 exact puis rejouer la fixture P60 renforcee dans Fusion. Le preparateur sauvegarde automatiquement un projet courant different :
 
-1. verifier les presets et leurs valeurs modifiables ;
-2. creer un bloc plein et confirmer qu il ne contient aucune cavite ;
-3. fixer une dimension finale de bac, recalculer et verifier le resultat ;
-4. materialiser, regenerer sans doublon, inspecter puis exporter ;
-5. confirmer la taille initiale de la palette.
+1. confirmer la taille initiale et les presets visibles ;
+2. verifier Bac jetons avec X final = 80 mm ;
+3. calculer et confirmer 3 corps, 1 complement et 0 automatique ;
+4. confirmer Cale pleine avant sans cavite ;
+5. materialiser, regenerer sans doublon, inspecter puis exporter 3 STL.
 
 ## Mission suivante apres acceptation P60
 

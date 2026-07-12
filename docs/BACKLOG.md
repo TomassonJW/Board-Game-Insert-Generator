@@ -1650,6 +1650,8 @@ impose les dependances de release suivantes.
   Separateur et verrouillage X/Y/Z visible en mode simple.
 - Statut : implemented, automated-validated, fusion-retest-required,
   print-validated: false.
+- Gate renforcee : fixture 3 corps / 1 complement / 3 cavites / 0 automatique,
+  Bac jetons X = 80 mm, cale solid sans cavite et sauvegarde projet locale.
 
 ### P61 - Empilement vertical explicite
 

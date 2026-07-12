@@ -1452,3 +1452,10 @@ Preuves : suite complete 387 tests, dont chaque preset jusqu a une partition
 construite, tests bridge/DOM/transport, syntaxe JavaScript Node, py_compile,
 parsing PowerShell, git diff --check, dry-run P60 et absence de adsk dans le
 coeur.
+
+La gate 0.1.9 est maintenant renforcee par une fixture unique : Bac jetons X
+local verrouille a 80 mm, Bac cartes et Cale pleine avant solid de 20 x 238,8 x
+63,4 mm. Les preuves hors Fusion confirment 3 corps, 1 complement explicite, 3
+cavites, 0 automatique et 3 occurrences compactes. Le preparateur sauvegarde
+tout projet courant different avant d installer cette fixture. L observation
+Fusion reste requise.
