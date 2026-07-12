@@ -1093,3 +1093,24 @@ Fusion ou impression n est revendique.
 
 Prochaine mission : P39, derivation expliquable des bacs et logements depuis les
 pieces et leur bac cible.
+
+## P39 - Derivation des bacs et logements
+
+Statut : `done`, `implemented-core`, `implemented-loopback-adapter`,
+`implemented-local-ui`, `print-validated: false`.
+
+Le moteur pur derive maintenant un bac minimal par groupe cible. Il compte les
+piles des pieces, preserve l epaisseur totale des paquets de cartes, ajoute les
+jeux, parois et fonds, puis explique toute dimension qui depasse la boite. Le
+Studio affiche ce resultat apres `Construire mes bacs` sans pretendre que les
+bacs sont deja places, generes dans Fusion ou imprimables.
+
+Preuves : 284 tests Python passent, le build TypeScript/Vite passe et la recette
+locale reelle retourne un plan P39 `ready_for_p40` pour 72 jetons : un bac de
+40.2 x 58.8 x 49.8 mm avec 6 piles. Aucun statut Fusion ou impression n est
+revendique.
+
+P40 reste responsable de la pile des plateaux et livrets. P41 reste responsable
+du placement global, du jeu entre bacs et du remplissage de volume.
+
+Prochaine mission : P40, pile superieure de plateaux et livrets.

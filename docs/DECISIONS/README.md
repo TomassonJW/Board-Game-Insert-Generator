@@ -169,3 +169,6 @@ Tests, cartes backlog ou gates humaines a preparer.
 - ADR-0047-canonical-release-order-and-mvp-critical-path.md - ordre V0.1, V0.2, V0.3 et verrou du chemin critique MVP.
 
 - ADR-0048-user-first-project-v1-contract.md - contrat utilisateur V0.1 et migration additive depuis le Studio P23.
+
+- ADR-0049-derived-container-plan-before-box-solver.md - plan de bacs derive
+  avant le solveur global de boite.

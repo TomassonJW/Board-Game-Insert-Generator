@@ -12,18 +12,16 @@ ADR-0047.
 
 ## Derniere mission terminee
 
-`P38 - Tables dynamiques et parcours user-first` : le Studio V0.1 permet de
-saisir la boite, les pieces, leur bac cible, les plateaux/livrets, les volumes de
-remplissage et les reglages de fabrication. Il charge, migre et sauvegarde le
-contrat `bgig.project.v1` sans vocabulaire moteur dans le parcours principal.
+`P39 - Derivation des bacs et logements` : le bouton Construire derive maintenant
+un bac et ses logements depuis chaque groupe de pieces. Il affiche une dimension
+minimale ou explique la mesure qui empeche le bac de tenir.
 
 ## Prochaine mission prete
 
-`P39 - Derivation des bacs et logements`.
+`P40 - Pile superieure plateaux et livrets`.
 
-Resultat attendu : le moteur derive des bacs et logements explicables depuis la
-forme, les mesures, la quantite et le `Bac cible`, sans demander une taille de
-bac externe a l utilisateur.
+Resultat attendu : le moteur reserve chaque plateau et livret au-dessus des bacs
+derives, ajuste la hauteur utilisable et refuse tout depassement de boite.
 
 ## Ce qui n'est plus demande a Thomas
 

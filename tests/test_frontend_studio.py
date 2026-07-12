@@ -9,6 +9,7 @@ class FrontendStudioContractTests(unittest.TestCase):
         cls.source = (root / "frontend" / "src" / "App.tsx").read_text(encoding="utf-8")
         cls.types = (root / "frontend" / "src" / "project_v1.ts").read_text(encoding="utf-8")
         cls.validation = (root / "frontend" / "src" / "project_v1_validation.ts").read_text(encoding="utf-8")
+        cls.api = (root / "frontend" / "src" / "api.ts").read_text(encoding="utf-8")
 
     def test_primary_journey_is_user_first_and_not_a_technical_wizard(self) -> None:
         for label in (
@@ -38,6 +39,12 @@ class FrontendStudioContractTests(unittest.TestCase):
         self.assertIn("Sauvegarder", self.source)
         for legacy_concept in ("CandidateEditor", "ReservationEditor", "allowed_layers", "manual_modules"):
             self.assertNotIn(legacy_concept, self.source)
+
+    def test_build_requests_and_explains_the_derived_container_plan(self) -> None:
+        for marker in ("deriveContainers", "containerPlan", "DerivationResult", "Dimensions calculées"):
+            self.assertIn(marker, self.source)
+        self.assertIn("/project-v1/derive-containers", self.api)
+        self.assertNotIn("Le prochain lot calcule automatiquement les bacs", self.source)
 
     def test_client_validation_covers_groups_flats_and_fill_elements(self) -> None:
         for marker in ("validateProjectV1", "container_groups", "flat_items", "fill_elements", "layout_clearance_mm"):

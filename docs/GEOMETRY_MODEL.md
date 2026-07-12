@@ -325,3 +325,11 @@ Prevu :
   nouveau modele metier.
 - Les modules composites doivent conserver de la matiere continue sur leurs faces
   internes soudees.
+
+## P39 - Enveloppes de logements derivees
+
+Les dimensions P39 sont des enveloppes internes minimales : elles incluent le
+jeu autour des pieces, les cloisons internes, les parois externes et le fond.
+Elles ne constituent pas encore une cavite materialisee. Les formes non
+rectangulaires sont representees par une enveloppe rectangulaire sure en V0.1 ;
+les formes ergonomiques restent V0.2.

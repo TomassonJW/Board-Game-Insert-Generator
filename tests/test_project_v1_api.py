@@ -46,6 +46,23 @@ class ProjectV1ApiTests(unittest.TestCase):
         self.assertEqual(normalized["project"]["schema_version"], PROJECT_SCHEMA_V1)
         self.assertEqual(len(normalized["project"]["contents"]), 3)
 
+    def test_derives_containers_from_a_migratable_project(self) -> None:
+        payload = json.dumps(starter_draft()).encode("utf-8")
+        self.connection.request(
+            "POST",
+            "/api/project-v1/derive-containers",
+            body=payload,
+            headers={"Content-Type": "application/json", "Content-Length": str(len(payload))},
+        )
+        response = self.connection.getresponse()
+        result = json.loads(response.read())
+
+        self.assertEqual(response.status, 200)
+        self.assertEqual(result["schema_version"], "bgig.container_derivation.v1")
+        self.assertTrue(result["source"]["migrated"])
+        self.assertGreaterEqual(result["summary"]["requested_container_count"], 1)
+        self.assertIn(result["summary"]["status"], {"ready_for_p40", "blocked"})
+
     def test_rejects_invalid_v1_project_with_a_draft_error(self) -> None:
         invalid = {"schema_version": PROJECT_SCHEMA_V1}
         payload = json.dumps(invalid).encode("utf-8")

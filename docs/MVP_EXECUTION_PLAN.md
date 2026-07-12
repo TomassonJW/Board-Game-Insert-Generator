@@ -34,8 +34,8 @@ V0.2 et V0.3 restent `deferred`.
 
 ### P38 - Surface de saisie V0.1
 
-- ne montrer par defaut que quatre zones : boîte, pieces, plateaux/livrets,
-  construire ;
+- ne montrer que les zones utiles : boite, pieces, plateaux/livrets, bacs,
+  remplissage, reglages et construction ;
 - ajouter/supprimer des lignes sans modal technique ;
 - adapter les champs de dimensions au preset choisi ;
 - proposer `Nouveau bac` puis les bacs existants dans chaque ligne ;

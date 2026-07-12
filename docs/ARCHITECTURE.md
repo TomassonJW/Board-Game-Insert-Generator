@@ -255,3 +255,10 @@ P19 est complet contre son contrat autorise : cellules libres AABB exactes (`exa
 ## P20 completion - 2026-07-10
 
 Statut : `done`, `implemented-core`, `implemented-cli`, `implemented-cad-ir-metadata`. Le moteur `box_fill_greedy_2d.v0` produit un nouveau BoxFillPlan sans muter la source, respecte locks, modules manuels, reservations et layers, supporte la rotation XY 90 degres et expose diagnostics, digest, metrics, rapports JSON/Markdown, preview SVG et metadata CAD IR. Aucun backtracking, solveur global, UI persistante, geometrie Fusion ou validation d impression n est ajoute. P21 reste gate et recommande les variantes/scoring.
+## P39 - Plan de bacs derive
+
+Le flux V0.1 est maintenant : `bgig.project.v1` ->
+`bgig.container_derivation.v1` -> reservation des plateaux P40 -> solveur global
+P41 -> CAD IR/Fusion P42. `container_derivation.py` est un module Python pur :
+il dimensionne les bacs et logements requis, mais ne les place pas dans la boite
+et n importe aucune API Fusion. ADR-0049 fixe cette frontiere.

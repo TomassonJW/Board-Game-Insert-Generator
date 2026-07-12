@@ -1,5 +1,5 @@
 import { type ChangeEvent, useEffect, useMemo, useState } from 'react'
-import { ApiError, loadProjectV1Starter, normalizeProjectV1 } from './api'
+import { ApiError, deriveContainers, loadProjectV1Starter, normalizeProjectV1 } from './api'
 import type {
   ContainerGroupDraft,
   FillElementDraft,
@@ -9,6 +9,7 @@ import type {
   ProjectV1Draft,
 } from './project_v1'
 import { type ProjectIssue, validateProjectV1 } from './project_v1_validation'
+import type { ContainerDerivationPlan } from './container_derivation'
 import type { Dimension } from './types'
 
 const shapeOptions: Array<{ value: ProjectShapeKind; label: string }> = [
@@ -42,6 +43,8 @@ export default function App() {
   const [message, setMessage] = useState('Préparation de ton projet…')
   const [error, setError] = useState<string>()
   const [attemptedBuild, setAttemptedBuild] = useState(false)
+  const [containerPlan, setContainerPlan] = useState<ContainerDerivationPlan>()
+  const [busy, setBusy] = useState(false)
 
   useEffect(() => {
     void loadProjectV1Starter()
@@ -59,6 +62,7 @@ export default function App() {
     setProject((current) => current ? mutator(current) : current)
     setError(undefined)
     setAttemptedBuild(false)
+    setContainerPlan(undefined)
   }
 
   function addContent() {
@@ -146,6 +150,7 @@ export default function App() {
       const normalized = await normalizeProjectV1(raw)
       setProject(normalized.project)
       setAttemptedBuild(false)
+      setContainerPlan(undefined)
       setError(undefined)
       setMessage(normalized.migrated
         ? 'Ton ancien projet a été converti. Vérifie les bacs, plateaux et réglages avant de continuer.'
@@ -157,14 +162,26 @@ export default function App() {
     }
   }
 
-  function handleBuild() {
+  async function handleBuild() {
     if (!project) return
     setAttemptedBuild(true)
     if (issues.length) {
       setMessage(`${issues.length} point(s) sont à compléter avant de construire l’insert.`)
       return
     }
-    setMessage('Le projet est prêt. Le prochain lot calcule automatiquement les bacs, les plateaux et le remplissage complet.')
+    setBusy(true)
+    setError(undefined)
+    try {
+      const result = await deriveContainers(project)
+      setContainerPlan(result)
+      setMessage(result.summary.status === 'blocked'
+        ? 'BGIG a trouvé un bac qui ne peut pas tenir avec ces mesures. Corrige le blocage indiqué, puis relance le calcul.'
+        : `${result.summary.ready_container_count} bac(s) ont été dimensionnés. La suite réservera les plateaux et fermera tout le volume de la boîte.`)
+    } catch (reason) {
+      setError(formatError(reason))
+    } finally {
+      setBusy(false)
+    }
   }
 
   if (!project || !metrics) {
@@ -247,7 +264,8 @@ export default function App() {
             </div>
           </Section>
 
-          <section className="build-panel"><div><p className="eyebrow">Prêt quand tu l’es</p><h2>Construire mon insert</h2><p>Le projet est vérifié avant le calcul. Les bacs et le remplissage complet seront ensuite déterminés par le moteur.</p></div><button className="build-button" onClick={handleBuild}>Construire mon insert <span>→</span></button></section>
+          <section className="build-panel"><div><p className="eyebrow">Prêt quand tu l’es</p><h2>Construire mon insert</h2><p>Le moteur calcule maintenant les dimensions nécessaires de chaque bac. Il réservera ensuite les plateaux et remplira la boîte dans les prochaines étapes.</p></div><button className="build-button" onClick={handleBuild} disabled={busy}>{busy ? 'Calcul des bacs…' : <>Construire mes bacs <span>→</span></>}</button></section>
+          {containerPlan && <DerivationResult plan={containerPlan} />}
         </div>
 
         <aside className="preview-column"><ProjectPreview project={project} metrics={metrics} /><section className="summary-card"><p className="eyebrow">Ce que BGIG voit</p><div className="summary-line"><span>Pièces à ranger</span><strong>{metrics.itemCount}</strong></div><div className="summary-line"><span>Bacs demandés</span><strong>{metrics.groupCount}</strong></div><div className="summary-line"><span>Hauteur plateaux/livrets</span><strong>{formatMillimeters(metrics.flatHeight)}</strong></div><div className="summary-line"><span>Volume intérieur</span><strong>{formatVolume(metrics.volume)}</strong></div></section><section className="tip-card"><strong>À retenir</strong><p>La vue est un plan de saisie, pas une fausse promesse de placement. Le moteur calculera les dimensions et positions réelles des bacs au moment de la construction.</p></section></aside>
@@ -272,6 +290,10 @@ function FillElementRow({ element, groups, onChange, onDelete }: { element: Fill
   return <article className="fill-row"><TextField label="Nom" value={element.name} onChange={(name) => onChange({ name })} /><label className="field"><span>Type</span><select value={element.kind} onChange={(event) => onChange({ kind: event.target.value as FillElementDraft['kind'] })}>{Object.entries(fillKindLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label><label className="field"><span>Taille</span><select value={element.mode} onChange={(event) => onChange({ mode: event.target.value as FillElementDraft['mode'], dimensions_mm: event.target.value === 'auto' ? null : { x: 10, y: 10, z: 10 } })}><option value="auto">À calculer</option><option value="exact">Je donne les mesures</option></select></label><label className="field"><span>Bac associé</span><select value={element.container_group_id ?? ''} onChange={(event) => onChange({ container_group_id: event.target.value || null })}><option value="">Dans toute la boîte</option>{groups.map((group) => <option key={group.id} value={group.id}>{group.name}</option>)}</select></label>{element.dimensions_mm && <div className="fill-dimensions"><DimensionFields labels={['Largeur', 'Profondeur', 'Hauteur']} value={element.dimensions_mm} onChange={(axis, value) => onChange({ dimensions_mm: { ...element.dimensions_mm!, [axis]: value } })} /></div>}<button className="delete-button" aria-label={`Supprimer ${element.name}`} onClick={onDelete}>×</button></article>
 }
 
+function DerivationResult({ plan }: { plan: ContainerDerivationPlan }) {
+  const blocked = plan.summary.status === 'blocked'
+  return <section className={`derivation-result ${blocked ? 'blocked' : 'ready'}`} aria-live="polite"><header><div><p className="eyebrow">Dimensions calculées</p><h2>{blocked ? 'Une mesure est à ajuster' : 'Tes bacs ont une taille'}</h2><p>{blocked ? 'Un ou plusieurs bacs dépassent la place disponible. Les mesures ci-dessous expliquent quoi corriger.' : 'Ce sont les tailles minimales des bacs avant la pose des plateaux et la fermeture complète de la boîte.'}</p></div><span>{plan.summary.ready_container_count}/{plan.summary.requested_container_count} prêts</span></header>{plan.containers.map((container) => <article key={container.container_group_id} className="derived-container"><div><strong>{container.container_name}</strong><span>{container.compartments.length ? `${container.compartments.length} logement(s)` : 'À dimensionner avec le remplissage'}</span></div><b>{container.outer_dimensions_mm ? formatDimension(container.outer_dimensions_mm) : 'À calculer plus tard'}</b>{container.compartments.map((compartment) => <small key={compartment.id}>{compartment.content_name} : {compartment.quantity.declared_count} pièce(s), {compartment.quantity.pile_count} pile(s)</small>)}{container.blockers.map((blocker) => <p className="derivation-blocker" key={blocker}>{blocker}</p>)}</article>)}<p className="derivation-next">Prochaine étape automatique : réserver les plateaux et livrets au-dessus de ces bacs.</p></section>
+}
 function ProjectPreview({ project, metrics }: { project: ProjectV1Draft; metrics: ReturnType<typeof projectMetrics> }) {
   const width = Math.max(project.box.inner_dimensions_mm.x, 1)
   const depth = Math.max(project.box.inner_dimensions_mm.y, 1)
@@ -330,6 +352,7 @@ function projectMetrics(project: ProjectV1Draft) {
 }
 
 function formatMillimeters(value: number) { return `${Math.round(value * 10) / 10} mm` }
+function formatDimension(value: Dimension) { return `${formatMillimeters(value.x)} × ${formatMillimeters(value.y)} × ${formatMillimeters(value.z)}` }
 function formatVolume(value: number) { return `${Math.round(value / 1000).toLocaleString('fr-FR')} cm³` }
 function safeFileName(value: string) { return value.trim().toLowerCase().replace(/[^a-z0-9]+/gi, '-').replace(/(^-|-$)/g, '') || 'bgig' }
 function downloadJson(fileName: string, value: unknown) { const url = URL.createObjectURL(new Blob([JSON.stringify(value, null, 2)], { type: 'application/json' })); const anchor = document.createElement('a'); anchor.href = url; anchor.download = fileName; anchor.click(); URL.revokeObjectURL(url) }

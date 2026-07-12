@@ -1455,8 +1455,10 @@ impose les dependances de release suivantes.
 - Dependances : P38.
 - Objectif : deriver capacite, logements, dimensions internes et externes depuis
   forme, quantite et `Bac cible`.
-- Validation : fixtures rond, carre, rectangle, cartes, cube/de, pion et custom.
-- Statut : `ready-after-p38`.
+- Validation : tests de derivation rond, carre, rectangle, cartes, cube/de,
+  pion, custom, quantite elevee, blocages et API locale ; build Studio.
+- Statut : `done`, `implemented-core`, `implemented-loopback-adapter`,
+  `implemented-local-ui`.
 
 ### P40 - Pile superieure plateaux et livrets
 
@@ -1464,7 +1466,7 @@ impose les dependances de release suivantes.
 - Objectif : reserver quantites, empreintes, hauteur et support au-dessus de tous
   les bacs sans depassement.
 - Validation : tests X/Y/Z, piles heterogenes et cas impossibles.
-- Statut : `blocked-by-p39`.
+- Statut : `ready-after-p39`.
 
 ### P41 - Solveur de fermeture du volume
 

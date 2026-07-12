@@ -188,3 +188,10 @@ pour les couvercles, charnieres et cartes sleevees.
 Le protocole `docs/CALIBRATION_PROTOCOL.md` decrit les coupons, mesures et
 criteres d'interpretation attendus avant toute modification des valeurs par
 defaut ou declaration de profil stable.
+
+## P39 - Application des jeux V0.1
+
+P39 applique `content_clearance_mm` de chaque famille, ou le jeu global de
+contenu, dans le logement derive. `layout_clearance_mm` reste volontairement
+absent de ce calcul : ce jeu est entre bacs et sera applique une seule fois par
+P41 lors du placement global.

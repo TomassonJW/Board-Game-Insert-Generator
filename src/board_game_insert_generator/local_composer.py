@@ -25,6 +25,7 @@ from board_game_insert_generator.mechanism import (
     sliding_lid_coupon_geometry,
     sliding_lid_readiness,
 )
+from board_game_insert_generator.container_derivation import derive_container_plan
 from board_game_insert_generator.project_v1 import (
     PROJECT_SCHEMA_V1,
     ProjectContractError,
@@ -227,6 +228,15 @@ def normalize_project_v1(raw_project: object) -> dict[str, object]:
 
     try:
         return normalize_project_draft(raw_project).to_dict()
+    except ProjectContractError as exc:
+        raise LocalComposerError(str(exc)) from exc
+
+
+def derive_containers_v1(raw_project: object) -> dict[str, object]:
+    """Return the P39 container plan for a V1 or migratable legacy project."""
+
+    try:
+        return derive_container_plan(raw_project)
     except ProjectContractError as exc:
         raise LocalComposerError(str(exc)) from exc
 
@@ -991,6 +1001,8 @@ class LocalComposerRequestHandler(BaseHTTPRequestHandler):
                 )
             elif route == "/api/project-v1/normalize":
                 self._send_json(HTTPStatus.OK, normalize_project_v1(payload))
+            elif route == "/api/project-v1/derive-containers":
+                self._send_json(HTTPStatus.OK, derive_containers_v1(payload))
             else:
                 self._send_error(HTTPStatus.NOT_FOUND, "NOT_FOUND", "Unknown local composer route.")
         except LocalComposerError as exc:

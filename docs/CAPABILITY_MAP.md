@@ -14,11 +14,11 @@ couvercles. Jusqu'a P43, seules les capacites ci-dessous sont des blockers actif
 
 | Blocker V0.1 | Etat reel | Prochaine preuve |
 | --- | --- | --- |
-| Saisie user-first sans objets moteur | implemented-local-ui | P39, construction derivee |
-| Regroupement `Bac cible` | implemented-local-ui | P39, logements derives |
-| Derivation des bacs et logements | partielle et manuelle | P39 |
+| Saisie user-first sans objets moteur | implemented-local-ui | P40, reservation superieure |
+| Regroupement `Bac cible` | implemented-core et local-ui | P40, hauteur disponible |
+| Derivation des bacs et logements | implemented-core et local-ui | P40, pile superieure |
 | Pile plateaux/livrets superieure | reservation abstraite seulement | P40 |
-| Parois par bac et jeu commun | valeurs dispersees | P37/P39 |
+| Parois par bac et jeu commun | derives par bac ; jeu inter-bacs P41 | P40/P41 |
 | Affectation de tout le volume | FreeVolume descriptif seulement | P41 |
 | Geometrie fonctionnelle complete | bacs ouverts generiques | P42 |
 | Parcours V0.1 accepte | absent | P43 |
@@ -548,3 +548,16 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - C-QUALITY : validation client, build Vite et routes locales V1 verifies ;
   aucune validation Fusion ou impression n est declaree.
 - C-AESTHETIC et mecanismes : absents du parcours V0.1 et toujours `deferred`.
+
+## P39 derived container plan update
+
+- C-PRODUCT-VISION : `implemented-local-ui` pour un bouton Construire qui montre
+  des dimensions de bacs et des blocages compréhensibles.
+- C-ASSET : `implemented-core` pour les sept formes de saisie, les piles
+  comptees et les logements derives par famille de pieces.
+- C-MODULE : `implemented-core` pour les dimensions internes/externes minimales,
+  parois, fond et cloisons internes de chaque bac derive.
+- C-QUALITY : tests unitaires de formes, cartes, cardinalite elevee, blocages,
+  API loopback et build Studio ; aucune validation Fusion ou impression.
+- C-RESERVATION et C-SOLVER : toujours P40 et P41 ; P39 ne place aucun bac et
+  n applique pas le jeu entre bacs.

@@ -1,4 +1,5 @@
 import type { ComposerDraft, ExportBundle, Portfolio, StarterTemplate } from './types'
+import type { ContainerDerivationPlan } from './container_derivation'
 import type { ProjectNormalization, ProjectV1Draft } from './project_v1'
 
 const apiBase = import.meta.env.VITE_BGIG_API_URL ?? 'http://127.0.0.1:8001/api'
@@ -33,6 +34,13 @@ export async function loadProjectV1Starter(): Promise<ProjectV1Draft> {
 
 export async function normalizeProjectV1(project: ProjectV1Draft | ComposerDraft): Promise<ProjectNormalization> {
   return request<ProjectNormalization>('/project-v1/normalize', {
+    method: 'POST',
+    body: JSON.stringify(project),
+  })
+}
+
+export async function deriveContainers(project: ProjectV1Draft): Promise<ContainerDerivationPlan> {
+  return request<ContainerDerivationPlan>('/project-v1/derive-containers', {
     method: 'POST',
     body: JSON.stringify(project),
   })
