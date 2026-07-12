@@ -21,7 +21,13 @@ PALETTE_REQUEST_SCHEMA = "bgig.palette.request.v1"
 PALETTE_RESPONSE_SCHEMA = "bgig.palette.response.v1"
 CURRENT_PROJECT_FILENAME = "bgig_project_v1.json"
 PROJECT_EXPORT_DIRECTORY = "projects"
-SUPPORTED_ACTIONS = frozenset({"load_project", "validate_project", "save_project", "import_project", "export_project", "solve_project", "materialize_project", "regenerate_project"})
+PERSONAL_PRESETS_FILENAME = "bgig_personal_element_presets_v1.json"
+SUPPORTED_ACTIONS = frozenset({
+    "load_project", "validate_project", "save_project", "import_project", "export_project",
+    "solve_project", "materialize_project", "regenerate_project",
+    "save_personal_preset", "delete_personal_preset",
+    "import_personal_presets", "export_personal_presets",
+})
 
 
 class PaletteProjectError(ValueError):
@@ -75,12 +81,22 @@ def current_project_path(addin_dir: str | Path) -> Path:
     return root / CURRENT_PROJECT_FILENAME
 
 
+def current_personal_presets_path(addin_dir: str | Path) -> Path:
+    """Return update-safe personal preset storage beside the current project."""
+
+    return current_project_path(addin_dir).parent / PERSONAL_PRESETS_FILENAME
+
+
 def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_id: str) -> dict[str, object]:
     from board_game_insert_generator.expandable_envelope import derive_expandable_envelope_contract
     from board_game_insert_generator.flat_stack_reservation import derive_flat_stack_reservation
     from board_game_insert_generator.partition_cad import build_partition_cad
     from board_game_insert_generator.partition_result_view import build_partition_result_view
     from board_game_insert_generator.partition_solver import solve_partition_plan
+    from board_game_insert_generator.personal_presets import (
+        delete_personal_preset, load_personal_presets, normalize_personal_presets,
+        save_personal_preset, write_personal_presets,
+    )
     from board_game_insert_generator.project_presets import build_creation_presets
     from board_game_insert_generator.project_v1 import normalize_project_draft
 
@@ -91,6 +107,7 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
             "ready",
             project=project,
             creation_presets=build_creation_presets(project),
+            personal_presets=load_personal_presets(current_personal_presets_path(addin_dir)),
             saved=current_project_path(addin_dir).is_file(),
         )
 
@@ -109,6 +126,28 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         project,
         storage_height_mm=float(flat_stack["flat_stack"]["storage_height_mm"]),
     )
+    preset_path = current_personal_presets_path(addin_dir)
+    personal_presets = load_personal_presets(preset_path)
+    if action == "save_personal_preset":
+        content_id = _text(request.get("content_id"), "request.content_id")
+        preset_name = _text(request.get("preset_name"), "request.preset_name")
+        content = next((item for item in project["contents"] if item["id"] == content_id), None)
+        if content is None:
+            raise PaletteProjectError(f"Element introuvable pour le preset : {content_id}.")
+        personal_presets = save_personal_preset(preset_path, name=preset_name, content=content)
+    elif action == "delete_personal_preset":
+        personal_presets = delete_personal_preset(
+            preset_path, _text(request.get("preset_id"), "request.preset_id")
+        )
+    elif action == "import_personal_presets":
+        raw_json = _text(request.get("preset_json"), "request.preset_json")
+        try:
+            imported = normalize_personal_presets(json.loads(raw_json))
+        except json.JSONDecodeError as exc:
+            raise PaletteProjectError(f"Le fichier de presets n est pas un JSON valide : {exc.msg}.") from exc
+        write_personal_presets(preset_path, imported)
+        personal_presets = imported
+
     partition = solve_partition_plan(project) if action in {"solve_project", "materialize_project", "regenerate_project"} else None
     result_view = (
         build_partition_result_view(partition)
@@ -127,6 +166,10 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         saved = True
     elif action == "export_project":
         export_path = str(_export_project(addin_dir, project))
+    elif action == "export_personal_presets":
+        preset_export = current_project_path(addin_dir).parent / "mes-presets-elements.bgig.json"
+        write_personal_presets(preset_export, personal_presets)
+        export_path = str(preset_export)
 
     warnings: list[str] = []
     if normalization.migrated:
@@ -136,6 +179,7 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         "ready",
         project=project,
         creation_presets=creation_presets,
+        personal_presets=personal_presets,
         envelopes=envelopes,
         flat_stack=flat_stack,
         partition=partition,
@@ -154,6 +198,7 @@ def _response(
     *,
     project: dict[str, object] | None = None,
     creation_presets: dict[str, object] | None = None,
+    personal_presets: dict[str, object] | None = None,
     envelopes: dict[str, object] | None = None,
     flat_stack: dict[str, object] | None = None,
     partition: dict[str, object] | None = None,
@@ -178,6 +223,7 @@ def _response(
             "materialized": "cad_ready" if cad_build is not None else "not_materialized",
         },
         "creation_presets": deepcopy(creation_presets),
+        "personal_presets": deepcopy(personal_presets),
         "envelopes": deepcopy(envelopes),
         "flat_stack": deepcopy(flat_stack),
         "partition": deepcopy(partition),

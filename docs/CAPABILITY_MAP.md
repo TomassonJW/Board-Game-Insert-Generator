@@ -749,3 +749,14 @@ de cavite V0.2 restent differees apres P66.
 - Validation : tests automatises verts ; observation Fusion reportee a P66,
   `print-validated: false`.
 - Prochaine capability : C-ASSET par P62, ADR-0058 acceptee.
+
+## P62 capability update
+
+- C-ASSET : `implemented-core` pour formats locaux, sleeves, epaisseur de paquet
+  mesuree ou comptee et orientations de rangement resolues avant cavite.
+- C-CAVITY : dimensions physiques et dimensions XYZ resolues sont distinctes ;
+  la cavite consomme seulement l enveloppe resolue.
+- C-FUSION-UI : `implemented`, `fusion-retest-required` pour edition compacte et
+  detaillee, dimensions resolues visibles et presets personnels hors package.
+- C-QUALITY : migration additive et 401 tests automatises ; aucune validation
+  Fusion ou impression n est revendiquee.

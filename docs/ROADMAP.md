@@ -315,3 +315,11 @@ Le package Fusion 0.1.10 implemente les etats source/derive/solve/materialise,
 l invalidation explicable, l ancien Apercu grise, les diagnostics techniques
 replies, le parcours renomme et les densites Compact/Detaille. Il ne modifie ni
 le solveur P57, ni les reservations P40, ni les tolerances. P62 devient ready.
+
+## P62 implemente - 2026-07-13
+
+Le package Fusion 0.1.12 implemente le catalogue local de cartes, sleeves,
+epaisseur mesuree ou comptee, orientations a plat/debout/auto, dimensions
+physiques et resolues ainsi que les presets personnels locaux exportables.
+Le solveur global reste P57 : P62 corrige ses entrees de cavite mais ne revendique
+ni reservations superieures P63 ni empilement multi-etages P64. P63 devient ready.

@@ -401,3 +401,16 @@ Les complements exacts sont des participants fixes. Un complement `auto` ou de
 hauteur incompatible est refuse ; le solveur ne cree jamais une lamelle pour
 fermer la partition. Le score de simplicite compare une famille bornee de
 candidats et ne revendique pas l optimalite mathematique globale.
+
+## Dimensions physiques et orientation P62
+
+Pour un element carte, `base_dimensions_mm` decrit le paquet physique avant
+orientation. `dimensions_mm` est l enveloppe XYZ resolue que consomment le
+dimensionnement de cavite et le solveur. Une orientation ne modifie jamais la
+mesure physique source ; elle permute seulement son enveloppe de rangement.
+
+Une surcharge manuelle (`dimension_source = explicit`) est prioritaire sur le
+format catalogue. `auto` choisit deterministiquement l empreinte minimale parmi
+les orientations compatibles avec la hauteur disponible courante. P63/P64
+remplaceront cette hauteur globale par les contraintes locales d encastrement et
+d etage ; P62 ne revendique pas encore cette composition verticale.

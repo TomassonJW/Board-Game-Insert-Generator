@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 
+from board_game_insert_generator.asset_catalog import card_catalog
 from board_game_insert_generator.project_v1 import normalize_project_draft
 
 
@@ -35,8 +36,15 @@ _CONTENT_PRESETS = (
         "content": {
             "name": "Cartes sleevees",
             "shape_kind": "cards",
-            "dimensions_mm": {"x": 68.0, "y": 94.0, "z": 25.0},
-            "quantity": 1,
+            "dimensions_mm": {"x": 66.0, "y": 91.0, "z": 24.0},
+            "base_dimensions_mm": {"x": 66.0, "y": 91.0, "z": 24.0},
+            "dimension_source": "catalog",
+            "card_format_id": "poker",
+            "sleeved": True,
+            "storage_orientation": "auto",
+            "card_stack_mode": "count",
+            "card_thickness_mm": 0.32,
+            "quantity": 60,
             "content_clearance_mm": None,
             "measurement_confidence": "exact",
         },
@@ -117,6 +125,7 @@ def build_creation_presets(raw_project: object, *, storage_height_mm: float | No
     )
     return {
         "schema_version": CREATION_PRESETS_SCHEMA_V1,
+        "card_catalog": card_catalog(),
         "contents": deepcopy(list(_CONTENT_PRESETS)),
         "complements": deepcopy(list(complements)),
         "defaults": {

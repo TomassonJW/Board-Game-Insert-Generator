@@ -15,6 +15,7 @@ sys.path.insert(0, str(ADDIN))
 
 from palette_project import (  # noqa: E402
     CURRENT_PROJECT_FILENAME,
+    PERSONAL_PRESETS_FILENAME,
     PALETTE_REQUEST_SCHEMA,
     PALETTE_RESPONSE_SCHEMA,
     handle_palette_request,
@@ -120,6 +121,37 @@ class FusionPaletteProjectTests(unittest.TestCase):
             solid["element"]["dimensions_mm"]["z"],
             response["flat_stack"]["flat_stack"]["storage_height_mm"],
         )
+
+    def test_personal_presets_save_export_import_and_delete_round_trip(self) -> None:
+        project = blank_project_v1()
+        project["container_groups"] = [
+            {"id": "g", "name": "Bac", "wall_thickness_mm": None, "floor_thickness_mm": None}
+        ]
+        project["contents"] = [{
+            "id": "deck", "name": "Mon deck", "shape_kind": "cards",
+            "dimensions_mm": {"x": 66, "y": 91, "z": 20}, "quantity": 60,
+            "container_group_id": "g", "content_clearance_mm": None,
+            "measurement_confidence": "exact", "storage_orientation": "auto",
+        }]
+        with tempfile.TemporaryDirectory() as temp_dir, patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}):
+            saved = handle_palette_request(
+                request("save_personal_preset", project=project, content_id="deck", preset_name="Deck test"),
+                ADDIN, ROOT,
+            )
+            exported = handle_palette_request(request("export_personal_presets", project=project), ADDIN, ROOT)
+            raw_export = Path(exported["export_path"]).read_text(encoding="utf-8")
+            deleted = handle_palette_request(
+                request("delete_personal_preset", project=project, preset_id="deck-test"), ADDIN, ROOT
+            )
+            imported = handle_palette_request(
+                request("import_personal_presets", project=project, preset_json=raw_export), ADDIN, ROOT
+            )
+            preset_file_created = (Path(temp_dir) / PERSONAL_PRESETS_FILENAME).is_file()
+
+        self.assertEqual(saved["personal_presets"]["presets"][0]["name"], "Deck test")
+        self.assertEqual(deleted["personal_presets"]["presets"], [])
+        self.assertEqual(imported["personal_presets"]["presets"][0]["id"], "deck-test")
+        self.assertTrue(preset_file_created)
 
     def test_invalid_project_returns_an_actionable_response_without_overwriting_saved_data(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir, patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}):

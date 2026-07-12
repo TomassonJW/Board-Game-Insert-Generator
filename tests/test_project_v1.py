@@ -88,6 +88,57 @@ class ProjectV1Tests(unittest.TestCase):
         self.assertEqual(normalized["flat_items"][0]["quantity"], 2)
         self.assertEqual(normalized["fill_elements"][1]["mode"], "exact")
 
+    def test_card_orientation_resolves_dimensions_without_losing_physical_base(self) -> None:
+        project = blank_project_v1()
+        project["box"]["usable_height_mm"] = 70
+        project["container_groups"] = [
+            {"id": "cards", "name": "Cartes", "wall_thickness_mm": None, "floor_thickness_mm": None}
+        ]
+        project["contents"] = [{
+            "id": "deck", "name": "Deck", "shape_kind": "cards",
+            "dimensions_mm": {"x": 63, "y": 88, "z": 24}, "quantity": 100,
+            "container_group_id": "cards", "content_clearance_mm": None,
+            "measurement_confidence": "exact", "storage_orientation": "upright_long_edge",
+        }]
+
+        content = normalize_project_draft(project).project["contents"][0]
+
+        self.assertEqual(content["base_dimensions_mm"], {"x": 63.0, "y": 88.0, "z": 24.0})
+        self.assertEqual(content["dimensions_mm"], {"x": 88.0, "y": 24.0, "z": 63.0})
+        self.assertEqual(content["resolved_orientation"], "upright_long_edge")
+
+    def test_catalog_sleeves_and_counted_stack_are_resolved_but_explicit_dimensions_win(self) -> None:
+        project = blank_project_v1()
+        project["box"]["usable_height_mm"] = 70
+        project["container_groups"] = [
+            {"id": "cards", "name": "Cartes", "wall_thickness_mm": None, "floor_thickness_mm": None}
+        ]
+        content = {
+            "id": "deck", "name": "Deck", "shape_kind": "cards",
+            "dimensions_mm": {"x": 1, "y": 1, "z": 1}, "quantity": 100,
+            "container_group_id": "cards", "content_clearance_mm": None,
+            "measurement_confidence": "exact", "dimension_source": "catalog",
+            "card_format_id": "poker", "sleeved": True, "storage_orientation": "auto",
+            "card_stack_mode": "count", "card_thickness_mm": 0.32,
+        }
+        project["contents"] = [content]
+
+        catalog_content = normalize_project_draft(project).project["contents"][0]
+
+        self.assertEqual(catalog_content["base_dimensions_mm"], {"x": 66.0, "y": 91.0, "z": 40.0})
+        self.assertEqual(catalog_content["resolved_orientation"], "upright_long_edge")
+        self.assertEqual(catalog_content["dimensions_mm"], {"x": 91.0, "y": 40.0, "z": 66.0})
+
+        content.update({
+            "dimension_source": "explicit",
+            "base_dimensions_mm": {"x": 70, "y": 100, "z": 20},
+            "card_stack_mode": "thickness",
+            "storage_orientation": "flat",
+        })
+        explicit = normalize_project_draft(project).project["contents"][0]
+        self.assertEqual(explicit["base_dimensions_mm"], {"x": 70.0, "y": 100.0, "z": 20.0})
+        self.assertEqual(explicit["dimensions_mm"], {"x": 70.0, "y": 100.0, "z": 20.0})
+
     def test_legacy_migration_preserves_groups_flats_and_deferred_features(self) -> None:
         legacy = starter_draft()
         original = deepcopy(legacy)

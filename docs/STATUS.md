@@ -8,7 +8,7 @@ Statut produit : **MVP V0.1 reouvert ; fondations techniques presentes, conformi
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P61 implemente l etat reactif et l architecture de palette ; P62 devient la prochaine mission ready du chemin V0.1 revise.
+Phase active : P62 implemente le catalogue local, les sleeves, les orientations et les presets personnels ; P63 devient la prochaine mission ready du chemin V0.1 revise.
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -1516,5 +1516,29 @@ Le statut `synchronized` exige desormais une inspection apres execution : une
 chaine de succes ne suffit plus si la scene ne peut pas etre retrouvee avec
 exactement le nombre de corps calcules. Le
 rapport retourne par Fusion est place dans `Details techniques` en cas de
-blocage. 392 tests automatises passent ; validation Fusion encore requise. P62
-reste la prochaine mission ready.
+blocage. 392 tests automatises passent ; validation Fusion encore requise.
+
+## P62 - Catalogue d elements et orientations
+
+Statut : `implemented`, `automated-validated`, `fusion-retest-required`,
+`print-validated: false`.
+
+Le package 0.1.12 ajoute un catalogue local versionne de cinq formats de cartes,
+les dimensions non sleevees/sleevees, une surcharge manuelle prioritaire et les
+orientations `flat`, `upright_long_edge`, `upright_short_edge` et `auto`. Le
+coeur conserve les dimensions physiques de depart et expose separement les
+dimensions XYZ resolues consommees par les cavites.
+
+L epaisseur d un paquet peut etre mesuree directement ou calculee depuis le
+nombre de cartes, l epaisseur unitaire et les sleeves. Les projets historiques
+sans champs P62 migrent additivement en dimensions explicites, a plat, sans
+changer leurs cavites.
+
+Les presets personnels sont stockes atomiquement hors du package Fusion, sans
+compte ni cloud. Ils sont enregistrables depuis un element, reutilisables,
+supprimables, importables et exportables. Les dimensions resolues restent
+visibles dans les cartes compactes et detaillees de la palette.
+
+Preuves : 401 tests automatises, syntaxe Python/JavaScript et packaging pur
+verifies. Aucune validation Fusion ou impression n est revendiquee. P63 est la
+prochaine mission ready.

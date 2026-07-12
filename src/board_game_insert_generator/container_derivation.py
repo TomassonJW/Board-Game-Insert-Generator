@@ -227,7 +227,9 @@ def _derive_compartment(
         content_height = unit["z"] + clearance_mm
         sizing_policy = "declared_deck_height_v1"
         count_semantics = "count_is_reported__z_is_total_deck_height"
-        warnings.append("For cards, the entered thickness is treated as the full deck height, not one card thickness.")
+        warnings.append(
+            "Card dimensions use the resolved storage orientation; the requested and resolved orientations are reported."
+        )
     else:
         available_stack_height_mm = usable_height_mm - floor_mm - clearance_mm
         if unit["z"] > available_stack_height_mm:
@@ -265,6 +267,10 @@ def _derive_compartment(
             "count_semantics": count_semantics,
         },
         "sizing_policy": sizing_policy,
+        "storage_orientation": content.get("storage_orientation", "flat"),
+        "resolved_orientation": content.get("resolved_orientation", "flat"),
+        "base_dimensions_mm": content.get("base_dimensions_mm", content["dimensions_mm"]),
+        "resolved_dimensions_mm": content["dimensions_mm"],
         "local_origin_mm": None,
         "blockers": blockers,
         "warnings": warnings,

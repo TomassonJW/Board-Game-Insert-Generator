@@ -11,6 +11,15 @@ from copy import deepcopy
 from dataclasses import dataclass
 from typing import Any
 
+from board_game_insert_generator.asset_catalog import (
+    CARD_STACK_MODES,
+    STORAGE_ORIENTATIONS,
+    AssetCatalogError,
+    card_format_dimensions,
+    card_stack_thickness_mm,
+    orient_dimensions,
+)
+
 
 PROJECT_SCHEMA_V1 = "bgig.project.v1"
 LEGACY_LOCAL_COMPOSER_SCHEMA_V0 = "bgig.local_composer.v0"
@@ -204,10 +213,13 @@ def _validate_v1(raw: dict[str, object]) -> dict[str, object]:
     groups = _validate_container_groups(
         _list(_required_value(raw, "container_groups", "project"), "project.container_groups")
     )
-    group_ids = {str(group["id"]) for group in groups}
     contents = _validate_contents(
-        _list(_required_value(raw, "contents", "project"), "project.contents"), group_ids
+        _list(_required_value(raw, "contents", "project"), "project.contents"),
+        groups,
+        usable_height_mm=float(box["usable_height_mm"]),
+        layout=layout,
     )
+    group_ids = {str(group["id"]) for group in groups}
     flat_items = _validate_flat_items(
         _list(_required_value(raw, "flat_items", "project"), "project.flat_items")
     )
@@ -336,8 +348,16 @@ def _validate_locked_dimensions(value: object, field: str) -> dict[str, float | 
     }
 
 
-def _validate_contents(values: list[object], group_ids: set[str]) -> list[dict[str, object]]:
+def _validate_contents(
+    values: list[object],
+    groups: list[dict[str, object]],
+    *,
+    usable_height_mm: float,
+    layout: dict[str, object],
+) -> list[dict[str, object]]:
     result: list[dict[str, object]] = []
+    groups_by_id = {str(group["id"]): group for group in groups}
+    group_ids = set(groups_by_id)
     ids: set[str] = set()
     for index, value in enumerate(values):
         field = f"project.contents[{index}]"
@@ -345,14 +365,11 @@ def _validate_contents(values: list[object], group_ids: set[str]) -> list[dict[s
         _reject_unknown(
             raw,
             {
-                "id",
-                "name",
-                "shape_kind",
-                "dimensions_mm",
-                "quantity",
-                "container_group_id",
-                "content_clearance_mm",
-                "measurement_confidence",
+                "id", "name", "shape_kind", "dimensions_mm", "base_dimensions_mm",
+                "quantity", "container_group_id", "content_clearance_mm",
+                "measurement_confidence", "dimension_source", "card_format_id",
+                "sleeved", "storage_orientation", "resolved_orientation",
+                "card_stack_mode", "card_thickness_mm",
             },
             field,
         )
@@ -364,19 +381,27 @@ def _validate_contents(values: list[object], group_ids: set[str]) -> list[dict[s
         group_id = _required_text(raw, "container_group_id", field)
         if group_id not in group_ids:
             raise ProjectContractError(f"{field}.container_group_id references unknown group '{group_id}'.")
+        quantity = _positive_int(raw, "quantity", field)
+        content_clearance = _optional_non_negative_number(raw.get("content_clearance_mm"), field)
+        effective_clearance = float(
+            layout["default_content_clearance_mm"] if content_clearance is None else content_clearance
+        )
+        group = groups_by_id[group_id]
+        effective_floor = float(group["floor_thickness_mm"] or layout["default_floor_thickness_mm"])
+        max_content_height = max(0.0001, usable_height_mm - effective_floor - effective_clearance)
+        geometry = _validate_content_geometry(
+            raw, shape_kind=shape_kind, quantity=quantity,
+            max_height_mm=max_content_height, field=field
+        )
         result.append(
             {
                 "id": item_id,
                 "name": _required_text(raw, "name", field),
                 "shape_kind": shape_kind,
-                "dimensions_mm": _dimension(
-                    _required_value(raw, "dimensions_mm", field), f"{field}.dimensions_mm"
-                ),
-                "quantity": _positive_int(raw, "quantity", field),
+                **geometry,
+                "quantity": quantity,
                 "container_group_id": group_id,
-                "content_clearance_mm": _optional_non_negative_number(
-                    raw.get("content_clearance_mm"), field
-                ),
+                "content_clearance_mm": content_clearance,
                 "measurement_confidence": _optional_enum(
                     raw.get("measurement_confidence"),
                     MEASUREMENT_CONFIDENCE,
@@ -386,6 +411,76 @@ def _validate_contents(values: list[object], group_ids: set[str]) -> list[dict[s
             }
         )
     return result
+
+
+def _validate_content_geometry(
+    raw: dict[str, object],
+    *,
+    shape_kind: str,
+    quantity: int,
+    max_height_mm: float,
+    field: str,
+) -> dict[str, object]:
+    base_value = (
+        raw["base_dimensions_mm"]
+        if "base_dimensions_mm" in raw
+        else _required_value(raw, "dimensions_mm", field)
+    )
+    base = _dimension(base_value, f"{field}.base_dimensions_mm")
+    if shape_kind != "cards":
+        return {"dimensions_mm": base}
+
+    dimension_source = _optional_enum(
+        raw.get("dimension_source"), frozenset({"explicit", "catalog"}), "explicit",
+        f"{field}.dimension_source",
+    )
+    format_value = raw.get("card_format_id")
+    card_format_id = None
+    if format_value is not None:
+        if not isinstance(format_value, str) or not format_value.strip():
+            raise ProjectContractError(f"{field}.card_format_id must be a non-empty string or null.")
+        card_format_id = format_value.strip()
+    sleeved = _optional_bool(raw.get("sleeved"), False, f"{field}.sleeved")
+    stack_mode = _optional_enum(
+        raw.get("card_stack_mode"), CARD_STACK_MODES, "thickness", f"{field}.card_stack_mode"
+    )
+    card_thickness = _optional_positive_number(
+        raw.get("card_thickness_mm", 0.32), f"{field}.card_thickness_mm"
+    )
+    assert card_thickness is not None
+    if dimension_source == "catalog":
+        if card_format_id is None:
+            raise ProjectContractError(f"{field}.card_format_id is required for catalog dimensions.")
+        try:
+            catalog_xy = card_format_dimensions(card_format_id, sleeved=sleeved)
+        except AssetCatalogError as exc:
+            raise ProjectContractError(f"{field}.card_format_id is not supported: {card_format_id!r}.") from exc
+        base.update(catalog_xy)
+    try:
+        base["z"] = card_stack_thickness_mm(
+            mode=stack_mode, declared_thickness_mm=base["z"], quantity=quantity,
+            card_thickness_mm=card_thickness, sleeved=sleeved,
+        )
+        requested_orientation = _optional_enum(
+            raw.get("storage_orientation"), STORAGE_ORIENTATIONS, "flat",
+            f"{field}.storage_orientation",
+        )
+        resolved_orientation, resolved = orient_dimensions(
+            base, requested_orientation, max_height_mm=max_height_mm
+        )
+    except AssetCatalogError as exc:
+        raise ProjectContractError(f"{field} has an invalid card configuration: {exc}") from exc
+    return {
+        "dimensions_mm": resolved,
+        "base_dimensions_mm": base,
+        "dimension_source": dimension_source,
+        "card_format_id": card_format_id,
+        "sleeved": sleeved,
+        "storage_orientation": requested_orientation,
+        "resolved_orientation": resolved_orientation,
+        "card_stack_mode": stack_mode,
+        "card_thickness_mm": card_thickness,
+    }
 
 
 def _validate_flat_items(values: list[object]) -> list[dict[str, object]]:
@@ -590,6 +685,14 @@ def _required_enum(raw: dict[str, object], key: str, values: frozenset[str], fie
     value = _required_text(raw, key, field)
     if value not in values:
         raise ProjectContractError(f"{field}.{key} is not supported: '{value}'.")
+    return value
+
+
+def _optional_bool(value: object, default: bool, field: str) -> bool:
+    if value is None:
+        return default
+    if not isinstance(value, bool):
+        raise ProjectContractError(f"{field} must be a boolean.")
     return value
 
 

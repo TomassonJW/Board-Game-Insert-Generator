@@ -136,6 +136,8 @@ function Assert-BgigPaletteProjectRuntime {
         (Join-Path $AddinPath "resources\16x16.svg"),
         (Join-Path $AddinPath "resources\32x32.svg"),
         (Join-Path $AddinPath "lib\board_game_insert_generator\project_v1.py"),
+        (Join-Path $AddinPath "lib\board_game_insert_generator\asset_catalog.py"),
+        (Join-Path $AddinPath "lib\board_game_insert_generator\personal_presets.py"),
         (Join-Path $AddinPath "lib\board_game_insert_generator\project_presets.py"),
         (Join-Path $AddinPath "lib\board_game_insert_generator\expandable_envelope.py"),
         (Join-Path $AddinPath "lib\board_game_insert_generator\flat_stack_reservation.py"),

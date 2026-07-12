@@ -8,39 +8,38 @@ V0.1 - vrai MVP Fusion-only selon ADR-0055 et rebase P60-R accepte.
 
 ## Derniere mission terminee
 
-P61 - etat reactif et architecture de palette, package 0.1.11 avec hotfix de synchronisation Fusion.
+P62 - catalogue d elements et orientations, package 0.1.12.
 
 ## Derniere preuve automatisee
 
-`Materialiser dans Fusion` cree la premiere scene ou remplace l unique scene
-BGIG saine. Une inspection apres execution interdit le faux statut synchronise
-et les erreurs restent disponibles dans Details techniques. Les scenes
-ambigues ne sont pas supprimees. Les tests palette/bridge sont verts ; aucune
-validation Fusion ou impression n est revendiquee.
+Le coeur distingue dimensions physiques et dimensions resolues pour les cartes
+a plat, debout ou en orientation automatique. Formats locaux, sleeves, epaisseur
+mesuree/comptee et presets personnels atomiques sont couverts par 401 tests.
+Aucune validation Fusion ou impression n est revendiquee.
 
 ## Mission courante
 
-Aucune mission en cours. Le hotfix P61 doit etre integre et installe avant P62.
+Aucune mission en cours. P62 est automatise ; P63 devient la premiere mission ready.
 
 ## Prochaine action prete
 
-P62 - catalogue d elements et orientations de rangement.
+P63 - reservations superieures encastrees, selon ADR-0057 acceptee.
 
 Scope borne :
 
-1. formats de cartes locaux et dimensions resolues visibles ;
-2. sleevees / non sleevees ;
-3. orientations a plat, debout grand cote, debout petit cote et automatique ;
-4. presets personnels locaux, versionnes et exportables ;
-5. migration additive et tests coeur/palette.
+1. reservations locales depuis le dessus des conteneurs ;
+2. ordre de retrait et appui explicites ;
+3. non-percement et zone de prise simple ;
+4. plateau ou livret affleurant sans reduire toute la hauteur des bacs ;
+5. vues, CAD IR et tests Fusion prepares.
 
-## Mission suivante apres P62
+## Mission suivante apres P63
 
-P63 - reservations superieures encastrees, selon ADR-0057 acceptee.
+P64 - solveur volumetrique multi-etages.
 
 ## Releases bloquees
 
-P63 depend de P62 ; P64 depend de P63 ; P65 depend de P64. P44 a P50 restent
+P64 depend de P63 ; P65 depend de P64. P44 a P50 restent
 bloques jusqu a l acceptation humaine P66. P47 a P50 restent aussi bloques
 jusqu a l acceptation de P46.
 

@@ -58,8 +58,8 @@ class FusionOnlyAlignmentTests(unittest.TestCase):
 
     def test_next_action_advances_the_revised_fusion_only_mvp(self) -> None:
         actions = self.read("docs/NEXT_ACTIONS.md")
-        self.assertIn("P61 - etat reactif", actions)
         self.assertIn("P62 - catalogue d elements", actions)
+        self.assertIn("P63 - reservations superieures", actions)
         self.assertIn("P66", actions)
         self.assertNotIn("codex/p56-premium-editor", actions)
         self.assertNotIn("inspection visuelle runtime du frontend reel", actions)

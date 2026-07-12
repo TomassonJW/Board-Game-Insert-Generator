@@ -1699,7 +1699,9 @@ impose les dependances de release suivantes.
   personnels locaux sans masquer les dimensions resolues.
 - Acceptation : surcharge explicite prioritaire, aller-retour preset et impact
   d orientation verifies dans le coeur et la palette.
-- Statut : `ready`.
+- Livrable : package 0.1.12, catalogue local, dimensions physiques/resolues,
+  epaisseur mesuree ou comptee et presets personnels atomiques hors package.
+- Statut : `done`, `implemented`, `automated-validated`, `fusion-retest-required`.
 
 ### P63 - Reservations superieures encastrees
 
@@ -1709,7 +1711,7 @@ impose les dependances de release suivantes.
   retrait, appui et zone de prise, sans reduire toute la hauteur des conteneurs.
 - Acceptation : intersections, non-percement, vues et coupe Fusion prouvent un
   plateau affleurant ; aucune ergonomie courbe V0.2 n est revendiquee.
-- Statut : `planned`.
+- Statut : `ready`.
 
 ### P64 - Solveur volumetrique multi-etages
 

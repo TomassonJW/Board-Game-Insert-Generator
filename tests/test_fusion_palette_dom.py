@@ -44,7 +44,7 @@ class FusionPaletteDomTests(unittest.TestCase):
 
     def test_supports_dynamic_rows_progressive_disclosure_and_local_file_import(self) -> None:
         self.assertNotIn("expert-mode", self.dom.ids)
-        for marker in ("import-file", "lifecycle", "technical-drawer", "technical-detail"):
+        for marker in ("import-file", "preset-import-file", "personal-presets", "lifecycle", "technical-drawer", "technical-detail"):
             self.assertIn(marker, self.dom.ids)
         for marker in ('data-density="compact"', 'data-density="detailed"', "local-details", "density-compact"):
             self.assertIn(marker, self.markup)
@@ -57,7 +57,7 @@ class FusionPaletteDomTests(unittest.TestCase):
             "bloc plein sert de cale ou de support",
             "Corps explicites",
             "final (auto si vide)",
-            "creation_presets",
+            "creation_presets", "Dimensions resolues", "Format de cartes", "Debout sur grand cote",
         ):
             self.assertIn(marker, self.markup)
 
@@ -68,7 +68,7 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertNotIn("Mode avance", self.markup)
 
     def test_routes_validation_and_persistence_to_the_versioned_python_bridge(self) -> None:
-        self.assertEqual(self.dom.bridge_actions, {"validate_project", "save_project", "export_project", "solve_project"})
+        self.assertEqual(self.dom.bridge_actions, {"validate_project", "save_project", "export_project", "export_personal_presets", "solve_project"})
         self.assertIn("bgig.palette.request.v1", self.markup)
         self.assertIn("bgig.palette.response.v1", self.markup)
         self.assertIn("bgig_palette_project", self.markup)

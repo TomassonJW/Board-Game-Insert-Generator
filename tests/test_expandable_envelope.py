@@ -62,6 +62,19 @@ class ExpandableEnvelopeContractTests(unittest.TestCase):
                     container["final_outer_envelope_mm"],
                 )
 
+    def test_card_orientation_changes_the_calibrated_cavity_envelope(self) -> None:
+        flat_project = _project_for("cards", quantity=100)
+        flat_project["contents"][0]["storage_orientation"] = "flat"
+        upright_project = deepcopy(flat_project)
+        upright_project["contents"][0]["storage_orientation"] = "upright_long_edge"
+
+        flat = derive_expandable_envelope_contract(flat_project)["containers"][0]["cavity_layout"][0]
+        upright = derive_expandable_envelope_contract(upright_project)["containers"][0]["cavity_layout"][0]
+
+        self.assertNotEqual(flat["inner_dimensions_mm"], upright["inner_dimensions_mm"])
+        self.assertLess(upright["inner_dimensions_mm"]["y"], flat["inner_dimensions_mm"]["y"])
+        self.assertGreater(upright["inner_dimensions_mm"]["z"], flat["inner_dimensions_mm"]["z"])
+
     def test_expanding_final_envelope_never_changes_local_cavities(self) -> None:
         project = _project_for("round", quantity=40)
         minimum_result = derive_expandable_envelope_contract(project)
