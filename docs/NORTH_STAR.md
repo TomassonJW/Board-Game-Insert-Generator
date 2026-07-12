@@ -6,6 +6,22 @@ Transformer les assets reels, contraintes de boite et intentions d'usage d'un je
 de societe en systemes volumetriques modulaires imprimables, tolerancees,
 inspectables et iterables, sans enfermer la logique de conception dans Fusion 360.
 
+## Traduction produit canonique acceptee le 2026-07-12
+
+La premiere promesse n'est pas un mecanisme avance. C'est un parcours complet :
+
+`mesurer la boite -> lister les pieces -> choisir quels elements partagent un bac
+-> lister plateaux et livrets -> construire un insert qui affecte tout le volume`.
+
+L'ordre des releases est obligatoire :
+
+1. V0.1 fonctionnelle complete ;
+2. V0.2 formes et ergonomie ;
+3. V0.3 couvercles.
+
+La specification detaillee est `docs/CANONICAL_PRODUCT_VISION.md`. Une
+exploration P33/P34 ne peut pas court-circuiter cet ordre.
+
 ## Vision longue
 
 BGIG doit devenir un generateur intelligent d'inserts modulaires parametrables
@@ -36,6 +52,8 @@ volumes libres, ordre de retrait et sorties CAD.
    Fusion reelle, l'impression ou l'ergonomie.
 7. `Design language and aesthetics` : ajouter labels, gravures, textures et
    style seulement apres la robustesse fonctionnelle.
+8. `Complete volume accounting` : chaque region utile est un bac, une
+   reservation, un remplissage ou un jeu technique voulu ; aucun vide oublie.
 
 ## Definition du succes
 

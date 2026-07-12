@@ -2,7 +2,7 @@
 
 ## Statut
 
-`accepted` - extension limitee derivate de ADR-0045, le 2026-07-11.
+`accepted-technical-primitive`, mais `superseded-for-product` pour le coupon P34 par ADR-0047. La primitive additive reste disponible sans imposer le futur mecanisme.
 
 ## Contexte
 

@@ -1,5 +1,8 @@
 # Contrat P33 - Forme et apparence V0
 
+> Statut 2026-07-12 : prototype historique `deferred-until-v0.1`. Il ne constitue
+> pas la V0.2 et doit rester hors du parcours principal jusqu'a la gate P43.
+
 ## But
 
 Donner une direction visible et sauvegardee a un projet BGIG sans modifier le plan, les tolerances, la CAD IR executable ou la scene Fusion.

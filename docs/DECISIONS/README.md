@@ -165,3 +165,5 @@ Tests, cartes backlog ou gates humaines a preparer.
 - ADR-0045-sliding-lid-contract-v0.md - premier mecanisme ferme : coulissant experimental sous coupon.
 
 - ADR-0046-additive-prism-join-for-sliding-lid-coupon.md - join rectangulaire borne pour les rails du coupon coulissant.
+
+- ADR-0047-canonical-release-order-and-mvp-critical-path.md - ordre V0.1, V0.2, V0.3 et verrou du chemin critique MVP.

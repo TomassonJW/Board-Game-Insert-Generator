@@ -56,6 +56,17 @@ merge, si un conflit reel apparait ou si une action risque de perdre du travail.
 | Publication de release | Une release cree une promesse utilisateur. | Checklist, changelog, tests, limites connues. | Autoriser version, notes et publication. | Version, contenu, statuts, validations, risques. |
 | Changement de licence ou de visibilite repo | Cela change les droits, obligations et exposition publique. | Inventaire, impacts, options. | Choisir licence ou visibilite. | Etat actuel, option proposee, consequences. |
 
+## Gates de version canoniques
+
+| Gate | Condition minimale | Ce qui reste humain | Effet |
+| --- | --- | --- | --- |
+| P43 - Acceptation V0.1 | Parcours vide -> saisie -> solution complete -> Fusion/export, couverture et volume verifies | Recette de comprehension UI et observation Fusion du jeu temoin | Autorise seulement alors le demarrage V0.2 |
+| P46 - Acceptation V0.2 | Formes et ergonomie materialisees, contraintes de paroi et volume recalculees | Evaluation visuelle/ergonomique et observation Fusion | Autorise seulement alors le demarrage V0.3 |
+| P50 - Validation V0.3 | Deux familles de couvercles conformes au contrat, coupons prepares | Impressions, mesures, glisse/tenue et interpretation | Autorise la qualification physique des mecanismes |
+
+Le smoke P34 n'est plus une gate active : le coupon ne correspond pas au
+mecanisme coulissant canonique et la V0.3 est bloquee par P43 puis P46.
+
 ## Format minimal d'un rapport de gate
 
 ```markdown

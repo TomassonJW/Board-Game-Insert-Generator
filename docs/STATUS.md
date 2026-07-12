@@ -1,6 +1,6 @@
 # Status
 
-Derniere mise a jour : 2026-07-11
+Derniere mise a jour : 2026-07-12
 
 ## Etat global
 
@@ -1039,3 +1039,18 @@ Le choix humain C du 2026-07-11 retient le couvercle coulissant. P34-M001 ajoute
 P34-M002 ajoute un seul coupon place a cote de la boite pour le premier module compatible : un bac ouvert et un capot. Le capot est une piece unique, composee d une plaque et de deux glissieres laterales jointes par `join_rectangular_prism`. L adaptateur Fusion consomme cette primitive additive avec des bornes XY et un recouvrement Z obligatoire. Aucun statut physique n est revendique.
 
 Le smoke Fusion est prepare par `P34_SLIDING_LID_FUSION_SMOKE.md`. Il doit confirmer deux glissieres jointes au capot et `Joined cap rails: 2`. Seulement apres ce retour, P35 pourra demander l impression et les mesures de glisse.
+## Rebase produit canonique - 2026-07-12
+
+Statut : `P36 canonical product rebase` termine et verifie.
+
+Thomas clarifie et accepte l'ordre V0.1 fonctionnelle, V0.2 formes/ergonomie,
+puis V0.3 couvercles. L'audit confirme que P33/P34 ont ete engages trop tot : le
+Studio et le moteur ne couvrent pas encore le regroupement simple par bac, la
+pile plateaux/livrets, le dimensionnement global des bacs ni l'affectation de
+tout le volume.
+
+P33 reste un prototype de preview. P34 reste une exploration CAD non conforme au
+coulissant canonique et son smoke Fusion n'est plus demande. Aucun statut de code
+ou test existant n'est efface, mais ces lots sont `superseded-for-product`.
+
+La vision, ADR-0047, l'audit et le plan P36-P50 sont alignes. La prochaine mission codee est P37, contrat projet V0.1 et migration compatible.

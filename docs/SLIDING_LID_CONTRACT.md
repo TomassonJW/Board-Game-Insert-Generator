@@ -1,5 +1,8 @@
 # Contrat coulissant V0
 
+> Statut 2026-07-12 : `superseded-for-product` par ADR-0047. Ce contrat a rails
+> exterieurs ne decrit pas le coulissant interieur canonique de la V0.3.
+
 ## Ce que l'utilisateur choisit
 
 Le projet peut garder `kind: sliding_lid` avec un sens de glisse et quatre

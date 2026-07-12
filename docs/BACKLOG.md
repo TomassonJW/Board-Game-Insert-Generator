@@ -1417,3 +1417,89 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - Gate : smoke Fusion humain obligatoire avant toute qualification Fusion ; impression et mesure restent necessaires.
 - Livrables : `join_rectangular_prism`, capot unique a deux rails, coupon hors boite, CLI/preset Fusion et smoke P34.
 - Statut : `done`, `implemented-cad-ir-coupon`, `implemented-fusion-adapter`, `fusion-smoke-required`, `print-validated: false`.
+## Rebase canonique V0.1 -> V0.2 -> V0.3 - 2026-07-12
+
+Les lots P33 et P34 restent dans l'historique technique, mais sont
+`superseded-for-product`. Le smoke P34 est retire des actions actives. ADR-0047
+impose les dependances de release suivantes.
+
+### P36 - Rebase vision, audit et chemin critique
+
+- Capability : C-PRODUCT-VISION, controle projet.
+- Objectif : traduire la vision canonique, expliquer la derive et reconstruire
+  le chemin V0.1/V0.2/V0.3.
+- Livrables : vision, audit, ADR-0047, plan d'execution et pilotage aligne.
+- Statut : `done-docs`, tests de pilotage passes.
+
+### P37 - Contrat projet V0.1 et migration
+
+- Capability : C-ASSET, C-RESERVATION, C-PRODUCT-VISION.
+- Dependances : P36 integre.
+- Objectif : groupes de bacs, elements plats, remplissages, jeu global et parois
+  par bac dans un schema additif.
+- Validation : tests de schema, migration et compatibilite des projets P23/P33/P34.
+- Statut : `ready-after-p36`.
+
+### P38 - Tables dynamiques et parcours user-first
+
+- Dependances : P37.
+- Objectif : boite, pieces, bac cible, plateaux/livrets et bouton `Construire mon
+  insert`, sans jargon moteur dans le parcours principal.
+- Validation : tests TypeScript et recette navigateur sur ajout/suppression,
+  formes, groupes, imports et erreurs.
+- Statut : `blocked-by-p37`.
+
+### P39 - Derivation des bacs et logements
+
+- Dependances : P38.
+- Objectif : deriver capacite, logements, dimensions internes et externes depuis
+  forme, quantite et `Bac cible`.
+- Validation : fixtures rond, carre, rectangle, cartes, cube/de, pion et custom.
+- Statut : `blocked-by-p38`.
+
+### P40 - Pile superieure plateaux et livrets
+
+- Dependances : P39.
+- Objectif : reserver quantites, empreintes, hauteur et support au-dessus de tous
+  les bacs sans depassement.
+- Validation : tests X/Y/Z, piles heterogenes et cas impossibles.
+- Statut : `blocked-by-p39`.
+
+### P41 - Solveur de fermeture du volume
+
+- Dependances : P40.
+- Objectif : affecter chaque region utile a un bac, une reservation, un jeu
+  technique, un bac creux, un separateur ou un remplissage plein.
+- Validation : conservation du volume, absence de collision, benchmarks de
+  grande cardinalite et diagnostics d'arret.
+- Statut : `blocked-by-p40`.
+
+### P42 - Geometrie fonctionnelle V0.1
+
+- Dependances : P41.
+- Objectif : materialiser bacs, logements, supports et remplissages resolus,
+  sans apparence V0.2 ni couvercles V0.3.
+- Validation : tests CAD IR/Fusion hors API puis smoke Fusion humain prepare.
+- Statut : `blocked-by-p41`.
+
+### P43 - Acceptation MVP V0.1
+
+- Dependances : P42.
+- Objectif : recette complete sur projet vide et jeu temoin reel.
+- Gate : comprehension UI et observation Fusion humaines ; impression physique
+  tracee separement.
+- Statut : `blocked-by-p42`.
+
+### P44 a P46 - V0.2 formes et ergonomie
+
+- Dependances : P43 accepte.
+- Scope : arrondis, chanfreins, encoches et fonds faciles a vider, avec impact
+  reel sur volume, parois et fabrication.
+- Statut : `deferred-until-v0.1`.
+
+### P47 a P50 - V0.3 couvercles
+
+- Dependances : P46 accepte.
+- Scope : couvercle encastrable puis couvercle coulissant dans trois rainures
+  interieures, entree ouverte, chanfreins et jeu 0 a 0,2 mm.
+- Statut : `deferred-until-v0.2`.

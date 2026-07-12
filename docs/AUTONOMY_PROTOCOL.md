@@ -26,6 +26,18 @@ validation humaine explicite.
 
 ## Selection de mission
 
+### Verrou de chemin critique des releases
+
+Depuis ADR-0047, la selection par capability est subordonnee a l'ordre des
+releases. Tant que P43 n'a pas accepte la V0.1, seules les missions P36 a P43 qui
+ferment un critere V0.1 peuvent etre `ready`. Tant que P46 n'a pas accepte la
+V0.2, aucune mission couvercle V0.3 ne peut etre `ready`.
+
+Une gate humaine qui choisit une option d'une version ulterieure n'en change pas
+la priorite. Codex doit verifier la checklist de sortie de la version active
+avant `NEXT_ACTIONS.md`, puis les capabilities. Les prototypes prematures restent
+archives et hors du parcours principal.
+
 Ordre de priorite :
 
 1. Mission explicite donnee par l'humain.

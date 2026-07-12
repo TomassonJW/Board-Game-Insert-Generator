@@ -1,5 +1,8 @@
 # P34-GATE - Premier mecanisme de couvercle
 
+> Gate historique fermee sans suite active. Le choix C ne changeait pas la
+> priorite produit ; la nouvelle specification V0.3 ne commencera qu'apres P46.
+
 ## Decision humaine recue
 
 Le 2026-07-11, le choix C est approuve : **couvercle coulissant**.

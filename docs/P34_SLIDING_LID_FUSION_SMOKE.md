@@ -1,8 +1,11 @@
 # P34 - Smoke Fusion du coupon coulissant
 
+> Statut 2026-07-12 : smoke archive, aucune action humaine demandee. Le coupon
+> n'est pas conforme au mecanisme coulissant canonique et ne pilote plus la suite.
+
 ## Statut
 
-`fusion-smoke-required`, `print-validated: false`.
+`archived-superseded-for-product`, `print-validated: false`.
 
 ## Ce qui est prepare automatiquement
 

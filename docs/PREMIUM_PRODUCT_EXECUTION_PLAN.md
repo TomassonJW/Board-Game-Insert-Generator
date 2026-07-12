@@ -1,10 +1,15 @@
 # Plan d execution - BGIG premium
 
+> Document historique, remplace pour l'ordre d'execution par
+> `docs/CANONICAL_PRODUCT_VISION.md`, `docs/MVP_EXECUTION_PLAN.md` et ADR-0047.
+> Le 2026-07-12, la sequence P33/P34 a ete reconnue prematuree : aucune mission
+> esthetique ou couvercle ne redevient active avant les gates V0.1 puis V0.2.
+
 ## Statut
 
-Actif depuis l objectif utilisateur du 2026-07-11. Ce plan est la reference de
-pilotage produit : il ne remplace pas la North Star et n autorise jamais une
-validation Fusion ou impression sans preuve correspondante.
+Historique depuis l'objectif utilisateur du 2026-07-11. Ce plan ne pilote plus
+les prochaines missions et n'autorise jamais une validation Fusion ou impression
+sans preuve correspondante.
 
 ## Resultat cible
 

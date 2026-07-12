@@ -2,7 +2,7 @@
 
 ## Statut
 
-`accepted` - choix humain explicite `C - Couvercle coulissant` du 2026-07-11.
+`superseded-for-product` par ADR-0047. Le choix C du 2026-07-11 reste historique, mais le contrat a deux rails exterieurs n est pas la specification V0.3 canonique.
 
 ## Contexte
 

@@ -6,6 +6,27 @@ Ce document relie la North Star aux missions executables. Il evite que Codex
 choisisse une mission seulement parce qu'elle est proche techniquement : chaque
 mission doit servir une capability, un milestone et une validation claire.
 
+## Priorite de release - rebase du 2026-07-12
+
+La carte ne constitue plus a elle seule un ordre d'execution. ADR-0047 impose le
+chemin critique suivant : V0.1 fonctionnelle, puis V0.2 ergonomique, puis V0.3
+couvercles. Jusqu'a P43, seules les capacites ci-dessous sont des blockers actifs.
+
+| Blocker V0.1 | Etat reel | Prochaine preuve |
+| --- | --- | --- |
+| Saisie user-first sans objets moteur | partiel | P38, recette navigateur |
+| Regroupement `Bac cible` | absent du contrat produit | P37/P38 |
+| Derivation des bacs et logements | partielle et manuelle | P39 |
+| Pile plateaux/livrets superieure | reservation abstraite seulement | P40 |
+| Parois par bac et jeu commun | valeurs dispersees | P37/P39 |
+| Affectation de tout le volume | FreeVolume descriptif seulement | P41 |
+| Geometrie fonctionnelle complete | bacs ouverts generiques | P42 |
+| Parcours V0.1 accepte | absent | P43 |
+
+`C-AESTHETIC` est `deferred` jusqu'a P43. Les mecanismes/couvercles sont
+`deferred` jusqu'a P46. Les paragraphes historiques P33/P34 ci-dessous decrivent
+du code existant, pas un statut de release acquis.
+
 Chaine de pilotage :
 
 `North Star -> Product Pillars -> Capabilities -> Milestones -> Epics -> Missions -> Tasks -> Gates -> Validation`.
@@ -500,7 +521,7 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 
 - C-STACKING / futur mecanisme : implemented-cad-ir-coupon pour un seul coupon coulissant a deux pieces, hors boite.
 - C-CAD-IR : le capot porte deux operations join_rectangular_prism, bornees au body local.
-- C-FUSION-UI : implemented-fusion-adapter, usion-smoke-required ; le rapport annonce les rails jointes.
+- C-FUSION-UI : implemented-fusion-adapter, fusion-smoke-required ; le rapport annonce les rails jointes.
 - C-PRODUCT-VISION : le Studio sauvegarde le choix sans modifier solveur, digest ou selection.
 - C-CALIBRATION : un coupon imprime et mesure reste obligatoire avant toute qualification physique.
 - C-AESTHETIC : aucun style ou finition Fusion supplementaire n est declare.
