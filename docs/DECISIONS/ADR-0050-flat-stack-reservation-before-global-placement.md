@@ -2,7 +2,8 @@
 
 ## Statut
 
-Acceptee, decision reversible de la mission P40 du MVP V0.1.
+Supersedee le 2026-07-12 par ADR-0057 acceptee. Cette ADR reste le
+contrat historique implemente par P40, pas la cible produit P63.
 
 ## Date
 

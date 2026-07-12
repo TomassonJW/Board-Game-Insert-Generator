@@ -727,7 +727,7 @@ comme experience acceptee. Les blockers V0.1 actifs deviennent :
 | Etat source/derive/solve/materialise | implemente et teste dans la palette 0.1.10 | observation P66 |
 | Diagnostics discrets et parcours progressif | socle P61 implemente ; finition P65 | P65 |
 | Catalogue et orientations de rangement | ADR-0058 acceptee | P62 |
-| Reservations superieures localisees | P40 global a remplacer, ADR-0057 proposee | P63 |
+| Reservations superieures localisees | ADR-0057 acceptee ; P40 historique a remplacer | P63 |
 | Placement multi-etages Z | contrats historiques presents, solveur actif absent | P64 |
 | Surplus pondere et Auto/Cible/Fixe | partage egal P57 insuffisant | P64 |
 | Conteneurs/reglages/apercu explicables | socle P56-P58 a reprendre | P65 |
