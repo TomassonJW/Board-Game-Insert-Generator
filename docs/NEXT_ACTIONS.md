@@ -8,37 +8,39 @@ V0.1 - vrai MVP Fusion-only selon ADR-0055.
 
 ## Derniere mission terminee
 
-P58 - resultat reel dans la palette Fusion.
+P59 - materialisation CAD et synchronisation de scene.
 
-Le coeur pur produit bgig.partition_result_view.v1 depuis le plan P57. La palette
-affiche deux SVG au repere millimetrique, corps, cavites, contenus, minima,
-enveloppes finales, surplus, positions, pile, supports, complements, digest et
-zero corps automatique. Une solution impossible n est jamais dessinee et toute
-modification rend le resultat obsolete.
+Le coeur pur transforme le plan P57 courant en `cad_ir.v0` deterministe : un
+composant par corps demande, enveloppes finales, cavites P55 fixes, complements
+uniquement explicites et zero corps automatique. La palette declenche
+generate/regenerate en mode compact, inspecte ou efface uniquement la scene BGIG
+et exporte les imprimables sans toucher aux objets Fusion non-BGIG.
 
-Preuves : 5 tests projection, 4 tests palette resultat, 7 tests bridge, 5 tests
-DOM, 87 tests Fusion historiques et syntaxe JavaScript valide. Aucun CAD,
-statut fusion-validated ou print-validated n est revendique.
+Preuves ciblees : 8 tests CAD P59, 8 tests bridge projet, 4 tests de
+synchronisation entrypoint, 5 tests resultat palette, 5 tests DOM, 87 tests
+Fusion historiques et syntaxes Python/JavaScript valides. Le manifeste add-in
+est 0.1.6. Aucun statut `fusion-validated` ou `print-validated` n est revendique.
 
 ## Prochaine mission prete
 
-P59 - Materialisation CAD et synchronisation de scene.
+P60 - acceptance du vrai MVP V0.1 Fusion-only.
 
-Resultat attendu : convertir exclusivement le plan P57 courant en CAD IR,
-materialiser les enveloppes finales, soustraire les cavites fixes, synchroniser
-la scene sans doublon, conserver les objets non-BGIG et activer generate,
-regenerate, inspect, clear et export depuis la palette. Aucun filler historique.
+Resultat attendu : preparer automatiquement l add-in exact du commit P59, ouvrir
+un projet Fusion compatible, parcourir les six vues, calculer la partition,
+materialiser la scene, verifier corps/cavites/noms/zero automatique, regenerer
+sans doublon, inspecter puis exporter. La seule preuve manquante est
+l observation humaine dans Fusion.
 
 ## Releases bloquees
 
-P60 depend de P59. P44 a P50 restent bloques jusqu a P60.
+P44 a P50 restent bloques jusqu a l acceptation humaine P60.
 
 ## Gate humaine active
 
-Aucune avant P60. Le retour humain obligatoire reste le smoke final du parcours
-complet dans Fusion, prepare automatiquement par Codex.
+P60 uniquement. Codex doit installer et verifier l add-in local, preparer les
+donnees du smoke et ne fournir a Thomas que les actions restantes dans Fusion.
 
 ## Fin de chaque mission
 
-Tests pertinents, git diff --check, commit atomique, integration directe dans
-main, push, puis mission suivante seulement si ses dependances sont terminees.
+Apres le smoke : documenter OK/KO sans extrapoler a l impression, mettre a jour
+le pilotage, committer et integrer directement dans main si la gate est acceptee.

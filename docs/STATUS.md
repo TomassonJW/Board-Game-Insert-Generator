@@ -8,7 +8,7 @@ Statut produit : **MVP V0.1 reouvert ; fondations techniques presentes, conformi
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P58 implemente, P59 ready ; validation visuelle finale reservee a P60.
+Phase active : P59 implemente et automatise ; P60 est la gate humaine finale de validation Fusion.
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -1342,3 +1342,31 @@ Preuves ciblees : 5 tests de projection, 4 contrats palette resultat, 7 tests
 bridge, 5 tests DOM et 87 tests Fusion historiques. La syntaxe JavaScript passe.
 Le controle visuel Fusion n est pas revendique ; la gate complete reste P60.
 P59 est ready.
+## P59 - Materialisation CAD et synchronisation de scene
+
+Statut : `implemented`, `automated-validated`, `fusion-validated: false`,
+`print-validated: false`.
+
+`partition_cad.py` transforme exclusivement `bgig.partition_plan.v1` en
+`cad_ir.v0`. Une partition obsolete ou modifiee est refusee. Chaque placement
+P57 devient exactement un composant CAD ; les enveloppes finales sont les
+blanks imprimables et les cavites P55 restent top-open, fixes et exprimees dans
+le repere local du corps apres rotation. Les complements creux, pleins et
+separateurs ne sont crees que s ils sont explicitement demandes. Aucun volume
+libre, filler P41/P42 ou corps automatique n est materialise.
+
+La palette expose maintenant `materialize_project` et `regenerate_project` via
+le bridge versionne. L entrypoint ecrit la CAD IR atomiquement, utilise le mode
+`compact_only`, puis appelle l adaptateur Fusion existant. Generate refuse une
+scene BGIG preexistante ; regenerate remplace uniquement la scene possedee par
+le registry. Inspect, clear et export sont accessibles dans la palette et
+preservent les objets non-BGIG. Une erreur de bridge renvoie toujours une
+reponse versionnee au lieu de laisser expirer l interface.
+
+Preuves ciblees : 8 tests du constructeur CAD, 8 tests du bridge projet, 4
+tests de synchronisation entrypoint, 5 tests resultat palette, 5 tests DOM et
+87 tests de l adaptateur Fusion historique. Syntaxes Python et JavaScript
+valides. Le packaging exige `partition_cad.py` et le manifeste passe en 0.1.6.
+
+Limite : aucune observation de cette scene P59 dans Fusion n est encore
+revendiquee. P60 est desormais la seule gate active avant acceptation V0.1.

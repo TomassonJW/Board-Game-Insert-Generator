@@ -20,7 +20,7 @@ PALETTE_REQUEST_SCHEMA = "bgig.palette.request.v1"
 PALETTE_RESPONSE_SCHEMA = "bgig.palette.response.v1"
 CURRENT_PROJECT_FILENAME = "bgig_project_v1.json"
 PROJECT_EXPORT_DIRECTORY = "projects"
-SUPPORTED_ACTIONS = frozenset({"load_project", "validate_project", "save_project", "import_project", "export_project", "solve_project"})
+SUPPORTED_ACTIONS = frozenset({"load_project", "validate_project", "save_project", "import_project", "export_project", "solve_project", "materialize_project", "regenerate_project"})
 
 
 class PaletteProjectError(ValueError):
@@ -77,6 +77,7 @@ def current_project_path(addin_dir: str | Path) -> Path:
 def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_id: str) -> dict[str, object]:
     from board_game_insert_generator.expandable_envelope import derive_expandable_envelope_contract
     from board_game_insert_generator.flat_stack_reservation import derive_flat_stack_reservation
+    from board_game_insert_generator.partition_cad import build_partition_cad
     from board_game_insert_generator.partition_result_view import build_partition_result_view
     from board_game_insert_generator.partition_solver import solve_partition_plan
     from board_game_insert_generator.project_v1 import normalize_project_draft
@@ -96,10 +97,15 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
     project = normalization.project
     envelopes = derive_expandable_envelope_contract(project)
     flat_stack = derive_flat_stack_reservation(project)
-    partition = solve_partition_plan(project) if action == "solve_project" else None
+    partition = solve_partition_plan(project) if action in {"solve_project", "materialize_project", "regenerate_project"} else None
     result_view = (
         build_partition_result_view(partition)
         if partition is not None and partition["summary"]["status"] == "constructed"
+        else None
+    )
+    cad_build = (
+        build_partition_cad(project, partition=partition)
+        if action in {"materialize_project", "regenerate_project"}
         else None
     )
     saved = False
@@ -121,6 +127,7 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         flat_stack=flat_stack,
         partition=partition,
         result_view=result_view,
+        cad_build=cad_build,
         saved=saved,
         migrated=normalization.migrated,
         warnings=warnings,
@@ -137,6 +144,7 @@ def _response(
     flat_stack: dict[str, object] | None = None,
     partition: dict[str, object] | None = None,
     result_view: dict[str, object] | None = None,
+    cad_build: dict[str, object] | None = None,
     errors: list[str] | None = None,
     warnings: list[str] | None = None,
     saved: bool = False,
@@ -152,6 +160,7 @@ def _response(
         "flat_stack": deepcopy(flat_stack),
         "partition": deepcopy(partition),
         "result_view": deepcopy(result_view),
+        "cad_build": deepcopy(cad_build),
         "errors": list(errors or []),
         "warnings": list(warnings or []),
         "saved": saved,

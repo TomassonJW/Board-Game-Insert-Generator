@@ -272,3 +272,9 @@ CAD-agnostic ; la palette appelle ce coeur et l adaptateur adsk materialise.
 Le frontend React/Vite, le serveur loopback et P23-P30 restent des prototypes
 historiques non packages. P56-P60 suivent maintenant : editeur palette, solveur
 pur, resultat palette, scene fidele, acceptance Fusion end-to-end.
+## P59 implemente - 2026-07-12
+
+La materialisation Fusion-only derive maintenant la CAD IR du plan P57 reel,
+avec correspondance exacte des corps demandes, cavites P55 fixes, zero filler
+automatique et synchronisation de scene possedee. P60 devient l unique gate de
+sortie V0.1 ; les V0.2 et V0.3 restent bloquees jusqu a son acceptation.

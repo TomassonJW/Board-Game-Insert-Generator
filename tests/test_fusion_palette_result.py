@@ -26,9 +26,21 @@ class FusionPaletteResultTests(unittest.TestCase):
         self.assertIn("['validate_project','save_project','export_project']", self.markup)
         self.assertIn("lastSolved=null;lastResponse=payload", self.markup)
         self.assertIn("if(summary.status!=='constructed')", self.markup)
-        self.assertIn("Materialiser dans Fusion - P59", self.markup)
-        self.assertIn("button disabled", self.markup)
+        self.assertIn('data-bridge="materialize_project"', self.markup)
+        self.assertIn('data-bridge="regenerate_project"', self.markup)
+        self.assertNotIn("Materialiser dans Fusion - P59", self.markup)
+        self.assertNotIn("button disabled", self.markup)
 
+    def test_p59_exposes_real_cad_evidence_and_owned_scene_actions(self) -> None:
+        for marker in (
+            "lastResponse.cad_build", "cad_ir_digest", "materialization?.component_count",
+            "materialization?.cavity_count", "materialization?.automatic_body_count",
+            'data-fusion="inspect"', 'data-fusion="clear"', 'data-fusion="export"',
+            "scene_status==='synchronized'",
+        ):
+            self.assertIn(marker, self.markup)
+        self.assertIn("build_partition_cad", self.bridge)
+        self.assertIn('"cad_build": deepcopy(cad_build)', self.bridge)
     def test_geometry_projection_is_owned_by_python_not_recomputed_by_javascript(self) -> None:
         self.assertIn("build_partition_result_view", self.bridge)
         self.assertIn('"result_view": deepcopy(result_view)', self.bridge)

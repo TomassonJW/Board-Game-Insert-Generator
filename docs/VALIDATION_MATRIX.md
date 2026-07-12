@@ -77,3 +77,12 @@ Certaines decisions restent humaines :
 
 Codex ne doit jamais declarer `implemente` une fonctionnalite dont les tests
 pertinents n'ont pas ete lances ou dont les echecs restent non resolus.
+## P59 - Preuve avant gate P60
+
+| Element | Preuve automatisee | Statut | Preuve restante |
+| --- | --- | --- | --- |
+| Plan P57 vers CAD IR | Tests digest, cardinalite, cavites, complements, 50 bodies | implemente | aucune |
+| Palette vers adaptateur | Tests materialize/regenerate, IR atomique, compact_only, reponse erreur | implemente | aucune |
+| Ownership de scene | Tests registry generate/regenerate/inspect/clear/export et preservation non-BGIG | implemente | observation Fusion P60 |
+| Scene geometrique finale | Lecture de la CAD IR par le plan Fusion hors API | implemente | observation et inspection Fusion P60 |
+| Impression | aucune promesse physique | print-validated: false | impression future hors V0.1 |

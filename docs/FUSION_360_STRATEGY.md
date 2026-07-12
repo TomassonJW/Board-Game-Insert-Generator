@@ -834,3 +834,16 @@ La separation est donc :
 La scene reste une projection regenerable. La commande CommandInputs reste un
 secours expert. P56 etend la palette P32 fusion-validated au lieu de poursuivre
 le Studio web P23.
+## P59 - Synchronisation depuis la palette produit
+
+La source produit canonique devient la CAD IR construite par
+`build_partition_cad()` depuis le plan P57 courant. La palette propose
+`materialize_project` pour une premiere scene et `regenerate_project` pour son
+remplacement controle. Les deux utilisent `compact_only` afin de ne pas creer
+une vue eclatee qui ressemble a des corps dupliques.
+
+Le registry BGIG reste l autorite d ownership : generate refuse une scene
+existante, regenerate ne supprime que les entites BGIG, inspect est en lecture
+seule, clear preserve les objets utilisateur et export cible les bodies
+imprimables tagues. Une partition impossible n appelle jamais l API Fusion.
+P59 est implemente mais reste `fusion-validated: false` jusqu au smoke P60.

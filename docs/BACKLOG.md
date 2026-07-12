@@ -1611,7 +1611,8 @@ impose les dependances de release suivantes.
   inspect/clear/export, zero doublon et preservation non-BGIG.
 - Acceptation : Fusion contient exactement les corps du plan courant, sans
   micro-remplissage ; la palette affiche scene synchronisee ou erreur avec retry.
-- Statut : ready.
+- Statut : `implemented`, `automated-validated`, `fusion-validated: false`, `print-validated: false`.
+- Preuves : constructeur `partition_cad.py`, bridge versionne, synchronisation generate/regenerate compacte, inspect/clear/export, packaging 0.1.6 et tests ciblés.
 
 ### P60 - Acceptance du vrai MVP V0.1 Fusion-only
 
@@ -1625,7 +1626,7 @@ impose les dependances de release suivantes.
 - Acceptation : editeur complet dans Fusion, cavites calibrees, volume absorbe
   par les bacs demandes, scene fidele, aucun serveur ou navigateur externe ;
   print-validated: false reste honnete.
-- Statut : blocked-by-P59.
+- Statut : `ready`, gate humaine Fusion preparee automatiquement.
 
 ### P44 a P46 - V0.2 formes et ergonomie
 

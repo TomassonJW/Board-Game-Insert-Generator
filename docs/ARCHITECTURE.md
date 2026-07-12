@@ -312,3 +312,16 @@ vue dessus et en coupe X/Z, transforme les cavites locales P55 selon la rotation
 P57 et transporte details, pile et supports. Elle ne genere pas de CAD IR et ne
 peut pas dessiner une partition non construite. Le JavaScript applique seulement
 les primitives SVG deja exprimees en millimetres.
+## P59 - CAD IR de partition et scene Fusion
+
+`partition_cad.py` remplace la route produit P42 historique. Il verifie que le
+plan fourni correspond encore au projet normalise, transforme chaque placement
+P57 en un composant `cad_ir.v0` et exprime les cavites P55 dans le repere local
+du body final. Le digest CAD est deterministe et les metadata transportent le
+digest P57, le nombre de composants et l invariant `automatic_body_count = 0`.
+
+Le bridge de palette orchestre seulement ce flux. L entrypoint ecrit l IR
+atomiquement puis appelle l adaptateur adsk en `compact_only`. La regeneration
+supprime la scene BGIG possedee avant remplacement ; les objets non-BGIG restent
+hors scope. Les routes P41/P42 de remplissage automatique restent testees mais
+`superseded-for-product`.

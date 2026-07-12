@@ -50,6 +50,7 @@ try:
         DEFAULT_FUSION_COMMAND_ACTION,
         DEFAULT_FUSION_INPUT_MODE,
         DEFAULT_FUSION_GENERATION_MODE,
+        FUSION_GENERATION_MODE_COMPACT_ONLY,
         DOCUMENT_STATUS_ZERO_DOC,
         FUSION_INPUT_MODE_CAD_IR_FILE,
         FUSION_INPUT_MODE_CONFIG_FILE,
@@ -154,6 +155,7 @@ except ImportError:  # pragma: no cover - Fusion may load the file as a script.
         DEFAULT_FUSION_COMMAND_ACTION,
         DEFAULT_FUSION_INPUT_MODE,
         DEFAULT_FUSION_GENERATION_MODE,
+        FUSION_GENERATION_MODE_COMPACT_ONLY,
         DOCUMENT_STATUS_ZERO_DOC,
         FUSION_INPUT_MODE_CAD_IR_FILE,
         FUSION_INPUT_MODE_CONFIG_FILE,
@@ -508,19 +510,32 @@ if adsk is not None:
             try:
                 if action == BGIG_PALETTE_PROJECT_ACTION:
                     raw_request = json.loads(str(getattr(args, "data", "{}") or "{}"))
-                    request = _safe_default_command_request(self.addin_dir)
-                    response = _handle_palette_project_request(
-                        raw_request,
-                        self.addin_dir,
-                        project_root=request.project_root,
-                    )
+                    try:
+                        request = _safe_default_command_request(self.addin_dir)
+                        response = _handle_palette_project_request(
+                            raw_request,
+                            self.addin_dir,
+                            project_root=request.project_root,
+                        )
+                        project_action = str(raw_request.get("action", "")) if isinstance(raw_request, dict) else ""
+                        if project_action in {"materialize_project", "regenerate_project"}:
+                            response = _synchronize_palette_cad_response(response, project_action, self.addin_dir)
+                    except Exception as exc:
+                        response = _palette_project_bridge_error_response(raw_request, exc)
                     self.palette.sendInfoToHTML(
                         BGIG_PALETTE_PROJECT_RESPONSE_ACTION,
                         json.dumps(response, ensure_ascii=False),
                     )
                     return
-                if action == "refresh" or action == "preview":
-                    _publish_palette_state(self.palette, self.addin_dir, "Vue Fusion actualisee.")
+                if action in {"refresh", "preview", "inspect"}:
+                    request = replace(_safe_default_command_request(self.addin_dir), action=FUSION_COMMAND_ACTION_INSPECT)
+                    result = _execute_generation_request(request, self.addin_dir)
+                    _publish_palette_state(self.palette, self.addin_dir, result)
+                    return
+                if action == "clear":
+                    request = replace(_safe_default_command_request(self.addin_dir), action=FUSION_COMMAND_ACTION_CLEAR)
+                    result = _execute_generation_request(request, self.addin_dir)
+                    _publish_palette_state(self.palette, self.addin_dir, result)
                     return
                 if action == "expert":
                     command_definition = _ui.commandDefinitions.itemById(BGIG_COMMAND_ID)
@@ -645,6 +660,70 @@ def _handle_palette_project_request(
         from palette_project import handle_palette_request  # type: ignore[no-redef]
     return handle_palette_request(raw_request, addin_dir, project_root)
 
+
+def _synchronize_palette_cad_response(
+    response: dict[str, object],
+    project_action: str,
+    addin_dir: Path,
+) -> dict[str, object]:
+    """Write the P59 CAD IR atomically and synchronize the owned BGIG scene."""
+
+    synchronized = dict(response)
+    cad_build = response.get("cad_build")
+    if response.get("status") != "ready" or not isinstance(cad_build, dict):
+        return synchronized
+    if cad_build.get("status") != "ready_for_fusion" or not isinstance(cad_build.get("cad_ir"), dict):
+        synchronized["scene_status"] = "blocked"
+        synchronized["scene_result"] = "La partition ne peut pas etre materialisee dans Fusion."
+        return synchronized
+
+    cad_ir_path = addin_dir / BGIG_GENERATED_CAD_IR_FILENAME
+    temporary = cad_ir_path.with_suffix(cad_ir_path.suffix + ".tmp")
+    temporary.write_text(json.dumps(cad_build["cad_ir"], indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    temporary.replace(cad_ir_path)
+    fusion_action = (
+        FUSION_COMMAND_ACTION_REGENERATE
+        if project_action == "regenerate_project"
+        else FUSION_COMMAND_ACTION_GENERATE
+    )
+    request = build_fusion_command_request(
+        str(cad_ir_path),
+        FUSION_GENERATION_MODE_COMPACT_ONLY,
+        addin_dir,
+        action=fusion_action,
+        input_mode=FUSION_INPUT_MODE_CAD_IR_FILE,
+    )
+    synchronized["scene_result"] = _execute_generation_request(request, addin_dir)
+    synchronized["scene_status"] = (
+        "blocked"
+        if fusion_action == FUSION_COMMAND_ACTION_GENERATE
+        and BGIG_EXISTING_SCENE_MESSAGE in str(synchronized["scene_result"])
+        else "synchronized"
+    )
+    synchronized["cad_ir_path"] = str(cad_ir_path)
+    return synchronized
+
+
+def _palette_project_bridge_error_response(raw_request: object, exc: Exception) -> dict[str, object]:
+    request_id = str(raw_request.get("request_id", "unknown")) if isinstance(raw_request, dict) else "unknown"
+    return {
+        "schema": "bgig.palette.response.v1",
+        "request_id": request_id,
+        "status": "bridge_error",
+        "project": None,
+        "envelopes": None,
+        "flat_stack": None,
+        "partition": None,
+        "result_view": None,
+        "cad_build": None,
+        "errors": [f"La synchronisation Fusion a echoue : {exc}"],
+        "warnings": [],
+        "saved": False,
+        "migrated": False,
+        "export_path": "",
+        "scene_status": "error",
+        "scene_result": "",
+    }
 
 def _palette_state(addin_dir: Path, notice: str = "", technical_detail: str = "") -> dict[str, object]:
     """Returns a concise, product-facing state; raw diagnostics remain optional."""

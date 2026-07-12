@@ -1,0 +1,134 @@
+from __future__ import annotations
+
+from copy import deepcopy
+from pathlib import Path
+import unittest
+
+from board_game_insert_generator.partition_cad import (
+    PARTITION_CAD_BUILD_SCHEMA_V1,
+    PARTITION_CAD_STATUS_READY,
+    PartitionCadBuildError,
+    build_partition_cad,
+)
+from board_game_insert_generator.partition_solver import solve_partition_plan
+from board_game_insert_generator.project_v1 import blank_project_v1
+from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
+    FUSION_GENERATION_MODE_COMPACT_ONLY,
+    generation_plan_from_cad_ir,
+)
+
+
+def project(count: int = 2) -> dict[str, object]:
+    value = blank_project_v1()
+    value["box"] = {"inner_dimensions_mm": {"x": 240.0, "y": 180.0, "z": 70.0}, "usable_height_mm": 66.0, "lid_clearance_mm": 2.0}
+    value["container_groups"] = [{"id": f"g{i}", "name": f"Bac {i}", "wall_thickness_mm": None, "floor_thickness_mm": None} for i in range(count)]
+    value["contents"] = [{
+        "id": f"c{i}", "name": f"Pieces {i}", "shape_kind": "rectangle",
+        "dimensions_mm": {"x": 22.0 + i, "y": 14.0, "z": 5.0}, "quantity": 4,
+        "container_group_id": f"g{i}", "content_clearance_mm": None, "measurement_confidence": "exact",
+    } for i in range(count)]
+    return value
+
+
+class PartitionCadTests(unittest.TestCase):
+    def test_builds_one_fusion_component_per_requested_p57_body(self) -> None:
+        value = project(3)
+        plan = solve_partition_plan(value)
+        result = build_partition_cad(value, partition=plan)
+        fusion = generation_plan_from_cad_ir(result["cad_ir"], FUSION_GENERATION_MODE_COMPACT_ONLY)
+
+        self.assertEqual(result["schema_version"], PARTITION_CAD_BUILD_SCHEMA_V1)
+        self.assertEqual(result["status"], PARTITION_CAD_STATUS_READY)
+        self.assertEqual(result["source_plan_digest"], plan["plan_digest"])
+        self.assertEqual(result["materialization"]["component_count"], plan["summary"]["final_body_count"])
+        self.assertEqual(fusion.module_component_count, plan["summary"]["final_body_count"])
+        self.assertEqual(len(fusion.compact_occurrences), plan["summary"]["final_body_count"])
+        self.assertEqual(len(fusion.exploded_occurrences), 0)
+
+    def test_cavity_operations_keep_p55_dimensions_and_open_on_the_final_top(self) -> None:
+        value = project(2)
+        plan = solve_partition_plan(value)
+        result = build_partition_cad(value, partition=plan)
+        components = {item["instance_id"]: item for item in result["cad_ir"]["components"]}
+
+        for placement in plan["placements"]:
+            component = components[placement["id"]]
+            body_size = component["body"]["printable_size_mm"]
+            operations = [item for item in component["body"]["operations"] if item["kind"] == "subtract_rectangular_cavity"]
+            self.assertEqual(len(operations), len(placement["cavity_layout"]))
+            for operation, cavity in zip(operations, placement["cavity_layout"]):
+                origin = operation["parameters"]["local_origin_mm"]
+                size = operation["parameters"]["size_mm"]
+                expected_xy = sorted([cavity["inner_dimensions_mm"]["x"], cavity["inner_dimensions_mm"]["y"]])
+                self.assertEqual(sorted([size["x"], size["y"]]), expected_xy)
+                self.assertEqual(size["z"], cavity["inner_dimensions_mm"]["z"])
+                self.assertAlmostEqual(origin["z"] + size["z"], body_size["z"])
+
+    def test_metadata_proves_zero_automatic_or_free_region_body(self) -> None:
+        result = build_partition_cad(project(2))
+        metadata = result["cad_ir"]["metadata"]
+
+        self.assertEqual(result["materialization"]["automatic_body_count"], 0)
+        self.assertFalse(result["invariants"]["free_regions_materialized"])
+        self.assertEqual(metadata["box_fill_plan"]["automatic_body_count"], 0)
+        self.assertFalse(metadata["box_fill_plan"]["free_regions_materialized"])
+        self.assertTrue(all(not component["metadata"]["automatic"] for component in result["cad_ir"]["components"]))
+        self.assertNotIn("p42_automatic_residual_fill", str(result["cad_ir"]))
+
+    def test_materializes_an_explicit_hollow_complement_with_no_invented_body(self) -> None:
+        value = project(1)
+        value["contents"][0]["shape_kind"] = "square"
+        value["contents"][0]["dimensions_mm"] = {"x": 18.0, "y": 18.0, "z": 5.0}
+        clearance = value["layout"]["layout_clearance_mm"]
+        value["fill_elements"] = [{
+            "id": "empty", "name": "Bac vide voulu", "kind": "hollow", "mode": "exact",
+            "dimensions_mm": {"x": 20.0, "y": 180.0 - 2 * clearance, "z": 66.0}, "container_group_id": None,
+        }]
+        result = build_partition_cad(value)
+
+        self.assertEqual(result["status"], PARTITION_CAD_STATUS_READY)
+        self.assertEqual(result["materialization"]["explicit_complement_component_count"], 1)
+        self.assertEqual(result["materialization"]["component_count"], 2)
+        complement = next(item for item in result["cad_ir"]["components"] if item["metadata"]["role"] == "explicit_complement")
+        self.assertEqual(complement["metadata"]["requested_complement_id"], "empty")
+        self.assertEqual(len(complement["body"]["cavities"]), 1)
+
+    def test_impossible_project_returns_no_cad_ir(self) -> None:
+        result = build_partition_cad(blank_project_v1())
+
+        self.assertEqual(result["status"], "impossible")
+        self.assertIsNone(result["cad_ir"])
+        self.assertEqual(result["materialization"]["component_count"], 0)
+        self.assertEqual(result["materialization"]["automatic_body_count"], 0)
+
+    def test_rejects_a_stale_or_tampered_partition(self) -> None:
+        value = project(1)
+        plan = solve_partition_plan(value)
+        stale = deepcopy(plan)
+        stale["placements"][0]["world_size_mm"]["x"] += 1.0
+        stale["plan_digest"] = plan["plan_digest"]  # Un digest recopie ne doit pas masquer un payload modifie.
+
+        with self.assertRaisesRegex(PartitionCadBuildError, "obsolete"):
+            build_partition_cad(value, partition=stale)
+
+    def test_cad_ir_digest_is_deterministic(self) -> None:
+        first = build_partition_cad(project(4))
+        second = build_partition_cad(project(4))
+
+        self.assertEqual(first["cad_ir_digest"], second["cad_ir_digest"])
+        self.assertEqual(first["cad_ir"], second["cad_ir"])
+
+    def test_handles_fifty_bodies_and_the_installed_core_stays_adsk_free(self) -> None:
+        value = project(50)
+        value["box"] = {"inner_dimensions_mm": {"x": 900.0, "y": 900.0, "z": 100.0}, "usable_height_mm": 96.0, "lid_clearance_mm": 2.0}
+        result = build_partition_cad(value)
+        fusion = generation_plan_from_cad_ir(result["cad_ir"], FUSION_GENERATION_MODE_COMPACT_ONLY)
+
+        self.assertEqual(result["materialization"]["component_count"], 50)
+        self.assertEqual(fusion.module_component_count, 50)
+        source = (Path(__file__).resolve().parents[1] / "src" / "board_game_insert_generator" / "partition_cad.py").read_text(encoding="utf-8")
+        self.assertNotIn("import adsk", source)
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -681,3 +681,15 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - C-CAVITY / C-MODULE : projections derivees des repères P55 et placements P57, rotations 0/90 testees.
 - C-QUALITY : `indicative_geometry: false`, zero corps automatique visible, aucune solution impossible dessinee.
 - C-CAD-IR : P59 devient `ready`; materialisation reste desactivee dans la palette P58.
+## P59 partition CAD and Fusion scene update
+
+- C-CAD-IR : `implemented-core`, `partition_cad.py` derive une CAD IR
+  deterministe du seul plan P57 courant et refuse toute partition obsolete.
+- C-CAVITY / C-MODULE : `implemented-cad-ir`, enveloppes finales materialisees,
+  cavites P55 top-open inchangees et complements uniquement explicites.
+- C-FUSION-UI : `implemented-bridge`, actions palette materialize/regenerate/
+  inspect/clear/export et etats synchronized/blocked/error.
+- C-QUALITY : correspondance exacte plan/composants, mode compact_only, zero
+  corps automatique, preservation non-BGIG et reponse versionnee sans timeout.
+- Validation : preuves automatisees vertes ; `fusion-validated: false` jusqu a
+  l observation P60.

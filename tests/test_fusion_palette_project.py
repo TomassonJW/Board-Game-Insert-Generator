@@ -83,6 +83,19 @@ class FusionPaletteProjectTests(unittest.TestCase):
         self.assertEqual(response["result_view"]["source_plan_digest"], response["partition"]["plan_digest"])
         self.assertTrue(response["result_view"]["invariants"]["derived_from_real_placements"])
         self.assertFalse(response["saved"])
+    def test_materialize_and_regenerate_return_the_same_real_cad_build(self) -> None:
+        project = blank_project_v1()
+        project["container_groups"] = [{"id": "g", "name": "Bac", "wall_thickness_mm": None, "floor_thickness_mm": None}]
+        project["contents"] = [{"id": "c", "name": "Pieces", "shape_kind": "square", "dimensions_mm": {"x": 12, "y": 12, "z": 3}, "quantity": 2, "container_group_id": "g", "content_clearance_mm": None, "measurement_confidence": "exact"}]
+        with tempfile.TemporaryDirectory() as temp_dir, patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}):
+            generated = handle_palette_request(request("materialize_project", project=project), ADDIN, ROOT)
+            regenerated = handle_palette_request(request("regenerate_project", project=project), ADDIN, ROOT)
+
+        self.assertEqual(generated["cad_build"]["status"], "ready_for_fusion")
+        self.assertEqual(generated["cad_build"]["materialization"]["component_count"], 1)
+        self.assertEqual(generated["cad_build"]["materialization"]["automatic_body_count"], 0)
+        self.assertEqual(generated["cad_build"]["cad_ir_digest"], regenerated["cad_build"]["cad_ir_digest"])
+        self.assertEqual(generated["partition"]["plan_digest"], generated["cad_build"]["source_plan_digest"])
     def test_invalid_project_returns_an_actionable_response_without_overwriting_saved_data(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir, patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}):
             valid = blank_project_v1()

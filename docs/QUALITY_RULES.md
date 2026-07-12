@@ -133,3 +133,14 @@ Statut : `done`, `implemented-core`, `implemented-cli`, `implemented-cad-ir-meta
 - Toute modification du projet invalide le dernier resultat ; une sauvegarde sans modification ne l invalide pas.
 - Les noms utilisateur accompagnent les identifiants stables dans le resultat.
 - Le rendu P58 ne vaut ni CAD IR, ni validation Fusion, ni validation d impression.
+## Regles P59 de materialisation Fusion
+
+- La CAD IR P59 doit citer le digest P57 et refuser un plan obsolete.
+- Le nombre de composants CAD doit egaler le nombre de corps finaux demandes.
+- Toute cavite de bac vient de P55 ; aucune cavite n est redimensionnee dans Fusion.
+- Les regions libres, fillers historiques et jeux techniques ne deviennent jamais des bodies.
+- `automatic_body_count` reste zero dans le plan, la CAD IR et la palette.
+- La synchronisation produit utilise `compact_only` et le registry d ownership BGIG.
+- Generate ne remplace rien implicitement ; regenerate preserve les objets non-BGIG.
+- Une erreur de bridge doit retourner une reponse versionnee et actionnable.
+- `implemented` ne vaut ni `fusion-validated`, ni `print-validated`.
