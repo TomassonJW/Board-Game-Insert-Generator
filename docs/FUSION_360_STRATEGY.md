@@ -854,3 +854,13 @@ revient sur `incomingFromHTML` avec l action reservee `response`. Cette action
 est un accuse de transport, pas une commande produit. Le handler doit l ignorer
 sans appeler de nouveau `sendInfoToHTML`, sinon il cree une boucle. Les actions
 utilisateur continuent a etre acquittees via `HTMLEventArgs.returnData`.
+## P60 - Handshake de readiness et lanceur produit
+
+La creation d une palette peut charger le HTML avant l attachement du handler
+`incomingFromHTML`. Le HTML ne doit donc jamais envoyer son unique chargement
+projet sans preuve de readiness. Il emet `bgig_palette_ready` avec retry borne ;
+la reception cote Python declenche le chargement versionne.
+
+Le bouton Utilities suit le Palette Sample Autodesk : une commande sans inputs
+attache un execute handler qui rend la palette visible. Il n ouvre aucun
+CommandInputs metier. Le `resourceFolder` fournit les SVG 16/32 px du bouton.

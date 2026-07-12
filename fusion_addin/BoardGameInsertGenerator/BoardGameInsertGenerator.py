@@ -244,6 +244,10 @@ BGIG_PALETTE_NOTICE_ACTION = "bgig_palette_notice"
 BGIG_PALETTE_PROJECT_ACTION = "bgig_palette_project"
 BGIG_PALETTE_PROJECT_RESPONSE_ACTION = "bgig_palette_project_response"
 BGIG_PALETTE_TRANSPORT_RESPONSE_ACTION = "response"
+BGIG_PALETTE_READY_ACTION = "bgig_palette_ready"
+BGIG_PALETTE_BOOTSTRAP_REQUEST_ID = "palette-bootstrap"
+BGIG_PALETTE_REQUEST_SCHEMA = "bgig.palette.request.v1"
+BGIG_COMMAND_RESOURCE_FOLDER = "resources"
 BGIG_PALETTE_DEFAULT_WIDTH = 1120
 BGIG_PALETTE_DEFAULT_HEIGHT = 760
 ACTION_INPUT_ID = "bgig_command_action"
@@ -309,6 +313,29 @@ def stop(context) -> None:  # noqa: ANN001 - Fusion controls the signature.
     _show_message("Board Game Insert Generator adapter stopped.")
 
 if adsk is not None:
+    class _BgigPaletteCommandExecuteHandler(adsk.core.CommandEventHandler):  # type: ignore[misc]
+        def __init__(self, addin_dir: Path) -> None:
+            super().__init__()
+            self.addin_dir = addin_dir
+
+        def notify(self, args) -> None:  # noqa: ANN001 - Fusion event args.
+            try:
+                _ensure_palette(self.addin_dir)
+            except Exception as exc:
+                _show_message(f"BGIG palette error:\n{exc}")
+
+
+    class _BgigPaletteCommandCreatedHandler(adsk.core.CommandCreatedEventHandler):  # type: ignore[misc]
+        def __init__(self, addin_dir: Path) -> None:
+            super().__init__()
+            self.addin_dir = addin_dir
+
+        def notify(self, args) -> None:  # noqa: ANN001 - Fusion event args.
+            execute_handler = _BgigPaletteCommandExecuteHandler(self.addin_dir)
+            args.command.execute.add(execute_handler)
+            _handlers.append(execute_handler)
+
+
     class _BgigCommandCreatedHandler(adsk.core.CommandCreatedEventHandler):  # type: ignore[misc]
         def __init__(self, addin_dir: Path) -> None:
             super().__init__()
@@ -517,6 +544,18 @@ if adsk is not None:
                     args.returnData = "OK"
                 except Exception:
                     pass
+                if action == BGIG_PALETTE_READY_ACTION:
+                    request = _safe_default_command_request(self.addin_dir)
+                    response = _handle_palette_project_request(
+                        _palette_bootstrap_request(),
+                        self.addin_dir,
+                        project_root=request.project_root,
+                    )
+                    self.palette.sendInfoToHTML(
+                        BGIG_PALETTE_PROJECT_RESPONSE_ACTION,
+                        json.dumps(response, ensure_ascii=False),
+                    )
+                    return
                 if action == BGIG_PALETTE_PROJECT_ACTION:
                     raw_request = json.loads(str(getattr(args, "data", "{}") or "{}"))
                     try:
@@ -596,15 +635,17 @@ def _register_command_and_show_palette(addin_dir: Path) -> None:
     _delete_command_control(BGIG_COMMAND_ID)
     _delete_command_definition(BGIG_COMMAND_ID)
     _delete_command_definition(BGIG_LEGACY_COMMAND_ID)
+    resource_folder = addin_dir / BGIG_COMMAND_RESOURCE_FOLDER
     command_definition = command_definitions.addButtonDefinition(
         BGIG_COMMAND_ID,
         BGIG_COMMAND_NAME,
         BGIG_COMMAND_TOOLTIP,
+        str(resource_folder),
     )
     if command_definition is None:
         raise FusionSkeletonError("Fusion command definition creation failed for Generate Board Game Insert.")
 
-    created_handler = _BgigCommandCreatedHandler(addin_dir)
+    created_handler = _BgigPaletteCommandCreatedHandler(addin_dir)
     command_definition.commandCreated.add(created_handler)
     _handlers.append(created_handler)
     _add_toolbar_button(command_definition)
@@ -673,6 +714,15 @@ def _handle_palette_project_request(
         from palette_project import handle_palette_request  # type: ignore[no-redef]
     return handle_palette_request(raw_request, addin_dir, project_root)
 
+
+def _palette_bootstrap_request() -> dict[str, str]:
+    """Return the deterministic load request sent only after Fusion proves readiness."""
+
+    return {
+        "schema": BGIG_PALETTE_REQUEST_SCHEMA,
+        "request_id": BGIG_PALETTE_BOOTSTRAP_REQUEST_ID,
+        "action": "load_project",
+    }
 
 def _is_palette_transport_response(action: str) -> bool:
     """Ignore the asynchronous acknowledgement emitted by Fusion QT."""
@@ -814,6 +864,7 @@ def _add_toolbar_button(command_definition) -> bool:  # noqa: ANN001 - Fusion AP
     except Exception:
         pass
     try:
+        control.isPromotedByDefault = True
         control.isPromoted = True
     except Exception:
         pass

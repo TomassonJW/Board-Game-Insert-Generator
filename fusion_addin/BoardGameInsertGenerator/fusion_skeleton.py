@@ -34,11 +34,11 @@ BGIG_TOOLBAR_PANEL_IDS = (
     "ToolsTabAddinsPanel",
 )
 BGIG_TOOLBAR_LOCATION = "Design workspace > Utilities > Add-Ins"
-BGIG_COMMAND_NAME = "Generate Board Game Insert"
+BGIG_COMMAND_NAME = "BGIG - Atelier de rangement"
 BGIG_COMMAND_TOOLTIP = (
-    "Open BGIG, choose a CAD IR or config JSON file and generate the selected Fusion scene."
+    "Ouvre la palette BGIG pour decrire le jeu, calculer les bacs et synchroniser la scene Fusion."
 )
-BGIG_UI_REOPEN_POLICY = "toolbar_button_reopens_command_without_addin_restart"
+BGIG_UI_REOPEN_POLICY = "utilities_toolbar_button_opens_product_palette"
 
 FUSION_COMMAND_ACTION_GENERATE = "generate"
 FUSION_COMMAND_ACTION_REGENERATE = "regenerate"

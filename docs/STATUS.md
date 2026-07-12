@@ -1405,3 +1405,27 @@ produit. La palette utilise aussi une taille initiale/minimale 1120 x 760, sans
 reduire une taille utilisateur plus grande. Trois tests de transport verrouillent
 le rebond QT, l ordre du garde-fou et les dimensions. Une nouvelle observation
 Fusion reste requise avant d accepter P60.
+## P60 - Correctif bootstrap et lanceur Utilities 0.1.8
+
+Statut : `implemented`, `automated-validated`, `fusion-retest-required`,
+`print-validated: false`.
+
+Le second retour humain confirme que le projet ne se charge jamais au demarrage.
+La cause est une course distincte du rebond QT : le HTML envoyait `load_project`
+pendant `palettes.add`, avant que `incomingFromHTML.add(handler)` soit termine.
+L evenement etait perdu, `project` restait nul et la garde JavaScript annulait
+ensuite silencieusement tous les boutons projet.
+
+Le bootstrap 0.1.8 utilise maintenant un handshake `bgig_palette_ready` repete.
+La reception de ce signal prouve que le handler Python est attache ; Python
+charge alors directement le projet et renvoie une reponse versionnee. Les
+boutons affichent un etat explicite tant que le bootstrap n est pas termine.
+
+La commande promue de la barre Utilities ouvre desormais exclusivement la
+palette `BGIG - Atelier de rangement`. L ancien dialogue technique n est plus
+relie au bouton ni expose dans la palette. Le package contient une icone maison
+BGIG SVG en 16 et 32 px et le controle est `isPromotedByDefault`.
+
+Preuves hors Fusion : handshake, ordre des routes, retry, absence de bootstrap
+historique, lanceur palette, promotion toolbar, ressources SVG valides et
+packaging testes. Une nouvelle observation Fusion reste obligatoire.

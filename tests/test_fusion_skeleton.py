@@ -261,7 +261,7 @@ class FusionSkeletonTests(unittest.TestCase):
             self.assertIn(label, markup)
         self.assertIn("Verifier", markup)
         self.assertIn("Sauvegarder", markup)
-        self.assertIn("Reglages experts", markup)
+        self.assertNotIn("Reglages experts", markup)
         self.assertIn("bgig.palette.request.v1", markup)
         self.assertIn("adsk.fusionSendData", markup)
         self.assertIn("fusionJavaScriptHandler", markup)

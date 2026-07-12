@@ -693,3 +693,13 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
   corps automatique, preservation non-BGIG et reponse versionnee sans timeout.
 - Validation : preuves automatisees vertes ; `fusion-validated: false` jusqu a
   l observation P60.
+## P60 bootstrap and Utilities launcher update
+
+- C-FUSION-UI : `implemented-bootstrap`, handshake readiness avant chargement
+  projet, retry borne et aucun bouton projet silencieux.
+- C-FUSION-UI : `implemented-toolbar-launcher`, bouton Utilities promu ouvrant
+  uniquement la palette produit avec icone maison SVG.
+- C-QUALITY : ancien dialogue retire du parcours normal, ressources packagees
+  et tests de course de demarrage.
+- Validation : `fusion-retest-required` ; aucune acceptation P60 ni impression
+  n est encore revendiquee.

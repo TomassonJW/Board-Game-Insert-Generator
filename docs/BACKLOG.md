@@ -1626,7 +1626,7 @@ impose les dependances de release suivantes.
 - Acceptation : editeur complet dans Fusion, cavites calibrees, volume absorbe
   par les bacs demandes, scene fidele, aucun serveur ou navigateur externe ;
   print-validated: false reste honnete.
-- Statut : `ready`, gate humaine Fusion preparee automatiquement.
+- Statut : `ready-for-retest`, correctifs runtime 0.1.8 implementes ; gate humaine Fusion a rejouer.
 
 ### P44 a P46 - V0.2 formes et ergonomie
 

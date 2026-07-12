@@ -29,12 +29,12 @@ Preuves attendues avant ouverture de Fusion :
 - partition construite : 2 corps finaux, 0 complement, 0 automatique ;
 - CAD IR : 2 composants, 3 cavites top-open, digest deterministe ;
 - plan Fusion hors API : 2 occurrences compactes, aucune occurrence eclatee ;
-- installateur : manifeste 0.1.7 et `partition_cad.py` package.
+- installateur : manifeste 0.1.8 et `partition_cad.py` package.
 
 ## Checklist humaine Fusion
 
 1. Ouvrir un nouveau design Fusion compatible Assembly.
-2. Lancer Board Game Insert Generator et confirmer que seule la palette locale s ouvre.
+2. Cliquer `BGIG - Atelier de rangement` dans Utilities et confirmer que seule la palette locale s ouvre.
 3. Parcourir les six vues : Boite, Pieces, Plateaux, Bacs, Fabrication, Resultat.
 4. Dans Fabrication, cliquer `Calculer la partition`.
 5. Confirmer : 2 corps finaux, 0 complement, 0 corps automatique.

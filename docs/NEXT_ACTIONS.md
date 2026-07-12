@@ -44,7 +44,7 @@ restantes dans Fusion.
 
 Retour P60 en cours : le premier essai a valide l apparence de la palette mais
 a revele une boucle d accusés QT (`response`) qui bloquait les actions projet.
-Le patch 0.1.7 ignore ce transport interne et ouvre la palette en 1120 x 760.
+Le patch 0.1.8 ajoute le handshake de readiness, ouvre la palette en 1120 x 760 et remplace l ancien dialogue par un bouton Utilities dedie.
 La prochaine action est de recharger l add-in puis rejouer la checklist P60.
 
 ## Fin de chaque mission

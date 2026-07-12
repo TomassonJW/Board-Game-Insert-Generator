@@ -55,7 +55,7 @@ else {
 
 Write-Output ""
 Write-Output "P60 Fusion actions remaining:"
-Write-Output "1. Ouvre un nouveau design Fusion en mode Assembly, puis lance Board Game Insert Generator."
+Write-Output "1. Ouvre un nouveau design Fusion en mode Assembly, puis clique BGIG - Atelier de rangement dans Utilities."
 Write-Output "2. Confirme que la palette charge P60 - MVP Fusion-only et que les six vues sont accessibles sans navigateur."
 Write-Output "3. Va a Fabrication, clique Calculer la partition et confirme 2 corps finaux, 0 complement, 0 corps automatique."
 Write-Output "4. Dans Resultat, verifie la vue dessus, la coupe X/Z, Bac jetons, Bac cartes et les cavites nommees."
