@@ -12,18 +12,18 @@ ADR-0047.
 
 ## Derniere mission terminee
 
-`P37 - Contrat projet V0.1 et migration` : `bgig.project.v1` represente la
-boite, les pieces, les bacs partages, les plateaux/livrets et les remplissages.
-Les projets P23 sont migrables sans perte ; les routes locales V1 et les tests
-sont prets.
+`P38 - Tables dynamiques et parcours user-first` : le Studio V0.1 permet de
+saisir la boite, les pieces, leur bac cible, les plateaux/livrets, les volumes de
+remplissage et les reglages de fabrication. Il charge, migre et sauvegarde le
+contrat `bgig.project.v1` sans vocabulaire moteur dans le parcours principal.
 
 ## Prochaine mission prete
 
-`P38 - Tables dynamiques et parcours user-first`.
+`P39 - Derivation des bacs et logements`.
 
-Resultat attendu : le Studio utilise `bgig.project.v1`, montre seulement boite,
-pieces, plateaux/livrets et construction, permet de choisir un `Bac cible` par
-ligne et masque candidats, layers, apparence et couvercles hors du parcours V0.1.
+Resultat attendu : le moteur derive des bacs et logements explicables depuis la
+forme, les mesures, la quantite et le `Bac cible`, sans demander une taille de
+bac externe a l utilisateur.
 
 ## Ce qui n'est plus demande a Thomas
 

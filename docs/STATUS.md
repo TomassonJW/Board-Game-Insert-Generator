@@ -1073,3 +1073,23 @@ passent ; build TypeScript/Vite passe. Le portfolio P21 et l export restent
 volontairement sur P23 tant que P39 ne derive pas les bacs V1.
 
 Prochaine mission : P38, reconstruction du Studio autour du contrat V1.
+
+## P38 - Studio de saisie V0.1
+
+Statut : `done`, `implemented-local-ui`, `implemented-client-validation`,
+`print-validated: false`.
+
+Le Studio est maintenant organise autour du langage utilisateur : boite, pieces
+a ranger, plateaux/livrets, bacs demandes, volumes de remplissage et reglages de
+fabrication. Chaque ligne de piece choisit une forme, des mesures, une quantite
+et le bac cible. Les imports V0/V1 et la sauvegarde JSON restent disponibles
+sans exposer candidats, layers, apparence ou couvercles dans le parcours V0.1.
+
+Preuves : 275 tests Python passent, le build TypeScript/Vite passe et le Studio
+local repond en HTTP 200, tout comme `/api/project-v1/starter` qui retourne le
+contrat `bgig.project.v1`. L inspection navigateur automatisee reste indisponible
+dans le sandbox Windows ; elle ne constitue pas une gate humaine et aucun statut
+Fusion ou impression n est revendique.
+
+Prochaine mission : P39, derivation expliquable des bacs et logements depuis les
+pieces et leur bac cible.

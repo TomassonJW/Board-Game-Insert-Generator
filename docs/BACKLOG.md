@@ -1445,9 +1445,10 @@ impose les dependances de release suivantes.
 - Dependances : P37.
 - Objectif : boite, pieces, bac cible, plateaux/livrets et bouton `Construire mon
   insert`, sans jargon moteur dans le parcours principal.
-- Validation : tests TypeScript et recette navigateur sur ajout/suppression,
-  formes, groupes, imports et erreurs.
-- Statut : `ready-after-p37`.
+- Validation : tests de contrat UI, validation TypeScript, build Vite et serveur
+  local HTTP ; parcours navigateur automatise indisponible dans ce sandbox,
+  sans gate humaine.
+- Statut : `done`, `implemented-local-ui`, `implemented-client-validation`.
 
 ### P39 - Derivation des bacs et logements
 
@@ -1455,7 +1456,7 @@ impose les dependances de release suivantes.
 - Objectif : deriver capacite, logements, dimensions internes et externes depuis
   forme, quantite et `Bac cible`.
 - Validation : fixtures rond, carre, rectangle, cartes, cube/de, pion et custom.
-- Statut : `blocked-by-p38`.
+- Statut : `ready-after-p38`.
 
 ### P40 - Pile superieure plateaux et livrets
 

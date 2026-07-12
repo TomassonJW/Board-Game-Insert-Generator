@@ -1,236 +1,155 @@
 import { type ChangeEvent, useEffect, useMemo, useState } from 'react'
-import { ApiError, createExport, generatePortfolio, loadStarters } from './api'
-import { isComposerDraft, type DraftIssue, summarizeDraft, validateDraft } from './validation'
-import { proposalExplanation, scoreExplanation } from './proposal_copy'
+import { ApiError, loadProjectV1Starter, normalizeProjectV1 } from './api'
 import type {
-  AppearanceDraft,
-  MechanismDraft,
-  AssetDraft,
-  CandidateDraft,
-  ComposerDraft,
-  Dimension,
-  EngineModule,
-  Portfolio,
-  ReservationDraft,
-  StarterTemplate,
-  Variant,
-} from './types'
+  ContainerGroupDraft,
+  FillElementDraft,
+  FlatItemDraft,
+  ProjectContentDraft,
+  ProjectShapeKind,
+  ProjectV1Draft,
+} from './project_v1'
+import { type ProjectIssue, validateProjectV1 } from './project_v1_validation'
+import type { Dimension } from './types'
 
-type StepId = 'box' | 'contents' | 'organisation' | 'proposals' | 'prepare'
-
-const studioSteps: Array<{ id: StepId; title: string; helper: string }> = [
-  { id: 'box', title: 'La boîte', helper: 'Mesure l’espace disponible.' },
-  { id: 'contents', title: 'Le contenu', helper: 'Ajoute ce qui doit être rangé.' },
-  { id: 'organisation', title: 'L’organisation', helper: 'Protège les éléments fixes.' },
-  { id: 'proposals', title: 'Les idées', helper: 'Compare les compromis.' },
-  { id: 'prepare', title: 'La suite', helper: 'Conserve une décision claire.' },
+const shapeOptions: Array<{ value: ProjectShapeKind; label: string }> = [
+  { value: 'round', label: 'Rond' },
+  { value: 'square', label: 'Carré' },
+  { value: 'rectangle', label: 'Rectangle' },
+  { value: 'cards', label: 'Cartes' },
+  { value: 'cube', label: 'Cube ou dé' },
+  { value: 'meeple', label: 'Pion ou figurine' },
+  { value: 'custom', label: 'Sur mesure' },
 ]
 
-const scoreLabels: Record<string, string> = {
-  compactness: 'Compacité',
-  free_space: 'Espace libre',
-  accessibility: 'Accès',
-  printability: 'Imprimabilité',
-  simplicity: 'Simplicité',
-  coverage: 'Couverture',
+const shapeLabels: Record<ProjectShapeKind, [string, string, string]> = {
+  round: ['Diamètre', 'Diamètre', 'Épaisseur'],
+  square: ['Côté', 'Côté', 'Hauteur'],
+  rectangle: ['Largeur', 'Profondeur', 'Hauteur'],
+  cards: ['Largeur', 'Hauteur', 'Épaisseur totale'],
+  cube: ['Côté', 'Côté', 'Côté'],
+  meeple: ['Largeur', 'Profondeur', 'Hauteur'],
+  custom: ['Largeur', 'Profondeur', 'Hauteur'],
 }
 
-const defaultDimension = (): Dimension => ({ x: 30, y: 30, z: 20 })
-
-const defaultAppearance = (): AppearanceDraft => ({
-  schema_version: 'bgig.appearance.v0',
-  shape: { corner_style: 'rounded', corner_radius_mm: 3, chamfer_mm: 1.5, notch_style: 'none' },
-  visual: { theme: 'atelier', label_mode: 'module_name', typography: 'quiet' },
-})
-const defaultMechanism = (): MechanismDraft => ({
-  schema_version: 'bgig.mechanism.v0',
-  kind: 'none',
-  slide_axis: 'x',
-  lid_thickness_mm: 1.2,
-  rail_height_mm: 1.2,
-  rail_clearance_mm: 0.3,
-  end_overlap_mm: 8,
-})
+const fillKindLabels: Record<FillElementDraft['kind'], string> = {
+  hollow: 'Bac vide',
+  solid: 'Remplissage plein',
+  separator: 'Séparateur',
+}
 
 export default function App() {
-  const [draft, setDraft] = useState<ComposerDraft>()
-  const [portfolio, setPortfolio] = useState<Portfolio>()
-  const [selectedVariantId, setSelectedVariantId] = useState<string>()
-  const [activeStep, setActiveStep] = useState<StepId>('box')
-  const [busy, setBusy] = useState(false)
-  const [message, setMessage] = useState('Chargement de ton atelier…')
+  const [project, setProject] = useState<ProjectV1Draft>()
+  const [message, setMessage] = useState('Préparation de ton projet…')
   const [error, setError] = useState<string>()
-  const [issues, setIssues] = useState<DraftIssue[]>([])
-  const [starters, setStarters] = useState<StarterTemplate[]>([])
-  const [showStarterPicker, setShowStarterPicker] = useState(false)
+  const [attemptedBuild, setAttemptedBuild] = useState(false)
 
   useEffect(() => {
-    void loadStarters()
-      .then((catalog) => {
-        if (!catalog.length) throw new Error('Aucun modèle local n’est disponible.')
-        setStarters(catalog)
-        setDraft(withAppearance(cloneDraft(catalog[0].draft)))
-        setMessage('Projet de départ chargé. Commence par vérifier les mesures de la boîte.')
+    void loadProjectV1Starter()
+      .then((starter) => {
+        setProject(starter)
+        setMessage('Commence par mesurer ta boîte, puis ajoute ce que tu veux ranger.')
       })
       .catch((reason: unknown) => setError(formatError(reason)))
   }, [])
 
-  const selectedVariant = useMemo(
-    () => portfolio?.variants.find((variant) => variant.id === selectedVariantId),
-    [portfolio, selectedVariantId],
-  )
+  const issues = useMemo(() => project ? validateProjectV1(project) : [], [project])
+  const metrics = useMemo(() => project ? projectMetrics(project) : undefined, [project])
 
-  const assetOwners = useMemo(() => {
-    const owners: Record<string, string[]> = {}
-    for (const candidate of draft?.candidates ?? []) {
-      for (const assetId of candidate.asset_ids) owners[assetId] = [...(owners[assetId] ?? []), candidate.id]
-    }
-    return owners
-  }, [draft])
-
-  const readiness = useMemo(() => draft ? summarizeDraft(draft) : undefined, [draft])
-  const currentStep = studioSteps.find((step) => step.id === activeStep) ?? studioSteps[0]
-
-  async function handleGenerate() {
-    if (!draft) return
-    const localIssues = validateDraft(draft)
-    if (localIssues.length) {
-      setIssues(localIssues)
-      setError(undefined)
-      setMessage(`${localIssues.length} point(s) sont à corriger avant de demander des idées au moteur.`)
-      return
-    }
-    setBusy(true)
+  function update(mutator: (current: ProjectV1Draft) => ProjectV1Draft) {
+    setProject((current) => current ? mutator(current) : current)
     setError(undefined)
-    setIssues([])
-    try {
-      const result = await generatePortfolio(draft)
-      setPortfolio(result)
-      setSelectedVariantId(result.recommended_variant_id ?? undefined)
-      setActiveStep('proposals')
-      setMessage(result.recommended_variant_id
-        ? `${result.variants.length} organisations ont été comparées. La recommandation est prête à être lue.`
-        : 'Aucune organisation complète n’a été trouvée : ajuste les contraintes indiquées.')
-    } catch (reason) {
-      setError(formatError(reason))
-    } finally {
-      setBusy(false)
-    }
+    setAttemptedBuild(false)
   }
 
-  async function handleExport() {
-    if (!draft || !selectedVariant) return
-    setBusy(true)
-    setError(undefined)
-    try {
-      const bundle = await createExport(draft, selectedVariant.id)
-      downloadJson(`${safeFileName(draft.project_name)}-decision.json`, bundle.selection)
-      downloadJson(`${safeFileName(draft.project_name)}-preparation-technique.json`, bundle.cad_ir)
-      setMessage('Le dossier de préparation contient des bacs ouverts à vérifier dans Fusion. Il ne confirme ni impression, ni mesure.')
-    } catch (reason) {
-      setError(formatError(reason))
-    } finally {
-      setBusy(false)
-    }
+  function addContent() {
+    update((current) => {
+      const group = newGroup(current)
+      const content: ProjectContentDraft = {
+        id: nextId('piece', current.contents.map((item) => item.id)),
+        name: 'Nouvelle pièce',
+        shape_kind: 'custom',
+        dimensions_mm: { x: 20, y: 20, z: 5 },
+        quantity: 1,
+        container_group_id: group.id,
+        content_clearance_mm: null,
+        measurement_confidence: 'exact',
+      }
+      return { ...current, container_groups: [...current.container_groups, group], contents: [...current.contents, content] }
+    })
   }
 
-  function updateDraft(mutator: (value: ComposerDraft) => ComposerDraft) {
-    setDraft((current) => (current ? mutator(current) : current))
-    setPortfolio(undefined)
-    setSelectedVariantId(undefined)
-    setIssues([])
-  }
-
-
-  function updateAppearance(next: AppearanceDraft) {
-    setDraft((current) => current ? { ...current, appearance: next } : current)
-    setMessage('Aperçu de forme et de style actualisé. L organisation et les dimensions restent inchangées.')
-  }
-  function updateMechanism(next: MechanismDraft) {
-    setDraft((current) => current ? { ...current, mechanism: next } : current)
-    setMessage(next.kind === 'sliding_lid'
-      ? 'Le couvercle coulissant est prepare comme coupon dans le dossier technique. Le plan ne bouge pas ; Fusion devra encore le confirmer.'
-      : 'Le projet reste sur des bacs ouverts. Le plan et les dimensions ne bougent pas.')
-  }
-  function chooseStarter(starter: StarterTemplate) {
-    setDraft(withAppearance(cloneDraft(starter.draft)))
-    setPortfolio(undefined)
-    setSelectedVariantId(undefined)
-    setActiveStep('box')
-    setIssues([])
-    setError(undefined)
-    setShowStarterPicker(false)
-    setMessage(`Modèle « ${starter.title} » chargé. Vérifie ses mesures avant de chercher une organisation.`)
-  }
-  function updateAsset(index: number, update: Partial<AssetDraft>) {
-    updateDraft((current) => ({
+  function addFlatItem() {
+    update((current) => ({
       ...current,
-      assets: current.assets.map((asset, position) => position === index ? { ...asset, ...update } : asset),
+      flat_items: [...current.flat_items, {
+        id: nextId('plat', current.flat_items.map((item) => item.id)),
+        name: 'Nouveau livret ou plateau',
+        kind: 'rulebook',
+        dimensions_mm: { x: 200, y: 140, z: 2 },
+        quantity: 1,
+        stack_order: null,
+      }],
     }))
   }
 
-  function updateAssetDimension(index: number, axis: keyof Dimension, value: number) {
-    updateDraft((current) => ({
+  function addFillElement() {
+    update((current) => ({
       ...current,
-      assets: current.assets.map((asset, position) => position === index
-        ? { ...asset, dimensions_mm: { ...asset.dimensions_mm, [axis]: value } }
-        : asset),
+      fill_elements: [...current.fill_elements, {
+        id: nextId('complement', current.fill_elements.map((item) => item.id)),
+        name: 'Bac vide à placer',
+        kind: 'hollow',
+        mode: 'auto',
+        dimensions_mm: null,
+        container_group_id: null,
+      }],
     }))
   }
 
-  function updateCandidate(index: number, update: Partial<CandidateDraft>) {
-    updateDraft((current) => ({
+  function assignContentToGroup(index: number, nextGroupId: string) {
+    update((current) => {
+      let groups = current.container_groups
+      let groupId = nextGroupId
+      if (nextGroupId === '__new__') {
+        const group = newGroup(current)
+        groups = [...groups, group]
+        groupId = group.id
+      }
+      return {
+        ...current,
+        container_groups: groups,
+        contents: current.contents.map((item, itemIndex) => itemIndex === index ? { ...item, container_group_id: groupId } : item),
+      }
+    })
+  }
+
+  function updateContentDimension(index: number, axis: keyof Dimension, value: number) {
+    update((current) => ({
       ...current,
-      candidates: current.candidates.map((candidate, position) => position === index ? { ...candidate, ...update } : candidate),
+      contents: current.contents.map((item, itemIndex) => {
+        if (itemIndex !== index) return item
+        const dimensions = { ...item.dimensions_mm, [axis]: value }
+        if (item.shape_kind === 'round' || item.shape_kind === 'square') {
+          if (axis === 'x' || axis === 'y') dimensions.x = dimensions.y = value
+        }
+        if (item.shape_kind === 'cube') dimensions.x = dimensions.y = dimensions.z = value
+        return { ...item, dimensions_mm: dimensions }
+      }),
     }))
   }
 
-  function updateCandidateDimension(index: number, axis: keyof Dimension, value: number) {
-    updateDraft((current) => ({
-      ...current,
-      candidates: current.candidates.map((candidate, position) => position === index
-        ? { ...candidate, size_mm: { ...candidate.size_mm, [axis]: value } }
-        : candidate),
-    }))
-  }
-
-  function updateReservation(index: number, update: Partial<ReservationDraft>) {
-    updateDraft((current) => ({
-      ...current,
-      reservations: current.reservations.map((reservation, position) => position === index ? { ...reservation, ...update } : reservation),
-    }))
-  }
-
-  function lockSelectedProposal() {
-    if (!draft || !selectedVariant) return
-    const lockedModules = selectedVariant.solution.solved_plan.modules
-      .filter((module) => Boolean(module.metadata?.auto_placed))
-      .map(toLockedModule)
-    if (!lockedModules.length) {
-      setError('Cette idée ne contient aucun emplacement automatique à conserver.')
-      return
-    }
-    updateDraft((current) => ({ ...current, manual_modules: lockedModules, candidates: [] }))
-    setMessage('Cette organisation est conservée comme positions fixes. Tu peux ensuite l’enregistrer ou reprendre les réglages experts.')
-  }
-
-  async function importDraft(event: ChangeEvent<HTMLInputElement>) {
+  async function importProject(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]
     if (!file) return
     try {
-      const incoming = JSON.parse(await file.text()) as unknown
-      if (!isComposerDraft(incoming)) throw new Error('Ce fichier ne correspond pas à un projet BGIG Studio compatible.')
-      const normalizedIncoming = withAppearance(incoming)
-      const importedIssues = validateDraft(normalizedIncoming)
-      setDraft(normalizedIncoming)
-      setPortfolio(undefined)
-      setSelectedVariantId(undefined)
-      setActiveStep('box')
-      setIssues(importedIssues)
-      setMessage(importedIssues.length
-        ? `Projet « ${incoming.project_name} » importé : ${importedIssues.length} point(s) sont à compléter.`
-        : `Projet « ${incoming.project_name} » importé. Tu peux l’explorer.`)
+      const raw = JSON.parse(await file.text()) as ProjectV1Draft
+      const normalized = await normalizeProjectV1(raw)
+      setProject(normalized.project)
+      setAttemptedBuild(false)
       setError(undefined)
+      setMessage(normalized.migrated
+        ? 'Ton ancien projet a été converti. Vérifie les bacs, plateaux et réglages avant de continuer.'
+        : 'Projet V0.1 importé. Tu peux reprendre là où tu en étais.')
     } catch (reason) {
       setError(formatError(reason))
     } finally {
@@ -238,192 +157,180 @@ export default function App() {
     }
   }
 
-  if (!draft || !readiness) {
-    return <main className="loading-shell"><div className="loading-card"><span className="orb" /><p>{error ?? 'Connexion à ton atelier local…'}</p></div></main>
+  function handleBuild() {
+    if (!project) return
+    setAttemptedBuild(true)
+    if (issues.length) {
+      setMessage(`${issues.length} point(s) sont à compléter avant de construire l’insert.`)
+      return
+    }
+    setMessage('Le projet est prêt. Le prochain lot calcule automatiquement les bacs, les plateaux et le remplissage complet.')
+  }
+
+  if (!project || !metrics) {
+    return <main className="loading-shell"><div className="loading-card"><span className="loading-dot" /><p>{error ?? 'Connexion à ton projet local…'}</p></div></main>
   }
 
   return (
-    <main className={`app-shell appearance-${draft.appearance.visual.theme}`}>
-      <header className="topbar">
+    <main className="studio-shell">
+      <header className="studio-topbar">
         <div className="brand"><span className="brand-mark">B</span><span>BGIG <strong>Studio</strong></span></div>
         <div className="topbar-actions">
-          <button className="button quiet" onClick={() => setShowStarterPicker((visible) => !visible)} disabled={!starters.length}>Changer de modèle</button>
-          <label className="button quiet"><span>Importer</span><input type="file" accept="application/json" onChange={importDraft} /></label>
-          <button className="button secondary" onClick={() => downloadJson(`${safeFileName(draft.project_name)}-projet.json`, draft)}>Sauvegarder</button>
-          <button className="button primary" onClick={() => void handleGenerate()} disabled={busy}>{busy ? 'Recherche…' : 'Explorer des idées'}</button>
+          <label className="button ghost"><span>Importer un projet</span><input type="file" accept="application/json" onChange={importProject} /></label>
+          <button className="button secondary" onClick={() => downloadJson(`${safeFileName(project.project_name)}-projet.json`, project)}>Sauvegarder</button>
         </div>
       </header>
 
-      {showStarterPicker && <section className="starter-gallery" aria-label="Modèles de démarrage"><div className="starter-gallery-heading"><div><p className="eyebrow">Nouveau point de départ</p><h2>Choisis un jeu proche du tien</h2><p>Chaque modèle reste local et modifiable. Il sert seulement à démarrer plus vite.</p></div><button className="text-button" onClick={() => setShowStarterPicker(false)}>Fermer</button></div><div className="starter-grid">{starters.map((starter) => <article key={starter.id} className="starter-card"><span className="starter-icon">▦</span><h3>{starter.title}</h3><p>{starter.description}</p><div className="starter-highlights">{starter.highlights.map((highlight) => <span key={highlight}>{highlight}</span>)}</div><button className="button secondary" onClick={() => chooseStarter(starter)}>Utiliser ce modèle</button></article>)}</div></section>}
-
-      <section className="studio-intro">
+      <section className="studio-hero">
         <div>
-          <p className="eyebrow">Atelier de rangement</p>
-          <h1>{draft.project_name || 'Nouveau projet'}</h1>
-          <p>Un espace pour organiser ta boîte, comprendre les compromis, puis préparer la suite sans termes techniques ni fausse promesse d’impression.</p>
+          <p className="eyebrow">Projet d’insert</p>
+          <h1>Organise ta boîte, simplement.</h1>
+          <p>Décris ce que tu veux ranger. BGIG prépare les bons bacs, garde la place des plateaux et remplit la boîte sans te demander de dessiner.</p>
         </div>
-        <ManufacturingStatus selectedVariant={selectedVariant} />
+        <div className="hero-status"><span className={issues.length ? 'status-dot warning' : 'status-dot'} /><div><strong>{issues.length ? 'À compléter' : 'Projet cohérent'}</strong><small>{issues.length ? `${issues.length} point(s) à vérifier` : 'Mesures et listes prêtes à construire'}</small></div></div>
       </section>
 
-      {error && <section className="notice error" aria-live="assertive"><strong>À corriger</strong><span>{error}</span></section>}
-      {issues.length > 0 && <section className="notice error" aria-live="polite"><strong>À compléter</strong><ul className="issue-list">{issues.map((issue, index) => <li key={`${issue.path}-${index}`}><b>{issue.path}</b> — {issue.message}</li>)}</ul></section>}
-      <section className="notice" aria-live="polite"><strong>Dans ton atelier</strong><span>{message}</span></section>
+      {error && <section className="message error" role="alert"><strong>Impossible de charger le projet</strong><span>{error}</span></section>}
+      <section className="message"><strong>Ce que tu fais ici</strong><span>{message}</span></section>
+      {attemptedBuild && issues.length > 0 && <IssueList issues={issues} />}
 
-      <nav className="studio-steps" aria-label="Étapes de conception">
-        {studioSteps.map((step, index) => <button key={step.id} type="button" className={step.id === activeStep ? 'active' : ''} onClick={() => setActiveStep(step.id)}><span>{String(index + 1).padStart(2, '0')}</span><b>{step.title}</b><small>{step.helper}</small></button>)}
-      </nav>
+      <section className="studio-layout">
+        <div className="editor-column">
+          <Section number="01" title="Ma boîte" subtitle="Mesure l’intérieur réellement disponible une fois la boîte fermée.">
+            <div className="field-grid box-fields">
+              <TextField label="Nom du projet" value={project.project_name} wide onChange={(value) => update((current) => ({ ...current, project_name: value }))} />
+              <NumberField label="Largeur intérieure" value={project.box.inner_dimensions_mm.x} onChange={(value) => update((current) => ({ ...current, box: { ...current.box, inner_dimensions_mm: { ...current.box.inner_dimensions_mm, x: value } } }))} />
+              <NumberField label="Profondeur intérieure" value={project.box.inner_dimensions_mm.y} onChange={(value) => update((current) => ({ ...current, box: { ...current.box, inner_dimensions_mm: { ...current.box.inner_dimensions_mm, y: value } } }))} />
+              <NumberField label="Hauteur intérieure" value={project.box.inner_dimensions_mm.z} onChange={(value) => update((current) => ({ ...current, box: { ...current.box, inner_dimensions_mm: { ...current.box.inner_dimensions_mm, z: value } } }))} />
+              <NumberField label="Hauteur disponible" value={project.box.usable_height_mm} onChange={(value) => update((current) => ({ ...current, box: { ...current.box, usable_height_mm: value } }))} />
+              <NumberField label="Marge sous le couvercle" value={project.box.lid_clearance_mm} minimum={0} onChange={(value) => update((current) => ({ ...current, box: { ...current.box, lid_clearance_mm: value } }))} />
+            </div>
+          </Section>
 
-      <section className="studio-workspace">
-        <StudioBoxPreview draft={draft} selectedVariant={selectedVariant} readiness={readiness} />
-        <section className="studio-editor" aria-labelledby="current-step-title">
-          <div className="step-heading"><span className="step-index">{String(studioSteps.findIndex((step) => step.id === activeStep) + 1).padStart(2, '0')}</span><div><p className="eyebrow">Étape active</p><h2 id="current-step-title">{currentStep.title}</h2><p>{currentStep.helper}</p></div></div>
-          {activeStep === 'box' && <section className="editor-card"><div className="card-intro"><h3>Mesure l’intérieur, pas la boîte extérieure</h3><p>Les chiffres ci-dessous mettent à jour la vue à gauche immédiatement. Utilise les dimensions réellement disponibles une fois le couvercle fermé.</p></div><div className="form-grid box-grid"><TextField label="Nom du projet" value={draft.project_name} onChange={(value) => updateDraft((current) => ({ ...current, project_name: value }))} wide /><NumberField label="Largeur interne" value={draft.box.inner_dimensions_mm.x} suffix="mm" onChange={(value) => updateDraft((current) => ({ ...current, box: { ...current.box, inner_dimensions_mm: { ...current.box.inner_dimensions_mm, x: value } } }))} /><NumberField label="Profondeur interne" value={draft.box.inner_dimensions_mm.y} suffix="mm" onChange={(value) => updateDraft((current) => ({ ...current, box: { ...current.box, inner_dimensions_mm: { ...current.box.inner_dimensions_mm, y: value } } }))} /><NumberField label="Hauteur interne" value={draft.box.inner_dimensions_mm.z} suffix="mm" onChange={(value) => updateDraft((current) => ({ ...current, box: { ...current.box, inner_dimensions_mm: { ...current.box.inner_dimensions_mm, z: value } } }))} /><NumberField label="Hauteur réellement exploitable" value={draft.box.usable_height_mm} suffix="mm" onChange={(value) => updateDraft((current) => ({ ...current, box: { ...current.box, usable_height_mm: value } }))} /><NumberField label="Marge sous le couvercle" value={draft.box.lid_clearance_mm} suffix="mm" onChange={(value) => updateDraft((current) => ({ ...current, box: { ...current.box, lid_clearance_mm: value } }))} /></div><div className="live-note"><span>↺</span><div><strong>Aperçu vivant</strong><p>Cette vue représente l’espace et les positions connues. Elle ne représente pas encore des bacs imprimables.</p></div></div></section>}
+          <Section number="02" title="Ce que tu veux ranger" subtitle="Une ligne par famille de pièces. Choisis le bac qu’elle doit partager avec les autres.">
+            <div className="section-heading"><p>{project.contents.length ? `${project.contents.length} famille(s) de pièces` : 'Aucune pièce pour le moment'}</p><button className="button secondary" onClick={addContent}>+ Ajouter une pièce</button></div>
+            <div className="table-scroll"><table className="data-table"><thead><tr><th>Pièce</th><th>Forme</th><th>Mesures</th><th>Quantité</th><th>Bac cible</th><th /></tr></thead><tbody>
+              {project.contents.map((content, index) => <tr key={content.id}>
+                <td><TextInput ariaLabel={`Nom de la pièce ${index + 1}`} value={content.name} onChange={(value) => update((current) => ({ ...current, contents: current.contents.map((item, itemIndex) => itemIndex === index ? { ...item, name: value } : item) }))} /></td>
+                <td><select aria-label={`Forme de ${content.name}`} value={content.shape_kind} onChange={(event) => update((current) => ({ ...current, contents: current.contents.map((item, itemIndex) => itemIndex === index ? { ...item, shape_kind: event.target.value as ProjectShapeKind } : item) }))}>{shapeOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></td>
+                <td><DimensionFields labels={shapeLabels[content.shape_kind]} value={content.dimensions_mm} onChange={(axis, value) => updateContentDimension(index, axis, value)} /></td>
+                <td><NumberInput ariaLabel={`Quantité de ${content.name}`} value={content.quantity} step={1} onChange={(value) => update((current) => ({ ...current, contents: current.contents.map((item, itemIndex) => itemIndex === index ? { ...item, quantity: Math.round(value) } : item) }))} /></td>
+                <td><select aria-label={`Bac cible de ${content.name}`} value={content.container_group_id} onChange={(event) => assignContentToGroup(index, event.target.value)}>{project.container_groups.map((group) => <option key={group.id} value={group.id}>{group.name}</option>)}<option value="__new__">+ Créer un nouveau bac</option></select></td>
+                <td><button className="delete-button" aria-label={`Supprimer ${content.name}`} onClick={() => update((current) => ({ ...current, contents: current.contents.filter((_, itemIndex) => itemIndex !== index) }))}>×</button></td>
+              </tr>)}
+            </tbody></table></div>
+            <p className="helper-copy">Rond, carré et cube synchronisent automatiquement leurs côtés. « Sur mesure » te laisse saisir les trois mesures librement.</p>
+          </Section>
 
-          {activeStep === 'contents' && <section className="editor-card"><div className="card-heading"><div><h3>Ce qui doit vraiment trouver sa place</h3><p>Indique le type, la quantité et l’encombrement d’un élément. Les dimensions peuvent rester approximatives au départ.</p></div><button className="button secondary" onClick={() => updateDraft((current) => ({ ...current, assets: [...current.assets, newAsset(current.assets.length + 1)] }))}>+ Ajouter un élément</button></div><div className="table-wrap"><table><thead><tr><th>Élément</th><th>Type</th><th>Qté</th><th>Largeur</th><th>Profondeur</th><th>Hauteur</th><th>Priorité</th><th /></tr></thead><tbody>{draft.assets.map((asset, index) => <tr key={asset.id}><td><TextInput value={asset.name} onChange={(value) => updateAsset(index, { name: value })} /></td><td><select value={asset.kind} onChange={(event) => updateAsset(index, { kind: event.target.value as AssetDraft['kind'] })}>{assetKinds.map((value) => <option key={value} value={value}>{kindLabel(value)}</option>)}</select></td><td><NumberInput value={asset.quantity.count} onChange={(value) => updateAsset(index, { quantity: { ...asset.quantity, count: value } })} /></td><td><NumberInput value={asset.dimensions_mm.x} onChange={(value) => updateAssetDimension(index, 'x', value)} /></td><td><NumberInput value={asset.dimensions_mm.y} onChange={(value) => updateAssetDimension(index, 'y', value)} /></td><td><NumberInput value={asset.dimensions_mm.z} onChange={(value) => updateAssetDimension(index, 'z', value)} /></td><td><select value={asset.containment_intent} onChange={(event) => updateAsset(index, { containment_intent: event.target.value as AssetDraft['containment_intent'] })}><option value="store">Ranger</option><option value="protect">Protéger</option><option value="separate">Séparer</option><option value="access_first">Accès rapide</option></select></td><td><button className="icon-button" aria-label={`Supprimer ${asset.name}`} onClick={() => updateDraft((current) => ({ ...current, assets: current.assets.filter((_, position) => position !== index) }))}>×</button></td></tr>)}</tbody></table></div><div className="step-actions"><button className="button primary" onClick={() => setActiveStep('organisation')}>Continuer vers l’organisation</button></div></section>}
-          {activeStep === 'organisation' && <section className="editor-card"><div className="card-intro"><h3>Garde visibles les contraintes qui comptent</h3><p>La plupart des jeux démarrent avec un modèle et quelques mesures. Les réglages ci-dessous servent lorsque tu dois protéger un livret, un plateau ou contrôler précisément les emplacements.</p></div><details className="expert-disclosure"><summary><span>Réservations fixes</span><small>Livret, plateau, bac existant…</small></summary><div className="disclosure-content"><div className="subpanel-heading"><p>Ces volumes ne seront pas déplacés par les propositions.</p><button className="text-button" onClick={() => updateDraft((current) => ({ ...current, reservations: [...current.reservations, newReservation(current.reservations.length + 1, current.layers[0]?.id ?? 'base')] }))}>+ Ajouter une réservation</button></div>{draft.reservations.length === 0 && <p className="empty-copy">Aucune réservation : la boîte est entièrement disponible.</p>}{draft.reservations.map((reservation, index) => <ReservationEditor key={reservation.id} reservation={reservation} layers={draft.layers.map((layer) => layer.id)} onChange={(update) => updateReservation(index, update)} onDelete={() => updateDraft((current) => ({ ...current, reservations: current.reservations.filter((_, position) => position !== index) }))} />)}</div></details><details className="expert-disclosure"><summary><span>Réglages des bacs envisagés</span><small>Pour guider le moteur, pas pour dessiner une pièce.</small></summary><div className="disclosure-content"><div className="subpanel-heading"><p>Un candidat décrit l’encombrement souhaité d’un futur bac.</p><button className="text-button" onClick={() => updateDraft((current) => ({ ...current, candidates: [...current.candidates, newCandidate(current.candidates.length + 1, current.layers[0]?.id ?? 'base')] }))}>+ Ajouter un bac envisagé</button></div>{draft.candidates.length === 0 && <p className="empty-copy">Aucun réglage avancé. Une décision conservée apparaîtra ici comme position fixe.</p>}{draft.candidates.map((candidate, index) => <CandidateEditor key={candidate.id} candidate={candidate} assets={draft.assets} assetOwners={assetOwners} layers={draft.layers.map((layer) => layer.id)} onChange={(update) => updateCandidate(index, update)} onDimensionChange={(axis, value) => updateCandidateDimension(index, axis, value)} onDelete={() => updateDraft((current) => ({ ...current, candidates: current.candidates.filter((_, position) => position !== index) }))} />)}</div></details>{draft.manual_modules.length > 0 && <div className="lock-strip"><strong>{draft.manual_modules.length} position(s) conservée(s)</strong><span>Elles restent fixes pour la prochaine recherche.</span><button className="text-button" onClick={() => updateDraft((current) => ({ ...current, manual_modules: [] }))}>Tout libérer</button></div>}<div className="step-actions"><button className="button primary" onClick={() => void handleGenerate()} disabled={busy}>{busy ? 'Recherche…' : 'Voir les idées possibles'}</button></div></section>}
+          <Section number="03" title="Plateaux et livrets" subtitle="Ces éléments sont posés au-dessus des bacs. Leur pile sera réservée automatiquement.">
+            <div className="section-heading"><p>{project.flat_items.length ? `${project.flat_items.length} élément(s) plat(s)` : 'Tu peux laisser cette liste vide.'}</p><button className="button secondary" onClick={addFlatItem}>+ Ajouter un plateau ou livret</button></div>
+            <div className="table-scroll"><table className="data-table compact"><thead><tr><th>Élément</th><th>Type</th><th>Mesures</th><th>Qté</th><th>Ordre</th><th /></tr></thead><tbody>
+              {project.flat_items.map((item, index) => <FlatItemRow key={item.id} item={item} index={index} onChange={(change) => update((current) => ({ ...current, flat_items: current.flat_items.map((entry, entryIndex) => entryIndex === index ? { ...entry, ...change } : entry) }))} onDimensionChange={(axis, value) => update((current) => ({ ...current, flat_items: current.flat_items.map((entry, entryIndex) => entryIndex === index ? { ...entry, dimensions_mm: { ...entry.dimensions_mm, [axis]: value } } : entry) }))} onDelete={() => update((current) => ({ ...current, flat_items: current.flat_items.filter((_, entryIndex) => entryIndex !== index) }))} />)}
+            </tbody></table></div>
+          </Section>
 
-          {activeStep === 'proposals' && <section className="editor-card"><div className="card-heading"><div><h3>Choisis un compromis, pas une boîte noire</h3><p>Chaque idée explique ce qu’elle privilégie. Les scores aident à comparer ; ils ne remplacent ni une mesure réelle, ni une impression.</p></div><label className="preference">Ce qui compte le plus<select value={draft.preference} onChange={(event) => updateDraft((current) => ({ ...current, preference: event.target.value as ComposerDraft['preference'] }))}><option value="balanced">Un bon équilibre</option><option value="compact">Prendre le moins de place</option><option value="accessible">Accéder facilement au matériel</option><option value="print_simple">Rester simple à fabriquer</option></select></label></div>{!portfolio && <div className="empty-state"><div className="empty-illustration">✦</div><h3>Prêt à comparer</h3><p>Quand tes mesures sont cohérentes, le moteur peut te proposer plusieurs organisations.</p><button className="button primary" onClick={() => void handleGenerate()} disabled={busy}>{busy ? 'Recherche…' : 'Explorer les idées'}</button></div>}{portfolio && <><div className="portfolio-summary"><span>{portfolio.variants.length} idées comparées</span><span>·</span><span>Priorité : {preferenceLabel(portfolio.preference.id)}</span></div><div className="variant-grid">{portfolio.variants.map((variant) => <VariantCard key={variant.id} variant={variant} active={selectedVariantId === variant.id} onSelect={() => { setSelectedVariantId(variant.id); setActiveStep('prepare') }} />)}</div><details className="limits"><summary>Ce que ces idées ne valident pas encore</summary><ul>{portfolio.limits.map((limit) => <li key={limit}>{limit}</li>)}</ul></details></>}</section>}
-          {activeStep === 'prepare' && <section className="editor-card prepare-card"><div className="card-intro"><h3>{selectedVariant ? 'Ton organisation est choisie' : 'Choisis d’abord une idée'}</h3><p>{selectedVariant ? `« ${proposalExplanation(selectedVariant.policy_id).title} » est retenue. Tu peux l’enregistrer comme décision, le téléchargement prépare des bacs ouverts à vérifier dans Fusion.` : 'Reviens à l’étape “Les idées” pour sélectionner une organisation.'}</p></div><div className="manufacturing-path" aria-label="Étapes de fabrication"><div className="active"><span>1</span><strong>À explorer</strong><small>Organisation numérique choisie</small></div><div><span>2</span><strong>À vérifier dans Fusion</strong><small>Après la génération de vrais bacs</small></div><div><span>3</span><strong>À imprimer et mesurer</strong><small>Validation physique nécessaire</small></div></div><AppearanceEditor appearance={draft.appearance} onChange={updateAppearance} /><MechanismEditor mechanism={draft.mechanism} onChange={updateMechanism} />{selectedVariant && <div className="prepare-actions"><button className="button secondary" disabled={busy} onClick={lockSelectedProposal}>Conserver cette organisation</button><button className="button primary" onClick={() => downloadJson(`${safeFileName(draft.project_name)}-projet.json`, draft)}>Sauvegarder le projet</button></div>}<details className="technical-download"><summary>Mode expert : télécharger le dossier de préparation</summary><p>Ce téléchargement contient les bacs ouverts et leur dossier technique. Il ne lance aucune scène Fusion et ne valide ni impression ni mesure.</p><button className="button quiet" disabled={!selectedVariant || busy} onClick={() => void handleExport()}>Télécharger le dossier technique</button></details></section>}
-        </section>
+          <Section number="04" title="Les bacs demandés" subtitle="Ils se créent automatiquement quand tu associes une pièce à un nouveau bac.">
+            <div className="group-grid">{project.container_groups.map((group) => <ContainerGroupCard key={group.id} group={group} contentCount={project.contents.filter((content) => content.container_group_id === group.id).length} onChange={(change) => update((current) => ({ ...current, container_groups: current.container_groups.map((entry) => entry.id === group.id ? { ...entry, ...change } : entry) }))} onDelete={() => update((current) => ({ ...current, container_groups: current.container_groups.filter((entry) => entry.id !== group.id), contents: current.contents.filter((content) => content.container_group_id !== group.id) }))} />)}</div>
+          </Section>
+
+          <Section number="05" title="Compléter l’espace" subtitle="Ajoute un bac vide, un séparateur ou un remplissage précis si tu sais déjà ce que tu veux.">
+            <div className="section-heading"><p>BGIG proposera aussi des compléments quand un espace reste libre.</p><button className="button secondary" onClick={addFillElement}>+ Ajouter un complément</button></div>
+            {project.fill_elements.length === 0 ? <div className="empty-row">Aucun complément demandé : BGIG cherchera d’abord à agrandir utilement les bacs.</div> : <div className="fill-list">{project.fill_elements.map((element, index) => <FillElementRow key={element.id} element={element} groups={project.container_groups} onChange={(change) => update((current) => ({ ...current, fill_elements: current.fill_elements.map((entry, entryIndex) => entryIndex === index ? { ...entry, ...change } : entry) }))} onDelete={() => update((current) => ({ ...current, fill_elements: current.fill_elements.filter((_, entryIndex) => entryIndex !== index) }))} />)}</div>}
+          </Section>
+
+          <Section number="06" title="Réglages de fabrication" subtitle="Ces valeurs sont appliquées à toute la boîte, sauf si un bac possède sa propre valeur.">
+            <div className="field-grid settings-fields">
+              <NumberField label="Jeu entre les bacs" value={project.layout.layout_clearance_mm} minimum={0} onChange={(value) => update((current) => ({ ...current, layout: { ...current.layout, layout_clearance_mm: value } }))} />
+              <NumberField label="Parois par défaut" value={project.layout.default_wall_thickness_mm} onChange={(value) => update((current) => ({ ...current, layout: { ...current.layout, default_wall_thickness_mm: value } }))} />
+              <NumberField label="Fond par défaut" value={project.layout.default_floor_thickness_mm} onChange={(value) => update((current) => ({ ...current, layout: { ...current.layout, default_floor_thickness_mm: value } }))} />
+              <NumberField label="Jeu autour des pièces" value={project.layout.default_content_clearance_mm} minimum={0} onChange={(value) => update((current) => ({ ...current, layout: { ...current.layout, default_content_clearance_mm: value } }))} />
+            </div>
+          </Section>
+
+          <section className="build-panel"><div><p className="eyebrow">Prêt quand tu l’es</p><h2>Construire mon insert</h2><p>Le projet est vérifié avant le calcul. Les bacs et le remplissage complet seront ensuite déterminés par le moteur.</p></div><button className="build-button" onClick={handleBuild}>Construire mon insert <span>→</span></button></section>
+        </div>
+
+        <aside className="preview-column"><ProjectPreview project={project} metrics={metrics} /><section className="summary-card"><p className="eyebrow">Ce que BGIG voit</p><div className="summary-line"><span>Pièces à ranger</span><strong>{metrics.itemCount}</strong></div><div className="summary-line"><span>Bacs demandés</span><strong>{metrics.groupCount}</strong></div><div className="summary-line"><span>Hauteur plateaux/livrets</span><strong>{formatMillimeters(metrics.flatHeight)}</strong></div><div className="summary-line"><span>Volume intérieur</span><strong>{formatVolume(metrics.volume)}</strong></div></section><section className="tip-card"><strong>À retenir</strong><p>La vue est un plan de saisie, pas une fausse promesse de placement. Le moteur calculera les dimensions et positions réelles des bacs au moment de la construction.</p></section></aside>
       </section>
     </main>
   )
 }
 
-function AppearanceEditor({ appearance, onChange }: { appearance: AppearanceDraft; onChange: (next: AppearanceDraft) => void }) {
-  const updateShape = (update: Partial<AppearanceDraft['shape']>) => onChange({ ...appearance, shape: { ...appearance.shape, ...update } })
-  const updateVisual = (update: Partial<AppearanceDraft['visual']>) => onChange({ ...appearance, visual: { ...appearance.visual, ...update } })
-  return <section className="appearance-editor" aria-label="Forme et style"><div className="appearance-heading"><div><p className="eyebrow">Finition vivante</p><h3>Donne un style à tes bacs</h3><p>Ces choix changent l aperçu et se sauvegardent avec le projet. Ils ne changent pas encore la géométrie Fusion ni les dimensions à imprimer.</p></div><span className="preview-tag">Aperçu uniquement</span></div><div className="appearance-grid"><label className="field"><span>Coins</span><select value={appearance.shape.corner_style} onChange={(event) => updateShape({ corner_style: event.target.value as AppearanceDraft['shape']['corner_style'] })}><option value="rounded">Arrondis</option><option value="straight">Droits</option><option value="chamfered">Biseautés</option></select></label><NumberField label="Rayon d aperçu" value={appearance.shape.corner_radius_mm} suffix="mm" onChange={(value) => updateShape({ corner_radius_mm: clamp(value, 0, 12) })} /><NumberField label="Biseau d aperçu" value={appearance.shape.chamfer_mm} suffix="mm" onChange={(value) => updateShape({ chamfer_mm: clamp(value, 0, 6) })} /><label className="field"><span>Prise visuelle</span><select value={appearance.shape.notch_style} onChange={(event) => updateShape({ notch_style: event.target.value as AppearanceDraft['shape']['notch_style'] })}><option value="none">Aucune</option><option value="front_scoop">Échancrure douce</option><option value="thumb_notch">Passe-doigt</option></select></label><label className="field"><span>Ambiance</span><select value={appearance.visual.theme} onChange={(event) => updateVisual({ theme: event.target.value as AppearanceDraft['visual']['theme'] })}><option value="atelier">Atelier calme</option><option value="graphite">Graphite</option><option value="playful">Jeu coloré</option></select></label><label className="field"><span>Étiquettes</span><select value={appearance.visual.label_mode} onChange={(event) => updateVisual({ label_mode: event.target.value as AppearanceDraft['visual']['label_mode'] })}><option value="none">Aucune</option><option value="module_name">Nom du bac</option><option value="module_name_and_role">Nom et role</option></select></label><label className="field"><span>Typographie</span><select value={appearance.visual.typography} onChange={(event) => updateVisual({ typography: event.target.value as AppearanceDraft['visual']['typography'] })}><option value="quiet">Sobre</option><option value="bold">Affirmée</option></select></label></div><div className="appearance-guard"><strong>Ce qui est protege</strong><span>Le plan, les tolérances, les murs et le fond ne bougent pas. Les formes imprimées viendront seulement après contraintes et validation physique.</span></div></section>
+function Section({ number, title, subtitle, children }: { number: string; title: string; subtitle: string; children: React.ReactNode }) {
+  return <section className="work-section"><header><span className="section-number">{number}</span><div><h2>{title}</h2><p>{subtitle}</p></div></header>{children}</section>
 }
 
-function MechanismEditor({ mechanism, onChange }: { mechanism: MechanismDraft; onChange: (next: MechanismDraft) => void }) {
-  const update = (change: Partial<MechanismDraft>) => onChange({ ...mechanism, ...change })
-  return <section className="mechanism-editor" aria-label="Couvercle coulissant"><div className="mechanism-heading"><div><p className="eyebrow">Fermeture a tester</p><h3>Couvercle coulissant</h3><p>Choisis si tu veux preparer un couvercle qui glisse. Ce reglage se sauvegarde avec ton projet et montre son intention dans l apercu.</p></div><span className="preview-tag">Essai requis</span></div><div className="mechanism-grid"><label className="field"><span>Fermeture</span><select value={mechanism.kind} onChange={(event) => update({ kind: event.target.value as MechanismDraft['kind'] })}><option value="none">Bac ouvert pour le moment</option><option value="sliding_lid">Couvercle coulissant</option></select></label>{mechanism.kind === 'sliding_lid' && <><label className="field"><span>Sens de glisse</span><select value={mechanism.slide_axis} onChange={(event) => update({ slide_axis: event.target.value as MechanismDraft['slide_axis'] })}><option value="x">Sur la largeur</option><option value="y">Sur la profondeur</option></select></label><NumberField label="Epaisseur du couvercle" value={mechanism.lid_thickness_mm} suffix="mm" onChange={(value) => update({ lid_thickness_mm: clamp(value, .8, 3) })} /><NumberField label="Hauteur des rails" value={mechanism.rail_height_mm} suffix="mm" onChange={(value) => update({ rail_height_mm: clamp(value, .8, 3) })} /><NumberField label="Jeu de glisse" value={mechanism.rail_clearance_mm} suffix="mm" onChange={(value) => update({ rail_clearance_mm: clamp(value, .15, .6) })} /><NumberField label="Recouvrement aux bouts" value={mechanism.end_overlap_mm} suffix="mm" onChange={(value) => update({ end_overlap_mm: clamp(value, 6, 20) })} /></>}</div><div className="mechanism-guard"><strong>Ce qui est protege</strong><span>Le moteur ne change pas l organisation. Le dossier technique prepare un coupon : un bac et un capot a deux glissieres. Fusion puis une impression mesuree restent obligatoires.</span></div></section>
-}
-type PreviewModuleData = Pick<EngineModule, 'id' | 'name' | 'origin_mm' | 'size_mm' | 'locked'>
-function PreviewModule({ module, viewHeight, appearance }: { module: PreviewModuleData; viewHeight: number; appearance: AppearanceDraft }) {
-  const x = module.origin_mm.x
-  const y = viewHeight - module.origin_mm.y - module.size_mm.y
-  const width = module.size_mm.x
-  const height = module.size_mm.y
-  const radius = appearance.shape.corner_style === 'rounded' ? Math.min(appearance.shape.corner_radius_mm, width / 4, height / 4) : 0
-  const cut = Math.min(appearance.shape.chamfer_mm, width / 4, height / 4)
-  const moduleClass = `module-fill ${module.locked ? 'locked' : ''} ${appearance.shape.corner_style}`
-  const notchRadius = Math.min(width, height) * .11
-  return <g><>{appearance.shape.corner_style === 'chamfered' ? <path className={moduleClass} d={`M ${x + cut} ${y} H ${x + width - cut} L ${x + width} ${y + cut} V ${y + height - cut} L ${x + width - cut} ${y + height} H ${x + cut} L ${x} ${y + height - cut} V ${y + cut} Z`} /> : <rect x={x} y={y} width={width} height={height} rx={radius} className={moduleClass} />}</>{appearance.shape.notch_style !== 'none' && <path className={`preview-notch ${appearance.shape.notch_style}`} d={`M ${x + width / 2 - notchRadius} ${y + height} Q ${x + width / 2} ${y + height - notchRadius} ${x + width / 2 + notchRadius} ${y + height}`} />}{appearance.visual.label_mode !== 'none' && <text className={`appearance-label ${appearance.visual.typography}`} x={x + 3} y={y + height - 4}>{module.name}{appearance.visual.label_mode === 'module_name_and_role' && <tspan x={x + 3} dy="8">bac</tspan>}</text>}</g>
-}
-function ManufacturingStatus({ selectedVariant }: { selectedVariant?: Variant }) {
-  return <div className="manufacturing-status"><span className="status-dot" /><div><strong>{selectedVariant ? 'À explorer' : 'Projet en préparation'}</strong><small>{selectedVariant ? 'Des bacs ouverts peuvent être préparés, puis vérifiés dans Fusion.' : 'Ajoute les mesures pour commencer.'}</small></div></div>
+function FlatItemRow({ item, index, onChange, onDimensionChange, onDelete }: { item: FlatItemDraft; index: number; onChange: (change: Partial<FlatItemDraft>) => void; onDimensionChange: (axis: keyof Dimension, value: number) => void; onDelete: () => void }) {
+  return <tr><td><TextInput ariaLabel={`Nom de l’élément plat ${index + 1}`} value={item.name} onChange={(name) => onChange({ name })} /></td><td><select aria-label={`Type de ${item.name}`} value={item.kind} onChange={(event) => onChange({ kind: event.target.value as FlatItemDraft['kind'] })}><option value="board">Plateau</option><option value="rulebook">Livret</option><option value="other">Autre élément plat</option></select></td><td><DimensionFields labels={['Largeur', 'Profondeur', 'Épaisseur']} value={item.dimensions_mm} onChange={onDimensionChange} /></td><td><NumberInput ariaLabel={`Quantité de ${item.name}`} value={item.quantity} step={1} onChange={(quantity) => onChange({ quantity: Math.round(quantity) })} /></td><td><NumberInput ariaLabel={`Ordre de ${item.name}`} value={item.stack_order ?? 0} step={1} onChange={(stack_order) => onChange({ stack_order: Math.round(stack_order) })} /></td><td><button className="delete-button" aria-label={`Supprimer ${item.name}`} onClick={onDelete}>×</button></td></tr>
 }
 
-function StudioBoxPreview({ draft, selectedVariant, readiness }: { draft: ComposerDraft; selectedVariant?: Variant; readiness: ReturnType<typeof summarizeDraft> }) {
-  const appearance = draft.appearance
-  const width = Math.max(1, draft.box.inner_dimensions_mm.x)
-  const depth = Math.max(1, draft.box.inner_dimensions_mm.y)
-  const plan = selectedVariant?.solution.solved_plan
-  const reservations = plan ? plan.reservations : draft.reservations
-  const modules = plan ? plan.modules : draft.manual_modules
-  const capacity = Math.max(0, width * depth * Math.max(0, draft.box.usable_height_mm))
-  const listedVolume = draft.assets.reduce((sum, asset) => sum + Math.max(0, asset.dimensions_mm.x * asset.dimensions_mm.y * asset.dimensions_mm.z * asset.quantity.count), 0)
-  const estimatedFill = capacity > 0 ? Math.min(100, Math.round((listedVolume / capacity) * 100)) : 0
-  return <aside className={`box-preview-panel appearance-preview ${appearance.shape.corner_style}`} aria-label="Aperçu vivant de la boîte"><div className="preview-heading"><div><p className="eyebrow">Vue vivante</p><h2>Ta boîte, maintenant</h2></div><span className="preview-tag">Plan 2D</span></div><div className="box-canvas"><svg viewBox={`0 0 ${width} ${depth}`} role="img" aria-label="Vue de dessus de la boîte"><rect width={width} height={depth} className="box-fill" />{reservations.map((entry) => <rect key={entry.id} x={entry.origin_mm.x} y={depth - entry.origin_mm.y - entry.size_mm.y} width={entry.size_mm.x} height={entry.size_mm.y} className="reservation-fill" />)}{modules.map((module) => <PreviewModule key={module.id} module={module} viewHeight={depth} appearance={appearance} />)}</svg>{modules.length === 0 && <div className="canvas-empty"><span>+</span><p>Les emplacements apparaîtront ici quand tu choisiras une idée.</p></div>}</div><div className="preview-legend"><span><i className="legend-reservation" />À garder libre</span><span><i className="legend-module" />Organisation choisie</span></div><div className="appearance-summary"><span>Forme : {appearanceLabel(appearance.shape.corner_style)}</span><span>Finition : {appearanceLabel(appearance.shape.notch_style)}</span><span>Labels : {appearanceLabel(appearance.visual.label_mode)}</span><span className="mechanism-preview-pill">Fermeture : {draft.mechanism.kind === 'sliding_lid' ? 'coulissant - essai' : 'bac ouvert'}</span></div><div className="preview-metrics"><div><span>Espace utile</span><strong>{formatVolume(capacity)}</strong><small>{formatDimension(draft.box.inner_dimensions_mm)}</small></div><div><span>Contenu déclaré</span><strong>{draft.assets.length} élément{draft.assets.length > 1 ? 's' : ''}</strong><small>{estimatedFill}% du volume estimé</small></div><div><span>Préparation</span><strong>{readiness.issues.length ? 'À compléter' : 'Prêt à explorer'}</strong><small>{readiness.reservation_count} zone(s) protégée(s)</small></div></div><p className="preview-disclaimer">Cet apercu reste une carte de rangement. Le dossier technique peut preparer un coupon coulissant ; Fusion puis une impression mesuree restent a verifier.</p></aside>
-}
-function VariantCard({ variant, active, onSelect }: { variant: Variant; active: boolean; onSelect: () => void }) {
-  const explanation = proposalExplanation(variant.policy_id)
-  return <article className={`variant-card ${active ? 'active' : ''}`}><div className="variant-card-header"><div><span className={`pill ${variant.recommended ? 'recommended' : ''}`}>{variant.recommended ? 'Recommandée' : variant.pareto ? 'Alternative solide' : 'Alternative'}</span><h3>{explanation.title}</h3></div><button className="select-button" onClick={onSelect}>{active ? 'Choisie' : 'Choisir'}</button></div><p className="variant-intent">{explanation.intent}</p><LayoutPreview variant={variant} /><div className="variant-advice"><div><strong>Bien si tu veux</strong><span>{explanation.choose_if}</span></div><div><strong>À surveiller</strong><span>{explanation.watch_for}</span></div></div><div className="score-line"><strong>{formatScore(variant.weighted_score)}</strong><span>selon ta priorité</span></div><div className="score-grid">{Object.entries(variant.subscores).map(([key, score]) => <div key={key}><span>{scoreLabels[key] ?? key}</span><small>{scoreExplanation(key)}</small><meter min="0" max="1" value={score} /><b>{formatScore(score)}</b></div>)}</div><details className="engine-note"><summary>Détails pour expert</summary><ul>{variant.reasons.map((reason) => <li key={reason}>{reason}</li>)}</ul></details></article>
+function ContainerGroupCard({ group, contentCount, onChange, onDelete }: { group: ContainerGroupDraft; contentCount: number; onChange: (change: Partial<ContainerGroupDraft>) => void; onDelete: () => void }) {
+  return <article className="group-card"><div className="group-card-heading"><span>{contentCount} famille(s)</span>{contentCount === 0 && <button className="text-button danger" onClick={onDelete}>Supprimer</button>}</div><TextField label="Nom du bac" value={group.name} onChange={(name) => onChange({ name })} /><div className="mini-grid"><OptionalNumberField label="Parois" value={group.wall_thickness_mm} onChange={(wall_thickness_mm) => onChange({ wall_thickness_mm })} /><OptionalNumberField label="Fond" value={group.floor_thickness_mm} onChange={(floor_thickness_mm) => onChange({ floor_thickness_mm })} /></div><p>Vide = réglage général.</p></article>
 }
 
-function LayoutPreview({ variant }: { variant: Variant }) {
-  const plan = variant.solution.solved_plan
-  const layer = plan.layers[0]
-  const width = Math.max(1, plan.box.inner_dimensions_mm.x)
-  const height = Math.max(1, plan.box.inner_dimensions_mm.y)
-  const reservations = plan.reservations.filter((entry) => entry.layer_id === layer?.id)
-  const modules = plan.modules.filter((entry) => entry.layer_id === layer?.id)
-  return <div className="layout-preview"><svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`Plan de la proposition ${variant.policy_id}`}><rect width={width} height={height} className="box-fill" />{reservations.map((entry) => <rect key={entry.id} x={entry.origin_mm.x} y={height - entry.origin_mm.y - entry.size_mm.y} width={entry.size_mm.x} height={entry.size_mm.y} className="reservation-fill" />)}{modules.map((module) => <g key={module.id}><rect x={module.origin_mm.x} y={height - module.origin_mm.y - module.size_mm.y} width={module.size_mm.x} height={module.size_mm.y} className={module.locked ? 'module-fill locked' : 'module-fill'} /><text x={module.origin_mm.x + 3} y={height - module.origin_mm.y - 4}>{module.name}</text></g>)}</svg><span>{layer ? `Niveau · ${layer.id}` : 'Vue de dessus'}</span></div>
+function FillElementRow({ element, groups, onChange, onDelete }: { element: FillElementDraft; groups: ContainerGroupDraft[]; onChange: (change: Partial<FillElementDraft>) => void; onDelete: () => void }) {
+  return <article className="fill-row"><TextField label="Nom" value={element.name} onChange={(name) => onChange({ name })} /><label className="field"><span>Type</span><select value={element.kind} onChange={(event) => onChange({ kind: event.target.value as FillElementDraft['kind'] })}>{Object.entries(fillKindLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label><label className="field"><span>Taille</span><select value={element.mode} onChange={(event) => onChange({ mode: event.target.value as FillElementDraft['mode'], dimensions_mm: event.target.value === 'auto' ? null : { x: 10, y: 10, z: 10 } })}><option value="auto">À calculer</option><option value="exact">Je donne les mesures</option></select></label><label className="field"><span>Bac associé</span><select value={element.container_group_id ?? ''} onChange={(event) => onChange({ container_group_id: event.target.value || null })}><option value="">Dans toute la boîte</option>{groups.map((group) => <option key={group.id} value={group.id}>{group.name}</option>)}</select></label>{element.dimensions_mm && <div className="fill-dimensions"><DimensionFields labels={['Largeur', 'Profondeur', 'Hauteur']} value={element.dimensions_mm} onChange={(axis, value) => onChange({ dimensions_mm: { ...element.dimensions_mm!, [axis]: value } })} /></div>}<button className="delete-button" aria-label={`Supprimer ${element.name}`} onClick={onDelete}>×</button></article>
 }
 
-function ReservationEditor({ reservation, layers, onChange, onDelete }: { reservation: ReservationDraft; layers: string[]; onChange: (update: Partial<ReservationDraft>) => void; onDelete: () => void }) {
-  return <div className="compact-editor"><div className="compact-top"><TextInput value={reservation.id} onChange={(value) => onChange({ id: value })} /><select value={reservation.kind} onChange={(event) => onChange({ kind: event.target.value as ReservationDraft['kind'] })}><option value="rulebook">Livret</option><option value="board">Plateau</option><option value="existing_tray">Bac existant</option><option value="generic">Réserve</option></select><select value={reservation.layer_id} onChange={(event) => onChange({ layer_id: event.target.value })}>{layers.map((layer) => <option key={layer}>{layer}</option>)}</select><button className="icon-button" aria-label="Supprimer la réservation" onClick={onDelete}>×</button></div><DimensionEditor label="Origine" value={reservation.origin_mm} onChange={(value) => onChange({ origin_mm: value })} /><DimensionEditor label="Taille" value={reservation.size_mm} onChange={(value) => onChange({ size_mm: value })} /></div>
+function ProjectPreview({ project, metrics }: { project: ProjectV1Draft; metrics: ReturnType<typeof projectMetrics> }) {
+  const width = Math.max(project.box.inner_dimensions_mm.x, 1)
+  const depth = Math.max(project.box.inner_dimensions_mm.y, 1)
+  const topHeightRatio = Math.min(1, metrics.flatHeight / Math.max(project.box.usable_height_mm, 1))
+  const groups = project.container_groups
+  const palette = ['#D9A441', '#94B78B', '#7FA8C9', '#C58DA4', '#7E9E91', '#BD9A6C']
+  return <section className="preview-card"><div className="preview-heading"><div><p className="eyebrow">Vue vivante</p><h2>Ta boîte, maintenant</h2></div><span>Plan de saisie</span></div><div className="box-figure"><svg viewBox={`0 0 ${width} ${depth}`} role="img" aria-label="Vue de dessus indicative de la boîte"><rect x="0" y="0" width={width} height={depth} rx="4" className="box-outline" />{groups.map((group, index) => { const columnWidth = width / Math.max(groups.length, 1); const x = index * columnWidth + 3; return <g key={group.id}><rect x={x} y="5" width={Math.max(columnWidth - 6, 1)} height={Math.max(depth - 10, 1)} rx="3" fill={palette[index % palette.length]} className="group-block" /><text x={x + 4} y="18">{group.name}</text></g> })}</svg>{groups.length === 0 && <div className="preview-empty"><span>+</span><p>Ajoute une pièce pour voir apparaître un bac demandé.</p></div>}</div><div className="preview-legend"><span><i className="legend-group" />Bac demandé</span><span><i className="legend-flat" />Plateaux et livrets au-dessus</span></div><div className="cross-section"><div className="cross-section-label"><span>Coupe de hauteur</span><strong>{formatMillimeters(project.box.usable_height_mm)}</strong></div><div className="height-bar"><div className="flat-stack" style={{ height: `${topHeightRatio * 100}%` }} /><div className="storage-stack" style={{ height: `${(1 - topHeightRatio) * 100}%` }} /></div><div className="height-key"><span><i className="key-storage" />Bacs à calculer</span><span><i className="key-flat" />Pile supérieure</span></div></div></section>
 }
 
-function CandidateEditor({ candidate, assets, assetOwners, layers, onChange, onDimensionChange, onDelete }: { candidate: CandidateDraft; assets: AssetDraft[]; assetOwners: Record<string, string[]>; layers: string[]; onChange: (update: Partial<CandidateDraft>) => void; onDimensionChange: (axis: keyof Dimension, value: number) => void; onDelete: () => void }) {
-  function toggleAsset(assetId: string, checked: boolean) {
-    const assetIds = checked ? Array.from(new Set([...candidate.asset_ids, assetId])) : candidate.asset_ids.filter((current) => current !== assetId)
-    onChange({ asset_ids: assetIds })
-  }
-
-  return <div className="compact-editor"><div className="compact-top"><TextInput value={candidate.name} onChange={(value) => onChange({ name: value })} /><select value={candidate.allowed_layers[0] ?? ''} onChange={(event) => onChange({ allowed_layers: [event.target.value] })}>{layers.map((layer) => <option key={layer}>{layer}</option>)}</select><label className="check"><input type="checkbox" checked={candidate.allow_xy_rotation} onChange={(event) => onChange({ allow_xy_rotation: event.target.checked })} /> Rotation</label><button className="icon-button" aria-label="Supprimer le bac envisagé" onClick={onDelete}>×</button></div><div className="candidate-details"><DimensionEditor label="Dimensions" value={candidate.size_mm} onChange={(value) => { onDimensionChange('x', value.x); onDimensionChange('y', value.y); onDimensionChange('z', value.z) }} /><div className="asset-picker"><div className="asset-picker-heading"><span>Éléments associés</span><small>{candidate.asset_ids.length ? `${candidate.asset_ids.length} sélectionné(s)` : 'Aucun élément'}</small></div>{assets.map((asset) => { const checked = candidate.asset_ids.includes(asset.id); const usedByOther = (assetOwners[asset.id] ?? []).some((ownerId) => ownerId !== candidate.id); return <label key={asset.id} className={`asset-option ${usedByOther ? 'assigned-elsewhere' : ''}`}><input type="checkbox" checked={checked} disabled={usedByOther && !checked} onChange={(event) => toggleAsset(asset.id, event.target.checked)} /><span>{asset.name}</span>{usedByOther && !checked && <small>Déjà associé ailleurs</small>}</label> })}</div></div></div>
-}
-function DimensionEditor({ label, value, onChange }: { label: string; value: Dimension | { x: number; y: number; z: number }; onChange: (value: Dimension) => void }) {
-  return <div className="dimension-editor"><span>{label}</span><NumberInput value={value.x} onChange={(next) => onChange({ ...value, x: next })} /><NumberInput value={value.y} onChange={(next) => onChange({ ...value, y: next })} /><NumberInput value={value.z} onChange={(next) => onChange({ ...value, z: next })} /></div>
+function IssueList({ issues }: { issues: ProjectIssue[] }) {
+  return <section className="message error issue-list" aria-live="polite"><strong>À compléter avant de construire</strong><ul>{issues.map((issue, index) => <li key={`${issue.path}-${index}`}><b>{issue.path}</b> — {issue.message}</li>)}</ul></section>
 }
 
 function TextField({ label, value, onChange, wide = false }: { label: string; value: string; onChange: (value: string) => void; wide?: boolean }) {
-  return <label className={`field ${wide ? 'wide' : ''}`}><span>{label}</span><TextInput value={value} onChange={onChange} /></label>
+  return <label className={`field ${wide ? 'wide' : ''}`}><span>{label}</span><input value={value} onChange={(event) => onChange(event.target.value)} /></label>
 }
 
-function NumberField({ label, value, suffix, onChange }: { label: string; value: number; suffix?: string; onChange: (value: number) => void }) {
-  return <label className="field"><span>{label}</span><div className="number-with-suffix"><NumberInput value={value} onChange={onChange} />{suffix && <i>{suffix}</i>}</div></label>
+function TextInput({ value, onChange, ariaLabel }: { value: string; onChange: (value: string) => void; ariaLabel: string }) {
+  return <input aria-label={ariaLabel} value={value} onChange={(event) => onChange(event.target.value)} />
 }
 
-function TextInput({ value, onChange }: { value: string; onChange: (value: string) => void }) {
-  return <input value={value} onChange={(event) => onChange(event.target.value)} />
+function NumberField({ label, value, onChange, minimum = 0.1 }: { label: string; value: number; onChange: (value: number) => void; minimum?: number }) {
+  return <label className="field"><span>{label}</span><div className="number-unit"><input type="number" min={minimum} step="0.1" value={value} onChange={(event) => onChange(Number(event.target.value))} /><i>mm</i></div></label>
 }
 
-function NumberInput({ value, onChange }: { value: number; onChange: (value: number) => void }) {
-  return <input type="number" min="0" step="0.1" value={Number.isFinite(value) ? value : 0} onChange={(event) => onChange(Number(event.target.value))} />
+function OptionalNumberField({ label, value, onChange }: { label: string; value: number | null; onChange: (value: number | null) => void }) {
+  return <label className="field"><span>{label}</span><div className="number-unit"><input type="number" min="0.1" step="0.1" value={value ?? ''} placeholder="Général" onChange={(event) => onChange(event.target.value === '' ? null : Number(event.target.value))} /><i>mm</i></div></label>
 }
 
-function withAppearance(draft: ComposerDraft): ComposerDraft {
-  return { ...draft, appearance: draft.appearance ?? defaultAppearance(), mechanism: draft.mechanism ?? defaultMechanism() }
-}
-function cloneDraft(draft: ComposerDraft): ComposerDraft {
-  return JSON.parse(JSON.stringify(draft)) as ComposerDraft
+function NumberInput({ value, onChange, ariaLabel, step = 0.1 }: { value: number; onChange: (value: number) => void; ariaLabel: string; step?: number }) {
+  return <input aria-label={ariaLabel} type="number" min="0" step={step} value={value} onChange={(event) => onChange(Number(event.target.value))} />
 }
 
-function newAsset(index: number): AssetDraft {
-  return { id: `asset-${index}`, name: 'Nouvel élément', kind: 'other', quantity: { count: 1, grouping: 'single' }, dimensions_mm: defaultDimension(), containment_intent: 'store', dimension_confidence: 'approximate' }
+function DimensionFields({ labels, value, onChange }: { labels: [string, string, string]; value: Dimension; onChange: (axis: keyof Dimension, value: number) => void }) {
+  return <div className="dimension-fields">{(['x', 'y', 'z'] as const).map((axis, index) => <label key={axis}><span>{labels[index]}</span><NumberInput ariaLabel={labels[index]} value={value[axis]} onChange={(next) => onChange(axis, next)} /></label>)}</div>
 }
 
-function newCandidate(index: number, layerId: string): CandidateDraft {
-  return { id: `module-${index}`, name: 'Nouveau bac', size_mm: defaultDimension(), allowed_layers: [layerId], allow_xy_rotation: true, priority: 0, asset_ids: [] }
+function newGroup(project: ProjectV1Draft): ContainerGroupDraft {
+  const id = nextId('bac', project.container_groups.map((group) => group.id))
+  return { id, name: `Bac ${project.container_groups.length + 1}`, wall_thickness_mm: null, floor_thickness_mm: null }
 }
 
-function newReservation(index: number, layerId: string): ReservationDraft {
-  return { id: `reservation-${index}`, kind: 'generic', origin_mm: { x: 0, y: 0, z: 0 }, size_mm: defaultDimension(), layer_id: layerId }
+function nextId(prefix: string, existing: string[]) {
+  let index = existing.length + 1
+  while (existing.includes(`${prefix}-${index}`)) index += 1
+  return `${prefix}-${index}`
 }
 
-function toLockedModule(module: EngineModule) {
-  return { id: module.id, name: module.name, origin_mm: module.origin_mm, size_mm: module.size_mm, layer_id: module.layer_id ?? 'base', locked: true }
-}
-
-function downloadJson(fileName: string, value: unknown) {
-  const blob = new Blob([JSON.stringify(value, null, 2)], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const anchor = document.createElement('a')
-  anchor.href = url
-  anchor.download = fileName
-  anchor.click()
-  URL.revokeObjectURL(url)
-}
-
-function safeFileName(value: string) {
-  return value.trim().toLowerCase().replace(/[^a-z0-9]+/gi, '-').replace(/(^-|-$)/g, '') || 'bgig-project'
-}
-
-function formatScore(value: number) { return `${Math.round(value * 100)}%` }
-function formatVolume(value: number) { return `${Math.round(value / 1000).toLocaleString('fr-FR')} cm³` }
-function formatDimension(value: Dimension) { return `${value.x} × ${value.y} × ${value.z} mm` }
-function formatError(reason: unknown) {
-  if (reason instanceof ApiError) {
-    if (reason.code === 'DRAFT_INVALID') return `Le projet a un point à corriger : ${reason.message}`
-    if (reason.code === 'ENGINE_REJECTED') return `Le moteur refuse ce projet : ${reason.message}`
+function projectMetrics(project: ProjectV1Draft) {
+  return {
+    itemCount: project.contents.reduce((total, item) => total + Math.max(0, item.quantity), 0),
+    groupCount: project.container_groups.length,
+    flatHeight: project.flat_items.reduce((total, item) => total + (item.dimensions_mm.z * item.quantity), 0),
+    volume: project.box.inner_dimensions_mm.x * project.box.inner_dimensions_mm.y * project.box.usable_height_mm,
   }
-  return reason instanceof Error ? reason.message : 'Une erreur inconnue est survenue.'
 }
-function clamp(value: number, minimum: number, maximum: number) { return Math.min(maximum, Math.max(minimum, value)) }
-function appearanceLabel(value: string) { return ({ rounded: 'arrondis', straight: 'droite', chamfered: 'biseautée', none: 'aucune', front_scoop: 'echancrure douce', thumb_notch: 'passe-doigt', module_name: 'nom du bac', module_name_and_role: 'nom et role' } as Record<string, string>)[value] ?? value }
-function preferenceLabel(preference: string) { return ({ balanced: 'Un bon équilibre', compact: 'Compacité', accessible: 'Accès facile', print_simple: 'Simplicité de fabrication' } as Record<string, string>)[preference] ?? preference }
-function kindLabel(kind: AssetDraft['kind']) { return ({ cards: 'Cartes', tokens: 'Jetons', dice: 'Dés', meeples: 'Figurines', other: 'Autre' } as Record<AssetDraft['kind'], string>)[kind] }
-const assetKinds: AssetDraft['kind'][] = ['cards', 'tokens', 'dice', 'meeples', 'other']
+
+function formatMillimeters(value: number) { return `${Math.round(value * 10) / 10} mm` }
+function formatVolume(value: number) { return `${Math.round(value / 1000).toLocaleString('fr-FR')} cm³` }
+function safeFileName(value: string) { return value.trim().toLowerCase().replace(/[^a-z0-9]+/gi, '-').replace(/(^-|-$)/g, '') || 'bgig' }
+function downloadJson(fileName: string, value: unknown) { const url = URL.createObjectURL(new Blob([JSON.stringify(value, null, 2)], { type: 'application/json' })); const anchor = document.createElement('a'); anchor.href = url; anchor.download = fileName; anchor.click(); URL.revokeObjectURL(url) }
+function formatError(reason: unknown) { return reason instanceof ApiError ? reason.message : reason instanceof Error ? reason.message : 'Une erreur inattendue est survenue.' }

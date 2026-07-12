@@ -5,47 +5,43 @@ import unittest
 class FrontendStudioContractTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        cls.source = (Path(__file__).resolve().parents[1] / "frontend" / "src" / "App.tsx").read_text(encoding="utf-8")
+        root = Path(__file__).resolve().parents[1]
+        cls.source = (root / "frontend" / "src" / "App.tsx").read_text(encoding="utf-8")
+        cls.types = (root / "frontend" / "src" / "project_v1.ts").read_text(encoding="utf-8")
+        cls.validation = (root / "frontend" / "src" / "project_v1_validation.ts").read_text(encoding="utf-8")
 
-    def test_primary_journey_has_five_progressive_steps(self) -> None:
-        for step_id in ("box", "contents", "organisation", "proposals", "prepare"):
-            self.assertIn(f"id: '{step_id}'", self.source)
-
-    def test_live_box_preview_does_not_pretend_to_be_printable(self) -> None:
-        self.assertIn("Vue vivante", self.source)
-        self.assertIn("Aperçu vivant", self.source)
-        self.assertIn("Elle ne représente pas encore des bacs imprimables.", self.source)
-
-    def test_manufacturing_statuses_are_explicit(self) -> None:
-        for label in ("À explorer", "À vérifier dans Fusion", "À imprimer et mesurer"):
-            self.assertIn(label, self.source)
-
-    def test_p33_appearance_controls_are_live_but_not_presented_as_printed_geometry(self) -> None:
+    def test_primary_journey_is_user_first_and_not_a_technical_wizard(self) -> None:
         for label in (
-            "Finition vivante",
-            "Aperçu uniquement",
-            "Rayon d aperçu",
-            "Biseau d aperçu",
-            "Prise visuelle",
-            "Le plan, les tolérances, les murs et le fond ne bougent pas.",
+            "Ma boîte",
+            "Ce que tu veux ranger",
+            "Plateaux et livrets",
+            "Les bacs demandés",
+            "Compléter l’espace",
+            "Réglages de fabrication",
+            "Construire mon insert",
         ):
             self.assertIn(label, self.source)
-        self.assertIn("appearance-${draft.appearance.visual.theme}", self.source)
-        self.assertIn("PreviewModule", self.source)
+        self.assertNotIn("AppearanceEditor", self.source)
+        self.assertNotIn("MechanismEditor", self.source)
+        self.assertNotIn("studioSteps", self.source)
 
-    def test_p34_sliding_lid_controls_are_saved_as_an_experimental_intention(self) -> None:
-        for label in (
-            "Couvercle coulissant",
-            "Essai requis",
-            "Jeu de glisse",
-            "Le dossier technique prepare un coupon",
-        ):
-            self.assertIn(label, self.source)
-        self.assertIn("MechanismEditor", self.source)
-        self.assertIn("mechanism-preview-pill", self.source)
-    def test_technical_export_stays_in_expert_mode_and_describes_p31_honestly(self) -> None:
-        self.assertIn("Mode expert : télécharger le dossier de préparation", self.source)
-        self.assertIn("bacs ouverts à vérifier dans Fusion", self.source)
+    def test_content_table_exposes_shape_quantity_and_target_container(self) -> None:
+        for marker in ("shape_kind", "quantity", "container_group_id", "+ Créer un nouveau bac"):
+            self.assertIn(marker, self.source)
+        for shape in ("round", "square", "rectangle", "cards", "cube", "meeple", "custom"):
+            self.assertIn(f"'{shape}'", self.types)
+
+    def test_v1_import_and_save_are_available_without_legacy_editor_concepts(self) -> None:
+        self.assertIn("loadProjectV1Starter", self.source)
+        self.assertIn("normalizeProjectV1", self.source)
+        self.assertIn("Importer un projet", self.source)
+        self.assertIn("Sauvegarder", self.source)
+        for legacy_concept in ("CandidateEditor", "ReservationEditor", "allowed_layers", "manual_modules"):
+            self.assertNotIn(legacy_concept, self.source)
+
+    def test_client_validation_covers_groups_flats_and_fill_elements(self) -> None:
+        for marker in ("validateProjectV1", "container_groups", "flat_items", "fill_elements", "layout_clearance_mm"):
+            self.assertIn(marker, self.validation)
 
 
 if __name__ == "__main__":

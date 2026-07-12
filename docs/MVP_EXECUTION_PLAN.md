@@ -12,7 +12,7 @@ V0.2 et V0.3 restent `deferred`.
 | --- | --- | --- | --- |
 | P36 | Vision et ordre fiables | Docs, ADR, backlog, gates | Coherence documentaire |
 | P37 | Projet V0.1 representable | Schema additif : groupes de bacs, elements plats, remplissages, reglages | Tests de migration et validation |
-| P38 | Saisie enfin evidente | UI boite + tableau pieces + tableau plateaux/livrets + bacs | Tests UI + recette navigateur |
+| P38 | Saisie enfin evidente | UI boite + tableau pieces + tableau plateaux/livrets + bacs | Tests UI, build et API locale |
 | P39 | Les bacs suivent les pieces | Derivation quantite/forme/groupe vers logements et bacs | Fixtures rond/carre/rectangle/custom et groupes |
 | P40 | Plateaux et livrets tiennent au-dessus | Pile superieure, hauteur et supports ajustes | Tests X/Y/Z et depassements |
 | P41 | Tout le volume est affecte | Solveur volumetrique borne, residus, bacs vides/pleins/separateurs | Conservation du volume et cas grande cardinalite |

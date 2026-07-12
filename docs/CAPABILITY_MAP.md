@@ -14,8 +14,8 @@ couvercles. Jusqu'a P43, seules les capacites ci-dessous sont des blockers actif
 
 | Blocker V0.1 | Etat reel | Prochaine preuve |
 | --- | --- | --- |
-| Saisie user-first sans objets moteur | partiel | P38, recette navigateur |
-| Regroupement `Bac cible` | absent du contrat produit | P37/P38 |
+| Saisie user-first sans objets moteur | implemented-local-ui | P39, construction derivee |
+| Regroupement `Bac cible` | implemented-local-ui | P39, logements derives |
 | Derivation des bacs et logements | partielle et manuelle | P39 |
 | Pile plateaux/livrets superieure | reservation abstraite seulement | P40 |
 | Parois par bac et jeu commun | valeurs dispersees | P37/P39 |
@@ -538,3 +538,13 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
   72 pieces / 50 bacs / 25 elements plats testes.
 - C-AESTHETIC et mecanismes : options conservees mais `deferred` jusqu'aux
   releases correspondantes.
+
+## P38 user-first Studio update
+
+- C-PRODUCT-VISION : `implemented-local-ui` pour la saisie lisible de la boite,
+  des pieces, des bacs cibles, des plateaux/livrets et des remplissages.
+- C-ASSET et C-RESERVATION : les donnees V1 sont editees et pre-validees dans le
+  Studio ; les logements et la pile superieure restent respectivement P39 et P40.
+- C-QUALITY : validation client, build Vite et routes locales V1 verifies ;
+  aucune validation Fusion ou impression n est declaree.
+- C-AESTHETIC et mecanismes : absents du parcours V0.1 et toujours `deferred`.
