@@ -9,18 +9,20 @@ et la lecture par capabilities dans `docs/CAPABILITY_MAP.md`.
 Les phases historiques ci-dessous decrivent les briques construites, pas l'ordre
 des prochaines missions. ADR-0047 et `docs/MVP_EXECUTION_PLAN.md` imposent :
 
-1. P36-P42 puis P52-P60 : V0.1 fonctionnelle complete ;
-2. P44-P46 : V0.2 formes et ergonomie ;
-3. P47-P50 : V0.3 couvercles et calibration.
+1. P36-P42 puis P52-P60 : socle technique V0.1 observe ;
+2. P60-R puis P61-P66 : convergence produit V0.1 revisee ;
+3. P44-P46 : V0.2 formes et ergonomie ;
+4. P47-P50 : V0.3 couvercles et calibration.
 
-Aucune mission P44+ ne peut devenir `ready` avant P60. Aucune mission P47+ ne
+Aucune mission P44+ ne peut devenir `ready` avant P66. Aucune mission P47+ ne
 peut devenir `ready` avant P46. Les explorations P33/P34 sont archivees et ne
 valent pas acceptation de V0.2/V0.3.
 
 P43 est reouvert le 2026-07-12 : la scene Fusion historique reste observee,
-mais le MVP produit n est pas accepte. P52 a P60 reforment le chemin critique
-V0.1 ; P44 V0.2 et P47 V0.3 restent bloques jusqu a P60. ADR-0054 interdit les
-corps de remplissage automatiques et impose l expansion des bacs demandes.
+mais le MVP produit n est pas accepte. P52 a P60 constituent le socle technique ;
+P60-R a P66 portent desormais le chemin critique V0.1. P44 V0.2 et P47 V0.3
+restent bloques jusqu a P66. ADR-0054 interdit les corps de remplissage
+automatiques et impose l expansion des bacs demandes.
 
 ADR-0055 impose aussi la surface produit : add-in Fusion et palette embarquee uniquement.
 Les references Studio web des phases historiques sont supersedees.
@@ -285,3 +287,24 @@ La finition V0.1 rend les presets, les corps pleins et les dimensions finales de
 bac accessibles dans la palette Fusion. Apres acceptation P60, P61 introduira
 par ADR un empilement vertical explicite avant les formes ergonomiques P44-P46.
 Les couvercles P47-P50 restent bloques jusqu a P46.
+
+## Rebase P60-R - Convergence produit V0.1 revisee
+
+La revue humaine du 2026-07-12 classe P60 `product-review-ko` tout en conservant
+ses preuves techniques. Le simple ajout d un nombre de bacs en hauteur est
+refuse : le solveur P57 reste XY, place tout a Z = 0 et reduit tous les
+conteneurs sous une pile globale de plateaux.
+
+Le nouveau chemin critique est strictement sequentiel :
+
+1. P60-R : contrats, alternatives, ADR et pilotage ;
+2. P61 : etat reactif, diagnostics discrets et architecture de palette ;
+3. P62 : catalogue local, sleeves et orientations de rangement ;
+4. P63 : reservations superieures encastrees pour plateaux/livrets ;
+5. P64 : solveur volumetrique borne par etages ;
+6. P65 : Conteneurs, Reglages et Apercu integres ;
+7. P66 : acceptance humaine du vrai MVP revise dans Fusion.
+
+P61-P65 ne deviennent pas `ready` avant acceptation des ADR structurelles qui
+les concernent. Aucune dependance de solveur externe, valeur de tolerance ou
+forme ergonomique V0.2 n est ajoutee par ce rebase.

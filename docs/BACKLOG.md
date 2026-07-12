@@ -1614,7 +1614,7 @@ impose les dependances de release suivantes.
 - Statut : `implemented`, `automated-validated`, `fusion-validated: false`, `print-validated: false`.
 - Preuves : constructeur `partition_cad.py`, bridge versionne, synchronisation generate/regenerate compacte, inspect/clear/export, packaging 0.1.6 et tests ciblés.
 
-### P60 - Acceptance du vrai MVP V0.1 Fusion-only
+### P60 - Tentative historique d acceptance V0.1 Fusion-only
 
 - Capability : C-QUALITY, C-PRODUCT-VISION, C-FUSION-UI.
 - Dependances : P59.
@@ -1626,11 +1626,11 @@ impose les dependances de release suivantes.
 - Acceptation : editeur complet dans Fusion, cavites calibrees, volume absorbe
   par les bacs demandes, scene fidele, aucun serveur ou navigateur externe ;
   print-validated: false reste honnete.
-- Statut : `ready-for-retest`, correctifs runtime 0.1.8 implementes ; gate humaine Fusion a rejouer.
+- Statut : `product-review-ko`, `technical-baseline-useful` ; remplace comme gate de sortie par P66.
 
 ### P44 a P46 - V0.2 formes et ergonomie
 
-- Dependances : P60 accepte.
+- Dependances : P66 accepte.
 - Scope : arrondis, chanfreins, encoches et fonds faciles a vider, avec impact
   reel sur volume, parois et fabrication.
 - Statut : `deferred-until-v0.1`.
@@ -1653,7 +1653,7 @@ impose les dependances de release suivantes.
 - Gate renforcee : fixture 3 corps / 1 complement / 3 cavites / 0 automatique,
   Bac jetons X = 80 mm, cale solid sans cavite et sauvegarde projet locale.
 
-### P61 - Empilement vertical explicite
+### P61 historique - Empilement vertical explicite
 
 - Capability : C-STACKING, C-LAYERS, C-GRID-3D, C-SOLVER, C-FUSION-UI.
 - Dependances : P60 accepte.
@@ -1662,4 +1662,83 @@ impose les dependances de release suivantes.
 - Premier livrable obligatoire : ADR, contrat pur et diagnostics pour ordre
   bas/haut, hauteur cumulee, support et depassement de boite.
 - Validation cible : tests moteur et resultat palette, puis gate Fusion dediee.
-- Statut : planned-after-p60, aucune implementation revendiquee.
+- Statut : `superseded-by-p61-p65`, aucune implementation revendiquee.
+
+### P60-R - Realignement produit apres revue Fusion
+
+- Capability : C-PRODUCT-VISION, C-SOLVER, C-RESERVATION, C-FUSION-UI, C-QUALITY.
+- Dependances : retour humain P60 du 2026-07-12.
+- Objectif : expliquer les ecarts observes, challenger les options et redefinir
+  un chemin V0.1 coherent sans modifier le runtime.
+- Livrables : rapport de realignement, ADR-0056 a ADR-0060 proposees, roadmap,
+  backlog, capability map, gates, visions et regles qualite realignes.
+- Acceptation : chaque retour utilisateur est classe, les contradictions P40/
+  P57 sont explicites et aucune implementation n est revendiquee.
+- Statut : `done-docs`, `product-review-ko`, `technical-baseline-useful`.
+
+### P61 - Etat reactif et architecture de palette
+
+- Capability : C-FUSION-UI, C-PROJECT, C-QUALITY.
+- Dependances : P60-R et acceptation ADR-0056/ADR-0060.
+- Objectif : rendre toute mesure editable, recalculer les derives, distinguer
+  plan obsolete et scene materialisee, et supprimer les diagnostics intrusifs.
+- Livrables : etats/digests, invalidation, ancien apercu grise, parcours cible,
+  listes compactes/detaillees, barre persistante et tiroir technique.
+- Acceptation : inspect sain silencieux ; aucune scene Fusion ne change sans
+  action ; les transitions et le DOM sont testes.
+- Statut : `blocked-by-architecture-gate`.
+
+### P62 - Catalogue d elements et orientations
+
+- Capability : C-ASSET, C-CAVITY, C-FUSION-UI.
+- Dependances : P61 et acceptation ADR-0058.
+- Objectif : formats nommes, sleeves, orientations a plat/debout/auto et presets
+  personnels locaux sans masquer les dimensions resolues.
+- Acceptation : surcharge explicite prioritaire, aller-retour preset et impact
+  d orientation verifies dans le coeur et la palette.
+- Statut : `planned`.
+
+### P63 - Reservations superieures encastrees
+
+- Capability : C-RESERVATION, C-STACKING, C-CAD-IR, C-FUSION-UI.
+- Dependances : P62 et acceptation ADR-0057 qui remplace ADR-0050.
+- Objectif : creuser localement plateaux/livrets depuis le dessus, avec ordre de
+  retrait, appui et zone de prise, sans reduire toute la hauteur des conteneurs.
+- Acceptation : intersections, non-percement, vues et coupe Fusion prouvent un
+  plateau affleurant ; aucune ergonomie courbe V0.2 n est revendiquee.
+- Statut : `planned`.
+
+### P64 - Solveur volumetrique multi-etages
+
+- Capability : C-SOLVER, C-GRID-3D, C-STACKING, C-QUALITY.
+- Dependances : P63 et acceptation ADR-0059.
+- Objectif : arrangements XY par etage, composition Z, supports/retraits,
+  Auto/Cible/Fixe, surplus pondere, residuels et suggestions explicites.
+- Invariant : aucun corps automatique ; une suggestion de cale ne mute rien.
+- Acceptation : fixtures multi-etages, conservation, collisions, support,
+  retrait et budget de recherche deterministe testes.
+- Statut : `planned`.
+
+### P65 - Conteneurs, reglages et apercu integres
+
+- Capability : C-FUSION-UI, C-MODULE, C-TOLERANCE, C-QUALITY.
+- Dependances : P64 et acceptation ADR-0060.
+- Objectif : centraliser les corps explicites, tailles min/cible/calculee,
+  estimation, jeux et minima ; traduire le resultat et ses sous-scores.
+- Acceptation : aucun code moteur au premier niveau, Materialiser est primaire
+  dans Apercu, les tolerances restent experimentales et inchangees.
+- Statut : `planned`.
+
+### P66 - Acceptance V0.1 revisee Fusion-only
+
+- Capability : C-QUALITY, C-PRODUCT-VISION, C-FUSION-UI, C-SOLVER.
+- Dependances : P61 a P65 implementes et automatises.
+- Objectif : valider dans Fusion un projet reel avec plateaux encastres,
+  orientations de cartes, plusieurs etages, edition/recalcul, regeneration,
+  export et preservation des objets non BGIG.
+- Gate : observation humaine preparee automatiquement.
+- Statut : `blocked-by-p61-p65`, `print-validated: false`.
+
+La carte historique P61 `Empilement vertical explicite` ci-dessus est remplacee
+par P61-P65 : ajouter seulement un nombre d etages ne corrigerait ni P40 ni P57.
+P44-P46 dependent desormais de P66 ; P47-P50 restent dependants de P46.

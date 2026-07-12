@@ -10,7 +10,8 @@ mission doit servir une capability, un milestone et une validation claire.
 
 La carte ne constitue plus a elle seule un ordre d'execution. ADR-0047 impose le
 chemin critique suivant : V0.1 fonctionnelle, puis V0.2 ergonomique, puis V0.3
-couvercles. Jusqu'a P60, seules les capacites du chemin V0.1 corrige sont des blockers actifs.
+couvercles. La table suivante est le snapshot historique P52-P60 ; le rebase
+actif P61-P66 est defini en fin de document.
 
 | Blocker V0.1 | Etat reel | Prochaine preuve |
 | --- | --- | --- |
@@ -23,8 +24,8 @@ couvercles. Jusqu'a P60, seules les capacites du chemin V0.1 corrige sont des bl
 | Partition complete sans corps automatique | absent | P57 |
 | Resultat et apercu issus du vrai plan | absent | P58 |
 | Scene Fusion fidele et palette principale fiable | palette minimale seulement | P56/P59 |
-| Parcours V0.1 accepte | non accepte | P60 |
-`C-AESTHETIC` est `deferred` jusqu'a P60. Les mecanismes/couvercles sont
+| Parcours V0.1 accepte | P60 refuse comme acceptance | P66 |
+`C-AESTHETIC` est `deferred` jusqu'a P66. Les mecanismes/couvercles sont
 `deferred` jusqu'a P46. Les paragraphes historiques P33/P34 ci-dessous decrivent
 du code existant, pas un statut de release acquis.
 
@@ -715,3 +716,24 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
   d empilement vertical dans le runtime courant.
 - Validation : preuves automatisees vertes ; observation Fusion partielle du
   runtime 0.1.8, retest 0.1.9 requis, print-validated: false.
+
+## Rebase de capability apres revue P60
+
+La preuve P60 conserve `C-FUSION-UI` comme base technique utilisable, mais pas
+comme experience acceptee. Les blockers V0.1 actifs deviennent :
+
+| Blocker V0.1 revise | Etat reel | Prochaine preuve |
+| --- | --- | --- |
+| Etat source/derive/solve/materialise | propose ADR-0056 | P61 |
+| Diagnostics discrets et parcours progressif | propose ADR-0060 | P61/P65 |
+| Catalogue et orientations de rangement | propose ADR-0058 | P62 |
+| Reservations superieures localisees | P40 global a remplacer, ADR-0057 proposee | P63 |
+| Placement multi-etages Z | contrats historiques presents, solveur actif absent | P64 |
+| Surplus pondere et Auto/Cible/Fixe | partage egal P57 insuffisant | P64 |
+| Conteneurs/reglages/apercu explicables | socle P56-P58 a reprendre | P65 |
+| Parcours V0.1 accepte | non accepte | P66 |
+
+`C-RESERVATION`, `C-STACKING`, `C-GRID-3D` et `C-SOLVER` redeviennent des
+blockers de convergence. Les implementations P40/P57 restent historiques et
+testees, mais sont `superseded-for-product` pour la semantique cible. Les formes
+de cavite V0.2 restent differees apres P66.

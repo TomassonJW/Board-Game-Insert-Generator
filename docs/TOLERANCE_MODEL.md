@@ -218,3 +218,15 @@ Les jeux restent du vide et ne sont pas absorbes. Le surplus de matiere est
 trace separement pour chaque face et pour le fond, afin que le mode avance puisse
 plus tard verrouiller ou ponderer sa repartition sans changer les valeurs de
 tolerance.
+
+## Revue P60 - Presentation sans changement de valeurs
+
+Les jeux sont regroupes dans l ecran Reglages et chaque libelle precise `par
+cote` ou `jeu total`. La hauteur de conception est derivee de la hauteur
+interieure moins le jeu superieur ; `usable_height_mm` ne doit plus apparaitre
+comme une seconde mesure novice contradictoire.
+
+La proposition utilisateur de 0,1 mm n est pas adoptee comme valeur generale :
+elle peut etre insuffisante en FDM, notamment comme jeu total entre corps. Les
+defaults existants restent experimentaux jusqu aux coupons et toute modification
+reste soumise a la gate humaine du modele de tolerance.

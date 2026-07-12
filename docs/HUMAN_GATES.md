@@ -17,13 +17,16 @@ Quand une gate est atteinte, Codex doit :
 
 ## Delegation active pour l objectif MVP V0.1
 
-Thomas a explicitement delegue toutes les decisions produit, architecture,
-documentation, Git et integration necessaires a l objectif V0.1. Pour ce run,
-Codex ne demande donc pas de validation de parcours UI, de schema, de backlog ou
-de release interne : ces points sont verifies par tests et preuves de runtime.
+Thomas a delegue les operations documentaires, Git et d integration normales
+necessaires a l objectif V0.1. La revue P60 introduit toutefois des decisions
+structurantes de modele produit, de reservation et de solveur. Conformement au
+protocole, Codex documente les options mais ne reprend pas le runtime avant une
+validation humaine explicite des ADR proposees.
 
-La seule validation humaine active avant la fin du MVP est l observation dans
-Fusion d un smoke prepare automatiquement.
+La revue P60 a rouvert une gate d architecture produit avant toute reprise du
+runtime : accepter, modifier ou refuser ADR-0056 a ADR-0060. Apres cette gate,
+la validation humaine finale reste l observation P66 dans Fusion d un smoke
+prepare automatiquement.
 Le produit observe est l add-in Fusion-only et sa palette embarquee ; aucun
 Studio web ne participe a cette gate. Les gates physiques d impression et
 les gates des V0.2/V0.3 restent hors de ce run.
@@ -73,12 +76,14 @@ merge, si un conflit reel apparait ou si une action risque de perdre du travail.
 
 | Gate | Condition minimale | Ce qui reste humain | Effet |
 | --- | --- | --- | --- |
-| P60 - Acceptation V0.1 Fusion-only | Editeur complet dans la palette Fusion, cavites calibrees, enveloppes extensibles, partition sans corps automatique, packaging sans localhost et scene fidele | Observation dans Fusion du parcours palette -> construction -> scene -> regeneration/export ; les preuves automatiques sont deja vertes | Autorise seulement alors le demarrage V0.2 |
+| P60 - Base technique V0.1 | Parcours palette -> calcul -> apercu -> materialisation observe | Revue produit du parcours | Revue KO ; ne debloque pas V0.2 |
+| ADR-0056 a ADR-0060 - Rebase produit | Alternatives, consequences et validations P61-P65 documentees | Accepter, modifier ou refuser les contrats structurants | Autorise seulement les lots d implementation acceptes |
+| P66 - Acceptation V0.1 revisee Fusion-only | Etat reactif, plateaux encastres, orientations, multi-etages, conteneurs/reglages/apercu integres et scene sure | Observation Fusion du parcours complet, regeneration/export et absence de fuite technique | Autorise seulement alors le demarrage V0.2 |
 | P46 - Acceptation V0.2 | Formes et ergonomie materialisees, contraintes de paroi et volume recalculees | Evaluation visuelle/ergonomique et observation Fusion | Autorise seulement alors le demarrage V0.3 |
 | P50 - Validation V0.3 | Deux familles de couvercles conformes au contrat, coupons prepares | Impressions, mesures, glisse/tenue et interpretation | Autorise la qualification physique des mecanismes |
 
 Le smoke P34 n'est plus une gate active : le coupon ne correspond pas au
-mecanisme coulissant canonique et la V0.3 est bloquee par P60 puis P46.
+mecanisme coulissant canonique et la V0.3 est bloquee par P66 puis P46.
 
 ## Format minimal d'un rapport de gate
 

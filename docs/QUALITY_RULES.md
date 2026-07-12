@@ -144,3 +144,14 @@ Statut : `done`, `implemented-core`, `implemented-cli`, `implemented-cad-ir-meta
 - Generate ne remplace rien implicitement ; regenerate preserve les objets non-BGIG.
 - Une erreur de bridge doit retourner une reponse versionnee et actionnable.
 - `implemented` ne vaut ni `fusion-validated`, ni `print-validated`.
+
+## Regles produit proposees apres revue P60
+
+- Un inspect sain au demarrage ne produit aucun message global.
+- Aucun enum, digest, milestone ou nom de moteur ne doit apparaitre au premier niveau utilisateur.
+- Toute edition distingue source courante, derives, plan obsolete et scene materialisee.
+- Une proposition partielle reste visible mais non materialisable par defaut.
+- `Auto`, `Cible` et `Fixe` ont des semantiques testees et distinctes.
+- Une reservation de plateau ne peut percer silencieusement cavite, fond ou paroi.
+- Une suggestion de cale ne cree jamais de corps sans confirmation.
+- Une erreur doit nommer la contrainte en conflit avant de conseiller d agrandir la boite.

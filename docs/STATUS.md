@@ -8,7 +8,7 @@ Statut produit : **MVP V0.1 reouvert ; fondations techniques presentes, conformi
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P59 implemente et automatise ; P60 est la gate humaine finale de validation Fusion.
+Phase active : P60-R documente la revue produit KO. P60 reste une base technique utile ; P61-P65 sont bloques par la revue des ADR-0056 a ADR-0060 et P66 devient la future gate V0.1.
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -1459,3 +1459,24 @@ local verrouille a 80 mm, Bac cartes et Cale pleine avant solid de 20 x 238,8 x
 cavites, 0 automatique et 3 occurrences compactes. Le preparateur sauvegarde
 tout projet courant different avant d installer cette fixture. L observation
 Fusion reste requise.
+
+## P60-R - Revue produit et realignement documentaire
+
+Statut : `done-docs`, `product-review-ko`, `technical-baseline-useful`,
+`implementation-not-authorized`, `print-validated: false`.
+
+Le retour humain confirme que le parcours atteint la materialisation Fusion et
+que l Apercu apporte une vraie valeur. Il refuse cependant P60 comme acceptance
+produit : rapport d inspection brut au demarrage, etat non reactif, vocabulaire
+et densite a reprendre, pile globale de plateaux contraire a l usage attendu,
+et solveur P57 incapable de plusieurs etages Z.
+
+Le rapport `docs/P60_PRODUCT_FEEDBACK_REALIGNMENT.md` explique les causes dans
+le code et definit le parcours cible Boite -> Plateaux et livrets -> Elements du
+jeu -> Conteneurs -> Reglages -> Apercu. Les ADR-0056 a ADR-0060 sont proposees,
+non acceptees. Aucun runtime, schema, solveur, adaptateur ou tolerance n est
+modifie dans P60-R.
+
+La prochaine action est une revue humaine des cinq ADR. Apres acceptation, P61
+ouvre le plus petit lot d implementation : etat reactif, diagnostics discrets
+et architecture de palette. La sortie V0.1 est transferee a P66.

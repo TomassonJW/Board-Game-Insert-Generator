@@ -8,58 +8,58 @@ V0.1 - vrai MVP Fusion-only selon ADR-0055.
 
 ## Derniere mission terminee
 
-P59 - materialisation CAD et synchronisation de scene, suivie des correctifs
-runtime P60 0.1.7 et 0.1.8.
+P60-R - realignement documentaire apres revue produit dans Fusion. P59 et le
+runtime P60 0.1.9 restent une base technique utile, pas une acceptance produit.
+
+Historique conserve : P59 - materialisation CAD et synchronisation de scene est
+implementee ; P60 - acceptance du vrai MVP a ete refusee par la revue produit.
 
 ## Derniere preuve humaine
 
-Le runtime 0.1.8 charge maintenant le projet, execute les boutons projet, calcule
-une partition, affiche le resultat reel et materialise les bacs dans Fusion.
-Cette observation leve les anciens KO de bootstrap et de transport QT. Elle ne
-clot pas encore P60 : regeneration, inspection/export et absence de doublon
-doivent encore etre confirmes sur le package courant.
+Le parcours charge, calcule, affiche un Apercu utile et materialise dans Fusion.
+La revue refuse cependant l acceptance P60 : diagnostic brut intrusif, editions
+non reactives, pile globale de plateaux et absence de solveur multi-etages.
 
 ## Mission courante
 
-P60 - acceptance du vrai MVP, avec P60-UX-01 comme finition du parcours de creation Fusion-only, package 0.1.9.
+P60-R - contrats et pilotage du MVP revise. Aucun code de production n est
+autorise par cette mission.
 
-Livrables implementes :
+Livrables documentaires :
 
-- palette initiale/minimale 1280 x 1100 ;
-- presets moteur editables Jetons, Cartes sleevees, Des et Pions ;
-- creation explicite Bac vide, Bloc plein / cale et Separateur ;
-- dimensions finales X/Y/Z de chaque bac visibles en mode simple, avec valeur
-  automatique si le champ reste vide et validation par le moteur ;
-- packaging et tests d installation du nouveau module pur project_presets.py.
+- rapport `docs/P60_PRODUCT_FEEDBACK_REALIGNMENT.md` ;
+- ADR-0056 a ADR-0060 proposees ;
+- chemin critique P61-P66 et gates de release realignes.
 
 ## Prochaine action prete
 
-Installer le commit 0.1.9 exact puis rejouer la fixture P60 renforcee dans Fusion. Le preparateur sauvegarde automatiquement un projet courant different :
+Relire et accepter, modifier ou refuser les cinq ADR proposees :
 
-1. confirmer la taille initiale et les presets visibles ;
-2. verifier Bac jetons avec X final = 80 mm ;
-3. calculer et confirmer 3 corps, 1 complement et 0 automatique ;
-4. confirmer Cale pleine avant sans cavite ;
-5. materialiser, regenerer sans doublon, inspecter puis exporter 3 STL.
+1. ADR-0056 : etat reactif et priorite des contraintes ;
+2. ADR-0057 : plateaux/livrets encastres depuis le dessus ;
+3. ADR-0058 : catalogue local et orientations ;
+4. ADR-0059 : solveur volumetrique borne par etages ;
+5. ADR-0060 : divulgation progressive dans la palette Fusion.
 
-## Mission suivante apres acceptation P60
+## Mission suivante apres acceptation des ADR
 
-P61 - contrat d empilement vertical explicite.
+P61 - etat reactif et architecture de palette.
 
-P61 commencera par une ADR et un contrat pur : etages Z, ordre bas/haut,
-nombre de bacs, surfaces porteuses, hauteur cumulee et diagnostics. Aucun
-empilement implicite ni duplication silencieuse de contenu ne sera introduit.
+P61 sera borne aux diagnostics discrets, aux etats source/derive/solve/
+materialise, a l invalidation explicable et a l architecture d information. Le
+solveur Z reste P64.
 
 ## Releases bloquees
 
-P61 et P44 a P50 restent bloques jusqu a l acceptation humaine P60. P47 a P50
-restent aussi bloques jusqu a l acceptation de P46.
+P61-P65 sont bloques par la revue des ADR. P44 a P50 restent bloques jusqu a
+l acceptation humaine P66. P47 a P50 restent aussi bloques jusqu a
+l acceptation de P46.
 
 ## Gate humaine active
 
-P60 uniquement. Le contrat reste docs/P60_FUSION_MVP_ACCEPTANCE.md et le
-preparateur reste scripts/fusion/prepare_p60_mvp_acceptance.ps1. Codex installe
-et verifie l add-in exact ; Thomas ne realise que les observations dans Fusion.
+Gate d architecture ADR-0056 a ADR-0060. Aucun nouveau smoke Fusion n est demande
+avant implementation de P61-P65. La future gate produit devient P66 et sera
+preparee automatiquement.
 
 ## Fin de chaque mission
 

@@ -259,3 +259,13 @@ groupes, ni dimensions, ni positions. frontend/ et le serveur local P23 sont des
 prototypes historiques hors MVP, non packages et non requis au runtime. Les
 statuts implemente, fusion-validated et print-validated restent strictement
 distincts.
+
+## Amendement propose apres revue P60
+
+`docs/P60_PRODUCT_FEEDBACK_REALIGNMENT.md` propose un amendement sans modifier
+la North Star : parcours Boite -> Plateaux et livrets -> Elements du jeu ->
+Conteneurs -> Reglages -> Apercu, etat reactif, reservations superieures
+encastrees et solveur multi-etages. Tant que les ADR-0056 a ADR-0060 ne sont pas
+acceptees, ces clauses restent proposees. Elles signalent explicitement que la
+pile globale ADR-0050, le shelf solver P57 et le mode avance global ne sont pas
+des contrats produit acceptes.

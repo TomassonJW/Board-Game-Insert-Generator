@@ -181,3 +181,8 @@ Tests, cartes backlog ou gates humaines a preparer.
 
 - ADR-0054-fixed-cavities-expandable-container-envelopes.md - cavites calibrees, enveloppes extensibles et aucun corps automatique.
 - ADR-0055-fusion-only-mvp-product-surface.md - add-in Fusion 360 comme produit MVP unique ; Studio web supersede.
+- ADR-0056-reactive-project-state-and-constraint-priority.md - proposition d etats source/derive/solve/materialise et de dimensions Auto/Cible/Fixe.
+- ADR-0057-top-inset-flat-reservations.md - proposition de reservations superieures encastrees, remplacant ADR-0050 si acceptee.
+- ADR-0058-local-asset-catalog-and-storage-orientations.md - proposition de catalogue local, presets personnels et orientations de rangement.
+- ADR-0059-bounded-volumetric-stage-solver.md - proposition de solveur volumetrique borne par etages et surplus pondere.
+- ADR-0060-progressive-disclosure-fusion-palette.md - proposition de parcours Fusion compact, diagnostics discrets et divulgation progressive locale.

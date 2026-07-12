@@ -147,3 +147,14 @@ font pas partie du runtime ni du packaging MVP.
 P56 reutilise la palette P32 et le coeur P55. Il ne reutilise pas le frontend
 React comme surface produit. P57-P59 restent sequentiels. V0.2 et V0.3 restent
 bloquees jusqu a P60.
+
+## Rebase apres revue produit P60
+
+P60 est une base technique observee, pas l acceptance V0.1. Le chemin de sortie
+est remplace par P60-R -> P61 -> P62 -> P63 -> P64 -> P65 -> P66. P66 reprend
+la gate humaine finale ; V0.2 et V0.3 restent bloquees jusque-la.
+
+Ce rebase ne relance pas le runtime tant que les ADR-0056 a ADR-0060 ne sont pas
+revues. Il interdit de traiter le probleme comme un simple champ de nombre de
+bacs en hauteur : etat reactif, reservations localisees et solveur Z doivent
+etre contractes ensemble, puis implementes par lots sequentiels.
