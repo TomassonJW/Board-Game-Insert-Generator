@@ -45,11 +45,11 @@ class FusionPaletteDomTests(unittest.TestCase):
     def test_supports_dynamic_rows_simple_advanced_and_local_file_import(self) -> None:
         self.assertIn("expert-mode", self.dom.ids)
         self.assertIn("import-file", self.dom.ids)
-        for action in ("add-content", "duplicate-content", "delete-content", "add-flat", "delete-flat", "add-group", "delete-group"):
+        for action in ("add-content", "duplicate-content", "delete-content", "add-flat", "delete-flat", "add-group", "delete-group", "add-complement", "delete-complement"):
             self.assertIn(action, self.markup)
 
     def test_routes_validation_and_persistence_to_the_versioned_python_bridge(self) -> None:
-        self.assertEqual(self.dom.bridge_actions, {"validate_project", "save_project", "export_project"})
+        self.assertEqual(self.dom.bridge_actions, {"validate_project", "save_project", "export_project", "solve_project"})
         self.assertIn("bgig.palette.request.v1", self.markup)
         self.assertIn("bgig.palette.response.v1", self.markup)
         self.assertIn("bgig_palette_project", self.markup)

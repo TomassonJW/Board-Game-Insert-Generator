@@ -72,6 +72,15 @@ class FusionPaletteProjectTests(unittest.TestCase):
         self.assertEqual(response["envelopes"]["containers"][0]["container_group_id"], "tokens")
         self.assertEqual(response["flat_stack"]["summary"]["status"], "ready_for_p41")
 
+    def test_solve_project_returns_the_p57_partition_without_saving_implicitly(self) -> None:
+        project = blank_project_v1()
+        project["container_groups"] = [{"id": "g", "name": "Bac", "wall_thickness_mm": None, "floor_thickness_mm": None}]
+        project["contents"] = [{"id": "c", "name": "Pieces", "shape_kind": "square", "dimensions_mm": {"x": 12, "y": 12, "z": 3}, "quantity": 2, "container_group_id": "g", "content_clearance_mm": None, "measurement_confidence": "exact"}]
+        with tempfile.TemporaryDirectory() as temp_dir, patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}):
+            response = handle_palette_request(request("solve_project", project=project), ADDIN, ROOT)
+        self.assertEqual(response["partition"]["summary"]["status"], "constructed")
+        self.assertEqual(response["partition"]["summary"]["automatic_body_count"], 0)
+        self.assertFalse(response["saved"])
     def test_invalid_project_returns_an_actionable_response_without_overwriting_saved_data(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir, patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}):
             valid = blank_project_v1()

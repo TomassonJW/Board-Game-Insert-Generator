@@ -8,7 +8,7 @@ Statut produit : **MVP V0.1 reouvert ; fondations techniques presentes, conformi
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P56 implemente et installe, P57 ready ; smoke visuel P56 non observe.
+Phase active : P57 implemente, P58 ready ; smoke visuel P56 non observe.
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -1293,3 +1293,29 @@ fusion-validated.
 Preuves ciblees : 6 tests bridge, 5 tests DOM, 87 tests Fusion historiques et
 validation syntaxique JavaScript. P57 est la prochaine mission ready ; la gate
 humaine produit reste P60.
+## P57 - Solveur de partition et expansion conjointe
+
+Statut : implemented, automated-validated, fusion-validated: false,
+print-validated: false.
+
+Le module pur partition_solver.py produit bgig.partition_plan.v1. Il reserve la
+pile P40, reprend les cavites et minima P55, explore une famille bornee de
+partitions en rangees, rotations et ordres deterministes, puis distribue le
+surplus uniquement aux axes extensibles des bacs demandes. Chaque enveloppe
+finale est revalidee par P55 avant acceptation.
+
+Une solution construite remplit tout le volume imprimable sous la pile hors jeux
+techniques. Les jeux contre la boite et entre corps restent des vides. Le nombre
+de corps final est exactement groupes constructibles + complements exacts
+explicitement demandes ; automatic_body_count reste zero. Le mode de complement
+historique auto est refuse avec correction, et un complement exact qui ne couvre
+pas la hauteur de rangement recoit un diagnostic specifique.
+
+La palette expose Calculer la partition et les diagnostics P57 via le bridge
+versionne. Elle permet aussi de saisir les complements exacts. Les boutons de
+materialisation/export du CAD historique ont ete retires du parcours normal en
+attendant P59.
+
+Preuves ciblees : 9 tests solveur, 7 tests bridge, 5 tests DOM et 87 tests Fusion
+historiques. Le solveur est borne et explicable, mais ne revendique pas
+l optimalite mathematique globale. P58 est ready.

@@ -665,3 +665,11 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - C-MODULE : `implemented-ui-bridge`, groupes stables et contraintes P55 editables sans recalcul JavaScript.
 - C-QUALITY : bridge JSON versionne, persistance atomique update-safe, import/export, timeout/retry et moteur pur package dans l add-in.
 - C-SOLVER : P57 devient `ready`; aucun placement global n est revendique par P56.
+## P57 partition solver update
+
+- C-SOLVER : `implemented-core`, solveur borne de partitions en rangees, ordres et rotations avec score de simplicite et digest deterministe.
+- C-MODULE : `implemented-core`, enveloppes finales conjointes revalidees par P55 ; cavites locales inchangees.
+- C-RESERVATION : `implemented-core`, hauteur P40 respectee et faces superieures alignees comme supports demandes.
+- C-QUALITY : `automatic_body_count = 0`, jeux non materialises, diagnostics actionnables, aucune optimalite globale revendiquee.
+- C-FUSION-UI : `implemented-bridge`, action solve_project et synthese construit/impossible ; rendu geometrique complet reste P58.
+- C-CAD-IR : inchange, P59 seul materialisera le plan.

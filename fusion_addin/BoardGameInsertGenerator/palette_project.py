@@ -20,7 +20,7 @@ PALETTE_REQUEST_SCHEMA = "bgig.palette.request.v1"
 PALETTE_RESPONSE_SCHEMA = "bgig.palette.response.v1"
 CURRENT_PROJECT_FILENAME = "bgig_project_v1.json"
 PROJECT_EXPORT_DIRECTORY = "projects"
-SUPPORTED_ACTIONS = frozenset({"load_project", "validate_project", "save_project", "import_project", "export_project"})
+SUPPORTED_ACTIONS = frozenset({"load_project", "validate_project", "save_project", "import_project", "export_project", "solve_project"})
 
 
 class PaletteProjectError(ValueError):
@@ -77,6 +77,7 @@ def current_project_path(addin_dir: str | Path) -> Path:
 def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_id: str) -> dict[str, object]:
     from board_game_insert_generator.expandable_envelope import derive_expandable_envelope_contract
     from board_game_insert_generator.flat_stack_reservation import derive_flat_stack_reservation
+    from board_game_insert_generator.partition_solver import solve_partition_plan
     from board_game_insert_generator.project_v1 import normalize_project_draft
 
     if action == "load_project":
@@ -94,6 +95,7 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
     project = normalization.project
     envelopes = derive_expandable_envelope_contract(project)
     flat_stack = derive_flat_stack_reservation(project)
+    partition = solve_partition_plan(project) if action == "solve_project" else None
     saved = False
     export_path = ""
     if action in {"save_project", "import_project"}:
@@ -111,6 +113,7 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         project=project,
         envelopes=envelopes,
         flat_stack=flat_stack,
+        partition=partition,
         saved=saved,
         migrated=normalization.migrated,
         warnings=warnings,
@@ -125,6 +128,7 @@ def _response(
     project: dict[str, object] | None = None,
     envelopes: dict[str, object] | None = None,
     flat_stack: dict[str, object] | None = None,
+    partition: dict[str, object] | None = None,
     errors: list[str] | None = None,
     warnings: list[str] | None = None,
     saved: bool = False,
@@ -138,6 +142,7 @@ def _response(
         "project": deepcopy(project),
         "envelopes": deepcopy(envelopes),
         "flat_stack": deepcopy(flat_stack),
+        "partition": deepcopy(partition),
         "errors": list(errors or []),
         "warnings": list(warnings or []),
         "saved": saved,

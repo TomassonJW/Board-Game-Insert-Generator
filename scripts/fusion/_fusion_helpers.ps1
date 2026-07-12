@@ -135,7 +135,8 @@ function Assert-BgigPaletteProjectRuntime {
         (Join-Path $AddinPath "palette_project.py"),
         (Join-Path $AddinPath "lib\board_game_insert_generator\project_v1.py"),
         (Join-Path $AddinPath "lib\board_game_insert_generator\expandable_envelope.py"),
-        (Join-Path $AddinPath "lib\board_game_insert_generator\flat_stack_reservation.py")
+        (Join-Path $AddinPath "lib\board_game_insert_generator\flat_stack_reservation.py"),
+        (Join-Path $AddinPath "lib\board_game_insert_generator\partition_solver.py")
     )
     foreach ($requiredPath in $required) {
         if (-not (Test-Path -LiteralPath $requiredPath -PathType Leaf)) {

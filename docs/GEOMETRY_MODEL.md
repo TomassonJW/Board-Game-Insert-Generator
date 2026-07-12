@@ -333,12 +333,14 @@ jeu autour des pieces, les cloisons internes, les parois externes et le fond.
 Elles ne constituent pas encore une cavite materialisee. Les formes non
 rectangulaires sont representees par une enveloppe rectangulaire sure en V0.1 ;
 les formes ergonomiques restent V0.2.
+
 ## P40 - Reservation de pile superieure
 
 La pile plateaux/livrets est une `Reservation` non imprimable : son empreinte et
 sa hauteur diminuent le volume de stockage disponible. Son support est une
 contrainte de placement, pas une feature geometrique ou un corps imprimable.
 P41 devra prouver la continuite de cette surface apres placement.
+
 ## P41/P42 - Comportement historique rejete
 
 P41 decompose le volume libre et P42 peut materialiser certaines regions en bacs
@@ -381,3 +383,21 @@ La translation du repere minimal dans l enveloppe finale est reportee separement
 par minimum_envelope_origin_in_final_mm. Cette translation ne constitue pas un
 recalcul de l arrangement local. P57 choisira conjointement enveloppes finales et
 placements ; P59 materialisera ensuite exactement ce plan.
+
+## P57 - Partition complete sans corps automatique
+
+Le plan bgig.partition_plan.v1 utilise des partitions rectangulaires en rangees.
+Chaque placement porte origine monde, taille monde, rotation Z, enveloppe finale
+locale, cavites P55 et repartition du surplus. Une solution `constructed` prouve :
+
+- tous les corps restent dans la boite et sous la reservation P40 ;
+- les corps ne se chevauchent pas et les jeux demandes sont respectes ;
+- chaque volume imprimable hors jeux appartient a un corps explicitement demande ;
+- les enveloppes finales sont revalidees par P55 ;
+- les cavites et leur repere local ne changent pas ;
+- `unassigned_printable_volume_mm3 = 0` et `automatic_body_count = 0`.
+
+Les complements exacts sont des participants fixes. Un complement `auto` ou de
+hauteur incompatible est refuse ; le solveur ne cree jamais une lamelle pour
+fermer la partition. Le score de simplicite compare une famille bornee de
+candidats et ne revendique pas l optimalite mathematique globale.

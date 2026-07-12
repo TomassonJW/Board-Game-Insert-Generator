@@ -51,6 +51,7 @@ atomiques, sans melanger les niveaux de maturite :
 
 Un track peut etre `designed` sans etre implemente. Le statut precis vit dans
 `docs/CAPABILITY_MAP.md`.
+
 ## Couches logicielles
 
 ### 1. Configuration
@@ -251,9 +252,11 @@ La verification dans Fusion 360 reste manuelle.
 ## P19 completion addendum
 
 P19 est complet contre son contrat autorise : cellules libres AABB exactes (`exact_aabb_cells_v0`), conservation de volume, diagnostics structures, coverage par asset, CLI `validate-box-fill` / `report-box-fill` / `export-box-fill-plan`, fixtures valide et invalides, bridge explicite `derived_from_executable_asset_plan` et transport CAD IR metadata. Les cellules decrivent le residuel et ne constituent pas un placement automatique. P20 greedy reste bloque par gate humaine ; Fusion ne recalcule ni ne materialise ce plan.
+
 ## P20 completion - 2026-07-10
 
 Statut : `done`, `implemented-core`, `implemented-cli`, `implemented-cad-ir-metadata`. Le moteur `box_fill_greedy_2d.v0` produit un nouveau BoxFillPlan sans muter la source, respecte locks, modules manuels, reservations et layers, supporte la rotation XY 90 degres et expose diagnostics, digest, metrics, rapports JSON/Markdown, preview SVG et metadata CAD IR. Aucun backtracking, solveur global, UI persistante, geometrie Fusion ou validation d impression n est ajoute. P21 reste gate et recommande les variantes/scoring.
+
 ## P39 - Plan de bacs derive
 
 Le flux V0.1 est maintenant : `bgig.project.v1` ->
@@ -261,22 +264,31 @@ Le flux V0.1 est maintenant : `bgig.project.v1` ->
 P41 -> CAD IR/Fusion P42. `container_derivation.py` est un module Python pur :
 il dimensionne les bacs et logements requis, mais ne les place pas dans la boite
 et n importe aucune API Fusion. ADR-0049 fixe cette frontiere.
+
 ## P40 - Reservation de pile superieure
 
 `flat_stack_reservation.py` est un module pur entre P39 et P41. Il reserve les
 plateaux/livrets, derive la hauteur restante et demande a P39 des bacs sous cette
 contrainte. Il transmet une exigence de support a P41 sans produire de geometrie
 ni declarer un support physique valide. ADR-0050 fixe ce contrat.
-## P41 - Fermeture globale
 
-olume_closure.py place les bacs et reservations, classifie les regions libres et reste un moteur Python pur. P42 seul produit le CAD IR/Fusion.
-## P42 - Materialisation fonctionnelle V0.1
+## P41 historique et remplacement P57
 
-`volume_cad.py` est une couche pure entre P41 et la CAD IR. Elle relit le projet
-normalise et le plan complet, mais ne refait ni placement ni tolerance. Elle
-cree les corps rectangulaires, leurs coupes de logements et les remplissages
-retenus. L adaptateur Fusion lit seulement cette scene. ADR-0052 interdit toute
-logique de solveur ou de dimensionnement dans Fusion.
+`volume_closure.py` reste une fondation experimentale historique : sa
+classification de regions libres ne constitue plus le plan produit. P57 le
+remplace par `partition_solver.py`, module pur qui produit
+`bgig.partition_plan.v1` depuis P40/P55. Le solveur choisit dimensions finales,
+rotations et positions des seuls corps demandes, revalide P55 et conserve les
+jeux comme vides. Il est borne et deterministe, sans pretendre etre globalement
+optimal.
+
+## P42 historique et remplacement P59
+
+`volume_cad.py` materialise encore le plan P41 historique, y compris ses
+remplissages retenus. Cette route reste testee comme fondation experimentale mais
+est `superseded-for-product`. P59 produira la CAD IR exclusivement depuis
+`bgig.partition_plan.v1`, sans region libre materialisee. ADR-0052 continue
+d interdire toute logique de solveur ou de dimensionnement dans Fusion.
 
 ## Pipeline V0.1 corrige par ADR-0054
 

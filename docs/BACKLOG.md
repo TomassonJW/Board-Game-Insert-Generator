@@ -1585,7 +1585,8 @@ impose les dependances de release suivantes.
   aucun automatic filler ; jeux externes conserves comme vides.
 - Acceptation : une solution impossible est expliquee dans la palette au lieu de
   generer lamelles ou micro-volumes.
-- Statut : blocked-by-P56.
+- Statut : `implemented`, `automated-validated`, `fusion-validated: false`, `print-validated: false`.
+- Preuves : solveur bgig.partition_plan.v1, 9 tests coeur, bridge palette solve_project, diagnostics francais, 50 bacs et complements exacts. Aucun CAD ni scene Fusion n est produit.
 
 ### P58 - Resultat premium dans la palette Fusion
 
@@ -1597,7 +1598,7 @@ impose les dependances de release suivantes.
   materialiser.
 - Acceptation : aucun dessin indicatif n est presente comme solution ; le
   resultat montre zero corps automatique et devient obsolete apres modification.
-- Statut : blocked-by-P57.
+- Statut : ready.
 
 ### P59 - Materialisation CAD et synchronisation de scene
 

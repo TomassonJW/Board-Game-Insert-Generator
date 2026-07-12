@@ -8,31 +8,31 @@ V0.1 - vrai MVP Fusion-only selon ADR-0055.
 
 ## Derniere mission terminee
 
-P56 - editeur complet embarque dans Fusion.
+P57 - solveur de partition et expansion conjointe.
 
-La palette unique propose les six vues Boite, Pieces, Plateaux, Bacs,
-Fabrication et Resultat. Elle edite bgig.project.v1, persiste atomiquement le
-projet hors du dossier d installation, importe/exporte JSON et affiche les
-contrats P40/P55 renvoyes par Python. Aucun navigateur, localhost, Vite ou calcul
-metier JavaScript n appartient au runtime.
+Le coeur pur produit bgig.partition_plan.v1 depuis bgig.project.v1, P40 et P55.
+Il place uniquement les bacs demandes et complements exacts explicites, remplit
+le volume imprimable hors jeux techniques, revalide les enveloppes finales et
+maintient automatic_body_count a zero. Les impossibilites indiquent une action
+corrective. La palette declenche ce calcul sans logique metier JavaScript.
 
-Preuves : 6 tests bridge, 5 tests DOM, 87 tests Fusion existants, syntaxe
-JavaScript valide, packaging autonome et add-in installe dans AppData. Le smoke
-visuel P56 est prepare mais non observe a cause du blocage Windows
-`apply deny-read ACLs`; le statut fusion-validated reste faux.
+Preuves : 9 tests solveur, 7 tests bridge, 5 tests DOM, 87 tests Fusion
+historiques, grande cardinalite 50 bacs et determinisme par digest. Aucun CAD,
+statut fusion-validated ou print-validated n est revendique.
 
 ## Prochaine mission prete
 
-P57 - Solveur de partition et expansion des bacs.
+P58 - Resultat premium dans la palette Fusion.
 
-Resultat attendu : partitionner le volume sous la pile plate entre les seuls
-bacs demandes et complements explicites, distribuer le surplus dans les
-parois/fonds selon P55, conserver les jeux comme vides et expliquer toute
-impossibilite. Aucun corps de remplissage automatique.
+Resultat attendu : afficher le plan P57 reel, ses bacs/contenus, cavites,
+enveloppes minimale/finale, surplus, positions, pile, supports, complements,
+alertes, vue dessus et coupe derivees des placements. Le resultat devient
+obsolete apres toute modification et aucune illustration indicative n est
+presentee comme solution.
 
 ## Releases bloquees
 
-P58 depend de P57. P44 a P50 restent bloques jusqu a P60.
+P59 depend de P58. P44 a P50 restent bloques jusqu a P60.
 
 ## Gate humaine active
 
