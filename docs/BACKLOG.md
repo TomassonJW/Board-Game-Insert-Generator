@@ -1499,7 +1499,20 @@ impose les dependances de release suivantes.
 - Objectif : recette complete sur projet vide et jeu temoin reel.
 - Gate : observation Fusion humaine uniquement ; parcours UI couvert par tests
   automatises, impression physique tracee separement.
-- Statut : `ready`, `waiting-human-fusion-smoke`.
+- Resultat : jeu temoin fonctionnel de 20 pieces CAD et 19 cavites, observation
+  humaine recue `Fusion P43 OK` le 2026-07-12.
+- Statut : `done`, `fusion-validated`, `print-validated: false`.
+
+### P51 - Qualite des volumes de complement V0.1.1
+
+- Dependances : P43 accepte.
+- Objectif : privilegier des volumes automatiques moins nombreux et plus utiles,
+  et rendre leur lecture dans Fusion plus claire, sans perdre la conservation de
+  volume, les classifications ni les epaisseurs garanties par P41/P42.
+- Gate : smoke Fusion cible seulement si la geometrie CAD change ; aucune
+  impression physique n est incluse.
+- Statut : `planned`, `post-mvp`, `non-blocking`.
+
 ### P44 a P46 - V0.2 formes et ergonomie
 
 - Dependances : P43 accepte.

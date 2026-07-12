@@ -4,7 +4,7 @@ Derniere mise a jour : 2026-07-12
 
 ## Etat global
 
-Statut produit : **V0 fondateur experimental**.
+Statut produit : **MVP V0.1 fonctionnel accepte dans Fusion ; impression non validee**.
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -1166,3 +1166,19 @@ jamais une forme en L. Le jeu temoin passe de 111 a 20 pieces CAD. L export
 
 Preuves : test anti-fragmentation, scene P43 relue par l adaptateur compact,
 validation des tests P42 et de l export BOM. Le statut Fusion reste a observer.
+
+## P43 - Acceptation Fusion du MVP V0.1
+
+Statut : `done`, `fusion-validated`, `print-validated: false`.
+
+Le jeu temoin P43 a ete prepare automatiquement avec 20 pieces CAD et
+19 cavites, puis confirme dans Fusion par le retour humain `Fusion P43 OK` du
+2026-07-12. Le MVP logiciel V0.1 est accepte : saisie du projet, construction,
+explication, export et scene fonctionnelle Fusion sont couverts. Cette preuve ne
+valide ni impression, ni ajustement physique, ni slicer.
+
+Retour produit consigne : P42/P43 n ont pas redessine la palette Fusion, qui
+reste une surface secondaire. Les 15 remplissages automatiques residuels sont
+valides pour le volume et les collisions, mais restent trop fragmentes pour une
+lecture produit elegante. P51 V0.1.1 est le suivi non bloquant de cette qualite
+de resultat ; P44 V0.2 peut commencer apres une nouvelle decision de priorite.

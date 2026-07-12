@@ -17,6 +17,10 @@ Aucune mission P44+ ne peut devenir `ready` avant P43. Aucune mission P47+ ne
 peut devenir `ready` avant P46. Les explorations P33/P34 sont archivees et ne
 valent pas acceptation de V0.2/V0.3.
 
+P43 est accepte dans Fusion le 2026-07-12. P51 V0.1.1 suit de facon non
+bloquante la lisibilite des volumes automatiques residuels ; P44 V0.2 est
+desormais autorise mais non demarre.
+
 ## Phase 0 - Gouvernance, autonomie, qualite
 
 Objectif : rendre le depot autopilotable, gate-aware et maintenable.

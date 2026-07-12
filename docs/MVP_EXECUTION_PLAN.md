@@ -88,6 +88,10 @@ du jeu temoin. Cette gate ne transforme pas une preuve Fusion en preuve
 d'impression. Une campagne physique peut suivre en V0.1.x sans bloquer
 l'existence du MVP logiciel.
 
+Resultat : le 2026-07-12, le jeu temoin de 20 pieces CAD et 19 cavites a recu le
+retour humain `Fusion P43 OK`. Le MVP logiciel V0.1 est accepte dans Fusion ;
+`print-validated: false` reste obligatoire.
+
 ## Chemin V0.2, bloque jusqu'a P43
 
 | Lot | Resultat |

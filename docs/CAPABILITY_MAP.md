@@ -590,3 +590,15 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
   les blocages ou jeux techniques sans exposer le jargon CAD dans le parcours.
 - C-AESTHETIC / C-STACKING : restent `deferred` jusqu aux gates P43 puis P46.
 - C-PRINT : `print-validated: false` maintenu.
+
+## P43 MVP acceptance update
+
+- C-FUSION-UI / C-CAD-IR / C-CAVITY : `fusion-validated` pour la scene
+  fonctionnelle V0.1 du jeu temoin observee le 2026-07-12 (`Fusion P43 OK`).
+- C-PRODUCT-VISION : `implemented-local-ui` pour le Studio principal ; la
+  palette Fusion reste une surface secondaire et n a pas ete redessinee par
+  P42/P43.
+- C-SOLVER / C-QUALITY : conservation de volume et absence de collision restent
+  couvertes ; la fragmentation des 15 remplissages automatiques residuels est
+  une dette produit suivie par P51 V0.1.1, non une preuve de defaut volumetrique.
+- C-PRINT : `print-validated: false` maintenu.

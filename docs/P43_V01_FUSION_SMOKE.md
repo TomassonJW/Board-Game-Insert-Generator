@@ -46,3 +46,20 @@ Ce statut accepte le MVP logiciel V0.1, mais ne valide pas une impression 3D.
 ## Validation demandee
 
 Retour humain unique : `Fusion P43 OK`, ou le texte/capture de l ecart observe.
+
+## Observation humaine recue
+
+Le 2026-07-12, Thomas a confirme : `Fusion P43 OK`.
+
+## Decision
+
+Le smoke Fusion est accepte. Le MVP logiciel V0.1 est `fusion-validated` ; il
+reste `print-validated: false` tant qu aucune impression et mesure physique n a
+ete conduite.
+
+## Suivi produit non bloquant
+
+La scene P43 contient 20 pieces, dont 15 remplissages automatiques residuels.
+Ils sont corrects pour le volume et les collisions, mais leur fragmentation est
+une dette de lisibilite produit. P51 V0.1.1 la traite sans remettre en cause
+l acceptation du MVP ; un nouveau smoke Fusion sera requis si la geometrie change.
