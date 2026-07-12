@@ -1641,3 +1641,23 @@ impose les dependances de release suivantes.
 - Scope : couvercle encastrable puis couvercle coulissant dans trois rainures
   interieures, entree ouverte, chanfreins et jeu 0 a 0,2 mm.
 - Statut : `deferred-until-v0.2`.
+
+### P60-UX-01 - Presets, corps pleins et dimensions de bac
+
+- Capability : C-FUSION-UI, C-SOLVER, C-CAVITY, C-QUALITY.
+- Dependances : runtime P60 0.1.8 fonctionnel jusqu a la materialisation.
+- Livrables : palette 1280 x 1100, presets purs, Bac vide, Bloc plein / cale,
+  Separateur et verrouillage X/Y/Z visible en mode simple.
+- Statut : implemented, automated-validated, fusion-retest-required,
+  print-validated: false.
+
+### P61 - Empilement vertical explicite
+
+- Capability : C-STACKING, C-LAYERS, C-GRID-3D, C-SOLVER, C-FUSION-UI.
+- Dependances : P60 accepte.
+- Objectif : definir plusieurs bacs en hauteur sans dupliquer implicitement les
+  contenus ni confondre quantite de pieces, nombre de corps et nombre d etages.
+- Premier livrable obligatoire : ADR, contrat pur et diagnostics pour ordre
+  bas/haut, hauteur cumulee, support et depassement de boite.
+- Validation cible : tests moteur et resultat palette, puis gate Fusion dediee.
+- Statut : planned-after-p60, aucune implementation revendiquee.

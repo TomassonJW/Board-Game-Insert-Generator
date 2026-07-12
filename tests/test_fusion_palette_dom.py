@@ -45,8 +45,18 @@ class FusionPaletteDomTests(unittest.TestCase):
     def test_supports_dynamic_rows_simple_advanced_and_local_file_import(self) -> None:
         self.assertIn("expert-mode", self.dom.ids)
         self.assertIn("import-file", self.dom.ids)
-        for action in ("add-content", "duplicate-content", "delete-content", "add-flat", "delete-flat", "add-group", "delete-group", "add-complement", "delete-complement"):
+        for action in ("add-content", "add-content-preset", "duplicate-content", "delete-content", "add-flat", "delete-flat", "add-group", "delete-group", "add-complement", "add-complement-preset", "delete-complement"):
             self.assertIn(action, self.markup)
+
+    def test_makes_presets_solid_bodies_and_final_bin_dimensions_obvious(self) -> None:
+        for marker in (
+            "Demarrage rapide",
+            "Bloc plein / cale",
+            "Bloc plein / cale cree un support sans aucune cavite",
+            "final (auto si vide)",
+            "creation_presets",
+        ):
+            self.assertIn(marker, self.markup)
 
     def test_routes_validation_and_persistence_to_the_versioned_python_bridge(self) -> None:
         self.assertEqual(self.dom.bridge_actions, {"validate_project", "save_project", "export_project", "solve_project"})

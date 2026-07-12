@@ -80,11 +80,18 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
     from board_game_insert_generator.partition_cad import build_partition_cad
     from board_game_insert_generator.partition_result_view import build_partition_result_view
     from board_game_insert_generator.partition_solver import solve_partition_plan
+    from board_game_insert_generator.project_presets import build_creation_presets
     from board_game_insert_generator.project_v1 import normalize_project_draft
 
     if action == "load_project":
         project = load_current_project(addin_dir)
-        return _response(request_id, "ready", project=project, saved=current_project_path(addin_dir).is_file())
+        return _response(
+            request_id,
+            "ready",
+            project=project,
+            creation_presets=build_creation_presets(project),
+            saved=current_project_path(addin_dir).is_file(),
+        )
 
     project_value = request.get("project")
     if action == "import_project" and isinstance(request.get("project_json"), str):
@@ -97,6 +104,10 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
     project = normalization.project
     envelopes = derive_expandable_envelope_contract(project)
     flat_stack = derive_flat_stack_reservation(project)
+    creation_presets = build_creation_presets(
+        project,
+        storage_height_mm=float(flat_stack["flat_stack"]["storage_height_mm"]),
+    )
     partition = solve_partition_plan(project) if action in {"solve_project", "materialize_project", "regenerate_project"} else None
     result_view = (
         build_partition_result_view(partition)
@@ -123,6 +134,7 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         request_id,
         "ready",
         project=project,
+        creation_presets=creation_presets,
         envelopes=envelopes,
         flat_stack=flat_stack,
         partition=partition,
@@ -140,6 +152,7 @@ def _response(
     status: str,
     *,
     project: dict[str, object] | None = None,
+    creation_presets: dict[str, object] | None = None,
     envelopes: dict[str, object] | None = None,
     flat_stack: dict[str, object] | None = None,
     partition: dict[str, object] | None = None,
@@ -156,6 +169,7 @@ def _response(
         "request_id": request_id,
         "status": status,
         "project": deepcopy(project),
+        "creation_presets": deepcopy(creation_presets),
         "envelopes": deepcopy(envelopes),
         "flat_stack": deepcopy(flat_stack),
         "partition": deepcopy(partition),

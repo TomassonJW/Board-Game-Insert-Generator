@@ -703,3 +703,15 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
   et tests de course de demarrage.
 - Validation : `fusion-retest-required` ; aucune acceptation P60 ni impression
   n est encore revendiquee.
+
+## P60 UX creation and sizing update
+
+- C-FUSION-UI : package 0.1.9 avec palette 1280 x 1100, presets de creation
+  fournis par le coeur, corps pleins explicites et dimensions finales par bac en
+  mode simple.
+- C-SOLVER / C-CAVITY : aucun solveur JavaScript ajoute ; les presets et
+  dimensions passent par les contrats Python P55/P57 existants.
+- C-STACKING : P61 planifie apres acceptation P60 ; aucune promesse
+  d empilement vertical dans le runtime courant.
+- Validation : preuves automatisees vertes ; observation Fusion partielle du
+  runtime 0.1.8, retest 0.1.9 requis, print-validated: false.

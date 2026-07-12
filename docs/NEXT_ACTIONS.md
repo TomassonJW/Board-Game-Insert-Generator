@@ -8,46 +8,61 @@ V0.1 - vrai MVP Fusion-only selon ADR-0055.
 
 ## Derniere mission terminee
 
-P59 - materialisation CAD et synchronisation de scene.
+P59 - materialisation CAD et synchronisation de scene, suivie des correctifs
+runtime P60 0.1.7 et 0.1.8.
 
-Le coeur pur transforme le plan P57 courant en `cad_ir.v0` deterministe : un
-composant par corps demande, enveloppes finales, cavites P55 fixes, complements
-uniquement explicites et zero corps automatique. La palette declenche
-generate/regenerate en mode compact, inspecte ou efface uniquement la scene BGIG
-et exporte les imprimables sans toucher aux objets Fusion non-BGIG.
+## Derniere preuve humaine
 
-Preuves ciblees : 8 tests CAD P59, 8 tests bridge projet, 4 tests de
-synchronisation entrypoint, 5 tests resultat palette, 5 tests DOM, 87 tests
-Fusion historiques et syntaxes Python/JavaScript valides. Le manifeste add-in
-est 0.1.6. Aucun statut `fusion-validated` ou `print-validated` n est revendique.
+Le runtime 0.1.8 charge maintenant le projet, execute les boutons projet, calcule
+une partition, affiche le resultat reel et materialise les bacs dans Fusion.
+Cette observation leve les anciens KO de bootstrap et de transport QT. Elle ne
+clot pas encore P60 : regeneration, inspection/export et absence de doublon
+doivent encore etre confirmes sur le package courant.
 
-## Prochaine mission prete
+## Mission courante
 
-P60 - acceptance du vrai MVP V0.1 Fusion-only.
+P60 - acceptance du vrai MVP, avec P60-UX-01 comme finition du parcours de creation Fusion-only, package 0.1.9.
 
-Resultat attendu : preparer automatiquement l add-in exact du commit P59, ouvrir
-un projet Fusion compatible, parcourir les six vues, calculer la partition,
-materialiser la scene, verifier corps/cavites/noms/zero automatique, regenerer
-sans doublon, inspecter puis exporter. La seule preuve manquante est
-l observation humaine dans Fusion.
+Livrables implementes :
+
+- palette initiale/minimale 1280 x 1100 ;
+- presets moteur editables Jetons, Cartes sleevees, Des et Pions ;
+- creation explicite Bac vide, Bloc plein / cale et Separateur ;
+- dimensions finales X/Y/Z de chaque bac visibles en mode simple, avec valeur
+  automatique si le champ reste vide et validation par le moteur ;
+- packaging et tests d installation du nouveau module pur project_presets.py.
+
+## Prochaine action prete
+
+Installer le commit 0.1.9 exact puis rejouer P60 dans Fusion :
+
+1. verifier les presets et leurs valeurs modifiables ;
+2. creer un bloc plein et confirmer qu il ne contient aucune cavite ;
+3. fixer une dimension finale de bac, recalculer et verifier le resultat ;
+4. materialiser, regenerer sans doublon, inspecter puis exporter ;
+5. confirmer la taille initiale de la palette.
+
+## Mission suivante apres acceptation P60
+
+P61 - contrat d empilement vertical explicite.
+
+P61 commencera par une ADR et un contrat pur : etages Z, ordre bas/haut,
+nombre de bacs, surfaces porteuses, hauteur cumulee et diagnostics. Aucun
+empilement implicite ni duplication silencieuse de contenu ne sera introduit.
 
 ## Releases bloquees
 
-P44 a P50 restent bloques jusqu a l acceptation humaine P60.
+P61 et P44 a P50 restent bloques jusqu a l acceptation humaine P60. P47 a P50
+restent aussi bloques jusqu a l acceptation de P46.
 
 ## Gate humaine active
 
-P60 uniquement. Le contrat est `docs/P60_FUSION_MVP_ACCEPTANCE.md` et le
-preparateur est `scripts/fusion/prepare_p60_mvp_acceptance.ps1`. Codex doit
-installer et verifier l add-in exact puis ne fournir a Thomas que les actions
-restantes dans Fusion.
-
-Retour P60 en cours : le premier essai a valide l apparence de la palette mais
-a revele une boucle d accusés QT (`response`) qui bloquait les actions projet.
-Le patch 0.1.8 ajoute le handshake de readiness, ouvre la palette en 1120 x 760 et remplace l ancien dialogue par un bouton Utilities dedie.
-La prochaine action est de recharger l add-in puis rejouer la checklist P60.
+P60 uniquement. Le contrat reste docs/P60_FUSION_MVP_ACCEPTANCE.md et le
+preparateur reste scripts/fusion/prepare_p60_mvp_acceptance.ps1. Codex installe
+et verifie l add-in exact ; Thomas ne realise que les observations dans Fusion.
 
 ## Fin de chaque mission
 
-Apres le smoke : documenter OK/KO sans extrapoler a l impression, mettre a jour
-le pilotage, committer et integrer directement dans main si la gate est acceptee.
+Documenter chaque OK/KO sans extrapoler a l impression, mettre a jour le
+pilotage, committer et integrer directement dans main quand les preuves
+automatisees sont vertes. print-validated: false reste obligatoire.

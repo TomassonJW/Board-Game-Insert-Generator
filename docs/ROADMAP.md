@@ -278,3 +278,10 @@ La materialisation Fusion-only derive maintenant la CAD IR du plan P57 reel,
 avec correspondance exacte des corps demandes, cavites P55 fixes, zero filler
 automatique et synchronisation de scene possedee. P60 devient l unique gate de
 sortie V0.1 ; les V0.2 et V0.3 restent bloquees jusqu a son acceptation.
+
+## P60 UX 0.1.9 et suite structurelle
+
+La finition V0.1 rend les presets, les corps pleins et les dimensions finales de
+bac accessibles dans la palette Fusion. Apres acceptation P60, P61 introduira
+par ADR un empilement vertical explicite avant les formes ergonomiques P44-P46.
+Les couvercles P47-P50 restent bloques jusqu a P46.

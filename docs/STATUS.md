@@ -1429,3 +1429,26 @@ BGIG SVG en 16 et 32 px et le controle est `isPromotedByDefault`.
 Preuves hors Fusion : handshake, ordre des routes, retry, absence de bootstrap
 historique, lanceur palette, promotion toolbar, ressources SVG valides et
 packaging testes. Une nouvelle observation Fusion reste obligatoire.
+
+## P60 - Finition UX Fusion-only 0.1.9
+
+Statut : implemented, automated-validated, partial-fusion-observation,
+fusion-retest-required, print-validated: false.
+
+Le retour humain du package 0.1.8 confirme maintenant le chargement, les actions
+projet, le calcul P57, le resultat P58 et la materialisation P59 dans Fusion.
+Les anciens KO transport/bootstrap sont donc resolus sur ce parcours. P60 reste
+ouverte tant que regeneration sans doublon, inspection et export ne sont pas
+observes sur le package courant.
+
+Le package 0.1.9 porte la palette initiale/minimale a 1280 x 1100. Le coeur pur
+fournit des presets editables Jetons, Cartes sleevees, Des et Pions, chacun
+verifie comme entree produisant une partition a un corps. Fabrication expose
+maintenant Bac vide, Bloc plein / cale sans cavite et Separateur. La vue Bacs
+montre les dimensions finales X/Y/Z en mode simple ; vide signifie automatique,
+une valeur renseignee reste soumise aux minima et limites de boite P55/P57.
+
+Preuves : suite complete 387 tests, dont chaque preset jusqu a une partition
+construite, tests bridge/DOM/transport, syntaxe JavaScript Node, py_compile,
+parsing PowerShell, git diff --check, dry-run P60 et absence de adsk dans le
+coeur.

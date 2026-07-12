@@ -96,6 +96,25 @@ class FusionPaletteProjectTests(unittest.TestCase):
         self.assertEqual(generated["cad_build"]["materialization"]["automatic_body_count"], 0)
         self.assertEqual(generated["cad_build"]["cad_ir_digest"], regenerated["cad_build"]["cad_ir_digest"])
         self.assertEqual(generated["partition"]["plan_digest"], generated["cad_build"]["source_plan_digest"])
+
+    def test_bridge_exposes_presets_adapted_to_the_current_storage_height(self) -> None:
+        project = blank_project_v1()
+        project["flat_items"] = [{
+            "id": "board", "name": "Plateau", "kind": "board",
+            "dimensions_mm": {"x": 100, "y": 100, "z": 4},
+            "quantity": 1, "stack_order": 0,
+        }]
+        with tempfile.TemporaryDirectory() as temp_dir, patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}):
+            response = handle_palette_request(request("validate_project", project=project), ADDIN, ROOT)
+
+        presets = response["creation_presets"]
+        solid = next(item for item in presets["complements"] if item["key"] == "solid")
+        self.assertEqual(presets["schema_version"], "bgig.creation_presets.v1")
+        self.assertEqual(
+            solid["element"]["dimensions_mm"]["z"],
+            response["flat_stack"]["flat_stack"]["storage_height_mm"],
+        )
+
     def test_invalid_project_returns_an_actionable_response_without_overwriting_saved_data(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir, patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}):
             valid = blank_project_v1()
