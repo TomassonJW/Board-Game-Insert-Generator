@@ -1570,7 +1570,8 @@ impose les dependances de release suivantes.
   CommandInputs uniquement sous Reglages experts.
 - Tests : DOM/bridge hors Fusion, absence de dependance runtime web, tests Python
   complets, puis smoke palette Fusion prepare automatiquement.
-- Statut : ready.
+- Statut : `implemented`, `automated-validated`, `fusion-smoke-prepared`, `fusion-validated: false`, `print-validated: false`.
+- Preuves : bridge pur et atomique, 6 tests bridge, 5 tests DOM, 87 tests Fusion existants, syntaxe JavaScript, packaging autonome et installation AppData verifies. Le controle visuel Fusion reste non observe car le controle Windows est bloque par `apply deny-read ACLs`.
 
 ### P57 - Solveur de partition et expansion des bacs
 

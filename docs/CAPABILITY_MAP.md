@@ -657,3 +657,11 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - C-QUALITY : nouveaux contrats interdisent localhost, Vite, navigateur externe et logique metier JavaScript dans le runtime MVP.
 - C-CAD-IR : frontiere inchangee ; la scene Fusion reste une projection.
 - Prototype web P23-P30 : `superseded-for-mvp`, conserve historiquement.
+## P56 embedded Fusion editor update
+
+- C-FUSION-UI : `implemented`, palette principale a six vues, mode simple/avance et etats bornes ; smoke visuel prepare, `fusion-validated: false`.
+- C-ASSET : `implemented-ui-bridge`, ajout, duplication, suppression, sept formes, quantite et bac cible sans cardinalite arbitraire.
+- C-RESERVATION : `implemented-ui-bridge`, pile plate editee et resume P40 calcule par le coeur.
+- C-MODULE : `implemented-ui-bridge`, groupes stables et contraintes P55 editables sans recalcul JavaScript.
+- C-QUALITY : bridge JSON versionne, persistance atomique update-safe, import/export, timeout/retry et moteur pur package dans l add-in.
+- C-SOLVER : P57 devient `ready`; aucun placement global n est revendique par P56.

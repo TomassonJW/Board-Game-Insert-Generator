@@ -239,6 +239,8 @@ BGIG_PALETTE_TITLE = "BGIG - Atelier de rangement"
 BGIG_PALETTE_HTML_FILENAME = "palette.html"
 BGIG_PALETTE_STATE_ACTION = "bgig_palette_state"
 BGIG_PALETTE_NOTICE_ACTION = "bgig_palette_notice"
+BGIG_PALETTE_PROJECT_ACTION = "bgig_palette_project"
+BGIG_PALETTE_PROJECT_RESPONSE_ACTION = "bgig_palette_project_response"
 ACTION_INPUT_ID = "bgig_command_action"
 INPUT_MODE_INPUT_ID = "bgig_input_mode"
 CAD_IR_PATH_INPUT_ID = "bgig_cad_ir_path"
@@ -504,6 +506,19 @@ if adsk is not None:
         def notify(self, args) -> None:  # noqa: ANN001 - Fusion event args.
             action = str(getattr(args, "action", ""))
             try:
+                if action == BGIG_PALETTE_PROJECT_ACTION:
+                    raw_request = json.loads(str(getattr(args, "data", "{}") or "{}"))
+                    request = _safe_default_command_request(self.addin_dir)
+                    response = _handle_palette_project_request(
+                        raw_request,
+                        self.addin_dir,
+                        project_root=request.project_root,
+                    )
+                    self.palette.sendInfoToHTML(
+                        BGIG_PALETTE_PROJECT_RESPONSE_ACTION,
+                        json.dumps(response, ensure_ascii=False),
+                    )
+                    return
                 if action == "refresh" or action == "preview":
                     _publish_palette_state(self.palette, self.addin_dir, "Vue Fusion actualisee.")
                     return
@@ -614,6 +629,21 @@ def _publish_palette_state(palette, addin_dir: Path, notice: str = "", technical
 
 def _publish_palette_notice(palette, notice: str) -> None:  # noqa: ANN001
     palette.sendInfoToHTML(BGIG_PALETTE_NOTICE_ACTION, json.dumps({"notice": notice}, ensure_ascii=False))
+
+
+def _handle_palette_project_request(
+    raw_request: object,
+    addin_dir: Path,
+    *,
+    project_root: Path | None,
+) -> dict[str, object]:
+    """Keep the palette bridge importable outside Fusion and free of business rules."""
+
+    try:
+        from .palette_project import handle_palette_request
+    except ImportError:  # pragma: no cover - Fusion may load the add-in as a script.
+        from palette_project import handle_palette_request  # type: ignore[no-redef]
+    return handle_palette_request(raw_request, addin_dir, project_root)
 
 
 def _palette_state(addin_dir: Path, notice: str = "", technical_detail: str = "") -> dict[str, object]:

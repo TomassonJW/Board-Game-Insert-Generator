@@ -124,6 +124,31 @@ function Assert-BgigFusionAddinMarkers {
     }
 }
 
+function Assert-BgigPaletteProjectRuntime {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $AddinPath
+    )
+
+    $required = @(
+        (Join-Path $AddinPath "palette.html"),
+        (Join-Path $AddinPath "palette_project.py"),
+        (Join-Path $AddinPath "lib\board_game_insert_generator\project_v1.py"),
+        (Join-Path $AddinPath "lib\board_game_insert_generator\expandable_envelope.py"),
+        (Join-Path $AddinPath "lib\board_game_insert_generator\flat_stack_reservation.py")
+    )
+    foreach ($requiredPath in $required) {
+        if (-not (Test-Path -LiteralPath $requiredPath -PathType Leaf)) {
+            throw "Installed Fusion-only runtime file missing: $requiredPath"
+        }
+    }
+    $palette = Get-Content -LiteralPath (Join-Path $AddinPath "palette.html") -Raw -Encoding UTF8
+    foreach ($marker in @("bgig.palette.request.v1", "1. Boite", "6. Resultat")) {
+        if ($palette -notlike "*$marker*") {
+            throw "Installed P56 palette marker missing: $marker"
+        }
+    }
+}
 function Assert-BgigTargetUnderAppData {
     param(
         [Parameter(Mandatory = $true)]
@@ -165,6 +190,16 @@ function Copy-BgigFusionAddin {
             Remove-Item -LiteralPath $TargetPath -Recurse -Force
         }
         Copy-Item -LiteralPath $SourcePath -Destination $parent -Recurse -Force
+
+        # The installed add-in must run without a development checkout or local server.
+        $repoRoot = (Resolve-Path -LiteralPath (Join-Path $SourcePath "..\..") -ErrorAction Stop).Path
+        $engineSource = Join-Path $repoRoot "src\board_game_insert_generator"
+        $engineTarget = Join-Path $TargetPath "lib\board_game_insert_generator"
+        if (-not (Test-Path -LiteralPath $engineSource -PathType Container)) {
+            throw "BGIG pure engine source missing: $engineSource"
+        }
+        New-Item -ItemType Directory -Force -Path $engineTarget | Out-Null
+        Get-ChildItem -LiteralPath $engineSource -File -Filter "*.py" | Copy-Item -Destination $engineTarget -Force
     }
     catch [System.UnauthorizedAccessException] {
         Write-Error $script:BgigAppDataBlockedMessage

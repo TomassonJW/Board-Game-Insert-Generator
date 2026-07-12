@@ -257,17 +257,15 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("incomingFromHTML", source)
         self.assertIn("sendInfoToHTML", source)
         self.assertIn("Atelier de rangement", markup)
-        self.assertIn("Previsualiser", markup)
-        self.assertIn("Mettre a jour la scene", markup)
-        self.assertIn("Exporter les bacs", markup)
+        for label in ("Boite", "Pieces", "Plateaux", "Bacs", "Fabrication", "Resultat"):
+            self.assertIn(label, markup)
+        self.assertIn("Verifier", markup)
+        self.assertIn("Sauvegarder", markup)
         self.assertIn("Reglages experts", markup)
+        self.assertIn("bgig.palette.request.v1", markup)
         self.assertIn("adsk.fusionSendData", markup)
         self.assertIn("fusionJavaScriptHandler", markup)
-        smoke_script = (ROOT / "scripts" / "fusion" / "prepare_p32_palette_test.ps1").read_text(encoding="utf-8")
-        self.assertIn("Atelier de rangement", smoke_script)
-        self.assertIn("Previsualiser", smoke_script)
-        self.assertIn("Reglages experts", smoke_script)
-        self.assertIn("P32 Fusion OK", smoke_script)
+        self.assertNotIn("localhost", markup)
 
     def test_palette_state_keeps_the_print_status_honest(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:

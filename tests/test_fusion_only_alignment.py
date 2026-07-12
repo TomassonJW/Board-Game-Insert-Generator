@@ -41,7 +41,8 @@ class FusionOnlyAlignmentTests(unittest.TestCase):
         p56 = backlog[start:end]
 
         self.assertIn("palette P32", p56)
-        self.assertIn("Statut : ready", p56)
+        self.assertIn("`implemented`", p56)
+        self.assertIn("`fusion-validated: false`", p56)
         self.assertIn("aucune logique metier en JavaScript", p56)
         self.assertNotIn("interface responsive", p56)
 
@@ -52,12 +53,14 @@ class FusionOnlyAlignmentTests(unittest.TestCase):
         self.assertNotIn("Studio", markup)
         self.assertNotIn("Studio", bridge)
         self.assertNotIn("localhost", markup)
-        self.assertIn("sans quitter Fusion", markup)
+        self.assertIn("BGIG dans Fusion 360", markup)
+        self.assertIn("bgig.palette.request.v1", markup)
 
     def test_next_action_does_not_merge_the_abandoned_web_branch(self) -> None:
         actions = self.read("docs/NEXT_ACTIONS.md")
-        self.assertIn("P56 - Editeur complet embarque dans Fusion", actions)
-        self.assertIn("ne doivent pas etre merges", actions)
+        self.assertIn("P56 - editeur complet embarque dans Fusion", actions)
+        self.assertIn("P57 - Solveur de partition", actions)
+        self.assertNotIn("codex/p56-premium-editor", actions)
         self.assertNotIn("inspection visuelle runtime du frontend reel", actions)
 
 

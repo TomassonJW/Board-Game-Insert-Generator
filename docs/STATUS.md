@@ -8,7 +8,7 @@ Statut produit : **MVP V0.1 reouvert ; fondations techniques presentes, conformi
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P54-R termine, P56 Fusion ready.
+Phase active : P56 implemente et installe, P57 ready ; smoke visuel P56 non observe.
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -1266,3 +1266,30 @@ pur ; la route derive-envelopes loopback est historique.
 P56-P60 sont redefinis : editeur Fusion, partition pure, resultat dans la
 palette, materialisation fidele, puis acceptance end-to-end Fusion. Aucune
 validation d impression n est revendiquee.
+## P56 - Editeur complet embarque dans Fusion
+
+Statut : implemented, automated-validated, fusion-smoke-prepared,
+fusion-validated: false, print-validated: false.
+
+La palette P32 est devenue l editeur principal a six vues : Boite, Pieces,
+Plateaux, Bacs, Fabrication et Resultat. Les tables Pieces et Plateaux sont
+sans limite arbitraire, les groupes de bacs sont stables, et le mode avance
+expose jeux, parois, fonds, axes extensibles, dimensions verrouillees et
+preferences de surplus.
+
+Le JavaScript ne calcule aucune regle metier. Il transmet des requetes
+bgig.palette.request.v1 ; palette_project.py normalise bgig.project.v1, appelle
+les contrats purs P40/P55, renvoie bgig.palette.response.v1 et persiste le projet
+atomiquement dans Documents/BGIG/projects, hors du dossier remplace lors des
+mises a jour de l add-in. Import, export et reprise locale sont couverts.
+
+L installateur embarque les modules Python purs dans lib/board_game_insert_generator.
+L add-in installe est donc autonome vis-a-vis du depot, de Vite, de localhost et
+d un navigateur. Le preparateur P56 a installe et verifie les marqueurs dans
+AppData. Le controle visuel Fusion n a pas pu etre automatise : le runtime de
+controle Windows echoue avec apply deny-read ACLs. Ce statut ne vaut donc pas
+fusion-validated.
+
+Preuves ciblees : 6 tests bridge, 5 tests DOM, 87 tests Fusion historiques et
+validation syntaxique JavaScript. P57 est la prochaine mission ready ; la gate
+humaine produit reste P60.

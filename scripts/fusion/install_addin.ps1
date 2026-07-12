@@ -23,6 +23,7 @@ Copy-BgigFusionAddin -SourcePath $source -TargetPath $target -DryRun:$DryRun
 
 if (-not $DryRun) {
     Assert-BgigFusionAddinMarkers -AddinPath $target
+    Assert-BgigPaletteProjectRuntime -AddinPath $target
 }
 
 Write-Output "Installed add-in: $(-not $DryRun)"

@@ -4,40 +4,40 @@ Derniere mise a jour : 2026-07-12
 
 ## Version active
 
-V0.1 - vrai MVP Fusion-only.
-
-ADR-0055 fixe le produit : add-in Fusion 360 unique, palette embarquee comme
-interface principale, coeur Python pur comme source de verite, aucun Studio web,
-localhost ou Vite au runtime.
+V0.1 - vrai MVP Fusion-only selon ADR-0055.
 
 ## Derniere mission terminee
 
-P55 - contrat executable cavites fixes / enveloppes extensibles, integre dans
-origin/main au commit 0ba10d2. Le coeur pur reste valide ; sa route loopback est
-historique et n appartient pas au produit Fusion-only.
+P56 - editeur complet embarque dans Fusion.
 
-## Realignement accepte
+La palette unique propose les six vues Boite, Pieces, Plateaux, Bacs,
+Fabrication et Resultat. Elle edite bgig.project.v1, persiste atomiquement le
+projet hors du dossier d installation, importe/exporte JSON et affiche les
+contrats P40/P55 renvoyes par Python. Aucun navigateur, localhost, Vite ou calcul
+metier JavaScript n appartient au runtime.
 
-P54-R remplace la trajectoire Studio principal / Fusion secondaire. La branche
-codex/p56-premium-editor et son commit f669b82 sont archives comme tentative web
-non integree. Ils ne doivent pas etre merges.
+Preuves : 6 tests bridge, 5 tests DOM, 87 tests Fusion existants, syntaxe
+JavaScript valide, packaging autonome et add-in installe dans AppData. Le smoke
+visuel P56 est prepare mais non observe a cause du blocage Windows
+`apply deny-read ACLs`; le statut fusion-validated reste faux.
 
 ## Prochaine mission prete
 
-P56 - Editeur complet embarque dans Fusion.
+P57 - Solveur de partition et expansion des bacs.
 
-Resultat attendu : etendre palette.html et son bridge pour editer bgig.project.v1
-dans Fusion, avec six vues, tables dynamiques, mode simple/avance, persistance,
-validation et appel au coeur P55. Aucun serveur local ni navigateur externe.
+Resultat attendu : partitionner le volume sous la pile plate entre les seuls
+bacs demandes et complements explicites, distribuer le surplus dans les
+parois/fonds selon P55, conserver les jeux comme vides et expliquer toute
+impossibilite. Aucun corps de remplissage automatique.
 
 ## Releases bloquees
 
-P57 reste bloque par P56. P44 a P50 restent bloques jusqu a P60.
+P58 depend de P57. P44 a P50 restent bloques jusqu a P60.
 
 ## Gate humaine active
 
-Aucune avant P60. Le prochain retour humain obligatoire est le smoke final du
-parcours complet dans Fusion, prepare automatiquement par Codex.
+Aucune avant P60. Le retour humain obligatoire reste le smoke final du parcours
+complet dans Fusion, prepare automatiquement par Codex.
 
 ## Fin de chaque mission
 
