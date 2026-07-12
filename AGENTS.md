@@ -111,6 +111,9 @@ ambigue que les docs ne resolvent pas.
 - Ne jamais importer `adsk.core`, `adsk.fusion` ou une API Fusion dans le coeur
   `src/board_game_insert_generator/`.
 - Fusion 360 est un adaptateur de sortie, pas le moteur de decision.
+- Depuis ADR-0055, l add-in Fusion 360 et sa palette embarquee sont la surface
+  produit unique du MVP ; cela ne deplace aucune logique metier dans adsk.
+- Ne poursuis pas frontend/, Vite ou local_composer comme parcours produit.
 - Toutes les dimensions metier sont en millimetres.
 - Distingue toujours asset, cellule theorique, corps imprimable, cavite, feature,
   layer, reservation, tolerance, layout et export CAD.

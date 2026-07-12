@@ -2,8 +2,8 @@
 
 ## Statut
 
-Reference UX executable pour P55-P60. Ce document decrit le produit a construire,
-pas l interface P38 actuelle.
+Supersede pour le MVP par ADR-0055 et docs/FUSION_ONLY_MVP_CONTRACT.md. Reference historique web uniquement.
+Le contenu ci-dessous documente le prototype web historique. Il ne pilote plus P56-P60.
 
 Prototype visuel : `docs/prototypes/p54_premium_editor_wireframe.html`.
 

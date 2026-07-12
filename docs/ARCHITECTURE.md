@@ -187,19 +187,18 @@ Cette couche doit recevoir une CAD IR deja resolue. Les futurs `PrintableBody`,
 convertis par l'adaptateur. L'adaptateur ne doit pas recalculer layout, offsets
 ou tolerances.
 
-### 8. Interfaces utilisateur futures
+### 8. Interface utilisateur Fusion-only
 
-Responsabilite future : rendre la configuration accessible.
+Responsabilite : porter le parcours produit dans la palette HTML embarquee de
+l add-in Fusion 360.
 
-Options possibles :
+La palette edite un projet versionne, affiche les validations et le plan moteur,
+puis demande explicitement la materialisation. Elle communique avec le coeur par
+un bridge JSON et ne contient aucun solveur. CommandInputs reste un mode expert.
 
-- CLI locale ;
-- formulaire desktop ou web local ;
-- import CSV ;
-- import Google Sheets ;
-- assistant de conception.
-
-Ces options ne doivent pas modifier le contrat du moteur pur.
+Le frontend web P23, le serveur loopback et les autres interfaces sont des
+prototypes ou outils de developpement hors MVP. Ils ne sont pas requis par le
+runtime utilisateur.
 
 ## Flux actuel
 
@@ -284,8 +283,8 @@ logique de solveur ou de dimensionnement dans Fusion.
 Le pipeline de decision est strictement sequentiel :
 
 `projet utilisateur -> cavites calibrees -> enveloppes minimales -> reservation
-plateaux/livrets -> partition et enveloppes finales -> apercu Studio -> CAD IR ->
-Fusion`.
+plateaux/livrets -> partition et enveloppes finales -> palette Fusion -> CAD IR ->
+scene Fusion`.
 
 Le solveur de partition est la seule couche qui peut choisir les dimensions
 exterieures finales. L editeur ne dessine pas les bacs a la main, la CAD IR ne

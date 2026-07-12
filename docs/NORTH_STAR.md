@@ -6,6 +6,11 @@ Transformer les assets reels, contraintes de boite et intentions d'usage d'un je
 de societe en systemes volumetriques modulaires imprimables, tolerancees,
 inspectables et iterables, sans enfermer la logique de conception dans Fusion 360.
 
+La surface utilisateur du MVP est pourtant Fusion 360 lui-meme : BGIG est un
+add-in autonome dont la palette embarquee porte le parcours complet. La logique
+reste hors adsk ; l utilisateur, lui, ne quitte pas Fusion et ne lance aucun
+serveur ou navigateur externe.
+
 ## Traduction produit canonique acceptee le 2026-07-12
 
 La premiere promesse n'est pas un mecanisme avance. C'est un parcours complet :
@@ -68,6 +73,8 @@ separateur n est invente par le moteur.
 
 Le produit est sur la bonne trajectoire quand :
 
+- la palette embarquee dans Fusion permet de creer, sauvegarder, construire et
+  materialiser un projet sans application web externe ;
 - un utilisateur peut decrire les assets et contraintes d'un jeu reel ;
 - le moteur distingue assets, modules, cavites, features, layers et reservations ;
 - plusieurs propositions peuvent etre comparees avec raisons et limites ;

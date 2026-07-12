@@ -31,18 +31,21 @@ apparaitre dans le parcours principal.
 
 ## V0.1 - MVP fonctionnel complet
 
-### 0. Editeur premium complet
+### 0. Add-in Fusion 360 comme produit unique
 
-Le produit presente un editeur unique, beau, fluide et comprehensible. Il permet
-de renseigner tout le projet sans JSON, sans jargon moteur et sans passer par un
-formulaire technique Fusion. Depuis Fusion, la palette conduit clairement vers
-cet editeur puis affiche l etat de la materialisation et de l export.
+Le produit est installe et utilise dans Fusion 360. Le bouton BGIG ouvre une
+palette HTML embarquee dans l add-in ; cette palette porte tout le parcours de
+creation et de resultat. Aucun navigateur externe, serveur loopback, processus
+Vite ou application separee n est requis.
 
-Le parcours novice montre les reglages essentiels au bon moment. Un mode avance
-ouvre progressivement un maximum de controle : jeux globaux et par bac, jeux des
-assets, epaisseurs minimales de paroi et de fond, priorites de repartition du
-surplus, dimensions verrouillees, ordre des plateaux/livrets et diagnostics. Les
-modifications mettent a jour les controles et l apercu sans perdre la saisie.
+La palette parle de boite, pieces, bacs, plateaux, livrets, parois et jeux. Un
+mode avance expose progressivement les axes extensibles, dimensions verrouillees,
+preferences de surplus et diagnostics. La commande Fusion CommandInputs reste
+un recours expert et de smoke, pas le parcours normal.
+
+Le moteur Python pur reste hors adsk et source de verite. La palette transmet un
+projet versionne au bridge ; le coeur calcule ; l adaptateur Fusion materialise.
+La scene CAD ne devient jamais le projet canonique.
 
 ### 1. Mesurer la boite principale
 
@@ -194,7 +197,7 @@ ni qu'une recherche exhaustive est instantanee. Le moteur doit :
 
 ## V0.2 - Formes et ergonomie, apres la V0.1
 
-La V0.2 ajoute dans le meme Studio des parametres visibles en direct et ayant un
+La V0.2 ajoute dans le meme add-in Fusion des parametres visibles en direct et ayant un
 effet reel sur la geometrie :
 
 - coins exterieurs droits, arrondis ou chanfreines ;
@@ -246,7 +249,13 @@ produit V0.3.
 
 ## Frontiere produit et technique
 
-Le Studio est l'interface principale. Le moteur Python pur est la source de
-verite. Fusion materialise et exporte un plan resolu ; il ne choisit ni les
-groupes, ni les dimensions, ni les positions. Les statuts `implemente`,
-`fusion-validated` et `print-validated` restent strictement distincts.
+L add-in Fusion 360 est le produit MVP et sa palette embarquee est l interface
+principale. Le moteur Python pur reste la source de verite et ne depend pas
+d adsk. La palette ne recalcule aucune decision metier : elle edite le projet,
+appelle le coeur par messages JSON versionnes et affiche ses resultats.
+
+L adaptateur Fusion materialise et exporte un plan resolu ; il ne choisit ni
+groupes, ni dimensions, ni positions. frontend/ et le serveur local P23 sont des
+prototypes historiques hors MVP, non packages et non requis au runtime. Les
+statuts implemente, fusion-validated et print-validated restent strictement
+distincts.

@@ -2,7 +2,7 @@
 
 ## Statut
 
-Accepte par l objectif utilisateur du 2026-07-11.
+Supersede le 2026-07-12 par ADR-0055 : add-in Fusion principal, aucun Studio web au runtime.
 
 ## Date
 

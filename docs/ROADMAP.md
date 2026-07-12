@@ -22,6 +22,9 @@ mais le MVP produit n est pas accepte. P52 a P60 reforment le chemin critique
 V0.1 ; P44 V0.2 et P47 V0.3 restent bloques jusqu a P60. ADR-0054 interdit les
 corps de remplissage automatiques et impose l expansion des bacs demandes.
 
+ADR-0055 impose aussi la surface produit : add-in Fusion et palette embarquee uniquement.
+Les references Studio web des phases historiques sont supersedees.
+
 ## Phase 0 - Gouvernance, autonomie, qualite
 
 Objectif : rendre le depot autopilotable, gate-aware et maintenable.
@@ -232,7 +235,7 @@ Statut : `done`, `implemented-local-ui`, `print-validated: false`. Les sorties P
 Statut : `implemented-cad-ir-selection-bridge`, `technical-path-observed`, `product-ux-rejected`, `print-validated: false`. La selection locale P21 devient une liste de composants CAD IR `rectangular_blank` que l add-in Fusion existant sait deja lire. Les dimensions et positions sont copiees depuis le plan resolu ; aucun score, placement, tolerance, cavite ou paroi n est invente. Le retour humain P28 rejette ce resultat comme experience produit ; P31 doit le remplacer par de vrais bacs avant toute nouvelle preuve Fusion.
 ## P29 product recovery - 2026-07-11
 
-Statut : `done-docs`, `accepted-product-direction`. La trajectoire premium est maintenant explicite : Studio local principal, palette Fusion secondaire, previews vivantes, projection des selections vers de vrais bacs, puis forme, esthetique, mecanismes et validation physique. Le raccord P28 de simples blanks est conserve comme preuve technique mais rejete comme resultat produit. P30 est implemente ; P31 attend la strategie de vrais bacs.
+Statut historique : superseded-for-mvp par ADR-0055. Cette tranche avait retenu Studio local principal / palette secondaire ; elle ne pilote plus le produit.
 ## P30 living Studio - 2026-07-11
 
 Statut : `implemented-local-ui`, `browser-inspection-pending`, `print-validated: false`. La direction `Atelier de rangement` est implementee : parcours progressif, boite centrale mise a jour en direct, propositions explicables, controles experts replis et etat de fabrication lisible. Le moteur, le schema V0 et la frontiere Fusion ne changent pas. P31 reste une gate : choisir la strategie de vrais bacs avant de remplacer les blanks P28.
@@ -257,3 +260,15 @@ Statut : `implemented-studio-preview`, `browser-inspection-pending`, `print-vali
 ## P34 sliding lid coupon - 2026-07-11
 
 Statut : implemented-cad-ir-coupon, implemented-fusion-adapter, fusion-smoke-required, print-validated: false. Apres le choix humain C, P34-M001 livre le contrat et P34-M002 ajoute un coupon hors boite : bac ouvert + capot unique avec deux glissieres jointes. Le solveur, les tolerances globales et les bacs ranges restent inchanges. Le smoke Fusion doit observer les deux joins avant P35 impression/mesures.
+
+## Rebase P54-R - Vrai MVP Fusion-only
+
+Statut : accepted-product-direction.
+
+ADR-0055 supersede le chemin Studio web principal. L add-in Fusion est le produit
+unique et sa palette embarquee devient l editeur complet. Le coeur Python reste
+CAD-agnostic ; la palette appelle ce coeur et l adaptateur adsk materialise.
+
+Le frontend React/Vite, le serveur loopback et P23-P30 restent des prototypes
+historiques non packages. P56-P60 suivent maintenant : editeur palette, solveur
+pur, resultat palette, scene fidele, acceptance Fusion end-to-end.

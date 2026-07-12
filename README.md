@@ -258,9 +258,27 @@ python -m board_game_insert_generator export-box-fill-variant examples/p21/portf
 ```
 
 Le dernier export transporte une selection explicite et son portefeuille dans les metadata CAD IR ; Fusion ne recalcule ni ne materialise encore ce plan.
-## BGIG Studio local (P23)
+## Produit actif : add-in Fusion 360
 
-Le premier parcours utilisateur local couvre la boite, les assets, les reservations, les propositions P21, la selection et l export de la decision. Il reste hors Fusion : aucun clic dans le Studio ne cree de geometrie CAD ni ne pretend valider une impression.
+Depuis ADR-0055, BGIG est un produit Fusion-only. Le parcours MVP doit etre
+realise dans la palette embarquee de l add-in
+fusion_addin/BoardGameInsertGenerator. Le coeur Python reste testable hors
+Fusion, mais l utilisateur ne lance ni navigateur, ni serveur loopback, ni Vite.
+
+Le script scripts/fusion/install_addin.ps1 prepare l installation de
+developpement. Les gates Fusion sont preparees automatiquement par Codex ; le
+parcours utilisateur final commence dans Fusion.
+
+## Prototype historique : Studio local P23
+
+Le frontend React/Vite et l API loopback sont conserves uniquement comme
+prototype historique et banc de tests. Ils sont superseded-for-mvp, non packages
+et ne doivent pas etre lances dans le parcours produit. Les commandes ci-dessous
+servent seulement a l investigation de cet ancien prototype.
+
+
+
+Le prototype local couvre la boite, les assets, les reservations, les propositions P21, la selection et l export de la decision. Il reste hors Fusion : aucun clic dans le Studio ne cree de geometrie CAD ni ne pretend valider une impression.
 
 Prerequis supplementaire : Node.js compatible avec Vite (20.19+ ou 22.12+). Installer une fois les dependances frontend, puis demarrer les deux services loopback :
 

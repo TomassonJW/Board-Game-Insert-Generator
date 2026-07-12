@@ -4,6 +4,9 @@
 
 Accepte le 2026-07-12 a la suite du retour produit rejetant l acceptance P43.
 
+Principe de conformite maintenu. La clause Studio principal est supersedee par
+ADR-0055 ; la conformite doit desormais etre prouvee dans l add-in Fusion.
+
 ## Date
 
 2026-07-12

@@ -14,15 +14,15 @@ couvercles. Jusqu'a P60, seules les capacites du chemin V0.1 corrige sont des bl
 
 | Blocker V0.1 | Etat reel | Prochaine preuve |
 | --- | --- | --- |
-| Editeur premium complet | code partiel, UX non acceptee | P54 puis P56 |
-| Tableau assets et regroupement `Bac cible` | contrat/core reutilisables | P55/P56 |
+| Editeur Fusion embarque complet | palette P32 minimale fusion-validated | P56 |
+| Tableau pieces et Bac cible dans Fusion | contrat et coeur reutilisables | P56 |
 | Cavites calibrees par forme, quantite et jeu | P39 reutilisable | P55 |
 | Pile plateaux/livrets | P40 reutilisable | P57 |
 | Parois/fonds minimaux et tolerances | partiellement implementes | P55 |
 | Enveloppes exterieures extensibles | absent | P55/P57 |
 | Partition complete sans corps automatique | absent | P57 |
 | Resultat et apercu issus du vrai plan | absent | P58 |
-| CAD/Fusion fidele et palette fiable | historique non conforme | P59 |
+| Scene Fusion fidele et palette principale fiable | palette minimale seulement | P56/P59 |
 | Parcours V0.1 accepte | non accepte | P60 |
 `C-AESTHETIC` est `deferred` jusqu'a P60. Les mecanismes/couvercles sont
 `deferred` jusqu'a P46. Les paragraphes historiques P33/P34 ci-dessous decrivent
@@ -471,7 +471,7 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
 - C-PRINT / C-ERGONOMICS : inchanges, `print-validated: false` ; les envelopes P28 ne sont pas des bacs finis.
 ## P29 premium product recovery update
 
-- C-PRODUCT-VISION : `accepted-product-direction` pour Studio principal, palette Fusion secondaire et progression vers geometrie fonctionnelle avant esthetique.
+- C-PRODUCT-VISION : orientation historique Studio, remplacee pour le MVP par ADR-0055 et l add-in Fusion comme surface unique.
 - C-FUSION-UI : la commande CommandInputs reste `fusion-validated` comme outil expert/smoke, mais elle est retiree de la cible UX produit ; la palette P32 est prevue sous gate Fusion.
 - C-CAD-IR : P28 reste `implemented-selection-bridge` uniquement ; il ne prouve pas une projection de bac fonctionnel.
 - C-AESTHETIC / C-STACKING : formes, labels et mecanismes sont inclus dans le plan mais restent `planned` / `experimental` jusqu aux gates P33-P35.
@@ -649,3 +649,11 @@ Statut : `accepted`, `implemented-core`, `implemented-cad-ir-metadata`. P20 est 
   des jeux entre bacs, alignements et support de pile.
 - C-CAD-IR / C-FUSION-UI : inchanges ; aucune validation Fusion ou impression
   n est revendiquee.
+## P54-R Fusion-only alignment update
+
+- C-PRODUCT-VISION : `accepted-product-direction` pour add-in Fusion unique.
+- C-FUSION-UI : la palette P32 devient la surface principale a etendre en P56.
+- C-ASSET / C-RESERVATION / C-MODULE : restent dans le coeur pur et seront editables par bridge depuis la palette.
+- C-QUALITY : nouveaux contrats interdisent localhost, Vite, navigateur externe et logique metier JavaScript dans le runtime MVP.
+- C-CAD-IR : frontiere inchangee ; la scene Fusion reste une projection.
+- Prototype web P23-P30 : `superseded-for-mvp`, conserve historiquement.

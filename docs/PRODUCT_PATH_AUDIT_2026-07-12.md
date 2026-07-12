@@ -1,5 +1,8 @@
 # Audit du chemin produit - 2026-07-12
 
+> Surface utilisateur supersedee par ADR-0055 : add-in Fusion et palette embarquee
+> uniquement. Toute mention du Studio web ci-dessous est historique.
+
 ## Verdict
 
 Le projet n'a pas regresse au sens ou les fondations auraient disparu. Il a

@@ -23,7 +23,9 @@ Codex ne demande donc pas de validation de parcours UI, de schema, de backlog ou
 de release interne : ces points sont verifies par tests et preuves de runtime.
 
 La seule validation humaine active avant la fin du MVP est l observation dans
-Fusion d un smoke prepare automatiquement. Les gates physiques d impression et
+Fusion d un smoke prepare automatiquement.
+Le produit observe est l add-in Fusion-only et sa palette embarquee ; aucun
+Studio web ne participe a cette gate. Les gates physiques d impression et
 les gates des V0.2/V0.3 restent hors de ce run.
 
 ## Operations Git standard
@@ -71,7 +73,7 @@ merge, si un conflit reel apparait ou si une action risque de perdre du travail.
 
 | Gate | Condition minimale | Ce qui reste humain | Effet |
 | --- | --- | --- | --- |
-| P60 - Acceptation V0.1 reprise | Editeur complet, cavites calibrees, enveloppes extensibles, partition sans corps automatique et CAD/Fusion fidele | Observation Fusion de la scene finale uniquement ; UI et resultat sont deja prouves par des tests de comportement | Autorise seulement alors le demarrage V0.2 |
+| P60 - Acceptation V0.1 Fusion-only | Editeur complet dans la palette Fusion, cavites calibrees, enveloppes extensibles, partition sans corps automatique, packaging sans localhost et scene fidele | Observation dans Fusion du parcours palette -> construction -> scene -> regeneration/export ; les preuves automatiques sont deja vertes | Autorise seulement alors le demarrage V0.2 |
 | P46 - Acceptation V0.2 | Formes et ergonomie materialisees, contraintes de paroi et volume recalculees | Evaluation visuelle/ergonomique et observation Fusion | Autorise seulement alors le demarrage V0.3 |
 | P50 - Validation V0.3 | Deux familles de couvercles conformes au contrat, coupons prepares | Impressions, mesures, glisse/tenue et interpretation | Autorise la qualification physique des mecanismes |
 

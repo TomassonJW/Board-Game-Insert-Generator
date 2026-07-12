@@ -23,6 +23,8 @@ validation humaine explicite.
 - S'arreter si une gate humaine est atteinte.
 - Ne jamais presenter une validation par code comme une validation par impression.
 - Ne jamais introduire Fusion 360 dans le coeur Python.
+- Le MVP se construit dans la palette embarquee de l add-in Fusion selon ADR-0055.
+- Refuser toute mission qui remet le Studio web, localhost ou Vite dans le runtime MVP.
 
 ## Selection de mission
 

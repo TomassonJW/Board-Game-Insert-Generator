@@ -513,7 +513,7 @@ if adsk is not None:
                         raise FusionSkeletonError("Fusion could not open the expert settings dialog.")
                     _publish_palette_notice(
                         self.palette,
-                        "Les reglages experts sont ouverts. Ils restent un outil de secours : le Studio est la surface de conception.",
+                        "Les reglages experts sont ouverts. Ils restent un outil de diagnostic et de secours.",
                     )
                     return
                 if action == "update":
@@ -632,7 +632,7 @@ def _palette_state(addin_dir: Path, notice: str = "", technical_detail: str = ""
     modules = int(inspection.get("bodies_tagged", 0))
     warnings: list[str] = []
     if not source_ready:
-        warnings.append("Aucun design BGIG pret a appliquer. Reviens au Studio ou ouvre les reglages experts.")
+        warnings.append("Aucun projet BGIG pret. Cree ou importe le projet dans la palette Fusion ; les reglages experts restent disponibles.")
     if inspection_error:
         warnings.append("Fusion ne peut pas encore lire la scene active. Ouvre ou cree un design Fusion.")
     elif scene_roots > 1:
@@ -652,7 +652,7 @@ def _palette_state(addin_dir: Path, notice: str = "", technical_detail: str = ""
 
     return {
         "source_status": "Design recu" if source_ready else "Design manquant",
-        "source_detail": "Le plan venant du Studio est pret a etre applique." if source_ready else "La palette ne fabrique pas de plan toute seule.",
+        "source_detail": "Le plan BGIG courant est pret a etre applique." if source_ready else "L editeur Fusion complet sera active par P56 ; aucun plan externe n est requis par le MVP.",
         "scene_status": scene_status,
         "scene_detail": scene_detail,
         "manufacturing_status": "Geometrie Fusion verifiee — impression non validee",

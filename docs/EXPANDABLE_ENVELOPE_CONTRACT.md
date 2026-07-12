@@ -60,6 +60,12 @@ arrangement.
 - jeux internes et externes restent du vide, jamais du materiau absorbe ;
 - aucun statut Fusion ou impression n est produit.
 
+## Bridge produit Fusion
+
+ADR-0055 conserve ce contrat pur mais retire la route loopback du parcours MVP.
+P56 appelle directement la fonction depuis le bridge de palette embarque. La
+section API locale ci-dessous documente seulement l adaptateur historique P23.
+
 ## API locale
 
 La route loopback POST /api/project-v1/derive-envelopes accepte soit un projet

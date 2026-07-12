@@ -2,7 +2,7 @@
 
 ## Statut
 
-Accepte pour P28 par validation humaine explicite le 2026-07-11.
+Supersede pour le MVP par ADR-0055. Le bridge Studio externe n est plus un chemin produit.
 
 ## Date
 

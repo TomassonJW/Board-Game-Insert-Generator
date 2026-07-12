@@ -1,5 +1,8 @@
 # Plan d execution - BGIG premium
 
+> Surface utilisateur supersedee par ADR-0055 : add-in Fusion et palette embarquee
+> uniquement. Toute mention du Studio web ci-dessous est historique.
+
 > Document historique, remplace pour l'ordre d'execution par
 > `docs/CANONICAL_PRODUCT_VISION.md`, `docs/MVP_EXECUTION_PLAN.md` et ADR-0047.
 > Le 2026-07-12, la sequence P33/P34 a ete reconnue prematuree : aucune mission

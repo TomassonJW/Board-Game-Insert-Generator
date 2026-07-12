@@ -486,3 +486,16 @@ Le pont reste borne : HTML envoie une action Fusion, l add-in relit le registre 
 Statut : `fusion-validated`, `print-validated: false`.
 
 Le retour humain `P32 Fusion OK` du 2026-07-11 accepte la premiere palette secondaire. La palette est donc le point d entree normal de l add-in; le dialogue CommandInputs demeure le mode expert/secours. Cette validation couvre la surface et son bridge d actions, pas la fabrication physique.
+
+## Decision active depuis ADR-0055
+
+La palette persistante n est plus une option future : elle est la surface produit
+principale du MVP Fusion-only.
+
+Elle est embarquee dans fusion_addin/BoardGameInsertGenerator et ne depend
+d aucun serveur web. Son bridge appelle le coeur Python pur ; JavaScript ne
+calcule ni layout, ni cavite, ni tolerance, ni CAD.
+
+La commande classique reste le mode expert, diagnostic et secours. Les sections
+historiques qui disent palette future ou Studio principal sont supersedees par
+ADR-0055 et docs/FUSION_ONLY_MVP_CONTRACT.md.

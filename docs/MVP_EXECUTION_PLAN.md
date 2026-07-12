@@ -128,23 +128,22 @@ le nouveau contrat.
 Chaque risque doit produire un test, un diagnostic ou une gate, jamais une note
 cachee dans un rapport technique.
 
-## Reprise corrective V0.1 apres P43
+## Rebase Fusion-only depuis ADR-0055
 
-P43 est reouvert par ADR-0053 : son smoke valide une scene geometrique, pas le
-MVP produit. ADR-0054 corrige ensuite la semantique de volume : les cavites sont
-calibrees, les enveloppes exterieures des bacs sont extensibles et aucun corps de
-remplissage automatique n est autorise. La sortie V0.1 est P60 :
+La table suivante remplace le contenu de surface utilisateur des anciens P54-P60.
+Les lots P23-P30 restent historiques ; le frontend web et le serveur loopback ne
+font pas partie du runtime ni du packaging MVP.
 
 | Lot | Resultat | Preuve de sortie |
 | --- | --- | --- |
-| P52 | Audit, contrat d acceptance et statuts corriges | Documents coherents avec vision, code et retour humain |
-| P53 | Cavites fixes / enveloppes extensibles | ADR-0054, vision et invariants coherents |
-| P54 | Architecture UX premium | Wireframe, composants, etats, mode simple/avance |
-| P55 | Contrat executable cavite/minimum/final | Schema, migration et tests de non-deformation des cavites |
-| P56 | Editeur premium complet | Tests d interaction sur toutes les saisies et validations |
-| P57 | Partition et expansion des bacs | Zero corps automatique, couverture et diagnostics |
-| P58 | Resultat premium fidele | Apercu issu du plan, surplus parois/fond explique |
-| P59 | CAD/Fusion fidele | Correspondance plan/CAD, palette non bloquante |
-| P60 | MVP V0.1 accepte | Scenarios verts puis smoke Fusion humain unique |
+| P54-R | Produit et pilotage Fusion-only | ADR-0055 et contrats coherents |
+| P55 | Cavites fixes / enveloppes extensibles dans le coeur | Tests de non-deformation |
+| P56 | Editeur complet dans palette Fusion embarquee | DOM/bridge, persistence, smoke palette |
+| P57 | Partition et expansion des bacs | Zero corps auto, couverture, diagnostics |
+| P58 | Resultat reel dans la palette | Preview issue du plan et obsolescence |
+| P59 | Scene Fusion fidele et regenerable | Correspondance plan/CAD/scene, zero doublon |
+| P60 | MVP accepte dans Fusion | Scenarios verts et observation humaine unique |
 
-Les lots P44 a P50 restent hors chemin tant que P60 n est pas accepte.
+P56 reutilise la palette P32 et le coeur P55. Il ne reutilise pas le frontend
+React comme surface produit. P57-P59 restent sequentiels. V0.2 et V0.3 restent
+bloquees jusqu a P60.

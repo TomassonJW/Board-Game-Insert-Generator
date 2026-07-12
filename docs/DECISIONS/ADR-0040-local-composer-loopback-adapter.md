@@ -2,7 +2,7 @@
 
 ## Statut
 
-Accepte pour P23 par validation humaine explicite de l option D le 2026-07-10.
+Supersede pour le MVP par ADR-0055. Conserve comme decision historique du prototype P23.
 
 ## Date
 

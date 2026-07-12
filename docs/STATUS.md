@@ -6,6 +6,10 @@ Derniere mise a jour : 2026-07-12
 
 Statut produit : **MVP V0.1 reouvert ; fondations techniques presentes, conformite produit non acceptee**.
 
+Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
+La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
+Phase active : P54-R termine, P56 Fusion ready.
+
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
 roadmap macro, backlog actionnable, prochaines actions, index ADR/logs et
@@ -1241,3 +1245,24 @@ Preuves : 321 tests Python passent, dont formes rond/carre/rectangle/cartes/
 cube/pion/custom, quantites, plusieurs cavites par groupe, migration additive,
 immutabilite du cavity_layout, contraintes, erreurs et API HTTP. P56 est la
 prochaine mission ready ; P57 reste responsable de la partition conjointe.
+
+## P54-R - Realignement integral Fusion-only
+
+Statut : done-docs, accepted-product-direction, implementation-required.
+
+La decision humaine Fusion uniquement supersede ADR-0040 et ADR-0042 pour le
+MVP. BGIG est un add-in Fusion 360 ; la palette HTML embarquee est la surface
+principale. Aucun navigateur externe, serveur loopback, Vite ou application web
+n appartient au runtime ou au packaging utilisateur.
+
+Le coeur src/board_game_insert_generator reste pur et sans adsk. La palette edite
+bgig.project.v1, transmet des messages JSON versionnes au bridge, affiche le plan
+moteur et declenche l adaptateur CAD. CommandInputs reste expert/secours.
+
+La branche codex/p56-premium-editor au commit f669b82 n a jamais ete integree a
+main et est classee prototype web abandonne. P55 reste valide pour son contrat
+pur ; la route derive-envelopes loopback est historique.
+
+P56-P60 sont redefinis : editeur Fusion, partition pure, resultat dans la
+palette, materialisation fidele, puis acceptance end-to-end Fusion. Aucune
+validation d impression n est revendiquee.

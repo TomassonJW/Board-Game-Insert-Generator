@@ -156,9 +156,9 @@ Tests, cartes backlog ou gates humaines a preparer.
 
 - ADR-0038-box-fill-greedy-2d-v0.md - Placement greedy 2D borne P20.
 - ADR-0039-box-fill-variants-v0.md - Portefeuille de variantes deterministes P21.
-- ADR-0040-local-composer-loopback-adapter.md - App locale React/Vite et adaptateur Python loopback P23.
+- ADR-0040-local-composer-loopback-adapter.md - prototype React/Vite P23, supersede pour le MVP par ADR-0055.
 - ADR-0041-local-composer-selection-cad-ir-bridge.md - Pont CAD IR de la selection locale P21 vers Fusion P28.
-- ADR-0042-studio-primary-fusion-palette-secondary.md - Studio produit principal et palette Fusion secondaire.
+- ADR-0042-studio-primary-fusion-palette-secondary.md - ancienne direction Studio principal, supersedee par ADR-0055.
 - ADR-0043-open-top-trays-from-p21-selection.md - Proposition de bacs ouverts depuis une selection P21 (P31-GATE).
 
 - ADR-0044-removable-lid-contract-v0.md - proposition de couvercle pose non retenue.
@@ -180,3 +180,4 @@ Tests, cartes backlog ou gates humaines a preparer.
 - ADR-0053-product-conformance-before-v01-acceptance.md - conformite produit obligatoire avant acceptance V0.1.
 
 - ADR-0054-fixed-cavities-expandable-container-envelopes.md - cavites calibrees, enveloppes extensibles et aucun corps automatique.
+- ADR-0055-fusion-only-mvp-product-surface.md - add-in Fusion 360 comme produit MVP unique ; Studio web supersede.

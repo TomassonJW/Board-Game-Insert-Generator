@@ -4,36 +4,40 @@ Derniere mise a jour : 2026-07-12
 
 ## Version active
 
-V0.1 - MVP reouvert : editeur premium et solveur d enveloppes extensibles.
+V0.1 - vrai MVP Fusion-only.
 
-ADR-0054 fixe la semantique centrale : cavites calibrees, enveloppes de bacs
-extensibles et aucun corps automatique.
+ADR-0055 fixe le produit : add-in Fusion 360 unique, palette embarquee comme
+interface principale, coeur Python pur comme source de verite, aucun Studio web,
+localhost ou Vite au runtime.
 
 ## Derniere mission terminee
 
-P55 - Contrat executable des cavites et contraintes d expansion.
+P55 - contrat executable cavites fixes / enveloppes extensibles, integre dans
+origin/main au commit 0ba10d2. Le coeur pur reste valide ; sa route loopback est
+historique et n appartient pas au produit Fusion-only.
 
-Le coeur pur expose maintenant les cavites calibrees dans un repere local stable,
-l enveloppe minimale, l enveloppe finale, la distribution du surplus et les
-contraintes d axes/verrous/preferences. Le schema projet reste additif et les
-anciens projets sont normalises avec des valeurs par defaut. La route loopback
-derive-envelopes expose le meme rapport. Preuve : 321 tests Python passent.
+## Realignement accepte
+
+P54-R remplace la trajectoire Studio principal / Fusion secondaire. La branche
+codex/p56-premium-editor et son commit f669b82 sont archives comme tentative web
+non integree. Ils ne doivent pas etre merges.
 
 ## Prochaine mission prete
 
-P56 - Implementation de l editeur premium complet.
+P56 - Editeur complet embarque dans Fusion.
 
-Resultat attendu : implementer la reference P54 sur le contrat reel P55, avec
-sauvegarde/import, tableaux dynamiques, mode simple/avance, validation locale et
-inspection visuelle runtime du frontend reel.
+Resultat attendu : etendre palette.html et son bridge pour editer bgig.project.v1
+dans Fusion, avec six vues, tables dynamiques, mode simple/avance, persistance,
+validation et appel au coeur P55. Aucun serveur local ni navigateur externe.
 
 ## Releases bloquees
 
-P44 a P50 restent bloques jusqu a P60. P57 reste bloque par P56.
+P57 reste bloque par P56. P44 a P50 restent bloques jusqu a P60.
 
 ## Gate humaine active
 
-Aucune. Le prochain retour humain obligatoire reste le smoke Fusion P60.
+Aucune avant P60. Le prochain retour humain obligatoire est le smoke final du
+parcours complet dans Fusion, prepare automatiquement par Codex.
 
 ## Fin de chaque mission
 

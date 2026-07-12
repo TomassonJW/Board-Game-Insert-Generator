@@ -2,7 +2,7 @@
 
 ## Decision centrale
 
-Fusion 360 est une cible de sortie, pas le coeur du projet.
+Fusion 360 heberge l add-in produit et reste la cible CAD, pas le coeur de calcul.
 
 Le moteur Python doit pouvoir calculer un layout, appliquer les tolerances et
 produire un rapport sans importer `adsk.core`, `adsk.fusion` ou toute API Fusion.
@@ -813,3 +813,24 @@ est la reference pour les projets a forte cardinalite. Fusion ne recalcule ni le
 positions, ni les parois, ni les jeux ; P43 doit seulement observer la scene et
 signaler tout ecart visible. Aucun export STL ou statut d impression n est
 inclus dans P42.
+
+## P54-R - Architecture produit Fusion-only
+
+ADR-0055 precise la decision centrale : Fusion reste hors du coeur de calcul,
+mais l add-in Fusion est le produit utilisateur du MVP.
+
+La palette HTML embarquee est la surface principale. Elle edite le projet,
+appelle le coeur Python pur par messages JSON versionnes, affiche le plan resolu
+et declenche la materialisation. Aucun serveur localhost, navigateur externe ou
+processus Vite n appartient au runtime.
+
+La separation est donc :
+
+- palette Fusion : interaction et rendu ;
+- bridge add-in : orchestration et conversion des messages ;
+- coeur Python pur : validation, cavites, partition, plan et CAD IR ;
+- adaptateur adsk : scene, regeneration et export.
+
+La scene reste une projection regenerable. La commande CommandInputs reste un
+secours expert. P56 etend la palette P32 fusion-validated au lieu de poursuivre
+le Studio web P23.

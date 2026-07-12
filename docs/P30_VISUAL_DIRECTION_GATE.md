@@ -1,5 +1,8 @@
 # Gate P30 - Direction visuelle et interaction principale
 
+> Surface utilisateur supersedee par ADR-0055 : add-in Fusion et palette embarquee
+> uniquement. Toute mention du Studio web ci-dessous est historique.
+
 ## Declencheur
 
 Le changement demande ne consiste pas a traduire quelques labels. Il remplace un
