@@ -1501,6 +1501,20 @@ L inspection saine du demarrage reste silencieuse : le rapport complet est
 place dans Details techniques et n alimente plus le message global. Les codes
 P57, digests et statuts moteur ont quitte le premier niveau de l Apercu.
 
-Preuves : 33 tests palette/bridge, controle syntaxique Node et suite complete
-389 tests OK. Aucune validation Fusion ou impression n est
-revendiquee. P62 est la prochaine mission ready.
+Preuves initiales : 33 tests palette/bridge, controle syntaxique Node et suite
+complete 389 tests OK.
+
+### Hotfix P61 - synchronisation de scene Fusion
+
+Le retour humain du 2026-07-13 a revele que `Materialiser dans Fusion`
+continuait d appeler la creation stricte meme lorsqu une scene BGIG saine
+existait deja. Le package 0.1.11 choisit maintenant creation pour un document
+sans scene et regeneration pour l unique scene BGIG correctement identifiee.
+Une scene multiple, non taguee ou ambigue reste bloquee sans suppression.
+
+Le statut `synchronized` exige desormais une inspection apres execution : une
+chaine de succes ne suffit plus si la scene ne peut pas etre retrouvee avec
+exactement le nombre de corps calcules. Le
+rapport retourne par Fusion est place dans `Details techniques` en cas de
+blocage. 392 tests automatises passent ; validation Fusion encore requise. P62
+reste la prochaine mission ready.

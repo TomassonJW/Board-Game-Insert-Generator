@@ -29,15 +29,36 @@ def response() -> dict[str, object]:
         "cad_build": {
             "status": "ready_for_fusion",
             "cad_ir": {"schema_version": "cad_ir.v0", "units": "mm", "components": [], "metadata": {}},
+            "materialization": {"component_count": 0},
         },
+    }
+
+
+def empty_scene() -> dict[str, object]:
+    return {
+        "bgig_scene_roots_total": 0,
+        "scene_roots_by_attribute": 0,
+        "tagged_bgig_entities": 0,
+        "bodies_tagged": 0,
+        "bgig_name_like_untagged_entities": 0,
+    }
+
+
+def owned_scene() -> dict[str, object]:
+    return {
+        "bgig_scene_roots_total": 1,
+        "scene_roots_by_attribute": 1,
+        "tagged_bgig_entities": 9,
+        "bodies_tagged": 0,
+        "bgig_name_like_untagged_entities": 0,
     }
 
 
 class FusionPaletteCadSyncTests(unittest.TestCase):
     def test_materialize_writes_atomic_cad_ir_and_generates_compact_scene(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir, patch.object(
-            entrypoint, "_execute_generation_request", return_value="generated"
-        ) as execute:
+            entrypoint, "_inspect_palette_scene", side_effect=[empty_scene(), owned_scene()]
+        ), patch.object(entrypoint, "_execute_generation_request", return_value="generated") as execute:
             result = entrypoint._synchronize_palette_cad_response(
                 response(), "materialize_project", Path(temp_dir)
             )
@@ -54,22 +75,63 @@ class FusionPaletteCadSyncTests(unittest.TestCase):
         self.assertEqual(request.generation_mode, FUSION_GENERATION_MODE_COMPACT_ONLY)
         self.assertEqual(request.input_mode, FUSION_INPUT_MODE_CAD_IR_FILE)
 
-    def test_materialize_reports_blocked_when_generate_refuses_an_existing_scene(self) -> None:
+    def test_materialize_replaces_one_safely_owned_scene(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir, patch.object(
+            entrypoint, "_inspect_palette_scene", side_effect=[owned_scene(), owned_scene()]
+        ), patch.object(entrypoint, "_execute_generation_request", return_value="regenerated") as execute:
+            result = entrypoint._synchronize_palette_cad_response(
+                response(), "materialize_project", Path(temp_dir)
+            )
+
+        self.assertEqual(execute.call_args.args[0].action, FUSION_COMMAND_ACTION_REGENERATE)
+        self.assertEqual(result["scene_status"], "synchronized")
+        self.assertEqual(result["lifecycle"]["materialized"], "current")
+
+    def test_materialize_blocks_an_ambiguous_scene_without_deleting_it(self) -> None:
+        ambiguous = {
+            **owned_scene(),
+            "bgig_scene_roots_total": 2,
+            "scene_roots_by_attribute": 2,
+        }
         refused = f"Board Game Insert Generator generate refused.\n{entrypoint.BGIG_EXISTING_SCENE_MESSAGE}"
         with tempfile.TemporaryDirectory() as temp_dir, patch.object(
-            entrypoint, "_execute_generation_request", return_value=refused
-        ):
+            entrypoint, "_inspect_palette_scene", side_effect=[ambiguous, ambiguous]
+        ), patch.object(entrypoint, "_execute_generation_request", return_value=refused) as execute:
+            result = entrypoint._synchronize_palette_cad_response(
+                response(), "materialize_project", Path(temp_dir)
+            )
+
+        self.assertEqual(execute.call_args.args[0].action, FUSION_COMMAND_ACTION_GENERATE)
+        self.assertEqual(result["scene_status"], "blocked")
+        self.assertEqual(result["lifecycle"]["materialized"], "blocked")
+
+    def test_success_text_never_masks_a_missing_scene(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir, patch.object(
+            entrypoint, "_inspect_palette_scene", side_effect=[empty_scene(), empty_scene()]
+        ), patch.object(entrypoint, "_execute_generation_request", return_value="generated"):
             result = entrypoint._synchronize_palette_cad_response(
                 response(), "materialize_project", Path(temp_dir)
             )
 
         self.assertEqual(result["scene_status"], "blocked")
-        self.assertIn("generate refused", result["scene_result"])
         self.assertEqual(result["lifecycle"]["materialized"], "blocked")
+
+    def test_wrong_body_count_never_reports_a_synchronized_scene(self) -> None:
+        partial = {**owned_scene(), "bodies_tagged": 1}
+        with tempfile.TemporaryDirectory() as temp_dir, patch.object(
+            entrypoint, "_inspect_palette_scene", side_effect=[empty_scene(), partial]
+        ), patch.object(entrypoint, "_execute_generation_request", return_value="generated"):
+            result = entrypoint._synchronize_palette_cad_response(
+                response(), "materialize_project", Path(temp_dir)
+            )
+
+        self.assertEqual(result["scene_status"], "blocked")
+        self.assertEqual(result["lifecycle"]["materialized"], "blocked")
+
     def test_regenerate_uses_owned_scene_replacement_action(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir, patch.object(
-            entrypoint, "_execute_generation_request", return_value="regenerated"
-        ) as execute:
+            entrypoint, "_inspect_palette_scene", side_effect=[owned_scene(), owned_scene()]
+        ), patch.object(entrypoint, "_execute_generation_request", return_value="regenerated") as execute:
             result = entrypoint._synchronize_palette_cad_response(
                 response(), "regenerate_project", Path(temp_dir)
             )

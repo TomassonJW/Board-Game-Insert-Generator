@@ -1686,6 +1686,9 @@ impose les dependances de release suivantes.
   listes compactes/detaillees, barre persistante et tiroir technique.
 - Acceptation : inspect sain silencieux ; aucune scene Fusion ne change sans
   action ; les transitions et le DOM sont testes.
+- Hotfix 0.1.11 : `Materialiser` cree la premiere scene ou regenere l unique
+  scene BGIG saine ; verification du registre apres execution et blocage des
+  scenes ambigues sans suppression.
 - Statut : `done`, `implemented`, `automated-validated`, `fusion-retest-required`.
 
 ### P62 - Catalogue d elements et orientations

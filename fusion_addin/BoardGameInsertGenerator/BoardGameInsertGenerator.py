@@ -753,11 +753,8 @@ def _synchronize_palette_cad_response(
     temporary = cad_ir_path.with_suffix(cad_ir_path.suffix + ".tmp")
     temporary.write_text(json.dumps(cad_build["cad_ir"], indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     temporary.replace(cad_ir_path)
-    fusion_action = (
-        FUSION_COMMAND_ACTION_REGENERATE
-        if project_action == "regenerate_project"
-        else FUSION_COMMAND_ACTION_GENERATE
-    )
+    inspection_before = _inspect_palette_scene()
+    fusion_action = _palette_materialization_action(project_action, inspection_before)
     request = build_fusion_command_request(
         str(cad_ir_path),
         FUSION_GENERATION_MODE_COMPACT_ONLY,
@@ -766,17 +763,57 @@ def _synchronize_palette_cad_response(
         input_mode=FUSION_INPUT_MODE_CAD_IR_FILE,
     )
     synchronized["scene_result"] = _execute_generation_request(request, addin_dir)
-    synchronized["scene_status"] = (
-        "blocked"
-        if fusion_action == FUSION_COMMAND_ACTION_GENERATE
-        and BGIG_EXISTING_SCENE_MESSAGE in str(synchronized["scene_result"])
-        else "synchronized"
-    )
+    inspection_after = _inspect_palette_scene()
+    scene_verified = _palette_scene_matches_cad_build(inspection_after, cad_build)
+    generation_refused = BGIG_EXISTING_SCENE_MESSAGE in str(synchronized["scene_result"])
+    synchronized["scene_status"] = "synchronized" if scene_verified and not generation_refused else "blocked"
+    synchronized["scene_inspection"] = inspection_after
     lifecycle = dict(synchronized.get("lifecycle") or {})
     lifecycle["materialized"] = "current" if synchronized["scene_status"] == "synchronized" else "blocked"
     synchronized["lifecycle"] = lifecycle
     synchronized["cad_ir_path"] = str(cad_ir_path)
     return synchronized
+
+
+def _inspect_palette_scene() -> dict[str, object]:
+    """Inspect the active Fusion document around one explicit palette mutation."""
+
+    return BgigFusionRegistry(_active_design(_app)).inspect()
+
+
+def _palette_scene_is_safely_owned(inspection: dict[str, object]) -> bool:
+    """Return whether exactly one rediscoverable, tagged BGIG scene owns the result."""
+
+    return (
+        int(inspection.get("bgig_scene_roots_total", 0)) == 1
+        and int(inspection.get("scene_roots_by_attribute", 0)) == 1
+        and int(inspection.get("tagged_bgig_entities", 0)) > 0
+        and int(inspection.get("bgig_name_like_untagged_entities", 0)) == 0
+    )
+
+
+def _palette_scene_matches_cad_build(
+    inspection: dict[str, object],
+    cad_build: dict[str, object],
+) -> bool:
+    """Verify registry ownership and the exact number of requested Fusion bodies."""
+
+    materialization = cad_build.get("materialization")
+    if not isinstance(materialization, dict):
+        return False
+    expected_bodies = int(materialization.get("component_count", -1))
+    return (
+        _palette_scene_is_safely_owned(inspection)
+        and int(inspection.get("bodies_tagged", -1)) == expected_bodies
+    )
+
+
+def _palette_materialization_action(project_action: str, inspection: dict[str, object]) -> str:
+    """Create a first scene or safely replace the single owned BGIG scene."""
+
+    if project_action == "regenerate_project" or _palette_scene_is_safely_owned(inspection):
+        return FUSION_COMMAND_ACTION_REGENERATE
+    return FUSION_COMMAND_ACTION_GENERATE
 
 
 def _palette_project_bridge_error_response(raw_request: object, exc: Exception) -> dict[str, object]:

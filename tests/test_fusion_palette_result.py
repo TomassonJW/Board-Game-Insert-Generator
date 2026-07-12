@@ -36,7 +36,7 @@ class FusionPaletteResultTests(unittest.TestCase):
         for marker in (
             "response.cad_build", "materializedDigest", "component_count",
             'data-fusion="inspect"', 'data-fusion="clear"', 'data-fusion="export"',
-            "scene_status==='synchronized'",
+            "scene_status==='synchronized'", "technicalDetail(payload.scene_result",
         ):
             self.assertIn(marker, self.markup)
         self.assertNotIn("cad_ir_digest", self.markup)

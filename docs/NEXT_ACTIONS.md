@@ -1,6 +1,6 @@
 # Next Actions
 
-Derniere mise a jour : 2026-07-12
+Derniere mise a jour : 2026-07-13
 
 ## Version active
 
@@ -8,19 +8,19 @@ V0.1 - vrai MVP Fusion-only selon ADR-0055 et rebase P60-R accepte.
 
 ## Derniere mission terminee
 
-P61 - etat reactif et architecture de palette, package 0.1.10.
+P61 - etat reactif et architecture de palette, package 0.1.11 avec hotfix de synchronisation Fusion.
 
 ## Derniere preuve automatisee
 
-La palette distingue saisie, minima, proposition et scene Fusion. Une edition
-recalcule les derives, conserve l ancien Apercu comme obsolete et bloque sa
-materialisation. Le rapport inspect complet reste dans Details techniques.
-Les tests palette/bridge et la suite complete sont verts ; aucune validation
-Fusion ou impression n est revendiquee.
+`Materialiser dans Fusion` cree la premiere scene ou remplace l unique scene
+BGIG saine. Une inspection apres execution interdit le faux statut synchronise
+et les erreurs restent disponibles dans Details techniques. Les scenes
+ambigues ne sont pas supprimees. Les tests palette/bridge sont verts ; aucune
+validation Fusion ou impression n est revendiquee.
 
 ## Mission courante
 
-Aucune mission en cours. P61 est integree avant selection de la suite.
+Aucune mission en cours. Le hotfix P61 doit etre integre et installe avant P62.
 
 ## Prochaine action prete
 
