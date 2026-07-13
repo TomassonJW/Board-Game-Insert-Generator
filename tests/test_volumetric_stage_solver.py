@@ -55,7 +55,8 @@ class VolumetricStageSolverTests(unittest.TestCase):
 
         self.assertEqual(result["status"], SOLUTION_COMPLETE)
         self.assertEqual(plan["stage_count"], 2)
-        self.assertEqual({item["origin_mm"]["z"] for item in plan["placements"]}, {0.0, 25.0})
+        self.assertEqual(result["clearances_mm"], {"xy": 0.6, "z": 0.6})
+        self.assertEqual({item["origin_mm"]["z"] for item in plan["placements"]}, {0.0, 25.3})
         self.assertEqual(plan["support"]["status"], "supported")
         self.assertTrue(all(item["supported"] for item in plan["support"]["supports"]))
         self.assertEqual(
@@ -123,7 +124,7 @@ class VolumetricStageSolverTests(unittest.TestCase):
 
         self.assertEqual(result["status"], SOLUTION_COMPLETE)
         self.assertIn("stack_partition_index", plan["search_origin"])
-        self.assertEqual({item["origin_mm"]["z"] for item in plan["placements"]}, {0.0, 35.0})
+        self.assertEqual({item["origin_mm"]["z"] for item in plan["placements"]}, {0.0, 35.3})
         self.assertTrue(any(stage["spanning_body_ids"] for stage in plan["stages"]))
         self.assertEqual(plan["support"]["status"], "supported")
         self.assertTrue(plan["volume_conservation"]["conserved"])

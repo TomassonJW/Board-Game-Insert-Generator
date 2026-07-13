@@ -49,6 +49,7 @@ def solve_stage_portfolio(
     storage_height_mm: float,
     clearance_mm: float,
     *,
+    vertical_clearance_mm: float | None = None,
     preference: str = "balanced",
 ) -> dict[str, object]:
     """Return a bounded portfolio of complete or residual stage candidates."""
@@ -57,8 +58,11 @@ def solve_stage_portfolio(
     bounds = _dimension(box, "box")
     height = float(storage_height_mm)
     clearance = float(clearance_mm)
-    if height <= 0.0 or clearance < 0.0:
-        raise VolumetricStageSolverError("Storage height must be positive and clearance non-negative.")
+    vertical_clearance = clearance if vertical_clearance_mm is None else float(vertical_clearance_mm)
+    if height <= 0.0 or clearance < 0.0 or vertical_clearance < 0.0:
+        raise VolumetricStageSolverError(
+            "Storage height must be positive and XY/Z clearances non-negative."
+        )
     if preference not in _SCORE_WEIGHTS:
         raise VolumetricStageSolverError(f"Unknown P64 solver preference: {preference!r}.")
 
@@ -92,6 +96,7 @@ def solve_stage_portfolio(
                     bounds,
                     height,
                     clearance,
+                    vertical_clearance,
                     preference=preference,
                     order_name=order_name,
                     group_size=group_size,
@@ -109,7 +114,7 @@ def solve_stage_portfolio(
                 break
         if truncated:
             break
-        for stack_partition_index, stacks in enumerate(_stack_partitions(ordered, height)):
+        for stack_partition_index, stacks in enumerate(_stack_partitions(ordered, height, vertical_clearance)):
             stack_partitions_evaluated += 1
             for orientation_strategy in ("width", "height", "balanced"):
                 if len(candidates) >= MAX_CANDIDATES:
@@ -120,6 +125,7 @@ def solve_stage_portfolio(
                     bounds,
                     height,
                     clearance,
+                    vertical_clearance,
                     preference=preference,
                     order_name=order_name,
                     partition_index=stack_partition_index,
@@ -163,6 +169,7 @@ def solve_stage_portfolio(
         "candidates": returned,
         "best_candidate": deepcopy(returned[0]) if returned else None,
         "budgets": budgets,
+        "clearances_mm": {"xy": _round(clearance), "z": _round(vertical_clearance)},
         "search": {
             "deterministic": True,
             "globally_optimal": False,
@@ -196,13 +203,14 @@ def _candidate_for_groups(
     box: dict[str, float],
     storage_height: float,
     clearance: float,
+    vertical_clearance: float,
     *,
     preference: str,
     order_name: str,
     group_size: int,
     orientation_strategy: str,
 ) -> tuple[dict[str, object] | None, int]:
-    height_plan = _stage_heights(groups, storage_height)
+    height_plan = _stage_heights(groups, storage_height, vertical_clearance)
     if height_plan is None:
         return None, 0
     stage_heights, vertical_complete = height_plan
@@ -319,9 +327,10 @@ def _candidate_for_groups(
                 "body_count": len(stage_placements),
                 "row_count": int(layout["row_count"]),
                 "xy_status": "complete" if layout["complete"] else "with_residuals",
+                "clearance_above_mm": _round(vertical_clearance if stage_index < len(groups) - 1 else 0.0),
             }
         )
-        cursor_z = stage_top
+        cursor_z = stage_top + (vertical_clearance if stage_index < len(groups) - 1 else 0.0)
 
     if cursor_z < storage_height - _EPSILON:
         inner_x = max(0.0, box["x"] - 2.0 * clearance)
@@ -336,7 +345,7 @@ def _candidate_for_groups(
             )
         )
 
-    support = _support_contract(placements, stages)
+    support = _support_contract(placements, stages, vertical_clearance)
     if support["status"] == "unsupported":
         return None, attempts
     complete = xy_complete and vertical_complete and all_reach_stage_top
@@ -404,6 +413,7 @@ def _candidate_for_stacks(
     box: dict[str, float],
     storage_height: float,
     clearance: float,
+    vertical_clearance: float,
     *,
     preference: str,
     order_name: str,
@@ -438,7 +448,7 @@ def _candidate_for_stacks(
     for stack_index, item_layout in enumerate(_mappings(layout["placements"])):
         descriptor = _mapping(item_layout["participant"])
         members = _mappings(descriptor["stack_members"])
-        heights = _stack_heights(members, storage_height)
+        heights = _stack_heights(members, storage_height, vertical_clearance)
         if heights is None:
             return None, attempts
 
@@ -486,12 +496,12 @@ def _candidate_for_stacks(
                 if key in participant:
                     placement[key] = participant[key]
             placements.append(placement)
-            cursor_z += body_height
+            cursor_z += body_height + (vertical_clearance if stack_level < len(members) - 1 else 0.0)
         if not isclose(cursor_z, storage_height, abs_tol=0.001):
             return None, attempts
 
     stages = _interval_stages(placements, storage_height, int(layout["row_count"]))
-    support = _support_contract(placements, stages)
+    support = _support_contract(placements, stages, vertical_clearance)
     if support["status"] == "unsupported":
         return None, attempts
 
@@ -557,13 +567,18 @@ def _candidate_for_stacks(
 
 
 def _stack_partitions(
-    values: list[dict[str, object]], storage_height: float
+    values: list[dict[str, object]],
+    storage_height: float,
+    vertical_clearance: float,
 ) -> list[list[list[dict[str, object]]]]:
     """Return bounded deterministic contiguous vertical-stack partitions."""
 
     count = len(values)
     if count == 0:
         return []
+
+    def stack_height(stack: list[dict[str, object]]) -> float:
+        return sum(_axis_base(item, "z") for item in stack) + vertical_clearance * max(0, len(stack) - 1)
 
     candidates: list[list[list[dict[str, object]]]] = []
     if count <= 10:
@@ -575,36 +590,29 @@ def _stack_partitions(
                 if index == count - 1 or boundary_mask & (1 << index):
                     stacks.append(current)
                     current = []
-            if all(
-                sum(_axis_base(item, "z") for item in stack) <= storage_height + _EPSILON
-                for stack in stacks
-            ):
+            if all(stack_height(stack) <= storage_height + _EPSILON for stack in stacks):
                 candidates.append(stacks)
     else:
         for group_size in _group_sizes(count):
-            stacks = [
-                values[index : index + group_size]
-                for index in range(0, count, group_size)
-            ]
-            if all(
-                sum(_axis_base(item, "z") for item in stack) <= storage_height + _EPSILON
-                for stack in stacks
-            ):
+            stacks = [values[index : index + group_size] for index in range(0, count, group_size)]
+            if all(stack_height(stack) <= storage_height + _EPSILON for stack in stacks):
                 candidates.append(stacks)
         greedy: list[list[dict[str, object]]] = []
         current = []
         current_height = 0.0
         for value in values:
             height = _axis_base(value, "z")
-            if current and current_height + height > storage_height + _EPSILON:
+            added_height = height + (vertical_clearance if current else 0.0)
+            if current and current_height + added_height > storage_height + _EPSILON:
                 greedy.append(current)
                 current = []
                 current_height = 0.0
+                added_height = height
             current.append(value)
-            current_height += height
+            current_height += added_height
         if current:
             greedy.append(current)
-        if all(sum(_axis_base(item, "z") for item in stack) <= storage_height + _EPSILON for stack in greedy):
+        if all(stack_height(stack) <= storage_height + _EPSILON for stack in greedy):
             candidates.append(greedy)
 
     unique: list[list[list[dict[str, object]]]] = []
@@ -613,7 +621,7 @@ def _stack_partitions(
         candidates,
         key=lambda stacks: (
             len(stacks),
-            max(sum(_axis_base(item, "z") for item in stack) for stack in stacks),
+            max(stack_height(stack) for stack in stacks),
             tuple(tuple(str(item["id"]) for item in stack) for stack in stacks),
         ),
     )
@@ -626,7 +634,6 @@ def _stack_partitions(
         if len(unique) >= MAX_STACK_PARTITIONS_PER_ORDER:
             break
     return unique
-
 
 def _stack_descriptor(
     members: list[dict[str, object]],
@@ -722,18 +729,22 @@ def _stack_descriptor(
 
 
 def _stack_heights(
-    members: list[dict[str, object]], storage_height: float
+    members: list[dict[str, object]],
+    storage_height: float,
+    vertical_clearance: float,
 ) -> list[float] | None:
     participants = [_mapping(member["participant"]) for member in members]
     heights = [_axis_base(participant, "z") for participant in participants]
-    if sum(heights) > storage_height + _EPSILON:
+    gap_total = vertical_clearance * max(0, len(members) - 1)
+    body_height_budget = storage_height - gap_total
+    if body_height_budget < -_EPSILON or sum(heights) > body_height_budget + _EPSILON:
         return None
     expandable = [
         index
         for index, participant in enumerate(participants)
         if _axis_mode(participant, "z") != "fixed"
     ]
-    extra = max(0.0, storage_height - sum(heights))
+    extra = max(0.0, body_height_budget - sum(heights))
     if extra > _EPSILON and not expandable:
         return None
     targets = [
@@ -761,7 +772,6 @@ def _interval_stages(
     for index, (bottom, top) in enumerate(zip(ordered, ordered[1:])):
         if top - bottom <= _EPSILON:
             continue
-        stage_id = f"interval-{index + 1}"
         active = [
             placement
             for placement in placements
@@ -775,10 +785,14 @@ def _interval_stages(
             for placement in active
             if isclose(float(_mapping(placement["origin_mm"])["z"]), bottom, abs_tol=0.001)
         ]
+        if not starting:
+            continue
+        stage_index = len(stages)
+        stage_id = f"interval-{stage_index + 1}"
         stages.append(
             {
                 "id": stage_id,
-                "index": index,
+                "index": stage_index,
                 "origin_z_mm": _round(bottom),
                 "height_mm": _round(top - bottom),
                 "top_z_mm": _round(top),
@@ -803,8 +817,11 @@ def _interval_stages(
         placement["stage_index"] = start["index"]
     return stages
 
+
 def _stage_heights(
-    groups: list[list[dict[str, object]]], storage_height: float
+    groups: list[list[dict[str, object]]],
+    storage_height: float,
+    vertical_clearance: float,
 ) -> tuple[list[float], bool] | None:
     heights: list[float] = []
     complete = True
@@ -815,10 +832,12 @@ def _stage_heights(
         if any(not isclose(value, stage_height, abs_tol=0.001) for value in fixed):
             complete = False
         heights.append(stage_height)
+    gap_total = vertical_clearance * max(0, len(groups) - 1)
+    body_height_budget = storage_height - gap_total
     minimum_total = sum(heights)
-    if minimum_total > storage_height + _EPSILON:
+    if body_height_budget < -_EPSILON or minimum_total > body_height_budget + _EPSILON:
         return None
-    extra = max(0.0, storage_height - minimum_total)
+    extra = max(0.0, body_height_budget - minimum_total)
     expandable = [
         index
         for index, group in enumerate(groups)
@@ -834,7 +853,6 @@ def _stage_heights(
     weights = [sum(_volume(_mapping(item["minimum_local_mm"])) for item in group) for group in groups]
     _allocate(heights, expandable, extra, targets, weights)
     return heights, complete
-
 
 def _best_xy_layout(
     group: list[dict[str, object]],
@@ -1104,7 +1122,9 @@ def _allocate(
 
 
 def _support_contract(
-    placements: list[dict[str, object]], stages: list[dict[str, object]]
+    placements: list[dict[str, object]],
+    stages: list[dict[str, object]],
+    vertical_clearance: float,
 ) -> dict[str, object]:
     supports: list[dict[str, object]] = []
     minimum_ratio = 1.0
@@ -1124,7 +1144,7 @@ def _support_contract(
                 lower_origin = _mapping(lower["origin_mm"])
                 lower_size = _mapping(lower["world_size_mm"])
                 if not isclose(
-                    float(lower_origin["z"]) + float(lower_size["z"]),
+                    float(lower_origin["z"]) + float(lower_size["z"]) + vertical_clearance,
                     float(origin["z"]),
                     abs_tol=0.001,
                 ):
@@ -1142,6 +1162,7 @@ def _support_contract(
                 "supporting_ids": supporting_ids,
                 "coverage_ratio": _round(ratio),
                 "supported": ratio + _EPSILON >= MIN_SUPPORT_RATIO,
+                "vertical_gap_mm": 0.0 if supporting_ids == ["box-floor"] else _round(vertical_clearance),
             }
         )
     unsupported = [item for item in supports if not item["supported"]]
@@ -1149,6 +1170,7 @@ def _support_contract(
         "status": "unsupported" if unsupported else "supported",
         "minimum_coverage_ratio": _round(minimum_ratio),
         "minimum_required_ratio": MIN_SUPPORT_RATIO,
+        "vertical_gap_mm": _round(vertical_clearance),
         "supports": supports,
         "unsupported_body_ids": [str(item["placement_id"]) for item in unsupported],
     }
@@ -1448,6 +1470,7 @@ def _empty_result(budgets: dict[str, int], message: str) -> dict[str, object]:
         "candidates": [],
         "best_candidate": None,
         "budgets": budgets,
+        "clearances_mm": {"xy": _round(clearance), "z": _round(vertical_clearance)},
         "search": {
             "deterministic": True,
             "globally_optimal": False,

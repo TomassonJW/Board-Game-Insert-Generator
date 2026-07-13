@@ -230,3 +230,17 @@ La proposition utilisateur de 0,1 mm n est pas adoptee comme valeur generale :
 elle peut etre insuffisante en FDM, notamment comme jeu total entre corps. Les
 defaults existants restent experimentaux jusqu aux coupons et toute modification
 reste soumise a la gate humaine du modele de tolerance.
+
+## P65 - Jeux anisotropes entre conteneurs
+
+Le projet distingue layout_clearance_mm, presente dans l interface
+comme jeu X-Y entre conteneurs, et container_z_clearance_mm, jeu vertical entre
+deux enveloppes empilees. Un ancien projet sans champ Z herite de sa valeur X-Y ;
+un nouveau projet ecrit les deux valeurs explicitement, toutes deux a 0,6 mm par
+defaut. Aucun nouveau calibrage physique n est revendique.
+
+Le jeu Z consomme le budget de hauteur entre deux corps, reste un vide technique
+non imprimable et n ajoute aucune cale ni support automatique. Le contrat d appui
+reconnait l alignement des faces separees par ce vide configure ; il ne pretend pas
+a un contact physique. Ces valeurs restent experimentales et a valider par
+impression reelle.

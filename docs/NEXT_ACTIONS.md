@@ -8,7 +8,7 @@ V0.1 - vrai MVP Fusion-only selon ADR-0055 et rebase P60-R accepte.
 
 ## Derniere mission terminee
 
-P64 - solveur volumetrique multi-etages, durcissement runtime et Fusion, package 0.1.15.
+P65-M001 - jeux X-Y/Z, budget vertical et action Fusion persistante, package 0.1.16.
 
 ## Derniere preuve automatisee
 
@@ -17,24 +17,26 @@ haut a cote de piles plus courtes. Les rotations sont revalidees dans leur reper
 local, les cavites conservent leur profondeur utile sous les plateaux et les noms
 techniques Fusion restent uniques meme si les libelles utilisateur sont repetes.
 Une proposition partielle reste bloquee avant Fusion.
-Le contrat, la palette, la CAD IR et le garde-fou Fusion sont couverts par 428 tests.
+Le contrat, le solveur, la palette, la CAD IR et le garde-fou Fusion sont couverts par 430 tests.
 Aucune validation Fusion P64 ou impression n est revendiquee.
 
 ## Mission courante
 
-Aucune mission en cours. P64 est automatise et durci ; P65 reste la premiere mission ready.
+Aucune mission en cours. P65-M001 est implemente ; P65 reste en cours par increments bornes.
 
 ## Prochaine action prete
 
-P65 - Conteneurs, Reglages et Apercu integres, selon ADR-0060 acceptee.
+P65 - Conteneurs, Reglages et Apercu integres.
+
+Increment pret : P65-M002 - Tailles et estimation lisibles dans Conteneurs.
 
 Scope borne :
 
-1. rendre taille minimale, cible et calculee lisibles au meme endroit ;
-2. integrer estimation, corps explicites et suggestions sans mutation ;
-3. rendre les sous-scores, appuis, retraits et residuels explicables sans jargon ;
-4. rendre `Materialiser dans Fusion` primaire uniquement pour une solution complete ;
-5. conserver les tolerances experimentales et ne pas changer leurs valeurs.
+1. afficher minimum, cible et taille calculee au meme endroit ;
+2. proposer une estimation explicite sans modifier le projet ni creer de corps ;
+3. conserver Auto/Cible/Fixe et les axes extensibles comme contrat moteur ;
+4. garder les corps explicites et suggestions confirmables par l utilisateur ;
+5. ne pas ouvrir la refonte generale des styles avant le MVP.
 
 ## Mission suivante apres P65
 

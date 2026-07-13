@@ -209,14 +209,16 @@ class PartitionSolverTests(unittest.TestCase):
             "usable_height_mm": 50.0,
             "lid_clearance_mm": 0.0,
         }
+        project["layout"]["container_z_clearance_mm"] = 1.2
 
         result = solve_partition_plan(project)
 
         self.assertEqual(result["summary"]["status"], "constructed")
         self.assertEqual(result["summary"]["solution_status"], "complete")
         self.assertEqual(result["summary"]["stage_count"], 2)
-        self.assertEqual({item["origin_mm"]["z"] for item in result["placements"]}, {0.0, 25.0})
+        self.assertEqual({item["origin_mm"]["z"] for item in result["placements"]}, {0.0, 25.6})
         self.assertEqual(result["stage_support"]["status"], "supported")
+        self.assertEqual(result["clearance_policy"]["between_bodies_z_mm"], 1.2)
         self.assertTrue(result["validation"]["conserved"])
         self.assertEqual(result["validation"]["unassigned_printable_volume_mm3"], 0.0)
         self.assertEqual(result["summary"]["automatic_body_count"], 0)

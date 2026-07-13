@@ -60,6 +60,8 @@ class PartitionCadTests(unittest.TestCase):
         self.assertEqual(fusion.module_component_count, plan["summary"]["final_body_count"])
         self.assertEqual(len(fusion.compact_occurrences), plan["summary"]["final_body_count"])
         self.assertEqual(len(fusion.exploded_occurrences), 0)
+        parameters = {item["id"]: item["value"] for item in result["cad_ir"]["parameters"]}
+        self.assertEqual(parameters["container_z_clearance_mm"], 0.6)
 
     def test_repeated_user_names_still_create_unique_fusion_body_names(self) -> None:
         value = project(4)
@@ -212,7 +214,7 @@ class PartitionCadTests(unittest.TestCase):
         components = result["cad_ir"]["components"]
 
         self.assertEqual(result["status"], PARTITION_CAD_STATUS_READY)
-        self.assertEqual({component["body"]["printable_origin_mm"]["z"] for component in components}, {0.0, 25.0})
+        self.assertEqual({component["body"]["printable_origin_mm"]["z"] for component in components}, {0.0, 25.3})
         self.assertEqual(len(result["cad_ir"]["metadata"]["box_fill_plan"]["stages"]), 2)
         self.assertEqual(result["cad_ir"]["metadata"]["box_fill_plan"]["stage_support"]["status"], "supported")
         self.assertEqual(result["materialization"]["automatic_body_count"], 0)

@@ -40,7 +40,8 @@ def solve_partition_plan(raw_project: object) -> dict[str, object]:
     stack = {"flat_stack": flat, "top_inset_reservations": top_inset_plan}
     box = _dimension(_mapping(project["box"])["inner_dimensions_mm"])
     storage_height = float(top_inset_plan["design_top_z_mm"])
-    clearance = float(_mapping(project["layout"])["layout_clearance_mm"])
+    xy_clearance = float(_mapping(project["layout"])["layout_clearance_mm"])
+    z_clearance = float(_mapping(project["layout"])["container_z_clearance_mm"])
     diagnostics = [
         _diagnostic(
             str(item["code"]), str(item["message"]), str(item["action"]), str(item.get("reference_id", ""))
@@ -105,7 +106,8 @@ def solve_partition_plan(raw_project: object) -> dict[str, object]:
         participants,
         box,
         storage_height,
-        clearance,
+        xy_clearance,
+        vertical_clearance_mm=z_clearance,
         preference=str(project["solver_preference"]),
     )
     evaluated = int(_mapping(stage_solver["search"])["groupings_evaluated"])
@@ -188,7 +190,7 @@ def solve_partition_plan(raw_project: object) -> dict[str, object]:
             )
             continue
         placements = _mappings(applied_top_insets["placements"])
-        validation = _validate_placements(placements, box, storage_height, clearance)
+        validation = _validate_placements(placements, box, storage_height, xy_clearance, z_clearance)
         if not all(
             bool(validation[key])
             for key in ("inside_box", "no_collisions", "clearances_respected")
@@ -290,8 +292,12 @@ def solve_partition_plan(raw_project: object) -> dict[str, object]:
         "project_name": project["project_name"],
         "box": {"inner_dimensions_mm": _rounded(box), "storage_height_mm": _round(storage_height)},
         "clearance_policy": {
-            "box_perimeter_mm": _round(clearance),
-            "between_bodies_mm": _round(clearance),
+            "box_perimeter_mm": _round(xy_clearance),
+            "between_bodies_mm": _round(xy_clearance),
+            "box_perimeter_xy_mm": _round(xy_clearance),
+            "between_bodies_xy_mm": _round(xy_clearance),
+            "between_bodies_z_mm": _round(z_clearance),
+            "vertical_support_gap_mm": _round(z_clearance),
             "vertical_support_contact_mm": 0.0,
             "materialize_clearances": False,
         },
@@ -361,6 +367,10 @@ def _result(
         "clearance_policy": {
             "box_perimeter_mm": _mapping(project["layout"])["layout_clearance_mm"],
             "between_bodies_mm": _mapping(project["layout"])["layout_clearance_mm"],
+            "box_perimeter_xy_mm": _mapping(project["layout"])["layout_clearance_mm"],
+            "between_bodies_xy_mm": _mapping(project["layout"])["layout_clearance_mm"],
+            "between_bodies_z_mm": _mapping(project["layout"])["container_z_clearance_mm"],
+            "vertical_support_gap_mm": _mapping(project["layout"])["container_z_clearance_mm"],
             "vertical_support_contact_mm": 0.0,
             "materialize_clearances": False,
         },
@@ -449,7 +459,8 @@ def _validate_placements(
     placements: list[dict[str, object]],
     box: dict[str, float],
     storage_height: float,
-    clearance: float,
+    xy_clearance: float,
+    z_clearance: float,
 ) -> dict[str, object]:
     inside = all(
         all(float(_mapping(item["origin_mm"])[axis]) >= -_EPSILON for axis in ("x", "y", "z"))
@@ -464,7 +475,7 @@ def _validate_placements(
         for right in placements[index + 1 :]
     )
     clearances = all(
-        _separated_with_clearance(left, right, clearance)
+        _separated_with_clearance(left, right, xy_clearance, z_clearance)
         for index, left in enumerate(placements)
         for right in placements[index + 1 :]
     )
@@ -487,20 +498,19 @@ def _intersects(left: dict[str, object], right: dict[str, object]) -> bool:
     return all(float(lo[a]) < float(ro[a]) + float(rs[a]) - _EPSILON and float(ro[a]) < float(lo[a]) + float(ls[a]) - _EPSILON for a in ("x", "y", "z"))
 
 
-def _separated_with_clearance(left: dict[str, object], right: dict[str, object], clearance: float) -> bool:
+def _separated_with_clearance(
+    left: dict[str, object],
+    right: dict[str, object],
+    xy_clearance: float,
+    z_clearance: float,
+) -> bool:
     lo, ls = _mapping(left["origin_mm"]), _mapping(left["world_size_mm"])
     ro, rs = _mapping(right["origin_mm"]), _mapping(right["world_size_mm"])
-    if (
-        float(lo["z"]) + float(ls["z"]) <= float(ro["z"]) + _EPSILON
-        or float(ro["z"]) + float(rs["z"]) <= float(lo["z"]) + _EPSILON
-    ):
-        return True
     return any(
-        float(lo[a]) + float(ls[a]) + clearance <= float(ro[a]) + 0.001
-        or float(ro[a]) + float(rs[a]) + clearance <= float(lo[a]) + 0.001
-        for a in ("x", "y")
+        float(lo[axis]) + float(ls[axis]) + clearance <= float(ro[axis]) + 0.001
+        or float(ro[axis]) + float(rs[axis]) + clearance <= float(lo[axis]) + 0.001
+        for axis, clearance in (("x", xy_clearance), ("y", xy_clearance), ("z", z_clearance))
     )
-
 
 
 def _top_inset_payload(value: dict[str, object]) -> dict[str, object]:

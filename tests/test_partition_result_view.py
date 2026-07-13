@@ -126,7 +126,7 @@ class PartitionResultViewTests(unittest.TestCase):
         self.assertEqual(view["status"], "constructed")
         self.assertTrue(view["materializable"])
         self.assertEqual(len(view["stages"]), 2)
-        self.assertEqual({body["z_mm"] for body in view["top_view"]["bodies"]}, {0.0, 25.0})
+        self.assertEqual({body["z_mm"] for body in view["top_view"]["bodies"]}, {0.0, 25.3})
         self.assertEqual({body["stage_id"] for body in view["top_view"]["bodies"]}, {"stage-1", "stage-2"})
         self.assertEqual(view["stage_support"]["status"], "supported")
         self.assertEqual(view["removal_sequence"][0]["stage_id"], "stage-2")

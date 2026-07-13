@@ -471,3 +471,12 @@ La compensation retenue est le maximum des profondeurs depuis le sommet parmi
 les reservations qui recouvrent la cavite. Le fond restant du corps doit rester
 superieur ou egal au fond minimal ; sinon la proposition est bloquee avant CAD.
 Le contrat conserve separement les dimensions de base et la compensation.
+
+## P65 - Intervalle technique Z entre etages
+
+Deux conteneurs empiles ne partagent plus implicitement une face Z. Leur pose est
+separee par container_z_clearance_mm. Cet intervalle appartient au volume
+technique reserve : il reduit la hauteur distribuable aux corps, apparait dans les
+origines CAD IR et ne constitue ni un PrintableBody, ni une Reservation de
+plateau, ni un etage fonctionnel supplementaire. Les etages de sortie restent les
+tranches ou au moins un corps commence.

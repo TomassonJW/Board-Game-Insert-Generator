@@ -40,8 +40,9 @@ avec un seul element developpe a la fois.
 
 La barre basse organise les actions en trois zones : verification/recalcul,
 projet/scene, navigation/sauvegarde. Les actions rares sont dans un menu.
-`Materialiser dans Fusion` et `Exporter les imprimables` restent primaires dans
-l Apercu seulement.
+`Materialiser dans Fusion` reste une action primaire persistante, placee a cote de
+`Recalculer`, mais desactivee tant que la proposition n est pas complete et a jour.
+`Exporter les imprimables` reste primaire dans l Apercu.
 
 Un inspect sain est silencieux au demarrage. Les erreurs utilisateur sont
 locales et actionnables ; le statut de scene reste discret en bas ; le rapport
@@ -67,3 +68,11 @@ niveau. Les scores sont traduits en sous-criteres expliques.
 - Tests DOM des densites, messages, actions et absence de fuite technique.
 - Observation Fusion sur petite et grande palette.
 - Navigation clavier et conservation de la densite choisie.
+
+
+## Amendement du 2026-07-13
+
+Le retour Fusion confirme que la materialisation doit rester accessible pendant les
+tests multi-etages. La barre persistante porte donc l action apres Recalculer.
+Cette visibilite ne desserre pas le garde-fou : proposition partielle, absente ou
+obsolete implique un bouton desactive et aucun envoi vers Fusion.

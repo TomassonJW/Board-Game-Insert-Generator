@@ -8,7 +8,7 @@ Statut produit : **MVP V0.1 reouvert ; fondations techniques presentes, conformi
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P64 durci sur les cas reels multi-couches et Fusion ; P65 reste la prochaine mission ready du chemin V0.1 revise.
+Phase active : P65 demarre par les jeux X-Y/Z et l action Fusion persistante ; les autres finitions Conteneurs, Reglages et Apercu restent a poursuivre.
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -1602,3 +1602,21 @@ traversent plusieurs intervalles, et un plan CAD IR de sept corps nommes
 identiquement passe generation_plan_from_cad_ir avec sept noms uniques.
 Compilation Python et git diff --check passent. Aucune observation Fusion de
 ce correctif ni impression n est encore revendiquee. P65 reste ready.
+
+
+## P65-M001 - Jeux X-Y/Z et materialisation persistante
+
+Le premier increment P65 separe le jeu X-Y entre conteneurs du jeu Z. Les
+anciens projets sans champ Z heritent du jeu X-Y ; le solveur reserve le vide Z
+dans son budget de hauteur, le valide, l expose dans son plan et le transporte
+dans la CAD IR. Aucune cale ni aucun corps automatique n est cree.
+
+La palette 0.1.16 renomme le champ historique, ajoute le reglage Z et place
+Materialiser dans Fusion juste apres Recalculer dans la barre basse. Le bouton
+reste desactive sans solution complete et a jour. L ancien bouton local de l Apercu
+est retire pour eviter le doublon.
+
+Preuves automatisees : 430 tests passent. Les tests projet, solveur volumique,
+partition, CAD et palette couvrent l heritage X-Y vers Z, un cas anisotrope 0,6/1,2 mm, les origines Z, le
+parametre CAD et l unicite de l action. Validation Fusion et impression reelle non
+revendiquees ; P65 reste en cours.

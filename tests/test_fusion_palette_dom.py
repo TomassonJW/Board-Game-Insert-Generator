@@ -71,12 +71,22 @@ class FusionPaletteDomTests(unittest.TestCase):
             self.assertNotIn(malformed, self.markup)
 
     def test_routes_validation_and_persistence_to_the_versioned_python_bridge(self) -> None:
-        self.assertEqual(self.dom.bridge_actions, {"validate_project", "save_project", "export_project", "export_personal_presets", "solve_project"})
+        self.assertEqual(self.dom.bridge_actions, {"validate_project", "save_project", "export_project", "export_personal_presets", "solve_project", "materialize_project"})
         self.assertIn("bgig.palette.request.v1", self.markup)
         self.assertIn("bgig.palette.response.v1", self.markup)
         self.assertIn("bgig_palette_project", self.markup)
         self.assertIn("8000", self.markup)
 
+    def test_exposes_xy_and_z_clearances_and_one_persistent_materialize_action(self) -> None:
+        self.assertIn("Jeu X-Y entre conteneurs", self.markup)
+        self.assertIn('data-path="layout.container_z_clearance_mm"', self.markup)
+        self.assertEqual(self.markup.count('data-bridge="materialize_project"'), 1)
+        self.assertIn('id="materialize-action"', self.markup)
+        self.assertIn("renderPersistentActions", self.markup)
+        self.assertLess(
+            self.markup.index('data-bridge="solve_project">Recalculer</button><button id="materialize-action"'),
+            self.markup.index('<div class="action-zone center">'),
+        )
     def test_has_no_external_web_runtime_or_business_solver_in_javascript(self) -> None:
         for forbidden in ("localhost", "fetch(", "XMLHttpRequest", "npm ", "Vite", "solvePartition", "derive_expandable_envelope_contract"):
             self.assertNotIn(forbidden, self.markup)

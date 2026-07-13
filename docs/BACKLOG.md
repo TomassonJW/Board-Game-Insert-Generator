@@ -1737,9 +1737,16 @@ impose les dependances de release suivantes.
 - Dependances : P64 integre et ADR-0060 acceptee.
 - Objectif : centraliser les corps explicites, tailles min/cible/calculee,
   estimation, jeux et minima ; traduire le resultat et ses sous-scores.
-- Acceptation : aucun code moteur au premier niveau, Materialiser est primaire
-  dans Apercu, les tolerances restent experimentales et inchangees.
-- Statut : `ready`.
+- Acceptation : aucun code moteur au premier niveau ; Materialiser est primaire,
+  persistant et garde par une solution complete/a jour ; les tolerances restent
+  experimentales et leurs valeurs par defaut ne sont pas recalibrees.
+- P65-M001 : done - jeux X-Y/Z separes, heritage compatible, budget Z solve,
+  CAD IR, palette 0.1.16 et action de materialisation persistante.
+- P65-M002 : ready - rapprocher minimum/cible/calculee et estimation dans
+  Conteneurs, sans mutation automatique des corps explicites.
+- Restant P65 : explication compacte des sous-scores, appuis, retraits,
+  residuels et suggestions ; finition des actions d Apercu.
+- Statut : `in_progress`, `fusion-retest-required`, `print-validated: false`.
 
 ### P66 - Acceptance V0.1 revisee Fusion-only
 

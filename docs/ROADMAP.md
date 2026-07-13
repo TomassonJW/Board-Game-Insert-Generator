@@ -349,3 +349,11 @@ revalidation des enveloppes consciente des rotations, la compensation de
 profondeur utile des cavites sous les plateaux et des noms de corps Fusion
 uniques. Les plans historiques gardent la priorite quand ils ferment deja le
 volume ; aucune dependance externe ni corps automatique n est ajoute.
+
+## P65 demarre - 2026-07-13
+
+P65-M001 separe les jeux de placement X-Y et Z, avec heritage compatible pour
+les projets existants. Le vide Z consomme la hauteur solvee et traverse la CAD IR.
+La palette 0.1.16 rend la materialisation persistante a cote du recalcul, sans
+autoriser une proposition partielle ou obsolete. Les travaux de lisibilite et
+d explication restants de P65 ne sont pas declares termines.

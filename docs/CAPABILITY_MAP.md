@@ -789,3 +789,18 @@ de cavite V0.2 restent differees apres P66.
   utile compensee sous plateaux et noms techniques Fusion uniques.- C-QUALITY : 428 tests automatises, aucun corps automatique, `fusion-retest-required`,
   `print-validated: false`.
 - Prochaine capability : C-FUSION-UI/C-MODULE/C-TOLERANCE par P65, ADR-0060 acceptee.
+
+
+## P65-M001 - Jeux anisotropes et action Fusion persistante
+
+- C-TOLERANCE : layout_clearance_mm reste le jeu X-Y ;
+  container_z_clearance_mm reserve un vide vertical reel et herite du X-Y pour
+  les projets historiques.
+- C-SOLVER / C-GRID-3D : les compositions globales et les piles hybrides
+  consomment le jeu Z entre corps, sans creer un faux etage ni un corps support.
+- C-CAD-IR : le parametre Z et les origines separees sont transportes jusqu au
+  plan Fusion.
+- C-FUSION-UI : le reglage Z est editable et l unique action de materialisation
+  est persistante, adjacente a Recalculer et gardee par l etat solve.
+- C-QUALITY : couverture automatisee ciblee puis complete requise ;
+  usion-retest-required, print-validated: false.
