@@ -355,8 +355,8 @@ volume ; aucune dependance externe ni corps automatique n est ajoute.
 P65-M001 separe les jeux de placement X-Y et Z, avec heritage compatible pour
 les projets existants. Le vide Z consomme la hauteur solvee et traverse la CAD IR.
 La palette 0.1.16 rend la materialisation persistante a cote du recalcul, sans
-autoriser une proposition partielle ou obsolete. Les travaux de lisibilite et
-d explication restants de P65 ne sont pas declares termines.
+autoriser une proposition partielle ou obsolete. Les travaux de lisibilite et d explication sont completes par P65-M003 et
+P65-M004 ; P66-M001 devient la prochaine mission de preparation.
 
 ## P65-M002 implemente - 2026-07-13
 

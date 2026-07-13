@@ -8,7 +8,7 @@ Statut produit : **MVP V0.1 reouvert ; fondations techniques presentes, conformi
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P65-M004 implementee et automatisee ; integration P65 puis preparation P66-M001.
+Phase active : P65 integree dans main ; P66-M001 est prete avant la gate humaine P66.
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -1619,7 +1619,7 @@ est retire pour eviter le doublon.
 Preuves automatisees : 430 tests passent. Les tests projet, solveur volumique,
 partition, CAD et palette couvrent l heritage X-Y vers Z, un cas anisotrope 0,6/1,2 mm, les origines Z, le
 parametre CAD et l unicite de l action. Validation Fusion et impression reelle non
-revendiquees ; P65 reste en cours.
+revendiquees ; P65-M001 est integree dans le P65 termine.
 ## P65-M002 - Separation des frontieres de jeu
 
 P65-M002 separe quatre roles non ambigus : jeu X-Y total entre conteneurs,
@@ -1662,8 +1662,8 @@ et a jour.
 
 Preuves : 440 tests automatises, syntaxe JavaScript, compilation Python,
 git diff --check et dry-run d installation Fusion verts. Validation Fusion et
-impression reelle restent a realiser en P66. P65-M004 devient la prochaine
-mission apres integration de M003.
+impression reelle restent a realiser en P66. P65-M003 est integree et
+P65-M004 est implementee dans le package 0.1.19.
 
 ## P65-M004 - Explications et actions finales de l Apercu
 
