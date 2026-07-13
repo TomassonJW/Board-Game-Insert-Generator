@@ -60,7 +60,7 @@ class FusionOnlyAlignmentTests(unittest.TestCase):
         actions = self.read("docs/NEXT_ACTIONS.md")
         framing = self.read("docs/P65_M004_FUNCTIONAL_CONTRACT.md")
 
-        self.assertIn("P65-M004", actions)
+        self.assertIn("P66-M000", actions)
         self.assertIn("P66-M001", actions)
         self.assertIn("Statut : ready.", actions)
         self.assertIn("implemented", framing)

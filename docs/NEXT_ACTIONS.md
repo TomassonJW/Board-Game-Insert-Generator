@@ -1,6 +1,6 @@
 # Next Actions
 
-Derniere mise a jour : 2026-07-13
+Derniere mise a jour : 2026-07-14
 
 ## Version active
 
@@ -8,38 +8,38 @@ V0.1 - vrai MVP Fusion-only selon ADR-0055 et rebase P60-R accepte.
 
 ## Derniere mission terminee
 
-P65-M004 - explications de l Apercu et actions finales, palette et package 0.1.19.
+P66-M000 - quarantaine des complements experimentaux, palette et package 0.1.20.
 
 ## Derniere preuve automatisee
 
-P65-M004 ajoute bgig.preview_explanations.v1 au resultat Python. La palette
-traduit score comparatif, appuis, ordre de retrait, residuels et suggestions
-sans exposer de codes solveur. Exporter les imprimables est primaire dans
-Apercu ; Recalculer et Materialiser dans Fusion restent uniquement dans la
-barre persistante. Aucun score, solveur, tolerance, corps ou geometrie n est
-modifie.
+P66-M000 retire les actions et presets de creation de Bac vide, Bloc plein /
+cale et Separateur du parcours normal. La compatibilite historique reste testee
+par DOM, bridge, import/round-trip et materialisation d un complement explicite.
+Aucun solveur, tolerance, geometrie, migration destructive ou corps automatique
+ne change.
 
-Preuves : 445 tests automatises verts, syntaxe JavaScript, compilation Python,
-git diff --check, installation locale Fusion 0.1.19 et controle des marqueurs verts.
-Aucune validation Fusion ni impression reelle n est revendiquee.
+Preuves : 446 tests automatises verts, syntaxe JavaScript, compilation Python et
+git diff --check verts. Aucune validation Fusion ni impression reelle n est
+revendiquee.
 
 ## Mission courante
 
-Aucune implementation en cours. P65 est integree dans main ; P66-M000 est la
-prochaine mission preparee.
+Aucune implementation en cours. P66-M000 est integree dans main ; P66-M001 est
+la prochaine mission preparee.
 
 ## Prochaine action recommandee
 
-P66-M000 - Quarantaine des complements experimentaux dans la palette.
+P66-M001 - Preparation automatisee de la gate Fusion MVP.
 
-Statut : ready. Retirer du parcours normal les actions Bac vide, Bloc plein /
-cale et Separateur, sans supprimer leur schema, leur loader ou la compatibilite
-des anciens projets. Aucun solveur, tolerance, geometrie ou corps automatique ne
-change. Package cible : 0.1.20.
+Statut : ready. Preparer les fixtures complete sans complement et impossible,
+le test de preparation, le preparateur PowerShell idempotent, le package du
+commit exact, les marqueurs et la checklist humaine. Ne pas corriger le produit
+pour faire passer une fixture ; ne modifier ni solveur, ni tolerance, ni
+gometrie, ni semantique future.
 
 Contrat : `docs/P66_TERRA_EXECUTION_CONTRACT.md` et ADR-0061. Apres integration
-et tests de P66-M000, P66-M001 prepare les fixtures, le package et la checklist,
-puis s arrete a la gate humaine P66-V.
+et validations de P66-M001, s arreter a la gate humaine P66-V ; ne commencer ni
+P67 ni P44.
 
 ## Releases bloquees
 
@@ -49,9 +49,9 @@ changer les defaults ; P69 reste bloque jusqu a P50.
 
 ## Gate humaine active
 
-P66-M000 et P66-M001 sont des missions bornees sans gate humaine. P66-V demande
-ensuite une observation Fusion preparee automatiquement. Apres P66 OK, P67 est
-la gate humaine de priorisation avant toute implementation P44.
+P66-M001 est une mission bornee sans gate humaine. P66-V demande ensuite une
+observation Fusion preparee automatiquement. Apres P66 OK, P67 est la gate
+humaine de priorisation avant toute implementation P44.
 
 ## Fin de chaque mission
 

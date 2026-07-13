@@ -1,6 +1,6 @@
 # P66 - Contrat d execution Terra et acceptation du MVP V0.1
 
-Statut : `ready-for-p66-m000`, `human-fusion-gate-required`,
+Statut : `p66-m000-integrated`, `p66-m001-ready`, `human-fusion-gate-required`,
 `print-validated: false`.
 
 Ce document est l instruction canonique pour deleguer P66 a un agent autonome.
@@ -99,7 +99,7 @@ Type : gate humaine, aucune mutation du depot.
 Thomas suit la checklist generee dans Fusion et retourne soit :
 
 ```text
-P66 Fusion OK 0.1.19 - commit <sha>
+P66 Fusion OK 0.1.20 - commit <sha>
 ```
 
 soit :

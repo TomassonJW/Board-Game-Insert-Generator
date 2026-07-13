@@ -48,14 +48,17 @@ class FusionPaletteDomTests(unittest.TestCase):
             self.assertIn(marker, self.dom.ids)
         for marker in ('data-density="compact"', 'data-density="detailed"', "local-details", "density-compact"):
             self.assertIn(marker, self.markup)
-        for action in ("add-content", "add-content-preset", "duplicate-content", "delete-content", "add-flat", "delete-flat", "add-group", "delete-group", "add-complement", "add-complement-preset", "delete-complement"):
+        for action in ("add-content", "add-content-preset", "duplicate-content", "delete-content", "add-flat", "delete-flat", "add-group", "delete-group", "delete-complement"):
             self.assertIn(action, self.markup)
+        self.assertNotIn('data-action="add-complement"', self.markup)
+        self.assertNotIn('data-action="add-complement-preset"', self.markup)
+        self.assertNotIn('id="complement-presets"', self.markup)
 
-    def test_makes_presets_explicit_bodies_and_container_dimensions_obvious(self) -> None:
+    def test_makes_presets_and_historical_complement_compatibility_obvious(self) -> None:
         for marker in (
             "Demarrage rapide",
-            "bloc plein sert de cale ou de support",
-            "Corps explicites",
+            "Complements historiques",
+            "historic-complements", "renderComplements",
             "Dimensionnement par axe",
             "group-mode", "group-target", "Auto", "Cible", "Fixe",
             "creation_presets", "Dimensions resolues", "Format de cartes", "Debout sur grand cote",

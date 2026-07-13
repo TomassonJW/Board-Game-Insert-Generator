@@ -849,16 +849,17 @@ de cavite V0.2 restent differees apres P66.
 
 - C-QUALITY / C-PRODUCT-VISION : contrat d execution delegable dans
   `docs/P66_TERRA_EXECUTION_CONTRACT.md`, sans nouvelle capability produit.
-- C-FUSION-UI : P66-M000 met en quarantaine les actions normales de creation de
-  complements, tout en conservant la compatibilite des projets historiques.
-- C-SOLVER / C-RESERVATION : la fixture complete sans complement doit relier
-  orientations, top insets, multi-etages, jeux separes, invalidation, scene et
-  export ; une fixture impossible doit rester non materialisable.
-- Validation : P66-M000 `ready`, P66-M001 `blocked-by-p66-m000`; acceptation
+- C-FUSION-UI : P66-M000 est implemented : les actions et presets normaux de
+  creation de complements sont absents, tandis que les projets historiques
+  restent visibles, sauvegardables et regenerables.
+- C-SOLVER / C-RESERVATION : aucun changement de solveur, tolerance, geometrie
+  ou semantique future ; les complements explicites historiques restent sans
+  creation automatique.
+- Validation : P66-M000 `done`, `automated-validated` (446 tests, syntaxe JS,
+  compilation Python et diff-check) ; P66-M001 `ready`. L acceptation reste
   reservee a l observation humaine P66-V ; print-validated: false.
 - Releases : P44-P46 restent deferred jusqu a P66 puis P67 ; P47-P50 restent
   deferred jusqu a P46 ; P69 reste bloquee jusqu a P50.
-
 ## P67-P69 - Pilotage humain et apprentissage post-MVP
 
 - P67 n implemente aucune capability : il priorise humainement P44-P50 et peut

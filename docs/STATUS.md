@@ -1,6 +1,6 @@
 # Status
 
-Derniere mise a jour : 2026-07-13
+Derniere mise a jour : 2026-07-14
 
 ## Etat global
 
@@ -8,7 +8,7 @@ Statut produit : **MVP V0.1 reouvert ; fondations techniques presentes, conformi
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P65 integree dans main ; P66-M000 est prete avant P66-M001 et la gate humaine P66.
+Phase active : P66-M000 terminee ; P66-M001 est prete avant la gate humaine P66.
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -1689,20 +1689,26 @@ sont verifies. La gate humaine Fusion et l impression restent a realiser.
 
 ## P66 - Quarantaine, preuve et fermeture du MVP V0.1
 
-Statut : `P66-M000 ready`, `P66-M001 blocked-by-p66-m000`,
-`human-fusion-gate-required`, `print-validated: false`.
+Statut : `P66-M000 done`, `implemented`, `automated-validated`,
+`fusion-retest-required`, `P66-M001 ready`, `human-fusion-gate-required`,
+`print-validated: false`.
 
 Le contrat `docs/P66_TERRA_EXECUTION_CONTRACT.md` borne la suite. P66-M000 retire
-du parcours normal la creation de Bac vide, Bloc plein / cale et Separateur,
-sans supprimer schema, loader, coeur ou materialisation des anciens projets.
-Le package cible est 0.1.20 ; aucun solveur, tolerance, geometrie ou corps
-automatique ne change.
+le parcours normal de creation de Bac vide, Bloc plein / cale et Separateur, et
+ne fournit plus de presets de complements. Les projets historiques gardent leur
+schema, loader, coeur, bridge et materialisation : un `fill_elements` explicite
+reste importable, lisible, sauvegardable et regenerable, sans migration
+destructive ni corps automatique.
+
+Le package Fusion est 0.1.20. Aucun solveur, tolerance, geometrie, nombre de
+corps automatique ou semantique future des complements ne change. Preuves : 446
+tests automatises, syntaxe JavaScript, compilation Python et `git diff --check`
+verts ; aucune validation Fusion ni impression reelle n est revendiquee.
 
 P66-M001 prepare ensuite un projet canonique sans complement, un projet
 impossible, les preuves, le package installe et la checklist. P66-V reste une
 observation humaine Fusion. Un KO ouvre uniquement un hotfix P66-Hxx borne ; un
 OK clot le MVP fonctionnel Fusion-only avec `print-validated: false`.
-
 ## Sequence post-MVP cadree
 
 P44-P50 gardent leurs identifiants canoniques. P67 est l atelier humain qui

@@ -21,15 +21,10 @@ class ProjectPresetTests(unittest.TestCase):
         self.assertEqual(presets["contents"][0]["content"]["shape_kind"], "round")
         self.assertNotIn("id", presets["contents"][0]["content"])
 
-    def test_exposes_an_obvious_solid_body_without_any_cavity_contract(self) -> None:
+    def test_quarantines_complement_starters_from_normal_creation_presets(self) -> None:
         presets = build_creation_presets(blank_project_v1(), storage_height_mm=42.5)
-        solid = next(item for item in presets["complements"] if item["key"] == "solid")
 
-        self.assertEqual(solid["element"]["kind"], "solid")
-        self.assertEqual(solid["element"]["mode"], "exact")
-        self.assertEqual(solid["element"]["dimensions_mm"]["z"], 42.5)
-        self.assertIsNone(solid["element"]["container_group_id"])
-
+        self.assertEqual(presets["complements"], [])
     def test_default_group_keeps_all_dimensions_automatic_and_expandable(self) -> None:
         defaults = build_creation_presets(blank_project_v1())["defaults"]["container_group"]
 

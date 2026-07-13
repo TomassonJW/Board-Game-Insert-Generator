@@ -1793,7 +1793,7 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
   automatique ou semantique future des complements.
 - Preuves : tests DOM, roundtrip projet, bridge/materialisation historique,
   package 0.1.20 et absence d action normale de creation.
-- Statut : `ready`.
+- Statut : `done`, `implemented`, `automated-validated`, `fusion-retest-required`.
 
 #### P66-M001 - Preparation automatisee
 
@@ -1805,7 +1805,7 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
 - Interdit : aucun correctif opportuniste du solveur, de l UI, des tolerances ou
   de la geometrie pour faire passer la fixture.
 - Sortie : `gate-prepared`, jamais `fusion-validated`.
-- Statut : `blocked-by-p66-m000`.
+- Statut : `ready`.
 
 #### P66-V - Gate humaine Fusion
 

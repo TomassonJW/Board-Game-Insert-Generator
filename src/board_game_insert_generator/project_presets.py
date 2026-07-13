@@ -79,55 +79,18 @@ _CONTENT_PRESETS = (
 
 
 def build_creation_presets(raw_project: object, *, storage_height_mm: float | None = None) -> dict[str, object]:
-    """Return UI seed values adapted to the current usable storage height."""
+    """Return normal-path UI seed values without creating complements."""
 
-    project = normalize_project_draft(raw_project).project
-    available_height = (
-        float(storage_height_mm)
-        if storage_height_mm is not None
-        else float(project["box"]["usable_height_mm"])
-    )
-    default_height = round(max(1.0, available_height), 4)
-    complements = (
-        {
-            "key": "hollow",
-            "label": "Bac vide",
-            "element": {
-                "name": "Bac vide",
-                "kind": "hollow",
-                "mode": "exact",
-                "dimensions_mm": {"x": 40.0, "y": 40.0, "z": default_height},
-                "container_group_id": None,
-            },
-        },
-        {
-            "key": "solid",
-            "label": "Bloc plein / cale",
-            "element": {
-                "name": "Bloc plein",
-                "kind": "solid",
-                "mode": "exact",
-                "dimensions_mm": {"x": 20.0, "y": 20.0, "z": default_height},
-                "container_group_id": None,
-            },
-        },
-        {
-            "key": "separator",
-            "label": "Separateur",
-            "element": {
-                "name": "Separateur",
-                "kind": "separator",
-                "mode": "exact",
-                "dimensions_mm": {"x": 2.0, "y": 50.0, "z": default_height},
-                "container_group_id": None,
-            },
-        },
-    )
+    # Keep accepting the bridge inputs and validating the project shape so the
+    # versioned response remains compatible with historical callers. P66-M000
+    # deliberately exposes no complement starter in the normal product path.
+    normalize_project_draft(raw_project)
+    _ = storage_height_mm
     return {
         "schema_version": CREATION_PRESETS_SCHEMA_V1,
         "card_catalog": card_catalog(),
         "contents": deepcopy(list(_CONTENT_PRESETS)),
-        "complements": deepcopy(list(complements)),
+        "complements": [],
         "defaults": {
             "container_group": {
                 "name": "Nouveau bac",

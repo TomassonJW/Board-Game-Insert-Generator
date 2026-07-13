@@ -130,6 +130,38 @@ class FusionPaletteProjectTests(unittest.TestCase):
         self.assertEqual(generated["cad_build"]["cad_ir_digest"], regenerated["cad_build"]["cad_ir_digest"])
         self.assertEqual(generated["partition"]["plan_digest"], generated["cad_build"]["source_plan_digest"])
 
+    def test_bridge_round_trip_and_materializes_an_explicit_legacy_complement(self) -> None:
+        project = blank_project_v1()
+        project["container_groups"] = [{
+            "id": "g", "name": "Bac", "wall_thickness_mm": None, "floor_thickness_mm": None,
+        }]
+        project["contents"] = [{
+            "id": "c", "name": "Pieces", "shape_kind": "square",
+            "dimensions_mm": {"x": 12, "y": 12, "z": 3}, "quantity": 2,
+            "container_group_id": "g", "content_clearance_mm": None,
+            "measurement_confidence": "exact",
+        }]
+        project["fill_elements"] = [{
+            "id": "legacy-solid", "name": "Cale historique", "kind": "solid", "mode": "exact",
+            "dimensions_mm": {"x": 20, "y": 148.8, "z": 56}, "container_group_id": None,
+        }]
+        with tempfile.TemporaryDirectory() as temp_dir, patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}):
+            imported = handle_palette_request(
+                request("import_project", project_json=json.dumps(project)), ADDIN, ROOT
+            )
+            loaded = handle_palette_request(request("load_project"), ADDIN, ROOT)
+            materialized = handle_palette_request(
+                request("materialize_project", project=loaded["project"]), ADDIN, ROOT
+            )
+
+        legacy = loaded["project"]["fill_elements"]
+        self.assertEqual(imported["status"], "ready")
+        self.assertEqual(legacy[0]["id"], "legacy-solid")
+        self.assertEqual(legacy[0]["kind"], "solid")
+        self.assertEqual(legacy[0]["mode"], "exact")
+        self.assertEqual(materialized["cad_build"]["status"], "ready_for_fusion")
+        self.assertEqual(materialized["cad_build"]["materialization"]["explicit_complement_component_count"], 1)
+
     def test_p64_partial_proposal_is_visible_but_blocked_before_fusion_materialization(self) -> None:
         project = blank_project_v1()
         project["container_groups"] = [{"id": "g", "name": "Bac", "wall_thickness_mm": None, "floor_thickness_mm": None}]
@@ -147,7 +179,7 @@ class FusionPaletteProjectTests(unittest.TestCase):
         self.assertIsNone(response["cad_build"]["cad_ir"])
         self.assertEqual(response["lifecycle"]["materialized"], "blocked")
 
-    def test_bridge_exposes_presets_adapted_to_the_current_storage_height(self) -> None:
+    def test_bridge_quarantines_complement_presets_without_changing_the_response_schema(self) -> None:
         project = blank_project_v1()
         project["flat_items"] = [{
             "id": "board", "name": "Plateau", "kind": "board",
@@ -158,13 +190,8 @@ class FusionPaletteProjectTests(unittest.TestCase):
             response = handle_palette_request(request("validate_project", project=project), ADDIN, ROOT)
 
         presets = response["creation_presets"]
-        solid = next(item for item in presets["complements"] if item["key"] == "solid")
         self.assertEqual(presets["schema_version"], "bgig.creation_presets.v1")
-        self.assertEqual(
-            solid["element"]["dimensions_mm"]["z"],
-            response["flat_stack"]["flat_stack"]["storage_height_mm"],
-        )
-
+        self.assertEqual(presets["complements"], [])
     def test_personal_presets_save_export_import_and_delete_round_trip(self) -> None:
         project = blank_project_v1()
         project["container_groups"] = [
