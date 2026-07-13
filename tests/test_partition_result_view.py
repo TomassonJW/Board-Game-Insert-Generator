@@ -26,6 +26,31 @@ def project() -> dict[str, object]:
     return value
 
 
+def tight_multistage_project() -> dict[str, object]:
+    value = blank_project_v1()
+    value["box"] = {"inner_dimensions_mm": {"x": 50.0, "y": 25.0, "z": 50.0}, "usable_height_mm": 50.0, "lid_clearance_mm": 0.0}
+    value["container_groups"] = [
+        {"id": f"g{index}", "name": f"Bac {index}", "wall_thickness_mm": None, "floor_thickness_mm": None}
+        for index in range(4)
+    ]
+    value["contents"] = [
+        {"id": f"c{index}", "name": f"Pieces {index}", "shape_kind": "square", "dimensions_mm": {"x": 18.0, "y": 18.0, "z": 5.0}, "quantity": 4, "container_group_id": f"g{index}", "content_clearance_mm": None, "measurement_confidence": "exact"}
+        for index in range(4)
+    ]
+    return value
+
+
+def fixed_residual_project() -> dict[str, object]:
+    value = project()
+    value["container_groups"] = [value["container_groups"][0]]
+    value["contents"] = [value["contents"][0]]
+    minimum = solve_partition_plan(value)["placements"][0]["minimum_outer_envelope_mm"]
+    group = value["container_groups"][0]
+    group["expansion_axes"] = {"x": False, "y": False, "z": False}
+    group["locked_outer_dimensions_mm"] = minimum
+    return value
+
+
 class PartitionResultViewTests(unittest.TestCase):
     def test_top_view_reuses_exact_body_bounds_and_real_cavity_count(self) -> None:
         plan = solve_partition_plan(project())
@@ -91,6 +116,33 @@ class PartitionResultViewTests(unittest.TestCase):
         self.assertEqual(view["top_view"]["top_inset_reservations"][0]["depth_mm"], 2.0)
         self.assertEqual(view["support"]["status"], "supported_by_requested_bodies")
         self.assertTrue(view["invariants"]["localized_top_insets"])
+
+    def test_p64_exposes_real_stages_support_and_removal_in_the_read_only_view(self) -> None:
+        plan = solve_partition_plan(tight_multistage_project())
+        view = build_partition_result_view(plan)
+
+        self.assertEqual(plan["summary"]["status"], "constructed")
+        self.assertEqual(view["status"], "constructed")
+        self.assertTrue(view["materializable"])
+        self.assertEqual(len(view["stages"]), 2)
+        self.assertEqual({body["z_mm"] for body in view["top_view"]["bodies"]}, {0.0, 25.0})
+        self.assertEqual({body["stage_id"] for body in view["top_view"]["bodies"]}, {"stage-1", "stage-2"})
+        self.assertEqual(view["stage_support"]["status"], "supported")
+        self.assertEqual(view["removal_sequence"][0]["stage_id"], "stage-2")
+        self.assertTrue(view["invariants"]["stage_aware"])
+
+    def test_p64_draws_residuals_but_never_marks_a_partial_proposal_materializable(self) -> None:
+        plan = solve_partition_plan(fixed_residual_project())
+        view = build_partition_result_view(plan)
+
+        self.assertEqual(plan["summary"]["status"], "proposal_with_residuals")
+        self.assertEqual(view["status"], "proposal_with_residuals")
+        self.assertFalse(view["materializable"])
+        self.assertTrue(view["top_view"]["residuals"])
+        self.assertTrue(view["residuals"]["zones"])
+        self.assertTrue(view["suggestions"])
+        self.assertTrue(view["invariants"]["residuals_are_non_printable"])
+        self.assertTrue(view["invariants"]["partial_never_materializable"])
 
     def test_never_draws_an_impossible_or_wrong_schema_plan_as_a_solution(self) -> None:
         impossible = solve_partition_plan(blank_project_v1())

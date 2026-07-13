@@ -34,6 +34,8 @@ class ProjectPresetTests(unittest.TestCase):
         defaults = build_creation_presets(blank_project_v1())["defaults"]["container_group"]
 
         self.assertEqual(defaults["locked_outer_dimensions_mm"], {"x": None, "y": None, "z": None})
+        self.assertEqual(defaults["target_outer_dimensions_mm"], {"x": None, "y": None, "z": None})
+        self.assertEqual(defaults["dimension_modes"], {"x": "auto", "y": "auto", "z": "auto"})
         self.assertEqual(defaults["expansion_axes"], {"x": True, "y": True, "z": True})
 
     def test_each_content_starter_builds_a_real_one_body_partition(self) -> None:

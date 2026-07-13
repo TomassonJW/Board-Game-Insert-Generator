@@ -8,38 +8,39 @@ V0.1 - vrai MVP Fusion-only selon ADR-0055 et rebase P60-R accepte.
 
 ## Derniere mission terminee
 
-P63 - reservations superieures encastrees, package 0.1.13.
+P64 - solveur volumetrique multi-etages, package 0.1.14.
 
 ## Derniere preuve automatisee
 
-Le coeur conserve les corps a la hauteur de conception hors empreinte et compose
-les plateaux/livrets en coupes locales avec retrait, appui, prise et non-percement.
-Le contrat, les vues, la CAD IR et le plan Fusion sont couverts par 408 tests.
-Aucune validation Fusion ou impression n est revendiquee.
+Le coeur compose des arrangements XY par etages Z, expose appui, retrait,
+residuels et sous-scores, puis bloque une proposition partielle avant Fusion.
+Les reservations P63 restent localisees sur les seuls corps superieurs intersectes.
+Le contrat, la palette, la CAD IR et le garde-fou Fusion sont couverts par 423 tests.
+Aucune validation Fusion P64 ou impression n est revendiquee.
 
 ## Mission courante
 
-Aucune mission en cours. P63 est automatise ; P64 devient la premiere mission ready.
+Aucune mission en cours. P64 est automatise ; P65 devient la premiere mission ready.
 
 ## Prochaine action prete
 
-P64 - solveur volumetrique multi-etages, selon ADR-0059 acceptee.
+P65 - Conteneurs, Reglages et Apercu integres, selon ADR-0060 acceptee.
 
 Scope borne :
 
-1. arrangements XY deterministes par etage et composition Z ;
-2. contraintes d appui, de retrait et de collision ;
-3. modes Auto/Cible/Fixe et surplus pondere ;
-4. residuels et suggestions sans creation automatique de corps ;
-5. fixtures multi-etages et budget de recherche explicite.
+1. rendre taille minimale, cible et calculee lisibles au meme endroit ;
+2. integrer estimation, corps explicites et suggestions sans mutation ;
+3. rendre les sous-scores, appuis, retraits et residuels explicables sans jargon ;
+4. rendre `Materialiser dans Fusion` primaire uniquement pour une solution complete ;
+5. conserver les tolerances experimentales et ne pas changer leurs valeurs.
 
 ## Mission suivante apres P64
 
-P65 - Conteneurs, Reglages et Apercu integres.
+P66 - acceptance humaine V0.1 revisee Fusion-only, apres P65.
 
 ## Releases bloquees
 
-P65 depend de P64. P44 a P50 restent
+P44 a P50 restent
 bloques jusqu a l acceptation humaine P66. P47 a P50 restent aussi bloques
 jusqu a l acceptation de P46.
 

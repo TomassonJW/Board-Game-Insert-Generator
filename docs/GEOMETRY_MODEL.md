@@ -411,9 +411,9 @@ mesure physique source ; elle permute seulement son enveloppe de rangement.
 
 Une surcharge manuelle (`dimension_source = explicit`) est prioritaire sur le
 format catalogue. `auto` choisit deterministiquement l empreinte minimale parmi
-les orientations compatibles avec la hauteur disponible courante. P63/P64
-remplaceront cette hauteur globale par les contraintes locales d encastrement et
-d etage ; P62 ne revendique pas encore cette composition verticale.
+les orientations compatibles avec la hauteur disponible courante. P64 compose
+ensuite ces envelopes par etages et conserve les cavites P55 dans leur repere
+local ; P62 ne recalcule pas les dimensions physiques source.
 
 
 ## P63 - Reservations superieures localisees
@@ -435,3 +435,22 @@ de cavite presentes au plan d appui sont retranchees de la couverture support.
 La CAD IR transporte les operations `subtract_top_inset_reservation` et
 `subtract_top_inset_grip` dans le repere `body.local`. Fusion execute ces
 operations sans recalculer placement, profondeur ou support.
+
+## P64 - Composition volumetrique par etages
+
+Un `Stage` P64 est une tranche logique calculee, pas un corps automatique. Il
+porte `origin_z_mm`, `height_mm`, les corps demandes et un etat XY. Les corps
+restent les seuls volumes imprimables : leurs origines monde, rotations et
+cavites sont ensuite transportees vers la CAD IR.
+
+Pour chaque axe d un conteneur, `Auto` accepte la taille calculee, `Cible`
+exprime un objectif souple et `Fixe` impose une taille dure. Un etage superieur
+doit atteindre un recouvrement d appui minimal sur l etage immediatement
+inferieur ; le retrait est ordonne du sommet vers le bas. Aucune surface d appui
+ni cale n est inventee.
+
+`complete` ferme le volume technique avec les seuls corps demandes et jeux ;
+`proposal_with_residuals` transporte des zones non imprimables et une suggestion
+optionnelle ; `impossible` ne fournit pas de projection de solution. Une
+reservation superieure P63 ne s applique qu au corps de l etage le plus haut
+qu elle intersecte, jamais aux corps inferieurs qui partagent son empreinte.

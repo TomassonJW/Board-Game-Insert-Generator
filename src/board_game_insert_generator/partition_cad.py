@@ -40,7 +40,7 @@ _EPSILON = 0.0001
 
 
 class PartitionCadBuildError(ValueError):
-    """Raised when a P57 plan cannot be materialized without changing it."""
+    """Raised when a P64 plan cannot be materialized without changing it."""
 
 
 @dataclass(frozen=True)
@@ -50,14 +50,14 @@ class _BuildResult:
 
 
 def build_partition_cad(raw_project: object, *, partition: object | None = None) -> dict[str, object]:
-    """Build CAD IR exclusively from a constructed P57 plan."""
+    """Build CAD IR exclusively from a complete, materializable P64 plan."""
 
     normalization = normalize_project_draft(raw_project)
     project = normalization.project
     expected_plan = solve_partition_plan(project)
     plan = expected_plan if partition is None else _mapping(partition, "partition")
     if partition is not None and plan != expected_plan:
-        raise PartitionCadBuildError("Le plan P57 fourni est obsolete ou ne correspond pas au projet courant.")
+        raise PartitionCadBuildError("Le plan P64 fourni est obsolete ou ne correspond pas au projet courant.")
     if plan.get("schema_version") != PARTITION_PLAN_SCHEMA_V1:
         raise PartitionCadBuildError("P59 exige un plan bgig.partition_plan.v1.")
     summary = _mapping(plan.get("summary"), "partition.summary")
@@ -68,14 +68,28 @@ def build_partition_cad(raw_project: object, *, partition: object | None = None)
         "source_plan_digest": str(plan.get("plan_digest", "")),
         "partition": plan,
     }
-    if summary.get("status") != "constructed":
+    if summary.get("status") != "constructed" or not bool(summary.get("materializable", False)):
+        partial = summary.get("status") == "proposal_with_residuals"
+        blockers = [
+            str(item.get("message", "Partition impossible."))
+            for item in _mappings(plan.get("diagnostics", []), "partition.diagnostics")
+        ]
+        if partial:
+            blockers.insert(
+                0,
+                "La proposition contient des volumes residuels : confirme un corps explicite ou ajuste les contraintes avant de materialiser.",
+            )
         return {
             **base,
-            "status": "impossible",
+            "status": "not_materializable" if partial else "impossible",
             "cad_ir": None,
             "cad_ir_digest": None,
-            "materialization": {"status": "not_started", "component_count": 0, "automatic_body_count": 0},
-            "blockers": [str(item.get("message", "Partition impossible.")) for item in _mappings(plan.get("diagnostics", []), "partition.diagnostics")],
+            "materialization": {
+                "status": "blocked_partial" if partial else "not_started",
+                "component_count": 0,
+                "automatic_body_count": 0,
+            },
+            "blockers": blockers,
         }
     if int(summary.get("automatic_body_count", -1)) != 0:
         raise PartitionCadBuildError("P59 refuse tout plan dont automatic_body_count n est pas zero.")
@@ -93,7 +107,7 @@ def build_partition_cad(raw_project: object, *, partition: object | None = None)
     expected_count = int(summary["final_body_count"])
     if len(build.components) != expected_count:
         raise PartitionCadBuildError(
-            f"P59 a produit {len(build.components)} composants mais le plan P57 en exige {expected_count}."
+            f"P59 a produit {len(build.components)} composants mais le plan P64 en exige {expected_count}."
         )
 
     layout = _mapping(project["layout"], "project.layout")
@@ -119,10 +133,10 @@ def build_partition_cad(raw_project: object, *, partition: object | None = None)
         metadata=CadSceneMetadata(
             project_name=str(project["project_name"]),
             source_path=None,
-            layout_strategy="p59_partition_plan_v1",
+            layout_strategy="p64_bounded_volumetric_stage_v1",
             print_profile="fusion_only_mvp_v0_1",
             warnings=(
-                "CAD IR derivee du plan P57 ; Fusion ne doit recalculer aucune dimension ou cavite.",
+                "CAD IR derivee du plan P64 ; Fusion ne doit recalculer aucun etage, placement, dimension ou cavite.",
                 "Les jeux, la pile plate et les regions libres ne sont pas materialises.",
                 "Fusion et impression restent non validees tant que les gates correspondantes ne sont pas observees.",
             ),
@@ -131,6 +145,13 @@ def build_partition_cad(raw_project: object, *, partition: object | None = None)
                 "plan_digest": plan.get("plan_digest"),
                 "summary": summary,
                 "support": plan.get("support"),
+                "stages": plan.get("stages"),
+                "stage_support": plan.get("stage_support"),
+                "removal_sequence": plan.get("removal_sequence"),
+                "residuals": plan.get("residuals"),
+                "suggestions": plan.get("suggestions"),
+                "score_breakdown": plan.get("score_breakdown"),
+                "volume_conservation": plan.get("validation"),
                 "top_inset_reservations": plan.get("top_inset_reservations"),
                 "invariants": plan.get("invariants"),
                 "free_regions_materialized": False,
@@ -230,7 +251,7 @@ def _container_component(placement: dict[str, object], index: int) -> CadCompone
         size=body_size,
         cavities=tuple(cavities),
         metadata={
-            "source": "p59_partition_plan_v1",
+            "source": "p64_partition_plan_v1",
             "role": "container",
             "container_group_id": placement["container_group_id"],
             "source_contents": placement.get("source_contents", []),
@@ -292,7 +313,7 @@ def _transformed_cavity(
     cavity_origin = _dimension(cavity["local_origin_mm"], "cavity.local_origin_mm")
     cavity_size = _dimension(cavity["inner_dimensions_mm"], "cavity.inner_dimensions_mm")
     local = {axis: minimum_origin[axis] + cavity_origin[axis] for axis in ("x", "y", "z")}
-    # P55 keeps cavity dimensions fixed while P57 assigns all Z surplus below.
+    # P55 keeps cavity dimensions fixed while P64 assigns the body within its stage.
     # Every storage cavity must therefore stay open on the final top face.
     local["z"] = final_local["z"] - cavity_size["z"]
     if rotation == 0:

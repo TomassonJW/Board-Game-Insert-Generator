@@ -79,7 +79,7 @@ class PartitionSolverTests(unittest.TestCase):
         self.assertEqual(result["top_inset_reservations"]["status"], "applied")
         self.assertTrue(all(item.get("top_inset_cuts") for item in result["placements"]))
 
-    def test_reports_actionable_impossible_when_axes_and_dimensions_prevent_a_complete_partition(self) -> None:
+    def test_returns_a_visible_residual_proposal_when_fixed_dimensions_prevent_closure(self) -> None:
         project = project_with_groups(1)
         minimum = solve_partition_plan(project)["placements"][0]["minimum_outer_envelope_mm"]
         project["container_groups"][0]["expansion_axes"] = {"x": False, "y": False, "z": False}
@@ -87,10 +87,13 @@ class PartitionSolverTests(unittest.TestCase):
 
         result = solve_partition_plan(project)
 
-        self.assertEqual(result["summary"]["status"], "impossible")
+        self.assertEqual(result["summary"]["status"], "proposal_with_residuals")
+        self.assertEqual(result["summary"]["solution_status"], "proposal_with_residuals")
+        self.assertFalse(result["summary"]["materializable"])
         self.assertEqual(result["summary"]["automatic_body_count"], 0)
-        self.assertIn("NO_COMPLETE_PARTITION", {item["code"] for item in result["diagnostics"]})
-        self.assertTrue(all(item["action"] for item in result["diagnostics"]))
+        self.assertGreater(result["residuals"]["residual_volume_mm3"], 0.0)
+        self.assertTrue(result["suggestions"])
+        self.assertFalse(result["suggestions"][0]["automatic"])
 
     def test_explicit_exact_complement_is_counted_but_never_invented(self) -> None:
         project = project_with_groups(1)
@@ -110,16 +113,19 @@ class PartitionSolverTests(unittest.TestCase):
         complements = [item for item in result["placements"] if item["role"] == "explicit_complement"]
         self.assertEqual(complements[0]["requested_complement_id"], "weight")
 
-    def test_exact_complement_with_partial_height_gets_a_specific_correction(self) -> None:
+    def test_exact_complement_with_partial_height_can_form_an_explicit_upper_stage(self) -> None:
         project = project_with_groups(1)
         project["fill_elements"] = [{
             "id": "short", "name": "Bloc court", "kind": "solid", "mode": "exact",
             "dimensions_mm": {"x": 20.0, "y": 20.0, "z": 10.0}, "container_group_id": None,
         }]
         result = solve_partition_plan(project)
-        self.assertEqual(result["summary"]["status"], "impossible")
-        self.assertIn("EXPLICIT_COMPLEMENT_HEIGHT_BREAKS_PARTITION", {item["code"] for item in result["diagnostics"]})
-        self.assertIn("hauteur Z", " ".join(item["action"] for item in result["diagnostics"]))
+        self.assertEqual(result["summary"]["status"], "proposal_with_residuals")
+        self.assertEqual(result["summary"]["stage_count"], 2)
+        complement = next(item for item in result["placements"] if item["role"] == "explicit_complement")
+        self.assertGreater(complement["origin_mm"]["z"], 0.0)
+        self.assertEqual(complement["world_size_mm"]["z"], 10.0)
+        self.assertEqual(result["summary"]["automatic_body_count"], 0)
     def test_auto_sized_complement_is_refused_instead_of_becoming_an_automatic_filler(self) -> None:
         project = project_with_groups(1)
         project["fill_elements"] = [{
@@ -132,6 +138,26 @@ class PartitionSolverTests(unittest.TestCase):
         self.assertEqual(result["summary"]["status"], "impossible")
         self.assertEqual(result["summary"]["automatic_body_count"], 0)
         self.assertIn("EXPLICIT_COMPLEMENT_NEEDS_EXACT_SIZE", {item["code"] for item in result["diagnostics"]})
+
+    def test_xy_pressure_builds_two_complete_stages_with_support_and_removal(self) -> None:
+        project = project_with_groups(4)
+        project["box"] = {
+            "inner_dimensions_mm": {"x": 50.0, "y": 25.0, "z": 50.0},
+            "usable_height_mm": 50.0,
+            "lid_clearance_mm": 0.0,
+        }
+
+        result = solve_partition_plan(project)
+
+        self.assertEqual(result["summary"]["status"], "constructed")
+        self.assertEqual(result["summary"]["solution_status"], "complete")
+        self.assertEqual(result["summary"]["stage_count"], 2)
+        self.assertEqual({item["origin_mm"]["z"] for item in result["placements"]}, {0.0, 25.0})
+        self.assertEqual(result["stage_support"]["status"], "supported")
+        self.assertTrue(result["validation"]["conserved"])
+        self.assertEqual(result["validation"]["unassigned_printable_volume_mm3"], 0.0)
+        self.assertEqual(result["summary"]["automatic_body_count"], 0)
+        self.assertEqual(result["removal_sequence"][0]["stage_id"], "stage-2")
 
     def test_handles_fifty_requested_containers_without_a_business_cardinality_limit(self) -> None:
         project = project_with_groups(50)

@@ -56,7 +56,8 @@ class FusionPaletteDomTests(unittest.TestCase):
             "Demarrage rapide",
             "bloc plein sert de cale ou de support",
             "Corps explicites",
-            "final (auto si vide)",
+            "Dimensionnement par axe",
+            "group-mode", "group-target", "Auto", "Cible", "Fixe",
             "creation_presets", "Dimensions resolues", "Format de cartes", "Debout sur grand cote",
         ):
             self.assertIn(marker, self.markup)
@@ -90,6 +91,7 @@ class FusionPaletteDomTests(unittest.TestCase):
         smoke = (ROOT / "scripts" / "fusion" / "prepare_p56_palette_test.ps1").read_text(encoding="utf-8")
         self.assertIn("lib\\board_game_insert_generator", helpers)
         self.assertIn("top_inset_reservation.py", helpers)
+        self.assertIn("volumetric_stage_solver.py", helpers)
         self.assertIn("Assert-BgigPaletteProjectRuntime", helpers)
         self.assertIn("Aucun navigateur", smoke)
         self.assertIn("P56 Fusion OK", smoke)

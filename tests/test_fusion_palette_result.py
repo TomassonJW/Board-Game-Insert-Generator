@@ -14,9 +14,9 @@ class FusionPaletteResultTests(unittest.TestCase):
             self.assertIn(marker, self.markup)
 
     def test_result_exposes_user_facing_evidence_without_engine_codes(self) -> None:
-        for marker in ("final_body_count", "explicit_complement_count", "automatic_body_count", "minimum_outer_envelope_mm", "final_outer_dimensions_mm", "surplus_distribution_mm", "cavity_count", "support.top_support_count", "support.coverage_ratio"):
+        for marker in ("final_body_count", "stage_count", "automatic_body_count", "minimum_outer_envelope_mm", "final_outer_dimensions_mm", "surplus_distribution_mm", "cavity_count", "stageSupport.minimum_coverage_ratio", "support.top_support_count", "support.coverage_ratio"):
             self.assertIn(marker, self.markup)
-        for marker in ("Qualite de la proposition", "Appui des plateaux et livrets", "Comment la proposition est-elle evaluee ?"):
+        for marker in ("Score de la proposition", "Appui des etages", "Comment la proposition est-elle evaluee ?", "score_breakdown"):
             self.assertIn(marker, self.markup)
         self.assertNotIn("Les deux vues ci-dessous utilisent exclusivement les placements P57", self.markup)
         self.assertNotIn("Plan ${esc(view.source_plan_digest", self.markup)
@@ -26,11 +26,13 @@ class FusionPaletteResultTests(unittest.TestCase):
         self.assertIn("Ancienne proposition", self.markup)
         self.assertIn("solvedStale=Boolean(lastSolved)", self.markup)
         self.assertIn("lastSolved=payload", self.markup)
-        self.assertIn("if(summary.status!=='constructed')", self.markup)
-        self.assertIn("['materialize_project','regenerate_project']", self.markup)
+        self.assertIn("if(!complete&&!partial)", self.markup)
+        self.assertIn("proposal_with_residuals", self.markup)
+        self.assertIn("materializable=complete", self.markup)
         self.assertIn('data-bridge="materialize_project"', self.markup)
         self.assertIn('data-bridge="regenerate_project"', self.markup)
-        self.assertIn("stale?'disabled'", self.markup)
+        self.assertIn("Une proposition complete et a jour est requise", self.markup)
+        self.assertIn("Volume residuel a decider", self.markup)
 
     def test_p59_exposes_owned_scene_actions_without_raw_cad_codes(self) -> None:
         for marker in (

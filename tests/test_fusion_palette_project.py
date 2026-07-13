@@ -105,6 +105,23 @@ class FusionPaletteProjectTests(unittest.TestCase):
         self.assertEqual(generated["cad_build"]["cad_ir_digest"], regenerated["cad_build"]["cad_ir_digest"])
         self.assertEqual(generated["partition"]["plan_digest"], generated["cad_build"]["source_plan_digest"])
 
+    def test_p64_partial_proposal_is_visible_but_blocked_before_fusion_materialization(self) -> None:
+        project = blank_project_v1()
+        project["container_groups"] = [{"id": "g", "name": "Bac", "wall_thickness_mm": None, "floor_thickness_mm": None}]
+        project["contents"] = [{"id": "c", "name": "Pieces", "shape_kind": "square", "dimensions_mm": {"x": 12, "y": 12, "z": 3}, "quantity": 2, "container_group_id": "g", "content_clearance_mm": None, "measurement_confidence": "exact"}]
+        with tempfile.TemporaryDirectory() as temp_dir, patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}):
+            baseline = handle_palette_request(request("solve_project", project=project), ADDIN, ROOT)
+            minimum = baseline["partition"]["placements"][0]["minimum_outer_envelope_mm"]
+            project["container_groups"][0]["expansion_axes"] = {"x": False, "y": False, "z": False}
+            project["container_groups"][0]["locked_outer_dimensions_mm"] = minimum
+            response = handle_palette_request(request("materialize_project", project=project), ADDIN, ROOT)
+
+        self.assertEqual(response["partition"]["summary"]["status"], "proposal_with_residuals")
+        self.assertFalse(response["result_view"]["materializable"])
+        self.assertEqual(response["cad_build"]["status"], "not_materializable")
+        self.assertIsNone(response["cad_build"]["cad_ir"])
+        self.assertEqual(response["lifecycle"]["materialized"], "blocked")
+
     def test_bridge_exposes_presets_adapted_to_the_current_storage_height(self) -> None:
         project = blank_project_v1()
         project["flat_items"] = [{

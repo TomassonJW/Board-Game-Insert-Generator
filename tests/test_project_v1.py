@@ -198,6 +198,25 @@ class ProjectV1Tests(unittest.TestCase):
         with self.assertRaisesRegex(ProjectContractError, "dimensions_mm is required"):
             normalize_project_draft(project)
 
+    def test_dimension_mode_validation_keeps_legacy_locks_and_rejects_ambiguous_targets(self) -> None:
+        project = blank_project_v1()
+        project["container_groups"] = [{
+            "id": "g", "name": "Bac", "wall_thickness_mm": None, "floor_thickness_mm": None,
+            "locked_outer_dimensions_mm": {"x": 42.0, "y": None, "z": None},
+        }]
+        normalized = normalize_project_draft(project).project["container_groups"][0]
+        self.assertEqual(normalized["dimension_modes"]["x"], "fixed")
+        self.assertEqual(normalized["target_outer_dimensions_mm"]["x"], 42.0)
+
+        project["container_groups"][0].update({
+            "dimension_modes": {"x": "auto", "y": "auto", "z": "auto"},
+            "target_outer_dimensions_mm": {"x": 42.0, "y": None, "z": None},
+            "locked_outer_dimensions_mm": {"x": None, "y": None, "z": None},
+        })
+        with self.assertRaisesRegex(ProjectContractError, "must be null in auto mode"):
+            normalize_project_draft(project)
+
+
     def test_has_no_business_cardinality_limit(self) -> None:
         project = blank_project_v1()
         project["container_groups"] = [

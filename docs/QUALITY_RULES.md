@@ -155,3 +155,20 @@ Statut : `done`, `implemented-core`, `implemented-cli`, `implemented-cad-ir-meta
 - Une reservation de plateau ne peut percer silencieusement cavite, fond ou paroi.
 - Une suggestion de cale ne cree jamais de corps sans confirmation.
 - Une erreur doit nommer la contrainte en conflit avant de conseiller d agrandir la boite.
+
+## Regles P64 de solveur volumetrique
+
+- La recherche d arrangements XY et d etages Z est deterministe, bornee et ne
+  revendique jamais une optimalite globale.
+- Les budgets de recherche sont exposes par le resultat ; une troncature reste
+  observable et ne transforme pas une heuristique en preuve d optimum.
+- `Auto`, `Cible` et `Fixe` sont distincts par axe : seule une dimension fixe
+  est dure, une cible peut devier avec une raison explicite.
+- Chaque etage superieur doit satisfaire son recouvrement d appui minimal et la
+  sequence de retrait est ordonnee du haut vers le bas.
+- `proposal_with_residuals` reste visible, mais est strictement non materialisable
+  et ne peut appeler Fusion ; `impossible` n est jamais dessine comme solution.
+- Les zones residuelles et les suggestions sont non imprimables et non mutantes ;
+  `automatic_body_count` reste zero dans le plan, la CAD IR et la palette.
+- Les reservations P63 ne peuvent toucher que les corps de l etage superieur
+  effectivement intersecte ; les corps sous-jacents restent inchanges.

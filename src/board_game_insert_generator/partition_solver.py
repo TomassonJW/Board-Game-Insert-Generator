@@ -10,8 +10,6 @@ from __future__ import annotations
 import hashlib
 import json
 from copy import deepcopy
-from itertools import product
-from math import isclose
 from typing import Any
 
 from board_game_insert_generator.expandable_envelope import derive_expandable_envelope_contract
@@ -21,6 +19,11 @@ from board_game_insert_generator.top_inset_reservation import (
     compatibility_flat_stack_payload,
     derive_top_inset_reservations,
 )
+from board_game_insert_generator.volumetric_stage_solver import (
+    SOLUTION_COMPLETE,
+    SOLUTION_WITH_RESIDUALS,
+    solve_stage_portfolio,
+)
 
 
 PARTITION_PLAN_SCHEMA_V1 = "bgig.partition_plan.v1"
@@ -28,7 +31,7 @@ _EPSILON = 0.0001
 
 
 def solve_partition_plan(raw_project: object) -> dict[str, object]:
-    """Return a bounded, explainable P57 partition without automatic fillers."""
+    """Return the bounded P64 volumetric-stage proposal for a project."""
 
     normalization = normalize_project_draft(raw_project)
     project = normalization.project
@@ -46,47 +49,45 @@ def solve_partition_plan(raw_project: object) -> dict[str, object]:
     ]
 
     envelope_report = derive_expandable_envelope_contract(
-        project,
-        max_container_height_mm=max(storage_height, 0.001),
+        project, max_container_height_mm=max(storage_height, 0.001)
     )
     diagnostics.extend(
-        _diagnostic("CONTAINER_MINIMUM_BLOCKED", str(item["message"]), "Corrige la piece, le bac ou la hauteur disponible.", str(item["container_group_id"]))
+        _diagnostic(
+            "CONTAINER_MINIMUM_BLOCKED",
+            str(item["message"]),
+            "Corrige l element, le conteneur ou une dimension fixe.",
+            str(item["container_group_id"]),
+        )
         for item in _mappings(envelope_report["blockers"])
     )
     containers = [item for item in _mappings(envelope_report["containers"]) if item["status"] == "ready"]
     requested_group_count = len(_values(project["container_groups"]))
     if not requested_group_count:
-        diagnostics.append(_diagnostic("NO_CONTAINER_GROUP", "Aucun bac n est demande.", "Ajoute au moins un bac cible et une famille de pieces."))
+        diagnostics.append(
+            _diagnostic(
+                "NO_CONTAINER_GROUP",
+                "Aucun conteneur n est demande.",
+                "Ajoute au moins un conteneur cible et une famille d elements.",
+            )
+        )
     if len(containers) != requested_group_count:
         diagnostics.append(
             _diagnostic(
                 "CONTAINER_SET_INCOMPLETE",
-                "Tous les bacs demandes ne possedent pas une enveloppe minimale constructible.",
-                "Corrige les bacs bloques avant de recalculer la partition.",
+                "Tous les conteneurs demandes ne possedent pas une enveloppe minimale constructible.",
+                "Corrige les conteneurs bloques avant de recalculer.",
             )
         )
 
     participants = [_container_participant(item) for item in containers]
-    explicit_complements = _values(project["fill_elements"])
-    for value in explicit_complements:
+    for value in _values(project["fill_elements"]):
         complement = _mapping(value)
         if complement["mode"] != "exact":
             diagnostics.append(
                 _diagnostic(
                     "EXPLICIT_COMPLEMENT_NEEDS_EXACT_SIZE",
-                    f"Le complement '{complement['name']}' utilise encore le mode auto.",
-                    "Renseigne des dimensions exactes ; BGIG ne cree aucun volume automatique.",
-                    str(complement["id"]),
-                )
-            )
-            continue
-        dimensions = _dimension(complement["dimensions_mm"])
-        if not isclose(dimensions["z"], storage_height, abs_tol=_EPSILON):
-            diagnostics.append(
-                _diagnostic(
-                    "EXPLICIT_COMPLEMENT_HEIGHT_BREAKS_PARTITION",
-                    f"Le complement '{complement['name']}' mesure {dimensions['z']} mm en Z, mais la hauteur de rangement est {storage_height} mm.",
-                    "Aligne sa hauteur Z sur la hauteur de rangement affichee, ou retire ce complement.",
+                    f"Le corps explicite '{complement['name']}' utilise encore le mode auto.",
+                    "Renseigne ses dimensions exactes ; BGIG ne cree aucun volume automatiquement.",
                     str(complement["id"]),
                 )
             )
@@ -95,140 +96,180 @@ def solve_partition_plan(raw_project: object) -> dict[str, object]:
 
     if diagnostics or not participants or storage_height <= 0.0:
         return _result(
-            normalization,
-            project,
-            stack,
-            envelope_report,
-            diagnostics,
+            normalization, project, stack, envelope_report, diagnostics,
             status="incomplete" if not requested_group_count else "impossible",
-            evaluated=0,
+            evaluated=0, stage_solver=None,
         )
 
-    candidates: list[dict[str, object]] = []
-    evaluated = 0
-    for order_name, ordered in _orders(participants):
-        for columns in range(1, len(ordered) + 1):
-            rows = [ordered[index : index + columns] for index in range(0, len(ordered), columns)]
-            for orientation_strategy in ("width", "height", "balanced"):
-                evaluated += 1
-                candidate = _build_candidate(
-                    rows,
-                    box,
-                    storage_height,
-                    clearance,
-                    order_name=order_name,
-                    orientation_strategy=orientation_strategy,
-                )
-                if candidate is not None:
-                    candidates.append(candidate)
+    stage_solver = solve_stage_portfolio(
+        participants,
+        box,
+        storage_height,
+        clearance,
+        preference=str(project["solver_preference"]),
+    )
+    evaluated = int(_mapping(stage_solver["search"])["groupings_evaluated"])
+    if not _values(stage_solver["candidates"]):
+        diagnostics.extend(
+            _diagnostic(str(item["code"]), str(item["message"]), str(item["action"]))
+            for item in _mappings(stage_solver["blockers"])
+        )
+        return _result(
+            normalization, project, stack, envelope_report, diagnostics,
+            status="impossible", evaluated=evaluated, stage_solver=stage_solver,
+        )
 
-    if not candidates:
+    chosen: dict[str, object] | None = None
+    chosen_envelopes: dict[str, object] | None = None
+    chosen_top_insets: dict[str, object] | None = None
+    chosen_validation: dict[str, object] | None = None
+    rejection_diagnostics: list[dict[str, object]] = []
+    content_names = {str(item["id"]): str(item["name"]) for item in _mappings(project["contents"])}
+    for candidate in _mappings(stage_solver["candidates"]):
+        proposals = {
+            str(item["container_group_id"]): deepcopy(item["final_outer_dimensions_mm"])
+            for item in _mappings(candidate["placements"])
+            if item["role"] == "container"
+        }
+        validated_envelopes = derive_expandable_envelope_contract(
+            project,
+            final_outer_dimensions_by_group=proposals,
+            max_container_height_mm=storage_height,
+        )
+        if _mapping(validated_envelopes["summary"])["status"] == "blocked":
+            rejection_diagnostics.extend(
+                _diagnostic(
+                    "FINAL_ENVELOPE_REJECTED", str(item["message"]),
+                    "Relache la dimension fixe ou cible indiquee.", str(item["container_group_id"]),
+                )
+                for item in _mappings(validated_envelopes["blockers"])
+            )
+            continue
+        envelope_by_group = {
+            str(item["container_group_id"]): item
+            for item in _mappings(validated_envelopes["containers"])
+        }
+        placements: list[dict[str, object]] = []
+        for placement in _mappings(candidate["placements"]):
+            final = deepcopy(placement)
+            if final["role"] == "container":
+                contract = envelope_by_group[str(final["container_group_id"])]
+                final["cavity_layout"] = deepcopy(contract["cavity_layout"])
+                final["minimum_outer_envelope_mm"] = deepcopy(contract["minimum_outer_envelope_mm"])
+                final["surplus_distribution_mm"] = deepcopy(contract["surplus_distribution_mm"])
+                final["minimum_envelope_origin_in_final_mm"] = deepcopy(contract["minimum_envelope_origin_in_final_mm"])
+                final["source_content_ids"] = [
+                    str(cavity["content_id"]) for cavity in _mappings(contract["cavity_layout"])
+                ]
+                final["source_contents"] = [
+                    {"id": content_id, "name": content_names[content_id]}
+                    for content_id in final["source_content_ids"]
+                ]
+            placements.append(final)
+
+        applied_top_insets = apply_top_inset_reservations(project, placements)
+        if _values(applied_top_insets["blockers"]):
+            rejection_diagnostics.extend(
+                _diagnostic(
+                    str(item["code"]), str(item["message"]), str(item["action"]),
+                    str(item.get("reference_id", "")),
+                )
+                for item in _mappings(applied_top_insets["blockers"])
+            )
+            continue
+        placements = _mappings(applied_top_insets["placements"])
+        validation = _validate_placements(placements, box, storage_height, clearance)
+        if not all(
+            bool(validation[key])
+            for key in ("inside_box", "no_collisions", "clearances_respected")
+        ):
+            rejection_diagnostics.append(
+                _diagnostic(
+                    "INTERNAL_STAGE_PLAN_INVALID",
+                    "Une proposition par etages viole une borne geometrique interne.",
+                    "Conserve le projet et signale ce cas pour correction.",
+                    str(candidate["candidate_id"]),
+                )
+            )
+            continue
+        conservation = _mapping(candidate["volume_conservation"])
+        validation.update(deepcopy(conservation))
+        validation["unassigned_printable_volume_mm3"] = conservation["residual_volume_mm3"]
+        candidate["placements"] = placements
+        chosen = candidate
+        chosen_envelopes = validated_envelopes
+        chosen_top_insets = applied_top_insets
+        chosen_validation = validation
+        break
+
+    if chosen is None or chosen_envelopes is None or chosen_top_insets is None or chosen_validation is None:
+        diagnostics.extend(rejection_diagnostics[:8])
         diagnostics.append(
             _diagnostic(
-                "NO_COMPLETE_PARTITION",
-                "Aucune partition complete ne respecte les minima, jeux, axes extensibles et dimensions verrouillees.",
-                "Agrandis la boite, reduis un contenu ou libere un axe/dimension de bac.",
+                "NO_VALIDATED_STAGE_PROPOSAL",
+                "Les arrangements trouves echouent apres validation des cavites, appuis ou reservations superieures.",
+                "Relache une dimension fixe, deplace un plateau ou reduis un contenu.",
             )
         )
         return _result(
-            normalization,
-            project,
-            stack,
-            envelope_report,
-            diagnostics,
-            status="impossible",
-            evaluated=evaluated,
+            normalization, project, stack, envelope_report, diagnostics,
+            status="impossible", evaluated=evaluated, stage_solver=stage_solver,
         )
 
-    chosen = max(candidates, key=lambda value: (float(value["simplicity_score"]), str(value["candidate_id"])))
-    proposals = {
-        str(item["container_group_id"]): _mapping(item["final_outer_dimensions_mm"])
-        for item in _mappings(chosen["placements"])
-        if item["role"] == "container"
-    }
-    validated_envelopes = derive_expandable_envelope_contract(
-        project,
-        final_outer_dimensions_by_group=proposals,
-        max_container_height_mm=storage_height,
-    )
-    if validated_envelopes["summary"]["status"] == "blocked":
-        diagnostics.extend(
-            _diagnostic("FINAL_ENVELOPE_REJECTED", str(item["message"]), "Relache la contrainte de bac indiquee.", str(item["container_group_id"]))
-            for item in _mappings(validated_envelopes["blockers"])
-        )
-        return _result(
-            normalization,
-            project,
-            stack,
-            validated_envelopes,
-            diagnostics,
-            status="impossible",
-            evaluated=evaluated,
-        )
-
-    envelope_by_group = {str(item["container_group_id"]): item for item in _mappings(validated_envelopes["containers"])}
-    content_names = {str(item["id"]): str(item["name"]) for item in _mappings(project["contents"])}
-    placements: list[dict[str, object]] = []
-    for placement in _mappings(chosen["placements"]):
-        final = deepcopy(placement)
-        if final["role"] == "container":
-            contract = envelope_by_group[str(final["container_group_id"])]
-            final["cavity_layout"] = deepcopy(contract["cavity_layout"])
-            final["minimum_outer_envelope_mm"] = deepcopy(contract["minimum_outer_envelope_mm"])
-            final["surplus_distribution_mm"] = deepcopy(contract["surplus_distribution_mm"])
-            final["minimum_envelope_origin_in_final_mm"] = deepcopy(contract["minimum_envelope_origin_in_final_mm"])
-            final["source_content_ids"] = [str(cavity["content_id"]) for cavity in _mappings(contract["cavity_layout"])]
-            final["source_contents"] = [{"id": content_id, "name": content_names[content_id]} for content_id in final["source_content_ids"]]
-        placements.append(final)
-
-    applied_top_insets = apply_top_inset_reservations(project, placements)
-    stack["top_inset_reservations"] = applied_top_insets
-    top_inset_blockers = _mappings(applied_top_insets["blockers"])
-    if top_inset_blockers:
-        diagnostics.extend(
-            _diagnostic(
-                str(item["code"]), str(item["message"]), str(item["action"]), str(item.get("reference_id", ""))
+    stack["top_inset_reservations"] = chosen_top_insets
+    placements = _mappings(chosen["placements"])
+    complete = chosen["solution_status"] == SOLUTION_COMPLETE
+    result_status = "constructed" if complete else SOLUTION_WITH_RESIDUALS
+    if not complete:
+        diagnostics.append(
+            _notice(
+                "PROPOSAL_HAS_RESIDUALS",
+                "Une proposition tient dans la boite mais laisse un volume residuel explicite.",
+                "Ajuste les cibles ou confirme plus tard une cale suggeree ; la materialisation reste bloquee.",
             )
-            for item in top_inset_blockers
         )
-        return _result(
-            normalization,
-            project,
-            stack,
-            validated_envelopes,
-            diagnostics,
-            status="impossible",
-            evaluated=evaluated,
-        )
-    placements = _mappings(applied_top_insets["placements"])
-    validation = _validate_placements(placements, box, storage_height, clearance)
-    if not validation["inside_box"] or not validation["no_collisions"] or not validation["clearances_respected"]:
-        diagnostics.append(_diagnostic("INTERNAL_PARTITION_INVALID", "La partition choisie viole une borne geometrique interne.", "Conserve le projet et signale ce cas pour correction."))
-        return _result(
-            normalization,
-            project,
-            stack,
-            validated_envelopes,
-            diagnostics,
-            status="impossible",
-            evaluated=evaluated,
-        )
-
-    support = deepcopy(applied_top_insets["support"])
+    flat_removal = [
+        {
+            "order": int(item["order"]),
+            "target_id": item["flat_item_id"],
+            "target_type": "flat_item",
+            "name": item["name"],
+            "access_direction": "top",
+        }
+        for item in _mappings(chosen_top_insets.get("removal_sequence", []))
+    ]
+    body_offset = len(flat_removal)
+    body_removal = [
+        {
+            **deepcopy(item),
+            "order": body_offset + int(item["order"]),
+            "target_id": item["placement_id"],
+            "target_type": "requested_body",
+        }
+        for item in _mappings(chosen["removal_sequence"])
+    ]
+    metrics = _mapping(chosen["metrics"])
+    search = _mapping(stage_solver["search"])
     summary = {
-        "status": "constructed",
+        "status": result_status,
+        "solution_status": chosen["solution_status"],
+        "materializable": complete,
         "requested_container_count": requested_group_count,
         "placed_container_count": sum(1 for item in placements if item["role"] == "container"),
         "explicit_complement_count": sum(1 for item in placements if item["role"] == "explicit_complement"),
         "final_body_count": len(placements),
         "automatic_body_count": 0,
-        "row_count": chosen["row_count"],
-        "rotation_count": chosen["rotation_count"],
-        "simplicity_score": chosen["simplicity_score"],
-        "complete_printable_partition": True,
-        "technical_voids_are_clearances_only": True,
+        "stage_count": int(chosen["stage_count"]),
+        "row_count": int(metrics["row_count"]),
+        "rotation_count": int(metrics["rotation_count"]),
+        "simplicity_score": chosen["quality_score"],
+        "quality_score": chosen["quality_score"],
+        "score_breakdown": deepcopy(chosen["score_breakdown"]),
+        "complete_printable_partition": complete,
+        "technical_voids_are_clearances_only": complete,
+        "residual_volume_mm3": _mapping(chosen["volume_conservation"])["residual_volume_mm3"],
         "candidate_count_evaluated": evaluated,
-        "candidate_count_feasible": len(candidates),
+        "candidate_count_feasible": int(search["candidate_count"]),
     }
     plan = {
         "schema_version": PARTITION_PLAN_SCHEMA_V1,
@@ -238,29 +279,42 @@ def solve_partition_plan(raw_project: object) -> dict[str, object]:
         "clearance_policy": {
             "box_perimeter_mm": _round(clearance),
             "between_bodies_mm": _round(clearance),
+            "vertical_support_contact_mm": 0.0,
             "materialize_clearances": False,
         },
         "flat_stack": deepcopy(flat),
-        "top_inset_reservations": _top_inset_payload(applied_top_insets),
-        "support": support,
+        "top_inset_reservations": _top_inset_payload(chosen_top_insets),
+        "support": deepcopy(chosen_top_insets["support"]),
+        "stage_support": deepcopy(chosen["support"]),
+        "stages": deepcopy(chosen["stages"]),
+        "removal_sequence": flat_removal + body_removal,
+        "residuals": deepcopy(chosen["residuals"]),
+        "suggestions": deepcopy(chosen["suggestions"]),
         "placements": placements,
         "diagnostics": diagnostics,
-        "validation": validation,
+        "validation": chosen_validation,
         "summary": summary,
         "solver": {
-            "kind": "bounded_shelf_partition",
+            "kind": "bounded_volumetric_stage_solver",
+            "schema_version": stage_solver["schema_version"],
             "candidate_id": chosen["candidate_id"],
-            "order": chosen["order_name"],
-            "orientation_strategy": chosen["orientation_strategy"],
+            "preference": project["solver_preference"],
+            "search_origin": deepcopy(chosen["search_origin"]),
+            "budgets": deepcopy(stage_solver["budgets"]),
+            "search": deepcopy(stage_solver["search"]),
             "deterministic": True,
             "globally_optimal": False,
         },
+        "envelope_contract": deepcopy(chosen_envelopes),
         "invariants": {
             "fixed_cavity_layouts": True,
             "localized_top_insets": True,
-            "containers_keep_design_top_outside_reservations": True,
+            "volumetric_stages": True,
+            "weighted_surplus": True,
+            "dimension_modes": ["auto", "target", "fixed"],
             "requested_bodies_only": True,
             "automatic_body_count": 0,
+            "suggestions_do_not_mutate": True,
             "free_space_materialized": False,
             "scene_is_not_source_of_truth": True,
         },
@@ -278,7 +332,9 @@ def _result(
     *,
     status: str,
     evaluated: int,
+    stage_solver: dict[str, object] | None,
 ) -> dict[str, object]:
+    search = _mapping(stage_solver["search"]) if stage_solver is not None else {}
     result = {
         "schema_version": PARTITION_PLAN_SCHEMA_V1,
         "source": {"source_schema": normalization.source_schema, "migrated": normalization.migrated},
@@ -290,34 +346,52 @@ def _result(
         "clearance_policy": {
             "box_perimeter_mm": _mapping(project["layout"])["layout_clearance_mm"],
             "between_bodies_mm": _mapping(project["layout"])["layout_clearance_mm"],
+            "vertical_support_contact_mm": 0.0,
             "materialize_clearances": False,
         },
         "flat_stack": deepcopy(stack["flat_stack"]),
         "top_inset_reservations": _top_inset_payload(_mapping(stack["top_inset_reservations"])),
         "support": {"status": "unresolved", "top_support_count": 0, "coverage_ratio": 0.0},
+        "stage_support": {"status": "unresolved", "supports": []},
+        "stages": [],
+        "removal_sequence": [],
+        "residuals": {"status": "unresolved", "zones": [], "residual_volume_mm3": 0.0},
+        "suggestions": [],
         "placements": [],
         "diagnostics": diagnostics,
         "validation": {"inside_box": False, "no_collisions": False, "clearances_respected": False},
         "summary": {
             "status": status,
+            "solution_status": "impossible",
+            "materializable": False,
             "requested_container_count": len(_values(project["container_groups"])),
             "placed_container_count": 0,
             "explicit_complement_count": 0,
             "final_body_count": 0,
             "automatic_body_count": 0,
+            "stage_count": 0,
             "complete_printable_partition": False,
             "technical_voids_are_clearances_only": False,
             "candidate_count_evaluated": evaluated,
-            "candidate_count_feasible": 0,
+            "candidate_count_feasible": int(search.get("candidate_count", 0)),
         },
-        "solver": {"kind": "bounded_shelf_partition", "deterministic": True, "globally_optimal": False},
+        "solver": {
+            "kind": "bounded_volumetric_stage_solver",
+            "schema_version": stage_solver.get("schema_version") if stage_solver else None,
+            "budgets": deepcopy(stage_solver.get("budgets", {})) if stage_solver else {},
+            "search": deepcopy(search),
+            "deterministic": True,
+            "globally_optimal": False,
+        },
         "envelope_contract": deepcopy(envelopes),
         "invariants": {
             "fixed_cavity_layouts": True,
             "localized_top_insets": True,
-            "containers_keep_design_top_outside_reservations": True,
+            "volumetric_stages": True,
+            "weighted_surplus": True,
             "requested_bodies_only": True,
             "automatic_body_count": 0,
+            "suggestions_do_not_mutate": True,
             "free_space_materialized": False,
             "scene_is_not_source_of_truth": True,
         },
@@ -329,23 +403,14 @@ def _result(
 def _container_participant(contract: dict[str, object]) -> dict[str, object]:
     minimum = _dimension(contract["minimum_outer_envelope_mm"])
     constraints = _mapping(contract["constraints"])
-    locked = _mapping(constraints["locked_outer_dimensions_mm"])
-    axes = _mapping(constraints["expansion_axes"])
-    base = {
-        axis: float(locked[axis]) if locked[axis] is not None else minimum[axis]
-        for axis in ("x", "y", "z")
-    }
     return {
         "id": f"container:{contract['container_group_id']}",
         "role": "container",
         "container_group_id": contract["container_group_id"],
         "name": contract["container_name"],
         "minimum_local_mm": minimum,
-        "base_local_mm": base,
-        "expand_local": {
-            axis: bool(axes[axis]) and locked[axis] is None
-            for axis in ("x", "y", "z")
-        },
+        "dimension_modes": deepcopy(constraints["dimension_modes"]),
+        "target_local_mm": deepcopy(constraints["target_outer_dimensions_mm"]),
         "surplus_preference": constraints["surplus_preference"],
     }
 
@@ -359,193 +424,10 @@ def _complement_participant(value: dict[str, object]) -> dict[str, object]:
         "complement_kind": value["kind"],
         "name": value["name"],
         "minimum_local_mm": dimensions,
-        "base_local_mm": dimensions,
-        "expand_local": {"x": False, "y": False, "z": False},
+        "dimension_modes": {"x": "fixed", "y": "fixed", "z": "fixed"},
+        "target_local_mm": deepcopy(dimensions),
         "surplus_preference": "fixed",
     }
-
-
-def _orders(values: list[dict[str, object]]) -> list[tuple[str, list[dict[str, object]]]]:
-    orders = [
-        ("input", list(values)),
-        ("area_desc", sorted(values, key=lambda item: (-_area(_mapping(item["base_local_mm"])), str(item["id"])))),
-        ("long_side_desc", sorted(values, key=lambda item: (-max(float(_mapping(item["base_local_mm"])["x"]), float(_mapping(item["base_local_mm"])["y"])), str(item["id"])))),
-    ]
-    unique: list[tuple[str, list[dict[str, object]]]] = []
-    seen: set[tuple[str, ...]] = set()
-    for name, order in orders:
-        signature = tuple(str(item["id"]) for item in order)
-        if signature not in seen:
-            seen.add(signature)
-            unique.append((name, order))
-    return unique
-
-
-def _build_candidate(
-    row_items: list[list[dict[str, object]]],
-    box: dict[str, float],
-    storage_height: float,
-    clearance: float,
-    *,
-    order_name: str,
-    orientation_strategy: str,
-) -> dict[str, object] | None:
-    inner_x = box["x"] - 2.0 * clearance
-    inner_y = box["y"] - 2.0 * clearance
-    if inner_x <= 0.0 or inner_y <= 0.0 or storage_height <= 0.0:
-        return None
-    rows: list[list[dict[str, object]]] = []
-    for values in row_items:
-        oriented = _orient_row(values, inner_x, inner_y, clearance, orientation_strategy)
-        if oriented is None:
-            return None
-        rows.append(oriented)
-    base_heights = [max(float(item["base_world_mm"]["y"]) for item in row) for row in rows]
-    minimum_y = sum(base_heights) + clearance * max(0, len(rows) - 1)
-    if minimum_y > inner_y + _EPSILON:
-        return None
-    for row, row_height in zip(rows, base_heights):
-        if any(float(item["base_world_mm"]["y"]) < row_height - _EPSILON and not bool(item["expand_world"]["y"]) for item in row):
-            return None
-    extra_y = inner_y - minimum_y
-    y_expandable_rows = [index for index, row in enumerate(rows) if all(bool(item["expand_world"]["y"]) for item in row)]
-    if extra_y > _EPSILON and not y_expandable_rows:
-        return None
-    row_heights = list(base_heights)
-    _distribute(row_heights, y_expandable_rows, extra_y)
-
-    placements: list[dict[str, object]] = []
-    cursor_y = clearance
-    rotations = 0
-    surplus_values: list[float] = []
-    for row, row_height in zip(rows, row_heights):
-        base_widths = [float(item["base_world_mm"]["x"]) for item in row]
-        printable_width = inner_x - clearance * max(0, len(row) - 1)
-        extra_x = printable_width - sum(base_widths)
-        if extra_x < -_EPSILON:
-            return None
-        expandable = [index for index, item in enumerate(row) if bool(item["expand_world"]["x"])]
-        if extra_x > _EPSILON and not expandable:
-            return None
-        widths = list(base_widths)
-        _distribute(widths, expandable, max(0.0, extra_x))
-        cursor_x = clearance
-        for item, width in zip(row, widths):
-            base_world = _mapping(item["base_world_mm"])
-            expand_world = _mapping(item["expand_world"])
-            if storage_height < float(base_world["z"]) - _EPSILON:
-                return None
-            if storage_height > float(base_world["z"]) + _EPSILON and not bool(expand_world["z"]):
-                return None
-            world_size = {"x": _round(width), "y": _round(row_height), "z": _round(storage_height)}
-            rotated = bool(item["rotated_xy"])
-            local_final = {
-                "x": world_size["y"] if rotated else world_size["x"],
-                "y": world_size["x"] if rotated else world_size["y"],
-                "z": world_size["z"],
-            }
-            minimum_local = _mapping(item["minimum_local_mm"])
-            surplus_values.extend(max(0.0, local_final[axis] - float(minimum_local[axis])) for axis in ("x", "y", "z"))
-            placement = {
-                "id": item["id"],
-                "role": item["role"],
-                "name": item["name"],
-                "origin_mm": {"x": _round(cursor_x), "y": _round(cursor_y), "z": 0.0},
-                "world_size_mm": world_size,
-                "rotation_deg_z": 90 if rotated else 0,
-                "final_outer_dimensions_mm": _rounded(local_final),
-                "printable": True,
-                "automatic": False,
-            }
-            for key in ("container_group_id", "requested_complement_id", "complement_kind"):
-                if key in item:
-                    placement[key] = item[key]
-            placements.append(placement)
-            cursor_x += width + clearance
-            rotations += int(rotated)
-        cursor_y += row_height + clearance
-    if not isclose(cursor_y - clearance + clearance, box["y"], abs_tol=0.001):
-        return None
-    imbalance = max(surplus_values, default=0.0) - min(surplus_values, default=0.0)
-    score = 1000.0 - len(rows) * 20.0 - rotations * 4.0 - imbalance * 0.05
-    candidate_id = f"{order_name}:{len(row_items[0])}:{orientation_strategy}"
-    return {
-        "candidate_id": candidate_id,
-        "order_name": order_name,
-        "orientation_strategy": orientation_strategy,
-        "row_count": len(rows),
-        "rotation_count": rotations,
-        "simplicity_score": _round(score),
-        "placements": placements,
-    }
-
-
-def _orient_row(
-    values: list[dict[str, object]],
-    inner_x: float,
-    inner_y: float,
-    clearance: float,
-    strategy: str,
-) -> list[dict[str, object]] | None:
-    option_sets = [_orientation_options(value) for value in values]
-    combinations = product(*option_sets) if len(values) <= 10 else [tuple(_greedy_orientation(value, strategy) for value in values)]
-    feasible: list[tuple[tuple[float, float, int], list[dict[str, object]]]] = []
-    for combination in combinations:
-        width = sum(float(item["base_world_mm"]["x"]) for item in combination) + clearance * max(0, len(values) - 1)
-        height = max(float(item["base_world_mm"]["y"]) for item in combination)
-        if width > inner_x + _EPSILON or height > inner_y + _EPSILON:
-            continue
-        rotations = sum(int(bool(item["rotated_xy"])) for item in combination)
-        if strategy == "width":
-            key = (width, height, rotations)
-        elif strategy == "height":
-            key = (height, width, rotations)
-        else:
-            key = (width / inner_x + height / inner_y, rotations, width)
-        feasible.append((key, [dict(item) for item in combination]))
-    return min(feasible, key=lambda item: item[0])[1] if feasible else None
-
-
-def _orientation_options(value: dict[str, object]) -> list[dict[str, object]]:
-    base = _dimension(value["base_local_mm"])
-    expand = _mapping(value["expand_local"])
-    options = [_oriented(value, base, expand, False)]
-    if not isclose(base["x"], base["y"], abs_tol=_EPSILON):
-        options.append(
-            _oriented(
-                value,
-                {"x": base["y"], "y": base["x"], "z": base["z"]},
-                {"x": expand["y"], "y": expand["x"], "z": expand["z"]},
-                True,
-            )
-        )
-    return options
-
-
-def _greedy_orientation(value: dict[str, object], strategy: str) -> dict[str, object]:
-    options = _orientation_options(value)
-    if strategy == "height":
-        return min(options, key=lambda item: (float(item["base_world_mm"]["y"]), float(item["base_world_mm"]["x"])))
-    return min(options, key=lambda item: (float(item["base_world_mm"]["x"]), float(item["base_world_mm"]["y"])))
-
-
-def _oriented(value: dict[str, object], base: dict[str, object], expand: dict[str, object], rotated: bool) -> dict[str, object]:
-    result = deepcopy(value)
-    result["base_world_mm"] = _dimension(base)
-    result["expand_world"] = {axis: bool(expand[axis]) for axis in ("x", "y", "z")}
-    result["rotated_xy"] = rotated
-    return result
-
-
-def _distribute(values: list[float], indexes: list[int], amount: float) -> None:
-    if amount <= _EPSILON or not indexes:
-        return
-    share = amount / len(indexes)
-    distributed = 0.0
-    for position, index in enumerate(indexes):
-        addition = amount - distributed if position == len(indexes) - 1 else share
-        values[index] += addition
-        distributed += addition
 
 
 def _validate_placements(
@@ -584,38 +466,6 @@ def _validate_placements(
     }
 
 
-def _support_plan(flat: dict[str, object], placements: list[dict[str, object]]) -> dict[str, object]:
-    reservation = flat.get("reservation_size_mm")
-    if reservation is None:
-        return {"status": "not_required", "top_support_count": 0, "coverage_ratio": 1.0, "supports": []}
-    origin = _mapping(flat["preferred_reservation_origin_mm"])
-    size = _mapping(reservation)
-    support_area = 0.0
-    supports: list[dict[str, object]] = []
-    for item in placements:
-        item_origin = _mapping(item["origin_mm"])
-        item_size = _mapping(item["world_size_mm"])
-        if not isclose(float(item_origin["z"]) + float(item_size["z"]), float(origin["z"]), abs_tol=0.001):
-            continue
-        overlap_x = max(0.0, min(float(item_origin["x"]) + float(item_size["x"]), float(origin["x"]) + float(size["x"])) - max(float(item_origin["x"]), float(origin["x"])))
-        overlap_y = max(0.0, min(float(item_origin["y"]) + float(item_size["y"]), float(origin["y"]) + float(size["y"])) - max(float(item_origin["y"]), float(origin["y"])))
-        area = overlap_x * overlap_y
-        if area > _EPSILON:
-            support_area += area
-            supports.append({"placement_id": item["id"], "area_mm2": _round(area), "top_z_mm": _round(float(origin["z"]))})
-    required_area = float(size["x"]) * float(size["y"])
-    ratio = min(1.0, support_area / required_area) if required_area else 1.0
-    return {
-        "status": "supported_by_requested_bodies" if supports else "unresolved",
-        "top_support_count": len(supports),
-        "required_area_mm2": _round(required_area),
-        "supported_area_mm2": _round(support_area),
-        "coverage_ratio": _round(ratio),
-        "supports": supports,
-        "note": "Les jeux techniques restent des vides entre les faces alignees ; aucun support automatique n est cree.",
-    }
-
-
 def _intersects(left: dict[str, object], right: dict[str, object]) -> bool:
     lo, ls = _mapping(left["origin_mm"]), _mapping(left["world_size_mm"])
     ro, rs = _mapping(right["origin_mm"]), _mapping(right["world_size_mm"])
@@ -625,9 +475,14 @@ def _intersects(left: dict[str, object], right: dict[str, object]) -> bool:
 def _separated_with_clearance(left: dict[str, object], right: dict[str, object], clearance: float) -> bool:
     lo, ls = _mapping(left["origin_mm"]), _mapping(left["world_size_mm"])
     ro, rs = _mapping(right["origin_mm"]), _mapping(right["world_size_mm"])
+    if (
+        float(lo["z"]) + float(ls["z"]) <= float(ro["z"]) + _EPSILON
+        or float(ro["z"]) + float(rs["z"]) <= float(lo["z"]) + _EPSILON
+    ):
+        return True
     return any(
-        float(lo[a]) + float(ls[a]) + clearance <= float(ro[a]) + _EPSILON
-        or float(ro[a]) + float(rs[a]) + clearance <= float(lo[a]) + _EPSILON
+        float(lo[a]) + float(ls[a]) + clearance <= float(ro[a]) + 0.001
+        or float(ro[a]) + float(rs[a]) + clearance <= float(lo[a]) + 0.001
         for a in ("x", "y")
     )
 
@@ -645,6 +500,10 @@ def _top_inset_payload(value: dict[str, object]) -> dict[str, object]:
 
 def _diagnostic(code: str, message: str, action: str, reference_id: str = "") -> dict[str, object]:
     return {"code": code, "severity": "blocker", "message": message, "action": action, "reference_id": reference_id}
+
+
+def _notice(code: str, message: str, action: str, reference_id: str = "") -> dict[str, object]:
+    return {"code": code, "severity": "warning", "message": message, "action": action, "reference_id": reference_id}
 
 
 def _digest(value: dict[str, object]) -> str:
@@ -675,10 +534,6 @@ def _dimension(value: object) -> dict[str, float]:
 
 def _rounded(value: dict[str, object]) -> dict[str, float]:
     return {axis: _round(float(value[axis])) for axis in ("x", "y", "z")}
-
-
-def _area(value: dict[str, object]) -> float:
-    return float(value["x"]) * float(value["y"])
 
 
 def _volume(value: dict[str, object]) -> float:

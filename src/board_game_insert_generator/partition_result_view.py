@@ -1,4 +1,4 @@
-"""P58 read-only projections derived from a constructed P57 partition plan."""
+"""Read-only projections derived from a complete or partial P64 partition plan."""
 
 from __future__ import annotations
 
@@ -16,18 +16,19 @@ class PartitionResultViewError(ValueError):
 
 
 def build_partition_result_view(partition: object) -> dict[str, object]:
-    """Build top and X/Z section primitives without changing the P57 plan."""
+    """Build honest top and X/Z primitives without changing the P64 plan."""
 
     plan = _mapping(partition, "partition")
     if plan.get("schema_version") != PARTITION_PLAN_SCHEMA_V1:
         raise PartitionResultViewError("Le resultat visuel exige un plan bgig.partition_plan.v1.")
     summary = _mapping(plan.get("summary"), "partition.summary")
-    if summary.get("status") != "constructed":
+    plan_status = str(summary.get("status", ""))
+    if plan_status not in {"constructed", "proposal_with_residuals"}:
         raise PartitionResultViewError("Une partition impossible ne peut pas etre dessinee comme une solution.")
+    materializable = bool(summary.get("materializable", plan_status == "constructed"))
     box = _dimension(_mapping(plan.get("box"), "partition.box").get("inner_dimensions_mm"), "partition.box.inner_dimensions_mm")
     storage_height = float(_mapping(plan["box"], "partition.box")["storage_height_mm"])
     placements = _mappings(plan.get("placements"), "partition.placements")
-    flat_stack = _mapping(plan.get("flat_stack"), "partition.flat_stack")
     section_y = box["y"] / 2.0
 
     top_bodies: list[dict[str, object]] = []
@@ -50,6 +51,8 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
             "z_mm": _round(origin["z"]),
             "depth_mm": _round(size["z"]),
             "rotation_deg_z": int(placement.get("rotation_deg_z", 0)),
+            "stage_id": str(placement.get("stage_id", "stage-1")),
+            "stage_index": int(placement.get("stage_index", 0)),
             "color_slot": index % 8,
         }
         top_bodies.append(body)
@@ -57,6 +60,7 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
             cut_bodies.append(
                 {
                     "id": body["id"], "kind": "body", "role": body["role"], "label": body["label"],
+                    "stage_id": body["stage_id"], "stage_index": body["stage_index"],
                     "x_mm": body["x_mm"], "z_from_top_mm": _round(box["z"] - origin["z"] - size["z"]),
                     "width_mm": body["width_mm"], "height_mm": body["depth_mm"], "color_slot": body["color_slot"],
                 }
@@ -75,6 +79,7 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
                 "x_mm": _round(bounds["x"]), "y_mm": _round(bounds["y"]),
                 "width_mm": _round(bounds["width"]), "height_mm": _round(bounds["height"]),
                 "z_mm": _round(bounds["z"]), "depth_mm": _round(bounds["depth"]),
+                "stage_id": body["stage_id"], "stage_index": body["stage_index"],
             }
             top_cavities.append(cavity_view)
             if _crosses(section_y, bounds["y"], bounds["height"]):
@@ -82,6 +87,7 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
                     {
                         "id": cavity_view["id"], "parent_id": body["id"], "kind": "cavity",
                         "shape_kind": cavity_view["shape_kind"], "content_id": cavity_view["content_id"],
+                        "content_name": cavity_view["content_name"], "stage_id": body["stage_id"],
                         "x_mm": cavity_view["x_mm"],
                         "z_from_top_mm": _round(box["z"] - bounds["z"] - bounds["depth"]),
                         "width_mm": cavity_view["width_mm"], "height_mm": cavity_view["depth_mm"],
@@ -93,8 +99,10 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
                 "origin_mm": deepcopy(placement["origin_mm"]),
                 "world_size_mm": deepcopy(placement["world_size_mm"]),
                 "rotation_deg_z": body["rotation_deg_z"],
+                "stage_id": body["stage_id"], "stage_index": body["stage_index"],
                 "minimum_outer_envelope_mm": deepcopy(placement.get("minimum_outer_envelope_mm")),
                 "final_outer_dimensions_mm": deepcopy(placement.get("final_outer_dimensions_mm")),
+                "dimension_contract": deepcopy(placement.get("dimension_contract")),
                 "surplus_distribution_mm": deepcopy(placement.get("surplus_distribution_mm")),
                 "source_content_ids": deepcopy(placement.get("source_content_ids", [])),
                 "source_contents": deepcopy(placement.get("source_contents", [])),
@@ -130,7 +138,29 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
                 "removal_order": top_item["removal_order"],
             })
 
-    # Historical singular keys remain as a bounded compatibility alias.
+    residual_contract = _mapping(plan.get("residuals", {}), "partition.residuals")
+    residual_tops: list[dict[str, object]] = []
+    residual_cuts: list[dict[str, object]] = []
+    for index, zone in enumerate(_mappings(residual_contract.get("zones", []), "partition.residuals.zones")):
+        origin = _dimension(zone.get("origin_mm"), f"residual[{index}].origin_mm")
+        size = _dimension(zone.get("size_mm"), f"residual[{index}].size_mm")
+        top_item = {
+            "id": str(zone["id"]), "kind": "residual", "residual_kind": str(zone["kind"]),
+            "stage_id": str(zone.get("stage_id", "")),
+            "x_mm": _round(origin["x"]), "y_mm": _round(origin["y"]),
+            "width_mm": _round(size["x"]), "height_mm": _round(size["y"]),
+            "z_mm": _round(origin["z"]), "depth_mm": _round(size["z"]),
+        }
+        residual_tops.append(top_item)
+        if _crosses(section_y, origin["y"], size["y"]):
+            residual_cuts.append({
+                "id": top_item["id"], "kind": "residual", "residual_kind": top_item["residual_kind"],
+                "stage_id": top_item["stage_id"], "x_mm": top_item["x_mm"],
+                "z_from_top_mm": _round(box["z"] - origin["z"] - size["z"]),
+                "width_mm": top_item["width_mm"], "height_mm": top_item["depth_mm"],
+            })
+
+    # Historical singular keys remain as bounded compatibility aliases.
     reservation_top = reservation_tops[0] if reservation_tops else None
     reservation_cut = reservation_cuts[0] if reservation_cuts else None
 
@@ -138,13 +168,15 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
         "schema_version": PARTITION_RESULT_VIEW_SCHEMA_V1,
         "source_plan_digest": str(plan.get("plan_digest", "")),
         "project_name": str(plan.get("project_name", "")),
-        "status": "constructed",
+        "status": plan_status,
+        "materializable": materializable,
         "top_view": {
             "view_box_mm": {"x": 0.0, "y": 0.0, "width": _round(box["x"]), "height": _round(box["y"])},
             "bodies": top_bodies,
             "cavities": top_cavities,
             "flat_stack_reservation": reservation_top,
             "top_inset_reservations": reservation_tops,
+            "residuals": residual_tops,
         },
         "section_xz": {
             "section_y_mm": _round(section_y),
@@ -153,9 +185,16 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
             "cavities": cut_cavities,
             "flat_stack_reservation": reservation_cut,
             "top_inset_reservations": reservation_cuts,
+            "residuals": residual_cuts,
         },
         "details": details,
         "support": deepcopy(plan.get("support")),
+        "stages": deepcopy(plan.get("stages", [])),
+        "stage_support": deepcopy(plan.get("stage_support", {})),
+        "removal_sequence": deepcopy(plan.get("removal_sequence", [])),
+        "residuals": deepcopy(residual_contract),
+        "suggestions": deepcopy(plan.get("suggestions", [])),
+        "score_breakdown": deepcopy(plan.get("score_breakdown", {})),
         "summary": deepcopy(summary),
         "diagnostics": deepcopy(plan.get("diagnostics", [])),
         "invariants": {
@@ -164,14 +203,20 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
             "automatic_body_count": int(summary.get("automatic_body_count", -1)),
             "source_plan_unchanged": True,
             "localized_top_insets": True,
+            "stage_aware": True,
+            "residuals_are_non_printable": all(
+                not bool(item.get("printable", False))
+                for item in _mappings(residual_contract.get("zones", []), "partition.residuals.zones")
+            ),
+            "partial_never_materializable": plan_status != "proposal_with_residuals" or not materializable,
         },
         "limitations": [
-            "La vue dessus projette les placements et les encastrements superieurs resolus.",
+            "La vue dessus projette les placements, etages, residus et encastrements superieurs resolus.",
             "La coupe X/Z traverse le plan a Y = box.y / 2 et peut ne pas couper tous les corps.",
+            "Les residus sont des volumes non imprimes ; une suggestion exige toujours confirmation.",
             "Cette vue ne constitue ni une CAD IR, ni une validation Fusion ou impression.",
         ],
     }
-
 
 def _cavity_world_bounds(placement: dict[str, Any], cavity: dict[str, Any]) -> dict[str, float]:
     origin = _dimension(placement["origin_mm"], "placement.origin_mm")

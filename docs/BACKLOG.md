@@ -1724,17 +1724,20 @@ impose les dependances de release suivantes.
 - Invariant : aucun corps automatique ; une suggestion de cale ne mute rien.
 - Acceptation : fixtures multi-etages, conservation, collisions, support,
   retrait et budget de recherche deterministe testes.
-- Statut : `ready`.
+- Livrable : `bgig.volumetric_stage_solver.v1`, CAD IR a origines Z, apercu
+  d etages/residuels, blocage des propositions partielles et package 0.1.14.
+- Statut : `done`, `implemented`, `automated-validated`, `fusion-retest-required`,
+  `print-validated: false`.
 
 ### P65 - Conteneurs, reglages et apercu integres
 
 - Capability : C-FUSION-UI, C-MODULE, C-TOLERANCE, C-QUALITY.
-- Dependances : P64 et acceptation ADR-0060.
+- Dependances : P64 integre et ADR-0060 acceptee.
 - Objectif : centraliser les corps explicites, tailles min/cible/calculee,
   estimation, jeux et minima ; traduire le resultat et ses sous-scores.
 - Acceptation : aucun code moteur au premier niveau, Materialiser est primaire
   dans Apercu, les tolerances restent experimentales et inchangees.
-- Statut : `planned`.
+- Statut : `ready`.
 
 ### P66 - Acceptance V0.1 revisee Fusion-only
 

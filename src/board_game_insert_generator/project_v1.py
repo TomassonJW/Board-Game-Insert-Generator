@@ -29,8 +29,9 @@ FLAT_ITEM_KINDS = frozenset({"board", "rulebook", "other"})
 FILL_ELEMENT_KINDS = frozenset({"hollow", "solid", "separator"})
 FILL_MODES = frozenset({"auto", "exact"})
 MEASUREMENT_CONFIDENCE = frozenset({"exact", "approximate"})
-SOLVER_PREFERENCES = frozenset({"balanced", "compact", "accessible", "print_simple"})
+SOLVER_PREFERENCES = frozenset({"balanced", "compact", "accessible", "print_simple", "material_reduced"})
 SURPLUS_PREFERENCES = frozenset({"balanced", "walls", "floor"})
+DIMENSION_MODES = frozenset({"auto", "target", "fixed"})
 
 
 class ProjectContractError(ValueError):
@@ -297,6 +298,7 @@ def _validate_container_groups(values: list[object]) -> list[dict[str, object]]:
             {
                 "id", "name", "wall_thickness_mm", "floor_thickness_mm",
                 "expansion_axes", "locked_outer_dimensions_mm", "surplus_preference",
+                "dimension_modes", "target_outer_dimensions_mm",
             },
             field,
         )
@@ -304,16 +306,21 @@ def _validate_container_groups(values: list[object]) -> list[dict[str, object]]:
         if group_id in ids:
             raise ProjectContractError(f"{field}.id duplicates '{group_id}'.")
         ids.add(group_id)
+        expansion_axes = _validate_expansion_axes(raw.get("expansion_axes"), field)
+        locked_dimensions = _validate_locked_dimensions(raw.get("locked_outer_dimensions_mm"), field)
+        dimension_modes, target_dimensions, expansion_axes, locked_dimensions = _validate_dimension_contract(
+            raw, expansion_axes, locked_dimensions, field
+        )
         result.append(
             {
                 "id": group_id,
                 "name": _required_text(raw, "name", field),
                 "wall_thickness_mm": _optional_positive_number(raw.get("wall_thickness_mm"), field),
                 "floor_thickness_mm": _optional_positive_number(raw.get("floor_thickness_mm"), field),
-                "expansion_axes": _validate_expansion_axes(raw.get("expansion_axes"), field),
-                "locked_outer_dimensions_mm": _validate_locked_dimensions(
-                    raw.get("locked_outer_dimensions_mm"), field
-                ),
+                "expansion_axes": expansion_axes,
+                "locked_outer_dimensions_mm": locked_dimensions,
+                "dimension_modes": dimension_modes,
+                "target_outer_dimensions_mm": target_dimensions,
                 "surplus_preference": _optional_enum(
                     raw.get("surplus_preference"), SURPLUS_PREFERENCES, "balanced",
                     f"{field}.surplus_preference",
@@ -344,6 +351,84 @@ def _validate_locked_dimensions(value: object, field: str) -> dict[str, float | 
     _reject_unknown(raw, {"x", "y", "z"}, f"{field}.locked_outer_dimensions_mm")
     return {
         axis: _optional_positive_number(raw.get(axis), f"{field}.locked_outer_dimensions_mm")
+        for axis in ("x", "y", "z")
+    }
+
+
+def _validate_dimension_contract(
+    raw: dict[str, object],
+    expansion_axes: dict[str, bool],
+    locked_dimensions: dict[str, float | None],
+    field: str,
+) -> tuple[dict[str, str], dict[str, float | None], dict[str, bool], dict[str, float | None]]:
+    modes_value = raw.get("dimension_modes")
+    targets = _validate_target_dimensions(raw.get("target_outer_dimensions_mm"), field)
+    if modes_value is None:
+        modes = {
+            axis: (
+                "fixed" if locked_dimensions[axis] is not None or not expansion_axes[axis]
+                else "target" if targets[axis] is not None
+                else "auto"
+            )
+            for axis in ("x", "y", "z")
+        }
+    else:
+        mode_raw = _mapping(modes_value, f"{field}.dimension_modes")
+        _reject_unknown(mode_raw, {"x", "y", "z"}, f"{field}.dimension_modes")
+        modes = {
+            axis: _optional_enum(
+                mode_raw.get(axis), DIMENSION_MODES, "auto", f"{field}.dimension_modes.{axis}"
+            )
+            for axis in ("x", "y", "z")
+        }
+
+    normalized_expansion = dict(expansion_axes)
+    normalized_locked = dict(locked_dimensions)
+    normalized_targets = dict(targets)
+    for axis in ("x", "y", "z"):
+        mode = modes[axis]
+        locked = locked_dimensions[axis]
+        target = targets[axis]
+        if locked is not None:
+            if modes_value is not None and mode != "fixed":
+                raise ProjectContractError(
+                    f"{field}.dimension_modes.{axis} must be 'fixed' while a locked dimension exists."
+                )
+            if target is not None and abs(float(target) - float(locked)) > 0.0001:
+                raise ProjectContractError(
+                    f"{field}.target_outer_dimensions_mm.{axis} conflicts with the locked dimension."
+                )
+            mode = "fixed"
+            modes[axis] = mode
+            normalized_targets[axis] = float(locked)
+        if mode == "auto":
+            if target is not None:
+                raise ProjectContractError(
+                    f"{field}.target_outer_dimensions_mm.{axis} must be null in auto mode."
+                )
+            normalized_expansion[axis] = True
+            normalized_locked[axis] = None
+        elif mode == "target":
+            if target is None:
+                raise ProjectContractError(
+                    f"{field}.target_outer_dimensions_mm.{axis} is required in target mode."
+                )
+            normalized_expansion[axis] = True
+            normalized_locked[axis] = None
+        else:
+            normalized_expansion[axis] = False
+            if normalized_targets[axis] is not None:
+                normalized_locked[axis] = float(normalized_targets[axis])
+    return modes, normalized_targets, normalized_expansion, normalized_locked
+
+
+def _validate_target_dimensions(value: object, field: str) -> dict[str, float | None]:
+    if value is None:
+        return {"x": None, "y": None, "z": None}
+    raw = _mapping(value, f"{field}.target_outer_dimensions_mm")
+    _reject_unknown(raw, {"x", "y", "z"}, f"{field}.target_outer_dimensions_mm")
+    return {
+        axis: _optional_positive_number(raw.get(axis), f"{field}.target_outer_dimensions_mm")
         for axis in ("x", "y", "z")
     }
 

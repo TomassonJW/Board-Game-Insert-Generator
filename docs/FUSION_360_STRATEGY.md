@@ -875,3 +875,20 @@ ne peut pas etre materialisee ou regeneree.
 L action inspect transmet le rapport complet uniquement comme detail technique.
 Un inspect sain ne produit plus de notification globale. La scene Fusion reste
 une projection explicite et aucune edition ne la modifie automatiquement.
+
+## P64 - Etages et propositions partielles
+
+La palette edite les modes `Auto`, `Cible` et `Fixe` par axe, puis envoie le
+projet au coeur Python. Elle ne repartit ni les dimensions, ni les etages, ni les
+supports en JavaScript ou dans `adsk`. Le package Fusion 0.1.14 embarque
+`volumetric_stage_solver.py` avec le reste du coeur pur.
+
+Une CAD IR complete transporte les positions Z reelles des corps, les etages,
+appuis, retraits, residuels et sous-scores comme metadata. L adaptateur Fusion
+consomme seulement ces primitives et conserve ses controles de registry et de
+nombre de corps. Si le plan est `proposal_with_residuals`, aucune CAD IR n est
+produite et `_synchronize_palette_cad_response` bloque avant tout appel Fusion.
+
+P64 est automatise mais `fusion-retest-required` : la scene multi-etages,
+la reservation P63 sur l etage superieur, la regeneration et l export seront
+observes ensemble a la gate P66. Aucune validation d impression n est deduite.

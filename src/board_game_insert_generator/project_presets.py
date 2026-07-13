@@ -135,6 +135,8 @@ def build_creation_presets(raw_project: object, *, storage_height_mm: float | No
                 "floor_thickness_mm": None,
                 "expansion_axes": {"x": True, "y": True, "z": True},
                 "locked_outer_dimensions_mm": {"x": None, "y": None, "z": None},
+                "dimension_modes": {"x": "auto", "y": "auto", "z": "auto"},
+                "target_outer_dimensions_mm": {"x": None, "y": None, "z": None},
                 "surplus_preference": "balanced",
             }
         },

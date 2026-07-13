@@ -100,6 +100,8 @@ class ExpandableEnvelopeContractTests(unittest.TestCase):
 
         self.assertEqual(group["expansion_axes"], {"x": True, "y": True, "z": True})
         self.assertEqual(group["locked_outer_dimensions_mm"], {"x": None, "y": None, "z": None})
+        self.assertEqual(group["target_outer_dimensions_mm"], {"x": None, "y": None, "z": None})
+        self.assertEqual(group["dimension_modes"], {"x": "auto", "y": "auto", "z": "auto"})
         self.assertEqual(group["surplus_preference"], "balanced")
 
     def test_enforces_disabled_axes_locks_and_minimum_dimensions(self) -> None:
@@ -126,6 +128,29 @@ class ExpandableEnvelopeContractTests(unittest.TestCase):
         self.assertIn("cannot expand", messages)
         self.assertIn("locked", messages)
         self.assertIn("below the minimum", messages)
+
+    def test_target_and_fixed_modes_keep_their_distinct_constraint_contracts(self) -> None:
+        project = _project_for()
+        minimum = derive_expandable_envelope_contract(project)["containers"][0]["minimum_outer_envelope_mm"]
+        project["container_groups"][0].update({
+            "dimension_modes": {"x": "target", "y": "fixed", "z": "auto"},
+            "target_outer_dimensions_mm": {
+                "x": minimum["x"] + 10.0,
+                "y": minimum["y"] + 4.0,
+                "z": None,
+            },
+        })
+
+        group = normalize_project_draft(project).project["container_groups"][0]
+        result = derive_expandable_envelope_contract(project)["containers"][0]
+
+        self.assertEqual(group["dimension_modes"], {"x": "target", "y": "fixed", "z": "auto"})
+        self.assertTrue(group["expansion_axes"]["x"])
+        self.assertFalse(group["expansion_axes"]["y"])
+        self.assertEqual(group["locked_outer_dimensions_mm"]["y"], minimum["y"] + 4.0)
+        self.assertEqual(result["constraints"]["dimension_modes"]["x"], "target")
+        self.assertEqual(result["constraints"]["dimension_modes"]["y"], "fixed")
+
 
     def test_multiple_contents_keep_distinct_fixed_cavities(self) -> None:
         project = _project_for("rectangle", quantity=24)

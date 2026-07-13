@@ -151,15 +151,9 @@ def apply_top_inset_reservations(
                 if intersection is None:
                     continue
                 if not isclose(body_top, design_top, abs_tol=0.001):
-                    blockers.append(
-                        _blocker(
-                            "TOP_INSET_BODY_NOT_AT_DESIGN_TOP",
-                            f"Le corps '{placement['name']}' intersecte '{reservation['name']}' "
-                            f"mais son sommet est a { _round(body_top) } mm au lieu de { _round(design_top) } mm.",
-                            "Recompose les etages pour placer un corps porteur sous cette empreinte.",
-                            str(placement["id"]),
-                        )
-                    )
+                    # P64 may place another requested body above this XY footprint.
+                    # Only bodies opening on the design top receive the local cut;
+                    # missing top coverage is diagnosed after all stages are scanned.
                     continue
                 depth = float(reservation["inset_depth_from_top_mm"])
                 minimum_floor = group_floor.get(

@@ -93,9 +93,13 @@ def _contract_for_container(
     group_id = str(container["container_group_id"])
     expansion_axes = {axis: bool(_mapping(group["expansion_axes"])[axis]) for axis in _AXES}
     locked = _nullable_dimension(group["locked_outer_dimensions_mm"])
+    dimension_modes = {axis: str(_mapping(group["dimension_modes"])[axis]) for axis in _AXES}
+    target_dimensions = _nullable_dimension(group["target_outer_dimensions_mm"])
     constraints = {
         "expansion_axes": expansion_axes,
         "locked_outer_dimensions_mm": locked,
+        "dimension_modes": dimension_modes,
+        "target_outer_dimensions_mm": target_dimensions,
         "surplus_preference": group["surplus_preference"],
         "minimum_wall_thickness_mm": container["wall_thickness_mm"],
         "minimum_floor_thickness_mm": container["floor_thickness_mm"],
@@ -134,7 +138,7 @@ def _contract_for_container(
                 f"Final outer {axis.upper()} dimension {final[axis]} mm is below the minimum "
                 f"{minimum[axis]} mm."
             )
-        if not expansion_axes[axis] and abs(final[axis] - minimum[axis]) > _EPSILON:
+        if not expansion_axes[axis] and locked[axis] is None and abs(final[axis] - minimum[axis]) > _EPSILON:
             blockers.append(
                 f"Axis {axis.upper()} cannot expand; final dimension must remain {minimum[axis]} mm."
             )
@@ -176,6 +180,19 @@ def _contract_for_container(
             "z": distribution["below"],
         },
         "surplus_distribution_mm": distribution,
+        "dimension_resolution": {
+            axis: {
+                "mode": dimension_modes[axis],
+                "minimum_mm": minimum[axis],
+                "target_mm": target_dimensions[axis],
+                "calculated_mm": final[axis],
+                "target_deviation_mm": (
+                    _round(final[axis] - float(target_dimensions[axis]))
+                    if target_dimensions[axis] is not None else None
+                ),
+            }
+            for axis in _AXES
+        },
         "constraints": constraints,
         "invariants": {
             "cavity_dimensions_fixed": True,

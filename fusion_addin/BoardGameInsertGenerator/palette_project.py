@@ -160,7 +160,8 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
     partition = solve_partition_plan(project) if action in {"solve_project", "materialize_project", "regenerate_project"} else None
     result_view = (
         build_partition_result_view(partition)
-        if partition is not None and partition["summary"]["status"] == "constructed"
+        if partition is not None
+        and partition["summary"]["status"] in {"constructed", "proposal_with_residuals"}
         else None
     )
     cad_build = (
@@ -229,7 +230,13 @@ def _response(
             "source": "current" if project is not None else "invalid",
             "derived": "current" if envelopes is not None and flat_stack is not None else "pending",
             "solved": "current" if partition is not None else "not_computed",
-            "materialized": "cad_ready" if cad_build is not None else "not_materialized",
+            "materialized": (
+                "cad_ready"
+                if isinstance(cad_build, dict) and cad_build.get("status") == "ready_for_fusion"
+                else "blocked"
+                if cad_build is not None
+                else "not_materialized"
+            ),
         },
         "creation_presets": deepcopy(creation_presets),
         "personal_presets": deepcopy(personal_presets),

@@ -152,6 +152,24 @@ class FusionPaletteCadSyncTests(unittest.TestCase):
         execute.assert_not_called()
         self.assertEqual(result["scene_status"], "blocked")
 
+    def test_p64_partial_build_never_calls_fusion(self) -> None:
+        blocked = response()
+        blocked["cad_build"] = {
+            "status": "not_materializable",
+            "cad_ir": None,
+            "materialization": {"status": "blocked_partial", "component_count": 0, "automatic_body_count": 0},
+        }
+        with tempfile.TemporaryDirectory() as temp_dir, patch.object(
+            entrypoint, "_execute_generation_request"
+        ) as execute:
+            result = entrypoint._synchronize_palette_cad_response(
+                blocked, "materialize_project", Path(temp_dir)
+            )
+
+        execute.assert_not_called()
+        self.assertEqual(result["scene_status"], "blocked")
+        self.assertEqual(result["lifecycle"]["materialized"], "blocked")
+
     def test_bridge_error_response_preserves_request_id_and_never_times_out(self) -> None:
         result = entrypoint._palette_project_bridge_error_response(
             {"request_id": "abc"}, RuntimeError("boom")

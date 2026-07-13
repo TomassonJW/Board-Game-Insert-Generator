@@ -114,6 +114,30 @@ class TopInsetReservationTests(unittest.TestCase):
         )
         self.assertEqual(result["summary"]["automatic_body_count"], 0)
 
+    def test_p64_applies_a_top_inset_only_to_intersected_upper_stage_bodies(self) -> None:
+        value = blank_project_v1()
+        value["box"] = {"inner_dimensions_mm": {"x": 50.0, "y": 25.0, "z": 50.0}, "usable_height_mm": 50.0, "lid_clearance_mm": 0.0}
+        value["container_groups"] = [
+            {"id": f"g{index}", "name": f"Bac {index}", "wall_thickness_mm": None, "floor_thickness_mm": None}
+            for index in range(4)
+        ]
+        value["contents"] = [
+            {"id": f"c{index}", "name": f"Pieces {index}", "shape_kind": "square", "dimensions_mm": {"x": 18.0, "y": 18.0, "z": 5.0}, "quantity": 4, "container_group_id": f"g{index}", "content_clearance_mm": None, "measurement_confidence": "exact"}
+            for index in range(4)
+        ]
+        value["flat_items"] = [flat("board", x=25.0, y=20.0, z=2.0, origin={"x": 1.0, "y": 1.0})]
+
+        result = solve_partition_plan(value)
+        lower = [item for item in result["placements"] if item["stage_id"] == "stage-1"]
+        upper = [item for item in result["placements"] if item["stage_id"] == "stage-2"]
+
+        self.assertEqual(result["summary"]["status"], "constructed")
+        self.assertEqual(result["summary"]["stage_count"], 2)
+        self.assertEqual(result["top_inset_reservations"]["status"], "applied")
+        self.assertTrue(all(not item.get("top_inset_cuts") for item in lower))
+        self.assertTrue(any(item.get("top_inset_cuts") for item in upper))
+        self.assertEqual(result["stage_support"]["status"], "supported")
+
     def test_rejects_an_inset_that_would_cut_below_an_intersected_cavity_floor(self) -> None:
         value = project()
         value["flat_items"] = [flat("too-deep", x=220.0, y=160.0, z=30.0)]

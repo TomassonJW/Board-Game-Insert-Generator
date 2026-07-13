@@ -30,6 +30,22 @@ def project(count: int = 2) -> dict[str, object]:
     return value
 
 
+def tight_multistage_project() -> dict[str, object]:
+    value = project(4)
+    value["box"] = {"inner_dimensions_mm": {"x": 50.0, "y": 25.0, "z": 50.0}, "usable_height_mm": 50.0, "lid_clearance_mm": 0.0}
+    for content in value["contents"]:
+        content["dimensions_mm"] = {"x": 18.0, "y": 18.0, "z": 5.0}
+    return value
+
+
+def fixed_residual_project() -> dict[str, object]:
+    value = project(1)
+    minimum = solve_partition_plan(value)["placements"][0]["minimum_outer_envelope_mm"]
+    value["container_groups"][0]["expansion_axes"] = {"x": False, "y": False, "z": False}
+    value["container_groups"][0]["locked_outer_dimensions_mm"] = minimum
+    return value
+
+
 class PartitionCadTests(unittest.TestCase):
     def test_builds_one_fusion_component_per_requested_p57_body(self) -> None:
         value = project(3)
@@ -138,6 +154,26 @@ class PartitionCadTests(unittest.TestCase):
         )
         self.assertTrue(result["invariants"]["top_insets_are_reservations_not_cavities"])
         self.assertTrue(result["invariants"]["top_inset_cut_count_matches_plan"])
+
+    def test_p64_transports_nonzero_stage_origins_to_the_cad_ir(self) -> None:
+        result = build_partition_cad(tight_multistage_project())
+        components = result["cad_ir"]["components"]
+
+        self.assertEqual(result["status"], PARTITION_CAD_STATUS_READY)
+        self.assertEqual({component["body"]["printable_origin_mm"]["z"] for component in components}, {0.0, 25.0})
+        self.assertEqual(len(result["cad_ir"]["metadata"]["box_fill_plan"]["stages"]), 2)
+        self.assertEqual(result["cad_ir"]["metadata"]["box_fill_plan"]["stage_support"]["status"], "supported")
+        self.assertEqual(result["materialization"]["automatic_body_count"], 0)
+
+    def test_p64_partial_proposal_never_produces_cad_ir(self) -> None:
+        result = build_partition_cad(fixed_residual_project())
+
+        self.assertEqual(result["status"], "not_materializable")
+        self.assertIsNone(result["cad_ir"])
+        self.assertEqual(result["materialization"]["status"], "blocked_partial")
+        self.assertEqual(result["materialization"]["component_count"], 0)
+        self.assertEqual(result["materialization"]["automatic_body_count"], 0)
+        self.assertIn("volumes residuels", result["blockers"][0])
 
     def test_impossible_project_returns_no_cad_ir(self) -> None:
         result = build_partition_cad(blank_project_v1())

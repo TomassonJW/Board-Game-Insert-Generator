@@ -8,7 +8,7 @@ Statut produit : **MVP V0.1 reouvert ; fondations techniques presentes, conformi
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P63 implemente les reservations superieures localisees ; P64 devient la prochaine mission ready du chemin V0.1 revise.
+Phase active : P64 implemente le solveur volumetrique borne par etages ; P65 devient la prochaine mission ready du chemin V0.1 revise.
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -1565,4 +1565,30 @@ X/Z. Aucun corps automatique n est cree.
 
 Preuves : 408 tests automatises passent, package Fusion 0.1.13 prepare et coeur
 Python sans `adsk`. Aucune observation Fusion ni impression n est revendiquee.
-P64 devient ready.
+
+## P64 - Solveur volumetrique multi-etages
+
+Statut : `implemented`, `automated-validated`, `fusion-retest-required`,
+`print-validated: false`.
+
+Le package 0.1.14 remplace le solveur P57 a hauteur unique par
+`bgig.volumetric_stage_solver.v1`, un portefeuille borne et deterministe
+d arrangements XY composes du bas vers le haut en Z. Chaque etage transporte
+ses placements, origine Z, support, ordre de retrait et score ; les cavites P55
+sont revalidees sans changement de leur repere local.
+
+Les trois modes par axe sont explicites dans le projet et la palette : `Auto`
+absorbe le surplus, `Cible` reste une preference ajustable et `Fixe` demeure une
+contrainte dure. Une fermeture impossible devient une
+`proposal_with_residuals`, visible dans l Apercu mais non materialisable. Les
+residuels peuvent suggerer une cale explicite, sans jamais creer un corps ni
+muter le projet.
+
+Les reservations superieures P63 ne coupent que les corps de l etage superieur
+qu elles intersectent. La CAD IR transporte les origines Z et metadata d etage ;
+le bridge bloque toute proposition partielle avant un appel a Fusion.
+
+Preuves : 423 tests automatises passent, compilation Python et syntaxe
+JavaScript extraite de la palette sont verifiees, package Fusion 0.1.14 prepare
+et coeur Python sans `adsk`. Aucune observation Fusion P64 ni impression n est
+revendiquee. P65 devient ready.

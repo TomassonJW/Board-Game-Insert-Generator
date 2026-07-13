@@ -331,5 +331,15 @@ Le package Fusion 0.1.13 implemente les reservations superieures localisees :
 empreintes descendantes, composition des plats qui se chevauchent, ordre de
 retrait, appui, prise rectangulaire, non-percement, vues et operations CAD
 IR/Fusion distinctes. Les corps demandes conservent leur hauteur complete hors
-empreinte et aucun corps automatique n est cree. La validation Fusion reste
-reportee a P66 ; P64 devient ready.
+empreinte et aucun corps automatique n est cree.
+
+## P64 implemente - 2026-07-13
+
+Le package Fusion 0.1.14 implemente le solveur borne par etages de l ADR-0059 :
+portefeuille XY deterministe, composition Z, rotations, appuis, ordre de retrait
+et bilan de volume. `Auto`, `Cible` et `Fixe` sont des contrats par axe ; le
+surplus est score selon la preference, sans revendication d optimalite globale.
+Une proposition incomplete expose residuels et suggestion non mutante, puis est
+bloquee avant materialisation Fusion. P63 ne coupe que les corps superieurs
+intersectes. La validation Fusion du comportement P64 reste reportee a P66 ;
+P65 devient ready.
