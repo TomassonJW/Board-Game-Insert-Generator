@@ -31,6 +31,6 @@ et les suggestions optionnelles.
 
 - 445 tests automatises verts ;
 - syntaxe JavaScript de la palette et compilation Python vertes ;
-- verification de package Fusion, diff et installation locale a relancer apres
-  integration ;
+- git diff --check, installation locale Fusion 0.1.19 depuis 23aaa70 et
+  controle des marqueurs verts ;
 - validation Fusion et impression reelle restent reportees a P66.

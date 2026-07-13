@@ -1684,5 +1684,5 @@ est primaire localement ; Recalculer et Materialiser dans Fusion restent uniques
 dans la barre persistante.
 
 Preuves : 445 tests automatises, syntaxe JavaScript et compilation Python verts.
-La verification de package Fusion et la gate humaine restent a rejouer apres
-integration. Aucun statut Fusion ou impression n est revendique.
+Le package Fusion 0.1.19 est installe localement depuis 23aaa70 et ses marqueurs
+sont verifies. La gate humaine Fusion et l impression restent a realiser.

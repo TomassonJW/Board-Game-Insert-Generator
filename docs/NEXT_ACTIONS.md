@@ -20,7 +20,7 @@ barre persistante. Aucun score, solveur, tolerance, corps ou geometrie n est
 modifie.
 
 Preuves : 445 tests automatises verts, syntaxe JavaScript, compilation Python,
-git diff --check et dry-run d installation Fusion a relancer apres integration.
+git diff --check, installation locale Fusion 0.1.19 et controle des marqueurs verts.
 Aucune validation Fusion ni impression reelle n est revendiquee.
 
 ## Mission courante
