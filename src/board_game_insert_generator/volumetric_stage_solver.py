@@ -49,6 +49,7 @@ def solve_stage_portfolio(
     storage_height_mm: float,
     clearance_mm: float,
     *,
+    box_clearance_mm: float | None = None,
     vertical_clearance_mm: float | None = None,
     preference: str = "balanced",
 ) -> dict[str, object]:
@@ -57,9 +58,10 @@ def solve_stage_portfolio(
     values = [_participant(item, index) for index, item in enumerate(participants)]
     bounds = _dimension(box, "box")
     height = float(storage_height_mm)
-    clearance = float(clearance_mm)
-    vertical_clearance = clearance if vertical_clearance_mm is None else float(vertical_clearance_mm)
-    if height <= 0.0 or clearance < 0.0 or vertical_clearance < 0.0:
+    between_clearance = float(clearance_mm)
+    box_clearance = between_clearance if box_clearance_mm is None else float(box_clearance_mm)
+    vertical_clearance = between_clearance if vertical_clearance_mm is None else float(vertical_clearance_mm)
+    if height <= 0.0 or between_clearance < 0.0 or box_clearance < 0.0 or vertical_clearance < 0.0:
         raise VolumetricStageSolverError(
             "Storage height must be positive and XY/Z clearances non-negative."
         )
@@ -75,7 +77,7 @@ def solve_stage_portfolio(
         "max_orientation_combinations": MAX_ORIENTATION_COMBINATIONS,
     }
     if not values:
-        return _empty_result(budgets, "No requested body can participate in the stage search.")
+        return _empty_result(budgets, "No requested body can participate in the stage search.", between_clearance, box_clearance, vertical_clearance)
 
     candidates: list[dict[str, object]] = []
     signatures: set[str] = set()
@@ -95,7 +97,8 @@ def solve_stage_portfolio(
                     groups,
                     bounds,
                     height,
-                    clearance,
+                    between_clearance,
+                    box_clearance,
                     vertical_clearance,
                     preference=preference,
                     order_name=order_name,
@@ -124,7 +127,8 @@ def solve_stage_portfolio(
                     stacks,
                     bounds,
                     height,
-                    clearance,
+                    between_clearance,
+                    box_clearance,
                     vertical_clearance,
                     preference=preference,
                     order_name=order_name,
@@ -169,7 +173,7 @@ def solve_stage_portfolio(
         "candidates": returned,
         "best_candidate": deepcopy(returned[0]) if returned else None,
         "budgets": budgets,
-        "clearances_mm": {"xy": _round(clearance), "z": _round(vertical_clearance)},
+        "clearances_mm": {"xy": _round(between_clearance), "z": _round(vertical_clearance), "box_xy": _round(box_clearance), "between_xy": _round(between_clearance), "between_z": _round(vertical_clearance)},
         "search": {
             "deterministic": True,
             "globally_optimal": False,
@@ -202,7 +206,8 @@ def _candidate_for_groups(
     groups: list[list[dict[str, object]]],
     box: dict[str, float],
     storage_height: float,
-    clearance: float,
+    between_clearance: float,
+    box_clearance: float,
     vertical_clearance: float,
     *,
     preference: str,
@@ -219,14 +224,14 @@ def _candidate_for_groups(
     xy_complete = True
     for group in groups:
         full, full_attempts = _best_xy_layout(
-            group, box, clearance, orientation_strategy=orientation_strategy, fill=True
+            group, box, between_clearance, box_clearance, orientation_strategy=orientation_strategy, fill=True
         )
         attempts += full_attempts
         if full is not None:
             stage_layouts.append(full)
             continue
         partial, partial_attempts = _best_xy_layout(
-            group, box, clearance, orientation_strategy=orientation_strategy, fill=False
+            group, box, between_clearance, box_clearance, orientation_strategy=orientation_strategy, fill=False
         )
         attempts += partial_attempts
         if partial is None:
@@ -333,13 +338,13 @@ def _candidate_for_groups(
         cursor_z = stage_top + (vertical_clearance if stage_index < len(groups) - 1 else 0.0)
 
     if cursor_z < storage_height - _EPSILON:
-        inner_x = max(0.0, box["x"] - 2.0 * clearance)
-        inner_y = max(0.0, box["y"] - 2.0 * clearance)
+        inner_x = max(0.0, box["x"] - 2.0 * box_clearance)
+        inner_y = max(0.0, box["y"] - 2.0 * box_clearance)
         residual_zones.append(
             _residual_zone(
                 "residual:top",
                 "above-stages",
-                {"x": _round(clearance), "y": _round(clearance), "z": _round(cursor_z)},
+                {"x": _round(box_clearance), "y": _round(box_clearance), "z": _round(cursor_z)},
                 {"x": _round(inner_x), "y": _round(inner_y), "z": _round(storage_height - cursor_z)},
                 "unused_height",
             )
@@ -350,7 +355,7 @@ def _candidate_for_groups(
         return None, attempts
     complete = xy_complete and vertical_complete and all_reach_stage_top
     solution_status = SOLUTION_COMPLETE if complete else SOLUTION_WITH_RESIDUALS
-    volume = _volume_contract(placements, box, storage_height, clearance, complete)
+    volume = _volume_contract(placements, box, storage_height, box_clearance, complete)
     if complete:
         residual_zones = []
     suggestions = _suggestions(residual_zones)
@@ -412,7 +417,8 @@ def _candidate_for_stacks(
     stacks: list[list[dict[str, object]]],
     box: dict[str, float],
     storage_height: float,
-    clearance: float,
+    between_clearance: float,
+    box_clearance: float,
     vertical_clearance: float,
     *,
     preference: str,
@@ -437,7 +443,8 @@ def _candidate_for_stacks(
     layout, attempts = _best_xy_layout(
         descriptors,
         box,
-        clearance,
+        between_clearance,
+        box_clearance,
         orientation_strategy=orientation_strategy,
         fill=True,
     )
@@ -506,7 +513,7 @@ def _candidate_for_stacks(
         return None, attempts
 
     complete = True
-    volume = _volume_contract(placements, box, storage_height, clearance, complete)
+    volume = _volume_contract(placements, box, storage_height, box_clearance, complete)
     scores = _score_candidate(
         placements,
         stages,
@@ -857,7 +864,8 @@ def _stage_heights(
 def _best_xy_layout(
     group: list[dict[str, object]],
     box: dict[str, float],
-    clearance: float,
+    between_clearance: float,
+    box_clearance: float,
     *,
     orientation_strategy: str,
     fill: bool,
@@ -870,7 +878,8 @@ def _best_xy_layout(
         layout = _layout_rows(
             rows,
             box,
-            clearance,
+            between_clearance,
+            box_clearance,
             orientation_strategy=orientation_strategy,
             fill=fill,
         )
@@ -892,18 +901,19 @@ def _best_xy_layout(
 def _layout_rows(
     row_items: list[list[dict[str, object]]],
     box: dict[str, float],
-    clearance: float,
+    between_clearance: float,
+    box_clearance: float,
     *,
     orientation_strategy: str,
     fill: bool,
 ) -> dict[str, object] | None:
-    inner_x = box["x"] - 2.0 * clearance
-    inner_y = box["y"] - 2.0 * clearance
+    inner_x = box["x"] - 2.0 * box_clearance
+    inner_y = box["y"] - 2.0 * box_clearance
     if inner_x <= 0.0 or inner_y <= 0.0:
         return None
     rows: list[list[dict[str, object]]] = []
     for values in row_items:
-        oriented = _orient_row(values, inner_x, inner_y, clearance, orientation_strategy)
+        oriented = _orient_row(values, inner_x, inner_y, between_clearance, orientation_strategy)
         if oriented is None:
             return None
         rows.append(oriented)
@@ -916,7 +926,7 @@ def _layout_rows(
         for item in row
     ) and fill:
         return None
-    minimum_y = sum(row_heights) + clearance * max(0, len(rows) - 1)
+    minimum_y = sum(row_heights) + between_clearance * max(0, len(rows) - 1)
     if minimum_y > inner_y + _EPSILON:
         return None
     if fill:
@@ -947,11 +957,11 @@ def _layout_rows(
 
     placements: list[dict[str, object]] = []
     residuals: list[dict[str, object]] = []
-    cursor_y = clearance
+    cursor_y = box_clearance
     rotations = 0
     for row_index, (row, row_height) in enumerate(zip(rows, row_heights)):
         widths = [float(item["base_world_mm"]["x"]) for item in row]
-        occupied_with_gaps = sum(widths) + clearance * max(0, len(row) - 1)
+        occupied_with_gaps = sum(widths) + between_clearance * max(0, len(row) - 1)
         if occupied_with_gaps > inner_x + _EPSILON:
             return None
         if fill:
@@ -970,7 +980,7 @@ def _layout_rows(
             ]
             weights = [_area(_mapping(item["participant"])["minimum_local_mm"]) for item in row]
             _allocate(widths, expandable, extra_x, targets, weights)
-        cursor_x = clearance
+        cursor_x = box_clearance
         for item_index, (item, width) in enumerate(zip(row, widths)):
             body_height = row_height if fill else float(item["base_world_mm"]["y"])
             placements.append(
@@ -992,30 +1002,30 @@ def _layout_rows(
                         "kind": "row_height_residual",
                     }
                 )
-            cursor_x += width + clearance
+            cursor_x += width + between_clearance
             rotations += int(bool(item["rotated_xy"]))
-        used_x = cursor_x - clearance
-        if not fill and used_x < box["x"] - clearance - _EPSILON:
+        used_x = cursor_x - between_clearance
+        if not fill and used_x < box["x"] - box_clearance - _EPSILON:
             residuals.append(
                 {
                     "id": f"r{row_index}-right",
                     "x": _round(used_x),
                     "y": _round(cursor_y),
-                    "width": _round(box["x"] - clearance - used_x),
+                    "width": _round(box["x"] - box_clearance - used_x),
                     "height": _round(row_height),
                     "kind": "row_right_residual",
                 }
             )
-        cursor_y += row_height + clearance
-    used_y = cursor_y - clearance
-    if not fill and used_y < box["y"] - clearance - _EPSILON:
+        cursor_y += row_height + between_clearance
+    used_y = cursor_y - between_clearance
+    if not fill and used_y < box["y"] - box_clearance - _EPSILON:
         residuals.append(
             {
                 "id": "back",
-                "x": _round(clearance),
+                "x": _round(box_clearance),
                 "y": _round(used_y),
                 "width": _round(inner_x),
-                "height": _round(box["y"] - clearance - used_y),
+                "height": _round(box["y"] - box_clearance - used_y),
                 "kind": "stage_back_residual",
             }
         )
@@ -1043,7 +1053,7 @@ def _orient_row(
     values: list[dict[str, object]],
     inner_x: float,
     inner_y: float,
-    clearance: float,
+    between_clearance: float,
     strategy: str,
 ) -> list[dict[str, object]] | None:
     option_sets = [_orientation_options(value) for value in values]
@@ -1056,7 +1066,7 @@ def _orient_row(
         combinations = [tuple(_greedy_orientation(value, strategy) for value in values)]
     feasible: list[tuple[tuple[float, float, int], list[dict[str, object]]]] = []
     for combination in combinations:
-        width = sum(float(item["base_world_mm"]["x"]) for item in combination) + clearance * max(0, len(values) - 1)
+        width = sum(float(item["base_world_mm"]["x"]) for item in combination) + between_clearance * max(0, len(values) - 1)
         height = max(float(item["base_world_mm"]["y"]) for item in combination)
         if width > inner_x + _EPSILON or height > inner_y + _EPSILON:
             continue
@@ -1069,7 +1079,6 @@ def _orient_row(
             key = (width / inner_x + height / inner_y, rotations, width)
         feasible.append((key, [dict(item) for item in combination]))
     return min(feasible, key=lambda item: item[0])[1] if feasible else None
-
 
 def _orientation_options(value: dict[str, object]) -> list[dict[str, object]]:
     base = {axis: _axis_base(value, axis) for axis in _AXES}
@@ -1463,14 +1472,20 @@ def _candidate_signature(candidate: dict[str, object]) -> str:
     )
 
 
-def _empty_result(budgets: dict[str, int], message: str) -> dict[str, object]:
+def _empty_result(
+    budgets: dict[str, int],
+    message: str,
+    between_clearance: float,
+    box_clearance: float,
+    vertical_clearance: float,
+) -> dict[str, object]:
     return {
         "schema_version": VOLUMETRIC_STAGE_SOLVER_SCHEMA_V1,
         "status": SOLUTION_IMPOSSIBLE,
         "candidates": [],
         "best_candidate": None,
         "budgets": budgets,
-        "clearances_mm": {"xy": _round(clearance), "z": _round(vertical_clearance)},
+        "clearances_mm": {"xy": _round(between_clearance), "z": _round(vertical_clearance), "box_xy": _round(box_clearance), "between_xy": _round(between_clearance), "between_z": _round(vertical_clearance)},
         "search": {
             "deterministic": True,
             "globally_optimal": False,

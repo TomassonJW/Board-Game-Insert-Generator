@@ -62,6 +62,8 @@ class PartitionCadTests(unittest.TestCase):
         self.assertEqual(len(fusion.exploded_occurrences), 0)
         parameters = {item["id"]: item["value"] for item in result["cad_ir"]["parameters"]}
         self.assertEqual(parameters["container_z_clearance_mm"], 0.6)
+        self.assertEqual(parameters["container_box_xy_clearance_mm"], 0.6)
+        self.assertEqual(parameters["box_top_z_clearance_mm"], 2.0)
 
     def test_repeated_user_names_still_create_unique_fusion_body_names(self) -> None:
         value = project(4)

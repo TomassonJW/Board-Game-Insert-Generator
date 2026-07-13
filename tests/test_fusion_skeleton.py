@@ -2308,7 +2308,8 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("asset_cavity_policy", skeleton_source)
         self.assertIn("single_asset_fit_rectangular_cavity_v0", skeleton_source)
         self.assertIn("count_aware_storage_sizing", skeleton_source)
-        self.assertIn("bottom_and_top_box_xy_outlines", source)
+        self.assertIn("bottom_and_top_box_xy_outlines_hidden_by_default", source)
+        self.assertIn("sketch.isLightBulbOn = False", source)
         self.assertIn("_create_reference_box_outlines", source)
         self.assertIn("Reference outline policy", source)
         self.assertLess(

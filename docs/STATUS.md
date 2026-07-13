@@ -8,7 +8,7 @@ Statut produit : **MVP V0.1 reouvert ; fondations techniques presentes, conformi
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P65-M001 integre ; P65-M002 est cadre et ready pour separer les jeux boite/conteneurs des jeux inter-conteneurs.
+Phase active : P65-M002 integre ; P65 reste en cours avec P65-M003 a cadrer avant implementation.
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -1620,15 +1620,19 @@ Preuves automatisees : 430 tests passent. Les tests projet, solveur volumique,
 partition, CAD et palette couvrent l heritage X-Y vers Z, un cas anisotrope 0,6/1,2 mm, les origines Z, le
 parametre CAD et l unicite de l action. Validation Fusion et impression reelle non
 revendiquees ; P65 reste en cours.
-## Plan P65-M002 - Separation des frontieres de jeu
+## P65-M002 - Separation des frontieres de jeu
 
-Le prochain lot distingue le perimetre X-Y de boite, l ecart X-Y entre voisins,
-l ecart Z entre etages et la marge Z superieure. Il masque aussi par defaut les
-deux sketches de reference de boite sans les supprimer ni les detaguer. Le fond reste ancre a Z=0 et le
-zero reste saisissable sans devenir un nouveau default. La migration doit
-preserver les placements historiques. Le lot est docs-only a ce stade : aucun
-code ni statut de capability n est modifie.
+P65-M002 separe quatre roles non ambigus : jeu X-Y total entre conteneurs,
+jeu X-Y par cote entre conteneur et boite, jeu Z total entre conteneurs et
+marge Z superieure de boite. Les projets V1 historiques sans le nouveau champ
+X-Y de boite heritent de leur jeu X-Y historique, sans changer leurs placements.
+Le fond reste ancre a Z=0 ; aucune cale, aucun support ni corps imprimable
+automatique n est cree.
 
-Le cadrage est borne pour une execution Terra tres elevee avec deux reviews
-obligatoires, tests complets, package 0.1.17 et integration directe dans main.
-La mission tailles/estimation devient P65-M003.
+La palette Fusion 0.1.17 affiche chaque role une seule fois. La CAD IR les
+transporte explicitement. Les deux sketches de reference de boite restent
+tagues et inspectables, mais sont masques par defaut a la creation comme a la
+regeneration. Preuves automatisees : 434 tests executes verts en trois lots,
+compilation Python, git diff --check et exemple CLI verts. Validation Fusion
+et impression reelle restent a realiser ; fusion-retest-required,
+print-validated: false. P65-M003 reste a cadrer.

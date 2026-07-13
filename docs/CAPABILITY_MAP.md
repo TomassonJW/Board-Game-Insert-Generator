@@ -804,3 +804,16 @@ de cavite V0.2 restent differees apres P66.
   est persistante, adjacente a Recalculer et gardee par l etat solve.
 - C-QUALITY : couverture automatisee ciblee puis complete requise ;
   usion-retest-required, print-validated: false.
+
+## P65-M002 - Frontieres de jeu explicites
+
+- C-TOLERANCE : `container_box_xy_clearance_mm` est le jeu par cote de boite ;
+  `layout_clearance_mm` et `container_z_clearance_mm` restent les jeux totaux
+  entre conteneurs ; `box.lid_clearance_mm` demeure la marge haute.
+- C-SOLVER / C-GRID-3D : perimetre X-Y, ecarts entre voisins et espaces Z sont
+  valides separement, sans jeu sous les bacs ni support ajoute.
+- C-CAD-IR : les quatre roles sont explicites jusqu au plan Fusion.
+- C-FUSION-UI : palette 0.1.17 a quatre libelles uniques ; les contours de
+  reference restent inspectables mais caches par defaut.
+- C-QUALITY : 434 tests executes verts ; fusion-retest-required,
+  print-validated: false.

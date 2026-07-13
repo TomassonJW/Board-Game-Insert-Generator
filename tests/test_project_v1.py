@@ -23,6 +23,7 @@ class ProjectV1Tests(unittest.TestCase):
         self.assertEqual(normalized.project["contents"], [])
         self.assertEqual(normalized.project["layout"]["layout_clearance_mm"], 0.6)
         self.assertEqual(normalized.project["layout"]["container_z_clearance_mm"], 0.6)
+        self.assertEqual(normalized.project["layout"]["container_box_xy_clearance_mm"], 0.6)
         self.assertEqual(normalized.project["deferred_features"], {"appearance": None, "mechanism": None})
 
     def test_native_project_without_z_clearance_inherits_xy_clearance(self) -> None:
@@ -34,6 +35,15 @@ class ProjectV1Tests(unittest.TestCase):
 
         self.assertFalse(normalized.migrated)
         self.assertEqual(normalized.project["layout"]["container_z_clearance_mm"], 0.85)
+    def test_native_project_without_box_xy_clearance_inherits_between_xy_clearance(self) -> None:
+        project = blank_project_v1()
+        project["layout"]["layout_clearance_mm"] = 0.85
+        project["layout"].pop("container_box_xy_clearance_mm")
+
+        normalized = normalize_project_draft(project)
+
+        self.assertFalse(normalized.migrated)
+        self.assertEqual(normalized.project["layout"]["container_box_xy_clearance_mm"], 0.85)
     def test_native_project_supports_groups_flat_items_and_fill_elements(self) -> None:
         project = blank_project_v1()
         project["container_groups"] = [

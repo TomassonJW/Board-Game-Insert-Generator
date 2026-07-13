@@ -1742,7 +1742,8 @@ impose les dependances de release suivantes.
   experimentales et leurs valeurs par defaut ne sont pas recalibrees.
 - P65-M001 : done - jeux X-Y/Z separes, heritage compatible, budget Z solve,
   CAD IR, palette 0.1.16 et action de materialisation persistante.
-- P65-M002 : ready - separer les jeux boite/conteneur et inter-conteneurs :
+- P65-M002 : done, implemented, automated-validated, fusion-retest-required -
+  jeux boite/conteneur et inter-conteneurs separes :
   perimetre X-Y par cote, ecart X-Y total, ecart Z total et marge Z superieure.
   Le fond reste ancre a Z=0 ; aucune cale ou geometrie de support n est creee.
   Les deux sketches de reference de boite restent presents et tagues, mais sont

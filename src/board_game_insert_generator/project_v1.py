@@ -67,6 +67,7 @@ def blank_project_v1() -> dict[str, object]:
         },
         "layout": {
             "layout_clearance_mm": 0.6,
+            "container_box_xy_clearance_mm": 0.6,
             "container_z_clearance_mm": 0.6,
             "default_wall_thickness_mm": 1.2,
             "default_floor_thickness_mm": 1.2,
@@ -155,6 +156,7 @@ def migrate_local_composer_v0(raw_legacy: object) -> dict[str, object]:
         },
         "layout": {
             "layout_clearance_mm": 0.6,
+            "container_box_xy_clearance_mm": 0.6,
             "container_z_clearance_mm": 0.6,
             "default_wall_thickness_mm": 1.2,
             "default_floor_thickness_mm": 1.2,
@@ -270,6 +272,7 @@ def _validate_layout(raw: dict[str, object]) -> dict[str, object]:
         {
             "layout_clearance_mm",
             "container_z_clearance_mm",
+            "container_box_xy_clearance_mm",
             "default_wall_thickness_mm",
             "default_floor_thickness_mm",
             "default_content_clearance_mm",
@@ -282,9 +285,15 @@ def _validate_layout(raw: dict[str, object]) -> dict[str, object]:
         if "container_z_clearance_mm" in raw
         else xy_clearance
     )
+    box_xy_clearance = (
+        _non_negative_number(raw, "container_box_xy_clearance_mm", "project.layout")
+        if "container_box_xy_clearance_mm" in raw
+        else xy_clearance
+    )
     return {
         "layout_clearance_mm": xy_clearance,
         "container_z_clearance_mm": z_clearance,
+        "container_box_xy_clearance_mm": box_xy_clearance,
         "default_wall_thickness_mm": _positive_number(
             raw, "default_wall_thickness_mm", "project.layout"
         ),

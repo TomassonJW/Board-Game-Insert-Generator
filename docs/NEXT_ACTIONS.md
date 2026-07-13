@@ -8,68 +8,36 @@ V0.1 - vrai MVP Fusion-only selon ADR-0055 et rebase P60-R accepte.
 
 ## Derniere mission terminee
 
-P65-M001 - jeux X-Y/Z, budget vertical et action Fusion persistante, package 0.1.16.
+P65-M002 - frontieres de jeu boite/conteneurs et inter-conteneurs, palette et package 0.1.17.
 
 ## Derniere preuve automatisee
 
-Socle conserve : P64 - solveur volumetrique multi-etages.
+P65-M002 conserve le solveur volumetrique P64 et separe quatre roles : jeu
+X-Y total entre conteneurs, jeu X-Y par cote de boite, jeu Z total entre
+conteneurs et marge Z superieure. Les projets historiques sans le nouveau champ
+X-Y de boite gardent leurs placements. La CAD IR et la palette Fusion exposent
+les quatre roles ; les sketches de reference restent tagues/inspectables et
+sont caches par defaut. Aucun corps, support ou espace imprimable automatique
+n est cree.
 
-Le coeur compose des arrangements XY par etages Z et sait aussi placer un corps
-haut a cote de piles plus courtes. Les rotations sont revalidees dans leur repere
-local, les cavites conservent leur profondeur utile sous les plateaux et les noms
-techniques Fusion restent uniques meme si les libelles utilisateur sont repetes.
-Une proposition partielle reste bloquee avant Fusion.
-Le contrat, le solveur, la palette, la CAD IR et le garde-fou Fusion sont couverts par 430 tests.
-Aucune validation Fusion P64 ou impression n est revendiquee.
+Preuves : 434 tests executes verts en trois lots courts, compilation Python,
+git diff --check et exemple CLI verts. Aucune validation Fusion ni impression
+reelle n est revendiquee.
 
 ## Mission courante
 
-Aucune mission en cours. P65-M001 est implemente ; P65 reste en cours par increments bornes.
+Aucune mission en cours. P65-M002 est implemente ; P65 reste en cours par increments bornes.
 
-## Prochaine action prete
+## Prochaine action recommandee
 
 P65 - Conteneurs, Reglages et Apercu integres.
 
-Increment pret : P65-M002 - Jeux boite/conteneurs et inter-conteneurs separes.
+P65-M003 - Minimum, cible, calculee et estimation dans Conteneurs.
 
-Contrat a implementer :
-
-1. conserver `layout_clearance_mm` comme jeu X-Y total entre conteneurs ;
-2. ajouter `container_box_xy_clearance_mm`, applique par cote entre les corps et
-   les quatre parois X-Y de la boite ;
-3. conserver `container_z_clearance_mm` comme jeu Z total entre conteneurs ;
-4. reutiliser `box.lid_clearance_mm` comme jeu conteneur/boite Z au-dessus et le
-   renommer clairement dans l UI ; le fond reste ancre a Z=0 ;
-5. migrer un ancien projet sans le nouveau champ X-Y boite en copiant
-   `layout_clearance_mm`, afin de conserver exactement ses placements ;
-6. conserver les valeurs par defaut actuelles : le zero est autorise mais n est
-   pas adopte comme nouveau default sans calibration humaine.
-7. conserver les sketches `Boite de reference - non imprimable bottom outline`
-   et `Boite de reference - non imprimable top outline`, leurs tags et leur
-   inspection, mais les masquer par defaut apres materialisation et regeneration.
-
-Acceptation automatisee obligatoire :
-
-- jeu boite X-Y nul avec jeu inter-conteneurs non nul ;
-- jeu boite X-Y non nul avec jeu inter-conteneurs nul ;
-- variation du jeu Z inter-conteneurs sans modifier la marge Z superieure ;
-- variation de la marge Z superieure sans modifier les espaces entre etages ;
-- ancien projet normalise sans changement de resultat ;
-- politique de jeu et CAD IR exposent quatre roles non ambigus ;
-- palette Fusion affiche une seule fois les quatre libelles ;
-- les deux sketches de reference existent, restent tagues/inspectables et sont
-  invisibles par defaut apres creation comme apres regeneration ;
-- aucun corps, support ou espace imprimable automatique n est cree.
-
-Hors scope : suppression des sketches de reference, jeu sous les bacs,
-supports/cales, recalibrage des valeurs, refonte
-visuelle, nouvelle heuristique de solveur ou changement de formes de cavite.
-
-Instruction d autonomie : mission atomique, deux passes de review (contrat puis
-diff/tests), suite complete verte, installation locale 0.1.17 et integration
-`direct-to-main`. Arret uniquement sur divergence de schema, regression solveur
-non bornee ou ambiguite contraire a ces invariants.
-
+Statut : a cadrer avant implementation. Le prochain increment ne doit ni
+modifier automatiquement un corps explicite, ni recalibrer les tolerances, ni
+elargir les formes de cavites. Il doit expliciter une estimation non mutante et
+les dimensions minimum/cible/calculee, apres validation du parcours UX.
 ## Mission suivante apres P65
 
 P66 - acceptance humaine V0.1 revisee Fusion-only, apres P65.

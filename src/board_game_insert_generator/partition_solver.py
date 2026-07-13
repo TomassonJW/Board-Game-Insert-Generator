@@ -41,6 +41,7 @@ def solve_partition_plan(raw_project: object) -> dict[str, object]:
     box = _dimension(_mapping(project["box"])["inner_dimensions_mm"])
     storage_height = float(top_inset_plan["design_top_z_mm"])
     xy_clearance = float(_mapping(project["layout"])["layout_clearance_mm"])
+    box_xy_clearance = float(_mapping(project["layout"])["container_box_xy_clearance_mm"])
     z_clearance = float(_mapping(project["layout"])["container_z_clearance_mm"])
     diagnostics = [
         _diagnostic(
@@ -107,6 +108,7 @@ def solve_partition_plan(raw_project: object) -> dict[str, object]:
         box,
         storage_height,
         xy_clearance,
+        box_clearance_mm=box_xy_clearance,
         vertical_clearance_mm=z_clearance,
         preference=str(project["solver_preference"]),
     )
@@ -190,10 +192,10 @@ def solve_partition_plan(raw_project: object) -> dict[str, object]:
             )
             continue
         placements = _mappings(applied_top_insets["placements"])
-        validation = _validate_placements(placements, box, storage_height, xy_clearance, z_clearance)
+        validation = _validate_placements(placements, box, storage_height, xy_clearance, box_xy_clearance, z_clearance)
         if not all(
             bool(validation[key])
-            for key in ("inside_box", "no_collisions", "clearances_respected")
+            for key in ("inside_box", "box_xy_clearance_respected", "no_collisions", "clearances_respected")
         ):
             rejection_diagnostics.append(
                 _diagnostic(
@@ -292,11 +294,13 @@ def solve_partition_plan(raw_project: object) -> dict[str, object]:
         "project_name": project["project_name"],
         "box": {"inner_dimensions_mm": _rounded(box), "storage_height_mm": _round(storage_height)},
         "clearance_policy": {
-            "box_perimeter_mm": _round(xy_clearance),
+            "box_perimeter_mm": _round(box_xy_clearance),
             "between_bodies_mm": _round(xy_clearance),
-            "box_perimeter_xy_mm": _round(xy_clearance),
+            "box_perimeter_xy_mm": _round(box_xy_clearance),
             "between_bodies_xy_mm": _round(xy_clearance),
             "between_bodies_z_mm": _round(z_clearance),
+            "box_top_z_clearance_mm": _round(float(_mapping(project["box"])["lid_clearance_mm"])),
+            "box_bottom_z_clearance_mm": 0.0,
             "vertical_support_gap_mm": _round(z_clearance),
             "vertical_support_contact_mm": 0.0,
             "materialize_clearances": False,
@@ -365,11 +369,13 @@ def _result(
             "storage_height_mm": _mapping(stack["flat_stack"])["storage_height_mm"],
         },
         "clearance_policy": {
-            "box_perimeter_mm": _mapping(project["layout"])["layout_clearance_mm"],
+            "box_perimeter_mm": _mapping(project["layout"])["container_box_xy_clearance_mm"],
             "between_bodies_mm": _mapping(project["layout"])["layout_clearance_mm"],
-            "box_perimeter_xy_mm": _mapping(project["layout"])["layout_clearance_mm"],
+            "box_perimeter_xy_mm": _mapping(project["layout"])["container_box_xy_clearance_mm"],
             "between_bodies_xy_mm": _mapping(project["layout"])["layout_clearance_mm"],
             "between_bodies_z_mm": _mapping(project["layout"])["container_z_clearance_mm"],
+            "box_top_z_clearance_mm": _mapping(project["box"])["lid_clearance_mm"],
+            "box_bottom_z_clearance_mm": 0.0,
             "vertical_support_gap_mm": _mapping(project["layout"])["container_z_clearance_mm"],
             "vertical_support_contact_mm": 0.0,
             "materialize_clearances": False,
@@ -384,7 +390,7 @@ def _result(
         "suggestions": [],
         "placements": [],
         "diagnostics": diagnostics,
-        "validation": {"inside_box": False, "no_collisions": False, "clearances_respected": False},
+        "validation": {"inside_box": False, "box_xy_clearance_respected": False, "no_collisions": False, "clearances_respected": False},
         "summary": {
             "status": status,
             "solution_status": "impossible",
@@ -460,6 +466,7 @@ def _validate_placements(
     box: dict[str, float],
     storage_height: float,
     xy_clearance: float,
+    box_xy_clearance: float,
     z_clearance: float,
 ) -> dict[str, object]:
     inside = all(
@@ -467,6 +474,15 @@ def _validate_placements(
         and float(_mapping(item["origin_mm"])["x"]) + float(_mapping(item["world_size_mm"])["x"]) <= box["x"] + _EPSILON
         and float(_mapping(item["origin_mm"])["y"]) + float(_mapping(item["world_size_mm"])["y"]) <= box["y"] + _EPSILON
         and float(_mapping(item["origin_mm"])["z"]) + float(_mapping(item["world_size_mm"])["z"]) <= storage_height + _EPSILON
+        for item in placements
+    )
+    box_xy_clearance_respected = all(
+        float(_mapping(item["origin_mm"])["x"]) >= box_xy_clearance - _EPSILON
+        and float(_mapping(item["origin_mm"])["y"]) >= box_xy_clearance - _EPSILON
+        and float(_mapping(item["origin_mm"])["x"]) + float(_mapping(item["world_size_mm"])["x"])
+        <= box["x"] - box_xy_clearance + _EPSILON
+        and float(_mapping(item["origin_mm"])["y"]) + float(_mapping(item["world_size_mm"])["y"])
+        <= box["y"] - box_xy_clearance + _EPSILON
         for item in placements
     )
     no_collisions = all(
@@ -483,6 +499,7 @@ def _validate_placements(
     storage_volume = box["x"] * box["y"] * storage_height
     return {
         "inside_box": inside,
+        "box_xy_clearance_respected": box_xy_clearance_respected,
         "no_collisions": no_collisions,
         "clearances_respected": clearances,
         "body_volume_mm3": _round(body_volume),

@@ -125,8 +125,10 @@ def build_partition_cad(raw_project: object, *, partition: object | None = None)
             size=_as_dimension(box_size),
         ),
         parameters=(
-            _parameter("layout_clearance_mm", float(layout["layout_clearance_mm"]), "clearance", "Jeu technique conserve comme vide."),
-            _parameter("container_z_clearance_mm", float(layout["container_z_clearance_mm"]), "clearance", "Jeu vertical entre conteneurs conserve comme vide."),
+            _parameter("layout_clearance_mm", float(layout["layout_clearance_mm"]), "clearance", "Jeu total X-Y entre conteneurs, conserve comme vide."),
+            _parameter("container_box_xy_clearance_mm", float(layout["container_box_xy_clearance_mm"]), "clearance", "Jeu X-Y par cote entre un conteneur et la boite, conserve comme vide."),
+            _parameter("container_z_clearance_mm", float(layout["container_z_clearance_mm"]), "clearance", "Jeu total Z entre conteneurs, conserve comme vide."),
+            _parameter("box_top_z_clearance_mm", float(box["lid_clearance_mm"]), "clearance", "Jeu unique entre les conteneurs et le haut interieur de la boite."),
             _parameter("default_wall_thickness_mm", float(layout["default_wall_thickness_mm"]), "geometry_default", "Paroi minimale pour complement creux explicite."),
             _parameter("default_floor_thickness_mm", float(layout["default_floor_thickness_mm"]), "geometry_default", "Fond minimal pour complement creux explicite."),
         ),

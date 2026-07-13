@@ -55,7 +55,7 @@ class VolumetricStageSolverTests(unittest.TestCase):
 
         self.assertEqual(result["status"], SOLUTION_COMPLETE)
         self.assertEqual(plan["stage_count"], 2)
-        self.assertEqual(result["clearances_mm"], {"xy": 0.6, "z": 0.6})
+        self.assertEqual(result["clearances_mm"], {"xy": 0.6, "z": 0.6, "box_xy": 0.6, "between_xy": 0.6, "between_z": 0.6})
         self.assertEqual({item["origin_mm"]["z"] for item in plan["placements"]}, {0.0, 25.3})
         self.assertEqual(plan["support"]["status"], "supported")
         self.assertTrue(all(item["supported"] for item in plan["support"]["supports"]))
@@ -63,6 +63,36 @@ class VolumetricStageSolverTests(unittest.TestCase):
             [item["stage_id"] for item in plan["removal_sequence"][:2]],
             ["stage-2", "stage-2"],
         )
+
+    def test_box_xy_and_between_xy_clearances_are_independent(self) -> None:
+        values = [
+            participant(index, x=10.0, y=5.0, z=5.0, modes={"x": "fixed", "y": "fixed", "z": "fixed"}, targets={"x": 10.0, "y": 5.0, "z": 5.0})
+            for index in range(2)
+        ]
+
+        separated = solve_stage_portfolio(
+            values, {"x": 30.0, "y": 10.0, "z": 10.0}, 10.0, 2.0, box_clearance_mm=1.0
+        )
+        touching = solve_stage_portfolio(
+            values, {"x": 30.0, "y": 10.0, "z": 10.0}, 10.0, 0.0, box_clearance_mm=1.0
+        )
+
+        separated_placements = sorted(separated["best_candidate"]["placements"], key=lambda item: item["origin_mm"]["x"])
+        edge_aligned = solve_stage_portfolio(
+            values, {"x": 30.0, "y": 10.0, "z": 10.0}, 10.0, 2.0, box_clearance_mm=0.0
+        )
+
+        touching_placements = sorted(touching["best_candidate"]["placements"], key=lambda item: item["origin_mm"]["x"])
+        edge_aligned_placements = sorted(edge_aligned["best_candidate"]["placements"], key=lambda item: item["origin_mm"]["x"])
+        self.assertEqual(separated["clearances_mm"]["box_xy"], 1.0)
+        self.assertEqual(separated["clearances_mm"]["between_xy"], 2.0)
+        self.assertEqual(separated_placements[0]["origin_mm"]["x"], 1.0)
+        self.assertEqual(separated_placements[1]["origin_mm"]["x"] - separated_placements[0]["origin_mm"]["x"] - 10.0, 2.0)
+        self.assertEqual(touching_placements[0]["origin_mm"]["x"], 1.0)
+        self.assertEqual(touching_placements[1]["origin_mm"]["x"] - touching_placements[0]["origin_mm"]["x"] - 10.0, 0.0)
+        self.assertEqual(edge_aligned["clearances_mm"]["box_xy"], 0.0)
+        self.assertEqual(edge_aligned_placements[0]["origin_mm"]["x"], 0.0)
+        self.assertEqual(edge_aligned_placements[1]["origin_mm"]["x"] - edge_aligned_placements[0]["origin_mm"]["x"] - 10.0, 2.0)
 
     def test_fixed_axis_is_hard_and_target_axis_is_soft(self) -> None:
         fixed = participant(

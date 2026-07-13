@@ -125,6 +125,28 @@ class PartitionSolverTests(unittest.TestCase):
         self.assertFalse(result["clearance_policy"]["materialize_clearances"])
         self.assertTrue(all(not item["automatic"] for item in result["placements"]))
 
+    def test_box_xy_clearance_is_independent_from_between_container_clearance(self) -> None:
+        project = project_with_groups(3)
+        project["layout"]["layout_clearance_mm"] = 0.0
+        project["layout"]["container_box_xy_clearance_mm"] = 1.5
+
+        result = solve_partition_plan(project)
+
+        self.assertEqual(result["summary"]["status"], "constructed")
+        self.assertEqual(result["clearance_policy"]["box_perimeter_xy_mm"], 1.5)
+        self.assertEqual(result["clearance_policy"]["between_bodies_xy_mm"], 0.0)
+        self.assertTrue(result["validation"]["box_xy_clearance_respected"])
+        self.assertTrue(all(item["origin_mm"]["x"] >= 1.5 and item["origin_mm"]["y"] >= 1.5 for item in result["placements"]))
+
+    def test_missing_box_xy_clearance_preserves_existing_partition_placements(self) -> None:
+        project = project_with_groups(2)
+        expected = solve_partition_plan(project)
+        project["layout"].pop("container_box_xy_clearance_mm")
+
+        migrated = solve_partition_plan(project)
+
+        self.assertEqual(migrated["placements"], expected["placements"])
+        self.assertEqual(migrated["clearance_policy"]["box_perimeter_xy_mm"], project["layout"]["layout_clearance_mm"])
     def test_top_inset_keeps_full_height_and_is_supported_by_aligned_requested_bodies(self) -> None:
         project = project_with_groups(2)
         project["flat_items"] = [{
@@ -202,7 +224,7 @@ class PartitionSolverTests(unittest.TestCase):
         self.assertEqual(result["summary"]["automatic_body_count"], 0)
         self.assertIn("EXPLICIT_COMPLEMENT_NEEDS_EXACT_SIZE", {item["code"] for item in result["diagnostics"]})
 
-    def test_xy_pressure_builds_two_complete_stages_with_support_and_removal(self) -> None:
+    def test_vertical_clearance_and_lid_clearance_are_independent(self) -> None:
         project = project_with_groups(4)
         project["box"] = {
             "inner_dimensions_mm": {"x": 50.0, "y": 25.0, "z": 50.0},
@@ -210,20 +232,33 @@ class PartitionSolverTests(unittest.TestCase):
             "lid_clearance_mm": 0.0,
         }
         project["layout"]["container_z_clearance_mm"] = 1.2
+        small_inter_container_gap = deepcopy(project)
+        small_inter_container_gap["layout"]["container_z_clearance_mm"] = 0.2
+        larger_lid_gap = deepcopy(project)
+        larger_lid_gap["box"]["lid_clearance_mm"] = 3.0
 
         result = solve_partition_plan(project)
+        smaller_z_result = solve_partition_plan(small_inter_container_gap)
+        larger_lid_result = solve_partition_plan(larger_lid_gap)
 
+        origins = sorted((item["id"], item["origin_mm"]["z"]) for item in result["placements"])
+        smaller_z_origins = sorted((item["id"], item["origin_mm"]["z"]) for item in smaller_z_result["placements"])
+        larger_lid_origins = sorted((item["id"], item["origin_mm"]["z"]) for item in larger_lid_result["placements"])
         self.assertEqual(result["summary"]["status"], "constructed")
         self.assertEqual(result["summary"]["solution_status"], "complete")
         self.assertEqual(result["summary"]["stage_count"], 2)
         self.assertEqual({item["origin_mm"]["z"] for item in result["placements"]}, {0.0, 25.6})
+        self.assertNotEqual(origins, smaller_z_origins)
+        self.assertEqual(origins, larger_lid_origins)
         self.assertEqual(result["stage_support"]["status"], "supported")
         self.assertEqual(result["clearance_policy"]["between_bodies_z_mm"], 1.2)
+        self.assertEqual(result["clearance_policy"]["box_top_z_clearance_mm"], 0.0)
+        self.assertEqual(larger_lid_result["clearance_policy"]["box_top_z_clearance_mm"], 3.0)
+        self.assertEqual(result["clearance_policy"]["box_bottom_z_clearance_mm"], 0.0)
         self.assertTrue(result["validation"]["conserved"])
         self.assertEqual(result["validation"]["unassigned_printable_volume_mm3"], 0.0)
         self.assertEqual(result["summary"]["automatic_body_count"], 0)
         self.assertEqual(result["removal_sequence"][0]["stage_id"], "stage-2")
-
     def test_handles_fifty_requested_containers_without_a_business_cardinality_limit(self) -> None:
         project = project_with_groups(50)
         project["box"] = {

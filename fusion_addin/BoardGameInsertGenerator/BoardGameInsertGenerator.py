@@ -2498,7 +2498,7 @@ def _generate_from_plan(design, plan: FusionGenerationPlan, registry: BgigFusion
         "scene_id": scene_id,
         "scene_roots_created": 1,
         "reference_outlines": len(reference_outlines),
-        "reference_outline_policy": "bottom_and_top_box_xy_outlines",
+        "reference_outline_policy": "bottom_and_top_box_xy_outlines_hidden_by_default",
         "asset_debug_visualizations": asset_debug_visualization_count,
         "physical_module_count": len(source_blanks),
         "module_components_created": len(created_components),
@@ -2669,6 +2669,7 @@ def _create_reference_outline_at_z(root_component, solid_plan: FusionSolidPlan, 
     sketch = root_component.sketches.add(sketch_plane)
     sketch.name = f"{solid_plan.component_name} {label} outline"
     _add_scene_rectangle(sketch, solid_plan)
+    sketch.isLightBulbOn = False
     return sketch
 
 

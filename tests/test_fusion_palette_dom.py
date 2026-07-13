@@ -78,7 +78,15 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertIn("8000", self.markup)
 
     def test_exposes_xy_and_z_clearances_and_one_persistent_materialize_action(self) -> None:
-        self.assertIn("Jeu X-Y entre conteneurs", self.markup)
+        self.assertIn("Jeu entre conteneurs X-Y (total)", self.markup)
+        self.assertIn("Jeu bac / boite X-Y (par cote)", self.markup)
+        self.assertIn('data-path="layout.container_box_xy_clearance_mm"', self.markup)
+        self.assertIn("Jeu entre conteneurs Z (total)", self.markup)
+        self.assertIn("Jeu bac / boite Z (haut)", self.markup)
+        self.assertEqual(self.markup.count("Jeu entre conteneurs X-Y (total)"), 1)
+        self.assertEqual(self.markup.count("Jeu bac / boite X-Y (par cote)"), 1)
+        self.assertEqual(self.markup.count("Jeu entre conteneurs Z (total)"), 1)
+        self.assertEqual(self.markup.count("Jeu bac / boite Z (haut)"), 1)
         self.assertIn('data-path="layout.container_z_clearance_mm"', self.markup)
         self.assertEqual(self.markup.count('data-bridge="materialize_project"'), 1)
         self.assertIn('id="materialize-action"', self.markup)

@@ -357,3 +357,11 @@ les projets existants. Le vide Z consomme la hauteur solvee et traverse la CAD I
 La palette 0.1.16 rend la materialisation persistante a cote du recalcul, sans
 autoriser une proposition partielle ou obsolete. Les travaux de lisibilite et
 d explication restants de P65 ne sont pas declares termines.
+
+## P65-M002 implemente - 2026-07-13
+
+P65-M002 rend independants le perimetre X-Y de boite, l ecart X-Y entre
+conteneurs, l ecart Z entre etages et la marge Z superieure. La CAD IR 0.1.17
+les expose sans creer de corps automatique. Les sketches de reference Fusion
+sont conserves tagues/inspectables mais caches par defaut. La validation Fusion
+et l impression reelle restent reportees a P66.
