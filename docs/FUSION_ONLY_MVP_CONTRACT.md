@@ -111,7 +111,7 @@ bac autour et sous son contenu.
 
 ## Vue Fabrication
 
-Reglages essentiels et avances, complements explicitement ajoutes et actions :
+Reglages essentiels et avances, compatibilite des complements historiques et actions :
 
 - verifier le projet ;
 - construire ou recalculer ;
@@ -119,7 +119,9 @@ Reglages essentiels et avances, complements explicitement ajoutes et actions :
 - ouvrir les reglages experts ;
 - inspecter ou nettoyer la scene BGIG.
 
-BGIG ne propose ni ne cree de complement automatique.
+BGIG ne propose ni ne cree de complement automatique. La creation de Bac vide,
+Bloc plein / cale et Separateur est retiree du parcours normal pour le MVP ; les
+anciens projets explicites restent lisibles et regenerables.
 
 ## Vue Resultat
 
@@ -130,7 +132,7 @@ Avant materialisation, la palette affiche exclusivement le plan moteur resolu :
 - cavites, enveloppes minimale/finale et surplus ;
 - positions X/Y/Z ;
 - pile superieure et supports ;
-- complements explicites ;
+- complements historiques presents dans le projet, le cas echeant ;
 - nombre de corps final ;
 - confirmation zero corps automatique ;
 - vue dessus et coupe derivees des placements reels ;

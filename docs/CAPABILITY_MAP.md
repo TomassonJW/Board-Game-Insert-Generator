@@ -831,7 +831,7 @@ de cavite V0.2 restent differees apres P66.
   perimes et les propositions partielles restent non materialisables.
 - Package : palette 0.1.18 ; 440 tests automatises, syntaxe JS, compilation et
   dry-run Fusion verts ; fusion-retest-required, print-validated: false.
-- Suite : P65-M004 implemente ; prochaine mission P66-M001 puis gate humaine P66.
+- Suite : P65-M004 implemente ; prochaine mission P66-M000 puis P66-M001 et gate humaine P66.
 
 ## P65-M004 - Explications et actions de l Apercu
 
@@ -843,16 +843,27 @@ de cavite V0.2 restent differees apres P66.
   le premier niveau de palette.
 - Package : palette 0.1.19 ; 445 tests automatises, syntaxe JS et compilation
   verts ; fusion-retest-required, print-validated: false.
-- Suite : P66-M001 de preparation automatisee, puis gate humaine P66.
+- Suite : P66-M000 de quarantaine, puis P66-M001 de preparation et gate humaine P66.
 
 ## P66 - Contrat de preuve et gate V0.1
 
 - C-QUALITY / C-PRODUCT-VISION : contrat d execution delegable dans
   `docs/P66_TERRA_EXECUTION_CONTRACT.md`, sans nouvelle capability produit.
-- C-FUSION-UI / C-SOLVER / C-RESERVATION : une fixture complete doit relier
+- C-FUSION-UI : P66-M000 met en quarantaine les actions normales de creation de
+  complements, tout en conservant la compatibilite des projets historiques.
+- C-SOLVER / C-RESERVATION : la fixture complete sans complement doit relier
   orientations, top insets, multi-etages, jeux separes, invalidation, scene et
   export ; une fixture impossible doit rester non materialisable.
-- Validation : P66-M001 `ready` pour la preparation automatique ; acceptation
+- Validation : P66-M000 `ready`, P66-M001 `blocked-by-p66-m000`; acceptation
   reservee a l observation humaine P66-V ; print-validated: false.
-- Releases : P44-P46 restent deferred jusqu a P66 OK ; P47-P50 restent deferred
-  jusqu a P46 OK.
+- Releases : P44-P46 restent deferred jusqu a P66 puis P67 ; P47-P50 restent
+  deferred jusqu a P46 ; P69 reste bloquee jusqu a P50.
+
+## P67-P69 - Pilotage humain et apprentissage post-MVP
+
+- P67 n implemente aucune capability : il priorise humainement P44-P50 et peut
+  seul rendre P44-M001 ready apres P66.
+- P68 augmente la preuve locale d usage et d impression sans promouvoir une
+  capability globale ni modifier les tolerances par defaut.
+- P69 audite exhaustivement C-FUSION-UI apres P50 et produit le cadrage P70+ ;
+  elle ne corrige aucun comportement dans la mission de revue.

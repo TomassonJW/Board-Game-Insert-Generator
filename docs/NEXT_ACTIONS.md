@@ -25,34 +25,33 @@ Aucune validation Fusion ni impression reelle n est revendiquee.
 
 ## Mission courante
 
-Aucune implementation en cours. P65 est integree dans main ; P66-M001 est la
+Aucune implementation en cours. P65 est integree dans main ; P66-M000 est la
 prochaine mission preparee.
 
 ## Prochaine action recommandee
 
-P66-M001 - Preparation automatisee de la gate Fusion V0.1.
+P66-M000 - Quarantaine des complements experimentaux dans la palette.
 
-Statut : ready. Produire le projet canonique, les
-CAD IR, le package installe, les marqueurs et une checklist afin de ne laisser
-a l humain que les observations dans Fusion. Aucun correctif produit ne doit
-etre anticipe avant une observation KO.
+Statut : ready. Retirer du parcours normal les actions Bac vide, Bloc plein /
+cale et Separateur, sans supprimer leur schema, leur loader ou la compatibilite
+des anciens projets. Aucun solveur, tolerance, geometrie ou corps automatique ne
+change. Package cible : 0.1.20.
 
-Contrat d execution delegable : `docs/P66_TERRA_EXECUTION_CONTRACT.md`.
-P66-M001 livre uniquement fixtures, preuves, preparateur, installation et
-checklist. La gate P66 reste humaine ; tout KO ouvre un hotfix P66-Hxx atomique
-avant de rejouer la gate complete.
+Contrat : `docs/P66_TERRA_EXECUTION_CONTRACT.md` et ADR-0061. Apres integration
+et tests de P66-M000, P66-M001 prepare les fixtures, le package et la checklist,
+puis s arrete a la gate humaine P66-V.
 
 ## Releases bloquees
 
-P44 a P50 restent
-bloques jusqu a l acceptation humaine P66. P47 a P50 restent aussi bloques
-jusqu a l acceptation de P46.
+P44-P46 restent bloques jusqu a P66 OK puis acceptation humaine P67. P47-P50
+restent bloques jusqu a P46. P68 recueille des observations physiques sans
+changer les defaults ; P69 reste bloque jusqu a P50.
 
 ## Gate humaine active
 
-Aucune gate avant P66 tant que P62-P65 restent dans les ADR acceptees et
-n introduisent ni dependance lourde ni changement de tolerance. P66 demandera
-une observation Fusion preparee automatiquement.
+P66-M000 et P66-M001 sont des missions bornees sans gate humaine. P66-V demande
+ensuite une observation Fusion preparee automatiquement. Apres P66 OK, P67 est
+la gate humaine de priorisation avant toute implementation P44.
 
 ## Fin de chaque mission
 

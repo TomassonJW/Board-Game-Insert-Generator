@@ -1,11 +1,11 @@
 # P66 - Contrat d execution Terra et acceptation du MVP V0.1
 
-Statut : `ready-for-p66-m001`, `human-fusion-gate-required`,
+Statut : `ready-for-p66-m000`, `human-fusion-gate-required`,
 `print-validated: false`.
 
 Ce document est l instruction canonique pour deleguer P66 a un agent autonome.
 Il complete `docs/MVP_V01_ACCEPTANCE_CONTRACT.md`, ADR-0055 et ADR-0056 a
-ADR-0060. En cas de contradiction, les ADR acceptees et le contrat d acceptation
+ADR-0061. En cas de contradiction, les ADR acceptees et le contrat d acceptation
 MVP restent prioritaires.
 
 ## 1. Resultat attendu
@@ -47,13 +47,34 @@ acceptation des lots canoniques suivants :
 | P49 | V0.3 | couvercle coulissant a trois rainures interieures | deferred |
 | P50 | V0.3 | coupons, calibration 0 a 0,2 mm et impressions mesurees | deferred |
 
-P44 ne peut devenir `ready` qu apres P66 OK. P47 reste bloque jusqu a P46 OK.
+P44 ne peut devenir `ready` qu apres P67 accepte. P47 reste bloque jusqu a P46 OK.
 
 ## 3. Decomposition obligatoire de P66
+
+### P66-M000 - Quarantaine des complements experimentaux
+
+Type : durcissement produit borne de la palette, sans changement de solveur.
+
+Avant la preparation de gate, l agent retire du parcours normal les actions de
+creation Bac vide, Bloc plein / cale et Separateur. Le comportement attendu est
+fixe par ADR-0061 :
+
+- aucun controle de creation de complement dans la palette normale ;
+- aucun complement dans les presets ou la fixture canonique P66 ;
+- schema, loader, coeur et materialisation historiques conserves ;
+- un ancien projet avec complement explicite reste lisible et regenerable ;
+- aucun complement automatique ni migration destructive ;
+- tests DOM, round-trip historique, bridge et materialisation de compatibilite ;
+- package 0.1.20 attendu, puis commit et integration avant P66-M001.
+
+P66-M000 ne redefinit pas le vrai futur comportement des complements. Cette
+decision reste reservee a P67 et a un lot post-MVP distinct.
 
 ### P66-M001 - Preparation automatisee de la gate
 
 Type : implementation de tooling, fixtures, tests et documentation de gate.
+
+Dependance : P66-M000 integree et package de quarantaine verifie.
 
 L agent prepare tout ce qui peut etre prouve hors Fusion et installe le package
 exact. Il s arrete ensuite. Il ne simule jamais l observation humaine.
@@ -113,8 +134,8 @@ Apres un retour P66 OK explicite :
 - enregistrer le commit/package observe et le rapport de gate ;
 - mettre STATUS, CAPABILITY_MAP, ROADMAP, BACKLOG, NEXT_ACTIONS et HUMAN_GATES
   en coherence ;
-- rendre seulement P44-M001 `ready` ;
-- ne pas commencer P44 dans la meme mission ;
+- rendre P67 `ready` et P68 `planned-after-p66` ;
+- ne rendre aucune mission P44 `ready` avant la decision humaine P67 ;
 - ne pas publier de tag ou release sans decision humaine separee.
 
 ## 4. Preconditions P66-M001
@@ -123,8 +144,8 @@ L agent doit verifier avant toute modification :
 
 - branche basee sur `origin/main`, workspace propre ;
 - P61, P62, P63, P64 et P65 marques `done` et automatises ;
-- package courant 0.1.19 ou version incrementee uniquement si le tooling P66
-  l exige reellement ;
+- P66-M000 integree, tests de compatibilite verts et package 0.1.20 present ;
+- package courant 0.1.20 issu de P66-M000 ; P66-M001 ne change pas le runtime ;
 - coeur `src/board_game_insert_generator` sans import `adsk` ;
 - aucun changement non integre appartenant a une autre mission ;
 - aucune nouvelle valeur de tolerance, geometrie V0.2 ou mecanisme V0.3.
@@ -134,7 +155,7 @@ Lectures obligatoires en plus d AGENTS.md :
 - `docs/MVP_V01_ACCEPTANCE_CONTRACT.md` ;
 - `docs/FUSION_ONLY_MVP_CONTRACT.md` ;
 - `docs/P60_FUSION_MVP_ACCEPTANCE.md` comme precedent, pas comme specification ;
-- ADR-0054 a ADR-0060 ;
+- ADR-0054 a ADR-0061 ;
 - les contrats P61 a P65 et leurs tests ;
 - les scripts `scripts/fusion/` existants.
 
@@ -157,8 +178,9 @@ Elle doit contenir au minimum :
 - une composition d au moins deux etages avec une origine Z strictement
   positive ;
 - au moins un appui d etage et un ordre de retrait top-down ;
-- si un complement est present, il doit etre demande explicitement ;
-- zero filler, cale, separateur ou corps libre invente.
+- zero complement dans la fixture canonique P66 ;
+- zero filler, cale, separateur ou corps libre invente ;
+- compatibilite des anciens complements couverte par un test separe, pas par la gate.
 
 Les donnees exactes ne doivent pas etre choisies a l intuition. Terra doit
 partir des fixtures deja prouvees de `test_partition_solver.py`,
@@ -236,7 +258,9 @@ P66-M001 doit echouer si une assertion suivante manque :
 - runtime pur copie dans `lib/board_game_insert_generator` ;
 - manifeste, icones, palette, bridge et modules P61-P65 presents dans le package ;
 - commit installe ecrit et relu ;
-- installation idempotente et sauvegarde du projet courant non destructive.
+- installation idempotente et sauvegarde du projet courant non destructive ;
+- actions Bac vide, Bloc plein / cale et Separateur absentes du parcours normal ;
+- ancien projet avec complement explicite toujours lisible sans creation nouvelle.
 
 ## 7. Comportement du preparateur PowerShell
 
@@ -278,7 +302,8 @@ les observations suivantes.
 ### B. Projet et invalidation
 
 5. Parcourir Boite, Plateaux et livrets, Elements du jeu, Conteneurs, Reglages,
-   Apercu.
+   Apercu. Confirmer que Bac vide, Bloc plein / cale et Separateur ne sont plus
+   proposes dans le parcours normal.
 6. Confirmer sleeves, dimensions resolues, une orientation a plat et une debout.
 7. Dans Conteneurs, lancer `Estimer les tailles` et confirmer minimum, demande,
    calculee, etage et raisons par axe sans creation de scene.
@@ -360,7 +385,8 @@ P66-M001 ne doit pas :
 - supprimer ou modifier un objet Fusion non BGIG ;
 - revendiquer `print-validated` ;
 - accepter P66 automatiquement ;
-- commencer P44 avant le retour humain P66 OK.
+- commencer P44 avant le retour humain P66 OK et l atelier humain P67 ;
+- reactiver ou supprimer les complements historiques pendant P66-M001.
 
 ## 11. Rapport de fin P66-M001
 
@@ -379,14 +405,16 @@ Le rapport Terra doit contenir :
 ## 12. Prompt court a donner a Terra
 
 ```text
-Reprends BGIG sur une branche propre basee sur origin/main et execute uniquement
-P66-M001 selon docs/P66_TERRA_EXECUTION_CONTRACT.md. Lis AGENTS.md et tout le
-pilotage obligatoire. Prepare les fixtures complete/impossible, les preuves
-automatiques, le preparateur Fusion idempotent, l installation du commit exact
-et la checklist humaine. Ne corrige aucun comportement produit sans KO prouve et
-mission P66-Hxx separee. Lance la suite complete, compileall, diff-check, controle
-de frontiere adsk, dry-run, installation reelle et marqueurs. Committe, integre
-directement dans main selon le protocole, puis arrete-toi a la gate humaine P66
-avec uniquement les observations Fusion restantes. Ne revendique ni validation
-Fusion ni impression.
+Reprends BGIG sur une branche propre basee sur origin/main et execute P66-M000
+puis P66-M001, strictement une mission a la fois, selon
+docs/P66_TERRA_EXECUTION_CONTRACT.md et ADR-0061. Lis AGENTS.md et tout le
+pilotage obligatoire. P66-M000 retire seulement du parcours normal la creation de
+Bac vide, Bloc plein / cale et Separateur, conserve les anciens projets et interdit
+toute migration destructive. Teste, committe et integre P66-M000 dans main avant
+P66-M001. Prepare ensuite les fixtures complete sans complement et impossible, les
+preuves automatiques, le preparateur Fusion idempotent, l installation du commit
+exact et la checklist humaine. Lance la suite complete, compileall, diff-check,
+controle adsk, dry-run, installation reelle et marqueurs. Integre P66-M001 puis
+arrete-toi a la gate humaine P66-V. Ne commence ni P67 ni P44 et ne revendique ni
+validation Fusion ni impression.
 ```

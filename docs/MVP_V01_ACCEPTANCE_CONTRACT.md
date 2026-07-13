@@ -30,8 +30,8 @@ Fusion quand une materialisation est attendue.
    corps extensible.
 4. Plusieurs bacs et plusieurs plateaux/livrets : partition complete sous la
    pile, support coherent et aucun depassement.
-5. Complement explicite : bac vide, volume plein ou separateur existe seulement
-   parce que la personne l a ajoute.
+5. Compatibilite complement : la fixture canonique ne contient aucun complement
+   et le parcours normal n en cree plus ; un ancien projet explicite reste lisible.
 6. Grande cardinalite : dizaines de lignes et de bacs, calcul borne et diagnostic.
 7. Projet impossible : aucun corps trompeur, cause et correction visibles.
 8. Regeneration : projet modifie, meme scene BGIG remplacee sans doublon.
@@ -49,7 +49,8 @@ Pour chaque groupe de bac, le coeur calcule :
 
 L expansion ne modifie jamais la taille ni l arrangement local des cavites. Les
 jeux restent du vide. Le nombre de corps final est exactement le nombre de
-groupes constructibles plus les complements explicitement demandes.
+groupes constructibles plus les complements historiques explicitement presents.
+La fixture canonique P66 en contient zero et aucun corps n est ajoute automatiquement.
 
 ## Editeur embarque obligatoire
 
@@ -59,9 +60,10 @@ La palette Fusion fournit :
 - table dynamique des pieces ;
 - table plateaux/livrets ;
 - cartes de bacs ;
-- complements explicites ;
+- aucune action normale de creation de complement experimental ;
+- compatibilite d import des complements historiques ;
 - tolerances et preferences ;
-- mode simple et avance ;
+- divulgation progressive locale, sans mode avance global ;
 - sauvegarde, import, validation et construction ;
 - resultat et actions de scene.
 
@@ -78,7 +80,7 @@ La palette montre depuis le plan moteur :
 - enveloppes minimale et finale ;
 - surplus parois/fond ;
 - placements reels ;
-- complements explicites ;
+- complements historiques presents dans le projet, le cas echeant ;
 - construit, partiel ou impossible ;
 - zero corps automatique.
 

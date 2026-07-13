@@ -11,17 +11,21 @@ des prochaines missions. ADR-0047 et `docs/MVP_EXECUTION_PLAN.md` imposent :
 
 1. P36-P42 puis P52-P60 : socle technique V0.1 observe ;
 2. P60-R puis P61-P66 : convergence produit V0.1 revisee ;
-3. P44-P46 : V0.2 formes et ergonomie ;
-4. P47-P50 : V0.3 couvercles et calibration.
+3. P67 : atelier humain de priorisation post-MVP ; P68 : retours de vrais inserts ;
+4. P44-P46 : V0.2 formes et ergonomie ;
+5. P47-P50 : V0.3 couvercles et calibration ;
+6. P69 : revue UI/UX exhaustive et cadrage humain des lots P70+.
 
-Aucune mission P44+ ne peut devenir `ready` avant P66. Aucune mission P47+ ne
-peut devenir `ready` avant P46. Les explorations P33/P34 sont archivees et ne
+Aucune mission P44+ ne peut devenir `ready` avant P66 puis P67. Aucune mission
+P47+ ne peut devenir `ready` avant P46. P69 reste bloquee jusqu a P50.
+Les explorations P33/P34 sont archivees et ne
 valent pas acceptation de V0.2/V0.3.
 
 P43 est reouvert le 2026-07-12 : la scene Fusion historique reste observee,
 mais le MVP produit n est pas accepte. P52 a P60 constituent le socle technique ;
-P60-R a P66 portent desormais le chemin critique V0.1. P44 V0.2 et P47 V0.3
-restent bloques jusqu a P66. ADR-0054 interdit les corps de remplissage
+P60-R a P66 portent desormais le chemin critique V0.1. P44 V0.2 reste bloque
+jusqu a P66 puis P67 ; P47 V0.3 reste en plus bloque jusqu a P46.
+ADR-0054 interdit les corps de remplissage
 automatiques et impose l expansion des bacs demandes.
 
 ADR-0055 impose aussi la surface produit : add-in Fusion et palette embarquee uniquement.
@@ -356,7 +360,7 @@ P65-M001 separe les jeux de placement X-Y et Z, avec heritage compatible pour
 les projets existants. Le vide Z consomme la hauteur solvee et traverse la CAD IR.
 La palette 0.1.16 rend la materialisation persistante a cote du recalcul, sans
 autoriser une proposition partielle ou obsolete. Les travaux de lisibilite et d explication sont completes par P65-M003 et
-P65-M004 ; P66-M001 devient la prochaine mission de preparation.
+P65-M004 ; P66-M000 devient la prochaine mission, avant P66-M001.
 
 ## P65-M002 implemente - 2026-07-13
 
@@ -400,30 +404,45 @@ restent reservees a P66.
 
 1. **P65-M003 - tailles et estimation** (`implemented`, 0.1.18) : minimum,
    demande, calculee et leurs etats explicites dans Conteneurs.
-2. **P65-M004 - explications d Apercu** (implemented, 0.1.19) :
-   traduire sous-scores, appuis, retraits, residuels et suggestions ; clarifier
-   les actions finales sans toucher aux formules ou au solveur.
-3. **P66-M001 - preparation automatisee** : produire le projet canonique, les
-   CAD IR, le package installe, les marqueurs et la checklist ; ne laisser a
-   l humain que les observations dans Fusion.
-4. **P66 - gate humaine Fusion-only** : verifier le parcours complet, les
+2. **P65-M004 - explications d Apercu** (`implemented`, 0.1.19) : traduire
+   sous-scores, appuis, retraits, residuels et suggestions ; clarifier les
+   actions finales sans toucher aux formules ou au solveur.
+3. **P66-M000 - quarantaine des complements** (`ready`, cible 0.1.20) : masquer
+   les actions normales Bac vide, Bloc plein / cale et Separateur, conserver la
+   compatibilite historique et ne changer ni solveur ni geometrie.
+4. **P66-M001 - preparation automatisee** : produire le projet canonique sans
+   complement, les CAD IR, le package installe, les marqueurs et la checklist ;
+   ne laisser a l humain que les observations dans Fusion.
+5. **P66-V - gate humaine Fusion-only** : verifier le parcours complet, les
    plateaux encastres, orientations, multi-etages, edition/invalidation,
    estimation/recalcul, materialisation/regeneration, export, scene BGIG unique
    et preservation des objets non-BGIG.
-5. **P66-Hxx si necessaire** : corriger uniquement les ecarts observes, retester
-   automatiquement puis rejouer la gate. Aucun P44 V0.2 ne commence avant P66 OK.
+6. **P66-Hxx si necessaire** : corriger uniquement les ecarts observes, retester
+   automatiquement puis rejouer la gate.
 
 Un P66 vert accepte le MVP fonctionnel V0.1 avec `print-validated: false`. La
-publication ou le tag de release constitue ensuite une decision humaine separee,
-pas une excuse pour repousser l acceptation fonctionnelle du MVP.
+publication ou le tag de release constitue ensuite une decision humaine separee.
+P44 ne demarre pas automatiquement : P67 doit d abord prioriser humainement V0.2.
 
 ## Cadrage d execution P66 - 2026-07-13
 
 `docs/P66_TERRA_EXECUTION_CONTRACT.md` rend P66 delegable sans ouvrir le scope
-produit : P66-M001 prepare fixtures, preuves, package et checklist ; P66-V reste
-une observation humaine ; un KO ouvre seulement un P66-Hxx atomique ; P66-CLOSE
-aligne le pilotage apres un OK explicite.
+produit : P66-M000 met les complements experimentaux en quarantaine ; P66-M001
+prepare fixtures, preuves, package et checklist ; P66-V reste une observation
+humaine ; un KO ouvre seulement un P66-Hxx atomique ; P66-CLOSE aligne le
+pilotage apres un OK explicite.
 
-P44 a P50 ne sont pas des validations acquises. P44-P46 constituent la V0.2
-formes/ergonomie et restent bloques jusqu a P66 OK. P47-P50 constituent la V0.3
-couvercles/calibration et restent en plus bloques jusqu a P46 OK.
+## Sequence post-MVP acceptee - 2026-07-13
+
+- **P67** : atelier humain cible pour redefinir priorites, perimetre et preuves
+  avant d activer P44 ; il conserve les identifiants P44-P50.
+- **P68** : boucle parallele de premiers inserts reels et mesures locales ; elle
+  nourrit les decisions sans changer silencieusement les valeurs par defaut.
+- **P44-P46 / V0.2** : formes, resistance et ergonomie, puis gate Fusion.
+- **P47-P50 / V0.3** : couvercles et calibration physique, apres P46.
+- **P69** : revue UI/UX humaine exhaustive, tres commentee, apres P44-P50 ; elle
+  produit le backlog P70+ et ne corrige rien dans la mission de revue.
+
+P44 a P50 restent des identifiants canoniques : les renumeroter casserait les
+liens documentaires sans apporter de valeur Git. Leur priorite est decidee par
+les dependances et statuts, pas par l ordre numerique.

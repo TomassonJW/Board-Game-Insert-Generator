@@ -30,10 +30,12 @@ validation humaine explicite.
 
 ### Verrou de chemin critique des releases
 
-Depuis ADR-0047 et le rebase P60-R, la selection par capability est subordonnee
-a l ordre des releases. Tant que P66 n a pas accepte la V0.1, seules les missions
-P61 a P66 du chemin revise peuvent etre `ready`. Tant que P46 n a pas accepte la
-V0.2, aucune mission couvercle V0.3 ne peut etre `ready`.
+Depuis ADR-0047, le rebase P60-R et ADR-0061, la selection par capability est
+subordonnee a l ordre des releases. Tant que P66 n a pas accepte la V0.1, seules
+les missions P61 a P66 du chemin revise peuvent etre `ready`. Apres P66, P67 doit
+accepter humainement les priorites avant que P44 devienne `ready`. Tant que P46
+n a pas accepte la V0.2, aucune mission couvercle V0.3 ne peut etre `ready`. P69
+reste bloquee jusqu a P50 et aucun P70+ ne devient `ready` avant son rapport.
 
 Une gate humaine qui choisit une option d'une version ulterieure n'en change pas
 la priorite. Codex doit verifier la checklist de sortie de la version active

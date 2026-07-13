@@ -78,12 +78,14 @@ merge, si un conflit reel apparait ou si une action risque de perdre du travail.
 | --- | --- | --- | --- |
 | P60 - Base technique V0.1 | Parcours palette -> calcul -> apercu -> materialisation observe | Revue produit du parcours | Revue KO ; ne debloque pas V0.2 |
 | ADR-0056 a ADR-0060 - Rebase produit | Alternatives, consequences et validations P61-P65 documentees | Acceptees par GO humain le 2026-07-12 | P61-P65 autorises sequentiellement |
-| P66 - Acceptation V0.1 revisee Fusion-only | Etat reactif, plateaux encastres, orientations, multi-etages, conteneurs/reglages/apercu integres et scene sure | Observation Fusion du parcours complet, regeneration/export et absence de fuite technique | Autorise seulement alors le demarrage V0.2 |
+| P66 - Acceptation V0.1 revisee Fusion-only | Etat reactif, plateaux encastres, orientations, multi-etages, conteneurs/reglages/apercu integres et scene sure | Observation Fusion du parcours complet, regeneration/export et absence de fuite technique | Clot le MVP et autorise P67 ainsi que les observations P68 ; n ouvre pas directement P44 |
+| P67 - Priorisation post-MVP | P66 OK, retours d usage disponibles si existants et contrat P67 prepare | Arbitrage humain du sous-scope, de l ordre P44-P50, des preuves et du devenir des complements | Peut rendre P44-M001 ready |
 | P46 - Acceptation V0.2 | Formes et ergonomie materialisees, contraintes de paroi et volume recalculees | Evaluation visuelle/ergonomique et observation Fusion | Autorise seulement alors le demarrage V0.3 |
-| P50 - Validation V0.3 | Deux familles de couvercles conformes au contrat, coupons prepares | Impressions, mesures, glisse/tenue et interpretation | Autorise la qualification physique des mecanismes |
+| P50 - Validation V0.3 | Deux familles de couvercles conformes au contrat, coupons prepares | Impressions, mesures, glisse/tenue et interpretation | Autorise P69, sans qualifier automatiquement tout le produit |
+| P69 - Revue UI/UX exhaustive | P44-P50 termines et retours P68 disponibles si des impressions existent | Audit commente, arbitrage du backlog et de la version suivante | Peut autoriser le cadrage P70+ ; aucun correctif n est implemente dans la gate |
 
 Le smoke P34 n'est plus une gate active : le coupon ne correspond pas au
-mecanisme coulissant canonique et la V0.3 est bloquee par P66 puis P46.
+mecanisme coulissant canonique et la V0.3 est bloquee par P66, P67, P44-P46.
 
 ## Format minimal d'un rapport de gate
 

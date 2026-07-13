@@ -1770,27 +1770,42 @@ impose les dependances de release suivantes.
   orientations de cartes, plusieurs etages, edition/recalcul, regeneration,
   export et preservation des objets non BGIG.
 - Gate : observation humaine preparee automatiquement.
-- Preparation P66-M001 : construire/installer le projet canonique et sa
-  checklist ; verifier lancement, invalidation source, orientations, reservations
-  superieures, multi-etages, estimation/recalcul, materialisation/regeneration,
-  sketches caches, scene unique, preservation non-BGIG et export.
+- Preparation : P66-M000 met en quarantaine la creation des complements
+  experimentaux ; P66-M001 construit et installe ensuite le projet canonique
+  sans complement ainsi que sa checklist.
 - Correctifs : uniquement P66-Hxx bornes si une observation est KO ; aucune
-  ouverture V0.2 avant un nouveau passage vert.
+  ouverture V0.2 avant un nouveau passage vert puis l atelier humain P67.
 - Statut : `ready`, `fusion-retest-required`, `print-validated: false`.
 
 La carte historique P61 `Empilement vertical explicite` ci-dessus est remplacee
 par P61-P65 : ajouter seulement un nombre d etages ne corrigerait ni P40 ni P57.
-P44-P46 dependent desormais de P66 ; P47-P50 restent dependants de P46.
+P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
+
+#### P66-M000 - Quarantaine des complements experimentaux
+
+- Contrat : `docs/P66_TERRA_EXECUTION_CONTRACT.md` et ADR-0061.
+- Livrables : retirer du parcours normal les actions `Bac vide`, `Bloc plein /
+  cale` et `Separateur`, retirer les complements des presets et de la fixture
+  canonique P66, conserver schema, loader, coeur et materialisation historiques.
+- Compatibilite : un ancien projet contenant un complement explicite reste
+  chargeable, sauvegardable et regenerable ; aucune migration destructive.
+- Interdit : aucun changement de solveur, tolerance, geometrie, nombre de corps
+  automatique ou semantique future des complements.
+- Preuves : tests DOM, roundtrip projet, bridge/materialisation historique,
+  package 0.1.20 et absence d action normale de creation.
+- Statut : `ready`.
 
 #### P66-M001 - Preparation automatisee
 
+- Dependances : P66-M000 integree et package 0.1.20 verifie.
 - Contrat : `docs/P66_TERRA_EXECUTION_CONTRACT.md`.
-- Livrables : fixtures complete et impossible, test de preparation, preparateur
-  PowerShell idempotent, package du commit exact, marqueurs et checklist Fusion.
+- Livrables : fixtures complete sans complement et impossible, test de
+  preparation, preparateur PowerShell idempotent, package du commit exact,
+  marqueurs et checklist Fusion.
 - Interdit : aucun correctif opportuniste du solveur, de l UI, des tolerances ou
   de la geometrie pour faire passer la fixture.
 - Sortie : `gate-prepared`, jamais `fusion-validated`.
-- Statut : `ready`.
+- Statut : `blocked-by-p66-m000`.
 
 #### P66-V - Gate humaine Fusion
 
@@ -1809,6 +1824,43 @@ P44-P46 dependent desormais de P66 ; P47-P50 restent dependants de P46.
 
 - Dependances : retour humain explicite P66 OK.
 - Mettre le pilotage a `mvp-accepted`, `fusion-validated`,
-  `print-validated: false`, puis rendre seulement P44-M001 `ready`.
+  `print-validated: false`, rendre P67 `ready` et P68 `planned-after-p66`.
+- Ne rendre aucune mission P44 `ready` avant la decision humaine P67.
 - Publication/tag et debut P44 restent des decisions/missions separees.
 - Statut : `blocked-by-human-p66`.
+
+### P67 - Atelier humain de priorisation post-MVP
+
+- Capability : C-PRODUCT-VISION, C-QUALITY, C-FUSION-UI.
+- Dependances : P66 OK ; premieres observations d usage P68 disponibles si
+  possible, sans en faire une condition bloquante.
+- Objectif : redefinir humainement l ordre, les criteres et le perimetre de
+  P44-P50 avant toute implementation V0.2.
+- Livrable : decisions explicites sur formes/ergonomie, complements, vrais
+  inserts prioritaires, niveau de preuve et ordre des missions.
+- Sortie : P44-M001 peut devenir `ready` seulement apres acceptation du compte
+  rendu P67 ; P67 ne remplace pas la revue UI/UX exhaustive P69.
+- Contrat : `docs/P67_POST_MVP_PRIORITIZATION_CONTRACT.md`.
+- Statut : `blocked-by-p66`.
+
+### P68 - Boucle de premiers inserts reels
+
+- Capability : C-QUALITY, C-FUSION-UI, C-MODULE, C-TOLERANCE.
+- Dependances : P66 OK et une impression volontaire de l utilisateur.
+- Objectif : recueillir des faits d usage, de Fusion et d impression sans
+  modifier silencieusement les valeurs par defaut ni revendiquer une calibration.
+- Livrable : fiches par insert avec projet/commit, observations, mesures,
+  irritants, severite et candidats backlog.
+- Contrat : `docs/P68_FIRST_USE_PRINT_FEEDBACK.md`.
+- Statut : `planned-after-p66`, `print-validated: false`.
+
+### P69 - Revue UI/UX exhaustive avant P70+
+
+- Capability : C-PRODUCT-VISION, C-FUSION-UI, C-QUALITY.
+- Dependances : P50 acceptee ; retours P68 disponibles si des impressions ont ete realisees.
+- Objectif : revue humaine complete, capturee et tres commentee de tout le
+  parcours Fusion apres les briques P44-P50.
+- Livrable : audit par ecran/etat/profil, problemes classes, alternatives,
+  recommandations et backlog P70+ ; aucun correctif runtime dans la revue.
+- Contrat : `docs/P69_FULL_UI_UX_REVIEW_CONTRACT.md`.
+- Statut : `blocked-by-p50`.

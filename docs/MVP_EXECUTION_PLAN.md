@@ -93,7 +93,7 @@ Resultat historique : le jeu temoin de 20 pieces CAD et 19 cavites a recu le
 retour `Fusion P43 OK`. Cette preuve est conservee comme
 `fusion-validated-geometry-only`, jamais comme acceptation V0.1.
 
-## Chemin V0.2, bloque jusqu'a P66
+## Chemin V0.2, bloque jusqu'a P66 puis P67
 
 | Lot | Resultat |
 | --- | --- |
@@ -102,6 +102,7 @@ retour `Fusion P43 OK`. Cette preuve est conservee comme
 | P46 | Preview live fidele, Fusion et acceptation V0.2 |
 
 P33 sert seulement de matiere de prototype ; aucun statut V0.2 n'est herite.
+P67 priorise humainement le sous-scope avant que P44 puisse devenir ready.
 
 ## Chemin V0.3, bloque jusqu'a P46
 
@@ -146,14 +147,14 @@ font pas partie du runtime ni du packaging MVP.
 | P60 | Base technique Fusion observee | Revue produit KO, rebase P60-R requis |
 
 P56 reutilise la palette P32 et le coeur P55. Il ne reutilise pas le frontend
-React comme surface produit. P57-P59 restent sequentiels. V0.2 et V0.3 restent
-bloquees jusqu a P66 selon le rebase ci-dessous.
+React comme surface produit. P57-P59 restent sequentiels. V0.2 reste bloquee
+jusqu a P66 puis P67 ; V0.3 reste en plus bloquee jusqu a P46.
 
 ## Rebase apres revue produit P60
 
 P60 est une base technique observee, pas l acceptance V0.1. Le chemin de sortie
 est remplace par P60-R -> P61 -> P62 -> P63 -> P64 -> P65 -> P66. P66 reprend
-la gate humaine finale ; V0.2 et V0.3 restent bloquees jusque-la.
+la gate humaine finale du MVP ; P67 priorise ensuite V0.2 avant P44.
 
 Ce rebase ne relance pas le runtime tant que les ADR-0056 a ADR-0060 ne sont pas
 revues. Il interdit de traiter le probleme comme un simple champ de nombre de

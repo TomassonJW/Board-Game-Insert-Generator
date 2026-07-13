@@ -8,7 +8,7 @@ Statut produit : **MVP V0.1 reouvert ; fondations techniques presentes, conformi
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P65 integree dans main ; P66-M001 est prete avant la gate humaine P66.
+Phase active : P65 integree dans main ; P66-M000 est prete avant P66-M001 et la gate humaine P66.
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -1687,20 +1687,26 @@ Preuves : 445 tests automatises, syntaxe JavaScript et compilation Python verts.
 Le package Fusion 0.1.19 est installe localement depuis 23aaa70 et ses marqueurs
 sont verifies. La gate humaine Fusion et l impression restent a realiser.
 
-## P66 - Cadrage Terra et fermeture du MVP V0.1
+## P66 - Quarantaine, preuve et fermeture du MVP V0.1
 
-Statut : `P66-M001 ready`, `human-fusion-gate-required`,
-`print-validated: false`.
+Statut : `P66-M000 ready`, `P66-M001 blocked-by-p66-m000`,
+`human-fusion-gate-required`, `print-validated: false`.
 
-Le contrat `docs/P66_TERRA_EXECUTION_CONTRACT.md` borne la suite en quatre
-etapes : preparation automatique, observation humaine Fusion, hotfixes P66-Hxx
-seulement sur KO, puis cloture documentaire sur OK. La preparation doit prouver
-un projet complet avec orientations, reservations superieures, plusieurs etages,
-jeux P65 separes, cycle d invalidation, scene unique et export, plus un projet
-impossible bloque honnetement. Aucun correctif produit opportuniste n est permis
-dans P66-M001.
+Le contrat `docs/P66_TERRA_EXECUTION_CONTRACT.md` borne la suite. P66-M000 retire
+du parcours normal la creation de Bac vide, Bloc plein / cale et Separateur,
+sans supprimer schema, loader, coeur ou materialisation des anciens projets.
+Le package cible est 0.1.20 ; aucun solveur, tolerance, geometrie ou corps
+automatique ne change.
 
-P44-P46 ne sont pas valides : ils restent la V0.2 formes et ergonomie. P47-P50
-ne sont pas valides : ils restent la V0.3 couvercles et calibration physique.
-Un P66 humain vert accepte enfin le MVP fonctionnel Fusion-only, sans valider
-l impression et sans publier automatiquement une release.
+P66-M001 prepare ensuite un projet canonique sans complement, un projet
+impossible, les preuves, le package installe et la checklist. P66-V reste une
+observation humaine Fusion. Un KO ouvre uniquement un hotfix P66-Hxx borne ; un
+OK clot le MVP fonctionnel Fusion-only avec `print-validated: false`.
+
+## Sequence post-MVP cadree
+
+P44-P50 gardent leurs identifiants canoniques. P67 est l atelier humain qui
+priorise leur perimetre avant P44. P68 recueille les premiers retours de vrais
+inserts sans changer les defaults. P44-P46 portent la V0.2 formes/ergonomie,
+P47-P50 la V0.3 couvercles/calibration, puis P69 realise la revue UI/UX exhaustive
+et prepare humainement les lots P70+.

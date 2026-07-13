@@ -186,3 +186,5 @@ Tests, cartes backlog ou gates humaines a preparer.
 - ADR-0058-local-asset-catalog-and-storage-orientations.md - catalogue local accepte, presets personnels et orientations de rangement.
 - ADR-0059-bounded-volumetric-stage-solver.md - solveur volumetrique accepte borne par etages et surplus pondere.
 - ADR-0060-progressive-disclosure-fusion-palette.md - parcours Fusion compact accepte, diagnostics discrets et divulgation progressive locale.
+
+- ADR-0061-post-mvp-sequencing-and-complement-quarantine.md - identifiants P44-P50 conserves, P67/P68/P69 cadres et complements experimentaux mis en quarantaine avant P66.
