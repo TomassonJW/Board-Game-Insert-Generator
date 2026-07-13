@@ -21,6 +21,7 @@ SOLUTION_IMPOSSIBLE = "impossible"
 
 MAX_ORDERINGS = 4
 MAX_GROUP_SIZES_PER_ORDER = 20
+MAX_STACK_PARTITIONS_PER_ORDER = 64
 MAX_CANDIDATES = 192
 MAX_RETURNED_CANDIDATES = 64
 MAX_ORIENTATION_COMBINATIONS = 1024
@@ -64,6 +65,7 @@ def solve_stage_portfolio(
     budgets = {
         "max_orderings": MAX_ORDERINGS,
         "max_group_sizes_per_order": MAX_GROUP_SIZES_PER_ORDER,
+        "max_stack_partitions_per_order": MAX_STACK_PARTITIONS_PER_ORDER,
         "max_candidates": MAX_CANDIDATES,
         "max_returned_candidates": MAX_RETURNED_CANDIDATES,
         "max_orientation_combinations": MAX_ORIENTATION_COMBINATIONS,
@@ -74,6 +76,7 @@ def solve_stage_portfolio(
     candidates: list[dict[str, object]] = []
     signatures: set[str] = set()
     groupings_evaluated = 0
+    stack_partitions_evaluated = 0
     xy_arrangements_evaluated = 0
     truncated = False
     for order_name, ordered in _orders(values):
@@ -106,11 +109,40 @@ def solve_stage_portfolio(
                 break
         if truncated:
             break
+        for stack_partition_index, stacks in enumerate(_stack_partitions(ordered, height)):
+            stack_partitions_evaluated += 1
+            for orientation_strategy in ("width", "height", "balanced"):
+                if len(candidates) >= MAX_CANDIDATES:
+                    truncated = True
+                    break
+                candidate, attempts = _candidate_for_stacks(
+                    stacks,
+                    bounds,
+                    height,
+                    clearance,
+                    preference=preference,
+                    order_name=order_name,
+                    partition_index=stack_partition_index,
+                    orientation_strategy=orientation_strategy,
+                )
+                xy_arrangements_evaluated += attempts
+                if candidate is None:
+                    continue
+                signature = _candidate_signature(candidate)
+                if signature in signatures:
+                    continue
+                signatures.add(signature)
+                candidates.append(candidate)
+            if truncated:
+                break
+        if truncated:
+            break
 
     ordered_candidates = sorted(
         candidates,
         key=lambda item: (
             item["solution_status"] != SOLUTION_COMPLETE,
+            int("stack_partition_index" in _mapping(item["search_origin"])),
             -float(item["quality_score"]),
             int(item["stage_count"]),
             str(item["candidate_id"]),
@@ -137,6 +169,7 @@ def solve_stage_portfolio(
             "truncated": truncated or len(ordered_candidates) > len(returned),
             "ordering_count": len(_orders(values)),
             "groupings_evaluated": groupings_evaluated,
+            "stack_partitions_evaluated": stack_partitions_evaluated,
             "xy_arrangements_evaluated": xy_arrangements_evaluated,
             "candidate_count": len(candidates),
             "complete_candidate_count": complete_count,
@@ -365,6 +398,410 @@ def _candidate_for_groups(
         attempts,
     )
 
+
+def _candidate_for_stacks(
+    stacks: list[list[dict[str, object]]],
+    box: dict[str, float],
+    storage_height: float,
+    clearance: float,
+    *,
+    preference: str,
+    order_name: str,
+    partition_index: int,
+    orientation_strategy: str,
+) -> tuple[dict[str, object] | None, int]:
+    """Pack independent vertical stacks in XY.
+
+    A body may span several global Z intervals beside a stack of shorter bodies.
+    This keeps the search deterministic while avoiding the old full-width slab
+    assumption.
+    """
+
+    descriptors: list[dict[str, object]] = []
+    for stack_index, members in enumerate(stacks):
+        descriptor = _stack_descriptor(members, orientation_strategy, stack_index)
+        if descriptor is None:
+            return None, 0
+        descriptors.append(descriptor)
+
+    layout, attempts = _best_xy_layout(
+        descriptors,
+        box,
+        clearance,
+        orientation_strategy=orientation_strategy,
+        fill=True,
+    )
+    if layout is None:
+        return None, attempts
+
+    placements: list[dict[str, object]] = []
+    for stack_index, item_layout in enumerate(_mappings(layout["placements"])):
+        descriptor = _mapping(item_layout["participant"])
+        members = _mappings(descriptor["stack_members"])
+        heights = _stack_heights(members, storage_height)
+        if heights is None:
+            return None, attempts
+
+        world_xy = _mapping(item_layout["world_size_mm"])
+        stack_origin = _mapping(item_layout["origin_mm"])
+        cursor_z = 0.0
+        for stack_level, (member, body_height) in enumerate(zip(members, heights)):
+            participant = _mapping(member["participant"])
+            rotated = bool(member["rotated_xy"])
+            world_size = {
+                "x": _round(float(world_xy["x"])),
+                "y": _round(float(world_xy["y"])),
+                "z": _round(body_height),
+            }
+            local_final = {
+                "x": world_size["y"] if rotated else world_size["x"],
+                "y": world_size["x"] if rotated else world_size["y"],
+                "z": world_size["z"],
+            }
+            placement = {
+                "id": participant["id"],
+                "role": participant["role"],
+                "name": participant["name"],
+                "origin_mm": {
+                    "x": _round(float(stack_origin["x"])),
+                    "y": _round(float(stack_origin["y"])),
+                    "z": _round(cursor_z),
+                },
+                "world_size_mm": world_size,
+                "rotation_deg_z": 90 if rotated else 0,
+                "final_outer_dimensions_mm": _rounded(local_final),
+                "stage_id": "",
+                "stage_index": -1,
+                "stage_bottom_z_mm": _round(cursor_z),
+                "stage_top_z_mm": _round(cursor_z + body_height),
+                "reaches_stage_top": True,
+                "stack_id": descriptor["id"],
+                "stack_index": stack_index,
+                "stack_level": stack_level,
+                "dimension_contract": _dimension_contract(participant, local_final),
+                "printable": True,
+                "automatic": False,
+            }
+            for key in ("container_group_id", "requested_complement_id", "complement_kind"):
+                if key in participant:
+                    placement[key] = participant[key]
+            placements.append(placement)
+            cursor_z += body_height
+        if not isclose(cursor_z, storage_height, abs_tol=0.001):
+            return None, attempts
+
+    stages = _interval_stages(placements, storage_height, int(layout["row_count"]))
+    support = _support_contract(placements, stages)
+    if support["status"] == "unsupported":
+        return None, attempts
+
+    complete = True
+    volume = _volume_contract(placements, box, storage_height, clearance, complete)
+    scores = _score_candidate(
+        placements,
+        stages,
+        support,
+        volume,
+        preference,
+        complete=complete,
+    )
+    candidate_id = (
+        f"{order_name}:stacks{partition_index}:{orientation_strategy}:"
+        f"{len(stacks)}c:{len(stages)}i"
+    )
+    return (
+        {
+            "candidate_id": candidate_id,
+            "solution_status": SOLUTION_COMPLETE,
+            "quality_score": scores["total"],
+            "score_breakdown": scores,
+            "stage_count": len(stages),
+            "stages": stages,
+            "placements": placements,
+            "support": support,
+            "removal_sequence": _removal_sequence(placements),
+            "residuals": {
+                "status": "none",
+                "zones": [],
+                "residual_volume_mm3": volume["residual_volume_mm3"],
+                "residual_ratio": volume["residual_ratio"],
+            },
+            "suggestions": [],
+            "volume_conservation": volume,
+            "metrics": {
+                "row_count": int(layout["row_count"]),
+                "rotation_count": sum(int(item["rotation_deg_z"] != 0) for item in placements),
+                "target_deviation_count": sum(
+                    int(value["status"] == "deviated")
+                    for item in placements
+                    for value in _mapping(item["dimension_contract"])["axes"].values()
+                ),
+            },
+            "search_origin": {
+                "order": order_name,
+                "stack_partition_index": partition_index,
+                "stack_count": len(stacks),
+                "orientation_strategy": orientation_strategy,
+            },
+            "invariants": {
+                "no_collisions_by_construction": True,
+                "requested_bodies_only": True,
+                "automatic_body_count": 0,
+                "suggestions_do_not_mutate": True,
+                "hybrid_vertical_stacks": True,
+                "bodies_may_span_z_intervals": True,
+            },
+        },
+        attempts,
+    )
+
+
+def _stack_partitions(
+    values: list[dict[str, object]], storage_height: float
+) -> list[list[list[dict[str, object]]]]:
+    """Return bounded deterministic contiguous vertical-stack partitions."""
+
+    count = len(values)
+    if count == 0:
+        return []
+
+    candidates: list[list[list[dict[str, object]]]] = []
+    if count <= 10:
+        for boundary_mask in range(1 << max(0, count - 1)):
+            stacks: list[list[dict[str, object]]] = []
+            current: list[dict[str, object]] = []
+            for index, value in enumerate(values):
+                current.append(value)
+                if index == count - 1 or boundary_mask & (1 << index):
+                    stacks.append(current)
+                    current = []
+            if all(
+                sum(_axis_base(item, "z") for item in stack) <= storage_height + _EPSILON
+                for stack in stacks
+            ):
+                candidates.append(stacks)
+    else:
+        for group_size in _group_sizes(count):
+            stacks = [
+                values[index : index + group_size]
+                for index in range(0, count, group_size)
+            ]
+            if all(
+                sum(_axis_base(item, "z") for item in stack) <= storage_height + _EPSILON
+                for stack in stacks
+            ):
+                candidates.append(stacks)
+        greedy: list[list[dict[str, object]]] = []
+        current = []
+        current_height = 0.0
+        for value in values:
+            height = _axis_base(value, "z")
+            if current and current_height + height > storage_height + _EPSILON:
+                greedy.append(current)
+                current = []
+                current_height = 0.0
+            current.append(value)
+            current_height += height
+        if current:
+            greedy.append(current)
+        if all(sum(_axis_base(item, "z") for item in stack) <= storage_height + _EPSILON for stack in greedy):
+            candidates.append(greedy)
+
+    unique: list[list[list[dict[str, object]]]] = []
+    signatures: set[tuple[tuple[str, ...], ...]] = set()
+    ordered = sorted(
+        candidates,
+        key=lambda stacks: (
+            len(stacks),
+            max(sum(_axis_base(item, "z") for item in stack) for stack in stacks),
+            tuple(tuple(str(item["id"]) for item in stack) for stack in stacks),
+        ),
+    )
+    for stacks in ordered:
+        signature = tuple(tuple(str(item["id"]) for item in stack) for stack in stacks)
+        if signature in signatures:
+            continue
+        signatures.add(signature)
+        unique.append(stacks)
+        if len(unique) >= MAX_STACK_PARTITIONS_PER_ORDER:
+            break
+    return unique
+
+
+def _stack_descriptor(
+    members: list[dict[str, object]],
+    strategy: str,
+    stack_index: int,
+) -> dict[str, object] | None:
+    option_sets = [_orientation_options(value) for value in members]
+    combination_count = 1
+    for options in option_sets:
+        combination_count *= len(options)
+    combinations = (
+        product(*option_sets)
+        if combination_count <= MAX_ORIENTATION_COMBINATIONS
+        else [tuple(_greedy_orientation(value, strategy) for value in members)]
+    )
+
+    feasible: list[tuple[tuple[object, ...], dict[str, object]]] = []
+    for combination in combinations:
+        minimum = {
+            axis: max(float(_mapping(item["base_world_mm"])[axis]) for item in combination)
+            for axis in ("x", "y")
+        }
+        modes: dict[str, str] = {}
+        targets: dict[str, float | None] = {}
+        valid = True
+        for axis in ("x", "y"):
+            fixed_values = [
+                float(_mapping(item["base_world_mm"])[axis])
+                for item in combination
+                if _axis_mode(
+                    _mapping(item["participant"]),
+                    axis,
+                    rotated=bool(item["rotated_xy"]),
+                )
+                == "fixed"
+            ]
+            if fixed_values:
+                fixed = fixed_values[0]
+                if any(not isclose(value, fixed, abs_tol=0.001) for value in fixed_values):
+                    valid = False
+                    break
+                if fixed + _EPSILON < minimum[axis]:
+                    valid = False
+                    break
+                modes[axis] = "fixed"
+                targets[axis] = fixed
+                minimum[axis] = fixed
+            else:
+                soft_targets = [
+                    _axis_target(
+                        _mapping(item["participant"]),
+                        axis,
+                        rotated=bool(item["rotated_xy"]),
+                    )
+                    for item in combination
+                ]
+                soft_targets = [value for value in soft_targets if value is not None]
+                modes[axis] = "target" if soft_targets else "auto"
+                targets[axis] = max([minimum[axis], *soft_targets]) if soft_targets else None
+        if not valid:
+            continue
+
+        rotations = sum(int(bool(item["rotated_xy"])) for item in combination)
+        if strategy == "width":
+            key: tuple[object, ...] = (minimum["x"], minimum["y"], rotations)
+        elif strategy == "height":
+            key = (minimum["y"], minimum["x"], rotations)
+        else:
+            key = (minimum["x"] * minimum["y"], rotations, minimum["x"])
+        signature = tuple(
+            (str(_mapping(item["participant"])["id"]), bool(item["rotated_xy"]))
+            for item in combination
+        )
+        descriptor = {
+            "id": f"stack:{stack_index}:" + "+".join(str(item["id"]) for item in members),
+            "role": "stack_descriptor",
+            "name": f"Pile {stack_index + 1}",
+            "minimum_local_mm": {"x": minimum["x"], "y": minimum["y"], "z": 1.0},
+            "dimension_modes": {"x": modes["x"], "y": modes["y"], "z": "fixed"},
+            "target_local_mm": {"x": targets["x"], "y": targets["y"], "z": 1.0},
+            "allow_xy_rotation": False,
+            "stack_members": [
+                {
+                    "participant": item["participant"],
+                    "rotated_xy": bool(item["rotated_xy"]),
+                    "base_world_mm": deepcopy(item["base_world_mm"]),
+                }
+                for item in combination
+            ],
+        }
+        feasible.append(((*key, signature), descriptor))
+    return min(feasible, key=lambda item: item[0])[1] if feasible else None
+
+
+def _stack_heights(
+    members: list[dict[str, object]], storage_height: float
+) -> list[float] | None:
+    participants = [_mapping(member["participant"]) for member in members]
+    heights = [_axis_base(participant, "z") for participant in participants]
+    if sum(heights) > storage_height + _EPSILON:
+        return None
+    expandable = [
+        index
+        for index, participant in enumerate(participants)
+        if _axis_mode(participant, "z") != "fixed"
+    ]
+    extra = max(0.0, storage_height - sum(heights))
+    if extra > _EPSILON and not expandable:
+        return None
+    targets = [
+        _axis_target(participant, "z") or heights[index]
+        for index, participant in enumerate(participants)
+    ]
+    weights = [_volume(_mapping(participant["minimum_local_mm"])) for participant in participants]
+    _allocate(heights, expandable, extra, targets, weights)
+    return heights
+
+
+def _interval_stages(
+    placements: list[dict[str, object]],
+    storage_height: float,
+    row_count: int,
+) -> list[dict[str, object]]:
+    boundaries = {0.0, _round(storage_height)}
+    for placement in placements:
+        origin = _mapping(placement["origin_mm"])
+        size = _mapping(placement["world_size_mm"])
+        boundaries.add(_round(float(origin["z"])))
+        boundaries.add(_round(float(origin["z"]) + float(size["z"])))
+    ordered = sorted(boundaries)
+    stages: list[dict[str, object]] = []
+    for index, (bottom, top) in enumerate(zip(ordered, ordered[1:])):
+        if top - bottom <= _EPSILON:
+            continue
+        stage_id = f"interval-{index + 1}"
+        active = [
+            placement
+            for placement in placements
+            if float(_mapping(placement["origin_mm"])["z"]) <= bottom + _EPSILON
+            and float(_mapping(placement["origin_mm"])["z"])
+            + float(_mapping(placement["world_size_mm"])["z"])
+            >= top - _EPSILON
+        ]
+        starting = [
+            placement
+            for placement in active
+            if isclose(float(_mapping(placement["origin_mm"])["z"]), bottom, abs_tol=0.001)
+        ]
+        stages.append(
+            {
+                "id": stage_id,
+                "index": index,
+                "origin_z_mm": _round(bottom),
+                "height_mm": _round(top - bottom),
+                "top_z_mm": _round(top),
+                "body_ids": [str(item["id"]) for item in active],
+                "body_count": len(active),
+                "starting_body_ids": [str(item["id"]) for item in starting],
+                "spanning_body_ids": [
+                    str(item["id"]) for item in active if item not in starting
+                ],
+                "row_count": row_count if index == 0 else 0,
+                "xy_status": "complete",
+            }
+        )
+    for placement in placements:
+        origin_z = float(_mapping(placement["origin_mm"])["z"])
+        start = next(
+            stage
+            for stage in stages
+            if isclose(float(stage["origin_z_mm"]), origin_z, abs_tol=0.001)
+        )
+        placement["stage_id"] = start["id"]
+        placement["stage_index"] = start["index"]
+    return stages
 
 def _stage_heights(
     groups: list[list[dict[str, object]]], storage_height: float
@@ -619,7 +1056,10 @@ def _orient_row(
 def _orientation_options(value: dict[str, object]) -> list[dict[str, object]]:
     base = {axis: _axis_base(value, axis) for axis in _AXES}
     options = [_oriented(value, base, False)]
-    if not isclose(base["x"], base["y"], abs_tol=_EPSILON):
+    if (
+        bool(value.get("allow_xy_rotation", True))
+        and not isclose(base["x"], base["y"], abs_tol=_EPSILON)
+    ):
         options.append(_oriented(value, {"x": base["y"], "y": base["x"], "z": base["z"]}, True))
     return options
 
@@ -669,18 +1109,17 @@ def _support_contract(
     supports: list[dict[str, object]] = []
     minimum_ratio = 1.0
     for placement in placements:
-        stage_index = int(placement["stage_index"])
+        origin = _mapping(placement["origin_mm"])
         footprint = _area(_mapping(placement["world_size_mm"]))
-        if stage_index == 0:
+        if isclose(float(origin["z"]), 0.0, abs_tol=0.001):
             ratio = 1.0
             supporting_ids = ["box-floor"]
         else:
-            origin = _mapping(placement["origin_mm"])
             size = _mapping(placement["world_size_mm"])
             area = 0.0
             supporting_ids: list[str] = []
             for lower in placements:
-                if int(lower["stage_index"]) != stage_index - 1:
+                if lower is placement:
                     continue
                 lower_origin = _mapping(lower["origin_mm"])
                 lower_size = _mapping(lower["world_size_mm"])
@@ -719,7 +1158,11 @@ def _removal_sequence(placements: list[dict[str, object]]) -> list[dict[str, obj
     ordered = sorted(
         placements,
         key=lambda item: (
-            -int(item["stage_index"]),
+            -(
+                float(_mapping(item["origin_mm"])["z"])
+                + float(_mapping(item["world_size_mm"])["z"])
+            ),
+            -float(_mapping(item["origin_mm"])["z"]),
             -float(_mapping(item["origin_mm"])["y"]),
             -float(_mapping(item["origin_mm"])["x"]),
             str(item["id"]),
@@ -751,13 +1194,15 @@ def _volume_contract(
     residual = 0.0 if complete else max(0.0, inner_volume - body_volume)
     technical = max(0.0, storage_volume - body_volume - residual)
     classified = body_volume + residual + technical
+    conservation_tolerance = max(0.01, storage_volume * 1e-6)
     return {
         "storage_volume_mm3": _round(storage_volume),
         "requested_body_volume_mm3": _round(body_volume),
         "residual_volume_mm3": _round(residual),
         "technical_clearance_volume_mm3": _round(technical),
         "classified_volume_mm3": _round(classified),
-        "conserved": isclose(classified, storage_volume, abs_tol=0.01),
+        "conserved": isclose(classified, storage_volume, abs_tol=conservation_tolerance),
+        "conservation_tolerance_mm3": _round(conservation_tolerance),
         "residual_ratio": _round(residual / storage_volume if storage_volume else 0.0),
     }
 

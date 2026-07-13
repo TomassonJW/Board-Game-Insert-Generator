@@ -138,6 +138,28 @@ class TopInsetReservationTests(unittest.TestCase):
         self.assertTrue(any(item.get("top_inset_cuts") for item in upper))
         self.assertEqual(result["stage_support"]["status"], "supported")
 
+    def test_overlapping_boards_preserve_asset_depth_with_cumulative_compensation(self) -> None:
+        value = project()
+        value["flat_items"] = [
+            flat("lower-board", x=220.0, y=160.0, z=2.0, order=0),
+            flat("upper-board", x=220.0, y=160.0, z=3.0, order=1),
+        ]
+
+        result = solve_partition_plan(value)
+        compensations = result["top_inset_reservations"]["cavity_depth_compensations"]
+
+        self.assertEqual(result["summary"]["status"], "constructed")
+        self.assertTrue(compensations)
+        self.assertEqual({item["compensation_mm"] for item in compensations}, {5.0})
+        self.assertTrue(
+            all(
+                item["final_depth_mm"] == item["base_depth_mm"] + item["compensation_mm"]
+                for item in compensations
+            )
+        )
+        self.assertFalse(result["invariants"]["fixed_cavity_layouts"])
+        self.assertTrue(result["invariants"]["base_cavity_layouts_fixed"])
+        self.assertTrue(result["invariants"]["top_inset_cavity_depth_compensated"])
     def test_rejects_an_inset_that_would_cut_below_an_intersected_cavity_floor(self) -> None:
         value = project()
         value["flat_items"] = [flat("too-deep", x=220.0, y=160.0, z=30.0)]

@@ -454,3 +454,20 @@ ni cale n est inventee.
 optionnelle ; `impossible` ne fournit pas de projection de solution. Une
 reservation superieure P63 ne s applique qu au corps de l etage le plus haut
 qu elle intersecte, jamais aux corps inferieurs qui partagent son empreinte.
+## P64 - Intervalles Z hybrides et profondeur utile sous plateau
+
+Le solveur conserve les etages XY historiques, puis peut construire des piles
+verticales independantes. Les bornes Z de tous les corps produisent des
+intervalles globaux de lecture ; un corps haut peut traverser plusieurs
+intervalles pendant qu une pile voisine change de corps. Chaque corps reste un
+corps explicitement demande, sans cale ni remplissage automatique.
+
+Pour une cavite de contenu recouverte par une reservation superieure, la
+profondeur de coupe finale est :
+
+    profondeur_finale = profondeur_asset_de_base + profondeur_encastrement_cumulee
+
+La compensation retenue est le maximum des profondeurs depuis le sommet parmi
+les reservations qui recouvrent la cavite. Le fond restant du corps doit rester
+superieur ou egal au fond minimal ; sinon la proposition est bloquee avant CAD.
+Le contrat conserve separement les dimensions de base et la compensation.

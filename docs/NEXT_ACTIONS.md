@@ -8,19 +8,21 @@ V0.1 - vrai MVP Fusion-only selon ADR-0055 et rebase P60-R accepte.
 
 ## Derniere mission terminee
 
-P64 - solveur volumetrique multi-etages, package 0.1.14.
+P64 - solveur volumetrique multi-etages, durcissement runtime et Fusion, package 0.1.15.
 
 ## Derniere preuve automatisee
 
-Le coeur compose des arrangements XY par etages Z, expose appui, retrait,
-residuels et sous-scores, puis bloque une proposition partielle avant Fusion.
-Les reservations P63 restent localisees sur les seuls corps superieurs intersectes.
-Le contrat, la palette, la CAD IR et le garde-fou Fusion sont couverts par 423 tests.
+Le coeur compose des arrangements XY par etages Z et sait aussi placer un corps
+haut a cote de piles plus courtes. Les rotations sont revalidees dans leur repere
+local, les cavites conservent leur profondeur utile sous les plateaux et les noms
+techniques Fusion restent uniques meme si les libelles utilisateur sont repetes.
+Une proposition partielle reste bloquee avant Fusion.
+Le contrat, la palette, la CAD IR et le garde-fou Fusion sont couverts par 428 tests.
 Aucune validation Fusion P64 ou impression n est revendiquee.
 
 ## Mission courante
 
-Aucune mission en cours. P64 est automatise ; P65 devient la premiere mission ready.
+Aucune mission en cours. P64 est automatise et durci ; P65 reste la premiere mission ready.
 
 ## Prochaine action prete
 
@@ -34,7 +36,7 @@ Scope borne :
 4. rendre `Materialiser dans Fusion` primaire uniquement pour une solution complete ;
 5. conserver les tolerances experimentales et ne pas changer leurs valeurs.
 
-## Mission suivante apres P64
+## Mission suivante apres P65
 
 P66 - acceptance humaine V0.1 revisee Fusion-only, apres P65.
 

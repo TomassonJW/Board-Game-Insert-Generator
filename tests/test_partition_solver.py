@@ -31,6 +31,69 @@ def project_with_groups(count: int = 2) -> dict[str, object]:
     return project
 
 
+def mixed_height_cards_project(card_count: int) -> dict[str, object]:
+    value = blank_project_v1()
+    value["box"] = {
+        "inner_dimensions_mm": {"x": 240.0, "y": 180.0, "z": 70.0},
+        "usable_height_mm": 70.0,
+        "lid_clearance_mm": 0.2,
+    }
+    value["layout"]["layout_clearance_mm"] = 0.6
+    value["container_groups"] = [
+        {
+            "id": "tokens",
+            "name": "Bac jetons",
+            "wall_thickness_mm": None,
+            "floor_thickness_mm": None,
+        },
+        *[
+            {
+                "id": f"cards-{index}",
+                "name": "Bac cartes",
+                "wall_thickness_mm": None,
+                "floor_thickness_mm": None,
+            }
+            for index in range(card_count)
+        ],
+    ]
+    value["contents"] = [
+        {
+            "id": "coins",
+            "name": "Pieces",
+            "shape_kind": "round",
+            "dimensions_mm": {"x": 18.0, "y": 18.0, "z": 2.5},
+            "quantity": 12,
+            "container_group_id": "tokens",
+            "content_clearance_mm": None,
+            "measurement_confidence": "exact",
+        },
+        {
+            "id": "cubes",
+            "name": "Cubes",
+            "shape_kind": "cube",
+            "dimensions_mm": {"x": 12.0, "y": 12.0, "z": 12.0},
+            "quantity": 8,
+            "container_group_id": "tokens",
+            "content_clearance_mm": None,
+            "measurement_confidence": "exact",
+        },
+        *[
+            {
+                "id": f"deck-{index}",
+                "name": "Cartes sleevees",
+                "shape_kind": "cards",
+                "dimensions_mm": {"x": 68.0, "y": 94.0, "z": 28.0},
+                "quantity": 1,
+                "container_group_id": f"cards-{index}",
+                "content_clearance_mm": None,
+                "measurement_confidence": "exact",
+            }
+            for index in range(card_count)
+        ],
+    ]
+    return value
+
+
 class PartitionSolverTests(unittest.TestCase):
     def test_single_requested_container_absorbs_the_printable_volume_without_changing_its_cavity(self) -> None:
         project = project_with_groups(1)
@@ -173,6 +236,17 @@ class PartitionSolverTests(unittest.TestCase):
         self.assertEqual(result["summary"]["placed_container_count"], 50)
         self.assertEqual(result["summary"]["final_body_count"], 50)
         self.assertGreater(result["summary"]["candidate_count_evaluated"], 50)
+
+    def test_mixed_height_cards_remain_solvable_when_a_new_z_layer_is_required(self) -> None:
+        results = [solve_partition_plan(mixed_height_cards_project(count)) for count in (4, 5, 6)]
+
+        self.assertEqual([item["summary"]["status"] for item in results], ["constructed"] * 3)
+        self.assertTrue(all(item["validation"]["no_collisions"] for item in results))
+        self.assertTrue(all(item["validation"]["conserved"] for item in results))
+        stacked = results[-1]
+        self.assertGreater(max(item["origin_mm"]["z"] for item in stacked["placements"]), 0.0)
+        self.assertIn("stack_partition_index", stacked["solver"]["search_origin"])
+        self.assertTrue(any(stage["spanning_body_ids"] for stage in stacked["stages"]))
 
     def test_is_deterministic_for_the_same_normalized_project(self) -> None:
         first = solve_partition_plan(project_with_groups(4))

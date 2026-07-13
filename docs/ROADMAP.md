@@ -335,7 +335,7 @@ empreinte et aucun corps automatique n est cree.
 
 ## P64 implemente - 2026-07-13
 
-Le package Fusion 0.1.14 implemente le solveur borne par etages de l ADR-0059 :
+Le package Fusion 0.1.15 implemente et durcit le solveur borne par etages de l ADR-0059 :
 portefeuille XY deterministe, composition Z, rotations, appuis, ordre de retrait
 et bilan de volume. `Auto`, `Cible` et `Fixe` sont des contrats par axe ; le
 surplus est score selon la preference, sans revendication d optimalite globale.
@@ -343,3 +343,9 @@ Une proposition incomplete expose residuels et suggestion non mutante, puis est
 bloquee avant materialisation Fusion. P63 ne coupe que les corps superieurs
 intersectes. La validation Fusion du comportement P64 reste reportee a P66 ;
 P65 devient ready.
+
+Le durcissement runtime P64 ajoute des piles verticales hybrides bornees, une
+revalidation des enveloppes consciente des rotations, la compensation de
+profondeur utile des cavites sous les plateaux et des noms de corps Fusion
+uniques. Les plans historiques gardent la priorite quand ils ferment deja le
+volume ; aucune dependance externe ni corps automatique n est ajoute.

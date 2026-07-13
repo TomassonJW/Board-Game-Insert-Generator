@@ -69,6 +69,7 @@ class PartitionResultViewTests(unittest.TestCase):
         self.assertEqual((first_view["width_mm"], first_view["height_mm"]), (first_plan["world_size_mm"]["x"], first_plan["world_size_mm"]["y"]))
         self.assertEqual(plan, original)
         self.assertFalse(view["invariants"]["indicative_geometry"])
+        self.assertEqual(view["score_breakdown"], plan["summary"]["score_breakdown"])
 
     def test_rotated_cavity_is_transformed_from_its_local_p55_frame(self) -> None:
         plan = {
@@ -93,7 +94,7 @@ class PartitionResultViewTests(unittest.TestCase):
 
         self.assertEqual((cavity["x_mm"], cavity["y_mm"]), (19.0, 16.0))
         self.assertEqual((cavity["width_mm"], cavity["height_mm"]), (6.0, 4.0))
-        self.assertEqual((cavity["z_mm"], cavity["depth_mm"]), (3.0, 5.0))
+        self.assertEqual((cavity["z_mm"], cavity["depth_mm"]), (35.0, 5.0))
 
     def test_section_is_declared_at_box_center_and_contains_only_crossed_real_bodies(self) -> None:
         plan = solve_partition_plan(project())

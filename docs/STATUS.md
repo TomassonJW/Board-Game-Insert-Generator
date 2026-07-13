@@ -8,7 +8,7 @@ Statut produit : **MVP V0.1 reouvert ; fondations techniques presentes, conformi
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P64 implemente le solveur volumetrique borne par etages ; P65 devient la prochaine mission ready du chemin V0.1 revise.
+Phase active : P64 durci sur les cas reels multi-couches et Fusion ; P65 reste la prochaine mission ready du chemin V0.1 revise.
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -1566,29 +1566,39 @@ X/Z. Aucun corps automatique n est cree.
 Preuves : 408 tests automatises passent, package Fusion 0.1.13 prepare et coeur
 Python sans `adsk`. Aucune observation Fusion ni impression n est revendiquee.
 
-## P64 - Solveur volumetrique multi-etages
+## P64 - Solveur volumetrique multi-etages et durcissement runtime
 
-Statut : `implemented`, `automated-validated`, `fusion-retest-required`,
-`print-validated: false`.
+Statut : implemented, automated-validated, runtime-hardened,
+fusion-retest-required, print-validated: false.
 
-Le package 0.1.14 remplace le solveur P57 a hauteur unique par
-`bgig.volumetric_stage_solver.v1`, un portefeuille borne et deterministe
-d arrangements XY composes du bas vers le haut en Z. Chaque etage transporte
-ses placements, origine Z, support, ordre de retrait et score ; les cavites P55
-sont revalidees sans changement de leur repere local.
+Le package 0.1.15 conserve bgig.volumetric_stage_solver.v1, son portefeuille
+borne et deterministe et ses plans historiques par etages complets. Il ajoute un
+repli par piles verticales independantes : un corps haut peut traverser plusieurs
+intervalles Z a cote de piles de corps plus courts. Les plans historiques gardent
+la priorite quand ils sont valides ; le repli hybride n est choisi que lorsqu il
+resout un cas que les tranches globales ne ferment pas.
 
-Les trois modes par axe sont explicites dans le projet et la palette : `Auto`
-absorbe le surplus, `Cible` reste une preference ajustable et `Fixe` demeure une
-contrainte dure. Une fermeture impossible devient une
-`proposal_with_residuals`, visible dans l Apercu mais non materialisable. Les
-residuels peuvent suggerer une cale explicite, sans jamais creer un corps ni
-muter le projet.
+La revalidation des enveloppes finales respecte maintenant la rotation XY : une
+dimension locale Y d un corps tourne est comparee a la largeur monde X
+correspondante. Les cas reels 4, 5 puis 6 bacs de cartes avec un bac haut restent
+ainsi monotones ; le sixieme bac declenche un second niveau sans retirer le bac
+haut voisin.
 
-Les reservations superieures P63 ne coupent que les corps de l etage superieur
-qu elles intersectent. La CAD IR transporte les origines Z et metadata d etage ;
-le bridge bloque toute proposition partielle avant un appel a Fusion.
+Conformement a ADR-0057, une cavite de contenu intersectee par un plateau conserve
+sa profondeur utile sous l encastrement. Sa profondeur CAD finale vaut profondeur
+de base plus profondeur cumulee des reservations superieures qui la recouvrent.
+Le fond minimal reste une contrainte dure et bloque la proposition si cette
+compensation ne tient pas. Le plan distingue la cavite de base fixe de la
+compensation appliquee.
 
-Preuves : 423 tests automatises passent, compilation Python et syntaxe
-JavaScript extraite de la palette sont verifiees, package Fusion 0.1.14 prepare
-et coeur Python sans `adsk`. Aucune observation Fusion P64 ni impression n est
-revendiquee. P65 devient ready.
+Le pont Fusion attribue des noms techniques uniques aux corps meme lorsque
+plusieurs conteneurs portent le meme nom utilisateur. La vue resultat reprend le
+vrai sous-score du solveur et dessine les cavites ouvertes sur le sommet final,
+comme la CAD IR.
+
+Preuves : 428 tests automatises passent. La matrice cartes/jetons 4-5-6 est
+construite, le cas hybride contient des origines Z non nulles et des corps qui
+traversent plusieurs intervalles, et un plan CAD IR de sept corps nommes
+identiquement passe generation_plan_from_cad_ir avec sept noms uniques.
+Compilation Python et git diff --check passent. Aucune observation Fusion de
+ce correctif ni impression n est encore revendiquee. P65 reste ready.

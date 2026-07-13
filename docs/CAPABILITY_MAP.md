@@ -783,6 +783,9 @@ de cavite V0.2 restent differees apres P66.
 - C-CAD-IR / C-FUSION-UI : positions Z, etages, sous-scores, residuels et
   suggestions sont transportes ; une proposition partielle est visible mais
   bloquee avant Fusion.
-- C-QUALITY : 423 tests automatises, aucun corps automatique, `fusion-retest-required`,
+- C-SOLVER / C-GRID-3D : repli hybride borne ou un corps haut traverse des
+  intervalles Z a cote de piles courtes ; les plans historiques restent prioritaires.
+- C-MODULE / C-CAD-IR : limites locales conscientes des rotations, profondeur
+  utile compensee sous plateaux et noms techniques Fusion uniques.- C-QUALITY : 428 tests automatises, aucun corps automatique, `fusion-retest-required`,
   `print-validated: false`.
 - Prochaine capability : C-FUSION-UI/C-MODULE/C-TOLERANCE par P65, ADR-0060 acceptee.

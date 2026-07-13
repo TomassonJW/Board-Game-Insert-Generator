@@ -27,6 +27,7 @@ def derive_expandable_envelope_contract(
     raw_project: object,
     *,
     final_outer_dimensions_by_group: object | None = None,
+    available_outer_dimensions_by_group: object | None = None,
     max_container_height_mm: float | None = None,
 ) -> dict[str, object]:
     """Return fixed cavity layouts plus minimum/final outer envelopes."""
@@ -36,7 +37,8 @@ def derive_expandable_envelope_contract(
     derived = derive_container_plan(project, max_container_height_mm=max_container_height_mm)
     groups = {str(value["id"]): value for value in _mappings(project["container_groups"])}
     proposals = _proposal_mapping(final_outer_dimensions_by_group)
-    unknown = sorted(set(proposals) - set(groups))
+    available_by_group = _proposal_mapping(available_outer_dimensions_by_group)
+    unknown = sorted((set(proposals) | set(available_by_group)) - set(groups))
     if unknown:
         raise ExpandableEnvelopeError(
             "Final envelope proposals reference unknown container groups: " + ", ".join(unknown) + "."
@@ -46,7 +48,13 @@ def derive_expandable_envelope_contract(
     for container in _mappings(derived["containers"]):
         group_id = str(container["container_group_id"])
         contracts.append(
-            _contract_for_container(container, groups[group_id], proposals.get(group_id), derived)
+            _contract_for_container(
+                container,
+                groups[group_id],
+                proposals.get(group_id),
+                derived,
+                available_by_group.get(group_id),
+            )
         )
 
     blocked = [item for item in contracts if item["status"] == "blocked"]
@@ -89,6 +97,7 @@ def _contract_for_container(
     group: dict[str, object],
     proposal: object | None,
     derived: dict[str, object],
+    available_outer_dimensions: object | None,
 ) -> dict[str, object]:
     group_id = str(container["container_group_id"])
     expansion_axes = {axis: bool(_mapping(group["expansion_axes"])[axis]) for axis in _AXES}
@@ -127,6 +136,8 @@ def _contract_for_container(
     blockers = list(base_blockers)
     limits = _dimension(_mapping(derived["box_limits_mm"])["inner_dimensions_mm"])
     limits["z"] = float(_mapping(derived["box_limits_mm"])["usable_height_mm"])
+    if available_outer_dimensions is not None:
+        limits = _dimension(available_outer_dimensions)
     for axis in _AXES:
         if locked[axis] is not None and locked[axis] + _EPSILON < minimum[axis]:
             blockers.append(

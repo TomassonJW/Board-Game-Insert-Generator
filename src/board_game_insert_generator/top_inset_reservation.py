@@ -126,6 +126,7 @@ def apply_top_inset_reservations(
     }
     cuts: list[dict[str, object]] = []
     supports: list[dict[str, object]] = []
+    cavity_compensation_by_placement: dict[str, dict[str, float]] = {}
 
     for reservation in _mappings(plan["reservations"]):
         reservation_cuts: list[dict[str, object]] = []
@@ -172,15 +173,19 @@ def apply_top_inset_reservations(
                         )
                     )
                     continue
-                cavity_overlap_area, cavity_blockers = _cavity_interactions(
+                cavity_overlap_area, overlapping_cavity_ids = _cavity_interactions(
                     placement,
                     intersection,
-                    depth,
-                    reservation_name=str(reservation["name"]),
                 )
-                blockers.extend(cavity_blockers)
-                if cavity_blockers:
-                    continue
+                if cut_kind == TOP_INSET_CUT_KIND:
+                    placement_compensation = cavity_compensation_by_placement.setdefault(
+                        str(placement["id"]), {}
+                    )
+                    for cavity_id in overlapping_cavity_ids:
+                        placement_compensation[cavity_id] = max(
+                            placement_compensation.get(cavity_id, 0.0),
+                            depth,
+                        )
                 cut = {
                     "id": f"{reservation['id']}:{placement['id']}:{cut_kind}:{len(reservation_cuts)}",
                     "kind": cut_kind,
@@ -251,6 +256,13 @@ def apply_top_inset_reservations(
             }
         )
 
+    compensations, compensation_blockers = _apply_cavity_depth_compensations(
+        result_placements,
+        cavity_compensation_by_placement,
+        group_floor,
+        float(layout["default_floor_thickness_mm"]),
+    )
+    blockers.extend(compensation_blockers)
     status = "blocked" if blockers else ("not_required" if not plan["reservations"] else "applied")
     ratios = [float(item["coverage_ratio"]) for item in supports]
     return {
@@ -259,6 +271,7 @@ def apply_top_inset_reservations(
         "placements": result_placements,
         "cuts": cuts,
         "supports": supports,
+        "cavity_depth_compensations": compensations,
         "support": {
             "status": "blocked" if blockers else ("not_required" if not supports else "supported_by_requested_bodies"),
             "top_support_count": sum(int(item["footprint_cut_count"]) for item in supports),
@@ -276,6 +289,10 @@ def apply_top_inset_reservations(
             "status": status,
             "cut_count": len(cuts),
             "support_count": len(supports),
+            "cavity_depth_compensation_count": len(compensations),
+            "maximum_cavity_depth_compensation_mm": _round(
+                max((float(item["compensation_mm"]) for item in compensations), default=0.0)
+            ),
         },
     }
 
@@ -518,32 +535,78 @@ def _grip_zone(
 def _cavity_interactions(
     placement: dict[str, object],
     cut_rect: dict[str, float],
-    cut_depth: float,
-    *,
-    reservation_name: str,
-) -> tuple[float, list[dict[str, object]]]:
+) -> tuple[float, list[str]]:
     overlap_area = 0.0
-    blockers: list[dict[str, object]] = []
+    cavity_ids: list[str] = []
     for cavity in _mappings(placement.get("cavity_layout", [])):
         bounds = _cavity_world_bounds(placement, cavity)
         overlap = _intersection(cut_rect, bounds)
         if overlap is None:
             continue
-        area = overlap["width"] * overlap["height"]
-        if cut_depth > bounds["depth"] + _EPSILON:
-            blockers.append(
-                _blocker(
-                    "TOP_INSET_PIERCES_CAVITY_FLOOR",
-                    f"L encastrement '{reservation_name}' descend sous le fond de la cavite "
-                    f"'{cavity['cavity_id']}' dans '{placement['name']}'.",
-                    "Deplace le plateau, reduis son epaisseur ou augmente la hauteur du corps.",
-                    str(placement["id"]),
-                )
-            )
-        else:
-            overlap_area += area
-    return min(cut_rect["width"] * cut_rect["height"], overlap_area), blockers
+        overlap_area += overlap["width"] * overlap["height"]
+        cavity_ids.append(str(cavity["cavity_id"]))
+    return min(cut_rect["width"] * cut_rect["height"], overlap_area), cavity_ids
 
+
+def _apply_cavity_depth_compensations(
+    placements: list[dict[str, object]],
+    compensation_by_placement: dict[str, dict[str, float]],
+    group_floor: dict[str, float],
+    default_floor: float,
+) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
+    """Preserve useful asset depth below localized top insets."""
+
+    compensations: list[dict[str, object]] = []
+    blockers: list[dict[str, object]] = []
+    for placement in placements:
+        requested = compensation_by_placement.get(str(placement["id"]), {})
+        if not requested:
+            continue
+        body_height = float(_mapping(placement["world_size_mm"])["z"])
+        minimum_floor = group_floor.get(
+            str(placement.get("container_group_id", "")),
+            default_floor,
+        )
+        for cavity in _mappings(placement.get("cavity_layout", [])):
+            cavity_id = str(cavity["cavity_id"])
+            compensation = float(requested.get(cavity_id, 0.0))
+            if compensation <= _EPSILON:
+                continue
+            base_dimensions = _dimension(
+                cavity.get("base_inner_dimensions_mm", cavity["inner_dimensions_mm"])
+            )
+            compensated_depth = base_dimensions["z"] + compensation
+            retained_floor = body_height - compensated_depth
+            if retained_floor + _EPSILON < minimum_floor:
+                blockers.append(
+                    _blocker(
+                        "TOP_INSET_PIERCES_CAVITY_FLOOR",
+                        f"La cavite '{cavity_id}' dans '{placement['name']}' doit gagner "
+                        f"{_round(compensation)} mm sous le plateau, mais ne laisserait que "
+                        f"{_round(retained_floor)} mm de fond.",
+                        "Augmente la hauteur du corps, reduis l epaisseur des elements plats "
+                        "ou deplace leur empreinte.",
+                        str(placement["id"]),
+                    )
+                )
+                continue
+            cavity["base_inner_dimensions_mm"] = {
+                axis: _round(base_dimensions[axis]) for axis in ("x", "y", "z")
+            }
+            _mapping(cavity["inner_dimensions_mm"])["z"] = _round(compensated_depth)
+            cavity["top_inset_compensation_mm"] = _round(compensation)
+            cavity["depth_semantics"] = "asset_depth_below_localized_top_inset"
+            compensations.append(
+                {
+                    "placement_id": placement["id"],
+                    "cavity_id": cavity_id,
+                    "base_depth_mm": _round(base_dimensions["z"]),
+                    "compensation_mm": _round(compensation),
+                    "final_depth_mm": _round(compensated_depth),
+                    "retained_floor_mm": _round(retained_floor),
+                }
+            )
+    return compensations, blockers
 
 def _cavity_world_bounds(
     placement: dict[str, object], cavity: dict[str, object]

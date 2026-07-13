@@ -106,6 +106,28 @@ class VolumetricStageSolverTests(unittest.TestCase):
         self.assertEqual(value, original)
         self.assertEqual(len(plan["placements"]), 1)
 
+    def test_hybrid_columns_allow_a_tall_body_beside_three_short_stacks(self) -> None:
+        values = [participant(0, x=36.0, y=28.2, z=49.8)]
+        values.extend(
+            participant(index, x=69.6, y=94.6, z=25.8)
+            for index in range(1, 7)
+        )
+
+        result = solve_stage_portfolio(
+            values,
+            {"x": 240.0, "y": 180.0, "z": 70.0},
+            70.0,
+            0.6,
+        )
+        plan = result["best_candidate"]
+
+        self.assertEqual(result["status"], SOLUTION_COMPLETE)
+        self.assertIn("stack_partition_index", plan["search_origin"])
+        self.assertEqual({item["origin_mm"]["z"] for item in plan["placements"]}, {0.0, 35.0})
+        self.assertTrue(any(stage["spanning_body_ids"] for stage in plan["stages"]))
+        self.assertEqual(plan["support"]["status"], "supported")
+        self.assertTrue(plan["volume_conservation"]["conserved"])
+        self.assertEqual(plan["residuals"]["residual_volume_mm3"], 0.0)
     def test_preference_changes_scores_without_changing_hard_constraints(self) -> None:
         values = [participant(index, x=20.0 + index * 2.0) for index in range(3)]
 

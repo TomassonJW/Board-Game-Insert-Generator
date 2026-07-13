@@ -892,3 +892,16 @@ produite et `_synchronize_palette_cad_response` bloque avant tout appel Fusion.
 P64 est automatise mais `fusion-retest-required` : la scene multi-etages,
 la reservation P63 sur l etage superieur, la regeneration et l export seront
 observes ensemble a la gate P66. Aucune validation d impression n est deduite.
+## P64 runtime hardening - package 0.1.15
+
+Le package 0.1.15 transporte les placements hybrides avec leurs origines Z et
+leurs cavites compensees sous les reservations superieures. La cavite CAD reste
+ouverte sur le sommet final du corps ; sa profondeur inclut la compensation
+calculee par le coeur pur.
+
+Les libelles utilisateur ne sont pas des identifiants Fusion. Chaque corps recoit
+un nom technique deterministe contenant son index de placement, ce qui autorise
+plusieurs conteneurs nommes Bac cartes sans conflit dans le planificateur Fusion.
+La preuve hors Fusion couvre sept corps, sept noms techniques uniques et un
+generation_plan_from_cad_ir valide. L observation visuelle dans Fusion reste a
+faire et ne vaut pas encore fusion-validated.

@@ -1725,9 +1725,11 @@ impose les dependances de release suivantes.
 - Acceptation : fixtures multi-etages, conservation, collisions, support,
   retrait et budget de recherche deterministe testes.
 - Livrable : `bgig.volumetric_stage_solver.v1`, CAD IR a origines Z, apercu
-  d etages/residuels, blocage des propositions partielles et package 0.1.14.
-- Statut : `done`, `implemented`, `automated-validated`, `fusion-retest-required`,
-  `print-validated: false`.
+  d etages/residuels, blocage des propositions partielles et package 0.1.15.
+- Durcissement : piles verticales hybrides, limites locales apres rotation,
+  profondeur de cavite compensee sous plateaux et noms Fusion uniques.
+- Statut : done, implemented, automated-validated, runtime-hardened,
+  fusion-retest-required, print-validated: false.
 
 ### P65 - Conteneurs, reglages et apercu integres
 

@@ -131,9 +131,19 @@ def solve_partition_plan(raw_project: object) -> dict[str, object]:
             for item in _mappings(candidate["placements"])
             if item["role"] == "container"
         }
+        available_by_group = {
+            str(item["container_group_id"]): {
+                "x": box["y"] if int(item.get("rotation_deg_z", 0)) == 90 else box["x"],
+                "y": box["x"] if int(item.get("rotation_deg_z", 0)) == 90 else box["y"],
+                "z": storage_height,
+            }
+            for item in _mappings(candidate["placements"])
+            if item["role"] == "container"
+        }
         validated_envelopes = derive_expandable_envelope_contract(
             project,
             final_outer_dimensions_by_group=proposals,
+            available_outer_dimensions_by_group=available_by_group,
             max_container_height_mm=storage_height,
         )
         if _mapping(validated_envelopes["summary"])["status"] == "blocked":
@@ -271,6 +281,9 @@ def solve_partition_plan(raw_project: object) -> dict[str, object]:
         "candidate_count_evaluated": evaluated,
         "candidate_count_feasible": int(search["candidate_count"]),
     }
+    cavity_compensation_count = int(
+        _mapping(chosen_top_insets["summary"]).get("cavity_depth_compensation_count", 0)
+    )
     plan = {
         "schema_version": PARTITION_PLAN_SCHEMA_V1,
         "source": {"source_schema": normalization.source_schema, "migrated": normalization.migrated},
@@ -307,7 +320,9 @@ def solve_partition_plan(raw_project: object) -> dict[str, object]:
         },
         "envelope_contract": deepcopy(chosen_envelopes),
         "invariants": {
-            "fixed_cavity_layouts": True,
+            "fixed_cavity_layouts": cavity_compensation_count == 0,
+            "base_cavity_layouts_fixed": True,
+            "top_inset_cavity_depth_compensated": cavity_compensation_count > 0,
             "localized_top_insets": True,
             "volumetric_stages": True,
             "weighted_surplus": True,
@@ -494,7 +509,8 @@ def _top_inset_payload(value: dict[str, object]) -> dict[str, object]:
     keys = (
         "schema_version", "status", "design_top_z_mm", "total_flat_height_mm",
         "clearance_mm", "reservations", "removal_sequence", "cuts", "supports",
-        "support", "blockers", "warnings", "summary", "invariants",
+        "cavity_depth_compensations", "support", "blockers", "warnings", "summary",
+        "invariants",
     )
     return {key: deepcopy(value[key]) for key in keys if key in value}
 

@@ -349,7 +349,7 @@ def _component(
     name = str(placement["name"])
     body = CadBody(
         id=body_id,
-        name=f"{name} - corps P59",
+        name=f"{name} - corps BGIG {index + 1}",
         kind="rectangular_blank",
         source_cell_instance_id=instance_id,
         theoretical_origin=_as_point(origin), theoretical_size=_as_dimension(size),

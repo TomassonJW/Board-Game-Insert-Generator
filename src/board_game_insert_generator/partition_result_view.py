@@ -194,7 +194,7 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
         "removal_sequence": deepcopy(plan.get("removal_sequence", [])),
         "residuals": deepcopy(residual_contract),
         "suggestions": deepcopy(plan.get("suggestions", [])),
-        "score_breakdown": deepcopy(plan.get("score_breakdown", {})),
+        "score_breakdown": deepcopy(summary.get("score_breakdown", {})),
         "summary": deepcopy(summary),
         "diagnostics": deepcopy(plan.get("diagnostics", [])),
         "invariants": {
@@ -226,7 +226,8 @@ def _cavity_world_bounds(placement: dict[str, Any], cavity: dict[str, Any]) -> d
     cavity_size = _dimension(cavity["inner_dimensions_mm"], "cavity.inner_dimensions_mm")
     local_x = minimum_origin["x"] + cavity_origin["x"]
     local_y = minimum_origin["y"] + cavity_origin["y"]
-    local_z = minimum_origin["z"] + cavity_origin["z"]
+    # Storage cavities stay open on the resolved body top after envelope expansion.
+    local_z = final_local["z"] - cavity_size["z"]
     rotation = int(placement.get("rotation_deg_z", 0))
     if rotation == 0:
         world_x, world_y = origin["x"] + local_x, origin["y"] + local_y

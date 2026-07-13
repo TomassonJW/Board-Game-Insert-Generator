@@ -61,6 +61,58 @@ class PartitionCadTests(unittest.TestCase):
         self.assertEqual(len(fusion.compact_occurrences), plan["summary"]["final_body_count"])
         self.assertEqual(len(fusion.exploded_occurrences), 0)
 
+    def test_repeated_user_names_still_create_unique_fusion_body_names(self) -> None:
+        value = project(4)
+        for group in value["container_groups"]:
+            group["name"] = "Bac cartes"
+
+        plan = solve_partition_plan(value)
+        result = build_partition_cad(value, partition=plan)
+        fusion = generation_plan_from_cad_ir(
+            result["cad_ir"],
+            FUSION_GENERATION_MODE_COMPACT_ONLY,
+        )
+        body_names = [
+            component["body"]["name"]
+            for component in result["cad_ir"]["components"]
+        ]
+
+        self.assertEqual(result["status"], PARTITION_CAD_STATUS_READY)
+        self.assertEqual(len(body_names), len(set(body_names)))
+        self.assertEqual(fusion.module_component_count, 4)
+
+    def test_compensated_cavity_depth_is_transported_to_fusion(self) -> None:
+        value = project(1)
+        value["flat_items"] = [{
+            "id": "board",
+            "name": "Plateau",
+            "kind": "board",
+            "dimensions_mm": {"x": 220.0, "y": 160.0, "z": 2.0},
+            "quantity": 1,
+            "stack_order": 0,
+        }]
+
+        plan = solve_partition_plan(value)
+        result = build_partition_cad(value, partition=plan)
+        component = result["cad_ir"]["components"][0]
+        cavity = plan["placements"][0]["cavity_layout"][0]
+        operation = next(
+            item
+            for item in component["body"]["operations"]
+            if item["kind"] == "subtract_rectangular_cavity"
+        )
+
+        self.assertEqual(cavity["top_inset_compensation_mm"], 2.0)
+        self.assertEqual(
+            operation["parameters"]["size_mm"]["z"],
+            cavity["base_inner_dimensions_mm"]["z"] + 2.0,
+        )
+        self.assertAlmostEqual(
+            operation["parameters"]["local_origin_mm"]["z"]
+            + operation["parameters"]["size_mm"]["z"],
+            component["body"]["printable_size_mm"]["z"],
+        )
+        generation_plan_from_cad_ir(result["cad_ir"], FUSION_GENERATION_MODE_COMPACT_ONLY)
     def test_cavity_operations_keep_p55_dimensions_and_open_on_the_final_top(self) -> None:
         value = project(2)
         plan = solve_partition_plan(value)

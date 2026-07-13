@@ -172,3 +172,15 @@ Statut : `done`, `implemented-core`, `implemented-cli`, `implemented-cad-ir-meta
   `automatic_body_count` reste zero dans le plan, la CAD IR et la palette.
 - Les reservations P63 ne peuvent toucher que les corps de l etage superieur
   effectivement intersecte ; les corps sous-jacents restent inchanges.
+## Regressions P64 runtime
+
+Les validations P64 doivent couvrir au minimum :
+
+- une sequence 4, 5 puis 6 bacs de cartes avec un bac haut, sans perte de
+  solvabilite quand un niveau Z devient necessaire ;
+- un corps haut traversant plusieurs intervalles Z a cote de piles courtes ;
+- les limites d enveloppe revalidees dans le repere local apres rotation XY ;
+- la profondeur utile conservee sous un ou plusieurs plateaux superposes ;
+- le blocage si la compensation perce le fond minimal ;
+- des noms de corps Fusion uniques malgre des libelles utilisateur identiques ;
+- determinisme, non-collision, appui, conservation et zero corps automatique.
