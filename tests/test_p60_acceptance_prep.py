@@ -40,7 +40,8 @@ class P60AcceptancePreparationTests(unittest.TestCase):
         solid = next(item for item in plan["placements"] if item.get("complement_kind") == "solid")
         self.assertEqual(tokens["final_outer_dimensions_mm"]["x"], 80.0)
         self.assertEqual(solid["requested_complement_id"], "solid-strip")
-        self.assertEqual(solid["final_outer_dimensions_mm"], {"x": 20.0, "y": 238.8, "z": 63.4})
+        self.assertEqual(solid["final_outer_dimensions_mm"], {"x": 20.0, "y": 238.8, "z": 66.0})
+        self.assertGreaterEqual(plan["top_inset_reservations"]["summary"]["cut_count"], 1)
         self.assertNotIn("cavity_layout", solid)
 
     def test_preparer_installs_exact_commit_and_leaves_only_fusion_actions(self) -> None:

@@ -15,8 +15,12 @@ from math import isclose
 from typing import Any
 
 from board_game_insert_generator.expandable_envelope import derive_expandable_envelope_contract
-from board_game_insert_generator.flat_stack_reservation import derive_flat_stack_reservation
 from board_game_insert_generator.project_v1 import normalize_project_draft
+from board_game_insert_generator.top_inset_reservation import (
+    apply_top_inset_reservations,
+    compatibility_flat_stack_payload,
+    derive_top_inset_reservations,
+)
 
 
 PARTITION_PLAN_SCHEMA_V1 = "bgig.partition_plan.v1"
@@ -28,14 +32,17 @@ def solve_partition_plan(raw_project: object) -> dict[str, object]:
 
     normalization = normalize_project_draft(raw_project)
     project = normalization.project
-    stack = derive_flat_stack_reservation(project)
-    flat = _mapping(stack["flat_stack"])
+    top_inset_plan = derive_top_inset_reservations(project)
+    flat = compatibility_flat_stack_payload(top_inset_plan)
+    stack = {"flat_stack": flat, "top_inset_reservations": top_inset_plan}
     box = _dimension(_mapping(project["box"])["inner_dimensions_mm"])
-    storage_height = float(flat["storage_height_mm"])
+    storage_height = float(top_inset_plan["design_top_z_mm"])
     clearance = float(_mapping(project["layout"])["layout_clearance_mm"])
     diagnostics = [
-        _diagnostic("FLAT_STACK_BLOCKED", message, "Corrige les dimensions ou la quantite des plateaux et livrets.")
-        for message in _values(stack["blockers"])
+        _diagnostic(
+            str(item["code"]), str(item["message"]), str(item["action"]), str(item.get("reference_id", ""))
+        )
+        for item in _mappings(top_inset_plan["blockers"])
     ]
 
     envelope_report = derive_expandable_envelope_contract(
@@ -174,6 +181,26 @@ def solve_partition_plan(raw_project: object) -> dict[str, object]:
             final["source_contents"] = [{"id": content_id, "name": content_names[content_id]} for content_id in final["source_content_ids"]]
         placements.append(final)
 
+    applied_top_insets = apply_top_inset_reservations(project, placements)
+    stack["top_inset_reservations"] = applied_top_insets
+    top_inset_blockers = _mappings(applied_top_insets["blockers"])
+    if top_inset_blockers:
+        diagnostics.extend(
+            _diagnostic(
+                str(item["code"]), str(item["message"]), str(item["action"]), str(item.get("reference_id", ""))
+            )
+            for item in top_inset_blockers
+        )
+        return _result(
+            normalization,
+            project,
+            stack,
+            validated_envelopes,
+            diagnostics,
+            status="impossible",
+            evaluated=evaluated,
+        )
+    placements = _mappings(applied_top_insets["placements"])
     validation = _validate_placements(placements, box, storage_height, clearance)
     if not validation["inside_box"] or not validation["no_collisions"] or not validation["clearances_respected"]:
         diagnostics.append(_diagnostic("INTERNAL_PARTITION_INVALID", "La partition choisie viole une borne geometrique interne.", "Conserve le projet et signale ce cas pour correction."))
@@ -187,7 +214,7 @@ def solve_partition_plan(raw_project: object) -> dict[str, object]:
             evaluated=evaluated,
         )
 
-    support = _support_plan(flat, placements)
+    support = deepcopy(applied_top_insets["support"])
     summary = {
         "status": "constructed",
         "requested_container_count": requested_group_count,
@@ -214,6 +241,7 @@ def solve_partition_plan(raw_project: object) -> dict[str, object]:
             "materialize_clearances": False,
         },
         "flat_stack": deepcopy(flat),
+        "top_inset_reservations": _top_inset_payload(applied_top_insets),
         "support": support,
         "placements": placements,
         "diagnostics": diagnostics,
@@ -229,6 +257,8 @@ def solve_partition_plan(raw_project: object) -> dict[str, object]:
         },
         "invariants": {
             "fixed_cavity_layouts": True,
+            "localized_top_insets": True,
+            "containers_keep_design_top_outside_reservations": True,
             "requested_bodies_only": True,
             "automatic_body_count": 0,
             "free_space_materialized": False,
@@ -263,6 +293,7 @@ def _result(
             "materialize_clearances": False,
         },
         "flat_stack": deepcopy(stack["flat_stack"]),
+        "top_inset_reservations": _top_inset_payload(_mapping(stack["top_inset_reservations"])),
         "support": {"status": "unresolved", "top_support_count": 0, "coverage_ratio": 0.0},
         "placements": [],
         "diagnostics": diagnostics,
@@ -283,6 +314,8 @@ def _result(
         "envelope_contract": deepcopy(envelopes),
         "invariants": {
             "fixed_cavity_layouts": True,
+            "localized_top_insets": True,
+            "containers_keep_design_top_outside_reservations": True,
             "requested_bodies_only": True,
             "automatic_body_count": 0,
             "free_space_materialized": False,
@@ -598,6 +631,17 @@ def _separated_with_clearance(left: dict[str, object], right: dict[str, object],
         for a in ("x", "y")
     )
 
+
+
+def _top_inset_payload(value: dict[str, object]) -> dict[str, object]:
+    """Keep the resolved reservation contract without duplicating placements."""
+
+    keys = (
+        "schema_version", "status", "design_top_z_mm", "total_flat_height_mm",
+        "clearance_mm", "reservations", "removal_sequence", "cuts", "supports",
+        "support", "blockers", "warnings", "summary", "invariants",
+    )
+    return {key: deepcopy(value[key]) for key in keys if key in value}
 
 def _diagnostic(code: str, message: str, action: str, reference_id: str = "") -> dict[str, object]:
     return {"code": code, "severity": "blocker", "message": message, "action": action, "reference_id": reference_id}

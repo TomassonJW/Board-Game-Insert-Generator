@@ -1,6 +1,6 @@
 # Status
 
-Derniere mise a jour : 2026-07-12
+Derniere mise a jour : 2026-07-13
 
 ## Etat global
 
@@ -8,7 +8,7 @@ Statut produit : **MVP V0.1 reouvert ; fondations techniques presentes, conformi
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P62 implemente le catalogue local, les sleeves, les orientations et les presets personnels ; P63 devient la prochaine mission ready du chemin V0.1 revise.
+Phase active : P63 implemente les reservations superieures localisees ; P64 devient la prochaine mission ready du chemin V0.1 revise.
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -1540,5 +1540,29 @@ supprimables, importables et exportables. Les dimensions resolues restent
 visibles dans les cartes compactes et detaillees de la palette.
 
 Preuves : 401 tests automatises, syntaxe Python/JavaScript et packaging pur
-verifies. Aucune validation Fusion ou impression n est revendiquee. P63 est la
-prochaine mission ready.
+verifies. Aucune validation Fusion ou impression n est revendiquee.
+
+
+## P63 - Reservations superieures encastrees
+
+Statut : `implemented`, `automated-validated`, `fusion-retest-required`,
+`print-validated: false`.
+
+Le package 0.1.13 remplace le rabotage global sous plateaux/livrets par le
+contrat `bgig.top_inset_reservations.v1`. Les corps demandes montent au plan
+superieur de conception hors empreinte. Les elements plats qui se chevauchent
+se composent en Z ; les elements cote a cote ne consomment pas une pile globale.
+
+Chaque reservation porte son ordre de retrait, son plan d appui et une prise
+rectangulaire simple. Une coupe est refusee si elle perce le fond minimal du
+corps ou descend sous le fond d une cavite intersectee. Les prises courbes et
+autres ergonomies V0.2 restent hors scope.
+
+La CAD IR distingue les coupes superieures des cavites de contenu. L adaptateur
+Fusion verifie leur ouverture sur la face superieure, leur profondeur retenue et
+leurs bornes locales. L Apercu expose les empreintes en vue de dessus et en coupe
+X/Z. Aucun corps automatique n est cree.
+
+Preuves : 408 tests automatises passent, package Fusion 0.1.13 prepare et coeur
+Python sans `adsk`. Aucune observation Fusion ni impression n est revendiquee.
+P64 devient ready.

@@ -66,6 +66,8 @@ class FusionPaletteDomTests(unittest.TestCase):
             self.assertIn(marker, self.markup)
         self.assertIn("sendFusion('inspect',true)", self.markup)
         self.assertNotIn("Mode avance", self.markup)
+        for malformed in ("Centr?", "Apr?s", "retrait n?", " ? encastrement"):
+            self.assertNotIn(malformed, self.markup)
 
     def test_routes_validation_and_persistence_to_the_versioned_python_bridge(self) -> None:
         self.assertEqual(self.dom.bridge_actions, {"validate_project", "save_project", "export_project", "export_personal_presets", "solve_project"})
@@ -80,12 +82,14 @@ class FusionPaletteDomTests(unittest.TestCase):
         bridge = (ROOT / "fusion_addin" / "BoardGameInsertGenerator" / "palette_project.py").read_text(encoding="utf-8")
         self.assertNotIn("import adsk", bridge)
         self.assertIn("derive_expandable_envelope_contract", bridge)
-        self.assertIn("derive_flat_stack_reservation", bridge)
+        self.assertIn("derive_top_inset_reservations", bridge)
+        self.assertIn("compatibility_flat_stack_payload", bridge)
 
     def test_installer_bundles_the_pure_engine_and_smoke_is_fusion_only(self) -> None:
         helpers = (ROOT / "scripts" / "fusion" / "_fusion_helpers.ps1").read_text(encoding="utf-8")
         smoke = (ROOT / "scripts" / "fusion" / "prepare_p56_palette_test.ps1").read_text(encoding="utf-8")
         self.assertIn("lib\\board_game_insert_generator", helpers)
+        self.assertIn("top_inset_reservation.py", helpers)
         self.assertIn("Assert-BgigPaletteProjectRuntime", helpers)
         self.assertIn("Aucun navigateur", smoke)
         self.assertIn("P56 Fusion OK", smoke)

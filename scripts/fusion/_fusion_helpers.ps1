@@ -141,6 +141,7 @@ function Assert-BgigPaletteProjectRuntime {
         (Join-Path $AddinPath "lib\board_game_insert_generator\project_presets.py"),
         (Join-Path $AddinPath "lib\board_game_insert_generator\expandable_envelope.py"),
         (Join-Path $AddinPath "lib\board_game_insert_generator\flat_stack_reservation.py"),
+        (Join-Path $AddinPath "lib\board_game_insert_generator\top_inset_reservation.py"),
         (Join-Path $AddinPath "lib\board_game_insert_generator\partition_solver.py"),
         (Join-Path $AddinPath "lib\board_game_insert_generator\partition_result_view.py"),
         (Join-Path $AddinPath "lib\board_game_insert_generator\partition_cad.py")

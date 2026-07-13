@@ -25,7 +25,7 @@
     {"id": "rulebook", "name": "Livret de regles", "kind": "rulebook", "dimensions_mm": {"x": 210.0, "y": 150.0, "z": 2.0}, "quantity": 1, "stack_order": 1}
   ],
   "fill_elements": [
-    {"id": "solid-strip", "name": "Cale pleine avant", "kind": "solid", "mode": "exact", "dimensions_mm": {"x": 20.0, "y": 238.8, "z": 63.4}, "container_group_id": null}
+    {"id": "solid-strip", "name": "Cale pleine avant", "kind": "solid", "mode": "exact", "dimensions_mm": {"x": 20.0, "y": 238.8, "z": 66.0}, "container_group_id": null}
   ],
   "solver_preference": "balanced",
   "deferred_features": {"appearance": null, "mechanism": null}

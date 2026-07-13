@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from copy import deepcopy
 from dataclasses import dataclass
 from typing import Any
 
@@ -25,6 +26,12 @@ from board_game_insert_generator.cad_ir import (
 from board_game_insert_generator.models import Dimension3D, Point3D
 from board_game_insert_generator.partition_solver import PARTITION_PLAN_SCHEMA_V1, solve_partition_plan
 from board_game_insert_generator.project_v1 import normalize_project_draft
+from board_game_insert_generator.top_inset_reservation import (
+    TOP_INSET_CUT_KIND,
+    TOP_INSET_GRIP_CUT_KIND,
+    TOP_INSET_GRIP_OPERATION_KIND,
+    TOP_INSET_OPERATION_KIND,
+)
 
 
 PARTITION_CAD_BUILD_SCHEMA_V1 = "bgig.partition_cad_build.v1"
@@ -124,6 +131,7 @@ def build_partition_cad(raw_project: object, *, partition: object | None = None)
                 "plan_digest": plan.get("plan_digest"),
                 "summary": summary,
                 "support": plan.get("support"),
+                "top_inset_reservations": plan.get("top_inset_reservations"),
                 "invariants": plan.get("invariants"),
                 "free_regions_materialized": False,
                 "automatic_body_count": 0,
@@ -133,6 +141,12 @@ def build_partition_cad(raw_project: object, *, partition: object | None = None)
     cad_ir = scene.to_dict()
     digest = hashlib.sha256(json.dumps(cad_ir, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
     cavity_count = sum(len(component.body.cavities) for component in build.components)
+    top_inset_cut_count = sum(
+        1
+        for component in build.components
+        for operation in component.body.operations
+        if operation.kind in {TOP_INSET_OPERATION_KIND, TOP_INSET_GRIP_OPERATION_KIND}
+    )
     return {
         **base,
         "status": PARTITION_CAD_STATUS_READY,
@@ -144,6 +158,7 @@ def build_partition_cad(raw_project: object, *, partition: object | None = None)
             "container_component_count": sum(1 for item in build.components if item.functional_type == "v0_1_storage_container"),
             "explicit_complement_component_count": sum(1 for item in build.components if item.functional_type != "v0_1_storage_container"),
             "cavity_count": cavity_count,
+            "top_inset_cut_count": top_inset_cut_count,
             "automatic_body_count": 0,
             "source_plan_digest": plan.get("plan_digest"),
         },
@@ -152,6 +167,8 @@ def build_partition_cad(raw_project: object, *, partition: object | None = None)
             "source_plan_unchanged": True,
             "component_count_matches_plan": True,
             "cavities_from_p55_only": True,
+            "top_insets_are_reservations_not_cavities": True,
+            "top_inset_cut_count_matches_plan": top_inset_cut_count == len(_mappings(_mapping(plan.get("top_inset_reservations"), "partition.top_inset_reservations").get("cuts", []), "partition.top_inset_reservations.cuts")),
             "automatic_body_count": 0,
             "free_regions_materialized": False,
         },
@@ -323,6 +340,10 @@ def _component(
                 parameters={"origin_source": "printable_origin_mm", "size_source": "printable_size_mm", "coordinate_frame": "scene.frame"},
             ),
             *tuple(_cavity_operation(body_id, cavity) for cavity in cavities),
+            *tuple(
+                _top_inset_operation(body_id, cut)
+                for cut in _mappings(placement.get("top_inset_cuts", []), f"placement[{index}].top_inset_cuts")
+            ),
         ),
     )
     module_id = str(placement.get("container_group_id") or placement.get("requested_complement_id") or f"body-{index}")
@@ -344,6 +365,36 @@ def _cavity_operation(body_id: str, cavity: CadCavity) -> CadOperation:
         },
     )
 
+
+
+def _top_inset_operation(body_id: str, cut: dict[str, object]) -> CadOperation:
+    cut_kind = str(cut.get("kind", ""))
+    if cut_kind == TOP_INSET_CUT_KIND:
+        operation_kind = TOP_INSET_OPERATION_KIND
+    elif cut_kind == TOP_INSET_GRIP_CUT_KIND:
+        operation_kind = TOP_INSET_GRIP_OPERATION_KIND
+    else:
+        raise PartitionCadBuildError(f"Type de coupe superieure inconnu : {cut_kind!r}.")
+    return CadOperation(
+        id=f"{body_id}:{cut['id']}:{operation_kind}",
+        kind=operation_kind,
+        target_id=body_id,
+        parameters={
+            "cut_id": cut["id"],
+            "cut_kind": cut_kind,
+            "reservation_id": cut["reservation_id"],
+            "flat_item_id": cut["flat_item_id"],
+            "removal_order": cut["removal_order"],
+            "local_origin_mm": deepcopy(cut["local_origin_mm"]),
+            "size_mm": deepcopy(cut["size_mm"]),
+            "retained_body_below_mm": cut["retained_body_below_mm"],
+            "minimum_floor_mm": cut["minimum_floor_mm"],
+            "non_perforating": bool(cut["non_perforating"]),
+            "coordinate_frame": "body.local",
+            "execution_status": PARTITION_CAD_STATUS_READY,
+            "fusion_generation": PARTITION_CAD_STATUS_READY,
+        },
+    )
 
 def _parameter(identifier: str, value: float, category: str, description: str) -> CadParameter:
     return CadParameter(id=identifier, value=_round(value), unit=CAD_IR_UNITS, category=category, description=description)

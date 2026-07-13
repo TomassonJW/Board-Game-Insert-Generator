@@ -89,7 +89,9 @@ def current_personal_presets_path(addin_dir: str | Path) -> Path:
 
 def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_id: str) -> dict[str, object]:
     from board_game_insert_generator.expandable_envelope import derive_expandable_envelope_contract
-    from board_game_insert_generator.flat_stack_reservation import derive_flat_stack_reservation
+    from board_game_insert_generator.top_inset_reservation import (
+        compatibility_flat_stack_payload, derive_top_inset_reservations,
+    )
     from board_game_insert_generator.partition_cad import build_partition_cad
     from board_game_insert_generator.partition_result_view import build_partition_result_view
     from board_game_insert_generator.partition_solver import solve_partition_plan
@@ -121,10 +123,17 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
     normalization = normalize_project_draft(project_value)
     project = normalization.project
     envelopes = derive_expandable_envelope_contract(project)
-    flat_stack = derive_flat_stack_reservation(project)
+    top_insets = derive_top_inset_reservations(project)
+    flat_stack = {
+        "schema_version": top_insets["schema_version"],
+        "flat_stack": compatibility_flat_stack_payload(top_insets),
+        "top_inset_reservations": top_insets,
+        "summary": top_insets["summary"],
+        "blockers": top_insets["blockers"],
+    }
     creation_presets = build_creation_presets(
         project,
-        storage_height_mm=float(flat_stack["flat_stack"]["storage_height_mm"]),
+        storage_height_mm=float(top_insets["design_top_z_mm"]),
     )
     preset_path = current_personal_presets_path(addin_dir)
     personal_presets = load_personal_presets(preset_path)

@@ -62,7 +62,7 @@ class PartitionSolverTests(unittest.TestCase):
         self.assertFalse(result["clearance_policy"]["materialize_clearances"])
         self.assertTrue(all(not item["automatic"] for item in result["placements"]))
 
-    def test_flat_stack_reduces_height_and_is_supported_by_aligned_requested_bodies(self) -> None:
+    def test_top_inset_keeps_full_height_and_is_supported_by_aligned_requested_bodies(self) -> None:
         project = project_with_groups(2)
         project["flat_items"] = [{
             "id": "board", "name": "Plateau", "kind": "board",
@@ -72,10 +72,12 @@ class PartitionSolverTests(unittest.TestCase):
         result = solve_partition_plan(project)
 
         self.assertEqual(result["summary"]["status"], "constructed")
-        self.assertLess(result["box"]["storage_height_mm"], 66.0)
+        self.assertEqual(result["box"]["storage_height_mm"], 66.0)
         self.assertEqual(result["support"]["status"], "supported_by_requested_bodies")
         self.assertGreater(result["support"]["top_support_count"], 0)
-        self.assertTrue(all(item["world_size_mm"]["z"] == result["box"]["storage_height_mm"] for item in result["placements"]))
+        self.assertTrue(all(item["world_size_mm"]["z"] == 66.0 for item in result["placements"]))
+        self.assertEqual(result["top_inset_reservations"]["status"], "applied")
+        self.assertTrue(all(item.get("top_inset_cuts") for item in result["placements"]))
 
     def test_reports_actionable_impossible_when_axes_and_dimensions_prevent_a_complete_partition(self) -> None:
         project = project_with_groups(1)

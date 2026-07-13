@@ -490,7 +490,14 @@ def _validate_flat_items(values: list[object]) -> list[dict[str, object]]:
     for index, value in enumerate(values):
         field = f"project.flat_items[{index}]"
         raw = _mapping(value, field)
-        _reject_unknown(raw, {"id", "name", "kind", "dimensions_mm", "quantity", "stack_order"}, field)
+        _reject_unknown(
+            raw,
+            {
+                "id", "name", "kind", "dimensions_mm", "quantity", "stack_order",
+                "origin_mm", "rotation_deg_z",
+            },
+            field,
+        )
         item_id = _required_text(raw, "id", field)
         if item_id in ids:
             raise ProjectContractError(f"{field}.id duplicates '{item_id}'.")
@@ -510,6 +517,10 @@ def _validate_flat_items(values: list[object]) -> list[dict[str, object]]:
                 ),
                 "quantity": _positive_int(raw, "quantity", field),
                 "stack_order": stack_order,
+                "origin_mm": _optional_xy_origin(raw.get("origin_mm"), f"{field}.origin_mm"),
+                "rotation_deg_z": _optional_right_angle_rotation(
+                    raw.get("rotation_deg_z"), f"{field}.rotation_deg_z"
+                ),
             }
         )
     return result
@@ -694,6 +705,28 @@ def _optional_bool(value: object, default: bool, field: str) -> bool:
     if not isinstance(value, bool):
         raise ProjectContractError(f"{field} must be a boolean.")
     return value
+
+
+def _optional_xy_origin(value: object, field: str) -> dict[str, float] | None:
+    if value is None:
+        return None
+    raw = _mapping(value, field)
+    _reject_unknown(raw, {"x", "y"}, field)
+    return {
+        axis: _non_negative_number(raw, axis, field)
+        for axis in ("x", "y")
+    }
+
+
+def _optional_right_angle_rotation(value: object, field: str) -> int | None:
+    if value is None:
+        return None
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ProjectContractError(f"{field} must be 0, 90 or null.")
+    rotation = int(value)
+    if float(value) != float(rotation) or rotation not in {0, 90}:
+        raise ProjectContractError(f"{field} must be 0, 90 or null.")
+    return rotation
 
 
 def _optional_enum(value: object, values: frozenset[str], default: str, field: str) -> str:

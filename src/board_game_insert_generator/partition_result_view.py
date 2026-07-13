@@ -99,28 +99,40 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
                 "source_content_ids": deepcopy(placement.get("source_content_ids", [])),
                 "source_contents": deepcopy(placement.get("source_contents", [])),
                 "cavity_count": len(cavities),
+                "top_inset_cut_count": len(_mappings(placement.get("top_inset_cuts", []), f"placement[{index}].top_inset_cuts")),
                 "requested_complement_id": placement.get("requested_complement_id"),
                 "complement_kind": placement.get("complement_kind"),
             }
         )
 
-    reservation_top = None
-    reservation_cut = None
-    if flat_stack.get("reservation_size_mm") is not None:
-        reservation_origin = _dimension(flat_stack.get("preferred_reservation_origin_mm"), "flat_stack.preferred_reservation_origin_mm")
-        reservation_size = _dimension(flat_stack.get("reservation_size_mm"), "flat_stack.reservation_size_mm")
-        reservation_top = {
-            "kind": "reservation", "label": "Pile plateaux / livrets",
-            "x_mm": _round(reservation_origin["x"]), "y_mm": _round(reservation_origin["y"]),
-            "width_mm": _round(reservation_size["x"]), "height_mm": _round(reservation_size["y"]),
+    top_insets = _mapping(plan.get("top_inset_reservations", {}), "partition.top_inset_reservations")
+    reservation_tops: list[dict[str, object]] = []
+    reservation_cuts: list[dict[str, object]] = []
+    for index, reservation in enumerate(_mappings(top_insets.get("reservations", []), "partition.top_inset_reservations.reservations")):
+        origin = _xy(reservation.get("cut_origin_mm"), f"top_inset[{index}].cut_origin_mm")
+        size = _xy(reservation.get("cut_size_mm"), f"top_inset[{index}].cut_size_mm")
+        depth = float(reservation["inset_depth_from_top_mm"])
+        top_item = {
+            "id": str(reservation["id"]), "kind": "top_inset_reservation",
+            "label": str(reservation["name"]), "flat_item_id": str(reservation["flat_item_id"]),
+            "x_mm": _round(origin["x"]), "y_mm": _round(origin["y"]),
+            "width_mm": _round(size["x"]), "height_mm": _round(size["y"]),
+            "depth_mm": _round(depth), "removal_order": int(reservation["removal_order"]),
+            "grip_zone": deepcopy(reservation.get("grip_zone")),
         }
-        if _crosses(section_y, reservation_origin["y"], reservation_size["y"]):
-            reservation_cut = {
-                "kind": "reservation", "label": "Pile plateaux / livrets",
-                "x_mm": _round(reservation_origin["x"]),
-                "z_from_top_mm": _round(box["z"] - reservation_origin["z"] - reservation_size["z"]),
-                "width_mm": _round(reservation_size["x"]), "height_mm": _round(reservation_size["z"]),
-            }
+        reservation_tops.append(top_item)
+        if _crosses(section_y, origin["y"], size["y"]):
+            reservation_cuts.append({
+                "id": top_item["id"], "kind": "top_inset_reservation", "label": top_item["label"],
+                "flat_item_id": top_item["flat_item_id"], "x_mm": top_item["x_mm"],
+                "z_from_top_mm": _round(box["z"] - float(top_insets.get("design_top_z_mm", storage_height))),
+                "width_mm": top_item["width_mm"], "height_mm": _round(depth),
+                "removal_order": top_item["removal_order"],
+            })
+
+    # Historical singular keys remain as a bounded compatibility alias.
+    reservation_top = reservation_tops[0] if reservation_tops else None
+    reservation_cut = reservation_cuts[0] if reservation_cuts else None
 
     return {
         "schema_version": PARTITION_RESULT_VIEW_SCHEMA_V1,
@@ -132,6 +144,7 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
             "bodies": top_bodies,
             "cavities": top_cavities,
             "flat_stack_reservation": reservation_top,
+            "top_inset_reservations": reservation_tops,
         },
         "section_xz": {
             "section_y_mm": _round(section_y),
@@ -139,6 +152,7 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
             "bodies": cut_bodies,
             "cavities": cut_cavities,
             "flat_stack_reservation": reservation_cut,
+            "top_inset_reservations": reservation_cuts,
         },
         "details": details,
         "support": deepcopy(plan.get("support")),
@@ -149,9 +163,10 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
             "indicative_geometry": False,
             "automatic_body_count": int(summary.get("automatic_body_count", -1)),
             "source_plan_unchanged": True,
+            "localized_top_insets": True,
         },
         "limitations": [
-            "La vue dessus est une projection orthographique des placements P57.",
+            "La vue dessus projette les placements et les encastrements superieurs resolus.",
             "La coupe X/Z traverse le plan a Y = box.y / 2 et peut ne pas couper tous les corps.",
             "Cette vue ne constitue ni une CAD IR, ni une validation Fusion ou impression.",
         ],
@@ -206,6 +221,14 @@ def _dimension(value: object, field: str) -> dict[str, float]:
     except (KeyError, TypeError, ValueError) as exc:
         raise PartitionResultViewError(f"{field} doit contenir x, y et z numeriques.") from exc
 
+
+
+def _xy(value: object, field: str) -> dict[str, float]:
+    raw = _mapping(value, field)
+    try:
+        return {axis: float(raw[axis]) for axis in ("x", "y")}
+    except (KeyError, TypeError, ValueError) as exc:
+        raise PartitionResultViewError(f"{field} doit contenir x et y numeriques.") from exc
 
 def _round(value: float) -> float:
     return round(float(value), 4)

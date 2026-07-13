@@ -108,6 +108,37 @@ class PartitionCadTests(unittest.TestCase):
         self.assertEqual(complement["metadata"]["requested_complement_id"], "empty")
         self.assertEqual(len(complement["body"]["cavities"]), 1)
 
+    def test_transports_top_insets_as_reservation_cuts_distinct_from_content_cavities(self) -> None:
+        value = project(2)
+        value["flat_items"] = [{
+            "id": "board", "name": "Plateau", "kind": "board",
+            "dimensions_mm": {"x": 220.0, "y": 160.0, "z": 3.0},
+            "quantity": 1, "stack_order": 0,
+        }]
+
+        result = build_partition_cad(value)
+        fusion = generation_plan_from_cad_ir(result["cad_ir"], FUSION_GENERATION_MODE_COMPACT_ONLY)
+        operations = [
+            operation
+            for component in result["cad_ir"]["components"]
+            for operation in component["body"]["operations"]
+        ]
+        top_operations = [
+            operation for operation in operations
+            if operation["kind"] in {"subtract_top_inset_reservation", "subtract_top_inset_grip"}
+        ]
+
+        self.assertEqual(result["status"], PARTITION_CAD_STATUS_READY)
+        self.assertEqual(result["materialization"]["top_inset_cut_count"], len(top_operations))
+        self.assertGreater(len(top_operations), 0)
+        self.assertTrue(all(operation["parameters"]["non_perforating"] for operation in top_operations))
+        self.assertEqual(
+            len([cut for cut in fusion.cavity_cuts if cut.cavity_source.startswith("top_inset")]),
+            len(top_operations),
+        )
+        self.assertTrue(result["invariants"]["top_insets_are_reservations_not_cavities"])
+        self.assertTrue(result["invariants"]["top_inset_cut_count_matches_plan"])
+
     def test_impossible_project_returns_no_cad_ir(self) -> None:
         result = build_partition_cad(blank_project_v1())
 

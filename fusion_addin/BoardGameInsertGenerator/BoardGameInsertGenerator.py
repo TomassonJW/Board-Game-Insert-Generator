@@ -1674,7 +1674,9 @@ def _generation_result_message(
         f"Occurrence naming policy: {OCCURRENCE_NAME_POLICY_COMPONENT_SOURCE}\n"
         "Occurrence Browser names: Fusion-generated; BGIG source Component names and plan roles are authoritative.\n"
         f"Grid-positioned modules refused: {len(generation_plan.rejected_grid_modules)}\n"
-        f"Rectangular cavity cuts: {result['cavity_cuts']}\n"
+        f"Rectangular cuts total: {result['cavity_cuts']}\n"
+        f"Top inset cuts planned/generated: {result['top_inset_cuts_planned']}/{result['top_inset_cuts_generated']}\n"
+        f"Top inset grips planned/generated: {result['top_inset_grips_planned']}/{result['top_inset_grips_generated']}\n"
         f"Joined cap rails: {result.get('joined_rectangular_prisms', 0)}\n"
         f"Asset cavity policy: {result['asset_cavity_policy']}\n"
         f"Asset-fit cavities planned: {result['asset_fit_cavities_planned']}\n"
@@ -1719,6 +1721,10 @@ def _stable_generation_result(result: dict[str, object]) -> dict[str, object]:
         "legacy_bodies_created": 0,
         "linked_exploded_occurrences": "no",
         "cavity_cuts": 0,
+        "top_inset_cuts_planned": 0,
+        "top_inset_cuts_generated": 0,
+        "top_inset_grips_planned": 0,
+        "top_inset_grips_generated": 0,
         "joined_rectangular_prisms": 0,
         "asset_cavity_policy": "none",
         "asset_fit_cavities_planned": 0,
@@ -2390,8 +2396,18 @@ def _generate_from_plan(design, plan: FusionGenerationPlan, registry: BgigFusion
         for cavity_cut in plan.cavity_cuts
         if getattr(cavity_cut, "cavity_source", "") in {"asset_fit_cavity", "asset_compartment_cavity"}
     ]
+    top_inset_cuts_planned = sum(
+        1 for cavity_cut in plan.cavity_cuts
+        if getattr(cavity_cut, "cavity_source", "") == "top_inset_reservation"
+    )
+    top_inset_grips_planned = sum(
+        1 for cavity_cut in plan.cavity_cuts
+        if getattr(cavity_cut, "cavity_source", "") == "top_inset_grip"
+    )
     asset_fit_cavity_cuts_generated = 0
     asset_compartment_cavity_cuts_generated = 0
+    top_inset_cuts_generated = 0
+    top_inset_grips_generated = 0
     cavity_cut_count = 0
     for cavity_cut in plan.cavity_cuts:
         target_body = created_bodies.get(cavity_cut.target_body_id)
@@ -2415,6 +2431,10 @@ def _generate_from_plan(design, plan: FusionGenerationPlan, registry: BgigFusion
             asset_fit_cavity_cuts_generated += 1
         if getattr(cavity_cut, "cavity_source", "") == "asset_compartment_cavity":
             asset_compartment_cavity_cuts_generated += 1
+        if getattr(cavity_cut, "cavity_source", "") == "top_inset_reservation":
+            top_inset_cuts_generated += 1
+        if getattr(cavity_cut, "cavity_source", "") == "top_inset_grip":
+            top_inset_grips_generated += 1
 
     asset_access_notch_cuts_planned = sum(
         1 for notch_cut in plan.finger_notch_cuts if getattr(notch_cut, "source_feature_kind", "") == "asset_access_notch"
@@ -2493,6 +2513,10 @@ def _generate_from_plan(design, plan: FusionGenerationPlan, registry: BgigFusion
         "legacy_bodies_created": 0,
         "linked_exploded_occurrences": "yes" if plan.linked_exploded_occurrences else "no",
         "cavity_cuts": cavity_cut_count,
+        "top_inset_cuts_planned": top_inset_cuts_planned,
+        "top_inset_cuts_generated": top_inset_cuts_generated,
+        "top_inset_grips_planned": top_inset_grips_planned,
+        "top_inset_grips_generated": top_inset_grips_generated,
         "joined_rectangular_prisms": additive_prism_join_count,
         "asset_cavity_policy": planned_asset_cavity_policies[0] if planned_asset_cavity_policies else "none",
         "asset_fit_cavities_planned": asset_fit_cavity_cuts_planned,
@@ -2895,15 +2919,19 @@ def _create_rectangular_cavity_cut(
     scene_id: str | None = None,
 ) -> None:
     local_cut_origin = _relative_vector(cut_plan.cut_origin_mm, body_origin_mm)
+    is_top_inset = str(getattr(cut_plan, "cavity_source", "")).startswith("top_inset")
+    feature_label = "top inset" if is_top_inset else "cavity"
+    sketch_role = "top_inset_sketch" if is_top_inset else "cavity_sketch"
+    cut_role = "top_inset_cut" if is_top_inset else "cavity_cut"
     cut_plane = _create_offset_xy_plane(
         target_component,
         local_cut_origin.z,
-        f"{cut_plan.component_name} {cut_plan.cavity_id} cavity cut plane",
+        f"{cut_plan.component_name} {cut_plan.cavity_id} {feature_label} cut plane",
     )
     sketch = target_component.sketches.add(cut_plane)
-    sketch.name = f"{cut_plan.component_name} {cut_plan.cavity_id} cavity footprint"
+    sketch.name = f"{cut_plan.component_name} {cut_plan.cavity_id} {feature_label} footprint"
     if registry is not None:
-        _tag_bgig_entity(sketch, "cavity_sketch", scene_id=scene_id, module_id=cut_plan.target_body_id, registry=registry)
+        _tag_bgig_entity(sketch, sketch_role, scene_id=scene_id, module_id=cut_plan.target_body_id, registry=registry)
     _add_scene_rectangle_from_mm(
         sketch,
         local_cut_origin.x,
@@ -2940,9 +2968,9 @@ def _create_rectangular_cavity_cut(
     cut_feature = extrudes.add(cut_input)
     if cut_feature is None:
         raise RuntimeError(f"Fusion cut failed for cavity {cut_plan.cavity_id}.")
-    cut_feature.name = f"{cut_plan.component_name} {cut_plan.cavity_id} cavity cut"
+    cut_feature.name = f"{cut_plan.component_name} {cut_plan.cavity_id} {feature_label} cut"
     if registry is not None:
-        _tag_bgig_entity(cut_feature, "cavity_cut", scene_id=scene_id, module_id=cut_plan.target_body_id, registry=registry)
+        _tag_bgig_entity(cut_feature, cut_role, scene_id=scene_id, module_id=cut_plan.target_body_id, registry=registry)
 
 
 def _create_rectangular_finger_notch_cut(

@@ -323,3 +323,13 @@ epaisseur mesuree ou comptee, orientations a plat/debout/auto, dimensions
 physiques et resolues ainsi que les presets personnels locaux exportables.
 Le solveur global reste P57 : P62 corrige ses entrees de cavite mais ne revendique
 ni reservations superieures P63 ni empilement multi-etages P64. P63 devient ready.
+
+
+## P63 implemente - 2026-07-13
+
+Le package Fusion 0.1.13 implemente les reservations superieures localisees :
+empreintes descendantes, composition des plats qui se chevauchent, ordre de
+retrait, appui, prise rectangulaire, non-percement, vues et operations CAD
+IR/Fusion distinctes. Les corps demandes conservent leur hauteur complete hors
+empreinte et aucun corps automatique n est cree. La validation Fusion reste
+reportee a P66 ; P64 devient ready.

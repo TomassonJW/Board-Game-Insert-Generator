@@ -726,8 +726,8 @@ comme experience acceptee. Les blockers V0.1 actifs deviennent :
 | --- | --- | --- |
 | Etat source/derive/solve/materialise | implemente et teste dans la palette 0.1.10 | observation P66 |
 | Diagnostics discrets et parcours progressif | socle P61 implemente ; finition P65 | P65 |
-| Catalogue et orientations de rangement | ADR-0058 acceptee | P62 |
-| Reservations superieures localisees | ADR-0057 acceptee ; P40 historique a remplacer | P63 |
+| Catalogue et orientations de rangement | implemente et teste par P62 | observation P66 |
+| Reservations superieures localisees | implementees et testees par P63 ; P40 superseded | observation P66 |
 | Placement multi-etages Z | contrats historiques presents, solveur actif absent | P64 |
 | Surplus pondere et Auto/Cible/Fixe | partage egal P57 insuffisant | P64 |
 | Conteneurs/reglages/apercu explicables | socle P56-P58 a reprendre | P65 |
@@ -760,3 +760,16 @@ de cavite V0.2 restent differees apres P66.
   detaillee, dimensions resolues visibles et presets personnels hors package.
 - C-QUALITY : migration additive et 401 tests automatises ; aucune validation
   Fusion ou impression n est revendiquee.
+
+
+## P63 capability update
+
+- C-RESERVATION : `implemented-core` pour empreintes locales, composition Z des
+  plats qui se chevauchent, ordre de retrait, appui et prise rectangulaire.
+- C-STACKING : la pile globale P40 est `superseded-for-product`; les conteneurs
+  gardent leur sommet de conception hors reservations.
+- C-CAD-IR / C-FUSION-UI : operations de coupe superieure distinctes des cavites,
+  vues de dessus/coupe et generation Fusion preparee dans le package 0.1.13.
+- C-QUALITY : non-percement du corps et des fonds de cavite, determinisme et
+  408 tests ; `fusion-retest-required`, `print-validated: false`.
+- Prochaine capability : C-SOLVER/C-GRID-3D par P64, ADR-0059 acceptee.

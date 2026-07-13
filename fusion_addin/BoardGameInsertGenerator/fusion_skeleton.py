@@ -171,6 +171,9 @@ PART_DESIGN_SINGLE_COMPONENT_ERROR_TEXT = "Part Design documents can only contai
 
 PLAN_STATUS_PLANNED_ONLY = "planned_only"
 CAVITY_CUT_OPERATION_KIND = "subtract_rectangular_cavity"
+TOP_INSET_CUT_OPERATION_KIND = "subtract_top_inset_reservation"
+TOP_INSET_GRIP_OPERATION_KIND = "subtract_top_inset_grip"
+TOP_INSET_CAVITY_SOURCES = frozenset({"top_inset_reservation", "top_inset_grip"})
 ADDITIVE_PRISM_JOIN_OPERATION_KIND = "join_rectangular_prism"
 ASSET_FIT_CAVITY_POLICY = "single_asset_fit_rectangular_cavity_v0"
 ASSET_COMPARTMENT_CAVITY_POLICY = "per_source_asset_rectangular_compartments_v0"
@@ -3637,7 +3640,9 @@ def _cavity_cut_plans(
         operation_kind = operation.get("kind")
         if operation_kind == CAVITY_FEATURE_OPERATION_KIND:
             continue
-        if operation_kind != CAVITY_CUT_OPERATION_KIND:
+        if operation_kind not in {
+            CAVITY_CUT_OPERATION_KIND, TOP_INSET_CUT_OPERATION_KIND, TOP_INSET_GRIP_OPERATION_KIND
+        }:
             continue
 
         parameters = operation.get("parameters")
@@ -3660,13 +3665,28 @@ def _cavity_cut_plans(
             "size_mm",
             f"body {blank.cad_id} cavity size",
         )
+        is_top_inset = operation_kind in {TOP_INSET_CUT_OPERATION_KIND, TOP_INSET_GRIP_OPERATION_KIND}
         cavity_id = _required_text(
             parameters,
-            "cavity_id",
-            f"body {blank.cad_id} cavity operation",
+            "cut_id" if is_top_inset else "cavity_id",
+            f"body {blank.cad_id} {'top inset' if is_top_inset else 'cavity'} operation",
         )
         _validate_cavity_cut_bounds(blank, local_origin, cavity_size, cavity_id)
         retained_floor_mm = blank.size_mm.z - cavity_size.z
+        if is_top_inset:
+            if parameters.get("non_perforating") is not True:
+                raise FusionSkeletonError(
+                    f"Top inset {cavity_id!r} for {blank.body_name!r} must be marked non_perforating."
+                )
+            if abs(local_origin.z + cavity_size.z - blank.size_mm.z) > 0.0001:
+                raise FusionSkeletonError(
+                    f"Top inset {cavity_id!r} for {blank.body_name!r} must open on the top face."
+                )
+            declared_retained = float(parameters.get("retained_body_below_mm", -1.0))
+            if abs(declared_retained - retained_floor_mm) > 0.0001:
+                raise FusionSkeletonError(
+                    f"Top inset {cavity_id!r} retained-body declaration does not match its cut depth."
+                )
         cut_plans.append(
             FusionCavityCutPlan(
                 component_id=component_id,
@@ -3687,6 +3707,15 @@ def _cavity_cut_plans(
                 cut_size_mm=cavity_size,
                 requested_local_origin_mm=local_origin,
                 retained_floor_mm=retained_floor_mm,
+                operation_kind=str(operation_kind),
+                cavity_source=(
+                    "top_inset_grip"
+                    if operation_kind == TOP_INSET_GRIP_OPERATION_KIND
+                    else "top_inset_reservation"
+                    if operation_kind == TOP_INSET_CUT_OPERATION_KIND
+                    else "cad_ir_cavity"
+                ),
+                policy="localized_top_inset_v1" if is_top_inset else None,
             )
         )
     return cut_plans
@@ -3698,11 +3727,11 @@ def _validate_cavity_cut_bounds(
     cavity_size: FusionVectorMm,
     cavity_id: str,
 ) -> None:
-    if local_origin.x + cavity_size.x > blank.size_mm.x:
+    if local_origin.x + cavity_size.x > blank.size_mm.x + 0.0001:
         raise FusionSkeletonError(
             f"Cavity {cavity_id!r} exceeds printable blank width for {blank.body_name!r}."
         )
-    if local_origin.y + cavity_size.y > blank.size_mm.y:
+    if local_origin.y + cavity_size.y > blank.size_mm.y + 0.0001:
         raise FusionSkeletonError(
             f"Cavity {cavity_id!r} exceeds printable blank depth for {blank.body_name!r}."
         )

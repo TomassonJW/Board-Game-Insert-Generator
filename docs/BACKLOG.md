@@ -1711,7 +1711,9 @@ impose les dependances de release suivantes.
   retrait, appui et zone de prise, sans reduire toute la hauteur des conteneurs.
 - Acceptation : intersections, non-percement, vues et coupe Fusion prouvent un
   plateau affleurant ; aucune ergonomie courbe V0.2 n est revendiquee.
-- Statut : `ready`.
+- Livrable : package 0.1.13, contrat `bgig.top_inset_reservations.v1`, coupes
+  CAD IR/Fusion distinctes et Apercu localise.
+- Statut : `done`, `implemented`, `automated-validated`, `fusion-retest-required`.
 
 ### P64 - Solveur volumetrique multi-etages
 
@@ -1722,7 +1724,7 @@ impose les dependances de release suivantes.
 - Invariant : aucun corps automatique ; une suggestion de cale ne mute rien.
 - Acceptation : fixtures multi-etages, conservation, collisions, support,
   retrait et budget de recherche deterministe testes.
-- Statut : `planned`.
+- Statut : `ready`.
 
 ### P65 - Conteneurs, reglages et apercu integres
 

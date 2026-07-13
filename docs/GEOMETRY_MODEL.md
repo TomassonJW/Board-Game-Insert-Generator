@@ -414,3 +414,24 @@ format catalogue. `auto` choisit deterministiquement l empreinte minimale parmi
 les orientations compatibles avec la hauteur disponible courante. P63/P64
 remplaceront cette hauteur globale par les contraintes locales d encastrement et
 d etage ; P62 ne revendique pas encore cette composition verticale.
+
+
+## P63 - Reservations superieures localisees
+
+Une reservation `bgig.top_inset_reservations.v1` est un volume de soustraction
+non imprimable ouvert sur le plan superieur de conception. Elle ne devient ni
+une cavite de contenu ni un corps. Hors de son empreinte, chaque corps demande
+conserve son sommet au plan de conception.
+
+Pour chaque plateau ou livret, le contrat fixe : empreinte physique, jeu XY,
+rotation 0/90, origine XY, epaisseur cumulee, profondeur depuis le sommet, ordre
+de retrait, plan d appui et prise rectangulaire. Deux empreintes qui se
+chevauchent se composent en Z selon leur ordre ; deux empreintes disjointes
+partagent le meme plan superieur.
+
+La coupe locale doit rester dans le blank, laisser au moins le fond minimal du
+corps et ne jamais descendre sous le fond d une cavite intersectee. Les surfaces
+de cavite presentes au plan d appui sont retranchees de la couverture support.
+La CAD IR transporte les operations `subtract_top_inset_reservation` et
+`subtract_top_inset_grip` dans le repere `body.local`. Fusion execute ces
+operations sans recalculer placement, profondeur ou support.

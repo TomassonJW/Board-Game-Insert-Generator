@@ -8,38 +8,38 @@ V0.1 - vrai MVP Fusion-only selon ADR-0055 et rebase P60-R accepte.
 
 ## Derniere mission terminee
 
-P62 - catalogue d elements et orientations, package 0.1.12.
+P63 - reservations superieures encastrees, package 0.1.13.
 
 ## Derniere preuve automatisee
 
-Le coeur distingue dimensions physiques et dimensions resolues pour les cartes
-a plat, debout ou en orientation automatique. Formats locaux, sleeves, epaisseur
-mesuree/comptee et presets personnels atomiques sont couverts par 401 tests.
+Le coeur conserve les corps a la hauteur de conception hors empreinte et compose
+les plateaux/livrets en coupes locales avec retrait, appui, prise et non-percement.
+Le contrat, les vues, la CAD IR et le plan Fusion sont couverts par 408 tests.
 Aucune validation Fusion ou impression n est revendiquee.
 
 ## Mission courante
 
-Aucune mission en cours. P62 est automatise ; P63 devient la premiere mission ready.
+Aucune mission en cours. P63 est automatise ; P64 devient la premiere mission ready.
 
 ## Prochaine action prete
 
-P63 - reservations superieures encastrees, selon ADR-0057 acceptee.
+P64 - solveur volumetrique multi-etages, selon ADR-0059 acceptee.
 
 Scope borne :
 
-1. reservations locales depuis le dessus des conteneurs ;
-2. ordre de retrait et appui explicites ;
-3. non-percement et zone de prise simple ;
-4. plateau ou livret affleurant sans reduire toute la hauteur des bacs ;
-5. vues, CAD IR et tests Fusion prepares.
+1. arrangements XY deterministes par etage et composition Z ;
+2. contraintes d appui, de retrait et de collision ;
+3. modes Auto/Cible/Fixe et surplus pondere ;
+4. residuels et suggestions sans creation automatique de corps ;
+5. fixtures multi-etages et budget de recherche explicite.
 
-## Mission suivante apres P63
+## Mission suivante apres P64
 
-P64 - solveur volumetrique multi-etages.
+P65 - Conteneurs, Reglages et Apercu integres.
 
 ## Releases bloquees
 
-P64 depend de P63 ; P65 depend de P64. P44 a P50 restent
+P65 depend de P64. P44 a P50 restent
 bloques jusqu a l acceptation humaine P66. P47 a P50 restent aussi bloques
 jusqu a l acceptation de P46.
 

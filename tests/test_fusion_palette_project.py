@@ -74,7 +74,8 @@ class FusionPaletteProjectTests(unittest.TestCase):
 
         self.assertEqual(response["status"], "ready")
         self.assertEqual(response["envelopes"]["containers"][0]["container_group_id"], "tokens")
-        self.assertEqual(response["flat_stack"]["summary"]["status"], "ready_for_p41")
+        self.assertEqual(response["flat_stack"]["summary"]["status"], "not_required")
+        self.assertEqual(response["flat_stack"]["flat_stack"]["semantics"], "localized_top_insets")
 
     def test_solve_project_returns_the_p57_partition_without_saving_implicitly(self) -> None:
         project = blank_project_v1()

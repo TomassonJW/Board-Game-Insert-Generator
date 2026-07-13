@@ -86,7 +86,11 @@ class PartitionResultViewTests(unittest.TestCase):
 
         self.assertIsNotNone(view["top_view"]["flat_stack_reservation"])
         self.assertIsNotNone(view["section_xz"]["flat_stack_reservation"])
+        self.assertEqual(len(view["top_view"]["top_inset_reservations"]), 1)
+        self.assertEqual(len(view["section_xz"]["top_inset_reservations"]), 1)
+        self.assertEqual(view["top_view"]["top_inset_reservations"][0]["depth_mm"], 2.0)
         self.assertEqual(view["support"]["status"], "supported_by_requested_bodies")
+        self.assertTrue(view["invariants"]["localized_top_insets"])
 
     def test_never_draws_an_impossible_or_wrong_schema_plan_as_a_solution(self) -> None:
         impossible = solve_partition_plan(blank_project_v1())
