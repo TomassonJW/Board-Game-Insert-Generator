@@ -193,10 +193,12 @@ Les settings techniques et le projet utilisateur restent distincts.
 - aucune URL localhost ni dependance runtime frontend ;
 - smoke humain de la palette dans Fusion avant statut fusion-validated.
 
-## Frontieres P57-P60
+## Frontieres P57-P66
 
 P56 edite et valide le projet. P57 resout la partition. P58 affiche le vrai plan.
-P59 materialise et synchronise. P60 prouve le parcours complet dans Fusion.
+P59 materialise et synchronise. P60 reste la base technique observee ; P61 a
+P65 corrigent les ecarts de convergence et P66 prouve le parcours complet dans
+Fusion.
 
-Aucune validation d impression n est deduite de P60. Le statut
+Aucune validation d impression n est deduite de P60 ou P66. Le statut
 print-validated reste faux tant qu une impression reelle n est pas mesuree.

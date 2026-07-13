@@ -416,3 +416,14 @@ restent reservees a P66.
 Un P66 vert accepte le MVP fonctionnel V0.1 avec `print-validated: false`. La
 publication ou le tag de release constitue ensuite une decision humaine separee,
 pas une excuse pour repousser l acceptation fonctionnelle du MVP.
+
+## Cadrage d execution P66 - 2026-07-13
+
+`docs/P66_TERRA_EXECUTION_CONTRACT.md` rend P66 delegable sans ouvrir le scope
+produit : P66-M001 prepare fixtures, preuves, package et checklist ; P66-V reste
+une observation humaine ; un KO ouvre seulement un P66-Hxx atomique ; P66-CLOSE
+aligne le pilotage apres un OK explicite.
+
+P44 a P50 ne sont pas des validations acquises. P44-P46 constituent la V0.2
+formes/ergonomie et restent bloques jusqu a P66 OK. P47-P50 constituent la V0.3
+couvercles/calibration et restent en plus bloques jusqu a P46 OK.

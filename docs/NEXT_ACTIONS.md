@@ -37,6 +37,11 @@ CAD IR, le package installe, les marqueurs et une checklist afin de ne laisser
 a l humain que les observations dans Fusion. Aucun correctif produit ne doit
 etre anticipe avant une observation KO.
 
+Contrat d execution delegable : `docs/P66_TERRA_EXECUTION_CONTRACT.md`.
+P66-M001 livre uniquement fixtures, preuves, preparateur, installation et
+checklist. La gate P66 reste humaine ; tout KO ouvre un hotfix P66-Hxx atomique
+avant de rejouer la gate complete.
+
 ## Releases bloquees
 
 P44 a P50 restent

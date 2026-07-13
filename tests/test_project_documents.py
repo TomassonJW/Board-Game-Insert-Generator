@@ -30,6 +30,7 @@ REQUIRED_PROJECT_FILES = (
     "docs/FUSION_360_GATE_REPORT.md",
     "docs/FUSION_360_STRATEGY.md",
     "docs/QUALITY_RULES.md",
+    "docs/P66_TERRA_EXECUTION_CONTRACT.md",
     "docs/DECISIONS/ADR-TEMPLATE.md",
     "docs/DECISIONS/ADR-0012-capability-driven-product-pilotage.md",
     "docs/DECISIONS/README.md",
@@ -159,6 +160,14 @@ REQUIRED_SECTIONS = {
     "docs/QUALITY_RULES.md": (
         "## Regles de documentation",
         "## Garde-fous documentaires automatises",
+    ),
+    "docs/P66_TERRA_EXECUTION_CONTRACT.md": (
+        "## 1. Resultat attendu",
+        "## 2. Clarification P44 a P50",
+        "## 3. Decomposition obligatoire de P66",
+        "## 8. Checklist humaine P66-V",
+        "## 10. Interdits explicites",
+        "## 12. Prompt court a donner a Terra",
     ),
     "docs/DECISIONS/README.md": (
         "## Template ADR",

@@ -84,7 +84,8 @@ V0.2 et V0.3 restent `deferred`.
 
 P43 a d abord ete defini comme une gate MVP, mais le retour produit du
 2026-07-12 a etabli que son smoke ne couvre que la scene geometrique. La sortie
-MVP est transferee a P60 : le contrat complet doit etre vert avant un smoke
+MVP a d abord ete transferee a P60, puis la revue KO P60 l a transferee a P66 :
+le contrat complet doit etre vert avant un smoke
 Fusion de la scene finale. Une campagne physique reste distincte et
 `print-validated: false` reste obligatoire.
 
@@ -92,7 +93,7 @@ Resultat historique : le jeu temoin de 20 pieces CAD et 19 cavites a recu le
 retour `Fusion P43 OK`. Cette preuve est conservee comme
 `fusion-validated-geometry-only`, jamais comme acceptation V0.1.
 
-## Chemin V0.2, bloque jusqu'a P60
+## Chemin V0.2, bloque jusqu'a P66
 
 | Lot | Resultat |
 | --- | --- |
@@ -142,11 +143,11 @@ font pas partie du runtime ni du packaging MVP.
 | P57 | Partition et expansion des bacs | Zero corps auto, couverture, diagnostics |
 | P58 | Resultat reel dans la palette | Preview issue du plan et obsolescence |
 | P59 | Scene Fusion fidele et regenerable | Correspondance plan/CAD/scene, zero doublon |
-| P60 | MVP accepte dans Fusion | Scenarios verts et observation humaine unique |
+| P60 | Base technique Fusion observee | Revue produit KO, rebase P60-R requis |
 
 P56 reutilise la palette P32 et le coeur P55. Il ne reutilise pas le frontend
 React comme surface produit. P57-P59 restent sequentiels. V0.2 et V0.3 restent
-bloquees jusqu a P60.
+bloquees jusqu a P66 selon le rebase ci-dessous.
 
 ## Rebase apres revue produit P60
 

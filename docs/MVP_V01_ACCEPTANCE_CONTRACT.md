@@ -100,8 +100,9 @@ La materialisation ne peut partir que de ce plan courant.
 - observation humaine finale dans Fusion ;
 - aucune revendication print-validated sans impression reelle.
 
-## Gate P60
+## Gate P66
 
 Codex prepare automatiquement l add-in, le projet temoin et les settings. Thomas
 ouvre Fusion, lance BGIG et confirme uniquement le parcours final visible et la
-scene. Cette observation est la seule gate humaine produit restante pour V0.1.
+scene selon docs/P66_TERRA_EXECUTION_CONTRACT.md. Cette observation P66 est la
+seule gate humaine produit restante pour V0.1.

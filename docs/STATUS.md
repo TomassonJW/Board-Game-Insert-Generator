@@ -1686,3 +1686,21 @@ dans la barre persistante.
 Preuves : 445 tests automatises, syntaxe JavaScript et compilation Python verts.
 Le package Fusion 0.1.19 est installe localement depuis 23aaa70 et ses marqueurs
 sont verifies. La gate humaine Fusion et l impression restent a realiser.
+
+## P66 - Cadrage Terra et fermeture du MVP V0.1
+
+Statut : `P66-M001 ready`, `human-fusion-gate-required`,
+`print-validated: false`.
+
+Le contrat `docs/P66_TERRA_EXECUTION_CONTRACT.md` borne la suite en quatre
+etapes : preparation automatique, observation humaine Fusion, hotfixes P66-Hxx
+seulement sur KO, puis cloture documentaire sur OK. La preparation doit prouver
+un projet complet avec orientations, reservations superieures, plusieurs etages,
+jeux P65 separes, cycle d invalidation, scene unique et export, plus un projet
+impossible bloque honnetement. Aucun correctif produit opportuniste n est permis
+dans P66-M001.
+
+P44-P46 ne sont pas valides : ils restent la V0.2 formes et ergonomie. P47-P50
+ne sont pas valides : ils restent la V0.3 couvercles et calibration physique.
+Un P66 humain vert accepte enfin le MVP fonctionnel Fusion-only, sans valider
+l impression et sans publier automatiquement une release.

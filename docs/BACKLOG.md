@@ -1781,3 +1781,34 @@ impose les dependances de release suivantes.
 La carte historique P61 `Empilement vertical explicite` ci-dessus est remplacee
 par P61-P65 : ajouter seulement un nombre d etages ne corrigerait ni P40 ni P57.
 P44-P46 dependent desormais de P66 ; P47-P50 restent dependants de P46.
+
+#### P66-M001 - Preparation automatisee
+
+- Contrat : `docs/P66_TERRA_EXECUTION_CONTRACT.md`.
+- Livrables : fixtures complete et impossible, test de preparation, preparateur
+  PowerShell idempotent, package du commit exact, marqueurs et checklist Fusion.
+- Interdit : aucun correctif opportuniste du solveur, de l UI, des tolerances ou
+  de la geometrie pour faire passer la fixture.
+- Sortie : `gate-prepared`, jamais `fusion-validated`.
+- Statut : `ready`.
+
+#### P66-V - Gate humaine Fusion
+
+- Dependances : P66-M001 integree, suite complete et installation reelle vertes.
+- Resultat : `P66 Fusion OK` ou KO numerote avec attendu, observe et message.
+- Une seule etape KO refuse toute l acceptance et ouvre un P66-Hxx borne.
+- Statut : `blocked-by-p66-m001`.
+
+#### P66-Hxx - Hotfix conditionnel
+
+- Une cause par mission, reproduction automatisee quand possible, aucune
+  extension V0.2/V0.3 et nouvelle gate complete apres correction.
+- Statut : `conditional-on-p66-ko`.
+
+#### P66-CLOSE - Cloture V0.1
+
+- Dependances : retour humain explicite P66 OK.
+- Mettre le pilotage a `mvp-accepted`, `fusion-validated`,
+  `print-validated: false`, puis rendre seulement P44-M001 `ready`.
+- Publication/tag et debut P44 restent des decisions/missions separees.
+- Statut : `blocked-by-human-p66`.

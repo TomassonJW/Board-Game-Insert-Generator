@@ -844,3 +844,15 @@ de cavite V0.2 restent differees apres P66.
 - Package : palette 0.1.19 ; 445 tests automatises, syntaxe JS et compilation
   verts ; fusion-retest-required, print-validated: false.
 - Suite : P66-M001 de preparation automatisee, puis gate humaine P66.
+
+## P66 - Contrat de preuve et gate V0.1
+
+- C-QUALITY / C-PRODUCT-VISION : contrat d execution delegable dans
+  `docs/P66_TERRA_EXECUTION_CONTRACT.md`, sans nouvelle capability produit.
+- C-FUSION-UI / C-SOLVER / C-RESERVATION : une fixture complete doit relier
+  orientations, top insets, multi-etages, jeux separes, invalidation, scene et
+  export ; une fixture impossible doit rester non materialisable.
+- Validation : P66-M001 `ready` pour la preparation automatique ; acceptation
+  reservee a l observation humaine P66-V ; print-validated: false.
+- Releases : P44-P46 restent deferred jusqu a P66 OK ; P47-P50 restent deferred
+  jusqu a P46 OK.
