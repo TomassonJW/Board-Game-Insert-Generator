@@ -62,7 +62,7 @@ class FusionOnlyAlignmentTests(unittest.TestCase):
 
         self.assertIn("P65-M004", actions)
         self.assertIn("P66-M001", actions)
-        self.assertIn("Statut : ready apres integration de P65-M004.", actions)
+        self.assertIn("Statut : ready.", actions)
         self.assertIn("implemented", framing)
         self.assertIn("bgig.preview_explanations.v1", framing)
         self.assertIn("ne modifie jamais le plan P64", framing)

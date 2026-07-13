@@ -25,14 +25,14 @@ Aucune validation Fusion ni impression reelle n est revendiquee.
 
 ## Mission courante
 
-Aucune implementation en cours. P65-M004 est implementee et doit etre integree
-dans main avant le demarrage de P66-M001.
+Aucune implementation en cours. P65 est integree dans main ; P66-M001 est la
+prochaine mission preparee.
 
 ## Prochaine action recommandee
 
 P66-M001 - Preparation automatisee de la gate Fusion V0.1.
 
-Statut : ready apres integration de P65-M004. Produire le projet canonique, les
+Statut : ready. Produire le projet canonique, les
 CAD IR, le package installe, les marqueurs et une checklist afin de ne laisser
 a l humain que les observations dans Fusion. Aucun correctif produit ne doit
 etre anticipe avant une observation KO.
