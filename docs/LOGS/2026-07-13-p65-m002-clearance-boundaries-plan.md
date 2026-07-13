@@ -11,3 +11,7 @@ X-Y. La compatibilite copie l ancien jeu X-Y quand ce champ manque.
 La mission est adaptee a Terra tres elevee si elle reste atomique et respecte les
 cas d acceptation de NEXT_ACTIONS. Terra ne doit ni inventer un jeu inferieur, ni
 changer les defaults, ni ajouter supports/cales, ni ouvrir la refonte UX.
+
+Complement UX Fusion : les deux sketches ox_reference bottom/top doivent
+rester presents, tagues et inspectables, mais invisibles par defaut apres
+materialisation comme apres regeneration. Leur suppression reste hors scope.

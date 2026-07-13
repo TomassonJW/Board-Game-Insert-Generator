@@ -1623,7 +1623,8 @@ revendiquees ; P65 reste en cours.
 ## Plan P65-M002 - Separation des frontieres de jeu
 
 Le prochain lot distingue le perimetre X-Y de boite, l ecart X-Y entre voisins,
-l ecart Z entre etages et la marge Z superieure. Le fond reste ancre a Z=0 et le
+l ecart Z entre etages et la marge Z superieure. Il masque aussi par defaut les
+deux sketches de reference de boite sans les supprimer ni les detaguer. Le fond reste ancre a Z=0 et le
 zero reste saisissable sans devenir un nouveau default. La migration doit
 preserver les placements historiques. Le lot est docs-only a ce stade : aucun
 code ni statut de capability n est modifie.

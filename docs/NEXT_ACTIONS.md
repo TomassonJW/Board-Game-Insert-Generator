@@ -44,6 +44,9 @@ Contrat a implementer :
    `layout_clearance_mm`, afin de conserver exactement ses placements ;
 6. conserver les valeurs par defaut actuelles : le zero est autorise mais n est
    pas adopte comme nouveau default sans calibration humaine.
+7. conserver les sketches `Boite de reference - non imprimable bottom outline`
+   et `Boite de reference - non imprimable top outline`, leurs tags et leur
+   inspection, mais les masquer par defaut apres materialisation et regeneration.
 
 Acceptation automatisee obligatoire :
 
@@ -54,9 +57,12 @@ Acceptation automatisee obligatoire :
 - ancien projet normalise sans changement de resultat ;
 - politique de jeu et CAD IR exposent quatre roles non ambigus ;
 - palette Fusion affiche une seule fois les quatre libelles ;
+- les deux sketches de reference existent, restent tagues/inspectables et sont
+  invisibles par defaut apres creation comme apres regeneration ;
 - aucun corps, support ou espace imprimable automatique n est cree.
 
-Hors scope : jeu sous les bacs, supports/cales, recalibrage des valeurs, refonte
+Hors scope : suppression des sketches de reference, jeu sous les bacs,
+supports/cales, recalibrage des valeurs, refonte
 visuelle, nouvelle heuristique de solveur ou changement de formes de cavite.
 
 Instruction d autonomie : mission atomique, deux passes de review (contrat puis

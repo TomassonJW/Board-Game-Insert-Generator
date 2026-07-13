@@ -905,3 +905,11 @@ plusieurs conteneurs nommes Bac cartes sans conflit dans le planificateur Fusion
 La preuve hors Fusion couvre sept corps, sept noms techniques uniques et un
 generation_plan_from_cad_ir valide. L observation visuelle dans Fusion reste a
 faire et ne vaut pas encore fusion-validated.
+## P65-M002 planifie - Visibilite des references de boite
+
+Les sketches `Boite de reference - non imprimable bottom outline` et `Boite de
+reference - non imprimable top outline` restent des entites BGIG necessaires a
+l inspection et a la tracabilite. Ils ne sont ni supprimes ni detagues. Apres une
+materialisation ou une regeneration, leur visibilite par defaut doit etre
+inactive afin de ne pas encombrer la scene utilisateur. L inspection doit
+continuer a les identifier avec le role `box_reference`.

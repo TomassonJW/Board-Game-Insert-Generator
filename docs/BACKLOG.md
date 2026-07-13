@@ -1745,6 +1745,8 @@ impose les dependances de release suivantes.
 - P65-M002 : ready - separer les jeux boite/conteneur et inter-conteneurs :
   perimetre X-Y par cote, ecart X-Y total, ecart Z total et marge Z superieure.
   Le fond reste ancre a Z=0 ; aucune cale ou geometrie de support n est creee.
+  Les deux sketches de reference de boite restent presents et tagues, mais sont
+  masques par defaut apres materialisation et regeneration.
 - P65-M003 : planned - rapprocher minimum/cible/calculee et estimation dans
   Conteneurs, sans mutation automatique des corps explicites.
 - Restant P65 : explication compacte des sous-scores, appuis, retraits,
