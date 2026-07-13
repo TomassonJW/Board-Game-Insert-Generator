@@ -1748,21 +1748,34 @@ impose les dependances de release suivantes.
   Le fond reste ancre a Z=0 ; aucune cale ou geometrie de support n est creee.
   Les deux sketches de reference de boite restent presents et tagues, mais sont
   masques par defaut apres materialisation et regeneration.
-- P65-M003 : planned - rapprocher minimum/cible/calculee et estimation dans
-  Conteneurs, sans mutation automatique des corps explicites.
-- Restant P65 : explication compacte des sous-scores, appuis, retraits,
-  residuels et suggestions ; finition des actions d Apercu.
+- P65-M003 : ready - contrat complet dans
+  `docs/P65_M003_FUNCTIONAL_CONTRACT.md`. Distinguer minimum derive, demande
+  Auto/Cible/Fixe et taille calculee ; afficher courant/perime/partiel/impossible ;
+  ajouter `Estimer les tailles` via le vrai `solve_project`, sans mutation du
+  projet ou de Fusion. Package cible : 0.1.18. Interdits : nouvel estimateur,
+  changement de solveur/tolerance/geometrie et corps automatique.
+- P65-M004 : planned, depend de P65-M003 - traduire et condenser dans Apercu les
+  sous-scores, appuis, ordre de retrait, residuels et suggestions ; rendre
+  Materialiser/Exporter evidents sans dupliquer les actions persistantes. Les
+  formules de score et le solveur restent inchanges. Package cible indicative :
+  0.1.19.
 - Statut : `in_progress`, `fusion-retest-required`, `print-validated: false`.
 
 ### P66 - Acceptance V0.1 revisee Fusion-only
 
 - Capability : C-QUALITY, C-PRODUCT-VISION, C-FUSION-UI, C-SOLVER.
-- Dependances : P61 a P65 implementes et automatises.
+- Dependances : P61 a P65-M004 implementes et automatises.
 - Objectif : valider dans Fusion un projet reel avec plateaux encastres,
   orientations de cartes, plusieurs etages, edition/recalcul, regeneration,
   export et preservation des objets non BGIG.
 - Gate : observation humaine preparee automatiquement.
-- Statut : `blocked-by-p61-p65`, `print-validated: false`.
+- Preparation P66-M001 : construire/installer le projet canonique et sa
+  checklist ; verifier lancement, invalidation source, orientations, reservations
+  superieures, multi-etages, estimation/recalcul, materialisation/regeneration,
+  sketches caches, scene unique, preservation non-BGIG et export.
+- Correctifs : uniquement P66-Hxx bornes si une observation est KO ; aucune
+  ouverture V0.2 avant un nouveau passage vert.
+- Statut : `blocked-by-p65-m003-m004`, `print-validated: false`.
 
 La carte historique P61 `Empilement vertical explicite` ci-dessus est remplacee
 par P61-P65 : ajouter seulement un nombre d etages ne corrigerait ni P40 ni P57.

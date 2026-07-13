@@ -26,21 +26,53 @@ reelle n est revendiquee.
 
 ## Mission courante
 
-Aucune mission en cours. P65-M002 est implemente ; P65 reste en cours par increments bornes.
+Aucune implementation en cours. Le cadrage fonctionnel de P65-M003 est termine
+et la mission est `ready` dans `docs/P65_M003_FUNCTIONAL_CONTRACT.md`.
 
 ## Prochaine action recommandee
 
 P65 - Conteneurs, Reglages et Apercu integres.
 
-P65-M003 - Minimum, cible, calculee et estimation dans Conteneurs.
+P65-M003 - Tailles minimum/demandee/calculee et estimation dans Conteneurs.
 
-Statut : a cadrer avant implementation. Le prochain increment ne doit ni
-modifier automatiquement un corps explicite, ni recalibrer les tolerances, ni
-elargir les formes de cavites. Il doit expliciter une estimation non mutante et
-les dimensions minimum/cible/calculee, apres validation du parcours UX.
-## Mission suivante apres P65
+Statut : `ready`. Contrat d execution :
+`docs/P65_M003_FUNCTIONAL_CONTRACT.md`. Cible : palette Fusion 0.1.18.
 
-P66 - acceptance humaine V0.1 revisee Fusion-only, apres P65.
+Le lot doit :
+
+- distinguer le minimum derive, le contrat Auto/Cible/Fixe et la taille issue
+  du vrai plan ;
+- exposer les etats non calcule, a jour, perime, partiel et impossible ;
+- ajouter un unique CTA local `Estimer les tailles` qui reutilise
+  `solve_project`, reste dans Conteneurs et ne mute ni projet ni scene ;
+- expliquer les ecarts par axe sans code moteur au premier niveau ;
+- conserver `Recalculer` et `Materialiser dans Fusion` comme actions globales,
+  avec les gardes existantes.
+
+Interdits : nouveau solveur, nouvelle heuristique, recalibrage de tolerance,
+corps/cale/support automatique, changement de cavite ou calcul metier JS.
+
+Deux revues avant integration sont obligatoires : fonctionnelle contre les cas
+d acceptation du contrat, puis architecture/scope contre ADR-0055 et les
+exclusions du lot.
+
+## Mission suivante apres P65-M003
+
+P65-M004 - Explications et actions finales de l Apercu. Cette mission reste
+`planned` et depend de P65-M003. Elle traduira les sous-scores, appuis, ordre de
+retrait, residuels et suggestions, sans modifier leurs formules ni le solveur.
+
+## Route suivante jusqu au MVP
+
+1. P65-M003 - tailles et estimation non mutante ;
+2. P65-M004 - lisibilite finale de l Apercu ;
+3. P66-M001 - preparation automatique du projet canonique, du package et de la
+   checklist Fusion ;
+4. P66 - gate humaine unique dans Fusion ;
+5. si KO seulement, correctifs P66-Hxx bornes puis nouvelle observation.
+
+Le MVP V0.1 est accepte uniquement apres un P66 vert. La publication/tag de
+release reste une gate humaine separee ; P44 V0.2 ne s ouvre qu apres P66.
 
 ## Releases bloquees
 

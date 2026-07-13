@@ -8,7 +8,7 @@ Statut produit : **MVP V0.1 reouvert ; fondations techniques presentes, conformi
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P65-M002 integre ; P65 reste en cours avec P65-M003 a cadrer avant implementation.
+Phase active : P65-M002 integre ; P65-M003 cadre et `ready` avant implementation.
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -1635,4 +1635,26 @@ tagues et inspectables, mais sont masques par defaut a la creation comme a la
 regeneration. Preuves automatisees : 434 tests executes verts en trois lots,
 compilation Python, git diff --check et exemple CLI verts. Validation Fusion
 et impression reelle restent a realiser ; fusion-retest-required,
-print-validated: false. P65-M003 reste a cadrer.
+print-validated: false.
+
+## P65-M003 - Cadrage fonctionnel des tailles de conteneurs
+
+Le cadrage docs-only du 2026-07-13 rend P65-M003 `ready` dans
+`docs/P65_M003_FUNCTIONAL_CONTRACT.md`. Il distingue quatre informations :
+minimum derive, demande Auto/Cible/Fixe, taille calculee par le vrai plan et
+statut explicatif. Les etats non calcule, a jour, perime, partiel et impossible
+sont contractuels ; une ancienne proposition ne peut plus etre presentee comme
+courante apres modification des sources.
+
+`Estimer les tailles` est defini comme un CTA local de Conteneurs qui reutilise
+`solve_project`. Il ne cree pas de second estimateur et ne mute ni projet, ni
+scene Fusion, ni CAD materialisee. Le lot cible la palette 0.1.18 et exclut tout
+changement de solveur, score, tolerance, cavite, reservation, multi-etages ou
+corps automatique.
+
+La route restante est bornee : P65-M003, P65-M004 pour les explications finales
+d Apercu, P66-M001 pour la preparation automatique, puis gate humaine P66 dans
+Fusion. Aucun statut de capability runtime ne change avec ce cadrage docs-only.
+Preuves : 434 tests automatises verts, dont les contrats documentaires et
+Fusion-only actualises, puis `git diff --check`.
+`fusion-retest-required` et `print-validated: false` restent inchanges.

@@ -365,3 +365,36 @@ conteneurs, l ecart Z entre etages et la marge Z superieure. La CAD IR 0.1.17
 les expose sans creer de corps automatique. Les sketches de reference Fusion
 sont conserves tagues/inspectables mais caches par defaut. La validation Fusion
 et l impression reelle restent reportees a P66.
+
+## P65-M003 cadre et ready - 2026-07-13
+
+Le contrat `docs/P65_M003_FUNCTIONAL_CONTRACT.md` definit la lecture canonique
+des tailles dans Conteneurs : minimum derive, demande par axe Auto/Cible/Fixe,
+taille calculee par le vrai plan, puis statut non calcule/a jour/perime/partiel/
+impossible. Un CTA local `Estimer les tailles` reutilise `solve_project`, reste
+dans Conteneurs et ne modifie ni sources, ni scene Fusion, ni CAD materialisee.
+
+Le package cible 0.1.18 peut ajouter une projection Python de presentation et
+le rendu Compact/Detaille. Il ne peut pas ajouter de solveur, changer score,
+tolerances, cavites, reservations, etages ou creer un corps automatique.
+
+## Route bornee de P65 a l acceptation MVP
+
+1. **P65-M003 - tailles et estimation** (`ready`, cible 0.1.18) : rendre
+   minimum/demande/calculee et leurs etats explicites dans Conteneurs.
+2. **P65-M004 - explications d Apercu** (`planned`, cible indicative 0.1.19) :
+   traduire sous-scores, appuis, retraits, residuels et suggestions ; clarifier
+   les actions finales sans toucher aux formules ou au solveur.
+3. **P66-M001 - preparation automatisee** : produire le projet canonique, les
+   CAD IR, le package installe, les marqueurs et la checklist ; ne laisser a
+   l humain que les observations dans Fusion.
+4. **P66 - gate humaine Fusion-only** : verifier le parcours complet, les
+   plateaux encastres, orientations, multi-etages, edition/invalidation,
+   estimation/recalcul, materialisation/regeneration, export, scene BGIG unique
+   et preservation des objets non-BGIG.
+5. **P66-Hxx si necessaire** : corriger uniquement les ecarts observes, retester
+   automatiquement puis rejouer la gate. Aucun P44 V0.2 ne commence avant P66 OK.
+
+Un P66 vert accepte le MVP fonctionnel V0.1 avec `print-validated: false`. La
+publication ou le tag de release constitue ensuite une decision humaine separee,
+pas une excuse pour repousser l acceptation fonctionnelle du MVP.

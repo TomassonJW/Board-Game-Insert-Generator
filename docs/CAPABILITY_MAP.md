@@ -817,3 +817,18 @@ de cavite V0.2 restent differees apres P66.
   reference restent inspectables mais caches par defaut.
 - C-QUALITY : 434 tests executes verts ; fusion-retest-required,
   print-validated: false.
+
+## P65-M003 - Cadrage des tailles et de l estimation
+
+- C-FUSION-UI : mission `ready` pour rapprocher minimum, demande
+  Auto/Cible/Fixe, taille calculee et statut dans chaque carte Conteneurs.
+- C-MODULE : aucune formule ou geometrie ne change ; l identifiant stable du
+  groupe reste la cle de projection.
+- C-SOLVER : `Estimer les tailles` reutilisera le vrai `solve_project` ; aucun
+  estimateur, score ou budget de recherche supplementaire n est autorise.
+- C-QUALITY : les etats non calcule, a jour, perime, partiel et impossible sont
+  contractuels. Ce cadrage docs-only ne change aucun statut runtime ;
+  fusion-retest-required et print-validated: false.
+- Contrat : `docs/P65_M003_FUNCTIONAL_CONTRACT.md`, package cible 0.1.18.
+- Suite : P65-M004 pour les explications d Apercu, puis preparation P66-M001 et
+  gate humaine P66.
