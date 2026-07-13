@@ -244,3 +244,24 @@ non imprimable et n ajoute aucune cale ni support automatique. Le contrat d appu
 reconnait l alignement des faces separees par ce vide configure ; il ne pretend pas
 a un contact physique. Ces valeurs restent experimentales et a valider par
 impression reelle.
+## P65-M002 planifie - Frontieres boite et voisinage
+
+Le MVP doit exposer quatre roles distincts, sans les additionner deux fois :
+
+| Interface | Champ | Semantique |
+| --- | --- | --- |
+| conteneur / boite X-Y | `container_box_xy_clearance_mm` | marge par cote sur le perimetre X-Y |
+| conteneur / conteneur X-Y | `layout_clearance_mm` | ecart total entre deux corps voisins |
+| conteneur / conteneur Z | `container_z_clearance_mm` | ecart total entre deux corps empiles |
+| conteneur / boite Z haut | `box.lid_clearance_mm` | marge unique sous le haut interieur/couvercle |
+
+La face basse reste ancree a `Z=0` et ne recoit pas de jeu. Un jeu inferieur
+necessiterait une geometrie porteuse explicite et reste hors MVP. Pour conserver
+les anciens projets, l absence de `container_box_xy_clearance_mm` doit heriter de
+`layout_clearance_mm`. Le zero est une valeur saisissable, pas un nouveau default.
+
+Le solveur doit utiliser le jeu boite X-Y uniquement pour reduire son rectangle
+interieur et positionner sa premiere/derniere enveloppe. Il doit utiliser le jeu
+inter-conteneurs X-Y uniquement entre voisins. En Z, la marge superieure reduit
+la hauteur de conception une seule fois ; le jeu inter-conteneurs est reserve
+uniquement entre etages.

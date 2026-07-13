@@ -12,6 +12,8 @@ P65-M001 - jeux X-Y/Z, budget vertical et action Fusion persistante, package 0.1
 
 ## Derniere preuve automatisee
 
+Socle conserve : P64 - solveur volumetrique multi-etages.
+
 Le coeur compose des arrangements XY par etages Z et sait aussi placer un corps
 haut a cote de piles plus courtes. Les rotations sont revalidees dans leur repere
 local, les cavites conservent leur profondeur utile sous les plateaux et les noms
@@ -28,15 +30,39 @@ Aucune mission en cours. P65-M001 est implemente ; P65 reste en cours par increm
 
 P65 - Conteneurs, Reglages et Apercu integres.
 
-Increment pret : P65-M002 - Tailles et estimation lisibles dans Conteneurs.
+Increment pret : P65-M002 - Jeux boite/conteneurs et inter-conteneurs separes.
 
-Scope borne :
+Contrat a implementer :
 
-1. afficher minimum, cible et taille calculee au meme endroit ;
-2. proposer une estimation explicite sans modifier le projet ni creer de corps ;
-3. conserver Auto/Cible/Fixe et les axes extensibles comme contrat moteur ;
-4. garder les corps explicites et suggestions confirmables par l utilisateur ;
-5. ne pas ouvrir la refonte generale des styles avant le MVP.
+1. conserver `layout_clearance_mm` comme jeu X-Y total entre conteneurs ;
+2. ajouter `container_box_xy_clearance_mm`, applique par cote entre les corps et
+   les quatre parois X-Y de la boite ;
+3. conserver `container_z_clearance_mm` comme jeu Z total entre conteneurs ;
+4. reutiliser `box.lid_clearance_mm` comme jeu conteneur/boite Z au-dessus et le
+   renommer clairement dans l UI ; le fond reste ancre a Z=0 ;
+5. migrer un ancien projet sans le nouveau champ X-Y boite en copiant
+   `layout_clearance_mm`, afin de conserver exactement ses placements ;
+6. conserver les valeurs par defaut actuelles : le zero est autorise mais n est
+   pas adopte comme nouveau default sans calibration humaine.
+
+Acceptation automatisee obligatoire :
+
+- jeu boite X-Y nul avec jeu inter-conteneurs non nul ;
+- jeu boite X-Y non nul avec jeu inter-conteneurs nul ;
+- variation du jeu Z inter-conteneurs sans modifier la marge Z superieure ;
+- variation de la marge Z superieure sans modifier les espaces entre etages ;
+- ancien projet normalise sans changement de resultat ;
+- politique de jeu et CAD IR exposent quatre roles non ambigus ;
+- palette Fusion affiche une seule fois les quatre libelles ;
+- aucun corps, support ou espace imprimable automatique n est cree.
+
+Hors scope : jeu sous les bacs, supports/cales, recalibrage des valeurs, refonte
+visuelle, nouvelle heuristique de solveur ou changement de formes de cavite.
+
+Instruction d autonomie : mission atomique, deux passes de review (contrat puis
+diff/tests), suite complete verte, installation locale 0.1.17 et integration
+`direct-to-main`. Arret uniquement sur divergence de schema, regression solveur
+non bornee ou ambiguite contraire a ces invariants.
 
 ## Mission suivante apres P65
 

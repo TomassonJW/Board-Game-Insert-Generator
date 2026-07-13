@@ -480,3 +480,15 @@ technique reserve : il reduit la hauteur distribuable aux corps, apparait dans l
 origines CAD IR et ne constitue ni un PrintableBody, ni une Reservation de
 plateau, ni un etage fonctionnel supplementaire. Les etages de sortie restent les
 tranches ou au moins un corps commence.
+## P65-M002 planifie - Enveloppe de placement distincte
+
+Le solveur doit construire une enveloppe de placement X-Y de la boite en
+retirant `container_box_xy_clearance_mm` sur chacun des quatre cotes. Les corps
+sont ensuite places dans cette enveloppe avec `layout_clearance_mm` uniquement
+entre voisins. Ces deux reductions sont independantes et doivent etre validees
+separement.
+
+En Z, l origine du premier corps reste `0`. La hauteur de conception integre deja
+`box.lid_clearance_mm` au sommet ; `container_z_clearance_mm` ne s applique
+qu entre deux enveloppes empilees. Aucun intervalle de boite ne doit etre
+reclasse comme etage, reservation, support ou corps imprimable.

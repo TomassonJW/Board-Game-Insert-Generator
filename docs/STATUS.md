@@ -8,7 +8,7 @@ Statut produit : **MVP V0.1 reouvert ; fondations techniques presentes, conformi
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P65 demarre par les jeux X-Y/Z et l action Fusion persistante ; les autres finitions Conteneurs, Reglages et Apercu restent a poursuivre.
+Phase active : P65-M001 integre ; P65-M002 est cadre et ready pour separer les jeux boite/conteneurs des jeux inter-conteneurs.
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -1620,3 +1620,14 @@ Preuves automatisees : 430 tests passent. Les tests projet, solveur volumique,
 partition, CAD et palette couvrent l heritage X-Y vers Z, un cas anisotrope 0,6/1,2 mm, les origines Z, le
 parametre CAD et l unicite de l action. Validation Fusion et impression reelle non
 revendiquees ; P65 reste en cours.
+## Plan P65-M002 - Separation des frontieres de jeu
+
+Le prochain lot distingue le perimetre X-Y de boite, l ecart X-Y entre voisins,
+l ecart Z entre etages et la marge Z superieure. Le fond reste ancre a Z=0 et le
+zero reste saisissable sans devenir un nouveau default. La migration doit
+preserver les placements historiques. Le lot est docs-only a ce stade : aucun
+code ni statut de capability n est modifie.
+
+Le cadrage est borne pour une execution Terra tres elevee avec deux reviews
+obligatoires, tests complets, package 0.1.17 et integration directe dans main.
+La mission tailles/estimation devient P65-M003.

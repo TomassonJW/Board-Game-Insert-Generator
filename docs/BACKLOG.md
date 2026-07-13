@@ -1742,7 +1742,10 @@ impose les dependances de release suivantes.
   experimentales et leurs valeurs par defaut ne sont pas recalibrees.
 - P65-M001 : done - jeux X-Y/Z separes, heritage compatible, budget Z solve,
   CAD IR, palette 0.1.16 et action de materialisation persistante.
-- P65-M002 : ready - rapprocher minimum/cible/calculee et estimation dans
+- P65-M002 : ready - separer les jeux boite/conteneur et inter-conteneurs :
+  perimetre X-Y par cote, ecart X-Y total, ecart Z total et marge Z superieure.
+  Le fond reste ancre a Z=0 ; aucune cale ou geometrie de support n est creee.
+- P65-M003 : planned - rapprocher minimum/cible/calculee et estimation dans
   Conteneurs, sans mutation automatique des corps explicites.
 - Restant P65 : explication compacte des sous-scores, appuis, retraits,
   residuels et suggestions ; finition des actions d Apercu.
