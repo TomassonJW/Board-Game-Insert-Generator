@@ -366,23 +366,29 @@ les expose sans creer de corps automatique. Les sketches de reference Fusion
 sont conserves tagues/inspectables mais caches par defaut. La validation Fusion
 et l impression reelle restent reportees a P66.
 
-## P65-M003 cadre et ready - 2026-07-13
+## P65-M003 implemente et automatise - 2026-07-13
 
-Le contrat `docs/P65_M003_FUNCTIONAL_CONTRACT.md` definit la lecture canonique
+Le contrat docs/P65_M003_FUNCTIONAL_CONTRACT.md definit la lecture canonique
 des tailles dans Conteneurs : minimum derive, demande par axe Auto/Cible/Fixe,
 taille calculee par le vrai plan, puis statut non calcule/a jour/perime/partiel/
-impossible. Un CTA local `Estimer les tailles` reutilise `solve_project`, reste
+impossible. Un CTA local Estimer les tailles reutilise solve_project, reste
 dans Conteneurs et ne modifie ni sources, ni scene Fusion, ni CAD materialisee.
 
-Le package cible 0.1.18 peut ajouter une projection Python de presentation et
-le rendu Compact/Detaille. Il ne peut pas ajouter de solveur, changer score,
-tolerances, cavites, reservations, etages ou creer un corps automatique.
+La palette 0.1.18 expose la projection Python bgig.container_sizing_view.v1 :
+elle montre les minimums, demandes, tailles calculees uniquement depuis le plan,
+surplus et raisons de contrainte par axe. Estimer les tailles reutilise le
+solveur borne existant, interdit les executions concurrentes et ne materialise
+rien dans Fusion. Les tests automatises, la syntaxe de palette et le dry-run
+d installation sont verts ; la reteste Fusion reste reservee a P66.
+
+Le lot n ajoute aucun solveur, ne change ni score, tolerances, cavites,
+reservations, etages, ni corps automatique.
 
 ## Route bornee de P65 a l acceptation MVP
 
-1. **P65-M003 - tailles et estimation** (`ready`, cible 0.1.18) : rendre
-   minimum/demande/calculee et leurs etats explicites dans Conteneurs.
-2. **P65-M004 - explications d Apercu** (`planned`, cible indicative 0.1.19) :
+1. **P65-M003 - tailles et estimation** (`implemented`, 0.1.18) : minimum,
+   demande, calculee et leurs etats explicites dans Conteneurs.
+2. **P65-M004 - explications d Apercu** (`ready`, cible indicative 0.1.19) :
    traduire sous-scores, appuis, retraits, residuels et suggestions ; clarifier
    les actions finales sans toucher aux formules ou au solveur.
 3. **P66-M001 - preparation automatisee** : produire le projet canonique, les

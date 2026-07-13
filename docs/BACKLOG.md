@@ -1748,13 +1748,14 @@ impose les dependances de release suivantes.
   Le fond reste ancre a Z=0 ; aucune cale ou geometrie de support n est creee.
   Les deux sketches de reference de boite restent presents et tagues, mais sont
   masques par defaut apres materialisation et regeneration.
-- P65-M003 : ready - contrat complet dans
-  `docs/P65_M003_FUNCTIONAL_CONTRACT.md`. Distinguer minimum derive, demande
-  Auto/Cible/Fixe et taille calculee ; afficher courant/perime/partiel/impossible ;
-  ajouter `Estimer les tailles` via le vrai `solve_project`, sans mutation du
-  projet ou de Fusion. Package cible : 0.1.18. Interdits : nouvel estimateur,
+- P65-M003 : done, implemented, automated-validated,
+  fusion-retest-required - package 0.1.18. La projection Python
+  `bgig.container_sizing_view.v1` distingue minimum derive, demande
+  Auto/Cible/Fixe, taille calculee depuis le plan, surplus et raisons par axe.
+  `Estimer les tailles` reutilise `solve_project`, bloque les doubles calculs
+  et ne mute ni projet, ni scene Fusion. Interdits respectes : nouvel estimateur,
   changement de solveur/tolerance/geometrie et corps automatique.
-- P65-M004 : planned, depend de P65-M003 - traduire et condenser dans Apercu les
+- P65-M004 : ready, depend de P65-M003 integre - traduire et condenser dans Apercu les
   sous-scores, appuis, ordre de retrait, residuels et suggestions ; rendre
   Materialiser/Exporter evidents sans dupliquer les actions persistantes. Les
   formules de score et le solveur restent inchanges. Package cible indicative :
@@ -1775,7 +1776,7 @@ impose les dependances de release suivantes.
   sketches caches, scene unique, preservation non-BGIG et export.
 - Correctifs : uniquement P66-Hxx bornes si une observation est KO ; aucune
   ouverture V0.2 avant un nouveau passage vert.
-- Statut : `blocked-by-p65-m003-m004`, `print-validated: false`.
+- Statut : `blocked-by-p65-m004`, `print-validated: false`.
 
 La carte historique P61 `Empilement vertical explicite` ci-dessus est remplacee
 par P61-P65 : ajouter seulement un nombre d etages ne corrigerait ni P40 ni P57.

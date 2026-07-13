@@ -145,6 +145,7 @@ function Assert-BgigPaletteProjectRuntime {
         (Join-Path $AddinPath "lib\board_game_insert_generator\partition_solver.py"),
         (Join-Path $AddinPath "lib\board_game_insert_generator\volumetric_stage_solver.py"),
         (Join-Path $AddinPath "lib\board_game_insert_generator\partition_result_view.py"),
+        (Join-Path $AddinPath "lib\board_game_insert_generator\container_sizing_view.py"),
         (Join-Path $AddinPath "lib\board_game_insert_generator\partition_cad.py")
     )
     foreach ($requiredPath in $required) {
@@ -153,7 +154,7 @@ function Assert-BgigPaletteProjectRuntime {
         }
     }
     $palette = Get-Content -LiteralPath (Join-Path $AddinPath "palette.html") -Raw -Encoding UTF8
-    foreach ($marker in @("bgig.palette.request.v1", "1. Boite", "6. Apercu", "materialize_project", "regenerate_project", "bgig_palette_ready", "Demarrage rapide", "Corps explicites", "Dimensionnement par axe", "group-mode", "proposal_with_residuals", "technical-drawer", "solvedStale")) {
+    foreach ($marker in @("bgig.palette.request.v1", "1. Boite", "6. Apercu", "materialize_project", "regenerate_project", "bgig_palette_ready", "Demarrage rapide", "Corps explicites", "Dimensionnement par axe", "group-mode", "estimate-groups-action", "container_sizing", "proposal_with_residuals", "technical-drawer", "solvedStale")) {
         if ($palette -notlike "*$marker*") {
             throw "Installed P56 palette marker missing: $marker"
         }

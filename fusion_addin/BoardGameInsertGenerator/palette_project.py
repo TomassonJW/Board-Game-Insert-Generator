@@ -95,6 +95,7 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
     from board_game_insert_generator.partition_cad import build_partition_cad
     from board_game_insert_generator.partition_result_view import build_partition_result_view
     from board_game_insert_generator.partition_solver import solve_partition_plan
+    from board_game_insert_generator.container_sizing_view import build_container_sizing_view
     from board_game_insert_generator.personal_presets import (
         delete_personal_preset, load_personal_presets, normalize_personal_presets,
         save_personal_preset, write_personal_presets,
@@ -158,6 +159,7 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         personal_presets = imported
 
     partition = solve_partition_plan(project) if action in {"solve_project", "materialize_project", "regenerate_project"} else None
+    container_sizing = build_container_sizing_view(project, envelopes, partition)
     result_view = (
         build_partition_result_view(partition)
         if partition is not None
@@ -191,6 +193,7 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         creation_presets=creation_presets,
         personal_presets=personal_presets,
         envelopes=envelopes,
+        container_sizing=container_sizing,
         flat_stack=flat_stack,
         partition=partition,
         result_view=result_view,
@@ -210,6 +213,7 @@ def _response(
     creation_presets: dict[str, object] | None = None,
     personal_presets: dict[str, object] | None = None,
     envelopes: dict[str, object] | None = None,
+    container_sizing: dict[str, object] | None = None,
     flat_stack: dict[str, object] | None = None,
     partition: dict[str, object] | None = None,
     result_view: dict[str, object] | None = None,
@@ -241,6 +245,7 @@ def _response(
         "creation_presets": deepcopy(creation_presets),
         "personal_presets": deepcopy(personal_presets),
         "envelopes": deepcopy(envelopes),
+        "container_sizing": deepcopy(container_sizing),
         "flat_stack": deepcopy(flat_stack),
         "partition": deepcopy(partition),
         "result_view": deepcopy(result_view),

@@ -1,7 +1,7 @@
 # P65-M003 - Contrat fonctionnel des tailles de conteneurs
 
 Date de cadrage : 2026-07-13
-Statut : `ready`
+Statut : `implemented`, `automated-validated`, `fusion-retest-required`
 Release cible : palette Fusion `0.1.18`
 Capabilities : `C-FUSION-UI`, `C-MODULE`, `C-SOLVER`, `C-QUALITY`
 Dependances : P64, P65-M001 et P65-M002 integres ; ADR-0055, ADR-0059 et ADR-0060 acceptees.

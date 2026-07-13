@@ -62,6 +62,22 @@ class FusionPaletteDomTests(unittest.TestCase):
         ):
             self.assertIn(marker, self.markup)
 
+    def test_exposes_non_mutating_container_estimation_without_a_new_bridge_action(self) -> None:
+        for marker in (
+            "estimate-groups-action",
+            "Estimer les tailles",
+            "Reestimer les tailles",
+            "container_sizing",
+            "Taille calculee",
+            "Avant modification - A reestimer",
+            "Estimation deja en cours.",
+            "calculated?'Calculee '+dimText(calculated)+' | ':'')+status",
+            "sendProject('solve_project')",
+        ):
+            self.assertIn(marker, self.markup)
+        self.assertIn("estimate-groups", self.dom.actions)
+        self.assertNotIn("estimate_project", self.dom.bridge_actions)
+        self.assertIn("does_not_materialize_fusion", (ROOT / "src" / "board_game_insert_generator" / "container_sizing_view.py").read_text(encoding="utf-8"))
     def test_exposes_the_p61_lifecycle_and_keeps_healthy_inspection_out_of_global_messages(self) -> None:
         for marker in ("renderLifecycle", "scheduleDerived", "solvedStale", "Ancienne proposition", "technical_detail"):
             self.assertIn(marker, self.markup)

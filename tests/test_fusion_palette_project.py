@@ -1,4 +1,5 @@
 import json
+from copy import deepcopy
 from pathlib import Path
 import tempfile
 import unittest
@@ -77,16 +78,38 @@ class FusionPaletteProjectTests(unittest.TestCase):
         self.assertEqual(response["flat_stack"]["summary"]["status"], "not_required")
         self.assertEqual(response["flat_stack"]["flat_stack"]["semantics"], "localized_top_insets")
 
-    def test_solve_project_returns_the_p57_partition_without_saving_implicitly(self) -> None:
+    def test_validate_exposes_minimum_and_request_without_a_calculated_size(self) -> None:
         project = blank_project_v1()
         project["container_groups"] = [{"id": "g", "name": "Bac", "wall_thickness_mm": None, "floor_thickness_mm": None}]
         project["contents"] = [{"id": "c", "name": "Pieces", "shape_kind": "square", "dimensions_mm": {"x": 12, "y": 12, "z": 3}, "quantity": 2, "container_group_id": "g", "content_clearance_mm": None, "measurement_confidence": "exact"}]
         with tempfile.TemporaryDirectory() as temp_dir, patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}):
+            response = handle_palette_request(request("validate_project", project=project), ADDIN, ROOT)
+
+        sizing = response["container_sizing"]["containers"][0]
+        self.assertEqual(response["container_sizing"]["proposal_status"], "not_computed")
+        self.assertIsNotNone(sizing["minimum_outer_dimensions_mm"])
+        self.assertIsNone(sizing["calculated_outer_dimensions_mm"])
+        self.assertFalse(response["saved"])
+    def test_solve_project_returns_the_p57_partition_without_saving_implicitly(self) -> None:
+        project = blank_project_v1()
+        project["container_groups"] = [{"id": "g", "name": "Bac", "wall_thickness_mm": None, "floor_thickness_mm": None}]
+        project["contents"] = [{"id": "c", "name": "Pieces", "shape_kind": "square", "dimensions_mm": {"x": 12, "y": 12, "z": 3}, "quantity": 2, "container_group_id": "g", "content_clearance_mm": None, "measurement_confidence": "exact"}]
+        project_before = deepcopy(project)
+        with tempfile.TemporaryDirectory() as temp_dir, patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}):
             response = handle_palette_request(request("solve_project", project=project), ADDIN, ROOT)
+        self.assertEqual(project, project_before)
         self.assertEqual(response["partition"]["summary"]["status"], "constructed")
         self.assertEqual(response["partition"]["summary"]["automatic_body_count"], 0)
         self.assertEqual(response["result_view"]["source_plan_digest"], response["partition"]["plan_digest"])
         self.assertTrue(response["result_view"]["invariants"]["derived_from_real_placements"])
+        sizing = response["container_sizing"]["containers"][0]
+        self.assertEqual(response["container_sizing"]["proposal_status"], "complete")
+        self.assertEqual(sizing["container_group_id"], "g")
+        self.assertIsNotNone(sizing["minimum_outer_dimensions_mm"])
+        self.assertIsNotNone(sizing["calculated_outer_dimensions_mm"])
+        self.assertEqual(sizing["axis_contracts"]["x"]["mode"], "auto")
+        self.assertTrue(response["container_sizing"]["invariants"]["does_not_mutate_project"])
+        self.assertTrue(response["container_sizing"]["invariants"]["does_not_materialize_fusion"])
         self.assertEqual(response["lifecycle"]["derived"], "current")
         self.assertEqual(response["lifecycle"]["solved"], "current")
         self.assertEqual(response["lifecycle"]["materialized"], "not_materialized")

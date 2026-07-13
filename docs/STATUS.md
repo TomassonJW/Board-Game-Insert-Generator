@@ -1637,24 +1637,30 @@ compilation Python, git diff --check et exemple CLI verts. Validation Fusion
 et impression reelle restent a realiser ; fusion-retest-required,
 print-validated: false.
 
-## P65-M003 - Cadrage fonctionnel des tailles de conteneurs
+## P65-M003 - Tailles de conteneurs et estimation non mutante
 
-Le cadrage docs-only du 2026-07-13 rend P65-M003 `ready` dans
-`docs/P65_M003_FUNCTIONAL_CONTRACT.md`. Il distingue quatre informations :
-minimum derive, demande Auto/Cible/Fixe, taille calculee par le vrai plan et
-statut explicatif. Les etats non calcule, a jour, perime, partiel et impossible
-sont contractuels ; une ancienne proposition ne peut plus etre presentee comme
-courante apres modification des sources.
+Statut : implemented, automated-validated, fusion-retest-required,
+print-validated: false.
 
-`Estimer les tailles` est defini comme un CTA local de Conteneurs qui reutilise
-`solve_project`. Il ne cree pas de second estimateur et ne mute ni projet, ni
-scene Fusion, ni CAD materialisee. Le lot cible la palette 0.1.18 et exclut tout
-changement de solveur, score, tolerance, cavite, reservation, multi-etages ou
-corps automatique.
+Le package Fusion 0.1.18 ajoute la projection Python
+bgig.container_sizing_view.v1. Chaque conteneur est relie par son identifiant
+stable a son minimum derive, sa demande Auto/Cible/Fixe, sa taille calculee,
+son surplus, son etage et son appui. La palette n infere aucune dimension
+physique ou proposition elle-meme.
 
-La route restante est bornee : P65-M003, P65-M004 pour les explications finales
-d Apercu, P66-M001 pour la preparation automatique, puis gate humaine P66 dans
-Fusion. Aucun statut de capability runtime ne change avec ce cadrage docs-only.
-Preuves : 434 tests automatises verts, dont les contrats documentaires et
-Fusion-only actualises, puis `git diff --check`.
-`fusion-retest-required` et `print-validated: false` restent inchanges.
+Dans Conteneurs, la vue compacte affiche minimum, reglage, taille calculee et
+statut. La vue detaillee explique chaque axe, le surplus et l etage. Estimer
+les tailles appelle le solve_project existant, reste dans l onglet, ne
+sauvegarde pas et ne materialise pas Fusion. Les etats non calcule, a jour,
+perime, partiel et impossible restent distinguables. Une estimation concurrente
+est refusee.
+
+Aucun changement de solveur, score, tolerance, cavite, reservation, geometrie,
+CAD IR ou corps automatique ne fait partie de ce lot. Materialiser dans Fusion
+reste l action persistante unique et demeure bloquee sans proposition complete
+et a jour.
+
+Preuves : 440 tests automatises, syntaxe JavaScript, compilation Python,
+git diff --check et dry-run d installation Fusion verts. Validation Fusion et
+impression reelle restent a realiser en P66. P65-M004 devient la prochaine
+mission apres integration de M003.

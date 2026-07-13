@@ -62,8 +62,9 @@ class FusionOnlyAlignmentTests(unittest.TestCase):
 
         self.assertIn("P65 - Conteneurs, Reglages et Apercu integres", actions)
         self.assertIn("P65-M003", actions)
-        self.assertIn("Statut : `ready`", actions)
         self.assertIn("P65-M004", actions)
+        self.assertIn("Statut : ready apres integration de P65-M003.", actions)
+        self.assertIn("Statut : `implemented`", framing)
         self.assertIn("P66-M001", actions)
         self.assertIn("P66", actions)
         self.assertIn("solve_project", framing)

@@ -818,17 +818,17 @@ de cavite V0.2 restent differees apres P66.
 - C-QUALITY : 434 tests executes verts ; fusion-retest-required,
   print-validated: false.
 
-## P65-M003 - Cadrage des tailles et de l estimation
+## P65-M003 - Tailles et estimation des conteneurs
 
-- C-FUSION-UI : mission `ready` pour rapprocher minimum, demande
-  Auto/Cible/Fixe, taille calculee et statut dans chaque carte Conteneurs.
-- C-MODULE : aucune formule ou geometrie ne change ; l identifiant stable du
-  groupe reste la cle de projection.
-- C-SOLVER : `Estimer les tailles` reutilisera le vrai `solve_project` ; aucun
-  estimateur, score ou budget de recherche supplementaire n est autorise.
-- C-QUALITY : les etats non calcule, a jour, perime, partiel et impossible sont
-  contractuels. Ce cadrage docs-only ne change aucun statut runtime ;
-  fusion-retest-required et print-validated: false.
-- Contrat : `docs/P65_M003_FUNCTIONAL_CONTRACT.md`, package cible 0.1.18.
-- Suite : P65-M004 pour les explications d Apercu, puis preparation P66-M001 et
-  gate humaine P66.
+- C-FUSION-UI : implemented pour minimum, demande, taille calculee, statut,
+  surplus et etage dans les cartes Conteneurs Compact/Detaille. Un unique CTA
+  local Estimer les tailles reutilise solve_project.
+- C-MODULE : projection additive par identifiant stable de groupe ; aucune
+  formule de cavite ou geometrie ne change.
+- C-SOLVER : la taille calculee, les motifs par axe et le statut complete/
+  partiel/impossible sont transportes sans estimateur, score ou budget nouveau.
+- C-QUALITY : projet et scene restent inchanges par estimation ; les etats
+  perimes et les propositions partielles restent non materialisables.
+- Package : palette 0.1.18 ; 440 tests automatises, syntaxe JS, compilation et
+  dry-run Fusion verts ; fusion-retest-required, print-validated: false.
+- Suite : C-FUSION-UI/C-QUALITY par P65-M004, puis preparation P66-M001.

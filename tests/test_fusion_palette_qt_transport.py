@@ -63,7 +63,7 @@ class FusionPaletteQtTransportTests(unittest.TestCase):
 
     def test_manifest_identifies_the_bootstrap_and_launcher_fix(self) -> None:
         manifest = json.loads((ADDIN / "BoardGameInsertGenerator.manifest").read_text(encoding="utf-8"))
-        self.assertEqual(manifest["version"], "0.1.17")
+        self.assertEqual(manifest["version"], "0.1.18")
     def test_palette_opens_at_a_product_sized_minimum(self) -> None:
         self.assertEqual(entrypoint.BGIG_PALETTE_DEFAULT_WIDTH, 1280)
         self.assertEqual(entrypoint.BGIG_PALETTE_DEFAULT_HEIGHT, 1100)
