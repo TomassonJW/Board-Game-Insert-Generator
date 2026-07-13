@@ -831,4 +831,16 @@ de cavite V0.2 restent differees apres P66.
   perimes et les propositions partielles restent non materialisables.
 - Package : palette 0.1.18 ; 440 tests automatises, syntaxe JS, compilation et
   dry-run Fusion verts ; fusion-retest-required, print-validated: false.
-- Suite : C-FUSION-UI/C-QUALITY par P65-M004, puis preparation P66-M001.
+- Suite : P65-M004 implemente ; prochaine mission P66-M001 puis gate humaine P66.
+
+## P65-M004 - Explications et actions de l Apercu
+
+- C-FUSION-UI : implemented pour une projection Python de presentation du score,
+  des appuis, de l ordre de retrait, des residuels et suggestions ; export
+  imprimable primaire et aucune duplication de Recalculer ou Materialiser.
+- C-QUALITY : implemented pour les invariants de non-mutation, de score
+  inchange, d absence de corps automatique et d absence de codes solveur dans
+  le premier niveau de palette.
+- Package : palette 0.1.19 ; 445 tests automatises, syntaxe JS et compilation
+  verts ; fusion-retest-required, print-validated: false.
+- Suite : P66-M001 de preparation automatisee, puis gate humaine P66.

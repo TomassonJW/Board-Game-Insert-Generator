@@ -102,6 +102,8 @@ class FusionPaletteProjectTests(unittest.TestCase):
         self.assertEqual(response["partition"]["summary"]["automatic_body_count"], 0)
         self.assertEqual(response["result_view"]["source_plan_digest"], response["partition"]["plan_digest"])
         self.assertTrue(response["result_view"]["invariants"]["derived_from_real_placements"])
+        self.assertEqual(response["result_view"]["presentation"]["schema_version"], "bgig.preview_explanations.v1")
+        self.assertTrue(response["result_view"]["presentation"]["invariants"]["does_not_change_score"])
         sizing = response["container_sizing"]["containers"][0]
         self.assertEqual(response["container_sizing"]["proposal_status"], "complete")
         self.assertEqual(sizing["container_group_id"], "g")

@@ -8,39 +8,35 @@ V0.1 - vrai MVP Fusion-only selon ADR-0055 et rebase P60-R accepte.
 
 ## Derniere mission terminee
 
-P65-M003 - tailles minimum/demandee/calculee et estimation non mutante, palette et package 0.1.18.
+P65-M004 - explications de l Apercu et actions finales, palette et package 0.1.19.
 
 ## Derniere preuve automatisee
 
-P65-M003 ajoute bgig.container_sizing_view.v1 et la palette 0.1.18 : chaque
-conteneur expose minimum derive, demande Auto/Cible/Fixe, taille du plan et
-statut non calcule/a jour/perime/partiel/impossible. Estimer les tailles
-reutilise solve_project, ne sauvegarde pas, ne modifie pas Fusion et ne lance
-pas de solve concurrent. Aucun solveur, score, tolerance, corps ou geometrie
-n est modifie.
+P65-M004 ajoute bgig.preview_explanations.v1 au resultat Python. La palette
+traduit score comparatif, appuis, ordre de retrait, residuels et suggestions
+sans exposer de codes solveur. Exporter les imprimables est primaire dans
+Apercu ; Recalculer et Materialiser dans Fusion restent uniquement dans la
+barre persistante. Aucun score, solveur, tolerance, corps ou geometrie n est
+modifie.
 
-Preuves : 440 tests automatises verts, syntaxe JavaScript, compilation Python,
-git diff --check et dry-run d installation Fusion verts. Aucune validation
-Fusion ni impression reelle n est revendiquee.
+Preuves : 445 tests automatises verts, syntaxe JavaScript, compilation Python,
+git diff --check et dry-run d installation Fusion a relancer apres integration.
+Aucune validation Fusion ni impression reelle n est revendiquee.
+
 ## Mission courante
 
-Aucune implementation en cours. P65-M003 est implementee et doit etre integree
-dans main avant le demarrage de P65-M004.
+Aucune implementation en cours. P65-M004 est implementee et doit etre integree
+dans main avant le demarrage de P66-M001.
 
 ## Prochaine action recommandee
 
-P65 - Conteneurs, Reglages et Apercu integres.
+P66-M001 - Preparation automatisee de la gate Fusion V0.1.
 
-P65-M004 - Explications et actions finales de l Apercu.
+Statut : ready apres integration de P65-M004. Produire le projet canonique, les
+CAD IR, le package installe, les marqueurs et une checklist afin de ne laisser
+a l humain que les observations dans Fusion. Aucun correctif produit ne doit
+etre anticipe avant une observation KO.
 
-Statut : ready apres integration de P65-M003. Le lot doit traduire et
-condenser sous-scores, appuis, ordre de retrait, residuels et suggestions. Il
-doit rendre l export imprimable visible dans Apercu et conserver Materialiser
-comme action persistante unique. Il ne modifie ni formules de score, ni solveur,
-ni tolerance, ni geometrie.
-
-Enchainement deja borne : P65-M004, puis P66-M001 de preparation automatisee,
-puis la gate humaine Fusion-only P66.
 ## Releases bloquees
 
 P44 a P50 restent

@@ -14,13 +14,22 @@ class FusionPaletteResultTests(unittest.TestCase):
             self.assertIn(marker, self.markup)
 
     def test_result_exposes_user_facing_evidence_without_engine_codes(self) -> None:
-        for marker in ("final_body_count", "stage_count", "automatic_body_count", "minimum_outer_envelope_mm", "final_outer_dimensions_mm", "surplus_distribution_mm", "cavity_count", "stageSupport.minimum_coverage_ratio", "support.top_support_count", "support.coverage_ratio"):
+        for marker in ("final_body_count", "stage_count", "automatic_body_count", "minimum_outer_envelope_mm", "final_outer_dimensions_mm", "surplus_distribution_mm", "cavity_count", "view.presentation", "preview-explanations", "stageExplanation.coverage_label", "flatExplanation.coverage_label", "Ordre de retrait"):
             self.assertIn(marker, self.markup)
-        for marker in ("Score de la proposition", "Appui des etages", "Comment la proposition est-elle evaluee ?", "score_breakdown"):
+        for marker in ("Indice de comparaison", "Appui des etages", "Comment lire cet indice ?", "presentation.score"):
             self.assertIn(marker, self.markup)
         self.assertNotIn("Les deux vues ci-dessous utilisent exclusivement les placements P57", self.markup)
         self.assertNotIn("Plan ${esc(view.source_plan_digest", self.markup)
+        self.assertNotIn("supported_by_requested_bodies", self.markup)
 
+    def test_preview_actions_are_clear_without_duplicating_the_persistent_calculation_actions(self) -> None:
+        start = self.markup.index("function renderResult")
+        result_block = self.markup[start:self.markup.index("function renderPersistentActions", start)]
+
+        self.assertIn('data-fusion="export"', result_block)
+        self.assertIn("Exporter les imprimables", result_block)
+        self.assertNotIn('data-bridge="solve_project"', result_block)
+        self.assertNotIn('data-bridge="materialize_project"', result_block)
     def test_impossible_and_obsolete_states_never_show_a_fake_solution(self) -> None:
         self.assertIn("Aucune fausse solution n est affichee", self.markup)
         self.assertIn("Ancienne proposition", self.markup)

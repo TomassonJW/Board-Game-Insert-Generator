@@ -78,6 +78,14 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertIn("estimate-groups", self.dom.actions)
         self.assertNotIn("estimate_project", self.dom.bridge_actions)
         self.assertIn("does_not_materialize_fusion", (ROOT / "src" / "board_game_insert_generator" / "container_sizing_view.py").read_text(encoding="utf-8"))
+    def test_translates_preview_explanations_without_solver_codes(self) -> None:
+        for marker in (
+            "view.presentation", "preview-explanations", "Indice de comparaison",
+            "Ordre de retrait", "previewRemoval", "Exporter les imprimables",
+        ):
+            self.assertIn(marker, self.markup)
+        self.assertNotIn("supported_by_requested_bodies", self.markup)
+        self.assertNotIn("data-bridge=\"solve_project\"", self.markup[self.markup.index("function renderResult"):self.markup.index("function renderPersistentActions")])
     def test_exposes_the_p61_lifecycle_and_keeps_healthy_inspection_out_of_global_messages(self) -> None:
         for marker in ("renderLifecycle", "scheduleDerived", "solvedStale", "Ancienne proposition", "technical_detail"):
             self.assertIn(marker, self.markup)

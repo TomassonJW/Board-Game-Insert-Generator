@@ -58,18 +58,16 @@ class FusionOnlyAlignmentTests(unittest.TestCase):
 
     def test_next_action_advances_the_revised_fusion_only_mvp(self) -> None:
         actions = self.read("docs/NEXT_ACTIONS.md")
-        framing = self.read("docs/P65_M003_FUNCTIONAL_CONTRACT.md")
+        framing = self.read("docs/P65_M004_FUNCTIONAL_CONTRACT.md")
 
-        self.assertIn("P65 - Conteneurs, Reglages et Apercu integres", actions)
-        self.assertIn("P65-M003", actions)
         self.assertIn("P65-M004", actions)
-        self.assertIn("Statut : ready apres integration de P65-M003.", actions)
-        self.assertIn("Statut : `implemented`", framing)
         self.assertIn("P66-M001", actions)
-        self.assertIn("P66", actions)
-        self.assertIn("solve_project", framing)
-        self.assertIn("ne cree pas un second solveur", framing)
-        self.assertIn("palette Fusion", framing)
+        self.assertIn("Statut : ready apres integration de P65-M004.", actions)
+        self.assertIn("implemented", framing)
+        self.assertIn("bgig.preview_explanations.v1", framing)
+        self.assertIn("ne modifie jamais le plan P64", framing)
+        self.assertIn("Exporter les imprimables", framing)
+        self.assertIn("Materialiser dans Fusion", framing)
         self.assertNotIn("codex/p56-premium-editor", actions)
         self.assertNotIn("inspection visuelle runtime du frontend reel", actions)
 

@@ -384,11 +384,23 @@ d installation sont verts ; la reteste Fusion reste reservee a P66.
 Le lot n ajoute aucun solveur, ne change ni score, tolerances, cavites,
 reservations, etages, ni corps automatique.
 
+## P65-M004 implemente et automatise - 2026-07-13
+
+La palette 0.1.19 consomme bgig.preview_explanations.v1, projection Python
+additive du plan P64. Score comparatif, appuis, ordre de retrait, residuels et
+suggestions sont traduits sans formule JavaScript ni code solveur visible.
+Exporter les imprimables devient primaire dans Apercu ; Recalculer et
+Materialiser restent les actions persistantes uniques correspondantes.
+
+Le lot ne change ni solveur, score, tolerance, reservation, cavite, CAD IR,
+scene Fusion ou corps automatique. La validation Fusion et l impression reelle
+restent reservees a P66.
+
 ## Route bornee de P65 a l acceptation MVP
 
 1. **P65-M003 - tailles et estimation** (`implemented`, 0.1.18) : minimum,
    demande, calculee et leurs etats explicites dans Conteneurs.
-2. **P65-M004 - explications d Apercu** (`ready`, cible indicative 0.1.19) :
+2. **P65-M004 - explications d Apercu** (implemented, 0.1.19) :
    traduire sous-scores, appuis, retraits, residuels et suggestions ; clarifier
    les actions finales sans toucher aux formules ou au solveur.
 3. **P66-M001 - preparation automatisee** : produire le projet canonique, les

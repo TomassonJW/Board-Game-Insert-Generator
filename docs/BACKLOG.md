@@ -1755,12 +1755,12 @@ impose les dependances de release suivantes.
   `Estimer les tailles` reutilise `solve_project`, bloque les doubles calculs
   et ne mute ni projet, ni scene Fusion. Interdits respectes : nouvel estimateur,
   changement de solveur/tolerance/geometrie et corps automatique.
-- P65-M004 : ready, depend de P65-M003 integre - traduire et condenser dans Apercu les
-  sous-scores, appuis, ordre de retrait, residuels et suggestions ; rendre
-  Materialiser/Exporter evidents sans dupliquer les actions persistantes. Les
-  formules de score et le solveur restent inchanges. Package cible indicative :
-  0.1.19.
-- Statut : `in_progress`, `fusion-retest-required`, `print-validated: false`.
+- P65-M004 : done, implemented, automated-validated,
+  fusion-retest-required - package 0.1.19. bgig.preview_explanations.v1 traduit
+  score comparatif, appuis, ordre de retrait, residuels et suggestions sans
+  modifier plan, score, materialisabilite, solveur ou geometrie. Apercu ne
+  duplique ni Recalculer ni Materialiser ; Exporter les imprimables est primaire.
+- Statut : `done`, `implemented`, `automated-validated`, `fusion-retest-required`, `print-validated: false`.
 
 ### P66 - Acceptance V0.1 revisee Fusion-only
 
@@ -1776,7 +1776,7 @@ impose les dependances de release suivantes.
   sketches caches, scene unique, preservation non-BGIG et export.
 - Correctifs : uniquement P66-Hxx bornes si une observation est KO ; aucune
   ouverture V0.2 avant un nouveau passage vert.
-- Statut : `blocked-by-p65-m004`, `print-validated: false`.
+- Statut : `ready`, `fusion-retest-required`, `print-validated: false`.
 
 La carte historique P61 `Empilement vertical explicite` ci-dessus est remplacee
 par P61-P65 : ajouter seulement un nombre d etages ne corrigerait ni P40 ni P57.

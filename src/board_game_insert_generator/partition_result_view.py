@@ -6,6 +6,7 @@ from copy import deepcopy
 from typing import Any
 
 from board_game_insert_generator.partition_solver import PARTITION_PLAN_SCHEMA_V1
+from board_game_insert_generator.preview_explanations import build_preview_explanations
 
 
 PARTITION_RESULT_VIEW_SCHEMA_V1 = "bgig.partition_result_view.v1"
@@ -195,6 +196,7 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
         "residuals": deepcopy(residual_contract),
         "suggestions": deepcopy(plan.get("suggestions", [])),
         "score_breakdown": deepcopy(summary.get("score_breakdown", {})),
+        "presentation": build_preview_explanations(plan),
         "summary": deepcopy(summary),
         "diagnostics": deepcopy(plan.get("diagnostics", [])),
         "invariants": {

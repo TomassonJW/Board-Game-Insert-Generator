@@ -6,7 +6,7 @@
   "description": {
     "": "Board Game Insert Generator: autonomous Fusion palette for editing, validating and materializing a local parametric insert project. Manual Fusion validation required."
   },
-  "version": "0.1.18",
+  "version": "0.1.19",
   "runOnStartup": false,
   "supportedOS": "windows|mac",
   "editEnabled": true

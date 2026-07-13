@@ -8,7 +8,7 @@ Statut produit : **MVP V0.1 reouvert ; fondations techniques presentes, conformi
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P65-M002 integre ; P65-M003 cadre et `ready` avant implementation.
+Phase active : P65-M004 implementee et automatisee ; integration P65 puis preparation P66-M001.
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -1664,3 +1664,25 @@ Preuves : 440 tests automatises, syntaxe JavaScript, compilation Python,
 git diff --check et dry-run d installation Fusion verts. Validation Fusion et
 impression reelle restent a realiser en P66. P65-M004 devient la prochaine
 mission apres integration de M003.
+
+## P65-M004 - Explications et actions finales de l Apercu
+
+Statut : implemented, automated-validated, fusion-retest-required,
+print-validated: false.
+
+Le package Fusion 0.1.19 ajoute bgig.preview_explanations.v1 au resultat de
+partition. Cette projection Python pure traduit le score comparatif, les appuis
+d etages, l appui des plateaux/livrets, l ordre de retrait, les residuels et les
+suggestions. Elle ne modifie pas le plan, le score, les placements ni la
+materialisabilite.
+
+Apercu ne montre plus les enums de support ou les raisons internes au premier
+niveau. Les sous-criteres du score sont nommes et l aide precise que le score ne
+remplace pas une validation physique. Les residuels restent non materialises et
+les suggestions exigent une decision humaine explicite. Exporter les imprimables
+est primaire localement ; Recalculer et Materialiser dans Fusion restent uniques
+dans la barre persistante.
+
+Preuves : 445 tests automatises, syntaxe JavaScript et compilation Python verts.
+La verification de package Fusion et la gate humaine restent a rejouer apres
+integration. Aucun statut Fusion ou impression n est revendique.
