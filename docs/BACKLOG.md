@@ -1888,17 +1888,35 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
   surplus et raisons par axe dans des details secondaires replies.
 - Livrable : package 0.1.22, cartes compactes accessibles et contrat
   `docs/P44_M002_COMPACT_ACCESSIBLE_CARDS_CONTRACT.md`.
-- Statut : `done`, `implemented`, `automated-validated`,
-  `fusion-retest-required` ; `print-validated: false`.
+- Statut : `implemented`, `automated-validated`, `human-ux-ko` pour 0.1.22 ;
+  remplace pour la densite par P44-M002V2. `print-validated: false`.
+
+#### P44-M002V2 - Correction de densite technique hybride A+B
+
+- Capability : C-FUSION-UI, C-QUALITY.
+- Dependances : P44-M002 integree et retour humain KO sur 0.1.22.
+- Objectif : bandes semantiques lisibles, grilles techniques denses, dimensions
+  bornees et comportement explicite aux seuils 760/560 px.
+- Livrable : package 0.1.23 et contrat
+  `docs/P44_M002V2_TECHNICAL_CARD_DENSITY_CONTRACT.md`.
+- Statut : `implemented`, `automated-validated`,
+  `fusion-validation-required` ; `print-validated: false`.
+
+#### P44-M002V - Gate humaine de densite Fusion
+
+- Dependances : P44-M002V2 integree, package 0.1.23 installe localement.
+- Validation : cartes Asset, Plateau/livret et Conteneur a largeur normale et
+  etroite ; champs essentiels visibles et calculs secondaires replies.
+- Statut : `human-gate`, `blocks-p44-m003`.
 
 #### P44-M003 - Quatre onglets, Boite et elements plats
 
-- Dependances : P44-M002 integree.
+- Dependances : P44-M002V acceptee.
 - Objectif : renforcer les quatre onglets, supprimer Precedent/Suivant, fusionner
   Boite/plateaux/livrets, traduire l ordre de retrait et ajouter X/Y.
 - Jeux : reserver le vocabulaire et la place du futur controle, sans afficher un
   override inerte ; contrat et implementation restent P44-M008/P44-M009.
-- Statut : `ready-after-p44-m002-integration`, `no-business-change`, `fusion-retest-required`.
+- Statut : `blocked-by-p44-m002v`, `no-business-change`, `fusion-retest-required`.
 
 #### P44-M004 - Conteneurs parents, contenus enfants et modes de taille
 

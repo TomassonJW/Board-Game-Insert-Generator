@@ -8,7 +8,7 @@ Statut produit : **MVP V0.1 Fusion-only accepte ; validation d impression non ac
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P44-M002 implemented, automated-validated et fusion-retest-required ; P44-M003 devient la seule mission suivante apres integration dans main.
+Phase active : P44-M002V2 implemented et automated-validated, package 0.1.23 en preparation de gate Fusion ; P44-M003 reste bloque jusqu au retour humain P44-M002V.
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -1852,3 +1852,25 @@ exemple CLI, `compileall`, controle de frontiere `adsk` et `git diff --check`.
 Une observation Fusion reste requise avant toute promotion au-dela de
 `implemented`. P44-M003 ne devient possible qu apres integration de ce lot dans
 `main`.
+
+## P44-M002V2 - Correction de densite technique hybride A+B
+
+Statut : `implemented`, `automated-validated`, `fusion-validation-required`,
+`human-ux-rework`, `print-validated: false`.
+
+La validation humaine du package 0.1.22 a conclu a un KO de compacite reelle :
+les preuves DOM etaient trop faibles pour qualifier la densite visuelle. Ce KO
+ne remet pas en cause les garanties de focus, de bridge ou de coeur.
+
+Le package 0.1.23 remplace l empilement de champs etires par des bandes
+semantiques et une grille technique dense : identite, dimensions, options,
+placement et solidite. Les champs numeriques sont bornes sur palette large,
+restent groupes en 2 x 2 sous 560 px et les cibles interactives conservent
+40 px. Prise/tolerances, Placement/ordre et Solidite restent visibles ; seules
+les explications et valeurs calculees secondaires sont repliees.
+
+Aucun schema, loader, bridge metier, solveur, tolerance, geometrie, CAD IR ou
+scene Fusion n est modifie. Preuves : 455 tests, syntaxe JavaScript, exemple
+CLI, compileall, frontiere `adsk` et diff-check passes. P44-M003 reste bloque
+jusqu au retour humain exact
+`P44-M002V Fusion OK 0.1.23 - commit <sha>`.

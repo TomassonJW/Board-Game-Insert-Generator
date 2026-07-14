@@ -960,3 +960,19 @@ de cavite V0.2 restent differees apres P66.
   `adsk` et diff-check passes ; observation Fusion encore requise.
   `print-validated: false`.
 - Suite : P44-M003 seulement apres integration P44-M002 dans `main`.
+
+## P44-M002V2 - Densite technique corrective
+
+- C-FUSION-UI : `implemented`, `automated-validated`,
+  `fusion-validation-required` pour la palette 0.1.23.
+- Le KO humain 0.1.22 est conserve comme preuve que la seule presence de grilles
+  responsives ne suffit pas a qualifier la compacite.
+- L hybride A+B combine bandes semantiques et grille technique dense, avec
+  nombres bornes, cibles de 40 px, sections essentielles visibles et calculs
+  secondaires replies.
+- C-QUALITY : contrats DOM aux seuils 760/560 px, syntaxe JavaScript, suite
+  complete (455 tests), exemple CLI, compileall, frontiere `adsk` et
+  diff-check passes.
+- Aucun changement de schema, calcul, tolerance, geometrie ou scene Fusion.
+- Suite : P44-M003 reste `blocked-by-p44-m002v` jusqu a validation humaine du
+  package 0.1.23. `print-validated: false`.

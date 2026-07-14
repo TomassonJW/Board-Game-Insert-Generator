@@ -151,3 +151,25 @@ declaree universelle.
 
 P45, P46, P47-P50 et P69 restent bloques par leurs dependances.
 `print-validated: false` reste obligatoire.
+
+## P44-M002V - Densite technique 0.1.23
+
+Declencheur : le package 0.1.22 a passe les preuves automatisees mais a recu un
+KO humain de compacite reelle.
+
+Etat actuel : P44-M002V2 implemente l hybride A+B dans la palette 0.1.23, sans
+changement metier. Les tests automatises peuvent prouver la structure, les
+seuils responsives et la permanence des controles, mais pas le confort final
+dans la palette Fusion.
+
+Validation demandee : verifier a largeur normale et etroite au moins une carte
+Asset, une carte Plateau/livret et une carte Conteneur. Confirmer que les bandes
+sont denses et lisibles, que X/Y/Z/quantite restent groupes, que Placement,
+Prise/tolerances et Solidite restent visibles, et que les calculs secondaires
+sont replies.
+
+Retour OK attendu :
+`P44-M002V Fusion OK 0.1.23 - commit <sha>`
+
+Un KO doit nommer la carte, la largeur approximative et le probleme observe.
+P44-M003 reste bloque tant que cette gate n est pas fermee.

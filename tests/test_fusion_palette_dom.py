@@ -54,13 +54,35 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertNotIn('data-action="add-complement-preset"', self.markup)
         self.assertNotIn('id="complement-presets"', self.markup)
 
-    def test_compacts_cards_without_hiding_essential_controls(self) -> None:
+    def test_compacts_cards_as_dense_responsive_technical_bands(self) -> None:
         self.assertNotIn(".density-compact .row-details{display:none}", self.markup)
         for marker in (
-            ".row-details .grid{grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}",
-            ".row-details .grid.three{grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:8px}",
-            ".row-actions button{min-width:40px;min-height:40px}",
-            'class="strength-fields"', "<h4>Solidite</h4>",
+            ".dimension-strip{grid-template-columns:repeat(3,minmax(80px,104px)) minmax(72px,88px)",
+            ".axis-control{display:grid;grid-template-columns:minmax(80px,.8fr) minmax(92px,1fr)",
+            ".row-actions button{min-width:40px;min-height:40px",
+            "@media(max-width:759px)", "@media(max-width:559px)",
+            ".dimension-strip{grid-template-columns:repeat(2,minmax(80px,112px))}",
+            'class="card row-card technical-card content-card"',
+            'class="card row-card technical-card flat-card"',
+            'class="card row-card technical-card group-card"',
+            'class="card technical-card box-card"',
+            'class="essential-strip tolerance-fields"',
+            'class="essential-strip placement-fields"',
+            'class="essential-strip strength-fields"',
+            ".density-compact .technical-card .compact-summary{display:none}",
+        ):
+            self.assertIn(marker, self.markup)
+
+    def test_keeps_essential_sections_visible_and_calculations_collapsed(self) -> None:
+        for forbidden in (
+            '<details class="local-details"><summary>Prise et tolerances',
+            '<details class="local-details"><summary>Placement et ordre',
+            '<details class="local-details"><summary>Solidite',
+        ):
+            self.assertNotIn(forbidden, self.markup)
+        for marker in (
+            "<h4>Prise et tolerances</h4>", "<h4>Placement et ordre</h4>",
+            "<h4>Solidite</h4>", "guidance-details",
             "document.createElement('details')",
             "section.className='container-sizing local-details calculated-details'",
             "summary.textContent='Details calcules'",

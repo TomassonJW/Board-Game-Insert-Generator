@@ -7,43 +7,47 @@ Derniere mise a jour : 2026-07-14
 V0.1 - MVP Fusion-only `mvp-accepted` par P66, package 0.1.20 au commit
 `6e351bb`. `fusion-validated: true`, `print-validated: false`.
 
-## Derniere mission terminee
+## Requalification humaine
 
-P44-M002 - densite compacte et hierarchie de carte, package 0.1.22.
+P44-M002, package 0.1.22, est `implemented` et `automated-validated`, mais
+`human-ux-ko` sur la compacite reelle. Les garanties de focus, bridge et coeur
+restent valides ; sa densite est remplacee par P44-M002V2.
+
+## Derniere mission implementee
+
+P44-M002V2 - correction de densite technique hybride A+B, package 0.1.23.
 
 ## Derniere preuve
 
-Le mode Compact conserve les champs editables des cartes, avec des grilles
-adaptees, des titres renforces et des actions de carte de 40 px minimum.
-`Solidite` est visible en permanence ; `Details calcules` replie taille,
-etage, appui, surplus et raisons de conteneur. Les 454 tests, la syntaxe JS,
-l exemple CLI, `compileall`, le controle `adsk` et le diff-check passent ; la
-validation Fusion reste a rejouer.
+Les cartes utilisent des bandes semantiques et une grille dense : dimensions
+bornees, seuils 760/560 px, cibles de 40 px, sections essentielles visibles et
+calculs secondaires replies. Les 455 tests, la syntaxe JavaScript, l exemple
+CLI, `compileall`, la frontiere `adsk` et le diff-check passent. La validation
+Fusion humaine n est pas acquise.
 
 ## Mission courante
 
-Aucune implementation en cours. P44-M002 est `implemented`,
-`automated-validated`, `fusion-retest-required` et integree dans `main`.
+P44-M002V - gate humaine de densite du package 0.1.23.
+
+Statut : `human-gate`, `blocks-p44-m003`.
+Action Codex : installer et verifier le package local.
+Action humaine : observer les cartes a largeur normale et etroite dans Fusion.
 
 ## Prochaine action recommandee
 
-P44-M003 - quatre onglets, Boite et elements plats.
+Retour attendu :
+`P44-M002V Fusion OK 0.1.23 - commit <sha>`
 
-Statut : `ready-after-p44-m002-integration`, `no-business-change`,
-`fusion-retest-required`.
-Dependance : P44-M002 integree dans `main`.
-
-Objectif : passer a quatre onglets, supprimer Precedent/Suivant, fusionner
-Boite/plateaux/livrets, traduire l ordre de retrait et ajouter le bouton X/Y.
-Aucun jeu par objet, schema, solveur, tolerance, geometrie, scene automatique
-ou complement ne sera modifie.
+En cas de KO, indiquer la carte, la largeur approximative et le probleme.
+P44-M003 ne doit pas commencer avant ce retour OK.
 
 ## Missions suivantes bloquees
 
-P44-M004 a P44-M007 restent bloquees par leur sequence. P44-M008 doit cadrer
-les jeux herites et overrides X/Y/Z par objet, puis obtenir une gate humaine de
-tolerance avant P44-M009. P45/P46 ne commencent pas avant P44-V ; P47-P50
-restent bloques jusqu a P46 ; P69 reste bloque jusqu a P50.
+P44-M003 est `blocked-by-p44-m002v`. P44-M004 a P44-M007 restent bloquees par
+leur sequence. P44-M008 doit cadrer les jeux herites et overrides X/Y/Z par
+objet, puis obtenir une gate humaine de tolerance avant P44-M009. P45/P46 ne
+commencent pas avant P44-V ; P47-P50 restent bloques jusqu a P46 ; P69 reste
+bloque jusqu a P50.
 
 P68 reste `planned-after-p66` et peut recueillir des observations reelles sans
 modifier les defaults. `print-validated: false` reste obligatoire.

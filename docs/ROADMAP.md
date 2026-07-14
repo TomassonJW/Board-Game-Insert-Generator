@@ -497,3 +497,13 @@ P67 devient `ready` comme atelier humain de priorisation ; P68 reste
 `planned-after-p66`. P44-P50 conservent leurs identifiants et restent bloques
 jusqu aux decisions P67 et aux dependances V0.2/V0.3. Aucun tag ou release ne
 resulte de cette acceptance.
+
+## P44-M002V2 - Correction avant poursuite de la fondation UX - 2026-07-14
+
+Le package 0.1.22 reste trace comme implementation automatisee mais recoit un KO
+UX humain sur la compacite. La trajectoire P44 est donc interrompue avant
+P44-M003 pour une correction bornee hybride A+B dans le package 0.1.23.
+
+P44-M003 ne redevient disponible qu apres la gate humaine P44-M002V. Aucun
+schema, solveur, tolerance, geometrie, complement ou scene Fusion ne change dans
+cette correction. Cette requalification protege la sequence UX avant geometrie.

@@ -1,10 +1,16 @@
 # P44-M002 - Densite compacte et hierarchie de carte
 
 Date de cadrage : 2026-07-14
-Statut : `implemented`, `automated-validated`, `fusion-retest-required`
+Statut : `implemented`, `automated-validated`, `human-ux-ko`, `superseded-for-density-by-p44-m002v2`
 Package cible : palette Fusion `0.1.22`
 Capabilities : `C-FUSION-UI`, `C-QUALITY`
 Dependance : P44-M001 integree dans `main`.
+
+## Decision de validation humaine
+
+Le package 0.1.22 a passe les controles automatises mais n a pas atteint la
+compacite attendue dans Fusion. Ce contrat reste une trace historique ; la
+correction normative est P44-M002V2, package 0.1.23.
 
 ## 1. But du lot
 
