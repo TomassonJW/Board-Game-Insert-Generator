@@ -1,6 +1,6 @@
 # Contrat d acceptation du MVP V0.1 Fusion-only
 
-Statut : actif selon ADR-0055.
+Statut : `mvp-accepted`, P66 Fusion OK 0.1.20, commit `6e351bb`, `fusion-validated`, `print-validated: false`.
 
 ## Regle de sortie
 

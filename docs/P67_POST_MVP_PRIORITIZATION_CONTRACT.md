@@ -1,6 +1,6 @@
 # P67 - Atelier humain de priorisation post-MVP
 
-Statut : `blocked-by-p66`, `human-review-required`, `no-runtime-change`.
+Statut : `ready`, `human-review-required`, `no-runtime-change`.
 
 ## Objectif
 

@@ -1,16 +1,19 @@
 # P66 - Gate humaine Fusion 360 du MVP V0.1
 
-Statut : `human-fusion-observation-required`, `gate-prepared`,
-`fusion-validated: false`, `print-validated: false`.
+Statut : `mvp-accepted`, `fusion-validated: true`, `print-validated: false`.
 
-Cette checklist est la seule action restante après
-`scripts/fusion/prepare_p66_mvp_acceptance.ps1`. Elle se déroule uniquement dans
-l add-in Fusion 360 installé : aucun navigateur, serveur, Vite ou script à
-lancer manuellement n est requis.
+Cette checklist archive la gate P66-V observee dans l add-in Fusion 360 ; aucun navigateur, serveur, Vite ou script utilisateur n a ete requis.
 
-Le package attendu est `0.1.20`. Le commit observé est celui écrit dans
-`bgig_installed_commit.txt` par le préparateur. Cette préparation ne constitue
-pas une validation Fusion ni une validation d impression.
+Le package observe est `0.1.20`, commit `6e351bb`. La validation Fusion est acquise pour le MVP V0.1, tandis que `print-validated: false` reste obligatoire.
+## Resultat humain enregistre
+
+Le 2026-07-14, Thomas a retourne exactement :
+
+```text
+P66 Fusion OK 0.1.20 - commit 6e351bb
+```
+
+Le MVP V0.1 Fusion-only est accepte. P67 devient `ready`; P44 reste bloque jusqu a la decision P67 et `print-validated` reste faux.
 
 ## Repères attendus avant observation
 

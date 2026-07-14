@@ -4,11 +4,11 @@ Derniere mise a jour : 2026-07-14
 
 ## Etat global
 
-Statut produit : **MVP V0.1 reouvert ; fondations techniques presentes, conformite produit non acceptee**.
+Statut produit : **MVP V0.1 Fusion-only accepte ; validation d impression non acquise**.
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P66-M001 terminee ; P66-V est la gate humaine Fusion active.
+Phase active : P66-CLOSE termine ; P67 est ready pour la priorisation humaine post-MVP.
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -1689,9 +1689,8 @@ sont verifies. La gate humaine Fusion et l impression restent a realiser.
 
 ## P66 - Quarantaine, preuve et fermeture du MVP V0.1
 
-Statut : `P66-M000 done`, `implemented`, `automated-validated`,
-`fusion-retest-required`, `P66-M001 ready`, `human-fusion-gate-required`,
-`print-validated: false`.
+Statut : `P66-M000 done`, `P66-M001 done`, `P66-V accepted`, `P66-CLOSE done`,
+`mvp-accepted`, `fusion-validated`, `print-validated: false`.
 
 Le contrat `docs/P66_TERRA_EXECUTION_CONTRACT.md` borne la suite. P66-M000 retire
 le parcours normal de creation de Bac vide, Bloc plein / cale et Separateur, et
@@ -1736,3 +1735,19 @@ fois, installe atomiquement la fixture puis ecrit le commit et un rapport de
 preflight. La suite complete, compileall, diff-check, controle adsk, dry-run et
 installation reelle sont les preuves requises avant P66-V. Aucune validation
 Fusion ou impression n est declaree.
+
+## P66-CLOSE - MVP V0.1 accepte dans Fusion
+
+Statut : `done`, `mvp-accepted`, `fusion-validated`,
+`print-validated: false`.
+
+Retour humain recu le 2026-07-14 : `P66 Fusion OK 0.1.20 - commit 6e351bb`.
+Le package 0.1.20 et le commit `6e351bbd652ebdf496e7e53060d0d18dda7c6b57`
+ont ete prepares et observes pour le parcours P66. Le MVP V0.1 Fusion-only est
+accepte : palette, projet, calcul, invalidation, materialisation, regeneration,
+export et preservation non-BGIG ont passe la gate humaine.
+
+Cette acceptance ne deduit aucune validation d impression, de tolerance
+physique, de resistance, d ergonomie V0.2 ou de couvercle V0.3. Aucun tag ou
+release n est publie. P67 est `ready` pour arbitrer humainement P44-P50 ; P68
+reste `planned-after-p66` et P44-M001 reste bloque jusqu a cette decision.

@@ -194,7 +194,7 @@ class P66AcceptancePreparationTests(unittest.TestCase):
         self.assertEqual(result["summary"]["automatic_body_count"], 0)
         self.assertGreater(result["summary"]["candidate_count_evaluated"], 50)
 
-    def test_preparer_package_and_human_gate_are_explicit(self) -> None:
+    def test_preparer_package_and_recorded_human_gate_are_explicit(self) -> None:
         prepare = PREPARE_SCRIPT.read_text(encoding="utf-8")
         checker = CHECK_SCRIPT.read_text(encoding="utf-8")
         document = ACCEPTANCE_DOC.read_text(encoding="utf-8")
@@ -213,7 +213,8 @@ class P66AcceptancePreparationTests(unittest.TestCase):
         self.assertIn("manifestText", checker)
         self.assertNotIn("ConvertFrom-Json", checker)
         self.assertEqual(manifest["version"], "0.1.20")
-        self.assertIn("human-fusion-observation-required", document)
+        self.assertIn("mvp-accepted", document)
+        self.assertIn("P66 Fusion OK 0.1.20 - commit 6e351bb", document)
         self.assertIn("P66 Fusion OK 0.1.20 - commit <sha>", document)
         self.assertIn("P66 NON BGIG - KEEP", document)
         self.assertIn("print-validated: false", document)

@@ -855,9 +855,9 @@ de cavite V0.2 restent differees apres P66.
 - C-SOLVER / C-RESERVATION : aucun changement de solveur, tolerance, geometrie
   ou semantique future ; les complements explicites historiques restent sans
   creation automatique.
-- Validation : P66-M000 `done`, `automated-validated` (446 tests, syntaxe JS,
-  compilation Python et diff-check) ; P66-M001 `ready`. L acceptation reste
-  reservee a l observation humaine P66-V ; print-validated: false.
+- Validation : P66-M000 et P66-M001 `done`, puis P66-V accepte humainement
+  le 2026-07-14 (package 0.1.20, commit `6e351bb`) ; `mvp-accepted`,
+  `fusion-validated`, `print-validated: false`.
 - Releases : P44-P46 restent deferred jusqu a P66 puis P67 ; P47-P50 restent
   deferred jusqu a P46 ; P69 reste bloquee jusqu a P50.
 ## P67-P69 - Pilotage humain et apprentissage post-MVP
@@ -879,5 +879,15 @@ de cavite V0.2 restent differees apres P66.
   complements historiques restent compatibles sans creation nouvelle.
 - C-SOLVER / C-RESERVATION : `implemented-cad-ir`, aucune formule, tolerance,
   geometrie ni semantique produit n est modifiee par P66-M001.
-- Gate : P66-V reste l unique observation humaine requise pour le MVP ;
-  `fusion-validated: false`, `print-validated: false`.
+- Gate : P66-V est acceptee humainement ; le MVP est `mvp-accepted`, `fusion-validated`, `print-validated: false`.
+
+## P66-CLOSE - Acceptance Fusion V0.1
+
+- C-PRODUCT-VISION / C-QUALITY / C-FUSION-UI : `mvp-accepted`,
+  `fusion-validated` pour le parcours Fusion-only observe par Thomas le
+  2026-07-14, package 0.1.20, commit `6e351bb`.
+- C-SOLVER / C-RESERVATION : les preuves automatees et la gate humaine
+  confirment le comportement V0.1 sans requalifier les tolerances ou la
+  geometrie physique.
+- Limite : `print-validated: false` ; aucune capability V0.2/V0.3 n est
+  promue. P67 est `ready`, P68 reste `planned-after-p66`, P44 reste bloque.

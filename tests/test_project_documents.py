@@ -73,7 +73,7 @@ REQUIRED_SECTIONS = {
         "## Tests et verifications connus",
     ),
     "docs/NEXT_ACTIONS.md": (
-        "## Gate humaine active",
+        "## Prochaine action recommandee",
         "## Fin de chaque mission",
     ),
     "docs/BACKLOG.md": (

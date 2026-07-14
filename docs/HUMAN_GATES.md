@@ -118,3 +118,14 @@ Risques techniques, produit, validation et maintenance.
 
 Decision concrete attendue de l'humain.
 ```
+
+## P66 accepte - 2026-07-14
+
+Thomas a confirme `P66 Fusion OK 0.1.20 - commit 6e351bb`. La gate P66 est
+fermee : le MVP V0.1 Fusion-only est `mvp-accepted` et `fusion-validated`.
+Cette decision ne qualifie pas l impression : `print-validated: false`.
+
+P67 est maintenant `ready` pour la priorisation humaine post-MVP. Il peut seul
+rendre P44-M001 `ready`; P44-P50 restent bloques jusque-la. P68 demeure une
+boucle de retours volontaires `planned-after-p66`. Aucun tag ou release n est
+autorise par cette gate seule.

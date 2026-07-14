@@ -407,7 +407,7 @@ restent reservees a P66.
 2. **P65-M004 - explications d Apercu** (`implemented`, 0.1.19) : traduire
    sous-scores, appuis, retraits, residuels et suggestions ; clarifier les
    actions finales sans toucher aux formules ou au solveur.
-3. **P66-M000 - quarantaine des complements** (`ready`, cible 0.1.20) : masquer
+3. **P66-M000 - quarantaine des complements** (`done`, 0.1.20) : masquer
    les actions normales Bac vide, Bloc plein / cale et Separateur, conserver la
    compatibilite historique et ne changer ni solveur ni geometrie.
 4. **P66-M001 - preparation automatisee** : produire le projet canonique sans
@@ -455,3 +455,12 @@ leurs preuves deterministes, le preflight CAD/Fusion, l installation du package
 la geometrie restent inchanges. P66-V est la prochaine et unique action : elle
 reste humaine, `fusion-validated: false`, `print-validated: false`. P67 et P44
 ne demarrent pas avant le retour P66 OK explicite.
+
+## P66-CLOSE - MVP V0.1 accepte - 2026-07-14
+
+Thomas a retourne `P66 Fusion OK 0.1.20 - commit 6e351bb`. Le MVP Fusion-only
+V0.1 est donc `mvp-accepted`, `fusion-validated`, `print-validated: false`.
+P67 devient `ready` comme atelier humain de priorisation ; P68 reste
+`planned-after-p66`. P44-P50 conservent leurs identifiants et restent bloques
+jusqu aux decisions P67 et aux dependances V0.2/V0.3. Aucun tag ou release ne
+resulte de cette acceptance.

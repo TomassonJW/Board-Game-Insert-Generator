@@ -4,53 +4,44 @@ Derniere mise a jour : 2026-07-14
 
 ## Version active
 
-V0.1 - vrai MVP Fusion-only selon ADR-0055 et rebase P60-R accepte.
+V0.1 - MVP Fusion-only `mvp-accepted` par P66, package 0.1.20 au commit `6e351bb`.
+`fusion-validated: true`, `print-validated: false`.
 
 ## Derniere mission terminee
 
-P66-M001 - preparation automatisee de la gate Fusion MVP, package 0.1.20.
+P66-CLOSE - acceptation humaine Fusion du MVP V0.1 et cloture du pilotage P66.
 
-## Derniere preuve automatisee
+## Derniere preuve
 
-La fixture canonique P66 est deterministe : 8 corps demandes, 0 complement, 0
-corps automatique, 2 etages, 2 reservations superieures et 7 coupes localisees.
-La fixture impossible reste bloquee par `CONTAINER_MINIMUM_BLOCKED`, sans CAD ni
-materialisation. Le bridge, le round-trip, les axes Auto/Cible/Fixe, le CAD IR,
-le plan Fusion compact et le cas automatise de 50 conteneurs sont testes.
+Thomas a retourne le 2026-07-14 :
 
-Le preparateur P66 lance ces preuves, construit les artefacts temporaires,
-installe le package 0.1.20 du commit exact, preserve une sauvegarde utilisateur
-unique, ecrit le marqueur de commit et fournit la checklist humaine. Aucun
-solveur, tolerance, geometrie, complement automatique ni validation Fusion ou
-impression n est revendique.
+```text
+P66 Fusion OK 0.1.20 - commit 6e351bb
+```
+
+Cette observation accepte le parcours Fusion-only V0.1 : palette, recalcul,
+materialisation, regeneration, export et preservation non-BGIG. Elle ne valide
+ni impression, ni mesures physiques, ni ergonomie V0.2, ni couvercles V0.3.
 
 ## Mission courante
 
-Aucune implementation en cours. P66-M001 est terminee ; seule la gate humaine
-P66-V reste active.
+Aucune implementation en cours. P67 est maintenant `ready` : atelier humain de
+priorisation post-MVP, sans modification runtime.
 
 ## Prochaine action recommandee
 
-P66-V - Observation humaine Fusion-only selon
-`docs/P66_FUSION_MVP_ACCEPTANCE.md`, etapes 1 a 21.
+P67 - Atelier humain de priorisation selon
+`docs/P67_POST_MVP_PRIORITIZATION_CONTRACT.md`.
 
-Statut : `human-fusion-gate-required`, `gate-prepared`,
-`fusion-validated: false`, `print-validated: false`.
+Statut : `ready`, `human-review-required`, `no-runtime-change`.
+P67 doit prioriser P44-P50, decider du devenir des complements et autoriser ou
+refuser explicitement P44-M001. Ne pas commencer P44 pendant la revue.
 
-Retour attendu : `P66 Fusion OK 0.1.20 - commit <sha>` ou
-`P66 Fusion KO - etape <n> - attendu <...> - observe <...> - message <...>`.
-Un KO ouvre seulement un P66-Hxx borne. Ne commencer ni P67 ni P44.
+## Releases et lots bloques
 
-## Releases bloquees
-
-P44-P46 restent bloques jusqu a P66 OK puis acceptation humaine P67. P47-P50
-restent bloques jusqu a P46. P68 recueille des observations physiques sans
-changer les defaults ; P69 reste bloque jusqu a P50.
-
-## Gate humaine active
-
-P66-V demande une observation Fusion preparee automatiquement. Apres P66 OK,
-P67 est la gate humaine de priorisation avant toute implementation P44.
+P68 reste `planned-after-p66`, `print-validated: false`. P44-P46 restent
+bloques jusqu a une decision humaine P67 ; P47-P50 restent bloques jusqu a P46 ;
+P69 reste bloque jusqu a P50. Aucun tag ou release n est publie par P66-CLOSE.
 
 ## Fin de chaque mission
 

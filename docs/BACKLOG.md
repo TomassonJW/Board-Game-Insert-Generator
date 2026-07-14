@@ -1775,7 +1775,7 @@ impose les dependances de release suivantes.
   sans complement ainsi que sa checklist.
 - Correctifs : uniquement P66-Hxx bornes si une observation est KO ; aucune
   ouverture V0.2 avant un nouveau passage vert puis l atelier humain P67.
-- Statut : `gate-prepared`, `human-fusion-gate-required`, `print-validated: false`.
+- Statut : `done`, `mvp-accepted`, `fusion-validated`, `print-validated: false`.
 
 La carte historique P61 `Empilement vertical explicite` ci-dessus est remplacee
 par P61-P65 : ajouter seulement un nombre d etages ne corrigerait ni P40 ni P57.
@@ -1805,14 +1805,13 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
 - Interdit : aucun correctif opportuniste du solveur, de l UI, des tolerances ou
   de la geometrie pour faire passer la fixture.
 - Sortie : `gate-prepared`, jamais `fusion-validated`.
-- Statut : `done`, `automated-validated`, `gate-prepared`,
-  `human-fusion-gate-required`, `print-validated: false`.
+- Statut : `done`, `automated-validated`, `gate-prepared`, `p66-v-accepted`, `print-validated: false`.
 #### P66-V - Gate humaine Fusion
 
 - Dependances : P66-M001 integree, suite complete et installation reelle vertes.
 - Resultat : `P66 Fusion OK` ou KO numerote avec attendu, observe et message.
 - Une seule etape KO refuse toute l acceptance et ouvre un P66-Hxx borne.
-- Statut : `blocked-by-human-p66`.
+- Statut : `done`, `fusion-validated`, `print-validated: false`.
 
 #### P66-Hxx - Hotfix conditionnel
 
@@ -1827,7 +1826,7 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
   `print-validated: false`, rendre P67 `ready` et P68 `planned-after-p66`.
 - Ne rendre aucune mission P44 `ready` avant la decision humaine P67.
 - Publication/tag et debut P44 restent des decisions/missions separees.
-- Statut : `blocked-by-human-p66`.
+- Statut : `done`, `mvp-accepted`, `fusion-validated`, `print-validated: false`.
 
 ### P67 - Atelier humain de priorisation post-MVP
 
@@ -1841,7 +1840,7 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
 - Sortie : P44-M001 peut devenir `ready` seulement apres acceptation du compte
   rendu P67 ; P67 ne remplace pas la revue UI/UX exhaustive P69.
 - Contrat : `docs/P67_POST_MVP_PRIORITIZATION_CONTRACT.md`.
-- Statut : `blocked-by-p66`.
+- Statut : `ready`, `human-review-required`, `no-runtime-change`.
 
 ### P68 - Boucle de premiers inserts reels
 
