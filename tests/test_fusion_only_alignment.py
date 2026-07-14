@@ -60,10 +60,11 @@ class FusionOnlyAlignmentTests(unittest.TestCase):
         actions = self.read("docs/NEXT_ACTIONS.md")
         framing = self.read("docs/P44_M001_UI_STATE_STABILITY_CONTRACT.md")
 
-        self.assertIn("P67-V", actions)
         self.assertIn("P44-M001", actions)
+        self.assertIn("implemented", actions)
+        self.assertIn("P44-M002", actions)
         self.assertIn("mvp-accepted", actions)
-        self.assertIn("Statut : `ready`, `no-business-change`, `fusion-retest-required`.", actions)
+        self.assertIn("Statut : `ready-after-p44-m001-integration`, `no-business-change`,", actions)
         self.assertIn("Package cible : palette Fusion `0.1.21`", framing)
         self.assertIn("focus", framing)
         self.assertIn("reponse asynchrone obsolete", framing)

@@ -122,6 +122,21 @@ class FusionPaletteDomTests(unittest.TestCase):
             self.markup.index('data-bridge="solve_project">Recalculer</button><button id="materialize-action"'),
             self.markup.index('<div class="action-zone center">'),
         )
+    def test_preserves_interaction_state_with_stable_identifiers_and_rejects_stale_derivations(self) -> None:
+        for marker in (
+            "sourceRevision", "stampUiIdentifiers", "captureUiState", "restoreUiState",
+            "data-object-id", "uiField", "uiDetails", "selectionStart",
+            "scrollTop", "requestAnimationFrame", "data-ui-active-card",
+        ):
+            self.assertIn(marker, self.markup)
+        self.assertIn("item?.id", self.markup)
+        self.assertIn("pendingRequest?.derived&&pendingRequest.sourceRevision!==sourceRevision", self.markup)
+        self.assertIn("derived:quiet||['validate_project','solve_project'].includes(action),sourceRevision", self.markup)
+        self.assertIn("renderAll({preserve:!(['load_project','import_project'].includes(action)||bootstrap)})", self.markup)
+        self.assertIn("if(['load_project','import_project'].includes(action)||bootstrap)sourceRevision+=1", self.markup)
+        self.assertIn("if(pendingRequest?.quiet){state('Modifications non sauvegardees - minima recalcules');renderAll();return}", self.markup)
+        self.assertNotIn("renderPresets();renderContents();renderFlats();renderGroups();renderContainerSizing();renderLifecycle();return", self.markup)
+
     def test_has_no_external_web_runtime_or_business_solver_in_javascript(self) -> None:
         for forbidden in ("localhost", "fetch(", "XMLHttpRequest", "npm ", "Vite", "solvePartition", "derive_expandable_envelope_contract"):
             self.assertNotIn(forbidden, self.markup)

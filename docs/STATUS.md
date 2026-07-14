@@ -1805,3 +1805,27 @@ P44-M001 devient la seule mission `ready`, avec le contrat
 `docs/P44_M001_UI_STATE_STABILITY_CONTRACT.md` et le package cible 0.1.21.
 Aucun runtime n est modifie par P67-V. La suite complete de 451 tests passe,
 sans constituer une preuve de la future implementation. `print-validated: false`.
+
+## P44-M001 - Stabilite de saisie et d etat de la palette
+
+Statut : `done`, `implemented`, `automated-validated`,
+`fusion-retest-required`, `print-validated: false`.
+
+Le package Fusion 0.1.21 stabilise les rendus de palette sans modifier le
+schema, le coeur, le solveur, les jeux, les tolerances, les reservations, la
+geometrie ou la scene Fusion. Avant toute reconstruction de liste, la palette
+capture le focus, la selection/caret, les details ouverts, la carte active et le
+scroll. Les champs et cartes sont ensuite retrouves par identifiant metier
+stable, jamais par leur seul index de liste.
+
+Chaque edition incremente une revision source. Les reponses derivees de
+validation ou de calcul qui correspondent a une revision obsolete sont ignorees;
+les reponses pertinentes restaurent le contexte d interaction. Import, chargement
+et bootstrap effectuent un reset explicite. Les listes de cinquante conteneurs
+sont couvertes dans le bridge et aucun appel de scene Fusion n est ajoute.
+
+Preuves automatisees : 453 tests passes, dont DOM, bridge et transport de
+palette ; syntaxe JavaScript, exemple CLI, `compileall`, controle de frontiere
+`adsk` et `git diff --check` passes. Une observation Fusion reste requise avant
+toute promotion au-dela de `implemented`. P44-M002 ne devient possible qu apres
+l integration de ce lot dans `main`.

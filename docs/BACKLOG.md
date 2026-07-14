@@ -1638,8 +1638,9 @@ impose les dependances de release suivantes.
 - Decision : rapport P67 et ADR-0062 `accepted`.
 - Jeux par objet : intention acceptee, contrat/gate P44-M008 requis avant
   implementation P44-M009.
-- Statut : P44-M001 `ready` uniquement ; autres missions bloquees par leurs
-  dependances.
+- Statut : P44-M001 `done`, `implemented`, `automated-validated`,
+  `fusion-retest-required` ; P44-M002 devient `ready-after-p44-m001-integration`.
+  Les autres missions restent bloquees par leurs dependances.
 
 ### P47 a P50 - V0.3 couvercles
 
@@ -1874,7 +1875,8 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
 - Contrat : `docs/P44_M001_UI_STATE_STABILITY_CONTRACT.md`.
 - Acceptation : saisies plateaux/assets/conteneurs, reponses obsoletes,
   duplication/suppression, navigation clavier et cinquante cartes stables.
-- Statut : `ready`.
+- Statut : `done`, `implemented`, `automated-validated`,
+  `fusion-retest-required` ; `print-validated: false`.
 
 #### P44-M002 - Densite compacte et hierarchie de carte
 
@@ -1883,7 +1885,7 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
   rendre les titres lisibles.
 - Conteneurs : `Solidite` toujours visible ; taille calculee, etage, appui,
   surplus et raisons par axe dans des details secondaires replies.
-- Statut : `blocked-by-p44-m001`.
+- Statut : `ready-after-p44-m001-integration`.
 
 #### P44-M003 - Quatre onglets, Boite et elements plats
 

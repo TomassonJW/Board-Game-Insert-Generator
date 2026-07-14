@@ -929,3 +929,18 @@ de cavite V0.2 restent differees apres P66.
   d implementation, de tolerance physique ou d impression.
 - Prochaine preuve : tests puis observation Fusion de P44-M001.
 - `print-validated: false`.
+
+## P44-M001 - Stabilite UI implementee
+
+- C-FUSION-UI : `implemented`, `automated-validated`, `fusion-retest-required`
+  pour la palette 0.1.21. Les cartes et controles recoivent des identifiants UI
+  derives des identifiants metier ; focus, caret, details, carte active et scroll
+  sont restaures apres un rendu pertinent.
+- C-PROJECT / C-QUALITY : une revision source accompagne les requetes derivees.
+  Les validations et calculs obsoletes sont ignores, sans nouvelle logique metier
+  JavaScript, mutation de projet, appel de scene Fusion ou changement de
+  serialisation.
+- Preuves : 453 tests, DOM/bridge incluant cinquante conteneurs, syntaxe
+  JavaScript, exemple CLI, `compileall`, controle `adsk` et diff-check passes ;
+  observation Fusion encore requise. `print-validated: false`.
+- Suite : P44-M002 seulement apres integration P44-M001 dans `main`.

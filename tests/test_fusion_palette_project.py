@@ -252,6 +252,28 @@ class FusionPaletteProjectTests(unittest.TestCase):
         self.assertTrue(imported["saved"])
         self.assertEqual(exported["status"], "ready")
 
+    def test_bridge_keeps_fifty_stable_container_identifiers(self) -> None:
+        project = blank_project_v1()
+        project["container_groups"] = [
+            {"id": f"group-{index:02d}", "name": f"Bac {index:02d}", "wall_thickness_mm": None, "floor_thickness_mm": None}
+            for index in range(50)
+        ]
+        project["contents"] = [
+            {
+                "id": f"content-{index:02d}", "name": f"Element {index:02d}", "shape_kind": "square",
+                "dimensions_mm": {"x": 8, "y": 8, "z": 2}, "quantity": 1,
+                "container_group_id": f"group-{index:02d}", "content_clearance_mm": None,
+                "measurement_confidence": "exact",
+            }
+            for index in range(50)
+        ]
+        with tempfile.TemporaryDirectory() as temp_dir, patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}):
+            response = handle_palette_request(request("validate_project", project=project), ADDIN, ROOT)
+
+        identifiers = [item["container_group_id"] for item in response["container_sizing"]["containers"]]
+        self.assertEqual(identifiers, [f"group-{index:02d}" for index in range(50)])
+        self.assertEqual(len(set(identifiers)), 50)
+
     def test_rejects_unversioned_and_unknown_messages(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir, patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}):
             malformed = handle_palette_request([], ADDIN, ROOT)
