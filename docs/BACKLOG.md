@@ -1880,12 +1880,16 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
 
 #### P44-M002 - Densite compacte et hierarchie de carte
 
+- Capability : C-FUSION-UI, C-QUALITY.
 - Dependances : P44-M001 integree.
 - Objectif : compacter champs/labels, conserver des cibles accessibles et
   rendre les titres lisibles.
 - Conteneurs : `Solidite` toujours visible ; taille calculee, etage, appui,
   surplus et raisons par axe dans des details secondaires replies.
-- Statut : `ready-after-p44-m001-integration`.
+- Livrable : package 0.1.22, cartes compactes accessibles et contrat
+  `docs/P44_M002_COMPACT_ACCESSIBLE_CARDS_CONTRACT.md`.
+- Statut : `done`, `implemented`, `automated-validated`,
+  `fusion-retest-required` ; `print-validated: false`.
 
 #### P44-M003 - Quatre onglets, Boite et elements plats
 
@@ -1894,7 +1898,7 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
   Boite/plateaux/livrets, traduire l ordre de retrait et ajouter X/Y.
 - Jeux : reserver le vocabulaire et la place du futur controle, sans afficher un
   override inerte ; contrat et implementation restent P44-M008/P44-M009.
-- Statut : `blocked-by-p44-m002`.
+- Statut : `ready-after-p44-m002-integration`, `no-business-change`, `fusion-retest-required`.
 
 #### P44-M004 - Conteneurs parents, contenus enfants et modes de taille
 

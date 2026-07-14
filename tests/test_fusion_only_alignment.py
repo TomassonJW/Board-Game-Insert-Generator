@@ -58,18 +58,19 @@ class FusionOnlyAlignmentTests(unittest.TestCase):
 
     def test_next_action_advances_the_accepted_post_mvp_fusion_path(self) -> None:
         actions = self.read("docs/NEXT_ACTIONS.md")
-        framing = self.read("docs/P44_M001_UI_STATE_STABILITY_CONTRACT.md")
+        framing = self.read("docs/P44_M002_COMPACT_ACCESSIBLE_CARDS_CONTRACT.md")
 
-        self.assertIn("P44-M001", actions)
-        self.assertIn("implemented", actions)
         self.assertIn("P44-M002", actions)
+        self.assertIn("implemented", actions)
+        self.assertIn("P44-M003", actions)
         self.assertIn("mvp-accepted", actions)
-        self.assertIn("Statut : `ready-after-p44-m001-integration`, `no-business-change`,", actions)
-        self.assertIn("Package cible : palette Fusion `0.1.21`", framing)
-        self.assertIn("focus", framing)
-        self.assertIn("reponse asynchrone obsolete", framing)
+        self.assertIn("Statut : `ready-after-p44-m002-integration`, `no-business-change`,", actions)
+        self.assertIn("Package cible : palette Fusion `0.1.22`", framing)
+        self.assertIn("mode Compact", framing)
+        self.assertIn("Solidite", framing)
+        self.assertIn("Details calcules", framing)
         self.assertIn("Aucun calcul metier n est ajoute au JavaScript", framing)
-        self.assertIn("changement de solveur, score, tolerance, jeu", framing)
+        self.assertIn("solveur, score, jeu, tolerance", framing)
         self.assertNotIn("codex/p56-premium-editor", actions)
         self.assertNotIn("inspection visuelle runtime du frontend reel", actions)
 

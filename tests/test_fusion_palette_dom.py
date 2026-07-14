@@ -54,6 +54,18 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertNotIn('data-action="add-complement-preset"', self.markup)
         self.assertNotIn('id="complement-presets"', self.markup)
 
+    def test_compacts_cards_without_hiding_essential_controls(self) -> None:
+        self.assertNotIn(".density-compact .row-details{display:none}", self.markup)
+        for marker in (
+            ".row-details .grid{grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}",
+            ".row-details .grid.three{grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:8px}",
+            ".row-actions button{min-width:40px;min-height:40px}",
+            'class="strength-fields"', "<h4>Solidite</h4>",
+            "document.createElement('details')",
+            "section.className='container-sizing local-details calculated-details'",
+            "summary.textContent='Details calcules'",
+        ):
+            self.assertIn(marker, self.markup)
     def test_makes_presets_and_historical_complement_compatibility_obvious(self) -> None:
         for marker in (
             "Demarrage rapide",

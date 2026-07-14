@@ -944,3 +944,19 @@ de cavite V0.2 restent differees apres P66.
   JavaScript, exemple CLI, `compileall`, controle `adsk` et diff-check passes ;
   observation Fusion encore requise. `print-validated: false`.
 - Suite : P44-M002 seulement apres integration P44-M001 dans `main`.
+
+## P44-M002 - Cartes compactes accessibles
+
+- C-FUSION-UI : `implemented`, `automated-validated`,
+  `fusion-retest-required` pour la palette 0.1.22 : le mode Compact conserve
+  les champs de cartes, les grilles s adaptent aux contenus et les actions de
+  cartes gardent une cible de 40 px minimum.
+- C-FUSION-UI : `implemented` pour la divulgation progressive des conteneurs :
+  `Solidite` et ses deux minima restent visibles ; `Details calcules` replie
+  taille, etage, appui, surplus et raisons par axe sans mutation.
+- C-QUALITY : tests DOM explicites ; aucune logique metier JavaScript, mutation
+  de schema, calcul, tolerance, geometrie, CAD IR ou scene Fusion automatique.
+- Preuves : 454 tests, syntaxe JavaScript, exemple CLI, `compileall`, controle
+  `adsk` et diff-check passes ; observation Fusion encore requise.
+  `print-validated: false`.
+- Suite : P44-M003 seulement apres integration P44-M002 dans `main`.

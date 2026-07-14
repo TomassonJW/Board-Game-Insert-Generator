@@ -8,7 +8,7 @@ Statut produit : **MVP V0.1 Fusion-only accepte ; validation d impression non ac
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P67-V acceptee ; P44-M001 ready, autres missions P44 et P45/P46 bloquees par leurs dependances.
+Phase active : P44-M002 implemented, automated-validated et fusion-retest-required ; P44-M003 devient la seule mission suivante apres integration dans main.
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -1829,3 +1829,26 @@ palette ; syntaxe JavaScript, exemple CLI, `compileall`, controle de frontiere
 `adsk` et `git diff --check` passes. Une observation Fusion reste requise avant
 toute promotion au-dela de `implemented`. P44-M002 ne devient possible qu apres
 l integration de ce lot dans `main`.
+
+## P44-M002 - Densite compacte et hierarchie de carte
+
+Statut : `done`, `implemented`, `automated-validated`,
+`fusion-retest-required`, `print-validated: false`.
+
+Le package Fusion 0.1.22 compacte les cartes de listes sans masquer leurs
+reglages essentiels : le mode Compact garde les champs editables, les grilles
+s adaptent aux valeurs X/Y/Z et les actions de carte font au moins 40 px. Les
+titres sont renforces, sans nouvelle navigation ni changement de vocabulaire
+metier.
+
+Dans les cartes Conteneurs, `Solidite`, paroi minimale et fond minimal restent
+visibles. Taille calculee, etage, appui, surplus et raisons par axe rejoignent
+`Details calcules`, replie par defaut. Cette presentation ne modifie ni projet,
+ni schema, ni calcul, ni scene Fusion ; les garanties de focus/scroll P44-M001
+restent actives.
+
+Preuves automatisees : 454 tests, DOM/bridge/transport, syntaxe JavaScript,
+exemple CLI, `compileall`, controle de frontiere `adsk` et `git diff --check`.
+Une observation Fusion reste requise avant toute promotion au-dela de
+`implemented`. P44-M003 ne devient possible qu apres integration de ce lot dans
+`main`.
