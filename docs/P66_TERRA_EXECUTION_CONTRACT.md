@@ -1,6 +1,6 @@
 # P66 - Contrat d execution Terra et acceptation du MVP V0.1
 
-Statut : `p66-m000-integrated`, `p66-m001-ready`, `human-fusion-gate-required`,
+Statut : `p66-m000-integrated`, `p66-m001-gate-prepared`, `human-fusion-gate-required`,
 `print-validated: false`.
 
 Ce document est l instruction canonique pour deleguer P66 a un agent autonome.

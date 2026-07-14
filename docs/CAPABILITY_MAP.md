@@ -868,3 +868,16 @@ de cavite V0.2 restent differees apres P66.
   capability globale ni modifier les tolerances par defaut.
 - P69 audite exhaustivement C-FUSION-UI apres P50 et produit le cadrage P70+ ;
   elle ne corrige aucun comportement dans la mission de revue.
+
+## P66-M001 - Preparation de gate V0.1
+
+- C-QUALITY : `gate-prepared` pour les fixtures deterministes complete et
+  impossible, leurs digests, les preuves de non-materialisation et le cas de 50
+  conteneurs conserve hors gate humaine.
+- C-FUSION-UI : `gate-prepared` pour le package 0.1.20 installe par le
+  preparateur unique, son runtime palette et ses marqueurs verifies ; les
+  complements historiques restent compatibles sans creation nouvelle.
+- C-SOLVER / C-RESERVATION : `implemented-cad-ir`, aucune formule, tolerance,
+  geometrie ni semantique produit n est modifiee par P66-M001.
+- Gate : P66-V reste l unique observation humaine requise pour le MVP ;
+  `fusion-validated: false`, `print-validated: false`.

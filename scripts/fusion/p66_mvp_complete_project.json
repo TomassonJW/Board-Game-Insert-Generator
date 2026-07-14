@@ -1,0 +1,45 @@
+{
+  "schema_version": "bgig.project.v1",
+  "project_name": "P66 - MVP Fusion-only 0.1.20",
+  "box": {
+    "inner_dimensions_mm": {"x": 240.0, "y": 180.0, "z": 70.0},
+    "usable_height_mm": 70.0,
+    "lid_clearance_mm": 0.2
+  },
+  "layout": {
+    "layout_clearance_mm": 0.6,
+    "container_box_xy_clearance_mm": 0.8,
+    "container_z_clearance_mm": 1.2,
+    "default_wall_thickness_mm": 1.2,
+    "default_floor_thickness_mm": 1.2,
+    "default_content_clearance_mm": 0.6
+  },
+  "contents": [
+    {"id": "coins", "name": "Pieces", "shape_kind": "round", "dimensions_mm": {"x": 18.0, "y": 18.0, "z": 2.5}, "quantity": 12, "container_group_id": "tokens", "content_clearance_mm": null, "measurement_confidence": "exact"},
+    {"id": "cubes", "name": "Cubes", "shape_kind": "cube", "dimensions_mm": {"x": 12.0, "y": 12.0, "z": 12.0}, "quantity": 8, "container_group_id": "tokens", "content_clearance_mm": null, "measurement_confidence": "exact"},
+    {"id": "cards-0", "name": "Cartes sleevées a plat", "shape_kind": "cards", "dimensions_mm": {"x": 63.0, "y": 88.0, "z": 24.0}, "quantity": 1, "container_group_id": "c0", "content_clearance_mm": null, "measurement_confidence": "exact", "sleeved": true, "storage_orientation": "flat"},
+    {"id": "cards-1", "name": "Cartes sleevées debout", "shape_kind": "cards", "dimensions_mm": {"x": 63.0, "y": 88.0, "z": 24.0}, "quantity": 1, "container_group_id": "c1", "content_clearance_mm": null, "measurement_confidence": "exact", "sleeved": true, "storage_orientation": "upright_long_edge"},
+    {"id": "cards-2", "name": "Cartes fixe", "shape_kind": "cards", "dimensions_mm": {"x": 63.0, "y": 88.0, "z": 24.0}, "quantity": 1, "container_group_id": "c2", "content_clearance_mm": null, "measurement_confidence": "exact", "sleeved": false, "storage_orientation": "flat"},
+    {"id": "cards-3", "name": "Cartes trois", "shape_kind": "cards", "dimensions_mm": {"x": 63.0, "y": 88.0, "z": 24.0}, "quantity": 1, "container_group_id": "c3", "content_clearance_mm": null, "measurement_confidence": "exact", "sleeved": false, "storage_orientation": "flat"},
+    {"id": "cards-4", "name": "Cartes quatre", "shape_kind": "cards", "dimensions_mm": {"x": 63.0, "y": 88.0, "z": 24.0}, "quantity": 1, "container_group_id": "c4", "content_clearance_mm": null, "measurement_confidence": "exact", "sleeved": false, "storage_orientation": "flat"},
+    {"id": "cards-5", "name": "Cartes cinq", "shape_kind": "cards", "dimensions_mm": {"x": 63.0, "y": 88.0, "z": 24.0}, "quantity": 1, "container_group_id": "c5", "content_clearance_mm": null, "measurement_confidence": "exact", "sleeved": false, "storage_orientation": "flat"},
+    {"id": "cards-6", "name": "Cartes six", "shape_kind": "cards", "dimensions_mm": {"x": 63.0, "y": 88.0, "z": 24.0}, "quantity": 1, "container_group_id": "c6", "content_clearance_mm": null, "measurement_confidence": "exact", "sleeved": false, "storage_orientation": "flat"}
+  ],
+  "container_groups": [
+    {"id": "tokens", "name": "Bac jetons", "wall_thickness_mm": null, "floor_thickness_mm": null, "expansion_axes": {"x": true, "y": true, "z": true}, "locked_outer_dimensions_mm": {"x": null, "y": null, "z": null}, "surplus_preference": "balanced"},
+    {"id": "c0", "name": "Bac cible", "wall_thickness_mm": null, "floor_thickness_mm": null, "dimension_modes": {"x": "target", "y": "auto", "z": "auto"}, "target_outer_dimensions_mm": {"x": 80.0, "y": null, "z": null}, "locked_outer_dimensions_mm": {"x": null, "y": null, "z": null}, "expansion_axes": {"x": true, "y": true, "z": true}, "surplus_preference": "balanced"},
+    {"id": "c1", "name": "Bac cartes debout", "wall_thickness_mm": null, "floor_thickness_mm": null, "expansion_axes": {"x": true, "y": true, "z": true}, "locked_outer_dimensions_mm": {"x": null, "y": null, "z": null}, "surplus_preference": "balanced"},
+    {"id": "c2", "name": "Bac fixe", "wall_thickness_mm": null, "floor_thickness_mm": null, "dimension_modes": {"x": "fixed", "y": "auto", "z": "auto"}, "target_outer_dimensions_mm": {"x": 79.0667, "y": null, "z": null}, "locked_outer_dimensions_mm": {"x": 79.0667, "y": null, "z": null}, "expansion_axes": {"x": false, "y": true, "z": true}, "surplus_preference": "balanced"},
+    {"id": "c3", "name": "Bac cartes trois", "wall_thickness_mm": null, "floor_thickness_mm": null, "expansion_axes": {"x": true, "y": true, "z": true}, "locked_outer_dimensions_mm": {"x": null, "y": null, "z": null}, "surplus_preference": "balanced"},
+    {"id": "c4", "name": "Bac cartes quatre", "wall_thickness_mm": null, "floor_thickness_mm": null, "expansion_axes": {"x": true, "y": true, "z": true}, "locked_outer_dimensions_mm": {"x": null, "y": null, "z": null}, "surplus_preference": "balanced"},
+    {"id": "c5", "name": "Bac cartes cinq", "wall_thickness_mm": null, "floor_thickness_mm": null, "expansion_axes": {"x": true, "y": true, "z": true}, "locked_outer_dimensions_mm": {"x": null, "y": null, "z": null}, "surplus_preference": "balanced"},
+    {"id": "c6", "name": "Bac cartes six", "wall_thickness_mm": null, "floor_thickness_mm": null, "expansion_axes": {"x": true, "y": true, "z": true}, "locked_outer_dimensions_mm": {"x": null, "y": null, "z": null}, "surplus_preference": "balanced"}
+  ],
+  "flat_items": [
+    {"id": "board", "name": "Plateau principal", "kind": "board", "dimensions_mm": {"x": 110.0, "y": 120.0, "z": 3.0}, "quantity": 1, "stack_order": 0, "origin_mm": {"x": 5.0, "y": 30.0}, "rotation_deg_z": 0},
+    {"id": "booklet", "name": "Livret", "kind": "rulebook", "dimensions_mm": {"x": 60.0, "y": 110.0, "z": 2.0}, "quantity": 1, "stack_order": 1, "origin_mm": {"x": 125.0, "y": 30.0}, "rotation_deg_z": 90}
+  ],
+  "fill_elements": [],
+  "solver_preference": "balanced",
+  "deferred_features": {"appearance": null, "mechanism": null}
+}

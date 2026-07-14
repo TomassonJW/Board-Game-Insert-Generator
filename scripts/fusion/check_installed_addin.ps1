@@ -13,13 +13,27 @@ if (-not (Test-Path -LiteralPath $target -PathType Container)) {
     throw "Installed add-in folder not found: $target"
 }
 
-Assert-BgigFusionAddinMarkers -AddinPath $target
-
 $entrypoint = Join-Path $target "BoardGameInsertGenerator.py"
 $manifest = Join-Path $target "BoardGameInsertGenerator.manifest"
 $settings = Join-Path $target "bgig_ui_settings.json"
+if (-not (Test-Path -LiteralPath $manifest -PathType Leaf)) {
+    throw "Installed add-in manifest missing: $manifest"
+}
+$manifestText = Get-Content -LiteralPath $manifest -Raw -Encoding UTF8
+$versionMatch = [regex]::Match($manifestText, '"version"\s*:\s*"(?<version>[^"]+)"')
+if (-not $versionMatch.Success) {
+    throw "Installed add-in manifest has no readable version: $manifest"
+}
+$manifestVersion = $versionMatch.Groups["version"].Value
+if ($manifestVersion -ne "0.1.20") {
+    throw "Installed add-in package version mismatch: expected 0.1.20, got $manifestVersion."
+}
+
+Assert-BgigFusionAddinMarkers -AddinPath $target
+Assert-BgigPaletteProjectRuntime -AddinPath $target
 
 Write-Output "Entrypoint: $entrypoint"
 Write-Output "Manifest exists: $(Test-Path -LiteralPath $manifest -PathType Leaf)"
+Write-Output "Manifest version: $manifestVersion"
 Write-Output "Settings exists: $(Test-Path -LiteralPath $settings -PathType Leaf)"
-Write-Output "Marker check: ok"
+Write-Output "Runtime package and marker check: ok"

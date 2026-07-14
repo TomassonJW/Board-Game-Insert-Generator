@@ -446,3 +446,12 @@ pilotage apres un OK explicite.
 P44 a P50 restent des identifiants canoniques : les renumeroter casserait les
 liens documentaires sans apporter de valeur Git. Leur priorite est decidee par
 les dependances et statuts, pas par l ordre numerique.
+
+## P66-M001 gate-prepared - 2026-07-14
+
+P66-M001 fige une fixture complete sans complement et une fixture impossible,
+leurs preuves deterministes, le preflight CAD/Fusion, l installation du package
+0.1.20 et la checklist humaine de 21 etapes. Le runtime, le solveur, les jeux et
+la geometrie restent inchanges. P66-V est la prochaine et unique action : elle
+reste humaine, `fusion-validated: false`, `print-validated: false`. P67 et P44
+ne demarrent pas avant le retour P66 OK explicite.

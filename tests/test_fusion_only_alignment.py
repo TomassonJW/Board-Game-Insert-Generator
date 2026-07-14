@@ -60,9 +60,10 @@ class FusionOnlyAlignmentTests(unittest.TestCase):
         actions = self.read("docs/NEXT_ACTIONS.md")
         framing = self.read("docs/P65_M004_FUNCTIONAL_CONTRACT.md")
 
-        self.assertIn("P66-M000", actions)
         self.assertIn("P66-M001", actions)
-        self.assertIn("Statut : ready.", actions)
+        self.assertIn("P66-V", actions)
+        self.assertIn("gate-prepared", actions)
+        self.assertIn("human-fusion-gate-required", actions)
         self.assertIn("implemented", framing)
         self.assertIn("bgig.preview_explanations.v1", framing)
         self.assertIn("ne modifie jamais le plan P64", framing)

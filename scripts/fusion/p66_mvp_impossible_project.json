@@ -1,0 +1,29 @@
+{
+  "schema_version": "bgig.project.v1",
+  "project_name": "P66 - contrainte locale impossible",
+  "box": {
+    "inner_dimensions_mm": {"x": 240.0, "y": 180.0, "z": 70.0},
+    "usable_height_mm": 70.0,
+    "lid_clearance_mm": 0.2
+  },
+  "layout": {
+    "layout_clearance_mm": 0.6,
+    "container_box_xy_clearance_mm": 0.8,
+    "container_z_clearance_mm": 1.2,
+    "default_wall_thickness_mm": 1.2,
+    "default_floor_thickness_mm": 1.2,
+    "default_content_clearance_mm": 0.6
+  },
+  "contents": [
+    {"id": "coin", "name": "Piece", "shape_kind": "round", "dimensions_mm": {"x": 18.0, "y": 18.0, "z": 2.5}, "quantity": 12, "container_group_id": "tokens", "content_clearance_mm": null, "measurement_confidence": "exact"},
+    {"id": "cards", "name": "Cartes fixe trop petite", "shape_kind": "cards", "dimensions_mm": {"x": 63.0, "y": 88.0, "z": 24.0}, "quantity": 1, "container_group_id": "too-small", "content_clearance_mm": null, "measurement_confidence": "exact", "sleeved": true, "storage_orientation": "flat"}
+  ],
+  "container_groups": [
+    {"id": "tokens", "name": "Bac jetons", "wall_thickness_mm": null, "floor_thickness_mm": null, "expansion_axes": {"x": true, "y": true, "z": true}, "locked_outer_dimensions_mm": {"x": null, "y": null, "z": null}, "surplus_preference": "balanced"},
+    {"id": "too-small", "name": "Bac fixe impossible", "wall_thickness_mm": null, "floor_thickness_mm": null, "dimension_modes": {"x": "fixed", "y": "auto", "z": "auto"}, "target_outer_dimensions_mm": {"x": 10.0, "y": null, "z": null}, "locked_outer_dimensions_mm": {"x": 10.0, "y": null, "z": null}, "expansion_axes": {"x": false, "y": true, "z": true}, "surplus_preference": "balanced"}
+  ],
+  "flat_items": [],
+  "fill_elements": [],
+  "solver_preference": "balanced",
+  "deferred_features": {"appearance": null, "mechanism": null}
+}

@@ -8,38 +8,38 @@ V0.1 - vrai MVP Fusion-only selon ADR-0055 et rebase P60-R accepte.
 
 ## Derniere mission terminee
 
-P66-M000 - quarantaine des complements experimentaux, palette et package 0.1.20.
+P66-M001 - preparation automatisee de la gate Fusion MVP, package 0.1.20.
 
 ## Derniere preuve automatisee
 
-P66-M000 retire les actions et presets de creation de Bac vide, Bloc plein /
-cale et Separateur du parcours normal. La compatibilite historique reste testee
-par DOM, bridge, import/round-trip et materialisation d un complement explicite.
-Aucun solveur, tolerance, geometrie, migration destructive ou corps automatique
-ne change.
+La fixture canonique P66 est deterministe : 8 corps demandes, 0 complement, 0
+corps automatique, 2 etages, 2 reservations superieures et 7 coupes localisees.
+La fixture impossible reste bloquee par `CONTAINER_MINIMUM_BLOCKED`, sans CAD ni
+materialisation. Le bridge, le round-trip, les axes Auto/Cible/Fixe, le CAD IR,
+le plan Fusion compact et le cas automatise de 50 conteneurs sont testes.
 
-Preuves : 446 tests automatises verts, syntaxe JavaScript, compilation Python et
-git diff --check verts. Aucune validation Fusion ni impression reelle n est
-revendiquee.
+Le preparateur P66 lance ces preuves, construit les artefacts temporaires,
+installe le package 0.1.20 du commit exact, preserve une sauvegarde utilisateur
+unique, ecrit le marqueur de commit et fournit la checklist humaine. Aucun
+solveur, tolerance, geometrie, complement automatique ni validation Fusion ou
+impression n est revendique.
 
 ## Mission courante
 
-Aucune implementation en cours. P66-M000 est integree dans main ; P66-M001 est
-la prochaine mission preparee.
+Aucune implementation en cours. P66-M001 est terminee ; seule la gate humaine
+P66-V reste active.
 
 ## Prochaine action recommandee
 
-P66-M001 - Preparation automatisee de la gate Fusion MVP.
+P66-V - Observation humaine Fusion-only selon
+`docs/P66_FUSION_MVP_ACCEPTANCE.md`, etapes 1 a 21.
 
-Statut : ready. Preparer les fixtures complete sans complement et impossible,
-le test de preparation, le preparateur PowerShell idempotent, le package du
-commit exact, les marqueurs et la checklist humaine. Ne pas corriger le produit
-pour faire passer une fixture ; ne modifier ni solveur, ni tolerance, ni
-gometrie, ni semantique future.
+Statut : `human-fusion-gate-required`, `gate-prepared`,
+`fusion-validated: false`, `print-validated: false`.
 
-Contrat : `docs/P66_TERRA_EXECUTION_CONTRACT.md` et ADR-0061. Apres integration
-et validations de P66-M001, s arreter a la gate humaine P66-V ; ne commencer ni
-P67 ni P44.
+Retour attendu : `P66 Fusion OK 0.1.20 - commit <sha>` ou
+`P66 Fusion KO - etape <n> - attendu <...> - observe <...> - message <...>`.
+Un KO ouvre seulement un P66-Hxx borne. Ne commencer ni P67 ni P44.
 
 ## Releases bloquees
 
@@ -49,9 +49,8 @@ changer les defaults ; P69 reste bloque jusqu a P50.
 
 ## Gate humaine active
 
-P66-M001 est une mission bornee sans gate humaine. P66-V demande ensuite une
-observation Fusion preparee automatiquement. Apres P66 OK, P67 est la gate
-humaine de priorisation avant toute implementation P44.
+P66-V demande une observation Fusion preparee automatiquement. Apres P66 OK,
+P67 est la gate humaine de priorisation avant toute implementation P44.
 
 ## Fin de chaque mission
 

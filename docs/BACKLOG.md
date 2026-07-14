@@ -1775,7 +1775,7 @@ impose les dependances de release suivantes.
   sans complement ainsi que sa checklist.
 - Correctifs : uniquement P66-Hxx bornes si une observation est KO ; aucune
   ouverture V0.2 avant un nouveau passage vert puis l atelier humain P67.
-- Statut : `ready`, `fusion-retest-required`, `print-validated: false`.
+- Statut : `gate-prepared`, `human-fusion-gate-required`, `print-validated: false`.
 
 La carte historique P61 `Empilement vertical explicite` ci-dessus est remplacee
 par P61-P65 : ajouter seulement un nombre d etages ne corrigerait ni P40 ni P57.
@@ -1800,19 +1800,19 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
 - Dependances : P66-M000 integree et package 0.1.20 verifie.
 - Contrat : `docs/P66_TERRA_EXECUTION_CONTRACT.md`.
 - Livrables : fixtures complete sans complement et impossible, test de
-  preparation, preparateur PowerShell idempotent, package du commit exact,
-  marqueurs et checklist Fusion.
+  preparation, preflight pur Python, preparateur PowerShell idempotent, package
+  du commit exact, marqueurs et checklist Fusion de 21 etapes.
 - Interdit : aucun correctif opportuniste du solveur, de l UI, des tolerances ou
   de la geometrie pour faire passer la fixture.
 - Sortie : `gate-prepared`, jamais `fusion-validated`.
-- Statut : `ready`.
-
+- Statut : `done`, `automated-validated`, `gate-prepared`,
+  `human-fusion-gate-required`, `print-validated: false`.
 #### P66-V - Gate humaine Fusion
 
 - Dependances : P66-M001 integree, suite complete et installation reelle vertes.
 - Resultat : `P66 Fusion OK` ou KO numerote avec attendu, observe et message.
 - Une seule etape KO refuse toute l acceptance et ouvre un P66-Hxx borne.
-- Statut : `blocked-by-p66-m001`.
+- Statut : `blocked-by-human-p66`.
 
 #### P66-Hxx - Hotfix conditionnel
 

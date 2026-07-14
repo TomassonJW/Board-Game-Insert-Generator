@@ -8,7 +8,7 @@ Statut produit : **MVP V0.1 reouvert ; fondations techniques presentes, conformi
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P66-M000 terminee ; P66-M001 est prete avant la gate humaine P66.
+Phase active : P66-M001 terminee ; P66-V est la gate humaine Fusion active.
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -1716,3 +1716,23 @@ priorise leur perimetre avant P44. P68 recueille les premiers retours de vrais
 inserts sans changer les defaults. P44-P46 portent la V0.2 formes/ergonomie,
 P47-P50 la V0.3 couvercles/calibration, puis P69 realise la revue UI/UX exhaustive
 et prepare humainement les lots P70+.
+
+## P66-M001 - Preparation automatisee de la gate Fusion
+
+Statut : `done`, `automated-validated`, `gate-prepared`,
+`human-fusion-gate-required`, `fusion-validated: false`,
+`print-validated: false`.
+
+P66-M001 ajoute les deux fixtures sans complement, le preflight pur Python, les
+preuves bridge/CAD/Fusion et le preparateur unique. La fixture complete fixe 8
+corps demandes, 2 etages, 2 reservations superieures, 7 coupes et un plan CAD
+compact deterministe ; la fixture impossible expose `CONTAINER_MINIMUM_BLOCKED`
+sans plan CAD ni materialisation. Le package Fusion reste 0.1.20 et le runtime
+produit n est pas modifie.
+
+Le preparateur reutilise l installateur existant, verifie le runtime palette,
+les marqueurs et la version, preserve un projet utilisateur different une seule
+fois, installe atomiquement la fixture puis ecrit le commit et un rapport de
+preflight. La suite complete, compileall, diff-check, controle adsk, dry-run et
+installation reelle sont les preuves requises avant P66-V. Aucune validation
+Fusion ou impression n est declaree.
