@@ -166,7 +166,7 @@ function Assert-BgigPaletteProjectRuntime {
         "bgig_palette_ready",
         "Demarrage rapide",
         "Complements historiques",
-        "Dimensionnement par axe",
+        "Mode de taille",
         "group-mode",
         "estimate-groups-action",
         "container_sizing",
@@ -179,7 +179,7 @@ function Assert-BgigPaletteProjectRuntime {
     )
     foreach ($marker in $paletteMarkers) {
         if ($palette -notlike "*$marker*") {
-            throw "Installed P56 palette marker missing: $marker"
+            throw "Installed palette marker missing: $marker"
         }
     }
     foreach ($forbiddenMarker in @('data-action="add-complement"', 'data-action="add-complement-preset"', 'id="complement-presets"')) {

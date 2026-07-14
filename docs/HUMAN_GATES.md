@@ -202,3 +202,19 @@ rotation historique reste compatible sans encombrer le parcours normal.
 Retour OK : `P44-M003V Fusion OK 0.1.24 - commit <sha>`.
 Un KO ouvre seulement un hotfix P44-M003Hxx borné. P44-M004 reste bloquée tant
 que cette gate n’est pas fermée.
+
+
+## P44-M003V acceptée et P44-M004V ouverte — 2026-07-14
+
+Thomas a retourné P44-M003V Fusion OK 0.1.24 - commit 7b71d01. La navigation à
+quatre onglets et l’interversion X/Y de P44-M003 sont fusion-validated ; cette
+preuve ne qualifie ni l’impression ni les futures formes.
+
+P44-M004 est autorisée et ouvre P44-M004V pour le package 0.1.25. La gate
+observe uniquement la projection conteneur parent / contenus enfants, le
+déplacement secondaire, les modes Auto/Cible/Fixe, le cas historique
+Personnalisé, le contrôle global confirmé et la préservation de l’état de
+saisie. Elle ne valide ni géométrie, ni tolérance, ni scène automatique, ni
+impression.
+
+Retour OK : P44-M004V Fusion OK 0.1.25 - commit <sha>.

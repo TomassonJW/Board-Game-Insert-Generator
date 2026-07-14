@@ -528,3 +528,13 @@ boîte, élément et plat, contrat complet de taille pour conteneur ; elle ne
 déplace jamais une origine. La rotation historique est conservée hors du
 parcours normal. Les changements restent UI-only et la gate P44-M003V est
 requise avant P44-M004.
+
+
+## P44-M003V acceptée et P44-M004 — 2026-07-14
+
+La preuve humaine P44-M003V Fusion OK 0.1.24 - commit 7b71d01 ferme la gate de
+navigation. P44-M004 réalise ensuite, dans le package 0.1.25, la projection UI
+conteneur parent / contenus enfants et les modes de taille compatibles, sans
+changer le modèle ni les capacités géométriques. P44-M004V devient la seule
+prochaine preuve ; P44-M005 et les missions suivantes gardent leurs
+dépendances. P45 reste après P44-V et print-validated: false.

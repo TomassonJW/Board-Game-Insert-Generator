@@ -201,3 +201,10 @@ Les validations P64 doivent couvrir au minimum :
   est locale, ne crée aucune action bridge et ne modifie jamais une origine
   ni une valeur Z ; pour un conteneur, elle échange le contrat complet de ses
   axes X/Y.
+
+
+- P44-M004 : la composition parent/enfant ne doit pas indexer root.children ;
+  les identifiants DOM sont dérivés des identifiants métier de chaque parent et
+  enfant. Le contrôle global de mode refuse toute valeur Cible/Fixe absente,
+  les axes historiques mixtes restent traçables sous Personnalisé, et aucun
+  changement de collection ou d’action bridge n’est autorisé.

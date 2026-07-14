@@ -1003,3 +1003,16 @@ de cavite V0.2 restent differees apres P66.
   migration n’est introduit.
 - Prochaine preuve : P44-M003V dans Fusion pour le package 0.1.24 ;
   `print-validated: false`.
+
+
+## P44-M003V et P44-M004 capability update
+
+- C-FUSION-UI : P44-M003 est fusion-validated pour les quatre onglets et
+  l’interversion X/Y ; P44-M004 est implemented, automated-validated, en
+  attente de P44-M004V pour sa projection parent/enfant et ses modes de taille.
+- C-MODULE : la relation conteneur/contenu est projetée depuis les identifiants
+  existants, sans schéma récursif, migration, solveur ou géométrie nouvelle.
+- C-QUALITY : identifiants DOM stables sous cartes enfants, compatibilité
+  historique par axe, absence de bridge additionnel et package 0.1.25 testés.
+- print-validated: false ; aucune capability physique ou géométrique n’est
+  promue.

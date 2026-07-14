@@ -521,3 +521,14 @@ quatre onglets, sections réunies, `Ordre de retrait` et interversion X/Y locale
 P44-M006 réalise l’audit global, ajoute les tests anti-mojibake et vérifie le
 roundtrip des noms accentués. Aucun calcul métier n’est déplacé dans
 JavaScript par cette exigence.
+
+
+## P44-M004 — Composition visualisée, modèle inchangé
+
+La carte conteneur est le parent visuel des cartes contenu ; la source de vérité
+reste contents[].container_group_id. Le rattachement permanent est remplacé par
+Déplacer vers…. Les modes Auto/Cible/Fixe sont une façade d’édition sur les
+axes existants ; un projet historique divergent reste explicitement
+Personnalisé. Cette projection ne crée ni action bridge, ni solveur JavaScript,
+ni migration de schéma. Package 0.1.25 : observation Fusion P44-M004V encore
+requise.

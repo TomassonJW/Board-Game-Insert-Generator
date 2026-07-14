@@ -58,19 +58,19 @@ class FusionOnlyAlignmentTests(unittest.TestCase):
 
     def test_next_action_advances_the_accepted_post_mvp_fusion_path(self) -> None:
         actions = self.read("docs/NEXT_ACTIONS.md")
-        framing = self.read("docs/P44_M002V2_TECHNICAL_CARD_DENSITY_CONTRACT.md")
+        framing = self.read("docs/P44_M004_CONTAINER_COMPOSITION_CONTRACT.md")
 
-        self.assertIn("P44-M003", actions)
-        self.assertIn("P44-M003V Fusion OK 0.1.24 - commit <sha>", actions)
+        self.assertIn("P44-M004", actions)
+        self.assertIn("P44-M004V Fusion OK 0.1.25 - commit <sha>", actions)
         self.assertIn("mvp-accepted", actions)
         self.assertIn("manual_validation_required", actions)
         self.assertIn("français", actions)
-        self.assertIn("Package cible : palette Fusion `0.1.23`", framing)
-        self.assertIn("grille technique dense", framing)
-        self.assertIn("Solidite", framing)
-        self.assertIn("calculs secondaires replies", framing)
-        self.assertIn("Aucune logique metier", framing)
-        self.assertIn("tolerance", framing)
+        self.assertIn("Package cible : palette Fusion 0.1.25", framing)
+        self.assertIn("projection parent/enfant", framing)
+        self.assertIn("Solidité", framing)
+        self.assertIn("Détails calculés", framing)
+        self.assertIn("Aucun schéma", framing)
+        self.assertIn("tolérance", framing)
         self.assertNotIn("codex/p56-premium-editor", actions)
         self.assertNotIn("inspection visuelle runtime du frontend reel", actions)
 

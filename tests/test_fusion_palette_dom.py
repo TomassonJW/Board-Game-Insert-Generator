@@ -89,7 +89,7 @@ class FusionPaletteDomTests(unittest.TestCase):
             ".row-actions button{min-width:40px;min-height:40px",
             "@media(max-width:759px)", "@media(max-width:559px)",
             ".dimension-strip{grid-template-columns:repeat(2,minmax(80px,112px))}",
-            'class="card row-card technical-card content-card"',
+            'class="card row-card technical-card content-card child-card"',
             'class="card row-card technical-card flat-card"',
             'class="card row-card technical-card group-card"',
             'class="card technical-card box-card"',
@@ -109,7 +109,7 @@ class FusionPaletteDomTests(unittest.TestCase):
             self.assertNotIn(forbidden, self.markup)
         for marker in (
             "<h4>Prise et tolérances</h4>", "<h4>Placement et ordre</h4>",
-            "<h4>Solidite</h4>", "guidance-details",
+            "<h4>Solidité</h4>", "guidance-details",
             "document.createElement('details')",
             "section.className='container-sizing local-details calculated-details'",
             "summary.textContent='Details calcules'",
@@ -120,11 +120,28 @@ class FusionPaletteDomTests(unittest.TestCase):
             "Demarrage rapide",
             "Complements historiques",
             "historic-complements", "renderComplements",
-            "Dimensionnement par axe",
+            "Mode de taille", "group-unified-mode", "Personnalisé",
             "group-mode", "group-target", "Auto", "Cible", "Fixe",
-            "creation_presets", "Dimensions resolues", "Format de cartes", "Debout sur grand cote",
+            "creation_presets", "Dimensions résolues", "Format de cartes", "Debout sur grand côté",
         ):
             self.assertIn(marker, self.markup)
+
+    def test_projects_contents_inside_their_parent_container_without_schema_or_bridge_change(self) -> None:
+        for marker in (
+            "renderContentCard", "content-children", "child-card",
+            "data-record-kind=\"content\"", "data-record-kind=\"group\"",
+            'data-row="content-move"', "add-content-to-group",
+            "Déplacer vers…", "setUnifiedGroupMode", "applyGroupModeToAll",
+            "group-unified-mode", "Compatibilité historique par axe",
+            "Personnalisé", "container-batch-controls",
+        ):
+            self.assertIn(marker, self.markup)
+        persistent_target = 'data-row="content" data-index="' + chr(36) + '{index}" data-key="container_group_id"'
+        self.assertNotIn(persistent_target, self.markup)
+        self.assertNotIn('data-bridge="move_', self.markup)
+        self.assertIn("project.contents[index].container_group_id=input.value", self.markup)
+        self.assertIn("group.dimension_modes={x:mode,y:mode,z:mode}", self.markup)
+        self.assertIn("data-record-kind][data-record-id]", self.markup)
 
     def test_exposes_non_mutating_container_estimation_without_a_new_bridge_action(self) -> None:
         for marker in (
@@ -214,7 +231,7 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertIn("top_inset_reservation.py", helpers)
         self.assertIn("volumetric_stage_solver.py", helpers)
         self.assertIn("Assert-BgigPaletteProjectRuntime", helpers)
-        for marker in ("$paletteMarkers", "[char]0x00EE", "[char]0x00E9", "[char]0x00E7"):
+        for marker in ("$paletteMarkers", "Mode de taille", "[char]0x00EE", "[char]0x00E9", "[char]0x00E7"):
             self.assertIn(marker, helpers)
         self.assertNotIn('\"1. Boite\", \"6. Apercu\"', helpers)
         self.assertIn("Aucun navigateur", smoke)

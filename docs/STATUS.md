@@ -1915,3 +1915,22 @@ Preuves automatisées : DOM, bridge conservé, roundtrip, Qt transport,
 acceptance P66 de non-régression et alignement Fusion-only. La suite complète,
 compileall, frontière `adsk`, diff-check et installation Fusion restent requis
 avant P44-M003V. Aucune validation Fusion ni impression n’est revendiquée.
+
+
+## P44-M003V acceptée puis P44-M004 — Composition conteneur / contenu
+
+Thomas a confirmé P44-M003V Fusion OK 0.1.24 - commit 7b71d01 : les quatre
+onglets et l’interversion X/Y de P44-M003 sont fusion-validated. La preuve
+reste limitée à cette UX ; print-validated: false.
+
+P44-M004 livre le package 0.1.25. La palette projette maintenant les contenus
+sous leur conteneur via container_group_id, sans migration ni arbre récursif.
+Le titre est le nom éditable, le changement de parent devient Déplacer vers…,
+et les dimensions ont un mode unifié par conteneur. Les anciens projets aux
+axes divergents restent éditables via Personnalisé et leur détail historique.
+Le mode global est confirmé et n’invente aucune dimension cible ou fixe.
+
+Statut : implemented, automated-validated, human-fusion-gate-required,
+fusion-validated: false pour P44-M004, print-validated: false. Aucun schéma,
+bridge, solveur, tolérance, géométrie, CAD IR ou scène Fusion n’est modifié.
+La prochaine preuve est P44-M004V dans Fusion.

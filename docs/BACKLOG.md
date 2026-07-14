@@ -2025,3 +2025,24 @@ contrat et la gate P44-M008. `print-validated: false`.
   recommandations et backlog P70+ ; aucun correctif runtime dans la revue.
 - Contrat : `docs/P69_FULL_UI_UX_REVIEW_CONTRACT.md`.
 - Statut : `blocked-by-p50`.
+
+
+#### P44-M003V — clôture humaine
+
+- Preuve : P44-M003V Fusion OK 0.1.24 - commit 7b71d01.
+- Statut : done-human-gate, fusion-validated, print-validated: false ;
+  débloque P44-M004.
+
+#### P44-M004 — actualisation 0.1.25
+
+- Contrat : docs/P44_M004_CONTAINER_COMPOSITION_CONTRACT.md.
+- Livrable : projection parent/enfant sur les collections existantes, titre
+  éditable unique, Déplacer vers…, mode unifié par conteneur, compatibilité
+  historique Personnalisé, contrôle global confirmé et calculs secondaires
+  repliés.
+- Exclusions : aucune migration, récursion, action bridge, solveur, tolérance,
+  géométrie, CAD IR, scène ou réactivation de complément.
+- Statut : done, implemented, automated-validated,
+  human-fusion-gate-required, print-validated: false.
+- Prochaine preuve : P44-M004V Fusion OK 0.1.25 - commit <sha> ; P44-M005
+  reste bloquée jusque-là.
