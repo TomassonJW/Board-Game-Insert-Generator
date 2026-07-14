@@ -93,21 +93,22 @@ Resultat historique : le jeu temoin de 20 pieces CAD et 19 cavites a recu le
 retour `Fusion P43 OK`. Cette preuve est conservee comme
 `fusion-validated-geometry-only`, jamais comme acceptation V0.1.
 
-## Chemin V0.2, bloque jusqu'a P66 puis P67
+## Chemin V0.2 accepte par P67-V
 
 | Lot | Resultat |
 | --- | --- |
-| P44 | Contrat de formes/ergonomie et contraintes de resistance |
+| P44 | Fondation UX bornee : stabilite, densite, parcours, document, jeux explicites et calcul adaptatif |
 | P45 | Arrondis externes, chanfreins, encoches et fonds faciles a vider |
 | P46 | Preview live fidele, Fusion et acceptation V0.2 |
 
 P33 sert seulement de matiere de prototype ; aucun statut V0.2 n'est herite.
-P67 priorise humainement le sous-scope avant que P44 puisse devenir ready.
+Thomas accepte l option C et ADR-0062 le 2026-07-14. Seule P44-M001 devient
+`ready` ; son contrat interdit tout changement de solveur, tolerance ou
+geometrie. Les autres missions P44 restent planifiees selon leurs dependances.
 
-La revue P67 du 2026-07-14 propose de reorienter ce tableau sans le modifier
-encore : P44 porterait une fondation UX bornee, P45 les geometries ergonomiques
-et P46 la gate V0.2 complete. ADR-0062 reste `proposed`; P67-V doit accepter ou
-amender ce choix avant de rendre P44-M001 ready.
+Les jeux surchargeables par objet sont acceptes comme besoin, mais P44-M008
+doit encore cadrer les roles, formules, defaults et migrations avant toute
+implementation P44-M009.
 
 ## Chemin V0.3, bloque jusqu'a P46
 

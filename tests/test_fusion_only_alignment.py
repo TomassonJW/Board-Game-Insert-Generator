@@ -56,19 +56,19 @@ class FusionOnlyAlignmentTests(unittest.TestCase):
         self.assertIn("BGIG dans Fusion 360", markup)
         self.assertIn("bgig.palette.request.v1", markup)
 
-    def test_next_action_advances_the_revised_fusion_only_mvp(self) -> None:
+    def test_next_action_advances_the_accepted_post_mvp_fusion_path(self) -> None:
         actions = self.read("docs/NEXT_ACTIONS.md")
-        framing = self.read("docs/P65_M004_FUNCTIONAL_CONTRACT.md")
+        framing = self.read("docs/P44_M001_UI_STATE_STABILITY_CONTRACT.md")
 
-        self.assertIn("P66-CLOSE", actions)
-        self.assertIn("P67", actions)
+        self.assertIn("P67-V", actions)
+        self.assertIn("P44-M001", actions)
         self.assertIn("mvp-accepted", actions)
-        self.assertIn("Statut : `ready`, `human-review-required`, `no-runtime-change`.", actions)
-        self.assertIn("implemented", framing)
-        self.assertIn("bgig.preview_explanations.v1", framing)
-        self.assertIn("ne modifie jamais le plan P64", framing)
-        self.assertIn("Exporter les imprimables", framing)
-        self.assertIn("Materialiser dans Fusion", framing)
+        self.assertIn("Statut : `ready`, `no-business-change`, `fusion-retest-required`.", actions)
+        self.assertIn("Package cible : palette Fusion `0.1.21`", framing)
+        self.assertIn("focus", framing)
+        self.assertIn("reponse asynchrone obsolete", framing)
+        self.assertIn("Aucun calcul metier n est ajoute au JavaScript", framing)
+        self.assertIn("changement de solveur, score, tolerance, jeu", framing)
         self.assertNotIn("codex/p56-premium-editor", actions)
         self.assertNotIn("inspection visuelle runtime du frontend reel", actions)
 

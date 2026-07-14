@@ -30,7 +30,9 @@ Pour chaque insert imprime, consigner :
 
 Les impressions peuvent etre realisees des que P66 est acceptee, y compris pour
 un usage personnel immediat. Elles restent des observations locales tant que le
-rapport n est pas complete. P67 choisit lesquelles nourrissent P44-P46. P68 ne
+rapport n est pas complete. P67-V a choisi la fondation UX ; les mesures P68
+nourrissent notamment le contrat de jeux P44-M008, les geometries P45 et la
+gate P46 sans changer silencieusement les defaults. P68 ne
 bloque pas formellement P47, mais ses mesures doivent etre examinees avant toute
 calibration fonctionnelle P50. P69 utilise ensuite ces retours dans la revue
 UI/UX exhaustive apres V0.3.

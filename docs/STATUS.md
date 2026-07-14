@@ -8,7 +8,7 @@ Statut produit : **MVP V0.1 Fusion-only accepte ; validation d impression non ac
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P67 en revue ; P67-M000 documente, arbitrage humain P67-V ready, P44 bloque.
+Phase active : P67-V acceptee ; P44-M001 ready, autres missions P44 et P45/P46 bloquees par leurs dependances.
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -1769,8 +1769,39 @@ sleeves, Verifier/Recalculer, Sauvegarder et Inspecter. Il propose quatre onglet
 des conteneurs parents avec elements enfants, une barre de creation, un vrai
 cycle de document local et un calcul adaptatif sans scene Fusion automatique.
 
-ADR-0062 propose de placer cette fondation UX dans P44 avant les geometries P45,
+Au terme de P67-M000, ADR-0062 propose de placer cette fondation UX dans P44 avant les geometries P45,
 puis de conserver P46 comme gate V0.2. Cette reorientation n est pas acceptee :
 P67-V reste humain, P44-M001 reste `blocked-by-p67-v`, les complements restent
 en quarantaine et aucun runtime, schema, solveur, tolerance, CAD ou statut de
 capability n est modifie.
+
+## P67-V - Fondation UX acceptee
+
+Thomas accepte explicitement D67-01 a D67-11, l option C et ADR-0062 le
+2026-07-14. P67 passe a `done-human-gate`. P44 porte la fondation UX, P45
+conserve les geometries ergonomiques et P46 la gate V0.2 complete. P69 reste
+apres P50.
+
+La decision confirme quatre onglets, la composition Conteneur parent ->
+Elements enfants, la toolbar sans complements, le bouton X/Y, le calcul hybride
+adaptatif sans scene automatique, le cycle de document, la separation gabarit
+asset/profil de cavite et les accents semantiques fixes. Les complements restent
+en quarantaine pour maintenant.
+
+La revue ajoute deux intentions :
+
+- plateaux, livrets, assets et conteneurs heritent d un jeu pertinent puis
+  peuvent le surcharger X/Y/Z par objet ;
+- les cartes Conteneurs proposent un mode global discret, un mode unique par
+  conteneur, `Solidite` permanente et les calculs secondaires replies.
+
+Ces intentions ne changent encore ni schema ni formule. Asset/cavite,
+plateau/encastrement et jeux externes des conteneurs restent distincts. Aucun
+default n est modifie. La valeur 0,2 / 0,2 / 0 mm n est pas declaree universelle.
+P44-M008 doit produire un contrat/ADR de tolerance et obtenir une gate humaine
+avant P44-M009.
+
+P44-M001 devient la seule mission `ready`, avec le contrat
+`docs/P44_M001_UI_STATE_STABILITY_CONTRACT.md` et le package cible 0.1.21.
+Aucun runtime n est modifie par P67-V. La suite complete de 451 tests passe,
+sans constituer une preuve de la future implementation. `print-validated: false`.

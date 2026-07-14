@@ -130,3 +130,24 @@ P67-V est la prochaine decision humaine. Elle doit accepter, corriger ou refuser
 le rapport et ADR-0062 proposee. Elle peut seule rendre P44-M001 `ready` ;
 P44-P50 restent bloques jusque-la. P68 demeure une boucle de retours volontaires
 `planned-after-p66`. Aucun tag ou release n est autorise par cette gate seule.
+
+## P67 accepte - 2026-07-14
+
+Thomas accepte explicitement D67-01 a D67-11, l option C et ADR-0062. La
+fondation UX bornee devient la premiere partie de P44 ; les geometries restent
+dans P45 et P46 reste la gate V0.2 complete.
+
+Effet de gate : P67 est `done-human-gate` et seule P44-M001 devient `ready`
+selon `docs/P44_M001_UI_STATE_STABILITY_CONTRACT.md`. P44-M002 et les missions
+suivantes ne sont pas autorisees automatiquement. Les complements restent en
+quarantaine pour maintenant ; leur reactivation exige toujours un contrat
+separe.
+
+La demande de jeux herites et surchargeables X/Y/Z par objet est acceptee comme
+intention produit, pas comme formule ni changement de default. P44-M008 doit
+produire le contrat de tolerance, les valeurs et les regles de resolution avant
+P44-M009 et avant toute mutation du runtime. La valeur 0,2 mm observee n est pas
+declaree universelle.
+
+P45, P46, P47-P50 et P69 restent bloques par leurs dependances.
+`print-validated: false` reste obligatoire.

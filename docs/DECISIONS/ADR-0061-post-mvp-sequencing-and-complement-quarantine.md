@@ -116,3 +116,14 @@ P67 est en revue. ADR-0062 propose de placer une fondation UX bornee dans P44
 avant les geometries P45, sans renumeroter P44-P50 et sans avancer P69. Cette
 reorientation reste soumise a P67-V. La quarantaine des complements reste
 pleinement active ; aucune toolbar ne peut les reactiver sans contrat accepte.
+
+## Decision P67-V du 2026-07-14
+
+P67 accepte l option C d ADR-0062 : P44 commence par une fondation UX bornee,
+P45 conserve les geometries ergonomiques et P46 reste la gate V0.2 complete.
+Les identifiants P44-P50 ne changent pas.
+
+La quarantaine des complements est confirmee `pour maintenant`. Bac vide, Bloc
+plein / cale et Separateur ne reviennent ni dans la toolbar ni dans les cartes
+normales. Cette decision reste revisitable seulement par un futur contrat
+separe ; la compatibilite historique demeure.

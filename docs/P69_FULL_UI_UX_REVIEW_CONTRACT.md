@@ -67,7 +67,7 @@ Chaque observation recoit :
 
 ## Articulation avec la fondation UX anticipee
 
-La revue P67 du 2026-07-14 peut autoriser une fondation UX bornee dans P44
+La gate P67-V du 2026-07-14 autorise une fondation UX bornee dans P44
 avant les geometries P45 : stabilite de saisie, densite, architecture
 d information, cycle document et traduction des concepts. Cette passe corrige
 un risque de construction ; elle ne remplace pas P69.

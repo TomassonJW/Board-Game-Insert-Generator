@@ -265,3 +265,48 @@ interieur et positionner sa premiere/derniere enveloppe. Il doit utiliser le jeu
 inter-conteneurs X-Y uniquement entre voisins. En Z, la marge superieure reduit
 la hauteur de conception une seule fois ; le jeu inter-conteneurs est reserve
 uniquement entre etages.
+
+## P67-V - Jeux herites et overrides par objet
+
+La revue humaine P67-V accepte le besoin produit suivant, sans changer encore le
+schema, les formules ou les valeurs numeriques : chaque plateau, livret, asset
+et conteneur doit afficher un jeu effectif herite d un default pertinent, puis
+permettre un override facultatif et independant en X, Y et Z.
+
+Le motif UX est commun, mais les roles physiques restent distincts :
+
+| Objet | Interface physique | Source actuelle | Cible planifiee |
+| --- | --- | --- | --- |
+| Asset | asset / cavite interne | `default_content_clearance_mm`, puis `content_clearance_mm` scalaire optionnel | default de cavite par role, override X/Y/Z par asset |
+| Plateau ou livret | element plat / top inset | `layout_clearance_mm` reutilise en X/Y, aucun override par objet, aucun jeu Z explicite | default d encastrement, override X/Y/Z par element plat |
+| Conteneur | corps / boite ou corps voisin | defaults globaux P65, separes par cote/total et par interface | override externe X/Y/Z par conteneur, resolu sans double comptage |
+
+Pour chaque axe, une absence d override signifie `Herite du projet`. La sortie
+derivee doit exposer la valeur effective et sa source : default de role, profil,
+override de l objet ou compatibilite historique. Un zero explicite reste
+different d une valeur absente.
+
+La presentation ne doit jamais laisser croire qu un meme nombre a le meme sens
+partout. Pour un asset ou un element plat, X/Y decrivent le jeu de logement
+autour de la piece. Pour un conteneur, le jeu est une interface externe et doit
+rester compatible avec les notions P65 `par cote` contre la boite et `total`
+entre voisins. Le jeu Z d un top inset augmente la profondeur utile de
+l encastrement ; sa composition entre elements plats superposes doit etre
+specifiee avant implementation.
+
+P67-V ne change aucun default et ne promeut pas la valeur observee
+0,2 / 0,2 / 0 mm en valeur universelle. Les choix suivants restent a figer par
+P44-M008 et une gate humaine de tolerance :
+
+- nom et forme exacte des champs additifs ;
+- semantique par cote ou totale de chaque axe ;
+- regle de resolution entre deux conteneurs ayant des overrides differents ;
+- interaction avec boite, voisins, etages et marge sous couvercle ;
+- composition Z de plusieurs plateaux/livrets superposes ;
+- migration des scalaires historiques sans changement de resultat ;
+- defaults affiches pour chaque role et protocole de calibration P68.
+
+P44-M008 est une mission de contrat et d ADR, sans code. P44-M009 pourra
+implementer le schema, le loader, le coeur, la palette, les rapports et la CAD
+IR uniquement apres acceptation de ces regles. `print-validated: false` reste
+obligatoire.

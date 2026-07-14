@@ -1,8 +1,8 @@
 # P67 - Rapport de priorisation post-MVP et revue UX structurelle
 
 Date : 2026-07-14
-Statut : `draft-human-review`, `p67-in-review`, `no-runtime-change`,
-`p44-m001-blocked`, `print-validated: false`.
+Statut : `accepted-human-review`, `p67-v-done`, `no-runtime-change`,
+`p44-m001-ready`, `print-validated: false`.
 
 ## 1. Contexte et preuves
 
@@ -49,9 +49,9 @@ formes et les couvercles, plusieurs profils utilisateurs, l accessibilite et les
 retours d impression. La passe anticipee proposee ici est une correction de
 fondation, pas la revue finale.
 
-Cette recommandation reoriente le debut de V0.2 par rapport a ADR-0061. Elle est
-donc portee par l ADR-0062 proposee et ne devient executable qu apres arbitrage
-humain P67-V.
+Cette recommandation reoriente le debut de V0.2 par rapport a ADR-0061. Thomas
+accepte l option C et ADR-0062 pendant P67-V le 2026-07-14. Seule P44-M001
+devient `ready` ; les missions suivantes gardent leurs dependances propres.
 
 ## 3. Observations classees
 
@@ -71,6 +71,8 @@ humain P67-V.
 | UX-012 | Presets personnels utilisables mais gestion fragmentee et prompts natifs pauvres. | amelioration | intermediaire, expert | Absence de panneau d edition dedie dans la palette. |
 | UX-013 | Les complements proposes dans la vision de toolbar sont encore sans contrat accepte. | question structurante | tous | Ils sont volontairement en quarantaine depuis P66/ADR-0061. |
 | UX-014 | Couleurs libres, conteneurs imbriques et profils dessines ouvrent des modeles futurs. | hors scope immediat | expert | Etat, accessibilite, solveur et schema a concevoir separement. |
+| UX-015 | Plateaux, livrets, assets et conteneurs ne disposent pas d une cascade de jeu X/Y/Z coherente et explicable par objet. | important | tous | Les interfaces physiques sont differentes et les defaults/overrides ne sont pas traces uniformement. |
+| UX-016 | Les modes Auto/Cible/Fixe par axe et les resultats calcules dominent la carte Conteneur. | important | novice, intermediaire | Le besoin courant est un mode unique, la solidite visible et les calculs secondaires replies. |
 
 ## 4. Decodage de l interface actuelle
 
@@ -312,6 +314,15 @@ persistance, contraste et etats sans valeur fonctionnelle immediate.
 retrait, position de pile, origine X/Y et resultat de placement. Les details de
 decoupe restent secondaires.
 
+Chaque plateau et livret doit aussi afficher un bloc compact
+`Jeu d encastrement` : `Herite du projet` par defaut, puis override facultatif
+X/Y/Z.
+Le resultat derive doit montrer la valeur effective et sa source. X/Y restent
+des marges laterales de coupe ; le sens exact de Z, les couches superposees et
+la compatibilite historique doivent etre figes par un contrat de tolerance
+avant implementation. La valeur observee 0,2 / 0,2 / 0 mm n est pas promue en
+default universel par cette revue.
+
 ### 5.3 Conteneurs parents, elements enfants
 
 Le schema actuel convient deja a cette presentation : `container_groups` et
@@ -323,8 +334,9 @@ Structure d une carte :
 
 ```text
 Conteneur : Bac joueurs                    [etat] [dupliquer] [supprimer]
-Taille : min. ... | reglage ... | calculee ...
-X [Auto v] [ ... ]   Y [Auto v] [ ... ]   Z [Auto v] [ ... ]
+Taille minimale : ... | Mode [Auto v] | X [...] Y [...] Z [...]
+Solidite : paroi ... | fond ...
+Details calcules [replies] : taille, etage, appui, surplus
 
   Elements contenus
   ├─ Cubes rouges    [gabarit] [X] [⇄] [Y] [Z] [qte] [prise/jeu]
@@ -342,6 +354,27 @@ Le champ permanent `Conteneur cible` disparait des cartes enfants. Il faut
 toutefois conserver une action accessible `Deplacer vers...` dans le menu de
 l element ; la composition visuelle ne doit pas rendre la reaffectation
 impossible ni dependre uniquement du glisser-deposer.
+
+Le dimensionnement normal est simplifie :
+
+- un controle discret en haut permet d appliquer Auto, Cible ou Fixe aux trois
+  axes de tous les conteneurs, avec confirmation explicite avant ecrasement ;
+- chaque conteneur porte un selecteur unique applique a X/Y/Z ;
+- Cible et Fixe affichent ensuite les trois valeurs compactes ;
+- un ancien projet qui melange les modes par axe affiche `Personnalise` et
+  conserve les trois contrats dans ses details ; aucune migration ne l aplatit ;
+- `Solidite` (paroi et fond minimaux) reste visible en permanence ;
+- taille calculee, etage, appui automatique, surplus et raisons par axe passent
+  dans `Details calcules`, replie par defaut ; statut et alerte restent visibles.
+
+Le controle global est une action de lot explicite, pas une nouvelle valeur
+cachee dans le schema. Il ne s applique qu apres confirmation et ne doit jamais
+inventer les valeurs Cible/Fixe manquantes.
+
+Les conteneurs pourront aussi recevoir un override de jeu externe X/Y/Z. Ce jeu
+ne doit pas etre confondu avec le jeu interne asset/cavite. La formule entre
+deux conteneurs et contre la boite doit preserver les jeux totaux/par cote P65
+et sera decidee dans le contrat P44-M008.
 
 ### 5.4 Barre de creation persistante
 
@@ -608,11 +641,12 @@ Avantages : evite de jeter des formulaires geometrie, ameliore vite la prise en
 main et garde P69 comme audit final. Inconvenient : reoriente P44 et demande un
 amendement accepte.
 
-**Recommandation : option C.**
+**Decision P67-V : option C acceptee.**
 
-## 12. Decoupage de missions propose, encore bloque
+## 12. Decoupage de missions accepte, activation progressive
 
-Les identifiants ci-dessous preservent P44-P50. Seule P67-V peut les autoriser.
+Les identifiants ci-dessous preservent P44-P50. P67-V accepte la fondation,
+mais rend uniquement P44-M001 `ready`.
 
 ### P44-M001 - Stabilite de saisie et contrat d etat UI
 
@@ -625,6 +659,8 @@ Les identifiants ci-dessous preservent P44-P50. Seule P67-V peut les autoriser.
 
 - Grilles adaptees au contenu, titres/labels, X/Y/Z/quantite compacts, icones
   accessibles et sections essentielles toujours visibles.
+- `Solidite` reste visible ; taille calculee, etage, appui, surplus et raisons
+  rejoignent des details calcules replies par defaut.
 - Prototype dans plusieurs largeurs de palette ; cible interactive >= 40 px.
 
 ### P44-M003 - Quatre onglets et Boite + elements plats
@@ -637,6 +673,8 @@ Les identifiants ci-dessous preservent P44-P50. Seule P67-V peut les autoriser.
 
 - Projection imbriquee depuis les collections actuelles ; nom unique comme
   titre ; action Deplacer vers ; pas de schema recursif.
+- Selecteur unique Auto/Cible/Fixe par conteneur, etat Personnalise pour les
+  anciens contrats mixtes ; action globale discrete et confirmee.
 - Suppression du champ conteneur cible permanent, sans perdre la reaffectation.
 
 ### P44-M005 - Barre de creation et gestion des presets
@@ -656,6 +694,21 @@ Les identifiants ci-dessous preservent P44-P50. Seule P67-V peut les autoriser.
 - Option de calcul retenue par P67, suppression de Verifier normal, gestion de
   requetes obsoletes et vues placees avant les metriques.
 - Materialisation toujours explicite et gardee.
+
+### P44-M008 - Contrat de jeux herites et overrides par objet
+
+- Cartographier jeu asset/cavite, jeu plateau/encastrement et jeux externes
+  conteneur/voisin/boite sans les fusionner.
+- Definir inheritance, override partiel X/Y/Z, source effective, semantique
+  par cote/total, resolution de paire et migration additive.
+- Produire ou amender l ADR de tolerance et demander la gate humaine sur les
+  formules/defaults ; aucune implementation dans cette mission.
+
+### P44-M009 - Implementation des jeux par objet
+
+- Ajouter schema/loader/coeur/UI seulement apres acceptation de P44-M008.
+- Roundtrip ancien/nouveau, calcul d encastrement, solveur, CAD IR et sources
+  de valeurs couverts ; aucun default physique change sans preuve.
 
 ### P44-V - Gate humaine de fondation UX
 
@@ -682,6 +735,8 @@ reste la gate Fusion de l ensemble V0.2 avec preview fidele.
 | Cycle de document complet | haute | moyen-fort | moyen | bridge/adaptateur | fondation P44 |
 | Auto-calcul adaptatif | haute | moyen-fort | moyen-fort | etat stable | fin fondation P44 |
 | Apercu en premier | haute | faible | faible | aucune | fondation P44 |
+| Jeux par objet X/Y/Z | haute | fort | fort | contrat de tolerance + migration | P44-M008/M009 |
+| Mode global/conteneur et details calcules | haute | moyen | moyen | etat stable + cartes compactes | P44-M002/M004 |
 | Vraies formes de cavite | haute | fort | fort | fondation UX + contrat resistance | P45 |
 | Reactivation complements | incertaine | fort | fort | nouveau contrat | apres preuves |
 | Plateaux dessous/fermeture | potentiellement haute | fort | fort | solveur + couvercles | a arbitrer P47+/P70+ |
@@ -689,41 +744,43 @@ reste la gate Fusion de l ensemble V0.2 avec preview fidele.
 | Couleurs utilisateur | faible-moyenne | moyen | faible-moyen | accessibilite | P70+ |
 | Profil dessine libre | experte | tres fort | tres fort | nouveau modele CAD | P70+ |
 
-## 14. Decisions P67 a rendre
+## 14. Decisions rendues par P67-V
 
-| Decision | Recommandation | Statut |
+| Decision | Decision humaine | Statut |
 | --- | --- | --- |
-| D67-01 - Fondation UX avant geometrie | Option C | a arbitrer |
-| D67-02 - Quatre onglets et suppression Precedent/Suivant | accepter | a arbitrer |
-| D67-03 - Conteneur parent / elements enfants sans migration schema | accepter | a arbitrer |
-| D67-04 - Toolbar creation proposee | accepter, avec complements exclus | a arbitrer |
-| D67-05 - Complements | garder en quarantaine ; futur contrat separe | a arbitrer |
-| D67-06 - X/Y | bouton d interversion ; rotation historique conservee | a arbitrer |
-| D67-07 - Calcul | hybride adaptatif, jamais de scene auto | a arbitrer |
-| D67-08 - Projet | document nomme + recuperation autosauvee | a arbitrer |
-| D67-09 - Formes | separer gabarit asset et profil de cavite | a arbitrer |
-| D67-10 - Couleurs | accents semantiques fixes maintenant, perso plus tard | a arbitrer |
-| D67-11 - P44-M001 | stabilite de saisie uniquement | bloque par P67-V |
+| D67-01 - Fondation UX avant geometrie | Option C | accepte |
+| D67-02 - Quatre onglets et suppression Precedent/Suivant | accepter | accepte |
+| D67-03 - Conteneur parent / elements enfants sans migration schema | accepter | accepte |
+| D67-04 - Toolbar creation proposee | accepter, avec complements exclus | accepte |
+| D67-05 - Complements | quarantaine maintenue pour maintenant ; futur contrat separe | accepte, revisitable |
+| D67-06 - X/Y | bouton d interversion ; rotation historique conservee | accepte |
+| D67-07 - Calcul | hybride adaptatif, jamais de scene auto | accepte a experimenter |
+| D67-08 - Projet | document nomme + recuperation autosauvee | accepte |
+| D67-09 - Formes | separer gabarit asset et profil de cavite | accepte |
+| D67-10 - Couleurs | accents semantiques fixes maintenant, perso plus tard | accepte |
+| D67-11 - P44-M001 | stabilite de saisie uniquement | accepte, ready |
+| D67-12 - Jeux par objet | heritage puis override X/Y/Z selon le role physique | intention acceptee ; contrat P44-M008 requis |
+| D67-13 - Conteneurs | mode global discret, mode unique par conteneur, solidite visible, calculs secondaires | accepte |
 
-## 15. Criteres de sortie P67
+## 15. Sortie P67-V - 2026-07-14
 
-P67 pourra etre accepte seulement quand Thomas aura :
+Thomas accepte explicitement D67-01 a D67-11, l option C et ADR-0062. Les
+precisions D67-12 et D67-13 sont ajoutees a la capture produit.
 
-1. choisi l option de sequencement ;
-2. accepte ou corrige l architecture quatre onglets ;
-3. tranche la toolbar et le maintien en quarantaine des complements ;
-4. choisi le mode de recalcul ;
-5. choisi le cycle de document ;
-6. accepte le premier lot P44-M001 et ses exclusions ;
-7. accepte ou refuse ADR-0062.
+Effets de gate :
 
-Jusque-la :
-
-- P44-M001 reste `blocked-by-p67-v` ;
+- P67 passe a `accepted` et `done-human-gate` ;
+- P44-M001 devient la seule mission V0.2 `ready` ;
+- P44-M002 a P44-M009 restent `planned` ou bloques par leurs dependances ;
 - P45/P46 ne commencent pas ;
 - P47-P50 restent bloques par P46 ;
 - P69 reste bloquee par P50 ;
+- les complements restent en quarantaine ;
+- aucune valeur de jeu, formule, geometrie ou scene n est modifiee par P67 ;
 - `print-validated: false` reste obligatoire.
+
+Le contrat d execution de la prochaine mission est
+`docs/P44_M001_UI_STATE_STABILITY_CONTRACT.md`.
 
 ## 16. Sources techniques externes consultees
 

@@ -858,26 +858,31 @@ de cavite V0.2 restent differees apres P66.
 - Validation : P66-M000 et P66-M001 `done`, puis P66-V accepte humainement
   le 2026-07-14 (package 0.1.20, commit `6e351bb`) ; `mvp-accepted`,
   `fusion-validated`, `print-validated: false`.
-- Releases : P44-P46 restent deferred jusqu a P66 puis P67 ; P47-P50 restent
-  deferred jusqu a P46 ; P69 reste bloquee jusqu a P50.
+- Releases : P44-M001 est `ready` apres P67-V ; les autres missions P44 et
+  P45/P46 suivent leurs dependances. P47-P50 restent bloques jusqu a P46 et
+  P69 jusqu a P50.
+
 ## P67-P69 - Pilotage humain et apprentissage post-MVP
 
-- P67 n implemente aucune capability : P67-M000 capture la revue UX, audite les
-  causes et propose ADR-0062 ; P67-V reste seul habilite a rendre P44-M001 ready.
-- C-FUSION-UI : aucune promotion. La revue observe une dette de focus, densite,
-  architecture d information, vocabulaire, document projet et priorite Apercu.
-- C-PROJECT : la persistance atomique du slot courant est implementee ; le cycle
-  Nouveau/Ouvrir/Enregistrer sous/projets recents est seulement propose.
+- P67 n implemente aucune capability : P67-M000 capture la revue et P67-V
+  accepte ADR-0062 ainsi que D67-01 a D67-11.
+- C-FUSION-UI : aucune promotion runtime. La fondation P44 est `designed` et
+  P44-M001 est la seule mission `ready`.
+- C-PROJECT : la persistance atomique du slot courant est implementee ; Nouveau,
+  Ouvrir, Enregistrer sous, recents et recuperation sont acceptes mais planifies.
 - C-ASSET / C-MODULE : la composition Conteneur parent -> Elements enfants est
-  une projection UI proposee sur les identifiants existants, sans schema recursif.
-- C-SOLVER : le calcul hybride adaptatif est une option P67 ; les poids, budgets
-  et heuristiques restent inchanges.
-- C-RESERVATION : les modes plateau dessous ou fermeture sont futurs et ne
-  modifient pas le top-inset valide.
+  acceptee comme projection UI sur les identifiants existants, sans schema recursif.
+- C-TOLERANCE : jeux herites puis surchargeables X/Y/Z acceptes comme besoin ;
+  roles, formules, defaults et migration restent a cadrer par P44-M008.
+- C-SOLVER : le calcul hybride adaptatif est accepte pour experimentation ; les
+  poids, budgets et heuristiques restent inchanges et la scene reste explicite.
+- C-RESERVATION : modes plateau dessous ou fermeture restent futurs ; le top
+  inset actuel ne change pas pendant P67.
 - P68 augmente la preuve locale d usage et d impression sans promouvoir une
   capability globale ni modifier les tolerances par defaut.
 - P69 audite exhaustivement C-FUSION-UI apres P50 et produit le cadrage P70+ ;
-  elle reexamine la fondation eventuelle P44 et ne corrige rien pendant la revue.
+  elle evalue la fondation P44 sur le produit enrichi et ne corrige rien pendant
+  la revue.
 
 ## P66-M001 - Preparation de gate V0.1
 
@@ -901,3 +906,26 @@ de cavite V0.2 restent differees apres P66.
   geometrie physique.
 - Limite : `print-validated: false` ; aucune capability V0.2/V0.3 n est
   promue. P67 est `in-review`, P67-V est la prochaine gate, P68 reste `planned-after-p66`, P44 reste bloque.
+
+## P67-V capability update
+
+- C-PRODUCT-VISION : `accepted-priority` pour l option C ; P44 porte la
+  fondation UX, P45 les geometries et P46 la gate V0.2.
+- C-FUSION-UI : `designed`, avec P44-M001 seule mission `ready` pour stabiliser
+  focus, details et scroll ; aucune promotion runtime par la gate documentaire.
+- C-PROJECT : cycle document nomme et recuperation acceptes pour P44, encore
+  non implementes.
+- C-ASSET / C-RESERVATION / C-MODULE : motif UX commun `Herite du projet` puis
+  override X/Y/Z accepte, mais roles physiques distincts.
+- C-TOLERANCE : `accepted-product-intent`, pas `designed` pour les jeux par
+  objet. P44-M008 doit fixer formules, defaults, sources et migration avant
+  P44-M009 ; aucune valeur actuelle ne change.
+- C-FUSION-UI / C-MODULE : mode global discret, mode unique par conteneur,
+  `Personnalise` legacy, solidite visible et calculs secondaires replies sont
+  planifies dans P44-M002/P44-M004.
+- C-SOLVER / C-CAD-IR : inchanges ; calcul adaptatif accepte en surface, scene
+  toujours explicite et aucune formule JavaScript.
+- C-QUALITY : P67-V est une preuve humaine de priorite, pas une preuve
+  d implementation, de tolerance physique ou d impression.
+- Prochaine preuve : tests puis observation Fusion de P44-M001.
+- `print-validated: false`.

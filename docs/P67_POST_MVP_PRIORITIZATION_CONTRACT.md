@@ -1,7 +1,7 @@
 # P67 - Atelier humain de priorisation post-MVP
 
-Statut : `in-review`, `human-review-required`, `no-runtime-change`,
-`p44-m001-blocked`.
+Statut : `accepted`, `done-human-gate`, `no-runtime-change`,
+`p44-m001-ready`.
 
 ## Objectif
 
@@ -14,8 +14,9 @@ apres P44-P50.
 La revue humaine du 2026-07-14 ouvre explicitement une option de reorientation :
 realiser une fondation UX structurelle bornee avant d ajouter les parametres de
 geometrie. Le rapport
-`docs/P67_POST_MVP_PRIORITIZATION_REPORT.md` et ADR-0062 proposee portent cette
-option. Aucun de leurs lots n est autorise avant P67-V.
+`docs/P67_POST_MVP_PRIORITIZATION_REPORT.md` et ADR-0062 acceptee portent cette
+option. P67-V rend uniquement P44-M001 `ready` ; les autres lots gardent
+leurs dependances.
 
 L ordre des cartes est semantique, pas numerique : P67 est execute apres P66,
 puis seulement P44-M001 peut devenir `ready`. Les identifiants P44 a P50 restent
@@ -100,9 +101,23 @@ P67 doit choisir, sans implementation simultanee :
 
 - P67-M000, capture et audit documentaire : `done-docs` apres integration de
   son rapport ;
-- ADR-0062 : `proposed`, jamais acceptee implicitement ;
-- P67-V : prochaine decision humaine ;
-- P44-M001 : `blocked-by-p67-v`.
+- ADR-0062 : `accepted` par Thomas ;
+- P67-V : `done-human-gate` ;
+- P44-M001 : `ready` avec son contrat fonctionnel.
+
+## Resultat P67-V du 2026-07-14
+
+Thomas accepte D67-01 a D67-11, l option C et ADR-0062. Les complements
+restent en quarantaine pour maintenant, le calcul hybride adaptatif sera
+experimente sans scene automatique et P44-M001 est limite a la stabilite de
+saisie.
+
+Deux precisions sont ajoutees au pilotage : jeux herites puis surchargeables
+X/Y/Z par objet avec contrat de tolerance separe ; modes de conteneur simplifies
+dans le parcours normal, solidite permanente et calculs secondaires replies.
+
+Aucune valeur de jeu, formule, geometrie, scene ou qualification d impression
+ne change pendant P67-V.
 
 ## Interdits
 

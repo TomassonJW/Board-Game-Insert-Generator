@@ -1632,13 +1632,14 @@ impose les dependances de release suivantes.
 
 ### P44 a P46 - V0.2 fondation UX, formes et ergonomie
 
-- Dependances : P66 accepte puis decision P67-V.
-- Scope canonique avant P67-V : arrondis, chanfreins, encoches et fonds faciles
-  a vider, avec impact reel sur volume, parois et fabrication.
-- Reorientation proposee : P44 stabilise d abord l ergonomie d interaction ;
-  P45 porte ensuite les geometries ergonomiques ; P46 reste la gate V0.2.
-- Decision : rapport P67 et ADR-0062 `proposed`.
-- Statut : `blocked-by-p67-v`, aucune implementation autorisee.
+- Dependances : P66 et P67-V acceptees.
+- Sequence acceptee : P44 stabilise l ergonomie d interaction ; P45 porte les
+  geometries ergonomiques ; P46 reste la gate V0.2.
+- Decision : rapport P67 et ADR-0062 `accepted`.
+- Jeux par objet : intention acceptee, contrat/gate P44-M008 requis avant
+  implementation P44-M009.
+- Statut : P44-M001 `ready` uniquement ; autres missions bloquees par leurs
+  dependances.
 
 ### P47 a P50 - V0.3 couvercles
 
@@ -1836,56 +1837,127 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
 ### P67 - Atelier humain de priorisation post-MVP
 
 - Capability : C-PRODUCT-VISION, C-QUALITY, C-FUSION-UI.
-- Dependances : P66 OK ; premieres observations d usage P68 disponibles si
-  possible, sans en faire une condition bloquante.
+- Dependances : P66 OK.
 - Objectif : redefinir humainement l ordre, les criteres et le perimetre de
   P44-P50 avant toute implementation V0.2.
-- Livrable : decisions explicites sur fondation UX, formes/ergonomie,
-  complements, vrais inserts prioritaires, niveau de preuve et ordre des
-  missions.
-- Sortie : P44-M001 peut devenir `ready` seulement apres acceptation du compte
-  rendu P67 ; P67 ne remplace pas la revue UI/UX exhaustive P69.
+- Resultat : option C, quatre onglets, composition conteneur/contenu, toolbar,
+  calcul hybride, cycle document, separation gabarit/profil et P44-M001 acceptes.
+- Complements : quarantaine maintenue pour maintenant, futur contrat separe.
 - Contrat : `docs/P67_POST_MVP_PRIORITIZATION_CONTRACT.md`.
 - Rapport : `docs/P67_POST_MVP_PRIORITIZATION_REPORT.md`.
-- Statut : `in-review`, `human-review-required`, `no-runtime-change`.
+- Statut : `done`, `accepted`, `done-human-gate`, `no-runtime-change`.
 
 #### P67-M000 - Capture, audit et options de la revue UX
 
-- Capability : C-PRODUCT-VISION, C-FUSION-UI, C-QUALITY.
-- Objectif : transcrire la revue humaine, verifier les comportements reels et
-  proposer des options sans modifier le runtime.
-- Livrables : rapport P67, glossaire de pilotage, ADR-0062 proposee, roadmap,
-  backlog, status, capabilities, gates et next actions synchronises.
-- Preuves : audit palette/bridge/coeur/tests, sources Autodesk pour palette et
-  FileDialog, aucune modification runtime.
-- Sortie : decisions D67-01 a D67-11 explicites ; P44 reste bloque.
-- Statut : `done-docs` apres integration.
+- Livrables : rapport P67, glossaire, ADR-0062, roadmap, backlog, status,
+  capabilities, gates et next actions.
+- Statut : `done-docs`.
 
 #### P67-V - Arbitrage humain de la trajectoire V0.2
 
-- Dependances : P67-M000 integree.
-- Objectif : accepter, corriger ou refuser l option de fondation UX avant
-  geometrie et le premier sous-lot P44.
-- Decisions : sequence, quatre onglets, composition conteneur/contenu, toolbar,
-  complements, X/Y, calcul, cycle document, gabarit/profil de cavite et P44-M001.
-- Gate : Thomas accepte ou refuse ADR-0062 et le rapport.
-- Sortie verte : rendre uniquement P44-M001 `ready`.
-- Statut : `ready`, `human-review-required`, `no-runtime-change`.
+- Decisions : D67-01 a D67-11 acceptes explicitement par Thomas.
+- Precisions : D67-12 jeux herites/overrides par objet et D67-13 hierarchie
+  Conteneurs ajoutees au pilotage.
+- Gate : ADR-0062 acceptee ; aucune mutation runtime ou valeur de tolerance.
+- Sortie : rendre uniquement P44-M001 `ready`.
+- Statut : `done-human-gate`, `accepted`, `no-runtime-change`.
 
-#### P44-M001 a P44-V - Fondation UX proposee
+#### P44-M001 - Stabilite de saisie et d etat de la palette
 
-- Dependances : P67-V verte et ADR-0062 acceptee ou amendee.
-- P44-M001 : stabilite de saisie, focus, details ouverts et scroll.
-- P44-M002 : densite compacte, labels et composants accessibles.
-- P44-M003 : quatre onglets, Boite + elements plats, ordre traduit et X/Y.
-- P44-M004 : conteneurs parents, elements enfants et reaffectation accessible.
-- P44-M005 : barre de creation et gestion des presets personnels.
-- P44-M006 : reglages, cycle de document local et outils de diagnostic.
-- P44-M007 : calcul adaptatif retenu et Apercu priorise.
-- P44-V : observation Fusion de la fondation, sans geometrie ni impression.
-- Frontieres : schema compatible, coeur sans adsk, complements en quarantaine,
-  zero changement solveur/tolerance/geometrie par glissement.
-- Statut : `proposed`, `blocked-by-p67-v`.
+- Capability : C-FUSION-UI, C-PROJECT, C-QUALITY.
+- Dependances : P67-V et ADR-0062 acceptees.
+- Objectif : conserver focus, caret, details ouverts, carte active et scroll
+  pendant les editions et reponses derivees asynchrones.
+- Livrable : package 0.1.21, etat UI par identifiant stable et tests DOM/bridge.
+- Exclusions : aucune densification, quatre onglets, schema, solveur, jeu,
+  tolerance, geometrie, scene automatique ou reactivation de complement.
+- Contrat : `docs/P44_M001_UI_STATE_STABILITY_CONTRACT.md`.
+- Acceptation : saisies plateaux/assets/conteneurs, reponses obsoletes,
+  duplication/suppression, navigation clavier et cinquante cartes stables.
+- Statut : `ready`.
+
+#### P44-M002 - Densite compacte et hierarchie de carte
+
+- Dependances : P44-M001 integree.
+- Objectif : compacter champs/labels, conserver des cibles accessibles et
+  rendre les titres lisibles.
+- Conteneurs : `Solidite` toujours visible ; taille calculee, etage, appui,
+  surplus et raisons par axe dans des details secondaires replies.
+- Statut : `blocked-by-p44-m001`.
+
+#### P44-M003 - Quatre onglets, Boite et elements plats
+
+- Dependances : P44-M002 integree.
+- Objectif : renforcer les quatre onglets, supprimer Precedent/Suivant, fusionner
+  Boite/plateaux/livrets, traduire l ordre de retrait et ajouter X/Y.
+- Jeux : reserver le vocabulaire et la place du futur controle, sans afficher un
+  override inerte ; contrat et implementation restent P44-M008/P44-M009.
+- Statut : `blocked-by-p44-m002`.
+
+#### P44-M004 - Conteneurs parents, contenus enfants et modes de taille
+
+- Dependances : P44-M003 integree.
+- Objectif : projection parent/enfants sans schema recursif, action Deplacer vers
+  et nom editable comme titre.
+- Dimensionnement : controle global discret et confirme ; un mode Auto/Cible/Fixe
+  par conteneur ; anciens axes mixtes conserves sous `Personnalise`.
+- Statut : `blocked-by-p44-m003`.
+
+#### P44-M005 - Barre de creation et presets
+
+- Dependances : P44-M004 integree.
+- Objectif : toolbar persistante, preset + destination, raccourci local et
+  gestion des presets personnels.
+- Complements : toujours exclus et en quarantaine.
+- Statut : `blocked-by-p44-m004`.
+
+#### P44-M006 - Reglages, cycle document et diagnostic
+
+- Dependances : P44-M005 integree.
+- Objectif : labels/hints, hauteur derivee, Nouveau/Ouvrir/Enregistrer sous,
+  recents, recuperation et outils scene reserves au diagnostic.
+- Statut : `blocked-by-p44-m005`.
+
+#### P44-M007 - Calcul adaptatif et Apercu priorise
+
+- Dependances : P44-M006 et P44-M009 integrees.
+- Objectif : calcul hybride adaptatif, requetes obsoletes gerees, Apercu en
+  premier et Materialiser toujours explicite.
+- Statut : `blocked-by-p44-m006-and-p44-m009`.
+
+#### P44-M008 - Contrat de jeux herites et overrides par objet
+
+- Capability : C-TOLERANCE, C-RESERVATION, C-MODULE, C-ASSET, C-QUALITY.
+- Dependances : P44-M003 et P44-M004 integrees.
+- Objectif : distinguer asset/cavite, plateau/encastrement et jeux externes des
+  conteneurs, puis specifier default, override partiel X/Y/Z et source effective.
+- Livrables : ADR de tolerance, schema additif propose, regles par cote/total,
+  resolution de paire, composition Z, migration et matrice de tests.
+- Gate : validation humaine obligatoire des formules et defaults.
+- Interdit : aucun code ni changement numerique dans P44-M008.
+- Statut : `blocked-by-p44-m003-and-p44-m004`.
+
+#### P44-M009 - Implementation des jeux par objet
+
+- Dependances : P44-M008 acceptee par gate humaine.
+- Objectif : implementer schema, loader, coeur, palette, rapports et CAD IR sans
+  changer les projets historiques ni recalibrer silencieusement les defaults.
+- Tests : inheritance/zero/override partiel, roundtrip, top inset, voisinage,
+  etages, bridge, materialisation historique et source effective.
+- Statut : `blocked-by-p44-m008-human-gate`.
+
+#### P44-V - Gate humaine de fondation UX
+
+- Dependances : P44-M001 a P44-M009 terminees selon leurs contrats.
+- Observation : novice/expert, petite/grande palette, clavier, cinquante
+  conteneurs, import historique et scene preservee.
+- Limite : qualifie la fondation de palette, ni geometrie P45 ni impression.
+- Statut : `blocked-by-p44-m002-to-m009`.
+
+Frontieres P44 : coeur sans adsk, complements en quarantaine, aucune scene
+automatique et aucun changement de solveur/tolerance/geometrie par glissement.
+P44-M009 est la seule mission de jeu envisagee et reste impossible sans le
+contrat et la gate P44-M008. `print-validated: false`.
 
 ### P68 - Boucle de premiers inserts reels
 

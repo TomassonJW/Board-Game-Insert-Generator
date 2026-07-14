@@ -84,3 +84,15 @@ reconstruction complete des cartes nuisent a la saisie. ADR-0062 propose de
 remplacer, apres decision P67-V, « un seul element developpe » par des lignes
 essentielles toujours visibles et des details techniques localement replies.
 Ce suivi ne modifie pas encore la decision acceptee.
+
+## Amendement P67-V du 2026-07-14
+
+ADR-0062 est acceptee. Le principe `un seul element developpe a la fois` est
+abandonne pour les controles essentiels : saisie principale, prise/jeu, ordre
+de retrait, position, mode de taille et solidite restent visibles dans des
+cartes compactes. Les resultats calcules, diagnostics, surplus, etage et appui
+peuvent rester dans des details locaux replies.
+
+La navigation cible passe a quatre onglets. Le calcul source/derive peut devenir
+adaptatif, mais aucune scene Fusion ne change sans action explicite. Cet
+amendement ne deplace aucune formule metier dans JavaScript.

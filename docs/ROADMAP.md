@@ -5,7 +5,7 @@ operationnel vit dans `docs/BACKLOG.md`, l'etat courant dans `docs/STATUS.md`,
 et la lecture par capabilities dans `docs/CAPABILITY_MAP.md`. La nomenclature
 et le role de ces documents sont definis dans `docs/PILOTAGE_GLOSSARY.md`.
 
-## Ordre canonique actif depuis le 2026-07-12
+## Ordre canonique actif, amende par P67-V le 2026-07-14
 
 Les phases historiques ci-dessous decrivent les briques construites, pas l'ordre
 des prochaines missions. ADR-0047 et `docs/MVP_EXECUTION_PLAN.md` imposent :
@@ -13,7 +13,7 @@ des prochaines missions. ADR-0047 et `docs/MVP_EXECUTION_PLAN.md` imposent :
 1. P36-P42 puis P52-P60 : socle technique V0.1 observe ;
 2. P60-R puis P61-P66 : convergence produit V0.1 revisee ;
 3. P67 : atelier humain de priorisation post-MVP ; P68 : retours de vrais inserts ;
-4. P44-P46 : V0.2 formes et ergonomie ;
+4. P44 : fondation UX ; P45 : formes et ergonomie geometrique ; P46 : gate V0.2 ;
 5. P47-P50 : V0.3 couvercles et calibration ;
 6. P69 : revue UI/UX exhaustive et cadrage humain des lots P70+.
 
@@ -22,15 +22,15 @@ P47+ ne peut devenir `ready` avant P46. P69 reste bloquee jusqu a P50.
 Les explorations P33/P34 sont archivees et ne
 valent pas acceptation de V0.2/V0.3.
 
-La revue P67 du 2026-07-14 propose, sans l accepter encore, que P44 porte une
-fondation UX bornee avant les geometries P45. Cette option est documentee dans
-ADR-0062 et le rapport P67. Tant que P67-V ne tranche pas, l ordre canonique
-ci-dessus reste actif et P44-M001 reste bloque.
+La gate P67-V du 2026-07-14 accepte que P44 porte une
+fondation UX bornee avant les geometries P45. Cette decision est documentee dans
+ADR-0062 et le rapport P67. Seule P44-M001 devient `ready` ; les missions
+suivantes gardent leurs dependances et P45/P46 restent bloques.
 
 P43 est reouvert le 2026-07-12 : la scene Fusion historique reste observee,
 mais le MVP produit n est pas accepte. P52 a P60 constituent le socle technique ;
-P60-R a P66 portent desormais le chemin critique V0.1. P44 V0.2 reste bloque
-jusqu a P66 puis P67 ; P47 V0.3 reste en plus bloque jusqu a P46.
+P60-R a P66 ont ferme le chemin critique V0.1. P67-V rend P44-M001 ready ;
+le reste de P44 suit ses dependances et P47 V0.3 reste bloque jusqu a P46.
 ADR-0054 interdit les corps de remplissage
 automatiques et impose l expansion des bacs demandes.
 
@@ -444,7 +444,7 @@ pilotage apres un OK explicite.
   avant d activer P44 ; il conserve les identifiants P44-P50.
 - **P68** : boucle parallele de premiers inserts reels et mesures locales ; elle
   nourrit les decisions sans changer silencieusement les valeurs par defaut.
-- **P44-P46 / V0.2** : formes, resistance et ergonomie, puis gate Fusion.
+- **P44-P46 / V0.2** : fondation UX P44, geometries/resistance P45, puis gate Fusion P46.
 - **P47-P50 / V0.3** : couvercles et calibration physique, apres P46.
 - **P69** : revue UI/UX humaine exhaustive, tres commentee, apres P44-P50 ; elle
   produit le backlog P70+ et ne corrige rien dans la mission de revue.
@@ -461,10 +461,24 @@ cycle document augmenterait la dette. Le rapport P67 propose quatre espaces
 Boite, Conteneurs, Reglages et Apercu, une composition Conteneur parent ->
 Elements enfants et une fondation UX en P44 avant la geometrie P45.
 
-Cette trajectoire est une option humaine, pas encore la roadmap acceptee.
-ADR-0062 reste `proposed`; P67-V doit choisir. P69 reste apres P50 comme audit
+Cette trajectoire est acceptee par la gate humaine P67-V.
+ADR-0062 est `accepted`; seule P44-M001 est `ready`. P69 reste apres P50
+comme audit
 UI/UX exhaustif du produit enrichi. Les complements restent en quarantaine et
-aucune capability, geometrie, tolerance ou validation physique ne change.
+aucune capability, geometrie, valeur de tolerance ou validation physique ne
+change.
+
+## P67-V accepte - Fondation UX avant geometrie - 2026-07-14
+
+Thomas accepte D67-01 a D67-11 et ADR-0062. P44 porte desormais la fondation
+UX bornee ; P45 garde les formes et P46 la gate V0.2. Les complements restent
+en quarantaine et P69 reste apres P50.
+
+P44-M001 devient la seule mission `ready`. Les jeux herites puis surchargeables
+X/Y/Z par plateau, livret, asset et conteneur sont une intention acceptee, mais
+leurs roles physiques restent distincts. P44-M008 doit cadrer formules, defaults
+et migration avant P44-M009. Aucun default, solveur, schema ou runtime ne change
+pendant P67-V.
 
 ## P66-M001 gate-prepared - 2026-07-14
 

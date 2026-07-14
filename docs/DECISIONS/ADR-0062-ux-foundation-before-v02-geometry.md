@@ -2,7 +2,7 @@
 
 ## Statut
 
-Proposee le 2026-07-14 ; decision humaine P67-V requise.
+Acceptee le 2026-07-14 par validation humaine explicite P67-V.
 
 ## Date
 
@@ -12,7 +12,7 @@ Proposee le 2026-07-14 ; decision humaine P67-V requise.
 
 - P67-M000 - Capture et cadrage de la revue UX
 - P67-V - Arbitrage humain post-MVP
-- P44-M001 a P44-V - Fondation UX proposee
+- P44-M001 a P44-M009 puis P44-V - Fondation UX acceptee
 - P45 - Formes et ergonomie geometrique
 - P46 - Acceptation V0.2
 
@@ -41,7 +41,8 @@ Contraintes :
 - produit Fusion-only et palette embarquee ;
 - coeur Python sans `adsk` ;
 - schema et projets historiques preserves ;
-- aucun changement de solveur, tolerance ou geometrie glisse dans un lot UI ;
+- aucun changement de solveur, tolerance ou geometrie ne glisse dans un lot UI ;
+- tout changement du modele de jeu reste une mission et une decision separees ;
 - complements toujours en quarantaine sans contrat separe ;
 - P44-P50 gardent leurs identifiants ;
 - aucune qualification d impression.
@@ -84,29 +85,34 @@ Contraintes :
 - Compatibilite MVP : compatible si schema, solveur et CAD restent inchanges.
 - Facilite de test : bonne avec missions et gates separees.
 
-## Decision proposee
+## Decision
 
-Retenir l option C, sous reserve de P67-V.
+Retenir l option C. Thomas l accepte explicitement pendant P67-V le
+2026-07-14.
 
-Le perimetre propose est :
+Le perimetre accepte est :
 
 1. P44-M001 stabilise focus, panneaux ouverts et scroll sans changement metier ;
 2. les missions P44 suivantes traitent une cause a la fois : densite, quatre
    onglets, composition conteneur/contenu, creation/presets, document/diagnostic
    et calcul adaptatif ;
-3. P44-V valide uniquement cette fondation dans Fusion ;
-4. P45 porte les profils de cavite et geometries ergonomiques ;
-5. P46 reste la gate de la V0.2 complete ;
-6. P69 reste l audit exhaustif apres les couvercles P47-P50.
+3. le besoin de jeux herites et surchargeables par objet est traite par un
+   contrat de tolerance distinct avant toute implementation ;
+4. P44-V valide uniquement cette fondation dans Fusion ;
+5. P45 porte les profils de cavite et geometries ergonomiques ;
+6. P46 reste la gate de la V0.2 complete ;
+7. P69 reste l audit exhaustif apres les couvercles P47-P50.
 
-Cette proposition autorise un changement de presentation et de workflow dans
+Cette decision autorise un changement de presentation et de workflow dans
 la palette apres acceptation. Elle n autorise pas encore :
 
 - la reactivation des complements ;
 - un schema de conteneurs imbriques ;
 - une reservation de plateau sous les conteneurs ou servant de couvercle ;
 - une nouvelle forme de cavite ;
-- un changement de tolerance ou de solveur ;
+- un changement de solveur ;
+- une implementation de jeux par objet avant son contrat, ses formules de
+  resolution, sa compatibilite et sa gate de tolerance ;
 - une materialisation Fusion automatique.
 
 ## Consequences
@@ -124,12 +130,12 @@ la palette apres acceptation. Elle n autorise pas encore :
 - le mot `ergonomie` couvre temporairement ergonomie d interaction puis
   ergonomie physique ; les contrats devront toujours les distinguer ;
 - P44 contiendra plusieurs missions atomiques avant la geometrie P45 ;
-- ADR-0060 devra recevoir un amendement sur les details essentiels toujours
+- ADR-0060 recoit un amendement sur les details essentiels toujours
   visibles et l abandon du principe « un seul element developpe ».
 
 ### Risques
 
-- refonte monolithique : mitigée par P44-M001...M007 et une cause par mission ;
+- refonte monolithique : mitigée par P44-M001...M009 et une cause par mission ;
 - logique metier deplacee en JavaScript : interdite, projections Python gardees ;
 - regression anciens projets : tests roundtrip, import et compatibilite requis ;
 - calcul automatique instable : decision et mission separees, scene toujours
@@ -138,15 +144,33 @@ la palette apres acceptation. Elle n autorise pas encore :
 
 ## Alternatives refusees
 
-Aucune option n est encore refusee tant que P67-V n a pas tranche. La
-recommandation documentee refuse seulement de traiter l option C comme deja
-acceptee.
+- Option A, geometrie avant UX : rejetee car elle construirait les nouveaux
+  champs sur des composants instables.
+- Option B, correctif minimal : rejetee car elle conserve les separations et le
+  cycle document qui provoqueraient une seconde refonte.
 
 ## Suivi
 
-- Arbitrer D67-01 a D67-11 dans
+- D67-01 a D67-11 sont acceptes dans
   `docs/P67_POST_MVP_PRIORITIZATION_REPORT.md`.
-- Si l option C est acceptee, amender ADR-0060 et ADR-0061 sans les effacer.
-- Rendre uniquement P44-M001 `ready`, pas tout P44.
-- Rediger le contrat fonctionnel P44-M001 avant toute modification runtime.
+- ADR-0060 et ADR-0061 sont amendees sans effacer leur historique.
+- Seule P44-M001 devient `ready`, pas tout P44.
+- Le contrat fonctionnel `docs/P44_M001_UI_STATE_STABILITY_CONTRACT.md` est la
+  source d execution de P44-M001.
 - Conserver P45, P46, P47-P50 et P69 bloques par leurs dependances.
+
+## Precision P67-V sur les conteneurs et les jeux
+
+La validation ajoute deux orientations produit a la fondation, sans les faire
+entrer dans P44-M001 :
+
+1. le parcours normal utilisera un mode de taille unique Auto/Cible/Fixe par
+   conteneur et un controle global discret ; les contrats historiques mixtes
+   par axe restent accessibles comme `Personnalise` ;
+2. les plateaux, livrets, assets et conteneurs doivent pouvoir heriter d un jeu
+   commun pertinent puis le surcharger en X/Y/Z par objet.
+
+Le second point ne signifie pas qu un seul champ physique convient a toutes les
+interfaces. Jeu asset/cavite, jeu plateau/encastrement et jeu externe des
+conteneurs restent des roles distincts. P67-V ne change aucune valeur par
+defaut et n adopte pas 0,2 mm comme valeur universelle.
