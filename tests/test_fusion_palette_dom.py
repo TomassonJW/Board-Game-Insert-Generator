@@ -214,6 +214,9 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertIn("top_inset_reservation.py", helpers)
         self.assertIn("volumetric_stage_solver.py", helpers)
         self.assertIn("Assert-BgigPaletteProjectRuntime", helpers)
+        for marker in ('1. Boîte et plateaux', '2. Conteneurs et éléments', '3. Réglages', '4. Aperçu'):
+            self.assertIn(marker, helpers)
+        self.assertNotIn('\"1. Boite\", \"6. Apercu\"', helpers)
         self.assertIn("Aucun navigateur", smoke)
         self.assertIn("P56 Fusion OK", smoke)
 
