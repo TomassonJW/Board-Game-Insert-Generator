@@ -104,6 +104,11 @@ retour `Fusion P43 OK`. Cette preuve est conservee comme
 P33 sert seulement de matiere de prototype ; aucun statut V0.2 n'est herite.
 P67 priorise humainement le sous-scope avant que P44 puisse devenir ready.
 
+La revue P67 du 2026-07-14 propose de reorienter ce tableau sans le modifier
+encore : P44 porterait une fondation UX bornee, P45 les geometries ergonomiques
+et P46 la gate V0.2 complete. ADR-0062 reste `proposed`; P67-V doit accepter ou
+amender ce choix avant de rendre P44-M001 ready.
+
 ## Chemin V0.3, bloque jusqu'a P46
 
 | Lot | Resultat |

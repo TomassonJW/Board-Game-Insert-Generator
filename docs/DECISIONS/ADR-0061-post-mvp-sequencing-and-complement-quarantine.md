@@ -109,3 +109,10 @@ Retenir l option B et refuser l option C.
 - P67, P68 et P69 sont documentes par des contrats separes.
 - Toute reactivation des complements exige une decision humaine issue de P67 ou
   d une ADR ulterieure.
+
+## Suivi P67 du 2026-07-14
+
+P67 est en revue. ADR-0062 propose de placer une fondation UX bornee dans P44
+avant les geometries P45, sans renumeroter P44-P50 et sans avancer P69. Cette
+reorientation reste soumise a P67-V. La quarantaine des complements reste
+pleinement active ; aucune toolbar ne peut les reactiver sans contrat accepte.

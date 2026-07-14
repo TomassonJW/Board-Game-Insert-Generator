@@ -862,12 +862,22 @@ de cavite V0.2 restent differees apres P66.
   deferred jusqu a P46 ; P69 reste bloquee jusqu a P50.
 ## P67-P69 - Pilotage humain et apprentissage post-MVP
 
-- P67 n implemente aucune capability : il priorise humainement P44-P50 et peut
-  seul rendre P44-M001 ready apres P66.
+- P67 n implemente aucune capability : P67-M000 capture la revue UX, audite les
+  causes et propose ADR-0062 ; P67-V reste seul habilite a rendre P44-M001 ready.
+- C-FUSION-UI : aucune promotion. La revue observe une dette de focus, densite,
+  architecture d information, vocabulaire, document projet et priorite Apercu.
+- C-PROJECT : la persistance atomique du slot courant est implementee ; le cycle
+  Nouveau/Ouvrir/Enregistrer sous/projets recents est seulement propose.
+- C-ASSET / C-MODULE : la composition Conteneur parent -> Elements enfants est
+  une projection UI proposee sur les identifiants existants, sans schema recursif.
+- C-SOLVER : le calcul hybride adaptatif est une option P67 ; les poids, budgets
+  et heuristiques restent inchanges.
+- C-RESERVATION : les modes plateau dessous ou fermeture sont futurs et ne
+  modifient pas le top-inset valide.
 - P68 augmente la preuve locale d usage et d impression sans promouvoir une
   capability globale ni modifier les tolerances par defaut.
 - P69 audite exhaustivement C-FUSION-UI apres P50 et produit le cadrage P70+ ;
-  elle ne corrige aucun comportement dans la mission de revue.
+  elle reexamine la fondation eventuelle P44 et ne corrige rien pendant la revue.
 
 ## P66-M001 - Preparation de gate V0.1
 
@@ -890,4 +900,4 @@ de cavite V0.2 restent differees apres P66.
   confirment le comportement V0.1 sans requalifier les tolerances ou la
   geometrie physique.
 - Limite : `print-validated: false` ; aucune capability V0.2/V0.3 n est
-  promue. P67 est `ready`, P68 reste `planned-after-p66`, P44 reste bloque.
+  promue. P67 est `in-review`, P67-V est la prochaine gate, P68 reste `planned-after-p66`, P44 reste bloque.

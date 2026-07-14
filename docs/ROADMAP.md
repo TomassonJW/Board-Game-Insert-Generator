@@ -2,7 +2,8 @@
 
 Cette roadmap decrit les phases macro jusqu'au produit cible. Le detail
 operationnel vit dans `docs/BACKLOG.md`, l'etat courant dans `docs/STATUS.md`,
-et la lecture par capabilities dans `docs/CAPABILITY_MAP.md`.
+et la lecture par capabilities dans `docs/CAPABILITY_MAP.md`. La nomenclature
+et le role de ces documents sont definis dans `docs/PILOTAGE_GLOSSARY.md`.
 
 ## Ordre canonique actif depuis le 2026-07-12
 
@@ -20,6 +21,11 @@ Aucune mission P44+ ne peut devenir `ready` avant P66 puis P67. Aucune mission
 P47+ ne peut devenir `ready` avant P46. P69 reste bloquee jusqu a P50.
 Les explorations P33/P34 sont archivees et ne
 valent pas acceptation de V0.2/V0.3.
+
+La revue P67 du 2026-07-14 propose, sans l accepter encore, que P44 porte une
+fondation UX bornee avant les geometries P45. Cette option est documentee dans
+ADR-0062 et le rapport P67. Tant que P67-V ne tranche pas, l ordre canonique
+ci-dessus reste actif et P44-M001 reste bloque.
 
 P43 est reouvert le 2026-07-12 : la scene Fusion historique reste observee,
 mais le MVP produit n est pas accepte. P52 a P60 constituent le socle technique ;
@@ -446,6 +452,19 @@ pilotage apres un OK explicite.
 P44 a P50 restent des identifiants canoniques : les renumeroter casserait les
 liens documentaires sans apporter de valeur Git. Leur priorite est decidee par
 les dependances et statuts, pas par l ordre numerique.
+
+## P67-M000 - Revue UX structurelle capturee - 2026-07-14
+
+La revue post-MVP identifie un risque de sequence : ajouter les champs de formes
+et couvercles avant de stabiliser focus, densite, architecture d information et
+cycle document augmenterait la dette. Le rapport P67 propose quatre espaces
+Boite, Conteneurs, Reglages et Apercu, une composition Conteneur parent ->
+Elements enfants et une fondation UX en P44 avant la geometrie P45.
+
+Cette trajectoire est une option humaine, pas encore la roadmap acceptee.
+ADR-0062 reste `proposed`; P67-V doit choisir. P69 reste apres P50 comme audit
+UI/UX exhaustif du produit enrichi. Les complements restent en quarantaine et
+aucune capability, geometrie, tolerance ou validation physique ne change.
 
 ## P66-M001 gate-prepared - 2026-07-14
 

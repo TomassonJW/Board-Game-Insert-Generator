@@ -1,9 +1,11 @@
 # Backlog
 
-Derniere mise a jour : 2026-07-11
+Derniere mise a jour : 2026-07-14
 
-Le backlog transforme la North Star en missions atomiques. Chaque mission future
-doit indiquer au minimum : ID, titre, capability liee, milestone lie, objectif,
+Le backlog transforme la North Star en missions atomiques. Voir
+`docs/PILOTAGE_GLOSSARY.md` pour la distinction roadmap/backlog et la
+nomenclature P/M/V/H. Chaque mission future doit indiquer au minimum : ID,
+titre, capability liee, milestone lie, objectif,
 livrable, criteres d'acceptation, tests, gate eventuelle et statut.
 
 Statuts utilises : `done`, `ready`, `ready_if_gate_deferred`, `todo`, `blocked`,
@@ -1628,12 +1630,15 @@ impose les dependances de release suivantes.
   print-validated: false reste honnete.
 - Statut : `product-review-ko`, `technical-baseline-useful` ; remplace comme gate de sortie par P66.
 
-### P44 a P46 - V0.2 formes et ergonomie
+### P44 a P46 - V0.2 fondation UX, formes et ergonomie
 
-- Dependances : P66 accepte.
-- Scope : arrondis, chanfreins, encoches et fonds faciles a vider, avec impact
-  reel sur volume, parois et fabrication.
-- Statut : `deferred-until-v0.1`.
+- Dependances : P66 accepte puis decision P67-V.
+- Scope canonique avant P67-V : arrondis, chanfreins, encoches et fonds faciles
+  a vider, avec impact reel sur volume, parois et fabrication.
+- Reorientation proposee : P44 stabilise d abord l ergonomie d interaction ;
+  P45 porte ensuite les geometries ergonomiques ; P46 reste la gate V0.2.
+- Decision : rapport P67 et ADR-0062 `proposed`.
+- Statut : `blocked-by-p67-v`, aucune implementation autorisee.
 
 ### P47 a P50 - V0.3 couvercles
 
@@ -1835,12 +1840,52 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
   possible, sans en faire une condition bloquante.
 - Objectif : redefinir humainement l ordre, les criteres et le perimetre de
   P44-P50 avant toute implementation V0.2.
-- Livrable : decisions explicites sur formes/ergonomie, complements, vrais
-  inserts prioritaires, niveau de preuve et ordre des missions.
+- Livrable : decisions explicites sur fondation UX, formes/ergonomie,
+  complements, vrais inserts prioritaires, niveau de preuve et ordre des
+  missions.
 - Sortie : P44-M001 peut devenir `ready` seulement apres acceptation du compte
   rendu P67 ; P67 ne remplace pas la revue UI/UX exhaustive P69.
 - Contrat : `docs/P67_POST_MVP_PRIORITIZATION_CONTRACT.md`.
+- Rapport : `docs/P67_POST_MVP_PRIORITIZATION_REPORT.md`.
+- Statut : `in-review`, `human-review-required`, `no-runtime-change`.
+
+#### P67-M000 - Capture, audit et options de la revue UX
+
+- Capability : C-PRODUCT-VISION, C-FUSION-UI, C-QUALITY.
+- Objectif : transcrire la revue humaine, verifier les comportements reels et
+  proposer des options sans modifier le runtime.
+- Livrables : rapport P67, glossaire de pilotage, ADR-0062 proposee, roadmap,
+  backlog, status, capabilities, gates et next actions synchronises.
+- Preuves : audit palette/bridge/coeur/tests, sources Autodesk pour palette et
+  FileDialog, aucune modification runtime.
+- Sortie : decisions D67-01 a D67-11 explicites ; P44 reste bloque.
+- Statut : `done-docs` apres integration.
+
+#### P67-V - Arbitrage humain de la trajectoire V0.2
+
+- Dependances : P67-M000 integree.
+- Objectif : accepter, corriger ou refuser l option de fondation UX avant
+  geometrie et le premier sous-lot P44.
+- Decisions : sequence, quatre onglets, composition conteneur/contenu, toolbar,
+  complements, X/Y, calcul, cycle document, gabarit/profil de cavite et P44-M001.
+- Gate : Thomas accepte ou refuse ADR-0062 et le rapport.
+- Sortie verte : rendre uniquement P44-M001 `ready`.
 - Statut : `ready`, `human-review-required`, `no-runtime-change`.
+
+#### P44-M001 a P44-V - Fondation UX proposee
+
+- Dependances : P67-V verte et ADR-0062 acceptee ou amendee.
+- P44-M001 : stabilite de saisie, focus, details ouverts et scroll.
+- P44-M002 : densite compacte, labels et composants accessibles.
+- P44-M003 : quatre onglets, Boite + elements plats, ordre traduit et X/Y.
+- P44-M004 : conteneurs parents, elements enfants et reaffectation accessible.
+- P44-M005 : barre de creation et gestion des presets personnels.
+- P44-M006 : reglages, cycle de document local et outils de diagnostic.
+- P44-M007 : calcul adaptatif retenu et Apercu priorise.
+- P44-V : observation Fusion de la fondation, sans geometrie ni impression.
+- Frontieres : schema compatible, coeur sans adsk, complements en quarantaine,
+  zero changement solveur/tolerance/geometrie par glissement.
+- Statut : `proposed`, `blocked-by-p67-v`.
 
 ### P68 - Boucle de premiers inserts reels
 

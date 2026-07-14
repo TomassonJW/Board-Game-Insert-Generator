@@ -8,7 +8,7 @@ Statut produit : **MVP V0.1 Fusion-only accepte ; validation d impression non ac
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P66-CLOSE termine ; P67 est ready pour la priorisation humaine post-MVP.
+Phase active : P67 en revue ; P67-M000 documente, arbitrage humain P67-V ready, P44 bloque.
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -1749,5 +1749,28 @@ export et preservation non-BGIG ont passe la gate humaine.
 
 Cette acceptance ne deduit aucune validation d impression, de tolerance
 physique, de resistance, d ergonomie V0.2 ou de couvercle V0.3. Aucun tag ou
-release n est publie. P67 est `ready` pour arbitrer humainement P44-P50 ; P68
+release n est publie. P67 est ouvert pour arbitrer humainement P44-P50 ; P68
 reste `planned-after-p66` et P44-M001 reste bloque jusqu a cette decision.
+
+## P67-M000 - Revue UX structurelle capturee
+
+Statut : `done-docs` apres integration, `p67-in-review`,
+`human-review-required`, `no-runtime-change`, `print-validated: false`.
+
+La revue humaine du 2026-07-14 confirme que le MVP est utilisable comme version
+de developpement, mais identifie avant les geometries V0.2 une dette de densite,
+de stabilite pendant la saisie, d architecture d information, de vocabulaire et
+de cycle de document. L audit relie notamment la fermeture de Placement et
+ordre a la reconstruction complete des cartes HTML apres chaque changement.
+
+Le rapport `docs/P67_POST_MVP_PRIORITIZATION_REPORT.md` explique les champs
+Retrait calcule, encastrement/prise, hauteur utilisable, preference solveur,
+sleeves, Verifier/Recalculer, Sauvegarder et Inspecter. Il propose quatre onglets,
+des conteneurs parents avec elements enfants, une barre de creation, un vrai
+cycle de document local et un calcul adaptatif sans scene Fusion automatique.
+
+ADR-0062 propose de placer cette fondation UX dans P44 avant les geometries P45,
+puis de conserver P46 comme gate V0.2. Cette reorientation n est pas acceptee :
+P67-V reste humain, P44-M001 reste `blocked-by-p67-v`, les complements restent
+en quarantaine et aucun runtime, schema, solveur, tolerance, CAD ou statut de
+capability n est modifie.

@@ -1,6 +1,7 @@
 # P67 - Atelier humain de priorisation post-MVP
 
-Statut : `ready`, `human-review-required`, `no-runtime-change`.
+Statut : `in-review`, `human-review-required`, `no-runtime-change`,
+`p44-m001-blocked`.
 
 ## Objectif
 
@@ -9,6 +10,12 @@ Il ne renumerote pas P44 a P50 et ne code rien. Il produit une decision
 explicite, commentee et actionnable sur les priorites produit apres usage reel
 de la palette Fusion. Il ne remplace pas P69, qui sera la revue UI/UX exhaustive
 apres P44-P50.
+
+La revue humaine du 2026-07-14 ouvre explicitement une option de reorientation :
+realiser une fondation UX structurelle bornee avant d ajouter les parametres de
+geometrie. Le rapport
+`docs/P67_POST_MVP_PRIORITIZATION_REPORT.md` et ADR-0062 proposee portent cette
+option. Aucun de leurs lots n est autorise avant P67-V.
 
 L ordre des cartes est semantique, pas numerique : P67 est execute apres P66,
 puis seulement P44-M001 peut devenir `ready`. Les identifiants P44 a P50 restent
@@ -46,6 +53,9 @@ prioriser V0.2 sans pretendre remplacer l audit exhaustif P69 :
 8. **Ergonomie V0.2** : classer arrondis, chanfreins, encoches, fonds faciles a
    vider et contraintes de resistance selon valeur utilisateur, risque physique
    et impact solveur/CAD.
+9. **Fondation UX avant geometrie** : arbitrer densite, stabilite de focus,
+   quatre onglets, composition conteneur/contenu, cycle document, aide et calcul
+   automatique sans confondre cette passe avec P69.
 
 Chaque observation est classee : `bloquant`, `important`, `amelioration`,
 `question`, `hors-scope`. Une capture annotee est recommandee pour chaque
@@ -73,7 +83,10 @@ P67 doit choisir, sans implementation simultanee :
 3. les criteres de preview et de gate Fusion P46 ;
 4. si les complements meritent un futur lot dedie, avec quelle politique de
    suggestion, confirmation et dimensionnement ;
-5. le perimetre de mesures P68 a utiliser pour les premiers prints.
+5. le perimetre de mesures P68 a utiliser pour les premiers prints ;
+6. si P44 commence par une fondation UX bornee avant les geometries P45 ;
+7. l architecture quatre onglets, le cycle de document et le mode de recalcul ;
+8. le premier sous-lot P44-M001 et ses exclusions strictes.
 
 ## Sorties possibles
 
@@ -82,6 +95,14 @@ P67 doit choisir, sans implementation simultanee :
 | P67 accepte | P44-M001 devient `ready`; les retours P68 continuent d alimenter V0.2. |
 | P67 a revoir | aucune carte V0.2 ne devient `ready`; rapport complete uniquement. |
 | P67 reoriente V0.2 | ADR ou amendement de contrat avant toute implementation. |
+
+## Etat de la revue du 2026-07-14
+
+- P67-M000, capture et audit documentaire : `done-docs` apres integration de
+  son rapport ;
+- ADR-0062 : `proposed`, jamais acceptee implicitement ;
+- P67-V : prochaine decision humaine ;
+- P44-M001 : `blocked-by-p67-v`.
 
 ## Interdits
 

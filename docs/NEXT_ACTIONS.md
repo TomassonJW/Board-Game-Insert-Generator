@@ -9,7 +9,8 @@ V0.1 - MVP Fusion-only `mvp-accepted` par P66, package 0.1.20 au commit `6e351bb
 
 ## Derniere mission terminee
 
-P66-CLOSE - acceptation humaine Fusion du MVP V0.1 et cloture du pilotage P66.
+P67-M000 - capture, audit et options de la revue UX post-MVP, sans modification
+runtime. Le rapport P67 et ADR-0062 restent soumis a arbitrage humain.
 
 ## Derniere preuve
 
@@ -25,23 +26,26 @@ ni impression, ni mesures physiques, ni ergonomie V0.2, ni couvercles V0.3.
 
 ## Mission courante
 
-Aucune implementation en cours. P67 est maintenant `ready` : atelier humain de
-priorisation post-MVP, sans modification runtime.
+Aucune implementation en cours. P67 est `in-review`. La revue UX structurelle
+est capturee ; P44-M001 reste bloque.
 
 ## Prochaine action recommandee
 
-P67 - Atelier humain de priorisation selon
-`docs/P67_POST_MVP_PRIORITIZATION_CONTRACT.md`.
+P67-V - arbitrage humain du rapport
+`docs/P67_POST_MVP_PRIORITIZATION_REPORT.md` et d ADR-0062 proposee.
 
 Statut : `ready`, `human-review-required`, `no-runtime-change`.
-P67 doit prioriser P44-P50, decider du devenir des complements et autoriser ou
-refuser explicitement P44-M001. Ne pas commencer P44 pendant la revue.
+Thomas doit accepter, corriger ou refuser les decisions D67-01 a D67-11,
+notamment la fondation UX avant geometrie, les quatre onglets, la composition
+conteneur/contenu, la toolbar, le maintien en quarantaine des complements, le
+calcul et le cycle document. Ne rendre que P44-M001 `ready` apres une sortie
+verte explicite.
 
 ## Releases et lots bloques
 
-P68 reste `planned-after-p66`, `print-validated: false`. P44-P46 restent
-bloques jusqu a une decision humaine P67 ; P47-P50 restent bloques jusqu a P46 ;
-P69 reste bloque jusqu a P50. Aucun tag ou release n est publie par P66-CLOSE.
+P68 reste `planned-after-p66`, `print-validated: false`. P44-M001 et les
+autres lots P44-P46 restent `blocked-by-p67-v` ; P47-P50 restent bloques
+jusqu a P46 ; P69 reste bloque jusqu a P50. Aucun tag ou release n est publie par P66-CLOSE.
 
 ## Fin de chaque mission
 

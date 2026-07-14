@@ -65,6 +65,18 @@ Chaque observation recoit :
 - sujets explicitement refuses ou reportes ;
 - decision humaine d ouverture de la version suivante.
 
+## Articulation avec la fondation UX anticipee
+
+La revue P67 du 2026-07-14 peut autoriser une fondation UX bornee dans P44
+avant les geometries P45 : stabilite de saisie, densite, architecture
+d information, cycle document et traduction des concepts. Cette passe corrige
+un risque de construction ; elle ne remplace pas P69.
+
+P69 reste la revue exhaustive du produit enrichi apres P50. Elle reexamine les
+choix P44 sur plusieurs profils, les vraies formes, les couvercles, les retours
+P68, l accessibilite et les parcours complets. Elle peut donc confirmer,
+corriger ou remettre en cause la fondation avec des preuves plus riches.
+
 ## Sortie
 
 P69 ne modifie aucun statut de capability par lui-meme. Il produit un backlog

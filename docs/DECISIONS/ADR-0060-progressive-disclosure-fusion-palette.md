@@ -76,3 +76,11 @@ Le retour Fusion confirme que la materialisation doit rester accessible pendant 
 tests multi-etages. La barre persistante porte donc l action apres Recalculer.
 Cette visibilite ne desserre pas le garde-fou : proposition partielle, absente ou
 obsolete implique un bouton desactive et aucun envoi vers Fusion.
+
+## Suivi P67 du 2026-07-14
+
+La revue post-MVP observe que les controles essentiels replies et la
+reconstruction complete des cartes nuisent a la saisie. ADR-0062 propose de
+remplacer, apres decision P67-V, « un seul element developpe » par des lignes
+essentielles toujours visibles et des details techniques localement replies.
+Ce suivi ne modifie pas encore la decision acceptee.

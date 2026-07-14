@@ -79,7 +79,7 @@ merge, si un conflit reel apparait ou si une action risque de perdre du travail.
 | P60 - Base technique V0.1 | Parcours palette -> calcul -> apercu -> materialisation observe | Revue produit du parcours | Revue KO ; ne debloque pas V0.2 |
 | ADR-0056 a ADR-0060 - Rebase produit | Alternatives, consequences et validations P61-P65 documentees | Acceptees par GO humain le 2026-07-12 | P61-P65 autorises sequentiellement |
 | P66 - Acceptation V0.1 revisee Fusion-only | Etat reactif, plateaux encastres, orientations, multi-etages, conteneurs/reglages/apercu integres et scene sure | Observation Fusion du parcours complet, regeneration/export et absence de fuite technique | Clot le MVP et autorise P67 ainsi que les observations P68 ; n ouvre pas directement P44 |
-| P67 - Priorisation post-MVP | P66 OK, retours d usage disponibles si existants et contrat P67 prepare | Arbitrage humain du sous-scope, de l ordre P44-P50, des preuves et du devenir des complements | Peut rendre P44-M001 ready |
+| P67 - Priorisation post-MVP | P66 OK, rapport P67 et ADR-0062 proposee disponibles | Arbitrage humain de la fondation UX avant geometrie, des quatre onglets, du calcul, du cycle document, du premier P44 et des complements | Peut rendre uniquement P44-M001 ready |
 | P46 - Acceptation V0.2 | Formes et ergonomie materialisees, contraintes de paroi et volume recalculees | Evaluation visuelle/ergonomique et observation Fusion | Autorise seulement alors le demarrage V0.3 |
 | P50 - Validation V0.3 | Deux familles de couvercles conformes au contrat, coupons prepares | Impressions, mesures, glisse/tenue et interpretation | Autorise P69, sans qualifier automatiquement tout le produit |
 | P69 - Revue UI/UX exhaustive | P44-P50 termines et retours P68 disponibles si des impressions existent | Audit commente, arbitrage du backlog et de la version suivante | Peut autoriser le cadrage P70+ ; aucun correctif n est implemente dans la gate |
@@ -125,7 +125,8 @@ Thomas a confirme `P66 Fusion OK 0.1.20 - commit 6e351bb`. La gate P66 est
 fermee : le MVP V0.1 Fusion-only est `mvp-accepted` et `fusion-validated`.
 Cette decision ne qualifie pas l impression : `print-validated: false`.
 
-P67 est maintenant `ready` pour la priorisation humaine post-MVP. Il peut seul
-rendre P44-M001 `ready`; P44-P50 restent bloques jusque-la. P68 demeure une
-boucle de retours volontaires `planned-after-p66`. Aucun tag ou release n est
-autorise par cette gate seule.
+P67 est maintenant `in-review`. P67-M000 a capture la revue UX sans runtime ;
+P67-V est la prochaine decision humaine. Elle doit accepter, corriger ou refuser
+le rapport et ADR-0062 proposee. Elle peut seule rendre P44-M001 `ready` ;
+P44-P50 restent bloques jusque-la. P68 demeure une boucle de retours volontaires
+`planned-after-p66`. Aucun tag ou release n est autorise par cette gate seule.
