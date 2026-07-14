@@ -196,3 +196,8 @@ Les validations P64 doivent couvrir au minimum :
 - Les nouveaux textes respectent la règle dès P44-M003 ; P44-M006 corrige
   exhaustivement l’historique.
 - Une observation Fusion reste requise pour qualifier le rendu réel.
+
+- P44-M003 impose exactement quatre onglets primaires ; une interversion X/Y
+  est locale, ne crée aucune action bridge et ne modifie jamais une origine
+  ni une valeur Z ; pour un conteneur, elle échange le contrat complet de ses
+  axes X/Y.

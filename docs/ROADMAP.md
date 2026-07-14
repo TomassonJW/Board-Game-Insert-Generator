@@ -517,3 +517,14 @@ prochaine mission `ready` de la fondation UX.
 accentué. P44-M006 garde la responsabilité de l’audit exhaustif des textes
 historiques, avec preuves UTF-8, anti-mojibake et validation Fusion. Cette
 exigence reste une qualité de surface et ne modifie aucune sémantique métier.
+
+
+## P44-M003 implémentée - Navigation UX 0.1.24 - 2026-07-14
+
+P44-M003 livre quatre onglets primaires, retire Précédent/Suivant et réunit
+Boîte/plateaux/livrets ainsi que Conteneurs/éléments sans changer les
+collections source. L’interversion X/Y est locale : dimensions source pour
+boîte, élément et plat, contrat complet de taille pour conteneur ; elle ne
+déplace jamais une origine. La rotation historique est conservée hors du
+parcours normal. Les changements restent UI-only et la gate P44-M003V est
+requise avant P44-M004.

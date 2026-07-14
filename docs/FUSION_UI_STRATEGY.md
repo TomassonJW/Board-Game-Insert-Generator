@@ -516,6 +516,8 @@ les caractères français dans les libellés utilisateur et conservent les
 identifiants techniques en ASCII. Cette séparation évite de coupler traduction,
 état DOM, bridge et persistance.
 
-P44-M003 applique la règle aux textes modifiés. P44-M006 réalise l’audit global,
-ajoute les tests anti-mojibake et vérifie le roundtrip des noms accentués. Aucun
-calcul métier n’est déplacé dans JavaScript par cette exigence.
+P44-M003 applique la règle aux textes modifiés et livre le package 0.1.24 :
+quatre onglets, sections réunies, `Ordre de retrait` et interversion X/Y locale.
+P44-M006 réalise l’audit global, ajoute les tests anti-mojibake et vérifie le
+roundtrip des noms accentués. Aucun calcul métier n’est déplacé dans
+JavaScript par cette exigence.

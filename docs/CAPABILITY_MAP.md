@@ -988,3 +988,18 @@ de cavite V0.2 restent differees apres P66.
 - Identifiants techniques ASCII, contenu humain UTF-8 sans BOM ni mojibake.
 - Cette gate ne change ni schéma, solveur, tolérance, géométrie ou statut
   d’impression. `print-validated: false`.
+
+
+## P44-M003 - Navigation et interversion X/Y
+
+- C-FUSION-UI : `implemented`, `automated-validated`,
+  `human-fusion-gate-required` pour quatre onglets primaires, sections
+  Boîte/plateaux/livrets et Conteneurs/éléments regroupées, sans composition
+  parent/enfant encore.
+- C-QUALITY : interversions locales testées ; boîte, élément, plateau/livret
+  et contrat X/Y complet de conteneur. Origines, Z, bridge, solveur et scène
+  restent inchangés.
+- Compatibilité : `rotation_deg_z` historique est préservé ; aucun schéma ou
+  migration n’est introduit.
+- Prochaine preuve : P44-M003V dans Fusion pour le package 0.1.24 ;
+  `print-validated: false`.

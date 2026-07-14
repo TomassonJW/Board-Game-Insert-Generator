@@ -47,18 +47,21 @@ class FusionPaletteProjectTests(unittest.TestCase):
 
     def test_save_is_atomic_and_load_restores_the_normalized_project(self) -> None:
         project = blank_project_v1()
-        project["project_name"] = "Mon jeu"
+        project_name = "Éléments d’été — boîte à dés"
+        project["project_name"] = project_name
         with tempfile.TemporaryDirectory() as temp_dir, patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}):
             saved = handle_palette_request(request("save_project", project=project), ADDIN, ROOT)
             loaded = handle_palette_request(request("load_project"), ADDIN, ROOT)
             path = Path(temp_dir) / CURRENT_PROJECT_FILENAME
+            raw = path.read_text(encoding="utf-8")
 
             self.assertTrue(path.is_file())
             self.assertFalse(path.with_suffix(path.suffix + ".tmp").exists())
-            self.assertEqual(json.loads(path.read_text(encoding="utf-8"))["project_name"], "Mon jeu")
+            self.assertIn(project_name, raw)
+            self.assertEqual(json.loads(raw)["project_name"], project_name)
 
         self.assertTrue(saved["saved"])
-        self.assertEqual(loaded["project"]["project_name"], "Mon jeu")
+        self.assertEqual(loaded["project"]["project_name"], project_name)
 
     def test_validate_delegates_project_rules_and_p55_envelopes_to_python(self) -> None:
         project = blank_project_v1()

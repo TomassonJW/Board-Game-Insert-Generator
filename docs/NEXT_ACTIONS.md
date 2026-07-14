@@ -4,56 +4,59 @@ Dernière mise à jour : 2026-07-14
 
 ## Version active
 
-V0.1 - MVP Fusion-only `mvp-accepted` par P66, package 0.1.20 au commit
-`6e351bb`. `fusion-validated: true`, `print-validated: false`.
+V0.1 est `mvp-accepted` par P66 (package 0.1.20) ; `fusion-validated: true`,
+`print-validated: false`. La fondation UX V0.2 est en cours dans P44, sans
+qualification de géométrie ni d’impression.
 
-## Dernière gate humaine fermée
+## Dernière mission intégrée
 
-P44-M002V est acceptée par le retour :
-`P44-M002V Fusion OK 0.1.23 - commit 2f78a99`.
+P44-M003 est `implemented` et `automated-validated` sur le package 0.1.24.
+La palette comporte maintenant quatre onglets : `Boîte et plateaux`,
+`Conteneurs et éléments`, `Réglages`, `Aperçu`. Les boutons
+`Précédent`/`Suivant` ont disparu. L’interversion X/Y est locale et
+atomique pour boîte, élément, plateau/livret et contrat de conteneur.
 
-La densité hybride A+B du package 0.1.23 est donc `fusion-validated`.
-Cette validation porte sur la compacité et la lisibilité des cartes, pas sur
-l’impression.
+Aucun schéma, bridge Python, solveur, tolérance, géométrie, CAD IR, scène
+automatique ou complément n’a changé. Les textes modifiés sont UTF-8
+accentués conformément au contrat P44.
 
-## Exigence transversale ajoutée
+## Prochaine action recommandée
 
-Les textes utilisateur doivent désormais employer un français correctement
-accentué. Tout nouveau texte P44 applique cette règle ; P44-M006 portera la
-passe exhaustive sur l’historique. Contrat :
-`docs/P44_FRENCH_UI_ORTHOTYPOGRAPHY_CONTRACT.md`.
+### Gate humaine P44-M003V
 
-## Mission courante
+Statut : `manual_validation_required`, `fusion-validated: false`, `print-validated: false`.
 
-Aucune implémentation en cours. La gate P44-M002V est fermée et intégrée au
-pilotage.
+Dans Fusion, avec le package 0.1.24 installé, vérifier :
 
-## Prochaine action recommandee
+1. les quatre onglets et la disparition de `Précédent`/`Suivant` ;
+2. Boîte avec plateaux/livrets, puis Conteneurs avec éléments, sans perte de
+   saisie ou de scroll ;
+3. `Ordre de retrait`, la phrase de placement et `Orientation historique` d’un
+   plateau/livret ;
+4. chaque bouton X/Y : valeurs boîte, élément, plateau/livret et mode/valeurs
+   X/Y d’un conteneur ; aucune origine X/Y ne doit bouger ;
+5. le rendu réel des accents français, y compris `Boîte`, `Éléments`, `Réglages`,
+   `Aperçu`, `Épaisseur` et `Quantité`.
 
-P44-M003 - quatre onglets, Boîte et éléments plats.
+Retour attendu :
 
-Statut : `ready-after-p44-m002v`, `no-business-change`,
-`fusion-retest-required`.
-Dépendance : P44-M002V acceptée.
+```text
+P44-M003V Fusion OK 0.1.24 - commit <sha>
+```
 
-Objectif : passer à quatre onglets, supprimer Précédent/Suivant, fusionner
-Boîte/plateaux/livrets, traduire l’ordre de retrait et ajouter le bouton X/Y.
-Les nouveaux libellés doivent respecter le contrat de français accentué.
-Aucun jeu par objet, schéma, solveur, tolérance, géométrie, scène automatique
-ou complément ne sera modifié.
+Un KO doit indiquer l’onglet, l’objet, la largeur approximative et l’écart observé.
 
-## Missions suivantes bloquées
+## Séquence verrouillée
 
-P44-M004 à P44-M007 restent bloquées par leur séquence. P44-M008 doit cadrer
-les jeux hérités et overrides X/Y/Z par objet, puis obtenir une gate humaine de
-tolérance avant P44-M009. P45/P46 ne commencent pas avant P44-V ; P47-P50
-restent bloqués jusqu’à P46 ; P69 reste bloqué jusqu’à P50.
+P44-M004 reste bloquée jusqu’à P44-M003V. P44-M008/P44-M009 gardent leur
+contrat et gate de tolérance ; P45/P46 ne commencent pas avant P44-V.
+P47-P50 restent bloqués jusqu’à P46 et P69 jusqu’à P50. P68 peut
+recueillir des faits réels sans modifier les valeurs par défaut.
+`print-validated: false` reste obligatoire.
 
-P68 reste `planned-after-p66` et peut recueillir des observations réelles sans
-modifier les defaults. `print-validated: false` reste obligatoire.
 
 ## Fin de chaque mission
 
-Documenter chaque OK/KO sans extrapoler à l’impression, mettre à jour le
-pilotage, committer et intégrer directement dans main quand les preuves
-automatisées sont vertes.
+Mettre à jour le pilotage, relire le diff, exécuter les preuves prévues,
+committer puis intégrer directement dans `main` quand aucune gate humaine
+n’est ouverte. Une gate Fusion ne devient jamais une validation d’impression.

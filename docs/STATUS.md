@@ -8,7 +8,7 @@ Statut produit : **MVP V0.1 Fusion-only accepte ; validation d impression non ac
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P44-M002V acceptée et fusion-validated sur le package 0.1.23 ; P44-M003 devient la seule mission ready.
+Phase active : P44-M003 est implementee et automatisee sur le package 0.1.24 ; P44-M003V est la seule gate humaine ouverte.
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -1888,3 +1888,30 @@ emploient les accents et caractères français corrects. La palette est déjà
 déclarée UTF-8 ; les identifiants techniques restent ASCII. La règle s’applique
 aux nouveaux textes dès P44-M003 et la normalisation exhaustive de l’historique
 est planifiée dans P44-M006. P44-M003 devient `ready-after-p44-m002v`.
+
+
+## P44-M003 - Quatre onglets, sections fusionnées et X/Y
+
+Statut : `done`, `implemented`, `automated-validated`,
+`human-fusion-gate-required`, `no-business-change`, `print-validated: false`.
+
+Le package Fusion 0.1.24 ramène la navigation à quatre onglets : Boîte et
+plateaux, Conteneurs et éléments, Réglages, Aperçu. Précédent et
+Suivant disparaissent. Les collections restent plates : la composition
+conteneur-parent / éléments-enfants est toujours P44-M004.
+
+Le bouton X/Y échange localement les deux dimensions de boîte, d’élément et
+de plateau/livret. Pour un conteneur, il échange le contrat complet X/Y : mode,
+cible, fixe et expansion. Il ne modifie ni origine, ni Z, ni valeur résolue. Un
+élément Cartes devient une mesure explicite comme lors d’une édition directe.
+`rotation_deg_z` reste compatible et uniquement exposée dans un détail historique.
+
+`Retrait calculé` devient `Ordre de retrait`. La phrase de plateau/livret
+explique position, taille du logement encastré et côté de la zone de prise.
+Les textes modifiés sont en UTF-8 accentué ; le roundtrip du nom
+`Éléments d’été — boîte à dés` est couvert.
+
+Preuves automatisées : DOM, bridge conservé, roundtrip, Qt transport,
+acceptance P66 de non-régression et alignement Fusion-only. La suite complète,
+compileall, frontière `adsk`, diff-check et installation Fusion restent requis
+avant P44-M003V. Aucune validation Fusion ni impression n’est revendiquée.

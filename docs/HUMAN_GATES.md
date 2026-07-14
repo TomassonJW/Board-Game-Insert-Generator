@@ -186,3 +186,19 @@ l’impression : `print-validated: false`.
 Le même retour ajoute une exigence de qualité linguistique : les futurs textes
 utilisateur emploient les accents et caractères français corrects. P44-M003
 l’applique aux textes qu’il touche ; P44-M006 effectue la passe exhaustive.
+
+
+## P44-M003V - Quatre onglets et interversion X/Y 0.1.24
+
+Déclencheur : P44-M003 est intégrée avec des preuves automatisées. La palette
+change son parcours principal, mais n’a ni modifié le modèle produit ni la
+scène Fusion.
+
+Validation humaine demandée : observer les quatre onglets, les sections
+réunies, les libellés français accentués, l’ordre de retrait et les quatre
+portées d’interversion X/Y. Confirmer qu’une origine ne bouge pas et que la
+rotation historique reste compatible sans encombrer le parcours normal.
+
+Retour OK : `P44-M003V Fusion OK 0.1.24 - commit <sha>`.
+Un KO ouvre seulement un hotfix P44-M003Hxx borné. P44-M004 reste bloquée tant
+que cette gate n’est pas fermée.

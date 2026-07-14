@@ -1911,22 +1911,34 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
 - Statut : `done-human-gate`, `fusion-validated`,
   `unblocks-p44-m003`.
 
-#### P44-M003 - Quatre onglets, Boite et elements plats
+#### P44-M003 - Quatre onglets, Boîte et éléments plats
 
-- Dependances : P44-M002V acceptee.
-- Objectif : renforcer les quatre onglets, supprimer Precedent/Suivant, fusionner
-  Boite/plateaux/livrets, traduire l ordre de retrait et ajouter X/Y.
-- Jeux : reserver le vocabulaire et la place du futur controle, sans afficher un
-  override inerte ; contrat et implementation restent P44-M008/P44-M009.
-- Français : tout nouveau libellé respecte
-  `docs/P44_FRENCH_UI_ORTHOTYPOGRAPHY_CONTRACT.md` ; seuls les textes
-  touchés sont corrigés dans ce lot.
-- Statut : `ready-after-p44-m002v`, `no-business-change`,
-  `fusion-retest-required`.
+- Dependances : P44-M002V acceptée.
+- Objectif : renforcer les quatre onglets, supprimer Précédent/Suivant, fusionner
+  Boîte/plateaux/livrets, clarifier l’ordre de retrait et ajouter X/Y.
+- Livrable : package 0.1.24, quatre vues primaires, interversion X/Y locale,
+  compatibilité `rotation_deg_z` et contrat
+  `docs/P44_M003_FOUR_TABS_XY_SWAP_CONTRACT.md`.
+- Jeux : aucun override inerte ; contrat et implémentation restent P44-M008/P44-M009.
+- Français : les textes modifiés respectent
+  `docs/P44_FRENCH_UI_ORTHOTYPOGRAPHY_CONTRACT.md`.
+- Statut : `done`, `implemented`, `automated-validated`,
+  `human-fusion-gate-required`, `no-business-change`, `print-validated: false`.
+
+#### P44-M003V - Gate Fusion des quatre onglets et de X/Y
+
+- Dépendances : P44-M003 intégrée, package 0.1.24 installé et preuves automatisées vertes.
+- Observation : les quatre onglets, l’absence de Précédent/Suivant, les deux sections
+  fusionnées, la clarté de l’ordre de retrait et chaque interversion X/Y.
+- Invariants : aucun mouvement d’origine, aucune nouvelle action bridge, aucune mutation du
+  solveur ou de la scène automatique ; une rotation historique reste éditable seulement dans
+  son détail de compatibilité.
+- Preuve attendue : `P44-M003V Fusion OK 0.1.24 - commit <sha>`.
+- Statut : `manual_validation_required`, `fusion-validated: false`, `print-validated: false`.
 
 #### P44-M004 - Conteneurs parents, contenus enfants et modes de taille
 
-- Dependances : P44-M003 integree.
+- Dependances : P44-M003V acceptée.
 - Objectif : projection parent/enfants sans schema recursif, action Deplacer vers
   et nom editable comme titre.
 - Dimensionnement : controle global discret et confirme ; un mode Auto/Cible/Fixe

@@ -73,7 +73,7 @@ REQUIRED_SECTIONS = {
         "## Tests et verifications connus",
     ),
     "docs/NEXT_ACTIONS.md": (
-        "## Prochaine action recommandee",
+        "## Prochaine action recommandée",
         "## Fin de chaque mission",
     ),
     "docs/BACKLOG.md": (

@@ -37,10 +37,37 @@ class FusionPaletteDomTests(unittest.TestCase):
         cls.dom = PaletteDomParser()
         cls.dom.feed(cls.markup)
 
-    def test_exposes_the_six_p56_views_in_one_embedded_surface(self) -> None:
-        expected = {"box", "contents", "flats", "groups", "manufacturing", "result"}
+    def test_exposes_four_primary_p44_m003_views_in_one_embedded_surface(self) -> None:
+        expected = {"box", "contents", "manufacturing", "result"}
         self.assertEqual(self.dom.views, expected)
         self.assertEqual(self.dom.panels, expected)
+        for marker in (">1. Boîte et plateaux<", ">2. Conteneurs et éléments<", ">3. Réglages<", ">4. Aperçu<"):
+            self.assertIn(marker, self.markup)
+        self.assertNotIn("previous-view", self.markup)
+        self.assertNotIn("next-view", self.markup)
+        self.assertIn('data-panel="box"', self.markup)
+        self.assertIn('id="flats-section-title"', self.markup)
+        self.assertIn('data-panel="contents"', self.markup)
+        self.assertIn('id="groups-section-title"', self.markup)
+
+    def test_interverts_xy_without_new_bridge_or_origin_mutation(self) -> None:
+        for marker in (
+            "swapBoxXY", "swapContentXY", "swapFlatXY", "swapGroupXY",
+            "swapPair(group[key])", "data-action=\"swap-box-xy\"",
+            "data-action=\"swap-content-xy\"", "data-action=\"swap-flat-xy\"",
+            "data-action=\"swap-group-xy\"", "Orientation historique",
+        ):
+            self.assertIn(marker, self.markup)
+        self.assertIn("['dimension_modes','target_outer_dimensions_mm','locked_outer_dimensions_mm','expansion_axes']", self.markup)
+        self.assertNotIn('data-bridge="swap_', self.markup)
+        self.assertIn("project.flat_items[index].origin_mm=values.x==null||values.y==null", self.markup)
+        self.assertIn("rotation_deg_z", self.markup)
+
+    def test_uses_utf8_french_copy_without_mojibake(self) -> None:
+        for marker in ("Boîte", "Éléments", "Réglages", "Aperçu", "Épaisseur", "Quantité", "À retirer"):
+            self.assertIn(marker, self.markup)
+        for forbidden in ("Ã", "Â", "�"):
+            self.assertNotIn(forbidden, self.markup)
 
     def test_supports_dynamic_rows_progressive_disclosure_and_local_file_import(self) -> None:
         self.assertNotIn("expert-mode", self.dom.ids)
@@ -81,7 +108,7 @@ class FusionPaletteDomTests(unittest.TestCase):
         ):
             self.assertNotIn(forbidden, self.markup)
         for marker in (
-            "<h4>Prise et tolerances</h4>", "<h4>Placement et ordre</h4>",
+            "<h4>Prise et tolérances</h4>", "<h4>Placement et ordre</h4>",
             "<h4>Solidite</h4>", "guidance-details",
             "document.createElement('details')",
             "section.className='container-sizing local-details calculated-details'",
