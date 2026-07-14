@@ -8,7 +8,7 @@ Statut produit : **MVP V0.1 Fusion-only accepte ; validation d impression non ac
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P44-M002V2 implemented et automated-validated, package 0.1.23 en preparation de gate Fusion ; P44-M003 reste bloque jusqu au retour humain P44-M002V.
+Phase active : P44-M002V acceptée et fusion-validated sur le package 0.1.23 ; P44-M003 devient la seule mission ready.
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -1874,3 +1874,17 @@ scene Fusion n est modifie. Preuves : 455 tests, syntaxe JavaScript, exemple
 CLI, compileall, frontiere `adsk` et diff-check passes. P44-M003 reste bloque
 jusqu au retour humain exact
 `P44-M002V Fusion OK 0.1.23 - commit <sha>`.
+
+## P44-M002V accepté et exigence de français accentué
+
+Thomas a confirmé :
+`P44-M002V Fusion OK 0.1.23 - commit 2f78a99`.
+
+La correction hybride A+B est donc `fusion-validated` pour la densité et la
+lisibilité des cartes. Cette preuve ne qualifie ni impression, ni géométrie.
+
+Le pilotage ajoute un invariant UX : les textes visibles par l’utilisateur
+emploient les accents et caractères français corrects. La palette est déjà
+déclarée UTF-8 ; les identifiants techniques restent ASCII. La règle s’applique
+aux nouveaux textes dès P44-M003 et la normalisation exhaustive de l’historique
+est planifiée dans P44-M006. P44-M003 devient `ready-after-p44-m002v`.

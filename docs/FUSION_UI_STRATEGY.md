@@ -508,3 +508,14 @@ contenus, le surplus, la pile, les supports, le digest et l invariant zero corps
 automatique. Impossible n affiche aucun SVG de solution. Modifier invalide le
 plan ; sauvegarder sans modification le conserve. L action de materialisation
 reste desactivee jusqu a P59.
+
+## P44 - Texte français et encodage
+
+La palette HTML déclare déjà UTF-8. Les futurs travaux P44 utilisent directement
+les caractères français dans les libellés utilisateur et conservent les
+identifiants techniques en ASCII. Cette séparation évite de coupler traduction,
+état DOM, bridge et persistance.
+
+P44-M003 applique la règle aux textes modifiés. P44-M006 réalise l’audit global,
+ajoute les tests anti-mojibake et vérifie le roundtrip des noms accentués. Aucun
+calcul métier n’est déplacé dans JavaScript par cette exigence.

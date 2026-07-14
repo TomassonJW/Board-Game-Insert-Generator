@@ -976,3 +976,15 @@ de cavite V0.2 restent differees apres P66.
 - Aucun changement de schema, calcul, tolerance, geometrie ou scene Fusion.
 - Suite : P44-M003 reste `blocked-by-p44-m002v` jusqu a validation humaine du
   package 0.1.23. `print-validated: false`.
+
+## P44-M002V - Densité validée et qualité linguistique
+
+- C-FUSION-UI : `fusion-validated` pour la densité hybride A+B du package
+  0.1.23, preuve humaine `P44-M002V Fusion OK 0.1.23 - commit 2f78a99`.
+- C-FUSION-UI : P44-M003 devient `ready-after-p44-m002v`.
+- C-QUALITY : exigence `accepted-product-requirement` pour le français
+  correctement accentué dans les textes utilisateur.
+- Application incrémentale dès P44-M003 ; audit exhaustif dans P44-M006.
+- Identifiants techniques ASCII, contenu humain UTF-8 sans BOM ni mojibake.
+- Cette gate ne change ni schéma, solveur, tolérance, géométrie ou statut
+  d’impression. `print-validated: false`.

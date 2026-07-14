@@ -507,3 +507,13 @@ P44-M003 pour une correction bornee hybride A+B dans le package 0.1.23.
 P44-M003 ne redevient disponible qu apres la gate humaine P44-M002V. Aucun
 schema, solveur, tolerance, geometrie, complement ou scene Fusion ne change dans
 cette correction. Cette requalification protege la sequence UX avant geometrie.
+
+## P44-M002V acceptée et orthotypographie française - 2026-07-14
+
+Le package 0.1.23 reçoit la validation humaine de densité. P44-M003 redevient la
+prochaine mission `ready` de la fondation UX.
+
+À partir de P44-M003, tout nouveau texte utilisateur respecte le français
+accentué. P44-M006 garde la responsabilité de l’audit exhaustif des textes
+historiques, avec preuves UTF-8, anti-mojibake et validation Fusion. Cette
+exigence reste une qualité de surface et ne modifie aucune sémantique métier.

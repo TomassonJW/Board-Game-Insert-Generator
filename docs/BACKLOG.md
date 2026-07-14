@@ -1899,15 +1899,17 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
   bornees et comportement explicite aux seuils 760/560 px.
 - Livrable : package 0.1.23 et contrat
   `docs/P44_M002V2_TECHNICAL_CARD_DENSITY_CONTRACT.md`.
-- Statut : `implemented`, `automated-validated`,
-  `fusion-validation-required` ; `print-validated: false`.
+- Statut : `done`, `implemented`, `automated-validated`,
+  `fusion-validated` sur 0.1.23 ; `print-validated: false`.
 
 #### P44-M002V - Gate humaine de densite Fusion
 
 - Dependances : P44-M002V2 integree, package 0.1.23 installe localement.
 - Validation : cartes Asset, Plateau/livret et Conteneur a largeur normale et
   etroite ; champs essentiels visibles et calculs secondaires replies.
-- Statut : `human-gate`, `blocks-p44-m003`.
+- Preuve : `P44-M002V Fusion OK 0.1.23 - commit 2f78a99`.
+- Statut : `done-human-gate`, `fusion-validated`,
+  `unblocks-p44-m003`.
 
 #### P44-M003 - Quatre onglets, Boite et elements plats
 
@@ -1916,7 +1918,11 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
   Boite/plateaux/livrets, traduire l ordre de retrait et ajouter X/Y.
 - Jeux : reserver le vocabulaire et la place du futur controle, sans afficher un
   override inerte ; contrat et implementation restent P44-M008/P44-M009.
-- Statut : `blocked-by-p44-m002v`, `no-business-change`, `fusion-retest-required`.
+- Français : tout nouveau libellé respecte
+  `docs/P44_FRENCH_UI_ORTHOTYPOGRAPHY_CONTRACT.md` ; seuls les textes
+  touchés sont corrigés dans ce lot.
+- Statut : `ready-after-p44-m002v`, `no-business-change`,
+  `fusion-retest-required`.
 
 #### P44-M004 - Conteneurs parents, contenus enfants et modes de taille
 
@@ -1940,6 +1946,9 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
 - Dependances : P44-M005 integree.
 - Objectif : labels/hints, hauteur derivee, Nouveau/Ouvrir/Enregistrer sous,
   recents, recuperation et outils scene reserves au diagnostic.
+- Français : passe exhaustive sur libellés, aides, placeholders, messages et
+  diagnostics historiques ; UTF-8 sans BOM, absence de mojibake, tests DOM et
+  roundtrip d’un nom accentué.
 - Statut : `blocked-by-p44-m005`.
 
 #### P44-M007 - Calcul adaptatif et Apercu priorise

@@ -173,3 +173,16 @@ Retour OK attendu :
 
 Un KO doit nommer la carte, la largeur approximative et le probleme observe.
 P44-M003 reste bloque tant que cette gate n est pas fermee.
+
+## P44-M002V acceptée - 2026-07-14
+
+Thomas a retourné
+`P44-M002V Fusion OK 0.1.23 - commit 2f78a99`.
+
+La densité technique hybride A+B est `fusion-validated`. P44-M002V est
+fermée et débloque P44-M003. La validation ne s’étend ni à la géométrie, ni à
+l’impression : `print-validated: false`.
+
+Le même retour ajoute une exigence de qualité linguistique : les futurs textes
+utilisateur emploient les accents et caractères français corrects. P44-M003
+l’applique aux textes qu’il touche ; P44-M006 effectue la passe exhaustive.

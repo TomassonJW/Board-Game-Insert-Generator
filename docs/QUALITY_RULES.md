@@ -184,3 +184,15 @@ Les validations P64 doivent couvrir au minimum :
 - le blocage si la compensation perce le fond minimal ;
 - des noms de corps Fusion uniques malgre des libelles utilisateur identiques ;
 - determinisme, non-collision, appui, conservation et zero corps automatique.
+
+## Orthotypographie française de la palette
+
+- Tout texte visible par l’utilisateur emploie les accents français corrects.
+- Les sources UI sont encodées en UTF-8 sans BOM.
+- La palette conserve `<meta charset="utf-8">`.
+- Les identifiants, clés, enums et protocoles restent indépendants des libellés.
+- Les tests refusent les signatures de mojibake `Ã`, `Â` et `�`.
+- Un nom utilisateur accentué doit survivre au roundtrip projet/bridge.
+- Les nouveaux textes respectent la règle dès P44-M003 ; P44-M006 corrige
+  exhaustivement l’historique.
+- Une observation Fusion reste requise pour qualifier le rendu réel.

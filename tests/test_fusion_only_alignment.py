@@ -60,12 +60,12 @@ class FusionOnlyAlignmentTests(unittest.TestCase):
         actions = self.read("docs/NEXT_ACTIONS.md")
         framing = self.read("docs/P44_M002V2_TECHNICAL_CARD_DENSITY_CONTRACT.md")
 
-        self.assertIn("P44-M002V2", actions)
-        self.assertIn("human-ux-ko", actions)
         self.assertIn("P44-M002V", actions)
+        self.assertIn("P44-M002V Fusion OK 0.1.23 - commit 2f78a99", actions)
         self.assertIn("P44-M003", actions)
         self.assertIn("mvp-accepted", actions)
-        self.assertIn("P44-M003 est `blocked-by-p44-m002v`", actions)
+        self.assertIn("Statut : `ready-after-p44-m002v`", actions)
+        self.assertIn("français correctement", actions)
         self.assertIn("Package cible : palette Fusion `0.1.23`", framing)
         self.assertIn("grille technique dense", framing)
         self.assertIn("Solidite", framing)
@@ -75,6 +75,27 @@ class FusionOnlyAlignmentTests(unittest.TestCase):
         self.assertNotIn("codex/p56-premium-editor", actions)
         self.assertNotIn("inspection visuelle runtime du frontend reel", actions)
 
+    def test_french_ui_copy_requirement_is_bounded_and_testable(self) -> None:
+        contract = self.read("docs/P44_FRENCH_UI_ORTHOTYPOGRAPHY_CONTRACT.md")
+        backlog = self.read("docs/BACKLOG.md")
+
+        for marker in (
+            "Éléments du jeu",
+            "Réglages",
+            "Aperçu",
+            "Épaisseur",
+            "Quantité",
+            "À plat",
+            "Boîte",
+            '<meta charset="utf-8">',
+            "Éléments d’été — boîte à dés",
+        ):
+            self.assertIn(marker, contract)
+        self.assertIn("P44-M003", contract)
+        self.assertIn("P44-M006", contract)
+        self.assertIn("identifiants stables", contract)
+        self.assertIn("UTF-8 sans BOM", contract)
+        self.assertIn("roundtrip d’un nom accentué", backlog)
 
 if __name__ == "__main__":
     unittest.main()
