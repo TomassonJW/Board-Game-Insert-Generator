@@ -22,8 +22,12 @@ PALETTE_RESPONSE_SCHEMA = "bgig.palette.response.v1"
 CURRENT_PROJECT_FILENAME = "bgig_project_v1.json"
 PROJECT_EXPORT_DIRECTORY = "projects"
 PERSONAL_PRESETS_FILENAME = "bgig_personal_element_presets_v1.json"
+DOCUMENT_STATE_FILENAME = "bgig_document_state_v1.json"
+DOCUMENT_STATE_SCHEMA = "bgig.document_state.v1"
 SUPPORTED_ACTIONS = frozenset({
-    "load_project", "validate_project", "save_project", "import_project", "export_project",
+    "load_project", "new_project", "validate_project",
+    "save_project", "autosave_project", "save_document", "save_project_as",
+    "open_project_file", "open_recent_project", "import_project", "export_project",
     "solve_project", "materialize_project", "regenerate_project",
     "save_personal_preset", "delete_personal_preset",
     "import_personal_presets", "export_personal_presets",
@@ -87,6 +91,102 @@ def current_personal_presets_path(addin_dir: str | Path) -> Path:
     return current_project_path(addin_dir).parent / PERSONAL_PRESETS_FILENAME
 
 
+def document_state_path(addin_dir: str | Path) -> Path:
+    """Return local metadata for the named document and recent documents."""
+
+    return current_project_path(addin_dir).parent / DOCUMENT_STATE_FILENAME
+
+
+def project_document_directory(addin_dir: str | Path) -> Path:
+    """Return the user-visible default folder for BGIG documents."""
+
+    return current_project_path(addin_dir).parent
+
+
+def load_document_state(addin_dir: str | Path) -> dict[str, object]:
+    """Load local document metadata without making a document mandatory."""
+
+    path = document_state_path(addin_dir)
+    default = {"schema_version": DOCUMENT_STATE_SCHEMA, "current_path": "", "recent_paths": []}
+    if not path.is_file():
+        return default
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8-sig"))
+    except (OSError, json.JSONDecodeError):
+        return default
+    if not isinstance(raw, dict) or raw.get("schema_version") != DOCUMENT_STATE_SCHEMA:
+        return default
+    current = raw.get("current_path")
+    recent = raw.get("recent_paths")
+    return {
+        "schema_version": DOCUMENT_STATE_SCHEMA,
+        "current_path": current if isinstance(current, str) else "",
+        "recent_paths": [item for item in recent if isinstance(item, str)] if isinstance(recent, list) else [],
+    }
+
+
+def _write_document_state(addin_dir: Path, state: dict[str, object]) -> None:
+    payload = {
+        "schema_version": DOCUMENT_STATE_SCHEMA,
+        "current_path": str(state.get("current_path") or ""),
+        "recent_paths": [str(item) for item in state.get("recent_paths", []) if isinstance(item, str)][:12],
+    }
+    _write_json_atomic(document_state_path(addin_dir), payload)
+
+
+def _record_current_document(state: dict[str, object], document_path: Path) -> dict[str, object]:
+    resolved = str(document_path.resolve())
+    previous = [str(item) for item in state.get("recent_paths", []) if isinstance(item, str)]
+    state["current_path"] = resolved
+    state["recent_paths"] = [resolved, *[item for item in previous if item != resolved]][:12]
+    return state
+
+
+def _document_info(addin_dir: Path, state: dict[str, object]) -> dict[str, object]:
+    current = str(state.get("current_path") or "")
+    recent_paths = [str(item) for item in state.get("recent_paths", []) if isinstance(item, str)]
+    existing_recent = [item for item in recent_paths if Path(item).is_file()]
+    if current and not Path(current).is_file():
+        current = ""
+    return {
+        "schema_version": DOCUMENT_STATE_SCHEMA,
+        "current_path": current,
+        "current_name": Path(current).name if current else "",
+        "project_directory": str(project_document_directory(addin_dir)),
+        "recovery_path": str(current_project_path(addin_dir)),
+        "recovery_available": current_project_path(addin_dir).is_file(),
+        "recent_documents": [
+            {"path": item, "name": Path(item).name}
+            for item in existing_recent
+        ],
+    }
+
+
+def _document_path_from_request(
+    request: dict[str, object],
+    *,
+    field: str = "document_path",
+    must_exist: bool = False,
+) -> Path:
+    value = request.get(field)
+    if not isinstance(value, str) or not value.strip():
+        raise PaletteProjectError("Le chemin du document doit etre renseigne.")
+    path = Path(value).expanduser()
+    if path.suffix.lower() != ".json":
+        path = path.with_suffix(".bgig.json")
+    resolved = path.resolve()
+    if must_exist and not resolved.is_file():
+        raise PaletteProjectError("Le document choisi est introuvable.")
+    return resolved
+
+
+def _load_project_document(path: Path) -> object:
+    try:
+        return json.loads(path.read_text(encoding="utf-8-sig"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise PaletteProjectError(f"Le document choisi est illisible : {exc}.") from exc
+
+
 def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_id: str) -> dict[str, object]:
     from board_game_insert_generator.expandable_envelope import derive_expandable_envelope_contract
     from board_game_insert_generator.top_inset_reservation import (
@@ -101,8 +201,9 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         save_personal_preset, write_personal_presets,
     )
     from board_game_insert_generator.project_presets import build_creation_presets
-    from board_game_insert_generator.project_v1 import normalize_project_draft
+    from board_game_insert_generator.project_v1 import blank_project_v1, normalize_project_draft
 
+    document_state = load_document_state(addin_dir)
     if action == "load_project":
         project = load_current_project(addin_dir)
         return _response(
@@ -112,10 +213,38 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
             creation_presets=build_creation_presets(project),
             personal_presets=load_personal_presets(current_personal_presets_path(addin_dir)),
             saved=current_project_path(addin_dir).is_file(),
+            recovery_saved=current_project_path(addin_dir).is_file(),
+            document=_document_info(addin_dir, document_state),
+        )
+    if action == "new_project":
+        project = blank_project_v1()
+        fresh_state = {
+            "schema_version": DOCUMENT_STATE_SCHEMA,
+            "current_path": "",
+            "recent_paths": document_state.get("recent_paths", []),
+        }
+        _write_document_state(addin_dir, fresh_state)
+        return _response(
+            request_id,
+            "ready",
+            project=project,
+            creation_presets=build_creation_presets(project),
+            personal_presets=load_personal_presets(current_personal_presets_path(addin_dir)),
+            document=_document_info(addin_dir, fresh_state),
         )
 
     project_value = request.get("project")
-    if action == "import_project" and isinstance(request.get("project_json"), str):
+    opened_document: Path | None = None
+    if action == "open_project_file":
+        opened_document = _document_path_from_request(request, must_exist=True)
+        project_value = _load_project_document(opened_document)
+    elif action == "open_recent_project":
+        opened_document = _document_path_from_request(request, must_exist=True)
+        allowed = {str(item) for item in document_state.get("recent_paths", []) if isinstance(item, str)}
+        if str(opened_document) not in allowed:
+            raise PaletteProjectError("Ce document ne fait pas partie des projets recents BGIG.")
+        project_value = _load_project_document(opened_document)
+    elif action == "import_project" and isinstance(request.get("project_json"), str):
         try:
             project_value = json.loads(str(request["project_json"]))
         except json.JSONDecodeError as exc:
@@ -172,10 +301,45 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         else None
     )
     saved = False
+    recovery_saved = False
     export_path = ""
-    if action in {"save_project", "import_project"}:
+    if action in {"save_project", "autosave_project"}:
         _write_json_atomic(current_project_path(addin_dir), project)
+        recovery_saved = True
+        saved = action == "save_project"
+    elif action == "import_project":
+        _write_json_atomic(current_project_path(addin_dir), project)
+        document_state["current_path"] = ""
+        _write_document_state(addin_dir, document_state)
+        recovery_saved = True
         saved = True
+    elif action == "save_document":
+        current = str(document_state.get("current_path") or "")
+        if not current:
+            raise PaletteProjectError("Ce nouveau projet n a pas encore de fichier. Utilise Enregistrer sous.")
+        named_path = Path(current)
+        _write_json_atomic(named_path, project)
+        _write_json_atomic(current_project_path(addin_dir), project)
+        _record_current_document(document_state, named_path)
+        _write_document_state(addin_dir, document_state)
+        saved = True
+        recovery_saved = True
+    elif action == "save_project_as":
+        named_path = _document_path_from_request(request)
+        _write_json_atomic(named_path, project)
+        _write_json_atomic(current_project_path(addin_dir), project)
+        _record_current_document(document_state, named_path)
+        _write_document_state(addin_dir, document_state)
+        saved = True
+        recovery_saved = True
+        export_path = str(named_path)
+    elif action in {"open_project_file", "open_recent_project"}:
+        if opened_document is None:
+            raise PaletteProjectError("Le document choisi est introuvable.")
+        _write_json_atomic(current_project_path(addin_dir), project)
+        _record_current_document(document_state, opened_document)
+        _write_document_state(addin_dir, document_state)
+        recovery_saved = True
     elif action == "export_project":
         export_path = str(_export_project(addin_dir, project))
     elif action == "export_personal_presets":
@@ -199,9 +363,11 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         result_view=result_view,
         cad_build=cad_build,
         saved=saved,
+        recovery_saved=recovery_saved,
         migrated=normalization.migrated,
         warnings=warnings,
         export_path=export_path,
+        document=_document_info(addin_dir, document_state),
     )
 
 
@@ -223,6 +389,8 @@ def _response(
     saved: bool = False,
     migrated: bool = False,
     export_path: str = "",
+    document: dict[str, object] | None = None,
+    recovery_saved: bool = False,
 ) -> dict[str, object]:
     return {
         "schema": PALETTE_RESPONSE_SCHEMA,
@@ -255,6 +423,8 @@ def _response(
         "saved": saved,
         "migrated": migrated,
         "export_path": export_path,
+        "document": deepcopy(document),
+        "recovery_saved": recovery_saved,
     }
 
 

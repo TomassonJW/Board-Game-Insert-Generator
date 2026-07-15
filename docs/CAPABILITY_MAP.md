@@ -1067,3 +1067,13 @@ complément, calcul ou scène Fusion automatique. Elle ne qualifie ni schéma,
 bridge, solveur, tolérance, géométrie, CAD IR ou impression.
 
 P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
+
+
+## P44-M006 capability update
+
+- C-FUSION-UI : implemented-awaiting-human-gate pour le cycle de document
+  nommé, la récupération locale, les réglages lisibles et le diagnostic replié.
+- C-QUALITY : audit UTF-8 et anti-mojibake couvert par les tests DOM et un
+  roundtrip de nom accentué.
+- C-SOLVER, C-TOLERANCE, C-GEOMETRY et C-CAD-IR : inchangés.
+- Validation : gate Fusion P44-M006V requise ; print-validated: false.

@@ -63,7 +63,23 @@ class FusionPaletteQtTransportTests(unittest.TestCase):
 
     def test_manifest_identifies_the_bootstrap_and_launcher_fix(self) -> None:
         manifest = json.loads((ADDIN / "BoardGameInsertGenerator.manifest").read_text(encoding="utf-8"))
-        self.assertEqual(manifest["version"], "0.1.28")
+        self.assertEqual(manifest["version"], "0.1.29")
+    def test_uses_native_file_dialog_only_in_the_fusion_adapter(self) -> None:
+        for marker in (
+            "BGIG_PALETTE_DOCUMENT_ACTION",
+            "if action == BGIG_PALETTE_DOCUMENT_ACTION:",
+            "createFileDialog()",
+            "dialog.initialDirectory",
+            "dialog.showOpen()",
+            "dialog.showSave()",
+            "open_project_file",
+            "save_project_as",
+        ):
+            self.assertIn(marker, self.source)
+        bridge = (ADDIN / "palette_project.py").read_text(encoding="utf-8")
+        self.assertNotIn("import adsk", bridge)
+        self.assertIn("project_document_directory", bridge)
+
     def test_palette_opens_at_a_product_sized_minimum(self) -> None:
         self.assertEqual(entrypoint.BGIG_PALETTE_DEFAULT_WIDTH, 1280)
         self.assertEqual(entrypoint.BGIG_PALETTE_DEFAULT_HEIGHT, 1100)

@@ -59,15 +59,18 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 
 ### P44-M006 — réglages, cycle document et diagnostic
 
-Statut : ready-for-explicit-go, fusion-validated: false,
-print-validated: false.
+Statut : implemented-awaiting-human-fusion-gate, package cible 0.1.29,
+fusion-validated: false, print-validated: false.
 
-P44-M005 est intégrée et sa gate Fusion est fermée. P44-M006 peut être cadrée
-sur GO explicite ; elle reste bornée aux réglages, au cycle de document et au
-diagnostic, avec la passe exhaustive des textes français prévue par son contrat.
+Le contrat P44_M006_DOCUMENT_CYCLE_CONTRACT.md est écrit. Le lot ajoute les
+réglages visibles, la hauteur de conception dérivée, le cycle Nouveau/Ouvrir/
+Enregistrer sous/Enregistrer, les récents, la récupération locale et le
+diagnostic de scène replié. Les validations automatisées sont terminées ; la gate Fusion est la
+dernière preuve avant intégration dans main.
+
 ## Séquence verrouillée
 
-P44-M005 est intégrée et fusion-validated pour son parcours UX. P44-M006 est la prochaine mission candidate, mais ne commence pas sans GO explicite.
+P44-M005 est intégrée et fusion-validated pour son parcours UX. P44-M006 est en gate Fusion ; P44-M007 reste bloquée par P44-M006 et P44-M009.
 P44-M008/P44-M009 gardent leur contrat de tolérance. P45/P46 ne commencent pas avant P44-V ;
 P47-P50 restent bloqués jusqu’à P46 et P69 jusqu’à P50. P68 peut recueillir des
 faits réels sans modifier les valeurs par défaut. print-validated: false reste

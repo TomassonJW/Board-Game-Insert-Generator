@@ -290,5 +290,80 @@ class FusionPaletteProjectTests(unittest.TestCase):
         self.assertEqual(unknown["status"], "invalid")
 
 
+    def test_named_document_save_open_and_recovery_round_trip_preserves_accents(self) -> None:
+        project = blank_project_v1()
+        project["project_name"] = "Éléments d’été — boîte à dés"
+        with tempfile.TemporaryDirectory() as temp_dir, patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}):
+            document_path = Path(temp_dir) / "Été jeux.bgig.json"
+            saved_as = handle_palette_request(
+                request("save_project_as", project=project, document_path=str(document_path)), ADDIN, ROOT
+            )
+            changed = deepcopy(saved_as["project"])
+            changed["project_name"] = "Été jeux — révision"
+            saved = handle_palette_request(request("save_document", project=changed), ADDIN, ROOT)
+            loaded = handle_palette_request(request("load_project"), ADDIN, ROOT)
+
+            self.assertTrue(document_path.is_file())
+            self.assertEqual(json.loads(document_path.read_text(encoding="utf-8"))["project_name"], changed["project_name"])
+            self.assertTrue((Path(temp_dir) / CURRENT_PROJECT_FILENAME).is_file())
+            self.assertEqual(loaded["document"]["current_path"], str(document_path.resolve()))
+            self.assertEqual(loaded["document"]["current_name"], document_path.name)
+            self.assertIn(str(document_path.resolve()), [item["path"] for item in loaded["document"]["recent_documents"]])
+
+        self.assertTrue(saved_as["saved"])
+        self.assertTrue(saved_as["recovery_saved"])
+        self.assertTrue(saved["saved"])
+        self.assertEqual(loaded["project"]["project_name"], changed["project_name"])
+
+    def test_new_project_clears_current_named_document_without_overwriting_it(self) -> None:
+        project = blank_project_v1()
+        project["project_name"] = "Projet à préserver"
+        with tempfile.TemporaryDirectory() as temp_dir, patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}):
+            document_path = Path(temp_dir) / "à préserver.bgig.json"
+            handle_palette_request(
+                request("save_project_as", project=project, document_path=str(document_path)), ADDIN, ROOT
+            )
+            new_project = handle_palette_request(request("new_project"), ADDIN, ROOT)
+            attempted_save = handle_palette_request(
+                request("save_document", project=new_project["project"]), ADDIN, ROOT
+            )
+            persisted = json.loads(document_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(new_project["document"]["current_path"], "")
+        self.assertEqual(attempted_save["status"], "invalid")
+        self.assertEqual(persisted["project_name"], "Projet à préserver")
+
+    def test_open_recent_document_is_restricted_to_known_documents_and_preserves_named_file(self) -> None:
+        original = blank_project_v1()
+        original["project_name"] = "Original nommé"
+        opened = blank_project_v1()
+        opened["project_name"] = "Document externe"
+        with tempfile.TemporaryDirectory() as temp_dir, patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}):
+            named_path = Path(temp_dir) / "original.bgig.json"
+            external_path = Path(temp_dir) / "externe.bgig.json"
+            external_path.write_text(json.dumps(opened, ensure_ascii=False), encoding="utf-8")
+            handle_palette_request(
+                request("save_project_as", project=original, document_path=str(named_path)), ADDIN, ROOT
+            )
+            opened_response = handle_palette_request(
+                request("open_project_file", project=original, document_path=str(external_path)), ADDIN, ROOT
+            )
+            recent_response = handle_palette_request(
+                request("open_recent_project", project=opened_response["project"], document_path=str(named_path)), ADDIN, ROOT
+            )
+            unknown = handle_palette_request(
+                request("open_recent_project", project=opened_response["project"], document_path=str(Path(temp_dir) / "inconnu.bgig.json")),
+                ADDIN,
+                ROOT,
+            )
+
+            self.assertEqual(json.loads(external_path.read_text(encoding="utf-8"))["project_name"], "Document externe")
+            self.assertEqual(recent_response["project"]["project_name"], "Original nommé")
+
+        self.assertEqual(opened_response["project"]["project_name"], "Document externe")
+        self.assertEqual(opened_response["document"]["current_path"], str(external_path.resolve()))
+        self.assertEqual(unknown["status"], "invalid")
+
+
 if __name__ == "__main__":
     unittest.main()

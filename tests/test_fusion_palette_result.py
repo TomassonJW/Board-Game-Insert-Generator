@@ -40,7 +40,7 @@ class FusionPaletteResultTests(unittest.TestCase):
         self.assertIn("materializable=complete", self.markup)
         self.assertIn('data-bridge="materialize_project"', self.markup)
         self.assertIn('data-bridge="regenerate_project"', self.markup)
-        self.assertIn("Une proposition complete et a jour est requise", self.markup)
+        self.assertIn("Une proposition complète et à jour est requise", self.markup)
         self.assertIn("Volume residuel a decider", self.markup)
 
     def test_p59_exposes_owned_scene_actions_without_raw_cad_codes(self) -> None:

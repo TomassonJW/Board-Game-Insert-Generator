@@ -587,3 +587,11 @@ complément, calcul ou scène Fusion automatique. Elle ne qualifie ni schéma,
 bridge, solveur, tolérance, géométrie, CAD IR ou impression.
 
 P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
+
+
+## P44-M006 en gate Fusion — package 0.1.29
+
+P44-M006 implémente le cycle document, la récupération locale, les réglages
+visibles et le diagnostic replié conformément à son contrat dédié. Elle reste
+en attente de la preuve humaine Fusion ; P44-M007 ne démarre pas avant cette
+gate et P44-M009.

@@ -242,6 +242,7 @@ BGIG_PALETTE_HTML_FILENAME = "palette.html"
 BGIG_PALETTE_STATE_ACTION = "bgig_palette_state"
 BGIG_PALETTE_NOTICE_ACTION = "bgig_palette_notice"
 BGIG_PALETTE_PROJECT_ACTION = "bgig_palette_project"
+BGIG_PALETTE_DOCUMENT_ACTION = "bgig_palette_document"
 BGIG_PALETTE_PROJECT_RESPONSE_ACTION = "bgig_palette_project_response"
 BGIG_PALETTE_TRANSPORT_RESPONSE_ACTION = "response"
 BGIG_PALETTE_READY_ACTION = "bgig_palette_ready"
@@ -556,6 +557,22 @@ if adsk is not None:
                         json.dumps(response, ensure_ascii=False),
                     )
                     return
+                if action == BGIG_PALETTE_DOCUMENT_ACTION:
+                    raw_request = json.loads(str(getattr(args, "data", "{}") or "{}"))
+                    try:
+                        request = _safe_default_command_request(self.addin_dir)
+                        response = _handle_palette_document_request(
+                            raw_request,
+                            self.addin_dir,
+                            project_root=request.project_root,
+                        )
+                    except Exception as exc:
+                        response = _palette_project_bridge_error_response(raw_request, exc)
+                    self.palette.sendInfoToHTML(
+                        BGIG_PALETTE_PROJECT_RESPONSE_ACTION,
+                        json.dumps(response, ensure_ascii=False),
+                    )
+                    return
                 if action == BGIG_PALETTE_PROJECT_ACTION:
                     raw_request = json.loads(str(getattr(args, "data", "{}") or "{}"))
                     try:
@@ -698,6 +715,78 @@ def _publish_palette_state(palette, addin_dir: Path, notice: str = "", technical
 
 def _publish_palette_notice(palette, notice: str) -> None:  # noqa: ANN001
     palette.sendInfoToHTML(BGIG_PALETTE_NOTICE_ACTION, json.dumps({"notice": notice}, ensure_ascii=False))
+
+
+def _palette_document_cancel_response(raw_request: object) -> dict[str, object]:
+    request_id = str(raw_request.get("request_id", "unknown")) if isinstance(raw_request, dict) else "unknown"
+    return {
+        "schema": "bgig.palette.response.v1",
+        "request_id": request_id,
+        "status": "cancelled",
+        "errors": [],
+        "warnings": [],
+    }
+
+
+def _palette_project_document_directory(addin_dir: Path) -> Path:
+    try:
+        from .palette_project import project_document_directory
+    except ImportError:
+        from palette_project import project_document_directory  # type: ignore[no-redef]
+    directory = project_document_directory(addin_dir)
+    directory.mkdir(parents=True, exist_ok=True)
+    return directory
+
+
+def _palette_document_dialog_path(
+    document_action: str,
+    raw_request: dict[str, object],
+    addin_dir: Path,
+) -> Path | None:
+    """Use Fusion's native FileDialog; the core bridge remains adsk-free."""
+
+    if adsk is None or _ui is None:
+        raise FusionSkeletonError("Le dialogue de fichier Fusion est indisponible.")
+    dialog = _ui.createFileDialog()
+    dialog.filter = "Projets BGIG (*.bgig.json);;Fichiers JSON (*.json)"
+    dialog.initialDirectory = str(_palette_project_document_directory(addin_dir))
+    dialog.isMultiSelectEnabled = False
+    if document_action == "open_project_file":
+        dialog.title = "Ouvrir un projet BGIG"
+        result = dialog.showOpen()
+    else:
+        project = raw_request.get("project")
+        raw_name = str(project.get("project_name", "projet-bgig")) if isinstance(project, dict) else "projet-bgig"
+        filename = "".join(char if char.isalnum() or char in "-_ " else "-" for char in raw_name).strip() or "projet-bgig"
+        dialog.title = "Enregistrer le projet BGIG sous"
+        dialog.initialFilename = f"{filename}.bgig.json"
+        result = dialog.showSave()
+    if result != adsk.core.DialogResults.DialogOK:
+        return None
+    filename = str(dialog.filename or "").strip()
+    if not filename:
+        return None
+    selected = Path(filename)
+    return selected if selected.suffix.lower() == ".json" else selected.with_suffix(".bgig.json")
+
+
+def _handle_palette_document_request(
+    raw_request: object,
+    addin_dir: Path,
+    *,
+    project_root: Path | None,
+) -> dict[str, object]:
+    if not isinstance(raw_request, dict):
+        raise FusionSkeletonError("La demande de document BGIG est invalide.")
+    document_action = str(raw_request.get("action", ""))
+    if document_action not in {"open_project_file", "save_project_as"}:
+        raise FusionSkeletonError(f"Action de document BGIG inconnue : {document_action}.")
+    selected = _palette_document_dialog_path(document_action, raw_request, addin_dir)
+    if selected is None:
+        return _palette_document_cancel_response(raw_request)
+    request = dict(raw_request)
+    request["document_path"] = str(selected)
+    return _handle_palette_project_request(request, addin_dir, project_root=project_root)
 
 
 def _handle_palette_project_request(

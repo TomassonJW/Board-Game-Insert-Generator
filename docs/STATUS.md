@@ -2010,3 +2010,19 @@ complément, calcul ou scène Fusion automatique. Elle ne qualifie ni schéma,
 bridge, solveur, tolérance, géométrie, CAD IR ou impression.
 
 P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
+
+
+## P44-M006 — réglages, cycle document et diagnostic
+
+Statut : implemented-awaiting-human-fusion-gate, package 0.1.29,
+fusion-validated: false, print-validated: false.
+
+Le bridge sans adsk gère maintenant un document nommé, des récents bornés et une
+récupération locale atomique. La palette utilise le FileDialog Fusion pour
+Ouvrir et Enregistrer sous ; Nouveau ne peut pas écraser le dernier fichier
+nommé. Les réglages sont visibles, documentés et la hauteur de conception est
+dérivée de Z moins le jeu sous le couvercle. Les outils de scène sont repliés
+dans Diagnostic et scène Fusion, avec confirmation pour Effacer.
+
+Aucun schéma, solveur, tolérance, géométrie, CAD IR, complément ou
+matérialisation automatique ne change. Les 466 tests, la compilation et les contrôles de frontière sont verts. La gate P44-M006V reste obligatoire.

@@ -220,24 +220,23 @@ class FusionPaletteDomTests(unittest.TestCase):
         for malformed in ("Centr?", "Apr?s", "retrait n?", " ? encastrement"):
             self.assertNotIn(malformed, self.markup)
 
-    def test_routes_validation_and_persistence_to_the_versioned_python_bridge(self) -> None:
-        self.assertEqual(self.dom.bridge_actions, {"validate_project", "save_project", "export_project", "export_personal_presets", "solve_project", "materialize_project"})
-        self.assertIn("bgig.palette.request.v1", self.markup)
-        self.assertIn("bgig.palette.response.v1", self.markup)
-        self.assertIn("bgig_palette_project", self.markup)
-        self.assertIn("8000", self.markup)
+    def test_routes_validation_persistence_and_native_documents_to_the_versioned_bridge(self) -> None:
+        self.assertEqual(self.dom.bridge_actions, {"validate_project", "save_document", "export_project", "export_personal_presets", "solve_project", "materialize_project"})
+        for marker in ("bgig.palette.request.v1", "bgig.palette.response.v1", "bgig_palette_project", "bgig_palette_document", "DOCUMENT_ACTION", "sendDocument", "8000"):
+            self.assertIn(marker, self.markup)
 
-    def test_exposes_xy_and_z_clearances_and_one_persistent_materialize_action(self) -> None:
-        self.assertIn("Jeu entre conteneurs X-Y (total)", self.markup)
-        self.assertIn("Jeu bac / boite X-Y (par cote)", self.markup)
-        self.assertIn('data-path="layout.container_box_xy_clearance_mm"', self.markup)
-        self.assertIn("Jeu entre conteneurs Z (total)", self.markup)
-        self.assertIn("Jeu bac / boite Z (haut)", self.markup)
-        self.assertEqual(self.markup.count("Jeu entre conteneurs X-Y (total)"), 1)
-        self.assertEqual(self.markup.count("Jeu bac / boite X-Y (par cote)"), 1)
-        self.assertEqual(self.markup.count("Jeu entre conteneurs Z (total)"), 1)
-        self.assertEqual(self.markup.count("Jeu bac / boite Z (haut)"), 1)
-        self.assertIn('data-path="layout.container_z_clearance_mm"', self.markup)
+    def test_exposes_clear_design_settings_and_one_persistent_materialize_action(self) -> None:
+        for marker in (
+            "Épaisseur minimale des parois", "Épaisseur minimale du fond",
+            "Jeu entre conteneurs", "Jeu conteneur-boîte",
+            "Jeu entre conteneurs en hauteur", "Jeu élément-cavité",
+            "Priorité de la proposition", "Jeu sous le couvercle",
+            'data-path="layout.container_box_xy_clearance_mm"',
+            'data-path="layout.container_z_clearance_mm"',
+        ):
+            self.assertIn(marker, self.markup)
+        self.assertNotIn("Jeux et preferences", self.markup)
+        self.assertNotIn('data-path="box.usable_height_mm"', self.markup)
         self.assertEqual(self.markup.count('data-bridge="materialize_project"'), 1)
         self.assertIn('id="materialize-action"', self.markup)
         self.assertIn("renderPersistentActions", self.markup)
@@ -255,10 +254,26 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertIn("item?.id", self.markup)
         self.assertIn("pendingRequest?.derived&&pendingRequest.sourceRevision!==sourceRevision", self.markup)
         self.assertIn("derived:quiet||['validate_project','solve_project'].includes(action),sourceRevision", self.markup)
-        self.assertIn("renderAll({preserve:!(['load_project','import_project'].includes(action)||bootstrap)})", self.markup)
-        self.assertIn("if(['load_project','import_project'].includes(action)||bootstrap)sourceRevision+=1", self.markup)
-        self.assertIn("if(pendingRequest?.quiet){state('Modifications non sauvegardees - minima recalcules');renderAll();return}", self.markup)
+        self.assertIn("renderAll({preserve:!(['load_project','import_project','new_project','open_project_file','open_recent_project'].includes(action)||bootstrap)})", self.markup)
+        self.assertIn("if(['load_project','import_project','new_project','open_project_file','open_recent_project'].includes(action)||bootstrap)sourceRevision+=1", self.markup)
+        self.assertIn("if(action==='autosave_project')state('Modifications non sauvegardées - récupération enregistrée','ok')", self.markup)
         self.assertNotIn("renderPresets();renderContents();renderFlats();renderGroups();renderContainerSizing();renderLifecycle();return", self.markup)
+
+    def test_supports_p44_m006_named_documents_recovery_and_discrete_diagnostics(self) -> None:
+        for marker in (
+            'data-action="new-project"', 'data-action="open-project"',
+            'data-action="save-project-as"', 'id="save-document-action"',
+            'id="document-status"', 'id="document-description"',
+            'id="recent-documents"', 'id="design-height"',
+            'id="diagnostic-tools"', 'data-confirm="Effacer uniquement les corps BGIG',
+            "scheduleRecovery", "autosave_project", "open_recent_project",
+            "save_project_as", "save_document", "new_project",
+        ):
+            self.assertIn(marker, self.markup)
+        self.assertIn("Hauteur de conception", self.markup)
+        self.assertIn("Diagnostic et scène Fusion", self.markup)
+        self.assertNotIn('data-path="box.usable_height_mm"', self.markup)
+        self.assertNotIn("<summary>Jeux et preferences</summary>", self.markup)
 
     def test_has_no_external_web_runtime_or_business_solver_in_javascript(self) -> None:
         for forbidden in ("localhost", "fetch(", "XMLHttpRequest", "npm ", "Vite", "solvePartition", "derive_expandable_envelope_contract"):
@@ -284,6 +299,16 @@ class FusionPaletteDomTests(unittest.TestCase):
         p44_smoke = (ROOT / "scripts" / "fusion" / "prepare_p44_m005_creation_presets_test.ps1").read_text(encoding="utf-8")
         for marker in ("0.1.28", "creation-preset", "creation-destination", "Nouveau conteneur li", "P44-M005 Fusion OK"):
             self.assertIn(marker, p44_smoke)
+
+
+    def test_prepares_the_p44_m006_fusion_document_cycle_gate(self) -> None:
+        script = (ROOT / "scripts" / "fusion" / "prepare_p44_m006_document_cycle_test.ps1").read_text(encoding="utf-8")
+        for marker in (
+            "0.1.29", "document-status", "save-document-action",
+            "open-project", "save-project-as", "design-height",
+            "diagnostic-tools", "createFileDialog", "P44-M006 Fusion OK",
+        ):
+            self.assertIn(marker, script)
 
 
 if __name__ == "__main__":
