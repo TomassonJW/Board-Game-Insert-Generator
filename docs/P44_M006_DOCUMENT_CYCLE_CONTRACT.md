@@ -2,13 +2,13 @@
 
 ## Statut
 
-Mission P44-M006. Package cible : 0.1.30. La validation humaine Fusion est
-requise avant toute intégration dans main. Cette mission ne valide aucune
-impression réelle.
+Mission P44-M006 terminée, package 0.1.30. La preuve humaine Fusion est
+validée ; cette mission ne valide aucune impression réelle.
 
-Le package 0.1.29 reçoit un KO de gate sur l’état Fusion et la confirmation
-d’abandon d’édition. Le correctif 0.1.30 rend ces affichages défensifs et protège
-une édition non enregistrée avant Nouveau, Ouvrir ou un récent.
+Preuve humaine : P44-M006 Fusion OK 0.1.30 - commit d82def6.
+
+Le KO 0.1.29 sur l’état Fusion et la confirmation d’abandon d’édition est fermé
+par le correctif 0.1.30.
 
 ## Intention
 

@@ -1962,9 +1962,9 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
   diagnostics historiques ; UTF-8 sans BOM, absence de mojibake, tests DOM et
   roundtrip d’un nom accentué.
 - Contrat : docs/P44_M006_DOCUMENT_CYCLE_CONTRACT.md.
-- Statut : implemented-awaiting-human-fusion-gate, package cible 0.1.30.
-- Gate corrective : le package 0.1.29 est KO sur l’état Fusion et l’absence de
-  confirmation avant abandon d’édition ; 0.1.30 doit fermer ces deux retours.
+- Statut : done-human-gate, fusion-validated, package 0.1.30.
+- Preuve : P44-M006 Fusion OK 0.1.30 - commit d82def6.
+- Limite : print-validated: false.
 
 #### P44-M007 - Calcul adaptatif et Apercu priorise
 
@@ -1983,7 +1983,7 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
   resolution de paire, composition Z, migration et matrice de tests.
 - Gate : validation humaine obligatoire des formules et defaults.
 - Interdit : aucun code ni changement numerique dans P44-M008.
-- Statut : `blocked-by-p44-m003-and-p44-m004`.
+- Statut : `ready-for-explicit-go`.
 
 #### P44-M009 - Implementation des jeux par objet
 

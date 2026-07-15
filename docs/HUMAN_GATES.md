@@ -294,11 +294,12 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 
 ## P44-M006V — cycle document, réglages et diagnostic Fusion
 
-Statut : required, package attendu 0.1.30.
+Statut : validated, package 0.1.30.
 
-Le package 0.1.29 est KO : l’état Fusion de démarrage et Inspecter pouvait écrire
-un nœud palette absent, puis afficher une réponse illisible. Le correctif 0.1.30
-doit aussi confirmer l’avertissement avant d’abandonner une édition non enregistrée.
+Preuve humaine : P44-M006 Fusion OK 0.1.30 - commit d82def6.
+
+Le KO 0.1.29 est fermé : l’état Fusion de démarrage et Inspecter reste lisible,
+et l’avertissement protège l’abandon d’une édition non enregistrée.
 
 La preuve humaine doit couvrir le FileDialog natif Fusion pour Ouvrir et
 Enregistrer sous, l’annulation sans perte, le nom du document courant, la
@@ -307,5 +308,5 @@ réglages visibles et la hauteur dérivée. Elle doit aussi constater que le
 diagnostic reste replié, que l’effacement demande confirmation et qu’aucun
 calcul, aucune scène ou matérialisation ne part automatiquement.
 
-Réponse attendue : P44-M006 Fusion OK 0.1.30 - commit SHA, ou un KO
-contextualisé. Cette gate ne valide pas l’impression réelle.
+Preuve reçue : P44-M006 Fusion OK 0.1.30 - commit d82def6.
+Cette gate ne valide pas l’impression réelle.

@@ -2014,14 +2014,12 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 
 ## P44-M006 — réglages, cycle document et diagnostic
 
-Statut : implemented-awaiting-human-fusion-gate, package 0.1.30,
-fusion-validated: false, print-validated: false.
+Statut : done-human-gate, package 0.1.30, fusion-validated: true,
+print-validated: false.
 
-Le package 0.1.29 est KO de gate : l’état Fusion de démarrage et Inspecter
-référençait un nœud retiré de la palette, ce qui affichait TypeError puis une
-réponse illisible. Le correctif 0.1.30 rend l’affichage défensif et confirme
-Nouveau, Ouvrir ou récent seulement lorsqu’une édition non enregistrée serait
-abandonnée.
+Preuve humaine : P44-M006 Fusion OK 0.1.30 - commit d82def6. Le KO 0.1.29 est
+fermé : l’état Fusion de démarrage et Inspecter reste lisible, et Nouveau,
+Ouvrir ou récent confirme uniquement l’abandon d’une édition non enregistrée.
 
 Le bridge sans adsk gère maintenant un document nommé, des récents bornés et une
 récupération locale atomique. La palette utilise le FileDialog Fusion pour
@@ -2031,4 +2029,4 @@ dérivée de Z moins le jeu sous le couvercle. Les outils de scène sont replié
 dans Diagnostic et scène Fusion, avec confirmation pour Effacer.
 
 Aucun schéma, solveur, tolérance, géométrie, CAD IR, complément ou
-matérialisation automatique ne change. Les 466 tests, la compilation et les contrôles de frontière sont verts. La gate P44-M006V reste obligatoire.
+matérialisation automatique ne change. Les 467 tests, la compilation et les contrôles de frontière sont verts. La gate P44-M006V est validée ; print-validated: false.

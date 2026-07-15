@@ -589,9 +589,9 @@ bridge, solveur, tolérance, géométrie, CAD IR ou impression.
 P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 
 
-## P44-M006 en gate Fusion corrective — package 0.1.30
+## P44-M006 acceptée — gate Fusion 0.1.30
 
-P44-M006 implémente le cycle document, la récupération locale, les réglages
-visibles et le diagnostic replié conformément à son contrat dédié. Elle reste
-en attente de la preuve humaine Fusion ; P44-M007 ne démarre pas avant cette
-gate et P44-M009.
+Preuve humaine : P44-M006 Fusion OK 0.1.30 - commit d82def6. Le cycle document,
+la récupération locale, les réglages visibles et le diagnostic replié sont
+fusion-validated. P44-M008 devient la prochaine mission ready-for-explicit-go ;
+P44-M007 reste bloquée par P44-M009. print-validated: false.

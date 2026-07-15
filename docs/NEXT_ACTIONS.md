@@ -57,23 +57,19 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 
 ## Prochaine action recommandée
 
-### P44-M006 — réglages, cycle document et diagnostic
+### P44-M008 — contrat de jeux hérités et overrides par objet
 
-Statut : implemented-awaiting-human-fusion-gate, package cible 0.1.30,
-fusion-validated: false, print-validated: false.
+Statut : ready-for-explicit-go, documentation et décision uniquement.
 
-Le package 0.1.29 est KO de gate ; 0.1.30 corrige l’état Fusion défensif et la
-confirmation d’abandon d’une édition non enregistrée.
-
-Le contrat P44_M006_DOCUMENT_CYCLE_CONTRACT.md est écrit. Le lot ajoute les
-réglages visibles, la hauteur de conception dérivée, le cycle Nouveau/Ouvrir/
-Enregistrer sous/Enregistrer, les récents, la récupération locale et le
-diagnostic de scène replié. Les validations automatisées sont terminées ; la gate Fusion est la
-dernière preuve avant intégration dans main.
+P44-M006 est fusion-validated, package 0.1.30, preuve humaine
+P44-M006 Fusion OK 0.1.30 - commit d82def6. P44-M008 doit maintenant cadrer les
+rôles distincts asset-cavité, plateau-encastrement et conteneur externe, leurs
+defaults, héritages et overrides X/Y/Z. Aucun code ni changement numérique ne
+commence avant sa décision humaine dédiée.
 
 ## Séquence verrouillée
 
-P44-M005 est intégrée et fusion-validated pour son parcours UX. P44-M006 est en gate Fusion ; P44-M007 reste bloquée par P44-M006 et P44-M009.
+P44-M005 et P44-M006 sont intégrées et fusion-validated pour leurs parcours UX. P44-M008 devient ready-for-explicit-go ; P44-M007 reste bloquée par P44-M009.
 P44-M008/P44-M009 gardent leur contrat de tolérance. P45/P46 ne commencent pas avant P44-V ;
 P47-P50 restent bloqués jusqu’à P46 et P69 jusqu’à P50. P68 peut recueillir des
 faits réels sans modifier les valeurs par défaut. print-validated: false reste
