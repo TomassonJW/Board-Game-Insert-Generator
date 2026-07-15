@@ -310,3 +310,10 @@ P44-M008 est une mission de contrat et d ADR, sans code. P44-M009 pourra
 implementer le schema, le loader, le coeur, la palette, les rapports et la CAD
 IR uniquement apres acceptation de ces regles. `print-validated: false` reste
 obligatoire.
+
+## P44-M008 - Proposition de jeux par role (2026-07-15)
+
+Le contrat P44_M008_TOLERANCE_OVERRIDE_CONTRACT propose asset-cavite,
+plat-encastrement et conteneur externe, avec zero explicite, sources effectives
+et semantiques P65 preservees. Gate humaine obligatoire avant P44-M009. Aucun
+default, formule executable ou resultat existant ne change.

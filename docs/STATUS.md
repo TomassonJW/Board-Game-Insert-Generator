@@ -2030,3 +2030,17 @@ dans Diagnostic et scène Fusion, avec confirmation pour Effacer.
 
 Aucun schéma, solveur, tolérance, géométrie, CAD IR, complément ou
 matérialisation automatique ne change. Les 467 tests, la compilation et les contrôles de frontière sont verts. La gate P44-M006V est validée ; print-validated: false.
+
+## P44-M008 - Contrat de jeux herites et overrides par objet
+
+Statut : proposition documentaire integree, gate humaine ouverte,
+print-validated: false.
+
+Le contrat et ADR-0063 proposent trois roles physiques distincts, une cascade
+par axe avec zero explicite et la preservation P65 : asset-cavite et plat X/Y
+par cote, jeu plat Z sous l element, boite X/Y par cote, voisinage conteneur
+X/Y/Z total. La proposition de paire conteneur est max. Aucun code, schema
+execute, solveur, CAD IR, materialisation ou valeur numerique n a change.
+
+P44-M009 reste bloquee jusqu a validation humaine explicite des formules,
+defaults projetes et migration.

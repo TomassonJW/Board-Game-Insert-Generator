@@ -595,3 +595,10 @@ Preuve humaine : P44-M006 Fusion OK 0.1.30 - commit d82def6. Le cycle document,
 la récupération locale, les réglages visibles et le diagnostic replié sont
 fusion-validated. P44-M008 devient la prochaine mission ready-for-explicit-go ;
 P44-M007 reste bloquée par P44-M009. print-validated: false.
+
+## P44-M008 - Proposition du contrat de jeux herites - 2026-07-15
+
+P44-M008 formalise sans code trois roles : asset-cavite, plat-encastrement et
+conteneur externe. Heritage par axe, zero explicite, sources effectives et max
+pour la paire de conteneurs sont proposes. La gate humaine formules/defaults/
+migration est ouverte. P44-M009 et P44-M007 restent bloques.

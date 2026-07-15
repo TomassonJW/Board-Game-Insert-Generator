@@ -1983,7 +1983,7 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
   resolution de paire, composition Z, migration et matrice de tests.
 - Gate : validation humaine obligatoire des formules et defaults.
 - Interdit : aucun code ni changement numerique dans P44-M008.
-- Statut : `ready-for-explicit-go`.
+- Statut : proposal-human-gate-open ; ADR-0063 et contrat proposes, aucune implementation.
 
 #### P44-M009 - Implementation des jeux par objet
 

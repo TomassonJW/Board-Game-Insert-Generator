@@ -57,15 +57,17 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 
 ## Prochaine action recommandée
 
-### P44-M008 — contrat de jeux hérités et overrides par objet
+### P44-M008 - Gate humaine du contrat de jeux herites
 
-Statut : ready-for-explicit-go, documentation et décision uniquement.
+Statut : human-gate-open, documentation et decision uniquement.
 
-P44-M006 est fusion-validated, package 0.1.30, preuve humaine
-P44-M006 Fusion OK 0.1.30 - commit d82def6. P44-M008 doit maintenant cadrer les
-rôles distincts asset-cavité, plateau-encastrement et conteneur externe, leurs
-defaults, héritages et overrides X/Y/Z. Aucun code ni changement numérique ne
-commence avant sa décision humaine dédiée.
+Le contrat P44_M008_TOLERANCE_OVERRIDE_CONTRACT et ADR-0063 proposent trois
+roles, heritage X/Y/Z, zero explicite, sources effectives et max pour une paire
+de conteneurs. Aucun code ni changement numerique n a commence.
+
+Action humaine attendue : accepter ou corriger les roles, formules, projection
+des defaults historiques et migration. P44-M009 ne peut commencer qu apres
+cette decision.
 
 ## Séquence verrouillée
 

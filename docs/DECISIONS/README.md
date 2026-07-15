@@ -189,3 +189,5 @@ Tests, cartes backlog ou gates humaines a preparer.
 
 - ADR-0061-post-mvp-sequencing-and-complement-quarantine.md - identifiants P44-P50 conserves, P67/P68/P69 cadres et complements experimentaux mis en quarantaine avant P66.
 - ADR-0062-ux-foundation-before-v02-geometry.md - option C acceptee par P67-V : fondation UX P44 avant geometries P45, P46 gate V0.2 et P69 apres P50.
+
+- ADR-0063-role-based-clearance-overrides.md - proposition P44-M008 : jeux par role, heritage par axe et gate humaine avant implementation.

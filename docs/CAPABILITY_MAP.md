@@ -1078,3 +1078,10 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - C-SOLVER, C-TOLERANCE, C-GEOMETRY et C-CAD-IR : inchangés.
 - Validation : P44-M006 Fusion OK 0.1.30 - commit d82def6 ;
   print-validated: false.
+
+## P44-M008 - Contrat propose de tolerance par objet - 2026-07-15
+
+- C-TOLERANCE : proposed-human-gate-open, pas encore designed.
+- C-ASSET / C-RESERVATION / C-MODULE : roles et sources documentes, runtime inchange.
+- C-QUALITY : matrice de non-regression definie pour P44-M009.
+- C-SOLVER / C-CAD-IR / C-FUSION-UI : inchanges. print-validated: false.
