@@ -572,3 +572,18 @@ P44-M005 compacte la création sans modifier le modèle : preset unique,
 destination explicite, ajout local et gestion locale des presets personnels.
 Les compléments restent hors parcours. La gate P44-M005V doit observer cette UX
 dans Fusion avant P44-M006 ; aucune capability géométrique ou physique n’avance.
+
+## P44-M005 acceptée — gate Fusion 0.1.28
+
+Preuve humaine : "P44-M005 Fusion OK 0.1.28 - commit b8cf884".
+
+Statut : done-human-gate, fusion-validated pour le parcours UX P44-M005 ;
+print-validated: false.
+
+La validation couvre la barre de création persistante, le preset et la
+destination explicite (nouveau conteneur lié ou existant), les presets
+personnels, le raccourci local "+", leur suppression locale et l'absence de
+complément, calcul ou scène Fusion automatique. Elle ne qualifie ni schéma,
+bridge, solveur, tolérance, géométrie, CAD IR ou impression.
+
+P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
