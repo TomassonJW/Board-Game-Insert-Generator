@@ -538,3 +538,13 @@ conteneur parent / contenus enfants et les modes de taille compatibles, sans
 changer le modèle ni les capacités géométriques. P44-M004V devient la seule
 prochaine preuve ; P44-M005 et les missions suivantes gardent leurs
 dépendances. P45 reste après P44-V et print-validated: false.
+
+## P44-M004V2 — correction de densité avant P44-M005
+
+La revue 0.1.25 n’accepte pas la densité réelle, sans invalider le modèle de
+composition. L’option humaine hybride C devient une correction bornée :
+1180 px utiles, chrome compact, barre unique, grilles techniques horizontales,
+actions secondaires en menus et calculs repliés. Le package cible est 0.1.26.
+
+La gate P44-M004V2 remplace la preuve de densité attendue avant P44-M005.
+Aucune étape géométrique, de tolérance, de CAD ou d’impression n’est avancée.

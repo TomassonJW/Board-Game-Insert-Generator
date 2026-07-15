@@ -218,3 +218,19 @@ saisie. Elle ne valide ni géométrie, ni tolérance, ni scène automatique, ni
 impression.
 
 Retour OK : P44-M004V Fusion OK 0.1.25 - commit <sha>.
+
+## P44-M004V2 ouverte — densité hybride C
+
+Le retour humain sur 0.1.25 n’accepte pas la densité de P44-M004. Il ne constitue
+ni une validation Fusion complète ni un échec du modèle parent/enfants.
+P44-M004V2 ouvre une nouvelle observation bornée sur le package 0.1.26.
+
+Observer à largeur habituelle et plus étroite : utilisation horizontale,
+apparition rapide du premier conteneur, comparaison de plusieurs parents et
+enfants, lisibilité des champs, stabilité des menus et cibles de 40 px. Vérifier
+qu’aucun calcul ou scène Fusion ne part automatiquement.
+
+Retour OK : P44-M004V2 Fusion OK 0.1.26 - commit <sha>.
+
+Cette gate ne valide ni géométrie, ni tolérance, ni impression. P44-M005 reste
+bloquée tant qu’elle n’est pas fermée.

@@ -1934,3 +1934,22 @@ Statut : implemented, automated-validated, human-fusion-gate-required,
 fusion-validated: false pour P44-M004, print-validated: false. Aucun schéma,
 bridge, solveur, tolérance, géométrie, CAD IR ou scène Fusion n’est modifié.
 La prochaine preuve est P44-M004V dans Fusion.
+
+## P44-M004V — retour de densité non accepté et correction P44-M004V2
+
+La revue humaine du package 0.1.25 confirme des comportements de composition,
+mais refuse la densité UX : largeur utile sous-exploitée, titres et aides
+redondants, premier conteneur trop bas et comparaison de plusieurs relations
+parent/enfants insuffisante. P44-M004 ne devient donc pas fusion-validated.
+
+P44-M004V2 livre l’hybride C dans le package 0.1.26. La palette utilise jusqu’à
+1180 px, réunit état et cycle de vie, conserve une seule barre de création et de
+densité, puis affiche boîte, plats, conteneurs et contenus en rangées techniques.
+Les réglages primaires restent visibles ; actions et calculs secondaires sont
+repliés. Les cibles principales restent à 40 px et trois seuils responsifs
+préservent l’usage étroit.
+
+Statut : implemented, automated-validated, human-fusion-gate-required,
+fusion-validated: false, print-validated: false. Aucun schéma, bridge, solveur,
+tolérance, géométrie, CAD IR, scène Fusion ou complément n’est modifié. La
+prochaine preuve est P44-M004V2 dans Fusion sur le package 0.1.26.

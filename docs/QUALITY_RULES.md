@@ -208,3 +208,10 @@ Les validations P64 doivent couvrir au minimum :
   enfant. Le contrôle global de mode refuse toute valeur Cible/Fixe absente,
   les axes historiques mixtes restent traçables sous Personnalisé, et aucun
   changement de collection ou d’action bridge n’est autorisé.
+
+- P44-M004V2 : une densité acceptable est structurelle. La palette doit exposer
+  une seule commande de densité, utiliser jusqu’à 1180 px, maintenir les champs
+  primaires en rangées et conserver des cibles principales de 40 px. Les calculs
+  secondaires peuvent être repliés, jamais supprimés. Les libellés nouveaux ou
+  touchés sont écrits en français UTF-8 accentué. Aucun compactage ne peut
+  modifier schéma, bridge, solveur, tolérance, géométrie ou scène Fusion.

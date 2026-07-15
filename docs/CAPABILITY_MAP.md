@@ -1016,3 +1016,15 @@ de cavite V0.2 restent differees apres P66.
   historique par axe, absence de bridge additionnel et package 0.1.25 testés.
 - print-validated: false ; aucune capability physique ou géométrique n’est
   promue.
+
+## P44-M004V2 — densité structurelle hybride C
+
+- C-FUSION-UI : la surface embarquée utilise la largeur Fusion, une barre unique
+  et des rangées techniques parent/enfants responsives.
+- C-QUALITY : le contrat DOM impose une seule commande de densité, des cibles de
+  40 px, trois seuils de repli et la conservation des identifiants métier.
+- C-MODULE : la projection reste fondée sur container_group_id, sans arbre
+  récursif ni migration.
+- C-SOLVER / C-TOLERANCE / C-CAD-IR : inchangées.
+- Statut : implemented, automated-validated, human-fusion-gate-required,
+  fusion-validated: false, print-validated: false.

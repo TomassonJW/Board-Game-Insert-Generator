@@ -532,3 +532,16 @@ axes existants ; un projet historique divergent reste explicitement
 Personnalisé. Cette projection ne crée ni action bridge, ni solveur JavaScript,
 ni migration de schéma. Package 0.1.25 : observation Fusion P44-M004V encore
 requise.
+
+## P44-M004V2 — hybride C de densité structurelle
+
+La densité ne se réduit pas au padding. La palette exploite jusqu’à 1180 px et
+organise les contrôles primaires en rangées techniques : identité, type ou mode,
+dimensions, quantité ou solidité et actions locales. Les titres pédagogiques
+répétés disparaissent ; les informations calculées restent accessibles sous un
+détail fermé et les actions rares sous un menu local.
+
+La composition visuelle parent/enfants reste explicite par un retrait et une
+bordure d’accent, mais sans carte imbriquée lourde. Les cibles principales gardent
+40 px. Les seuils 1020, 760 et 559 px réorganisent progressivement les grilles.
+Le mode détaillé ne réintroduit pas l’ancienne pile verticale.

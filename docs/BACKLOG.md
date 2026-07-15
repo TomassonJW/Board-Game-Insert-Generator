@@ -2046,3 +2046,18 @@ contrat et la gate P44-M008. `print-validated: false`.
   human-fusion-gate-required, print-validated: false.
 - Prochaine preuve : P44-M004V Fusion OK 0.1.25 - commit <sha> ; P44-M005
   reste bloquée jusque-là.
+
+#### P44-M004V2 — densité structurelle hybride C
+
+- Dépendances : P44-M004 intégrée ; retour humain 0.1.25 reçu.
+- Contrat : docs/P44_M004V2_HYBRID_DENSITY_CONTRACT.md.
+- Objectif : exploiter la largeur Fusion et rendre plusieurs conteneurs avec
+  leurs éléments réellement comparables, sans réduire les cibles sous 40 px.
+- Livrables : en-tête compact, barre unique, grilles boîte/plat/conteneur/asset,
+  actions secondaires en menus, calculs repliés, package 0.1.26.
+- Exclusions : schéma, migration, bridge, solveur, tolérance, géométrie, CAD IR,
+  scène automatique, compléments.
+- Statut : done, implemented, automated-validated,
+  human-fusion-gate-required, print-validated: false.
+- Preuve attendue : P44-M004V2 Fusion OK 0.1.26 - commit <sha>.
+- P44-M005 reste blocked-by-p44-m004v2.

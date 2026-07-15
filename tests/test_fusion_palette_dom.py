@@ -64,7 +64,7 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertIn("rotation_deg_z", self.markup)
 
     def test_uses_utf8_french_copy_without_mojibake(self) -> None:
-        for marker in ("Boîte", "Éléments", "Réglages", "Aperçu", "Épaisseur", "Quantité", "À retirer"):
+        for marker in ("Boîte", "éléments", "Réglages", "Aperçu", "Épaisseur", "Tolérance", "À plat"):
             self.assertIn(marker, self.markup)
         for forbidden in ("Ã", "Â", "�"):
             self.assertNotIn(forbidden, self.markup)
@@ -81,48 +81,69 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertNotIn('data-action="add-complement-preset"', self.markup)
         self.assertNotIn('id="complement-presets"', self.markup)
 
-    def test_compacts_cards_as_dense_responsive_technical_bands(self) -> None:
+    def test_compacts_cards_as_dense_responsive_technical_rows(self) -> None:
         self.assertNotIn(".density-compact .row-details{display:none}", self.markup)
         for marker in (
-            ".dimension-strip{grid-template-columns:repeat(3,minmax(80px,104px)) minmax(72px,88px)",
-            ".axis-control{display:grid;grid-template-columns:minmax(80px,.8fr) minmax(92px,1fr)",
-            ".row-actions button{min-width:40px;min-height:40px",
-            "@media(max-width:759px)", "@media(max-width:559px)",
-            ".dimension-strip{grid-template-columns:repeat(2,minmax(80px,112px))}",
+            ".shell{max-width:1180px",
+            ".app-status-line{display:flex",
+            ".workspace-toolbar{display:flex",
+            "main>.message.show{position:fixed",
+            ".box-inline-grid{display:grid",
+            ".asset-primary-grid{display:grid",
+            ".flat-primary-grid{display:grid",
+            ".container-primary-grid{display:grid",
             'class="card row-card technical-card content-card child-card"',
             'class="card row-card technical-card flat-card"',
             'class="card row-card technical-card group-card"',
             'class="card technical-card box-card"',
-            'class="essential-strip tolerance-fields"',
-            'class="essential-strip placement-fields"',
-            'class="essential-strip strength-fields"',
-            ".density-compact .technical-card .compact-summary{display:none}",
+            'class="flat-secondary-grid"',
+            'class="content-children"',
+            "@media(max-width:1020px)",
+            "@media(max-width:760px)",
+            "@media(max-width:559px)",
         ):
             self.assertIn(marker, self.markup)
+        self.assertEqual(self.markup.count('aria-label="Densité des listes"'), 1)
+        self.assertNotIn("<h2>Démarrage rapide</h2>", self.markup)
+        self.assertNotIn("<h4>Éléments contenus</h4>", self.markup)
+        self.assertIn('<div class="row-details">${targetControls}${customDetails}${children}</div>', self.markup)
 
-    def test_keeps_essential_sections_visible_and_calculations_collapsed(self) -> None:
+    def test_keeps_primary_controls_visible_and_calculations_collapsed(self) -> None:
         for forbidden in (
-            '<details class="local-details"><summary>Prise et tolerances',
-            '<details class="local-details"><summary>Placement et ordre',
-            '<details class="local-details"><summary>Solidite',
+            "<h4>Prise et tolérances</h4>",
+            "<h4>Placement et ordre</h4>",
+            "<h4>Solidité</h4>",
         ):
             self.assertNotIn(forbidden, self.markup)
         for marker in (
-            "<h4>Prise et tolérances</h4>", "<h4>Placement et ordre</h4>",
-            "<h4>Solidité</h4>", "guidance-details",
+            'title="Tolérance élément / cavité">Tolérance',
+            "<label>Pile<input",
+            "<label>Paroi<input",
+            "<label>Fond<input",
             "document.createElement('details')",
             "section.className='container-sizing local-details calculated-details'",
-            "summary.textContent='Details calcules'",
+            "summary.textContent='Détails calculés'",
         ):
             self.assertIn(marker, self.markup)
+
     def test_makes_presets_and_historical_complement_compatibility_obvious(self) -> None:
         for marker in (
-            "Demarrage rapide",
-            "Complements historiques",
-            "historic-complements", "renderComplements",
-            "Mode de taille", "group-unified-mode", "Personnalisé",
-            "group-mode", "group-target", "Auto", "Cible", "Fixe",
-            "creation_presets", "Dimensions résolues", "Format de cartes", "Debout sur grand côté",
+            "workspace-toolbar",
+            "Mes presets",
+            "Compléments historiques",
+            "historic-complements",
+            "renderComplements",
+            "group-unified-mode",
+            "Personnalisé",
+            "group-mode",
+            "group-target",
+            "Auto",
+            "Cible",
+            "Fixe",
+            "creation_presets",
+            "Résolu",
+            "Format",
+            "Orientation",
         ):
             self.assertIn(marker, self.markup)
 
@@ -146,19 +167,19 @@ class FusionPaletteDomTests(unittest.TestCase):
     def test_exposes_non_mutating_container_estimation_without_a_new_bridge_action(self) -> None:
         for marker in (
             "estimate-groups-action",
-            "Estimer les tailles",
-            "Reestimer les tailles",
+            ">Réestimer</button>",
             "container_sizing",
-            "Taille calculee",
+            "Taille calculée",
             "Avant modification - A reestimer",
             "Estimation deja en cours.",
-            "calculated?'Calculee '+dimText(calculated)+' | ':'')+status",
+            "calculated?'Calculée '+dimText(calculated)+' | ':'')+status",
             "sendProject('solve_project')",
         ):
             self.assertIn(marker, self.markup)
         self.assertIn("estimate-groups", self.dom.actions)
         self.assertNotIn("estimate_project", self.dom.bridge_actions)
         self.assertIn("does_not_materialize_fusion", (ROOT / "src" / "board_game_insert_generator" / "container_sizing_view.py").read_text(encoding="utf-8"))
+
     def test_translates_preview_explanations_without_solver_codes(self) -> None:
         for marker in (
             "view.presentation", "preview-explanations", "Indice de comparaison",
@@ -231,7 +252,7 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertIn("top_inset_reservation.py", helpers)
         self.assertIn("volumetric_stage_solver.py", helpers)
         self.assertIn("Assert-BgigPaletteProjectRuntime", helpers)
-        for marker in ("$paletteMarkers", "Mode de taille", "[char]0x00EE", "[char]0x00E9", "[char]0x00E7"):
+        for marker in ("$paletteMarkers", "workspace-toolbar", "container-primary-grid", "[char]0x00EE", "[char]0x00E9", "[char]0x00E7"):
             self.assertIn(marker, helpers)
         self.assertNotIn('\"1. Boite\", \"6. Apercu\"', helpers)
         self.assertIn("Aucun navigateur", smoke)
