@@ -2,9 +2,13 @@
 
 ## Statut
 
-Mission P44-M006. Package cible : 0.1.29. La validation humaine Fusion est
+Mission P44-M006. Package cible : 0.1.30. La validation humaine Fusion est
 requise avant toute intégration dans main. Cette mission ne valide aucune
 impression réelle.
+
+Le package 0.1.29 reçoit un KO de gate sur l’état Fusion et la confirmation
+d’abandon d’édition. Le correctif 0.1.30 rend ces affichages défensifs et protège
+une édition non enregistrée avant Nouveau, Ouvrir ou un récent.
 
 ## Intention
 
@@ -63,18 +67,20 @@ source importé.
 
 ## Gate humaine P44-M006V
 
-Dans Fusion 360, avec le package 0.1.29 :
+Dans Fusion 360, avec le package 0.1.30 :
 
-1. ouvrir BGIG et vérifier les libellés français, la hauteur de conception
-   calculée et le panneau diagnostic replié ;
-2. Nouveau puis Enregistrer sous : vérifier le dialogue natif Fusion, le dossier
-   par défaut, l’annulation sans perte et le nom affiché ;
-3. modifier une valeur, attendre au moins deux secondes, fermer et rouvrir BGIG :
+1. ouvrir BGIG puis Inspecter la scène : aucune erreur TypeError ne doit
+   apparaître et la réponse du diagnostic doit rester lisible ;
+2. modifier une valeur puis choisir Nouveau : vérifier la confirmation et que
+   Annuler conserve l’édition courante ;
+3. enregistrer sous un nom, puis choisir Nouveau sans nouvelle modification :
+   vérifier qu’un projet vierge non nommé s’ouvre sans écraser le fichier nommé ;
+4. modifier une valeur, attendre au moins deux secondes, fermer et rouvrir BGIG :
    vérifier la récupération locale ;
-4. Ouvrir un fichier BGIG, vérifier que le document source est lu sans
+5. Ouvrir un fichier BGIG, vérifier que le document source est lu sans
    réécriture automatique, puis ouvrir un projet récent ;
-5. vérifier Inspecter et Effacer la scène dans le diagnostic, avec confirmation
-   pour Effacer ; aucun calcul ni changement de scène ne doit partir seul.
+6. vérifier Effacer la scène dans le diagnostic, avec confirmation ; aucun calcul
+   ni changement de scène ne doit partir seul.
 
-Réponse attendue : P44-M006 Fusion OK 0.1.29 - commit SHA, ou un KO
+Réponse attendue : P44-M006 Fusion OK 0.1.30 - commit SHA, ou un KO
 contextualisé.

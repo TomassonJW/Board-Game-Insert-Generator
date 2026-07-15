@@ -275,6 +275,21 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertNotIn('data-path="box.usable_height_mm"', self.markup)
         self.assertNotIn("<summary>Jeux et preferences</summary>", self.markup)
 
+    def test_p44_m006_h01_guards_fusion_state_and_unsaved_document_transitions(self) -> None:
+        for marker in (
+            "function hasUnsavedEdition()",
+            "documentInfo?.recovery_available",
+            "function confirmDiscardUnsavedEdition(actionLabel)",
+            "confirmDiscardUnsavedEdition('Créer un nouveau projet')",
+            "confirmDiscardUnsavedEdition('Ouvrir un autre projet')",
+            "const sceneSummary=$('#scene-summary'),sceneStatus=$('#scene-status');",
+            "if(sceneSummary)sceneSummary.textContent=detail||'Inspection disponible.'",
+            "if(sceneStatus)sceneStatus.textContent=payload.scene_status||'Scène inspectée'",
+            "state('Réponse Fusion illisible','error')",
+        ):
+            self.assertIn(marker, self.markup)
+        self.assertNotIn("$('#scene-status').textContent=", self.markup)
+
     def test_has_no_external_web_runtime_or_business_solver_in_javascript(self) -> None:
         for forbidden in ("localhost", "fetch(", "XMLHttpRequest", "npm ", "Vite", "solvePartition", "derive_expandable_envelope_contract"):
             self.assertNotIn(forbidden, self.markup)
@@ -304,7 +319,7 @@ class FusionPaletteDomTests(unittest.TestCase):
     def test_prepares_the_p44_m006_fusion_document_cycle_gate(self) -> None:
         script = (ROOT / "scripts" / "fusion" / "prepare_p44_m006_document_cycle_test.ps1").read_text(encoding="utf-8")
         for marker in (
-            "0.1.29", "document-status", "save-document-action",
+            "0.1.30", "document-status", "save-document-action",
             "open-project", "save-project-as", "design-height",
             "diagnostic-tools", "createFileDialog", "P44-M006 Fusion OK",
         ):

@@ -2014,8 +2014,14 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 
 ## P44-M006 — réglages, cycle document et diagnostic
 
-Statut : implemented-awaiting-human-fusion-gate, package 0.1.29,
+Statut : implemented-awaiting-human-fusion-gate, package 0.1.30,
 fusion-validated: false, print-validated: false.
+
+Le package 0.1.29 est KO de gate : l’état Fusion de démarrage et Inspecter
+référençait un nœud retiré de la palette, ce qui affichait TypeError puis une
+réponse illisible. Le correctif 0.1.30 rend l’affichage défensif et confirme
+Nouveau, Ouvrir ou récent seulement lorsqu’une édition non enregistrée serait
+abandonnée.
 
 Le bridge sans adsk gère maintenant un document nommé, des récents bornés et une
 récupération locale atomique. La palette utilise le FileDialog Fusion pour

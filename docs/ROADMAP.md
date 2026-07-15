@@ -589,7 +589,7 @@ bridge, solveur, tolérance, géométrie, CAD IR ou impression.
 P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 
 
-## P44-M006 en gate Fusion — package 0.1.29
+## P44-M006 en gate Fusion corrective — package 0.1.30
 
 P44-M006 implémente le cycle document, la récupération locale, les réglages
 visibles et le diagnostic replié conformément à son contrat dédié. Elle reste

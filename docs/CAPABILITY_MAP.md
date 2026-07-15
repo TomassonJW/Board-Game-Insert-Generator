@@ -1073,6 +1073,8 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 
 - C-FUSION-UI : implemented-awaiting-human-gate pour le cycle de document
   nommé, la récupération locale, les réglages lisibles et le diagnostic replié.
+  Le KO 0.1.29 du handler d’état Fusion est corrigé par le package 0.1.30 ; la
+  gate humaine reste requise et aucune capability physique n’est promue.
 - C-QUALITY : audit UTF-8 et anti-mojibake couvert par les tests DOM et un
   roundtrip de nom accentué.
 - C-SOLVER, C-TOLERANCE, C-GEOMETRY et C-CAD-IR : inchangés.

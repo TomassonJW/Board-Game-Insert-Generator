@@ -1962,7 +1962,9 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
   diagnostics historiques ; UTF-8 sans BOM, absence de mojibake, tests DOM et
   roundtrip d’un nom accentué.
 - Contrat : docs/P44_M006_DOCUMENT_CYCLE_CONTRACT.md.
-- Statut : implemented-awaiting-human-fusion-gate, package cible 0.1.29.
+- Statut : implemented-awaiting-human-fusion-gate, package cible 0.1.30.
+- Gate corrective : le package 0.1.29 est KO sur l’état Fusion et l’absence de
+  confirmation avant abandon d’édition ; 0.1.30 doit fermer ces deux retours.
 
 #### P44-M007 - Calcul adaptatif et Apercu priorise
 

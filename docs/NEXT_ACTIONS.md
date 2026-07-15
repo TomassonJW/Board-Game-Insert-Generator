@@ -59,8 +59,11 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 
 ### P44-M006 — réglages, cycle document et diagnostic
 
-Statut : implemented-awaiting-human-fusion-gate, package cible 0.1.29,
+Statut : implemented-awaiting-human-fusion-gate, package cible 0.1.30,
 fusion-validated: false, print-validated: false.
+
+Le package 0.1.29 est KO de gate ; 0.1.30 corrige l’état Fusion défensif et la
+confirmation d’abandon d’une édition non enregistrée.
 
 Le contrat P44_M006_DOCUMENT_CYCLE_CONTRACT.md est écrit. Le lot ajoute les
 réglages visibles, la hauteur de conception dérivée, le cycle Nouveau/Ouvrir/
