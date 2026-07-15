@@ -261,3 +261,17 @@ ne valide ni schéma, ni bridge, ni solveur, ni tolérance, ni géométrie, ni C
 IR, ni scène automatique, ni impression. print-validated: false.
 
 P44-M005 devient prête mais ne commence pas sans GO explicite de Thomas.
+
+## P44-M005V — création pilotée et presets 0.1.28
+
+Déclencheur : P44-M005 est implémentée sans changement métier. La gate observe
+seulement le parcours de création dans la palette Fusion.
+
+Vérifier successivement : preset BGIG vers Nouveau conteneur lié, preset BGIG
+vers conteneur existant, preset personnel vers les deux destinations, raccourci
++ local, suppression d’un preset personnel et persistance des éléments déjà
+créés. Confirmer qu’aucun complément, calcul ou scène Fusion ne part.
+
+Retour OK : P44-M005 Fusion OK 0.1.28 - commit <sha>.
+
+Cette gate ne valide ni géométrie, ni tolérance, ni impression.

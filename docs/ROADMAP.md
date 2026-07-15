@@ -565,3 +565,10 @@ ni géométrie, ni tolérance, ni CAD, ni impression.
 
 P44-M005 devient la prochaine mission ready-for-explicit-go. Elle reste
 strictement non commencée tant que Thomas ne donne pas le GO.
+
+## P44-M005 — création pilotée 0.1.28
+
+P44-M005 compacte la création sans modifier le modèle : preset unique,
+destination explicite, ajout local et gestion locale des presets personnels.
+Les compléments restent hors parcours. La gate P44-M005V doit observer cette UX
+dans Fusion avant P44-M006 ; aucune capability géométrique ou physique n’avance.

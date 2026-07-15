@@ -2092,3 +2092,16 @@ contrat et la gate P44-M008. `print-validated: false`.
   seulement la création pilotée, les presets, la destination explicite, le
   raccourci local et les presets personnels.
 - Démarrage : GO explicite de Thomas requis.
+
+#### P44-M005 — implémentation 0.1.28
+
+- Contrat : docs/P44_M005_CREATION_PRESETS_CONTRACT.md.
+- Livrable : sélection unique de preset BGIG ou personnel, destination nouveau
+  conteneur lié ou existante, ajout explicite et raccourci local +.
+- Presets personnels : import, export et suppression locale du preset
+  sélectionné ; édition différée.
+- Exclusions : schéma, migration, bridge, solveur, tolérance, géométrie, CAD
+  IR, scène automatique, conteneurs imbriqués et compléments.
+- Statut : done, implemented, automated-validation-required,
+  human-fusion-gate-required, print-validated: false.
+- Preuve attendue : P44-M005 Fusion OK 0.1.28 - commit <sha>.

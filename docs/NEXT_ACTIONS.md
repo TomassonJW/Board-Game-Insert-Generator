@@ -42,21 +42,25 @@ scène Fusion, ni une impression réelle.
 
 ## Prochaine action recommandée
 
-### P44-M005 — création pilotée et presets
+### Gate humaine P44-M005V
 
-Statut : ready-for-explicit-go, non commencée.
+Statut : manual_validation_required, fusion-validated: false,
+print-validated: false.
 
-Cadrer puis réaliser uniquement le reliquat de création pilotée : presets,
-destination explicite, raccourci local et gestion des presets personnels. Les
-barres collantes validées en P44-M004V2H01 ne sont pas à refaire. Les
-compléments restent exclus et en quarantaine.
+Dans Fusion avec le package 0.1.28, vérifier le parcours preset + destination :
+nouveau conteneur lié, conteneur existant, preset personnel, raccourci local +,
+suppression locale et absence de création de complément ou de calcul/scène
+automatique.
 
-P44-M005 ne commence qu’après un GO explicite de Thomas.
+Retour attendu : P44-M005 Fusion OK 0.1.28 - commit <sha>.
+
+Un KO doit indiquer la sélection, la destination, l’action et l’écart observé.
+P44-M006 reste bloquée tant que cette gate n’est pas fermée.
 
 ## Séquence verrouillée
 
-P44-M005 est maintenant déverrouillée mais non démarrée. P44-M008/P44-M009
-gardent leur contrat de tolérance. P45/P46 ne commencent pas avant P44-V ;
+P44-M005 est implémentée et attend uniquement sa gate P44-M005V.
+P44-M008/P44-M009 gardent leur contrat de tolérance. P45/P46 ne commencent pas avant P44-V ;
 P47-P50 restent bloqués jusqu’à P46 et P69 jusqu’à P50. P68 peut recueillir des
 faits réels sans modifier les valeurs par défaut. print-validated: false reste
 obligatoire.

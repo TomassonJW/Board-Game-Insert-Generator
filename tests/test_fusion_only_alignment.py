@@ -67,8 +67,9 @@ class FusionOnlyAlignmentTests(unittest.TestCase):
         self.assertIn("fusion-validated", actions)
         self.assertIn("print-validated: false", actions)
         self.assertIn("P44-M005", actions)
-        self.assertIn("ready-for-explicit-go", actions)
-        self.assertIn("GO explicite", actions)
+        self.assertIn("P44-M005V", actions)
+        self.assertIn("manual_validation_required", actions)
+        self.assertIn("P44-M005 Fusion OK 0.1.28 - commit <sha>", actions)
         self.assertIn("français", framing)
         self.assertIn("Package cible : palette Fusion 0.1.26", framing)
         self.assertIn("hybride C", framing)
@@ -79,7 +80,7 @@ class FusionOnlyAlignmentTests(unittest.TestCase):
         self.assertIn("aucun schéma", framing)
         self.assertIn("tolérance", framing)
         self.assertIn("print-validated: false", framing)
-        self.assertNotIn("manual_validation_required", actions)
+
         self.assertNotIn("codex/p56-premium-editor", actions)
         self.assertNotIn("inspection visuelle runtime du frontend reel", actions)
 

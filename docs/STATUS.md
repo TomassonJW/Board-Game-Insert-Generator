@@ -1981,3 +1981,17 @@ schéma, bridge, solveur, tolérance, géométrie, CAD IR, scène Fusion automat
 ou impression physique.
 
 P44-M005 est ready-for-explicit-go et reste non commencée.
+
+## P44-M005 — création pilotée et presets
+
+Le package 0.1.28 remplace les boutons de presets dispersés par une création
+explicite : un preset, une destination Nouveau conteneur lié ou existante, puis
+Ajouter. Le raccourci + local réutilise le preset sélectionné dans le conteneur
+courant. Les presets personnels apparaissent dans la même liste ; import,
+export et suppression locale sont conservés.
+
+Statut : implemented, automated-validation-required,
+human-fusion-gate-required, fusion-validated: false,
+print-validated: false. Aucun schéma, bridge, solveur, tolérance, géométrie,
+CAD IR ou scène Fusion n’est modifié. Les compléments restent en quarantaine.
+La prochaine preuve est P44-M005V dans Fusion.

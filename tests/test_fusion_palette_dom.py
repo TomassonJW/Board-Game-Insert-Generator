@@ -75,7 +75,7 @@ class FusionPaletteDomTests(unittest.TestCase):
             self.assertIn(marker, self.dom.ids)
         for marker in ('data-density="compact"', 'data-density="detailed"', "local-details", "density-compact"):
             self.assertIn(marker, self.markup)
-        for action in ("add-content", "add-content-preset", "duplicate-content", "delete-content", "add-flat", "delete-flat", "add-group", "delete-group", "delete-complement"):
+        for action in ("add-selected-content", "duplicate-content", "delete-content", "add-flat", "delete-flat", "add-group", "delete-group", "delete-complement"):
             self.assertIn(action, self.markup)
         self.assertNotIn('data-action="add-complement"', self.markup)
         self.assertNotIn('data-action="add-complement-preset"', self.markup)
@@ -132,6 +132,23 @@ class FusionPaletteDomTests(unittest.TestCase):
             "summary.textContent='Détails calculés'",
         ):
             self.assertIn(marker, self.markup)
+
+    def test_creates_one_selected_preset_in_an_explicit_destination_without_new_bridge(self) -> None:
+        for marker in (
+            'id="creation-preset"', 'id="creation-destination"',
+            'data-action="add-selected-content"', "Nouveau conteneur lié",
+            "selectedCreationPreset", "selectedCreationDestination",
+            "function selectedCreationTemplate()", "function addContent(groupId=null)",
+            "addContent(button.dataset.groupId)",
+            "Preset sélectionné", "Supprimer ce preset",
+        ):
+            self.assertIn(marker, self.markup)
+        self.assertIn("add-selected-content", self.dom.actions)
+        self.assertNotIn("add-content-preset", self.dom.actions)
+        self.assertNotIn("add-personal-preset", self.dom.actions)
+        self.assertNotIn('data-action="add-complement"', self.markup)
+        self.assertNotIn('data-action="add-complement-preset"', self.markup)
+        self.assertNotIn('data-bridge="add_', self.markup)
 
     def test_makes_presets_and_historical_complement_compatibility_obvious(self) -> None:
         for marker in (
@@ -264,6 +281,9 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertNotIn('\"1. Boite\", \"6. Apercu\"', helpers)
         self.assertIn("Aucun navigateur", smoke)
         self.assertIn("P56 Fusion OK", smoke)
+        p44_smoke = (ROOT / "scripts" / "fusion" / "prepare_p44_m005_creation_presets_test.ps1").read_text(encoding="utf-8")
+        for marker in ("0.1.28", "creation-preset", "creation-destination", "P44-M005 Fusion OK"):
+            self.assertIn(marker, p44_smoke)
 
 
 if __name__ == "__main__":

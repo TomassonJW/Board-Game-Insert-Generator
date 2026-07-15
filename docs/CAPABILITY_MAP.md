@@ -1040,3 +1040,15 @@ de cavite V0.2 restent differees apres P66.
 - C-SOLVER / C-TOLERANCE / C-CAD-IR : inchangées et non qualifiées par cette
   gate UX.
 - print-validated: false. P44-M005 devient ready-for-explicit-go.
+
+## P44-M005 — création et presets explicites
+
+- C-FUSION-UI : implemented, automated-validation-required pour une création
+  compacte preset + destination + Ajouter, avec raccourci local dans un
+  conteneur et sans calcul automatique.
+- C-ASSET : les starters existants et les presets personnels restent des
+  brouillons éditables ; aucun nouveau format, type ou champ métier.
+- C-MODULE : la destination réutilise exclusivement container_group_id ; aucun
+  conteneur imbriqué ni complément.
+- C-QUALITY : DOM, bridge existant, roundtrip et gate Fusion dédiés.
+- print-validated: false.
