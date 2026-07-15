@@ -249,3 +249,15 @@ qu’elle ne masque plus les premiers champs.
 Retour OK : P44-M004V2 Fusion OK 0.1.27 - commit <sha>.
 
 Cette gate ne valide ni géométrie, ni tolérance, ni impression.
+
+## P44-M004V2 acceptée — 2026-07-15
+
+Thomas a retourné "P44-M004V2 Fusion OK 0.1.27 - commit 80c1a6c".
+
+La gate ferme P44-M004V2 et son hotfix H01 : la densité hybride C, la
+comparaison conteneur / éléments, les deux barres collantes et les notifications
+temporisées sont fusion-validated comme comportement UX observé. Cette preuve
+ne valide ni schéma, ni bridge, ni solveur, ni tolérance, ni géométrie, ni CAD
+IR, ni scène automatique, ni impression. print-validated: false.
+
+P44-M005 devient prête mais ne commence pas sans GO explicite de Thomas.

@@ -56,14 +56,19 @@ class FusionOnlyAlignmentTests(unittest.TestCase):
         self.assertIn('class="eyebrow">BGIG</span>', markup)
         self.assertIn("bgig.palette.request.v1", markup)
 
-    def test_next_action_advances_the_hybrid_density_gate(self) -> None:
+    def test_next_action_closes_the_hybrid_density_gate_without_promoting_print(self) -> None:
         actions = self.read("docs/NEXT_ACTIONS.md")
         framing = self.read("docs/P44_M004V2_HYBRID_DENSITY_CONTRACT.md")
 
         self.assertIn("P44-M004V2", actions)
-        self.assertIn("P44-M004V2 Fusion OK 0.1.27 - commit <sha>", actions)
+        self.assertIn("P44-M004V2 Fusion OK 0.1.27 - commit 80c1a6c", actions)
         self.assertIn("mvp-accepted", actions)
-        self.assertIn("manual_validation_required", actions)
+        self.assertIn("done-human-gate", actions)
+        self.assertIn("fusion-validated", actions)
+        self.assertIn("print-validated: false", actions)
+        self.assertIn("P44-M005", actions)
+        self.assertIn("ready-for-explicit-go", actions)
+        self.assertIn("GO explicite", actions)
         self.assertIn("français", framing)
         self.assertIn("Package cible : palette Fusion 0.1.26", framing)
         self.assertIn("hybride C", framing)
@@ -73,6 +78,8 @@ class FusionOnlyAlignmentTests(unittest.TestCase):
         self.assertIn("Détails calculés", framing)
         self.assertIn("aucun schéma", framing)
         self.assertIn("tolérance", framing)
+        self.assertIn("print-validated: false", framing)
+        self.assertNotIn("manual_validation_required", actions)
         self.assertNotIn("codex/p56-premium-editor", actions)
         self.assertNotIn("inspection visuelle runtime du frontend reel", actions)
 

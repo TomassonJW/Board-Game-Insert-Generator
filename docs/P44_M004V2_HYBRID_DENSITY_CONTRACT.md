@@ -105,3 +105,16 @@ Aucun comportement métier, schéma, bridge, solveur, tolérance, géométrie, C
 ou scène Fusion n’est modifié.
 
 Retour attendu : P44-M004V2 Fusion OK 0.1.27 - commit <sha>.
+
+## Preuve humaine et clôture — 2026-07-15
+
+Thomas a confirmé "P44-M004V2 Fusion OK 0.1.27 - commit 80c1a6c".
+
+P44-M004V2 et P44-M004V2H01 sont fusion-validated pour la surface UX livrée :
+densité hybride C, composition compacte conteneur / éléments, barres Créer et
+Plateaux et livrets collantes et toasts temporisés. La preuve est strictement
+limitée à cette observation : aucun schéma, bridge, solveur, tolérance,
+géométrie, CAD IR, scène automatique ou impression n’est validé.
+print-validated: false.
+
+P44-M005 devient ready-for-explicit-go et ne démarre pas sans GO explicite.

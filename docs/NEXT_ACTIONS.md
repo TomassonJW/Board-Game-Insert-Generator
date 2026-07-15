@@ -25,31 +25,44 @@ P44-M004V2H01 complète cette direction dans le package 0.1.27 : barre Créer et
 ligne Plateaux et livrets collantes sous les onglets, confirmations remontées et
 masquées après 3 secondes, avertissements ou erreurs après 6 secondes.
 
+## Dernière gate humaine acceptée
+
+### P44-M004V2 — densité hybride C et hotfix H01
+
+Thomas a confirmé : "P44-M004V2 Fusion OK 0.1.27 - commit 80c1a6c".
+
+Statut : done-human-gate, fusion-validated pour la surface UX P44-M004V2
+uniquement ; print-validated: false.
+
+La preuve couvre la compacité hybride C, la comparaison des cartes conteneur /
+éléments, les contrôles Créer et Plateaux et livrets collants sous les onglets,
+ainsi que les notifications temporisées. Elle ne qualifie ni le schéma, ni le
+bridge, ni le solveur, ni les tolérances, ni la géométrie, ni le CAD IR, ni la
+scène Fusion, ni une impression réelle.
+
 ## Prochaine action recommandée
 
-### Gate humaine P44-M004V2
+### P44-M005 — création pilotée et presets
 
-Statut : manual_validation_required, fusion-validated: false,
-print-validated: false.
+Statut : ready-for-explicit-go, non commencée.
 
-Dans Fusion avec le package 0.1.27, vérifier la densité réelle à la largeur
-habituelle puis plus étroite, la comparaison de plusieurs parents/enfants, la
-lisibilité des champs principaux, les menus secondaires, la stabilité de saisie
-et l’absence de calcul ou scène automatique.
+Cadrer puis réaliser uniquement le reliquat de création pilotée : presets,
+destination explicite, raccourci local et gestion des presets personnels. Les
+barres collantes validées en P44-M004V2H01 ne sont pas à refaire. Les
+compléments restent exclus et en quarantaine.
 
-Retour attendu : P44-M004V2 Fusion OK 0.1.27 - commit <sha>.
-
-Un KO doit indiquer largeur approximative, carte, champ et écart observé.
+P44-M005 ne commence qu’après un GO explicite de Thomas.
 
 ## Séquence verrouillée
 
-P44-M005 reste bloquée jusqu’à P44-M004V2. P44-M008/P44-M009 gardent leur
-contrat de tolérance. P45/P46 ne commencent pas avant P44-V ; P47-P50 restent
-bloqués jusqu’à P46 et P69 jusqu’à P50. P68 peut recueillir des faits réels sans
-modifier les valeurs par défaut. print-validated: false reste obligatoire.
+P44-M005 est maintenant déverrouillée mais non démarrée. P44-M008/P44-M009
+gardent leur contrat de tolérance. P45/P46 ne commencent pas avant P44-V ;
+P47-P50 restent bloqués jusqu’à P46 et P69 jusqu’à P50. P68 peut recueillir des
+faits réels sans modifier les valeurs par défaut. print-validated: false reste
+obligatoire.
 
 ## Fin de chaque mission
 
 Mettre à jour le pilotage, relire le diff, exécuter les preuves prévues,
-committer puis intégrer directement dans main lorsqu’aucune gate humaine
-n’est ouverte. Une gate Fusion ne devient jamais une validation d’impression.
+committer puis intégrer directement dans main lorsqu’aucune gate humaine n’est
+ouverte. Une gate Fusion ne devient jamais une validation d’impression.

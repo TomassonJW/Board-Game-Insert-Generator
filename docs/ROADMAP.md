@@ -555,3 +555,13 @@ Le retour 0.1.26 accepte la direction hybride C. Un hotfix 0.1.27 rend les deux
 barres de création collantes sous les onglets et transforme les messages globaux
 en toasts temporisés. P44-M005 reste bloquée jusqu’à la nouvelle observation
 Fusion.
+
+## P44-M004V2 acceptée — 2026-07-15
+
+La preuve humaine "P44-M004V2 Fusion OK 0.1.27 - commit 80c1a6c" ferme la gate UX de la densité hybride C dans le
+package 0.1.27. La validation est limitée aux cartes compactes parent / enfants,
+aux contrôles collants et aux notifications temporisées ; elle ne fait avancer
+ni géométrie, ni tolérance, ni CAD, ni impression.
+
+P44-M005 devient la prochaine mission ready-for-explicit-go. Elle reste
+strictement non commencée tant que Thomas ne donne pas le GO.

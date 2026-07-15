@@ -2073,3 +2073,22 @@ contrat et la gate P44-M008. `print-validated: false`.
 - Statut : done, implemented, automated-validation-required,
   human-fusion-gate-required.
 - Preuve attendue : P44-M004V2 Fusion OK 0.1.27 - commit <sha>.
+
+#### P44-M004V2 — clôture de gate Fusion 0.1.27
+
+- Preuve humaine : "P44-M004V2 Fusion OK 0.1.27 - commit 80c1a6c".
+- Statut : done-human-gate, fusion-validated pour l’UX P44-M004V2 ;
+  print-validated: false.
+- Portée validée : densité hybride C, cartes parent / enfants, contrôles Créer
+  et Plateaux et livrets collants, notifications temporisées.
+- Exclusions conservées : schéma, migration, bridge, solveur, tolérance,
+  géométrie, CAD IR, scène automatique, compléments et impression.
+- Conséquence : P44-M005 est ready-for-explicit-go, non commencée.
+
+#### P44-M005 — disponibilité après P44-M004V2
+
+- Statut courant : ready-for-explicit-go.
+- Frontière : ne pas refaire les barres collantes déjà validées ; traiter
+  seulement la création pilotée, les presets, la destination explicite, le
+  raccourci local et les presets personnels.
+- Démarrage : GO explicite de Thomas requis.

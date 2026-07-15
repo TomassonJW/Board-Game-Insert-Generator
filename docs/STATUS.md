@@ -1966,3 +1966,18 @@ Statut : implemented, automated-validation-required,
 human-fusion-gate-required, fusion-validated: false,
 print-validated: false. Aucun schéma, bridge, solveur, tolérance, géométrie,
 CAD IR ou scène Fusion n’est modifié.
+
+## P44-M004V2 acceptée — gate Fusion 0.1.27
+
+Thomas a confirmé "P44-M004V2 Fusion OK 0.1.27 - commit 80c1a6c".
+
+Statut : done-human-gate, fusion-validated pour la surface UX P44-M004V2 ;
+print-validated: false.
+
+La validation humaine couvre la densité hybride C, l’affichage compact de la
+composition conteneur / éléments, les contrôles Créer et Plateaux et livrets
+collants, et les toasts temporisés. Elle ne promeut aucune capability de
+schéma, bridge, solveur, tolérance, géométrie, CAD IR, scène Fusion automatique
+ou impression physique.
+
+P44-M005 est ready-for-explicit-go et reste non commencée.

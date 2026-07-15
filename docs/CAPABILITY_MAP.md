@@ -1028,3 +1028,15 @@ de cavite V0.2 restent differees apres P66.
 - C-SOLVER / C-TOLERANCE / C-CAD-IR : inchangées.
 - Statut : implemented, automated-validated, human-fusion-gate-required,
   fusion-validated: false, print-validated: false.
+
+## P44-M004V2 — gate UX Fusion acceptée
+
+- C-FUSION-UI : fusion-validated pour la densité hybride C, la comparaison
+  conteneur / éléments, les contrôles Créer et Plateaux et livrets collants et
+  les notifications temporisées du package 0.1.27 ; preuve "P44-M004V2 Fusion OK 0.1.27 - commit 80c1a6c".
+- C-MODULE : la projection continue de s’appuyer sur container_group_id, sans
+  arbre récursif ni migration ; aucune nouvelle capability de modèle n’est
+  promue.
+- C-SOLVER / C-TOLERANCE / C-CAD-IR : inchangées et non qualifiées par cette
+  gate UX.
+- print-validated: false. P44-M005 devient ready-for-explicit-go.
