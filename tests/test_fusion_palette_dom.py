@@ -282,7 +282,7 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertIn("Aucun navigateur", smoke)
         self.assertIn("P56 Fusion OK", smoke)
         p44_smoke = (ROOT / "scripts" / "fusion" / "prepare_p44_m005_creation_presets_test.ps1").read_text(encoding="utf-8")
-        for marker in ("0.1.28", "creation-preset", "creation-destination", "P44-M005 Fusion OK"):
+        for marker in ("0.1.28", "creation-preset", "creation-destination", "Nouveau conteneur li", "P44-M005 Fusion OK"):
             self.assertIn(marker, p44_smoke)
 
 

@@ -26,7 +26,7 @@ if (-not $DryRun) {
         throw "Installed P44-M005 package mismatch: expected 0.1.28."
     }
     $palette = Get-Content -LiteralPath (Join-Path $target "palette.html") -Raw -Encoding UTF8
-    foreach ($marker in @('id="creation-preset"', 'id="creation-destination"', 'data-action="add-selected-content"', 'Nouveau conteneur lié')) {
+    foreach ($marker in @('id="creation-preset"', 'id="creation-destination"', 'data-action="add-selected-content"', 'Nouveau conteneur li')) {
         if ($palette -notlike "*$marker*") { throw "Installed P44-M005 palette marker missing: $marker" }
     }
 }
@@ -34,7 +34,7 @@ if (-not $DryRun) {
 Write-Output ""
 Write-Output "P44-M005 Fusion actions remaining:"
 Write-Output "1. Ouvre Fusion 360 puis BGIG ; aucun navigateur externe ne doit s ouvrir."
-Write-Output "2. Choisis un preset BGIG, Nouveau conteneur lié puis Ajouter."
+Write-Output ("2. Choisis un preset BGIG, Nouveau conteneur li" + [char]0x00E9 + " puis Ajouter.")
 Write-Output "3. Choisis ensuite un conteneur existant et vérifie qu aucun second conteneur n est créé."
 Write-Output "4. Vérifie un preset personnel, son ajout, le raccourci + local et sa suppression."
 Write-Output "5. Confirme qu aucun complément, calcul ou scène Fusion ne se déclenche seul."
