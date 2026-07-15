@@ -165,7 +165,7 @@ function Assert-BgigPaletteProjectRuntime {
         "regenerate_project",
         "bgig_palette_ready",
         "workspace-toolbar",
-        "Complements historiques",
+        "historic-complements",
         "container-primary-grid",
         "group-mode",
         "estimate-groups-action",
