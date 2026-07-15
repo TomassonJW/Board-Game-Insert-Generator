@@ -548,3 +548,10 @@ actions secondaires en menus et calculs repliés. Le package cible est 0.1.26.
 
 La gate P44-M004V2 remplace la preuve de densité attendue avant P44-M005.
 Aucune étape géométrique, de tolérance, de CAD ou d’impression n’est avancée.
+
+## P44-M004V2H01 — ajustements de gate 0.1.27
+
+Le retour 0.1.26 accepte la direction hybride C. Un hotfix 0.1.27 rend les deux
+barres de création collantes sous les onglets et transforme les messages globaux
+en toasts temporisés. P44-M005 reste bloquée jusqu’à la nouvelle observation
+Fusion.

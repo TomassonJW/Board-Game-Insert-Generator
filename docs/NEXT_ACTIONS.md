@@ -21,6 +21,10 @@ techniques pour boîte, plateaux/livrets, conteneurs et éléments, actions
 secondaires en menus et calculs repliés. Aucun schéma, bridge, solveur,
 tolérance, géométrie, CAD IR, scène automatique ou complément n’a changé.
 
+P44-M004V2H01 complète cette direction dans le package 0.1.27 : barre Créer et
+ligne Plateaux et livrets collantes sous les onglets, confirmations remontées et
+masquées après 3 secondes, avertissements ou erreurs après 6 secondes.
+
 ## Prochaine action recommandée
 
 ### Gate humaine P44-M004V2
@@ -28,12 +32,12 @@ tolérance, géométrie, CAD IR, scène automatique ou complément n’a changé
 Statut : manual_validation_required, fusion-validated: false,
 print-validated: false.
 
-Dans Fusion avec le package 0.1.26, vérifier la densité réelle à la largeur
+Dans Fusion avec le package 0.1.27, vérifier la densité réelle à la largeur
 habituelle puis plus étroite, la comparaison de plusieurs parents/enfants, la
 lisibilité des champs principaux, les menus secondaires, la stabilité de saisie
 et l’absence de calcul ou scène automatique.
 
-Retour attendu : P44-M004V2 Fusion OK 0.1.26 - commit <sha>.
+Retour attendu : P44-M004V2 Fusion OK 0.1.27 - commit <sha>.
 
 Un KO doit indiquer largeur approximative, carte, champ et écart observé.
 

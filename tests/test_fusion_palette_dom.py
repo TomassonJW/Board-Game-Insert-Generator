@@ -106,6 +106,13 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertEqual(self.markup.count('aria-label="Densité des listes"'), 1)
         self.assertNotIn("<h2>Démarrage rapide</h2>", self.markup)
         self.assertNotIn("<h4>Éléments contenus</h4>", self.markup)
+        self.assertIn('.workspace-toolbar,.view[data-panel="box"] .section-command-bar{position:sticky', self.markup)
+        self.assertIn("top:var(--bgig-sticky-controls-top,102px)", self.markup)
+        self.assertIn("function syncStickyControlsOffset()", self.markup)
+        self.assertIn("new ResizeObserver(syncStickyControlsOffset)", self.markup)
+        self.assertIn("kind==='ok'?3000:6000", self.markup)
+        self.assertIn("messageTimer=setTimeout", self.markup)
+        self.assertIn("main>.message.show{position:fixed;top:8px", self.markup)
         self.assertIn('<div class="row-details">${targetControls}${customDetails}${children}</div>', self.markup)
 
     def test_keeps_primary_controls_visible_and_calculations_collapsed(self) -> None:

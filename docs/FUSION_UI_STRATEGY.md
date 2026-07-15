@@ -545,3 +545,11 @@ La composition visuelle parent/enfants reste explicite par un retrait et une
 bordure d’accent, mais sans carte imbriquée lourde. Les cibles principales gardent
 40 px. Les seuils 1020, 760 et 559 px réorganisent progressivement les grilles.
 Le mode détaillé ne réintroduit pas l’ancienne pile verticale.
+
+## P44-M004V2H01 — accès persistant aux commandes de création
+
+Une commande qui ajoute un objet en fin de liste reste visible pendant le
+défilement. La barre Créer et la ligne Plateaux et livrets sont collantes sous
+l’en-tête ; leur offset est mesuré dynamiquement pour suivre les retours à la
+ligne responsifs. Les notifications sont des toasts transitoires : 3 secondes
+pour une confirmation, 6 secondes pour un avertissement ou une erreur.

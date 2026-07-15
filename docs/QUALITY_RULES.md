@@ -215,3 +215,9 @@ Les validations P64 doivent couvrir au minimum :
   secondaires peuvent être repliés, jamais supprimés. Les libellés nouveaux ou
   touchés sont écrits en français UTF-8 accentué. Aucun compactage ne peut
   modifier schéma, bridge, solveur, tolérance, géométrie ou scène Fusion.
+
+- P44-M004V2H01 : les commandes collantes utilisent la hauteur réelle de
+  l’en-tête et ne doivent ni chevaucher les onglets ni masquer le contenu. Un
+  nouveau toast annule le minuteur précédent. Confirmation : 3 secondes ;
+  avertissement ou erreur : 6 secondes. Les tests DOM verrouillent offset,
+  temporisation et position haute.

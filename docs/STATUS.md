@@ -1953,3 +1953,16 @@ Statut : implemented, automated-validated, human-fusion-gate-required,
 fusion-validated: false, print-validated: false. Aucun schéma, bridge, solveur,
 tolérance, géométrie, CAD IR, scène Fusion ou complément n’est modifié. La
 prochaine preuve est P44-M004V2 dans Fusion sur le package 0.1.26.
+
+## P44-M004V2H01 — contrôles collants et notifications temporisées
+
+La revue Fusion de 0.1.26 accepte la compacité hybride C et demande deux
+ajustements avant fermeture de gate. Le package 0.1.27 garde la barre Créer et la
+ligne Plateaux et livrets collées sous les onglets avec un offset dérivé de la
+hauteur réelle de l’en-tête. Les confirmations sont remontées et disparaissent
+après 3 secondes ; avertissements et erreurs après 6 secondes.
+
+Statut : implemented, automated-validation-required,
+human-fusion-gate-required, fusion-validated: false,
+print-validated: false. Aucun schéma, bridge, solveur, tolérance, géométrie,
+CAD IR ou scène Fusion n’est modifié.

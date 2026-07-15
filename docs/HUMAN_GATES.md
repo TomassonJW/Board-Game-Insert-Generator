@@ -234,3 +234,18 @@ Retour OK : P44-M004V2 Fusion OK 0.1.26 - commit <sha>.
 
 Cette gate ne valide ni géométrie, ni tolérance, ni impression. P44-M005 reste
 bloquée tant qu’elle n’est pas fermée.
+
+## P44-M004V2H01 — gate 0.1.27
+
+La revue 0.1.26 valide l’orientation de compacité mais demande de garder les
+commandes de création accessibles pendant le défilement et de temporiser les
+notifications.
+
+Observer dans 0.1.27 que la barre Créer et la ligne Plateaux et livrets restent
+juste sous les onglets, sans chevauchement à largeur habituelle ou étroite.
+Confirmer qu’une notification de succès disparaît après environ 3 secondes et
+qu’elle ne masque plus les premiers champs.
+
+Retour OK : P44-M004V2 Fusion OK 0.1.27 - commit <sha>.
+
+Cette gate ne valide ni géométrie, ni tolérance, ni impression.

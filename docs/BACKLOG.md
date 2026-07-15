@@ -2061,3 +2061,15 @@ contrat et la gate P44-M008. `print-validated: false`.
   human-fusion-gate-required, print-validated: false.
 - Preuve attendue : P44-M004V2 Fusion OK 0.1.26 - commit <sha>.
 - P44-M005 reste blocked-by-p44-m004v2.
+
+#### P44-M004V2H01 — contrôles collants et toasts
+
+- Dépendance : retour humain positif avec ajustements sur 0.1.26.
+- Objectif : conserver Créer et Plateaux et livrets sous les onglets pendant le
+  défilement ; remonter et temporiser les notifications.
+- Package : 0.1.27.
+- Temporisation : 3 s confirmation, 6 s avertissement ou erreur.
+- Exclusions : modèle, bridge, solveur, tolérance, géométrie, CAD IR, scène.
+- Statut : done, implemented, automated-validation-required,
+  human-fusion-gate-required.
+- Preuve attendue : P44-M004V2 Fusion OK 0.1.27 - commit <sha>.

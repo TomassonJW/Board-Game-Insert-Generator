@@ -82,3 +82,26 @@ Retour attendu : P44-M004V2 Fusion OK 0.1.26 - commit <sha>.
 
 Un KO doit préciser la largeur approximative, la carte, le champ et l’écart
 observé. P44-M005 reste bloquée jusqu’à cette preuve.
+
+## Hotfix P44-M004V2H01 — contrôles collants et notifications
+
+Package cible : palette Fusion 0.1.27.
+
+La revue 0.1.26 accepte la densité hybride C et demande deux ajustements bornés :
+
+- la barre Créer de Conteneurs et éléments reste collée immédiatement sous les
+  onglets pendant le défilement ;
+- la ligne Plateaux et livrets, ses résumés et son action d’ajout suivent la même
+  règle dans le premier onglet ;
+- l’offset collant est calculé depuis la hauteur réelle de l’en-tête, y compris
+  après repli responsive ;
+- les confirmations disparaissent après 3 secondes ;
+- avertissements et erreurs disparaissent après 6 secondes ;
+- chaque nouveau message annule le minuteur précédent ;
+- le toast est remonté en haut de la palette pour ne plus masquer les premiers
+  champs de la liste.
+
+Aucun comportement métier, schéma, bridge, solveur, tolérance, géométrie, CAD IR
+ou scène Fusion n’est modifié.
+
+Retour attendu : P44-M004V2 Fusion OK 0.1.27 - commit <sha>.
