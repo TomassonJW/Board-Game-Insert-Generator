@@ -1239,7 +1239,7 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
   orienté vers le nombre minimal de compositions.
 - C-QUALITY : budgets publics, borne Z, déterminisme, fixture dense de 30 corps
   et progression automatisée 1/2/3 étages.
-- C-FUSION-UI : package 0.1.42 automated-validated ; gate P64-H01V requise.
+- C-FUSION-UI : package 0.1.42 fusion-validated par `P64-H01 Fusion OK 0.1.42 - commit 5865645`.
 - Limites : heuristique non globalement optimale ; schéma, tolérances, valeurs
-  physiques, géométrie et scène inchangés ; fusion-validated: false,
+  physiques, géométrie et scène inchangés ; fusion-validated: true,
   print-validated: false.

@@ -49,25 +49,18 @@ conscients de leur hauteur et score d'équilibre X/Y/Z avec charge des étages.
 
 ## Prochaine action recommandée
 
-### P64-H01V - Recherche dense et équilibre spatial 3D
+### P44-VH02 - Suppression directe et noms de conteneurs non ambigus
 
-Statut : human-fusion-check-required. P64-H01 est implemented et
-automated-validated dans le package 0.1.42. Le projet réel augmenté du petit
-asset problématique trouve une solution complète en deux étages en environ
-1,8 seconde ; les fixtures homogènes 2, 8 et 32 conteneurs choisissent
-respectivement 1, 2 et 3 étages en mode Équilibré.
+Statut : ready. P64-H01 est fusion-validated dans le package 0.1.42 par la
+preuve `P64-H01 Fusion OK 0.1.42 - commit 5865645`. P44-VH02 est la seule
+mission de code autorisée : ajouter une suppression directe à côté du menu de
+chaque élément, confirmer explicitement la suppression d'un conteneur non vide
+avec tous ses éléments, et attribuer un suffixe numérique incrémental à chaque
+nouveau conteneur dont le nom existe déjà.
 
-Thomas rouvre le projet dense, reproduit l'ajout du petit asset, vérifie que le
-calcul reste constructible, que Z est utilisé progressivement et qu'aucune
-scène ne change avant matérialisation. Retour attendu :
-
-    P64-H01 Fusion OK 0.1.42 - commit <sha>
-
-Après ce retour, P44-VH02 est la seule mission de code suivante : suppression
-directe d’un élément, confirmation pour supprimer un conteneur non vide avec
-tous ses éléments, et nom de conteneur incrémental en cas de doublon.
-
-P44-V reste ouverte ; P45 ne commence pas. `print-validated: false`.
+Ne changer ni schéma, ni solveur, ni valeurs physiques, ni géométrie, ni scène
+automatique. P44-V reste ouverte en KO contextuel ; P45 ne commence pas.
+`print-validated: false`.
 
 ## Lots découverts, non ouverts
 
@@ -80,7 +73,7 @@ P44-V reste ouverte ; P45 ne commence pas. `print-validated: false`.
 P44-M005, P44-M006 et P44-M009H05 sont fusion-validated pour leurs parcours UX.
 P44-M007H03 est désormais fusion-validated dans Fusion 360 ; P0-M010 et P44-VP
 sont terminées. P44-VH01V est supersédée sans revendication fusion-validated par
-P64-H01V, seule action humaine suivante. P44-V reste en KO contextuel et P45/P46
+P64-H01, fusion-validated dans Fusion 0.1.42. P44-VH02 est la seule mission de code suivante. P44-V reste en KO contextuel et P45/P46
 ne commencent pas avant sa reprise positive après P44-VH02. P47-P50 restent
 bloqués jusqu’à P46 et P69 jusqu’à P50.
 P68 peut recueillir des faits réels sans modifier les valeurs par défaut.

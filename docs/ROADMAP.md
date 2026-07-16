@@ -735,5 +735,6 @@ une recherche adaptative bornée et fait de l'expansion X/Y/Z avec charge
 d'étages un critère explicite. Les étages progressent avec la densité sans
 modifier le mode compact, les contraintes physiques ou le schéma.
 
-P64-H01V devient la seule gate suivante. Après son acceptation, P44-VH02 reste
-le seul lot de code ; P45 demeure bloqué. print-validated: false.
+P64-H01 est fusion-validated par `P64-H01 Fusion OK 0.1.42 - commit 5865645`.
+P44-VH02 devient le seul lot de code suivant ; P45 demeure bloqué.
+print-validated: false.

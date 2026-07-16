@@ -551,7 +551,7 @@ d’impression. `print-validated: false` reste inchangé.
 
 ## P44-V - Gate globale de fondation UX 0.1.40
 
-Statut : contextual-KO. Le package 0.1.40 ne doit pas recevoir de retour OK ; voir P64-H01V puis P44-VH02.
+Statut : contextual-KO. Le package 0.1.40 ne doit pas recevoir de retour OK ; voir P44-VH02.
 
 Vérifier les sept scénarios novice/expert, largeur, clavier/focus, conteneurs, import historique et scène préservée du dossier.
 
@@ -581,7 +581,7 @@ Cette gate ne valide aucune dimension physique, aucune géométrie imprimée et 
 
 ## P64-H01V - Recherche dense et équilibre spatial 0.1.42
 
-Statut : human-fusion-check-required. Cette gate remplace P44-VH01V sans
+Statut : fusion-validated: true. Preuve Fusion reçue le 2026-07-17 : `P64-H01 Fusion OK 0.1.42 - commit 5865645`. Cette gate remplace P44-VH01V sans
 transformer l'observation contextuelle précédente en fusion-validation.
 
 Déclencheur : P64-H01 intégrée dans main, package 0.1.42 installé par
@@ -602,7 +602,7 @@ Vérifier dans Fusion :
    et cohérente ;
 6. confirmer qu'aucune scène ne change avant Matérialiser dans Fusion.
 
-Retour OK : P64-H01 Fusion OK 0.1.42 - commit <sha>.
+Retour reçu : P64-H01 Fusion OK 0.1.42 - commit 5865645.
 
 Cette gate valide uniquement le comportement logiciel observé dans Fusion. Elle
 ne calibre aucune valeur physique, ne valide aucune géométrie imprimée et ne

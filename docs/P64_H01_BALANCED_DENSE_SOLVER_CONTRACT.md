@@ -3,8 +3,8 @@
 ## Statut
 
 Implemented et automated-validated dans le package 0.1.42.
-Gate Fusion P64-H01V requise.
-`fusion-validated: false`, `print-validated: false`.
+Fusion-validated par `P64-H01 Fusion OK 0.1.42 - commit 5865645`.
+`fusion-validated: true`, `print-validated: false`.
 
 ## Déclencheur
 
@@ -73,16 +73,13 @@ Vérifier le projet dense réel, l'ajout du petit asset, la présence de plusieu
 niveaux Z équilibrés, la fraîcheur du recalcul et l'absence de modification de
 scène avant `Matérialiser dans Fusion`.
 
-Retour attendu :
+Retour reçu :
 
-`P64-H01 Fusion OK 0.1.42 - commit <sha>`
+`P64-H01 Fusion OK 0.1.42 - commit 5865645`
 
 Cette preuve ne valide ni les valeurs physiques, ni la géométrie imprimée, ni
 l'impression réelle.
 
 ## Suite verrouillée
 
-Après P64-H01V, P44-VH02 reste la seule mission de code suivante : suppression
-directe des éléments, confirmation transactionnelle de suppression d'un
-conteneur non vide, puis nommage incrémental des nouveaux conteneurs. P45 et les
-missions géométriques restent bloquées.
+Après P64-H01 fusion-validated, P44-VH02 reste la seule mission de code suivante : suppression directe des éléments, confirmation transactionnelle de suppression d'un conteneur non vide, puis nommage incrémental des nouveaux conteneurs. P45 et les missions géométriques restent bloquées.

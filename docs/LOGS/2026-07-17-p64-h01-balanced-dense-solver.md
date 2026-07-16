@@ -54,5 +54,6 @@ jusqu'aux preuves correspondantes.
 
 ## Suite
 
-Préparer et installer le package 0.1.42 pour P64-H01V. Après son retour positif,
-P44-VH02 est le seul lot de code suivant ; P45 reste bloqué.
+Le package 0.1.42 a été observé positivement dans Fusion :
+`P64-H01 Fusion OK 0.1.42 - commit 5865645`. P64-H01 est fusion-validated ;
+P44-VH02 est le seul lot de code suivant et P45 reste bloqué.

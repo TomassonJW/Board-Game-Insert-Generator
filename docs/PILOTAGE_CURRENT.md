@@ -11,11 +11,11 @@ Ce document est le point d’entrée court de reprise. Il indique l’état acti
 
 ## État actif
 
-- Dernière preuve : `P44-M007H03 Fusion OK 0.1.40 - commit 92f07c8` ; P44-M007H03 est `fusion-validated`.
-- `print-validated: false` ; aucune valeur physique n’est calibrée par cette preuve.
-- P44-VH01 corrige la hauteur cachée ; le cas originel est désormais observé comme calculable, sans retour formel de gate ni revendication fusion-validated.
+- Dernière preuve : `P64-H01 Fusion OK 0.1.42 - commit 5865645` ; P64-H01 est `fusion-validated`.
+- `print-validated: false` ; aucune valeur physique n'est calibrée par cette preuve.
+- P44-VH01 corrige la hauteur cachée ; le cas originel est calculable, sans retour formel de gate ni revendication fusion-validated.
 - Code produit : P64-H01 ajoute la recherche dense adaptative et l'équilibre spatial X/Y/Z dans le package 0.1.42.
-- Prochaine action : gate humaine P64-H01V. Après son OK, P44-VH02 est le seul lot de code ; P45 reste bloqué.
+- Prochaine action : P44-VH02, seul lot de code prêt ; P45 reste bloqué.
 
 ## Vue de séquence
 
@@ -24,8 +24,9 @@ Ce document est le point d’entrée court de reprise. Il indique l’état acti
 | Terminé | P44-M007H03 / H03V | UX et calcul sleeves observés dans Fusion 0.1.40. |
 | Terminé | P44-VP | Dossier global préparé ; le retour P44-V 0.1.40 est un KO contextuel. |
 | Supersédé | P44-VH01V | Le cas Z originel passe, mais la densité a révélé P64-H01 ; aucune fusion-validation formelle n'est revendiquée. |
-| Prêt | P64-H01V | Vérifier la recherche dense et la répartition progressive X/Y/Z dans Fusion 0.1.42. |
-| KO contextuel | P44-V | Reprendre après P64-H01V puis P44-VH02. |
+| Terminé | P64-H01 / H01V | Recherche dense et répartition progressive X/Y/Z observées dans Fusion 0.1.42. |
+| Prêt | P44-VH02 | Suppression directe, confirmation transactionnelle et noms incrémentaux. |
+| KO contextuel | P44-V | Reprendre après P44-VH02. |
 | Bloqué | P45 à P50, P67 à P69 | Dépendances et gates de version non satisfaites. |
 
 ## Autorité documentaire

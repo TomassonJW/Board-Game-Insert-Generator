@@ -2000,7 +2000,7 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
 - Observation : novice/expert, petite/grande palette, clavier, cinquante
   conteneurs, import historique et scene preservee.
 - Limite : qualifie la fondation de palette, ni geometrie P45 ni impression.
-- Statut : contextual-KO sur 0.1.40 ; reprendre après P64-H01V puis P44-VH02. P45 reste bloqué.
+- Statut : contextual-KO sur 0.1.40 ; reprendre après P44-VH02. P45 reste bloqué.
 
 Frontieres P44 : coeur sans adsk, complements en quarantaine, aucune scene
 automatique et aucun changement de solveur/tolerance/geometrie par glissement.
@@ -2325,14 +2325,14 @@ P44-M007 est ready-for-explicit-go.
   dépendance d'optimisation externe ou scène automatique.
 - Validation : fixture dense 30 corps, progression 1/2/3 étages, mode compact,
   suite complète et gate P64-H01V dans le package 0.1.42.
-- Statut : implemented, automated-validated, human-fusion-check-required,
-  fusion-validated: false, print-validated: false.
+- Statut : implemented, automated-validated, fusion-validated: true par la
+  preuve `P64-H01 Fusion OK 0.1.42 - commit 5865645` ; print-validated: false.
 
 #### P44-VH02 - Suppression directe et noms de conteneurs non ambigus
 
-- Dépendance : P64-H01V acceptée.
+- Dépendance : P64-H01 fusion-validated.
 - Ajouter un bouton Supprimer directement à côté du menu de chaque élément.
 - Pour un conteneur non vide, demander explicitement la suppression du conteneur et de tous ses éléments ; une annulation ne modifie rien.
 - Attribuer un suffixe numérique incrémental à tout nouveau conteneur dont le nom existe déjà.
 - Ne changer ni schéma, ni solveur, ni géométrie, ni scène automatique.
-- Statut : ready-after-p64-h01v ; autorisation produit déjà reçue, lot non commencé.
+- Statut : ready ; autorisation produit déjà reçue, lot non commencé.

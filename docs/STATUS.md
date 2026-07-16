@@ -2280,6 +2280,6 @@ Validation automatisée : 488 tests, `compileall`, exemple CLI, dry-run de la
 gate Fusion, frontière `adsk` et `git diff --check`.
 
 Package : 0.1.42. Statut : implemented, automated-validated,
-human-fusion-check-required par P64-H01V, fusion-validated: false,
-print-validated: false. P44-VH02 reste la seule mission de code suivante après
-la gate ; P45 reste bloqué.
+fusion-validated: true par la preuve `P64-H01 Fusion OK 0.1.42 - commit
+5865645`, print-validated: false. P44-VH02 est désormais la seule mission de
+code suivante ; P45 reste bloqué.
