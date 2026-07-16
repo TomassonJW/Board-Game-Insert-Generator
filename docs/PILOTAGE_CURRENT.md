@@ -14,7 +14,7 @@ Ce document est le point d’entrée court de reprise. Il indique l’état acti
 - Dernière preuve : `P44-M007H03 Fusion OK 0.1.40 - commit 92f07c8` ; P44-M007H03 est `fusion-validated`.
 - `print-validated: false` ; aucune valeur physique n’est calibrée par cette preuve.
 - Code produit : aucune mission runtime ouverte par ce document.
-- Prochaine mission unique : `P44-VP`, préparation documentaire de la gate P44-V. P45 reste bloqué.
+- Prochaine action : gate humaine `P44-V`, préparée par P44-VP. P45 reste bloqué.
 
 ## Vue de séquence
 

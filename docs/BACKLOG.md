@@ -2000,7 +2000,7 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
 - Observation : novice/expert, petite/grande palette, clavier, cinquante
   conteneurs, import historique et scene preservee.
 - Limite : qualifie la fondation de palette, ni geometrie P45 ni impression.
-- Statut : `blocked-by-p44-vp`.
+- Statut : `human-gate-ready` après P44-VP ; P45 reste bloqué jusqu’au retour P44-V.
 
 Frontieres P44 : coeur sans adsk, complements en quarantaine, aucune scene
 automatique et aucun changement de solveur/tolerance/geometrie par glissement.
@@ -2284,7 +2284,7 @@ P44-M007 est ready-for-explicit-go.
 - Objectif : préparer le dossier de preuve et la checklist P44-V sans code produit.
 - Livrable : scénarios novice/expert, palette petite/grande, clavier, cinquante conteneurs, import historique et scène préservée.
 - Non-objectifs : runtime, solveur, tolérances, géométrie, scène automatique ou impression.
-- Statut : ready.
+- Statut : done, gate-prepared, documentation-validated.
 
 #### P44-M007H03 - Repli global et résolution sleeves fiable
 

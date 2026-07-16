@@ -42,22 +42,17 @@ impression réelle n’est validée ; `print-validated: false` reste obligatoire
 
 ## Prochaine action recommandée
 
-### P44-VP - Préparer la gate globale de fondation UX
+### P44-V - Gate humaine de fondation UX
 
-Statut : ready.
+Statut : human-fusion-check-required. P44-VP est terminée : le dossier et le script de préparation sont disponibles dans [P44_V_FOUNDATION_UX_GATE.md](P44_V_FOUNDATION_UX_GATE.md).
 
-P0-M010 est terminé : le parcours de reprise commence désormais par
-[PILOTAGE_CURRENT.md](PILOTAGE_CURRENT.md). P44-VP prépare la gate P44-V, sans
-ouvrir P45.
+Thomas vérifie dans Fusion le parcours court décrit par le dossier, puis répond :
 
-Objectif : consolider les preuves P44-M001 à P44-M009 et rendre la revue humaine
-P44-V courte, reproductible et sans ambiguïté.
+```text
+P44-V Fusion OK 0.1.40 - package 92f07c8
+```
 
-Scope : documentation et préparation de gate seulement. Aucun changement runtime,
-solveur, schéma, valeur physique, géométrie ou scène automatique.
-
-Ne pas ouvrir P45/P46, P47-P50, P67, P68 ou P69 pendant P44-VP.
-`print-validated: false` reste obligatoire.
+Un KO doit indiquer le scénario, la largeur approximative ou le nombre de conteneurs, l’action et le résultat observé. Cette gate ne valide ni P45, ni une valeur physique, ni une impression ; `print-validated: false` reste obligatoire.
 
 ## Lots découverts, non ouverts
 
@@ -68,9 +63,9 @@ Ne pas ouvrir P45/P46, P47-P50, P67, P68 ou P69 pendant P44-VP.
 ## Séquence verrouillée
 
 P44-M005, P44-M006 et P44-M009H05 sont fusion-validated pour leurs parcours UX.
-P44-M007H03 est désormais fusion-validated dans Fusion 360 ; P0-M010 est
-terminée et P44-VP est la seule action suivante autorisée. P45/P46 ne commencent
-pas avant P44-V ; P47-P50 restent bloqués jusqu’à P46 et P69 jusqu’à P50.
+P44-M007H03 est désormais fusion-validated dans Fusion 360 ; P0-M010 et P44-VP
+sont terminées. P44-V est la seule action humaine suivante ; P45/P46 ne commencent
+pas avant son retour positif. P47-P50 restent bloqués jusqu’à P46 et P69 jusqu’à P50.
 P68 peut recueillir des faits réels sans modifier les valeurs par défaut.
 
 ## Fin de chaque mission

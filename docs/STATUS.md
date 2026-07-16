@@ -2238,3 +2238,7 @@ Statut : done, documentation-validated, sans changement runtime ni validation pr
 `docs/PILOTAGE_CURRENT.md` devient le point d’entrée court : état actif, une seule prochaine mission, éléments bloqués et liens vers les sources canoniques. `RESUME_STATE.md` conserve explicitement le snapshot P22 comme archive historique. Les instructions de reprise utilisent une lecture progressive : index, action/gate/contrat actifs, puis sources de détail si nécessaire.
 
 P44-VP devient la seule mission `ready` : elle prépare P44-V sans ouvrir P45 ni modifier le runtime. `print-validated: false` reste inchangé.
+
+## P44-VP - Préparation de la gate globale P44 (2026-07-16)
+
+Statut : done, gate-prepared, documentation-validated. Le dossier et le script installent et contrôlent le package 0.1.40 de référence `92f07c8`, puis ne laissent à Thomas que la revue Fusion globale. P44-V devient la seule action humaine suivante. Aucun runtime, solveur, schéma, tolérance, géométrie, scène automatique ou valeur physique ne change ; `print-validated: false`.

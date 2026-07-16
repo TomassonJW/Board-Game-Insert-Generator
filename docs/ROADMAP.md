@@ -713,3 +713,7 @@ modifié. P0-M010 devient la prochaine mission documentaire ; P45 reste bloqué.
 ## P0-M010 - Pilotage de reprise compact (2026-07-16)
 
 La maintenance documentaire isole un point de reprise court, synchronisé et auditable. Elle ne réécrit pas l’historique : elle distingue le résumé actif, les sources canoniques de détail et les preuves archivées. Le prochain lot est P44-VP, préparation documentaire de la gate globale P44 ; P45 demeure bloqué jusqu’à P44-V. Aucun comportement produit ou physique ne change.
+
+## P44-VP - Préparation de la gate globale P44 (2026-07-16)
+
+Le package 0.1.40 de référence `92f07c8` reçoit un dossier et une préparation Fusion reproductible. La prochaine étape est P44-V ; P45 reste bloqué. Aucun comportement produit ou physique ne change.

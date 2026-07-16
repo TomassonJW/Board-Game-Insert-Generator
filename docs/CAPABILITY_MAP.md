@@ -1212,3 +1212,10 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - C-AUTONOMY : les instructions distinguent lecture minimale et consultation détaillée conditionnelle, sans réduire l’autorité des contrats, ADR, gates ou preuves.
 - Limites : aucun runtime, solveur, schéma, valeur physique, géométrie ou scène Fusion n’est modifié ; `print-validated: false`.
 - Suite : P44-VP est la seule mission `ready`, pour préparer P44-V avant P45.
+
+## P44-VP - Capability update de préparation (2026-07-16)
+
+- C-FUSION-UI / C-USABILITY : P44-V dispose d’une recette unique couvrant parcours novice/expert, densité, clavier, conteneurs, import et scène préservée.
+- C-QUALITY : package 0.1.40 installable et contrôlé avant observation humaine.
+- Limites : P44-VP n’est pas une validation Fusion ; `print-validated: false`.
+- Suite : retour humain P44-V, puis seulement P45 si la gate est acceptée.

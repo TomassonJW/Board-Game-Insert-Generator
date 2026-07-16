@@ -548,3 +548,13 @@ Retour OK :
 Cette gate qualifie l’UX et le calcul logiciel observés. Elle ne calibre pas les
 valeurs physiques, ne valide pas la géométrie imprimée et ne vaut pas validation
 d’impression. `print-validated: false` reste inchangé.
+
+## P44-V - Gate globale de fondation UX 0.1.40
+
+Statut : human-fusion-check-required. Le dossier `docs/P44_V_FOUNDATION_UX_GATE.md` et son script préparent la revue du package 0.1.40, référence `92f07c8`.
+
+Vérifier les sept scénarios novice/expert, largeur, clavier/focus, conteneurs, import historique et scène préservée du dossier.
+
+Retour OK : `P44-V Fusion OK 0.1.40 - package 92f07c8`
+
+Cette gate ne valide ni P45, ni les valeurs physiques ou l’impression. `print-validated: false`.
