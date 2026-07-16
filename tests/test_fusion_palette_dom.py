@@ -91,7 +91,7 @@ class FusionPaletteDomTests(unittest.TestCase):
             ".box-inline-grid{display:grid",
             ".asset-primary-grid{display:grid",
             ".flat-primary-grid{display:grid",
-            ".container-primary-grid{display:grid",
+            ".container-primary-grid{display:flex",
             'class="card row-card technical-card content-card child-card"',
             'class="card row-card technical-card flat-card"',
             'class="card row-card technical-card group-card"',
@@ -115,8 +115,8 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertIn("main>.message.show{position:fixed;top:8px", self.markup)
         self.assertIn('<div class="row-details">${customDetails}${children}</div>', self.markup)
         for marker in (
-            ".container-primary-grid.group-mode-auto",
-            ".container-primary-grid.group-mode-sized",
+            ".container-summary{display:flex",
+            ".container-controls{display:flex",
             'class="container-identity"',
             'class="group-mode-control"',
             'class="group-target-field"',
@@ -239,6 +239,22 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertIn("project.contents[index].container_group_id=input.value", self.markup)
         self.assertIn("group.dimension_modes={x:mode,y:mode,z:mode}", self.markup)
         self.assertIn("data-record-kind][data-record-id]", self.markup)
+
+    def test_aligns_container_identity_left_and_controls_right_with_a_truthful_global_mode(self) -> None:
+        for marker in (
+            'id="group-batch-controls"',
+            'class="container-section-actions"',
+            'class="container-summary"',
+            'class="container-controls"',
+            '.container-controls{display:flex;align-items:flex-end;justify-content:flex-end',
+            'const modes=groups.map(uniformGroupMode),batchMode=',
+            '>Mixte</option>',
+            'groups.forEach(group=>setUnifiedGroupMode(group,mode))',
+        ):
+            self.assertIn(marker, self.markup)
+        self.assertNotIn("Renseigne", self.markup)
+        self.assertNotIn("confirm(`Appliquer le mode", self.markup)
+
 
     def test_exposes_non_mutating_container_estimation_without_a_new_bridge_action(self) -> None:
         for marker in (

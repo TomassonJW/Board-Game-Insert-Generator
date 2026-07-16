@@ -2118,3 +2118,13 @@ La revue Fusion 0.1.34 accepte la direction fonctionnelle H03 mais refuse encore
 Dans les cartes conteneur, le nombre d’éléments passe sous le nom, le minimum et le mode sont bornés, les libellés deviennent « Épaisseur paroi » et « Épaisseur fond ». En Cible/Fixe, X, interversion, Y et Z sont placés directement dans l’en-tête ; en Auto ils sont absents. La rangée de dimensions séparée est supprimée.
 
 Aucun schéma, bridge, solveur, tolérance, géométrie ou comportement de scène ne change. Validation : 474 tests, syntaxe JavaScript, tests DOM et transport Qt, `compileall` et frontière `adsk` passent. P44-M007 reste bloquée par P44-M009H04V.
+
+## P44-M009H05 - En-tête conteneur distribué et mode global fiable (2026-07-16)
+
+Statut : implemented, automated-validated, package 0.1.36, human-fusion-check-required, fusion-validated: false, print-validated: false.
+
+La revue Fusion 0.1.35 confirme la densité générale et demande une dernière distribution horizontale : identité et minimum à gauche, contrôles du mode jusqu’à la suppression justifiés à droite. Le mode global quitte sa bande dédiée et rejoint la ligne Conteneurs.
+
+Le sélecteur global ne prétend plus être Auto lorsque les cartes diffèrent : il affiche Mixte, ou le mode uniforme réel. Appliquer Auto, Cible ou Fixe configure les trois axes de chaque conteneur ; Cible et Fixe peuvent repartir des dimensions explicites existantes ou des minima calculés.
+
+Aucun schéma, bridge, solveur, tolérance, géométrie ou comportement de scène ne change. Validation : 475 tests, syntaxe JavaScript, DOM, transport Qt, compileall et frontière adsk passent. P44-M007 reste bloquée par P44-M009H05V.

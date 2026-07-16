@@ -1135,3 +1135,11 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - C-TOLERANCE et C-GEOMETRY : aucun changement fonctionnel.
 - C-QUALITY : 474 tests, syntaxe JavaScript, DOM, transport Qt, `compileall` et frontière `adsk` passés.
 - Suite : P44-M009H04V avant P44-M007 ; fusion-validated: false ; print-validated: false.
+
+## P44-M009H05 - Capability update (2026-07-16)
+
+- C-FUSION-UI : cartes distribuées gauche/droite et commande globale intégrée à la ligne Conteneurs.
+- C-USABILITY : le mode global expose son état réel, y compris Mixte, puis applique un choix unique aux trois axes de tous les conteneurs.
+- C-TOLERANCE et C-GEOMETRY : aucun changement fonctionnel.
+- C-QUALITY : 475 tests, syntaxe JavaScript, DOM, transport Qt, compileall et frontière adsk passés.
+- Suite : P44-M009H05V avant P44-M007 ; fusion-validated: false ; print-validated: false.

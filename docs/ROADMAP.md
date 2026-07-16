@@ -647,3 +647,9 @@ Le package 0.1.34 retire le volet de jeu externe des cartes, conserve les overri
 Le package 0.1.35 ferme les écarts visuels observés sur 0.1.34 sans rouvrir le contrat de tolérance : largeur utile bornée dans Réglages, composition gauche compacte et dimensions de conteneur intégrées dans l’en-tête en Cible/Fixe.
 
 P44-M009H03V est remplacée par P44-M009H04V. P44-M007 reste bloquée jusqu’à cette preuve ; P44-V demeure la gate globale.
+
+## P44-M009H05 - Distribution finale des contrôles conteneur (2026-07-16)
+
+Le package 0.1.36 sépare visuellement l’identité à gauche des contrôles à droite et intègre le mode global dans la ligne Conteneurs. Son état devient fidèle aux cartes et son application couvre les trois axes de chaque conteneur.
+
+P44-M009H04V est remplacée par P44-M009H05V. P44-M007 reste bloquée jusqu’à cette preuve ; P44-V demeure la gate globale.

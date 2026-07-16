@@ -391,3 +391,22 @@ Retour OK :
 `P44-M009H04 Fusion OK 0.1.35 - commit <sha>`
 
 Cette gate qualifie uniquement la composition UI observée et la non-régression fonctionnelle dans Fusion. Elle ne valide ni les valeurs physiques ni l’impression. P44-M007 reste bloquée jusqu’à ce retour.
+
+## P44-M009H05V - Distribution finale et mode global 0.1.36
+
+Déclencheur : la revue 0.1.35 accepte la densité H04 mais demande la justification gauche/droite des cartes et révèle que le sélecteur global affiche toujours Auto, indépendamment de l’état réel.
+
+Vérifier dans Fusion :
+
+1. identité, nombre d’éléments et minimum restent groupés à gauche ;
+2. Mode, dimensions contextuelles, épaisseurs et actions sont justifiés à droite ;
+3. le mode global se trouve sur la ligne Conteneurs, sans bande supplémentaire ;
+4. il affiche Mixte lorsque les cartes diffèrent et le mode réel lorsqu’elles sont uniformes ;
+5. Appliquer Auto, Cible ou Fixe modifie les trois axes de tous les conteneurs ;
+6. aucune scène Fusion n’est créée ou modifiée automatiquement.
+
+Retour OK :
+
+P44-M009H05 Fusion OK 0.1.36 - commit <sha>
+
+Cette gate qualifie uniquement la composition UI et le comportement du sélecteur global observés dans Fusion. Elle ne valide ni les valeurs physiques ni l’impression. P44-M007 reste bloquée jusqu’à ce retour.
