@@ -352,3 +352,13 @@ Un override inférieur remplace le default pour un asset ou un plat. Pour un jeu
 externe, une interface reste contrainte par le max des deux conteneurs voisins :
 un seul côté inférieur ne peut pas réduire la demande héritée de l’autre côté.
 Ce calcul pairwise ne copie jamais l’override vers les autres conteneurs.
+
+## P44-M009H03 - Jeux externes exclusivement globaux
+
+Les vecteurs `container_between_mm` et `container_box_per_side_xy_mm` sont désormais résolus uniquement depuis les defaults du projet. La résolution ne consulte plus `container_groups[].clearance_overrides_v1`.
+
+Ces champs historiques restent validés et roundtrippables afin de ne pas détruire les projets 0.1.31 à 0.1.33, mais leur provenance n’apparaît plus dans les effectifs. Tous les conteneurs reçoivent le même vecteur global et la même provenance de projet.
+
+Les rôles `asset_cavity_mm` et `flat_inset_mm` conservent l’héritage par axe et leurs overrides par objet. Dans la palette, X et Y sont édités ensemble et Z séparément. Le jeu Z conteneur-boîte est `box.lid_clearance_mm` ; il reste retranché de la hauteur de conception.
+
+Aucune valeur par défaut ni formule de cavité ou d’encastrement n’est recalibrée. print-validated: false.

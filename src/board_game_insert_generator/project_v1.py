@@ -389,8 +389,12 @@ def _validate_container_groups(values: list[object], *, layout: dict[str, object
         )
         overrides = _validate_container_clearance_overrides(raw.get("clearance_overrides_v1"), field)
         defaults = dict(layout["clearance_defaults_v1"]); sources = dict(layout["clearance_default_sources_v1"])
-        between, between_sources = _resolved_clearance(dict(overrides["between_mm"]), dict(defaults["container_between_mm"]), dict(sources["container_between_mm"]))
-        box_clearance, box_sources = _resolved_clearance(dict(overrides["box_per_side_xy_mm"]), dict(defaults["container_box_per_side_xy_mm"]), dict(sources["container_box_per_side_xy_mm"]))
+        # Les anciens overrides par bac restent sérialisables pour un roundtrip non
+        # destructif, mais le produit applique désormais exclusivement les jeux globaux.
+        between = dict(defaults["container_between_mm"])
+        between_sources = dict(sources["container_between_mm"])
+        box_clearance = dict(defaults["container_box_per_side_xy_mm"])
+        box_sources = dict(sources["container_box_per_side_xy_mm"])
         result.append(
             {
                 "id": group_id,

@@ -113,13 +113,18 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertIn("kind==='ok'?3000:6000", self.markup)
         self.assertIn("messageTimer=setTimeout", self.markup)
         self.assertIn("main>.message.show{position:fixed;top:8px", self.markup)
-        self.assertIn('<div class="row-details">${targetControls}${customDetails}${clearanceControls}${children}</div>', self.markup)
+        self.assertIn('<div class="row-details">${targetControls}${customDetails}${children}</div>', self.markup)
 
     def test_collapses_unit_clearances_and_edits_one_xy_value_plus_z(self) -> None:
         for forbidden in (
             "<h4>Prise et tolérances</h4>",
             "<h4>Placement et ordre</h4>",
             "<h4>Solidité</h4>",
+            "Jeu externe",
+            "Voisinage total",
+            "function groupClearanceFields",
+            'data-row="group-clearance"',
+            "resolvedGroup.clearance_effective_v1",
         ):
             self.assertNotIn(forbidden, self.markup)
         for marker in (
@@ -128,12 +133,8 @@ class FusionPaletteDomTests(unittest.TestCase):
             'class="clearance-details local-details"',
             "Tolérance cavité",
             "Jeu d’encastrement",
-            "Jeu externe",
-            "Entre deux conteneurs voisins, BGIG retient la plus grande demande des deux.",
-            "Cette valeur ne se copie pas dans les autres cartes.",
             'data-key="xy"',
             "key==='xy'?{...current,x:value,y:value}",
-            "axis==='xy'?{...current,x:value,y:value}",
             "Les valeurs X et Y diffèrent dans ce projet.",
             "<label>Pile<input",
             "<label>Paroi<input",
@@ -151,23 +152,22 @@ class FusionPaletteDomTests(unittest.TestCase):
             "</div>${clearanceVectorFields(item,index,'flat-clearance','Jeu d’encastrement',derived)}",
             self.markup,
         )
-        self.assertNotIn("['x','y','z'].map(axis=>input('between_mm'", self.markup)
 
     def test_synchronizes_role_defaults_and_reads_latest_derived_values(self) -> None:
         for marker in (
-            "GLOBAL_CLEARANCE_DEFAULT_BINDINGS",
-            "function synchronizeGlobalClearanceDefault(path,value)",
-            "function globalClearanceDefaultValue(path)",
+            "GLOBAL_CLEARANCE_BINDINGS",
+            "function setGlobalClearance(name,value)",
+            "function globalClearanceValue(name)",
             "Valeurs mixtes",
-            "['container_between_mm','x']",
-            "['container_between_mm','z']",
-            "['container_box_per_side_xy_mm','x']",
-            "['asset_cavity_mm','z']",
+            "container_between_xy",
+            "container_between_z",
+            "container_box_xy",
+            "container_box_z",
+            "asset_cavity_xy",
+            "asset_cavity_z",
             "[axis]:'project_default'",
             "function derivedProjectItem(collection,idValue)",
-            "derivedGroup(group.id)||group",
             "resolvedItem.clearance_effective_v1",
-            "resolvedGroup.clearance_effective_v1",
             "#design-height[readonly]",
         ):
             self.assertIn(marker, self.markup)
@@ -266,15 +266,24 @@ class FusionPaletteDomTests(unittest.TestCase):
 
     def test_exposes_clear_design_settings_and_one_persistent_materialize_action(self) -> None:
         for marker in (
-            "Épaisseur minimale des parois", "Épaisseur minimale du fond",
-            "Jeu entre conteneurs", "Jeu conteneur-boîte",
-            "Jeu entre conteneurs en hauteur", "Jeu élément-cavité",
-            "Priorité de la proposition", "Jeu sous le couvercle",
-            'data-path="layout.container_box_xy_clearance_mm"',
-            'data-path="layout.container_z_clearance_mm"',
+            "Réglages de conception", "Épaisseurs minimales", "Parois", "Fond",
+            "Jeux (tolérances)", "Jeu entre conteneurs", "Jeu conteneur-boîte",
+            "Jeu élément-cavité (par défaut)", "Priorité de la proposition",
+            'class="settings-clearance-table"',
+            'data-global-clearance="container_between_xy"',
+            'data-global-clearance="container_between_z"',
+            'data-global-clearance="container_box_xy"',
+            'data-global-clearance="container_box_z"',
+            'data-global-clearance="asset_cavity_xy"',
+            'data-global-clearance="asset_cavity_z"',
         ):
             self.assertIn(marker, self.markup)
+        self.assertEqual(self.markup.count('data-global-clearance="'), 6)
         self.assertNotIn("Jeux et preferences", self.markup)
+        self.assertNotIn("Jeu entre conteneurs en hauteur", self.markup)
+        self.assertNotIn("Jeu sous le couvercle", self.markup)
+        self.assertNotIn('data-path="layout.container_box_xy_clearance_mm"', self.markup)
+        self.assertNotIn('data-path="layout.container_z_clearance_mm"', self.markup)
         self.assertNotIn('data-path="box.usable_height_mm"', self.markup)
         self.assertEqual(self.markup.count('data-bridge="materialize_project"'), 1)
         self.assertIn('id="materialize-action"', self.markup)
@@ -283,6 +292,7 @@ class FusionPaletteDomTests(unittest.TestCase):
             self.markup.index('data-bridge="solve_project">Recalculer</button><button id="materialize-action"'),
             self.markup.index('<div class="action-zone center">'),
         )
+
     def test_preserves_interaction_state_with_stable_identifiers_and_rejects_stale_derivations(self) -> None:
         for marker in (
             "sourceRevision", "stampUiIdentifiers", "captureUiState", "restoreUiState",

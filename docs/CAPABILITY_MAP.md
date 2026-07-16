@@ -1119,3 +1119,11 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - C-QUALITY : 476 tests passent, dont isolation asset et trois conteneurs ;
   syntaxe JavaScript et DOM passent.
 - Suite : P44-M009H02V avant P44-M007 ; print-validated: false.
+
+## P44-M009H03 - Capability update (2026-07-16)
+
+- C-TOLERANCE : les jeux externes des conteneurs sont exclusivement globaux ; les anciens overrides par bac sont compatibles mais inactifs. Les overrides asset et plat restent locaux.
+- C-FUSION-UI : Réglages adopte une surface dense et structurée en épaisseurs, tableau de jeux X/Y–Z et comportement. Les cartes de conteneurs ne portent plus de volet « Jeu externe ».
+- C-COMPATIBILITY : aucun champ historique n’est supprimé et aucun projet n’est migré destructivement.
+- C-QUALITY : 474 tests, syntaxe JavaScript et DOM passés ; compileall, frontière adsk et `git diff --check` passés.
+- Suite : P44-M009H03V avant P44-M007 ; fusion-validated: false ; print-validated: false.

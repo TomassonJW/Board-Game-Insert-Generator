@@ -635,3 +635,9 @@ résultat dérivé et prouve l’isolation sur deux assets et trois conteneurs.
 
 Les formules de l’ADR-0063 ne changent pas. P44-M007 reste bloquée jusqu’à la
 gate P44-M009H02V ; P44-V reste la gate globale.
+
+## P44-M009H03 - Simplification globale des jeux de conteneurs (2026-07-16)
+
+La revue produit remplace la correction H02 par une simplification de contrat : les jeux entre conteneurs et conteneur-boîte sont des réglages globaux du projet, jamais des propriétés éditables d’un bac. ADR-0064 remplace cette partie de l’ADR-0063 sans supprimer les données historiques.
+
+Le package 0.1.34 retire le volet de jeu externe des cartes, conserve les overrides asset et plateau/livret, et réorganise Réglages en tableau dense X/Y–Z. P44-M007 reste bloquée jusqu’à la gate P44-M009H03V ; P44-V reste la gate globale de fondation UX.

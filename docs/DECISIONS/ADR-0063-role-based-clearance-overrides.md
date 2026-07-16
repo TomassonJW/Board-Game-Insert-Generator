@@ -87,3 +87,7 @@ P44-M009H02 impose donc :
    ni propagation vers leurs autres cartes.
 
 Aucune formule, valeur par défaut, migration ou sémantique physique ne change.
+
+## Remplacement partiel par ADR-0064
+
+La décision produit du 2026-07-16 retire les overrides externes par conteneur. Les rôles globaux et les overrides asset, plateau et livret restent applicables. Les champs historiques par bac sont conservés sans effet runtime ; voir ADR-0064.

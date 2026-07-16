@@ -4,98 +4,50 @@ Dernière mise à jour : 2026-07-16
 
 ## Version active
 
-V0.1 est mvp-accepted par P66 (package 0.1.20), fusion-validated: true et
-print-validated: false. La fondation UX V0.2 continue dans P44 sans promouvoir
-de capacité géométrique ou physique.
+V0.1 reste mvp-accepted par P66 (package 0.1.20), fusion-validated: true et print-validated: false. La fondation UX V0.2 continue dans P44 sans promouvoir de capacité géométrique ou physique.
 
 ## Dernier état réel
 
-P44-M009 est implémentée dans le package 0.1.31 : trois rôles,
-héritage X/Y/Z, zéro explicite, provenance et deux vecteurs externes de
-conteneur. Les paires utilisent max, jamais une somme. Les projets historiques
-restent compatibles. fusion-validated: false, print-validated: false.
+P44-M009H03 est implémentée dans le package 0.1.34 et automatisée. `fusion-validated: false`, `print-validated: false` :
 
-P44-M004 est intégrée dans le package 0.1.25, mais sa revue humaine de densité
-n’a pas été acceptée : la relation parent/enfants fonctionne, tandis que la
-palette reste trop verticale pour comparer plusieurs cartes. Cette preuve ne
-rend donc pas P44-M004 fusion-validated.
+- les jeux externes des conteneurs sont exclusivement globaux ;
+- les anciennes valeurs par bac restent chargeables et roundtrippables, mais sont inactives ;
+- les jeux par asset, plateau et livret restent actifs ;
+- Réglages utilise une interface dense avec épaisseurs séparées et un tableau X/Y–Z ;
+- « Hauteur de conception » reste calculée, grisée et non éditable ;
+- aucune valeur, géométrie, scène Fusion automatique ou sémantique d’impression n’est ajoutée.
 
-P44-M004V2 applique l’hybride C dans le package 0.1.26 : largeur utile de
-1180 px, en-tête compact, une seule barre de création et densité, rangées
-techniques pour boîte, plateaux/livrets, conteneurs et éléments, actions
-secondaires en menus et calculs repliés. Aucun schéma, bridge, solveur,
-tolérance, géométrie, CAD IR, scène automatique ou complément n’a changé.
-
-P44-M004V2H01 complète cette direction dans le package 0.1.27 : barre Créer et
-ligne Plateaux et livrets collantes sous les onglets, confirmations remontées et
-masquées après 3 secondes, avertissements ou erreurs après 6 secondes.
-
-## Dernières gates humaines acceptées
-
-### P44-M004V2 — densité hybride C et hotfix H01
-
-Thomas a confirmé : "P44-M004V2 Fusion OK 0.1.27 - commit 80c1a6c".
-
-Statut : done-human-gate, fusion-validated pour la surface UX P44-M004V2
-uniquement ; print-validated: false.
-
-La preuve couvre la compacité hybride C, la comparaison des cartes conteneur /
-éléments, les contrôles Créer et Plateaux et livrets collants sous les onglets,
-ainsi que les notifications temporisées. Elle ne qualifie ni le schéma, ni le
-bridge, ni le solveur, ni les tolérances, ni la géométrie, ni le CAD IR, ni la
-scène Fusion, ni une impression réelle.
-
-## P44-M005 acceptée — gate Fusion 0.1.28
-
-Preuve humaine : "P44-M005 Fusion OK 0.1.28 - commit b8cf884".
-
-Statut : done-human-gate, fusion-validated pour le parcours UX P44-M005 ;
-print-validated: false.
-
-La validation couvre la barre de création persistante, le preset et la
-destination explicite (nouveau conteneur lié ou existant), les presets
-personnels, le raccourci local "+", leur suppression locale et l'absence de
-complément, calcul ou scène Fusion automatique. Elle ne qualifie ni schéma,
-bridge, solveur, tolérance, géométrie, CAD IR ou impression.
-
-P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
+La validation fonctionnelle de P44-M009H01 puis la gate proposée P44-M009H02V sont révoquées par la décision produit ADR-0064. Le package 0.1.33 n’est pas fusion-validated.
 
 ## Prochaine action recommandée
 
-### P44-M009H02V - Vérification Fusion de l’isolation des jeux 0.1.33
+### P44-M009H03V - Vérification Fusion des jeux globaux 0.1.34
 
 Statut : human-fusion-check-required après intégration et installation.
 
-La preuve P44-M009H01V est révoquée pour le comportement fonctionnel. Vérifier
-sur trois objets que :
+Vérifier dans Fusion :
 
-1. un jeu local d’asset inférieur au default réduit uniquement sa cavité ;
-2. un jeu local supérieur agrandit uniquement sa cavité ;
-3. modifier un default global met à jour les objets qui héritent ;
-4. un jeu externe élevé sur un conteneur ne touche que ses interfaces avec ses
-   voisins, tandis qu’une paire de deux autres conteneurs garde son propre jeu ;
-5. les valeurs effectives affichées se mettent à jour après le recalcul
-   silencieux, sans copie dans les autres cartes ;
-6. « Hauteur de conception » est visiblement grisée et reste non éditable.
+1. aucune carte de conteneur n’affiche « Jeu externe », « Voisinage total » ou un réglage de tolérance propre au bac ;
+2. les volets de tolérance des assets restent présents et un override local ne modifie aucun autre asset ;
+3. les volets de jeu des plateaux et livrets restent présents et locaux ;
+4. Réglages affiche séparément « Épaisseurs minimales » et « Jeux (tolérances) » ;
+5. le tableau contient exactement les lignes « Jeu entre conteneurs », « Jeu conteneur-boîte » et « Jeu élément-cavité (par défaut) », avec les colonnes X/Y et Z ;
+6. modifier le jeu entre conteneurs X/Y ou Z s’applique globalement à tous les conteneurs ;
+7. modifier le jeu conteneur-boîte X/Y agit sur le périmètre et Z agit sur la marge sous couvercle ;
+8. modifier le jeu élément-cavité par défaut met à jour les assets hérités sans écraser leurs overrides ;
+9. « Hauteur de conception » est visiblement grisée et non éditable ;
+10. aucune scène Fusion n’est créée ou modifiée automatiquement.
 
 Retour OK attendu :
-P44-M009H02 Fusion OK 0.1.33 - commit <sha>.
 
-P44-M007 redevient ready-for-explicit-go seulement après ce retour. P44-V reste
-la gate globale.
+`P44-M009H03 Fusion OK 0.1.34 - commit <sha>`
+
+P44-M007 redevient ready-for-explicit-go seulement après ce retour. P44-V reste la gate globale.
 
 ## Séquence verrouillée
 
-P44-M005 et P44-M006 restent fusion-validated pour leurs parcours UX. La
-présentation P44-M009H01 a été observée, mais sa preuve fonctionnelle est
-révoquée. P44-M009H02V est la seule prochaine action ; P44-M007 est bloquée.
-P44-M008/P44-M009 gardent leur contrat de tolérance. P45/P46 ne commencent pas avant P44-V ;
-P47-P50 restent bloqués jusqu’à P46 et P69 jusqu’à P50. P68 peut recueillir des
-faits réels sans modifier les valeurs par défaut. print-validated: false reste
-obligatoire.
+P44-M005 et P44-M006 restent fusion-validated pour leurs parcours UX. P44-M009H03V est la seule prochaine action ; P44-M007 est bloquée. P45/P46 ne commencent pas avant P44-V ; P47-P50 restent bloqués jusqu’à P46 et P69 jusqu’à P50. P68 peut recueillir des faits réels sans modifier les valeurs par défaut. `print-validated: false` reste obligatoire.
 
 ## Fin de chaque mission
 
-Mettre à jour le pilotage, relire le diff, exécuter les preuves prévues,
-committer puis intégrer directement dans main lorsqu’aucune gate humaine n’est
-ouverte. Une gate Fusion ne devient jamais une validation d’impression.
+Mettre à jour le pilotage, relire le diff, exécuter les preuves prévues, committer puis intégrer directement dans main lorsqu’aucune gate humaine n’est ouverte. Une gate Fusion ne devient jamais une validation d’impression.

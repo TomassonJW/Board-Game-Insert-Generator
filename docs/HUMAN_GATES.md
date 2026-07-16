@@ -352,3 +352,22 @@ P44-M009H02 Fusion OK 0.1.33 - commit <sha>.
 Cette gate qualifie uniquement le comportement UI/moteur observé dans Fusion.
 Elle ne valide ni les valeurs physiques ni l’impression. P44-M007 reste bloquée
 jusqu’à ce retour.
+## P44-M009H03V - Jeux globaux et Réglages dense 0.1.34
+
+Déclencheur : la revue produit annule la gate P44-M009H02V et retire le concept de jeu externe par bac. L’add-in 0.1.34 doit être installé depuis le commit intégré dans `main`.
+
+Vérifier dans Fusion :
+
+1. aucun conteneur n’affiche de réglage de jeu externe ;
+2. les overrides asset, plateau et livret restent locaux et fonctionnels ;
+3. Réglages sépare « Épaisseurs minimales » et « Jeux (tolérances) » ;
+4. le tableau global affiche X/Y et Z pour jeu entre conteneurs, jeu conteneur-boîte et jeu élément-cavité par défaut ;
+5. les jeux de conteneurs modifiés dans Réglages s’appliquent globalement ;
+6. Z conteneur-boîte pilote la marge sous couvercle et la hauteur de conception reste grisée ;
+7. aucune scène Fusion n’est créée ou modifiée automatiquement.
+
+Retour OK :
+
+`P44-M009H03 Fusion OK 0.1.34 - commit <sha>`
+
+Cette gate qualifie uniquement le comportement UI/moteur observé dans Fusion. Elle ne valide ni les valeurs physiques ni l’impression. P44-M007 reste bloquée jusqu’à ce retour.

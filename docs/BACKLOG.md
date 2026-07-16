@@ -1968,12 +1968,12 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
 
 #### P44-M007 - Calcul adaptatif et Apercu priorise
 
-- Dependances : P44-M006 et P44-M009 integrees ; P44-M009H02V acceptee dans Fusion.
+- Dependances : P44-M006 et P44-M009 integrees ; P44-M009H03V acceptee dans Fusion.
 - Objectif : calcul hybride adaptatif, requetes obsoletes gerees, Apercu en premier et Materialiser toujours explicite.
 - Micro-ajustement inclus : dans Réglages, griser visiblement « Hauteur de
   conception », qui reste une valeur dérivée non éditable ; aucun calcul ni
   sémantique ne change.
-- Statut : bloque par la gate corrective P44-M009H02V.
+- Statut : bloque par la gate corrective P44-M009H03V.
 
 #### P44-M008 - Contrat de jeux herites et overrides par objet
 
@@ -2168,4 +2168,17 @@ comportement des jeux.
 - Statut : implemented, automated-validated, human-fusion-check-required,
   fusion-validated: false, print-validated: false.
 
-P44-M007 reste bloquée jusqu’à P44-M009H02V.
+P44-M007 reste bloquée jusqu’à P44-M009H03V.
+#### P44-M009H03 - Jeux externes globaux et Réglages dense
+
+- Dépendance : P44-M009H02 intégrée, mais sa gate fonctionnelle est annulée par la revue produit.
+- Capability : C-FUSION-UI, C-TOLERANCE, C-COMPATIBILITY, C-QUALITY.
+- Décision : ADR-0064 ; aucun jeu externe éditable ou effectif par bac.
+- Compatibilité : `clearance_overrides_v1` des conteneurs reste chargeable et roundtrippable, sans effet runtime ni migration destructive.
+- UI : aucune section « Jeu externe » dans les cartes ; Réglages dense avec épaisseurs séparées et tableau X/Y–Z sur trois lignes.
+- Préservé : overrides asset, plateau et livret ; schéma historique ; aucun changement de valeur par défaut, géométrie, scène automatique ou impression.
+- Package : 0.1.34.
+- Tests : roundtrip historique inactif, effectifs globaux identiques, overrides asset/plat, DOM, transport Qt, suite complète, JavaScript, compileall, frontière adsk et diff-check.
+- Statut : implemented, automated-validated, human-fusion-check-required, fusion-validated: false, print-validated: false.
+
+P44-M007 reste bloquée jusqu’à P44-M009H03V.

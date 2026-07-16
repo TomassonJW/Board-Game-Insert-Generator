@@ -2098,3 +2098,13 @@ visiblement grisé, toujours dérivé et non éditable.
 
 Validation : 476 tests, syntaxe JavaScript et tests DOM ciblés passés. P44-M007
 reste bloquée par P44-M009H02V.
+
+## P44-M009H03 - Jeux de conteneurs globaux et Réglages dense (2026-07-16)
+
+Statut : implemented, automated-validated, package 0.1.34, human-fusion-check-required, fusion-validated: false, print-validated: false.
+
+La décision produit ADR-0064 retire toute édition et tout effet runtime des jeux externes par bac. Tous les conteneurs utilisent `container_between_mm` et `container_box_per_side_xy_mm` au niveau projet. Les anciens `clearance_overrides_v1` restent validés et sérialisés sans migration destructive, mais sont inactifs.
+
+Les overrides asset, plateau et livret restent inchangés. Réglages sépare désormais les épaisseurs minimales et un tableau global X/Y–Z : jeu entre conteneurs, jeu conteneur-boîte et jeu élément-cavité par défaut. Le Z conteneur-boîte correspond à la marge sous couvercle. « Hauteur de conception » reste dérivée, grisée et non éditable.
+
+Validation : 474 tests, syntaxe JavaScript et tests DOM passent. Compileall, frontière adsk et `git diff --check` passent également. P44-M009H02V est annulée ; P44-M007 reste bloquée par P44-M009H03V.

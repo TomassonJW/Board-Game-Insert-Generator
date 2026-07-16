@@ -186,3 +186,14 @@ prend les valeurs effectives du dernier résultat dérivé par id d’objet.
 La règle `max` des conteneurs n’est pas un override global : elle résout une
 interface entre exactement deux voisins. Avec trois corps A, B et C, une forte
 demande de A peut affecter A-B, mais B-C conserve le max propre à B et C.
+## Révision P44-M009H03 - portée locale réduite
+
+ADR-0064 remplace la partie du présent contrat qui rendait `container_groups[].clearance_overrides_v1` effective. Les jeux externes des conteneurs sont désormais exclusivement globaux :
+
+- `container_between_mm` : X/Y total entre voisins et Z total entre niveaux ;
+- `container_box_per_side_xy_mm` : X/Y par côté contre la boîte ;
+- `box.lid_clearance_mm` : Z conteneur-boîte.
+
+Les anciennes valeurs par bac restent dans le schéma et au roundtrip, mais sont inactives. Les overrides `contents[].clearance_override_mm` et `flat_items[].clearance_override_mm` restent pleinement applicables.
+
+Cette révision ne recalibre aucune valeur et ne constitue pas une migration destructive.
