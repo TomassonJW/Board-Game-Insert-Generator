@@ -1200,8 +1200,8 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
   résultat 69 × 91 × 43,53 et roundtrip sans cumul ; 484 tests passent.
 - C-SOLVER / C-TOLERANCE / C-GEOMETRY / C-CAD-IR : aucune modification du
   placement, aucune recalibration et aucune scène automatique.
-- Limites : fusion-validated: false ; print-validated: false ; valeurs sleeves
-  non validées physiquement.
-- Suite : P44-M007H03V est la seule action suivante autorisée. Les dispositions
-  non-cartes restent candidates de P45 et P0-M010 reste la maintenance
-  documentaire séparée après cette gate.
+- Limites : fusion-validated: true ; print-validated: false ; valeurs sleeves
+  non validées physiquement. Preuve Fusion : `P44-M007H03 Fusion OK 0.1.40 - commit 92f07c8`.
+- Suite : P0-M010 est la seule action suivante autorisée. Les dispositions
+  non-cartes restent candidates de P45 ; aucune mission produit suivante n’est
+  ouverte par cette validation.

@@ -2263,7 +2263,8 @@ P44-M007 est ready-for-explicit-go.
 ### P0-M010 - Compacter le pilotage de reprise
 
 - Capability : pilotage projet et C-QUALITY.
-- Dépendance : P44-M007H03V observée ; mission documentaire isolée.
+- Dépendance satisfaite : P44-M007H03V fusion-validated ; mission documentaire
+  isolée.
 - Objectif : réduire le coût de reprise, les lectures redondantes et les risques
   de divergence du backlog/roadmap sans perdre l’historique auditable.
 - Livrable : index courant court, vues `actif / prochain / bloqué`, archives
@@ -2274,7 +2275,7 @@ P44-M007 est ready-for-explicit-go.
   verts ; aucune suppression destructive d’historique.
 - Non-objectifs : changement produit, solveur, schéma ou réécriture massive sans
   plan de migration documentaire.
-- Statut : todo-after-P44-M007H03V.
+- Statut : ready.
 
 #### P44-M007H03 - Repli global et résolution sleeves fiable
 
@@ -2289,5 +2290,6 @@ P44-M007 est ready-for-explicit-go.
   automatique ; une seule matérialisation explicite.
 - Validation : tests cœur/DOM/transport, syntaxe JS, suite complète,
   `compileall`, exemple CLI, frontière `adsk`, gate Fusion reproductible.
-- Statut : done, automated-validated, human-fusion-check-required par
-  P44-M007H03V, fusion-validated: false, print-validated: false.
+- Statut : done, automated-validated, fusion-validated: true,
+  print-validated: false. Preuve Fusion :
+  `P44-M007H03 Fusion OK 0.1.40 - commit 92f07c8`.

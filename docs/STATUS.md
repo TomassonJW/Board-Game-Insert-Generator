@@ -2205,8 +2205,9 @@ physiquement et aucune validation d’impression n’est acquise.
 ## P44-M007H03 - Repli global et résolution sleeves fiable (2026-07-16)
 
 Statut : implemented, automated-validated, package 0.1.40,
-human-fusion-check-required par P44-M007H03V, fusion-validated: false,
-print-validated: false.
+gate P44-M007H03V, fusion-validated: true,
+print-validated: false. Preuve reçue le 2026-07-16 :
+`P44-M007H03 Fusion OK 0.1.40 - commit 92f07c8`.
 
 Le retour Fusion sur 0.1.39 a confirmé deux défauts : le delta sleeve X/Y
 n’était pas appliqué aux cartes en dimensions manuelles et un fait `Résolu`
@@ -2227,4 +2228,5 @@ Validation automatisée : 484 tests passent, syntaxe JavaScript, parse
 PowerShell, dry-run de gate, `compileall`, exemple CLI, frontière `adsk` et
 diff-check. Le solveur de placement, ses budgets, les tolérances, la géométrie,
 la CAD IR et la scène restent inchangés. Les valeurs 3, 0,19 et 0,31 mm ne sont
-pas calibrées physiquement. P44-M007H03V est la seule action suivante.
+pas calibrées physiquement. P44-M007H03V est validée dans Fusion ;
+P0-M010 devient la prochaine mission documentaire.

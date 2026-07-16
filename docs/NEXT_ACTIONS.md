@@ -35,57 +35,51 @@ Le package 0.1.37 a échoué la saisie rapide. Le package 0.1.38 a été supers�
 avant observation. Le retour Fusion sur 0.1.39 est un KO contextuel : delta X/Y
 manuel absent de `Résolu` et faits dérivés parfois anciens. P44-M009H05 reste
 fusion-validated dans Fusion 360 (package 0.1.36, preuve
-`P44-M009H05 Fusion OK 0.1.36 - commit 7c76ba0`). P44-M007H03 n’est pas encore
-fusion-validated et aucune valeur physique ni impression réelle n’est validée.
+`P44-M009H05 Fusion OK 0.1.36 - commit 7c76ba0`). P44-M007H03 est désormais
+fusion-validated dans Fusion 360 (package 0.1.40, preuve
+`P44-M007H03 Fusion OK 0.1.40 - commit 92f07c8`). Aucune valeur physique ni
+impression réelle n’est validée ; `print-validated: false` reste obligatoire.
 
 ## Prochaine action recommandée
 
-### P44-M007H03V - Gate Fusion repli global et résolution sleeves
+### P0-M010 - Compacter le pilotage de reprise
 
-Statut : human-fusion-check-required après installation du package 0.1.40.
+Statut : ready.
 
-Thomas vérifie dans Fusion uniquement :
+Dépendance satisfaite : P44-M007H03V est fusion-validated dans Fusion 360.
 
-1. saisie rapide dans plusieurs champs sans perte de focus ni de sélection ;
-2. `À recalculer` remplace immédiatement l’ancien fait, puis seul le dernier résultat apparaît ;
-3. absence des boutons `Compact` et `Détaillé` ;
-4. repli/dépli global et individuel des conteneurs, sans masquer leur ligne principale ;
-5. placeholders `Défaut` pour les épaisseurs héritées ;
-6. ligne cartes compacte avec `Nb cartes` et `Résolu` ;
-7. X = 66, Y = 88, Z = 27, sleeves actifs, X/Y = 3 et Z/carte = 0,19 donnent
-   87 cartes et 69 × 91 × 43,53 mm ;
-8. désactiver les sleeves restitue 66 × 88 × 27 mm sans cumul ;
-9. Aperçu, fallback manuel, hauteur grisée et absence de scène automatique restent conformes.
+Objectif : réduire le coût de reprise, les lectures redondantes et les risques
+de divergence du backlog/roadmap sans perdre l’historique auditable.
 
-Preuve attendue :
+Scope autorisé : documentation et pilotage uniquement : index courant court,
+vues `actif / prochain / bloqué`, archives et liens de reprise. Aucun changement
+runtime, produit, solveur, schéma ou valeur physique ; aucune suppression
+destructive d’historique.
 
-```text
-P44-M007H03 Fusion OK 0.1.40 - commit <sha>
-```
+Vérifications attendues :
 
-Cette gate qualifie le comportement UI et le calcul logiciel observés. Elle ne
-calibre pas 3 mm, 0,19 mm ou 0,31 mm, ne valide pas la géométrie imprimée et ne
-vaut pas validation d’impression.
+1. relire le diff documentaire et vérifier les liens vers les contrats actifs ;
+2. conserver les anciennes décisions et preuves en archive auditable ;
+3. garder une seule mission `ready` et une séquence explicite vers P45 ;
+4. mettre à jour STATUS, NEXT_ACTIONS, BACKLOG et le journal de mission.
 
-Ne pas ouvrir P45/P46, P47-P50, P67, P68 ou P69 avant ce retour. P44-V reste la
-gate globale de fondation UX et print-validated: false reste obligatoire.
+Ne pas ouvrir P45/P46, P47-P50, P67, P68 ou P69 pendant P0-M010. La validation
+Fusion ne vaut pas validation d’impression et `print-validated: false` reste
+obligatoire.
 
 ## Lots découverts, non ouverts
 
 - `P45-M001` cadrera les dispositions des assets non-cartes (standard/auto,
   rangée et colonne verticale) avec effet réel sur les cavités et le solveur ;
   aucun contrôle décoratif n’est ajouté dans P44.
-- `P0-M010` compactera le pilotage de reprise (index court, archives et vues
-  actionnables) après P44-M007H03V, sans supprimer l’historique ni mélanger
-  cette maintenance documentaire au lot produit.
 
 ## Séquence verrouillée
 
 P44-M005, P44-M006 et P44-M009H05 sont fusion-validated pour leurs parcours UX.
-P44-M007H03 est implemented et automated-validated ; P44-M007H03V est la seule
-action suivante autorisée. P45/P46 ne commencent pas avant P44-V ; P47-P50
-restent bloqués jusqu’à P46 et P69 jusqu’à P50. P68 peut recueillir des faits
-réels sans modifier les valeurs par défaut.
+P44-M007H03 est désormais fusion-validated dans Fusion 360 ; P0-M010 est la
+seule action suivante autorisée. P45/P46 ne commencent pas avant la fin de P0 et
+la gate P44 appropriée ; P47-P50 restent bloqués jusqu’à P46 et P69 jusqu’à P50.
+P68 peut recueillir des faits réels sans modifier les valeurs par défaut.
 
 ## Fin de chaque mission
 

@@ -704,8 +704,8 @@ reste dérivé du Z déclaré et les faits anciens sont remplacés par
 les modes de densité obsolètes disparaissent et les conteneurs gagnent un repli
 global en plus du repli individuel.
 
-Statut : implemented, automated-validated, human-fusion-check-required par
-P44-M007H03V, fusion-validated: false, print-validated: false. Aucun solveur de
-placement, valeur physique, tolérance, géométrie, CAD IR ou comportement de
-scène n’est modifié. P45 reste bloqué jusqu’à la gate P44 appropriée et P0-M010
-reste séparé après la gate courante.
+Statut : implemented, automated-validated, fusion-validated: true,
+print-validated: false. Preuve Fusion reçue le 2026-07-16 :
+`P44-M007H03 Fusion OK 0.1.40 - commit 92f07c8`. Aucun solveur de placement,
+valeur physique, tolérance, géométrie, CAD IR ou comportement de scène n’est
+modifié. P0-M010 devient la prochaine mission documentaire ; P45 reste bloqué.

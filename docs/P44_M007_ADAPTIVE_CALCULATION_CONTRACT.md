@@ -1,6 +1,6 @@
 # P44-M007 - Calcul adaptatif et Aperçu priorisé
 
-Statut : implémenté et automated-validated dans le package Fusion 0.1.40 ; gate corrective P44-M007H03V requise, fusion-validated: false, print-validated: false.
+Statut : implémenté et automated-validated dans le package Fusion 0.1.40 ; gate corrective P44-M007H03V validée dans Fusion, fusion-validated: true, print-validated: false.
 
 ## Objectif
 
@@ -213,10 +213,10 @@ valeurs physiques, ni la géométrie imprimée, ni l’impression.
 
 ## P44-M007H03V - Repli global et résolution sleeves cohérente 0.1.40
 
-Statut : human-fusion-check-required. Le retour Fusion sur 0.1.39 a montré que
-le delta X/Y manuel n’entrait pas dans `Résolu`, que les faits dérivés pouvaient
-rester anciens pendant le cycle adaptatif et que l’estimation était alors
-difficile à interpréter. P44-M007H02V est supersédée par cette gate corrective.
+Statut : fusion-validated: true. Retour Fusion reçu le 2026-07-16 :
+`P44-M007H03 Fusion OK 0.1.40 - commit 92f07c8`. Le delta X/Y manuel,
+les faits dérivés et l’estimation sont cohérents dans le parcours observé.
+P44-M007H02V est supersédée par cette gate corrective.
 
 Déclencheur : P44-M007H03 est intégrée dans `main`, le package 0.1.40 est
 installé avec `scripts/fusion/prepare_p44_m007_adaptive_preview_test.ps1`, et
@@ -242,7 +242,7 @@ Vérifier dans Fusion :
 
 Retour OK :
 
-`P44-M007H03 Fusion OK 0.1.40 - commit <sha>`
+`P44-M007H03 Fusion OK 0.1.40 - commit 92f07c8`
 
 Cette gate qualifie l’UX et le calcul logiciel observés. Elle ne calibre pas les
 valeurs physiques, ne valide pas la géométrie imprimée et ne vaut pas validation
