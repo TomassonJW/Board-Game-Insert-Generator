@@ -2128,3 +2128,13 @@ La revue Fusion 0.1.35 confirme la densité générale et demande une dernière 
 Le sélecteur global ne prétend plus être Auto lorsque les cartes diffèrent : il affiche Mixte, ou le mode uniforme réel. Appliquer Auto, Cible ou Fixe configure les trois axes de chaque conteneur ; Cible et Fixe peuvent repartir des dimensions explicites existantes ou des minima calculés.
 
 Aucun schéma, bridge, solveur, tolérance, géométrie ou comportement de scène ne change. Validation automatisée : 475 tests, syntaxe JavaScript, DOM, transport Qt, compileall et frontière adsk passent. Preuve humaine : P44-M009H05 Fusion OK 0.1.36 - commit 7c76ba0. P44-M007 est ready-for-explicit-go ; aucune validation d’impression n’est acquise.
+
+## P44-M007 - Calcul adaptatif et Aperçu priorisé (2026-07-16)
+
+Statut : implemented, automated-validated, package 0.1.37, human-fusion-check-required par P44-M007V, fusion-validated: false, print-validated: false.
+
+La palette valide les dérivations après 350 ms sans nouvelle édition puis demande la proposition complète à 1 500 ms de stabilité. Une nouvelle édition annule le solve planifié. Une réponse dérivée ne peut mettre l’UI à jour que si sa révision source est courante et si son identité est la dernière requête du même type. `Recalculer maintenant` reste le fallback manuel ; l’action `Vérifier` disparaît du parcours normal.
+
+Dans Aperçu, le statut compact et les vues dessus/X-Z précèdent désormais les alertes et les détails. `Matérialiser dans Fusion` reste l’unique action de matérialisation et n’est jamais appelée automatiquement. `Hauteur de conception` reste calculée depuis Z moins le jeu sous couvercle, `readonly`, hors tabulation et visiblement grisée.
+
+Aucun schéma, bridge Python, solveur, budget, valeur physique, tolérance, géométrie, CAD IR ou comportement de scène ne change. Validation : 477 tests, syntaxe JavaScript, tests ciblés DOM/Aperçu/transport Qt/squelette, parse PowerShell, suite complète, `compileall`, exemple CLI, frontière `adsk` et préparation dry-run de la gate passent. P44-M007V est la seule action suivante ; aucune validation d’impression n’est acquise.

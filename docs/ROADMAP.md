@@ -653,3 +653,11 @@ P44-M009H03V est remplacée par P44-M009H04V. P44-M007 reste bloquée jusqu’à
 Le package 0.1.36 sépare visuellement l’identité à gauche des contrôles à droite et intègre le mode global dans la ligne Conteneurs. Son état devient fidèle aux cartes et son application couvre les trois axes de chaque conteneur.
 
 Preuve humaine acceptée le 2026-07-16 : P44-M009H05 Fusion OK 0.1.36 - commit 7c76ba0. P44-M007 devient ready-for-explicit-go ; P44-V demeure la gate globale et print-validated: false.
+
+## P44-M007 - Calcul adaptatif et Aperçu priorisé (2026-07-16)
+
+Le package 0.1.37 orchestre la palette en deux temps : dérivations à 350 ms puis proposition complète à 1 500 ms de stabilité. Les réponses dépassées ne peuvent plus remplacer l’état courant, même entre deux requêtes du même type et de la même révision. `Recalculer maintenant` reste le fallback explicite.
+
+L’Aperçu présente désormais son statut et ses projections réelles avant les alertes et détails. `Matérialiser dans Fusion` reste unique, persistant et strictement manuel ; `Hauteur de conception` reste dérivée, grisée et non éditable. Aucun schéma, solveur, budget, valeur physique, tolérance, géométrie ou contrat CAD ne change.
+
+Statut : implemented, automated-validated, human-fusion-check-required par P44-M007V, fusion-validated: false, print-validated: false. P45/P46 et les lots ultérieurs restent verrouillés jusqu’aux gates P44 prévues.

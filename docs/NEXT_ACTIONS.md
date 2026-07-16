@@ -8,34 +8,48 @@ V0.1 reste mvp-accepted par P66 (package 0.1.20), fusion-validated: true et prin
 
 ## Dernier état réel
 
-P44-M009H05 est fusion-validated dans Fusion 360 (package 0.1.36, commit 7c76ba0). print-validated: false :
+P44-M007 est implemented et automated-validated dans le package Fusion 0.1.37 :
 
-- les jeux externes des conteneurs restent exclusivement globaux selon ADR-0064 ;
-- les overrides asset, plateau et livret restent actifs ;
-- Réglages est borné à une largeur lisible, avec son tableau X/Y–Z aligné à gauche ;
-- les cartes conteneur regroupent nom, nombre d’éléments, minimum, mode, dimensions et épaisseurs sur une ligne technique compacte à largeur normale ;
-- X, interversion, Y et Z apparaissent directement dans cette ligne en modes Cible et Fixe ; la flèche est absente en Auto ;
-- l’identité et le minimum restent regroupés à gauche, tandis que Mode, dimensions, épaisseurs et actions sont justifiés à droite ;
-- le mode global est intégré à droite du titre « Conteneurs », reflète Auto/Cible/Fixe ou Mixte et applique réellement le choix aux trois axes de tous les conteneurs ;
-- aucune valeur, schéma, bridge, solveur, géométrie ou scène Fusion automatique ne change.
+- validation dérivée après 350 ms sans nouvelle édition ;
+- proposition complète après 1 500 ms de stabilité ;
+- réponses obsolètes ignorées par révision source et par dernière identité de requête ;
+- `Recalculer maintenant` conservé comme fallback manuel ;
+- statut compact et projections de l’Aperçu affichés avant les alertes et détails ;
+- `Matérialiser dans Fusion` reste l’unique action de matérialisation et ne part jamais automatiquement ;
+- `Hauteur de conception` reste dérivée, non éditable et visiblement grisée ;
+- aucun schéma, bridge, solveur, budget, valeur physique, tolérance, géométrie ou comportement de scène n’est modifié.
 
-La revue Fusion confirme la composition finale et l’application du mode global. P44-M009H05V ferme la gate corrective ; aucune propriété physique ni impression réelle n’est validée.
+P44-M009H05 reste fusion-validated dans Fusion 360 (package 0.1.36, preuve `P44-M009H05 Fusion OK 0.1.36 - commit 7c76ba0`). P44-M007 n’est pas encore fusion-validated et aucune propriété physique ni impression réelle n’est validée.
 
 ## Prochaine action recommandée
 
-### P44-M007 - Calcul adaptatif et Aperçu priorisé
+### P44-M007V - Gate Fusion du calcul adaptatif et de l’Aperçu
 
-Statut : ready-for-explicit-go. Le GO est déjà accordé pour la reprise dans le nouveau clavardage après son préflight Git et documentaire.
+Statut : human-fusion-check-required après installation du package 0.1.37.
 
-Objectif borné : calcul hybride adaptatif, annulation des requêtes obsolètes, Aperçu en premier et Matérialiser toujours explicite. Inclure le micro-ajustement UI qui maintient « Hauteur de conception » visiblement grisée car dérivée et non éditable.
+Thomas vérifie dans Fusion uniquement :
 
-Ne pas ouvrir P45/P46, P47-P50, P67, P68 ou P69. La prochaine gate humaine sera préparée seulement à la fin de P44-M007 selon son contrat.
+1. plusieurs éditions rapides ne volent ni focus ni scroll ;
+2. seul le calcul correspondant aux dernières valeurs devient visible ;
+3. l’Aperçu automatique arrive après environ 1,5 seconde de stabilité ;
+4. statut et projections précèdent alertes et détails ;
+5. `Recalculer maintenant` fonctionne comme fallback sans créer de scène ;
+6. `Hauteur de conception` est grisée et impossible à éditer ;
+7. aucune scène BGIG ne change avant un clic explicite sur `Matérialiser dans Fusion`.
 
-P44-V reste la gate globale de fondation UX et print-validated: false reste obligatoire.
+Preuve attendue :
+
+```text
+P44-M007 Fusion OK 0.1.37 - commit <sha>
+```
+
+Cette gate qualifie le comportement UI observé, pas les valeurs physiques, la géométrie imprimée ou l’impression.
+
+Ne pas ouvrir P45/P46, P47-P50, P67, P68 ou P69 avant ce retour. P44-V reste la gate globale de fondation UX et print-validated: false reste obligatoire.
 
 ## Séquence verrouillée
 
-P44-M005, P44-M006 et P44-M009H05 sont fusion-validated pour leurs parcours UX. P44-M007 est la seule mission suivante autorisée. P45/P46 ne commencent pas avant P44-V ; P47-P50 restent bloqués jusqu’à P46 et P69 jusqu’à P50. P68 peut recueillir des faits réels sans modifier les valeurs par défaut.
+P44-M005, P44-M006 et P44-M009H05 sont fusion-validated pour leurs parcours UX. P44-M007 est implemented et automated-validated ; P44-M007V est la seule action suivante autorisée. P45/P46 ne commencent pas avant P44-V ; P47-P50 restent bloqués jusqu’à P46 et P69 jusqu’à P50. P68 peut recueillir des faits réels sans modifier les valeurs par défaut.
 
 ## Fin de chaque mission
 

@@ -259,7 +259,8 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("Atelier de rangement", markup)
         for label in ("Boîte et plateaux", "Conteneurs et éléments", "Réglages", "Aperçu"):
             self.assertIn(label, markup)
-        self.assertIn("Vérifier", markup)
+        self.assertIn("Recalculer maintenant", markup)
+        self.assertNotIn('data-bridge="validate_project"', markup)
         self.assertIn("Enregistrer", markup)
         self.assertNotIn("Reglages experts", markup)
         self.assertIn("bgig.palette.request.v1", markup)

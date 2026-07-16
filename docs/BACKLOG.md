@@ -1970,10 +1970,11 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
 
 - Dependances : P44-M006 et P44-M009 integrees ; P44-M009H05V acceptee dans Fusion.
 - Objectif : calcul hybride adaptatif, requetes obsoletes gerees, Apercu en premier et Materialiser toujours explicite.
-- Micro-ajustement inclus : dans Réglages, griser visiblement « Hauteur de
-  conception », qui reste une valeur dérivée non éditable ; aucun calcul ni
-  sémantique ne change.
-- Statut : ready-for-explicit-go ; GO déjà accordé pour la reprise après la clôture documentaire de P44-M009H05V.
+- Contrat : `docs/P44_M007_ADAPTIVE_CALCULATION_CONTRACT.md`.
+- Livrable : package 0.1.37 ; dérivation à 350 ms, solve à 1 500 ms, double garde d’obsolescence, fallback `Recalculer maintenant`, projections avant détails et unique matérialisation explicite.
+- Micro-ajustement inclus : dans Réglages, « Hauteur de conception » est visiblement grisée, marquée calculée automatiquement, dérivée et non éditable ; aucun calcul ni sémantique ne change.
+- Validation : 477 tests, syntaxe JavaScript, parse PowerShell, compileall, exemple CLI et frontière adsk passés.
+- Statut : done-code, implemented, automated-validated, human-fusion-check-required par P44-M007V, fusion-validated: false, print-validated: false.
 
 #### P44-M008 - Contrat de jeux herites et overrides par objet
 

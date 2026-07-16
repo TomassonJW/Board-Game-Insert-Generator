@@ -1143,3 +1143,11 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - C-TOLERANCE et C-GEOMETRY : aucun changement fonctionnel.
 - C-QUALITY : 475 tests, syntaxe JavaScript, DOM, transport Qt, compileall et frontière adsk passés ; preuve Fusion reçue le 2026-07-16 (package 0.1.36, commit 7c76ba0).
 - Suite : C-FUSION-UI et C-USABILITY sont fusion-validated pour H05 ; P44-M007 est ready-for-explicit-go ; print-validated: false.
+
+## P44-M007 - Capability update (2026-07-16)
+
+- C-FUSION-UI : calcul hybride adaptatif implemented ; validation dérivée à 350 ms, solve complet à 1 500 ms, fallback manuel et état de cycle lisible.
+- C-USABILITY : statut et projections de l’Aperçu précèdent les alertes et détails ; `Hauteur de conception` est explicitement dérivée, grisée et non éditable.
+- C-QUALITY : réponses obsolètes rejetées par révision source et dernière identité de requête ; une seule action de matérialisation explicite ; package 0.1.37 et gate reproductible.
+- C-SOLVER / C-TOLERANCE / C-GEOMETRY / C-CAD-IR : aucun changement fonctionnel, aucune recalibration et aucun appel adaptatif de scène.
+- Suite : P44-M007 est implemented et automated-validated, fusion-validated: false ; P44-M007V est la seule action suivante ; print-validated: false.

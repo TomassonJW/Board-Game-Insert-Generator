@@ -175,7 +175,10 @@ function Assert-BgigPaletteProjectRuntime {
         "Ordre de retrait",
         "proposal_with_residuals",
         "technical-drawer",
-        "solvedStale"
+        "solvedStale",
+        "scheduleAdaptiveSolve",
+        "latestDerivedRequest",
+        "Recalculer maintenant"
     )
     foreach ($marker in $paletteMarkers) {
         if ($palette -notlike "*$marker*") {

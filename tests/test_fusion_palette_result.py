@@ -16,7 +16,7 @@ class FusionPaletteResultTests(unittest.TestCase):
     def test_result_exposes_user_facing_evidence_without_engine_codes(self) -> None:
         for marker in ("final_body_count", "stage_count", "automatic_body_count", "minimum_outer_envelope_mm", "final_outer_dimensions_mm", "surplus_distribution_mm", "cavity_count", "view.presentation", "preview-explanations", "stageExplanation.coverage_label", "flatExplanation.coverage_label", "Ordre de retrait"):
             self.assertIn(marker, self.markup)
-        for marker in ("Indice de comparaison", "Appui des etages", "Comment lire cet indice ?", "presentation.score"):
+        for marker in ("Indice de comparaison", "Appui des étages", "Comment lire cet indice ?", "presentation.score"):
             self.assertIn(marker, self.markup)
         self.assertNotIn("Les deux vues ci-dessous utilisent exclusivement les placements P57", self.markup)
         self.assertNotIn("Plan ${esc(view.source_plan_digest", self.markup)
@@ -30,8 +30,10 @@ class FusionPaletteResultTests(unittest.TestCase):
         self.assertIn("Exporter les imprimables", result_block)
         self.assertNotIn('data-bridge="solve_project"', result_block)
         self.assertNotIn('data-bridge="materialize_project"', result_block)
+        self.assertLess(result_block.index('id="preview-status"'), result_block.index('class="plan-grid"'))
+        self.assertLess(result_block.index('class="plan-grid"'), result_block.index('id="preview-explanations"'))
     def test_impossible_and_obsolete_states_never_show_a_fake_solution(self) -> None:
-        self.assertIn("Aucune fausse solution n est affichee", self.markup)
+        self.assertIn("Aucune fausse solution n est affichée", self.markup)
         self.assertIn("Ancienne proposition", self.markup)
         self.assertIn("solvedStale=Boolean(lastSolved)", self.markup)
         self.assertIn("lastSolved=payload", self.markup)
@@ -41,7 +43,7 @@ class FusionPaletteResultTests(unittest.TestCase):
         self.assertIn('data-bridge="materialize_project"', self.markup)
         self.assertIn('data-bridge="regenerate_project"', self.markup)
         self.assertIn("Une proposition complète et à jour est requise", self.markup)
-        self.assertIn("Volume residuel a decider", self.markup)
+        self.assertIn("Volume résiduel à décider", self.markup)
 
     def test_p59_exposes_owned_scene_actions_without_raw_cad_codes(self) -> None:
         for marker in (

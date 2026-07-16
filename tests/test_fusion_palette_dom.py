@@ -280,6 +280,23 @@ class FusionPaletteDomTests(unittest.TestCase):
             self.assertIn(marker, self.markup)
         self.assertNotIn("supported_by_requested_bodies", self.markup)
         self.assertNotIn("data-bridge=\"solve_project\"", self.markup[self.markup.index("function renderResult"):self.markup.index("function renderPersistentActions")])
+    def test_runs_adaptive_calculation_and_ignores_obsolete_responses(self) -> None:
+        for marker in (
+            "DERIVE_DEBOUNCE_MS=350", "AUTO_SOLVE_STABILITY_MS=1500",
+            "scheduleAdaptiveSolve", "cancelAdaptiveSolve", "autoSolveTimer",
+            "latestDerivedRequest", "adaptiveStatus", "Recalculer maintenant",
+            "sendProject('validate_project',{},true,'adaptive')",
+            "sendProject('solve_project',{},true,'adaptive')",
+            "latestDerivedRequest[pendingRequest.derivedKey]!==payload.request_id",
+        ):
+            self.assertIn(marker, self.markup)
+        self.assertNotIn('data-bridge="validate_project"', self.markup)
+        self.assertEqual(self.markup.count('data-bridge="materialize_project"'), 1)
+        self.assertLess(self.markup.index('id="preview-status"'), self.markup.index('id="preview-explanations"'))
+        self.assertLess(self.markup.index('class="plan-grid"', self.markup.index("function renderResult")), self.markup.index('id="preview-explanations"'))
+        self.assertIn('Calculée automatiquement', self.markup)
+        self.assertIn('id="design-height" readonly aria-readonly="true" tabindex="-1"', self.markup)
+
     def test_exposes_the_p61_lifecycle_and_keeps_healthy_inspection_out_of_global_messages(self) -> None:
         for marker in ("renderLifecycle", "scheduleDerived", "solvedStale", "Ancienne proposition", "technical_detail"):
             self.assertIn(marker, self.markup)
@@ -289,7 +306,7 @@ class FusionPaletteDomTests(unittest.TestCase):
             self.assertNotIn(malformed, self.markup)
 
     def test_routes_validation_persistence_and_native_documents_to_the_versioned_bridge(self) -> None:
-        self.assertEqual(self.dom.bridge_actions, {"validate_project", "save_document", "export_project", "export_personal_presets", "solve_project", "materialize_project"})
+        self.assertEqual(self.dom.bridge_actions, {"save_document", "export_project", "export_personal_presets", "solve_project", "materialize_project"})
         for marker in ("bgig.palette.request.v1", "bgig.palette.response.v1", "bgig_palette_project", "bgig_palette_document", "DOCUMENT_ACTION", "sendDocument", "8000"):
             self.assertIn(marker, self.markup)
 
@@ -322,7 +339,7 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertIn('id="materialize-action"', self.markup)
         self.assertIn("renderPersistentActions", self.markup)
         self.assertLess(
-            self.markup.index('data-bridge="solve_project">Recalculer</button><button id="materialize-action"'),
+            self.markup.index('data-bridge="solve_project">Recalculer maintenant</button><button id="materialize-action"'),
             self.markup.index('<div class="action-zone center">'),
         )
 
@@ -334,8 +351,8 @@ class FusionPaletteDomTests(unittest.TestCase):
         ):
             self.assertIn(marker, self.markup)
         self.assertIn("item?.id", self.markup)
-        self.assertIn("pendingRequest?.derived&&pendingRequest.sourceRevision!==sourceRevision", self.markup)
-        self.assertIn("derived:quiet||['validate_project','solve_project'].includes(action),sourceRevision", self.markup)
+        self.assertIn("pendingRequest?.derived&&(pendingRequest.sourceRevision!==sourceRevision", self.markup)
+        self.assertIn("derived:quiet||Boolean(derivedKey),derivedKey,sourceRevision", self.markup)
         self.assertIn("renderAll({preserve:!(['load_project','import_project','new_project','open_project_file','open_recent_project'].includes(action)||bootstrap)})", self.markup)
         self.assertIn("if(['load_project','import_project','new_project','open_project_file','open_recent_project'].includes(action)||bootstrap)sourceRevision+=1", self.markup)
         self.assertIn("if(action==='autosave_project')state('Modifications non sauvegardées - récupération enregistrée','ok')", self.markup)
@@ -397,6 +414,16 @@ class FusionPaletteDomTests(unittest.TestCase):
         for marker in ("0.1.28", "creation-preset", "creation-destination", "Nouveau conteneur li", "P44-M005 Fusion OK"):
             self.assertIn(marker, p44_smoke)
 
+
+    def test_prepares_the_p44_m007_adaptive_preview_gate(self) -> None:
+        script = (ROOT / "scripts" / "fusion" / "prepare_p44_m007_adaptive_preview_test.ps1").read_text(encoding="utf-8")
+        for marker in (
+            "0.1.37", "DERIVE_DEBOUNCE_MS=350", "AUTO_SOLVE_STABILITY_MS=1500",
+            "latestDerivedRequest", "Recalculer maintenant", "preview-status",
+            "preview-explanations", "Calculée automatiquement",
+            "exactly one explicit materialize action", "P44-M007 Fusion OK 0.1.37",
+        ):
+            self.assertIn(marker, script)
 
     def test_prepares_the_p44_m006_fusion_document_cycle_gate(self) -> None:
         script = (ROOT / "scripts" / "fusion" / "prepare_p44_m006_document_cycle_test.ps1").read_text(encoding="utf-8")

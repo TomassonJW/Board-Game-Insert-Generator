@@ -56,26 +56,26 @@ class FusionOnlyAlignmentTests(unittest.TestCase):
         self.assertIn('class="eyebrow">BGIG</span>', markup)
         self.assertIn("bgig.palette.request.v1", markup)
 
-    def test_next_action_records_the_accepted_container_header_gate_without_promoting_print(self) -> None:
+    def test_next_action_records_p44_m007_without_promoting_print(self) -> None:
         actions = self.read("docs/NEXT_ACTIONS.md")
         decision = self.read("docs/DECISIONS/ADR-0064-global-container-clearances.md")
+        contract = self.read("docs/P44_M007_ADAPTIVE_CALCULATION_CONTRACT.md")
 
         self.assertIn("mvp-accepted", actions)
         self.assertIn("P44-M009H05", actions)
         self.assertIn("0.1.36", actions)
-        self.assertIn("P44-M009H05V", actions)
-        self.assertIn("P44-M007 - Calcul adaptatif", actions)
-        self.assertIn("ready-for-explicit-go", actions)
-        self.assertIn("commit 7c76ba0", actions)
-        self.assertIn("P44-M007", actions)
-        self.assertIn("P44-M009H05 est fusion-validated", actions)
-        self.assertNotIn("human-fusion-check-required", actions)
-        self.assertIn("print-validated: false", actions)
+        self.assertIn("P44-M007V", actions)
+        self.assertIn("0.1.37", actions)
+        self.assertIn("human-fusion-check-required", actions)
+        self.assertIn("P44-M007 Fusion OK 0.1.37 - commit <sha>", actions)
+        self.assertIn("350 ms", contract)
+        self.assertIn("1 500 ms", contract)
+        self.assertIn("annulation logique", contract)
         self.assertIn("exclusivement globaux", decision)
         self.assertIn("roundtrippables", decision)
-        self.assertNotIn("manual_validation_required", actions)
-        self.assertNotIn("P44-M009H04 Fusion OK 0.1.35 - commit <sha>", actions)
-
+        self.assertIn("print-validated: false", actions)
+        self.assertNotIn("ready-for-explicit-go", actions)
+        self.assertNotIn("data-bridge=\"validate_project\"", self.read("fusion_addin/BoardGameInsertGenerator/palette.html"))
     def test_french_ui_copy_requirement_is_bounded_and_testable(self) -> None:
         contract = self.read("docs/P44_FRENCH_UI_ORTHOTYPOGRAPHY_CONTRACT.md")
         backlog = self.read("docs/BACKLOG.md")

@@ -410,3 +410,23 @@ Retour reçu le 2026-07-16 :
 P44-M009H05 Fusion OK 0.1.36 - commit 7c76ba0
 
 Cette gate qualifie uniquement la composition UI et le comportement du sélecteur global observés dans Fusion. Elle ne valide ni les valeurs physiques ni l’impression. P44-M007 est désormais ready-for-explicit-go.
+
+## P44-M007V - Calcul adaptatif et Aperçu priorisé 0.1.37
+
+Déclencheur : P44-M007 est intégrée dans `main`, le package 0.1.37 est installé avec `scripts/fusion/prepare_p44_m007_adaptive_preview_test.ps1`, et les validations automatisées sont passées.
+
+Vérifier dans Fusion :
+
+1. modifier rapidement plusieurs dimensions ; le focus, la sélection et le scroll actifs restent stables ;
+2. arrêter la saisie ; après environ 1,5 seconde, seule la proposition correspondant aux dernières valeurs devient visible ;
+3. ouvrir Aperçu ; le statut compact et les vues dessus/X-Z précèdent les alertes et détails ;
+4. modifier une valeur ; l’ancienne proposition est marquée à recalculer puis remplacée par la proposition courante ;
+5. utiliser `Recalculer maintenant` ; la proposition se met à jour sans création ou modification de scène ;
+6. vérifier que `Hauteur de conception` est grisée, dérivée et non éditable ;
+7. vérifier qu’aucune scène BGIG ne change avant un clic explicite sur `Matérialiser dans Fusion`.
+
+Retour OK :
+
+`P44-M007 Fusion OK 0.1.37 - commit <sha>`
+
+Cette gate qualifie uniquement l’orchestration UI et l’ordre de l’Aperçu observés dans Fusion. Elle ne valide ni les valeurs physiques, ni la géométrie imprimée, ni l’impression. `print-validated: false` reste inchangé et P44-V demeure la gate globale suivante.
