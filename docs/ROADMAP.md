@@ -610,3 +610,14 @@ par axe, zero explicite, provenance et deux vecteurs externes. Compatibilite
 historique preservee et paires resolues par maximum, jamais somme. La mission
 ne qualifie ni Fusion ni impression : fusion-validated: false,
 print-validated: false. P44-M007 est la prochaine mission sur GO explicite.
+
+## P44-M009H01 - Correction UI avant calcul adaptatif (2026-07-16)
+
+Le retour humain sur la 0.1.31 demande une correction bornée avant P44-M007 :
+les jeux unitaires quittent les lignes principales, rejoignent des volets
+repliés et utilisent un seul champ X/Y plus un champ Z distinct. Le package
+cible est 0.1.32. Le modèle X/Y/Z reste intact pour la rétrocompatibilité ;
+aucune valeur ni formule n’est recalibrée.
+
+P44-M007 reprend seulement après l’observation Fusion positive de cette
+correction. P44-V reste la gate globale de fondation UX.

@@ -159,3 +159,19 @@ Décision rendue : Thomas a accepté les points suivants :
 6. le schema externe a deux sous-vecteurs.
 
 P44-M009 est implémentée ; P44-M007 devient ready-for-explicit-go. P44-V reste bloquée par les missions P44 restantes. print-validated: false.
+
+## Correction UI P44-M009H01
+
+La palette 0.1.32 applique une règle d’édition plus simple que le schéma
+interne : chaque objet affiche ses jeux dans un volet replié par défaut et
+propose un seul champ X/Y, puis un champ Z lorsque ce rôle possède une
+composante verticale.
+
+Une saisie X/Y écrit la même valeur dans les axes x et y. Effacer ce champ
+rétablit l’héritage sur les deux axes. Le schéma X/Y/Z reste inchangé pour la
+rétrocompatibilité. Un projet importé dont X et Y diffèrent conserve ses deux
+valeurs tant que l’utilisateur ne saisit pas un nouveau X/Y commun ; la palette
+affiche alors une note explicite.
+
+Cette correction ne change ni les valeurs par défaut, ni les formules, ni la
+règle max entre voisins, ni le solveur, ni la CAD IR, ni la géométrie.

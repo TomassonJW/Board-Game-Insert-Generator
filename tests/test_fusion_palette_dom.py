@@ -115,7 +115,7 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertIn("main>.message.show{position:fixed;top:8px", self.markup)
         self.assertIn('<div class="row-details">${targetControls}${customDetails}${clearanceControls}${children}</div>', self.markup)
 
-    def test_keeps_primary_controls_visible_and_calculations_collapsed(self) -> None:
+    def test_collapses_unit_clearances_and_edits_one_xy_value_plus_z(self) -> None:
         for forbidden in (
             "<h4>Prise et tolérances</h4>",
             "<h4>Placement et ordre</h4>",
@@ -123,8 +123,16 @@ class FusionPaletteDomTests(unittest.TestCase):
         ):
             self.assertNotIn(forbidden, self.markup)
         for marker in (
+            "function sharedXYClearanceState",
             "function clearanceVectorFields",
+            'class="clearance-details local-details"',
             "Tolérance cavité",
+            "Jeu d’encastrement",
+            "Jeu externe",
+            'data-key="xy"',
+            "key==='xy'?{...current,x:value,y:value}",
+            "axis==='xy'?{...current,x:value,y:value}",
+            "Les valeurs X et Y diffèrent dans ce projet.",
             "<label>Pile<input",
             "<label>Paroi<input",
             "<label>Fond<input",
@@ -133,6 +141,15 @@ class FusionPaletteDomTests(unittest.TestCase):
             "summary.textContent='Détails calculés'",
         ):
             self.assertIn(marker, self.markup)
+        self.assertIn(
+            "</div>${clearanceVectorFields(item,index,'content-clearance','Tolérance cavité')}",
+            self.markup,
+        )
+        self.assertIn(
+            "</div>${clearanceVectorFields(item,index,'flat-clearance','Jeu d’encastrement')}",
+            self.markup,
+        )
+        self.assertNotIn("['x','y','z'].map(axis=>input('between_mm'", self.markup)
 
     def test_creates_one_selected_preset_in_an_explicit_destination_without_new_bridge(self) -> None:
         for marker in (

@@ -328,3 +328,14 @@ box_per_side_xy_mm (perimetre par cote). Chaque paire utilise max, jamais une
 somme, y compris les interfaces d etage. Le schema est additif et les rapports,
 palette et CAD IR portent valeurs et provenance. fusion-validated: false ;
 print-validated: false.
+
+## P44-M009H01 - Édition horizontale commune dans la palette
+
+Le moteur conserve ses vecteurs X/Y/Z et leur provenance pour la compatibilité,
+mais la palette 0.1.32 n’autorise plus deux saisies horizontales indépendantes.
+Chaque override unitaire utilise un champ X/Y commun et un champ Z distinct
+lorsqu’il existe. Les champs sont rangés dans un volet replié par objet.
+
+Les projets anisotropes existants restent inchangés jusqu’à une nouvelle saisie
+X/Y, qui unifie alors les deux axes. Aucun jeu par défaut ni aucune formule
+physique ne change. print-validated: false.

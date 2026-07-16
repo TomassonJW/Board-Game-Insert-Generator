@@ -2119,3 +2119,23 @@ complément, calcul ou scène Fusion automatique. Elle ne qualifie ni schéma,
 bridge, solveur, tolérance, géométrie, CAD IR ou impression.
 
 P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
+
+#### P44-M009H01 - Volets de jeux et saisie X/Y commune
+
+- Dépendance : P44-M009 intégrée ; retour humain UI sur le package 0.1.31.
+- Capability : C-FUSION-UI, C-TOLERANCE, C-QUALITY.
+- Objectif : retirer les jeux unitaires des lignes principales, les placer dans
+  des volets repliés et remplacer les saisies X et Y séparées par un champ
+  X/Y commun, avec Z distinct.
+- Compatibilité : conserver le schéma X/Y/Z et les valeurs anisotropes
+  historiques ; une saisie X/Y unifie volontairement les deux axes.
+- Exclusions : aucun changement de défaut, formule, solveur, CAD IR, géométrie
+  ou scène automatique.
+- Package : 0.1.32.
+- Tests : DOM, transport Qt, syntaxe JavaScript, suite complète, compileall,
+  frontière adsk et diff-check.
+- Gate : observation Fusion de la densité et de l’édition X/Y + Z.
+- Statut : implemented, automated-validated,
+  human-fusion-check-required, print-validated: false.
+
+P44-M007 est temporairement bloquée par cette observation corrective.

@@ -2058,3 +2058,18 @@ y compris en Z. Coeur, palette, rapports et CAD IR exposent la provenance.
 Aucune scene automatique, complement, recalibration ou impression reelle.
 
 P44-M007 devient ready-for-explicit-go ; P44-V reste la gate humaine globale.
+
+## P44-M009H01 - Correction de densité des jeux (2026-07-16)
+
+Statut : implemented, automated-validated, package 0.1.32,
+human-fusion-check-required, fusion-validated: false, print-validated: false.
+
+Les jeux unitaires des assets, plateaux/livrets et conteneurs sont déplacés
+dans des volets repliés par défaut. Le parcours normal expose un seul champ
+X/Y et un champ Z séparé lorsque le rôle le prévoit. Une saisie X/Y met à jour
+les deux axes.
+
+Le schéma, le loader, le cœur, les rapports, le solveur et la CAD IR restent
+compatibles X/Y/Z. Les valeurs anisotropes importées sont préservées et
+signalées jusqu’à une saisie X/Y commune. Aucun défaut, calcul, jeu physique,
+géométrie ou comportement de scène ne change.

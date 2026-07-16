@@ -55,3 +55,17 @@ partiel ni la provenance par axe.
 ## Suivi
 
 P44-M009 implémente le schéma, loader, cœur, palette, rapports, CAD IR et tests. P44-M007 est la prochaine mission sur GO explicite.
+
+## Amendement P44-M009H01 - édition X/Y commune
+
+Le retour humain du 2026-07-16 corrige la présentation acceptée initialement :
+le parcours normal ne doit pas permettre de saisir X et Y séparément. Pour
+chaque rôle, la palette expose un seul jeu horizontal X/Y et, lorsque le rôle le
+prévoit, un jeu vertical Z distinct.
+
+Le schéma additif et la résolution interne par axe sont conservés pour ne pas
+détruire les projets 0.1.31 déjà enregistrés ni les imports historiques
+anisotropes. Si X et Y diffèrent, la palette le signale sans les réécrire. La
+première saisie dans le champ X/Y applique la même valeur aux deux axes. Cette
+décision est une contrainte d’édition UI, pas une recalibration des jeux, une
+migration de schéma ou un changement des formules physiques.

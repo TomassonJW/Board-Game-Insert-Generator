@@ -310,3 +310,21 @@ calcul, aucune scène ou matérialisation ne part automatiquement.
 
 Preuve reçue : P44-M006 Fusion OK 0.1.30 - commit d82def6.
 Cette gate ne valide pas l’impression réelle.
+
+## P44-M009H01V - Volets de jeux X/Y + Z 0.1.32
+
+Déclencheur : le retour humain sur 0.1.31 refuse les champs X, Y et Z visibles
+dans les lignes principales et corrige le besoin en un jeu X/Y commun plus un
+jeu Z distinct.
+
+Observer dans Fusion que les volets Tolérance cavité, Jeu d’encastrement et
+Jeu externe sont repliés par défaut. Les ouvrir et confirmer que X/Y est un
+champ unique, que Z reste séparé lorsqu’il existe et qu’une modification X/Y
+sur un asset, un plat et un conteneur est conservée après recalcul, sans
+matérialisation automatique.
+
+Retour OK :
+P44-M009H01 Fusion OK 0.1.32 - commit <sha>.
+
+Cette gate ne valide ni les valeurs physiques, ni l’impression. P44-M007 reste
+bloquée jusqu’à ce retour.

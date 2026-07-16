@@ -62,13 +62,19 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 
 ## Prochaine action recommandée
 
-### P44-M007 - Calcul adaptatif et Aperçu priorisé
+### P44-M009H01V - Observation Fusion de la correction 0.1.32
 
-Statut : ready-for-explicit-go après l intégration de P44-M009.
+Statut : human-fusion-check-required après intégration et installation.
 
-Portée : calcul hybride adaptatif, requêtes obsolètes, Aperçu en premier
-et matérialisation toujours explicite. Les règles P44-M009 sont consommées,
-pas recalibrées. Un GO explicite est requis. P44-V reste la gate globale.
+Vérifier que les jeux des assets, plateaux/livrets et conteneurs sont repliés
+par défaut ; que chaque volet expose un seul champ X/Y et un champ Z distinct
+lorsqu’il existe ; et qu’une saisie X/Y met bien à jour les deux axes sans
+déclencher de scène Fusion.
+
+Retour OK attendu :
+P44-M009H01 Fusion OK 0.1.32 - commit <sha>.
+
+P44-M007 redevient ensuite ready-for-explicit-go. P44-V reste la gate globale.
 
 ## Séquence verrouillée
 

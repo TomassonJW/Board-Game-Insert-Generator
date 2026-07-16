@@ -1097,3 +1097,13 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - C-FUSION-UI / C-QUALITY : palette, DOM, roundtrip, bridge et materialisation
   historique testes. fusion-validated: false, print-validated: false.
 - Suite : P44-M007 est ready-for-explicit-go ; P44-V reste une gate humaine.
+
+## P44-M009H01 - Capability update (2026-07-16)
+
+- C-FUSION-UI : implemented pour des volets de jeux repliés et une saisie
+  horizontale X/Y commune, avec Z distinct.
+- C-TOLERANCE : inchangée côté moteur ; les vecteurs et provenances X/Y/Z
+  restent compatibles et les projets anisotropes ne sont pas migrés.
+- C-QUALITY : 473 tests, transport Qt, syntaxe JavaScript, compileall,
+  frontière adsk et diff-check passés ; observation Fusion 0.1.32 avant P44-M007.
+- print-validated: false.
