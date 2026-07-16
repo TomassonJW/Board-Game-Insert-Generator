@@ -13,16 +13,17 @@ Ce document est le point d’entrée court de reprise. Il indique l’état acti
 
 - Dernière preuve : `P44-M007H03 Fusion OK 0.1.40 - commit 92f07c8` ; P44-M007H03 est `fusion-validated`.
 - `print-validated: false` ; aucune valeur physique n’est calibrée par cette preuve.
-- Code produit : aucune mission runtime ouverte par ce document.
-- Prochaine action : gate humaine `P44-V`, préparée par P44-VP. P45 reste bloqué.
+- Code produit : P44-VH01 corrige la hauteur cachée transmise au solveur dans le package 0.1.41.
+- Prochaine action : gate humaine P44-VH01V. Après son OK, P44-VH02 est le seul lot de code ; P45 reste bloqué.
 
 ## Vue de séquence
 
 | État | Élément | Rôle |
 | --- | --- | --- |
 | Terminé | P44-M007H03 / H03V | UX et calcul sleeves observés dans Fusion 0.1.40. |
-| Prêt | P44-VP | Préparer checklist et dossier de preuve de P44-V, sans code produit. |
-| Bloqué | P44-V | Gate humaine globale, après P44-VP. |
+| Terminé | P44-VP | Dossier global préparé ; le retour P44-V 0.1.40 est un KO contextuel. |
+| Prêt | P44-VH01V | Vérifier que Z pilote réellement la hauteur multi-étages dans Fusion 0.1.41. |
+| KO contextuel | P44-V | Reprendre après P44-VH01V puis P44-VH02. |
 | Bloqué | P45 à P50, P67 à P69 | Dépendances et gates de version non satisfaites. |
 
 ## Autorité documentaire

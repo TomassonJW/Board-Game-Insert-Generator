@@ -224,8 +224,10 @@ const GLOBAL_CLEARANCE_BINDINGS={
 };
 function setObjectPath(path,value){const keys=path.split('.');let target=project;keys.slice(0,-1).forEach(key=>target=target[key]||(target[key]={}));target[keys.at(-1)]=value}
 function globalClearanceValue(name){const binding=GLOBAL_CLEARANCE_BINDINGS[name];if(!binding)return'';if(binding.valuePath)return getPath(binding.valuePath);const values=binding.axes.map(axis=>project.layout?.clearance_defaults_v1?.[binding.vector]?.[axis]);return values.length&&values.every(value=>value===values[0])?values[0]:''}
-function setGlobalClearance(name,value){const binding=GLOBAL_CLEARANCE_BINDINGS[name];if(!binding)return;if(binding.valuePath)setObjectPath(binding.valuePath,value);if(binding.legacyPath)setObjectPath(binding.legacyPath,value);if(binding.vector){const layout=project.layout||(project.layout={}),defaults=layout.clearance_defaults_v1||(layout.clearance_defaults_v1={}),sources=layout.clearance_default_sources_v1||(layout.clearance_default_sources_v1={});binding.axes.forEach(axis=>{defaults[binding.vector]={...(defaults[binding.vector]||{}),[axis]:value};sources[binding.vector]={...(sources[binding.vector]||{}),[axis]:'project_default'}})}markDirty()}
-function setPath(path,value){setObjectPath(path,value);markDirty()}
+function designHeightValue(){const z=Number(project?.box?.inner_dimensions_mm?.z??0),lid=Number(project?.box?.lid_clearance_mm??0);return Math.max(0,z-lid)}
+function syncDesignHeight(){if(project?.box)project.box.usable_height_mm=Math.max(0.0001,designHeightValue())}
+function setGlobalClearance(name,value){const binding=GLOBAL_CLEARANCE_BINDINGS[name];if(!binding)return;if(binding.valuePath)setObjectPath(binding.valuePath,value);if(binding.legacyPath)setObjectPath(binding.legacyPath,value);if(binding.vector){const layout=project.layout||(project.layout={}),defaults=layout.clearance_defaults_v1||(layout.clearance_defaults_v1={}),sources=layout.clearance_default_sources_v1||(layout.clearance_default_sources_v1={});binding.axes.forEach(axis=>{defaults[binding.vector]={...(defaults[binding.vector]||{}),[axis]:value};sources[binding.vector]={...(sources[binding.vector]||{}),[axis]:'project_default'}})}if(name==='container_box_z')syncDesignHeight();markDirty()}
+function setPath(path,value){setObjectPath(path,value);if(path==='box.inner_dimensions_mm.z')syncDesignHeight();markDirty()}
 function numberValue(input,optional=false){if(input.value==='')return optional?null:0;return Number(input.value)}
 function state(label,kind=''){const el=$('#project-state');el.dataset.kind=kind;el.innerHTML=`<span class="status-dot ${kind}"></span>${esc(label)}`}
 function message(text,kind='ok'){const el=$('#global-message');if(messageTimer!==null){clearTimeout(messageTimer);messageTimer=null}el.textContent=text||'';el.className=`message ${text?'show ':''}${kind}`;if(!text)return;const duration=kind==='ok'?3000:6000;messageTimer=setTimeout(()=>{messageTimer=null;if(el.textContent===text){el.textContent='';el.className='message'}},duration)}
@@ -246,6 +248,7 @@ function captureUiState(){const active=document.activeElement,scroll=document.sc
 function restoreUiState(snapshot){if(!snapshot)return;$$('details').forEach(detail=>{const open=snapshot.details[detail.dataset.uiDetails||detail.id];if(open!==undefined)detail.open=open});$$('[data-object-id]').forEach(card=>card.toggleAttribute('data-ui-active-card',Boolean(snapshot.card&&card.dataset.objectId===snapshot.card)));const apply=()=>{const scroll=document.scrollingElement,restoreScroll=()=>{if(scroll){scroll.scrollTop=snapshot.scrollTop;scroll.scrollLeft=snapshot.scrollLeft}};restoreScroll();const field=snapshot.field&&$$('[data-ui-field]').find(input=>input.dataset.uiField===snapshot.field);if(!field)return;try{field.focus({preventScroll:true})}catch(_error){field.focus()}if(snapshot.selection&&typeof field.setSelectionRange==='function'){try{field.setSelectionRange(snapshot.selection.start,snapshot.selection.end,snapshot.selection.direction)}catch(_error){}}restoreScroll()};if(typeof requestAnimationFrame==='function')requestAnimationFrame(apply);else setTimeout(apply,0)}
 function failProjectRequest(requestId,error){const item=pending.get(requestId);if(item)clearTimeout(item.timeout);pending.delete(requestId);if(item?.derivedKey&&latestDerivedRequest[item.derivedKey]===requestId)adaptiveStatus='error';state('Connexion Fusion interrompue','error');message(`Le bridge Fusion a refusé la requête : ${String(error)}`,'error');renderLifecycle()}
 function sendProject(action,extra={},quiet=false,origin='manual'){
+  if(project)syncDesignHeight();
   if(solvedStale&&['materialize_project','regenerate_project'].includes(action)){message('La proposition ne correspond plus aux valeurs saisies. Recalcule avant de mettre Fusion à jour.','warn');return}
   if(!project&&action!=='load_project'){state('Projet en cours de chargement...');message('Connexion au moteur en cours. La demande sera disponible dans un instant.','warn');requestBootstrap();return}
   if(action==='solve_project'&&origin!=='adaptive'){if(deriveTimer!==null){clearTimeout(deriveTimer);deriveTimer=null}cancelAdaptiveSolve();adaptiveStatus='solving';renderLifecycle()}
@@ -258,6 +261,7 @@ function sendProject(action,extra={},quiet=false,origin='manual'){
   try{const call=adsk.fusionSendData(BRIDGE_ACTION,JSON.stringify(payload));if(call&&typeof call.catch==='function')call.catch(error=>failProjectRequest(requestId,error))}catch(error){failProjectRequest(requestId,error)}
 }
 function sendDocument(action){
+  if(project)syncDesignHeight();
   if(!project){message('Le projet est encore en cours de chargement.','warn');return}
   const requestId='p61-document-'+Date.now()+'-'+(++sequence),payload={schema:REQUEST_SCHEMA,request_id:requestId,action,project};
   state(action==='open_project_file'?'Ouverture du fichier...':'Choix du fichier...');
@@ -296,7 +300,7 @@ function handleResponse(payload){
 
 function renderBindings(){$$('[data-path]').forEach(input=>{const value=getPath(input.dataset.path);if(input.type==='checkbox')input.checked=Boolean(value);else input.value=value??''});$$('[data-global-clearance]').forEach(input=>{const value=globalClearanceValue(input.dataset.globalClearance);input.value=value??'';input.placeholder=value===''?'Valeurs mixtes':''})}
 function renderDocument(){
-  const info=documentInfo||{},currentName=info.current_name||'',currentPath=info.current_path||'',recovery=Boolean(info.recovery_available),status=$('#document-status'),description=$('#document-description'),save=$('#save-document-action'),recent=$('#recent-documents'),height=$('#design-height'),z=Number(project?.box?.inner_dimensions_mm?.z??0),lid=Number(project?.box?.lid_clearance_mm??0),design=Math.max(0,z-lid);
+  const info=documentInfo||{},currentName=info.current_name||'',currentPath=info.current_path||'',recovery=Boolean(info.recovery_available),status=$('#document-status'),description=$('#document-description'),save=$('#save-document-action'),recent=$('#recent-documents'),height=$('#design-height'),design=designHeightValue();
   if(height)height.value=`${design.toFixed(2).replace(/\.00$/,'')} mm`;
   if(status){status.textContent=currentName?`Fichier : ${currentName}`:'Document non nomme';status.title=currentPath||'Choisis Enregistrer sous pour creer un fichier projet.'}
   if(save)save.disabled=!currentPath;

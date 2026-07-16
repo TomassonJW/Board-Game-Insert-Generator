@@ -2242,3 +2242,14 @@ P44-VP devient la seule mission `ready` : elle prépare P44-V sans ouvrir P45 ni
 ## P44-VP - Préparation de la gate globale P44 (2026-07-16)
 
 Statut : done, gate-prepared, documentation-validated. Le dossier et le script installent et contrôlent le package 0.1.40 de référence `92f07c8`, puis ne laissent à Thomas que la revue Fusion globale. P44-V devient la seule action humaine suivante. Aucun runtime, solveur, schéma, tolérance, géométrie, scène automatique ou valeur physique ne change ; `print-validated: false`.
+
+
+## P44-VH01 - Correction du plafond Z réellement transmis
+
+Le retour P44-V a confirmé tous les autres points observés, mais a produit un KO contextuel sur un projet dense : environ 23 conteneurs, plusieurs éléments plats et impossibilité persistante malgré un Z de boîte porté à 5 000 mm.
+
+Le solveur multi-étages n’était pas la cause primaire. La palette affichait Hauteur de conception = Z moins jeu sous couvercle, tandis que le payload conservait une ancienne box.usable_height_mm. Le cœur continuait donc à chercher dans l’ancienne hauteur et rejetait correctement les cavités qui ne pouvaient pas gagner les 10 mm de réservation supérieure.
+
+P44-VH01 synchronise la hauteur cachée avec la valeur dérivée lors des deux éditions concernées et avant tout envoi moteur ou document. Une régression de 24 conteneurs avec plateau et 5 000 mm réellement disponibles construit plusieurs étages sans collision. Le solveur, ses budgets et ses heuristiques ne changent pas.
+
+Package : 0.1.41. Statut : implemented, automated-validated, human-fusion-check-required, fusion-validated: false, print-validated: false. P44-V reste ouverte. P44-VH02 est le lot UX suivant ; P45 reste bloqué.

@@ -285,6 +285,24 @@ class PartitionSolverTests(unittest.TestCase):
         self.assertIn("stack_partition_index", stacked["solver"]["search_origin"])
         self.assertTrue(any(stage["spanning_body_ids"] for stage in stacked["stages"]))
 
+    def test_many_containers_with_a_top_inset_use_multiple_stages_when_height_is_available(self) -> None:
+        project = mixed_height_cards_project(23)
+        project["box"]["inner_dimensions_mm"]["z"] = 5000.0
+        project["box"]["usable_height_mm"] = 5000.0
+        project["flat_items"] = [{
+            "id": "board", "name": "Plateau", "kind": "board",
+            "dimensions_mm": {"x": 220.0, "y": 160.0, "z": 10.0},
+            "quantity": 1, "stack_order": 0,
+        }]
+
+        result = solve_partition_plan(project)
+
+        self.assertEqual(result["summary"]["status"], "constructed")
+        self.assertGreater(result["summary"]["stage_count"], 1)
+        self.assertEqual(result["summary"]["placed_container_count"], 24)
+        self.assertEqual(result["top_inset_reservations"]["status"], "applied")
+        self.assertTrue(result["validation"]["no_collisions"])
+
     def test_is_deterministic_for_the_same_normalized_project(self) -> None:
         first = solve_partition_plan(project_with_groups(4))
         second = solve_partition_plan(project_with_groups(4))

@@ -717,3 +717,10 @@ La maintenance documentaire isole un point de reprise court, synchronisé et aud
 ## P44-VP - Préparation de la gate globale P44 (2026-07-16)
 
 Le package 0.1.40 de référence `92f07c8` reçoit un dossier et une préparation Fusion reproductible. La prochaine étape est P44-V ; P45 reste bloqué. Aucun comportement produit ou physique ne change.
+
+
+## P44-VH01 - Cohérence Z et reprise multi-étages (2026-07-16)
+
+Le KO contextuel P44-V a révélé une divergence de données dans la palette : Z et la hauteur affichée changeaient sans mettre à jour box.usable_height_mm. Le package 0.1.41 synchronise cette hauteur dérivée avant calcul et persistance, sans modifier le solveur volumétrique. Gate P44-VH01V requise.
+
+Après cette gate, P44-VH02 traite uniquement la suppression directe, la confirmation de suppression d’un conteneur non vide et les noms incrémentaux. P44-V reste ouverte et P45 demeure bloqué. print-validated: false.

@@ -427,6 +427,18 @@ class FusionPaletteDomTests(unittest.TestCase):
             self.markup.index('<div class="action-zone center">'),
         )
 
+    def test_keeps_solver_usable_height_synced_with_the_visible_design_height(self) -> None:
+        for marker in (
+            "function designHeightValue()",
+            "function syncDesignHeight()",
+            "project.box.usable_height_mm=Math.max(0.0001,designHeightValue())",
+            "if(path===\'box.inner_dimensions_mm.z\')syncDesignHeight()",
+            "if(name===\'container_box_z\')syncDesignHeight()",
+        ):
+            self.assertIn(marker, self.markup)
+        self.assertGreaterEqual(self.markup.count("if(project)syncDesignHeight();"), 2)
+        self.assertNotIn("design=Math.max(0,z-lid)", self.markup)
+
     def test_preserves_interaction_state_with_stable_identifiers_and_rejects_stale_derivations(self) -> None:
         for marker in (
             "sourceRevision", "stampUiIdentifiers", "captureUiState", "restoreUiState",

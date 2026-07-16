@@ -2000,7 +2000,7 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
 - Observation : novice/expert, petite/grande palette, clavier, cinquante
   conteneurs, import historique et scene preservee.
 - Limite : qualifie la fondation de palette, ni geometrie P45 ni impression.
-- Statut : `human-gate-ready` après P44-VP ; P45 reste bloqué jusqu’au retour P44-V.
+- Statut : contextual-KO sur 0.1.40 ; reprendre après P44-VH01V puis P44-VH02. P45 reste bloqué.
 
 Frontieres P44 : coeur sans adsk, complements en quarantaine, aucune scene
 automatique et aucun changement de solveur/tolerance/geometrie par glissement.
@@ -2302,3 +2302,21 @@ P44-M007 est ready-for-explicit-go.
 - Statut : done, automated-validated, fusion-validated: true,
   print-validated: false. Preuve Fusion :
   `P44-M007H03 Fusion OK 0.1.40 - commit 92f07c8`.
+
+
+#### P44-VH01 - Cohérence hauteur de conception / solveur multi-étages
+
+- Déclencheur : KO contextuel P44-V avec environ 23 conteneurs, réservations supérieures et modification de Z sans effet sur le plafond réel du solveur.
+- Cause : box.inner_dimensions_mm.z et la hauteur visible changeaient, mais box.usable_height_mm restait ancien dans les payloads de la palette.
+- Correction : synchronisation Z moins jeu sous couvercle avant validation, solve et persistance ; solveur, budgets, tolérances et géométrie inchangés.
+- Livrable : package 0.1.41 et gate P44-VH01V.
+- Statut : implemented, automated-validated, human-fusion-check-required, fusion-validated: false, print-validated: false.
+
+#### P44-VH02 - Suppression directe et noms de conteneurs non ambigus
+
+- Dépendance : P44-VH01V acceptée.
+- Ajouter un bouton Supprimer directement à côté du menu de chaque élément.
+- Pour un conteneur non vide, demander explicitement la suppression du conteneur et de tous ses éléments ; une annulation ne modifie rien.
+- Attribuer un suffixe numérique incrémental à tout nouveau conteneur dont le nom existe déjà.
+- Ne changer ni schéma, ni solveur, ni géométrie, ni scène automatique.
+- Statut : ready-after-p44-vh01v ; autorisation produit déjà reçue, lot non commencé.

@@ -56,7 +56,7 @@ class FusionOnlyAlignmentTests(unittest.TestCase):
         self.assertIn('class="eyebrow">BGIG</span>', markup)
         self.assertIn("bgig.palette.request.v1", markup)
 
-    def test_next_action_records_p44_m007_without_promoting_print(self) -> None:
+    def test_next_action_records_p44_vh01_without_promoting_print(self) -> None:
         actions = self.read("docs/NEXT_ACTIONS.md")
         decision = self.read("docs/DECISIONS/ADR-0064-global-container-clearances.md")
         contract = self.read("docs/P44_M007_ADAPTIVE_CALCULATION_CONTRACT.md")
@@ -64,10 +64,11 @@ class FusionOnlyAlignmentTests(unittest.TestCase):
         self.assertIn("mvp-accepted", actions)
         self.assertIn("P44-M009H05", actions)
         self.assertIn("0.1.36", actions)
-        self.assertIn("P44-M007H03V", actions)
+        self.assertIn("P44-VH01V", actions)
         self.assertIn("0.1.37", actions)
         self.assertIn("human-fusion-check-required", actions)
-        self.assertIn("P44-M007H03 Fusion OK 0.1.40 - commit <sha>", actions)
+        self.assertIn("P44-VH01 Fusion OK 0.1.41 - commit <sha>", actions)
+        self.assertIn("P44-VH02", actions)
         self.assertIn("350 ms", contract)
         self.assertIn("1 500 ms", contract)
         self.assertIn("annulation logique", contract)

@@ -1,6 +1,6 @@
 # P44-V — Gate globale de fondation UX
 
-Statut : `human-fusion-check-required`.
+Statut : contextual-KO ; superseded-until-P44-VH01V et P44-VH02.
 
 ## Déclencheur
 
@@ -12,7 +12,13 @@ ADR-0062 : palette Fusion seule, quatre espaces cohérents, édition stable, con
 
 Preuves de support : densité/cartes `2f78a99`, conteneurs `80c1a6c`, navigation `7b71d01`, création `b8cf884`, document `d82def6`, réglages `7c76ba0`, saisie/aperçu `92f07c8`. Elles ne remplacent pas l’observation globale actuelle.
 
-## Préparation Codex
+## KO contextuel du 2026-07-16
+
+Le parcours avec environ 23 conteneurs et des réservations supérieures a révélé une divergence entre le Z visible et box.usable_height_mm réellement envoyé au solveur. P44-VH01 corrige ce défaut dans le package 0.1.41.
+
+Les demandes de suppression directe, confirmation transactionnelle d’un conteneur non vide et nommage incrémental sont isolées dans P44-VH02. Le retour global P44-V 0.1.40 ne doit pas être envoyé.
+
+## Préparation historique 0.1.40 — ne pas relancer
 
 ```powershell
 .\scripts\fusion\prepare_p44_v_foundation_ux_test.ps1 -RepoRoot (Get-Location).Path
@@ -28,7 +34,7 @@ Preuves de support : densité/cartes `2f78a99`, conteneurs `80c1a6c`, navigation
 6. Ouvrir et enregistrer sous un projet historique : héritages, overrides compatibles et hauteur dérivée restent cohérents.
 7. Avec une scène BGIG existante, confirmer qu’aucune saisie, sauvegarde, vérification ou prévisualisation ne la modifie ; seul `Matérialiser dans Fusion` peut le faire.
 
-## Retour attendu
+## Retour historique 0.1.40 — ne pas envoyer
 
 `P44-V Fusion OK 0.1.40 - package 92f07c8`
 

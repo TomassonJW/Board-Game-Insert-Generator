@@ -1219,3 +1219,12 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - C-QUALITY : package 0.1.40 installable et contrôlé avant observation humaine.
 - Limites : P44-VP n’est pas une validation Fusion ; `print-validated: false`.
 - Suite : retour humain P44-V, puis seulement P45 si la gate est acceptée.
+
+
+## P44-VH01 - Cohérence hauteur dérivée et calcul volumétrique
+
+- C-USABILITY : la hauteur visible dans Réglages est exactement celle transmise au cœur après édition de Z ou du jeu sous couvercle.
+- C-LAYOUT : la capacité multi-étages existante est couverte par une régression à 24 conteneurs avec réservation supérieure et hauteur abondante.
+- C-QUALITY : aucun état caché usable_height_mm divergent ne traverse validation, solve, autosave ou sauvegarde nommée depuis la palette.
+- C-FUSION-UI : package 0.1.41 automated-validated ; gate Fusion P44-VH01V requise.
+- Limites : solveur, budgets, tolérances, géométrie et valeurs physiques inchangés ; fusion-validated: false, print-validated: false.

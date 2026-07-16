@@ -247,3 +247,8 @@ Retour OK :
 Cette gate qualifie l’UX et le calcul logiciel observés. Elle ne calibre pas les
 valeurs physiques, ne valide pas la géométrie imprimée et ne vaut pas validation
 d’impression. `print-validated: false` reste inchangé.
+
+
+## Correctif post-gate P44-VH01
+
+Le KO contextuel P44-V a révélé que la présentation dérivée était correcte mais que box.usable_height_mm pouvait rester ancien dans le payload. P44-VH01 synchronise désormais cette donnée redondante avec Z moins le jeu sous couvercle avant calcul et persistance. Le solveur, ses budgets, ses heuristiques et les valeurs physiques ne changent pas. Voir P44_VH01_DESIGN_HEIGHT_MULTISTAGE_CONTRACT.md.

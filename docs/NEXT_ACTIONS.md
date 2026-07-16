@@ -42,17 +42,17 @@ impression réelle n’est validée ; `print-validated: false` reste obligatoire
 
 ## Prochaine action recommandée
 
-### P44-V - Gate humaine de fondation UX
+### P44-VH01V - Vérification de la hauteur réellement calculée
 
-Statut : human-fusion-check-required. P44-VP est terminée : le dossier et le script de préparation sont disponibles dans [P44_V_FOUNDATION_UX_GATE.md](P44_V_FOUNDATION_UX_GATE.md).
+Statut : human-fusion-check-required. Le KO P44-V a révélé que Z visible pouvait diverger de box.usable_height_mm envoyé au solveur. P44-VH01 est implemented et automated-validated dans le package 0.1.41, sans changement du solveur.
 
-Thomas vérifie dans Fusion le parcours court décrit par le dossier, puis répond :
+Thomas relance le projet dense après installation, modifie Z, puis vérifie que Hauteur de conception et le calcul multi-étages suivent cette valeur. Retour attendu :
 
-```text
-P44-V Fusion OK 0.1.40 - package 92f07c8
-```
+    P44-VH01 Fusion OK 0.1.41 - commit <sha>
 
-Un KO doit indiquer le scénario, la largeur approximative ou le nombre de conteneurs, l’action et le résultat observé. Cette gate ne valide ni P45, ni une valeur physique, ni une impression ; `print-validated: false` reste obligatoire.
+Après ce retour, P44-VH02 est la seule mission de code suivante : suppression directe d’un élément, confirmation pour supprimer un conteneur non vide avec tous ses éléments, et nom de conteneur incrémental en cas de doublon.
+
+P44-V reste ouverte ; P45 ne commence pas. print-validated: false.
 
 ## Lots découverts, non ouverts
 
@@ -64,8 +64,8 @@ Un KO doit indiquer le scénario, la largeur approximative ou le nombre de conte
 
 P44-M005, P44-M006 et P44-M009H05 sont fusion-validated pour leurs parcours UX.
 P44-M007H03 est désormais fusion-validated dans Fusion 360 ; P0-M010 et P44-VP
-sont terminées. P44-V est la seule action humaine suivante ; P45/P46 ne commencent
-pas avant son retour positif. P47-P50 restent bloqués jusqu’à P46 et P69 jusqu’à P50.
+sont terminées. P44-VH01V est la seule action humaine suivante ; P44-V reste en KO
+contextuel et P45/P46 ne commencent pas avant sa reprise positive après P44-VH02. P47-P50 restent bloqués jusqu’à P46 et P69 jusqu’à P50.
 P68 peut recueillir des faits réels sans modifier les valeurs par défaut.
 
 ## Fin de chaque mission
