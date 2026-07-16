@@ -2209,3 +2209,18 @@ P44-M007 reste bloquée jusqu’à P44-M009H05V.
 - Statut : done, implemented, automated-validated, fusion-validated le 2026-07-16 (P44-M009H05 Fusion OK 0.1.36 - commit 7c76ba0), print-validated: false.
 
 P44-M007 est ready-for-explicit-go.
+
+#### P44-M007H01 - Focus stable, cartes explicites et conteneurs repliables
+
+- Capability : C-FUSION-UI, C-USABILITY, C-PROJECT-CONTRACT et C-QUALITY.
+- Dépendances : P44-M007 intégrée ; retour humain KO du package 0.1.37.
+- Livrable : package 0.1.38 ; mises à jour de fond sans remplacement du DOM
+  éditable, peinture dérivée différée, champs cartes conditionnels, deltas
+  sleeves optionnels et conteneurs repliables.
+- Non-objectifs : solveur, budgets, tolérances, valeurs physiques validées,
+  géométrie, CAD IR, scène automatique, frontend/Vite/local_composer.
+- Validation : 481 tests, JS, PowerShell, compileall, exemple CLI, frontière
+  adsk, diff-check et gate Fusion reproductible.
+- Statut : done-code, implemented, automated-validated,
+  human-fusion-check-required par P44-M007H01V, fusion-validated: false,
+  print-validated: false.

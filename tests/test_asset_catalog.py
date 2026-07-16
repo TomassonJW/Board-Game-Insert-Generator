@@ -26,6 +26,22 @@ class AssetCatalogTests(unittest.TestCase):
             40.0,
         )
 
+    def test_explicit_sleeve_deltas_override_catalog_and_stack_defaults(self) -> None:
+        self.assertEqual(
+            card_format_dimensions(
+                "poker", sleeved=True, sleeve_extra_xy_mm=2.0
+            ),
+            {"x": 65.5, "y": 90.9},
+        )
+        self.assertEqual(
+            card_stack_thickness_mm(
+                mode="count", declared_thickness_mm=1, quantity=100,
+                card_thickness_mm=0.32, sleeved=True,
+                sleeve_extra_z_mm_per_card=0.1,
+            ),
+            42.0,
+        )
+
     def test_orientations_change_xyz_and_auto_respects_available_height(self) -> None:
         base = {"x": 63.0, "y": 88.0, "z": 24.0}
 

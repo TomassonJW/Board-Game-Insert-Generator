@@ -2138,3 +2138,35 @@ La palette valide les dérivations après 350 ms sans nouvelle édition puis dem
 Dans Aperçu, le statut compact et les vues dessus/X-Z précèdent désormais les alertes et les détails. `Matérialiser dans Fusion` reste l’unique action de matérialisation et n’est jamais appelée automatiquement. `Hauteur de conception` reste calculée depuis Z moins le jeu sous couvercle, `readonly`, hors tabulation et visiblement grisée.
 
 Aucun schéma, bridge Python, solveur, budget, valeur physique, tolérance, géométrie, CAD IR ou comportement de scène ne change. Validation : 477 tests, syntaxe JavaScript, tests ciblés DOM/Aperçu/transport Qt/squelette, parse PowerShell, suite complète, `compileall`, exemple CLI, frontière `adsk` et préparation dry-run de la gate passent. P44-M007V est la seule action suivante ; aucune validation d’impression n’est acquise.
+
+## P44-M007H01 - Focus stable, cartes explicites et conteneurs repliables (2026-07-16)
+
+Statut : implemented, automated-validated, package 0.1.38,
+human-fusion-check-required par P44-M007H01V, fusion-validated: false,
+print-validated: false.
+
+Le retour humain sur le package 0.1.37 a confirmé une perte de focus et de
+sélection lors des éditions rapides. La cause était la reconstruction complète
+du DOM éditable à chacune des réponses silencieuses d’autosave, validation et
+solve. La palette 0.1.38 met désormais à jour les statuts, l’Aperçu et les faits
+calculés sans remplacer les champs. La peinture des dimensions dérivées est
+différée tant qu’un champ éditable reste actif ; un rendu complet n’est conservé
+que pour une mutation réellement structurelle.
+
+Les cartes placent `Méthode de mesure` entre Forme et X. `Épaisseur paquet`
+affiche Z et masque Qté/Épaisseur carte ; `Épaisseur carte × nb` fait
+l’inverse. Les sleeves exposent un delta commun X/Y et un delta Z par carte en
+mode compté. Les champs projet correspondants sont optionnels : leur absence
+conserve le catalogue historique, leur activation dans la nouvelle UI propose
+2,0 mm et 0,08 mm. Ces valeurs restent non validées physiquement.
+
+Chaque conteneur devient une section repliable indépendante : son en-tête
+complet reste visible et seuls ses assets sont masqués. Le solveur, ses budgets,
+les tolérances, la géométrie, la CAD IR et la matérialisation automatique ne
+changent pas.
+
+Validation automatisée : 481 tests, syntaxe JavaScript, tests ciblés
+catalogue/projet/presets/DOM/transport, parse PowerShell, dry-run de gate,
+`compileall`, exemple CLI, frontière `adsk` et `git diff --check`.
+P44-M007H01V est la seule action suivante. Aucune validation d’impression n’est
+acquise.

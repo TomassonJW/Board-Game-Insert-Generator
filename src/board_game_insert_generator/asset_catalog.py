@@ -9,7 +9,8 @@ CARD_CATALOG_SCHEMA_V1 = "bgig.card_catalog.v1"
 STORAGE_ORIENTATIONS = frozenset({"flat", "upright_long_edge", "upright_short_edge", "auto"})
 CARD_STACK_MODES = frozenset({"thickness", "count"})
 
-_SLEEVE_STACK_EXTRA_MM = 0.08
+DEFAULT_SLEEVE_EXTRA_XY_MM = 2.0
+DEFAULT_SLEEVE_EXTRA_Z_MM_PER_CARD = 0.08
 _CARD_FORMATS = (
     {"id": "poker", "label": "Poker / Standard", "unsleeved_mm": {"x": 63.5, "y": 88.9}, "sleeved_mm": {"x": 66.0, "y": 91.0}},
     {"id": "standard_euro", "label": "Standard europeen", "unsleeved_mm": {"x": 59.0, "y": 92.0}, "sleeved_mm": {"x": 61.0, "y": 94.0}},
@@ -29,13 +30,24 @@ def card_catalog() -> dict[str, object]:
     return {"schema_version": CARD_CATALOG_SCHEMA_V1, "formats": deepcopy(list(_CARD_FORMATS))}
 
 
-def card_format_dimensions(format_id: str, *, sleeved: bool) -> dict[str, float]:
+def card_format_dimensions(
+    format_id: str,
+    *,
+    sleeved: bool,
+    sleeve_extra_xy_mm: float | None = None,
+) -> dict[str, float]:
     """Resolve the visible XY dimensions of one named card format."""
 
     for item in _CARD_FORMATS:
         if item["id"] == format_id:
-            key = "sleeved_mm" if sleeved else "unsleeved_mm"
-            return {axis: float(item[key][axis]) for axis in ("x", "y")}
+            if not sleeved:
+                return {axis: float(item["unsleeved_mm"][axis]) for axis in ("x", "y")}
+            if sleeve_extra_xy_mm is None:
+                return {axis: float(item["sleeved_mm"][axis]) for axis in ("x", "y")}
+            return {
+                axis: _round(float(item["unsleeved_mm"][axis]) + sleeve_extra_xy_mm)
+                for axis in ("x", "y")
+            }
     raise AssetCatalogError(f"Unknown card format: {format_id!r}.")
 
 
@@ -46,6 +58,7 @@ def card_stack_thickness_mm(
     quantity: int,
     card_thickness_mm: float,
     sleeved: bool,
+    sleeve_extra_z_mm_per_card: float | None = None,
 ) -> float:
     """Resolve a full deck thickness from a declaration or a counted stack."""
 
@@ -53,7 +66,12 @@ def card_stack_thickness_mm(
         raise AssetCatalogError(f"Unsupported card stack mode: {mode!r}.")
     if mode == "thickness":
         return _round(declared_thickness_mm)
-    per_card = card_thickness_mm + (_SLEEVE_STACK_EXTRA_MM if sleeved else 0.0)
+    sleeve_extra = (
+        DEFAULT_SLEEVE_EXTRA_Z_MM_PER_CARD
+        if sleeve_extra_z_mm_per_card is None
+        else sleeve_extra_z_mm_per_card
+    )
+    per_card = card_thickness_mm + (sleeve_extra if sleeved else 0.0)
     return _round(quantity * per_card)
 
 

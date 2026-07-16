@@ -413,6 +413,8 @@ Cette gate qualifie uniquement la composition UI et le comportement du sélecteu
 
 ## P44-M007V - Calcul adaptatif et Aperçu priorisé 0.1.37
 
+Statut : KO fonctionnel observé en saisie rapide ; le package reconstruisait le DOM éditable et perdait focus/sélection. Gate remplacée par P44-M007H01V.
+
 Déclencheur : P44-M007 est intégrée dans `main`, le package 0.1.37 est installé avec `scripts/fusion/prepare_p44_m007_adaptive_preview_test.ps1`, et les validations automatisées sont passées.
 
 Vérifier dans Fusion :
@@ -430,3 +432,43 @@ Retour OK :
 `P44-M007 Fusion OK 0.1.37 - commit <sha>`
 
 Cette gate qualifie uniquement l’orchestration UI et l’ordre de l’Aperçu observés dans Fusion. Elle ne valide ni les valeurs physiques, ni la géométrie imprimée, ni l’impression. `print-validated: false` reste inchangé et P44-V demeure la gate globale suivante.
+
+## P44-M007H01V - Focus stable, cartes explicites et conteneurs repliables 0.1.38
+
+Déclencheur : P44-M007H01 est intégrée dans `main`, le package 0.1.38 est
+installé avec `scripts/fusion/prepare_p44_m007_adaptive_preview_test.ps1`, et
+les validations automatisées sont passées.
+
+Vérifier dans Fusion :
+
+1. sélectionner entièrement la valeur d’un champ numérique, saisir son
+   remplacement puis enchaîner immédiatement sur au moins deux autres champs ;
+   les réponses d’autosave, minima et proposition ne retirent ni focus ni
+   sélection ;
+2. arrêter la saisie ; après environ 1,5 seconde, seule la proposition
+   correspondant aux dernières valeurs devient visible ;
+3. sur une carte, vérifier que `Méthode de mesure` est entre Forme et X ;
+4. avec `Épaisseur paquet`, vérifier que Z apparaît et que Qté et Épaisseur
+   carte sont masqués ;
+5. avec `Épaisseur carte × nb`, vérifier que Z est masqué et que Qté et
+   Épaisseur carte apparaissent ;
+6. activer les sleeves : vérifier le delta X/Y et, en mode compté, le delta Z
+   par carte ; les deux restent modifiables ;
+7. replier puis déplier un conteneur ; son en-tête complet reste visible et
+   seuls ses assets disparaissent lorsqu’il est replié ;
+8. ouvrir Aperçu ; statut compact et vues dessus/X-Z précèdent alertes et
+   détails ;
+9. utiliser `Recalculer maintenant` sans création ou modification de scène ;
+10. vérifier que `Hauteur de conception` est grisée, dérivée et non éditable ;
+11. vérifier qu’aucune scène BGIG ne change avant un clic explicite sur
+    `Matérialiser dans Fusion`.
+
+Retour OK :
+
+`P44-M007H01 Fusion OK 0.1.38 - commit <sha>`
+
+Cette gate qualifie uniquement l’orchestration UI, la stabilité de saisie et la
+composition des cartes et conteneurs observées dans Fusion. Elle ne valide ni
+les valeurs physiques, ni la géométrie imprimée, ni l’impression.
+`print-validated: false` reste inchangé et P44-V demeure la gate globale
+suivante.

@@ -661,3 +661,19 @@ Le package 0.1.37 orchestre la palette en deux temps : dérivations à 350 ms pu
 L’Aperçu présente désormais son statut et ses projections réelles avant les alertes et détails. `Matérialiser dans Fusion` reste unique, persistant et strictement manuel ; `Hauteur de conception` reste dérivée, grisée et non éditable. Aucun schéma, solveur, budget, valeur physique, tolérance, géométrie ou contrat CAD ne change.
 
 Statut : implemented, automated-validated, human-fusion-check-required par P44-M007V, fusion-validated: false, print-validated: false. P45/P46 et les lots ultérieurs restent verrouillés jusqu’aux gates P44 prévues.
+
+## P44-M007H01 - Correction de saisie et clarification cartes/conteneurs (2026-07-16)
+
+Le package 0.1.37 a échoué la vérification humaine de saisie rapide : chaque
+réponse d’autosave, validation ou solve reconstruisait le DOM et pouvait retirer
+focus ou sélection. Le package 0.1.38 sépare désormais les mises à jour de fond
+du rendu structurel, diffère la peinture dérivée pendant une édition et conserve
+les doubles gardes de réponses obsolètes.
+
+Le même lot borné clarifie la méthode de mesure des cartes, rend les deltas
+sleeves X/Y et Z explicites sans migration des anciens projets, et transforme
+les conteneurs en sections repliables à en-tête permanent.
+
+Statut : implemented, automated-validated, human-fusion-check-required par
+P44-M007H01V, fusion-validated: false, print-validated: false. Aucun lot P45/P46,
+P47-P50, P67, P68 ou P69 n’est ouvert.

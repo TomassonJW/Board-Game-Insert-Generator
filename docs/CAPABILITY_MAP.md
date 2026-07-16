@@ -1151,3 +1151,18 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - C-QUALITY : réponses obsolètes rejetées par révision source et dernière identité de requête ; une seule action de matérialisation explicite ; package 0.1.37 et gate reproductible.
 - C-SOLVER / C-TOLERANCE / C-GEOMETRY / C-CAD-IR : aucun changement fonctionnel, aucune recalibration et aucun appel adaptatif de scène.
 - Suite : P44-M007 est implemented et automated-validated, fusion-validated: false ; P44-M007V est la seule action suivante ; print-validated: false.
+
+## P44-M007H01 - Capability update corrective (2026-07-16)
+
+- C-FUSION-UI : les réponses de fond ne remplacent plus le DOM éditable ; focus,
+  sélection et saisie rapide deviennent des invariants de la gate 0.1.38.
+- C-USABILITY : champs cartes conditionnels, deltas sleeves visibles et
+  conteneurs repliables avec en-tête permanent.
+- C-PROJECT-CONTRACT : deux champs sleeves optionnels et additifs ; absence
+  préservée au roundtrip pour les projets historiques.
+- C-QUALITY : 481 tests, garde d’obsolescence conservée, rendu complet limité
+  aux mutations structurelles et gate P44-M007H01V reproductible.
+- Limites : valeurs de départ sleeves non validées physiquement ; solveur,
+  tolérances, géométrie et scène inchangés ; fusion-validated: false ;
+  print-validated: false.
+- Suite : P44-M007H01V est la seule action suivante autorisée.

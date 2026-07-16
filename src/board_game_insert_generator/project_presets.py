@@ -41,6 +41,8 @@ _CONTENT_PRESETS = (
             "dimension_source": "catalog",
             "card_format_id": "poker",
             "sleeved": True,
+            "sleeve_extra_xy_mm": 2.0,
+            "sleeve_extra_z_mm_per_card": 0.08,
             "storage_orientation": "auto",
             "card_stack_mode": "count",
             "card_thickness_mm": 0.32,

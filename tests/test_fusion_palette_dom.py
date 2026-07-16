@@ -94,7 +94,7 @@ class FusionPaletteDomTests(unittest.TestCase):
             ".container-primary-grid{display:flex",
             'class="card row-card technical-card content-card child-card"',
             'class="card row-card technical-card flat-card"',
-            'class="card row-card technical-card group-card"',
+            "group-card ${collapsed?'is-collapsed':''}",
             'class="card technical-card box-card"',
             'class="flat-secondary-grid"',
             'class="content-children"',
@@ -297,6 +297,55 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertIn('Calculée automatiquement', self.markup)
         self.assertIn('id="design-height" readonly aria-readonly="true" tabindex="-1"', self.markup)
 
+    def test_keeps_background_updates_out_of_editable_dom_and_defers_layout_paint(self) -> None:
+        quiet_start = self.markup.index("if(pendingRequest?.quiet)")
+        quiet_end = self.markup.index("if(payload.partition)", quiet_start)
+        quiet_branch = self.markup[quiet_start:quiet_end]
+        self.assertIn("renderBackgroundUpdate(action)", quiet_branch)
+        self.assertNotIn("renderAll()", quiet_branch)
+        for marker in (
+            "function renderBackgroundUpdate(action)",
+            "function editableFieldActive()",
+            "deferredDerivedPaint=true",
+            "function flushDeferredDerivedPaint()",
+            "document.addEventListener('focusout'",
+            "function renderDerivedFacts()",
+        ):
+            self.assertIn(marker, self.markup)
+        change_start = self.markup.index("document.addEventListener('change'")
+        change_end = self.markup.index("window.fusionJavaScriptHandler=", change_start)
+        change_handler = self.markup[change_start:change_end]
+        self.assertIn("if(structural)renderAll()", change_handler)
+        self.assertNotIn("markDirty();renderAll()", change_handler)
+
+    def test_switches_card_measure_fields_and_exposes_explicit_sleeve_deltas(self) -> None:
+        for marker in (
+            "M\u00e9thode de mesure",
+            "\u00c9paisseur paquet",
+            "\u00c9paisseur carte \u00d7 nb",
+            "counted?'':dimensionField('z')",
+            "const quantityField=!isCards||counted?",
+            "const thicknessField=counted?",
+            "sleeve_extra_xy_mm",
+            "sleeve_extra_z_mm_per_card",
+            "DEFAULT_SLEEVE_EXTRA_XY_MM=2",
+            "DEFAULT_SLEEVE_EXTRA_Z_MM_PER_CARD=.08",
+            'placeholder="Catalogue"',
+        ):
+            self.assertIn(marker, self.markup)
+
+    def test_collapses_and_expands_each_container_without_hiding_its_primary_line(self) -> None:
+        for marker in (
+            "collapsedGroups=new Set()",
+            'data-action="toggle-group"',
+            "function toggleGroup(groupId,button)",
+            ".group-card.is-collapsed .row-details{display:none}",
+            'aria-expanded="${String(!collapsed)}"',
+            '<div class="container-primary-grid">',
+            '<div class="row-details">${customDetails}${children}</div>',
+        ):
+            self.assertIn(marker, self.markup)
+
     def test_exposes_the_p61_lifecycle_and_keeps_healthy_inspection_out_of_global_messages(self) -> None:
         for marker in ("renderLifecycle", "scheduleDerived", "solvedStale", "Ancienne proposition", "technical_detail"):
             self.assertIn(marker, self.markup)
@@ -418,10 +467,12 @@ class FusionPaletteDomTests(unittest.TestCase):
     def test_prepares_the_p44_m007_adaptive_preview_gate(self) -> None:
         script = (ROOT / "scripts" / "fusion" / "prepare_p44_m007_adaptive_preview_test.ps1").read_text(encoding="utf-8")
         for marker in (
-            "0.1.37", "DERIVE_DEBOUNCE_MS=350", "AUTO_SOLVE_STABILITY_MS=1500",
-            "latestDerivedRequest", "Recalculer maintenant", "preview-status",
+            "0.1.38", "DERIVE_DEBOUNCE_MS=350", "AUTO_SOLVE_STABILITY_MS=1500",
+            "latestDerivedRequest", "renderBackgroundUpdate(action)", "deferredDerivedPaint",
+            "sleeve_extra_xy_mm", "sleeve_extra_z_mm_per_card", "toggle-group",
+            "Recalculer maintenant", "preview-status",
             "preview-explanations", "[char]0x00E9",
-            "exactly one explicit materialize action", "P44-M007 Fusion OK 0.1.37",
+            "exactly one explicit materialize action", "P44-M007H01 Fusion OK 0.1.38",
         ):
             self.assertIn(marker, script)
 

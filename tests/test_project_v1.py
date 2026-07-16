@@ -148,6 +148,8 @@ class ProjectV1Tests(unittest.TestCase):
         self.assertEqual(catalog_content["base_dimensions_mm"], {"x": 66.0, "y": 91.0, "z": 40.0})
         self.assertEqual(catalog_content["resolved_orientation"], "upright_long_edge")
         self.assertEqual(catalog_content["dimensions_mm"], {"x": 91.0, "y": 40.0, "z": 66.0})
+        self.assertNotIn("sleeve_extra_xy_mm", catalog_content)
+        self.assertNotIn("sleeve_extra_z_mm_per_card", catalog_content)
 
         content.update({
             "dimension_source": "explicit",
@@ -158,6 +160,20 @@ class ProjectV1Tests(unittest.TestCase):
         explicit = normalize_project_draft(project).project["contents"][0]
         self.assertEqual(explicit["base_dimensions_mm"], {"x": 70.0, "y": 100.0, "z": 20.0})
         self.assertEqual(explicit["dimensions_mm"], {"x": 70.0, "y": 100.0, "z": 20.0})
+
+        content.update({
+            "dimension_source": "catalog",
+            "card_format_id": "poker",
+            "card_stack_mode": "count",
+            "storage_orientation": "flat",
+            "sleeve_extra_xy_mm": 2.0,
+            "sleeve_extra_z_mm_per_card": 0.1,
+        })
+        overridden = normalize_project_draft(project).project["contents"][0]
+        self.assertEqual(overridden["base_dimensions_mm"], {"x": 65.5, "y": 90.9, "z": 42.0})
+        self.assertEqual(overridden["dimensions_mm"], {"x": 65.5, "y": 90.9, "z": 42.0})
+        self.assertEqual(overridden["sleeve_extra_xy_mm"], 2.0)
+        self.assertEqual(overridden["sleeve_extra_z_mm_per_card"], 0.1)
 
     def test_legacy_migration_preserves_groups_flats_and_deferred_features(self) -> None:
         legacy = starter_draft()

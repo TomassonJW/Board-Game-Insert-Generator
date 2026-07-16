@@ -555,6 +555,7 @@ def _validate_contents(
                 "measurement_confidence", "dimension_source", "card_format_id",
                 "sleeved", "storage_orientation", "resolved_orientation",
                 "card_stack_mode", "card_thickness_mm",
+                "sleeve_extra_xy_mm", "sleeve_extra_z_mm_per_card",
             },
             field,
         )
@@ -627,6 +628,12 @@ def _validate_content_geometry(
             raise ProjectContractError(f"{field}.card_format_id must be a non-empty string or null.")
         card_format_id = format_value.strip()
     sleeved = _optional_bool(raw.get("sleeved"), False, f"{field}.sleeved")
+    sleeve_extra_xy = _optional_non_negative_number(
+        raw.get("sleeve_extra_xy_mm"), f"{field}.sleeve_extra_xy_mm"
+    )
+    sleeve_extra_z = _optional_non_negative_number(
+        raw.get("sleeve_extra_z_mm_per_card"), f"{field}.sleeve_extra_z_mm_per_card"
+    )
     stack_mode = _optional_enum(
         raw.get("card_stack_mode"), CARD_STACK_MODES, "thickness", f"{field}.card_stack_mode"
     )
@@ -638,14 +645,20 @@ def _validate_content_geometry(
         if card_format_id is None:
             raise ProjectContractError(f"{field}.card_format_id is required for catalog dimensions.")
         try:
-            catalog_xy = card_format_dimensions(card_format_id, sleeved=sleeved)
+            catalog_xy = card_format_dimensions(
+                card_format_id,
+                sleeved=sleeved,
+                sleeve_extra_xy_mm=sleeve_extra_xy,
+            )
         except AssetCatalogError as exc:
             raise ProjectContractError(f"{field}.card_format_id is not supported: {card_format_id!r}.") from exc
         base.update(catalog_xy)
     try:
         base["z"] = card_stack_thickness_mm(
             mode=stack_mode, declared_thickness_mm=base["z"], quantity=quantity,
-            card_thickness_mm=card_thickness, sleeved=sleeved,
+            card_thickness_mm=card_thickness,
+            sleeved=sleeved,
+            sleeve_extra_z_mm_per_card=sleeve_extra_z,
         )
         requested_orientation = _optional_enum(
             raw.get("storage_orientation"), STORAGE_ORIENTATIONS, "flat",
@@ -656,7 +669,7 @@ def _validate_content_geometry(
         )
     except AssetCatalogError as exc:
         raise ProjectContractError(f"{field} has an invalid card configuration: {exc}") from exc
-    return {
+    geometry = {
         "dimensions_mm": resolved,
         "base_dimensions_mm": base,
         "dimension_source": dimension_source,
@@ -667,6 +680,11 @@ def _validate_content_geometry(
         "card_stack_mode": stack_mode,
         "card_thickness_mm": card_thickness,
     }
+    if "sleeve_extra_xy_mm" in raw:
+        geometry["sleeve_extra_xy_mm"] = sleeve_extra_xy
+    if "sleeve_extra_z_mm_per_card" in raw:
+        geometry["sleeve_extra_z_mm_per_card"] = sleeve_extra_z
+    return geometry
 
 
 def _validate_flat_items(values: list[object], *, layout: dict[str, object]) -> list[dict[str, object]]:
