@@ -17,6 +17,7 @@ from board_game_insert_generator.asset_catalog import (
     AssetCatalogError,
     card_format_dimensions,
     card_stack_thickness_mm,
+    explicit_card_xy_dimensions,
     orient_dimensions,
 )
 
@@ -556,7 +557,7 @@ def _validate_contents(
                 "sleeved", "storage_orientation", "resolved_orientation",
                 "card_stack_mode", "card_thickness_mm",
                 "sleeve_extra_xy_mm", "sleeve_extra_z_mm_per_card",
-                "card_stack_declared_thickness_mm",
+                "card_stack_declared_thickness_mm", "card_declared_xy_mm",
             },
             field,
         )
@@ -635,6 +636,11 @@ def _validate_content_geometry(
     sleeve_extra_z = _optional_non_negative_number(
         raw.get("sleeve_extra_z_mm_per_card"), f"{field}.sleeve_extra_z_mm_per_card"
     )
+    declared_xy = (
+        _xy_dimension(raw.get("card_declared_xy_mm"), f"{field}.card_declared_xy_mm")
+        if "card_declared_xy_mm" in raw
+        else {axis: base[axis] for axis in ("x", "y")}
+    )
     stack_mode = _optional_enum(
         raw.get("card_stack_mode"), CARD_STACK_MODES, "thickness", f"{field}.card_stack_mode"
     )
@@ -663,6 +669,17 @@ def _validate_content_geometry(
         except AssetCatalogError as exc:
             raise ProjectContractError(f"{field}.card_format_id is not supported: {card_format_id!r}.") from exc
         base.update(catalog_xy)
+    else:
+        try:
+            base.update(
+                explicit_card_xy_dimensions(
+                    declared_xy,
+                    sleeved=sleeved,
+                    sleeve_extra_xy_mm=sleeve_extra_xy,
+                )
+            )
+        except AssetCatalogError as exc:
+            raise ProjectContractError(f"{field} has invalid explicit card dimensions: {exc}") from exc
     try:
         base["z"] = card_stack_thickness_mm(
             mode=stack_mode, declared_thickness_mm=declared_stack_thickness, quantity=quantity,
@@ -698,6 +715,10 @@ def _validate_content_geometry(
         stack_mode == "thickness" and sleeved and sleeve_extra_z is not None
     ):
         geometry["card_stack_declared_thickness_mm"] = declared_stack_thickness
+    if "card_declared_xy_mm" in raw or (
+        dimension_source == "explicit" and sleeve_extra_xy is not None
+    ):
+        geometry["card_declared_xy_mm"] = declared_xy
     return geometry
 
 
@@ -964,6 +985,12 @@ def _dimension(value: object, field: str) -> dict[str, float]:
     raw = _mapping(value, field)
     _reject_unknown(raw, {"x", "y", "z"}, field)
     return {axis: _positive_number(raw, axis, field) for axis in ("x", "y", "z")}
+
+
+def _xy_dimension(value: object, field: str) -> dict[str, float]:
+    raw = _mapping(value, field)
+    _reject_unknown(raw, {"x", "y"}, field)
+    return {axis: _positive_number(raw, axis, field) for axis in ("x", "y")}
 
 
 def _positive_number(raw: dict[str, object], key: str, field: str) -> float:

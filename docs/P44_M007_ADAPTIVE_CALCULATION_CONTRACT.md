@@ -1,6 +1,6 @@
 # P44-M007 - Calcul adaptatif et Aperçu priorisé
 
-Statut : implémenté et automated-validated dans le package Fusion 0.1.39 ; gate corrective P44-M007H02V requise, fusion-validated: false, print-validated: false.
+Statut : implémenté et automated-validated dans le package Fusion 0.1.40 ; gate corrective P44-M007H03V requise, fusion-validated: false, print-validated: false.
 
 ## Objectif
 
@@ -13,7 +13,9 @@ Le retour humain sur le package 0.1.37 a révélé qu’autosave, validation et 
 reconstruisaient chacun le DOM éditable. Cette reconstruction retirait le focus,
 la sélection et parfois la position de saisie. P44-M007H01 corrige cette cause
 structurelle. P44-M007H02 conserve cette correction et finalise la présentation
-cartes/sleeves demandée dans le même périmètre UX.
+cartes/sleeves demandée. Le retour Fusion sur 0.1.39 a ensuite révélé un delta
+X/Y manuel absent du résultat et des faits visuellement anciens ; P44-M007H03
+corrige ces deux défauts et simplifie les contrôles dans le même périmètre UX.
 
 ## Périmètre autorisé
 
@@ -30,8 +32,9 @@ cartes/sleeves demandée dans le même périmètre UX.
 
 Le bridge JSON, le solveur, ses budgets, ses heuristiques, les tolérances, la
 géométrie, la CAD IR et la matérialisation restent inchangés. L’extension de
-`bgig.project.v1` est strictement additive pour les deux deltas de sleeves et le
-Z de paquet déclaré, nécessaire pour empêcher un cumul au roundtrip.
+`bgig.project.v1` est strictement additive pour les deux deltas de sleeves, le
+Z de paquet déclaré et le X/Y manuel déclaré, nécessaires pour empêcher tout
+cumul au roundtrip.
 Aucun import `adsk` n’entre dans le cœur Python.
 
 ## Cycle adaptatif
@@ -106,10 +109,16 @@ En mode `count`, Z reste dérivé de la quantité multipliée par l’épaisseur
 d’une carte plus le delta sleeve Z par carte. Le delta X/Y reste un ajout total,
 identique sur X et Y.
 
+Pour des dimensions manuelles, X et Y saisis sont conservés séparément dans
+`card_declared_xy_mm`. Le résultat ajoute le delta X/Y uniquement lorsque
+`Sleeves` est actif. Ainsi X = 66, Y = 88 et delta = 3 donnent 69 × 91 ; un
+roundtrip ou une désactivation des sleeves ne cumule pas le delta et restitue
+66 × 88. `Nb cartes` reste dérivé du Z déclaré, jamais du Z déjà résolu.
+
 Compatibilité : si les deltas sont absents d’un ancien projet, le comportement
 catalogue antérieur est conservé. Le normaliseur ne les injecte pas et aucune
 migration silencieuse ne change ses dimensions. Le champ déclaré est ajouté
-uniquement lorsque le nouveau calcul thickness+sleeves en a besoin. Les valeurs
+uniquement lorsque le nouveau calcul sleeves en a besoin. Les valeurs
 3,0 mm, 0,19 mm et 0,31 mm restent non fusion-validated physiquement et
 non print-validated.
 
@@ -119,7 +128,9 @@ Chaque conteneur est une section repliable, de type accordéon indépendant.
 Son en-tête reste toujours visible : nom, nombre d’éléments, minimum calculé,
 mode, dimensions cibles éventuelles, épaisseurs, ajout et suppression. Replier
 masque uniquement le détail et les assets. L’état replié est local à la palette
-et n’entre pas dans le schéma projet.
+et n’entre pas dans le schéma projet. Un contrôle global discret placé à droite
+du titre `Conteneurs` replie ou déplie tous les conteneurs sans modifier le
+projet ; les contrôles individuels restent disponibles.
 
 ## Aperçu priorisé
 
@@ -157,7 +168,10 @@ Aucune valeur physique n’est recalibrée par cette présentation.
 - rerender complet limité aux mutations structurelles ;
 - visibilité conditionnelle des champs cartes couverte ;
 - deltas de sleeves validés et rétrocompatibilité couverte ;
-- conteneurs repliables et attributs d’accessibilité couverts ;
+- conteneurs repliables individuellement et globalement, avec attributs d’accessibilité couverts ;
+- résultat carte marqué `À recalculer` dès une édition, sans exposer un fait ancien ;
+- delta X/Y manuel et non-cumul au roundtrip couverts ;
+- modes de densité obsolètes absents ;
 - action `Vérifier` absente du parcours normal ;
 - fallback `Recalculer maintenant` présent ;
 - exactement une action `materialize_project` dans le DOM ;
@@ -165,9 +179,11 @@ Aucune valeur physique n’est recalibrée par cette présentation.
 - hauteur dérivée non éditable et visiblement grisée ;
 - syntaxe JavaScript, tests ciblés, suite complète, `compileall`, exemple CLI,
   frontière `adsk` du cœur et `git diff --check` passés ;
-- manifest et runtime installé en 0.1.39.
+- manifest et runtime installé en 0.1.40.
 
 ## Gate humaine P44-M007H02V
+
+Statut : superseded-after-contextual-KO par P44-M007H03V.
 
 P44-M007H01V est supersédée avant observation par cette gate qui inclut le
 correctif cartes/sleeves 0.1.39.
@@ -194,3 +210,40 @@ P44-M007H02 Fusion OK 0.1.39 - commit <sha>
 Cette preuve qualifie l’UX et le calcul logiciel observés, mais ne calibre ni les
 valeurs physiques, ni la géométrie imprimée, ni l’impression.
 `print-validated: false` reste obligatoire.
+
+## P44-M007H03V - Repli global et résolution sleeves cohérente 0.1.40
+
+Statut : human-fusion-check-required. Le retour Fusion sur 0.1.39 a montré que
+le delta X/Y manuel n’entrait pas dans `Résolu`, que les faits dérivés pouvaient
+rester anciens pendant le cycle adaptatif et que l’estimation était alors
+difficile à interpréter. P44-M007H02V est supersédée par cette gate corrective.
+
+Déclencheur : P44-M007H03 est intégrée dans `main`, le package 0.1.40 est
+installé avec `scripts/fusion/prepare_p44_m007_adaptive_preview_test.ps1`, et
+les validations automatisées sont passées.
+
+Vérifier dans Fusion :
+
+1. remplacer rapidement la sélection complète d’au moins trois champs sans perte
+   de focus ni de sélection ;
+2. pendant le recalcul, le fait carte affiche `À recalculer`, puis uniquement le
+   résultat correspondant à la dernière saisie ;
+3. les boutons `Compact` et `Détaillé` sont absents ;
+4. le bouton discret à droite de `Conteneurs` replie et déplie tous les
+   conteneurs, tandis que chaque conteneur reste pilotable individuellement ;
+5. les placeholders des épaisseurs de paroi et de fond indiquent `Défaut` ;
+6. les contrôles cartes tiennent sur une ligne large et le champ grisé est nommé
+   `Nb cartes` ;
+7. pour X = 66, Y = 88, Z = 27, sleeves actifs, delta X/Y = 3 et delta Z/carte =
+   0,19, `Nb cartes` vaut 87 et `Résolu` vaut 69 × 91 × 43,53 mm ;
+8. désactiver les sleeves ramène `Résolu` à 66 × 88 × 27 mm sans cumul ;
+9. l’Aperçu, le fallback manuel, la hauteur grisée et la matérialisation
+   exclusivement explicite restent conformes.
+
+Retour OK :
+
+`P44-M007H03 Fusion OK 0.1.40 - commit <sha>`
+
+Cette gate qualifie l’UX et le calcul logiciel observés. Elle ne calibre pas les
+valeurs physiques, ne valide pas la géométrie imprimée et ne vaut pas validation
+d’impression. `print-validated: false` reste inchangé.

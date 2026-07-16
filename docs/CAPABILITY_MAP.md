@@ -1186,3 +1186,22 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
   print-validated: false.
 - Suite : P44-M007H02V est la seule action suivante autorisée. Les dispositions
   non-cartes sont candidates de P45, pas de P44.
+
+## P44-M007H03 - Capability update corrective (2026-07-16)
+
+- C-ASSET : X/Y manuels déclarés séparément dans `card_declared_xy_mm` ; delta
+  sleeve X/Y appliqué une seule fois lorsque `Sleeves` est actif.
+- C-PROJECT : champ additif roundtrippable ; anciens projets sans champ ni delta
+  conservés sans migration destructive.
+- C-UX : faits cartes invalidés explicitement par `À recalculer`, ligne cartes
+  plus compacte, `Nb cartes`, repli global et individuel, placeholders
+  `Défaut`, modes de densité supprimés.
+- C-QUALITY : reproduction automatisée du cas 66 × 88 × 27 + deltas 3/0,19,
+  résultat 69 × 91 × 43,53 et roundtrip sans cumul ; 484 tests passent.
+- C-SOLVER / C-TOLERANCE / C-GEOMETRY / C-CAD-IR : aucune modification du
+  placement, aucune recalibration et aucune scène automatique.
+- Limites : fusion-validated: false ; print-validated: false ; valeurs sleeves
+  non validées physiquement.
+- Suite : P44-M007H03V est la seule action suivante autorisée. Les dispositions
+  non-cartes restent candidates de P45 et P0-M010 reste la maintenance
+  documentaire séparée après cette gate.

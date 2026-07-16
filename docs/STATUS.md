@@ -2201,3 +2201,30 @@ catalogue/projet/presets/DOM/transport, parse PowerShell, dry-run de gate,
 `compileall`, exemple CLI, frontière `adsk` et diff-check. P44-M007H02V est
 la seule action suivante. Les valeurs 3, 0,19 et 0,31 mm ne sont pas calibrées
 physiquement et aucune validation d’impression n’est acquise.
+
+## P44-M007H03 - Repli global et résolution sleeves fiable (2026-07-16)
+
+Statut : implemented, automated-validated, package 0.1.40,
+human-fusion-check-required par P44-M007H03V, fusion-validated: false,
+print-validated: false.
+
+Le retour Fusion sur 0.1.39 a confirmé deux défauts : le delta sleeve X/Y
+n’était pas appliqué aux cartes en dimensions manuelles et un fait `Résolu`
+ancien pouvait rester visible pendant autosave, validation et solve. Le cœur
+conserve désormais `card_declared_xy_mm` séparément des dimensions résolues,
+comme il le faisait déjà pour le Z déclaré. Le cas signalé 66 × 88 × 27 mm avec
+deltas 3 mm et 0,19 mm/carte estime 87 cartes et résout 69 × 91 × 43,53 mm ;
+désactiver les sleeves restitue 66 × 88 × 27 mm et le roundtrip ne cumule rien.
+
+La palette marque immédiatement les faits cartes `À recalculer` après une
+édition et ne repeint le résultat courant qu’après acceptation de la dérivation
+correspondante. Les champs secondaires ont été compactés, `Nb cartes` remplace
+le libellé long, les modes obsolètes `Compact`/`Détaillé` ont été supprimés,
+les placeholders d’épaisseur indiquent `Défaut` et un contrôle global replie ou
+déplie tous les conteneurs sans mutation du projet.
+
+Validation automatisée : 484 tests passent, syntaxe JavaScript, parse
+PowerShell, dry-run de gate, `compileall`, exemple CLI, frontière `adsk` et
+diff-check. Le solveur de placement, ses budgets, les tolérances, la géométrie,
+la CAD IR et la scène restent inchangés. Les valeurs 3, 0,19 et 0,31 mm ne sont
+pas calibrées physiquement. P44-M007H03V est la seule action suivante.

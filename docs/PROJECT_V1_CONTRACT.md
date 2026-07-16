@@ -71,21 +71,26 @@ Une ligne `shape_kind: cards` peut utiliser les champs suivants :
 | `card_format_id` | Format du catalogue, ou `null` pour des dimensions explicites |
 | `card_stack_mode` | `thickness` pour une épaisseur totale ou `count` pour épaisseur de carte × quantité |
 | `card_stack_declared_thickness_mm` | Z du paquet saisi avant ajout sleeves, additif et utile au mode `thickness` |
+| `card_declared_xy_mm` | X/Y manuels saisis avant delta sleeves, additif et stable au roundtrip |
 | `card_thickness_mm` | Épaisseur d’une carte, active pour `count` |
 | `sleeved` | Active la résolution avec sleeves ; `false` par défaut dans le preset `Cartes` |
 | `sleeve_extra_xy_mm` | Delta total optionnel, identique sur X et Y |
 | `sleeve_extra_z_mm_per_card` | Delta Z optionnel ajouté à chaque carte dans les deux modes |
 
-Les deltas et le Z déclaré doivent être finis ; les deltas sont supérieurs ou
-égaux à zéro et le Z déclaré est strictement positif. Leur absence conserve le
+Les deltas, le Z déclaré et le X/Y déclaré doivent être finis ; les deltas sont
+supérieurs ou égaux à zéro et les dimensions déclarées sont strictement positives.
+Leur absence conserve le
 comportement catalogue historique : le normaliseur ne les injecte pas dans un
 ancien projet et ne recalcule pas implicitement ses dimensions.
 
 Dans la nouvelle UI, activer les sleeves initialise les valeurs communes
 éditables à 3,0 mm sur X/Y et 0,19 mm par carte sur Z. En mode `thickness`, le
 nombre estimé est `max(1, floor(declared_Z / 0.31 + 0.5))` et le Z résolu vaut
-`declared_Z + estimated_count × sleeve_extra_z_mm_per_card`. Le champ déclaré
-reste stable au roundtrip afin de ne jamais cumuler la surépaisseur.
+`declared_Z + estimated_count × sleeve_extra_z_mm_per_card`. Les champs déclarés
+restent stables au roundtrip afin de ne jamais cumuler la surépaisseur. Pour des
+dimensions manuelles, le X/Y résolu vaut `card_declared_xy_mm + sleeve_extra_xy_mm`
+sur chaque axe lorsque les sleeves sont actifs ; sans sleeves, le X/Y déclaré
+est restitué.
 
 En mode `count`, Z vaut
 `quantity × (card_thickness_mm + sleeve_extra_z_mm_per_card)`. Décocher les

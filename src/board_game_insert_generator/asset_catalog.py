@@ -54,6 +54,23 @@ def card_format_dimensions(
     raise AssetCatalogError(f"Unknown card format: {format_id!r}.")
 
 
+def explicit_card_xy_dimensions(
+    declared_dimensions_mm: dict[str, float],
+    *,
+    sleeved: bool,
+    sleeve_extra_xy_mm: float | None = None,
+) -> dict[str, float]:
+    """Resolve manually declared card XY without compounding sleeve deltas."""
+
+    declared = {axis: float(declared_dimensions_mm[axis]) for axis in ("x", "y")}
+    if any(value <= 0 for value in declared.values()):
+        raise AssetCatalogError("Declared card X/Y dimensions must be positive.")
+    if sleeve_extra_xy_mm is not None and sleeve_extra_xy_mm < 0:
+        raise AssetCatalogError("Sleeve X/Y delta must be non-negative.")
+    delta = sleeve_extra_xy_mm if sleeved and sleeve_extra_xy_mm is not None else 0.0
+    return {axis: _round(value + delta) for axis, value in declared.items()}
+
+
 def card_stack_thickness_mm(
     *,
     mode: str,

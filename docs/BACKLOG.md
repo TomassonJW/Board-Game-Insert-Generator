@@ -2263,7 +2263,7 @@ P44-M007 est ready-for-explicit-go.
 ### P0-M010 - Compacter le pilotage de reprise
 
 - Capability : pilotage projet et C-QUALITY.
-- Dépendance : P44-M007H02V observée ; mission documentaire isolée.
+- Dépendance : P44-M007H03V observée ; mission documentaire isolée.
 - Objectif : réduire le coût de reprise, les lectures redondantes et les risques
   de divergence du backlog/roadmap sans perdre l’historique auditable.
 - Livrable : index courant court, vues `actif / prochain / bloqué`, archives
@@ -2274,4 +2274,20 @@ P44-M007 est ready-for-explicit-go.
   verts ; aucune suppression destructive d’historique.
 - Non-objectifs : changement produit, solveur, schéma ou réécriture massive sans
   plan de migration documentaire.
-- Statut : todo-after-P44-M007H02V.
+- Statut : todo-after-P44-M007H03V.
+
+#### P44-M007H03 - Repli global et résolution sleeves fiable
+
+- Capability : C-ASSET, C-PROJECT, C-UX, C-QUALITY.
+- Milestone : P44 / V0.2 foundation UX.
+- Dépendance : retour Fusion contextuel KO sur P44-M007H02V.
+- Livrable : package 0.1.40 ; X/Y manuel déclaré sans cumul, fait
+  `À recalculer`, ligne cartes compacte, `Nb cartes`, repli global,
+  placeholders `Défaut`, suppression complète des modes de densité.
+- Critères : 66 × 88 × 27 avec sleeves 3/0,19 donne 87 cartes et
+  69 × 91 × 43,53 ; sans sleeves 66 × 88 × 27 ; roundtrip stable ; aucune scène
+  automatique ; une seule matérialisation explicite.
+- Validation : tests cœur/DOM/transport, syntaxe JS, suite complète,
+  `compileall`, exemple CLI, frontière `adsk`, gate Fusion reproductible.
+- Statut : done, automated-validated, human-fusion-check-required par
+  P44-M007H03V, fusion-validated: false, print-validated: false.

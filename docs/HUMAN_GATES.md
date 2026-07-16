@@ -477,8 +477,9 @@ suivante.
 
 ## P44-M007H02V - Focus stable et calcul sleeves cartes 0.1.39
 
-Statut : human-fusion-check-required. Cette gate remplace P44-M007H01V, qui
-n’a pas été observée dans Fusion avant l’intégration du correctif cartes 0.1.39.
+Statut : superseded-after-contextual-KO par P44-M007H03V. Le retour Fusion sur
+0.1.39 a montré un delta X/Y manuel absent de `Résolu` et des faits dérivés
+visuellement anciens. Cette gate remplaçait P44-M007H01V, non observée.
 
 Déclencheur : P44-M007H02 est intégrée dans `main`, le package 0.1.39 est
 installé avec `scripts/fusion/prepare_p44_m007_adaptive_preview_test.ps1`, et
@@ -510,3 +511,40 @@ Cette gate qualifie la stabilité de saisie, la composition UI et le calcul
 logiciel observés. Elle ne calibre pas physiquement 3 mm, 0,19 mm ou 0,31 mm,
 ne valide pas la géométrie imprimée et ne vaut pas validation d’impression.
 `print-validated: false` reste inchangé.
+
+## P44-M007H03V - Repli global et résolution sleeves cohérente 0.1.40
+
+Statut : human-fusion-check-required. Le retour Fusion sur 0.1.39 a montré que
+le delta X/Y manuel n’entrait pas dans `Résolu`, que les faits dérivés pouvaient
+rester anciens pendant le cycle adaptatif et que l’estimation était alors
+difficile à interpréter. P44-M007H02V est supersédée par cette gate corrective.
+
+Déclencheur : P44-M007H03 est intégrée dans `main`, le package 0.1.40 est
+installé avec `scripts/fusion/prepare_p44_m007_adaptive_preview_test.ps1`, et
+les validations automatisées sont passées.
+
+Vérifier dans Fusion :
+
+1. remplacer rapidement la sélection complète d’au moins trois champs sans perte
+   de focus ni de sélection ;
+2. pendant le recalcul, le fait carte affiche `À recalculer`, puis uniquement le
+   résultat correspondant à la dernière saisie ;
+3. les boutons `Compact` et `Détaillé` sont absents ;
+4. le bouton discret à droite de `Conteneurs` replie et déplie tous les
+   conteneurs, tandis que chaque conteneur reste pilotable individuellement ;
+5. les placeholders des épaisseurs de paroi et de fond indiquent `Défaut` ;
+6. les contrôles cartes tiennent sur une ligne large et le champ grisé est nommé
+   `Nb cartes` ;
+7. pour X = 66, Y = 88, Z = 27, sleeves actifs, delta X/Y = 3 et delta Z/carte =
+   0,19, `Nb cartes` vaut 87 et `Résolu` vaut 69 × 91 × 43,53 mm ;
+8. désactiver les sleeves ramène `Résolu` à 66 × 88 × 27 mm sans cumul ;
+9. l’Aperçu, le fallback manuel, la hauteur grisée et la matérialisation
+   exclusivement explicite restent conformes.
+
+Retour OK :
+
+`P44-M007H03 Fusion OK 0.1.40 - commit <sha>`
+
+Cette gate qualifie l’UX et le calcul logiciel observés. Elle ne calibre pas les
+valeurs physiques, ne valide pas la géométrie imprimée et ne vaut pas validation
+d’impression. `print-validated: false` reste inchangé.

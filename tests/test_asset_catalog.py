@@ -5,6 +5,7 @@ from board_game_insert_generator.asset_catalog import (
     card_format_dimensions,
     card_stack_thickness_mm,
     estimate_card_count_from_thickness,
+    explicit_card_xy_dimensions,
     orient_dimensions,
 )
 
@@ -45,6 +46,15 @@ class AssetCatalogTests(unittest.TestCase):
 
     def test_estimates_count_and_adds_explicit_sleeve_z_to_declared_stack(self) -> None:
         self.assertEqual(estimate_card_count_from_thickness(24.0), 77)
+        self.assertEqual(estimate_card_count_from_thickness(27.0), 87)
+        self.assertEqual(
+            explicit_card_xy_dimensions(
+                {"x": 66.0, "y": 88.0},
+                sleeved=True,
+                sleeve_extra_xy_mm=3.0,
+            ),
+            {"x": 69.0, "y": 91.0},
+        )
         self.assertEqual(
             card_stack_thickness_mm(
                 mode="thickness", declared_thickness_mm=24.0, quantity=60,

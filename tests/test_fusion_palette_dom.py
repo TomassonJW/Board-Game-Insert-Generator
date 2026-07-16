@@ -73,8 +73,9 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertNotIn("expert-mode", self.dom.ids)
         for marker in ("import-file", "preset-import-file", "personal-presets", "lifecycle", "technical-drawer", "technical-detail"):
             self.assertIn(marker, self.dom.ids)
-        for marker in ('data-density="compact"', 'data-density="detailed"', "local-details", "density-compact"):
-            self.assertIn(marker, self.markup)
+        self.assertIn("local-details", self.markup)
+        for marker in ('data-density="compact"', 'data-density="detailed"', "density-compact", "setDensity(", "bgig-list-density", "compact-summary"):
+            self.assertNotIn(marker, self.markup)
         for action in ("add-selected-content", "duplicate-content", "delete-content", "add-flat", "delete-flat", "add-group", "delete-group", "delete-complement"):
             self.assertIn(action, self.markup)
         self.assertNotIn('data-action="add-complement"', self.markup)
@@ -103,7 +104,9 @@ class FusionPaletteDomTests(unittest.TestCase):
             "@media(max-width:559px)",
         ):
             self.assertIn(marker, self.markup)
-        self.assertEqual(self.markup.count('aria-label="Densité des listes"'), 1)
+        self.assertNotIn('aria-label="Densité des listes"', self.markup)
+        self.assertNotIn(">Compact</button>", self.markup)
+        self.assertNotIn(">Détaillé</button>", self.markup)
         self.assertNotIn("<h2>Démarrage rapide</h2>", self.markup)
         self.assertNotIn("<h4>Éléments contenus</h4>", self.markup)
         self.assertIn('.workspace-toolbar,.view[data-panel="box"] .section-command-bar{position:sticky', self.markup)
@@ -264,7 +267,6 @@ class FusionPaletteDomTests(unittest.TestCase):
             "Taille calculée",
             "Avant modification - A reestimer",
             "Estimation deja en cours.",
-            "calculated?'Calculée '+dimText(calculated)+' | ':'')+status",
             "sendProject('solve_project')",
         ):
             self.assertIn(marker, self.markup)
@@ -310,6 +312,8 @@ class FusionPaletteDomTests(unittest.TestCase):
             "function flushDeferredDerivedPaint()",
             "document.addEventListener('focusout'",
             "function renderDerivedFacts()",
+            "derivedStale=true",
+            "markCardFactsPending()",
         ):
             self.assertIn(marker, self.markup)
         change_start = self.markup.index("document.addEventListener('change'")
@@ -331,8 +335,12 @@ class FusionPaletteDomTests(unittest.TestCase):
             "DEFAULT_SLEEVE_EXTRA_XY_MM=3",
             "DEFAULT_SLEEVE_EXTRA_Z_MM_PER_CARD=.19",
             "ESTIMATED_CARD_THICKNESS_MM=.31",
-            "Nombre de cartes estim\u00e9es",
+            "Nb cartes",
             "card_stack_declared_thickness_mm",
+            "card_declared_xy_mm",
+            "function estimatedCardCount",
+            "function markCardFactsPending",
+            "À recalculer",
             'placeholder="Catalogue"',
         ):
             self.assertIn(marker, self.markup)
@@ -346,21 +354,32 @@ class FusionPaletteDomTests(unittest.TestCase):
         sleeve_end = self.markup.index("const cardFields=", sleeve_start)
         self.assertNotIn("counted?", self.markup[sleeve_start:sleeve_end])
         self.assertIn(
-            'class="card-estimated-count">Nombre de cartes estim\u00e9es<input type="number"',
+            'class="card-estimated-count" title="Épaisseur paquet divisée par 0,31 mm',
             self.markup,
         )
+        self.assertIn(">Nb cartes<input type=\"number\"", self.markup)
+        self.assertNotIn("Nombre de cartes estimées", self.markup)
+        for marker in ("card-sleeve-toggle", "card-orientation-field", "card-sleeve-xy", "card-sleeve-z", ".card-resolved-fact{flex:"):
+            self.assertIn(marker, self.markup)
 
     def test_collapses_and_expands_each_container_without_hiding_its_primary_line(self) -> None:
         for marker in (
             "collapsedGroups=new Set()",
             'data-action="toggle-group"',
-            "function toggleGroup(groupId,button)",
+            "function toggleGroup(groupId)",
             ".group-card.is-collapsed .row-details{display:none}",
             'aria-expanded="${String(!collapsed)}"',
             '<div class="container-primary-grid">',
             '<div class="row-details">${customDetails}${children}</div>',
         ):
             self.assertIn(marker, self.markup)
+        for marker in (
+            'id="toggle-all-groups"', 'data-action="toggle-all-groups"',
+            "function toggleAllGroups()", "function renderToggleAllGroups()",
+            "Tout replier", "Tout déplier", 'placeholder="Défaut"',
+        ):
+            self.assertIn(marker, self.markup)
+        self.assertEqual(self.markup.count('placeholder="Défaut"'), 2)
 
     def test_exposes_the_p61_lifecycle_and_keeps_healthy_inspection_out_of_global_messages(self) -> None:
         for marker in ("renderLifecycle", "scheduleDerived", "solvedStale", "Ancienne proposition", "technical_detail"):
@@ -417,6 +436,7 @@ class FusionPaletteDomTests(unittest.TestCase):
             self.assertIn(marker, self.markup)
         self.assertIn("item?.id", self.markup)
         self.assertIn("pendingRequest?.derived&&(pendingRequest.sourceRevision!==sourceRevision", self.markup)
+        self.assertIn("payload.envelopes&&payload.flat_stack&&(bootstrap||pendingRequest?.sourceRevision===sourceRevision)", self.markup)
         self.assertIn("derived:quiet||Boolean(derivedKey),derivedKey,sourceRevision", self.markup)
         self.assertIn("renderAll({preserve:!(['load_project','import_project','new_project','open_project_file','open_recent_project'].includes(action)||bootstrap)})", self.markup)
         self.assertIn("if(['load_project','import_project','new_project','open_project_file','open_recent_project'].includes(action)||bootstrap)sourceRevision+=1", self.markup)
@@ -483,14 +503,16 @@ class FusionPaletteDomTests(unittest.TestCase):
     def test_prepares_the_p44_m007_adaptive_preview_gate(self) -> None:
         script = (ROOT / "scripts" / "fusion" / "prepare_p44_m007_adaptive_preview_test.ps1").read_text(encoding="utf-8")
         for marker in (
-            "0.1.39", "DERIVE_DEBOUNCE_MS=350", "AUTO_SOLVE_STABILITY_MS=1500",
+            "0.1.40", "DERIVE_DEBOUNCE_MS=350", "AUTO_SOLVE_STABILITY_MS=1500",
             "latestDerivedRequest", "renderBackgroundUpdate(action)", "deferredDerivedPaint",
+            "derivedStale=true", "markCardFactsPending",
             "DEFAULT_SLEEVE_EXTRA_XY_MM=3", "DEFAULT_SLEEVE_EXTRA_Z_MM_PER_CARD=.19",
             "ESTIMATED_CARD_THICKNESS_MM=.31", "card_stack_declared_thickness_mm",
-            "sleeve_extra_xy_mm", "sleeve_extra_z_mm_per_card", "toggle-group",
-            "Recalculer maintenant", "preview-status",
-            "preview-explanations", "[char]0x00E9",
-            "exactly one explicit materialize action", "P44-M007H02 Fusion OK 0.1.39",
+            "card_declared_xy_mm", "Nb cartes", "sleeve_extra_xy_mm",
+            "sleeve_extra_z_mm_per_card", "toggle-group", "toggle-all-groups",
+            "data-density=", "bgig-list-density", "compact-summary", "Recalculer maintenant",
+            "preview-status", "preview-explanations", "[char]0x00E9",
+            "exactly one explicit materialize action", "P44-M007H03 Fusion OK 0.1.40",
         ):
             self.assertIn(marker, script)
 

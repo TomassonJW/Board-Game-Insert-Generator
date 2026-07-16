@@ -694,3 +694,18 @@ P44-M007H02V, fusion-validated: false, print-validated: false. La gate H01 est
 supersédée. Les dispositions d’assets non-cartes restent dans P45 après P44-V ;
 aucun solveur de placement, tolérance, géométrie ou comportement de scène n’est
 modifié ici.
+
+## P44-M007H03 - Résolution cartes et repli global cohérents (2026-07-16)
+
+Le package 0.1.40 corrige le KO contextuel observé sur 0.1.39 : les cartes
+manuelles appliquent réellement le delta sleeve X/Y sans cumul, `Nb cartes`
+reste dérivé du Z déclaré et les faits anciens sont remplacés par
+`À recalculer` pendant le cycle adaptatif. Les contrôles cartes sont resserrés,
+les modes de densité obsolètes disparaissent et les conteneurs gagnent un repli
+global en plus du repli individuel.
+
+Statut : implemented, automated-validated, human-fusion-check-required par
+P44-M007H03V, fusion-validated: false, print-validated: false. Aucun solveur de
+placement, valeur physique, tolérance, géométrie, CAD IR ou comportement de
+scène n’est modifié. P45 reste bloqué jusqu’à la gate P44 appropriée et P0-M010
+reste séparé après la gate courante.
