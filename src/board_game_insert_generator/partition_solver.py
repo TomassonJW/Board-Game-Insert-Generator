@@ -81,7 +81,13 @@ def solve_partition_plan(raw_project: object) -> dict[str, object]:
             )
         )
 
-    participants = [_container_participant(item) for item in containers]
+    groups_by_id = {
+        str(group["id"]): group for group in _mappings(project["container_groups"])
+    }
+    participants = [
+        _container_participant(item, groups_by_id[str(item["container_group_id"])])
+        for item in containers
+    ]
     for value in _values(project["fill_elements"]):
         complement = _mapping(value)
         if complement["mode"] != "exact":
@@ -103,13 +109,16 @@ def solve_partition_plan(raw_project: object) -> dict[str, object]:
             evaluated=0, stage_solver=None,
         )
 
+    solver_xy_clearance, solver_box_clearance, solver_z_clearance = _solver_clearance_fallbacks(
+        participants, xy_clearance, box_xy_clearance, z_clearance
+    )
     stage_solver = solve_stage_portfolio(
         participants,
         box,
         storage_height,
-        xy_clearance,
-        box_clearance_mm=box_xy_clearance,
-        vertical_clearance_mm=z_clearance,
+        solver_xy_clearance,
+        box_clearance_mm=solver_box_clearance,
+        vertical_clearance_mm=solver_z_clearance,
         preference=str(project["solver_preference"]),
     )
     evaluated = int(_mapping(stage_solver["search"])["groupings_evaluated"])
@@ -293,18 +302,7 @@ def solve_partition_plan(raw_project: object) -> dict[str, object]:
         "source": {"source_schema": normalization.source_schema, "migrated": normalization.migrated},
         "project_name": project["project_name"],
         "box": {"inner_dimensions_mm": _rounded(box), "storage_height_mm": _round(storage_height)},
-        "clearance_policy": {
-            "box_perimeter_mm": _round(box_xy_clearance),
-            "between_bodies_mm": _round(xy_clearance),
-            "box_perimeter_xy_mm": _round(box_xy_clearance),
-            "between_bodies_xy_mm": _round(xy_clearance),
-            "between_bodies_z_mm": _round(z_clearance),
-            "box_top_z_clearance_mm": _round(float(_mapping(project["box"])["lid_clearance_mm"])),
-            "box_bottom_z_clearance_mm": 0.0,
-            "vertical_support_gap_mm": _round(z_clearance),
-            "vertical_support_contact_mm": 0.0,
-            "materialize_clearances": False,
-        },
+        "clearance_policy": _clearance_policy(project),
         "flat_stack": deepcopy(flat),
         "top_inset_reservations": _top_inset_payload(chosen_top_insets),
         "support": deepcopy(chosen_top_insets["support"]),
@@ -368,18 +366,7 @@ def _result(
             "inner_dimensions_mm": deepcopy(_mapping(project["box"])["inner_dimensions_mm"]),
             "storage_height_mm": _mapping(stack["flat_stack"])["storage_height_mm"],
         },
-        "clearance_policy": {
-            "box_perimeter_mm": _mapping(project["layout"])["container_box_xy_clearance_mm"],
-            "between_bodies_mm": _mapping(project["layout"])["layout_clearance_mm"],
-            "box_perimeter_xy_mm": _mapping(project["layout"])["container_box_xy_clearance_mm"],
-            "between_bodies_xy_mm": _mapping(project["layout"])["layout_clearance_mm"],
-            "between_bodies_z_mm": _mapping(project["layout"])["container_z_clearance_mm"],
-            "box_top_z_clearance_mm": _mapping(project["box"])["lid_clearance_mm"],
-            "box_bottom_z_clearance_mm": 0.0,
-            "vertical_support_gap_mm": _mapping(project["layout"])["container_z_clearance_mm"],
-            "vertical_support_contact_mm": 0.0,
-            "materialize_clearances": False,
-        },
+        "clearance_policy": _clearance_policy(project),
         "flat_stack": deepcopy(stack["flat_stack"]),
         "top_inset_reservations": _top_inset_payload(_mapping(stack["top_inset_reservations"])),
         "support": {"status": "unresolved", "top_support_count": 0, "coverage_ratio": 0.0},
@@ -431,7 +418,29 @@ def _result(
     return result
 
 
-def _container_participant(contract: dict[str, object]) -> dict[str, object]:
+def _clearance_policy(project: dict[str, object]) -> dict[str, object]:
+    layout = _mapping(project["layout"])
+    defaults = _mapping(layout["clearance_defaults_v1"])
+    sources = _mapping(layout["clearance_default_sources_v1"])
+    return {
+        "box_perimeter_mm": _round(float(layout["container_box_xy_clearance_mm"])),
+        "between_bodies_mm": _round(float(layout["layout_clearance_mm"])),
+        "box_perimeter_xy_mm": _round(float(layout["container_box_xy_clearance_mm"])),
+        "between_bodies_xy_mm": _round(float(layout["layout_clearance_mm"])),
+        "between_bodies_z_mm": _round(float(layout["container_z_clearance_mm"])),
+        "box_top_z_clearance_mm": _round(float(_mapping(project["box"])["lid_clearance_mm"])),
+        "box_bottom_z_clearance_mm": 0.0,
+        "vertical_support_gap_mm": _round(float(layout["container_z_clearance_mm"])),
+        "vertical_support_contact_mm": 0.0,
+        "role_defaults_v1": deepcopy(defaults),
+        "role_default_sources_v1": deepcopy(sources),
+        "materialize_clearances": False,
+    }
+
+
+def _container_participant(
+    contract: dict[str, object], group: dict[str, object]
+) -> dict[str, object]:
     minimum = _dimension(contract["minimum_outer_envelope_mm"])
     constraints = _mapping(contract["constraints"])
     return {
@@ -443,7 +452,33 @@ def _container_participant(contract: dict[str, object]) -> dict[str, object]:
         "dimension_modes": deepcopy(constraints["dimension_modes"]),
         "target_local_mm": deepcopy(constraints["target_outer_dimensions_mm"]),
         "surplus_preference": constraints["surplus_preference"],
+        "external_clearance_effective_v1": deepcopy(group["clearance_effective_v1"]),
     }
+
+
+def _solver_clearance_fallbacks(
+    participants: list[dict[str, object]],
+    default_xy: float,
+    default_box_xy: float,
+    default_z: float,
+) -> tuple[float, float, float]:
+    policies = [
+        _mapping(item["external_clearance_effective_v1"])
+        for item in participants
+        if isinstance(item.get("external_clearance_effective_v1"), dict)
+    ]
+    if not policies:
+        return default_xy, default_box_xy, default_z
+    between_xy = max(
+        float(_mapping(policy["between_mm"])[axis])
+        for policy in policies for axis in ("x", "y")
+    )
+    box_xy = max(
+        float(_mapping(policy["box_per_side_xy_mm"])[axis])
+        for policy in policies for axis in ("x", "y")
+    )
+    between_z = max(float(_mapping(policy["between_mm"])["z"]) for policy in policies)
+    return between_xy, box_xy, between_z
 
 
 def _complement_participant(value: dict[str, object]) -> dict[str, object]:
@@ -477,12 +512,12 @@ def _validate_placements(
         for item in placements
     )
     box_xy_clearance_respected = all(
-        float(_mapping(item["origin_mm"])["x"]) >= box_xy_clearance - _EPSILON
-        and float(_mapping(item["origin_mm"])["y"]) >= box_xy_clearance - _EPSILON
+        float(_mapping(item["origin_mm"])["x"]) >= _placement_clearance(item, "box_per_side_xy_mm", "x", box_xy_clearance) - _EPSILON
+        and float(_mapping(item["origin_mm"])["y"]) >= _placement_clearance(item, "box_per_side_xy_mm", "y", box_xy_clearance) - _EPSILON
         and float(_mapping(item["origin_mm"])["x"]) + float(_mapping(item["world_size_mm"])["x"])
-        <= box["x"] - box_xy_clearance + _EPSILON
+        <= box["x"] - _placement_clearance(item, "box_per_side_xy_mm", "x", box_xy_clearance) + _EPSILON
         and float(_mapping(item["origin_mm"])["y"]) + float(_mapping(item["world_size_mm"])["y"])
-        <= box["y"] - box_xy_clearance + _EPSILON
+        <= box["y"] - _placement_clearance(item, "box_per_side_xy_mm", "y", box_xy_clearance) + _EPSILON
         for item in placements
     )
     no_collisions = all(
@@ -515,6 +550,22 @@ def _intersects(left: dict[str, object], right: dict[str, object]) -> bool:
     return all(float(lo[a]) < float(ro[a]) + float(rs[a]) - _EPSILON and float(ro[a]) < float(lo[a]) + float(ls[a]) - _EPSILON for a in ("x", "y", "z"))
 
 
+def _placement_clearance(
+    placement: dict[str, object], vector: str, axis: str, fallback: float
+) -> float:
+    policy = placement.get("external_clearance_effective_v1")
+    if not isinstance(policy, dict):
+        return float(fallback)
+    values = policy.get(vector)
+    if not isinstance(values, dict):
+        return float(fallback)
+    local_axis = axis
+    if axis in {"x", "y"} and int(placement.get("rotation_deg_z", 0)) == 90:
+        local_axis = "y" if axis == "x" else "x"
+    value = values.get(local_axis)
+    return float(fallback) if value is None else float(value)
+
+
 def _separated_with_clearance(
     left: dict[str, object],
     right: dict[str, object],
@@ -526,7 +577,11 @@ def _separated_with_clearance(
     return any(
         float(lo[axis]) + float(ls[axis]) + clearance <= float(ro[axis]) + 0.001
         or float(ro[axis]) + float(rs[axis]) + clearance <= float(lo[axis]) + 0.001
-        for axis, clearance in (("x", xy_clearance), ("y", xy_clearance), ("z", z_clearance))
+        for axis, clearance in (
+            ("x", max(_placement_clearance(left, "between_mm", "x", xy_clearance), _placement_clearance(right, "between_mm", "x", xy_clearance))),
+            ("y", max(_placement_clearance(left, "between_mm", "y", xy_clearance), _placement_clearance(right, "between_mm", "y", xy_clearance))),
+            ("z", max(_placement_clearance(left, "between_mm", "z", z_clearance), _placement_clearance(right, "between_mm", "z", z_clearance))),
+        )
     )
 
 

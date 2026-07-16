@@ -10,6 +10,11 @@ de capacité géométrique ou physique.
 
 ## Dernier état réel
 
+P44-M009 est implémentée dans le package 0.1.31 : trois rôles,
+héritage X/Y/Z, zéro explicite, provenance et deux vecteurs externes de
+conteneur. Les paires utilisent max, jamais une somme. Les projets historiques
+restent compatibles. fusion-validated: false, print-validated: false.
+
 P44-M004 est intégrée dans le package 0.1.25, mais sa revue humaine de densité
 n’a pas été acceptée : la relation parent/enfants fonctionne, tandis que la
 palette reste trop verticale pour comparer plusieurs cartes. Cette preuve ne
@@ -57,17 +62,13 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 
 ## Prochaine action recommandée
 
-### P44-M008 - Gate humaine du contrat de jeux herites
+### P44-M007 - Calcul adaptatif et Aperçu priorisé
 
-Statut : human-gate-open, documentation et decision uniquement.
+Statut : ready-for-explicit-go après l intégration de P44-M009.
 
-Le contrat P44_M008_TOLERANCE_OVERRIDE_CONTRACT et ADR-0063 proposent trois
-roles, heritage X/Y/Z, zero explicite, sources effectives et max pour une paire
-de conteneurs. Aucun code ni changement numerique n a commence.
-
-Action humaine attendue : accepter ou corriger les roles, formules, projection
-des defaults historiques et migration. P44-M009 ne peut commencer qu apres
-cette decision.
+Portée : calcul hybride adaptatif, requêtes obsolètes, Aperçu en premier
+et matérialisation toujours explicite. Les règles P44-M009 sont consommées,
+pas recalibrées. Un GO explicite est requis. P44-V reste la gate globale.
 
 ## Séquence verrouillée
 

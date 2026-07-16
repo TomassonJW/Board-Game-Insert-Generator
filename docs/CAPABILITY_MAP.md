@@ -1085,3 +1085,15 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - C-ASSET / C-RESERVATION / C-MODULE : roles et sources documentes, runtime inchange.
 - C-QUALITY : matrice de non-regression definie pour P44-M009.
 - C-SOLVER / C-CAD-IR / C-FUSION-UI : inchanges. print-validated: false.
+
+## P44-M009 - Capability update (2026-07-16)
+
+- C-TOLERANCE : implemented et automated-validated pour roles, heritage X/Y/Z,
+  zero explicite, provenance et vecteurs conteneur ; aucune recalibration.
+- C-ASSET / C-RESERVATION / C-MODULE : cavity et top inset consomment les
+  vecteurs effectifs ; projets historiques compatibles.
+- C-SOLVER / C-CAD-IR : voisinage et perimetre sont par conteneur, les paires
+  utilisent max et la CAD IR expose la provenance.
+- C-FUSION-UI / C-QUALITY : palette, DOM, roundtrip, bridge et materialisation
+  historique testes. fusion-validated: false, print-validated: false.
+- Suite : P44-M007 est ready-for-explicit-go ; P44-V reste une gate humaine.

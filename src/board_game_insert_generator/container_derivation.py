@@ -211,7 +211,14 @@ def _derive_compartment(
     shape_kind = str(content["shape_kind"])
     quantity = int(content["quantity"])
     configured_clearance = content["content_clearance_mm"]
-    clearance_mm = float(default_clearance_mm if configured_clearance is None else configured_clearance)
+    effective_payload = content.get("clearance_effective_v1")
+    if isinstance(effective_payload, dict):
+        clearance = _dimension(_mapping(effective_payload["values_mm"]))
+        clearance_source = dict(_mapping(effective_payload["source_by_axis"]))
+    else:
+        scalar = float(default_clearance_mm if configured_clearance is None else configured_clearance)
+        clearance = {"x": scalar, "y": scalar, "z": scalar}
+        clearance_source = {"x": "legacy_scalar", "y": "legacy_scalar", "z": "legacy_scalar"}
     unit = _shape_envelope(shape_kind, dimensions)
     blockers: list[str] = []
     warnings: list[str] = []
@@ -224,14 +231,14 @@ def _derive_compartment(
         grid_rows = 1
         capacity_per_stack = quantity
         items_per_pile = quantity
-        content_height = unit["z"] + clearance_mm
+        content_height = unit["z"] + clearance["z"]
         sizing_policy = "declared_deck_height_v1"
         count_semantics = "count_is_reported__z_is_total_deck_height"
         warnings.append(
             "Card dimensions use the resolved storage orientation; the requested and resolved orientations are reported."
         )
     else:
-        available_stack_height_mm = usable_height_mm - floor_mm - clearance_mm
+        available_stack_height_mm = usable_height_mm - floor_mm - clearance["z"]
         if unit["z"] > available_stack_height_mm:
             blockers.append(
                 f"'{content['name']}' is {unit['z']} mm tall, leaving no usable vertical clearance in this box."
@@ -239,14 +246,14 @@ def _derive_compartment(
         capacity_per_stack = max(1, int(available_stack_height_mm // unit["z"]))
         pile_count = max(1, ceil(quantity / capacity_per_stack))
         items_per_pile = max(1, ceil(quantity / pile_count))
-        grid_columns, grid_rows = _choose_pile_grid(pile_count, unit["x"], unit["y"], clearance_mm)
-        content_height = items_per_pile * unit["z"] + clearance_mm
+        grid_columns, grid_rows = _choose_pile_grid(pile_count, unit["x"], unit["y"], clearance["x"], clearance["y"])
+        content_height = items_per_pile * unit["z"] + clearance["z"]
         sizing_policy = "count_aware_pile_grid_v1"
         count_semantics = "quantity_is_counted_as_stackable_items"
 
     inner = {
-        "x": _round(grid_columns * unit["x"] + (grid_columns - 1) * clearance_mm + clearance_mm * 2.0),
-        "y": _round(grid_rows * unit["y"] + (grid_rows - 1) * clearance_mm + clearance_mm * 2.0),
+        "x": _round(grid_columns * unit["x"] + (grid_columns - 1) * clearance["x"] + clearance["x"] * 2.0),
+        "y": _round(grid_rows * unit["y"] + (grid_rows - 1) * clearance["y"] + clearance["y"] * 2.0),
         "z": _round(content_height),
     }
     return {
@@ -256,7 +263,12 @@ def _derive_compartment(
         "shape_kind": shape_kind,
         "footprint_profile": _footprint_profile(shape_kind, unit),
         "inner_dimensions_mm": inner,
-        "content_clearance_mm": _round(clearance_mm),
+        "content_clearance_mm": _round(clearance["z"]),
+        "clearance_effective_v1": {
+            "role": "asset_cavity",
+            "values_mm": _rounded_dimension(clearance),
+            "source_by_axis": clearance_source,
+        },
         "quantity": {
             "declared_count": quantity,
             "capacity_per_stack": capacity_per_stack,
@@ -303,7 +315,9 @@ def _footprint_profile(shape_kind: str, unit: dict[str, float]) -> dict[str, obj
     return result
 
 
-def _choose_pile_grid(count: int, unit_x: float, unit_y: float, clearance_mm: float) -> tuple[int, int]:
+def _choose_pile_grid(
+    count: int, unit_x: float, unit_y: float, clearance_x_mm: float, clearance_y_mm: float
+) -> tuple[int, int]:
     candidates: list[tuple[float, float, int, int]] = []
     # Only a constant-size neighbourhood around the balanced grid is needed.
     # This keeps a very large declared quantity from turning a single content
@@ -313,8 +327,8 @@ def _choose_pile_grid(count: int, unit_x: float, unit_y: float, clearance_mm: fl
     candidate_columns.update(max(1, min(count, target_columns + delta)) for delta in range(-3, 4))
     for columns in sorted(candidate_columns):
         rows = ceil(count / columns)
-        width = columns * unit_x + (columns - 1) * clearance_mm + clearance_mm * 2.0
-        height = rows * unit_y + (rows - 1) * clearance_mm + clearance_mm * 2.0
+        width = columns * unit_x + (columns - 1) * clearance_x_mm + clearance_x_mm * 2.0
+        height = rows * unit_y + (rows - 1) * clearance_y_mm + clearance_y_mm * 2.0
         aspect_penalty = abs(log(max(width, height) / min(width, height))) if min(width, height) else 0.0
         score = width * height * (1.0 + aspect_penalty * 0.25)
         candidates.append((score, width * height, columns, rows))

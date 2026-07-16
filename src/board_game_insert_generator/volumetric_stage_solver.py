@@ -218,7 +218,7 @@ def _candidate_for_groups(
     height_plan = _stage_heights(groups, storage_height, vertical_clearance)
     if height_plan is None:
         return None, 0
-    stage_heights, vertical_complete = height_plan
+    stage_heights, vertical_complete, stage_gaps = height_plan
     stage_layouts: list[dict[str, object]] = []
     attempts = 0
     xy_complete = True
@@ -288,6 +288,8 @@ def _candidate_for_groups(
                 "printable": True,
                 "automatic": False,
             }
+            if "external_clearance_effective_v1" in item:
+                placement["external_clearance_effective_v1"] = deepcopy(item["external_clearance_effective_v1"])
             for key in ("container_group_id", "requested_complement_id", "complement_kind"):
                 if key in item:
                     placement[key] = item[key]
@@ -332,10 +334,10 @@ def _candidate_for_groups(
                 "body_count": len(stage_placements),
                 "row_count": int(layout["row_count"]),
                 "xy_status": "complete" if layout["complete"] else "with_residuals",
-                "clearance_above_mm": _round(vertical_clearance if stage_index < len(groups) - 1 else 0.0),
+                "clearance_above_mm": _round(stage_gaps[stage_index] if stage_index < len(stage_gaps) else 0.0),
             }
         )
-        cursor_z = stage_top + (vertical_clearance if stage_index < len(groups) - 1 else 0.0)
+        cursor_z = stage_top + (stage_gaps[stage_index] if stage_index < len(stage_gaps) else 0.0)
 
     if cursor_z < storage_height - _EPSILON:
         inner_x = max(0.0, box["x"] - 2.0 * box_clearance)
@@ -499,11 +501,22 @@ def _candidate_for_stacks(
                 "printable": True,
                 "automatic": False,
             }
+            if "external_clearance_effective_v1" in participant:
+                placement["external_clearance_effective_v1"] = deepcopy(participant["external_clearance_effective_v1"])
             for key in ("container_group_id", "requested_complement_id", "complement_kind"):
                 if key in participant:
                     placement[key] = participant[key]
             placements.append(placement)
-            cursor_z += body_height + (vertical_clearance if stack_level < len(members) - 1 else 0.0)
+            next_participant = (
+                _mapping(members[stack_level + 1]["participant"])
+                if stack_level < len(members) - 1
+                else None
+            )
+            cursor_z += body_height + (
+                _participant_pair_clearance(participant, next_participant, "z", vertical_clearance)
+                if next_participant is not None
+                else 0.0
+            )
         if not isclose(cursor_z, storage_height, abs_tol=0.001):
             return None, attempts
 
@@ -585,7 +598,11 @@ def _stack_partitions(
         return []
 
     def stack_height(stack: list[dict[str, object]]) -> float:
-        return sum(_axis_base(item, "z") for item in stack) + vertical_clearance * max(0, len(stack) - 1)
+        gaps = [
+            _participant_pair_clearance(left, right, "z", vertical_clearance)
+            for left, right in zip(stack, stack[1:])
+        ]
+        return sum(_axis_base(item, "z") for item in stack) + sum(gaps)
 
     candidates: list[list[list[dict[str, object]]]] = []
     if count <= 10:
@@ -609,7 +626,11 @@ def _stack_partitions(
         current_height = 0.0
         for value in values:
             height = _axis_base(value, "z")
-            added_height = height + (vertical_clearance if current else 0.0)
+            added_height = height + (
+                _participant_pair_clearance(current[-1], value, "z", vertical_clearance)
+                if current
+                else 0.0
+            )
             if current and current_height + added_height > storage_height + _EPSILON:
                 greedy.append(current)
                 current = []
@@ -742,7 +763,11 @@ def _stack_heights(
 ) -> list[float] | None:
     participants = [_mapping(member["participant"]) for member in members]
     heights = [_axis_base(participant, "z") for participant in participants]
-    gap_total = vertical_clearance * max(0, len(members) - 1)
+    gaps = [
+        _participant_pair_clearance(left, right, "z", vertical_clearance)
+        for left, right in zip(participants, participants[1:])
+    ]
+    gap_total = sum(gaps)
     body_height_budget = storage_height - gap_total
     if body_height_budget < -_EPSILON or sum(heights) > body_height_budget + _EPSILON:
         return None
@@ -825,11 +850,33 @@ def _interval_stages(
     return stages
 
 
+def _group_vertical_clearance(
+    lower: list[dict[str, object]],
+    upper: list[dict[str, object]],
+    fallback: float,
+) -> float:
+    """Resolve a stage interface as the maximum of its pair requirements.
+
+    A stage has one common Z origin.  The interface must therefore satisfy every
+    potentially adjacent lower/upper pair, while preserving the pair rule:
+    each pair uses max(left, right), and interface values are never summed.
+    """
+
+    return max(
+        (
+            _participant_pair_clearance(left, right, "z", fallback)
+            for left in lower
+            for right in upper
+        ),
+        default=0.0,
+    )
+
+
 def _stage_heights(
     groups: list[list[dict[str, object]]],
     storage_height: float,
     vertical_clearance: float,
-) -> tuple[list[float], bool] | None:
+) -> tuple[list[float], bool, list[float]] | None:
     heights: list[float] = []
     complete = True
     for group in groups:
@@ -839,7 +886,11 @@ def _stage_heights(
         if any(not isclose(value, stage_height, abs_tol=0.001) for value in fixed):
             complete = False
         heights.append(stage_height)
-    gap_total = vertical_clearance * max(0, len(groups) - 1)
+    gaps = [
+        _group_vertical_clearance(lower, upper, vertical_clearance)
+        for lower, upper in zip(groups, groups[1:])
+    ]
+    gap_total = sum(gaps)
     body_height_budget = storage_height - gap_total
     minimum_total = sum(heights)
     if body_height_budget < -_EPSILON or minimum_total > body_height_budget + _EPSILON:
@@ -852,14 +903,14 @@ def _stage_heights(
     ]
     if extra > _EPSILON and not expandable:
         complete = False
-        return heights, complete
+        return heights, complete, gaps
     targets = [
         max((_axis_target(item, "z") or heights[index]) for item in group)
         for index, group in enumerate(groups)
     ]
     weights = [sum(_volume(_mapping(item["minimum_local_mm"])) for item in group) for group in groups]
     _allocate(heights, expandable, extra, targets, weights)
-    return heights, complete
+    return heights, complete, gaps
 
 def _best_xy_layout(
     group: list[dict[str, object]],
@@ -898,6 +949,108 @@ def _best_xy_layout(
     ), attempts
 
 
+def _participant_clearance(
+    participant: dict[str, object],
+    vector: str,
+    axis: str,
+    fallback: float,
+) -> float:
+    policy = participant.get("external_clearance_effective_v1")
+    if not isinstance(policy, dict):
+        return float(fallback)
+    values = policy.get(vector)
+    if not isinstance(values, dict):
+        return float(fallback)
+    value = values.get(axis)
+    return float(fallback) if value is None else float(value)
+
+
+def _participant_pair_clearance(
+    left: dict[str, object],
+    right: dict[str, object],
+    axis: str,
+    fallback: float,
+) -> float:
+    return max(
+        _participant_clearance(left, "between_mm", axis, fallback),
+        _participant_clearance(right, "between_mm", axis, fallback),
+    )
+
+
+def _placement_pair_clearance(
+    left: dict[str, object],
+    right: dict[str, object],
+    axis: str,
+    fallback: float,
+) -> float:
+    return max(
+        _participant_clearance(left, "between_mm", axis, fallback),
+        _participant_clearance(right, "between_mm", axis, fallback),
+    )
+
+
+def _external_clearance(
+    item: dict[str, object],
+    vector: str,
+    axis: str,
+    fallback: float,
+) -> float:
+    participant = _mapping(item["participant"])
+    local_axis = axis
+    if axis in {"x", "y"} and bool(item.get("rotated_xy", False)):
+        local_axis = "y" if axis == "x" else "x"
+    return _participant_clearance(participant, vector, local_axis, fallback)
+
+
+def _pair_clearance(
+    left: dict[str, object],
+    right: dict[str, object],
+    axis: str,
+    fallback: float,
+) -> float:
+    return max(
+        _external_clearance(left, "between_mm", axis, fallback),
+        _external_clearance(right, "between_mm", axis, fallback),
+    )
+
+
+def _row_width(
+    row: list[dict[str, object]], *,
+    between_clearance: float, box_clearance: float,
+) -> float:
+    if not row:
+        return 0.0
+    widths = sum(float(item["base_world_mm"]["x"]) for item in row)
+    gaps = sum(
+        _pair_clearance(left, right, "x", between_clearance)
+        for left, right in zip(row, row[1:])
+    )
+    return (
+        _external_clearance(row[0], "box_per_side_xy_mm", "x", box_clearance)
+        + widths + gaps
+        + _external_clearance(row[-1], "box_per_side_xy_mm", "x", box_clearance)
+    )
+
+
+def _row_y_margin(row: list[dict[str, object]], fallback: float) -> float:
+    return max(
+        (_external_clearance(item, "box_per_side_xy_mm", "y", fallback) for item in row),
+        default=float(fallback),
+    )
+
+
+def _row_between_y(
+    left: list[dict[str, object]], right: list[dict[str, object]], fallback: float
+) -> float:
+    return max(
+        [
+            _external_clearance(item, "between_mm", "y", fallback)
+            for item in [*left, *right]
+        ],
+        default=float(fallback),
+    )
+
+
 def _layout_rows(
     row_items: list[list[dict[str, object]]],
     box: dict[str, float],
@@ -907,13 +1060,13 @@ def _layout_rows(
     orientation_strategy: str,
     fill: bool,
 ) -> dict[str, object] | None:
-    inner_x = box["x"] - 2.0 * box_clearance
-    inner_y = box["y"] - 2.0 * box_clearance
-    if inner_x <= 0.0 or inner_y <= 0.0:
+    if box["x"] <= 0.0 or box["y"] <= 0.0:
         return None
     rows: list[list[dict[str, object]]] = []
     for values in row_items:
-        oriented = _orient_row(values, inner_x, inner_y, between_clearance, orientation_strategy)
+        oriented = _orient_row(
+            values, box, between_clearance, box_clearance, orientation_strategy
+        )
         if oriented is None:
             return None
         rows.append(oriented)
@@ -926,14 +1079,20 @@ def _layout_rows(
         for item in row
     ) and fill:
         return None
-    minimum_y = sum(row_heights) + between_clearance * max(0, len(rows) - 1)
-    if minimum_y > inner_y + _EPSILON:
+
+    front_margin = _row_y_margin(rows[0], box_clearance)
+    back_margin = _row_y_margin(rows[-1], box_clearance)
+    row_gaps = [
+        _row_between_y(left, right, between_clearance)
+        for left, right in zip(rows, rows[1:])
+    ]
+    minimum_y = front_margin + sum(row_heights) + sum(row_gaps) + back_margin
+    if minimum_y > box["y"] + _EPSILON:
         return None
     if fill:
-        extra_y = inner_y - minimum_y
+        extra_y = box["y"] - minimum_y
         expandable_rows = [
-            index
-            for index, row in enumerate(rows)
+            index for index, row in enumerate(rows)
             if all(
                 _axis_mode(_mapping(item["participant"]), "y", rotated=bool(item["rotated_xy"])) != "fixed"
                 for item in row
@@ -944,141 +1103,111 @@ def _layout_rows(
         row_targets = [
             max(
                 _axis_target(_mapping(item["participant"]), "y", rotated=bool(item["rotated_xy"]))
-                or row_heights[index]
-                for item in row
-            )
-            for index, row in enumerate(rows)
+                or row_heights[index] for item in row
+            ) for index, row in enumerate(rows)
         ]
-        row_weights = [
-            sum(_area(_mapping(item["participant"])["minimum_local_mm"]) for item in row)
-            for row in rows
-        ]
+        row_weights = [sum(_area(_mapping(item["participant"])["minimum_local_mm"]) for item in row) for row in rows]
         _allocate(row_heights, expandable_rows, extra_y, row_targets, row_weights)
 
     placements: list[dict[str, object]] = []
     residuals: list[dict[str, object]] = []
-    cursor_y = box_clearance
+    cursor_y = front_margin
     rotations = 0
     for row_index, (row, row_height) in enumerate(zip(rows, row_heights)):
         widths = [float(item["base_world_mm"]["x"]) for item in row]
-        occupied_with_gaps = sum(widths) + between_clearance * max(0, len(row) - 1)
-        if occupied_with_gaps > inner_x + _EPSILON:
+        left_margin = _external_clearance(row[0], "box_per_side_xy_mm", "x", box_clearance)
+        right_margin = _external_clearance(row[-1], "box_per_side_xy_mm", "x", box_clearance)
+        gaps = [
+            _pair_clearance(left, right, "x", between_clearance)
+            for left, right in zip(row, row[1:])
+        ]
+        occupied = left_margin + sum(widths) + sum(gaps) + right_margin
+        if occupied > box["x"] + _EPSILON:
             return None
         if fill:
-            extra_x = inner_x - occupied_with_gaps
+            extra_x = box["x"] - occupied
             expandable = [
-                index
-                for index, item in enumerate(row)
+                index for index, item in enumerate(row)
                 if _axis_mode(_mapping(item["participant"]), "x", rotated=bool(item["rotated_xy"])) != "fixed"
             ]
             if extra_x > _EPSILON and not expandable:
                 return None
             targets = [
                 _axis_target(_mapping(item["participant"]), "x", rotated=bool(item["rotated_xy"]))
-                or widths[index]
-                for index, item in enumerate(row)
+                or widths[index] for index, item in enumerate(row)
             ]
             weights = [_area(_mapping(item["participant"])["minimum_local_mm"]) for item in row]
             _allocate(widths, expandable, extra_x, targets, weights)
-        cursor_x = box_clearance
+        cursor_x = left_margin
         for item_index, (item, width) in enumerate(zip(row, widths)):
             body_height = row_height if fill else float(item["base_world_mm"]["y"])
-            placements.append(
-                {
-                    "participant": item["participant"],
-                    "origin_mm": {"x": _round(cursor_x), "y": _round(cursor_y)},
-                    "world_size_mm": {"x": _round(width), "y": _round(body_height)},
-                    "rotated_xy": bool(item["rotated_xy"]),
-                }
-            )
+            placements.append({
+                "participant": item["participant"],
+                "origin_mm": {"x": _round(cursor_x), "y": _round(cursor_y)},
+                "world_size_mm": {"x": _round(width), "y": _round(body_height)},
+                "rotated_xy": bool(item["rotated_xy"]),
+            })
             if not fill and body_height < row_height - _EPSILON:
-                residuals.append(
-                    {
-                        "id": f"r{row_index}-i{item_index}-above",
-                        "x": _round(cursor_x),
-                        "y": _round(cursor_y + body_height),
-                        "width": _round(width),
-                        "height": _round(row_height - body_height),
-                        "kind": "row_height_residual",
-                    }
-                )
-            cursor_x += width + between_clearance
+                residuals.append({
+                    "id": f"r{row_index}-i{item_index}-above", "x": _round(cursor_x),
+                    "y": _round(cursor_y + body_height), "width": _round(width),
+                    "height": _round(row_height - body_height), "kind": "row_height_residual",
+                })
+            cursor_x += width + (gaps[item_index] if item_index < len(gaps) else 0.0)
             rotations += int(bool(item["rotated_xy"]))
-        used_x = cursor_x - between_clearance
-        if not fill and used_x < box["x"] - box_clearance - _EPSILON:
-            residuals.append(
-                {
-                    "id": f"r{row_index}-right",
-                    "x": _round(used_x),
-                    "y": _round(cursor_y),
-                    "width": _round(box["x"] - box_clearance - used_x),
-                    "height": _round(row_height),
-                    "kind": "row_right_residual",
-                }
-            )
-        cursor_y += row_height + between_clearance
-    used_y = cursor_y - between_clearance
-    if not fill and used_y < box["y"] - box_clearance - _EPSILON:
-        residuals.append(
-            {
-                "id": "back",
-                "x": _round(box_clearance),
-                "y": _round(used_y),
-                "width": _round(inner_x),
-                "height": _round(box["y"] - box_clearance - used_y),
-                "kind": "stage_back_residual",
-            }
-        )
+        used_x = cursor_x
+        if not fill and used_x < box["x"] - right_margin - _EPSILON:
+            residuals.append({
+                "id": f"r{row_index}-right", "x": _round(used_x), "y": _round(cursor_y),
+                "width": _round(box["x"] - right_margin - used_x),
+                "height": _round(row_height), "kind": "row_right_residual",
+            })
+        cursor_y += row_height + (row_gaps[row_index] if row_index < len(row_gaps) else 0.0)
+    used_y = cursor_y
+    if not fill and used_y < box["y"] - back_margin - _EPSILON:
+        residuals.append({
+            "id": "back", "x": _round(0.0), "y": _round(used_y),
+            "width": _round(box["x"]), "height": _round(box["y"] - back_margin - used_y),
+            "kind": "stage_back_residual",
+        })
     target_error = sum(
-        _xy_target_error(
-            _mapping(item["participant"]),
-            _mapping(item["world_size_mm"]),
-            rotated=bool(item["rotated_xy"]),
-        )
+        _xy_target_error(_mapping(item["participant"]), _mapping(item["world_size_mm"]), rotated=bool(item["rotated_xy"]))
         for item in placements
     )
     local_score = 1000.0 - len(rows) * 20.0 - rotations * 4.0 - target_error * 25.0
     return {
         "layout_id": f"{len(row_items[0]) if row_items else 0}c:{orientation_strategy}:{'full' if fill else 'partial'}",
-        "complete": fill,
-        "row_count": len(rows),
-        "rotation_count": rotations,
-        "placements": placements,
-        "residual_rectangles": residuals,
-        "local_score": _round(local_score),
+        "complete": fill, "row_count": len(rows), "rotation_count": rotations,
+        "placements": placements, "residual_rectangles": residuals, "local_score": _round(local_score),
     }
 
 
 def _orient_row(
     values: list[dict[str, object]],
-    inner_x: float,
-    inner_y: float,
+    box: dict[str, float],
     between_clearance: float,
+    box_clearance: float,
     strategy: str,
 ) -> list[dict[str, object]] | None:
     option_sets = [_orientation_options(value) for value in values]
     combination_count = 1
     for options in option_sets:
         combination_count *= len(options)
-    if combination_count <= MAX_ORIENTATION_COMBINATIONS:
-        combinations = product(*option_sets)
-    else:
-        combinations = [tuple(_greedy_orientation(value, strategy) for value in values)]
+    combinations = product(*option_sets) if combination_count <= MAX_ORIENTATION_COMBINATIONS else [tuple(_greedy_orientation(value, strategy) for value in values)]
     feasible: list[tuple[tuple[float, float, int], list[dict[str, object]]]] = []
-    for combination in combinations:
-        width = sum(float(item["base_world_mm"]["x"]) for item in combination) + between_clearance * max(0, len(values) - 1)
+    for combination_tuple in combinations:
+        combination = [dict(item) for item in combination_tuple]
+        width = _row_width(combination, between_clearance=between_clearance, box_clearance=box_clearance)
         height = max(float(item["base_world_mm"]["y"]) for item in combination)
-        if width > inner_x + _EPSILON or height > inner_y + _EPSILON:
+        if width > box["x"] + _EPSILON or height > box["y"] + _EPSILON:
             continue
         rotations = sum(int(bool(item["rotated_xy"])) for item in combination)
-        if strategy == "width":
-            key = (width, height, rotations)
-        elif strategy == "height":
-            key = (height, width, rotations)
-        else:
-            key = (width / inner_x + height / inner_y, rotations, width)
-        feasible.append((key, [dict(item) for item in combination]))
+        if strategy == "width": key = (width, height, rotations)
+        elif strategy == "height": key = (height, width, rotations)
+        else: key = (width / box["x"] + height / box["y"], rotations, width)
+        feasible.append((key, combination))
     return min(feasible, key=lambda item: item[0])[1] if feasible else None
+
 
 def _orientation_options(value: dict[str, object]) -> list[dict[str, object]]:
     base = {axis: _axis_base(value, axis) for axis in _AXES}
@@ -1152,11 +1281,13 @@ def _support_contract(
                     continue
                 lower_origin = _mapping(lower["origin_mm"])
                 lower_size = _mapping(lower["world_size_mm"])
-                if not isclose(
-                    float(lower_origin["z"]) + float(lower_size["z"]) + vertical_clearance,
-                    float(origin["z"]),
-                    abs_tol=0.001,
-                ):
+                actual_gap = float(origin["z"]) - (
+                    float(lower_origin["z"]) + float(lower_size["z"])
+                )
+                required_gap = _placement_pair_clearance(
+                    lower, placement, "z", vertical_clearance
+                )
+                if actual_gap + _EPSILON < required_gap:
                     continue
                 overlap = _xy_overlap(origin, size, lower_origin, lower_size)
                 if overlap > _EPSILON:
@@ -1171,7 +1302,21 @@ def _support_contract(
                 "supporting_ids": supporting_ids,
                 "coverage_ratio": _round(ratio),
                 "supported": ratio + _EPSILON >= MIN_SUPPORT_RATIO,
-                "vertical_gap_mm": 0.0 if supporting_ids == ["box-floor"] else _round(vertical_clearance),
+                "vertical_gap_mm": (
+                    0.0
+                    if not supporting_ids or supporting_ids == ["box-floor"]
+                    else _round(
+                        min(
+                            float(origin["z"])
+                            - (
+                                float(_mapping(lower["origin_mm"])["z"])
+                                + float(_mapping(lower["world_size_mm"])["z"])
+                            )
+                            for lower in placements
+                            if str(lower["id"]) in supporting_ids
+                        )
+                    )
+                ),
             }
         )
     unsupported = [item for item in supports if not item["supported"]]

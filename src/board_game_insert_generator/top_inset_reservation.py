@@ -41,13 +41,19 @@ def derive_top_inset_reservations(raw_project: object) -> dict[str, object]:
     box_payload = _mapping(project["box"])
     box = _dimension(box_payload["inner_dimensions_mm"])
     design_top_z = min(float(box_payload["usable_height_mm"]), box["z"])
-    clearance = float(_mapping(project["layout"])["layout_clearance_mm"])
+    layout = _mapping(project["layout"])
+    clearance = float(layout["layout_clearance_mm"])
+    default_clearance = {
+        "x": clearance,
+        "y": clearance,
+        "z": 0.0,
+    }
     ordered = _ordered_flat_items(_mappings(project["flat_items"]))
     blockers: list[dict[str, object]] = []
 
     resolved: list[dict[str, object]] = []
     for item in ordered:
-        reservation, item_blockers = _resolve_item(item, box, clearance)
+        reservation, item_blockers = _resolve_item(item, box, default_clearance)
         resolved.append(reservation)
         blockers.extend(item_blockers)
 
@@ -84,6 +90,7 @@ def derive_top_inset_reservations(raw_project: object) -> dict[str, object]:
         "design_top_z_mm": _round(design_top_z),
         "total_flat_height_mm": _round(total_stack_height),
         "clearance_mm": _round(clearance),
+        "clearance_defaults_v1": deepcopy(layout["clearance_defaults_v1"]),
         "reservations": reservations,
         "removal_sequence": removal_sequence,
         "blockers": blockers,
@@ -390,9 +397,20 @@ def _resolve_vertical_layers(
 def _resolve_item(
     item: dict[str, object],
     box: dict[str, float],
-    clearance: float,
+    default_clearance: dict[str, float],
 ) -> tuple[dict[str, object], list[dict[str, object]]]:
     dimensions = _dimension(item["dimensions_mm"])
+    effective = item.get("clearance_effective_v1")
+    clearance_values = (
+        _dimension(_mapping(effective["values_mm"]))
+        if isinstance(effective, dict)
+        else dict(default_clearance)
+    )
+    clearance_sources = (
+        dict(_mapping(effective["source_by_axis"]))
+        if isinstance(effective, dict)
+        else {"x": "legacy_scalar", "y": "legacy_scalar", "z": "legacy_scalar"}
+    )
     requested_rotation = item.get("rotation_deg_z")
     rotations = [int(requested_rotation)] if requested_rotation is not None else [0, 90]
     blockers: list[dict[str, object]] = []
@@ -403,7 +421,9 @@ def _resolve_item(
             if rotation == 0
             else (dimensions["y"], dimensions["x"])
         )
-        if physical_x + 2.0 * clearance <= box["x"] + _EPSILON and physical_y + 2.0 * clearance <= box["y"] + _EPSILON:
+        clearance_x = clearance_values['x'] if rotation == 0 else clearance_values['y']
+        clearance_y = clearance_values['y'] if rotation == 0 else clearance_values['x']
+        if physical_x + 2.0 * clearance_x <= box["x"] + _EPSILON and physical_y + 2.0 * clearance_y <= box["y"] + _EPSILON:
             chosen = (rotation, physical_x, physical_y)
             break
     if chosen is None:
@@ -417,15 +437,17 @@ def _resolve_item(
         blockers.append(
             _blocker(
                 "TOP_INSET_FOOTPRINT_EXCEEDS_BOX",
-                f"'{item['name']}' demande { _round(physical_x + 2 * clearance) } x "
-                f"{ _round(physical_y + 2 * clearance) } mm avec jeu, au-dela de la boite.",
+                f"'{item['name']}' demande { _round(physical_x + 2 * (clearance_values['x'] if rotation == 0 else clearance_values['y'])) } x "
+                f"{ _round(physical_y + 2 * (clearance_values['y'] if rotation == 0 else clearance_values['x'])) } mm avec jeu, au-dela de la boite.",
                 "Reduis l empreinte, le jeu ou choisis une rotation compatible.",
                 str(item["id"]),
             )
         )
     rotation, physical_x, physical_y = chosen
-    cut_x = physical_x + 2.0 * clearance
-    cut_y = physical_y + 2.0 * clearance
+    clearance_x = clearance_values['x'] if rotation == 0 else clearance_values['y']
+    clearance_y = clearance_values['y'] if rotation == 0 else clearance_values['x']
+    cut_x = physical_x + 2.0 * clearance_x
+    cut_y = physical_y + 2.0 * clearance_y
     origin_value = item.get("origin_mm")
     if origin_value is None:
         cut_origin_x = (box["x"] - cut_x) / 2.0
@@ -433,8 +455,8 @@ def _resolve_item(
         placement_source = "auto_center"
     else:
         physical_origin = _xy(origin_value)
-        cut_origin_x = physical_origin["x"] - clearance
-        cut_origin_y = physical_origin["y"] - clearance
+        cut_origin_x = physical_origin["x"] - clearance_x
+        cut_origin_y = physical_origin["y"] - clearance_y
         placement_source = "explicit_origin"
     if (
         cut_origin_x < -_EPSILON
@@ -478,10 +500,15 @@ def _resolve_item(
                 "z": _round(dimensions["z"]),
             },
             "physical_origin_mm": {
-                "x": _round(cut_origin_x + clearance),
-                "y": _round(cut_origin_y + clearance),
+                "x": _round(cut_origin_x + clearance_x),
+                "y": _round(cut_origin_y + clearance_y),
             },
-            "total_thickness_mm": _round(dimensions["z"] * int(item["quantity"])),
+            "total_thickness_mm": _round(dimensions["z"] * int(item["quantity"]) + clearance_values["z"]),
+            "clearance_effective_v1": {
+                "role": "flat_inset",
+                "values_mm": _rounded_dimension(clearance_values),
+                "source_by_axis": clearance_sources,
+            },
             "cut_origin_mm": {"x": _round(cut_origin_x), "y": _round(cut_origin_y)},
             "cut_size_mm": {"x": _round(cut_x), "y": _round(cut_y)},
             "grip_zone": grip,
@@ -700,6 +727,10 @@ def _values(value: object) -> list[Any]:
 def _dimension(value: object) -> dict[str, float]:
     raw = _mapping(value)
     return {axis: float(raw[axis]) for axis in ("x", "y", "z")}
+
+
+def _rounded_dimension(value: dict[str, float]) -> dict[str, float]:
+    return {axis: _round(value[axis]) for axis in ("x", "y", "z")}
 
 
 def _xy(value: object) -> dict[str, float]:

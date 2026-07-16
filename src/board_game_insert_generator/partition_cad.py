@@ -232,15 +232,24 @@ def _container_component(placement: dict[str, object], index: int) -> CadCompone
         local_origin, local_size = _transformed_cavity(cavity, final_local, minimum_origin, rotation)
         cavity_id = str(cavity["cavity_id"])
         _assert_cavity(str(placement["name"]), cavity_id, local_origin, local_size, body_size)
+        effective = cavity.get("clearance_effective_v1")
+        values = _mapping(effective["values_mm"], "cavity.clearance_effective_v1.values_mm") if isinstance(effective, dict) else {"x": cavity["content_clearance_mm"], "y": cavity["content_clearance_mm"], "z": cavity["content_clearance_mm"]}
+        sources = _mapping(effective["source_by_axis"], "cavity.clearance_effective_v1.source_by_axis") if isinstance(effective, dict) else {"x": "legacy_content_clearance_mm", "y": "legacy_content_clearance_mm", "z": "legacy_content_clearance_mm"}
+        source_label = "asset_cavity x={x}, y={y}, z={z}".format(
+            x=sources["x"], y=sources["y"], z=sources["z"]
+        )
         cavities.append(
             CadCavity(
                 id=cavity_id,
                 functional_type=str(cavity["shape_kind"]),
                 local_origin=_as_point(local_origin),
                 size=_as_dimension(local_size),
-                clearance_mm=float(cavity["content_clearance_mm"]),
-                clearance_source="bgig.project.v1 content_clearance_mm",
-                comment=f"Cavite P55 calibree pour {cavity['content_id']}; ouverte par le dessus.",
+                clearance_mm=float(values["z"]),
+                clearance_source=f"bgig.project.v1 {source_label}",
+                comment=(
+                    f"Cavite P55 calibree pour {cavity['content_id']}; jeux effectifs "
+                    f"X/Y/Z = {values['x']}/{values['y']}/{values['z']} mm; ouverte par le dessus."
+                ),
                 features=(),
                 status=PARTITION_CAD_STATUS_READY,
                 fusion_generation=PARTITION_CAD_STATUS_READY,

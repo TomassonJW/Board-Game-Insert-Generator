@@ -2044,3 +2044,17 @@ execute, solveur, CAD IR, materialisation ou valeur numerique n a change.
 
 P44-M009 reste bloquee jusqu a validation humaine explicite des formules,
 defaults projetes et migration.
+
+## P44-M009 - Jeux par objet implementes (2026-07-16)
+
+Statut : done, implemented, automated-validated, package 0.1.31,
+fusion-validated: false, print-validated: false.
+
+La gate P44-M008 accepte l option B. Le schema additif resout les overrides
+X/Y/Z, preserve null comme heritage et 0 comme valeur explicite. Les projets
+historiques gardent leurs scalaires et resultats. Les conteneurs exposent
+between_mm et box_per_side_xy_mm ; toute paire applique max, jamais une somme,
+y compris en Z. Coeur, palette, rapports et CAD IR exposent la provenance.
+Aucune scene automatique, complement, recalibration ou impression reelle.
+
+P44-M007 devient ready-for-explicit-go ; P44-V reste la gate humaine globale.

@@ -602,3 +602,11 @@ P44-M008 formalise sans code trois roles : asset-cavite, plat-encastrement et
 conteneur externe. Heritage par axe, zero explicite, sources effectives et max
 pour la paire de conteneurs sont proposes. La gate humaine formules/defaults/
 migration est ouverte. P44-M009 et P44-M007 restent bloques.
+
+## P44-M009 - Tolerances par role implementees (2026-07-16)
+
+P44-M009 implemente l option B dans le package 0.1.31 : trois roles, heritage
+par axe, zero explicite, provenance et deux vecteurs externes. Compatibilite
+historique preservee et paires resolues par maximum, jamais somme. La mission
+ne qualifie ni Fusion ni impression : fusion-validated: false,
+print-validated: false. P44-M007 est la prochaine mission sur GO explicite.

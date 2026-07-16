@@ -69,9 +69,9 @@ class P66AcceptancePreparationTests(unittest.TestCase):
         self.assertEqual(first["partition"], second["partition"])
         self.assertEqual(first["summary"], {
             "status": "constructed",
-            "plan_digest": "b5bf4e9c164642bfacc51bec038421827a1d30738f22149d2a00e6603d8abc9e",
-            "cad_digest": "d5875dd560805a6420222e115b652027c24cb2e358442266fc1c3cd020025d7b",
-            "source_digest": "57a4ac8b4119c6d6fa22ae714884c71addadc19ecc375642821b55b36fff7e05",
+            "plan_digest": "2b981bdb9ff033e6d0bef52d3e0826d363a96d3e2add98ab21b4eb755179c0b3",
+            "cad_digest": "303daa9cd169a469218c56c8dd3bb7d29245a2f1496fcf0282d76923643c2fe1",
+            "source_digest": "bc176b0562b4eff493413d928129485ff49e136cd91e84ee9ccb9c21a7d3337c",
             "materializable": True,
             "cad_ready": True,
             "fusion_plan_ready": True,
@@ -212,7 +212,7 @@ class P66AcceptancePreparationTests(unittest.TestCase):
         self.assertIn("expected 0.1.20", checker)
         self.assertIn("manifestText", checker)
         self.assertNotIn("ConvertFrom-Json", checker)
-        self.assertEqual(manifest["version"], "0.1.30")
+        self.assertEqual(manifest["version"], "0.1.31")
         self.assertIn("mvp-accepted", document)
         self.assertIn("P66 Fusion OK 0.1.20 - commit 6e351bb", document)
         self.assertIn("P66 Fusion OK 0.1.20 - commit <sha>", document)

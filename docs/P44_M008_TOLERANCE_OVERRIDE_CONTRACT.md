@@ -2,8 +2,9 @@
 
 ## Statut
 
-Proposition documentaire. La gate humaine P44-M008 est ouverte : aucune formule,
-valeur, schema executable ou palette ne change avant son acceptation explicite.
+Contrat documentaire accepté le 2026-07-16 : Thomas accepte l’option B (trois
+rôles, héritage par axe et vecteurs additifs). P44-M009 est autorisée ; aucun
+default n’est recalibré.
 
 ## But et roles
 
@@ -86,9 +87,9 @@ historique comme total. Si les deux objets heritent, le resultat est identique
 au projet actuel. Le fond de boîte reste a zéro hors epaisseur propre et le jeu
 sous couvercle reste séparé.
 
-## Schema additif propose pour P44-M009
+## Schéma additif accepté pour P44-M009
 
-Aucun champ ci-dessous n est implemente dans P44-M008.
+P44-M008 reste documentaire ; P44-M009 implémente ces champs de manière additive.
 
 ~~~
 layout.clearance_defaults_v1:
@@ -147,9 +148,9 @@ Inclure aussi validation des nombres non negatifs, absence versus zéro, default
 partiels invalides, source effective dans rapports et palette, charge 50/72/25
 et frontiere core sans adsk.
 
-## Gate humaine P44-M008
+## Gate humaine P44-M008 - clôturée le 2026-07-16
 
-Avant P44-M009, Thomas doit accepter ou corriger :
+Décision rendue : Thomas a accepté les points suivants :
 1. les trois roles ;
 2. les trois formules ;
 3. max pour une paire de conteneurs ;
@@ -157,4 +158,4 @@ Avant P44-M009, Thomas doit accepter ou corriger :
 5. la projection historique, notamment plat Z a zéro ;
 6. le schema externe a deux sous-vecteurs.
 
-P44-M009, P44-M007 et P44-V restent bloques. print-validated: false.
+P44-M009 est implémentée ; P44-M007 devient ready-for-explicit-go. P44-V reste bloquée par les missions P44 restantes. print-validated: false.

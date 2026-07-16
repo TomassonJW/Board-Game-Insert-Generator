@@ -317,3 +317,14 @@ Le contrat P44_M008_TOLERANCE_OVERRIDE_CONTRACT propose asset-cavite,
 plat-encastrement et conteneur externe, avec zero explicite, sources effectives
 et semantiques P65 preservees. Gate humaine obligatoire avant P44-M009. Aucun
 default, formule executable ou resultat existant ne change.
+
+## P44-M009 - Jeux effectifs par role (2026-07-16)
+
+P44-M009 implemente l option B acceptee : asset_cavity, flat_inset et
+external_container. Les valeurs se resolvent par axe : override objet,
+scalaire historique compatible, puis default de role. Null herite ; zero est
+effectif. Les conteneurs externes portent between_mm (voisinage total) et
+box_per_side_xy_mm (perimetre par cote). Chaque paire utilise max, jamais une
+somme, y compris les interfaces d etage. Le schema est additif et les rapports,
+palette et CAD IR portent valeurs et provenance. fusion-validated: false ;
+print-validated: false.

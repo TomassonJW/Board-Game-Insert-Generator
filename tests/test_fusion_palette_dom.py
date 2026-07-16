@@ -113,7 +113,7 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertIn("kind==='ok'?3000:6000", self.markup)
         self.assertIn("messageTimer=setTimeout", self.markup)
         self.assertIn("main>.message.show{position:fixed;top:8px", self.markup)
-        self.assertIn('<div class="row-details">${targetControls}${customDetails}${children}</div>', self.markup)
+        self.assertIn('<div class="row-details">${targetControls}${customDetails}${clearanceControls}${children}</div>', self.markup)
 
     def test_keeps_primary_controls_visible_and_calculations_collapsed(self) -> None:
         for forbidden in (
@@ -123,7 +123,8 @@ class FusionPaletteDomTests(unittest.TestCase):
         ):
             self.assertNotIn(forbidden, self.markup)
         for marker in (
-            'title="Tolérance élément / cavité">Tolérance',
+            "function clearanceVectorFields",
+            "Tolérance cavité",
             "<label>Pile<input",
             "<label>Paroi<input",
             "<label>Fond<input",

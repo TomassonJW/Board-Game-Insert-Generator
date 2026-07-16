@@ -22,9 +22,9 @@ $preflightReportPath = Join-Path $projectDirectory "p66_preflight_report.json"
 $commitMarker = Join-Path $target "bgig_installed_commit.txt"
 
 $expected = @{
-    source_digest = "57a4ac8b4119c6d6fa22ae714884c71addadc19ecc375642821b55b36fff7e05"
-    plan_digest = "b5bf4e9c164642bfacc51bec038421827a1d30738f22149d2a00e6603d8abc9e"
-    cad_digest = "d5875dd560805a6420222e115b652027c24cb2e358442266fc1c3cd020025d7b"
+    source_digest = "bc176b0562b4eff493413d928129485ff49e136cd91e84ee9ccb9c21a7d3337c"
+    plan_digest = "2b981bdb9ff033e6d0bef52d3e0826d363a96d3e2add98ab21b4eb755179c0b3"
+    cad_digest = "303daa9cd169a469218c56c8dd3bb7d29245a2f1496fcf0282d76923643c2fe1"
 }
 
 function Read-P66Json {

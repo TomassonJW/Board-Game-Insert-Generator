@@ -2,7 +2,7 @@
 
 ## Statut
 
-Proposee le 2026-07-15. En attente de la gate humaine P44-M008.
+Acceptée le 2026-07-16 après la gate humaine P44-M008. L’option B est la décision applicable.
 
 ## Carte liee
 
@@ -30,9 +30,9 @@ sous-vecteurs : perimetre boîte par côté et voisinage total.
 
 Cout court terme faible, dette forte et zéro ambigu.
 
-## Decision proposée
+## Décision
 
-Proposer B selon le contrat P44-M008. Null signifie héritage, zéro est explicite.
+L option B est acceptée. Null signifie héritage, zéro est explicite.
 Les formules preservent les règles P65 et la paire de conteneurs utilise max,
 jamais une somme. Les valeurs historiques sont projetees sans recalibration.
 
@@ -54,5 +54,4 @@ partiel ni la provenance par axe.
 
 ## Suivi
 
-Obtenir la gate P44-M008, puis seulement lancer P44-M009 avec schema, loader,
-cœur, palette, rapports, bridge et tests de non-regression.
+P44-M009 implémente le schéma, loader, cœur, palette, rapports, CAD IR et tests. P44-M007 est la prochaine mission sur GO explicite.

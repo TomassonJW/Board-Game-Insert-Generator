@@ -1969,30 +1969,26 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
 #### P44-M007 - Calcul adaptatif et Apercu priorise
 
 - Dependances : P44-M006 et P44-M009 integrees.
-- Objectif : calcul hybride adaptatif, requetes obsoletes gerees, Apercu en
-  premier et Materialiser toujours explicite.
-- Statut : `blocked-by-p44-m006-and-p44-m009`.
+- Objectif : calcul hybride adaptatif, requetes obsoletes gerees, Apercu en premier et Materialiser toujours explicite.
+- Statut : ready-for-explicit-go apres integration P44-M009.
 
 #### P44-M008 - Contrat de jeux herites et overrides par objet
 
 - Capability : C-TOLERANCE, C-RESERVATION, C-MODULE, C-ASSET, C-QUALITY.
-- Dependances : P44-M003 et P44-M004 integrees.
 - Objectif : distinguer asset/cavite, plateau/encastrement et jeux externes des
   conteneurs, puis specifier default, override partiel X/Y/Z et source effective.
-- Livrables : ADR de tolerance, schema additif propose, regles par cote/total,
-  resolution de paire, composition Z, migration et matrice de tests.
-- Gate : validation humaine obligatoire des formules et defaults.
-- Interdit : aucun code ni changement numerique dans P44-M008.
-- Statut : proposal-human-gate-open ; ADR-0063 et contrat proposes, aucune implementation.
+- Livrables : ADR, schema additif, regles par cote/total, resolution de paire,
+  composition Z, migration et matrice de tests.
+- Gate : acceptee le 2026-07-16 ; option B retenue.
+- Statut : done-human-gate ; ADR-0063 et contrat acceptes.
 
 #### P44-M009 - Implementation des jeux par objet
 
 - Dependances : P44-M008 acceptee par gate humaine.
-- Objectif : implementer schema, loader, coeur, palette, rapports et CAD IR sans
-  changer les projets historiques ni recalibrer silencieusement les defaults.
-- Tests : inheritance/zero/override partiel, roundtrip, top inset, voisinage,
-  etages, bridge, materialisation historique et source effective.
-- Statut : `blocked-by-p44-m008-human-gate`.
+- Objectif : schema, loader, coeur, palette, rapports et CAD IR sans recalibrer les defaults.
+- Tests : inheritance, zero, override partiel, roundtrip, top inset, voisinage, etages, bridge et materialisation historique.
+- Package : 0.1.31.
+- Statut : done, implemented, automated-validated, fusion-validated: false, print-validated: false.
 
 #### P44-V - Gate humaine de fondation UX
 

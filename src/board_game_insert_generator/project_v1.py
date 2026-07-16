@@ -29,6 +29,7 @@ FLAT_ITEM_KINDS = frozenset({"board", "rulebook", "other"})
 FILL_ELEMENT_KINDS = frozenset({"hollow", "solid", "separator"})
 FILL_MODES = frozenset({"auto", "exact"})
 MEASUREMENT_CONFIDENCE = frozenset({"exact", "approximate"})
+_CLEARANCE_DEFAULT_SOURCES = frozenset({"compatibility_legacy_scalar", "project_default"})
 SOLVER_PREFERENCES = frozenset({"balanced", "compact", "accessible", "print_simple", "material_reduced"})
 SURPLUS_PREFERENCES = frozenset({"balanced", "walls", "floor"})
 DIMENSION_MODES = frozenset({"auto", "target", "fixed"})
@@ -216,7 +217,8 @@ def _validate_v1(raw: dict[str, object]) -> dict[str, object]:
     box = _validate_box(_mapping(_required_value(raw, "box", "project"), "project.box"))
     layout = _validate_layout(_mapping(_required_value(raw, "layout", "project"), "project.layout"))
     groups = _validate_container_groups(
-        _list(_required_value(raw, "container_groups", "project"), "project.container_groups")
+        _list(_required_value(raw, "container_groups", "project"), "project.container_groups"),
+        layout=layout,
     )
     contents = _validate_contents(
         _list(_required_value(raw, "contents", "project"), "project.contents"),
@@ -226,7 +228,8 @@ def _validate_v1(raw: dict[str, object]) -> dict[str, object]:
     )
     group_ids = {str(group["id"]) for group in groups}
     flat_items = _validate_flat_items(
-        _list(_required_value(raw, "flat_items", "project"), "project.flat_items")
+        _list(_required_value(raw, "flat_items", "project"), "project.flat_items"),
+        layout=layout,
     )
     fill_elements = _validate_fill_elements(
         _list(_required_value(raw, "fill_elements", "project"), "project.fill_elements"), group_ids
@@ -267,46 +270,99 @@ def _validate_box(raw: dict[str, object]) -> dict[str, object]:
 
 
 def _validate_layout(raw: dict[str, object]) -> dict[str, object]:
-    _reject_unknown(
-        raw,
-        {
-            "layout_clearance_mm",
-            "container_z_clearance_mm",
-            "container_box_xy_clearance_mm",
-            "default_wall_thickness_mm",
-            "default_floor_thickness_mm",
-            "default_content_clearance_mm",
-        },
-        "project.layout",
-    )
-    xy_clearance = _non_negative_number(raw, "layout_clearance_mm", "project.layout")
-    z_clearance = (
-        _non_negative_number(raw, "container_z_clearance_mm", "project.layout")
-        if "container_z_clearance_mm" in raw
-        else xy_clearance
-    )
-    box_xy_clearance = (
-        _non_negative_number(raw, "container_box_xy_clearance_mm", "project.layout")
-        if "container_box_xy_clearance_mm" in raw
-        else xy_clearance
-    )
+    _reject_unknown(raw, {
+        "layout_clearance_mm", "container_z_clearance_mm", "container_box_xy_clearance_mm",
+        "default_wall_thickness_mm", "default_floor_thickness_mm", "default_content_clearance_mm",
+        "clearance_defaults_v1", "clearance_default_sources_v1",
+    }, "project.layout")
+    xy = _non_negative_number(raw, "layout_clearance_mm", "project.layout")
+    z = _non_negative_number(raw, "container_z_clearance_mm", "project.layout") if "container_z_clearance_mm" in raw else xy
+    box_xy = _non_negative_number(raw, "container_box_xy_clearance_mm", "project.layout") if "container_box_xy_clearance_mm" in raw else xy
+    content = _non_negative_number(raw, "default_content_clearance_mm", "project.layout")
+    explicit = raw.get("clearance_defaults_v1")
+    if explicit is None:
+        defaults = {
+            "asset_cavity_mm": {"x": content, "y": content, "z": content},
+            "flat_inset_mm": {"x": xy, "y": xy, "z": 0.0},
+            "container_between_mm": {"x": xy, "y": xy, "z": z},
+            "container_box_per_side_xy_mm": {"x": box_xy, "y": box_xy},
+        }
+        default_sources = _clearance_default_sources(None, "compatibility_legacy_scalar")
+    else:
+        defaults = _validate_clearance_defaults_v1(explicit, "project.layout.clearance_defaults_v1")
+        default_sources = _clearance_default_sources(raw.get("clearance_default_sources_v1"), "project_default")
     return {
-        "layout_clearance_mm": xy_clearance,
-        "container_z_clearance_mm": z_clearance,
-        "container_box_xy_clearance_mm": box_xy_clearance,
-        "default_wall_thickness_mm": _positive_number(
-            raw, "default_wall_thickness_mm", "project.layout"
-        ),
-        "default_floor_thickness_mm": _positive_number(
-            raw, "default_floor_thickness_mm", "project.layout"
-        ),
-        "default_content_clearance_mm": _non_negative_number(
-            raw, "default_content_clearance_mm", "project.layout"
-        ),
+        "layout_clearance_mm": xy, "container_z_clearance_mm": z, "container_box_xy_clearance_mm": box_xy,
+        "default_wall_thickness_mm": _positive_number(raw, "default_wall_thickness_mm", "project.layout"),
+        "default_floor_thickness_mm": _positive_number(raw, "default_floor_thickness_mm", "project.layout"),
+        "default_content_clearance_mm": content, "clearance_defaults_v1": defaults,
+        "clearance_default_sources_v1": default_sources,
     }
 
 
-def _validate_container_groups(values: list[object]) -> list[dict[str, object]]:
+def _clearance_default_sources(value: object, fallback: str) -> dict[str, dict[str, str]]:
+    axes_by_vector = {
+        "asset_cavity_mm": ("x", "y", "z"),
+        "flat_inset_mm": ("x", "y", "z"),
+        "container_between_mm": ("x", "y", "z"),
+        "container_box_per_side_xy_mm": ("x", "y"),
+    }
+    if value is None:
+        return {name: {axis: fallback for axis in axes} for name, axes in axes_by_vector.items()}
+    raw = _mapping(value, "project.layout.clearance_default_sources_v1")
+    _reject_unknown(raw, set(axes_by_vector), "project.layout.clearance_default_sources_v1")
+    result: dict[str, dict[str, str]] = {}
+    for name, axes in axes_by_vector.items():
+        values = _mapping(_required_value(raw, name, "project.layout.clearance_default_sources_v1"), f"project.layout.clearance_default_sources_v1.{name}")
+        _reject_unknown(values, set(axes), f"project.layout.clearance_default_sources_v1.{name}")
+        result[name] = {}
+        for axis in axes:
+            source_name = _required_text(
+                values,
+                axis,
+                f"project.layout.clearance_default_sources_v1.{name}",
+            )
+            if source_name not in _CLEARANCE_DEFAULT_SOURCES:
+                raise ProjectContractError(
+                    f"project.layout.clearance_default_sources_v1.{name}.{axis} "
+                    "must be a known provenance."
+                )
+            result[name][axis] = source_name
+    return result
+
+
+def _validate_clearance_defaults_v1(value: object, field: str) -> dict[str, dict[str, float]]:
+    raw = _mapping(value, field)
+    _reject_unknown(raw, {"asset_cavity_mm", "flat_inset_mm", "container_between_mm", "container_box_per_side_xy_mm"}, field)
+    return {
+        "asset_cavity_mm": _clearance_vector(_required_value(raw, "asset_cavity_mm", field), ("x", "y", "z"), f"{field}.asset_cavity_mm"),
+        "flat_inset_mm": _clearance_vector(_required_value(raw, "flat_inset_mm", field), ("x", "y", "z"), f"{field}.flat_inset_mm"),
+        "container_between_mm": _clearance_vector(_required_value(raw, "container_between_mm", field), ("x", "y", "z"), f"{field}.container_between_mm"),
+        "container_box_per_side_xy_mm": _clearance_vector(_required_value(raw, "container_box_per_side_xy_mm", field), ("x", "y"), f"{field}.container_box_per_side_xy_mm"),
+    }
+
+
+def _clearance_vector(value: object, axes: tuple[str, ...], field: str) -> dict[str, float]:
+    raw = _mapping(value, field); _reject_unknown(raw, set(axes), field)
+    return {a: _non_negative_number(raw, a, field) for a in axes}
+
+
+def _optional_clearance_vector(value: object, axes: tuple[str, ...], field: str) -> dict[str, float | None]:
+    if value is None: return {a: None for a in axes}
+    raw = _mapping(value, field); _reject_unknown(raw, set(axes), field)
+    return {a: _optional_non_negative_number(raw.get(a), field) for a in axes}
+
+
+def _resolved_clearance(override: dict[str, float | None], defaults: dict[str, float], sources: dict[str, object], *, legacy_scalar: float | None = None, legacy_source: str = "legacy_scalar") -> tuple[dict[str, float], dict[str, str]]:
+    values: dict[str, float] = {}; provenance: dict[str, str] = {}
+    for a, default in defaults.items():
+        if override[a] is not None: values[a], provenance[a] = float(override[a]), "object_override"
+        elif legacy_scalar is not None: values[a], provenance[a] = float(legacy_scalar), legacy_source
+        else: values[a], provenance[a] = float(default), str(sources[a])
+    return values, provenance
+
+
+def _validate_container_groups(values: list[object], *, layout: dict[str, object]) -> list[dict[str, object]]:
     result: list[dict[str, object]] = []
     ids: set[str] = set()
     for index, value in enumerate(values):
@@ -318,6 +374,7 @@ def _validate_container_groups(values: list[object]) -> list[dict[str, object]]:
                 "id", "name", "wall_thickness_mm", "floor_thickness_mm",
                 "expansion_axes", "locked_outer_dimensions_mm", "surplus_preference",
                 "dimension_modes", "target_outer_dimensions_mm",
+                "clearance_overrides_v1", "clearance_effective_v1",
             },
             field,
         )
@@ -330,6 +387,10 @@ def _validate_container_groups(values: list[object]) -> list[dict[str, object]]:
         dimension_modes, target_dimensions, expansion_axes, locked_dimensions = _validate_dimension_contract(
             raw, expansion_axes, locked_dimensions, field
         )
+        overrides = _validate_container_clearance_overrides(raw.get("clearance_overrides_v1"), field)
+        defaults = dict(layout["clearance_defaults_v1"]); sources = dict(layout["clearance_default_sources_v1"])
+        between, between_sources = _resolved_clearance(dict(overrides["between_mm"]), dict(defaults["container_between_mm"]), dict(sources["container_between_mm"]))
+        box_clearance, box_sources = _resolved_clearance(dict(overrides["box_per_side_xy_mm"]), dict(defaults["container_box_per_side_xy_mm"]), dict(sources["container_box_per_side_xy_mm"]))
         result.append(
             {
                 "id": group_id,
@@ -344,9 +405,24 @@ def _validate_container_groups(values: list[object]) -> list[dict[str, object]]:
                     raw.get("surplus_preference"), SURPLUS_PREFERENCES, "balanced",
                     f"{field}.surplus_preference",
                 ),
+                "clearance_overrides_v1": overrides,
+                "clearance_effective_v1": {
+                    "role": "external_container", "between_mm": between, "box_per_side_xy_mm": box_clearance,
+                    "source_by_vector": {"between_mm": between_sources, "box_per_side_xy_mm": box_sources},
+                },
             }
         )
     return result
+
+
+def _validate_container_clearance_overrides(value: object, field: str) -> dict[str, dict[str, float | None]]:
+    if value is None: return {"between_mm": {"x": None, "y": None, "z": None}, "box_per_side_xy_mm": {"x": None, "y": None}}
+    raw = _mapping(value, f"{field}.clearance_overrides_v1")
+    _reject_unknown(raw, {"between_mm", "box_per_side_xy_mm"}, f"{field}.clearance_overrides_v1")
+    return {
+        "between_mm": _optional_clearance_vector(raw.get("between_mm"), ("x", "y", "z"), f"{field}.clearance_overrides_v1.between_mm"),
+        "box_per_side_xy_mm": _optional_clearance_vector(raw.get("box_per_side_xy_mm"), ("x", "y"), f"{field}.clearance_overrides_v1.box_per_side_xy_mm"),
+    }
 
 
 def _validate_expansion_axes(value: object, field: str) -> dict[str, bool]:
@@ -471,6 +547,7 @@ def _validate_contents(
             {
                 "id", "name", "shape_kind", "dimensions_mm", "base_dimensions_mm",
                 "quantity", "container_group_id", "content_clearance_mm",
+                "clearance_override_mm", "clearance_effective_v1",
                 "measurement_confidence", "dimension_source", "card_format_id",
                 "sleeved", "storage_orientation", "resolved_orientation",
                 "card_stack_mode", "card_thickness_mm",
@@ -487,12 +564,12 @@ def _validate_contents(
             raise ProjectContractError(f"{field}.container_group_id references unknown group '{group_id}'.")
         quantity = _positive_int(raw, "quantity", field)
         content_clearance = _optional_non_negative_number(raw.get("content_clearance_mm"), field)
-        effective_clearance = float(
-            layout["default_content_clearance_mm"] if content_clearance is None else content_clearance
-        )
+        override = _optional_clearance_vector(raw.get("clearance_override_mm"), ("x", "y", "z"), f"{field}.clearance_override_mm")
+        defaults = dict(layout["clearance_defaults_v1"]); sources = dict(layout["clearance_default_sources_v1"])
+        effective, effective_sources = _resolved_clearance(override, dict(defaults["asset_cavity_mm"]), dict(sources["asset_cavity_mm"]), legacy_scalar=content_clearance, legacy_source="legacy_content_clearance_mm")
         group = groups_by_id[group_id]
         effective_floor = float(group["floor_thickness_mm"] or layout["default_floor_thickness_mm"])
-        max_content_height = max(0.0001, usable_height_mm - effective_floor - effective_clearance)
+        max_content_height = max(0.0001, usable_height_mm - effective_floor - effective["z"])
         geometry = _validate_content_geometry(
             raw, shape_kind=shape_kind, quantity=quantity,
             max_height_mm=max_content_height, field=field
@@ -505,7 +582,8 @@ def _validate_contents(
                 **geometry,
                 "quantity": quantity,
                 "container_group_id": group_id,
-                "content_clearance_mm": content_clearance,
+                "content_clearance_mm": content_clearance, "clearance_override_mm": override,
+                "clearance_effective_v1": {"role": "asset_cavity", "values_mm": effective, "source_by_axis": effective_sources},
                 "measurement_confidence": _optional_enum(
                     raw.get("measurement_confidence"),
                     MEASUREMENT_CONFIDENCE,
@@ -587,7 +665,7 @@ def _validate_content_geometry(
     }
 
 
-def _validate_flat_items(values: list[object]) -> list[dict[str, object]]:
+def _validate_flat_items(values: list[object], *, layout: dict[str, object]) -> list[dict[str, object]]:
     result: list[dict[str, object]] = []
     ids: set[str] = set()
     orders: set[int] = set()
@@ -598,7 +676,7 @@ def _validate_flat_items(values: list[object]) -> list[dict[str, object]]:
             raw,
             {
                 "id", "name", "kind", "dimensions_mm", "quantity", "stack_order",
-                "origin_mm", "rotation_deg_z",
+                "origin_mm", "rotation_deg_z", "clearance_override_mm", "clearance_effective_v1",
             },
             field,
         )
@@ -611,6 +689,9 @@ def _validate_flat_items(values: list[object]) -> list[dict[str, object]]:
             if stack_order in orders:
                 raise ProjectContractError(f"{field}.stack_order duplicates '{stack_order}'.")
             orders.add(stack_order)
+        override = _optional_clearance_vector(raw.get("clearance_override_mm"), ("x", "y", "z"), f"{field}.clearance_override_mm")
+        defaults = dict(layout["clearance_defaults_v1"]); sources = dict(layout["clearance_default_sources_v1"])
+        effective, effective_sources = _resolved_clearance(override, dict(defaults["flat_inset_mm"]), dict(sources["flat_inset_mm"]))
         result.append(
             {
                 "id": item_id,
@@ -625,6 +706,8 @@ def _validate_flat_items(values: list[object]) -> list[dict[str, object]]:
                 "rotation_deg_z": _optional_right_angle_rotation(
                     raw.get("rotation_deg_z"), f"{field}.rotation_deg_z"
                 ),
+                "clearance_override_mm": override,
+                "clearance_effective_v1": {"role": "flat_inset", "values_mm": effective, "source_by_axis": effective_sources},
             }
         )
     return result
