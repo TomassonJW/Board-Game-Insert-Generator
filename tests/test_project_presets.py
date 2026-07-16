@@ -20,9 +20,14 @@ class ProjectPresetTests(unittest.TestCase):
         )
         self.assertEqual(presets["contents"][0]["content"]["shape_kind"], "round")
         self.assertNotIn("id", presets["contents"][0]["content"])
-        cards = next(item["content"] for item in presets["contents"] if item["key"] == "cards")
-        self.assertEqual(cards["sleeve_extra_xy_mm"], 2.0)
-        self.assertEqual(cards["sleeve_extra_z_mm_per_card"], 0.08)
+        card_preset = next(item for item in presets["contents"] if item["key"] == "cards")
+        cards = card_preset["content"]
+        self.assertEqual(card_preset["label"], "Cartes")
+        self.assertEqual(cards["name"], "Cartes")
+        self.assertFalse(cards["sleeved"])
+        self.assertNotIn("sleeve_extra_xy_mm", cards)
+        self.assertNotIn("sleeve_extra_z_mm_per_card", cards)
+        self.assertEqual(cards["base_dimensions_mm"], {"x": 63.5, "y": 88.9, "z": 24.0})
 
     def test_quarantines_complement_starters_from_normal_creation_presets(self) -> None:
         presets = build_creation_presets(blank_project_v1(), storage_height_mm=42.5)

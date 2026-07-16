@@ -328,11 +328,27 @@ class FusionPaletteDomTests(unittest.TestCase):
             "const thicknessField=counted?",
             "sleeve_extra_xy_mm",
             "sleeve_extra_z_mm_per_card",
-            "DEFAULT_SLEEVE_EXTRA_XY_MM=2",
-            "DEFAULT_SLEEVE_EXTRA_Z_MM_PER_CARD=.08",
+            "DEFAULT_SLEEVE_EXTRA_XY_MM=3",
+            "DEFAULT_SLEEVE_EXTRA_Z_MM_PER_CARD=.19",
+            "ESTIMATED_CARD_THICKNESS_MM=.31",
+            "Nombre de cartes estim\u00e9es",
+            "card_stack_declared_thickness_mm",
             'placeholder="Catalogue"',
         ):
             self.assertIn(marker, self.markup)
+
+        self.assertIn(
+            "${dimensions}${quantityField}${thicknessField}${methodField}${moveAction}",
+            self.markup,
+        )
+        self.assertNotIn("${methodField}${dimensions}", self.markup)
+        sleeve_start = self.markup.index("const sleeveFields=")
+        sleeve_end = self.markup.index("const cardFields=", sleeve_start)
+        self.assertNotIn("counted?", self.markup[sleeve_start:sleeve_end])
+        self.assertIn(
+            'class="card-estimated-count">Nombre de cartes estim\u00e9es<input type="number"',
+            self.markup,
+        )
 
     def test_collapses_and_expands_each_container_without_hiding_its_primary_line(self) -> None:
         for marker in (
@@ -467,12 +483,14 @@ class FusionPaletteDomTests(unittest.TestCase):
     def test_prepares_the_p44_m007_adaptive_preview_gate(self) -> None:
         script = (ROOT / "scripts" / "fusion" / "prepare_p44_m007_adaptive_preview_test.ps1").read_text(encoding="utf-8")
         for marker in (
-            "0.1.38", "DERIVE_DEBOUNCE_MS=350", "AUTO_SOLVE_STABILITY_MS=1500",
+            "0.1.39", "DERIVE_DEBOUNCE_MS=350", "AUTO_SOLVE_STABILITY_MS=1500",
             "latestDerivedRequest", "renderBackgroundUpdate(action)", "deferredDerivedPaint",
+            "DEFAULT_SLEEVE_EXTRA_XY_MM=3", "DEFAULT_SLEEVE_EXTRA_Z_MM_PER_CARD=.19",
+            "ESTIMATED_CARD_THICKNESS_MM=.31", "card_stack_declared_thickness_mm",
             "sleeve_extra_xy_mm", "sleeve_extra_z_mm_per_card", "toggle-group",
             "Recalculer maintenant", "preview-status",
             "preview-explanations", "[char]0x00E9",
-            "exactly one explicit materialize action", "P44-M007H01 Fusion OK 0.1.38",
+            "exactly one explicit materialize action", "P44-M007H02 Fusion OK 0.1.39",
         ):
             self.assertIn(marker, script)
 

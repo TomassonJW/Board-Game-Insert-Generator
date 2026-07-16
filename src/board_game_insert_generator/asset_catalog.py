@@ -3,14 +3,17 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from math import floor
 
 
 CARD_CATALOG_SCHEMA_V1 = "bgig.card_catalog.v1"
 STORAGE_ORIENTATIONS = frozenset({"flat", "upright_long_edge", "upright_short_edge", "auto"})
 CARD_STACK_MODES = frozenset({"thickness", "count"})
 
-DEFAULT_SLEEVE_EXTRA_XY_MM = 2.0
-DEFAULT_SLEEVE_EXTRA_Z_MM_PER_CARD = 0.08
+DEFAULT_SLEEVE_EXTRA_XY_MM = 3.0
+DEFAULT_SLEEVE_EXTRA_Z_MM_PER_CARD = 0.19
+ESTIMATED_CARD_THICKNESS_MM = 0.31
+_LEGACY_SLEEVE_EXTRA_Z_MM_PER_CARD = 0.08
 _CARD_FORMATS = (
     {"id": "poker", "label": "Poker / Standard", "unsleeved_mm": {"x": 63.5, "y": 88.9}, "sleeved_mm": {"x": 66.0, "y": 91.0}},
     {"id": "standard_euro", "label": "Standard europeen", "unsleeved_mm": {"x": 59.0, "y": 92.0}, "sleeved_mm": {"x": 61.0, "y": 94.0}},
@@ -65,14 +68,34 @@ def card_stack_thickness_mm(
     if mode not in CARD_STACK_MODES:
         raise AssetCatalogError(f"Unsupported card stack mode: {mode!r}.")
     if mode == "thickness":
-        return _round(declared_thickness_mm)
+        sleeve_total = 0.0
+        if sleeved and sleeve_extra_z_mm_per_card is not None:
+            sleeve_total = (
+                estimate_card_count_from_thickness(declared_thickness_mm)
+                * sleeve_extra_z_mm_per_card
+            )
+        return _round(declared_thickness_mm + sleeve_total)
     sleeve_extra = (
-        DEFAULT_SLEEVE_EXTRA_Z_MM_PER_CARD
+        _LEGACY_SLEEVE_EXTRA_Z_MM_PER_CARD
         if sleeve_extra_z_mm_per_card is None
         else sleeve_extra_z_mm_per_card
     )
     per_card = card_thickness_mm + (sleeve_extra if sleeved else 0.0)
     return _round(quantity * per_card)
+
+
+def estimate_card_count_from_thickness(
+    declared_thickness_mm: float,
+    *,
+    estimated_card_thickness_mm: float = ESTIMATED_CARD_THICKNESS_MM,
+) -> int:
+    """Estimate a whole card count from an unsleeved deck thickness."""
+
+    if declared_thickness_mm <= 0:
+        raise AssetCatalogError("Declared card stack thickness must be positive.")
+    if estimated_card_thickness_mm <= 0:
+        raise AssetCatalogError("Estimated card thickness must be positive.")
+    return max(1, floor(declared_thickness_mm / estimated_card_thickness_mm + 0.5))
 
 
 def orient_dimensions(

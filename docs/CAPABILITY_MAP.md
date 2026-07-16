@@ -1165,4 +1165,24 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - Limites : valeurs de départ sleeves non validées physiquement ; solveur,
   tolérances, géométrie et scène inchangés ; fusion-validated: false ;
   print-validated: false.
-- Suite : P44-M007H01V est la seule action suivante autorisée.
+- Suite : P44-M007H01V est supersédée avant observation par P44-M007H02V.
+
+## P44-M007H02 - Capability update corrective (2026-07-16)
+
+- C-FUSION-UI : preset `Cartes` non sleevé, méthode de mesure placée avant le
+  menu et champs conditionnels réellement absents quand ils sont inactifs.
+- C-USABILITY : deltas sleeves 3 mm X/Y et 0,19 mm/carte visibles dans les deux
+  méthodes ; quantité estimée grisée en épaisseur paquet.
+- C-PROJECT-CONTRACT : `card_stack_declared_thickness_mm` additif sépare le Z
+  saisi du Z résolu et empêche tout cumul au roundtrip.
+- C-ASSET : estimation déterministe demi-supérieure sur la base de 0,31 mm par
+  carte ; surcharge Z appliquée par carte seulement lorsque les sleeves et le
+  delta explicite sont actifs.
+- C-QUALITY : 483 tests passent et gate P44-M007H02V reproductible ; anciens
+  projets sans deltas préservés.
+- C-SOLVER / C-TOLERANCE / C-GEOMETRY / C-CAD-IR : aucune modification du
+  placement, aucune recalibration et aucune scène automatique.
+- Limites : valeurs sleeves non validées physiquement ; fusion-validated: false ;
+  print-validated: false.
+- Suite : P44-M007H02V est la seule action suivante autorisée. Les dispositions
+  non-cartes sont candidates de P45, pas de P44.

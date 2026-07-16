@@ -1,6 +1,6 @@
 # Backlog
 
-Derniere mise a jour : 2026-07-14
+Derniere mise a jour : 2026-07-16
 
 Le backlog transforme la North Star en missions atomiques. Voir
 `docs/PILOTAGE_GLOSSARY.md` pour la distinction roadmap/backlog et la
@@ -2224,3 +2224,54 @@ P44-M007 est ready-for-explicit-go.
 - Statut : done-code, implemented, automated-validated,
   human-fusion-check-required par P44-M007H01V, fusion-validated: false,
   print-validated: false.
+
+#### P44-M007H02 - Cartes non sleevées et estimation de surcharge
+
+- Capability : C-FUSION-UI, C-USABILITY, C-ASSET, C-PROJECT-CONTRACT et C-QUALITY.
+- Dépendances : P44-M007H01 intégrée ; clarification humaine avant gate 0.1.38.
+- Livrable : package 0.1.39 ; preset `Cartes` non sleevé, méthode à droite,
+  champs conditionnels, deltas 3 mm X/Y et 0,19 mm/carte dans les deux modes,
+  estimation grisée à 0,31 mm/carte et Z déclaré sans cumul.
+- Compatibilité : les anciens projets sans deltas gardent leur comportement ;
+  aucun défaut historique n’est injecté silencieusement.
+- Non-objectifs : disposition des assets non-cartes, solveur de placement,
+  budgets, tolérances, géométrie, CAD IR, scène automatique et impression.
+- Validation : 483 tests passent, JavaScript, PowerShell, compileall, exemple
+  CLI, frontière adsk, diff-check et gate Fusion reproductible.
+- Statut : done-code, implemented, automated-validated,
+  human-fusion-check-required par P44-M007H02V, fusion-validated: false,
+  print-validated: false.
+
+#### P45-M001 - Contrat de disposition des assets non-cartes
+
+- Capability : C-GEOMETRY, C-ASSET, C-SOLVER et C-USABILITY.
+- Dépendance : P44-V acceptée.
+- Objectif produit : choisir par asset une disposition qui gouverne réellement
+  sa future cavité : `standard/auto`, `rangée` ou `colonne verticale`.
+- Intention `standard/auto` : rechercher une empreinte X/Y proche du carré et
+  une profondeur Z proportionnée, approximativement entre la moitié et les deux
+  tiers de X lorsque les contraintes le permettent.
+- Intention `rangée` : laisser le solveur choisir l’axe X ou Y et la longueur
+  utile. Intention `colonne verticale` : empiler dans la profondeur Z.
+- Premier livrable : contrat et ADR de géométrie comparant sémantique, quantité,
+  rotations, formes, limites de boîte, accessibilité et compatibilité avant UI.
+- Critères : chaque contrôle a un effet moteur testable ; aucun mode décoratif,
+  aucune migration destructive et aucune recalibration implicite.
+- Gate : décision de contrat P45 puis validation Fusion distincte.
+- Statut : blocked-by-P44-V.
+
+### P0-M010 - Compacter le pilotage de reprise
+
+- Capability : pilotage projet et C-QUALITY.
+- Dépendance : P44-M007H02V observée ; mission documentaire isolée.
+- Objectif : réduire le coût de reprise, les lectures redondantes et les risques
+  de divergence du backlog/roadmap sans perdre l’historique auditable.
+- Livrable : index courant court, vues `actif / prochain / bloqué`, archives
+  navigables et règles d’écriture évitant la répétition entre STATUS, ROADMAP,
+  BACKLOG et NEXT_ACTIONS.
+- Critères : un agent retrouve mission, dépendances, contrats, gate et état Git
+  depuis un petit parcours canonique ; les tests documentaires et liens restent
+  verts ; aucune suppression destructive d’historique.
+- Non-objectifs : changement produit, solveur, schéma ou réécriture massive sans
+  plan de migration documentaire.
+- Statut : todo-after-P44-M007H02V.

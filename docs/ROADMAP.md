@@ -675,5 +675,22 @@ sleeves X/Y et Z explicites sans migration des anciens projets, et transforme
 les conteneurs en sections repliables à en-tête permanent.
 
 Statut : implemented, automated-validated, human-fusion-check-required par
-P44-M007H01V, fusion-validated: false, print-validated: false. Aucun lot P45/P46,
-P47-P50, P67, P68 ou P69 n’est ouvert.
+P44-M007H01V, désormais supersédée par P44-M007H02V, fusion-validated: false,
+print-validated: false. Aucun lot P45/P46, P47-P50, P67, P68 ou P69 n’est ouvert.
+
+## P44-M007H02 - Mesure cartes et sleeves cohérents (2026-07-16)
+
+Le package 0.1.39 finalise le correctif P44-M007 avant sa gate Fusion. Le preset
+`Cartes` devient non sleevé par défaut, la méthode de mesure rejoint la droite
+de la ligne principale et seuls les champs actifs restent visibles.
+
+Les sleeves proposent 3 mm au total sur X/Y et 0,19 mm par carte sur Z dans les
+deux méthodes. En épaisseur paquet, une estimation grisée utilise 0,31 mm par
+carte et le Z résolu ajoute le delta par carte sans jamais cumuler la surcharge
+au roundtrip.
+
+Statut : implemented, automated-validated, human-fusion-check-required par
+P44-M007H02V, fusion-validated: false, print-validated: false. La gate H01 est
+supersédée. Les dispositions d’assets non-cartes restent dans P45 après P44-V ;
+aucun solveur de placement, tolérance, géométrie ou comportement de scène n’est
+modifié ici.

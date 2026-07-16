@@ -435,6 +435,8 @@ Cette gate qualifie uniquement l’orchestration UI et l’ordre de l’Aperçu 
 
 ## P44-M007H01V - Focus stable, cartes explicites et conteneurs repliables 0.1.38
 
+Statut : superseded-before-observation par P44-M007H02V.
+
 Déclencheur : P44-M007H01 est intégrée dans `main`, le package 0.1.38 est
 installé avec `scripts/fusion/prepare_p44_m007_adaptive_preview_test.ps1`, et
 les validations automatisées sont passées.
@@ -472,3 +474,39 @@ composition des cartes et conteneurs observées dans Fusion. Elle ne valide ni
 les valeurs physiques, ni la géométrie imprimée, ni l’impression.
 `print-validated: false` reste inchangé et P44-V demeure la gate globale
 suivante.
+
+## P44-M007H02V - Focus stable et calcul sleeves cartes 0.1.39
+
+Statut : human-fusion-check-required. Cette gate remplace P44-M007H01V, qui
+n’a pas été observée dans Fusion avant l’intégration du correctif cartes 0.1.39.
+
+Déclencheur : P44-M007H02 est intégrée dans `main`, le package 0.1.39 est
+installé avec `scripts/fusion/prepare_p44_m007_adaptive_preview_test.ps1`, et
+les validations automatisées sont passées.
+
+Vérifier dans Fusion :
+
+1. remplacer rapidement la sélection complète d’au moins trois champs ;
+   autosave, minima et proposition ne retirent ni focus ni sélection ;
+2. après stabilisation, seule la proposition correspondant aux dernières valeurs
+   devient visible ;
+3. le preset `Cartes` est non sleevé par défaut ;
+4. `Méthode de mesure` est le dernier champ avant le menu `...`, après Z en
+   épaisseur paquet et après Épaisseur carte en mode compté ;
+5. les champs Z ou Qté/Épaisseur carte sont affichés selon la méthode ;
+6. activer les sleeves expose 3 mm sur X/Y et 0,19 mm par carte sur Z dans les
+   deux méthodes ;
+7. avec Z paquet = 24 mm, le champ grisé estime 77 cartes et le Z résolu vaut
+   38,63 mm ; désactiver les sleeves ramène le Z résolu à 24 mm ;
+8. le repli d’un conteneur conserve son en-tête ;
+9. Aperçu, fallback manuel, hauteur grisée et matérialisation exclusivement
+   explicite restent conformes.
+
+Retour OK :
+
+`P44-M007H02 Fusion OK 0.1.39 - commit <sha>`
+
+Cette gate qualifie la stabilité de saisie, la composition UI et le calcul
+logiciel observés. Elle ne calibre pas physiquement 3 mm, 0,19 mm ou 0,31 mm,
+ne valide pas la géométrie imprimée et ne vaut pas validation d’impression.
+`print-validated: false` reste inchangé.

@@ -556,6 +556,7 @@ def _validate_contents(
                 "sleeved", "storage_orientation", "resolved_orientation",
                 "card_stack_mode", "card_thickness_mm",
                 "sleeve_extra_xy_mm", "sleeve_extra_z_mm_per_card",
+                "card_stack_declared_thickness_mm",
             },
             field,
         )
@@ -637,6 +638,15 @@ def _validate_content_geometry(
     stack_mode = _optional_enum(
         raw.get("card_stack_mode"), CARD_STACK_MODES, "thickness", f"{field}.card_stack_mode"
     )
+    declared_stack_thickness = (
+        _optional_positive_number(
+            raw.get("card_stack_declared_thickness_mm"),
+            f"{field}.card_stack_declared_thickness_mm",
+        )
+        if "card_stack_declared_thickness_mm" in raw
+        else base["z"]
+    )
+    assert declared_stack_thickness is not None
     card_thickness = _optional_positive_number(
         raw.get("card_thickness_mm", 0.32), f"{field}.card_thickness_mm"
     )
@@ -655,7 +665,7 @@ def _validate_content_geometry(
         base.update(catalog_xy)
     try:
         base["z"] = card_stack_thickness_mm(
-            mode=stack_mode, declared_thickness_mm=base["z"], quantity=quantity,
+            mode=stack_mode, declared_thickness_mm=declared_stack_thickness, quantity=quantity,
             card_thickness_mm=card_thickness,
             sleeved=sleeved,
             sleeve_extra_z_mm_per_card=sleeve_extra_z,
@@ -684,6 +694,10 @@ def _validate_content_geometry(
         geometry["sleeve_extra_xy_mm"] = sleeve_extra_xy
     if "sleeve_extra_z_mm_per_card" in raw:
         geometry["sleeve_extra_z_mm_per_card"] = sleeve_extra_z
+    if "card_stack_declared_thickness_mm" in raw or (
+        stack_mode == "thickness" and sleeved and sleeve_extra_z is not None
+    ):
+        geometry["card_stack_declared_thickness_mm"] = declared_stack_thickness
     return geometry
 
 

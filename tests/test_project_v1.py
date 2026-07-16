@@ -175,6 +175,38 @@ class ProjectV1Tests(unittest.TestCase):
         self.assertEqual(overridden["sleeve_extra_xy_mm"], 2.0)
         self.assertEqual(overridden["sleeve_extra_z_mm_per_card"], 0.1)
 
+    def test_sleeved_declared_stack_estimate_is_additive_and_roundtrippable(self) -> None:
+        project = blank_project_v1()
+        project["box"]["usable_height_mm"] = 100
+        project["container_groups"] = [
+            {"id": "cards", "name": "Cartes", "wall_thickness_mm": None, "floor_thickness_mm": None}
+        ]
+        project["contents"] = [{
+            "id": "deck", "name": "Cartes", "shape_kind": "cards",
+            "dimensions_mm": {"x": 63.5, "y": 88.9, "z": 24.0},
+            "base_dimensions_mm": {"x": 63.5, "y": 88.9, "z": 24.0},
+            "quantity": 60, "container_group_id": "cards",
+            "content_clearance_mm": None, "measurement_confidence": "exact",
+            "dimension_source": "catalog", "card_format_id": "poker",
+            "sleeved": True, "storage_orientation": "flat",
+            "card_stack_mode": "thickness", "card_thickness_mm": 0.32,
+            "sleeve_extra_xy_mm": 3.0, "sleeve_extra_z_mm_per_card": 0.19,
+        }]
+
+        normalized = normalize_project_draft(project).project
+        cards = normalized["contents"][0]
+        self.assertEqual(cards["card_stack_declared_thickness_mm"], 24.0)
+        self.assertEqual(cards["base_dimensions_mm"], {"x": 66.5, "y": 91.9, "z": 38.63})
+        self.assertEqual(cards["dimensions_mm"], {"x": 66.5, "y": 91.9, "z": 38.63})
+
+        roundtripped = normalize_project_draft(normalized).project["contents"][0]
+        self.assertEqual(roundtripped["card_stack_declared_thickness_mm"], 24.0)
+        self.assertEqual(roundtripped["base_dimensions_mm"]["z"], 38.63)
+
+        normalized["contents"][0]["sleeved"] = False
+        unsleeved = normalize_project_draft(normalized).project["contents"][0]
+        self.assertEqual(unsleeved["base_dimensions_mm"], {"x": 63.5, "y": 88.9, "z": 24.0})
+
     def test_legacy_migration_preserves_groups_flats_and_deferred_features(self) -> None:
         legacy = starter_draft()
         original = deepcopy(legacy)

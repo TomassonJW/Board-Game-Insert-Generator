@@ -69,24 +69,28 @@ Une ligne `shape_kind: cards` peut utiliser les champs suivants :
 | Champ | Signification |
 | --- | --- |
 | `card_format_id` | Format du catalogue, ou `null` pour des dimensions explicites |
-| `card_stack_mode` | `thickness` pour une epaisseur totale ou `count` pour epaisseur de carte x quantite |
-| `card_thickness_mm` | Epaisseur d'une carte, active pour `count` |
-| `sleeved` | Active la resolution avec sleeves |
+| `card_stack_mode` | `thickness` pour une épaisseur totale ou `count` pour épaisseur de carte × quantité |
+| `card_stack_declared_thickness_mm` | Z du paquet saisi avant ajout sleeves, additif et utile au mode `thickness` |
+| `card_thickness_mm` | Épaisseur d’une carte, active pour `count` |
+| `sleeved` | Active la résolution avec sleeves ; `false` par défaut dans le preset `Cartes` |
 | `sleeve_extra_xy_mm` | Delta total optionnel, identique sur X et Y |
-| `sleeve_extra_z_mm_per_card` | Delta Z optionnel ajoute a chaque carte en mode `count` |
+| `sleeve_extra_z_mm_per_card` | Delta Z optionnel ajouté à chaque carte dans les deux modes |
 
-Les deux deltas doivent etre finis et superieurs ou egaux a zero lorsqu'ils sont
-presents. Ils sont additifs et optionnels. Leur absence conserve le comportement
-catalogue historique : le normaliseur ne les injecte pas dans un ancien projet
-et ne recalcule pas implicitement ses dimensions. Dans la nouvelle UI, activer
-les sleeves initialise les valeurs communes editables de 2,0 mm sur X/Y et
-0,08 mm par carte sur Z. Ces valeurs restent des valeurs de depart non
-print-validated.
+Les deltas et le Z déclaré doivent être finis ; les deltas sont supérieurs ou
+égaux à zéro et le Z déclaré est strictement positif. Leur absence conserve le
+comportement catalogue historique : le normaliseur ne les injecte pas dans un
+ancien projet et ne recalcule pas implicitement ses dimensions.
 
-En mode `thickness`, Z est l'epaisseur explicite du paquet ; `quantity`,
-`card_thickness_mm` et le delta Z par carte ne participent pas a cette
-epaisseur. En mode `count`, Z est derive de la quantite, de l'epaisseur de
-carte et du delta sleeve Z par carte.
+Dans la nouvelle UI, activer les sleeves initialise les valeurs communes
+éditables à 3,0 mm sur X/Y et 0,19 mm par carte sur Z. En mode `thickness`, le
+nombre estimé est `max(1, floor(declared_Z / 0.31 + 0.5))` et le Z résolu vaut
+`declared_Z + estimated_count × sleeve_extra_z_mm_per_card`. Le champ déclaré
+reste stable au roundtrip afin de ne jamais cumuler la surépaisseur.
+
+En mode `count`, Z vaut
+`quantity × (card_thickness_mm + sleeve_extra_z_mm_per_card)`. Décocher les
+sleeves exclut les deltas du résultat. Les valeurs de départ 3,0, 0,19 et 0,31 mm
+ne sont ni fusion-validated physiquement ni print-validated.
 
 ## Plateaux et livrets
 

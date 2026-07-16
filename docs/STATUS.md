@@ -2168,5 +2168,36 @@ changent pas.
 Validation automatisée : 481 tests, syntaxe JavaScript, tests ciblés
 catalogue/projet/presets/DOM/transport, parse PowerShell, dry-run de gate,
 `compileall`, exemple CLI, frontière `adsk` et `git diff --check`.
-P44-M007H01V est la seule action suivante. Aucune validation d’impression n’est
-acquise.
+P44-M007H01V a été supersédée avant observation par P44-M007H02V. Aucune
+validation d’impression n’est acquise.
+
+## P44-M007H02 - Mesure cartes et estimation sleeves sans cumul (2026-07-16)
+
+Statut : implemented, automated-validated, package 0.1.39,
+human-fusion-check-required par P44-M007H02V, fusion-validated: false,
+print-validated: false. P44-M007H01V est supersédée avant observation.
+
+Le preset intégré s’appelle désormais `Cartes` et reste non sleevé par défaut.
+La méthode de mesure est le dernier contrôle avant le menu : après Z en
+`Épaisseur paquet`, après Épaisseur carte en `Épaisseur carte × nb`.
+Les champs inactifs disparaissent au lieu de rester éditables.
+
+Activer les sleeves initialise des deltas éditables de 3 mm au total sur X/Y et
+0,19 mm par carte sur Z. Le delta Z est disponible dans les deux méthodes. En
+épaisseur paquet, le nombre de cartes est estimé par Z / 0,31, arrondi à
+l’entier le plus proche et affiché dans un champ grisé. Le Z résolu ajoute
+l’estimation multipliée par le delta Z. Un Z déclaré additif séparé empêche
+toute accumulation lors d’un autosave, d’une validation ou d’un roundtrip ;
+désactiver les sleeves restitue le Z saisi.
+
+La compatibilité reste conservatrice : un ancien projet sans deltas garde le
+comportement catalogue historique. Le solveur de placement, ses budgets, les
+tolérances, la géométrie, la CAD IR et la scène ne changent pas. Les modes de
+disposition des assets non-cartes sont reportés à P45, où ils pourront avoir un
+effet géométrique réel.
+
+Validation automatisée : 483 tests passent, syntaxe JavaScript, tests ciblés
+catalogue/projet/presets/DOM/transport, parse PowerShell, dry-run de gate,
+`compileall`, exemple CLI, frontière `adsk` et diff-check. P44-M007H02V est
+la seule action suivante. Les valeurs 3, 0,19 et 0,31 mm ne sont pas calibrées
+physiquement et aucune validation d’impression n’est acquise.
