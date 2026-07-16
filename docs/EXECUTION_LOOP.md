@@ -5,12 +5,12 @@ Cette boucle est le mode standard d'un run Codex autonome sur ce depot.
 ## Boucle standard
 
 1. Lire `AGENTS.md`.
-2. Lire `docs/STATUS.md`.
-3. Lire `docs/NORTH_STAR.md`.
-4. Lire `docs/CAPABILITY_MAP.md`.
-5. Lire `docs/NEXT_ACTIONS.md`.
-6. Lire `docs/BACKLOG.md`.
-7. Identifier la premiere mission `ready` non bloquee et non gated.
+2. Lire `docs/PILOTAGE_CURRENT.md`.
+3. Lire `docs/NEXT_ACTIONS.md` et `docs/HUMAN_GATES.md`.
+4. Lire le contrat, les ADR et les fichiers directement concernés.
+5. Ouvrir `STATUS.md`, `NORTH_STAR.md`, `CAPABILITY_MAP.md`, `ROADMAP.md` et
+   `BACKLOG.md` lorsqu’une information active doit être vérifiée en détail.
+6. Identifier la premiere mission `ready` non bloquée et non gated.
 8. Verifier sa capability, son milestone, ses dependances et sa validation cible.
 9. Creer une branche ou travailler dans un worktree si disponible.
 10. Executer exactement une mission atomique.

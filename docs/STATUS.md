@@ -2230,3 +2230,11 @@ diff-check. Le solveur de placement, ses budgets, les tolérances, la géométri
 la CAD IR et la scène restent inchangés. Les valeurs 3, 0,19 et 0,31 mm ne sont
 pas calibrées physiquement. P44-M007H03V est validée dans Fusion ;
 P0-M010 devient la prochaine mission documentaire.
+
+## P0-M010 - Pilotage de reprise compact (2026-07-16)
+
+Statut : done, documentation-validated, sans changement runtime ni validation produit supplémentaire.
+
+`docs/PILOTAGE_CURRENT.md` devient le point d’entrée court : état actif, une seule prochaine mission, éléments bloqués et liens vers les sources canoniques. `RESUME_STATE.md` conserve explicitement le snapshot P22 comme archive historique. Les instructions de reprise utilisent une lecture progressive : index, action/gate/contrat actifs, puis sources de détail si nécessaire.
+
+P44-VP devient la seule mission `ready` : elle prépare P44-V sans ouvrir P45 ni modifier le runtime. `print-validated: false` reste inchangé.

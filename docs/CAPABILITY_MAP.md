@@ -1205,3 +1205,10 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - Suite : P0-M010 est la seule action suivante autorisée. Les dispositions
   non-cartes restent candidates de P45 ; aucune mission produit suivante n’est
   ouverte par cette validation.
+
+## P0-M010 - Capability update documentaire (2026-07-16)
+
+- C-QUALITY : `PILOTAGE_CURRENT.md` fournit une reprise courte, une vue terminé/prêt/bloqué et des renvois explicites vers les sources canoniques.
+- C-AUTONOMY : les instructions distinguent lecture minimale et consultation détaillée conditionnelle, sans réduire l’autorité des contrats, ADR, gates ou preuves.
+- Limites : aucun runtime, solveur, schéma, valeur physique, géométrie ou scène Fusion n’est modifié ; `print-validated: false`.
+- Suite : P44-VP est la seule mission `ready`, pour préparer P44-V avant P45.

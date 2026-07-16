@@ -42,30 +42,22 @@ impression réelle n’est validée ; `print-validated: false` reste obligatoire
 
 ## Prochaine action recommandée
 
-### P0-M010 - Compacter le pilotage de reprise
+### P44-VP - Préparer la gate globale de fondation UX
 
 Statut : ready.
 
-Dépendance satisfaite : P44-M007H03V est fusion-validated dans Fusion 360.
+P0-M010 est terminé : le parcours de reprise commence désormais par
+[PILOTAGE_CURRENT.md](PILOTAGE_CURRENT.md). P44-VP prépare la gate P44-V, sans
+ouvrir P45.
 
-Objectif : réduire le coût de reprise, les lectures redondantes et les risques
-de divergence du backlog/roadmap sans perdre l’historique auditable.
+Objectif : consolider les preuves P44-M001 à P44-M009 et rendre la revue humaine
+P44-V courte, reproductible et sans ambiguïté.
 
-Scope autorisé : documentation et pilotage uniquement : index courant court,
-vues `actif / prochain / bloqué`, archives et liens de reprise. Aucun changement
-runtime, produit, solveur, schéma ou valeur physique ; aucune suppression
-destructive d’historique.
+Scope : documentation et préparation de gate seulement. Aucun changement runtime,
+solveur, schéma, valeur physique, géométrie ou scène automatique.
 
-Vérifications attendues :
-
-1. relire le diff documentaire et vérifier les liens vers les contrats actifs ;
-2. conserver les anciennes décisions et preuves en archive auditable ;
-3. garder une seule mission `ready` et une séquence explicite vers P45 ;
-4. mettre à jour STATUS, NEXT_ACTIONS, BACKLOG et le journal de mission.
-
-Ne pas ouvrir P45/P46, P47-P50, P67, P68 ou P69 pendant P0-M010. La validation
-Fusion ne vaut pas validation d’impression et `print-validated: false` reste
-obligatoire.
+Ne pas ouvrir P45/P46, P47-P50, P67, P68 ou P69 pendant P44-VP.
+`print-validated: false` reste obligatoire.
 
 ## Lots découverts, non ouverts
 
@@ -76,9 +68,9 @@ obligatoire.
 ## Séquence verrouillée
 
 P44-M005, P44-M006 et P44-M009H05 sont fusion-validated pour leurs parcours UX.
-P44-M007H03 est désormais fusion-validated dans Fusion 360 ; P0-M010 est la
-seule action suivante autorisée. P45/P46 ne commencent pas avant la fin de P0 et
-la gate P44 appropriée ; P47-P50 restent bloqués jusqu’à P46 et P69 jusqu’à P50.
+P44-M007H03 est désormais fusion-validated dans Fusion 360 ; P0-M010 est
+terminée et P44-VP est la seule action suivante autorisée. P45/P46 ne commencent
+pas avant P44-V ; P47-P50 restent bloqués jusqu’à P46 et P69 jusqu’à P50.
 P68 peut recueillir des faits réels sans modifier les valeurs par défaut.
 
 ## Fin de chaque mission

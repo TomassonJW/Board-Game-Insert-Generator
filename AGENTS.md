@@ -9,18 +9,18 @@ types, les commandes ou la documentation officielle imposent l'anglais.
 
 ## Lecture obligatoire avant toute mission
 
-Avant de proposer ou modifier quoi que ce soit, lis au minimum :
+Avant de proposer ou modifier quoi que ce soit, commence par le parcours court :
 
-- `docs/AUTONOMY_PROTOCOL.md`
-- `docs/HUMAN_GATES.md`
-- `docs/STATUS.md`
-- `docs/NORTH_STAR.md`
-- `docs/CAPABILITY_MAP.md`
-- `docs/ROADMAP.md`
-- `docs/BACKLOG.md`
+- `docs/PILOTAGE_CURRENT.md`
 - `docs/NEXT_ACTIONS.md`
-- les ADR pertinentes dans `docs/DECISIONS/`
-- les fichiers de code ou documentation directement concernes par la mission
+- `docs/HUMAN_GATES.md`
+- le contrat, les ADR et les fichiers directement concernés par la mission.
+
+Ouvre ensuite `docs/AUTONOMY_PROTOCOL.md`, `docs/STATUS.md`,
+`docs/NORTH_STAR.md`, `docs/CAPABILITY_MAP.md`, `docs/ROADMAP.md` et
+`docs/BACKLOG.md` lorsqu’un fait, une dépendance, une capability, une trajectoire
+ou une décision doit être vérifié en détail. L’index court ne remplace jamais un
+contrat, une ADR, une gate, une preuve ou une source canonique.
 
 Ne pars jamais directement sur une implementation lourde sans verifier la mission
 active, la capability servie, son milestone, son statut, ses dependances et ses criteres d'acceptation.

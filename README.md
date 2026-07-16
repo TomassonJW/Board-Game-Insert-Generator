@@ -43,6 +43,7 @@ arrondis, fillets, exports STL/3MF et pieces imprimees restent non valides.
 Consulter d'abord :
 
 - [AGENTS.md](AGENTS.md)
+- [Pilotage courant](docs/PILOTAGE_CURRENT.md)
 - [Statut projet](docs/STATUS.md)
 - [Roadmap](docs/ROADMAP.md)
 - [Backlog](docs/BACKLOG.md)

@@ -73,18 +73,18 @@ proposition de clarification.
 
 ## Verification de readiness
 
-Avant implementation, Codex verifie :
+Avant implementation, Codex vérifie d’abord le parcours court :
 
 - `AGENTS.md` ;
-- `docs/STATUS.md` ;
-- `docs/NORTH_STAR.md` ;
-- `docs/CAPABILITY_MAP.md` ;
-- `docs/ROADMAP.md` ;
+- `docs/PILOTAGE_CURRENT.md` ;
 - `docs/NEXT_ACTIONS.md` ;
-- `docs/BACKLOG.md` ;
 - `docs/HUMAN_GATES.md` ;
-- les ADR pertinentes dans `docs/DECISIONS/` ;
-- les fichiers de code ou documentation directement concernes.
+- le contrat, les ADR et les fichiers directement concernés.
+
+Il ouvre ensuite `STATUS.md`, `NORTH_STAR.md`, `CAPABILITY_MAP.md`, `ROADMAP.md`
+et `BACKLOG.md` dès qu’un fait, une dépendance, une capability, une trajectoire
+ou une décision doit être vérifié en détail. Le parcours court ne remplace jamais
+ces sources canoniques.
 
 Une mission est prete seulement si son objectif, sa capability, son milestone,
 ses livrables, ses dependances, ses criteres d'acceptation et ses verifications
