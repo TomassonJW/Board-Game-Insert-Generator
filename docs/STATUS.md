@@ -2252,4 +2252,34 @@ Le solveur multi-étages n’était pas la cause primaire. La palette affichait 
 
 P44-VH01 synchronise la hauteur cachée avec la valeur dérivée lors des deux éditions concernées et avant tout envoi moteur ou document. Une régression de 24 conteneurs avec plateau et 5 000 mm réellement disponibles construit plusieurs étages sans collision. Le solveur, ses budgets et ses heuristiques ne changent pas.
 
-Package : 0.1.41. Statut : implemented, automated-validated, human-fusion-check-required, fusion-validated: false, print-validated: false. P44-V reste ouverte. P44-VH02 est le lot UX suivant ; P45 reste bloqué.
+Package : 0.1.41. Statut : implemented, automated-validated ; cas initial observé comme calculable, gate P44-VH01V supersédée par P64-H01V, fusion-validated: false, print-validated: false. P44-V reste ouverte. P44-VH02 est le lot UX suivant après P64-H01V ; P45 reste bloqué.
+
+
+## P64-H01 - Recherche dense et répartition 3D équilibrée (2026-07-17)
+
+Le projet réel de 30 conteneurs et 77 éléments utilise environ 40 % du volume
+minimal disponible. Après ajout d'un asset 10 × 10 × 5 mm dans le bac le plus
+dense, les groupes contigus historiques ne produisaient pourtant plus aucun
+candidat à 183 mm de hauteur. Un prototype non contigu réparti en deux groupes
+d'empreintes comparables démontre une solution complète.
+
+Le solveur évalue désormais des partitions adaptatives LPT de tailles variables
+avant les familles historiques, avec huit nombres d'étages au maximum par ordre
+et une borne Z optimiste. Le mode `balanced` choisit aussi ses rangées XY en
+fonction de la hauteur d'étage, compare l'expansion moyenne X/Y/Z et équilibre
+les empreintes minimales entre niveaux. Le mode `compact` conserve sa priorité
+aux compositions simples.
+
+Les régressions donnent 1, 2 puis 3 étages pour 2, 8 puis 32 conteneurs
+homogènes, contre un étage pour 8 en mode compact. La fixture dense anonymisée
+trouve deux étages complets ; le projet réel augmenté trouve une solution en
+environ 1,8 seconde. Aucun schéma, défaut, tolérance, valeur physique, cavité,
+géométrie ou comportement de scène ne change.
+
+Validation automatisée : 488 tests, `compileall`, exemple CLI, dry-run de la
+gate Fusion, frontière `adsk` et `git diff --check`.
+
+Package : 0.1.42. Statut : implemented, automated-validated,
+human-fusion-check-required par P64-H01V, fusion-validated: false,
+print-validated: false. P44-VH02 reste la seule mission de code suivante après
+la gate ; P45 reste bloqué.

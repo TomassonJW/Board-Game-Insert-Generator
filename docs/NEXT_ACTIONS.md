@@ -1,6 +1,6 @@
 # Next Actions
 
-Dernière mise à jour : 2026-07-16
+Dernière mise à jour : 2026-07-17
 
 ## Version active
 
@@ -40,19 +40,34 @@ fusion-validated dans Fusion 360 (package 0.1.40, preuve
 `P44-M007H03 Fusion OK 0.1.40 - commit 92f07c8`). Aucune valeur physique ni
 impression réelle n’est validée ; `print-validated: false` reste obligatoire.
 
+Le retour contextuel suivant confirme que P44-VH01 laisse désormais passer le
+cas de hauteur initial, mais révèle deux limites du solveur : faux impossible
+sur environ 30 conteneurs et 77 éléments malgré environ 40 % de volume minimal,
+et attente de la saturation XY avant d'utiliser Z. P64-H01 corrige ces limites
+dans le package 0.1.42 par partitions adaptatives bornées, arrangements XY
+conscients de leur hauteur et score d'équilibre X/Y/Z avec charge des étages.
+
 ## Prochaine action recommandée
 
-### P44-VH01V - Vérification de la hauteur réellement calculée
+### P64-H01V - Recherche dense et équilibre spatial 3D
 
-Statut : human-fusion-check-required. Le KO P44-V a révélé que Z visible pouvait diverger de box.usable_height_mm envoyé au solveur. P44-VH01 est implemented et automated-validated dans le package 0.1.41, sans changement du solveur.
+Statut : human-fusion-check-required. P64-H01 est implemented et
+automated-validated dans le package 0.1.42. Le projet réel augmenté du petit
+asset problématique trouve une solution complète en deux étages en environ
+1,8 seconde ; les fixtures homogènes 2, 8 et 32 conteneurs choisissent
+respectivement 1, 2 et 3 étages en mode Équilibré.
 
-Thomas relance le projet dense après installation, modifie Z, puis vérifie que Hauteur de conception et le calcul multi-étages suivent cette valeur. Retour attendu :
+Thomas rouvre le projet dense, reproduit l'ajout du petit asset, vérifie que le
+calcul reste constructible, que Z est utilisé progressivement et qu'aucune
+scène ne change avant matérialisation. Retour attendu :
 
-    P44-VH01 Fusion OK 0.1.41 - commit <sha>
+    P64-H01 Fusion OK 0.1.42 - commit <sha>
 
-Après ce retour, P44-VH02 est la seule mission de code suivante : suppression directe d’un élément, confirmation pour supprimer un conteneur non vide avec tous ses éléments, et nom de conteneur incrémental en cas de doublon.
+Après ce retour, P44-VH02 est la seule mission de code suivante : suppression
+directe d’un élément, confirmation pour supprimer un conteneur non vide avec
+tous ses éléments, et nom de conteneur incrémental en cas de doublon.
 
-P44-V reste ouverte ; P45 ne commence pas. print-validated: false.
+P44-V reste ouverte ; P45 ne commence pas. `print-validated: false`.
 
 ## Lots découverts, non ouverts
 
@@ -64,8 +79,10 @@ P44-V reste ouverte ; P45 ne commence pas. print-validated: false.
 
 P44-M005, P44-M006 et P44-M009H05 sont fusion-validated pour leurs parcours UX.
 P44-M007H03 est désormais fusion-validated dans Fusion 360 ; P0-M010 et P44-VP
-sont terminées. P44-VH01V est la seule action humaine suivante ; P44-V reste en KO
-contextuel et P45/P46 ne commencent pas avant sa reprise positive après P44-VH02. P47-P50 restent bloqués jusqu’à P46 et P69 jusqu’à P50.
+sont terminées. P44-VH01V est supersédée sans revendication fusion-validated par
+P64-H01V, seule action humaine suivante. P44-V reste en KO contextuel et P45/P46
+ne commencent pas avant sa reprise positive après P44-VH02. P47-P50 restent
+bloqués jusqu’à P46 et P69 jusqu’à P50.
 P68 peut recueillir des faits réels sans modifier les valeurs par défaut.
 
 ## Fin de chaque mission

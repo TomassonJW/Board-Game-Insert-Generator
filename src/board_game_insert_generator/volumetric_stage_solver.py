@@ -21,6 +21,7 @@ SOLUTION_IMPOSSIBLE = "impossible"
 
 MAX_ORDERINGS = 4
 MAX_GROUP_SIZES_PER_ORDER = 20
+MAX_ADAPTIVE_STAGE_COUNTS = 8
 MAX_STACK_PARTITIONS_PER_ORDER = 64
 MAX_CANDIDATES = 192
 MAX_RETURNED_CANDIDATES = 64
@@ -31,11 +32,11 @@ _AXES = ("x", "y", "z")
 _EPSILON = 0.0001
 
 _SCORE_WEIGHTS = {
-    "balanced": {"simplicity": 0.25, "targets": 0.30, "material": 0.25, "support": 0.20},
-    "compact": {"simplicity": 0.40, "targets": 0.25, "material": 0.20, "support": 0.15},
-    "accessible": {"simplicity": 0.25, "targets": 0.15, "material": 0.15, "support": 0.45},
-    "print_simple": {"simplicity": 0.50, "targets": 0.15, "material": 0.20, "support": 0.15},
-    "material_reduced": {"simplicity": 0.15, "targets": 0.20, "material": 0.50, "support": 0.15},
+    "balanced": {"simplicity": 0.05, "targets": 0.20, "material": 0.10, "support": 0.20, "spatial": 0.45},
+    "compact": {"simplicity": 0.40, "targets": 0.25, "material": 0.20, "support": 0.15, "spatial": 0.0},
+    "accessible": {"simplicity": 0.25, "targets": 0.15, "material": 0.15, "support": 0.45, "spatial": 0.0},
+    "print_simple": {"simplicity": 0.50, "targets": 0.15, "material": 0.20, "support": 0.15, "spatial": 0.0},
+    "material_reduced": {"simplicity": 0.15, "targets": 0.20, "material": 0.50, "support": 0.15, "spatial": 0.0},
 }
 
 
@@ -71,6 +72,7 @@ def solve_stage_portfolio(
     budgets = {
         "max_orderings": MAX_ORDERINGS,
         "max_group_sizes_per_order": MAX_GROUP_SIZES_PER_ORDER,
+        "max_adaptive_stage_counts": MAX_ADAPTIVE_STAGE_COUNTS,
         "max_stack_partitions_per_order": MAX_STACK_PARTITIONS_PER_ORDER,
         "max_candidates": MAX_CANDIDATES,
         "max_returned_candidates": MAX_RETURNED_CANDIDATES,
@@ -82,10 +84,56 @@ def solve_stage_portfolio(
     candidates: list[dict[str, object]] = []
     signatures: set[str] = set()
     groupings_evaluated = 0
+    adaptive_partitions_evaluated = 0
     stack_partitions_evaluated = 0
     xy_arrangements_evaluated = 0
     truncated = False
     for order_name, ordered in _orders(values):
+        for stage_count in range(2, min(len(ordered), MAX_ADAPTIVE_STAGE_COUNTS) + 1):
+            if not _minimum_stage_height_fits(
+                ordered,
+                stage_count,
+                height,
+                vertical_clearance,
+            ):
+                continue
+            adaptive_partitions_evaluated += 1
+            groups = _adaptive_stage_partition(ordered, stage_count)
+            for orientation_strategy in ("width", "height", "balanced"):
+                if len(candidates) >= MAX_CANDIDATES:
+                    truncated = True
+                    break
+                candidate, attempts = _candidate_for_groups(
+                    groups,
+                    bounds,
+                    height,
+                    between_clearance,
+                    box_clearance,
+                    vertical_clearance,
+                    preference=preference,
+                    order_name=order_name,
+                    group_size=0,
+                    orientation_strategy=orientation_strategy,
+                )
+                xy_arrangements_evaluated += attempts
+                if candidate is None:
+                    continue
+                candidate["candidate_id"] = (
+                    f"{order_name}:adaptive{stage_count}:{orientation_strategy}:"
+                    f"{len(_mappings(candidate['stages']))}s"
+                )
+                origin = _mapping(candidate["search_origin"])
+                origin.pop("group_size", None)
+                origin["adaptive_stage_count"] = stage_count
+                signature = _candidate_signature(candidate)
+                if signature in signatures:
+                    continue
+                signatures.add(signature)
+                candidates.append(candidate)
+            if truncated:
+                break
+        if truncated:
+            break
         for group_size in _group_sizes(len(ordered)):
             groups = [ordered[index : index + group_size] for index in range(0, len(ordered), group_size)]
             for orientation_strategy in ("width", "height", "balanced"):
@@ -150,13 +198,7 @@ def solve_stage_portfolio(
 
     ordered_candidates = sorted(
         candidates,
-        key=lambda item: (
-            item["solution_status"] != SOLUTION_COMPLETE,
-            int("stack_partition_index" in _mapping(item["search_origin"])),
-            -float(item["quality_score"]),
-            int(item["stage_count"]),
-            str(item["candidate_id"]),
-        ),
+        key=lambda item: _candidate_sort_key(item, preference),
     )
     returned = ordered_candidates[:MAX_RETURNED_CANDIDATES]
     complete_count = sum(item["solution_status"] == SOLUTION_COMPLETE for item in candidates)
@@ -180,6 +222,7 @@ def solve_stage_portfolio(
             "truncated": truncated or len(ordered_candidates) > len(returned),
             "ordering_count": len(_orders(values)),
             "groupings_evaluated": groupings_evaluated,
+            "adaptive_partitions_evaluated": adaptive_partitions_evaluated,
             "stack_partitions_evaluated": stack_partitions_evaluated,
             "xy_arrangements_evaluated": xy_arrangements_evaluated,
             "candidate_count": len(candidates),
@@ -202,6 +245,42 @@ def solve_stage_portfolio(
     }
 
 
+def _adaptive_stage_partition(
+    values: list[dict[str, object]],
+    stage_count: int,
+) -> list[list[dict[str, object]]]:
+    """Distribute footprints with a bounded deterministic LPT partition."""
+
+    groups: list[list[dict[str, object]]] = [[] for _ in range(stage_count)]
+    footprint_loads = [0.0 for _ in range(stage_count)]
+    for value in values:
+        index = min(
+            range(stage_count),
+            key=lambda candidate: (
+                footprint_loads[candidate],
+                len(groups[candidate]),
+                candidate,
+            ),
+        )
+        groups[index].append(value)
+        footprint_loads[index] += _area(_mapping(value["minimum_local_mm"]))
+    return groups
+
+
+def _minimum_stage_height_fits(
+    values: list[dict[str, object]],
+    stage_count: int,
+    storage_height: float,
+    vertical_clearance: float,
+) -> bool:
+    """Reject stage counts whose optimistic Z lower bound already overflows."""
+
+    heights = sorted(_axis_base(value, "z") for value in values)
+    minimum_body_height = heights[-1] + sum(heights[: stage_count - 1])
+    minimum_clearance = max(0, stage_count - 1) * vertical_clearance
+    return minimum_body_height + minimum_clearance <= storage_height + _EPSILON
+
+
 def _candidate_for_groups(
     groups: list[list[dict[str, object]]],
     box: dict[str, float],
@@ -222,16 +301,29 @@ def _candidate_for_groups(
     stage_layouts: list[dict[str, object]] = []
     attempts = 0
     xy_complete = True
-    for group in groups:
+    for group, stage_height in zip(groups, stage_heights):
+        spatial_reference = stage_height if preference == "balanced" else None
         full, full_attempts = _best_xy_layout(
-            group, box, between_clearance, box_clearance, orientation_strategy=orientation_strategy, fill=True
+            group,
+            box,
+            between_clearance,
+            box_clearance,
+            orientation_strategy=orientation_strategy,
+            fill=True,
+            spatial_reference_height=spatial_reference
         )
         attempts += full_attempts
         if full is not None:
             stage_layouts.append(full)
             continue
         partial, partial_attempts = _best_xy_layout(
-            group, box, between_clearance, box_clearance, orientation_strategy=orientation_strategy, fill=False
+            group,
+            box,
+            between_clearance,
+            box_clearance,
+            orientation_strategy=orientation_strategy,
+            fill=False,
+            spatial_reference_height=spatial_reference
         )
         attempts += partial_attempts
         if partial is None:
@@ -920,6 +1012,7 @@ def _best_xy_layout(
     *,
     orientation_strategy: str,
     fill: bool,
+    spatial_reference_height: float | None = None,
 ) -> tuple[dict[str, object] | None, int]:
     feasible: list[dict[str, object]] = []
     attempts = 0
@@ -941,12 +1034,38 @@ def _best_xy_layout(
     return min(
         feasible,
         key=lambda item: (
+            -(
+                _layout_spatial_balance(item, spatial_reference_height)
+                if orientation_strategy == "balanced"
+                and spatial_reference_height is not None
+                else float(item["local_score"])
+            ),
             -float(item["local_score"]),
             int(item["row_count"]),
             int(item["rotation_count"]),
             str(item["layout_id"]),
         ),
     ), attempts
+
+
+def _layout_spatial_balance(
+    layout: dict[str, object],
+    stage_height: float,
+) -> float:
+    factors = {axis: [] for axis in _AXES}
+    for placement in _mappings(layout["placements"]):
+        participant = _mapping(placement["participant"])
+        rotated = bool(placement["rotated_xy"])
+        world_size = _mapping(placement["world_size_mm"])
+        for axis in ("x", "y"):
+            minimum = _axis_base(
+                participant,
+                _local_axis(axis, rotated),
+            )
+            factors[axis].append(float(world_size[axis]) / minimum)
+        factors["z"].append(stage_height / _axis_base(participant, "z"))
+    means = [sum(factors[axis]) / len(factors[axis]) for axis in _AXES]
+    return 100.0 * min(means) / max(means)
 
 
 def _participant_clearance(
@@ -1394,9 +1513,20 @@ def _score_candidate(
 ) -> dict[str, float]:
     rotations = sum(int(item["rotation_deg_z"] != 0) for item in placements)
     rows = sum(int(item["row_count"]) for item in stages)
-    simplicity = max(0.0, 100.0 - max(0, len(stages) - 1) * 12.0 - rows * 2.0 - rotations * 2.0)
+    hybrid_interval_penalty = 4.0 if any(
+        "spanning_body_ids" in stage for stage in stages
+    ) else 0.0
+    simplicity = max(
+        0.0,
+        100.0
+        - max(0, len(stages) - 1) * 12.0
+        - rows * 2.0
+        - rotations * 2.0
+        - hybrid_interval_penalty,
+    )
     target_errors: list[float] = []
     surplus_ratios: list[float] = []
+    expansion_factors = {axis: [] for axis in _AXES}
     for placement in placements:
         contract = _mapping(placement["dimension_contract"])
         for axis in _AXES:
@@ -1404,12 +1534,38 @@ def _score_candidate(
             if value["mode"] == "target" and value["target_mm"] is not None:
                 target_errors.append(abs(float(value["calculated_mm"]) - float(value["target_mm"])) / float(value["target_mm"]))
             minimum = float(value["minimum_mm"])
-            surplus_ratios.append(max(0.0, float(value["calculated_mm"]) - minimum) / minimum)
+            calculated = float(value["calculated_mm"])
+            surplus_ratios.append(max(0.0, calculated - minimum) / minimum)
+            expansion_factors[axis].append(calculated / minimum)
     targets = max(0.0, 100.0 - 100.0 * (sum(target_errors) / len(target_errors) if target_errors else 0.0))
     mean_surplus = sum(surplus_ratios) / len(surplus_ratios) if surplus_ratios else 0.0
     spread = max(surplus_ratios, default=0.0) - min(surplus_ratios, default=0.0)
     material = max(0.0, 100.0 - 25.0 * mean_surplus - 15.0 * spread)
     support_score = 100.0 * float(support["minimum_coverage_ratio"])
+    mean_expansion = [
+        sum(expansion_factors[axis]) / len(expansion_factors[axis])
+        for axis in _AXES
+        if expansion_factors[axis]
+    ]
+    axis_balance = (
+        100.0 * min(mean_expansion) / max(mean_expansion)
+        if mean_expansion
+        else 100.0
+    )
+    stage_loads = {str(stage["id"]): 0.0 for stage in stages}
+    for placement in placements:
+        axes = _mapping(_mapping(placement["dimension_contract"])["axes"])
+        minimum_area = float(_mapping(axes["x"])["minimum_mm"]) * float(
+            _mapping(axes["y"])["minimum_mm"]
+        )
+        stage_loads[str(placement["stage_id"])] += minimum_area
+    positive_loads = [value for value in stage_loads.values() if value > _EPSILON]
+    stage_load_balance = (
+        100.0 * min(positive_loads) / max(positive_loads)
+        if positive_loads
+        else 100.0
+    )
+    spatial = 0.70 * axis_balance + 0.30 * stage_load_balance
     weights = _SCORE_WEIGHTS[preference]
     total = sum(
         value * weights[key]
@@ -1418,6 +1574,7 @@ def _score_candidate(
             "targets": targets,
             "material": material,
             "support": support_score,
+            "spatial": spatial,
         }.items()
     )
     if not complete:
@@ -1428,6 +1585,8 @@ def _score_candidate(
         "target_fit": _round(targets),
         "material_distribution": _round(material),
         "support": _round(support_score),
+        "spatial_balance": _round(spatial),
+        "stage_load_balance": _round(stage_load_balance),
     }
 
 
@@ -1610,6 +1769,30 @@ def _xy_overlap(
     return width * height
 
 
+def _candidate_sort_key(
+    candidate: dict[str, object],
+    preference: str,
+) -> tuple[object, ...]:
+    origin = _mapping(candidate["search_origin"])
+    search_family_rank = int("stack_partition_index" in origin)
+    common = (
+        candidate["solution_status"] != SOLUTION_COMPLETE,
+        -float(candidate["quality_score"]),
+        int(candidate["stage_count"]),
+        search_family_rank,
+        str(candidate["candidate_id"]),
+    )
+    if preference == "balanced":
+        return common
+    return (
+        candidate["solution_status"] != SOLUTION_COMPLETE,
+        search_family_rank,
+        -float(candidate["quality_score"]),
+        int(candidate["stage_count"]),
+        str(candidate["candidate_id"]),
+    )
+
+
 def _candidate_signature(candidate: dict[str, object]) -> str:
     return "|".join(
         f"{item['id']}@{item['origin_mm']}:{item['world_size_mm']}:{item['rotation_deg_z']}"
@@ -1637,6 +1820,8 @@ def _empty_result(
             "truncated": False,
             "ordering_count": 0,
             "groupings_evaluated": 0,
+            "adaptive_partitions_evaluated": 0,
+            "stack_partitions_evaluated": 0,
             "xy_arrangements_evaluated": 0,
             "candidate_count": 0,
             "complete_candidate_count": 0,

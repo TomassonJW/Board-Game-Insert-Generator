@@ -1,6 +1,6 @@
 # P44-VH01 — Hauteur de conception cohérente avec le solveur
 
-Statut : implemented, automated-validated, human-fusion-check-required, fusion-validated: false, print-validated: false.
+Statut : implemented, automated-validated ; gate P44-VH01V supersédée par P64-H01V après observation contextuelle positive du cas initial. fusion-validated: false, print-validated: false.
 
 ## Déclencheur
 
@@ -39,8 +39,8 @@ Après installation par scripts/fusion/prepare_p44_vh01_design_height_test.ps1, 
 3. une hauteur réaliste peut encore refuser un empilement réellement trop bas ;
 4. aucune scène n’est créée avant Matérialiser dans Fusion.
 
-Retour attendu : P44-VH01 Fusion OK 0.1.41 - commit <sha>.
+Retour historique non reçu : P44-VH01 Fusion OK 0.1.41 - commit <sha>. P64-H01V couvre désormais la reprise dense dans le package 0.1.42.
 
 ## Suite séparée
 
-P44-VH02 traitera ensuite les actions de suppression directe et le nommage incrémental. P44-V reste ouverte jusqu’à validation de ses correctifs contextuels ; P45 ne commence pas.
+Après P64-H01V, P44-VH02 traitera les actions de suppression directe et le nommage incrémental. P44-V reste ouverte jusqu’à validation de ses correctifs contextuels ; P45 ne commence pas.

@@ -1226,5 +1226,20 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - C-USABILITY : la hauteur visible dans Réglages est exactement celle transmise au cœur après édition de Z ou du jeu sous couvercle.
 - C-LAYOUT : la capacité multi-étages existante est couverte par une régression à 24 conteneurs avec réservation supérieure et hauteur abondante.
 - C-QUALITY : aucun état caché usable_height_mm divergent ne traverse validation, solve, autosave ou sauvegarde nommée depuis la palette.
-- C-FUSION-UI : package 0.1.41 automated-validated ; gate Fusion P44-VH01V requise.
+- C-FUSION-UI : package 0.1.41 automated-validated ; gate P44-VH01V supersédée par P64-H01V sans revendication fusion-validated.
 - Limites : solveur, budgets, tolérances, géométrie et valeurs physiques inchangés ; fusion-validated: false, print-validated: false.
+
+
+## P64-H01 - Recherche dense et équilibre volumétrique
+
+- C-LAYOUT : partitions adaptatives d'empreintes variables et arrangements XY
+  évalués avec leur hauteur d'étage.
+- C-SOLVER : le mode balanced classe les candidats complets par qualité X/Y/Z,
+  charge des étages, support, cibles, matière et simplicité ; compact reste
+  orienté vers le nombre minimal de compositions.
+- C-QUALITY : budgets publics, borne Z, déterminisme, fixture dense de 30 corps
+  et progression automatisée 1/2/3 étages.
+- C-FUSION-UI : package 0.1.42 automated-validated ; gate P64-H01V requise.
+- Limites : heuristique non globalement optimale ; schéma, tolérances, valeurs
+  physiques, géométrie et scène inchangés ; fusion-validated: false,
+  print-validated: false.

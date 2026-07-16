@@ -551,7 +551,7 @@ d’impression. `print-validated: false` reste inchangé.
 
 ## P44-V - Gate globale de fondation UX 0.1.40
 
-Statut : contextual-KO. Le package 0.1.40 ne doit pas recevoir de retour OK ; voir P44-VH01V puis P44-VH02.
+Statut : contextual-KO. Le package 0.1.40 ne doit pas recevoir de retour OK ; voir P64-H01V puis P44-VH02.
 
 Vérifier les sept scénarios novice/expert, largeur, clavier/focus, conteneurs, import historique et scène préservée du dossier.
 
@@ -562,7 +562,7 @@ Cette gate ne valide ni P45, ni les valeurs physiques ou l’impression. `print-
 
 ## P44-VH01V - Hauteur dérivée et reprise multi-étages 0.1.41
 
-Statut : human-fusion-check-required. P44-V a produit un KO contextuel ; elle ne devient pas fusion-validated.
+Statut : superseded par P64-H01V après observation contextuelle du cas initial. Aucun retour formel P44-VH01 n'a été reçu ; fusion-validated reste false.
 
 Déclencheur : P44-VH01 intégrée dans main, package 0.1.41 installé par scripts/fusion/prepare_p44_vh01_design_height_test.ps1 et validations automatisées vertes.
 
@@ -577,3 +577,33 @@ Vérifier dans Fusion :
 Retour OK : P44-VH01 Fusion OK 0.1.41 - commit <sha>.
 
 Cette gate ne valide aucune dimension physique, aucune géométrie imprimée et aucune impression. print-validated: false.
+
+
+## P64-H01V - Recherche dense et équilibre spatial 0.1.42
+
+Statut : human-fusion-check-required. Cette gate remplace P44-VH01V sans
+transformer l'observation contextuelle précédente en fusion-validation.
+
+Déclencheur : P64-H01 intégrée dans main, package 0.1.42 installé par
+scripts/fusion/prepare_p64_h01_balanced_dense_solver_test.ps1 et validations
+automatisées vertes.
+
+Vérifier dans Fusion :
+
+1. rouvrir le projet réel avec environ 30 conteneurs et 77 éléments en mode
+   Équilibré ;
+2. conserver une hauteur utile réaliste proche de 183 mm et ajouter le petit
+   asset qui déclenchait le faux impossible ;
+3. vérifier que le calcul reste constructible, utilise plusieurs niveaux Z et
+   n'affiche plus les anciens diagnostics sans rapport avec le volume restant ;
+4. observer que la composition répartit X, Y et Z au lieu d'attendre
+   systématiquement la saturation XY ;
+5. modifier encore un petit asset et vérifier que la proposition reste courante
+   et cohérente ;
+6. confirmer qu'aucune scène ne change avant Matérialiser dans Fusion.
+
+Retour OK : P64-H01 Fusion OK 0.1.42 - commit <sha>.
+
+Cette gate valide uniquement le comportement logiciel observé dans Fusion. Elle
+ne calibre aucune valeur physique, ne valide aucune géométrie imprimée et ne
+vaut pas validation d'impression. print-validated: false.

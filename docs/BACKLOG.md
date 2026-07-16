@@ -2000,7 +2000,7 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
 - Observation : novice/expert, petite/grande palette, clavier, cinquante
   conteneurs, import historique et scene preservee.
 - Limite : qualifie la fondation de palette, ni geometrie P45 ni impression.
-- Statut : contextual-KO sur 0.1.40 ; reprendre après P44-VH01V puis P44-VH02. P45 reste bloqué.
+- Statut : contextual-KO sur 0.1.40 ; reprendre après P64-H01V puis P44-VH02. P45 reste bloqué.
 
 Frontieres P44 : coeur sans adsk, complements en quarantaine, aucune scene
 automatique et aucun changement de solveur/tolerance/geometrie par glissement.
@@ -2310,13 +2310,29 @@ P44-M007 est ready-for-explicit-go.
 - Cause : box.inner_dimensions_mm.z et la hauteur visible changeaient, mais box.usable_height_mm restait ancien dans les payloads de la palette.
 - Correction : synchronisation Z moins jeu sous couvercle avant validation, solve et persistance ; solveur, budgets, tolérances et géométrie inchangés.
 - Livrable : package 0.1.41 et gate P44-VH01V.
-- Statut : implemented, automated-validated, human-fusion-check-required, fusion-validated: false, print-validated: false.
+- Statut : implemented, automated-validated ; le cas originel est observé comme
+  calculable, mais P44-VH01V est supersédée par P64-H01V sans revendication
+  fusion-validated. print-validated: false.
+
+#### P64-H01 - Recherche dense et répartition 3D équilibrée
+
+- Capability : C-LAYOUT, C-SOLVER, C-USABILITY et C-QUALITY.
+- Déclencheur : projet réel 30 conteneurs / 77 éléments, faux impossible malgré
+  environ 40 % de volume minimal et préférence XY excessive du mode balanced.
+- Livrable : partitions adaptatives bornées, borne Z préalable, arrangements XY
+  conscients de leur hauteur, score d'équilibre X/Y/Z et de charge des étages.
+- Non-objectifs : schéma, valeurs physiques, tolérances, cavités, géométrie,
+  dépendance d'optimisation externe ou scène automatique.
+- Validation : fixture dense 30 corps, progression 1/2/3 étages, mode compact,
+  suite complète et gate P64-H01V dans le package 0.1.42.
+- Statut : implemented, automated-validated, human-fusion-check-required,
+  fusion-validated: false, print-validated: false.
 
 #### P44-VH02 - Suppression directe et noms de conteneurs non ambigus
 
-- Dépendance : P44-VH01V acceptée.
+- Dépendance : P64-H01V acceptée.
 - Ajouter un bouton Supprimer directement à côté du menu de chaque élément.
 - Pour un conteneur non vide, demander explicitement la suppression du conteneur et de tous ses éléments ; une annulation ne modifie rien.
 - Attribuer un suffixe numérique incrémental à tout nouveau conteneur dont le nom existe déjà.
 - Ne changer ni schéma, ni solveur, ni géométrie, ni scène automatique.
-- Statut : ready-after-p44-vh01v ; autorisation produit déjà reçue, lot non commencé.
+- Statut : ready-after-p64-h01v ; autorisation produit déjà reçue, lot non commencé.

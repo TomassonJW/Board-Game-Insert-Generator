@@ -1,6 +1,6 @@
 # P44-V — Gate globale de fondation UX
 
-Statut : contextual-KO ; superseded-until-P44-VH01V et P44-VH02.
+Statut : contextual-KO ; superseded-until-P64-H01V et P44-VH02.
 
 ## Déclencheur
 
@@ -14,7 +14,7 @@ Preuves de support : densité/cartes `2f78a99`, conteneurs `80c1a6c`, navigation
 
 ## KO contextuel du 2026-07-16
 
-Le parcours avec environ 23 conteneurs et des réservations supérieures a révélé une divergence entre le Z visible et box.usable_height_mm réellement envoyé au solveur. P44-VH01 corrige ce défaut dans le package 0.1.41.
+Le parcours avec environ 23 conteneurs et des réservations supérieures a révélé une divergence entre le Z visible et box.usable_height_mm réellement envoyé au solveur. P44-VH01 corrige ce défaut dans le package 0.1.41. L'observation suivante confirme ce cas, puis révèle une recherche dense insuffisante ; P64-H01 la corrige dans le package 0.1.42.
 
 Les demandes de suppression directe, confirmation transactionnelle d’un conteneur non vide et nommage incrémental sont isolées dans P44-VH02. Le retour global P44-V 0.1.40 ne doit pas être envoyé.
 

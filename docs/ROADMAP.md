@@ -721,6 +721,19 @@ Le package 0.1.40 de référence `92f07c8` reçoit un dossier et une préparatio
 
 ## P44-VH01 - Cohérence Z et reprise multi-étages (2026-07-16)
 
-Le KO contextuel P44-V a révélé une divergence de données dans la palette : Z et la hauteur affichée changeaient sans mettre à jour box.usable_height_mm. Le package 0.1.41 synchronise cette hauteur dérivée avant calcul et persistance, sans modifier le solveur volumétrique. Gate P44-VH01V requise.
+Le KO contextuel P44-V a révélé une divergence de données dans la palette : Z et la hauteur affichée changeaient sans mettre à jour box.usable_height_mm. Le package 0.1.41 synchronise cette hauteur dérivée avant calcul et persistance, sans modifier le solveur volumétrique. Le cas initial est observé comme calculable ; P44-VH01V est supersédée par P64-H01V sans revendication fusion-validated.
 
-Après cette gate, P44-VH02 traite uniquement la suppression directe, la confirmation de suppression d’un conteneur non vide et les noms incrémentaux. P44-V reste ouverte et P45 demeure bloqué. print-validated: false.
+Après P64-H01V, P44-VH02 traite uniquement la suppression directe, la confirmation de suppression d’un conteneur non vide et les noms incrémentaux. P44-V reste ouverte et P45 demeure bloqué. print-validated: false.
+
+
+## P64-H01 - Durcissement dense et équilibre X/Y/Z (2026-07-17)
+
+Le retour sur le projet réel confirme P44-VH01 mais révèle que les partitions
+contiguës de P64 peuvent encore produire un faux impossible à forte densité et
+que balanced attend trop longtemps avant d'utiliser Z. Le package 0.1.42 ajoute
+une recherche adaptative bornée et fait de l'expansion X/Y/Z avec charge
+d'étages un critère explicite. Les étages progressent avec la densité sans
+modifier le mode compact, les contraintes physiques ou le schéma.
+
+P64-H01V devient la seule gate suivante. Après son acceptation, P44-VH02 reste
+le seul lot de code ; P45 demeure bloqué. print-validated: false.

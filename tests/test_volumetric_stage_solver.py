@@ -4,7 +4,9 @@ from copy import deepcopy
 import unittest
 
 from board_game_insert_generator.volumetric_stage_solver import (
+    MAX_ADAPTIVE_STAGE_COUNTS,
     MAX_CANDIDATES,
+    MAX_ORDERINGS,
     SOLUTION_COMPLETE,
     SOLUTION_WITH_RESIDUALS,
     VOLUMETRIC_STAGE_SOLVER_SCHEMA_V1,
@@ -180,6 +182,69 @@ class VolumetricStageSolverTests(unittest.TestCase):
         self.assertNotEqual(
             balanced["best_candidate"]["score_breakdown"]["total"],
             reduced["best_candidate"]["score_breakdown"]["total"],
+        )
+
+    def test_balanced_builds_z_progressively_while_compact_stays_simple(self) -> None:
+        box = {"x": 160.0, "y": 120.0, "z": 100.0}
+
+        stage_counts = []
+        for count in (2, 8, 32):
+            result = solve_stage_portfolio(
+                [participant(index, z=20.0) for index in range(count)],
+                box,
+                100.0,
+                1.0,
+                preference="balanced",
+            )
+            stage_counts.append(result["best_candidate"]["stage_count"])
+            self.assertIn("spatial_balance", result["best_candidate"]["score_breakdown"])
+            self.assertIn("stage_load_balance", result["best_candidate"]["score_breakdown"])
+
+        compact = solve_stage_portfolio(
+            [participant(index, z=20.0) for index in range(8)],
+            box,
+            100.0,
+            1.0,
+            preference="compact",
+        )
+
+        self.assertEqual(stage_counts, [1, 2, 3])
+        self.assertEqual(compact["best_candidate"]["stage_count"], 1)
+
+    def test_adaptive_partition_solves_dense_variable_footprints(self) -> None:
+        dimensions = [
+            (198.9, 233.6, 90.7),
+            (133.0, 88.4, 90.7),
+            (67.1, 131.6, 90.7),
+            (67.1, 88.4, 90.7),
+            (67.1, 87.6, 90.7),
+            *[(67.1, 22.8, 90.7) for _ in range(25)],
+        ]
+        values = [
+            participant(index, x=x, y=y, z=z)
+            for index, (x, y, z) in enumerate(dimensions)
+        ]
+
+        result = solve_stage_portfolio(
+            values,
+            {"x": 400.0, "y": 300.0, "z": 183.0},
+            183.0,
+            0.6,
+            box_clearance_mm=0.6,
+            vertical_clearance_mm=0.6,
+            preference="balanced",
+        )
+        plan = result["best_candidate"]
+
+        self.assertEqual(result["status"], SOLUTION_COMPLETE)
+        self.assertEqual(plan["stage_count"], 2)
+        self.assertIn("adaptive_stage_count", plan["search_origin"])
+        self.assertEqual(sum(stage["body_count"] for stage in plan["stages"]), 30)
+        self.assertTrue(all(stage["body_count"] > 0 for stage in plan["stages"]))
+        self.assertGreater(plan["score_breakdown"]["stage_load_balance"], 95.0)
+        self.assertLessEqual(
+            result["search"]["adaptive_partitions_evaluated"],
+            MAX_ORDERINGS * MAX_ADAPTIVE_STAGE_COUNTS,
         )
 
 
