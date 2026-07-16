@@ -371,3 +371,23 @@ Retour OK :
 `P44-M009H03 Fusion OK 0.1.34 - commit <sha>`
 
 Cette gate qualifie uniquement le comportement UI/moteur observé dans Fusion. Elle ne valide ni les valeurs physiques ni l’impression. P44-M007 reste bloquée jusqu’à ce retour.
+
+## P44-M009H04V - Densité finale UI 0.1.35
+
+Déclencheur : la revue 0.1.34 confirme la fonction H03 mais demande une composition moins étirée dans Réglages et les cartes conteneur. L’add-in 0.1.35 doit être installé depuis le commit intégré dans `main`.
+
+Vérifier dans Fusion :
+
+1. Réglages forme un bloc compact aligné à gauche ; le tableau X/Y–Z ne rejette plus les champs à l’extrémité de la fenêtre ;
+2. Épaisseurs minimales et Comportement sont compacts et lisibles ;
+3. le nom du conteneur porte le nombre d’éléments juste dessous et le minimum reste proche ;
+4. Auto n’affiche ni X/Y/Z explicites ni flèche ;
+5. Cible et Fixe affichent X, la flèche, Y et Z dans l’en-tête, sans rangée supplémentaire ;
+6. « Épaisseur paroi » et « Épaisseur fond » sont explicites ;
+7. aucun comportement métier ou scène Fusion automatique ne change.
+
+Retour OK :
+
+`P44-M009H04 Fusion OK 0.1.35 - commit <sha>`
+
+Cette gate qualifie uniquement la composition UI observée et la non-régression fonctionnelle dans Fusion. Elle ne valide ni les valeurs physiques ni l’impression. P44-M007 reste bloquée jusqu’à ce retour.

@@ -1127,3 +1127,11 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - C-COMPATIBILITY : aucun champ historique n’est supprimé et aucun projet n’est migré destructivement.
 - C-QUALITY : 474 tests, syntaxe JavaScript et DOM passés ; compileall, frontière adsk et `git diff --check` passés.
 - Suite : P44-M009H03V avant P44-M007 ; fusion-validated: false ; print-validated: false.
+
+## P44-M009H04 - Capability update (2026-07-16)
+
+- C-FUSION-UI : Réglages est borné et aligné à gauche ; les dimensions Cible/Fixe sont intégrées à l’en-tête des conteneurs.
+- C-USABILITY : nombre d’éléments sous le nom, minimum et mode compacts, épaisseurs explicitement nommées, interversion X/Y contextualisée.
+- C-TOLERANCE et C-GEOMETRY : aucun changement fonctionnel.
+- C-QUALITY : 474 tests, syntaxe JavaScript, DOM, transport Qt, `compileall` et frontière `adsk` passés.
+- Suite : P44-M009H04V avant P44-M007 ; fusion-validated: false ; print-validated: false.

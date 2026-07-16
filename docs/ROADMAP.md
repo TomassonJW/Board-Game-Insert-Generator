@@ -641,3 +641,9 @@ gate P44-M009H02V ; P44-V reste la gate globale.
 La revue produit remplace la correction H02 par une simplification de contrat : les jeux entre conteneurs et conteneur-boîte sont des réglages globaux du projet, jamais des propriétés éditables d’un bac. ADR-0064 remplace cette partie de l’ADR-0063 sans supprimer les données historiques.
 
 Le package 0.1.34 retire le volet de jeu externe des cartes, conserve les overrides asset et plateau/livret, et réorganise Réglages en tableau dense X/Y–Z. P44-M007 reste bloquée jusqu’à la gate P44-M009H03V ; P44-V reste la gate globale de fondation UX.
+
+## P44-M009H04 - Consolidation de densité UI (2026-07-16)
+
+Le package 0.1.35 ferme les écarts visuels observés sur 0.1.34 sans rouvrir le contrat de tolérance : largeur utile bornée dans Réglages, composition gauche compacte et dimensions de conteneur intégrées dans l’en-tête en Cible/Fixe.
+
+P44-M009H03V est remplacée par P44-M009H04V. P44-M007 reste bloquée jusqu’à cette preuve ; P44-V demeure la gate globale.

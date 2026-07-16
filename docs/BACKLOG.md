@@ -1968,12 +1968,12 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
 
 #### P44-M007 - Calcul adaptatif et Apercu priorise
 
-- Dependances : P44-M006 et P44-M009 integrees ; P44-M009H03V acceptee dans Fusion.
+- Dependances : P44-M006 et P44-M009 integrees ; P44-M009H04V acceptee dans Fusion.
 - Objectif : calcul hybride adaptatif, requetes obsoletes gerees, Apercu en premier et Materialiser toujours explicite.
 - Micro-ajustement inclus : dans Réglages, griser visiblement « Hauteur de
   conception », qui reste une valeur dérivée non éditable ; aucun calcul ni
   sémantique ne change.
-- Statut : bloque par la gate corrective P44-M009H03V.
+- Statut : bloque par la gate corrective P44-M009H04V.
 
 #### P44-M008 - Contrat de jeux herites et overrides par objet
 
@@ -2168,7 +2168,7 @@ comportement des jeux.
 - Statut : implemented, automated-validated, human-fusion-check-required,
   fusion-validated: false, print-validated: false.
 
-P44-M007 reste bloquée jusqu’à P44-M009H03V.
+P44-M007 reste bloquée jusqu’à P44-M009H04V.
 #### P44-M009H03 - Jeux externes globaux et Réglages dense
 
 - Dépendance : P44-M009H02 intégrée, mais sa gate fonctionnelle est annulée par la revue produit.
@@ -2181,4 +2181,17 @@ P44-M007 reste bloquée jusqu’à P44-M009H03V.
 - Tests : roundtrip historique inactif, effectifs globaux identiques, overrides asset/plat, DOM, transport Qt, suite complète, JavaScript, compileall, frontière adsk et diff-check.
 - Statut : implemented, automated-validated, human-fusion-check-required, fusion-validated: false, print-validated: false.
 
-P44-M007 reste bloquée jusqu’à P44-M009H03V.
+P44-M007 reste bloquée jusqu’à P44-M009H04V.
+
+#### P44-M009H04 - Densité finale Réglages et conteneurs
+
+- Dépendance : P44-M009H03 intégrée ; revue Fusion 0.1.34 non acceptée sur la composition UI.
+- Capability : C-FUSION-UI, C-USABILITY, C-QUALITY.
+- Réglages : bloc 760 px maximum, tableau 590 px maximum, champs alignés à gauche.
+- Conteneurs : identité compacte, minimum et mode bornés, épaisseurs clarifiées, dimensions Cible/Fixe intégrées dans l’en-tête, interversion entre X et Y, aucune interversion en Auto.
+- Exclusions : aucun schéma, bridge, solveur, tolérance, géométrie, scène automatique ou complément.
+- Package : 0.1.35.
+- Tests : DOM, transport Qt, syntaxe JavaScript, suite complète, compileall, frontière adsk et diff-check.
+- Statut : implemented, automated-validated, human-fusion-check-required, fusion-validated: false, print-validated: false.
+
+P44-M007 reste bloquée jusqu’à P44-M009H04V.

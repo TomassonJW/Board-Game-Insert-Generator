@@ -113,7 +113,20 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertIn("kind==='ok'?3000:6000", self.markup)
         self.assertIn("messageTimer=setTimeout", self.markup)
         self.assertIn("main>.message.show{position:fixed;top:8px", self.markup)
-        self.assertIn('<div class="row-details">${targetControls}${customDetails}${children}</div>', self.markup)
+        self.assertIn('<div class="row-details">${customDetails}${children}</div>', self.markup)
+        for marker in (
+            ".container-primary-grid.group-mode-auto",
+            ".container-primary-grid.group-mode-sized",
+            'class="container-identity"',
+            'class="group-mode-control"',
+            'class="group-target-field"',
+            "const targetControls=sizedMode?",
+            '''targetField('x')}<button type="button" class="xy-swap-button"''',
+            "${targetField('y')}${targetField('z')}",
+            "Épaisseur paroi", "Épaisseur fond",
+        ):
+            self.assertIn(marker, self.markup)
+        self.assertNotIn("container-target-grid", self.markup)
 
     def test_collapses_unit_clearances_and_edits_one_xy_value_plus_z(self) -> None:
         for forbidden in (
@@ -137,8 +150,8 @@ class FusionPaletteDomTests(unittest.TestCase):
             "key==='xy'?{...current,x:value,y:value}",
             "Les valeurs X et Y diffèrent dans ce projet.",
             "<label>Pile<input",
-            "<label>Paroi<input",
-            "<label>Fond<input",
+            'Épaisseur paroi<input',
+            'Épaisseur fond<input',
             "document.createElement('details')",
             "section.className='container-sizing local-details calculated-details'",
             "summary.textContent='Détails calculés'",
@@ -270,6 +283,10 @@ class FusionPaletteDomTests(unittest.TestCase):
             "Jeux (tolérances)", "Jeu entre conteneurs", "Jeu conteneur-boîte",
             "Jeu élément-cavité (par défaut)", "Priorité de la proposition",
             'class="settings-clearance-table"',
+            '.settings-card{width:min(100%,760px)',
+            '.settings-clearance-table{display:grid;gap:4px;width:min(100%,590px)',
+            'grid-template-columns:minmax(270px,1fr) 104px 104px',
+            '.settings-band-title{display:flex;align-items:baseline;justify-content:flex-start',
             'data-global-clearance="container_between_xy"',
             'data-global-clearance="container_between_z"',
             'data-global-clearance="container_box_xy"',

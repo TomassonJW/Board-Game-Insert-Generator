@@ -2108,3 +2108,13 @@ La décision produit ADR-0064 retire toute édition et tout effet runtime des je
 Les overrides asset, plateau et livret restent inchangés. Réglages sépare désormais les épaisseurs minimales et un tableau global X/Y–Z : jeu entre conteneurs, jeu conteneur-boîte et jeu élément-cavité par défaut. Le Z conteneur-boîte correspond à la marge sous couvercle. « Hauteur de conception » reste dérivée, grisée et non éditable.
 
 Validation : 474 tests, syntaxe JavaScript et tests DOM passent. Compileall, frontière adsk et `git diff --check` passent également. P44-M009H02V est annulée ; P44-M007 reste bloquée par P44-M009H03V.
+
+## P44-M009H04 - Densité finale de Réglages et des conteneurs (2026-07-16)
+
+Statut : implemented, automated-validated, package 0.1.35, human-fusion-check-required, fusion-validated: false, print-validated: false.
+
+La revue Fusion 0.1.34 accepte la direction fonctionnelle H03 mais refuse encore deux étirements UI. H04 borne le bloc Réglages à 760 px et son tableau à 590 px, avec toutes les grilles alignées à gauche.
+
+Dans les cartes conteneur, le nombre d’éléments passe sous le nom, le minimum et le mode sont bornés, les libellés deviennent « Épaisseur paroi » et « Épaisseur fond ». En Cible/Fixe, X, interversion, Y et Z sont placés directement dans l’en-tête ; en Auto ils sont absents. La rangée de dimensions séparée est supprimée.
+
+Aucun schéma, bridge, solveur, tolérance, géométrie ou comportement de scène ne change. Validation : 474 tests, syntaxe JavaScript, tests DOM et transport Qt, `compileall` et frontière `adsk` passent. P44-M007 reste bloquée par P44-M009H04V.
