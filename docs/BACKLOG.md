@@ -1973,7 +1973,7 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
 - Micro-ajustement inclus : dans Réglages, griser visiblement « Hauteur de
   conception », qui reste une valeur dérivée non éditable ; aucun calcul ni
   sémantique ne change.
-- Statut : bloque par la gate corrective P44-M009H05V.
+- Statut : ready-for-explicit-go ; GO déjà accordé pour la reprise après la clôture documentaire de P44-M009H05V.
 
 #### P44-M008 - Contrat de jeux herites et overrides par objet
 
@@ -2205,6 +2205,6 @@ P44-M007 reste bloquée jusqu’à P44-M009H05V.
 - Exclusions : aucun schéma, bridge, solveur, tolérance, géométrie, scène automatique ou complément.
 - Package : 0.1.36.
 - Tests : DOM, transport Qt, syntaxe JavaScript, suite complète, compileall, frontière adsk et diff-check.
-- Statut : implemented, automated-validated, human-fusion-check-required, fusion-validated: false, print-validated: false.
+- Statut : done, implemented, automated-validated, fusion-validated le 2026-07-16 (P44-M009H05 Fusion OK 0.1.36 - commit 7c76ba0), print-validated: false.
 
-P44-M007 reste bloquée jusqu’à P44-M009H05V.
+P44-M007 est ready-for-explicit-go.

@@ -405,8 +405,8 @@ Vérifier dans Fusion :
 5. Appliquer Auto, Cible ou Fixe modifie les trois axes de tous les conteneurs ;
 6. aucune scène Fusion n’est créée ou modifiée automatiquement.
 
-Retour OK :
+Retour reçu le 2026-07-16 :
 
-P44-M009H05 Fusion OK 0.1.36 - commit <sha>
+P44-M009H05 Fusion OK 0.1.36 - commit 7c76ba0
 
-Cette gate qualifie uniquement la composition UI et le comportement du sélecteur global observés dans Fusion. Elle ne valide ni les valeurs physiques ni l’impression. P44-M007 reste bloquée jusqu’à ce retour.
+Cette gate qualifie uniquement la composition UI et le comportement du sélecteur global observés dans Fusion. Elle ne valide ni les valeurs physiques ni l’impression. P44-M007 est désormais ready-for-explicit-go.

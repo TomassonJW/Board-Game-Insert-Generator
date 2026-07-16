@@ -652,4 +652,4 @@ P44-M009H03V est remplacée par P44-M009H04V. P44-M007 reste bloquée jusqu’à
 
 Le package 0.1.36 sépare visuellement l’identité à gauche des contrôles à droite et intègre le mode global dans la ligne Conteneurs. Son état devient fidèle aux cartes et son application couvre les trois axes de chaque conteneur.
 
-P44-M009H04V est remplacée par P44-M009H05V. P44-M007 reste bloquée jusqu’à cette preuve ; P44-V demeure la gate globale.
+Preuve humaine acceptée le 2026-07-16 : P44-M009H05 Fusion OK 0.1.36 - commit 7c76ba0. P44-M007 devient ready-for-explicit-go ; P44-V demeure la gate globale et print-validated: false.

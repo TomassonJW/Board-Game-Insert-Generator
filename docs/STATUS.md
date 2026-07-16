@@ -2121,10 +2121,10 @@ Aucun schéma, bridge, solveur, tolérance, géométrie ou comportement de scèn
 
 ## P44-M009H05 - En-tête conteneur distribué et mode global fiable (2026-07-16)
 
-Statut : implemented, automated-validated, package 0.1.36, human-fusion-check-required, fusion-validated: false, print-validated: false.
+Statut : done, implemented, automated-validated, fusion-validated, package 0.1.36, commit 7c76ba0, print-validated: false.
 
 La revue Fusion 0.1.35 confirme la densité générale et demande une dernière distribution horizontale : identité et minimum à gauche, contrôles du mode jusqu’à la suppression justifiés à droite. Le mode global quitte sa bande dédiée et rejoint la ligne Conteneurs.
 
 Le sélecteur global ne prétend plus être Auto lorsque les cartes diffèrent : il affiche Mixte, ou le mode uniforme réel. Appliquer Auto, Cible ou Fixe configure les trois axes de chaque conteneur ; Cible et Fixe peuvent repartir des dimensions explicites existantes ou des minima calculés.
 
-Aucun schéma, bridge, solveur, tolérance, géométrie ou comportement de scène ne change. Validation : 475 tests, syntaxe JavaScript, DOM, transport Qt, compileall et frontière adsk passent. P44-M007 reste bloquée par P44-M009H05V.
+Aucun schéma, bridge, solveur, tolérance, géométrie ou comportement de scène ne change. Validation automatisée : 475 tests, syntaxe JavaScript, DOM, transport Qt, compileall et frontière adsk passent. Preuve humaine : P44-M009H05 Fusion OK 0.1.36 - commit 7c76ba0. P44-M007 est ready-for-explicit-go ; aucune validation d’impression n’est acquise.

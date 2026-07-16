@@ -1141,5 +1141,5 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - C-FUSION-UI : cartes distribuées gauche/droite et commande globale intégrée à la ligne Conteneurs.
 - C-USABILITY : le mode global expose son état réel, y compris Mixte, puis applique un choix unique aux trois axes de tous les conteneurs.
 - C-TOLERANCE et C-GEOMETRY : aucun changement fonctionnel.
-- C-QUALITY : 475 tests, syntaxe JavaScript, DOM, transport Qt, compileall et frontière adsk passés.
-- Suite : P44-M009H05V avant P44-M007 ; fusion-validated: false ; print-validated: false.
+- C-QUALITY : 475 tests, syntaxe JavaScript, DOM, transport Qt, compileall et frontière adsk passés ; preuve Fusion reçue le 2026-07-16 (package 0.1.36, commit 7c76ba0).
+- Suite : C-FUSION-UI et C-USABILITY sont fusion-validated pour H05 ; P44-M007 est ready-for-explicit-go ; print-validated: false.

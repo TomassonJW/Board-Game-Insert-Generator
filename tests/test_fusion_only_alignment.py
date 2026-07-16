@@ -56,7 +56,7 @@ class FusionOnlyAlignmentTests(unittest.TestCase):
         self.assertIn('class="eyebrow">BGIG</span>', markup)
         self.assertIn("bgig.palette.request.v1", markup)
 
-    def test_next_action_exposes_the_current_container_header_gate_without_promoting_print(self) -> None:
+    def test_next_action_records_the_accepted_container_header_gate_without_promoting_print(self) -> None:
         actions = self.read("docs/NEXT_ACTIONS.md")
         decision = self.read("docs/DECISIONS/ADR-0064-global-container-clearances.md")
 
@@ -64,9 +64,12 @@ class FusionOnlyAlignmentTests(unittest.TestCase):
         self.assertIn("P44-M009H05", actions)
         self.assertIn("0.1.36", actions)
         self.assertIn("P44-M009H05V", actions)
-        self.assertIn("P44-M009H05 Fusion OK 0.1.36 - commit <sha>", actions)
+        self.assertIn("P44-M007 - Calcul adaptatif", actions)
+        self.assertIn("ready-for-explicit-go", actions)
+        self.assertIn("commit 7c76ba0", actions)
         self.assertIn("P44-M007", actions)
-        self.assertIn("fusion-validated: false", actions)
+        self.assertIn("P44-M009H05 est fusion-validated", actions)
+        self.assertNotIn("human-fusion-check-required", actions)
         self.assertIn("print-validated: false", actions)
         self.assertIn("exclusivement globaux", decision)
         self.assertIn("roundtrippables", decision)

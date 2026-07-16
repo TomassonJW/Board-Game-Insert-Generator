@@ -8,7 +8,7 @@ V0.1 reste mvp-accepted par P66 (package 0.1.20), fusion-validated: true et prin
 
 ## Dernier état réel
 
-P44-M009H05 est implémentée dans le package 0.1.36 et automatisée. `fusion-validated: false`, `print-validated: false` :
+P44-M009H05 est fusion-validated dans Fusion 360 (package 0.1.36, commit 7c76ba0). print-validated: false :
 
 - les jeux externes des conteneurs restent exclusivement globaux selon ADR-0064 ;
 - les overrides asset, plateau et livret restent actifs ;
@@ -19,33 +19,23 @@ P44-M009H05 est implémentée dans le package 0.1.36 et automatisée. `fusion-va
 - le mode global est intégré à droite du titre « Conteneurs », reflète Auto/Cible/Fixe ou Mixte et applique réellement le choix aux trois axes de tous les conteneurs ;
 - aucune valeur, schéma, bridge, solveur, géométrie ou scène Fusion automatique ne change.
 
-La revue du package 0.1.35 valide la compacité générale mais demande une dernière composition de l’en-tête conteneur et corrige l’état trompeur du mode global. P44-M009H04V est donc remplacée par P44-M009H05V.
+La revue Fusion confirme la composition finale et l’application du mode global. P44-M009H05V ferme la gate corrective ; aucune propriété physique ni impression réelle n’est validée.
 
 ## Prochaine action recommandée
 
-### P44-M009H05V - Vérification Fusion de la densité finale 0.1.36
+### P44-M007 - Calcul adaptatif et Aperçu priorisé
 
-Statut : human-fusion-check-required après intégration et installation.
+Statut : ready-for-explicit-go. Le GO est déjà accordé pour la reprise dans le nouveau clavardage après son préflight Git et documentaire.
 
-Vérifier dans Fusion :
+Objectif borné : calcul hybride adaptatif, annulation des requêtes obsolètes, Aperçu en premier et Matérialiser toujours explicite. Inclure le micro-ajustement UI qui maintient « Hauteur de conception » visiblement grisée car dérivée et non éditable.
 
-1. le nom, le nombre d’éléments et le minimum calculé restent regroupés à gauche de chaque carte ;
-2. Mode, X/Y/Z en Cible/Fixe, épaisseurs et actions sont alignés contre la droite ;
-3. Auto masque toujours X/Y/Z et la flèche ;
-4. le mode global est sur la même ligne que « Conteneurs », sans bande supplémentaire ;
-5. il affiche « Mixte » lorsque les conteneurs diffèrent et reflète Auto, Cible ou Fixe lorsqu’ils sont uniformes ;
-6. choisir Auto, Cible ou Fixe puis « Appliquer » met les trois axes de tous les conteneurs dans ce mode ;
-7. aucune scène Fusion n’est créée ou modifiée automatiquement.
+Ne pas ouvrir P45/P46, P47-P50, P67, P68 ou P69. La prochaine gate humaine sera préparée seulement à la fin de P44-M007 selon son contrat.
 
-Retour OK attendu :
-
-`P44-M009H05 Fusion OK 0.1.36 - commit <sha>`
-
-P44-M007 redevient ready-for-explicit-go seulement après ce retour. P44-V reste la gate globale.
+P44-V reste la gate globale de fondation UX et print-validated: false reste obligatoire.
 
 ## Séquence verrouillée
 
-P44-M005 et P44-M006 restent fusion-validated pour leurs parcours UX. P44-M009H05V est la seule prochaine action ; P44-M007 est bloquée. P45/P46 ne commencent pas avant P44-V ; P47-P50 restent bloqués jusqu’à P46 et P69 jusqu’à P50. P68 peut recueillir des faits réels sans modifier les valeurs par défaut. `print-validated: false` reste obligatoire.
+P44-M005, P44-M006 et P44-M009H05 sont fusion-validated pour leurs parcours UX. P44-M007 est la seule mission suivante autorisée. P45/P46 ne commencent pas avant P44-V ; P47-P50 restent bloqués jusqu’à P46 et P69 jusqu’à P50. P68 peut recueillir des faits réels sans modifier les valeurs par défaut.
 
 ## Fin de chaque mission
 
