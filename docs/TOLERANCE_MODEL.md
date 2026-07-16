@@ -339,3 +339,16 @@ lorsqu’il existe. Les champs sont rangés dans un volet replié par objet.
 Les projets anisotropes existants restent inchangés jusqu’à une nouvelle saisie
 X/Y, qui unifie alors les deux axes. Aucun jeu par défaut ni aucune formule
 physique ne change. print-validated: false.
+
+## P44-M009H02 - Cohérence des defaults et isolation UI
+
+Les contrôles globaux de la palette restent compatibles avec les scalaires
+historiques mais écrivent aussi le vecteur par rôle réellement résolu et la
+provenance `project_default`. Les effectifs affichés viennent du dernier projet
+dérivé correspondant au même id ; les overrides saisis restent dans le projet
+source de leur seule carte.
+
+Un override inférieur remplace le default pour un asset ou un plat. Pour un jeu
+externe, une interface reste contrainte par le max des deux conteneurs voisins :
+un seul côté inférieur ne peut pas réduire la demande héritée de l’autre côté.
+Ce calcul pairwise ne copie jamais l’override vers les autres conteneurs.

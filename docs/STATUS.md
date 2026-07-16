@@ -2061,8 +2061,9 @@ P44-M007 devient ready-for-explicit-go ; P44-V reste la gate humaine globale.
 
 ## P44-M009H01 - Correction de densité des jeux (2026-07-16)
 
-Statut : implemented, automated-validated, package 0.1.32,
-fusion-validated pour le parcours UI le 2026-07-16, print-validated: false.
+Statut : implemented, automated-validated, package 0.1.32, présentation UI
+observée mais validation fonctionnelle révoquée, fusion-validated: false,
+print-validated: false.
 
 Les jeux unitaires des assets, plateaux/livrets et conteneurs sont déplacés
 dans des volets repliés par défaut. Le parcours normal expose un seul champ
@@ -2074,7 +2075,26 @@ compatibles X/Y/Z. Les valeurs anisotropes importées sont préservées et
 signalées jusqu’à une saisie X/Y commune. Aucun défaut, calcul, jeu physique,
 géométrie ou comportement de scène ne change.
 
-Preuve humaine : P44-M009H01 Fusion OK 0.1.32 - commit 8fc5157.
-P44-M007 est ready-for-explicit-go. Son périmètre inclura le micro-ajustement
-visuel « Hauteur de conception » grisée dans Réglages ; cette valeur reste
-dérivée et non éditable, sans effet métier.
+Preuve humaine initiale : P44-M009H01 Fusion OK 0.1.32 - commit 8fc5157.
+Cette preuve est ensuite révoquée pour le comportement fonctionnel ; elle ne
+conserve qu’une observation visuelle historique. P44-M007 est rebloquée par
+P44-M009H02V.
+
+## P44-M009H02 - Isolation corrective des jeux (2026-07-16)
+
+Statut : implemented, automated-validated, package 0.1.33,
+human-fusion-check-required, fusion-validated: false, print-validated: false.
+
+La palette synchronise désormais les champs globaux historiques avec les
+vecteurs `clearance_defaults_v1` réellement consommés par le moteur et marque
+leurs sources `project_default`. Les cartes lisent les dernières valeurs
+effectives du recalcul silencieux au lieu de conserver une projection périmée.
+
+Les tests prouvent qu’un override d’asset inférieur remplace le default sans
+modifier l’autre asset et qu’avec trois conteneurs un jeu de 2 mm ne concerne
+que les interfaces adjacentes ; la paire restante conserve 0,2 mm. La règle
+pairwise max de l’ADR-0063 ne change pas. Le champ « Hauteur de conception » est
+visiblement grisé, toujours dérivé et non éditable.
+
+Validation : 476 tests, syntaxe JavaScript et tests DOM ciblés passés. P44-M007
+reste bloquée par P44-M009H02V.

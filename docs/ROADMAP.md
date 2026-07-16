@@ -624,3 +624,14 @@ commit 8fc5157. P44-M007 redevient ready-for-explicit-go. Le premier détail
 borné de cette mission rendra « Hauteur de conception » visiblement grisée dans
 Réglages, sans modifier son statut dérivé ni les calculs. P44-V reste la gate
 globale de fondation UX.
+
+## P44-M009H02 - Correction fonctionnelle des jeux (2026-07-16)
+
+Le retour Fusion postérieur à P44-M009H01 révoque sa validation fonctionnelle :
+les champs globaux modifiaient les scalaires historiques sans synchroniser les
+defaults par rôle, et la palette pouvait afficher des valeurs effectives
+périmées. Le package 0.1.33 synchronise ces deux représentations, lit le dernier
+résultat dérivé et prouve l’isolation sur deux assets et trois conteneurs.
+
+Les formules de l’ADR-0063 ne changent pas. P44-M007 reste bloquée jusqu’à la
+gate P44-M009H02V ; P44-V reste la gate globale.

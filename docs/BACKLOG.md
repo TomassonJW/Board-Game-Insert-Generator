@@ -1968,12 +1968,12 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
 
 #### P44-M007 - Calcul adaptatif et Apercu priorise
 
-- Dependances : P44-M006, P44-M009 et P44-M009H01V acceptee dans Fusion.
+- Dependances : P44-M006 et P44-M009 integrees ; P44-M009H02V acceptee dans Fusion.
 - Objectif : calcul hybride adaptatif, requetes obsoletes gerees, Apercu en premier et Materialiser toujours explicite.
 - Micro-ajustement inclus : dans Réglages, griser visiblement « Hauteur de
   conception », qui reste une valeur dérivée non éditable ; aucun calcul ni
   sémantique ne change.
-- Statut : ready-for-explicit-go sur GO explicite.
+- Statut : bloque par la gate corrective P44-M009H02V.
 
 #### P44-M008 - Contrat de jeux herites et overrides par objet
 
@@ -2141,4 +2141,31 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - Statut : done, implemented, automated-validated, fusion-validated pour le
   parcours UI, print-validated: false.
 
-P44-M007 est débloquée et reste la prochaine mission unique sur GO explicite.
+La preuve fonctionnelle P44-M009H01V est révoquée après observation de defaults
+globaux désynchronisés et de valeurs effectives périmées dans la palette. La
+validation visuelle des volets reste un fait, mais elle ne qualifie plus le
+comportement des jeux.
+
+#### P44-M009H02 - Isolation des jeux et synchronisation des defaults
+
+- Dépendance : P44-M009H01 intégrée ; anomalie Fusion observée sur 0.1.32.
+- Capability : C-FUSION-UI, C-TOLERANCE, C-QUALITY.
+- Objectif : synchroniser les anciens champs globaux avec
+  `clearance_defaults_v1`, afficher les dernières valeurs effectives dérivées et
+  garantir qu’un override local, inférieur ou supérieur, reste attaché à son
+  objet.
+- Sémantique conservée : un override explicite remplace le default, même s’il
+  est inférieur ; entre deux conteneurs voisins seulement, le gap est le max
+  de leurs deux demandes.
+- UI : expliquer la règle de voisinage et griser visiblement « Hauteur de
+  conception » sans changer sa valeur dérivée.
+- Exclusions : aucune recalibration, migration destructive, nouvelle formule,
+  géométrie, scène automatique ou validation d’impression.
+- Package : 0.1.33.
+- Tests : override inférieur isolé, trois conteneurs/deux interfaces, defaults
+  globaux, DOM, transport Qt, suite complète, syntaxe JavaScript, compileall,
+  frontière adsk et diff-check.
+- Statut : implemented, automated-validated, human-fusion-check-required,
+  fusion-validated: false, print-validated: false.
+
+P44-M007 reste bloquée jusqu’à P44-M009H02V.

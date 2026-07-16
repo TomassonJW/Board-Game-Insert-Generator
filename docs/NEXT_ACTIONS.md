@@ -1,6 +1,6 @@
 # Next Actions
 
-Dernière mise à jour : 2026-07-15
+Dernière mise à jour : 2026-07-16
 
 ## Version active
 
@@ -62,23 +62,33 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 
 ## Prochaine action recommandée
 
-### P44-M007 - Calcul adaptatif et Aperçu priorisé
+### P44-M009H02V - Vérification Fusion de l’isolation des jeux 0.1.33
 
-Statut : ready-for-explicit-go après P44-M009H01V acceptée dans Fusion sur le
-package 0.1.32 (commit 8fc5157).
+Statut : human-fusion-check-required après intégration et installation.
 
-Le prochain GO ouvre uniquement P44-M007. Inclure d’abord le micro-ajustement
-UI déjà demandé : dans Réglages, « Hauteur de conception » reste dérivée et non
-éditable, mais doit être visiblement grisée. Aucun calcul, schéma ou sémantique
-ne change par ce détail. Puis appliquer le contrat P44-M007 : calcul hybride
-adaptatif, requêtes obsolètes gérées, Aperçu priorisé et matérialisation
-explicite. P44-V reste la gate globale.
+La preuve P44-M009H01V est révoquée pour le comportement fonctionnel. Vérifier
+sur trois objets que :
+
+1. un jeu local d’asset inférieur au default réduit uniquement sa cavité ;
+2. un jeu local supérieur agrandit uniquement sa cavité ;
+3. modifier un default global met à jour les objets qui héritent ;
+4. un jeu externe élevé sur un conteneur ne touche que ses interfaces avec ses
+   voisins, tandis qu’une paire de deux autres conteneurs garde son propre jeu ;
+5. les valeurs effectives affichées se mettent à jour après le recalcul
+   silencieux, sans copie dans les autres cartes ;
+6. « Hauteur de conception » est visiblement grisée et reste non éditable.
+
+Retour OK attendu :
+P44-M009H02 Fusion OK 0.1.33 - commit <sha>.
+
+P44-M007 redevient ready-for-explicit-go seulement après ce retour. P44-V reste
+la gate globale.
 
 ## Séquence verrouillée
 
-P44-M005, P44-M006 et P44-M009H01 sont intégrées et fusion-validated pour leurs
-parcours UX. P44-M008 est acceptée ; P44-M007 est la seule prochaine mission
-ready-for-explicit-go.
+P44-M005 et P44-M006 restent fusion-validated pour leurs parcours UX. La
+présentation P44-M009H01 a été observée, mais sa preuve fonctionnelle est
+révoquée. P44-M009H02V est la seule prochaine action ; P44-M007 est bloquée.
 P44-M008/P44-M009 gardent leur contrat de tolérance. P45/P46 ne commencent pas avant P44-V ;
 P47-P50 restent bloqués jusqu’à P46 et P69 jusqu’à P50. P68 peut recueillir des
 faits réels sans modifier les valeurs par défaut. print-validated: false reste

@@ -129,6 +129,8 @@ class FusionPaletteDomTests(unittest.TestCase):
             "Tolérance cavité",
             "Jeu d’encastrement",
             "Jeu externe",
+            "Entre deux conteneurs voisins, BGIG retient la plus grande demande des deux.",
+            "Cette valeur ne se copie pas dans les autres cartes.",
             'data-key="xy"',
             "key==='xy'?{...current,x:value,y:value}",
             "axis==='xy'?{...current,x:value,y:value}",
@@ -142,14 +144,33 @@ class FusionPaletteDomTests(unittest.TestCase):
         ):
             self.assertIn(marker, self.markup)
         self.assertIn(
-            "</div>${clearanceVectorFields(item,index,'content-clearance','Tolérance cavité')}",
+            "</div>${clearanceVectorFields(item,index,'content-clearance','Tolérance cavité',derived)}",
             self.markup,
         )
         self.assertIn(
-            "</div>${clearanceVectorFields(item,index,'flat-clearance','Jeu d’encastrement')}",
+            "</div>${clearanceVectorFields(item,index,'flat-clearance','Jeu d’encastrement',derived)}",
             self.markup,
         )
         self.assertNotIn("['x','y','z'].map(axis=>input('between_mm'", self.markup)
+
+    def test_synchronizes_role_defaults_and_reads_latest_derived_values(self) -> None:
+        for marker in (
+            "GLOBAL_CLEARANCE_DEFAULT_BINDINGS",
+            "function synchronizeGlobalClearanceDefault(path,value)",
+            "function globalClearanceDefaultValue(path)",
+            "Valeurs mixtes",
+            "['container_between_mm','x']",
+            "['container_between_mm','z']",
+            "['container_box_per_side_xy_mm','x']",
+            "['asset_cavity_mm','z']",
+            "[axis]:'project_default'",
+            "function derivedProjectItem(collection,idValue)",
+            "derivedGroup(group.id)||group",
+            "resolvedItem.clearance_effective_v1",
+            "resolvedGroup.clearance_effective_v1",
+            "#design-height[readonly]",
+        ):
+            self.assertIn(marker, self.markup)
 
     def test_creates_one_selected_preset_in_an_explicit_destination_without_new_bridge(self) -> None:
         for marker in (

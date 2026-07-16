@@ -69,3 +69,21 @@ anisotropes. Si X et Y diffèrent, la palette le signale sans les réécrire. La
 première saisie dans le champ X/Y applique la même valeur aux deux axes. Cette
 décision est une contrainte d’édition UI, pas une recalibration des jeux, une
 migration de schéma ou un changement des formules physiques.
+
+## Correctif P44-M009H02 - cohérence UI, sans changement de décision
+
+L’observation Fusion 0.1.32 ne remet pas en cause la cascade acceptée. Elle
+révèle deux défauts d’adaptation : les champs globaux historiques n’écrivaient
+pas les defaults par rôle déjà présents, et l’UI pouvait lire une ancienne
+valeur effective après un recalcul silencieux.
+
+P44-M009H02 impose donc :
+
+1. toute édition globale synchronise le scalaire compatible, le vecteur de rôle
+   concerné et sa provenance `project_default` ;
+2. toute carte affiche l’effectif du dernier projet dérivé pour son propre id ;
+3. un override local reste prioritaire même inférieur ;
+4. `max` s’applique seulement à l’interface d’une paire de voisins, sans mutation
+   ni propagation vers leurs autres cartes.
+
+Aucune formule, valeur par défaut, migration ou sémantique physique ne change.

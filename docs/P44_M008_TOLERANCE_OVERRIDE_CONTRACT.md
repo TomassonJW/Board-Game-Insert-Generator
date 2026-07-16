@@ -175,3 +175,14 @@ affiche alors une note explicite.
 
 Cette correction ne change ni les valeurs par défaut, ni les formules, ni la
 règle max entre voisins, ni le solveur, ni la CAD IR, ni la géométrie.
+
+## Correctif d’adaptation P44-M009H02
+
+Le contrat reste `override si présent, default sinon`, y compris lorsque
+l’override est inférieur. La palette 0.1.33 synchronise les contrôles globaux
+historiques avec les vecteurs `clearance_defaults_v1` et leur provenance. Elle
+prend les valeurs effectives du dernier résultat dérivé par id d’objet.
+
+La règle `max` des conteneurs n’est pas un override global : elle résout une
+interface entre exactement deux voisins. Avec trois corps A, B et C, une forte
+demande de A peut affecter A-B, mais B-C conserve le max propre à B et C.

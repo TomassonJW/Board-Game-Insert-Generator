@@ -326,8 +326,29 @@ matérialisation automatique.
 Retour reçu le 2026-07-16 :
 P44-M009H01 Fusion OK 0.1.32 - commit 8fc5157.
 
-Gate acceptée pour le parcours UI observé : les volets et la saisie X/Y + Z sont
-fusion-validated dans ce périmètre. Elle ne valide ni les valeurs physiques, ni
-l’impression. P44-M007 redevient ready-for-explicit-go ; son premier
-micro-ajustement demandé est seulement de griser visiblement le champ dérivé
-« Hauteur de conception », sans modifier sa lecture seule ni aucun calcul.
+Retour initialement accepté pour la présentation des volets et la saisie X/Y +
+Z. La validation fonctionnelle est révoquée par l’observation suivante : elle ne
+prouve ni l’isolation des overrides, ni la cohérence des defaults, ni les valeurs
+physiques ou l’impression. P44-M007 reste bloquée par P44-M009H02V.
+
+## P44-M009H02V - Isolation fonctionnelle des jeux 0.1.33
+
+Déclencheur : après le retour P44-M009H01 initialement positif, une observation
+plus poussée montre que les champs globaux et les defaults par rôle pouvaient
+être désynchronisés et que la palette pouvait afficher des valeurs effectives
+périmées. La preuve fonctionnelle H01 est donc révoquée ; sa validation visuelle
+des volets reste seulement historique.
+
+Observer dans Fusion sur au moins deux assets et trois conteneurs : override
+asset inférieur puis supérieur, modification du default global, absence de
+copie des valeurs entre cartes et deux gaps de conteneurs distincts. Le gap
+d’une paire vaut le max des deux voisins de cette paire uniquement. Confirmer
+aussi que « Hauteur de conception » est grisée et non éditable. Aucune scène ne
+doit partir automatiquement.
+
+Retour OK :
+P44-M009H02 Fusion OK 0.1.33 - commit <sha>.
+
+Cette gate qualifie uniquement le comportement UI/moteur observé dans Fusion.
+Elle ne valide ni les valeurs physiques ni l’impression. P44-M007 reste bloquée
+jusqu’à ce retour.

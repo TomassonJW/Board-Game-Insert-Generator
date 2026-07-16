@@ -1100,13 +1100,22 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 
 ## P44-M009H01 - Capability update (2026-07-16)
 
-- C-FUSION-UI : fusion-validated le 2026-07-16 pour des volets de jeux repliés
-  et une saisie horizontale X/Y commune, avec Z distinct (0.1.32, 8fc5157).
+- C-FUSION-UI : présentation des volets et saisie X/Y observée le 2026-07-16,
+  mais validation fonctionnelle révoquée après anomalie sur 0.1.32.
 - C-TOLERANCE : inchangée côté moteur ; les vecteurs et provenances X/Y/Z
   restent compatibles et les projets anisotropes ne sont pas migrés.
 - C-QUALITY : 473 tests, transport Qt, syntaxe JavaScript, compileall,
   frontière adsk et diff-check passés ; observation Fusion 0.1.32 acceptée.
-- Suite : P44-M007 est ready-for-explicit-go ; son premier détail UI est de
-  rendre visiblement grisée la valeur dérivée « Hauteur de conception », sans
-  changer ses calculs.
+- Suite : état remplacé par P44-M009H02 ; P44-M007 est de nouveau bloquée.
 - print-validated: false.
+
+## P44-M009H02 - Capability update (2026-07-16)
+
+- C-FUSION-UI : implemented pour la synchronisation des defaults par rôle, la
+  lecture des dernières valeurs dérivées, l’aide pairwise et le grisage de la
+  hauteur de conception ; fusion-validated: false.
+- C-TOLERANCE : contrat inchangé et mieux prouvé : override explicite prioritaire
+  même inférieur, héritage sinon, max uniquement entre deux voisins.
+- C-QUALITY : 476 tests passent, dont isolation asset et trois conteneurs ;
+  syntaxe JavaScript et DOM passent.
+- Suite : P44-M009H02V avant P44-M007 ; print-validated: false.

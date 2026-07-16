@@ -163,6 +163,74 @@ class P44M009ClearanceOverrideTests(unittest.TestCase):
         )
         self.assertAlmostEqual(gap, 0.8, places=4)
 
+    def test_lower_asset_override_replaces_global_and_stays_local(self) -> None:
+        project = blank_project_v1()
+        project["layout"]["clearance_defaults_v1"] = {
+            "asset_cavity_mm": {"x": 0.5, "y": 0.5, "z": 0.5},
+            "flat_inset_mm": {"x": 0.2, "y": 0.2, "z": 0.0},
+            "container_between_mm": {"x": 0.2, "y": 0.2, "z": 0.2},
+            "container_box_per_side_xy_mm": {"x": 0.2, "y": 0.2},
+        }
+        project["container_groups"] = [
+            {"id": "local", "name": "Local", "wall_thickness_mm": None, "floor_thickness_mm": None},
+            {"id": "global", "name": "Global", "wall_thickness_mm": None, "floor_thickness_mm": None},
+        ]
+        base_content = {
+            "name": "Objet", "shape_kind": "rectangle",
+            "dimensions_mm": {"x": 10.0, "y": 8.0, "z": 2.0},
+            "quantity": 1, "content_clearance_mm": None,
+            "measurement_confidence": "exact",
+        }
+        project["contents"] = [
+            {**base_content, "id": "local-item", "container_group_id": "local",
+             "clearance_override_mm": {"x": 0.1, "y": 0.1, "z": 0.1}},
+            {**base_content, "id": "global-item", "container_group_id": "global"},
+        ]
+
+        containers = {
+            item["container_group_id"]: item for item in derive_container_plan(project)["containers"]
+        }
+        local = containers["local"]["compartments"][0]
+        inherited = containers["global"]["compartments"][0]
+        self.assertEqual(local["clearance_effective_v1"]["values_mm"], {"x": 0.1, "y": 0.1, "z": 0.1})
+        self.assertEqual(inherited["clearance_effective_v1"]["values_mm"], {"x": 0.5, "y": 0.5, "z": 0.5})
+        self.assertEqual(local["inner_dimensions_mm"], {"x": 10.2, "y": 8.2, "z": 2.1})
+        self.assertEqual(inherited["inner_dimensions_mm"], {"x": 11.0, "y": 9.0, "z": 2.5})
+
+    def test_one_container_override_does_not_propagate_to_other_pairs(self) -> None:
+        def participant(identifier: str, clearance: float) -> dict[str, object]:
+            policy = {
+                "role": "external_container",
+                "between_mm": {"x": clearance, "y": clearance, "z": 0.0},
+                "box_per_side_xy_mm": {"x": 0.0, "y": 0.0},
+            }
+            return {
+                "id": identifier, "role": "container", "name": identifier,
+                "minimum_local_mm": {"x": 10.0, "y": 10.0, "z": 10.0},
+                "dimension_modes": {"x": "fixed", "y": "fixed", "z": "fixed"},
+                "target_local_mm": {"x": 10.0, "y": 10.0, "z": 10.0},
+                "external_clearance_effective_v1": policy,
+            }
+
+        result = solve_stage_portfolio(
+            [participant("wide", 2.0), participant("normal-a", 0.2), participant("normal-b", 0.2)],
+            {"x": 32.2, "y": 10.0, "z": 10.0},
+            10.0,
+            0.2,
+            box_clearance_mm=0.0,
+            vertical_clearance_mm=0.0,
+        )
+        candidate = result["best_candidate"]
+        self.assertIsNotNone(candidate)
+        placements = sorted(candidate["placements"], key=lambda item: item["origin_mm"]["x"])
+        gaps = [
+            placements[index + 1]["origin_mm"]["x"]
+            - placements[index]["origin_mm"]["x"]
+            - placements[index]["world_size_mm"]["x"]
+            for index in range(2)
+        ]
+        self.assertEqual(sorted(round(gap, 4) for gap in gaps), [0.2, 2.0])
+
     def test_historical_fixture_stays_materializable_with_legacy_sources(self) -> None:
         fixture = Path(__file__).resolve().parents[1] / "scripts" / "fusion" / "p66_mvp_complete_project.json"
         raw = json.loads(fixture.read_text(encoding="utf-8"))
