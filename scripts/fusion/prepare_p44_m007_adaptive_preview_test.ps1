@@ -34,7 +34,7 @@ if (-not $DryRun) {
         "Recalculer maintenant",
         'id="preview-status"',
         'id="preview-explanations"',
-        "Calculée automatiquement",
+        ("Calcul" + [char]0x00E9 + "e automatiquement"),
         'id="design-height" readonly aria-readonly="true" tabindex="-1"',
         'data-bridge="materialize_project"'
     )) {

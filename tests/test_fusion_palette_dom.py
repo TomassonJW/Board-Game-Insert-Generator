@@ -420,7 +420,7 @@ class FusionPaletteDomTests(unittest.TestCase):
         for marker in (
             "0.1.37", "DERIVE_DEBOUNCE_MS=350", "AUTO_SOLVE_STABILITY_MS=1500",
             "latestDerivedRequest", "Recalculer maintenant", "preview-status",
-            "preview-explanations", "Calculée automatiquement",
+            "preview-explanations", "[char]0x00E9",
             "exactly one explicit materialize action", "P44-M007 Fusion OK 0.1.37",
         ):
             self.assertIn(marker, script)
