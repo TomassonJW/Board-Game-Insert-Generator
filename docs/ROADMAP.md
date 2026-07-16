@@ -619,5 +619,8 @@ repliés et utilisent un seul champ X/Y plus un champ Z distinct. Le package
 cible est 0.1.32. Le modèle X/Y/Z reste intact pour la rétrocompatibilité ;
 aucune valeur ni formule n’est recalibrée.
 
-P44-M007 reprend seulement après l’observation Fusion positive de cette
-correction. P44-V reste la gate globale de fondation UX.
+Observation Fusion acceptée le 2026-07-16 : P44-M009H01 Fusion OK 0.1.32 -
+commit 8fc5157. P44-M007 redevient ready-for-explicit-go. Le premier détail
+borné de cette mission rendra « Hauteur de conception » visiblement grisée dans
+Réglages, sans modifier son statut dérivé ni les calculs. P44-V reste la gate
+globale de fondation UX.

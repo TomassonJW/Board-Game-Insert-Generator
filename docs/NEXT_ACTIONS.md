@@ -62,23 +62,23 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 
 ## Prochaine action recommandée
 
-### P44-M009H01V - Observation Fusion de la correction 0.1.32
+### P44-M007 - Calcul adaptatif et Aperçu priorisé
 
-Statut : human-fusion-check-required après intégration et installation.
+Statut : ready-for-explicit-go après P44-M009H01V acceptée dans Fusion sur le
+package 0.1.32 (commit 8fc5157).
 
-Vérifier que les jeux des assets, plateaux/livrets et conteneurs sont repliés
-par défaut ; que chaque volet expose un seul champ X/Y et un champ Z distinct
-lorsqu’il existe ; et qu’une saisie X/Y met bien à jour les deux axes sans
-déclencher de scène Fusion.
-
-Retour OK attendu :
-P44-M009H01 Fusion OK 0.1.32 - commit <sha>.
-
-P44-M007 redevient ensuite ready-for-explicit-go. P44-V reste la gate globale.
+Le prochain GO ouvre uniquement P44-M007. Inclure d’abord le micro-ajustement
+UI déjà demandé : dans Réglages, « Hauteur de conception » reste dérivée et non
+éditable, mais doit être visiblement grisée. Aucun calcul, schéma ou sémantique
+ne change par ce détail. Puis appliquer le contrat P44-M007 : calcul hybride
+adaptatif, requêtes obsolètes gérées, Aperçu priorisé et matérialisation
+explicite. P44-V reste la gate globale.
 
 ## Séquence verrouillée
 
-P44-M005 et P44-M006 sont intégrées et fusion-validated pour leurs parcours UX. P44-M008 devient ready-for-explicit-go ; P44-M007 reste bloquée par P44-M009.
+P44-M005, P44-M006 et P44-M009H01 sont intégrées et fusion-validated pour leurs
+parcours UX. P44-M008 est acceptée ; P44-M007 est la seule prochaine mission
+ready-for-explicit-go.
 P44-M008/P44-M009 gardent leur contrat de tolérance. P45/P46 ne commencent pas avant P44-V ;
 P47-P50 restent bloqués jusqu’à P46 et P69 jusqu’à P50. P68 peut recueillir des
 faits réels sans modifier les valeurs par défaut. print-validated: false reste

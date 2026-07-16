@@ -1968,9 +1968,12 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
 
 #### P44-M007 - Calcul adaptatif et Apercu priorise
 
-- Dependances : P44-M006 et P44-M009 integrees.
+- Dependances : P44-M006, P44-M009 et P44-M009H01V acceptee dans Fusion.
 - Objectif : calcul hybride adaptatif, requetes obsoletes gerees, Apercu en premier et Materialiser toujours explicite.
-- Statut : ready-for-explicit-go apres integration P44-M009.
+- Micro-ajustement inclus : dans Réglages, griser visiblement « Hauteur de
+  conception », qui reste une valeur dérivée non éditable ; aucun calcul ni
+  sémantique ne change.
+- Statut : ready-for-explicit-go sur GO explicite.
 
 #### P44-M008 - Contrat de jeux herites et overrides par objet
 
@@ -2134,8 +2137,8 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - Package : 0.1.32.
 - Tests : DOM, transport Qt, syntaxe JavaScript, suite complète, compileall,
   frontière adsk et diff-check.
-- Gate : observation Fusion de la densité et de l’édition X/Y + Z.
-- Statut : implemented, automated-validated,
-  human-fusion-check-required, print-validated: false.
+- Gate : acceptée le 2026-07-16 ; P44-M009H01 Fusion OK 0.1.32 - commit 8fc5157.
+- Statut : done, implemented, automated-validated, fusion-validated pour le
+  parcours UI, print-validated: false.
 
-P44-M007 est temporairement bloquée par cette observation corrective.
+P44-M007 est débloquée et reste la prochaine mission unique sur GO explicite.

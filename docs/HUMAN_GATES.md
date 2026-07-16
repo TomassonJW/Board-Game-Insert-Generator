@@ -323,8 +323,11 @@ champ unique, que Z reste séparé lorsqu’il existe et qu’une modification X
 sur un asset, un plat et un conteneur est conservée après recalcul, sans
 matérialisation automatique.
 
-Retour OK :
-P44-M009H01 Fusion OK 0.1.32 - commit <sha>.
+Retour reçu le 2026-07-16 :
+P44-M009H01 Fusion OK 0.1.32 - commit 8fc5157.
 
-Cette gate ne valide ni les valeurs physiques, ni l’impression. P44-M007 reste
-bloquée jusqu’à ce retour.
+Gate acceptée pour le parcours UI observé : les volets et la saisie X/Y + Z sont
+fusion-validated dans ce périmètre. Elle ne valide ni les valeurs physiques, ni
+l’impression. P44-M007 redevient ready-for-explicit-go ; son premier
+micro-ajustement demandé est seulement de griser visiblement le champ dérivé
+« Hauteur de conception », sans modifier sa lecture seule ni aucun calcul.
