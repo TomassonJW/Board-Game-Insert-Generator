@@ -1,7 +1,7 @@
 # P64 — Programme portefeuille multi-solveurs et finition volumique
 
-Statut : architecture acceptée le 2026-07-17 ; P64-H05 est intégrée.
-Prochaine mission exécutable : `P64-H06`.
+Statut : architecture acceptée le 2026-07-17 ; P64-H06 est intégrée.
+Prochaine mission exécutable : `P64-H07`.
 
 Capability principale : `C-SOLVER`. Capabilities associées : `C-LAYOUT`,
 `C-GRID-3D`, `C-STACKING`, `C-USABILITY`, `C-QUALITY`.
@@ -278,7 +278,7 @@ hors chemin critique.
 
 ### P64-H06 — Placement 3D libre greedy EP/EMS
 
-- Statut : `ready`.
+- Statut : `terminé et intégré` le 2026-07-17, package 0.1.49.
 - Agent conseillé : Luna/frontier ; revue algorithmique obligatoire.
 - Objectif : obtenir un second moteur réellement différent avec une enveloppe
   canonique par conteneur.
@@ -293,7 +293,7 @@ hors chemin critique.
 
 ### P64-H07 — Beam robuste et portefeuille Auto
 
-- Statut : `blocked-by-P64-H06`.
+- Statut : `ready`.
 - Agent conseillé : Luna/frontier ; revue performance et produit obligatoire.
 - Objectif : conserver plusieurs états 3D et comparer baseline, greedy et beam
   sous un budget monotone.

@@ -2394,13 +2394,14 @@ P44-M007 est ready-for-explicit-go.
 
 ### P64-H06 — Placement 3D libre greedy EP/EMS
 
-- Statut : ready. Agent : Luna/frontier, revue algorithmique obligatoire.
+- Statut : terminé et intégré, package 0.1.49, `automated-validated`.
+- Contrat : `docs/P64_H06_FREE_3D_GREEDY_CONTRACT.md`.
 - Livrable : points extrêmes, espaces maximaux vides, plus contraint d'abord,
   rotations XY et validation commune, avec une enveloppe par conteneur.
 
 ### P64-H07 — Beam robuste et portefeuille Auto
 
-- Statut : blocked-by-P64-H06. Agent : Luna/frontier.
+- Statut : ready. Agent : Luna/frontier, revue performance et produit obligatoire.
 - Livrable : beam borné, efforts monotones, comparaison baseline/greedy/beam et
   sélection de candidats certifiés.
 

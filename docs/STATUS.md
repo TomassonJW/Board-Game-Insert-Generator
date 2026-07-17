@@ -8,7 +8,8 @@ Statut produit : **MVP V0.1 Fusion-only accepte ; validation d impression non ac
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P64-H05 est intégré avec contrat commun et baseline certifiée ; P64-H06 est la seule mission `ready`. P44-V reste en KO contextuel et P45 reste bloqué.
+Phase active : P64-H06 est intégré avec greedy 3D EP/EMS ; P64-H07 est la seule
+mission `ready`. P44-V reste en KO contextuel et P45 reste bloqué.
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -2328,7 +2329,7 @@ ADR-0069 sépare faisabilité et finition : fermeture continue puis harmonisatio
 modulaire, avec fallback obligatoire vers la solution certifiée.
 
 Le programme P64-H05 à H08 devient le chemin critique avant P64-V2 et reprise de
-P44-V. P64-H05 est intégré et P64-H06 est la seule mission `ready`. P45/P46 et les lots ultérieurs ne
+P44-V. P64-H05/H06 sont intégrés et P64-H07 est la seule mission `ready`. P45/P46 et les lots ultérieurs ne
 sont pas ouverts. Aucun schéma, default, dimension physique, tolérance, cavité,
 géométrie, CAD IR ou scène ne change ; `print-validated: false`.
 
@@ -2340,3 +2341,25 @@ Package : 0.1.48. Statut : `implemented`, `automated-validated`.
 La baseline H03R reste le chemin `stage_stack`. Elle est maintenant enveloppée par des candidats, budgets et certificats immuables. Le validateur commun est utilisé durant la sélection et avant exposition d'une solution complète ; il couvre boîte, jeux, collisions, enveloppes, cavités/parois/fonds, réservations, appuis, retrait, conservation et absence de corps automatiques.
 
 Les références H04 simple, dense et réservations restent identiques bit-à-bit ; les ordres, piles, budgets, score, digest et télémétrie H04 ne changent pas. Un cas dense contextuel reste sans solution dans le budget, donc P64-H06 reste nécessaire. Aucune preuve Fusion ni impression nouvelle : dernière preuve solveur P64-H01 0.1.42 ; `print-validated: false`.
+
+## P64-H06 — Placement 3D libre greedy EP/EMS (2026-07-17)
+
+Package : 0.1.49. Statut : `implemented`, `automated-validated`.
+
+La famille interne `free_3d_greedy` place une enveloppe canonique par conteneur
+avec des espaces maximaux vides, des points extrêmes issus des faces, le choix
+du participant courant le plus contraint, les rotations XY 0/90 et une seule
+trajectoire greedy déterministe. Les limites sur états, essais, EMS et points
+sont explicites et obligatoires ; aucun profil produit par défaut n'est créé.
+
+Le corpus H04 simple, dense H01 et réservations H02 est placé. Les tests couvrent
+aussi un franchissement de plan Z local, un appui supérieur sur deux corps, la
+non-collision, la déduplication, le déterminisme, les bornes nécessaires et
+l'épuisement honnête du budget. Le moteur réutilise le validateur géométrique
+commun ; la certification produit complète reste obligatoire dans P64-H07 avant
+toute exposition comme matérialisable.
+
+Le chemin public `solve_partition_plan` et la baseline `stage_stack` ne changent
+pas. Beam, portefeuille Auto, profils d'effort, UI, finition, cales, variantes
+P45 et solveur exact restent hors scope. Aucune nouvelle preuve Fusion ni
+impression : dernière preuve solveur P64-H01 0.1.42 ; `print-validated: false`.

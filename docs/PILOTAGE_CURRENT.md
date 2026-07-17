@@ -21,8 +21,11 @@ preuves archivées.
 - P64-H03R est `automated-validated`, mais ni `fusion-validated` ni `print-validated`.
 - P64-A01 accepte la trajectoire multi-solveurs des ADR-0068/0069 ; aucun runtime
   n'est modifié par cette mission documentaire.
-- P64-H05 (package 0.1.48) encapsule la baseline H03R derrière le contrat commun ; ses références H04 restent identiques.
-- Prochaine action unique : `P64-H06`, placement 3D libre greedy EP/EMS. P44-V et P45 restent bloqués.
+- P64-H06 (package 0.1.49) livre le moteur interne `free_3d_greedy` EP/EMS ;
+  le corpus H04, les plans Z locaux, les appuis multiples, le déterminisme et
+  les budgets durs sont automatisés, sans changer le chemin public H05.
+- Prochaine action unique : `P64-H07`, beam robuste et portefeuille Auto.
+  P44-V et P45 restent bloqués.
 
 ## Vue de séquence
 
@@ -37,7 +40,8 @@ preuves archivées.
 | Terminé | P64-A01 | Contrat programme et ADR multi-solveurs/finition acceptés. |
 | Terminé | P64-H04 | Résultats honnêtes, télémétrie versionnée et corpus automatisé ; aucune nouvelle stratégie. |
 | Terminé | P64-H05 | Contrat commun, certificat et baseline `Étages et piles` préservée. |
-| Prêt | P64-H06 | Placement 3D libre greedy EP/EMS. |
+| Terminé | P64-H06 | Placement 3D libre greedy EP/EMS, admission géométrique commune et budgets explicites. |
+| Prêt | P64-H07 | Beam robuste et portefeuille Auto ; certification produit complète des familles. |
 | KO contextuel | P44-V | Reprendre seulement après P64-V2 ; P45 reste bloqué. |
 | Bloqué | P45 à P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |

@@ -1282,7 +1282,8 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
   prépare seulement leur interface future.
 - C-GEOMETRY : finition continue/modulaire planifiée après P46 ; aucun filler ni
   cale automatique.
-- État : P64-H03R/H04/H05 intégrés (baseline dirigée, résultats honnêtes et contrat commun). P64-H06 `ready`,
-  P64-H07 à H08 bloquées séquentiellement, P64-V2 planifiée.
+- État : P64-H03R/H04/H05/H06 intégrés (baseline dirigée, résultats honnêtes,
+  contrat commun et greedy 3D EP/EMS). P64-H07 `ready`, P64-H08 bloquée
+  séquentiellement, P64-V2 planifiée.
 - Validation : dernière preuve inchangée P64-H01 0.1.42 ; P64-H02/H03 non
   fusion-validées ; `print-validated: false`.
