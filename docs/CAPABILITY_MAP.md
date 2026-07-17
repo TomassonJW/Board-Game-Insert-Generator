@@ -1366,3 +1366,14 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
   `fusion-validated: false` et `print-validated: false` pour P64-V2H03.
 - Suite : P64-V2H03B est `ready` ; P64-V2H03C/V restent bloquées. P45 reste
   bloquée par P44-V.
+
+## Mise à jour P64-V2H03B — 2026-07-18
+
+- C-GEOMETRY / C-ASSET : `implemented-core` pour snapshots, producteurs et
+  certificat local.
+- C-QUALITY : `automated-validated` pour digests, provenance, déduplication,
+  Pareto, fail-closed et corpus 11 × 34.
+- C-SOLVER / C-LAYOUT : frontière disponible, sélection globale encore
+  `designed` et non branchée jusqu'à H03C.
+- C-USABILITY : aucune surface novice ne change.
+- H03C devient `ready` ; H03V reste bloquée par C.

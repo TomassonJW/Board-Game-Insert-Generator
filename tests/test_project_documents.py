@@ -36,6 +36,7 @@ REQUIRED_PROJECT_FILES = (
     "docs/P69_FULL_UI_UX_REVIEW_CONTRACT.md",
     "docs/P64_MULTI_SOLVER_PORTFOLIO_PROGRAM.md",
     "docs/P64_V2H03_INTERNAL_VARIANT_COORDINATION_CONTRACT.md",
+    "docs/P64_V2H03B_LOCAL_VARIANT_EVIDENCE.md",
     "docs/P64_H04_OBSERVABILITY_AND_RESULT_TRUTH_CONTRACT.md",
     "docs/DECISIONS/ADR-0068-multi-solver-portfolio-and-truthful-results.md",
     "docs/DECISIONS/ADR-0069-continuous-and-modular-volume-finishing.md",
@@ -188,6 +189,14 @@ REQUIRED_SECTIONS = {
         "## 12. Fixtures déterministes obligatoires",
         "## 13. Découpage de livraison",
         "## 15. Hors scope absolu",
+    ),
+    "docs/P64_V2H03B_LOCAL_VARIANT_EVIDENCE.md": (
+        "## Portée vérifiée",
+        "## Implémentation",
+        "## Mesures du corpus déterministe",
+        "## Fixtures verrouillées",
+        "## Validation",
+        "## Limites",
     ),
     "docs/P64_H04_OBSERVABILITY_AND_RESULT_TRUTH_CONTRACT.md": (
         "## 1. Objectif",

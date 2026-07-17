@@ -8,11 +8,10 @@ Statut produit : **MVP V0.1 Fusion-only accepte ; validation d impression non ac
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P64-V2H03A a accepté ADR-0070 et le contrat de variantes
-internes. P64-V2H03B est la seule mission `ready` ; elle prépare la frontière
-locale, les certificats, les fixtures et les caps sans modifier la sélection
-publique. P64-V2H02R reste la dernière preuve Fusion. P44-V et P45 restent
-bloquées pendant le chemin correctif.
+Phase active : P64-V2H03B est `implemented-core` et
+`automated-validated`. La frontière locale et ses caps sont disponibles sans
+routage public. P64-V2H03C devient la seule mission `ready`. P64-V2H02R reste
+la dernière preuve Fusion ; P44-V et P45 restent bloquées.
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
 roadmap macro, backlog actionnable, prochaines actions, index ADR/logs et
@@ -2502,3 +2501,20 @@ cavité, scène Fusion ou comportement de matérialisation n'est modifié.
 P64-V2H03B devient la seule mission `ready` ; P64-V2H03C et P64-V2H03V restent
 bloquées. P44-V et P45 restent bloquées. `fusion-validated: false` et
 `print-validated: false` pour P64-V2H03.
+
+## P64-V2H03B — Frontière locale certifiée (2026-07-18)
+
+Statut : `implemented-core`, `automated-validated`.
+
+`container_internal_variants.py` conserve `canonical_v1`, génère des
+relayouts rectangulaires bornés, certifie les invariants locaux, déduplique et
+élague par Pareto. Les profils verrouillent 24/48/96 variantes générées,
+4/8/12 retenues et 2/4/6 options futures par expansion.
+
+Le corpus 11 × 34 observe 231 layouts bruts sur le cœur dense. Les sorties
+publiques restent bit-à-bit identiques. Preuve :
+`docs/P64_V2H03B_LOCAL_VARIANT_EVIDENCE.md`.
+
+Suite complète : 556/556 OK (166,087 s). Aucun schéma, solveur public, UI, valeur
+physique, scène ou corps automatique n'est modifié. H03C devient `ready`.
+`fusion-validated: false` et `print-validated: false`.

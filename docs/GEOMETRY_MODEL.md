@@ -514,3 +514,14 @@ locale supplémentaire.
 
 Voir ADR-0070 et
 `docs/P64_V2H03_INTERNAL_VARIANT_COORDINATION_CONTRACT.md`.
+
+## Implémentation P64-V2H03B
+
+Une variante certifiée contient enveloppe minimale, paroi, fond, repère local,
+cavités triées, origines, dimensions, quantités, jeux effectifs et leurs
+sources. Le digest exclut provenance producteur, origine boîte et rotation
+globale ; les miroirs restent distincts.
+
+Le certificat vérifie couverture, invariants de contenus, valeurs physiques,
+géométrie finie, cloisons, non-recouvrement, enveloppe serrée, axes Fixe,
+absence de corps automatique et digest. Cible reste préférentiel et Auto libre.

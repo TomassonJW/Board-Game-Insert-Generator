@@ -1,11 +1,11 @@
 # P64 — Programme portefeuille multi-solveurs et finition volumique
 
 Statut : architecture portefeuille acceptée ; P64-V2H02R 0.1.54 est
-fusion-validated. P64-V2H03A est terminé : ADR-0070 et le contrat de coordination
-fixent la propriété P45/P64. P64-V2H03B est la seule mission `ready`.
+fusion-validated. P64-V2H03B est `implemented-core` et
+`automated-validated`, sans branchement public.
 
-Prochaine action : P64-V2H03B, frontière locale, certificats, fixtures et caps
-mesurés, sans branchement dans la sélection publique.
+Prochaine action : P64-V2H03C, sélection globale paresseuse, lanes monotones,
+télémétrie et certificat global.
 Capability principale : `C-SOLVER`. Capabilities associées : `C-LAYOUT`,
 `C-GRID-3D`, `C-STACKING`, `C-USABILITY`, `C-QUALITY`.
 
@@ -379,15 +379,15 @@ hors chemin critique.
 
 ### P64-V2H03B — Frontière locale et fixtures
 
-- Statut : `ready`.
-- Agent conseillé : `gpt-5.6-sol`, raisonnement `xhigh`.
-- Objectif : types immuables, digests, producteurs canonique/correctif,
-  certificat local, frontière non dominée, fixtures et caps mesurés.
-- Interdit : sélection publique, UI, formes P45, schéma ou valeurs physiques.
+- Statut : `done-automated`, `implemented-core`.
+- Preuve : `docs/P64_V2H03B_LOCAL_VARIANT_EVIDENCE.md`.
+- Livrables : types, digests, producteurs, certificat, Pareto et caps 24/48/96.
+- Interdit respecté : aucun routage public, UI, forme P45 ou valeur physique.
 
 ### P64-V2H03C — Sélection globale paresseuse
 
-- Statut : `blocked-by-P64-V2H03B`.
+- Statut : `ready`.
+- Agent conseillé : `gpt-5.6-sol`, raisonnement `max`.
 - Objectif : expansion variante-placement par lanes monotones, certificat global
   et télémétrie, sans produit cartésien.
 - Acceptation : cul-de-sac multi-cavités résolu, baseline préservée,

@@ -833,3 +833,13 @@ caps ; P64-V2H03C pour sélection globale et télémétrie ; P64-V2H03V seulemen
 une observation Fusion est requise. P44-V et P45 restent bloquées pendant ce
 chemin. Aucune valeur physique, tolérance, default, scène ou preuve d'impression
 ne change.
+
+## P64-V2H03B — Frontière locale implémentée (2026-07-18)
+
+La frontière locale ADR-0070 est exécutable dans le cœur Python : canonique,
+relayout rectangulaire, digest, certificat fail-closed, provenance, Pareto et
+caps monotones. Les fixtures 1 à 8 incluent le mécanisme anonymisé 11 × 34.
+
+H03C devient `ready`. Aucun résultat public, schéma, UI, default, jeu
+externe, valeur physique ou état Fusion n'est modifié.
+`print-validated: false`.

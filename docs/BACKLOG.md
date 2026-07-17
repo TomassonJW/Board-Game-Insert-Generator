@@ -2456,19 +2456,15 @@ P44-M007 est ready-for-explicit-go.
 
 ### P64-V2H03B — Frontière locale, certificats et fixtures
 
-- Statut : ready. Modèle : `gpt-5.6-sol`, raisonnement `xhigh`.
-- Objectif : extraire `canonical_v1`, produire des relayouts rectangulaires
-  bornés, certifier localement et construire une frontière non dominée.
-- Livrables : types immuables, digests, provenance, certificat fail-closed,
-  fixtures déterministes et tableau de caps mesuré.
-- Gate : parité canonique publique, génération bornée, suite complète,
-  compileall, frontière adsk et diff-check.
-- Interdits : branchement dans le sélecteur public, formes/modes P45, schéma,
-  defaults, valeurs physiques, UI ou scène automatique.
+- Statut : `done-automated`, `implemented-core`.
+- Livrables : snapshots, digests, provenance, canonique, relayout, certificat,
+  Pareto, fixtures 1 à 8 et caps mesurés.
+- Preuve : `docs/P64_V2H03B_LOCAL_VARIANT_EVIDENCE.md`.
+- Limite : aucun routage public, UI, forme P45 ou valeur physique.
 
 ### P64-V2H03C — Sélection globale paresseuse
 
-- Statut : blocked-by-P64-V2H03B.
+- Statut : `ready`. Modèle : `gpt-5.6-sol`, raisonnement `max`.
 - Objectif : choisir variante et placement dans les lanes free-3D sans produit
   cartésien, tout en conservant le portefeuille canonique complet.
 - Livrables : budgets monotones, lanes préservées, télémétrie, certificat global

@@ -728,3 +728,12 @@ P45, ni P64-V2H03C avant les fixtures/caps de B, ni P44-V/P46.
 
 Aucune nouvelle preuve Fusion ou physique n'est acquise.
 `fusion-validated: false` et `print-validated: false` pour P64-V2H03.
+
+## P64-V2H03B — Frontière locale clôturée automatiquement
+
+Statut : `implemented-core`, `automated-validated`. Le lot ne modifie ni
+sélection publique, ni UI, ni scène et ne demande aucune observation Fusion.
+
+P64-V2H03C devient `ready`. Une gate humaine ne sera préparée qu'après C si
+un comportement visible doit être observé. `fusion-validated: false` et
+`print-validated: false` pour P64-V2H03.

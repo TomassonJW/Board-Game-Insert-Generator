@@ -32,9 +32,10 @@ preuves archivées.
 - P64-V2H03A accepte ADR-0070 et le contrat de coordination : P45 possède les
   sémantiques et le certificat local ; P64 possède la recherche et le certificat
   global.
-- P64-V2H03B devient la seule mission `ready` : frontière locale, certificats,
-  fixtures déterministes et caps mesurés, sans branchement public.
-- P64-V2H03C et sa gate Fusion restent bloquées par P64-V2H03B.
+- P64-V2H03B est `implemented-core` et `automated-validated` :
+  frontière locale, certificats, fixtures et caps, sans branchement public.
+- P64-V2H03C devient la seule mission `ready` ; sa gate Fusion éventuelle
+  reste séparée.
 - P44-V et P45 restent bloquées pendant ce chemin correctif.
 
 ## Vue de séquence
@@ -55,7 +56,8 @@ preuves archivées.
 | KO contextuel | P64-V2H01 | Le projet réel étendu dépasse la fixture 0.1.52. |
 | Terminé — gate Fusion | P64-V2H02R | Fusion OK 0.1.54 commit 42e8993 ; pas de validation physique. |
 | Terminé — contrat | P64-V2H03A | ADR-0070, propriété P45/P64 et découpage H03B/H03C acceptés. |
-| Prêt | P64-V2H03B | Frontière locale, certificats, fixtures et tableau de caps ; aucun routage public. |
+| Terminé — automatisé | P64-V2H03B | Frontière locale certifiée, fixtures 1 à 8 et caps mesurés. |
+| Prêt | P64-V2H03C | Sélection globale paresseuse, lanes monotones et certificat global. |
 | KO contextuel | P44-V | À requalifier séparément après arbitrage ; P45 reste bloqué. |
 | Bloqué | P45 à P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
@@ -67,6 +69,7 @@ preuves archivées.
 - P64_MULTI_SOLVER_PORTFOLIO_PROGRAM.md : ordre, contrats et interdits P64.
 - P64_V2H03_INTERNAL_VARIANT_COORDINATION_CONTRACT.md : propriété, identité,
   certificats, budgets, fixtures et découpage des variantes internes.
+- P64_V2H03B_LOCAL_VARIANT_EVIDENCE.md : mesures, caps et fixtures automatisées.
 - STATUS.md : faits réalisés, validations et limites.
 - CAPABILITY_MAP.md : capability et niveau de preuve.
 - ROADMAP.md : trajectoire et verrouillage de version.

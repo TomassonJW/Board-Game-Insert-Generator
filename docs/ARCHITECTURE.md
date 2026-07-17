@@ -360,3 +360,11 @@ projet ou matérialisation automatique.
 
 Contrat d'exécution :
 `docs/P64_V2H03_INTERNAL_VARIANT_COORDINATION_CONTRACT.md`.
+
+## Implémentation de la frontière locale P64-V2H03B
+
+`container_internal_variants.py` est une couche cœur pure après la dérivation
+canonique et avant tout solveur global. Aucun chemin public ne l'importe dans
+H03B. Elle porte snapshots immuables, producteurs, digest, certificat local et
+Pareto. Le producteur canonique reste primaire ; les doublons correctifs
+deviennent des alias de provenance. Le cœur reste sans `adsk`.

@@ -4,82 +4,69 @@ Dernière mise à jour : 2026-07-18
 
 ## Version active
 
-V0.1 reste `mvp-accepted` par P66, `fusion-validated: true` et
-`print-validated: false`. P44 poursuit la fondation UX V0.2, mais P44-V reste en
-KO contextuel. P64-V2H02R est fusion-validated. P64-V2H03A a fermé l'arbitrage
-architectural sans modifier le runtime.
+V0.1 reste `mvp-accepted`, `fusion-validated: true` et
+`print-validated: false`. P64-V2H02R demeure la dernière preuve Fusion.
+P64-V2H03B est implémenté et validé automatiquement sans modifier la sélection
+publique.
 
 ## Dernier état réel
 
-- P44-M009H05 reste `fusion-validated` dans Fusion 0.1.36 ; le package
-  initial P44-M007 0.1.37 est supersédé par ses correctifs.
-- P44-VH02 a corrigé la suppression directe et le nommage incrémental ; ses
-  faits UX restent acceptés contextuellement sans valider le solveur.
-- P64-H01 reste `fusion-validated` par
+- P44-M009H05 reste fusion-validated dans Fusion 0.1.36 ; le package initial
+  P44-M007 0.1.37 est supersédé par ses correctifs.
+- P44-VH02 conserve ses corrections de suppression et de nommage.
+- P64-H01 reste fusion-validated par
   `P64-H01 Fusion OK 0.1.42 - commit 5865645`.
-- P64-V2H02R est `fusion-validated` dans Fusion 0.1.54 par
+- P64-V2H02R reste fusion-validated par
   `P64-V2H02R Fusion OK 0.1.54 - commit 42e8993`.
-- La preuve couvre capacité informative, vérité des statuts, budgets, méthodes,
-  occlusion et orientation de la vue de dessus.
-- Le projet dense de référence reste `no_solution_within_budget` malgré environ
-  693,6 cm³ de marge théorique ; cette marge ne prouve pas une disposition.
-- ADR-0070 et
-  `docs/P64_V2H03_INTERNAL_VARIANT_COORDINATION_CONTRACT.md` fixent la
-  frontière : P45 possède la sémantique et la certification locale ; P64
-  consomme les variantes certifiées et possède la sélection globale.
-- Aucun schéma projet, solveur public, default, jeu, tolérance, valeur physique,
-  scène ou matérialisation automatique n'a changé dans P64-V2H03A.
+- H03B ajoute canonique, relayouts rectangulaires, digests, certificats, Pareto
+  et caps 24/48/96 dans une frontière Python interne.
+- Les sorties de `derive_container_plan`, le schéma, les solveurs et l'UI
+  restent inchangés.
+- Le cas dense reste `no_solution_within_budget` ; le volume positif ne
+  prouve pas une disposition.
 
 ## Prochaine action recommandée
 
-### P64-V2H03B — Frontière locale, certificats et fixtures
+### P64-V2H03C — Sélection globale paresseuse
 
-P64-V2H03B est la seule mission `ready`.
+P64-V2H03C est la seule mission `ready`.
 
 Périmètre :
 
-1. introduire les types immuables de variante, identité et digest ;
-2. extraire la variante `canonical_v1` sans changer ses sorties publiques ;
-3. ajouter le producteur technique `bounded_rectangular_relayout_v1` ;
-4. certifier localement cavités, contenus, jeux, parois, cloisons et fond ;
-5. dédupliquer et construire une petite frontière non dominée ;
-6. figer les fixtures de parité, duplication, rotation, cul-de-sac
-   multi-cavités, réservation localisée et cas dense anonymisé ;
-7. mesurer puis verrouiller les caps Rapide/Normal/Approfondi.
+1. adapter les variantes certifiées aux participants free-3D ;
+2. exécuter d'abord le portefeuille canonique complet inchangé ;
+3. ouvrir le fallback multi-variantes seulement sans candidat canonique ;
+4. développer paresseusement au plus 2/4/6 variantes par participant ;
+5. préserver les lanes Rapide/Normal/Approfondi par préfixes ;
+6. appliquer le certificat global après chaque plan complet ;
+7. exposer budgets, digests, rejets et arrêt dans le diagnostic secondaire ;
+8. activer les fixtures globales 4 à 10 sans changer schéma ou UI.
 
-Interdits du lot : branchement dans la sélection publique, nouveau contrôle
-Fusion, mode P45, changement de résultat utilisateur, schéma projet, valeur
-physique ou scène automatique.
+Interdits : produit cartésien, forme P45, contrôle Fusion, score public, valeur
+physique, scène ou matérialisation automatique.
 
-Validation cible : parité canonique aux frontières publiques, digests
-déterministes, certificats fail-closed, génération bornée, suite complète,
-`compileall`, frontière `adsk` et `git diff --check`.
+Validation : fallback canonique, cul-de-sac multi-cavités, monotonie, arrêt
+borné, annulation/stale, non-régressions denses, suite complète, compileall,
+frontière adsk et diff-check.
 
-Modèle conseillé : `gpt-5.6-sol`, raisonnement `xhigh`. Alternative économique :
-`gpt-5.6-terra`, raisonnement `max`, avec un risque supérieur de reprise sur les
-digests, symétries et invariants de monotonie.
+Modèle conseillé : `gpt-5.6-sol`, raisonnement `max`. Option économique :
+`gpt-5.6-sol`, raisonnement `xhigh`, avec plus de risque sur les états
+paresseux, la monotonie et les certificats globaux.
 
 ## Lots suivants, non ouverts
 
-1. P64-V2H03C : sélection globale paresseuse, lanes préservées, budgets et
-   télémétrie ; bloquée par P64-V2H03B.
-2. P64-V2H03V : gate Fusion préparée seulement après C si le comportement
-   visible change.
-3. P44-V, puis P45/P46 selon leurs contrats et gates.
-4. P64-F01 restant / P64-F02 après P46.
-5. P64-U01 : progression non modale et annulable.
-6. P64-X01 : moteur exact éventuel après benchmark, ADR de dépendance et GO
-   distinct.
+1. P64-V2H03V après C si le résultat visible change.
+2. P44-V, puis P45/P46 selon leurs contrats et gates.
+3. P64-F01 restant / P64-F02 après P46.
+4. P64-U01 : progression non modale et annulable.
+5. P64-X01 : moteur exact éventuel après benchmark, ADR et GO distinct.
 
 ## Séquence verrouillée
 
-Une seule mission est active. P45 ne commence pas dans P64-V2H03B ; ses futurs
-modes et formes restent hors scope. P44-V et P46 restent bloquées. P47-P50
-restent bloquées jusqu'à P46 et P69 jusqu'à P50. P68 peut recueillir des faits
-réels sans recalibrer les defaults.
+Une seule mission est active. P45 et ses formes restent hors scope. P44-V et
+P46 restent bloquées ; P47-P50 restent bloquées jusqu'à P46 et P69 jusqu'à P50.
 
 ## Fin de chaque mission
 
-Mettre à jour le pilotage, relire le diff, exécuter les preuves prévues, committer
-puis intégrer directement dans `main` lorsqu'aucune gate humaine n'est ouverte.
-Une gate Fusion ne devient jamais une validation d'impression.
+Mettre à jour le pilotage, relire le diff, exécuter les preuves, committer puis
+intégrer directement dans main. Une gate Fusion ne vaut jamais impression.

@@ -239,3 +239,12 @@ atteinte reste `no_solution_within_budget`. Les valeurs numériques des caps ne
 seront fixées qu'après les fixtures et mesures de P64-V2H03B.
 
 Contrat : `docs/P64_V2H03_INTERNAL_VARIANT_COORDINATION_CONTRACT.md`.
+
+## État P64-V2H03B
+
+La frontière locale est implémentée, mais aucun solveur public ne la consomme.
+Le portefeuille canonique, greedy, EMS historique et beam reste inchangé.
+
+H03C devra adapter les références aux états free-3D, conserver les lanes avant
+le fallback et appliquer le certificat global. Les caps globaux sont présents
+mais non consommés dans H03B.

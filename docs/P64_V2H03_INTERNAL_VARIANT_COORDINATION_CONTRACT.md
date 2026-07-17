@@ -1,6 +1,7 @@
 # P64-V2H03 — Variantes internes bornées et sélection globale
 
-Statut : contrat d'architecture accepté le 2026-07-18 ; runtime non commencé.
+Statut : contrat accepté le 2026-07-18 ; H03B `implemented-core` et
+`automated-validated` ; sélection globale H03C non commencée.
 
 ADR :
 [ADR-0070](DECISIONS/ADR-0070-internal-container-variant-ownership.md).
@@ -226,8 +227,17 @@ Règles obligatoires :
 - aucun cap numérique n'est promu avant mesure des fixtures P64-V2H03B ;
 - atteindre une limite ne prouve jamais l'impossibilité.
 
-Les budgets H07/V2H02 existants ne sont pas modifiés par P64-V2H03A. Le tableau
-numérique initial sera un livrable de P64-V2H03B, revu avant le branchement C.
+Les budgets H07/V2H02 existants ne sont pas modifiés.
+
+| Profil | Générées | Certifiées | Retenues | Options | États | Essais |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Rapide | 24 | 24 | 4 | 2 | 32 | 128 |
+| Normal | 48 | 48 | 8 | 4 | 384 | 3 072 |
+| Approfondi | 96 | 96 | 12 | 6 | 3 072 | 36 864 |
+
+Les trois premiers caps sont mesurés. Les trois derniers dérivent des budgets
+beam et restent non consommés jusqu'à H03C. Preuve :
+`docs/P64_V2H03B_LOCAL_VARIANT_EVIDENCE.md`.
 
 ## 11. Télémétrie et traçabilité
 
@@ -289,18 +299,16 @@ cavités multiples et au moins deux enveloppes locales certifiées.
 
 ### P64-V2H03B — Frontière locale, certificats et fixtures
 
-- Statut après H03A : `ready`.
-- Livrables : types immuables, digests, producteurs canonique/correctif,
-  certificat local, frontière de Pareto, fixtures 1 à 8 et tableau de caps
-  mesuré.
-- Interdit : branchement dans la sélection publique, UI, schéma projet, formes
-  P45 ou changement de résultat utilisateur.
-- Acceptation : parité canonique bit-à-bit aux frontières publiques, génération
-  déterministe et bornée, fixtures locales vertes, suite complète.
+- Statut : `done-automated`, `implemented-core`.
+- Livrables : types, digests, producteurs, certificat, Pareto, fixtures 1 à 8
+  et caps mesurés.
+- Preuve : `docs/P64_V2H03B_LOCAL_VARIANT_EVIDENCE.md`.
+- Interdit respecté : aucun routage public, UI, schéma, forme P45 ou changement
+  de résultat utilisateur.
 
 ### P64-V2H03C — Sélection globale paresseuse
 
-- Statut : `blocked-by-P64-V2H03B`.
+- Statut : `ready`.
 - Livrables : lanes préservées, expansion variante-placement, budgets
   monotones, télémétrie, certificat global et fixtures 4 à 10.
 - Acceptation : cul-de-sac minimal résolu, non-régressions denses, fallback
