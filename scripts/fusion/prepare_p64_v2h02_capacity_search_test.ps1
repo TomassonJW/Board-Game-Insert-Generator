@@ -22,8 +22,8 @@ if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 if (-not $DryRun) {
     Assert-BgigPaletteProjectRuntime -AddinPath $target
     $manifest = Get-Content -LiteralPath (Join-Path $target "BoardGameInsertGenerator.manifest") -Raw -Encoding UTF8
-    if ($manifest -notmatch '"version"\s*:\s*"0\.1\.53"') {
-        throw "Installed P64-V2H02 package mismatch: expected 0.1.53."
+    if ($manifest -notmatch '"version"\s*:\s*"0\.1\.54"') {
+        throw "Installed P64-V2H02 package mismatch: expected 0.1.54."
     }
 
     $palette = Get-Content -LiteralPath (Join-Path $target "palette.html") -Raw -Encoding UTF8
@@ -33,7 +33,9 @@ if (-not $DryRun) {
         'max_participant_branches',
         'eligible_family_ids',
         'orderedBodies=[...bodyItems]',
-        'cavity.parent_id===body.id'
+        'cavity.parent_id===body.id',
+        'function topViewY(item,box)',
+        'item.z_from_top_mm:topViewY(item,box)'
     )) {
         if (-not $palette.Contains($marker)) {
             throw "Installed P64-V2H02 palette marker missing: $marker"
@@ -84,11 +86,11 @@ if (-not $DryRun) {
 
 Write-Output ""
 Write-Output "P64-V2H02 Fusion actions remaining:"
-Write-Output "1. Reload add-in 0.1.53. Open a simple solvable project and confirm that Capacity shows usable volume, minimum envelopes and theoretical remaining volume."
+Write-Output "1. Reload add-in 0.1.54. Open a simple solvable project and confirm that Capacity shows usable volume, minimum envelopes and theoretical remaining volume."
 Write-Output "2. Return to the preserved dense project. Recalculate with Free 3D + Deep. A non-certified result must say unresolved within budget, not impossible, and must still show the theoretical capacity bound."
 Write-Output "3. Compare Quick, Normal and Deep diagnostics: max placement orders must be 1, 2 and 4; beam widths must be 8, 24 and 64. Identical final outcomes are allowed."
 Write-Output "4. Compare Auto intelligent and Free 3D. Their strategy chains must differ in the diagnostic even when the same best result or status is returned."
-Write-Output "5. Inspect Top view: upper bodies must mask cavities below them. The side cut remains unchanged."
+Write-Output "5. Inspect Top view: upper bodies must mask cavities below them and Y must be mirrored around the X axis, like a view from above. The side cut remains unchanged."
 Write-Output "6. Confirm that no Fusion body changes before Materialize in Fusion. This gate validates no physical value and no print."
-Write-Output "7. Reply: P64-V2H02 Fusion OK 0.1.53 - commit $commit, or contextual KO with method, effort, capacity and diagnostic."
+Write-Output "7. Reply: P64-V2H02R Fusion OK 0.1.54 - commit $commit, or contextual KO with method, effort, capacity and diagnostic."
 Write-Output "Prepared P64-V2H02 Fusion test: $(-not $DryRun)"

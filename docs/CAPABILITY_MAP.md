@@ -1285,7 +1285,7 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - État : P64-H03R/H04/H05/H06/H07 intégrés (baseline dirigée, résultats honnêtes,
   contrat commun, greedy et beam 3D, portefeuille Auto interne). P64-H08 est
   intégrée dans 0.1.51 ; P64-V2 est un KO contextuel et P64-V2H01 0.1.52 est
-  contextual-KO et supersédée par P64-V2H02 0.1.53.
+  contextual-KO et supersédée par P64-V2H02R 0.1.54.
 - Validation : dernière preuve inchangée P64-H01 0.1.42 ; P64-H02/H03 non
   fusion-validées ; `print-validated: false`.
 
@@ -1327,16 +1327,16 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
   et les fonds/cavités restent contrôlés par le validateur commun.
 - C-USABILITY : automated-validated seulement. Les méthodes donnent des
   résultats effectivement différents sur la fixture, mais l'observation Fusion
-  0.1.52 est désormais supersédée par la gate 0.1.53.
+  0.1.52 est désormais supersédée par la gate corrective 0.1.54.
 - Harmonisation : alignement de faces amélioré seulement ; P64-F02 reste prévu.
 - Preuve : tests automatisés et reproduction locale ; fusion-validated: false,
   print-validated: false.
 
-## Mise à jour P64-V2H02 — 2026-07-17
+## Mise à jour P64-V2H02R — 2026-07-17
 
 - C-SOLVEUR-DENSE : enveloppes multi-cavités bornées, placement beam traversant
   plusieurs EMS, points extrêmes aux frontières des réservations et validation
-  de coupe localisée sont implémentés dans 0.1.53.
+  de coupe localisée sont implémentés dans 0.1.53 et conservés dans 0.1.54.
 - C-SOLVEUR-PORTFOLIO : Rapide, Normal et Approfondi explorent respectivement
   1, 2 et 4 priorités beam ; les méthodes restent distinctes même si leur meilleur
   résultat visible converge.
@@ -1344,9 +1344,9 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
   marge positive est explicitement une borne nécessaire, pas un certificat de
   placement. Les épuisements heuristiques restent `no_solution_within_budget`.
 - C-FUSION-UI : capacité théorique visible sur succès/échec et vue de dessus
-  correctement occultée ; package 0.1.53 automated-validated, gate P64-V2H02.
+  correctement occultée ; P64-V2H02 0.1.53 est observée OK sauf le repère Y. Le package 0.1.54 retourne Y autour de l'axe X dans la seule vue de dessus ; gate P64-V2H02R.
 - Limite : le projet de référence à 11 conteneurs et 34 contenus reste non
   certifié malgré environ 693,6 cm³ de marge théorique. Les variantes internes
   globales relèvent de P64-V2H03 à coordonner avec P45.
 - Validation : `fusion-validated: false`, `print-validated: false`. P44-V et P45
-  restent bloqués jusqu'à la gate P64-V2H02 puis l'arbitrage explicite de la suite.
+  restent bloqués jusqu'à la gate P64-V2H02R puis l'arbitrage explicite de la suite.

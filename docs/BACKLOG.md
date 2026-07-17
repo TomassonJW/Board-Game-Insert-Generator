@@ -2433,21 +2433,21 @@ P44-M007 est ready-for-explicit-go.
 - Gate historique supersédée : aucune preuve OK 0.1.52 ne doit être émise.
 - Limite : amélioration d'alignement, pas harmonisation modulaire P64-F02.
 
-### P64-V2H02 — Capacité et vérité de recherche dense
+### P64-V2H02R — Capacité, vérité et repère de vue de dessus
 
-- Statut : implemented, automated-validated dans 0.1.53 ; ready-for-human-fusion-check.
+- Statut : P64-V2H02 0.1.53 observée OK sauf le repère Y de la vue de dessus ; P64-V2H02R implemented, automated-validated dans 0.1.54 ; ready-for-human-fusion-check.
 - Contrat : `docs/P64_V2H02_CAPACITY_AND_SEARCH_TRUTH_CONTRACT.md`.
 - Livrable : enveloppes multi-cavités bornées, beam traversant plusieurs EMS,
   réservations localisées, budgets 1/2/4, capacité théorique sur chaque résultat
-  et occlusion correcte de la vue de dessus.
+  occlusion correcte de la vue de dessus et repère Y retourné autour de l'axe X.
 - Préparation : `scripts/fusion/prepare_p64_v2h02_capacity_search_test.ps1`.
-- Gate : `P64-V2H02 Fusion OK 0.1.53 - commit <sha>` ou KO contextuel documenté.
+- Gate : `P64-V2H02R Fusion OK 0.1.54 - commit <sha>` ou KO contextuel documenté.
 - Limite : une marge positive ne prouve pas le placement ; le cas dense reste
   honnêtement `no_solution_within_budget`.
 
 ### P64-V2H03 — Variantes internes bornées et sélection globale
 
-- Statut : proposed-after-P64-V2H02-gate ; ne pas implémenter sans arbitrage.
+- Statut : proposed-after-P64-V2H02R-gate ; ne pas implémenter sans arbitrage.
 - Objectif : produire plusieurs enveloppes certifiables par conteneur
   multi-cavités et sélectionner leur combinaison avec le placement global.
 - Dépendance structurante : coordonner la propriété des variantes avec P45 et

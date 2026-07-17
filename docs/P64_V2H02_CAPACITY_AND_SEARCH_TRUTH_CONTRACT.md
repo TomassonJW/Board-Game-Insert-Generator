@@ -1,7 +1,7 @@
 # P64-V2H02 — Capacité théorique et vérité de recherche dense
 
-Statut : implemented, automated-validated dans le package 0.1.53 ; validation
-Fusion requise. Ce lot remplace la gate P64-V2H01 0.1.52 après le nouveau KO
+Statut : P64-V2H02 0.1.53 est observée OK sauf le sens Y de la vue de dessus ; P64-V2H02R 0.1.54 est automated-validated pour ce correctif visuel borné et requiert sa confirmation Fusion.
+Ce lot remplace la gate P64-V2H01 0.1.52 après le nouveau KO
 contextuel sur le projet dense réel.
 
 ## Problème confirmé
@@ -40,7 +40,7 @@ Le lot doit :
 4. rendre les budgets Rapide, Normal et Approfondi réellement distincts ;
 5. publier une capacité volumique théorique signée, sur succès comme sur échec ;
 6. réserver `proven_impossible` aux contradictions formelles ;
-7. corriger l'occlusion de la vue de dessus.
+7. corriger l'occlusion de la vue de dessus et son repère écran : X reste inchangé, Y est retourné autour de l'axe X pour représenter une observation depuis le dessus.
 
 Le lot ne change ni schéma projet, ni valeurs physiques, ni tolérances, ni
 solveur exact, ni scène Fusion. Matérialiser reste explicite.
@@ -126,7 +126,7 @@ découvrent le même meilleur candidat, leur résultat visible peut légitimemen
 
 Les corps sont peints du bas vers le haut et les cavités sont composées avec leur
 corps parent. Un corps supérieur masque ainsi les cavités inférieures au lieu de
-les laisser visibles à travers ses parois. La coupe latérale ne change pas.
+les laisser visibles à travers ses parois. Dans la vue de dessus, la coordonnée Y métier est retournée autour de l'axe X du SVG ; X ne change pas et la coupe latérale ne change pas.
 
 ## Critères d'acceptation
 
@@ -154,7 +154,7 @@ Préparation : `scripts/fusion/prepare_p64_v2h02_capacity_search_test.ps1`.
 
 Retour attendu :
 
-`P64-V2H02 Fusion OK 0.1.53 - commit <sha>`
+`P64-V2H02R Fusion OK 0.1.54 - commit <sha>`
 
 Un retour positif valide uniquement l'affichage, les budgets observables, la vue
 et la vérité du résultat logiciel. Il ne prouve pas que le projet dense possède

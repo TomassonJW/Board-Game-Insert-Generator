@@ -26,9 +26,9 @@ preuves archivées.
 - P64-V2H01 0.1.52 a séparé faisabilité minimale et fermeture continue, mais le
   nouveau cas réel à 11 conteneurs et 34 contenus produit encore un KO contextuel ;
   aucune preuve Fusion OK 0.1.52 ne doit être émise.
-- P64-V2H02 0.1.53 corrige les enveloppes multi-cavités, la recherche beam, les
-  réservations localisées, les budgets d'effort, la capacité théorique et la vue
-  de dessus. La seule prochaine action est sa gate préparée par
+- P64-V2H02 0.1.53 est observée OK sauf le miroir de la vue de dessus autour de l'axe X.
+  P64-V2H02R 0.1.54 corrige ce seul repère écran, sans changer les calculs ni la coupe X/Z.
+  La seule prochaine action est sa gate préparée par
   scripts/fusion/prepare_p64_v2h02_capacity_search_test.ps1.
 - P44-V et P45 restent bloqués.
 
@@ -48,7 +48,7 @@ preuves archivées.
 | Terminé | P64-H08 | Réglages Fusion et diagnostic secondaire 0.1.51. |
 | KO contextuel | P64-V2 | Contrôles visibles, mais cas dense réel sans solution. |
 | KO contextuel | P64-V2H01 | Le projet réel étendu dépasse la fixture 0.1.52. |
-| Prêt — gate humaine | P64-V2H02 | Vérifier 0.1.53, capacité, vérité, budgets et vue de dessus. |
+| Prêt — gate humaine | P64-V2H02R | Vérifier 0.1.54 : orientation de la vue de dessus ; les autres faits sont observés OK. |
 | KO contextuel | P44-V | Reprendre seulement après P64-V2H02 ; P45 reste bloqué. |
 | Bloqué | P45 à P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |

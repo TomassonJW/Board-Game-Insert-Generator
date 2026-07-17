@@ -684,9 +684,9 @@ Les comportements acquis sont conservés dans 0.1.53 par la variante EMS
 historique. Aucune validation physique ou d'impression n'est revendiquée.
 `print-validated: false`.
 
-## P64-V2H02 — Gate capacité et vérité de recherche 0.1.53
+## P64-V2H02R — Correctif de repère de la vue de dessus 0.1.54
 
-Statut : ready-for-human-fusion-check. Préparation automatisée :
+Statut : les faits capacité, vérité, budget, méthode et occlusion sont observés OK dans 0.1.53 ; seule l'orientation écran de la vue de dessus reste à confirmer dans 0.1.54. Préparation automatisée :
 `scripts/fusion/prepare_p64_v2h02_capacity_search_test.ps1`.
 
 Vérifier dans Fusion sur un projet simple résolu, puis sur le projet dense laissé
@@ -703,10 +703,10 @@ dans son état reproductible :
 5. Auto intelligent et Placement 3D libre affichent leur chaîne distincte, même
    lorsqu'ils aboutissent au même statut ou au même meilleur candidat ;
 6. la vue de dessus peint les corps supérieurs au-dessus des cavités inférieures
-   et ne donne plus l'impression de regarder à travers les parois ;
+   et représente Y comme observée depuis le dessus (miroir autour de l'axe X), sans modifier la coupe X/Z ;
 7. aucune scène ne change avant `Matérialiser dans Fusion`.
 
-Retour attendu : `P64-V2H02 Fusion OK 0.1.53 - commit <sha>`, ou KO contextuel
+Retour attendu : `P64-V2H02R Fusion OK 0.1.54 - commit <sha>`, ou KO contextuel
 avec méthode, effort, capacité et diagnostic visibles.
 
 Cette gate ne demande pas de confirmer que le cas dense est soluble. Elle valide

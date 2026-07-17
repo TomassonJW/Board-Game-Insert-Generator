@@ -550,7 +550,9 @@ class FusionPaletteDomTests(unittest.TestCase):
             "Compléments explicites inclus dans le minimum",
             "orderedBodies", "cavity.parent_id===body.id",
             ".top-layer .plan-body{opacity:1}", '<g class="top-layer">',
-            "layeredTop", "Deux efforts peuvent produire le même résultat",
+            "layeredTop", "function topViewY(item,box)",
+            "Number(box.height||0)-Number(item.y_mm||0)-Number(item.height_mm||0)",
+            "item.z_from_top_mm:topViewY(item,box)", "Deux efforts peuvent produire le même résultat",
             "EMS historique + ponts multi-EMS",
         ):
             self.assertIn(marker, self.markup)
@@ -571,7 +573,7 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertNotIn('<option value="print_simple">', self.markup)
         self.assertNotIn('<option value="material_reduced">', self.markup)
         script = (ROOT / "scripts" / "fusion" / "prepare_p64_v2h02_capacity_search_test.ps1").read_text(encoding="utf-8")
-        for marker in ("0.1.53", "function capacityCard", "PARTITION_CAPACITY_SCHEMA_V1", "P64-V2H02 Fusion OK"):
+        for marker in ("0.1.54", "function capacityCard", "PARTITION_CAPACITY_SCHEMA_V1", "function topViewY(item,box)", "P64-V2H02R Fusion OK"):
             self.assertIn(marker, script)
 
 if __name__ == "__main__":
