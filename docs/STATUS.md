@@ -1,6 +1,6 @@
 # Status
 
-Derniere mise a jour : 2026-07-14
+Derniere mise a jour : 2026-07-17
 
 ## Etat global
 
@@ -8,7 +8,7 @@ Statut produit : **MVP V0.1 Fusion-only accepte ; validation d impression non ac
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P44-M003 est implementee et automatisee sur le package 0.1.24 ; P44-M003V est la seule gate humaine ouverte.
+Phase active : P64-A01 est documentée et acceptée ; P64-H04 est la seule mission `ready`. P44-V reste en KO contextuel et P45 reste bloqué.
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -2307,8 +2307,27 @@ construit 8 conteneurs sur 2 niveaux après 3 portefeuilles au total. Les compte
 agrégés restent exposés. La croix de suppression et le menu `...` partagent aussi
 désormais la même cellule de la ligne principale.
 
-Package : 0.1.44. Statut : implemented, automated-validated,
-human-fusion-check-required par P64-H02V ; `fusion-validated: false`,
-`print-validated: false`. Aucun schéma, default, dimension physique, tolérance,
-cavité, réservation, géométrie, CAD IR ou comportement de scène ne change.
+Package : 0.1.44. Statut : implemented, automated-validated, contextual-KO par
+P64-H02V ; `fusion-validated: false`, `print-validated: false`. Aucun schéma,
+default, dimension physique, tolérance, cavité, réservation, géométrie, CAD IR
+ou comportement de scène ne change. P64-A01/H04 supersèdent la trajectoire ;
 P44-V reste ouverte et P45 reste bloqué.
+
+## P64-A01 — Architecture portefeuille multi-solveurs (2026-07-17)
+
+Statut : `done`, `documentation-validated`, sans modification runtime.
+
+Le retour P64-H02V confirme les corrections UX mais révèle un nouveau faux
+impossible. Un essai local P64-H03 non commité explore davantage d'ordres et de
+structures ; un cas réel supplémentaire l'épuise également. L'essai reste
+préservé hors `main`, sans preuve `fusion-validated`.
+
+ADR-0068 conserve le solveur par étages comme baseline rapide et planifie un
+greedy 3D EP/EMS, un beam robuste, un portefeuille Auto et un mode exact futur.
+ADR-0069 sépare faisabilité et finition : fermeture continue puis harmonisation
+modulaire, avec fallback obligatoire vers la solution certifiée.
+
+Le programme P64-H04 à H08 devient le chemin critique avant P64-V2 et reprise de
+P44-V. P64-H04 est la seule mission `ready`. P45/P46 et les lots ultérieurs ne
+sont pas ouverts. Aucun schéma, default, dimension physique, tolérance, cavité,
+géométrie, CAD IR ou scène ne change ; `print-validated: false`.

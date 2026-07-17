@@ -4,86 +4,72 @@ Dernière mise à jour : 2026-07-17
 
 ## Version active
 
-V0.1 reste mvp-accepted par P66 (package 0.1.20), fusion-validated: true et
-print-validated: false. La fondation UX V0.2 continue dans P44 sans promouvoir
-de capacité géométrique ou physique.
+V0.1 reste `mvp-accepted` par P66, `fusion-validated: true` et
+`print-validated: false`. P44 poursuit la fondation UX V0.2, mais P44-V reste en
+KO contextuel tant que le solveur n'a pas passé P64-V2.
 
 ## Dernier état réel
 
-P44-M007 est implemented et automated-validated dans le package Fusion 0.1.40
-avec le correctif P44-M007H03 :
-
-- validation dérivée après 350 ms et proposition complète après 1 500 ms de stabilité ;
-- réponses obsolètes ignorées, DOM éditable non remplacé en arrière-plan et focus/sélection préservés ;
-- tout fait carte invalidé affiche immédiatement `À recalculer` jusqu’à la réponse courante ;
-- Aperçu priorisé, fallback manuel et matérialisation toujours explicite ;
-- preset `Cartes` non sleevé par défaut ;
-- `Méthode de mesure` reste à droite, immédiatement avant le menu `...` ;
-- `Épaisseur paquet` affiche Z ; `Épaisseur carte × nb` affiche Qté et Épaisseur carte ;
-- activer les sleeves propose 3 mm sur X/Y et 0,19 mm par carte sur Z ;
-- `Nb cartes`, grisé, utilise le Z déclaré divisé par 0,31 et arrondi à l’entier le plus proche ;
-- les X/Y et Z manuels déclarés restent séparés des dimensions résolues, sans cumul au roundtrip ;
-- le cas X = 66, Y = 88, Z = 27, sleeves 3/0,19 donne 87 cartes et 69 × 91 × 43,53 mm ;
-- les contrôles cartes sont compactés afin de conserver `Résolu` sur la même ligne large ;
-- les modes `Compact` et `Détaillé` et leur persistance ont été supprimés ;
-- chaque conteneur reste repliable et un bouton global replie/déplie tous les conteneurs ;
-- les épaisseurs de paroi/fond héritées affichent `Défaut` ;
-- `Hauteur de conception` reste dérivée, grisée et non éditable ;
-- solveur de placement, budgets, tolérances, géométrie, CAD IR et scène inchangés.
-
-Le package 0.1.37 a échoué la saisie rapide. Le package 0.1.38 a été supersédé
-avant observation. Le retour Fusion sur 0.1.39 est un KO contextuel : delta X/Y
-manuel absent de `Résolu` et faits dérivés parfois anciens. P44-M009H05 reste
-fusion-validated dans Fusion 360 (package 0.1.36, preuve
-`P44-M009H05 Fusion OK 0.1.36 - commit 7c76ba0`). P44-M007H03 est désormais
-fusion-validated dans Fusion 360 (package 0.1.40, preuve
-`P44-M007H03 Fusion OK 0.1.40 - commit 92f07c8`). Aucune valeur physique ni
-impression réelle n’est validée ; `print-validated: false` reste obligatoire.
-
-Le retour contextuel suivant confirme que P44-VH01 laisse désormais passer le
-cas de hauteur initial, mais révèle deux limites du solveur : faux impossible
-sur environ 30 conteneurs et 77 éléments malgré environ 40 % de volume minimal,
-et attente de la saturation XY avant d'utiliser Z. P64-H01 corrige ces limites
-dans le package 0.1.42 par partitions adaptatives bornées, arrangements XY
-conscients de leur hauteur et score d'équilibre X/Y/Z avec charge des étages.
-P64-H01 reste fusion-validated par la preuve `P64-H01 Fusion OK 0.1.42 - commit 5865645`.
+- P44-M007H03 est `fusion-validated` dans Fusion 0.1.40 par la preuve
+  `P44-M007H03 Fusion OK 0.1.40 - commit 92f07c8`.
+- P44-M009H05 reste `fusion-validated` dans Fusion 0.1.36 par la preuve
+  `P44-M009H05 Fusion OK 0.1.36 - commit 7c76ba0`.
+- Le package initial P44-M007 0.1.37 a été supersédé ; P44-M007H03 0.1.40
+  reste la référence validée pour focus, sleeves et Aperçu.
+- P44-VH02 a corrigé suppression et nommage ; ses faits UX sont acceptés
+  contextuellement, sans valider le solveur ni le package 0.1.43.
+- P64-H01 est `fusion-validated` dans Fusion 0.1.42 par la preuve
+  `P64-H01 Fusion OK 0.1.42 - commit 5865645`.
+- P64-H02 est implémenté et automatisé dans 0.1.44, mais P64-H02V est un KO
+  contextuel : un nouveau petit ajout peut encore épuiser la recherche alors
+  que du volume reste disponible.
+- Un essai local P64-H03 non commité a exploré d'autres ordres/structures. Un
+  nouveau cas réel l'a également mis en échec ; il reste préservé hors `main`.
+- P64-A01 documente la rupture : le solveur actuel devient baseline rapide ;
+  placement 3D libre, beam et portefeuille Auto sont introduits derrière un
+  contrat et un validateur communs.
 
 ## Prochaine action recommandée
 
-### P64-H02V — Reprise diversifiée et actions d’élément alignées
+### P64-H04 — Résultats honnêtes, observabilité et corpus de régression
 
-Statut : P64-H02 et la correction P44-VH02H01 sont implemented et
-automated-validated dans le package 0.1.44 ; une vérification Fusion ciblée reste
-requise. Le projet exact laissé ouvert construit désormais 8 conteneurs sur
-2 niveaux après 3 portefeuilles au total. La croix partage la ligne du menu `...`,
-immédiatement à sa droite.
+Statut : `ready`. Contrat :
+`docs/P64_H04_OBSERVABILITY_AND_RESULT_TRUTH_CONTRACT.md`.
 
-Préparation : `scripts/fusion/prepare_p64_h02_diversified_portfolio_test.ps1`.
-Retour attendu : `P64-H02 Fusion OK 0.1.44 - commit <sha>`.
+Résultat attendu :
 
-Cette gate ne change ni schéma, ni dimensions, ni defaults, ni tolérances, ni
-cavités, ni géométrie, ni scène automatique. P44-V reste ouverte jusqu’à ce
-retour ; P45 ne commence pas. `print-validated: false`.
+- distinguer `Solution trouvée`, `Aucune solution trouvée dans le budget`,
+  `Impossible prouvé`, `Projet à corriger` et réponse obsolète/annulée ;
+- exposer famille, budget, temps, candidats, états, motifs de coupe et motif
+  d'arrêt sans voler le focus ;
+- anonymiser et geler les cas réels P64-H01/H02/H03 dans la suite ;
+- conserver exactement les placements actuels : aucun nouvel algorithme, seed,
+  budget, score, schéma, default, tolérance, cavité ou comportement de scène.
 
-## Lots découverts, non ouverts
+Agent conseillé : Terra avec revue senior du contrat de résultat. Aucune gate
+Fusion autonome n'est ouverte par défaut ; les libellés seront observés dans
+P64-V2.
 
-- `P45-M001` cadrera les dispositions des assets non-cartes (standard/auto,
-  rangée et colonne verticale) avec effet réel sur les cavités et le solveur ;
-  aucun contrôle décoratif n’est ajouté dans P44.
+## Lots suivants, non ouverts
+
+1. P64-H05 : contrat commun et baseline `Étages et piles`.
+2. P64-H06 : placement 3D libre greedy EP/EMS.
+3. P64-H07 : beam robuste, efforts et portefeuille `Auto intelligent`.
+4. P64-H08 : réglages Fusion et diagnostic secondaire.
+5. P64-V2 : gate humaine, puis reprise de P44-V.
+6. P45/P46 selon leurs contrats actuels.
+7. P64-F01/F02 après P46 : fermeture continue puis harmonisation modulaire.
+8. P64-F03 après retours physiques ; P64-X01 exact seulement sous nouvelle gate.
 
 ## Séquence verrouillée
 
-P44-M005, P44-M006 et P44-M009H05 sont fusion-validated pour leurs parcours UX.
-P44-M007H03 est désormais fusion-validated dans Fusion 360 ; P0-M010 et P44-VP
-sont terminées. P44-VH01V est supersédée sans revendication fusion-validated par
-P64-H01, fusion-validated dans Fusion 0.1.42. P44-VH02V a reçu un KO contextuel sur son alignement ; P64-H02V est la seule
-action suivante. P44-V reste en KO contextuel et P45/P46
-ne commencent pas avant sa reprise positive après P64-H02V. P47-P50 restent
-bloqués jusqu’à P46 et P69 jusqu’à P50.
-P68 peut recueillir des faits réels sans modifier les valeurs par défaut.
+P64-H04 est la seule mission `ready`. P64-H05 à H08 s'ouvrent une par une. Aucune
+preuve P64-H02/H03 ne doit être revendiquée. P44-V, P45 et P46 attendent P64-V2
+puis la reprise positive de P44-V. P47-P50 restent bloqués jusqu'à P46 et P69
+jusqu'à P50. P68 peut recueillir des faits réels sans recalibrer les defaults.
 
 ## Fin de chaque mission
 
 Mettre à jour le pilotage, relire le diff, exécuter les preuves prévues, committer
-puis intégrer directement dans main lorsqu’aucune gate humaine n’est ouverte.
-Une gate Fusion ne devient jamais une validation d’impression.
+puis intégrer directement dans `main` lorsqu'aucune gate humaine n'est ouverte.
+Une gate Fusion ne devient jamais une validation d'impression.

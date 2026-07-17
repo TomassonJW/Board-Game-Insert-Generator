@@ -221,3 +221,25 @@ Les validations P64 doivent couvrir au minimum :
   nouveau toast annule le minuteur précédent. Confirmation : 3 secondes ;
   avertissement ou erreur : 6 secondes. Les tests DOM verrouillent offset,
   temporisation et position haute.
+
+## Règles P64 multi-solveurs
+
+- `Calcul impossible` ne représente jamais un simple épuisement heuristique.
+- `proven_impossible` exige une preuve et un domaine explicitement couverts.
+- Aucun seuil de quantité de conteneurs ne force un étage ; les scénarios 2/8/32
+  sont des régressions, jamais des règles produit.
+- Les profils d'effort sont bornés et monotones : un profil plus profond ne
+  retire aucune famille ou option autorisée au profil précédent.
+- Toute stratégie passe par le même validateur final.
+- Les métriques distinguent non applicable, zéro réel et donnée non collectée.
+- Le temps réel ne participe pas aux digests déterministes.
+- Une réponse obsolète ne peint ni résultat, ni diagnostic, ni métrique.
+- Une vue développeur ne vole pas focus/sélection et ne reconstruit pas le DOM.
+- Une finition échouée conserve la solution certifiée et ne devient pas un échec
+  de faisabilité.
+- Aucune grille, cale, corps ou relaxation implicite ne peut être ajoutée par un
+  profil d'effort.
+
+Les régressions P64-H04+ couvrent corpus simple/dense, déterminisme, budgets,
+annulation, validation commune, non-collision, appui, retrait, réservations,
+zéro corps automatique et parité du baseline.

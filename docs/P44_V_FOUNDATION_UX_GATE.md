@@ -43,3 +43,10 @@ Pour un KO : scénario, largeur ou nombre de conteneurs, action, attendu et obse
 ## Non-revendications
 
 Aucune forme P45, valeur physique, géométrie imprimée ou impression : `print-validated: false`.
+
+## Actualisation solveur du 2026-07-17
+
+P64-H01 est validé, mais P64-H02 puis un essai local P64-H03 ont encore produit
+des faux impossibles. P44-V reste donc `contextual-KO` et ne doit pas être
+relancée sur les packages 0.1.40 à 0.1.45. La prochaine reprise globale de P44-V
+aura lieu seulement après une gate P64-V2 positive. P45 reste bloqué.

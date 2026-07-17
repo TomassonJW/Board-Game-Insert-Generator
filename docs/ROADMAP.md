@@ -752,5 +752,24 @@ contrats d’enveloppe, cavité, support et réservation. Le cas exact de 8 cont
 et deux réservations supérieures construit désormais deux niveaux. La correction
 P44-VH02H01 réunit également `...` et la croix dans la même cellule d’action.
 
-P64-H02V devient la seule action suivante. P44-V reste ouverte jusqu’à sa preuve ;
-P45 demeure bloqué. `fusion-validated: false`, `print-validated: false`.
+P64-H02V reçoit ensuite un KO contextuel sur un nouveau faux impossible. Aucune
+preuve Fusion OK n'est revendiquée ; P64-A01 puis P64-H04 remplacent cette
+trajectoire. P44-V et P45 restent bloqués. `fusion-validated: false`,
+`print-validated: false`.
+
+## P64-A01 — Portefeuille multi-solveurs et finitions (2026-07-17)
+
+Le solveur par étages reste le chemin rapide, mais les KO contextuels P64-H02 et
+P64-H03 interdisent de continuer par simple ajout de seeds. ADR-0068 introduit
+un contrat commun, un greedy 3D EP/EMS, un beam robuste et un portefeuille Auto.
+ADR-0069 reporte la finition continue et modulaire après la faisabilité.
+
+Chemin critique avant reprise de P44-V : P64-H04 vérité/observabilité, P64-H05
+contrat/baseline, P64-H06 greedy 3D, P64-H07 beam/portfolio, P64-H08 UI, puis
+P64-V2. P45/P46 reprennent seulement après P64-V2 et une P44-V positive.
+
+P64-F01/F02 sont planifiées après P46 afin de ne pas gonfler le chemin critique
+V0.2 ; elles précèdent les finitions plus physiques. P64-F03 attend des retours
+d'impression pertinents. P64-X01 exact reste après benchmark, ADR de dépendance
+et GO distinct. Le contrat exécutable est
+`docs/P64_MULTI_SOLVER_PORTFOLIO_PROGRAM.md`.

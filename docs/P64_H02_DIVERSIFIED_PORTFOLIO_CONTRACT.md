@@ -3,7 +3,9 @@
 ## Statut
 
 Implémenté et automated-validated dans le package 0.1.44.
-`fusion-validated: false`, `print-validated: false`. Gate suivante : P64-H02V.
+P64-H02V a reçu un KO contextuel sur un nouveau faux impossible ; aucune preuve
+Fusion OK n'est revendiquée. `fusion-validated: false`,
+`print-validated: false`. La trajectoire est supersédée par P64-A01 puis H04-H08.
 
 ## Déclencheur
 
@@ -55,15 +57,24 @@ portefeuilles réellement évalués sont exposés dans `solver.search`.
 - un seed diversifié produit un seul ordre, stable entre deux exécutions ;
 - les régressions P64-H01, support, conservation, déterminisme et UI restent vertes.
 
-## Gate P64-H02V
+## Gate P64-H02V — historique
 
-Préparation : `scripts/fusion/prepare_p64_h02_diversified_portfolio_test.ps1`.
+Préparation historique — ne pas relancer : `scripts/fusion/prepare_p64_h02_diversified_portfolio_test.ps1`.
 
 Vérifier le projet laissé ouvert, le retour à une proposition complète en deux
 niveaux, l’absence de faux diagnostic de plateau, la fraîcheur après une petite
 édition, la croix sur la même ligne que `...` et la scène inchangée avant
 `Matérialiser dans Fusion`.
 
-Retour attendu : `P64-H02 Fusion OK 0.1.44 - commit <sha>`.
+Retour historique non reçu — ne pas envoyer : `P64-H02 Fusion OK 0.1.44 - commit <sha>`.
 
 Cette preuve ne calibre aucune valeur physique et ne vaut pas impression réelle.
+
+## Retour P64-H02V
+
+Le placement problématique initial et l'alignement de la croix sont observés
+comme corrigés. Un ajout ultérieur d'asset dans un projet disposant encore de
+volume reproduit toutefois `Calcul impossible`. Le package 0.1.44 ne reçoit donc
+pas de preuve Fusion OK. P64-H02 reste une amélioration automatisée utile, mais
+pas une solution générale. Ne pas prolonger ce contrat par de nouveaux seeds :
+suivre `P64_MULTI_SOLVER_PORTFOLIO_PROGRAM.md` à partir de P64-H04.

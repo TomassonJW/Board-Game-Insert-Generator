@@ -325,3 +325,20 @@ atomiquement puis appelle l adaptateur adsk en `compact_only`. La regeneration
 supprime la scene BGIG possedee avant remplacement ; les objets non-BGIG restent
 hors scope. Les routes P41/P42 de remplissage automatique restent testees mais
 `superseded-for-product`.
+
+## Portefeuille de stratégies P64
+
+ADR-0068 remplace le solveur monolithique comme trajectoire par quatre composants
+internes purs : `SolverStrategy`, `SolverCandidate`, `ValidationCertificate` et
+`SolverRunTelemetry`. `stage_stack` encapsule le comportement actuel ; les
+familles 3D libres utilisent le même contrat.
+
+Les stratégies proposent, le validateur commun certifie. Une stratégie ne peut
+ni recalculer les cavités, ni assouplir support/réservation, ni produire de CAD.
+L'orchestrateur compare seulement des candidats certifiés et la palette projette
+le résultat sans déplacer la logique dans JavaScript ou `adsk`.
+
+La finition ADR-0069 est une couche postérieure au certificat de faisabilité.
+Elle transforme les seules enveloppes extensibles, puis demande un nouveau
+certificat. Son échec restitue le candidat de base. Les assets, cavités, minima,
+jeux, tolérances et réservations demeurent immuables.

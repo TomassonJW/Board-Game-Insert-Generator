@@ -206,3 +206,20 @@ Ce qui reste interdit : solveur global, backtracking, permutation optimale de mo
 L'heuristique `flat_tray_2d_v0` est locale au sizing d'un asset ou groupe d'assets. Elle choisit une grille de piles deterministe en enumerant les colonnes possibles, en minimisant d'abord les cases vides puis l'ecart au `target_aspect_ratio`.
 
 Cette implementation ne change pas le placement global des modules dans la grille volumetrique : le `executable_asset_plan` continue d'utiliser le placement greedy borne existant. Il n'y a toujours pas de backtracking ni d'optimisation globale.
+
+## Stratégie acceptée après P64-A01
+
+Le solveur cible est un portefeuille, pas un algorithme universel. Le baseline
+`stage_stack` sert les projets simples et réguliers. `free_3d_greedy` exploite
+points extrêmes et espaces maximaux vides. `free_3d_beam` conserve plusieurs
+états pour les projets denses. `portfolio_auto` distribue un budget et retient
+le meilleur candidat certifié. `exact_proof` reste futur et sous gate.
+
+La génération de variantes internes par conteneur sera une frontière de Pareto
+bornée, jamais le produit cartésien global. P45 en définit la sémantique. Les
+grilles uniformes restent des seeds/labs ; les plans de coupe adaptatifs et
+espaces résiduels sont l'état principal du moteur 3D.
+
+La faisabilité précède toujours la finition. Fermeture continue et harmonisation
+modulaire ne peuvent modifier les contraintes physiques ni invalider la solution
+de base. Voir `P64_MULTI_SOLVER_PORTFOLIO_PROGRAM.md`.

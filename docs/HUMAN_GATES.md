@@ -633,10 +633,11 @@ P64-H02V. Le même retour révèle aussi un nouveau faux impossible du solveur.
 
 ## P64-H02V — Reprise diversifiée et actions alignées 0.1.44
 
-Statut : human-fusion-check-required. P64-H02 et P44-VH02H01 sont implemented et
-automated-validated dans le package 0.1.44.
+Statut : contextual-KO. P64-H02 et P44-VH02H01 sont implemented et
+automated-validated dans le package 0.1.44, mais aucun retour Fusion OK ne doit
+être envoyé pour ce package.
 
-Préparation : `scripts/fusion/prepare_p64_h02_diversified_portfolio_test.ps1`.
+Préparation historique — ne pas relancer : `scripts/fusion/prepare_p64_h02_diversified_portfolio_test.ps1`.
 
 Vérifier dans Fusion :
 
@@ -650,9 +651,31 @@ Vérifier dans Fusion :
    et constructible ;
 5. confirmer qu’aucune scène BGIG ne change avant `Matérialiser dans Fusion`.
 
-Retour OK : `P64-H02 Fusion OK 0.1.44 - commit <sha>`.
+Retour historique non reçu — ne pas envoyer : `P64-H02 Fusion OK 0.1.44 - commit <sha>`.
 
-Cette gate valide uniquement ces comportements logiciels et complète le retour
-contextuel « le reste est OK ». Elle ne calibre aucune valeur physique, ne valide
-aucune géométrie imprimée et ne vaut pas impression réelle.
+La portée prévue se limitait à ces comportements logiciels. Le KO conserve les
+observations UX partielles, mais n'accorde aucune `fusion-validation` au package
+0.1.44. Il ne calibre aucune valeur physique, ne valide aucune géométrie
+imprimée et ne vaut pas impression réelle. `print-validated: false`.
+
+## P64-V2 — Gate portefeuille multi-solveurs
+
+Statut : `planned`, non ouverte. Déclencheur : P64-H04 à P64-H08 intégrées,
+validations automatisées vertes, package Fusion dédié préparé par les scripts du
+dépôt.
+
+La gate devra vérifier au minimum :
+
+1. un projet simple conserve un calcul rapide et une proposition régulière ;
+2. les cas denses anonymisés P64-H01/H02/H03 obtiennent une solution certifiée ou
+   affichent honnêtement `Aucune solution trouvée dans le budget` ;
+3. `Auto intelligent`, `Étages et piles` et `Placement 3D libre` produisent des
+   comportements distincts et traçables ;
+4. Rapide/Normal/Approfondi ont des coûts visibles et l'autosave reste borné ;
+5. focus, sélection, scroll et saisie rapide restent stables pendant les runs ;
+6. aucune scène ne change avant `Matérialiser dans Fusion` ;
+7. aucun échec heuristique n'est présenté comme `Impossible prouvé`.
+
+Le retour exact et le package seront fixés par P64-H08. Cette gate ne valide ni
+valeur physique, ni géométrie imprimée, ni impression réelle.
 `print-validated: false`.

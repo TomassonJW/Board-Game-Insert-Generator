@@ -1261,6 +1261,28 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
   exacte de l’autosauvegarde Fusion.
 - C-USABILITY : le cas sauvegardé passe de `Calcul impossible` à 8 conteneurs sur
   2 niveaux ; le menu `...` et la croix restent sur la même ligne.
-- C-FUSION-UI : package 0.1.44 automated-validated ; gate P64-H02V requise.
+- C-FUSION-UI : package 0.1.44 automated-validated ; P64-H02V contextual-KO,
+  aucune preuve Fusion OK.
 - Limites : aucune promotion physique ou géométrique ; recherche heuristique,
-  fusion-validated: false, print-validated: false.
+  fusion-validated: false, print-validated: false ; trajectoire supersédée par
+  P64-A01 puis P64-H04.
+
+## P64-A01 — Programme multi-solveurs et finition volumique
+
+- C-SOLVER : trajectoire acceptée vers `stage_stack`, `free_3d_greedy`,
+  `free_3d_beam`, `portfolio_auto` et un `exact_proof` futur sous gate.
+- C-QUALITY : distinction obligatoire entre solution, épuisement heuristique,
+  impossibilité prouvée, entrée invalide et réponse obsolète ; télémétrie
+  structurée avant nouvel algorithme.
+- C-LAYOUT / C-GRID-3D : EP/EMS et points extrêmes deviennent la seconde famille ;
+  les grilles uniformes restent expérimentales et non canoniques.
+- C-USABILITY : méthode, effort, classement et finition sont quatre réglages
+  séparés ; diagnostic secondaire sans perte de focus.
+- C-ASSET : P45 reste propriétaire des variantes internes non-cartes ; P64
+  prépare seulement leur interface future.
+- C-GEOMETRY : finition continue/modulaire planifiée après P46 ; aucun filler ni
+  cale automatique.
+- État : architecture/documentation acceptée, runtime inchangé. P64-H04 `ready`,
+  P64-H05 à H08 bloquées séquentiellement, P64-V2 planifiée.
+- Validation : dernière preuve inchangée P64-H01 0.1.42 ; P64-H02/H03 non
+  fusion-validées ; `print-validated: false`.

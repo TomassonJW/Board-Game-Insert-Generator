@@ -2350,7 +2350,83 @@ P44-M007 est ready-for-explicit-go.
   compteurs agrégés et actions d’élément réunies sur une ligne.
 - Non-objectifs : schéma, dimensions, defaults, tolérances, cavités, réservations,
   géométrie, dépendance externe ou scène automatique.
-- Validation : fixture anonymisée, état Fusion exact, déterminisme, suite complète
-  et gate P64-H02V dans le package 0.1.44.
-- Statut : implemented, automated-validated, human-fusion-check-required ;
-  fusion-validated: false, print-validated: false. P44-V et P45 restent bloqués.
+- Validation : fixture anonymisée, état Fusion exact, déterminisme et suite
+  complète ; la gate P64-H02V reçoit un KO contextuel dans le package 0.1.44.
+- Statut : implemented, automated-validated, contextual-KO ;
+  fusion-validated: false, print-validated: false. P64-A01/H04 supersèdent la
+  trajectoire ; P44-V et P45 restent bloqués.
+
+### P64-A01 — Cadrer le portefeuille multi-solveurs
+
+- Capability : C-SOLVER, C-LAYOUT, C-USABILITY, C-QUALITY.
+- Livrables : programme P64, ADR-0068, ADR-0069, pilotage et contrats Terra/Luna.
+- Statut : done, documentation-validated ; aucun runtime modifié.
+
+### P64-H03 — Essai local de recherche dirigée
+
+- État : essai non commité, non intégré, préservé hors `main`.
+- Résultat : contextual-KO sur un nouveau cas réel ; aucune preuve Fusion.
+- Suite : ne pas ajouter d'autres seeds ; récupérer seulement fixtures et faits
+  utiles dans P64-H04.
+
+### P64-H04 — Résultats honnêtes et observabilité
+
+- Statut : ready. Agent : Terra avec revue senior.
+- Contrat : `docs/P64_H04_OBSERVABILITY_AND_RESULT_TRUTH_CONTRACT.md`.
+- Objectif : statuts honnêtes, télémétrie, fixtures anonymisées ; placements et
+  budgets de recherche inchangés.
+- Gate : aucune autonome ; libellés observés dans P64-V2.
+
+### P64-H05 — Contrat commun et baseline Étages et piles
+
+- Statut : blocked-by-P64-H04. Agent : Terra, revue Luna/senior.
+- Livrable : stratégies/candidats/certificats/budgets communs et parité du
+  solveur actuel.
+
+### P64-H06 — Placement 3D libre greedy EP/EMS
+
+- Statut : blocked-by-P64-H05. Agent : Luna/frontier.
+- Livrable : points extrêmes, espaces maximaux vides, plus contraint d'abord,
+  rotations XY et validation commune, avec une enveloppe par conteneur.
+
+### P64-H07 — Beam robuste et portefeuille Auto
+
+- Statut : blocked-by-P64-H06. Agent : Luna/frontier.
+- Livrable : beam borné, efforts monotones, comparaison baseline/greedy/beam et
+  sélection de candidats certifiés.
+
+### P64-H08 — Réglages Fusion et diagnostic secondaire
+
+- Statut : blocked-by-P64-H07. Agent : Terra, gate UX humaine ensuite.
+- Livrable : méthode, effort, classement honnête, métriques du dernier run,
+  persistance additive et focus stable.
+
+### P64-V2 — Gate humaine portefeuille multi-solveurs
+
+- Statut : blocked-by-P64-H08.
+- Sortie : si positive, reprendre P44-V ; P45 reste bloqué jusqu'à P44-V.
+- Limites : aucune validation physique ou d'impression.
+
+### P64-F01 — Fermeture continue par graphe d'adjacence
+
+- Statut : planned-after-P46. Agent : Luna/frontier.
+- Objectif : redistribuer le résiduel sans changer la topologie, les cavités
+  ou le nombre de corps.
+- Gate : revalidation commune et fallback exact vers la solution de base.
+
+### P64-F02 — Harmonisation modulaire adaptative
+
+- Statut : blocked-by-P64-F01. Agent : Luna/frontier.
+- Objectif : inférer des trames globales/locales et répartir des dalles de
+  cellules sans modifier les contraintes physiques.
+- Gate : coût borné, résultat total/partiel/rejeté et solution de base préservée.
+
+### P64-F03 — Résiduel utile et cales explicites
+
+- Statut : blocked-by-P64-F02-and-physical-feedback.
+- Interdit : corps automatique ou promesse physique non imprimée.
+
+### P64-X01 — Mode exact / preuve pour petits projets
+
+- Statut : future-gated.
+- Préconditions : besoin démontré, benchmark, ADR de dépendance et GO explicite.

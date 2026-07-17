@@ -32,3 +32,14 @@ Statut : `done`, `implemented-core`, `implemented-cli`, `implemented-cad-ir-meta
 ## Etat apres P21
 
 `box_fill_v3_variant_generation` est implemente dans son scope borne : policies deterministes, portfolios dedupliques, Pareto, sous-scores, preference, preview statique et selection explicite. Les policies restent des heuristiques d ordre de candidats ; elles ne constituent ni une recherche exhaustive ni une preuve ergonomique. L etape suivante est `box_fill_v4_interactive_editor`, mais sa surface persistante reste bloquee par la gate ADR-0036.
+
+## Actualisation P64 — recherche globale produit
+
+Les étapes historiques P19-P21 restent des fondations utiles, mais la route
+produit P64 est désormais : observabilité, contrat commun, baseline par étages,
+greedy 3D EP/EMS, beam, portfolio Auto, puis UI/gate. Les variantes P21 ne sont
+pas une recherche 3D et ne prouvent pas l'impossibilité.
+
+La finition continue/modulaire est une phase séparée après P46. Le mode exact est
+un horizon optionnel, non une dépendance actuelle. Le détail exécutable et les
+budgets à benchmarker sont dans `P64_MULTI_SOLVER_PORTFOLIO_PROGRAM.md`.

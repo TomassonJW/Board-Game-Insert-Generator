@@ -193,3 +193,9 @@ Tests, cartes backlog ou gates humaines a preparer.
 - ADR-0063-role-based-clearance-overrides.md - proposition P44-M008 : jeux par role, heritage par axe et gate humaine avant implementation.
 
 - ADR-0064-global-container-clearances.md - jeux externes des conteneurs exclusivement globaux ; anciens overrides par bac conservés mais inactifs.
+
+- ADR-0065-recherche-dense-et-equilibre-spatial-3d.md - partitions adaptatives et équilibre X/Y/Z.
+- ADR-0066-diversification-bornee-apres-cul-de-sac.md - reprise bornée par ordres diversifiés.
+- ADR-0067 n'est pas intégrée : numéro occupé par l'essai local P64-H03 préservé hors `main` ; ne pas le réutiliser sans réconciliation.
+- ADR-0068-multi-solver-portfolio-and-truthful-results.md - portefeuille de stratégies, validateur commun et résultats honnêtes.
+- ADR-0069-continuous-and-modular-volume-finishing.md - finition continue puis harmonisation modulaire après faisabilité.
