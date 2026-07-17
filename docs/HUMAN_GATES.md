@@ -658,28 +658,36 @@ observations UX partielles, mais n'accorde aucune `fusion-validation` au package
 0.1.44. Il ne calibre aucune valeur physique, ne valide aucune géométrie
 imprimée et ne vaut pas impression réelle. `print-validated: false`.
 
-## P64-V2 — Gate portefeuille multi-solveurs
+## P64-V2 — Gate portefeuille multi-solveurs 0.1.51
 
-Statut : `ready-for-human-fusion-check`. Déclencheur satisfait : P64-H04 à
-P64-H08 sont intégrées, les validations automatisées sont vertes et le package
-0.1.51 est préparé par
-`scripts/fusion/prepare_p64_v2_solver_portfolio_test.ps1`.
+Statut : contextual-KO. Les contrôles sont visibles, mais le projet dense réel
+laissé dans Fusion reste faussement sans solution et la répartition n'est pas
+jugée suffisamment harmonieuse. Aucun retour P64-V2 Fusion OK 0.1.51 ne doit
+être envoyé.
 
-Vérifier dans Fusion :
+Cette observation ne valide ni valeurs physiques ni impression.
 
-1. les choix `Auto intelligent`, `Étages et piles`, `Placement 3D libre` et
-   `Rapide` / `Normal` / `Approfondi` sont visibles et conservés localement ;
-2. sur un projet non trivial, le diagnostic repliable affiche méthode, effort,
-   temps, famille retenue et arrêt cohérents ;
-3. aucun résultat non certifié, épuisé ou impossible ne devient matérialisable ;
-4. la baseline Étages et piles reste utilisable, le 3D libre exclut la baseline,
-   et Auto sélectionne seulement un candidat certifié ;
-5. focus, sélection, scroll et saisie rapide restent stables pendant autosave,
-   minima et aperçu adaptatif ;
-6. aucune scène ne change avant `Matérialiser dans Fusion` ;
-7. aucun échec heuristique n'est présenté comme `Impossible prouvé`.
+## P64-V2H01 — Gate fermeture continue corrective 0.1.52
 
-Retour attendu : `P64-V2 Fusion OK 0.1.51 - commit <sha>` ou KO contextuel avec
-le projet, la méthode, l'effort et le diagnostic observé. Cette gate ne valide
-ni valeur physique, ni géométrie imprimée, ni impression réelle.
-`print-validated: false`.
+Statut : ready-for-human-fusion-check. Préparation automatisée :
+scripts/fusion/prepare_p64_v2h01_continuous_closure_test.ps1.
+
+Vérifier dans Fusion, sur le projet dense inchangé :
+
+1. Placement 3D libre + Approfondi trouve 9 conteneurs matérialisables sans
+   Calcul impossible ni erreur de cavité sous plateau ;
+2. le diagnostic retient free_3d_beam et le plan présente plusieurs niveaux
+   avec des faces mieux alignées ;
+3. Étages et piles peut rester sans solution dans son budget, tandis que
+   Placement 3D libre puis Auto retrouvent la solution certifiée : les méthodes
+   sont donc effectivement distinctes ;
+4. les grands bacs incompatibles avec les coupes plateau/livret restent hors de
+   leur empreinte et les corps compatibles portent correctement les coupes ;
+5. aucune scène ne change avant Matérialiser dans Fusion.
+
+Retour attendu : P64-V2H01 Fusion OK 0.1.52 - commit <sha>, ou KO contextuel avec
+méthode, effort et diagnostic.
+
+Cette gate valide le comportement logiciel observé seulement. Elle ne valide
+pas l'harmonisation modulaire future P64-F02, aucune valeur physique, aucune
+géométrie imprimée et aucune impression réelle. print-validated: false.

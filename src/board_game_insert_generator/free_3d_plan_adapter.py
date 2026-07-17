@@ -16,7 +16,10 @@ from typing import Mapping
 from board_game_insert_generator.expandable_envelope import (
     derive_expandable_envelope_contract,
 )
-from board_game_insert_generator.free_3d_greedy_solver import Free3DPlacement
+from board_game_insert_generator.free_3d_greedy_solver import (
+    Free3DPlacement,
+    TopInsetZone,
+)
 from board_game_insert_generator.partition_solver import (
     PARTITION_PLAN_SCHEMA_V1,
     _clearance_policy,
@@ -79,6 +82,7 @@ class Free3DPreparedProblem:
     box_xy_clearance_mm: float
     z_clearance_mm: float
     participants: tuple[dict[str, object], ...]
+    top_inset_zones: tuple[TopInsetZone, ...]
     requested_container_count: int
 
 
@@ -174,6 +178,21 @@ def prepare_free_3d_problem(raw_project: object) -> Free3DPreparation:
         box_xy_clearance,
         z_clearance,
     )
+    top_inset_zones = tuple(
+        TopInsetZone(
+            origin_xy_mm=(
+                float(_mapping(item["cut_origin_mm"])["x"]),
+                float(_mapping(item["cut_origin_mm"])["y"]),
+            ),
+            size_xy_mm=(
+                float(_mapping(item["cut_size_mm"])["x"]),
+                float(_mapping(item["cut_size_mm"])["y"]),
+            ),
+            support_plane_z_mm=float(item["support_plane_z_mm"]),
+            inset_depth_mm=float(item["inset_depth_from_top_mm"]),
+        )
+        for item in _mappings(top_inset_plan["reservations"])
+    )
     problem = Free3DPreparedProblem(
         normalization_source_schema=normalization.source_schema,
         normalization_migrated=normalization.migrated,
@@ -187,6 +206,7 @@ def prepare_free_3d_problem(raw_project: object) -> Free3DPreparation:
         box_xy_clearance_mm=solver_clearances[1],
         z_clearance_mm=solver_clearances[2],
         participants=tuple(participants),
+        top_inset_zones=top_inset_zones,
         requested_container_count=requested_count,
     )
     return Free3DPreparation(status="ready", problem=problem, rejection_codes=())

@@ -1283,7 +1283,7 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - C-GEOMETRY : finition continue/modulaire planifiée après P46 ; aucun filler ni
   cale automatique.
 - État : P64-H03R/H04/H05/H06/H07 intégrés (baseline dirigée, résultats honnêtes,
-  contrat commun, greedy et beam 3D, portefeuille Auto interne). P64-H08 intégrée dans 0.1.51 ; P64-V2 `ready-for-human-fusion-check`.
+  contrat commun, greedy et beam 3D, portefeuille Auto interne). P64-H08 intégrée dans 0.1.51 ; P64-V2 est un KO contextuel et P64-V2H01 0.1.52 est `ready-for-human-fusion-check`.
 - Validation : dernière preuve inchangée P64-H01 0.1.42 ; P64-H02/H03 non
   fusion-validées ; `print-validated: false`.
 ## Mise à jour P64-H07 — 2026-07-17
@@ -1310,5 +1310,21 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
   sans reconstruction du DOM éditable.
 - C-QUALITY : résultat, matérialisabilité et proposition résiduelle restent
   cohérents ; aucun budget épuisé ne devient une impossibilité prouvée.
-- Validation : P64-V2 est prête mais non exécutée dans Fusion ; dernière preuve
+- Validation : P64-V2 0.1.51 est un KO contextuel ; dernière preuve
   solveur Fusion inchangée P64-H01 0.1.42 ; `print-validated: false`.
+
+## Mise à jour P64-V2H01 — 2026-07-17
+
+- C-SOLVER : implemented, automated-validated. Le beam v2 place d'abord les
+  minima, conserve plusieurs états et délègue la fermeture continue avant le
+  certificat commun.
+- C-LAYOUT / C-GRID-3D : implemented. Le cas anonymisé réel produit 9 corps sur
+  plusieurs niveaux, sans résiduel imprimable ni corps automatique.
+- C-QUALITY : implemented. Les réservations plateau/livret sont conditionnelles
+  et les fonds/cavités restent contrôlés par le validateur commun.
+- C-USABILITY : automated-validated seulement. Les méthodes donnent des
+  résultats effectivement différents sur la fixture, mais l'observation Fusion
+  0.1.52 reste requise.
+- Harmonisation : alignement de faces amélioré seulement ; P64-F02 reste prévu.
+- Preuve : tests automatisés et reproduction locale ; fusion-validated: false,
+  print-validated: false.

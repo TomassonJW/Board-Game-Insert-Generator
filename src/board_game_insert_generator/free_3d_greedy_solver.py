@@ -1,19 +1,10 @@
-"""Bounded free-3D greedy solver based on extreme points and EMS.
+"""Bounded free-3D greedy feasibility solver based on extreme points and EMS.
 
-P64-H06 deliberately exposes a second *internal* strategy family without
-changing the public project schema or the stage-stack default.  The engine
-packs one already-derived canonical envelope per requested body.  It maintains
-maximal empty spaces (EMS), derives extreme points from placed faces, chooses
-the currently most constrained participant and follows one deterministic
-greedy trajectory.  P64-H07 remains responsible for beam search and portfolio
-orchestration.
-
-The engine proposes geometry; the common validator remains authoritative.  A
-geometric admission report is therefore included here, while a materializable
-partition still has to pass ``certify_partition_candidate`` after the adapter
-has restored cavities, reservations, removal and conservation contracts.
+The engine follows one deterministic minimum-envelope trajectory. Conditional
+top-inset constraints keep bodies that cannot support a localized cut outside
+its footprint, while the shared continuous closure and product certificate own
+final envelope growth and materializability.
 """
-
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -33,7 +24,7 @@ from board_game_insert_generator.solver_contract import (
 
 
 FREE_3D_GREEDY_FAMILY_ID = "free_3d_greedy"
-FREE_3D_GREEDY_VERSION = "bgig.free_3d_greedy.v1"
+FREE_3D_GREEDY_VERSION = "bgig.free_3d_greedy.v2"
 FREE_3D_GEOMETRY_VALIDATION_V1 = "bgig.free_3d_geometry_validation.v1"
 _EPSILON = 0.0001
 _AXES = ("x", "y", "z")
@@ -54,6 +45,15 @@ class EmptySpace:
     def volume_mm3(self) -> float:
         return self.size_mm[0] * self.size_mm[1] * self.size_mm[2]
 
+
+@dataclass(frozen=True)
+class TopInsetZone:
+    """One conditional top opening constraint used during feasibility search."""
+
+    origin_xy_mm: tuple[float, float]
+    size_xy_mm: tuple[float, float]
+    support_plane_z_mm: float
+    inset_depth_mm: float
 
 @dataclass(frozen=True)
 class Free3DPlacement:
@@ -157,6 +157,8 @@ def solve_free_3d_greedy(
     box_perimeter_xy_mm: float,
     between_bodies_z_mm: float,
     budget: SolverBudget,
+    forbidden_spaces: Iterable[EmptySpace] = (),
+    top_inset_zones: Iterable[TopInsetZone] = (),
 ) -> Free3DGreedyExecution:
     """Pack canonical envelopes through one deterministic greedy trajectory.
 
@@ -184,9 +186,22 @@ def solve_free_3d_greedy(
 
     placements: list[Free3DPlacement] = []
     remaining = list(values)
-    spaces = [EmptySpace(_rounded_point((box_clearance, box_clearance, 0.0)), _rounded_point(root_size))]
-    points = {_rounded_point((box_clearance, box_clearance, 0.0))}
-    counters = _Counters()
+    root_space = EmptySpace(
+        _rounded_point((box_clearance, box_clearance, 0.0)),
+        _rounded_point(root_size),
+    )
+    forbidden = _validated_forbidden_spaces(forbidden_spaces, dimensions)
+    inset_zones = _validated_top_inset_zones(top_inset_zones, dimensions)
+    spaces = _subtract_forbidden_spaces([root_space], forbidden)
+    if not spaces:
+        raise Free3DGreedyError("The forbidden spaces consume the whole useful box.")
+    points = {space.origin_mm for space in spaces}
+    counters = _Counters(
+        extreme_points_generated=len(points),
+        empty_spaces_generated=len(spaces),
+        maximum_empty_spaces_retained=len(spaces),
+        maximum_extreme_points_retained=len(points),
+    )
     input_digest = _digest(
         {
             "strategy": strategy.__dict__,
@@ -198,6 +213,11 @@ def solve_free_3d_greedy(
             "participants": values,
             "box": dimensions,
             "clearances": (xy_clearance, box_clearance, z_clearance),
+            "forbidden_spaces": [
+                {"origin_mm": item.origin_mm, "size_mm": item.size_mm}
+                for item in forbidden
+            ],
+            "top_inset_zones": [item.__dict__ for item in inset_zones],
         }
     )
     formal_impossibility = _necessary_bound_failure(values, root_size)
@@ -233,6 +253,7 @@ def solve_free_3d_greedy(
             z_clearance,
             counters,
             limits,
+            inset_zones,
         )
         if counters.budget_exhausted:
             break
@@ -309,6 +330,7 @@ def _most_constrained_current_participant(
     z_clearance: float,
     counters: _Counters,
     limits: dict[str, int],
+    top_inset_zones: tuple[TopInsetZone, ...],
 ) -> tuple[dict[str, object] | None, list[_Option]]:
     """Choose the fewest-current-options participant, deferring zero-option ones.
 
@@ -330,6 +352,7 @@ def _most_constrained_current_participant(
             z_clearance,
             counters,
             limits,
+            top_inset_zones,
         )
         if counters.budget_exhausted:
             return None, []
@@ -363,6 +386,7 @@ def _placement_options(
     z_clearance: float,
     counters: _Counters,
     limits: dict[str, int],
+    top_inset_zones: tuple[TopInsetZone, ...],
 ) -> list[_Option]:
     result: dict[tuple[object, ...], _Option] = {}
     for rotation, world_size, local_size in _orientations(participant):
@@ -376,6 +400,14 @@ def _placement_options(
                     return []
                 counters.placement_trials += 1
                 if not _inside_box(point, world_size, box):
+                    continue
+                if not _top_inset_option_allowed(
+                    participant,
+                    point,
+                    world_size,
+                    box[2],
+                    top_inset_zones,
+                ):
                     continue
                 if not _separated_from_placements(
                     point,
@@ -458,6 +490,128 @@ def _aligned_face_count(option: _Option, placements: list[Free3DPlacement]) -> i
             count += sum(abs(value - candidate) <= _EPSILON for value in faces[axis] for candidate in other)
     return count
 
+
+def _validated_top_inset_zones(
+    values: Iterable[TopInsetZone],
+    box: tuple[float, float, float],
+) -> tuple[TopInsetZone, ...]:
+    result: list[TopInsetZone] = []
+    for index, value in enumerate(values):
+        if not isinstance(value, TopInsetZone):
+            raise Free3DGreedyError(f"Top inset zone {index} must be a TopInsetZone.")
+        if any(number < -_EPSILON for number in value.origin_xy_mm):
+            raise Free3DGreedyError(f"Top inset zone {index} starts outside the box.")
+        if any(number <= _EPSILON for number in value.size_xy_mm):
+            raise Free3DGreedyError(f"Top inset zone {index} must have positive XY dimensions.")
+        if any(
+            value.origin_xy_mm[axis] + value.size_xy_mm[axis] > box[axis] + _EPSILON
+            for axis in range(2)
+        ):
+            raise Free3DGreedyError(f"Top inset zone {index} extends outside the box.")
+        if not 0.0 <= value.support_plane_z_mm <= box[2] + _EPSILON:
+            raise Free3DGreedyError(f"Top inset zone {index} has an invalid support plane.")
+        if value.inset_depth_mm <= _EPSILON:
+            raise Free3DGreedyError(f"Top inset zone {index} must have a positive depth.")
+        result.append(value)
+    return tuple(
+        sorted(
+            set(result),
+            key=lambda item: (
+                item.support_plane_z_mm,
+                item.origin_xy_mm[1],
+                item.origin_xy_mm[0],
+                item.size_xy_mm,
+            ),
+        )
+    )
+
+
+def _top_inset_option_allowed(
+    participant: Mapping[str, object],
+    origin: tuple[float, float, float],
+    world_size: tuple[float, float, float],
+    storage_height_mm: float,
+    zones: tuple[TopInsetZone, ...],
+) -> bool:
+    """Reject a body that can neither stay below nor validly reach a top inset."""
+
+    body_top = origin[2] + world_size[2]
+    minimum_height = _minimum_local(participant)[2]
+    z_mode = str(_mapping(participant["dimension_modes"])["z"])
+    for zone in zones:
+        if not (
+            origin[0] < zone.origin_xy_mm[0] + zone.size_xy_mm[0] - _EPSILON
+            and zone.origin_xy_mm[0] < origin[0] + world_size[0] - _EPSILON
+            and origin[1] < zone.origin_xy_mm[1] + zone.size_xy_mm[1] - _EPSILON
+            and zone.origin_xy_mm[1] < origin[1] + world_size[1] - _EPSILON
+        ):
+            continue
+        if body_top <= zone.support_plane_z_mm + _EPSILON:
+            continue
+        can_reach_top_with_floor = (
+            storage_height_mm - origin[2] + _EPSILON
+            >= minimum_height + zone.inset_depth_mm
+        )
+        if not can_reach_top_with_floor:
+            return False
+        if z_mode == "fixed" and abs(body_top - storage_height_mm) > 0.001:
+            return False
+    return True
+
+def _validated_forbidden_spaces(
+    values: Iterable[EmptySpace],
+    box: tuple[float, float, float],
+) -> tuple[EmptySpace, ...]:
+    """Return deterministic reserved prisms after strict geometry validation."""
+
+    result: list[EmptySpace] = []
+    for index, value in enumerate(values):
+        if not isinstance(value, EmptySpace):
+            raise Free3DGreedyError(f"Forbidden space {index} must be an EmptySpace.")
+        if any(number < -_EPSILON for number in value.origin_mm):
+            raise Free3DGreedyError(f"Forbidden space {index} starts outside the box.")
+        if any(number <= _EPSILON for number in value.size_mm):
+            raise Free3DGreedyError(f"Forbidden space {index} must have positive dimensions.")
+        if any(
+            value.origin_mm[axis] + value.size_mm[axis] > box[axis] + _EPSILON
+            for axis in range(3)
+        ):
+            raise Free3DGreedyError(f"Forbidden space {index} extends outside the box.")
+        result.append(
+            EmptySpace(
+                _rounded_point(value.origin_mm),
+                _rounded_point(value.size_mm),
+            )
+        )
+    return tuple(
+        sorted(
+            set(result),
+            key=lambda item: (
+                item.origin_mm[2],
+                item.origin_mm[1],
+                item.origin_mm[0],
+                item.size_mm,
+            ),
+        )
+    )
+
+
+def _subtract_forbidden_spaces(
+    spaces: list[EmptySpace],
+    forbidden_spaces: Iterable[EmptySpace],
+) -> list[EmptySpace]:
+    """Carve immutable reserved prisms from a maximal-empty-space collection."""
+
+    current = list(spaces)
+    for forbidden in forbidden_spaces:
+        generated: list[EmptySpace] = []
+        for space in current:
+            if not _spaces_intersect(space, forbidden):
+                generated.append(space)
+                continue
+            generated.extend(_split_space(space, forbidden))
+        current, _ = _deduplicate_spaces(generated)
+    return current
 
 def _subtract_placement_from_spaces(
     spaces: list[EmptySpace],

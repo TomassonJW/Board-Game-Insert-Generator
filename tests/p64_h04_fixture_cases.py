@@ -60,6 +60,54 @@ def h03_contextual_unresolved_project() -> dict[str, object]:
     return project
 
 
+def p64_v2_continuous_closure_project() -> dict[str, object]:
+    """Anonymised dense case captured from the contextual P64-V2 Fusion KO."""
+
+    project = blank_project_v1()
+    project["project_name"] = "P64-V2 anonymised residual closure"
+    project["box"] = {
+        "inner_dimensions_mm": {"x": 250.0, "y": 180.0, "z": 70.0},
+        "usable_height_mm": 69.8,
+        "lid_clearance_mm": 0.2,
+    }
+    definitions = (
+        ("tokens", {"x": 69.8, "y": 92.2, "z": 30.0}),
+        ("c0", {"x": 69.0, "y": 91.0, "z": 35.0}),
+        ("c1", {"x": 89.0, "y": 62.72, "z": 64.0}),
+        ("c2", {"x": 63.0, "y": 88.0, "z": 24.0}),
+        ("c3", {"x": 63.0, "y": 88.0, "z": 24.0}),
+        ("c4", {"x": 63.0, "y": 88.0, "z": 24.0}),
+        ("tall-row", {"x": 162.5, "y": 32.6, "z": 63.5}),
+        ("mixed", {"x": 38.4, "y": 32.6, "z": 48.0}),
+        ("added-small", {"x": 63.5, "y": 88.9, "z": 3.2}),
+    )
+    project["container_groups"] = [_group(group_id) for group_id, _ in definitions]
+    project["contents"] = [
+        _content(group_id, f"content-{group_id}", dimensions)
+        for group_id, dimensions in definitions
+    ]
+    project["flat_items"] = [
+        {
+            "id": "flat-board",
+            "name": "Plateau anonymise",
+            "kind": "board",
+            "dimensions_mm": {"x": 115.0, "y": 110.0, "z": 3.0},
+            "quantity": 3,
+            "stack_order": 1,
+            "origin_mm": {"x": 10.0, "y": 10.0},
+        },
+        {
+            "id": "flat-booklet",
+            "name": "Livret anonymise",
+            "kind": "rulebook",
+            "dimensions_mm": {"x": 110.0, "y": 60.0, "z": 3.0},
+            "quantity": 1,
+            "stack_order": 0,
+            "origin_mm": {"x": 10.0, "y": 20.0},
+        },
+    ]
+    return project
+
 def formal_conflict_project() -> dict[str, object]:
     project = blank_project_v1()
     project["box"] = {"inner_dimensions_mm": {"x": 40.0, "y": 40.0, "z": 20.0}, "usable_height_mm": 20.0, "lid_clearance_mm": 0.0}

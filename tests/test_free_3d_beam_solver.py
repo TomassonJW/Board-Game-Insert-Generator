@@ -2,6 +2,9 @@ from __future__ import annotations
 
 import unittest
 
+from board_game_insert_generator.free_3d_continuous_closure import (
+    close_free_3d_residual,
+)
 from board_game_insert_generator.free_3d_beam_solver import (
     FREE_3D_BEAM_FAMILY_ID,
     solve_free_3d_beam,
@@ -48,7 +51,7 @@ def _participant(identifier: str, size: tuple[float, float, float]) -> dict[str,
 
 
 class Free3DBeamSolverTests(unittest.TestCase):
-    def test_beam_searches_final_envelopes_and_closes_the_printable_ems(self) -> None:
+    def test_beam_places_all_requested_minimum_envelopes_for_deferred_closure(self) -> None:
         execution = solve_free_3d_beam(
             [
                 _participant("a", (20.0, 20.0, 10.0)),
@@ -139,13 +142,28 @@ class Free3DBeamSolverTests(unittest.TestCase):
         )
 
         self.assertEqual(execution.status, "solution_found")
+        closure = close_free_3d_residual(
+            problem.participants,
+            execution.solutions[0].placements,
+            problem.box,
+            problem.storage_height_mm,
+            problem.xy_clearance_mm,
+            box_perimeter_xy_mm=problem.box_xy_clearance_mm,
+            between_bodies_z_mm=problem.z_clearance_mm,
+            budget=budget,
+            top_inset_zones=problem.top_inset_zones,
+        )
+        self.assertFalse(closure.empty_spaces)
         certified, rejection_codes = certify_free_3d_plan(
             problem,
             strategy=execution.strategy,
             budget=budget,
             candidate_id=execution.solutions[0].candidate.candidate_id,
-            placements=execution.solutions[0].placements,
-            search_telemetry=execution.telemetry.__dict__,
+            placements=closure.placements,
+            search_telemetry={
+                **execution.telemetry.__dict__,
+                "closure_status": closure.status,
+            },
         )
 
         self.assertEqual(rejection_codes, ())

@@ -1,15 +1,12 @@
-"""Bounded free-3D beam search for P64-H07.
+"""Bounded free-3D beam feasibility search with deferred continuous closure.
 
-The H06 greedy family keeps one canonical minimum-envelope trajectory.  This
-module deliberately keeps several EP/EMS states and searches *final* expandable
-envelopes.  A complete beam state has no printable EMS left: requested bodies
-and their explicit clearance reservations cover the useful box.  This is a
-feasibility invariant, not the later P64-F01/F02 finishing pass.
-
-The result remains internal until ``solver_portfolio`` reconstructs a complete
-partition plan and the common product validator certifies it.
+The greedy family keeps one minimum-envelope trajectory. This module retains
+several EP/EMS states, places every requested minimum envelope first and leaves
+continuous Auto/Target growth to free_3d_continuous_closure. Keeping those
+phases separate prevents a large early body from pruning a feasible dense
+layout. Top-inset constraints are evaluated during search, while the common
+product validator remains the final authority.
 """
-
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -21,6 +18,7 @@ from board_game_insert_generator.free_3d_greedy_solver import (
     EmptySpace,
     Free3DGeometryAdmission,
     Free3DPlacement,
+    TopInsetZone,
     _Counters,
     _aligned_face_count,
     _box_dimensions,
@@ -38,8 +36,12 @@ from board_game_insert_generator.free_3d_greedy_solver import (
     _separated_from_placements,
     _subtract_placement_from_spaces,
     _support_at,
+    _subtract_forbidden_spaces,
+    _top_inset_option_allowed,
     _update_extreme_points,
     _upper,
+    _validated_forbidden_spaces,
+    _validated_top_inset_zones,
     _volume,
 )
 from board_game_insert_generator.solver_contract import (
@@ -53,7 +55,7 @@ from board_game_insert_generator.solver_contract import (
 
 
 FREE_3D_BEAM_FAMILY_ID = "free_3d_beam"
-FREE_3D_BEAM_VERSION = "bgig.free_3d_beam.v1"
+FREE_3D_BEAM_VERSION = "bgig.free_3d_beam.v2"
 _EPSILON = 0.0001
 _AXES = ("x", "y", "z")
 
@@ -69,6 +71,7 @@ class Free3DBeamSolution:
     candidate: SolverCandidate
     geometry_admission: Free3DGeometryAdmission
     placements: tuple[Free3DPlacement, ...]
+    empty_spaces: tuple[EmptySpace, ...]
     score_key: tuple[object, ...]
 
 
@@ -159,8 +162,10 @@ def solve_free_3d_beam(
     between_bodies_z_mm: float,
     budget: SolverBudget,
     cancel_check: Callable[[], bool] | None = None,
+    forbidden_spaces: Iterable[EmptySpace] = (),
+    top_inset_zones: Iterable[TopInsetZone] = (),
 ) -> Free3DBeamExecution:
-    """Search several final-envelope EP/EMS states under explicit hard limits."""
+    """Search several minimum-envelope EP/EMS states under explicit hard limits."""
 
     strategy = SolverStrategy(FREE_3D_BEAM_FAMILY_ID, FREE_3D_BEAM_VERSION)
     limits = _budget_limits(budget)
@@ -184,11 +189,16 @@ def solve_free_3d_beam(
         raise Free3DBeamError("Participant identifiers must be unique.")
     root_origin = _rounded_point((box_clearance, box_clearance, 0.0))
     root_space = EmptySpace(root_origin, _rounded_point(root_size))
+    forbidden = _validated_forbidden_spaces(forbidden_spaces, dimensions)
+    inset_zones = _validated_top_inset_zones(top_inset_zones, dimensions)
+    initial_spaces = _subtract_forbidden_spaces([root_space], forbidden)
+    if not initial_spaces:
+        raise Free3DBeamError("The forbidden spaces consume the whole useful box.")
     initial = _BeamState(
         placements=(),
         remaining_ids=tuple(sorted(participants_by_id)),
-        spaces=(root_space,),
-        points=frozenset((root_origin,)),
+        spaces=tuple(initial_spaces),
+        points=frozenset(space.origin_mm for space in initial_spaces),
     )
     input_digest = _digest(
         {
@@ -201,6 +211,11 @@ def solve_free_3d_beam(
             "participants": values,
             "box": dimensions,
             "clearances": (xy_clearance, box_clearance, z_clearance),
+            "forbidden_spaces": [
+                {"origin_mm": item.origin_mm, "size_mm": item.size_mm}
+                for item in forbidden
+            ],
+            "top_inset_zones": [item.__dict__ for item in inset_zones],
         }
     )
     formal_impossibility = _necessary_bound_failure(values, root_size)
@@ -237,6 +252,7 @@ def solve_free_3d_beam(
                 z_clearance,
                 counters,
                 limits,
+                inset_zones,
             )
             for _, options in participant_options:
                 for option in options[: limits["max_options_per_participant"]]:
@@ -267,7 +283,6 @@ def solve_free_3d_beam(
                         counters.geometric_completions += 1
                         if advanced.spaces:
                             counters.completions_with_printable_residual += 1
-                            continue
                         solution = _solution(
                             strategy,
                             input_digest,
@@ -311,7 +326,7 @@ def solve_free_3d_beam(
     elif counters.timed_out:
         status, stop_reason = "no_solution_within_budget", "hard_time_budget_reached"
     elif ordered_solutions:
-        status, stop_reason = "solution_found", "beam_complete_partition_found"
+        status, stop_reason = "solution_found", "beam_feasible_geometry_found"
     elif counters.budget_exhausted:
         status, stop_reason = "no_solution_within_budget", "hard_budget_reached"
     else:
@@ -340,6 +355,7 @@ def _participant_branches(
     z_clearance: float,
     counters: _BeamCounters,
     limits: dict[str, int],
+    top_inset_zones: tuple[TopInsetZone, ...],
 ) -> list[tuple[dict[str, object], list[_BeamOption]]]:
     evaluated: list[tuple[tuple[object, ...], dict[str, object], list[_BeamOption]]] = []
     placements = list(state.placements)
@@ -357,6 +373,7 @@ def _participant_branches(
             z_clearance,
             counters,
             limits,
+            top_inset_zones,
         )
         if counters.budget_exhausted:
             break
@@ -388,6 +405,7 @@ def _placement_options(
     z_clearance: float,
     counters: _BeamCounters,
     limits: dict[str, int],
+    top_inset_zones: tuple[TopInsetZone, ...],
 ) -> list[_BeamOption]:
     result: dict[tuple[object, ...], _BeamOption] = {}
     for rotation, minimum_world, minimum_local in _orientations(participant):
@@ -407,6 +425,14 @@ def _placement_options(
                         return []
                     counters.placement_trials += 1
                     if not _inside_box(point, world_size, box):
+                        continue
+                    if not _top_inset_option_allowed(
+                        participant,
+                        point,
+                        world_size,
+                        box[2],
+                        top_inset_zones,
+                    ):
                         continue
                     if not _separated_from_placements(
                         point,
@@ -454,12 +480,7 @@ def _dimension_variants(
     modes = _mapping(participant["dimension_modes"])
     targets = _mapping(participant["target_local_mm"])
     world_to_local = (1, 0, 2) if rotation == 90 else (0, 1, 2)
-    expandable_world_axes = [
-        world_axis
-        for world_axis, local_axis in enumerate(world_to_local)
-        if str(modes[_AXES[local_axis]]) != "fixed"
-        and maximum_world[world_axis] > minimum_world[world_axis] + _EPSILON
-    ]
+
     bases = {minimum_world}
     target_world = list(minimum_world)
     for world_axis, local_axis in enumerate(world_to_local):
@@ -469,15 +490,10 @@ def _dimension_variants(
                 maximum_world[world_axis], max(minimum_world[world_axis], float(target))
             )
     bases.add(_rounded_point(tuple(target_world)))
+    # Feasibility search stays compact: continuous growth is handled only after
+    # every requested body has a valid placement.  Mixing EMS-sized expansion
+    # into this phase prunes viable dense layouts before they can complete.
     variants = set(bases)
-    for base in bases:
-        count = len(expandable_world_axes)
-        for mask in range(1, 1 << count):
-            values = list(base)
-            for bit, world_axis in enumerate(expandable_world_axes):
-                if mask & (1 << bit):
-                    values[world_axis] = maximum_world[world_axis]
-            variants.add(_rounded_point(tuple(values)))
 
     result = []
     for world in sorted(variants):
@@ -589,7 +605,7 @@ def _solution(
         {
             "input_digest": input_digest,
             "placements": [value.__dict__ for value in placements],
-            "printable_ems_remaining": [],
+            "printable_ems_remaining": [value.__dict__ for value in state.spaces],
         }
     )
     snapshots = tuple(
@@ -613,7 +629,7 @@ def _solution(
         score_breakdown=(
             ("body_volume_mm3", _round(body_volume)),
             ("minimum_support_ratio", _round(minimum_support)),
-            ("printable_ems_remaining", 0.0),
+            ("printable_ems_remaining", float(len(state.spaces))),
             ("z_start_levels", z_levels),
         ),
         automatic_body_count=0,
@@ -654,7 +670,7 @@ def _solution(
             minimum_support + _EPSILON >= 0.25,
             "SUPPORT_COVERAGE",
         ),
-        ValidationCheck("complete_printable_partition", True, "PRINTABLE_RESIDUAL"),
+        ValidationCheck("requested_body_feasibility", True, "PARTICIPANT_SET_INCOMPLETE"),
         ValidationCheck("requested_bodies_only", True, "AUTOMATIC_BODY_FORBIDDEN"),
     )
     admission = Free3DGeometryAdmission(
@@ -677,17 +693,22 @@ def _solution(
             for value in placements
         ),
     )
-    return Free3DBeamSolution(candidate, admission, placements, score_key)
+    return Free3DBeamSolution(
+        candidate,
+        admission,
+        placements,
+        tuple(state.spaces),
+        score_key,
+    )
 
 
 def _option_score(option: _BeamOption, placements: list[Free3DPlacement]) -> tuple[object, ...]:
     body_volume = _volume(option.world_size)
-    fill_ratio = body_volume / max(option.containing_space_volume, _EPSILON)
     aligned_faces = _aligned_face_count(option, placements)  # type: ignore[arg-type]
     return (
         -_round(option.support_ratio),
         -aligned_faces,
-        -_round(fill_ratio),
+        _round(body_volume),
         _round(option.origin[2]),
         _round(option.origin[1]),
         _round(option.origin[0]),
@@ -702,8 +723,8 @@ def _state_score(state: _BeamState) -> tuple[object, ...]:
     minimum_support = min((value.support_coverage_ratio for value in state.placements), default=1.0)
     return (
         len(state.remaining_ids),
-        _round(residual_upper_bound),
         len(state.spaces),
+        -_round(residual_upper_bound),
         -_round(minimum_support),
         len(state.points),
         _state_signature(state),

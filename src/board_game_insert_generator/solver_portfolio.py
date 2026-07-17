@@ -1,18 +1,19 @@
-"""Internal P64-H07 multi-solver portfolio.
+"""Bounded multi-solver portfolio with common certification.
 
-The public ``solve_partition_plan`` route remains ``stage_stack`` until H08.
-This orchestrator supplies the already-accepted internal boundary for that next
-lot: monotone effort profiles, fast-path preservation, bounded greedy/beam
-runs, cross-family deduplication and selection among common-certified plans
-only.
+Stage-stack, greedy and beam retain distinct search behaviour. Free-3D geometry
+is admitted only after the bounded continuous closure has removed printable
+residuals and the shared product validator has accepted cavities, top insets,
+support, removal and conservation.
 """
-
 from __future__ import annotations
 
 from copy import deepcopy
 from dataclasses import dataclass
 from typing import Callable
 
+from board_game_insert_generator.free_3d_continuous_closure import (
+    close_free_3d_residual,
+)
 from board_game_insert_generator.free_3d_beam_solver import (
     FREE_3D_BEAM_FAMILY_ID,
     Free3DBeamExecution,
@@ -48,7 +49,7 @@ from board_game_insert_generator.solver_outcome import (
 
 
 PORTFOLIO_AUTO_FAMILY_ID = "portfolio_auto"
-PORTFOLIO_AUTO_VERSION = "bgig.portfolio_auto.v1"
+PORTFOLIO_AUTO_VERSION = "bgig.portfolio_auto.v2"
 EFFORT_QUICK = "quick"
 EFFORT_NORMAL = "normal"
 EFFORT_DEEP = "deep"
@@ -129,19 +130,19 @@ def portfolio_effort_profiles() -> tuple[PortfolioEffortProfile, ...]:
             EFFORT_QUICK,
             "Rapide",
             greedy=(512, 512, 100_000, 256),
-            beam=(8, 2, 1_000, 512, 512, 12, 2, 30_000, 512),
+            beam=(8, 2, 1_000, 512, 512, 12, 1, 30_000, 512),
         ),
         _profile(
             EFFORT_NORMAL,
             "Normal",
             greedy=(2_048, 2_048, 500_000, 512),
-            beam=(24, 6, 5_000, 2_048, 2_048, 24, 3, 250_000, 4_096),
+            beam=(24, 6, 5_000, 2_048, 2_048, 24, 1, 250_000, 4_096),
         ),
         _profile(
             EFFORT_DEEP,
             "Approfondi",
             greedy=(4_096, 4_096, 2_000_000, 1_024),
-            beam=(64, 12, 15_000, 4_096, 4_096, 48, 4, 1_000_000, 20_000),
+            beam=(64, 12, 15_000, 4_096, 4_096, 48, 1, 1_000_000, 20_000),
         ),
     )
 
@@ -317,6 +318,7 @@ def solve_partition_portfolio(
         box_perimeter_xy_mm=problem.box_xy_clearance_mm,
         between_bodies_z_mm=problem.z_clearance_mm,
         budget=profile.greedy_budget,
+        top_inset_zones=problem.top_inset_zones,
     )
     greedy_certified, greedy_rejections = _certify_greedy(problem, greedy)
     if greedy_certified is not None:
@@ -351,6 +353,7 @@ def solve_partition_portfolio(
         between_bodies_z_mm=problem.z_clearance_mm,
         budget=profile.beam_budget,
         cancel_check=cancel_check,
+        top_inset_zones=problem.top_inset_zones,
     )
     beam_candidates, beam_rejections = _certify_beam(problem, beam)
     candidates.extend(_portfolio_candidate(value) for value in beam_candidates)
@@ -409,15 +412,37 @@ def _certify_greedy(
 ) -> tuple[CertifiedFree3DPlan | None, tuple[str, ...]]:
     if execution.candidate is None or execution.geometry_admission is None:
         return None, ()
-    if execution.empty_spaces:
+    closure = close_free_3d_residual(
+        problem.participants,
+        execution.placements,
+        problem.box,
+        problem.storage_height_mm,
+        problem.xy_clearance_mm,
+        box_perimeter_xy_mm=problem.box_xy_clearance_mm,
+        between_bodies_z_mm=problem.z_clearance_mm,
+        budget=execution.budget,
+        top_inset_zones=problem.top_inset_zones,
+    )
+    if closure.empty_spaces:
         return None, ("PRINTABLE_RESIDUAL",)
+    telemetry = dict(execution.telemetry.__dict__)
+    telemetry.update(
+        {
+            "closure_status": closure.status,
+            "closure_iterations": closure.iterations,
+            "closure_candidates_evaluated": closure.candidates_evaluated,
+            "closure_initial_residual_metric": closure.initial_residual_metric,
+            "closure_final_residual_metric": closure.final_residual_metric,
+            "closure_aligned_face_count": closure.aligned_face_count,
+        }
+    )
     return certify_free_3d_plan(
         problem,
         strategy=execution.strategy,
         budget=execution.budget,
-        candidate_id=execution.candidate.candidate_id,
-        placements=execution.placements,
-        search_telemetry=execution.telemetry.__dict__,
+        candidate_id=f"{execution.candidate.candidate_id}:closed",
+        placements=closure.placements,
+        search_telemetry=telemetry,
     )
 
 
@@ -428,17 +453,43 @@ def _certify_beam(
     certified: list[CertifiedFree3DPlan] = []
     rejection_codes: set[str] = set()
     for solution in execution.solutions:
+        closure = close_free_3d_residual(
+            problem.participants,
+            solution.placements,
+            problem.box,
+            problem.storage_height_mm,
+            problem.xy_clearance_mm,
+            box_perimeter_xy_mm=problem.box_xy_clearance_mm,
+            between_bodies_z_mm=problem.z_clearance_mm,
+            budget=execution.budget,
+            top_inset_zones=problem.top_inset_zones,
+        )
+        if closure.empty_spaces:
+            rejection_codes.add("PRINTABLE_RESIDUAL")
+            continue
+        telemetry = dict(execution.telemetry.__dict__)
+        telemetry.update(
+            {
+                "closure_status": closure.status,
+                "closure_iterations": closure.iterations,
+                "closure_candidates_evaluated": closure.candidates_evaluated,
+                "closure_initial_residual_metric": closure.initial_residual_metric,
+                "closure_final_residual_metric": closure.final_residual_metric,
+                "closure_aligned_face_count": closure.aligned_face_count,
+            }
+        )
         result, rejected = certify_free_3d_plan(
             problem,
             strategy=execution.strategy,
             budget=execution.budget,
-            candidate_id=solution.candidate.candidate_id,
-            placements=solution.placements,
-            search_telemetry=execution.telemetry.__dict__,
+            candidate_id=f"{solution.candidate.candidate_id}:closed",
+            placements=closure.placements,
+            search_telemetry=telemetry,
         )
         rejection_codes.update(rejected)
         if result is not None:
             certified.append(result)
+            break
     return tuple(certified), tuple(sorted(rejection_codes))
 
 

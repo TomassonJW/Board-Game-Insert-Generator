@@ -767,11 +767,13 @@ ADR-0069 reporte la finition continue et modulaire après la faisabilité.
 
 Chemin critique avant reprise de P44-V : P64-H04/H05/H06 intégrés (vérité,
 observabilité, contrat/baseline et greedy 3D EP/EMS), P64-H07 beam/portfolio intégré dans 0.1.50,
-P64-H08 intégré dans 0.1.51, puis P64-V2 prête pour validation humaine. P45/P46
-reprennent seulement après P64-V2 et une P44-V positive.
+P64-H08 intégré dans 0.1.51 ; P64-V2 0.1.51 est ensuite un KO contextuel.
+P64-V2H01 0.1.52 devient la gate corrective. P45/P46 reprennent seulement
+après P64-V2H01 et une P44-V positive.
 
-P64-F01/F02 sont planifiées après P46 afin de ne pas gonfler le chemin critique
-V0.2 ; elles précèdent les finitions plus physiques. P64-F03 attend des retours
+Le sous-ensemble de fermeture P64-F01 nécessaire au certificat est avancé
+dans P64-V2H01. Le reste de P64-F01 et P64-F02 est planifié après P46 afin
+de ne pas gonfler le chemin critique V0.2 ; elles précèdent les finitions plus physiques. P64-F03 attend des retours
 d'impression pertinents. P64-X01 exact reste après benchmark, ADR de dépendance
 et GO distinct. Le contrat exécutable est
 `docs/P64_MULTI_SOLVER_PORTFOLIO_PROGRAM.md`.
@@ -779,11 +781,24 @@ et GO distinct. Le contrat exécutable est
 
 Le beam 3D, les efforts monotones, la reconstruction certifiée et le
 portefeuille Auto interne sont intégrés. P64-H08 rend ces contrôles visibles
-dans Fusion 0.1.51 ; P64-V2 est la prochaine gate humaine du chemin critique.
+dans Fusion 0.1.51 ; P64-V2H01 remplace la gate après le KO contextuel 0.1.51.
 
 ### Avancement P64-H08 — package 0.1.51
 
 Méthode, effort et critères mesurés sont exposés comme préférences locales dans
 la palette Fusion. Le diagnostic secondaire rend méthode/effort/famille/temps
-observables, sans changer les dimensions ni matérialiser automatiquement. La
-prochaine étape est P64-V2 ; P44-V, P45 et P46 restent verrouillés.
+observables, sans changer les dimensions ni matérialiser automatiquement. P64-V2 0.1.51 a ensuite reçu un KO contextuel ; la gate corrective est
+P64-V2H01. P44-V, P45 et P46 restent verrouillés.
+
+### Avancement P64-V2H01 — package 0.1.52
+
+Le KO réel révèle que le beam gonflait les enveloppes pendant la faisabilité et
+que le résiduel était rejeté avant une fermeture. La correction place d'abord
+les minima, traite plateau/livret comme contraintes conditionnelles, puis ferme
+les axes Auto/Cible avant le certificat commun.
+
+Le cas anonymisé réel distingue maintenant les méthodes : Étages et piles reste
+sans solution dans son budget ; Placement 3D libre et Auto certifient 9 corps
+sur plusieurs niveaux. L'alignement de faces progresse, mais l'harmonisation
+modulaire P64-F02 reste future. La seule étape ouverte est la gate Fusion
+P64-V2H01 0.1.52.

@@ -1,7 +1,7 @@
 # P64 — Programme portefeuille multi-solveurs et finition volumique
 
-Statut : architecture acceptée le 2026-07-17 ; P64-H08 est intégrée dans 0.1.51.
-Prochaine action : gate humaine `P64-V2`.
+Statut : architecture acceptée le 2026-07-17 ; P64-V2 0.1.51 est un KO contextuel et P64-V2H01 est implémentée dans 0.1.52.
+Prochaine action : gate humaine P64-V2H01.
 
 Capability principale : `C-SOLVER`. Capabilities associées : `C-LAYOUT`,
 `C-GRID-3D`, `C-STACKING`, `C-USABILITY`, `C-QUALITY`.
@@ -229,7 +229,8 @@ P64-A01 documentation/ADR (ce document)
   -> P64-H06 placement 3D libre greedy EP/EMS
   -> P64-H07 beam robuste + portefeuille Auto
   -> P64-H08 réglages Fusion + diagnostic secondaire
-  -> P64-V2 gate humaine solveur
+  -> P64-V2 KO contextuel
+  -> P64-V2H01 fermeture corrective + nouvelle gate humaine
   -> reprise P44-V
   -> P45/P46 selon leurs contrats existants
   -> P64-F01/F02 finitions continues et modulaires
@@ -322,9 +323,21 @@ hors chemin critique.
 - Sortie : préparer `P64-V2`, puis ne demander à Thomas que les observations
   Fusion restantes.
 
+### P64-V2H01 — Fermeture corrective avant certificat
+
+- Statut : implemented, automated-validated dans 0.1.52 ; gate Fusion requise.
+- Contrat : docs/P64_V2H01_CONTINUOUS_CLOSURE_CONTRACT.md.
+- Déclencheur : P64-V2 0.1.51 reproduit un cas où la faisabilité free-3D
+  existait mais aucun candidat ne survivait au résiduel et aux réservations
+  supérieures.
+- Livrables : faisabilité sur minima, beam multi-états compact, réservations
+  supérieures conditionnelles, fermeture continue bornée avant certificat et
+  fixture anonymisée du cas réel.
+- Limite : alignement de faces seulement ; aucune harmonisation modulaire P64-F02.
+
 ### P64-F01 — Fermeture continue par graphe d'adjacence
 
-- Statut : `planned-after-P46`.
+- Statut : remaining-finishing-planned-after-P46 ; le sous-ensemble de correction nécessaire au certificat est intégré par P64-V2H01.
 - Agent conseillé : Luna/frontier.
 - Objectif : redistribuer le résiduel sans changer la topologie ni créer de
   corps, puis revalider.

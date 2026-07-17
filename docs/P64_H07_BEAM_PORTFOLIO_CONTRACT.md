@@ -99,3 +99,21 @@ mais ne constitue ni seuil produit ni preuve de supériorité du beam.
 P64-H08 est la prochaine mission : exposer méthode, effort et diagnostic
 secondaire en préservant focus, autosave et matérialisation explicite, puis
 préparer P64-V2. `print-validated: false`.
+
+## Amendement P64-V2H01 — beam v2 dans 0.1.52
+
+Le retour P64-V2 invalide la stratégie de gonflement final pendant le beam pour
+les cas denses : elle privilégie trop tôt le remplissage d'un EMS et élague des
+placements minimaux qui pourraient être fermés ensuite.
+
+Le comportement H07 v1 reste historique. Le runtime v2 :
+
+- cherche plusieurs placements complets sur enveloppes minimales ;
+- évalue les réservations supérieures comme contraintes conditionnelles ;
+- transmet les géométries faisables à une fermeture continue bornée ;
+- ne reconstruit et ne classe qu'après fermeture sans résiduel et certificat
+  produit commun.
+
+Cette modification ne transforme pas un échec de fermeture en impossibilité
+prouvée. Le détail normatif est dans
+docs/P64_V2H01_CONTINUOUS_CLOSURE_CONTRACT.md.

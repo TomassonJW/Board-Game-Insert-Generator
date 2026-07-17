@@ -29,39 +29,44 @@ KO contextuel tant que le solveur n'a pas passé P64-V2.
   placement 3D libre, beam et portefeuille Auto sont introduits derrière un
   contrat et un validateur communs.
 
+- P64-V2 0.1.51 est un KO contextuel sur le cas dense réel.
+- P64-V2H01 corrige ce cas dans 0.1.52 par faisabilité minimale, top insets
+  conditionnels et fermeture continue avant certificat.
 ## Prochaine action recommandée
 
-### P64-V2 — Gate humaine portefeuille multi-solveurs
+### P64-V2H01 — Gate Fusion de la fermeture continue corrective
 
-Statut : `ready-for-human-fusion-check`. P64-H08 est intégré dans le package
-0.1.51 et automatisé : le sélecteur local expose Auto intelligent, Étages et
-piles, Placement 3D libre et Rapide/Normal/Approfondi ; seuls les plans complets
-certifiés restent matérialisables. Les retours silencieux préservent le DOM
-éditable et l'aperçu adaptatif reste borné.
+Statut : ready-for-human-fusion-check. P64-V2 0.1.51 est un KO contextuel : le
+cas dense laissé dans Fusion restait sans solution malgré un volume suffisant.
 
-Préparation déjà disponible :
-`scripts/fusion/prepare_p64_v2_solver_portfolio_test.ps1`.
+Le package 0.1.52 sépare désormais la faisabilité sur minima de la fermeture
+continue, traite les réservations plateau/livret comme contraintes
+conditionnelles et ne certifie qu'après fermeture et validation communes. Sur
+la fixture anonymisée du cas réel, Étages et piles reste sans solution dans son
+budget tandis que Placement 3D libre et Auto trouvent 9 corps sur plusieurs
+niveaux.
 
-Objectif humain : vérifier dans Fusion les méthodes et efforts, la vérité du
-résultat/d'un budget épuisé, le diagnostic secondaire, la stabilité
-focus/sélection pendant une saisie rapide, et l'absence de scène automatique.
-Cette gate ne valide ni valeur physique ni impression.
+Préparation : scripts/fusion/prepare_p64_v2h01_continuous_closure_test.ps1.
 
+Objectif humain : vérifier le projet réel inchangé, la différence effective
+entre les méthodes, la solution certifiée free-3D/Auto, les coupes supérieures
+valides, l'alignement visuel amélioré et l'absence de scène automatique.
+
+Cette gate ne revendique pas encore l'harmonisation modulaire P64-F02 et ne
+valide ni valeur physique ni impression.
 ## Lots suivants, non ouverts
 
-1. P64-V2 : gate humaine, puis reprise de P44-V.
+1. P64-V2H01 : gate humaine corrective, puis reprise de P44-V.
 2. P45/P46 selon leurs contrats actuels.
-3. P64-F01/F02 après P46 : fermeture continue puis harmonisation modulaire.
+3. P64-F01 restant / P64-F02 après P46 : optimisation de finition puis harmonisation modulaire.
 4. P64-F03 après retours physiques ; P64-X01 exact seulement sous nouvelle gate.
 
 ## Séquence verrouillée
 
-P64-V2 est la seule action `ready-for-human-fusion-check`. P64-H08 est intégré et ne doit pas être redémarré. Aucune
-preuve P64-H02/H03 ne doit être revendiquée comme preuve Fusion.
-P44-V, P45 et P46 attendent P64-V2 puis la reprise positive de P44-V.
-P47-P50 restent bloqués jusqu'à P46 et P69
-jusqu'à P50. P68 peut recueillir des faits réels sans recalibrer les defaults.
-
+P64-V2H01 est la seule action ready-for-human-fusion-check. P64-V2 0.1.51 ne
+reçoit aucune preuve Fusion OK. P44-V, P45 et P46 attendent cette gate puis la
+reprise positive de P44-V. P47-P50 restent bloqués jusqu'à P46 et P69 jusqu'à
+P50. P68 peut recueillir des faits réels sans recalibrer les defaults.
 ## Fin de chaque mission
 
 Mettre à jour le pilotage, relire le diff, exécuter les preuves prévues, committer

@@ -88,3 +88,26 @@ préconditions physiques. Aucun corps n'est généré automatiquement.
 - P64-F02 après P64-F01 : harmonisation modulaire adaptative.
 - P64-F03 après retours physiques suffisants : résiduel utile et cales
   explicites.
+
+## Amendement P64-V2H01 — 2026-07-17
+
+Le KO contextuel de P64-V2 montre que la séparation initiale était placée un
+cran trop tard : le certificat produit exige un résiduel imprimable nul, donc
+une géométrie minimale faisable ne peut pas être certifiée avant une fermeture
+bornée.
+
+La séquence normative devient :
+
+faisabilité géométrique -> fermeture continue minimale -> certificat produit.
+
+Le sous-ensemble de P64-F01 nécessaire à cette chaîne est avancé dans
+P64-V2H01. Il reste strictement topologique, sans corps ajouté, sans axe Fixe
+modifié et avec rejet honnête si la fermeture échoue. Le reste de P64-F01
+(optimisation de plusieurs fermetures et objectifs de finition) demeure
+planifié. P64-F02 reste entièrement distinct et futur : aucune modularité
+globale ou locale n'est revendiquée par le package 0.1.52.
+
+Les réservations supérieures sont en outre des contraintes conditionnelles, pas
+des obstacles pleins : un corps reste sous le plan d'appui ou atteint le sommet
+avec une coupe et des fonds valides. Cette précision évite à la fois les
+intersections invalides et l'exclusion abusive de solutions réelles.

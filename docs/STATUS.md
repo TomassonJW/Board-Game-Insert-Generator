@@ -8,7 +8,7 @@ Statut produit : **MVP V0.1 Fusion-only accepte ; validation d impression non ac
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P64-H08 est intégré dans le package 0.1.51 ; P64-V2 est la seule action `ready-for-human-fusion-check`. P44-V reste en KO contextuel et P45 reste bloqué.
+Phase active : P64-V2 0.1.51 est un KO contextuel ; P64-V2H01 est automatisée dans le package 0.1.52 et constitue la seule gate humaine prête. P44-V reste en KO contextuel et P45 reste bloqué.
 
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
@@ -2328,8 +2328,9 @@ greedy 3D EP/EMS, un beam robuste, un portefeuille Auto et un mode exact futur.
 ADR-0069 sépare faisabilité et finition : fermeture continue puis harmonisation
 modulaire, avec fallback obligatoire vers la solution certifiée.
 
-Le programme P64-H05 à H08 devient le chemin critique avant P64-V2 et reprise de
-P44-V. P64-H05/H06/H07/H08 sont intégrés ; P64-V2 est la seule action `ready-for-human-fusion-check`. P45/P46 et les lots ultérieurs ne
+Le programme P64-H05 à H08 constituait le chemin critique avant P64-V2 et reprise
+de P44-V. P64-H05/H06/H07/H08 sont intégrés ; P64-V2 0.1.51 a ensuite reçu
+un KO contextuel et P64-V2H01 porte la gate corrective. P45/P46 et les lots ultérieurs ne
 sont pas ouverts. Aucun schéma, default, dimension physique, tolérance, cavité,
 géométrie, CAD IR ou scène ne change ; `print-validated: false`.
 
@@ -2400,6 +2401,38 @@ résiduelles héritées restent visibles, non matérialisables et diagnostiquée
 La réponse silencieuse des préférences ne reconstruit pas le DOM éditable ; elle
 relance un aperçu adaptatif borné en conservant focus et sélection.
 
-P64-V2 est préparée par `scripts/fusion/prepare_p64_v2_solver_portfolio_test.ps1`
-mais aucune preuve Fusion ou impression nouvelle n'est revendiquée.
+P64-V2 a été préparée par `scripts/fusion/prepare_p64_v2_solver_portfolio_test.ps1`
+puis a reçu un KO contextuel sur le cas dense réel ; aucune preuve Fusion ou
+impression nouvelle n'est revendiquée.
 `print-validated: false`.
+
+## P64-V2H01 — Fermeture continue corrective avant certificat (2026-07-17)
+
+Le cas Fusion réel de P64-V2 a été reproduit sur la sauvegarde locale : boîte
+250 x 180 x 70 mm, 9 conteneurs, 26 éléments et deux réservations supérieures.
+Dans la 0.1.51, Étages et piles ne trouvait aucun arrangement ; le greedy
+produisait une géométrie non certifiée avec résiduel ; le beam élaguait avant
+placement complet. Les familles étaient distinctes dans le code, mais aucune
+ne produisait le résultat utilisateur attendu.
+
+Le package 0.1.52 sépare désormais placement des minima et fermeture continue.
+Le beam conserve plusieurs états compacts, les zones plateau/livret sont
+conditionnelles, puis seuls les axes Auto/Cible absorbent le résiduel avant
+certificat. Aucun corps n'est créé et aucun axe Fixe, asset, cavité, paroi,
+fond, jeu ou défaut physique n'est recalibré.
+
+La fixture anonymisée du cas réel établit que :
+
+- Étages et piles reste honnêtement sans solution dans son budget ;
+- Placement 3D libre et Auto trouvent 9 corps certifiés sur plusieurs niveaux ;
+- le résiduel imprimable final est nul ;
+- les coupes supérieures, cavités, supports et retraits passent le validateur
+  commun ;
+- la fermeture expose statut, itérations, candidats et faces alignées.
+
+Statut : implemented, automated-validated, package 0.1.52,
+ready-for-human-fusion-check. Préparation :
+scripts/fusion/prepare_p64_v2h01_continuous_closure_test.ps1.
+
+La régularité visuelle progresse par alignement de faces, mais la modularité
+adaptative reste P64-F02. fusion-validated: false ; print-validated: false.

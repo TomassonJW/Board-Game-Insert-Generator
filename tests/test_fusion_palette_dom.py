@@ -505,6 +505,7 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertIn("lib\\board_game_insert_generator", helpers)
         self.assertIn("top_inset_reservation.py", helpers)
         self.assertIn("volumetric_stage_solver.py", helpers)
+        self.assertIn("free_3d_continuous_closure.py", helpers)
         self.assertIn("Assert-BgigPaletteProjectRuntime", helpers)
         for marker in ("$paletteMarkers", "workspace-toolbar", "container-primary-grid", "historic-complements", "[char]0x00EE", "[char]0x00E9", "[char]0x00E7"):
             self.assertIn(marker, helpers)
@@ -554,8 +555,8 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertNotIn('<option value="accessible">', self.markup)
         self.assertNotIn('<option value="print_simple">', self.markup)
         self.assertNotIn('<option value="material_reduced">', self.markup)
-        script = (ROOT / "scripts" / "fusion" / "prepare_p64_v2_solver_portfolio_test.ps1").read_text(encoding="utf-8")
-        for marker in ("0.1.51", "solver-method", "solver-effort", "save_solver_settings", "P64-V2 Fusion OK"):
+        script = (ROOT / "scripts" / "fusion" / "prepare_p64_v2h01_continuous_closure_test.ps1").read_text(encoding="utf-8")
+        for marker in ("0.1.52", "solver-method", "solver-effort", "save_solver_settings", "P64-V2H01 Fusion OK"):
             self.assertIn(marker, script)
 
 if __name__ == "__main__":

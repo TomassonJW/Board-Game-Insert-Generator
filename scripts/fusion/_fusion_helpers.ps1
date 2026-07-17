@@ -148,6 +148,7 @@ function Assert-BgigPaletteProjectRuntime {
         (Join-Path $AddinPath "lib\board_game_insert_generator\solver_contract.py"),
         (Join-Path $AddinPath "lib\board_game_insert_generator\solver_portfolio.py"),
         (Join-Path $AddinPath "lib\board_game_insert_generator\free_3d_greedy_solver.py"),
+        (Join-Path $AddinPath "lib\board_game_insert_generator\free_3d_continuous_closure.py"),
         (Join-Path $AddinPath "lib\board_game_insert_generator\free_3d_beam_solver.py"),
         (Join-Path $AddinPath "lib\board_game_insert_generator\free_3d_plan_adapter.py"),
         (Join-Path $AddinPath "lib\board_game_insert_generator\volumetric_stage_solver.py"),

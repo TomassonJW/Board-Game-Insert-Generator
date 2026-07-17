@@ -2416,14 +2416,26 @@ P44-M007 est ready-for-explicit-go.
 
 ### P64-V2 — Gate humaine portefeuille multi-solveurs
 
-- Statut : ready-for-human-fusion-check, package 0.1.51 préparé.
-- Préparation : `scripts/fusion/prepare_p64_v2_solver_portfolio_test.ps1`.
-- Sortie : si positive, reprendre P44-V ; P45 reste bloqué jusqu'à P44-V.
+- Statut : contextual-KO sur le package 0.1.51.
+- Observation : méthodes visibles, mais le cas dense réel reste faussement sans
+  solution et la répartition n'est pas suffisamment harmonisée.
+- Préparation historique : scripts/fusion/prepare_p64_v2_solver_portfolio_test.ps1.
+- Sortie : correction P64-V2H01 obligatoire avant reprise de P44-V.
 - Limites : aucune validation physique ou d'impression.
+
+### P64-V2H01 — Fermeture continue corrective et top insets conditionnels
+
+- Statut : implemented, automated-validated dans 0.1.52 ; ready-for-human-fusion-check.
+- Contrat : docs/P64_V2H01_CONTINUOUS_CLOSURE_CONTRACT.md.
+- Livrable : beam sur minima, contraintes plateau/livret conditionnelles,
+  fermeture continue Auto/Cible avant certificat et fixture anonymisée du KO.
+- Préparation : scripts/fusion/prepare_p64_v2h01_continuous_closure_test.ps1.
+- Gate : P64-V2H01 Fusion OK 0.1.52 - commit <sha>.
+- Limite : amélioration d'alignement, pas harmonisation modulaire P64-F02.
 
 ### P64-F01 — Fermeture continue par graphe d'adjacence
 
-- Statut : planned-after-P46. Agent : Luna/frontier.
+- Statut : remaining-finishing-planned-after-P46 ; sous-ensemble correctif intégré par P64-V2H01. Agent : Luna/frontier.
 - Objectif : redistribuer le résiduel sans changer la topologie, les cavités
   ou le nombre de corps.
 - Gate : revalidation commune et fallback exact vers la solution de base.
