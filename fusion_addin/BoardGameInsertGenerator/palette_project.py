@@ -57,7 +57,12 @@ def handle_palette_request(
         _ensure_engine_available(Path(addin_dir), None if project_root is None else Path(project_root))
         return _dispatch(action, request, Path(addin_dir), request_id)
     except Exception as exc:
-        return _response(request_id, "invalid", errors=[_french_error(exc)])
+        return _response(
+            request_id,
+            "invalid",
+            errors=[_french_error(exc)],
+            solver_result=_invalid_solver_result(request_id, _request_revision(raw_request)),
+        )
 
 
 def load_current_project(addin_dir: str | Path, project_root: str | Path | None = None) -> dict[str, object]:
@@ -287,7 +292,15 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         write_personal_presets(preset_path, imported)
         personal_presets = imported
 
-    partition = solve_partition_plan(project) if action in {"solve_project", "materialize_project", "regenerate_project"} else None
+    partition = (
+        solve_partition_plan(
+            project,
+            request_id=request_id,
+            request_revision=_request_revision(request),
+        )
+        if action in {"solve_project", "materialize_project", "regenerate_project"}
+        else None
+    )
     container_sizing = build_container_sizing_view(project, envelopes, partition)
     result_view = (
         build_partition_result_view(partition)
@@ -361,6 +374,7 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         flat_stack=flat_stack,
         partition=partition,
         result_view=result_view,
+        solver_result=_partition_solver_result(partition),
         cad_build=cad_build,
         saved=saved,
         recovery_saved=recovery_saved,
@@ -391,6 +405,7 @@ def _response(
     export_path: str = "",
     document: dict[str, object] | None = None,
     recovery_saved: bool = False,
+    solver_result: dict[str, object] | None = None,
 ) -> dict[str, object]:
     return {
         "schema": PALETTE_RESPONSE_SCHEMA,
@@ -417,6 +432,7 @@ def _response(
         "flat_stack": deepcopy(flat_stack),
         "partition": deepcopy(partition),
         "result_view": deepcopy(result_view),
+        "solver_result": deepcopy(solver_result),
         "cad_build": deepcopy(cad_build),
         "errors": list(errors or []),
         "warnings": list(warnings or []),
@@ -426,6 +442,34 @@ def _response(
         "document": deepcopy(document),
         "recovery_saved": recovery_saved,
     }
+
+
+
+def _request_revision(raw_request: object) -> int | None:
+    if not isinstance(raw_request, dict):
+        return None
+    value = raw_request.get("source_revision")
+    return value if isinstance(value, int) and not isinstance(value, bool) and value >= 0 else None
+
+
+def _partition_solver_result(partition: dict[str, object] | None) -> dict[str, object] | None:
+    if not isinstance(partition, dict):
+        return None
+    solver = partition.get("solver")
+    if not isinstance(solver, dict):
+        return None
+    result = solver.get("result")
+    if not isinstance(result, dict):
+        return None
+    payload = deepcopy(result)
+    payload["telemetry"] = deepcopy(solver.get("telemetry"))
+    return payload
+
+
+def _invalid_solver_result(request_id: str, request_revision: int | None) -> dict[str, object]:
+    from board_game_insert_generator.solver_outcome import invalid_input_result
+
+    return invalid_input_result(request_id, request_revision)
 
 
 def _project_digest(project: dict[str, object] | None) -> str:

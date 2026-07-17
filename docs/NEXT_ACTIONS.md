@@ -31,39 +31,28 @@ KO contextuel tant que le solveur n'a pas passé P64-V2.
 
 ## Prochaine action recommandée
 
-### P64-H04 — Résultats honnêtes, observabilité et corpus de régression
+### P64-H05 — Contrat commun et baseline `Étages et piles`
 
-Statut : `ready`. Contrat :
-`docs/P64_H04_OBSERVABILITY_AND_RESULT_TRUTH_CONTRACT.md`.
+Statut : `ready`. P64-H04 est intégré : les sorties du solveur sont désormais
+distinguées entre solution, budget, preuve, projet invalide et réponse obsolète.
 
-Résultat attendu :
-
-- distinguer `Solution trouvée`, `Aucune solution trouvée dans le budget`,
-  `Impossible prouvé`, `Projet à corriger` et réponse obsolète/annulée ;
-- exposer famille, budget, temps, candidats, états, motifs de coupe et motif
-  d'arrêt sans voler le focus ;
-- anonymiser et geler les cas réels P64-H01/H02/H03 dans la suite ;
-- conserver exactement les placements actuels : aucun nouvel algorithme, seed,
-  budget, score, schéma, default, tolérance, cavité ou comportement de scène.
-
-Agent conseillé : Terra avec revue senior du contrat de résultat. Aucune gate
-Fusion autonome n'est ouverte par défaut ; les libellés seront observés dans
-P64-V2.
+Objectif : introduire la frontière interne commune (candidats, budgets,
+certificats et résultats) et adapter à parité le solveur actuel `Étages et piles`,
+sans modifier le schéma projet, les valeurs physiques ni les réservations.
 
 ## Lots suivants, non ouverts
 
-1. P64-H05 : contrat commun et baseline `Étages et piles`.
-2. P64-H06 : placement 3D libre greedy EP/EMS.
-3. P64-H07 : beam robuste, efforts et portefeuille `Auto intelligent`.
-4. P64-H08 : réglages Fusion et diagnostic secondaire.
-5. P64-V2 : gate humaine, puis reprise de P44-V.
-6. P45/P46 selon leurs contrats actuels.
-7. P64-F01/F02 après P46 : fermeture continue puis harmonisation modulaire.
-8. P64-F03 après retours physiques ; P64-X01 exact seulement sous nouvelle gate.
+1. P64-H06 : placement 3D libre greedy EP/EMS.
+2. P64-H07 : beam robuste, efforts et portefeuille `Auto intelligent`.
+3. P64-H08 : réglages Fusion et diagnostic secondaire.
+4. P64-V2 : gate humaine, puis reprise de P44-V.
+5. P45/P46 selon leurs contrats actuels.
+6. P64-F01/F02 après P46 : fermeture continue puis harmonisation modulaire.
+7. P64-F03 après retours physiques ; P64-X01 exact seulement sous nouvelle gate.
 
 ## Séquence verrouillée
 
-P64-H04 est la seule mission `ready`. P64-H05 à H08 s'ouvrent une par une. Aucune
+P64-H05 est la seule mission `ready`. P64-H06 à H08 s'ouvrent une par une. Aucune
 preuve P64-H02/H03 ne doit être revendiquée. P44-V, P45 et P46 attendent P64-V2
 puis la reprise positive de P44-V. P47-P50 restent bloqués jusqu'à P46 et P69
 jusqu'à P50. P68 peut recueillir des faits réels sans recalibrer les defaults.

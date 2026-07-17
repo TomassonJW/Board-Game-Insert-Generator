@@ -2371,7 +2371,7 @@ P44-M007 est ready-for-explicit-go.
 
 ### P64-H04 — Résultats honnêtes et observabilité
 
-- Statut : ready. Agent : Terra avec revue senior.
+- Statut : terminé et intégré. Agent : Terra avec revue senior.
 - Contrat : `docs/P64_H04_OBSERVABILITY_AND_RESULT_TRUTH_CONTRACT.md`.
 - Objectif : statuts honnêtes, télémétrie, fixtures anonymisées ; placements et
   budgets de recherche inchangés.
@@ -2379,7 +2379,7 @@ P44-M007 est ready-for-explicit-go.
 
 ### P64-H05 — Contrat commun et baseline Étages et piles
 
-- Statut : blocked-by-P64-H04. Agent : Terra, revue Luna/senior.
+- Statut : ready. Agent : Terra, revue Luna/senior.
 - Livrable : stratégies/candidats/certificats/budgets communs et parité du
   solveur actuel.
 

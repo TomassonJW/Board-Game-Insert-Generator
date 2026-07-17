@@ -764,7 +764,7 @@ P64-H03 interdisent de continuer par simple ajout de seeds. ADR-0068 introduit
 un contrat commun, un greedy 3D EP/EMS, un beam robuste et un portefeuille Auto.
 ADR-0069 reporte la finition continue et modulaire après la faisabilité.
 
-Chemin critique avant reprise de P44-V : P64-H04 vérité/observabilité, P64-H05
+Chemin critique avant reprise de P44-V : P64-H04 intégré (vérité/observabilité), P64-H05
 contrat/baseline, P64-H06 greedy 3D, P64-H07 beam/portfolio, P64-H08 UI, puis
 P64-V2. P45/P46 reprennent seulement après P64-V2 et une P44-V positive.
 

@@ -56,17 +56,20 @@ def build_partition_cad(raw_project: object, *, partition: object | None = None)
     project = normalization.project
     expected_plan = solve_partition_plan(project)
     plan = expected_plan if partition is None else _mapping(partition, "partition")
-    if partition is not None and plan != expected_plan:
+    if partition is not None and _plan_for_semantic_comparison(plan) != _plan_for_semantic_comparison(expected_plan):
         raise PartitionCadBuildError("Le plan P64 fourni est obsolete ou ne correspond pas au projet courant.")
     if plan.get("schema_version") != PARTITION_PLAN_SCHEMA_V1:
         raise PartitionCadBuildError("P59 exige un plan bgig.partition_plan.v1.")
     summary = _mapping(plan.get("summary"), "partition.summary")
+    semantic_summary = deepcopy(summary)
+    semantic_summary.pop("result_status", None)
+    semantic_summary.pop("result_label", None)
     base = {
         "schema_version": PARTITION_CAD_BUILD_SCHEMA_V1,
         "source": {"source_schema": normalization.source_schema, "migrated": normalization.migrated},
         "project_name": project["project_name"],
         "source_plan_digest": str(plan.get("plan_digest", "")),
-        "partition": plan,
+        "partition": _plan_for_semantic_comparison(plan),
     }
     if summary.get("status") != "constructed" or not bool(summary.get("materializable", False)):
         partial = summary.get("status") == "proposal_with_residuals"
@@ -146,7 +149,7 @@ def build_partition_cad(raw_project: object, *, partition: object | None = None)
             box_fill_plan={
                 "schema_version": plan["schema_version"],
                 "plan_digest": plan.get("plan_digest"),
-                "summary": summary,
+                "summary": semantic_summary,
                 "support": plan.get("support"),
                 "stages": plan.get("stages"),
                 "stage_support": plan.get("stage_support"),
@@ -431,6 +434,21 @@ def _top_inset_operation(body_id: str, cut: dict[str, object]) -> CadOperation:
 
 def _parameter(identifier: str, value: float, category: str, description: str) -> CadParameter:
     return CadParameter(id=identifier, value=_round(value), unit=CAD_IR_UNITS, category=category, description=description)
+
+
+def _plan_for_semantic_comparison(plan: dict[str, object]) -> dict[str, object]:
+    """Ignore additive H04 observability when guarding a materializable plan."""
+
+    canonical = deepcopy(plan)
+    summary = canonical.get("summary")
+    if isinstance(summary, dict):
+        summary.pop("result_status", None)
+        summary.pop("result_label", None)
+    solver = canonical.get("solver")
+    if isinstance(solver, dict):
+        solver.pop("result", None)
+        solver.pop("telemetry", None)
+    return canonical
 
 
 def _mapping(value: object, field: str) -> dict[str, Any]:

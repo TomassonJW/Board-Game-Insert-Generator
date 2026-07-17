@@ -1,6 +1,6 @@
 # P64-H04 — Résultats honnêtes, observabilité et corpus de régression
 
-Statut : `ready`. Mission suivante unique après P64-A01.
+Statut : `terminé et intégré` le 2026-07-17 ; P64-H05 devient la mission suivante unique.
 
 Agent conseillé : Terra. Une revue senior est requise sur les contrats publics
 de résultat ; aucun travail algorithmique Luna n'est nécessaire dans ce lot.

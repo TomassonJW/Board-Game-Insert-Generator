@@ -21,8 +21,8 @@ preuves archivées.
 - P64-H03 reste préservé hors `main`, sans preuve Fusion et sans intégration.
 - P64-A01 accepte la trajectoire multi-solveurs des ADR-0068/0069 ; aucun runtime
   n'est modifié par cette mission documentaire.
-- Prochaine action unique : `P64-H04`, résultats honnêtes, observabilité et
-  corpus de régression. P44-V et P45 restent bloqués.
+- Prochaine action unique : `P64-H05`, contrat commun et baseline `Étages et piles`.
+  P44-V et P45 restent bloqués.
 
 ## Vue de séquence
 
@@ -35,8 +35,8 @@ preuves archivées.
 | KO contextuel | P64-H02V | L'alignement UX est accepté contextuellement, mais un nouveau faux impossible empêche toute preuve globale 0.1.44. |
 | Essai local préservé | P64-H03 | Recherche dirigée non commitée ; nouveau KO contextuel, aucune validation ni intégration. |
 | Terminé | P64-A01 | Contrat programme et ADR multi-solveurs/finition acceptés. |
-| Prêt | P64-H04 | Vérité des statuts, télémétrie et fixtures ; aucun nouvel algorithme. |
-| Bloqué | P64-H05 à H08 / P64-V2 | Contrat commun, 3D libre, portfolio, UI puis gate, dans cet ordre. |
+| Terminé | P64-H04 | Résultats honnêtes, télémétrie versionnée et corpus automatisé ; aucune nouvelle stratégie. |
+| Prêt | P64-H05 | Contrat commun et baseline `Étages et piles`. |
 | KO contextuel | P44-V | Reprendre seulement après P64-V2 ; P45 reste bloqué. |
 | Bloqué | P45 à P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |

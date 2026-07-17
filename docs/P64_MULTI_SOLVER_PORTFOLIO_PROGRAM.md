@@ -1,7 +1,7 @@
 # P64 — Programme portefeuille multi-solveurs et finition volumique
 
 Statut : architecture et trajectoire acceptées le 2026-07-17 ; aucun runtime
-modifié par ce document. Prochaine mission exécutable : `P64-H04`.
+Prochaine mission exécutable : `P64-H05`.
 
 Capability principale : `C-SOLVER`. Capabilities associées : `C-LAYOUT`,
 `C-GRID-3D`, `C-STACKING`, `C-USABILITY`, `C-QUALITY`.
@@ -248,7 +248,7 @@ hors chemin critique.
 
 ### P64-H04 — Résultats honnêtes, observabilité et corpus de régression
 
-- Statut : `ready`.
+- Statut : `terminé et intégré` le 2026-07-17.
 - Agent conseillé : Terra ; revue de contrat senior requise.
 - Dépendances : P64-A01 accepté ; état P64-H03 local préservé en lecture seule.
 - Objectif : rendre l'échec diagnosable avant tout nouvel algorithme.
@@ -267,7 +267,7 @@ hors chemin critique.
 
 ### P64-H05 — Contrat commun et baseline Étages et piles
 
-- Statut : `blocked-by-P64-H04`.
+- Statut : `ready`.
 - Agent conseillé : Terra avec revue Luna/senior.
 - Objectif : introduire l'interface stratégie/candidat/certificat et encapsuler
   le solveur actuel sans changer ses placements de référence.

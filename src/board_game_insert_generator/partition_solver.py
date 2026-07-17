@@ -10,10 +10,12 @@ from __future__ import annotations
 import hashlib
 import json
 from copy import deepcopy
+from time import perf_counter
 from typing import Any
 
 from board_game_insert_generator.expandable_envelope import derive_expandable_envelope_contract
 from board_game_insert_generator.project_v1 import normalize_project_draft
+from board_game_insert_generator.solver_outcome import attach_solver_outcome
 from board_game_insert_generator.top_inset_reservation import (
     apply_top_inset_reservations,
     compatibility_flat_stack_payload,
@@ -32,14 +34,20 @@ _EPSILON = 0.0001
 _DIVERSIFIED_RETRY_CODES = {"NO_STAGE_COMPOSITION_FITS", "NO_VALIDATED_STAGE_PROPOSAL"}
 
 
-def solve_partition_plan(raw_project: object) -> dict[str, object]:
+def solve_partition_plan(
+    raw_project: object,
+    *,
+    request_id: str | None = None,
+    request_revision: int | None = None,
+) -> dict[str, object]:
     """Return a bounded canonical proposal, then diversify only after a false dead end."""
 
+    started_at = perf_counter()
     attempts = [_solve_partition_plan_once(raw_project)]
     initial = attempts[0]
     diagnostic_codes = {str(item["code"]) for item in _mappings(initial["diagnostics"])}
     if not diagnostic_codes.intersection(_DIVERSIFIED_RETRY_CODES):
-        return initial
+        return _attach_outcome(initial, request_id, request_revision, started_at)
 
     partial: dict[str, object] | None = None
     chosen: dict[str, object] | None = None
@@ -53,7 +61,12 @@ def solve_partition_plan(raw_project: object) -> dict[str, object]:
         if status == SOLUTION_WITH_RESIDUALS and partial is None:
             partial = proposal
 
-    return _finalize_portfolio_search(chosen or partial or initial, attempts)
+    return _attach_outcome(
+        _finalize_portfolio_search(chosen or partial or initial, attempts),
+        request_id,
+        request_revision,
+        started_at,
+    )
 
 
 def _solve_partition_plan_once(
@@ -92,6 +105,7 @@ def _solve_partition_plan_once(
         )
         for item in _mappings(envelope_report["blockers"])
     )
+    diagnostics.extend(_minimum_envelope_box_proofs(envelope_report, box, storage_height))
     containers = [item for item in _mappings(envelope_report["containers"]) if item["status"] == "ready"]
     requested_group_count = len(_values(project["container_groups"]))
     if not requested_group_count:
@@ -664,8 +678,39 @@ def _top_inset_payload(value: dict[str, object]) -> dict[str, object]:
     )
     return {key: deepcopy(value[key]) for key in keys if key in value}
 
-def _diagnostic(code: str, message: str, action: str, reference_id: str = "") -> dict[str, object]:
-    return {"code": code, "severity": "blocker", "message": message, "action": action, "reference_id": reference_id}
+def _minimum_envelope_box_proofs(
+    envelope_report: dict[str, object],
+    box: dict[str, float],
+    storage_height: float,
+) -> list[dict[str, object]]:
+    """Expose only explicit necessary bounds as formal impossibility proofs."""
+
+    limits = {"x": box["x"], "y": box["y"], "z": storage_height}
+    proofs: list[dict[str, object]] = []
+    for container in _mappings(envelope_report["containers"]):
+        minimum = container.get("minimum_outer_envelope_mm")
+        if not isinstance(minimum, dict):
+            continue
+        exceeded = [axis for axis in ("x", "y", "z") if float(_mapping(minimum)[axis]) > limits[axis] + _EPSILON]
+        if not exceeded:
+            continue
+        dimensions = ", ".join(f"{axis.upper()} ({float(_mapping(minimum)[axis])} mm > {limits[axis]} mm)" for axis in exceeded)
+        proofs.append(_diagnostic("MINIMUM_ENVELOPE_EXCEEDS_BOX", f"Le minimum du conteneur '{container['container_name']}' dépasse la boîte utile sur {dimensions}.", "Réduis ce contenu, sa quantité ou ses dimensions fixes avant de recalculer.", str(container["container_group_id"]), proof_code="minimum_outer_envelope_exceeds_box_limit_v1"))
+    return proofs
+
+
+def _attach_outcome(plan: dict[str, object], request_id: str | None, request_revision: int | None, started_at: float) -> dict[str, object]:
+    attach_solver_outcome(plan, request_id=request_id, request_revision=request_revision, elapsed_ms=(perf_counter() - started_at) * 1000.0)
+    plan.pop("plan_digest", None)
+    plan["plan_digest"] = _digest(plan)
+    return plan
+
+
+def _diagnostic(code: str, message: str, action: str, reference_id: str = "", *, proof_code: str | None = None) -> dict[str, object]:
+    diagnostic: dict[str, object] = {"code": code, "severity": "blocker", "message": message, "action": action, "reference_id": reference_id}
+    if proof_code is not None:
+        diagnostic["proof"] = {"code": proof_code, "kind": "necessary_bound"}
+    return diagnostic
 
 
 def _notice(code: str, message: str, action: str, reference_id: str = "") -> dict[str, object]:
@@ -673,7 +718,14 @@ def _notice(code: str, message: str, action: str, reference_id: str = "") -> dic
 
 
 def _digest(value: dict[str, object]) -> str:
-    payload = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
+    canonical = deepcopy(value)
+    summary = _mapping(canonical.get("summary", {}))
+    summary.pop("result_status", None)
+    summary.pop("result_label", None)
+    solver = _mapping(canonical.get("solver", {}))
+    solver.pop("result", None)
+    solver.pop("telemetry", None)
+    payload = json.dumps(canonical, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
