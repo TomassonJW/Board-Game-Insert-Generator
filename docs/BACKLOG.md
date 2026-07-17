@@ -2335,4 +2335,4 @@ P44-M007 est ready-for-explicit-go.
 - Pour un conteneur non vide, demander explicitement la suppression du conteneur et de tous ses éléments ; une annulation ne modifie rien.
 - Attribuer un suffixe numérique incrémental à tout nouveau conteneur dont le nom existe déjà.
 - Ne changer ni schéma, ni solveur, ni géométrie, ni scène automatique.
-- Statut : ready ; autorisation produit déjà reçue, lot non commencé.
+- Statut : implemented, automated-validated, human-fusion-check-required par P44-VH02V ; package 0.1.43, fusion-validated: false, print-validated: false.

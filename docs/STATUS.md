@@ -2283,3 +2283,12 @@ Package : 0.1.42. Statut : implemented, automated-validated,
 fusion-validated: true par la preuve `P64-H01 Fusion OK 0.1.42 - commit
 5865645`, print-validated: false. P44-VH02 est désormais la seule mission de
 code suivante ; P45 reste bloqué.
+
+
+## P44-VH02 - Suppression directe et noms de conteneurs non ambigus (2026-07-17)
+
+La palette expose une croix de suppression directement a cote du menu de chaque element. La suppression d'un conteneur non vide demande une confirmation : l'annulation conserve tout, la confirmation retire atomiquement le conteneur et tous ses elements. Toute creation de conteneur applique un suffixe numerique deterministe au premier nom deja present.
+
+Aucun schema, bridge, solveur, valeur physique, tolerance, geometrie, CAD IR ou scene automatique ne change.
+
+Package : 0.1.43. Statut : implemented, automated-validated, human-fusion-check-required par P44-VH02V, fusion-validated: false, print-validated: false. P44-V reste ouverte ; P45 reste bloque.

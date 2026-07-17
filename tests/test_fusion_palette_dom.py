@@ -228,7 +228,10 @@ class FusionPaletteDomTests(unittest.TestCase):
 
     def test_projects_contents_inside_their_parent_container_without_schema_or_bridge_change(self) -> None:
         for marker in (
-            "renderContentCard", "content-children", "child-card",
+            "renderContentCard", "content-children", "child-card", "child-delete-action",
+            "function nextUniqueGroupName(requestedName)", "group.name=nextUniqueGroupName(name||group.name)",
+            "Supprimer « ${group.name||'ce conteneur'} » et ses ${contents.length} élément(s)",
+            "project.contents=project.contents.filter(content=>content.container_group_id!==group.id)",
             "data-record-kind=\"content\"", "data-record-kind=\"group\"",
             'data-row="content-move"', "add-content-to-group",
             "Déplacer vers…", "setUnifiedGroupMode", "applyGroupModeToAll",

@@ -15,7 +15,8 @@ Ce document est le point d’entrée court de reprise. Il indique l’état acti
 - `print-validated: false` ; aucune valeur physique n'est calibrée par cette preuve.
 - P44-VH01 corrige la hauteur cachée ; le cas originel est calculable, sans retour formel de gate ni revendication fusion-validated.
 - Code produit : P64-H01 ajoute la recherche dense adaptative et l'équilibre spatial X/Y/Z dans le package 0.1.42.
-- Prochaine action : P44-VH02, seul lot de code prêt ; P45 reste bloqué.
+- Code produit : P44-VH02 ajoute suppression directe, confirmation transactionnelle et noms incrementaux dans le package 0.1.43.
+- Prochaine action : gate humaine P44-VH02V ; P45 reste bloque.
 
 ## Vue de séquence
 
@@ -25,7 +26,7 @@ Ce document est le point d’entrée court de reprise. Il indique l’état acti
 | Terminé | P44-VP | Dossier global préparé ; le retour P44-V 0.1.40 est un KO contextuel. |
 | Supersédé | P44-VH01V | Le cas Z originel passe, mais la densité a révélé P64-H01 ; aucune fusion-validation formelle n'est revendiquée. |
 | Terminé | P64-H01 / H01V | Recherche dense et répartition progressive X/Y/Z observées dans Fusion 0.1.42. |
-| Prêt | P44-VH02 | Suppression directe, confirmation transactionnelle et noms incrémentaux. |
+| Pret | P44-VH02V | Verifier suppression directe, annulation sans effet, suppression atomique et noms incrementaux dans Fusion 0.1.43. |
 | KO contextuel | P44-V | Reprendre après P44-VH02. |
 | Bloqué | P45 à P50, P67 à P69 | Dépendances et gates de version non satisfaites. |
 

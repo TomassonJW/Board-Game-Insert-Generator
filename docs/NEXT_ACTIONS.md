@@ -51,8 +51,7 @@ conscients de leur hauteur et score d'équilibre X/Y/Z avec charge des étages.
 
 ### P44-VH02 - Suppression directe et noms de conteneurs non ambigus
 
-Statut : ready. P64-H01 est fusion-validated dans le package 0.1.42 par la
-preuve `P64-H01 Fusion OK 0.1.42 - commit 5865645`. P44-VH02 est la seule
+Statut : implemented, automated-validated, human-fusion-check-required par P44-VH02V dans le package 0.1.43. P64-H01 reste fusion-validated par `P64-H01 Fusion OK 0.1.42 - commit 5865645`. P44-VH02 est la seule
 mission de code autorisée : ajouter une suppression directe à côté du menu de
 chaque élément, confirmer explicitement la suppression d'un conteneur non vide
 avec tous ses éléments, et attribuer un suffixe numérique incrémental à chaque

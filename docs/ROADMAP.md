@@ -738,3 +738,8 @@ modifier le mode compact, les contraintes physiques ou le schéma.
 P64-H01 est fusion-validated par `P64-H01 Fusion OK 0.1.42 - commit 5865645`.
 P44-VH02 devient le seul lot de code suivant ; P45 demeure bloqué.
 print-validated: false.
+
+
+## P44-VH02 - Suppression directe et noms incrementiels (2026-07-17)
+
+Le package 0.1.43 ajoute la suppression visible des elements, la confirmation atomique des conteneurs non vides et le suffixage des noms dupliques. P44-VH02V est la seule gate humaine suivante ; P44-V reste ouverte et P45 reste bloque. print-validated: false.

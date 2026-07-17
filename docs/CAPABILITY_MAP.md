@@ -1243,3 +1243,11 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - Limites : heuristique non globalement optimale ; schéma, tolérances, valeurs
   physiques, géométrie et scène inchangés ; fusion-validated: true,
   print-validated: false.
+
+
+## P44-VH02 - Suppression directe et nommage incrementiel
+
+- C-USABILITY : suppression visible par element, confirmation transactionnelle des conteneurs non vides et noms de conteneurs non ambigus.
+- C-QUALITY : aucun schema, bridge, solveur, geometrie ou scene automatique ne change.
+- C-FUSION-UI : package 0.1.43 automated-validated ; gate P44-VH02V requise.
+- Limites : fusion-validated: false, print-validated: false.

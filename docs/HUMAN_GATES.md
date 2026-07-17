@@ -607,3 +607,22 @@ Retour reçu : P64-H01 Fusion OK 0.1.42 - commit 5865645.
 Cette gate valide uniquement le comportement logiciel observé dans Fusion. Elle
 ne calibre aucune valeur physique, ne valide aucune géométrie imprimée et ne
 vaut pas validation d'impression. print-validated: false.
+
+
+## P44-VH02V - Suppression directe et noms de conteneurs non ambigus 0.1.43
+
+Statut : human-fusion-check-required. P44-VH02 est implementee et automated-validated dans le package 0.1.43.
+
+Preparation : `scripts/fusion/prepare_p44_vh02_direct_delete_test.ps1`.
+
+Verifier dans Fusion :
+
+1. la croix de suppression est visible a cote du menu `...` de chaque element et ne supprime que cet element ;
+2. supprimer un conteneur non vide demande une confirmation explicite ; Annuler ne modifie rien ;
+3. confirmer supprime atomiquement le conteneur et tous ses elements ;
+4. les nouveaux conteneurs au meme nom recoivent un suffixe numerique incrementiel ;
+5. aucune scene ne change avant `Materialiser dans Fusion`.
+
+Retour OK : `P44-VH02 Fusion OK 0.1.43 - commit <sha>`.
+
+Cette gate valide uniquement le comportement logiciel observe dans Fusion. Elle ne valide ni valeurs physiques, ni geometrie imprimee, ni impression reelle. `print-validated: false`.
