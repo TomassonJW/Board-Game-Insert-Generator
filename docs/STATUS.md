@@ -8,7 +8,7 @@ Statut produit : **MVP V0.1 Fusion-only accepte ; validation d impression non ac
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P64-V2H02 0.1.53 est observée OK sauf l'inversion Y de sa vue de dessus ; P64-V2H02R est automatisée dans le package 0.1.54 et constitue la seule gate humaine prête. P44-V reste en KO contextuel et P45 reste bloqué.
+Phase active : P64-V2H02R est fusion-validated dans Fusion 0.1.54 par la preuve 42e8993. Aucune mission runtime ne devient prête automatiquement : P64-V2H03 exige un arbitrage avec P45 ; P44-V reste en KO contextuel et P45 reste bloqué.
 
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
@@ -2437,9 +2437,9 @@ scripts/fusion/prepare_p64_v2h01_continuous_closure_test.ps1.
 La régularité visuelle progresse par alignement de faces, mais la modularité
 adaptative reste P64-F02. fusion-validated: false ; print-validated: false.
 
-## P64-V2H02R — Repère de vue de dessus (2026-07-17)
+## P64-V2H02R — Repère de vue de dessus (2026-07-18)
 
-P64-V2H02 0.1.53 est observée OK pour la capacité, la vérité, les budgets, les méthodes et l'occlusion ; le seul défaut restant est une vue de dessus affichée depuis le dessous, par inversion de Y autour de l'axe X. P64-V2H02R 0.1.54 retourne cette coordonnée écran sans changer le modèle métier, les calculs, l'occlusion ou la coupe X/Z.
+P64-V2H02R est fusion-validated par la preuve `P64-V2H02R Fusion OK 0.1.54 - commit 42e8993`. La vue de dessus est confirmée depuis le dessus, avec l'occlusion, les calculs et la coupe X/Z inchangés.
 
 Le projet réel étendu à 11 conteneurs et 34 contenus révèle quatre faux blocages
 internes : dérivation multi-cavités en rangée unique, élagage beam exigeant un
@@ -2473,7 +2473,7 @@ des diagnostics de budget et peint la vue de dessus du bas vers le haut avec les
 cavités composées avec leur corps parent. Un corps supérieur masque donc les
 cavités inférieures.
 
-Package : 0.1.54. Statut : implemented, automated-validated,
-ready-for-human-fusion-check par P64-V2H02R ; `fusion-validated: false`,
+Package : 0.1.54. Statut : fusion-validated,
+done-human-gate par P64-V2H02R ; `fusion-validated: true`,
 `print-validated: false`. P44-V et P45 restent bloqués. P64-U01 conserve la future
 progression de calcul non modale et annulable ; aucun écran bloquant n'est ajouté.

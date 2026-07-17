@@ -686,10 +686,10 @@ historique. Aucune validation physique ou d'impression n'est revendiquée.
 
 ## P64-V2H02R — Correctif de repère de la vue de dessus 0.1.54
 
-Statut : les faits capacité, vérité, budget, méthode et occlusion sont observés OK dans 0.1.53 ; seule l'orientation écran de la vue de dessus reste à confirmer dans 0.1.54. Préparation automatisée :
-`scripts/fusion/prepare_p64_v2h02_capacity_search_test.ps1`.
+Statut : fusion-validated. Preuve reçue le 2026-07-18 : `P64-V2H02R Fusion OK 0.1.54 - commit 42e8993`. La gate est fermée ; cette preuve ne couvre pas les valeurs physiques, l'impression ni la résolution du cas dense.
+Préparation historique : `scripts/fusion/prepare_p64_v2h02_capacity_search_test.ps1`.
 
-Vérifier dans Fusion sur un projet simple résolu, puis sur le projet dense laissé
+Checklist observée dans Fusion sur un projet simple résolu, puis sur le projet dense laissé
 dans son état reproductible :
 
 1. la carte de capacité affiche volume utilisable, enveloppes minimales et marge
@@ -706,8 +706,8 @@ dans son état reproductible :
    et représente Y comme observée depuis le dessus (miroir autour de l'axe X), sans modifier la coupe X/Z ;
 7. aucune scène ne change avant `Matérialiser dans Fusion`.
 
-Retour attendu : `P64-V2H02R Fusion OK 0.1.54 - commit <sha>`, ou KO contextuel
-avec méthode, effort, capacité et diagnostic visibles.
+Retour reçu : `P64-V2H02R Fusion OK 0.1.54 - commit 42e8993`.
+
 
 Cette gate ne demande pas de confirmer que le cas dense est soluble. Elle valide
 la vérité du résultat, la capacité informative, les budgets et la vue. Elle ne

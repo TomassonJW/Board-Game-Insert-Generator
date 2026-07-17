@@ -809,7 +809,7 @@ Le cas réel étendu invalide la gate P64-V2H01 0.1.52 sans supprimer ses gains.
 P64-V2H02 corrige les faux blocages d'enveloppes multi-cavités, d'EMS, de points
 extrêmes et de réservations localisées. Il rend les budgets d'effort réellement
 croissants, publie une borne de capacité sur chaque résultat et corrige
-l'occlusion de la vue de dessus. Le retour Fusion confirme ces faits, mais révèle un miroir Y autour de l'axe X ; P64-V2H02R retourne cette seule coordonnée écran.
+l'occlusion de la vue de dessus. La preuve Fusion `P64-V2H02R Fusion OK 0.1.54 - commit 42e8993` confirme aussi le repère Y retourné autour de l'axe X.
 
 La marge volumique positive du projet dense ne suffit pas à prouver une
 configuration orthogonale. Le package reste honnêtement non certifié sur ce cas
@@ -817,6 +817,6 @@ et prépare deux trajectoires distinctes : P64-V2H03 pour des variantes internes
 bornées coordonnées avec P45, et P64-X01 pour un éventuel mode exact sous ADR et
 benchmark. P64-U01 portera ultérieurement une progression non modale et annulable.
 
-La seule gate suivante est P64-V2H02R 0.1.54. P44-V, P45 et P46 restent
+P64-V2H02R est clôturée. P64-V2H03 exige maintenant un arbitrage explicite avec P45 ; P44-V, P45 et P46 restent
 verrouillés ; aucun défaut, tolérance, schéma ou comportement de matérialisation
 n'est modifié. `print-validated: false`.

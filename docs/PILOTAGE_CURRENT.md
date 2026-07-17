@@ -15,7 +15,7 @@ preuves archivées.
 
 ## État actif
 
-- Dernière preuve : P64-H01 Fusion OK 0.1.42 - commit 5865645 ; P64-H01 est
+- Dernière preuve : P64-V2H02R Fusion OK 0.1.54 - commit 42e8993 ; P64-V2H02R est
   fusion-validated.
 - print-validated: false ; aucune valeur physique n'est calibrée par cette preuve.
 - P64-H03R 0.1.47 conserve les gains de recherche dirigée déjà automatisés.
@@ -26,10 +26,10 @@ preuves archivées.
 - P64-V2H01 0.1.52 a séparé faisabilité minimale et fermeture continue, mais le
   nouveau cas réel à 11 conteneurs et 34 contenus produit encore un KO contextuel ;
   aucune preuve Fusion OK 0.1.52 ne doit être émise.
-- P64-V2H02 0.1.53 est observée OK sauf le miroir de la vue de dessus autour de l'axe X.
-  P64-V2H02R 0.1.54 corrige ce seul repère écran, sans changer les calculs ni la coupe X/Z.
-  La seule prochaine action est sa gate préparée par
-  scripts/fusion/prepare_p64_v2h02_capacity_search_test.ps1.
+- P64-V2H02R 0.1.54 est fusion-validated : capacité, vérité, budgets, méthodes, occlusion et repère Y sont observés dans Fusion.
+  Le cas dense reste honnêtement non certifié ; P64-V2H03 exige un arbitrage explicite avec P45.
+  Aucune nouvelle mission runtime n'est ouverte automatiquement ; la suite est un arbitrage produit.
+
 - P44-V et P45 restent bloqués.
 
 ## Vue de séquence
@@ -48,8 +48,8 @@ preuves archivées.
 | Terminé | P64-H08 | Réglages Fusion et diagnostic secondaire 0.1.51. |
 | KO contextuel | P64-V2 | Contrôles visibles, mais cas dense réel sans solution. |
 | KO contextuel | P64-V2H01 | Le projet réel étendu dépasse la fixture 0.1.52. |
-| Prêt — gate humaine | P64-V2H02R | Vérifier 0.1.54 : orientation de la vue de dessus ; les autres faits sont observés OK. |
-| KO contextuel | P44-V | Reprendre seulement après P64-V2H02 ; P45 reste bloqué. |
+| Terminé — gate Fusion | P64-V2H02R | Fusion OK 0.1.54 commit 42e8993 ; pas de validation physique. |
+| KO contextuel | P44-V | À requalifier séparément après arbitrage ; P45 reste bloqué. |
 | Bloqué | P45 à P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 

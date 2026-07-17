@@ -1,12 +1,12 @@
 # Next Actions
 
-Dernière mise à jour : 2026-07-17
+Dernière mise à jour : 2026-07-18
 
 ## Version active
 
 V0.1 reste `mvp-accepted` par P66, `fusion-validated: true` et
 `print-validated: false`. P44 poursuit la fondation UX V0.2, mais P44-V reste en
-KO contextuel tant que le solveur n'a pas passé la gate corrective P64-V2H02.
+KO contextuel. P64-V2H02R est maintenant fusion-validated, sans rouvrir automatiquement une mission runtime.
 
 ## Dernier état réel
 
@@ -26,41 +26,27 @@ KO contextuel tant que le solveur n'a pas passé la gate corrective P64-V2H02.
 - P64-V2H01 0.1.52 a certifié la fixture à 9 corps, mais le projet réel étendu à
   11 conteneurs et 34 contenus reste sans candidat : la gate 0.1.52 est
   supersédée et ne doit pas recevoir de preuve OK.
-- P64-V2H02 0.1.53 est observée OK pour capacité, vérité, budgets, méthodes et occlusion ;
-  seul le sens Y de la vue de dessus est encore inversé à l'écran. P64-V2H02R 0.1.54
-  corrige ce repère visuel uniquement.
+- P64-V2H02R est `fusion-validated` dans Fusion 0.1.54 par la preuve
+  `P64-V2H02R Fusion OK 0.1.54 - commit 42e8993` ; la correction conserve
+  la portée bornée : aucune preuve de solubilité du cas dense ni d'impression.
 - Le cas de référence conserve environ 693,6 cm³ de marge volumique théorique,
   mais cette borne ne prouve pas une disposition orthogonale. Son statut reste
   honnêtement `no_solution_within_budget`.
 
 ## Prochaine action recommandée
 
-### P64-V2H02R — Correctif de repère de la vue de dessus
+### Arbitrage explicite avant toute nouvelle mission runtime
 
-Statut : ready-for-human-fusion-check après installation du package 0.1.54.
+P64-V2H02R est `done-human-gate` et `fusion-validated` par la preuve
+`P64-V2H02R Fusion OK 0.1.54 - commit 42e8993`.
 
-Préparation : `scripts/fusion/prepare_p64_v2h02_capacity_search_test.ps1`.
-
-Objectif humain :
-
-- vérifier que la capacité théorique apparaît sur résultat résolu et non résolu ;
-- vérifier qu'un budget épuisé dit `non résolu` et non `impossible` ;
-- vérifier que Rapide, Normal et Approfondi exposent 1, 2 et 4 priorités et des
-  largeurs beam distinctes ;
-- vérifier que des méthodes ou efforts peuvent légitimement conserver le même
-  résultat tout en affichant leurs métriques propres ;
-- vérifier que la vue de dessus masque les cavités situées sous un corps et représente Y dans le sens d'une observation depuis le dessus (miroir autour de l'axe X), sans modifier la coupe X/Z ;
-- vérifier qu'aucune scène n'est matérialisée automatiquement.
-
-Retour attendu : `P64-V2H02R Fusion OK 0.1.54 - commit <sha>`, ou KO contextuel
-avec le projet laissé dans son état reproductible.
-
-La gate ne revendique ni solution du cas dense, ni harmonisation modulaire,
-ni calibration physique, ni impression.
+Aucune mission n'est automatiquement prête : P64-V2H03 engage les variantes internes
+et leur coordination avec P45. L'arbitrage humain doit choisir son périmètre avant
+tout code. P44-V reste un KO contextuel à requalifier séparément.
 
 ## Lots suivants, non ouverts
 
-1. P64-V2H02R : correctif de repère, puis arbitrage de P64-V2H03.
+1. Arbitrage explicite P64-V2H03 / P45 avant toute mission runtime.
 2. P64-V2H03 : variantes internes bornées et sélection globale, à coordonner
    explicitement avec P45 avant tout code.
 3. P44-V, puis P45/P46 selon leurs contrats et gates.
@@ -71,7 +57,7 @@ ni calibration physique, ni impression.
 
 ## Séquence verrouillée
 
-P64-V2H02R est la seule action `ready-for-human-fusion-check`. P44-V, P45 et P46
+Aucune action runtime n'est `ready` sans arbitrage. P44-V, P45 et P46
 restent bloqués. P47-P50 restent bloqués jusqu'à P46 et P69 jusqu'à P50. P68
 peut recueillir des faits réels sans recalibrer les defaults.
 

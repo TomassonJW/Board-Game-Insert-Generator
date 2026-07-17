@@ -1,6 +1,6 @@
 # P64-V2H02 — Capacité théorique et vérité de recherche dense
 
-Statut : P64-V2H02 0.1.53 est observée OK sauf le sens Y de la vue de dessus ; P64-V2H02R 0.1.54 est automated-validated pour ce correctif visuel borné et requiert sa confirmation Fusion.
+Statut : fusion-validated. Preuve Fusion reçue le 2026-07-18 : `P64-V2H02R Fusion OK 0.1.54 - commit 42e8993`. La preuve confirme la portée bornée du lot, sans qualifier les valeurs physiques, l'impression ni la solubilité du cas dense.
 Ce lot remplace la gate P64-V2H01 0.1.52 après le nouveau KO
 contextuel sur le projet dense réel.
 
@@ -152,9 +152,9 @@ aucun écran bloquant n'est introduit dans ce lot.
 
 Préparation : `scripts/fusion/prepare_p64_v2h02_capacity_search_test.ps1`.
 
-Retour attendu :
+Retour reçu :
 
-`P64-V2H02R Fusion OK 0.1.54 - commit <sha>`
+`P64-V2H02R Fusion OK 0.1.54 - commit 42e8993`
 
 Un retour positif valide uniquement l'affichage, les budgets observables, la vue
 et la vérité du résultat logiciel. Il ne prouve pas que le projet dense possède

@@ -1332,7 +1332,7 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - Preuve : tests automatisés et reproduction locale ; fusion-validated: false,
   print-validated: false.
 
-## Mise à jour P64-V2H02R — 2026-07-17
+## Mise à jour P64-V2H02R — 2026-07-18
 
 - C-SOLVEUR-DENSE : enveloppes multi-cavités bornées, placement beam traversant
   plusieurs EMS, points extrêmes aux frontières des réservations et validation
@@ -1344,9 +1344,9 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
   marge positive est explicitement une borne nécessaire, pas un certificat de
   placement. Les épuisements heuristiques restent `no_solution_within_budget`.
 - C-FUSION-UI : capacité théorique visible sur succès/échec et vue de dessus
-  correctement occultée ; P64-V2H02 0.1.53 est observée OK sauf le repère Y. Le package 0.1.54 retourne Y autour de l'axe X dans la seule vue de dessus ; gate P64-V2H02R.
+  correctement occultée et correctement orientée autour de l'axe X ; P64-V2H02R est fusion-validated par la preuve 0.1.54 commit 42e8993.
 - Limite : le projet de référence à 11 conteneurs et 34 contenus reste non
   certifié malgré environ 693,6 cm³ de marge théorique. Les variantes internes
   globales relèvent de P64-V2H03 à coordonner avec P45.
-- Validation : `fusion-validated: false`, `print-validated: false`. P44-V et P45
-  restent bloqués jusqu'à la gate P64-V2H02R puis l'arbitrage explicite de la suite.
+- Validation : `fusion-validated: true` pour la portée P64-V2H02R, `print-validated: false`. P44-V et P45
+  restent bloqués jusqu'à l'arbitrage explicite de la suite.

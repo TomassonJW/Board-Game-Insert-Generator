@@ -2435,13 +2435,13 @@ P44-M007 est ready-for-explicit-go.
 
 ### P64-V2H02R — Capacité, vérité et repère de vue de dessus
 
-- Statut : P64-V2H02 0.1.53 observée OK sauf le repère Y de la vue de dessus ; P64-V2H02R implemented, automated-validated dans 0.1.54 ; ready-for-human-fusion-check.
+- Statut : done-human-gate, fusion-validated dans 0.1.54 par `P64-V2H02R Fusion OK 0.1.54 - commit 42e8993`.
 - Contrat : `docs/P64_V2H02_CAPACITY_AND_SEARCH_TRUTH_CONTRACT.md`.
 - Livrable : enveloppes multi-cavités bornées, beam traversant plusieurs EMS,
   réservations localisées, budgets 1/2/4, capacité théorique sur chaque résultat
-  occlusion correcte de la vue de dessus et repère Y retourné autour de l'axe X.
+  et occlusion correcte de la vue de dessus et repère Y retourné autour de l'axe X.
 - Préparation : `scripts/fusion/prepare_p64_v2h02_capacity_search_test.ps1`.
-- Gate : `P64-V2H02R Fusion OK 0.1.54 - commit <sha>` ou KO contextuel documenté.
+- Gate : fermée par `P64-V2H02R Fusion OK 0.1.54 - commit 42e8993`.
 - Limite : une marge positive ne prouve pas le placement ; le cas dense reste
   honnêtement `no_solution_within_budget`.
 
