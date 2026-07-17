@@ -492,3 +492,25 @@ En Z, l origine du premier corps reste `0`. La hauteur de conception integre dej
 `box.lid_clearance_mm` au sommet ; `container_z_clearance_mm` ne s applique
 qu entre deux enveloppes empilees. Aucun intervalle de boite ne doit etre
 reclasse comme etage, reservation, support ou corps imprimable.
+
+## P64-V2H03 - Variantes locales certifiées
+
+Une variante interne de conteneur n'est ni un nouveau corps, ni une forme P45,
+ni une rotation globale. Elle associe, dans le repère
+`minimum_outer_envelope.local`, une enveloppe minimale et un layout complet de
+cavités dont dimensions, quantités, formes résolues et jeux sont inchangés.
+
+Le certificat local vérifie couverture des contenus, non-recouvrement, parois,
+cloisons, fond, repère, digest et absence de corps automatique. Il ne certifie
+pas la boîte, les jeux externes, les réservations supérieures, l'appui ou le
+retrait : ces contraintes restent au certificat global P64 après choix de la
+variante et du placement.
+
+P45 possède les futures sémantiques `standard/auto`, `rangée`, `colonne
+verticale` et les formes ergonomiques. P64-V2H03 peut seulement produire des
+relayouts techniques rectangulaires des cavités existantes. Une rotation XY de
+90 degrés reste une option de placement globale et ne crée pas une variante
+locale supplémentaire.
+
+Voir ADR-0070 et
+`docs/P64_V2H03_INTERNAL_VARIANT_COORDINATION_CONTRACT.md`.

@@ -199,3 +199,6 @@ Tests, cartes backlog ou gates humaines a preparer.
 - ADR-0067 n'est pas intégrée : numéro occupé par l'essai local P64-H03 préservé hors `main` ; ne pas le réutiliser sans réconciliation.
 - ADR-0068-multi-solver-portfolio-and-truthful-results.md - portefeuille de stratégies, validateur commun et résultats honnêtes.
 - ADR-0069-continuous-and-modular-volume-finishing.md - finition continue puis harmonisation modulaire après faisabilité.
+- ADR-0070-internal-container-variant-ownership.md - propriété P45 des
+  sémantiques locales, frontière de variantes certifiées et sélection globale
+  bornée par P64.

@@ -223,3 +223,19 @@ espaces résiduels sont l'état principal du moteur 3D.
 La faisabilité précède toujours la finition. Fermeture continue et harmonisation
 modulaire ne peuvent modifier les contraintes physiques ni invalider la solution
 de base. Voir `P64_MULTI_SOLVER_PORTFOLIO_PROGRAM.md`.
+
+## Frontière acceptée P64-V2H03 / P45
+
+ADR-0070 interdit de présélectionner une seule disposition locale avant la
+recherche globale lorsque plusieurs enveloppes multi-cavités sont certifiées.
+P45 conserve la sémantique des modes et formes ; une frontière géométrique pure
+produit les variantes et leur certificat local ; P64 choisit paresseusement
+variante et placement puis applique le certificat global.
+
+Le premier runtime est un fallback correctif. Le portefeuille canonique complet
+reste prioritaire et inchangé. Les recherches multi-variantes sont exécutées par
+lanes préservées, sans produit cartésien et avec des caps monotones. Une limite
+atteinte reste `no_solution_within_budget`. Les valeurs numériques des caps ne
+seront fixées qu'après les fixtures et mesures de P64-V2H03B.
+
+Contrat : `docs/P64_V2H03_INTERNAL_VARIANT_COORDINATION_CONTRACT.md`.

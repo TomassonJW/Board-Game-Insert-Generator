@@ -2445,16 +2445,42 @@ P44-M007 est ready-for-explicit-go.
 - Limite : une marge positive ne prouve pas le placement ; le cas dense reste
   honnêtement `no_solution_within_budget`.
 
-### P64-V2H03 — Variantes internes bornées et sélection globale
+### P64-V2H03A — Arbitrage et contrat des variantes internes
 
-- Statut : proposed-after-P64-V2H02R-gate ; ne pas implémenter sans arbitrage.
-- Objectif : produire plusieurs enveloppes certifiables par conteneur
-  multi-cavités et sélectionner leur combinaison avec le placement global.
-- Dépendance structurante : coordonner la propriété des variantes avec P45 et
-  amender le contrat avant code ; ne changer ni valeurs physiques ni schéma.
-- Gate : corpus dense reproductible, budgets bornés, fallback canonique et
-  comparaison explicite des variantes évaluées.
-- Modèle recommandé : `gpt-5.6-sol`, raisonnement `xhigh`.
+- Capability : C-GEOMETRY, C-ASSET, C-SOLVER, C-LAYOUT et C-QUALITY.
+- Dépendance : P64-V2H02R fusion-validated et GO explicite du 2026-07-18.
+- Livrables : ADR-0070, contrat de coordination, propriété, identité,
+  déduplication, deux certificats, budgets, traçabilité, fixtures et découpage.
+- Non-objectifs : runtime, schéma projet, mode P45, valeur physique, UI ou scène.
+- Statut : done-documentation, architecture-accepted.
+
+### P64-V2H03B — Frontière locale, certificats et fixtures
+
+- Statut : ready. Modèle : `gpt-5.6-sol`, raisonnement `xhigh`.
+- Objectif : extraire `canonical_v1`, produire des relayouts rectangulaires
+  bornés, certifier localement et construire une frontière non dominée.
+- Livrables : types immuables, digests, provenance, certificat fail-closed,
+  fixtures déterministes et tableau de caps mesuré.
+- Gate : parité canonique publique, génération bornée, suite complète,
+  compileall, frontière adsk et diff-check.
+- Interdits : branchement dans le sélecteur public, formes/modes P45, schéma,
+  defaults, valeurs physiques, UI ou scène automatique.
+
+### P64-V2H03C — Sélection globale paresseuse
+
+- Statut : blocked-by-P64-V2H03B.
+- Objectif : choisir variante et placement dans les lanes free-3D sans produit
+  cartésien, tout en conservant le portefeuille canonique complet.
+- Livrables : budgets monotones, lanes préservées, télémétrie, certificat global
+  et non-régressions denses.
+- Gate : cul-de-sac multi-cavités minimal résolu, résultats Rapide conservés en
+  Normal/Approfondi et vérité `no_solution_within_budget`.
+
+### P64-V2H03V — Gate Fusion des variantes internes
+
+- Statut : blocked-by-P64-V2H03C.
+- Portée : résultat et diagnostic secondaire, stabilité de palette et absence de
+  scène automatique ; aucune valeur physique ni impression.
 
 ### P64-U01 — Progression de calcul non modale
 

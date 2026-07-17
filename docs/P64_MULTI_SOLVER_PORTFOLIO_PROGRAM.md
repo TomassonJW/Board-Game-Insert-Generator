@@ -1,8 +1,11 @@
 # P64 — Programme portefeuille multi-solveurs et finition volumique
 
-Statut : architecture acceptée le 2026-07-17 ; P64-V2 0.1.51 est un KO contextuel et P64-V2H01 est implémentée dans 0.1.52.
-Prochaine action : gate humaine P64-V2H01.
+Statut : architecture portefeuille acceptée ; P64-V2H02R 0.1.54 est
+fusion-validated. P64-V2H03A est terminé : ADR-0070 et le contrat de coordination
+fixent la propriété P45/P64. P64-V2H03B est la seule mission `ready`.
 
+Prochaine action : P64-V2H03B, frontière locale, certificats, fixtures et caps
+mesurés, sans branchement dans la sélection publique.
 Capability principale : `C-SOLVER`. Capabilities associées : `C-LAYOUT`,
 `C-GRID-3D`, `C-STACKING`, `C-USABILITY`, `C-QUALITY`.
 
@@ -175,6 +178,22 @@ Le volume total minimal est une borne nécessaire, jamais une preuve : les borne
 par axe, sections, réservations, supports, retrait et fragmentation restent
 obligatoires.
 
+### Amendement P64-V2H03A — 2026-07-18
+
+ADR-0070 fixe la propriété : P45 définit les sémantiques et certifie la
+géométrie locale ; P64 consomme seulement des variantes immuables certifiées et
+certifie le plan global. Le producteur correctif initial reste rectangulaire et
+technique ; il ne préfigure aucun mode ou forme P45.
+
+La frontière est identifiée par digest, dédupliquée par géométrie et bornée par
+profil. La rotation globale 0/90 reste une option de placement, pas une variante.
+La recherche multi-variantes est paresseuse et corrective après la lane
+canonique complète. Rapide, Normal et Approfondi conservent les lanes moins
+profondes avant d'ajouter du budget. Les caps numériques seront fixés par les
+fixtures et mesures de P64-V2H03B.
+
+Contrat : [P64-V2H03](P64_V2H03_INTERNAL_VARIANT_COORDINATION_CONTRACT.md).
+
 ## 10. Placement 3D libre cible
 
 Le moteur libre maintient des espaces maximaux vides et des points extrêmes issus
@@ -230,7 +249,12 @@ P64-A01 documentation/ADR (ce document)
   -> P64-H07 beam robuste + portefeuille Auto
   -> P64-H08 réglages Fusion + diagnostic secondaire
   -> P64-V2 KO contextuel
-  -> P64-V2H01 fermeture corrective + nouvelle gate humaine
+  -> P64-V2H01 fermeture corrective, KO contextuel
+  -> P64-V2H02R capacité/vérité/vue, fusion-validated
+  -> P64-V2H03A contrat/ADR de propriété
+  -> P64-V2H03B frontière locale/certificats/fixtures
+  -> P64-V2H03C sélection globale paresseuse
+  -> P64-V2H03V gate Fusion si requise
   -> reprise P44-V
   -> P45/P46 selon leurs contrats existants
   -> P64-F01/F02 finitions continues et modulaires
@@ -346,14 +370,34 @@ hors chemin critique.
   dessus correctement occultée.
 - Règle : une marge de volume positive n'est jamais une preuve de placement.
 
-### P64-V2H03 — Variantes internes bornées
+### P64-V2H03A — Arbitrage et contrat
 
-- Statut : proposed-after-P64-V2H02-gate.
+- Statut : `terminé et intégré` après ce lot documentaire.
+- Livrables : ADR-0070, contrat de coordination, propriété, identité,
+  certificats, budget, traçabilité, fixtures et découpage.
+- Runtime : aucun.
+
+### P64-V2H03B — Frontière locale et fixtures
+
+- Statut : `ready`.
 - Agent conseillé : `gpt-5.6-sol`, raisonnement `xhigh`.
-- Objectif : combiner plusieurs enveloppes internes certifiables avec la recherche
-  globale au lieu de figer une seule dérivation canonique.
-- Prérequis : arbitrage explicite avec P45, fixture dense, budget/déterminisme et
-  contrat de fallback. Aucun code avant cette coordination.
+- Objectif : types immuables, digests, producteurs canonique/correctif,
+  certificat local, frontière non dominée, fixtures et caps mesurés.
+- Interdit : sélection publique, UI, formes P45, schéma ou valeurs physiques.
+
+### P64-V2H03C — Sélection globale paresseuse
+
+- Statut : `blocked-by-P64-V2H03B`.
+- Objectif : expansion variante-placement par lanes monotones, certificat global
+  et télémétrie, sans produit cartésien.
+- Acceptation : cul-de-sac multi-cavités résolu, baseline préservée,
+  non-régressions denses et résultat honnête.
+
+### P64-V2H03V — Gate Fusion
+
+- Statut : `blocked-by-P64-V2H03C`.
+- Portée : observation du résultat et du diagnostic seulement ; aucune preuve
+  physique ou d'impression.
 
 ### P64-U01 — Progression non modale du calcul
 

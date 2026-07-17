@@ -713,3 +713,18 @@ Cette gate ne demande pas de confirmer que le cas dense est soluble. Elle valide
 la vérité du résultat, la capacité informative, les budgets et la vue. Elle ne
 calibre aucune valeur physique, ne valide aucune géométrie imprimée et ne vaut
 pas impression réelle. `print-validated: false`.
+
+## P64-V2H03A — Arbitrage de propriété accepté
+
+Le GO explicite transmis le 2026-07-18 autorise la reprise directe de
+P64-V2H03 / P45 et délègue l'arbitrage borné nécessaire avant code. ADR-0070
+retient une frontière à deux certificats : P45 possède la sémantique et le
+certificat local ; P64 possède les budgets, la sélection globale et le
+certificat du plan complet.
+
+Effet de gate : l'arbitrage architectural P64-V2H03A est fermé et seule
+P64-V2H03B devient `ready`. Cette autorisation n'ouvre ni les modes ou formes
+P45, ni P64-V2H03C avant les fixtures/caps de B, ni P44-V/P46.
+
+Aucune nouvelle preuve Fusion ou physique n'est acquise.
+`fusion-validated: false` et `print-validated: false` pour P64-V2H03.

@@ -1,6 +1,6 @@
 # Status
 
-Derniere mise a jour : 2026-07-17
+Derniere mise a jour : 2026-07-18
 
 ## Etat global
 
@@ -8,9 +8,11 @@ Statut produit : **MVP V0.1 Fusion-only accepte ; validation d impression non ac
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P64-V2H02R est fusion-validated dans Fusion 0.1.54 par la preuve 42e8993. Aucune mission runtime ne devient prête automatiquement : P64-V2H03 exige un arbitrage avec P45 ; P44-V reste en KO contextuel et P45 reste bloqué.
-
-
+Phase active : P64-V2H03A a accepté ADR-0070 et le contrat de variantes
+internes. P64-V2H03B est la seule mission `ready` ; elle prépare la frontière
+locale, les certificats, les fixtures et les caps sans modifier la sélection
+publique. P64-V2H02R reste la dernière preuve Fusion. P44-V et P45 restent
+bloquées pendant le chemin correctif.
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
 roadmap macro, backlog actionnable, prochaines actions, index ADR/logs et
@@ -2477,3 +2479,26 @@ Package : 0.1.54. Statut : fusion-validated,
 done-human-gate par P64-V2H02R ; `fusion-validated: true`,
 `print-validated: false`. P44-V et P45 restent bloqués. P64-U01 conserve la future
 progression de calcul non modale et annulable ; aucun écran bloquant n'est ajouté.
+
+## P64-V2H03A — Arbitrage des variantes internes (2026-07-18)
+
+Statut : `done-documentation`, architecture acceptée, runtime non commencé.
+
+ADR-0070 et
+`docs/P64_V2H03_INTERNAL_VARIANT_COORDINATION_CONTRACT.md` séparent désormais
+la conception locale du placement global. P45 possède les intentions
+fonctionnelles, futures formes et certificat local. P64 reçoit seulement des
+variantes immuables certifiées, choisit paresseusement variante et placement,
+puis applique son certificat global.
+
+Le premier runtime restera un fallback correctif après le portefeuille canonique
+complet. Les lanes Rapide/Normal/Approfondi devront être préfixes et monotones,
+sans produit cartésien ni éviction d'une solution historique. Les caps
+numériques seront mesurés et verrouillés dans P64-V2H03B, pas inventés par ce
+lot documentaire.
+
+Aucun code, schéma `bgig.project.v1`, default, jeu, tolérance, valeur physique,
+cavité, scène Fusion ou comportement de matérialisation n'est modifié.
+P64-V2H03B devient la seule mission `ready` ; P64-V2H03C et P64-V2H03V restent
+bloquées. P44-V et P45 restent bloquées. `fusion-validated: false` et
+`print-validated: false` pour P64-V2H03.

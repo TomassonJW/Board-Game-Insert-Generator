@@ -342,3 +342,21 @@ La finition ADR-0069 est une couche postérieure au certificat de faisabilité.
 Elle transforme les seules enveloppes extensibles, puis demande un nouveau
 certificat. Son échec restitue le candidat de base. Les assets, cavités, minima,
 jeux, tolérances et réservations demeurent immuables.
+
+## Frontière des variantes internes P64-V2H03
+
+ADR-0070 ajoute une frontière interne entre dérivation géométrique et placement
+global, sans modifier le projet utilisateur. Une variante locale immuable porte
+une enveloppe minimale, un layout de cavités, un digest, une provenance, un coût
+local et un certificat local. P45 reste propriétaire des sémantiques et futures
+formes ; P64 reçoit seulement des variantes certifiées.
+
+Le solveur n'énumère pas leur produit cartésien. Il choisit paresseusement une
+variante lorsqu'il développe un participant, puis le validateur commun certifie
+le plan complet avec boîte, jeux globaux, réservations, appuis, retrait,
+fermeture et conservation. La voie canonique est exécutée en premier et reste
+inchangée. Ce contrat reste Python pur, sans `adsk`, nouvelle forme, schéma
+projet ou matérialisation automatique.
+
+Contrat d'exécution :
+`docs/P64_V2H03_INTERNAL_VARIANT_COORDINATION_CONTRACT.md`.

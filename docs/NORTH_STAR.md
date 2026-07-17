@@ -83,6 +83,18 @@ Le produit est sur la bonne trajectoire quand :
 - les tolerances et geometries critiques sont validees par impression reelle ;
 - un agent peut choisir une mission par capability, milestone, gate et validation.
 
+## Coordination des variantes internes
+
+Plusieurs dispositions internes d'un même conteneur peuvent être nécessaires
+pour satisfaire le volume global, mais elles ne changent pas la North Star :
+les assets et intentions d'usage définissent les cavités, puis le solveur choisit
+parmi des variantes locales certifiées. P45 possède la sémantique et les formes ;
+P64 possède la combinaison globale, les budgets et la vérité du résultat.
+
+Une marge volumique positive reste une condition nécessaire et non une promesse
+de disposition. Aucune variante ne peut modifier silencieusement un jeu, une
+valeur physique, une cavité ou ajouter un corps.
+
 ## Ce que le projet doit apprendre a faire
 
 ### Court terme

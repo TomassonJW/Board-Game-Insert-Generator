@@ -1349,4 +1349,20 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
   certifié malgré environ 693,6 cm³ de marge théorique. Les variantes internes
   globales relèvent de P64-V2H03 à coordonner avec P45.
 - Validation : `fusion-validated: true` pour la portée P64-V2H02R, `print-validated: false`. P44-V et P45
-  restent bloqués jusqu'à l'arbitrage explicite de la suite.
+  restent bloquées pendant le chemin correctif P64-V2H03.
+
+## Mise à jour P64-V2H03A — 2026-07-18
+
+- C-GEOMETRY / C-ASSET : `contracted` pour une frontière locale de variantes
+  immuables ; P45 garde les sémantiques, futures formes et certification locale.
+- C-SOLVER / C-LAYOUT : `designed` pour une sélection globale paresseuse et
+  bornée après la voie canonique, sans produit cartésien.
+- C-QUALITY : identité par digest, déduplication, deux certificats, lanes
+  préservées, monotonie des profils et fixtures de culs-de-sac deviennent des
+  critères normatifs.
+- C-USABILITY : aucun contrôle novice ajouté ; la traçabilité reste dans le
+  diagnostic secondaire.
+- Validation : documentaire seulement. Aucun runtime ou schéma projet ne change ;
+  `fusion-validated: false` et `print-validated: false` pour P64-V2H03.
+- Suite : P64-V2H03B est `ready` ; P64-V2H03C/V restent bloquées. P45 reste
+  bloquée par P44-V.

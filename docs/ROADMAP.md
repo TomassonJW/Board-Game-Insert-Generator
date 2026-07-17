@@ -817,6 +817,19 @@ et prépare deux trajectoires distinctes : P64-V2H03 pour des variantes internes
 bornées coordonnées avec P45, et P64-X01 pour un éventuel mode exact sous ADR et
 benchmark. P64-U01 portera ultérieurement une progression non modale et annulable.
 
-P64-V2H02R est clôturée. P64-V2H03 exige maintenant un arbitrage explicite avec P45 ; P44-V, P45 et P46 restent
-verrouillés ; aucun défaut, tolérance, schéma ou comportement de matérialisation
+P64-V2H02R est clôturée. L'arbitrage P64-V2H03A / P45 est maintenant accepté ;
+P44-V, P45 et P46 restent verrouillées ; aucun défaut, tolérance, schéma ou comportement de matérialisation
 n'est modifié. `print-validated: false`.
+
+## P64-V2H03A — Frontière P45/P64 acceptée (2026-07-18)
+
+ADR-0070 fixe la coordination des variantes internes. P45 reste propriétaire
+des modes de disposition, formes et certificats locaux. P64 consomme une petite
+frontière de variantes certifiées, choisit variante et placement sous des lanes
+bornées, puis réapplique le certificat global.
+
+La séquence corrective devient : P64-V2H03B pour types, certificats, fixtures et
+caps ; P64-V2H03C pour sélection globale et télémétrie ; P64-V2H03V seulement si
+une observation Fusion est requise. P44-V et P45 restent bloquées pendant ce
+chemin. Aucune valeur physique, tolérance, default, scène ou preuve d'impression
+ne change.

@@ -144,6 +144,12 @@ les laisser visibles à travers ses parois. Dans la vue de dessus, la coordonné
 
 P64-V2H03 devra étudier un portefeuille borné de variantes d'enveloppes internes
 et leur sélection globale, coordonné avec la propriété fonctionnelle de P45.
+L'arbitrage est maintenant fixé par
+`docs/P64_V2H03_INTERNAL_VARIANT_COORDINATION_CONTRACT.md` et ADR-0070 : P45
+possède les sémantiques et le certificat local, P64 consomme paresseusement les
+variantes certifiées et conserve le certificat global. Le runtime reste non
+commencé.
+
 P64-X01 demeure le futur mode exact soumis à ADR et benchmark. P64-U01 portera
 une progression de calcul non modale, annulable et incapable de voler le focus ;
 aucun écran bloquant n'est introduit dans ce lot.
