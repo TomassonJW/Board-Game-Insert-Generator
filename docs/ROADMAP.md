@@ -760,8 +760,9 @@ trajectoire. P44-V et P45 restent bloqués. `fusion-validated: false`,
 ## P64-A01 — Portefeuille multi-solveurs et finitions (2026-07-17)
 
 Le solveur par étages reste le chemin rapide, mais les KO contextuels P64-H02 et
-P64-H03 interdisent de continuer par simple ajout de seeds. ADR-0068 introduit
-un contrat commun, un greedy 3D EP/EMS, un beam robuste et un portefeuille Auto.
+P64-H03 interdisent de continuer par simple ajout de seeds. H03R conserve toutefois
+les gains déjà observés ; ADR-0068 introduit un contrat commun, un greedy 3D
+EP/EMS, un beam robuste et un portefeuille Auto.
 ADR-0069 reporte la finition continue et modulaire après la faisabilité.
 
 Chemin critique avant reprise de P44-V : P64-H04 intégré (vérité/observabilité), P64-H05

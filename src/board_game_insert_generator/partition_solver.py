@@ -24,6 +24,7 @@ from board_game_insert_generator.top_inset_reservation import (
 from board_game_insert_generator.volumetric_stage_solver import (
     SOLUTION_COMPLETE,
     SOLUTION_WITH_RESIDUALS,
+    STRUCTURED_ORDER_STRATEGIES,
     solve_stage_portfolio,
 )
 
@@ -40,7 +41,7 @@ def solve_partition_plan(
     request_id: str | None = None,
     request_revision: int | None = None,
 ) -> dict[str, object]:
-    """Return a bounded canonical proposal, then diversify only after a false dead end."""
+    """Use a fast canonical search, then bounded directed and hash retries."""
 
     started_at = perf_counter()
     attempts = [_solve_partition_plan_once(raw_project)]
@@ -51,8 +52,11 @@ def solve_partition_plan(
 
     partial: dict[str, object] | None = None
     chosen: dict[str, object] | None = None
-    for seed in range(MAX_DIVERSIFIED_PORTFOLIOS):
-        proposal = _solve_partition_plan_once(raw_project, diversified_order_seed=seed)
+    for strategy in _structured_retry_strategies(diagnostic_codes):
+        proposal = _solve_partition_plan_once(
+            raw_project,
+            structured_order_strategy=strategy,
+        )
         attempts.append(proposal)
         status = str(_mapping(proposal["summary"])["status"])
         if status == "constructed":
@@ -60,6 +64,17 @@ def solve_partition_plan(
             break
         if status == SOLUTION_WITH_RESIDUALS and partial is None:
             partial = proposal
+
+    if chosen is None:
+        for seed in range(MAX_DIVERSIFIED_PORTFOLIOS):
+            proposal = _solve_partition_plan_once(raw_project, diversified_order_seed=seed)
+            attempts.append(proposal)
+            status = str(_mapping(proposal["summary"])["status"])
+            if status == "constructed":
+                chosen = proposal
+                break
+            if status == SOLUTION_WITH_RESIDUALS and partial is None:
+                partial = proposal
 
     return _attach_outcome(
         _finalize_portfolio_search(chosen or partial or initial, attempts),
@@ -73,8 +88,9 @@ def _solve_partition_plan_once(
     raw_project: object,
     *,
     diversified_order_seed: int | None = None,
+    structured_order_strategy: str | None = None,
 ) -> dict[str, object]:
-    """Evaluate one canonical or hash-diversified ordering portfolio."""
+    """Evaluate one canonical, directed or hash-diversified portfolio."""
 
     normalization = normalize_project_draft(raw_project)
     project = normalization.project
@@ -128,8 +144,15 @@ def _solve_partition_plan_once(
     groups_by_id = {
         str(group["id"]): group for group in _mappings(project["container_groups"])
     }
+    default_floor = float(_mapping(project["layout"])["default_floor_thickness_mm"])
     participants = [
-        _container_participant(item, groups_by_id[str(item["container_group_id"])])
+        _container_participant(
+            item,
+            groups_by_id[str(item["container_group_id"])],
+            top_inset_plan=top_inset_plan,
+            default_floor_mm=default_floor,
+            storage_height_mm=storage_height,
+        )
         for item in containers
     ]
     for value in _values(project["fill_elements"]):
@@ -165,6 +188,10 @@ def _solve_partition_plan_once(
         vertical_clearance_mm=solver_z_clearance,
         preference=str(project["solver_preference"]),
         diversified_order_seed=diversified_order_seed,
+        structured_order_strategy=structured_order_strategy,
+        top_inset_search_context={
+            "reservations": deepcopy(top_inset_plan["reservations"]),
+        },
     )
     evaluated = int(_mapping(stage_solver["search"])["groupings_evaluated"])
     if not _values(stage_solver["candidates"]):
@@ -391,6 +418,20 @@ def _solve_partition_plan_once(
     return plan
 
 
+def _structured_retry_strategies(
+    diagnostic_codes: set[str],
+) -> tuple[str, ...]:
+    """Prefer top-inset-aware orders only when validation exposed that constraint."""
+
+    if any(code.startswith("TOP_INSET_") for code in diagnostic_codes):
+        return STRUCTURED_ORDER_STRATEGIES
+    return tuple(
+        strategy
+        for strategy in STRUCTURED_ORDER_STRATEGIES
+        if not strategy.startswith("top_inset_")
+    )
+
+
 def _finalize_portfolio_search(
     proposal: dict[str, object],
     attempts: list[dict[str, object]],
@@ -412,13 +453,27 @@ def _finalize_portfolio_search(
 
     solver = _mapping(result["solver"])
     budgets = _mapping(solver["budgets"])
+    budgets["max_structured_portfolios"] = len(STRUCTURED_ORDER_STRATEGIES)
     budgets["max_diversified_portfolios"] = MAX_DIVERSIFIED_PORTFOLIOS
+    budgets["max_retry_portfolios"] = (
+        len(STRUCTURED_ORDER_STRATEGIES) + MAX_DIVERSIFIED_PORTFOLIOS
+    )
+    attempt_searches = [
+        _mapping(_mapping(item["solver"])["search"])
+        for item in attempts
+    ]
+    directed_count = sum(
+        "structured_order_strategy" in item for item in attempt_searches
+    )
+    hash_count = sum("diversified_order_seed" in item for item in attempt_searches)
     search = _mapping(solver["search"])
     search.update(
         {
             "canonical_portfolio_failed": True,
             "portfolios_evaluated": len(attempts),
-            "diversified_portfolios_evaluated": len(attempts) - 1,
+            "directed_portfolios_evaluated": directed_count,
+            "hash_portfolios_evaluated": hash_count,
+            "diversified_portfolios_evaluated": directed_count + hash_count,
             "candidate_count_across_portfolios": feasible,
             "groupings_evaluated_across_portfolios": evaluated,
         }
@@ -521,10 +576,22 @@ def _clearance_policy(project: dict[str, object]) -> dict[str, object]:
 
 
 def _container_participant(
-    contract: dict[str, object], group: dict[str, object]
+    contract: dict[str, object],
+    group: dict[str, object],
+    *,
+    top_inset_plan: dict[str, object],
+    default_floor_mm: float,
+    storage_height_mm: float,
 ) -> dict[str, object]:
     minimum = _dimension(contract["minimum_outer_envelope_mm"])
     constraints = _mapping(contract["constraints"])
+    search_hint = _top_inset_search_hint(
+        contract,
+        group,
+        top_inset_plan,
+        default_floor_mm=default_floor_mm,
+        storage_height_mm=storage_height_mm,
+    )
     return {
         "id": f"container:{contract['container_group_id']}",
         "role": "container",
@@ -535,6 +602,49 @@ def _container_participant(
         "target_local_mm": deepcopy(constraints["target_outer_dimensions_mm"]),
         "surplus_preference": constraints["surplus_preference"],
         "external_clearance_effective_v1": deepcopy(group["clearance_effective_v1"]),
+        "top_inset_search_hint_v1": search_hint,
+    }
+
+
+def _top_inset_search_hint(
+    contract: dict[str, object],
+    group: dict[str, object],
+    top_inset_plan: dict[str, object],
+    *,
+    default_floor_mm: float,
+    storage_height_mm: float,
+) -> dict[str, object]:
+    """Expose bounded search hints; physical validation remains authoritative."""
+
+    maximum_inset_depth = max(
+        (
+            float(item["inset_depth_from_top_mm"])
+            for item in _mappings(top_inset_plan["reservations"])
+        ),
+        default=0.0,
+    )
+    maximum_cavity_depth = max(
+        (
+            float(_mapping(item["inner_dimensions_mm"])["z"])
+            for item in _mappings(contract["cavity_layout"])
+        ),
+        default=0.0,
+    )
+    floor = float(group["floor_thickness_mm"] or default_floor_mm)
+    required_height = maximum_cavity_depth + maximum_inset_depth + floor
+    return {
+        "maximum_inset_depth_mm": _round(maximum_inset_depth),
+        "maximum_cavity_depth_mm": _round(maximum_cavity_depth),
+        "required_safe_height_mm": _round(required_height),
+        "headroom_deficit_mm": _round(max(0.0, required_height - storage_height_mm)),
+        "floor_thickness_mm": _round(floor),
+        "cavities": [
+            {
+                "local_origin_mm": deepcopy(item["local_origin_mm"]),
+                "inner_dimensions_mm": deepcopy(item["inner_dimensions_mm"]),
+            }
+            for item in _mappings(contract["cavity_layout"])
+        ],
     }
 
 
@@ -695,19 +805,50 @@ def _minimum_envelope_box_proofs(
         if not exceeded:
             continue
         dimensions = ", ".join(f"{axis.upper()} ({float(_mapping(minimum)[axis])} mm > {limits[axis]} mm)" for axis in exceeded)
-        proofs.append(_diagnostic("MINIMUM_ENVELOPE_EXCEEDS_BOX", f"Le minimum du conteneur '{container['container_name']}' dépasse la boîte utile sur {dimensions}.", "Réduis ce contenu, sa quantité ou ses dimensions fixes avant de recalculer.", str(container["container_group_id"]), proof_code="minimum_outer_envelope_exceeds_box_limit_v1"))
+        proofs.append(
+            _diagnostic(
+                "MINIMUM_ENVELOPE_EXCEEDS_BOX",
+                f"Le minimum du conteneur '{container['container_name']}' dépasse la boîte utile sur {dimensions}.",
+                "Réduis ce contenu, sa quantité ou ses dimensions fixes avant de recalculer.",
+                str(container["container_group_id"]),
+                proof_code="minimum_outer_envelope_exceeds_box_limit_v1",
+            )
+        )
     return proofs
 
 
-def _attach_outcome(plan: dict[str, object], request_id: str | None, request_revision: int | None, started_at: float) -> dict[str, object]:
-    attach_solver_outcome(plan, request_id=request_id, request_revision=request_revision, elapsed_ms=(perf_counter() - started_at) * 1000.0)
+def _attach_outcome(
+    plan: dict[str, object],
+    request_id: str | None,
+    request_revision: int | None,
+    started_at: float,
+) -> dict[str, object]:
+    attach_solver_outcome(
+        plan,
+        request_id=request_id,
+        request_revision=request_revision,
+        elapsed_ms=(perf_counter() - started_at) * 1000.0,
+    )
     plan.pop("plan_digest", None)
     plan["plan_digest"] = _digest(plan)
     return plan
 
 
-def _diagnostic(code: str, message: str, action: str, reference_id: str = "", *, proof_code: str | None = None) -> dict[str, object]:
-    diagnostic: dict[str, object] = {"code": code, "severity": "blocker", "message": message, "action": action, "reference_id": reference_id}
+def _diagnostic(
+    code: str,
+    message: str,
+    action: str,
+    reference_id: str = "",
+    *,
+    proof_code: str | None = None,
+) -> dict[str, object]:
+    diagnostic: dict[str, object] = {
+        "code": code,
+        "severity": "blocker",
+        "message": message,
+        "action": action,
+        "reference_id": reference_id,
+    }
     if proof_code is not None:
         diagnostic["proof"] = {"code": proof_code, "kind": "necessary_bound"}
     return diagnostic

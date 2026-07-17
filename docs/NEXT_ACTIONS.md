@@ -23,8 +23,8 @@ KO contextuel tant que le solveur n'a pas passé P64-V2.
 - P64-H02 est implémenté et automatisé dans 0.1.44, mais P64-H02V est un KO
   contextuel : un nouveau petit ajout peut encore épuiser la recherche alors
   que du volume reste disponible.
-- Un essai local P64-H03 non commité a exploré d'autres ordres/structures. Un
-  nouveau cas réel l'a également mis en échec ; il reste préservé hors `main`.
+- P64-H03R conserve ces ordres/structures au-dessus de H04 dans 0.1.47. Un
+  nouveau cas réel reste en échec : il motive H06/H07, sans supprimer les gains H03.
 - P64-A01 documente la rupture : le solveur actuel devient baseline rapide ;
   placement 3D libre, beam et portefeuille Auto sont introduits derrière un
   contrat et un validateur communs.
@@ -37,7 +37,7 @@ Statut : `ready`. P64-H04 est intégré : les sorties du solveur sont désormais
 distinguées entre solution, budget, preuve, projet invalide et réponse obsolète.
 
 Objectif : introduire la frontière interne commune (candidats, budgets,
-certificats et résultats) et adapter à parité le solveur actuel `Étages et piles`,
+certificats et résultats) et adapter à parité la baseline H03R `Étages et piles`,
 sans modifier le schéma projet, les valeurs physiques ni les réservations.
 
 ## Lots suivants, non ouverts

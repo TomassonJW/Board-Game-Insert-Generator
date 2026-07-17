@@ -15,10 +15,10 @@ preuves archivées.
 
 - Dernière preuve : `P64-H01 Fusion OK 0.1.42 - commit 5865645` ; P64-H01 est `fusion-validated`.
 - `print-validated: false` ; aucune valeur physique n'est calibrée par cette preuve.
-- P64-H02 (package 0.1.44) puis l'essai local P64-H03 non commité ont reçu des
-  KO contextuels sur de nouveaux projets denses : leur famille de recherche ne
-  couvre pas tous les placements 3D plausibles.
-- P64-H03 reste préservé hors `main`, sans preuve Fusion et sans intégration.
+- P64-H03R (package 0.1.47) conserve la recherche dirigée H03 au-dessus de H04 ;
+  un autre cas dense reste un KO contextuel, sans remettre en cause les cas
+  supplémentaires déjà résolus.
+- P64-H03R est `automated-validated`, mais ni `fusion-validated` ni `print-validated`.
 - P64-A01 accepte la trajectoire multi-solveurs des ADR-0068/0069 ; aucun runtime
   n'est modifié par cette mission documentaire.
 - Prochaine action unique : `P64-H05`, contrat commun et baseline `Étages et piles`.
@@ -33,7 +33,7 @@ preuves archivées.
 | Terminé | P64-H01 / H01V | Recherche dense et répartition progressive X/Y/Z observées dans Fusion 0.1.42. |
 | KO contextuel | P44-VH02V | Fonctions acceptées contextuellement, croix corrigée ensuite. |
 | KO contextuel | P64-H02V | L'alignement UX est accepté contextuellement, mais un nouveau faux impossible empêche toute preuve globale 0.1.44. |
-| Essai local préservé | P64-H03 | Recherche dirigée non commitée ; nouveau KO contextuel, aucune validation ni intégration. |
+| Terminé, KO contextuel | P64-H03R | Baseline dirigée conservée sur H04 ; un cas dense reste à dépasser par H06/H07. |
 | Terminé | P64-A01 | Contrat programme et ADR multi-solveurs/finition acceptés. |
 | Terminé | P64-H04 | Résultats honnêtes, télémétrie versionnée et corpus automatisé ; aucune nouvelle stratégie. |
 | Prêt | P64-H05 | Contrat commun et baseline `Étages et piles`. |

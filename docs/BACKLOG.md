@@ -2369,6 +2369,13 @@ P44-M007 est ready-for-explicit-go.
 - Suite : ne pas ajouter d'autres seeds ; récupérer seulement fixtures et faits
   utiles dans P64-H04.
 
+### P64-H03R — Réintégration de la baseline dirigée
+
+- Statut : terminé et intégré dans 0.1.47, `automated-validated`.
+- Contrat : `docs/P64_H03R_BASELINE_PRESERVATION_CONTRACT.md`.
+- Décision : conserver les gains H03 malgré le KO contextuel d'un autre cas ; H06/H07 doivent le dépasser, pas le retirer.
+- Validation : aucune preuve Fusion ni impression ajoutée.
+
 ### P64-H04 — Résultats honnêtes et observabilité
 
 - Statut : terminé et intégré. Agent : Terra avec revue senior.

@@ -24,10 +24,22 @@ MAX_ORDERINGS = 4
 MAX_GROUP_SIZES_PER_ORDER = 20
 MAX_ADAPTIVE_STAGE_COUNTS = 8
 MAX_STACK_PARTITIONS_PER_ORDER = 64
+MAX_STRUCTURED_STACK_PARTITIONS_PER_ORDER = 128
+MAX_STACK_ASSIGNMENT_BEAM = 128
 MAX_CANDIDATES = 192
 MAX_RETURNED_CANDIDATES = 64
 MAX_ORIENTATION_COMBINATIONS = 1024
 MIN_SUPPORT_RATIO = 0.25
+
+STRUCTURED_ORDER_STRATEGIES = (
+    "top_inset_headroom_asc",
+    "top_inset_safe_top_asc",
+    "top_inset_headroom_asc_reverse",
+    "long_side_desc",
+    "short_side_desc",
+    "area_interleave",
+    "height_interleave",
+)
 
 _AXES = ("x", "y", "z")
 _EPSILON = 0.0001
@@ -55,6 +67,8 @@ def solve_stage_portfolio(
     vertical_clearance_mm: float | None = None,
     preference: str = "balanced",
     diversified_order_seed: int | None = None,
+    structured_order_strategy: str | None = None,
+    top_inset_search_context: dict[str, object] | None = None,
 ) -> dict[str, object]:
     """Return a bounded portfolio of complete or residual stage candidates."""
 
@@ -70,12 +84,27 @@ def solve_stage_portfolio(
         )
     if preference not in _SCORE_WEIGHTS:
         raise VolumetricStageSolverError(f"Unknown P64 solver preference: {preference!r}.")
+    if diversified_order_seed is not None and structured_order_strategy is not None:
+        raise VolumetricStageSolverError(
+            "A stage portfolio cannot combine hash diversification and a structured order."
+        )
+    if (
+        structured_order_strategy is not None
+        and structured_order_strategy not in STRUCTURED_ORDER_STRATEGIES
+    ):
+        raise VolumetricStageSolverError(
+            f"Unknown structured order strategy: {structured_order_strategy!r}."
+        )
 
     budgets = {
         "max_orderings": MAX_ORDERINGS,
         "max_group_sizes_per_order": MAX_GROUP_SIZES_PER_ORDER,
         "max_adaptive_stage_counts": MAX_ADAPTIVE_STAGE_COUNTS,
-        "max_stack_partitions_per_order": MAX_STACK_PARTITIONS_PER_ORDER,
+        "max_stack_partitions_per_order": (
+            MAX_STRUCTURED_STACK_PARTITIONS_PER_ORDER
+            if structured_order_strategy == "top_inset_safe_top_asc"
+            else MAX_STACK_PARTITIONS_PER_ORDER
+        ),
         "max_candidates": MAX_CANDIDATES,
         "max_returned_candidates": MAX_RETURNED_CANDIDATES,
         "max_orientation_combinations": MAX_ORIENTATION_COMBINATIONS,
@@ -83,7 +112,16 @@ def solve_stage_portfolio(
     if not values:
         return _empty_result(budgets, "No requested body can participate in the stage search.", between_clearance, box_clearance, vertical_clearance)
 
-    orderings = _orders(values, diversified_order_seed=diversified_order_seed)
+    orderings = _orders(
+        values,
+        diversified_order_seed=diversified_order_seed,
+        structured_order_strategy=structured_order_strategy,
+    )
+    constraint_directed = (
+        structured_order_strategy == "top_inset_safe_top_asc"
+        and isinstance(top_inset_search_context, dict)
+    )
+    enforce_top_inset_headroom = False
     candidates: list[dict[str, object]] = []
     signatures: set[str] = set()
     groupings_evaluated = 0
@@ -117,6 +155,9 @@ def solve_stage_portfolio(
                     order_name=order_name,
                     group_size=0,
                     orientation_strategy=orientation_strategy,
+                    enforce_top_inset_headroom=enforce_top_inset_headroom,
+                    constraint_directed=constraint_directed,
+                    top_inset_search_context=top_inset_search_context,
                 )
                 xy_arrangements_evaluated += attempts
                 if candidate is None:
@@ -155,6 +196,9 @@ def solve_stage_portfolio(
                     order_name=order_name,
                     group_size=group_size,
                     orientation_strategy=orientation_strategy,
+                    enforce_top_inset_headroom=enforce_top_inset_headroom,
+                    constraint_directed=constraint_directed,
+                    top_inset_search_context=top_inset_search_context,
                 )
                 xy_arrangements_evaluated += attempts
                 if candidate is None:
@@ -168,7 +212,15 @@ def solve_stage_portfolio(
                 break
         if truncated:
             break
-        for stack_partition_index, stacks in enumerate(_stack_partitions(ordered, height, vertical_clearance)):
+        for stack_partition_index, stacks in enumerate(
+            _stack_partitions(
+                ordered,
+                height,
+                vertical_clearance,
+                assignment_beam=constraint_directed,
+                enforce_top_inset_headroom=enforce_top_inset_headroom,
+            )
+        ):
             stack_partitions_evaluated += 1
             for orientation_strategy in ("width", "height", "balanced"):
                 if len(candidates) >= MAX_CANDIDATES:
@@ -185,6 +237,9 @@ def solve_stage_portfolio(
                     order_name=order_name,
                     partition_index=stack_partition_index,
                     orientation_strategy=orientation_strategy,
+                    enforce_top_inset_headroom=enforce_top_inset_headroom,
+                    constraint_directed=constraint_directed,
+                    top_inset_search_context=top_inset_search_context,
                 )
                 xy_arrangements_evaluated += attempts
                 if candidate is None:
@@ -225,6 +280,11 @@ def solve_stage_portfolio(
             "truncated": truncated or len(ordered_candidates) > len(returned),
             "ordering_count": len(orderings),
             **({"diversified_order_seed": diversified_order_seed} if diversified_order_seed is not None else {}),
+            **(
+                {"structured_order_strategy": structured_order_strategy}
+                if structured_order_strategy is not None
+                else {}
+            ),
             "groupings_evaluated": groupings_evaluated,
             "adaptive_partitions_evaluated": adaptive_partitions_evaluated,
             "stack_partitions_evaluated": stack_partitions_evaluated,
@@ -297,16 +357,37 @@ def _candidate_for_groups(
     order_name: str,
     group_size: int,
     orientation_strategy: str,
+    enforce_top_inset_headroom: bool,
+    constraint_directed: bool,
+    top_inset_search_context: dict[str, object] | None,
 ) -> tuple[dict[str, object] | None, int]:
-    height_plan = _stage_heights(groups, storage_height, vertical_clearance)
+    height_plan = _stage_heights(
+        groups,
+        storage_height,
+        vertical_clearance,
+        enforce_top_inset_headroom=enforce_top_inset_headroom,
+    )
     if height_plan is None:
         return None, 0
     stage_heights, vertical_complete, stage_gaps = height_plan
     stage_layouts: list[dict[str, object]] = []
     attempts = 0
     xy_complete = True
-    for group, stage_height in zip(groups, stage_heights):
+    for stage_index, (group, stage_height) in enumerate(zip(groups, stage_heights)):
         spatial_reference = stage_height if preference == "balanced" else None
+        search_context = (
+            top_inset_search_context
+            if constraint_directed and stage_index == len(groups) - 1
+            else None
+        )
+        body_heights = {
+            str(item["id"]): (
+                _axis_base(item, "z")
+                if _axis_mode(item, "z") == "fixed"
+                else stage_height
+            )
+            for item in group
+        }
         full, full_attempts = _best_xy_layout(
             group,
             box,
@@ -314,7 +395,9 @@ def _candidate_for_groups(
             box_clearance,
             orientation_strategy=orientation_strategy,
             fill=True,
-            spatial_reference_height=spatial_reference
+            spatial_reference_height=spatial_reference,
+            top_inset_search_context=search_context,
+            top_body_heights_by_id=body_heights,
         )
         attempts += full_attempts
         if full is not None:
@@ -327,7 +410,9 @@ def _candidate_for_groups(
             box_clearance,
             orientation_strategy=orientation_strategy,
             fill=False,
-            spatial_reference_height=spatial_reference
+            spatial_reference_height=spatial_reference,
+            top_inset_search_context=search_context,
+            top_body_heights_by_id=body_heights,
         )
         attempts += partial_attempts
         if partial is None:
@@ -499,6 +584,18 @@ def _candidate_for_groups(
                 "order": order_name,
                 "group_size": group_size,
                 "orientation_strategy": orientation_strategy,
+                **(
+                    {
+                        "top_inset_search_violation_count": int(
+                            stage_layouts[-1].get("_top_inset_violation_count", 0)
+                        ),
+                        "top_inset_search_shortfall_mm": float(
+                            stage_layouts[-1].get("_top_inset_shortfall_mm", 0.0)
+                        ),
+                    }
+                    if constraint_directed
+                    else {}
+                ),
             },
             "invariants": {
                 "no_collisions_by_construction": True,
@@ -523,6 +620,9 @@ def _candidate_for_stacks(
     order_name: str,
     partition_index: int,
     orientation_strategy: str,
+    enforce_top_inset_headroom: bool,
+    constraint_directed: bool,
+    top_inset_search_context: dict[str, object] | None,
 ) -> tuple[dict[str, object] | None, int]:
     """Pack independent vertical stacks in XY.
 
@@ -536,6 +636,22 @@ def _candidate_for_stacks(
         descriptor = _stack_descriptor(members, orientation_strategy, stack_index)
         if descriptor is None:
             return None, 0
+        resolved_members = _mappings(descriptor["stack_members"])
+        heights = _stack_heights(
+            resolved_members,
+            storage_height,
+            vertical_clearance,
+            enforce_top_inset_headroom=enforce_top_inset_headroom,
+        )
+        if heights is None:
+            return None, 0
+        top_member = _mapping(resolved_members[-1])
+        descriptor["resolved_stack_heights"] = heights
+        descriptor["top_inset_layout_subject"] = {
+            "participant": top_member["participant"],
+            "body_height_mm": heights[-1],
+            "rotated_xy": bool(top_member["rotated_xy"]),
+        }
         descriptors.append(descriptor)
 
     layout, attempts = _best_xy_layout(
@@ -545,6 +661,9 @@ def _candidate_for_stacks(
         box_clearance,
         orientation_strategy=orientation_strategy,
         fill=True,
+        top_inset_search_context=(
+            top_inset_search_context if constraint_directed else None
+        ),
     )
     if layout is None:
         return None, attempts
@@ -553,9 +672,20 @@ def _candidate_for_stacks(
     for stack_index, item_layout in enumerate(_mappings(layout["placements"])):
         descriptor = _mapping(item_layout["participant"])
         members = _mappings(descriptor["stack_members"])
-        heights = _stack_heights(members, storage_height, vertical_clearance)
-        if heights is None:
-            return None, attempts
+        raw_heights = descriptor["resolved_stack_heights"]
+        if not isinstance(raw_heights, list):
+            raise VolumetricStageSolverError("Resolved stack heights must be a list.")
+        heights = [float(item) for item in raw_heights]
+        if constraint_directed and top_inset_search_context is not None:
+            adjusted_heights = _rebalance_stack_top_height_for_inset(
+                descriptor,
+                item_layout,
+                heights,
+                top_inset_search_context,
+            )
+            if adjusted_heights is None:
+                return None, attempts
+            heights = adjusted_heights
 
         world_xy = _mapping(item_layout["world_size_mm"])
         stack_origin = _mapping(item_layout["origin_mm"])
@@ -668,6 +798,18 @@ def _candidate_for_stacks(
                 "stack_partition_index": partition_index,
                 "stack_count": len(stacks),
                 "orientation_strategy": orientation_strategy,
+                **(
+                    {
+                        "top_inset_search_violation_count": int(
+                            layout.get("_top_inset_violation_count", 0)
+                        ),
+                        "top_inset_search_shortfall_mm": float(
+                            layout.get("_top_inset_shortfall_mm", 0.0)
+                        ),
+                    }
+                    if constraint_directed
+                    else {}
+                ),
             },
             "invariants": {
                 "no_collisions_by_construction": True,
@@ -686,22 +828,34 @@ def _stack_partitions(
     values: list[dict[str, object]],
     storage_height: float,
     vertical_clearance: float,
+    *,
+    assignment_beam: bool = False,
+    enforce_top_inset_headroom: bool = False,
 ) -> list[list[list[dict[str, object]]]]:
-    """Return bounded deterministic contiguous vertical-stack partitions."""
+    """Return bounded contiguous or assignment-beam vertical partitions."""
 
     count = len(values)
     if count == 0:
         return []
 
     def stack_height(stack: list[dict[str, object]]) -> float:
-        gaps = [
-            _participant_pair_clearance(left, right, "z", vertical_clearance)
-            for left, right in zip(stack, stack[1:])
-        ]
-        return sum(_axis_base(item, "z") for item in stack) + sum(gaps)
+        return _stack_minimum_height(
+            stack,
+            storage_height,
+            vertical_clearance,
+            enforce_top_inset_headroom=enforce_top_inset_headroom,
+        )
 
-    candidates: list[list[list[dict[str, object]]]] = []
-    if count <= 10:
+    if assignment_beam:
+        candidates = _beam_stack_partitions(
+            values,
+            storage_height,
+            vertical_clearance,
+            enforce_top_inset_headroom=enforce_top_inset_headroom,
+        )
+    else:
+        candidates: list[list[list[dict[str, object]]]] = []
+    if not assignment_beam and count <= 10:
         for boundary_mask in range(1 << max(0, count - 1)):
             stacks: list[list[dict[str, object]]] = []
             current: list[dict[str, object]] = []
@@ -712,7 +866,7 @@ def _stack_partitions(
                     current = []
             if all(stack_height(stack) <= storage_height + _EPSILON for stack in stacks):
                 candidates.append(stacks)
-    else:
+    elif not assignment_beam:
         for group_size in _group_sizes(count):
             stacks = [values[index : index + group_size] for index in range(0, count, group_size)]
             if all(stack_height(stack) <= storage_height + _EPSILON for stack in stacks):
@@ -741,13 +895,23 @@ def _stack_partitions(
 
     unique: list[list[list[dict[str, object]]]] = []
     signatures: set[tuple[tuple[str, ...], ...]] = set()
-    ordered = sorted(
-        candidates,
-        key=lambda stacks: (
-            len(stacks),
-            max(stack_height(stack) for stack in stacks),
-            tuple(tuple(str(item["id"]) for item in stack) for stack in stacks),
-        ),
+    ordered = (
+        _diverse_stack_states(
+            candidates,
+            storage_height,
+            vertical_clearance,
+            enforce_top_inset_headroom=enforce_top_inset_headroom,
+            limit=len(candidates),
+        )
+        if assignment_beam
+        else sorted(
+            candidates,
+            key=lambda stacks: (
+                len(stacks),
+                max(stack_height(stack) for stack in stacks),
+                tuple(tuple(str(item["id"]) for item in stack) for stack in stacks),
+            ),
+        )
     )
     for stacks in ordered:
         signature = tuple(tuple(str(item["id"]) for item in stack) for stack in stacks)
@@ -755,9 +919,201 @@ def _stack_partitions(
             continue
         signatures.add(signature)
         unique.append(stacks)
-        if len(unique) >= MAX_STACK_PARTITIONS_PER_ORDER:
+        limit = (
+            MAX_STRUCTURED_STACK_PARTITIONS_PER_ORDER
+            if assignment_beam
+            else MAX_STACK_PARTITIONS_PER_ORDER
+        )
+        if len(unique) >= limit:
             break
     return unique
+
+
+def _stack_minimum_height(
+    stack: list[dict[str, object]],
+    storage_height: float,
+    vertical_clearance: float,
+    *,
+    enforce_top_inset_headroom: bool,
+) -> float:
+    heights = [_axis_base(item, "z") for item in stack]
+    if enforce_top_inset_headroom and stack:
+        heights[-1] = max(
+            heights[-1],
+            _bounded_safe_top_height(stack[-1], storage_height),
+        )
+    gaps = [
+        _participant_pair_clearance(left, right, "z", vertical_clearance)
+        for left, right in zip(stack, stack[1:])
+    ]
+    return sum(heights) + sum(gaps)
+
+
+def _beam_stack_partitions(
+    values: list[dict[str, object]],
+    storage_height: float,
+    vertical_clearance: float,
+    *,
+    enforce_top_inset_headroom: bool,
+) -> list[list[list[dict[str, object]]]]:
+    """Assign bodies to non-contiguous stacks with a deterministic bounded beam."""
+
+    states: list[list[list[dict[str, object]]]] = [[]]
+    for value in values:
+        expanded: dict[
+            tuple[tuple[str, ...], ...],
+            list[list[dict[str, object]]],
+        ] = {}
+        for stacks in states:
+            proposals = [[*stack] for stack in stacks]
+            proposals.append([value])
+            _keep_stack_state(expanded, proposals)
+
+            for stack_index, stack in enumerate(stacks):
+                for members in ([*stack, value], [value, *stack]):
+                    if (
+                        _stack_minimum_height(
+                            members,
+                            storage_height,
+                            vertical_clearance,
+                            enforce_top_inset_headroom=enforce_top_inset_headroom,
+                        )
+                        > storage_height + _EPSILON
+                    ):
+                        continue
+                    proposals = [[*item] for item in stacks]
+                    proposals[stack_index] = members
+                    _keep_stack_state(expanded, proposals)
+
+        states = _diverse_stack_states(
+            list(expanded.values()),
+            storage_height,
+            vertical_clearance,
+            enforce_top_inset_headroom=enforce_top_inset_headroom,
+            limit=MAX_STACK_ASSIGNMENT_BEAM,
+        )
+
+    return [
+        sorted(
+            stacks,
+            key=lambda stack: (
+                _top_inset_headroom_deficit(stack[-1]),
+                -max(_axis_base(item, "z") for item in stack),
+                tuple(str(item["id"]) for item in stack),
+            ),
+        )
+        for stacks in states
+    ]
+
+
+def _diverse_stack_states(
+    states: list[list[list[dict[str, object]]]],
+    storage_height: float,
+    vertical_clearance: float,
+    *,
+    enforce_top_inset_headroom: bool,
+    limit: int,
+) -> list[list[list[dict[str, object]]]]:
+    """Keep good states for every explored stack count, not only the densest."""
+
+    buckets: dict[int, list[list[list[dict[str, object]]]]] = {}
+    for stacks in sorted(
+        states,
+        key=lambda item: _stack_state_key(
+            item,
+            storage_height,
+            vertical_clearance,
+            enforce_top_inset_headroom=enforce_top_inset_headroom,
+        ),
+    ):
+        buckets.setdefault(len(stacks), []).append(stacks)
+
+    selected: list[list[list[dict[str, object]]]] = []
+    rank = 0
+    while len(selected) < limit:
+        added = False
+        for stack_count in sorted(buckets):
+            bucket = buckets[stack_count]
+            if rank >= len(bucket):
+                continue
+            selected.append(bucket[rank])
+            added = True
+            if len(selected) >= limit:
+                break
+        if not added:
+            break
+        rank += 1
+    return selected
+
+def _keep_stack_state(
+    states: dict[tuple[tuple[str, ...], ...], list[list[dict[str, object]]]],
+    stacks: list[list[dict[str, object]]],
+) -> None:
+    signature = tuple(
+        sorted(tuple(str(item["id"]) for item in stack) for stack in stacks)
+    )
+    states.setdefault(signature, stacks)
+
+
+def _stack_safe_top_shortfall(
+    stack: list[dict[str, object]],
+    storage_height: float,
+    vertical_clearance: float,
+) -> float:
+    """Return headroom that no Z redistribution inside this stack can recover."""
+
+    if not stack:
+        return 0.0
+    top = stack[-1]
+    required = _layout_top_required_height(top)
+    if _axis_mode(top, "z") == "fixed":
+        maximum_top_height = _axis_base(top, "z")
+    else:
+        lower_minimum = sum(_axis_base(item, "z") for item in stack[:-1])
+        gaps = sum(
+            _participant_pair_clearance(left, right, "z", vertical_clearance)
+            for left, right in zip(stack, stack[1:])
+        )
+        maximum_top_height = max(0.0, storage_height - lower_minimum - gaps)
+    return _round(max(0.0, required - maximum_top_height))
+
+def _stack_state_key(
+    stacks: list[list[dict[str, object]]],
+    storage_height: float,
+    vertical_clearance: float,
+    *,
+    enforce_top_inset_headroom: bool,
+) -> tuple[object, ...]:
+    heights = [
+        _stack_minimum_height(
+            stack,
+            storage_height,
+            vertical_clearance,
+            enforce_top_inset_headroom=enforce_top_inset_headroom,
+        )
+        for stack in stacks
+    ]
+    footprint_area = sum(
+        max(_axis_base(item, "x") for item in stack)
+        * max(_axis_base(item, "y") for item in stack)
+        for stack in stacks
+    )
+    safe_top_shortfalls = [
+        _stack_safe_top_shortfall(stack, storage_height, vertical_clearance)
+        for stack in stacks
+    ]
+    return (
+        sum(int(value > _EPSILON) for value in safe_top_shortfalls),
+        _round(sum(safe_top_shortfalls)),
+        len(stacks),
+        footprint_area,
+        max(heights, default=0.0),
+        max(heights, default=0.0) - min(heights, default=0.0),
+        tuple(
+            sorted(tuple(str(item["id"]) for item in stack) for stack in stacks)
+        ),
+    )
+
 
 def _stack_descriptor(
     members: list[dict[str, object]],
@@ -856,9 +1212,16 @@ def _stack_heights(
     members: list[dict[str, object]],
     storage_height: float,
     vertical_clearance: float,
+    *,
+    enforce_top_inset_headroom: bool,
 ) -> list[float] | None:
     participants = [_mapping(member["participant"]) for member in members]
     heights = [_axis_base(participant, "z") for participant in participants]
+    if enforce_top_inset_headroom and participants:
+        heights[-1] = max(
+            heights[-1],
+            _bounded_safe_top_height(participants[-1], storage_height),
+        )
     gaps = [
         _participant_pair_clearance(left, right, "z", vertical_clearance)
         for left, right in zip(participants, participants[1:])
@@ -972,12 +1335,22 @@ def _stage_heights(
     groups: list[list[dict[str, object]]],
     storage_height: float,
     vertical_clearance: float,
+    *,
+    enforce_top_inset_headroom: bool,
 ) -> tuple[list[float], bool, list[float]] | None:
     heights: list[float] = []
     complete = True
-    for group in groups:
+    for group_index, group in enumerate(groups):
         bases = [_axis_base(item, "z") for item in group]
         stage_height = max(bases)
+        if enforce_top_inset_headroom and group_index == len(groups) - 1:
+            stage_height = max(
+                stage_height,
+                *(
+                    _bounded_safe_top_height(item, storage_height)
+                    for item in group
+                ),
+            )
         fixed = [base for item, base in zip(group, bases) if _axis_mode(item, "z") == "fixed"]
         if any(not isclose(value, stage_height, abs_tol=0.001) for value in fixed):
             complete = False
@@ -1017,27 +1390,51 @@ def _best_xy_layout(
     orientation_strategy: str,
     fill: bool,
     spatial_reference_height: float | None = None,
+    top_inset_search_context: dict[str, object] | None = None,
+    top_body_heights_by_id: dict[str, float] | None = None,
 ) -> tuple[dict[str, object] | None, int]:
     feasible: list[dict[str, object]] = []
     attempts = 0
-    for columns in range(1, len(group) + 1):
-        rows = [group[index : index + columns] for index in range(0, len(group), columns)]
-        attempts += 1
-        layout = _layout_rows(
-            rows,
-            box,
-            between_clearance,
-            box_clearance,
-            orientation_strategy=orientation_strategy,
-            fill=fill,
-        )
-        if layout is not None:
+    order_variants = (
+        _constraint_layout_orders(group)
+        if top_inset_search_context is not None
+        else [list(group)]
+    )
+    for variant_index, ordered in enumerate(order_variants):
+        for columns in range(1, len(ordered) + 1):
+            rows = [
+                ordered[index : index + columns]
+                for index in range(0, len(ordered), columns)
+            ]
+            attempts += 1
+            layout = _layout_rows(
+                rows,
+                box,
+                between_clearance,
+                box_clearance,
+                orientation_strategy=orientation_strategy,
+                fill=fill,
+            )
+            if layout is None:
+                continue
+            if variant_index:
+                layout["layout_id"] = f"{layout['layout_id']}:v{variant_index}"
+            if top_inset_search_context is not None:
+                violation_count, shortfall = _layout_top_inset_penalty(
+                    layout,
+                    top_inset_search_context,
+                    top_body_heights_by_id,
+                )
+                layout["_top_inset_violation_count"] = violation_count
+                layout["_top_inset_shortfall_mm"] = shortfall
             feasible.append(layout)
     if not feasible:
         return None, attempts
     return min(
         feasible,
         key=lambda item: (
+            int(item.get("_top_inset_violation_count", 0)),
+            float(item.get("_top_inset_shortfall_mm", 0.0)),
             -(
                 _layout_spatial_balance(item, spatial_reference_height)
                 if orientation_strategy == "balanced"
@@ -1050,6 +1447,312 @@ def _best_xy_layout(
             str(item["layout_id"]),
         ),
     ), attempts
+
+
+def _constraint_layout_orders(
+    group: list[dict[str, object]],
+) -> list[list[dict[str, object]]]:
+    if len(group) <= 1:
+        return [list(group)]
+    inset_order = sorted(
+        group,
+        key=lambda item: (
+            _layout_top_required_height(item),
+            str(item["id"]),
+        ),
+    )
+    recoverability_order = sorted(
+        group,
+        key=lambda item: (
+            _layout_top_unrecoverable_height(item),
+            str(item["id"]),
+        ),
+    )
+    candidates = [
+        list(group),
+        recoverability_order,
+        inset_order,
+        list(reversed(group)),
+        list(reversed(recoverability_order)),
+        list(reversed(inset_order)),
+    ]
+    geometric_orders = [
+        sorted(group, key=lambda item: (_axis_base(item, "x"), str(item["id"]))),
+        sorted(group, key=lambda item: (_axis_base(item, "y"), str(item["id"]))),
+        sorted(
+            group,
+            key=lambda item: (
+                _axis_base(item, "x") * _axis_base(item, "y"),
+                str(item["id"]),
+            ),
+        ),
+    ]
+    for geometric_order in geometric_orders:
+        candidates.extend(
+            [
+                geometric_order,
+                list(reversed(geometric_order)),
+                _interleave_extremes(geometric_order),
+            ]
+        )
+    risky = [
+        item
+        for item in recoverability_order
+        if _layout_top_unrecoverable_height(item) > _EPSILON
+    ]
+    safe = [item for item in recoverability_order if item not in risky]
+    if risky and safe:
+        for safe_order in (
+            sorted(safe, key=lambda item: (_axis_base(item, "x"), str(item["id"]))),
+            sorted(safe, key=lambda item: (_axis_base(item, "y"), str(item["id"]))),
+        ):
+            for split in range(1, len(safe_order) + 1):
+                candidates.append(
+                    [*safe_order[:split], risky[0], *safe_order[split:], *risky[1:]]
+                )
+    for base_order in (recoverability_order, list(group), inset_order):
+        for shift in range(1, len(base_order)):
+            candidates.append([*base_order[shift:], *base_order[:shift]])
+    candidates.append(_interleave_extremes(list(group)))
+
+    result: list[list[dict[str, object]]] = []
+    signatures: set[tuple[str, ...]] = set()
+    for candidate in candidates:
+        signature = tuple(str(item["id"]) for item in candidate)
+        if signature in signatures:
+            continue
+        signatures.add(signature)
+        result.append(candidate)
+        if len(result) >= 32:
+            break
+    return result
+
+
+def _layout_top_required_height(item: dict[str, object]) -> float:
+    subject_payload = item.get("top_inset_layout_subject")
+    subject = (
+        _mapping(subject_payload["participant"])
+        if isinstance(subject_payload, dict)
+        else item
+    )
+    hint = subject.get("top_inset_search_hint_v1")
+    if not isinstance(hint, dict):
+        return _axis_base(subject, "z")
+    return float(hint.get("required_safe_height_mm", _axis_base(subject, "z")))
+
+
+def _layout_top_unrecoverable_height(item: dict[str, object]) -> float:
+    """Estimate worst-case top headroom that this stack cannot redistribute."""
+
+    subject_payload = item.get("top_inset_layout_subject")
+    if not isinstance(subject_payload, dict):
+        hint = item.get("top_inset_search_hint_v1")
+        return (
+            float(hint.get("headroom_deficit_mm", 0.0))
+            if isinstance(hint, dict)
+            else 0.0
+        )
+    subject = _mapping(subject_payload["participant"])
+    required = _layout_top_required_height(item)
+    body_height = float(subject_payload["body_height_mm"])
+    transferable = _layout_top_height_transfer(item, subject)
+    return _round(max(0.0, required - body_height - transferable))
+
+def _layout_top_inset_penalty(
+    layout: dict[str, object],
+    context: dict[str, object],
+    body_heights_by_id: dict[str, float] | None,
+) -> tuple[int, float]:
+    violations = 0
+    shortfall = 0.0
+    for placement in _mappings(layout["placements"]):
+        layout_participant = _mapping(placement["participant"])
+        subject_data = _layout_top_subject(
+            layout_participant,
+            placement,
+            body_heights_by_id,
+        )
+        if subject_data is None:
+            continue
+        subject, body_height, rotated = subject_data
+        required = _required_top_height_for_layout(
+            subject,
+            placement,
+            rotated,
+            context,
+        )
+        deficit = max(0.0, required - body_height)
+        transferable = _layout_top_height_transfer(layout_participant, subject)
+        unresolved = max(0.0, deficit - transferable)
+        if unresolved <= _EPSILON:
+            continue
+        violations += 1
+        shortfall += unresolved
+    return violations, _round(shortfall)
+
+
+def _layout_top_subject(
+    layout_participant: dict[str, object],
+    placement: dict[str, object],
+    body_heights_by_id: dict[str, float] | None,
+) -> tuple[dict[str, object], float, bool] | None:
+    subject_payload = layout_participant.get("top_inset_layout_subject")
+    if isinstance(subject_payload, dict):
+        return (
+            _mapping(subject_payload["participant"]),
+            float(subject_payload["body_height_mm"]),
+            bool(subject_payload["rotated_xy"]),
+        )
+    if body_heights_by_id is None:
+        return None
+    identifier = str(layout_participant["id"])
+    if identifier not in body_heights_by_id:
+        return None
+    return (
+        layout_participant,
+        float(body_heights_by_id[identifier]),
+        bool(placement["rotated_xy"]),
+    )
+
+
+def _required_top_height_for_layout(
+    subject: dict[str, object],
+    placement: dict[str, object],
+    rotated: bool,
+    context: dict[str, object],
+) -> float:
+    hint = subject.get("top_inset_search_hint_v1")
+    if not isinstance(hint, dict):
+        return _axis_base(subject, "z")
+    floor = float(hint.get("floor_thickness_mm", 0.0))
+    body_origin = _mapping(placement["origin_mm"])
+    world_size = _mapping(placement["world_size_mm"])
+    minimum = _mapping(subject["minimum_local_mm"])
+    final_local = {
+        "x": float(world_size["y"] if rotated else world_size["x"]),
+        "y": float(world_size["x"] if rotated else world_size["y"]),
+    }
+    minimum_origin = {
+        axis: max(0.0, final_local[axis] - float(minimum[axis])) / 2.0
+        for axis in ("x", "y")
+    }
+    required = _axis_base(subject, "z")
+    reservations = _mappings(context.get("reservations", []))
+    for cavity in _mappings(hint.get("cavities", [])):
+        cavity_origin = _mapping(cavity["local_origin_mm"])
+        cavity_size = _mapping(cavity["inner_dimensions_mm"])
+        local_x = minimum_origin["x"] + float(cavity_origin["x"])
+        local_y = minimum_origin["y"] + float(cavity_origin["y"])
+        if rotated:
+            cavity_rect = {
+                "x": float(body_origin["x"]) + final_local["y"]
+                - local_y - float(cavity_size["y"]),
+                "y": float(body_origin["y"]) + local_x,
+                "width": float(cavity_size["y"]),
+                "height": float(cavity_size["x"]),
+            }
+        else:
+            cavity_rect = {
+                "x": float(body_origin["x"]) + local_x,
+                "y": float(body_origin["y"]) + local_y,
+                "width": float(cavity_size["x"]),
+                "height": float(cavity_size["y"]),
+            }
+        for reservation in reservations:
+            cut_origin = _mapping(reservation["cut_origin_mm"])
+            cut_size = _mapping(reservation["cut_size_mm"])
+            reservation_rect = {
+                "x": float(cut_origin["x"]),
+                "y": float(cut_origin["y"]),
+                "width": float(cut_size["x"]),
+                "height": float(cut_size["y"]),
+            }
+            if _rectangles_intersect(cavity_rect, reservation_rect):
+                required = max(
+                    required,
+                    float(cavity_size["z"])
+                    + float(reservation["inset_depth_from_top_mm"])
+                    + floor,
+                )
+    return required
+
+
+def _layout_top_height_transfer(
+    layout_participant: dict[str, object],
+    subject: dict[str, object],
+) -> float:
+    if _axis_mode(subject, "z") == "fixed":
+        return 0.0
+    raw_heights = layout_participant.get("resolved_stack_heights")
+    raw_members = layout_participant.get("stack_members")
+    if not isinstance(raw_heights, list) or not isinstance(raw_members, list):
+        return 0.0
+    available = 0.0
+    for raw_member, raw_height in zip(raw_members[:-1], raw_heights[:-1]):
+        member = _mapping(_mapping(raw_member)["participant"])
+        if _axis_mode(member, "z") == "fixed":
+            continue
+        available += max(0.0, float(raw_height) - _axis_base(member, "z"))
+    return available
+
+
+def _rebalance_stack_top_height_for_inset(
+    descriptor: dict[str, object],
+    item_layout: dict[str, object],
+    heights: list[float],
+    context: dict[str, object],
+) -> list[float] | None:
+    """Transfer unused lower-stack height to the top body when an inset needs it."""
+
+    subject_payload = descriptor.get("top_inset_layout_subject")
+    if not isinstance(subject_payload, dict):
+        return heights
+    subject = _mapping(subject_payload["participant"])
+    required = _required_top_height_for_layout(
+        subject,
+        item_layout,
+        bool(subject_payload["rotated_xy"]),
+        context,
+    )
+    deficit = max(0.0, required - heights[-1])
+    if deficit <= _EPSILON:
+        return heights
+    if _axis_mode(subject, "z") == "fixed":
+        return None
+
+    members = _mappings(descriptor["stack_members"])
+    adjusted = list(heights)
+    donors: list[tuple[float, int]] = []
+    for index, member in enumerate(members[:-1]):
+        participant = _mapping(member["participant"])
+        if _axis_mode(participant, "z") == "fixed":
+            continue
+        surplus = max(0.0, adjusted[index] - _axis_base(participant, "z"))
+        if surplus > _EPSILON:
+            donors.append((surplus, index))
+
+    remaining = deficit
+    for surplus, index in sorted(donors, key=lambda item: (-item[0], item[1])):
+        transferred = min(surplus, remaining)
+        adjusted[index] -= transferred
+        adjusted[-1] += transferred
+        remaining -= transferred
+        if remaining <= _EPSILON:
+            break
+    if remaining > _EPSILON:
+        return None
+    return [_round(value) for value in adjusted]
+
+def _rectangles_intersect(
+    left: dict[str, float],
+    right: dict[str, float],
+) -> bool:
+    return (
+        left["x"] < right["x"] + right["width"] - _EPSILON
+        and right["x"] < left["x"] + left["width"] - _EPSILON
+        and left["y"] < right["y"] + right["height"] - _EPSILON
+        and right["y"] < left["y"] + left["height"] - _EPSILON
+    )
 
 
 def _layout_spatial_balance(
@@ -1707,7 +2410,11 @@ def _orders(
     values: list[dict[str, object]],
     *,
     diversified_order_seed: int | None = None,
+    structured_order_strategy: str | None = None,
 ) -> list[tuple[str, list[dict[str, object]]]]:
+    if structured_order_strategy is not None:
+        structured = _structured_order(values, structured_order_strategy)
+        return [(f"structured_{structured_order_strategy}", structured)]
     if diversified_order_seed is not None:
         seed = int(diversified_order_seed)
         diversified = sorted(
@@ -1730,6 +2437,90 @@ def _orders(
             signatures.add(signature)
             unique.append((name, order))
     return unique[:MAX_ORDERINGS]
+
+
+def _structured_order(
+    values: list[dict[str, object]],
+    strategy: str,
+) -> list[dict[str, object]]:
+    """Build one deterministic O(n log n) order for a directed retry."""
+
+    if strategy in {"top_inset_headroom_asc", "top_inset_safe_top_asc"}:
+        return sorted(values, key=_top_inset_headroom_deficit)
+    if strategy == "top_inset_headroom_asc_reverse":
+        return sorted(reversed(values), key=_top_inset_headroom_deficit)
+    if strategy == "long_side_desc":
+        return sorted(
+            values,
+            key=lambda item: (
+                -max(_axis_base(item, "x"), _axis_base(item, "y")),
+                -min(_axis_base(item, "x"), _axis_base(item, "y")),
+                str(item["id"]),
+            ),
+        )
+    if strategy == "short_side_desc":
+        return sorted(
+            values,
+            key=lambda item: (
+                -min(_axis_base(item, "x"), _axis_base(item, "y")),
+                -max(_axis_base(item, "x"), _axis_base(item, "y")),
+                str(item["id"]),
+            ),
+        )
+    if strategy == "area_interleave":
+        ordered = sorted(
+            values,
+            key=lambda item: (
+                -_area(_mapping(item["minimum_local_mm"])),
+                str(item["id"]),
+            ),
+        )
+        return _interleave_extremes(ordered)
+    if strategy == "height_interleave":
+        ordered = sorted(
+            values,
+            key=lambda item: (-_axis_base(item, "z"), str(item["id"])),
+        )
+        return _interleave_extremes(ordered)
+    raise VolumetricStageSolverError(
+        f"Unknown structured order strategy: {strategy!r}."
+    )
+
+
+def _bounded_safe_top_height(
+    item: dict[str, object],
+    storage_height: float,
+) -> float:
+    base = _axis_base(item, "z")
+    hint = item.get("top_inset_search_hint_v1")
+    if not isinstance(hint, dict):
+        return base
+    required = max(base, float(hint.get("required_safe_height_mm", base)))
+    if required > storage_height + _EPSILON:
+        return base
+    return required
+
+
+def _top_inset_headroom_deficit(item: dict[str, object]) -> float:
+    hint = item.get("top_inset_search_hint_v1")
+    if not isinstance(hint, dict):
+        return 0.0
+    return max(0.0, float(hint.get("headroom_deficit_mm", 0.0)))
+
+
+def _interleave_extremes(
+    ordered: list[dict[str, object]],
+) -> list[dict[str, object]]:
+    result: list[dict[str, object]] = []
+    left = 0
+    right = len(ordered) - 1
+    while left <= right:
+        result.append(ordered[left])
+        left += 1
+        if left <= right:
+            result.append(ordered[right])
+            right -= 1
+    return result
 
 
 def _group_sizes(count: int) -> list[int]:
@@ -1807,6 +2598,8 @@ def _candidate_sort_key(
     origin = _mapping(candidate["search_origin"])
     search_family_rank = int("stack_partition_index" in origin)
     common = (
+        int(origin.get("top_inset_search_violation_count", 0)),
+        float(origin.get("top_inset_search_shortfall_mm", 0.0)),
         candidate["solution_status"] != SOLUTION_COMPLETE,
         -float(candidate["quality_score"]),
         int(candidate["stage_count"]),
@@ -1816,6 +2609,8 @@ def _candidate_sort_key(
     if preference == "balanced":
         return common
     return (
+        int(origin.get("top_inset_search_violation_count", 0)),
+        float(origin.get("top_inset_search_shortfall_mm", 0.0)),
         candidate["solution_status"] != SOLUTION_COMPLETE,
         search_family_rank,
         -float(candidate["quality_score"]),

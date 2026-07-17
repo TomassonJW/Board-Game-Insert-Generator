@@ -2307,8 +2307,8 @@ construit 8 conteneurs sur 2 niveaux après 3 portefeuilles au total. Les compte
 agrégés restent exposés. La croix de suppression et le menu `...` partagent aussi
 désormais la même cellule de la ligne principale.
 
-Package : 0.1.46. Statut : implemented, automated-validated ; P64-H04 clarifie les sorties sans nouvelle stratégie.
-P64-H02V demeure un KO contextuel ; `fusion-validated: false`, `print-validated: false`. Aucun schéma,
+Package : 0.1.47. Statut : implemented, automated-validated ; P64-H03R conserve la recherche dirigée au-dessus de H04.
+Un cas dense demeure un KO contextuel ; `fusion-validated: false`, `print-validated: false`. Aucun schéma,
 default, dimension physique, tolérance, cavité, réservation, géométrie, CAD IR
 ou comportement de scène ne change. P64-A01/H04 supersèdent la trajectoire ;
 P44-V reste ouverte et P45 reste bloqué.
@@ -2318,9 +2318,9 @@ P44-V reste ouverte et P45 reste bloqué.
 Statut : `done`, `documentation-validated`, sans modification runtime.
 
 Le retour P64-H02V confirme les corrections UX mais révèle un nouveau faux
-impossible. Un essai local P64-H03 non commité explore davantage d'ordres et de
-structures ; un cas réel supplémentaire l'épuise également. L'essai reste
-préservé hors `main`, sans preuve `fusion-validated`.
+impossible. P64-H03R conserve davantage d'ordres et de structures car ils
+résolvent des cas supplémentaires ; un cas réel l'épuise encore. Le package
+reste sans preuve `fusion-validated`.
 
 ADR-0068 conserve le solveur par étages comme baseline rapide et planifie un
 greedy 3D EP/EMS, un beam robuste, un portefeuille Auto et un mode exact futur.

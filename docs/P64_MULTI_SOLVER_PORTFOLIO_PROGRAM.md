@@ -34,9 +34,9 @@ P64-H01 est `fusion-validated` dans le package 0.1.42. P64-H02 est
 Fusion est un KO contextuel : d'autres ajouts légers peuvent encore épuiser la
 recherche malgré un volume manifestement disponible.
 
-Un essai local P64-H03 non commité a ensuite augmenté la diversité des ordres et
-des structures. Un nouveau cas réel l'a également mis en échec. Cet essai reste
-préservé comme matériau d'analyse, mais il n'est ni intégré, ni
+P64-H03R réintègre la diversité d'ordres et de structures H03 au-dessus de H04,
+car elle résout des cas supplémentaires. Un autre cas réel reste en échec : H03R
+reste `automated-validated`, sans preuve Fusion, et H06/H07 doivent aller plus loin.
 `fusion-validated`, ni la base canonique de la suite.
 
 Conclusion : ajouter indéfiniment des seeds à la même famille de recherche ne
@@ -270,7 +270,7 @@ hors chemin critique.
 - Statut : `ready`.
 - Agent conseillé : Terra avec revue Luna/senior.
 - Objectif : introduire l'interface stratégie/candidat/certificat et encapsuler
-  le solveur actuel sans changer ses placements de référence.
+  la baseline H03R sans retirer ses placements de référence.
 - Livrables : types immuables, budgets communs, validateur unique, adaptateur
   `stage_stack`, tests de parité bit-à-bit ou géométrique documentée.
 - Non-objectifs : EP/EMS, beam, nouvelle UI, score physique, dépendance externe.
