@@ -228,7 +228,7 @@ class FusionPaletteDomTests(unittest.TestCase):
 
     def test_projects_contents_inside_their_parent_container_without_schema_or_bridge_change(self) -> None:
         for marker in (
-            "renderContentCard", "content-children", "child-card", "child-delete-action",
+            "renderContentCard", "content-children", "child-card", "child-delete-action", "child-inline-actions",
             "function nextUniqueGroupName(requestedName)", "group.name=nextUniqueGroupName(name||group.name)",
             "Supprimer « ${group.name||'ce conteneur'} » et ses ${contents.length} élément(s)",
             "project.contents=project.contents.filter(content=>content.container_group_id!==group.id)",
@@ -239,6 +239,7 @@ class FusionPaletteDomTests(unittest.TestCase):
             "Personnalisé", "container-batch-controls",
         ):
             self.assertIn(marker, self.markup)
+        self.assertIn('class="child-inline-actions">${moveAction}${deleteAction}</div>', self.markup)
         persistent_target = 'data-row="content" data-index="' + chr(36) + '{index}" data-key="container_group_id"'
         self.assertNotIn(persistent_target, self.markup)
         self.assertNotIn('data-bridge="move_', self.markup)
@@ -349,7 +350,7 @@ class FusionPaletteDomTests(unittest.TestCase):
             self.assertIn(marker, self.markup)
 
         self.assertIn(
-            "${dimensions}${quantityField}${thicknessField}${methodField}${moveAction}",
+            "${dimensions}${quantityField}${thicknessField}${methodField}${childActions}",
             self.markup,
         )
         self.assertNotIn("${methodField}${dimensions}", self.markup)
