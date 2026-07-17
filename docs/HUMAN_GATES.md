@@ -660,7 +660,7 @@ imprimée et ne vaut pas impression réelle. `print-validated: false`.
 
 ## P64-V2 — Gate portefeuille multi-solveurs
 
-Statut : `planned`, non ouverte. Déclencheur : P64-H04 à P64-H08 intégrées,
+Statut : `blocked-by-P64-H08`, non ouverte. Déclencheur : P64-H04 à P64-H08 intégrées,
 validations automatisées vertes, package Fusion dédié préparé par les scripts du
 dépôt.
 

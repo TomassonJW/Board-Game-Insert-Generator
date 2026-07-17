@@ -1,7 +1,7 @@
 # P64 — Programme portefeuille multi-solveurs et finition volumique
 
-Statut : architecture acceptée le 2026-07-17 ; P64-H06 est intégrée.
-Prochaine mission exécutable : `P64-H07`.
+Statut : architecture acceptée le 2026-07-17 ; P64-H07 est intégrée.
+Prochaine mission exécutable : `P64-H08`.
 
 Capability principale : `C-SOLVER`. Capabilities associées : `C-LAYOUT`,
 `C-GRID-3D`, `C-STACKING`, `C-USABILITY`, `C-QUALITY`.
@@ -293,7 +293,8 @@ hors chemin critique.
 
 ### P64-H07 — Beam robuste et portefeuille Auto
 
-- Statut : `ready`.
+- Statut : `terminé et intégré` le 2026-07-17, package 0.1.50.
+
 - Agent conseillé : Luna/frontier ; revue performance et produit obligatoire.
 - Objectif : conserver plusieurs états 3D et comparer baseline, greedy et beam
   sous un budget monotone.
@@ -301,13 +302,14 @@ hors chemin critique.
   déduplication inter-familles, sélection parmi candidats certifiés.
 - Non-objectifs : moteur exact, propriétés d'accessibilité ou de matière non
   mesurées, réglages Fusion complets, finition modulaire.
-- Acceptation : augmenter l'effort ne réduit jamais le portefeuille autorisé ;
-  le mode Auto garde le chemin rapide sur cas simples et trouve au moins les cas
-  denses du corpus ; timeout et annulation sont propres.
+- Acceptation obtenue : profils monotones, fast path simple, corpus H04
+  certifié, timeout/annulation propres, déduplication inter-familles et refus
+  fail-closed des candidats seulement géométriques.
+- Contrat : `docs/P64_H07_BEAM_PORTFOLIO_CONTRACT.md`.
 
 ### P64-H08 — Réglages Fusion, critères honnêtes et diagnostic secondaire
 
-- Statut : `blocked-by-P64-H07`.
+- Statut : `ready`.
 - Agent conseillé : Terra ; revue UX humaine à la gate.
 - Objectif : exposer méthode, effort et classement sans surcharger le parcours.
 - Livrables : `Auto intelligent` par défaut, choix avancés, temps réel du dernier

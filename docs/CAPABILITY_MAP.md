@@ -1282,8 +1282,21 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
   prépare seulement leur interface future.
 - C-GEOMETRY : finition continue/modulaire planifiée après P46 ; aucun filler ni
   cale automatique.
-- État : P64-H03R/H04/H05/H06 intégrés (baseline dirigée, résultats honnêtes,
-  contrat commun et greedy 3D EP/EMS). P64-H07 `ready`, P64-H08 bloquée
-  séquentiellement, P64-V2 planifiée.
+- État : P64-H03R/H04/H05/H06/H07 intégrés (baseline dirigée, résultats honnêtes,
+  contrat commun, greedy et beam 3D, portefeuille Auto interne). P64-H08
+  `ready`, P64-V2 bloquée séquentiellement.
 - Validation : dernière preuve inchangée P64-H01 0.1.42 ; P64-H02/H03 non
   fusion-validées ; `print-validated: false`.
+## Mise à jour P64-H07 — 2026-07-17
+
+- C-SOLVER : `free_3d_beam` et `portfolio_auto` sont `implemented` et
+  `automated-validated` derrière la frontière interne ; profils monotones,
+  timeout/annulation et déduplication testés.
+- C-LAYOUT / C-GRID-3D / C-STACKING : enveloppes finales cherchées dans EP/EMS,
+  fermeture sans résiduel arbitraire et topologie multi-niveaux certifiée.
+- C-QUALITY : correspondance candidat/plan ajoutée au certificat autoritaire ;
+  seuls les plans complets certifiés sont classés.
+- C-USABILITY : aucun réglage visible encore ; P64-H08 est `ready` pour exposer
+  méthode, effort et diagnostic sans perte de focus.
+- Validation : aucune preuve Fusion ou impression nouvelle ; dernière preuve
+  solveur P64-H01 0.1.42, `print-validated: false`.

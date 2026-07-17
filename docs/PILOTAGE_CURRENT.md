@@ -21,11 +21,12 @@ preuves archivées.
 - P64-H03R est `automated-validated`, mais ni `fusion-validated` ni `print-validated`.
 - P64-A01 accepte la trajectoire multi-solveurs des ADR-0068/0069 ; aucun runtime
   n'est modifié par cette mission documentaire.
-- P64-H06 (package 0.1.49) livre le moteur interne `free_3d_greedy` EP/EMS ;
-  le corpus H04, les plans Z locaux, les appuis multiples, le déterminisme et
-  les budgets durs sont automatisés, sans changer le chemin public H05.
-- Prochaine action unique : `P64-H07`, beam robuste et portefeuille Auto.
-  P44-V et P45 restent bloqués.
+- P64-H07 (package 0.1.50) livre le beam `free_3d_beam`, les profils d'effort
+  monotones et l'orchestrateur interne `portfolio_auto`. Seuls les plans
+  reconstruits et certifiés entrent au classement ; le chemin public reste
+  `stage_stack` jusqu'à P64-H08.
+- Prochaine action unique : `P64-H08`, réglages Fusion, diagnostic secondaire
+  et préparation de P64-V2. P44-V et P45 restent bloqués.
 
 ## Vue de séquence
 
@@ -41,7 +42,8 @@ preuves archivées.
 | Terminé | P64-H04 | Résultats honnêtes, télémétrie versionnée et corpus automatisé ; aucune nouvelle stratégie. |
 | Terminé | P64-H05 | Contrat commun, certificat et baseline `Étages et piles` préservée. |
 | Terminé | P64-H06 | Placement 3D libre greedy EP/EMS, admission géométrique commune et budgets explicites. |
-| Prêt | P64-H07 | Beam robuste et portefeuille Auto ; certification produit complète des familles. |
+| Terminé | P64-H07 | Beam robuste, profils monotones, plans libres certifiés et portefeuille Auto interne. |
+| Prêt | P64-H08 | Réglages Fusion, diagnostic secondaire et préparation de P64-V2. |
 | KO contextuel | P44-V | Reprendre seulement après P64-V2 ; P45 reste bloqué. |
 | Bloqué | P45 à P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |

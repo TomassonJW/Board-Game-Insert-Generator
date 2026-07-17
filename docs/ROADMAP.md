@@ -766,8 +766,8 @@ EP/EMS, un beam robuste et un portefeuille Auto.
 ADR-0069 reporte la finition continue et modulaire après la faisabilité.
 
 Chemin critique avant reprise de P44-V : P64-H04/H05/H06 intégrés (vérité,
-observabilité, contrat/baseline et greedy 3D EP/EMS), P64-H07 beam/portfolio,
-P64-H08 UI, puis P64-V2. P45/P46
+observabilité, contrat/baseline et greedy 3D EP/EMS), P64-H07 beam/portfolio intégré dans 0.1.50,
+P64-H08 UI désormais prêt, puis P64-V2. P45/P46
 reprennent seulement après P64-V2 et une P44-V positive.
 
 P64-F01/F02 sont planifiées après P46 afin de ne pas gonfler le chemin critique
@@ -775,3 +775,8 @@ V0.2 ; elles précèdent les finitions plus physiques. P64-F03 attend des retour
 d'impression pertinents. P64-X01 exact reste après benchmark, ADR de dépendance
 et GO distinct. Le contrat exécutable est
 `docs/P64_MULTI_SOLVER_PORTFOLIO_PROGRAM.md`.
+### Avancement P64-H07 — package 0.1.50
+
+Le beam 3D, les efforts monotones, la reconstruction certifiée et le
+portefeuille Auto interne sont intégrés. P64-H08 est la prochaine mission du
+chemin critique ; aucune UI solveur ou gate Fusion n'est ouverte avant elle.

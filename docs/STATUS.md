@@ -8,8 +8,8 @@ Statut produit : **MVP V0.1 Fusion-only accepte ; validation d impression non ac
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P64-H06 est intégré avec greedy 3D EP/EMS ; P64-H07 est la seule
-mission `ready`. P44-V reste en KO contextuel et P45 reste bloqué.
+Phase active : P64-H07 est intégré avec beam 3D et portefeuille Auto interne ;
+P64-H08 est la seule mission `ready`. P44-V reste en KO contextuel et P45 reste bloqué.
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -2329,7 +2329,7 @@ ADR-0069 sépare faisabilité et finition : fermeture continue puis harmonisatio
 modulaire, avec fallback obligatoire vers la solution certifiée.
 
 Le programme P64-H05 à H08 devient le chemin critique avant P64-V2 et reprise de
-P44-V. P64-H05/H06 sont intégrés et P64-H07 est la seule mission `ready`. P45/P46 et les lots ultérieurs ne
+P44-V. P64-H05/H06/H07 sont intégrés et P64-H08 est la seule mission `ready`. P45/P46 et les lots ultérieurs ne
 sont pas ouverts. Aucun schéma, default, dimension physique, tolérance, cavité,
 géométrie, CAD IR ou scène ne change ; `print-validated: false`.
 
@@ -2356,10 +2356,31 @@ Le corpus H04 simple, dense H01 et réservations H02 est placé. Les tests couvr
 aussi un franchissement de plan Z local, un appui supérieur sur deux corps, la
 non-collision, la déduplication, le déterminisme, les bornes nécessaires et
 l'épuisement honnête du budget. Le moteur réutilise le validateur géométrique
-commun ; la certification produit complète reste obligatoire dans P64-H07 avant
+commun ; la certification produit complète est livrée ensuite par P64-H07 avant
 toute exposition comme matérialisable.
 
 Le chemin public `solve_partition_plan` et la baseline `stage_stack` ne changent
 pas. Beam, portefeuille Auto, profils d'effort, UI, finition, cales, variantes
 P45 et solveur exact restent hors scope. Aucune nouvelle preuve Fusion ni
 impression : dernière preuve solveur P64-H01 0.1.42 ; `print-validated: false`.
+## P64-H07 — Beam robuste et portefeuille Auto (2026-07-17)
+
+Package : 0.1.50. Statut : `implemented`, `automated-validated`.
+
+La famille interne `free_3d_beam` conserve plusieurs états EP/EMS, explore les
+rotations XY et les enveloppes finales autorisées, et s'arrête sous des limites
+dures d'états, essais, largeur, temps et candidats. Une fermeture libre ne
+reclasse aucun résiduel : plus aucun EMS imprimable ne doit rester.
+
+L'adaptateur libre restaure enveloppes, cavités, parois, fonds, réservations,
+appuis, retrait et conservation avant le certificat commun. Celui-ci vérifie
+désormais aussi l'identité exacte entre snapshot candidat et placements du
+plan. `portfolio_auto` conserve le fast path simple, applique trois profils
+monotones, refuse les admissions seulement géométriques, déduplique entre
+familles et classe seulement des plans certifiés.
+
+Le corpus H04 simple/dense/réservations conserve une solution Auto certifiée ;
+un cas multi-niveaux distinct obtient un plan beam complet certifié. Le chemin
+public `solve_partition_plan`, le schéma, l'UI, les dimensions physiques, les
+jeux, la CAD IR et la scène restent inchangés. P64-H08 devient `ready` ; aucune
+preuve Fusion ou impression nouvelle. `print-validated: false`.

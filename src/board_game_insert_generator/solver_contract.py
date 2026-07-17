@@ -248,7 +248,9 @@ def certify_partition_candidate(
         and _integer(_mapping(plan.get("invariants")).get("automatic_body_count")) == 0
         and bool(_mapping(plan.get("invariants")).get("requested_bodies_only"))
     )
+    candidate_snapshot = _candidate_matches_plan(candidate, placements)
     checks = (
+        ValidationCheck("candidate_snapshot", candidate_snapshot, "CANDIDATE_PLAN_MISMATCH"),
         ValidationCheck("inside_box", bool(geometry["inside_box"]), "OUTSIDE_USEFUL_BOX"),
         ValidationCheck("box_xy_clearance", bool(geometry["box_xy_clearance_respected"]), "BOX_XY_CLEARANCE"),
         ValidationCheck("no_collisions", bool(geometry["no_collisions"]), "BODY_COLLISION"),
@@ -267,6 +269,36 @@ def certify_partition_candidate(
         checks=checks,
     )
 
+
+def _candidate_matches_plan(
+    candidate: SolverCandidate,
+    placements: list[dict[str, object]],
+) -> bool:
+    expected = tuple(
+        sorted(
+            (
+                _text(item.get("id")) or _text(item.get("placement_id")),
+                _text(item.get("role")),
+                _dimension_tuple(_mapping(item.get("origin_mm"))),
+                _dimension_tuple(_mapping(item.get("world_size_mm"))),
+                _integer(item.get("rotation_deg_z")),
+            )
+            for item in placements
+        )
+    )
+    proposed = tuple(
+        sorted(
+            (
+                item.placement_id,
+                item.role,
+                item.origin_mm,
+                item.size_mm,
+                item.rotation_deg_z,
+            )
+            for item in candidate.placements
+        )
+    )
+    return proposed == expected
 
 def validate_placement_geometry(
     placements: list[dict[str, object]],

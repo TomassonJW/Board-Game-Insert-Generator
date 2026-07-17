@@ -2401,13 +2401,15 @@ P44-M007 est ready-for-explicit-go.
 
 ### P64-H07 — Beam robuste et portefeuille Auto
 
-- Statut : ready. Agent : Luna/frontier, revue performance et produit obligatoire.
-- Livrable : beam borné, efforts monotones, comparaison baseline/greedy/beam et
+- Statut : terminé et intégré, package 0.1.50, `automated-validated`.
+- Contrat : `docs/P64_H07_BEAM_PORTFOLIO_CONTRACT.md`.
+- Livrable : beam borné sur enveloppes finales, efforts monotones,
+  reconstruction produit, comparaison baseline/greedy/beam, déduplication et
   sélection de candidats certifiés.
 
 ### P64-H08 — Réglages Fusion et diagnostic secondaire
 
-- Statut : blocked-by-P64-H07. Agent : Terra, gate UX humaine ensuite.
+- Statut : ready. Agent : Terra, gate UX humaine ensuite.
 - Livrable : méthode, effort, classement honnête, métriques du dernier run,
   persistance additive et focus stable.
 
