@@ -15,6 +15,10 @@ from typing import Any
 
 from board_game_insert_generator.expandable_envelope import derive_expandable_envelope_contract
 from board_game_insert_generator.project_v1 import normalize_project_draft
+from board_game_insert_generator.solver_contract import (
+    run_stage_stack_adapter,
+    validate_placement_geometry,
+)
 from board_game_insert_generator.solver_outcome import attach_solver_outcome
 from board_game_insert_generator.top_inset_reservation import (
     apply_top_inset_reservations,
@@ -41,7 +45,23 @@ def solve_partition_plan(
     request_id: str | None = None,
     request_revision: int | None = None,
 ) -> dict[str, object]:
-    """Use a fast canonical search, then bounded directed and hash retries."""
+    """Expose the P64 baseline only through the common strategy adapter."""
+
+    return run_stage_stack_adapter(
+        _solve_stage_stack_baseline,
+        raw_project,
+        request_id=request_id,
+        request_revision=request_revision,
+    )
+
+
+def _solve_stage_stack_baseline(
+    raw_project: object,
+    *,
+    request_id: str | None = None,
+    request_revision: int | None = None,
+) -> dict[str, object]:
+    """Preserve the H03R canonical/directed/hash stage-stack sequence exactly."""
 
     started_at = perf_counter()
     attempts = [_solve_partition_plan_once(raw_project)]
@@ -273,7 +293,14 @@ def _solve_partition_plan_once(
             )
             continue
         placements = _mappings(applied_top_insets["placements"])
-        validation = _validate_placements(placements, box, storage_height, xy_clearance, box_xy_clearance, z_clearance)
+        validation = validate_placement_geometry(
+            placements,
+            box,
+            storage_height,
+            xy_clearance,
+            box_xy_clearance,
+            z_clearance,
+        )
         if not all(
             bool(validation[key])
             for key in ("inside_box", "box_xy_clearance_respected", "no_collisions", "clearances_respected")
@@ -686,95 +713,6 @@ def _complement_participant(value: dict[str, object]) -> dict[str, object]:
         "target_local_mm": deepcopy(dimensions),
         "surplus_preference": "fixed",
     }
-
-
-def _validate_placements(
-    placements: list[dict[str, object]],
-    box: dict[str, float],
-    storage_height: float,
-    xy_clearance: float,
-    box_xy_clearance: float,
-    z_clearance: float,
-) -> dict[str, object]:
-    inside = all(
-        all(float(_mapping(item["origin_mm"])[axis]) >= -_EPSILON for axis in ("x", "y", "z"))
-        and float(_mapping(item["origin_mm"])["x"]) + float(_mapping(item["world_size_mm"])["x"]) <= box["x"] + _EPSILON
-        and float(_mapping(item["origin_mm"])["y"]) + float(_mapping(item["world_size_mm"])["y"]) <= box["y"] + _EPSILON
-        and float(_mapping(item["origin_mm"])["z"]) + float(_mapping(item["world_size_mm"])["z"]) <= storage_height + _EPSILON
-        for item in placements
-    )
-    box_xy_clearance_respected = all(
-        float(_mapping(item["origin_mm"])["x"]) >= _placement_clearance(item, "box_per_side_xy_mm", "x", box_xy_clearance) - _EPSILON
-        and float(_mapping(item["origin_mm"])["y"]) >= _placement_clearance(item, "box_per_side_xy_mm", "y", box_xy_clearance) - _EPSILON
-        and float(_mapping(item["origin_mm"])["x"]) + float(_mapping(item["world_size_mm"])["x"])
-        <= box["x"] - _placement_clearance(item, "box_per_side_xy_mm", "x", box_xy_clearance) + _EPSILON
-        and float(_mapping(item["origin_mm"])["y"]) + float(_mapping(item["world_size_mm"])["y"])
-        <= box["y"] - _placement_clearance(item, "box_per_side_xy_mm", "y", box_xy_clearance) + _EPSILON
-        for item in placements
-    )
-    no_collisions = all(
-        not _intersects(left, right)
-        for index, left in enumerate(placements)
-        for right in placements[index + 1 :]
-    )
-    clearances = all(
-        _separated_with_clearance(left, right, xy_clearance, z_clearance)
-        for index, left in enumerate(placements)
-        for right in placements[index + 1 :]
-    )
-    body_volume = sum(_volume(_mapping(item["world_size_mm"])) for item in placements)
-    storage_volume = box["x"] * box["y"] * storage_height
-    return {
-        "inside_box": inside,
-        "box_xy_clearance_respected": box_xy_clearance_respected,
-        "no_collisions": no_collisions,
-        "clearances_respected": clearances,
-        "body_volume_mm3": _round(body_volume),
-        "storage_volume_mm3": _round(storage_volume),
-        "technical_void_volume_mm3": _round(max(0.0, storage_volume - body_volume)),
-        "unassigned_printable_volume_mm3": 0.0,
-    }
-
-
-def _intersects(left: dict[str, object], right: dict[str, object]) -> bool:
-    lo, ls = _mapping(left["origin_mm"]), _mapping(left["world_size_mm"])
-    ro, rs = _mapping(right["origin_mm"]), _mapping(right["world_size_mm"])
-    return all(float(lo[a]) < float(ro[a]) + float(rs[a]) - _EPSILON and float(ro[a]) < float(lo[a]) + float(ls[a]) - _EPSILON for a in ("x", "y", "z"))
-
-
-def _placement_clearance(
-    placement: dict[str, object], vector: str, axis: str, fallback: float
-) -> float:
-    policy = placement.get("external_clearance_effective_v1")
-    if not isinstance(policy, dict):
-        return float(fallback)
-    values = policy.get(vector)
-    if not isinstance(values, dict):
-        return float(fallback)
-    local_axis = axis
-    if axis in {"x", "y"} and int(placement.get("rotation_deg_z", 0)) == 90:
-        local_axis = "y" if axis == "x" else "x"
-    value = values.get(local_axis)
-    return float(fallback) if value is None else float(value)
-
-
-def _separated_with_clearance(
-    left: dict[str, object],
-    right: dict[str, object],
-    xy_clearance: float,
-    z_clearance: float,
-) -> bool:
-    lo, ls = _mapping(left["origin_mm"]), _mapping(left["world_size_mm"])
-    ro, rs = _mapping(right["origin_mm"]), _mapping(right["world_size_mm"])
-    return any(
-        float(lo[axis]) + float(ls[axis]) + clearance <= float(ro[axis]) + 0.001
-        or float(ro[axis]) + float(rs[axis]) + clearance <= float(lo[axis]) + 0.001
-        for axis, clearance in (
-            ("x", max(_placement_clearance(left, "between_mm", "x", xy_clearance), _placement_clearance(right, "between_mm", "x", xy_clearance))),
-            ("y", max(_placement_clearance(left, "between_mm", "y", xy_clearance), _placement_clearance(right, "between_mm", "y", xy_clearance))),
-            ("z", max(_placement_clearance(left, "between_mm", "z", z_clearance), _placement_clearance(right, "between_mm", "z", z_clearance))),
-        )
-    )
 
 
 def _top_inset_payload(value: dict[str, object]) -> dict[str, object]:

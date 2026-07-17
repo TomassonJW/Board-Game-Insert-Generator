@@ -1,7 +1,7 @@
 # P64 — Programme portefeuille multi-solveurs et finition volumique
 
-Statut : architecture et trajectoire acceptées le 2026-07-17 ; aucun runtime
-Prochaine mission exécutable : `P64-H05`.
+Statut : architecture acceptée le 2026-07-17 ; P64-H05 est intégrée.
+Prochaine mission exécutable : `P64-H06`.
 
 Capability principale : `C-SOLVER`. Capabilities associées : `C-LAYOUT`,
 `C-GRID-3D`, `C-STACKING`, `C-USABILITY`, `C-QUALITY`.
@@ -96,8 +96,8 @@ préférées à une voxelisation globale.
 
 ## 6. Contrat commun de stratégie
 
-P64-H05 doit introduire une frontière interne stable, sans modifier le schéma de
-projet utilisateur.
+P64-H05 introduit une frontière interne stable, sans modifier le schéma de
+projet utilisateur. P64-H06 et les familles suivantes doivent l'utiliser.
 
 ### Entrée minimale
 
@@ -267,20 +267,18 @@ hors chemin critique.
 
 ### P64-H05 — Contrat commun et baseline Étages et piles
 
-- Statut : `ready`.
-- Agent conseillé : Terra avec revue Luna/senior.
-- Objectif : introduire l'interface stratégie/candidat/certificat et encapsuler
-  la baseline H03R sans retirer ses placements de référence.
+- Statut : `terminé et intégré` le 2026-07-17, package 0.1.48.
+- Agent : Terra ; revue de contrat senior effectuée par tests de parité.
 - Livrables : types immuables, budgets communs, validateur unique, adaptateur
-  `stage_stack`, tests de parité bit-à-bit ou géométrique documentée.
-- Non-objectifs : EP/EMS, beam, nouvelle UI, score physique, dépendance externe.
-- Acceptation : fixtures H04 identiques sous baseline ; aucune famille ne peut
-  contourner validation ; digest et télémétrie déterministes.
-- Vérifications : tests de contrat et parité, suite complète et gardes usuelles.
+  `stage_stack`, tests de parité bit-à-bit H04.
+- Réalisé : le plan public, son digest, ses placements et sa télémétrie H04
+  restent inchangés ; une solution complète ne sort plus sans certificat.
+- Non-objectifs conservés : EP/EMS, beam, nouvelle UI, score physique,
+  dépendance externe.
 
 ### P64-H06 — Placement 3D libre greedy EP/EMS
 
-- Statut : `blocked-by-P64-H05`.
+- Statut : `ready`.
 - Agent conseillé : Luna/frontier ; revue algorithmique obligatoire.
 - Objectif : obtenir un second moteur réellement différent avec une enveloppe
   canonique par conteneur.

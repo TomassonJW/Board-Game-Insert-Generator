@@ -31,28 +31,29 @@ KO contextuel tant que le solveur n'a pas passé P64-V2.
 
 ## Prochaine action recommandée
 
-### P64-H05 — Contrat commun et baseline `Étages et piles`
+### P64-H06 — Placement 3D libre greedy EP/EMS
 
-Statut : `ready`. P64-H04 est intégré : les sorties du solveur sont désormais
-distinguées entre solution, budget, preuve, projet invalide et réponse obsolète.
+Statut : `ready`. P64-H05 est intégré dans le package 0.1.48 : la baseline H03R
+`stage_stack` est passée par des candidats, budgets et certificats immuables,
+sans changer les placements, le digest, le schéma projet, les valeurs physiques
+ni les réservations.
 
-Objectif : introduire la frontière interne commune (candidats, budgets,
-certificats et résultats) et adapter à parité la baseline H03R `Étages et piles`,
-sans modifier le schéma projet, les valeurs physiques ni les réservations.
+Objectif : livrer un second moteur réellement distinct, à points extrêmes et
+espaces maximaux vides, derrière le validateur commun. Le lot reste borné au
+greedy 3D ; beam, portefeuille Auto, réglages Fusion et finition restent fermés.
 
 ## Lots suivants, non ouverts
 
-1. P64-H06 : placement 3D libre greedy EP/EMS.
-2. P64-H07 : beam robuste, efforts et portefeuille `Auto intelligent`.
-3. P64-H08 : réglages Fusion et diagnostic secondaire.
-4. P64-V2 : gate humaine, puis reprise de P44-V.
-5. P45/P46 selon leurs contrats actuels.
-6. P64-F01/F02 après P46 : fermeture continue puis harmonisation modulaire.
-7. P64-F03 après retours physiques ; P64-X01 exact seulement sous nouvelle gate.
+1. P64-H07 : beam robuste, efforts et portefeuille `Auto intelligent`.
+2. P64-H08 : réglages Fusion et diagnostic secondaire.
+3. P64-V2 : gate humaine, puis reprise de P44-V.
+4. P45/P46 selon leurs contrats actuels.
+5. P64-F01/F02 après P46 : fermeture continue puis harmonisation modulaire.
+6. P64-F03 après retours physiques ; P64-X01 exact seulement sous nouvelle gate.
 
 ## Séquence verrouillée
 
-P64-H05 est la seule mission `ready`. P64-H06 à H08 s'ouvrent une par une. Aucune
+P64-H06 est la seule mission `ready`. P64-H07 à H08 s'ouvrent une par une. Aucune
 preuve P64-H02/H03 ne doit être revendiquée. P44-V, P45 et P46 attendent P64-V2
 puis la reprise positive de P44-V. P47-P50 restent bloqués jusqu'à P46 et P69
 jusqu'à P50. P68 peut recueillir des faits réels sans recalibrer les defaults.

@@ -2386,13 +2386,15 @@ P44-M007 est ready-for-explicit-go.
 
 ### P64-H05 — Contrat commun et baseline Étages et piles
 
-- Statut : ready. Agent : Terra, revue Luna/senior.
-- Livrable : stratégies/candidats/certificats/budgets communs et parité du
-  solveur actuel.
+- Statut : terminé et intégré, package 0.1.48, `automated-validated`.
+- Contrat : `docs/P64_H05_COMMON_STRATEGY_CONTRACT.md`.
+- Livrable : candidats, budgets et certificats immuables ; adaptateur `stage_stack`
+  et validateur commun, avec parité H04 bit-à-bit.
+- Limite : aucune famille 3D libre, UI, score physique ou dépendance externe.
 
 ### P64-H06 — Placement 3D libre greedy EP/EMS
 
-- Statut : blocked-by-P64-H05. Agent : Luna/frontier.
+- Statut : ready. Agent : Luna/frontier, revue algorithmique obligatoire.
 - Livrable : points extrêmes, espaces maximaux vides, plus contraint d'abord,
   rotations XY et validation commune, avec une enveloppe par conteneur.
 
