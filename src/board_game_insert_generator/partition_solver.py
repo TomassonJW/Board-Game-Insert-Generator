@@ -46,6 +46,7 @@ from board_game_insert_generator.volumetric_stage_solver import (
 
 
 PARTITION_PLAN_SCHEMA_V1 = "bgig.partition_plan.v1"
+PARTITION_CAPACITY_SCHEMA_V1 = "bgig.partition_capacity.v1"
 MAX_DIVERSIFIED_PORTFOLIOS = 6
 _EPSILON = 0.0001
 _DIVERSIFIED_RETRY_CODES = {"NO_STAGE_COMPOSITION_FITS", "NO_VALIDATED_STAGE_PROPOSAL"}
@@ -73,10 +74,13 @@ def solve_partition_plan(
         )
         if solver_method is None:
             return baseline
-        return _stage_stack_product_plan(
-            baseline,
-            effort_profile=settings["effort"],
-            elapsed_ms=(perf_counter() - started_at) * 1000.0,
+        return _attach_capacity_summary(
+            _stage_stack_product_plan(
+                baseline,
+                effort_profile=settings["effort"],
+                elapsed_ms=(perf_counter() - started_at) * 1000.0,
+            ),
+            raw_project,
         )
 
     from board_game_insert_generator.solver_portfolio import (
@@ -99,14 +103,120 @@ def solve_partition_plan(
         request_revision=request_revision,
         selected_family_ids=selected_families,
     )
-    return _portfolio_public_plan(
+    return _attach_capacity_summary(
+        _portfolio_public_plan(
+            raw_project,
+            execution,
+            solver_method=settings["method"],
+            request_id=request_id,
+            request_revision=request_revision,
+            elapsed_ms=(perf_counter() - started_at) * 1000.0,
+        ),
         raw_project,
-        execution,
-        solver_method=settings["method"],
-        request_id=request_id,
-        request_revision=request_revision,
-        elapsed_ms=(perf_counter() - started_at) * 1000.0,
     )
+
+
+def _attach_capacity_summary(
+    plan: dict[str, object],
+    raw_project: object,
+) -> dict[str, object]:
+    """Expose a necessary volume bound without claiming 3D packability."""
+
+    projected = deepcopy(plan)
+    normalization = normalize_project_draft(raw_project)
+    project = normalization.project
+    box = _mapping(project["box"])
+    box_dimensions = _dimension(box["inner_dimensions_mm"])
+    storage_height = min(float(box["usable_height_mm"]), box_dimensions["z"])
+    envelope_report = derive_expandable_envelope_contract(
+        project,
+        max_container_height_mm=storage_height,
+    )
+    containers = _mappings(envelope_report["containers"])
+    ready = [
+        item
+        for item in containers
+        if item.get("status") == "ready"
+        and isinstance(item.get("minimum_outer_envelope_mm"), dict)
+    ]
+    fill_elements = _mappings(project["fill_elements"])
+    exact_complements = [
+        item
+        for item in fill_elements
+        if item.get("mode") == "exact" and isinstance(item.get("dimensions_mm"), dict)
+    ]
+    complement_volume = sum(
+        _volume(_mapping(item["dimensions_mm"]))
+        for item in exact_complements
+    )
+    complete = (
+        len(ready) == len(containers)
+        and len(exact_complements) == len(fill_elements)
+    )
+    minimum_volume = sum(
+        _volume(_mapping(item["minimum_outer_envelope_mm"]))
+        for item in ready
+    ) + complement_volume
+    layout = _mapping(project["layout"])
+    clearance = float(layout.get("container_box_xy_clearance_mm", 0.0))
+    for group in _mappings(project["container_groups"]):
+        policy_value = group.get("clearance_effective_v1")
+        if not isinstance(policy_value, dict):
+            continue
+        per_side = _mapping(policy_value["box_per_side_xy_mm"])
+        clearance = max(clearance, float(per_side["x"]), float(per_side["y"]))
+    solver_x = max(0.0, box_dimensions["x"] - clearance * 2.0)
+    solver_y = max(0.0, box_dimensions["y"] - clearance * 2.0)
+    gross_volume = box_dimensions["x"] * box_dimensions["y"] * storage_height
+    solver_volume = solver_x * solver_y * storage_height
+    balance = solver_volume - minimum_volume if complete else None
+    remaining = max(0.0, balance) if balance is not None else None
+    flat_volume = sum(
+        _volume(_mapping(item["dimensions_mm"])) * int(item["quantity"])
+        for item in _mappings(project["flat_items"])
+    )
+    capacity = {
+        "schema_version": PARTITION_CAPACITY_SCHEMA_V1,
+        "status": (
+            "incomplete_minimum_model"
+            if not complete
+            else "minimum_volume_exceeds_solver_volume"
+            if balance is not None and balance < -_EPSILON
+            else "positive_theoretical_margin"
+        ),
+        "complete_minimum_model": complete,
+        "gross_usable_box_volume_mm3": _round(gross_volume),
+        "solver_usable_volume_mm3": _round(solver_volume),
+        "minimum_requested_envelope_volume_mm3": _round(minimum_volume),
+        "flat_item_physical_volume_mm3": _round(flat_volume),
+        "explicit_complement_volume_mm3": _round(complement_volume),
+        "signed_volume_balance_mm3": None if balance is None else _round(balance),
+        "theoretical_remaining_volume_mm3": None if remaining is None else _round(remaining),
+        "theoretical_remaining_ratio": (
+            None
+            if remaining is None or solver_volume <= _EPSILON
+            else _round(remaining / solver_volume)
+        ),
+        "requested_container_count": len(containers),
+        "modeled_container_count": len(ready),
+        "requested_complement_count": len(fill_elements),
+        "modeled_complement_count": len(exact_complements),
+        "perimeter_clearance_mm": {"x": _round(clearance), "y": _round(clearance)},
+        "interpretation": "necessary_volume_bound_not_packing_proof",
+        "not_scalarized_constraints": [
+            "orthogonal_shapes_and_orientations",
+            "between_body_clearances",
+            "supports_and_removal",
+            "localized_top_inset_reservations",
+        ],
+    }
+    projected["capacity"] = capacity
+    summary = _mapping(projected["summary"])
+    summary["capacity_status"] = capacity["status"]
+    summary["theoretical_remaining_volume_mm3"] = capacity["theoretical_remaining_volume_mm3"]
+    projected.pop("plan_digest", None)
+    projected["plan_digest"] = _digest(projected)
+    return projected
 
 
 def solve_stage_stack_plan(
@@ -142,6 +252,7 @@ def _stage_stack_product_plan(
         "effort_profile": effort_profile,
         "effort_label": {"quick": "Rapide", "normal": "Normal", "deep": "Approfondi"}[effort_profile],
         "selected_family_id": family_id,
+        "eligible_family_ids": [family_id],
         "family_reports": [],
         "fast_path_used": True,
         "deduplicated_candidate_count": 0,
@@ -151,9 +262,24 @@ def _stage_stack_product_plan(
     telemetry["elapsed_ms"] = round(max(0.0, elapsed_ms), 3)
     solver["portfolio"] = deepcopy(portfolio)
     solver["telemetry"] = telemetry
+    result = _mapping(solver.get("result"))
+    if result.get("status") == "no_solution_within_budget":
+        summary = _mapping(projected["summary"])
+        summary["status"] = "unresolved"
+        summary["solution_status"] = "unresolved"
+        result["legacy_summary_status"] = "unresolved"
+        solver["result"] = result
+        projected["diagnostics"] = [
+            _diagnostic(
+                "STAGE_STACK_NO_SOLUTION_WITHIN_BUDGET",
+                "Etages et piles n a trouve aucune disposition certifiee dans son budget. Ce resultat n est pas une preuve d impossibilite.",
+                "Essaie Auto intelligent ou Placement 3D libre ; une marge de volume positive ne garantit pas la compatibilite des formes.",
+            )
+        ]
     projected.pop("plan_digest", None)
     projected["plan_digest"] = _digest(projected)
     return projected
+
 
 def _portfolio_public_plan(
     raw_project: object,
@@ -203,18 +329,25 @@ def _portfolio_public_plan(
             "no_collisions": False,
             "clearances_respected": False,
         }
-        if execution.status != "proven_impossible" and not plan.get("diagnostics"):
+        if execution.status == "no_solution_within_budget":
             plan["diagnostics"] = [
                 _diagnostic(
                     "PORTFOLIO_NO_SOLUTION_WITHIN_BUDGET",
-                    "Aucune solution certifiee n a ete trouvee par la methode selectionnee dans son budget.",
-                    "Essaie un effort plus profond, la methode Auto intelligent, ou ajuste le projet.",
+                    "Aucune disposition certifiee n a ete trouvee dans le budget. Ce resultat n est pas une preuve d impossibilite.",
+                    "Essaie un effort plus profond ou une autre methode ; les formes, appuis et reservations peuvent bloquer malgre une marge de volume positive.",
                 )
             ]
+        unresolved_status = (
+            "impossible"
+            if execution.status == "proven_impossible"
+            else "blocked"
+            if execution.status == "invalid_input"
+            else "unresolved"
+        )
         summary.update(
             {
-                "status": "impossible",
-                "solution_status": "impossible",
+                "status": unresolved_status,
+                "solution_status": unresolved_status,
                 "materializable": False,
                 "placed_container_count": 0,
                 "final_body_count": 0,
@@ -257,6 +390,7 @@ def _portfolio_public_plan(
                 "effort_profile": execution.effort_profile.profile_id,
                 "effort_label": execution.effort_profile.product_label,
                 "selected_family_id": execution.selected_family_id,
+                "eligible_family_ids": list(execution.selected_family_ids),
                 "family_reports": reports,
                 "fast_path_used": execution.fast_path_used,
                 "deduplicated_candidate_count": execution.deduplicated_candidate_count,
@@ -416,7 +550,7 @@ def _solve_partition_plan_once(
         )
         for item in _mappings(envelope_report["blockers"])
     )
-    diagnostics.extend(_minimum_envelope_box_proofs(envelope_report, box, storage_height))
+    diagnostics.extend(_minimum_envelope_box_proofs(envelope_report, project, box, storage_height))
     containers = [item for item in _mappings(envelope_report["containers"]) if item["status"] == "ready"]
     requested_group_count = len(_values(project["container_groups"]))
     if not requested_group_count:
@@ -1001,30 +1135,67 @@ def _top_inset_payload(value: dict[str, object]) -> dict[str, object]:
     )
     return {key: deepcopy(value[key]) for key in keys if key in value}
 
+
 def _minimum_envelope_box_proofs(
     envelope_report: dict[str, object],
+    project: dict[str, object],
     box: dict[str, float],
     storage_height: float,
 ) -> list[dict[str, object]]:
-    """Expose only explicit necessary bounds as formal impossibility proofs."""
+    """Expose only orientation-independent necessary bounds as proofs."""
 
-    limits = {"x": box["x"], "y": box["y"], "z": storage_height}
     proofs: list[dict[str, object]] = []
     for container in _mappings(envelope_report["containers"]):
-        minimum = container.get("minimum_outer_envelope_mm")
-        if not isinstance(minimum, dict):
+        minimum_value = container.get("minimum_outer_envelope_mm")
+        if not isinstance(minimum_value, dict):
             continue
-        exceeded = [axis for axis in ("x", "y", "z") if float(_mapping(minimum)[axis]) > limits[axis] + _EPSILON]
-        if not exceeded:
+        minimum = _mapping(minimum_value)
+        height_exceeded = float(minimum["z"]) > storage_height + _EPSILON
+        cavities = container.get("cavity_layout", [])
+        single_cavity = isinstance(cavities, list) and len(cavities) <= 1
+        direct_xy = float(minimum["x"]) <= box["x"] + _EPSILON and float(minimum["y"]) <= box["y"] + _EPSILON
+        rotated_xy = float(minimum["x"]) <= box["y"] + _EPSILON and float(minimum["y"]) <= box["x"] + _EPSILON
+        exact_xy_exceeded = single_cavity and not (direct_xy or rotated_xy)
+        if not height_exceeded and not exact_xy_exceeded:
             continue
-        dimensions = ", ".join(f"{axis.upper()} ({float(_mapping(minimum)[axis])} mm > {limits[axis]} mm)" for axis in exceeded)
+        reason = (
+            "sa hauteur minimale depasse la hauteur utile"
+            if height_exceeded and not exact_xy_exceeded
+            else "son empreinte minimale ne tient dans aucune orientation X/Y"
+            if exact_xy_exceeded and not height_exceeded
+            else "sa hauteur et son empreinte minimales depassent les bornes utiles"
+        )
         proofs.append(
             _diagnostic(
                 "MINIMUM_ENVELOPE_EXCEEDS_BOX",
-                f"Le minimum du conteneur '{container['container_name']}' dépasse la boîte utile sur {dimensions}.",
-                "Réduis ce contenu, sa quantité ou ses dimensions fixes avant de recalculer.",
+                f"Le conteneur '{container['container_name']}' est incompatible avec la boite : {reason}.",
+                "Reduis ce contenu, sa quantite ou une dimension fixe avant de recalculer.",
                 str(container["container_group_id"]),
                 proof_code="minimum_outer_envelope_exceeds_box_limit_v1",
+            )
+        )
+    minimum_volume = sum(
+        _volume(_mapping(item["minimum_outer_envelope_mm"]))
+        for item in _mappings(envelope_report["containers"])
+        if item.get("status") == "ready"
+        and isinstance(item.get("minimum_outer_envelope_mm"), dict)
+    )
+    minimum_volume += sum(
+        _volume(_mapping(item["dimensions_mm"]))
+        for item in _mappings(project["fill_elements"])
+        if item.get("mode") == "exact"
+        and isinstance(item.get("dimensions_mm"), dict)
+    )
+    box_volume = box["x"] * box["y"] * storage_height
+    if minimum_volume > box_volume + _EPSILON:
+        excess_cm3 = _round((minimum_volume - box_volume) / 1000.0)
+        proofs.append(
+            _diagnostic(
+                "MINIMUM_VOLUME_EXCEEDS_BOX",
+                f"Le volume minimal demande depasse le volume utile de la boite de {excess_cm3} cm3.",
+                "Reduis un contenu, sa quantite ou une dimension fixe avant de recalculer.",
+                "",
+                proof_code="minimum_body_volume_exceeds_useful_box_v1",
             )
         )
     return proofs

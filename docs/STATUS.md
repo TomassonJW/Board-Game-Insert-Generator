@@ -8,7 +8,7 @@ Statut produit : **MVP V0.1 Fusion-only accepte ; validation d impression non ac
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P64-V2 0.1.51 est un KO contextuel ; P64-V2H01 est automatisée dans le package 0.1.52 et constitue la seule gate humaine prête. P44-V reste en KO contextuel et P45 reste bloqué.
+Phase active : P64-V2H01 0.1.52 est supersédée par le KO du projet dense étendu ; P64-V2H02 est automatisée dans le package 0.1.53 et constitue la seule gate humaine prête. P44-V reste en KO contextuel et P45 reste bloqué.
 
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
@@ -2436,3 +2436,42 @@ scripts/fusion/prepare_p64_v2h01_continuous_closure_test.ps1.
 
 La régularité visuelle progresse par alignement de faces, mais la modularité
 adaptative reste P64-F02. fusion-validated: false ; print-validated: false.
+
+## P64-V2H02 — Capacité et vérité de recherche dense (2026-07-17)
+
+Le projet réel étendu à 11 conteneurs et 34 contenus révèle quatre faux blocages
+internes : dérivation multi-cavités en rangée unique, élagage beam exigeant un
+seul EMS, points initiaux ignorant les frontières de réservations et préfiltre de
+profondeur non localisé. Le lot 0.1.53 corrige ces quatre mécanismes sans changer
+les cavités, les valeurs physiques, le schéma ou la matérialisation explicite.
+
+Le beam exécute d'abord la variante EMS historique à une priorité, puis la
+variante multi-EMS avec le plafond du profil. La fixture P64-V2H01 conserve ainsi
+sa solution certifiée au lieu d'être évincée par le sur-ensemble de candidats.
+
+Les profils d'effort explorent maintenant 1, 2 et 4 priorités de participants,
+avec des largeurs beam 8, 24 et 64. Un même résultat entre profils reste possible,
+mais les domaines explorés et les métriques sont désormais réellement distincts.
+
+`bgig.partition_capacity.v1` est attaché à tous les résultats. Sur la sauvegarde
+de référence, le volume utilisable par le solveur est 3 105 083,712 mm³, la
+somme des enveloppes minimales 2 411 449,9376 mm³ et la marge théorique
+693 633,7744 mm³, soit environ 693,6 cm³ et 22,34 %. Cette marge est une borne
+nécessaire et non une preuve d'empilabilité.
+
+Après correction des faux blocages, le projet complet reste
+`no_solution_within_budget`. Une relaxation exacte de diagnostic hors produit,
+sans dépendance ajoutée, conclut à l'infaisabilité de la combinaison canonique
+sous les origines explicites et réservations actuelles. Le produit ne revendique
+pas cette preuve : il reste honnêtement non certifié et prépare P64-V2H03 pour
+les variantes internes bornées, à coordonner avec P45.
+
+La palette affiche la capacité sur succès et échec, retire les mesures trompeuses
+des diagnostics de budget et peint la vue de dessus du bas vers le haut avec les
+cavités composées avec leur corps parent. Un corps supérieur masque donc les
+cavités inférieures.
+
+Package : 0.1.53. Statut : implemented, automated-validated,
+ready-for-human-fusion-check par P64-V2H02 ; `fusion-validated: false`,
+`print-validated: false`. P44-V et P45 restent bloqués. P64-U01 conserve la future
+progression de calcul non modale et annulable ; aucun écran bloquant n'est ajouté.

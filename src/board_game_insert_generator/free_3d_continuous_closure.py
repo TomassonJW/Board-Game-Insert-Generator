@@ -467,6 +467,7 @@ def _valid_geometry(
         participants_by_id[changed.participant_id],
         changed.origin_mm,
         changed.world_size_mm,
+        changed.rotation_deg_z,
         dimensions[2],
         top_inset_zones,
     ):

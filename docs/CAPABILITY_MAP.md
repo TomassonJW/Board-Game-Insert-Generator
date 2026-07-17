@@ -1283,9 +1283,12 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - C-GEOMETRY : finition continue/modulaire planifiée après P46 ; aucun filler ni
   cale automatique.
 - État : P64-H03R/H04/H05/H06/H07 intégrés (baseline dirigée, résultats honnêtes,
-  contrat commun, greedy et beam 3D, portefeuille Auto interne). P64-H08 intégrée dans 0.1.51 ; P64-V2 est un KO contextuel et P64-V2H01 0.1.52 est `ready-for-human-fusion-check`.
+  contrat commun, greedy et beam 3D, portefeuille Auto interne). P64-H08 est
+  intégrée dans 0.1.51 ; P64-V2 est un KO contextuel et P64-V2H01 0.1.52 est
+  contextual-KO et supersédée par P64-V2H02 0.1.53.
 - Validation : dernière preuve inchangée P64-H01 0.1.42 ; P64-H02/H03 non
   fusion-validées ; `print-validated: false`.
+
 ## Mise à jour P64-H07 — 2026-07-17
 
 - C-SOLVER : `free_3d_beam` et `portfolio_auto` sont `implemented` et
@@ -1324,7 +1327,26 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
   et les fonds/cavités restent contrôlés par le validateur commun.
 - C-USABILITY : automated-validated seulement. Les méthodes donnent des
   résultats effectivement différents sur la fixture, mais l'observation Fusion
-  0.1.52 reste requise.
+  0.1.52 est désormais supersédée par la gate 0.1.53.
 - Harmonisation : alignement de faces amélioré seulement ; P64-F02 reste prévu.
 - Preuve : tests automatisés et reproduction locale ; fusion-validated: false,
   print-validated: false.
+
+## Mise à jour P64-V2H02 — 2026-07-17
+
+- C-SOLVEUR-DENSE : enveloppes multi-cavités bornées, placement beam traversant
+  plusieurs EMS, points extrêmes aux frontières des réservations et validation
+  de coupe localisée sont implémentés dans 0.1.53.
+- C-SOLVEUR-PORTFOLIO : Rapide, Normal et Approfondi explorent respectivement
+  1, 2 et 4 priorités beam ; les méthodes restent distinctes même si leur meilleur
+  résultat visible converge.
+- C-RESULT-TRUTH : tous les résultats exposent `bgig.partition_capacity.v1` ; une
+  marge positive est explicitement une borne nécessaire, pas un certificat de
+  placement. Les épuisements heuristiques restent `no_solution_within_budget`.
+- C-FUSION-UI : capacité théorique visible sur succès/échec et vue de dessus
+  correctement occultée ; package 0.1.53 automated-validated, gate P64-V2H02.
+- Limite : le projet de référence à 11 conteneurs et 34 contenus reste non
+  certifié malgré environ 693,6 cm³ de marge théorique. Les variantes internes
+  globales relèvent de P64-V2H03 à coordonner avec P45.
+- Validation : `fusion-validated: false`, `print-validated: false`. P44-V et P45
+  restent bloqués jusqu'à la gate P64-V2H02 puis l'arbitrage explicite de la suite.

@@ -94,3 +94,34 @@ et soumise à une ADR de dépendance et à un GO distincts.
 - P64-H07 : `free_3d_beam` et `portfolio_auto`.
 - P64-H08 puis P64-V2 : réglages Fusion et validation humaine.
 - P64-X01 : éventuel moteur exact après nouvelle ADR et GO.
+
+## Amendement P64-V2H02 — 2026-07-17
+
+Le volume disponible devient une borne publique, pas un certificat. Une marge
+strictement positive prouve seulement que la somme des enveloppes minimales ne
+dépasse pas le volume utilisable. Elle ne prouve pas l'existence d'un placement
+orthogonal respectant formes, jeux, réservations, supports, axes fixes et ordre
+de retrait.
+
+Tout résultat issu du sélecteur produit expose donc `bgig.partition_capacity.v1`, y compris
+`no_solution_within_budget`. Un échec du portefeuille affiche un statut non
+certifié et ses limites de recherche ; seules les contradictions de bornes
+formelles peuvent produire `proven_impossible`.
+
+Les profils de beam explorent désormais 1, 2 et 4 priorités de participants pour
+Rapide, Normal et Approfondi, avec des largeurs respectives de 8, 24 et 64. Deux
+profils ou deux méthodes peuvent légitimement retourner le même meilleur plan ou
+le même statut : la différence porte sur le domaine exploré, pas sur une promesse
+de résultat différent.
+
+Le cas dense P64-V2H02 conserve une marge théorique d'environ 693,6 cm³ mais sa
+combinaison d'enveloppes canoniques et de réservations explicites a été déclarée
+infaisable par une relaxation exacte de diagnostic hors produit. Aucune
+dépendance externe ni revendication de moteur exact n'est ajoutée. La suite doit
+explorer des variantes internes bornées, sous coordination avec P45, plutôt que
+masquer l'échec par une fausse solution.
+La famille beam conserve en conséquence deux variantes dans chaque effort :
+`legacy_ems_v1` avec une priorité, puis `bridge_ems_v2` avec le plafond 1/2/4 du
+profil. Cette composition évite qu'un sur-ensemble d'options change le classement
+et évince une ancienne solution validée. Les candidats des deux variantes passent
+le même certificat et le même classement public.

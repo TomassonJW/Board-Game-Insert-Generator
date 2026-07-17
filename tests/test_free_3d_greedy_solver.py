@@ -6,7 +6,11 @@ import unittest
 from board_game_insert_generator.expandable_envelope import derive_expandable_envelope_contract
 from board_game_insert_generator.free_3d_greedy_solver import (
     FREE_3D_GREEDY_FAMILY_ID,
+    EmptySpace,
     Free3DGreedyError,
+    TopInsetZone,
+    _initial_extreme_points,
+    _top_inset_option_allowed,
     solve_free_3d_greedy,
 )
 from board_game_insert_generator.partition_solver import (
@@ -107,6 +111,60 @@ class Free3DGreedySolverTests(unittest.TestCase):
                 self.assertIsNotNone(execution.geometry_admission)
                 self.assertTrue(execution.geometry_admission.admitted)
                 self.assertEqual(execution.geometry_admission.rejection_codes, ())
+
+    def test_top_inset_boundaries_are_seeded_and_only_overlapping_cavities_add_depth(self) -> None:
+        spaces = (EmptySpace((0.6, 0.6, 0.0), (248.8, 178.8, 69.8)),)
+        seed_zone = TopInsetZone((9.4, 9.4), (116.2, 111.2), 60.8, 9.0)
+        points = _initial_extreme_points(spaces, (seed_zone,))
+        self.assertIn((125.6, 0.6, 0.0), points)
+        self.assertIn((0.6, 120.6, 0.0), points)
+
+        participant = _participant("localized", (80.0, 80.0, 65.0))
+        participant["top_inset_search_hint_v1"] = {
+            "floor_thickness_mm": 1.2,
+            "cavities": [
+                {
+                    "local_origin_mm": {"x": 1.2, "y": 1.2, "z": 1.2},
+                    "inner_dimensions_mm": {"x": 20.0, "y": 20.0, "z": 63.8},
+                }
+            ],
+        }
+        clear_solid_zone = TopInsetZone((60.0, 60.0), (10.0, 10.0), 60.0, 9.0)
+        overlapping_cavity_zone = TopInsetZone((10.0, 10.0), (10.0, 10.0), 60.0, 9.0)
+        self.assertTrue(
+            _top_inset_option_allowed(
+                participant, (0.0, 0.0, 0.0), (80.0, 80.0, 65.0), 0, 69.8, (clear_solid_zone,)
+            )
+        )
+        self.assertFalse(
+            _top_inset_option_allowed(
+                participant, (0.0, 0.0, 0.0), (80.0, 80.0, 65.0), 0, 69.8, (overlapping_cavity_zone,)
+            )
+        )
+
+    def test_localized_top_inset_uses_centered_cavity_after_rotation_and_growth(self) -> None:
+        participant = _participant("rotated", (80.0, 60.0, 65.0))
+        participant["top_inset_search_hint_v1"] = {
+            "floor_thickness_mm": 1.2,
+            "cavities": [
+                {
+                    "local_origin_mm": {"x": 1.0, "y": 1.0, "z": 1.2},
+                    "inner_dimensions_mm": {"x": 20.0, "y": 20.0, "z": 63.8},
+                }
+            ],
+        }
+        zone = TopInsetZone((60.0, 12.0), (8.0, 8.0), 60.0, 9.0)
+
+        self.assertFalse(
+            _top_inset_option_allowed(
+                participant,
+                (0.0, 0.0, 0.0),
+                (100.0, 100.0, 65.0),
+                90,
+                69.8,
+                (zone,),
+            )
+        )
 
     def test_one_body_can_cross_a_neighbours_local_z_plane(self) -> None:
         participants = [

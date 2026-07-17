@@ -195,7 +195,7 @@ def solve_free_3d_greedy(
     spaces = _subtract_forbidden_spaces([root_space], forbidden)
     if not spaces:
         raise Free3DGreedyError("The forbidden spaces consume the whole useful box.")
-    points = {space.origin_mm for space in spaces}
+    points = _initial_extreme_points(spaces, inset_zones)
     counters = _Counters(
         extreme_points_generated=len(points),
         empty_spaces_generated=len(spaces),
@@ -405,6 +405,7 @@ def _placement_options(
                     participant,
                     point,
                     world_size,
+                    rotation,
                     box[2],
                     top_inset_zones,
                 ):
@@ -526,37 +527,133 @@ def _validated_top_inset_zones(
     )
 
 
+def _initial_extreme_points(
+    spaces: Iterable[EmptySpace],
+    zones: Iterable[TopInsetZone],
+) -> set[tuple[float, float, float]]:
+    """Seed floor points at empty-space origins and top-inset boundaries.
+
+    A tall body may be forbidden below a top reservation while remaining fully
+    feasible immediately beside it.  Seeding only the useful-box corner would
+    make that region unreachable until another placement happened to create the
+    required coordinate.  The cartesian boundary grid remains tiny because the
+    number of top reservations is bounded by the project contract.
+    """
+
+    retained_spaces = tuple(spaces)
+    x_values = {space.origin_mm[0] for space in retained_spaces}
+    y_values = {space.origin_mm[1] for space in retained_spaces}
+    z_values = {space.origin_mm[2] for space in retained_spaces}
+    for zone in zones:
+        x_values.add(_round(zone.origin_xy_mm[0] + zone.size_xy_mm[0]))
+        y_values.add(_round(zone.origin_xy_mm[1] + zone.size_xy_mm[1]))
+    candidates = {space.origin_mm for space in retained_spaces}
+    candidates.update(
+        _rounded_point((x_value, y_value, z_value))
+        for x_value in x_values
+        for y_value in y_values
+        for z_value in z_values
+    )
+    return {
+        point
+        for point in candidates
+        if any(_point_inside_space(point, space) for space in retained_spaces)
+    }
+
+
 def _top_inset_option_allowed(
     participant: Mapping[str, object],
     origin: tuple[float, float, float],
     world_size: tuple[float, float, float],
+    rotation_deg_z: int,
     storage_height_mm: float,
     zones: tuple[TopInsetZone, ...],
 ) -> bool:
-    """Reject a body that can neither stay below nor validly reach a top inset."""
+    """Apply top cuts only to cavities that their XY footprint intersects.
+
+    The final reservation validator compensates the depth of overlapping
+    cavities, not the deepest cavity anywhere in the container.  Search must
+    use the same localized lower bound or a cut above solid material can
+    falsely route an otherwise feasible tall body out of the reservation.
+    """
 
     body_top = origin[2] + world_size[2]
-    minimum_height = _minimum_local(participant)[2]
+    minimum_local = _minimum_local(participant)
+    minimum_height = minimum_local[2]
     z_mode = str(_mapping(participant["dimension_modes"])["z"])
+    hint_value = participant.get("top_inset_search_hint_v1")
+    hint = hint_value if isinstance(hint_value, dict) else {}
+    floor_thickness = float(hint.get("floor_thickness_mm", 0.0))
+    cavities_value = hint.get("cavities", [])
+    cavities = cavities_value if isinstance(cavities_value, list) else []
+    final_local_x = world_size[1] if rotation_deg_z == 90 else world_size[0]
+    final_local_y = world_size[0] if rotation_deg_z == 90 else world_size[1]
+    minimum_origin_x = max(0.0, final_local_x - minimum_local[0]) / 2.0
+    minimum_origin_y = max(0.0, final_local_y - minimum_local[1]) / 2.0
     for zone in zones:
-        if not (
-            origin[0] < zone.origin_xy_mm[0] + zone.size_xy_mm[0] - _EPSILON
-            and zone.origin_xy_mm[0] < origin[0] + world_size[0] - _EPSILON
-            and origin[1] < zone.origin_xy_mm[1] + zone.size_xy_mm[1] - _EPSILON
-            and zone.origin_xy_mm[1] < origin[1] + world_size[1] - _EPSILON
-        ):
+        zone_rect = (
+            zone.origin_xy_mm[0],
+            zone.origin_xy_mm[1],
+            zone.size_xy_mm[0],
+            zone.size_xy_mm[1],
+        )
+        body_rect = (origin[0], origin[1], world_size[0], world_size[1])
+        if not _xy_rectangles_overlap(body_rect, zone_rect):
             continue
         if body_top <= zone.support_plane_z_mm + _EPSILON:
             continue
-        can_reach_top_with_floor = (
-            storage_height_mm - origin[2] + _EPSILON
-            >= minimum_height + zone.inset_depth_mm
-        )
-        if not can_reach_top_with_floor:
-            return False
         if z_mode == "fixed" and abs(body_top - storage_height_mm) > 0.001:
             return False
+        required_height = max(
+            minimum_height,
+            floor_thickness + zone.inset_depth_mm,
+        )
+        for cavity_value in cavities:
+            if not isinstance(cavity_value, dict):
+                continue
+            cavity_origin = _mapping(cavity_value["local_origin_mm"])
+            cavity_size = _mapping(cavity_value["inner_dimensions_mm"])
+            local_x = minimum_origin_x + float(cavity_origin["x"])
+            local_y = minimum_origin_y + float(cavity_origin["y"])
+            size_x = float(cavity_size["x"])
+            size_y = float(cavity_size["y"])
+            if rotation_deg_z == 90:
+                cavity_rect = (
+                    origin[0] + final_local_y - local_y - size_y,
+                    origin[1] + local_x,
+                    size_y,
+                    size_x,
+                )
+            else:
+                cavity_rect = (
+                    origin[0] + local_x,
+                    origin[1] + local_y,
+                    size_x,
+                    size_y,
+                )
+            if _xy_rectangles_overlap(cavity_rect, zone_rect):
+                required_height = max(
+                    required_height,
+                    floor_thickness
+                    + float(cavity_size["z"])
+                    + zone.inset_depth_mm,
+                )
+        if storage_height_mm - origin[2] + _EPSILON < required_height:
+            return False
     return True
+
+
+def _xy_rectangles_overlap(
+    first: tuple[float, float, float, float],
+    second: tuple[float, float, float, float],
+) -> bool:
+    return (
+        first[0] < second[0] + second[2] - _EPSILON
+        and second[0] < first[0] + first[2] - _EPSILON
+        and first[1] < second[1] + second[3] - _EPSILON
+        and second[1] < first[1] + first[3] - _EPSILON
+    )
+
 
 def _validated_forbidden_spaces(
     values: Iterable[EmptySpace],
@@ -612,6 +709,7 @@ def _subtract_forbidden_spaces(
             generated.extend(_split_space(space, forbidden))
         current, _ = _deduplicate_spaces(generated)
     return current
+
 
 def _subtract_placement_from_spaces(
     spaces: list[EmptySpace],

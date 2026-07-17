@@ -23,12 +23,13 @@ preuves archivées.
   expose Auto intelligent, Étages et piles, Placement 3D libre et les efforts.
 - P64-V2 0.1.51 est un KO contextuel : le cas dense réel reste faussement sans
   solution et l'harmonisation visuelle reste insuffisante.
-- P64-V2H01 0.1.52 sépare faisabilité minimale et fermeture continue, traite les
-  réservations plateau/livret comme contraintes conditionnelles et certifie la
-  fixture anonymisée réelle avec 9 corps sur plusieurs niveaux.
-- P64-V2H01 est automated-validated, sans preuve Fusion ni impression. La seule
-  prochaine action est sa gate préparée par
-  scripts/fusion/prepare_p64_v2h01_continuous_closure_test.ps1.
+- P64-V2H01 0.1.52 a séparé faisabilité minimale et fermeture continue, mais le
+  nouveau cas réel à 11 conteneurs et 34 contenus produit encore un KO contextuel ;
+  aucune preuve Fusion OK 0.1.52 ne doit être émise.
+- P64-V2H02 0.1.53 corrige les enveloppes multi-cavités, la recherche beam, les
+  réservations localisées, les budgets d'effort, la capacité théorique et la vue
+  de dessus. La seule prochaine action est sa gate préparée par
+  scripts/fusion/prepare_p64_v2h02_capacity_search_test.ps1.
 - P44-V et P45 restent bloqués.
 
 ## Vue de séquence
@@ -46,8 +47,9 @@ preuves archivées.
 | Terminé | P64-H07 | Beam, profils monotones et portefeuille Auto interne. |
 | Terminé | P64-H08 | Réglages Fusion et diagnostic secondaire 0.1.51. |
 | KO contextuel | P64-V2 | Contrôles visibles, mais cas dense réel sans solution. |
-| Prêt — gate humaine | P64-V2H01 | Vérifier 0.1.52, fermeture, top insets et méthodes distinctes. |
-| KO contextuel | P44-V | Reprendre seulement après P64-V2H01 ; P45 reste bloqué. |
+| KO contextuel | P64-V2H01 | Le projet réel étendu dépasse la fixture 0.1.52. |
+| Prêt — gate humaine | P64-V2H02 | Vérifier 0.1.53, capacité, vérité, budgets et vue de dessus. |
+| KO contextuel | P44-V | Reprendre seulement après P64-V2H02 ; P45 reste bloqué. |
 | Bloqué | P45 à P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 

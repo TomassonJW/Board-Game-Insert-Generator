@@ -286,6 +286,7 @@ class FusionPaletteDomTests(unittest.TestCase):
             self.assertIn(marker, self.markup)
         self.assertNotIn("supported_by_requested_bodies", self.markup)
         self.assertNotIn("data-bridge=\"solve_project\"", self.markup[self.markup.index("function renderResult"):self.markup.index("function renderPersistentActions")])
+
     def test_runs_adaptive_calculation_and_ignores_obsolete_responses(self) -> None:
         for marker in (
             "DERIVE_DEBOUNCE_MS=350", "AUTO_SOLVE_STABILITY_MS=1500",
@@ -543,6 +544,19 @@ class FusionPaletteDomTests(unittest.TestCase):
             self.assertIn(marker, script)
 
 
+    def test_shows_capacity_on_every_result_and_occludes_lower_cavities_in_top_view(self) -> None:
+        for marker in (
+            "function formatVolumeMm3", "function capacityCard", "Marge volumique théorique",
+            "Compléments explicites inclus dans le minimum",
+            "orderedBodies", "cavity.parent_id===body.id",
+            ".top-layer .plan-body{opacity:1}", '<g class="top-layer">',
+            "layeredTop", "Deux efforts peuvent produire le même résultat",
+            "EMS historique + ponts multi-EMS",
+        ):
+            self.assertIn(marker, self.markup)
+        self.assertIn("${capacityCard(response)}${diagnostics.length?", self.markup)
+        self.assertIn("${capacityCard(response)}<div class=\"plan-grid\">", self.markup)
+
     def test_exposes_p64_h08_solver_method_effort_and_focus_safe_local_persistence(self) -> None:
         for marker in (
             'id="solver-method"', 'id="solver-effort"', 'id="solver-ranking"',
@@ -550,13 +564,14 @@ class FusionPaletteDomTests(unittest.TestCase):
             'Auto intelligent', 'Placement 3D libre', 'function saveSolverSetting',
             'save_solver_settings', 'function solverTelemetryDetails',
             'renderSolverSettings()', "action==='save_solver_settings'",
+            'function solverFamilyLabel', 'eligible_family_ids', 'Familles éligibles',
         ):
             self.assertIn(marker, self.markup)
         self.assertNotIn('<option value="accessible">', self.markup)
         self.assertNotIn('<option value="print_simple">', self.markup)
         self.assertNotIn('<option value="material_reduced">', self.markup)
-        script = (ROOT / "scripts" / "fusion" / "prepare_p64_v2h01_continuous_closure_test.ps1").read_text(encoding="utf-8")
-        for marker in ("0.1.52", "solver-method", "solver-effort", "save_solver_settings", "P64-V2H01 Fusion OK"):
+        script = (ROOT / "scripts" / "fusion" / "prepare_p64_v2h02_capacity_search_test.ps1").read_text(encoding="utf-8")
+        for marker in ("0.1.53", "function capacityCard", "PARTITION_CAPACITY_SCHEMA_V1", "P64-V2H02 Fusion OK"):
             self.assertIn(marker, script)
 
 if __name__ == "__main__":

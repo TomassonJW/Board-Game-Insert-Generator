@@ -25,6 +25,7 @@ from board_game_insert_generator.free_3d_greedy_solver import (
     _digest,
     _fits_in_space,
     _inside_box,
+    _initial_extreme_points,
     _mapping,
     _minimum_local,
     _necessary_bound_failure,
@@ -56,6 +57,8 @@ from board_game_insert_generator.solver_contract import (
 
 FREE_3D_BEAM_FAMILY_ID = "free_3d_beam"
 FREE_3D_BEAM_VERSION = "bgig.free_3d_beam.v2"
+BEAM_SEARCH_LEGACY_EMS = "legacy_ems_v1"
+BEAM_SEARCH_BRIDGE_EMS = "bridge_ems_v2"
 _EPSILON = 0.0001
 _AXES = ("x", "y", "z")
 
@@ -164,10 +167,13 @@ def solve_free_3d_beam(
     cancel_check: Callable[[], bool] | None = None,
     forbidden_spaces: Iterable[EmptySpace] = (),
     top_inset_zones: Iterable[TopInsetZone] = (),
+    search_variant: str = BEAM_SEARCH_BRIDGE_EMS,
 ) -> Free3DBeamExecution:
     """Search several minimum-envelope EP/EMS states under explicit hard limits."""
 
     strategy = SolverStrategy(FREE_3D_BEAM_FAMILY_ID, FREE_3D_BEAM_VERSION)
+    if search_variant not in {BEAM_SEARCH_LEGACY_EMS, BEAM_SEARCH_BRIDGE_EMS}:
+        raise Free3DBeamError(f"Unsupported beam search variant: {search_variant}.")
     limits = _budget_limits(budget)
     values = tuple(_participant(value, index) for index, value in enumerate(participants))
     dimensions = _box_dimensions(box, storage_height_mm)
@@ -198,11 +204,16 @@ def solve_free_3d_beam(
         placements=(),
         remaining_ids=tuple(sorted(participants_by_id)),
         spaces=tuple(initial_spaces),
-        points=frozenset(space.origin_mm for space in initial_spaces),
+        points=(
+            frozenset(space.origin_mm for space in initial_spaces)
+            if search_variant == BEAM_SEARCH_LEGACY_EMS
+            else frozenset(_initial_extreme_points(initial_spaces, inset_zones))
+        ),
     )
     input_digest = _digest(
         {
             "strategy": strategy.__dict__,
+            "search_variant": search_variant,
             "budget": {
                 "family_id": budget.family_id,
                 "effort_profile": budget.effort_profile,
@@ -253,6 +264,7 @@ def solve_free_3d_beam(
                 counters,
                 limits,
                 inset_zones,
+                search_variant,
             )
             for _, options in participant_options:
                 for option in options[: limits["max_options_per_participant"]]:
@@ -269,9 +281,10 @@ def solve_free_3d_beam(
                     )
                     if advanced is None:
                         continue
-                    if advanced.remaining_ids and not _remaining_participants_fit(
-                        advanced,
-                        participants_by_id,
+                    if (
+                        search_variant == BEAM_SEARCH_LEGACY_EMS
+                        and advanced.remaining_ids
+                        and not _remaining_participants_fit(advanced, participants_by_id)
                     ):
                         continue
                     counters.search_states += 1
@@ -356,6 +369,7 @@ def _participant_branches(
     counters: _BeamCounters,
     limits: dict[str, int],
     top_inset_zones: tuple[TopInsetZone, ...],
+    search_variant: str,
 ) -> list[tuple[dict[str, object], list[_BeamOption]]]:
     evaluated: list[tuple[tuple[object, ...], dict[str, object], list[_BeamOption]]] = []
     placements = list(state.placements)
@@ -374,6 +388,7 @@ def _participant_branches(
             counters,
             limits,
             top_inset_zones,
+            search_variant,
         )
         if counters.budget_exhausted:
             break
@@ -406,12 +421,30 @@ def _placement_options(
     counters: _BeamCounters,
     limits: dict[str, int],
     top_inset_zones: tuple[TopInsetZone, ...],
+    search_variant: str,
 ) -> list[_BeamOption]:
     result: dict[tuple[object, ...], _BeamOption] = {}
     for rotation, minimum_world, minimum_local in _orientations(participant):
         for point in sorted(points, key=lambda value: (value[2], value[1], value[0])):
-            containing = [space for space in spaces if _fits_in_space(point, minimum_world, space)]
-            for space in containing:
+            if search_variant == BEAM_SEARCH_LEGACY_EMS:
+                search_spaces = tuple(
+                    space
+                    for space in spaces
+                    if _fits_in_space(point, minimum_world, space)
+                )
+            else:
+                # A valid body may bridge several lower supports and therefore
+                # span several EMS. EMS generate points; collision, clearance,
+                # box and support checks remain authoritative.
+                search_spaces = (
+                    EmptySpace(
+                        point,
+                        _rounded_point(
+                            tuple(box[index] - point[index] for index in range(3))
+                        ),
+                    ),
+                )
+            for space in search_spaces:
                 for world_size, local_size in _dimension_variants(
                     participant,
                     point,
@@ -426,13 +459,25 @@ def _placement_options(
                     counters.placement_trials += 1
                     if not _inside_box(point, world_size, box):
                         continue
-                    if not _top_inset_option_allowed(
-                        participant,
-                        point,
-                        world_size,
-                        box[2],
-                        top_inset_zones,
-                    ):
+                    inset_allowed = (
+                        _legacy_top_inset_option_allowed(
+                            participant,
+                            point,
+                            world_size,
+                            box[2],
+                            top_inset_zones,
+                        )
+                        if search_variant == BEAM_SEARCH_LEGACY_EMS
+                        else _top_inset_option_allowed(
+                            participant,
+                            point,
+                            world_size,
+                            rotation,
+                            box[2],
+                            top_inset_zones,
+                        )
+                    )
+                    if not inset_allowed:
                         continue
                     if not _separated_from_placements(
                         point,
@@ -577,15 +622,47 @@ def _remaining_participants_fit(
     state: _BeamState,
     participants_by_id: dict[str, dict[str, object]],
 ) -> bool:
-    """Prune only when a remaining minimum cannot fit any shrinking EMS."""
+    """Preserve the historical EMS prune only in the legacy search variant."""
 
     for participant_id in state.remaining_ids:
         participant = participants_by_id[participant_id]
         if not any(
-            all(world_size[index] <= space.size_mm[index] + _EPSILON for index in range(3))
+            all(
+                world_size[index] <= space.size_mm[index] + _EPSILON
+                for index in range(3)
+            )
             for _, world_size, _ in _orientations(participant)
             for space in state.spaces
         ):
+            return False
+    return True
+
+
+def _legacy_top_inset_option_allowed(
+    participant: Mapping[str, object],
+    origin: tuple[float, float, float],
+    world_size: tuple[float, float, float],
+    storage_height_mm: float,
+    zones: tuple[TopInsetZone, ...],
+) -> bool:
+    """Keep the validated H01 search ordering as a portfolio baseline."""
+
+    body_top = origin[2] + world_size[2]
+    minimum_height = _minimum_local(participant)[2]
+    z_mode = str(_mapping(participant["dimension_modes"])["z"])
+    for zone in zones:
+        if not (
+            origin[0] < zone.origin_xy_mm[0] + zone.size_xy_mm[0] - _EPSILON
+            and zone.origin_xy_mm[0] < origin[0] + world_size[0] - _EPSILON
+            and origin[1] < zone.origin_xy_mm[1] + zone.size_xy_mm[1] - _EPSILON
+            and zone.origin_xy_mm[1] < origin[1] + world_size[1] - _EPSILON
+        ):
+            continue
+        if body_top <= zone.support_plane_z_mm + _EPSILON:
+            continue
+        if storage_height_mm - origin[2] + _EPSILON < minimum_height + zone.inset_depth_mm:
+            return False
+        if z_mode == "fixed" and abs(body_top - storage_height_mm) > 0.001:
             return False
     return True
 

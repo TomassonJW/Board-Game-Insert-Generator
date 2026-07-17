@@ -138,7 +138,7 @@ def _derive_container(
         )
         for content in contents
     ]
-    arrangement = _arrange_compartments(compartments, wall_mm)
+    arrangement = _arrange_compartments(compartments, wall_mm, box_inner)
     for compartment in compartments:
         origin = arrangement["origins"][str(compartment["id"])]
         compartment["local_origin_mm"] = {
@@ -162,13 +162,15 @@ def _derive_container(
         for compartment in compartments
         for blocker in _values(compartment["blockers"])
     ]
-    if outer["x"] > box_inner["x"]:
+    xy_fits = (
+        outer["x"] <= box_inner["x"] and outer["y"] <= box_inner["y"]
+    ) or (
+        outer["x"] <= box_inner["y"] and outer["y"] <= box_inner["x"]
+    )
+    if not xy_fits:
         blockers.append(
-            f"The container needs {outer['x']} mm in width but the box allows {box_inner['x']} mm."
-        )
-    if outer["y"] > box_inner["y"]:
-        blockers.append(
-            f"The container needs {outer['y']} mm in depth but the box allows {box_inner['y']} mm."
+            "L empreinte minimale calculee du conteneur ne tient dans aucune "
+            "orientation X/Y autorisee de la boite."
         )
     if outer["z"] > usable_height_mm:
         blockers.append(
@@ -189,7 +191,10 @@ def _derive_container(
         "inner_dimensions_mm": inner,
         "outer_dimensions_mm": outer,
         "compartment_layout": {
-            "policy": "deterministic_rows_with_internal_walls_v1",
+            "policy": "bounded_shelf_candidates_v2",
+            "candidate_count_evaluated": arrangement["candidate_count_evaluated"],
+            "box_fit_orientation": arrangement["box_fit_orientation"],
+            "order_strategy": arrangement["order_strategy"],
             "columns": arrangement["columns"],
             "rows": arrangement["rows"],
             "internal_wall_thickness_mm": _round(wall_mm),
@@ -336,32 +341,81 @@ def _choose_pile_grid(
     return columns, rows
 
 
-def _arrange_compartments(compartments: list[dict[str, object]], wall_mm: float) -> dict[str, object]:
-    candidates: list[dict[str, object]] = []
+def _arrange_compartments(
+    compartments: list[dict[str, object]],
+    wall_mm: float,
+    box_inner: dict[str, float],
+) -> dict[str, object]:
+    """Choose a compact deterministic shelf layout that can fit the box XY."""
+
+    max_inner_x = max(0.0, box_inner["x"] - wall_mm * 2.0)
+    max_inner_y = max(0.0, box_inner["y"] - wall_mm * 2.0)
+    legacy_candidates: dict[tuple[tuple[str, ...], ...], dict[str, object]] = {}
     for columns in range(1, len(compartments) + 1):
-        rows = [compartments[index : index + columns] for index in range(0, len(compartments), columns)]
-        row_widths = [
-            sum(float(_mapping(item["inner_dimensions_mm"])["x"]) for item in row) + wall_mm * (len(row) - 1)
-            for row in rows
+        rows = [
+            compartments[index : index + columns]
+            for index in range(0, len(compartments), columns)
         ]
-        row_heights = [max(float(_mapping(item["inner_dimensions_mm"])["y"]) for item in row) for row in rows]
-        width = max(row_widths)
-        height = sum(row_heights) + wall_mm * (len(rows) - 1)
-        aspect_penalty = abs(log(max(width, height) / min(width, height))) if min(width, height) else 0.0
-        candidates.append(
-            {
-                "columns": columns,
-                "rows": len(rows),
-                "row_values": rows,
-                "row_heights": row_heights,
-                "size_mm": {"x": _round(width), "y": _round(height)},
-                "score": width * height * (1.0 + aspect_penalty * 0.25),
-            }
+        _register_arrangement_candidate(
+            legacy_candidates,
+            rows,
+            wall_mm,
+            box_inner,
+            "source",
         )
-    selected = min(candidates, key=lambda item: (float(item["score"]), int(item["columns"])))
+    legacy_selected = min(legacy_candidates.values(), key=_legacy_arrangement_score)
+
+    if legacy_selected["box_fit_orientation"] != "none":
+        # Preserve the established canonical geometry whenever it is feasible.
+        # The broader search is a corrective fallback, not a silent relayout of
+        # every historical project.
+        candidates = legacy_candidates
+        selected = legacy_selected
+    else:
+        candidates: dict[tuple[tuple[str, ...], ...], dict[str, object]] = {}
+        for order_strategy, ordered in _compartment_orderings(compartments):
+            count = len(ordered)
+            for columns in range(1, count + 1):
+                rows = [
+                    ordered[index : index + columns]
+                    for index in range(0, count, columns)
+                ]
+                _register_arrangement_candidate(
+                    candidates,
+                    rows,
+                    wall_mm,
+                    box_inner,
+                    order_strategy,
+                )
+
+            target_widths = _bounded_target_widths(
+                ordered,
+                wall_mm,
+                max_inner_x,
+                max_inner_y,
+            )
+            for target_width in target_widths:
+                _register_arrangement_candidate(
+                    candidates,
+                    _next_fit_rows(ordered, target_width, wall_mm),
+                    wall_mm,
+                    box_inner,
+                    order_strategy,
+                )
+                _register_arrangement_candidate(
+                    candidates,
+                    _best_fit_rows(ordered, target_width, wall_mm),
+                    wall_mm,
+                    box_inner,
+                    order_strategy,
+                )
+        selected = min(candidates.values(), key=_arrangement_score)
     origins: dict[str, dict[str, float]] = {}
     y = 0.0
-    for row, row_height in zip(_values(selected["row_values"]), _values(selected["row_heights"])):
+    for row, row_height in zip(
+        _values(selected["row_values"]),
+        _values(selected["row_heights"]),
+    ):
         x = 0.0
         for item in _values(row):
             compartment = _mapping(item)
@@ -374,7 +428,239 @@ def _arrange_compartments(compartments: list[dict[str, object]], wall_mm: float)
         "rows": selected["rows"],
         "size_mm": selected["size_mm"],
         "origins": origins,
+        "candidate_count_evaluated": len(candidates),
+        "box_fit_orientation": selected["box_fit_orientation"],
+        "order_strategy": selected["order_strategy"],
     }
+
+
+def _compartment_orderings(
+    compartments: list[dict[str, object]],
+) -> list[tuple[str, list[dict[str, object]]]]:
+    def identifier(item: dict[str, object]) -> str:
+        return str(item["id"])
+
+    definitions = (
+        ("source", list(compartments)),
+        (
+            "width_desc",
+            sorted(
+                compartments,
+                key=lambda item: (
+                    -_compartment_width(item),
+                    -_compartment_height(item),
+                    identifier(item),
+                ),
+            ),
+        ),
+        (
+            "height_desc",
+            sorted(
+                compartments,
+                key=lambda item: (
+                    -_compartment_height(item),
+                    -_compartment_width(item),
+                    identifier(item),
+                ),
+            ),
+        ),
+        (
+            "area_desc",
+            sorted(
+                compartments,
+                key=lambda item: (
+                    -_compartment_width(item) * _compartment_height(item),
+                    -max(_compartment_width(item), _compartment_height(item)),
+                    identifier(item),
+                ),
+            ),
+        ),
+        (
+            "max_side_desc",
+            sorted(
+                compartments,
+                key=lambda item: (
+                    -max(_compartment_width(item), _compartment_height(item)),
+                    -min(_compartment_width(item), _compartment_height(item)),
+                    identifier(item),
+                ),
+            ),
+        ),
+    )
+    result: list[tuple[str, list[dict[str, object]]]] = []
+    seen: set[tuple[str, ...]] = set()
+    for name, values in definitions:
+        signature = tuple(identifier(item) for item in values)
+        if signature in seen:
+            continue
+        seen.add(signature)
+        result.append((name, values))
+    return result
+
+
+def _bounded_target_widths(
+    ordered: list[dict[str, object]],
+    wall_mm: float,
+    max_inner_x: float,
+    max_inner_y: float,
+    *,
+    maximum_count: int = 48,
+) -> list[float]:
+    """Bound the downstream shelf search while retaining representative widths."""
+
+    maximum_item = max(_compartment_width(item) for item in ordered)
+    values = {max_inner_x, max_inner_y, maximum_item}
+    max_span = max(max_inner_x, max_inner_y)
+    for first in range(len(ordered)):
+        width = 0.0
+        for last in range(first, len(ordered)):
+            if last > first:
+                width += wall_mm
+            width += _compartment_width(ordered[last])
+            if width <= max_span + 0.0001:
+                values.add(_round(width))
+    eligible = sorted(value for value in values if value + 0.0001 >= maximum_item)
+    if len(eligible) <= maximum_count:
+        return eligible
+    mandatory = {maximum_item, max_inner_x, max_inner_y}
+    remaining_slots = max(0, maximum_count - len(mandatory))
+    sampled = {
+        eligible[round(index * (len(eligible) - 1) / max(1, remaining_slots - 1))]
+        for index in range(remaining_slots)
+    }
+    return sorted(mandatory | sampled)
+
+
+def _next_fit_rows(
+    ordered: list[dict[str, object]],
+    target_width: float,
+    wall_mm: float,
+) -> list[list[dict[str, object]]]:
+    rows: list[list[dict[str, object]]] = []
+    widths: list[float] = []
+    for item in ordered:
+        width = _compartment_width(item)
+        if rows and widths[-1] + wall_mm + width <= target_width + 0.0001:
+            rows[-1].append(item)
+            widths[-1] += wall_mm + width
+        else:
+            rows.append([item])
+            widths.append(width)
+    return rows
+
+
+def _best_fit_rows(
+    ordered: list[dict[str, object]],
+    target_width: float,
+    wall_mm: float,
+) -> list[list[dict[str, object]]]:
+    rows: list[list[dict[str, object]]] = []
+    widths: list[float] = []
+    heights: list[float] = []
+    for item in ordered:
+        width = _compartment_width(item)
+        height = _compartment_height(item)
+        fits: list[tuple[float, float, int]] = []
+        for index, row_width in enumerate(widths):
+            next_width = row_width + wall_mm + width
+            if next_width <= target_width + 0.0001:
+                fits.append(
+                    (
+                        max(heights[index], height) - heights[index],
+                        target_width - next_width,
+                        index,
+                    )
+                )
+        if not fits:
+            rows.append([item])
+            widths.append(width)
+            heights.append(height)
+            continue
+        _, _, index = min(fits)
+        rows[index].append(item)
+        widths[index] += wall_mm + width
+        heights[index] = max(heights[index], height)
+    return rows
+
+
+def _register_arrangement_candidate(
+    candidates: dict[tuple[tuple[str, ...], ...], dict[str, object]],
+    rows: list[list[dict[str, object]]],
+    wall_mm: float,
+    box_inner: dict[str, float],
+    order_strategy: str,
+) -> None:
+    signature = tuple(tuple(str(item["id"]) for item in row) for row in rows)
+    if signature in candidates:
+        return
+    row_widths = [
+        sum(_compartment_width(item) for item in row) + wall_mm * (len(row) - 1)
+        for row in rows
+    ]
+    row_heights = [max(_compartment_height(item) for item in row) for row in rows]
+    width = max(row_widths)
+    height = sum(row_heights) + wall_mm * (len(rows) - 1)
+    outer_x = width + wall_mm * 2.0
+    outer_y = height + wall_mm * 2.0
+    if outer_x <= box_inner["x"] + 0.0001 and outer_y <= box_inner["y"] + 0.0001:
+        orientation = "direct"
+    elif outer_x <= box_inner["y"] + 0.0001 and outer_y <= box_inner["x"] + 0.0001:
+        orientation = "rotated_90"
+    else:
+        orientation = "none"
+    candidates[signature] = {
+        "columns": max(len(row) for row in rows),
+        "rows": len(rows),
+        "row_values": rows,
+        "row_heights": row_heights,
+        "size_mm": {"x": _round(width), "y": _round(height)},
+        "outer_area_mm2": outer_x * outer_y,
+        "box_fit_orientation": orientation,
+        "order_strategy": order_strategy,
+        "signature": signature,
+    }
+
+
+def _legacy_arrangement_score(value: dict[str, object]) -> tuple[object, ...]:
+    size = _mapping(value["size_mm"])
+    width = float(size["x"])
+    height = float(size["y"])
+    aspect_penalty = (
+        abs(log(max(width, height) / min(width, height)))
+        if min(width, height) > 0.0
+        else 0.0
+    )
+    return (
+        width * height * (1.0 + aspect_penalty * 0.25),
+        int(value["columns"]),
+    )
+
+
+def _arrangement_score(value: dict[str, object]) -> tuple[object, ...]:
+    size = _mapping(value["size_mm"])
+    width = float(size["x"])
+    height = float(size["y"])
+    aspect_penalty = (
+        abs(log(max(width, height) / min(width, height)))
+        if min(width, height) > 0.0
+        else 0.0
+    )
+    return (
+        0 if value["box_fit_orientation"] != "none" else 1,
+        _round(float(value["outer_area_mm2"])),
+        _round(aspect_penalty),
+        int(value["rows"]),
+        str(value["order_strategy"]),
+        value["signature"],
+    )
+
+
+def _compartment_width(item: dict[str, object]) -> float:
+    return float(_mapping(item["inner_dimensions_mm"])["x"])
+
+
+def _compartment_height(item: dict[str, object]) -> float:
+    return float(_mapping(item["inner_dimensions_mm"])["y"])
 
 
 def _source_payload(normalization: ProjectNormalization) -> dict[str, object]:

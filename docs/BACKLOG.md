@@ -2420,19 +2420,49 @@ P44-M007 est ready-for-explicit-go.
 - Observation : méthodes visibles, mais le cas dense réel reste faussement sans
   solution et la répartition n'est pas suffisamment harmonisée.
 - Préparation historique : scripts/fusion/prepare_p64_v2_solver_portfolio_test.ps1.
-- Sortie : correction P64-V2H01 obligatoire avant reprise de P44-V.
+- Sortie : corrections P64-V2H01 puis P64-V2H02 obligatoires avant reprise de P44-V.
 - Limites : aucune validation physique ou d'impression.
 
 ### P64-V2H01 — Fermeture continue corrective et top insets conditionnels
 
-- Statut : implemented, automated-validated dans 0.1.52 ; ready-for-human-fusion-check.
+- Statut : implemented, automated-validated dans 0.1.52 ; contextual-KO sur le projet réel étendu, gate supersédée.
 - Contrat : docs/P64_V2H01_CONTINUOUS_CLOSURE_CONTRACT.md.
 - Livrable : beam sur minima, contraintes plateau/livret conditionnelles,
   fermeture continue Auto/Cible avant certificat et fixture anonymisée du KO.
 - Préparation : scripts/fusion/prepare_p64_v2h01_continuous_closure_test.ps1.
-- Gate : P64-V2H01 Fusion OK 0.1.52 - commit <sha>.
+- Gate historique supersédée : aucune preuve OK 0.1.52 ne doit être émise.
 - Limite : amélioration d'alignement, pas harmonisation modulaire P64-F02.
 
+### P64-V2H02 — Capacité et vérité de recherche dense
+
+- Statut : implemented, automated-validated dans 0.1.53 ; ready-for-human-fusion-check.
+- Contrat : `docs/P64_V2H02_CAPACITY_AND_SEARCH_TRUTH_CONTRACT.md`.
+- Livrable : enveloppes multi-cavités bornées, beam traversant plusieurs EMS,
+  réservations localisées, budgets 1/2/4, capacité théorique sur chaque résultat
+  et occlusion correcte de la vue de dessus.
+- Préparation : `scripts/fusion/prepare_p64_v2h02_capacity_search_test.ps1`.
+- Gate : `P64-V2H02 Fusion OK 0.1.53 - commit <sha>` ou KO contextuel documenté.
+- Limite : une marge positive ne prouve pas le placement ; le cas dense reste
+  honnêtement `no_solution_within_budget`.
+
+### P64-V2H03 — Variantes internes bornées et sélection globale
+
+- Statut : proposed-after-P64-V2H02-gate ; ne pas implémenter sans arbitrage.
+- Objectif : produire plusieurs enveloppes certifiables par conteneur
+  multi-cavités et sélectionner leur combinaison avec le placement global.
+- Dépendance structurante : coordonner la propriété des variantes avec P45 et
+  amender le contrat avant code ; ne changer ni valeurs physiques ni schéma.
+- Gate : corpus dense reproductible, budgets bornés, fallback canonique et
+  comparaison explicite des variantes évaluées.
+- Modèle recommandé : `gpt-5.6-sol`, raisonnement `xhigh`.
+
+### P64-U01 — Progression de calcul non modale
+
+- Statut : planned-after-solver-truth ; non bloquant pour P64-V2H02.
+- Objectif : afficher progression, méthode active, temps et annulation sans
+  voler le focus, sans modal bloquant et sans matérialisation automatique.
+- Dépendance : métriques d'avancement stables et contrat d'annulation du moteur.
+- Modèle recommandé : `gpt-5.6-terra`, raisonnement `high` après spécification UX.
 ### P64-F01 — Fermeture continue par graphe d'adjacence
 
 - Statut : remaining-finishing-planned-after-P46 ; sous-ensemble correctif intégré par P64-V2H01. Agent : Luna/frontier.

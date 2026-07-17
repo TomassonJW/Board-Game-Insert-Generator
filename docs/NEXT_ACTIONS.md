@@ -6,67 +6,75 @@ Dernière mise à jour : 2026-07-17
 
 V0.1 reste `mvp-accepted` par P66, `fusion-validated: true` et
 `print-validated: false`. P44 poursuit la fondation UX V0.2, mais P44-V reste en
-KO contextuel tant que le solveur n'a pas passé P64-V2.
+KO contextuel tant que le solveur n'a pas passé la gate corrective P64-V2H02.
 
 ## Dernier état réel
 
-- P44-M007H03 est `fusion-validated` dans Fusion 0.1.40 par la preuve
-  `P44-M007H03 Fusion OK 0.1.40 - commit 92f07c8`.
 - P44-M009H05 reste `fusion-validated` dans Fusion 0.1.36 par la preuve
   `P44-M009H05 Fusion OK 0.1.36 - commit 7c76ba0`.
-- Le package initial P44-M007 0.1.37 a été supersédé ; P44-M007H03 0.1.40
-  reste la référence validée pour focus, sleeves et Aperçu.
-- P44-VH02 a corrigé suppression et nommage ; ses faits UX sont acceptés
-  contextuellement, sans valider le solveur ni le package 0.1.43.
+- Le package initial P44-M007 0.1.37 est supersédé par ses correctifs.
+- P44-M007H03 est `fusion-validated` dans Fusion 0.1.40 par la preuve
+  `P44-M007H03 Fusion OK 0.1.40 - commit 92f07c8`.
+- P44-VH02 a corrigé la suppression directe et le nommage incrémental ; ses faits
+  UX restent acceptés contextuellement sans valider le solveur.
 - P64-H01 est `fusion-validated` dans Fusion 0.1.42 par la preuve
   `P64-H01 Fusion OK 0.1.42 - commit 5865645`.
-- P64-H02 est implémenté et automatisé dans 0.1.44, mais P64-H02V est un KO
-  contextuel : un nouveau petit ajout peut encore épuiser la recherche alors
-  que du volume reste disponible.
-- P64-H03R conserve ces ordres/structures au-dessus de H04 dans 0.1.47. Un
-  nouveau cas réel reste en échec : il motive H06/H07, sans supprimer les gains H03.
-- P64-A01 documente la rupture : le solveur actuel devient baseline rapide ;
-  placement 3D libre, beam et portefeuille Auto sont introduits derrière un
-  contrat et un validateur communs.
-
+- P64-H03R conserve les gains de recherche dirigée ; ils n'ont pas été retirés.
+- P64-H04 à H08 ont introduit résultats honnêtes, contrat commun, greedy 3D,
+  beam, portefeuille et réglages Fusion.
 - P64-V2 0.1.51 est un KO contextuel sur le cas dense réel.
-- P64-V2H01 corrige ce cas dans 0.1.52 par faisabilité minimale, top insets
-  conditionnels et fermeture continue avant certificat.
+- P64-V2H01 0.1.52 a certifié la fixture à 9 corps, mais le projet réel étendu à
+  11 conteneurs et 34 contenus reste sans candidat : la gate 0.1.52 est
+  supersédée et ne doit pas recevoir de preuve OK.
+- P64-V2H02 0.1.53 corrige les faux blocages d'enveloppes multi-cavités, les
+  coupures beam trop fortes, les réservations localisées, les budgets d'effort,
+  l'affichage de capacité et l'occlusion de la vue de dessus.
+- Le cas de référence conserve environ 693,6 cm³ de marge volumique théorique,
+  mais cette borne ne prouve pas une disposition orthogonale. Son statut reste
+  honnêtement `no_solution_within_budget`.
+
 ## Prochaine action recommandée
 
-### P64-V2H01 — Gate Fusion de la fermeture continue corrective
+### P64-V2H02 — Gate Fusion capacité et vérité de recherche
 
-Statut : ready-for-human-fusion-check. P64-V2 0.1.51 est un KO contextuel : le
-cas dense laissé dans Fusion restait sans solution malgré un volume suffisant.
+Statut : ready-for-human-fusion-check après installation du package 0.1.53.
 
-Le package 0.1.52 sépare désormais la faisabilité sur minima de la fermeture
-continue, traite les réservations plateau/livret comme contraintes
-conditionnelles et ne certifie qu'après fermeture et validation communes. Sur
-la fixture anonymisée du cas réel, Étages et piles reste sans solution dans son
-budget tandis que Placement 3D libre et Auto trouvent 9 corps sur plusieurs
-niveaux.
+Préparation : `scripts/fusion/prepare_p64_v2h02_capacity_search_test.ps1`.
 
-Préparation : scripts/fusion/prepare_p64_v2h01_continuous_closure_test.ps1.
+Objectif humain :
 
-Objectif humain : vérifier le projet réel inchangé, la différence effective
-entre les méthodes, la solution certifiée free-3D/Auto, les coupes supérieures
-valides, l'alignement visuel amélioré et l'absence de scène automatique.
+- vérifier que la capacité théorique apparaît sur résultat résolu et non résolu ;
+- vérifier qu'un budget épuisé dit `non résolu` et non `impossible` ;
+- vérifier que Rapide, Normal et Approfondi exposent 1, 2 et 4 priorités et des
+  largeurs beam distinctes ;
+- vérifier que des méthodes ou efforts peuvent légitimement conserver le même
+  résultat tout en affichant leurs métriques propres ;
+- vérifier que la vue de dessus masque les cavités situées sous un corps ;
+- vérifier qu'aucune scène n'est matérialisée automatiquement.
 
-Cette gate ne revendique pas encore l'harmonisation modulaire P64-F02 et ne
-valide ni valeur physique ni impression.
+Retour attendu : `P64-V2H02 Fusion OK 0.1.53 - commit <sha>`, ou KO contextuel
+avec le projet laissé dans son état reproductible.
+
+La gate ne revendique ni solution du cas dense, ni harmonisation modulaire,
+ni calibration physique, ni impression.
+
 ## Lots suivants, non ouverts
 
-1. P64-V2H01 : gate humaine corrective, puis reprise de P44-V.
-2. P45/P46 selon leurs contrats actuels.
-3. P64-F01 restant / P64-F02 après P46 : optimisation de finition puis harmonisation modulaire.
-4. P64-F03 après retours physiques ; P64-X01 exact seulement sous nouvelle gate.
+1. P64-V2H02 : gate humaine corrective, puis arbitrage de P64-V2H03.
+2. P64-V2H03 : variantes internes bornées et sélection globale, à coordonner
+   explicitement avec P45 avant tout code.
+3. P44-V, puis P45/P46 selon leurs contrats et gates.
+4. P64-F01 restant / P64-F02 après P46 : finition et harmonisation modulaire.
+5. P64-U01 : progression de calcul non modale et annulable, sans vol de focus.
+6. P64-X01 : éventuel moteur exact, seulement après benchmark, ADR de dépendance
+   et GO distinct.
 
 ## Séquence verrouillée
 
-P64-V2H01 est la seule action ready-for-human-fusion-check. P64-V2 0.1.51 ne
-reçoit aucune preuve Fusion OK. P44-V, P45 et P46 attendent cette gate puis la
-reprise positive de P44-V. P47-P50 restent bloqués jusqu'à P46 et P69 jusqu'à
-P50. P68 peut recueillir des faits réels sans recalibrer les defaults.
+P64-V2H02 est la seule action `ready-for-human-fusion-check`. P44-V, P45 et P46
+restent bloqués. P47-P50 restent bloqués jusqu'à P46 et P69 jusqu'à P50. P68
+peut recueillir des faits réels sans recalibrer les defaults.
+
 ## Fin de chaque mission
 
 Mettre à jour le pilotage, relire le diff, exécuter les preuves prévues, committer

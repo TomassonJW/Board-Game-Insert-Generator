@@ -669,25 +669,47 @@ Cette observation ne valide ni valeurs physiques ni impression.
 
 ## P64-V2H01 — Gate fermeture continue corrective 0.1.52
 
+Statut : contextual-KO après extension du projet réel à 11 conteneurs et 34
+contenus. Le package 0.1.52 ne doit pas recevoir de preuve Fusion OK.
+
+La fixture automatisée à 9 corps reste certifiée et devient une non-régression
+du portefeuille. La préparation historique est
+`scripts/fusion/prepare_p64_v2h01_continuous_closure_test.ps1`, mais elle n'est
+plus la gate active.
+
+Retour historique non reçu — ne pas envoyer :
+`P64-V2H01 Fusion OK 0.1.52 - commit <sha>`.
+
+Les comportements acquis sont conservés dans 0.1.53 par la variante EMS
+historique. Aucune validation physique ou d'impression n'est revendiquée.
+`print-validated: false`.
+
+## P64-V2H02 — Gate capacité et vérité de recherche 0.1.53
+
 Statut : ready-for-human-fusion-check. Préparation automatisée :
-scripts/fusion/prepare_p64_v2h01_continuous_closure_test.ps1.
+`scripts/fusion/prepare_p64_v2h02_capacity_search_test.ps1`.
 
-Vérifier dans Fusion, sur le projet dense inchangé :
+Vérifier dans Fusion sur un projet simple résolu, puis sur le projet dense laissé
+dans son état reproductible :
 
-1. Placement 3D libre + Approfondi trouve 9 conteneurs matérialisables sans
-   Calcul impossible ni erreur de cavité sous plateau ;
-2. le diagnostic retient free_3d_beam et le plan présente plusieurs niveaux
-   avec des faces mieux alignées ;
-3. Étages et piles peut rester sans solution dans son budget, tandis que
-   Placement 3D libre puis Auto retrouvent la solution certifiée : les méthodes
-   sont donc effectivement distinctes ;
-4. les grands bacs incompatibles avec les coupes plateau/livret restent hors de
-   leur empreinte et les corps compatibles portent correctement les coupes ;
-5. aucune scène ne change avant Matérialiser dans Fusion.
+1. la carte de capacité affiche volume utilisable, enveloppes minimales et marge
+   théorique en cm³ et mm³ sur succès comme sur absence de candidat ;
+2. une marge positive est présentée comme borne nécessaire, jamais comme promesse
+   de placement ;
+3. le cas dense affiche `non résolu dans le budget` et non `impossible`, sans
+   mesure négative issue d'une branche rejetée ;
+4. Rapide, Normal et Approfondi exposent respectivement 1, 2 et 4 priorités beam,
+   des largeurs 8, 24 et 64 et leur durée réelle ;
+5. Auto intelligent et Placement 3D libre affichent leur chaîne distincte, même
+   lorsqu'ils aboutissent au même statut ou au même meilleur candidat ;
+6. la vue de dessus peint les corps supérieurs au-dessus des cavités inférieures
+   et ne donne plus l'impression de regarder à travers les parois ;
+7. aucune scène ne change avant `Matérialiser dans Fusion`.
 
-Retour attendu : P64-V2H01 Fusion OK 0.1.52 - commit <sha>, ou KO contextuel avec
-méthode, effort et diagnostic.
+Retour attendu : `P64-V2H02 Fusion OK 0.1.53 - commit <sha>`, ou KO contextuel
+avec méthode, effort, capacité et diagnostic visibles.
 
-Cette gate valide le comportement logiciel observé seulement. Elle ne valide
-pas l'harmonisation modulaire future P64-F02, aucune valeur physique, aucune
-géométrie imprimée et aucune impression réelle. print-validated: false.
+Cette gate ne demande pas de confirmer que le cas dense est soluble. Elle valide
+la vérité du résultat, la capacité informative, les budgets et la vue. Elle ne
+calibre aucune valeur physique, ne valide aucune géométrie imprimée et ne vaut
+pas impression réelle. `print-validated: false`.

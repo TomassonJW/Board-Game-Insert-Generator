@@ -111,3 +111,19 @@ Les réservations supérieures sont en outre des contraintes conditionnelles, pa
 des obstacles pleins : un corps reste sous le plan d'appui ou atteint le sommet
 avec une coupe et des fonds valides. Cette précision évite à la fois les
 intersections invalides et l'exclusion abusive de solutions réelles.
+
+## Amendement P64-V2H02 — 2026-07-17
+
+La prévalidation d'une réservation supérieure est localisée. Pour une
+orientation candidate donnée, elle compare chaque cavité transformée à
+l'empreinte XY de la réservation. Une cavité profonde sans recouvrement ne peut
+plus interdire globalement le conteneur. Le validateur final reste autoritaire
+sur coupe, matière résiduelle, fonds et support.
+
+Les points extrêmes initiaux incluent en outre les frontières droite et arrière
+des réservations. Cette règle permet de placer directement un corps haut hors de
+leur empreinte sans transformer la réservation en obstacle plein.
+
+Ces précisions corrigent la faisabilité ; elles ne constituent ni
+l'harmonisation modulaire P64-F02, ni une autorisation d'ajouter des cales ou de
+modifier des valeurs physiques.

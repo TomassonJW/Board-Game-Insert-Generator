@@ -5,6 +5,7 @@ import unittest
 
 from board_game_insert_generator.container_derivation import (
     CONTAINER_DERIVATION_SCHEMA_V1,
+    _bounded_target_widths,
     derive_container_plan,
 )
 from board_game_insert_generator.project_v1 import blank_project_v1
@@ -91,7 +92,7 @@ class ContainerDerivationTests(unittest.TestCase):
 
         self.assertEqual(result["summary"]["status"], "blocked")
         self.assertEqual(result["containers"][0]["status"], "blocked")
-        self.assertTrue(any("width" in blocker for blocker in result["containers"][0]["blockers"]))
+        self.assertTrue(any("orientation X/Y" in blocker for blocker in result["containers"][0]["blockers"]))
         self.assertEqual(result["blockers"][0]["container_group_id"], "shared")
 
     def test_uses_per_container_wall_floor_and_a_zero_content_clearance(self) -> None:
@@ -134,6 +135,70 @@ class ContainerDerivationTests(unittest.TestCase):
         container = result["containers"][0]
         self.assertEqual(container["status"], "ready")
         self.assertEqual({item["shape_kind"] for item in container["compartments"]}, set(shape_kinds))
+
+    def test_shelf_width_candidates_remain_bounded_for_dense_containers(self) -> None:
+        compartments = [
+            {
+                "id": f"cavity-{index}",
+                "inner_dimensions_mm": {
+                    "x": 8.0 + index % 11,
+                    "y": 10.0 + index % 7,
+                    "z": 5.0,
+                },
+            }
+            for index in range(100)
+        ]
+
+        widths = _bounded_target_widths(compartments, 1.2, 247.6, 177.6)
+
+        self.assertLessEqual(len(widths), 48)
+        self.assertIn(247.6, widths)
+        self.assertIn(177.6, widths)
+
+    def test_dense_mixed_container_uses_a_box_bounded_multi_row_layout(self) -> None:
+        project = blank_project_v1()
+        project["box"] = {
+            "inner_dimensions_mm": {"x": 250.0, "y": 180.0, "z": 70.0},
+            "usable_height_mm": 69.8,
+            "lid_clearance_mm": 0.2,
+        }
+        project["container_groups"] = [
+            {"id": "dense", "name": "Dense", "wall_thickness_mm": None, "floor_thickness_mm": None}
+        ]
+        project["contents"] = [
+            {
+                "id": f"cards-{index}",
+                "name": "Cards",
+                "shape_kind": "cards",
+                "dimensions_mm": {"x": 89.0, "y": 30.16, "z": 64.0},
+                "quantity": 1,
+                "container_group_id": "dense",
+                "content_clearance_mm": 0.6,
+                "measurement_confidence": "exact",
+            }
+            for index in range(2)
+        ] + [
+            {
+                "id": f"tokens-{index}",
+                "name": "Tokens",
+                "shape_kind": "round",
+                "dimensions_mm": {"x": 20.0, "y": 20.0, "z": 3.0},
+                "quantity": 60,
+                "container_group_id": "dense",
+                "content_clearance_mm": 0.6,
+                "measurement_confidence": "exact",
+            }
+            for index in range(4)
+        ]
+
+        result = derive_container_plan(project)
+
+        container = result["containers"][0]
+        self.assertEqual(container["status"], "ready")
+        self.assertEqual(container["outer_dimensions_mm"], {"x": 92.6, "y": 129.92, "z": 65.8})
+        self.assertEqual(container["compartment_layout"]["policy"], "bounded_shelf_candidates_v2")
+        self.assertGreater(container["compartment_layout"]["candidate_count_evaluated"], 1)
+        self.assertNotEqual(container["compartment_layout"]["box_fit_orientation"], "none")
 
     def test_empty_requested_container_waits_for_fill_resolution(self) -> None:
         project = blank_project_v1()

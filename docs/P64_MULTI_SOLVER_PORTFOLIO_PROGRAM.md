@@ -325,7 +325,7 @@ hors chemin critique.
 
 ### P64-V2H01 — Fermeture corrective avant certificat
 
-- Statut : implemented, automated-validated dans 0.1.52 ; gate Fusion requise.
+- Statut : implemented, automated-validated dans 0.1.52 ; contextual-KO sur le projet réel étendu, gate supersédée.
 - Contrat : docs/P64_V2H01_CONTINUOUS_CLOSURE_CONTRACT.md.
 - Déclencheur : P64-V2 0.1.51 reproduit un cas où la faisabilité free-3D
   existait mais aucun candidat ne survivait au résiduel et aux réservations
@@ -334,6 +334,34 @@ hors chemin critique.
   supérieures conditionnelles, fermeture continue bornée avant certificat et
   fixture anonymisée du cas réel.
 - Limite : alignement de faces seulement ; aucune harmonisation modulaire P64-F02.
+
+### P64-V2H02 — Capacité et vérité de recherche dense
+
+- Statut : implemented, automated-validated dans 0.1.53 ; gate Fusion requise.
+- Contrat : `docs/P64_V2H02_CAPACITY_AND_SEARCH_TRUTH_CONTRACT.md`.
+- Déclencheur : le projet réel étendu à 11 conteneurs et 34 contenus révèle des
+  faux blocages d'enveloppe, d'EMS et de réservations, puis demeure non certifié.
+- Livrables : dérivation multi-cavités bornée, recherche beam moins destructive,
+  réservations localisées, budgets 1/2/4, capacité théorique publique et vue de
+  dessus correctement occultée.
+- Règle : une marge de volume positive n'est jamais une preuve de placement.
+
+### P64-V2H03 — Variantes internes bornées
+
+- Statut : proposed-after-P64-V2H02-gate.
+- Agent conseillé : `gpt-5.6-sol`, raisonnement `xhigh`.
+- Objectif : combiner plusieurs enveloppes internes certifiables avec la recherche
+  globale au lieu de figer une seule dérivation canonique.
+- Prérequis : arbitrage explicite avec P45, fixture dense, budget/déterminisme et
+  contrat de fallback. Aucun code avant cette coordination.
+
+### P64-U01 — Progression non modale du calcul
+
+- Statut : planned ; indépendant de la vérité géométrique.
+- Agent conseillé : `gpt-5.6-terra`, raisonnement `high` pour l'UX, puis `sol high`
+  si le contrat d'annulation moteur doit évoluer.
+- Objectif : progression, durée et annulation sans voler le focus, sans modal et
+  sans matérialisation automatique.
 
 ### P64-F01 — Fermeture continue par graphe d'adjacence
 
@@ -400,5 +428,5 @@ Le chemin P64-H04 à P64-H08 est terminé seulement si :
 - le mode Auto choisit parmi des solutions certifiées et explique son arrêt ;
 - les budgets sont monotones, bornés et observables ;
 - l'UI conserve focus, sélection, autosave et matérialisation explicite ;
-- la gate P64-V2 est positive dans Fusion ;
+- la gate corrective P64-V2H02 est positive dans Fusion ;
 - `print-validated: false` reste explicite.

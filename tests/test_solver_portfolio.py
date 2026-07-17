@@ -2,9 +2,14 @@ from __future__ import annotations
 
 import unittest
 
+from board_game_insert_generator.free_3d_beam_solver import (
+    BEAM_SEARCH_BRIDGE_EMS,
+    BEAM_SEARCH_LEGACY_EMS,
+)
 from board_game_insert_generator.project_v1 import blank_project_v1
 from board_game_insert_generator.solver_portfolio import (
     EFFORT_NORMAL,
+    _beam_search_runs,
     portfolio_effort_profiles,
     solve_partition_portfolio,
 )
@@ -55,6 +60,20 @@ class SolverPortfolioTests(unittest.TestCase):
         self.assertTrue(deep.is_at_least_as_permissive_as(normal))
         self.assertEqual(quick.allowed_family_ids, normal.allowed_family_ids)
         self.assertEqual(normal.allowed_family_ids, deep.allowed_family_ids)
+        self.assertEqual(dict(quick.beam_budget.limits)["max_participant_branches"], 1)
+        self.assertEqual(dict(normal.beam_budget.limits)["max_participant_branches"], 2)
+        self.assertEqual(dict(deep.beam_budget.limits)["max_participant_branches"], 4)
+        for profile, maximum in ((quick, 1), (normal, 2), (deep, 4)):
+            runs = _beam_search_runs(profile)
+            self.assertEqual(
+                tuple(search_variant for _, search_variant in runs),
+                (BEAM_SEARCH_LEGACY_EMS, BEAM_SEARCH_BRIDGE_EMS),
+            )
+            self.assertEqual(dict(runs[0][0].limits)["max_participant_branches"], 1)
+            self.assertEqual(
+                dict(runs[1][0].limits)["max_participant_branches"],
+                maximum,
+            )
 
     def test_simple_stage_solution_keeps_the_fast_path(self) -> None:
         project = blank_project_v1()

@@ -15,6 +15,8 @@ from board_game_insert_generator.free_3d_continuous_closure import (
     close_free_3d_residual,
 )
 from board_game_insert_generator.free_3d_beam_solver import (
+    BEAM_SEARCH_BRIDGE_EMS,
+    BEAM_SEARCH_LEGACY_EMS,
     FREE_3D_BEAM_FAMILY_ID,
     Free3DBeamExecution,
     solve_free_3d_beam,
@@ -136,13 +138,13 @@ def portfolio_effort_profiles() -> tuple[PortfolioEffortProfile, ...]:
             EFFORT_NORMAL,
             "Normal",
             greedy=(2_048, 2_048, 500_000, 512),
-            beam=(24, 6, 5_000, 2_048, 2_048, 24, 1, 250_000, 4_096),
+            beam=(24, 6, 5_000, 2_048, 2_048, 24, 2, 250_000, 4_096),
         ),
         _profile(
             EFFORT_DEEP,
             "Approfondi",
             greedy=(4_096, 4_096, 2_000_000, 1_024),
-            beam=(64, 12, 15_000, 4_096, 4_096, 48, 1, 1_000_000, 20_000),
+            beam=(64, 12, 15_000, 4_096, 4_096, 48, 4, 1_000_000, 20_000),
         ),
     )
 
@@ -344,36 +346,48 @@ def solve_partition_portfolio(
         )
     )
 
-    beam = solve_free_3d_beam(
-        problem.participants,
-        problem.box,
-        problem.storage_height_mm,
-        problem.xy_clearance_mm,
-        box_perimeter_xy_mm=problem.box_xy_clearance_mm,
-        between_bodies_z_mm=problem.z_clearance_mm,
-        budget=profile.beam_budget,
-        cancel_check=cancel_check,
-        top_inset_zones=problem.top_inset_zones,
-    )
-    beam_candidates, beam_rejections = _certify_beam(problem, beam)
-    candidates.extend(_portfolio_candidate(value) for value in beam_candidates)
+    beam_runs = []
+    beam_candidates = []
+    beam_rejections: set[str] = set()
+    for beam_budget, search_variant in _beam_search_runs(profile):
+        beam = solve_free_3d_beam(
+            problem.participants,
+            problem.box,
+            problem.storage_height_mm,
+            problem.xy_clearance_mm,
+            box_perimeter_xy_mm=problem.box_xy_clearance_mm,
+            between_bodies_z_mm=problem.z_clearance_mm,
+            budget=beam_budget,
+            cancel_check=cancel_check,
+            top_inset_zones=problem.top_inset_zones,
+            search_variant=search_variant,
+        )
+        beam_runs.append(beam)
+        certified, rejections = _certify_beam(problem, beam)
+        beam_candidates.extend(certified)
+        beam_rejections.update(rejections)
+        candidates.extend(_portfolio_candidate(value) for value in certified)
+        if beam.status == STALE_OR_CANCELLED:
+            break
+
+    last_beam = beam_runs[-1]
     reports.append(
         PortfolioFamilyReport(
             FREE_3D_BEAM_FAMILY_ID,
-            SOLUTION_FOUND if beam_candidates else beam.status,
-            "validated_complete_proposal" if beam_candidates else beam.stop_reason,
-            len(beam.solutions),
+            SOLUTION_FOUND if beam_candidates else last_beam.status,
+            "validated_complete_proposal" if beam_candidates else last_beam.stop_reason,
+            sum(len(value.solutions) for value in beam_runs),
             len(beam_candidates),
-            beam_rejections,
+            tuple(sorted(beam_rejections)),
         )
     )
 
-    if beam.status == STALE_OR_CANCELLED:
+    if last_beam.status == STALE_OR_CANCELLED:
         return _portfolio_execution(
             strategy,
             profile,
             STALE_OR_CANCELLED,
-            beam.stop_reason,
+            last_beam.stop_reason,
             (),
             tuple(reports),
             0,
@@ -443,6 +457,26 @@ def _certify_greedy(
         candidate_id=f"{execution.candidate.candidate_id}:closed",
         placements=closure.placements,
         search_telemetry=telemetry,
+    )
+
+
+def _beam_search_runs(
+    profile: PortfolioEffortProfile,
+) -> tuple[tuple[SolverBudget, str], ...]:
+    """Retain the validated EMS baseline and add the bridge-capable search."""
+
+    source = profile.beam_budget
+    legacy = SolverBudget(
+        source.family_id,
+        source.effort_profile,
+        tuple(
+            (name, 1 if name == "max_participant_branches" else value)
+            for name, value in source.limits
+        ),
+    )
+    return (
+        (legacy, BEAM_SEARCH_LEGACY_EMS),
+        (source, BEAM_SEARCH_BRIDGE_EMS),
     )
 
 
