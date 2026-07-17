@@ -32,7 +32,7 @@ if (-not $DryRun) {
         'theoretical_remaining_volume_mm3',
         'max_participant_branches',
         'eligible_family_ids',
-        'const orderedBodies=',
+        'orderedBodies=[...bodyItems]',
         'cavity.parent_id===body.id'
     )) {
         if (-not $palette.Contains($marker)) {
