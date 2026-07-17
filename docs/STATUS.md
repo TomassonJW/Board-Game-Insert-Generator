@@ -8,8 +8,8 @@ Statut produit : **MVP V0.1 Fusion-only accepte ; validation d impression non ac
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P64-H07 est intégré avec beam 3D et portefeuille Auto interne ;
-P64-H08 est la seule mission `ready`. P44-V reste en KO contextuel et P45 reste bloqué.
+Phase active : P64-H08 est intégré dans le package 0.1.51 ; P64-V2 est la seule action `ready-for-human-fusion-check`. P44-V reste en KO contextuel et P45 reste bloqué.
+
 
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
@@ -2329,7 +2329,7 @@ ADR-0069 sépare faisabilité et finition : fermeture continue puis harmonisatio
 modulaire, avec fallback obligatoire vers la solution certifiée.
 
 Le programme P64-H05 à H08 devient le chemin critique avant P64-V2 et reprise de
-P44-V. P64-H05/H06/H07 sont intégrés et P64-H08 est la seule mission `ready`. P45/P46 et les lots ultérieurs ne
+P44-V. P64-H05/H06/H07/H08 sont intégrés ; P64-V2 est la seule action `ready-for-human-fusion-check`. P45/P46 et les lots ultérieurs ne
 sont pas ouverts. Aucun schéma, default, dimension physique, tolérance, cavité,
 géométrie, CAD IR ou scène ne change ; `print-validated: false`.
 
@@ -2382,5 +2382,24 @@ familles et classe seulement des plans certifiés.
 Le corpus H04 simple/dense/réservations conserve une solution Auto certifiée ;
 un cas multi-niveaux distinct obtient un plan beam complet certifié. Le chemin
 public `solve_partition_plan`, le schéma, l'UI, les dimensions physiques, les
-jeux, la CAD IR et la scène restent inchangés. P64-H08 devient `ready` ; aucune
+jeux, la CAD IR et la scène restent inchangés. P64-H07 se termine ; P64-H08 est alors préparée, sans
 preuve Fusion ou impression nouvelle. `print-validated: false`.
+
+## P64-H08 — Réglages Fusion, critères honnêtes et diagnostic secondaire (2026-07-17)
+
+Package : 0.1.51. Statut : `implemented`, `automated-validated`.
+
+La palette expose `Auto intelligent` (défaut), `Étages et piles` et
+`Placement 3D libre`, avec les efforts Rapide/Normal/Approfondi. Les réglages
+sont conservés dans l'état local du document, pas dans `bgig.project.v1` : aucun
+projet existant n'est migré ou auto-enregistré par ce choix.
+
+Le chemin Auto classe seulement les plans complets certifiés ; le mode baseline
+reste préservé et le mode 3D libre exclut la baseline. Les propositions
+résiduelles héritées restent visibles, non matérialisables et diagnostiquées.
+La réponse silencieuse des préférences ne reconstruit pas le DOM éditable ; elle
+relance un aperçu adaptatif borné en conservant focus et sélection.
+
+P64-V2 est préparée par `scripts/fusion/prepare_p64_v2_solver_portfolio_test.ps1`
+mais aucune preuve Fusion ou impression nouvelle n'est revendiquée.
+`print-validated: false`.

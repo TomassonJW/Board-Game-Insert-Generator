@@ -300,7 +300,7 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertEqual(self.markup.count('data-bridge="materialize_project"'), 1)
         self.assertLess(self.markup.index('id="preview-status"'), self.markup.index('id="preview-explanations"'))
         self.assertLess(self.markup.index('class="plan-grid"', self.markup.index("function renderResult")), self.markup.index('id="preview-explanations"'))
-        self.assertIn('Calculée automatiquement', self.markup)
+        self.assertIn('Calcul&eacute;e automatiquement', self.markup)
         self.assertIn('id="design-height" readonly aria-readonly="true" tabindex="-1"', self.markup)
 
     def test_keeps_background_updates_out_of_editable_dom_and_defers_layout_paint(self) -> None:
@@ -402,7 +402,7 @@ class FusionPaletteDomTests(unittest.TestCase):
         for marker in (
             "Réglages de conception", "Épaisseurs minimales", "Parois", "Fond",
             "Jeux (tolérances)", "Jeu entre conteneurs", "Jeu conteneur-boîte",
-            "Jeu élément-cavité (par défaut)", "Priorité de la proposition",
+            "Jeu élément-cavité (par défaut)", "Crit&egrave;re de classement",
             'class="settings-clearance-table"',
             '.settings-card{width:min(100%,760px)',
             '.settings-clearance-table{display:grid;gap:4px;width:min(100%,590px)',
@@ -541,6 +541,22 @@ class FusionPaletteDomTests(unittest.TestCase):
         ):
             self.assertIn(marker, script)
 
+
+    def test_exposes_p64_h08_solver_method_effort_and_focus_safe_local_persistence(self) -> None:
+        for marker in (
+            'id="solver-method"', 'id="solver-effort"', 'id="solver-ranking"',
+            'data-solver-setting="method"', 'data-solver-setting="effort"',
+            'Auto intelligent', 'Placement 3D libre', 'function saveSolverSetting',
+            'save_solver_settings', 'function solverTelemetryDetails',
+            'renderSolverSettings()', "action==='save_solver_settings'",
+        ):
+            self.assertIn(marker, self.markup)
+        self.assertNotIn('<option value="accessible">', self.markup)
+        self.assertNotIn('<option value="print_simple">', self.markup)
+        self.assertNotIn('<option value="material_reduced">', self.markup)
+        script = (ROOT / "scripts" / "fusion" / "prepare_p64_v2_solver_portfolio_test.ps1").read_text(encoding="utf-8")
+        for marker in ("0.1.51", "solver-method", "solver-effort", "save_solver_settings", "P64-V2 Fusion OK"):
+            self.assertIn(marker, script)
 
 if __name__ == "__main__":
     unittest.main()

@@ -1283,8 +1283,7 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - C-GEOMETRY : finition continue/modulaire planifiée après P46 ; aucun filler ni
   cale automatique.
 - État : P64-H03R/H04/H05/H06/H07 intégrés (baseline dirigée, résultats honnêtes,
-  contrat commun, greedy et beam 3D, portefeuille Auto interne). P64-H08
-  `ready`, P64-V2 bloquée séquentiellement.
+  contrat commun, greedy et beam 3D, portefeuille Auto interne). P64-H08 intégrée dans 0.1.51 ; P64-V2 `ready-for-human-fusion-check`.
 - Validation : dernière preuve inchangée P64-H01 0.1.42 ; P64-H02/H03 non
   fusion-validées ; `print-validated: false`.
 ## Mise à jour P64-H07 — 2026-07-17
@@ -1296,7 +1295,20 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
   fermeture sans résiduel arbitraire et topologie multi-niveaux certifiée.
 - C-QUALITY : correspondance candidat/plan ajoutée au certificat autoritaire ;
   seuls les plans complets certifiés sont classés.
-- C-USABILITY : aucun réglage visible encore ; P64-H08 est `ready` pour exposer
+- C-USABILITY (état historique H07) : aucun réglage visible encore ; P64-H08 devait exposer
   méthode, effort et diagnostic sans perte de focus.
 - Validation : aucune preuve Fusion ou impression nouvelle ; dernière preuve
   solveur P64-H01 0.1.42, `print-validated: false`.
+
+## Mise à jour P64-H08 — 2026-07-17
+
+- C-SOLVER : `implemented`, `automated-validated` pour la sélection publique
+  Auto / Étages et piles / Placement 3D libre, bornée par les profils H07 et
+  classée seulement parmi les plans complets certifiés.
+- C-USABILITY : méthode, effort et classement mesuré sont visibles dans Fusion ;
+  préférences locales additives, diagnostic repliable et mises à jour silencieuses
+  sans reconstruction du DOM éditable.
+- C-QUALITY : résultat, matérialisabilité et proposition résiduelle restent
+  cohérents ; aucun budget épuisé ne devient une impossibilité prouvée.
+- Validation : P64-V2 est prête mais non exécutée dans Fusion ; dernière preuve
+  solveur Fusion inchangée P64-H01 0.1.42 ; `print-validated: false`.

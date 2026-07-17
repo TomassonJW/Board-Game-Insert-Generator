@@ -767,7 +767,7 @@ ADR-0069 reporte la finition continue et modulaire après la faisabilité.
 
 Chemin critique avant reprise de P44-V : P64-H04/H05/H06 intégrés (vérité,
 observabilité, contrat/baseline et greedy 3D EP/EMS), P64-H07 beam/portfolio intégré dans 0.1.50,
-P64-H08 UI désormais prêt, puis P64-V2. P45/P46
+P64-H08 intégré dans 0.1.51, puis P64-V2 prête pour validation humaine. P45/P46
 reprennent seulement après P64-V2 et une P44-V positive.
 
 P64-F01/F02 sont planifiées après P46 afin de ne pas gonfler le chemin critique
@@ -778,5 +778,12 @@ et GO distinct. Le contrat exécutable est
 ### Avancement P64-H07 — package 0.1.50
 
 Le beam 3D, les efforts monotones, la reconstruction certifiée et le
-portefeuille Auto interne sont intégrés. P64-H08 est la prochaine mission du
-chemin critique ; aucune UI solveur ou gate Fusion n'est ouverte avant elle.
+portefeuille Auto interne sont intégrés. P64-H08 rend ces contrôles visibles
+dans Fusion 0.1.51 ; P64-V2 est la prochaine gate humaine du chemin critique.
+
+### Avancement P64-H08 — package 0.1.51
+
+Méthode, effort et critères mesurés sont exposés comme préférences locales dans
+la palette Fusion. Le diagnostic secondaire rend méthode/effort/famille/temps
+observables, sans changer les dimensions ni matérialiser automatiquement. La
+prochaine étape est P64-V2 ; P44-V, P45 et P46 restent verrouillés.

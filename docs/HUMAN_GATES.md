@@ -660,22 +660,26 @@ imprimée et ne vaut pas impression réelle. `print-validated: false`.
 
 ## P64-V2 — Gate portefeuille multi-solveurs
 
-Statut : `blocked-by-P64-H08`, non ouverte. Déclencheur : P64-H04 à P64-H08 intégrées,
-validations automatisées vertes, package Fusion dédié préparé par les scripts du
-dépôt.
+Statut : `ready-for-human-fusion-check`. Déclencheur satisfait : P64-H04 à
+P64-H08 sont intégrées, les validations automatisées sont vertes et le package
+0.1.51 est préparé par
+`scripts/fusion/prepare_p64_v2_solver_portfolio_test.ps1`.
 
-La gate devra vérifier au minimum :
+Vérifier dans Fusion :
 
-1. un projet simple conserve un calcul rapide et une proposition régulière ;
-2. les cas denses anonymisés P64-H01/H02/H03 obtiennent une solution certifiée ou
-   affichent honnêtement `Aucune solution trouvée dans le budget` ;
-3. `Auto intelligent`, `Étages et piles` et `Placement 3D libre` produisent des
-   comportements distincts et traçables ;
-4. Rapide/Normal/Approfondi ont des coûts visibles et l'autosave reste borné ;
-5. focus, sélection, scroll et saisie rapide restent stables pendant les runs ;
+1. les choix `Auto intelligent`, `Étages et piles`, `Placement 3D libre` et
+   `Rapide` / `Normal` / `Approfondi` sont visibles et conservés localement ;
+2. sur un projet non trivial, le diagnostic repliable affiche méthode, effort,
+   temps, famille retenue et arrêt cohérents ;
+3. aucun résultat non certifié, épuisé ou impossible ne devient matérialisable ;
+4. la baseline Étages et piles reste utilisable, le 3D libre exclut la baseline,
+   et Auto sélectionne seulement un candidat certifié ;
+5. focus, sélection, scroll et saisie rapide restent stables pendant autosave,
+   minima et aperçu adaptatif ;
 6. aucune scène ne change avant `Matérialiser dans Fusion` ;
 7. aucun échec heuristique n'est présenté comme `Impossible prouvé`.
 
-Le retour exact et le package seront fixés par P64-H08. Cette gate ne valide ni
-valeur physique, ni géométrie imprimée, ni impression réelle.
+Retour attendu : `P64-V2 Fusion OK 0.1.51 - commit <sha>` ou KO contextuel avec
+le projet, la méthode, l'effort et le diagnostic observé. Cette gate ne valide
+ni valeur physique, ni géométrie imprimée, ni impression réelle.
 `print-validated: false`.

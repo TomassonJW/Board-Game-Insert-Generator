@@ -29,7 +29,7 @@ from board_game_insert_generator.free_3d_plan_adapter import (
     certify_free_3d_plan,
     prepare_free_3d_problem,
 )
-from board_game_insert_generator.partition_solver import solve_partition_plan
+from board_game_insert_generator.partition_solver import solve_stage_stack_plan
 from board_game_insert_generator.solver_contract import (
     STAGE_STACK_FAMILY_ID,
     SolverBudget,
@@ -117,6 +117,8 @@ class PortfolioExecution:
     deduplicated_candidate_count: int
     fast_path_used: bool
     deterministic_digest: str
+    fallback_plan: dict[str, object] | None
+    selected_family_ids: tuple[str, ...]
 
 
 def portfolio_effort_profiles() -> tuple[PortfolioEffortProfile, ...]:
@@ -151,10 +153,16 @@ def solve_partition_portfolio(
     request_id: str | None = None,
     request_revision: int | None = None,
     cancel_check: Callable[[], bool] | None = None,
+    selected_family_ids: tuple[str, ...] | None = None,
 ) -> PortfolioExecution:
-    """Run Auto internally and select only common-certified complete plans."""
+    """Run bounded families and select only allowed common-certified plans."""
 
     profile = _effort_profile(effort_profile)
+    selected_families = (
+        tuple(selected_family_ids) if selected_family_ids is not None else _ALLOWED_FAMILIES
+    )
+    if not selected_families or not set(selected_families).issubset(_ALLOWED_FAMILIES):
+        raise ValueError("Selected portfolio families must be a non-empty supported subset.")
     strategy = SolverStrategy(PORTFOLIO_AUTO_FAMILY_ID, PORTFOLIO_AUTO_VERSION)
     if cancel_check is not None and cancel_check():
         return _portfolio_execution(
@@ -169,9 +177,10 @@ def solve_partition_portfolio(
             ),
             0,
             False,
+            selected_family_ids=selected_families,
         )
 
-    stage_plan = solve_partition_plan(
+    stage_plan = solve_stage_stack_plan(
         raw_project,
         request_id=request_id,
         request_revision=request_revision,
@@ -240,8 +249,13 @@ def solve_partition_portfolio(
             tuple(reports),
             0,
             False,
+            selected_family_ids=selected_families,
         )
-    if candidates and _is_simple_stage_fast_path(stage_plan):
+    if (
+        candidates
+        and STAGE_STACK_FAMILY_ID in selected_families
+        and _is_simple_stage_fast_path(stage_plan)
+    ):
         reports.extend(
             PortfolioFamilyReport(
                 family_id,
@@ -263,6 +277,8 @@ def solve_partition_portfolio(
             tuple(reports),
             0,
             True,
+            fallback_plan=stage_plan,
+            selected_family_ids=selected_families,
         )
 
     preparation = prepare_free_3d_problem(raw_project)
@@ -289,6 +305,7 @@ def solve_partition_portfolio(
             tuple(reports),
             0,
             False,
+            selected_family_ids=selected_families,
         )
     problem = preparation.problem
 
@@ -358,8 +375,12 @@ def solve_partition_portfolio(
             tuple(reports),
             0,
             False,
+            selected_family_ids=selected_families,
         )
-    deduplicated, duplicate_count = _deduplicate_candidates(candidates)
+    deduplicated_all, duplicate_count = _deduplicate_candidates(candidates)
+    deduplicated = tuple(
+        value for value in deduplicated_all if value.family_id in selected_families
+    )
     if deduplicated:
         status, stop_reason = SOLUTION_FOUND, "best_common_certified_candidate_selected"
     elif all(report.status == PROVEN_IMPOSSIBLE for report in reports):
@@ -377,6 +398,8 @@ def solve_partition_portfolio(
         tuple(reports),
         duplicate_count,
         False,
+        fallback_plan=stage_plan,
+        selected_family_ids=selected_families,
     )
 
 
@@ -479,6 +502,8 @@ def _portfolio_execution(
     reports: tuple[PortfolioFamilyReport, ...],
     duplicate_count: int,
     fast_path_used: bool,
+    fallback_plan: dict[str, object] | None = None,
+    selected_family_ids: tuple[str, ...] = _ALLOWED_FAMILIES,
 ) -> PortfolioExecution:
     selected = candidates[0] if candidates else None
     digest = _stable_digest(
@@ -491,6 +516,7 @@ def _portfolio_execution(
             "family_reports": [value.__dict__ for value in reports],
             "deduplicated_candidate_count": duplicate_count,
             "fast_path_used": fast_path_used,
+            "selected_family_ids": selected_family_ids,
         }
     )
     return PortfolioExecution(
@@ -505,6 +531,8 @@ def _portfolio_execution(
         deduplicated_candidate_count=duplicate_count,
         fast_path_used=fast_path_used,
         deterministic_digest=digest,
+        fallback_plan=deepcopy(fallback_plan) if fallback_plan is not None else None,
+        selected_family_ids=selected_family_ids,
     )
 
 

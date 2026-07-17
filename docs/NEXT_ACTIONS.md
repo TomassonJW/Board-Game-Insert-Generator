@@ -31,18 +31,21 @@ KO contextuel tant que le solveur n'a pas passé P64-V2.
 
 ## Prochaine action recommandée
 
-### P64-H08 — Réglages Fusion, critères honnêtes et diagnostic secondaire
+### P64-V2 — Gate humaine portefeuille multi-solveurs
 
-Statut : `ready`. P64-H07 est intégré dans le package 0.1.50 : le beam
-`free_3d_beam` conserve plusieurs états, cherche directement les enveloppes
-finales et ne produit un plan matérialisable qu'après reconstruction et
-certificat commun. `portfolio_auto` conserve le fast path simple, compare les
-trois familles sous Rapide/Normal/Approfondi et déduplique les placements.
+Statut : `ready-for-human-fusion-check`. P64-H08 est intégré dans le package
+0.1.51 et automatisé : le sélecteur local expose Auto intelligent, Étages et
+piles, Placement 3D libre et Rapide/Normal/Approfondi ; seuls les plans complets
+certifiés restent matérialisables. Les retours silencieux préservent le DOM
+éditable et l'aperçu adaptatif reste borné.
 
-Objectif : exposer méthode, effort et classement honnête dans les Réglages
-Fusion, avec diagnostic secondaire et budgets visibles, sans reconstruction du
-DOM éditable, sans perte de focus, sans autosave approfondi illimité et sans
-matérialisation automatique. La sortie prépare P64-V2 et ne l'auto-valide pas.
+Préparation déjà disponible :
+`scripts/fusion/prepare_p64_v2_solver_portfolio_test.ps1`.
+
+Objectif humain : vérifier dans Fusion les méthodes et efforts, la vérité du
+résultat/d'un budget épuisé, le diagnostic secondaire, la stabilité
+focus/sélection pendant une saisie rapide, et l'absence de scène automatique.
+Cette gate ne valide ni valeur physique ni impression.
 
 ## Lots suivants, non ouverts
 
@@ -53,7 +56,7 @@ matérialisation automatique. La sortie prépare P64-V2 et ne l'auto-valide pas.
 
 ## Séquence verrouillée
 
-P64-H08 est la seule mission `ready`. P64-V2 s'ouvre ensuite. Aucune
+P64-V2 est la seule action `ready-for-human-fusion-check`. P64-H08 est intégré et ne doit pas être redémarré. Aucune
 preuve P64-H02/H03 ne doit être revendiquée comme preuve Fusion.
 P44-V, P45 et P46 attendent P64-V2 puis la reprise positive de P44-V.
 P47-P50 restent bloqués jusqu'à P46 et P69

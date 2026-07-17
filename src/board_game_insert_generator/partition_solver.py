@@ -19,7 +19,19 @@ from board_game_insert_generator.solver_contract import (
     run_stage_stack_adapter,
     validate_placement_geometry,
 )
-from board_game_insert_generator.solver_outcome import attach_solver_outcome
+from board_game_insert_generator.solver_outcome import (
+    SOLUTION_FOUND,
+    SOLVER_RESULT_SCHEMA_V1,
+    SOLVER_TELEMETRY_SCHEMA_V1,
+    attach_solver_outcome,
+    result_label,
+)
+from board_game_insert_generator.solver_settings import (
+    EFFORT_NORMAL,
+    SOLVER_METHOD_AUTO,
+    SOLVER_METHOD_STAGE_STACK,
+    normalize_solver_settings,
+)
 from board_game_insert_generator.top_inset_reservation import (
     apply_top_inset_reservations,
     compatibility_flat_stack_payload,
@@ -44,8 +56,66 @@ def solve_partition_plan(
     *,
     request_id: str | None = None,
     request_revision: int | None = None,
+    solver_method: str | None = None,
+    effort_profile: str = EFFORT_NORMAL,
 ) -> dict[str, object]:
-    """Expose the P64 baseline only through the common strategy adapter."""
+    """Run the H08 public method selector without moving solving into Fusion."""
+
+    settings = normalize_solver_settings(
+        {"method": solver_method or SOLVER_METHOD_STAGE_STACK, "effort": effort_profile}
+    )
+    if settings["method"] == SOLVER_METHOD_STAGE_STACK:
+        started_at = perf_counter()
+        baseline = solve_stage_stack_plan(
+            raw_project,
+            request_id=request_id,
+            request_revision=request_revision,
+        )
+        if solver_method is None:
+            return baseline
+        return _stage_stack_product_plan(
+            baseline,
+            effort_profile=settings["effort"],
+            elapsed_ms=(perf_counter() - started_at) * 1000.0,
+        )
+
+    from board_game_insert_generator.solver_portfolio import (
+        FREE_3D_BEAM_FAMILY_ID,
+        FREE_3D_GREEDY_FAMILY_ID,
+        _ALLOWED_FAMILIES,
+        solve_partition_portfolio,
+    )
+
+    started_at = perf_counter()
+    selected_families = (
+        _ALLOWED_FAMILIES
+        if settings["method"] == SOLVER_METHOD_AUTO
+        else (FREE_3D_GREEDY_FAMILY_ID, FREE_3D_BEAM_FAMILY_ID)
+    )
+    execution = solve_partition_portfolio(
+        raw_project,
+        effort_profile=settings["effort"],
+        request_id=request_id,
+        request_revision=request_revision,
+        selected_family_ids=selected_families,
+    )
+    return _portfolio_public_plan(
+        raw_project,
+        execution,
+        solver_method=settings["method"],
+        request_id=request_id,
+        request_revision=request_revision,
+        elapsed_ms=(perf_counter() - started_at) * 1000.0,
+    )
+
+
+def solve_stage_stack_plan(
+    raw_project: object,
+    *,
+    request_id: str | None = None,
+    request_revision: int | None = None,
+) -> dict[str, object]:
+    """Expose the preserved H05 baseline for explicit product selection."""
 
     return run_stage_stack_adapter(
         _solve_stage_stack_baseline,
@@ -53,6 +123,211 @@ def solve_partition_plan(
         request_id=request_id,
         request_revision=request_revision,
     )
+
+
+def _stage_stack_product_plan(
+    plan: dict[str, object],
+    *,
+    effort_profile: str,
+    elapsed_ms: float,
+) -> dict[str, object]:
+    """Add H08 presentation metadata without changing the baseline result."""
+
+    projected = deepcopy(plan)
+    solver = _mapping(projected.get("solver"))
+    telemetry = _mapping(solver.get("telemetry"))
+    family_id = str(solver.get("family_id") or "stage_stack")
+    portfolio = {
+        "method": SOLVER_METHOD_STAGE_STACK,
+        "effort_profile": effort_profile,
+        "effort_label": {"quick": "Rapide", "normal": "Normal", "deep": "Approfondi"}[effort_profile],
+        "selected_family_id": family_id,
+        "family_reports": [],
+        "fast_path_used": True,
+        "deduplicated_candidate_count": 0,
+        "deterministic_digest": _digest({"method": SOLVER_METHOD_STAGE_STACK, "plan": plan.get("plan_digest", "")}),
+    }
+    telemetry["portfolio"] = portfolio
+    telemetry["elapsed_ms"] = round(max(0.0, elapsed_ms), 3)
+    solver["portfolio"] = deepcopy(portfolio)
+    solver["telemetry"] = telemetry
+    projected.pop("plan_digest", None)
+    projected["plan_digest"] = _digest(projected)
+    return projected
+
+def _portfolio_public_plan(
+    raw_project: object,
+    execution: Any,
+    *,
+    solver_method: str,
+    request_id: str | None,
+    request_revision: int | None,
+    elapsed_ms: float,
+) -> dict[str, object]:
+    """Project one bounded portfolio execution onto the existing plan contract."""
+
+    selected_plan = execution.selected_plan
+    plan = deepcopy(selected_plan or execution.fallback_plan)
+    if plan is None:
+        plan = solve_stage_stack_plan(
+            raw_project,
+            request_id=request_id,
+            request_revision=request_revision,
+        )
+    solution_found = selected_plan is not None and execution.status == SOLUTION_FOUND
+    summary = _mapping(plan["summary"])
+    solver = _mapping(plan["solver"])
+
+    preserve_residual_proposal = (
+        not solution_found and summary.get("status") == SOLUTION_WITH_RESIDUALS
+    )
+    if not solution_found and not preserve_residual_proposal:
+        plan["placements"] = []
+        plan["stages"] = []
+        plan["removal_sequence"] = []
+        plan["support"] = {
+            "status": "unresolved",
+            "top_support_count": 0,
+            "coverage_ratio": 0.0,
+        }
+        plan["stage_support"] = {"status": "unresolved", "supports": []}
+        plan["residuals"] = {
+            "status": "unresolved",
+            "zones": [],
+            "residual_volume_mm3": 0.0,
+        }
+        plan["suggestions"] = []
+        plan["validation"] = {
+            "inside_box": False,
+            "box_xy_clearance_respected": False,
+            "no_collisions": False,
+            "clearances_respected": False,
+        }
+        if execution.status != "proven_impossible" and not plan.get("diagnostics"):
+            plan["diagnostics"] = [
+                _diagnostic(
+                    "PORTFOLIO_NO_SOLUTION_WITHIN_BUDGET",
+                    "Aucune solution certifiee n a ete trouvee par la methode selectionnee dans son budget.",
+                    "Essaie un effort plus profond, la methode Auto intelligent, ou ajuste le projet.",
+                )
+            ]
+        summary.update(
+            {
+                "status": "impossible",
+                "solution_status": "impossible",
+                "materializable": False,
+                "placed_container_count": 0,
+                "final_body_count": 0,
+                "stage_count": 0,
+                "complete_printable_partition": False,
+                "technical_voids_are_clearances_only": False,
+            }
+        )
+    elif preserve_residual_proposal:
+        summary["materializable"] = False
+        summary["complete_printable_partition"] = False
+
+    reports = [
+        {
+            "family_id": report.family_id,
+            "status": report.status,
+            "stop_reason": report.stop_reason,
+            "proposed_candidate_count": report.proposed_candidate_count,
+            "certified_candidate_count": report.certified_candidate_count,
+            "rejection_codes": list(report.rejection_codes),
+            "skipped_by_fast_path": report.skipped_by_fast_path,
+        }
+        for report in execution.family_reports
+    ]
+    budgets = {
+        "profile": execution.effort_profile.profile_id,
+        "greedy": dict(execution.effort_profile.greedy_budget.limits),
+        "beam": dict(execution.effort_profile.beam_budget.limits),
+    }
+    proof = _mapping(solver.get("result", {})).get("proof") if execution.status == "proven_impossible" else None
+    solver.update(
+        {
+            "kind": "bounded_solver_portfolio",
+            "family_id": execution.strategy.family_id,
+            "schema_version": execution.strategy.version,
+            "selected_family_id": execution.selected_family_id,
+            "budgets": budgets,
+            "portfolio": {
+                "method": solver_method,
+                "effort_profile": execution.effort_profile.profile_id,
+                "effort_label": execution.effort_profile.product_label,
+                "selected_family_id": execution.selected_family_id,
+                "family_reports": reports,
+                "fast_path_used": execution.fast_path_used,
+                "deduplicated_candidate_count": execution.deduplicated_candidate_count,
+                "deterministic_digest": execution.deterministic_digest,
+            },
+            "deterministic": True,
+            "globally_optimal": False,
+        }
+    )
+    elapsed = (
+        round(max(0.0, float(elapsed_ms)), 3)
+        if request_id is not None or request_revision is not None
+        else "not_applicable"
+    )
+    telemetry = {
+        "schema_version": SOLVER_TELEMETRY_SCHEMA_V1,
+        "family": {
+            "id": execution.strategy.family_id,
+            "version": execution.strategy.version,
+        },
+        "request": {
+            "id": request_id or "not_applicable",
+            "revision": request_revision if request_revision is not None else "not_applicable",
+        },
+        "elapsed_ms": elapsed,
+        "budgets": budgets,
+        "counters": {
+            "candidate_proposals": sum(item["proposed_candidate_count"] for item in reports),
+            "search_states": "portfolio",
+            "placements_attempted": "see_family_reports",
+            "certified_complete_solutions": len(execution.certified_candidates),
+            "z_start_levels": (
+                len(
+                    {
+                        float(_mapping(item["origin_mm"])["z"])
+                        for item in _mappings(plan.get("placements", []))
+                    }
+                )
+                if solution_found
+                else "not_applicable"
+            ),
+        },
+        "prunes": {
+            "candidate_budget_truncations": sum(
+                1
+                for item in reports
+                if item["stop_reason"]
+                in {"portfolio_budget_exhausted", "budget_exhausted", "time_budget_reached"}
+            ),
+            "visible_validation_rejections": sum(len(item["rejection_codes"]) for item in reports),
+            "deduplicated_candidates": execution.deduplicated_candidate_count,
+        },
+        "diagnostic_code_counts": {},
+        "stop_reason": execution.stop_reason,
+        "portfolio": deepcopy(solver["portfolio"]),
+    }
+    result = {
+        "schema_version": SOLVER_RESULT_SCHEMA_V1,
+        "status": execution.status,
+        "label": result_label(execution.status),
+        "legacy_summary_status": summary.get("status"),
+        "proof": deepcopy(proof) if isinstance(proof, dict) else None,
+        "materializable": solution_found and bool(summary.get("materializable")),
+    }
+    summary["result_status"] = result["status"]
+    summary["result_label"] = result["label"]
+    solver["result"] = result
+    solver["telemetry"] = telemetry
+    plan.pop("plan_digest", None)
+    plan["plan_digest"] = _digest(plan)
+    return plan
 
 
 def _solve_stage_stack_baseline(

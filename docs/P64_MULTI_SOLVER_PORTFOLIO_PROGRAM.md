@@ -1,7 +1,7 @@
 # P64 — Programme portefeuille multi-solveurs et finition volumique
 
-Statut : architecture acceptée le 2026-07-17 ; P64-H07 est intégrée.
-Prochaine mission exécutable : `P64-H08`.
+Statut : architecture acceptée le 2026-07-17 ; P64-H08 est intégrée dans 0.1.51.
+Prochaine action : gate humaine `P64-V2`.
 
 Capability principale : `C-SOLVER`. Capabilities associées : `C-LAYOUT`,
 `C-GRID-3D`, `C-STACKING`, `C-USABILITY`, `C-QUALITY`.
@@ -309,7 +309,7 @@ hors chemin critique.
 
 ### P64-H08 — Réglages Fusion, critères honnêtes et diagnostic secondaire
 
-- Statut : `ready`.
+- Statut : `terminé et intégré`, package 0.1.51, `automated-validated`.
 - Agent conseillé : Terra ; revue UX humaine à la gate.
 - Objectif : exposer méthode, effort et classement sans surcharger le parcours.
 - Livrables : `Auto intelligent` par défaut, choix avancés, temps réel du dernier

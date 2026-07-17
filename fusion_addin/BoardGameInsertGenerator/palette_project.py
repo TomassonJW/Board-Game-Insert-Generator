@@ -30,7 +30,7 @@ SUPPORTED_ACTIONS = frozenset({
     "open_project_file", "open_recent_project", "import_project", "export_project",
     "solve_project", "materialize_project", "regenerate_project",
     "save_personal_preset", "delete_personal_preset",
-    "import_personal_presets", "export_personal_presets",
+    "import_personal_presets", "export_personal_presets", "save_solver_settings",
 })
 
 
@@ -112,7 +112,12 @@ def load_document_state(addin_dir: str | Path) -> dict[str, object]:
     """Load local document metadata without making a document mandatory."""
 
     path = document_state_path(addin_dir)
-    default = {"schema_version": DOCUMENT_STATE_SCHEMA, "current_path": "", "recent_paths": []}
+    default = {
+        "schema_version": DOCUMENT_STATE_SCHEMA,
+        "current_path": "",
+        "recent_paths": [],
+        "solver_settings": _normalize_solver_settings(None),
+    }
     if not path.is_file():
         return default
     try:
@@ -127,6 +132,7 @@ def load_document_state(addin_dir: str | Path) -> dict[str, object]:
         "schema_version": DOCUMENT_STATE_SCHEMA,
         "current_path": current if isinstance(current, str) else "",
         "recent_paths": [item for item in recent if isinstance(item, str)] if isinstance(recent, list) else [],
+        "solver_settings": _normalize_solver_settings(raw.get("solver_settings")),
     }
 
 
@@ -135,8 +141,17 @@ def _write_document_state(addin_dir: Path, state: dict[str, object]) -> None:
         "schema_version": DOCUMENT_STATE_SCHEMA,
         "current_path": str(state.get("current_path") or ""),
         "recent_paths": [str(item) for item in state.get("recent_paths", []) if isinstance(item, str)][:12],
+        "solver_settings": _normalize_solver_settings(state.get("solver_settings")),
     }
     _write_json_atomic(document_state_path(addin_dir), payload)
+
+
+def _normalize_solver_settings(value: object) -> dict[str, str]:
+    """Keep palette-local solver choices within the core public vocabulary."""
+
+    from board_game_insert_generator.solver_settings import normalize_solver_settings
+
+    return normalize_solver_settings(value)
 
 
 def _record_current_document(state: dict[str, object], document_path: Path) -> dict[str, object]:
@@ -209,6 +224,18 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
     from board_game_insert_generator.project_v1 import blank_project_v1, normalize_project_draft
 
     document_state = load_document_state(addin_dir)
+    solver_settings = _normalize_solver_settings(
+        request.get("solver_settings", document_state.get("solver_settings"))
+    )
+    if action == "save_solver_settings":
+        document_state["solver_settings"] = solver_settings
+        _write_document_state(addin_dir, document_state)
+        return _response(
+            request_id,
+            "ready",
+            solver_settings=solver_settings,
+            document=_document_info(addin_dir, document_state),
+        )
     if action == "load_project":
         project = load_current_project(addin_dir)
         return _response(
@@ -220,6 +247,7 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
             saved=current_project_path(addin_dir).is_file(),
             recovery_saved=current_project_path(addin_dir).is_file(),
             document=_document_info(addin_dir, document_state),
+            solver_settings=solver_settings,
         )
     if action == "new_project":
         project = blank_project_v1()
@@ -227,6 +255,7 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
             "schema_version": DOCUMENT_STATE_SCHEMA,
             "current_path": "",
             "recent_paths": document_state.get("recent_paths", []),
+            "solver_settings": solver_settings,
         }
         _write_document_state(addin_dir, fresh_state)
         return _response(
@@ -236,6 +265,7 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
             creation_presets=build_creation_presets(project),
             personal_presets=load_personal_presets(current_personal_presets_path(addin_dir)),
             document=_document_info(addin_dir, fresh_state),
+            solver_settings=solver_settings,
         )
 
     project_value = request.get("project")
@@ -297,6 +327,8 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
             project,
             request_id=request_id,
             request_revision=_request_revision(request),
+            solver_method=solver_settings["method"],
+            effort_profile=solver_settings["effort"],
         )
         if action in {"solve_project", "materialize_project", "regenerate_project"}
         else None
@@ -309,7 +341,12 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         else None
     )
     cad_build = (
-        build_partition_cad(project, partition=partition)
+        build_partition_cad(
+            project,
+            partition=partition,
+            solver_method=solver_settings["method"],
+            effort_profile=solver_settings["effort"],
+        )
         if action in {"materialize_project", "regenerate_project"}
         else None
     )
@@ -382,6 +419,7 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         warnings=warnings,
         export_path=export_path,
         document=_document_info(addin_dir, document_state),
+        solver_settings=solver_settings,
     )
 
 
@@ -406,6 +444,7 @@ def _response(
     document: dict[str, object] | None = None,
     recovery_saved: bool = False,
     solver_result: dict[str, object] | None = None,
+    solver_settings: dict[str, str] | None = None,
 ) -> dict[str, object]:
     return {
         "schema": PALETTE_RESPONSE_SCHEMA,
@@ -433,6 +472,7 @@ def _response(
         "partition": deepcopy(partition),
         "result_view": deepcopy(result_view),
         "solver_result": deepcopy(solver_result),
+        "solver_settings": deepcopy(solver_settings),
         "cad_build": deepcopy(cad_build),
         "errors": list(errors or []),
         "warnings": list(warnings or []),

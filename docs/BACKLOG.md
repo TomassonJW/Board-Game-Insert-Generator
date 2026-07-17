@@ -2409,13 +2409,15 @@ P44-M007 est ready-for-explicit-go.
 
 ### P64-H08 — Réglages Fusion et diagnostic secondaire
 
-- Statut : ready. Agent : Terra, gate UX humaine ensuite.
-- Livrable : méthode, effort, classement honnête, métriques du dernier run,
-  persistance additive et focus stable.
+- Statut : terminé et intégré, package 0.1.51, `automated-validated`.
+- Contrat : `docs/P64_H08_FUSION_SETTINGS_DIAGNOSTICS_CONTRACT.md`.
+- Livrable : méthode, effort, classement mesuré, métriques du dernier run,
+  persistance locale additive et focus stable.
 
 ### P64-V2 — Gate humaine portefeuille multi-solveurs
 
-- Statut : blocked-by-P64-H08.
+- Statut : ready-for-human-fusion-check, package 0.1.51 préparé.
+- Préparation : `scripts/fusion/prepare_p64_v2_solver_portfolio_test.ps1`.
 - Sortie : si positive, reprendre P44-V ; P45 reste bloqué jusqu'à P44-V.
 - Limites : aucune validation physique ou d'impression.
 

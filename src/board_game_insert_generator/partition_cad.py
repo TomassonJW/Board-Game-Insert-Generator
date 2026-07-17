@@ -49,12 +49,22 @@ class _BuildResult:
     blockers: tuple[str, ...]
 
 
-def build_partition_cad(raw_project: object, *, partition: object | None = None) -> dict[str, object]:
-    """Build CAD IR exclusively from a complete, materializable P64 plan."""
+def build_partition_cad(
+    raw_project: object,
+    *,
+    partition: object | None = None,
+    solver_method: str | None = None,
+    effort_profile: str = "normal",
+) -> dict[str, object]:
+    """Build CAD IR from a complete P64 plan under the same solver settings."""
 
     normalization = normalize_project_draft(raw_project)
     project = normalization.project
-    expected_plan = solve_partition_plan(project)
+    expected_plan = solve_partition_plan(
+        project,
+        solver_method=solver_method,
+        effort_profile=effort_profile,
+    )
     plan = expected_plan if partition is None else _mapping(partition, "partition")
     if partition is not None and _plan_for_semantic_comparison(plan) != _plan_for_semantic_comparison(expected_plan):
         raise PartitionCadBuildError("Le plan P64 fourni est obsolete ou ne correspond pas au projet courant.")

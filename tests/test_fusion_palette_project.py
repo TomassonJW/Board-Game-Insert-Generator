@@ -365,5 +365,41 @@ class FusionPaletteProjectTests(unittest.TestCase):
         self.assertEqual(unknown["status"], "invalid")
 
 
+    def test_p64_h08_persists_solver_choices_locally_without_project_autosave(self) -> None:
+        project = blank_project_v1()
+        project["container_groups"] = [
+            {"id": "g", "name": "Bac", "wall_thickness_mm": None, "floor_thickness_mm": None}
+        ]
+        project["contents"] = [{
+            "id": "asset", "name": "Pions", "shape_kind": "custom",
+            "dimensions_mm": {"x": 20, "y": 20, "z": 10}, "quantity": 1,
+            "container_group_id": "g", "content_clearance_mm": None,
+            "measurement_confidence": "exact",
+        }]
+        with tempfile.TemporaryDirectory() as temp_dir, patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}):
+            saved_settings = handle_palette_request(
+                request("save_solver_settings", solver_settings={"method": "stage_stack", "effort": "deep"}),
+                ADDIN,
+                ROOT,
+            )
+            raw_state = json.loads((Path(temp_dir) / "bgig_document_state_v1.json").read_text(encoding="utf-8"))
+            solved = handle_palette_request(
+                request(
+                    "solve_project",
+                    project=project,
+                    solver_settings={"method": "stage_stack", "effort": "deep"},
+                ),
+                ADDIN,
+                ROOT,
+            )
+            reloaded = handle_palette_request(request("load_project"), ADDIN, ROOT)
+
+            self.assertFalse((Path(temp_dir) / CURRENT_PROJECT_FILENAME).exists())
+        self.assertEqual(saved_settings["solver_settings"], {"method": "stage_stack", "effort": "deep"})
+        self.assertEqual(raw_state["solver_settings"], {"method": "stage_stack", "effort": "deep"})
+        self.assertEqual(solved["solver_settings"], {"method": "stage_stack", "effort": "deep"})
+        self.assertEqual(solved["partition"]["solver"]["portfolio"]["method"], "stage_stack")
+        self.assertEqual(reloaded["solver_settings"], {"method": "stage_stack", "effort": "deep"})
+
 if __name__ == "__main__":
     unittest.main()
