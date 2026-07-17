@@ -8,6 +8,7 @@ reported and may produce suggestions, but never printable bodies.
 
 from __future__ import annotations
 
+import hashlib
 from copy import deepcopy
 from itertools import product
 from math import ceil, isclose
@@ -53,6 +54,7 @@ def solve_stage_portfolio(
     box_clearance_mm: float | None = None,
     vertical_clearance_mm: float | None = None,
     preference: str = "balanced",
+    diversified_order_seed: int | None = None,
 ) -> dict[str, object]:
     """Return a bounded portfolio of complete or residual stage candidates."""
 
@@ -81,6 +83,7 @@ def solve_stage_portfolio(
     if not values:
         return _empty_result(budgets, "No requested body can participate in the stage search.", between_clearance, box_clearance, vertical_clearance)
 
+    orderings = _orders(values, diversified_order_seed=diversified_order_seed)
     candidates: list[dict[str, object]] = []
     signatures: set[str] = set()
     groupings_evaluated = 0
@@ -88,7 +91,7 @@ def solve_stage_portfolio(
     stack_partitions_evaluated = 0
     xy_arrangements_evaluated = 0
     truncated = False
-    for order_name, ordered in _orders(values):
+    for order_name, ordered in orderings:
         for stage_count in range(2, min(len(ordered), MAX_ADAPTIVE_STAGE_COUNTS) + 1):
             if not _minimum_stage_height_fits(
                 ordered,
@@ -220,7 +223,8 @@ def solve_stage_portfolio(
             "deterministic": True,
             "globally_optimal": False,
             "truncated": truncated or len(ordered_candidates) > len(returned),
-            "ordering_count": len(_orders(values)),
+            "ordering_count": len(orderings),
+            **({"diversified_order_seed": diversified_order_seed} if diversified_order_seed is not None else {}),
             "groupings_evaluated": groupings_evaluated,
             "adaptive_partitions_evaluated": adaptive_partitions_evaluated,
             "stack_partitions_evaluated": stack_partitions_evaluated,
@@ -1684,7 +1688,34 @@ def _participant(value: dict[str, object], index: int) -> dict[str, object]:
     return result
 
 
-def _orders(values: list[dict[str, object]]) -> list[tuple[str, list[dict[str, object]]]]:
+def _diversified_order_key(
+    item: dict[str, object],
+    seed: int,
+) -> tuple[bytes, str]:
+    semantic_id = str(
+        item.get("container_group_id")
+        or item.get("requested_complement_id")
+        or item["id"]
+    )
+    return (
+        hashlib.sha256(f"{seed}:{semantic_id}".encode("utf-8")).digest(),
+        str(item["id"]),
+    )
+
+
+def _orders(
+    values: list[dict[str, object]],
+    *,
+    diversified_order_seed: int | None = None,
+) -> list[tuple[str, list[dict[str, object]]]]:
+    if diversified_order_seed is not None:
+        seed = int(diversified_order_seed)
+        diversified = sorted(
+            values,
+            key=lambda item: _diversified_order_key(item, seed),
+        )
+        return [(f"diversified_{seed}", diversified)]
+
     orders = [
         ("input", list(values)),
         ("volume_desc", sorted(values, key=lambda item: (-_volume(_mapping(item["minimum_local_mm"])), str(item["id"])))),

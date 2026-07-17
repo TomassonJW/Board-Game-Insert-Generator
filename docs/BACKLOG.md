@@ -2336,3 +2336,21 @@ P44-M007 est ready-for-explicit-go.
 - Attribuer un suffixe numérique incrémental à tout nouveau conteneur dont le nom existe déjà.
 - Ne changer ni schéma, ni solveur, ni géométrie, ni scène automatique.
 - Statut : implemented, automated-validated, human-fusion-check-required par P44-VH02V ; package 0.1.43, fusion-validated: false, print-validated: false.
+- Retour contextuel : annulation, suppression atomique et noms sont observés comme
+  OK ; la croix passait seule sur une nouvelle ligne. P44-VH02V est supersédée
+  par P64-H02V, sans revendication fusion-validated sur le package 0.1.43.
+
+#### P64-H02 — Portefeuilles diversifiés après cul-de-sac
+
+- Capability : C-LAYOUT, C-SOLVER, C-USABILITY et C-QUALITY.
+- Déclencheur : 8 candidats canoniques rejetés sous deux réservations localisées,
+  alors qu’un autre ordre des mêmes 8 conteneurs construit deux niveaux.
+- Livrable : chemin canonique inchangé, jusqu’à 6 portefeuilles hash-diversifiés
+  uniquement après `NO_STAGE_COMPOSITION_FITS` ou `NO_VALIDATED_STAGE_PROPOSAL`,
+  compteurs agrégés et actions d’élément réunies sur une ligne.
+- Non-objectifs : schéma, dimensions, defaults, tolérances, cavités, réservations,
+  géométrie, dépendance externe ou scène automatique.
+- Validation : fixture anonymisée, état Fusion exact, déterminisme, suite complète
+  et gate P64-H02V dans le package 0.1.44.
+- Statut : implemented, automated-validated, human-fusion-check-required ;
+  fusion-validated: false, print-validated: false. P44-V et P45 restent bloqués.

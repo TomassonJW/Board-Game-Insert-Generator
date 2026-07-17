@@ -626,3 +626,33 @@ Verifier dans Fusion :
 Retour OK : `P44-VH02 Fusion OK 0.1.43 - commit <sha>`.
 
 Cette gate valide uniquement le comportement logiciel observe dans Fusion. Elle ne valide ni valeurs physiques, ni geometrie imprimee, ni impression reelle. `print-validated: false`.
+Retour contextuel reçu le 2026-07-17 : annulation, suppression atomique et noms
+sont observés comme OK, mais la croix apparaît sur une ligne séparée. Le package
+0.1.43 ne reçoit donc pas de preuve Fusion OK ; P44-VH02V est supersédée par
+P64-H02V. Le même retour révèle aussi un nouveau faux impossible du solveur.
+
+## P64-H02V — Reprise diversifiée et actions alignées 0.1.44
+
+Statut : human-fusion-check-required. P64-H02 et P44-VH02H01 sont implemented et
+automated-validated dans le package 0.1.44.
+
+Préparation : `scripts/fusion/prepare_p64_h02_diversified_portfolio_test.ps1`.
+
+Vérifier dans Fusion :
+
+1. recharger l’add-in sans modifier les dimensions du projet problématique laissé
+   ouvert ;
+2. vérifier que chaque croix d’élément est sur la même ligne que `...`, juste à
+   sa droite ;
+3. cliquer `Recalculer maintenant` : les 8 conteneurs doivent être placés sur
+   2 niveaux, sans `TOP_INSET_PIERCES_CAVITY_FLOOR` ni `Calcul impossible` ;
+4. modifier ou ajouter un petit élément et vérifier que le recalcul reste courant
+   et constructible ;
+5. confirmer qu’aucune scène BGIG ne change avant `Matérialiser dans Fusion`.
+
+Retour OK : `P64-H02 Fusion OK 0.1.44 - commit <sha>`.
+
+Cette gate valide uniquement ces comportements logiciels et complète le retour
+contextuel « le reste est OK ». Elle ne calibre aucune valeur physique, ne valide
+aucune géométrie imprimée et ne vaut pas impression réelle.
+`print-validated: false`.

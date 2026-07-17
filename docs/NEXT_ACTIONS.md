@@ -46,20 +46,24 @@ sur environ 30 conteneurs et 77 éléments malgré environ 40 % de volume minima
 et attente de la saturation XY avant d'utiliser Z. P64-H01 corrige ces limites
 dans le package 0.1.42 par partitions adaptatives bornées, arrangements XY
 conscients de leur hauteur et score d'équilibre X/Y/Z avec charge des étages.
+P64-H01 reste fusion-validated par la preuve `P64-H01 Fusion OK 0.1.42 - commit 5865645`.
 
 ## Prochaine action recommandée
 
-### P44-VH02 - Suppression directe et noms de conteneurs non ambigus
+### P64-H02V — Reprise diversifiée et actions d’élément alignées
 
-Statut : implemented, automated-validated, human-fusion-check-required par P44-VH02V dans le package 0.1.43. P64-H01 reste fusion-validated par `P64-H01 Fusion OK 0.1.42 - commit 5865645`. P44-VH02 est la seule
-mission de code autorisée : ajouter une suppression directe à côté du menu de
-chaque élément, confirmer explicitement la suppression d'un conteneur non vide
-avec tous ses éléments, et attribuer un suffixe numérique incrémental à chaque
-nouveau conteneur dont le nom existe déjà.
+Statut : P64-H02 et la correction P44-VH02H01 sont implemented et
+automated-validated dans le package 0.1.44 ; une vérification Fusion ciblée reste
+requise. Le projet exact laissé ouvert construit désormais 8 conteneurs sur
+2 niveaux après 3 portefeuilles au total. La croix partage la ligne du menu `...`,
+immédiatement à sa droite.
 
-Ne changer ni schéma, ni solveur, ni valeurs physiques, ni géométrie, ni scène
-automatique. P44-V reste ouverte en KO contextuel ; P45 ne commence pas.
-`print-validated: false`.
+Préparation : `scripts/fusion/prepare_p64_h02_diversified_portfolio_test.ps1`.
+Retour attendu : `P64-H02 Fusion OK 0.1.44 - commit <sha>`.
+
+Cette gate ne change ni schéma, ni dimensions, ni defaults, ni tolérances, ni
+cavités, ni géométrie, ni scène automatique. P44-V reste ouverte jusqu’à ce
+retour ; P45 ne commence pas. `print-validated: false`.
 
 ## Lots découverts, non ouverts
 
@@ -72,8 +76,9 @@ automatique. P44-V reste ouverte en KO contextuel ; P45 ne commence pas.
 P44-M005, P44-M006 et P44-M009H05 sont fusion-validated pour leurs parcours UX.
 P44-M007H03 est désormais fusion-validated dans Fusion 360 ; P0-M010 et P44-VP
 sont terminées. P44-VH01V est supersédée sans revendication fusion-validated par
-P64-H01, fusion-validated dans Fusion 0.1.42. P44-VH02 est la seule mission de code suivante. P44-V reste en KO contextuel et P45/P46
-ne commencent pas avant sa reprise positive après P44-VH02. P47-P50 restent
+P64-H01, fusion-validated dans Fusion 0.1.42. P44-VH02V a reçu un KO contextuel sur son alignement ; P64-H02V est la seule
+action suivante. P44-V reste en KO contextuel et P45/P46
+ne commencent pas avant sa reprise positive après P64-H02V. P47-P50 restent
 bloqués jusqu’à P46 et P69 jusqu’à P50.
 P68 peut recueillir des faits réels sans modifier les valeurs par défaut.
 

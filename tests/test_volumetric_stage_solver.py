@@ -211,6 +211,33 @@ class VolumetricStageSolverTests(unittest.TestCase):
         self.assertEqual(stage_counts, [1, 2, 3])
         self.assertEqual(compact["best_candidate"]["stage_count"], 1)
 
+    def test_diversified_order_seed_is_single_order_bounded_and_deterministic(self) -> None:
+        values = [participant(index) for index in range(6)]
+        first = solve_stage_portfolio(
+            values,
+            {"x": 160.0, "y": 120.0, "z": 80.0},
+            80.0,
+            0.6,
+            diversified_order_seed=2,
+        )
+        second = solve_stage_portfolio(
+            values,
+            {"x": 160.0, "y": 120.0, "z": 80.0},
+            80.0,
+            0.6,
+            diversified_order_seed=2,
+        )
+
+        self.assertEqual(first["search"]["ordering_count"], 1)
+        self.assertEqual(first["search"]["diversified_order_seed"], 2)
+        self.assertEqual(first["candidates"], second["candidates"])
+        self.assertTrue(
+            all(
+                item["search_origin"]["order"] == "diversified_2"
+                for item in first["candidates"]
+            )
+        )
+
     def test_adaptive_partition_solves_dense_variable_footprints(self) -> None:
         dimensions = [
             (198.9, 233.6, 90.7),

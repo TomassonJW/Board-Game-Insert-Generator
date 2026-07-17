@@ -94,6 +94,55 @@ def mixed_height_cards_project(card_count: int) -> dict[str, object]:
     return value
 
 
+def localized_top_inset_order_project() -> dict[str, object]:
+    project = blank_project_v1()
+    project["box"] = {
+        "inner_dimensions_mm": {"x": 250.0, "y": 180.0, "z": 70.0},
+        "usable_height_mm": 69.8,
+        "lid_clearance_mm": 0.2,
+    }
+    definitions = [
+        ("tokens", {"x": 25.0, "y": 47.4, "z": 30.0}),
+        ("c0", {"x": 69.0, "y": 91.0, "z": 35.0}),
+        ("c1", {"x": 89.0, "y": 62.72, "z": 64.0}),
+        ("c2", {"x": 63.0, "y": 88.0, "z": 24.0}),
+        ("c3", {"x": 63.0, "y": 88.0, "z": 24.0}),
+        ("c4", {"x": 63.0, "y": 88.0, "z": 24.0}),
+        ("c5", {"x": 88.9, "y": 19.2, "z": 63.5}),
+        ("c6", {"x": 38.4, "y": 32.6, "z": 48.0}),
+    ]
+    project["container_groups"] = [
+        {"id": group_id, "name": f"Bac {group_id}", "wall_thickness_mm": None, "floor_thickness_mm": None}
+        for group_id, _ in definitions
+    ]
+    project["contents"] = [
+        {
+            "id": f"content-{group_id}",
+            "name": f"Element {group_id}",
+            "shape_kind": "custom",
+            "dimensions_mm": dimensions,
+            "quantity": 1,
+            "container_group_id": group_id,
+            "content_clearance_mm": None,
+            "measurement_confidence": "exact",
+        }
+        for group_id, dimensions in definitions
+    ]
+    project["flat_items"] = [
+        {
+            "id": "board", "name": "Plateau", "kind": "board",
+            "dimensions_mm": {"x": 115.0, "y": 110.0, "z": 3.0},
+            "quantity": 3, "stack_order": 1, "origin_mm": {"x": 10.0, "y": 10.0},
+        },
+        {
+            "id": "booklet", "name": "Livret", "kind": "rulebook",
+            "dimensions_mm": {"x": 110.0, "y": 60.0, "z": 3.0},
+            "quantity": 1, "stack_order": 0, "origin_mm": {"x": 10.0, "y": 20.0},
+        },
+    ]
+    return project
+
+
 class PartitionSolverTests(unittest.TestCase):
     def test_single_requested_container_absorbs_the_printable_volume_without_changing_its_cavity(self) -> None:
         project = project_with_groups(1)
@@ -302,6 +351,18 @@ class PartitionSolverTests(unittest.TestCase):
         self.assertEqual(result["summary"]["placed_container_count"], 24)
         self.assertEqual(result["top_inset_reservations"]["status"], "applied")
         self.assertTrue(result["validation"]["no_collisions"])
+
+    def test_retries_diversified_orders_when_top_insets_reject_the_canonical_portfolio(self) -> None:
+        result = solve_partition_plan(localized_top_inset_order_project())
+
+        self.assertEqual(result["summary"]["status"], "constructed")
+        self.assertEqual(result["summary"]["placed_container_count"], 8)
+        self.assertGreater(result["solver"]["search"]["portfolios_evaluated"], 1)
+        self.assertGreater(result["solver"]["search"]["diversified_portfolios_evaluated"], 0)
+        self.assertNotIn(
+            "TOP_INSET_PIERCES_CAVITY_FLOOR",
+            {item["code"] for item in result["diagnostics"]},
+        )
 
     def test_is_deterministic_for_the_same_normalized_project(self) -> None:
         first = solve_partition_plan(project_with_groups(4))

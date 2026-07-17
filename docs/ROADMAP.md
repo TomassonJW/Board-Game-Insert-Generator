@@ -743,3 +743,14 @@ print-validated: false.
 ## P44-VH02 - Suppression directe et noms incrementiels (2026-07-17)
 
 Le package 0.1.43 ajoute la suppression visible des elements, la confirmation atomique des conteneurs non vides et le suffixage des noms dupliques. P44-VH02V est la seule gate humaine suivante ; P44-V reste ouverte et P45 reste bloque. print-validated: false.
+## P64-H02 — Reprise diversifiée après validation (2026-07-17)
+
+Le package 0.1.44 conserve les quatre ordres canoniques et toute la logique
+P64-H01. Seulement après un cul-de-sac, il peut essayer jusqu’à six ordres
+hash-diversifiés, un par portefeuille, puis réapplique sans relâchement les mêmes
+contrats d’enveloppe, cavité, support et réservation. Le cas exact de 8 conteneurs
+et deux réservations supérieures construit désormais deux niveaux. La correction
+P44-VH02H01 réunit également `...` et la croix dans la même cellule d’action.
+
+P64-H02V devient la seule action suivante. P44-V reste ouverte jusqu’à sa preuve ;
+P45 demeure bloqué. `fusion-validated: false`, `print-validated: false`.

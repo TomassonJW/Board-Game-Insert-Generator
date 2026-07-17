@@ -1251,3 +1251,16 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - C-QUALITY : aucun schema, bridge, solveur, geometrie ou scene automatique ne change.
 - C-FUSION-UI : package 0.1.43 automated-validated ; gate P44-VH02V requise.
 - Limites : fusion-validated: false, print-validated: false.
+## P64-H02 — Reprise diversifiée après cul-de-sac
+
+- C-LAYOUT / C-SOLVER : le portefeuille canonique reste prioritaire ; six ordres
+  diversifiés au maximum sont activés seulement après un échec de recherche ou
+  de validation finale compatible avec une reprise.
+- C-QUALITY : ordre SHA-256 stable par identifiant métier, un seul ordre par
+  portefeuille, budget et compteurs publics, fixture localisée et reproduction
+  exacte de l’autosauvegarde Fusion.
+- C-USABILITY : le cas sauvegardé passe de `Calcul impossible` à 8 conteneurs sur
+  2 niveaux ; le menu `...` et la croix restent sur la même ligne.
+- C-FUSION-UI : package 0.1.44 automated-validated ; gate P64-H02V requise.
+- Limites : aucune promotion physique ou géométrique ; recherche heuristique,
+  fusion-validated: false, print-validated: false.

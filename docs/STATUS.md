@@ -2292,3 +2292,23 @@ La palette expose une croix de suppression directement a cote du menu de chaque 
 Aucun schema, bridge, solveur, valeur physique, tolerance, geometrie, CAD IR ou scene automatique ne change.
 
 Package : 0.1.43. Statut : implemented, automated-validated, human-fusion-check-required par P44-VH02V, fusion-validated: false, print-validated: false. P44-V reste ouverte ; P45 reste bloque.
+## P64-H02 — Reprise diversifiée après cul-de-sac (2026-07-17)
+
+Le nouveau cas Fusion sauvegardé n’est pas un manque de volume : la boîte mesure
+250 × 180 × 70 mm et contient 8 conteneurs, 11 éléments et deux réservations
+supérieures. Le portefeuille canonique trouve 8 candidats complets en volume,
+mais tous placent une cavité trop haute sous le plateau ou le livret. Un ordre
+différent des mêmes corps construit une solution complète en deux niveaux.
+
+Le solveur conserve son chemin canonique. Seulement après
+`NO_STAGE_COMPOSITION_FITS` ou `NO_VALIDATED_STAGE_PROPOSAL`, il essaie au plus
+six ordres diversifiés, déterministes et stables. L’état exact laissé dans Fusion
+construit 8 conteneurs sur 2 niveaux après 3 portefeuilles au total. Les compteurs
+agrégés restent exposés. La croix de suppression et le menu `...` partagent aussi
+désormais la même cellule de la ligne principale.
+
+Package : 0.1.44. Statut : implemented, automated-validated,
+human-fusion-check-required par P64-H02V ; `fusion-validated: false`,
+`print-validated: false`. Aucun schéma, default, dimension physique, tolérance,
+cavité, réservation, géométrie, CAD IR ou comportement de scène ne change.
+P44-V reste ouverte et P45 reste bloqué.

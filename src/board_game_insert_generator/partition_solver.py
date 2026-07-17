@@ -27,11 +27,41 @@ from board_game_insert_generator.volumetric_stage_solver import (
 
 
 PARTITION_PLAN_SCHEMA_V1 = "bgig.partition_plan.v1"
+MAX_DIVERSIFIED_PORTFOLIOS = 6
 _EPSILON = 0.0001
+_DIVERSIFIED_RETRY_CODES = {"NO_STAGE_COMPOSITION_FITS", "NO_VALIDATED_STAGE_PROPOSAL"}
 
 
 def solve_partition_plan(raw_project: object) -> dict[str, object]:
-    """Return the bounded P64 volumetric-stage proposal for a project."""
+    """Return a bounded canonical proposal, then diversify only after a false dead end."""
+
+    attempts = [_solve_partition_plan_once(raw_project)]
+    initial = attempts[0]
+    diagnostic_codes = {str(item["code"]) for item in _mappings(initial["diagnostics"])}
+    if not diagnostic_codes.intersection(_DIVERSIFIED_RETRY_CODES):
+        return initial
+
+    partial: dict[str, object] | None = None
+    chosen: dict[str, object] | None = None
+    for seed in range(MAX_DIVERSIFIED_PORTFOLIOS):
+        proposal = _solve_partition_plan_once(raw_project, diversified_order_seed=seed)
+        attempts.append(proposal)
+        status = str(_mapping(proposal["summary"])["status"])
+        if status == "constructed":
+            chosen = proposal
+            break
+        if status == SOLUTION_WITH_RESIDUALS and partial is None:
+            partial = proposal
+
+    return _finalize_portfolio_search(chosen or partial or initial, attempts)
+
+
+def _solve_partition_plan_once(
+    raw_project: object,
+    *,
+    diversified_order_seed: int | None = None,
+) -> dict[str, object]:
+    """Evaluate one canonical or hash-diversified ordering portfolio."""
 
     normalization = normalize_project_draft(raw_project)
     project = normalization.project
@@ -120,6 +150,7 @@ def solve_partition_plan(raw_project: object) -> dict[str, object]:
         box_clearance_mm=solver_box_clearance,
         vertical_clearance_mm=solver_z_clearance,
         preference=str(project["solver_preference"]),
+        diversified_order_seed=diversified_order_seed,
     )
     evaluated = int(_mapping(stage_solver["search"])["groupings_evaluated"])
     if not _values(stage_solver["candidates"]):
@@ -344,6 +375,43 @@ def solve_partition_plan(raw_project: object) -> dict[str, object]:
     }
     plan["plan_digest"] = _digest(plan)
     return plan
+
+
+def _finalize_portfolio_search(
+    proposal: dict[str, object],
+    attempts: list[dict[str, object]],
+) -> dict[str, object]:
+    """Expose the bounded failure-driven retries without changing project semantics."""
+
+    result = deepcopy(proposal)
+    evaluated = sum(
+        int(_mapping(item["summary"]).get("candidate_count_evaluated", 0))
+        for item in attempts
+    )
+    feasible = sum(
+        int(_mapping(item["summary"]).get("candidate_count_feasible", 0))
+        for item in attempts
+    )
+    summary = _mapping(result["summary"])
+    summary["candidate_count_evaluated"] = evaluated
+    summary["candidate_count_feasible"] = feasible
+
+    solver = _mapping(result["solver"])
+    budgets = _mapping(solver["budgets"])
+    budgets["max_diversified_portfolios"] = MAX_DIVERSIFIED_PORTFOLIOS
+    search = _mapping(solver["search"])
+    search.update(
+        {
+            "canonical_portfolio_failed": True,
+            "portfolios_evaluated": len(attempts),
+            "diversified_portfolios_evaluated": len(attempts) - 1,
+            "candidate_count_across_portfolios": feasible,
+            "groupings_evaluated_across_portfolios": evaluated,
+        }
+    )
+    result.pop("plan_digest", None)
+    result["plan_digest"] = _digest(result)
+    return result
 
 
 def _result(
