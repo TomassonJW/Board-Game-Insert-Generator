@@ -2464,17 +2464,21 @@ P44-M007 est ready-for-explicit-go.
 
 ### P64-V2H03C — Sélection globale paresseuse
 
-- Statut : `ready`. Modèle : `gpt-5.6-sol`, raisonnement `max`.
+- Statut : `done-automated`, `implemented-core`, `automated-validated`.
 - Objectif : choisir variante et placement dans les lanes free-3D sans produit
   cartésien, tout en conservant le portefeuille canonique complet.
 - Livrables : budgets monotones, lanes préservées, télémétrie, certificat global
   et non-régressions denses.
-- Gate : cul-de-sac multi-cavités minimal résolu, résultats Rapide conservés en
-  Normal/Approfondi et vérité `no_solution_within_budget`.
+- Acceptation : cul-de-sac multi-cavités minimal résolu, résultats Rapide
+  conservés en Normal/Approfondi, vérité `no_solution_within_budget` et suite
+  566/566 OK. Preuve : `docs/P64_V2H03C_GLOBAL_SELECTION_EVIDENCE.md`.
 
 ### P64-V2H03V — Gate Fusion des variantes internes
 
-- Statut : blocked-by-P64-V2H03C.
+- Statut : `ready`, préparation Fusion non commencée.
+- Modèle recommandé : `gpt-5.6-sol`, raisonnement `xhigh` ; option économique
+  `gpt-5.6-terra`, raisonnement `high`, avec plus de risque sur le packaging et
+  la traçabilité de gate.
 - Portée : résultat et diagnostic secondaire, stabilité de palette et absence de
   scène automatique ; aucune valeur physique ni impression.
 

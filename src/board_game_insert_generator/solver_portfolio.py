@@ -11,6 +11,10 @@ from copy import deepcopy
 from dataclasses import dataclass
 from typing import Callable
 
+from board_game_insert_generator.container_variant_global_search import (
+    ContainerVariantGlobalExecution,
+    run_container_variant_global_search,
+)
 from board_game_insert_generator.free_3d_continuous_closure import (
     close_free_3d_residual,
 )
@@ -52,6 +56,7 @@ from board_game_insert_generator.solver_outcome import (
 
 PORTFOLIO_AUTO_FAMILY_ID = "portfolio_auto"
 PORTFOLIO_AUTO_VERSION = "bgig.portfolio_auto.v2"
+CONTAINER_VARIANT_SEARCH_REPORT_ID = "container_variant_global_search"
 EFFORT_QUICK = "quick"
 EFFORT_NORMAL = "normal"
 EFFORT_DEEP = "deep"
@@ -122,6 +127,7 @@ class PortfolioExecution:
     deterministic_digest: str
     fallback_plan: dict[str, object] | None
     selected_family_ids: tuple[str, ...]
+    container_variant_search: ContainerVariantGlobalExecution | None = None
 
 
 def portfolio_effort_profiles() -> tuple[PortfolioEffortProfile, ...]:
@@ -398,6 +404,56 @@ def solve_partition_portfolio(
     deduplicated = tuple(
         value for value in deduplicated_all if value.family_id in selected_families
     )
+    container_variant_search = None
+    if not deduplicated and FREE_3D_BEAM_FAMILY_ID in selected_families:
+        container_variant_search = run_container_variant_global_search(
+            raw_project,
+            requested_effort_profile=profile.profile_id,
+            beam_budgets_by_effort={
+                value.profile_id: value.beam_budget
+                for value in portfolio_effort_profiles()
+            },
+            cancel_check=cancel_check,
+        )
+        variant_rejections = set(
+            container_variant_search.preparation_rejection_codes
+        )
+        for lane in container_variant_search.lane_reports:
+            variant_rejections.update(lane.rejection_codes)
+        reports.append(
+            PortfolioFamilyReport(
+                CONTAINER_VARIANT_SEARCH_REPORT_ID,
+                container_variant_search.status,
+                container_variant_search.stop_reason,
+                sum(
+                    value.certified_plan_count
+                    for value in container_variant_search.lane_reports
+                ),
+                len(container_variant_search.candidates),
+                tuple(sorted(variant_rejections)),
+            )
+        )
+        if container_variant_search.status == STALE_OR_CANCELLED:
+            return _portfolio_execution(
+                strategy,
+                profile,
+                STALE_OR_CANCELLED,
+                container_variant_search.stop_reason,
+                (),
+                tuple(reports),
+                duplicate_count,
+                False,
+                selected_family_ids=selected_families,
+                container_variant_search=container_variant_search,
+            )
+        candidates.extend(
+            _portfolio_candidate(value)
+            for value in container_variant_search.candidates
+        )
+        deduplicated_all, duplicate_count = _deduplicate_candidates(candidates)
+        deduplicated = tuple(
+            value for value in deduplicated_all if value.family_id in selected_families
+        )
     if deduplicated:
         status, stop_reason = SOLUTION_FOUND, "best_common_certified_candidate_selected"
     elif all(report.status == PROVEN_IMPOSSIBLE for report in reports):
@@ -417,6 +473,7 @@ def solve_partition_portfolio(
         False,
         fallback_plan=stage_plan,
         selected_family_ids=selected_families,
+        container_variant_search=container_variant_search,
     )
 
 
@@ -589,21 +646,25 @@ def _portfolio_execution(
     fast_path_used: bool,
     fallback_plan: dict[str, object] | None = None,
     selected_family_ids: tuple[str, ...] = _ALLOWED_FAMILIES,
+    container_variant_search: ContainerVariantGlobalExecution | None = None,
 ) -> PortfolioExecution:
     selected = candidates[0] if candidates else None
-    digest = _stable_digest(
-        {
-            "strategy": strategy.__dict__,
-            "effort_profile": profile.profile_id,
-            "status": status,
-            "stop_reason": stop_reason,
-            "candidate_digests": [value.candidate.digest for value in candidates],
-            "family_reports": [value.__dict__ for value in reports],
-            "deduplicated_candidate_count": duplicate_count,
-            "fast_path_used": fast_path_used,
-            "selected_family_ids": selected_family_ids,
-        }
-    )
+    digest_payload = {
+        "strategy": strategy.__dict__,
+        "effort_profile": profile.profile_id,
+        "status": status,
+        "stop_reason": stop_reason,
+        "candidate_digests": [value.candidate.digest for value in candidates],
+        "family_reports": [value.__dict__ for value in reports],
+        "deduplicated_candidate_count": duplicate_count,
+        "fast_path_used": fast_path_used,
+        "selected_family_ids": selected_family_ids,
+    }
+    if container_variant_search is not None:
+        digest_payload["container_variant_search_digest"] = (
+            container_variant_search.deterministic_digest
+        )
+    digest = _stable_digest(digest_payload)
     return PortfolioExecution(
         strategy=strategy,
         effort_profile=profile,
@@ -618,6 +679,7 @@ def _portfolio_execution(
         deterministic_digest=digest,
         fallback_plan=deepcopy(fallback_plan) if fallback_plan is not None else None,
         selected_family_ids=selected_family_ids,
+        container_variant_search=container_variant_search,
     )
 
 

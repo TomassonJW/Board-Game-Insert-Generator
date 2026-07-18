@@ -843,3 +843,22 @@ caps monotones. Les fixtures 1 à 8 incluent le mécanisme anonymisé 11 × 34.
 H03C devient `ready`. Aucun résultat public, schéma, UI, default, jeu
 externe, valeur physique ou état Fusion n'est modifié.
 `print-validated: false`.
+
+## P64-V2H03C — Sélection globale implémentée (2026-07-18)
+
+La frontière locale H03B est consommée après le portefeuille canonique complet.
+Le beam développe variante et placement dans un même état borné, les lanes
+Quick/Normal/Deep restent préfixées et le certificat produit commun est complété
+par un certificat global de sélection. Le diagnostic secondaire porte budgets,
+compteurs, digests, rejets et arrêt sans ajouter de contrôle à la palette.
+
+Le cul-de-sac multi-cavités minimal et la réservation localisée sont résolus ;
+les succès canoniques restent sur leur fast path. Le mécanisme dense 11 × 34
+reste `no_solution_within_budget` jusque dans la lane Deep : H03C augmente la
+capacité de recherche sans promettre qu'un volume positif implique une
+disposition.
+
+P64-V2H03V devient `ready` car le résultat visible peut changer. Cette gate ne
+calibre aucune valeur et ne vaut pas impression. Les futures formes restent la
+propriété de P45 ; un éventuel solveur exact reste P64-X01 sous ADR et benchmark
+distincts.

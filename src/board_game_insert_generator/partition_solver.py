@@ -377,6 +377,26 @@ def _portfolio_public_plan(
         "greedy": dict(execution.effort_profile.greedy_budget.limits),
         "beam": dict(execution.effort_profile.beam_budget.limits),
     }
+    container_variant_trace = None
+    if execution.container_variant_search is not None:
+        from board_game_insert_generator.container_variant_global_search import (
+            container_variant_global_execution_to_dict,
+        )
+
+        container_variant_trace = container_variant_global_execution_to_dict(
+            execution.container_variant_search
+        )
+        budgets["container_variants"] = {
+            "schema_version": container_variant_trace["schema_version"],
+            "lanes": [
+                {
+                    "effort_profile": value["effort_profile"],
+                    "variant_budget": value["variant_budget"],
+                    "beam_budget": value["beam_budget"],
+                }
+                for value in container_variant_trace["lanes"]
+            ],
+        }
     proof = _mapping(solver.get("result", {})).get("proof") if execution.status == "proven_impossible" else None
     solver.update(
         {
@@ -400,6 +420,10 @@ def _portfolio_public_plan(
             "globally_optimal": False,
         }
     )
+    if container_variant_trace is not None:
+        _mapping(solver["portfolio"])["container_variant_search"] = (
+            container_variant_trace
+        )
     elapsed = (
         round(max(0.0, float(elapsed_ms)), 3)
         if request_id is not None or request_revision is not None

@@ -8,7 +8,7 @@ adds a body, moves a cavity, changes a fixed axis or alters physical defaults.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Iterable, Mapping
 
 from board_game_insert_generator.free_3d_greedy_solver import (
@@ -421,16 +421,11 @@ def _grow_placement(
     if placement.rotation_deg_z == 90 and axis in {0, 1}:
         local_axis = 1 - axis
     local[local_axis] += delta
-    return Free3DPlacement(
-        participant_id=placement.participant_id,
-        role=placement.role,
-        name=placement.name,
+    return replace(
+        placement,
         origin_mm=_rounded_point(tuple(origin)),
         world_size_mm=_rounded_point(tuple(world)),
         local_size_mm=_rounded_point(tuple(local)),
-        rotation_deg_z=placement.rotation_deg_z,
-        supporting_ids=placement.supporting_ids,
-        support_coverage_ratio=placement.support_coverage_ratio,
     )
 
 

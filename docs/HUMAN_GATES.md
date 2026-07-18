@@ -737,3 +737,36 @@ sélection publique, ni UI, ni scène et ne demande aucune observation Fusion.
 P64-V2H03C devient `ready`. Une gate humaine ne sera préparée qu'après C si
 un comportement visible doit être observé. `fusion-validated: false` et
 `print-validated: false` pour P64-V2H03.
+
+## P64-V2H03C — Sélection globale clôturée automatiquement
+
+Statut : `implemented-core`, `automated-validated`. Le cul-de-sac minimal et la
+réservation localisée sont certifiés hors Fusion ; les profils, caps, digests,
+annulation et non-régressions denses sont couverts par 566 tests.
+
+Le mécanisme dense 11 × 34 reste `no_solution_within_budget` jusque dans la lane
+Deep. H03C ne transforme ni cette absence de certificat en impossibilité, ni une
+marge volumique positive en promesse de disposition.
+
+Le résultat public pouvant changer sur un projet multi-cavités, P64-V2H03V
+devient `ready`. Aucune preuve Fusion ou physique n'est acquise par C.
+`fusion-validated: false`, `print-validated: false`.
+
+## P64-V2H03V — Gate Fusion à préparer
+
+Statut : `ready`, package et fixture non encore installés. La mission de
+préparation devra automatiser l'installation de l'add-in courant et ne demander
+à Thomas que les observations restantes :
+
+1. le cul-de-sac multi-cavités produit une solution visible avec le fallback
+   variantes ;
+2. le diagnostic secondaire expose effort, lanes, budgets, compteurs, variantes
+   retenues et certificat global sans encombrer le parcours normal ;
+3. un projet canonique simple conserve son résultat et son parcours ;
+4. la palette reste stable et aucune scène ne change avant l'action explicite
+   `Matérialiser dans Fusion` ;
+5. le cas dense, s'il est inclus, reste présenté comme non résolu dans le budget
+   et non comme impossible.
+
+Cette gate ne calibre aucune valeur physique, ne valide aucune forme P45 et ne
+vaut pas impression réelle.

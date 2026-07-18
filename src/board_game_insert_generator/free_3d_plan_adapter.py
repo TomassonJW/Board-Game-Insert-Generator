@@ -11,9 +11,15 @@ from __future__ import annotations
 
 from copy import deepcopy
 from dataclasses import dataclass
+import json
 from typing import Mapping
 
+from board_game_insert_generator.container_internal_variants import (
+    ContainerInternalVariant,
+    ContainerVariantFrontier,
+)
 from board_game_insert_generator.expandable_envelope import (
+    _surplus_distribution,
     derive_expandable_envelope_contract,
 )
 from board_game_insert_generator.free_3d_greedy_solver import (
@@ -41,6 +47,7 @@ from board_game_insert_generator.solver_contract import (
     SolverCandidate,
     SolverStrategy,
     ValidationCertificate,
+    ValidationCheck,
     certify_partition_candidate,
     validate_placement_geometry,
 )
@@ -84,6 +91,7 @@ class Free3DPreparedProblem:
     participants: tuple[dict[str, object], ...]
     top_inset_zones: tuple[TopInsetZone, ...]
     requested_container_count: int
+    container_variant_frontiers: tuple[ContainerVariantFrontier, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -96,6 +104,35 @@ class Free3DPreparation:
 
 
 @dataclass(frozen=True)
+class SelectedContainerVariant:
+    """One locally certified variant referenced by a complete placement."""
+
+    container_group_id: str
+    variant_id: str
+    geometry_digest: str
+    canonical: bool
+    local_certificate_schema: str
+
+
+@dataclass(frozen=True)
+class ContainerVariantGlobalCertificate:
+    """Explicit H03C selection certificate layered over the common validator."""
+
+    schema_version: str
+    selection_digest: str
+    certified: bool
+    checks: tuple[ValidationCheck, ...]
+
+    @property
+    def rejection_codes(self) -> tuple[str, ...]:
+        return tuple(
+            check.rejection_code
+            for check in self.checks
+            if not check.passed and check.rejection_code is not None
+        )
+
+
+@dataclass(frozen=True)
 class CertifiedFree3DPlan:
     """A complete plan paired with the common immutable candidate/certificate."""
 
@@ -103,6 +140,8 @@ class CertifiedFree3DPlan:
     candidate: SolverCandidate
     certificate: ValidationCertificate
     placement_digest: str
+    selected_container_variants: tuple[SelectedContainerVariant, ...] = ()
+    container_variant_global_certificate: ContainerVariantGlobalCertificate | None = None
 
 
 def prepare_free_3d_problem(raw_project: object) -> Free3DPreparation:
@@ -228,6 +267,12 @@ def certify_free_3d_plan(
     if placement_ids != set(participants_by_id):
         return None, ("PARTICIPANT_SET_INCOMPLETE",)
 
+    selected_by_group, selected_references, variant_rejections = (
+        _resolve_selected_container_variants(problem, participants_by_id, placements)
+    )
+    if variant_rejections:
+        return None, variant_rejections
+
     proposals = {
         str(participants_by_id[value.participant_id]["container_group_id"]): dict(
             zip(("x", "y", "z"), value.local_size_mm)
@@ -244,14 +289,23 @@ def certify_free_3d_plan(
         for value in placements
         if value.role == "container"
     }
-    envelopes = derive_expandable_envelope_contract(
-        problem.project,
-        final_outer_dimensions_by_group=proposals,
-        available_outer_dimensions_by_group=available_by_group,
-        max_container_height_mm=problem.storage_height_mm,
-    )
-    if _mapping(envelopes["summary"])["status"] == "blocked":
-        return None, ("FINAL_ENVELOPE_REJECTED",)
+    if selected_by_group:
+        envelopes, envelope_rejections = _selected_variant_envelope_contract(
+            problem,
+            proposals,
+            selected_by_group,
+        )
+        if envelope_rejections:
+            return None, envelope_rejections
+    else:
+        envelopes = derive_expandable_envelope_contract(
+            problem.project,
+            final_outer_dimensions_by_group=proposals,
+            available_outer_dimensions_by_group=available_by_group,
+            max_container_height_mm=problem.storage_height_mm,
+        )
+        if _mapping(envelopes["summary"])["status"] == "blocked":
+            return None, ("FINAL_ENVELOPE_REJECTED",)
     envelope_by_group = {
         str(item["container_group_id"]): item for item in _mappings(envelopes["containers"])
     }
@@ -304,6 +358,18 @@ def certify_free_3d_plan(
                 {"id": content_id, "name": content_names[content_id]}
                 for content_id in placement["source_content_ids"]
             ]
+            selected_variant = selected_by_group.get(
+                str(participant["container_group_id"])
+            )
+            if selected_variant is not None:
+                placement["container_internal_variant_v1"] = {
+                    "variant_id": selected_variant.variant_id,
+                    "geometry_digest": selected_variant.geometry_digest,
+                    "canonical": selected_variant.canonical,
+                    "local_certificate_schema": (
+                        selected_variant.local_certificate.schema_version
+                    ),
+                }
         resolved.append(placement)
 
     applied_top_insets = apply_top_inset_reservations(problem.project, resolved)
@@ -479,6 +545,34 @@ def certify_free_3d_plan(
             "scene_is_not_source_of_truth": True,
         },
     }
+    if selected_references:
+        selection_digest = _digest(
+            {
+                "selected": [
+                    {
+                        "container_group_id": value.container_group_id,
+                        "variant_id": value.variant_id,
+                        "geometry_digest": value.geometry_digest,
+                        "canonical": value.canonical,
+                    }
+                    for value in selected_references
+                ]
+            }
+        )
+        _mapping(plan["solver"])["container_variant_selection_v1"] = {
+            "schema_version": "bgig.container_variant_selection.v1",
+            "selection_digest": selection_digest,
+            "selected": [
+                {
+                    "container_group_id": value.container_group_id,
+                    "variant_id": value.variant_id,
+                    "geometry_digest": value.geometry_digest,
+                    "canonical": value.canonical,
+                    "local_certificate_schema": value.local_certificate_schema,
+                }
+                for value in selected_references
+            ],
+        }
     plan["plan_digest"] = _digest(plan)
     product_candidate = SolverCandidate(
         strategy=strategy,
@@ -504,6 +598,16 @@ def certify_free_3d_plan(
     certificate = certify_partition_candidate(plan, product_candidate)
     if not certificate.certified:
         return None, certificate.rejection_codes
+    variant_global_certificate = _container_variant_global_certificate(
+        selected_references,
+        problem.requested_container_count,
+        certificate,
+    )
+    if (
+        variant_global_certificate is not None
+        and not variant_global_certificate.certified
+    ):
+        return None, variant_global_certificate.rejection_codes
     placement_digest = _digest(
         {
             "placements": [
@@ -519,7 +623,288 @@ def certify_free_3d_plan(
             ]
         }
     )
+    if selected_references:
+        placement_digest = _digest(
+            {
+                "base_placement_digest": placement_digest,
+                "variant_selection": [
+                    (value.container_group_id, value.geometry_digest)
+                    for value in selected_references
+                ],
+            }
+        )
     return (
-        CertifiedFree3DPlan(plan, product_candidate, certificate, placement_digest),
+        CertifiedFree3DPlan(
+            plan,
+            product_candidate,
+            certificate,
+            placement_digest,
+            selected_references,
+            variant_global_certificate,
+        ),
         (),
+    )
+
+
+def _resolve_selected_container_variants(
+    problem: Free3DPreparedProblem,
+    participants_by_id: dict[str, dict[str, object]],
+    placements: tuple[Free3DPlacement, ...],
+) -> tuple[
+    dict[str, ContainerInternalVariant],
+    tuple[SelectedContainerVariant, ...],
+    tuple[str, ...],
+]:
+    if not problem.container_variant_frontiers:
+        return {}, (), ()
+    frontiers = {
+        value.container_group_id: value
+        for value in problem.container_variant_frontiers
+    }
+    selected: dict[str, ContainerInternalVariant] = {}
+    references: list[SelectedContainerVariant] = []
+    rejections: set[str] = set()
+    for placement in placements:
+        if placement.role != "container":
+            continue
+        participant = participants_by_id[placement.participant_id]
+        group_id = str(participant["container_group_id"])
+        variant_id = str(getattr(placement, "container_variant_id", ""))
+        geometry_digest = str(
+            getattr(placement, "container_variant_digest", "")
+        )
+        frontier = frontiers.get(group_id)
+        if frontier is None or not variant_id or not geometry_digest:
+            rejections.add("GLOBAL_VARIANT_REFERENCE_MISSING")
+            continue
+        matches = [
+            value
+            for value in frontier.variants
+            if value.variant_id == variant_id
+            and value.geometry_digest == geometry_digest
+        ]
+        if len(matches) != 1:
+            rejections.add("GLOBAL_VARIANT_REFERENCE_UNKNOWN")
+            continue
+        variant = matches[0]
+        if not variant.local_certificate.certified:
+            rejections.add("GLOBAL_VARIANT_LOCAL_CERTIFICATE_REJECTED")
+            continue
+        if any(
+            placement.local_size_mm[index] + 0.0001
+            < variant.draft.minimum_outer_envelope_mm[index]
+            for index in range(3)
+        ):
+            rejections.add("GLOBAL_VARIANT_ENVELOPE_UNDERSIZED")
+            continue
+        if group_id in selected:
+            rejections.add("GLOBAL_VARIANT_SELECTION_NOT_UNIQUE")
+            continue
+        selected[group_id] = variant
+        references.append(
+            SelectedContainerVariant(
+                container_group_id=group_id,
+                variant_id=variant.variant_id,
+                geometry_digest=variant.geometry_digest,
+                canonical=variant.canonical,
+                local_certificate_schema=variant.local_certificate.schema_version,
+            )
+        )
+    expected_groups = {
+        str(value["container_group_id"])
+        for value in problem.participants
+        if value["role"] == "container"
+    }
+    if set(selected) != expected_groups:
+        rejections.add("GLOBAL_VARIANT_SELECTION_INCOMPLETE")
+    return (
+        selected,
+        tuple(sorted(references, key=lambda value: value.container_group_id)),
+        tuple(sorted(rejections)),
+    )
+
+
+def _selected_variant_envelope_contract(
+    problem: Free3DPreparedProblem,
+    proposals: dict[str, dict[str, float]],
+    selected_by_group: dict[str, ContainerInternalVariant],
+) -> tuple[dict[str, object], tuple[str, ...]]:
+    result = deepcopy(problem.envelope_report)
+    source_contracts = {
+        str(value["container_group_id"]): value
+        for value in _mappings(problem.envelope_report["containers"])
+    }
+    contracts: list[dict[str, object]] = []
+    rejections: set[str] = set()
+    for group_id in sorted(selected_by_group):
+        variant = selected_by_group[group_id]
+        source = source_contracts.get(group_id)
+        final = proposals.get(group_id)
+        if source is None or final is None:
+            rejections.add("GLOBAL_VARIANT_ENVELOPE_SOURCE_MISSING")
+            continue
+        minimum = dict(
+            zip(("x", "y", "z"), variant.draft.minimum_outer_envelope_mm)
+        )
+        if any(final[axis] + 0.0001 < minimum[axis] for axis in ("x", "y", "z")):
+            rejections.add("GLOBAL_VARIANT_ENVELOPE_UNDERSIZED")
+            continue
+        contract = deepcopy(source)
+        constraints = _mapping(contract["constraints"])
+        target = _mapping(constraints["target_outer_dimensions_mm"])
+        surplus = {
+            axis: _round(max(0.0, final[axis] - minimum[axis]))
+            for axis in ("x", "y", "z")
+        }
+        distribution = _surplus_distribution(surplus)
+        contract.update(
+            {
+                "status": "ready",
+                "cavity_layout": _variant_cavity_layout(variant, source),
+                "cavity_layout_frame": "minimum_outer_envelope.local",
+                "minimum_outer_envelope_mm": deepcopy(minimum),
+                "final_outer_envelope_mm": deepcopy(final),
+                "minimum_envelope_origin_in_final_mm": {
+                    "x": distribution["left"],
+                    "y": distribution["front"],
+                    "z": distribution["below"],
+                },
+                "surplus_distribution_mm": distribution,
+                "dimension_resolution": {
+                    axis: {
+                        "mode": _mapping(constraints["dimension_modes"])[axis],
+                        "minimum_mm": minimum[axis],
+                        "target_mm": target[axis],
+                        "calculated_mm": final[axis],
+                        "target_deviation_mm": (
+                            _round(final[axis] - float(target[axis]))
+                            if target[axis] is not None
+                            else None
+                        ),
+                    }
+                    for axis in ("x", "y", "z")
+                },
+                "blockers": [],
+                "invariants": {
+                    "cavity_dimensions_fixed": True,
+                    "cavity_local_origins_fixed": True,
+                    "external_envelope_expansion_only": True,
+                    "automatic_body_created": False,
+                    "container_internal_variant_certified": True,
+                },
+            }
+        )
+        contracts.append(contract)
+    if rejections:
+        return result, tuple(sorted(rejections))
+    result["containers"] = contracts
+    _mapping(result["summary"]).update(
+        {
+            "status": "ready_for_p56",
+            "ready_container_count": len(contracts),
+            "blocked_container_count": 0,
+            "fixed_cavity_count": sum(
+                len(_mappings(value["cavity_layout"])) for value in contracts
+            ),
+            "invariant": (
+                "certified_internal_variant__expandable_outer_envelope"
+            ),
+        }
+    )
+    result["blockers"] = []
+    return result, ()
+
+
+def _variant_cavity_layout(
+    variant: ContainerInternalVariant,
+    source_contract: dict[str, object],
+) -> list[dict[str, object]]:
+    source_by_id = {
+        str(value["cavity_id"]): value
+        for value in _mappings(source_contract["cavity_layout"])
+    }
+    result: list[dict[str, object]] = []
+    for cavity in variant.draft.cavities:
+        source = source_by_id[cavity.cavity_id]
+        result.append(
+            {
+                "cavity_id": cavity.cavity_id,
+                "content_id": cavity.content_id,
+                "shape_kind": cavity.shape_kind,
+                "local_origin_mm": dict(
+                    zip(("x", "y", "z"), cavity.local_origin_mm)
+                ),
+                "inner_dimensions_mm": dict(
+                    zip(("x", "y", "z"), cavity.inner_dimensions_mm)
+                ),
+                "base_inner_dimensions_mm": dict(
+                    zip(("x", "y", "z"), cavity.base_dimensions_mm)
+                ),
+                "resolved_dimensions_mm": dict(
+                    zip(("x", "y", "z"), cavity.resolved_dimensions_mm)
+                ),
+                "content_clearance_mm": source["content_clearance_mm"],
+                "clearance_effective_v1": {
+                    "values_mm": dict(
+                        zip(("x", "y", "z"), cavity.clearance_values_mm)
+                    ),
+                    "source_by_axis": dict(
+                        zip(("x", "y", "z"), cavity.clearance_sources)
+                    ),
+                },
+                "quantity": json.loads(cavity.quantity_payload),
+            }
+        )
+    return result
+
+
+def _container_variant_global_certificate(
+    selected: tuple[SelectedContainerVariant, ...],
+    requested_container_count: int,
+    common_certificate: ValidationCertificate,
+) -> ContainerVariantGlobalCertificate | None:
+    if not selected:
+        return None
+    selection_digest = _digest(
+        {
+            "selected": [
+                {
+                    "container_group_id": value.container_group_id,
+                    "variant_id": value.variant_id,
+                    "geometry_digest": value.geometry_digest,
+                }
+                for value in selected
+            ]
+        }
+    )
+    checks = (
+        ValidationCheck(
+            "exactly_one_variant_per_container",
+            len(selected) == requested_container_count
+            and len({value.container_group_id for value in selected})
+            == requested_container_count,
+            "GLOBAL_VARIANT_SELECTION_INCOMPLETE",
+        ),
+        ValidationCheck(
+            "unique_variant_references",
+            len(
+                {
+                    (value.container_group_id, value.variant_id)
+                    for value in selected
+                }
+            )
+            == len(selected),
+            "GLOBAL_VARIANT_SELECTION_NOT_UNIQUE",
+        ),
+        ValidationCheck(
+            "common_product_certificate",
+            common_certificate.certified,
+            "GLOBAL_PRODUCT_CERTIFICATE_REJECTED",
+        ),
+    )
+    return ContainerVariantGlobalCertificate(
+        schema_version="bgig.container_variant_global_certificate.v1",
+        selection_digest=selection_digest,
+        certified=all(value.passed for value in checks),
+        checks=checks,
     )

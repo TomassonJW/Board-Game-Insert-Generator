@@ -1377,3 +1377,21 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
   `designed` et non branchée jusqu'à H03C.
 - C-USABILITY : aucune surface novice ne change.
 - H03C devient `ready` ; H03V reste bloquée par C.
+
+## Mise à jour P64-V2H03C — 2026-07-18
+
+- C-SOLVER / C-LAYOUT : `implemented-core`, `automated-validated` pour la
+  sélection conjointe variante-placement après échec du portefeuille canonique.
+  Les affectations restent paresseuses et bornées, sans produit cartésien.
+- C-GEOMETRY / C-ASSET : les cavités et jeux locaux proviennent exclusivement
+  des variantes H03B certifiées ; la fermeture ne mute ni dimensions ni origines
+  locales et les jeux externes restent globaux.
+- C-QUALITY : certificats local, commun et global, digests de lanes, caps
+  2/4/6, 32/384/3 072 états et 128/3 072/36 864 essais, stale et vérité
+  `no_solution_within_budget` sont couverts automatiquement.
+- C-USABILITY : aucune option novice ou experte n'est ajoutée ; la trace H03C
+  reste dans le diagnostic secondaire des méthodes et efforts H08 existants.
+- Preuve : `docs/P64_V2H03C_GLOBAL_SELECTION_EVIDENCE.md`, suite 566/566 OK.
+- Limite : le mécanisme dense 11 × 34 reste non certifié jusqu'en Approfondi ;
+  aucune impossibilité, preuve Fusion ou impression n'est revendiquée.
+- Suite : P64-V2H03V `ready` ; P45 et P44-V restent bloquées pendant la gate.

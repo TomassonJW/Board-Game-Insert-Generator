@@ -32,10 +32,13 @@ preuves archivées.
 - P64-V2H03A accepte ADR-0070 et le contrat de coordination : P45 possède les
   sémantiques et le certificat local ; P64 possède la recherche et le certificat
   global.
-- P64-V2H03B est `implemented-core` et `automated-validated` :
-  frontière locale, certificats, fixtures et caps, sans branchement public.
-- P64-V2H03C devient la seule mission `ready` ; sa gate Fusion éventuelle
-  reste séparée.
+- P64-V2H03B et P64-V2H03C sont `implemented-core` et
+  `automated-validated` : frontière locale, sélection globale paresseuse,
+  certificats, fixtures et caps.
+- Le cul-de-sac minimal est résolu ; le mécanisme dense 11 × 34 reste
+  honnêtement `no_solution_within_budget` jusque dans la lane Deep.
+- P64-V2H03V devient la seule mission `ready` ; sa préparation Fusion reste
+  séparée et aucune preuve Fusion H03 n'est encore acquise.
 - P44-V et P45 restent bloquées pendant ce chemin correctif.
 
 ## Vue de séquence
@@ -57,7 +60,8 @@ preuves archivées.
 | Terminé — gate Fusion | P64-V2H02R | Fusion OK 0.1.54 commit 42e8993 ; pas de validation physique. |
 | Terminé — contrat | P64-V2H03A | ADR-0070, propriété P45/P64 et découpage H03B/H03C acceptés. |
 | Terminé — automatisé | P64-V2H03B | Frontière locale certifiée, fixtures 1 à 8 et caps mesurés. |
-| Prêt | P64-V2H03C | Sélection globale paresseuse, lanes monotones et certificat global. |
+| Terminé — automatisé | P64-V2H03C | Sélection globale paresseuse, lanes monotones, certificat global et fixtures 4 à 10. |
+| Prêt | P64-V2H03V | Préparer la gate Fusion du résultat variantes et du diagnostic secondaire. |
 | KO contextuel | P44-V | À requalifier séparément après arbitrage ; P45 reste bloqué. |
 | Bloqué | P45 à P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
@@ -70,6 +74,7 @@ preuves archivées.
 - P64_V2H03_INTERNAL_VARIANT_COORDINATION_CONTRACT.md : propriété, identité,
   certificats, budgets, fixtures et découpage des variantes internes.
 - P64_V2H03B_LOCAL_VARIANT_EVIDENCE.md : mesures, caps et fixtures automatisées.
+- P64_V2H03C_GLOBAL_SELECTION_EVIDENCE.md : fallback, benchmarks, certificats et limites denses.
 - STATUS.md : faits réalisés, validations et limites.
 - CAPABILITY_MAP.md : capability et niveau de preuve.
 - ROADMAP.md : trajectoire et verrouillage de version.

@@ -8,10 +8,10 @@ Statut produit : **MVP V0.1 Fusion-only accepte ; validation d impression non ac
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P64-V2H03B est `implemented-core` et
-`automated-validated`. La frontière locale et ses caps sont disponibles sans
-routage public. P64-V2H03C devient la seule mission `ready`. P64-V2H02R reste
-la dernière preuve Fusion ; P44-V et P45 restent bloquées.
+Phase active : P64-V2H03C est `implemented-core` et `automated-validated`.
+La sélection globale paresseuse est branchée après le portefeuille canonique ;
+P64-V2H03V devient la seule mission `ready`. P64-V2H02R reste la dernière
+preuve Fusion ; P44-V et P45 restent bloquées.
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
 roadmap macro, backlog actionnable, prochaines actions, index ADR/logs et
@@ -2518,3 +2518,31 @@ publiques restent bit-à-bit identiques. Preuve :
 Suite complète : 556/556 OK (166,087 s). Aucun schéma, solveur public, UI, valeur
 physique, scène ou corps automatique n'est modifié. H03C devient `ready`.
 `fusion-validated: false` et `print-validated: false`.
+
+## P64-V2H03C — Sélection globale paresseuse (2026-07-18)
+
+Statut : `implemented-core`, `automated-validated`, `fusion-validated: false`,
+`print-validated: false`.
+
+Le fallback H03C s'exécute seulement sans candidat communément certifié du
+portefeuille canonique complet. Les variantes H03B sont développées directement
+dans les états beam à raison de 2/4/6 options par expansion ; aucun produit
+cartésien des affectations n'est matérialisé. La fermeture continue conserve la
+référence locale, reconstruit ses cavités et soumet le plan au certificat commun
+puis au certificat global H03C.
+
+Le cul-de-sac minimal à deux vrais conteneurs multi-cavités est résolu en Rapide
+avec deux relayouts non canoniques : 5 états, 16 essais. La réservation localisée
+est résolue en Normal après un préfixe Quick rejeté. Les lanes préservées gardent
+leurs digests et les succès canoniques ne déclenchent pas H03C.
+
+Le mécanisme dense anonymisé 11 × 34 reste honnêtement
+`no_solution_within_budget` : 7/128 en Rapide, 295/3 072 dans la lane Normal et
+3 072/9 264 dans la lane Deep. Cette preuve ne conclut ni à la solubilité ni à
+l'impossibilité du cas réel. Une marge volumique positive reste insuffisante.
+
+Preuve : `docs/P64_V2H03C_GLOBAL_SELECTION_EVIDENCE.md`. Suite complète :
+566/566 OK en 150,895 s. Aucune forme P45, valeur physique, tolérance, default,
+scène, matérialisation ou corps automatique n'est ajouté. Le résultat pouvant
+changer visiblement pour un projet, P64-V2H03V devient `ready` ; sa préparation
+Fusion reste une mission séparée.

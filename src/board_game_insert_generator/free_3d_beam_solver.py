@@ -59,6 +59,7 @@ FREE_3D_BEAM_FAMILY_ID = "free_3d_beam"
 FREE_3D_BEAM_VERSION = "bgig.free_3d_beam.v2"
 BEAM_SEARCH_LEGACY_EMS = "legacy_ems_v1"
 BEAM_SEARCH_BRIDGE_EMS = "bridge_ems_v2"
+BEAM_SEARCH_INTERNAL_VARIANTS = "internal_variants_v1"
 _EPSILON = 0.0001
 _AXES = ("x", "y", "z")
 
@@ -76,6 +77,15 @@ class Free3DBeamSolution:
     placements: tuple[Free3DPlacement, ...]
     empty_spaces: tuple[EmptySpace, ...]
     score_key: tuple[object, ...]
+
+
+@dataclass(frozen=True)
+class VariantFree3DPlacement(Free3DPlacement):
+    """Placement retaining the certified local variant chosen by the beam."""
+
+    container_variant_id: str
+    container_variant_digest: str
+    container_variant_canonical: bool
 
 
 @dataclass(frozen=True)
@@ -133,6 +143,10 @@ class _BeamOption:
     supporting_ids: tuple[str, ...]
     support_ratio: float
     containing_space_volume: float
+    container_variant_id: str = ""
+    container_variant_digest: str = ""
+    container_variant_canonical: bool = False
+    container_variant_order: int = 0
 
 
 @dataclass
@@ -172,7 +186,11 @@ def solve_free_3d_beam(
     """Search several minimum-envelope EP/EMS states under explicit hard limits."""
 
     strategy = SolverStrategy(FREE_3D_BEAM_FAMILY_ID, FREE_3D_BEAM_VERSION)
-    if search_variant not in {BEAM_SEARCH_LEGACY_EMS, BEAM_SEARCH_BRIDGE_EMS}:
+    if search_variant not in {
+        BEAM_SEARCH_LEGACY_EMS,
+        BEAM_SEARCH_BRIDGE_EMS,
+        BEAM_SEARCH_INTERNAL_VARIANTS,
+    }:
         raise Free3DBeamError(f"Unsupported beam search variant: {search_variant}.")
     limits = _budget_limits(budget)
     values = tuple(_participant(value, index) for index, value in enumerate(participants))
@@ -229,7 +247,11 @@ def solve_free_3d_beam(
             "top_inset_zones": [item.__dict__ for item in inset_zones],
         }
     )
-    formal_impossibility = _necessary_bound_failure(values, root_size)
+    formal_impossibility = (
+        None
+        if search_variant == BEAM_SEARCH_INTERNAL_VARIANTS
+        else _necessary_bound_failure(values, root_size)
+    )
     counters = _BeamCounters()
     if formal_impossibility is not None:
         return _execution(
@@ -424,93 +446,154 @@ def _placement_options(
     search_variant: str,
 ) -> list[_BeamOption]:
     result: dict[tuple[object, ...], _BeamOption] = {}
-    for rotation, minimum_world, minimum_local in _orientations(participant):
-        for point in sorted(points, key=lambda value: (value[2], value[1], value[0])):
-            if search_variant == BEAM_SEARCH_LEGACY_EMS:
-                search_spaces = tuple(
-                    space
-                    for space in spaces
-                    if _fits_in_space(point, minimum_world, space)
-                )
-            else:
-                # A valid body may bridge several lower supports and therefore
-                # span several EMS. EMS generate points; collision, clearance,
-                # box and support checks remain authoritative.
-                search_spaces = (
-                    EmptySpace(
-                        point,
-                        _rounded_point(
-                            tuple(box[index] - point[index] for index in range(3))
+    for selected_participant in _variant_participants(
+        participant,
+        limits,
+        search_variant,
+    ):
+        raw_variant = selected_participant.get("selected_container_variant_v1")
+        variant = raw_variant if isinstance(raw_variant, dict) else {}
+        for rotation, minimum_world, minimum_local in _orientations(selected_participant):
+            for point in sorted(points, key=lambda value: (value[2], value[1], value[0])):
+                if search_variant == BEAM_SEARCH_LEGACY_EMS:
+                    search_spaces = tuple(
+                        space
+                        for space in spaces
+                        if _fits_in_space(point, minimum_world, space)
+                    )
+                else:
+                    # A valid body may bridge several lower supports and therefore
+                    # span several EMS. EMS generate points; collision, clearance,
+                    # box and support checks remain authoritative.
+                    search_spaces = (
+                        EmptySpace(
+                            point,
+                            _rounded_point(
+                                tuple(box[index] - point[index] for index in range(3))
+                            ),
                         ),
-                    ),
-                )
-            for space in search_spaces:
-                for world_size, local_size in _dimension_variants(
-                    participant,
-                    point,
-                    space,
-                    rotation,
-                    minimum_world,
-                    minimum_local,
-                ):
-                    if counters.placement_trials >= limits["max_placement_trials"]:
-                        counters.budget_exhausted = True
-                        return []
-                    counters.placement_trials += 1
-                    if not _inside_box(point, world_size, box):
-                        continue
-                    inset_allowed = (
-                        _legacy_top_inset_option_allowed(
-                            participant,
-                            point,
-                            world_size,
-                            box[2],
-                            top_inset_zones,
-                        )
-                        if search_variant == BEAM_SEARCH_LEGACY_EMS
-                        else _top_inset_option_allowed(
-                            participant,
-                            point,
-                            world_size,
-                            rotation,
-                            box[2],
-                            top_inset_zones,
-                        )
                     )
-                    if not inset_allowed:
-                        continue
-                    if not _separated_from_placements(
+                for space in search_spaces:
+                    for world_size, local_size in _dimension_variants(
+                        selected_participant,
                         point,
-                        world_size,
-                        participant,
-                        placements,
-                        xy_clearance,
-                        z_clearance,
+                        space,
+                        rotation,
+                        minimum_world,
+                        minimum_local,
                     ):
-                        continue
-                    supporting_ids, support_ratio = _support_at(
-                        point,
-                        world_size,
-                        placements,
-                        participant,
-                        z_clearance,
-                    )
-                    if point[2] > _EPSILON and support_ratio + _EPSILON < 0.25:
-                        continue
-                    option = _BeamOption(
-                        participant=participant,
-                        origin=point,
-                        world_size=world_size,
-                        local_size=local_size,
-                        rotation_deg_z=rotation,
-                        supporting_ids=supporting_ids,
-                        support_ratio=support_ratio,
-                        containing_space_volume=space.volume_mm3,
-                    )
-                    result[(point, world_size, rotation)] = option
+                        if counters.placement_trials >= limits["max_placement_trials"]:
+                            counters.budget_exhausted = True
+                            return []
+                        counters.placement_trials += 1
+                        if not _inside_box(point, world_size, box):
+                            continue
+                        inset_allowed = (
+                            _legacy_top_inset_option_allowed(
+                                selected_participant,
+                                point,
+                                world_size,
+                                box[2],
+                                top_inset_zones,
+                            )
+                            if search_variant == BEAM_SEARCH_LEGACY_EMS
+                            else _top_inset_option_allowed(
+                                selected_participant,
+                                point,
+                                world_size,
+                                rotation,
+                                box[2],
+                                top_inset_zones,
+                            )
+                        )
+                        if not inset_allowed:
+                            continue
+                        if not _separated_from_placements(
+                            point,
+                            world_size,
+                            selected_participant,
+                            placements,
+                            xy_clearance,
+                            z_clearance,
+                        ):
+                            continue
+                        supporting_ids, support_ratio = _support_at(
+                            point,
+                            world_size,
+                            placements,
+                            selected_participant,
+                            z_clearance,
+                        )
+                        if point[2] > _EPSILON and support_ratio + _EPSILON < 0.25:
+                            continue
+                        option = _BeamOption(
+                            participant=selected_participant,
+                            origin=point,
+                            world_size=world_size,
+                            local_size=local_size,
+                            rotation_deg_z=rotation,
+                            supporting_ids=supporting_ids,
+                            support_ratio=support_ratio,
+                            containing_space_volume=space.volume_mm3,
+                            container_variant_id=str(variant.get("variant_id", "")),
+                            container_variant_digest=str(
+                                variant.get("geometry_digest", "")
+                            ),
+                            container_variant_canonical=bool(
+                                variant.get("canonical", False)
+                            ),
+                            container_variant_order=int(
+                                variant.get("frontier_index", 0)
+                            ),
+                        )
+                        result[
+                            (
+                                point,
+                                world_size,
+                                rotation,
+                                option.container_variant_digest,
+                            )
+                        ] = option
     counters.feasible_options += len(result)
     return list(result.values())
 
+
+def _variant_participants(
+    participant: dict[str, object],
+    limits: dict[str, int],
+    search_variant: str,
+) -> tuple[dict[str, object], ...]:
+    if search_variant != BEAM_SEARCH_INTERNAL_VARIANTS:
+        return (participant,)
+    raw_options = participant.get("container_internal_variant_options_v1")
+    if not isinstance(raw_options, list) or not raw_options:
+        return (participant,)
+    maximum = max(1, int(limits.get("max_variant_options_per_expansion", 1)))
+    result: list[dict[str, object]] = []
+    for raw_option in raw_options[:maximum]:
+        option = _mapping(raw_option)
+        minimum = _mapping(option["minimum_outer_envelope_mm"])
+        selected = dict(participant)
+        selected["minimum_local_mm"] = {
+            axis: float(minimum[axis]) for axis in _AXES
+        }
+        selected["selected_container_variant_v1"] = dict(option)
+        hint = selected.get("top_inset_search_hint_v1")
+        raw_cavities = option.get("cavities")
+        if isinstance(hint, dict) and isinstance(raw_cavities, list):
+            selected_hint = dict(hint)
+            selected_hint["cavities"] = [
+                {
+                    "local_origin_mm": dict(_mapping(value)["local_origin_mm"]),
+                    "inner_dimensions_mm": dict(
+                        _mapping(value)["inner_dimensions_mm"]
+                    ),
+                }
+                for value in raw_cavities
+            ]
+            selected["top_inset_search_hint_v1"] = selected_hint
+        result.append(selected)
+    return tuple(result)
 
 def _dimension_variants(
     participant: dict[str, object],
@@ -557,16 +640,26 @@ def _advance_state(
     counters: _BeamCounters,
     limits: dict[str, int],
 ) -> _BeamState | None:
-    placement = Free3DPlacement(
-        participant_id=str(option.participant["id"]),
-        role=str(option.participant["role"]),
-        name=str(option.participant["name"]),
-        origin_mm=_rounded_point(option.origin),
-        world_size_mm=_rounded_point(option.world_size),
-        local_size_mm=_rounded_point(option.local_size),
-        rotation_deg_z=option.rotation_deg_z,
-        supporting_ids=option.supporting_ids,
-        support_coverage_ratio=_round(option.support_ratio),
+    common = {
+        "participant_id": str(option.participant["id"]),
+        "role": str(option.participant["role"]),
+        "name": str(option.participant["name"]),
+        "origin_mm": _rounded_point(option.origin),
+        "world_size_mm": _rounded_point(option.world_size),
+        "local_size_mm": _rounded_point(option.local_size),
+        "rotation_deg_z": option.rotation_deg_z,
+        "supporting_ids": option.supporting_ids,
+        "support_coverage_ratio": _round(option.support_ratio),
+    }
+    placement = (
+        VariantFree3DPlacement(
+            **common,
+            container_variant_id=option.container_variant_id,
+            container_variant_digest=option.container_variant_digest,
+            container_variant_canonical=option.container_variant_canonical,
+        )
+        if option.container_variant_id
+        else Free3DPlacement(**common)
     )
     scratch = _Counters()
     spaces = _subtract_placement_from_spaces(
@@ -766,6 +859,14 @@ def _solution(
                 value.origin_mm,
                 value.world_size_mm,
                 value.rotation_deg_z,
+                value.container_variant_digest,
+            )
+            if isinstance(value, VariantFree3DPlacement)
+            else (
+                value.participant_id,
+                value.origin_mm,
+                value.world_size_mm,
+                value.rotation_deg_z,
             )
             for value in placements
         ),
@@ -782,13 +883,23 @@ def _solution(
 def _option_score(option: _BeamOption, placements: list[Free3DPlacement]) -> tuple[object, ...]:
     body_volume = _volume(option.world_size)
     aligned_faces = _aligned_face_count(option, placements)  # type: ignore[arg-type]
-    return (
+    common = (
         -_round(option.support_ratio),
         -aligned_faces,
         _round(body_volume),
         _round(option.origin[2]),
         _round(option.origin[1]),
         _round(option.origin[0]),
+    )
+    if option.container_variant_digest:
+        return common + (
+            option.container_variant_order,
+            option.rotation_deg_z,
+            str(option.participant["id"]),
+            option.container_variant_digest,
+            option.world_size,
+        )
+    return common + (
         option.rotation_deg_z,
         str(option.participant["id"]),
         option.world_size,
@@ -818,6 +929,15 @@ def _state_signature(state: _BeamState) -> str:
                     "origin": value.origin_mm,
                     "size": value.world_size_mm,
                     "rotation": value.rotation_deg_z,
+                    **(
+                        {
+                            "container_variant_digest": (
+                                value.container_variant_digest
+                            )
+                        }
+                        if isinstance(value, VariantFree3DPlacement)
+                        else {}
+                    ),
                 }
                 for value in sorted(state.placements, key=lambda item: item.participant_id)
             ],

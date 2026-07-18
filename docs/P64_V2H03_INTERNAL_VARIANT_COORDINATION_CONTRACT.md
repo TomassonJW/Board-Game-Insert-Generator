@@ -1,7 +1,7 @@
 # P64-V2H03 — Variantes internes bornées et sélection globale
 
-Statut : contrat accepté le 2026-07-18 ; H03B `implemented-core` et
-`automated-validated` ; sélection globale H03C non commencée.
+Statut : contrat accepté le 2026-07-18 ; H03B et H03C `implemented-core`
+et `automated-validated` ; H03V `ready`.
 
 ADR :
 [ADR-0070](DECISIONS/ADR-0070-internal-container-variant-ownership.md).
@@ -308,15 +308,16 @@ cavités multiples et au moins deux enveloppes locales certifiées.
 
 ### P64-V2H03C — Sélection globale paresseuse
 
-- Statut : `ready`.
+- Statut : `done-automated`, `implemented-core`.
 - Livrables : lanes préservées, expansion variante-placement, budgets
   monotones, télémétrie, certificat global et fixtures 4 à 10.
-- Acceptation : cul-de-sac minimal résolu, non-régressions denses, fallback
-  canonique, aucune fausse impossibilité, suite complète et benchmarks bornés.
+- Acceptation acquise : cul-de-sac minimal résolu, non-régressions denses,
+  fallback canonique, aucune fausse impossibilité, suite complète et benchmarks
+  bornés. Preuve : `docs/P64_V2H03C_GLOBAL_SELECTION_EVIDENCE.md`.
 
 ### P64-V2H03V — Gate Fusion éventuelle
 
-- Statut : `blocked-by-P64-V2H03C`.
+- Statut : `ready`, préparation Fusion non commencée.
 - Codex prépare l'add-in et la fixture ; Thomas observe seulement le résultat,
   le diagnostic secondaire, la stabilité de la palette et l'absence de scène
   automatique.
