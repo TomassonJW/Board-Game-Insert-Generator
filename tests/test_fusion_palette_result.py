@@ -62,5 +62,21 @@ class FusionPaletteResultTests(unittest.TestCase):
         for forbidden in ("deriveCavity", "solvePartition", "packBodies", "localhost", "fetch("):
             self.assertNotIn(forbidden, self.markup)
 
+    def test_internal_variant_trace_stays_in_a_progressive_secondary_diagnostic(self) -> None:
+        for marker in (
+            "function containerVariantTraceDetails",
+            "portfolio?.container_variant_search",
+            "container-variant-diagnostics",
+            "Variantes internes :",
+            "Canonique exécuté d abord",
+            "Produit cartésien matérialisé",
+            "Variantes sélectionnées",
+            "États variantes",
+            "Essais placement",
+            "Ce diagnostic de recherche ne valide ni valeurs physiques ni impression",
+        ):
+            self.assertIn(marker, self.markup)
+        self.assertIn("${containerVariantTraceDetails(portfolio)}</details>", self.markup)
+
 if __name__ == "__main__":
     unittest.main()

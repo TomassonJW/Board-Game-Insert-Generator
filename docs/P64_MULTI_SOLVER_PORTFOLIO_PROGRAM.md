@@ -1,11 +1,11 @@
 # P64 — Programme portefeuille multi-solveurs et finition volumique
 
 Statut : architecture portefeuille acceptée ; P64-V2H02R 0.1.54 est
-fusion-validated. P64-V2H03B est `implemented-core` et
-`automated-validated`, sans branchement public.
+fusion-validated. P64-V2H03B/C sont `implemented-core` et
+`automated-validated`. P64-V2H03V 0.1.55 est `ready-for-human-fusion-check`.
 
-Prochaine action : P64-V2H03C, sélection globale paresseuse, lanes monotones,
-télémétrie et certificat global.
+Prochaine action : observation humaine H03V du résultat variantes, du diagnostic
+secondaire, du contrôle canonique et de l'absence de scène automatique.
 Capability principale : `C-SOLVER`. Capabilities associées : `C-LAYOUT`,
 `C-GRID-3D`, `C-STACKING`, `C-USABILITY`, `C-QUALITY`.
 
@@ -386,7 +386,7 @@ hors chemin critique.
 
 ### P64-V2H03C — Sélection globale paresseuse
 
-- Statut : `ready`.
+- Statut : `done-automated`, `implemented-core`, `automated-validated`.
 - Agent conseillé : `gpt-5.6-sol`, raisonnement `max`.
 - Objectif : expansion variante-placement par lanes monotones, certificat global
   et télémétrie, sans produit cartésien.
@@ -395,9 +395,10 @@ hors chemin critique.
 
 ### P64-V2H03V — Gate Fusion
 
-- Statut : `blocked-by-P64-V2H03C`.
-- Portée : observation du résultat et du diagnostic seulement ; aucune preuve
-  physique ou d'impression.
+- Statut : `ready-for-human-fusion-check`, package 0.1.55 préparé.
+- Portée : observation du résultat, du diagnostic secondaire replié, du contrôle
+  canonique et de l'absence de scène automatique ; aucune preuve physique ou
+  d'impression.
 
 ### P64-U01 — Progression non modale du calcul
 

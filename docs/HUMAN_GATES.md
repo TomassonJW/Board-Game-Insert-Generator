@@ -752,21 +752,32 @@ Le résultat public pouvant changer sur un projet multi-cavités, P64-V2H03V
 devient `ready`. Aucune preuve Fusion ou physique n'est acquise par C.
 `fusion-validated: false`, `print-validated: false`.
 
-## P64-V2H03V — Gate Fusion à préparer
+## P64-V2H03V — Gate Fusion préparée
 
-Statut : `ready`, package et fixture non encore installés. La mission de
-préparation devra automatiser l'installation de l'add-in courant et ne demander
-à Thomas que les observations restantes :
+Statut : `ready-for-human-fusion-check`. Le package 0.1.55 et les fixtures sont
+préparés par `scripts/fusion/prepare_p64_v2h03v_variant_gate.ps1`. Le préparateur
+installe l'add-in, préserve le projet et l'état document existants dans des
+backups bornés, charge la fixture variantes, conserve un contrôle canonique
+récent, règle `Auto intelligent + Rapide` et vérifie le marqueur de commit.
 
-1. le cul-de-sac multi-cavités produit une solution visible avec le fallback
-   variantes ;
-2. le diagnostic secondaire expose effort, lanes, budgets, compteurs, variantes
-   retenues et certificat global sans encombrer le parcours normal ;
-3. un projet canonique simple conserve son résultat et son parcours ;
+Thomas observe seulement :
+
+1. le cul-de-sac multi-cavités produit une solution visible avec deux variantes
+   internes non canoniques ;
+2. le diagnostic secondaire expose effort, lane, budgets, compteurs, variantes
+   retenues, certificat global, canonique-first et absence de produit cartésien,
+   tout en restant replié dans le parcours normal ;
+3. le contrôle `p64-v2h03v-simple-control.bgig.json` conserve une solution
+   `Étages et piles` sans trace de fallback ;
 4. la palette reste stable et aucune scène ne change avant l'action explicite
    `Matérialiser dans Fusion` ;
-5. le cas dense, s'il est inclus, reste présenté comme non résolu dans le budget
-   et non comme impossible.
+5. tout cas dense éventuellement observé reste présenté comme
+   `no_solution_within_budget`, jamais comme impossible sur le seul volume.
 
-Cette gate ne calibre aucune valeur physique, ne valide aucune forme P45 et ne
-vaut pas impression réelle.
+Retour attendu :
+`P64-V2H03V Fusion OK 0.1.55 - commit <sha>`, ou un KO contextuel avec projet,
+méthode, effort, statut visible et diagnostic.
+
+Cette préparation n'est pas une preuve Fusion. Elle ne calibre aucune valeur
+physique, ne valide aucune forme P45 et ne vaut pas impression réelle.
+`fusion-validated: false`, `print-validated: false`.

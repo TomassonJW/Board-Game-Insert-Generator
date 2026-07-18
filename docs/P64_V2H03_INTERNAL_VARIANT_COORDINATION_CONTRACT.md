@@ -1,7 +1,7 @@
 # P64-V2H03 — Variantes internes bornées et sélection globale
 
 Statut : contrat accepté le 2026-07-18 ; H03B et H03C `implemented-core`
-et `automated-validated` ; H03V `ready`.
+et `automated-validated` ; H03V 0.1.55 `ready-for-human-fusion-check`.
 
 ADR :
 [ADR-0070](DECISIONS/ADR-0070-internal-container-variant-ownership.md).
@@ -317,10 +317,10 @@ cavités multiples et au moins deux enveloppes locales certifiées.
 
 ### P64-V2H03V — Gate Fusion éventuelle
 
-- Statut : `ready`, préparation Fusion non commencée.
-- Codex prépare l'add-in et la fixture ; Thomas observe seulement le résultat,
-  le diagnostic secondaire, la stabilité de la palette et l'absence de scène
-  automatique.
+- Statut : `ready-for-human-fusion-check`, package 0.1.55 et fixtures préparés.
+- Codex installe l'add-in et les réglages ; Thomas observe seulement le résultat,
+  le diagnostic secondaire replié, le contrôle canonique, la stabilité de la
+  palette et l'absence de scène automatique.
 - Cette gate ne calibre aucune valeur et ne vaut pas impression.
 
 ## 14. Vérifications minimales des lots runtime

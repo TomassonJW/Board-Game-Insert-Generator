@@ -1395,3 +1395,16 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - Limite : le mécanisme dense 11 × 34 reste non certifié jusqu'en Approfondi ;
   aucune impossibilité, preuve Fusion ou impression n'est revendiquée.
 - Suite : P64-V2H03V `ready` ; P45 et P44-V restent bloquées pendant la gate.
+
+## Mise à jour P64-V2H03V — 2026-07-18
+
+- C-FUSION-UI / C-USABILITY : `implemented-fusion-unvalidated` pour le diagnostic
+  H03C secondaire et replié ; le parcours normal ne gagne aucun contrôle.
+- C-SOLVER / C-LAYOUT : aucune logique ne change ; la palette projette la trace
+  H03C déjà certifiée et le contrôle canonique reste sur `stage_stack`.
+- C-QUALITY : fixture synchronisée avec H03C, préflight pur, package 0.1.55,
+  installateur borné, backups locaux et marqueur de commit.
+- Limites : `fusion-validated: false`, `print-validated: false`, cas dense non
+  certifié, aucune forme P45, valeur physique, tolérance ou scène automatique.
+- Suite : observation humaine P64-V2H03V ; P44-V et P45 restent bloquées jusqu'au
+  retour explicite.

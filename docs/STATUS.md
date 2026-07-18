@@ -8,10 +8,11 @@ Statut produit : **MVP V0.1 Fusion-only accepte ; validation d impression non ac
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P64-V2H03C est `implemented-core` et `automated-validated`.
-La sélection globale paresseuse est branchée après le portefeuille canonique ;
-P64-V2H03V devient la seule mission `ready`. P64-V2H02R reste la dernière
-preuve Fusion ; P44-V et P45 restent bloquées.
+Phase active : P64-V2H03V 0.1.55 est `ready-for-human-fusion-check`.
+La sélection globale paresseuse H03C reste `implemented-core` et
+`automated-validated` ; sa fixture, son contrôle canonique et son diagnostic
+secondaire sont préparés. P64-V2H02R reste la dernière preuve Fusion ; P44-V et
+P45 restent bloquées.
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
 roadmap macro, backlog actionnable, prochaines actions, index ADR/logs et
@@ -2546,3 +2547,27 @@ Preuve : `docs/P64_V2H03C_GLOBAL_SELECTION_EVIDENCE.md`. Suite complète :
 scène, matérialisation ou corps automatique n'est ajouté. Le résultat pouvant
 changer visiblement pour un projet, P64-V2H03V devient `ready` ; sa préparation
 Fusion reste une mission séparée.
+
+## P64-V2H03V — Gate Fusion préparée (2026-07-18)
+
+Statut : `ready-for-human-fusion-check`, package 0.1.55,
+`fusion-validated: false`, `print-validated: false`.
+
+La palette rend maintenant la trace H03C dans un second niveau replié du
+`Diagnostic du calcul`. Elle expose uniquement lorsque le fallback a réellement
+été exécuté : statut, lanes, caps, compteurs, frontières, variantes retenues,
+certificat global, ordre canonique-first et absence de produit cartésien. Aucun
+nouveau réglage novice, schéma, solveur ou comportement de scène n'est ajouté.
+
+La fixture `p64_v2h03v_variant_project.json` reproduit le vrai cul-de-sac minimal
+à deux conteneurs multi-cavités. Le préflight Python pur confirme en Rapide une
+solution `free_3d_beam`, deux variantes non canoniques et un certificat global.
+Le contrôle simple reste `stage_stack` et ne transporte aucune trace H03C.
+
+Le préparateur `prepare_p64_v2h03v_variant_gate.ps1` teste ces invariants,
+installe l'add-in, préserve les données locales existantes, prépare les deux
+documents, règle `Auto intelligent + Rapide` et écrit le SHA installé. Il ne
+matérialise rien. Validation : 571/571 tests, compileall, syntaxe JavaScript,
+frontière `adsk` et dry-run du préparateur passent. Seule l'observation humaine
+décrite dans `HUMAN_GATES.md` reste à faire ; aucune preuve Fusion ou physique
+n'est encore acquise.

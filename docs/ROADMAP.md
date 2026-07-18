@@ -862,3 +862,14 @@ P64-V2H03V devient `ready` car le résultat visible peut changer. Cette gate ne
 calibre aucune valeur et ne vaut pas impression. Les futures formes restent la
 propriété de P45 ; un éventuel solveur exact reste P64-X01 sous ADR et benchmark
 distincts.
+
+## P64-V2H03V — Gate Fusion préparée (2026-07-18)
+
+Le package 0.1.55 projette la trace H03C dans un diagnostic secondaire replié et
+fournit une fixture variantes plus un contrôle canonique. Le préflight confirme
+la solution du cul-de-sac minimal, deux variantes non canoniques certifiées et
+la non-régression `stage_stack`, sans scène automatique.
+
+La trajectoire attend maintenant l'observation humaine H03V. Elle ne valide ni
+le cas dense, ni une valeur physique, ni P45, ni l'impression. Aucune mission
+runtime suivante n'est ouverte avant le retour explicite.

@@ -31,36 +31,33 @@ Fusion H03 n'est encore acquise.
 
 ## Prochaine action recommandée
 
-### P64-V2H03V — Préparation et observation Fusion
+### P64-V2H03V — Observation humaine Fusion
 
-P64-V2H03V est la seule mission `ready`.
+P64-V2H03V est `ready-for-human-fusion-check`. Le package 0.1.55, la fixture du
+cul-de-sac multi-cavités, le contrôle canonique simple, les réglages
+`Auto intelligent + Rapide` et le diagnostic secondaire replié sont préparés.
 
-Périmètre :
+Action restante pour Thomas :
 
-1. créer une fixture Fusion déterministe du cul-de-sac multi-cavités résolu ;
-2. préparer le package add-in suivant sans changer schéma, valeurs ou defaults ;
-3. installer automatiquement l'add-in et les settings locaux ;
-4. vérifier les marqueurs du commit installé ;
-5. demander à Thomas uniquement l'observation du résultat variantes, du
-   diagnostic secondaire, de la stabilité de palette et de l'absence de scène
-   automatique ;
-6. conserver un projet canonique simple comme non-régression visible ;
-7. présenter tout cas dense non certifié comme `no_solution_within_budget`,
-   jamais comme impossible.
+1. recharger l'add-in 0.1.55 et ouvrir BGIG ;
+2. confirmer que la fixture affiche une solution avec deux variantes internes
+   non canoniques et un certificat global ;
+3. ouvrir `Diagnostic du calcul > Variantes internes` et vérifier voie, budgets,
+   compteurs, ordre canonique-first et absence de produit cartésien ;
+4. ouvrir le contrôle récent `p64-v2h03v-simple-control.bgig.json` et confirmer
+   `Étages et piles`, sans diagnostic variantes ;
+5. confirmer la stabilité de la palette et l'absence de scène avant
+   `Matérialiser dans Fusion`.
 
-Interdits : forme ou champ P45, nouveau solveur, valeur physique, tolérance,
-default, corps automatique, scène automatique ou revendication d'impression.
+Retour attendu :
+`P64-V2H03V Fusion OK 0.1.55 - commit <sha>`, ou un KO contextuel avec projet,
+méthode, effort, statut visible et diagnostic.
 
-Validation avant observation : tests ciblés, suite pertinente, compileall,
-frontière `adsk`, diff-check, installation locale et SHA installé vérifié. La
-gate humaine ne commence qu'après cette préparation.
-
-Modèle conseillé : `gpt-5.6-sol`, raisonnement `xhigh`. La mission est surtout
-une intégration Fusion et une préparation de preuve, avec un risque modéré sur
-le packaging, les fixtures et la traçabilité. Option économique :
-`gpt-5.6-terra`, raisonnement `high`, acceptable si le contrat H03V est suivi
-strictement, avec davantage de risque de reprise sur les marqueurs et le
-parcours de gate.
+Aucun agent n'est requis pendant cette gate humaine. Après retour explicite, la
+clôture documentaire peut utiliser `gpt-5.6-terra`, raisonnement `medium` ; le
+compromis est acceptable car elle ne doit modifier aucun runtime. Un modèle plus
+puissant n'est utile qu'en cas de KO nécessitant une nouvelle analyse du solveur
+ou de la palette.
 
 ## Lots suivants, non ouverts
 

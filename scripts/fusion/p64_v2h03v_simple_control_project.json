@@ -1,0 +1,36 @@
+{
+  "schema_version": "bgig.project.v1",
+  "project_name": "P64-V2H03V simple canonical control",
+  "box": {
+    "inner_dimensions_mm": {"x": 240.0, "y": 180.0, "z": 70.0},
+    "usable_height_mm": 66.0,
+    "lid_clearance_mm": 2.0
+  },
+  "layout": {
+    "layout_clearance_mm": 0.6,
+    "container_box_xy_clearance_mm": 0.6,
+    "container_z_clearance_mm": 0.6,
+    "default_wall_thickness_mm": 1.2,
+    "default_floor_thickness_mm": 1.2,
+    "default_content_clearance_mm": 0.6
+  },
+  "contents": [
+    {
+      "id": "simple-content",
+      "name": "Élément simple-content",
+      "shape_kind": "custom",
+      "dimensions_mm": {"x": 18.0, "y": 18.0, "z": 5.0},
+      "quantity": 4,
+      "container_group_id": "simple",
+      "content_clearance_mm": null,
+      "measurement_confidence": "exact"
+    }
+  ],
+  "container_groups": [
+    {"id": "simple", "name": "Bac simple", "wall_thickness_mm": null, "floor_thickness_mm": null}
+  ],
+  "flat_items": [],
+  "fill_elements": [],
+  "solver_preference": "balanced",
+  "deferred_features": {"appearance": null, "mechanism": null}
+}

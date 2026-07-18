@@ -1,0 +1,35 @@
+{
+  "schema_version": "bgig.project.v1",
+  "project_name": "P64-V2H03V multi-container variant dead end",
+  "box": {
+    "inner_dimensions_mm": {"x": 148.0, "y": 80.0, "z": 10.0},
+    "usable_height_mm": 10.0,
+    "lid_clearance_mm": 0.0
+  },
+  "layout": {
+    "layout_clearance_mm": 0.6,
+    "container_box_xy_clearance_mm": 0.6,
+    "container_z_clearance_mm": 0.6,
+    "default_wall_thickness_mm": 1.2,
+    "default_floor_thickness_mm": 1.2,
+    "default_content_clearance_mm": 0.6
+  },
+  "contents": [
+    {"id": "long", "name": "Element long", "shape_kind": "rectangle", "dimensions_mm": {"x": 48.0, "y": 18.0, "z": 8.0}, "quantity": 1, "container_group_id": "left", "content_clearance_mm": 0.0, "measurement_confidence": "exact"},
+    {"id": "wide", "name": "Element wide", "shape_kind": "rectangle", "dimensions_mm": {"x": 36.0, "y": 28.0, "z": 7.0}, "quantity": 1, "container_group_id": "left", "content_clearance_mm": 0.0, "measurement_confidence": "exact"},
+    {"id": "tall", "name": "Element tall", "shape_kind": "rectangle", "dimensions_mm": {"x": 24.0, "y": 42.0, "z": 6.0}, "quantity": 1, "container_group_id": "left", "content_clearance_mm": 0.0, "measurement_confidence": "exact"},
+    {"id": "small", "name": "Element small", "shape_kind": "rectangle", "dimensions_mm": {"x": 18.0, "y": 18.0, "z": 5.0}, "quantity": 1, "container_group_id": "left", "content_clearance_mm": 0.0, "measurement_confidence": "exact"},
+    {"id": "right-long", "name": "Droite Element long", "shape_kind": "rectangle", "dimensions_mm": {"x": 48.0, "y": 18.0, "z": 8.0}, "quantity": 1, "container_group_id": "right", "content_clearance_mm": 0.0, "measurement_confidence": "exact"},
+    {"id": "right-wide", "name": "Droite Element wide", "shape_kind": "rectangle", "dimensions_mm": {"x": 36.0, "y": 28.0, "z": 7.0}, "quantity": 1, "container_group_id": "right", "content_clearance_mm": 0.0, "measurement_confidence": "exact"},
+    {"id": "right-tall", "name": "Droite Element tall", "shape_kind": "rectangle", "dimensions_mm": {"x": 24.0, "y": 42.0, "z": 6.0}, "quantity": 1, "container_group_id": "right", "content_clearance_mm": 0.0, "measurement_confidence": "exact"},
+    {"id": "right-small", "name": "Droite Element small", "shape_kind": "rectangle", "dimensions_mm": {"x": 18.0, "y": 18.0, "z": 5.0}, "quantity": 1, "container_group_id": "right", "content_clearance_mm": 0.0, "measurement_confidence": "exact"}
+  ],
+  "container_groups": [
+    {"id": "left", "name": "Bac gauche", "wall_thickness_mm": 2.0, "floor_thickness_mm": 2.0},
+    {"id": "right", "name": "Bac droit", "wall_thickness_mm": 2.0, "floor_thickness_mm": 2.0}
+  ],
+  "flat_items": [],
+  "fill_elements": [],
+  "solver_preference": "balanced",
+  "deferred_features": {"appearance": null, "mechanism": null}
+}
