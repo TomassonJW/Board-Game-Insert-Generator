@@ -781,3 +781,31 @@ méthode, effort, statut visible et diagnostic.
 Cette préparation n'est pas une preuve Fusion. Elle ne calibre aucune valeur
 physique, ne valide aucune forme P45 et ne vaut pas impression réelle.
 `fusion-validated: false`, `print-validated: false`.
+
+
+## P64-A02 — Arbitrage de calcul étagé et capacité accepté
+
+Statut : gate d'architecture fermée le 2026-07-21 par le GO explicite de Thomas.
+ADR-0071 et ADR-0072 sont acceptées comme cible produit. Cette décision autorise
+la documentation détaillée et le découpage des futures missions ; elle ne
+constitue ni une preuve runtime, ni une preuve Fusion, ni une preuve physique.
+
+Décisions humaines acquises :
+
+1. une édition déclenche seulement les dérivations locales et bornes globales
+   nécessaires ; elle ne doit plus imposer à terme un solve global complet ;
+2. le solve global devient une action primaire explicite ;
+3. la finalisation du volume devient une action séparée, remplaçable ou
+   désactivable ;
+4. les meilleurs candidats locaux sont expliqués dans une section repliée ; une
+   shortlist de trois est un choix UX, pas un plafond de recherche ;
+5. les opportunités post-solve peuvent accélérer une insertion locale, mais
+   toute modification est recertifiée et aucune zone technique n'est assimilée
+   à une réserve fonctionnelle ;
+6. l'ajout d'un conteneur autonome sans baie réservée déclenche un solve global,
+   il ne bénéficie pas d'une promesse de réutilisation locale.
+
+Les gates P64-L03V et P64-CV sont déclarées pour les futurs comportements
+visibles, mais elles ne sont pas actives. La seule gate humaine active demeure
+P64-V2H03V 0.1.55. fusion-validated reste false pour P64-A02 et
+print-validated reste false.

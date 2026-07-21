@@ -2517,3 +2517,139 @@ P44-M007 est ready-for-explicit-go.
 
 - Statut : future-gated.
 - Préconditions : besoin démontré, benchmark, ADR de dépendance et GO explicite.
+
+
+### P64-A02 — Programme de calcul étagé et capacité réutilisable
+
+- Capability : C-USABILITY, C-ASSET, C-GEOMETRY, C-SOLVER, C-LAYOUT, C-QUALITY.
+- Déclencheur : arbitrage produit explicite du 2026-07-21.
+- Livrables : ADR-0071, ADR-0072, programme de calcul/finalisation, contrat de
+  capacité post-solve, pilotage, roadmap, backlog et garde-fous documentaires.
+- Décisions : analyses locales incrémentales, solve global explicite,
+  finalisation séparée, shortlist UX non limitante et mémoire courte dérivée.
+- Non-objectifs : runtime, schéma, valeur physique, géométrie, scène Fusion,
+  résolution du cas dense ou nouvelle preuve de validation.
+- Statut : done-documentation, architecture-accepted.
+
+### P64-L01 — États, digests et invalidation incrémentale
+
+- Dépendances : P64-V2H03V fermée, P44-V requalifiée, P45-M001 cadré.
+- Objectif : représenter source, analyse locale, agencement global, finalisation
+  et matérialisation avec digests d'entités et graphe de dépendances.
+- Livrables : types purs, cache borné, invalidation par asset/conteneur/boîte,
+  rejet des réponses stale, télémétrie et fixtures de changement isolé.
+- Acceptation : modifier un asset ne recalcule pas les autres conteneurs ;
+  modifier un conteneur ne réécrit pas ses assets ; une contrainte globale
+  invalide honnêtement le plan ; zéro import adsk.
+- Non-objectifs : nouveau bouton, score produit, solveur, schéma public ou CAD.
+- Statut : planned-locked.
+
+### P64-L02 — Frontières locales, score et résumé progressif
+
+- Dépendance : P64-L01.
+- Objectif : enrichir automatiquement la seule frontière locale touchée avec les
+  variantes rectangulaires certifiables et les classer sans promesse d'optimum.
+- Score : compacité, gaspillage dans l'enveloppe, stabilité, accessibilité connue,
+  compatibilité sous-plateau et coût estimé de recherche, publiés séparément.
+- UX : au plus trois représentants visibles dans un volet replié ; la frontière
+  interne reste plus large et s'élargit selon l'effort.
+- Parois : réutiliser le default global et wall_thickness_mm par conteneur ;
+  aucun second paramètre de cloison avant contrat P45 et validation physique.
+- Acceptation : déterminisme, Pareto, diversité, top 3 non normatif, cache
+  invalidé correctement et aucun impact sur les autres conteneurs.
+- Statut : planned-locked.
+
+### P64-L03 — Solve global explicite et plan finalisable
+
+- Dépendance : P64-L02.
+- Objectif : remplacer le solve complet réactif par l'action visible Calculer
+  l'agencement, puis séparer le résultat faisable de sa finalisation.
+- Préservation : stage_stack, EMS historique, greedy, beam, portefeuille Auto,
+  H03C, profils d'effort, annulation et no_solution_within_budget.
+- Livrables : action explicite, état stale visible, progressive widening,
+  certificat global, finalization_required et matérialisation désactivée tant
+  que le plan n'est pas finalisé et recertifié.
+- Migration : comportement public changé uniquement avec ADR-0071, tests de
+  compatibilité et gate P64-L03V ; aucune migration destructive.
+- Statut : planned-locked.
+
+### P64-L03V — Gate Fusion du cycle explicite
+
+- Dépendance : P64-L03 automated-validated.
+- Observations : édition locale rapide, absence de solve global silencieux,
+  bouton primaire clair, focus stable, diagnostic replié, stale honnête,
+  finalisation séparée et aucune scène avant matérialisation.
+- Refus : aucun résultat ancien présenté comme courant, aucun top 3 moteur,
+  aucune allégation physique.
+- Statut : future-human-gate, inactive.
+
+### P64-F01A02 — Finalisation simple autour des enveloppes
+
+- Dépendances : P64-L03V, P45/P46 selon leurs gates.
+- Objectif : répartir le volume admissible sur les faces extensibles sans
+  modifier topologie, cavités, minima, jeux ou pose monde.
+- Acceptation : conservation, déterminisme, certificat de finalisation et
+  fallback bit-à-bit vers le plan global de base.
+- Statut : planned-locked ; remplace le cadrage incomplet de P64-F01 sans
+  supprimer son historique.
+
+### P64-F02A02 — Finalisation équilibrée et proportionnelle
+
+- Dépendance : P64-F01A02.
+- Objectif : proposer séparément égalité des volumes ajoutés et égalité des
+  ratios d'expansion ; les deux objectifs ne doivent jamais être confondus.
+- Extension : harmonisation modulaire et alignements structuraux seulement
+  lorsque les contrats P45/P46 rendent les faces admissibles explicites.
+- Acceptation : objectifs mesurés, contraintes dures prioritaires, résultat
+  total/partiel/rejeté et solution de base préservée.
+- Statut : planned-locked.
+
+### P64-C01 — Carte de capacité post-solve en lecture seule
+
+- Dépendances : P64-F01A02 et P64-F02A02.
+- Objectif : dériver une CapacityOpportunityMap depuis un plan finalisé certifié.
+- Livrables : InternalOpportunityZone, BoxReserveBay, digests, invalidation,
+  classement dimensionnel, lecture seule et diagnostics de rejet.
+- Acceptation : aucun EMS accidentel promu, aucune source persistée, aucune
+  création d'objet, aucune revendication zéro recalcul.
+- Statut : planned-locked.
+
+### P64-C02 — Insertion locale d'asset et recertification
+
+- Dépendance : P64-C01.
+- Objectif : permettre l'ajout confirmé d'un asset dans une opportunité interne
+  si l'enveloppe extérieure et la pose monde restent inchangées.
+- Pipeline : nouvelle source, dérivation P45 locale, certificat local,
+  certificat global réappliqué, nouvelle finalisation et nouvelle carte.
+- Échec : transaction atomique abandonnée et proposition de solve global ;
+  aucun plan partiel matérialisable.
+- Séparateurs : route locale distincte, jamais cale ou corps implicite.
+- Statut : planned-locked.
+
+### P64-F03A02 — Cales explicites et stratégie hybride
+
+- Dépendances : P64-F02A02, P68 ou preuves physiques pertinentes.
+- Objectif : proposer le moins de cales justifiées, ou un hybride
+  expansion/cales, uniquement après confirmation.
+- Interdit : création silencieuse, promesse de tenue, print-validated sans
+  impression réelle.
+- Statut : blocked-by-physical-feedback.
+
+### P64-C03 — Conteneur autonome dans une baie réservée
+
+- Dépendances : P64-C01, P64-C02 et capacité P45 suffisante.
+- Objectif : créer sur action explicite un conteneur dans une BoxReserveBay
+  volontaire, dimensionnellement et fonctionnellement compatible.
+- Règle dure : sans baie certifiée, ou si la nouvelle enveloppe déborde, lancer
+  un solve global ; une zone interne ne peut pas devenir un conteneur autonome.
+- Acceptation : conservation des poses existantes, certificats reconstruits,
+  rollback atomique et absence de migration destructive.
+- Statut : planned-locked.
+
+### P64-CV — Gate Fusion de capacité réutilisable
+
+- Dépendances : C01 à C03 automated-validated.
+- Observations : capacités expliquées, actions contextuelles, fallback solve
+  global, aucune création automatique et scène inchangée avant matérialisation.
+- Preuve : Fusion seulement ; l'impression reste une gate séparée.
+- Statut : future-human-gate, inactive.

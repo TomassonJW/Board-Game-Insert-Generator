@@ -130,3 +130,26 @@ valeur physique, une cavité ou ajouter un corps.
 
 La trajectoire est detaillee dans `docs/CAPABILITY_MAP.md`, puis declinee dans
 `docs/ROADMAP.md`, `docs/BACKLOG.md`, `docs/NEXT_ACTIONS.md` et les gates.
+
+
+## Évolution contractée — calcul étagé et réserves utiles
+
+La North Star conserve le complete volume accounting, mais distingue désormais
+la faisabilité, la finalisation et la matérialisation. À terme, une édition
+locale doit produire rapidement des possibilités locales explicables ; le
+calcul global est lancé consciemment ; la répartition du volume restant est une
+décision de finalisation séparée. Cette cible ne modifie pas l'invariant runtime
+V0.1 avant P64-L03 et sa gate humaine.
+
+Un volume non occupé doit toujours être classé : jeu technique, réservation
+fonctionnelle, opportunité interne, baie de boîte volontaire ou résiduel rejeté.
+« Complet » ne signifie donc pas « tout transformer immédiatement en matière » :
+une réserve utile explicitement demandée et certifiée satisfait aussi la
+comptabilité complète. Un vide accidentel ou un EMS de recherche ne la satisfait
+pas.
+
+Le produit peut mémoriser brièvement les capacités d'un plan finalisé pour
+faciliter une évolution. Cette mémoire reste dérivée et périssable. Ajouter un
+asset dans une enveloppe inchangée ou un conteneur dans une baie réservée exige
+toujours une nouvelle certification. Aucun objet imprimable, séparateur ou cale
+n'apparaît sans action utilisateur explicite.

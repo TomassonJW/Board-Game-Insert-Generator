@@ -362,3 +362,18 @@ Ces champs historiques restent validés et roundtrippables afin de ne pas détru
 Les rôles `asset_cavity_mm` et `flat_inset_mm` conservent l’héritage par axe et leurs overrides par objet. Dans la palette, X et Y sont édités ensemble et Z séparément. Le jeu Z conteneur-boîte est `box.lid_clearance_mm` ; il reste retranché de la hauteur de conception.
 
 Aucune valeur par défaut ni formule de cavité ou d’encastrement n’est recalibrée. print-validated: false.
+
+
+## P64-A02 — parois internes et score local
+
+Le programme P64-A02 n'ajoute aucun nouveau default physique. Le minimum de
+paroi et de cloison utilisé par une variante locale reste le default projet
+existant, avec wall_thickness_mm comme override de conteneur lorsque le modèle
+courant l'autorise. Le score ne peut jamais compenser une violation de cette
+valeur : une variante non certifiée est rejetée avant classement.
+
+Un futur réglage séparant paroi extérieure et cloison interne serait une nouvelle
+sémantique P45. Il exige contrat, migration additive, source effective visible,
+tests géométriques et validation physique avant toute valeur par défaut. Les
+jeux externes de conteneurs restent exclusivement globaux conformément à
+ADR-0064 ; les overrides asset, plateau et livret restent inchangés.

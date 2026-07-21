@@ -553,3 +553,27 @@ défilement. La barre Créer et la ligne Plateaux et livrets sont collantes sous
 l’en-tête ; leur offset est mesuré dynamiquement pour suivre les retours à la
 ligne responsifs. Les notifications sont des toasts transitoires : 3 secondes
 pour une confirmation, 6 secondes pour un avertissement ou une erreur.
+
+
+## P64-A02 — UX cible du calcul étagé
+
+Après la future gate P64-L03V, l'édition ne déclenchera plus un solve global
+complet. Chaque carte de conteneur pourra afficher discrètement un état local :
+à jour, en analyse, possibilités disponibles ou à recalculer. Les détails
+expert — variantes, score décomposé, compatibilité sous-plateau et raisons de
+rejet — restent dans un champ replié par défaut.
+
+Calculer l'agencement devient l'action primaire visible quand la source est
+valide et le plan global absent ou obsolète. Finaliser le volume apparaît
+seulement après un solve certifié. Ses familles — expansion, cales, hybride ou
+réserve utile — sont séparées de ses objectifs de répartition — simple,
+équilibré ou proportionnel.
+
+Dans une vue de conteneur finalisé, Remplir avec un asset ou Ajouter un conteneur
+n'apparaît que si la CapacityOpportunityMap courante offre une action compatible.
+Le second exige une BoxReserveBay. L'UI annonce toujours si l'action conservera
+les poses monde ou relancera le solve global. Elle ne crée rien sans confirmation
+et ne matérialise jamais en arrière-plan.
+
+Jusqu'à P64-L03V, le cycle réactif 0.1.55 reste le comportement réel ; cette
+section décrit une cible, pas une fonctionnalité disponible.

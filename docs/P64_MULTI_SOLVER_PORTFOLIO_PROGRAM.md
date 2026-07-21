@@ -475,3 +475,30 @@ Le chemin P64-H04 à P64-H08 est terminé seulement si :
 - l'UI conserve focus, sélection, autosave et matérialisation explicite ;
 - la gate corrective P64-V2H02 est positive dans Fusion ;
 - `print-validated: false` reste explicite.
+
+
+## 16. Amendement P64-A02 — calcul étagé et réutilisation bornée
+
+ADR-0071 et ADR-0072 complètent ce programme sans retirer ses stratégies ni ses
+vérités. Le portefeuille global reste P64 ; les variantes locales et futures
+formes restent P45. Le cycle cible devient :
+
+source -> analyse locale -> solve global explicite -> finalisation explicite ->
+matérialisation.
+
+La frontière locale peut être préparée et scorée après une édition, mais le
+solve global ne part plus automatiquement lorsque P64-L03 aura franchi sa gate.
+Le moteur consomme progressivement plus de variantes que la shortlist visible et
+préserve stage_stack, EMS historique, greedy, beam, Auto et H03C. Les profils
+plus profonds restent des sur-ensembles ; aucun budget ne transforme une marge
+positive en disposition.
+
+Après finalisation, une carte de capacité dérivée peut accélérer une insertion
+locale. Elle ne remplace jamais les certificats. L'ajout d'un asset conserve le
+placement monde seulement si l'enveloppe extérieure ne change pas ; l'ajout d'un
+conteneur exige une baie de boîte réservée, sinon le portefeuille global repart.
+
+Sources normatives :
+P64_STAGED_CALCULATION_AND_FINISHING_PROGRAM.md,
+P64_POST_SOLVE_CAPACITY_REUSE_CONTRACT.md, ADR-0071 et ADR-0072.
+La séquence active reste P64-V2H03V ; cet amendement n'ouvre aucun runtime.

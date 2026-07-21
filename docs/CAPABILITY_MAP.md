@@ -1408,3 +1408,22 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
   certifié, aucune forme P45, valeur physique, tolérance ou scène automatique.
 - Suite : observation humaine P64-V2H03V ; P44-V et P45 restent bloquées jusqu'au
   retour explicite.
+
+
+## Mise à jour P64-A02 — 2026-07-21
+
+- C-USABILITY / C-FUSION-UI : designed pour une boucle progressive où l'analyse
+  locale reste discrète, le solve global est une action primaire et la
+  finalisation une action séparée. Les résultats experts restent repliés.
+- C-ASSET / C-GEOMETRY : contracted pour des variantes locales certifiées, un
+  score explicable, des opportunités internes et des baies de boîte réservées.
+  P45 conserve les sémantiques et formes ; P64 conserve la combinaison globale.
+- C-SOLVER / C-LAYOUT : designed pour l'élargissement progressif de frontières,
+  sans limite moteur top 3 et sans retrait des lanes historiques.
+- C-QUALITY : contracted pour états explicites, digests par entité, invalidation
+  minimale, réponses stale refusées, certificats local/global/finalisation et
+  carte de capacité éphémère.
+- C-RESULT-TRUTH : aucune zone, marge ou score ne prouve la faisabilité. Une
+  insertion accélérée réutilise une pose, jamais un certificat ancien.
+- Validation : documentaire uniquement. Aucun runtime, schéma ou comportement
+  Fusion n'est implémenté ; P64-V2H03V reste ready-for-human-fusion-check.

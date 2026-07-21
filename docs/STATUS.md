@@ -2571,3 +2571,49 @@ matérialise rien. Validation : 571/571 tests, compileall, syntaxe JavaScript,
 frontière `adsk` et dry-run du préparateur passent. Seule l'observation humaine
 décrite dans `HUMAN_GATES.md` reste à faire ; aucune preuve Fusion ou physique
 n'est encore acquise.
+
+
+## P64-A02 — Calcul étagé, finalisation et capacité réutilisable (2026-07-21)
+
+Statut : done-documentation, architecture-accepted, runtime-not-started.
+fusion-validated: false ; print-validated: false.
+
+ADR-0071 fixe une boucle cible en cinq états. Les changements d'asset invalident
+son analyse et la frontière de son conteneur sans recalculer les autres
+conteneurs. Les changements de conteneur invalident sa frontière et le plan
+global sans réécrire les assets source. Les changements de boîte, réservations
+ou jeux externes globaux invalident le plan global ; leur effet local n'est
+recalculé que si une contrainte locale en dépend réellement. Chaque résultat
+porte un digest de source et les réponses obsolètes sont rejetées.
+
+L'analyse locale cible peut explorer intensivement des variantes rectangulaires
+certifiables, les classer par score décomposé et exposer quelques représentants.
+Le top 3 est seulement une vue compacte ; la recherche globale élargit
+progressivement la frontière sous les profils d'effort existants. Les voies
+stage_stack, EMS historique, greedy, beam et variantes H03C restent préservées.
+Un budget épuisé reste no_solution_within_budget.
+
+Le solve global et la finalisation sont séparés. La finalisation pourra choisir
+l'expansion simple, une répartition équilibrée absolue, une répartition
+proportionnelle relative, une réserve utile ou des cales explicites. Seul un plan
+finalisé et recertifié devient matérialisable. Le comportement 0.1.55 reste
+inchangé jusqu'à P64-L03 et sa gate Fusion.
+
+ADR-0072 accepte deux classes de capacité post-solve : InternalOpportunityZone,
+surplus solide convertible à l'intérieur d'une enveloppe extérieure inchangée,
+et BoxReserveBay, volume monde volontairement laissé disponible pour un futur
+conteneur. La CapacityOpportunityMap est une mémoire courte dérivée, liée aux
+digests du projet, du plan global et de la finalisation. Elle n'est ni persistée
+comme source d'autorité ni transformée automatiquement en objet.
+
+Une insertion locale peut éviter une nouvelle recherche de placement global
+seulement si l'enveloppe extérieure et la pose monde restent identiques. Elle
+doit néanmoins reconstruire le certificat local, le certificat global et la
+finalisation. Un nouveau conteneur autonome est réutilisable uniquement dans une
+BoxReserveBay certifiée ; sinon un solve global est obligatoire.
+
+Fichiers canoniques :
+docs/P64_STAGED_CALCULATION_AND_FINISHING_PROGRAM.md,
+docs/P64_POST_SOLVE_CAPACITY_REUSE_CONTRACT.md, ADR-0071 et ADR-0072.
+Aucun schéma, default, valeur physique, tolérance, géométrie, scène ou résultat
+du cas dense n'est modifié par P64-A02. P64-V2H03V reste l'action active.

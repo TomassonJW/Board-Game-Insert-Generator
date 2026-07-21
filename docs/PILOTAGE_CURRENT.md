@@ -90,3 +90,32 @@ dans BACKLOG.md. Ajouter ensuite le fait vérifiable à STATUS.md,
 CAPABILITY_MAP.md, ROADMAP.md et au journal, sans recopier le récit complet.
 Ne jamais effacer une preuve historique : la lier, l'archiver ou la marquer
 comme supersédée.
+
+
+## Amendement P64-A02 — boucle étagée et capacité réutilisable (2026-07-21)
+
+L'arbitrage produit est accepté comme architecture future, sans modifier le
+runtime 0.1.55. ADR-0071 remplace la cible « tout recalculer après chaque
+édition » par cinq états explicites : source, analyse locale, agencement global,
+plan finalisé et scène matérialisée. Les analyses locales rapides peuvent se
+mettre à jour par asset ou conteneur ; le solve global et la finalisation restent
+deux actions utilisateur distinctes.
+
+ADR-0072 accepte une carte de capacité post-solve strictement éphémère. Elle
+distingue les opportunités internes, situées dans l'enveloppe finale d'un
+conteneur existant, des baies de boîte volontairement réservées pour un futur
+conteneur autonome. Une zone libre technique ou un EMS résiduel n'est jamais
+promu implicitement en réserve utile.
+
+Documents d'autorité ajoutés :
+
+- P64_STAGED_CALCULATION_AND_FINISHING_PROGRAM.md : états, invalidation, scores,
+  UX, finalisation et séquence L01 à F03 ;
+- P64_POST_SOLVE_CAPACITY_REUSE_CONTRACT.md : détection, mémoire courte,
+  insertion locale, recertification et séquence C01 à CV ;
+- ADR-0071 et ADR-0072 : décisions structurantes et alternatives refusées.
+
+P64-A02 est done-documentation et architecture-accepted. Aucune carte runtime
+nouvelle n'est active : P64-V2H03V reste l'unique prochaine gate, P44-V/P45/P46
+restent verrouillées, le cas dense 11 × 34 reste no_solution_within_budget et
+print-validated reste false.

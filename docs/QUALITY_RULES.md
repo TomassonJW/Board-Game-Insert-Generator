@@ -243,3 +243,28 @@ Les validations P64 doivent couvrir au minimum :
 Les régressions P64-H04+ couvrent corpus simple/dense, déterminisme, budgets,
 annulation, validation commune, non-collision, appui, retrait, réservations,
 zéro corps automatique et parité du baseline.
+
+
+## Règles P64-A02 — calcul étagé et capacité
+
+- Chaque analyse locale, plan global, finalisation et carte de capacité cite les
+  digests exacts de ses entrées.
+- Une réponse stale ne modifie aucun état visible et ne devient jamais
+  matérialisable.
+- Une shortlist UI, y compris top 3, ne limite jamais silencieusement la
+  frontière consommable par le solveur.
+- Un score classe uniquement des variantes déjà certifiées ; ses composantes
+  restent exposables séparément et aucune somme ne masque une contrainte dure.
+- Modifier un asset n'invalide pas les autres conteneurs sans dépendance réelle ;
+  modifier un conteneur ne réécrit jamais ses assets source.
+- Un plan global certifié n'est pas matérialisable avant finalisation explicite
+  lorsque le nouveau cycle P64-L03 est actif.
+- Une finalisation échouée conserve le plan global certifié et ne devient ni
+  impossible ni no_solution_within_budget.
+- InternalOpportunityZone, BoxReserveBay et CapacityOpportunityMap restent des
+  données dérivées non imprimables.
+- Réutiliser une pose monde ne réutilise jamais un ancien certificat.
+- Sans BoxReserveBay certifiée, ajouter un conteneur impose un solve global.
+- Aucun asset, séparateur, conteneur, corps ou cale n'est créé automatiquement.
+- Les gates Fusion et impression restent distinctes ; aucune valeur physique
+  n'est calibrée par une observation UI.

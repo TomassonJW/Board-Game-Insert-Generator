@@ -368,3 +368,36 @@ canonique et avant tout solveur global. Aucun chemin public ne l'importe dans
 H03B. Elle porte snapshots immuables, producteurs, digest, certificat local et
 Pareto. Le producteur canonique reste primaire ; les doublons correctifs
 deviennent des alias de provenance. Le cœur reste sans `adsk`.
+
+
+## Pipeline cible P64-A02 — calcul étagé
+
+ADR-0071 ajoute une machine d'état au pipeline produit sans déplacer la logique
+dans Fusion :
+
+projet source -> analyses locales certifiées -> agencement global certifié ->
+plan finalisé certifié -> CAD IR -> scène Fusion.
+
+Les analyses locales sont indexées par digest d'asset, de conteneur et de
+contraintes pertinentes. Elles sont réutilisables tant que leurs dépendances ne
+changent pas. Le plan global cite chaque variante locale retenue ; la
+finalisation cite le plan global ; la CAD IR cite la finalisation. Une réponse
+dont le digest source n'est plus courant est rejetée à chaque frontière.
+
+Le solve global reste l'unique propriétaire des poses monde et des jeux externes.
+La finalisation peut étendre des faces autorisées ou préserver une réserve, mais
+elle ne modifie ni cavités, ni minima, ni topologie fonctionnelle. Fusion reste
+un adaptateur de projection et de matérialisation explicite.
+
+## Carte de capacité dérivée P64-A02
+
+ADR-0072 place CapacityOpportunityMap après la finalisation. Une
+InternalOpportunityZone décrit de la matière potentiellement reconvertible à
+l'intérieur d'un corps existant ; une BoxReserveBay décrit un volume monde
+intentionnellement préservé. Ni l'une ni l'autre n'est un corps, une cavité, un
+EMS autoritaire ou une source projet.
+
+La carte est éphémère, liée aux digests source/global/final. Une insertion locale
+crée une nouvelle révision de projet puis traverse à nouveau dérivation locale,
+certificat global et finalisation. Le chemin accéléré évite seulement la
+recherche de nouvelles poses ; il n'évite jamais la validation.

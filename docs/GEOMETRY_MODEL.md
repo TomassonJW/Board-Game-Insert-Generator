@@ -525,3 +525,22 @@ globale ; les miroirs restent distincts.
 Le certificat vérifie couverture, invariants de contenus, valeurs physiques,
 géométrie finie, cloisons, non-recouvrement, enveloppe serrée, axes Fixe,
 absence de corps automatique et digest. Cible reste préférentiel et Auto libre.
+
+
+## P64-A02 — géométrie des capacités dérivées
+
+InternalOpportunityZone est une AABB ou union orthogonale conservatrice située
+dans l'enveloppe extérieure finale d'un conteneur. Elle décrit du surplus solide
+qui pourrait être reconverti par une nouvelle dérivation P45. Elle n'est pas une
+cavité existante et ne doit pas être soustraite par Fusion à sa seule présence.
+
+BoxReserveBay est une région monde explicitement volontaire, extérieure aux
+corps imprimables et intérieure à l'enveloppe utile de boîte. Elle doit respecter
+jeux globaux, réservations, accès et insertion. Un EMS, un canal technique ou un
+résiduel fortuit ne devient jamais une BoxReserveBay sans décision de
+finalisation et certificat.
+
+Les deux classes portent bornes, repère, provenance, contraintes admissibles et
+digests. Elles ne possèdent ni forme ergonomique, ni asset, ni conteneur. P45
+reste propriétaire de la géométrie locale créée après une action utilisateur ;
+P64 vérifie ensuite la compatibilité monde.

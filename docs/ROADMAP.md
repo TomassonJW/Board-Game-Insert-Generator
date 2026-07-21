@@ -873,3 +873,43 @@ la non-régression `stage_stack`, sans scène automatique.
 La trajectoire attend maintenant l'observation humaine H03V. Elle ne valide ni
 le cas dense, ni une valeur physique, ni P45, ni l'impression. Aucune mission
 runtime suivante n'est ouverte avant le retour explicite.
+
+
+## P64-A02 — Trajectoire de calcul étagé et capacité réutilisable (2026-07-21)
+
+P64-A02 ajoute une trajectoire contractuelle sans court-circuiter la gate H03V.
+Le produit cible ne relance plus silencieusement tout le solveur après chaque
+frappe. Il maintient des analyses locales cachables, lance l'agencement global
+sur action explicite, puis finalise séparément le volume restant avant
+matérialisation.
+
+### Macro-phase L — calcul incrémental et solve explicite
+
+- L01 introduit les états, digests, dépendances et caches sans modifier encore
+  l'UX publique ;
+- L02 produit les frontières locales, scores décomposés, compatibilité
+  sous-plateau et shortlist repliée ;
+- L03 rend le solve global explicite et introduit le plan finalisable ;
+- L03V observe dans Fusion la stabilité, les invalidations et l'absence de scène
+  automatique.
+
+### Macro-phase F — finalisation choisie
+
+- F01 distribue simplement le résiduel autour des enveloppes, avec fallback exact ;
+- F02 ajoute équilibrage absolu et proportion relative, puis l'harmonisation
+  modulaire si P45/P46 l'autorisent ;
+- F03 propose des cales explicites seulement après données physiques suffisantes.
+
+### Macro-phase C — capacité post-solve réutilisable
+
+- C01 détecte et affiche en lecture seule les opportunités internes et baies
+  réservées ;
+- C02 permet une insertion locale d'asset lorsque l'enveloppe monde ne change
+  pas, puis recertifie tout le plan ;
+- C03 permet un nouveau conteneur seulement dans une baie de boîte réservée ;
+- CV vérifie les parcours Fusion, le fallback vers solve global et l'absence de
+  création automatique.
+
+Séquence : H03V et sa clôture, P44-V, P45-M001, L01, L02, L03/L03V, P45/P46,
+F01, F02, C01/C02, F03, C03/CV. Cette séquence peut être replanifiée par une ADR
+ultérieure, mais aucune carte runtime n'est ouverte par P64-A02.

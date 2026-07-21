@@ -248,3 +248,28 @@ Le portefeuille canonique, greedy, EMS historique et beam reste inchangé.
 H03C devra adapter les références aux états free-3D, conserver les lanes avant
 le fallback et appliquer le certificat global. Les caps globaux sont présents
 mais non consommés dans H03B.
+
+
+## Cible P64-A02 — préparation locale et solve explicite
+
+Le calcul local automatique n'est pas un solve global miniature. Il construit
+pour le conteneur touché une frontière certifiée et un score explicable. Les
+bornes globales réactives autorisées sont seulement des conditions nécessaires
+rapides : volume, axes, hauteur et compatibilités évidentes. Elles ne publient
+jamais une solution.
+
+L'action globale consomme les frontières avec élargissement progressif. Le top 3
+de la palette est une sélection représentative, pas l'ensemble exploré. Les
+profils Rapide, Normal et Approfondi conservent des domaines préfixés et
+monotones. Stage_stack, EMS historique, greedy, beam, portfolio Auto et H03C
+restent des lanes distinctes et observables.
+
+Le solve s'arrête sur un agencement certifié, pas sur une boîte remplie.
+L'étape de finalisation applique ensuite simple, équilibré absolu,
+proportionnel relatif, réserve utile ou cales explicites selon les missions
+autorisées. Un échec de finalisation restitue le plan global et n'est pas
+reclassé en impossibilité de placement.
+
+La réutilisation post-solve est un chemin d'incrémentalité, pas une nouvelle
+heuristique de vérité. Elle peut figer les poses monde existantes, puis doit
+rejouer les certificats avec la nouvelle source.

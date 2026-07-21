@@ -202,3 +202,10 @@ Tests, cartes backlog ou gates humaines a preparer.
 - ADR-0070-internal-container-variant-ownership.md - propriété P45 des
   sémantiques locales, frontière de variantes certifiées et sélection globale
   bornée par P64.
+
+- ADR-0071-staged-local-analysis-explicit-solve-and-finalization.md - calculs
+  locaux réactifs, solve global explicite et finition séparée avant
+  matérialisation.
+- ADR-0072-post-solve-capacity-maps-and-bounded-reuse.md - carte éphémère des
+  opportunités internes et baies réservées, avec réutilisation bornée et
+  recertification obligatoire.
