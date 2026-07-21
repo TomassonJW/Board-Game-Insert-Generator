@@ -1,67 +1,106 @@
 # Next Actions
 
-Dernière mise à jour : 2026-07-21
+Dernière mise à jour : 2026-07-22
 
 ## Version active
 
-V0.1 reste `mvp-accepted`, `fusion-validated: true` et
-`print-validated: false` pour son périmètre historique. P64-V2H03V et P44-V
-sont fermées dans Fusion 0.1.55.
+V0.1 reste `mvp-accepted`, `fusion-validated: true` pour son périmètre
+historique et `print-validated: false`. La surface MVP reste exclusivement
+l’add-in Fusion 360.
 
-P64-L01, P64-L02 et P64-L03 restent `automated-validated` pour l'état
-incrémental, l'analyse locale et le retrait du solve global automatique.
-P64-L03V est un KO contextuel sur Fusion 0.1.56 : la séparation des actions est
-visible, mais le solve agrandit déjà les enveloppes et la finalisation ne
-transforme rien. La mise à jour d'une scène existante peut aussi rester masquée
-par un ancien digest.
+P64-L03R-B et P64-L03R-C sont `automated-validated`. L’observation exploratoire
+du package 0.1.57 confirme une forte amélioration du plan minimal, mais ne
+constitue pas le retour formel `P64-L03R-V Fusion OK`. Elle a révélé trois
+suites distinctes, formalisées par ADR-0075 et le contrat P64-L04 :
 
-ADR-0074 et P64-L03R-A sont `architecture-accepted`. P64-L03R-B et
-P64-L03R-C sont `implemented-core` et `automated-validated`. C branche le plan
-minimal sur la CAD IR, la palette et le remplacement borné de scène ; aucune
-observation Fusion n'est encore revendiquée.
+- réutiliser localement une enveloppe déjà placée ;
+- rendre Approfondi anytime, borné et jamais moins utile que l’incumbent Normal ;
+- rendre visibles les opérations longues sans faux pourcentage.
+
+P64-L04A est `implemented-core`, `implemented-fusion-bridge`,
+`implemented-fusion-ui` et `automated-validated` dans le package 0.1.58.
+`fusion-validated: false`, `print-validated: false`.
 
 ## Dernier état réel
 
-- les dimensions et variantes locales restent réactives sans solve global ;
-- `Calculer` consomme désormais le `minimal_layout` certifié de L03R-B ;
-- la CAD IR minimale conserve les enveloppes exactes et le résiduel non
-  distribué ;
-- `minimal_layout` est matérialisable avant toute finalisation ;
-- aucune méthode réelle de finition n'est livrée dans C ;
-- l'identité de scène compare `artifact_kind`, les digests du plan, de
-  l'artefact et de la CAD IR, ainsi que `source_revision` ;
-- une scène ambiguë est refusée avant suppression, et une scène détenue par BGIG
-  peut être remplacée sans viser les objets utilisateur ;
-- le package de gate corrective est 0.1.57 ;
+- une édition continue de recalculer uniquement ses dérivations locales ;
+- si le conteneur modifié peut être recertifié dans l’enveloppe exacte déjà
+  placée, un nouveau `minimal_layout` devient courant sans recherche globale ;
+- les poses monde, orientations, dimensions extérieures et corps restent
+  identiques ; les cavités existantes sont conservées lorsque possible ;
+- un fallback peut choisir une variante locale déjà certifiée de même enveloppe,
+  sans déplacer le conteneur ;
+- un échec laisse l’ancien aperçu obsolète et demande explicitement
+  `Calculer l’agencement minimal` ;
+- toute CAD IR ou scène précédente devient désynchronisée ; aucune scène n’est
+  modifiée automatiquement ;
+- la palette expose le succès local, le fallback global requis, le producteur,
+  les caps et les compteurs dans des détails repliés ;
+- Approfondi garde les lenteurs et régressions observées : L04A ne les masque
+  pas et ne modifie aucun budget de solveur ;
+- l’indication d’attente pendant calcul et matérialisation reste absente ;
 - le cas dense 11 × 34 reste `no_solution_within_budget`.
 
 ## Prochaine action recommandée
 
-### P64-L03R-V — Gate Fusion corrective 0.1.57
+### P64-L04B — Approfondi anytime, incumbent Normal et deadline stricte
 
-Aucun nouveau lot de code n'est ouvert avant cette observation humaine. Le
-package doit être préparé par
-`scripts/fusion/prepare_p64_l03r_v_corrective_test.ps1`, puis Thomas vérifie dans
-Fusion :
+Objectif : rendre l’effort Approfondi utile sans perdre une solution déjà
+certifiée par le préfixe Normal et sans timeout interminable.
 
-1. une édition locale ne lance aucun solve global et ne modifie aucune scène ;
-2. `Calculer l'agencement minimal` conserve les dimensions minimales et montre
-   le résiduel non imprimé ;
-3. `Matérialiser les volumes minimaux` fonctionne sans finalisation ;
-4. une nouvelle édition laisse l'ancienne scène visible mais désynchronisée ;
-5. le nouveau calcul expose `Mettre à jour la scène` ;
-6. la mise à jour conserve exactement une racine BGIG et un objet utilisateur
-   témoin non tagué ;
-7. l'identité technique contient les cinq champs contractuels exacts.
+Avant code, préciser le contrat de budget et d’arrêt, puis implémenter un lot
+borné qui garantit :
 
-Retour attendu : `P64-L03R-V Fusion OK 0.1.57 - commit <sha>`, ou KO contextuel
-avec projet, étape, statut visible et diagnostic. Cette gate ne valide ni valeur
-physique ni impression.
+1. Rapide reste préfixe de Normal et Normal préfixe d’Approfondi ;
+2. le meilleur plan Normal certifié devient l’incumbent initial ;
+3. chaque lane Deep améliore ou conserve cet incumbent ;
+4. une deadline stricte et un arrêt coopératif conservent le meilleur résultat ;
+5. un timeout Deep ne transforme jamais une solution Normal en
+   `no_solution_within_budget` ;
+6. budgets, temps, lanes tentées, incumbent et raison d’arrêt restent
+   observables ;
+7. aucun changement de schéma, valeur physique, finalisation ou scène ;
+8. le cas dense ne reçoit aucune nouvelle revendication sans certificat.
 
-Contrat :
-`docs/P64_L03R_MINIMAL_LAYOUT_AND_MATERIALIZATION_CONTRACT.md`.
-Preuve automatisée d'entrée :
-`docs/P64_L03R_C_DUAL_MATERIALIZATION_EVIDENCE.md`.
+Autorité :
+`docs/DECISIONS/ADR-0075-pre-final-local-layout-reuse.md` et
+`docs/P64_L04_INCREMENTAL_LOCAL_REUSE_CONTRACT.md`.
+
+## Lot suivant déjà consigné
+
+### P64-L04C — Attente et progression UX honnêtes
+
+Après L04B, ajouter une activité immédiate pour analyse, calcul, finalisation et
+matérialisation, avec étape courante et temps écoulé. Ne pas inventer de
+pourcentage. Bloquer les doubles lancements ; n’exposer Annuler que pour les
+opérations réellement coopératives.
+
+## Gate humaine différée
+
+### P64-L04V — Parcours incrémental et opérations longues
+
+La prochaine revue Fusion est regroupée après L04B et L04C. Elle devra observer
+le plan minimal, l’insertion locale sans mouvement monde ni solve global, le
+fallback explicite, la scène désynchronisée puis remplacée sans doublon, et le
+retour d’activité des opérations longues.
+
+Le retour formel futur sera défini par le préparateur L04V. D’ici là, ne
+revendiquer ni `fusion-validated` pour P64-L04, ni impression réelle.
+
+## Lots verrouillés
+
+- P64-F01A02 et F02A02 restent séparés : ils possèdent la finalisation du volume ;
+- P64-C01/C02 restent post-finalisation et ne doivent pas absorber L04A ;
+- P45 conserve formes, intentions et certificat local ;
+- P46, P47-P50, P67-P69 et les valeurs physiques restent hors scope ;
+- aucune résolution du cas dense n’est implicite.
+
+## Fin de chaque mission
+
+Mettre à jour le pilotage, relire le diff, exécuter les preuves, committer puis
+intégrer directement dans `main` lorsqu’aucune vraie gate humaine n’est active.
+Une gate Fusion ne vaut jamais impression.
+
 
 ## Repères historiques conservés
 
@@ -72,23 +111,3 @@ Preuve automatisée d'entrée :
   `fusion-validated` ;
 - `P64-V2H03V Fusion OK 0.1.55` ;
 - `P44-V Fusion OK 0.1.55 - commit 70d45c6`.
-
-## Lots suivants, non ouverts
-
-1. P64-L03R-V : gate Fusion corrective active ;
-2. P64-F01A02 seulement après une L03R-V positive et ses dépendances ;
-3. P64-F02A02, C01-C03 et F03 selon leurs dépendances ;
-4. P45 runtime, P46 et P47-P50 restent séparés et verrouillés.
-
-## Séquence verrouillée
-
-Une seule étape est active : P64-L03R-V, gate humaine sans nouvelle mission de
-code. P45 conserve les variantes/formes locales ; P64 conserve le placement
-global. Aucune transformation de finition, valeur physique ou migration de
-schéma n'est ouverte avant le retour de gate.
-
-## Fin de chaque mission
-
-Mettre à jour le pilotage, relire le diff, exécuter les preuves, committer puis
-intégrer directement dans main lorsqu'aucune vraie gate humaine n'est ouverte.
-Une gate Fusion ne vaut jamais impression.

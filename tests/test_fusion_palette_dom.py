@@ -637,5 +637,26 @@ class FusionPaletteDomTests(unittest.TestCase):
         for marker in ("0.1.54", "function capacityCard", "PARTITION_CAPACITY_SCHEMA_V1", "function topViewY(item,box)", "P64-V2H02R Fusion OK"):
             self.assertIn(marker, script)
 
+    def test_exposes_p64_l04a_local_reuse_feedback_without_fake_progress(self) -> None:
+        for marker in (
+            "localReuse.status==='placement_reused'",
+            "Élément intégré localement",
+            "Placement global conservé",
+            "mis à jour localement",
+            "Détails de la recertification",
+            "global_solver_invocation_count",
+            "max_search_states_per_container",
+            "max_positions_per_cavity",
+            "localReuse.stop_reason",
+            "localReuse.source_plan_digest",
+            "localReuse.result_plan_digest",
+            "Le plan courant ne peut pas être conservé après cette modification",
+        ):
+            self.assertIn(marker, self.markup)
+        self.assertIn(
+            "action==='validate_project'&&(localReuse.status==='global_solve_required'||payload.staged_calculation?.minimal_layout?.status==='stale')",
+            self.markup,
+        )
+        self.assertNotIn("localReuse.percentage", self.markup)
 if __name__ == "__main__":
     unittest.main()

@@ -1020,6 +1020,21 @@ ambiguë est bloquée avant suppression ; une scène BGIG possédée peut être
 remplacée et les objets utilisateur restent hors de la portée d'effacement. Ces
 comportements sont `automated-validated`, pas observés dans Fusion.
 
-La prochaine étape est P64-L03R-V sur le package 0.1.57. F01A02 reste verrouillé
-jusqu'à une gate positive. Aucun résultat dense, valeur physique, schéma ou
-budget ne change ; `print-validated: false`.
+L’observation exploratoire du package 0.1.57 est positive avec réserves mais ne
+vaut pas une gate formelle. ADR-0075 et P64-L04 reprennent la réutilisation
+locale, la fiabilité d’Approfondi et l’attente UX avant une gate combinée L04V.
+Aucun résultat dense, valeur physique, schéma ou budget ne change ;
+`print-validated: false`.
+
+## P64-L04A — Réutilisation locale livrée (2026-07-22)
+
+ADR-0075 remplace la gate L03R-V isolée par une trajectoire corrective en quatre
+lots. L04A est livré et validé automatiquement : une édition interne peut
+recertifier le conteneur dans son enveloppe et sa pose monde existantes, sans
+recherche globale ni finalisation. Un refus reste explicite et fail-closed.
+
+L04B doit rendre Approfondi anytime sous deadline stricte en conservant
+l’incumbent Normal. L04C ajoutera activité, étape et temps écoulé sans faux
+pourcentage. L04V regroupera ensuite la prochaine observation Fusion. Les lots
+F01A02/F02A02 de finalisation et C01/C02 post-finalisation restent verrouillés
+jusqu’à cette trajectoire et leurs dépendances P45/P46 applicables.

@@ -1,4 +1,5 @@
 import json
+import sys
 from copy import deepcopy
 from pathlib import Path
 import tempfile
@@ -11,7 +12,6 @@ from board_game_insert_generator.project_v1 import blank_project_v1
 ROOT = Path(__file__).resolve().parents[1]
 ADDIN = ROOT / "fusion_addin" / "BoardGameInsertGenerator"
 
-import sys
 sys.path.insert(0, str(ADDIN))
 
 from palette_project import (  # noqa: E402
@@ -207,6 +207,110 @@ class FusionPaletteProjectTests(unittest.TestCase):
         self.assertIsNotNone(sizing["minimum_outer_dimensions_mm"])
         self.assertIsNone(sizing["calculated_outer_dimensions_mm"])
         self.assertFalse(response["saved"])
+
+    def test_validate_inserts_locally_without_reinvoking_global_solver(self) -> None:
+        project = blank_project_v1()
+        project["box"]["inner_dimensions_mm"] = {
+            "x": 120.0,
+            "y": 120.0,
+            "z": 30.0,
+        }
+        project["box"]["usable_height_mm"] = 30.0
+        project["container_groups"] = [
+            {
+                "id": "g",
+                "name": "Bac",
+                "wall_thickness_mm": 2.0,
+                "floor_thickness_mm": 2.0,
+            }
+        ]
+
+        def content(
+            identifier: str,
+            dimensions: tuple[float, float, float],
+        ) -> dict[str, object]:
+            return {
+                "id": identifier,
+                "name": identifier.upper(),
+                "shape_kind": "rectangle",
+                "dimensions_mm": dict(zip(("x", "y", "z"), dimensions)),
+                "quantity": 1,
+                "container_group_id": "g",
+                "content_clearance_mm": 0.0,
+                "measurement_confidence": "exact",
+            }
+
+        project["contents"] = [
+            content("a", (40.0, 40.0, 10.0)),
+            content("b", (10.0, 20.0, 10.0)),
+        ]
+        changed = deepcopy(project)
+        changed["contents"].append(content("c", (8.0, 16.0, 8.0)))
+        with tempfile.TemporaryDirectory() as temp_dir, patch.dict(
+            "os.environ",
+            {"BGIG_USER_DATA_DIR": temp_dir},
+        ):
+            solved = handle_palette_request(
+                request(
+                    "solve_project",
+                    project=project,
+                    solver_settings={"method": "auto", "effort": "quick"},
+                ),
+                ADDIN,
+                ROOT,
+            )
+            with patch(
+                "board_game_insert_generator.minimal_layout_solver.solve_minimal_layout",
+                side_effect=AssertionError("validate must not run the global solver"),
+            ):
+                reused = handle_palette_request(
+                    request(
+                        "validate_project",
+                        project=changed,
+                        solver_settings={"method": "auto", "effort": "quick"},
+                    ),
+                    ADDIN,
+                    ROOT,
+                )
+
+        self.assertIsNotNone(reused["partition"])
+        self.assertEqual(
+            reused["staged_calculation"]["local_reuse"]["status"],
+            "placement_reused",
+        )
+        self.assertEqual(
+            reused["staged_calculation"]["local_reuse"][
+                "global_solver_invocation_count"
+            ],
+            0,
+        )
+        self.assertNotEqual(
+            reused["partition"]["plan_digest"],
+            solved["partition"]["plan_digest"],
+        )
+        before = [
+            (
+                value["id"],
+                value["origin_mm"],
+                value["world_size_mm"],
+                value["rotation_deg_z"],
+            )
+            for value in solved["partition"]["placements"]
+        ]
+        after = [
+            (
+                value["id"],
+                value["origin_mm"],
+                value["world_size_mm"],
+                value["rotation_deg_z"],
+            )
+            for value in reused["partition"]["placements"]
+        ]
+        self.assertEqual(after, before)
+        self.assertEqual(reused["lifecycle"]["solved"], "current")
+        self.assertEqual(reused["result_view"]["artifact_kind"], "minimal_layout")
+        self.assertIsNone(reused["cad_build"])
+
     def test_solve_project_returns_the_minimal_layout_without_saving_implicitly(self) -> None:
         project = blank_project_v1()
         project["container_groups"] = [{"id": "g", "name": "Bac", "wall_thickness_mm": None, "floor_thickness_mm": None}]

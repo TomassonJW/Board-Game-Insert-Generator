@@ -47,8 +47,12 @@ preuves archivées.
 - P64-L03V est un KO contextuel 0.1.56 : expansion déjà réalisée au solve,
   finalisation sans transformation et mise à jour de scène mal détectée.
 - ADR-0074 et P64-L03R-A sont architecture-accepted ; P64-L03R-B et
-  P64-L03R-C sont `implemented-core`, `automated-validated`. La prochaine
-  étape est la gate humaine P64-L03R-V sur le package Fusion 0.1.57.
+  P64-L03R-C sont `implemented-core`, `automated-validated`.
+- L’observation exploratoire humaine du package 0.1.57 est positive avec
+  réserves, mais ne vaut pas le retour formel `P64-L03R-V Fusion OK`.
+- ADR-0075 et le contrat P64-L04 sont acceptés. P64-L04A est
+  `implemented-core`, `implemented-fusion-bridge`, `implemented-fusion-ui` et
+  `automated-validated` dans 0.1.58 ; P64-L04B devient la prochaine mission.
 
 ## Vue de séquence
 
@@ -80,7 +84,10 @@ preuves archivées.
 | Terminé — contrat | P64-L03R-A | ADR-0074 et contrat minimal/matérialisation duale acceptés. |
 | Terminé — automatisé | P64-L03R-B | Solve minimal multi-graines certifié, résiduel non attribué, sans finition ni scène. |
 | Terminé — automatisé | P64-L03R-C | Matérialisation minimale/finalisée, digests exacts et remplacement sûr de scène simulé. |
-| Gate humaine active | P64-L03R-V | Observer le plan minimal non rempli et le remplacement de scène dans Fusion 0.1.57. |
+| Revue exploratoire, non formelle | P64-L03R-V | Plan minimal prometteur observé dans 0.1.57 ; réserves reprises par L04, aucune promotion fusion-validated. |
+| Terminé — automatisé | P64-L04A | Insertion locale à enveloppe fixe, recertification globale sans solve et UX compacte dans 0.1.58. |
+| Prochaine mission | P64-L04B | Approfondi anytime, incumbent Normal et deadline stricte. |
+| Planifié | P64-L04C / L04V | Attente UX honnête, puis gate Fusion combinée. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -102,6 +109,12 @@ preuves archivées.
   portefeuille, couches locales, budgets et non-régression dense.
 - P64_L03R_C_DUAL_MATERIALIZATION_EVIDENCE.md : sélection duale, CAD IR,
   identité exacte et remplacement borné de scène.
+- P64_L04_INCREMENTAL_LOCAL_REUSE_CONTRACT.md : insertion pré-finalisation,
+  enveloppe fixe, caps, certificats, fallback et lots B/C/V.
+- P64_L04A_INCREMENTAL_LOCAL_REUSE_EVIDENCE.md : preuves cœur, staged, bridge
+  et DOM de localité sans solve global.
+- ADR-0075 : distinction L04A pré-finalisation / C02 post-finalisation et
+  séparation des corrections Approfondi / attente UX.
 - ADR-0074 : supersession partielle d'ADR-0071 après le KO Fusion 0.1.56.
 - STATUS.md : faits réalisés, validations et limites.
 - CAPABILITY_MAP.md : capability et niveau de preuve.
@@ -258,7 +271,25 @@ Le remplacement refuse toute scène BGIG ambiguë avant suppression et reste bor
 absence de doublon et préservation des objets utilisateur. Preuve :
 `docs/P64_L03R_C_DUAL_MATERIALIZATION_EVIDENCE.md`.
 
-P64-L03R-V est la prochaine gate humaine sur Fusion 0.1.57. C ne revendique
+À la clôture de L03R-C, P64-L03R-V était la prochaine gate humaine sur
+Fusion 0.1.57 ; ADR-0075 la supplante désormais par L04V. C ne revendique
 aucune observation Fusion ou impression, ne livre aucune méthode de finition et
 ne change ni solveur public, ni budget, ni schéma, ni valeur physique. Le cas
 dense 11 × 34 reste `no_solution_within_budget`.
+
+## P64-L04A — insertion locale pré-finalisation (2026-07-22)
+
+L’observation Fusion 0.1.57 reste exploratoire et ne vaut pas le retour formel
+L03R-V. ADR-0075 la supplante par L04A/B/C puis une gate combinée L04V.
+
+L04A conserve le plan monde et tente d’insérer les nouvelles cavités dans
+l’enveloppe exacte du conteneur déjà placé. Le plan source, les variantes locales
+et le plan reconstruit sont recertifiés ; aucun solve global, finaliseur ou
+adaptateur Fusion n’est appelé. Un refus laisse le plan stale et demande un
+calcul minimal explicite.
+
+Le cœur, le lifecycle staged, le bridge validate_project et la palette sont
+automated-validated dans le package 0.1.58. Une réussite crée un nouvel artefact
+minimal ; le plan finalisé et la scène précédente deviennent obsolètes sans
+mutation automatique. P64-L04B est la prochaine mission, puis L04C et L04V.
+fusion-validated: false, print-validated: false.

@@ -3,11 +3,13 @@
 Statut : architecture amendée ; P64-L01, P64-L02 et P64-L03 restent validés
 automatiquement pour leurs acquis. P64-L03V est un KO contextuel sur Fusion
 0.1.56. ADR-0074 et P64-L03R-A corrigent la frontière minimal/final ;
-P64-L03R-B est `implemented-core`, `automated-validated`.
+P64-L03R-B/C sont `automated-validated`. ADR-0075 est accepté ; P64-L04A est
+`automated-validated` et P64-L04B devient la prochaine mission.
 
 ADR historiques et amendement courant :
-[ADR-0071](DECISIONS/ADR-0071-staged-local-analysis-explicit-solve-and-finalization.md)
-et [ADR-0074](DECISIONS/ADR-0074-minimal-layout-seeds-and-dual-materialization.md).
+[ADR-0071](DECISIONS/ADR-0071-staged-local-analysis-explicit-solve-and-finalization.md),
+[ADR-0074](DECISIONS/ADR-0074-minimal-layout-seeds-and-dual-materialization.md)
+et [ADR-0075](DECISIONS/ADR-0075-pre-final-local-layout-reuse.md).
 ADR liées : ADR-0054, ADR-0056, ADR-0068, ADR-0069 et ADR-0070.
 
 Capability principale : `C-USABILITY`. Capabilities associées : `C-ASSET`,
@@ -510,7 +512,8 @@ P64-V2H03V retour humain
   -> P64-L03 / L03V contextual-KO
   -> P64-L03R-A
   -> P64-L03R-B
-  -> P64-L03R-C / L03R-V
+  -> P64-L03R-C
+  -> P64-L04A / L04B / L04C / L04V
   -> P45/P46 selon contrats
   -> P64-F01
   -> P64-F02
@@ -521,8 +524,9 @@ P64-V2H03V retour humain
 
 NEXT_ACTIONS.md reste autoritaire. P64-V2H03V et P44-V sont clôturées,
 P64-L01/L02/L03 restent automated-validated pour leurs acquis, P64-L03V est un
-KO contextuel et P64-L03R-B/P64-L03R-C sont automated-validated. P64-L03R-V est
-la gate humaine active. Les lots P45/P46 et de finition restent verrouillés.
+KO contextuel et P64-L03R-B/P64-L03R-C/P64-L04A sont automated-validated.
+P64-L04B est la prochaine mission ; L04V reste une gate future inactive. Les
+lots P45/P46 et de finition restent verrouillés.
 
 ## 21. Vérifications minimales futures
 
@@ -594,3 +598,21 @@ Les acquis L03 sur l'absence d'auto-solve, le stale fail-closed, la provenance
 et les budgets restent valides. Le cas dense 11 × 34 reste
 `no_solution_within_budget`. `fusion-validated: false`,
 `print-validated: false` pour la correction.
+
+## 24. Amendement P64-L04 — réutilisation locale avant finalisation
+
+ADR-0075 et le contrat P64-L04 supersèdent la fin de la séquence corrective
+historique de la section 23. L’observation Fusion 0.1.57 reste exploratoire : elle
+ne vaut ni retour formel L03R-V, ni promotion fusion-validated.
+
+P64-L04A recertifie un plan minimal à enveloppe et pose monde inchangées, sans
+solve global, finalisation ni mutation de scène. L04B possède le comportement
+Approfondi anytime et L04C le retour d’activité honnête. La prochaine gate
+humaine est L04V, regroupée seulement après leurs preuves automatisées.
+
+La séquence autoritaire devient : L03R-C, L04A, L04B, L04C, L04V, puis les
+dépendances P45/P46 applicables et P64-F01A02. P64-C01/C02 restent
+post-finalisation. NEXT_ACTIONS.md reste autoritaire pour le lot actif.
+
+Aucune valeur physique, forme P45, budget public, résultat dense, scène ou
+revendication d’impression ne change dans cet amendement.

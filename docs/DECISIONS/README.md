@@ -217,3 +217,7 @@ Tests, cartes backlog ou gates humaines a preparer.
 - ADR-0074-minimal-layout-seeds-and-dual-materialization.md - plan global
   strictement minimal, portfolio déterministe de graines/ancres/propagations,
   matérialisation minimale avant finition et identité exacte de scène Fusion.
+
+- ADR-0075-pre-final-local-layout-reuse.md - réutilisation pré-finalisation à
+  enveloppe fixe, recertification monde sans solve global et séparation des
+  lots Deep anytime / attente UX.

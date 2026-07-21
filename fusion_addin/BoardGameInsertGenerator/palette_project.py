@@ -347,7 +347,14 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
     partition: dict[str, object] | None = None
     artifact_selection: dict[str, object] | None = None
     artifact_kind = str(request.get("artifact_kind") or "minimal_layout")
-    if action == "solve_project":
+    if (
+        action == "validate_project"
+        and staged_calculation.get("local_reuse", {}).get("status")
+        == "placement_reused"
+    ):
+        partition = staged_session.current_minimal_partition()
+        staged_solver_result = _partition_solver_result(partition)
+    elif action == "solve_project":
         staged_action = staged_session.calculate_layout(
             request_id=request_id,
             request_revision=_request_revision(request),
@@ -372,7 +379,7 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         else None
     )
     if result_view is not None:
-        if action == "solve_project":
+        if action in {"solve_project", "validate_project"}:
             minimal_current = bool(
                 staged_calculation.get("minimal_layout", {}).get("placement_certified")
             )

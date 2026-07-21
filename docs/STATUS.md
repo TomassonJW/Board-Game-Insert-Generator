@@ -1,6 +1,6 @@
 # Status
 
-Derniere mise a jour : 2026-07-21
+Derniere mise a jour : 2026-07-22
 
 ## Etat global
 
@@ -8,7 +8,8 @@ Statut produit : **MVP V0.1 Fusion-only accepte ; validation d impression non ac
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P64-L03R-C est `automated-validated` ; P64-L03R-V est la prochaine gate humaine sur Fusion 0.1.57.
+Phase active : P64-L04A est `automated-validated` dans le package 0.1.58 ;
+P64-L04B est la prochaine mission. La gate Fusion combinée L04V reste inactive.
 P64-V2H03V et P44-V sont fusion-validated sur 0.1.55. P45-M001V est
 architecture-accepted. P64-L03V est un KO contextuel sur 0.1.56 et n'accorde
 aucune validation Fusion à la correction minimal/final.
@@ -2786,3 +2787,29 @@ Aucun solveur public historique, budget, schéma, valeur physique, tolérance,
 default, jeu, cavité ou résultat dense ne change. Le cas 11 × 34 reste
 `no_solution_within_budget`. P64-L03R-V devient `ready-human-gate` sur le package
 0.1.57. `fusion-validated: false`, `print-validated: false` pour la correction.
+
+## P64-L04A — Réutilisation locale pré-finalisation (2026-07-22)
+
+Statut : `implemented-core`, `implemented-fusion-bridge`,
+`implemented-fusion-ui`, `automated-validated` dans le package 0.1.58.
+
+Le producteur pur `incremental_fixed_envelope_v1` conserve les cavités existantes
+admissibles, insère les nouvelles cavités rectangulaires sous caps déterministes
+et peut sélectionner une variante locale certifiée de même enveloppe. Il vérifie
+le `plan_digest` source, rejoue le certificat minimal commun et garantit des poses
+monde inchangées sans invoquer la recherche globale.
+
+L’orchestrateur staged publie un nouvel artefact minimal courant après succès,
+rend toute finalisation `stale` et désynchronise CAD/scène. Le bridge
+`validate_project`
+renvoie ce plan sans solve ; la palette expose succès local ou recalcul global
+requis, avec détails repliés. Aucun remplissage, finalisation, corps automatique
+ou mutation de scène n’est effectué.
+
+Validation finale : 636/636 tests complets en 154,576 s ; 9/9 L04A, 22/22
+bridge, 34/34 DOM, Ruff, py_compile, node --check, compileall et frontière adsk
+OK. Le cas dense 11 × 34 reste `no_solution_within_budget`.
+
+P64-L04B est `ready` pour rendre Approfondi anytime et strictement borné ; L04C
+portera ensuite l’attente UX honnête, puis L04V la prochaine gate Fusion combinée.
+`fusion-validated: false`, `print-validated: false`.

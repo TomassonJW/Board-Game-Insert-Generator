@@ -941,3 +941,57 @@ Thomas doit observer :
 Retour attendu : `P64-L03R-V Fusion OK 0.1.57 - commit <sha>`, ou KO contextuel
 avec projet, étape, statut visible et diagnostic. Cette gate ne valide ni
 calibration physique, ni imprimabilité, ni impression réelle.
+
+
+## P64-L03R-V — observation exploratoire reprise par P64-L04
+
+Statut au 2026-07-22 : observation humaine réelle mais retour formel de gate non
+reçu. Le package 0.1.57 montre un plan minimal nettement plus prometteur et la
+séparation calcul / matérialisation est comprise. Les réserves portent sur la
+réutilisation locale, l’effort Approfondi et l’absence d’indication pendant les
+opérations longues.
+
+Cette observation ne doit pas être transformée en `P64-L03R-V Fusion OK` et ne
+promeut aucune capability en `fusion-validated`. ADR-0075 reprend les réserves
+dans P64-L04A/B/C. La prochaine gate Fusion est regroupée dans P64-L04V après
+les lots B et C ; l’ancien préparateur 0.1.57 reste une preuve historique.
+
+## P64-L04A — clôture automatisée sans revue humaine
+
+Statut : `implemented-core`, `implemented-fusion-bridge`,
+`implemented-fusion-ui`, `automated-validated`.
+
+Le lot tente une insertion ou modification locale dans l’enveloppe exacte d’un
+conteneur déjà placé, puis rejoue le certificat global sans recherche de
+placement. Un succès garde toutes les poses monde ; un échec rend l’ancien plan
+obsolète et demande un solve explicite. Toute scène reste inchangée et devient
+seulement désynchronisée.
+
+Aucune revue humaine n’est requise entre L04A et L04B : les invariants sont
+prouvables hors Fusion et la mission ne revendique aucune observation Fusion.
+Le package passe à 0.1.58 pour la future gate combinée.
+`fusion-validated: false`, `print-validated: false`.
+
+## P64-L04B / P64-L04C — aucune gate intermédiaire
+
+P64-L04B doit rendre Approfondi anytime sous deadline stricte et conserver
+l’incumbent Normal. P64-L04C doit exposer activité, étape et temps écoulé sans
+faux pourcentage. Ces lots sont automatisés séparément ; aucune installation ni
+revue humaine intermédiaire n’est exigée si leurs contrats et tests passent.
+
+## P64-L04V — future gate Fusion combinée
+
+Statut : `future-human-gate`, inactive jusqu’à L04B et L04C
+`automated-validated`.
+
+La gate devra observer au minimum :
+
+1. insertion locale réussie sans solve global ni déplacement de voisins ;
+2. fallback explicite lorsque l’enveloppe ne suffit pas ;
+3. plan minimal toujours non finalisé et matérialisable ;
+4. scène ancienne désynchronisée puis remplacée sans doublon ;
+5. activité immédiate, étape et temps écoulé pendant calcul et matérialisation ;
+6. absence de faux pourcentage et de double lancement ;
+7. identité technique et compteur global à zéro sur la voie locale.
+
+Cette gate ne valide ni valeur physique, ni imprimabilité, ni impression réelle.

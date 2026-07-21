@@ -452,3 +452,16 @@ La gate Fusion ne valide ni résistance, ni ergonomie, ni impression.
 - promesse de zéro recalcul ou de solubilité ;
 - changement de valeur physique, default ou tolérance ;
 - preuve Fusion ou impression sans observation correspondante.
+
+
+## 21. Distinction avec P64-L04A (2026-07-22)
+
+P64-L04A est désormais implémenté, mais ne constitue pas une implémentation de
+C01 ou C02. Il intervient sur un `minimal_layout` avant finalisation, utilise
+les cavités et variantes locales déjà certifiées et exige l’enveloppe exacte
+déjà placée. Il ne dérive aucune `CapacityOpportunityMap` et ne convertit aucun
+surplus finalisé.
+
+C01/C02 restent donc `planned-locked` avec leurs dépendances F01/F02. Toute
+preuve, action ou statut L04A doit rester séparé des cartes de capacité
+post-finalisation.

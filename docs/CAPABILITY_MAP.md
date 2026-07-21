@@ -1544,3 +1544,29 @@ séparation géométrique minimal/final ; ADR-0074 porte la correction.
   préservation d'objet utilisateur et altération CAD couvertes.
 - Suite : P64-L03R-V `ready-human-gate` sur Fusion 0.1.57.
   `fusion-validated: false`, `print-validated: false`.
+
+
+## Mise à jour P64-L04A — réutilisation locale certifiée
+
+- C-ASSET / C-GEOMETRY : un asset ajouté ou modifié peut être dérivé dans le
+  conteneur existant sans changer sa pose ni son enveloppe ; le producteur reste
+  rectangulaire et ne crée aucune nouvelle intention P45.
+- C-SOLVER / C-LAYOUT : `implemented-core`, `automated-validated` pour la
+  recertification d’un plan monde fixe. La recherche globale n’est pas appelée ;
+  un fallback de variante locale à enveloppe identique reste borné.
+- C-PROJECT-CONTRACT : nouvel artefact, révision, digests, provenance, budget,
+  compteurs et raisons d’arrêt ; le cache et le schéma projet ne deviennent pas
+  sources d’autorité.
+- C-FUSION-UI : `implemented-fusion-bridge`, `implemented-fusion-ui`,
+  `automated-validated` pour le succès local, le recalcul global requis et les
+  détails repliés. Une scène existante devient désynchronisée sans mutation.
+- C-RESULT-TRUTH : aucun espace visible n’est promu en garantie ; le certificat
+  local puis global décide. `unknown` n’est jamais promu.
+- C-QUALITY : insertion dans une poche, invariance monde, déterminisme, caps,
+  fallback même enveloppe, trop-grand fail-closed, nouvelle boîte/conteneur,
+  certificat altéré, lifecycle, bridge et DOM couverts.
+- Non livré : Deep anytime (L04B), attente UX (L04C), finalisation, capacité
+  post-finalisation C01/C02, forme P45, valeur physique, preuve Fusion ou
+  impression.
+- Suite : P64-L04B `ready`, puis L04C et L04V.
+  `fusion-validated: false`, `print-validated: false`.

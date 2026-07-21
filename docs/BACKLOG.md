@@ -2616,16 +2616,60 @@ P44-M007 est ready-for-explicit-go.
 
 ### P64-L03R-V — Gate Fusion corrective
 
-- Dépendances obtenues : L03R-B et L03R-C automated-validated.
-- Observer plan minimal non rempli, matérialisation avant finition, puis
-  recalcul et remplacement sûr de la scène.
-- Préparation : `scripts/fusion/prepare_p64_l03r_v_corrective_test.ps1`, package
-  0.1.57, objet témoin utilisateur et retour contextualisé.
-- Statut : ready-human-gate, active.
+- Observation réelle : package 0.1.57 prometteur, mais retour formel
+  `P64-L03R-V Fusion OK` non reçu.
+- Réserves : réutilisation locale absente, Approfondi trop lent et parfois moins
+  utile que Normal, attente UX insuffisante.
+- Effet : aucune promotion `fusion-validated` ; les réserves sont reprises par
+  ADR-0075 et P64-L04. La prochaine gate est regroupée dans L04V.
+- Statut : contextual-human-observation, superseded-by-P64-L04V.
+
+### P64-L04A — Réutilisation locale pré-finalisation à enveloppe fixe
+
+- Dépendances obtenues : L01/L02, L03R-B/C et ADR-0075.
+- Livré : producteur rectangulaire borné, conservation des cavités existantes,
+  insertion sur positions de contact, fallback vers une variante locale
+  certifiée de même enveloppe et certificat global rejoué sans recherche.
+- Lifecycle : nouvel artefact et nouvelle révision ; plan finalisé stale ; CAD
+  et scène désynchronisées ; aucun solve ou matérialisation automatique.
+- UX : succès local et solve global requis explicites, détails repliés avec
+  producteur, caps, compteurs, conteneurs et digests.
+- Preuve : `docs/P64_L04A_INCREMENTAL_LOCAL_REUSE_EVIDENCE.md`.
+- Statut : done-code, implemented-core, implemented-fusion-bridge,
+  implemented-fusion-ui, automated-validated, fusion-validated: false,
+  print-validated: false.
+
+### P64-L04B — Approfondi anytime et borné
+
+- Dépendance : P64-L04A.
+- Objectif : démarrer avec l’incumbent Normal, poursuivre les lanes Deep sous
+  deadline stricte et conserver le meilleur plan certifié à tout arrêt.
+- Acceptation : Deep ne régresse jamais une solution Normal en absence de
+  solution ; timeout, annulation, lanes, incumbent et raison d’arrêt sont
+  observables ; budgets publics historiques inchangés sauf contrat explicite.
+- Non-objectifs : géométrie locale, finalisation, scène, schéma, valeur physique
+  ou nouvelle revendication dense.
+- Statut : ready, next.
+
+### P64-L04C — Attente et progression UX honnêtes
+
+- Dépendance : P64-L04B.
+- Objectif : activité immédiate, étape courante et temps écoulé pour analyse,
+  calcul, finalisation et matérialisation.
+- Règles : aucun faux pourcentage, doubles lancements bloqués, annulation visible
+  seulement pour une opération réellement coopérative.
+- Statut : planned-ready-after-L04B.
+
+### P64-L04V — Gate Fusion combinée
+
+- Dépendances : P64-L04B et P64-L04C automated-validated.
+- Observer insertion locale sans solve ni déplacement monde, fallback explicite,
+  scène stale puis remplacée sans doublon, et attente UX honnête.
+- Statut : future-human-gate, inactive.
 
 ### P64-F01A02 — Finalisation simple autour des enveloppes
 
-- Dépendances : P64-L03R-V positive, P45/P46 selon leurs gates.
+- Dépendances : P64-L04V positive, P45/P46 selon leurs gates.
 - Objectif : répartir le volume admissible sur les faces extensibles sans
   modifier topologie, cavités, minima, jeux ou pose monde.
 - Acceptation : conservation, déterminisme, certificat de finalisation et
@@ -2654,9 +2698,11 @@ P44-M007 est ready-for-explicit-go.
   création d'objet, aucune revendication zéro recalcul.
 - Statut : planned-locked.
 
-### P64-C02 — Insertion locale d'asset et recertification
+### P64-C02 — Insertion locale post-finalisation et recertification
 
 - Dépendance : P64-C01.
+- Distinction : C02 consomme une opportunité post-finalisation C01 ; la
+  réutilisation pré-finalisation à enveloppe fixe appartient à L04A.
 - Objectif : permettre l'ajout confirmé d'un asset dans une opportunité interne
   si l'enveloppe extérieure et la pose monde restent inchangées.
 - Pipeline : nouvelle source, dérivation P45 locale, certificat local,
