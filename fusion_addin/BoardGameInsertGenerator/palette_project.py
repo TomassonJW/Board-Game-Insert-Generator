@@ -12,6 +12,7 @@ import json
 import os
 import re
 import sys
+from collections import OrderedDict
 from copy import deepcopy
 from pathlib import Path
 from typing import Any
@@ -32,6 +33,8 @@ SUPPORTED_ACTIONS = frozenset({
     "save_personal_preset", "delete_personal_preset",
     "import_personal_presets", "export_personal_presets", "save_solver_settings",
 })
+_LOCAL_ANALYSIS_ENGINE_LIMIT = 8
+_LOCAL_ANALYSIS_ENGINES: OrderedDict[tuple[str, str], object] = OrderedDict()
 
 
 class PaletteProjectError(ValueError):
@@ -296,6 +299,11 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         "summary": top_insets["summary"],
         "blockers": top_insets["blockers"],
     }
+    local_analysis = _contextual_local_analysis(
+        project,
+        addin_dir,
+        effort_profile=solver_settings["effort"],
+    )
     creation_presets = build_creation_presets(
         project,
         storage_height_mm=float(top_insets["design_top_z_mm"]),
@@ -409,6 +417,7 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         envelopes=envelopes,
         container_sizing=container_sizing,
         flat_stack=flat_stack,
+        local_analysis=local_analysis,
         partition=partition,
         result_view=result_view,
         solver_result=_partition_solver_result(partition),
@@ -433,6 +442,7 @@ def _response(
     envelopes: dict[str, object] | None = None,
     container_sizing: dict[str, object] | None = None,
     flat_stack: dict[str, object] | None = None,
+    local_analysis: dict[str, object] | None = None,
     partition: dict[str, object] | None = None,
     result_view: dict[str, object] | None = None,
     cad_build: dict[str, object] | None = None,
@@ -469,6 +479,7 @@ def _response(
         "envelopes": deepcopy(envelopes),
         "container_sizing": deepcopy(container_sizing),
         "flat_stack": deepcopy(flat_stack),
+        "local_analysis": deepcopy(local_analysis),
         "partition": deepcopy(partition),
         "result_view": deepcopy(result_view),
         "solver_result": deepcopy(solver_result),
@@ -483,6 +494,33 @@ def _response(
         "recovery_saved": recovery_saved,
     }
 
+
+
+def _contextual_local_analysis(
+    project: dict[str, object],
+    addin_dir: Path,
+    *,
+    effort_profile: str,
+) -> dict[str, object]:
+    """Reuse one bounded in-memory L01/L02 engine per local document and effort."""
+
+    from board_game_insert_generator.contextual_local_analysis import (
+        IncrementalLocalAnalysisEngine,
+    )
+
+    engine_key = (str(current_project_path(addin_dir).resolve()), effort_profile)
+    engine = _LOCAL_ANALYSIS_ENGINES.get(engine_key)
+    if engine is None:
+        engine = IncrementalLocalAnalysisEngine(
+            project,
+            effort_profile=effort_profile,
+        )
+        _LOCAL_ANALYSIS_ENGINES[engine_key] = engine
+        while len(_LOCAL_ANALYSIS_ENGINES) > _LOCAL_ANALYSIS_ENGINE_LIMIT:
+            _LOCAL_ANALYSIS_ENGINES.popitem(last=False)
+        return engine.snapshot()
+    _LOCAL_ANALYSIS_ENGINES.move_to_end(engine_key)
+    return engine.update_project(project)
 
 
 def _request_revision(raw_request: object) -> int | None:

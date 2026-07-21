@@ -1,4 +1,4 @@
-# Status
+﻿# Status
 
 Derniere mise a jour : 2026-07-18
 
@@ -2683,3 +2683,12 @@ Aucun schéma, UI, solveur, budget, valeur physique, CAD IR ou scène ne change.
 Le timer global P44-M007 reste actif jusqu'à L03/L03V. P64-L02 devient `ready`.
 Le cas dense 11 × 34 reste `no_solution_within_budget`.
 `fusion-validated: false`, `print-validated: false`.
+
+## P64-L02 — Analyse locale contextuelle et résumé progressif (2026-07-21)
+
+- Statut : implémenté, preuves automatisées disponibles dans docs/P64_L02_CONTEXTUAL_LOCAL_ANALYSIS_EVIDENCE.md.
+- Le cœur Python calcule des compatibilités fail-closed, des sous-scores explicables, une frontière Pareto déterministe et des représentants UX nommés.
+- Les bornes globales réactives sont strictement nécessaires et ne réalisent aucun placement global ni preuve de solution.
+- Le bridge conserve un moteur incrémental borné par projet et expose lifecycle, digests, provenance, budgets, recompute et reuse.
+- La palette Fusion présente un résumé compact puis des détails et options expertes repliés.
+- Validation Fusion : false. Validation impression : false. Le cas dense 11 × 34 reste no_solution_within_budget.

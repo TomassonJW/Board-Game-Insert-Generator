@@ -82,6 +82,31 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertNotIn('data-action="add-complement-preset"', self.markup)
         self.assertNotIn('id="complement-presets"', self.markup)
 
+    def test_local_analysis_is_progressive_and_does_not_limit_the_engine_frontier(self) -> None:
+        for marker in (
+            "function renderLocalAnalysis()",
+            "local_analysis?.containers",
+            "container-local-analysis",
+            "local-analysis-representatives",
+            "local-analysis-expert",
+            "visible_representatives",
+            "engine_frontier_count",
+            "pareto_variant_digests",
+            "aucun score total opaque",
+        ):
+            self.assertIn(marker, self.markup)
+        self.assertIn(
+            "renderContainerSizing();renderLocalAnalysis();",
+            self.markup,
+        )
+        self.assertNotIn(
+            "section.open=true",
+            self.markup[
+                self.markup.index("function renderLocalAnalysis()"):
+                self.markup.index("function displayedSizing")
+            ],
+        )
+
     def test_compacts_cards_as_dense_responsive_technical_rows(self) -> None:
         self.assertNotIn(".density-compact .row-details{display:none}", self.markup)
         for marker in (

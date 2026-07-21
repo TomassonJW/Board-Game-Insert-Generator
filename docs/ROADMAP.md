@@ -1,4 +1,4 @@
-# Roadmap
+﻿# Roadmap
 
 Cette roadmap decrit les phases macro jusqu'au produit cible. Le detail
 operationnel vit dans `docs/BACKLOG.md`, l'etat courant dans `docs/STATUS.md`,
@@ -961,3 +961,9 @@ finalisation et aucune scène ne changent. P64-L02 devient `ready` pour les
 annotations contextuelles, les sous-scores et le résumé progressif non limitant.
 L03/L03V reste propriétaire du retrait du solve automatique et de la gate
 Fusion. `print-validated: false`.
+
+## P64-L02 — Analyse locale contextuelle livrée (2026-07-21)
+
+- P64-L02 est implémenté au-dessus de P64-L01 sans modifier le solveur public, le schéma, les budgets ni les valeurs physiques.
+- La frontière Pareto moteur reste complète ; les trois représentants nommés sont une projection UX progressive et non normative.
+- P64-L03 est le prochain incrément recommandé : poursuivre le staged calculation program à partir des états et analyses observables désormais disponibles.

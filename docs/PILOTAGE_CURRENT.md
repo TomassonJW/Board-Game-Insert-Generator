@@ -42,7 +42,8 @@ preuves archivées.
   replié, contrôle canonique et absence de scène automatique sont observés.
 - Le cas dense 11 × 34 reste honnêtement `no_solution_within_budget` ; la gate
   ne le déclare ni soluble ni impossible.
-- P44-V est fusion-validated avec réserve de charge ; P45-M001V est acceptée ; P64-L01 est automated-validated et P64-L02 devient ready.
+- P44-V est fusion-validated avec réserve de charge ; P45-M001V est acceptée ;
+  P64-L01 et P64-L02 sont automated-validated ; P64-L03 devient ready.
 
 ## Vue de séquence
 
@@ -68,7 +69,8 @@ preuves archivées.
 | Terminé — gate Fusion | P44-V | Fusion OK 0.1.55 avec réserve de charge explicitement non observée. |
 | Terminé — décision | P45-M001V | Contrat accepté avec Pile / Basculer unifiés ; aucun runtime. |
 | Terminé — automatisé | P64-L01 | États, digests, invalidation ciblée, cache borné et stale fail-closed. |
-| Ready | P64-L02 | Annotations contextuelles, sous-scores et résumé progressif. |
+| Terminé — automatisé | P64-L02 | Annotations contextuelles, sous-scores, Pareto et résumé progressif non normatif. |
+| Ready | P64-L03 | Solve global explicite, finalisation staged et matérialisation séparée. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -81,6 +83,9 @@ preuves archivées.
   certificats, budgets, fixtures et découpage des variantes internes.
 - P64_V2H03B_LOCAL_VARIANT_EVIDENCE.md : mesures, caps et fixtures automatisées.
 - P64_V2H03C_GLOBAL_SELECTION_EVIDENCE.md : fallback, benchmarks, certificats et limites denses.
+- P64_L01_INCREMENTAL_STATE_EVIDENCE.md : identités, cache et invalidation.
+- P64_L02_CONTEXTUAL_LOCAL_ANALYSIS_EVIDENCE.md : annotations, scores, Pareto,
+  résumé progressif et absence de solve global.
 - STATUS.md : faits réalisés, validations et limites.
 - CAPABILITY_MAP.md : capability et niveau de preuve.
 - ROADMAP.md : trajectoire et verrouillage de version.
@@ -144,9 +149,9 @@ commun aux cartes et aux autres assets ; seul le sleeving reste spécialisé. Le
 côté choisi est le côté d'appui, Z ne change jamais sans action explicite, P45
 certifie les variantes locales et P64 choisit globalement.
 
-P64-L01 est `implemented-core` et `automated-validated`. P64-L02 devient la seule
-mission `ready`. Tout runtime ou schéma P45 reste bloqué jusqu'à son contrat
-additif. Aucune valeur physique ou scène n'est modifiée.
+P64-L01 et P64-L02 sont `implemented-core` et `automated-validated`.
+P64-L03 devient la seule mission `ready`. Tout runtime ou schéma P45 reste
+bloqué jusqu'à son contrat additif. Aucune valeur physique ou scène n'est modifiée.
 
 ## P64-L01 — état incrémental automatisé
 
@@ -156,7 +161,16 @@ requête à usage unique et des statuts `current` / `stale`. Une édition locale
 lance aucun solveur dans cette API et une réponse tardive ne peut pas remplacer
 l'état courant.
 
-La preuve automatisée couvre 16 fixtures ciblées, un corpus de cinquante
-conteneurs et la parité de dérivation. La palette et le cycle P44-M007 restent
-inchangés jusqu'à L03/L03V. P64-L02 est `ready` ; aucune preuve Fusion ou
-impression n'est revendiquée.
+La preuve automatisée L01 couvre 16 fixtures ciblées, un corpus de cinquante
+conteneurs et la parité de dérivation. L02 ajoute l'analyse contextuelle locale et
+le résumé progressif sans modifier le solveur public. P64-L03 est `ready` ;
+aucune preuve Fusion ou impression n'est revendiquée.
+
+## P64-L02 — analyse contextuelle automatisée
+
+- État : implémenté et couvert par les tests automatisés ; aucune gate Fusion ou impression ouverte.
+- Le moteur pur consomme P64-L01 pour produire les annotations compatible, conditional, incompatible et unknown sans promouvoir unknown.
+- Les sous-scores restent séparés et explicables ; la frontière Pareto moteur demeure complète et déterministe.
+- La palette expose Compact, Équilibré et Bas comme représentants UX non normatifs, avec détails et options expertes repliés par défaut.
+- Une édition locale invalide uniquement la chaîne concernée et ne lance aucun solve global.
+- P64-L03 devient la prochaine mission ready ; aucun solve global, remplissage, cale, finalisation ou matérialisation ne fait partie de L02.

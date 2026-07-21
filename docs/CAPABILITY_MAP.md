@@ -1,4 +1,4 @@
-# Capability Map
+﻿# Capability Map
 
 ## Objectif
 
@@ -1481,3 +1481,10 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - C-FUSION-UI : inchangée ; aucune scène ni matérialisation automatique.
 - Suite : P64-L02 `ready`. `fusion-validated: false`,
   `print-validated: false`.
+
+## Mise à jour P64-L02 — analyse locale contextuelle
+
+- P64-L02 : implémenté et testé automatiquement.
+- Capacités livrées : analyse contextuelle locale, compatibilités explicites, sous-scores séparés, Pareto déterministe, représentants UX progressifs et invalidation ciblée.
+- Capacités non livrées : solve global, finalisation, remplissage, cales, matérialisation, validation Fusion et validation impression.
+- Dépendance suivante : P64-L03, sans ouvrir P46, P47-P50, P67-P69 ou P64-F02 hors dépendances.

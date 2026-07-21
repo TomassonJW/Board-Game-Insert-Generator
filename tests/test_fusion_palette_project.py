@@ -81,6 +81,120 @@ class FusionPaletteProjectTests(unittest.TestCase):
         self.assertEqual(response["flat_stack"]["summary"]["status"], "not_required")
         self.assertEqual(response["flat_stack"]["flat_stack"]["semantics"], "localized_top_insets")
 
+    def test_validate_returns_local_analysis_without_invoking_global_solver(self) -> None:
+        project = blank_project_v1()
+        project["container_groups"] = [
+            {
+                "id": "g",
+                "name": "Bac",
+                "wall_thickness_mm": None,
+                "floor_thickness_mm": None,
+            }
+        ]
+        project["contents"] = [
+            {
+                "id": "c",
+                "name": "Pieces",
+                "shape_kind": "square",
+                "dimensions_mm": {"x": 12, "y": 12, "z": 3},
+                "quantity": 2,
+                "container_group_id": "g",
+                "content_clearance_mm": None,
+                "measurement_confidence": "exact",
+            }
+        ]
+        with (
+            tempfile.TemporaryDirectory() as temp_dir,
+            patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}),
+            patch(
+                "board_game_insert_generator.partition_solver.solve_partition_plan"
+            ) as global_solver,
+        ):
+            response = handle_palette_request(
+                request("validate_project", project=project),
+                ADDIN,
+                ROOT,
+            )
+
+        global_solver.assert_not_called()
+        self.assertEqual(
+            response["local_analysis"]["schema_version"],
+            "bgig.contextual_local_analysis.v1",
+        )
+        self.assertIsNone(response["partition"])
+        self.assertEqual(
+            response["local_analysis"]["invariants"][
+                "global_solver_invocation_count"
+            ],
+            0,
+        )
+        self.assertFalse(
+            response["local_analysis"]["reactive_global_bounds"][
+                "placement_performed"
+            ]
+        )
+
+    def test_validate_reuses_untouched_container_analysis_between_edits(self) -> None:
+        project = blank_project_v1()
+        project["container_groups"] = [
+            {
+                "id": group_id,
+                "name": group_id,
+                "wall_thickness_mm": None,
+                "floor_thickness_mm": None,
+            }
+            for group_id in ("g1", "g2")
+        ]
+        project["contents"] = [
+            {
+                "id": asset_id,
+                "name": asset_id,
+                "shape_kind": "square",
+                "dimensions_mm": {"x": 12, "y": 12, "z": 3},
+                "quantity": 2,
+                "container_group_id": group_id,
+                "content_clearance_mm": None,
+                "measurement_confidence": "exact",
+            }
+            for asset_id, group_id in (("a1", "g1"), ("a2", "g2"))
+        ]
+        with tempfile.TemporaryDirectory() as temp_dir, patch.dict(
+            "os.environ", {"BGIG_USER_DATA_DIR": temp_dir}
+        ):
+            first = handle_palette_request(
+                request("validate_project", project=project),
+                ADDIN,
+                ROOT,
+            )
+            changed = deepcopy(project)
+            changed["contents"][0]["quantity"] = 3
+            second = handle_palette_request(
+                request("validate_project", project=changed),
+                ADDIN,
+                ROOT,
+            )
+
+        before = {
+            value["container_group_id"]: value["frontier_digest"]
+            for value in first["local_analysis"]["containers"]
+        }
+        after = {
+            value["container_group_id"]: value["frontier_digest"]
+            for value in second["local_analysis"]["containers"]
+        }
+        incremental = second["local_analysis"]["incremental"]
+        self.assertEqual(
+            incremental["recomputed_frontier_group_ids"],
+            ["g1"],
+        )
+        self.assertEqual(
+            incremental["recomputed_context_group_ids"],
+            ["g1"],
+        )
+        self.assertIn("g2", incremental["reused_frontier_group_ids"])
+        self.assertEqual(before["g2"], after["g2"])
+        self.assertNotEqual(before["g1"], after["g1"])
+
     def test_validate_exposes_minimum_and_request_without_a_calculated_size(self) -> None:
         project = blank_project_v1()
         project["container_groups"] = [{"id": "g", "name": "Bac", "wall_thickness_mm": None, "floor_thickness_mm": None}]

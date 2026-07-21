@@ -2544,18 +2544,20 @@ P44-M007 est ready-for-explicit-go.
 
 ### P64-L02 — Frontières locales, score et résumé progressif
 
-- Dépendance : P64-L01.
-- Objectif : enrichir automatiquement la seule frontière locale touchée avec les
-  variantes rectangulaires certifiables et les classer sans promesse d'optimum.
-- Score : compacité, gaspillage dans l'enveloppe, stabilité, accessibilité connue,
-  compatibilité sous-plateau et coût estimé de recherche, publiés séparément.
-- UX : au plus trois représentants visibles dans un volet replié ; la frontière
-  interne reste plus large et s'élargit selon l'effort.
-- Parois : réutiliser le default global et wall_thickness_mm par conteneur ;
-  aucun second paramètre de cloison avant contrat P45 et validation physique.
-- Acceptation : déterminisme, Pareto, diversité, top 3 non normatif, cache
-  invalidé correctement et aucun impact sur les autres conteneurs.
-- Statut : ready.
+- Dépendance obtenue : P64-L01.
+- Livré : analyse incrémentale de la seule frontière touchée, annotations
+  compatible / conditional / incompatible / unknown, sous-scores
+  enveloppe/volume/empreinte/aspect/hauteur/complexité et compatibilités.
+- Pareto : frontière déterministe complète conservée ; représentants UX
+  Compact / Équilibré / Bas dédupliqués et strictement non normatifs.
+- UX : résumé et cartes repliés par défaut, options expertes avec variantes,
+  digests, provenance, budgets et causes d'invalidation.
+- Bornes : volume, hauteur, axes et absence de candidat seulement ; aucun
+  placement ni certificat global.
+- Preuve : docs/P64_L02_CONTEXTUAL_LOCAL_ANALYSIS_EVIDENCE.md.
+- Statut : done-code, implemented-core, implemented-fusion-bridge,
+  implemented-fusion-ui, automated-validated, fusion-validated: false,
+  print-validated: false.
 
 ### P64-L03 — Solve global explicite et plan finalisable
 
@@ -2569,7 +2571,7 @@ P44-M007 est ready-for-explicit-go.
   que le plan n'est pas finalisé et recertifié.
 - Migration : comportement public changé uniquement avec ADR-0071, tests de
   compatibilité et gate P64-L03V ; aucune migration destructive.
-- Statut : planned-locked.
+- Statut : ready.
 
 ### P64-L03V — Gate Fusion du cycle explicite
 

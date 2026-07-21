@@ -9,82 +9,86 @@ V0.1 reste `mvp-accepted`, `fusion-validated: true` et
 La réserve de charge P44 à environ cinquante conteneurs reste explicitement non
 observée et ne constitue aucune preuve de performance Fusion.
 
-P45-M001V est `architecture-accepted` sans runtime. P64-L01 est
-`implemented-core` et `automated-validated` : états, digests, invalidation
-ciblée, cache borné et rejet des réponses tardives existent dans le cœur Python,
-sans changement UI, solveur, schéma ou scène.
+P45-M001V est `architecture-accepted` sans runtime. P64-L01 et P64-L02 sont
+`implemented-core` et `automated-validated`. Le bridge et la palette exposent
+désormais l’analyse locale progressive, sans changement de schéma, solveur,
+valeur physique ou scène.
 
 ## Dernier état réel
 
-- les clés complètes distinguent source asset, pose, defaults hérités, frontière
-  de conteneur, contexte boîte, solve global et finalisation ;
-- modifier un asset invalide seulement sa résolution et son conteneur ;
-- modifier un conteneur ne réécrit pas les mesures de ses assets ;
-- déplacer un asset invalide exactement les anciennes et nouvelles frontières ;
-- changer boîte ou réservation réutilise les géométries intrinsèques et
-  renouvelle les contextes ;
-- le cache LRU exige une capacité positive, des digests SHA-256 complets et les
-  versions exactes des producteurs ;
-- une réponse locale liée à une ancienne révision devient
-  `stale_or_cancelled` et ne remplace jamais l'état courant ;
+- les clés complètes L01 distinguent source asset, pose, defaults hérités,
+  frontière de conteneur, contexte boîte, solve global et finalisation ;
+- une édition d’asset recalcule seulement sa frontière et son contexte ;
+- une édition de boîte réutilise les géométries intrinsèques et renouvelle les
+  annotations contextuelles ;
+- les statuts `compatible`, `conditional`, `incompatible` et `unknown`
+  restent séparés du certificat global ; `unknown` n’est jamais compatible ;
+- efficacité d’enveloppe, volume, empreinte, aspect, hauteur et complexité sont
+  publiés séparément, sans score total opaque ;
+- la frontière moteur reste plus large que les représentants `Compact`,
+  `Équilibré` et `Bas` visibles dans un volet replié ;
+- les bornes globales réactives n’effectuent aucun placement et ne prouvent
+  aucune solution ;
+- `validate_project` ne lance aucun solve global dans le bridge L02 ;
 - le mécanisme dense 11 × 34 reste honnêtement
   `no_solution_within_budget`, sans nouvelle revendication.
 
 ## Prochaine action recommandée
 
-### P64-L02 — Frontières locales, scores et résumé progressif
+### P64-L03 — Solvage explicite et finalisation staged
 
-Objectif borné : brancher sur L01 les annotations contextuelles, les métriques
-locales explicables et une shortlist progressive qui ne limite jamais la
-frontière consommable par le solveur global.
+Objectif borné : remplacer l’orchestration globale automatique P44-M007 par une
+action visible `Calculer l’agencement`, conserver l’ancien résultat comme
+obsolète, puis séparer placement, finalisation et matérialisation.
 
 Livrables attendus :
 
-1. annotations `compatible`, `conditional`, `incompatible` ou `unknown` pour la
-   boîte et les réservations, sans modifier le digest géométrique local ;
-2. sous-scores séparés : enveloppe, volume, empreinte, aspect, hauteur,
-   complexité et compatibilités réellement calculées ;
-3. Pareto et choix de représentants `Compact`, `Équilibré` et `Bas`, sans top 3
-   moteur fixe ;
-4. bornes globales réactives strictement nécessaires, sans placement ;
-5. résumé progressif et détail replié dans la palette Fusion, sans surcharge du
-   parcours normal ;
-6. preuve que toute édition reste locale et ne déclenche aucun solve global.
+1. aucune édition ordinaire ne lance le portefeuille global ;
+2. action primaire contextuelle `Calculer l’agencement`, puis
+   `Finaliser le volume`, puis `Matérialiser dans Fusion` ;
+3. progressive widening sur la frontière moteur complète, jamais sur les trois
+   cartes visibles seulement ;
+4. annulation, requêtes tardives et mutations pendant run traitées
+   `stale_or_cancelled` ;
+5. placement certifié distinct d’un plan final certifié et matérialisable ;
+6. ancien aperçu grisé, focus stable, détails techniques repliés ;
+7. tests cœur, bridge et DOM, puis gate Fusion P64-L03V distincte.
 
-Frontières : aucun nouveau champ P45, aucune forme, aucune recalibration, aucun
-changement des budgets baseline/EMS/greedy/beam, aucune finalisation, aucune
-matérialisation et aucune promotion de `unknown` en compatible.
+Frontières : préserver baseline, EMS historique, greedy, beam, Auto, budgets
+Rapide/Normal/Approfondi et statuts ADR-0068. Aucun runtime P45, aucune
+recalibration, aucune forme, aucun corps automatique, aucune cale et aucune
+harmonisation F01/F02 implicite.
 
-Sources : ADR-0071, ADR-0073, le programme P64-A02 et la preuve P64-L01.
+Sources : ADR-0056, ADR-0068, ADR-0069, ADR-0070, ADR-0071,
+`P64_STAGED_CALCULATION_AND_FINISHING_PROGRAM.md` et la preuve P64-L02.
 
 ## Repères historiques conservés
-
-Ces jalons restent fermés et sont cités uniquement pour préserver la continuité
-des preuves automatisées :
 
 - `P44-M009H05 Fusion OK 0.1.36 - commit 7c76ba0` ;
 - P44-M007 a livré le package `0.1.37` ;
 - `P64-H01 Fusion OK 0.1.42 - commit 5865645` ;
 - P44-VH02 reste un retour contextuel supersédé, sans promotion
-  `fusion-validated`.
+  `fusion-validated` ;
+- `P64-V2H03V Fusion OK 0.1.55` ;
+- `P44-V Fusion OK 0.1.55 - commit 70d45c6`.
 
 ## Lots suivants, non ouverts
 
-1. P64-L03 puis P64-L03V selon ADR-0071 ;
+1. P64-L03V après L03 automated-validated ;
 2. futur runtime P45 par contrat de schéma et migration additive distincts ;
-3. P46 seulement après formes et ergonomie réellement matérialisées ;
+3. P46 seulement après formes et ergonomie matérialisées ;
 4. P64-F01/F02, C01-C03 et F03 selon leurs dépendances ;
 5. P47-P50 restent bloqués par P46, P69 par P50.
 
 ## Séquence verrouillée
 
-Une seule mission peut être exécutée à la fois. P64-L02 est la seule mission
+Une seule mission peut être exécutée à la fois. P64-L03 est la seule mission
 `ready`. P45 ne possède pas le solveur global ; P64 ne définit pas les piles,
 poses, intentions ou formes. Les jeux externes restent globaux, les valeurs
-physiques inchangées et aucune scène n'est créée automatiquement.
+physiques inchangées et aucune scène n’est créée automatiquement.
 
 ## Fin de chaque mission
 
 Mettre à jour le pilotage, relire le diff, exécuter les preuves, committer puis
-intégrer directement dans main seulement lorsqu'aucune gate humaine n'est
+intégrer directement dans main seulement lorsqu’aucune gate humaine n’est
 ouverte. Une gate Fusion ne vaut jamais impression.

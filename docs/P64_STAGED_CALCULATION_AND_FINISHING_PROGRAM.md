@@ -1,8 +1,9 @@
 # P64-A02 — Programme de calcul étagé et finalisation explicite
 
-Statut : architecture acceptée le 2026-07-21 ; documentation validée seulement.
-Runtime courant inchangé : P44-M007 continue de programmer le solve automatique
-tant que P64-L03/L03V n'ont pas été implémentés et observés dans Fusion.
+Statut : architecture acceptée ; P64-L01 et P64-L02 implémentés et validés
+automatiquement le 2026-07-21. Runtime de solve courant inchangé : P44-M007
+continue de programmer le solve automatique tant que P64-L03/L03V n'ont pas été
+implémentés et observés dans Fusion.
 
 ADR principale :
 [ADR-0071](DECISIONS/ADR-0071-staged-local-analysis-explicit-solve-and-finalization.md).
@@ -428,14 +429,21 @@ Fusion non BGIG.
 
 ### P64-L02 — Frontières, scores et résumé progressif
 
-- Statut : `ready` après P64-L01.
-- Dépendance : L01.
-- Livrables : annotations contextuelles, représentants UI, sous-scores, détail
-  replié et bornes globales rapides.
-- Critères : fixtures 7 et 8 ; aucun score magique ; aucun solve automatique.
+- Statut : done-code, implemented-core, implemented-fusion-bridge,
+  implemented-fusion-ui, automated-validated le 2026-07-21.
+- Dépendance obtenue : L01.
+- Livré : annotations contextuelles fail-closed, sous-scores séparés, Pareto,
+  représentants Compact / Équilibré / Bas, détail replié et bornes nécessaires
+  sans placement.
+- Critères obtenus : fixtures 7 et 8, top 3 non normatif, invalidation locale,
+  aucun score opaque et validate_project sans solve global.
+- Preuve : docs/P64_L02_CONTEXTUAL_LOCAL_ANALYSIS_EVIDENCE.md.
+- Limite : le timer global P44-M007 reste actif jusqu'à L03/L03V ;
+  fusion-validated: false, print-validated: false.
 
 ### P64-L03 — Solvage explicite et finalisation staged
 
+- Statut : ready après P64-L02 automated-validated.
 - Dépendance : L02. Réutiliser le contrat d'annulation H07/H03C ; P64-U01
   reste un lot UX séparé et n'est pas ouvert implicitement.
 - Livrables : suppression du timer global automatique, action primaire
@@ -474,9 +482,9 @@ P64-V2H03V retour humain
   -> P64-C03/CV
 ```
 
-Ce document n'ouvre aucune de ces missions runtime. `NEXT_ACTIONS.md` reste
-autoritaire ; P64-V2H03V est clôturée et P44-V doit être requalifiée avant
-toute ouverture runtime L01.
+NEXT_ACTIONS.md reste autoritaire. P64-V2H03V et P44-V sont clôturées,
+P64-L01/L02 sont automated-validated et P64-L03 devient la seule mission
+runtime ready. Les lots P45/P46 et de finition restent verrouillés.
 
 ## 21. Vérifications minimales futures
 

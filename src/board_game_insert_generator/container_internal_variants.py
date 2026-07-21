@@ -285,11 +285,43 @@ def derive_container_internal_variant_frontiers(
     *,
     effort_profile: str = EFFORT_NORMAL,
     max_container_height_mm: float | None = None,
+    container_group_ids: Sequence[str] | None = None,
 ) -> InternalVariantRun:
-    """Build internal frontiers without changing the public derivation result."""
+    """Build internal frontiers without changing the public derivation result.
+
+    container_group_ids is an internal incremental-analysis boundary. When
+    supplied, only those groups are derived; it never changes the default full
+    frontier used by the global solver.
+    """
 
     normalization = normalize_project_draft(raw_project)
     project = normalization.project
+    if container_group_ids is not None:
+        requested = tuple(sorted(set(container_group_ids)))
+        known = {str(value["id"]) for value in _mappings(project["container_groups"])}
+        unknown = tuple(value for value in requested if value not in known)
+        if unknown:
+            raise ValueError(f"Unknown container groups for local analysis: {unknown!r}.")
+        requested_set = set(requested)
+        project = {
+            **project,
+            "container_groups": [
+                value
+                for value in _mappings(project["container_groups"])
+                if str(value["id"]) in requested_set
+            ],
+            "contents": [
+                value
+                for value in _mappings(project["contents"])
+                if str(value["container_group_id"]) in requested_set
+            ],
+            "fill_elements": [
+                value
+                for value in _mappings(project["fill_elements"])
+                if value.get("container_group_id") is None
+                or str(value["container_group_id"]) in requested_set
+            ],
+        }
     plan = derive_container_plan(project, max_container_height_mm=max_container_height_mm)
     groups = {str(value["id"]): value for value in _mappings(project["container_groups"])}
     budget = variant_budget_for_effort(effort_profile)

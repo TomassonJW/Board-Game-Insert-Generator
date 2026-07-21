@@ -1,4 +1,4 @@
-# Human Gates
+﻿# Human Gates
 
 Les gates humaines protegent les decisions qui changent la vision, l'architecture
 ou la credibilite physique du projet. Codex peut preparer les analyses, rapports,
@@ -856,3 +856,9 @@ commun aux cartes et aux autres assets :
 Effet : P45-M001 et ADR-0073 sont `architecture-accepted`. P64-L01 devient la
 prochaine mission `ready`. Aucun runtime, schéma, UI ou calcul P45 n'est validé
 par cette gate. `fusion-validated: false`, `print-validated: false`.
+
+## P64-L02 — Preuve automatisée, aucune gate Fusion ouverte
+
+- P64-L02 ne requiert aucune nouvelle gate humaine pour être intégré : il ne génère ni géométrie ni scène et ne revendique aucune validation Fusion ou impression.
+- Les statuts fusion-validated et print-validated restent false.
+- Toute future revendication physique ou Fusion demeure soumise aux gates existantes et à une preuve humaine distincte.
