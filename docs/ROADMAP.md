@@ -1003,8 +1003,23 @@ caps Rapide / Normal / Approfondi monotones. Les variantes L01/L02, supports,
 réservations et six surplus nuls passent par un certificat global distinct du
 certificat de partition remplie.
 
-La trajectoire corrective avance vers L03R-C, désormais `ready`, pour brancher
-CAD IR, sélection d'artefact et remplacement sûr de scène. L03R-V reste une
-future gate humaine inactive jusque-là. F01 et les vraies transformations de
-finition restent verrouillées. Le cas dense 11 × 34, les valeurs physiques et
-l'impression restent inchangés.
+La trajectoire corrective a ensuite livré L03R-C : CAD IR minimale, sélection
+d'artefact et remplacement sûr de scène sont validés automatiquement. L03R-V
+devient la gate humaine active sur Fusion 0.1.57. F01 et les vraies
+transformations de finition restent verrouillées. Le cas dense 11 × 34, les
+valeurs physiques et l'impression restent inchangés.
+## P64-L03R-C — Matérialisation duale livrée (2026-07-21)
+
+L03R-C branche le plan minimal certifié sur l'orchestration staged, la CAD IR et
+la palette Fusion. Le plan minimal est matérialisable sans plan finalisé ; son
+résiduel reste non attribué. La sélection duale conserve un artefact finalisé
+séparé pour les futurs lots de finition.
+
+L'identité de scène couvre artefact, plan, CAD IR et révision source. Une scène
+ambiguë est bloquée avant suppression ; une scène BGIG possédée peut être
+remplacée et les objets utilisateur restent hors de la portée d'effacement. Ces
+comportements sont `automated-validated`, pas observés dans Fusion.
+
+La prochaine étape est P64-L03R-V sur le package 0.1.57. F01A02 reste verrouillé
+jusqu'à une gate positive. Aucun résultat dense, valeur physique, schéma ou
+budget ne change ; `print-validated: false`.

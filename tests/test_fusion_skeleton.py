@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import hashlib
 import json
 import tempfile
 import unittest
@@ -286,6 +287,8 @@ class FusionSkeletonTests(unittest.TestCase):
 
         self.assertEqual(state["source_status"], "Design recu")
         self.assertEqual(state["scene_status"], "Bacs visibles dans Fusion")
+        self.assertTrue(state["scene_present"])
+        self.assertIsNone(state["scene_artifact_identity"])
         self.assertIn("3 corps", state["scene_detail"])
         self.assertIn("impression non validee", state["manufacturing_status"])
         self.assertEqual(state["notice"], "Scene actualisee.")
@@ -671,6 +674,86 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertIn("Tagged BGIG unique entities: 7", message)
         self.assertIn("BGIG-looking untagged entities: 0", message)
         self.assertIn("Inconsistencies:\n- none", message)
+
+    def test_registry_reports_the_exact_scene_artifact_identity(self) -> None:
+        root_component = _FakeComponent("Root", "component-root")
+        scene_component = _FakeComponent("BGIG Generated Scene", "component-scene")
+        scene_occurrence = _FakeOccurrence(
+            "BGIG Generated Scene:1", "occurrence-scene", scene_component
+        )
+        root_component.occurrences = _FakeCollection([scene_occurrence])
+        identity = {
+            "schema_version": "bgig.scene_artifact_identity.v1",
+            "artifact_kind": "minimal_layout",
+            "artifact_digest": "a" * 64,
+            "partition_plan_digest": "b" * 64,
+            "cad_ir_digest": "c" * 64,
+            "source_revision": 7,
+        }
+        fusion_entrypoint._tag_bgig_entity_direct(
+            scene_occurrence,
+            "scene_root",
+            scene_id="scene-identity",
+            artifact_identity=identity,
+        )
+        fusion_entrypoint._tag_bgig_entity_direct(
+            scene_component,
+            "scene_root_component",
+            scene_id="scene-identity",
+            artifact_identity=identity,
+        )
+        design = _FakeDesignForRegistry(
+            root_component,
+            [root_component, scene_occurrence, scene_component],
+        )
+
+        inspection = fusion_entrypoint.BgigFusionRegistry(design).inspect()
+
+        self.assertEqual(
+            inspection["scene_artifact_identity"],
+            {**identity, "source_revision": "7"},
+        )
+
+    def test_fixture_15_registry_clear_preserves_untagged_user_objects(self) -> None:
+        root_component = _FakeComponent("Root", "component-root")
+        scene_component = _FakeComponent("BGIG Generated Scene", "component-scene")
+        scene_occurrence = _FakeOccurrence(
+            "BGIG Generated Scene:1", "occurrence-scene", scene_component
+        )
+        user_component = _FakeComponent("Thomas custom part", "component-user")
+        user_occurrence = _FakeOccurrence(
+            "Thomas custom part:1", "occurrence-user", user_component
+        )
+        root_component.occurrences = _FakeCollection(
+            [scene_occurrence, user_occurrence]
+        )
+        fusion_entrypoint._tag_bgig_entity_direct(
+            scene_occurrence,
+            "scene_root",
+            scene_id="scene-owned",
+        )
+        fusion_entrypoint._tag_bgig_entity_direct(
+            scene_component,
+            "scene_root_component",
+            scene_id="scene-owned",
+        )
+        design = _FakeDesignForRegistry(
+            root_component,
+            [
+                root_component,
+                scene_occurrence,
+                scene_component,
+                user_occurrence,
+                user_component,
+            ],
+        )
+
+        result = fusion_entrypoint.BgigFusionRegistry(design).clear()
+
+        self.assertTrue(scene_occurrence.deleted)
+        self.assertFalse(user_occurrence.deleted)
+        self.assertEqual(result["non_bgig_objects_preserved"], "yes")
+        self.assertEqual(result["scene_roots_found"], 1)
 
     def test_export_printables_exports_only_tagged_module_bodies(self) -> None:
         root_component = _FakeComponent("Root", "component-root")
@@ -1524,6 +1607,30 @@ class FusionSkeletonTests(unittest.TestCase):
         self.assertEqual(plan.blanks[0].size_mm.to_dict(), {"x": 68.9, "y": 99.2, "z": 44.0})
         self.assertEqual(plan.blanks[0].validation_status, FUSION_MANUAL_VALIDATION_REQUIRED)
 
+    def test_staged_cad_identity_covers_the_exact_geometry(self) -> None:
+        payload = _cad_ir_payload()
+        identity = {
+            "schema_version": "bgig.scene_artifact_identity.v1",
+            "artifact_kind": "minimal_layout",
+            "artifact_digest": "a" * 64,
+            "partition_plan_digest": "b" * 64,
+            "source_revision": 3,
+        }
+        payload.setdefault("metadata", {})["artifact_identity"] = identity
+        cad_ir_digest = hashlib.sha256(
+            json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        ).hexdigest()
+        payload["metadata"]["artifact_identity"] = {
+            **identity,
+            "cad_ir_digest": cad_ir_digest,
+        }
+
+        plan = generation_plan_from_cad_ir(payload)
+
+        self.assertEqual(plan.artifact_identity, payload["metadata"]["artifact_identity"])
+        payload["components"][0]["body"]["printable_size_mm"]["x"] += 1
+        with self.assertRaisesRegex(FusionSkeletonError, "cad_ir_digest"):
+            generation_plan_from_cad_ir(payload)
     def test_loads_addin_fixture_generation_plan(self) -> None:
         fixture_path = ROOT / "fusion_addin" / "BoardGameInsertGenerator" / "cad_ir_input.json"
 

@@ -345,6 +345,10 @@ certificat.
 - comparer les digests exacts et exposer `Mettre à jour la scène` ;
 - remplacer atomiquement la seule scène BGIG possédée ;
 - tests bridge, DOM et registre Fusion simulé.
+- Statut d'exécution au 2026-07-21 : `implemented-core`,
+  `implemented-fusion-bridge`, `implemented-fusion-ui`,
+  `automated-validated` ; preuve
+  `docs/P64_L03R_C_DUAL_MATERIALIZATION_EVIDENCE.md`.
 
 ### P64-L03R-V — Gate Fusion corrective
 

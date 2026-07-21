@@ -4,19 +4,25 @@ from copy import deepcopy
 import unittest
 
 from board_game_insert_generator.contextual_local_analysis import (
-    build_contextual_local_analysis,
+    IncrementalLocalAnalysisEngine,
 )
-from board_game_insert_generator.partition_solver import solve_partition_plan
+from board_game_insert_generator.incremental_project_state import canonical_digest
+from board_game_insert_generator.minimal_layout_solver import solve_minimal_layout
+from board_game_insert_generator.partition_cad import build_partition_cad
 from board_game_insert_generator.project_v1 import blank_project_v1
 from board_game_insert_generator.staged_calculation import (
+    ARTIFACT_KIND_FINALIZED,
+    ARTIFACT_KIND_MINIMAL,
+    STATUS_CAD_READY,
     STATUS_CURRENT,
+    STATUS_DESYNCHRONIZED,
     STATUS_STALE,
     StagedCalculationError,
     StagedCalculationSession,
 )
 
 
-SETTINGS = {"method": "stage_stack", "effort": "quick"}
+SETTINGS = {"method": "auto", "effort": "quick"}
 
 
 def _project() -> dict[str, object]:
@@ -32,7 +38,7 @@ def _project() -> dict[str, object]:
     project["contents"] = [
         {
             "id": "c",
-            "name": "Pièces",
+            "name": "Pieces",
             "shape_kind": "square",
             "dimensions_mm": {"x": 12, "y": 12, "z": 3},
             "quantity": 2,
@@ -44,134 +50,131 @@ def _project() -> dict[str, object]:
     return project
 
 
-def _analysis(project: object) -> dict[str, object]:
-    return build_contextual_local_analysis(project, effort_profile="quick")
+def _engine(project: object) -> IncrementalLocalAnalysisEngine:
+    return IncrementalLocalAnalysisEngine(project, effort_profile="quick")
+
+
+def _synchronize(
+    session: StagedCalculationSession,
+    project: object,
+    engine: IncrementalLocalAnalysisEngine,
+    *,
+    settings: dict[str, str] = SETTINGS,
+) -> dict[str, object]:
+    return session.synchronize(
+        project,
+        engine.snapshot(),
+        solver_settings=settings,
+        container_frontiers=engine.certified_frontiers(),
+        frontier_digests=engine.frontier_digests(),
+    )
+
+
+def _minimal_cad(
+    session: StagedCalculationSession,
+    project: dict[str, object],
+) -> dict[str, object]:
+    selection = session.select_materializable_artifact(ARTIFACT_KIND_MINIMAL)
+    return build_partition_cad(
+        project,
+        partition=selection["partition"],
+        artifact_identity=selection,
+        effort_profile="quick",
+    )
 
 
 class StagedCalculationTests(unittest.TestCase):
     def test_synchronization_never_invokes_the_global_solver(self) -> None:
         project = _project()
+        engine = _engine(project)
         session = StagedCalculationSession(project, solver_settings=SETTINGS)
 
-        initial = session.synchronize(project, _analysis(project), solver_settings=SETTINGS)
+        initial = _synchronize(session, project, engine)
         changed = deepcopy(project)
         changed["contents"][0]["quantity"] = 3
+        refreshed_analysis = engine.update_project(changed)
         refreshed = session.synchronize(
             changed,
-            _analysis(changed),
+            refreshed_analysis,
             solver_settings=SETTINGS,
+            container_frontiers=engine.certified_frontiers(),
+            frontier_digests=engine.frontier_digests(),
         )
 
-        self.assertEqual(initial["global_layout"]["status"], "not_computed")
-        self.assertEqual(refreshed["global_layout"]["status"], "not_computed")
+        self.assertEqual(initial["minimal_layout"]["status"], "not_computed")
+        self.assertEqual(refreshed["minimal_layout"]["status"], "not_computed")
         self.assertEqual(refreshed["next_action"], "calculate_layout")
-        self.assertTrue(
-            refreshed["invariants"]["global_solve_is_explicit"]
-        )
+        self.assertTrue(refreshed["invariants"]["global_solve_is_explicit"])
 
-    def test_calculate_then_finalize_gates_materialization_without_geometry_change(
-        self,
-    ) -> None:
+    def test_fixture_11_minimal_materialization_is_selected_before_finalization(self) -> None:
         project = _project()
+        engine = _engine(project)
         session = StagedCalculationSession(project, solver_settings=SETTINGS)
-        session.synchronize(project, _analysis(project), solver_settings=SETTINGS)
+        _synchronize(session, project, engine)
 
-        calculated = session.calculate_layout(
-            request_id="solve-1",
-            request_revision=0,
-        )
+        calculated = session.calculate_layout(request_id="solve-1", request_revision=0)
+        selection = session.select_materializable_artifact(ARTIFACT_KIND_MINIMAL)
+        cad = _minimal_cad(session, project)
 
-        self.assertEqual(
-            calculated["solver_result"]["status"],
-            "solution_found",
-        )
-        self.assertTrue(
-            calculated["staged_calculation"]["global_layout"][
-                "placement_certified"
-            ]
-        )
-        self.assertTrue(
-            calculated["staged_calculation"]["global_layout"][
-                "finalization_required"
-            ]
-        )
-        with self.assertRaises(StagedCalculationError):
-            session.materializable_partition()
-
-        finalized = session.finalize_volume()
-        materializable = session.materializable_partition()
-
-        self.assertEqual(
-            finalized["staged_calculation"]["finalized_plan"]["status"],
-            STATUS_CURRENT,
-        )
-        self.assertFalse(
-            finalized["staged_calculation"]["finalized_plan"][
-                "geometry_changed"
-            ]
-        )
-        self.assertEqual(
-            calculated["partition"]["plan_digest"],
-            materializable["plan_digest"],
-        )
-        self.assertEqual(
-            finalized["staged_calculation"]["next_action"],
-            "materialize_in_fusion",
-        )
+        self.assertEqual(calculated["solver_result"]["status"], "solution_found")
+        self.assertTrue(calculated["staged_calculation"]["minimal_layout"]["placement_certified"])
+        self.assertFalse(calculated["staged_calculation"]["minimal_layout"]["finalization_required"])
+        self.assertEqual(calculated["staged_calculation"]["finalized_plan"]["status"], "not_finalized")
+        self.assertEqual(selection["artifact_kind"], ARTIFACT_KIND_MINIMAL)
+        self.assertEqual(selection["partition_plan_digest"], calculated["partition"]["plan_digest"])
+        self.assertEqual(cad["status"], "ready_for_fusion")
+        self.assertEqual(cad["artifact_identity"]["artifact_kind"], ARTIFACT_KIND_MINIMAL)
+        self.assertFalse(cad["partition"]["invariants"]["residual_distributed"])
 
     def test_identical_explicit_calculation_reuses_the_complete_global_key(self) -> None:
         project = _project()
+        engine = _engine(project)
         session = StagedCalculationSession(project, solver_settings=SETTINGS)
-        analysis = _analysis(project)
-        session.synchronize(project, analysis, solver_settings=SETTINGS)
+        _synchronize(session, project, engine)
         calls = 0
 
         def counted_solver(raw_project: object, **kwargs: object) -> dict[str, object]:
             nonlocal calls
             calls += 1
-            return solve_partition_plan(raw_project, **kwargs)
+            kwargs.pop("solver_method", None)
+            return solve_minimal_layout(raw_project, **kwargs)
 
         first = session.calculate_layout(
-            request_id="solve-1",
-            request_revision=0,
-            solver=counted_solver,
+            request_id="solve-1", request_revision=0, solver=counted_solver
         )
         second = session.calculate_layout(
-            request_id="solve-2",
-            request_revision=0,
-            solver=counted_solver,
+            request_id="solve-2", request_revision=2, solver=counted_solver
         )
 
         self.assertEqual(calls, 1)
+        self.assertEqual(first["partition"]["plan_digest"], second["partition"]["plan_digest"])
+        self.assertEqual(second["staged_calculation"]["minimal_layout"]["cache_status"], "hit")
         self.assertEqual(
-            first["partition"]["plan_digest"],
-            second["partition"]["plan_digest"],
+            second["solver_result"]["telemetry"]["request"],
+            {"id": "solve-2", "revision": 2},
         )
         self.assertEqual(
-            second["staged_calculation"]["global_layout"]["cache_status"],
-            "hit",
+            second["solver_result"]["telemetry"]["request_scope"],
+            "staged_action",
         )
 
     def test_mutation_during_global_run_is_rejected_as_stale(self) -> None:
         project = _project()
+        engine = _engine(project)
         session = StagedCalculationSession(project, solver_settings=SETTINGS)
-        session.synchronize(project, _analysis(project), solver_settings=SETTINGS)
+        _synchronize(session, project, engine)
 
         def mutating_solver(raw_project: object, **kwargs: object) -> dict[str, object]:
-            result = solve_partition_plan(raw_project, **kwargs)
+            kwargs.pop("solver_method", None)
+            result = solve_minimal_layout(raw_project, **kwargs)
             changed = deepcopy(project)
             changed["contents"][0]["quantity"] = 3
-            session.synchronize(
-                changed,
-                _analysis(changed),
-                solver_settings=SETTINGS,
-            )
+            changed_engine = _engine(changed)
+            _synchronize(session, changed, changed_engine)
             return result
 
         result = session.calculate_layout(
-            request_id="solve-stale",
-            request_revision=4,
-            solver=mutating_solver,
+            request_id="solve-stale", request_revision=4, solver=mutating_solver
         )
 
         self.assertIsNone(result["partition"])
@@ -180,82 +183,139 @@ class StagedCalculationTests(unittest.TestCase):
             result["solver_result"]["telemetry"]["stop_reason"],
             "dependencies_changed_during_global_run",
         )
-        self.assertEqual(
-            result["staged_calculation"]["global_layout"]["status"],
-            "not_computed",
-        )
+        self.assertEqual(result["staged_calculation"]["minimal_layout"]["status"], "not_computed")
 
-    def test_source_and_solver_setting_changes_stale_both_downstream_stages(
-        self,
-    ) -> None:
+    def test_fixture_12_failed_finalization_preserves_minimal_materialization(self) -> None:
         project = _project()
+        engine = _engine(project)
         session = StagedCalculationSession(project, solver_settings=SETTINGS)
-        analysis = _analysis(project)
-        session.synchronize(project, analysis, solver_settings=SETTINGS)
-        session.calculate_layout(request_id="solve-1", request_revision=0)
-        session.finalize_volume()
+        _synchronize(session, project, engine)
+        calculated = session.calculate_layout(request_id="solve-1", request_revision=0)
 
-        settings_changed = session.synchronize(
-            project,
-            analysis,
-            solver_settings={"method": "stage_stack", "effort": "normal"},
-        )
+        with self.assertRaisesRegex(StagedCalculationError, "Aucune methode de finition"):
+            session.finalize_volume()
 
-        self.assertEqual(
-            settings_changed["global_layout"]["status"],
-            STATUS_STALE,
-        )
-        self.assertEqual(
-            settings_changed["finalized_plan"]["status"],
-            STATUS_STALE,
-        )
-        self.assertEqual(settings_changed["next_action"], "calculate_layout")
-        with self.assertRaises(StagedCalculationError):
-            session.materializable_partition()
-
-    def test_failed_finalization_preserves_the_current_base_layout(self) -> None:
-        project = _project()
-        session = StagedCalculationSession(project, solver_settings=SETTINGS)
-        session.synchronize(project, _analysis(project), solver_settings=SETTINGS)
-        calculated = session.calculate_layout(
-            request_id="solve-1",
-            request_revision=0,
-        )
-
-        with self.assertRaises(StagedCalculationError):
-            session.finalize_volume(certify=lambda _partition: False)
-
+        selection = session.select_materializable_artifact(ARTIFACT_KIND_MINIMAL)
         snapshot = session.snapshot()
-        self.assertEqual(snapshot["global_layout"]["status"], STATUS_CURRENT)
+        self.assertEqual(snapshot["minimal_layout"]["status"], STATUS_CURRENT)
         self.assertEqual(
-            snapshot["global_layout"]["artifact_digest"],
-            calculated["staged_calculation"]["global_layout"][
-                "artifact_digest"
-            ],
+            snapshot["minimal_layout"]["artifact_digest"],
+            calculated["staged_calculation"]["minimal_layout"]["artifact_digest"],
         )
-        self.assertEqual(
-            snapshot["finalized_plan"]["status"],
-            "not_finalized",
-        )
+        self.assertEqual(snapshot["finalized_plan"]["status"], "not_finalized")
+        self.assertEqual(selection["partition_plan_digest"], calculated["partition"]["plan_digest"])
 
-    def test_cad_ready_is_observable_without_claiming_fusion_validation(self) -> None:
+    def test_dual_selection_accepts_a_separately_certified_finalized_plan(self) -> None:
         project = _project()
+        engine = _engine(project)
         session = StagedCalculationSession(project, solver_settings=SETTINGS)
-        session.synchronize(project, _analysis(project), solver_settings=SETTINGS)
-        session.calculate_layout(request_id="solve-1", request_revision=0)
-        session.finalize_volume()
+        _synchronize(session, project, engine)
+        calculated = session.calculate_layout(request_id="solve-1", request_revision=0)
+        minimal_digest = calculated["staged_calculation"]["minimal_layout"]["artifact_digest"]
 
-        session.record_cad_ready(
-            {
-                "status": "ready_for_fusion",
-                "cad_ir_digest": "a" * 64,
+        def explicit_finalizer(plan: dict[str, object]) -> dict[str, object]:
+            finalized = deepcopy(plan)
+            finalized["summary"]["materializable"] = True
+            finalized["finalization"] = {
+                "artifact_kind": ARTIFACT_KIND_FINALIZED,
+                "source_minimal_artifact_digest": minimal_digest,
+                "certificate": {"certified": True},
             }
-        )
-        snapshot = session.snapshot()
+            finalized.pop("plan_digest", None)
+            finalized["plan_digest"] = canonical_digest(finalized)
+            return finalized
 
-        self.assertEqual(snapshot["materialization"]["status"], "cad_ready")
+        finalized = session.finalize_volume(
+            finalizer=explicit_finalizer,
+            finishing_policy="test_explicit_policy",
+            finishing_budget_digest=canonical_digest({"budget": "test"}),
+            finalizer_id="test-finalizer",
+            finalizer_version="1",
+        )
+        selection = session.select_materializable_artifact(ARTIFACT_KIND_FINALIZED)
+
+        self.assertEqual(finalized["staged_calculation"]["finalized_plan"]["status"], STATUS_CURRENT)
+        self.assertEqual(selection["artifact_kind"], ARTIFACT_KIND_FINALIZED)
+        self.assertNotEqual(
+            selection["artifact_digest"],
+            calculated["staged_calculation"]["minimal_layout"]["artifact_digest"],
+        )
+        self.assertEqual(
+            session.select_materializable_artifact(ARTIFACT_KIND_MINIMAL)["partition_plan_digest"],
+            calculated["partition"]["plan_digest"],
+        )
+
+    def test_cad_ready_requires_the_exact_selected_identity(self) -> None:
+        project = _project()
+        engine = _engine(project)
+        session = StagedCalculationSession(project, solver_settings=SETTINGS)
+        _synchronize(session, project, engine)
+        session.calculate_layout(request_id="solve-1", request_revision=0)
+        cad = _minimal_cad(session, project)
+
+        wrong = deepcopy(cad)
+        wrong["artifact_identity"]["artifact_digest"] = "old-artifact"
+        with self.assertRaisesRegex(StagedCalculationError, "correspond pas exactement"):
+            session.record_cad_ready(wrong)
+
+        session.record_cad_ready(cad)
+        snapshot = session.snapshot()
+        self.assertEqual(snapshot["materialization"]["status"], STATUS_CAD_READY)
         self.assertFalse(snapshot["materialization"]["fusion_observed"])
-        self.assertEqual(snapshot["next_action"], "none")
+        self.assertEqual(snapshot["next_action"], "choose_optional_finishing_or_export")
+
+    def test_fixture_13_new_revision_desynchronizes_the_old_scene_identity(self) -> None:
+        project = _project()
+        engine = _engine(project)
+        session = StagedCalculationSession(project, solver_settings=SETTINGS)
+        _synchronize(session, project, engine)
+        session.calculate_layout(request_id="solve-1", request_revision=0)
+        cad = _minimal_cad(session, project)
+        session.record_cad_ready(cad)
+
+        changed = deepcopy(project)
+        changed["contents"][0]["quantity"] = 3
+        changed_engine = _engine(changed)
+        snapshot = _synchronize(session, changed, changed_engine)
+
+        self.assertEqual(snapshot["minimal_layout"]["status"], STATUS_STALE)
+        self.assertEqual(snapshot["materialization"]["status"], STATUS_DESYNCHRONIZED)
+        self.assertEqual(snapshot["next_action"], "calculate_layout")
+        with self.assertRaises(StagedCalculationError):
+            session.select_materializable_artifact(ARTIFACT_KIND_MINIMAL)
+
+    def test_frontier_digest_change_stales_minimal_without_project_mutation(self) -> None:
+        project = _project()
+        engine = _engine(project)
+        session = StagedCalculationSession(project, solver_settings=SETTINGS)
+        _synchronize(session, project, engine)
+        session.calculate_layout(request_id="solve-1", request_revision=0)
+
+        changed = session.synchronize(
+            project,
+            engine.snapshot(),
+            solver_settings=SETTINGS,
+            container_frontiers=engine.certified_frontiers(),
+            frontier_digests=(("g", canonical_digest({"frontier": "changed"})),),
+        )
+
+        self.assertEqual(changed["minimal_layout"]["status"], STATUS_STALE)
+        self.assertEqual(changed["next_action"], "calculate_layout")
+    def test_solver_setting_change_stales_minimal_and_finalized_artifacts(self) -> None:
+        project = _project()
+        engine = _engine(project)
+        session = StagedCalculationSession(project, solver_settings=SETTINGS)
+        _synchronize(session, project, engine)
+        session.calculate_layout(request_id="solve-1", request_revision=0)
+        changed = session.synchronize(
+            project,
+            engine.snapshot(),
+            solver_settings={"method": "auto", "effort": "normal"},
+            container_frontiers=engine.certified_frontiers(),
+            frontier_digests=engine.frontier_digests(),
+        )
+        self.assertEqual(changed["minimal_layout"]["status"], STATUS_STALE)
+        self.assertEqual(changed["next_action"], "calculate_layout")
 
 
 if __name__ == "__main__":

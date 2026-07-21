@@ -305,11 +305,17 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         addin_dir,
         effort_profile=solver_settings["effort"],
     )
+    local_frontiers, local_frontier_digests = _local_analysis_artifacts(
+        addin_dir,
+        effort_profile=solver_settings["effort"],
+    )
     staged_session = _staged_calculation_session(project, addin_dir, solver_settings)
     staged_calculation = staged_session.synchronize(
         project,
         local_analysis,
         solver_settings=solver_settings,
+        container_frontiers=local_frontiers,
+        frontier_digests=local_frontier_digests,
     )
     creation_presets = build_creation_presets(
         project,
@@ -339,6 +345,8 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
 
     staged_solver_result: dict[str, object] | None = None
     partition: dict[str, object] | None = None
+    artifact_selection: dict[str, object] | None = None
+    artifact_kind = str(request.get("artifact_kind") or "minimal_layout")
     if action == "solve_project":
         staged_action = staged_session.calculate_layout(
             request_id=request_id,
@@ -353,7 +361,8 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         staged_solver_result = staged_action["solver_result"]
         staged_calculation = staged_action["staged_calculation"]
     elif action in {"materialize_project", "regenerate_project"}:
-        partition = staged_session.materializable_partition()
+        artifact_selection = staged_session.select_materializable_artifact(artifact_kind)
+        partition = artifact_selection["partition"]
         staged_solver_result = _partition_solver_result(partition)
     container_sizing = build_container_sizing_view(project, envelopes, partition)
     result_view = (
@@ -362,17 +371,29 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         and partition["summary"]["status"] in {"constructed", "proposal_with_residuals"}
         else None
     )
-    if result_view is not None and action == "solve_project":
-        result_view["materializable"] = False
-        result_view.setdefault("invariants", {})[
-            "explicit_finalization_required_before_materialization"
-        ] = True
+    if result_view is not None:
+        if action == "solve_project":
+            minimal_current = bool(
+                staged_calculation.get("minimal_layout", {}).get("placement_certified")
+            )
+            result_view["artifact_kind"] = "minimal_layout"
+            result_view["materializable"] = minimal_current
+            result_view.setdefault("invariants", {})[
+                "minimal_materialization_without_finalization"
+            ] = minimal_current
+        elif artifact_selection is not None:
+            result_view["artifact_kind"] = artifact_selection["artifact_kind"]
+            result_view["materializable"] = True
+            result_view.setdefault("invariants", {})[
+                "selected_artifact_identity_exact"
+            ] = True
     cad_build = (
         build_partition_cad(
             project,
             partition=partition,
             solver_method=solver_settings["method"],
             effort_profile=solver_settings["effort"],
+            artifact_identity=artifact_selection,
         )
         if action in {"materialize_project", "regenerate_project"}
         else None
@@ -547,6 +568,21 @@ def _contextual_local_analysis(
     _LOCAL_ANALYSIS_ENGINES.move_to_end(engine_key)
     return engine.update_project(project)
 
+
+def _local_analysis_artifacts(
+    addin_dir: Path,
+    *,
+    effort_profile: str,
+) -> tuple[tuple[object, ...], tuple[tuple[str, str], ...]]:
+    """Expose the exact cached L02 frontiers consumed by the minimal solver."""
+
+    engine_key = (str(current_project_path(addin_dir).resolve()), effort_profile)
+    engine = _LOCAL_ANALYSIS_ENGINES.get(engine_key)
+    if engine is None:
+        raise PaletteProjectError(
+            "Les frontieres locales courantes sont indisponibles ; relance l analyse locale."
+        )
+    return tuple(engine.certified_frontiers()), tuple(engine.frontier_digests())
 
 def _staged_calculation_session(
     project: dict[str, object],

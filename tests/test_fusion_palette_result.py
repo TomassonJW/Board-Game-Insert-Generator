@@ -41,21 +41,22 @@ class FusionPaletteResultTests(unittest.TestCase):
         self.assertIn("proposal_with_residuals", self.markup)
         self.assertIn("materializable=complete", self.markup)
         self.assertIn("finalizedCurrent", self.markup)
-        self.assertIn("action='finalize_project'", self.markup)
+        self.assertIn("button.dataset.artifactKind='minimal_layout'", self.markup)
         self.assertIn("action='materialize_project'", self.markup)
         self.assertNotIn('data-bridge="materialize_project"', self.markup)
-        self.assertIn('data-bridge="regenerate_project"', self.markup)
-        self.assertIn("Finalise explicitement le volume avant de pouvoir matérialiser", self.markup)
+        self.assertIn("sceneKnown?'regenerate_project':'materialize_project'", self.markup)
+        self.assertIn("Plan minimal certifi", self.markup)
         self.assertIn("Volume résiduel à décider", self.markup)
 
     def test_p59_exposes_owned_scene_actions_without_raw_cad_codes(self) -> None:
         for marker in (
-            "response.cad_build", "materializedDigest", "component_count",
+            "response.cad_build", "materializedIdentity", "scenePresent",
+            "payload.scene_artifact_identity", "component_count",
             'data-fusion="inspect"', 'data-fusion="clear"', 'data-fusion="export"',
             "scene_status==='synchronized'", "technicalDetail(payload.scene_result",
         ):
             self.assertIn(marker, self.markup)
-        self.assertNotIn("cad_ir_digest", self.markup)
+        self.assertIn("cad_ir_digest", self.markup)
         self.assertIn("build_partition_cad", self.bridge)
         self.assertIn('"cad_build": deepcopy(cad_build)', self.bridge)
 

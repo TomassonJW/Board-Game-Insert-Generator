@@ -20,6 +20,11 @@ try:
         BGIG_ATTRIBUTE_GROUP,
         BGIG_ATTRIBUTE_KIND,
         BGIG_ATTRIBUTE_MODULE_ID_KEY,
+        BGIG_ATTRIBUTE_ARTIFACT_KIND_KEY,
+        BGIG_ATTRIBUTE_ARTIFACT_DIGEST_KEY,
+        BGIG_ATTRIBUTE_PARTITION_PLAN_DIGEST_KEY,
+        BGIG_ATTRIBUTE_CAD_IR_DIGEST_KEY,
+        BGIG_ATTRIBUTE_SOURCE_REVISION_KEY,
         BGIG_ATTRIBUTE_ROLE_KEY,
         BGIG_ATTRIBUTE_SCENE_ID_KEY,
         BGIG_ATTRIBUTE_VALUE,
@@ -125,6 +130,11 @@ except ImportError:  # pragma: no cover - Fusion may load the file as a script.
         BGIG_ATTRIBUTE_GROUP,
         BGIG_ATTRIBUTE_KIND,
         BGIG_ATTRIBUTE_MODULE_ID_KEY,
+        BGIG_ATTRIBUTE_ARTIFACT_KIND_KEY,
+        BGIG_ATTRIBUTE_ARTIFACT_DIGEST_KEY,
+        BGIG_ATTRIBUTE_PARTITION_PLAN_DIGEST_KEY,
+        BGIG_ATTRIBUTE_CAD_IR_DIGEST_KEY,
+        BGIG_ATTRIBUTE_SOURCE_REVISION_KEY,
         BGIG_ATTRIBUTE_ROLE_KEY,
         BGIG_ATTRIBUTE_SCENE_ID_KEY,
         BGIG_ATTRIBUTE_VALUE,
@@ -843,6 +853,16 @@ def _synchronize_palette_cad_response(
     temporary.write_text(json.dumps(cad_build["cad_ir"], indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     temporary.replace(cad_ir_path)
     inspection_before = _inspect_palette_scene()
+    if _palette_scene_blocks_replacement(inspection_before):
+        synchronized["scene_status"] = "blocked"
+        synchronized["scene_result"] = (
+            "La scene BGIG existante est ambigue. Aucune suppression ni regeneration n a ete lancee."
+        )
+        synchronized["scene_inspection"] = inspection_before
+        lifecycle = dict(synchronized.get("lifecycle") or {})
+        lifecycle["materialized"] = "blocked"
+        synchronized["lifecycle"] = lifecycle
+        return synchronized
     fusion_action = _palette_materialization_action(project_action, inspection_before)
     request = build_fusion_command_request(
         str(cad_ir_path),
@@ -857,6 +877,7 @@ def _synchronize_palette_cad_response(
     generation_refused = BGIG_EXISTING_SCENE_MESSAGE in str(synchronized["scene_result"])
     synchronized["scene_status"] = "synchronized" if scene_verified and not generation_refused else "blocked"
     synchronized["scene_inspection"] = inspection_after
+    synchronized["scene_artifact_identity"] = inspection_after.get("scene_artifact_identity")
     lifecycle = dict(synchronized.get("lifecycle") or {})
     lifecycle["materialized"] = "current" if synchronized["scene_status"] == "synchronized" else "blocked"
     synchronized["lifecycle"] = lifecycle
@@ -881,26 +902,60 @@ def _palette_scene_is_safely_owned(inspection: dict[str, object]) -> bool:
     )
 
 
+def _palette_scene_blocks_replacement(inspection: dict[str, object]) -> bool:
+    """Refuse any non-empty scene that is not one unambiguous BGIG root."""
+
+    has_bgig = bool(
+        int(inspection.get("bgig_scene_roots_total", 0))
+        or int(inspection.get("tagged_bgig_entities", 0))
+        or int(inspection.get("bgig_name_like_untagged_entities", 0))
+    )
+    return has_bgig and not _palette_scene_is_safely_owned(inspection)
+
+
+def _normalized_scene_artifact_identity(value: object) -> dict[str, str] | None:
+    if not isinstance(value, dict):
+        return None
+    keys = (
+        "schema_version",
+        "artifact_kind",
+        "artifact_digest",
+        "partition_plan_digest",
+        "cad_ir_digest",
+        "source_revision",
+    )
+    normalized = {key: str(value.get(key, "")) for key in keys}
+    return normalized if all(normalized.values()) else None
+
+
 def _palette_scene_matches_cad_build(
     inspection: dict[str, object],
     cad_build: dict[str, object],
 ) -> bool:
-    """Verify registry ownership and the exact number of requested Fusion bodies."""
+    """Verify ownership, body count, and every exact artifact identity field."""
 
     materialization = cad_build.get("materialization")
-    if not isinstance(materialization, dict):
+    expected_identity = _normalized_scene_artifact_identity(
+        cad_build.get("artifact_identity")
+    )
+    actual_identity = _normalized_scene_artifact_identity(
+        inspection.get("scene_artifact_identity")
+    )
+    if not isinstance(materialization, dict) or expected_identity is None:
         return False
     expected_bodies = int(materialization.get("component_count", -1))
     return (
         _palette_scene_is_safely_owned(inspection)
         and int(inspection.get("bodies_tagged", -1)) == expected_bodies
+        and actual_identity == expected_identity
     )
 
 
 def _palette_materialization_action(project_action: str, inspection: dict[str, object]) -> str:
     """Create a first scene or safely replace the single owned BGIG scene."""
 
-    if project_action == "regenerate_project" or _palette_scene_is_safely_owned(inspection):
+    del project_action  # The inspected ownership, not the button label, decides.
+    if _palette_scene_is_safely_owned(inspection):
         return FUSION_COMMAND_ACTION_REGENERATE
     return FUSION_COMMAND_ACTION_GENERATE
 
@@ -967,6 +1022,12 @@ def _palette_state(addin_dir: Path, notice: str = "", technical_detail: str = ""
         "source_detail": "Le plan BGIG courant est pret a etre applique." if source_ready else "L editeur Fusion complet sera active par P56 ; aucun plan externe n est requis par le MVP.",
         "scene_status": scene_status,
         "scene_detail": scene_detail,
+        "scene_present": bool(
+            scene_roots
+            or int(inspection.get("tagged_bgig_entities", 0))
+            or int(inspection.get("bgig_name_like_untagged_entities", 0))
+        ),
+        "scene_artifact_identity": inspection.get("scene_artifact_identity"),
         "manufacturing_status": "Geometrie Fusion verifiee — impression non validee",
         "manufacturing_detail": "Les bacs ouverts sont observes dans Fusion. L ajustement reel et l impression restent a mesurer.",
         "warnings": warnings,
@@ -1114,12 +1175,18 @@ def _execute_generation_request(request, addin_dir: Path) -> str:  # noqa: ANN00
     cad_ir_path = request.cad_ir_path
     quick_parametric_payload = None
     quick_asset_payload = None
-    if request.source_kind == "config":        cad_ir_path = _generate_cad_ir_from_config_request(request, addin_dir)
+    if request.source_kind == "config":
+        cad_ir_path = _generate_cad_ir_from_config_request(request, addin_dir)
     elif request.source_kind == "quick_parametric_box":
-        cad_ir_path, quick_parametric_payload = _generate_cad_ir_from_quick_parametric_box_request(request, addin_dir)
+        cad_ir_path, quick_parametric_payload = (
+            _generate_cad_ir_from_quick_parametric_box_request(request, addin_dir)
+        )
     elif request.source_kind == "quick_asset_box":
-        cad_ir_path, quick_asset_payload = _generate_cad_ir_from_quick_asset_box_request(request, addin_dir)
-    if cad_ir_path is None:        raise FusionSkeletonError("No CAD IR path is available for generation.")
+        cad_ir_path, quick_asset_payload = (
+            _generate_cad_ir_from_quick_asset_box_request(request, addin_dir)
+        )
+    if cad_ir_path is None:
+        raise FusionSkeletonError("No CAD IR path is available for generation.")
 
     payload = load_cad_ir_json(cad_ir_path)
     generation_plan = generation_plan_from_cad_ir(
@@ -1129,6 +1196,10 @@ def _execute_generation_request(request, addin_dir: Path) -> str:  # noqa: ANN00
 
     clear_result = None
     if request.action == FUSION_COMMAND_ACTION_REGENERATE:
+        if not _palette_scene_is_safely_owned(inspection_before):
+            raise FusionSkeletonError(
+                "Regeneration refused: the existing BGIG scene is absent or ambiguous."
+            )
         clear_result = registry.clear(scene_roots_before=scene_roots_before)
         if int(clear_result.get("bgig_objects_remaining", 0)) != 0:
             raise FusionSkeletonError(
@@ -1866,7 +1937,14 @@ class BgigFusionRegistry:
     def create_scene_id(self) -> str:
         return f"bgig-{uuid.uuid4().hex[:12]}"
 
-    def tag(self, entity, role: str, scene_id: str | None = None, module_id: str | None = None) -> bool:  # noqa: ANN001
+    def tag(
+        self,
+        entity,
+        role: str,
+        scene_id: str | None = None,
+        module_id: str | None = None,
+        artifact_identity: dict[str, object] | None = None,
+    ) -> bool:  # noqa: ANN001
         attributes = getattr(entity, "attributes", None)
         if attributes is None:
             return False
@@ -1878,6 +1956,18 @@ class BgigFusionRegistry:
                 attributes.add(BGIG_ATTRIBUTE_GROUP, BGIG_ATTRIBUTE_SCENE_ID_KEY, scene_id)
             if module_id:
                 attributes.add(BGIG_ATTRIBUTE_GROUP, BGIG_ATTRIBUTE_MODULE_ID_KEY, module_id)
+            if artifact_identity:
+                for attribute_name, identity_key in (
+                    (BGIG_ATTRIBUTE_ARTIFACT_KIND_KEY, "artifact_kind"),
+                    (BGIG_ATTRIBUTE_ARTIFACT_DIGEST_KEY, "artifact_digest"),
+                    (BGIG_ATTRIBUTE_PARTITION_PLAN_DIGEST_KEY, "partition_plan_digest"),
+                    (BGIG_ATTRIBUTE_CAD_IR_DIGEST_KEY, "cad_ir_digest"),
+                    (BGIG_ATTRIBUTE_SOURCE_REVISION_KEY, "source_revision"),
+                ):
+                    value = artifact_identity.get(identity_key)
+                    if value is None or str(value) == "":
+                        raise ValueError(f"Missing BGIG artifact identity field {identity_key}.")
+                    attributes.add(BGIG_ATTRIBUTE_GROUP, attribute_name, str(value))
             return True
         except Exception:
             return False
@@ -1893,6 +1983,9 @@ class BgigFusionRegistry:
         scene_roots_by_attribute = self.scene_root_occurrences_by_attribute(root_occurrences)
         scene_roots_by_name = self.scene_root_occurrences_by_name(root_occurrences)
         scene_roots = self._unique_entities([*scene_roots_by_attribute, *scene_roots_by_name])
+        scene_artifact_identity = (
+            self.artifact_identity(scene_roots[0]) if len(scene_roots) == 1 else None
+        )
         tagged_keys = {self.entity_key(entity) for entity, _role in tagged_entities}
         candidate_entities = self._unique_entities([*root_occurrences, *components, *bodies, *sketches, *features])
         name_like = [
@@ -1932,6 +2025,7 @@ class BgigFusionRegistry:
             "scene_roots_by_attribute": len(scene_roots_by_attribute),
             "bgig_scene_roots_total": len(scene_roots),
             "bgig_scene_root_occurrences": len(scene_roots),
+            "scene_artifact_identity": scene_artifact_identity,
             "tagged_bgig_entities": len(tagged_entities),
             "tagged_bgig_unique_entities": len(tagged_entities),
             "tagged_bgig_attributes_found": self.bgig_attribute_count(),
@@ -2139,6 +2233,19 @@ class BgigFusionRegistry:
     def module_id(self, entity) -> str | None:  # noqa: ANN001
         return _bgig_attribute_value(entity, BGIG_ATTRIBUTE_MODULE_ID_KEY)
 
+    def artifact_identity(self, entity) -> dict[str, object] | None:  # noqa: ANN001
+        values: dict[str, object] = {
+            "schema_version": "bgig.scene_artifact_identity.v1",
+            "artifact_kind": _bgig_attribute_value(entity, BGIG_ATTRIBUTE_ARTIFACT_KIND_KEY),
+            "artifact_digest": _bgig_attribute_value(entity, BGIG_ATTRIBUTE_ARTIFACT_DIGEST_KEY),
+            "partition_plan_digest": _bgig_attribute_value(entity, BGIG_ATTRIBUTE_PARTITION_PLAN_DIGEST_KEY),
+            "cad_ir_digest": _bgig_attribute_value(entity, BGIG_ATTRIBUTE_CAD_IR_DIGEST_KEY),
+            "source_revision": _bgig_attribute_value(entity, BGIG_ATTRIBUTE_SOURCE_REVISION_KEY),
+        }
+        if any(values[key] in (None, "") for key in values if key != "schema_version"):
+            return None
+        return values
+
     def generated_by(self, entity) -> str | None:  # noqa: ANN001
         return _bgig_attribute_value(entity, BGIG_ATTRIBUTE_KIND)
 
@@ -2149,6 +2256,7 @@ class BgigFusionRegistry:
             f"role={role or self.role(entity) or 'n/a'}; "
             f"scene_id={self.scene_id(entity) or 'n/a'}; "
             f"module_id={self.module_id(entity) or 'n/a'}; "
+            f"artifact_kind={(self.artifact_identity(entity) or {}).get('artifact_kind', 'n/a')}; "
             f"parent={_entity_context_name(entity)}; "
             f"visible={_bgig_entity_is_visible(entity)}"
         )
@@ -2291,15 +2399,34 @@ def _tag_bgig_entity(
     role: str,
     scene_id: str | None = None,
     module_id: str | None = None,
+    artifact_identity: dict[str, object] | None = None,
     registry: BgigFusionRegistry | None = None,
 ) -> bool:  # noqa: ANN001 - Fusion API object.
     active_registry = registry
     if active_registry is None:
-        return _tag_bgig_entity_direct(entity, role, scene_id=scene_id, module_id=module_id)
-    return active_registry.tag(entity, role, scene_id=scene_id, module_id=module_id)
+        return _tag_bgig_entity_direct(
+            entity,
+            role,
+            scene_id=scene_id,
+            module_id=module_id,
+            artifact_identity=artifact_identity,
+        )
+    return active_registry.tag(
+        entity,
+        role,
+        scene_id=scene_id,
+        module_id=module_id,
+        artifact_identity=artifact_identity,
+    )
 
 
-def _tag_bgig_entity_direct(entity, role: str, scene_id: str | None = None, module_id: str | None = None) -> bool:  # noqa: ANN001
+def _tag_bgig_entity_direct(
+    entity,
+    role: str,
+    scene_id: str | None = None,
+    module_id: str | None = None,
+    artifact_identity: dict[str, object] | None = None,
+) -> bool:  # noqa: ANN001
     attributes = getattr(entity, "attributes", None)
     if attributes is None:
         return False
@@ -2311,6 +2438,18 @@ def _tag_bgig_entity_direct(entity, role: str, scene_id: str | None = None, modu
             attributes.add(BGIG_ATTRIBUTE_GROUP, BGIG_ATTRIBUTE_SCENE_ID_KEY, scene_id)
         if module_id:
             attributes.add(BGIG_ATTRIBUTE_GROUP, BGIG_ATTRIBUTE_MODULE_ID_KEY, module_id)
+        if artifact_identity:
+            for attribute_name, identity_key in (
+                (BGIG_ATTRIBUTE_ARTIFACT_KIND_KEY, "artifact_kind"),
+                (BGIG_ATTRIBUTE_ARTIFACT_DIGEST_KEY, "artifact_digest"),
+                (BGIG_ATTRIBUTE_PARTITION_PLAN_DIGEST_KEY, "partition_plan_digest"),
+                (BGIG_ATTRIBUTE_CAD_IR_DIGEST_KEY, "cad_ir_digest"),
+                (BGIG_ATTRIBUTE_SOURCE_REVISION_KEY, "source_revision"),
+            ):
+                value = artifact_identity.get(identity_key)
+                if value is None or str(value) == "":
+                    raise ValueError(f"Missing BGIG artifact identity field {identity_key}.")
+                attributes.add(BGIG_ATTRIBUTE_GROUP, attribute_name, str(value))
         return True
     except Exception:
         return False
@@ -2401,7 +2540,12 @@ def _active_design(application):  # noqa: ANN001 - Fusion API object.
     return design
 
 
-def _create_bgig_scene_root(root_component, registry: BgigFusionRegistry, scene_id: str):  # noqa: ANN001 - Fusion API object.
+def _create_bgig_scene_root(
+    root_component,
+    registry: BgigFusionRegistry,
+    scene_id: str,
+    artifact_identity: dict[str, object] | None = None,
+):  # noqa: ANN001 - Fusion API object.
     transform = _matrix_for_origin(FusionVectorMm(0.0, 0.0, 0.0))
     try:
         occurrence = root_component.occurrences.addNewComponent(transform)
@@ -2414,17 +2558,17 @@ def _create_bgig_scene_root(root_component, registry: BgigFusionRegistry, scene_
     if occurrence is None:
         raise RuntimeError("Fusion component creation failed for BGIG Generated Scene.")
     _apply_occurrence_transform(occurrence, transform)
-    _tag_bgig_entity(occurrence, BGIG_SCENE_ROOT_ROLE, scene_id=scene_id, registry=registry)
+    _tag_bgig_entity(occurrence, BGIG_SCENE_ROOT_ROLE, scene_id=scene_id, artifact_identity=artifact_identity, registry=registry)
     component = occurrence.component
     if component is None:
         raise RuntimeError("BGIG Generated Scene component is unavailable.")
     component.name = BGIG_SCENE_ROOT_COMPONENT_NAME
-    _tag_bgig_entity(component, "scene_root_component", scene_id=scene_id, registry=registry)
+    _tag_bgig_entity(component, "scene_root_component", scene_id=scene_id, artifact_identity=artifact_identity, registry=registry)
     return occurrence, component
 
 def _generate_from_plan(design, plan: FusionGenerationPlan, registry: BgigFusionRegistry, scene_id: str) -> dict[str, object]:  # noqa: ANN001
     root_component = design.rootComponent
-    _scene_occurrence, scene_component = _create_bgig_scene_root(root_component, registry, scene_id)
+    _scene_occurrence, scene_component = _create_bgig_scene_root(root_component, registry, scene_id, plan.artifact_identity)
     reference_outlines = _create_reference_box_outlines(scene_component, plan.reference_box)
     for reference_outline in reference_outlines:
         _tag_bgig_entity(reference_outline, "box_reference", scene_id=scene_id, registry=registry)

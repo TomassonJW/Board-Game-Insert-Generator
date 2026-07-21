@@ -1525,5 +1525,22 @@ séparation géométrique minimal/final ; ADR-0074 porte la correction.
   échec borné et cas dense 11 × 34 couverts.
 - C-FUSION-UI / C-CAD : inchangées dans B ; aucune scène, CAD IR ou
   matérialisation minimale n'est encore promue.
-- Suite : P64-L03R-C `ready`, puis P64-L03R-V seulement après C.
+- Suite réalisée : P64-L03R-C `automated-validated` ; P64-L03R-V est désormais `ready-human-gate`.
+  `fusion-validated: false`, `print-validated: false`.
+## Mise à jour P64-L03R-C — matérialisation duale automatisée
+
+- C-SOLVER / C-LAYOUT : l'orchestration staged consomme le `minimal_layout`
+  certifié de L03R-B et rend stale tout changement de dépendance L01/L02 ; aucun
+  solveur historique public ni budget n'est modifié.
+- C-CAD : `implemented-core`, `automated-validated` pour une CAD IR minimale
+  construite sans nouveau solve, sans résiduel distribué et avec digest de
+  géométrie revalidé.
+- C-FUSION-UI : `implemented-fusion-bridge`, `implemented-fusion-ui`,
+  `automated-validated` pour la sélection minimal/finalisé, l'identité exacte,
+  `Mettre à jour la scène` et le remplacement borné d'une seule racine BGIG.
+- C-RESULT-TRUTH : la finalisation reste optionnelle et absente de C ; le plan
+  minimal reste consultable et matérialisable après un échec de finition.
+- C-QUALITY : fixtures 11 à 18, scène ambiguë fail-closed, ancien digest, stale,
+  préservation d'objet utilisateur et altération CAD couvertes.
+- Suite : P64-L03R-V `ready-human-gate` sur Fusion 0.1.57.
   `fusion-validated: false`, `print-validated: false`.

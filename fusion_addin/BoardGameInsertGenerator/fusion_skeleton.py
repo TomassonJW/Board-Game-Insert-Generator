@@ -7,6 +7,7 @@ boundary checks in normal Python.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 from dataclasses import dataclass
@@ -76,8 +77,13 @@ BGIG_ATTRIBUTE_KIND = "generated_by"
 BGIG_ATTRIBUTE_ROLE_KEY = "role"
 BGIG_ATTRIBUTE_SCENE_ID_KEY = "scene_id"
 BGIG_ATTRIBUTE_MODULE_ID_KEY = "module_id"
+BGIG_ATTRIBUTE_ARTIFACT_KIND_KEY = "artifact_kind"
+BGIG_ATTRIBUTE_ARTIFACT_DIGEST_KEY = "artifact_digest"
+BGIG_ATTRIBUTE_PARTITION_PLAN_DIGEST_KEY = "partition_plan_digest"
+BGIG_ATTRIBUTE_CAD_IR_DIGEST_KEY = "cad_ir_digest"
+BGIG_ATTRIBUTE_SOURCE_REVISION_KEY = "source_revision"
 BGIG_ATTRIBUTE_VERSION_KEY = "version"
-BGIG_ATTRIBUTE_VERSION_VALUE = "p12-ui-m002v7"
+BGIG_ATTRIBUTE_VERSION_VALUE = "p64-l03r-c-v1"
 BGIG_ATTRIBUTE_VALUE = "BoardGameInsertGenerator"
 BGIG_CLEAR_SCOPE = "registry_scene_root_deleteMe_then_strict_bgig_legacy_cleanup"
 BGIG_SCENE_ROOT_COMPONENT_NAME = "BGIG Generated Scene"
@@ -646,6 +652,7 @@ class FusionGenerationPlan:
     cavity_cuts: tuple[FusionCavityCutPlan, ...] = ()
     additive_prism_joins: tuple[FusionAdditivePrismPlan, ...] = ()
     finger_notch_cuts: tuple[FusionFingerNotchCutPlan, ...] = ()
+    artifact_identity: dict[str, object] | None = None
     generation_mode: str = DEFAULT_FUSION_GENERATION_MODE
     validation_status: str = FUSION_MANUAL_VALIDATION_REQUIRED
 
@@ -714,6 +721,7 @@ class FusionGenerationPlan:
             "cavity_cuts": [cut.to_dict() for cut in self.cavity_cuts],
             "additive_prism_joins": [join.to_dict() for join in self.additive_prism_joins],
             "finger_notch_cuts": [cut.to_dict() for cut in self.finger_notch_cuts],
+            "artifact_identity": self.artifact_identity,
             "generation_mode": self.generation_mode,
             "validation_status": self.validation_status,
         }
@@ -2739,6 +2747,67 @@ def resolve_generation_mode(
     return _validated_generation_mode(configured_mode)
 
 
+def _artifact_identity_from_metadata(metadata: Any) -> dict[str, object] | None:
+    """Validate the exact artifact identity carried by staged CAD IR."""
+
+    if not isinstance(metadata, dict):
+        return None
+    value = metadata.get("artifact_identity")
+    if value is None:
+        return None
+    if not isinstance(value, dict):
+        raise FusionSkeletonError("CAD IR metadata.artifact_identity must be an object.")
+    required_text = (
+        "schema_version",
+        "artifact_kind",
+        "artifact_digest",
+        "partition_plan_digest",
+        "cad_ir_digest",
+    )
+    normalized: dict[str, object] = {}
+    for key in required_text:
+        item = value.get(key)
+        if not isinstance(item, str) or not item:
+            raise FusionSkeletonError(
+                f"CAD IR artifact identity requires a non-empty {key}."
+            )
+        normalized[key] = item
+    if normalized["schema_version"] != "bgig.scene_artifact_identity.v1":
+        raise FusionSkeletonError("Unsupported CAD IR artifact identity schema.")
+    if normalized["artifact_kind"] not in {"minimal_layout", "finalized_plan"}:
+        raise FusionSkeletonError("Unsupported CAD IR artifact kind.")
+    source_revision = value.get("source_revision")
+    if (
+        not isinstance(source_revision, int)
+        or isinstance(source_revision, bool)
+        or source_revision < 0
+    ):
+        raise FusionSkeletonError("CAD IR artifact identity requires a non-negative source_revision.")
+    normalized["source_revision"] = source_revision
+    return normalized
+
+def _validate_artifact_cad_ir_digest(
+    payload: dict[str, Any],
+    identity: dict[str, object] | None,
+) -> None:
+    """Reject a staged CAD IR whose exact geometry digest was altered."""
+
+    if identity is None:
+        return
+    canonical = json.loads(json.dumps(payload))
+    metadata = canonical.get("metadata")
+    embedded = metadata.get("artifact_identity") if isinstance(metadata, dict) else None
+    if not isinstance(embedded, dict):
+        raise FusionSkeletonError("CAD IR artifact identity disappeared during validation.")
+    embedded.pop("cad_ir_digest", None)
+    actual = hashlib.sha256(
+        json.dumps(canonical, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    if actual != identity["cad_ir_digest"]:
+        raise FusionSkeletonError(
+            "CAD IR artifact identity cad_ir_digest does not match the staged geometry."
+        )
+
 def generation_plan_from_cad_ir(
     payload: Any,
     generation_mode: str = DEFAULT_FUSION_GENERATION_MODE,
@@ -2752,6 +2821,8 @@ def generation_plan_from_cad_ir(
     validated_payload = validate_cad_ir_payload(payload)
     generation_mode = _validated_generation_mode(generation_mode)
     metadata = validated_payload.get("metadata", {})
+    artifact_identity = _artifact_identity_from_metadata(metadata)
+    _validate_artifact_cad_ir_digest(validated_payload, artifact_identity)
     project_name = (
         metadata.get("project_name")
         if isinstance(metadata, dict) and isinstance(metadata.get("project_name"), str)
@@ -2871,6 +2942,7 @@ def generation_plan_from_cad_ir(
         cavity_cuts=tuple(cavity_cuts),
         additive_prism_joins=tuple(additive_prism_joins),
         finger_notch_cuts=tuple(finger_notch_cuts),
+        artifact_identity=artifact_identity,
         generation_mode=generation_mode,
     )
 

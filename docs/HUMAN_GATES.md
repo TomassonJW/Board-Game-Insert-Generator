@@ -904,6 +904,40 @@ un artefact cœur minimal certifié, conserve le résiduel non attribué et ne
 revendique aucune observation Fusion ou impression. Le cas dense 11 × 34 reste
 `no_solution_within_budget`.
 
-Effet : P64-L03R-C devient `ready`. La gate P64-L03R-V reste inactive jusqu'à la
-clôture automatisée de C. Il n'y a donc aucune revue humaine à demander entre B
-et C. `fusion-validated: false`, `print-validated: false`.
+Effet historique : P64-L03R-C est ensuite devenu `ready`, puis a été clôturé
+automatiquement. Il n'y avait aucune revue humaine à demander entre B et C.
+`fusion-validated: false`, `print-validated: false`.
+
+## P64-L03R-C — Preuve automatisée, aucune revue humaine
+
+Statut : `implemented-core`, `implemented-fusion-bridge`,
+`implemented-fusion-ui`, `automated-validated`.
+
+C matérialise le plan minimal avant finition, transporte l'identité exacte de
+l'artefact et remplace uniquement une scène BGIG possédée et non ambiguë. Les
+tests simulés ne valent aucune observation Fusion. La preuve est
+`docs/P64_L03R_C_DUAL_MATERIALIZATION_EVIDENCE.md`.
+
+Effet : P64-L03R-V devient la prochaine gate humaine. `fusion-validated: false`,
+`print-validated: false` tant que Thomas n'a pas observé le parcours 0.1.57.
+
+## P64-L03R-V — Gate Fusion corrective active
+
+Statut : `ready-human-gate`. Cible : package Fusion 0.1.57, préparé par
+`scripts/fusion/prepare_p64_l03r_v_corrective_test.ps1` après intégration du
+commit de C.
+
+Thomas doit observer :
+
+1. édition locale sans solve global ni mutation de scène ;
+2. plan minimal non étendu et résiduel visible après calcul ;
+3. matérialisation des volumes minimaux avant toute finition ;
+4. ancienne scène visible mais désynchronisée après édition ;
+5. action `Mettre à jour la scène` après nouveau calcul ;
+6. exactement une scène BGIG après remplacement ;
+7. conservation d'un corps utilisateur témoin non tagué ;
+8. identité technique exacte et aucun corps automatique.
+
+Retour attendu : `P64-L03R-V Fusion OK 0.1.57 - commit <sha>`, ou KO contextuel
+avec projet, étape, statut visible et diagnostic. Cette gate ne valide ni
+calibration physique, ni imprimabilité, ni impression réelle.

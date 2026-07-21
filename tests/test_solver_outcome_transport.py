@@ -31,7 +31,22 @@ class SolverOutcomeTransportTests(unittest.TestCase):
         self.assertEqual(response["status"], "ready")
         self.assertEqual(response["solver_result"]["status"], "solution_found")
         self.assertEqual(response["solver_result"]["telemetry"]["request"], {"id": "h04-transport", "revision": 23})
-        self.assertEqual(response["solver_result"], {**response["partition"]["solver"]["result"], "telemetry": response["partition"]["solver"]["telemetry"]})
+        self.assertEqual(
+            response["solver_result"]["status"],
+            response["partition"]["solver"]["result"]["status"],
+        )
+        self.assertEqual(
+            response["solver_result"]["telemetry"]["family"],
+            response["partition"]["solver"]["telemetry"]["family"],
+        )
+        self.assertEqual(
+            response["solver_result"]["telemetry"]["artifact_request"],
+            response["partition"]["solver"]["telemetry"]["request"],
+        )
+        self.assertEqual(
+            response["solver_result"]["telemetry"]["request_scope"],
+            "staged_action",
+        )
 
     def test_invalid_input_returns_the_same_truthful_contract_before_search(self) -> None:
         project = blank_project_v1()

@@ -8,7 +8,7 @@ Statut produit : **MVP V0.1 Fusion-only accepte ; validation d impression non ac
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P64-L03R-A est `done-documentation` et P64-L03R-B est `ready`.
+Phase active : P64-L03R-C est `automated-validated` ; P64-L03R-V est la prochaine gate humaine sur Fusion 0.1.57.
 P64-V2H03V et P44-V sont fusion-validated sur 0.1.55. P45-M001V est
 architecture-accepted. P64-L03V est un KO contextuel sur 0.1.56 et n'accorde
 aucune validation Fusion à la correction minimal/final.
@@ -2748,5 +2748,41 @@ schéma projet ne change. Les solveurs publics historiques restent inchangés. L
 cas dense 11 × 34 reste `no_solution_within_budget`.
 Validation : 617/617 tests complets, plus les régressions ciblées L03R-B et
 historiques. Preuve : `docs/P64_L03R_B_MINIMAL_SOLVER_EVIDENCE.md`.
-P64-L03R-C devient `ready`. `fusion-validated: false`,
+P64-L03R-C a ensuite été clôturé automatiquement. `fusion-validated: false`,
 `print-validated: false`.
+## P64-L03R-C — Matérialisation duale et scène courante (2026-07-21)
+
+Statut : `implemented-core`, `implemented-fusion-bridge`,
+`implemented-fusion-ui`, `automated-validated`.
+
+L'orchestrateur staged consomme désormais les frontières L01/L02 et
+`solve_minimal_layout`. Le `minimal_layout` certifié est un artefact autonome,
+matérialisable avant finalisation. Une méthode de finition doit être injectée et
+certifiée explicitement ; C n'en livre aucune et conserve toujours le plan
+minimal en cas d'échec.
+
+La CAD IR explicite ne relance pas le solveur historique. Elle conserve les
+dimensions minimales, refuse tout résiduel distribué et porte une identité
+complète avec type d'artefact, digests artefact/plan/CAD et révision source. Le
+digest de géométrie est revalidé par l'adaptateur Fusion avant génération.
+
+La palette expose `Matérialiser les volumes minimaux` puis, après édition et
+nouveau calcul, `Mettre à jour la scène`. Le bridge refuse une scène ambiguë
+avant toute suppression, limite l'effacement aux entités BGIG taguées et
+revérifie racine, corps et identité après génération. Les objets utilisateur non
+BGIG restent hors de cette portée.
+
+Les fixtures 11 à 18, 185/185 tests ciblés du préparateur et 625/625 tests
+complets, plus Ruff ciblé, compileall et la frontière adsk constituent la preuve
+automatisée.
+Détail : `docs/P64_L03R_C_DUAL_MATERIALIZATION_EVIDENCE.md`.
+
+Limite observée : la fixture P66 historique à huit bacs et réservations hautes
+reste `no_solution_within_budget` sur le nouveau chemin minimal Normal avec
+`TOP_INSET_WITHOUT_SUPPORTING_BODY`. Aucun CAD n'est émis ; son preflight
+historique rempli reste une preuve séparée, non promue en plan minimal.
+
+Aucun solveur public historique, budget, schéma, valeur physique, tolérance,
+default, jeu, cavité ou résultat dense ne change. Le cas 11 × 34 reste
+`no_solution_within_budget`. P64-L03R-V devient `ready-human-gate` sur le package
+0.1.57. `fusion-validated: false`, `print-validated: false` pour la correction.

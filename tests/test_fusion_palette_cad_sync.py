@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 import json
 from pathlib import Path
 import sys
@@ -21,14 +22,31 @@ from fusion_skeleton import (  # noqa: E402
 )
 
 
+IDENTITY = {
+    "schema_version": "bgig.scene_artifact_identity.v1",
+    "artifact_kind": "minimal_layout",
+    "artifact_digest": "a" * 64,
+    "partition_plan_digest": "b" * 64,
+    "cad_ir_digest": "c" * 64,
+    "source_revision": 3,
+}
+
+
 def response() -> dict[str, object]:
     return {
         "schema": "bgig.palette.response.v1",
-        "request_id": "p59",
+        "request_id": "p64-l03r-c",
         "status": "ready",
         "cad_build": {
             "status": "ready_for_fusion",
-            "cad_ir": {"schema_version": "cad_ir.v0", "units": "mm", "components": [], "metadata": {}},
+            "artifact_identity": deepcopy(IDENTITY),
+            "cad_ir_digest": IDENTITY["cad_ir_digest"],
+            "cad_ir": {
+                "schema_version": "cad_ir.v0",
+                "units": "mm",
+                "components": [],
+                "metadata": {"artifact_identity": deepcopy(IDENTITY)},
+            },
             "materialization": {"component_count": 0},
         },
     }
@@ -41,16 +59,18 @@ def empty_scene() -> dict[str, object]:
         "tagged_bgig_entities": 0,
         "bodies_tagged": 0,
         "bgig_name_like_untagged_entities": 0,
+        "scene_artifact_identity": None,
     }
 
 
-def owned_scene() -> dict[str, object]:
+def owned_scene(identity: dict[str, object] | None = None) -> dict[str, object]:
     return {
         "bgig_scene_roots_total": 1,
         "scene_roots_by_attribute": 1,
         "tagged_bgig_entities": 9,
         "bodies_tagged": 0,
         "bgig_name_like_untagged_entities": 0,
+        "scene_artifact_identity": deepcopy(identity or IDENTITY),
     }
 
 
@@ -70,7 +90,8 @@ class FusionPaletteCadSyncTests(unittest.TestCase):
         self.assertEqual(result["scene_status"], "synchronized")
         self.assertEqual(result["scene_result"], "generated")
         self.assertEqual(result["lifecycle"]["materialized"], "current")
-        self.assertEqual(payload["schema_version"], "cad_ir.v0")
+        self.assertEqual(result["scene_artifact_identity"], IDENTITY)
+        self.assertEqual(payload["metadata"]["artifact_identity"], IDENTITY)
         self.assertEqual(request.action, FUSION_COMMAND_ACTION_GENERATE)
         self.assertEqual(request.generation_mode, FUSION_GENERATION_MODE_COMPACT_ONLY)
         self.assertEqual(request.input_mode, FUSION_INPUT_MODE_CAD_IR_FILE)
@@ -87,23 +108,23 @@ class FusionPaletteCadSyncTests(unittest.TestCase):
         self.assertEqual(result["scene_status"], "synchronized")
         self.assertEqual(result["lifecycle"]["materialized"], "current")
 
-    def test_materialize_blocks_an_ambiguous_scene_without_deleting_it(self) -> None:
+    def test_fixture_15_ambiguous_scene_is_blocked_before_any_delete_or_generation(self) -> None:
         ambiguous = {
             **owned_scene(),
             "bgig_scene_roots_total": 2,
             "scene_roots_by_attribute": 2,
         }
-        refused = f"Board Game Insert Generator generate refused.\n{entrypoint.BGIG_EXISTING_SCENE_MESSAGE}"
         with tempfile.TemporaryDirectory() as temp_dir, patch.object(
-            entrypoint, "_inspect_palette_scene", side_effect=[ambiguous, ambiguous]
-        ), patch.object(entrypoint, "_execute_generation_request", return_value=refused) as execute:
+            entrypoint, "_inspect_palette_scene", return_value=ambiguous
+        ), patch.object(entrypoint, "_execute_generation_request") as execute:
             result = entrypoint._synchronize_palette_cad_response(
                 response(), "materialize_project", Path(temp_dir)
             )
 
-        self.assertEqual(execute.call_args.args[0].action, FUSION_COMMAND_ACTION_GENERATE)
+        execute.assert_not_called()
         self.assertEqual(result["scene_status"], "blocked")
         self.assertEqual(result["lifecycle"]["materialized"], "blocked")
+        self.assertIn("ambigue", result["scene_result"])
 
     def test_success_text_never_masks_a_missing_scene(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir, patch.object(
@@ -127,6 +148,23 @@ class FusionPaletteCadSyncTests(unittest.TestCase):
 
         self.assertEqual(result["scene_status"], "blocked")
         self.assertEqual(result["lifecycle"]["materialized"], "blocked")
+
+    def test_fixture_14_old_digest_never_masks_scene_update(self) -> None:
+        old_identity = {**IDENTITY, "artifact_digest": "d" * 64}
+        with tempfile.TemporaryDirectory() as temp_dir, patch.object(
+            entrypoint,
+            "_inspect_palette_scene",
+            side_effect=[owned_scene(old_identity), owned_scene(old_identity)],
+        ), patch.object(entrypoint, "_execute_generation_request", return_value="regenerated"):
+            result = entrypoint._synchronize_palette_cad_response(
+                response(), "regenerate_project", Path(temp_dir)
+            )
+
+        self.assertEqual(result["scene_status"], "blocked")
+        self.assertNotEqual(
+            result["scene_artifact_identity"]["artifact_digest"],
+            result["cad_build"]["artifact_identity"]["artifact_digest"],
+        )
 
     def test_regenerate_uses_owned_scene_replacement_action(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir, patch.object(

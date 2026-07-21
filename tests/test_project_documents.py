@@ -40,6 +40,7 @@ REQUIRED_PROJECT_FILES = (
     "docs/P64_L02_CONTEXTUAL_LOCAL_ANALYSIS_EVIDENCE.md",
     "docs/P64_L03_EXPLICIT_STAGED_CYCLE_EVIDENCE.md",
     "docs/P64_L03R_B_MINIMAL_SOLVER_EVIDENCE.md",
+    "docs/P64_L03R_C_DUAL_MATERIALIZATION_EVIDENCE.md",
     "docs/P64_POST_SOLVE_CAPACITY_REUSE_CONTRACT.md",
     "docs/P64_V2H03_INTERNAL_VARIANT_COORDINATION_CONTRACT.md",
     "docs/P64_V2H03B_LOCAL_VARIANT_EVIDENCE.md",
@@ -249,7 +250,17 @@ REQUIRED_SECTIONS = {
         "## Limites",
         "## Suite",
     ),
-    "docs/P64_POST_SOLVE_CAPACITY_REUSE_CONTRACT.md": (
+    "docs/P64_L03R_C_DUAL_MATERIALIZATION_EVIDENCE.md": (
+        "## Résultat",
+        "## Portée livrée",
+        "## Identité exacte de l'artefact et de la CAD IR",
+        "## Remplacement borné de la scène Fusion",
+        "## UX progressive",
+        "## Fixtures contractuelles couvertes",
+        "## Validation automatisée",
+        "## Limites",
+        "## Suite",
+    ),    "docs/P64_POST_SOLVE_CAPACITY_REUSE_CONTRACT.md": (
         "## 1. Objectif et promesse honnête",
         "## 2. Vocabulaire normatif",
         "## 9. Mémoire courte et invalidation",

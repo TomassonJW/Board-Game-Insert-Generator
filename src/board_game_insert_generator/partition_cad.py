@@ -6,7 +6,7 @@ import hashlib
 import json
 from copy import deepcopy
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Mapping
 
 from board_game_insert_generator.cad_ir import (
     CAD_IR_COORDINATE_SYSTEM,
@@ -36,6 +36,9 @@ from board_game_insert_generator.top_inset_reservation import (
 
 PARTITION_CAD_BUILD_SCHEMA_V1 = "bgig.partition_cad_build.v1"
 PARTITION_CAD_STATUS_READY = "ready_for_fusion"
+SCENE_ARTIFACT_IDENTITY_SCHEMA_V1 = "bgig.scene_artifact_identity.v1"
+ARTIFACT_KIND_MINIMAL = "minimal_layout"
+ARTIFACT_KIND_FINALIZED = "finalized_plan"
 _EPSILON = 0.0001
 
 
@@ -55,19 +58,32 @@ def build_partition_cad(
     partition: object | None = None,
     solver_method: str | None = None,
     effort_profile: str = "normal",
+    artifact_identity: Mapping[str, object] | None = None,
 ) -> dict[str, object]:
-    """Build CAD IR from a complete P64 plan under the same solver settings."""
+    """Build CAD IR from one exact minimal or finalized P64 artifact.
+
+    Calls without ``artifact_identity`` keep the historical certified-partition
+    validation path. The staged Fusion palette always supplies an explicit
+    identity and therefore never recomputes or silently transforms its source.
+    """
 
     normalization = normalize_project_draft(raw_project)
     project = normalization.project
-    expected_plan = solve_partition_plan(
-        project,
-        solver_method=solver_method,
-        effort_profile=effort_profile,
-    )
-    plan = expected_plan if partition is None else _mapping(partition, "partition")
-    if partition is not None and _plan_for_semantic_comparison(plan) != _plan_for_semantic_comparison(expected_plan):
-        raise PartitionCadBuildError("Le plan P64 fourni est obsolete ou ne correspond pas au projet courant.")
+    if artifact_identity is None:
+        expected_plan = solve_partition_plan(
+            project,
+            solver_method=solver_method,
+            effort_profile=effort_profile,
+        )
+        plan = expected_plan if partition is None else _mapping(partition, "partition")
+        if partition is not None and _plan_for_semantic_comparison(plan) != _plan_for_semantic_comparison(expected_plan):
+            raise PartitionCadBuildError("Le plan P64 fourni est obsolete ou ne correspond pas au projet courant.")
+        identity = None
+    else:
+        if partition is None:
+            raise PartitionCadBuildError("Un artefact selectionne exige son plan P64 exact.")
+        plan = _mapping(partition, "partition")
+        identity = _normalize_artifact_identity(artifact_identity, plan)
     if plan.get("schema_version") != PARTITION_PLAN_SCHEMA_V1:
         raise PartitionCadBuildError("P59 exige un plan bgig.partition_plan.v1.")
     summary = _mapping(plan.get("summary"), "partition.summary")
@@ -79,9 +95,16 @@ def build_partition_cad(
         "source": {"source_schema": normalization.source_schema, "migrated": normalization.migrated},
         "project_name": project["project_name"],
         "source_plan_digest": str(plan.get("plan_digest", "")),
+        "artifact_kind": identity.get("artifact_kind") if identity else "legacy_partition",
+        "artifact_identity": None,
         "partition": _plan_for_semantic_comparison(plan),
     }
-    if summary.get("status") != "constructed" or not bool(summary.get("materializable", False)):
+    cad_eligible = (
+        _selected_plan_is_cad_eligible(plan, identity)
+        if identity is not None
+        else summary.get("status") == "constructed" and bool(summary.get("materializable", False))
+    )
+    if not cad_eligible:
         partial = summary.get("status") == "proposal_with_residuals"
         blockers = [
             str(item.get("message", "Partition impossible."))
@@ -117,7 +140,7 @@ def build_partition_cad(
             "materialization": {"status": "blocked", "component_count": 0, "automatic_body_count": 0},
             "blockers": list(build.blockers),
         }
-    expected_count = int(summary["final_body_count"])
+    expected_count = len(_mappings(plan.get("placements", []), "partition.placements")) if identity else int(summary["final_body_count"])
     if len(build.components) != expected_count:
         raise PartitionCadBuildError(
             f"P59 a produit {len(build.components)} composants mais le plan P64 en exige {expected_count}."
@@ -149,7 +172,7 @@ def build_partition_cad(
         metadata=CadSceneMetadata(
             project_name=str(project["project_name"]),
             source_path=None,
-            layout_strategy="p64_bounded_volumetric_stage_v1",
+            layout_strategy=("p64_minimal_layout_v1" if identity and identity["artifact_kind"] == ARTIFACT_KIND_MINIMAL else "p64_bounded_volumetric_stage_v1"),
             print_profile="fusion_only_mvp_v0_1",
             warnings=(
                 "CAD IR derivee du plan P64 ; Fusion ne doit recalculer aucun etage, placement, dimension ou cavite.",
@@ -176,7 +199,15 @@ def build_partition_cad(
         ),
     )
     cad_ir = scene.to_dict()
+    if identity is not None:
+        cad_ir["metadata"]["artifact_identity"] = deepcopy(identity)
+    # The digest covers the complete CAD geometry and immutable source identity,
+    # excluding only its own recursive ``cad_ir_digest`` field.
     digest = hashlib.sha256(json.dumps(cad_ir, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+    full_identity = None
+    if identity is not None:
+        full_identity = {**identity, "cad_ir_digest": digest}
+        cad_ir["metadata"]["artifact_identity"] = deepcopy(full_identity)
     cavity_count = sum(len(component.body.cavities) for component in build.components)
     top_inset_cut_count = sum(
         1
@@ -187,6 +218,7 @@ def build_partition_cad(
     return {
         **base,
         "status": PARTITION_CAD_STATUS_READY,
+        "artifact_identity": full_identity,
         "cad_ir": cad_ir,
         "cad_ir_digest": digest,
         "materialization": {
@@ -198,6 +230,7 @@ def build_partition_cad(
             "top_inset_cut_count": top_inset_cut_count,
             "automatic_body_count": 0,
             "source_plan_digest": plan.get("plan_digest"),
+            "artifact_kind": identity.get("artifact_kind") if identity else "legacy_partition",
         },
         "blockers": [],
         "invariants": {
@@ -208,6 +241,8 @@ def build_partition_cad(
             "top_inset_cut_count_matches_plan": top_inset_cut_count == len(_mappings(_mapping(plan.get("top_inset_reservations"), "partition.top_inset_reservations").get("cuts", []), "partition.top_inset_reservations.cuts")),
             "automatic_body_count": 0,
             "free_regions_materialized": False,
+            "selected_artifact_identity_exact": identity is None or full_identity is not None,
+            "minimal_residual_distributed": False if identity and identity["artifact_kind"] == ARTIFACT_KIND_MINIMAL else None,
         },
         "limitations": [
             "P59 V0.1 materialise des prismes et cavites rectangulaires ouverts par le dessus.",
@@ -216,6 +251,94 @@ def build_partition_cad(
         ],
     }
 
+
+def _normalize_artifact_identity(
+    value: Mapping[str, object],
+    plan: Mapping[str, object],
+) -> dict[str, object]:
+    artifact_kind = str(value.get("artifact_kind", ""))
+    if artifact_kind not in {ARTIFACT_KIND_MINIMAL, ARTIFACT_KIND_FINALIZED}:
+        raise PartitionCadBuildError(
+            "artifact_kind doit etre minimal_layout ou finalized_plan."
+        )
+    artifact_digest = str(value.get("artifact_digest", ""))
+    partition_plan_digest = str(value.get("partition_plan_digest", ""))
+    source_revision = value.get("source_revision")
+    if not artifact_digest:
+        raise PartitionCadBuildError("L artefact selectionne exige un digest non vide.")
+    if partition_plan_digest != str(plan.get("plan_digest", "")):
+        raise PartitionCadBuildError(
+            "Le digest du plan ne correspond pas a l artefact selectionne."
+        )
+    if not isinstance(source_revision, int) or isinstance(source_revision, bool) or source_revision < 0:
+        raise PartitionCadBuildError("source_revision doit etre un entier positif ou nul.")
+    return {
+        "schema_version": SCENE_ARTIFACT_IDENTITY_SCHEMA_V1,
+        "artifact_kind": artifact_kind,
+        "artifact_digest": artifact_digest,
+        "partition_plan_digest": partition_plan_digest,
+        "source_revision": source_revision,
+    }
+
+
+def _selected_plan_is_cad_eligible(
+    plan: dict[str, object],
+    identity: Mapping[str, object],
+) -> bool:
+    summary = _mapping(plan.get("summary"), "partition.summary")
+    if summary.get("status") != "constructed" or int(summary.get("automatic_body_count", -1)) != 0:
+        return False
+    if identity["artifact_kind"] == ARTIFACT_KIND_FINALIZED:
+        finalization = plan.get("finalization")
+        certificate = finalization.get("certificate") if isinstance(finalization, Mapping) else None
+        return bool(
+            summary.get("materializable") is True
+            and isinstance(finalization, Mapping)
+            and finalization.get("artifact_kind") == ARTIFACT_KIND_FINALIZED
+            and isinstance(certificate, Mapping)
+            and certificate.get("certified") is True
+        )
+
+    minimal = plan.get("minimal_layout")
+    invariants = plan.get("invariants")
+    solver = plan.get("solver")
+    result = solver.get("result") if isinstance(solver, Mapping) else None
+    certificate = minimal.get("global_certificate") if isinstance(minimal, Mapping) else None
+    if not (
+        summary.get("placement_certified") is True
+        and isinstance(minimal, Mapping)
+        and minimal.get("artifact_kind") == ARTIFACT_KIND_MINIMAL
+        and minimal.get("finalization_applied") is False
+        and isinstance(certificate, Mapping)
+        and certificate.get("certified") is True
+        and isinstance(result, Mapping)
+        and result.get("status") == "solution_found"
+        and isinstance(invariants, Mapping)
+        and invariants.get("minimum_outer_dimensions_only") is True
+        and invariants.get("residual_distributed") is False
+        and invariants.get("automatic_body_count") == 0
+    ):
+        return False
+    placements = _mappings(plan.get("placements", []), "partition.placements")
+    if not placements or any(
+        value.get("role") not in {"container", "explicit_complement"}
+        for value in placements
+    ):
+        return False
+    for placement in placements:
+        if placement.get("role") != "container":
+            continue
+        minimum = _dimension(
+            placement.get("minimum_outer_envelope_mm"),
+            "placement.minimum_outer_envelope_mm",
+        )
+        final = _dimension(
+            placement.get("final_outer_dimensions_mm"),
+            "placement.final_outer_dimensions_mm",
+        )
+        if any(abs(minimum[axis] - final[axis]) > _EPSILON for axis in ("x", "y", "z")):
+            return False
+    return True
 
 def _components(project: dict[str, object], plan: dict[str, object]) -> _BuildResult:
     layout = _mapping(project["layout"], "project.layout")

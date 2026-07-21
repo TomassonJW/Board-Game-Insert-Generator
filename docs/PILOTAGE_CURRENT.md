@@ -46,9 +46,9 @@ preuves archivées.
   P64-L01, P64-L02 et P64-L03 restent automated-validated pour leurs acquis.
 - P64-L03V est un KO contextuel 0.1.56 : expansion déjà réalisée au solve,
   finalisation sans transformation et mise à jour de scène mal détectée.
-- ADR-0074 et P64-L03R-A sont architecture-accepted ; P64-L03R-B est désormais
-  `implemented-core`, `automated-validated`, et P64-L03R-C devient la seule
-  prochaine mission runtime.
+- ADR-0074 et P64-L03R-A sont architecture-accepted ; P64-L03R-B et
+  P64-L03R-C sont `implemented-core`, `automated-validated`. La prochaine
+  étape est la gate humaine P64-L03R-V sur le package Fusion 0.1.57.
 
 ## Vue de séquence
 
@@ -79,7 +79,8 @@ preuves archivées.
 | KO contextuel | P64-L03V | Fusion 0.1.56 révèle expansion au solve et scène non réactivable normalement. |
 | Terminé — contrat | P64-L03R-A | ADR-0074 et contrat minimal/matérialisation duale acceptés. |
 | Terminé — automatisé | P64-L03R-B | Solve minimal multi-graines certifié, résiduel non attribué, sans finition ni scène. |
-| Ready — bridge et scène | P64-L03R-C | Matérialisation minimale/finalisée, digests exacts et remplacement sûr de scène. |
+| Terminé — automatisé | P64-L03R-C | Matérialisation minimale/finalisée, digests exacts et remplacement sûr de scène simulé. |
+| Gate humaine active | P64-L03R-V | Observer le plan minimal non rempli et le remplacement de scène dans Fusion 0.1.57. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -99,6 +100,8 @@ preuves archivées.
   portfolio multi-graines, matérialisation duale et remplacement de scène.
 - P64_L03R_B_MINIMAL_SOLVER_EVIDENCE.md : solveur minimal, certificats,
   portefeuille, couches locales, budgets et non-régression dense.
+- P64_L03R_C_DUAL_MATERIALIZATION_EVIDENCE.md : sélection duale, CAD IR,
+  identité exacte et remplacement borné de scène.
 - ADR-0074 : supersession partielle d'ADR-0071 après le KO Fusion 0.1.56.
 - STATUS.md : faits réalisés, validations et limites.
 - CAPABILITY_MAP.md : capability et niveau de preuve.
@@ -235,6 +238,27 @@ plusieurs intervalles à côté de piles fines certifiées.
 
 Aucune finalisation, CAD IR, scène Fusion, valeur physique ou mutation du
 solveur public historique n'est incluse. Le cas dense 11 × 34 reste
-`no_solution_within_budget`. P64-L03R-C est `ready` ; aucune revue humaine n'est
-requise avant sa clôture automatisée. `fusion-validated: false`,
+`no_solution_within_budget`. P64-L03R-C est désormais clôturé automatiquement ;
+la gate humaine P64-L03R-V devient active. `fusion-validated: false`,
 `print-validated: false`.
+## P64-L03R-C — matérialisation duale livrée
+
+Le cycle staged sélectionne maintenant le `minimal_layout` certifié par défaut.
+La CAD IR est construite sans relancer le solveur historique, sans distribuer le
+résiduel et sans exiger de plan finalisé. Une finition reste un artefact distinct,
+optionnel et absent de ce lot.
+
+La sélection et la scène transportent `artifact_kind`, `artifact_digest`,
+`partition_plan_digest`, `cad_ir_digest` et `source_revision`. Le digest CAD est
+revalidé avant génération. La palette ne considère la scène courante que si
+toute l'identité correspond ; sinon elle expose `Mettre à jour la scène`.
+
+Le remplacement refuse toute scène BGIG ambiguë avant suppression et reste borné
+à l'unique racine possédée. Les tests simulés couvrent stale, ancien digest,
+absence de doublon et préservation des objets utilisateur. Preuve :
+`docs/P64_L03R_C_DUAL_MATERIALIZATION_EVIDENCE.md`.
+
+P64-L03R-V est la prochaine gate humaine sur Fusion 0.1.57. C ne revendique
+aucune observation Fusion ou impression, ne livre aucune méthode de finition et
+ne change ni solveur public, ni budget, ni schéma, ni valeur physique. Le cas
+dense 11 × 34 reste `no_solution_within_budget`.

@@ -2600,19 +2600,28 @@ P44-M007 est ready-for-explicit-go.
 
 ### P64-L03R-C — Matérialisation duale et remplacement de scène
 
-- Dépendance : L03R-B.
-- Objectif : matérialiser/exporter minimal ou finalisé, comparer les digests
-  exacts et remplacer uniquement la scène BGIG possédée.
-- Acceptation : tests bridge/DOM/registre, scène stale, aucun doublon et objets
-  utilisateur préservés.
-- Statut : ready.
+- Dépendance obtenue : L03R-B.
+- Livré : calcul minimal staged, sélection explicite minimal/finalisé, CAD IR
+  minimale sans solve historique ni résiduel distribué, identité exacte et
+  remplacement borné de la scène BGIG possédée.
+- Acceptation : fixtures 11 à 18, tests bridge/DOM/registre, stale, ancien
+  digest, scène ambiguë, aucun doublon, altération CAD et objets utilisateur.
+- Preuve : `docs/P64_L03R_C_DUAL_MATERIALIZATION_EVIDENCE.md`.
+- Limite : la fixture P66 historique à réservations hautes reste non certifiée
+  par le portefeuille minimal Normal ; aucune CAD n'est émise et aucun résultat
+  de solveur n'est contourné dans C.
+- Statut : done-code, implemented-core, implemented-fusion-bridge,
+  implemented-fusion-ui, automated-validated, fusion-validated: false,
+  print-validated: false.
 
 ### P64-L03R-V — Gate Fusion corrective
 
-- Dépendances : L03R-B et L03R-C automated-validated.
+- Dépendances obtenues : L03R-B et L03R-C automated-validated.
 - Observer plan minimal non rempli, matérialisation avant finition, puis
   recalcul et remplacement sûr de la scène.
-- Statut : future-human-gate, inactive.
+- Préparation : `scripts/fusion/prepare_p64_l03r_v_corrective_test.ps1`, package
+  0.1.57, objet témoin utilisateur et retour contextualisé.
+- Statut : ready-human-gate, active.
 
 ### P64-F01A02 — Finalisation simple autour des enveloppes
 

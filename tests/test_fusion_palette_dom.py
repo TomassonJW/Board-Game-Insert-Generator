@@ -291,7 +291,7 @@ class FusionPaletteDomTests(unittest.TestCase):
     def test_exposes_non_mutating_container_estimation_without_a_new_bridge_action(self) -> None:
         for marker in (
             "estimate-groups-action",
-            "Calculer l’agencement</button>",
+            "Calculer l\u2019agencement minimal</button>",
             "container_sizing",
             "Taille calculée",
             "Avant modification - A reestimer",
@@ -456,7 +456,7 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertEqual(self.markup.count('data-bridge="materialize_project"'), 0)
         self.assertIn('id="primary-calculation-action"', self.markup)
         self.assertIn("renderPersistentActions", self.markup)
-        for marker in ("action='finalize_project'", "action='materialize_project'", "Finaliser le volume", "Matérialiser dans Fusion"):
+        for marker in ("sceneKnown?'regenerate_project':'materialize_project'", "button.dataset.artifactKind='minimal_layout'", "Finaliser le volume", "artifact_kind"):
             self.assertIn(marker, self.markup)
         self.assertLess(
             self.markup.index('id="primary-calculation-action"'),
@@ -560,6 +560,25 @@ class FusionPaletteDomTests(unittest.TestCase):
         ):
             self.assertIn(marker, script)
 
+    def test_prepares_the_p64_l03r_v_corrective_gate(self) -> None:
+        script = (
+            ROOT / "scripts" / "fusion" / "prepare_p64_l03r_v_corrective_test.ps1"
+        ).read_text(encoding="utf-8")
+        for marker in (
+            "0.1.57",
+            "test_staged_calculation.py",
+            "test_fusion_palette_cad_sync.py",
+            "materializedIdentity",
+            "sceneMatchesCurrentArtifact",
+            "artifact_kind",
+            "cad_ir_digest",
+            "TEMOIN_UTILISATEUR",
+            "Mettre a jour la scene",
+            "P64-L03R-V Fusion OK 0.1.57",
+        ):
+            self.assertIn(marker, script)
+        self.assertIn("Finalise explicitement le volume avant", script)
+        self.assertIn("forbidden marker present", script)
     def test_prepares_the_p44_m007_adaptive_preview_gate(self) -> None:
         script = (ROOT / "scripts" / "fusion" / "prepare_p44_m007_adaptive_preview_test.ps1").read_text(encoding="utf-8")
         for marker in (

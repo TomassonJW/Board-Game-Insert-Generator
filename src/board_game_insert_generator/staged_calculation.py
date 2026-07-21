@@ -1,9 +1,10 @@
-"""Explicit global layout, finalization and materialization gating for P64-L03.
+"""Explicit minimal layout, optional finishing, and dual materialization.
 
-The session consumes P64-L01 identities and P64-L02 frontier digests.  It does
-not change solver search, budgets or geometry.  The compatibility finalizer
-accepts an already complete, commonly certified partition without modifying it;
-future finishing policies remain owned by P64-F01/F02/F03.
+The session consumes the versioned L01 dependency state, the L02 local
+frontiers, and the L03R-B minimal solver. A certified ``minimal_layout`` is a
+first-class artifact: it can produce CAD without a finalized plan. Finishing
+remains an optional, separately certified transformation and is never invoked
+implicitly by calculation, local edits, or materialization.
 """
 
 from __future__ import annotations
@@ -21,6 +22,7 @@ from board_game_insert_generator.incremental_project_state import (
     IncrementalProjectState,
     canonical_digest,
 )
+from board_game_insert_generator.minimal_layout_solver import MINIMAL_LAYOUT_SOLVER_VERSION
 from board_game_insert_generator.project_v1 import normalize_project_draft
 from board_game_insert_generator.solver_outcome import (
     SOLUTION_FOUND,
@@ -33,19 +35,14 @@ from board_game_insert_generator.solver_settings import normalize_solver_setting
 
 
 STAGED_CALCULATION_SCHEMA_V1 = "bgig.staged_calculation.v1"
-GLOBAL_LAYOUT_ARTIFACT_SCHEMA_V1 = "bgig.global_layout_artifact.v1"
+GLOBAL_LAYOUT_ARTIFACT_SCHEMA_V1 = "bgig.minimal_layout_artifact.v1"
 FINALIZED_PLAN_ARTIFACT_SCHEMA_V1 = "bgig.finalized_plan_artifact.v1"
-GLOBAL_SOLVER_VERSION = "partition_solver_portfolio.v1"
-COMPATIBILITY_FINALIZER_ID = "preserve_certified_partition"
-COMPATIBILITY_FINALIZER_VERSION = "1"
-COMPATIBILITY_FINISHING_POLICY = "preserve_existing_certified_closure"
-FINISHING_BUDGET_DIGEST = canonical_digest(
-    {
-        "policy": COMPATIBILITY_FINISHING_POLICY,
-        "geometry_transformations": 0,
-        "automatic_bodies": 0,
-    }
-)
+ARTIFACT_SELECTION_SCHEMA_V1 = "bgig.materializable_artifact_selection.v1"
+SCENE_ARTIFACT_IDENTITY_SCHEMA_V1 = "bgig.scene_artifact_identity.v1"
+ARTIFACT_KIND_MINIMAL = "minimal_layout"
+ARTIFACT_KIND_FINALIZED = "finalized_plan"
+MATERIALIZABLE_ARTIFACT_KINDS = (ARTIFACT_KIND_MINIMAL, ARTIFACT_KIND_FINALIZED)
+GLOBAL_SOLVER_VERSION = MINIMAL_LAYOUT_SOLVER_VERSION
 
 STATUS_NOT_COMPUTED = "not_computed"
 STATUS_CURRENT = "current"
@@ -69,11 +66,12 @@ class GlobalRequestToken:
 
 
 SolverCallable = Callable[..., dict[str, object]]
+FinalizerCallable = Callable[[dict[str, object]], dict[str, object]]
 FinalCertificateCallable = Callable[[dict[str, object]], bool]
 
 
 class StagedCalculationSession:
-    """Keep reconstructible staged artifacts for one local Fusion document."""
+    """Keep reconstructible artifacts for one local Fusion document."""
 
     def __init__(
         self,
@@ -89,6 +87,8 @@ class StagedCalculationSession:
         self._settings_digest = canonical_digest(self._settings)
         self._local_analysis: dict[str, object] = {}
         self._local_analysis_digest = canonical_digest({"status": "not_available"})
+        self._container_frontiers: tuple[object, ...] = ()
+        self._frontier_digests: tuple[tuple[str, str], ...] = ()
         self._request_sequence = 0
         self._active_global_request: GlobalRequestToken | None = None
         self._global_status = STATUS_NOT_COMPUTED
@@ -103,8 +103,10 @@ class StagedCalculationSession:
         self._finalized_artifact_digest = ""
         self._finalization_key_digest = ""
         self._finalization_cache_status = "not_queried"
+        self._finalization_policy = "not_selected"
         self._cad_status = STATUS_NOT_MATERIALIZED
         self._cad_build_digest = ""
+        self._cad_identity: dict[str, object] | None = None
 
     def synchronize(
         self,
@@ -112,6 +114,8 @@ class StagedCalculationSession:
         local_analysis: Mapping[str, object],
         *,
         solver_settings: Mapping[str, object] | None = None,
+        container_frontiers: Sequence[object] = (),
+        frontier_digests: Sequence[tuple[str, str]] = (),
     ) -> dict[str, object]:
         """Refresh dependencies and mark downstream artifacts stale only."""
 
@@ -120,6 +124,8 @@ class StagedCalculationSession:
         settings = normalize_solver_settings(solver_settings or self._settings)
         settings_digest = canonical_digest(settings)
         settings_changed = settings_digest != self._settings_digest
+        previous_local_analysis_digest = self._local_analysis_digest
+        previous_frontier_digests = self._frontier_digests
         self._project = project
         self._settings = settings
         self._settings_digest = settings_digest
@@ -132,7 +138,15 @@ class StagedCalculationSession:
                 ),
             }
         )
-        if delta.changed or settings_changed:
+        self._container_frontiers = tuple(container_frontiers)
+        self._frontier_digests = tuple(
+            sorted((str(key), str(value)) for key, value in frontier_digests)
+        )
+        local_dependencies_changed = bool(
+            self._local_analysis_digest != previous_local_analysis_digest
+            or self._frontier_digests != previous_frontier_digests
+        )
+        if delta.changed or settings_changed or local_dependencies_changed:
             self._invalidate_downstream()
         return self.snapshot()
 
@@ -143,34 +157,46 @@ class StagedCalculationSession:
         request_revision: int | None,
         solver: SolverCallable | None = None,
     ) -> dict[str, object]:
-        """Run or reuse one explicitly requested global layout."""
+        """Run or reuse one explicitly requested minimal global layout."""
 
         key = self._global_layout_key()
         token = self._begin_global_request(key)
         lookup = self.cache.lookup(key)
         if lookup.status == "hit":
             if not isinstance(lookup.value, dict):
-                raise TypeError("Cached global layout has an unexpected type.")
+                raise TypeError("Cached minimal layout has an unexpected type.")
             partition = deepcopy(lookup.value)
             artifact_digest = lookup.artifact_digest or ""
         else:
             if solver is None:
-                from board_game_insert_generator.partition_solver import (
-                    solve_partition_plan,
+                from board_game_insert_generator.minimal_layout_solver import (
+                    solve_minimal_layout,
                 )
 
-                solver = solve_partition_plan
-            partition = solver(
-                self._project,
-                request_id=request_id,
-                request_revision=request_revision,
-                solver_method=self._settings["method"],
-                effort_profile=self._settings["effort"],
-            )
+                partition = solve_minimal_layout(
+                    self._project,
+                    request_id=request_id,
+                    request_revision=request_revision,
+                    effort_profile=self._settings["effort"],
+                    container_frontiers=self._container_frontiers or None,
+                    frontier_digests=self._frontier_digests,
+                )
+            else:
+                # The injectable lane keeps deterministic legacy fixtures usable;
+                # production always takes the minimal solver path above.
+                partition = solver(
+                    self._project,
+                    request_id=request_id,
+                    request_revision=request_revision,
+                    solver_method=self._settings["method"],
+                    effort_profile=self._settings["effort"],
+                )
             artifact_digest = canonical_digest(
                 {
                     "schema_version": GLOBAL_LAYOUT_ARTIFACT_SCHEMA_V1,
+                    "artifact_kind": ARTIFACT_KIND_MINIMAL,
                     "global_key_digest": key.digest,
+                    "partition_plan_digest": partition.get("plan_digest"),
                     "partition": partition,
                 }
             )
@@ -201,45 +227,83 @@ class StagedCalculationSession:
             self._finalized_status = STATUS_STALE
         else:
             self._finalized_status = STATUS_NOT_FINALIZED
-        if self._cad_build_digest:
-            self._cad_status = STATUS_DESYNCHRONIZED
-        else:
-            self._cad_status = STATUS_NOT_MATERIALIZED
+        self._cad_status = (
+            STATUS_DESYNCHRONIZED
+            if self._cad_identity is not None
+            else STATUS_NOT_MATERIALIZED
+        )
         return {
             "partition": deepcopy(partition),
-            "solver_result": _partition_solver_result(partition),
+            "solver_result": _partition_solver_result(
+                partition,
+                request_id=request_id,
+                request_revision=request_revision,
+            ),
             "staged_calculation": self.snapshot(),
         }
 
     def finalize_volume(
         self,
         *,
+        finalizer: FinalizerCallable | None = None,
+        finishing_policy: str = "not_selected",
+        finishing_budget_digest: str = "",
+        finalizer_id: str = "",
+        finalizer_version: str = "",
         certify: FinalCertificateCallable | None = None,
     ) -> dict[str, object]:
-        """Accept the current certified closure without changing its geometry."""
+        """Create a distinct finalized artifact through an explicit policy.
 
-        if self._global_status != STATUS_CURRENT or self._global_partition is None:
+        L03R-C deliberately ships no finishing transformation. Callers must
+        provide one; a missing or rejected transformation leaves the current
+        minimal layout untouched and materializable.
+        """
+
+        if not self._minimal_current():
             raise StagedCalculationError(
-                "Calcule l agencement courant avant de finaliser le volume."
+                "Calcule un agencement minimal courant avant de choisir une finition."
             )
-        if not _placement_certified(self._global_partition):
+        if finalizer is None:
             raise StagedCalculationError(
-                "Seul un agencement complet et certifie peut etre finalise."
+                "Aucune methode de finition n est encore disponible dans ce lot ; "
+                "les volumes minimaux restent materialisables."
             )
-        validator = certify or _placement_certified
-        candidate = deepcopy(self._global_partition)
+        if not all(
+            isinstance(value, str) and value.strip()
+            for value in (
+                finishing_policy,
+                finishing_budget_digest,
+                finalizer_id,
+                finalizer_version,
+            )
+        ):
+            raise StagedCalculationError(
+                "La politique, le budget et la version du finaliseur doivent etre explicites."
+            )
+
+        candidate = finalizer(deepcopy(self._global_partition))
+        if not isinstance(candidate, dict):
+            raise StagedCalculationError(
+                "La methode de finition n a pas produit un plan exploitable."
+            )
+        validator = certify or (
+            lambda value: _finalized_certified(
+                value,
+                source_minimal_artifact_digest=self._global_artifact_digest,
+            )
+        )
         if not validator(candidate):
             self._global_stop_reason = "finalization_certificate_rejected"
             raise StagedCalculationError(
-                "La finalisation a ete rejetee ; l agencement de base est conserve."
+                "La finalisation a ete rejetee ; le plan minimal courant est conserve."
             )
 
         key = FinalizationKey(
             global_layout_digest=self._global_artifact_digest,
-            finishing_policy=COMPATIBILITY_FINISHING_POLICY,
-            finishing_budget_digest=FINISHING_BUDGET_DIGEST,
-            finalizer_id=COMPATIBILITY_FINALIZER_ID,
-            finalizer_version=COMPATIBILITY_FINALIZER_VERSION,
+            finishing_policy=finishing_policy,
+            finishing_budget_digest=finishing_budget_digest,
+            finalizer_id=finalizer_id,
+            finalizer_version=finalizer_version,
         )
         lookup = self.cache.lookup(key)
         if lookup.status == "hit":
@@ -248,14 +312,15 @@ class StagedCalculationSession:
             finalized = deepcopy(lookup.value)
             artifact_digest = lookup.artifact_digest or ""
         else:
-            finalized = candidate
+            finalized = deepcopy(candidate)
             artifact_digest = canonical_digest(
                 {
                     "schema_version": FINALIZED_PLAN_ARTIFACT_SCHEMA_V1,
+                    "artifact_kind": ARTIFACT_KIND_FINALIZED,
                     "finalization_key_digest": key.digest,
-                    "global_layout_digest": self._global_artifact_digest,
+                    "source_minimal_artifact_digest": self._global_artifact_digest,
                     "partition_plan_digest": finalized.get("plan_digest"),
-                    "geometry_changed": False,
+                    "partition": finalized,
                 }
             )
             self.cache.put(key, artifact_digest, finalized)
@@ -266,108 +331,204 @@ class StagedCalculationSession:
         self._finalized_artifact_digest = artifact_digest
         self._finalization_key_digest = key.digest
         self._finalization_cache_status = lookup.status
-        self._cad_status = STATUS_NOT_MATERIALIZED
-        self._cad_build_digest = ""
+        self._finalization_policy = finishing_policy
         return {
             "partition": deepcopy(finalized),
             "solver_result": _partition_solver_result(finalized),
             "staged_calculation": self.snapshot(),
         }
 
-    def materializable_partition(self) -> dict[str, object]:
-        """Return only a current finalized plan; never trigger solving."""
+    def select_materializable_artifact(
+        self,
+        artifact_kind: str = ARTIFACT_KIND_MINIMAL,
+    ) -> dict[str, object]:
+        """Select one exact current artifact without solving or finalizing."""
 
-        if (
-            self._finalized_status != STATUS_CURRENT
-            or self._finalized_partition is None
-            or not self.state.can_materialize
-        ):
+        if artifact_kind not in MATERIALIZABLE_ARTIFACT_KINDS:
             raise StagedCalculationError(
-                "Finalise le volume courant avant de materialiser dans Fusion."
+                "Artefact inconnu ; choisis minimal_layout ou finalized_plan."
             )
-        return deepcopy(self._finalized_partition)
+        if artifact_kind == ARTIFACT_KIND_MINIMAL:
+            if not self._minimal_current():
+                raise StagedCalculationError(
+                    "Calcule un agencement minimal certifie avant de le materialiser."
+                )
+            partition = self._global_partition
+            artifact_digest = self._global_artifact_digest
+        else:
+            if not self._finalized_current():
+                raise StagedCalculationError(
+                    "Aucun plan finalise courant n est disponible ; "
+                    "le plan minimal peut rester materialisable."
+                )
+            partition = self._finalized_partition
+            artifact_digest = self._finalized_artifact_digest
+        if partition is None:
+            raise StagedCalculationError("L artefact courant est indisponible.")
+        return {
+            "schema_version": ARTIFACT_SELECTION_SCHEMA_V1,
+            "artifact_kind": artifact_kind,
+            "artifact_digest": artifact_digest,
+            "partition_plan_digest": str(partition.get("plan_digest", "")),
+            "source_revision": self.state.source_revision,
+            "partition": deepcopy(partition),
+        }
+
+    def materializable_partition(
+        self,
+        artifact_kind: str = ARTIFACT_KIND_MINIMAL,
+    ) -> dict[str, object]:
+        """Compatibility accessor returning only the selected partition."""
+
+        selection = self.select_materializable_artifact(artifact_kind)
+        return deepcopy(_mapping(selection["partition"]))
 
     def record_cad_ready(self, cad_build: Mapping[str, object]) -> None:
-        """Record a prepared CAD payload without claiming Fusion observation."""
+        """Record CAD prepared for the exact selected artifact, not Fusion proof."""
 
         if str(cad_build.get("status")) != "ready_for_fusion":
             raise StagedCalculationError(
-                "Le plan finalise n a pas produit de CAD IR materialisable."
+                "L artefact selectionne n a pas produit de CAD IR materialisable."
+            )
+        identity = _mapping(cad_build.get("artifact_identity", {}))
+        artifact_kind = str(identity.get("artifact_kind", ""))
+        selection = self.select_materializable_artifact(artifact_kind)
+        expected = {
+            "schema_version": SCENE_ARTIFACT_IDENTITY_SCHEMA_V1,
+            "artifact_kind": artifact_kind,
+            "artifact_digest": selection["artifact_digest"],
+            "partition_plan_digest": selection["partition_plan_digest"],
+            "source_revision": selection["source_revision"],
+        }
+        for key, value in expected.items():
+            if identity.get(key) != value:
+                raise StagedCalculationError(
+                    "La CAD IR ne correspond pas exactement a l artefact courant."
+                )
+        cad_ir_digest = str(identity.get("cad_ir_digest", ""))
+        if not cad_ir_digest or cad_ir_digest != str(cad_build.get("cad_ir_digest", "")):
+            raise StagedCalculationError(
+                "Le digest CAD IR de l artefact selectionne est absent ou incoherent."
             )
         self._cad_status = STATUS_CAD_READY
         self._cad_build_digest = canonical_digest(dict(cad_build))
+        self._cad_identity = deepcopy(identity)
 
     def snapshot(self) -> dict[str, object]:
-        """Expose compact states, provenance and next explicit action."""
+        """Expose compact states, identities, provenance and next action."""
 
-        placement_certified = (
-            self._global_status == STATUS_CURRENT
-            and self._global_partition is not None
-            and _placement_certified(self._global_partition)
-        )
-        finalized_current = (
-            self._finalized_status == STATUS_CURRENT
-            and self._finalized_partition is not None
-            and self.state.can_materialize
-        )
+        minimal_current = self._minimal_current()
+        finalized_current = self._finalized_current()
+        minimal_payload = {
+            "status": self._global_status,
+            "artifact_kind": ARTIFACT_KIND_MINIMAL,
+            "artifact_digest": self._global_artifact_digest,
+            "key_digest": self._global_key_digest,
+            "request_id": self._global_request_id,
+            "cache_status": self._global_cache_status,
+            "solver_result_status": _solver_status(self._global_partition),
+            "stop_reason": self._global_stop_reason,
+            "placement_certified": minimal_current,
+            "partition_plan_digest": (
+                str(self._global_partition.get("plan_digest", ""))
+                if self._global_partition is not None
+                else ""
+            ),
+            "source_revision": self.state.source_revision,
+            "materializable_without_finalization": minimal_current,
+            "finalization_required": False,
+        }
+        finalized_payload = {
+            "status": self._finalized_status,
+            "artifact_kind": ARTIFACT_KIND_FINALIZED,
+            "artifact_digest": self._finalized_artifact_digest,
+            "key_digest": self._finalization_key_digest,
+            "cache_status": self._finalization_cache_status,
+            "finishing_policy": self._finalization_policy,
+            "source_minimal_artifact_digest": (
+                self._global_artifact_digest if finalized_current else ""
+            ),
+            "partition_plan_digest": (
+                str(self._finalized_partition.get("plan_digest", ""))
+                if finalized_current and self._finalized_partition is not None
+                else ""
+            ),
+            "source_revision": self.state.source_revision,
+            "materializable": finalized_current,
+        }
         next_action = "calculate_layout"
-        if placement_certified and not finalized_current:
-            next_action = "finalize_volume"
-        elif finalized_current and self._cad_status != STATUS_CAD_READY:
-            next_action = "materialize_in_fusion"
-        elif finalized_current:
-            next_action = "none"
+        if minimal_current:
+            if not self._cad_identity_matches_artifact(ARTIFACT_KIND_MINIMAL):
+                next_action = "materialize_minimal_in_fusion"
+            else:
+                next_action = "choose_optional_finishing_or_export"
         return {
             "schema_version": STAGED_CALCULATION_SCHEMA_V1,
             "source_revision": self.state.source_revision,
             "local_analysis_digest": self._local_analysis_digest,
-            "global_layout": {
-                "status": self._global_status,
-                "artifact_digest": self._global_artifact_digest,
-                "key_digest": self._global_key_digest,
-                "request_id": self._global_request_id,
-                "cache_status": self._global_cache_status,
-                "solver_result_status": _solver_status(self._global_partition),
-                "stop_reason": self._global_stop_reason,
-                "placement_certified": placement_certified,
-                "finalization_required": placement_certified
-                and not finalized_current,
-            },
-            "finalized_plan": {
-                "status": self._finalized_status,
-                "artifact_digest": self._finalized_artifact_digest,
-                "key_digest": self._finalization_key_digest,
-                "cache_status": self._finalization_cache_status,
-                "finishing_policy": COMPATIBILITY_FINISHING_POLICY,
-                "geometry_changed": False,
-                "source_global_artifact_digest": (
-                    self._global_artifact_digest if finalized_current else ""
-                ),
-                "partition_plan_digest": (
-                    str(self._finalized_partition.get("plan_digest", ""))
-                    if finalized_current and self._finalized_partition is not None
-                    else ""
-                ),
-                "materializable": finalized_current,
-            },
+            # ``global_layout`` remains as an additive compatibility alias.
+            "global_layout": deepcopy(minimal_payload),
+            "minimal_layout": minimal_payload,
+            "finalized_plan": finalized_payload,
             "materialization": {
                 "status": self._cad_status,
                 "cad_build_digest": self._cad_build_digest,
+                "artifact_identity": deepcopy(self._cad_identity),
                 "fusion_observed": False,
+            },
+            "available_artifacts": {
+                ARTIFACT_KIND_MINIMAL: minimal_current,
+                ARTIFACT_KIND_FINALIZED: finalized_current,
             },
             "next_action": next_action,
             "cache": self.cache.telemetry(),
             "invariants": {
                 "global_solve_is_explicit": True,
+                "global_solve_uses_minimal_layout_portfolio": True,
                 "finalization_is_explicit": True,
-                "materialization_requires_current_finalized_plan": True,
-                "compatibility_finalizer_changes_geometry": False,
-                "automatic_body_count_added_by_finalizer": 0,
+                "finalization_is_optional": True,
+                "minimal_materialization_requires_finalized_plan": False,
+                "artifact_selection_is_explicit": True,
+                "automatic_body_count_added_by_orchestrator": 0,
                 "solver_method_or_budget_changed": False,
                 "project_schema_mutated": False,
                 "fusion_validation_claimed": False,
             },
         }
+
+    def _minimal_current(self) -> bool:
+        return bool(
+            self._global_status == STATUS_CURRENT
+            and self._global_partition is not None
+            and _minimal_placement_certified(self._global_partition)
+        )
+
+    def _finalized_current(self) -> bool:
+        return bool(
+            self._finalized_status == STATUS_CURRENT
+            and self._finalized_partition is not None
+            and _finalized_certified(
+                self._finalized_partition,
+                source_minimal_artifact_digest=self._global_artifact_digest,
+            )
+        )
+
+    def _cad_identity_matches_artifact(self, artifact_kind: str) -> bool:
+        if self._cad_identity is None:
+            return False
+        try:
+            selection = self.select_materializable_artifact(artifact_kind)
+        except StagedCalculationError:
+            return False
+        return all(
+            self._cad_identity.get(key) == selection.get(key)
+            for key in (
+                "artifact_kind",
+                "artifact_digest",
+                "partition_plan_digest",
+                "source_revision",
+            )
+        ) and bool(self._cad_identity.get("cad_ir_digest"))
 
     def _invalidate_downstream(self) -> None:
         self._active_global_request = None
@@ -375,23 +536,24 @@ class StagedCalculationSession:
             self._global_status = STATUS_STALE
         if self._finalized_partition is not None:
             self._finalized_status = STATUS_STALE
-        if self._cad_build_digest:
+        if self._cad_identity is not None:
             self._cad_status = STATUS_DESYNCHRONIZED
 
     def _global_layout_key(self) -> GlobalLayoutKey:
-        containers = _mappings(self._local_analysis.get("containers", []))
-        frontier_digests = []
-        for container in containers:
-            group_id = str(container.get("container_group_id", ""))
-            digest = str(container.get("frontier_digest", ""))
-            if not digest:
-                digest = canonical_digest(
-                    {
-                        "container_group_id": group_id,
-                        "summary": container.get("summary", {}),
-                    }
-                )
-            frontier_digests.append((group_id, digest))
+        frontier_digests = list(self._frontier_digests)
+        if not frontier_digests:
+            containers = _mappings(self._local_analysis.get("containers", []))
+            for container in containers:
+                group_id = str(container.get("container_group_id", ""))
+                digest = str(container.get("frontier_digest", ""))
+                if not digest:
+                    digest = canonical_digest(
+                        {
+                            "container_group_id": group_id,
+                            "summary": container.get("summary", {}),
+                        }
+                    )
+                frontier_digests.append((group_id, digest))
         return GlobalLayoutKey(
             frontier_digests=tuple(sorted(frontier_digests)),
             box_context_digest=self.state.snapshot.box_context_digest,
@@ -438,17 +600,49 @@ class StagedCalculationSession:
         )
 
 
-def _placement_certified(partition: dict[str, object]) -> bool:
+def _minimal_placement_certified(partition: dict[str, object]) -> bool:
     summary = _mapping(partition.get("summary", {}))
+    minimal = _mapping(partition.get("minimal_layout", {}))
+    certificate = _mapping(minimal.get("global_certificate", {}))
+    variant_certificate_value = minimal.get("container_variant_certificate")
+    variant_certified = True
+    if isinstance(variant_certificate_value, Mapping):
+        variant_certified = bool(variant_certificate_value.get("certified"))
     return bool(
         _solver_status(partition) == SOLUTION_FOUND
         and summary.get("status") == "constructed"
-        and summary.get("materializable")
+        and summary.get("placement_certified") is True
+        and minimal.get("artifact_kind") == ARTIFACT_KIND_MINIMAL
+        and minimal.get("finalization_applied") is False
+        and certificate.get("certified") is True
+        and variant_certified
+    )
+
+
+def _finalized_certified(
+    partition: dict[str, object],
+    *,
+    source_minimal_artifact_digest: str,
+) -> bool:
+    summary = _mapping(partition.get("summary", {}))
+    finalization = _mapping(partition.get("finalization", {}))
+    certificate = _mapping(finalization.get("certificate", {}))
+    return bool(
+        _solver_status(partition) == SOLUTION_FOUND
+        and summary.get("status") == "constructed"
+        and summary.get("materializable") is True
+        and finalization.get("artifact_kind") == ARTIFACT_KIND_FINALIZED
+        and finalization.get("source_minimal_artifact_digest")
+        == source_minimal_artifact_digest
+        and certificate.get("certified") is True
     )
 
 
 def _partition_solver_result(
     partition: dict[str, object] | None,
+    *,
+    request_id: str | None = None,
+    request_revision: int | None = None,
 ) -> dict[str, object] | None:
     if not isinstance(partition, dict):
         return None
@@ -457,7 +651,22 @@ def _partition_solver_result(
     if not isinstance(result, Mapping):
         return None
     payload = deepcopy(dict(result))
-    payload["telemetry"] = deepcopy(solver.get("telemetry"))
+    telemetry = deepcopy(_mapping(solver.get("telemetry", {})))
+    if request_id is not None:
+        artifact_request = deepcopy(telemetry.get("request"))
+        current_request = {
+            "id": request_id,
+            "revision": (
+                request_revision
+                if request_revision is not None
+                else "not_applicable"
+            ),
+        }
+        if artifact_request != current_request:
+            telemetry["artifact_request"] = artifact_request
+        telemetry["request"] = current_request
+        telemetry["request_scope"] = "staged_action"
+    payload["telemetry"] = telemetry
     return payload
 
 
@@ -486,7 +695,7 @@ def _stale_solver_result(
         "materializable": False,
         "telemetry": {
             "schema_version": SOLVER_TELEMETRY_SCHEMA_V1,
-            "family": {"id": "staged_orchestrator", "version": "1"},
+            "family": {"id": "staged_orchestrator", "version": "2"},
             "request": {
                 "id": request_id,
                 "revision": (

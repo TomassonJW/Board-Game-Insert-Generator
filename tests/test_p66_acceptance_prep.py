@@ -103,7 +103,7 @@ class P66AcceptancePreparationTests(unittest.TestCase):
         self.assertEqual(len(fusion["cavity_cuts"]), 16)
         self.assertTrue(all(item["linked_component"] for item in fusion["compact_occurrences"]))
 
-    def test_bridge_lifecycle_axes_roundtrip_and_regeneration_are_explicit(self) -> None:
+    def test_bridge_lifecycle_axes_roundtrip_and_minimal_gate_are_explicit(self) -> None:
         raw = json.loads(COMPLETE_FIXTURE.read_text(encoding="utf-8"))
         edited = deepcopy(raw)
         edited["contents"][0]["dimensions_mm"]["x"] = 19.0
@@ -134,13 +134,22 @@ class P66AcceptancePreparationTests(unittest.TestCase):
         self.assertEqual(axes["tokens"]["x"]["mode"], "auto")
         self.assertEqual(axes["c0"]["x"]["mode"], "target")
         self.assertEqual(axes["c2"]["x"]["mode"], "fixed")
-        self.assertEqual(finalized["staged_calculation"]["finalized_plan"]["status"], "current")
-        self.assertEqual(finalized["staged_calculation"]["finalized_plan"]["status"], "current")
-        self.assertEqual(generated["lifecycle"]["materialized"], "cad_ready")
-        self.assertEqual(generated["cad_build"]["materialization"]["automatic_body_count"], 0)
-        self.assertEqual(generated["cad_build"]["cad_ir_digest"], regenerated["cad_build"]["cad_ir_digest"])
+        self.assertEqual(solved["staged_calculation"]["minimal_layout"]["status"], "current")
+        self.assertFalse(
+            solved["staged_calculation"]["minimal_layout"]["materializable_without_finalization"]
+        )
+        self.assertEqual(solved["partition"]["summary"]["status"], "not_constructed")
+        self.assertIn(
+            "TOP_INSET_WITHOUT_SUPPORTING_BODY",
+            {item["code"] for item in solved["partition"]["diagnostics"]},
+        )
+        self.assertEqual(finalized["status"], "invalid")
+        self.assertIn("Calcule un agencement minimal courant", finalized["errors"][0])
+        self.assertEqual(generated["status"], "invalid")
+        self.assertEqual(regenerated["status"], "invalid")
+        self.assertIsNone(generated["cad_build"])
+        self.assertIsNone(regenerated["cad_build"])
         self.assertNotEqual(solved["project_digest"], solved["partition"]["plan_digest"])
-        self.assertNotEqual(generated["cad_build"]["cad_ir_digest"], generated["partition"]["plan_digest"])
         self.assertNotEqual(solved["project_digest"], edited_response["project_digest"])
         self.assertEqual(edited_response["lifecycle"]["solved"], "not_computed")
         self.assertEqual(edited_response["lifecycle"]["materialized"], "not_materialized")
@@ -164,7 +173,7 @@ class P66AcceptancePreparationTests(unittest.TestCase):
         self.assertFalse(preflight["summary"]["cad_ready"])
         self.assertIsNone(preflight["fusion_generation_plan"])
         self.assertIn("CONTAINER_MINIMUM_BLOCKED", {item["code"] for item in preflight["partition"]["diagnostics"]})
-        self.assertEqual(response["partition"]["summary"]["status"], "blocked")
+        self.assertEqual(response["partition"]["summary"]["status"], "not_constructed")
         self.assertEqual(finalized["status"], "invalid")
         self.assertEqual(materialized["status"], "invalid")
         self.assertIsNone(materialized["cad_build"])
@@ -217,7 +226,7 @@ class P66AcceptancePreparationTests(unittest.TestCase):
         self.assertIn("expected 0.1.20", checker)
         self.assertIn("manifestText", checker)
         self.assertNotIn("ConvertFrom-Json", checker)
-        self.assertEqual(manifest["version"], "0.1.56")
+        self.assertEqual(manifest["version"], "0.1.57")
         self.assertIn("mvp-accepted", document)
         self.assertIn("P66 Fusion OK 0.1.20 - commit 6e351bb", document)
         self.assertIn("P66 Fusion OK 0.1.20 - commit <sha>", document)
