@@ -209,3 +209,7 @@ Tests, cartes backlog ou gates humaines a preparer.
 - ADR-0072-post-solve-capacity-maps-and-bounded-reuse.md - carte éphémère des
   opportunités internes et baies réservées, avec réutilisation bornée et
   recertification obligatoire.
+
+- ADR-0073-locked-asset-pose-and-local-arrangement-intents.md - proposition
+  P45-M001 : pose verticale verrouillée, intentions locales certifiées et
+  sélection globale conservée par P64.

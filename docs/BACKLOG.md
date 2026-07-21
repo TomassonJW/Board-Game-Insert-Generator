@@ -2000,7 +2000,7 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
 - Observation : novice/expert, petite/grande palette, clavier, cinquante
   conteneurs, import historique et scene preservee.
 - Limite : qualifie la fondation de palette, ni geometrie P45 ni impression.
-- Statut : ready-for-human-fusion-check sur 0.1.55. Voir docs/P44_V_FOUNDATION_UX_GATE.md ; P45 reste bloque.
+- Statut : done-human-gate, fusion-validated 0.1.55 avec réserve de charge non observée.
 
 Frontieres P44 : coeur sans adsk, complements en quarantaine, aucune scene
 automatique et aucun changement de solveur/tolerance/geometrie par glissement.
@@ -2258,7 +2258,8 @@ P44-M007 est ready-for-explicit-go.
 - Critères : chaque contrôle a un effet moteur testable ; aucun mode décoratif,
   aucune migration destructive et aucune recalibration implicite.
 - Gate : décision de contrat P45 puis validation Fusion distincte.
-- Statut : blocked-by-P44-V.
+- Contrat : docs/P45_M001_NON_CARD_ASSET_ARRANGEMENT_CONTRACT.md et ADR-0073.
+- Statut : done-draft, human-decision-required par P45-M001V ; runtime non commencé.
 
 ### P0-M010 - Compacter le pilotage de reprise
 

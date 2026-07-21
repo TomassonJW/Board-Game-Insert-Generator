@@ -544,3 +544,16 @@ Les deux classes portent bornes, repère, provenance, contraintes admissibles et
 digests. Elles ne possèdent ni forme ergonomique, ni asset, ni conteneur. P45
 reste propriétaire de la géométrie locale créée après une action utilisateur ;
 P64 vérifie ensuite la compatibilité monde.
+
+
+## P45-M001 — Pose et disposition locale des assets non-cartes
+
+La pose physique résolue fixe les axes locaux X/Y/Z. Une recherche automatique
+peut échanger X et Y autour de Z, mais ne permute jamais X ou Y avec Z. Empiler
+verticalement translate les occurrences sans les réorienter.
+
+P45 possède les producteurs Automatique, En ligne et Empilé verticalement et
+leur certificat local. P64 choisit une variante certifiée et un placement
+global sans modifier pose ou cavités. Une rotation de conteneur autour de Z reste
+une option P64. Voir ADR-0073 et le contrat P45-M001. Aucun de ces comportements
+n'est encore implémenté.

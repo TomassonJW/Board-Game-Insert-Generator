@@ -836,3 +836,18 @@ P45 reste bloquée jusqu'à cette requalification.
 Statut : done-human-gate, fusion-validated pour la fondation UX P44. Retour humain : P44-V Fusion OK 0.1.55 - commit 70d45c6.
 
 Reserve explicite : le scenario d environ 50 conteneurs n a pas ete observe, car il ne pouvait pas etre controle dans un volume raisonnable. Cette gate ne revendique donc pas cette preuve de charge. Elle valide la palette actuelle, la saisie, le repli, la preservation de scene et l absence de materialisation automatique. P45 est debloque pour son cadrage contractuel. print-validated: false.
+
+
+## P45-M001V — Décision de contrat des dispositions non-cartes
+
+Statut : human-decision-required. Aucun test Fusion n'est demandé : P45-M001
+est documentaire.
+
+Décision groupée attendue : distinguer pose physique, disposition locale et
+placement global ; verrouiller Z sans permutation X/Y vers Z ; accepter
+Automatique, En ligne et Empilé verticalement sans fallback silencieux ; faire
+certifier les variantes locales par P45 ; laisser P64 sélectionner variante et
+placement ; ouvrir ensuite P64-L01 sans UI ni forme P45 runtime.
+
+Retour attendu : P45-M001 contrat accepté, ou corrections précises.
+fusion-validated: false, print-validated: false.

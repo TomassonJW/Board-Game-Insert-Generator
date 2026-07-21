@@ -1454,3 +1454,14 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - C-FUSION-UI / C-USABILITY : fondation UX fusion-validated pour la palette observee.
 - C-QUALITY : reserve explicite, aucune preuve de charge a environ 50 conteneurs.
 - Suite : P45-M001 peut etre cadre sans transfert du solveur global P64.
+
+
+## Mise à jour P45-M001 — contrat proposé
+
+- C-GEOMETRY / C-ASSET : contract-proposed pour pose verrouillée, trois
+  intentions et certificat local sémantique.
+- C-SOLVER / C-LAYOUT : inchangées ; P64 conserve budgets, placement et
+  certificat global.
+- C-USABILITY : libellés futurs compacts et sans ambiguïté ligne/colonne.
+- C-QUALITY : fixtures et migration additive obligatoires avant runtime.
+- Suite : décision humaine P45-M001V ; aucune capability runtime promue.
