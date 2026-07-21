@@ -184,12 +184,14 @@ function Assert-BgigPaletteProjectRuntime {
         "proposal_with_residuals",
         "technical-drawer",
         "solvedStale",
-        "scheduleAdaptiveSolve",
+        "primary-calculation-action",
+        "finalize_project",
+        "staged_calculation",
         "latestDerivedRequest",
         "solver-method",
         "solver-effort",
         "save_solver_settings",
-        "Recalculer maintenant"
+        ("Calculer l" + [char]0x2019 + "agencement")
     )
     foreach ($marker in $paletteMarkers) {
         if ($palette -notlike "*$marker*") {

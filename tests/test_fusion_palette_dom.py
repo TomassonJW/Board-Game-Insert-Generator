@@ -539,9 +539,10 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertIn("volumetric_stage_solver.py", helpers)
         self.assertIn("free_3d_continuous_closure.py", helpers)
         self.assertIn("Assert-BgigPaletteProjectRuntime", helpers)
-        for marker in ("$paletteMarkers", "workspace-toolbar", "container-primary-grid", "historic-complements", "[char]0x00EE", "[char]0x00E9", "[char]0x00E7"):
+        for marker in ("$paletteMarkers", "workspace-toolbar", "container-primary-grid", "historic-complements", "primary-calculation-action", "finalize_project", "staged_calculation", "[char]0x00EE", "[char]0x00E9", "[char]0x00E7"):
             self.assertIn(marker, helpers)
         self.assertNotIn('\"1. Boite\", \"6. Apercu\"', helpers)
+        self.assertNotIn('        "scheduleAdaptiveSolve",', helpers)
         self.assertIn("Aucun navigateur", smoke)
         self.assertIn("P56 Fusion OK", smoke)
         p44_smoke = (ROOT / "scripts" / "fusion" / "prepare_p44_m005_creation_presets_test.ps1").read_text(encoding="utf-8")
