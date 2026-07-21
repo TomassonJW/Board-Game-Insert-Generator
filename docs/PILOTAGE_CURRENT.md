@@ -42,7 +42,7 @@ preuves archivées.
   replié, contrôle canonique et absence de scène automatique sont observés.
 - Le cas dense 11 × 34 reste honnêtement `no_solution_within_budget` ; la gate
   ne le déclare ni soluble ni impossible.
-- P44-V est fusion-validated avec réserve de charge ; P45-M001 atteint sa décision de contrat.
+- P44-V est fusion-validated avec réserve de charge ; P45-M001V est acceptée ; P64-L01 devient ready.
 
 ## Vue de séquence
 
@@ -66,7 +66,8 @@ preuves archivées.
 | Terminé — automatisé | P64-V2H03C | Sélection globale paresseuse, lanes monotones, certificat global et fixtures 4 à 10. |
 | Terminé — gate Fusion | P64-V2H03V | Fusion OK 0.1.55 : variantes internes visibles, diagnostic replié, contrôle canonique et aucune scène automatique. |
 | Terminé — gate Fusion | P44-V | Fusion OK 0.1.55 avec réserve de charge explicitement non observée. |
-| En décision | P45-M001V | Pose verrouillée et intentions locales proposées ; aucun runtime. |
+| Terminé — décision | P45-M001V | Contrat accepté avec Pile / Basculer unifiés ; aucun runtime. |
+| Ready | P64-L01 | États, digests et invalidation incrémentale. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -134,11 +135,13 @@ Preparation terminee : package 0.1.55, invariants DOM P44 et H03V controles. Gat
 P44-V est fusion-validated pour la fondation UX 0.1.55 par le retour humain du 2026-07-21. La charge d environ 50 conteneurs reste non observee et ne vaut aucune revendication de capacite. P45-M001 peut etre cadre ; P45 ne doit pas absorber le solveur P64.
 
 
-## P45-M001 — contrat proposé
+## P45-M001V — contrat accepté avec interface unifiée
 
-ADR-0073 et le contrat P45-M001 distinguent désormais pose physique,
-disposition locale et placement global. Z reste verrouillé par la pose ; P45
-certifie Automatique, En ligne et Empilé verticalement ; P64 choisit globalement.
+ADR-0073 et le contrat P45-M001 distinguent constitution de pile, pose physique,
+disposition locale et placement global. `Pile` et `Basculer` forment un composant
+commun aux cartes et aux autres assets ; seul le sleeving reste spécialisé. Le
+côté choisi est le côté d'appui, Z ne change jamais sans action explicite, P45
+certifie les variantes locales et P64 choisit globalement.
 
-P45-M001V est l'unique décision active. P64-L01 et tout runtime P45 restent
-bloqués jusqu'au retour. Aucune valeur physique ou scène n'est modifiée.
+P64-L01 est la seule mission `ready`. Tout runtime ou schéma P45 reste bloqué
+jusqu'à son contrat additif. Aucune valeur physique ou scène n'est modifiée.

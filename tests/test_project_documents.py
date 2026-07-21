@@ -228,10 +228,11 @@ REQUIRED_SECTIONS = {
         "## 1. Résultat produit attendu",
         "## 3. Verrou absolu de pose et de Z",
         "## 4. Intentions de disposition",
+        "## 17. Amendement accepté P45-M001V",
         "## 7. Certificat local P45",
         "## 10. Responsabilité P64 inchangée",
         "## 13. Fixtures obligatoires avant runtime",
-        "## 15. Acceptation demandée",
+        "## 15. Acceptation enregistrée",
         "## 16. Hors scope absolu",
     ),
     "docs/DECISIONS/ADR-0073-locked-asset-pose-and-local-arrangement-intents.md": (

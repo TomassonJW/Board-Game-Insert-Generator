@@ -210,6 +210,6 @@ Tests, cartes backlog ou gates humaines a preparer.
   opportunités internes et baies réservées, avec réutilisation bornée et
   recertification obligatoire.
 
-- ADR-0073-locked-asset-pose-and-local-arrangement-intents.md - proposition
-  P45-M001 : pose verticale verrouillée, intentions locales certifiées et
-  sélection globale conservée par P64.
+- ADR-0073-locked-asset-pose-and-local-arrangement-intents.md - décision
+  P45-M001V acceptée : `Pile` / `Basculer` unifiés, pose verticale verrouillée,
+  intentions locales certifiées et sélection globale conservée par P64.

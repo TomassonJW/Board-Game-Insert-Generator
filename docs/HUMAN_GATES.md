@@ -838,16 +838,21 @@ Statut : done-human-gate, fusion-validated pour la fondation UX P44. Retour huma
 Reserve explicite : le scenario d environ 50 conteneurs n a pas ete observe, car il ne pouvait pas etre controle dans un volume raisonnable. Cette gate ne revendique donc pas cette preuve de charge. Elle valide la palette actuelle, la saisie, le repli, la preservation de scene et l absence de materialisation automatique. P45 est debloque pour son cadrage contractuel. print-validated: false.
 
 
-## P45-M001V — Décision de contrat des dispositions non-cartes
+## P45-M001V — Contrat accepté avec interface de pile unifiée
 
-Statut : human-decision-required. Aucun test Fusion n'est demandé : P45-M001
-est documentaire.
+Statut : done-human-gate le 2026-07-21. Aucun test Fusion n'était demandé :
+P45-M001 est documentaire.
 
-Décision groupée attendue : distinguer pose physique, disposition locale et
-placement global ; verrouiller Z sans permutation X/Y vers Z ; accepter
-Automatique, En ligne et Empilé verticalement sans fallback silencieux ; faire
-certifier les variantes locales par P45 ; laisser P64 sélectionner variante et
-placement ; ouvrir ensuite P64-L01 sans UI ni forme P45 runtime.
+Retour humain : `P45-M001 contrat accepté` sous réserve intégrée d'un composant
+commun aux cartes et aux autres assets :
 
-Retour attendu : P45-M001 contrat accepté, ou corrections précises.
-fusion-validated: false, print-validated: false.
+- `Pile` active les dimensions unitaires, l'épaisseur et le nombre par pile ;
+- les cartes neuves sont empilées par défaut ;
+- `Basculer` révèle `Poser sur : Grand côté / Petit côté` ;
+- le sleeving reste spécifique aux cartes ;
+- pose, disposition locale P45 et placement global P64 restent séparés ;
+- aucune permutation avec Z ni fallback silencieux n'est autorisé.
+
+Effet : P45-M001 et ADR-0073 sont `architecture-accepted`. P64-L01 devient la
+prochaine mission `ready`. Aucun runtime, schéma, UI ou calcul P45 n'est validé
+par cette gate. `fusion-validated: false`, `print-validated: false`.

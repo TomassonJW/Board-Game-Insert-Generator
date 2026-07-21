@@ -2648,13 +2648,18 @@ Statut : ready-for-human-fusion-check. La recette 0.1.40 est remplacee par un pr
 Statut : done-human-gate, fusion-validated pour la fondation UX. Preuve humaine : P44-V Fusion OK 0.1.55 - commit 70d45c6. La verification de charge d environ 50 conteneurs est explicitement non observee, car non controlable dans un volume raisonnable. Cette reserve ne devient pas un echec runtime et aucune performance n est revendiquee. P45 est debloque pour son cadrage contractuel seulement ; print-validated: false.
 
 
-## P45-M001 — Contrat de disposition des assets non-cartes (2026-07-21)
+## P45-M001V — Contrat de disposition et de pile accepté (2026-07-21)
 
-Statut : done-draft, human-decision-required, runtime non commencé. ADR-0073
-sépare pose physique, disposition locale et placement global. Le contrat propose
-Automatique, En ligne et Empilé verticalement. Z reste verrouillé par la pose ;
-P45 certifie une frontière locale et P64 sélectionne globalement.
+Statut : done-documentation, architecture-accepted, runtime non commencé.
+ADR-0073 sépare constitution de pile, pose physique, disposition locale et
+placement global.
+
+Le composant futur `Pile` / `Basculer` est commun aux cartes et aux autres
+assets. Les cartes neuves sont empilées par défaut ; `Basculer` révèle le côté
+d'appui grand/petit. Le sleeving reste propre aux cartes. La quantité totale et
+le nombre par pile sont distincts, Z ne change pas implicitement, P45 certifie
+la frontière locale et P64 sélectionne globalement.
 
 Aucun code, schéma, UI, valeur physique, solveur, CAD IR ou scène ne change.
-P64-L01 reste bloqué jusqu'à P45-M001V. fusion-validated: false,
-print-validated: false.
+P64-L01 devient `ready`. `fusion-validated: false`,
+`print-validated: false`.

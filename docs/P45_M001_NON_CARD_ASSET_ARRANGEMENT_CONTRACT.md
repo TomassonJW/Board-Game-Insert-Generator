@@ -1,6 +1,7 @@
-# P45-M001 — Disposition des assets non-cartes
+# P45-M001 — Disposition locale et interface unifiée des piles d'assets
 
-Statut : proposé pour décision humaine. Aucun runtime, schéma ou comportement
+Statut : accepté par décision humaine P45-M001V le 2026-07-21, avec le
+composant unifié Pile / Basculer. Aucun runtime, schéma ou comportement
 public n'est modifié par ce contrat.
 
 ADR : [ADR-0073](DECISIONS/ADR-0073-locked-asset-pose-and-local-arrangement-intents.md).
@@ -228,16 +229,15 @@ Trois représentants visibles au plus ne limitent jamais la frontière moteur.
 
 ## 14. Découpage après décision
 
-- `P45-M001V` : acceptation, correction ou refus de ce contrat et d'ADR-0073 ;
-- `P64-L01` : états, digests et invalidation, désormais cadrable mais encore
-  bloqué jusqu'à P45-M001V ;
-- futur lot P45 runtime : champ additif, producteurs sémantiques, certificat et
+- `P45-M001V` : acceptée le 2026-07-21 avec `Pile` / `Basculer` unifiés ;
+- `P64-L01` : états, digests et invalidation, désormais `ready` ;
+- futur lot P45 runtime : schéma additif, producteurs sémantiques, certificat et
   fixtures, après contrat de migration ;
 - gate Fusion P45 distincte avant P46.
 
-## 15. Acceptation demandée
+## 15. Acceptation enregistrée
 
-Valider ensemble :
+Thomas accepte les principes suivants le 2026-07-21 :
 
 1. pose physique et disposition sont deux choix distincts ;
 2. Z ne change jamais sans action explicite de pose ;
@@ -255,3 +255,74 @@ Valider ensemble :
 - P46, P47-P50, P64-F01/F02/C01-C03 ;
 - scène Fusion ou matérialisation ;
 - revendication `fusion-validated` ou `print-validated`.
+
+## 17. Amendement accepté P45-M001V — composant unifié `Pile` / `Basculer`
+
+Cette section est normative et remplace toute formulation antérieure incompatible
+sur l'interface de pose. Elle n'ajoute encore aucun champ public ni runtime.
+
+### Une seule grammaire pour tous les assets
+
+Le même composant est destiné aux cartes et aux autres assets. Seul le sous-bloc
+de sleeving reste propre aux cartes.
+
+- `Pile` est une case à cocher indiquant que plusieurs unités identiques sont
+  regroupées suivant leur axe physique d'épaisseur.
+- Pour une carte nouvellement créée, `Pile` est cochée par défaut.
+- Pour les autres types et les anciens projets, le default et la migration
+  restent à fixer par un contrat additif afin de préserver le comportement
+  historique.
+- Lorsque `Pile` est cochée, l'interface expose X, Y, l'épaisseur unitaire, la
+  quantité totale et le nombre souhaité d'unités par pile.
+- `quantity_total` reste l'autorité et ne se confond jamais avec le nombre par
+  pile. Si nécessaire, plusieurs piles sont formées ; la dernière peut être
+  partielle et la partition doit couvrir exactement la quantité.
+- Le sleeving modifie seulement l'épaisseur résolue des cartes selon son contrat
+  existant ; il ne s'applique pas aux autres assets et n'absorbe pas les jeux de
+  cavité.
+
+`Pile` constitue ainsi un ou plusieurs groupes physiques. Elle ne décide ni leur
+disposition dans le conteneur, ni leur placement dans la boîte.
+
+### Pose explicite avec `Basculer`
+
+- `Basculer` est une case à cocher commune à tous les assets empilables.
+- Non cochée, la pile reste à plat : son épaisseur cumulée est portée par Z et
+  ses dimensions de face restent en XY.
+- Cochée, elle révèle `Poser sur : Grand côté / Petit côté`.
+- Le choix désigne le côté d'appui, jamais le côté vertical : sur le grand côté,
+  le petit côté devient vertical ; sur le petit côté, le grand devient vertical.
+- L'épaisseur cumulée devient l'autre dimension horizontale.
+- Aucune valeur `Automatique` n'est proposée dans ce contrôle et aucun solveur ne
+  peut changer cette pose.
+
+L'ancienne orientation carte `auto` reste un état de compatibilité en lecture
+jusqu'à une migration explicite ; elle ne doit provoquer aucune réécriture
+silencieuse. Les dimensions résolues et un schéma compact doivent rendre la pose
+vérifiable avant solve.
+
+### Séparation avec la disposition
+
+`Pile` et `Basculer` produisent l'unité physique orientée. Les intentions
+`Automatique`, `En ligne` et `Empilé verticalement` organisent ensuite une ou
+plusieurs occurrences ou piles. L'intention avancée `Empilé verticalement`
+translate des groupes déjà orientés le long de Z ; elle ne remplace jamais
+`Pile`, le nombre par pile ou `Basculer`. Si un seul groupe ne lui donne aucun
+effet, elle est masquée ou désactivée avec une raison lisible.
+
+Toute modification de pile ou pose entre dans le digest local et invalide
+seulement l'analyse concernée. P64 ne lit pas ces contrôles pour réinventer la
+géométrie : il consomme les candidats P45 certifiés.
+
+### Fixtures ajoutées au futur lot runtime
+
+1. équivalence carte/non-carte du composant `Pile` hors sleeving ;
+2. pile à plat, appui grand côté et appui petit côté avec axes exacts ;
+3. quantité totale répartie en plusieurs piles, dernière pile partielle et
+   couverture exacte ;
+4. sleeving affectant seulement l'épaisseur résolue des cartes ;
+5. ancienne orientation carte `auto` relue sans migration silencieuse ;
+6. intention `Empilé verticalement` sans effet indisponible pour un seul groupe.
+
+P45-M001V est fermée par cette acceptation. P64-L01 devient `ready`, sans ouvrir
+dans ce lot le schéma, l'UI ou les formes runtime P45.

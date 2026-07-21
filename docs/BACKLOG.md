@@ -2242,24 +2242,23 @@ P44-M007 est ready-for-explicit-go.
   human-fusion-check-required par P44-M007H02V, fusion-validated: false,
   print-validated: false.
 
-#### P45-M001 - Contrat de disposition des assets non-cartes
+#### P45-M001 - Contrat unifié de pile, pose et disposition des assets
 
 - Capability : C-GEOMETRY, C-ASSET, C-SOLVER et C-USABILITY.
 - Dépendance : P44-V acceptée.
-- Objectif produit : choisir par asset une disposition qui gouverne réellement
-  sa future cavité : `standard/auto`, `rangée` ou `colonne verticale`.
-- Intention `standard/auto` : rechercher une empreinte X/Y proche du carré et
-  une profondeur Z proportionnée, approximativement entre la moitié et les deux
-  tiers de X lorsque les contraintes le permettent.
-- Intention `rangée` : laisser le solveur choisir l’axe X ou Y et la longueur
-  utile. Intention `colonne verticale` : empiler dans la profondeur Z.
-- Premier livrable : contrat et ADR de géométrie comparant sémantique, quantité,
-  rotations, formes, limites de boîte, accessibilité et compatibilité avant UI.
-- Critères : chaque contrôle a un effet moteur testable ; aucun mode décoratif,
-  aucune migration destructive et aucune recalibration implicite.
-- Gate : décision de contrat P45 puis validation Fusion distincte.
-- Contrat : docs/P45_M001_NON_CARD_ASSET_ARRANGEMENT_CONTRACT.md et ADR-0073.
-- Statut : done-draft, human-decision-required par P45-M001V ; runtime non commencé.
+- Objectif produit : séparer constitution physique d'une pile, pose explicite,
+  disposition locale certifiée P45 et placement global P64.
+- Interface acceptée : `Pile` expose dimensions unitaires, épaisseur, quantité
+  totale et nombre par pile ; `Basculer` révèle le côté d'appui grand/petit.
+- Cartes : `Pile` active par défaut sur un nouvel asset ; même interface que les
+  autres assets, avec sleeving conservé dans un sous-bloc spécifique.
+- Intentions : `Automatique`, `En ligne` et `Empilé verticalement`, sans fallback
+  silencieux et sans ratio physique universel.
+- Premier livrable : contrat et ADR-0073 ; aucun runtime ni schéma public.
+- Critères runtime futurs : effet moteur testable, axes exacts, comptage exact,
+  compatibilité historique, aucune migration destructive ni recalibration.
+- Gate : P45-M001V acceptée ; validation Fusion distincte après runtime.
+- Statut : done-documentation, architecture-accepted ; runtime non commencé.
 
 ### P0-M010 - Compacter le pilotage de reprise
 
@@ -2541,7 +2540,7 @@ P44-M007 est ready-for-explicit-go.
   modifier un conteneur ne réécrit pas ses assets ; une contrainte globale
   invalide honnêtement le plan ; zéro import adsk.
 - Non-objectifs : nouveau bouton, score produit, solveur, schéma public ou CAD.
-- Statut : planned-locked.
+- Statut : ready.
 
 ### P64-L02 — Frontières locales, score et résumé progressif
 

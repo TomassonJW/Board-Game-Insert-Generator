@@ -557,3 +557,25 @@ leur certificat local. P64 choisit une variante certifiée et un placement
 global sans modifier pose ou cavités. Une rotation de conteneur autour de Z reste
 une option P64. Voir ADR-0073 et le contrat P45-M001. Aucun de ces comportements
 n'est encore implémenté.
+
+## P45-M001V — Modèle géométrique unifié des piles
+
+Le modèle accepté ajoute conceptuellement, sans runtime dans P45-M001, une
+constitution de pile distincte de la pose et de la disposition :
+
+1. les dimensions unitaires X/Y et l'épaisseur physique forment l'unité ;
+2. `Pile` répartit `quantity_total` en un ou plusieurs groupes selon le nombre
+   demandé par pile ;
+3. `Basculer` détermine la pose du groupe ;
+4. P45 dispose les groupes et certifie leurs cavités ;
+5. P64 place les enveloppes certifiées sans modifier leur pose.
+
+À plat, l'épaisseur cumulée de la pile est portée par Z. Avec `Basculer`, le
+côté choisi est le côté d'appui : le côté opposé devient vertical et
+l'épaisseur cumulée devient horizontale. Les cartes suivent exactement ce
+modèle ; seul le sleeving modifie leur épaisseur résolue selon son contrat
+spécifique. Aucun solveur ne permute X ou Y avec Z sans ce choix utilisateur.
+
+`Empilé verticalement` reste une intention de disposition de plusieurs groupes
+déjà orientés. Elle ne constitue pas la pile physique et ne remplace jamais le
+nombre d'unités par pile ou `Basculer`.

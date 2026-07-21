@@ -937,13 +937,14 @@ La gate globale P44 est preparee sur 0.1.55 apres P64-V2H03V. Cinq observations 
 La fondation UX P44 est acceptee sur 0.1.55. Le scenario de charge d environ 50 conteneurs n est pas valide ; aucune capacite dense n en est deduite. Le prochain lot est le cadrage P45-M001, sans implementation de formes ni changement du solveur P64.
 
 
-## P45-M001 — Pose verrouillée et dispositions locales (2026-07-21)
+## P45-M001V — Pile unifiée et dispositions locales acceptées (2026-07-21)
 
-Le premier lot P45 propose ADR-0073 et un contrat sans runtime. Il distingue
-pose de l'asset, disposition de ses occurrences et placement du conteneur. Les
-modes futurs sont Automatique, En ligne et Empilé verticalement ; aucune
-recherche ne permute X/Y avec Z sans décision utilisateur.
+ADR-0073 et le contrat P45-M001 sont acceptés sans runtime. Ils distinguent
+constitution de pile, pose de l'asset, disposition locale et placement global.
+`Pile` / `Basculer` est commun aux cartes et autres assets ; le sleeving reste
+propre aux cartes. Aucune recherche ne permute X/Y avec Z sans décision
+utilisateur.
 
 P45 produit les variantes locales certifiées et P64 choisit leur combinaison
-globale. P45-M001V précède P64-L01. Formes ergonomiques, schéma, UI, valeurs
+globale. P64-L01 est désormais `ready`. Formes ergonomiques, schéma, UI, valeurs
 physiques et P46 restent hors scope.

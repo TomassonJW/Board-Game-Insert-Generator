@@ -2,7 +2,7 @@
 
 ## Statut
 
-Proposée dans P45-M001 ; décision humaine requise avant tout runtime.
+Acceptée le 2026-07-21 par P45-M001V avec le composant unifié Pile / Basculer. Aucun runtime inclus.
 
 ## Date
 
@@ -55,7 +55,7 @@ global et aucune scène automatique.
 
 ## Décision
 
-Proposer l'option C.
+Retenir l'option C.
 
 Les identifiants internes sont `auto_balanced_v1`, `linear_xy_v1` et
 `vertical_stack_z_v1`. La pose résolue verrouille Z. Une permutation X/Y reste
@@ -105,7 +105,36 @@ et préservera bit-à-bit l'absence d'intention explicite.
 ## Suivi
 
 - contrat normatif : `docs/P45_M001_NON_CARD_ASSET_ARRANGEMENT_CONTRACT.md` ;
-- décision attendue : `P45-M001V` ;
-- après acceptation, P64-L01 peut démarrer sans attendre les formes P45 ;
+- décision `P45-M001V` : acceptée le 2026-07-21 avec l'interface unifiée ;
+- P64-L01 peut démarrer sans attendre les formes P45 ;
 - tout runtime P45 exige migration additive, tests et gate Fusion distincte ;
 - `fusion-validated: false`, `print-validated: false`.
+
+## Amendement accepté P45-M001V — modèle `Pile` / `Basculer`
+
+L'option C est acceptée avec une grammaire de pose commune aux cartes et aux
+autres assets :
+
+- `Pile` regroupe des unités identiques selon leur axe physique d'épaisseur et
+  sépare dimensions unitaires, quantité totale et nombre d'unités par pile ;
+- les cartes nouvellement créées activent `Pile` par défaut ; le default des
+  autres types et la migration des anciens projets exigent un contrat additif ;
+- `Basculer` désactivé signifie pile à plat, épaisseur cumulée sur Z ;
+- `Basculer` activé exige `Poser sur : Grand côté / Petit côté` ; le choix
+  désigne le côté d'appui et le côté opposé devient vertical ;
+- l'ancienne orientation carte `auto` reste compatible en lecture mais disparaît
+  du choix normal ; aucune migration ou réorientation silencieuse n'est admise ;
+- le sleeving reste spécifique aux cartes ;
+- `Pile` et `Basculer` déterminent l'unité physique orientée, tandis que les
+  intentions P45 organisent ensuite une ou plusieurs unités ou piles ;
+- P64 consomme la géométrie et le certificat locaux sans réinterpréter ces
+  contrôles.
+
+Le risque principal est l'ambiguïté entre côté d'appui et côté vertical. L'UX
+doit donc dire `Poser sur`, afficher les dimensions résolues et, si utile, un
+schéma compact. `Empilé verticalement` reste une intention avancée de disposition
+de plusieurs groupes ; il ne remplace jamais la case `Pile` ni `Basculer`.
+
+Cette précision ajoute des digests distincts pour constitution de pile, pose et
+intention, mais ne change ni schéma public, ni runtime, ni valeur physique dans
+P45-M001. `fusion-validated: false`, `print-validated: false`.

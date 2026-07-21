@@ -1456,12 +1456,14 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - Suite : P45-M001 peut etre cadre sans transfert du solveur global P64.
 
 
-## Mise à jour P45-M001 — contrat proposé
+## Mise à jour P45-M001V — contrat accepté
 
-- C-GEOMETRY / C-ASSET : contract-proposed pour pose verrouillée, trois
-  intentions et certificat local sémantique.
+- C-GEOMETRY / C-ASSET : `architecture-accepted` pour le composant commun
+  `Pile` / `Basculer`, la pose verrouillée, les intentions et le certificat local.
 - C-SOLVER / C-LAYOUT : inchangées ; P64 conserve budgets, placement et
   certificat global.
-- C-USABILITY : libellés futurs compacts et sans ambiguïté ligne/colonne.
-- C-QUALITY : fixtures et migration additive obligatoires avant runtime.
-- Suite : décision humaine P45-M001V ; aucune capability runtime promue.
+- C-USABILITY : même grammaire compacte pour cartes et autres assets ; le
+  sleeving reste une spécialisation des cartes.
+- C-QUALITY : quantité totale distincte du nombre par pile, compatibilité
+  `auto` historique, fixtures d'axes et migration additive obligatoires.
+- Suite : P64-L01 `ready` ; aucune capability runtime P45 promue.
