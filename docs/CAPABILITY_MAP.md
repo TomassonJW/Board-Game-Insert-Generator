@@ -1467,3 +1467,17 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - C-QUALITY : quantité totale distincte du nombre par pile, compatibilité
   `auto` historique, fixtures d'axes et migration additive obligatoires.
 - Suite : P64-L01 `ready` ; aucune capability runtime P45 promue.
+
+## Mise à jour P64-L01 — état incrémental
+
+- C-ASSET / C-GEOMETRY : `implemented-core` pour les identités source, pose,
+  defaults hérités et invalidation locale ; aucune forme P45 ajoutée.
+- C-SOLVER / C-LAYOUT : infrastructure de dépendances `implemented-core` ;
+  méthodes, budgets, résultats et auto-solve public inchangés.
+- C-PROJECT-CONTRACT : aucun champ ajouté ; cache et artefacts dérivés restent
+  reconstructibles et hors `bgig.project.v1`.
+- C-QUALITY : 16 fixtures L01, corpus cinquante conteneurs, parité de dérivation,
+  stale fail-closed, cache borné et 587 tests complets.
+- C-FUSION-UI : inchangée ; aucune scène ni matérialisation automatique.
+- Suite : P64-L02 `ready`. `fusion-validated: false`,
+  `print-validated: false`.

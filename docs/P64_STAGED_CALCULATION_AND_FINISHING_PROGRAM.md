@@ -417,13 +417,18 @@ Fusion non BGIG.
 
 ### P64-L01 — État dérivé incrémental et cache local
 
-- Dépendances : H03V clôturée, P44-V requalifiée, contrat P45-M001 accepté.
-- Livrables : clés/digests, graphe d'invalidation, cache fail-closed, stale et
-  API cœur sans changement UI.
-- Critères : fixtures 1 à 6 et 9 ; parité de dérivation ; benchmark borné.
+- Statut : `done-code`, `implemented-core`, `automated-validated` le 2026-07-21.
+- Livrables : clés/digests versionnés, graphe d'invalidation, cache LRU
+  fail-closed, jetons stale à usage unique et API cœur sans changement UI.
+- Critères obtenus : fixtures 1 à 6 et 9, parité de dérivation, corpus borné à
+  cinquante conteneurs et suite complète.
+- Preuve : `docs/P64_L01_INCREMENTAL_STATE_EVIDENCE.md`.
+- Limite : aucune orchestration locale, suppression d'auto-solve, UI ou scène ;
+  `fusion-validated: false`, `print-validated: false`.
 
 ### P64-L02 — Frontières, scores et résumé progressif
 
+- Statut : `ready` après P64-L01.
 - Dépendance : L01.
 - Livrables : annotations contextuelles, représentants UI, sous-scores, détail
   replié et bornes globales rapides.

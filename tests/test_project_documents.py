@@ -36,6 +36,7 @@ REQUIRED_PROJECT_FILES = (
     "docs/P69_FULL_UI_UX_REVIEW_CONTRACT.md",
     "docs/P64_MULTI_SOLVER_PORTFOLIO_PROGRAM.md",
     "docs/P64_STAGED_CALCULATION_AND_FINISHING_PROGRAM.md",
+    "docs/P64_L01_INCREMENTAL_STATE_EVIDENCE.md",
     "docs/P64_POST_SOLVE_CAPACITY_REUSE_CONTRACT.md",
     "docs/P64_V2H03_INTERNAL_VARIANT_COORDINATION_CONTRACT.md",
     "docs/P64_V2H03B_LOCAL_VARIANT_EVIDENCE.md",
@@ -195,6 +196,15 @@ REQUIRED_SECTIONS = {
         "## 14. Action `Finaliser le volume`",
         "## 19. Découpage des missions",
         "## 22. Hors scope absolu",
+    ),
+    "docs/P64_L01_INCREMENTAL_STATE_EVIDENCE.md": (
+        "## Portée livrée",
+        "## Identités et fail-closed",
+        "## Matrice d'invalidation vérifiée",
+        "## Fixtures automatisées",
+        "## Validation",
+        "## Limites",
+        "## Suite",
     ),
     "docs/P64_POST_SOLVE_CAPACITY_REUSE_CONTRACT.md": (
         "## 1. Objectif et promesse honnête",

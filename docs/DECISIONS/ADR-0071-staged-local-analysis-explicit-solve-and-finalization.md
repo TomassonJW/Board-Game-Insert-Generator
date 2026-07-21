@@ -233,7 +233,8 @@ intentionnelle, nommée et certifiée ; elle n'est jamais un résiduel oublié.
 - Contrat détaillé :
   `docs/P64_STAGED_CALCULATION_AND_FINISHING_PROGRAM.md`.
 - La carte P64-A02 clôt uniquement l'architecture documentaire.
-- P64-L01 à L03 restent bloquées par la séquence active et leurs dépendances.
+- P64-L01 est automated-validated ; P64-L02 devient ready ; P64-L03 reste
+  bloquée par L02 et sa future gate.
 - Toute mutation runtime exige tests purs, DOM, bridge, stale/annulation,
   monotonie, suite complète et gate Fusion P64-L03V.
 - `fusion-validated: false` et `print-validated: false` pour cette trajectoire.

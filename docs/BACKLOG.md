@@ -2531,16 +2531,16 @@ P44-M007 est ready-for-explicit-go.
 
 ### P64-L01 — États, digests et invalidation incrémentale
 
-- Dépendances : P64-V2H03V fermée, P44-V requalifiée, P45-M001 cadré.
-- Objectif : représenter source, analyse locale, agencement global, finalisation
-  et matérialisation avec digests d'entités et graphe de dépendances.
-- Livrables : types purs, cache borné, invalidation par asset/conteneur/boîte,
-  rejet des réponses stale, télémétrie et fixtures de changement isolé.
-- Acceptation : modifier un asset ne recalcule pas les autres conteneurs ;
-  modifier un conteneur ne réécrit pas ses assets ; une contrainte globale
-  invalide honnêtement le plan ; zéro import adsk.
-- Non-objectifs : nouveau bouton, score produit, solveur, schéma public ou CAD.
-- Statut : ready.
+- Dépendances : P64-V2H03V fermée, P44-V requalifiée, P45-M001 accepté.
+- Livré : types purs, clés/digests versionnés, cache LRU borné, invalidation par
+  asset/conteneur/boîte, stale fail-closed, télémétrie et états de lifecycle.
+- Acceptation obtenue : un asset ne recalcule pas les autres conteneurs ; un
+  conteneur ne réécrit pas ses assets ; un changement global invalide
+  honnêtement le plan ; parité de dérivation ; zéro import adsk.
+- Preuve : `docs/P64_L01_INCREMENTAL_STATE_EVIDENCE.md`, 16 tests ciblés et
+  corpus de cinquante conteneurs à cardinalité d'invalidation 1/1/1.
+- Non-objectifs préservés : bouton, score produit, solveur, schéma public ou CAD.
+- Statut : done-code, implemented-core, automated-validated.
 
 ### P64-L02 — Frontières locales, score et résumé progressif
 
@@ -2555,7 +2555,7 @@ P44-M007 est ready-for-explicit-go.
   aucun second paramètre de cloison avant contrat P45 et validation physique.
 - Acceptation : déterminisme, Pareto, diversité, top 3 non normatif, cache
   invalidé correctement et aucun impact sur les autres conteneurs.
-- Statut : planned-locked.
+- Statut : ready.
 
 ### P64-L03 — Solve global explicite et plan finalisable
 

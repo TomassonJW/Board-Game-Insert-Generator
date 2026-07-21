@@ -2663,3 +2663,23 @@ la frontière locale et P64 sélectionne globalement.
 Aucun code, schéma, UI, valeur physique, solveur, CAD IR ou scène ne change.
 P64-L01 devient `ready`. `fusion-validated: false`,
 `print-validated: false`.
+
+## P64-L01 — État incrémental et cache fail-closed (2026-07-21)
+
+Statut : `done-code`, `implemented-core`, `automated-validated`.
+
+`incremental_project_state.py` fournit des snapshots normalisés, des digests
+séparés source/pose/defaults/conteneur/contexte/global/final, cinq clés de cache
+versionnées, un cache LRU borné, une matrice d'invalidation ciblée et des jetons
+locaux à identité unique. Les anciens artefacts restent disponibles avec le
+statut `stale` mais ne sont plus consommables ou matérialisables.
+
+Les 16 fixtures ciblées couvrent asset, conteneur, déplacement, boîte, héritage,
+override, fill local, stale, identité de requête et cinquante conteneurs. La
+parité de `derive_container_plan` est préservée. La suite complète compte 587
+tests verts ; Ruff, compileall et la frontière adsk sont verts.
+
+Aucun schéma, UI, solveur, budget, valeur physique, CAD IR ou scène ne change.
+Le timer global P44-M007 reste actif jusqu'à L03/L03V. P64-L02 devient `ready`.
+Le cas dense 11 × 34 reste `no_solution_within_budget`.
+`fusion-validated: false`, `print-validated: false`.

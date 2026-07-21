@@ -948,3 +948,16 @@ utilisateur.
 P45 produit les variantes locales certifiées et P64 choisit leur combinaison
 globale. P64-L01 est désormais `ready`. Formes ergonomiques, schéma, UI, valeurs
 physiques et P46 restent hors scope.
+
+## P64-L01 — Infrastructure incrémentale livrée (2026-07-21)
+
+P64-L01 implémente les digests d'entités, les clés versionnées, le graphe
+d'invalidation, le cache LRU borné et le rejet des réponses locales obsolètes.
+Les artefacts global, finalisé et matérialisé deviennent `stale` sans être
+modifiés lorsqu'une dépendance change.
+
+Le lot reste une infrastructure cœur : aucune UI, aucun solveur, aucune
+finalisation et aucune scène ne changent. P64-L02 devient `ready` pour les
+annotations contextuelles, les sous-scores et le résumé progressif non limitant.
+L03/L03V reste propriétaire du retrait du solve automatique et de la gate
+Fusion. `print-validated: false`.
