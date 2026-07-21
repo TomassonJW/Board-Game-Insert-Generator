@@ -1,4 +1,4 @@
-﻿# Capability Map
+# Capability Map
 
 ## Objectif
 
@@ -1487,4 +1487,13 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - P64-L02 : implémenté et testé automatiquement.
 - Capacités livrées : analyse contextuelle locale, compatibilités explicites, sous-scores séparés, Pareto déterministe, représentants UX progressifs et invalidation ciblée.
 - Capacités non livrées : solve global, finalisation, remplissage, cales, matérialisation, validation Fusion et validation impression.
-- Dépendance suivante : P64-L03, sans ouvrir P46, P47-P50, P67-P69 ou P64-F02 hors dépendances.
+- P64-L03 est automated-validated ; P64-L03V est la dépendance suivante, sans ouvrir P46, P47-P50, P67-P69 ou P64-F02 hors dépendances.
+
+## Mise à jour P64-L03 — cycle explicite
+
+C-SOLVER / C-LAYOUT : orchestration staged implémentée sans changement des
+méthodes, budgets ou résultats. C-PROJECT-CONTRACT : état et caches restent
+dérivés hors schéma. C-FUSION-UI : action progressive Calculer / Finaliser /
+Matérialiser, sans scène automatique. C-QUALITY : stale, provenance, clé
+globale complète et refus direct testés. P64-L03V est ready ; aucune capability
+physique n'est promue.

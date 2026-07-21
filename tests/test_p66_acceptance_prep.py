@@ -110,6 +110,7 @@ class P66AcceptancePreparationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp_dir, patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}):
             estimated = handle_palette_request(request("validate_project", project=raw), ADDIN, ROOT)
             solved = handle_palette_request(request("solve_project", project=raw), ADDIN, ROOT)
+            finalized = handle_palette_request(request("finalize_project", project=raw), ADDIN, ROOT)
             generated = handle_palette_request(request("materialize_project", project=raw), ADDIN, ROOT)
             regenerated = handle_palette_request(request("regenerate_project", project=raw), ADDIN, ROOT)
             edited_response = handle_palette_request(request("validate_project", project=edited), ADDIN, ROOT)
@@ -133,6 +134,8 @@ class P66AcceptancePreparationTests(unittest.TestCase):
         self.assertEqual(axes["tokens"]["x"]["mode"], "auto")
         self.assertEqual(axes["c0"]["x"]["mode"], "target")
         self.assertEqual(axes["c2"]["x"]["mode"], "fixed")
+        self.assertEqual(finalized["staged_calculation"]["finalized_plan"]["status"], "current")
+        self.assertEqual(finalized["staged_calculation"]["finalized_plan"]["status"], "current")
         self.assertEqual(generated["lifecycle"]["materialized"], "cad_ready")
         self.assertEqual(generated["cad_build"]["materialization"]["automatic_body_count"], 0)
         self.assertEqual(generated["cad_build"]["cad_ir_digest"], regenerated["cad_build"]["cad_ir_digest"])
@@ -150,7 +153,9 @@ class P66AcceptancePreparationTests(unittest.TestCase):
         raw = json.loads(IMPOSSIBLE_FIXTURE.read_text(encoding="utf-8"))
         preflight = load_preflight_module().build_preflight(raw)
         with tempfile.TemporaryDirectory() as temp_dir, patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}):
-            response = handle_palette_request(request("materialize_project", project=raw), ADDIN, ROOT)
+            response = handle_palette_request(request("solve_project", project=raw), ADDIN, ROOT)
+            finalized = handle_palette_request(request("finalize_project", project=raw), ADDIN, ROOT)
+            materialized = handle_palette_request(request("materialize_project", project=raw), ADDIN, ROOT)
             project_path = Path(temp_dir) / CURRENT_PROJECT_FILENAME
             persisted = project_path.is_file()
 
@@ -159,10 +164,10 @@ class P66AcceptancePreparationTests(unittest.TestCase):
         self.assertFalse(preflight["summary"]["cad_ready"])
         self.assertIsNone(preflight["fusion_generation_plan"])
         self.assertIn("CONTAINER_MINIMUM_BLOCKED", {item["code"] for item in preflight["partition"]["diagnostics"]})
-        self.assertEqual(response["cad_build"]["status"], "impossible")
-        self.assertIsNone(response["cad_build"]["cad_ir"])
-        self.assertEqual(response["cad_build"]["materialization"]["component_count"], 0)
-        self.assertEqual(response["lifecycle"]["materialized"], "blocked")
+        self.assertEqual(response["partition"]["summary"]["status"], "blocked")
+        self.assertEqual(finalized["status"], "invalid")
+        self.assertEqual(materialized["status"], "invalid")
+        self.assertIsNone(materialized["cad_build"])
         self.assertFalse(persisted)
 
     def test_fifty_requested_containers_remain_an_automated_non_materialized_proof(self) -> None:
@@ -212,7 +217,7 @@ class P66AcceptancePreparationTests(unittest.TestCase):
         self.assertIn("expected 0.1.20", checker)
         self.assertIn("manifestText", checker)
         self.assertNotIn("ConvertFrom-Json", checker)
-        self.assertEqual(manifest["version"], "0.1.55")
+        self.assertEqual(manifest["version"], "0.1.56")
         self.assertIn("mvp-accepted", document)
         self.assertIn("P66 Fusion OK 0.1.20 - commit 6e351bb", document)
         self.assertIn("P66 Fusion OK 0.1.20 - commit <sha>", document)

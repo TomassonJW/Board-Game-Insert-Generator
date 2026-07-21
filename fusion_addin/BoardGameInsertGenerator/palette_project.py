@@ -29,12 +29,14 @@ SUPPORTED_ACTIONS = frozenset({
     "load_project", "new_project", "validate_project",
     "save_project", "autosave_project", "save_document", "save_project_as",
     "open_project_file", "open_recent_project", "import_project", "export_project",
-    "solve_project", "materialize_project", "regenerate_project",
+    "solve_project", "finalize_project", "materialize_project", "regenerate_project",
     "save_personal_preset", "delete_personal_preset",
     "import_personal_presets", "export_personal_presets", "save_solver_settings",
 })
 _LOCAL_ANALYSIS_ENGINE_LIMIT = 8
 _LOCAL_ANALYSIS_ENGINES: OrderedDict[tuple[str, str], object] = OrderedDict()
+_STAGED_CALCULATION_SESSION_LIMIT = 8
+_STAGED_CALCULATION_SESSIONS: OrderedDict[str, object] = OrderedDict()
 
 
 class PaletteProjectError(ValueError):
@@ -217,7 +219,6 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
     )
     from board_game_insert_generator.partition_cad import build_partition_cad
     from board_game_insert_generator.partition_result_view import build_partition_result_view
-    from board_game_insert_generator.partition_solver import solve_partition_plan
     from board_game_insert_generator.container_sizing_view import build_container_sizing_view
     from board_game_insert_generator.personal_presets import (
         delete_personal_preset, load_personal_presets, normalize_personal_presets,
@@ -304,6 +305,12 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         addin_dir,
         effort_profile=solver_settings["effort"],
     )
+    staged_session = _staged_calculation_session(project, addin_dir, solver_settings)
+    staged_calculation = staged_session.synchronize(
+        project,
+        local_analysis,
+        solver_settings=solver_settings,
+    )
     creation_presets = build_creation_presets(
         project,
         storage_height_mm=float(top_insets["design_top_z_mm"]),
@@ -330,17 +337,24 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         write_personal_presets(preset_path, imported)
         personal_presets = imported
 
-    partition = (
-        solve_partition_plan(
-            project,
+    staged_solver_result: dict[str, object] | None = None
+    partition: dict[str, object] | None = None
+    if action == "solve_project":
+        staged_action = staged_session.calculate_layout(
             request_id=request_id,
             request_revision=_request_revision(request),
-            solver_method=solver_settings["method"],
-            effort_profile=solver_settings["effort"],
         )
-        if action in {"solve_project", "materialize_project", "regenerate_project"}
-        else None
-    )
+        partition = staged_action["partition"]
+        staged_solver_result = staged_action["solver_result"]
+        staged_calculation = staged_action["staged_calculation"]
+    elif action == "finalize_project":
+        staged_action = staged_session.finalize_volume()
+        partition = staged_action["partition"]
+        staged_solver_result = staged_action["solver_result"]
+        staged_calculation = staged_action["staged_calculation"]
+    elif action in {"materialize_project", "regenerate_project"}:
+        partition = staged_session.materializable_partition()
+        staged_solver_result = _partition_solver_result(partition)
     container_sizing = build_container_sizing_view(project, envelopes, partition)
     result_view = (
         build_partition_result_view(partition)
@@ -348,6 +362,11 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         and partition["summary"]["status"] in {"constructed", "proposal_with_residuals"}
         else None
     )
+    if result_view is not None and action == "solve_project":
+        result_view["materializable"] = False
+        result_view.setdefault("invariants", {})[
+            "explicit_finalization_required_before_materialization"
+        ] = True
     cad_build = (
         build_partition_cad(
             project,
@@ -358,6 +377,9 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         if action in {"materialize_project", "regenerate_project"}
         else None
     )
+    if cad_build is not None and cad_build.get("status") == "ready_for_fusion":
+        staged_session.record_cad_ready(cad_build)
+        staged_calculation = staged_session.snapshot()
     saved = False
     recovery_saved = False
     export_path = ""
@@ -418,9 +440,10 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         container_sizing=container_sizing,
         flat_stack=flat_stack,
         local_analysis=local_analysis,
+        staged_calculation=staged_calculation,
         partition=partition,
         result_view=result_view,
-        solver_result=_partition_solver_result(partition),
+        solver_result=staged_solver_result or _partition_solver_result(partition),
         cad_build=cad_build,
         saved=saved,
         recovery_saved=recovery_saved,
@@ -443,6 +466,7 @@ def _response(
     container_sizing: dict[str, object] | None = None,
     flat_stack: dict[str, object] | None = None,
     local_analysis: dict[str, object] | None = None,
+    staged_calculation: dict[str, object] | None = None,
     partition: dict[str, object] | None = None,
     result_view: dict[str, object] | None = None,
     cad_build: dict[str, object] | None = None,
@@ -480,6 +504,7 @@ def _response(
         "container_sizing": deepcopy(container_sizing),
         "flat_stack": deepcopy(flat_stack),
         "local_analysis": deepcopy(local_analysis),
+        "staged_calculation": deepcopy(staged_calculation),
         "partition": deepcopy(partition),
         "result_view": deepcopy(result_view),
         "solver_result": deepcopy(solver_result),
@@ -521,6 +546,32 @@ def _contextual_local_analysis(
         return engine.snapshot()
     _LOCAL_ANALYSIS_ENGINES.move_to_end(engine_key)
     return engine.update_project(project)
+
+
+def _staged_calculation_session(
+    project: dict[str, object],
+    addin_dir: Path,
+    solver_settings: dict[str, str],
+) -> object:
+    """Reuse one bounded in-memory P64-L03 session per local document."""
+
+    from board_game_insert_generator.staged_calculation import (
+        StagedCalculationSession,
+    )
+
+    session_key = str(current_project_path(addin_dir).resolve())
+    session = _STAGED_CALCULATION_SESSIONS.get(session_key)
+    if session is None:
+        session = StagedCalculationSession(
+            project,
+            solver_settings=solver_settings,
+        )
+        _STAGED_CALCULATION_SESSIONS[session_key] = session
+        while len(_STAGED_CALCULATION_SESSIONS) > _STAGED_CALCULATION_SESSION_LIMIT:
+            _STAGED_CALCULATION_SESSIONS.popitem(last=False)
+        return session
+    _STAGED_CALCULATION_SESSIONS.move_to_end(session_key)
+    return session
 
 
 def _request_revision(raw_request: object) -> int | None:

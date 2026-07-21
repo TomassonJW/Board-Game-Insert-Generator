@@ -34,15 +34,18 @@ class FusionPaletteResultTests(unittest.TestCase):
         self.assertLess(result_block.index('class="plan-grid"'), result_block.index('id="preview-explanations"'))
     def test_impossible_and_obsolete_states_never_show_a_fake_solution(self) -> None:
         self.assertIn("Aucune fausse solution n est affichée", self.markup)
-        self.assertIn("Ancienne proposition", self.markup)
+        self.assertIn("Ancien agencement", self.markup)
         self.assertIn("solvedStale=Boolean(lastSolved)", self.markup)
         self.assertIn("lastSolved=payload", self.markup)
         self.assertIn("if(!complete&&!partial)", self.markup)
         self.assertIn("proposal_with_residuals", self.markup)
         self.assertIn("materializable=complete", self.markup)
-        self.assertIn('data-bridge="materialize_project"', self.markup)
+        self.assertIn("finalizedCurrent", self.markup)
+        self.assertIn("action='finalize_project'", self.markup)
+        self.assertIn("action='materialize_project'", self.markup)
+        self.assertNotIn('data-bridge="materialize_project"', self.markup)
         self.assertIn('data-bridge="regenerate_project"', self.markup)
-        self.assertIn("Une proposition complète et à jour est requise", self.markup)
+        self.assertIn("Finalise explicitement le volume avant de pouvoir matérialiser", self.markup)
         self.assertIn("Volume résiduel à décider", self.markup)
 
     def test_p59_exposes_owned_scene_actions_without_raw_cad_codes(self) -> None:

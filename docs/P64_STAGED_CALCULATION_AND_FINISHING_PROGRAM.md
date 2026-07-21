@@ -1,9 +1,8 @@
 # P64-A02 — Programme de calcul étagé et finalisation explicite
 
-Statut : architecture acceptée ; P64-L01 et P64-L02 implémentés et validés
-automatiquement le 2026-07-21. Runtime de solve courant inchangé : P44-M007
-continue de programmer le solve automatique tant que P64-L03/L03V n'ont pas été
-implémentés et observés dans Fusion.
+Statut : architecture acceptée ; P64-L01, P64-L02 et P64-L03 sont
+implémentés et validés automatiquement au 2026-07-21. Le runtime staged est
+livré ; P64-L03V reste à observer dans Fusion avant toute revendication Fusion.
 
 ADR principale :
 [ADR-0071](DECISIONS/ADR-0071-staged-local-analysis-explicit-solve-and-finalization.md).
@@ -443,15 +442,17 @@ Fusion non BGIG.
 
 ### P64-L03 — Solvage explicite et finalisation staged
 
-- Statut : ready après P64-L02 automated-validated.
+- Statut : done-code, implemented-core, implemented-fusion-bridge, implemented-fusion-ui, automated-validated.
 - Dépendance : L02. Réutiliser le contrat d'annulation H07/H03C ; P64-U01
   reste un lot UX séparé et n'est pas ouvert implicitement.
 - Livrables : suppression du timer global automatique, action primaire
   contextuelle, progressive widening, état `finalized` et matérialisabilité.
-- Critères : fixtures 10 à 16, bridge, DOM, focus, suite complète.
+- Critères obtenus : cycle explicite, bridge, DOM, stale fail-closed et suite complète.
+- Preuve : docs/P64_L03_EXPLICIT_STAGED_CYCLE_EVIDENCE.md.
 
 ### P64-L03V — Gate Fusion
 
+- Statut : ready-for-human-fusion-check ; préparation : scripts/fusion/prepare_p64_l03v_explicit_cycle_test.ps1.
 - Observer éditions rapides, analyses locales ciblées, absence de solve global,
   bouton explicite, résultat obsolète, finalisation et scène inchangée.
 - Cette gate ne valide aucune valeur physique ni impression.
@@ -483,8 +484,8 @@ P64-V2H03V retour humain
 ```
 
 NEXT_ACTIONS.md reste autoritaire. P64-V2H03V et P44-V sont clôturées,
-P64-L01/L02 sont automated-validated et P64-L03 devient la seule mission
-runtime ready. Les lots P45/P46 et de finition restent verrouillés.
+P64-L01/L02/L03 sont automated-validated et P64-L03V devient la seule gate
+humaine active. Les lots P45/P46 et de finition restent verrouillés.
 
 ## 21. Vérifications minimales futures
 

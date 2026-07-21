@@ -1,4 +1,4 @@
-﻿# Roadmap
+# Roadmap
 
 Cette roadmap decrit les phases macro jusqu'au produit cible. Le detail
 operationnel vit dans `docs/BACKLOG.md`, l'etat courant dans `docs/STATUS.md`,
@@ -966,4 +966,12 @@ Fusion. `print-validated: false`.
 
 - P64-L02 est implémenté au-dessus de P64-L01 sans modifier le solveur public, le schéma, les budgets ni les valeurs physiques.
 - La frontière Pareto moteur reste complète ; les trois représentants nommés sont une projection UX progressive et non normative.
-- P64-L03 est le prochain incrément recommandé : poursuivre le staged calculation program à partir des états et analyses observables désormais disponibles.
+- P64-L03 est livré et validé automatiquement ; P64-L03V est la prochaine gate humaine sur le cycle explicite.
+
+## P64-L03 — Cycle global explicite livré (2026-07-21)
+
+P64-L03 retire le solve global temporisé et impose calcul, finalisation puis
+matérialisation. L'analyse locale reste réactive et les artefacts obsolètes ne
+sont plus consommables. Le finaliseur actuel est une politique de compatibilité
+sans changement géométrique ; F01/F02/F03 restent verrouillés. P64-L03V devient
+la seule gate active sur 0.1.56.

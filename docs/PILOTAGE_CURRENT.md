@@ -43,7 +43,7 @@ preuves archivées.
 - Le cas dense 11 × 34 reste honnêtement `no_solution_within_budget` ; la gate
   ne le déclare ni soluble ni impossible.
 - P44-V est fusion-validated avec réserve de charge ; P45-M001V est acceptée ;
-  P64-L01 et P64-L02 sont automated-validated ; P64-L03 devient ready.
+  P64-L01, P64-L02 et P64-L03 sont automated-validated ; P64-L03V devient ready-for-human-fusion-check.
 
 ## Vue de séquence
 
@@ -70,7 +70,8 @@ preuves archivées.
 | Terminé — décision | P45-M001V | Contrat accepté avec Pile / Basculer unifiés ; aucun runtime. |
 | Terminé — automatisé | P64-L01 | États, digests, invalidation ciblée, cache borné et stale fail-closed. |
 | Terminé — automatisé | P64-L02 | Annotations contextuelles, sous-scores, Pareto et résumé progressif non normatif. |
-| Ready | P64-L03 | Solve global explicite, finalisation staged et matérialisation séparée. |
+| Terminé — automatisé | P64-L03 | Solve global explicite, finalisation staged et matérialisation séparée. |
+| Ready — gate Fusion | P64-L03V | Vérifier le cycle explicite dans Fusion 0.1.56. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -149,8 +150,8 @@ commun aux cartes et aux autres assets ; seul le sleeving reste spécialisé. Le
 côté choisi est le côté d'appui, Z ne change jamais sans action explicite, P45
 certifie les variantes locales et P64 choisit globalement.
 
-P64-L01 et P64-L02 sont `implemented-core` et `automated-validated`.
-P64-L03 devient la seule mission `ready`. Tout runtime ou schéma P45 reste
+P64-L01, P64-L02 et P64-L03 sont `implemented-core` et `automated-validated`.
+P64-L03V devient la seule gate `ready-for-human-fusion-check`. Tout runtime ou schéma P45 reste
 bloqué jusqu'à son contrat additif. Aucune valeur physique ou scène n'est modifiée.
 
 ## P64-L01 — état incrémental automatisé
@@ -163,7 +164,7 @@ l'état courant.
 
 La preuve automatisée L01 couvre 16 fixtures ciblées, un corpus de cinquante
 conteneurs et la parité de dérivation. L02 ajoute l'analyse contextuelle locale et
-le résumé progressif sans modifier le solveur public. P64-L03 est `ready` ;
+le résumé progressif sans modifier le solveur public. P64-L03 est automated-validated ; P64-L03V est `ready-for-human-fusion-check` ;
 aucune preuve Fusion ou impression n'est revendiquée.
 
 ## P64-L02 — analyse contextuelle automatisée
@@ -173,4 +174,13 @@ aucune preuve Fusion ou impression n'est revendiquée.
 - Les sous-scores restent séparés et explicables ; la frontière Pareto moteur demeure complète et déterministe.
 - La palette expose Compact, Équilibré et Bas comme représentants UX non normatifs, avec détails et options expertes repliés par défaut.
 - Une édition locale invalide uniquement la chaîne concernée et ne lance aucun solve global.
-- P64-L03 devient la prochaine mission ready ; aucun solve global, remplissage, cale, finalisation ou matérialisation ne fait partie de L02.
+- P64-L03 est désormais automated-validated ; aucun solve global, remplissage, cale, finalisation ou matérialisation ne faisait partie de L02.
+
+## P64-L03 — cycle explicite automatisé (2026-07-21)
+
+Le timer global est retiré. La palette impose Calculer, Finaliser, puis
+Matérialiser. Le cœur conserve provenance, cache borné, stale et raisons
+d'arrêt. La finalisation de compatibilité ne change aucune géométrie.
+Preuve : docs/P64_L03_EXPLICIT_STAGED_CYCLE_EVIDENCE.md.
+P64-L03V est ready-for-human-fusion-check ; validations Fusion et impression
+restent false.

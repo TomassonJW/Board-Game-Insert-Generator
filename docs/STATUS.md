@@ -2692,3 +2692,14 @@ Le cas dense 11 × 34 reste `no_solution_within_budget`.
 - Le bridge conserve un moteur incrémental borné par projet et expose lifecycle, digests, provenance, budgets, recompute et reuse.
 - La palette Fusion présente un résumé compact puis des détails et options expertes repliés.
 - Validation Fusion : false. Validation impression : false. Le cas dense 11 × 34 reste no_solution_within_budget.
+
+## P64-L03 — cycle explicite et finalisation staged (2026-07-21)
+
+Statut : implemented-core, implemented-fusion-bridge, implemented-fusion-ui,
+automated-validated. Le solve global automatique est supprimé et
+validate_project reste local. Le cycle Calculer / Finaliser / Matérialiser est
+explicite et fail-closed. Le finaliseur conserve le plan certifié sans
+géométrie ni corps automatique. Preuve :
+docs/P64_L03_EXPLICIT_STAGED_CYCLE_EVIDENCE.md. P64-L03V est
+ready-for-human-fusion-check sur 0.1.56. Validations Fusion et impression :
+false ; cas dense inchangé.

@@ -232,20 +232,46 @@ class FusionPaletteProjectTests(unittest.TestCase):
         self.assertEqual(response["lifecycle"]["derived"], "current")
         self.assertEqual(response["lifecycle"]["solved"], "current")
         self.assertEqual(response["lifecycle"]["materialized"], "not_materialized")
+        staged = response["staged_calculation"]
+        self.assertEqual(staged["global_layout"]["status"], "current")
+        self.assertTrue(staged["global_layout"]["placement_certified"])
+        self.assertEqual(staged["finalized_plan"]["status"], "not_finalized")
+        self.assertEqual(staged["next_action"], "finalize_volume")
+        self.assertFalse(response["result_view"]["materializable"])
         self.assertFalse(response["saved"])
-    def test_materialize_and_regenerate_return_the_same_real_cad_build(self) -> None:
+
+    def test_materialize_and_regenerate_return_the_same_explicit_final_plan(self) -> None:
         project = blank_project_v1()
         project["container_groups"] = [{"id": "g", "name": "Bac", "wall_thickness_mm": None, "floor_thickness_mm": None}]
         project["contents"] = [{"id": "c", "name": "Pieces", "shape_kind": "square", "dimensions_mm": {"x": 12, "y": 12, "z": 3}, "quantity": 2, "container_group_id": "g", "content_clearance_mm": None, "measurement_confidence": "exact"}]
         with tempfile.TemporaryDirectory() as temp_dir, patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}):
+            solved = handle_palette_request(request("solve_project", project=project), ADDIN, ROOT)
+            finalized = handle_palette_request(request("finalize_project", project=project), ADDIN, ROOT)
             generated = handle_palette_request(request("materialize_project", project=project), ADDIN, ROOT)
             regenerated = handle_palette_request(request("regenerate_project", project=project), ADDIN, ROOT)
 
+        self.assertEqual(finalized["staged_calculation"]["finalized_plan"]["status"], "current")
+        self.assertEqual(
+            solved["partition"]["plan_digest"],
+            finalized["staged_calculation"]["finalized_plan"]["partition_plan_digest"],
+        )
+        self.assertFalse(finalized["staged_calculation"]["finalized_plan"]["geometry_changed"])
         self.assertEqual(generated["cad_build"]["status"], "ready_for_fusion")
         self.assertEqual(generated["cad_build"]["materialization"]["component_count"], 1)
         self.assertEqual(generated["cad_build"]["materialization"]["automatic_body_count"], 0)
         self.assertEqual(generated["cad_build"]["cad_ir_digest"], regenerated["cad_build"]["cad_ir_digest"])
         self.assertEqual(generated["partition"]["plan_digest"], generated["cad_build"]["source_plan_digest"])
+
+    def test_direct_materialization_is_rejected_without_explicit_finalization(self) -> None:
+        project = blank_project_v1()
+        project["container_groups"] = [{"id": "g", "name": "Bac", "wall_thickness_mm": None, "floor_thickness_mm": None}]
+        project["contents"] = [{"id": "c", "name": "Pieces", "shape_kind": "square", "dimensions_mm": {"x": 12, "y": 12, "z": 3}, "quantity": 2, "container_group_id": "g", "content_clearance_mm": None, "measurement_confidence": "exact"}]
+        with tempfile.TemporaryDirectory() as temp_dir, patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}):
+            response = handle_palette_request(request("materialize_project", project=project), ADDIN, ROOT)
+
+        self.assertEqual(response["status"], "invalid")
+        self.assertIsNone(response["cad_build"])
+        self.assertIn("finalise", " ".join(response["errors"]).lower())
 
     def test_bridge_round_trip_and_materializes_an_explicit_legacy_complement(self) -> None:
         project = blank_project_v1()
@@ -267,6 +293,8 @@ class FusionPaletteProjectTests(unittest.TestCase):
                 request("import_project", project_json=json.dumps(project)), ADDIN, ROOT
             )
             loaded = handle_palette_request(request("load_project"), ADDIN, ROOT)
+            handle_palette_request(request("solve_project", project=loaded["project"]), ADDIN, ROOT)
+            handle_palette_request(request("finalize_project", project=loaded["project"]), ADDIN, ROOT)
             materialized = handle_palette_request(
                 request("materialize_project", project=loaded["project"]), ADDIN, ROOT
             )
@@ -288,13 +316,15 @@ class FusionPaletteProjectTests(unittest.TestCase):
             minimum = baseline["partition"]["placements"][0]["minimum_outer_envelope_mm"]
             project["container_groups"][0]["expansion_axes"] = {"x": False, "y": False, "z": False}
             project["container_groups"][0]["locked_outer_dimensions_mm"] = minimum
-            response = handle_palette_request(request("materialize_project", project=project), ADDIN, ROOT)
+            response = handle_palette_request(request("solve_project", project=project), ADDIN, ROOT)
+            finalized = handle_palette_request(request("finalize_project", project=project), ADDIN, ROOT)
+            materialized = handle_palette_request(request("materialize_project", project=project), ADDIN, ROOT)
 
         self.assertEqual(response["partition"]["summary"]["status"], "proposal_with_residuals")
         self.assertFalse(response["result_view"]["materializable"])
-        self.assertEqual(response["cad_build"]["status"], "not_materializable")
-        self.assertIsNone(response["cad_build"]["cad_ir"])
-        self.assertEqual(response["lifecycle"]["materialized"], "blocked")
+        self.assertEqual(finalized["status"], "invalid")
+        self.assertEqual(materialized["status"], "invalid")
+        self.assertIsNone(materialized["cad_build"])
 
     def test_bridge_quarantines_complement_presets_without_changing_the_response_schema(self) -> None:
         project = blank_project_v1()

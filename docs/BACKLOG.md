@@ -2571,7 +2571,7 @@ P44-M007 est ready-for-explicit-go.
   que le plan n'est pas finalisé et recertifié.
 - Migration : comportement public changé uniquement avec ADR-0071, tests de
   compatibilité et gate P64-L03V ; aucune migration destructive.
-- Statut : ready.
+- Statut : done-code, implemented-core, implemented-fusion-bridge, implemented-fusion-ui, automated-validated. Preuve : docs/P64_L03_EXPLICIT_STAGED_CYCLE_EVIDENCE.md.
 
 ### P64-L03V — Gate Fusion du cycle explicite
 
@@ -2581,7 +2581,7 @@ P44-M007 est ready-for-explicit-go.
   finalisation séparée et aucune scène avant matérialisation.
 - Refus : aucun résultat ancien présenté comme courant, aucun top 3 moteur,
   aucune allégation physique.
-- Statut : future-human-gate, inactive.
+- Statut : ready-for-human-fusion-check ; package 0.1.56 préparé.
 
 ### P64-F01A02 — Finalisation simple autour des enveloppes
 

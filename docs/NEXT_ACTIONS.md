@@ -9,7 +9,7 @@ V0.1 reste `mvp-accepted`, `fusion-validated: true` et
 La réserve de charge P44 à environ cinquante conteneurs reste explicitement non
 observée et ne constitue aucune preuve de performance Fusion.
 
-P45-M001V est `architecture-accepted` sans runtime. P64-L01 et P64-L02 sont
+P45-M001V est `architecture-accepted` sans runtime. P64-L01, P64-L02 et P64-L03 sont
 `implemented-core` et `automated-validated`. Le bridge et la palette exposent
 désormais l’analyse locale progressive, sans changement de schéma, solveur,
 valeur physique ou scène.
@@ -35,32 +35,19 @@ valeur physique ou scène.
 
 ## Prochaine action recommandée
 
-### P64-L03 — Solvage explicite et finalisation staged
+### P64-L03V — Gate Fusion du cycle explicite
 
-Objectif borné : remplacer l’orchestration globale automatique P44-M007 par une
-action visible `Calculer l’agencement`, conserver l’ancien résultat comme
-obsolète, puis séparer placement, finalisation et matérialisation.
+P64-L03 est automated-validated. La prochaine action est une observation
+humaine du package Fusion 0.1.56 préparé par
+scripts/fusion/prepare_p64_l03v_explicit_cycle_test.ps1.
 
-Livrables attendus :
+Vérifier : édition locale sans solve ni scène ; action Calculer ; action
+Finaliser sans changement géométrique ; stale après mutation ; refus d'une
+matérialisation directe ; scène créée seulement par la troisième action ;
+focus stable et diagnostic replié.
 
-1. aucune édition ordinaire ne lance le portefeuille global ;
-2. action primaire contextuelle `Calculer l’agencement`, puis
-   `Finaliser le volume`, puis `Matérialiser dans Fusion` ;
-3. progressive widening sur la frontière moteur complète, jamais sur les trois
-   cartes visibles seulement ;
-4. annulation, requêtes tardives et mutations pendant run traitées
-   `stale_or_cancelled` ;
-5. placement certifié distinct d’un plan final certifié et matérialisable ;
-6. ancien aperçu grisé, focus stable, détails techniques repliés ;
-7. tests cœur, bridge et DOM, puis gate Fusion P64-L03V distincte.
-
-Frontières : préserver baseline, EMS historique, greedy, beam, Auto, budgets
-Rapide/Normal/Approfondi et statuts ADR-0068. Aucun runtime P45, aucune
-recalibration, aucune forme, aucun corps automatique, aucune cale et aucune
-harmonisation F01/F02 implicite.
-
-Sources : ADR-0056, ADR-0068, ADR-0069, ADR-0070, ADR-0071,
-`P64_STAGED_CALCULATION_AND_FINISHING_PROGRAM.md` et la preuve P64-L02.
+Retour attendu : P64-L03V Fusion OK 0.1.56 - commit <sha>, ou KO contextuel
+avec projet, étape, statut visible et diagnostic. Aucune validation physique.
 
 ## Repères historiques conservés
 
@@ -74,7 +61,7 @@ Sources : ADR-0056, ADR-0068, ADR-0069, ADR-0070, ADR-0071,
 
 ## Lots suivants, non ouverts
 
-1. P64-L03V après L03 automated-validated ;
+1. P64-F01A02 seulement après une P64-L03V positive et ses dépendances ;
 2. futur runtime P45 par contrat de schéma et migration additive distincts ;
 3. P46 seulement après formes et ergonomie matérialisées ;
 4. P64-F01/F02, C01-C03 et F03 selon leurs dépendances ;
@@ -82,8 +69,8 @@ Sources : ADR-0056, ADR-0068, ADR-0069, ADR-0070, ADR-0071,
 
 ## Séquence verrouillée
 
-Une seule mission peut être exécutée à la fois. P64-L03 est la seule mission
-`ready`. P45 ne possède pas le solveur global ; P64 ne définit pas les piles,
+Une seule mission peut être exécutée à la fois. P64-L03V est la seule gate
+`ready-for-human-fusion-check`. P45 ne possède pas le solveur global ; P64 ne définit pas les piles,
 poses, intentions ou formes. Les jeux externes restent globaux, les valeurs
 physiques inchangées et aucune scène n’est créée automatiquement.
 

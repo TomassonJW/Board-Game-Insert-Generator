@@ -862,3 +862,18 @@ par cette gate. `fusion-validated: false`, `print-validated: false`.
 - P64-L02 ne requiert aucune nouvelle gate humaine pour être intégré : il ne génère ni géométrie ni scène et ne revendique aucune validation Fusion ou impression.
 - Les statuts fusion-validated et print-validated restent false.
 - Toute future revendication physique ou Fusion demeure soumise aux gates existantes et à une preuve humaine distincte.
+
+## P64-L03V — Gate Fusion du cycle explicite
+
+Statut : ready-for-human-fusion-check. Aucune revue humaine n'était requise
+avant ou pendant l'intégration automatisée de P64-L03.
+
+Préparation : scripts/fusion/prepare_p64_l03v_explicit_cycle_test.ps1,
+package 0.1.56 et marqueur du commit installé.
+
+Observer l'édition locale sans solve, les actions Calculer puis Finaliser,
+le stale et les refus fail-closed, l'absence de scène avant Matérialiser,
+le focus stable et le diagnostic replié.
+
+Retour : P64-L03V Fusion OK 0.1.56 - commit <sha>, ou KO contextuel.
+fusion-validated: false et print-validated: false jusqu'au retour.

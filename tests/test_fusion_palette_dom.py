@@ -291,11 +291,11 @@ class FusionPaletteDomTests(unittest.TestCase):
     def test_exposes_non_mutating_container_estimation_without_a_new_bridge_action(self) -> None:
         for marker in (
             "estimate-groups-action",
-            ">Réestimer</button>",
+            "Calculer l’agencement</button>",
             "container_sizing",
             "Taille calculée",
             "Avant modification - A reestimer",
-            "Estimation deja en cours.",
+            "Calcul de l’agencement déjà en cours.",
             "sendProject('solve_project')",
         ):
             self.assertIn(marker, self.markup)
@@ -312,18 +312,22 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertNotIn("supported_by_requested_bodies", self.markup)
         self.assertNotIn("data-bridge=\"solve_project\"", self.markup[self.markup.index("function renderResult"):self.markup.index("function renderPersistentActions")])
 
-    def test_runs_adaptive_calculation_and_ignores_obsolete_responses(self) -> None:
+    def test_keeps_local_analysis_reactive_and_global_calculation_explicit(self) -> None:
         for marker in (
-            "DERIVE_DEBOUNCE_MS=350", "AUTO_SOLVE_STABILITY_MS=1500",
-            "scheduleAdaptiveSolve", "cancelAdaptiveSolve", "autoSolveTimer",
-            "latestDerivedRequest", "adaptiveStatus", "Recalculer maintenant",
-            "sendProject('validate_project',{},true,'adaptive')",
-            "sendProject('solve_project',{},true,'adaptive')",
+            "DERIVE_DEBOUNCE_MS=350", "latestDerivedRequest", "adaptiveStatus",
+            "sendProject('validate_project',{},true,'local')",
             "latestDerivedRequest[pendingRequest.derivedKey]!==payload.request_id",
+            "primary-calculation-action", "finalize_project",
+            "Calculer l’agencement", "Finaliser le volume",
         ):
             self.assertIn(marker, self.markup)
+        for forbidden in (
+            "AUTO_SOLVE_STABILITY_MS", "scheduleAdaptiveSolve", "cancelAdaptiveSolve",
+            "autoSolveTimer", "sendProject('solve_project',{},true,'adaptive')",
+        ):
+            self.assertNotIn(forbidden, self.markup)
         self.assertNotIn('data-bridge="validate_project"', self.markup)
-        self.assertEqual(self.markup.count('data-bridge="materialize_project"'), 1)
+        self.assertEqual(self.markup.count('data-bridge="materialize_project"'), 0)
         self.assertLess(self.markup.index('id="preview-status"'), self.markup.index('id="preview-explanations"'))
         self.assertLess(self.markup.index('class="plan-grid"', self.markup.index("function renderResult")), self.markup.index('id="preview-explanations"'))
         self.assertIn('Calcul&eacute;e automatiquement', self.markup)
@@ -412,7 +416,7 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertEqual(self.markup.count('placeholder="Défaut"'), 2)
 
     def test_exposes_the_p61_lifecycle_and_keeps_healthy_inspection_out_of_global_messages(self) -> None:
-        for marker in ("renderLifecycle", "scheduleDerived", "solvedStale", "Ancienne proposition", "technical_detail"):
+        for marker in ("renderLifecycle", "scheduleDerived", "solvedStale", "Ancien agencement", "technical_detail"):
             self.assertIn(marker, self.markup)
         self.assertIn("sendFusion('inspect',true)", self.markup)
         self.assertNotIn("Mode avance", self.markup)
@@ -420,11 +424,11 @@ class FusionPaletteDomTests(unittest.TestCase):
             self.assertNotIn(malformed, self.markup)
 
     def test_routes_validation_persistence_and_native_documents_to_the_versioned_bridge(self) -> None:
-        self.assertEqual(self.dom.bridge_actions, {"save_document", "export_project", "export_personal_presets", "solve_project", "materialize_project"})
+        self.assertEqual(self.dom.bridge_actions, {"save_document", "export_project", "export_personal_presets", "solve_project"})
         for marker in ("bgig.palette.request.v1", "bgig.palette.response.v1", "bgig_palette_project", "bgig_palette_document", "DOCUMENT_ACTION", "sendDocument", "8000"):
             self.assertIn(marker, self.markup)
 
-    def test_exposes_clear_design_settings_and_one_persistent_materialize_action(self) -> None:
+    def test_exposes_clear_design_settings_and_one_progressive_primary_action(self) -> None:
         for marker in (
             "Réglages de conception", "Épaisseurs minimales", "Parois", "Fond",
             "Jeux (tolérances)", "Jeu entre conteneurs", "Jeu conteneur-boîte",
@@ -449,11 +453,13 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertNotIn('data-path="layout.container_box_xy_clearance_mm"', self.markup)
         self.assertNotIn('data-path="layout.container_z_clearance_mm"', self.markup)
         self.assertNotIn('data-path="box.usable_height_mm"', self.markup)
-        self.assertEqual(self.markup.count('data-bridge="materialize_project"'), 1)
-        self.assertIn('id="materialize-action"', self.markup)
+        self.assertEqual(self.markup.count('data-bridge="materialize_project"'), 0)
+        self.assertIn('id="primary-calculation-action"', self.markup)
         self.assertIn("renderPersistentActions", self.markup)
+        for marker in ("action='finalize_project'", "action='materialize_project'", "Finaliser le volume", "Matérialiser dans Fusion"):
+            self.assertIn(marker, self.markup)
         self.assertLess(
-            self.markup.index('data-bridge="solve_project">Recalculer maintenant</button><button id="materialize-action"'),
+            self.markup.index('id="primary-calculation-action"'),
             self.markup.index('<div class="action-zone center">'),
         )
 
@@ -542,6 +548,16 @@ class FusionPaletteDomTests(unittest.TestCase):
         for marker in ("0.1.28", "creation-preset", "creation-destination", "Nouveau conteneur li", "P44-M005 Fusion OK"):
             self.assertIn(marker, p44_smoke)
 
+
+    def test_prepares_the_p64_l03v_explicit_cycle_gate(self) -> None:
+        script = (ROOT / "scripts" / "fusion" / "prepare_p64_l03v_explicit_cycle_test.ps1").read_text(encoding="utf-8")
+        for marker in (
+            "0.1.56", "primary-calculation-action", "Calculer l’agencement",
+            "Finaliser le volume", "finalize_project", "staged_calculation",
+            "AUTO_SOLVE_STABILITY_MS", "scheduleAdaptiveSolve",
+            "P64-L03V Fusion OK 0.1.56",
+        ):
+            self.assertIn(marker, script)
 
     def test_prepares_the_p44_m007_adaptive_preview_gate(self) -> None:
         script = (ROOT / "scripts" / "fusion" / "prepare_p44_m007_adaptive_preview_test.ps1").read_text(encoding="utf-8")
