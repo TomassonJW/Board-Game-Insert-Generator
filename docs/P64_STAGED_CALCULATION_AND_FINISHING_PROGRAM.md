@@ -470,7 +470,8 @@ P64-V2H03V retour humain
 ```
 
 Ce document n'ouvre aucune de ces missions runtime. `NEXT_ACTIONS.md` reste
-autoritaire et P64-V2H03V reste la seule action courante.
+autoritaire ; P64-V2H03V est clôturée et P44-V doit être requalifiée avant
+toute ouverture runtime L01.
 
 ## 21. Vérifications minimales futures
 

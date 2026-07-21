@@ -2475,17 +2475,15 @@ P44-M007 est ready-for-explicit-go.
 
 ### P64-V2H03V — Gate Fusion des variantes internes
 
-- Statut : `ready-for-human-fusion-check`, package 0.1.55 préparé.
-- Livrables : fixture déterministe du cul-de-sac résolu, contrôle canonique simple,
-  préflight Python pur, diagnostic variantes replié, installateur/settings et
-  marqueur de commit.
-- Observation restante : résultat visible, deux variantes non canoniques,
-  certificat global, budgets/compteurs, contrôle `stage_stack`, stabilité de
-  palette et aucune scène automatique.
-- Modèle : aucun agent pendant la gate humaine ; clôture documentaire ensuite
-  avec `gpt-5.6-terra`, raisonnement `medium`, sauf KO runtime.
-- Portée : aucune forme P45, valeur physique, tolérance, default, scène
-  automatique ni impression. `fusion-validated: false`, `print-validated: false`.
+- Statut : `done-human-gate`, fusion-validated par
+  `P64-V2H03V Fusion OK 0.1.55`.
+- Preuve : fixture multi-cavités résolue avec variantes non canoniques et
+  certificat global ; diagnostic replié, contrôle `stage_stack`, palette stable
+  et absence de scène automatique observés.
+- Limite : le dense 11 × 34 reste `no_solution_within_budget` ; aucune forme
+  P45, valeur physique, tolérance, default ou impression n'est validée.
+- Sortie : P64-V2H03 est clôturée. P44-V est la prochaine gate à requalifier ;
+  P45 reste bloquée. `print-validated: false`.
 
 ### P64-U01 — Progression de calcul non modale
 

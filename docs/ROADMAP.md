@@ -913,3 +913,15 @@ matérialisation.
 Séquence : H03V et sa clôture, P44-V, P45-M001, L01, L02, L03/L03V, P45/P46,
 F01, F02, C01/C02, F03, C03/CV. Cette séquence peut être replanifiée par une ADR
 ultérieure, mais aucune carte runtime n'est ouverte par P64-A02.
+
+
+## P64-V2H03V — Gate Fusion validée (2026-07-21)
+
+Le retour `P64-V2H03V Fusion OK 0.1.55` clôt la trajectoire corrective H03.
+La coordination P45/P64, la frontière locale, la sélection globale paresseuse et
+leur diagnostic Fusion sont validés pour ce périmètre. La suite ne traite pas le
+cas dense comme résolu : il reste no_solution_within_budget.
+
+Le chemin critique revient à P44-V, qui doit être requalifiée avant l'ouverture
+de P45. Les programmes P64-A02 restent une architecture future, pas un
+changement runtime déjà validé. print-validated: false.

@@ -1427,3 +1427,16 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
   insertion accélérée réutilise une pose, jamais un certificat ancien.
 - Validation : documentaire uniquement. Aucun runtime, schéma ou comportement
   Fusion n'est implémenté ; P64-V2H03V reste ready-for-human-fusion-check.
+
+
+## Mise à jour P64-V2H03V — 2026-07-21
+
+- C-SOLVER / C-LAYOUT : fusion-validated pour la projection du fallback H03C,
+  la sélection paresseuse de variantes et le certificat global visible.
+- C-USABILITY / C-FUSION-UI : fusion-validated pour le diagnostic secondaire
+  replié, le contrôle canonique et l'absence de scène automatique.
+- C-QUALITY : la vérité no_solution_within_budget demeure intacte sur le corpus
+  dense ; aucun budget heuristique ne devient une impossibilité.
+- Limites : P45, valeurs physiques, tolérances et impression restent hors
+  périmètre. print-validated: false.
+- Suite : P64-V2H03 est clôturée ; P44-V doit être requalifiée avant P45.

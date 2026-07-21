@@ -5,9 +5,9 @@ Dernière mise à jour : 2026-07-21
 ## Version active
 
 V0.1 reste `mvp-accepted`, `fusion-validated: true` et
-`print-validated: false`. P64-V2H02R demeure la dernière preuve Fusion.
-P64-V2H03B et C sont implémentés et validés automatiquement ; aucune preuve
-Fusion H03 n'est encore acquise.
+`print-validated: false`. P64-V2H03V est la dernière preuve Fusion :
+`P64-V2H03V Fusion OK 0.1.55`. H03B et H03C restent les preuves automatisées
+de la frontière locale et de la sélection globale.
 
 ## Dernier état réel
 
@@ -31,41 +31,29 @@ Fusion H03 n'est encore acquise.
 
 ## Prochaine action recommandée
 
-### P64-V2H03V — Observation humaine Fusion
+### P44-V — Requalification de la fondation UX
 
-P64-V2H03V est `ready-for-human-fusion-check`. Le package 0.1.55, la fixture du
-cul-de-sac multi-cavités, le contrôle canonique simple, les réglages
-`Auto intelligent + Rapide` et le diagnostic secondaire replié sont préparés.
+P64-V2H03V est clôturée par le retour humain `P64-V2H03V Fusion OK 0.1.55`.
+La prochaine étape n'est pas une nouvelle exploration du solveur : elle consiste
+à requalifier séparément la gate globale P44-V, restée contextual-KO en 0.1.40.
 
-Action restante pour Thomas :
+Aucune action immédiate n'est demandée à Thomas dans ce lot de clôture. Avant une
+nouvelle observation P44-V, un agent doit seulement vérifier que son dossier de
+preuve et sa checklist correspondent au runtime désormais fusion-validated H03V,
+sans modifier P45, les valeurs physiques ou la scène.
 
-1. recharger l'add-in 0.1.55 et ouvrir BGIG ;
-2. confirmer que la fixture affiche une solution avec deux variantes internes
-   non canoniques et un certificat global ;
-3. ouvrir `Diagnostic du calcul > Variantes internes` et vérifier voie, budgets,
-   compteurs, ordre canonique-first et absence de produit cartésien ;
-4. ouvrir le contrôle récent `p64-v2h03v-simple-control.bgig.json` et confirmer
-   `Étages et piles`, sans diagnostic variantes ;
-5. confirmer la stabilité de la palette et l'absence de scène avant
-   `Matérialiser dans Fusion`.
-
-Retour attendu :
-`P64-V2H03V Fusion OK 0.1.55 - commit <sha>`, ou un KO contextuel avec projet,
-méthode, effort, statut visible et diagnostic.
-
-Aucun agent n'est requis pendant cette gate humaine. Après retour explicite, la
-clôture documentaire peut utiliser `gpt-5.6-terra`, raisonnement `medium` ; le
-compromis est acceptable car elle ne doit modifier aucun runtime. Un modèle plus
-puissant n'est utile qu'en cas de KO nécessitant une nouvelle analyse du solveur
-ou de la palette.
+Modèle conseillé pour cette préparation documentaire : `gpt-5.6-terra`,
+raisonnement `medium`. Si une divergence runtime est découverte, passer à
+`gpt-5.6-sol`, raisonnement `xhigh`, car la frontière UI/solveur devrait alors
+être réanalysée.
 
 ## Lots suivants, non ouverts
 
-1. clôture documentaire P64-V2H03 après retour Fusion explicite ;
-2. P44-V, puis P45/P46 selon leurs contrats et gates ;
-3. P64-F01 restant / P64-F02 après P46 ;
-4. P64-U01 : progression non modale et annulable ;
-5. P64-X01 : moteur exact éventuel après benchmark, ADR et GO distinct.
+1. préparation puis requalification de P44-V ;
+2. P45/P46 seulement selon leurs contrats et gates ;
+3. P64-L01 après H03V, P44-V et P45-M001, comme défini par P64-A02 ;
+4. P64-F01 restant / P64-F02 après P46 ;
+5. P64-U01 et P64-X01 restent des trajectoires séparées.
 
 ## Séquence verrouillée
 
@@ -82,8 +70,8 @@ intégrer directement dans main. Une gate Fusion ne vaut jamais impression.
 
 Le GO produit du 2026-07-21 accepte ADR-0071, ADR-0072 et les programmes
 P64 de calcul étagé, finalisation et capacité réutilisable. Cette acceptation est
-documentaire : elle ne remplace pas la gate P64-V2H03V et n'autorise pas encore
-un changement du cycle réactif 0.1.55.
+documentaire : H03V est désormais clôturée, mais cette trajectoire n'autorise pas
+encore un changement du cycle réactif 0.1.55.
 
 Ordre futur verrouillé après les gates déjà actives :
 

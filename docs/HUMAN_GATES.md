@@ -806,6 +806,26 @@ Décisions humaines acquises :
    il ne bénéficie pas d'une promesse de réutilisation locale.
 
 Les gates P64-L03V et P64-CV sont déclarées pour les futurs comportements
-visibles, mais elles ne sont pas actives. La seule gate humaine active demeure
-P64-V2H03V 0.1.55. fusion-validated reste false pour P64-A02 et
+visibles, mais elles ne sont pas actives. P64-V2H03V est clôturée ; la prochaine
+gate à requalifier est P44-V. fusion-validated reste false pour P64-A02 et
 print-validated reste false.
+
+
+## P64-V2H03V — Gate Fusion clôturée
+
+Statut : fusion-validated par le retour humain reçu le 2026-07-21 :
+`P64-V2H03V Fusion OK 0.1.55`.
+
+Cette preuve clôt la gate 0.1.55 pour son périmètre : le cul-de-sac
+multi-cavités montre des variantes internes non canoniques et un certificat
+global ; le diagnostic secondaire reste replié et expose la trace attendue ; le
+contrôle canonique conserve Étages et piles ; la palette reste stable et aucune
+scène ne change avant Matérialiser dans Fusion.
+
+La preuve ne déclare pas le mécanisme dense 11 × 34 soluble, ne transforme pas
+no_solution_within_budget en impossible, ne valide aucune forme P45, ne calibre
+aucune valeur physique et ne vaut pas impression réelle.
+`print-validated: false`.
+
+Effet : P64-V2H03 est clôturée. P44-V devient la prochaine gate à requalifier ;
+P45 reste bloquée jusqu'à cette requalification.

@@ -15,8 +15,8 @@ preuves archivées.
 
 ## État actif
 
-- Dernière preuve : P64-V2H02R Fusion OK 0.1.54 - commit 42e8993 ; P64-V2H02R est
-  fusion-validated.
+- Dernière preuve : P64-V2H03V Fusion OK 0.1.55 ; P64-V2H03 est
+  fusion-validated pour la coordination des variantes internes.
 - print-validated: false ; aucune valeur physique n'est calibrée par cette preuve.
 - P64-H03R 0.1.47 conserve les gains de recherche dirigée déjà automatisés.
 - P64-H07 0.1.50 livre le beam et le portefeuille interne ; P64-H08 0.1.51
@@ -37,10 +37,12 @@ preuves archivées.
   certificats, fixtures et caps.
 - Le cul-de-sac minimal est résolu ; le mécanisme dense 11 × 34 reste
   honnêtement `no_solution_within_budget` jusque dans la lane Deep.
-- P64-V2H03V est `ready-for-human-fusion-check` : package 0.1.55, fixture
-  multi-cavités, contrôle canonique, diagnostic secondaire et préparateur local
-  sont prêts. Aucune preuve Fusion H03 n'est encore acquise.
-- P44-V et P45 restent bloquées pendant ce chemin correctif.
+- P64-V2H03V est fusion-validated par le retour humain `P64-V2H03V Fusion OK
+  0.1.55` : solution multi-cavités, variantes non canoniques, diagnostic
+  replié, contrôle canonique et absence de scène automatique sont observés.
+- Le cas dense 11 × 34 reste honnêtement `no_solution_within_budget` ; la gate
+  ne le déclare ni soluble ni impossible.
+- P44-V doit être requalifiée ; P45 reste bloquée jusqu'à cette gate.
 
 ## Vue de séquence
 
@@ -62,8 +64,8 @@ preuves archivées.
 | Terminé — contrat | P64-V2H03A | ADR-0070, propriété P45/P64 et découpage H03B/H03C acceptés. |
 | Terminé — automatisé | P64-V2H03B | Frontière locale certifiée, fixtures 1 à 8 et caps mesurés. |
 | Terminé — automatisé | P64-V2H03C | Sélection globale paresseuse, lanes monotones, certificat global et fixtures 4 à 10. |
-| Gate humaine prête | P64-V2H03V | Observer 0.1.55 : résultat variantes, diagnostic replié, contrôle canonique et absence de scène automatique. |
-| KO contextuel | P44-V | À requalifier séparément après arbitrage ; P45 reste bloqué. |
+| Terminé — gate Fusion | P64-V2H03V | Fusion OK 0.1.55 : variantes internes visibles, diagnostic replié, contrôle canonique et aucune scène automatique. |
+| KO contextuel, à requalifier | P44-V | Reprendre la gate globale UX ; P45 reste bloqué. |
 | Bloqué | P45 à P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 

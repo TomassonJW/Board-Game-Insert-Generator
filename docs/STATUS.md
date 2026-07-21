@@ -2617,3 +2617,22 @@ docs/P64_STAGED_CALCULATION_AND_FINISHING_PROGRAM.md,
 docs/P64_POST_SOLVE_CAPACITY_REUSE_CONTRACT.md, ADR-0071 et ADR-0072.
 Aucun schéma, default, valeur physique, tolérance, géométrie, scène ou résultat
 du cas dense n'est modifié par P64-A02. P64-V2H03V reste l'action active.
+
+
+## P64-V2H03V — Validation Fusion 0.1.55 (2026-07-21)
+
+Statut : done-human-gate, fusion-validated pour le périmètre H03V.
+Preuve humaine : `P64-V2H03V Fusion OK 0.1.55`.
+
+La fixture multi-cavités confirme visuellement le résultat H03C avec deux
+variantes internes non canoniques et un certificat global. Le diagnostic
+secondaire est observé comme replié ; le contrôle canonique conserve
+Étages et piles sans fallback ; la palette reste stable et aucune scène ne
+change avant l'action explicite de matérialisation.
+
+Le mécanisme dense 11 × 34 demeure no_solution_within_budget jusque dans Deep.
+H03V ne prouve ni solubilité, ni impossibilité, ni valeurs physiques, ni
+impression. print-validated: false.
+
+P64-V2H03 est clôturée. La prochaine dépendance est la requalification séparée
+de P44-V ; P45 reste bloquée jusque-là.

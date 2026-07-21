@@ -395,10 +395,12 @@ hors chemin critique.
 
 ### P64-V2H03V — Gate Fusion
 
-- Statut : `ready-for-human-fusion-check`, package 0.1.55 préparé.
-- Portée : observation du résultat, du diagnostic secondaire replié, du contrôle
-  canonique et de l'absence de scène automatique ; aucune preuve physique ou
-  d'impression.
+- Statut : `done-human-gate`, fusion-validated par
+  `P64-V2H03V Fusion OK 0.1.55`.
+- Portée validée : résultat multi-cavités, diagnostic secondaire replié,
+  contrôle canonique et absence de scène automatique.
+- Limite inchangée : aucune preuve physique ou d'impression ; le dense 11 × 34
+  reste `no_solution_within_budget`.
 
 ### P64-U01 — Progression non modale du calcul
 
