@@ -334,6 +334,9 @@ certificat.
 - produire `minimal_layout`, résiduel et télémétrie multi-graines ;
 - préserver les lanes historiques comme comparateurs/fallbacks minimaux ;
 - tests cœur, monotonie et non-régression du cas dense.
+- Statut d'exécution au 2026-07-21 : `implemented-core`,
+  `automated-validated` ; preuve
+  `docs/P64_L03R_B_MINIMAL_SOLVER_EVIDENCE.md`.
 
 ### P64-L03R-C — Matérialisation duale et scène courante
 

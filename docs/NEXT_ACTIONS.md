@@ -15,7 +15,9 @@ visible, mais le solve agrandit déjà les enveloppes et la finalisation ne
 transforme rien. La mise à jour d'une scène existante peut aussi rester masquée
 par un ancien digest.
 
-ADR-0074 et P64-L03R-A sont `architecture-accepted`, sans changement runtime.
+ADR-0074 et P64-L03R-A sont `architecture-accepted`. P64-L03R-B est
+`implemented-core` et `automated-validated` ; il ne modifie ni bridge, ni CAD
+IR, ni scène Fusion.
 
 ## Dernier état réel
 
@@ -35,25 +37,33 @@ ADR-0074 et P64-L03R-A sont `architecture-accepted`, sans changement runtime.
 
 ## Prochaine action recommandée
 
-### P64-L03R-B — Solveur minimal multi-graines
+### P64-L03R-C — Matérialisation duale et scène courante
 
-Implémenter uniquement le nouvel artefact `minimal_layout` dans le cœur Python :
+Brancher uniquement le nouvel artefact `minimal_layout` sur le cycle explicite
+et sur les adaptateurs Fusion :
 
-1. consommer les variantes locales minimales ;
-2. interdire toute allocation implicite de surplus X/Y/Z ;
-3. comparer plusieurs graines, ancres coin/bord/centre/surface basse et
-   propagations déterministes ;
-4. favoriser le Z faisable le plus bas avec surfaces de support locales ;
-5. conserver un beam diversifié, les budgets monotones et les statuts honnêtes ;
-6. produire résiduel, provenance, sous-scores et certificat global ;
-7. ne modifier ni bridge de matérialisation, ni scène Fusion, ni finition.
+1. remplacer l'ancien résultat rempli du chemin `Calculer` par le
+   `minimal_layout` certifié de L03R-B ;
+2. produire une CAD IR minimale sans distribuer le résiduel ;
+3. permettre la sélection explicite de `minimal_layout` ou `finalized_plan`
+   pour matérialiser et exporter ;
+4. suivre `artifact_kind`, `artifact_digest`, `partition_plan_digest`,
+   `cad_ir_digest` et `source_revision` ;
+5. exposer `Mettre à jour la scène` lorsque l'artefact courant diffère ;
+6. remplacer atomiquement la seule scène possédée par BGIG et préserver les
+   objets utilisateur ;
+7. conserver finalisation, valeurs physiques, solveurs historiques et schéma
+   projet inchangés.
 
-Contrat : `docs/P64_L03R_MINIMAL_LAYOUT_AND_MATERIALIZATION_CONTRACT.md`.
+Contrat :
+`docs/P64_L03R_MINIMAL_LAYOUT_AND_MATERIALIZATION_CONTRACT.md`.
+Preuve d'entrée :
+`docs/P64_L03R_B_MINIMAL_SOLVER_EVIDENCE.md`.
 
-Acceptation : fixtures 1 à 10 et 16 à 18 du contrat, tests cœur ciblés, suite
-complète, compileall, frontière adsk et diff-check. Aucun nouveau résultat dense
-n'est exigé.
-
+Acceptation : fixtures 11 à 15 et dépendances bridge/DOM du contrat, registre de
+scène simulé, stale fail-closed, suite complète, compileall, frontière adsk et
+diff-check. Aucune gate humaine n'est nécessaire dans C ; P64-L03R-V ne devient
+active qu'après B et C automatisés.
 ## Repères historiques conservés
 
 - `P44-M009H05 Fusion OK 0.1.36 - commit 7c76ba0` ;
@@ -65,8 +75,8 @@ n'est exigé.
 - `P44-V Fusion OK 0.1.55 - commit 70d45c6`.
 ## Lots suivants, non ouverts
 
-1. P64-L03R-C après B : matérialisation minimale, digests exacts et remplacement
-   sûr de la scène BGIG ;
+1. P64-L03R-C : matérialisation minimale, digests exacts et remplacement sûr
+   de la scène BGIG ;
 2. P64-L03R-V après B/C : gate Fusion corrective ;
 3. P64-F01A02 seulement après une L03R-V positive et ses dépendances ;
 4. P64-F02A02, C01-C03 et F03 selon leurs dépendances ;
@@ -74,10 +84,10 @@ n'est exigé.
 
 ## Séquence verrouillée
 
-Une seule mission peut être exécutée à la fois. P64-L03R-B est la seule mission
+Une seule mission peut être exécutée à la fois. P64-L03R-C est la seule mission
 `ready`. P45 conserve les variantes/formes locales ; P64 conserve le placement
-global. Aucune finition, valeur physique, scène ou migration de schéma n'est
-ouverte par le contrat L03R-A.
+global. Aucune vraie transformation de finition, valeur physique ou migration
+de schéma n'est ouverte par L03R-B.
 
 ## Fin de chaque mission
 

@@ -46,8 +46,9 @@ preuves archivées.
   P64-L01, P64-L02 et P64-L03 restent automated-validated pour leurs acquis.
 - P64-L03V est un KO contextuel 0.1.56 : expansion déjà réalisée au solve,
   finalisation sans transformation et mise à jour de scène mal détectée.
-- ADR-0074 et P64-L03R-A sont architecture-accepted ; P64-L03R-B devient la
-  seule prochaine mission runtime.
+- ADR-0074 et P64-L03R-A sont architecture-accepted ; P64-L03R-B est désormais
+  `implemented-core`, `automated-validated`, et P64-L03R-C devient la seule
+  prochaine mission runtime.
 
 ## Vue de séquence
 
@@ -77,7 +78,8 @@ preuves archivées.
 | Terminé — automatisé, sémantique à corriger | P64-L03 | Solve explicite et stale acquis ; géométrie minimal/final supersédée par ADR-0074. |
 | KO contextuel | P64-L03V | Fusion 0.1.56 révèle expansion au solve et scène non réactivable normalement. |
 | Terminé — contrat | P64-L03R-A | ADR-0074 et contrat minimal/matérialisation duale acceptés. |
-| Ready — runtime cœur | P64-L03R-B | Solve minimal multi-graines, sans finition ni scène. |
+| Terminé — automatisé | P64-L03R-B | Solve minimal multi-graines certifié, résiduel non attribué, sans finition ni scène. |
+| Ready — bridge et scène | P64-L03R-C | Matérialisation minimale/finalisée, digests exacts et remplacement sûr de scène. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -95,6 +97,8 @@ preuves archivées.
   résumé progressif et absence de solve global.
 - P64_L03R_MINIMAL_LAYOUT_AND_MATERIALIZATION_CONTRACT.md : invariant minimal,
   portfolio multi-graines, matérialisation duale et remplacement de scène.
+- P64_L03R_B_MINIMAL_SOLVER_EVIDENCE.md : solveur minimal, certificats,
+  portefeuille, couches locales, budgets et non-régression dense.
 - ADR-0074 : supersession partielle d'ADR-0071 après le KO Fusion 0.1.56.
 - STATUS.md : faits réalisés, validations et limites.
 - CAPABILITY_MAP.md : capability et niveau de preuve.
@@ -209,7 +213,28 @@ recherche bornée multi-graines par rareté de placement, des couches de support
 locales, puis deux branches : matérialiser minimal ou finaliser. Une scène BGIG
 est courante seulement par égalité des digests exacts.
 
-P64-L03R-A est done-documentation et architecture-accepted. P64-L03R-B est la
-seule prochaine mission. Aucun runtime, schéma, valeur physique, CAD IR ou
-scène n'est modifié par A. `fusion-validated: false`,
+P64-L03R-A est done-documentation et architecture-accepted. P64-L03R-B est
+`implemented-core` et `automated-validated`. P64-L03R-C devient la seule
+prochaine mission. Aucun schéma projet, valeur physique, CAD IR, finalisation
+ou scène n'est modifié par B. `fusion-validated: false`,
 `print-validated: false` pour la correction.
+
+## P64-L03R-B — solveur minimal multi-graines livré
+
+Le cœur pur expose désormais `solve_minimal_layout`. Il consomme les frontières
+locales certifiées de L01/L02, ou les dérive sous le même budget en fallback,
+puis compare des préfixes Rapide / Normal / Approfondi de graines, ordres,
+ancres et propagations déterministes. Les lanes EMS historiques restent des
+comparateurs isolés.
+
+Le certificat `bgig.minimal_layout_certificate.v1` impose les dimensions
+minimales exactes, six surplus nuls, le support, les réservations et la
+conservation avec résiduel classifié mais non attribué. Le groupe compact est
+recentré lorsque le monde final le permet. Les corps hauts peuvent traverser
+plusieurs intervalles à côté de piles fines certifiées.
+
+Aucune finalisation, CAD IR, scène Fusion, valeur physique ou mutation du
+solveur public historique n'est incluse. Le cas dense 11 × 34 reste
+`no_solution_within_budget`. P64-L03R-C est `ready` ; aucune revue humaine n'est
+requise avant sa clôture automatisée. `fusion-validated: false`,
+`print-validated: false`.

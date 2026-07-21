@@ -20,6 +20,7 @@ from typing import Any, Callable, Mapping
 
 STAGE_STACK_FAMILY_ID = "stage_stack"
 COMMON_VALIDATOR_SCHEMA_V1 = "bgig.solver_candidate_certificate.v1"
+MINIMAL_LAYOUT_VALIDATOR_SCHEMA_V1 = "bgig.minimal_layout_certificate.v1"
 _EPSILON = 0.0001
 _AXES = ("x", "y", "z")
 
@@ -267,6 +268,99 @@ def certify_partition_candidate(
         candidate_digest=candidate.digest,
         certified=all(check.passed for check in checks),
         checks=checks,
+    )
+
+
+
+def certify_minimal_layout_candidate(
+    plan: Mapping[str, object],
+    candidate: SolverCandidate,
+) -> ValidationCertificate:
+    """Certify placement completeness while keeping residual volume unassigned."""
+
+    common = certify_partition_candidate(plan, candidate)
+    summary = _mapping(plan.get("summary"))
+    validation = _mapping(plan.get("validation"))
+    placements = _mappings(plan.get("placements"))
+    checks = tuple(
+        (
+            ValidationCheck(
+                "residual_volume_classified",
+                _residual_conservation_is_complete(summary, validation),
+                "RESIDUAL_CLASSIFICATION",
+            )
+            if check.name == "volume_conservation"
+            else check
+        )
+        for check in common.checks
+    ) + (
+        ValidationCheck(
+            "minimum_outer_dimensions",
+            _placements_are_minimal(placements),
+            "MINIMAL_ENVELOPE_EXPANDED",
+        ),
+        ValidationCheck(
+            "placement_complete",
+            bool(summary.get("placement_certified"))
+            and _integer(summary.get("placed_container_count"))
+            == _integer(summary.get("requested_container_count")),
+            "PARTICIPANT_SET_INCOMPLETE",
+        ),
+        ValidationCheck(
+            "residual_unassigned",
+            not bool(summary.get("complete_printable_partition"))
+            and not bool(_mapping(plan.get("invariants")).get("residual_distributed")),
+            "RESIDUAL_WAS_DISTRIBUTED",
+        ),
+    )
+    return ValidationCertificate(
+        schema_version=MINIMAL_LAYOUT_VALIDATOR_SCHEMA_V1,
+        candidate_digest=candidate.digest,
+        certified=all(check.passed for check in checks),
+        checks=checks,
+    )
+
+
+def _placements_are_minimal(placements: list[dict[str, object]]) -> bool:
+    for placement in placements:
+        if _text(placement.get("role")) != "container":
+            continue
+        final = _dimension(_mapping(placement.get("final_outer_dimensions_mm")))
+        minimum = _dimension(_mapping(placement.get("minimum_outer_envelope_mm")))
+        surplus = _mapping(placement.get("surplus_distribution_mm"))
+        expected_faces = {"left", "right", "front", "back", "below", "above"}
+        if set(surplus) != expected_faces:
+            return False
+        if any(abs(final[axis] - minimum[axis]) > _EPSILON for axis in _AXES):
+            return False
+        if any(
+            abs(_number(surplus.get(face))) > _EPSILON
+            for face in ("left", "right", "front", "back", "below", "above")
+        ):
+            return False
+    return True
+
+
+def _residual_conservation_is_complete(
+    summary: Mapping[str, object],
+    validation: Mapping[str, object],
+) -> bool:
+    storage = _number(validation.get("storage_volume_mm3"))
+    bodies = _number(validation.get("requested_body_volume_mm3"))
+    residual = _number(validation.get("residual_volume_mm3"))
+    technical = _number(validation.get("technical_clearance_volume_mm3"))
+    classified = _number(validation.get("classified_volume_mm3"))
+    tolerance = max(
+        _number(validation.get("conservation_tolerance_mm3")),
+        0.01,
+    )
+    return (
+        bool(validation.get("conserved"))
+        and residual >= -_EPSILON
+        and abs(classified - (bodies + residual + technical)) <= tolerance
+        and abs(storage - classified) <= tolerance
+        and abs(_number(summary.get("residual_volume_mm3")) - residual)
+        <= tolerance
     )
 
 

@@ -157,6 +157,19 @@ class IncrementalLocalAnalysisEngine:
             },
         }
 
+    def certified_frontiers(self) -> tuple[ContainerVariantFrontier, ...]:
+        """Expose immutable current frontiers to the explicit global solver."""
+
+        return tuple(
+            self._frontiers[group_id]
+            for group_id in sorted(self._frontiers)
+        )
+
+    def frontier_digests(self) -> tuple[tuple[str, str], ...]:
+        """Expose exact L01/L02 identities without serializing cache entries."""
+
+        return tuple(sorted(self._frontier_digests.items()))
+
     def _analyze(
         self,
         *,

@@ -39,6 +39,7 @@ REQUIRED_PROJECT_FILES = (
     "docs/P64_L01_INCREMENTAL_STATE_EVIDENCE.md",
     "docs/P64_L02_CONTEXTUAL_LOCAL_ANALYSIS_EVIDENCE.md",
     "docs/P64_L03_EXPLICIT_STAGED_CYCLE_EVIDENCE.md",
+    "docs/P64_L03R_B_MINIMAL_SOLVER_EVIDENCE.md",
     "docs/P64_POST_SOLVE_CAPACITY_REUSE_CONTRACT.md",
     "docs/P64_V2H03_INTERNAL_VARIANT_COORDINATION_CONTRACT.md",
     "docs/P64_V2H03B_LOCAL_VARIANT_EVIDENCE.md",
@@ -240,7 +241,15 @@ REQUIRED_SECTIONS = {
         "## 19. Fixtures automatisées obligatoires",
         "## 20. Découpage de livraison",
         "## 22. Hors scope absolu",
-    ),    "docs/P64_POST_SOLVE_CAPACITY_REUSE_CONTRACT.md": (
+    ),
+    "docs/P64_L03R_B_MINIMAL_SOLVER_EVIDENCE.md": (
+        "## Résultat",
+        "## Contrat livré",
+        "## Validation automatisée",
+        "## Limites",
+        "## Suite",
+    ),
+    "docs/P64_POST_SOLVE_CAPACITY_REUSE_CONTRACT.md": (
         "## 1. Objectif et promesse honnête",
         "## 2. Vocabulaire normatif",
         "## 9. Mémoire courte et invalidation",

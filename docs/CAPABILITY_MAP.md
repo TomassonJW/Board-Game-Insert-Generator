@@ -1511,3 +1511,19 @@ séparation géométrique minimal/final ; ADR-0074 porte la correction.
   des objets utilisateur.
 - État : aucun runtime promu. P64-L03V contextual-KO ; P64-L03R-B ready.
   `fusion-validated: false`, `print-validated: false`.
+
+## Mise à jour P64-L03R-B — solveur minimal certifié
+
+- C-SOLVER / C-LAYOUT : `implemented-core`, `automated-validated` pour le
+  portefeuille minimal multi-graines, les préfixes d'effort monotones, les
+  couches locales supportées et la frontière Pareto globale non tronquée.
+- C-RESULT-TRUTH : `minimal_layout` certifie les enveloppes minimales exactes et
+  conserve le résiduel non attribué ; le résultat reste « meilleure proposition
+  certifiée trouvée dans le budget ».
+- C-QUALITY : variantes locales et digests L01/L02 consommés explicitement,
+  fallback borné, symétrie canonique, réservation asymétrique, support, stale,
+  échec borné et cas dense 11 × 34 couverts.
+- C-FUSION-UI / C-CAD : inchangées dans B ; aucune scène, CAD IR ou
+  matérialisation minimale n'est encore promue.
+- Suite : P64-L03R-C `ready`, puis P64-L03R-V seulement après C.
+  `fusion-validated: false`, `print-validated: false`.

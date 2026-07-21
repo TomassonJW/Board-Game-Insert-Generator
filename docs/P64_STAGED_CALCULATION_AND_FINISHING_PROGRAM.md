@@ -2,8 +2,8 @@
 
 Statut : architecture amendée ; P64-L01, P64-L02 et P64-L03 restent validés
 automatiquement pour leurs acquis. P64-L03V est un KO contextuel sur Fusion
-0.1.56. ADR-0074 et P64-L03R-A corrigent la frontière minimal/final sans
-modifier le runtime dans ce lot documentaire.
+0.1.56. ADR-0074 et P64-L03R-A corrigent la frontière minimal/final ;
+P64-L03R-B est `implemented-core`, `automated-validated`.
 
 ADR historiques et amendement courant :
 [ADR-0071](DECISIONS/ADR-0071-staged-local-analysis-explicit-solve-and-finalization.md)
@@ -467,6 +467,16 @@ Fusion non BGIG.
   transformation et mise à jour de scène mal détectée.
 - ADR-0074 ouvre L03R-A/B/C/V ; aucune valeur physique ni impression validée.
 
+### P64-L03R-B — Solveur minimal multi-graines
+
+- Statut : `done-code`, `implemented-core`, `automated-validated`.
+- Livré : enveloppes minimales exactes, résiduel non attribué, variantes locales
+  L01/L02, portfolio borné multi-graines, couches supportées et certificat
+  minimal global.
+- Non livré : finalisation, CAD IR, bridge, palette, scène et valeur physique.
+- Preuve : `docs/P64_L03R_B_MINIMAL_SOLVER_EVIDENCE.md`.
+- Suite : P64-L03R-C `ready`, P64-L03R-V encore inactive.
+
 ### P64-F01/F02/F03
 
 - F01 élargit les politiques de fermeture continue ;
@@ -498,8 +508,8 @@ P64-V2H03V retour humain
 
 NEXT_ACTIONS.md reste autoritaire. P64-V2H03V et P44-V sont clôturées,
 P64-L01/L02/L03 restent automated-validated pour leurs acquis, P64-L03V est un
-KO contextuel et P64-L03R-B devient la seule mission `ready`. Les lots P45/P46
-et de finition restent verrouillés.
+KO contextuel et P64-L03R-B est automated-validated. P64-L03R-C devient la seule
+mission `ready`. Les lots P45/P46 et de finition restent verrouillés.
 
 ## 21. Vérifications minimales futures
 

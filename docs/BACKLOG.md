@@ -2593,7 +2593,10 @@ P44-M007 est ready-for-explicit-go.
   placement, ancres alternatives, surfaces support locales et beam diversifié.
 - Acceptation : fixtures cœur 1 à 10 et 16 à 18, monotonie, suite complète,
   statut dense honnête et aucune finition/scène.
-- Statut : ready.
+- Livré : `minimal_layout` sans surplus, portefeuille multi-graines, résiduel
+  non attribué, certificat global, caps monotones et preuve automatisée.
+- Preuve : `docs/P64_L03R_B_MINIMAL_SOLVER_EVIDENCE.md`.
+- Statut : done-code, implemented-core, automated-validated.
 
 ### P64-L03R-C — Matérialisation duale et remplacement de scène
 
@@ -2602,7 +2605,7 @@ P44-M007 est ready-for-explicit-go.
   exacts et remplacer uniquement la scène BGIG possédée.
 - Acceptation : tests bridge/DOM/registre, scène stale, aucun doublon et objets
   utilisateur préservés.
-- Statut : blocked-by-P64-L03R-B.
+- Statut : ready.
 
 ### P64-L03R-V — Gate Fusion corrective
 

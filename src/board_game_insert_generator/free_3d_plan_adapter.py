@@ -23,6 +23,7 @@ from board_game_insert_generator.expandable_envelope import (
     derive_expandable_envelope_contract,
 )
 from board_game_insert_generator.free_3d_greedy_solver import (
+    EmptySpace,
     Free3DPlacement,
     TopInsetZone,
 )
@@ -48,6 +49,7 @@ from board_game_insert_generator.solver_contract import (
     SolverStrategy,
     ValidationCertificate,
     ValidationCheck,
+    certify_minimal_layout_candidate,
     certify_partition_candidate,
     validate_placement_geometry,
 )
@@ -71,6 +73,8 @@ from board_game_insert_generator.volumetric_stage_solver import (
     _support_contract,
     _volume_contract,
 )
+
+MINIMAL_LAYOUT_ARTIFACT_SCHEMA_V1 = "bgig.minimal_layout.v1"
 
 
 @dataclass(frozen=True)
@@ -644,6 +648,340 @@ def certify_free_3d_plan(
         ),
         (),
     )
+
+
+
+def certify_minimal_free_3d_plan(
+    problem: Free3DPreparedProblem,
+    *,
+    strategy: SolverStrategy,
+    budget: SolverBudget,
+    candidate_id: str,
+    placements: tuple[Free3DPlacement, ...],
+    empty_spaces: tuple[EmptySpace, ...],
+    search_telemetry: Mapping[str, object],
+    search_provenance: Mapping[str, object],
+) -> tuple[CertifiedFree3DPlan | None, tuple[str, ...]]:
+    """Certify a complete minimum-envelope placement without closing residuals."""
+
+    scaffold, rejection_codes = certify_free_3d_plan(
+        problem,
+        strategy=strategy,
+        budget=budget,
+        candidate_id=candidate_id,
+        placements=placements,
+        search_telemetry=search_telemetry,
+    )
+    if scaffold is None:
+        return None, rejection_codes
+
+    plan = deepcopy(scaffold.plan)
+    resolved = _mappings(plan["placements"])
+    volume = _volume_contract(
+        resolved,
+        problem.box,
+        problem.storage_height_mm,
+        problem.box_xy_clearance_mm,
+        False,
+    )
+    validation = _mapping(plan["validation"])
+    validation.update(deepcopy(volume))
+    validation["unassigned_printable_volume_mm3"] = volume["residual_volume_mm3"]
+    plan["validation"] = validation
+
+    metrics = _minimal_layout_metrics(problem, resolved, empty_spaces)
+    summary = _mapping(plan["summary"])
+    summary.update(
+        {
+            "status": "constructed",
+            "solution_status": "minimal_layout_certified",
+            "materializable": False,
+            "placement_certified": True,
+            "minimal_layout_core_ready": True,
+            "complete_printable_partition": False,
+            "technical_voids_are_clearances_only": False,
+            "residual_volume_mm3": volume["residual_volume_mm3"],
+            "quality_score": None,
+            "simplicity_score": None,
+            "score_breakdown": deepcopy(metrics),
+        }
+    )
+    plan["summary"] = summary
+    displayed_spaces = tuple(
+        sorted(
+            empty_spaces,
+            key=lambda value: (
+                value.origin_mm[2],
+                value.origin_mm[1],
+                value.origin_mm[0],
+                -value.volume_mm3,
+                value.size_mm,
+            ),
+        )[:64]
+    )
+    plan["residuals"] = {
+        "status": "unassigned",
+        "classification": "maximal_empty_spaces_plus_conserved_volume",
+        "zones": [
+            {
+                "id": f"minimal-residual-{index:03d}",
+                "kind": "unassigned_residual",
+                "stage_id": "",
+                "origin_mm": dict(zip(("x", "y", "z"), value.origin_mm)),
+                "size_mm": dict(zip(("x", "y", "z"), value.size_mm)),
+                "volume_mm3": _round(value.volume_mm3),
+                "printable": False,
+            }
+            for index, value in enumerate(displayed_spaces)
+        ],
+        "zone_count": len(empty_spaces),
+        "displayed_zone_count": len(displayed_spaces),
+        "zones_truncated": len(displayed_spaces) < len(empty_spaces),
+        "zones_may_overlap": True,
+        "residual_volume_mm3": volume["residual_volume_mm3"],
+        "residual_ratio": volume["residual_ratio"],
+        "residual_is_distributed": False,
+    }
+    plan["suggestions"] = []
+    invariants = _mapping(plan["invariants"])
+    invariants.update(
+        {
+            "minimal_layout": True,
+            "minimum_outer_dimensions_only": True,
+            "residual_distributed": False,
+            "continuous_closure_applied": False,
+            "weighted_surplus": False,
+            "free_3d_final_envelopes": False,
+            "automatic_body_count": 0,
+            "free_space_materialized": False,
+        }
+    )
+    plan["invariants"] = invariants
+    solver = _mapping(plan["solver"])
+    solver.update(
+        {
+            "kind": "bounded_minimal_layout_solver",
+            "candidate_id": candidate_id,
+            "search_origin": deepcopy(dict(search_provenance)),
+            "globally_optimal": False,
+        }
+    )
+    result = _mapping(solver["result"])
+    result["materializable"] = False
+    solver["result"] = result
+    telemetry = _mapping(solver["telemetry"])
+    telemetry["stop_reason"] = "minimal_placement_certified"
+    telemetry["counters"] = deepcopy(dict(search_telemetry))
+    solver["telemetry"] = telemetry
+    plan["solver"] = solver
+    plan["minimal_layout"] = {
+        "schema_version": MINIMAL_LAYOUT_ARTIFACT_SCHEMA_V1,
+        "artifact_kind": "minimal_layout",
+        "geometry_statement": "minimum_envelopes_only_residual_unassigned",
+        "best_candidate_statement": (
+            "best_certified_proposal_found_within_budget"
+        ),
+        "search_provenance": deepcopy(dict(search_provenance)),
+        "metrics": deepcopy(metrics),
+        "residual": {
+            "volume_mm3": volume["residual_volume_mm3"],
+            "ratio": volume["residual_ratio"],
+            "fragment_count": len(empty_spaces),
+            "distributed": False,
+        },
+        "finalization_applied": False,
+        "automatic_body_count": 0,
+    }
+    plan.pop("plan_digest", None)
+    certifiable_payload_digest = _digest(plan)
+    plan["minimal_layout"]["certifiable_payload_digest"] = certifiable_payload_digest
+
+    product_candidate = SolverCandidate(
+        strategy=strategy,
+        candidate_id=candidate_id,
+        plan_digest=certifiable_payload_digest,
+        placements=tuple(
+            PlacementSnapshot(
+                placement_id=str(item["id"]),
+                role=str(item["role"]),
+                origin_mm=tuple(
+                    float(_mapping(item["origin_mm"])[axis])
+                    for axis in ("x", "y", "z")
+                ),
+                size_mm=tuple(
+                    float(_mapping(item["world_size_mm"])[axis])
+                    for axis in ("x", "y", "z")
+                ),
+                rotation_deg_z=int(item["rotation_deg_z"]),
+            )
+            for item in resolved
+        ),
+        score_breakdown=tuple(
+            sorted(
+                (str(key), float(value))
+                for key, value in metrics.items()
+                if isinstance(value, (int, float)) and not isinstance(value, bool)
+            )
+        ),
+        automatic_body_count=0,
+    )
+    certificate = certify_minimal_layout_candidate(plan, product_candidate)
+    if not certificate.certified:
+        return None, certificate.rejection_codes
+    variant_global_certificate = _container_variant_global_certificate(
+        scaffold.selected_container_variants,
+        problem.requested_container_count,
+        certificate,
+    )
+    if (
+        variant_global_certificate is not None
+        and not variant_global_certificate.certified
+    ):
+        return None, variant_global_certificate.rejection_codes
+
+    plan["minimal_layout"]["global_certificate"] = _certificate_payload(certificate)
+    if variant_global_certificate is not None:
+        plan["minimal_layout"]["container_variant_certificate"] = {
+            "schema_version": variant_global_certificate.schema_version,
+            "selection_digest": variant_global_certificate.selection_digest,
+            "certified": variant_global_certificate.certified,
+            "checks": [
+                {
+                    "name": check.name,
+                    "passed": check.passed,
+                    "rejection_code": check.rejection_code,
+                }
+                for check in variant_global_certificate.checks
+            ],
+        }
+    plan["plan_digest"] = _digest(plan)
+    return (
+        CertifiedFree3DPlan(
+            plan=plan,
+            candidate=product_candidate,
+            certificate=certificate,
+            placement_digest=scaffold.placement_digest,
+            selected_container_variants=scaffold.selected_container_variants,
+            container_variant_global_certificate=variant_global_certificate,
+        ),
+        (),
+    )
+
+
+def _dimension_tuple(
+    value: Mapping[str, object],
+) -> tuple[float, float, float]:
+    dimensions = _dimension(value)
+    return (
+        dimensions["x"],
+        dimensions["y"],
+        dimensions["z"],
+    )
+
+
+def _minimal_layout_metrics(
+    problem: Free3DPreparedProblem,
+    placements: list[dict[str, object]],
+    empty_spaces: tuple[EmptySpace, ...],
+) -> dict[str, float]:
+    origins = [_dimension_tuple(_mapping(item["origin_mm"])) for item in placements]
+    sizes = [_dimension_tuple(_mapping(item["world_size_mm"])) for item in placements]
+    lower = [
+        min(origin[index] for origin in origins)
+        for index in range(3)
+    ]
+    upper = [
+        max(origin[index] + size[index] for origin, size in zip(origins, sizes))
+        for index in range(3)
+    ]
+    spans = [upper[index] - lower[index] for index in range(3)]
+    body_volume = sum(size[0] * size[1] * size[2] for size in sizes)
+    cluster_volume = spans[0] * spans[1] * spans[2]
+    support_ratios = [
+        float(item.get("support_coverage_ratio", 1.0))
+        for item in placements
+    ]
+    return {
+        "lowest_z_mm": _round(min(origin[2] for origin in origins)),
+        "cluster_height_mm": _round(upper[2]),
+        "cluster_footprint_mm2": _round(spans[0] * spans[1]),
+        "cluster_volume_mm3": _round(cluster_volume),
+        "internal_gap_mm3": _round(max(0.0, cluster_volume - body_volume)),
+        "residual_fragmentation": float(len(empty_spaces)),
+        "contact_count": float(
+            _contact_count(
+                placements,
+                problem.xy_clearance_mm,
+                problem.z_clearance_mm,
+            )
+        ),
+        "minimum_support_ratio": _round(min(support_ratios, default=1.0)),
+        "top_compatibility_certified": 1.0,
+        "removal_sequence_certified": 1.0,
+    }
+
+
+def _contact_count(
+    placements: list[dict[str, object]],
+    xy_clearance: float,
+    z_clearance: float,
+) -> int:
+    contacts = 0
+    for index, left in enumerate(placements):
+        left_origin = _dimension_tuple(_mapping(left["origin_mm"]))
+        left_size = _dimension_tuple(_mapping(left["world_size_mm"]))
+        for right in placements[index + 1 :]:
+            right_origin = _dimension_tuple(_mapping(right["origin_mm"]))
+            right_size = _dimension_tuple(_mapping(right["world_size_mm"]))
+            overlaps = [
+                min(
+                    left_origin[axis] + left_size[axis],
+                    right_origin[axis] + right_size[axis],
+                )
+                - max(left_origin[axis], right_origin[axis])
+                for axis in range(3)
+            ]
+            gaps = [
+                max(
+                    0.0,
+                    right_origin[axis] - (left_origin[axis] + left_size[axis]),
+                    left_origin[axis] - (right_origin[axis] + right_size[axis]),
+                )
+                for axis in range(3)
+            ]
+            if (
+                gaps[0] <= xy_clearance + 0.0001
+                and overlaps[1] > 0.0001
+                and overlaps[2] > 0.0001
+            ) or (
+                gaps[1] <= xy_clearance + 0.0001
+                and overlaps[0] > 0.0001
+                and overlaps[2] > 0.0001
+            ) or (
+                gaps[2] <= z_clearance + 0.0001
+                and overlaps[0] > 0.0001
+                and overlaps[1] > 0.0001
+            ):
+                contacts += 1
+    return contacts
+
+
+def _certificate_payload(
+    certificate: ValidationCertificate,
+) -> dict[str, object]:
+    return {
+        "schema_version": certificate.schema_version,
+        "candidate_digest": certificate.candidate_digest,
+        "certified": certificate.certified,
+        "checks": [
+            {
+                "name": check.name,
+                "passed": check.passed,
+                "rejection_code": check.rejection_code,
+            }
+            for check in certificate.checks
+        ],
+    }
 
 
 def _resolve_selected_container_variants(

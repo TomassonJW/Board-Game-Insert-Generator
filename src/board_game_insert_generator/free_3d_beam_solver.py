@@ -60,6 +60,16 @@ FREE_3D_BEAM_VERSION = "bgig.free_3d_beam.v2"
 BEAM_SEARCH_LEGACY_EMS = "legacy_ems_v1"
 BEAM_SEARCH_BRIDGE_EMS = "bridge_ems_v2"
 BEAM_SEARCH_INTERNAL_VARIANTS = "internal_variants_v1"
+PROPAGATION_INWARD_CONTACT = "inward_contact"
+PROPAGATION_LONG_AXIS_SPINE = "long_axis_spine"
+PROPAGATION_RADIAL_COMPACT = "radial_compact"
+PROPAGATION_LOWEST_SUPPORTED_SURFACE = "lowest_supported_surface_first"
+_MINIMAL_PROPAGATION_POLICIES = {
+    PROPAGATION_INWARD_CONTACT,
+    PROPAGATION_LONG_AXIS_SPINE,
+    PROPAGATION_RADIAL_COMPACT,
+    PROPAGATION_LOWEST_SUPPORTED_SURFACE,
+}
 _EPSILON = 0.0001
 _AXES = ("x", "y", "z")
 
@@ -182,6 +192,10 @@ def solve_free_3d_beam(
     forbidden_spaces: Iterable[EmptySpace] = (),
     top_inset_zones: Iterable[TopInsetZone] = (),
     search_variant: str = BEAM_SEARCH_BRIDGE_EMS,
+    participant_order: Iterable[str] | None = None,
+    seed_participant_id: str | None = None,
+    initial_anchor_points: Iterable[tuple[float, float, float]] = (),
+    propagation_policy: str | None = None,
 ) -> Free3DBeamExecution:
     """Search several minimum-envelope EP/EMS states under explicit hard limits."""
 
@@ -192,6 +206,13 @@ def solve_free_3d_beam(
         BEAM_SEARCH_INTERNAL_VARIANTS,
     }:
         raise Free3DBeamError(f"Unsupported beam search variant: {search_variant}.")
+    if (
+        propagation_policy is not None
+        and propagation_policy not in _MINIMAL_PROPAGATION_POLICIES
+    ):
+        raise Free3DBeamError(
+            f"Unsupported propagation policy: {propagation_policy}."
+        )
     limits = _budget_limits(budget)
     values = tuple(_participant(value, index) for index, value in enumerate(participants))
     dimensions = _box_dimensions(box, storage_height_mm)
@@ -211,6 +232,13 @@ def solve_free_3d_beam(
     participants_by_id = {str(value["id"]): value for value in values}
     if len(participants_by_id) != len(values):
         raise Free3DBeamError("Participant identifiers must be unique.")
+    order_is_explicit = participant_order is not None
+    ordered_participants = _validated_participant_order(
+        participant_order,
+        participants_by_id,
+    )
+    if seed_participant_id is not None and seed_participant_id not in participants_by_id:
+        raise Free3DBeamError("The requested seed participant is unknown.")
     root_origin = _rounded_point((box_clearance, box_clearance, 0.0))
     root_space = EmptySpace(root_origin, _rounded_point(root_size))
     forbidden = _validated_forbidden_spaces(forbidden_spaces, dimensions)
@@ -218,20 +246,32 @@ def solve_free_3d_beam(
     initial_spaces = _subtract_forbidden_spaces([root_space], forbidden)
     if not initial_spaces:
         raise Free3DBeamError("The forbidden spaces consume the whole useful box.")
+    base_points = (
+        {space.origin_mm for space in initial_spaces}
+        if search_variant == BEAM_SEARCH_LEGACY_EMS
+        else set(_initial_extreme_points(initial_spaces, inset_zones))
+    )
+    for raw_point in initial_anchor_points:
+        values_at_point = tuple(float(value) for value in raw_point)
+        if len(values_at_point) != 3:
+            raise Free3DBeamError("Every initial anchor point must have three axes.")
+        point = _rounded_point(values_at_point)
+        if _point_in_any_space(point, initial_spaces):
+            base_points.add(point)
     initial = _BeamState(
         placements=(),
-        remaining_ids=tuple(sorted(participants_by_id)),
+        remaining_ids=ordered_participants,
         spaces=tuple(initial_spaces),
-        points=(
-            frozenset(space.origin_mm for space in initial_spaces)
-            if search_variant == BEAM_SEARCH_LEGACY_EMS
-            else frozenset(_initial_extreme_points(initial_spaces, inset_zones))
-        ),
+        points=frozenset(base_points),
     )
     input_digest = _digest(
         {
             "strategy": strategy.__dict__,
             "search_variant": search_variant,
+            "participant_order": ordered_participants,
+            "seed_participant_id": seed_participant_id,
+            "initial_anchor_points": sorted(base_points),
+            "propagation_policy": propagation_policy or "legacy_default",
             "budget": {
                 "family_id": budget.family_id,
                 "effort_profile": budget.effort_profile,
@@ -274,7 +314,10 @@ def solve_free_3d_beam(
             break
         next_states: list[_BeamState] = []
         for state in beam:
-            best_state = min((best_state, state), key=_state_score)
+            best_state = min(
+                (best_state, state),
+                key=lambda value: _state_score(value, propagation_policy),
+            )
             if _should_stop(cancel_check, started_at, limits, counters):
                 break
             participant_options = _participant_branches(
@@ -287,6 +330,10 @@ def solve_free_3d_beam(
                 limits,
                 inset_zones,
                 search_variant,
+                ordered_participants,
+                order_is_explicit,
+                seed_participant_id,
+                propagation_policy,
             )
             for _, options in participant_options:
                 for option in options[: limits["max_options_per_participant"]]:
@@ -343,17 +390,25 @@ def solve_free_3d_beam(
         for state in next_states:
             signature = _state_signature(state)
             previous = unique.get(signature)
-            if previous is None or _state_score(state) < _state_score(previous):
+            if previous is None or _state_score(
+                state, propagation_policy
+            ) < _state_score(previous, propagation_policy):
                 unique[signature] = state
             else:
                 counters.states_deduplicated += 1
-        ordered = sorted(unique.values(), key=_state_score)
+        ordered = sorted(
+            unique.values(),
+            key=lambda value: _state_score(value, propagation_policy),
+        )
         if len(ordered) > limits["beam_width"]:
             counters.states_pruned_by_width += len(ordered) - limits["beam_width"]
         beam = ordered[: limits["beam_width"]]
         counters.maximum_beam_width_retained = max(counters.maximum_beam_width_retained, len(beam))
         if beam:
-            best_state = min((best_state, beam[0]), key=_state_score)
+            best_state = min(
+                (best_state, beam[0]),
+                key=lambda value: _state_score(value, propagation_policy),
+            )
 
     ordered_solutions = tuple(sorted(solutions, key=lambda value: value.score_key))
     if counters.cancelled:
@@ -392,12 +447,23 @@ def _participant_branches(
     limits: dict[str, int],
     top_inset_zones: tuple[TopInsetZone, ...],
     search_variant: str,
+    participant_order: tuple[str, ...],
+    order_is_explicit: bool,
+    seed_participant_id: str | None,
+    propagation_policy: str | None,
 ) -> list[tuple[dict[str, object], list[_BeamOption]]]:
     evaluated: list[tuple[tuple[object, ...], dict[str, object], list[_BeamOption]]] = []
     placements = list(state.placements)
     spaces = list(state.spaces)
     points = set(state.points)
-    for participant_id in state.remaining_ids:
+    remaining_ids = state.remaining_ids
+    if not state.placements and seed_participant_id in remaining_ids:
+        remaining_ids = (str(seed_participant_id),)
+    order_index = {
+        participant_id: index
+        for index, participant_id in enumerate(participant_order)
+    }
+    for participant_id in remaining_ids:
         participant = participants_by_id[participant_id]
         options = _placement_options(
             participant,
@@ -418,16 +484,34 @@ def _participant_branches(
             continue
         modes = _mapping(participant["dimension_modes"])
         constrained_axes = sum(str(modes[axis]) == "fixed" for axis in _AXES)
-        key = (
+        legacy_key = (
             len(options),
             -constrained_axes,
             -_volume(_minimum_local(participant)),
             participant_id,
         )
+        key = (
+            (
+                order_index.get(participant_id, len(order_index)),
+                *legacy_key,
+            )
+            if order_is_explicit
+            else legacy_key
+        )
         evaluated.append((key, participant, options))
     evaluated.sort(key=lambda item: item[0])
     return [
-        (participant, sorted(options, key=lambda item: _option_score(item, list(state.placements))))
+        (
+            participant,
+            sorted(
+                options,
+                key=lambda item: _option_score(
+                    item,
+                    list(state.placements),
+                    propagation_policy,
+                ),
+            ),
+        )
         for _, participant, options in evaluated[: limits["max_participant_branches"]]
     ]
 
@@ -880,10 +964,14 @@ def _solution(
     )
 
 
-def _option_score(option: _BeamOption, placements: list[Free3DPlacement]) -> tuple[object, ...]:
+def _option_score(
+    option: _BeamOption,
+    placements: list[Free3DPlacement],
+    propagation_policy: str | None = None,
+) -> tuple[object, ...]:
     body_volume = _volume(option.world_size)
     aligned_faces = _aligned_face_count(option, placements)  # type: ignore[arg-type]
-    common = (
+    legacy_common = (
         -_round(option.support_ratio),
         -aligned_faces,
         _round(body_volume),
@@ -891,6 +979,43 @@ def _option_score(option: _BeamOption, placements: list[Free3DPlacement]) -> tup
         _round(option.origin[1]),
         _round(option.origin[0]),
     )
+    if propagation_policy is None:
+        common = legacy_common
+    else:
+        cluster = _cluster_metrics(placements, option)
+        if propagation_policy == PROPAGATION_INWARD_CONTACT:
+            common = (
+                -aligned_faces,
+                _round(cluster["volume_mm3"]),
+                _round(cluster["internal_gap_mm3"]),
+                _round(option.origin[2]),
+                -_round(option.support_ratio),
+            )
+        elif propagation_policy == PROPAGATION_LONG_AXIS_SPINE:
+            common = (
+                _round(cluster["spine_offset_mm"]),
+                _round(cluster["minor_span_mm"]),
+                _round(cluster["major_span_mm"]),
+                _round(option.origin[2]),
+                -aligned_faces,
+                -_round(option.support_ratio),
+            )
+        elif propagation_policy == PROPAGATION_RADIAL_COMPACT:
+            common = (
+                _round(cluster["center_distance_mm"]),
+                _round(cluster["volume_mm3"]),
+                _round(cluster["internal_gap_mm3"]),
+                _round(option.origin[2]),
+                -_round(option.support_ratio),
+            )
+        else:
+            common = (
+                _round(option.origin[2]),
+                -_round(option.support_ratio),
+                _round(cluster["height_mm"]),
+                _round(cluster["volume_mm3"]),
+                -aligned_faces,
+            )
     if option.container_variant_digest:
         return common + (
             option.container_variant_order,
@@ -906,10 +1031,13 @@ def _option_score(option: _BeamOption, placements: list[Free3DPlacement]) -> tup
     )
 
 
-def _state_score(state: _BeamState) -> tuple[object, ...]:
+def _state_score(
+    state: _BeamState,
+    propagation_policy: str | None = None,
+) -> tuple[object, ...]:
     residual_upper_bound = sum(space.volume_mm3 for space in state.spaces)
     minimum_support = min((value.support_coverage_ratio for value in state.placements), default=1.0)
-    return (
+    legacy = (
         len(state.remaining_ids),
         len(state.spaces),
         -_round(residual_upper_bound),
@@ -917,6 +1045,148 @@ def _state_score(state: _BeamState) -> tuple[object, ...]:
         len(state.points),
         _state_signature(state),
     )
+    if propagation_policy is None or not state.placements:
+        return legacy
+    metrics = _placement_cluster_metrics(state.placements)
+    if propagation_policy == PROPAGATION_LOWEST_SUPPORTED_SURFACE:
+        preference = (
+            _round(metrics["height_mm"]),
+            _round(metrics["volume_mm3"]),
+            _round(metrics["internal_gap_mm3"]),
+        )
+    elif propagation_policy == PROPAGATION_LONG_AXIS_SPINE:
+        preference = (
+            _round(metrics["minor_span_mm"]),
+            _round(metrics["major_span_mm"]),
+            _round(metrics["height_mm"]),
+        )
+    else:
+        preference = (
+            _round(metrics["volume_mm3"]),
+            _round(metrics["internal_gap_mm3"]),
+            _round(metrics["height_mm"]),
+        )
+    return (
+        len(state.remaining_ids),
+        *preference,
+        len(state.spaces),
+        -_round(minimum_support),
+        _state_signature(state),
+    )
+
+
+def _validated_participant_order(
+    participant_order: Iterable[str] | None,
+    participants_by_id: Mapping[str, object],
+) -> tuple[str, ...]:
+    if participant_order is None:
+        return tuple(sorted(participants_by_id))
+    requested = tuple(str(value) for value in participant_order)
+    if len(set(requested)) != len(requested):
+        raise Free3DBeamError("Participant order identifiers must be unique.")
+    unknown = sorted(set(requested).difference(participants_by_id))
+    if unknown:
+        raise Free3DBeamError(
+            f"Participant order contains unknown identifiers: {', '.join(unknown)}."
+        )
+    return requested + tuple(
+        value for value in sorted(participants_by_id) if value not in requested
+    )
+
+
+def _point_in_any_space(
+    point: tuple[float, float, float],
+    spaces: Iterable[EmptySpace],
+) -> bool:
+    return any(
+        all(
+            space.origin_mm[index] - _EPSILON
+            <= point[index]
+            <= space.origin_mm[index] + space.size_mm[index] + _EPSILON
+            for index in range(3)
+        )
+        for space in spaces
+    )
+
+
+def _cluster_metrics(
+    placements: Iterable[Free3DPlacement],
+    option: _BeamOption,
+) -> dict[str, float]:
+    existing = tuple(placements)
+    projected = existing + (
+        Free3DPlacement(
+            participant_id=str(option.participant["id"]),
+            role=str(option.participant["role"]),
+            name=str(option.participant["name"]),
+            origin_mm=option.origin,
+            world_size_mm=option.world_size,
+            local_size_mm=option.local_size,
+            rotation_deg_z=option.rotation_deg_z,
+            supporting_ids=option.supporting_ids,
+            support_coverage_ratio=option.support_ratio,
+        ),
+    )
+    result = _placement_cluster_metrics(projected)
+    if existing:
+        first = existing[0]
+        first_center = (
+            first.origin_mm[0] + first.world_size_mm[0] / 2.0,
+            first.origin_mm[1] + first.world_size_mm[1] / 2.0,
+        )
+        option_center = (
+            option.origin[0] + option.world_size[0] / 2.0,
+            option.origin[1] + option.world_size[1] / 2.0,
+        )
+        long_axis = 0 if first.world_size_mm[0] >= first.world_size_mm[1] else 1
+        minor_axis = 1 - long_axis
+        result["spine_offset_mm"] = abs(
+            option_center[minor_axis] - first_center[minor_axis]
+        )
+    else:
+        result["spine_offset_mm"] = 0.0
+    return result
+
+
+def _placement_cluster_metrics(
+    placements: Iterable[Free3DPlacement],
+) -> dict[str, float]:
+    values = tuple(placements)
+    if not values:
+        return {
+            "volume_mm3": 0.0,
+            "internal_gap_mm3": 0.0,
+            "height_mm": 0.0,
+            "major_span_mm": 0.0,
+            "minor_span_mm": 0.0,
+            "center_distance_mm": 0.0,
+        }
+    lower = [min(value.origin_mm[index] for value in values) for index in range(3)]
+    upper = [
+        max(value.origin_mm[index] + value.world_size_mm[index] for value in values)
+        for index in range(3)
+    ]
+    spans = [upper[index] - lower[index] for index in range(3)]
+    cluster_volume = spans[0] * spans[1] * spans[2]
+    body_volume = sum(_volume(value.world_size_mm) for value in values)
+    center = ((lower[0] + upper[0]) / 2.0, (lower[1] + upper[1]) / 2.0)
+    latest = values[-1]
+    latest_center = (
+        latest.origin_mm[0] + latest.world_size_mm[0] / 2.0,
+        latest.origin_mm[1] + latest.world_size_mm[1] / 2.0,
+    )
+    return {
+        "volume_mm3": cluster_volume,
+        "internal_gap_mm3": max(0.0, cluster_volume - body_volume),
+        "height_mm": upper[2],
+        "major_span_mm": max(spans[0], spans[1]),
+        "minor_span_mm": min(spans[0], spans[1]),
+        "center_distance_mm": (
+            (latest_center[0] - center[0]) ** 2
+            + (latest_center[1] - center[1]) ** 2
+        )
+        ** 0.5,
+    }
 
 
 def _state_signature(state: _BeamState) -> str:

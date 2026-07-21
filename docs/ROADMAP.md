@@ -994,3 +994,17 @@ Trajectoire corrective :
 
 P45 conserve les variantes/formes locales. P64 conserve placement et certificat
 global. Le cas dense, les valeurs physiques et l'impression restent inchangés.
+
+## P64-L03R-B — Solveur minimal livré (2026-07-21)
+
+L03R-B livre le cœur `minimal_layout` sans répartition du résiduel. Plusieurs
+ordres de contrainte, graines, ancres et propagations sont comparés sous des
+caps Rapide / Normal / Approfondi monotones. Les variantes L01/L02, supports,
+réservations et six surplus nuls passent par un certificat global distinct du
+certificat de partition remplie.
+
+La trajectoire corrective avance vers L03R-C, désormais `ready`, pour brancher
+CAD IR, sélection d'artefact et remplacement sûr de scène. L03R-V reste une
+future gate humaine inactive jusque-là. F01 et les vraies transformations de
+finition restent verrouillées. Le cas dense 11 × 34, les valeurs physiques et
+l'impression restent inchangés.

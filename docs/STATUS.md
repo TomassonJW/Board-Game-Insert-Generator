@@ -1,4 +1,4 @@
-﻿# Status
+# Status
 
 Derniere mise a jour : 2026-07-21
 
@@ -2723,3 +2723,30 @@ Aucun runtime, schéma, solveur, budget, valeur physique, CAD IR ou scène n'est
 modifié par L03R-A. Le cas dense 11 × 34 reste
 `no_solution_within_budget`. P64-L03R-B devient `ready`.
 `fusion-validated: false`, `print-validated: false` pour cette correction.
+
+## P64-L03R-B — Solveur minimal multi-graines (2026-07-21)
+
+Statut : `implemented-core`, `automated-validated`. Le module pur
+`minimal_layout_solver.py` consomme les frontières locales certifiées, force les
+enveloppes minimales pendant la recherche et produit un `minimal_layout` avec
+résiduel classifié mais non attribué.
+
+Le portefeuille déterministe conserve les lanes EMS historiques et ajoute
+ordres par rareté/pression/empreinte/hauteur/volume, graines alternatives,
+ancres coin/bord/centre/surface basse et propagations contact/axe/radiale/Z
+supporté. Rapide est préfixe de Normal, Normal d'Approfondi. Le classement est
+lexicographique et décomposé ; aucune optimalité globale n'est revendiquée.
+
+Le certificat minimal vérifie géométrie, jeux, variantes locales, cavités,
+plateaux, retrait, support, dimensions exactes, six surplus nuls et conservation
+du volume avec résiduel. Une pile fine au côté d'un corps haut est certifiée ;
+un corps flottant est refusé. Une édition locale ne lance toujours aucun solve
+global.
+
+Aucune finalisation, CAD IR, UI, scène, valeur physique, tolérance, défaut ou
+schéma projet ne change. Les solveurs publics historiques restent inchangés. Le
+cas dense 11 × 34 reste `no_solution_within_budget`.
+Validation : 617/617 tests complets, plus les régressions ciblées L03R-B et
+historiques. Preuve : `docs/P64_L03R_B_MINIMAL_SOLVER_EVIDENCE.md`.
+P64-L03R-C devient `ready`. `fusion-validated: false`,
+`print-validated: false`.

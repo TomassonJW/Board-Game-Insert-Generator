@@ -1,4 +1,4 @@
-﻿# Human Gates
+# Human Gates
 
 Les gates humaines protegent les decisions qui changent la vision, l'architecture
 ou la credibilite physique du projet. Codex peut preparer les analyses, rapports,
@@ -894,3 +894,16 @@ P64-L03R-V devra observer : volumes minimaux non étendus, résiduel visible,
 matérialisation avant finition, scène stale après édition, remplacement sans
 doublon et objets utilisateur préservés. Elle ne valide ni valeur physique ni
 impression. `print-validated: false`.
+
+## P64-L03R-B — Preuve automatisée, aucune gate humaine
+
+Statut : `implemented-core`, `automated-validated`.
+
+L03R-B ne modifie ni bridge, ni CAD IR, ni palette, ni scène Fusion. Il produit
+un artefact cœur minimal certifié, conserve le résiduel non attribué et ne
+revendique aucune observation Fusion ou impression. Le cas dense 11 × 34 reste
+`no_solution_within_budget`.
+
+Effet : P64-L03R-C devient `ready`. La gate P64-L03R-V reste inactive jusqu'à la
+clôture automatisée de C. Il n'y a donc aucune revue humaine à demander entre B
+et C. `fusion-validated: false`, `print-validated: false`.
