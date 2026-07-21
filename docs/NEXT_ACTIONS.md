@@ -90,3 +90,8 @@ séparateur, conteneur, corps ou cale n'est créé automatiquement.
 ## Mise a jour P44-V 0.1.55
 
 La preparation est terminee. Action humaine unique : executer scripts/fusion/prepare_p44_v_requalification.ps1 puis suivre la recette P44-V. Au premier ecart runtime reel, arreter avec projet, action, attendu, observe et capture. Modele ensuite : terra medium si conforme ; sol xhigh seulement pour diagnostiquer une divergence.
+
+
+## P44-V cloturee avec reserve de charge
+
+La gate Fusion 0.1.55 est acceptee par Thomas. Le scenario d environ 50 conteneurs n est pas revendique comme observe. Prochaine mission : cadrer P45-M001 selon son contrat, sans ouvrir le solveur P64, les valeurs physiques ou les formes finales. Modele conseille : gpt-5.6-sol, raisonnement xhigh ; option economique terra high pour une simple consolidation documentaire, avec plus de risque sur les frontieres P45/P64.

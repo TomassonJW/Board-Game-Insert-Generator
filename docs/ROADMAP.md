@@ -930,3 +930,8 @@ changement runtime déjà validé. print-validated: false.
 ## P44-V - Preparation de requalification 0.1.55 (2026-07-21)
 
 La gate globale P44 est preparee sur 0.1.55 apres P64-V2H03V. Cinq observations Fusion couvrent saisie, repli, import dense, scene preservee et materialisation explicite. P45 reste bloque.
+
+
+## P44-V - gate Fusion acceptee avec reserve (2026-07-21)
+
+La fondation UX P44 est acceptee sur 0.1.55. Le scenario de charge d environ 50 conteneurs n est pas valide ; aucune capacite dense n en est deduite. Le prochain lot est le cadrage P45-M001, sans implementation de formes ni changement du solveur P64.

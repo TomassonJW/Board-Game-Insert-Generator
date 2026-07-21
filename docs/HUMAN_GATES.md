@@ -829,3 +829,10 @@ aucune valeur physique et ne vaut pas impression réelle.
 
 Effet : P64-V2H03 est clôturée. P44-V devient la prochaine gate à requalifier ;
 P45 reste bloquée jusqu'à cette requalification.
+
+
+## P44-V - Validation Fusion 0.1.55 (2026-07-21)
+
+Statut : done-human-gate, fusion-validated pour la fondation UX P44. Retour humain : P44-V Fusion OK 0.1.55 - commit 70d45c6.
+
+Reserve explicite : le scenario d environ 50 conteneurs n a pas ete observe, car il ne pouvait pas etre controle dans un volume raisonnable. Cette gate ne revendique donc pas cette preuve de charge. Elle valide la palette actuelle, la saisie, le repli, la preservation de scene et l absence de materialisation automatique. P45 est debloque pour son cadrage contractuel. print-validated: false.

@@ -64,3 +64,10 @@ Statut : ready-for-human-fusion-check after P64-V2H03V.
 Verifier dans Fusion : saisie rapide dans Boite, Conteneurs, Reglages et Apercu sans perte de focus, selection ou scroll ; repli individuel et global ; import d un projet historique puis d environ 50 conteneurs ; absence de modification de scene avant le clic explicite Materialiser dans Fusion.
 
 Retour OK : P44-V Fusion OK 0.1.55 - commit <sha>. Un KO doit donner projet, action, attendu, observe et capture. Une divergence runtime reelle arrete la requalification.
+
+
+## Validation Fusion 0.1.55 (2026-07-21)
+
+Retour humain accepte : P44-V Fusion OK 0.1.55 - commit 70d45c6.
+
+Portee observee : palette, saisie, repli et absence de scene automatique avant Materialiser dans Fusion. Reserve : le scenario d environ 50 conteneurs n a pas ete verifie, car non controlable dans un volume raisonnable ; aucune preuve de charge UX n est donc deduite. P45 peut commencer par son contrat, sans modifier retrospectivement P44. print-validated: false.

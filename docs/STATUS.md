@@ -2641,3 +2641,8 @@ de P44-V ; P45 reste bloquée jusque-là.
 ## P44-V - Preparation de requalification 0.1.55 (2026-07-21)
 
 Statut : ready-for-human-fusion-check. La recette 0.1.40 est remplacee par un preparateur 0.1.55 qui controle les invariants P44 et H03V. Le cycle 350/1 500 ms reste le comportement actuel ; ADR-0071 est futur. P45 reste bloque ; print-validated: false.
+
+
+## P44-V - Validation Fusion 0.1.55 (2026-07-21)
+
+Statut : done-human-gate, fusion-validated pour la fondation UX. Preuve humaine : P44-V Fusion OK 0.1.55 - commit 70d45c6. La verification de charge d environ 50 conteneurs est explicitement non observee, car non controlable dans un volume raisonnable. Cette reserve ne devient pas un echec runtime et aucune performance n est revendiquee. P45 est debloque pour son cadrage contractuel seulement ; print-validated: false.

@@ -1447,3 +1447,10 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - C-FUSION-UI / C-USABILITY : recette de requalification du runtime actuel, sans promotion avant retour Fusion.
 - C-QUALITY : package, SHA installe, invariants DOM P44 et H03V controles.
 - Suite : P44-V humaine, puis P45 seulement si OK explicite.
+
+
+## Mise a jour P44-V - gate Fusion 0.1.55
+
+- C-FUSION-UI / C-USABILITY : fondation UX fusion-validated pour la palette observee.
+- C-QUALITY : reserve explicite, aucune preuve de charge a environ 50 conteneurs.
+- Suite : P45-M001 peut etre cadre sans transfert du solveur global P64.
