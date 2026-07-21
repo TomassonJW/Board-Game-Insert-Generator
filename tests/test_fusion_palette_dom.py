@@ -553,7 +553,7 @@ class FusionPaletteDomTests(unittest.TestCase):
     def test_prepares_the_p64_l03v_explicit_cycle_gate(self) -> None:
         script = (ROOT / "scripts" / "fusion" / "prepare_p64_l03v_explicit_cycle_test.ps1").read_text(encoding="utf-8")
         for marker in (
-            "0.1.56", "primary-calculation-action", "Calculer l’agencement",
+            "0.1.56", "primary-calculation-action", "[char]0x2019",
             "Finaliser le volume", "finalize_project", "staged_calculation",
             "AUTO_SOLVE_STABILITY_MS", "scheduleAdaptiveSolve",
             "P64-L03V Fusion OK 0.1.56",

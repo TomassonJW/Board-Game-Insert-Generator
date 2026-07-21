@@ -47,7 +47,7 @@ if (-not $DryRun) {
     $palette = Get-Content -LiteralPath (Join-Path $target "palette.html") -Raw -Encoding UTF8
     foreach ($marker in @(
         "primary-calculation-action",
-        "Calculer l’agencement",
+        ("Calculer l" + [char]0x2019 + "agencement"),
         "Finaliser le volume",
         "finalize_project",
         "staged_calculation"
