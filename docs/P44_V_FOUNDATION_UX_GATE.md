@@ -1,6 +1,6 @@
 # P44-V — Gate globale de fondation UX
 
-Statut : contextual-KO ; superseded-until-P64-H01V et P44-VH02.
+Statut : ready-for-human-fusion-check sur 0.1.55 apres P64-V2H03V.
 
 ## Déclencheur
 
@@ -50,3 +50,17 @@ P64-H01 est validé, mais P64-H02 puis un essai local P64-H03 ont encore produit
 des faux impossibles. P44-V reste donc `contextual-KO` et ne doit pas être
 relancée sur les packages 0.1.40 à 0.1.45. La prochaine reprise globale de P44-V
 aura lieu seulement après une gate P64-V2 positive. P45 reste bloqué.
+
+
+## Requalification courante 0.1.55
+
+Statut : ready-for-human-fusion-check after P64-V2H03V.
+
+- package attendu : 0.1.55 ;
+- preparation : scripts/fusion/prepare_p44_v_requalification.ps1 ;
+- le cycle adaptatif actuel reste a 350 ms puis 1 500 ms ; ADR-0071 est futur et n est pas une attente de cette gate ;
+- aucun solveur, schema, jeu, valeur physique, forme P45, CAD IR ou scene automatique ne change.
+
+Verifier dans Fusion : saisie rapide dans Boite, Conteneurs, Reglages et Apercu sans perte de focus, selection ou scroll ; repli individuel et global ; import d un projet historique puis d environ 50 conteneurs ; absence de modification de scene avant le clic explicite Materialiser dans Fusion.
+
+Retour OK : P44-V Fusion OK 0.1.55 - commit <sha>. Un KO doit donner projet, action, attendu, observe et capture. Une divergence runtime reelle arrete la requalification.

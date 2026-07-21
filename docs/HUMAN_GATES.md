@@ -551,7 +551,7 @@ d’impression. `print-validated: false` reste inchangé.
 
 ## P44-V - Gate globale de fondation UX 0.1.40
 
-Statut : contextual-KO. Le package 0.1.40 ne doit pas recevoir de retour OK ; voir P44-VH02.
+Statut : ready-for-human-fusion-check sur 0.1.55. Voir docs/P44_V_FOUNDATION_UX_GATE.md.
 
 Vérifier les sept scénarios novice/expert, largeur, clavier/focus, conteneurs, import historique et scène préservée du dossier.
 

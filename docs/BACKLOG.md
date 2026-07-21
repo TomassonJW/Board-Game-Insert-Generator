@@ -2000,7 +2000,7 @@ P44-P46 dependent desormais de P66 puis P67 ; P47-P50 restent dependants de P46.
 - Observation : novice/expert, petite/grande palette, clavier, cinquante
   conteneurs, import historique et scene preservee.
 - Limite : qualifie la fondation de palette, ni geometrie P45 ni impression.
-- Statut : contextual-KO sur 0.1.40 ; reprendre après P44-VH02. P45 reste bloqué.
+- Statut : ready-for-human-fusion-check sur 0.1.55. Voir docs/P44_V_FOUNDATION_UX_GATE.md ; P45 reste bloque.
 
 Frontieres P44 : coeur sans adsk, complements en quarantaine, aucune scene
 automatique et aucun changement de solveur/tolerance/geometrie par glissement.

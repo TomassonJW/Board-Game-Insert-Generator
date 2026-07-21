@@ -1440,3 +1440,10 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 - Limites : P45, valeurs physiques, tolérances et impression restent hors
   périmètre. print-validated: false.
 - Suite : P64-V2H03 est clôturée ; P44-V doit être requalifiée avant P45.
+
+
+## Mise a jour P44-V - preparation de requalification 0.1.55
+
+- C-FUSION-UI / C-USABILITY : recette de requalification du runtime actuel, sans promotion avant retour Fusion.
+- C-QUALITY : package, SHA installe, invariants DOM P44 et H03V controles.
+- Suite : P44-V humaine, puis P45 seulement si OK explicite.

@@ -2636,3 +2636,8 @@ impression. print-validated: false.
 
 P64-V2H03 est clôturée. La prochaine dépendance est la requalification séparée
 de P44-V ; P45 reste bloquée jusque-là.
+
+
+## P44-V - Preparation de requalification 0.1.55 (2026-07-21)
+
+Statut : ready-for-human-fusion-check. La recette 0.1.40 est remplacee par un preparateur 0.1.55 qui controle les invariants P44 et H03V. Le cycle 350/1 500 ms reste le comportement actuel ; ADR-0071 est futur. P45 reste bloque ; print-validated: false.

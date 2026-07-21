@@ -37,15 +37,7 @@ P64-V2H03V est clôturée par le retour humain `P64-V2H03V Fusion OK 0.1.55`.
 La prochaine étape n'est pas une nouvelle exploration du solveur : elle consiste
 à requalifier séparément la gate globale P44-V, restée contextual-KO en 0.1.40.
 
-Aucune action immédiate n'est demandée à Thomas dans ce lot de clôture. Avant une
-nouvelle observation P44-V, un agent doit seulement vérifier que son dossier de
-preuve et sa checklist correspondent au runtime désormais fusion-validated H03V,
-sans modifier P45, les valeurs physiques ou la scène.
-
-Modèle conseillé pour cette préparation documentaire : `gpt-5.6-terra`,
-raisonnement `medium`. Si une divergence runtime est découverte, passer à
-`gpt-5.6-sol`, raisonnement `xhigh`, car la frontière UI/solveur devrait alors
-être réanalysée.
+Action humaine unique : executer scripts/fusion/prepare_p44_v_requalification.ps1 puis suivre la recette P44-V. Au premier ecart runtime reel, arreter avec projet, action, attendu, observe et capture. Modele : terra medium si conforme ; sol xhigh seulement pour diagnostiquer une divergence.
 
 ## Lots suivants, non ouverts
 
@@ -93,3 +85,8 @@ Ordre futur verrouillé après les gates déjà actives :
 P64-U01 et P64-X01 restent des trajectoires séparées. Aucun volume positif,
 score élevé ou espace résiduel ne promet une disposition. Aucun asset,
 séparateur, conteneur, corps ou cale n'est créé automatiquement.
+
+
+## Mise a jour P44-V 0.1.55
+
+La preparation est terminee. Action humaine unique : executer scripts/fusion/prepare_p44_v_requalification.ps1 puis suivre la recette P44-V. Au premier ecart runtime reel, arreter avec projet, action, attendu, observe et capture. Modele ensuite : terra medium si conforme ; sol xhigh seulement pour diagnostiquer une divergence.

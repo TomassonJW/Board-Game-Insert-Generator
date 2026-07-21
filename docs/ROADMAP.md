@@ -925,3 +925,8 @@ cas dense comme résolu : il reste no_solution_within_budget.
 Le chemin critique revient à P44-V, qui doit être requalifiée avant l'ouverture
 de P45. Les programmes P64-A02 restent une architecture future, pas un
 changement runtime déjà validé. print-validated: false.
+
+
+## P44-V - Preparation de requalification 0.1.55 (2026-07-21)
+
+La gate globale P44 est preparee sur 0.1.55 apres P64-V2H03V. Cinq observations Fusion couvrent saisie, repli, import dense, scene preservee et materialisation explicite. P45 reste bloque.

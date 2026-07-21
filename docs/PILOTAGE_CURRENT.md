@@ -121,3 +121,8 @@ P64-A02 est done-documentation et architecture-accepted. Aucune carte runtime
 nouvelle n'est active : P64-V2H03V reste l'unique prochaine gate, P44-V/P45/P46
 restent verrouillées, le cas dense 11 × 34 reste no_solution_within_budget et
 print-validated reste false.
+
+
+## P44-V requalification 0.1.55
+
+Preparation terminee : package 0.1.55, invariants DOM P44 et H03V controles. Gate humaine suivante ; P45 reste bloque. Aucun comportement runtime ou physique ne change.
