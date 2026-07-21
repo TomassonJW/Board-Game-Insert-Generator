@@ -1,6 +1,6 @@
 ﻿# Status
 
-Derniere mise a jour : 2026-07-18
+Derniere mise a jour : 2026-07-21
 
 ## Etat global
 
@@ -8,11 +8,10 @@ Statut produit : **MVP V0.1 Fusion-only accepte ; validation d impression non ac
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P64-V2H03V 0.1.55 est `ready-for-human-fusion-check`.
-La sélection globale paresseuse H03C reste `implemented-core` et
-`automated-validated` ; sa fixture, son contrôle canonique et son diagnostic
-secondaire sont préparés. P64-V2H02R reste la dernière preuve Fusion ; P44-V et
-P45 restent bloquées.
+Phase active : P64-L03R-A est `done-documentation` et P64-L03R-B est `ready`.
+P64-V2H03V et P44-V sont fusion-validated sur 0.1.55. P45-M001V est
+architecture-accepted. P64-L03V est un KO contextuel sur 0.1.56 et n'accorde
+aucune validation Fusion à la correction minimal/final.
 Le depot contient deja un coeur Python minimal et testable hors Fusion 360. La
 mission du 2026-07-03 a ajoute le systeme de pilotage projet : protocole Codex,
 roadmap macro, backlog actionnable, prochaines actions, index ADR/logs et
@@ -2700,6 +2699,27 @@ automated-validated. Le solve global automatique est supprimé et
 validate_project reste local. Le cycle Calculer / Finaliser / Matérialiser est
 explicite et fail-closed. Le finaliseur conserve le plan certifié sans
 géométrie ni corps automatique. Preuve :
-docs/P64_L03_EXPLICIT_STAGED_CYCLE_EVIDENCE.md. P64-L03V est
-ready-for-human-fusion-check sur 0.1.56. Validations Fusion et impression :
-false ; cas dense inchangé.
+docs/P64_L03_EXPLICIT_STAGED_CYCLE_EVIDENCE.md. La revue P64-L03V devient
+`contextual-KO` sur 0.1.56 ; ADR-0074 porte la correction minimal/final.
+Validations Fusion et impression : false ; cas dense inchangé.
+
+## P64-L03R-A — Contrat minimal/final après KO Fusion (2026-07-21)
+
+Statut : `done-documentation`, `architecture-accepted`. P64-L03V devient
+`contextual-KO` sur 0.1.56.
+
+La revue humaine confirme le retrait du solve automatique et le lifecycle stale,
+mais refuse la géométrie : le solve distribue déjà les surplus X/Y/Z et le
+finaliseur de compatibilité ne transforme rien. Elle signale aussi l'impossibilité
+de mettre normalement à jour une scène après nouveau calcul/finalisation.
+
+ADR-0074 distingue désormais `minimal_layout` et `finalized_plan`. Le plan
+minimal reste à ses enveloppes minimales, classifie le résiduel et peut être
+matérialisé ou exporté avant finition. La recherche cible un portfolio borné de
+graines, ancres et propagations, ordonné par rareté de placement et surfaces de
+support locales. La scène future sera suivie par type et digest exact d'artefact.
+
+Aucun runtime, schéma, solveur, budget, valeur physique, CAD IR ou scène n'est
+modifié par L03R-A. Le cas dense 11 × 34 reste
+`no_solution_within_budget`. P64-L03R-B devient `ready`.
+`fusion-validated: false`, `print-validated: false` pour cette correction.

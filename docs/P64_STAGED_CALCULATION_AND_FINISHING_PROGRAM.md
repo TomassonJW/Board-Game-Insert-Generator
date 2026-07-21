@@ -1,11 +1,13 @@
 # P64-A02 — Programme de calcul étagé et finalisation explicite
 
-Statut : architecture acceptée ; P64-L01, P64-L02 et P64-L03 sont
-implémentés et validés automatiquement au 2026-07-21. Le runtime staged est
-livré ; P64-L03V reste à observer dans Fusion avant toute revendication Fusion.
+Statut : architecture amendée ; P64-L01, P64-L02 et P64-L03 restent validés
+automatiquement pour leurs acquis. P64-L03V est un KO contextuel sur Fusion
+0.1.56. ADR-0074 et P64-L03R-A corrigent la frontière minimal/final sans
+modifier le runtime dans ce lot documentaire.
 
-ADR principale :
-[ADR-0071](DECISIONS/ADR-0071-staged-local-analysis-explicit-solve-and-finalization.md).
+ADR historiques et amendement courant :
+[ADR-0071](DECISIONS/ADR-0071-staged-local-analysis-explicit-solve-and-finalization.md)
+et [ADR-0074](DECISIONS/ADR-0074-minimal-layout-seeds-and-dual-materialization.md).
 ADR liées : ADR-0054, ADR-0056, ADR-0068, ADR-0069 et ADR-0070.
 
 Capability principale : `C-USABILITY`. Capabilities associées : `C-ASSET`,
@@ -13,14 +15,16 @@ Capability principale : `C-USABILITY`. Capabilities associées : `C-ASSET`,
 
 ## 1. Résultat produit attendu
 
-Le parcours cible sépare quatre décisions visibles :
+Le parcours cible sépare le placement minimal de la transformation du résiduel :
 
 ```text
 Éditer
   -> analyser localement
-  -> calculer l'agencement global
-  -> finaliser le volume
-  -> matérialiser dans Fusion
+  -> calculer l'agencement minimal global
+  -> afficher le résiduel sans le distribuer
+       -> matérialiser / exporter les volumes minimaux
+       -> choisir et appliquer une finalisation
+  -> matérialiser / mettre à jour la scène Fusion
 ```
 
 Pendant l'édition, BGIG met à jour les dimensions, erreurs et possibilités du
@@ -29,9 +33,10 @@ peut modifier plusieurs valeurs sans déclencher une succession de recherches
 devenues obsolètes.
 
 Le solveur global utilise ensuite des frontières locales déjà certifiées et
-mises en cache. La finalisation transforme seulement un placement global
-valide. Fusion consomme exclusivement un plan final courant et ne recalcule
-aucune décision.
+mises en cache. Il place exclusivement leurs enveloppes minimales et classifie
+le résiduel. La finalisation optionnelle transforme seulement ce placement
+global valide. Fusion peut consommer le plan minimal ou un plan finalisé courant
+et ne recalcule aucune décision.
 
 ## 2. Non-objectifs immédiats
 
@@ -65,23 +70,26 @@ Collection d'analyses indépendantes :
 Une analyse locale peut être courante pour un conteneur et obsolète pour un
 autre. Le statut dérivé n'est plus seulement un booléen projet.
 
-### `global_layout`
+### `minimal_layout` (`global_layout` historique)
 
 Résultat d'une action explicite `Calculer l'agencement`. Il choisit exactement
-une variante par conteneur, place tous les participants ou rapporte un arrêt
-honnête, puis classifie le résiduel. Il porte un certificat de placement et son
-digest de dépendances.
+une variante minimale par conteneur, place tous les participants ou rapporte un
+arrêt honnête, puis classifie le résiduel sans l'attribuer. Il porte un
+certificat de placement, les digests de dépendances et la provenance de
+recherche multi-graines.
 
 ### `finalized_plan`
 
-Résultat d'une action explicite `Finaliser le volume`. Il applique une politique
-de fermeture, d'harmonisation, de réserve utile ou de cales explicites, puis
-repasse par le validateur commun. Lui seul peut devenir matérialisable.
+Résultat optionnel d'une action explicite `Finaliser le volume`. Il applique une
+politique de fermeture, d'harmonisation, de réserve utile ou de cales explicites,
+puis repasse par le validateur commun. Il référence le `minimal_layout` source
+sans l'écraser.
 
 ### `materialized`
 
-Scène Fusion issue d'un digest précis de `finalized_plan`. Toute mutation source
-ou finalisation différente rend la scène désynchronisée sans la modifier.
+Scène Fusion issue d'un digest précis de `minimal_layout` ou de
+`finalized_plan`. Toute mutation source, nouveau solve ou finalisation différente
+rend la scène désynchronisée sans la modifier.
 
 ## 4. Digests et cache
 
@@ -452,10 +460,12 @@ Fusion non BGIG.
 
 ### P64-L03V — Gate Fusion
 
-- Statut : ready-for-human-fusion-check ; préparation : scripts/fusion/prepare_p64_l03v_explicit_cycle_test.ps1.
-- Observer éditions rapides, analyses locales ciblées, absence de solve global,
-  bouton explicite, résultat obsolète, finalisation et scène inchangée.
-- Cette gate ne valide aucune valeur physique ni impression.
+- Statut : `contextual-KO` sur Fusion 0.1.56.
+- Acquis : éditions rapides, analyses locales ciblées, absence de solve global
+  silencieux, résultat obsolète et scène inchangée avant action.
+- Refus : géométrie déjà étendue pendant `Calculer`, finalisation sans
+  transformation et mise à jour de scène mal détectée.
+- ADR-0074 ouvre L03R-A/B/C/V ; aucune valeur physique ni impression validée.
 
 ### P64-F01/F02/F03
 
@@ -474,7 +484,10 @@ P64-V2H03V retour humain
   -> P45-M001 contrat de disposition
   -> P64-L01
   -> P64-L02
-  -> P64-L03 / L03V
+  -> P64-L03 / L03V contextual-KO
+  -> P64-L03R-A
+  -> P64-L03R-B
+  -> P64-L03R-C / L03R-V
   -> P45/P46 selon contrats
   -> P64-F01
   -> P64-F02
@@ -484,8 +497,9 @@ P64-V2H03V retour humain
 ```
 
 NEXT_ACTIONS.md reste autoritaire. P64-V2H03V et P44-V sont clôturées,
-P64-L01/L02/L03 sont automated-validated et P64-L03V devient la seule gate
-humaine active. Les lots P45/P46 et de finition restent verrouillés.
+P64-L01/L02/L03 restent automated-validated pour leurs acquis, P64-L03V est un
+KO contextuel et P64-L03R-B devient la seule mission `ready`. Les lots P45/P46
+et de finition restent verrouillés.
 
 ## 21. Vérifications minimales futures
 
@@ -512,7 +526,48 @@ humaine active. Les lots P45/P46 et de finition restent verrouillés.
 - limite moteur définitive au top 3 ;
 - score non décomposé ;
 - modification automatique des assets ou cavités ;
-- matérialisation d'un plan seulement placé ;
+- matérialisation d'un placement non certifié ou obsolète ;
+- expansion implicite pendant le calcul du `minimal_layout` ;
+- déclaration de scène courante sans égalité des digests d'artefact ;
 - corps automatique, valeur physique ou forme P45 implicite ;
 - preuve d'impossibilité issue d'un budget heuristique ;
 - revendication Fusion ou impression sans preuve correspondante.
+
+## 23. Amendement P64-L03R-A — plan minimal et recherche multi-graines
+
+ADR-0074 et le contrat
+`docs/P64_L03R_MINIMAL_LAYOUT_AND_MATERIALIZATION_CONTRACT.md` supersèdent les
+clauses qui réservaient la matérialisation au plan finalisé.
+
+`Calculer l'agencement` doit produire un `minimal_layout` certifié sans aucune
+allocation du résiduel sur X, Y ou Z. La recherche compare un portfolio borné de
+modules graines, ancres coin/bord/centre/surface basse et propagations vers
+l'intérieur, le long d'un axe, radialement ou par surface supportée la plus
+basse. L'ordre privilégie la rareté de placement et les pressions d'axe
+normalisées, puis l'empreinte, la hauteur, le volume et des interleavings
+déterministes.
+
+Les couches sont locales : un corps haut peut traverser plusieurs intervalles Z
+à côté de piles fines. Toute pile repasse par le certificat commun de support.
+Le groupe compact est centré dans le domaine admissible après recherche, sauf
+contrainte asymétrique.
+
+Le plan minimal peut être matérialisé et exporté avant finalisation. Une scène
+BGIG est courante seulement si son type d'artefact et ses digests exacts
+correspondent au plan sélectionné. `Mettre à jour la scène` remplace uniquement
+la scène possédée par BGIG après validation du nouvel artefact.
+
+P64-L03V est `contextual-KO` sur 0.1.56. Séquence corrective :
+
+```text
+P64-L03R-A contrat
+  -> P64-L03R-B solveur minimal multi-graines
+  -> P64-L03R-C matérialisation duale et digests de scène
+  -> P64-L03R-V gate Fusion
+  -> P64-F01A02 finalisation simple réelle
+```
+
+Les acquis L03 sur l'absence d'auto-solve, le stale fail-closed, la provenance
+et les budgets restent valides. Le cas dense 11 × 34 reste
+`no_solution_within_budget`. `fusion-validated: false`,
+`print-validated: false` pour la correction.

@@ -968,10 +968,29 @@ Fusion. `print-validated: false`.
 - La frontière Pareto moteur reste complète ; les trois représentants nommés sont une projection UX progressive et non normative.
 - P64-L03 est livré et validé automatiquement ; P64-L03V est la prochaine gate humaine sur le cycle explicite.
 
-## P64-L03 — Cycle global explicite livré (2026-07-21)
+## P64-L03 — Cycle explicite livré puis recadré (2026-07-21)
 
-P64-L03 retire le solve global temporisé et impose calcul, finalisation puis
-matérialisation. L'analyse locale reste réactive et les artefacts obsolètes ne
-sont plus consommables. Le finaliseur actuel est une politique de compatibilité
-sans changement géométrique ; F01/F02/F03 restent verrouillés. P64-L03V devient
-la seule gate active sur 0.1.56.
+P64-L03 retire le solve global temporisé et impose des actions explicites.
+L'analyse locale reste réactive et les artefacts obsolètes ne sont plus
+consommables. La gate 0.1.56 devient toutefois un KO contextuel : le solve
+étend déjà les enveloppes et le finaliseur de compatibilité ne transforme rien.
+ADR-0074 et P64-L03R supersèdent cette sémantique sans retirer les acquis
+d'orchestration. F01/F02/F03 restent verrouillés jusqu'à L03R-V.
+
+## P64-L03R — Correction du cycle minimal/final (2026-07-21)
+
+La gate P64-L03V sur Fusion 0.1.56 est un KO contextuel. L'orchestration
+explicite est conservée, mais la géométrie doit être recadrée : le solve global
+produit d'abord un plan strictement minimal et la finalisation transforme
+seulement ensuite le résiduel.
+
+Trajectoire corrective :
+
+1. L03R-A formalise ADR-0074, l'algorithme multi-graines et les deux artefacts ;
+2. L03R-B implémente le solve minimal par rareté, ancres et couches locales ;
+3. L03R-C autorise la matérialisation minimale et corrige l'identité de scène ;
+4. L03R-V observe le parcours dans Fusion ;
+5. F01A02 implémente ensuite la première vraie transformation de finition.
+
+P45 conserve les variantes/formes locales. P64 conserve placement et certificat
+global. Le cas dense, les valeurs physiques et l'impression restent inchangés.

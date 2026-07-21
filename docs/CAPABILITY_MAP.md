@@ -1494,6 +1494,20 @@ P44-M006 devient ready-for-explicit-go et ne commence pas sans GO explicite.
 C-SOLVER / C-LAYOUT : orchestration staged implémentée sans changement des
 méthodes, budgets ou résultats. C-PROJECT-CONTRACT : état et caches restent
 dérivés hors schéma. C-FUSION-UI : action progressive Calculer / Finaliser /
-Matérialiser, sans scène automatique. C-QUALITY : stale, provenance, clé
-globale complète et refus direct testés. P64-L03V est ready ; aucune capability
-physique n'est promue.
+Matérialiser, sans scène automatique. C-QUALITY : stale, provenance et clé
+globale testés. La revue L03V est ensuite devenue `contextual-KO` sur la
+séparation géométrique minimal/final ; ADR-0074 porte la correction.
+
+## Mise à jour P64-L03R-A — contrat minimal et scène duale
+
+- C-SOLVER / C-LAYOUT : `architecture-accepted` pour un `minimal_layout` sans
+  surplus et un portfolio multi-graines borné par rareté, ancres, propagations,
+  support local, symétrie et progressive widening.
+- C-FUSION-UI : `contracted` pour matérialiser minimal ou finalisé, comparer les
+  digests exacts et remplacer uniquement la scène possédée par BGIG.
+- C-RESULT-TRUTH : le résiduel reste non attribué ; meilleure proposition
+  certifiée dans le budget, jamais optimalité implicite.
+- C-QUALITY : 18 fixtures contractuelles, monotonie, stale, scène et préservation
+  des objets utilisateur.
+- État : aucun runtime promu. P64-L03V contextual-KO ; P64-L03R-B ready.
+  `fusion-validated: false`, `print-validated: false`.

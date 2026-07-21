@@ -865,15 +865,32 @@ par cette gate. `fusion-validated: false`, `print-validated: false`.
 
 ## P64-L03V — Gate Fusion du cycle explicite
 
-Statut : ready-for-human-fusion-check. Aucune revue humaine n'était requise
-avant ou pendant l'intégration automatisée de P64-L03.
+Statut : historique, supersédé par le KO contextuel documenté ci-dessous.
 
-Préparation : scripts/fusion/prepare_p64_l03v_explicit_cycle_test.ps1,
-package 0.1.56 et marqueur du commit installé.
+Le package 0.1.56 avait été préparé pour observer édition locale, actions
+Calculer/Finaliser, stale, absence de scène automatique, focus et diagnostic.
+La revue a ensuite refusé la sémantique géométrique minimal/final.
 
-Observer l'édition locale sans solve, les actions Calculer puis Finaliser,
-le stale et les refus fail-closed, l'absence de scène avant Matérialiser,
-le focus stable et le diagnostic replié.
+`fusion-validated: false`, `print-validated: false`.
 
-Retour : P64-L03V Fusion OK 0.1.56 - commit <sha>, ou KO contextuel.
-fusion-validated: false et print-validated: false jusqu'au retour.
+## P64-L03V — KO contextuel et gate corrective
+
+Statut : `contextual-KO` sur Fusion 0.1.56, retour humain du 2026-07-21.
+
+Observations acquises : l'édition locale ne lance plus le solve global, les
+actions sont explicites, le stale est visible et aucune scène ne change
+automatiquement.
+
+Refus : `Calculer` présente déjà des enveloppes remplies par surplus,
+`Finaliser` conserve cette géométrie sans transformation, la matérialisation
+minimale est interdite et une scène ancienne peut masquer l'action de mise à
+jour après nouveau solve/finalisation.
+
+Effet : aucune preuve `fusion-validated` n'est accordée à P64-L03. ADR-0074 et
+P64-L03R-A sont acceptés comme correction documentaire. La prochaine gate
+humaine sera P64-L03R-V, seulement après L03R-B et L03R-C automatisés.
+
+P64-L03R-V devra observer : volumes minimaux non étendus, résiduel visible,
+matérialisation avant finition, scène stale après édition, remplacement sans
+doublon et objets utilisateur préservés. Elle ne valide ni valeur physique ni
+impression. `print-validated: false`.

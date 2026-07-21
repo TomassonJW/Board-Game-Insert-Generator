@@ -238,3 +238,22 @@ intentionnelle, nommée et certifiée ; elle n'est jamais un résiduel oublié.
 - Toute mutation runtime exige tests purs, DOM, bridge, stale/annulation,
   monotonie, suite complète et gate Fusion P64-L03V.
 - `fusion-validated: false` et `print-validated: false` pour cette trajectoire.
+
+## Amendement P64-L03R-A — supersession partielle par ADR-0074
+
+La revue humaine Fusion 0.1.56 confirme l'intérêt du solve explicite, du stale
+fail-closed et de la séparation des coûts, mais refuse la sémantique géométrique
+livrée : le solve distribue déjà les surplus, tandis que la finalisation de
+compatibilité ne transforme rien.
+
+ADR-0074 supersède donc deux décisions de cette ADR :
+
+- `Calculer l'agencement` produit désormais un `minimal_layout` dont les
+  enveloppes restent minimales et dont le résiduel n'est pas attribué ;
+- un `minimal_layout` courant et certifié peut être matérialisé ou exporté avant
+  finalisation.
+
+La finalisation reste une action distincte et devient optionnelle. Elle seule
+peut transformer le résiduel. Les analyses locales, digests, invalidations,
+budgets monotones, vérité des résultats et absence de scène automatique restent
+normatifs sans changement.

@@ -2562,30 +2562,58 @@ P44-M007 est ready-for-explicit-go.
 ### P64-L03 — Solve global explicite et plan finalisable
 
 - Dépendance : P64-L02.
-- Objectif : remplacer le solve complet réactif par l'action visible Calculer
-  l'agencement, puis séparer le résultat faisable de sa finalisation.
-- Préservation : stage_stack, EMS historique, greedy, beam, portefeuille Auto,
-  H03C, profils d'effort, annulation et no_solution_within_budget.
-- Livrables : action explicite, état stale visible, progressive widening,
-  certificat global, finalization_required et matérialisation désactivée tant
-  que le plan n'est pas finalisé et recertifié.
-- Migration : comportement public changé uniquement avec ADR-0071, tests de
-  compatibilité et gate P64-L03V ; aucune migration destructive.
-- Statut : done-code, implemented-core, implemented-fusion-bridge, implemented-fusion-ui, automated-validated. Preuve : docs/P64_L03_EXPLICIT_STAGED_CYCLE_EVIDENCE.md.
+- Acquis : retrait du solve automatique, action visible, stale fail-closed,
+  provenance, cache borné et actions séparées.
+- Limite révélée : le solve courant distribue déjà les surplus et la finalisation
+  de compatibilité ne transforme rien.
+- Statut : done-code, automated-validated pour l'orchestration ; sémantique
+  minimal/final supersédée par ADR-0074.
 
 ### P64-L03V — Gate Fusion du cycle explicite
 
-- Dépendance : P64-L03 automated-validated.
-- Observations : édition locale rapide, absence de solve global silencieux,
-  bouton primaire clair, focus stable, diagnostic replié, stale honnête,
-  finalisation séparée et aucune scène avant matérialisation.
-- Refus : aucun résultat ancien présenté comme courant, aucun top 3 moteur,
-  aucune allégation physique.
-- Statut : ready-for-human-fusion-check ; package 0.1.56 préparé.
+- Retour humain : KO contextuel sur Fusion 0.1.56.
+- Acquis observés : absence d'auto-solve, actions explicites, stale et scène
+  inchangée avant action.
+- Refus : géométrie déjà étendue, finalisation sans transformation,
+  matérialisation minimale interdite et mise à jour de scène mal détectée.
+- Statut : contextual-KO ; aucune preuve fusion-validated ou print-validated.
+
+### P64-L03R-A — Contrat correctif minimal/final
+
+- Livrables : ADR-0074, contrat exécutable, gate KO et pilotage synchronisé.
+- Décision : `minimal_layout` strict, finition optionnelle, matérialisation
+  minimale, portfolio multi-graines et scène suivie par digest exact.
+- Non-objectifs : runtime, schéma, solveur, valeur physique, CAD IR ou scène.
+- Statut : done-documentation, architecture-accepted.
+
+### P64-L03R-B — Solveur minimal multi-graines
+
+- Dépendance : L03R-A intégré.
+- Objectif : produire le plan global minimal sans surplus, avec rareté de
+  placement, ancres alternatives, surfaces support locales et beam diversifié.
+- Acceptation : fixtures cœur 1 à 10 et 16 à 18, monotonie, suite complète,
+  statut dense honnête et aucune finition/scène.
+- Statut : ready.
+
+### P64-L03R-C — Matérialisation duale et remplacement de scène
+
+- Dépendance : L03R-B.
+- Objectif : matérialiser/exporter minimal ou finalisé, comparer les digests
+  exacts et remplacer uniquement la scène BGIG possédée.
+- Acceptation : tests bridge/DOM/registre, scène stale, aucun doublon et objets
+  utilisateur préservés.
+- Statut : blocked-by-P64-L03R-B.
+
+### P64-L03R-V — Gate Fusion corrective
+
+- Dépendances : L03R-B et L03R-C automated-validated.
+- Observer plan minimal non rempli, matérialisation avant finition, puis
+  recalcul et remplacement sûr de la scène.
+- Statut : future-human-gate, inactive.
 
 ### P64-F01A02 — Finalisation simple autour des enveloppes
 
-- Dépendances : P64-L03V, P45/P46 selon leurs gates.
+- Dépendances : P64-L03R-V positive, P45/P46 selon leurs gates.
 - Objectif : répartir le volume admissible sur les faces extensibles sans
   modifier topologie, cavités, minima, jeux ou pose monde.
 - Acceptation : conservation, déterminisme, certificat de finalisation et

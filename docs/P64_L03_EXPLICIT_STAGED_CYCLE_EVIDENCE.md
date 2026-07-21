@@ -73,3 +73,17 @@ print-validated restent false.
 P64-L03V est la seule prochaine gate. Elle observe dans Fusion l'absence de
 solve silencieux, les trois actions, le stale honnête, le focus stable et
 l'absence de scène avant matérialisation.
+
+## Revue Fusion 0.1.56 et supersession
+
+La revue humaine P64-L03V refuse la sémantique géométrique observée : le solve
+courant distribue déjà les surplus de boîte, tandis que la finalisation de
+compatibilité conserve cette géométrie sans transformation. Elle observe aussi
+qu'un ancien digest peut masquer la nécessité de mettre la scène à jour.
+
+Cette preuve reste valable pour le retrait du solve automatique, l'orchestration
+explicite, le stale fail-closed et les tests automatisés. Elle ne prouve pas la
+séparation minimal/final et ne constitue aucune validation Fusion.
+
+ADR-0074 et le contrat P64-L03R supersèdent ces limites. P64-L03V est
+`contextual-KO`; `fusion-validated: false`, `print-validated: false`.

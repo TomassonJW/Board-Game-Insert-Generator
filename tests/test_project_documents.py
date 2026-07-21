@@ -50,6 +50,8 @@ REQUIRED_PROJECT_FILES = (
     "docs/DECISIONS/ADR-0071-staged-local-analysis-explicit-solve-and-finalization.md",
     "docs/DECISIONS/ADR-0072-post-solve-capacity-maps-and-bounded-reuse.md",
     "docs/DECISIONS/ADR-0073-locked-asset-pose-and-local-arrangement-intents.md",
+    "docs/DECISIONS/ADR-0074-minimal-layout-seeds-and-dual-materialization.md",
+    "docs/P64_L03R_MINIMAL_LAYOUT_AND_MATERIALIZATION_CONTRACT.md",
     "docs/DECISIONS/ADR-TEMPLATE.md",
     "docs/DECISIONS/ADR-0061-post-mvp-sequencing-and-complement-quarantine.md",
     "docs/DECISIONS/ADR-0012-capability-driven-product-pilotage.md",
@@ -227,7 +229,18 @@ REQUIRED_SECTIONS = {
         "## Limites",
         "## Suite",
     ),
-    "docs/P64_POST_SOLVE_CAPACITY_REUSE_CONTRACT.md": (
+    "docs/P64_L03R_MINIMAL_LAYOUT_AND_MATERIALIZATION_CONTRACT.md": (
+        "## 1. Résultat produit attendu",
+        "## 4. Invariant géométrique du `minimal_layout`",
+        "## 6. Portfolio de graines déterministes",
+        "## 9. Couches locales, skyline et support",
+        "## 11. Progressive widening et budgets",
+        "## 15. Matérialisation minimale",
+        "## 17. Identité et remplacement de scène Fusion",
+        "## 19. Fixtures automatisées obligatoires",
+        "## 20. Découpage de livraison",
+        "## 22. Hors scope absolu",
+    ),    "docs/P64_POST_SOLVE_CAPACITY_REUSE_CONTRACT.md": (
         "## 1. Objectif et promesse honnête",
         "## 2. Vocabulaire normatif",
         "## 9. Mémoire courte et invalidation",
@@ -275,7 +288,15 @@ REQUIRED_SECTIONS = {
         "## Alternatives refusées",
         "## Suivi",
     ),
-    "docs/P64_H04_OBSERVABILITY_AND_RESULT_TRUTH_CONTRACT.md": (
+    "docs/DECISIONS/ADR-0074-minimal-layout-seeds-and-dual-materialization.md": (
+        "## Statut",
+        "## Contexte",
+        "## Options",
+        "## Décision",
+        "## Conséquences",
+        "## Alternatives refusées",
+        "## Suivi",
+    ),    "docs/P64_H04_OBSERVABILITY_AND_RESULT_TRUTH_CONTRACT.md": (
         "## 1. Objectif",
         "## 3. Livrables obligatoires",
         "## 7. Non-objectifs absolus",

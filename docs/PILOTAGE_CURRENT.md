@@ -43,7 +43,11 @@ preuves archivées.
 - Le cas dense 11 × 34 reste honnêtement `no_solution_within_budget` ; la gate
   ne le déclare ni soluble ni impossible.
 - P44-V est fusion-validated avec réserve de charge ; P45-M001V est acceptée ;
-  P64-L01, P64-L02 et P64-L03 sont automated-validated ; P64-L03V devient ready-for-human-fusion-check.
+  P64-L01, P64-L02 et P64-L03 restent automated-validated pour leurs acquis.
+- P64-L03V est un KO contextuel 0.1.56 : expansion déjà réalisée au solve,
+  finalisation sans transformation et mise à jour de scène mal détectée.
+- ADR-0074 et P64-L03R-A sont architecture-accepted ; P64-L03R-B devient la
+  seule prochaine mission runtime.
 
 ## Vue de séquence
 
@@ -70,8 +74,10 @@ preuves archivées.
 | Terminé — décision | P45-M001V | Contrat accepté avec Pile / Basculer unifiés ; aucun runtime. |
 | Terminé — automatisé | P64-L01 | États, digests, invalidation ciblée, cache borné et stale fail-closed. |
 | Terminé — automatisé | P64-L02 | Annotations contextuelles, sous-scores, Pareto et résumé progressif non normatif. |
-| Terminé — automatisé | P64-L03 | Solve global explicite, finalisation staged et matérialisation séparée. |
-| Ready — gate Fusion | P64-L03V | Vérifier le cycle explicite dans Fusion 0.1.56. |
+| Terminé — automatisé, sémantique à corriger | P64-L03 | Solve explicite et stale acquis ; géométrie minimal/final supersédée par ADR-0074. |
+| KO contextuel | P64-L03V | Fusion 0.1.56 révèle expansion au solve et scène non réactivable normalement. |
+| Terminé — contrat | P64-L03R-A | ADR-0074 et contrat minimal/matérialisation duale acceptés. |
+| Ready — runtime cœur | P64-L03R-B | Solve minimal multi-graines, sans finition ni scène. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -87,6 +93,9 @@ preuves archivées.
 - P64_L01_INCREMENTAL_STATE_EVIDENCE.md : identités, cache et invalidation.
 - P64_L02_CONTEXTUAL_LOCAL_ANALYSIS_EVIDENCE.md : annotations, scores, Pareto,
   résumé progressif et absence de solve global.
+- P64_L03R_MINIMAL_LAYOUT_AND_MATERIALIZATION_CONTRACT.md : invariant minimal,
+  portfolio multi-graines, matérialisation duale et remplacement de scène.
+- ADR-0074 : supersession partielle d'ADR-0071 après le KO Fusion 0.1.56.
 - STATUS.md : faits réalisés, validations et limites.
 - CAPABILITY_MAP.md : capability et niveau de preuve.
 - ROADMAP.md : trajectoire et verrouillage de version.
@@ -150,9 +159,10 @@ commun aux cartes et aux autres assets ; seul le sleeving reste spécialisé. Le
 côté choisi est le côté d'appui, Z ne change jamais sans action explicite, P45
 certifie les variantes locales et P64 choisit globalement.
 
-P64-L01, P64-L02 et P64-L03 sont `implemented-core` et `automated-validated`.
-P64-L03V devient la seule gate `ready-for-human-fusion-check`. Tout runtime ou schéma P45 reste
-bloqué jusqu'à son contrat additif. Aucune valeur physique ou scène n'est modifiée.
+P64-L01, P64-L02 et P64-L03 sont `implemented-core` et `automated-validated`
+pour leurs acquis. P64-L03V, préparée ensuite, est désormais un KO contextuel ;
+ADR-0074 et P64-L03R-A portent la correction. Tout runtime ou schéma P45 reste
+bloqué jusqu'à son contrat additif. Aucune valeur physique n'est modifiée.
 
 ## P64-L01 — état incrémental automatisé
 
@@ -164,8 +174,9 @@ l'état courant.
 
 La preuve automatisée L01 couvre 16 fixtures ciblées, un corpus de cinquante
 conteneurs et la parité de dérivation. L02 ajoute l'analyse contextuelle locale et
-le résumé progressif sans modifier le solveur public. P64-L03 est automated-validated ; P64-L03V est `ready-for-human-fusion-check` ;
-aucune preuve Fusion ou impression n'est revendiquée.
+le résumé progressif sans modifier le solveur public. P64-L03 reste
+automated-validated pour l'orchestration ; L03V est désormais un KO contextuel.
+Aucune preuve Fusion ou impression n'est revendiquée pour la correction.
 
 ## P64-L02 — analyse contextuelle automatisée
 
@@ -182,5 +193,23 @@ Le timer global est retiré. La palette impose Calculer, Finaliser, puis
 Matérialiser. Le cœur conserve provenance, cache borné, stale et raisons
 d'arrêt. La finalisation de compatibilité ne change aucune géométrie.
 Preuve : docs/P64_L03_EXPLICIT_STAGED_CYCLE_EVIDENCE.md.
-P64-L03V est ready-for-human-fusion-check ; validations Fusion et impression
-restent false.
+P64-L03V est ensuite devenue `contextual-KO` ; ADR-0074 supersède la sémantique
+minimal/final. Les validations Fusion et impression restent false.
+
+## P64-L03R-A — recadrage minimal/final (2026-07-21)
+
+La revue humaine du package 0.1.56 clôt P64-L03V en KO contextuel. Le cycle
+explicite et l'absence d'auto-solve restent acquis, mais le solve global courant
+distribue déjà les surplus et la finalisation de compatibilité ne transforme
+pas la géométrie. L'UI peut aussi confondre un ancien digest matérialisé avec le
+nouvel artefact courant.
+
+ADR-0074 et le contrat P64-L03R imposent un `minimal_layout` sans surplus, une
+recherche bornée multi-graines par rareté de placement, des couches de support
+locales, puis deux branches : matérialiser minimal ou finaliser. Une scène BGIG
+est courante seulement par égalité des digests exacts.
+
+P64-L03R-A est done-documentation et architecture-accepted. P64-L03R-B est la
+seule prochaine mission. Aucun runtime, schéma, valeur physique, CAD IR ou
+scène n'est modifié par A. `fusion-validated: false`,
+`print-validated: false` pour la correction.

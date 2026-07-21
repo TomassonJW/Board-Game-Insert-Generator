@@ -213,3 +213,7 @@ Tests, cartes backlog ou gates humaines a preparer.
 - ADR-0073-locked-asset-pose-and-local-arrangement-intents.md - décision
   P45-M001V acceptée : `Pile` / `Basculer` unifiés, pose verticale verrouillée,
   intentions locales certifiées et sélection globale conservée par P64.
+
+- ADR-0074-minimal-layout-seeds-and-dual-materialization.md - plan global
+  strictement minimal, portfolio déterministe de graines/ancres/propagations,
+  matérialisation minimale avant finition et identité exacte de scène Fusion.
