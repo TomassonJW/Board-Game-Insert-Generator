@@ -2756,3 +2756,18 @@ P44-M007 est ready-for-explicit-go.
 - Livre : preflight pur local-reuse/fallback, fixture portable, installation et reglages de palette controles, checklist humaine.
 - Validation : 650/650 tests complets ; gate Fusion toujours en attente.
 - Statut : ready-human-gate, fusion-validated: false, print-validated: false.
+
+### P64-L04R1 — cache négatif et temps honnêtes
+
+- Livré : cache limité aux plans certifiés ; échecs recalculés sur chaque action explicite.
+- Livré : temps de recherche initiale et restitution cache distincts du staged au DOM.
+- Preuve : docs/P64_L04R1_NEGATIVE_CACHE_EVIDENCE.md, 651/651 tests.
+- Statut : done-code, automated-validated, fusion-validated: false,
+  print-validated: false.
+
+### Programme P64-L05 accepté
+
+Ordre autorisé : L05A insertion de nouveau conteneur à voisins figés ; L05B
+SolverCaseBundle et bouton DEV ; L05C plan-witness persistant et warm start ;
+L05D corpus, optimisation des lanes et benchmarks. Une seule mission est
+implémentée et intégrée à la fois.

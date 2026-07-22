@@ -347,3 +347,13 @@ Le preflight couvre une reussite locale sans solveur global et un fallback expli
 La promotion Fusion reste humaine ; print-validated: false.
 
 Preuves : P64_L04V_FUSION_GATE_CHECKLIST.md et P64_L04V_FUSION_GATE_PREPARATION_EVIDENCE.md.
+
+## P64-L04R1 — cache négatif corrigé (2026-07-22)
+
+Le retour L04V est partiellement positif : l'insertion d'asset dans un conteneur
+existant fonctionne, mais l'ajout d'un nouveau conteneur dans le vide global et
+la reconstruction depuis zéro restent KO. R1 supprime la réutilisation des
+échecs par le cache et distingue temps de recherche initiale et restitution d'un
+succès certifié. Validation automatisée : 651/651. L05A devient la prochaine
+mission du programme correctif accepté ; fusion-validated: false,
+print-validated: false.

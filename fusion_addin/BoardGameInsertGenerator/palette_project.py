@@ -172,12 +172,36 @@ def _finish_bridge_operation(
     )
 
     succeeded = response.get("status") == "ready"
-    return finish_operation_activity(
+    terminal = finish_operation_activity(
         activity,
         finished_at_ms=_now_ms(),
         succeeded=succeeded,
         stop_reason=_operation_stop_reason(action, response),
     )
+    result_timing = _calculation_result_timing(action, response)
+    if result_timing is not None:
+        terminal["result_timing"] = result_timing
+    return terminal
+
+
+def _calculation_result_timing(
+    action: str,
+    response: dict[str, object],
+) -> dict[str, object] | None:
+    if action != "solve_project":
+        return None
+    staged = response.get("staged_calculation")
+    if not isinstance(staged, dict):
+        return None
+    minimal = staged.get("minimal_layout") or staged.get("global_layout")
+    if not isinstance(minimal, dict):
+        return None
+    timing = minimal.get("calculation_timing")
+    if not isinstance(timing, dict):
+        return None
+    if timing.get("schema_version") != "bgig.calculation_timing.v1":
+        return None
+    return deepcopy(timing)
 
 
 def _operation_stop_reason(action: str, response: dict[str, object]) -> str:

@@ -1004,3 +1004,17 @@ Cette gate ne valide ni valeur physique, ni imprimabilité, ni impression réell
 ### Mise a jour P64-L04V preparation (2026-07-22)
 
 Statut : preparation automatisee validee, ready-human-gate. Le preparateur, la baseline portable et la checklist sont versionnes ; la preuve hors Fusion est docs/P64_L04V_FUSION_GATE_PREPARATION_EVIDENCE.md. Installation reelle et observation visuelle restent humaines.
+
+## Retour P64-L04V — gate globalement KO (2026-07-22)
+
+Observation humaine réelle sur « Mon insert » :
+
+- positif : ajout d'assets dans le volume libre d'un conteneur existant ;
+- positif partiel : Approfondi conserve le résultat Normal lorsqu'un incumbent existe ;
+- KO : aucun chemin incrémental pour un nouveau conteneur dans le vide global ;
+- KO : un plan certifié matérialisé n'est pas reconstructible depuis zéro ;
+- KO UX/correctness : un échec Approfondi pouvait être restitué du cache en 0 s.
+
+R1 corrige automatiquement le dernier point, sans observation Fusion nouvelle.
+Les autres KO ouvrent L05A à L05D. P64-L04 n'est pas promu
+fusion-validated ; print-validated: false.

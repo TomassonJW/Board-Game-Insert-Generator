@@ -126,10 +126,15 @@ class StagedCalculationTests(unittest.TestCase):
         self.assertEqual(cad["artifact_identity"]["artifact_kind"], ARTIFACT_KIND_MINIMAL)
         self.assertFalse(cad["partition"]["invariants"]["residual_distributed"])
 
-    def test_identical_explicit_calculation_reuses_the_complete_global_key(self) -> None:
+    def test_identical_explicit_calculation_reuses_only_a_certified_plan(self) -> None:
         project = _project()
         engine = _engine(project)
-        session = StagedCalculationSession(project, solver_settings=SETTINGS)
+        clock = iter((100, 350, 1_000, 1_004))
+        session = StagedCalculationSession(
+            project,
+            solver_settings=SETTINGS,
+            monotonic_ms=lambda: next(clock),
+        )
         _synchronize(session, project, engine)
         calls = 0
 
@@ -148,7 +153,27 @@ class StagedCalculationTests(unittest.TestCase):
 
         self.assertEqual(calls, 1)
         self.assertEqual(first["partition"]["plan_digest"], second["partition"]["plan_digest"])
-        self.assertEqual(second["staged_calculation"]["minimal_layout"]["cache_status"], "hit")
+        first_minimal = first["staged_calculation"]["minimal_layout"]
+        second_minimal = second["staged_calculation"]["minimal_layout"]
+        self.assertEqual(first_minimal["cache_write_status"], "stored_certified")
+        self.assertEqual(first_minimal["calculation_timing"]["result_source"], "fresh_search")
+        self.assertEqual(first_minimal["calculation_timing"]["search_elapsed_ms"], 250)
+        self.assertEqual(
+            first_minimal["calculation_timing"]["retrieval_elapsed_ms"],
+            "not_applicable",
+        )
+        self.assertEqual(second_minimal["cache_status"], "hit")
+        self.assertEqual(second_minimal["cache_write_status"], "reused_certified")
+        self.assertEqual(
+            second_minimal["calculation_timing"],
+            {
+                "schema_version": "bgig.calculation_timing.v1",
+                "result_source": "certified_cache",
+                "search_elapsed_ms": 250,
+                "request_elapsed_ms": 4,
+                "retrieval_elapsed_ms": 4,
+            },
+        )
         self.assertEqual(
             second["solver_result"]["telemetry"]["request"],
             {"id": "solve-2", "revision": 2},
@@ -157,6 +182,62 @@ class StagedCalculationTests(unittest.TestCase):
             second["solver_result"]["telemetry"]["request_scope"],
             "staged_action",
         )
+
+    def test_negative_result_is_observed_but_never_satisfies_a_new_explicit_run(self) -> None:
+        project = _project()
+        engine = _engine(project)
+        clock = iter((0, 8_000, 9_000, 17_000))
+        session = StagedCalculationSession(
+            project,
+            solver_settings=SETTINGS,
+            monotonic_ms=lambda: next(clock),
+        )
+        _synchronize(session, project, engine)
+        calls = 0
+
+        def failing_solver(_raw_project: object, **_kwargs: object) -> dict[str, object]:
+            nonlocal calls
+            calls += 1
+            return {
+                "plan_digest": canonical_digest({"negative_attempt": calls}),
+                "summary": {
+                    "status": "not_constructed",
+                    "placement_certified": False,
+                },
+                "minimal_layout": {
+                    "artifact_kind": "minimal_layout",
+                    "finalization_applied": False,
+                    "global_certificate": {"certified": False},
+                },
+                "solver": {
+                    "result": {"status": "no_solution_within_budget"},
+                    "telemetry": {"stop_reason": "test_budget_exhausted"},
+                },
+            }
+
+        first = session.calculate_layout(
+            request_id="negative-1",
+            request_revision=0,
+            solver=failing_solver,
+        )
+        second = session.calculate_layout(
+            request_id="negative-2",
+            request_revision=0,
+            solver=failing_solver,
+        )
+
+        self.assertEqual(calls, 2)
+        for result in (first, second):
+            minimal = result["staged_calculation"]["minimal_layout"]
+            self.assertEqual(minimal["cache_status"], "miss")
+            self.assertEqual(minimal["cache_write_status"], "skipped_non_certified")
+            self.assertEqual(minimal["calculation_timing"]["result_source"], "fresh_search")
+            self.assertEqual(minimal["calculation_timing"]["search_elapsed_ms"], 8_000)
+            self.assertEqual(
+                minimal["calculation_timing"]["retrieval_elapsed_ms"],
+                "not_applicable",
+            )
+        self.assertEqual(second["staged_calculation"]["cache"]["current_entries"], 0)
 
     def test_mutation_during_global_run_is_rejected_as_stale(self) -> None:
         project = _project()

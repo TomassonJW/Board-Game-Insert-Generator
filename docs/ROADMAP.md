@@ -1075,3 +1075,11 @@ Fusion ou impression n'est revendiquée.
 ## P64-L04V preparation automatisee (2026-07-22)
 
 La gate combinee dispose maintenant dun preflight reproductible, dun fixture portable et dune checklist. Le package reste 0.1.58. La suite complete 650/650 valide la preparation hors Fusion ; aucune observation Fusion ou impression nest revendiquee.
+
+## P64-L04R1 — intégrité du cache (2026-07-22)
+
+R1 réserve le cache staged aux plans certifiés et sépare les temps de recherche
+et de restitution. La suite complète passe 651/651. Le retour L04V reste
+globalement KO et ouvre le programme L05A à L05D accepté : insertion de nouveau
+conteneur, capture de cas solveur, plan-witness/warm start, puis optimisation sur
+corpus. Aucun budget ou solveur n'est modifié dans R1.

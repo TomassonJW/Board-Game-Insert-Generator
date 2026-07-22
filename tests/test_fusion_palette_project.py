@@ -319,6 +319,7 @@ class FusionPaletteProjectTests(unittest.TestCase):
         project_before = deepcopy(project)
         with tempfile.TemporaryDirectory() as temp_dir, patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}):
             response = handle_palette_request(request("solve_project", project=project), ADDIN, ROOT)
+            cached = handle_palette_request(request("solve_project", project=project), ADDIN, ROOT)
         self.assertEqual(project, project_before)
         self.assertEqual(response["partition"]["summary"]["status"], "constructed")
         self.assertEqual(response["partition"]["summary"]["automatic_body_count"], 0)
@@ -350,6 +351,22 @@ class FusionPaletteProjectTests(unittest.TestCase):
         )
         self.assertFalse(response["partition"]["invariants"]["residual_distributed"])
         self.assertFalse(response["saved"])
+        self.assertEqual(
+            response["operation_activity"]["result_timing"]["result_source"],
+            "fresh_search",
+        )
+        self.assertEqual(
+            cached["operation_activity"]["result_timing"]["result_source"],
+            "certified_cache",
+        )
+        self.assertEqual(
+            cached["operation_activity"]["result_timing"]["search_elapsed_ms"],
+            response["operation_activity"]["result_timing"]["search_elapsed_ms"],
+        )
+        self.assertIsInstance(
+            cached["operation_activity"]["result_timing"]["retrieval_elapsed_ms"],
+            int,
+        )
 
     def test_materialize_and_regenerate_return_the_same_explicit_minimal_plan(self) -> None:
         project = blank_project_v1()

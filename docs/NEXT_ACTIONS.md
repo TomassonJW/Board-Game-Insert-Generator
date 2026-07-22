@@ -92,3 +92,15 @@ Une gate Fusion ne vaut jamais impression.
 
 Le preparateur versionne scripts/fusion/prepare_p64_l04v_gate.ps1, le fixture portable et la checklist sont prets. Executer le preparateur depuis le commit integre, puis collecter le retour humain defini par docs/P64_L04V_FUSION_GATE_CHECKLIST.md.
 Aucune promotion fusion-validated ne precede cette observation ; print-validated: false.
+
+## Mise à jour après P64-L04R1 (2026-07-22)
+
+P64-L04R1 est automated-validated : un échec ne satisfait plus une nouvelle
+action explicite et seuls les plans certifiés sont réutilisés. La palette
+distingue calcul frais, recherche initiale et restitution cache.
+
+Prochaine mission unique : P64-L05A, insertion d'un nouveau conteneur dans le
+vide global d'un plan minimal certifié avec voisins figés et recertification
+complète. Le lot doit commencer par une ADR, car ADR-0075 exclut actuellement ce
+comportement. L05B/L05C/L05D restent ensuite autorisés et ordonnés. Aucune gate
+Fusion ni impression n'est revendiquée par R1.

@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from dataclasses import dataclass
+import time
 from typing import Callable, Mapping, Sequence
 
 from board_game_insert_generator.incremental_project_state import (
@@ -41,6 +42,8 @@ from board_game_insert_generator.solver_settings import normalize_solver_setting
 
 STAGED_CALCULATION_SCHEMA_V1 = "bgig.staged_calculation.v1"
 GLOBAL_LAYOUT_ARTIFACT_SCHEMA_V1 = "bgig.minimal_layout_artifact.v1"
+CACHED_MINIMAL_LAYOUT_SCHEMA_V1 = "bgig.cached_minimal_layout.v1"
+CALCULATION_TIMING_SCHEMA_V1 = "bgig.calculation_timing.v1"
 FINALIZED_PLAN_ARTIFACT_SCHEMA_V1 = "bgig.finalized_plan_artifact.v1"
 ARTIFACT_SELECTION_SCHEMA_V1 = "bgig.materializable_artifact_selection.v1"
 SCENE_ARTIFACT_IDENTITY_SCHEMA_V1 = "bgig.scene_artifact_identity.v1"
@@ -84,12 +87,14 @@ class StagedCalculationSession:
         *,
         solver_settings: Mapping[str, object] | None = None,
         cache_entries: int = 16,
+        monotonic_ms: Callable[[], int] | None = None,
     ) -> None:
         self.state = IncrementalProjectState(raw_project)
         self.cache = BoundedArtifactCache(cache_entries)
         self._project = normalize_project_draft(raw_project).project
         self._settings = normalize_solver_settings(solver_settings or {})
         self._settings_digest = canonical_digest(self._settings)
+        self._monotonic_ms = monotonic_ms or _system_monotonic_ms
         self._local_analysis: dict[str, object] = {}
         self._local_analysis_digest = canonical_digest({"status": "not_available"})
         self._container_frontiers: tuple[object, ...] = ()
@@ -101,6 +106,11 @@ class StagedCalculationSession:
         self._global_artifact_digest = ""
         self._global_key_digest = ""
         self._global_cache_status = "not_queried"
+        self._global_cache_write_status = "not_attempted"
+        self._global_result_source = "not_available"
+        self._global_search_elapsed_ms: int | str = "not_applicable"
+        self._global_request_elapsed_ms: int | str = "not_applicable"
+        self._global_retrieval_elapsed_ms: int | str = "not_applicable"
         self._global_request_id = ""
         self._global_stop_reason = "not_started"
         self._local_reuse = empty_local_reuse_report()
@@ -215,6 +225,11 @@ class StagedCalculationSession:
                 self._global_artifact_digest = artifact_digest
                 self._global_key_digest = key.digest
                 self._global_cache_status = "local_reuse_not_cached"
+                self._global_cache_write_status = "not_applicable"
+                self._global_result_source = "local_reuse"
+                self._global_search_elapsed_ms = "not_applicable"
+                self._global_request_elapsed_ms = "not_applicable"
+                self._global_retrieval_elapsed_ms = "not_applicable"
                 self._global_request_id = (
                     f"local-reuse-revision-{self.state.source_revision}"
                 )
@@ -254,16 +269,29 @@ class StagedCalculationSession:
         request_revision: int | None,
         solver: SolverCallable | None = None,
     ) -> dict[str, object]:
-        """Run or reuse one explicitly requested minimal global layout."""
+        """Run explicitly, or reuse only one certified minimal layout."""
 
+        request_started_ms = self._monotonic_ms()
         key = self._global_layout_key()
         token = self._begin_global_request(key)
         lookup = self.cache.lookup(key)
         if lookup.status == "hit":
-            if not isinstance(lookup.value, dict):
+            cached = _mapping(lookup.value)
+            if cached.get("schema_version") != CACHED_MINIMAL_LAYOUT_SCHEMA_V1:
+                raise TypeError("Cached minimal layout has an unexpected schema.")
+            cached_partition = cached.get("partition")
+            if not isinstance(cached_partition, dict):
                 raise TypeError("Cached minimal layout has an unexpected type.")
-            partition = deepcopy(lookup.value)
+            partition = deepcopy(cached_partition)
             artifact_digest = lookup.artifact_digest or ""
+            search_elapsed_ms = _non_negative_timing(
+                cached.get("search_elapsed_ms"),
+                "cached search_elapsed_ms",
+            )
+            request_elapsed_ms = max(0, self._monotonic_ms() - request_started_ms)
+            retrieval_elapsed_ms: int | str = request_elapsed_ms
+            result_source = "certified_cache"
+            cache_write_status = "reused_certified"
         else:
             if solver is None:
                 from board_game_insert_generator.minimal_layout_solver import (
@@ -297,6 +325,11 @@ class StagedCalculationSession:
                     "partition": partition,
                 }
             )
+            request_elapsed_ms = max(0, self._monotonic_ms() - request_started_ms)
+            search_elapsed_ms = request_elapsed_ms
+            retrieval_elapsed_ms = "not_applicable"
+            result_source = "fresh_search"
+            cache_write_status = "not_attempted"
 
         if not self._accept_global_request(token):
             self._global_stop_reason = "dependencies_changed_during_global_run"
@@ -311,13 +344,30 @@ class StagedCalculationSession:
             }
 
         if lookup.status != "hit":
-            self.cache.put(key, artifact_digest, partition)
+            if _minimal_placement_certified(partition):
+                self.cache.put(
+                    key,
+                    artifact_digest,
+                    {
+                        "schema_version": CACHED_MINIMAL_LAYOUT_SCHEMA_V1,
+                        "partition": deepcopy(partition),
+                        "search_elapsed_ms": search_elapsed_ms,
+                    },
+                )
+                cache_write_status = "stored_certified"
+            else:
+                cache_write_status = "skipped_non_certified"
         self.state.mark_lifecycle_current(STAGE_GLOBAL_LAYOUT, artifact_digest)
         self._global_status = STATUS_CURRENT
         self._global_partition = deepcopy(partition)
         self._global_artifact_digest = artifact_digest
         self._global_key_digest = key.digest
         self._global_cache_status = lookup.status
+        self._global_cache_write_status = cache_write_status
+        self._global_result_source = result_source
+        self._global_search_elapsed_ms = search_elapsed_ms
+        self._global_request_elapsed_ms = request_elapsed_ms
+        self._global_retrieval_elapsed_ms = retrieval_elapsed_ms
         self._global_request_id = request_id
         self._global_stop_reason = _solver_stop_reason(partition)
         if self._finalized_partition is not None:
@@ -523,6 +573,14 @@ class StagedCalculationSession:
             "key_digest": self._global_key_digest,
             "request_id": self._global_request_id,
             "cache_status": self._global_cache_status,
+            "cache_write_status": self._global_cache_write_status,
+            "calculation_timing": {
+                "schema_version": CALCULATION_TIMING_SCHEMA_V1,
+                "result_source": self._global_result_source,
+                "search_elapsed_ms": self._global_search_elapsed_ms,
+                "request_elapsed_ms": self._global_request_elapsed_ms,
+                "retrieval_elapsed_ms": self._global_retrieval_elapsed_ms,
+            },
             "solver_result_status": _solver_status(self._global_partition),
             "stop_reason": self._global_stop_reason,
             "placement_certified": minimal_current,
@@ -821,6 +879,16 @@ def _mapping(value: object) -> dict[str, object]:
     if not isinstance(value, Mapping):
         raise TypeError("Staged calculation value must be a mapping.")
     return dict(value)
+
+
+def _system_monotonic_ms() -> int:
+    return time.monotonic_ns() // 1_000_000
+
+
+def _non_negative_timing(value: object, field: str) -> int:
+    if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+        raise TypeError(f"{field} must be a non-negative integer.")
+    return value
 
 
 def _mappings(value: object) -> list[dict[str, object]]:

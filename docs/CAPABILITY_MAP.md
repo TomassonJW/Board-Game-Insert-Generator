@@ -1611,3 +1611,13 @@ séparation géométrique minimal/final ; ADR-0074 porte la correction.
 
 - C-FUSION-UI / C-LAYOUT : preflight et fixture de gate automated-validated ; le prepareur ne lance aucun solve global, finaliseur ou remplacement de scene.
 - Statut : ready-human-gate, fusion-validated: false, print-validated: false. La promotion depend seulement du retour humain L04V.
+
+## Mise à jour P64-L04R1 — cache négatif
+
+- C-LAYOUT / C-USABILITY : un résultat négatif n'est plus un artefact de cache
+  réutilisable ; une nouvelle action explicite relance la recherche.
+- C-FUSION-UI : calcul frais, recherche initiale et restitution cache sont
+  distingués sans faux pourcentage.
+- Aucun gain de capacité du solveur n'est revendiqué. L05A porte l'insertion
+  incrémentale d'un nouveau conteneur.
+- Statut : automated-validated, fusion-validated: false, print-validated: false.

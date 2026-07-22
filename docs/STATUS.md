@@ -2882,3 +2882,15 @@ Preuve : docs/P64_L04C_OPERATION_ACTIVITY_EVIDENCE.md.
 Statut : automated-validated, ready-human-gate ; fusion-validated: false, print-validated: false.
 Le preparateur lance le preflight pur, genere une baseline portable, verifie les marqueurs add-in et palette, puis fournit les actions humaines restantes. Validations : 2/2 preflight, 92 tests cibles via dry-run, Ruff cible, py_compile et 650/650 tests complets en 150,672 s.
 Preuve : docs/P64_L04V_FUSION_GATE_PREPARATION_EVIDENCE.md.
+
+## P64-L04R1 — cache négatif et temps distincts (2026-07-22)
+
+Statut : implemented-core, implemented-fusion-bridge, implemented-fusion-ui,
+automated-validated ; fusion-validated: false, print-validated: false.
+
+Seuls les plans minimaux certifiés sont mis en cache. Une action explicite après
+no_solution_within_budget relance le solveur. Le staged, le bridge et la palette
+transportent séparément search_elapsed_ms et retrieval_elapsed_ms.
+Validation : 11/11 staged, 24/24 bridge, 35/35 DOM, Ruff, py_compile,
+JavaScript et 651/651 suite complète. Preuve :
+docs/P64_L04R1_NEGATIVE_CACHE_EVIDENCE.md.
