@@ -2837,12 +2837,21 @@ implémentée et intégrée à la fois.
 
 ### P64-L05V-A - preparation de gate Fusion
 
-- Statut : ready.
+- Statut : done, automated-validated, ready-human-gate.
 - Dependances obtenues : P64-L05A/B/C/D automated-validated.
 - Scope : checklist, package courant, installation locale verifiee et settings
   necessaires a la capture.
 - Gate humaine : insertion globale, witness persistant, bouton DEV sans effet
   metier et export d'un SolverCaseBundle reel.
 - Sortie : retour Fusion contextualise et bundle local ; aucune promotion
+  automatique dans le corpus.
+- print-validated reste false.
+
+### P64-L05V - observation Fusion et capture reelle
+
+- Statut : ready-human-gate.
+- Preparation : add-in 0.1.58 commit 261f7cc et fixture installes localement.
+- Humain : observer insertion globale, witness, activite et capture DEV.
+- Sortie : OK ou KO contextuel ; bundle conserve localement, sans promotion
   automatique dans le corpus.
 - print-validated reste false.

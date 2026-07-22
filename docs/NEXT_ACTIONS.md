@@ -55,36 +55,24 @@ Preuve L05D1 : P64_L05D1_SOLVER_CORPUS_EVIDENCE.md.
 
 ## Prochaine action recommandée
 
-### P64-L05V-A - preparer la gate Fusion et la capture reelle
+### P64-L05V - observation Fusion et capture du premier cas reel
 
-Type : preparation automatisee puis gate humaine.
+Type : gate humaine preparee.
 
-Objectif : installer un package Fusion issu du commit integre, faire observer
-L05A/B/C/D dans le projet reel et recuperer un premier SolverCaseBundle explicite
-sans auto-apprentissage.
+Le package 0.1.58 du commit 261f7cc est installe localement. La fixture
+p64-l05v-global-void-baseline.bgig.json est prete dans Documents/BGIG/projects.
 
-Codex doit d'abord :
+Thomas suit uniquement docs/P64_L05V_FUSION_GATE_CHECKLIST.md dans Fusion :
 
-1. cadrer la checklist L05V et les marqueurs exacts du package ;
-2. preparer et installer l'add-in courant lorsque l'environnement le permet ;
-3. verifier localement les fichiers installes et les settings de la palette ;
-4. fournir a Thomas uniquement les actions restantes dans Fusion.
+1. calculer et materialiser la fixture ;
+2. ajouter le petit nouveau conteneur ;
+3. verifier insertion globale ou fallback honnete ;
+4. observer le witness apres changement d'effort ;
+5. capturer le bundle avec le bouton DEV ;
+6. renvoyer OK ou KO contextuel avec les faits visibles.
 
-Thomas observe ensuite :
-
-1. ajout d'un petit conteneur dans le vide global a voisins figes ;
-2. conservation/rechargement d'un witness certifie apres changement d'effort ;
-3. bouton DEV rouge visible et sans solve, finalisation, CAD ou scene ;
-4. export d'un SolverCaseBundle sur le cas reel connu ;
-5. identites, etapes, budgets, temps et raisons d'arret toujours observables.
-
-Le bundle reste local et n'est jamais promu automatiquement. L'iteration solveur
-suivante sera cadree a partir de son replay anonymise. Aucune validation
-d'impression n'est impliquee.
-
-L05D1/D2 sont automated-validated : corpus exact, gate A/B et premiere
-optimisation interne. Le cas personnel reste sans completion geometrique ; aucune
-revendication de resolution n'est faite.
+La capture reste locale et ne declenche aucun auto-apprentissage. Aucune
+validation d'impression n'est impliquee.
 ## Lots verrouillés
 
 - P64-F01A02 et F02A02 restent séparés : ils possèdent la finalisation du volume ;
@@ -179,3 +167,9 @@ projet personnel reste sans solution.
 
 Prochaine mission unique : P64-L05V-A, preparation puis installation de la gate
 Fusion de capture reelle. La revue dans Fusion reste humaine.
+
+## Mise a jour apres P64-L05V-A (2026-07-22)
+
+P64-L05V-A est automated-validated et installe localement : add-in 0.1.58,
+commit 261f7cc, runtime L05 et fixture sont verifies. P64-L05V devient la
+prochaine action, exclusivement humaine dans Fusion.

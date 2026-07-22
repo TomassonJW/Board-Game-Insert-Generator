@@ -62,7 +62,8 @@ preuves archivées.
   global. P64-L05B, P64-L05C et P64-L05D1/D2 sont automated-validated.
   L05D1 fournit un corpus anonymise, un replay borne et une gate A/B.
   P64-L05D2 reduit les evaluations inutiles sans regression fonctionnelle.
-  P64-L05V-A est la prochaine mission unique de preparation de gate.
+  P64-L05V-A est automated-validated et installe localement.
+  P64-L05 est la prochaine gate humaine de capture reelle.
 
 ## Vue de séquence
 
@@ -105,7 +106,8 @@ preuves archivées.
 | Termine - automatise | P64-L05C | Sidecar exact et incumbent recertifie, recherche courante conservee. |
 | Termine - automatise | P64-L05D1 | Corpus anonymise, replay borne et gate A/B fonctionnelle prioritaire. |
 | Termine - automatise | P64-L05D2 | Elagage sous ordre explicite, -44,355 % essais sur corpus, 0 regression fonctionnelle. |
-| Prochaine mission | P64-L05V-A | Preparer et installer la gate Fusion de capture reelle. |
+| Termine - automatise | P64-L05V-A | Preflight, add-in 0.1.58 et fixture installes et verifies. |
+| Prochaine gate humaine | P64-L05V | Observer Fusion et capturer le premier bundle reel. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -453,3 +455,12 @@ automated-validated ; fusion-validated: false, print-validated: false.
 
 P64-L05V-A devient la prochaine mission unique : preparer et installer la gate
 Fusion, puis faire capturer explicitement un SolverCaseBundle reel.
+
+## P64-L05V-A - gate Fusion preparee et installee (2026-07-22)
+
+Le commit 261f7cc est installe dans l'add-in Fusion 0.1.58. Les marqueurs L05,
+le runtime, le settings et le commit installe sont verifies ; la fixture globale
+est ecrite dans Documents/BGIG/projects. P64-L05 est maintenant ready-human-gate.
+
+fusion-validated: false. print-validated: false. La capture DEV reste locale et
+ne modifie pas automatiquement le solveur.

@@ -1694,3 +1694,14 @@ séparation géométrique minimal/final ; ADR-0074 porte la correction.
   aucun gain global de temps revendique.
 - Validation : fusion-validated: false, print-validated: false.
 - Suite : P64-L05V-A, gate Fusion et premier bundle reel.
+
+## Mise a jour P64-L05V-A - gate de capture installee
+
+- Capability servie : observation Fusion reproductible du reuse global, witness et
+  capture de cas solveur.
+- Statut : automated-validated, ready-human-gate.
+- Acquis : preflight, fixture portable, add-in 0.1.58 commit 261f7cc, runtime et
+  marqueurs verifies dans AppData.
+- Limites : aucune observation humaine encore, aucun bundle reel, aucun cas
+  personnel promu dans le corpus.
+- Suite : P64-L05V, gate Fusion humaine.

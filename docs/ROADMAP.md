@@ -1167,3 +1167,12 @@ suivante est empirique mais non auto-modifiante :
 4. cadrer une iteration solveur suivante a partir de la trace reproductible.
 
 fusion-validated: false. print-validated: false.
+
+## P64-L05V-A - preparation de gate installee (2026-07-22)
+
+Le preparateur et la fixture L05V sont integres et installes depuis le commit
+261f7cc. Le package Fusion reste 0.1.58. Les tests et les marqueurs locaux sont
+verifies ; l'observation du comportement dans Fusion reste humaine.
+
+Etape suivante : P64-L05V, puis anonymisation/replay du premier bundle uniquement
+apres retour explicite. fusion-validated: false. print-validated: false.

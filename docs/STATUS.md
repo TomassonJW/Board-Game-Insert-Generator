@@ -12,7 +12,7 @@ Phase active : P64-L04A/B/C, P64-L04R1 et P64-L05A/B/C/D1/D2 sont
 automated-validated. Le retour humain L04V est globalement KO mais partiellement
 positif. Le manifest Fusion reste a 0.1.58. L05D1/D2 sont
 automated-validated.
-P64-L05V-A est la prochaine mission de preparation de gate Fusion.
+P64-L05V-A est automated-validated et installe localement. P64-L05V est la prochaine gate humaine.
 P64-V2H03V et P44-V sont fusion-validated sur 0.1.55. P45-M001V est
 architecture-accepted. P64-L03V est un KO contextuel sur 0.1.56 et n'accorde
 aucune validation Fusion à la correction minimal/final.
@@ -3002,3 +3002,14 @@ Aucune donnee personnelle n'est commitee.
 
 fusion-validated: false. print-validated: false. Manifest Fusion inchange a
 0.1.58. P64-L05V-A est la prochaine mission de preparation de gate.
+
+## P64-L05V-A - preparation Fusion installee (2026-07-22)
+
+Statut : automated-validated, ready-human-gate.
+
+Le preparateur L05V teste le succes et le fallback global-void, installe le
+commit 261f7cc dans l'add-in Fusion 0.1.58, verifie runtime, markers, settings
+et marqueur de commit, puis cree la fixture globale dans Documents/BGIG/projects.
+
+La prochaine action est humaine : observer P64-L05V et capturer un premier
+SolverCaseBundle reel. fusion-validated: false. print-validated: false.

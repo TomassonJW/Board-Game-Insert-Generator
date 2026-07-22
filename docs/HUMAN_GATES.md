@@ -1031,7 +1031,7 @@ fusion-validated: false, print-validated: false pour L05A.
 
 ## P64-L05V - gate Fusion de capture reelle
 
-Statut : preparation requise apres P64-L05A/B/C/D automated-validated.
+Statut : ready-human-gate. Preparation et installation locales verifiees par P64-L05V-A.
 
 P64-L05V ne valide aucune impression. Elle doit observer dans le package issu du
 commit integre :
@@ -1054,5 +1054,8 @@ Le projet personnel reste hors capacite de reconstruction automatisée a l'issue
 de L05D2 ; la gate collecte une preuve de developpement, elle ne suppose pas sa
 resolution.
 
+Preparation reelle : add-in 0.1.58 et commit 261f7cc installes ; fixture
+p64-l05v-global-void-baseline.bgig.json ecrite dans Documents/BGIG/projects.
+Checklist : docs/P64_L05V_FUSION_GATE_CHECKLIST.md.
 fusion-validated: false avant retour humain explicite.
 print-validated: false.
