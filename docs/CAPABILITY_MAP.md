@@ -1606,3 +1606,8 @@ séparation géométrique minimal/final ; ADR-0074 porte la correction.
   métier n'est déclenchée par le suivi d'activité.
 - Suite : P64-L04V est la prochaine gate Fusion distincte ; manifest 0.1.58,
   fusion-validated: false, print-validated: false.
+
+## Mise a jour P64-L04V preparation de gate
+
+- C-FUSION-UI / C-LAYOUT : preflight et fixture de gate automated-validated ; le prepareur ne lance aucun solve global, finaliseur ou remplacement de scene.
+- Statut : ready-human-gate, fusion-validated: false, print-validated: false. La promotion depend seulement du retour humain L04V.

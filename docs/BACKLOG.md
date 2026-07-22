@@ -2750,3 +2750,9 @@ P44-M007 est ready-for-explicit-go.
   global, aucune création automatique et scène inchangée avant matérialisation.
 - Preuve : Fusion seulement ; l'impression reste une gate séparée.
 - Statut : future-human-gate, inactive.
+
+### P64-L04V preparation automatisee (2026-07-22)
+
+- Livre : preflight pur local-reuse/fallback, fixture portable, installation et reglages de palette controles, checklist humaine.
+- Validation : 650/650 tests complets ; gate Fusion toujours en attente.
+- Statut : ready-human-gate, fusion-validated: false, print-validated: false.

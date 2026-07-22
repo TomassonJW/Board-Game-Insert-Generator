@@ -1071,3 +1071,7 @@ Les preuves automatisées couvrent le producteur pur, le bridge, le DOM et la
 fin de synchronisation de scène : 648/648 tests complets. Le manifest reste
 0.1.58. L04V devient la prochaine gate humaine distincte ; aucune validation
 Fusion ou impression n'est revendiquée.
+
+## P64-L04V preparation automatisee (2026-07-22)
+
+La gate combinee dispose maintenant dun preflight reproductible, dun fixture portable et dune checklist. Le package reste 0.1.58. La suite complete 650/650 valide la preparation hors Fusion ; aucune observation Fusion ou impression nest revendiquee.

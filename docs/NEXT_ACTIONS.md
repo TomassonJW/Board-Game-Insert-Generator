@@ -87,3 +87,8 @@ Une gate Fusion ne vaut jamais impression.
   `fusion-validated` ;
 - `P64-V2H03V Fusion OK 0.1.55` ;
 - `P44-V Fusion OK 0.1.55 - commit 70d45c6`.
+
+## Mise a jour P64-L04V preparation (2026-07-22)
+
+Le preparateur versionne scripts/fusion/prepare_p64_l04v_gate.ps1, le fixture portable et la checklist sont prets. Executer le preparateur depuis le commit integre, puis collecter le retour humain defini par docs/P64_L04V_FUSION_GATE_CHECKLIST.md.
+Aucune promotion fusion-validated ne precede cette observation ; print-validated: false.

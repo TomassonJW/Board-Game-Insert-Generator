@@ -2876,3 +2876,9 @@ géométrie, valeur physique, CAD IR, scène automatique ou manifest Fusion ne
 change. Le cas dense 11 × 34 ne reçoit aucune nouvelle revendication.
 fusion-validated: false, print-validated: false. P64-L04V est la prochaine gate.
 Preuve : docs/P64_L04C_OPERATION_ACTIVITY_EVIDENCE.md.
+
+## P64-L04V preparation de la gate Fusion (2026-07-22)
+
+Statut : automated-validated, ready-human-gate ; fusion-validated: false, print-validated: false.
+Le preparateur lance le preflight pur, genere une baseline portable, verifie les marqueurs add-in et palette, puis fournit les actions humaines restantes. Validations : 2/2 preflight, 92 tests cibles via dry-run, Ruff cible, py_compile et 650/650 tests complets en 150,672 s.
+Preuve : docs/P64_L04V_FUSION_GATE_PREPARATION_EVIDENCE.md.

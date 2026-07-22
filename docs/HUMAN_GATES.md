@@ -1000,3 +1000,7 @@ La gate devra observer au minimum :
 7. identité technique et compteur global à zéro sur la voie locale.
 
 Cette gate ne valide ni valeur physique, ni imprimabilité, ni impression réelle.
+
+### Mise a jour P64-L04V preparation (2026-07-22)
+
+Statut : preparation automatisee validee, ready-human-gate. Le preparateur, la baseline portable et la checklist sont versionnes ; la preuve hors Fusion est docs/P64_L04V_FUSION_GATE_PREPARATION_EVIDENCE.md. Installation reelle et observation visuelle restent humaines.

@@ -339,3 +339,11 @@ suite complète. Ruff ciblé, py_compile et syntaxe JavaScript passent. Aucun
 solveur, budget, schéma, géométrie, valeur physique, CAD IR ou scène automatique
 n'est modifié. P64-L04V devient la prochaine gate distincte.
 fusion-validated: false, print-validated: false.
+
+## P64-L04V preparation de gate Fusion (2026-07-22)
+
+Le preparateur borne, la baseline portable et la checklist L04V sont versionnes.
+Le preflight couvre une reussite locale sans solveur global et un fallback explicite sans solve automatique. La suite complete est verte (650/650).
+La promotion Fusion reste humaine ; print-validated: false.
+
+Preuves : P64_L04V_FUSION_GATE_CHECKLIST.md et P64_L04V_FUSION_GATE_PREPARATION_EVIDENCE.md.
