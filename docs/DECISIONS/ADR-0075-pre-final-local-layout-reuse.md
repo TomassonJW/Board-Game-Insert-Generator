@@ -172,7 +172,7 @@ Ils ne sont pas inclus dans P64-L04A.
   `docs/P64_L04_INCREMENTAL_LOCAL_REUSE_CONTRACT.md`.
 - P64-L04A livre le cœur, l’orchestration, la palette et les preuves
   automatisées de localité.
-- P64-L04B et P64-L04C restent planifiés séparément.
+- P64-L04B est `automated-validated` ; P64-L04C reste le lot `ready` séparé.
 - P64-L04V observera dans Fusion succès local, fallback explicite, scène stale
   et mise à jour sans doublon.
 - `fusion-validated: false`, `print-validated: false`.

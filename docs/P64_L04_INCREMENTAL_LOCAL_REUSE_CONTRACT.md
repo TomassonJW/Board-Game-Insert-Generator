@@ -1,6 +1,6 @@
 # P64-L04 — Réutilisation incrémentale d’un agencement minimal
 
-Statut : contrat accepté le 2026-07-22 ; P64-L04A autorisé par GO humain.
+Statut : contrat accepté ; P64-L04A et L04B `automated-validated` ; L04C `ready`.
 
 ADR :
 [ADR-0075](DECISIONS/ADR-0075-pre-final-local-layout-reuse.md).
@@ -150,10 +150,15 @@ certification.
 
 ### P64-L04B — Approfondi anytime et borné
 
+Statut : `implemented-core`, `automated-validated`.
+
 - Normal devient l’incumbent conservé ;
-- Approfondi ajoute des lanes sans pouvoir perdre une solution déjà obtenue ;
-- deadline stricte, arrêt coopératif et meilleur résultat conservé ;
-- contrat et budgets séparés avant code.
+- Approfondi ajoute trois lanes sans pouvoir perdre une solution déjà obtenue ;
+- deadline commune de 30 000 ms, arrêt coopératif et meilleur résultat conservé ;
+- caps par lane historiques inchangés ;
+- annulation stale distinguée d’une expiration ;
+- détail normatif : `docs/P64_L04B_DEEP_ANYTIME_CONTRACT.md` ;
+- preuve : `docs/P64_L04B_DEEP_ANYTIME_EVIDENCE.md`.
 
 ### P64-L04C — Attente et progression UX
 

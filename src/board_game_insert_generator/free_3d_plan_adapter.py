@@ -763,6 +763,9 @@ def certify_minimal_free_3d_plan(
             "kind": "bounded_minimal_layout_solver",
             "candidate_id": candidate_id,
             "search_origin": deepcopy(dict(search_provenance)),
+            "deterministic": not bool(
+                search_provenance.get("wall_clock_limited")
+            ),
             "globally_optimal": False,
         }
     )
@@ -771,6 +774,12 @@ def certify_minimal_free_3d_plan(
     solver["result"] = result
     telemetry = _mapping(solver["telemetry"])
     telemetry["stop_reason"] = "minimal_placement_certified"
+    if isinstance(search_provenance.get("elapsed_ms"), int):
+        telemetry["elapsed_ms"] = int(search_provenance["elapsed_ms"])
+    if search_provenance.get("stop_reason") is not None:
+        telemetry["search_stop_reason"] = str(
+            search_provenance["stop_reason"]
+        )
     telemetry["counters"] = deepcopy(dict(search_telemetry))
     solver["telemetry"] = telemetry
     plan["solver"] = solver

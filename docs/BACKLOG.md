@@ -2642,14 +2642,18 @@ P44-M007 est ready-for-explicit-go.
 ### P64-L04B — Approfondi anytime et borné
 
 - Dépendance : P64-L04A.
-- Objectif : démarrer avec l’incumbent Normal, poursuivre les lanes Deep sous
-  deadline stricte et conserver le meilleur plan certifié à tout arrêt.
-- Acceptation : Deep ne régresse jamais une solution Normal en absence de
-  solution ; timeout, annulation, lanes, incumbent et raison d’arrêt sont
-  observables ; budgets publics historiques inchangés sauf contrat explicite.
-- Non-objectifs : géométrie locale, finalisation, scène, schéma, valeur physique
-  ou nouvelle revendication dense.
-- Statut : ready, next.
+- Livré : préfixe Normal exact, incumbent certifié, trois lanes Deep sous
+  deadline commune de 30 000 ms et sélection strictement monotone.
+- Vérité : timeout avec incumbent retourne la solution ; sans incumbent il reste
+  `no_solution_within_budget` ; annulation stale fail-closed.
+- Observabilité : budgets, temps, lanes, phases, frontières, incumbent,
+  sélection et raison d’arrêt.
+- Preuve : `docs/P64_L04B_DEEP_ANYTIME_EVIDENCE.md` ; 14/14 ciblés et 639/639
+  suite complète.
+- Non-objectifs respectés : géométrie locale, finalisation, scène, schéma,
+  valeur physique et revendication dense inchangés.
+- Statut : done-code, implemented-core, automated-validated,
+  fusion-validated: false, print-validated: false.
 
 ### P64-L04C — Attente et progression UX honnêtes
 
@@ -2658,7 +2662,7 @@ P44-M007 est ready-for-explicit-go.
   calcul, finalisation et matérialisation.
 - Règles : aucun faux pourcentage, doubles lancements bloqués, annulation visible
   seulement pour une opération réellement coopérative.
-- Statut : planned-ready-after-L04B.
+- Statut : ready, next ; aucune gate humaine avant implémentation.
 
 ### P64-L04V — Gate Fusion combinée
 

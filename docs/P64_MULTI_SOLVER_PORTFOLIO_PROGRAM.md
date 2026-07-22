@@ -504,3 +504,18 @@ Sources normatives :
 P64_STAGED_CALCULATION_AND_FINISHING_PROGRAM.md,
 P64_POST_SOLVE_CAPACITY_REUSE_CONTRACT.md, ADR-0071 et ADR-0072.
 La séquence active reste P64-V2H03V ; cet amendement n'ouvre aucun runtime.
+## Amendement P64-L04B — extension Deep anytime (2026-07-22)
+
+Pour le solve minimal P64, Approfondi n’est plus neuf lanes indépendantes sous
+les caps Deep. Il exécute le préfixe Normal exact, conserve son meilleur plan
+certifié, puis ajoute seulement les trois lanes Deep sous une enveloppe commune
+de 30 000 ms.
+
+Les caps historiques par lane restent inchangés. Une expiration conserve
+l’incumbent ; sans incumbent elle reste `no_solution_within_budget`. Une
+annulation de validité reste `stale_or_cancelled`. La sélection conserve les
+axes nommés et ne remplace l’incumbent que par une amélioration stricte.
+
+Contrat :
+`docs/P64_L04B_DEEP_ANYTIME_CONTRACT.md`.
+`fusion-validated: false`, `print-validated: false`.

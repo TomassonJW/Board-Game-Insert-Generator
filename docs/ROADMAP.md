@@ -1033,8 +1033,24 @@ lots. L04A est livré et validé automatiquement : une édition interne peut
 recertifier le conteneur dans son enveloppe et sa pose monde existantes, sans
 recherche globale ni finalisation. Un refus reste explicite et fail-closed.
 
-L04B doit rendre Approfondi anytime sous deadline stricte en conservant
+L04B rend désormais Approfondi anytime sous deadline stricte en conservant
 l’incumbent Normal. L04C ajoutera activité, étape et temps écoulé sans faux
 pourcentage. L04V regroupera ensuite la prochaine observation Fusion. Les lots
 F01A02/F02A02 de finalisation et C01/C02 post-finalisation restent verrouillés
 jusqu’à cette trajectoire et leurs dépendances P45/P46 applicables.
+
+## P64-L04B — Approfondi anytime livré (2026-07-22)
+
+L04B transforme Deep en extension anytime du préfixe Normal. Le meilleur plan
+Normal certifié devient l’incumbent ; seules les trois lanes supplémentaires
+partagent une deadline globale de 30 s et ne peuvent remplacer l’incumbent que
+par une amélioration stricte des axes nommés.
+
+Timeout avec incumbent, timeout sans incumbent, completion, caps, temps, phases
+et annulation stale sont automatisés. La suite complète passe à 639/639. Aucun
+manifest Fusion, schéma, solveur historique public, budget par lane, valeur
+physique, finaliseur ou scène ne change.
+
+L04C est maintenant la prochaine mission pour l’attente UX honnête. L04V reste la
+gate Fusion combinée ; les lots F01A02/F02A02 et C01/C02 demeurent verrouillés.
+`fusion-validated: false`, `print-validated: false`.

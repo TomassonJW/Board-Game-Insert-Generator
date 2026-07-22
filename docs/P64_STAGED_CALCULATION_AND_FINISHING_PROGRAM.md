@@ -3,8 +3,8 @@
 Statut : architecture amendée ; P64-L01, P64-L02 et P64-L03 restent validés
 automatiquement pour leurs acquis. P64-L03V est un KO contextuel sur Fusion
 0.1.56. ADR-0074 et P64-L03R-A corrigent la frontière minimal/final ;
-P64-L03R-B/C sont `automated-validated`. ADR-0075 est accepté ; P64-L04A est
-`automated-validated` et P64-L04B devient la prochaine mission.
+P64-L03R-B/C sont `automated-validated`. ADR-0075 est accepté ; P64-L04A et
+P64-L04B sont `automated-validated` et P64-L04C devient la prochaine mission.
 
 ADR historiques et amendement courant :
 [ADR-0071](DECISIONS/ADR-0071-staged-local-analysis-explicit-solve-and-finalization.md),
@@ -524,8 +524,9 @@ P64-V2H03V retour humain
 
 NEXT_ACTIONS.md reste autoritaire. P64-V2H03V et P44-V sont clôturées,
 P64-L01/L02/L03 restent automated-validated pour leurs acquis, P64-L03V est un
-KO contextuel et P64-L03R-B/P64-L03R-C/P64-L04A sont automated-validated.
-P64-L04B est la prochaine mission ; L04V reste une gate future inactive. Les
+KO contextuel et P64-L03R-B/P64-L03R-C/P64-L04A/P64-L04B sont
+automated-validated. P64-L04C est la prochaine mission ; L04V reste une gate
+future inactive. Les
 lots P45/P46 et de finition restent verrouillés.
 
 ## 21. Vérifications minimales futures
@@ -606,9 +607,10 @@ historique de la section 23. L’observation Fusion 0.1.57 reste exploratoire : 
 ne vaut ni retour formel L03R-V, ni promotion fusion-validated.
 
 P64-L04A recertifie un plan minimal à enveloppe et pose monde inchangées, sans
-solve global, finalisation ni mutation de scène. L04B possède le comportement
-Approfondi anytime et L04C le retour d’activité honnête. La prochaine gate
-humaine est L04V, regroupée seulement après leurs preuves automatisées.
+solve global, finalisation ni mutation de scène. L04B est livré : Normal fournit
+l’incumbent, puis trois lanes Deep partagent une deadline de 30 s. L04C possède
+le retour d’activité honnête. La prochaine gate humaine est L04V, regroupée
+seulement après sa preuve automatisée.
 
 La séquence autoritaire devient : L03R-C, L04A, L04B, L04C, L04V, puis les
 dépendances P45/P46 applicables et P64-F01A02. P64-C01/C02 restent

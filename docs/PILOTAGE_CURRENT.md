@@ -52,7 +52,10 @@ preuves archivées.
   réserves, mais ne vaut pas le retour formel `P64-L03R-V Fusion OK`.
 - ADR-0075 et le contrat P64-L04 sont acceptés. P64-L04A est
   `implemented-core`, `implemented-fusion-bridge`, `implemented-fusion-ui` et
-  `automated-validated` dans 0.1.58 ; P64-L04B devient la prochaine mission.
+  `automated-validated` dans 0.1.58.
+- P64-L04B est `implemented-core`, `automated-validated` : le préfixe Normal
+  fournit l’incumbent, les trois lanes Deep partagent 30 s et une expiration
+  conserve toute solution certifiée. P64-L04C devient la prochaine mission.
 
 ## Vue de séquence
 
@@ -86,8 +89,9 @@ preuves archivées.
 | Terminé — automatisé | P64-L03R-C | Matérialisation minimale/finalisée, digests exacts et remplacement sûr de scène simulé. |
 | Revue exploratoire, non formelle | P64-L03R-V | Plan minimal prometteur observé dans 0.1.57 ; réserves reprises par L04, aucune promotion fusion-validated. |
 | Terminé — automatisé | P64-L04A | Insertion locale à enveloppe fixe, recertification globale sans solve et UX compacte dans 0.1.58. |
-| Prochaine mission | P64-L04B | Approfondi anytime, incumbent Normal et deadline stricte. |
-| Planifié | P64-L04C / L04V | Attente UX honnête, puis gate Fusion combinée. |
+| Terminé — automatisé | P64-L04B | Préfixe Normal incumbent, extension Deep anytime sous deadline commune de 30 s. |
+| Prochaine mission | P64-L04C | Activité, étape et temps écoulé honnêtes pour les opérations longues. |
+| Planifié | P64-L04V | Gate Fusion combinée après L04C. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -113,6 +117,10 @@ preuves archivées.
   enveloppe fixe, caps, certificats, fallback et lots B/C/V.
 - P64_L04A_INCREMENTAL_LOCAL_REUSE_EVIDENCE.md : preuves cœur, staged, bridge
   et DOM de localité sans solve global.
+- P64_L04B_DEEP_ANYTIME_CONTRACT.md : préfixe Normal, deadline Deep, sélection
+  monotone, annulation stale et observabilité.
+- P64_L04B_DEEP_ANYTIME_EVIDENCE.md : preuves d’incumbent, expiration,
+  télémétrie et non-régression automatisée.
 - ADR-0075 : distinction L04A pré-finalisation / C02 post-finalisation et
   séparation des corrections Approfondi / attente UX.
 - ADR-0074 : supersession partielle d'ADR-0071 après le KO Fusion 0.1.56.
@@ -291,5 +299,24 @@ calcul minimal explicite.
 Le cœur, le lifecycle staged, le bridge validate_project et la palette sont
 automated-validated dans le package 0.1.58. Une réussite crée un nouvel artefact
 minimal ; le plan finalisé et la scène précédente deviennent obsolètes sans
-mutation automatique. P64-L04B est la prochaine mission, puis L04C et L04V.
+mutation automatique. L04B est désormais acquis ; L04C puis L04V suivent.
 fusion-validated: false, print-validated: false.
+
+## P64-L04B — Approfondi anytime (2026-07-22)
+
+L04B exécute le préfixe Normal exact avant toute lane propre à Deep. Son meilleur
+plan certifié devient l’incumbent initial. Les trois lanes supplémentaires
+partagent une seule deadline de 30 000 ms ; chaque beam reçoit le temps restant.
+Une expiration conserve l’incumbent, tandis qu’une annulation de validité reste
+fail-closed.
+
+Le tuple de classement nommé reste inchangé et une égalité ne déplace pas
+gratuitement l’incumbent. Les provenances de phases, budgets, temps, lanes,
+frontières, digests et raisons d’arrêt sont observables. Le plan retenu repasse
+par le certificat minimal commun.
+
+Validation : 14/14 tests ciblés et 639/639 suite complète. Aucun manifest Fusion,
+schéma, budget historique par lane, valeur physique, finalisation, CAD ou scène
+n’est modifié. Le cas dense 11 × 34 ne reçoit aucune nouvelle revendication.
+P64-L04C est la prochaine mission ; aucune gate humaine n’est requise avant.
+`fusion-validated: false`, `print-validated: false`.

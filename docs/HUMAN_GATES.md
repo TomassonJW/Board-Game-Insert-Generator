@@ -974,15 +974,19 @@ Le package passe à 0.1.58 pour la future gate combinée.
 
 ## P64-L04B / P64-L04C — aucune gate intermédiaire
 
-P64-L04B doit rendre Approfondi anytime sous deadline stricte et conserver
-l’incumbent Normal. P64-L04C doit exposer activité, étape et temps écoulé sans
-faux pourcentage. Ces lots sont automatisés séparément ; aucune installation ni
-revue humaine intermédiaire n’est exigée si leurs contrats et tests passent.
+P64-L04B est `implemented-core` et `automated-validated` : le préfixe Normal
+fournit l’incumbent et les trois lanes Deep partagent une deadline de 30 s. Le
+manifest Fusion reste à 0.1.58 ; aucune installation ou revue humaine n’est
+requise pour cette clôture cœur.
+
+P64-L04C est maintenant `ready`. Il doit exposer activité, étape et temps écoulé
+sans faux pourcentage. Aucune gate humaine n’est requise avant ou pendant son
+implémentation automatisée si son contrat et ses tests restent dans le scope.
 
 ## P64-L04V — future gate Fusion combinée
 
-Statut : `future-human-gate`, inactive jusqu’à L04B et L04C
-`automated-validated`.
+Statut : `future-human-gate`, inactive jusqu’à L04C
+`automated-validated`. L04B est déjà acquis automatiquement.
 
 La gate devra observer au minimum :
 

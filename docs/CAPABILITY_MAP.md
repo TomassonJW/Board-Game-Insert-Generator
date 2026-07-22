@@ -1570,3 +1570,23 @@ séparation géométrique minimal/final ; ADR-0074 porte la correction.
   impression.
 - Suite : P64-L04B `ready`, puis L04C et L04V.
   `fusion-validated: false`, `print-validated: false`.
+
+## Mise à jour P64-L04B — Approfondi anytime
+
+- C-SOLVER / C-LAYOUT : `implemented-core`, `automated-validated` pour le
+  préfixe Normal incumbent et l’extension Deep bornée. Les caps par lane restent
+  inchangés ; les trois lanes Deep partagent 30 000 ms.
+- C-RESULT-TRUTH : une expiration conserve une solution Normal certifiée ; sans
+  incumbent elle reste `no_solution_within_budget`. Une annulation stale reste
+  fail-closed.
+- C-PROJECT-CONTRACT : aucun champ projet ajouté. La provenance dérivée expose
+  phases, budgets, temps, lanes, frontières, incumbent, sélection et arrêt.
+- C-QUALITY : expiration avec/sans incumbent, monotonie, égalité conservatrice,
+  completion Deep, certificat commun et intégrations staged/CAD/palette couverts ;
+  639/639 tests complets.
+- C-FUSION-UI : inchangée dans L04B. L’activité visuelle des opérations longues
+  appartient à L04C ; le manifest reste 0.1.58.
+- Non livré : animation/progression L04C, finalisation, capacité
+  post-finalisation, formes P45, valeurs physiques, preuve Fusion ou impression.
+- Suite : P64-L04C `ready`, puis L04V.
+  `fusion-validated: false`, `print-validated: false`.

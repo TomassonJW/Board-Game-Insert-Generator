@@ -8,8 +8,9 @@ Statut produit : **MVP V0.1 Fusion-only accepte ; validation d impression non ac
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P64-L04A est `automated-validated` dans le package 0.1.58 ;
-P64-L04B est la prochaine mission. La gate Fusion combinée L04V reste inactive.
+Phase active : P64-L04A et P64-L04B sont `automated-validated` ; le manifest
+Fusion reste à 0.1.58. P64-L04C est la prochaine mission. La gate Fusion
+combinée L04V reste inactive.
 P64-V2H03V et P44-V sont fusion-validated sur 0.1.55. P45-M001V est
 architecture-accepted. P64-L03V est un KO contextuel sur 0.1.56 et n'accorde
 aucune validation Fusion à la correction minimal/final.
@@ -2812,4 +2813,34 @@ OK. Le cas dense 11 × 34 reste `no_solution_within_budget`.
 
 P64-L04B est `ready` pour rendre Approfondi anytime et strictement borné ; L04C
 portera ensuite l’attente UX honnête, puis L04V la prochaine gate Fusion combinée.
+`fusion-validated: false`, `print-validated: false`.
+
+## P64-L04B — Approfondi anytime et borné (2026-07-22)
+
+Statut : `implemented-core`, `automated-validated`.
+
+Le solve minimal Deep exécute d’abord les six lanes Normal sous leurs caps
+historiques et conserve leur meilleur plan certifié comme incumbent. Les trois
+lanes supplémentaires partagent ensuite
+`max_deep_extension_elapsed_ms = 30_000`. Leur cap par lane est réduit au temps
+restant sans modifier les valeurs historiques 5 000 / 12 000 / 30 000 ms.
+
+Une expiration avec incumbent retourne `solution_found` ; sans incumbent, elle
+reste `no_solution_within_budget`. Une annulation de validité conserve
+`stale_or_cancelled` et ne publie pas un plan potentiellement obsolète. Une
+égalité de rang préserve l’incumbent ; seule une amélioration stricte le remplace.
+
+La provenance expose les deux phases, budgets, temps, lanes, frontières,
+incumbent, sélection et raisons d’arrêt. Le plan sélectionné repasse par le
+certificat minimal commun. Les exécutions limitées par horloge ne sont pas
+présentées comme déterministes.
+
+Validation finale : 14/14 tests ciblés ; 10/10 staged ; 9/9 réutilisation locale ;
+14/14 CAD ; 22/22 palette/projet ; 639/639 suite complète en 154,896 s. Ruff
+ciblé, py_compile, compileall, frontière adsk et diff-check OK. Le Ruff global
+conserve 41 diagnostics préexistants hors fichiers L04B.
+
+Aucun schéma, valeur physique, forme P45, finalisation, CAD IR, scène ou manifest
+Fusion n’est modifié. Le cas dense 11 × 34 ne reçoit aucune nouvelle
+revendication. P64-L04C devient `ready`.
 `fusion-validated: false`, `print-validated: false`.
