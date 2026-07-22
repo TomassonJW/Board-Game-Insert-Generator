@@ -1680,3 +1680,17 @@ séparation géométrique minimal/final ; ADR-0074 porte la correction.
 - Limites : corpus initial petit ; aucun placement du projet personnel disponible
   comme oracle ; fusion-validated: false ; print-validated: false.
 - Suite : P64-L05D2, optimisation interne bornee sous preuve A/B.
+
+## Mise a jour P64-L05D2 - elagage explicite mesure
+
+- Capability servie : recherche P64 bornee capable de consacrer ses essais aux
+  branches qui peuvent etre retenues.
+- Statut : implemented-core, automated-validated.
+- Acquis : coupure exacte apres le quota non vide sous ordre explicite ; voie
+  heuristique inchangee ; 44,355 % d'essais en moins sur le corpus complet.
+- Non-regression : 7 cas, 0 perte fonctionnelle, prefixes de lanes et certificats
+  conserves.
+- Limite : aucun nouveau cas resolu, projet personnel toujours hors capacite,
+  aucun gain global de temps revendique.
+- Validation : fusion-validated: false, print-validated: false.
+- Suite : P64-L05V-A, gate Fusion et premier bundle reel.

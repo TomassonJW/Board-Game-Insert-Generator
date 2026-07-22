@@ -2811,7 +2811,7 @@ implémentée et intégrée à la fois.
   de projet personnel.
 - Livrable : replay borne, mesures comparables, ameliorations relues des lanes et
   optimisation de vitesse sans regression de certificat.
-- Statut : ready.
+- Statut : done, automated-validated.
 
 ### P64-L05D1 - corpus, replay et gate A/B
 
@@ -2826,7 +2826,7 @@ implémentée et intégrée à la fois.
 
 ### P64-L05D2 - premiere optimisation mesuree
 
-- Statut : ready.
+- Statut : done, automated-validated.
 - Dependances obtenues : P64-L05D1 automated-validated.
 - Scope : eviter l'evaluation de participants qui ne peuvent pas entrer dans
   `max_participant_branches` quand l'ordre est explicite.
@@ -2834,3 +2834,15 @@ implémentée et intégrée à la fois.
   comparaison A/B acceptee, suite complete et projet personnel inchange.
 - Interdits : aucun ajustement des caps ou budgets, aucun changement du
   portefeuille, aucun auto-apprentissage, aucune revendication sur le cas dense.
+
+### P64-L05V-A - preparation de gate Fusion
+
+- Statut : ready.
+- Dependances obtenues : P64-L05A/B/C/D automated-validated.
+- Scope : checklist, package courant, installation locale verifiee et settings
+  necessaires a la capture.
+- Gate humaine : insertion globale, witness persistant, bouton DEV sans effet
+  metier et export d'un SolverCaseBundle reel.
+- Sortie : retour Fusion contextualise et bundle local ; aucune promotion
+  automatique dans le corpus.
+- print-validated reste false.

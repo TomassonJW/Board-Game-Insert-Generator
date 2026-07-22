@@ -59,9 +59,10 @@ preuves archivées.
   depuis zéro restaient en défaut.
 - P64-L04R1 et P64-L05A sont automated-validated. L05A insère exactement un
   nouveau conteneur à voisins figés puis recertifie le plan complet sans solve
-  global. P64-L05B, P64-L05C et P64-L05D1 sont automated-validated.
+  global. P64-L05B, P64-L05C et P64-L05D1/D2 sont automated-validated.
   L05D1 fournit un corpus anonymise, un replay borne et une gate A/B.
-  P64-L05D2 est la prochaine mission unique.
+  P64-L05D2 reduit les evaluations inutiles sans regression fonctionnelle.
+  P64-L05V-A est la prochaine mission unique de preparation de gate.
 
 ## Vue de séquence
 
@@ -103,7 +104,8 @@ preuves archivées.
 | Termine — automatise | P64-L05B | Bouton DEV rouge et SolverCaseBundle local, versionne, filtre et sans effet metier. |
 | Termine - automatise | P64-L05C | Sidecar exact et incumbent recertifie, recherche courante conservee. |
 | Termine - automatise | P64-L05D1 | Corpus anonymise, replay borne et gate A/B fonctionnelle prioritaire. |
-| Prochaine mission | P64-L05D2 | Optimisation interne sous ordre explicite, conservee uniquement sur preuve A/B. |
+| Termine - automatise | P64-L05D2 | Elagage sous ordre explicite, -44,355 % essais sur corpus, 0 regression fonctionnelle. |
+| Prochaine mission | P64-L05V-A | Preparer et installer la gate Fusion de capture reelle. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -434,3 +436,20 @@ le fichier dans le corpus.
 P64-L05D1 est implemented-core et automated-validated.
 fusion-validated: false. print-validated: false. P64-L05D2 est la prochaine
 mission unique : optimisation interne bornee, baselined puis comparee.
+
+## P64-L05D2 - premiere optimisation mesuree (2026-07-22)
+
+Sous ordre explicite, le quota de participants non vides definit un prefixe que
+les participants ulterieurs ne peuvent plus rejoindre. Leur evaluation est
+omise ; la voie heuristique sans ordre reste inchangee.
+
+Sur sept cas, les essais passent de 57 329 a 31 901, les etats de 2 581 a 3 333
+sous les memes caps, et aucune regression fonctionnelle n'est observee. Les
+temps cumules varient de +2,883 % : aucun gain global de vitesse n'est revendique.
+
+Le projet personnel reste sans completion geometrique et son SHA-256 demeure
+identique apres replay en lecture seule. P64-L05D2 est implemented-core et
+automated-validated ; fusion-validated: false, print-validated: false.
+
+P64-L05V-A devient la prochaine mission unique : preparer et installer la gate
+Fusion, puis faire capturer explicitement un SolverCaseBundle reel.

@@ -1028,3 +1028,31 @@ aucune scène. Une future gate Fusion sera cadrée seulement après les lots
 automatisés pertinents.
 
 fusion-validated: false, print-validated: false pour L05A.
+
+## P64-L05V - gate Fusion de capture reelle
+
+Statut : preparation requise apres P64-L05A/B/C/D automated-validated.
+
+P64-L05V ne valide aucune impression. Elle doit observer dans le package issu du
+commit integre :
+
+1. insertion d'un nouveau petit conteneur dans le vide global a voisins figes ;
+2. fallback explicite si cette insertion locale n'est pas certifiable ;
+3. rechargement d'un witness certifie apres changement temporaire d'effort ;
+4. recherche courante toujours executee, sans cache hit revendique ;
+5. bouton DEV rouge visible ;
+6. capture sans solve, finalisation, CAD ni modification de scene ;
+7. SolverCaseBundle cree localement avec identite, digests et statut observes ;
+8. activite, budgets, lanes, temps et raison d'arret toujours honnetes.
+
+Avant Thomas, Codex doit preparer et installer l'add-in courant, verifier ses
+marqueurs et fournir uniquement la checklist Fusion restante. Le bundle reste
+local, n'entraine aucune auto-modification et ne peut entrer dans le corpus
+qu'apres anonymisation et revue.
+
+Le projet personnel reste hors capacite de reconstruction automatisée a l'issue
+de L05D2 ; la gate collecte une preuve de developpement, elle ne suppose pas sa
+resolution.
+
+fusion-validated: false avant retour humain explicite.
+print-validated: false.

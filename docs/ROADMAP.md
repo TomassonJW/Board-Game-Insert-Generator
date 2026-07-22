@@ -1151,3 +1151,19 @@ Trajectoire restante :
 
 Le projet personnel confirme une limite reelle de profondeur mais reste hors
 corpus versionne. fusion-validated: false. print-validated: false.
+
+## P64-L05D2 - premiere optimisation livree (2026-07-22)
+
+P64-L05D est automated-validated. La premiere optimisation supprime les
+evaluations incapables d'entrer dans le prefixe sous ordre explicite. Le corpus
+mesure 44,355 % d'essais en moins et aucune regression fonctionnelle.
+
+Cette livraison ne suffit pas a reconstruire le projet personnel. La trajectoire
+suivante est empirique mais non auto-modifiante :
+
+1. P64-L05V-A - preparer et installer la gate Fusion ;
+2. P64-L05V - observer insertion globale, witness et capture DEV ;
+3. promouvoir seulement un bundle anonymise et relu dans le corpus ;
+4. cadrer une iteration solveur suivante a partir de la trace reproductible.
+
+fusion-validated: false. print-validated: false.

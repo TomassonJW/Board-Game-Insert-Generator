@@ -14,7 +14,7 @@ le cache négatif. P64-L05A est automated-validated : exactement un nouveau
 conteneur peut être inséré dans le vide global à voisins figés et plan complet
 recertifié. Le manifest Fusion reste à 0.1.58. fusion-validated: false et
 print-validated: false pour L05A, L05B et L05C. Le manifest reste inchange.
-P64-L05B, P64-L05C et P64-L05D1 sont automated-validated.
+P64-L05B, P64-L05C et P64-L05D1/D2 sont automated-validated.
 
 ## Dernier état réel
 
@@ -55,28 +55,36 @@ Preuve L05D1 : P64_L05D1_SOLVER_CORPUS_EVIDENCE.md.
 
 ## Prochaine action recommandée
 
-### P64-L05D2 - optimisation interne mesuree
+### P64-L05V-A - preparer la gate Fusion et la capture reelle
 
-Type : developpement borne, sans gate humaine intermediaire.
+Type : preparation automatisee puis gate humaine.
 
-Objectif : reduire le travail inutile des lanes a ordre de participants explicite
-sans changer le portefeuille, le prefixe de lanes, le classement, les caps, les
-budgets publics ni la deadline Deep.
+Objectif : installer un package Fusion issu du commit integre, faire observer
+L05A/B/C/D dans le projet reel et recuperer un premier SolverCaseBundle explicite
+sans auto-apprentissage.
 
-La mission doit :
+Codex doit d'abord :
 
-1. produire les rapports baseline CI et extended avant toute modification ;
-2. prouver que seuls les premiers participants encore pertinents pour
-   `max_participant_branches` sont evalues sous ordre explicite ;
-3. ajouter un test d'equivalence de branches et de reduction d'essais ;
-4. rejouer le meme corpus apres modification ;
-5. refuser le changement a la moindre regression fonctionnelle ;
-6. observer le projet personnel uniquement en lecture seule, sans en faire une
-   condition d'acceptation universelle.
+1. cadrer la checklist L05V et les marqueurs exacts du package ;
+2. preparer et installer l'add-in courant lorsque l'environnement le permet ;
+3. verifier localement les fichiers installes et les settings de la palette ;
+4. fournir a Thomas uniquement les actions restantes dans Fusion.
 
-L05D1 est automated-validated : 7 cas anonymises, replay borne, digest
-fonctionnel et gate A/B. Le manifest Fusion reste a 0.1.58.
-fusion-validated: false. print-validated: false.
+Thomas observe ensuite :
+
+1. ajout d'un petit conteneur dans le vide global a voisins figes ;
+2. conservation/rechargement d'un witness certifie apres changement d'effort ;
+3. bouton DEV rouge visible et sans solve, finalisation, CAD ou scene ;
+4. export d'un SolverCaseBundle sur le cas reel connu ;
+5. identites, etapes, budgets, temps et raisons d'arret toujours observables.
+
+Le bundle reste local et n'est jamais promu automatiquement. L'iteration solveur
+suivante sera cadree a partir de son replay anonymise. Aucune validation
+d'impression n'est impliquee.
+
+L05D1/D2 sont automated-validated : corpus exact, gate A/B et premiere
+optimisation interne. Le cas personnel reste sans completion geometrique ; aucune
+revendication de resolution n'est faite.
 ## Lots verrouillés
 
 - P64-F01A02 et F02A02 restent séparés : ils possèdent la finalisation du volume ;
@@ -161,3 +169,13 @@ de lanes avant toute comparaison de vitesse.
 
 Prochaine mission unique : P64-L05D2, premiere optimisation interne bornee et
 mesuree. Aucune validation Fusion ou impression n'est revendiquee.
+
+## Mise a jour apres P64-L05D2 (2026-07-22)
+
+P64-L05D2 est automated-validated. Sous ordre explicite, les participants qui ne
+peuvent plus entrer dans le quota de branches ne sont plus evalues. Le corpus
+complet mesure 57 329 -> 31 901 essais, sans regression fonctionnelle, mais le
+projet personnel reste sans solution.
+
+Prochaine mission unique : P64-L05V-A, preparation puis installation de la gate
+Fusion de capture reelle. La revue dans Fusion reste humaine.

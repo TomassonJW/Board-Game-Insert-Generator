@@ -8,11 +8,11 @@ Statut produit : **MVP V0.1 Fusion-only accepte ; validation d impression non ac
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P64-L04A/B/C, P64-L04R1 et P64-L05A/B/C/D1 sont
+Phase active : P64-L04A/B/C, P64-L04R1 et P64-L05A/B/C/D1/D2 sont
 automated-validated. Le retour humain L04V est globalement KO mais partiellement
-positif. Le manifest Fusion reste a 0.1.58. P64-L05D1 est
-automated-validated. P64-L05D2 est la prochaine mission
-unique ; aucune gate humaine intermediaire n'est requise.
+positif. Le manifest Fusion reste a 0.1.58. L05D1/D2 sont
+automated-validated.
+P64-L05V-A est la prochaine mission de preparation de gate Fusion.
 P64-V2H03V et P44-V sont fusion-validated sur 0.1.55. P45-M001V est
 architecture-accepted. P64-L03V est un KO contextuel sur 0.1.56 et n'accorde
 aucune validation Fusion à la correction minimal/final.
@@ -2980,3 +2980,25 @@ aucune completion geometrique. Le fichier n'est pas copie dans le depot.
 
 fusion-validated: false. print-validated: false. Manifest Fusion inchange a
 0.1.58. P64-L05D2 est la prochaine mission unique.
+
+## P64-L05D2 - elagage sous ordre explicite (2026-07-22)
+
+Statut : implemented-core, automated-validated.
+
+L'index de l'ordre explicite est la cle primaire de selection des participants.
+Apres le quota de participants non vides, toute evaluation ulterieure est
+maintenant omise. La voie sans ordre explicite conserve son evaluation complete.
+
+Gate A/B, sept cas et trois repetitions :
+
+- 0 regression fonctionnelle ;
+- 57 329 -> 31 901 essais de placement ;
+- 2 581 -> 3 333 etats explores sous les memes caps ;
+- temps median cumule +2,883 %, sans revendication de gain global de vitesse.
+
+Le projet personnel reste sans completion geometrique dans Rapide, Normal et
+Approfondi. Son SHA-256 est inchange apres observation en lecture seule.
+Aucune donnee personnelle n'est commitee.
+
+fusion-validated: false. print-validated: false. Manifest Fusion inchange a
+0.1.58. P64-L05V-A est la prochaine mission de preparation de gate.

@@ -499,6 +499,13 @@ def _participant_branches(
             else legacy_key
         )
         evaluated.append((key, participant, options))
+        if (
+            order_is_explicit
+            and len(evaluated) >= limits["max_participant_branches"]
+        ):
+            # The explicit order index is the primary sort key. Any later
+            # participant is therefore unable to enter the retained prefix.
+            break
     evaluated.sort(key=lambda item: item[0])
     return [
         (
