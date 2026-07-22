@@ -220,10 +220,11 @@ class P66AcceptancePreparationTests(unittest.TestCase):
             "bgig_installed_commit.txt", "bgig_project_v1.before-p66.json",
             "P66 Fusion OK 0.1.20", "CONTAINER_MINIMUM_BLOCKED",
             "Dry run: would", "Remove-Item -LiteralPath $evidenceRoot",
+            '-ExpectedVersion "0.1.20"',
         ):
             self.assertIn(marker, prepare)
         self.assertIn("Assert-BgigPaletteProjectRuntime", checker)
-        self.assertIn("expected 0.1.20", checker)
+        self.assertIn("ExpectedVersion", checker)
         self.assertIn("manifestText", checker)
         self.assertNotIn("ConvertFrom-Json", checker)
         self.assertEqual(manifest["version"], "0.1.58")

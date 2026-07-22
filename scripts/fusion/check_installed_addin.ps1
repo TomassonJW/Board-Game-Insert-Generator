@@ -1,5 +1,6 @@
 param(
-    [string] $TargetPath
+    [string] $TargetPath,
+    [string] $ExpectedVersion
 )
 
 $ErrorActionPreference = "Stop"
@@ -25,8 +26,8 @@ if (-not $versionMatch.Success) {
     throw "Installed add-in manifest has no readable version: $manifest"
 }
 $manifestVersion = $versionMatch.Groups["version"].Value
-if ($manifestVersion -ne "0.1.20") {
-    throw "Installed add-in package version mismatch: expected 0.1.20, got $manifestVersion."
+if ($ExpectedVersion -and $manifestVersion -ne $ExpectedVersion) {
+    throw "Installed add-in package version mismatch: expected $ExpectedVersion, got $manifestVersion."
 }
 
 Assert-BgigFusionAddinMarkers -AddinPath $target

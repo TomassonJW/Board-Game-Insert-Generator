@@ -116,7 +116,7 @@ if ($DryRun) {
 }
 else {
     try {
-        & "$PSScriptRoot\check_installed_addin.ps1" -TargetPath $target
+        & "$PSScriptRoot\check_installed_addin.ps1" -TargetPath $target -ExpectedVersion "0.1.20"
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
         New-Item -ItemType Directory -Force -Path $projectDirectory | Out-Null
