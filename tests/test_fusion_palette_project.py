@@ -209,6 +209,108 @@ class FusionPaletteProjectTests(unittest.TestCase):
         self.assertIsNone(sizing["calculated_outer_dimensions_mm"])
         self.assertFalse(response["saved"])
 
+    def test_validate_inserts_new_container_in_global_void_without_global_solver(self) -> None:
+        project = blank_project_v1()
+        project["box"]["inner_dimensions_mm"] = {
+            "x": 120.0,
+            "y": 120.0,
+            "z": 30.0,
+        }
+        project["box"]["usable_height_mm"] = 30.0
+        project["container_groups"] = [
+            {
+                "id": "g",
+                "name": "Bac",
+                "wall_thickness_mm": 2.0,
+                "floor_thickness_mm": 2.0,
+            }
+        ]
+        project["contents"] = [
+            {
+                "id": "a",
+                "name": "A",
+                "shape_kind": "rectangle",
+                "dimensions_mm": {"x": 40.0, "y": 40.0, "z": 10.0},
+                "quantity": 1,
+                "container_group_id": "g",
+                "content_clearance_mm": 0.0,
+                "measurement_confidence": "exact",
+            }
+        ]
+        changed = deepcopy(project)
+        changed["container_groups"].append(
+            {
+                "id": "g2",
+                "name": "Nouveau bac",
+                "wall_thickness_mm": 2.0,
+                "floor_thickness_mm": 2.0,
+            }
+        )
+        changed["contents"].append(
+            {
+                "id": "b",
+                "name": "B",
+                "shape_kind": "rectangle",
+                "dimensions_mm": {"x": 8.0, "y": 8.0, "z": 8.0},
+                "quantity": 1,
+                "container_group_id": "g2",
+                "content_clearance_mm": 0.0,
+                "measurement_confidence": "exact",
+            }
+        )
+        settings = {"method": "auto", "effort": "quick"}
+        with tempfile.TemporaryDirectory() as temp_dir, patch.dict(
+            "os.environ",
+            {"BGIG_USER_DATA_DIR": temp_dir},
+        ):
+            solved = handle_palette_request(
+                request("solve_project", project=project, solver_settings=settings),
+                ADDIN,
+                ROOT,
+            )
+            with patch(
+                "board_game_insert_generator.minimal_layout_solver.solve_minimal_layout",
+                side_effect=AssertionError("validate must not run the global solver"),
+            ):
+                reused = handle_palette_request(
+                    request(
+                        "validate_project",
+                        project=changed,
+                        solver_settings=settings,
+                    ),
+                    ADDIN,
+                    ROOT,
+                )
+
+        self.assertIsNotNone(reused["partition"])
+        report = reused["staged_calculation"]["global_void_reuse"]
+        self.assertEqual(report["status"], "container_placed_in_global_void")
+        self.assertEqual(report["global_solver_invocation_count"], 0)
+        self.assertFalse(report["existing_world_placements_changed"])
+        self.assertEqual(
+            reused["operation_activity"]["stop_reason"],
+            "new_container_inserted_and_plan_recertified",
+        )
+        old_ids = {value["id"] for value in solved["partition"]["placements"]}
+        before = {
+            value["id"]: (
+                value["origin_mm"],
+                value["world_size_mm"],
+                value["rotation_deg_z"],
+            )
+            for value in solved["partition"]["placements"]
+        }
+        after = {
+            value["id"]: (
+                value["origin_mm"],
+                value["world_size_mm"],
+                value["rotation_deg_z"],
+            )
+            for value in reused["partition"]["placements"]
+            if value["id"] in old_ids
+        }
+        self.assertEqual(before, after)
+
     def test_validate_inserts_locally_without_reinvoking_global_solver(self) -> None:
         project = blank_project_v1()
         project["box"]["inner_dimensions_mm"] = {

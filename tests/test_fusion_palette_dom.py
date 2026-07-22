@@ -659,6 +659,26 @@ class FusionPaletteDomTests(unittest.TestCase):
         )
         self.assertNotIn("localReuse.percentage", self.markup)
 
+    def test_exposes_p64_l05a_global_void_container_feedback(self) -> None:
+        for marker in (
+            "globalVoidReuse.status==='container_placed_in_global_void'",
+            "global_void_reuse",
+            "Nouveau conteneur int",
+            "volume global disponible",
+            "Tous les placements existants sont conserv",
+            "globalVoidReuse.new_container_group_id",
+            "globalVoidReuse.new_placement_id",
+            "globalVoidReuse.counters?.variant_options_considered",
+            "globalVoidReuse.counters?.position_trials",
+            "globalVoidReuse.counters?.global_recertification_count",
+            "globalVoidReuse.budget?.max_position_trials",
+            "globalVoidReuse.stop_reason",
+            "globalVoidReuse.source_plan_digest",
+            "globalVoidReuse.result_plan_digest",
+        ):
+            self.assertIn(marker, self.markup)
+        self.assertNotIn("globalVoidReuse.percentage", self.markup)
+
     def test_exposes_truthful_operation_activity_and_blocks_only_duplicates(self) -> None:
         for marker in (
             'id="operation-activity"',

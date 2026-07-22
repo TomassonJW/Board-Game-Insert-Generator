@@ -1,6 +1,6 @@
 # Backlog
 
-Derniere mise a jour : 2026-07-16
+Derniere mise a jour : 2026-07-22
 
 Le backlog transforme la North Star en missions atomiques. Voir
 `docs/PILOTAGE_GLOSSARY.md` pour la distinction roadmap/backlog et la
@@ -2771,3 +2771,23 @@ Ordre autorisé : L05A insertion de nouveau conteneur à voisins figés ; L05B
 SolverCaseBundle et bouton DEV ; L05C plan-witness persistant et warm start ;
 L05D corpus, optimisation des lanes et benchmarks. Une seule mission est
 implémentée et intégrée à la fois.
+
+### P64-L05A — insertion de nouveau conteneur à voisins figés
+
+- Dépendance : R1 automated-validated et ADR-0076 acceptée.
+- Livré : producteur pur, caps, recertification complète, staged, bridge et DOM.
+- Invariants : voisins inchangés, solve global/finalisation/CAD/Fusion non
+  invoqués, zones résiduelles non normatives.
+- Preuve : docs/P64_L05A_GLOBAL_VOID_CONTAINER_REUSE_EVIDENCE.md.
+- Statut : done-code, automated-validated, fusion-validated: false,
+  print-validated: false.
+
+### P64-L05B — SolverCaseBundle et bouton DEV
+
+- Dépendance obtenue : P64-L05A automated-validated.
+- Livrable : capture locale versionnée et reproductible du projet, du plan
+  témoin, des réglages, budgets, lanes, temps, raisons d’arrêt et événements
+  utiles.
+- Interdits : aucune auto-modification du solveur, aucun solve ou scène déclenché
+  par la capture, aucun secret.
+- Statut : ready.

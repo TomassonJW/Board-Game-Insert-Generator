@@ -1018,3 +1018,13 @@ Observation humaine réelle sur « Mon insert » :
 R1 corrige automatiquement le dernier point, sans observation Fusion nouvelle.
 Les autres KO ouvrent L05A à L05D. P64-L04 n'est pas promu
 fusion-validated ; print-validated: false.
+
+## P64-L05A / L05B — aucune gate intermédiaire
+
+P64-L05A est automated-validated. Aucune observation Fusion n’est nécessaire
+pour ouvrir L05B, conformément au GO humain du programme correctif. L05B capture
+des cas de développement mais ne déclenche aucun solve, aucune finalisation et
+aucune scène. Une future gate Fusion sera cadrée seulement après les lots
+automatisés pertinents.
+
+fusion-validated: false, print-validated: false pour L05A.

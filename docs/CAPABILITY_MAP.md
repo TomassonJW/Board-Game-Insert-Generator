@@ -1621,3 +1621,16 @@ séparation géométrique minimal/final ; ADR-0074 porte la correction.
 - Aucun gain de capacité du solveur n'est revendiqué. L05A porte l'insertion
   incrémentale d'un nouveau conteneur.
 - Statut : automated-validated, fusion-validated: false, print-validated: false.
+
+## Mise à jour P64-L05A — nouveau conteneur à voisins figés
+
+- C-LAYOUT : insertion incrémentale d’un nouveau conteneur dans le vide global,
+  sous caps, suivie du certificat complet.
+- C-PROJECT-CONTRACT : ancien plan intègre requis ; exactement un nouveau groupe
+  et nouveaux contenus exclusifs ; digests et provenance versionnés.
+- C-FUSION-UI : message dédié, détails repliés, compteurs et raison d’arrêt ;
+  aucun pourcentage ni scène automatique.
+- C-SOLVER : inchangée. Le portefeuille, ses lanes et budgets ne sont pas
+  modifiés et aucune capacité de reconstruction depuis zéro n’est revendiquée.
+- Statut : automated-validated, fusion-validated: false,
+  print-validated: false. Suite : P64-L05B.

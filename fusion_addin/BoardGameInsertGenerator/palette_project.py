@@ -210,6 +210,14 @@ def _operation_stop_reason(action: str, response: dict[str, object]) -> str:
     if action == "validate_project":
         staged = response.get("staged_calculation") or {}
         if isinstance(staged, dict):
+            global_void_reuse = staged.get("global_void_reuse") or {}
+            if (
+                isinstance(global_void_reuse, dict)
+                and global_void_reuse.get("status")
+                == "container_placed_in_global_void"
+                and global_void_reuse.get("stop_reason")
+            ):
+                return str(global_void_reuse["stop_reason"])
             reuse = staged.get("local_reuse") or {}
             if isinstance(reuse, dict) and reuse.get("stop_reason"):
                 return str(reuse["stop_reason"])
@@ -514,8 +522,12 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
     artifact_kind = str(request.get("artifact_kind") or "minimal_layout")
     if (
         action == "validate_project"
-        and staged_calculation.get("local_reuse", {}).get("status")
-        == "placement_reused"
+        and (
+            staged_calculation.get("local_reuse", {}).get("status")
+            == "placement_reused"
+            or staged_calculation.get("global_void_reuse", {}).get("status")
+            == "container_placed_in_global_void"
+        )
     ):
         partition = staged_session.current_minimal_partition()
         staged_solver_result = _partition_solver_result(partition)

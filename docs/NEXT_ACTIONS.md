@@ -8,17 +8,20 @@ V0.1 reste `mvp-accepted`, `fusion-validated: true` pour son périmètre
 historique et `print-validated: false`. La surface MVP reste exclusivement
 l’add-in Fusion 360.
 
-P64-L04A, P64-L04B et P64-L04C sont automated-validated. L04A fournit
-la réutilisation locale à enveloppe fixe dans le package 0.1.58. L04B rend
-Approfondi anytime. L04C ajoute l'activité honnête sans modifier le manifest
-Fusion, qui reste à 0.1.58. fusion-validated: false et
-print-validated: false pour P64-L04.
+P64-L04A/B/C restent automated-validated dans le package 0.1.58.
+Le retour humain L04V est globalement KO mais partiellement positif. R1 corrige
+le cache négatif. P64-L05A est automated-validated : exactement un nouveau
+conteneur peut être inséré dans le vide global à voisins figés et plan complet
+recertifié. Le manifest Fusion reste à 0.1.58. fusion-validated: false et
+print-validated: false pour L05A.
 
 ## Dernier état réel
 
 - une édition continue de recalculer uniquement ses dérivations locales ;
 - une insertion interne admissible peut republier un `minimal_layout` courant
   sans solve global ni déplacement monde ;
+- exactement un nouveau conteneur peut aussi être inséré à voisins figés si le
+  certificat global accepte le plan complet ;
 - le fallback global reste explicite et aucune scène n’est modifiée
   automatiquement ;
 - Rapide reste préfixe de Normal, Normal devient le préfixe et l’incumbent
@@ -42,27 +45,33 @@ Preuves :
 [P64-L04B](P64_L04B_DEEP_ANYTIME_EVIDENCE.md) et
 [P64-L04C](P64_L04C_OPERATION_ACTIVITY_EVIDENCE.md).
 
+Preuve L05A : P64_L05A_GLOBAL_VOID_CONTAINER_REUSE_EVIDENCE.md.
+
 ## Prochaine action recommandée
 
-### P64-L04V — Gate Fusion du parcours incrémental et des opérations longues
+### P64-L05B — Capture DEV d’un SolverCaseBundle versionné
 
-Type : gate humaine distincte. Aucun développement runtime supplémentaire ne doit
-être ouvert avant son retour formel.
+Type : développement borné, sans gate humaine intermédiaire.
 
-Préparation attendue dans une mission dédiée :
+Objectif : ajouter près du calcul et de la matérialisation un bouton DEV rouge,
+explicitement réservé au développement, qui capture un cas reproductible sans
+modifier automatiquement le solveur.
 
-1. installer le package Fusion courant seulement après vérification du commit ;
-2. vérifier l'activité immédiate, l'étape et le temps écoulé sur les opérations
-   longues, sans pourcentage ni bouton Annuler décoratif ;
-3. observer insertion locale sans mouvement monde ni solve global, puis fallback
-   explicite ;
-4. vérifier scène désynchronisée puis remplacée sans doublon ;
-5. conserver provenance, méthode, budgets, phases, incumbent et raison d'arrêt ;
-6. enregistrer un retour Fusion formel, sans revendication d'impression.
+Le bundle doit contenir au minimum :
 
-État d'entrée : L04A/B/C sont automated-validated ; package 0.1.58 ;
-fusion-validated: false et print-validated: false pour P64-L04.
+1. projet normalisé et digests de source ;
+2. réglages solveur, effort, budgets, lanes, temps et raison d’arrêt ;
+3. plan minimal certifié courant lorsqu’il existe ;
+4. placements, variantes locales, certificats et provenance ;
+5. événements utilisateur utiles à la reproduction ;
+6. identité de schéma et version du producteur ;
+7. export local explicite, sans secret ni écriture silencieuse dans le dépôt.
 
+La capture doit être testée dans le producteur pur, le bridge et le DOM. Elle ne
+doit lancer ni solve, ni finalisation, ni CAD, ni scène, ni auto-apprentissage.
+
+État d’entrée : R1 et L05A automated-validated ; ADR-0076 acceptée ;
+fusion-validated: false, print-validated: false.
 
 ## Lots verrouillés
 
@@ -104,3 +113,14 @@ vide global d'un plan minimal certifié avec voisins figés et recertification
 complète. Le lot doit commencer par une ADR, car ADR-0075 exclut actuellement ce
 comportement. L05B/L05C/L05D restent ensuite autorisés et ordonnés. Aucune gate
 Fusion ni impression n'est revendiquée par R1.
+
+## Mise à jour après P64-L05A (2026-07-22)
+
+P64-L05A est automated-validated. Le producteur fixe tous les voisins, teste des
+positions de contact contre les placements réels et rejoue le certificat global
+commun. Il n’utilise pas les zones résiduelles affichées comme preuve et
+n’appelle pas le portefeuille global.
+
+Prochaine mission unique : P64-L05B, capture locale et versionnée d’un
+SolverCaseBundle depuis un bouton DEV explicite. L05C puis L05D restent ordonnés.
+Aucune validation Fusion ou impression n’est revendiquée.

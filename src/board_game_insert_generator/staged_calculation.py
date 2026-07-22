@@ -23,6 +23,11 @@ from board_game_insert_generator.incremental_project_state import (
     IncrementalProjectState,
     canonical_digest,
 )
+from board_game_insert_generator.incremental_global_container_reuse import (
+    STATUS_CONTAINER_PLACED as STATUS_GLOBAL_VOID_CONTAINER_PLACED,
+    attempt_incremental_global_void_container_reuse,
+    empty_global_void_reuse_report,
+)
 from board_game_insert_generator.incremental_layout_reuse import (
     STATUS_PLACEMENT_REUSED,
     attempt_incremental_minimal_layout_reuse,
@@ -114,6 +119,7 @@ class StagedCalculationSession:
         self._global_request_id = ""
         self._global_stop_reason = "not_started"
         self._local_reuse = empty_local_reuse_report()
+        self._global_void_reuse = empty_global_void_reuse_report()
         self._finalized_status = STATUS_NOT_FINALIZED
         self._finalized_partition: dict[str, object] | None = None
         self._finalized_artifact_digest = ""
@@ -173,6 +179,13 @@ class StagedCalculationSession:
                 "dependencies_unchanged"
                 if not dependencies_changed
                 else "no_eligible_local_edit"
+            )
+        )
+        self._global_void_reuse = empty_global_void_reuse_report(
+            stop_reason=(
+                "dependencies_unchanged"
+                if not dependencies_changed
+                else "no_eligible_new_container"
             )
         )
 
@@ -237,6 +250,85 @@ class StagedCalculationSession:
                     reuse.report.get(
                         "stop_reason",
                         "fixed_envelope_plan_recertified",
+                    )
+                )
+                if self._finalized_partition is not None:
+                    self._finalized_status = STATUS_STALE
+                else:
+                    self._finalized_status = STATUS_NOT_FINALIZED
+                self._cad_status = (
+                    STATUS_DESYNCHRONIZED
+                    if self._cad_identity is not None
+                    else STATUS_NOT_MATERIALIZED
+                )
+                return self.snapshot()
+
+        if (
+            delta.changed
+            and not settings_changed
+            and previous_minimal_current
+            and previous_partition is not None
+        ):
+            try:
+                global_void_reuse = (
+                    attempt_incremental_global_void_container_reuse(
+                        previous_project,
+                        project,
+                        previous_partition,
+                        container_frontiers=self._container_frontiers,
+                        effort_profile=str(self._settings["effort"]),
+                    )
+                )
+                self._global_void_reuse = deepcopy(global_void_reuse.report)
+            except (KeyError, TypeError, ValueError) as exc:
+                self._global_void_reuse = empty_global_void_reuse_report(
+                    status="global_solve_required",
+                    stop_reason="global_void_reuse_input_rejected",
+                )
+                self._global_void_reuse["rejection_codes"] = [
+                    type(exc).__name__
+                ]
+                global_void_reuse = None
+
+            if (
+                global_void_reuse is not None
+                and global_void_reuse.report.get("status")
+                == STATUS_GLOBAL_VOID_CONTAINER_PLACED
+                and global_void_reuse.partition is not None
+            ):
+                key = self._global_layout_key()
+                partition = deepcopy(global_void_reuse.partition)
+                artifact_digest = canonical_digest(
+                    {
+                        "schema_version": GLOBAL_LAYOUT_ARTIFACT_SCHEMA_V1,
+                        "artifact_kind": ARTIFACT_KIND_MINIMAL,
+                        "global_key_digest": key.digest,
+                        "partition_plan_digest": partition.get("plan_digest"),
+                        "partition": partition,
+                    }
+                )
+                self._active_global_request = None
+                self.state.mark_lifecycle_current(
+                    STAGE_GLOBAL_LAYOUT,
+                    artifact_digest,
+                )
+                self._global_status = STATUS_CURRENT
+                self._global_partition = partition
+                self._global_artifact_digest = artifact_digest
+                self._global_key_digest = key.digest
+                self._global_cache_status = "global_void_reuse_not_cached"
+                self._global_cache_write_status = "not_applicable"
+                self._global_result_source = "global_void_container_reuse"
+                self._global_search_elapsed_ms = "not_applicable"
+                self._global_request_elapsed_ms = "not_applicable"
+                self._global_retrieval_elapsed_ms = "not_applicable"
+                self._global_request_id = (
+                    f"global-void-reuse-revision-{self.state.source_revision}"
+                )
+                self._global_stop_reason = str(
+                    global_void_reuse.report.get(
+                        "stop_reason",
+                        "new_container_inserted_and_plan_recertified",
                     )
                 )
                 if self._finalized_partition is not None:
@@ -622,6 +714,7 @@ class StagedCalculationSession:
             "source_revision": self.state.source_revision,
             "local_analysis_digest": self._local_analysis_digest,
             "local_reuse": deepcopy(self._local_reuse),
+            "global_void_reuse": deepcopy(self._global_void_reuse),
             # ``global_layout`` remains as an additive compatibility alias.
             "global_layout": deepcopy(minimal_payload),
             "minimal_layout": minimal_payload,

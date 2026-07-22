@@ -1083,3 +1083,19 @@ et de restitution. La suite complète passe 651/651. Le retour L04V reste
 globalement KO et ouvre le programme L05A à L05D accepté : insertion de nouveau
 conteneur, capture de cas solveur, plan-witness/warm start, puis optimisation sur
 corpus. Aucun budget ou solveur n'est modifié dans R1.
+
+## P64-L05A — insertion globale incrémentale livrée (2026-07-22)
+
+L05A corrige la dissymétrie observée pendant L04V : un nouveau conteneur peut
+désormais exploiter un vide global si tous les voisins restent identiques et si
+le plan complet est recertifié. ADR-0076 interdit de confondre les zones
+résiduelles affichées avec une preuve.
+
+Ordre restant du programme accepté :
+
+1. L05B — bouton DEV et SolverCaseBundle versionné ;
+2. L05C — plan témoin certifié persistant et warm start ;
+3. L05D — corpus, optimisation des lanes et mesures de performance.
+
+Chaque lot reste atomique et intégré séparément. Aucune validation Fusion ou
+impression n’est implicite.

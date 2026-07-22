@@ -8,9 +8,10 @@ Statut produit : **MVP V0.1 Fusion-only accepte ; validation d impression non ac
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P64-L04A, P64-L04B et P64-L04C sont automated-validated ;
-le manifest Fusion reste à 0.1.58. P64-L04V est la prochaine gate humaine
-distincte, non exécutée dans ce lot.
+Phase active : P64-L04A/B/C, P64-L04R1 et P64-L05A sont
+automated-validated. Le retour humain L04V est globalement KO mais partiellement
+positif. Le manifest Fusion reste à 0.1.58. P64-L05B est la prochaine mission
+unique ; aucune gate humaine intermédiaire n’est requise.
 P64-V2H03V et P44-V sont fusion-validated sur 0.1.55. P45-M001V est
 architecture-accepted. P64-L03V est un KO contextuel sur 0.1.56 et n'accorde
 aucune validation Fusion à la correction minimal/final.
@@ -2894,3 +2895,20 @@ transportent séparément search_elapsed_ms et retrieval_elapsed_ms.
 Validation : 11/11 staged, 24/24 bridge, 35/35 DOM, Ruff, py_compile,
 JavaScript et 651/651 suite complète. Preuve :
 docs/P64_L04R1_NEGATIVE_CACHE_EVIDENCE.md.
+
+## P64-L05A — insertion d’un nouveau conteneur (2026-07-22)
+
+Statut : implemented-core, implemented-fusion-bridge,
+implemented-fusion-ui, automated-validated ; fusion-validated: false,
+print-validated: false.
+
+ADR-0076 autorise exactement un nouveau conteneur dans un plan minimal certifié.
+Le producteur conserve tous les voisins, teste des contacts déterministes contre
+les placements réels, puis rejoue le certificat global commun. Succès :
+container_placed_in_global_void. Échec : global_solve_required. Le portefeuille
+global, la finalisation, la CAD et Fusion restent à zéro invocation.
+
+Validation : 7/7 L05A, 9/9 L04A, 25/25 bridge, 36/36 DOM et 660/660 suite complète en 137,923 s.
+La validation complète est consignée dans la preuve L05A. Le projet personnel
+Mon insert.bgig.json reste inchangé et ne constitue pas une fixture versionnée.
+P64-L05B est la prochaine mission unique.

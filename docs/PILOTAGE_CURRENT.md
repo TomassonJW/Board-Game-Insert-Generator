@@ -53,9 +53,13 @@ preuves archivées.
 - ADR-0075 et le contrat P64-L04 sont acceptés. P64-L04A est
   `implemented-core`, `implemented-fusion-bridge`, `implemented-fusion-ui` et
   `automated-validated` dans 0.1.58.
-- P64-L04B est `implemented-core`, `automated-validated` : le préfixe Normal
-  fournit l’incumbent, les trois lanes Deep partagent 30 s et une expiration
-  conserve toute solution certifiée. P64-L04C est automated-validated ; L04V devient la prochaine gate humaine.
+- P64-L04B et P64-L04C sont automated-validated.
+- Le retour humain P64-L04V est globalement KO mais partiellement positif :
+  l’insertion interne fonctionne, le nouveau conteneur et la reconstruction
+  depuis zéro restaient en défaut.
+- P64-L04R1 et P64-L05A sont automated-validated. L05A insère exactement un
+  nouveau conteneur à voisins figés puis recertifie le plan complet sans solve
+  global. P64-L05B est la prochaine mission unique.
 
 ## Vue de séquence
 
@@ -91,7 +95,10 @@ preuves archivées.
 | Terminé — automatisé | P64-L04A | Insertion locale à enveloppe fixe, recertification globale sans solve et UX compacte dans 0.1.58. |
 | Terminé — automatisé | P64-L04B | Préfixe Normal incumbent, extension Deep anytime sous deadline commune de 30 s. |
 | Terminé — automatisé | P64-L04C | Identité, lifecycle, étape et temps écoulé honnêtes ; doublons sémantiques bloqués. |
-| Prochaine gate humaine | P64-L04V | Gate Fusion combinée distincte après validation automatisée de L04C. |
+| Retour humain globalement KO | P64-L04V | Insertion interne positive ; nouveau conteneur et reconstruction depuis zéro encore insuffisants. |
+| Terminé — automatisé | P64-L04R1 | Cache réservé aux plans certifiés et temps recherche/restitution distincts. |
+| Terminé — automatisé | P64-L05A | Nouveau conteneur inséré à voisins figés, plan complet recertifié sans solve global. |
+| Prochaine mission | P64-L05B | Bouton DEV et SolverCaseBundle local, versionné et reproductible. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -121,8 +128,12 @@ preuves archivées.
   monotone, annulation stale et observabilité.
 - P64_L04B_DEEP_ANYTIME_EVIDENCE.md : preuves d’incumbent, expiration,
   télémétrie et non-régression automatisée.
-- ADR-0075 : distinction L04A pré-finalisation / C02 post-finalisation et
-  séparation des corrections Approfondi / attente UX.
+- ADR-0075 : réutilisation locale interne à enveloppe fixe.
+- ADR-0076 : insertion bornée d’un nouveau conteneur dans le vide global.
+- P64_L05A_GLOBAL_VOID_CONTAINER_REUSE_CONTRACT.md : éligibilité, caps,
+  certificat et fallback L05A.
+- P64_L05A_GLOBAL_VOID_CONTAINER_REUSE_EVIDENCE.md : preuves cœur, staged,
+  bridge et DOM de L05A.
 - ADR-0074 : supersession partielle d'ADR-0071 après le KO Fusion 0.1.56.
 - STATUS.md : faits réalisés, validations et limites.
 - CAPABILITY_MAP.md : capability et niveau de preuve.
@@ -357,3 +368,15 @@ la reconstruction depuis zéro restent KO. R1 supprime la réutilisation des
 succès certifié. Validation automatisée : 651/651. L05A devient la prochaine
 mission du programme correctif accepté ; fusion-validated: false,
 print-validated: false.
+
+## P64-L05A — nouveau conteneur dans le vide global (2026-07-22)
+
+ADR-0076 et le contrat L05A sont implémentés. Un delta strictement borné à un
+nouveau groupe peut conserver bit-à-bit les placements monde existants,
+énumérer des positions de contact pour ses variantes locales certifiées et
+republier un plan minimal entièrement recertifié. Les zones résiduelles ne sont
+pas une preuve. Aucun solve global, finaliseur, CAD ou scène n’est déclenché.
+
+Statut : implemented-core, implemented-fusion-bridge,
+implemented-fusion-ui, automated-validated. fusion-validated: false,
+print-validated: false. P64-L05B est la prochaine mission.
