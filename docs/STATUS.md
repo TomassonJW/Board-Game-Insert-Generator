@@ -8,10 +8,10 @@ Statut produit : **MVP V0.1 Fusion-only accepte ; validation d impression non ac
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P64-L04A/B/C, P64-L04R1 et P64-L05A sont
+Phase active : P64-L04A/B/C, P64-L04R1 et P64-L05A/B sont
 automated-validated. Le retour humain L04V est globalement KO mais partiellement
-positif. Le manifest Fusion reste à 0.1.58. P64-L05B est la prochaine mission
-unique ; aucune gate humaine intermédiaire n’est requise.
+positif. Le manifest Fusion reste a 0.1.58. P64-L05C est la prochaine mission
+unique ; aucune gate humaine intermediaire n'est requise.
 P64-V2H03V et P44-V sont fusion-validated sur 0.1.55. P45-M001V est
 architecture-accepted. P64-L03V est un KO contextuel sur 0.1.56 et n'accorde
 aucune validation Fusion à la correction minimal/final.
@@ -2912,3 +2912,24 @@ Validation : 7/7 L05A, 9/9 L04A, 25/25 bridge, 36/36 DOM et 660/660 suite compl�
 La validation complète est consignée dans la preuve L05A. Le projet personnel
 Mon insert.bgig.json reste inchangé et ne constitue pas une fixture versionnée.
 P64-L05B est la prochaine mission unique.
+
+
+## P64-L05B — SolverCaseBundle et bouton DEV (2026-07-22)
+
+Statut : implemented-core, implemented-fusion-bridge,
+implemented-fusion-ui, automated-validated ; fusion-validated: false,
+print-validated: false.
+
+ADR-0077 definit un artefact local `bgig.solver_case_bundle.v1`. Le producteur
+pur fige projet normalise, etat staged observe, frontieres P45, reglages,
+provenance, trace semantique et identite de scene, puis calcule des digests
+stables. La trace est limitee aux 256 evenements recents, sans valeurs saisies,
+chemins de document ou secrets.
+
+Validation : 3/3 producteur, 12/12 staged, 26/26 bridge, 37/37 DOM et 667/667 suite complete en 154,990 s. Ruff, py_compile, compileall, JavaScript, frontiere adsk et diff-check passent.
+
+Le bridge ecrit atomiquement sous `solver-cases` et ne renvoie qu'un resume. Le
+bouton DEV rouge est visible a cote du calcul, bloque seulement une seconde
+capture et ne lance ni solve, finalisation, CAD ou scene. Il n'effectue aucune
+auto-modification du solveur. Le projet personnel Mon insert.bgig.json reste
+inchange. P64-L05C est la prochaine mission unique.

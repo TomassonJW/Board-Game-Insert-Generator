@@ -13,7 +13,7 @@ Le retour humain L04V est globalement KO mais partiellement positif. R1 corrige
 le cache négatif. P64-L05A est automated-validated : exactement un nouveau
 conteneur peut être inséré dans le vide global à voisins figés et plan complet
 recertifié. Le manifest Fusion reste à 0.1.58. fusion-validated: false et
-print-validated: false pour L05A.
+print-validated: false pour L05A et L05B. P64-L05B est automated-validated ; le manifest reste inchange.
 
 ## Dernier état réel
 
@@ -38,6 +38,7 @@ print-validated: false pour L05A.
   étape et temps écoulé sans pourcentage ni ETA inventés ;
 - un second lancement du même type est bloqué ; aucune annulation décorative
   n'est exposée ;
+- un bouton DEV rouge exporte un SolverCaseBundle versionne, local et filtre sans lancer de solve, finalisation, CAD ou scene ;
 - le cas dense 11 × 34 ne reçoit aucune nouvelle revendication.
 
 Preuves :
@@ -46,32 +47,37 @@ Preuves :
 [P64-L04C](P64_L04C_OPERATION_ACTIVITY_EVIDENCE.md).
 
 Preuve L05A : P64_L05A_GLOBAL_VOID_CONTAINER_REUSE_EVIDENCE.md.
+Preuve L05B : P64_L05B_SOLVER_CASE_BUNDLE_EVIDENCE.md.
 
 ## Prochaine action recommandée
 
-### P64-L05B — Capture DEV d’un SolverCaseBundle versionné
+### P64-L05C — Plan temoin certifie persistant et warm start
 
-Type : développement borné, sans gate humaine intermédiaire.
+Type : developpement borne, sans gate humaine intermediaire.
 
-Objectif : ajouter près du calcul et de la matérialisation un bouton DEV rouge,
-explicitement réservé au développement, qui capture un cas reproductible sans
-modifier automatiquement le solveur.
+Objectif : conserver un plan minimal certifie comme temoin versionne et le
+reinjecter comme incumbent de reconstruction depuis zero lorsque le projet, les
+frontieres locales, les reglages et les dependances geometriques correspondent
+exactement.
 
-Le bundle doit contenir au minimum :
+Le lot doit cadrer puis implementer :
 
-1. projet normalisé et digests de source ;
-2. réglages solveur, effort, budgets, lanes, temps et raison d’arrêt ;
-3. plan minimal certifié courant lorsqu’il existe ;
-4. placements, variantes locales, certificats et provenance ;
-5. événements utilisateur utiles à la reproduction ;
-6. identité de schéma et version du producteur ;
-7. export local explicite, sans secret ni écriture silencieuse dans le dépôt.
+1. une identite et un schema de witness distincts du cache opportuniste ;
+2. une validation fail-closed du projet, des frontieres P45 et du certificat ;
+3. un warm start qui propose l'incumbent sans court-circuiter la recherche ni
+   abaisser le certificat global ;
+4. une provenance et une telemetrie distinguant witness charge, accepte, rejete,
+   ameliore ou seulement restitue ;
+5. des tests montrant qu'un plan materialisable connu peut etre retrouve depuis
+   zero et qu'un witness stale ou incompatible est refuse.
 
-La capture doit être testée dans le producteur pur, le bridge et le DOM. Elle ne
-doit lancer ni solve, ni finalisation, ni CAD, ni scène, ni auto-apprentissage.
+Aucune capture personnelle n'est importee automatiquement dans le depot. Aucun
+plan non certifie, stale, finalise seulement visuellement ou issu de la scene ne
+devient une preuve. Le solveur, ses lanes et budgets ne sont modifies que si le
+contrat L05C l'exige explicitement et apres cadrage.
 
-État d’entrée : R1 et L05A automated-validated ; ADR-0076 acceptée ;
-fusion-validated: false, print-validated: false.
+Etat d'entree : R1, L05A et L05B automated-validated ; ADR-0076 et ADR-0077
+acceptees ; fusion-validated: false, print-validated: false.
 
 ## Lots verrouillés
 
@@ -124,3 +130,15 @@ n’appelle pas le portefeuille global.
 Prochaine mission unique : P64-L05B, capture locale et versionnée d’un
 SolverCaseBundle depuis un bouton DEV explicite. L05C puis L05D restent ordonnés.
 Aucune validation Fusion ou impression n’est revendiquée.
+
+
+## Mise a jour apres P64-L05B (2026-07-22)
+
+P64-L05B est automated-validated. Un bouton DEV rouge produit localement un
+SolverCaseBundle v1 reproductible avec etat staged observe, frontieres P45,
+reglages, provenance, trace semantique filtree et identite de scene. La capture
+ne declenche aucune operation de domaine et ne modifie pas le solveur.
+
+Prochaine mission unique : P64-L05C, plan temoin certifie persistant et warm
+start fail-closed. L05D reste ensuite ordonnee. Aucune validation Fusion ou
+impression n'est revendiquee.

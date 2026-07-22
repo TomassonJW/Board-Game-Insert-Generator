@@ -713,5 +713,37 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertNotIn("percentage", self.markup[activity_start:activity_end])
         self.assertNotIn("<details open", self.markup[activity_start:activity_end])
 
+    def test_exposes_explicit_red_dev_solver_case_capture_without_fake_learning(self) -> None:
+        for marker in (
+            'id="dev-solver-case-capture"',
+            'class="dev-capture"',
+            'data-action="capture-solver-case"',
+            'button.dev-capture{background:#b3261e',
+            "capture_solver_case:{kind:'solver_case_capture'",
+            'function recordSolverCaseEvent',
+            'function captureSolverCase',
+            "item.action==='capture_solver_case'",
+            "sendProject('capture_solver_case'",
+            'interaction_events:solverCaseEvents',
+            'scene_artifact_identity:materializedIdentity',
+            'solverCaseEvents.length>256',
+            "for(const key of ['action','ui_field','object_id'])",
+            "recordSolverCaseEvent('field_changed'",
+            "captured?'Cas solveur captur",
+            "Bundle DEV enregistre : ",
+        ):
+            self.assertIn(marker, self.markup)
+        primary = self.markup.index('id="primary-calculation-action"')
+        capture = self.markup.index('id="dev-solver-case-capture"')
+        self.assertLess(primary, capture)
+        trace_start = self.markup.index("function recordSolverCaseEvent")
+        trace_end = self.markup.index("function markDirty", trace_start)
+        trace_code = self.markup[trace_start:trace_end]
+        self.assertNotIn("details.value", trace_code)
+        self.assertNotIn("input.value", trace_code)
+        self.assertNotIn("percentage", trace_code)
+        self.assertNotIn("train", trace_code.lower())
+        self.assertNotIn("autoam", trace_code.lower())
+
 if __name__ == "__main__":
     unittest.main()

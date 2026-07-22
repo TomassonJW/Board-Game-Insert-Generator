@@ -863,5 +863,153 @@ class FusionPaletteProjectTests(unittest.TestCase):
         self.assertEqual(solved["partition"]["minimal_layout"]["search_provenance"]["effort_profile"], "deep")
         self.assertEqual(reloaded["solver_settings"], {"method": "stage_stack", "effort": "deep"})
 
+    def test_p64_l05b_captures_a_local_solver_case_without_domain_operations(self) -> None:
+        from board_game_insert_generator.staged_calculation import (
+            StagedCalculationSession,
+        )
+
+        project = blank_project_v1()
+        project["project_name"] = "Mon insert"
+        project["container_groups"] = [
+            {
+                "id": "g",
+                "name": "Bac",
+                "wall_thickness_mm": None,
+                "floor_thickness_mm": None,
+            }
+        ]
+        project["contents"] = [
+            {
+                "id": "asset",
+                "name": "Pions",
+                "shape_kind": "square",
+                "dimensions_mm": {"x": 12, "y": 12, "z": 3},
+                "quantity": 2,
+                "container_group_id": "g",
+                "content_clearance_mm": None,
+                "measurement_confidence": "exact",
+            }
+        ]
+        settings = {"method": "auto", "effort": "quick"}
+        interaction_events = [
+            {
+                "sequence": 1,
+                "event_type": "field_changed",
+                "ui_field": "contents.quantity",
+                "object_id": "asset",
+                "source_revision": 7,
+                "elapsed_ms": 25,
+                "value": "private",
+                "password": "private",
+            }
+        ]
+        with tempfile.TemporaryDirectory() as temp_dir, patch.dict(
+            "os.environ", {"BGIG_USER_DATA_DIR": temp_dir}
+        ):
+            solved = handle_palette_request(
+                request(
+                    "solve_project",
+                    project=project,
+                    solver_settings=settings,
+                    source_revision=7,
+                ),
+                ADDIN,
+                ROOT,
+            )
+            self.assertEqual(solved["status"], "ready")
+            self.assertIsNotNone(solved["partition"])
+            with (
+                patch.object(
+                    StagedCalculationSession,
+                    "calculate_layout",
+                    side_effect=AssertionError("capture invoked global solve"),
+                ),
+                patch.object(
+                    StagedCalculationSession,
+                    "finalize_volume",
+                    side_effect=AssertionError("capture invoked finalization"),
+                ),
+                patch.object(
+                    StagedCalculationSession,
+                    "select_materializable_artifact",
+                    side_effect=AssertionError("capture selected CAD artifact"),
+                ),
+                patch(
+                    "board_game_insert_generator.partition_cad.build_partition_cad",
+                    side_effect=AssertionError("capture invoked CAD build"),
+                ),
+            ):
+                captured = handle_palette_request(
+                    request(
+                        "capture_solver_case",
+                        project=project,
+                        solver_settings=settings,
+                        source_revision=7,
+                        captured_at_ms=123456,
+                        interaction_events=interaction_events,
+                        client_context={
+                            "scene_present": True,
+                            "dirty": False,
+                            "solved_stale": False,
+                            "document_path": "C:/private/Mon insert.bgig.json",
+                            "scene_artifact_identity": {
+                                "schema_version": "bgig.artifact_identity.v1",
+                                "artifact_kind": "minimal_layout",
+                                "artifact_digest": "a" * 64,
+                                "partition_plan_digest": solved["partition"]["plan_digest"],
+                                "cad_ir_digest": "b" * 64,
+                                "source_revision": 7,
+                                "document_path": "C:/private/scene.f3d",
+                            },
+                        },
+                    ),
+                    ADDIN,
+                    ROOT,
+                )
+            bundle_path = Path(captured["export_path"])
+            bundle = json.loads(bundle_path.read_text(encoding="utf-8"))
+
+            self.assertEqual(bundle_path.parent, Path(temp_dir) / "solver-cases")
+            self.assertTrue(bundle_path.is_file())
+            self.assertFalse(bundle_path.with_suffix(bundle_path.suffix + ".tmp").exists())
+
+        self.assertEqual(captured["status"], "ready")
+        self.assertEqual(
+            captured["operation_activity"]["operation_kind"],
+            "solver_case_capture",
+        )
+        self.assertEqual(
+            captured["operation_activity"]["stop_reason"],
+            "solver_case_bundle_exported",
+        )
+        self.assertIsNone(captured["partition"])
+        self.assertIsNone(captured["cad_build"])
+        self.assertEqual(
+            captured["solver_case_capture"]["schema_version"],
+            "bgig.solver_case_bundle.v1",
+        )
+        self.assertTrue(captured["solver_case_capture"]["has_observed_partition"])
+        self.assertTrue(captured["solver_case_capture"]["has_certified_plan"])
+        self.assertFalse(
+            captured["solver_case_capture"]["automatic_solver_modification"]
+        )
+        self.assertEqual(bundle["project"]["project_name"], "Mon insert")
+        self.assertEqual(bundle["interaction_trace"]["event_count"], 1)
+        self.assertEqual(
+            set(bundle["interaction_trace"]["events"][0]),
+            {
+                "sequence",
+                "event_type",
+                "ui_field",
+                "object_id",
+                "source_revision",
+                "elapsed_ms",
+            },
+        )
+        encoded = json.dumps(bundle, sort_keys=True).lower()
+        self.assertNotIn("password", encoded)
+        self.assertNotIn("c:/private", encoded)
+        self.assertFalse(bundle["invariants"]["automatic_solver_modification"])
+
 if __name__ == "__main__":
     unittest.main()

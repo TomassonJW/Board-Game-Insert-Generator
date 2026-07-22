@@ -2785,9 +2785,26 @@ implémentée et intégrée à la fois.
 ### P64-L05B — SolverCaseBundle et bouton DEV
 
 - Dépendance obtenue : P64-L05A automated-validated.
-- Livrable : capture locale versionnée et reproductible du projet, du plan
-  témoin, des réglages, budgets, lanes, temps, raisons d’arrêt et événements
-  utiles.
-- Interdits : aucune auto-modification du solveur, aucun solve ou scène déclenché
-  par la capture, aucun secret.
+- Livre : producteur pur, schema v1, capture locale atomique, trace semantique
+  bornee et bouton DEV rouge avec anti-doublon cible.
+- Interdits respectes : aucune auto-modification du solveur, aucun solve,
+  finalisation, CAD ou scene declenche par la capture, aucun secret ou chemin.
+- Preuve : docs/P64_L05B_SOLVER_CASE_BUNDLE_EVIDENCE.md.
+- Statut : done-code, automated-validated, fusion-validated: false,
+  print-validated: false.
+
+### P64-L05C — plan temoin certifie persistant et warm start
+
+- Dependances obtenues : P64-L05A et P64-L05B automated-validated.
+- Livrable : witness versionne et valide fail-closed, incumbent de warm start,
+  provenance et telemetrie d'acceptation, rejet, restitution ou amelioration.
+- Interdits : aucun plan stale ou non certifie, aucun court-circuit du certificat,
+  aucune scene ou finalisation automatique.
 - Statut : ready.
+
+### P64-L05D — corpus, lanes et performance
+
+- Dependances : P64-L05C automated-validated et corpus de cas explicites.
+- Livrable : replay borne, mesures comparables, ameliorations relues des lanes et
+  optimisation de vitesse sans regression de certificat.
+- Statut : blocked-by-P64-L05C.

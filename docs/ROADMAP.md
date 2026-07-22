@@ -1099,3 +1099,19 @@ Ordre restant du programme accepté :
 
 Chaque lot reste atomique et intégré séparément. Aucune validation Fusion ou
 impression n’est implicite.
+
+
+## P64-L05B — capture DEV versionnee livree (2026-07-22)
+
+L05B livre ADR-0077, un producteur pur de SolverCaseBundle v1, l'export atomique
+local et un bouton DEV rouge dans la palette. Le bundle conserve les faits utiles
+a la reproduction tout en excluant valeurs de formulaire, chemins et secrets.
+La capture ne lance aucune operation de domaine et ne modifie pas le solveur.
+
+Ordre restant du programme accepte :
+
+1. L05C — plan temoin certifie persistant et warm start ;
+2. L05D — corpus, optimisation des lanes et mesures de performance.
+
+Le manifest reste 0.1.58. Aucune validation Fusion ou impression n'est
+revendiquee.

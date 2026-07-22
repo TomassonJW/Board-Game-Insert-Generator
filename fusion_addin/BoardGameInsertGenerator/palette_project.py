@@ -34,6 +34,7 @@ SUPPORTED_ACTIONS = frozenset({
     "solve_project", "finalize_project", "materialize_project", "regenerate_project",
     "save_personal_preset", "delete_personal_preset",
     "import_personal_presets", "export_personal_presets", "save_solver_settings",
+    "capture_solver_case",
 })
 _LOCAL_ANALYSIS_ENGINE_LIMIT = 8
 _LOCAL_ANALYSIS_ENGINES: OrderedDict[tuple[str, str], object] = OrderedDict()
@@ -207,6 +208,8 @@ def _calculation_result_timing(
 def _operation_stop_reason(action: str, response: dict[str, object]) -> str:
     if response.get("status") != "ready":
         return "bridge_request_rejected"
+    if action == "capture_solver_case":
+        return "solver_case_bundle_exported"
     if action == "validate_project":
         staged = response.get("staged_calculation") or {}
         if isinstance(staged, dict):
@@ -399,6 +402,10 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
     )
     from board_game_insert_generator.project_presets import build_creation_presets
     from board_game_insert_generator.project_v1 import blank_project_v1, normalize_project_draft
+    from board_game_insert_generator.solver_case_bundle import (
+        build_solver_case_bundle,
+        solver_case_capture_summary,
+    )
 
     document_state = load_document_state(addin_dir)
     solver_settings = _normalize_solver_settings(
@@ -519,6 +526,9 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
     staged_solver_result: dict[str, object] | None = None
     partition: dict[str, object] | None = None
     artifact_selection: dict[str, object] | None = None
+    solver_case_bundle: dict[str, object] | None = None
+    solver_case_capture: dict[str, object] | None = None
+    solver_case_export_path = ""
     artifact_kind = str(request.get("artifact_kind") or "minimal_layout")
     if (
         action == "validate_project"
@@ -548,6 +558,35 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         artifact_selection = staged_session.select_materializable_artifact(artifact_kind)
         partition = artifact_selection["partition"]
         staged_solver_result = _partition_solver_result(partition)
+    elif action == "capture_solver_case":
+        captured_at_value = request.get("captured_at_ms")
+        captured_at_ms = (
+            captured_at_value
+            if isinstance(captured_at_value, int)
+            and not isinstance(captured_at_value, bool)
+            and captured_at_value >= 0
+            else _now_ms()
+        )
+        solver_case_bundle = build_solver_case_bundle(
+            project,
+            solver_settings=solver_settings,
+            solver_case_state=staged_session.solver_case_snapshot(),
+            local_analysis=local_analysis,
+            container_frontiers=local_frontiers,
+            interaction_events=request.get("interaction_events"),
+            client_context=(
+                request.get("client_context")
+                if isinstance(request.get("client_context"), dict)
+                else {}
+            ),
+            capture_id=request_id,
+            captured_at_ms=captured_at_ms,
+            source_revision=_request_revision(request) or 0,
+        )
+        solver_case_export_path = str(
+            _export_solver_case(addin_dir, project, solver_case_bundle)
+        )
+        solver_case_capture = solver_case_capture_summary(solver_case_bundle)
     container_sizing = build_container_sizing_view(project, envelopes, partition)
     result_view = (
         build_partition_result_view(partition)
@@ -587,7 +626,7 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         staged_calculation = staged_session.snapshot()
     saved = False
     recovery_saved = False
-    export_path = ""
+    export_path = solver_case_export_path
     if action in {"save_project", "autosave_project"}:
         _write_json_atomic(current_project_path(addin_dir), project)
         recovery_saved = True
@@ -657,6 +696,7 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         export_path=export_path,
         document=_document_info(addin_dir, document_state),
         solver_settings=solver_settings,
+        solver_case_capture=solver_case_capture,
     )
 
 
@@ -684,6 +724,7 @@ def _response(
     recovery_saved: bool = False,
     solver_result: dict[str, object] | None = None,
     solver_settings: dict[str, str] | None = None,
+    solver_case_capture: dict[str, object] | None = None,
 ) -> dict[str, object]:
     return {
         "schema": PALETTE_RESPONSE_SCHEMA,
@@ -714,6 +755,7 @@ def _response(
         "result_view": deepcopy(result_view),
         "solver_result": deepcopy(solver_result),
         "solver_settings": deepcopy(solver_settings),
+        "solver_case_capture": deepcopy(solver_case_capture),
         "cad_build": deepcopy(cad_build),
         "errors": list(errors or []),
         "warnings": list(warnings or []),
@@ -835,6 +877,28 @@ def _export_project(addin_dir: Path, project: dict[str, object]) -> Path:
     slug = re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-") or "projet-bgig"
     path = current_project_path(addin_dir).parent / f"{slug}.bgig.json"
     _write_json_atomic(path, project)
+    return path
+
+
+def _export_solver_case(
+    addin_dir: Path,
+    project: dict[str, object],
+    bundle: dict[str, object],
+) -> Path:
+    name = str(project.get("project_name", "projet-bgig"))
+    slug = re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-") or "projet-bgig"
+    capture = bundle.get("capture")
+    captured_at_ms = (
+        int(capture.get("captured_at_ms", 0))
+        if isinstance(capture, dict)
+        else 0
+    )
+    digest = str(bundle.get("bundle_digest", ""))
+    directory = current_project_path(addin_dir).parent / "solver-cases"
+    path = directory / (
+        f"solver-case-{slug}-{captured_at_ms}-{digest[:12]}.bgig.json"
+    )
+    _write_json_atomic(path, bundle)
     return path
 
 

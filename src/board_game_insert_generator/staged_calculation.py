@@ -750,6 +750,22 @@ class StagedCalculationSession:
 
         return deepcopy(self._global_partition) if self._minimal_current() else None
 
+    def solver_case_snapshot(self) -> dict[str, object]:
+        """Expose observed staged facts without running any domain operation."""
+
+        return {
+            "staged_calculation": self.snapshot(),
+            "observed_partition": deepcopy(self._global_partition),
+            "current_minimal_partition": self.current_minimal_partition(),
+            "invariants": {
+                "snapshot_only": True,
+                "global_solver_invocation_count": 0,
+                "finalization_invocation_count": 0,
+                "cad_build_invocation_count": 0,
+                "fusion_materialization_invocation_count": 0,
+            },
+        }
+
     def _minimal_current(self) -> bool:
         return bool(
             self._global_status == STATUS_CURRENT

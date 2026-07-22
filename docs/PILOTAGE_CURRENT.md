@@ -59,7 +59,7 @@ preuves archivées.
   depuis zéro restaient en défaut.
 - P64-L04R1 et P64-L05A sont automated-validated. L05A insère exactement un
   nouveau conteneur à voisins figés puis recertifie le plan complet sans solve
-  global. P64-L05B est la prochaine mission unique.
+  global. P64-L05B est automated-validated : le bouton DEV exporte un SolverCaseBundle versionne sans operation de domaine. P64-L05C est la prochaine mission unique.
 
 ## Vue de séquence
 
@@ -98,7 +98,8 @@ preuves archivées.
 | Retour humain globalement KO | P64-L04V | Insertion interne positive ; nouveau conteneur et reconstruction depuis zéro encore insuffisants. |
 | Terminé — automatisé | P64-L04R1 | Cache réservé aux plans certifiés et temps recherche/restitution distincts. |
 | Terminé — automatisé | P64-L05A | Nouveau conteneur inséré à voisins figés, plan complet recertifié sans solve global. |
-| Prochaine mission | P64-L05B | Bouton DEV et SolverCaseBundle local, versionné et reproductible. |
+| Termine — automatise | P64-L05B | Bouton DEV rouge et SolverCaseBundle local, versionne, filtre et sans effet metier. |
+| Prochaine mission | P64-L05C | Plan temoin certifie persistant et warm start depuis zero, sans baisser les certificats. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -134,6 +135,9 @@ preuves archivées.
   certificat et fallback L05A.
 - P64_L05A_GLOBAL_VOID_CONTAINER_REUSE_EVIDENCE.md : preuves cœur, staged,
   bridge et DOM de L05A.
+- ADR-0077 : capture locale versionnee, semantique et sans auto-apprentissage.
+- P64_L05B_SOLVER_CASE_BUNDLE_CONTRACT.md : schema, filtrage, lifecycle et invariants.
+- P64_L05B_SOLVER_CASE_BUNDLE_EVIDENCE.md : preuves producteur, staged, bridge et DOM.
 - ADR-0074 : supersession partielle d'ADR-0071 après le KO Fusion 0.1.56.
 - STATUS.md : faits réalisés, validations et limites.
 - CAPABILITY_MAP.md : capability et niveau de preuve.
@@ -380,3 +384,16 @@ pas une preuve. Aucun solve global, finaliseur, CAD ou scène n’est déclench�
 Statut : implemented-core, implemented-fusion-bridge,
 implemented-fusion-ui, automated-validated. fusion-validated: false,
 print-validated: false. P64-L05B est la prochaine mission.
+
+
+## P64-L05B — SolverCaseBundle et capture DEV (2026-07-22)
+
+ADR-0077 et le contrat L05B sont implementes. Le bouton rouge explicite capture
+un bundle local `bgig.solver_case_bundle.v1` : projet normalise, etat staged
+observe positif ou negatif, frontieres P45, provenance, budgets, raison d'arret,
+trace semantique sans valeurs et identite de scene allowlistee.
+
+La capture est atomique, bornee a 256 evenements et n'appelle ni solveur,
+finalisation, CAD ou Fusion. Elle ne modifie pas automatiquement l'algorithme.
+Le manifest reste 0.1.58 ; fusion-validated: false, print-validated: false.
+P64-L05C est la prochaine mission unique.

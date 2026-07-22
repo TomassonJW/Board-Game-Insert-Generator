@@ -399,5 +399,38 @@ class StagedCalculationTests(unittest.TestCase):
         self.assertEqual(changed["next_action"], "calculate_layout")
 
 
+    def test_solver_case_snapshot_preserves_observed_facts_without_operations(self) -> None:
+        project = _project()
+        engine = _engine(project)
+        session = StagedCalculationSession(project, solver_settings=SETTINGS)
+        _synchronize(session, project, engine)
+        calculated = session.calculate_layout(
+            request_id="solve-case", request_revision=4
+        )
+
+        snapshot = session.solver_case_snapshot()
+
+        self.assertEqual(
+            snapshot["observed_partition"]["plan_digest"],
+            calculated["partition"]["plan_digest"],
+        )
+        self.assertEqual(
+            snapshot["current_minimal_partition"]["plan_digest"],
+            calculated["partition"]["plan_digest"],
+        )
+        self.assertEqual(
+            snapshot["staged_calculation"], calculated["staged_calculation"]
+        )
+        self.assertEqual(
+            snapshot["invariants"],
+            {
+                "snapshot_only": True,
+                "global_solver_invocation_count": 0,
+                "finalization_invocation_count": 0,
+                "cad_build_invocation_count": 0,
+                "fusion_materialization_invocation_count": 0,
+            },
+        )
+
 if __name__ == "__main__":
     unittest.main()

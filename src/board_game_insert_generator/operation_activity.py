@@ -19,6 +19,11 @@ STATUS_FAILED = "failed"
 STATUS_REJECTED = "rejected"
 
 _ACTION_CONTRACTS: dict[str, tuple[str, str, str]] = {
+    "capture_solver_case": (
+        "solver_case_capture",
+        "Capture DEV du cas solveur",
+        "Assemblage et export du SolverCaseBundle",
+    ),
     "validate_project": (
         "local_analysis",
         "Analyse locale",

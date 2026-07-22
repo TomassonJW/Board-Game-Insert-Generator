@@ -74,6 +74,35 @@ class OperationActivityTests(unittest.TestCase):
             different.activity["invariants"]["different_operation_kinds_blocked"]
         )
 
+    def test_solver_case_capture_has_its_own_identity_and_duplicate_guard(self) -> None:
+        running = begin_operation_activity(
+            action="capture_solver_case",
+            operation_id="capture-1",
+            source_revision=5,
+            started_at_ms=100,
+        ).activity
+        duplicate = begin_operation_activity(
+            action="capture_solver_case",
+            operation_id="capture-2",
+            source_revision=5,
+            started_at_ms=120,
+            active_activities=(running,),
+        )
+        different = begin_operation_activity(
+            action="solve_project",
+            operation_id="solve-1",
+            source_revision=5,
+            started_at_ms=120,
+            active_activities=(running,),
+        )
+
+        self.assertEqual(running["operation_kind"], "solver_case_capture")
+        self.assertFalse(duplicate.accepted)
+        self.assertEqual(
+            duplicate.activity["conflicting_operation_id"], "capture-1"
+        )
+        self.assertTrue(different.accepted)
+
     def test_finishes_with_exact_identity_and_explicit_stop_reason(self) -> None:
         started = begin_operation_activity(
             action="validate_project",

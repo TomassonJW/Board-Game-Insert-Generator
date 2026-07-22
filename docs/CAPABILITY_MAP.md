@@ -1634,3 +1634,18 @@ séparation géométrique minimal/final ; ADR-0074 porte la correction.
   modifiés et aucune capacité de reconstruction depuis zéro n’est revendiquée.
 - Statut : automated-validated, fusion-validated: false,
   print-validated: false. Suite : P64-L05B.
+
+
+## Mise a jour P64-L05B — acquisition de cas solveur
+
+- C-PROJECT-CONTRACT : SolverCaseBundle v1 local, versionne, digeste et
+  reproductible ; projet personnel non verse dans le depot.
+- C-LAYOUT / C-SOLVER : etat staged observe positif ou negatif, provenance,
+  budgets, temps, raisons d'arret et frontieres P45 sont conserves sans les
+  reinterpreter. Capacite du solveur inchangee.
+- C-FUSION-UI : bouton DEV rouge explicite, trace semantique bornee et filtree,
+  anti-doublon limite a la capture ; aucune scene automatique.
+- C-SAFETY : aucune valeur saisie, aucun chemin de document, aucun secret, aucune
+  auto-modification de l'algorithme.
+- Statut : automated-validated, fusion-validated: false,
+  print-validated: false. Suite : P64-L05C.
