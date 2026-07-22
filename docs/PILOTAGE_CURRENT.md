@@ -464,3 +464,11 @@ est ecrite dans Documents/BGIG/projects. P64-L05 est maintenant ready-human-gate
 
 fusion-validated: false. print-validated: false. La capture DEV reste locale et
 ne modifie pas automatiquement le solveur.
+
+## P64-L05V - retour Fusion positif partiel (2026-07-22)
+
+Thomas observe dans Fusion 0.1.58 le plan minimal a deux conteneurs, dont le nouveau `Bac 888`, avec `Recherche poursuivie : Oui`, aucun cache revendique et une ecriture atomique du plan temoin. Aucune scene BGIG n est trouvee pendant l inspection read-only, comme attendu sans materialisation.
+
+La fixture confirme le mecanisme, pas la capacite sur un cas difficile. Le retour affiche `Warm start : non fourni` et `no_initial_incumbent` : seule la premiere persistance est observee, pas un rechargement compatible. Aucun bundle DEV reel n est encore fourni. La prochaine preuve humaine est donc de recharger ce witness et de capturer localement un cas representatif de `Mon insert` ; P64-L06A ne commencera qu apres anonymisation et revue du bundle.
+
+fusion-validated reste false globalement. print-validated: false.

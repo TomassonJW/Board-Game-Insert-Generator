@@ -1705,3 +1705,11 @@ séparation géométrique minimal/final ; ADR-0074 porte la correction.
 - Limites : aucune observation humaine encore, aucun bundle reel, aucun cas
   personnel promu dans le corpus.
 - Suite : P64-L05V, gate Fusion humaine.
+
+## Mise a jour P64-L05V - observation de fixture recue
+
+- C-LAYOUT : l insertion incrementale d un conteneur dans le vide global est observee dans Fusion sur une fixture a deux conteneurs, avec plan minimal persiste atomiquement.
+- C-PROJECT-CONTRACT : premiere ecriture witness observee ; le rechargement compatible reste a confirmer car le retour affiche `no_initial_incumbent`.
+- C-SAFETY : aucune scene BGIG n est trouvee par l inspection read-only ; la capture DEV et son absence d effet metier restent a observer sur un cas reel.
+- Limite : fixture de mecanisme uniquement, sans preuve de capacite, de reconstruction ou de performance sur `Mon insert.bgig.json`.
+- Statut : observation Fusion positive partielle ; fusion-validated: false, print-validated: false. Suite : preuve humaine de rechargement et capture, puis P64-L06A apres anonymisation/revue d un bundle reel.

@@ -173,3 +173,11 @@ Fusion de capture reelle. La revue dans Fusion reste humaine.
 P64-L05V-A est automated-validated et installe localement : add-in 0.1.58,
 commit 261f7cc, runtime L05 et fixture sont verifies. P64-L05V devient la
 prochaine action, exclusivement humaine dans Fusion.
+
+## Retour P64-L05V - ne pas confondre smoke et capacite (2026-07-22)
+
+Le retour Fusion est positif pour l insertion dans le vide global de la fixture, la premiere persistance atomique du witness et l absence de cache revendique. La fixture est volontairement simple : elle ne mesure pas la profondeur de recherche et ne valide pas la reconstruction de `Mon insert.bgig.json`.
+
+La prochaine action unique est humaine et courte : produire un SolverCaseBundle DEV representatif du projet complexe apres une manipulation reelle, puis fournir son chemin et son digest. En parallele, recharger le witness sur le meme projet pour observer un warm start accepte. Aucun bundle personnel n entre dans le depot avant anonymisation et revue.
+
+La prochaine mission de code, non demarree, sera P64-L06A : anonymiser, rejouer et classifier ce premier cas reel avant de proposer une amelioration ciblee du solveur. Aucune promesse de capacite ou de vitesse n est faite avant cette preuve.

@@ -2855,3 +2855,15 @@ implémentée et intégrée à la fois.
 - Sortie : OK ou KO contextuel ; bundle conserve localement, sans promotion
   automatique dans le corpus.
 - print-validated reste false.
+
+### P64-L05V-B - completement de preuve humaine
+
+- Statut : ready-human-gate.
+- Scope : recharger le witness apres changement temporaire d effort et capturer un SolverCaseBundle DEV local sur une manipulation representant le cas complexe.
+- Interdits : aucune scene automatique, aucune auto-modification du solveur, aucun import de projet personnel dans le depot.
+
+### P64-L06A - premier cas complexe anonymise et replaye
+
+- Statut : planned ; depend de P64-L05V-B et d un bundle local anonymisable.
+- Scope : classification/replay deterministe du cas reel et proposition de sous-mission solveur ciblee, sans changement automatique des budgets ou lanes.
+- Limite : la fixture L05V valide le mecanisme, pas la capacite de reconstruction du projet personnel.

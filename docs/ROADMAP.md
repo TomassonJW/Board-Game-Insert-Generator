@@ -1176,3 +1176,11 @@ verifies ; l'observation du comportement dans Fusion reste humaine.
 
 Etape suivante : P64-L05V, puis anonymisation/replay du premier bundle uniquement
 apres retour explicite. fusion-validated: false. print-validated: false.
+
+## P64-L05V - observation Fusion partielle recue (2026-07-22)
+
+La fixture installee confirme dans Fusion le flux L05A et la premiere ecriture atomique du witness. Elle est un smoke test de mecanisme, non un benchmark ni une preuve que les volumes libres visibles permettent une insertion ou une reconstruction complexe.
+
+La trajectoire obligatoire reste empirique et revue : recharger un witness compatible, capturer un SolverCaseBundle local du projet complexe, anonymiser et rejouer ce cas, puis seulement cadrer une evolution ciblee du solveur. Aucune auto-amelioration ou modification automatique n est autorisee.
+
+fusion-validated: false tant que le warm start et la capture reelle ne sont pas observes. print-validated: false.

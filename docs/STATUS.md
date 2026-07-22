@@ -3013,3 +3013,11 @@ et marqueur de commit, puis cree la fixture globale dans Documents/BGIG/projects
 
 La prochaine action est humaine : observer P64-L05V et capturer un premier
 SolverCaseBundle reel. fusion-validated: false. print-validated: false.
+
+## P64-L05V - observation Fusion recue (2026-07-22)
+
+Statut : observation positive partielle ; fusion-validated: false, print-validated: false.
+
+Le package Fusion 0.1.58 issu de 261f7cc produit un plan a deux conteneurs, incluant `Bac 888`, et persiste le witness atomiquement. La palette indique que la recherche continue et ne revendique pas de cache. L inspection read-only ne trouve aucune scene BGIG, ce qui est attendu avant materialisation.
+
+La trace recue contient `exact_witness_file_not_found` puis `certified_witness_stored_atomically`, avec `Warm start : non fourni`. Elle prouve la premiere ecriture, non le rechargement. Aucun SolverCaseBundle DEV reel n est encore joint. Le cas personnel complexe reste hors corpus et hors preuve de capacite : la suite doit d abord capturer, anonymiser et rejouer ce cas, sans auto-modifier le solveur.

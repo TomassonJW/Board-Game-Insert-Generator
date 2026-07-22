@@ -1059,3 +1059,15 @@ p64-l05v-global-void-baseline.bgig.json ecrite dans Documents/BGIG/projects.
 Checklist : docs/P64_L05V_FUSION_GATE_CHECKLIST.md.
 fusion-validated: false avant retour humain explicite.
 print-validated: false.
+
+## Retour P64-L05V - observation positive, preuve partielle (2026-07-22)
+
+Thomas confirme le comportement de la fixture 0.1.58 installee depuis le commit 261f7cc : deux conteneurs sont proposes sur un etage, dont `Bac 888`, et le plan temoin est ecrit atomiquement. La palette declare `Recherche poursuivie : Oui` et `Cache revendique : Non`. L inspection de scene reste read-only et ne trouve aucune scene BGIG ; ce resultat est coherent avec une gate sans materialisation.
+
+Cette observation valide humainement le mecanisme L05A dans la fixture et la premiere ecriture du witness. Elle ne constitue ni un test de capacite du solveur, ni une preuve que des volumes affiches suffisent a un nouveau placement, ni une revendication sur le projet personnel complexe.
+
+Les traces recues indiquent `Warm start : non fourni` et `no_initial_incumbent`. Ce n est pas un echec : c est le premier calcul, anterieur a tout rechargement compatible. Elles ne prouvent donc pas encore le rechargement du witness. Aucun chemin de SolverCaseBundle DEV n est joint non plus. Ces deux observations restent ouvertes et ne sont pas promues en fusion-validated.
+
+Prochaine preuve humaine minimale : recharger le meme projet apres un changement temporaire d effort et verifier un witness/warm start acceptes ; puis, sur `Mon insert.bgig.json`, capturer explicitement un SolverCaseBundle DEV apres une manipulation representative et transmettre seulement son chemin local et son digest pour anonymisation/revue.
+
+Statut de gate : positif partiel ; L05V ne devient pas globalement fusion-validated. print-validated: false.
