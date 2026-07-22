@@ -360,6 +360,7 @@ class StagedCalculationSession:
         request_id: str,
         request_revision: int | None,
         solver: SolverCallable | None = None,
+        initial_incumbent: Mapping[str, object] | None = None,
     ) -> dict[str, object]:
         """Run explicitly, or reuse only one certified minimal layout."""
 
@@ -397,17 +398,22 @@ class StagedCalculationSession:
                     effort_profile=self._settings["effort"],
                     container_frontiers=self._container_frontiers or None,
                     frontier_digests=self._frontier_digests,
+                    initial_incumbent=initial_incumbent,
                 )
             else:
                 # The injectable lane keeps deterministic legacy fixtures usable;
                 # production always takes the minimal solver path above.
-                partition = solver(
-                    self._project,
-                    request_id=request_id,
-                    request_revision=request_revision,
-                    solver_method=self._settings["method"],
-                    effort_profile=self._settings["effort"],
-                )
+                solver_kwargs: dict[str, object] = {
+                    "request_id": request_id,
+                    "request_revision": request_revision,
+                    "solver_method": self._settings["method"],
+                    "effort_profile": self._settings["effort"],
+                }
+                if initial_incumbent is not None:
+                    solver_kwargs["initial_incumbent"] = deepcopy(
+                        dict(initial_incumbent)
+                    )
+                partition = solver(self._project, **solver_kwargs)
             artifact_digest = canonical_digest(
                 {
                     "schema_version": GLOBAL_LAYOUT_ARTIFACT_SCHEMA_V1,
@@ -420,7 +426,11 @@ class StagedCalculationSession:
             request_elapsed_ms = max(0, self._monotonic_ms() - request_started_ms)
             search_elapsed_ms = request_elapsed_ms
             retrieval_elapsed_ms = "not_applicable"
-            result_source = "fresh_search"
+            result_source = (
+                "fresh_search_with_certified_witness"
+                if _partition_warm_start(partition).get("status") == "accepted"
+                else "fresh_search"
+            )
             cache_write_status = "not_attempted"
 
         if not self._accept_global_request(token):
@@ -675,6 +685,7 @@ class StagedCalculationSession:
             },
             "solver_result_status": _solver_status(self._global_partition),
             "stop_reason": self._global_stop_reason,
+            "warm_start": _partition_warm_start(self._global_partition),
             "placement_certified": minimal_current,
             "partition_plan_digest": (
                 str(self._global_partition.get("plan_digest", ""))
@@ -868,6 +879,23 @@ class StagedCalculationSession:
             and token.settings_digest == self._settings_digest
             and token.global_key_digest == self._global_layout_key().digest
         )
+
+
+def _partition_warm_start(
+    partition: Mapping[str, object] | None,
+) -> dict[str, object]:
+    if partition is None:
+        return {
+            "status": "not_available",
+            "stop_reason": "partition_not_available",
+        }
+    minimal = _mapping(partition.get("minimal_layout", {}))
+    provenance = _mapping(minimal.get("search_provenance", {}))
+    warm_start = provenance.get("warm_start")
+    return deepcopy(dict(warm_start)) if isinstance(warm_start, Mapping) else {
+        "status": "not_available",
+        "stop_reason": "warm_start_not_reported",
+    }
 
 
 def _minimal_placement_certified(partition: dict[str, object]) -> bool:

@@ -257,3 +257,13 @@ La finalisation reste une action distincte et devient optionnelle. Elle seule
 peut transformer le résiduel. Les analyses locales, digests, invalidations,
 budgets monotones, vérité des résultats et absence de scène automatique restent
 normatifs sans changement.
+
+## Amendement P64-L05C - temoin certifie persistant
+
+ADR-0078 amende la seule interdiction de persistance implicite. Un sidecar
+`bgig.certified_plan_witness.v1` peut conserver une partition minimale deja
+certifiee sous le digest exact du projet normalise et du jeu de frontieres P45.
+Il ne devient ni source projet, ni cache hit, ni certificat implicite : le coeur
+reconstruit la geometrie, rejoue le certificat commun et execute les lanes
+courantes avant toute selection. Toute autre forme de cache ou de variante
+persistante comme verite utilisateur reste refusee.

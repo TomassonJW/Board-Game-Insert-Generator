@@ -13,7 +13,8 @@ Le retour humain L04V est globalement KO mais partiellement positif. R1 corrige
 le cache négatif. P64-L05A est automated-validated : exactement un nouveau
 conteneur peut être inséré dans le vide global à voisins figés et plan complet
 recertifié. Le manifest Fusion reste à 0.1.58. fusion-validated: false et
-print-validated: false pour L05A et L05B. P64-L05B est automated-validated ; le manifest reste inchange.
+print-validated: false pour L05A, L05B et L05C. Le manifest reste inchange.
+P64-L05B et P64-L05C sont automated-validated.
 
 ## Dernier état réel
 
@@ -39,6 +40,7 @@ print-validated: false pour L05A et L05B. P64-L05B est automated-validated ; le 
 - un second lancement du même type est bloqué ; aucune annulation décorative
   n'est exposée ;
 - un bouton DEV rouge exporte un SolverCaseBundle versionne, local et filtre sans lancer de solve, finalisation, CAD ou scene ;
+- un witness certifie persistant est recertifie comme incumbent sans ajouter de lane, court-circuiter la recherche ou revendiquer un cache hit ;
 - le cas dense 11 × 34 ne reçoit aucune nouvelle revendication.
 
 Preuves :
@@ -48,35 +50,36 @@ Preuves :
 
 Preuve L05A : P64_L05A_GLOBAL_VOID_CONTAINER_REUSE_EVIDENCE.md.
 Preuve L05B : P64_L05B_SOLVER_CASE_BUNDLE_EVIDENCE.md.
+Preuve L05C : P64_L05C_CERTIFIED_PLAN_WITNESS_EVIDENCE.md.
 
 ## Prochaine action recommandée
 
-### P64-L05C — Plan temoin certifie persistant et warm start
+### P64-L05D - Corpus, replay et optimisation mesuree
 
 Type : developpement borne, sans gate humaine intermediaire.
 
-Objectif : conserver un plan minimal certifie comme temoin versionne et le
-reinjecter comme incumbent de reconstruction depuis zero lorsque le projet, les
-frontieres locales, les reglages et les dependances geometriques correspondent
-exactement.
+Objectif : transformer les SolverCaseBundle et fixtures limites existantes en un
+corpus versionne et rejouable, puis mesurer les lanes avant toute modification
+afin d'ameliorer capacite et vitesse sans perdre les certificats ni masquer les
+echecs.
 
 Le lot doit cadrer puis implementer :
 
-1. une identite et un schema de witness distincts du cache opportuniste ;
-2. une validation fail-closed du projet, des frontieres P45 et du certificat ;
-3. un warm start qui propose l'incumbent sans court-circuiter la recherche ni
-   abaisser le certificat global ;
-4. une provenance et une telemetrie distinguant witness charge, accepte, rejete,
-   ameliore ou seulement restitue ;
-5. des tests montrant qu'un plan materialisable connu peut etre retrouve depuis
-   zero et qu'un witness stale ou incompatible est refuse.
+1. un manifest de corpus versionne, deterministe et sans donnees personnelles ;
+2. un replay pur et borne des projets, frontieres et reglages compatibles ;
+3. des mesures comparables par cas, effort, lane, statut, candidat, temps et
+   qualite de plan ;
+4. une baseline figee avant optimisation ;
+5. seulement ensuite, une amelioration relue des lanes ou de leur ordonnancement,
+   conservee uniquement si le corpus prouve un gain sans regression ;
+6. un format d'import futur pour les bundles captures par Thomas, sans import
+   automatique ni auto-edition de code.
 
-Aucune capture personnelle n'est importee automatiquement dans le depot. Aucun
-plan non certifie, stale, finalise seulement visuellement ou issu de la scene ne
-devient une preuve. Le solveur, ses lanes et budgets ne sont modifies que si le
-contrat L05C l'exige explicitement et apres cadrage.
+Aucune scene Fusion n'est lancee. Aucun cas humain n'est transforme en preuve
+universelle. Les certificats, budgets publics, deadline Deep et prefixe Normal ne
+peuvent pas etre affaiblis. Une optimisation sans gain mesure reste refusee.
 
-Etat d'entree : R1, L05A et L05B automated-validated ; ADR-0076 et ADR-0077
+Etat d'entree : R1 et L05A/B/C automated-validated ; ADR-0076 a ADR-0078
 acceptees ; fusion-validated: false, print-validated: false.
 
 ## Lots verrouillés
@@ -142,3 +145,14 @@ ne declenche aucune operation de domaine et ne modifie pas le solveur.
 Prochaine mission unique : P64-L05C, plan temoin certifie persistant et warm
 start fail-closed. L05D reste ensuite ordonnee. Aucune validation Fusion ou
 impression n'est revendiquee.
+
+## Mise a jour apres P64-L05C (2026-07-22)
+
+P64-L05C est automated-validated. Un sidecar exact conserve le meilleur plan
+certifie par identite projet + frontieres P45. Il est recertifie comme incumbent,
+les lanes courantes continuent et Deep garde son prefixe Normal historique. Un
+fichier incompatible ou corrompu est rejete puis remplace apres un solve certifie.
+
+Prochaine mission unique : P64-L05D, corpus versionne, replay borne, baseline et
+optimisation mesuree des lanes. Aucune validation Fusion ou impression n'est
+revendiquee.

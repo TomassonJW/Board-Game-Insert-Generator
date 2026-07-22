@@ -323,6 +323,7 @@ def solve_minimal_layout(
     cancel_check: Callable[[], bool] | None = None,
     container_frontiers: Sequence[ContainerVariantFrontier] | None = None,
     frontier_digests: Sequence[tuple[str, str]] = (),
+    initial_incumbent: Mapping[str, object] | None = None,
 ) -> dict[str, object]:
     """Build a placement-certified minimal layout under explicit hard caps."""
 
@@ -335,6 +336,7 @@ def solve_minimal_layout(
             cancel_check=cancel_check,
             container_frontiers=container_frontiers,
             frontier_digests=frontier_digests,
+            initial_incumbent=initial_incumbent,
         )
     return _solve_deep_anytime(
         raw_project,
@@ -343,6 +345,7 @@ def solve_minimal_layout(
         cancel_check=cancel_check,
         container_frontiers=container_frontiers,
         frontier_digests=frontier_digests,
+        initial_incumbent=initial_incumbent,
     )
 
 
@@ -358,6 +361,7 @@ def _solve_minimal_layout_once(
     lane_specs_override: Sequence[MinimalLaneSpec] | None = None,
     deadline_at_ms: float | None = None,
     frontier_source_override: str | None = None,
+    initial_incumbent: Mapping[str, object] | None = None,
 ) -> dict[str, object]:
     """Execute one explicit lane prefix or extension without orchestration."""
 
@@ -472,7 +476,18 @@ def _solve_minimal_layout_once(
 
     aggregate = Counter()
     lane_reports: list[dict[str, object]] = []
-    proposals: list[_CertifiedProposal] = []
+    warm_start_proposal, warm_start_report = _certify_warm_start_incumbent(
+        initial_incumbent,
+        problem=certification_problem,
+        strategy=strategy,
+        budget=budget,
+        effort_profile=effort_profile,
+        frontier_source=frontier_source,
+        ordered_frontier_digests=ordered_digests,
+    )
+    proposals: list[_CertifiedProposal] = (
+        [warm_start_proposal] if warm_start_proposal is not None else []
+    )
     rejection_codes: Counter[str] = Counter()
     deadline_reached = False
     for lane in lane_specs:
@@ -718,6 +733,7 @@ def _solve_minimal_layout_once(
             lane_reports=tuple(lane_reports),
             frontier_source=frontier_source,
             ordered_frontier_digests=ordered_digests,
+            warm_start=warm_start_report,
         )
 
     deduplicated = _deduplicate_proposals(proposals)
@@ -730,6 +746,14 @@ def _solve_minimal_layout_once(
             value.lane.lane_id,
         ),
     )
+    witness_selected = selected.lane.lane_id == "certified_witness_incumbent"
+    warm_start_payload = {
+        **warm_start_report,
+        "selected": witness_selected,
+        "incumbent_preserved": witness_selected,
+        "search_continued": True,
+        "lane_count_added": 0,
+    }
     portfolio = {
         "schema_version": MINIMAL_LAYOUT_PORTFOLIO_SCHEMA_V1,
         "solver_version": MINIMAL_LAYOUT_SOLVER_VERSION,
@@ -754,7 +778,11 @@ def _solve_minimal_layout_once(
         "stop_reason": (
             "deep_deadline_reached_with_candidate"
             if deadline_reached
-            else "bounded_lane_prefix_completed"
+            else (
+                "certified_witness_incumbent_preserved_after_lane_search"
+                if witness_selected
+                else "bounded_lane_prefix_completed"
+            )
         ),
         "frontier_source": frontier_source,
         "ordered_frontier_digests": [
@@ -766,6 +794,7 @@ def _solve_minimal_layout_once(
             "historical_bridge_edge",
         ],
         "lanes": lane_reports,
+        "warm_start": warm_start_payload,
         "candidate_count_before_deduplication": len(proposals),
         "candidate_count_after_deduplication": len(deduplicated),
         "deduplicated_candidate_count": len(proposals) - len(deduplicated),
@@ -784,6 +813,9 @@ def _solve_minimal_layout_once(
             {"name": "minimum_support_ratio", "direction": "maximize"},
         ],
         "selected": {
+            "candidate_source": (
+                "certified_witness" if witness_selected else "portfolio_lane"
+            ),
             "lane_id": selected.lane.lane_id,
             "order_id": selected.lane.order_id,
             "seed_participant_id": selected.seed_participant_id,
@@ -811,6 +843,10 @@ def _solve_minimal_layout_once(
     aggregate["certified_candidates_before_deduplication"] = len(proposals)
     aggregate["certified_candidates_after_deduplication"] = len(deduplicated)
     aggregate["pareto_candidates"] = len(pareto)
+    aggregate["warm_start_accepted"] = int(
+        warm_start_report["status"] == "accepted"
+    )
+    aggregate["warm_start_selected"] = int(witness_selected)
 
     final, final_rejections = certify_minimal_free_3d_plan(
         certification_problem,
@@ -849,6 +885,7 @@ def _solve_deep_anytime(
     cancel_check: Callable[[], bool] | None,
     container_frontiers: Sequence[ContainerVariantFrontier] | None,
     frontier_digests: Sequence[tuple[str, str]],
+    initial_incumbent: Mapping[str, object] | None,
 ) -> dict[str, object]:
     """Run the exact Normal prefix before a deadline-bounded Deep extension."""
 
@@ -991,6 +1028,7 @@ def _solve_deep_anytime(
             deep_started_ms + _DEEP_EXTENSION_DEADLINE_MS
         ),
         frontier_source_override=deep_source,
+        initial_incumbent=initial_incumbent,
     )
     elapsed_ms = max(0, int(_monotonic_ms() - deep_started_ms))
     deep_status = _solver_result_status(deep_plan)
@@ -1126,6 +1164,7 @@ def _phase_summary(
             provenance.get("pareto_placement_digests", [])
         ),
         "selected": deepcopy(provenance.get("selected")),
+        "warm_start": deepcopy(provenance.get("warm_start", {})),
     }
 
 
@@ -1141,6 +1180,116 @@ def _problem_with_frontiers(
         base_problem,
         participants=participants,
         container_variant_frontiers=frontiers,
+    )
+
+
+_CERTIFIED_WITNESS_INCUMBENT_LANE = MinimalLaneSpec(
+    "certified_witness_incumbent",
+    "not_applicable",
+    "not_applicable",
+    "not_applicable",
+    "certified_witness",
+    0,
+)
+
+
+def _certify_warm_start_incumbent(
+    initial_incumbent: Mapping[str, object] | None,
+    *,
+    problem: Free3DPreparedProblem,
+    strategy: SolverStrategy,
+    budget: SolverBudget,
+    effort_profile: str,
+    frontier_source: str,
+    ordered_frontier_digests: Sequence[tuple[str, str]],
+) -> tuple[_CertifiedProposal | None, dict[str, object]]:
+    report: dict[str, object] = {
+        "schema_version": "bgig.certified_witness_warm_start.v1",
+        "status": "not_supplied",
+        "stop_reason": "no_initial_incumbent",
+        "source_plan_digest": "",
+        "recertified_placement_digest": "",
+        "rejection_codes": [],
+        "recertification_count": 0,
+        "search_continued": True,
+        "lane_count_added": 0,
+        "cache_hit_claimed": False,
+    }
+    if initial_incumbent is None:
+        return None, report
+    report["source_plan_digest"] = str(
+        initial_incumbent.get("plan_digest", "")
+    )
+    try:
+        placements = _placements_from_certified_plan(initial_incumbent)
+        if not placements:
+            raise ValueError("witness has no placements")
+        empty_spaces = _rebuild_empty_spaces(placements, problem, budget)
+    except (KeyError, TypeError, ValueError, OverflowError) as exc:
+        report.update(
+            {
+                "status": "rejected",
+                "stop_reason": "witness_geometry_payload_invalid",
+                "rejection_codes": [type(exc).__name__],
+            }
+        )
+        return None, report
+    provisional_provenance = {
+        "portfolio_schema": MINIMAL_LAYOUT_PORTFOLIO_SCHEMA_V1,
+        "effort_profile": effort_profile,
+        "lane_id": _CERTIFIED_WITNESS_INCUMBENT_LANE.lane_id,
+        "candidate_source": "certified_witness",
+        "frontier_source": frontier_source,
+        "ordered_frontier_digests": [
+            {"container_group_id": key, "digest": value}
+            for key, value in ordered_frontier_digests
+        ],
+        "future_recertification_performed": True,
+        "search_continued": True,
+        "lane_count_added": 0,
+        "finalization_invocation_count": 0,
+        "fusion_materialization_invocation_count": 0,
+    }
+    certified, rejections = certify_minimal_free_3d_plan(
+        problem,
+        strategy=strategy,
+        budget=budget,
+        candidate_id="certified-witness-incumbent",
+        placements=placements,
+        empty_spaces=empty_spaces,
+        search_telemetry={"warm_start_recertification_count": 1},
+        search_provenance=provisional_provenance,
+    )
+    if certified is None:
+        report.update(
+            {
+                "status": "rejected",
+                "stop_reason": "witness_recertification_rejected",
+                "rejection_codes": list(rejections),
+                "recertification_count": 1,
+            }
+        )
+        return None, report
+    report.update(
+        {
+            "status": "accepted",
+            "stop_reason": "witness_recertified_as_initial_incumbent",
+            "recertified_placement_digest": certified.placement_digest,
+            "rejection_codes": [],
+            "recertification_count": 1,
+        }
+    )
+    return (
+        _CertifiedProposal(
+            lane=_CERTIFIED_WITNESS_INCUMBENT_LANE,
+            seed_participant_id="not_applicable",
+            translation_id="witness_identity",
+            placements=placements,
+            empty_spaces=empty_spaces,
+            certified=certified,
+            rank_key=_proposal_rank_key(certified),
+        ),
+        report,
     )
 
 
@@ -1361,6 +1510,7 @@ def _combined_anytime_provenance(
             "historical_bridge_edge",
         ],
         "lanes": lanes,
+        "warm_start": deepcopy(selected_provenance.get("warm_start", {})),
         "candidate_count_before_deduplication": (
             int(
                 normal_provenance.get(
@@ -2285,6 +2435,7 @@ def _failure_plan(
     lane_reports: Sequence[Mapping[str, object]],
     frontier_source: str,
     ordered_frontier_digests: Sequence[tuple[str, str]],
+    warm_start: Mapping[str, object] | None = None,
 ) -> dict[str, object]:
     result = {
         "schema_version": SOLVER_RESULT_SCHEMA_V1,
@@ -2338,6 +2489,16 @@ def _failure_plan(
             for key, value in ordered_frontier_digests
         ],
         "lanes": deepcopy(list(lane_reports)),
+        "warm_start": deepcopy(
+            dict(warm_start)
+            if warm_start is not None
+            else {
+                "status": "not_supplied",
+                "stop_reason": "no_initial_incumbent",
+                "search_continued": True,
+                "lane_count_added": 0,
+            }
+        ),
         "candidate_count_before_deduplication": 0,
         "candidate_count_after_deduplication": 0,
         "pareto_candidate_count": 0,

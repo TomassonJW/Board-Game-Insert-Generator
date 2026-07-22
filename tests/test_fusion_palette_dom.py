@@ -618,7 +618,7 @@ class FusionPaletteDomTests(unittest.TestCase):
         ):
             self.assertIn(marker, self.markup)
         self.assertIn("${capacityCard(response)}${diagnostics.length?", self.markup)
-        self.assertIn("${capacityCard(response)}<div class=\"plan-grid\">", self.markup)
+        self.assertIn("${capacityCard(response)}${certifiedWitnessDetails(response)}<div class=\"plan-grid\">", self.markup)
 
     def test_exposes_p64_h08_solver_method_effort_and_focus_safe_local_persistence(self) -> None:
         for marker in (
@@ -712,6 +712,29 @@ class FusionPaletteDomTests(unittest.TestCase):
         activity_end = self.markup.index("function renderOperationActivity", activity_start)
         self.assertNotIn("percentage", self.markup[activity_start:activity_end])
         self.assertNotIn("<details open", self.markup[activity_start:activity_end])
+
+    def test_exposes_p64_l05c_certified_witness_without_cache_claim(self) -> None:
+        for marker in (
+            "function certifiedWitnessDetails",
+            "certified-witness-diagnostics",
+            "Plan témoin certifié",
+            "fresh_search_with_certified_witness",
+            "plan témoin recertifié comme incumbent",
+            "warm.recertification_count",
+            "warm.search_continued",
+            "Recherche poursuivie",
+            "Cache revendiqué",
+            "load.compatibility_digest",
+            "${capacityCard(response)}${certifiedWitnessDetails(response)}",
+        ):
+            self.assertIn(marker, self.markup)
+        start = self.markup.index("function certifiedWitnessDetails")
+        end = self.markup.index("function solverTelemetryDetails", start)
+        witness_markup = self.markup[start:end]
+        self.assertNotIn("percentage", witness_markup)
+        self.assertNotIn("ETA", witness_markup)
+        self.assertNotIn("cache_hit_claimed===true?'Non'", witness_markup)
+        self.assertNotIn('data-action="accept-witness"', self.markup)
 
     def test_exposes_explicit_red_dev_solver_case_capture_without_fake_learning(self) -> None:
         for marker in (

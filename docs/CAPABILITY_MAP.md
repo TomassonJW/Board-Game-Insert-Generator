@@ -1649,3 +1649,20 @@ séparation géométrique minimal/final ; ADR-0074 porte la correction.
   auto-modification de l'algorithme.
 - Statut : automated-validated, fusion-validated: false,
   print-validated: false. Suite : P64-L05C.
+
+## Mise a jour P64-L05C - temoin certifie persistant
+
+- C-PROJECT-CONTRACT : sidecar v1 local, versionne et fail-closed, lie au projet
+  normalise et au jeu exact de frontieres P45 ; le projet reste la source.
+- C-LAYOUT : une partition connue est reconstruite et recertifiee comme incumbent
+  sans finalisation ni scene. Un witness stale, incompatible ou corrompu est
+  refuse.
+- C-SOLVER : toutes les lanes et caps restent inchanges. Deep execute son prefixe
+  Normal sans witness, puis ses trois lanes avec incumbent sous la deadline de
+  30 000 ms. Le witness n'ajoute aucune lane et ne revendique aucun cache hit.
+- C-FUSION-UI : chargement, stockage, recertification, poursuite de recherche,
+  digests et raisons d'arret sont visibles dans des details replies.
+- C-SAFETY : aucun plan issu de la scene, aucune auto-modification d'algorithme et
+  aucun projet personnel importe.
+- Statut : automated-validated, fusion-validated: false,
+  print-validated: false. Suite : P64-L05D.

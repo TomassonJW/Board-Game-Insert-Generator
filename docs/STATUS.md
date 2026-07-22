@@ -8,9 +8,9 @@ Statut produit : **MVP V0.1 Fusion-only accepte ; validation d impression non ac
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P64-L04A/B/C, P64-L04R1 et P64-L05A/B sont
+Phase active : P64-L04A/B/C, P64-L04R1 et P64-L05A/B/C sont
 automated-validated. Le retour humain L04V est globalement KO mais partiellement
-positif. Le manifest Fusion reste a 0.1.58. P64-L05C est la prochaine mission
+positif. Le manifest Fusion reste a 0.1.58. P64-L05D est la prochaine mission
 unique ; aucune gate humaine intermediaire n'est requise.
 P64-V2H03V et P44-V sont fusion-validated sur 0.1.55. P45-M001V est
 architecture-accepted. P64-L03V est un KO contextuel sur 0.1.56 et n'accorde
@@ -2933,3 +2933,27 @@ bouton DEV rouge est visible a cote du calcul, bloque seulement une seconde
 capture et ne lance ni solve, finalisation, CAD ou scene. Il n'effectue aucune
 auto-modification du solveur. Le projet personnel Mon insert.bgig.json reste
 inchange. P64-L05C est la prochaine mission unique.
+
+## P64-L05C - temoin certifie persistant et warm start (2026-07-22)
+
+Statut : implemented-core, implemented-fusion-bridge,
+implemented-fusion-ui, automated-validated ; fusion-validated: false,
+print-validated: false.
+
+ADR-0078 autorise un sidecar exact `bgig.certified_plan_witness.v1`, distinct du
+cache et de la source projet. L'identite combine projet normalise et jeu exact de
+frontieres P45. Les sidecars de frontieres differentes coexistent ; un fichier
+corrompu ou incompatible est rejete fail-closed.
+
+Le solveur reconstruit puis recertifie le witness comme incumbent, execute toutes
+les lanes courantes et rejoue le certificat final. En Deep, les six lanes Normal
+restent sans witness ; seules les trois lanes de l'extension recoivent
+l'incumbent sous la deadline existante. Aucune lane ni budget n'est ajoute.
+
+Validation : 4/4 witness, 14/14 solveur minimal, 13/13 staged, 27/27 bridge,
+38/38 DOM et 674/674 suite complete finale en 152,142 s. Ruff, py_compile,
+compileall, JavaScript, frontiere adsk et diff-check passent.
+
+Le manifest reste 0.1.58. Aucune scene, finalisation ou capture personnelle n'est
+produite. P64-L05D est la prochaine mission unique : corpus, replay borne,
+mesures comparables et optimisation relue des lanes.

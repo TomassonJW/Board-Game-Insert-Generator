@@ -59,7 +59,7 @@ preuves archivées.
   depuis zéro restaient en défaut.
 - P64-L04R1 et P64-L05A sont automated-validated. L05A insère exactement un
   nouveau conteneur à voisins figés puis recertifie le plan complet sans solve
-  global. P64-L05B est automated-validated : le bouton DEV exporte un SolverCaseBundle versionne sans operation de domaine. P64-L05C est la prochaine mission unique.
+  global. P64-L05B est automated-validated : le bouton DEV exporte un SolverCaseBundle versionne sans operation de domaine. P64-L05C est automated-validated. P64-L05D est la prochaine mission unique.
 
 ## Vue de séquence
 
@@ -99,7 +99,8 @@ preuves archivées.
 | Terminé — automatisé | P64-L04R1 | Cache réservé aux plans certifiés et temps recherche/restitution distincts. |
 | Terminé — automatisé | P64-L05A | Nouveau conteneur inséré à voisins figés, plan complet recertifié sans solve global. |
 | Termine — automatise | P64-L05B | Bouton DEV rouge et SolverCaseBundle local, versionne, filtre et sans effet metier. |
-| Prochaine mission | P64-L05C | Plan temoin certifie persistant et warm start depuis zero, sans baisser les certificats. |
+| Termine - automatise | P64-L05C | Sidecar exact et incumbent recertifie, recherche courante conservee. |
+| Prochaine mission | P64-L05D | Corpus versionne, replay borne, baseline et optimisation mesuree des lanes. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -138,6 +139,9 @@ preuves archivées.
 - ADR-0077 : capture locale versionnee, semantique et sans auto-apprentissage.
 - P64_L05B_SOLVER_CASE_BUNDLE_CONTRACT.md : schema, filtrage, lifecycle et invariants.
 - P64_L05B_SOLVER_CASE_BUNDLE_EVIDENCE.md : preuves producteur, staged, bridge et DOM.
+- ADR-0078 : sidecar exact, recertification et recherche sans court-circuit.
+- P64_L05C_CERTIFIED_PLAN_WITNESS_CONTRACT.md : identite, persistance, warm start et invariants.
+- P64_L05C_CERTIFIED_PLAN_WITNESS_EVIDENCE.md : preuves coeur, Deep, staged, bridge et DOM.
 - ADR-0074 : supersession partielle d'ADR-0071 après le KO Fusion 0.1.56.
 - STATUS.md : faits réalisés, validations et limites.
 - CAPABILITY_MAP.md : capability et niveau de preuve.
@@ -397,3 +401,16 @@ La capture est atomique, bornee a 256 evenements et n'appelle ni solveur,
 finalisation, CAD ou Fusion. Elle ne modifie pas automatiquement l'algorithme.
 Le manifest reste 0.1.58 ; fusion-validated: false, print-validated: false.
 P64-L05C est la prochaine mission unique.
+
+## P64-L05C - temoin certifie persistant automatise
+
+ADR-0078 autorise un sidecar local distinct du cache et de la source projet. Il
+est compatible uniquement avec le projet normalise et le jeu exact de frontieres
+P45, puis recertifie comme incumbent dans le coeur. Les lanes, caps, prefixe
+Normal et deadline Deep restent inchanges ; la recherche ne revendique jamais un
+cache hit.
+
+P64-L05C est implemented-core, implemented-fusion-bridge,
+implemented-fusion-ui et automated-validated. Le manifest reste 0.1.58,
+fusion-validated: false et print-validated: false. P64-L05D devient la prochaine
+mission unique : corpus, replay, baseline et optimisation mesuree.

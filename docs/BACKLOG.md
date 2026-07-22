@@ -2793,18 +2793,22 @@ implémentée et intégrée à la fois.
 - Statut : done-code, automated-validated, fusion-validated: false,
   print-validated: false.
 
-### P64-L05C — plan temoin certifie persistant et warm start
+### P64-L05C - plan temoin certifie persistant et warm start
 
 - Dependances obtenues : P64-L05A et P64-L05B automated-validated.
-- Livrable : witness versionne et valide fail-closed, incumbent de warm start,
-  provenance et telemetrie d'acceptation, rejet, restitution ou amelioration.
-- Interdits : aucun plan stale ou non certifie, aucun court-circuit du certificat,
-  aucune scene ou finalisation automatique.
-- Statut : ready.
+- Livre : witness v1 exact et atomique, coexistence par frontieres, remplacement
+  fail-closed, incumbent recertifie, provenance staged/bridge/DOM.
+- Interdits respectes : aucun plan stale ou non certifie, aucun court-circuit du
+  certificat, aucune lane ou budget ajoute, aucune scene ou finalisation.
+- Preuve : docs/P64_L05C_CERTIFIED_PLAN_WITNESS_EVIDENCE.md.
+- Statut : done-code, automated-validated, fusion-validated: false,
+  print-validated: false.
 
-### P64-L05D — corpus, lanes et performance
+### P64-L05D - corpus, lanes et performance
 
-- Dependances : P64-L05C automated-validated et corpus de cas explicites.
+- Dependances obtenues : P64-L05C automated-validated ; SolverCaseBundle v1 et
+  fixtures limites existantes disponibles pour amorcer le corpus sans importer
+  de projet personnel.
 - Livrable : replay borne, mesures comparables, ameliorations relues des lanes et
   optimisation de vitesse sans regression de certificat.
-- Statut : blocked-by-P64-L05C.
+- Statut : ready.

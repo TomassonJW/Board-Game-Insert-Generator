@@ -1115,3 +1115,21 @@ Ordre restant du programme accepte :
 
 Le manifest reste 0.1.58. Aucune validation Fusion ou impression n'est
 revendiquee.
+
+## P64-L05C - temoin certifie persistant livre (2026-07-22)
+
+ADR-0078 et le schema `bgig.certified_plan_witness.v1` conservent un plan
+minimal certifie sous l'identite exacte projet + frontieres P45. Le witness est
+recertifie comme incumbent, toutes les lanes courantes s'executent et le
+certificat final commun reste obligatoire. Les efforts a frontieres differentes
+coexistent sans ecrasement.
+
+P64-L05C est implemented-core, implemented-fusion-bridge,
+implemented-fusion-ui et automated-validated. Le manifest reste 0.1.58 ; aucune
+validation Fusion ou impression n'est revendiquee.
+
+Suite ordonnee :
+
+1. L05D - corpus versionne et replay borne des SolverCaseBundle ;
+2. comparaison des lanes et mesures de temps/qualite reproductibles ;
+3. optimisation relue sans regression de certificat, budgets ou cas historiques.

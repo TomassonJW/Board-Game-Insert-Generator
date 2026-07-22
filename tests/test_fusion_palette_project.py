@@ -863,6 +863,145 @@ class FusionPaletteProjectTests(unittest.TestCase):
         self.assertEqual(solved["partition"]["minimal_layout"]["search_provenance"]["effort_profile"], "deep")
         self.assertEqual(reloaded["solver_settings"], {"method": "stage_stack", "effort": "deep"})
 
+    def test_p64_l05c_persists_and_reloads_exact_certified_witness(self) -> None:
+        project = blank_project_v1()
+        project["project_name"] = "Witness persistant"
+        project["container_groups"] = [
+            {
+                "id": "g",
+                "name": "Bac",
+                "wall_thickness_mm": None,
+                "floor_thickness_mm": None,
+            }
+        ]
+        project["contents"] = [
+            {
+                "id": "asset",
+                "name": "Pions",
+                "shape_kind": "square",
+                "dimensions_mm": {"x": 12, "y": 12, "z": 3},
+                "quantity": 2,
+                "container_group_id": "g",
+                "content_clearance_mm": None,
+                "measurement_confidence": "exact",
+            }
+        ]
+        settings = {"method": "auto", "effort": "quick"}
+        with (
+            tempfile.TemporaryDirectory() as temp_dir,
+            patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}),
+        ):
+            first = handle_palette_request(
+                request(
+                    "solve_project",
+                    project=project,
+                    solver_settings=settings,
+                    source_revision=1,
+                ),
+                ADDIN,
+                ROOT,
+            )
+            first_store = first["certified_plan_witness"]["store"]
+            witness_path = Path(first_store["path"])
+            first_witness = json.loads(witness_path.read_text(encoding="utf-8"))
+            palette_project_module._STAGED_CALCULATION_SESSIONS.clear()
+            palette_project_module._LOCAL_ANALYSIS_ENGINES.clear()
+            normal = handle_palette_request(
+                request(
+                    "solve_project",
+                    project=project,
+                    solver_settings={"method": "auto", "effort": "normal"},
+                    source_revision=2,
+                ),
+                ADDIN,
+                ROOT,
+            )
+            normal_witness_path = Path(normal["certified_plan_witness"]["store"]["path"])
+            palette_project_module._STAGED_CALCULATION_SESSIONS.clear()
+            palette_project_module._LOCAL_ANALYSIS_ENGINES.clear()
+
+            second = handle_palette_request(
+                request(
+                    "solve_project",
+                    project=project,
+                    solver_settings=settings,
+                    source_revision=2,
+                ),
+                ADDIN,
+                ROOT,
+            )
+            second_witness = json.loads(witness_path.read_text(encoding="utf-8"))
+
+            self.assertEqual(first_store["status"], "stored")
+            self.assertTrue(witness_path.is_file())
+            self.assertTrue(normal_witness_path.is_file())
+            self.assertNotEqual(normal_witness_path, witness_path)
+            self.assertEqual(witness_path.parent, Path(temp_dir) / "certified-witnesses")
+            self.assertFalse(witness_path.with_suffix(witness_path.suffix + ".tmp").exists())
+            self.assertEqual(
+                second["certified_plan_witness"]["load"]["status"],
+                "accepted",
+            )
+            self.assertEqual(
+                second["staged_calculation"]["minimal_layout"]["warm_start"]["status"],
+                "accepted",
+            )
+            self.assertTrue(
+                second["staged_calculation"]["minimal_layout"]["warm_start"]["search_continued"]
+            )
+            self.assertEqual(
+                second["staged_calculation"]["minimal_layout"]["calculation_timing"][
+                    "result_source"
+                ],
+                "fresh_search_with_certified_witness",
+            )
+            self.assertEqual(
+                second["certified_plan_witness"]["store"]["stop_reason"],
+                "same_geometry_witness_preserved",
+            )
+            self.assertEqual(first_witness["witness_digest"], second_witness["witness_digest"])
+            self.assertEqual(
+                first_witness["source"]["placement_geometry_digest"],
+                second_witness["source"]["placement_geometry_digest"],
+            )
+            tampered = deepcopy(second_witness)
+            tampered["partition"]["placements"][0]["origin_mm"]["x"] += 1
+            witness_path.write_text(
+                json.dumps(tampered, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            palette_project_module._STAGED_CALCULATION_SESSIONS.clear()
+            palette_project_module._LOCAL_ANALYSIS_ENGINES.clear()
+            repaired = handle_palette_request(
+                request(
+                    "solve_project",
+                    project=project,
+                    solver_settings=settings,
+                    source_revision=3,
+                ),
+                ADDIN,
+                ROOT,
+            )
+            repaired_witness = json.loads(witness_path.read_text(encoding="utf-8"))
+            self.assertEqual(
+                repaired["certified_plan_witness"]["load"]["status"],
+                "rejected",
+            )
+            self.assertEqual(
+                repaired["certified_plan_witness"]["load"]["stop_reason"],
+                "witness_digest_mismatch",
+            )
+            self.assertEqual(
+                repaired["certified_plan_witness"]["store"]["status"],
+                "stored",
+            )
+            self.assertNotEqual(
+                tampered["partition"]["placements"],
+                repaired_witness["partition"]["placements"],
+            )
+        palette_project_module._STAGED_CALCULATION_SESSIONS.clear()
+        palette_project_module._LOCAL_ANALYSIS_ENGINES.clear()
+
     def test_p64_l05b_captures_a_local_solver_case_without_domain_operations(self) -> None:
         from board_game_insert_generator.staged_calculation import (
             StagedCalculationSession,

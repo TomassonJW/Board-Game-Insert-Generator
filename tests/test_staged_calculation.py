@@ -126,6 +126,36 @@ class StagedCalculationTests(unittest.TestCase):
         self.assertEqual(cad["artifact_identity"]["artifact_kind"], ARTIFACT_KIND_MINIMAL)
         self.assertFalse(cad["partition"]["invariants"]["residual_distributed"])
 
+    def test_certified_witness_is_forwarded_as_recertified_fresh_search(self) -> None:
+        project = _project()
+        source_engine = _engine(project)
+        source = StagedCalculationSession(project, solver_settings=SETTINGS)
+        _synchronize(source, project, source_engine)
+        witness_plan = source.calculate_layout(
+            request_id="source-witness", request_revision=0
+        )["partition"]
+
+        engine = _engine(project)
+        session = StagedCalculationSession(project, solver_settings=SETTINGS)
+        _synchronize(session, project, engine)
+        calculated = session.calculate_layout(
+            request_id="warm-start",
+            request_revision=1,
+            initial_incumbent=witness_plan,
+        )
+
+        minimal = calculated["staged_calculation"]["minimal_layout"]
+        self.assertEqual(
+            minimal["calculation_timing"]["result_source"],
+            "fresh_search_with_certified_witness",
+        )
+        self.assertEqual(minimal["warm_start"]["status"], "accepted")
+        self.assertTrue(minimal["warm_start"]["search_continued"])
+        self.assertTrue(minimal["placement_certified"])
+        self.assertEqual(
+            calculated["solver_result"]["status"], "solution_found"
+        )
+
     def test_identical_explicit_calculation_reuses_only_a_certified_plan(self) -> None:
         project = _project()
         engine = _engine(project)
