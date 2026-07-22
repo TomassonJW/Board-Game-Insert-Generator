@@ -14,7 +14,7 @@ le cache négatif. P64-L05A est automated-validated : exactement un nouveau
 conteneur peut être inséré dans le vide global à voisins figés et plan complet
 recertifié. Le manifest Fusion reste à 0.1.58. fusion-validated: false et
 print-validated: false pour L05A, L05B et L05C. Le manifest reste inchange.
-P64-L05B et P64-L05C sont automated-validated.
+P64-L05B, P64-L05C et P64-L05D1 sont automated-validated.
 
 ## Dernier état réel
 
@@ -51,37 +51,32 @@ Preuves :
 Preuve L05A : P64_L05A_GLOBAL_VOID_CONTAINER_REUSE_EVIDENCE.md.
 Preuve L05B : P64_L05B_SOLVER_CASE_BUNDLE_EVIDENCE.md.
 Preuve L05C : P64_L05C_CERTIFIED_PLAN_WITNESS_EVIDENCE.md.
+Preuve L05D1 : P64_L05D1_SOLVER_CORPUS_EVIDENCE.md.
 
 ## Prochaine action recommandée
 
-### P64-L05D - Corpus, replay et optimisation mesuree
+### P64-L05D2 - optimisation interne mesuree
 
 Type : developpement borne, sans gate humaine intermediaire.
 
-Objectif : transformer les SolverCaseBundle et fixtures limites existantes en un
-corpus versionne et rejouable, puis mesurer les lanes avant toute modification
-afin d'ameliorer capacite et vitesse sans perdre les certificats ni masquer les
-echecs.
+Objectif : reduire le travail inutile des lanes a ordre de participants explicite
+sans changer le portefeuille, le prefixe de lanes, le classement, les caps, les
+budgets publics ni la deadline Deep.
 
-Le lot doit cadrer puis implementer :
+La mission doit :
 
-1. un manifest de corpus versionne, deterministe et sans donnees personnelles ;
-2. un replay pur et borne des projets, frontieres et reglages compatibles ;
-3. des mesures comparables par cas, effort, lane, statut, candidat, temps et
-   qualite de plan ;
-4. une baseline figee avant optimisation ;
-5. seulement ensuite, une amelioration relue des lanes ou de leur ordonnancement,
-   conservee uniquement si le corpus prouve un gain sans regression ;
-6. un format d'import futur pour les bundles captures par Thomas, sans import
-   automatique ni auto-edition de code.
+1. produire les rapports baseline CI et extended avant toute modification ;
+2. prouver que seuls les premiers participants encore pertinents pour
+   `max_participant_branches` sont evalues sous ordre explicite ;
+3. ajouter un test d'equivalence de branches et de reduction d'essais ;
+4. rejouer le meme corpus apres modification ;
+5. refuser le changement a la moindre regression fonctionnelle ;
+6. observer le projet personnel uniquement en lecture seule, sans en faire une
+   condition d'acceptation universelle.
 
-Aucune scene Fusion n'est lancee. Aucun cas humain n'est transforme en preuve
-universelle. Les certificats, budgets publics, deadline Deep et prefixe Normal ne
-peuvent pas etre affaiblis. Une optimisation sans gain mesure reste refusee.
-
-Etat d'entree : R1 et L05A/B/C automated-validated ; ADR-0076 a ADR-0078
-acceptees ; fusion-validated: false, print-validated: false.
-
+L05D1 est automated-validated : 7 cas anonymises, replay borne, digest
+fonctionnel et gate A/B. Le manifest Fusion reste a 0.1.58.
+fusion-validated: false. print-validated: false.
 ## Lots verrouillés
 
 - P64-F01A02 et F02A02 restent séparés : ils possèdent la finalisation du volume ;
@@ -156,3 +151,13 @@ fichier incompatible ou corrompu est rejete puis remplace apres un solve certifi
 Prochaine mission unique : P64-L05D, corpus versionne, replay borne, baseline et
 optimisation mesuree des lanes. Aucune validation Fusion ou impression n'est
 revendiquee.
+
+## Mise a jour apres P64-L05D1 (2026-07-22)
+
+P64-L05D1 est automated-validated. Le corpus versionne contient cinq cas CI et
+deux extended ; les rapports separent preuves fonctionnelles et temps mur. La
+gate A/B refuse une perte de solution, de certificat, de qualite ou de contrat
+de lanes avant toute comparaison de vitesse.
+
+Prochaine mission unique : P64-L05D2, premiere optimisation interne bornee et
+mesuree. Aucune validation Fusion ou impression n'est revendiquee.

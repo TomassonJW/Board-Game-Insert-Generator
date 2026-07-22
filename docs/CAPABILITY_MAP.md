@@ -1666,3 +1666,17 @@ séparation géométrique minimal/final ; ADR-0074 porte la correction.
   aucun projet personnel importe.
 - Statut : automated-validated, fusion-validated: false,
   print-validated: false. Suite : P64-L05D.
+
+## Mise a jour P64-L05D1 - corpus solveur reproductible
+
+- Capability servie : recherche globale P64 observable, testable et optimisable
+  sans affaiblir le certificat commun.
+- Statut : implemented-core, automated-validated.
+- Acquis : manifest exact de sept cas anonymises, import fail-closed des
+  SolverCaseBundle, replay borne, digest fonctionnel sans temps mur et gate A/B
+  fonctionnelle prioritaire.
+- Invariants : aucun auto-apprentissage, aucune scene, aucun changement de lane,
+  budget, deadline ou classement dans L05D1.
+- Limites : corpus initial petit ; aucun placement du projet personnel disponible
+  comme oracle ; fusion-validated: false ; print-validated: false.
+- Suite : P64-L05D2, optimisation interne bornee sous preuve A/B.

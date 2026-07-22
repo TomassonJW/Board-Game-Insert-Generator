@@ -1133,3 +1133,21 @@ Suite ordonnee :
 1. L05D - corpus versionne et replay borne des SolverCaseBundle ;
 2. comparaison des lanes et mesures de temps/qualite reproductibles ;
 3. optimisation relue sans regression de certificat, budgets ou cas historiques.
+
+## P64-L05D1 - corpus et baseline livres (2026-07-22)
+
+L05D est decoupe en deux missions atomiques afin qu'aucune optimisation ne
+precede son filet de non-regression.
+
+P64-L05D1 livre sept cas anonymises, un replay borne et une gate A/B qui compare
+d'abord solutions, certificats, lanes et qualite. Les temps restent des
+observations non normatives. Le solveur n'est pas modifie.
+
+Trajectoire restante :
+
+1. P64-L05D2 - optimiser le travail interne sous ordre explicite ;
+2. prouver l'equivalence fonctionnelle et mesurer le gain sur le meme corpus ;
+3. conserver le changement seulement si la gate A/B et la suite complete passent.
+
+Le projet personnel confirme une limite reelle de profondeur mais reste hors
+corpus versionne. fusion-validated: false. print-validated: false.

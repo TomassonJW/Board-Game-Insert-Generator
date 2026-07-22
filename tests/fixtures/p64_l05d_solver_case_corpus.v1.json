@@ -1,0 +1,4760 @@
+{
+  "cases": [
+    {
+      "baseline": {
+        "plan_digest": "53fa995b2481f84dca57215ec45f19bb5e6be0b4a601bba32c8ed7c9375f946e",
+        "status": "no_solution_within_budget",
+        "stop_reason": ""
+      },
+      "case_id": "continuous-closure-normal",
+      "execution_tier": "extended",
+      "expectations": {
+        "accepted_statuses": [
+          "solution_found",
+          "no_solution_within_budget"
+        ],
+        "allow_solution_improvement": true,
+        "proven_impossible_claim_allowed": false,
+        "require_certificate_if_solution": true,
+        "required_lane_ids": [
+          "historical_legacy_corner",
+          "historical_bridge_edge",
+          "variant_corner_long_side",
+          "variant_center_footprint",
+          "variant_lowest_height",
+          "variant_edge_interleave"
+        ]
+      },
+      "project": {
+        "box": {
+          "inner_dimensions_mm": {
+            "x": 250.0,
+            "y": 180.0,
+            "z": 70.0
+          },
+          "lid_clearance_mm": 0.2,
+          "usable_height_mm": 69.8
+        },
+        "container_groups": [
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "tokens",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Bac tokens",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "c0",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Bac c0",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "c1",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Bac c1",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "c2",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Bac c2",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "c3",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Bac c3",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "c4",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Bac c4",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "tall-row",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Bac tall-row",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "mixed",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Bac mixed",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "added-small",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Bac added-small",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          }
+        ],
+        "contents": [
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "tokens",
+            "content_clearance_mm": null,
+            "dimensions_mm": {
+              "x": 69.8,
+              "y": 92.2,
+              "z": 30.0
+            },
+            "id": "content-tokens",
+            "measurement_confidence": "exact",
+            "name": "Élément content-tokens",
+            "quantity": 1,
+            "shape_kind": "custom"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "c0",
+            "content_clearance_mm": null,
+            "dimensions_mm": {
+              "x": 69.0,
+              "y": 91.0,
+              "z": 35.0
+            },
+            "id": "content-c0",
+            "measurement_confidence": "exact",
+            "name": "Élément content-c0",
+            "quantity": 1,
+            "shape_kind": "custom"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "c1",
+            "content_clearance_mm": null,
+            "dimensions_mm": {
+              "x": 89.0,
+              "y": 62.72,
+              "z": 64.0
+            },
+            "id": "content-c1",
+            "measurement_confidence": "exact",
+            "name": "Élément content-c1",
+            "quantity": 1,
+            "shape_kind": "custom"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "c2",
+            "content_clearance_mm": null,
+            "dimensions_mm": {
+              "x": 63.0,
+              "y": 88.0,
+              "z": 24.0
+            },
+            "id": "content-c2",
+            "measurement_confidence": "exact",
+            "name": "Élément content-c2",
+            "quantity": 1,
+            "shape_kind": "custom"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "c3",
+            "content_clearance_mm": null,
+            "dimensions_mm": {
+              "x": 63.0,
+              "y": 88.0,
+              "z": 24.0
+            },
+            "id": "content-c3",
+            "measurement_confidence": "exact",
+            "name": "Élément content-c3",
+            "quantity": 1,
+            "shape_kind": "custom"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "c4",
+            "content_clearance_mm": null,
+            "dimensions_mm": {
+              "x": 63.0,
+              "y": 88.0,
+              "z": 24.0
+            },
+            "id": "content-c4",
+            "measurement_confidence": "exact",
+            "name": "Élément content-c4",
+            "quantity": 1,
+            "shape_kind": "custom"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "tall-row",
+            "content_clearance_mm": null,
+            "dimensions_mm": {
+              "x": 162.5,
+              "y": 32.6,
+              "z": 63.5
+            },
+            "id": "content-tall-row",
+            "measurement_confidence": "exact",
+            "name": "Élément content-tall-row",
+            "quantity": 1,
+            "shape_kind": "custom"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "mixed",
+            "content_clearance_mm": null,
+            "dimensions_mm": {
+              "x": 38.4,
+              "y": 32.6,
+              "z": 48.0
+            },
+            "id": "content-mixed",
+            "measurement_confidence": "exact",
+            "name": "Élément content-mixed",
+            "quantity": 1,
+            "shape_kind": "custom"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "added-small",
+            "content_clearance_mm": null,
+            "dimensions_mm": {
+              "x": 63.5,
+              "y": 88.9,
+              "z": 3.2
+            },
+            "id": "content-added-small",
+            "measurement_confidence": "exact",
+            "name": "Élément content-added-small",
+            "quantity": 1,
+            "shape_kind": "custom"
+          }
+        ],
+        "deferred_features": {
+          "appearance": null,
+          "mechanism": null
+        },
+        "fill_elements": [],
+        "flat_items": [
+          {
+            "clearance_effective_v1": {
+              "role": "flat_inset",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.0
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "dimensions_mm": {
+              "x": 115.0,
+              "y": 110.0,
+              "z": 3.0
+            },
+            "id": "flat-board",
+            "kind": "board",
+            "name": "Plateau anonymise",
+            "origin_mm": {
+              "x": 10.0,
+              "y": 10.0
+            },
+            "quantity": 3,
+            "rotation_deg_z": null,
+            "stack_order": 1
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "flat_inset",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.0
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "dimensions_mm": {
+              "x": 110.0,
+              "y": 60.0,
+              "z": 3.0
+            },
+            "id": "flat-booklet",
+            "kind": "rulebook",
+            "name": "Livret anonymise",
+            "origin_mm": {
+              "x": 10.0,
+              "y": 20.0
+            },
+            "quantity": 1,
+            "rotation_deg_z": null,
+            "stack_order": 0
+          }
+        ],
+        "layout": {
+          "clearance_default_sources_v1": {
+            "asset_cavity_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar",
+              "z": "compatibility_legacy_scalar"
+            },
+            "container_between_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar",
+              "z": "compatibility_legacy_scalar"
+            },
+            "container_box_per_side_xy_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar"
+            },
+            "flat_inset_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar",
+              "z": "compatibility_legacy_scalar"
+            }
+          },
+          "clearance_defaults_v1": {
+            "asset_cavity_mm": {
+              "x": 0.6,
+              "y": 0.6,
+              "z": 0.6
+            },
+            "container_between_mm": {
+              "x": 0.6,
+              "y": 0.6,
+              "z": 0.6
+            },
+            "container_box_per_side_xy_mm": {
+              "x": 0.6,
+              "y": 0.6
+            },
+            "flat_inset_mm": {
+              "x": 0.6,
+              "y": 0.6,
+              "z": 0.0
+            }
+          },
+          "container_box_xy_clearance_mm": 0.6,
+          "container_z_clearance_mm": 0.6,
+          "default_content_clearance_mm": 0.6,
+          "default_floor_thickness_mm": 1.2,
+          "default_wall_thickness_mm": 1.2,
+          "layout_clearance_mm": 0.6
+        },
+        "project_name": "P64-L05D corpus continuous-closure-normal",
+        "schema_version": "bgig.project.v1",
+        "solver_preference": "balanced"
+      },
+      "project_digest": "a968a72726e2b524e0d051d1af341edfabb21cf8449bd60a0272519032ab8b23",
+      "solver_settings": {
+        "effort": "normal",
+        "method": "auto"
+      },
+      "source": {
+        "id": "p64_v2_continuous_closure_project",
+        "kind": "fixture"
+      }
+    },
+    {
+      "baseline": {
+        "plan_digest": "633793342be16fd885e9bc3f0a25ceea053cfdae36e88507cdadc466b6e90eb2",
+        "status": "no_solution_within_budget",
+        "stop_reason": ""
+      },
+      "case_id": "dense-11x34-quick",
+      "execution_tier": "extended",
+      "expectations": {
+        "accepted_statuses": [
+          "solution_found",
+          "no_solution_within_budget"
+        ],
+        "allow_solution_improvement": true,
+        "proven_impossible_claim_allowed": false,
+        "require_certificate_if_solution": true,
+        "required_lane_ids": [
+          "historical_legacy_corner",
+          "historical_bridge_edge",
+          "variant_corner_long_side"
+        ]
+      },
+      "project": {
+        "box": {
+          "inner_dimensions_mm": {
+            "x": 250.0,
+            "y": 180.0,
+            "z": 70.0
+          },
+          "lid_clearance_mm": 0.2,
+          "usable_height_mm": 69.8
+        },
+        "container_groups": [
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "dense-core",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Bac dense-core",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "satellite-00",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Bac satellite-00",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "satellite-01",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Bac satellite-01",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "satellite-02",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Bac satellite-02",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "satellite-03",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Bac satellite-03",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "satellite-04",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Bac satellite-04",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "satellite-05",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Bac satellite-05",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "satellite-06",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Bac satellite-06",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "satellite-07",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Bac satellite-07",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "satellite-08",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Bac satellite-08",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "satellite-09",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Bac satellite-09",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          }
+        ],
+        "contents": [
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "dense-core",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 18.0,
+              "y": 12.0,
+              "z": 4.0
+            },
+            "id": "core-00",
+            "measurement_confidence": "exact",
+            "name": "Element core-00",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "dense-core",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 24.0,
+              "y": 16.0,
+              "z": 6.0
+            },
+            "id": "core-01",
+            "measurement_confidence": "exact",
+            "name": "Element core-01",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "dense-core",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 14.0,
+              "y": 28.0,
+              "z": 5.0
+            },
+            "id": "core-02",
+            "measurement_confidence": "exact",
+            "name": "Element core-02",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "dense-core",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 32.0,
+              "y": 10.0,
+              "z": 7.0
+            },
+            "id": "core-03",
+            "measurement_confidence": "exact",
+            "name": "Element core-03",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "dense-core",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 20.0,
+              "y": 20.0,
+              "z": 8.0
+            },
+            "id": "core-04",
+            "measurement_confidence": "exact",
+            "name": "Element core-04",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "dense-core",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 26.0,
+              "y": 14.0,
+              "z": 5.0
+            },
+            "id": "core-05",
+            "measurement_confidence": "exact",
+            "name": "Element core-05",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "dense-core",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 16.0,
+              "y": 30.0,
+              "z": 6.0
+            },
+            "id": "core-06",
+            "measurement_confidence": "exact",
+            "name": "Element core-06",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "dense-core",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 18.0,
+              "y": 12.0,
+              "z": 4.0
+            },
+            "id": "core-07",
+            "measurement_confidence": "exact",
+            "name": "Element core-07",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "dense-core",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 24.0,
+              "y": 16.0,
+              "z": 6.0
+            },
+            "id": "core-08",
+            "measurement_confidence": "exact",
+            "name": "Element core-08",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "dense-core",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 14.0,
+              "y": 28.0,
+              "z": 5.0
+            },
+            "id": "core-09",
+            "measurement_confidence": "exact",
+            "name": "Element core-09",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "dense-core",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 32.0,
+              "y": 10.0,
+              "z": 7.0
+            },
+            "id": "core-10",
+            "measurement_confidence": "exact",
+            "name": "Element core-10",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "dense-core",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 20.0,
+              "y": 20.0,
+              "z": 8.0
+            },
+            "id": "core-11",
+            "measurement_confidence": "exact",
+            "name": "Element core-11",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "dense-core",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 26.0,
+              "y": 14.0,
+              "z": 5.0
+            },
+            "id": "core-12",
+            "measurement_confidence": "exact",
+            "name": "Element core-12",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "dense-core",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 16.0,
+              "y": 30.0,
+              "z": 6.0
+            },
+            "id": "core-13",
+            "measurement_confidence": "exact",
+            "name": "Element core-13",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "satellite-00",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 18.0,
+              "y": 12.0,
+              "z": 4.0
+            },
+            "id": "satellite-00-0",
+            "measurement_confidence": "exact",
+            "name": "Element satellite-00-0",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "satellite-00",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 24.0,
+              "y": 16.0,
+              "z": 6.0
+            },
+            "id": "satellite-00-1",
+            "measurement_confidence": "exact",
+            "name": "Element satellite-00-1",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "satellite-01",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 14.0,
+              "y": 28.0,
+              "z": 5.0
+            },
+            "id": "satellite-01-0",
+            "measurement_confidence": "exact",
+            "name": "Element satellite-01-0",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "satellite-01",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 32.0,
+              "y": 10.0,
+              "z": 7.0
+            },
+            "id": "satellite-01-1",
+            "measurement_confidence": "exact",
+            "name": "Element satellite-01-1",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "satellite-02",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 20.0,
+              "y": 20.0,
+              "z": 8.0
+            },
+            "id": "satellite-02-0",
+            "measurement_confidence": "exact",
+            "name": "Element satellite-02-0",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "satellite-02",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 26.0,
+              "y": 14.0,
+              "z": 5.0
+            },
+            "id": "satellite-02-1",
+            "measurement_confidence": "exact",
+            "name": "Element satellite-02-1",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "satellite-03",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 16.0,
+              "y": 30.0,
+              "z": 6.0
+            },
+            "id": "satellite-03-0",
+            "measurement_confidence": "exact",
+            "name": "Element satellite-03-0",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "satellite-03",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 18.0,
+              "y": 12.0,
+              "z": 4.0
+            },
+            "id": "satellite-03-1",
+            "measurement_confidence": "exact",
+            "name": "Element satellite-03-1",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "satellite-04",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 24.0,
+              "y": 16.0,
+              "z": 6.0
+            },
+            "id": "satellite-04-0",
+            "measurement_confidence": "exact",
+            "name": "Element satellite-04-0",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "satellite-04",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 14.0,
+              "y": 28.0,
+              "z": 5.0
+            },
+            "id": "satellite-04-1",
+            "measurement_confidence": "exact",
+            "name": "Element satellite-04-1",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "satellite-05",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 32.0,
+              "y": 10.0,
+              "z": 7.0
+            },
+            "id": "satellite-05-0",
+            "measurement_confidence": "exact",
+            "name": "Element satellite-05-0",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "satellite-05",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 20.0,
+              "y": 20.0,
+              "z": 8.0
+            },
+            "id": "satellite-05-1",
+            "measurement_confidence": "exact",
+            "name": "Element satellite-05-1",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "satellite-06",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 26.0,
+              "y": 14.0,
+              "z": 5.0
+            },
+            "id": "satellite-06-0",
+            "measurement_confidence": "exact",
+            "name": "Element satellite-06-0",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "satellite-06",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 16.0,
+              "y": 30.0,
+              "z": 6.0
+            },
+            "id": "satellite-06-1",
+            "measurement_confidence": "exact",
+            "name": "Element satellite-06-1",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "satellite-07",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 18.0,
+              "y": 12.0,
+              "z": 4.0
+            },
+            "id": "satellite-07-0",
+            "measurement_confidence": "exact",
+            "name": "Element satellite-07-0",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "satellite-07",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 24.0,
+              "y": 16.0,
+              "z": 6.0
+            },
+            "id": "satellite-07-1",
+            "measurement_confidence": "exact",
+            "name": "Element satellite-07-1",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "satellite-08",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 14.0,
+              "y": 28.0,
+              "z": 5.0
+            },
+            "id": "satellite-08-0",
+            "measurement_confidence": "exact",
+            "name": "Element satellite-08-0",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "satellite-08",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 32.0,
+              "y": 10.0,
+              "z": 7.0
+            },
+            "id": "satellite-08-1",
+            "measurement_confidence": "exact",
+            "name": "Element satellite-08-1",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "satellite-09",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 20.0,
+              "y": 20.0,
+              "z": 8.0
+            },
+            "id": "satellite-09-0",
+            "measurement_confidence": "exact",
+            "name": "Element satellite-09-0",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.4,
+                "y": 0.4,
+                "z": 0.4
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "satellite-09",
+            "content_clearance_mm": 0.4,
+            "dimensions_mm": {
+              "x": 26.0,
+              "y": 14.0,
+              "z": 5.0
+            },
+            "id": "satellite-09-1",
+            "measurement_confidence": "exact",
+            "name": "Element satellite-09-1",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          }
+        ],
+        "deferred_features": {
+          "appearance": null,
+          "mechanism": null
+        },
+        "fill_elements": [],
+        "flat_items": [
+          {
+            "clearance_effective_v1": {
+              "role": "flat_inset",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.0
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "dimensions_mm": {
+              "x": 115.0,
+              "y": 110.0,
+              "z": 3.0
+            },
+            "id": "dense-board",
+            "kind": "board",
+            "name": "Plateau anonymise",
+            "origin_mm": {
+              "x": 10.0,
+              "y": 10.0
+            },
+            "quantity": 2,
+            "rotation_deg_z": 0,
+            "stack_order": 0
+          }
+        ],
+        "layout": {
+          "clearance_default_sources_v1": {
+            "asset_cavity_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar",
+              "z": "compatibility_legacy_scalar"
+            },
+            "container_between_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar",
+              "z": "compatibility_legacy_scalar"
+            },
+            "container_box_per_side_xy_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar"
+            },
+            "flat_inset_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar",
+              "z": "compatibility_legacy_scalar"
+            }
+          },
+          "clearance_defaults_v1": {
+            "asset_cavity_mm": {
+              "x": 0.6,
+              "y": 0.6,
+              "z": 0.6
+            },
+            "container_between_mm": {
+              "x": 0.6,
+              "y": 0.6,
+              "z": 0.6
+            },
+            "container_box_per_side_xy_mm": {
+              "x": 0.6,
+              "y": 0.6
+            },
+            "flat_inset_mm": {
+              "x": 0.6,
+              "y": 0.6,
+              "z": 0.0
+            }
+          },
+          "container_box_xy_clearance_mm": 0.6,
+          "container_z_clearance_mm": 0.6,
+          "default_content_clearance_mm": 0.6,
+          "default_floor_thickness_mm": 1.2,
+          "default_wall_thickness_mm": 1.2,
+          "layout_clearance_mm": 0.6
+        },
+        "project_name": "P64-L05D corpus dense-11x34-quick",
+        "schema_version": "bgig.project.v1",
+        "solver_preference": "balanced"
+      },
+      "project_digest": "1ae97df3903781863d749ad91a456d54ee99d3783ba0a653754b6a916dcfefc7",
+      "solver_settings": {
+        "effort": "quick",
+        "method": "auto"
+      },
+      "source": {
+        "id": "dense_11_containers_34_contents_project",
+        "kind": "fixture"
+      }
+    },
+    {
+      "baseline": {
+        "plan_digest": "63615bbfd1cccf72c5950eb307ef77c422d6fc7dc8e15d3f28e5eb5a42ae7037",
+        "status": "no_solution_within_budget",
+        "stop_reason": ""
+      },
+      "case_id": "localized-reservation-normal",
+      "execution_tier": "ci",
+      "expectations": {
+        "accepted_statuses": [
+          "solution_found",
+          "no_solution_within_budget"
+        ],
+        "allow_solution_improvement": true,
+        "proven_impossible_claim_allowed": false,
+        "require_certificate_if_solution": true,
+        "required_lane_ids": [
+          "historical_legacy_corner",
+          "historical_bridge_edge",
+          "variant_corner_long_side",
+          "variant_center_footprint",
+          "variant_lowest_height",
+          "variant_edge_interleave"
+        ]
+      },
+      "project": {
+        "box": {
+          "inner_dimensions_mm": {
+            "x": 180.0,
+            "y": 140.0,
+            "z": 50.0
+          },
+          "lid_clearance_mm": 2.0,
+          "usable_height_mm": 48.0
+        },
+        "container_groups": [
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": 2.0,
+            "id": "tradeoff",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Bac multi-cavites",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": 2.0
+          }
+        ],
+        "contents": [
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "tradeoff",
+            "content_clearance_mm": 0.0,
+            "dimensions_mm": {
+              "x": 48.0,
+              "y": 18.0,
+              "z": 8.0
+            },
+            "id": "long",
+            "measurement_confidence": "exact",
+            "name": "Element long",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "tradeoff",
+            "content_clearance_mm": 0.0,
+            "dimensions_mm": {
+              "x": 36.0,
+              "y": 28.0,
+              "z": 7.0
+            },
+            "id": "wide",
+            "measurement_confidence": "exact",
+            "name": "Element wide",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "tradeoff",
+            "content_clearance_mm": 0.0,
+            "dimensions_mm": {
+              "x": 24.0,
+              "y": 42.0,
+              "z": 6.0
+            },
+            "id": "tall",
+            "measurement_confidence": "exact",
+            "name": "Element tall",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "tradeoff",
+            "content_clearance_mm": 0.0,
+            "dimensions_mm": {
+              "x": 18.0,
+              "y": 18.0,
+              "z": 5.0
+            },
+            "id": "small",
+            "measurement_confidence": "exact",
+            "name": "Element small",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          }
+        ],
+        "deferred_features": {
+          "appearance": null,
+          "mechanism": null
+        },
+        "fill_elements": [],
+        "flat_items": [
+          {
+            "clearance_effective_v1": {
+              "role": "flat_inset",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.0
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "dimensions_mm": {
+              "x": 72.0,
+              "y": 48.0,
+              "z": 3.0
+            },
+            "id": "localized-board",
+            "kind": "board",
+            "name": "Plateau localise",
+            "origin_mm": {
+              "x": 82.0,
+              "y": 12.0
+            },
+            "quantity": 1,
+            "rotation_deg_z": 0,
+            "stack_order": 0
+          }
+        ],
+        "layout": {
+          "clearance_default_sources_v1": {
+            "asset_cavity_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar",
+              "z": "compatibility_legacy_scalar"
+            },
+            "container_between_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar",
+              "z": "compatibility_legacy_scalar"
+            },
+            "container_box_per_side_xy_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar"
+            },
+            "flat_inset_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar",
+              "z": "compatibility_legacy_scalar"
+            }
+          },
+          "clearance_defaults_v1": {
+            "asset_cavity_mm": {
+              "x": 0.6,
+              "y": 0.6,
+              "z": 0.6
+            },
+            "container_between_mm": {
+              "x": 0.6,
+              "y": 0.6,
+              "z": 0.6
+            },
+            "container_box_per_side_xy_mm": {
+              "x": 0.6,
+              "y": 0.6
+            },
+            "flat_inset_mm": {
+              "x": 0.6,
+              "y": 0.6,
+              "z": 0.0
+            }
+          },
+          "container_box_xy_clearance_mm": 0.6,
+          "container_z_clearance_mm": 0.6,
+          "default_content_clearance_mm": 0.6,
+          "default_floor_thickness_mm": 1.2,
+          "default_wall_thickness_mm": 1.2,
+          "layout_clearance_mm": 0.6
+        },
+        "project_name": "P64-L05D corpus localized-reservation-normal",
+        "schema_version": "bgig.project.v1",
+        "solver_preference": "balanced"
+      },
+      "project_digest": "33f4eac80515e342366d22931934194ee90e9aff6f66241c8accb773bb214228",
+      "solver_settings": {
+        "effort": "normal",
+        "method": "auto"
+      },
+      "source": {
+        "id": "localized_reservation_project",
+        "kind": "fixture"
+      }
+    },
+    {
+      "baseline": {
+        "placement_digest": "246c88ed76a5781589e7479accf474ca558f54457208a2e09b1e75ebffd44434",
+        "plan_digest": "232695f46d8d2cf6b4c8be31fa8d8ead4064d2b5819158c9cb1a703e0807f7d6",
+        "rank_axes": [
+          68400.0,
+          0.0,
+          10.0,
+          6840.0,
+          5.0,
+          -0.0,
+          -1.0
+        ],
+        "status": "solution_found",
+        "stop_reason": "bounded_lane_prefix_completed"
+      },
+      "case_id": "multi-cavity-normal",
+      "execution_tier": "ci",
+      "expectations": {
+        "accepted_statuses": [
+          "solution_found",
+          "no_solution_within_budget"
+        ],
+        "allow_solution_improvement": true,
+        "proven_impossible_claim_allowed": false,
+        "require_certificate_if_solution": true,
+        "required_lane_ids": [
+          "historical_legacy_corner",
+          "historical_bridge_edge",
+          "variant_corner_long_side",
+          "variant_center_footprint",
+          "variant_lowest_height",
+          "variant_edge_interleave"
+        ]
+      },
+      "project": {
+        "box": {
+          "inner_dimensions_mm": {
+            "x": 180.0,
+            "y": 140.0,
+            "z": 50.0
+          },
+          "lid_clearance_mm": 2.0,
+          "usable_height_mm": 48.0
+        },
+        "container_groups": [
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": 2.0,
+            "id": "tradeoff",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Bac multi-cavites",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": 2.0
+          }
+        ],
+        "contents": [
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "tradeoff",
+            "content_clearance_mm": 0.0,
+            "dimensions_mm": {
+              "x": 48.0,
+              "y": 18.0,
+              "z": 8.0
+            },
+            "id": "long",
+            "measurement_confidence": "exact",
+            "name": "Element long",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "tradeoff",
+            "content_clearance_mm": 0.0,
+            "dimensions_mm": {
+              "x": 36.0,
+              "y": 28.0,
+              "z": 7.0
+            },
+            "id": "wide",
+            "measurement_confidence": "exact",
+            "name": "Element wide",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "tradeoff",
+            "content_clearance_mm": 0.0,
+            "dimensions_mm": {
+              "x": 24.0,
+              "y": 42.0,
+              "z": 6.0
+            },
+            "id": "tall",
+            "measurement_confidence": "exact",
+            "name": "Element tall",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "tradeoff",
+            "content_clearance_mm": 0.0,
+            "dimensions_mm": {
+              "x": 18.0,
+              "y": 18.0,
+              "z": 5.0
+            },
+            "id": "small",
+            "measurement_confidence": "exact",
+            "name": "Element small",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          }
+        ],
+        "deferred_features": {
+          "appearance": null,
+          "mechanism": null
+        },
+        "fill_elements": [],
+        "flat_items": [],
+        "layout": {
+          "clearance_default_sources_v1": {
+            "asset_cavity_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar",
+              "z": "compatibility_legacy_scalar"
+            },
+            "container_between_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar",
+              "z": "compatibility_legacy_scalar"
+            },
+            "container_box_per_side_xy_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar"
+            },
+            "flat_inset_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar",
+              "z": "compatibility_legacy_scalar"
+            }
+          },
+          "clearance_defaults_v1": {
+            "asset_cavity_mm": {
+              "x": 0.6,
+              "y": 0.6,
+              "z": 0.6
+            },
+            "container_between_mm": {
+              "x": 0.6,
+              "y": 0.6,
+              "z": 0.6
+            },
+            "container_box_per_side_xy_mm": {
+              "x": 0.6,
+              "y": 0.6
+            },
+            "flat_inset_mm": {
+              "x": 0.6,
+              "y": 0.6,
+              "z": 0.0
+            }
+          },
+          "container_box_xy_clearance_mm": 0.6,
+          "container_z_clearance_mm": 0.6,
+          "default_content_clearance_mm": 0.6,
+          "default_floor_thickness_mm": 1.2,
+          "default_wall_thickness_mm": 1.2,
+          "layout_clearance_mm": 0.6
+        },
+        "project_name": "P64-L05D corpus multi-cavity-normal",
+        "schema_version": "bgig.project.v1",
+        "solver_preference": "balanced"
+      },
+      "project_digest": "a2f208b522362575605d5672f332260d8cb3ad0f9c32bb9cc8fe6683b48b59d1",
+      "solver_settings": {
+        "effort": "normal",
+        "method": "auto"
+      },
+      "source": {
+        "id": "multi_cavity_tradeoff_project",
+        "kind": "fixture"
+      }
+    },
+    {
+      "baseline": {
+        "placement_digest": "ca0ce51820a7e0ba51c187de154e4e5048bb8502304cb5eee23b757d4f909d27",
+        "plan_digest": "88a7ee51cd0ccb2fa32b27df6a963748d8163de1cba900ab53d1ff3ccf9d83d1",
+        "rank_axes": [
+          10171.008,
+          0.0,
+          21.8,
+          466.56,
+          5.0,
+          -0.0,
+          -1.0
+        ],
+        "status": "solution_found",
+        "stop_reason": "bounded_lane_prefix_completed"
+      },
+      "case_id": "simple-quick",
+      "execution_tier": "ci",
+      "expectations": {
+        "accepted_statuses": [
+          "solution_found"
+        ],
+        "allow_solution_improvement": true,
+        "proven_impossible_claim_allowed": false,
+        "require_certificate_if_solution": true,
+        "required_lane_ids": [
+          "historical_legacy_corner",
+          "historical_bridge_edge",
+          "variant_corner_long_side"
+        ]
+      },
+      "project": {
+        "box": {
+          "inner_dimensions_mm": {
+            "x": 240.0,
+            "y": 180.0,
+            "z": 70.0
+          },
+          "lid_clearance_mm": 2.0,
+          "usable_height_mm": 66.0
+        },
+        "container_groups": [
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "simple",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Bac simple",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          }
+        ],
+        "contents": [
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "simple",
+            "content_clearance_mm": null,
+            "dimensions_mm": {
+              "x": 18.0,
+              "y": 18.0,
+              "z": 5.0
+            },
+            "id": "simple-content",
+            "measurement_confidence": "exact",
+            "name": "Élément simple-content",
+            "quantity": 4,
+            "shape_kind": "custom"
+          }
+        ],
+        "deferred_features": {
+          "appearance": null,
+          "mechanism": null
+        },
+        "fill_elements": [],
+        "flat_items": [],
+        "layout": {
+          "clearance_default_sources_v1": {
+            "asset_cavity_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar",
+              "z": "compatibility_legacy_scalar"
+            },
+            "container_between_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar",
+              "z": "compatibility_legacy_scalar"
+            },
+            "container_box_per_side_xy_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar"
+            },
+            "flat_inset_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar",
+              "z": "compatibility_legacy_scalar"
+            }
+          },
+          "clearance_defaults_v1": {
+            "asset_cavity_mm": {
+              "x": 0.6,
+              "y": 0.6,
+              "z": 0.6
+            },
+            "container_between_mm": {
+              "x": 0.6,
+              "y": 0.6,
+              "z": 0.6
+            },
+            "container_box_per_side_xy_mm": {
+              "x": 0.6,
+              "y": 0.6
+            },
+            "flat_inset_mm": {
+              "x": 0.6,
+              "y": 0.6,
+              "z": 0.0
+            }
+          },
+          "container_box_xy_clearance_mm": 0.6,
+          "container_z_clearance_mm": 0.6,
+          "default_content_clearance_mm": 0.6,
+          "default_floor_thickness_mm": 1.2,
+          "default_wall_thickness_mm": 1.2,
+          "layout_clearance_mm": 0.6
+        },
+        "project_name": "P64-L05D corpus simple-quick",
+        "schema_version": "bgig.project.v1",
+        "solver_preference": "balanced"
+      },
+      "project_digest": "a41b1aa8456f974fa28466b6d7c098916878c43f13d54b75308d5e4ad3d3c9b5",
+      "solver_settings": {
+        "effort": "quick",
+        "method": "auto"
+      },
+      "source": {
+        "id": "simple_success_project",
+        "kind": "fixture"
+      }
+    },
+    {
+      "baseline": {
+        "plan_digest": "c731ad4c76bae338166bd9567e67cd348f3c93472c4e80cb3344fed2b0386f64",
+        "status": "no_solution_within_budget",
+        "stop_reason": ""
+      },
+      "case_id": "variant-dead-end-quick",
+      "execution_tier": "ci",
+      "expectations": {
+        "accepted_statuses": [
+          "solution_found",
+          "no_solution_within_budget"
+        ],
+        "allow_solution_improvement": true,
+        "proven_impossible_claim_allowed": false,
+        "require_certificate_if_solution": true,
+        "required_lane_ids": [
+          "historical_legacy_corner",
+          "historical_bridge_edge",
+          "variant_corner_long_side"
+        ]
+      },
+      "project": {
+        "box": {
+          "inner_dimensions_mm": {
+            "x": 148.0,
+            "y": 80.0,
+            "z": 10.0
+          },
+          "lid_clearance_mm": 0.0,
+          "usable_height_mm": 10.0
+        },
+        "container_groups": [
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": 2.0,
+            "id": "left",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Bac gauche",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": 2.0
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": 2.0,
+            "id": "right",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Bac droit",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": 2.0
+          }
+        ],
+        "contents": [
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "left",
+            "content_clearance_mm": 0.0,
+            "dimensions_mm": {
+              "x": 48.0,
+              "y": 18.0,
+              "z": 8.0
+            },
+            "id": "long",
+            "measurement_confidence": "exact",
+            "name": "Element long",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "left",
+            "content_clearance_mm": 0.0,
+            "dimensions_mm": {
+              "x": 36.0,
+              "y": 28.0,
+              "z": 7.0
+            },
+            "id": "wide",
+            "measurement_confidence": "exact",
+            "name": "Element wide",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "left",
+            "content_clearance_mm": 0.0,
+            "dimensions_mm": {
+              "x": 24.0,
+              "y": 42.0,
+              "z": 6.0
+            },
+            "id": "tall",
+            "measurement_confidence": "exact",
+            "name": "Element tall",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "left",
+            "content_clearance_mm": 0.0,
+            "dimensions_mm": {
+              "x": 18.0,
+              "y": 18.0,
+              "z": 5.0
+            },
+            "id": "small",
+            "measurement_confidence": "exact",
+            "name": "Element small",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "right",
+            "content_clearance_mm": 0.0,
+            "dimensions_mm": {
+              "x": 48.0,
+              "y": 18.0,
+              "z": 8.0
+            },
+            "id": "right-long",
+            "measurement_confidence": "exact",
+            "name": "Droite Element long",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "right",
+            "content_clearance_mm": 0.0,
+            "dimensions_mm": {
+              "x": 36.0,
+              "y": 28.0,
+              "z": 7.0
+            },
+            "id": "right-wide",
+            "measurement_confidence": "exact",
+            "name": "Droite Element wide",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "right",
+            "content_clearance_mm": 0.0,
+            "dimensions_mm": {
+              "x": 24.0,
+              "y": 42.0,
+              "z": 6.0
+            },
+            "id": "right-tall",
+            "measurement_confidence": "exact",
+            "name": "Droite Element tall",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "right",
+            "content_clearance_mm": 0.0,
+            "dimensions_mm": {
+              "x": 18.0,
+              "y": 18.0,
+              "z": 5.0
+            },
+            "id": "right-small",
+            "measurement_confidence": "exact",
+            "name": "Droite Element small",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          }
+        ],
+        "deferred_features": {
+          "appearance": null,
+          "mechanism": null
+        },
+        "fill_elements": [],
+        "flat_items": [],
+        "layout": {
+          "clearance_default_sources_v1": {
+            "asset_cavity_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar",
+              "z": "compatibility_legacy_scalar"
+            },
+            "container_between_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar",
+              "z": "compatibility_legacy_scalar"
+            },
+            "container_box_per_side_xy_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar"
+            },
+            "flat_inset_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar",
+              "z": "compatibility_legacy_scalar"
+            }
+          },
+          "clearance_defaults_v1": {
+            "asset_cavity_mm": {
+              "x": 0.6,
+              "y": 0.6,
+              "z": 0.6
+            },
+            "container_between_mm": {
+              "x": 0.6,
+              "y": 0.6,
+              "z": 0.6
+            },
+            "container_box_per_side_xy_mm": {
+              "x": 0.6,
+              "y": 0.6
+            },
+            "flat_inset_mm": {
+              "x": 0.6,
+              "y": 0.6,
+              "z": 0.0
+            }
+          },
+          "container_box_xy_clearance_mm": 0.6,
+          "container_z_clearance_mm": 0.6,
+          "default_content_clearance_mm": 0.6,
+          "default_floor_thickness_mm": 1.2,
+          "default_wall_thickness_mm": 1.2,
+          "layout_clearance_mm": 0.6
+        },
+        "project_name": "P64-L05D corpus variant-dead-end-quick",
+        "schema_version": "bgig.project.v1",
+        "solver_preference": "balanced"
+      },
+      "project_digest": "2cdae958a66f7098119fe79502628a36f2b12b463c31fa6b388beb44b4305a19",
+      "solver_settings": {
+        "effort": "quick",
+        "method": "auto"
+      },
+      "source": {
+        "id": "multi_container_variant_dead_end_project",
+        "kind": "fixture"
+      }
+    },
+    {
+      "baseline": {
+        "plan_digest": "e563635f319fa531ccf1cdbae65528cfca5fa11e8b5c6e33f4aef906ff6aea2b",
+        "status": "no_solution_within_budget",
+        "stop_reason": ""
+      },
+      "case_id": "variant-unsolved-quick",
+      "execution_tier": "ci",
+      "expectations": {
+        "accepted_statuses": [
+          "solution_found",
+          "no_solution_within_budget"
+        ],
+        "allow_solution_improvement": true,
+        "proven_impossible_claim_allowed": false,
+        "require_certificate_if_solution": true,
+        "required_lane_ids": [
+          "historical_legacy_corner",
+          "historical_bridge_edge",
+          "variant_corner_long_side"
+        ]
+      },
+      "project": {
+        "box": {
+          "inner_dimensions_mm": {
+            "x": 100.0,
+            "y": 76.0,
+            "z": 10.0
+          },
+          "lid_clearance_mm": 0.0,
+          "usable_height_mm": 10.0
+        },
+        "container_groups": [
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": 2.0,
+            "id": "left",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Bac gauche",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": 2.0
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": 2.0,
+            "id": "right",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Bac droit",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": 2.0
+          }
+        ],
+        "contents": [
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "left",
+            "content_clearance_mm": 0.0,
+            "dimensions_mm": {
+              "x": 48.0,
+              "y": 18.0,
+              "z": 8.0
+            },
+            "id": "long",
+            "measurement_confidence": "exact",
+            "name": "Element long",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "left",
+            "content_clearance_mm": 0.0,
+            "dimensions_mm": {
+              "x": 36.0,
+              "y": 28.0,
+              "z": 7.0
+            },
+            "id": "wide",
+            "measurement_confidence": "exact",
+            "name": "Element wide",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "left",
+            "content_clearance_mm": 0.0,
+            "dimensions_mm": {
+              "x": 24.0,
+              "y": 42.0,
+              "z": 6.0
+            },
+            "id": "tall",
+            "measurement_confidence": "exact",
+            "name": "Element tall",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "left",
+            "content_clearance_mm": 0.0,
+            "dimensions_mm": {
+              "x": 18.0,
+              "y": 18.0,
+              "z": 5.0
+            },
+            "id": "small",
+            "measurement_confidence": "exact",
+            "name": "Element small",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "right",
+            "content_clearance_mm": 0.0,
+            "dimensions_mm": {
+              "x": 48.0,
+              "y": 18.0,
+              "z": 8.0
+            },
+            "id": "right-long",
+            "measurement_confidence": "exact",
+            "name": "Droite Element long",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "right",
+            "content_clearance_mm": 0.0,
+            "dimensions_mm": {
+              "x": 36.0,
+              "y": 28.0,
+              "z": 7.0
+            },
+            "id": "right-wide",
+            "measurement_confidence": "exact",
+            "name": "Droite Element wide",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "right",
+            "content_clearance_mm": 0.0,
+            "dimensions_mm": {
+              "x": 24.0,
+              "y": 42.0,
+              "z": 6.0
+            },
+            "id": "right-tall",
+            "measurement_confidence": "exact",
+            "name": "Droite Element tall",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "legacy_content_clearance_mm",
+                "y": "legacy_content_clearance_mm",
+                "z": "legacy_content_clearance_mm"
+              },
+              "values_mm": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "right",
+            "content_clearance_mm": 0.0,
+            "dimensions_mm": {
+              "x": 18.0,
+              "y": 18.0,
+              "z": 5.0
+            },
+            "id": "right-small",
+            "measurement_confidence": "exact",
+            "name": "Droite Element small",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          }
+        ],
+        "deferred_features": {
+          "appearance": null,
+          "mechanism": null
+        },
+        "fill_elements": [],
+        "flat_items": [],
+        "layout": {
+          "clearance_default_sources_v1": {
+            "asset_cavity_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar",
+              "z": "compatibility_legacy_scalar"
+            },
+            "container_between_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar",
+              "z": "compatibility_legacy_scalar"
+            },
+            "container_box_per_side_xy_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar"
+            },
+            "flat_inset_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar",
+              "z": "compatibility_legacy_scalar"
+            }
+          },
+          "clearance_defaults_v1": {
+            "asset_cavity_mm": {
+              "x": 0.6,
+              "y": 0.6,
+              "z": 0.6
+            },
+            "container_between_mm": {
+              "x": 0.6,
+              "y": 0.6,
+              "z": 0.6
+            },
+            "container_box_per_side_xy_mm": {
+              "x": 0.6,
+              "y": 0.6
+            },
+            "flat_inset_mm": {
+              "x": 0.6,
+              "y": 0.6,
+              "z": 0.0
+            }
+          },
+          "container_box_xy_clearance_mm": 0.6,
+          "container_z_clearance_mm": 0.6,
+          "default_content_clearance_mm": 0.6,
+          "default_floor_thickness_mm": 1.2,
+          "default_wall_thickness_mm": 1.2,
+          "layout_clearance_mm": 0.6
+        },
+        "project_name": "P64-L05D corpus variant-unsolved-quick",
+        "schema_version": "bgig.project.v1",
+        "solver_preference": "balanced"
+      },
+      "project_digest": "c8b928f0bac18b2e46d8d1ee19410dd5596fbb4959a2448f44b731084badd79a",
+      "solver_settings": {
+        "effort": "quick",
+        "method": "auto"
+      },
+      "source": {
+        "id": "multi_container_variant_unsolved_project",
+        "kind": "fixture"
+      }
+    }
+  ],
+  "corpus_digest": "409c75095c47c4ca85a6dda469e986d36d67d460bf308ac9a96e1d3898ac26cf",
+  "invariants": {
+    "automatic_solver_modification": false,
+    "cad_build_invocation_count": 0,
+    "finalization_invocation_count": 0,
+    "functional_evidence_deterministic": true,
+    "fusion_materialization_invocation_count": 0,
+    "personal_project_paths_embedded": false,
+    "wall_clock_samples_non_normative": true
+  },
+  "producer": {
+    "id": "solver_case_corpus_v1",
+    "version": "1"
+  },
+  "schema_version": "bgig.solver_case_corpus.v1",
+  "summary": {
+    "case_count": 7,
+    "ci_case_count": 5,
+    "extended_case_count": 2
+  }
+}

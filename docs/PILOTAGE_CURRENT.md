@@ -59,7 +59,9 @@ preuves archivées.
   depuis zéro restaient en défaut.
 - P64-L04R1 et P64-L05A sont automated-validated. L05A insère exactement un
   nouveau conteneur à voisins figés puis recertifie le plan complet sans solve
-  global. P64-L05B est automated-validated : le bouton DEV exporte un SolverCaseBundle versionne sans operation de domaine. P64-L05C est automated-validated. P64-L05D est la prochaine mission unique.
+  global. P64-L05B, P64-L05C et P64-L05D1 sont automated-validated.
+  L05D1 fournit un corpus anonymise, un replay borne et une gate A/B.
+  P64-L05D2 est la prochaine mission unique.
 
 ## Vue de séquence
 
@@ -100,7 +102,8 @@ preuves archivées.
 | Terminé — automatisé | P64-L05A | Nouveau conteneur inséré à voisins figés, plan complet recertifié sans solve global. |
 | Termine — automatise | P64-L05B | Bouton DEV rouge et SolverCaseBundle local, versionne, filtre et sans effet metier. |
 | Termine - automatise | P64-L05C | Sidecar exact et incumbent recertifie, recherche courante conservee. |
-| Prochaine mission | P64-L05D | Corpus versionne, replay borne, baseline et optimisation mesuree des lanes. |
+| Termine - automatise | P64-L05D1 | Corpus anonymise, replay borne et gate A/B fonctionnelle prioritaire. |
+| Prochaine mission | P64-L05D2 | Optimisation interne sous ordre explicite, conservee uniquement sur preuve A/B. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -414,3 +417,20 @@ P64-L05C est implemented-core, implemented-fusion-bridge,
 implemented-fusion-ui et automated-validated. Le manifest reste 0.1.58,
 fusion-validated: false et print-validated: false. P64-L05D devient la prochaine
 mission unique : corpus, replay, baseline et optimisation mesuree.
+
+## P64-L05D1 - corpus et gate A/B automatises (2026-07-22)
+
+Sept cas anonymises sont versionnes dans un manifest exact : cinq CI et deux
+extended. Le replay separe un digest fonctionnel deterministe des temps mur non
+normatifs. La comparaison A/B refuse perte de solution, certificat absent,
+prefixe de lanes modifie, qualite degradee ou attente violee avant de regarder
+la vitesse.
+
+Le projet personnel indique par Thomas a ete observe en lecture seule et son
+SHA-256 est reste identique. Rapide, Normal et Approfondi n'y produisent aucune
+completion geometrique ; cela confirme une limite de profondeur sans promouvoir
+le fichier dans le corpus.
+
+P64-L05D1 est implemented-core et automated-validated.
+fusion-validated: false. print-validated: false. P64-L05D2 est la prochaine
+mission unique : optimisation interne bornee, baselined puis comparee.

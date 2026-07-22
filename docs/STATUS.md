@@ -8,9 +8,10 @@ Statut produit : **MVP V0.1 Fusion-only accepte ; validation d impression non ac
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P64-L04A/B/C, P64-L04R1 et P64-L05A/B/C sont
+Phase active : P64-L04A/B/C, P64-L04R1 et P64-L05A/B/C/D1 sont
 automated-validated. Le retour humain L04V est globalement KO mais partiellement
-positif. Le manifest Fusion reste a 0.1.58. P64-L05D est la prochaine mission
+positif. Le manifest Fusion reste a 0.1.58. P64-L05D1 est
+automated-validated. P64-L05D2 est la prochaine mission
 unique ; aucune gate humaine intermediaire n'est requise.
 P64-V2H03V et P44-V sont fusion-validated sur 0.1.55. P45-M001V est
 architecture-accepted. P64-L03V est un KO contextuel sur 0.1.56 et n'accorde
@@ -2957,3 +2958,25 @@ compileall, JavaScript, frontiere adsk et diff-check passent.
 Le manifest reste 0.1.58. Aucune scene, finalisation ou capture personnelle n'est
 produite. P64-L05D est la prochaine mission unique : corpus, replay borne,
 mesures comparables et optimisation relue des lanes.
+
+## P64-L05D1 - corpus solveur et gate A/B (2026-07-22)
+
+Statut : implemented-core, automated-validated.
+
+Le depot contient maintenant un manifest `bgig.solver_case_corpus.v1` de sept
+cas anonymises, un replay `bgig.solver_case_replay.v1` et une comparaison
+`bgig.solver_case_comparison.v1`. Le digest fonctionnel exclut les temps mur.
+Une perte de solution, certificat, prefixe de lanes ou qualite est eliminatoire
+avant toute mesure de vitesse.
+
+Le tiers CI rejoue cinq cas : deux solutions certifiees et trois
+`no_solution_within_budget` honnetes, sans attente violee. Les scripts de
+replay et de comparaison passent. Le solveur, ses lanes, ses budgets et la
+deadline Deep ne sont pas modifies par L05D1.
+
+Le projet personnel indique par Thomas a ete rejoue strictement en lecture seule.
+Son SHA-256 est reste identique ; Rapide, Normal et Approfondi ne produisent
+aucune completion geometrique. Le fichier n'est pas copie dans le depot.
+
+fusion-validated: false. print-validated: false. Manifest Fusion inchange a
+0.1.58. P64-L05D2 est la prochaine mission unique.

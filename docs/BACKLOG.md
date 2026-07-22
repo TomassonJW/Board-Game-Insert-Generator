@@ -2812,3 +2812,25 @@ implémentée et intégrée à la fois.
 - Livrable : replay borne, mesures comparables, ameliorations relues des lanes et
   optimisation de vitesse sans regression de certificat.
 - Statut : ready.
+
+### P64-L05D1 - corpus, replay et gate A/B
+
+- Statut : done, automated-validated.
+- Dependances obtenues : P64-L05B SolverCaseBundle v1 et P64-L05C witness
+  certifie.
+- Livrable : sept cas anonymises, replay CI/extended, comparaison fonctionnelle
+  prioritaire et scripts de developpement.
+- Preuve : `docs/P64_L05D1_SOLVER_CORPUS_EVIDENCE.md`.
+- Decision : ADR-0079.
+- Aucun changement de solveur, budget, deadline, finalisation ou scene.
+
+### P64-L05D2 - premiere optimisation mesuree
+
+- Statut : ready.
+- Dependances obtenues : P64-L05D1 automated-validated.
+- Scope : eviter l'evaluation de participants qui ne peuvent pas entrer dans
+  `max_participant_branches` quand l'ordre est explicite.
+- Acceptation : equivalence fonctionnelle, reduction mesuree du travail,
+  comparaison A/B acceptee, suite complete et projet personnel inchange.
+- Interdits : aucun ajustement des caps ou budgets, aucun changement du
+  portefeuille, aucun auto-apprentissage, aucune revendication sur le cas dense.
