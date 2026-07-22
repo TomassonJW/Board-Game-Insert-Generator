@@ -1586,7 +1586,23 @@ séparation géométrique minimal/final ; ADR-0074 porte la correction.
   639/639 tests complets.
 - C-FUSION-UI : inchangée dans L04B. L’activité visuelle des opérations longues
   appartient à L04C ; le manifest reste 0.1.58.
-- Non livré : animation/progression L04C, finalisation, capacité
-  post-finalisation, formes P45, valeurs physiques, preuve Fusion ou impression.
-- Suite : P64-L04C `ready`, puis L04V.
-  `fusion-validated: false`, `print-validated: false`.
+- Livré ensuite par L04C : activité immédiate, identité, étape et temps écoulé.
+- Non livré : finalisation, capacité post-finalisation, formes P45, valeurs
+  physiques, preuve Fusion ou impression.
+- Statut : `fusion-validated: false`, `print-validated: false`.
+
+## Mise à jour P64-L04C — activité opérationnelle honnête
+
+- C-USABILITY / C-FUSION-UI : implemented-fusion-ui et automated-validated
+  pour l'activité immédiate, l'étape courante, le temps écoulé et l'identité
+  exacte de chaque analyse, calcul, finalisation ou matérialisation.
+- C-QUALITY : producteur pur déterministe, lifecycle terminal exact, verrou du
+  même type dans la palette et le bridge, détails repliés, focus et autosave
+  préservés ; 648/648 tests complets.
+- C-PROJECT-CONTRACT : inchangé ; état dérivé non persisté, aucun pourcentage,
+  aucune ETA et aucune annulation utilisateur décorative. stale_or_cancelled
+  reste une invalidation de validité fail-closed.
+- C-SOLVER / C-LAYOUT / C-GEOMETRY / C-CAD-IR : inchangées ; aucune opération
+  métier n'est déclenchée par le suivi d'activité.
+- Suite : P64-L04V est la prochaine gate Fusion distincte ; manifest 0.1.58,
+  fusion-validated: false, print-validated: false.

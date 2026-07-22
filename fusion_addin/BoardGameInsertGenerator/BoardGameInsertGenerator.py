@@ -595,6 +595,7 @@ if adsk is not None:
                         project_action = str(raw_request.get("action", "")) if isinstance(raw_request, dict) else ""
                         if project_action in {"materialize_project", "regenerate_project"}:
                             response = _synchronize_palette_cad_response(response, project_action, self.addin_dir)
+                            response = _refresh_palette_fusion_activity(response)
                     except Exception as exc:
                         response = _palette_project_bridge_error_response(raw_request, exc)
                     self.palette.sendInfoToHTML(
@@ -883,6 +884,33 @@ def _synchronize_palette_cad_response(
     synchronized["lifecycle"] = lifecycle
     synchronized["cad_ir_path"] = str(cad_ir_path)
     return synchronized
+
+
+def _refresh_palette_fusion_activity(
+    response: dict[str, object],
+) -> dict[str, object]:
+    """Include the completed Fusion scene synchronization in elapsed time."""
+
+    activity = response.get("operation_activity")
+    scene_status = response.get("scene_status")
+    if not isinstance(activity, dict) or scene_status not in {"synchronized", "blocked"}:
+        return response
+    from board_game_insert_generator.operation_activity import (
+        refresh_terminal_operation_activity,
+    )
+
+    refreshed = dict(response)
+    refreshed["operation_activity"] = refresh_terminal_operation_activity(
+        activity,
+        observed_at_ms=int(datetime.now(timezone.utc).timestamp() * 1_000),
+        succeeded=scene_status == "synchronized",
+        stop_reason=(
+            "scene_synchronized"
+            if scene_status == "synchronized"
+            else "scene_sync_blocked"
+        ),
+    )
+    return refreshed
 
 
 def _inspect_palette_scene() -> dict[str, object]:

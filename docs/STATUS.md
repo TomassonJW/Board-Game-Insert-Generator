@@ -8,9 +8,9 @@ Statut produit : **MVP V0.1 Fusion-only accepte ; validation d impression non ac
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P64-L04A et P64-L04B sont `automated-validated` ; le manifest
-Fusion reste à 0.1.58. P64-L04C est la prochaine mission. La gate Fusion
-combinée L04V reste inactive.
+Phase active : P64-L04A, P64-L04B et P64-L04C sont automated-validated ;
+le manifest Fusion reste à 0.1.58. P64-L04V est la prochaine gate humaine
+distincte, non exécutée dans ce lot.
 P64-V2H03V et P44-V sont fusion-validated sur 0.1.55. P45-M001V est
 architecture-accepted. P64-L03V est un KO contextuel sur 0.1.56 et n'accorde
 aucune validation Fusion à la correction minimal/final.
@@ -2842,5 +2842,37 @@ conserve 41 diagnostics préexistants hors fichiers L04B.
 
 Aucun schéma, valeur physique, forme P45, finalisation, CAD IR, scène ou manifest
 Fusion n’est modifié. Le cas dense 11 × 34 ne reçoit aucune nouvelle
-revendication. P64-L04C devient `ready`.
+revendication. P64-L04C est automated-validated ; P64-L04V devient la
+prochaine gate humaine distincte.
 `fusion-validated: false`, `print-validated: false`.
+
+## P64-L04C — activité et progression UX honnêtes (2026-07-22)
+
+Statut : implemented-core, implemented-fusion-bridge, implemented-fusion-ui,
+automated-validated.
+
+Un producteur pur dérive l'identité, le type, l'étape, le lifecycle et le temps
+écoulé d'une opération explicite. La palette démarre cet état avant le bridge,
+affiche le temps réel sans pourcentage ni ETA, et conserve identité et raison
+d'arrêt dans un détail replié. Analyse, calcul minimal, finalisation et
+matérialisation sont couverts.
+
+Le même type d'opération ne peut pas être lancé deux fois simultanément ; les
+types différents ne sont pas arbitrairement verrouillés. Aucun bouton Annuler
+n'est exposé faute de sémantique coopérative sûre. stale_or_cancelled reste une
+invalidation de validité et ne devient pas une annulation utilisateur générique.
+
+La synchronisation réelle de la scène Fusion contribue au temps terminal de la
+matérialisation. Ce suivi ne lance aucun solveur, finaliseur, CAD ou mutation de
+scène et ne persiste rien dans le projet.
+
+Validation finale : 5/5 tests purs ; 85/85 palette, bridge et CAD ciblés ;
+648/648 suite complète en 163,810 s ; Ruff ciblé, py_compile et node --check
+OK. compileall, frontière adsk et diff-check passent. L'entrypoint Fusion conserve
+7 diagnostics Ruff F401 préexistants hors diff.
+
+Aucun solveur, portefeuille, classement, budget, deadline Deep, schéma,
+géométrie, valeur physique, CAD IR, scène automatique ou manifest Fusion ne
+change. Le cas dense 11 × 34 ne reçoit aucune nouvelle revendication.
+fusion-validated: false, print-validated: false. P64-L04V est la prochaine gate.
+Preuve : docs/P64_L04C_OPERATION_ACTIVITY_EVIDENCE.md.

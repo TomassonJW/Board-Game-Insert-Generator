@@ -979,14 +979,15 @@ fournit l’incumbent et les trois lanes Deep partagent une deadline de 30 s. Le
 manifest Fusion reste à 0.1.58 ; aucune installation ou revue humaine n’est
 requise pour cette clôture cœur.
 
-P64-L04C est maintenant `ready`. Il doit exposer activité, étape et temps écoulé
-sans faux pourcentage. Aucune gate humaine n’est requise avant ou pendant son
-implémentation automatisée si son contrat et ses tests restent dans le scope.
+P64-L04C est implemented-core, implemented-fusion-bridge,
+implemented-fusion-ui et automated-validated. Il expose identité, étape et temps
+écoulé sans faux pourcentage ni annulation décorative. Aucune gate humaine
+n'était requise pendant son implémentation automatisée.
 
-## P64-L04V — future gate Fusion combinée
+## P64-L04V — prochaine gate Fusion combinée
 
-Statut : `future-human-gate`, inactive jusqu’à L04C
-`automated-validated`. L04B est déjà acquis automatiquement.
+Statut : ready-human-gate. L04A, L04B et L04C sont automated-validated ;
+la préparation et l'installation appartiennent à une mission de gate distincte.
 
 La gate devra observer au minimum :
 

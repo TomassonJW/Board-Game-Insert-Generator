@@ -208,6 +208,39 @@ class FusionPaletteCadSyncTests(unittest.TestCase):
         self.assertEqual(result["scene_status"], "blocked")
         self.assertEqual(result["lifecycle"]["materialized"], "blocked")
 
+    def test_refreshes_materialization_activity_after_scene_sync(self) -> None:
+        activity = {
+            "schema_version": "bgig.operation_activity.v1",
+            "operation_id": "materialize-7",
+            "operation_kind": "fusion_materialization",
+            "action": "materialize_project",
+            "started_at_ms": 1_000,
+            "status": "completed",
+            "elapsed_ms": 400,
+            "stop_reason": "ready_for_fusion",
+        }
+        with patch.object(entrypoint, "datetime") as clock:
+            clock.now.return_value.timestamp.return_value = 2.25
+            result = entrypoint._refresh_palette_fusion_activity(
+                {"scene_status": "synchronized", "operation_activity": activity}
+            )
+
+        refreshed = result["operation_activity"]
+        self.assertEqual(refreshed["operation_id"], "materialize-7")
+        self.assertEqual(refreshed["elapsed_ms"], 1_250)
+        self.assertEqual(refreshed["stop_reason"], "scene_synchronized")
+        self.assertEqual(refreshed["status"], "completed")
+        with patch.object(entrypoint, "datetime") as clock:
+            clock.now.return_value.timestamp.return_value = 2.5
+            blocked = entrypoint._refresh_palette_fusion_activity(
+                {"scene_status": "blocked", "operation_activity": activity}
+            )
+        self.assertEqual(blocked["operation_activity"]["status"], "failed")
+        self.assertEqual(
+            blocked["operation_activity"]["stop_reason"],
+            "scene_sync_blocked",
+        )
+
     def test_bridge_error_response_preserves_request_id_and_never_times_out(self) -> None:
         result = entrypoint._palette_project_bridge_error_response(
             {"request_id": "abc"}, RuntimeError("boom")

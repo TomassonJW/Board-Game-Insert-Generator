@@ -8,10 +8,11 @@ V0.1 reste `mvp-accepted`, `fusion-validated: true` pour son périmètre
 historique et `print-validated: false`. La surface MVP reste exclusivement
 l’add-in Fusion 360.
 
-P64-L04A et P64-L04B sont `automated-validated`. L04A fournit la réutilisation
-locale à enveloppe fixe dans le package 0.1.58. L04B rend Approfondi anytime
-dans le cœur sans modifier le manifest Fusion, qui reste à 0.1.58.
-`fusion-validated: false` et `print-validated: false` pour P64-L04.
+P64-L04A, P64-L04B et P64-L04C sont automated-validated. L04A fournit
+la réutilisation locale à enveloppe fixe dans le package 0.1.58. L04B rend
+Approfondi anytime. L04C ajoute l'activité honnête sans modifier le manifest
+Fusion, qui reste à 0.1.58. fusion-validated: false et
+print-validated: false pour P64-L04.
 
 ## Dernier état réel
 
@@ -30,52 +31,38 @@ dans le cœur sans modifier le manifest Fusion, qui reste à 0.1.58.
 - sans incumbent, l’échec reste honnête ; une annulation stale reste
   `stale_or_cancelled` ;
 - budgets, temps, lanes, phases, incumbent et raison d’arrêt sont observables ;
-- l’indication d’attente pendant calcul et matérialisation reste absente ;
+- analyse, calcul, finalisation et matérialisation exposent désormais identité,
+  étape et temps écoulé sans pourcentage ni ETA inventés ;
+- un second lancement du même type est bloqué ; aucune annulation décorative
+  n'est exposée ;
 - le cas dense 11 × 34 ne reçoit aucune nouvelle revendication.
 
 Preuves :
 `docs/P64_L04A_INCREMENTAL_LOCAL_REUSE_EVIDENCE.md` et
-`docs/P64_L04B_DEEP_ANYTIME_EVIDENCE.md`.
+[P64-L04B](P64_L04B_DEEP_ANYTIME_EVIDENCE.md) et
+[P64-L04C](P64_L04C_OPERATION_ACTIVITY_EVIDENCE.md).
 
 ## Prochaine action recommandée
 
-### P64-L04C — Attente et progression UX honnêtes
+### P64-L04V — Gate Fusion du parcours incrémental et des opérations longues
 
-Objectif : rendre immédiatement visibles les opérations longues dans la palette
-Fusion sans inventer une précision que le moteur ne possède pas.
+Type : gate humaine distincte. Aucun développement runtime supplémentaire ne doit
+être ouvert avant son retour formel.
 
-Lot borné :
+Préparation attendue dans une mission dédiée :
 
-1. afficher une activité dès le lancement d’une analyse, d’un calcul, d’une
-   finalisation ou d’une matérialisation ;
-2. exposer l’étape courante et le temps écoulé, sans faux pourcentage ;
-3. bloquer les doubles lancements d’une même opération ;
-4. conserver les actions, focus, autosave et détails repliés existants ;
-5. n’afficher Annuler que lorsqu’une opération possède une vraie sémantique
-   coopérative et sûre ; `stale_or_cancelled` ne devient pas une annulation
-   utilisateur générique ;
-6. tester le producteur pur d’état d’activité, le bridge et le DOM ;
-7. ne modifier ni solveur, budgets, schéma, géométrie, finalisation, scène ou
-   valeur physique.
+1. installer le package Fusion courant seulement après vérification du commit ;
+2. vérifier l'activité immédiate, l'étape et le temps écoulé sur les opérations
+   longues, sans pourcentage ni bouton Annuler décoratif ;
+3. observer insertion locale sans mouvement monde ni solve global, puis fallback
+   explicite ;
+4. vérifier scène désynchronisée puis remplacée sans doublon ;
+5. conserver provenance, méthode, budgets, phases, incumbent et raison d'arrêt ;
+6. enregistrer un retour Fusion formel, sans revendication d'impression.
 
-Autorité :
-`docs/DECISIONS/ADR-0075-pre-final-local-layout-reuse.md`,
-`docs/P64_L04_INCREMENTAL_LOCAL_REUSE_CONTRACT.md` et
-`docs/P64_L04B_DEEP_ANYTIME_CONTRACT.md`.
+État d'entrée : L04A/B/C sont automated-validated ; package 0.1.58 ;
+fusion-validated: false et print-validated: false pour P64-L04.
 
-Aucune revue humaine n’est requise entre L04B et L04C.
-
-## Gate humaine différée
-
-### P64-L04V — Parcours incrémental et opérations longues
-
-La prochaine revue Fusion reste regroupée après L04C automatisé. Elle devra
-observer le plan minimal, l’insertion locale sans mouvement monde ni solve
-global, le fallback explicite, la scène désynchronisée puis remplacée sans
-doublon, et le retour d’activité des opérations longues.
-
-Le retour formel futur sera défini par le préparateur L04V. D’ici là, ne
-revendiquer ni `fusion-validated` pour P64-L04, ni impression réelle.
 
 ## Lots verrouillés
 

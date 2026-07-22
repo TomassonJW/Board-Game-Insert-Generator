@@ -1034,7 +1034,7 @@ recertifier le conteneur dans son enveloppe et sa pose monde existantes, sans
 recherche globale ni finalisation. Un refus reste explicite et fail-closed.
 
 L04B rend désormais Approfondi anytime sous deadline stricte en conservant
-l’incumbent Normal. L04C ajoutera activité, étape et temps écoulé sans faux
+l'incumbent Normal. L04C ajoute désormais activité, étape et temps écoulé sans faux
 pourcentage. L04V regroupera ensuite la prochaine observation Fusion. Les lots
 F01A02/F02A02 de finalisation et C01/C02 post-finalisation restent verrouillés
 jusqu’à cette trajectoire et leurs dépendances P45/P46 applicables.
@@ -1051,6 +1051,23 @@ et annulation stale sont automatisés. La suite complète passe à 639/639. Aucu
 manifest Fusion, schéma, solveur historique public, budget par lane, valeur
 physique, finaliseur ou scène ne change.
 
-L04C est maintenant la prochaine mission pour l’attente UX honnête. L04V reste la
-gate Fusion combinée ; les lots F01A02/F02A02 et C01/C02 demeurent verrouillés.
+L04C est livré et automated-validated. L04V devient la prochaine gate Fusion
+combinée ; les lots F01A02/F02A02 et C01/C02 demeurent verrouillés.
 `fusion-validated: false`, `print-validated: false`.
+
+## P64-L04C — activité opérationnelle livrée (2026-07-22)
+
+L04C rend immédiatement visibles analyse, calcul minimal, finalisation et
+matérialisation dans la palette Fusion. Un état dérivé pur transporte identité,
+étape, lifecycle, temps écoulé et raison d'arrêt. Il ne persiste rien dans le
+projet et ne déclenche aucune opération métier.
+
+La palette et le bridge bloquent seulement un doublon du même type. Les détails
+restent repliés ; focus, autosave et actions existantes sont préservés. Aucun
+pourcentage, ETA ou bouton Annuler sans sémantique sûre n'est introduit.
+stale_or_cancelled reste une invalidation fail-closed.
+
+Les preuves automatisées couvrent le producteur pur, le bridge, le DOM et la
+fin de synchronisation de scène : 648/648 tests complets. Le manifest reste
+0.1.58. L04V devient la prochaine gate humaine distincte ; aucune validation
+Fusion ou impression n'est revendiquée.

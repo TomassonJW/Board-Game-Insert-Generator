@@ -658,5 +658,35 @@ class FusionPaletteDomTests(unittest.TestCase):
             self.markup,
         )
         self.assertNotIn("localReuse.percentage", self.markup)
+
+    def test_exposes_truthful_operation_activity_and_blocks_only_duplicates(self) -> None:
+        for marker in (
+            'id="operation-activity"',
+            "bgig.operation_activity.v1",
+            "OPERATION_ACTIVITY_CONTRACTS",
+            "beginOperationActivity",
+            "finishOperationActivity",
+            "operation_started_at_ms",
+            "operationKindActive",
+            "déjà en cours",
+            "current_step",
+            "formatOperationElapsed",
+            "Raison d’arrêt",
+            "Annulation utilisateur : non disponible",
+            "Réponse obsolète ou invalidée",
+            "operationWatchdogMs",
+            "240000",
+            "prefers-reduced-motion",
+        ):
+            self.assertIn(marker, self.markup)
+        self.assertIn("if(existing){message", self.markup)
+        self.assertIn("different_operation_kinds", (ROOT / "src" / "board_game_insert_generator" / "operation_activity.py").read_text(encoding="utf-8"))
+        self.assertNotIn('data-action="cancel-operation"', self.markup)
+        self.assertNotIn("Réponse obsolète ou annulée", self.markup)
+        activity_start = self.markup.index("function operationActivityMarkup")
+        activity_end = self.markup.index("function renderOperationActivity", activity_start)
+        self.assertNotIn("percentage", self.markup[activity_start:activity_end])
+        self.assertNotIn("<details open", self.markup[activity_start:activity_end])
+
 if __name__ == "__main__":
     unittest.main()

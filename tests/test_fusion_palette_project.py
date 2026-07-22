@@ -14,6 +14,7 @@ ADDIN = ROOT / "fusion_addin" / "BoardGameInsertGenerator"
 
 sys.path.insert(0, str(ADDIN))
 
+import palette_project as palette_project_module  # noqa: E402
 from palette_project import (  # noqa: E402
     CURRENT_PROJECT_FILENAME,
     PERSONAL_PRESETS_FILENAME,
@@ -546,6 +547,77 @@ class FusionPaletteProjectTests(unittest.TestCase):
         identifiers = [item["container_group_id"] for item in response["container_sizing"]["containers"]]
         self.assertEqual(identifiers, [f"group-{index:02d}" for index in range(50)])
         self.assertEqual(len(set(identifiers)), 50)
+
+    def test_bridge_rejects_same_kind_already_active(self) -> None:
+        from board_game_insert_generator.operation_activity import (
+            begin_operation_activity,
+        )
+
+        active = begin_operation_activity(
+            action="validate_project",
+            operation_id="analysis-active",
+            source_revision=4,
+            started_at_ms=900,
+        ).activity
+        key = (str(ADDIN.resolve()), "local_analysis")
+        with palette_project_module._ACTIVE_OPERATION_LOCK:
+            palette_project_module._ACTIVE_OPERATIONS[key] = active
+        try:
+            response = handle_palette_request(
+                request(
+                    "validate_project",
+                    project=blank_project_v1(),
+                    source_revision=4,
+                    operation_started_at_ms=1_000,
+                ),
+                ADDIN,
+                ROOT,
+            )
+        finally:
+            with palette_project_module._ACTIVE_OPERATION_LOCK:
+                palette_project_module._ACTIVE_OPERATIONS.pop(key, None)
+
+        activity = response["operation_activity"]
+        self.assertEqual(response["status"], "busy")
+        self.assertEqual(activity["status"], "rejected")
+        self.assertEqual(
+            activity["stop_reason"],
+            "same_operation_already_active",
+        )
+        self.assertEqual(
+            activity["conflicting_operation_id"],
+            "analysis-active",
+        )
+
+    def test_bridge_exposes_exact_terminal_activity_without_fake_progress(self) -> None:
+        project = blank_project_v1()
+        with (
+            tempfile.TemporaryDirectory() as temp_dir,
+            patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}),
+            patch("palette_project._now_ms", return_value=1_300),
+        ):
+            response = handle_palette_request(
+                request(
+                    "validate_project",
+                    project=project,
+                    source_revision=4,
+                    operation_started_at_ms=1_000,
+                ),
+                ADDIN,
+                ROOT,
+            )
+
+        activity = response["operation_activity"]
+        self.assertEqual(activity["schema_version"], "bgig.operation_activity.v1")
+        self.assertEqual(activity["operation_id"], "test-validate_project")
+        self.assertEqual(activity["operation_kind"], "local_analysis")
+        self.assertEqual(activity["source_revision"], 4)
+        self.assertEqual(activity["status"], "completed")
+        self.assertEqual(activity["elapsed_ms"], 300)
+        self.assertTrue(activity["stop_reason"])
+        self.assertFalse(activity["cancel_supported"])
+        self.assertNotIn("percentage", activity)
+        self.assertNotIn("eta", activity)
 
     def test_rejects_unversioned_and_unknown_messages(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir, patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}):

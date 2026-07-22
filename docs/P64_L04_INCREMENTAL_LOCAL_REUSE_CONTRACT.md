@@ -1,6 +1,6 @@
 # P64-L04 — Réutilisation incrémentale d’un agencement minimal
 
-Statut : contrat accepté ; P64-L04A et L04B `automated-validated` ; L04C `ready`.
+Statut : contrat accepté ; P64-L04A, L04B et L04C automated-validated ; L04V ready-human-gate.
 
 ADR :
 [ADR-0075](DECISIONS/ADR-0075-pre-final-local-layout-reuse.md).
@@ -163,10 +163,16 @@ Statut : `implemented-core`, `automated-validated`.
 ### P64-L04C — Attente et progression UX
 
 - activité immédiate pour analyse, calcul, finalisation et matérialisation ;
-- étape courante et temps écoulé ;
-- aucun faux pourcentage ;
-- annulation seulement lorsqu’elle est réellement coopérative ;
-- blocage des doubles lancements et identités d’opération.
+- identité exacte, lifecycle, étape courante, temps écoulé et raison d'arrêt ;
+- aucun faux pourcentage ni ETA ;
+- aucun bouton Annuler sans sémantique coopérative sûre ;
+- stale_or_cancelled reste une invalidation de validité, jamais une annulation
+  utilisateur générique ;
+- blocage du même type d'opération dans la palette et le bridge, sans verrou
+  arbitraire entre types différents ;
+- état dérivé non persisté, sans déclenchement de solve, finalisation, CAD ou scène ;
+- détails repliés, focus, autosave et actions existantes préservés ;
+- preuve : docs/P64_L04C_OPERATION_ACTIVITY_EVIDENCE.md.
 
 ### P64-L04V — Gate Fusion
 

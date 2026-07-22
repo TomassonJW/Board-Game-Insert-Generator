@@ -12,6 +12,8 @@ import json
 import os
 import re
 import sys
+import threading
+import time
 from collections import OrderedDict
 from copy import deepcopy
 from pathlib import Path
@@ -37,6 +39,8 @@ _LOCAL_ANALYSIS_ENGINE_LIMIT = 8
 _LOCAL_ANALYSIS_ENGINES: OrderedDict[tuple[str, str], object] = OrderedDict()
 _STAGED_CALCULATION_SESSION_LIMIT = 8
 _STAGED_CALCULATION_SESSIONS: OrderedDict[str, object] = OrderedDict()
+_ACTIVE_OPERATION_LOCK = threading.Lock()
+_ACTIVE_OPERATIONS: dict[tuple[str, str], dict[str, object]] = {}
 
 
 class PaletteProjectError(ValueError):
@@ -51,6 +55,8 @@ def handle_palette_request(
     """Handle one versioned palette request and return a versioned response."""
 
     request_id = "unknown"
+    operation_key: tuple[str, str] | None = None
+    operation_activity: dict[str, object] | None = None
     try:
         request = _mapping(raw_request, "request")
         request_id = _text(request.get("request_id"), "request.request_id")
@@ -60,14 +66,149 @@ def handle_palette_request(
         if action not in SUPPORTED_ACTIONS:
             raise PaletteProjectError(f"Action de palette inconnue : {action}.")
         _ensure_engine_available(Path(addin_dir), None if project_root is None else Path(project_root))
-        return _dispatch(action, request, Path(addin_dir), request_id)
+        operation_key, operation_activity, rejection = _begin_bridge_operation(
+            action,
+            request,
+            Path(addin_dir),
+        )
+        if rejection is not None:
+            response = _response(
+                request_id,
+                "busy",
+                errors=[
+                    "Cette operation est deja en cours. BGIG conserve la premiere identite."
+                ],
+            )
+            response["operation_activity"] = rejection
+            return response
+        response = _dispatch(action, request, Path(addin_dir), request_id)
+        if operation_activity is not None:
+            response["operation_activity"] = _finish_bridge_operation(
+                operation_activity,
+                action=action,
+                response=response,
+            )
+        return response
     except Exception as exc:
-        return _response(
+        response = _response(
             request_id,
             "invalid",
             errors=[_french_error(exc)],
             solver_result=_invalid_solver_result(request_id, _request_revision(raw_request)),
         )
+        if operation_activity is not None:
+            response["operation_activity"] = _finish_bridge_operation(
+                operation_activity,
+                action=str(operation_activity.get("action", "")),
+                response=response,
+            )
+        return response
+    finally:
+        if operation_key is not None:
+            with _ACTIVE_OPERATION_LOCK:
+                current = _ACTIVE_OPERATIONS.get(operation_key)
+                if current is operation_activity:
+                    _ACTIVE_OPERATIONS.pop(operation_key, None)
+
+
+def _begin_bridge_operation(
+    action: str,
+    request: dict[str, object],
+    addin_dir: Path,
+) -> tuple[
+    tuple[str, str] | None,
+    dict[str, object] | None,
+    dict[str, object] | None,
+]:
+    """Register one existing explicit operation without invoking its domain work."""
+
+    from board_game_insert_generator.operation_activity import (
+        begin_operation_activity,
+        supports_operation_activity,
+    )
+
+    if not supports_operation_activity(action):
+        return None, None, None
+    started_value = request.get("operation_started_at_ms")
+    started_at_ms = (
+        started_value
+        if isinstance(started_value, int)
+        and not isinstance(started_value, bool)
+        and started_value >= 0
+        else _now_ms()
+    )
+    scope = str(addin_dir.resolve())
+    with _ACTIVE_OPERATION_LOCK:
+        active = tuple(
+            activity
+            for (activity_scope, _kind), activity in _ACTIVE_OPERATIONS.items()
+            if activity_scope == scope
+        )
+        decision = begin_operation_activity(
+            action=action,
+            operation_id=str(request["request_id"]),
+            source_revision=_request_revision(request),
+            started_at_ms=started_at_ms,
+            active_activities=active,
+        )
+        if not decision.accepted:
+            return None, None, decision.activity
+        operation_kind = str(decision.activity["operation_kind"])
+        key = (scope, operation_kind)
+        _ACTIVE_OPERATIONS[key] = decision.activity
+        return key, decision.activity, None
+
+
+def _finish_bridge_operation(
+    activity: dict[str, object],
+    *,
+    action: str,
+    response: dict[str, object],
+) -> dict[str, object]:
+    """Attach real elapsed time and the bridge stop reason to the same identity."""
+
+    from board_game_insert_generator.operation_activity import (
+        finish_operation_activity,
+    )
+
+    succeeded = response.get("status") == "ready"
+    return finish_operation_activity(
+        activity,
+        finished_at_ms=_now_ms(),
+        succeeded=succeeded,
+        stop_reason=_operation_stop_reason(action, response),
+    )
+
+
+def _operation_stop_reason(action: str, response: dict[str, object]) -> str:
+    if response.get("status") != "ready":
+        return "bridge_request_rejected"
+    if action == "validate_project":
+        staged = response.get("staged_calculation") or {}
+        if isinstance(staged, dict):
+            reuse = staged.get("local_reuse") or {}
+            if isinstance(reuse, dict) and reuse.get("stop_reason"):
+                return str(reuse["stop_reason"])
+        return "local_analysis_ready"
+    if action == "solve_project":
+        result = response.get("solver_result") or {}
+        if isinstance(result, dict):
+            telemetry = result.get("telemetry") or {}
+            if isinstance(telemetry, dict) and telemetry.get("stop_reason"):
+                return str(telemetry["stop_reason"])
+        return "minimal_layout_calculation_completed"
+    if action == "finalize_project":
+        return "finalized_plan_ready"
+    if action in {"materialize_project", "regenerate_project"}:
+        cad_build = response.get("cad_build") or {}
+        if isinstance(cad_build, dict) and cad_build.get("status"):
+            return str(cad_build["status"])
+        return "materialization_preparation_completed"
+    return "operation_completed"
+
+
+def _now_ms() -> int:
+    return time.time_ns() // 1_000_000
 
 
 def load_current_project(addin_dir: str | Path, project_root: str | Path | None = None) -> dict[str, object]:

@@ -2657,19 +2657,26 @@ P44-M007 est ready-for-explicit-go.
 
 ### P64-L04C — Attente et progression UX honnêtes
 
-- Dépendance : P64-L04B.
-- Objectif : activité immédiate, étape courante et temps écoulé pour analyse,
-  calcul, finalisation et matérialisation.
-- Règles : aucun faux pourcentage, doubles lancements bloqués, annulation visible
-  seulement pour une opération réellement coopérative.
-- Statut : ready, next ; aucune gate humaine avant implémentation.
+- Dépendance obtenue : P64-L04B.
+- Livré : producteur pur déterministe, identité et lifecycle exacts, activité
+  immédiate, étape courante et temps écoulé pour analyse, calcul minimal,
+  finalisation et matérialisation.
+- Verrous : même type bloqué dans la palette et le bridge ; types différents
+  non bloqués arbitrairement ; aucun bouton Annuler sans sémantique sûre.
+- Invariants : aucun pourcentage ni ETA ; détails repliés, focus et autosave
+  préservés ; stale_or_cancelled reste une invalidation fail-closed.
+- Preuve : docs/P64_L04C_OPERATION_ACTIVITY_EVIDENCE.md ; 5/5 purs, 85/85
+  palette/bridge/CAD ciblés et 648/648 suite complète.
+- Statut : done-code, implemented-core, implemented-fusion-bridge,
+  implemented-fusion-ui, automated-validated, fusion-validated: false,
+  print-validated: false.
 
 ### P64-L04V — Gate Fusion combinée
 
-- Dépendances : P64-L04B et P64-L04C automated-validated.
+- Dépendances obtenues : P64-L04A, P64-L04B et P64-L04C automated-validated.
 - Observer insertion locale sans solve ni déplacement monde, fallback explicite,
   scène stale puis remplacée sans doublon, et attente UX honnête.
-- Statut : future-human-gate, inactive.
+- Statut : ready-human-gate ; préparation et installation dans une mission distincte.
 
 ### P64-F01A02 — Finalisation simple autour des enveloppes
 

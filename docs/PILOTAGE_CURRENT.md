@@ -55,7 +55,7 @@ preuves archivées.
   `automated-validated` dans 0.1.58.
 - P64-L04B est `implemented-core`, `automated-validated` : le préfixe Normal
   fournit l’incumbent, les trois lanes Deep partagent 30 s et une expiration
-  conserve toute solution certifiée. P64-L04C devient la prochaine mission.
+  conserve toute solution certifiée. P64-L04C est automated-validated ; L04V devient la prochaine gate humaine.
 
 ## Vue de séquence
 
@@ -90,8 +90,8 @@ preuves archivées.
 | Revue exploratoire, non formelle | P64-L03R-V | Plan minimal prometteur observé dans 0.1.57 ; réserves reprises par L04, aucune promotion fusion-validated. |
 | Terminé — automatisé | P64-L04A | Insertion locale à enveloppe fixe, recertification globale sans solve et UX compacte dans 0.1.58. |
 | Terminé — automatisé | P64-L04B | Préfixe Normal incumbent, extension Deep anytime sous deadline commune de 30 s. |
-| Prochaine mission | P64-L04C | Activité, étape et temps écoulé honnêtes pour les opérations longues. |
-| Planifié | P64-L04V | Gate Fusion combinée après L04C. |
+| Terminé — automatisé | P64-L04C | Identité, lifecycle, étape et temps écoulé honnêtes ; doublons sémantiques bloqués. |
+| Prochaine gate humaine | P64-L04V | Gate Fusion combinée distincte après validation automatisée de L04C. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -299,7 +299,7 @@ calcul minimal explicite.
 Le cœur, le lifecycle staged, le bridge validate_project et la palette sont
 automated-validated dans le package 0.1.58. Une réussite crée un nouvel artefact
 minimal ; le plan finalisé et la scène précédente deviennent obsolètes sans
-mutation automatique. L04B est désormais acquis ; L04C puis L04V suivent.
+mutation automatique. L04B et L04C sont désormais acquis ; L04V suit.
 fusion-validated: false, print-validated: false.
 
 ## P64-L04B — Approfondi anytime (2026-07-22)
@@ -318,5 +318,24 @@ par le certificat minimal commun.
 Validation : 14/14 tests ciblés et 639/639 suite complète. Aucun manifest Fusion,
 schéma, budget historique par lane, valeur physique, finalisation, CAD ou scène
 n’est modifié. Le cas dense 11 × 34 ne reçoit aucune nouvelle revendication.
-P64-L04C est la prochaine mission ; aucune gate humaine n’est requise avant.
+P64-L04C est automated-validated ; P64-L04V devient la prochaine gate humaine.
 `fusion-validated: false`, `print-validated: false`.
+
+## P64-L04C — activité opérationnelle honnête (2026-07-22)
+
+L04C introduit un état dérivé pur et déterministe pour analyse, calcul minimal,
+finalisation et matérialisation. Chaque lancement explicite possède une identité,
+une étape courante et un temps écoulé ; aucun pourcentage ni ETA ne sont inventés.
+
+La palette affiche l'activité immédiatement, conserve les détails repliés et
+bloque seulement un second lancement du même type sémantique. Le bridge réapplique
+le même verrou. La matérialisation inclut la synchronisation réelle de la scène
+dans son temps terminal. Aucune action Annuler n'est exposée :
+stale_or_cancelled reste une invalidation de validité, pas une annulation
+utilisateur générique.
+
+Validation : 5/5 tests purs, 85/85 palette/bridge/CAD ciblés et 648/648
+suite complète. Ruff ciblé, py_compile et syntaxe JavaScript passent. Aucun
+solveur, budget, schéma, géométrie, valeur physique, CAD IR ou scène automatique
+n'est modifié. P64-L04V devient la prochaine gate distincte.
+fusion-validated: false, print-validated: false.
