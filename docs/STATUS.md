@@ -3156,7 +3156,7 @@ documentaires et contrôles Git sont consignés dans
 Aucun solveur produit, lane, budget, deadline, certificat public, schéma projet,
 tolérance, géométrie, finalisation, CAD, scène Fusion, manifest ou valeur physique
 n'est modifié. Le cas dense 11 × 34 ne reçoit aucune nouvelle revendication.
-P64-L06D est terminée ; P64-L06E est la prochaine mission.
+P64-L06D et P64-L06E sont terminées ; le premier Goal est clôturé.
 
 ## P64-L06D — campagne progressive autonome (2026-07-23)
 
@@ -3174,4 +3174,14 @@ La sélection unique `no_algorithm_change_v1` est scellée avant le holdout. Le 
 
 Validation : tests ciblés adapters 9/9, campagne 8/8, garde documentaire 2/2, alignement Fusion-only 6/6, suite complète 715/715 en 209,367 s, Ruff ciblé et py_compile OK.
 
-Aucun budget, délai, certificat, schéma, tolérance, géométrie, ownership P45/P64, finalisation, CAD, scène, manifest ou valeur physique ne change. Le cas dense 11 × 34 ne reçoit aucune nouvelle revendication. P64-L06E est la prochaine mission de clôture négative.
+Aucun budget, délai, certificat, schéma, tolérance, géométrie, ownership P45/P64, finalisation, CAD, scène, manifest ou valeur physique ne change. Le cas dense 11 × 34 ne reçoit aucune nouvelle revendication. P64-L06E a enregistré la décision négative et clôturé le premier Goal.
+
+## P64-L06E — décision algorithmique négative (2026-07-23)
+
+Statut : done, automated-validated, negative-result-accepted. fusion-validated: false, print-validated: false.
+
+La gate finale exige un gain objectif. Les trois variantes `lane_center_quick_v1`, `lane_lowest_quick_v1` et `lane_interleave_quick_v1` restent identiques à la baseline sur discovery et tuning ; elles sont donc refusées. Le choix final est `no_algorithm_change_v1`.
+
+L06E est documentaire et ne modifie aucun code du solveur, budget, deadline, certificat, schéma, tolérance, géométrie, finalisation, CAD, scène, manifest ou valeur physique. Le holdout L06 est consommé et une future campagne devra en créer un nouveau.
+
+Le premier Goal P64-L06 est terminé. Aucune action humaine ni validation Fusion supplémentaire n'est requise pour cette clôture.

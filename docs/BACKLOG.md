@@ -2917,10 +2917,11 @@ implémentée et intégrée à la fois.
 
 ### P64-L06E — décision algorithmique du premier Goal
 
-- Statut : ready-after-P64-L06D-integration.
-- Scope : enregistrer le résultat négatif, refuser formellement les trois variantes sans gain et publier la synthèse du Goal.
-- Changement solveur autorisé dans cette clôture : aucun.
-- Suite différée : une nouvelle hypothèse devra cibler une lacune profonde, utiliser un corpus/holdout renouvelé et repasser une gate mesurée distincte.
+- Statut : done, automated-validated, negative-result-accepted.
+- Livré : décision `no_algorithm_change_v1`, refus formel des trois variantes sans gain et rapport final du Goal.
+- Changement solveur : aucun.
+- Holdout : consommé ; une future sélection exige une nouvelle version de corpus ou un nouveau holdout.
+- Suite différée : cibler une seule lacune profonde et repasser une gate mesurée distincte.
 - Interdits : changement silencieux de caps, budgets, deadline, certificat ou schéma ; auto-édition ; revendication générale depuis un cas trivial.
 
 ### P64-L06V — confirmation Fusion des cas retenus
@@ -2946,7 +2947,7 @@ implémentée et intégrée à la fois.
 - Statut : done-documentation.
 - Livré : runbook 36 h, matrice P45/P64, splits, oracle interne prioritaire,
   tournoi progressif, checkpoints, pause sûre, arrêts et prompt `/goal`.
-- Dépendance runtime : L06A à L06D sont terminées ; L06E est prête après intégration de la campagne.
+- Dépendance runtime : L06A à L06E sont terminées ; le premier Goal est clôturé.
 - Interdits : aucun solveur ou budget modifié, aucune dépendance externe
   installée, aucun T2-T4, aucune promotion d'un projet personnel.
-- Suite : L06D à L06E sans nouvelle action humaine.
+- Suite : aucune action immédiate ; nouvelle priorisation humaine avant un second programme.

@@ -1095,3 +1095,9 @@ La palette 0.1.59 journalise automatiquement chaque action utile et référence 
 Les captures déjà présentes restent des observations locales utiles mais ne sont pas promues automatiquement. Elles ne valent ni preuve géométrique générale, ni validation Fusion, ni validation d'impression.
 
 Statut : aucune action humaine requise pour lancer ou poursuivre P64-L06. fusion-validated: false. print-validated: false.
+
+## P64-L06E — clôture du premier Goal
+
+La décision `no_algorithm_change_v1` ne demande aucune validation humaine : aucun comportement produit, géométrie, budget, certificat, Fusion ou scène ne change. P64-L06V reste une observation future facultative et ne bloque pas la clôture.
+
+Statut : aucune action humaine requise. fusion-validated: false. print-validated: false.

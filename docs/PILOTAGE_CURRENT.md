@@ -65,7 +65,7 @@ preuves archivées.
   P64-L05V-R2 remplace la recapture manuelle par un journal local automatique
   dans l'add-in 0.1.59. ADR-0080 ferme la gate humaine. L06A, L06B et L06C sont terminées :
   13/13 bundles classés, un cas réel anonymisé, 192 cas T0/T1, deux comparateurs
-  offline et un petit oracle exact. L06D est terminée : 904 exécutions, trois hypothèses sans gain et un holdout sans contradiction. L06E doit enregistrer la décision `no_algorithm_change_v1`.
+  offline et un petit oracle exact. L06D et L06E sont terminées : 904 exécutions, trois hypothèses sans gain, holdout sans contradiction et décision finale `no_algorithm_change_v1`.
 
 ## Vue de séquence
 
@@ -514,7 +514,7 @@ Le programme P64-L06 définit une campagne autonome reprenable : cas T0/T1
 actuels, oracles certifiés, adapters offline, tiers CI/extended/soak et gate A/B.
 Il exclut l'auto-modification et ne rend aucune dépendance externe acceptable.
 L06A à L06D sont désormais terminées. La campagne progressive a retenu une
-décision négative sans modifier le solveur ; L06E clôt ce premier Goal.
+décision négative sans modifier le solveur ; L06E a clôturé ce premier Goal.
 
 ## P64-L06P — runbook Goal prêt (2026-07-23)
 
@@ -523,7 +523,7 @@ amélioration intégrée. Le corpus sépare regression, discovery, tuning et hol
 le holdout reste fermé avant la sélection d'une hypothèse. Un petit oracle exact
 interne évite toute dépendance externe bloquante.
 
-Historique : ce lot était documentaire et attendait encore la paire R1. ADR-0080 a levé cette attente. L06A à L06D sont terminées sans modifier les frontières produit ; L06E est prête pour la décision négative.
+Historique : ce lot était documentaire et attendait encore la paire R1. ADR-0080 a levé cette attente. L06A à L06E sont terminées sans modifier les frontières produit ; le premier Goal est clôturé.
 
 ## P64-L05V-R2 — journal automatique et Goal débloqué (2026-07-23)
 
@@ -541,7 +541,7 @@ Treize bundles locaux sur treize sont valides. La paire récente retenue décrit
 
 Un seul état final 18 conteneurs / 20 contenus est anonymisé, renormalisé et versionné au tier étendu. Deux replays sont fonctionnellement identiques et satisfont les attentes. Les douze autres bundles restent locaux ; aucun journal personnel n'est promu.
 
-Statut : P64-L06A à P64-L06D done, automated-validated ; P64-L06E prochaine. Résultat L06D négatif accepté. fusion-validated: false. print-validated: false.
+Statut : P64-L06A à P64-L06E done, automated-validated ; premier Goal clôturé par un résultat négatif accepté. fusion-validated: false. print-validated: false.
 
 ## P64-L06B — corpus T0/T1 généré (2026-07-23)
 
@@ -557,7 +557,7 @@ reste fermé et aucun solveur n'y a été exécuté. Le schéma projet ne sachan
 interdire une rotation globale, cette politique reste une contrainte explicite
 du benchmark et un adapter incapable doit répondre unsupported.
 
-Statut : P64-L06B à P64-L06D done, automated-validated ; P64-L06E prochaine mission.
+Statut : P64-L06B à P64-L06E done, automated-validated ; premier Goal clôturé.
 fusion-validated: false. print-validated: false.
 
 ## P64-L06C — comparateurs offline et petit oracle exact (2026-07-23)
@@ -572,7 +572,7 @@ au plus quatre conteneurs. Il retrouve 4 cas faisables et 2 impossibles sur les
 interdiction de rotation non représentable reçoit un refus honnête. Le holdout
 reste fermé.
 
-Statut : P64-L06C et P64-L06D done, automated-validated ; P64-L06E prochaine mission.
+Statut : P64-L06C à P64-L06E done, automated-validated ; premier Goal clôturé.
 fusion-validated: false. print-validated: false.
 
 ## P64-L06D — campagne progressive terminée (2026-07-23)
@@ -581,4 +581,12 @@ Le runner écrit un résultat et un checkpoint atomiques après chaque couple ca
 
 Les huit régressions passent. Trois contrôles d'entrée montrent l'effet des rotations et réservations. Trois variantes de lanes Rapide, à budget constant, restent identiques à la baseline sur discovery et tuning. Le choix `no_algorithm_change_v1` est scellé avant holdout ; le holdout confirme zéro gain et zéro contradiction d'oracle. Aucun soak ni changement du solveur produit.
 
-Statut : P64-L06D done, automated-validated, negative-result-accepted ; P64-L06E prochaine mission. fusion-validated: false. print-validated: false.
+Statut : P64-L06D et P64-L06E done, automated-validated, negative-result-accepted ; premier Goal clôturé. fusion-validated: false. print-validated: false.
+
+## P64-L06E — décision négative et Goal clôturé (2026-07-23)
+
+La gate finale refuse les trois variantes de lanes faute de gain objectif. La décision `no_algorithm_change_v1` est enregistrée : aucun changement du solveur, des budgets, des certificats ou du produit.
+
+Le premier Goal P64-L06 est terminé. Son résultat utile est la chaîne de mesure autonome et la classification des lacunes, pas une revendication de capacité supplémentaire. Le holdout est consommé ; un futur programme devra en créer un nouveau.
+
+Statut : P64-L06A à P64-L06E done, automated-validated, negative-result-accepted. Aucune action humaine requise. fusion-validated: false. print-validated: false.

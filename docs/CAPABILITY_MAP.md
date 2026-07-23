@@ -1760,7 +1760,7 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
 - C-SAFETY : plafond 36 h / 2 Gio, reprise sans double exécution, aucune
   dépendance externe installée sans gate et une seule amélioration intégrable.
 - C-FUSION-UI / C-GEOMETRY / C-CAD-IR : inchangées.
-- Statut runtime : L06A à L06D sont terminées ; L06E est prête pour la décision négative, sans recapture humaine.
+- Statut runtime : L06A à L06E sont terminées ; le premier Goal est clôturé par la décision négative, sans recapture humaine.
 
 ## Mise à jour P64-L05V-R2 — parcours de développement automatique
 
@@ -1769,7 +1769,7 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
 - C-SAFETY : chemins et secrets refusés, texte libre absent des lignes, aucune promotion automatique, aucune panne du journal bloquante pour le produit.
 - C-SOLVER / C-LAYOUT / C-GEOMETRY / C-CAD-IR : capacités et contrats inchangés ; le journal n'appelle aucune opération métier.
 - C-QUALITY : les futurs cas humains deviennent des entrées complémentaires ; le corpus, les générateurs et oracles autonomes ne dépendent plus d'une capture manuelle.
-- Statut : implemented-fusion-bridge, implemented-fusion-ui, automated-validated. L06A à L06D done, L06E prochaine ; fusion-validated: false ; print-validated: false.
+- Statut : implemented-fusion-bridge, implemented-fusion-ui, automated-validated. L06A à L06E done, premier Goal clôturé ; fusion-validated: false ; print-validated: false.
 
 ## Mise à jour P64-L06A — cas réel anonymisé
 
@@ -1777,7 +1777,7 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
 - C-PROJECT-CONTRACT : noms, identifiants, métadonnées différées, trace et contexte client retirés ; références internes recâblées puis projet renormalisé.
 - C-SAFETY : constructeur à sortie séparée, aucune modification automatique du corpus source, 12 bundles et tous les journaux personnels non promus.
 - C-FUSION-UI / C-GEOMETRY / C-CAD-IR : inchangées.
-- Statut : P64-L06A à P64-L06D `done` ; P64-L06E `ready-after-integration` ; fusion-validated: false, print-validated: false.
+- Statut : P64-L06A à P64-L06E `done` ; premier Goal clôturé ; fusion-validated: false, print-validated: false.
 
 ## Mise à jour P64-L06B — corpus T0/T1 exécutable
 
@@ -1792,7 +1792,7 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
 - C-FUSION-UI / C-GEOMETRY / C-CAD-IR : inchangées.
 - Limite : l'interdiction de rotation reste une contrainte du benchmark, car le
   schéma projet courant ne l'expose pas.
-- Statut : implemented-core, automated-validated ; L06C et L06D terminées, L06E prochaine mission ;
+- Statut : implemented-core, automated-validated ; L06C à L06E terminées, premier Goal clôturé ;
   fusion-validated: false, print-validated: false.
 
 ## Mise à jour P64-L06C — comparateurs offline et oracle exact
@@ -1806,7 +1806,7 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
 - C-PROJECT-CONTRACT : l'interdiction de rotation reste non exposée ; l'adapter
   courant la refuse au lieu de changer le schéma.
 - C-FUSION-UI / C-GEOMETRY / C-CAD-IR : inchangées.
-- Statut : implemented-core, automated-validated ; L06D terminée, L06E prochaine mission ;
+- Statut : implemented-core, automated-validated ; L06D et L06E terminées, premier Goal clôturé ;
   fusion-validated: false, print-validated: false.
 
 ## Mise à jour P64-L06D — campagne progressive et décision négative
@@ -1816,4 +1816,12 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
 - C-PROJECT-CONTRACT : les contrôles rotation/réservation restent explicitement séparés des candidats algorithmiques ; le holdout est ouvert seulement après sélection unique.
 - C-SAFETY : un worker, zéro dépendance externe, zéro soak inutile, zéro changement de budget, de certificat ou du solveur produit.
 - C-FUSION-UI / C-GEOMETRY / C-CAD-IR : inchangées.
-- Statut : implemented-core, automated-validated, negative-result-accepted ; L06E prochaine mission ; fusion-validated: false, print-validated: false.
+- Statut : implemented-core, automated-validated, negative-result-accepted ; L06E terminée, premier Goal clôturé ; fusion-validated: false, print-validated: false.
+
+## Mise à jour P64-L06E — clôture sans changement algorithmique
+
+- C-SOLVER : aucune capacité ni lane produit ajoutée ; les trois variantes sont rejetées faute de gain.
+- C-QUALITY : la gate négative est explicite, traçable et liée au rapport de campagne versionné.
+- C-SAFETY : le holdout L06 est marqué consommé ; aucune réutilisation pour régler une future hypothèse.
+- C-PROJECT-CONTRACT / C-FUSION-UI / C-GEOMETRY / C-CAD-IR : inchangées.
+- Statut : P64-L06A à P64-L06E done, automated-validated, negative-result-accepted ; fusion-validated: false, print-validated: false.

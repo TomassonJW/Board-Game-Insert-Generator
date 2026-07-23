@@ -14,7 +14,7 @@ le cache négatif. P64-L05A est automated-validated : exactement un nouveau
 conteneur peut être inséré dans le vide global à voisins figés et plan complet
 recertifié. Le manifest Fusion passe à 0.1.59 pour le journal automatique. fusion-validated: false et
 print-validated: false pour L05A, L05B et L05C. Le solveur reste inchangé.
-P64-L05B, P64-L05C, P64-L05D1/D2 et P64-L06A/B/C/D sont automated-validated. L06D se termine par un résultat négatif accepté : aucune variante de lane ne progresse.
+P64-L05B, P64-L05C, P64-L05D1/D2 et P64-L06A/B/C/D/E sont automated-validated. Le premier Goal L06 est terminé par la décision négative `no_algorithm_change_v1`.
 
 ## Dernier état réel
 
@@ -55,24 +55,25 @@ Preuve L05D1 : P64_L05D1_SOLVER_CORPUS_EVIDENCE.md.
 Preuve L06B : P64_L06B_BENCHMARK_CORPUS_EVIDENCE.md.
 Preuve L06C : P64_L06C_OFFLINE_ADAPTER_AND_EXACT_ORACLE_EVIDENCE.md.
 Preuve L06D : P64_L06D_PROGRESSIVE_CAMPAIGN_EVIDENCE.md.
+Preuve L06E : P64_L06E_ALGORITHM_DECISION_EVIDENCE.md.
+Rapport final : P64_L06_GOAL_FINAL_REPORT.md.
 
 ## Prochaine action recommandée
 
-### P64-L06E — décision algorithmique du premier Goal
+### Priorisation après le premier Goal P64-L06
 
-Type : mission autonome de clôture, sans action humaine.
+Type : décision humaine facultative ; aucune action immédiate requise.
 
-P64-L06D est terminée : 904 exécutions cas/comparateur, huit régressions satisfaites, trois contrôles diagnostiques, trois hypothèses de lanes testées sur discovery et tuning, puis un holdout ouvert après sélection unique. Aucune hypothèse ne produit de gain fonctionnel et aucune contradiction d'oracle n'est observée.
+P64-L06A à P64-L06E sont terminées. Le premier Goal apporte un corpus, un oracle, un runner et une décision fiable, mais aucune amélioration du solveur. Les trois variantes de lanes sont rejetées et le holdout utilisé est consommé.
 
-L06E doit maintenant :
+Deux suites restent possibles, sans urgence :
 
-1. enregistrer formellement `no_algorithm_change_v1` comme décision du premier Goal ;
-2. ne modifier aucun solveur, budget, certificat, schéma ou comportement produit ;
-3. classer les trois variantes comme rejetées sans gain ;
-4. conserver les lacunes profondes comme futures hypothèses bornées ;
-5. publier la synthèse finale du Goal et les SHAs intégrés.
+1. arrêter ici et laisser le journal automatique enrichir les observations réelles pendant l'usage normal de BGIG ;
+2. cadrer un second programme autonome autour d'une seule lacune profonde — contrôle de rotation, réservations ou recherche multi-conteneurs — avec un nouveau holdout.
 
-Le Goal déjà lancé reste valable. L06E poursuit sans nouveau GO. Aucune action Fusion ni recapture humaine n'est requise pour cette clôture.
+P64-L06V reste une observation Fusion future et facultative. Aucun parcours spécial, aucune recapture et aucun agent ne sont nécessaires pour clôturer le Goal actuel.
+
+Modèle pour la prochaine étape : aucun tant que Thomas ne choisit pas une nouvelle cible. Si un second programme est décidé, le choix du modèle sera réévalué selon la lacune retenue.
 
 ## Lots verrouillés
 

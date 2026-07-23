@@ -1239,7 +1239,7 @@ fusion-validated: false. print-validated: false.
 
 Les 13 bundles locaux sont valides. Un seul cas 18 conteneurs / 20 contenus est anonymisé et versionné dans un corpus étendu autonome ; son replay répété reste stable en `no_solution_within_budget`. Les 12 autres captures restent des preuves locales non promues.
 
-L06A n'améliore pas le solveur et ne revendique aucune capacité générale depuis ce cas. L06B a livré les générateurs T0/T1 et L06C les deux comparateurs sans dépendance. L06D est terminée avec un résultat négatif accepté ; L06E devient la prochaine mission. fusion-validated: false ; print-validated: false.
+L06A n'améliore pas le solveur et ne revendique aucune capacité générale depuis ce cas. L06B a livré les générateurs T0/T1 et L06C les deux comparateurs sans dépendance. L06D et L06E sont terminées avec un résultat négatif accepté ; le premier Goal est clôturé. fusion-validated: false ; print-validated: false.
 
 ## P64-L06B — corpus T0/T1 livré (2026-07-23)
 
@@ -1252,7 +1252,7 @@ Les cas possibles ont un témoin local P45 et un placement global vérifiés. Le
 cas impossibles ont une preuve stricte de volume ou de hauteur. Les fronts P45
 réels couvrent 1, 2, 4 et 8 variantes. Le holdout reste fermé et n'a reçu aucun
 run solveur. L06C a depuis livré l'interface offline, le petit oracle exact
-interne et la recertification commune. L06D est terminée avec un résultat négatif accepté ; L06E devient la prochaine mission.
+interne et la recertification commune. L06D et L06E sont terminées avec un résultat négatif accepté ; le premier Goal est clôturé.
 
 fusion-validated: false. print-validated: false.
 
@@ -1279,6 +1279,14 @@ Le runner reprenable et son rapport versionné couvrent 904 exécutions cas/comp
 
 Trois variantes de la troisième lane Rapide ont été testées au même budget sur discovery et tuning. Toutes restent identiques à la baseline : aucun cas faisable supplémentaire. `no_algorithm_change_v1` a donc été scellé avant le holdout. Le holdout confirme zéro gain et zéro contradiction ; le soak est inutile.
 
-P64-L06E clôt le premier Goal par une décision algorithmique négative. Une future campagne pourra viser une limite plus profonde, mais elle devra utiliser un nouveau holdout ou une nouvelle version de corpus et conserver les frontières T0/T1.
+P64-L06E a clôturé le premier Goal par une décision algorithmique négative. Une future campagne pourra viser une limite plus profonde, mais elle devra utiliser un nouveau holdout ou une nouvelle version de corpus et conserver les frontières T0/T1.
+
+fusion-validated: false. print-validated: false.
+
+## P64-L06E — premier Goal clôturé (2026-07-23)
+
+La gate finale refuse les trois variantes de lanes faute de progression mesurée. `no_algorithm_change_v1` est la décision finale. Aucun changement du solveur, de ses budgets ou des frontières produit n'est intégré.
+
+La chaîne autonome de mesure est désormais disponible, mais le holdout L06 est consommé. Une future campagne devra sélectionner une seule lacune profonde, créer un nouveau holdout et obtenir un nouveau cadre d'exécution avant tout changement structurel.
 
 fusion-validated: false. print-validated: false.

@@ -19,8 +19,7 @@ de problème. L'objectif raisonnable est :
 - préparer des interfaces compatibles avec de futures formes sans les simuler
   prématurément.
 
-P64-L06A, P64-L06B et P64-L06C sont terminées : 13/13 bundles classés, un cas réel anonymisé, 192 cas T0/T1 puis deux comparateurs offline.
-P64-L06D est la prochaine mission runtime.
+P64-L06A à P64-L06E sont terminées : 13/13 bundles classés, un cas réel anonymisé, 192 cas T0/T1, deux comparateurs offline, 904 exécutions et décision finale `no_algorithm_change_v1`.
 Le lancement autonome, ses ressources, checkpoints, splits et arrêts sont normés par
 `docs/P64_L06_AUTONOMOUS_GOAL_RUNBOOK.md`.
 
@@ -233,13 +232,13 @@ Statut : `done`, `automated-validated`. Six cas discovery dans la portée exacte
 
 Statut : `done`, `automated-validated`, `negative-result-accepted`. La campagne a enregistré 904 exécutions cas/comparateur. Les trois hypothèses de lanes restent identiques à la baseline sur discovery et tuning ; le choix scellé `no_algorithm_change_v1` est confirmé sans contradiction sur holdout. Aucun changement algorithmique a été intégré.
 
-### P64-L06E — amélioration ciblée
+### P64-L06E — décision algorithmique
 
 - changer une lane, un ordre, une borne ou une représentation à la fois ;
 - conserver caps publics et certificat sauf contrat explicitement amendé ;
 - passer la gate A/B L05D1 et le corpus L06.
 
-Statut : `ready-after-L06D`, avec une décision négative à enregistrer : aucun candidat algorithmique acceptable dans ce premier Goal.
+Statut : `done`, `negative-result-accepted`. La décision finale est `no_algorithm_change_v1` ; les trois variantes de lanes sont refusées faute de gain et le premier Goal est clôturé sans modification du solveur.
 
 ### P64-L06V — confirmation réelle
 

@@ -2,15 +2,16 @@
 
 ## 1. Rôle et statut
 
-Ce document est le contrat d'exécution du futur Goal P64-L06. Il complète
+Ce document est le contrat d'exécution du premier Goal P64-L06, désormais terminé. Il complète
 `P64_L06_SOLVER_BENCHMARK_CAMPAIGN.md` sans modifier le runtime.
 
 Statut courant :
 
-- `goal-launch-authorized-by-ADR-0080` ;
+- `goal-completed-negative-result` ;
 - journal local automatique retenu pour les futurs parcours réels ;
-- P64-L06A, P64-L06B et P64-L06C terminées : inventaire réel, 192 cas T0/T1 puis comparateurs offline ;
-- prochaine mission : P64-L06D ;
+- P64-L06A à P64-L06E terminées ;
+- décision finale : `no_algorithm_change_v1` ;
+- aucune mission suivante dans ce Goal ;
 - `fusion-validated: false` ;
 - `print-validated: false`.
 
@@ -157,10 +158,10 @@ La campagne utilise un tournoi progressif :
 1. une passe `ci` élimine toute régression fonctionnelle ;
 2. `discovery` classe les lacunes par famille et mesure les lanes gagnantes ;
 3. trois hypothèses maximum passent dans `tuning` ;
-4. une seule hypothèse est sélectionnée avant ouverture du `holdout` ;
+4. une seule hypothèse, y compris `no_algorithm_change_v1`, est sélectionnée avant ouverture du `holdout` ;
 5. `soak` n'est lancé que si le holdout passe et si une incertitude précise
    demeure ;
-6. L06E implémente seulement l'hypothèse retenue.
+6. L06E implémente seulement un candidat ayant gagné, sinon elle enregistre le résultat négatif.
 
 Les comparaisons de vitesse utilisent les mêmes digests, la même machine et un
 ordre alterné baseline/candidat. Les runs froids et chauds restent séparés. Une
@@ -334,3 +335,9 @@ n'a pas été ouvert. L06D reprend sans nouveau GO.
 L06D a exécuté 904 couples cas/comparateur avec un worker et aucune dépendance externe. Les huit régressions passent. Trois contrôles discovery séparent les limites de rotation et de réservation des limites de recherche. Trois hypothèses de lanes Rapide, à budget constant, restent strictement identiques à la baseline sur discovery et tuning.
 
 Le choix unique `no_algorithm_change_v1` a été scellé avant l'ouverture du holdout. Le holdout confirme l'absence de gain et ne révèle aucune contradiction d'oracle. Aucun changement algorithmique, aucun soak et aucun changement de budget ne sont retenus. L06E doit enregistrer ce résultat négatif sans nouveau GO.
+
+## 19. Clôture P64-L06E
+
+L06E accepte le résultat négatif de la campagne : aucune des trois variantes de lanes ne franchit la gate de gain objectif. La décision finale est `no_algorithm_change_v1`. Aucun solveur, budget, certificat, schéma, géométrie, Fusion, CAD, scène ou valeur physique ne change.
+
+Le premier Goal P64-L06 est terminé. Son holdout est consommé et ne peut pas servir à régler une future hypothèse. Une seconde campagne exigera une nouvelle mission, une lacune ciblée et un holdout renouvelé. Aucune action humaine n'est requise pour la clôture.
