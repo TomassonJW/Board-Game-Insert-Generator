@@ -328,3 +328,9 @@ solution est recertifiée à neuf. Six cas discovery entrent dans la portée exa
 et retrouvent quatre faisables et deux impossibles. Les refus de rotation,
 réservation, étages, variantes multiples et caps restent explicites. Le holdout
 n'a pas été ouvert. L06D reprend sans nouveau GO.
+
+## 18. Checkpoint P64-L06D intégré
+
+L06D a exécuté 904 couples cas/comparateur avec un worker et aucune dépendance externe. Les huit régressions passent. Trois contrôles discovery séparent les limites de rotation et de réservation des limites de recherche. Trois hypothèses de lanes Rapide, à budget constant, restent strictement identiques à la baseline sur discovery et tuning.
+
+Le choix unique `no_algorithm_change_v1` a été scellé avant l'ouverture du holdout. Le holdout confirme l'absence de gain et ne révèle aucune contradiction d'oracle. Aucun changement algorithmique, aucun soak et aucun changement de budget ne sont retenus. L06E doit enregistrer ce résultat négatif sans nouveau GO.

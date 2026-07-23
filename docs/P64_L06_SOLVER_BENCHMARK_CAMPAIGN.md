@@ -231,7 +231,7 @@ Statut : `done`, `automated-validated`. Six cas discovery dans la portée exacte
 - publier couverture, qualité, coûts et familles de lacunes ;
 - sélectionner une seule hypothèse algorithmique suivante.
 
-Statut : `ready-after-L06C-integration`.
+Statut : `done`, `automated-validated`, `negative-result-accepted`. La campagne a enregistré 904 exécutions cas/comparateur. Les trois hypothèses de lanes restent identiques à la baseline sur discovery et tuning ; le choix scellé `no_algorithm_change_v1` est confirmé sans contradiction sur holdout. Aucun changement algorithmique a été intégré.
 
 ### P64-L06E — amélioration ciblée
 
@@ -239,7 +239,7 @@ Statut : `ready-after-L06C-integration`.
 - conserver caps publics et certificat sauf contrat explicitement amendé ;
 - passer la gate A/B L05D1 et le corpus L06.
 
-Statut : `planned-after-L06D`.
+Statut : `ready-after-L06D`, avec une décision négative à enregistrer : aucun candidat algorithmique acceptable dans ce premier Goal.
 
 ### P64-L06V — confirmation réelle
 

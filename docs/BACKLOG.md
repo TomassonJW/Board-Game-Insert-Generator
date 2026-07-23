@@ -2909,18 +2909,19 @@ implémentée et intégrée à la fois.
 
 ### P64-L06D — campagne autonome bornée
 
-- Statut : ready-after-P64-L06C-integration.
-- Scope : tiers CI/extended/soak reprenables, métriques fonctionnelles,
-  qualité, temps au premier incumbent, mémoire et stabilité.
-- Sortie : une classification des lacunes et une seule hypothèse L06E.
+- Statut : done, automated-validated, negative-result-accepted.
+- Livré : runner atomique reprenable, 904 exécutions cas/comparateur, rapport versionné, régressions, discovery, trois contrôles, trois hypothèses, tuning, sélection unique et holdout.
+- Décision : les trois variantes de lanes restent identiques à la baseline ; `no_algorithm_change_v1` est sélectionné, aucun soak et aucun changement algorithmique.
+- Preuve : `P64_L06D_PROGRESSIVE_CAMPAIGN_EVIDENCE.md` et `p64_l06d_campaign_report.v1.json`.
+- Lacunes conservées : contrôle explicite de rotation absent du schéma, référence exacte avec réservations absente, recherche multi-conteneurs encore insuffisante sous caps.
 
-### P64-L06E — amélioration algorithmique ciblée
+### P64-L06E — décision algorithmique du premier Goal
 
-- Statut : planned-after-P64-L06D.
-- Scope : modifier une lane, une borne, un ordre ou une représentation à la
-  fois, puis passer L05D1 A/B et le corpus L06.
-- Interdits : changement silencieux de caps, budgets, deadline, certificat ou
-  schéma ; auto-édition ; revendication générale depuis un cas trivial.
+- Statut : ready-after-P64-L06D-integration.
+- Scope : enregistrer le résultat négatif, refuser formellement les trois variantes sans gain et publier la synthèse du Goal.
+- Changement solveur autorisé dans cette clôture : aucun.
+- Suite différée : une nouvelle hypothèse devra cibler une lacune profonde, utiliser un corpus/holdout renouvelé et repasser une gate mesurée distincte.
+- Interdits : changement silencieux de caps, budgets, deadline, certificat ou schéma ; auto-édition ; revendication générale depuis un cas trivial.
 
 ### P64-L06V — confirmation Fusion des cas retenus
 
@@ -2945,7 +2946,7 @@ implémentée et intégrée à la fois.
 - Statut : done-documentation.
 - Livré : runbook 36 h, matrice P45/P64, splits, oracle interne prioritaire,
   tournoi progressif, checkpoints, pause sûre, arrêts et prompt `/goal`.
-- Dépendance runtime : L06A, L06B et L06C sont terminées ; L06D est prête après intégration des comparateurs.
+- Dépendance runtime : L06A à L06D sont terminées ; L06E est prête après intégration de la campagne.
 - Interdits : aucun solveur ou budget modifié, aucune dépendance externe
   installée, aucun T2-T4, aucune promotion d'un projet personnel.
 - Suite : L06D à L06E sans nouvelle action humaine.

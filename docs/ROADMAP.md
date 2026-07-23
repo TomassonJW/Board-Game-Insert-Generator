@@ -1199,7 +1199,7 @@ La trajectoire solveur après R1 est maintenant verrouillée :
 2. L06B ajoute oracles et génération T0/T1 ;
 3. L06C compare au plus deux adapters offline et recertifie leurs sorties ;
 4. L06D exécute les tiers CI, extended puis éventuellement soak ;
-5. L06E implémente une seule amélioration passée par la gate A/B ;
+5. L06E intègre au plus une amélioration passée par la gate A/B, ou enregistre une décision négative ;
 6. L06V vérifie les cas réels dans Fusion.
 
 Les candidats externes ne sont pas des dépendances acceptées. La campagne mesure
@@ -1239,7 +1239,7 @@ fusion-validated: false. print-validated: false.
 
 Les 13 bundles locaux sont valides. Un seul cas 18 conteneurs / 20 contenus est anonymisé et versionné dans un corpus étendu autonome ; son replay répété reste stable en `no_solution_within_budget`. Les 12 autres captures restent des preuves locales non promues.
 
-L06A n'améliore pas le solveur et ne revendique aucune capacité générale depuis ce cas. L06B a livré les générateurs T0/T1 et L06C les deux comparateurs sans dépendance. L06D devient la prochaine mission. fusion-validated: false ; print-validated: false.
+L06A n'améliore pas le solveur et ne revendique aucune capacité générale depuis ce cas. L06B a livré les générateurs T0/T1 et L06C les deux comparateurs sans dépendance. L06D est terminée avec un résultat négatif accepté ; L06E devient la prochaine mission. fusion-validated: false ; print-validated: false.
 
 ## P64-L06B — corpus T0/T1 livré (2026-07-23)
 
@@ -1252,7 +1252,7 @@ Les cas possibles ont un témoin local P45 et un placement global vérifiés. Le
 cas impossibles ont une preuve stricte de volume ou de hauteur. Les fronts P45
 réels couvrent 1, 2, 4 et 8 variantes. Le holdout reste fermé et n'a reçu aucun
 run solveur. L06C a depuis livré l'interface offline, le petit oracle exact
-interne et la recertification commune. L06D devient la prochaine mission.
+interne et la recertification commune. L06D est terminée avec un résultat négatif accepté ; L06E devient la prochaine mission.
 
 fusion-validated: false. print-validated: false.
 
@@ -1268,7 +1268,17 @@ sans réservation et avec une variante locale. Il retrouve 4 cas faisables et
 2 impossibles sur 6 cas discovery indépendants. Les caps et contraintes hors
 portée restent visibles. Le holdout n'est pas ouvert.
 
-L06D peut maintenant exécuter régressions, CI, discovery puis tuning, choisir une
-seule hypothèse avant holdout et n'utiliser soak que si utile.
+L06D a exécuté régressions, CI, discovery, tuning et holdout après une
+sélection unique. Aucun soak ni changement algorithmique ne sont justifiés.
+
+fusion-validated: false. print-validated: false.
+
+## P64-L06D — campagne progressive livrée (2026-07-23)
+
+Le runner reprenable et son rapport versionné couvrent 904 exécutions cas/comparateur. Les huit régressions passent. Les contrôles rotation/réservation montrent que les limites d'entrée expliquent une partie des refus, mais les cas multi-conteneurs restent largement non résolus dans les plafonds existants.
+
+Trois variantes de la troisième lane Rapide ont été testées au même budget sur discovery et tuning. Toutes restent identiques à la baseline : aucun cas faisable supplémentaire. `no_algorithm_change_v1` a donc été scellé avant le holdout. Le holdout confirme zéro gain et zéro contradiction ; le soak est inutile.
+
+P64-L06E clôt le premier Goal par une décision algorithmique négative. Une future campagne pourra viser une limite plus profonde, mais elle devra utiliser un nouveau holdout ou une nouvelle version de corpus et conserver les frontières T0/T1.
 
 fusion-validated: false. print-validated: false.

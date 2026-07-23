@@ -1,0 +1,365 @@
+{
+  "base_sha": "30d7301cf92f03650a4467df729a729c1fd3c1e5",
+  "candidate": {
+    "adapter_id": "current_bgig_minimal_layout",
+    "base_sha": "30d7301cf92f03650a4467df729a729c1fd3c1e5",
+    "discovery_summary_digest": "4bc3449f06ead00354a453fa77a9e28e33ce935033ccad57fa9e849c3118ae76",
+    "experiment_id": "canonical",
+    "hypothesis_id": "no_algorithm_change_v1",
+    "solver_version": "p64-l04b-v1",
+    "tuning_summary_digest": "934fb1e40566ad5114fb804676fc0bbad53ee9670b4fc9e1b9f41409682a94c7"
+  },
+  "costs": {
+    "case_adapter_executions": 904,
+    "external_dependency_count": 0,
+    "functional_workers": 1,
+    "soak_executed": false
+  },
+  "decision": {
+    "accepted_algorithmic_candidate": false,
+    "algorithm_change_integrated": false,
+    "holdout_opened_after_unique_selection": true,
+    "holdout_outcome": "no_gain_no_oracle_contradiction",
+    "reason": "three_same_budget_lane_hypotheses_produced_no_functional_gain",
+    "selected_hypothesis_id": "no_algorithm_change_v1",
+    "soak_reason": "skipped_because_no_candidate_showed_a_functional_gain"
+  },
+  "diagnostic_controls": [
+    {
+      "comparison_counts": {
+        "feasible_found": 12,
+        "feasible_missed_within_budget": 32,
+        "impossible_not_overclaimed": 17,
+        "unsupported_constraint": 3
+      },
+      "diagnostic_id": "relax_rotation_policy",
+      "role": "input_control_only_not_algorithm_candidate",
+      "summary_digest": "ba08aefd16962e8f1f2ff45d5cc099144a78c64185157af2f04e45cc6b9dc3fe"
+    },
+    {
+      "comparison_counts": {
+        "feasible_found": 6,
+        "feasible_missed_within_budget": 15,
+        "impossible_not_overclaimed": 8,
+        "unsupported_constraint": 35
+      },
+      "diagnostic_id": "remove_top_reservations",
+      "role": "input_control_only_not_algorithm_candidate",
+      "summary_digest": "d52f2ef5339cdab21596d8bfeec3935c06511b90d886c9f09d51c694996ea426"
+    },
+    {
+      "comparison_counts": {
+        "feasible_found": 18,
+        "feasible_missed_within_budget": 28,
+        "impossible_not_overclaimed": 17,
+        "unsupported_constraint": 1
+      },
+      "diagnostic_id": "relax_rotation_and_reservations",
+      "role": "input_control_only_not_algorithm_candidate",
+      "summary_digest": "b976f504e44c50a4ca7dbf435068e14aa6e87f7583e35cf60427fa8b5759347a"
+    }
+  ],
+  "hypotheses": [
+    {
+      "discovery": {
+        "feasible_missed_within_budget": 19,
+        "impossible_not_overclaimed": 8,
+        "unsupported_constraint": 37
+      },
+      "hypothesis_id": "current_baseline",
+      "tuning": {
+        "feasible_missed_within_budget": 21,
+        "impossible_not_overclaimed": 10,
+        "unsupported_constraint": 33
+      }
+    },
+    {
+      "discovery": {
+        "feasible_missed_within_budget": 19,
+        "impossible_not_overclaimed": 8,
+        "unsupported_constraint": 37
+      },
+      "hypothesis_id": "lane_center_quick_v1",
+      "tuning": {
+        "feasible_missed_within_budget": 21,
+        "impossible_not_overclaimed": 10,
+        "unsupported_constraint": 33
+      }
+    },
+    {
+      "discovery": {
+        "feasible_missed_within_budget": 19,
+        "impossible_not_overclaimed": 8,
+        "unsupported_constraint": 37
+      },
+      "hypothesis_id": "lane_lowest_quick_v1",
+      "tuning": {
+        "feasible_missed_within_budget": 21,
+        "impossible_not_overclaimed": 10,
+        "unsupported_constraint": 33
+      }
+    },
+    {
+      "discovery": {
+        "feasible_missed_within_budget": 19,
+        "impossible_not_overclaimed": 8,
+        "unsupported_constraint": 37
+      },
+      "hypothesis_id": "lane_interleave_quick_v1",
+      "tuning": {
+        "feasible_missed_within_budget": 21,
+        "impossible_not_overclaimed": 10,
+        "unsupported_constraint": 33
+      }
+    }
+  ],
+  "invariants": {
+    "holdout_phase_is_last": true,
+    "no_external_dependency": true,
+    "no_product_solver_change": true,
+    "no_public_budget_change": true,
+    "oracle_contradiction_count": 0,
+    "regression_expectation_met_count": 8,
+    "solution_requires_fresh_bgig_certificate": true
+  },
+  "manifest_digest": "53db786793dee3a26128f4db28cc830f68dde394262cd7ffbfad27cb895a85ee",
+  "phases": [
+    {
+      "adapter_ids": [
+        "current_bgig_minimal_layout"
+      ],
+      "checkpoint_digest": "b819744f4698471837df144ef3abfd388b2a3235e628593d37aff68959e94041",
+      "comparison_counts": {
+        "regression_expectation_met": 8
+      },
+      "experiment_id": "canonical",
+      "phase_id": "ci-regression-current",
+      "row_count": 8,
+      "split": "regression",
+      "summary_digest": "68de3683b829fbf9bd1b0b04fca0535d329ed382c40f7f0fa3ed63e54c24174b",
+      "tier": "ci"
+    },
+    {
+      "adapter_ids": [
+        "current_bgig_minimal_layout",
+        "internal_exact_floor"
+      ],
+      "checkpoint_digest": "b8a3dd72a6b9498035372606f64d6c9b1a3920347fe92a303a649ff9946d9c4a",
+      "comparison_counts": {
+        "feasible_found": 4,
+        "feasible_missed_within_budget": 19,
+        "impossible_not_overclaimed": 8,
+        "impossible_proven": 2,
+        "unsupported_constraint": 95
+      },
+      "experiment_id": "canonical",
+      "phase_id": "extended-discovery-baseline",
+      "row_count": 128,
+      "split": "discovery",
+      "summary_digest": "4bc3449f06ead00354a453fa77a9e28e33ce935033ccad57fa9e849c3118ae76",
+      "tier": "extended"
+    },
+    {
+      "adapter_ids": [
+        "current_bgig_minimal_layout"
+      ],
+      "checkpoint_digest": "24185741d6ce7627677b1a30e5802c9b3669257343a24e06b31bbc2b48d8c2d2",
+      "comparison_counts": {
+        "feasible_found": 12,
+        "feasible_missed_within_budget": 32,
+        "impossible_not_overclaimed": 17,
+        "unsupported_constraint": 3
+      },
+      "experiment_id": "relax_rotation_policy",
+      "phase_id": "diagnostic-relax-rotation",
+      "row_count": 64,
+      "split": "discovery",
+      "summary_digest": "ba08aefd16962e8f1f2ff45d5cc099144a78c64185157af2f04e45cc6b9dc3fe",
+      "tier": "extended-control"
+    },
+    {
+      "adapter_ids": [
+        "current_bgig_minimal_layout"
+      ],
+      "checkpoint_digest": "d8653f08e209bdc2a19fee6d0ca003e31c2581aa2ce1ba60bebd169073ceea8a",
+      "comparison_counts": {
+        "feasible_found": 6,
+        "feasible_missed_within_budget": 15,
+        "impossible_not_overclaimed": 8,
+        "unsupported_constraint": 35
+      },
+      "experiment_id": "remove_top_reservations",
+      "phase_id": "diagnostic-remove-reservations",
+      "row_count": 64,
+      "split": "discovery",
+      "summary_digest": "d52f2ef5339cdab21596d8bfeec3935c06511b90d886c9f09d51c694996ea426",
+      "tier": "extended-control"
+    },
+    {
+      "adapter_ids": [
+        "current_bgig_minimal_layout"
+      ],
+      "checkpoint_digest": "31fbebe8576ff715ec36dc1f6d191094a4f91745350c0988337cd27c53c3f83d",
+      "comparison_counts": {
+        "feasible_found": 18,
+        "feasible_missed_within_budget": 28,
+        "impossible_not_overclaimed": 17,
+        "unsupported_constraint": 1
+      },
+      "experiment_id": "relax_rotation_and_reservations",
+      "phase_id": "diagnostic-relax-both",
+      "row_count": 64,
+      "split": "discovery",
+      "summary_digest": "b976f504e44c50a4ca7dbf435068e14aa6e87f7583e35cf60427fa8b5759347a",
+      "tier": "extended-control"
+    },
+    {
+      "adapter_ids": [
+        "current_bgig_minimal_layout"
+      ],
+      "checkpoint_digest": "5b7a28811950eb403813a256e11fc2d7a7a3e6876bd38f52308135321826365a",
+      "comparison_counts": {
+        "feasible_missed_within_budget": 19,
+        "impossible_not_overclaimed": 8,
+        "unsupported_constraint": 37
+      },
+      "experiment_id": "lane_center_quick_v1",
+      "phase_id": "discovery-lane-center",
+      "row_count": 64,
+      "split": "discovery",
+      "summary_digest": "b758c0cf255d6b8588b997b7a272068c0b56e934cb9f6f81b458793747615972",
+      "tier": "extended-candidate"
+    },
+    {
+      "adapter_ids": [
+        "current_bgig_minimal_layout"
+      ],
+      "checkpoint_digest": "28820c3e257a9ad42d3368fd20fcd4ed6f1c9e026e7198dd7165a172af066d53",
+      "comparison_counts": {
+        "feasible_missed_within_budget": 19,
+        "impossible_not_overclaimed": 8,
+        "unsupported_constraint": 37
+      },
+      "experiment_id": "lane_lowest_quick_v1",
+      "phase_id": "discovery-lane-lowest",
+      "row_count": 64,
+      "split": "discovery",
+      "summary_digest": "30bfde2f6dc095eb139e58aa76d14f950073f246fa5bbabffc7e9adb8a1c9ab8",
+      "tier": "extended-candidate"
+    },
+    {
+      "adapter_ids": [
+        "current_bgig_minimal_layout"
+      ],
+      "checkpoint_digest": "fe504e0a3efedf60988179cb1620818b16e1aeb564ef6613f804cccf2b016d93",
+      "comparison_counts": {
+        "feasible_missed_within_budget": 19,
+        "impossible_not_overclaimed": 8,
+        "unsupported_constraint": 37
+      },
+      "experiment_id": "lane_interleave_quick_v1",
+      "phase_id": "discovery-lane-interleave",
+      "row_count": 64,
+      "split": "discovery",
+      "summary_digest": "c77da9adec5985fedbe0c4c539331bd6ffb15bafbd7e2fcbb778ceffd0936789",
+      "tier": "extended-candidate"
+    },
+    {
+      "adapter_ids": [
+        "current_bgig_minimal_layout"
+      ],
+      "checkpoint_digest": "148014f6f2e086dce96ac22e6e2933b1df114066d919792381a83d2f97cb40f2",
+      "comparison_counts": {
+        "feasible_missed_within_budget": 21,
+        "impossible_not_overclaimed": 10,
+        "unsupported_constraint": 33
+      },
+      "experiment_id": "canonical",
+      "phase_id": "tuning-baseline",
+      "row_count": 64,
+      "split": "tuning",
+      "summary_digest": "934fb1e40566ad5114fb804676fc0bbad53ee9670b4fc9e1b9f41409682a94c7",
+      "tier": "extended-candidate"
+    },
+    {
+      "adapter_ids": [
+        "current_bgig_minimal_layout"
+      ],
+      "checkpoint_digest": "a6277519505a3e50e8f1ac431e76981b66d72ce266b91f3d64a7d9758f0bff7a",
+      "comparison_counts": {
+        "feasible_missed_within_budget": 21,
+        "impossible_not_overclaimed": 10,
+        "unsupported_constraint": 33
+      },
+      "experiment_id": "lane_center_quick_v1",
+      "phase_id": "tuning-lane-center",
+      "row_count": 64,
+      "split": "tuning",
+      "summary_digest": "5001b47d34706fe91deef9013b1ecfb423c4d3946f476d5acb370fe3a0b98228",
+      "tier": "extended-candidate"
+    },
+    {
+      "adapter_ids": [
+        "current_bgig_minimal_layout"
+      ],
+      "checkpoint_digest": "fc41490cf073784dde1a825c9d84d51ca0f58aa435793fd0468dde0535c3e8ad",
+      "comparison_counts": {
+        "feasible_missed_within_budget": 21,
+        "impossible_not_overclaimed": 10,
+        "unsupported_constraint": 33
+      },
+      "experiment_id": "lane_lowest_quick_v1",
+      "phase_id": "tuning-lane-lowest",
+      "row_count": 64,
+      "split": "tuning",
+      "summary_digest": "ab288a3865080d77ee3dfda028c9ce886ba105c798fdd577fa2b15a4dc95a095",
+      "tier": "extended-candidate"
+    },
+    {
+      "adapter_ids": [
+        "current_bgig_minimal_layout"
+      ],
+      "checkpoint_digest": "92cc6c35edf2113661c12c8f1e57c09edf6f9836d003b1a64ce43a739b73f696",
+      "comparison_counts": {
+        "feasible_missed_within_budget": 21,
+        "impossible_not_overclaimed": 10,
+        "unsupported_constraint": 33
+      },
+      "experiment_id": "lane_interleave_quick_v1",
+      "phase_id": "tuning-lane-interleave",
+      "row_count": 64,
+      "split": "tuning",
+      "summary_digest": "882c1d84d06224e638a269e9f6f93e804a54efcae12d2e82214456dc2ebd20c0",
+      "tier": "extended-candidate"
+    },
+    {
+      "adapter_ids": [
+        "current_bgig_minimal_layout",
+        "internal_exact_floor"
+      ],
+      "checkpoint_digest": "12d8c7792015fbfe2f72b44bff1632902f54ad00fbbbf1239239520274cc2a98",
+      "comparison_counts": {
+        "feasible_missed_within_budget": 19,
+        "impossible_not_overclaimed": 8,
+        "impossible_proven": 1,
+        "unsupported_constraint": 100
+      },
+      "experiment_id": "canonical",
+      "phase_id": "holdout-selected-baseline",
+      "row_count": 128,
+      "split": "holdout",
+      "summary_digest": "437b26879bfb723e3499223e94c4661d10b74ec183ba8c75d1980d0bc9c6fa28",
+      "tier": "extended-holdout"
+    }
+  ],
+  "report_digest": "27722e8fdbc6662c45ba6a33714f37cf2197de9decd3a76fb3b05993198b1fd5",
+  "schema_version": "bgig.solver_benchmark_campaign_report.v1",
+  "selection": {
+    "candidate_digest": "8ae8c9a93a5bdacd73841edaa90b34540926fd708f17b6c67268b1e911596d4b",
+    "hypothesis_id": "no_algorithm_change_v1",
+    "schema_version": "bgig.solver_benchmark_holdout_selection.v1",
+    "selected_before_holdout": true,
+    "selected_candidate_count": 1,
+    "selection_digest": "4c84aaa5a864fa04a7c6cfeed2c338f549c60f3c4f9a0dd4928132ff10151d7d"
+  }
+}

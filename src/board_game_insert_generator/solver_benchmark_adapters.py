@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from dataclasses import dataclass
-from typing import Mapping
+from typing import Callable, Mapping
 
 from board_game_insert_generator.free_3d_greedy_solver import Free3DPlacement
 from board_game_insert_generator.free_3d_plan_adapter import (
@@ -149,6 +149,7 @@ def run_benchmark_adapter(
     *,
     exact_caps: ExactOracleCaps | None = None,
     initial_incumbent: Mapping[str, object] | None = None,
+    current_solver: Callable[..., dict[str, object]] | None = None,
 ) -> BenchmarkAdapterExecution:
     """Exécute un adapter connu et retourne la même forme de rapport."""
 
@@ -159,7 +160,11 @@ def run_benchmark_adapter(
             f"Unknown benchmark adapter {adapter_id!r}; expected one of {sorted(known)}."
         )
     if adapter_id == CURRENT_BGIG_ADAPTER_ID:
-        return _run_current_bgig(normalized, initial_incumbent=initial_incumbent)
+        return _run_current_bgig(
+            normalized,
+            initial_incumbent=initial_incumbent,
+            solver_callable=current_solver or solve_minimal_layout,
+        )
     return _run_internal_exact(normalized, exact_caps or ExactOracleCaps())
 
 
@@ -213,6 +218,7 @@ def _run_current_bgig(
     case: dict[str, object],
     *,
     initial_incumbent: Mapping[str, object] | None,
+    solver_callable: Callable[..., dict[str, object]],
 ) -> BenchmarkAdapterExecution:
     features = _mapping_or_empty(case.get("features"))
     rotation_policy = str(features.get("rotation_policy_target", "permitted"))
@@ -241,7 +247,7 @@ def _run_current_bgig(
 
     settings = _mapping(case.get("solver_settings"), "case.solver_settings")
     effort = str(settings.get("effort", "quick"))
-    plan = solve_minimal_layout(
+    plan = solver_callable(
         case["project"],
         effort_profile=effort,
         initial_incumbent=initial_incumbent,

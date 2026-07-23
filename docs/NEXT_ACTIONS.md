@@ -14,7 +14,7 @@ le cache négatif. P64-L05A est automated-validated : exactement un nouveau
 conteneur peut être inséré dans le vide global à voisins figés et plan complet
 recertifié. Le manifest Fusion passe à 0.1.59 pour le journal automatique. fusion-validated: false et
 print-validated: false pour L05A, L05B et L05C. Le solveur reste inchangé.
-P64-L05B, P64-L05C, P64-L05D1/D2 et P64-L06A/B/C sont automated-validated.
+P64-L05B, P64-L05C, P64-L05D1/D2 et P64-L06A/B/C/D sont automated-validated. L06D se termine par un résultat négatif accepté : aucune variante de lane ne progresse.
 
 ## Dernier état réel
 
@@ -54,30 +54,25 @@ Preuve L05C : P64_L05C_CERTIFIED_PLAN_WITNESS_EVIDENCE.md.
 Preuve L05D1 : P64_L05D1_SOLVER_CORPUS_EVIDENCE.md.
 Preuve L06B : P64_L06B_BENCHMARK_CORPUS_EVIDENCE.md.
 Preuve L06C : P64_L06C_OFFLINE_ADAPTER_AND_EXACT_ORACLE_EVIDENCE.md.
+Preuve L06D : P64_L06D_PROGRESSIVE_CAMPAIGN_EVIDENCE.md.
 
 ## Prochaine action recommandée
 
-### P64-L06D — campagne autonome progressive
+### P64-L06E — décision algorithmique du premier Goal
 
-Type : mission autonome de benchmark, sans action humaine.
+Type : mission autonome de clôture, sans action humaine.
 
-P64-L06C est terminée : exactement deux candidats sont disponibles sans
-dépendance externe. Toute solution est recertifiée par BGIG. Le petit oracle
-exact retrouve 4 cas faisables et 2 impossibles sur les 6 cas discovery de sa
-portée déclarée. Le holdout n'a pas été ouvert.
+P64-L06D est terminée : 904 exécutions cas/comparateur, huit régressions satisfaites, trois contrôles diagnostiques, trois hypothèses de lanes testées sur discovery et tuning, puis un holdout ouvert après sélection unique. Aucune hypothèse ne produit de gain fonctionnel et aucune contradiction d'oracle n'est observée.
 
-L06D doit maintenant :
+L06E doit maintenant :
 
-1. livrer un runner reprenable avec checkpoint atomique par cas ;
-2. exécuter les régressions et le tier CI, puis discovery ;
-3. classer les lacunes et retenir au plus trois hypothèses ;
-4. utiliser tuning pour n'en sélectionner qu'une ;
-5. sceller ce choix avant d'ouvrir une seule fois le holdout ;
-6. lancer soak seulement si le résultat reste ambigu ou utile ;
-7. publier couverture, qualité, coûts et décision, puis ouvrir L06E.
+1. enregistrer formellement `no_algorithm_change_v1` comme décision du premier Goal ;
+2. ne modifier aucun solveur, budget, certificat, schéma ou comportement produit ;
+3. classer les trois variantes comme rejetées sans gain ;
+4. conserver les lacunes profondes comme futures hypothèses bornées ;
+5. publier la synthèse finale du Goal et les SHAs intégrés.
 
-Le Goal déjà lancé reste valable. Il poursuit L06D et L06E sans nouveau GO,
-sans dépendance externe et sans forcer une amélioration algorithmique.
+Le Goal déjà lancé reste valable. L06E poursuit sans nouveau GO. Aucune action Fusion ni recapture humaine n'est requise pour cette clôture.
 
 ## Lots verrouillés
 

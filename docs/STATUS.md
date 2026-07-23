@@ -3156,4 +3156,22 @@ documentaires et contrôles Git sont consignés dans
 Aucun solveur produit, lane, budget, deadline, certificat public, schéma projet,
 tolérance, géométrie, finalisation, CAD, scène Fusion, manifest ou valeur physique
 n'est modifié. Le cas dense 11 × 34 ne reçoit aucune nouvelle revendication.
-P64-L06D est la prochaine mission.
+P64-L06D est terminée ; P64-L06E est la prochaine mission.
+
+## P64-L06D — campagne progressive autonome (2026-07-23)
+
+Statut : implemented-core, automated-validated, negative-result-accepted. fusion-validated: false, print-validated: false.
+
+Le runner `solver_benchmark_campaign.py` exécute un planning borné, écrit chaque résultat puis son checkpoint de manière atomique et reprend sans rejouer un résultat valide. Un résultat corrompu est recalculé une fois ; un checkpoint modifié ou un plafond trop petit est refusé.
+
+La campagne totalise 904 exécutions cas/comparateur. Les huit régressions historiques satisfont leurs attentes. La baseline discovery retrouve 4 faisables et 2 impossibles avec le petit oracle, tandis que le solveur courant ne trouve aucun des 19 faisables qu'il peut effectivement tenter et refuse honnêtement 37 contraintes non représentables.
+
+Trois contrôles discovery montrent un effet net des commandes d'entrée : 12 faisables avec rotation relâchée, 6 sans réservations et 18 lorsque les deux contraintes sont relâchées. Ces contrôles ne sont pas des candidats produit.
+
+Trois variantes des lanes Rapide conservent le même nombre de lanes et les mêmes plafonds. Sur discovery, chacune produit 0 faisable trouvé, 19 manqués et 37 hors portée. Sur tuning, chacune produit 0 trouvé, 21 manqués et 33 hors portée, exactement comme la baseline.
+
+La sélection unique `no_algorithm_change_v1` est scellée avant le holdout. Le holdout confirme zéro gain et zéro contradiction d'oracle. Aucun soak, aucune dépendance externe et aucun changement algorithmique ne sont retenus. Le rapport versionné `p64_l06d_campaign_report.v1.json` porte un digest stable et conserve les digests de tous les checkpoints et résumés.
+
+Validation : tests ciblés adapters 9/9, campagne 8/8, garde documentaire 2/2, alignement Fusion-only 6/6, suite complète 715/715 en 209,367 s, Ruff ciblé et py_compile OK.
+
+Aucun budget, délai, certificat, schéma, tolérance, géométrie, ownership P45/P64, finalisation, CAD, scène, manifest ou valeur physique ne change. Le cas dense 11 × 34 ne reçoit aucune nouvelle revendication. P64-L06E est la prochaine mission de clôture négative.
