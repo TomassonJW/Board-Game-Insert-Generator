@@ -2880,3 +2880,5 @@ implémentée et intégrée à la fois.
 
 - Statut : blocked-by-P64-L05V-R1-human-recapture.
 - Entree attendue : deux bundles R1, refus incremental puis echec global, avec projet identique entre les deux captures.
+
+P64-L05V-R1 installation : done sur 0.1.58 commit e817432. Statut courant : ready-human-recapture.

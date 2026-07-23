@@ -33,3 +33,7 @@ Le test bridge calcule un plan, ajoute un conteneur hors limite, observe global_
 - Ruff cible et py_compile : OK.
 
 La premiere tentative de suite complete a ete interrompue par l enveloppe Codex a 41 s alors que le wrapper etait actif ; le PID a ete verifie absent avant une unique relance gardee. Cette relance est la preuve 682/682 ci-dessus.
+
+## Installation locale
+
+Le preparateur officiel a installe le commit e817432 dans l add-in 0.1.58, ecrit et relu le marqueur bgig_installed_commit.txt, verifie les settings, le runtime et la fixture. Ses validations passent : insertion globale 7/7, bundle 3/3, witness 4/4, bridge 27/27, DOM 38/38 et preflight 2/2.

@@ -480,3 +480,7 @@ Trois bundles reels valides etablissent la sequence plan certifie, ajout d exact
 Le bridge fige maintenant le snapshot observe avant cette resynchronisation. P64-L05V-R1 est automated-validated, 682/682. Aucun solveur, budget, lane, geometrie, finalisation, CAD ou scene ne change. L add-in doit etre reinstalle puis deux captures courtes doivent confirmer le rapport exact apres ajout et l echec apres calcul. P64-L06A reste verrouille jusqu a cette preuve.
 
 fusion-validated: false. print-validated: false.
+
+### Installation P64-L05V-R1
+
+Le commit e817432 est installe dans l add-in 0.1.58 ; marqueur, settings, runtime et fixture sont verifies. Statut : ready-human-recapture. La prochaine action reste uniquement les deux captures du cas reel.

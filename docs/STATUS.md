@@ -3029,3 +3029,5 @@ Statut : implemented-fusion-bridge, automated-validated ; fusion-validated: fals
 Trois bundles locaux valides montrent 17/19 avec plan certifie, puis 18/20 avec ancien plan stale, puis le meme projet en no_solution_within_budget / hard_budget_reached apres 2707 ms de recherche fraiche. La marge volumique necessaire reste positive mais ne prouve aucune disposition.
 
 Le defaut etait dans l instrumentation : capture_solver_case resynchronisait la session et remplacait le rapport du refus par dependencies_unchanged. Le snapshot est maintenant fige avant cette etape. Validation : 27/27 bridge, 3/3 bundle, 7/7 insertion globale, 38/38 DOM et 682/682 suite complete. Aucun fichier personnel n est commite.
+
+Installation P64-L05V-R1 : commit e817432 installe dans 0.1.58 ; marqueur de commit, settings, runtime, fixture et 81 validations ciblees du preparateur sont OK. La recapture humaine reste la seule action ouverte.

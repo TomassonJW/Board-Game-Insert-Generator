@@ -189,3 +189,7 @@ Les trois bundles reels sont valides et prouvent le delta exact puis l echec glo
 Prochaine action unique : installer le commit R1, reprendre l etat certifie de Mon insert, ajouter le meme petit conteneur, puis capturer deux fois : juste apres le refus incremental et juste apres le calcul global rate. Les nouveaux bundles doivent conserver le statut, la raison et les compteurs exacts.
 
 P64-L06A pourra ensuite anonymiser, rejouer et classifier la paire. Aucune optimisation de solveur ne commence avant cette recapture.
+
+### Installation P64-L05V-R1 terminee
+
+Le commit e817432 est installe et marque dans Fusion 0.1.58. Thomas doit seulement recharger l add-in, ouvrir Mon insert dans son etat certifie, refaire le meme ajout, capturer apres le refus, lancer le calcul puis capturer apres l echec. Aucune preparation technique supplementaire n est requise.

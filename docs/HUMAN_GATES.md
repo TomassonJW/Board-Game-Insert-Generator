@@ -1084,3 +1084,5 @@ Les trois bundles du 2026-07-23 sont valides et utiles, mais la version installe
 4. transmettre les deux chemins et digests.
 
 Aucune materialisation ni impression n est requise. Aucun bundle n entre automatiquement dans le depot. fusion-validated: false avant ce retour ; print-validated: false.
+
+Installation P64-L05V-R1 confirmee : add-in 0.1.58, commit e817432, marqueur et settings verifies. La gate de recapture est active ; Thomas ne doit executer que les quatre actions humaines listees ci-dessus.
