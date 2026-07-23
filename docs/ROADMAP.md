@@ -1239,4 +1239,19 @@ fusion-validated: false. print-validated: false.
 
 Les 13 bundles locaux sont valides. Un seul cas 18 conteneurs / 20 contenus est anonymisé et versionné dans un corpus étendu autonome ; son replay répété reste stable en `no_solution_within_budget`. Les 12 autres captures restent des preuves locales non promues.
 
-L06A n'améliore pas le solveur et ne revendique aucune capacité générale depuis ce cas. L06B devient la prochaine mission : générateurs T0/T1, familles obligatoires et splits fermés du benchmark. fusion-validated: false ; print-validated: false.
+L06A n'améliore pas le solveur et ne revendique aucune capacité générale depuis ce cas. L06B a depuis livré les générateurs T0/T1, les familles obligatoires et les splits fermés. L06C devient la prochaine mission. fusion-validated: false ; print-validated: false.
+
+## P64-L06B — corpus T0/T1 livré (2026-07-23)
+
+Le manifest versionné conserve huit cas de régression et ajoute 192 recettes
+réparties également entre discovery, tuning et holdout. Les cinq familles, les
+cardinalités P45/P64, un à trois étages, les densités, réservations, politiques
+de rotation et permutations sont couvertes sans produit cartésien.
+
+Les cas possibles ont un témoin local P45 et un placement global vérifiés. Les
+cas impossibles ont une preuve stricte de volume ou de hauteur. Les fronts P45
+réels couvrent 1, 2, 4 et 8 variantes. Le holdout reste fermé et n'a reçu aucun
+run solveur. L06C devient la prochaine mission : interface offline, petit oracle
+exact interne et recertification commune, sans dépendance externe.
+
+fusion-validated: false. print-validated: false.

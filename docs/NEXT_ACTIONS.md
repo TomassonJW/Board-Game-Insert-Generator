@@ -55,21 +55,26 @@ Preuve L05D1 : P64_L05D1_SOLVER_CORPUS_EVIDENCE.md.
 
 ## Prochaine action recommandée
 
-### P64-L06B — générateurs et splits T0/T1
+### P64-L06C — comparateur offline et petit oracle exact
 
 Type : mission autonome de benchmark, sans action humaine.
 
-P64-L06A est terminée : 13/13 bundles locaux sont valides, un seul cas 18 conteneurs / 20 contenus a été anonymisé, rejoué deux fois et intégré au tier étendu. Les 12 autres restent des preuves complémentaires locales non promues.
+P64-L06B est terminée : le manifest conserve huit cas de régression et ajoute
+64 cas discovery, 64 tuning et 64 holdout. Les cinq familles, les cardinalités
+P45/P64, les étages, réservations, rotations et ordres adversariaux sont couverts.
+Les cas faisables ont un témoin vérifié, les cas négatifs une preuve exacte, et
+le holdout reste fermé.
 
-L06B doit maintenant :
+L06C doit maintenant :
 
-1. définir le manifest L06 et les splits regression, discovery, tuning et holdout ;
-2. générer des cas T0/T1 faisables par construction et des cas négatifs prouvables ;
-3. couvrir les cinq familles obligatoires nombreux/un, peu/nombreux, nombreux/nombreux, mixte et incrémental puis froid ;
-4. garder le holdout fermé jusqu'au choix unique prévu par le runbook ;
-5. livrer tests, preuve, commit et intégration dans `main`, puis ouvrir L06C.
+1. définir une entrée/sortie commune pour les solveurs offline ;
+2. livrer un petit oracle exact interne sans dépendance externe ;
+3. déclarer explicitement les contraintes non prises en charge ;
+4. recertifier toute solution par le certificat BGIG commun ;
+5. livrer tests, preuve, commit et intégration dans `main`, puis ouvrir L06D.
 
-Le Goal déjà lancé reste valable. Il poursuit L06B à L06E sans nouveau GO et sans installer de dépendance externe.
+Le Goal déjà lancé reste valable. Il poursuit L06C à L06E sans nouveau GO et
+sans installer de dépendance externe.
 
 ## Lots verrouillés
 

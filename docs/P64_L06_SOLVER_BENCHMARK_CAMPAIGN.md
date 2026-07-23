@@ -19,8 +19,8 @@ de problème. L'objectif raisonnable est :
 - préparer des interfaces compatibles avec de futures formes sans les simuler
   prématurément.
 
-P64-L06A est terminée : 13/13 bundles classés et un cas réel anonymisé.
-P64-L06B est la prochaine mission runtime.
+P64-L06A et P64-L06B sont terminées : 13/13 bundles classés, un cas réel anonymisé, puis 192 cas T0/T1 générés.
+P64-L06C est la prochaine mission runtime.
 Le lancement autonome, ses ressources, checkpoints, splits et arrêts sont normés par
 `docs/P64_L06_AUTONOMOUS_GOAL_RUNBOOK.md`.
 
@@ -214,7 +214,7 @@ Statut : `done`, `automated-validated`. Treize bundles classés, un seul cas ano
   adversariales ;
 - définir le futur témoin humain assisté sans scène Fusion autoritaire.
 
-Statut : `ready-after-L06A-integration`.
+Statut : `done`, `automated-validated`. Huit régressions et 192 recettes ; holdout fermé, aucun solveur modifié.
 
 ### P64-L06C — adapters comparatifs offline
 
@@ -223,8 +223,7 @@ Statut : `ready-after-L06A-integration`.
 - recertifier chaque sortie par BGIG ;
 - garder toute dépendance hors runtime Fusion.
 
-Statut : `planned`, soumis aux gates de dépendance pour toute installation ou
-intégration versionnée.
+Statut : `ready-after-L06B-integration`. Le petit oracle interne sans dépendance est prioritaire ; toute installation reste soumise aux gates.
 
 ### P64-L06D — campagne autonome
 

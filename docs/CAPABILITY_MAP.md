@@ -1760,7 +1760,7 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
 - C-SAFETY : plafond 36 h / 2 Gio, reprise sans double exécution, aucune
   dépendance externe installée sans gate et une seule amélioration intégrable.
 - C-FUSION-UI / C-GEOMETRY / C-CAD-IR : inchangées.
-- Statut runtime : L06A est terminée ; L06B est prête après intégration, sans recapture humaine.
+- Statut runtime : L06A et L06B sont terminées ; L06C est prête après intégration, sans recapture humaine.
 ## Mise à jour P64-L05V-R2 — parcours de développement automatique
 
 - C-FUSION-UI : le bouton DEV disparaît ; chaque bouton et changement utile est journalisé sans action spéciale de Thomas.
@@ -1768,7 +1768,7 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
 - C-SAFETY : chemins et secrets refusés, texte libre absent des lignes, aucune promotion automatique, aucune panne du journal bloquante pour le produit.
 - C-SOLVER / C-LAYOUT / C-GEOMETRY / C-CAD-IR : capacités et contrats inchangés ; le journal n'appelle aucune opération métier.
 - C-QUALITY : les futurs cas humains deviennent des entrées complémentaires ; le corpus, les générateurs et oracles autonomes ne dépendent plus d'une capture manuelle.
-- Statut : implemented-fusion-bridge, implemented-fusion-ui, automated-validated. L06A done, L06B prochaine ; fusion-validated: false ; print-validated: false.
+- Statut : implemented-fusion-bridge, implemented-fusion-ui, automated-validated. L06A et L06B done, L06C prochaine ; fusion-validated: false ; print-validated: false.
 
 ## Mise à jour P64-L06A — cas réel anonymisé
 
@@ -1776,4 +1776,20 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
 - C-PROJECT-CONTRACT : noms, identifiants, métadonnées différées, trace et contexte client retirés ; références internes recâblées puis projet renormalisé.
 - C-SAFETY : constructeur à sortie séparée, aucune modification automatique du corpus source, 12 bundles et tous les journaux personnels non promus.
 - C-FUSION-UI / C-GEOMETRY / C-CAD-IR : inchangées.
-- Statut : P64-L06A `done`, P64-L06B `ready-after-integration` ; fusion-validated: false, print-validated: false.
+- Statut : P64-L06A et P64-L06B `done` ; P64-L06C `ready-after-integration` ; fusion-validated: false, print-validated: false.
+
+## Mise à jour P64-L06B — corpus T0/T1 exécutable
+
+- C-SOLVER / C-QUALITY : huit régressions et 192 recettes déterministes ; cinq
+  familles et couverture réelle des fronts P45 1, 2, 4 et 8.
+- C-PROJECT-CONTRACT : projets générés normalisés, témoins locaux/globaux et
+  digests exacts ; aucun projet personnel ou chemin local.
+- C-LAYOUT : cas faisables vérifiés pour boîte, chevauchement, réservations,
+  appuis et retrait ; cas négatifs prouvés par volume ou hauteur.
+- C-SAFETY : holdout fermé, témoin jamais utilisé comme warm start, aucune
+  dépendance externe, aucune auto-modification et aucun run holdout avant choix.
+- C-FUSION-UI / C-GEOMETRY / C-CAD-IR : inchangées.
+- Limite : l'interdiction de rotation reste une contrainte du benchmark, car le
+  schéma projet courant ne l'expose pas.
+- Statut : implemented-core, automated-validated ; L06C prochaine mission ;
+  fusion-validated: false, print-validated: false.

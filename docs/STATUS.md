@@ -3096,4 +3096,34 @@ L'état final est anonymisé dans `tests/fixtures/p64_l06a_reviewed_real_case.v1
 
 Livraison : anonymiseur déterministe, constructeur à sortie séparée pour revue, fixture étendue, tests et preuve `P64_L06A_REAL_CASE_INVENTORY_EVIDENCE.md`. Aucun changement de solveur, budget, délai, certificat, géométrie, finalisation, CAD ou scène.
 
-Statut : done, automated-validated. fusion-validated: false. print-validated: false. Prochaine mission : P64-L06B.
+Statut : done, automated-validated. fusion-validated: false. print-validated: false. P64-L06B est désormais terminée ; prochaine mission : P64-L06C.
+
+## P64-L06B — corpus T0/T1 généré (2026-07-23)
+
+Statut : implemented-core, automated-validated. fusion-validated: false,
+print-validated: false.
+
+Le manifest `bgig.solver_benchmark_manifest.v1` conserve les sept cas L05D1 et
+le cas réel anonymisé L06A, puis ajoute 192 recettes : 64 discovery, 64 tuning et
+64 holdout. Chaque split couvre les cinq familles obligatoires et les axes de
+cardinalité, étages, dimensions, densité, réservation, rotation et ordre prévus.
+
+Les cas faisables sont reconstruits depuis le plan local canonique P45 et un
+placement global indépendant, puis vérifiés pour murs, plancher, boîte,
+chevauchements, réservations, support et retrait. Les cas négatifs portent une
+preuve exacte de volume ou de hauteur. Les fronts P45 réellement observés sur
+les splits ouverts couvrent 1, 2, 4 et 8 variantes ; aucun cas faisable n'a une
+frontière vide.
+
+Le holdout est scellé par digest et refuse tout accès implicite. Aucun solveur
+n'y a été exécuté. Un petit cas discovery a été résolu en Rapide avec certificat
+BGIG ; un cas faisable à huit conteneurs reste exploratoirement borné sans
+solution, à mesurer formellement dans L06D.
+
+Le constructeur reproduit la fixture octet pour octet. Tests L06B 9/9, audit P45
+discovery/tuning, Ruff ciblé et py_compile : OK. La suite complète est consignée
+à la clôture Git de la mission.
+
+Aucun solveur, lane, budget, deadline, classement, certificat public, schéma
+projet, valeur physique, finalisation, CAD ou scène Fusion n'est modifié. L06C
+est la prochaine mission.

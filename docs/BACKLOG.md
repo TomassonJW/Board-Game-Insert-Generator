@@ -2889,15 +2889,17 @@ implémentée et intégrée à la fois.
 
 ### P64-L06B — oracles et génération T0/T1
 
-- Statut : ready-after-P64-L06A-integration.
-- Scope : étendre le corpus avec cas faisables par construction, cas négatifs
-  prouvables, permutations adverses et futur témoin humain normalisé.
-- Interdits : aucune scène Fusion autoritaire, aucun projet personnel promu,
-  aucune forme future simulée dans T0/T1.
+- Statut : done, automated-validated ; fusion-validated: false, print-validated: false.
+- Livré : manifest `bgig.solver_benchmark_manifest.v1`, 8 régressions et
+  192 recettes, cinq familles par split, témoins faisables, preuves négatives,
+  six paires incrémental/froid par split et holdout fermé.
+- Preuve : `P64_L06B_BENCHMARK_CORPUS_EVIDENCE.md`.
+- Limite : l'interdiction de rotation reste une contrainte du benchmark, non un
+  nouveau champ du schéma projet.
 
 ### P64-L06C — comparateurs solveur offline
 
-- Statut : planned-after-P64-L06A.
+- Statut : ready-after-P64-L06B-integration.
 - Scope : adapters pour deux candidats maximum, priorité à PackingSolver et à un
   petit oracle exact interne ou CP-SAT ; recertification BGIG obligatoire.
 - Gate : toute installation, dépendance versionnée ou intégration produit exige
@@ -2941,7 +2943,7 @@ implémentée et intégrée à la fois.
 - Statut : done-documentation.
 - Livré : runbook 36 h, matrice P45/P64, splits, oracle interne prioritaire,
   tournoi progressif, checkpoints, pause sûre, arrêts et prompt `/goal`.
-- Dépendance runtime : L06A est terminée ; L06B devient prête après intégration de son cas réel anonymisé.
+- Dépendance runtime : L06A et L06B sont terminées ; L06C est prête après intégration du corpus généré.
 - Interdits : aucun solveur ou budget modifié, aucune dépendance externe
   installée, aucun T2-T4, aucune promotion d'un projet personnel.
-- Suite : L06B à L06E sans nouvelle action humaine.
+- Suite : L06C à L06E sans nouvelle action humaine.

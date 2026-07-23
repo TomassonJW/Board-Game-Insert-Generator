@@ -9,8 +9,8 @@ Statut courant :
 
 - `goal-launch-authorized-by-ADR-0080` ;
 - journal local automatique retenu pour les futurs parcours réels ;
-- P64-L06A terminée : 13/13 bundles classés, un cas anonymisé et rejoué ;
-- prochaine mission : P64-L06B ;
+- P64-L06A et P64-L06B terminées : inventaire réel puis 192 cas T0/T1 ;
+- prochaine mission : P64-L06C ;
 - `fusion-validated: false` ;
 - `print-validated: false`.
 
@@ -292,7 +292,7 @@ Dans la nouvelle tâche préparée pour P64-L06, Thomas peut lancer :
 ```text
 /goal
 Exécute P64-L06 selon docs/P64_L06_AUTONOMOUS_GOAL_RUNBOOK.md, pendant 36 h
-maximum. Reprends à la première mission incomplète, actuellement L06B, puis
+maximum. Reprends à la première mission incomplète, actuellement L06C, puis
 avance jusqu'à L06E avec tests,
 preuve, commit et intégration dans main avant la suivante. Classe les cas réels
 disponibles sans en faire une condition de départ. Sans nouveau GO, utilise
@@ -310,3 +310,11 @@ reprends sans double exécution et rends compte en français courant.
 Le lancement de ce prompt constitue le GO d'exécution. Le futur agent ne doit
 pas demander une seconde autorisation de démarrage ; il s'arrête seulement sur
 une gate réelle définie ci-dessus.
+
+## 16. Checkpoint P64-L06B intégré
+
+L06B produit le manifest `bgig.solver_benchmark_manifest.v1` : huit cas de
+régression, 64 discovery, 64 tuning et 64 holdout. Les témoins positifs et
+preuves négatives sont validés, les fronts P45 réels couvrent 1, 2, 4 et 8
+variantes et le holdout reste fermé. Aucun solveur n'a été exécuté sur le
+holdout. L06C reprend sans nouveau GO et sans dépendance externe.
