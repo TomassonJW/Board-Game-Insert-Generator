@@ -253,6 +253,7 @@ BGIG_PALETTE_STATE_ACTION = "bgig_palette_state"
 BGIG_PALETTE_NOTICE_ACTION = "bgig_palette_notice"
 BGIG_PALETTE_PROJECT_ACTION = "bgig_palette_project"
 BGIG_PALETTE_DOCUMENT_ACTION = "bgig_palette_document"
+BGIG_PALETTE_DEV_LOG_ACTION = "bgig_palette_dev_log"
 BGIG_PALETTE_PROJECT_RESPONSE_ACTION = "bgig_palette_project_response"
 BGIG_PALETTE_TRANSPORT_RESPONSE_ACTION = "response"
 BGIG_PALETTE_READY_ACTION = "bgig_palette_ready"
@@ -555,6 +556,21 @@ if adsk is not None:
                     args.returnData = "OK"
                 except Exception:
                     pass
+                if action == BGIG_PALETTE_DEV_LOG_ACTION:
+                    try:
+                        raw_event = json.loads(
+                            str(getattr(args, "data", "{}") or "{}")
+                        )
+                        _append_palette_dev_action_event(
+                            raw_event,
+                            self.addin_dir,
+                        )
+                    except Exception:
+                        try:
+                            args.returnData = "DEV_LOG_ERROR"
+                        except Exception:
+                            pass
+                    return
                 if action == BGIG_PALETTE_READY_ACTION:
                     request = _safe_default_command_request(self.addin_dir)
                     response = _handle_palette_project_request(
@@ -813,6 +829,19 @@ def _handle_palette_project_request(
     except ImportError:  # pragma: no cover - Fusion may load the add-in as a script.
         from palette_project import handle_palette_request  # type: ignore[no-redef]
     return handle_palette_request(raw_request, addin_dir, project_root)
+
+
+def _append_palette_dev_action_event(
+    raw_event: object,
+    addin_dir: Path,
+) -> dict[str, object]:
+    """Persist one UI trail event without invoking project or solver work."""
+
+    try:
+        from .dev_action_log import append_dev_action_event
+    except ImportError:  # pragma: no cover - Fusion may load the add-in as a script.
+        from dev_action_log import append_dev_action_event  # type: ignore[no-redef]
+    return append_dev_action_event(raw_event, addin_dir)
 
 
 def _palette_bootstrap_request() -> dict[str, str]:

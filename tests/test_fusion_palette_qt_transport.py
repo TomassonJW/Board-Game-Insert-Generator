@@ -62,9 +62,21 @@ class FusionPaletteQtTransportTests(unittest.TestCase):
         self.assertIn("technical_detail=result", inspect_block)
         self.assertNotIn("self.addin_dir, result)", inspect_block)
 
+    def test_routes_the_automatic_dev_log_without_project_or_solver_work(self) -> None:
+        self.assertEqual(entrypoint.BGIG_PALETTE_DEV_LOG_ACTION, "bgig_palette_dev_log")
+        log_route = self.source.index("if action == BGIG_PALETTE_DEV_LOG_ACTION:")
+        ready_route = self.source.index("if action == BGIG_PALETTE_READY_ACTION:")
+        project_route = self.source.index("if action == BGIG_PALETTE_PROJECT_ACTION:")
+        self.assertLess(log_route, ready_route)
+        self.assertLess(log_route, project_route)
+        block = self.source[log_route:ready_route]
+        self.assertIn("_append_palette_dev_action_event", block)
+        self.assertNotIn("_handle_palette_project_request", block)
+        self.assertNotIn("_execute_generation_request", block)
+
     def test_manifest_identifies_the_bootstrap_and_launcher_fix(self) -> None:
         manifest = json.loads((ADDIN / "BoardGameInsertGenerator.manifest").read_text(encoding="utf-8"))
-        self.assertEqual(manifest["version"], "0.1.58")
+        self.assertEqual(manifest["version"], "0.1.59")
 
     def test_uses_native_file_dialog_only_in_the_fusion_adapter(self) -> None:
         for marker in (

@@ -1086,3 +1086,12 @@ Les trois bundles du 2026-07-23 sont valides et utiles, mais la version installe
 Aucune materialisation ni impression n est requise. Aucun bundle n entre automatiquement dans le depot. fusion-validated: false avant ce retour ; print-validated: false.
 
 Installation P64-L05V-R1 confirmee : add-in 0.1.58, commit e817432, marqueur et settings verifies. La gate de recapture est active ; Thomas ne doit executer que les quatre actions humaines listees ci-dessus.
+## P64-L05V-R2 - remplacement de la recapture manuelle
+
+Décision humaine du 2026-07-23 : la gate de recapture par bouton DEV est fermée et remplacée par ADR-0080.
+
+La palette 0.1.59 journalise automatiquement chaque action utile et référence les états locaux dédupliqués. Thomas n'a plus à cliquer au bon instant, à produire une paire exacte ni à répéter des ajouts pour débloquer P64-L06.
+
+Les captures déjà présentes restent des observations locales utiles mais ne sont pas promues automatiquement. Elles ne valent ni preuve géométrique générale, ni validation Fusion, ni validation d'impression.
+
+Statut : aucune action humaine requise pour lancer ou poursuivre P64-L06. fusion-validated: false. print-validated: false.

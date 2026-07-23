@@ -1,5 +1,7 @@
 # P64-L05B — Preuve SolverCaseBundle et capture DEV
 
+Mise à jour ADR-0080 (2026-07-23) : cette preuve historique du bouton reste valide pour le producteur de bundle. La palette courante retire le bouton et utilise le journal automatique R2.
+
 ## Resultat
 
 Statut : implemented-core, implemented-fusion-bridge,

@@ -2,6 +2,8 @@
 
 ## Statut
 
+Mise à jour du 2026-07-23 : ADR-0080 remplace le bouton DEV et la collecte manuelle par un journal local automatique avec états dédupliqués. Le schéma SolverCaseBundle et son producteur interne restent valides.
+
 Acceptee le 2026-07-22 dans le programme correctif P64-L05 explicitement
 valide apres le retour humain P64-L04V. Cette decision ouvre P64-L05B. Elle ne
 vaut ni validation Fusion, ni validation d'impression, ni autorisation

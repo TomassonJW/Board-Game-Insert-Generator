@@ -221,3 +221,8 @@ Tests, cartes backlog ou gates humaines a preparer.
 - ADR-0075-pre-final-local-layout-reuse.md - réutilisation pré-finalisation à
   enveloppe fixe, recertification monde sans solve global et séparation des
   lots Deep anytime / attente UX.
+- ADR-0076-global-void-container-insertion.md - insertion bornée d'un nouveau conteneur à voisins figés et recertification globale.
+- ADR-0077-solver-case-bundle.md - bundle local versionné ; son bouton DEV est supersédé par ADR-0080.
+- ADR-0078-certified-plan-witness.md - plan témoin certifié persistant et recertifié comme point de départ.
+- ADR-0079-solver-case-corpus-and-measurement-gate.md - corpus exact, replay borné et comparaison fonctionnelle prioritaire.
+- ADR-0080-automatic-local-development-trail.md - journal local automatique, états dédupliqués et fin de la gate par bouton DEV.

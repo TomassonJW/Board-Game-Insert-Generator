@@ -534,3 +534,5 @@ PackingSolver, LAFF, CP-SAT ou un moteur de nesting restent des candidats de
 benchmark, pas des dépendances acceptées. Toute sortie externe repasse par le
 validateur commun. ADR-0068, ADR-0079, les caps publics, la deadline Deep et
 l'interdiction d'auto-modification restent normatifs.
+
+ADR-0080 rend les journaux et cas réels complémentaires : leur absence ne bloque plus la génération T0/T1, les oracles internes ni la campagne autonome. Aucune validation Fusion ou impression n'en est déduite.

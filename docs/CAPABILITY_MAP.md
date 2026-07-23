@@ -1749,16 +1749,23 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
 - C-SAFETY : aucune auto-modification, aucun projet personnel promu, aucune
   dépendance ou installation acceptée par le cadrage.
 - C-FUSION-UI / C-GEOMETRY / C-CAD-IR : inchangées.
-- Statut runtime : P64-L06A reste bloqué par la confirmation R1 ;
+- Statut runtime historique : blocage R1 supersédé par ADR-0080 ;
   `fusion-validated: false`, `print-validated: false`.
 
 ## Mise à jour P64-L06P — runbook Goal prêt
 
 - C-SOLVER / C-QUALITY : protocole d'expérience renforcé avec splits séparés,
   holdout fermé, oracle interne et gate A/B avant toute vitesse.
-- C-PROJECT-CONTRACT : préflight exact des deux bundles post-R1, anonymisation
-  obligatoire et absence d'import automatique.
+- C-PROJECT-CONTRACT : inventaire des cas réels et des journaux locaux, anonymisation obligatoire et absence d'import automatique.
 - C-SAFETY : plafond 36 h / 2 Gio, reprise sans double exécution, aucune
   dépendance externe installée sans gate et une seule amélioration intégrable.
 - C-FUSION-UI / C-GEOMETRY / C-CAD-IR : inchangées.
-- Statut runtime : inchangé ; L06A reste bloqué par la recapture humaine.
+- Statut runtime : L06A est ready après ADR-0080 ; aucune recapture humaine requise.
+## Mise à jour P64-L05V-R2 — parcours de développement automatique
+
+- C-FUSION-UI : le bouton DEV disparaît ; chaque bouton et changement utile est journalisé sans action spéciale de Thomas.
+- C-PROJECT-CONTRACT : chaque état complet est stocké localement une seule fois par SHA-256 et référencé depuis le parcours chronologique.
+- C-SAFETY : chemins et secrets refusés, texte libre absent des lignes, aucune promotion automatique, aucune panne du journal bloquante pour le produit.
+- C-SOLVER / C-LAYOUT / C-GEOMETRY / C-CAD-IR : capacités et contrats inchangés ; le journal n'appelle aucune opération métier.
+- C-QUALITY : les futurs cas humains deviennent des entrées complémentaires ; le corpus, les générateurs et oracles autonomes ne dépendent plus d'une capture manuelle.
+- Statut : implemented-fusion-bridge, implemented-fusion-ui, automated-validated. L06A ready ; fusion-validated: false ; print-validated: false.

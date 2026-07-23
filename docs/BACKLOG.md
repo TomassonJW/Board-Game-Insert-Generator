@@ -2858,31 +2858,34 @@ implémentée et intégrée à la fois.
 
 ### P64-L05V-B - completement de preuve humaine
 
-- Statut : ready-human-gate.
-- Scope : recharger le witness apres changement temporaire d effort et capturer un SolverCaseBundle DEV local sur une manipulation representant le cas complexe.
-- Interdits : aucune scene automatique, aucune auto-modification du solveur, aucun import de projet personnel dans le depot.
+- Statut : superseded-by-ADR-0080.
+- Décision : aucun parcours manuel ni bouton DEV n'est désormais requis.
 
-### P64-L06A - premier cas complexe anonymise et replaye
+### P64-L06A - ancienne carte dépendante d'une capture
 
-- Statut : planned ; depend de P64-L05V-B et d un bundle local anonymisable.
-- Scope : classification/replay deterministe du cas reel et proposition de sous-mission solveur ciblee, sans changement automatique des budgets ou lanes.
-- Limite : la fixture L05V valide le mecanisme, pas la capacite de reconstruction du projet personnel.
+- Statut : superseded-by-ADR-0080 et par la carte courante ci-dessous.
 
 ### P64-L05V-R1 - fidelite de capture du refus
 
-- Statut : done-code, automated-validated, pending-install-and-human-recapture.
+- Statut : done-code, automated-validated ; recapture manuelle superseded-by-ADR-0080.
 - Defaut : la requete DEV remplacait le dernier rapport global_void_reuse par dependencies_unchanged avant l export.
 - Livre : snapshot staged fige avant resynchronisation, test bridge du rapport refuse exact, preuve des trois bundles reels.
 - Invariants : aucun changement solveur, budget, lane, geometrie, finalisation, CAD, scene ou schema bundle.
 - Preuve : docs/P64_L05V_R1_CAPTURE_FIDELITY_EVIDENCE.md ; 682/682.
 
-### P64-L06A - premier cas complexe anonymise et replaye
+### P64-L05V-R2 - journal automatique du parcours
 
-- Statut : blocked-by-P64-L05V-R1-human-recapture.
-- Entree attendue : deux bundles R1, refus incremental puis echec global, avec projet identique entre les deux captures.
+- Statut : done-code, automated-validated, pending-integration-and-install.
+- Livre : bouton DEV retiré, événements JSON Lines, états de projet dédupliqués, route Fusion séparée et add-in 0.1.59.
+- Protection : aucun chemin ou secret, aucune promotion automatique, aucune opération métier déclenchée.
+- Décision : ADR-0080 ; contrat et preuve P64-L05V-R2.
 
-P64-L05V-R1 installation : done sur 0.1.58 commit e817432. Statut courant : ready-human-recapture.
+### P64-L06A - inventaire réel non bloquant
 
+- Statut : ready-after-ADR-0080.
+- Entrée minimale : corpus L05D1 versionné ; bundles et journaux locaux seulement comme compléments.
+- Scope : valider en lecture seule, anonymiser/rejouer un cas cohérent si disponible, classifier les autres et terminer sans modifier le solveur.
+- Sortie : rapport d'inventaire intégré, puis L06B.
 ### P64-L06B — oracles et génération T0/T1
 
 - Statut : planned-after-P64-L06A.
@@ -2937,8 +2940,7 @@ P64-L05V-R1 installation : done sur 0.1.58 commit e817432. Statut courant : read
 - Statut : done-documentation.
 - Livré : runbook 36 h, matrice P45/P64, splits, oracle interne prioritaire,
   tournoi progressif, checkpoints, pause sûre, arrêts et prompt `/goal`.
-- Dépendance runtime inchangée : L06A reste
-  `blocked-by-P64-L05V-R1-human-recapture`.
+- Dépendance runtime : L06A est `ready` depuis ADR-0080 ; elle commence par l'inventaire du corpus et des journaux locaux.
 - Interdits : aucun solveur ou budget modifié, aucune dépendance externe
   installée, aucun T2-T4, aucune promotion d'un projet personnel.
-- Suite : recapture R1, puis lancement du Goal dans la nouvelle tâche.
+- Suite : L06A, puis campagne autonome L06B à L06E sans nouvelle action humaine.

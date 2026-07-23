@@ -12,8 +12,8 @@ P64-L04A/B/C restent automated-validated dans le package 0.1.58.
 Le retour humain L04V est globalement KO mais partiellement positif. R1 corrige
 le cache négatif. P64-L05A est automated-validated : exactement un nouveau
 conteneur peut être inséré dans le vide global à voisins figés et plan complet
-recertifié. Le manifest Fusion reste à 0.1.58. fusion-validated: false et
-print-validated: false pour L05A, L05B et L05C. Le manifest reste inchange.
+recertifié. Le manifest Fusion passe à 0.1.59 pour le journal automatique. fusion-validated: false et
+print-validated: false pour L05A, L05B et L05C. Le solveur reste inchangé.
 P64-L05B, P64-L05C et P64-L05D1/D2 sont automated-validated.
 
 ## Dernier état réel
@@ -39,7 +39,7 @@ P64-L05B, P64-L05C et P64-L05D1/D2 sont automated-validated.
   étape et temps écoulé sans pourcentage ni ETA inventés ;
 - un second lancement du même type est bloqué ; aucune annulation décorative
   n'est exposée ;
-- un bouton DEV rouge exporte un SolverCaseBundle versionne, local et filtre sans lancer de solve, finalisation, CAD ou scene ;
+- un journal local automatique conserve clics, changements, demandes, résultats et états dédupliqués sans bouton spécial, sans solve supplémentaire, finalisation, CAD ou scène ;
 - un witness certifie persistant est recertifie comme incumbent sans ajouter de lane, court-circuiter la recherche ou revendiquer un cache hit ;
 - le cas dense 11 × 34 ne reçoit aucune nouvelle revendication.
 
@@ -55,29 +55,21 @@ Preuve L05D1 : P64_L05D1_SOLVER_CORPUS_EVIDENCE.md.
 
 ## Prochaine action recommandée
 
-### P64-L05V-R1 — recapture humaine exacte avant Goal
+### P64-L06A — inventaire réel non bloquant, puis campagne autonome
 
-Type : gate humaine courte déjà préparée.
+Type : mission autonome courte avant L06B.
 
-Le correctif `e817432` est installé dans l'add-in Fusion 0.1.58. Les derniers
-bundles locaux présents datent encore de la séquence qui a révélé le défaut de
-capture ; aucune paire post-R1 n'est actuellement disponible.
+ADR-0080 supprime le bouton DEV et ferme la gate de recapture manuelle. La palette 0.1.59 écrit désormais un journal local automatique et des états de projet dédupliqués. Aucune action humaine n'est nécessaire pour démarrer la campagne.
 
-Thomas doit seulement :
+L06A doit maintenant :
 
-1. repartir du plan certifié de `Mon insert` ;
-2. ajouter le même petit conteneur et cliquer DEV après le refus incrémental ;
-3. lancer le calcul global, puis cliquer DEV après l'échec ;
-4. conserver les deux chemins locaux et digests.
+1. inventorier en lecture seule les bundles et journaux locaux disponibles ;
+2. valider, anonymiser et rejouer seulement un cas cohérent ;
+3. classer les autres cas comme preuves complémentaires non promues ;
+4. terminer par un rapport, même si aucun cas réel n'est promouvable ;
+5. intégrer L06A, puis ouvrir L06B sur le corpus et les générateurs T0/T1.
 
-Aucune matérialisation ni impression n'est demandée. Les projets et bundles
-personnels restent locaux et ne sont jamais promus automatiquement.
-
-Le runbook `P64_L06_AUTONOMOUS_GOAL_RUNBOOK.md` et son prompt canonique sont
-prêts. Dès que la paire passe le préflight, la nouvelle tâche peut lancer le
-Goal de 36 h sans redemander de GO. L06A reste bloqué jusque-là ; L06B à L06E ne
-doivent pas être anticipés.
-
+Le Goal déjà lancé reste valable. Il poursuit L06A à L06E sans nouveau GO, une mission intégrée à la fois, avec le corpus versionné et les oracles internes comme base minimale.
 ## Lots verrouillés
 
 - P64-F01A02 et F02A02 restent séparés : ils possèdent la finalisation du volume ;
@@ -191,20 +183,20 @@ La prochaine mission de code, non demarree, sera P64-L06A : anonymiser, rejouer 
 
 Les trois bundles reels sont valides et prouvent le delta exact puis l echec global, mais le clic DEV 0.1.58 ecrasait la raison du refus incremental avant l export. R1 corrige cette instrumentation sans modifier le solveur.
 
-Prochaine action unique : installer le commit R1, reprendre l etat certifie de Mon insert, ajouter le meme petit conteneur, puis capturer deux fois : juste apres le refus incremental et juste apres le calcul global rate. Les nouveaux bundles doivent conserver le statut, la raison et les compteurs exacts.
+Historique : cette recapture manuelle était l action demandée avant ADR-0080. Elle est maintenant remplacée par le journal automatique local.
 
-P64-L06A pourra ensuite anonymiser, rejouer et classifier la paire. Aucune optimisation de solveur ne commence avant cette recapture.
+P64-L06A est désormais prête : elle inventorie les cas réels et les journaux, puis lance le benchmark sans attendre une nouvelle manipulation humaine.
 
 ### Installation P64-L05V-R1 terminee
 
-Le commit e817432 est installe et marque dans Fusion 0.1.58. Thomas doit seulement recharger l add-in, ouvrir Mon insert dans son etat certifie, refaire le meme ajout, capturer apres le refus, lancer le calcul puis capturer apres l echec. Aucune preparation technique supplementaire n est requise.
+Historique : le commit e817432 avait été installé dans Fusion 0.1.58. La manipulation manuelle alors demandée est annulée par ADR-0080 et remplacée par le journal automatique 0.1.59.
 
 ## Cadrage de la suite P64-L06 (2026-07-23)
 
 Le programme de benchmark et le registre des horizons produit sont désormais
 documentés. Ils n'écrasent pas la prochaine action unique :
 
-1. confirmer les deux captures R1 exactes ;
+1. inventorier les cas réels et les journaux locaux ;
 2. exécuter P64-L06A en lecture contrôlée : anonymisation, replay et
    classification, sans changement de solveur ;
 3. seulement ensuite ouvrir L06B/L06C pour les oracles, générateurs et
@@ -223,5 +215,4 @@ tuning/holdout, un oracle exact interne sans dépendance, le tournoi progressif,
 les budgets, la pause sûre et les arrêts. Le premier Goal intègre au maximum une
 amélioration validée ; il peut conclure sans diff si aucune hypothèse ne passe.
 
-Cette préparation est `done-documentation`. Elle ne lève pas la gate R1 et ne
-change aucun comportement runtime.
+Cette préparation est `done-documentation`. ADR-0080 lève ensuite la gate R1 sans changer le solveur ni les règles du benchmark.

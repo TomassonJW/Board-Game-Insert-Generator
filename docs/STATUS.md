@@ -1,6 +1,6 @@
 # Status
 
-Derniere mise a jour : 2026-07-22
+Derniere mise a jour : 2026-07-23
 
 ## Etat global
 
@@ -10,9 +10,9 @@ Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
 Phase active : P64-L04A/B/C, P64-L04R1 et P64-L05A/B/C/D1/D2 sont
 automated-validated. Le retour humain L04V est globalement KO mais partiellement
-positif. Le manifest Fusion reste a 0.1.58. L05D1/D2 sont
+positif. Le manifest Fusion passe à 0.1.59 pour P64-L05V-R2. L05D1/D2 sont
 automated-validated.
-P64-L05V-A est automated-validated et installe localement. P64-L05V est la prochaine gate humaine.
+ADR-0080 remplace la gate humaine par un journal local automatique ; P64-L06 est autorisé et L06A est la prochaine mission autonome.
 P64-V2H03V et P44-V sont fusion-validated sur 0.1.55. P45-M001V est
 architecture-accepted. P64-L03V est un KO contextuel sur 0.1.56 et n'accorde
 aucune validation Fusion à la correction minimal/final.
@@ -3030,7 +3030,7 @@ Trois bundles locaux valides montrent 17/19 avec plan certifie, puis 18/20 avec 
 
 Le defaut etait dans l instrumentation : capture_solver_case resynchronisait la session et remplacait le rapport du refus par dependencies_unchanged. Le snapshot est maintenant fige avant cette etape. Validation : 27/27 bridge, 3/3 bundle, 7/7 insertion globale, 38/38 DOM et 682/682 suite complete. Aucun fichier personnel n est commite.
 
-Installation P64-L05V-R1 : commit e817432 installe dans 0.1.58 ; marqueur de commit, settings, runtime, fixture et 81 validations ciblees du preparateur sont OK. La recapture humaine reste la seule action ouverte.
+Historique P64-L05V-R1 : le commit e817432 avait été installé dans 0.1.58 et validé. La recapture alors demandée a depuis été remplacée par le journal automatique décidé dans ADR-0080.
 
 ## P64-L06 — cadrage benchmark et horizons différés (2026-07-23)
 
@@ -3050,9 +3050,7 @@ et P69/P70+ propriétaires des futures surfaces UI. PackingSolver, LAFF, CP-SAT
 et libnest2d sont seulement des candidats d'étude ; aucune dépendance n'est
 ajoutée.
 
-P64-L06A reste bloqué par la confirmation des captures R1. Aucun solveur, lane,
-classement, budget, deadline, schéma, géométrie, CAD IR, scène ou manifest Fusion
-ne change. `fusion-validated: false`, `print-validated: false`.
+Historique : P64-L06A attendait alors la confirmation des captures R1. ADR-0080 a depuis remplacé cette attente par le journal automatique, sans changer solveur, classement, budget, schéma, géométrie, CAD IR, scène ou manifest Fusion. `fusion-validated: false`, `print-validated: false`.
 
 Validation du cadrage : garde documentaire 2/2, Ruff ciblé, py_compile et suite
 complète 682/682. Le premier lancement sans `PYTHONPATH` a échoué sur deux
@@ -3067,11 +3065,21 @@ regression/discovery/tuning/holdout, petit oracle exact interne, tournoi
 progressif, checkpoints atomiques et une seule amélioration intégrable. Il évite
 qu'une dépendance externe ou un soak inutile bloque la campagne.
 
-L'état local vérifié ne contient encore que les trois bundles antérieurs à la
-recapture corrigée. P64-L06A reste donc `blocked-by-P64-L05V-R1-human-recapture`.
+Historique : cet état précédait ADR-0080. P64-L06A est désormais `ready` et commence par inventorier le corpus et les journaux locaux.
 Aucun solveur, lane, classement, budget, deadline, schéma, géométrie, Fusion,
 CAD IR, scène ou manifest ne change. `fusion-validated: false`,
 `print-validated: false`.
 
 Validation : garde documentaire 2/2, Ruff ciblé, py_compile et suite complète
 682/682 en 163,352 s.
+## P64-L05V-R2 - journal local automatique (2026-07-23)
+
+ADR-0080 est implémentée dans l'add-in 0.1.59. Le bouton DEV est retiré. Chaque session écrit automatiquement les clics, changements, demandes, résultats, erreurs, documents et actions Fusion dans un fichier JSON Lines local. Les états complets du projet sont écrits une seule fois par empreinte et référencés ensuite.
+
+Le producteur refuse les clés de chemins et de secrets, reste hors `adsk` et n'appelle aucune opération métier. Les nombres et choix utiles sont observables ; le texte libre n'est pas copié dans les lignes. Aucun journal personnel n'est commité.
+
+Tests ciblés : journal 2/2, palette 38/38, transport Fusion 9/9 et préparation d acceptation 5/5. Suite complète : 685/685 en 156,721 s. Compilation Python, syntaxe JavaScript, préparateur PowerShell et contrôles ciblés du code : OK.
+
+La gate de paire R1 est supersédée. Les bundles existants sont des observations complémentaires locales ; L06A les inventorie sans bloquer L06B. Aucun changement de solveur, budget, deadline, certificat, géométrie, finalisation, CAD ou scène.
+
+fusion-validated: false. print-validated: false.

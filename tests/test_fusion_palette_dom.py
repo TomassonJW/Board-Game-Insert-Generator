@@ -736,34 +736,43 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertNotIn("cache_hit_claimed===true?'Non'", witness_markup)
         self.assertNotIn('data-action="accept-witness"', self.markup)
 
-    def test_exposes_explicit_red_dev_solver_case_capture_without_fake_learning(self) -> None:
+    def test_records_automatic_local_development_trail_without_dev_button(self) -> None:
         for marker in (
             'id="dev-solver-case-capture"',
             'class="dev-capture"',
             'data-action="capture-solver-case"',
             'button.dev-capture{background:#b3261e',
-            "capture_solver_case:{kind:'solver_case_capture'",
             'function recordSolverCaseEvent',
             'function captureSolverCase',
-            "item.action==='capture_solver_case'",
-            "sendProject('capture_solver_case'",
             'interaction_events:solverCaseEvents',
-            'scene_artifact_identity:materializedIdentity',
-            'solverCaseEvents.length>256',
-            "for(const key of ['action','ui_field','object_id'])",
             "recordSolverCaseEvent('field_changed'",
-            "captured?'Cas solveur captur",
             "Bundle DEV enregistre : ",
         ):
+            self.assertNotIn(marker, self.markup)
+        for marker in (
+            "DEV_LOG_ACTION='bgig_palette_dev_log'",
+            "DEV_LOG_SCHEMA='bgig.dev_action_log_event.v1'",
+            'Journal technique automatique actif.',
+            'function recordDevAction',
+            "recordDevAction('button_pressed'",
+            "recordDevAction('field_changed'",
+            "recordDevAction('bridge_request'",
+            "recordDevAction('bridge_response'",
+            "recordDevAction('project_changed',",
+            'event.project_snapshot=projectSnapshot',
+            "logging_mode:'automatic_local'",
+        ):
             self.assertIn(marker, self.markup)
-        primary = self.markup.index('id="primary-calculation-action"')
-        capture = self.markup.index('id="dev-solver-case-capture"')
-        self.assertLess(primary, capture)
-        trace_start = self.markup.index("function recordSolverCaseEvent")
+        self.assertIn("failure:'transport_error'", self.markup)
+        self.assertNotIn("error:String(error||'').slice", self.markup)
+        trace_start = self.markup.index("function devLogFieldValue")
         trace_end = self.markup.index("function markDirty", trace_start)
         trace_code = self.markup[trace_start:trace_end]
-        self.assertNotIn("details.value", trace_code)
-        self.assertNotIn("input.value", trace_code)
+        self.assertIn("value_kind:'number'", trace_code)
+        self.assertIn("value_kind:'choice'", trace_code)
+        self.assertIn("value_kind:'text_changed'", trace_code)
+        self.assertNotIn("document_path", trace_code)
+        self.assertNotIn("currentPath", trace_code)
         self.assertNotIn("percentage", trace_code)
         self.assertNotIn("train", trace_code.lower())
         self.assertNotIn("autoam", trace_code.lower())

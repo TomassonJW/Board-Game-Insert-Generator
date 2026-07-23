@@ -1189,13 +1189,13 @@ fusion-validated: false tant que le warm start et la capture reelle ne sont pas 
 
 La premiere sequence reelle de trois bundles valide le mecanisme de collecte et expose une lacune : la capture relancait une synchronisation avant de figer l etat, ce qui supprimait la raison exacte du refus incremental. R1 fige le snapshot d abord et ne change aucune capacite solveur.
 
-Ordre suivant : installation R1, recapture de la paire refus incremental / echec global, anonymisation et replay P64-L06A, puis seulement proposition d une evolution algorithmique mesuree. fusion-validated: false ; print-validated: false.
+Ordre historique supersédé par ADR-0080 : la recapture manuelle n est plus une condition de P64-L06. R1 reste une preuve du producteur de bundle. fusion-validated: false ; print-validated: false.
 
 ## P64-L06 — campagne algorithmique mesurée (cadrage 2026-07-23)
 
 La trajectoire solveur après R1 est maintenant verrouillée :
 
-1. L06A anonymise et rejoue le cas réel sans modifier l'algorithme ;
+1. L06A inventorie les cas réels, ne promeut que les cas valides et ne modifie pas l'algorithme ;
 2. L06B ajoute oracles et génération T0/T1 ;
 3. L06C compare au plus deux adapters offline et recertifie leurs sorties ;
 4. L06D exécute les tiers CI, extended puis éventuellement soak ;
@@ -1226,5 +1226,11 @@ exact interne, tournoi progressif, holdout fermé, checkpoints et plafond de
 36 h. La campagne intègre au maximum une amélioration mesurée ; un résultat
 négatif honnête est acceptable.
 
-Cette préparation ne modifie pas l'ordre L06A -> L06E. La recapture post-R1 reste
-la condition d'entrée et les formes T2-T4 restent hors campagne initiale.
+Cette préparation conserve l'ordre L06A -> L06E. Depuis ADR-0080, l'inventaire du corpus et du journal automatique remplace la recapture comme entrée ; les formes T2-T4 restent hors campagne initiale.
+## P64-L05V-R2 — journal automatique et autonomie L06 (2026-07-23)
+
+ADR-0080 retire le bouton DEV et journalise automatiquement les actions et résultats de la palette 0.1.59. Les états complets du projet sont dédupliqués localement. Aucun parcours humain spécial n'est requis et aucun cas personnel n'est promu automatiquement.
+
+La trajectoire L06 reste atomique et mesurée, mais son entrée change : L06A classe les observations réelles disponibles sans bloquer le corpus ; L06B à L06E utilisent en priorité les générateurs T0/T1, l'oracle interne, les splits fermés et la gate A/B. Aucune dépendance externe, auto-modification ou extension T2-T4 n'est autorisée.
+
+fusion-validated: false. print-validated: false.

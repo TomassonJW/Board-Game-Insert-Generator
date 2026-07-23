@@ -2,7 +2,7 @@
 
 ## 1. Statut et objectif
 
-Statut : `designed`, `execution-locked-by-P64-L06A-input`.
+Statut : `designed`, `execution-authorized-by-ADR-0080`.
 
 Ce programme transforme les cas réels, synthétiques et adversariaux en preuves
 comparables afin d'améliorer la capacité puis la vitesse du solveur P64. Il
@@ -19,9 +19,9 @@ de problème. L'objectif raisonnable est :
 - préparer des interfaces compatibles avec de futures formes sans les simuler
   prématurément.
 
-P64-L06A reste la première mission runtime : anonymiser, rejouer et classifier la
-paire réelle R1. Le présent cadrage ne lève pas cette dépendance. Le lancement
-autonome, ses ressources, checkpoints, splits et arrêts sont normés par
+P64-L06A reste la première mission runtime : inventorier, valider et classifier
+les cas réels disponibles. ADR-0080 retire leur absence des conditions de départ.
+Le lancement autonome, ses ressources, checkpoints, splits et arrêts sont normés par
 `docs/P64_L06_AUTONOMOUS_GOAL_RUNBOOK.md`.
 
 ## 2. Réponse au besoin d'auto-amélioration
@@ -39,7 +39,7 @@ Le runtime BGIG ne s'auto-modifie pas. Un clic DEV ne réécrit pas l'algorithme
 un modèle d'apprentissage n'est pas entraîné silencieusement. Le flux accepté
 reste :
 
-`capture -> anonymisation -> replay -> diagnostic -> changement relu -> A/B -> validation`.
+`journal ou cas local -> validation -> anonymisation éventuelle -> replay -> diagnostic -> changement relu -> A/B -> validation`.
 
 Le chemin utilisateur est une provenance utile, pas une preuve géométrique. Une
 solution humaine connue ne devient un oracle que si ses placements normalisés
@@ -197,16 +197,15 @@ précise subsiste.
 
 ## 9. Découpage de livraison
 
-### P64-L06A — cas réel R1
+### P64-L06A — inventaire des cas réels
 
-- anonymiser la paire de bundles R1 ;
-- rejouer refus incrémental puis échec global ;
-- classifier la première lacune reproductible ;
+- valider en lecture seule les bundles et journaux locaux disponibles ;
+- anonymiser et rejouer uniquement un cas cohérent s'il existe ;
+- classifier les autres observations comme preuves complémentaires non promues ;
+- produire un rapport d'inventaire même sans cas réel promouvable ;
 - ne modifier aucun solveur.
 
-Statut : `blocked-by-P64-L05V-R1-human-recapture` tant que les entrées exactes ne
-sont pas confirmées.
-
+Statut : `ready-after-ADR-0080`. L'absence d'une paire R1 exacte ne bloque plus L06B.
 ### P64-L06B — oracles et générateur T0/T1
 
 - étendre le manifest L05D1 sans casser ses digests historiques ;
@@ -283,7 +282,7 @@ un diagnostic sans intervention. Elle ne peut pas :
 
 Le programme est considéré opérationnel seulement lorsque :
 
-- le cas réel L06A est anonymisé et rejouable ;
+- L06A inventorie les cas réels et ne promeut que les entrées valides et anonymisées ;
 - le corpus distingue faisable, impossible prouvé et inconnu borné ;
 - au moins un oracle indépendant ou comparateur est recertifié par BGIG ;
 - les tiers CI/extended sont reprenables et déterministes fonctionnellement ;

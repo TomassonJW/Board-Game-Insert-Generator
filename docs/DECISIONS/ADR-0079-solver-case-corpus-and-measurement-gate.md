@@ -2,6 +2,8 @@
 
 ## Statut
 
+Mise à jour du 2026-07-23 : ADR-0080 remplace l'acquisition obligatoire par bouton DEV. Les journaux automatiques et cas réels sont des entrées complémentaires ; le corpus versionné et les générateurs T0/T1 suffisent désormais à lancer la campagne autonome.
+
 Acceptee le 2026-07-22 dans P64-L05D1, apres SolverCaseBundle L05B et witness
 certifie L05C automated-validated.
 

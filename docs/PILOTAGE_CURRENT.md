@@ -62,9 +62,9 @@ preuves archivées.
   global. P64-L05B, P64-L05C et P64-L05D1/D2 sont automated-validated.
   L05D1 fournit un corpus anonymise, un replay borne et une gate A/B.
   P64-L05D2 reduit les evaluations inutiles sans regression fonctionnelle.
-  P64-L05V-R1 est automated-validated et installe localement ; sa recapture
-  humaine exacte reste ouverte. P64-L06 est cadre et son runbook Goal est pret,
-  mais L06A reste bloque jusqu'a cette paire post-R1.
+  P64-L05V-R2 remplace la recapture manuelle par un journal local automatique
+  dans l'add-in 0.1.59. ADR-0080 ferme la gate humaine ; P64-L06 est autorisé
+  et L06A devient un inventaire réel non bloquant avant la campagne autonome.
 
 ## Vue de séquence
 
@@ -108,8 +108,8 @@ preuves archivées.
 | Termine - automatise | P64-L05D1 | Corpus anonymise, replay borne et gate A/B fonctionnelle prioritaire. |
 | Termine - automatise | P64-L05D2 | Elagage sous ordre explicite, -44,355 % essais sur corpus, 0 regression fonctionnelle. |
 | Termine - automatise | P64-L05V-A | Preflight, add-in 0.1.58 et fixture installes et verifies. |
-| Prochaine gate humaine | P64-L05V-R1 | Recapturer le refus incremental puis l'echec global apres le correctif installe. |
-| Préparé — Goal | P64-L06 | Runbook 36 h, matrice T0/T1, splits, checkpoints et prompt canonique ; exécution encore verrouillée. |
+| Supersédée | P64-L05V-R1 | La recapture manuelle est remplacée par le journal automatique ADR-0080. |
+| Autorisé — Goal | P64-L06 | Runbook 36 h, matrice T0/T1, splits et checkpoints ; exécution débloquée par ADR-0080. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -146,6 +146,7 @@ preuves archivées.
 - P64_L05A_GLOBAL_VOID_CONTAINER_REUSE_EVIDENCE.md : preuves cœur, staged,
   bridge et DOM de L05A.
 - ADR-0077 : capture locale versionnee, semantique et sans auto-apprentissage.
+- ADR-0080 : journal local automatique, états dédupliqués et fin de la gate par bouton DEV.
 - P64_L05B_SOLVER_CASE_BUNDLE_CONTRACT.md : schema, filtrage, lifecycle et invariants.
 - P64_L05B_SOLVER_CASE_BUNDLE_EVIDENCE.md : preuves producteur, staged, bridge et DOM.
 - ADR-0078 : sidecar exact, recertification et recherche sans court-circuit.
@@ -485,13 +486,13 @@ fusion-validated reste false globalement. print-validated: false.
 
 Trois bundles reels valides etablissent la sequence plan certifie, ajout d exactement un conteneur, puis echec global borne. Ils revelent que la requete DEV ecrasait le rapport de refus incremental par dependencies_unchanged avant l export.
 
-Le bridge fige maintenant le snapshot observe avant cette resynchronisation. P64-L05V-R1 est automated-validated, 682/682. Aucun solveur, budget, lane, geometrie, finalisation, CAD ou scene ne change. L add-in doit etre reinstalle puis deux captures courtes doivent confirmer le rapport exact apres ajout et l echec apres calcul. P64-L06A reste verrouille jusqu a cette preuve.
+Historique R1 : le bridge figeait le snapshot observé avant resynchronisation et les 682 tests passaient. La demande de deux captures manuelles a depuis été remplacée par le journal automatique décidé dans ADR-0080 ; P64-L06A n est plus verrouillé par cette preuve.
 
 fusion-validated: false. print-validated: false.
 
 ### Installation P64-L05V-R1
 
-Le commit e817432 est installe dans l add-in 0.1.58 ; marqueur, settings, runtime et fixture sont verifies. Statut : ready-human-recapture. La prochaine action reste uniquement les deux captures du cas reel.
+Historique : le commit e817432 avait été installé dans l add-in 0.1.58 et vérifié. ADR-0080 remplace maintenant la recapture manuelle par le journal automatique 0.1.59.
 
 ## Cadrage P64-L06 et horizons produit (2026-07-23)
 
@@ -514,6 +515,13 @@ amélioration intégrée. Le corpus sépare regression, discovery, tuning et hol
 le holdout reste fermé avant la sélection d'une hypothèse. Un petit oracle exact
 interne évite toute dépendance externe bloquante.
 
-Ce lot est uniquement documentaire. La paire R1 postérieure à `e817432` manque
-encore dans `solver-cases` : L06A reste `blocked-by-human-recapture`. Aucun
-solveur, budget, deadline, schéma, géométrie, Fusion ou manifest ne change.
+Historique : ce lot était documentaire et attendait encore la paire R1. ADR-0080 a levé cette attente ; L06A est désormais prête sans modifier solveur, budget, schéma, géométrie, Fusion ou manifest.
+## P64-L05V-R2 — journal automatique et Goal débloqué (2026-07-23)
+
+Sur décision explicite de Thomas, le bouton DEV est supprimé. L'add-in 0.1.59 écrit automatiquement un fichier chronologique par session et conserve chaque état complet du projet une seule fois par empreinte. Les clics, champs, demandes, résultats, erreurs, documents et actions Fusion deviennent analysables sans manipulation spéciale.
+
+Les chemins personnels et secrets sont refusés. Les journaux et projets restent locaux, sans promotion automatique. Le journal ne lance aucun solveur, finaliseur, CAD ou changement de scène et une erreur d'écriture ne bloque pas le produit.
+
+ADR-0080 ferme la gate de recapture R1. Les cas réels restent complémentaires ; le corpus versionné, les générateurs T0/T1 et les oracles internes suffisent au Goal. L06A est `ready` comme inventaire et classification, puis L06B à L06E restent ordonnés.
+
+Statut : implemented-fusion-bridge, implemented-fusion-ui, automated-validated. fusion-validated: false. print-validated: false.

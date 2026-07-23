@@ -44,6 +44,7 @@ try {
         "test_certified_plan_witness.py",
         "test_fusion_palette_project.py",
         "test_fusion_palette_dom.py",
+        "test_dev_action_log.py",
         "test_p64_l05v_preflight.py"
     )) {
         & $python -m unittest discover -s (Join-Path $root "tests") -p $pattern
@@ -83,9 +84,9 @@ if (-not $DryRun) {
     }
     $palette = Get-Content -LiteralPath (Join-Path $target "palette.html") -Raw -Encoding UTF8
     foreach ($marker in @(
-        "dev-solver-case-capture",
-        "capture_solver_case",
-        "SolverCaseBundle",
+        "bgig_palette_dev_log",
+        "bgig.dev_action_log_event.v1",
+        "Journal technique automatique actif",
         "certified-witness-diagnostics",
         "container_placed_in_global_void",
         "global_void_reuse",
@@ -100,7 +101,8 @@ if (-not $DryRun) {
         "lib\board_game_insert_generator\solver_case_bundle.py",
         "lib\board_game_insert_generator\certified_plan_witness.py",
         "lib\board_game_insert_generator\operation_activity.py",
-        "lib\board_game_insert_generator\staged_calculation.py"
+        "lib\board_game_insert_generator\staged_calculation.py",
+        "dev_action_log.py"
     )) {
         if (-not (Test-Path -LiteralPath (Join-Path $target $relativeRuntime) -PathType Leaf)) {
             throw "Installed P64-L05V runtime missing: $relativeRuntime"
@@ -118,14 +120,9 @@ if (-not $DryRun) {
 }
 
 Write-Output ""
-Write-Output "P64-L05V Fusion actions remaining:"
-Write-Output "1. Recharger l add-in $expectedVersion, puis ouvrir la palette BGIG dans Fusion."
-Write-Output "2. Ouvrir p64-l05v-global-void-baseline.bgig.json depuis Documents/BGIG/projects."
-Write-Output "3. Calculer, puis materialiser le plan minimal pour creer le premier witness certifie."
-Write-Output "4. Ajouter un nouveau conteneur Nouveau bac avec un element 8 x 8 x 8 mm."
-Write-Output "5. Verifier Nouveau conteneur integre, voisins conserves, solve global a zero et details de recertification."
-Write-Output "6. Modifier temporairement l effort, revenir a Rapide et relancer Calculer. Verifier witness accepte, recherche poursuivie et cache non revendique."
-Write-Output "7. Cliquer DEV Capturer le cas. Verifier le bundle local, sans calcul, finalisation, CAD ni scene."
-Write-Output "8. Relever identite, lanes, budgets, temps et raison d arret ; ne pas ajouter le bundle au depot."
-Write-Output "9. Reply: P64-L05V Fusion OK $expectedVersion - commit $commit, or contextual KO with step, visible status and diagnostic."
-Write-Output "Prepared P64-L05V Fusion gate: $(-not $DryRun)"
+Write-Output "P64-L05V-R2 Fusion actions remaining:"
+Write-Output "1. Recharger l add-in $expectedVersion puis utiliser normalement la palette BGIG."
+Write-Output "2. Verifier que le bouton DEV a disparu et que Journal technique automatique actif est visible dans Diagnostic."
+Write-Output "3. Chaque action est desormais conservee sous Documents/BGIG/projects/dev-action-logs sans clic special."
+Write-Output "4. Aucun bundle ou journal personnel n est ajoute automatiquement au depot."
+Write-Output "Prepared P64-L05V-R2 automatic action log: $(-not $DryRun)"

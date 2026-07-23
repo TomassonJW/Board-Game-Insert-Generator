@@ -1,5 +1,7 @@
 # P64-L05B — Contrat SolverCaseBundle et capture DEV
 
+Mise à jour ADR-0080 (2026-07-23) : le bouton DEV décrit ci-dessous est retiré de la palette. Le producteur et le schéma restent disponibles pour les outils internes ; l'acquisition courante passe par le journal local automatique P64-L05V-R2.
+
 ## Statut
 
 Contrat implemente et valide automatiquement le 2026-07-22.

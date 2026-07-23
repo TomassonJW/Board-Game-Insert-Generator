@@ -7,21 +7,17 @@ Ce document est le contrat d'exécution du futur Goal P64-L06. Il complète
 
 Statut courant :
 
-- `ready-for-handoff` pour la préparation ;
-- `goal-launch-blocked-by-P64-L05V-R1-human-recapture` pour l'exécution ;
+- `goal-launch-authorized-by-ADR-0080` ;
+- journal local automatique retenu pour les futurs parcours réels ;
 - `fusion-validated: false` ;
 - `print-validated: false`.
 
-Le Goal ne doit pas commencer L06A tant que les deux recaptures R1 postérieures à
-l'installation du commit `e817432` ne sont pas disponibles. La préparation du
-runbook n'est ni une levée de gate, ni une autorisation d'installer une
-dépendance externe.
-
+La décision humaine ADR-0080 retire la paire R1 des conditions de lancement. Les cas réels déjà présents sont classés honnêtement et restent locaux ; leur absence ou leur imperfection ne bloque plus le corpus, les générateurs ni les oracles autonomes. Aucune dépendance externe n'est autorisée par cette levée de gate.
 ## 2. Résultat attendu du premier Goal
 
 Le premier Goal doit, dans l'ordre :
 
-1. vérifier et anonymiser la paire R1, puis la rejouer sans changer le solveur ;
+1. inventorier les cas réels disponibles, promouvoir seulement ceux qui sont valides et anonymisables, sans changer le solveur ;
 2. construire un corpus T0/T1 stratifié avec oracles explicites ;
 3. livrer un petit oracle exact interne sans dépendance et une interface
    d'adapter offline ;
@@ -37,33 +33,15 @@ jamais modifier le solveur uniquement pour produire un diff.
 
 Le futur agent commence par :
 
-1. lire `AGENTS.md`, le pilotage court, ce runbook, le programme L06, ADR-0068
-   et ADR-0079 ;
-2. vérifier `git status --short --branch`, `HEAD`, la branche, `origin/main` et
-   `HEAD...origin/main` ;
-3. travailler dans un nouveau worktree sur une branche `codex/` créée depuis
-   `origin/main` ;
-4. vérifier que le worktree source et tous les autres worktrees restent
-   intacts ;
-5. vérifier les deux derniers bundles R1 attendus dans le répertoire local
-   `Documents/BGIG/projects/solver-cases`.
+1. lire `AGENTS.md`, le pilotage court, ce runbook, le programme L06, ADR-0068, ADR-0079 et ADR-0080 ;
+2. vérifier `git status --short --branch`, `HEAD`, la branche, `origin/main` et `HEAD...origin/main` ;
+3. travailler dans un nouveau worktree sur une branche `codex/` créée depuis `origin/main` ;
+4. vérifier que le worktree source et tous les autres worktrees restent intacts ;
+5. inventorier en lecture seule le corpus versionné, les cas réels locaux disponibles et les journaux automatiques éventuels.
 
-La paire R1 est acceptable seulement si :
+Un cas réel n'entre dans le corpus que s'il passe son validateur, peut être anonymisé, ne contient aucun chemin personnel et porte des faits cohérents. Une paire R1 peut toujours être retenue si elle conserve le refus incrémental exact, le plan stale, le même projet puis l'échec global frais sans cache négatif.
 
-- chaque bundle passe `validate_solver_case_bundle` ;
-- les captures sont postérieures à l'installation R1 ;
-- le premier bundle conserve
-  `staged_calculation.global_void_reuse.status = global_solve_required`, sa
-  raison d'arrêt et ses compteurs exacts ;
-- son `minimal_layout` est `stale` ;
-- le second bundle porte le même projet normalisé et le même digest de projet ;
-- le second bundle observe le calcul global frais puis
-  `no_solution_within_budget`, sans cache négatif ;
-- aucun fichier personnel n'est écrit, renommé ou déplacé.
-
-Si une de ces conditions manque, le Goal s'arrête avec la différence exacte. Il
-ne fabrique pas de substitut synthétique et n'ouvre pas L06B.
-
+Une paire absente ou imparfaite est classée comme preuve complémentaire non promue. Elle ne bloque pas L06B à L06E et n'est jamais remplacée silencieusement par un faux cas réel. Le corpus versionné, les générateurs T0/T1 et les oracles internes sont les entrées minimales obligatoires.
 ## 4. Enveloppe globale
 
 | Ressource | Limite du premier Goal |
@@ -91,7 +69,7 @@ la reprise. Aucun chemin local ne doit apparaître dans un artefact versionné.
 
 | Phase | Plafond | Sortie obligatoire |
 | --- | ---: | --- |
-| Préflight et L06A | 1 h 30 | paire validée, cas anonymisé, replay et classification |
+| Préflight et L06A | 1 h 30 | inventaire réel classé, cas valide anonymisé si disponible, aucune promotion forcée |
 | L06B | 4 h | générateur, splits, oracles, corpus et tests |
 | L06C interne | 3 h | interface d'adapter et petit oracle exact interne |
 | Baseline + `ci` | 1 h | rapport fonctionnel stable |
@@ -147,7 +125,7 @@ digest :
 
 | Split | Cible initiale | Utilisation |
 | --- | ---: | --- |
-| `regression` | corpus historique + paire R1 | interdiction de perdre un acquis |
+| `regression` | corpus historique + cas réels validés disponibles | interdiction de perdre un acquis |
 | `discovery` | 60 à 80 cas | identifier les familles de lacunes |
 | `tuning` | 60 à 80 cas | choisir les paramètres internes d'une hypothèse |
 | `holdout` | 60 à 80 cas | accepter ou refuser le candidat final |
@@ -265,7 +243,7 @@ Le candidat final est accepté seulement si :
 - le préfixe Rapide/Normal/Approfondi et les budgets publics restent conformes ;
 - les résultats fonctionnels sont stables sur répétition ;
 - le `holdout` passe sans réglage postérieur ;
-- la paire R1 progresse ou la lacune ciblée est objectivement améliorée ;
+- le corpus ou la lacune ciblée progresse objectivement ;
 - les tests ciblés, la gate A/B L05D1 et la suite complète passent ;
 - Ruff ciblé, `py_compile`, frontière `adsk` et `git diff --check` passent.
 
@@ -276,7 +254,7 @@ bruité est refusé.
 
 Le Goal s'arrête sur :
 
-- paire R1 absente, invalide ou incohérente ;
+- corpus versionné absent, invalide ou incohérent ;
 - régression fonctionnelle ;
 - corpus ou checkpoint corrompu ;
 - dépendance externe nécessaire mais non autorisée ;
@@ -291,7 +269,7 @@ Il ne transforme jamais cet arrêt en réussite partielle silencieuse.
 
 ## 14. Livrables finaux
 
-- cas R1 anonymisé et rapport de classification ;
+- inventaire des cas réels et rapport de classification ;
 - générateur T0/T1 et manifest versionné ;
 - splits regression/discovery/tuning/holdout ;
 - petit oracle exact et protocole d'adapter ;
@@ -313,8 +291,8 @@ Dans la nouvelle tâche préparée pour P64-L06, Thomas peut lancer :
 /goal
 Exécute P64-L06 selon docs/P64_L06_AUTONOMOUS_GOAL_RUNBOOK.md, pendant 36 h
 maximum. Avance une mission atomique à la fois de L06A à L06E, avec tests,
-preuve, commit et intégration dans main avant la suivante. Ne commence pas si
-la paire R1 post-e817432 manque ou est incohérente. Sans nouveau GO, utilise
+preuve, commit et intégration dans main avant la suivante. Classe les cas réels
+disponibles sans en faire une condition de départ. Sans nouveau GO, utilise
 l'oracle exact interne et les composants déjà présents ; n'installe aucune
 dépendance externe. Sépare regression, discovery, tuning et holdout ; garde le
 holdout fermé jusqu'au choix d'une seule hypothèse. Recertifie chaque plan par
