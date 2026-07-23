@@ -1826,21 +1826,20 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
 - C-PROJECT-CONTRACT / C-FUSION-UI / C-GEOMETRY / C-CAD-IR : inchangées.
 - Statut : P64-L06A à P64-L06E done, automated-validated, negative-result-accepted ; fusion-validated: false, print-validated: false.
 
-## Mise à jour P64-L07 — tournoi externe prêt
+## Mise à jour P64-L07 — audit externe lancé
 
-- C-SOLVER : le prochain Goal ne se limite plus aux variantes internes ; il
-  audite au moins huit solutions et compare au moins trois moteurs externes
-  réellement distincts.
-- C-QUALITY : corpus V2, sources publiques, nouveau holdout, ressources
-  comparables et sélection scellée avant l'ouverture finale.
-- C-SAFETY : licences, versions, empreintes, fonctionnement Windows hors ligne,
-  isolation et fallback deviennent des gates d'intégration.
-- C-PROJECT-CONTRACT : toute sortie externe est convertie puis recertifiée ;
-  une contrainte perdue produit `unsupported`.
-- C-SOLVER : un gagnant principal et jusqu'à deux compléments sont autorisés
-  uniquement si leurs gains couvrent des familles distinctes et si le
-  portefeuille bat le meilleur moteur seul.
-- C-FUSION-UI / C-GEOMETRY / C-CAD-IR : inchangées.
-- Statut : designed, architecture-accepted, ready-for-explicit-go ; aucun
-  candidat externe encore adopté ; fusion-validated: false,
-  print-validated: false.
+- C-SOLVER : L07A audite dix solutions. PackingSolver, LAFF, OR-Tools CP-SAT,
+  SCIP et HiGHS restent en lice dans cinq familles distinctes.
+- C-QUALITY : l'inventaire versionné et six gardes ciblés verrouillent le
+  minimum de concurrence, les sources, les licences et les pertes de modèle.
+- C-SAFETY : PackingSolver exclut CLP et Knitro ; CBC reste sous gate copyleft ;
+  tout artefact exige un SHA-256 avant exécution.
+- C-PROJECT-CONTRACT : une contrainte perdue produit `unsupported` et toute
+  sortie positive externe devra être recertifiée par BGIG.
+- C-GEOMETRY : aucun moteur n'apporte de formes 3D arbitraires ; T2 à T4
+  restent hors scope.
+- C-QUALITY : L07B doit encore créer le corpus V2, les sources publiques et le
+  nouveau holdout avant le tournoi.
+- C-FUSION-UI / C-CAD-IR : inchangées.
+- Statut : P64-L07A done, automated-validated ; P64-L07B next ; aucun candidat
+  externe adopté ; fusion-validated: false, print-validated: false.

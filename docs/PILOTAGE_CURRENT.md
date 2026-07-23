@@ -70,9 +70,11 @@ preuves archivées.
   ouvre P64-L07 : audit d'au moins huit solutions existantes, benchmark d'au
   moins trois concurrents externes distincts, nouveau holdout et intégration
   mesurée d'un à trois gagnants complémentaires.
-- P64-L07 est `ready-for-explicit-go`. La prochaine action unique est le
-  `/goal` de Thomas dans la tâche de reprise ; aucune campagne L07 n'est encore
-  lancée.
+- P64-L07A est terminé et automated-validated : dix candidats ont été audités ;
+  PackingSolver, LAFF, OR-Tools CP-SAT, SCIP et HiGHS restent en lice dans cinq
+  familles distinctes. Aucun moteur n'est encore adopté.
+- Le Goal P64-L07 est actif. La prochaine mission atomique est L07B : corpus
+  BGIG V2, deux sources publiques indépendantes et nouveau holdout scellé.
 
 ## Vue de séquence
 
@@ -122,7 +124,8 @@ preuves archivées.
 | Terminé — automatisé | P64-L06B | 192 cas T0/T1, cinq familles, oracles vérifiés et holdout fermé. |
 | Terminé — automatisé | P64-L06C | Deux comparateurs sans dépendance, recertification fraîche et petit oracle exact 6/6 dans sa portée. |
 | Terminé — résultat négatif | P64-L06D/E | 904 exécutions internes ; aucune amélioration intégrée ; holdout L06 consommé. |
-| Prêt — attente `/goal` | P64-L07A à L07E | Recherche externe, corpus V2, au moins trois concurrents, tournoi puis intégration conditionnelle de 1 à 3 gagnants. |
+| Terminé — automatisé | P64-L07A | Dix candidats audités ; cinq moteurs et cinq familles passent la première gate, sans adoption. |
+| En cours — autonome | P64-L07B à L07E | Corpus V2, adapters réels, tournoi puis intégration conditionnelle de 1 à 3 gagnants. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -179,6 +182,8 @@ preuves archivées.
   recherche de l'état de l'art, corpus V2, mesures équitables et missions L07.
 - P64_L07_AUTONOMOUS_GOAL_RUNBOOK.md : enveloppe 36 h, acquisition isolée,
   tournoi progressif, holdout neuf et prompt `/goal` canonique.
+- P64_L07A_EXTERNAL_SOLVER_AUDIT_EVIDENCE.md : dix candidats, shortlist de
+  cinq familles, licences, limites de modèle et absence de formes 3D arbitraires.
 - FUTURE_PRODUCT_HORIZONS.md : registre différé des formes, mécanismes,
   visualisations et du futur compositeur manuel 3D.
 - ADR-0074 : supersession partielle d'ADR-0071 après le KO Fusion 0.1.56.

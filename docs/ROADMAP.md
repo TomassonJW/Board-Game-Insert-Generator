@@ -1315,6 +1315,10 @@ et licences verrouillées. Chaque mission est testée, documentée, intégrée d
 `main`, poussée et vérifiée avant la suivante. Le `/goal` de la tâche de reprise
 vaut GO complet, sans seconde autorisation dans ce périmètre.
 
-Statut : ready-for-explicit-go. Aucun benchmark L07 ni aucune intégration
-externe ne sont encore réalisés. fusion-validated: false.
+Avancement : L07A est done et automated-validated. Dix candidats ont été
+audités ; PackingSolver, LAFF, OR-Tools CP-SAT, SCIP et HiGHS passent la
+première gate dans cinq familles. Aucun moteur n'est encore intégré.
+
+Statut : Goal actif ; L07B est la prochaine mission atomique. Aucun benchmark
+comparatif L07 n'est encore exécuté. fusion-validated: false.
 print-validated: false.

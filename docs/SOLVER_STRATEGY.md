@@ -290,3 +290,10 @@ au maximum peuvent être ajoutés seulement pour des familles d'entrée
 identifiables avant le solve et si l'ensemble bat le meilleur moteur seul sans
 multiplier artificiellement le budget. Les lanes internes restent le fallback
 tant que la nouvelle chaîne n'est pas certifiée et distribuable hors ligne.
+
+L07A retient cinq candidats pour la suite : PackingSolver, LAFF, OR-Tools
+CP-SAT, SCIP et HiGHS. Ce choix couvre recherche géométrique spécialisée,
+heuristique par niveaux, CP/SAT, CIP et MIP. Il ne préjuge pas du gagnant.
+PackingSolver ne couvre pas les réservations en mode `box` ; les moteurs
+génériques doivent prouver une traduction entière sans perte. Aucun candidat
+ne fournit de formes 3D arbitraires : T2 à T4 restent hors programme.

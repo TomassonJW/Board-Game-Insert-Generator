@@ -102,7 +102,7 @@ def _write_json_atomic(path: Path, value: object) -> None:
     rendered = json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(path.suffix + ".tmp")
-    temporary.write_text(rendered, encoding="utf-8")
+    temporary.write_bytes(rendered.encode("utf-8"))
     temporary.replace(path)
 
 

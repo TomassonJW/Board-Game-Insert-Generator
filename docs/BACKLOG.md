@@ -2950,7 +2950,7 @@ implémentée et intégrée à la fois.
 - Dépendance runtime : L06A à L06E sont terminées ; le premier Goal est clôturé.
 - Interdits : aucun solveur ou budget modifié, aucune dépendance externe
   installée, aucun T2-T4, aucune promotion d'un projet personnel.
-- Suite : P64-L07A est `ready-for-explicit-go` ; le `/goal` dans la tâche de reprise est l'unique lancement humain.
+- Suite : le `/goal` a lancé P64-L07 ; L07A est terminé et L07B est la prochaine mission atomique.
 
 ### P64-L07P — préparation du vrai benchmark externe
 
@@ -2964,20 +2964,22 @@ implémentée et intégrée à la fois.
 
 ### P64-L07A — recherche et shortlist externe
 
-- Statut : ready-for-explicit-go.
-- Dépendance : P64-L07P terminé et `/goal` de Thomas.
-- Objectif : auditer au moins huit solutions depuis leurs sources officielles.
-- Couverture : solveur spécialisé 3D, contraintes/SAT, nombres entiers et
-  recherche exacte ou hybride.
-- Acceptation : au moins trois candidats externes réellement distincts passent
-  licence, plateforme, hors ligne, automatisation, délai et mémoire.
-- Refus honnête : moins de trois candidats conformes laisse le Goal incomplet.
-- Sortie : inventaire versionné, shortlist et preuves, puis intégration Git
-  complète avant L07B.
+- Statut : done, automated-validated.
+- Livré : inventaire versionné de dix candidats et preuve documentaire.
+- Shortlist : PackingSolver, LAFF, OR-Tools CP-SAT, SCIP et HiGHS dans cinq
+  familles distinctes.
+- Contrôles : sources officielles, publications primaires, licences, Windows
+  hors ligne, automatisation, délais, mémoire et pertes de modèle.
+- Gate : aucun artefact exécuté avant verrou SHA-256 ; PackingSolver sans CLP
+  ni Knitro ; CBC reste `benchmark-only`.
+- Limite : aucune forme 3D arbitraire, aucun T2-T4, aucun moteur adopté.
+- Robustesse : le constructeur du manifest écrit explicitement en LF ;
+  reconstruction Windows 9/9 et suite complète 721/721.
+- Preuve : `docs/P64_L07A_EXTERNAL_SOLVER_AUDIT_EVIDENCE.md`.
 
 ### P64-L07B — corpus public et BGIG V2
 
-- Statut : blocked-by-P64-L07A.
+- Statut : ready, in-progress-by-goal.
 - Objectif : manifest V2, familles BGIG, au moins deux sources publiques
   indépendantes et petits cas exacts.
 - Splits : regression, discovery, tuning et nouveau holdout fermé.

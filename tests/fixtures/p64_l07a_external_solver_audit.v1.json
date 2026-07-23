@@ -1,0 +1,606 @@
+{
+  "schema_version": "bgig.external_solver_audit.v1",
+  "audit_date": "2026-07-23",
+  "status": "done",
+  "source_policy": {
+    "official_repository_required": true,
+    "official_documentation_required": true,
+    "primary_publication_required_for_method_claims": true,
+    "artifact_sha256_required_before_execution": true,
+    "global_install_forbidden": true,
+    "online_runtime_forbidden": true,
+    "telemetry_required_forbidden": true
+  },
+  "decision": {
+    "minimum_audited_candidates": 8,
+    "minimum_external_competitors": 3,
+    "minimum_distinct_families": 3,
+    "audited_candidate_count": 10,
+    "shortlisted_ids": [
+      "packingsolver",
+      "laff",
+      "ortools_cp_sat",
+      "scip",
+      "highs"
+    ],
+    "shortlisted_families": [
+      "specialized_anytime_tree_search",
+      "specialized_level_heuristic_and_enumeration",
+      "constraint_programming_sat_hybrid",
+      "constraint_integer_programming",
+      "mixed_integer_programming"
+    ],
+    "minimum_gate_passed": true,
+    "next_gate": "lock_and_verify_artifact_sha256_before_any_l07c_execution"
+  },
+  "candidates": [
+    {
+      "id": "packingsolver",
+      "name": "PackingSolver",
+      "decision": "shortlisted",
+      "decision_reason": "Seul candidat audite specialise en packing geometrique avec un mode box 3D, six rotations, sortie de certificat et limite de temps. Le build produit doit desactiver CLP et Knitro.",
+      "snapshot": {
+        "benchmark_target": "commit-4041884e6fdf6e77de352559b995889152a7dfaf",
+        "audited_head_commit": "4041884e6fdf6e77de352559b995889152a7dfaf",
+        "activity_date": "2026-07-23"
+      },
+      "family": "specialized_anytime_tree_search",
+      "guarantees": "Anytime heuristic result in box mode; no BGIG infeasibility proof is accepted without an independently complete search and fresh BGIG recertification.",
+      "licenses": {
+        "code": "MIT",
+        "binary": "MIT plus bundled dependency notices",
+        "data": "No external benchmark data is integrated by L07A",
+        "dependencies": "Boost-1.84.0 BSL-1.0, HiGHS-1.13.1 MIT, and pinned fontanf libraries MIT. GoogleTest is test-only. CLP EPL-2.0 and proprietary Knitro are excluded from the candidate build.",
+        "redistribution": "permissive_only_build_required"
+      },
+      "runtime": {
+        "language": "C++14",
+        "windows": "CMake and MSVC route available",
+        "offline": true,
+        "automated": "CLI with CSV input and JSON/certificate output",
+        "deadline_control": "native_time_limit",
+        "memory_control": "outer_process_job_required",
+        "global_install": false,
+        "telemetry": "none_documented"
+      },
+      "mapping": {
+        "rotations": "native_six_axis_aligned_rotations",
+        "reservations": "unsupported_in_box_mode",
+        "levels": "implicit_z_placement_only",
+        "p45_variants": "only_when_reduced_losslessly_to_rectangular_items",
+        "incremental": "cold_restart_only",
+        "complex_shapes_3d": "unsupported; irregular mode is two-dimensional only",
+        "model_loss": "Reservation and BGIG semantic-level cases must return unsupported; only the faithful rectangular free-bin subset can be ranked."
+      },
+      "cost": {
+        "adaptation": "medium",
+        "distribution": "measure_after_isolated_release_build",
+        "maintenance": "active"
+      },
+      "sources": [
+        {
+          "kind": "official_repository",
+          "url": "https://github.com/fontanf/packingsolver"
+        },
+        {
+          "kind": "official_documentation",
+          "url": "https://fontanf.github.io/packingsolver/"
+        },
+        {
+          "kind": "primary_publication",
+          "url": "https://arxiv.org/abs/2004.02603"
+        }
+      ]
+    },
+    {
+      "id": "laff",
+      "name": "3d-bin-container-packing / LAFF",
+      "decision": "shortlisted",
+      "decision_reason": "Solveur rectangulaire 3D specialise, actif, leger, avec LAFF, recherche brute-force pour petits cas, obstacles, rotations et deadlines.",
+      "snapshot": {
+        "benchmark_target": "4.2.1",
+        "audited_head_commit": "31244b0510616c8dfe5a8c0f9878a642227951d5",
+        "activity_date": "2026-07-18"
+      },
+      "family": "specialized_level_heuristic_and_enumeration",
+      "guarantees": "LAFF is heuristic. Brute-force enumerates orders and rotations for small supported instances, but BGIG exact status still requires completion plus fresh recertification.",
+      "licenses": {
+        "code": "Apache-2.0",
+        "binary": "Apache-2.0 Maven artifacts",
+        "data": "No dataset bundled into the BGIG adapter",
+        "dependencies": "Core 4.2.1 depends on first-party api and points modules under Apache-2.0; visualizer and test dependencies are excluded.",
+        "redistribution": "permissive_with_notice"
+      },
+      "runtime": {
+        "language": "Java",
+        "windows": "JDK 17 available; Maven artifact usable from an isolated classpath",
+        "offline": true,
+        "automated": "Java API wrapped by a local JSON-lines process",
+        "deadline_control": "native_deadline",
+        "memory_control": "JVM_heap_limit_and_outer_process_job",
+        "global_install": false,
+        "telemetry": "none_documented"
+      },
+      "mapping": {
+        "rotations": "native_axis_aligned_3d",
+        "reservations": "native_rectangular_obstacles",
+        "levels": "native_level_heuristic_but_not_BGIG_semantic_levels",
+        "p45_variants": "custom_controls_possible_but_each_constraint_requires_proof",
+        "incremental": "cold_restart_only",
+        "complex_shapes_3d": "unsupported",
+        "model_loss": "Only axis-aligned boxes and rectangular obstacles are native; unsupported BGIG policies must fail closed."
+      },
+      "cost": {
+        "adaptation": "low_to_medium",
+        "distribution": "measure_core_api_points_jars_and_jre_assumption",
+        "maintenance": "active"
+      },
+      "sources": [
+        {
+          "kind": "official_repository",
+          "url": "https://github.com/skjolber/3d-bin-container-packing"
+        },
+        {
+          "kind": "official_package",
+          "url": "https://central.sonatype.com/artifact/com.github.skjolber.3d-bin-container-packing/core/4.2.1"
+        },
+        {
+          "kind": "primary_publication",
+          "url": "https://www.drupal.org/files/An%20Efficient%20Algorithm%20for%203D%20Rectangular%20Box%20Packing.pdf"
+        }
+      ]
+    },
+    {
+      "id": "ortools_cp_sat",
+      "name": "OR-Tools CP-SAT",
+      "decision": "shortlisted",
+      "decision_reason": "Moteur CP/SAT mature, Windows, pilotable et capable de statuts exacts sur un modele entier fidele. Il apporte une famille differente des heuristiques 3D.",
+      "snapshot": {
+        "benchmark_target": "9.15.6755",
+        "audited_head_commit": "98c165af62df62b3056c2ee0fca66b24e79097cb",
+        "activity_date": "2026-06-09"
+      },
+      "family": "constraint_programming_sat_hybrid",
+      "guarantees": "FEASIBLE is a witness only; OPTIMAL or INFEASIBLE can be used as exact solver status only for a lossless integer BGIG formulation that completed.",
+      "licenses": {
+        "code": "Apache-2.0",
+        "binary": "Apache-2.0 Python wheel with notices",
+        "data": "No dataset bundled into the adapter",
+        "dependencies": "Python distribution dependencies and bundled native notices must be locked from the 9.15.6755 wheel before execution; no optional commercial solver is used.",
+        "redistribution": "permissive_with_notice"
+      },
+      "runtime": {
+        "language": "C++ core with Python API",
+        "windows": "official CPython 3.10 win_amd64 wheel",
+        "offline": true,
+        "automated": "Python API in isolated virtual environment",
+        "deadline_control": "native_time_limit",
+        "memory_control": "native_parameter_plus_outer_process_job",
+        "global_install": false,
+        "telemetry": "none_documented"
+      },
+      "mapping": {
+        "rotations": "modelled_exactly_with_integer_choice_variables",
+        "reservations": "modelled_with_disjunctions",
+        "levels": "modelled_with_integer_coordinates_and_support_rules",
+        "p45_variants": "modelled_only_when every active rule has an exact integer encoding",
+        "incremental": "hints_possible_but_scored_as_cold_unless_contractually_equivalent",
+        "complex_shapes_3d": "no native geometry; finite voxel or decomposition models are theoretical only and outside L07",
+        "model_loss": "Any non-lossless millimetre scaling or omitted BGIG rule makes the case unsupported."
+      },
+      "cost": {
+        "adaptation": "high",
+        "distribution": "official wheel about 24 MiB before transitive packages",
+        "maintenance": "very_active"
+      },
+      "sources": [
+        {
+          "kind": "official_repository",
+          "url": "https://github.com/google/or-tools"
+        },
+        {
+          "kind": "official_documentation",
+          "url": "https://developers.google.com/optimization/cp/cp_solver"
+        },
+        {
+          "kind": "primary_publication",
+          "url": "https://doi.org/10.4230/LIPIcs.CP.2023.3"
+        }
+      ]
+    },
+    {
+      "id": "scip",
+      "name": "SCIP with PySCIPOpt",
+      "decision": "shortlisted",
+      "decision_reason": "Moteur CIP/MIP mature et permissif, avec wheel Windows autonome. Il permet une formulation distincte et des limites natives de temps et memoire.",
+      "snapshot": {
+        "benchmark_target": "SCIP-10.0.3_PySCIPOpt-6.2.1",
+        "audited_head_commit": "796fbc52a71936a0b6199d330b27cf10fad69c8c",
+        "activity_date": "2026-07-22"
+      },
+      "family": "constraint_integer_programming",
+      "guarantees": "Optimal or infeasible status is meaningful only after a faithful finite model completes; every positive placement is independently recertified by BGIG.",
+      "licenses": {
+        "code": "SCIP Apache-2.0 and PySCIPOpt MIT",
+        "binary": "PySCIPOpt wheel bundles SCIP under their notices",
+        "data": "No dataset bundled into the adapter",
+        "dependencies": "Official wheel is the only candidate artifact; optional proprietary LP solvers and older SCIP licenses are excluded.",
+        "redistribution": "permissive_with_notice"
+      },
+      "runtime": {
+        "language": "C/C++ core with Python API",
+        "windows": "official CPython 3.10 win_amd64 wheel",
+        "offline": true,
+        "automated": "PySCIPOpt API in isolated virtual environment",
+        "deadline_control": "native_time_limit",
+        "memory_control": "native_memory_limit_and_outer_process_job",
+        "global_install": false,
+        "telemetry": "none_documented"
+      },
+      "mapping": {
+        "rotations": "binary_orientation_variables",
+        "reservations": "linear_or_constraint_disjunctions",
+        "levels": "integer_coordinates_and_support_constraints",
+        "p45_variants": "possible through a faithful CIP model only",
+        "incremental": "warm_start_possible_but_not_assumed",
+        "complex_shapes_3d": "no native geometry; decomposition or non-linear models are theoretical and outside L07",
+        "model_loss": "Numerical tolerances and every omitted BGIG rule are guarded by fresh recertification; lossy cases are unsupported."
+      },
+      "cost": {
+        "adaptation": "high",
+        "distribution": "Windows wheel roughly 50 MiB",
+        "maintenance": "very_active"
+      },
+      "sources": [
+        {
+          "kind": "official_repository",
+          "url": "https://github.com/scipopt/scip"
+        },
+        {
+          "kind": "official_package",
+          "url": "https://pypi.org/project/PySCIPOpt/6.2.1/"
+        },
+        {
+          "kind": "primary_publication",
+          "url": "https://optimization-online.org/2024/02/the-scip-optimization-suite-9-0/"
+        }
+      ]
+    },
+    {
+      "id": "highs",
+      "name": "HiGHS / highspy",
+      "decision": "shortlisted",
+      "decision_reason": "Moteur MIP permissif, compact, Windows et sans service. Il constitue le controle entier lineaire distinct du CIP et du CP/SAT.",
+      "snapshot": {
+        "benchmark_target": "1.15.1",
+        "audited_head_commit": "04024d701f79feb8e2f18bc3df0dffc04ef05088",
+        "activity_date": "2026-07-02"
+      },
+      "family": "mixed_integer_programming",
+      "guarantees": "MIP status is accepted only for a faithful formulation and remains subject to numeric tolerances; placements are always recertified by BGIG.",
+      "licenses": {
+        "code": "MIT",
+        "binary": "MIT official highspy wheel",
+        "data": "No dataset bundled into the adapter",
+        "dependencies": "Core documents no third-party utilities; Python wheel and NumPy dependency notices must be locked before execution. Apache optional binary variants are excluded.",
+        "redistribution": "permissive_with_notice"
+      },
+      "runtime": {
+        "language": "C++11 core with Python API",
+        "windows": "official win_amd64 wheel",
+        "offline": true,
+        "automated": "highspy API in isolated virtual environment",
+        "deadline_control": "native_time_limit",
+        "memory_control": "outer_process_job_required",
+        "global_install": false,
+        "telemetry": "none_documented"
+      },
+      "mapping": {
+        "rotations": "binary_orientation_variables",
+        "reservations": "big_M_or_indicator_style_linearization",
+        "levels": "integer_coordinates_and_linear_support_approximation_only_if_exact",
+        "p45_variants": "possible only for rules with a faithful MIP linearization",
+        "incremental": "warm_start_possible_but_not_assumed",
+        "complex_shapes_3d": "no native geometry; finite decompositions are theoretical and outside L07",
+        "model_loss": "Unsupported when BGIG rules cannot be expressed without relaxation; numerical positives are recertified."
+      },
+      "cost": {
+        "adaptation": "high",
+        "distribution": "small official wheel; exact installed size measured in L07C",
+        "maintenance": "very_active"
+      },
+      "sources": [
+        {
+          "kind": "official_repository",
+          "url": "https://github.com/ERGO-Code/HiGHS"
+        },
+        {
+          "kind": "official_documentation",
+          "url": "https://highs.dev/"
+        },
+        {
+          "kind": "primary_publication",
+          "url": "https://doi.org/10.1007/s12532-017-0130-5"
+        }
+      ]
+    },
+    {
+      "id": "choco",
+      "name": "Choco Solver",
+      "decision": "benchmark-only",
+      "decision_reason": "Candidat CP credible et actif, mais sa formulation recouvre largement CP-SAT tout en ajoutant un second adaptateur Java. Conserve comme secours si CP-SAT echoue au packaging.",
+      "snapshot": {
+        "benchmark_target": "6.0.1",
+        "audited_head_commit": "f210dc0aac61ceb0f8dc38d31d49cdbe785276c8",
+        "activity_date": "2026-05-21"
+      },
+      "family": "finite_domain_constraint_programming",
+      "guarantees": "Complete finite-domain search is possible for a faithful bounded model; no native 3D packing guarantee.",
+      "licenses": {
+        "code": "BSD-3-Clause",
+        "binary": "BSD-3-Clause Maven artifact",
+        "data": "No dataset selected",
+        "dependencies": "Maven dependency graph must be locked before promotion; no product artifact is selected in L07A.",
+        "redistribution": "permissive_with_notice"
+      },
+      "runtime": {
+        "language": "Java 17",
+        "windows": "JDK 17 and Maven route available",
+        "offline": true,
+        "automated": "Java API",
+        "deadline_control": "native_stop_criteria",
+        "memory_control": "JVM_heap_limit_and_outer_process_job",
+        "global_install": false,
+        "telemetry": "none_documented"
+      },
+      "mapping": {
+        "rotations": "custom_finite_domain_model",
+        "reservations": "custom_disjunction_model",
+        "levels": "custom_model",
+        "p45_variants": "custom_model",
+        "incremental": "not_assumed",
+        "complex_shapes_3d": "no native geometry",
+        "model_loss": "Same lossless-model requirement as CP-SAT with higher adapter cost."
+      },
+      "cost": {
+        "adaptation": "high",
+        "distribution": "measure_if_promoted",
+        "maintenance": "active"
+      },
+      "sources": [
+        {
+          "kind": "official_repository",
+          "url": "https://github.com/chocoteam/choco-solver"
+        },
+        {
+          "kind": "official_documentation",
+          "url": "https://choco-solver.org/"
+        },
+        {
+          "kind": "primary_publication",
+          "url": "https://doi.org/10.21105/joss.04708"
+        }
+      ]
+    },
+    {
+      "id": "chuffed",
+      "name": "Chuffed",
+      "decision": "benchmark-only",
+      "decision_reason": "Solveur LCG credible et compilable sous Windows, mais son modele FlatZinc generique recouvre largement CP-SAT et exige un second adaptateur de contraintes couteux.",
+      "snapshot": {
+        "benchmark_target": "develop-f698d5623bb0c2bcd497388ba966f0436d62caf4",
+        "audited_head_commit": "f698d5623bb0c2bcd497388ba966f0436d62caf4",
+        "activity_date": "2026-07-12"
+      },
+      "family": "lazy_clause_generation",
+      "guarantees": "Complete finite-domain solving is possible for a faithful FlatZinc model; no native 3D geometry.",
+      "licenses": {
+        "code": "MIT",
+        "binary": "MIT solver; MiniZinc bundle has a separate multi-component notice set",
+        "data": "No dataset selected",
+        "dependencies": "Standalone source build and third-party notices must be audited; the full MiniZinc installer is not required and remains forbidden.",
+        "redistribution": "permissive_solver_but_bundle_audit_required"
+      },
+      "runtime": {
+        "language": "C++ through FlatZinc/MiniZinc",
+        "windows": "standalone CMake and MSVC route documented by the official repository",
+        "offline": true,
+        "automated": "FlatZinc CLI",
+        "deadline_control": "CLI_time_limit",
+        "memory_control": "outer_process_job_required",
+        "global_install": false,
+        "telemetry": "none_documented"
+      },
+      "mapping": {
+        "rotations": "custom_finite_domain_model",
+        "reservations": "custom_disjunction_model",
+        "levels": "custom_model",
+        "p45_variants": "custom_model",
+        "incremental": "not_assumed",
+        "complex_shapes_3d": "no native geometry",
+        "model_loss": "FlatZinc mapping must be proven lossless; packaging overhead dominates the marginal method value."
+      },
+      "cost": {
+        "adaptation": "very_high",
+        "distribution": "measure_standalone_build_without_full_minizinc_bundle",
+        "maintenance": "active"
+      },
+      "sources": [
+        {
+          "kind": "official_repository",
+          "url": "https://github.com/chuffed/chuffed"
+        },
+        {
+          "kind": "official_distribution",
+          "url": "https://www.minizinc.org/software.html"
+        },
+        {
+          "kind": "primary_publication",
+          "url": "https://hdl.handle.net/11343/37821"
+        }
+      ]
+    },
+    {
+      "id": "cbc",
+      "name": "COIN-OR CBC",
+      "decision": "benchmark-only",
+      "decision_reason": "MIP mature et Windows, mais EPL-2.0 declenche la gate copyleft d'ADR-0081 et la methode recouvre HiGHS. Aucune integration produit sans decision humaine separee.",
+      "snapshot": {
+        "benchmark_target": "2.10.13",
+        "audited_head_commit": "c69261633774bbb47d367d550dda5419b0867e8c",
+        "activity_date": "2026-06-25"
+      },
+      "family": "mixed_integer_branch_and_cut",
+      "guarantees": "MIP optimal/infeasible statuses on a faithful linear model, subject to numerical tolerances and BGIG recertification.",
+      "licenses": {
+        "code": "EPL-2.0",
+        "binary": "EPL-2.0 plus COIN-OR dependency notices",
+        "data": "No dataset selected",
+        "dependencies": "COIN-OR stack varies by build and requires a complete artifact notice audit.",
+        "redistribution": "copyleft_human_gate_required"
+      },
+      "runtime": {
+        "language": "C++",
+        "windows": "official Windows release archives exist",
+        "offline": true,
+        "automated": "CLI or library",
+        "deadline_control": "native_time_limit",
+        "memory_control": "outer_process_job_required",
+        "global_install": false,
+        "telemetry": "none_documented"
+      },
+      "mapping": {
+        "rotations": "custom_MIP_model",
+        "reservations": "custom_MIP_model",
+        "levels": "custom_MIP_model",
+        "p45_variants": "custom_MIP_model",
+        "incremental": "not_assumed",
+        "complex_shapes_3d": "no native geometry",
+        "model_loss": "Same formulation limits as HiGHS plus an unresolved product-license gate."
+      },
+      "cost": {
+        "adaptation": "high",
+        "distribution": "measure_if_human_gate_allows_promotion",
+        "maintenance": "active"
+      },
+      "sources": [
+        {
+          "kind": "official_repository",
+          "url": "https://github.com/coin-or/Cbc"
+        },
+        {
+          "kind": "official_documentation",
+          "url": "https://coin-or.github.io/Cbc/"
+        }
+      ]
+    },
+    {
+      "id": "timefold",
+      "name": "Timefold Solver Community Edition",
+      "decision": "rejected",
+      "decision_reason": "Moteur metaheuristique general actif, mais sans modele 3D natif, sans preuve d'infaisabilite et avec un cout d'integration superieur a sa valeur marginale pour L07.",
+      "snapshot": {
+        "benchmark_target": "2.3.0",
+        "audited_head_commit": "4b666e1505b8e7764e619f9d5db36ee30e9f7538",
+        "activity_date": "2026-07-20"
+      },
+      "family": "construction_heuristics_and_metaheuristics",
+      "guarantees": "Best-so-far heuristic only; no general infeasibility or optimality proof.",
+      "licenses": {
+        "code": "Apache-2.0 Community Edition",
+        "binary": "Apache-2.0 Maven artifacts",
+        "data": "No dataset selected",
+        "dependencies": "Large Java dependency graph; enterprise-only features are excluded.",
+        "redistribution": "permissive_community_edition_only"
+      },
+      "runtime": {
+        "language": "Java 21",
+        "windows": "JDK 21 route available",
+        "offline": true,
+        "automated": "Java API",
+        "deadline_control": "native_termination",
+        "memory_control": "JVM_heap_limit_and_outer_process_job",
+        "global_install": false,
+        "telemetry": "none_required_for_solver_core"
+      },
+      "mapping": {
+        "rotations": "custom_moves",
+        "reservations": "custom_score_constraints",
+        "levels": "custom_score_constraints",
+        "p45_variants": "custom_domain_model",
+        "incremental": "possible_but_not_BGIG_ready",
+        "complex_shapes_3d": "no native geometry",
+        "model_loss": "A full custom domain and move system would be required before comparison."
+      },
+      "cost": {
+        "adaptation": "very_high",
+        "distribution": "large_dependency_graph",
+        "maintenance": "very_active"
+      },
+      "sources": [
+        {
+          "kind": "official_repository",
+          "url": "https://github.com/TimefoldAI/timefold-solver"
+        },
+        {
+          "kind": "official_documentation",
+          "url": "https://docs.timefold.ai/timefold-solver/latest/optimization-algorithms/overview"
+        }
+      ]
+    },
+    {
+      "id": "py3dbp",
+      "name": "py3dbp",
+      "decision": "rejected",
+      "decision_reason": "Petit controle heuristique rectangulaire utile pour lecture, mais release 2020, maintenance faible et absence de deadline ou limite memoire contractuelle. Il ne compte pas comme moteur mature.",
+      "snapshot": {
+        "benchmark_target": "1.1.2",
+        "audited_head_commit": "31b9a40c78490da082bebde39a36e5327fb5191e",
+        "activity_date": "2023-04-10"
+      },
+      "family": "simple_3d_box_heuristic",
+      "guarantees": "Heuristic placement only; no optimality or infeasibility proof.",
+      "licenses": {
+        "code": "MIT",
+        "binary": "MIT source distribution",
+        "data": "No dataset selected",
+        "dependencies": "No material runtime dependency surface documented",
+        "redistribution": "permissive"
+      },
+      "runtime": {
+        "language": "Python",
+        "windows": "portable source package",
+        "offline": true,
+        "automated": "Python API",
+        "deadline_control": "missing",
+        "memory_control": "outer_process_only",
+        "global_install": false,
+        "telemetry": "none_documented"
+      },
+      "mapping": {
+        "rotations": "axis_aligned_box_rotations",
+        "reservations": "unsupported",
+        "levels": "implicit_z_only",
+        "p45_variants": "unsupported",
+        "incremental": "cold_only",
+        "complex_shapes_3d": "unsupported",
+        "model_loss": "Only a narrow rectangular-box subset is representable."
+      },
+      "cost": {
+        "adaptation": "low",
+        "distribution": "tiny",
+        "maintenance": "stale"
+      },
+      "sources": [
+        {
+          "kind": "official_repository",
+          "url": "https://github.com/enzoruiz/3dbinpacking"
+        },
+        {
+          "kind": "official_package",
+          "url": "https://pypi.org/project/py3dbp/1.1.2/"
+        }
+      ]
+    }
+  ]
+}

@@ -16,7 +16,8 @@ recertifié. Le manifest Fusion passe à 0.1.59 pour le journal automatique. fus
 print-validated: false pour L05A, L05B et L05C. Le solveur reste inchangé.
 P64-L05B, P64-L05C, P64-L05D1/D2 et P64-L06A/B/C/D/E sont automated-validated. Le premier Goal L06 est terminé par la décision négative `no_algorithm_change_v1`.
 Cette décision ne compare aucun solveur externe mature. ADR-0081 et P64-L07
-préparent désormais la vraie campagne externe ; elle n'est pas encore lancée.
+encadrent désormais la vraie campagne externe. L07A est terminée : dix
+candidats ont été audités et cinq familles passent la première gate.
 
 ## Dernier état réel
 
@@ -59,36 +60,37 @@ Preuve L06C : P64_L06C_OFFLINE_ADAPTER_AND_EXACT_ORACLE_EVIDENCE.md.
 Preuve L06D : P64_L06D_PROGRESSIVE_CAMPAIGN_EVIDENCE.md.
 Preuve L06E : P64_L06E_ALGORITHM_DECISION_EVIDENCE.md.
 Rapport final : P64_L06_GOAL_FINAL_REPORT.md.
+Preuve L07A : P64_L07A_EXTERNAL_SOLVER_AUDIT_EVIDENCE.md.
 
 ## Prochaine action recommandée
 
-### Lancer P64-L07 dans la tâche de reprise
+### Exécuter P64-L07B — corpus V2 et nouveau holdout
 
-Type : lancement humain unique.
+Type : mission autonome déjà autorisée par le Goal.
 
 La prochaine action exacte est :
 
-1. ouvrir la nouvelle tâche P64-L07 créée depuis `origin/main` vérifié ;
-2. envoyer `/goal` ;
-3. laisser cette tâche exécuter L07A à L07E sans second GO.
+1. conserver les régressions utiles sans recycler le holdout L06 ;
+2. ajouter au moins deux sources publiques 3D indépendantes avec licences,
+   empreintes et correspondance d'objectif explicites ;
+3. construire les familles BGIG V2 et les petits contrôles exacts ;
+4. séparer regression, discovery, tuning et nouveau holdout par familles,
+   projets et graines ;
+5. sceller le manifest, les recettes, les sources et le holdout avant tout
+   lancement d'un moteur externe.
 
-Le Goal devra auditer au moins huit solutions existantes et comparer au moins
-trois moteurs externes réellement distincts. Le solveur BGIG et son petit oracle
-interne restent des références mais ne comptent pas dans ces trois concurrents.
-
-Le tournoi utilisera un corpus V2, des sources publiques pertinentes et un
-nouveau holdout. Il pourra intégrer un gagnant principal et jusqu'à deux
-compléments seulement si chacun apporte un gain distinct et si l'ensemble bat
-le meilleur moteur seul sous des ressources comparables.
+La shortlist L07A contient PackingSolver, LAFF, OR-Tools CP-SAT, SCIP et HiGHS.
+Ce n'est ni un classement ni une adoption. Les artefacts devront être verrouillés
+par SHA-256 avant leur première exécution en L07C.
 
 P64-L06 reste une expérience interne terminée ; son holdout est consommé et
 n'est pas réutilisable pour choisir P64-L07.
 
-Modèle conseillé : `gpt-5.6-sol`, raisonnement `high`, car la mission combine
-recherche récente, licences, modélisation mathématique, benchmarks longs,
-packaging Windows et intégration Git autonome. Option plus économique :
-`gpt-5.6-terra`, raisonnement `high`, acceptable pour L07A/L07B mais plus risqué
-pour l'adaptation, l'analyse des résultats et l'intégration L07C à L07E.
+Modèle conseillé : `gpt-5.6-sol`, raisonnement `high`, car L07B doit empêcher
+les fuites entre splits, prouver la correspondance des objectifs publics et
+préparer un holdout réellement indépendant. Option plus économique :
+`gpt-5.6-terra`, raisonnement `high`, acceptable si la revue des licences,
+empreintes et séparations reste automatisée et stricte.
 
 ## Lots verrouillés
 

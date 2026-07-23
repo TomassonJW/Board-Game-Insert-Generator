@@ -13,9 +13,10 @@ automated-validated. Le retour humain L04V est globalement KO mais partiellement
 positif. Le manifest Fusion passe à 0.1.59 pour P64-L05V-R2. L05D1/D2 sont
 automated-validated.
 ADR-0080 remplace la gate humaine par un journal local automatique.
-P64-L06A à L06E sont terminées avec une décision négative interne. ADR-0081
-rend P64-L07 `ready-for-explicit-go` pour la vraie comparaison externe ; aucun
-benchmark L07 n'est encore lancé.
+P64-L06A à L06E sont terminées avec une décision négative interne. Le Goal
+P64-L07 est lancé. L07A est automated-validated : dix candidats externes ont
+été audités et cinq familles passent la première gate ; aucun moteur n'est
+encore adopté.
 P64-V2H03V et P44-V sont fusion-validated sur 0.1.55. P45-M001V est
 architecture-accepted. P64-L03V est un KO contextuel sur 0.1.56 et n'accorde
 aucune validation Fusion à la correction minimal/final.
@@ -3214,17 +3215,37 @@ Les sources officielles confirment des points de départ plausibles :
 - HiGHS fournit un solveur MIP sous MIT, testé sous Windows :
   <https://highs.dev/>.
 
-Ces noms ne sont pas des gagnants préchoisis. L07A doit élargir la recherche,
-vérifier les versions et toutes les licences, puis retenir au moins trois
-familles différentes. Toute sortie est recertifiée par BGIG. L07E intègre un
-gagnant principal et jusqu'à deux compléments seulement si leurs gains sont
-distincts et si le portefeuille bat le meilleur moteur seul sous ressources
-comparables.
+Ces noms n'étaient pas des gagnants préchoisis. L07A a élargi l'audit à
+Choco, Chuffed, CBC, Timefold et py3dbp. La shortlist factuelle retient
+PackingSolver, LAFF, OR-Tools CP-SAT, SCIP et HiGHS. Choco, Chuffed et CBC
+restent `benchmark-only` ; Timefold et py3dbp sont rejetés pour L07.
 
-Le `/goal` lancé dans la tâche de reprise vaut GO complet pour L07A à L07E sans
-seconde autorisation dans le périmètre ADR-0081. La campagne reste bornée à 36 h,
-8 Gio, T0/T1, Windows hors ligne et des installations isolées.
+Le Goal est actif pour L07A à L07E sans seconde autorisation dans le périmètre
+ADR-0081. La campagne reste bornée à 36 h, 8 Gio, T0/T1, Windows hors ligne et
+des installations isolées.
 
-Validation de cette préparation : garde documentaire 2/2, alignement
-Fusion-only 6/6 et suite complète 715/715 en 225,888 s. Les contrôles Git sont
-consignés à la clôture de la mission.
+### P64-L07A — audit externe terminé
+
+Statut : done, automated-validated. Aucun changement runtime.
+
+L'inventaire versionné documente licences du code, binaires, données et
+dépendances, maintenance, Windows, hors ligne, automatisation, délais, mémoire,
+coût d'adaptation et pertes de modèle. Cinq moteurs dans cinq familles passent
+le minimum de concurrence réelle.
+
+PackingSolver ne peut être construit pour le produit qu'avec CLP et Knitro
+désactivés. CBC reste sous gate copyleft. Tous les artefacts devront être
+verrouillés par SHA-256 avant leur première exécution.
+
+Aucun candidat ne prend en charge nativement des formes 3D arbitraires.
+PackingSolver irrégulier reste 2D ; T2 à T4 demeurent hors scope.
+
+Validation L07A : audit 5/5, garde de preuve 1/1, reconstruction portable
+9/9 et suite complète 721/721 en 217,756 s, OK. Le constructeur du manifest
+écrit désormais explicitement en LF et reste identique à la fixture depuis un
+worktree Windows neuf. Preuve :
+`docs/P64_L07A_EXTERNAL_SOLVER_AUDIT_EVIDENCE.md`.
+
+Suite : P64-L07B construit le corpus V2, ajoute au moins deux sources publiques
+indépendantes et scelle un nouveau holdout. fusion-validated: false,
+print-validated: false.
