@@ -79,8 +79,11 @@ preuves archivées.
 - P64-L07C est terminé et automated-validated : OR-Tools, HiGHS, SCIP et LAFF
   ont réellement exécuté 12 contrôles sur 12 avec recertification BGIG. SCIP et
   LAFF restent benchmark-only ; aucun moteur n'est encore adopté.
-- Le Goal P64-L07 est actif. La prochaine mission atomique est L07D : tournoi
-  progressif, sélection scellée, puis ouverture unique du holdout.
+- P64-L07D est terminé et automated-validated : quatre moteurs externes
+  sont comparés, HiGHS est scellé seul puis certifie 5/7 cas représentables du
+  holdout. Le holdout est consommé ; aucun gain produit n'est encore démontré.
+- Le Goal P64-L07 est actif. La prochaine mission atomique est L07E :
+  intégration conditionnelle de HiGHS ou décision négative honnête.
 
 ## Vue de séquence
 
@@ -133,7 +136,8 @@ preuves archivées.
 | Terminé — automatisé | P64-L07A | Dix candidats audités ; cinq moteurs et cinq familles passent la première gate, sans adoption. |
 | Terminé — automatisé | P64-L07B | Corpus V2 déterministe, deux sources publiques et nouveau holdout scellé, sans run candidat. |
 | Terminé — automatisé | P64-L07C | Quatre moteurs externes, quatre familles et 12/12 contrôles réels recertifiés. |
-| En cours — autonome | P64-L07D à L07E | Tournoi puis intégration conditionnelle de 1 à 3 gagnants. |
+| Terminé — automatisé | P64-L07D | Quatre moteurs comparés ; HiGHS scellé seul, holdout 5/7 dans sa portée. |
+| En cours — autonome | P64-L07E | Gate produit, packaging, fallback puis intégration conditionnelle de HiGHS seul. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -637,14 +641,16 @@ ADR-0081 et le nouveau runbook imposent :
   si chacun gagne une famille distincte et si le portefeuille bat le meilleur
   moteur seul.
 
-Le solveur courant reste la baseline. L07A à L07C sont terminés : dix
-candidats sont audités, le corpus V2 et son holdout sont scellés, puis quatre
-moteurs externes dans quatre familles passent 12/12 contrôles réels. Les huit
-sorties positives sont recertifiées par BGIG. SCIP et LAFF restent
-`benchmark-only` après l'inventaire réel de leurs dépendances.
+Le solveur courant reste la baseline. L07A à L07D sont terminés : dix
+candidats sont audités, quatre moteurs de quatre familles sont exécutés et le
+holdout neuf est consommé après une sélection scellée. HiGHS, meilleur candidat
+produit, certifie 5/7 cas représentables du holdout ; deux restent
+`bounded_unknown`.
 
-Le holdout reste fermé. Aucun moteur externe n'est adopté et aucun résultat de
-contrôle L07C ne vaut classement produit.
+SCIP et LAFF restent `benchmark-only`. OR-Tools ne gagne aucune famille face à
+HiGHS et aucun portefeuille n'est retenu. Les cas de sélection interdisent tous
+la rotation par une propriété absente du schéma produit : aucun gain produit
+n'est encore démontré et aucun moteur externe n'est adopté.
 
-Statut : Goal actif ; P64-L07A/B/C done, automated-validated ; P64-L07D next.
+Statut : Goal actif ; P64-L07A/B/C/D done, automated-validated ; P64-L07E next.
 fusion-validated: false. print-validated: false.

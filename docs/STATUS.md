@@ -14,10 +14,10 @@ positif. Le manifest Fusion passe à 0.1.59 pour P64-L05V-R2. L05D1/D2 sont
 automated-validated.
 ADR-0080 remplace la gate humaine par un journal local automatique.
 P64-L06A à L06E sont terminées avec une décision négative interne. Le Goal
-P64-L07 est lancé. L07A à L07C sont automated-validated : dix candidats ont
-été audités, le corpus V2 et son nouveau holdout sont scellés, puis OR-Tools,
-HiGHS, SCIP et LAFF passent 12/12 contrôles réels recertifiés. Aucun moteur
-externe n'est encore adopté.
+P64-L07 est lancé. L07A à L07D sont automated-validated : quatre moteurs
+externes de quatre familles sont comparés, HiGHS est scellé seul puis certifie
+5/7 cas représentables du holdout. Le holdout est consommé. Aucun gain produit
+n'est encore démontré et aucun moteur externe n'est encore adopté.
 P64-V2H03V et P44-V sont fusion-validated sur 0.1.55. P45-M001V est
 architecture-accepted. P64-L03V est un KO contextuel sur 0.1.56 et n'accorde
 aucune validation Fusion à la correction minimal/final.
@@ -3306,4 +3306,42 @@ Preuves : `docs/P64_L07C_EXTERNAL_ADAPTERS_CONTRACT.md` et
 
 Suite : P64-L07D exécute contrôles, régressions, discovery, tuning et sélection
 scellée avant l'ouverture unique du holdout. fusion-validated: false,
+print-validated: false.
+
+### P64-L07D — tournoi externe progressif
+
+Statut : done, implemented-core, automated-validated, holdout-consumed. Aucun
+changement du solveur produit.
+
+OR-Tools, HiGHS, SCIP et LAFF représentent quatre familles externes réelles.
+Les huit contrôles publics de THPACK9 et Q4RealBPP sont vérifiés comme contrôles
+de méthode non classants. La portée sans perte compte huit cas discovery, sept
+cas tuning et sept cas holdout.
+
+Discovery donne SCIP 8/8, HiGHS 8/8, LAFF 7/8 et OR-Tools 3/8. Le tuning retenu
+donne LAFF 7/7, SCIP 6/7, HiGHS 5/7 et OR-Tools 2/7. SCIP et LAFF restent
+benchmark-only par leurs gates de redistribution. HiGHS est donc le meilleur
+candidat produit ; OR-Tools ne gagne aucune famille et aucun portefeuille
+n'est retenu.
+
+La sélection HiGHS seule est scellée dans le commit `acdee83` avant toute
+ouverture. Le holdout unique donne cinq solutions certifiées sur sept cas
+représentables, deux `bounded_unknown`, zéro sortie invalide et zéro erreur
+candidat. Le post-traitement a repris quatorze checkpoints sans relancer un
+moteur après un `TypeError` sur le temps `null` des lignes `unsupported`.
+
+La baseline BGIG refuse les 22 cas ouverts communs, car ils interdisent tous la
+rotation par une propriété non exposée dans le schéma projet V1. La comparaison
+reste donc `product_gain_demonstrated=false`. HiGHS passe en L07E comme gagnant
+de laboratoire candidat produit, pas comme dépendance déjà adoptée.
+
+Validation L07D : tests externes ciblés 40/40, garde documentaire 2/2,
+alignement Fusion-only 6/6, suite complète 756/756 en 230,824 s, compilation
+Python ciblée et diff-check OK.
+
+Preuve : `docs/P64_L07D_EXTERNAL_TOURNAMENT_EVIDENCE.md`.
+
+Suite : P64-L07E compare HiGHS à BGIG sur des entrées produit représentables,
+valide licence, packaging hors ligne et fallback, puis intègre ou conserve
+`benchmark-winner-not-integrated`. fusion-validated: false,
 print-validated: false.

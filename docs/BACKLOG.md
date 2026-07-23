@@ -2950,7 +2950,7 @@ implémentée et intégrée à la fois.
 - Dépendance runtime : L06A à L06E sont terminées ; le premier Goal est clôturé.
 - Interdits : aucun solveur ou budget modifié, aucune dépendance externe
   installée, aucun T2-T4, aucune promotion d'un projet personnel.
-- Suite : le `/goal` a lancé P64-L07 ; L07A/B/C sont terminés et L07D est la prochaine mission atomique.
+- Suite : le `/goal` a lancé P64-L07 ; L07A/B/C/D sont terminés et L07E est la prochaine mission atomique.
 
 ### P64-L07P — préparation du vrai benchmark externe
 
@@ -3008,17 +3008,21 @@ implémentée et intégrée à la fois.
 
 ### P64-L07D — tournoi externe progressif
 
-- Statut : ready, in-progress-by-goal.
-- Ordre : contrôles exacts, régressions, discovery, élimination, tuning, choix
-  scellé, holdout unique, soak seulement si utile.
-- Équité : même entrée, limites annoncées et ressources totales comparables ;
-  mesure de couverture, certificat, qualité, temps, CPU, mémoire et packaging.
-- Acceptation : rapport reproductible, choix avant holdout et absence de
-  contamination.
+- Statut : done, implemented-core, automated-validated, holdout-consumed.
+- Concurrents : OR-Tools, HiGHS, SCIP et LAFF dans quatre familles réelles.
+- Résultat ouvert : HiGHS 8/8 discovery et 5/7 tuning ; meilleur candidat
+  produit après exclusion préalable de SCIP et LAFF par leurs gates.
+- Sélection : HiGHS seul scellé dans `acdee83`; OR-Tools ne gagne aucune
+  famille et aucun portefeuille ne bat le meilleur moteur seul.
+- Holdout : 5/7 solutions certifiées, 2 `bounded_unknown`, 0 sortie invalide,
+  0 erreur candidat ; aucune double exécution pendant la reprise du rapport.
+- Limite : la baseline ne sait pas exprimer l'interdiction de rotation du
+  benchmark ; `product_gain_demonstrated=false`.
+- Preuve : `docs/P64_L07D_EXTERNAL_TOURNAMENT_EVIDENCE.md`.
 
 ### P64-L07E — intégration du meilleur portefeuille
 
-- Statut : blocked-by-P64-L07D.
+- Statut : ready, in-progress-by-goal.
 - Objectif : intégrer le gagnant principal et jusqu'à deux compléments.
 - Condition multi-moteurs : chaque complément gagne une famille distincte et le
   portefeuille bat le meilleur moteur seul sous ressources comparables.

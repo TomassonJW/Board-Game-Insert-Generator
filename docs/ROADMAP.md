@@ -1291,7 +1291,7 @@ La chaîne autonome de mesure est désormais disponible et le holdout L06 est co
 
 fusion-validated: false. print-validated: false.
 
-## P64-L07 — benchmark externe et portefeuille mesuré (L07A-C réalisés 2026-07-23)
+## P64-L07 — benchmark externe et portefeuille mesuré (L07A-D réalisés 2026-07-23)
 
 ADR-0081 remplace la suite vague de L06 par une séquence exécutable :
 
@@ -1315,10 +1315,12 @@ et licences verrouillées. Chaque mission est testée, documentée, intégrée d
 `main`, poussée et vérifiée avant la suivante. Le `/goal` de la tâche de reprise
 vaut GO complet, sans seconde autorisation dans ce périmètre.
 
-Avancement : L07A à L07C sont done et automated-validated. Dix candidats ont
-été audités, le corpus V2 ajoute 192 cas BGIG et quatre moteurs externes dans
-quatre familles passent 12/12 contrôles réels recertifiés. SCIP et LAFF restent
-benchmark-only. Aucun moteur externe n'est encore intégré.
+Avancement : L07A à L07D sont done et automated-validated. Quatre moteurs
+externes de quatre familles sont comparés. HiGHS est scellé seul avant
+l'ouverture unique du holdout et certifie 5/7 cas représentables ; deux restent
+`bounded_unknown`. SCIP et LAFF restent benchmark-only. Aucun moteur externe
+n'est encore intégré.
 
-Statut : Goal actif ; L07D est la prochaine mission atomique. Le holdout reste
-fermé. fusion-validated: false. print-validated: false.
+Statut : Goal actif ; L07E est la prochaine mission atomique. Le holdout est
+consommé et `product_gain_demonstrated=false` tant que la gate produit
+représentable n'est pas passée. fusion-validated: false. print-validated: false.

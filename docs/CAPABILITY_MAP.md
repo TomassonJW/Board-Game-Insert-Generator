@@ -1826,7 +1826,7 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
 - C-PROJECT-CONTRACT / C-FUSION-UI / C-GEOMETRY / C-CAD-IR : inchangées.
 - Statut : P64-L06A à P64-L06E done, automated-validated, negative-result-accepted ; fusion-validated: false, print-validated: false.
 
-## Mise à jour P64-L07 — audit, corpus V2 et adapters terminés
+## Mise à jour P64-L07 — audit, corpus V2, adapters et tournoi terminés
 
 - C-SOLVER : L07A audite dix solutions ; L07C exécute OR-Tools, HiGHS, SCIP
   et LAFF dans quatre familles sous des adapters isolés.
@@ -1841,5 +1841,11 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
   devra être recertifiée par BGIG.
 - C-GEOMETRY : le corpus reste T0/T1 ; aucune forme 3D arbitraire ni T2 à T4.
 - C-FUSION-UI / C-CAD-IR : inchangées.
-- Statut : P64-L07A/B/C done, automated-validated ; P64-L07D next ; aucun
+- C-SOLVER / C-QUALITY : L07D compare quatre moteurs externes et scelle HiGHS
+  seul ; le holdout donne 5/7 certificats dans la portée représentable.
+- C-SAFETY : le holdout est consommé après une ouverture ; aucun tuning
+  postérieur, aucune double exécution et aucun portefeuille sans gain distinct.
+- Limite produit : l'interdiction de rotation du benchmark n'est pas exposée
+  dans le schéma V1 ; `product_gain_demonstrated=false`.
+- Statut : P64-L07A/B/C/D done, automated-validated ; P64-L07E next ; aucun
   candidat externe adopté ; fusion-validated: false, print-validated: false.

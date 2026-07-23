@@ -1,0 +1,3362 @@
+{
+  "artifact_lock_digest": "58736ecde2a6bfbc4d57c3e5bc4e947c9875fe9f7a3c654cb87594e91c552bc6",
+  "code_bundle_digest": "57abfc4ce47c6cc99df6c52c3cf987535f113dfdb26769327ad64d8372622cb7",
+  "config_digest": "03b40e95e8bad5b11f2bfa2c669b4509e6743c62d068ad34107fb25a9e1ced7c",
+  "evidence_digest": "86874f606b2c78a52bb1222f6d5a06aedad68cfe27406a2015a4a554f914a81c",
+  "holdout_campaign_digest": "bcc4e85a3175943fbf1ee85692ef91c861cc22856be22f89b3d8b3049f1e369d",
+  "holdout_portfolio_summary": {
+    "candidate_failure_count": 0,
+    "case_count": 64,
+    "certified_solution_count": 5,
+    "oracle_evaluable_count": 7,
+    "oracle_pass_count": 5,
+    "representable_count": 7,
+    "routed_case_count_by_candidate": {
+      "highs": 64
+    },
+    "statuses": {
+      "bounded_unknown": 2,
+      "invalid_input": 2,
+      "solution_found": 5,
+      "unsupported": 55
+    },
+    "summary_digest": "7578aa39f479536fe344be9b47a8988d340bfa5e82bc9c5d1650154842ff265f",
+    "total_wall_seconds": 17.673607
+  },
+  "holdout_portfolio_vs_primary": {
+    "beats_second": false,
+    "certified_solution_delta": 0,
+    "common_case_count": 64,
+    "details": [
+      {
+        "case_id": "l07-v2-holdout-a-001",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-a-006",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-a-011",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "l07-v2-holdout-a-016",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-a-021",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-a-026",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-a-031",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-a-036",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-a-041",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "l07-v2-holdout-a-046",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-a-051",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-a-056",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-a-061",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-b-002",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-b-007",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-b-012",
+        "first_status": "invalid_input",
+        "quality_relation": "not_comparable",
+        "second_status": "invalid_input"
+      },
+      {
+        "case_id": "l07-v2-holdout-b-017",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-b-022",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-b-027",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-b-032",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-b-037",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-b-042",
+        "first_status": "invalid_input",
+        "quality_relation": "not_comparable",
+        "second_status": "invalid_input"
+      },
+      {
+        "case_id": "l07-v2-holdout-b-047",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-b-052",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-b-057",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-b-062",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-c-003",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-c-008",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-c-013",
+        "first_status": "solution_found",
+        "quality_relation": "tie",
+        "second_status": "solution_found"
+      },
+      {
+        "case_id": "l07-v2-holdout-c-018",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-c-023",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-c-028",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-c-033",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-c-038",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-c-043",
+        "first_status": "solution_found",
+        "quality_relation": "tie",
+        "second_status": "solution_found"
+      },
+      {
+        "case_id": "l07-v2-holdout-c-048",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-c-053",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-c-058",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-c-063",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-d-004",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-d-009",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-d-014",
+        "first_status": "solution_found",
+        "quality_relation": "tie",
+        "second_status": "solution_found"
+      },
+      {
+        "case_id": "l07-v2-holdout-d-019",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-d-024",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-d-029",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-d-034",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-d-039",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-d-044",
+        "first_status": "solution_found",
+        "quality_relation": "tie",
+        "second_status": "solution_found"
+      },
+      {
+        "case_id": "l07-v2-holdout-d-049",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-d-054",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-d-059",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-d-064",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-e-005",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-e-010",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-e-015",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-e-020",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-e-025",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-e-030",
+        "first_status": "solution_found",
+        "quality_relation": "tie",
+        "second_status": "solution_found"
+      },
+      {
+        "case_id": "l07-v2-holdout-e-035",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-e-040",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-e-045",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-e-050",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-e-055",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-e-060",
+        "first_status": "unsupported",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      }
+    ],
+    "first_total_wall_seconds": 17.673607,
+    "quality_losses": 0,
+    "quality_ties": 5,
+    "quality_wins": 0,
+    "second_total_wall_seconds": 17.673607,
+    "truth_pass_delta": 0
+  },
+  "holdout_primary_summary": {
+    "candidate_failure_count": 0,
+    "case_count": 64,
+    "certified_solution_count": 5,
+    "oracle_evaluable_count": 7,
+    "oracle_pass_count": 5,
+    "representable_count": 7,
+    "routed_case_count_by_candidate": {
+      "highs": 64
+    },
+    "statuses": {
+      "bounded_unknown": 2,
+      "invalid_input": 2,
+      "solution_found": 5,
+      "unsupported": 55
+    },
+    "summary_digest": "7578aa39f479536fe344be9b47a8988d340bfa5e82bc9c5d1650154842ff265f",
+    "total_wall_seconds": 17.673607
+  },
+  "holdout_results": [
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-a-001",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "many_containers_one_content",
+      "report_digest": "9a82f53c516d2438601769a51accb949bafd33f147c9f882829d83cb3aad2e8e",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-b-002",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "few_containers_many_contents",
+      "report_digest": "3799f63079d79a49201c6221820403ea5cfe43824bb5c9672a2a4a2dda6c626e",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-c-003",
+      "certified": false,
+      "expected_truth": "impossible",
+      "family": "many_containers_many_contents",
+      "report_digest": "790898f37b088f22f6d36785cc2dc22ba3bf00249ebd9dda4634eb189123d4c9",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-d-004",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "mixed_dense_simple_heterogeneous",
+      "report_digest": "8c9603474abac7c56c8abee8ae3c5ee8ea812ec8375d27782d417fd40bd1f209",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-e-005",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "incremental_then_cold",
+      "report_digest": "146b1cbf3ebef896b8e0f01c8fa130e8d534793975a69e1431fa147b2bf714cf",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-a-006",
+      "certified": false,
+      "expected_truth": "impossible",
+      "family": "many_containers_one_content",
+      "report_digest": "a2a7eb5dae6618cc521f83838170b4c2290b464f2bf19539bb689f9febc86e71",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-b-007",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "few_containers_many_contents",
+      "report_digest": "65037814904047bfd12daec94adf78c3004c9086d227308207d0c77c143a7031",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-c-008",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "many_containers_many_contents",
+      "report_digest": "83258c1a352c3b81481ad02d72e0e9acfe2b534a30d6127df07d3c828a5d1dfa",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-d-009",
+      "certified": false,
+      "expected_truth": "impossible",
+      "family": "mixed_dense_simple_heterogeneous",
+      "report_digest": "2ba6e10b1894d5e552608b3c368d11e73dd9bec14d484045f96883cd1a96c854",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-e-010",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "incremental_then_cold",
+      "report_digest": "653ceb1e8a359eb7f94e4519847a57f1cfed4cb6fa15c5ad8818049d72b35d3b",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-a-011",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "many_containers_one_content",
+      "report_digest": "994ec3022f0abf11173baffaa3e0853d0ed9ebf793e6f1cd0fda474043bd08d4",
+      "status": "bounded_unknown"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-b-012",
+      "certified": false,
+      "expected_truth": "impossible",
+      "family": "few_containers_many_contents",
+      "report_digest": "89ad9b10ba6e9cf1dba59ef6c5e178310f20d81932823850edc3b228dbc03c6c",
+      "status": "invalid_input"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-c-013",
+      "certified": true,
+      "expected_truth": "feasible",
+      "family": "many_containers_many_contents",
+      "report_digest": "c3f6150dbbb915c6c734ab36f56e0799bcf2cf247e11fa0f513dc746d4be9dc1",
+      "status": "solution_found"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-d-014",
+      "certified": true,
+      "expected_truth": "feasible",
+      "family": "mixed_dense_simple_heterogeneous",
+      "report_digest": "2ccbe4e6e6682f85377c53a719f7604105cb690f9c67f92a6057ec34e519a9fd",
+      "status": "solution_found"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-e-015",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "incremental_then_cold",
+      "report_digest": "61039ee22eaf39993a60b15412da175ee2613e1bd86fd9832fa7d13c57604186",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-a-016",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "many_containers_one_content",
+      "report_digest": "03b2da0543ddbdefbb856ea3372e43ae04b6ffe696906994560981f3f5e76dea",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-b-017",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "few_containers_many_contents",
+      "report_digest": "84d5e878a369c99bc01da28e8947b9da56f843af0d6164028b5759c3fd2bbffe",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-c-018",
+      "certified": false,
+      "expected_truth": "impossible",
+      "family": "many_containers_many_contents",
+      "report_digest": "d5928a0a5b224464dcdf9242f51a8b267f18c8fa4415497c1b1313eb8bff28a9",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-d-019",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "mixed_dense_simple_heterogeneous",
+      "report_digest": "50a8dd0a08156fe7baa97c9f199ba954cbe3a14d7e83330b3c08d53e6b844b77",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-e-020",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "incremental_then_cold",
+      "report_digest": "45f118105f8407cd69117cc1588271d3e29b56a8e0df33ef12c406c96d0a92bb",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-a-021",
+      "certified": false,
+      "expected_truth": "impossible",
+      "family": "many_containers_one_content",
+      "report_digest": "1981c7f5230a0d03848a3770a0282cef09aad6fa22be2e35e9a2784ad183ace9",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-b-022",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "few_containers_many_contents",
+      "report_digest": "c4f249d5c0d9f980d49d92b0ee32f84d632b73898d3e8d8e8a859de8ebaae81f",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-c-023",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "many_containers_many_contents",
+      "report_digest": "31b79c746537cdf0c3b7ce9f8f6f2a0b9ccc1f4780670041bf7bc19a3b5435fc",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-d-024",
+      "certified": false,
+      "expected_truth": "impossible",
+      "family": "mixed_dense_simple_heterogeneous",
+      "report_digest": "81019d613be80f91c948284cea0b2855571e20b95e6c268b688cb254f28053e6",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-e-025",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "incremental_then_cold",
+      "report_digest": "1c4861cec3c015f9f5ad2ef1d3c82e9848b71ba8f9aeb2711b6158d4b3f127d9",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-a-026",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "many_containers_one_content",
+      "report_digest": "e3194445b531cdc10a42849de49ef262ec58e5fee2cceca4b6ad16e23b238174",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-b-027",
+      "certified": false,
+      "expected_truth": "impossible",
+      "family": "few_containers_many_contents",
+      "report_digest": "c6eb8d67869f2eb7405e75a6e1c909993251625f93bde6bcb895ec00aefa85ca",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-c-028",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "many_containers_many_contents",
+      "report_digest": "ebd17afd065e9e731f968df249f0bfce53a8d5b04aa7c9d08cb42e967efecf5e",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-d-029",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "mixed_dense_simple_heterogeneous",
+      "report_digest": "6be6a42f2279bd8b8a7a5f752db4af5e090f847cb6f696c7839758b6c1854ffe",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-e-030",
+      "certified": true,
+      "expected_truth": "feasible",
+      "family": "incremental_then_cold",
+      "report_digest": "c739cc73608b6e0c5b83cc94186a8aa5007d4d75f4b5fd236614d2dc80aabe3b",
+      "status": "solution_found"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-a-031",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "many_containers_one_content",
+      "report_digest": "f4f3edb0803101883e045e6190bcb3de5b5d492cdf879bac2db6fe36d2fe6765",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-b-032",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "few_containers_many_contents",
+      "report_digest": "390004ad060a17e085cb7034d9296ff59ca03b8d6b5d58951a31c6bd1f1beec0",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-c-033",
+      "certified": false,
+      "expected_truth": "impossible",
+      "family": "many_containers_many_contents",
+      "report_digest": "0ec16ecf2f5596c3c6fe9d4ed6c8bb1a1c2b3e3595fd16f0573acbb3614bb251",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-d-034",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "mixed_dense_simple_heterogeneous",
+      "report_digest": "6d7a85590d2e4bc709c68e9397311ea0007997143a039d36d9fcd4b27743d5ac",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-e-035",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "incremental_then_cold",
+      "report_digest": "d2d35e2094fe74712f494a31b00886cc440536f9f12fc22c35c41307c8a9cde8",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-a-036",
+      "certified": false,
+      "expected_truth": "impossible",
+      "family": "many_containers_one_content",
+      "report_digest": "f7223293602bd686b385ac08ad8360706b7fbfe6bc44454c675461feef47ae24",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-b-037",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "few_containers_many_contents",
+      "report_digest": "7a33da0ff1fbab162c43037152f017f03ece757dfe564056fe30e5dd0984eed4",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-c-038",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "many_containers_many_contents",
+      "report_digest": "d5a6a392a14bd4c066c741a53cb47b1449e02709f59e8828cf5831154b6361eb",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-d-039",
+      "certified": false,
+      "expected_truth": "impossible",
+      "family": "mixed_dense_simple_heterogeneous",
+      "report_digest": "1b5e1c7565394eea8a68dbf54edcf3e4d6108370d6f6f5018c1b80e51a740cb3",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-e-040",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "incremental_then_cold",
+      "report_digest": "a17af416baea7814d96a2f6bf63ff1e9aa99a1280cee1bb270920b39baab4999",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-a-041",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "many_containers_one_content",
+      "report_digest": "b9f49aac2eef18b3a74d89c9e382a5e5657fb71a3dbf9dcee0cdc1c077605cec",
+      "status": "bounded_unknown"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-b-042",
+      "certified": false,
+      "expected_truth": "impossible",
+      "family": "few_containers_many_contents",
+      "report_digest": "363ec71a13b0702f30448b2f98d64f7ef5a54a5de2b1e3da8a05ecb0aa1dcd1f",
+      "status": "invalid_input"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-c-043",
+      "certified": true,
+      "expected_truth": "feasible",
+      "family": "many_containers_many_contents",
+      "report_digest": "f287921c378c3ab5efe50ba2850fc7eb4512e49c0098ce74062a179e61618030",
+      "status": "solution_found"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-d-044",
+      "certified": true,
+      "expected_truth": "feasible",
+      "family": "mixed_dense_simple_heterogeneous",
+      "report_digest": "5ccce2cebc583802a6447de19e04a9cae49710710735595d6cb8df494f2d156d",
+      "status": "solution_found"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-e-045",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "incremental_then_cold",
+      "report_digest": "409b19b0ba8dddfcf41bf73cf6cf2a65370a00403dcb6f2972eb5748f81951c7",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-a-046",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "many_containers_one_content",
+      "report_digest": "d008bb36648e3ca3507bea5809e3334587c6ff4612c1841c688330c1e2e8689e",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-b-047",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "few_containers_many_contents",
+      "report_digest": "1dfbd38bc984eaa0ecb81425a13c16d7b616ffdb956b028a079d5c2cfd955fca",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-c-048",
+      "certified": false,
+      "expected_truth": "impossible",
+      "family": "many_containers_many_contents",
+      "report_digest": "29c7bb5838b9bdb51c3ca3c734e004999be64e2787fa479cb32620512cd26d0f",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-d-049",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "mixed_dense_simple_heterogeneous",
+      "report_digest": "224a47a1bc6d4ba40ddfe60d83dc8ac689f9334018b336cec5bee74a2ac1fe45",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-e-050",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "incremental_then_cold",
+      "report_digest": "3d4d0a5d4da3e62f7c803cfd47321dc39bb8c2bba4e617089b248c4f57cedbaf",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-a-051",
+      "certified": false,
+      "expected_truth": "impossible",
+      "family": "many_containers_one_content",
+      "report_digest": "05bb07693c1f1617547855342285baa14ca3b47413052979424e4ec9d6aca89a",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-b-052",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "few_containers_many_contents",
+      "report_digest": "c8f3270dbf3aba643567e24c5c86be3fb57e500157cff5a64ee74db32e55aa0e",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-c-053",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "many_containers_many_contents",
+      "report_digest": "f53b09904f7777ec401c20da67eb0df0862746bc4e8b5b573f75cd7311070f58",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-d-054",
+      "certified": false,
+      "expected_truth": "impossible",
+      "family": "mixed_dense_simple_heterogeneous",
+      "report_digest": "c29f6a78afefa79b020237d5942b03175e745f17c364eddc2b94a7b93cd1b44d",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-e-055",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "incremental_then_cold",
+      "report_digest": "561704018c6d03bea287527a5848edd18d52a18b5d1007a32d2d5f9dc4d3eab9",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-a-056",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "many_containers_one_content",
+      "report_digest": "094fb4a5fc4a1b70f07aa2fce27c24cb94cac5b6fcf7e07f14a81ac9d7b607e2",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-b-057",
+      "certified": false,
+      "expected_truth": "impossible",
+      "family": "few_containers_many_contents",
+      "report_digest": "0f53983f7f81e8999fc42278360d8389d2857170cd57154910241578b5938508",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-c-058",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "many_containers_many_contents",
+      "report_digest": "7f4ec6cfc565b255c75986e53d2d9a633692986f0e65e5469095f92ef999426c",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-d-059",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "mixed_dense_simple_heterogeneous",
+      "report_digest": "1b0c8f853428d3f076205496847252478fc49cd848917abf7dede4107bebf405",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-e-060",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "incremental_then_cold",
+      "report_digest": "abd29824528af65c0db6666ae06f991c6355ddb8ff9012771074f221e12480eb",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-a-061",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "many_containers_one_content",
+      "report_digest": "f1dcdb57b344422056053df9636b49afc386f1bf74254fa64325bc908660a4aa",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-b-062",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "few_containers_many_contents",
+      "report_digest": "7727b7159be77dbcf792494e4728b97876df46387cc6a9d571a67c37cffead8e",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-c-063",
+      "certified": false,
+      "expected_truth": "impossible",
+      "family": "many_containers_many_contents",
+      "report_digest": "1895c7e5a1f018873173aeedf01357b543322bd9b142eb75f0ecfb0bffd79190",
+      "status": "unsupported"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07-v2-holdout-d-064",
+      "certified": false,
+      "expected_truth": "feasible",
+      "family": "mixed_dense_simple_heterogeneous",
+      "report_digest": "81afd49b6f7dea79e3c10a046912c953335d3b5ca14068fb65f3169b22028c31",
+      "status": "unsupported"
+    }
+  ],
+  "holdout_selected_vs_bgig_baseline": {
+    "baseline_unsupported_count": 7,
+    "beats_second": true,
+    "certified_solution_delta": 5,
+    "common_case_count": 7,
+    "comparison_status": "baseline_cannot_represent_declared_benchmark_constraint",
+    "details": [
+      {
+        "case_id": "l07-v2-holdout-a-011",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-a-041",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-c-013",
+        "first_status": "solution_found",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-c-043",
+        "first_status": "solution_found",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-d-014",
+        "first_status": "solution_found",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-d-044",
+        "first_status": "solution_found",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      },
+      {
+        "case_id": "l07-v2-holdout-e-030",
+        "first_status": "solution_found",
+        "quality_relation": "not_comparable",
+        "second_status": "unsupported"
+      }
+    ],
+    "first_total_wall_seconds": 17.673607,
+    "product_gain_demonstrated": false,
+    "quality_losses": 0,
+    "quality_ties": 0,
+    "quality_wins": 0,
+    "second_total_wall_seconds": 0.854062,
+    "truth_pass_delta": 5
+  },
+  "invariants": {
+    "heavy_processes_run_concurrently": 1,
+    "holdout_opening_count": 1,
+    "network_service_invocation_count": 0,
+    "one_engine_invocation_per_portfolio_case": true,
+    "positive_results_require_bgig_certificate": true,
+    "post_open_tuning_count": 0,
+    "product_solver_routing_changed": false
+  },
+  "manifest_digest": "828c4df787b07b35040a6026db0cfd43efa20c5b9c01f42eefd63a3607a48c9c",
+  "open_baseline_comparisons": {
+    "highs": {
+      "discovery": {
+        "baseline_unsupported_count": 8,
+        "beats_second": true,
+        "certified_solution_delta": 7,
+        "common_case_count": 8,
+        "comparison_status": "baseline_cannot_represent_declared_benchmark_constraint",
+        "details": [
+          {
+            "case_id": "l07-v2-discovery-a-016",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-discovery-a-046",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-discovery-b-017",
+            "first_status": "infeasible_proven",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-discovery-c-018",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-discovery-c-048",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-discovery-d-019",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-discovery-d-049",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-discovery-e-040",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          }
+        ],
+        "first_total_wall_seconds": 17.474552,
+        "product_gain_demonstrated": false,
+        "quality_losses": 0,
+        "quality_ties": 0,
+        "quality_wins": 0,
+        "second_total_wall_seconds": 1.011482,
+        "truth_pass_delta": 8
+      },
+      "tuning": {
+        "baseline_unsupported_count": 7,
+        "beats_second": true,
+        "certified_solution_delta": 5,
+        "common_case_count": 7,
+        "comparison_status": "baseline_cannot_represent_declared_benchmark_constraint",
+        "details": [
+          {
+            "case_id": "l07-v2-tuning-a-006",
+            "first_status": "bounded_unknown",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-tuning-a-036",
+            "first_status": "bounded_unknown",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-tuning-c-008",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-tuning-c-038",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-tuning-d-009",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-tuning-d-039",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-tuning-e-020",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          }
+        ],
+        "first_total_wall_seconds": 15.042533,
+        "product_gain_demonstrated": false,
+        "quality_losses": 0,
+        "quality_ties": 0,
+        "quality_wins": 0,
+        "second_total_wall_seconds": 0.857708,
+        "truth_pass_delta": 5
+      }
+    },
+    "laff": {
+      "discovery": {
+        "baseline_unsupported_count": 8,
+        "beats_second": true,
+        "certified_solution_delta": 7,
+        "common_case_count": 8,
+        "comparison_status": "baseline_cannot_represent_declared_benchmark_constraint",
+        "details": [
+          {
+            "case_id": "l07-v2-discovery-a-016",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-discovery-a-046",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-discovery-b-017",
+            "first_status": "bounded_unknown",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-discovery-c-018",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-discovery-c-048",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-discovery-d-019",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-discovery-d-049",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-discovery-e-040",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          }
+        ],
+        "first_total_wall_seconds": 1.960342,
+        "product_gain_demonstrated": false,
+        "quality_losses": 0,
+        "quality_ties": 0,
+        "quality_wins": 0,
+        "second_total_wall_seconds": 1.011482,
+        "truth_pass_delta": 7
+      },
+      "tuning": {
+        "baseline_unsupported_count": 7,
+        "beats_second": true,
+        "certified_solution_delta": 7,
+        "common_case_count": 7,
+        "comparison_status": "baseline_cannot_represent_declared_benchmark_constraint",
+        "details": [
+          {
+            "case_id": "l07-v2-tuning-a-006",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-tuning-a-036",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-tuning-c-008",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-tuning-c-038",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-tuning-d-009",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-tuning-d-039",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-tuning-e-020",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          }
+        ],
+        "first_total_wall_seconds": 1.787342,
+        "product_gain_demonstrated": false,
+        "quality_losses": 0,
+        "quality_ties": 0,
+        "quality_wins": 0,
+        "second_total_wall_seconds": 0.857708,
+        "truth_pass_delta": 7
+      }
+    },
+    "ortools_cp_sat": {
+      "discovery": {
+        "baseline_unsupported_count": 8,
+        "beats_second": true,
+        "certified_solution_delta": 2,
+        "common_case_count": 8,
+        "comparison_status": "baseline_cannot_represent_declared_benchmark_constraint",
+        "details": [
+          {
+            "case_id": "l07-v2-discovery-a-016",
+            "first_status": "bounded_unknown",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-discovery-a-046",
+            "first_status": "bounded_unknown",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-discovery-b-017",
+            "first_status": "infeasible_proven",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-discovery-c-018",
+            "first_status": "bounded_unknown",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-discovery-c-048",
+            "first_status": "bounded_unknown",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-discovery-d-019",
+            "first_status": "bounded_unknown",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-discovery-d-049",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-discovery-e-040",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          }
+        ],
+        "first_total_wall_seconds": 18.842884,
+        "product_gain_demonstrated": false,
+        "quality_losses": 0,
+        "quality_ties": 0,
+        "quality_wins": 0,
+        "second_total_wall_seconds": 1.011482,
+        "truth_pass_delta": 3
+      },
+      "tuning": {
+        "baseline_unsupported_count": 7,
+        "beats_second": true,
+        "certified_solution_delta": 2,
+        "common_case_count": 7,
+        "comparison_status": "baseline_cannot_represent_declared_benchmark_constraint",
+        "details": [
+          {
+            "case_id": "l07-v2-tuning-a-006",
+            "first_status": "bounded_unknown",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-tuning-a-036",
+            "first_status": "bounded_unknown",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-tuning-c-008",
+            "first_status": "bounded_unknown",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-tuning-c-038",
+            "first_status": "bounded_unknown",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-tuning-d-009",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-tuning-d-039",
+            "first_status": "bounded_unknown",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-tuning-e-020",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          }
+        ],
+        "first_total_wall_seconds": 15.753984,
+        "product_gain_demonstrated": false,
+        "quality_losses": 0,
+        "quality_ties": 0,
+        "quality_wins": 0,
+        "second_total_wall_seconds": 0.857708,
+        "truth_pass_delta": 2
+      }
+    },
+    "scip": {
+      "discovery": {
+        "baseline_unsupported_count": 8,
+        "beats_second": true,
+        "certified_solution_delta": 7,
+        "common_case_count": 8,
+        "comparison_status": "baseline_cannot_represent_declared_benchmark_constraint",
+        "details": [
+          {
+            "case_id": "l07-v2-discovery-a-016",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-discovery-a-046",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-discovery-b-017",
+            "first_status": "infeasible_proven",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-discovery-c-018",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-discovery-c-048",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-discovery-d-019",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-discovery-d-049",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-discovery-e-040",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          }
+        ],
+        "first_total_wall_seconds": 17.026337,
+        "product_gain_demonstrated": false,
+        "quality_losses": 0,
+        "quality_ties": 0,
+        "quality_wins": 0,
+        "second_total_wall_seconds": 1.011482,
+        "truth_pass_delta": 8
+      },
+      "tuning": {
+        "baseline_unsupported_count": 7,
+        "beats_second": true,
+        "certified_solution_delta": 6,
+        "common_case_count": 7,
+        "comparison_status": "baseline_cannot_represent_declared_benchmark_constraint",
+        "details": [
+          {
+            "case_id": "l07-v2-tuning-a-006",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-tuning-a-036",
+            "first_status": "bounded_unknown",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-tuning-c-008",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-tuning-c-038",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-tuning-d-009",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-tuning-d-039",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          },
+          {
+            "case_id": "l07-v2-tuning-e-020",
+            "first_status": "solution_found",
+            "quality_relation": "not_comparable",
+            "second_status": "unsupported"
+          }
+        ],
+        "first_total_wall_seconds": 14.492254,
+        "product_gain_demonstrated": false,
+        "quality_losses": 0,
+        "quality_ties": 0,
+        "quality_wins": 0,
+        "second_total_wall_seconds": 0.857708,
+        "truth_pass_delta": 6
+      }
+    }
+  },
+  "open_campaign_digest": "5e135f0f83eb3396249934fc0a82b08bfb8b80e1ef09e14a85e4223edc01c035",
+  "open_summaries": {
+    "discovery": {
+      "artifact_lock_digest": "58736ecde2a6bfbc4d57c3e5bc4e947c9875fe9f7a3c654cb87594e91c552bc6",
+      "candidate_count": 4,
+      "candidates": [
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "scip",
+          "case_count": 64,
+          "certified_solution_count": 7,
+          "families": {
+            "few_containers_many_contents": {
+              "infeasible_proven": 1,
+              "invalid_input": 1,
+              "unsupported": 11
+            },
+            "incremental_then_cold": {
+              "solution_found": 1,
+              "unsupported": 11
+            },
+            "many_containers_many_contents": {
+              "solution_found": 2,
+              "unsupported": 11
+            },
+            "many_containers_one_content": {
+              "solution_found": 2,
+              "unsupported": 11
+            },
+            "mixed_dense_simple_heterogeneous": {
+              "solution_found": 2,
+              "unsupported": 11
+            }
+          },
+          "family": "constraint_integer_programming",
+          "oracle_evaluable_count": 8,
+          "oracle_miss_count": 0,
+          "oracle_pass_count": 8,
+          "product_gate": "benchmark_only_pending_bundled_native_license_inventory",
+          "quality_pairwise": {
+            "losses": 7,
+            "ties": 2,
+            "wins": 7
+          },
+          "rank_key": [
+            0,
+            0,
+            -8,
+            -7,
+            -7,
+            7,
+            17.026337,
+            61194406,
+            "scip"
+          ],
+          "representable_count": 8,
+          "resources": {
+            "bundle_byte_count": 61194406,
+            "peak_working_set_bytes": 64651264,
+            "total_cpu_seconds": 16.625,
+            "total_wall_seconds": 17.026337
+          },
+          "result_count": 64,
+          "statuses": {
+            "infeasible_proven": 1,
+            "invalid_input": 1,
+            "solution_found": 7,
+            "unsupported": 55
+          },
+          "trial_count": 1,
+          "version": "SCIP-10.0.2_PySCIPOpt-6.2.1",
+          "worker_invocation_count": 8
+        },
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "highs",
+          "case_count": 64,
+          "certified_solution_count": 7,
+          "families": {
+            "few_containers_many_contents": {
+              "infeasible_proven": 1,
+              "invalid_input": 1,
+              "unsupported": 11
+            },
+            "incremental_then_cold": {
+              "solution_found": 1,
+              "unsupported": 11
+            },
+            "many_containers_many_contents": {
+              "solution_found": 2,
+              "unsupported": 11
+            },
+            "many_containers_one_content": {
+              "solution_found": 2,
+              "unsupported": 11
+            },
+            "mixed_dense_simple_heterogeneous": {
+              "solution_found": 2,
+              "unsupported": 11
+            }
+          },
+          "family": "mixed_integer_programming",
+          "oracle_evaluable_count": 8,
+          "oracle_miss_count": 0,
+          "oracle_pass_count": 8,
+          "product_gate": "candidate",
+          "quality_pairwise": {
+            "losses": 11,
+            "ties": 2,
+            "wins": 3
+          },
+          "rank_key": [
+            0,
+            0,
+            -8,
+            -7,
+            -3,
+            11,
+            17.474552,
+            15612832,
+            "highs"
+          ],
+          "representable_count": 8,
+          "resources": {
+            "bundle_byte_count": 15612832,
+            "peak_working_set_bytes": 58331136,
+            "total_cpu_seconds": 16.984375,
+            "total_wall_seconds": 17.474552
+          },
+          "result_count": 64,
+          "statuses": {
+            "infeasible_proven": 1,
+            "invalid_input": 1,
+            "solution_found": 7,
+            "unsupported": 55
+          },
+          "trial_count": 1,
+          "version": "1.15.1",
+          "worker_invocation_count": 8
+        },
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "laff",
+          "case_count": 64,
+          "certified_solution_count": 7,
+          "families": {
+            "few_containers_many_contents": {
+              "bounded_unknown": 1,
+              "invalid_input": 1,
+              "unsupported": 11
+            },
+            "incremental_then_cold": {
+              "solution_found": 1,
+              "unsupported": 11
+            },
+            "many_containers_many_contents": {
+              "solution_found": 2,
+              "unsupported": 11
+            },
+            "many_containers_one_content": {
+              "solution_found": 2,
+              "unsupported": 11
+            },
+            "mixed_dense_simple_heterogeneous": {
+              "solution_found": 2,
+              "unsupported": 11
+            }
+          },
+          "family": "specialized_level_heuristic",
+          "oracle_evaluable_count": 8,
+          "oracle_miss_count": 1,
+          "oracle_pass_count": 7,
+          "product_gate": "benchmark_only_pending_epl_edl_dual_license_review",
+          "quality_pairwise": {
+            "losses": 6,
+            "ties": 0,
+            "wins": 10
+          },
+          "rank_key": [
+            0,
+            1,
+            -7,
+            -7,
+            -10,
+            6,
+            1.960342,
+            204015872,
+            "laff"
+          ],
+          "representable_count": 8,
+          "resources": {
+            "bundle_byte_count": 204015872,
+            "peak_working_set_bytes": 99815424,
+            "total_cpu_seconds": 4.28125,
+            "total_wall_seconds": 1.960342
+          },
+          "result_count": 64,
+          "statuses": {
+            "bounded_unknown": 1,
+            "invalid_input": 1,
+            "solution_found": 7,
+            "unsupported": 55
+          },
+          "trial_count": 1,
+          "version": "4.2.1",
+          "worker_invocation_count": 8
+        },
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "ortools_cp_sat",
+          "case_count": 64,
+          "certified_solution_count": 2,
+          "families": {
+            "few_containers_many_contents": {
+              "infeasible_proven": 1,
+              "invalid_input": 1,
+              "unsupported": 11
+            },
+            "incremental_then_cold": {
+              "solution_found": 1,
+              "unsupported": 11
+            },
+            "many_containers_many_contents": {
+              "bounded_unknown": 2,
+              "unsupported": 11
+            },
+            "many_containers_one_content": {
+              "bounded_unknown": 2,
+              "unsupported": 11
+            },
+            "mixed_dense_simple_heterogeneous": {
+              "bounded_unknown": 1,
+              "solution_found": 1,
+              "unsupported": 11
+            }
+          },
+          "family": "constraint_programming_sat_hybrid",
+          "oracle_evaluable_count": 8,
+          "oracle_miss_count": 5,
+          "oracle_pass_count": 3,
+          "product_gate": "candidate",
+          "quality_pairwise": {
+            "losses": 0,
+            "ties": 2,
+            "wins": 4
+          },
+          "rank_key": [
+            0,
+            5,
+            -3,
+            -2,
+            -4,
+            0,
+            18.842884,
+            49821428,
+            "ortools_cp_sat"
+          ],
+          "representable_count": 8,
+          "resources": {
+            "bundle_byte_count": 49821428,
+            "peak_working_set_bytes": 88543232,
+            "total_cpu_seconds": 18.578125,
+            "total_wall_seconds": 18.842884
+          },
+          "result_count": 64,
+          "statuses": {
+            "bounded_unknown": 5,
+            "infeasible_proven": 1,
+            "invalid_input": 1,
+            "solution_found": 2,
+            "unsupported": 55
+          },
+          "trial_count": 1,
+          "version": "9.15.6755",
+          "worker_invocation_count": 8
+        }
+      ],
+      "case_trial_count": 64,
+      "external_family_count": 4,
+      "invariants": {
+        "invalid_output_fails_closed": true,
+        "positive_results_require_bgig_certificate": true,
+        "same_input_set_for_every_candidate": true,
+        "unsupported_cases_counted_but_not_quality_ranked": true
+      },
+      "ranking": [
+        "scip",
+        "highs",
+        "laff",
+        "ortools_cp_sat"
+      ],
+      "result_count": 256,
+      "schema_version": "bgig.external_solver_tournament_stage_summary.v1",
+      "stage": "discovery",
+      "summary_digest": "699a0dbd8b6857253ffa3bbce2daa928d5329174876c19fea823c53ef8b0fe89"
+    },
+    "exact_controls": {
+      "artifact_lock_digest": "58736ecde2a6bfbc4d57c3e5bc4e947c9875fe9f7a3c654cb87594e91c552bc6",
+      "candidate_count": 4,
+      "candidates": [
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "highs",
+          "case_count": 3,
+          "certified_solution_count": 2,
+          "families": {
+            "l07c_small_exact_floor": {
+              "infeasible_proven": 1,
+              "solution_found": 2
+            }
+          },
+          "family": "mixed_integer_programming",
+          "oracle_evaluable_count": 3,
+          "oracle_miss_count": 0,
+          "oracle_pass_count": 3,
+          "product_gate": "candidate",
+          "quality_pairwise": {
+            "losses": 0,
+            "ties": 5,
+            "wins": 1
+          },
+          "rank_key": [
+            0,
+            0,
+            -3,
+            -2,
+            -1,
+            0,
+            0.416503,
+            15612832,
+            "highs"
+          ],
+          "representable_count": 3,
+          "resources": {
+            "bundle_byte_count": 15612832,
+            "peak_working_set_bytes": 32063488,
+            "total_cpu_seconds": 0.328125,
+            "total_wall_seconds": 0.416503
+          },
+          "result_count": 3,
+          "statuses": {
+            "infeasible_proven": 1,
+            "solution_found": 2
+          },
+          "trial_count": 1,
+          "version": "1.15.1",
+          "worker_invocation_count": 3
+        },
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "scip",
+          "case_count": 3,
+          "certified_solution_count": 2,
+          "families": {
+            "l07c_small_exact_floor": {
+              "infeasible_proven": 1,
+              "solution_found": 2
+            }
+          },
+          "family": "constraint_integer_programming",
+          "oracle_evaluable_count": 3,
+          "oracle_miss_count": 0,
+          "oracle_pass_count": 3,
+          "product_gate": "benchmark_only_pending_bundled_native_license_inventory",
+          "quality_pairwise": {
+            "losses": 0,
+            "ties": 5,
+            "wins": 1
+          },
+          "rank_key": [
+            0,
+            0,
+            -3,
+            -2,
+            -1,
+            0,
+            0.420418,
+            61194406,
+            "scip"
+          ],
+          "representable_count": 3,
+          "resources": {
+            "bundle_byte_count": 61194406,
+            "peak_working_set_bytes": 36589568,
+            "total_cpu_seconds": 0.265625,
+            "total_wall_seconds": 0.420418
+          },
+          "result_count": 3,
+          "statuses": {
+            "infeasible_proven": 1,
+            "solution_found": 2
+          },
+          "trial_count": 1,
+          "version": "SCIP-10.0.2_PySCIPOpt-6.2.1",
+          "worker_invocation_count": 3
+        },
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "ortools_cp_sat",
+          "case_count": 3,
+          "certified_solution_count": 2,
+          "families": {
+            "l07c_small_exact_floor": {
+              "infeasible_proven": 1,
+              "solution_found": 2
+            }
+          },
+          "family": "constraint_programming_sat_hybrid",
+          "oracle_evaluable_count": 3,
+          "oracle_miss_count": 0,
+          "oracle_pass_count": 3,
+          "product_gate": "candidate",
+          "quality_pairwise": {
+            "losses": 0,
+            "ties": 5,
+            "wins": 1
+          },
+          "rank_key": [
+            0,
+            0,
+            -3,
+            -2,
+            -1,
+            0,
+            1.139334,
+            49821428,
+            "ortools_cp_sat"
+          ],
+          "representable_count": 3,
+          "resources": {
+            "bundle_byte_count": 49821428,
+            "peak_working_set_bytes": 74121216,
+            "total_cpu_seconds": 0.984375,
+            "total_wall_seconds": 1.139334
+          },
+          "result_count": 3,
+          "statuses": {
+            "infeasible_proven": 1,
+            "solution_found": 2
+          },
+          "trial_count": 1,
+          "version": "9.15.6755",
+          "worker_invocation_count": 3
+        },
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "laff",
+          "case_count": 3,
+          "certified_solution_count": 2,
+          "families": {
+            "l07c_small_exact_floor": {
+              "bounded_unknown": 1,
+              "solution_found": 2
+            }
+          },
+          "family": "specialized_level_heuristic",
+          "oracle_evaluable_count": 3,
+          "oracle_miss_count": 1,
+          "oracle_pass_count": 2,
+          "product_gate": "benchmark_only_pending_epl_edl_dual_license_review",
+          "quality_pairwise": {
+            "losses": 3,
+            "ties": 3,
+            "wins": 0
+          },
+          "rank_key": [
+            0,
+            1,
+            -2,
+            -2,
+            0,
+            3,
+            0.792356,
+            204015872,
+            "laff"
+          ],
+          "representable_count": 3,
+          "resources": {
+            "bundle_byte_count": 204015872,
+            "peak_working_set_bytes": 96985088,
+            "total_cpu_seconds": 2.09375,
+            "total_wall_seconds": 0.792356
+          },
+          "result_count": 3,
+          "statuses": {
+            "bounded_unknown": 1,
+            "solution_found": 2
+          },
+          "trial_count": 1,
+          "version": "4.2.1",
+          "worker_invocation_count": 3
+        }
+      ],
+      "case_trial_count": 3,
+      "external_family_count": 4,
+      "invariants": {
+        "invalid_output_fails_closed": true,
+        "positive_results_require_bgig_certificate": true,
+        "same_input_set_for_every_candidate": true,
+        "unsupported_cases_counted_but_not_quality_ranked": true
+      },
+      "ranking": [
+        "highs",
+        "scip",
+        "ortools_cp_sat",
+        "laff"
+      ],
+      "result_count": 12,
+      "schema_version": "bgig.external_solver_tournament_stage_summary.v1",
+      "stage": "exact_controls",
+      "summary_digest": "ed9a9c89649d9e350088dcefa8ef6d963cf793a32bf083cdeec55d82f35ad2bc"
+    },
+    "regression": {
+      "artifact_lock_digest": "58736ecde2a6bfbc4d57c3e5bc4e947c9875fe9f7a3c654cb87594e91c552bc6",
+      "candidate_count": 4,
+      "candidates": [
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "laff",
+          "case_count": 8,
+          "certified_solution_count": 2,
+          "families": {
+            "historical_regression": {
+              "bounded_unknown": 3,
+              "solution_found": 2,
+              "unsupported": 3
+            }
+          },
+          "family": "specialized_level_heuristic",
+          "oracle_evaluable_count": 0,
+          "oracle_miss_count": 0,
+          "oracle_pass_count": 0,
+          "product_gate": "benchmark_only_pending_epl_edl_dual_license_review",
+          "quality_pairwise": {
+            "losses": 0,
+            "ties": 6,
+            "wins": 0
+          },
+          "rank_key": [
+            0,
+            0,
+            0,
+            -2,
+            0,
+            0,
+            1.034008,
+            204015872,
+            "laff"
+          ],
+          "representable_count": 5,
+          "resources": {
+            "bundle_byte_count": 204015872,
+            "peak_working_set_bytes": 99860480,
+            "total_cpu_seconds": 2.390625,
+            "total_wall_seconds": 1.034008
+          },
+          "result_count": 8,
+          "statuses": {
+            "bounded_unknown": 3,
+            "solution_found": 2,
+            "unsupported": 3
+          },
+          "trial_count": 1,
+          "version": "4.2.1",
+          "worker_invocation_count": 5
+        },
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "scip",
+          "case_count": 8,
+          "certified_solution_count": 2,
+          "families": {
+            "historical_regression": {
+              "bounded_unknown": 3,
+              "solution_found": 2,
+              "unsupported": 3
+            }
+          },
+          "family": "constraint_integer_programming",
+          "oracle_evaluable_count": 0,
+          "oracle_miss_count": 0,
+          "oracle_pass_count": 0,
+          "product_gate": "benchmark_only_pending_bundled_native_license_inventory",
+          "quality_pairwise": {
+            "losses": 0,
+            "ties": 6,
+            "wins": 0
+          },
+          "rank_key": [
+            0,
+            0,
+            0,
+            -2,
+            0,
+            0,
+            1.05745,
+            61194406,
+            "scip"
+          ],
+          "representable_count": 5,
+          "resources": {
+            "bundle_byte_count": 61194406,
+            "peak_working_set_bytes": 64901120,
+            "total_cpu_seconds": 0.84375,
+            "total_wall_seconds": 1.05745
+          },
+          "result_count": 8,
+          "statuses": {
+            "bounded_unknown": 3,
+            "solution_found": 2,
+            "unsupported": 3
+          },
+          "trial_count": 1,
+          "version": "SCIP-10.0.2_PySCIPOpt-6.2.1",
+          "worker_invocation_count": 5
+        },
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "highs",
+          "case_count": 8,
+          "certified_solution_count": 2,
+          "families": {
+            "historical_regression": {
+              "bounded_unknown": 3,
+              "solution_found": 2,
+              "unsupported": 3
+            }
+          },
+          "family": "mixed_integer_programming",
+          "oracle_evaluable_count": 0,
+          "oracle_miss_count": 0,
+          "oracle_pass_count": 0,
+          "product_gate": "candidate",
+          "quality_pairwise": {
+            "losses": 0,
+            "ties": 6,
+            "wins": 0
+          },
+          "rank_key": [
+            0,
+            0,
+            0,
+            -2,
+            0,
+            0,
+            1.308987,
+            15612832,
+            "highs"
+          ],
+          "representable_count": 5,
+          "resources": {
+            "bundle_byte_count": 15612832,
+            "peak_working_set_bytes": 45174784,
+            "total_cpu_seconds": 1.125,
+            "total_wall_seconds": 1.308987
+          },
+          "result_count": 8,
+          "statuses": {
+            "bounded_unknown": 3,
+            "solution_found": 2,
+            "unsupported": 3
+          },
+          "trial_count": 1,
+          "version": "1.15.1",
+          "worker_invocation_count": 5
+        },
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "ortools_cp_sat",
+          "case_count": 8,
+          "certified_solution_count": 2,
+          "families": {
+            "historical_regression": {
+              "bounded_unknown": 3,
+              "solution_found": 2,
+              "unsupported": 3
+            }
+          },
+          "family": "constraint_programming_sat_hybrid",
+          "oracle_evaluable_count": 0,
+          "oracle_miss_count": 0,
+          "oracle_pass_count": 0,
+          "product_gate": "candidate",
+          "quality_pairwise": {
+            "losses": 0,
+            "ties": 6,
+            "wins": 0
+          },
+          "rank_key": [
+            0,
+            0,
+            0,
+            -2,
+            0,
+            0,
+            1.67492,
+            49821428,
+            "ortools_cp_sat"
+          ],
+          "representable_count": 5,
+          "resources": {
+            "bundle_byte_count": 49821428,
+            "peak_working_set_bytes": 76361728,
+            "total_cpu_seconds": 1.421875,
+            "total_wall_seconds": 1.67492
+          },
+          "result_count": 8,
+          "statuses": {
+            "bounded_unknown": 3,
+            "solution_found": 2,
+            "unsupported": 3
+          },
+          "trial_count": 1,
+          "version": "9.15.6755",
+          "worker_invocation_count": 5
+        }
+      ],
+      "case_trial_count": 8,
+      "external_family_count": 4,
+      "invariants": {
+        "invalid_output_fails_closed": true,
+        "positive_results_require_bgig_certificate": true,
+        "same_input_set_for_every_candidate": true,
+        "unsupported_cases_counted_but_not_quality_ranked": true
+      },
+      "ranking": [
+        "laff",
+        "scip",
+        "highs",
+        "ortools_cp_sat"
+      ],
+      "result_count": 32,
+      "schema_version": "bgig.external_solver_tournament_stage_summary.v1",
+      "stage": "regression",
+      "summary_digest": "9a1c08e5461f6fb6c97004ab59e4564d09b44fde728a4995a82ae7dae8c38f2f"
+    },
+    "tuning": {
+      "invariants": {
+        "post_open_tuning_allowed": false,
+        "trial_choice_precedes_holdout": true,
+        "trial_count_identical_for_every_candidate": true
+      },
+      "schema_version": "bgig.external_solver_tournament_tuning_summary.v1",
+      "selected_trial_by_candidate": {
+        "highs": "seed-640708",
+        "laff": "seed-640708",
+        "ortools_cp_sat": "seed-640708",
+        "scip": "seed-640707"
+      },
+      "summary_digest": "40d941c62a3886ac1cf056bceeafe21ebe2141405645483fed908141067cf16f",
+      "trial_count": 2,
+      "trials": [
+        {
+          "artifact_lock_digest": "58736ecde2a6bfbc4d57c3e5bc4e947c9875fe9f7a3c654cb87594e91c552bc6",
+          "candidate_count": 4,
+          "candidates": [
+            {
+              "candidate_failure_count": 0,
+              "candidate_id": "laff",
+              "case_count": 64,
+              "certified_solution_count": 7,
+              "families": {
+                "few_containers_many_contents": {
+                  "invalid_input": 2,
+                  "unsupported": 11
+                },
+                "incremental_then_cold": {
+                  "solution_found": 1,
+                  "unsupported": 11
+                },
+                "many_containers_many_contents": {
+                  "solution_found": 2,
+                  "unsupported": 11
+                },
+                "many_containers_one_content": {
+                  "solution_found": 2,
+                  "unsupported": 11
+                },
+                "mixed_dense_simple_heterogeneous": {
+                  "solution_found": 2,
+                  "unsupported": 11
+                }
+              },
+              "family": "specialized_level_heuristic",
+              "oracle_evaluable_count": 7,
+              "oracle_miss_count": 0,
+              "oracle_pass_count": 7,
+              "product_gate": "benchmark_only_pending_epl_edl_dual_license_review",
+              "quality_pairwise": {
+                "losses": 1,
+                "ties": 0,
+                "wins": 11
+              },
+              "rank_key": [
+                0,
+                0,
+                -7,
+                -7,
+                -11,
+                1,
+                1.865306,
+                204015872,
+                "laff"
+              ],
+              "representable_count": 7,
+              "resources": {
+                "bundle_byte_count": 204015872,
+                "peak_working_set_bytes": 99438592,
+                "total_cpu_seconds": 3.90625,
+                "total_wall_seconds": 1.865306
+              },
+              "result_count": 64,
+              "statuses": {
+                "invalid_input": 2,
+                "solution_found": 7,
+                "unsupported": 55
+              },
+              "trial_count": 1,
+              "version": "4.2.1",
+              "worker_invocation_count": 7
+            },
+            {
+              "candidate_failure_count": 0,
+              "candidate_id": "scip",
+              "case_count": 64,
+              "certified_solution_count": 6,
+              "families": {
+                "few_containers_many_contents": {
+                  "invalid_input": 2,
+                  "unsupported": 11
+                },
+                "incremental_then_cold": {
+                  "solution_found": 1,
+                  "unsupported": 11
+                },
+                "many_containers_many_contents": {
+                  "solution_found": 2,
+                  "unsupported": 11
+                },
+                "many_containers_one_content": {
+                  "bounded_unknown": 1,
+                  "solution_found": 1,
+                  "unsupported": 11
+                },
+                "mixed_dense_simple_heterogeneous": {
+                  "solution_found": 2,
+                  "unsupported": 11
+                }
+              },
+              "family": "constraint_integer_programming",
+              "oracle_evaluable_count": 7,
+              "oracle_miss_count": 1,
+              "oracle_pass_count": 6,
+              "product_gate": "benchmark_only_pending_bundled_native_license_inventory",
+              "quality_pairwise": {
+                "losses": 5,
+                "ties": 2,
+                "wins": 5
+              },
+              "rank_key": [
+                0,
+                1,
+                -6,
+                -6,
+                -5,
+                5,
+                14.492254,
+                61194406,
+                "scip"
+              ],
+              "representable_count": 7,
+              "resources": {
+                "bundle_byte_count": 61194406,
+                "peak_working_set_bytes": 149852160,
+                "total_cpu_seconds": 14.1875,
+                "total_wall_seconds": 14.492254
+              },
+              "result_count": 64,
+              "statuses": {
+                "bounded_unknown": 1,
+                "invalid_input": 2,
+                "solution_found": 6,
+                "unsupported": 55
+              },
+              "trial_count": 1,
+              "version": "SCIP-10.0.2_PySCIPOpt-6.2.1",
+              "worker_invocation_count": 7
+            },
+            {
+              "candidate_failure_count": 0,
+              "candidate_id": "highs",
+              "case_count": 64,
+              "certified_solution_count": 4,
+              "families": {
+                "few_containers_many_contents": {
+                  "invalid_input": 2,
+                  "unsupported": 11
+                },
+                "incremental_then_cold": {
+                  "solution_found": 1,
+                  "unsupported": 11
+                },
+                "many_containers_many_contents": {
+                  "bounded_unknown": 1,
+                  "solution_found": 1,
+                  "unsupported": 11
+                },
+                "many_containers_one_content": {
+                  "bounded_unknown": 2,
+                  "unsupported": 11
+                },
+                "mixed_dense_simple_heterogeneous": {
+                  "solution_found": 2,
+                  "unsupported": 11
+                }
+              },
+              "family": "mixed_integer_programming",
+              "oracle_evaluable_count": 7,
+              "oracle_miss_count": 3,
+              "oracle_pass_count": 4,
+              "product_gate": "candidate",
+              "quality_pairwise": {
+                "losses": 7,
+                "ties": 3,
+                "wins": 0
+              },
+              "rank_key": [
+                0,
+                3,
+                -4,
+                -4,
+                0,
+                7,
+                14.96516,
+                15612832,
+                "highs"
+              ],
+              "representable_count": 7,
+              "resources": {
+                "bundle_byte_count": 15612832,
+                "peak_working_set_bytes": 92127232,
+                "total_cpu_seconds": 14.640625,
+                "total_wall_seconds": 14.96516
+              },
+              "result_count": 64,
+              "statuses": {
+                "bounded_unknown": 3,
+                "invalid_input": 2,
+                "solution_found": 4,
+                "unsupported": 55
+              },
+              "trial_count": 1,
+              "version": "1.15.1",
+              "worker_invocation_count": 7
+            },
+            {
+              "candidate_failure_count": 0,
+              "candidate_id": "ortools_cp_sat",
+              "case_count": 64,
+              "certified_solution_count": 2,
+              "families": {
+                "few_containers_many_contents": {
+                  "invalid_input": 2,
+                  "unsupported": 11
+                },
+                "incremental_then_cold": {
+                  "solution_found": 1,
+                  "unsupported": 11
+                },
+                "many_containers_many_contents": {
+                  "bounded_unknown": 2,
+                  "unsupported": 11
+                },
+                "many_containers_one_content": {
+                  "bounded_unknown": 2,
+                  "unsupported": 11
+                },
+                "mixed_dense_simple_heterogeneous": {
+                  "bounded_unknown": 1,
+                  "solution_found": 1,
+                  "unsupported": 11
+                }
+              },
+              "family": "constraint_programming_sat_hybrid",
+              "oracle_evaluable_count": 7,
+              "oracle_miss_count": 5,
+              "oracle_pass_count": 2,
+              "product_gate": "candidate",
+              "quality_pairwise": {
+                "losses": 3,
+                "ties": 3,
+                "wins": 0
+              },
+              "rank_key": [
+                0,
+                5,
+                -2,
+                -2,
+                0,
+                3,
+                15.829944,
+                49821428,
+                "ortools_cp_sat"
+              ],
+              "representable_count": 7,
+              "resources": {
+                "bundle_byte_count": 49821428,
+                "peak_working_set_bytes": 103284736,
+                "total_cpu_seconds": 15.4375,
+                "total_wall_seconds": 15.829944
+              },
+              "result_count": 64,
+              "statuses": {
+                "bounded_unknown": 5,
+                "invalid_input": 2,
+                "solution_found": 2,
+                "unsupported": 55
+              },
+              "trial_count": 1,
+              "version": "9.15.6755",
+              "worker_invocation_count": 7
+            }
+          ],
+          "case_trial_count": 64,
+          "external_family_count": 4,
+          "invariants": {
+            "invalid_output_fails_closed": true,
+            "positive_results_require_bgig_certificate": true,
+            "same_input_set_for_every_candidate": true,
+            "unsupported_cases_counted_but_not_quality_ranked": true
+          },
+          "ranking": [
+            "laff",
+            "scip",
+            "highs",
+            "ortools_cp_sat"
+          ],
+          "result_count": 256,
+          "schema_version": "bgig.external_solver_tournament_stage_summary.v1",
+          "stage": "tuning:seed-640707",
+          "summary_digest": "a156851b8d7d573c61eede774696edfbdb134f88cb572baf3ee339c212464df0"
+        },
+        {
+          "artifact_lock_digest": "58736ecde2a6bfbc4d57c3e5bc4e947c9875fe9f7a3c654cb87594e91c552bc6",
+          "candidate_count": 4,
+          "candidates": [
+            {
+              "candidate_failure_count": 0,
+              "candidate_id": "laff",
+              "case_count": 64,
+              "certified_solution_count": 7,
+              "families": {
+                "few_containers_many_contents": {
+                  "invalid_input": 2,
+                  "unsupported": 11
+                },
+                "incremental_then_cold": {
+                  "solution_found": 1,
+                  "unsupported": 11
+                },
+                "many_containers_many_contents": {
+                  "solution_found": 2,
+                  "unsupported": 11
+                },
+                "many_containers_one_content": {
+                  "solution_found": 2,
+                  "unsupported": 11
+                },
+                "mixed_dense_simple_heterogeneous": {
+                  "solution_found": 2,
+                  "unsupported": 11
+                }
+              },
+              "family": "specialized_level_heuristic",
+              "oracle_evaluable_count": 7,
+              "oracle_miss_count": 0,
+              "oracle_pass_count": 7,
+              "product_gate": "benchmark_only_pending_epl_edl_dual_license_review",
+              "quality_pairwise": {
+                "losses": 1,
+                "ties": 0,
+                "wins": 12
+              },
+              "rank_key": [
+                0,
+                0,
+                -7,
+                -7,
+                -12,
+                1,
+                1.787342,
+                204015872,
+                "laff"
+              ],
+              "representable_count": 7,
+              "resources": {
+                "bundle_byte_count": 204015872,
+                "peak_working_set_bytes": 99643392,
+                "total_cpu_seconds": 4.328125,
+                "total_wall_seconds": 1.787342
+              },
+              "result_count": 64,
+              "statuses": {
+                "invalid_input": 2,
+                "solution_found": 7,
+                "unsupported": 55
+              },
+              "trial_count": 1,
+              "version": "4.2.1",
+              "worker_invocation_count": 7
+            },
+            {
+              "candidate_failure_count": 0,
+              "candidate_id": "scip",
+              "case_count": 64,
+              "certified_solution_count": 6,
+              "families": {
+                "few_containers_many_contents": {
+                  "invalid_input": 2,
+                  "unsupported": 11
+                },
+                "incremental_then_cold": {
+                  "solution_found": 1,
+                  "unsupported": 11
+                },
+                "many_containers_many_contents": {
+                  "solution_found": 2,
+                  "unsupported": 11
+                },
+                "many_containers_one_content": {
+                  "bounded_unknown": 1,
+                  "solution_found": 1,
+                  "unsupported": 11
+                },
+                "mixed_dense_simple_heterogeneous": {
+                  "solution_found": 2,
+                  "unsupported": 11
+                }
+              },
+              "family": "constraint_integer_programming",
+              "oracle_evaluable_count": 7,
+              "oracle_miss_count": 1,
+              "oracle_pass_count": 6,
+              "product_gate": "benchmark_only_pending_bundled_native_license_inventory",
+              "quality_pairwise": {
+                "losses": 7,
+                "ties": 2,
+                "wins": 4
+              },
+              "rank_key": [
+                0,
+                1,
+                -6,
+                -6,
+                -4,
+                7,
+                14.222848,
+                61194406,
+                "scip"
+              ],
+              "representable_count": 7,
+              "resources": {
+                "bundle_byte_count": 61194406,
+                "peak_working_set_bytes": 149889024,
+                "total_cpu_seconds": 13.96875,
+                "total_wall_seconds": 14.222848
+              },
+              "result_count": 64,
+              "statuses": {
+                "bounded_unknown": 1,
+                "invalid_input": 2,
+                "solution_found": 6,
+                "unsupported": 55
+              },
+              "trial_count": 1,
+              "version": "SCIP-10.0.2_PySCIPOpt-6.2.1",
+              "worker_invocation_count": 7
+            },
+            {
+              "candidate_failure_count": 0,
+              "candidate_id": "highs",
+              "case_count": 64,
+              "certified_solution_count": 5,
+              "families": {
+                "few_containers_many_contents": {
+                  "invalid_input": 2,
+                  "unsupported": 11
+                },
+                "incremental_then_cold": {
+                  "solution_found": 1,
+                  "unsupported": 11
+                },
+                "many_containers_many_contents": {
+                  "solution_found": 2,
+                  "unsupported": 11
+                },
+                "many_containers_one_content": {
+                  "bounded_unknown": 2,
+                  "unsupported": 11
+                },
+                "mixed_dense_simple_heterogeneous": {
+                  "solution_found": 2,
+                  "unsupported": 11
+                }
+              },
+              "family": "mixed_integer_programming",
+              "oracle_evaluable_count": 7,
+              "oracle_miss_count": 2,
+              "oracle_pass_count": 5,
+              "product_gate": "candidate",
+              "quality_pairwise": {
+                "losses": 7,
+                "ties": 3,
+                "wins": 2
+              },
+              "rank_key": [
+                0,
+                2,
+                -5,
+                -5,
+                -2,
+                7,
+                15.042533,
+                15612832,
+                "highs"
+              ],
+              "representable_count": 7,
+              "resources": {
+                "bundle_byte_count": 15612832,
+                "peak_working_set_bytes": 82485248,
+                "total_cpu_seconds": 14.71875,
+                "total_wall_seconds": 15.042533
+              },
+              "result_count": 64,
+              "statuses": {
+                "bounded_unknown": 2,
+                "invalid_input": 2,
+                "solution_found": 5,
+                "unsupported": 55
+              },
+              "trial_count": 1,
+              "version": "1.15.1",
+              "worker_invocation_count": 7
+            },
+            {
+              "candidate_failure_count": 0,
+              "candidate_id": "ortools_cp_sat",
+              "case_count": 64,
+              "certified_solution_count": 2,
+              "families": {
+                "few_containers_many_contents": {
+                  "invalid_input": 2,
+                  "unsupported": 11
+                },
+                "incremental_then_cold": {
+                  "solution_found": 1,
+                  "unsupported": 11
+                },
+                "many_containers_many_contents": {
+                  "bounded_unknown": 2,
+                  "unsupported": 11
+                },
+                "many_containers_one_content": {
+                  "bounded_unknown": 2,
+                  "unsupported": 11
+                },
+                "mixed_dense_simple_heterogeneous": {
+                  "bounded_unknown": 1,
+                  "solution_found": 1,
+                  "unsupported": 11
+                }
+              },
+              "family": "constraint_programming_sat_hybrid",
+              "oracle_evaluable_count": 7,
+              "oracle_miss_count": 5,
+              "oracle_pass_count": 2,
+              "product_gate": "candidate",
+              "quality_pairwise": {
+                "losses": 3,
+                "ties": 3,
+                "wins": 0
+              },
+              "rank_key": [
+                0,
+                5,
+                -2,
+                -2,
+                0,
+                3,
+                15.753984,
+                49821428,
+                "ortools_cp_sat"
+              ],
+              "representable_count": 7,
+              "resources": {
+                "bundle_byte_count": 49821428,
+                "peak_working_set_bytes": 104173568,
+                "total_cpu_seconds": 15.5625,
+                "total_wall_seconds": 15.753984
+              },
+              "result_count": 64,
+              "statuses": {
+                "bounded_unknown": 5,
+                "invalid_input": 2,
+                "solution_found": 2,
+                "unsupported": 55
+              },
+              "trial_count": 1,
+              "version": "9.15.6755",
+              "worker_invocation_count": 7
+            }
+          ],
+          "case_trial_count": 64,
+          "external_family_count": 4,
+          "invariants": {
+            "invalid_output_fails_closed": true,
+            "positive_results_require_bgig_certificate": true,
+            "same_input_set_for_every_candidate": true,
+            "unsupported_cases_counted_but_not_quality_ranked": true
+          },
+          "ranking": [
+            "laff",
+            "scip",
+            "highs",
+            "ortools_cp_sat"
+          ],
+          "result_count": 256,
+          "schema_version": "bgig.external_solver_tournament_stage_summary.v1",
+          "stage": "tuning:seed-640708",
+          "summary_digest": "2e131d737085489b4c25d71b18097948a0172a48d14708582a4f4fe89781a0b0"
+        }
+      ]
+    }
+  },
+  "opening_receipt": {
+    "case_count": 64,
+    "holdout_commitment_digest": "706f0452410fb877d77a87f1df08a6f558167f5a5a98f30f421ccb37d1e0296a",
+    "manifest_digest": "828c4df787b07b35040a6026db0cfd43efa20c5b9c01f42eefd63a3607a48c9c",
+    "opening_receipt_digest": "114e2b5934b734c2bcdb1fa7cc239ca59b580420f4d18020f705a516ddde82e8",
+    "post_open_tuning_allowed": false,
+    "schema_version": "bgig.external_solver_holdout_opening_receipt.v1",
+    "sealed_holdout_digest": "4ec4eb2cc8cea01c71cd3073857d0c152b4f8a3e4c3d6b5fac25edc49b400bcc",
+    "selection_digest": "b716fef9e10540f89209092d82c13894c8dca28fc59531894d145ba1f4bf02ae",
+    "selection_evidence_digest": "b2f7fa79d96a6facbfc814bb408076a245d7964bfc4d723c3f1b4ad0fbcb634e"
+  },
+  "public_method_evidence": {
+    "control_count": 8,
+    "controls": [
+      {
+        "case_id": "orlib-thpack9-001",
+        "method_control": {
+          "bin_dimensions": [
+            10,
+            6,
+            16
+          ],
+          "expanded_item_count": 70,
+          "item_type_count": 2,
+          "total_item_volume": 17920,
+          "volume_lower_bound_container_count": 19
+        },
+        "objective_correspondence": "exact_decision_reduction",
+        "product_ranking_eligible": false,
+        "source_case_id": "instance-001",
+        "source_id": "orlib-thpack9"
+      },
+      {
+        "case_id": "orlib-thpack9-002",
+        "method_control": {
+          "bin_dimensions": [
+            14,
+            14,
+            14
+          ],
+          "expanded_item_count": 70,
+          "item_type_count": 2,
+          "total_item_volume": 17920,
+          "volume_lower_bound_container_count": 7
+        },
+        "objective_correspondence": "exact_decision_reduction",
+        "product_ranking_eligible": false,
+        "source_case_id": "instance-002",
+        "source_id": "orlib-thpack9"
+      },
+      {
+        "case_id": "orlib-thpack9-003",
+        "method_control": {
+          "bin_dimensions": [
+            20,
+            16,
+            20
+          ],
+          "expanded_item_count": 180,
+          "item_type_count": 4,
+          "total_item_volume": 116160,
+          "volume_lower_bound_container_count": 19
+        },
+        "objective_correspondence": "exact_decision_reduction",
+        "product_ranking_eligible": false,
+        "source_case_id": "instance-003",
+        "source_id": "orlib-thpack9"
+      },
+      {
+        "case_id": "orlib-thpack9-004",
+        "method_control": {
+          "bin_dimensions": [
+            24,
+            12,
+            16
+          ],
+          "expanded_item_count": 180,
+          "item_type_count": 4,
+          "total_item_volume": 116160,
+          "volume_lower_bound_container_count": 26
+        },
+        "objective_correspondence": "exact_decision_reduction",
+        "product_ranking_eligible": false,
+        "source_case_id": "instance-004",
+        "source_id": "orlib-thpack9"
+      },
+      {
+        "case_id": "q4realbpp-1",
+        "method_control": {
+          "bin_dimensions": [
+            1200,
+            1200,
+            1200
+          ],
+          "expanded_item_count": 51,
+          "item_type_count": 10,
+          "single_bin_volume_load_ratio": 0.66462976,
+          "total_item_volume": 1148480228
+        },
+        "objective_correspondence": "exact_single_bin_feasibility",
+        "product_ranking_eligible": false,
+        "source_case_id": "Input/3dBPP_1.txt",
+        "source_id": "q4realbpp-v1"
+      },
+      {
+        "case_id": "q4realbpp-3",
+        "method_control": {
+          "bin_dimensions": [
+            1100,
+            1100,
+            1100
+          ],
+          "expanded_item_count": 52,
+          "item_type_count": 10,
+          "single_bin_volume_load_ratio": 0.60191589,
+          "total_item_volume": 801150049
+        },
+        "objective_correspondence": "exact_single_bin_feasibility",
+        "product_ranking_eligible": false,
+        "source_case_id": "Input/3dBPP_3.txt",
+        "source_id": "q4realbpp-v1"
+      },
+      {
+        "case_id": "q4realbpp-5",
+        "method_control": {
+          "bin_dimensions": [
+            1100,
+            1100,
+            1100
+          ],
+          "expanded_item_count": 53,
+          "item_type_count": 10,
+          "single_bin_volume_load_ratio": 0.64584515,
+          "total_item_volume": 859619894
+        },
+        "objective_correspondence": "exact_single_bin_feasibility",
+        "product_ranking_eligible": false,
+        "source_case_id": "Input/3dBPP_5.txt",
+        "source_id": "q4realbpp-v1"
+      },
+      {
+        "case_id": "q4realbpp-7",
+        "method_control": {
+          "bin_dimensions": [
+            1200,
+            1200,
+            1200
+          ],
+          "expanded_item_count": 46,
+          "item_type_count": 10,
+          "single_bin_volume_load_ratio": 0.63068567,
+          "total_item_volume": 1089824841
+        },
+        "objective_correspondence": "exact_single_bin_feasibility",
+        "product_ranking_eligible": false,
+        "source_case_id": "Input/3dBPP_7.txt",
+        "source_id": "q4realbpp-v1"
+      }
+    ],
+    "evidence_digest": "d8840d4a26f1748d08d6f8923263971463108b5cef6ce107660d825008115c54",
+    "invariants": {
+      "all_sources_verified_by_size_and_sha256": true,
+      "candidate_invocation_count": 0,
+      "holdout_eligible": false,
+      "objective_mapping_copied_from_manifest": true,
+      "product_ranking_eligible": false
+    },
+    "manifest_digest": "828c4df787b07b35040a6026db0cfd43efa20c5b9c01f42eefd63a3607a48c9c",
+    "schema_version": "bgig.external_solver_public_method_evidence.v1",
+    "source_count": 2,
+    "source_receipts": {
+      "orlib-thpack9": {
+        "artifact_byte_count": 3818,
+        "artifact_sha256": "a4f5e3a748709217cdc749f7d27940f15b9f2a31b3e840e725642237036f82cc",
+        "selected_members": [],
+        "source_digest": "6bbd8188901f5bcf8e9c05df0f2adc652db2c830394e829eefa33efa6ad96bf4",
+        "source_id": "orlib-thpack9",
+        "status": "verified"
+      },
+      "q4realbpp-v1": {
+        "artifact_byte_count": 12201414,
+        "artifact_sha256": "dd3825b8abac54e04e748777d654065e176bb6ddf5e479cbeb638630fdb22fb4",
+        "selected_members": [
+          {
+            "byte_count": 837,
+            "path": "Benchmark dataset and instance generator for Real-World 3dBPP/Input/3dBPP_1.txt",
+            "sha256": "97d62d38f65dc23729cca2904232170f2c641150044974df244f27f5b77bee0e"
+          },
+          {
+            "byte_count": 837,
+            "path": "Benchmark dataset and instance generator for Real-World 3dBPP/Input/3dBPP_3.txt",
+            "sha256": "c723c24d530ca61d9d0d67fff0ad8423761b66cfc071efb28ff8d487b6647034"
+          },
+          {
+            "byte_count": 838,
+            "path": "Benchmark dataset and instance generator for Real-World 3dBPP/Input/3dBPP_5.txt",
+            "sha256": "78dfddd4f5370c753cb247d799b3ab66eb927a1788098ca15a6883024c330d3f"
+          },
+          {
+            "byte_count": 838,
+            "path": "Benchmark dataset and instance generator for Real-World 3dBPP/Input/3dBPP_7.txt",
+            "sha256": "6e06fd72a8459c6a27706ec062cbd20556e2fff1b71e0f8e58c0ba1209564fac"
+          }
+        ],
+        "source_digest": "b19729cc47c2a4d689cd2aa7bc314fc1c00a580cb23d4f356120ea07f7e89943",
+        "source_id": "q4realbpp-v1",
+        "status": "verified"
+      }
+    }
+  },
+  "schema_version": "bgig.external_solver_tournament_evidence.v1",
+  "selection": {
+    "artifact_lock_digest": "58736ecde2a6bfbc4d57c3e5bc4e947c9875fe9f7a3c654cb87594e91c552bc6",
+    "candidate_bundle_digest": "1c9f525908e956a2a53941f64c9a4c721b5337b57741d6f3c32b0af7081c6636",
+    "candidate_decisions": [
+      {
+        "candidate_id": "ortools_cp_sat",
+        "family": "constraint_programming_sat_hybrid",
+        "product_gate": "candidate",
+        "rejection_reasons": [],
+        "selected_tuning_trial": "seed-640708",
+        "selection_eligible": true,
+        "selection_rank_key": [
+          0,
+          10,
+          -5,
+          -4,
+          -4,
+          3,
+          34.596868,
+          49821428,
+          "ortools_cp_sat"
+        ]
+      },
+      {
+        "candidate_id": "highs",
+        "family": "mixed_integer_programming",
+        "product_gate": "candidate",
+        "rejection_reasons": [],
+        "selected_tuning_trial": "seed-640708",
+        "selection_eligible": true,
+        "selection_rank_key": [
+          0,
+          2,
+          -13,
+          -12,
+          -5,
+          18,
+          32.517085,
+          15612832,
+          "highs"
+        ]
+      },
+      {
+        "candidate_id": "scip",
+        "family": "constraint_integer_programming",
+        "product_gate": "benchmark_only_pending_bundled_native_license_inventory",
+        "rejection_reasons": [
+          "benchmark_only_pending_bundled_native_license_inventory"
+        ],
+        "selected_tuning_trial": "seed-640707",
+        "selection_eligible": false,
+        "selection_rank_key": [
+          0,
+          1,
+          -14,
+          -13,
+          -12,
+          12,
+          31.518591,
+          61194406,
+          "scip"
+        ]
+      },
+      {
+        "candidate_id": "laff",
+        "family": "specialized_level_heuristic",
+        "product_gate": "benchmark_only_pending_epl_edl_dual_license_review",
+        "rejection_reasons": [
+          "benchmark_only_pending_epl_edl_dual_license_review"
+        ],
+        "selected_tuning_trial": "seed-640708",
+        "selection_eligible": false,
+        "selection_rank_key": [
+          0,
+          1,
+          -14,
+          -14,
+          -22,
+          7,
+          3.747684,
+          204015872,
+          "laff"
+        ]
+      }
+    ],
+    "code_bundle_digest": "57abfc4ce47c6cc99df6c52c3cf987535f113dfdb26769327ad64d8372622cb7",
+    "complementary_candidate_ids": [],
+    "config_digest": "03b40e95e8bad5b11f2bfa2c669b4509e6743c62d068ad34107fb25a9e1ced7c",
+    "holdout_limits": {
+      "memory_mebibytes": 1024,
+      "seed": 640709,
+      "threads": 1,
+      "wall_seconds": 3
+    },
+    "holdout_selection": {
+      "candidate_bundle_digest": "1c9f525908e956a2a53941f64c9a4c721b5337b57741d6f3c32b0af7081c6636",
+      "complementary_candidate_ids": [],
+      "open_corpus_digest": "d5a4be1ea1b666c93ad38a3bea4aad49334b606f101b6de2cc5e52741dbe153e",
+      "post_open_tuning_allowed": false,
+      "primary_candidate_id": "highs",
+      "router_digest": "236f3149977bf4ef4559cd6f5aebb31fbbd858f90a20f3ec0e25d950b5022f03",
+      "schema_version": "bgig.external_solver_holdout_selection.v2",
+      "selected_before_holdout": true,
+      "selected_candidate_count": 1,
+      "selected_candidate_ids": [
+        "highs"
+      ],
+      "selection_digest": "b716fef9e10540f89209092d82c13894c8dca28fc59531894d145ba1f4bf02ae",
+      "settings_digest": "4d7347b6bdbeed08cc9ded0d9b354b6c7c74938b2f14ba9bb960b0fcc38ac669",
+      "total_budget_seconds": 3
+    },
+    "invariants": {
+      "external_candidate_count": 4,
+      "external_family_count": 4,
+      "holdout_case_count_seen": 0,
+      "one_engine_invocation_per_case": true,
+      "post_open_tuning_allowed": false,
+      "product_solver_routing_changed": false,
+      "selected_before_holdout": true
+    },
+    "manifest_digest": "828c4df787b07b35040a6026db0cfd43efa20c5b9c01f42eefd63a3607a48c9c",
+    "open_corpus_digest": "d5a4be1ea1b666c93ad38a3bea4aad49334b606f101b6de2cc5e52741dbe153e",
+    "open_stage_summary_digests": {
+      "discovery": "699a0dbd8b6857253ffa3bbce2daa928d5329174876c19fea823c53ef8b0fe89",
+      "exact_controls": "ed9a9c89649d9e350088dcefa8ef6d963cf793a32bf083cdeec55d82f35ad2bc",
+      "regression": "9a1c08e5461f6fb6c97004ab59e4564d09b44fde728a4995a82ae7dae8c38f2f"
+    },
+    "portfolio_analysis": {
+      "complementary_candidate_ids": [],
+      "family_comparisons": [
+        {
+          "candidate_id": "ortools_cp_sat",
+          "certified_solution_delta": 0,
+          "family": "few_containers_many_contents",
+          "quality_losses": 0,
+          "quality_wins": 0,
+          "truth_pass_delta": 0,
+          "wins_family": false
+        },
+        {
+          "candidate_id": "ortools_cp_sat",
+          "certified_solution_delta": 0,
+          "family": "incremental_then_cold",
+          "quality_losses": 0,
+          "quality_wins": 0,
+          "truth_pass_delta": 0,
+          "wins_family": false
+        },
+        {
+          "candidate_id": "ortools_cp_sat",
+          "certified_solution_delta": -2,
+          "family": "many_containers_many_contents",
+          "quality_losses": 0,
+          "quality_wins": 0,
+          "truth_pass_delta": -2,
+          "wins_family": false
+        },
+        {
+          "candidate_id": "ortools_cp_sat",
+          "certified_solution_delta": 0,
+          "family": "many_containers_one_content",
+          "quality_losses": 0,
+          "quality_wins": 0,
+          "truth_pass_delta": 0,
+          "wins_family": false
+        },
+        {
+          "candidate_id": "ortools_cp_sat",
+          "certified_solution_delta": -1,
+          "family": "mixed_dense_simple_heterogeneous",
+          "quality_losses": 0,
+          "quality_wins": 0,
+          "truth_pass_delta": -1,
+          "wins_family": false
+        }
+      ],
+      "portfolio_vs_primary": {
+        "beats_best_single": false,
+        "certified_solution_delta": 0,
+        "quality_losses": 0,
+        "quality_wins": 0,
+        "truth_pass_delta": 0
+      },
+      "primary_candidate_id": "highs",
+      "router": {
+        "default_candidate_id": "highs",
+        "family_routes": {},
+        "input_features_only": [
+          "family"
+        ],
+        "one_engine_invocation_per_case": true,
+        "schema_version": "bgig.external_solver_router.v1"
+      }
+    },
+    "primary_candidate_id": "highs",
+    "public_method_evidence_digest": "d8840d4a26f1748d08d6f8923263971463108b5cef6ce107660d825008115c54",
+    "router": {
+      "default_candidate_id": "highs",
+      "family_routes": {},
+      "input_features_only": [
+        "family"
+      ],
+      "one_engine_invocation_per_case": true,
+      "schema_version": "bgig.external_solver_router.v1"
+    },
+    "router_digest": "236f3149977bf4ef4559cd6f5aebb31fbbd858f90a20f3ec0e25d950b5022f03",
+    "schema_version": "bgig.external_solver_tournament_selection_evidence.v1",
+    "selected_candidate_ids": [
+      "highs"
+    ],
+    "selected_settings": {
+      "holdout": {
+        "memory_mebibytes": 1024,
+        "seed": 640709,
+        "threads": 1,
+        "wall_seconds": 3
+      },
+      "tuning_by_candidate": {
+        "highs": {
+          "memory_mebibytes": 1024,
+          "seed": 640708,
+          "threads": 1,
+          "trial_id": "seed-640708",
+          "wall_seconds": 3.0
+        }
+      }
+    },
+    "selection_evidence_digest": "b2f7fa79d96a6facbfc814bb408076a245d7964bfc4d723c3f1b4ad0fbcb634e",
+    "settings_digest": "4d7347b6bdbeed08cc9ded0d9b354b6c7c74938b2f14ba9bb960b0fcc38ac669",
+    "tuning_summary_digest": "40d941c62a3886ac1cf056bceeafe21ebe2141405645483fed908141067cf16f"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "compact_evidence_digest": "86874f606b2c78a52bb1222f6d5a06aedad68cfe27406a2015a4a554f914a81c",
+  "failure": {
+    "candidate_oracle_results_read_before_repair": false,
+    "cause": "null_timing_for_unsupported_rows",
+    "phase": "postprocessing_after_all_64_portfolio_cases",
+    "type": "TypeError"
+  },
+  "holdout_campaign_digest": "bcc4e85a3175943fbf1ee85692ef91c861cc22856be22f89b3d8b3049f1e369d",
+  "invariants": {
+    "holdout_opening_count": 1,
+    "one_engine_invocation_per_portfolio_case": true,
+    "positive_results_require_bgig_certificate": true,
+    "product_solver_routing_changed": false
+  },
+  "opening_receipt_digest": "114e2b5934b734c2bcdb1fa7cc239ca59b580420f4d18020f705a516ddde82e8",
+  "recovery": {
+    "baseline_checkpoint_reuse_count": 7,
+    "baseline_worker_reexecution_count": 0,
+    "candidate_set_changed": false,
+    "external_checkpoint_reuse_count": 7,
+    "external_worker_reexecution_count": 0,
+    "post_open_tuning_count": 0,
+    "postprocessing_attempt_count": 2,
+    "recovery_code_versioned": false,
+    "router_changed": false,
+    "sealed_code_bundle_unchanged": true,
+    "selection_changed": false,
+    "settings_changed": false
+  },
+  "recovery_receipt_digest": "117e9c011678859ea3d1f41b2c04bc214a541743ed7e0c65fa4647eeafe7b220",
+  "recovery_script_sha256": "e13fac599d9bb964dea6f88f0f019f47f3bbdeb7dc2c5186674e83f605a038a3",
+  "schema_version": "bgig.external_holdout_recovery_receipt.v1",
+  "sealed_code_bundle_digest": "57abfc4ce47c6cc99df6c52c3cf987535f113dfdb26769327ad64d8372622cb7",
+  "selection_evidence_digest": "b2f7fa79d96a6facbfc814bb408076a245d7964bfc4d723c3f1b4ad0fbcb634e"
+}

@@ -16,10 +16,10 @@ recertifié. Le manifest Fusion passe à 0.1.59 pour le journal automatique. fus
 print-validated: false pour L05A, L05B et L05C. Le solveur reste inchangé.
 P64-L05B, P64-L05C, P64-L05D1/D2 et P64-L06A/B/C/D/E sont automated-validated. Le premier Goal L06 est terminé par la décision négative `no_algorithm_change_v1`.
 Cette décision ne compare aucun solveur externe mature. ADR-0081 et P64-L07
-encadrent désormais la vraie campagne externe. L07A, L07B et L07C sont
-terminées : dix candidats ont été audités, le corpus V2 et son holdout sont
-scellés, puis OR-Tools, HiGHS, SCIP et LAFF passent 12/12 contrôles réels avec
-recertification BGIG.
+encadrent désormais la vraie campagne externe. L07A à L07D sont
+terminées : quatre moteurs externes de quatre familles ont été comparés, HiGHS
+est scellé seul puis confirme 5/7 cas représentables du holdout. Aucun gain
+produit n'est encore démontré et aucun moteur n'est encore adopté.
 
 ## Dernier état réel
 
@@ -66,37 +66,40 @@ Preuve L07A : P64_L07A_EXTERNAL_SOLVER_AUDIT_EVIDENCE.md.
 Preuve L07B : P64_L07B_CORPUS_V2_EVIDENCE.md.
 Contrat L07C : P64_L07C_EXTERNAL_ADAPTERS_CONTRACT.md.
 Preuve L07C : P64_L07C_EXTERNAL_ADAPTERS_EVIDENCE.md.
+Preuve L07D : P64_L07D_EXTERNAL_TOURNAMENT_EVIDENCE.md.
 
 ## Prochaine action recommandée
 
-### Exécuter P64-L07D — tournoi externe progressif
+### Exécuter P64-L07E — intégration conditionnelle de HiGHS
 
 Type : mission autonome déjà autorisée par le Goal.
 
 La prochaine action exacte est :
 
-1. rejouer les trois contrôles exacts L07C puis les huit régressions ;
-2. mesurer la couverture réellement représentable avant de classer la qualité ;
-3. exécuter discovery pour les quatre moteurs sous la même enveloppe totale ;
-4. éliminer explicitement les sorties invalides, candidats dominés ou gates de
-   licence incompatibles avec une future intégration ;
-5. effectuer un tuning borné et identique dans son principe ;
-6. sceller le candidat seul ou le portefeuille, son routeur et ses réglages ;
-7. seulement alors ouvrir une fois le sidecar holdout, sans aucun réglage
-   postérieur ;
-8. comparer tout portefeuille au meilleur moteur seul sous ressources totales
-   comparables.
+1. comparer HiGHS et le solveur BGIG sur les cinq régressions produit dans la
+   portée commune, sous limites mesurées et avec recertification fraîche ;
+2. démontrer un gain réel et répété avant de modifier le routage produit ;
+3. valider la licence MIT, les avis, le paquet Windows hors ligne, la version,
+   l'empreinte, la taille, le démarrage et l'arrêt ;
+4. concevoir un fallback BGIG fail-closed si HiGHS manque, échoue ou expire ;
+5. créer l'ADR factuelle de dépendance seulement si toutes les gates passent ;
+6. intégrer HiGHS seul : OR-Tools ne gagne aucune famille et aucun portefeuille
+   ne bat le meilleur moteur seul ;
+7. lancer les tests produit, packaging et hors ligne, puis publier le rapport
+   final du Goal ;
+8. si le gain produit ou une gate échoue, conserver honnêtement
+   `benchmark-winner-not-integrated` sans forcer l'adoption.
 
-OR-Tools et HiGHS restent candidats produit. SCIP et LAFF participent au vrai
-benchmark, mais restent `benchmark-only` tant que leurs gates de redistribution
-ne sont pas levées. Le holdout ne doit être lu qu'après production et
-versionnement de la sélection scellée.
+Le holdout est consommé. Il ne doit être ni rouvert, ni réglé, ni rejoué.
+HiGHS a certifié 5/7 cas représentables ; la baseline BGIG ne pouvait pas
+exprimer leur interdiction de rotation. Ce résultat choisit le candidat de
+L07E, mais ne vaut pas encore preuve d'amélioration produit.
 
-Modèle conseillé : `gpt-5.6-sol`, raisonnement `high`, car L07D combine une
-campagne longue, des checkpoints, une sélection non biaisée et des comparaisons
-de ressources. Option plus économique : `gpt-5.6-terra`, raisonnement `high`,
-acceptable si le runner et les gates restent inchangés ; le compromis est une
-revue plus fragile des biais de sélection et des statuts exacts.
+Modèle conseillé : `gpt-5.6-sol`, raisonnement `high`, car L07E combine décision
+d'intégration, packaging Windows hors ligne, fallback, ADR et non-régression.
+Option plus économique : `gpt-5.6-terra`, raisonnement `high`, acceptable si la
+gate conclut rapidement à une décision négative documentaire ; le risque de
+reprise augmente si le routage produit ou le paquet natif doivent changer.
 
 ## Lots verrouillés
 
