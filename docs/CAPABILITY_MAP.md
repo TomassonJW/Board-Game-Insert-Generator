@@ -1825,3 +1825,22 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
 - C-SAFETY : le holdout L06 est marqué consommé ; aucune réutilisation pour régler une future hypothèse.
 - C-PROJECT-CONTRACT / C-FUSION-UI / C-GEOMETRY / C-CAD-IR : inchangées.
 - Statut : P64-L06A à P64-L06E done, automated-validated, negative-result-accepted ; fusion-validated: false, print-validated: false.
+
+## Mise à jour P64-L07 — tournoi externe prêt
+
+- C-SOLVER : le prochain Goal ne se limite plus aux variantes internes ; il
+  audite au moins huit solutions et compare au moins trois moteurs externes
+  réellement distincts.
+- C-QUALITY : corpus V2, sources publiques, nouveau holdout, ressources
+  comparables et sélection scellée avant l'ouverture finale.
+- C-SAFETY : licences, versions, empreintes, fonctionnement Windows hors ligne,
+  isolation et fallback deviennent des gates d'intégration.
+- C-PROJECT-CONTRACT : toute sortie externe est convertie puis recertifiée ;
+  une contrainte perdue produit `unsupported`.
+- C-SOLVER : un gagnant principal et jusqu'à deux compléments sont autorisés
+  uniquement si leurs gains couvrent des familles distinctes et si le
+  portefeuille bat le meilleur moteur seul.
+- C-FUSION-UI / C-GEOMETRY / C-CAD-IR : inchangées.
+- Statut : designed, architecture-accepted, ready-for-explicit-go ; aucun
+  candidat externe encore adopté ; fusion-validated: false,
+  print-validated: false.

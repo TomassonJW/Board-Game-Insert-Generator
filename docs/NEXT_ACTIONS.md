@@ -15,6 +15,8 @@ conteneur peut être inséré dans le vide global à voisins figés et plan comp
 recertifié. Le manifest Fusion passe à 0.1.59 pour le journal automatique. fusion-validated: false et
 print-validated: false pour L05A, L05B et L05C. Le solveur reste inchangé.
 P64-L05B, P64-L05C, P64-L05D1/D2 et P64-L06A/B/C/D/E sont automated-validated. Le premier Goal L06 est terminé par la décision négative `no_algorithm_change_v1`.
+Cette décision ne compare aucun solveur externe mature. ADR-0081 et P64-L07
+préparent désormais la vraie campagne externe ; elle n'est pas encore lancée.
 
 ## Dernier état réel
 
@@ -60,20 +62,33 @@ Rapport final : P64_L06_GOAL_FINAL_REPORT.md.
 
 ## Prochaine action recommandée
 
-### Priorisation après le premier Goal P64-L06
+### Lancer P64-L07 dans la tâche de reprise
 
-Type : décision humaine facultative ; aucune action immédiate requise.
+Type : lancement humain unique.
 
-P64-L06A à P64-L06E sont terminées. Le premier Goal apporte un corpus, un oracle, un runner et une décision fiable, mais aucune amélioration du solveur. Les trois variantes de lanes sont rejetées et le holdout utilisé est consommé.
+La prochaine action exacte est :
 
-Deux suites restent possibles, sans urgence :
+1. ouvrir la nouvelle tâche P64-L07 créée depuis `origin/main` vérifié ;
+2. envoyer `/goal` ;
+3. laisser cette tâche exécuter L07A à L07E sans second GO.
 
-1. arrêter ici et laisser le journal automatique enrichir les observations réelles pendant l'usage normal de BGIG ;
-2. cadrer un second programme autonome autour d'une seule lacune profonde — contrôle de rotation, réservations ou recherche multi-conteneurs — avec un nouveau holdout.
+Le Goal devra auditer au moins huit solutions existantes et comparer au moins
+trois moteurs externes réellement distincts. Le solveur BGIG et son petit oracle
+interne restent des références mais ne comptent pas dans ces trois concurrents.
 
-P64-L06V reste une observation Fusion future et facultative. Aucun parcours spécial, aucune recapture et aucun agent ne sont nécessaires pour clôturer le Goal actuel.
+Le tournoi utilisera un corpus V2, des sources publiques pertinentes et un
+nouveau holdout. Il pourra intégrer un gagnant principal et jusqu'à deux
+compléments seulement si chacun apporte un gain distinct et si l'ensemble bat
+le meilleur moteur seul sous des ressources comparables.
 
-Modèle pour la prochaine étape : aucun tant que Thomas ne choisit pas une nouvelle cible. Si un second programme est décidé, le choix du modèle sera réévalué selon la lacune retenue.
+P64-L06 reste une expérience interne terminée ; son holdout est consommé et
+n'est pas réutilisable pour choisir P64-L07.
+
+Modèle conseillé : `gpt-5.6-sol`, raisonnement `high`, car la mission combine
+recherche récente, licences, modélisation mathématique, benchmarks longs,
+packaging Windows et intégration Git autonome. Option plus économique :
+`gpt-5.6-terra`, raisonnement `high`, acceptable pour L07A/L07B mais plus risqué
+pour l'adaptation, l'analyse des résultats et l'intégration L07C à L07E.
 
 ## Lots verrouillés
 

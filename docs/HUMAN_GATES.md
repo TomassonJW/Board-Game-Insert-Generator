@@ -1101,3 +1101,30 @@ Statut : aucune action humaine requise pour lancer ou poursuivre P64-L06. fusion
 La décision `no_algorithm_change_v1` ne demande aucune validation humaine : aucun comportement produit, géométrie, budget, certificat, Fusion ou scène ne change. P64-L06V reste une observation future facultative et ne bloque pas la clôture.
 
 Statut : aucune action humaine requise. fusion-validated: false. print-validated: false.
+
+## P64-L07 — lancement du benchmark externe
+
+Décision humaine enregistrée le 2026-07-23 : Thomas veut comparer BGIG au
+meilleur de ce qui est accessible et libre d'utilisation, puis intégrer le
+meilleur moteur ou jusqu'à trois moteurs complémentaires si les mesures le
+justifient.
+
+La seule action humaine requise pour démarrer est d'envoyer `/goal` dans la
+tâche de reprise P64-L07. Ce message vaut GO pour :
+
+- la recherche officielle et l'audit d'au moins huit candidats ;
+- l'acquisition isolée des candidats conformes ;
+- le benchmark d'au moins trois concurrents externes distincts ;
+- la création d'un corpus V2 et d'un nouveau holdout ;
+- l'intégration d'un à trois gagnants conformes à ADR-0081.
+
+Ne pas demander une seconde autorisation dans ce périmètre.
+
+Une nouvelle gate humaine apparaît seulement si le meilleur candidat exige une
+licence ambiguë ou incompatible, un composant propriétaire, un service distant,
+une installation globale, un dépassement de l'enveloppe 36 h / 8 Gio ou une
+extension T2-T4. Dans ce cas, conserver le résultat de benchmark sans intégrer
+le composant concerné.
+
+Statut : `ready-for-explicit-go`, en attente du `/goal` dans la nouvelle tâche.
+fusion-validated: false. print-validated: false.

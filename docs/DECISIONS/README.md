@@ -226,3 +226,4 @@ Tests, cartes backlog ou gates humaines a preparer.
 - ADR-0078-certified-plan-witness.md - plan témoin certifié persistant et recertifié comme point de départ.
 - ADR-0079-solver-case-corpus-and-measurement-gate.md - corpus exact, replay borné et comparaison fonctionnelle prioritaire.
 - ADR-0080-automatic-local-development-trail.md - journal local automatique, états dédupliqués et fin de la gate par bouton DEV.
+- ADR-0081-open-external-solver-tournament.md - audit de l'état de l'art, au moins trois concurrents externes et intégration mesurée de 1 à 3 gagnants.

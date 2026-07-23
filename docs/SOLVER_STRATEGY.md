@@ -273,3 +273,20 @@ reclassé en impossibilité de placement.
 La réutilisation post-solve est un chemin d'incrémentalité, pas une nouvelle
 heuristique de vérité. Elle peut figer les poses monde existantes, puis doit
 rejouer les certificats avec la nouvelle source.
+
+## Stratégie P64-L07 — comparer avant d'adopter
+
+ADR-0081 amende la préférence historique pour les seules lanes internes. Le
+portefeuille cible peut désormais inclure des moteurs externes libres
+d'utilisation si un tournoi reproductible démontre leur intérêt pour BGIG.
+
+La stratégie n'est pas « choisir un nom connu ». Elle impose au moins huit
+candidats audités, au moins trois concurrents externes distincts, un corpus V2,
+un nouveau holdout, des ressources comparables et une recertification BGIG de
+chaque sortie.
+
+Le meilleur moteur devient le candidat principal. Deux moteurs complémentaires
+au maximum peuvent être ajoutés seulement pour des familles d'entrée
+identifiables avant le solve et si l'ensemble bat le meilleur moteur seul sans
+multiplier artificiellement le budget. Les lanes internes restent le fallback
+tant que la nouvelle chaîne n'est pas certifiée et distribuable hors ligne.

@@ -1287,6 +1287,34 @@ fusion-validated: false. print-validated: false.
 
 La gate finale refuse les trois variantes de lanes faute de progression mesurée. `no_algorithm_change_v1` est la décision finale. Aucun changement du solveur, de ses budgets ou des frontières produit n'est intégré.
 
-La chaîne autonome de mesure est désormais disponible, mais le holdout L06 est consommé. Une future campagne devra sélectionner une seule lacune profonde, créer un nouveau holdout et obtenir un nouveau cadre d'exécution avant tout changement structurel.
+La chaîne autonome de mesure est désormais disponible et le holdout L06 est consommé. La restriction historique à une seule lacune profonde est supersédée par ADR-0081 : P64-L07 compare plusieurs familles externes sur un corpus V2 et un nouveau holdout, sans réutiliser les réponses L06.
 
 fusion-validated: false. print-validated: false.
+
+## P64-L07 — benchmark externe et portefeuille mesuré (cadrage 2026-07-23)
+
+ADR-0081 remplace la suite vague de L06 par une séquence exécutable :
+
+1. L07A audite au moins huit solutions et retient au moins trois concurrents
+   externes distincts après les gates de licence et de plateforme ;
+2. L07B construit un corpus BGIG V2, ajoute des sources publiques et scelle un
+   nouveau holdout indépendant ;
+3. L07C adapte au moins trois moteurs dans des environnements isolés et
+   recertifie leurs sorties ;
+4. L07D exécute régressions, discovery, tuning, sélection scellée puis holdout
+   sous ressources comparables ;
+5. L07E intègre le gagnant principal et jusqu'à deux compléments seulement si
+   leurs gains sont distincts et répétés.
+
+Les trois variantes internes de L06 ne comptent pas comme trois concurrents. Le
+solveur BGIG et le petit oracle restent des références. Le holdout L06 est
+consommé et interdit pour la nouvelle sélection.
+
+Le Goal est borné à 36 h et 8 Gio, T0/T1, fonctionnement hors ligne, versions
+et licences verrouillées. Chaque mission est testée, documentée, intégrée dans
+`main`, poussée et vérifiée avant la suivante. Le `/goal` de la tâche de reprise
+vaut GO complet, sans seconde autorisation dans ce périmètre.
+
+Statut : ready-for-explicit-go. Aucun benchmark L07 ni aucune intégration
+externe ne sont encore réalisés. fusion-validated: false.
+print-validated: false.

@@ -12,7 +12,10 @@ Phase active : P64-L04A/B/C, P64-L04R1 et P64-L05A/B/C/D1/D2 sont
 automated-validated. Le retour humain L04V est globalement KO mais partiellement
 positif. Le manifest Fusion passe à 0.1.59 pour P64-L05V-R2. L05D1/D2 sont
 automated-validated.
-ADR-0080 remplace la gate humaine par un journal local automatique ; P64-L06 est autorisé et L06A est la prochaine mission autonome.
+ADR-0080 remplace la gate humaine par un journal local automatique.
+P64-L06A à L06E sont terminées avec une décision négative interne. ADR-0081
+rend P64-L07 `ready-for-explicit-go` pour la vraie comparaison externe ; aucun
+benchmark L07 n'est encore lancé.
 P64-V2H03V et P44-V sont fusion-validated sur 0.1.55. P45-M001V est
 architecture-accepted. P64-L03V est un KO contextuel sur 0.1.56 et n'accorde
 aucune validation Fusion à la correction minimal/final.
@@ -3185,3 +3188,43 @@ La gate finale exige un gain objectif. Les trois variantes `lane_center_quick_v1
 L06E est documentaire et ne modifie aucun code du solveur, budget, deadline, certificat, schéma, tolérance, géométrie, finalisation, CAD, scène, manifest ou valeur physique. Le holdout L06 est consommé et une future campagne devra en créer un nouveau.
 
 Le premier Goal P64-L06 est terminé. Aucune action humaine ni validation Fusion supplémentaire n'est requise pour cette clôture.
+
+## P64-L07 — vrai benchmark externe préparé (2026-07-23)
+
+Statut : done-documentation, architecture-accepted, ready-for-explicit-go.
+Aucun changement runtime. fusion-validated: false, print-validated: false.
+
+ADR-0081 enregistre que P64-L06 n'a pas comparé l'état de l'art : il a mesuré
+BGIG, un petit oracle interne et trois variantes mineures. P64-L07 devient une
+campagne distincte avec au moins huit candidats audités, au moins trois moteurs
+externes réellement distincts, des sources publiques, un corpus V2 et un nouveau
+holdout.
+
+Les sources officielles confirment des points de départ plausibles :
+
+- PackingSolver couvre notamment le packing de boîtes 3D et publie son code sous
+  licence MIT : <https://github.com/fontanf/packingsolver> ;
+- `3d-bin-container-packing` fournit LAFF et une recherche exhaustive pour les
+  petits cas sous Apache-2.0 :
+  <https://github.com/skjolber/3d-bin-container-packing> ;
+- OR-Tools CP-SAT est disponible en Python sous Windows et sous Apache-2.0 :
+  <https://developers.google.com/optimization/cp/cp_solver> ;
+- SCIP est sous Apache-2.0 depuis sa version 8.0.3, avec audit requis pour ses
+  composants optionnels : <https://www.scipopt.org/> ;
+- HiGHS fournit un solveur MIP sous MIT, testé sous Windows :
+  <https://highs.dev/>.
+
+Ces noms ne sont pas des gagnants préchoisis. L07A doit élargir la recherche,
+vérifier les versions et toutes les licences, puis retenir au moins trois
+familles différentes. Toute sortie est recertifiée par BGIG. L07E intègre un
+gagnant principal et jusqu'à deux compléments seulement si leurs gains sont
+distincts et si le portefeuille bat le meilleur moteur seul sous ressources
+comparables.
+
+Le `/goal` lancé dans la tâche de reprise vaut GO complet pour L07A à L07E sans
+seconde autorisation dans le périmètre ADR-0081. La campagne reste bornée à 36 h,
+8 Gio, T0/T1, Windows hors ligne et des installations isolées.
+
+Validation de cette préparation : garde documentaire 2/2, alignement
+Fusion-only 6/6 et suite complète 715/715 en 225,888 s. Les contrôles Git sont
+consignés à la clôture de la mission.

@@ -536,3 +536,33 @@ validateur commun. ADR-0068, ADR-0079, les caps publics, la deadline Deep et
 l'interdiction d'auto-modification restent normatifs.
 
 ADR-0080 rend les journaux et cas réels complémentaires : leur absence ne bloque plus la génération T0/T1, les oracles internes ni la campagne autonome. Aucune validation Fusion ou impression n'en est déduite.
+
+## 18. Amendement P64-L07 — comparaison externe obligatoire
+
+ADR-0081 corrige la portée du premier Goal sans invalider ses mesures : L06 a
+testé le solveur BGIG, un petit oracle interne et des variantes mineures, pas
+l'état de l'art externe.
+
+P64-L07 rend désormais obligatoires :
+
+- un inventaire d'au moins huit solutions existantes ;
+- au moins trois concurrents externes de familles réellement distinctes ;
+- un contrôle de licence, de redistribution, de Windows hors ligne et de
+  packaging avant intégration ;
+- un corpus V2 avec sources publiques et nouveau holdout ;
+- la recertification de toutes les sorties par BGIG ;
+- une comparaison sous ressources totales équivalentes ;
+- un gagnant principal et jusqu'à deux compléments seulement si leurs gains ne
+  se recouvrent pas.
+
+PackingSolver, LAFF, CP-SAT, SCIP et HiGHS deviennent des points de départ à
+auditer, pas des gagnants préchoisis. Une dépendance qui satisfait ADR-0081 peut
+être intégrée par L07E avec son ADR factuelle et sans second GO après le
+`/goal` canonique. Une licence ambiguë, un service distant ou une installation
+globale reste une vraie gate humaine.
+
+Autorités :
+
+- `docs/DECISIONS/ADR-0081-open-external-solver-tournament.md` ;
+- `docs/P64_L07_OPEN_SOLVER_TOURNAMENT_PROGRAM.md` ;
+- `docs/P64_L07_AUTONOMOUS_GOAL_RUNBOOK.md`.

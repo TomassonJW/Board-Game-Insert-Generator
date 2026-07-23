@@ -2921,7 +2921,7 @@ implémentée et intégrée à la fois.
 - Livré : décision `no_algorithm_change_v1`, refus formel des trois variantes sans gain et rapport final du Goal.
 - Changement solveur : aucun.
 - Holdout : consommé ; une future sélection exige une nouvelle version de corpus ou un nouveau holdout.
-- Suite différée : cibler une seule lacune profonde et repasser une gate mesurée distincte.
+- Suite : cette formulation est supersédée par ADR-0081 ; P64-L07 compare plusieurs familles externes sur un corpus V2 et un nouveau holdout.
 - Interdits : changement silencieux de caps, budgets, deadline, certificat ou schéma ; auto-édition ; revendication générale depuis un cas trivial.
 
 ### P64-L06V — confirmation Fusion des cas retenus
@@ -2950,4 +2950,80 @@ implémentée et intégrée à la fois.
 - Dépendance runtime : L06A à L06E sont terminées ; le premier Goal est clôturé.
 - Interdits : aucun solveur ou budget modifié, aucune dépendance externe
   installée, aucun T2-T4, aucune promotion d'un projet personnel.
-- Suite : aucune action immédiate ; nouvelle priorisation humaine avant un second programme.
+- Suite : P64-L07A est `ready-for-explicit-go` ; le `/goal` dans la tâche de reprise est l'unique lancement humain.
+
+### P64-L07P — préparation du vrai benchmark externe
+
+- Statut : done-documentation, architecture-accepted.
+- Décision : ADR-0081.
+- Livré : programme externe, runbook 36 h / 8 Gio, minimum de trois
+  concurrents, corpus V2, nouveau holdout et règle d'intégration de 1 à 3
+  gagnants complémentaires.
+- Déclencheur : `/goal` dans la tâche de reprise ; aucun second GO.
+- Runtime : inchangé ; aucun candidat encore adopté.
+
+### P64-L07A — recherche et shortlist externe
+
+- Statut : ready-for-explicit-go.
+- Dépendance : P64-L07P terminé et `/goal` de Thomas.
+- Objectif : auditer au moins huit solutions depuis leurs sources officielles.
+- Couverture : solveur spécialisé 3D, contraintes/SAT, nombres entiers et
+  recherche exacte ou hybride.
+- Acceptation : au moins trois candidats externes réellement distincts passent
+  licence, plateforme, hors ligne, automatisation, délai et mémoire.
+- Refus honnête : moins de trois candidats conformes laisse le Goal incomplet.
+- Sortie : inventaire versionné, shortlist et preuves, puis intégration Git
+  complète avant L07B.
+
+### P64-L07B — corpus public et BGIG V2
+
+- Statut : blocked-by-P64-L07A.
+- Objectif : manifest V2, familles BGIG, au moins deux sources publiques
+  indépendantes et petits cas exacts.
+- Splits : regression, discovery, tuning et nouveau holdout fermé.
+- Protection : aucune famille, graine ou projet corrélé entre tuning et holdout ;
+  holdout L06 consommé et interdit pour la sélection.
+- Acceptation : reconstruction déterministe, licences/empreintes des données,
+  témoins et preuves négatives vérifiés.
+
+### P64-L07C — adapters d'au moins trois moteurs
+
+- Statut : blocked-by-P64-L07B.
+- Objectif : environnements isolés, versions et SHA-256 verrouillés, entrée et
+  sortie communes.
+- Vérité : toute solution repasse par le certificat BGIG ; contrainte perdue =
+  `unsupported`, limite atteinte = `bounded_unknown`.
+- Acceptation : au moins trois concurrents externes distincts contrôlés sur les
+  petits cas exacts et les régressions.
+- Git : mission testée, commitée, intégrée et poussée avant L07D.
+
+### P64-L07D — tournoi externe progressif
+
+- Statut : blocked-by-P64-L07C.
+- Ordre : contrôles exacts, régressions, discovery, élimination, tuning, choix
+  scellé, holdout unique, soak seulement si utile.
+- Équité : même entrée, limites annoncées et ressources totales comparables ;
+  mesure de couverture, certificat, qualité, temps, CPU, mémoire et packaging.
+- Acceptation : rapport reproductible, choix avant holdout et absence de
+  contamination.
+
+### P64-L07E — intégration du meilleur portefeuille
+
+- Statut : blocked-by-P64-L07D.
+- Objectif : intégrer le gagnant principal et jusqu'à deux compléments.
+- Condition multi-moteurs : chaque complément gagne une famille distincte et le
+  portefeuille bat le meilleur moteur seul sous ressources comparables.
+- Gate produit : licence et redistribution, Windows hors ligne, version,
+  empreinte, avis, taille, démarrage, fallback et plan de retrait.
+- Acceptation : aucune régression, suite complète verte, ADR factuelle par
+  dépendance, rapport final, `main` poussé et SHA distant vérifié.
+- Résultat négatif valide : aucun moteur intégré si les gates échouent ; moins
+  de trois moteurs externes testés ne vaut pas benchmark terminé.
+
+### P64-L07V — observation Fusion éventuelle
+
+- Statut : future-human-gate.
+- Dépendance : seulement après une intégration L07E.
+- Scope : observer le comportement produit du portefeuille intégré sans
+  revendiquer de validation d'impression.
+- fusion-validated: false et print-validated: false avant preuve dédiée.
