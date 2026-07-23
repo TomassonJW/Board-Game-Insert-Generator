@@ -29,7 +29,10 @@ Le validateur refuse les chemins de documents, chemins de fichiers, secrets, jet
 - contrôle du nouveau code Python : OK ;
 - syntaxe JavaScript de la palette : OK ;
 - syntaxe du préparateur PowerShell : OK ;
-- contrôle final des différences : prévu juste avant le commit.
+- contrôle final des différences avant commit : OK ;
+- préparateur et installation locale : 83/83 contrôles ciblés, préflight et vérification du paquet OK ;
+- commit fonctionnel `31b867e` intégré directement dans `main` et SHA distant vérifié ;
+- add-in 0.1.59 installé : manifest et journal présents, bouton DEV absent.
 
 ## Limites honnêtes
 

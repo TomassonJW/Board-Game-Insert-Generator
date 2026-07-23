@@ -524,4 +524,4 @@ Les chemins personnels et secrets sont refusés. Les journaux et projets restent
 
 ADR-0080 ferme la gate de recapture R1. Les cas réels restent complémentaires ; le corpus versionné, les générateurs T0/T1 et les oracles internes suffisent au Goal. L06A est `ready` comme inventaire et classification, puis L06B à L06E restent ordonnés.
 
-Statut : implemented-fusion-bridge, implemented-fusion-ui, automated-validated. fusion-validated: false. print-validated: false.
+Statut : implemented-fusion-bridge, implemented-fusion-ui, automated-validated, integrated-main, installed-local 0.1.59. fusion-validated: false. print-validated: false.

@@ -3080,6 +3080,8 @@ Le producteur refuse les clés de chemins et de secrets, reste hors `adsk` et n'
 
 Tests ciblés : journal 2/2, palette 38/38, transport Fusion 9/9 et préparation d acceptation 5/5. Suite complète : 685/685 en 156,721 s. Compilation Python, syntaxe JavaScript, préparateur PowerShell et contrôles ciblés du code : OK.
 
+Clôture locale : commit fonctionnel `31b867e` intégré dans `main` et vérifié à distance ; préparateur 83/83, add-in 0.1.59 installé, journal présent et bouton DEV absent.
+
 La gate de paire R1 est supersédée. Les bundles existants sont des observations complémentaires locales ; L06A les inventorie sans bloquer L06B. Aucun changement de solveur, budget, deadline, certificat, géométrie, finalisation, CAD ou scène.
 
 fusion-validated: false. print-validated: false.

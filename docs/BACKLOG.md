@@ -2875,7 +2875,7 @@ implémentée et intégrée à la fois.
 
 ### P64-L05V-R2 - journal automatique du parcours
 
-- Statut : done-code, automated-validated, pending-integration-and-install.
+- Statut : done, automated-validated, integrated-main, installed-local ; fusion-validated: false, print-validated: false.
 - Livre : bouton DEV retiré, événements JSON Lines, états de projet dédupliqués, route Fusion séparée et add-in 0.1.59.
 - Protection : aucun chemin ou secret, aucune promotion automatique, aucune opération métier déclenchée.
 - Décision : ADR-0080 ; contrat et preuve P64-L05V-R2.
