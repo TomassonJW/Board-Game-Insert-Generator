@@ -149,6 +149,10 @@ preuves archivées.
 - ADR-0078 : sidecar exact, recertification et recherche sans court-circuit.
 - P64_L05C_CERTIFIED_PLAN_WITNESS_CONTRACT.md : identite, persistance, warm start et invariants.
 - P64_L05C_CERTIFIED_PLAN_WITNESS_EVIDENCE.md : preuves coeur, Deep, staged, bridge et DOM.
+- P64_L06_SOLVER_BENCHMARK_CAMPAIGN.md : tiers T0/T1, oracles, comparateurs,
+  métriques, protocole goal et lots L06A à L06V.
+- FUTURE_PRODUCT_HORIZONS.md : registre différé des formes, mécanismes,
+  visualisations et du futur compositeur manuel 3D.
 - ADR-0074 : supersession partielle d'ADR-0071 après le KO Fusion 0.1.56.
 - STATUS.md : faits réalisés, validations et limites.
 - CAPABILITY_MAP.md : capability et niveau de preuve.
@@ -484,3 +488,17 @@ fusion-validated: false. print-validated: false.
 ### Installation P64-L05V-R1
 
 Le commit e817432 est installe dans l add-in 0.1.58 ; marqueur, settings, runtime et fixture sont verifies. Statut : ready-human-recapture. La prochaine action reste uniquement les deux captures du cas reel.
+
+## Cadrage P64-L06 et horizons produit (2026-07-23)
+
+La vision différée distingue désormais les capacités locales P45, le placement
+global P64, les mécanismes P47-P50 et les futures surfaces P69/P70+. Cercles,
+polygones, formes composites, poses inclinées, conteneurs fermés réorientables,
+plateaux-couvercles, cloisons spécialisées, finitions, couleurs, aperçu 3D et
+compositeur manuel sont conservés sans élargir le runtime.
+
+Le programme P64-L06 définit une campagne autonome reprenable : cas T0/T1
+actuels, oracles certifiés, adapters offline, tiers CI/extended/soak et gate A/B.
+Il exclut l'auto-modification et ne rend aucune dépendance externe acceptable.
+La première mission runtime reste P64-L06A après confirmation des captures R1 ;
+ce cadrage documentaire ne lève aucune gate.

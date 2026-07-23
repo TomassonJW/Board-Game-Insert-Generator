@@ -193,3 +193,20 @@ P64-L06A pourra ensuite anonymiser, rejouer et classifier la paire. Aucune optim
 ### Installation P64-L05V-R1 terminee
 
 Le commit e817432 est installe et marque dans Fusion 0.1.58. Thomas doit seulement recharger l add-in, ouvrir Mon insert dans son etat certifie, refaire le meme ajout, capturer apres le refus, lancer le calcul puis capturer apres l echec. Aucune preparation technique supplementaire n est requise.
+
+## Cadrage de la suite P64-L06 (2026-07-23)
+
+Le programme de benchmark et le registre des horizons produit sont désormais
+documentés. Ils n'écrasent pas la prochaine action unique :
+
+1. confirmer les deux captures R1 exactes ;
+2. exécuter P64-L06A en lecture contrôlée : anonymisation, replay et
+   classification, sans changement de solveur ;
+3. seulement ensuite ouvrir L06B/L06C pour les oracles, générateurs et
+   comparateurs offline ;
+4. lancer une campagne autonome L06D avant de sélectionner une seule
+   amélioration L06E.
+
+Les formes complexes, couvercles avancés, couleurs, aperçu 3D et compositeur
+manuel restent des horizons différés. Ils ne sont pas injectés dans le benchmark
+rectangulaire T0/T1.

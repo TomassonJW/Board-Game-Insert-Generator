@@ -1190,3 +1190,30 @@ fusion-validated: false tant que le warm start et la capture reelle ne sont pas 
 La premiere sequence reelle de trois bundles valide le mecanisme de collecte et expose une lacune : la capture relancait une synchronisation avant de figer l etat, ce qui supprimait la raison exacte du refus incremental. R1 fige le snapshot d abord et ne change aucune capacite solveur.
 
 Ordre suivant : installation R1, recapture de la paire refus incremental / echec global, anonymisation et replay P64-L06A, puis seulement proposition d une evolution algorithmique mesuree. fusion-validated: false ; print-validated: false.
+
+## P64-L06 — campagne algorithmique mesurée (cadrage 2026-07-23)
+
+La trajectoire solveur après R1 est maintenant verrouillée :
+
+1. L06A anonymise et rejoue le cas réel sans modifier l'algorithme ;
+2. L06B ajoute oracles et génération T0/T1 ;
+3. L06C compare au plus deux adapters offline et recertifie leurs sorties ;
+4. L06D exécute les tiers CI, extended puis éventuellement soak ;
+5. L06E implémente une seule amélioration passée par la gate A/B ;
+6. L06V vérifie les cas réels dans Fusion.
+
+Les candidats externes ne sont pas des dépendances acceptées. La campagne mesure
+d'abord couverture et certificats, puis qualité et vitesse. Un échec borné reste
+inconnu et une marge volumique positive ne prouve pas la faisabilité.
+
+## Horizons post-V0.3 conservés, non activés
+
+`docs/FUTURE_PRODUCT_HORIZONS.md` explicite les directions destinées aux futures
+priorisations P69/P70+ : primitives circulaires et polygonales, composites,
+rangeurs inclinés, conteneurs fermés réorientables, couvercles avancés,
+plateaux-couvercles, cloisons spécialisées, finitions par coin, ajourages,
+couleurs sémantiques, aperçu 3D léger et compositeur manuel sur grille 3D.
+
+Ce registre n'altère pas la séquence V0.2/V0.3 ni les dépendances P45-P50/P69.
+Les formes futures deviennent des familles de benchmark seulement après leur
+contrat ; l'UI et l'esthétique ne deviennent jamais des objectifs du solveur.

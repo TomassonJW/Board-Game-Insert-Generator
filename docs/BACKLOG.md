@@ -2882,3 +2882,52 @@ implémentée et intégrée à la fois.
 - Entree attendue : deux bundles R1, refus incremental puis echec global, avec projet identique entre les deux captures.
 
 P64-L05V-R1 installation : done sur 0.1.58 commit e817432. Statut courant : ready-human-recapture.
+
+### P64-L06B — oracles et génération T0/T1
+
+- Statut : planned-after-P64-L06A.
+- Scope : étendre le corpus avec cas faisables par construction, cas négatifs
+  prouvables, permutations adverses et futur témoin humain normalisé.
+- Interdits : aucune scène Fusion autoritaire, aucun projet personnel promu,
+  aucune forme future simulée dans T0/T1.
+
+### P64-L06C — comparateurs solveur offline
+
+- Statut : planned-after-P64-L06A.
+- Scope : adapters pour deux candidats maximum, priorité à PackingSolver et à un
+  petit oracle exact interne ou CP-SAT ; recertification BGIG obligatoire.
+- Gate : toute installation, dépendance versionnée ou intégration produit exige
+  analyse de licence/packaging, ADR et GO explicite.
+
+### P64-L06D — campagne autonome bornée
+
+- Statut : planned-after-P64-L06B/L06C.
+- Scope : tiers CI/extended/soak reprenables, métriques fonctionnelles,
+  qualité, temps au premier incumbent, mémoire et stabilité.
+- Sortie : une classification des lacunes et une seule hypothèse L06E.
+
+### P64-L06E — amélioration algorithmique ciblée
+
+- Statut : planned-after-P64-L06D.
+- Scope : modifier une lane, une borne, un ordre ou une représentation à la
+  fois, puis passer L05D1 A/B et le corpus L06.
+- Interdits : changement silencieux de caps, budgets, deadline, certificat ou
+  schéma ; auto-édition ; revendication générale depuis un cas trivial.
+
+### P64-L06V — confirmation Fusion des cas retenus
+
+- Statut : future-human-gate.
+- Scope : rejouer les cas réels difficiles, distinguer capacité, UX, temps et
+  matérialisation.
+- `print-validated: false` tant qu'aucune impression réelle n'est mesurée.
+
+### P70+ — registre des horizons produit après V0.3
+
+- Statut : deferred-by-P69.
+- Autorité : `docs/FUTURE_PRODUCT_HORIZONS.md`.
+- Scope conservé : formes circulaires/polygonales/composites, poses inclinées,
+  conteneurs fermés réorientables, familles de couvercles, plateau à double
+  rôle, cloisons spécialisées, finitions, couleurs, aperçu 3D léger et
+  compositeur manuel 3D.
+- Activation : P69 priorise et découpe ; aucune de ces directions n'est `ready`
+  par sa seule présence dans le backlog.

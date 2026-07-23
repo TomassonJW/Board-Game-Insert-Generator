@@ -1721,3 +1721,33 @@ séparation géométrique minimal/final ; ADR-0074 porte la correction.
 - C-SAFETY : aucun solve, finaliseur, CAD, scene ou auto-modification ; aucun bundle personnel commite.
 - C-SOLVER : capacite strictement inchangee. Les trois captures confirment seulement un echec borne sur le cas reel.
 - Statut : automated-validated, fusion-validated: false, print-validated: false. Suite : recapture R1 puis P64-L06A.
+
+## Registre de capabilities différées après V0.3
+
+Ces capabilities sont `deferred-vision`. Elles ne modifient pas le tableau
+canonique V0.1-V0.3 et ne deviennent pas `ready` avant P69 ou une dépendance
+explicitement acceptée.
+
+| ID | Capability | Propriétaire | Statut | Horizon indicatif | Gate |
+| --- | --- | --- | --- | --- | --- |
+| C-SHAPE-PRIMITIVES | Cercles, polygones et contours simples extrudés | P45 / C-GEOMETRY | `deferred-vision` | V1.x/V2 | contrat, CAD, Fusion, impression |
+| C-SHAPE-ARBITRARY-3D | Solides irréguliers, maillages ou voxels | futur moteur géométrique | `research-only` | V4+ | ADR majeure et benchmark dédié |
+| C-ANGLED-HOLDERS | Rangeurs inclinés avec angles discrets | P45 | `deferred-vision` | V1.x/V2 | pose, support, accès, impression |
+| C-ADVANCED-MECHANISMS | Familles de couvercles et plateau à double rôle | P47-P50/P70+ | `deferred-vision` | V1.x/V3 | mécanisme, tolérances, coupons |
+| C-LIGHTWEIGHT-3D-PREVIEW | Rendu primitif du plan sans CAD | P69/P70+ | `deferred-vision` | V1.x/V2 | vérité du plan et UX approximative |
+| C-MANUAL-3D-COMPOSER | Surface parallèle de placement manuel sur grille | P70+ | `deferred-vision` | V3/V4 | ADR UI, même validateur et certificats |
+| C-SEMANTIC-THEMES | Couleurs par entité et presets accessibles | P69/P70+ | `deferred-vision` | V1.x/V2 | identités, contraste, persistance |
+
+Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
+
+## Mise à jour P64-L06 — campagne de benchmark conçue
+
+- C-SOLVER / C-QUALITY : un programme T0/T1 reproductible est `designed` ;
+  vérité fonctionnelle, certificat et qualité précèdent le temps.
+- C-PROJECT-CONTRACT : les cas réels restent anonymisés et revus ; un futur
+  témoin humain doit être normalisé et certifié, jamais déduit de la scène.
+- C-SAFETY : aucune auto-modification, aucun projet personnel promu, aucune
+  dépendance ou installation acceptée par le cadrage.
+- C-FUSION-UI / C-GEOMETRY / C-CAD-IR : inchangées.
+- Statut runtime : P64-L06A reste bloqué par la confirmation R1 ;
+  `fusion-validated: false`, `print-validated: false`.

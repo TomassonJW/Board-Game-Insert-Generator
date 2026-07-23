@@ -3031,3 +3031,29 @@ Trois bundles locaux valides montrent 17/19 avec plan certifie, puis 18/20 avec 
 Le defaut etait dans l instrumentation : capture_solver_case resynchronisait la session et remplacait le rapport du refus par dependencies_unchanged. Le snapshot est maintenant fige avant cette etape. Validation : 27/27 bridge, 3/3 bundle, 7/7 insertion globale, 38/38 DOM et 682/682 suite complete. Aucun fichier personnel n est commite.
 
 Installation P64-L05V-R1 : commit e817432 installe dans 0.1.58 ; marqueur de commit, settings, runtime, fixture et 81 validations ciblees du preparateur sont OK. La recapture humaine reste la seule action ouverte.
+
+## P64-L06 — cadrage benchmark et horizons différés (2026-07-23)
+
+Statut : `done-documentation`, aucun changement runtime.
+
+Deux autorités documentaires sont ajoutées :
+
+- `P64_L06_SOLVER_BENCHMARK_CAMPAIGN.md` définit les familles T0 à T4, la
+  matrice T0/T1, les oracles, les comparateurs offline, les métriques, les tiers
+  CI/extended/soak et le protocole goal ;
+- `FUTURE_PRODUCT_HORIZONS.md` conserve les formes, poses, mécanismes,
+  finitions, couleurs, aperçu 3D et compositeur manuel sans les rendre `ready`.
+
+L'arbitrage maintient P45 propriétaire des formes et poses locales, P64
+propriétaire du placement global certifié, P47-P50 propriétaires des mécanismes
+et P69/P70+ propriétaires des futures surfaces UI. PackingSolver, LAFF, CP-SAT
+et libnest2d sont seulement des candidats d'étude ; aucune dépendance n'est
+ajoutée.
+
+P64-L06A reste bloqué par la confirmation des captures R1. Aucun solveur, lane,
+classement, budget, deadline, schéma, géométrie, CAD IR, scène ou manifest Fusion
+ne change. `fusion-validated: false`, `print-validated: false`.
+
+Validation du cadrage : garde documentaire 2/2, Ruff ciblé, py_compile et suite
+complète 682/682. Le premier lancement sans `PYTHONPATH` a échoué sur deux
+imports ; la relance canonique avec `PYTHONPATH=src` est verte.

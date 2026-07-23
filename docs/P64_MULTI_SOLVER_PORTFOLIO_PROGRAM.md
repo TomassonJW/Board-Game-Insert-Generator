@@ -519,3 +519,18 @@ axes nommés et ne remplace l’incumbent que par une amélioration stricte.
 Contrat :
 `docs/P64_L04B_DEEP_ANYTIME_CONTRACT.md`.
 `fusion-validated: false`, `print-validated: false`.
+
+## 17. Gouvernance de la campagne P64-L06
+
+`docs/P64_L06_SOLVER_BENCHMARK_CAMPAIGN.md` prolonge le corpus et la gate A/B
+sans changer ce portefeuille. Il sépare :
+
+- les scénarios T0/T1 du contrat rectangulaire actuel ;
+- les futurs contrats de poses, formes extrudées et formes 3D arbitraires ;
+- les comparateurs offline d'une éventuelle dépendance produit ;
+- capacité fonctionnelle, qualité, temps au premier incumbent et vitesse.
+
+PackingSolver, LAFF, CP-SAT ou un moteur de nesting restent des candidats de
+benchmark, pas des dépendances acceptées. Toute sortie externe repasse par le
+validateur commun. ADR-0068, ADR-0079, les caps publics, la deadline Deep et
+l'interdiction d'auto-modification restent normatifs.
