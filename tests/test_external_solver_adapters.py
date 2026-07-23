@@ -182,6 +182,53 @@ class ExternalSolverAdapterTests(unittest.TestCase):
             self.assertEqual(second.report["status"], STATUS_SOLUTION_FOUND)
             self.assertTrue(second.report["timing"]["checkpoint_reused"])
 
+    def test_wall_limit_is_bounded_unknown_not_external_error(self) -> None:
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            worker = _write_fake_worker(root, "sleep")
+            execution = run_external_solver_adapter(
+                self.controls["cases"][0],
+                "ortools_cp_sat",
+                artifact_lock=self.lock,
+                artifact_receipt=_receipt(self.lock, "ortools_cp_sat"),
+                runtime=ExternalSolverRuntime(
+                    candidate_id="ortools_cp_sat",
+                    command=(sys.executable, str(worker)),
+                    environment=(),
+                    scratch_root=str(root / "runs"),
+                    worker_digest=_sha256_path(worker),
+                ),
+                limits=ExternalSolverLimits(wall_seconds=0.1),
+            )
+
+            self.assertEqual(
+                execution.report["status"], STATUS_BOUNDED_UNKNOWN
+            )
+            self.assertEqual(
+                execution.report["stop_reason"],
+                "wall_time_limit_exceeded",
+            )
+            self.assertEqual(execution.report["errors"], [])
+
+            resumed = run_external_solver_adapter(
+                self.controls["cases"][0],
+                "ortools_cp_sat",
+                artifact_lock=self.lock,
+                artifact_receipt=_receipt(self.lock, "ortools_cp_sat"),
+                runtime=ExternalSolverRuntime(
+                    candidate_id="ortools_cp_sat",
+                    command=(sys.executable, str(worker)),
+                    environment=(),
+                    scratch_root=str(root / "runs"),
+                    worker_digest=_sha256_path(worker),
+                ),
+                limits=ExternalSolverLimits(wall_seconds=0.1),
+            )
+            self.assertEqual(
+                resumed.report["status"], STATUS_BOUNDED_UNKNOWN
+            )
+            self.assertTrue(resumed.report["timing"]["checkpoint_reused"])
+
     def test_exact_and_heuristic_negative_statuses_remain_distinct(self) -> None:
         with TemporaryDirectory() as directory:
             root = Path(directory)
@@ -265,7 +312,7 @@ def _write_fake_worker(root: Path, status: str) -> Path:
         ]
         Path(sys.argv[2]).write_text("\\n".join(output) + "\\n")
         """
-    else:
+    elif status == "infeasible":
         body = """
         import sys
         from pathlib import Path
@@ -274,6 +321,12 @@ def _write_fake_worker(root: Path, status: str) -> Path:
             "P64L07RESULT\\t1\\n"
             "RESULT\\tinfeasible\\t1.0\\tZmFrZS1pbmZlYXNpYmxl\\n"
         )
+        """
+    else:
+        body = """
+        from time import sleep
+
+        sleep(2.0)
         """
     worker.write_text(textwrap.dedent(body), encoding="utf-8")
     return worker.resolve()

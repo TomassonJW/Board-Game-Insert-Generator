@@ -1,0 +1,86 @@
+{
+  "candidate_ids": [
+    "ortools_cp_sat",
+    "highs",
+    "scip",
+    "laff"
+  ],
+  "config_digest": "03b40e95e8bad5b11f2bfa2c669b4509e6743c62d068ad34107fb25a9e1ced7c",
+  "invariants": {
+    "fusion_validated": false,
+    "holdout_opening_count_before_selection": 0,
+    "minimum_external_candidate_count": 3,
+    "minimum_external_family_count": 3,
+    "post_open_tuning_allowed": false,
+    "print_validated": false,
+    "product_solver_routing_changed": false
+  },
+  "portfolio_policy": {
+    "distinct_family_gain_required": true,
+    "maximum_candidate_count": 3,
+    "must_beat_best_single": true,
+    "one_engine_invocation_per_case": true,
+    "router_inputs": [
+      "family"
+    ]
+  },
+  "ranking": {
+    "gate_order": [
+      "candidate_failure_count",
+      "oracle_miss_count",
+      "oracle_pass_count",
+      "certified_solution_count",
+      "shared_lexicographic_quality",
+      "total_wall_seconds",
+      "distribution_byte_count",
+      "candidate_id"
+    ],
+    "invalid_output_policy": "fail_closed",
+    "public_method_controls_product_ranked": false,
+    "quality_contract": "bgig.minimal_layout_lexicographic.v1",
+    "unsupported_policy": "excluded_from_quality_but_counted_in_coverage"
+  },
+  "schema_version": "bgig.external_solver_tournament_config.v1",
+  "stages": {
+    "discovery": {
+      "memory_mebibytes": 1024,
+      "seed": 640707,
+      "threads": 1,
+      "wall_seconds": 3.0
+    },
+    "exact_controls": {
+      "memory_mebibytes": 1024,
+      "seed": 640707,
+      "threads": 1,
+      "wall_seconds": 10.0
+    },
+    "holdout": {
+      "memory_mebibytes": 1024,
+      "seed": 640709,
+      "threads": 1,
+      "wall_seconds": 3
+    },
+    "regression": {
+      "memory_mebibytes": 1024,
+      "seed": 640707,
+      "threads": 1,
+      "wall_seconds": 3.0
+    },
+    "tuning_trials": [
+      {
+        "memory_mebibytes": 1024,
+        "seed": 640707,
+        "threads": 1,
+        "trial_id": "seed-640707",
+        "wall_seconds": 3.0
+      },
+      {
+        "memory_mebibytes": 1024,
+        "seed": 640708,
+        "threads": 1,
+        "trial_id": "seed-640708",
+        "wall_seconds": 3.0
+      }
+    ]
+  }
+}

@@ -471,7 +471,12 @@ def run_external_solver_adapter(
         return ExternalAdapterExecution(report, None)
     problem = preparation.problem
     worker_run = _execute_worker(problem, runtime, envelope)
-    if worker_run["execution_status"] != "completed":
+    execution_status = str(worker_run["execution_status"])
+    if execution_status != "completed":
+        bounded_limit = execution_status in {
+            "wall_time_limit_exceeded",
+            "memory_limit_exceeded",
+        }
         report = _report_from_worker(
             problem,
             candidate,
@@ -479,8 +484,12 @@ def run_external_solver_adapter(
             envelope,
             worker_run,
             worker_output=None,
-            status=STATUS_EXTERNAL_ERROR,
-            stop_reason=str(worker_run["execution_status"]),
+            status=(
+                STATUS_BOUNDED_UNKNOWN
+                if bounded_limit
+                else STATUS_EXTERNAL_ERROR
+            ),
+            stop_reason=execution_status,
             recertification=_not_attempted_certificate(),
             solution=None,
         )
@@ -696,7 +705,7 @@ def _execute_worker(
     else:
         input_path.write_text(input_payload, encoding="utf-8")
     if output_path.exists() or metadata_path.exists():
-        if not output_path.is_file() or not metadata_path.is_file():
+        if not metadata_path.is_file():
             return {
                 "execution_status": "incomplete_checkpoint",
                 "output_path": str(output_path),
@@ -704,12 +713,24 @@ def _execute_worker(
             }
         metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
         supplied_digest = metadata.pop("metadata_digest", None)
+        expected_output_digest = metadata.get("output_digest")
+        output_binding_valid = (
+            (
+                expected_output_digest is None
+                and not output_path.exists()
+            )
+            or (
+                _is_digest(expected_output_digest)
+                and output_path.is_file()
+                and expected_output_digest == _sha256_path(output_path)
+            )
+        )
         if (
             not _is_digest(supplied_digest)
             or canonical_digest(metadata) != supplied_digest
             or metadata.get("input_digest") != input_digest
             or metadata.get("worker_digest") != runtime.worker_digest
-            or metadata.get("output_digest") != _sha256_path(output_path)
+            or not output_binding_valid
         ):
             return {
                 "execution_status": "invalid_checkpoint",
