@@ -136,6 +136,42 @@ def solver_case_from_bundle(
     )
 
 
+def anonymize_solver_case_project(raw_project: object) -> dict[str, object]:
+    """Remove user labels and identifiers while preserving solver-relevant facts."""
+
+    project = deepcopy(normalize_project_draft(raw_project).project)
+    project["project_name"] = "Cas solveur anonymisé"
+
+    group_identifiers: dict[str, str] = {}
+    for index, group in enumerate(project["container_groups"], start=1):
+        previous = str(group["id"])
+        identifier = f"container-{index:03d}"
+        group_identifiers[previous] = identifier
+        group["id"] = identifier
+        group["name"] = f"Conteneur anonymisé {index:03d}"
+
+    for index, content in enumerate(project["contents"], start=1):
+        content["id"] = f"content-{index:03d}"
+        content["name"] = f"Contenu anonymisé {index:03d}"
+        content["container_group_id"] = group_identifiers[
+            str(content["container_group_id"])
+        ]
+
+    for index, flat_item in enumerate(project["flat_items"], start=1):
+        flat_item["id"] = f"flat-{index:03d}"
+        flat_item["name"] = f"Élément plat anonymisé {index:03d}"
+
+    for index, fill_element in enumerate(project["fill_elements"], start=1):
+        fill_element["id"] = f"fill-{index:03d}"
+        fill_element["name"] = f"Remplissage anonymisé {index:03d}"
+        group_id = fill_element.get("container_group_id")
+        if group_id is not None:
+            fill_element["container_group_id"] = group_identifiers[str(group_id)]
+
+    project["deferred_features"] = {"appearance": None, "mechanism": None}
+    return normalize_project_draft(project).project
+
+
 def build_solver_case_corpus(
     cases: Sequence[Mapping[str, object]],
 ) -> dict[str, object]:

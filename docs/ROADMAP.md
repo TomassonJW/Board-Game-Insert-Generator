@@ -1234,3 +1234,9 @@ ADR-0080 retire le bouton DEV et journalise automatiquement les actions et résu
 La trajectoire L06 reste atomique et mesurée, mais son entrée change : L06A classe les observations réelles disponibles sans bloquer le corpus ; L06B à L06E utilisent en priorité les générateurs T0/T1, l'oracle interne, les splits fermés et la gate A/B. Aucune dépendance externe, auto-modification ou extension T2-T4 n'est autorisée.
 
 fusion-validated: false. print-validated: false.
+
+## P64-L06A — inventaire réel terminé (2026-07-23)
+
+Les 13 bundles locaux sont valides. Un seul cas 18 conteneurs / 20 contenus est anonymisé et versionné dans un corpus étendu autonome ; son replay répété reste stable en `no_solution_within_budget`. Les 12 autres captures restent des preuves locales non promues.
+
+L06A n'améliore pas le solveur et ne revendique aucune capacité générale depuis ce cas. L06B devient la prochaine mission : générateurs T0/T1, familles obligatoires et splits fermés du benchmark. fusion-validated: false ; print-validated: false.

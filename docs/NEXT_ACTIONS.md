@@ -55,21 +55,22 @@ Preuve L05D1 : P64_L05D1_SOLVER_CORPUS_EVIDENCE.md.
 
 ## Prochaine action recommandée
 
-### P64-L06A — inventaire réel non bloquant, puis campagne autonome
+### P64-L06B — générateurs et splits T0/T1
 
-Type : mission autonome courte avant L06B.
+Type : mission autonome de benchmark, sans action humaine.
 
-ADR-0080 supprime le bouton DEV et ferme la gate de recapture manuelle. La palette 0.1.59 écrit désormais un journal local automatique et des états de projet dédupliqués. Aucune action humaine n'est nécessaire pour démarrer la campagne.
+P64-L06A est terminée : 13/13 bundles locaux sont valides, un seul cas 18 conteneurs / 20 contenus a été anonymisé, rejoué deux fois et intégré au tier étendu. Les 12 autres restent des preuves complémentaires locales non promues.
 
-L06A doit maintenant :
+L06B doit maintenant :
 
-1. inventorier en lecture seule les bundles et journaux locaux disponibles ;
-2. valider, anonymiser et rejouer seulement un cas cohérent ;
-3. classer les autres cas comme preuves complémentaires non promues ;
-4. terminer par un rapport, même si aucun cas réel n'est promouvable ;
-5. intégrer L06A, puis ouvrir L06B sur le corpus et les générateurs T0/T1.
+1. définir le manifest L06 et les splits regression, discovery, tuning et holdout ;
+2. générer des cas T0/T1 faisables par construction et des cas négatifs prouvables ;
+3. couvrir les cinq familles obligatoires nombreux/un, peu/nombreux, nombreux/nombreux, mixte et incrémental puis froid ;
+4. garder le holdout fermé jusqu'au choix unique prévu par le runbook ;
+5. livrer tests, preuve, commit et intégration dans `main`, puis ouvrir L06C.
 
-Le Goal déjà lancé reste valable. Il poursuit L06A à L06E sans nouveau GO, une mission intégrée à la fois, avec le corpus versionné et les oracles internes comme base minimale.
+Le Goal déjà lancé reste valable. Il poursuit L06B à L06E sans nouveau GO et sans installer de dépendance externe.
+
 ## Lots verrouillés
 
 - P64-F01A02 et F02A02 restent séparés : ils possèdent la finalisation du volume ;

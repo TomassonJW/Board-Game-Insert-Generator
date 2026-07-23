@@ -2882,13 +2882,14 @@ implémentée et intégrée à la fois.
 
 ### P64-L06A - inventaire réel non bloquant
 
-- Statut : ready-after-ADR-0080.
+- Statut : done, automated-validated ; fusion-validated: false, print-validated: false.
 - Entrée minimale : corpus L05D1 versionné ; bundles et journaux locaux seulement comme compléments.
 - Scope : valider en lecture seule, anonymiser/rejouer un cas cohérent si disponible, classifier les autres et terminer sans modifier le solveur.
-- Sortie : rapport d'inventaire intégré, puis L06B.
+- Sortie : 13/13 bundles classés, un cas anonymisé et rejoué dans `p64_l06a_reviewed_real_case.v1.json`, preuve intégrée ; puis L06B.
+
 ### P64-L06B — oracles et génération T0/T1
 
-- Statut : planned-after-P64-L06A.
+- Statut : ready-after-P64-L06A-integration.
 - Scope : étendre le corpus avec cas faisables par construction, cas négatifs
   prouvables, permutations adverses et futur témoin humain normalisé.
 - Interdits : aucune scène Fusion autoritaire, aucun projet personnel promu,
@@ -2940,7 +2941,7 @@ implémentée et intégrée à la fois.
 - Statut : done-documentation.
 - Livré : runbook 36 h, matrice P45/P64, splits, oracle interne prioritaire,
   tournoi progressif, checkpoints, pause sûre, arrêts et prompt `/goal`.
-- Dépendance runtime : L06A est `ready` depuis ADR-0080 ; elle commence par l'inventaire du corpus et des journaux locaux.
+- Dépendance runtime : L06A est terminée ; L06B devient prête après intégration de son cas réel anonymisé.
 - Interdits : aucun solveur ou budget modifié, aucune dépendance externe
   installée, aucun T2-T4, aucune promotion d'un projet personnel.
-- Suite : L06A, puis campagne autonome L06B à L06E sans nouvelle action humaine.
+- Suite : L06B à L06E sans nouvelle action humaine.

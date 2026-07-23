@@ -1760,7 +1760,7 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
 - C-SAFETY : plafond 36 h / 2 Gio, reprise sans double exécution, aucune
   dépendance externe installée sans gate et une seule amélioration intégrable.
 - C-FUSION-UI / C-GEOMETRY / C-CAD-IR : inchangées.
-- Statut runtime : L06A est ready après ADR-0080 ; aucune recapture humaine requise.
+- Statut runtime : L06A est terminée ; L06B est prête après intégration, sans recapture humaine.
 ## Mise à jour P64-L05V-R2 — parcours de développement automatique
 
 - C-FUSION-UI : le bouton DEV disparaît ; chaque bouton et changement utile est journalisé sans action spéciale de Thomas.
@@ -1768,4 +1768,12 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
 - C-SAFETY : chemins et secrets refusés, texte libre absent des lignes, aucune promotion automatique, aucune panne du journal bloquante pour le produit.
 - C-SOLVER / C-LAYOUT / C-GEOMETRY / C-CAD-IR : capacités et contrats inchangés ; le journal n'appelle aucune opération métier.
 - C-QUALITY : les futurs cas humains deviennent des entrées complémentaires ; le corpus, les générateurs et oracles autonomes ne dépendent plus d'une capture manuelle.
-- Statut : implemented-fusion-bridge, implemented-fusion-ui, automated-validated. L06A ready ; fusion-validated: false ; print-validated: false.
+- Statut : implemented-fusion-bridge, implemented-fusion-ui, automated-validated. L06A done, L06B prochaine ; fusion-validated: false ; print-validated: false.
+
+## Mise à jour P64-L06A — cas réel anonymisé
+
+- C-SOLVER / C-QUALITY : 13/13 bundles locaux validés ; un cas étendu 18 conteneurs / 20 contenus rejoué deux fois avec résultat fonctionnel stable.
+- C-PROJECT-CONTRACT : noms, identifiants, métadonnées différées, trace et contexte client retirés ; références internes recâblées puis projet renormalisé.
+- C-SAFETY : constructeur à sortie séparée, aucune modification automatique du corpus source, 12 bundles et tous les journaux personnels non promus.
+- C-FUSION-UI / C-GEOMETRY / C-CAD-IR : inchangées.
+- Statut : P64-L06A `done`, P64-L06B `ready-after-integration` ; fusion-validated: false, print-validated: false.

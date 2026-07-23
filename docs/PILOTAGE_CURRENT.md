@@ -63,8 +63,8 @@ preuves archivées.
   L05D1 fournit un corpus anonymise, un replay borne et une gate A/B.
   P64-L05D2 reduit les evaluations inutiles sans regression fonctionnelle.
   P64-L05V-R2 remplace la recapture manuelle par un journal local automatique
-  dans l'add-in 0.1.59. ADR-0080 ferme la gate humaine ; P64-L06 est autorisé
-  et L06A devient un inventaire réel non bloquant avant la campagne autonome.
+  dans l'add-in 0.1.59. ADR-0080 ferme la gate humaine. L06A est terminée :
+  13/13 bundles classés et un cas réel anonymisé ; L06B est la prochaine mission.
 
 ## Vue de séquence
 
@@ -110,6 +110,8 @@ preuves archivées.
 | Termine - automatise | P64-L05V-A | Preflight, add-in 0.1.58 et fixture installes et verifies. |
 | Supersédée | P64-L05V-R1 | La recapture manuelle est remplacée par le journal automatique ADR-0080. |
 | Autorisé — Goal | P64-L06 | Runbook 36 h, matrice T0/T1, splits et checkpoints ; exécution débloquée par ADR-0080. |
+| Terminé — automatisé | P64-L06A | 13/13 bundles classés ; un cas réel anonymisé et rejoué, 12 non promus. |
+| Prêt — autonome | P64-L06B | Générateurs T0/T1, cinq familles obligatoires et splits fermés du benchmark. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -522,6 +524,14 @@ Sur décision explicite de Thomas, le bouton DEV est supprimé. L'add-in 0.1.59 
 
 Les chemins personnels et secrets sont refusés. Les journaux et projets restent locaux, sans promotion automatique. Le journal ne lance aucun solveur, finaliseur, CAD ou changement de scène et une erreur d'écriture ne bloque pas le produit.
 
-ADR-0080 ferme la gate de recapture R1. Les cas réels restent complémentaires ; le corpus versionné, les générateurs T0/T1 et les oracles internes suffisent au Goal. L06A est `ready` comme inventaire et classification, puis L06B à L06E restent ordonnés.
+ADR-0080 ferme la gate de recapture R1. L06A a classé 13 bundles et intégré un seul cas anonymisé. L06B est la prochaine mission ; le corpus versionné, les générateurs T0/T1 et les oracles internes restent la base du Goal.
 
 Statut : implemented-fusion-bridge, implemented-fusion-ui, automated-validated, integrated-main, installed-local 0.1.59. fusion-validated: false. print-validated: false.
+
+## P64-L06A — inventaire réel terminé (2026-07-23)
+
+Treize bundles locaux sur treize sont valides. La paire récente retenue décrit honnêtement un ajout de contenu : plan stale puis échec global frais sur le même projet, sans cache négatif. Elle ne remplace pas artificiellement l'ancien cas d'ajout de conteneur.
+
+Un seul état final 18 conteneurs / 20 contenus est anonymisé, renormalisé et versionné au tier étendu. Deux replays sont fonctionnellement identiques et satisfont les attentes. Les douze autres bundles restent locaux ; aucun journal personnel n'est promu.
+
+Statut : P64-L06A done, automated-validated ; P64-L06B ready-after-integration. fusion-validated: false. print-validated: false.

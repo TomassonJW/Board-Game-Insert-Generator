@@ -9,6 +9,8 @@ Statut courant :
 
 - `goal-launch-authorized-by-ADR-0080` ;
 - journal local automatique retenu pour les futurs parcours réels ;
+- P64-L06A terminée : 13/13 bundles classés, un cas anonymisé et rejoué ;
+- prochaine mission : P64-L06B ;
 - `fusion-validated: false` ;
 - `print-validated: false`.
 
@@ -290,7 +292,8 @@ Dans la nouvelle tâche préparée pour P64-L06, Thomas peut lancer :
 ```text
 /goal
 Exécute P64-L06 selon docs/P64_L06_AUTONOMOUS_GOAL_RUNBOOK.md, pendant 36 h
-maximum. Avance une mission atomique à la fois de L06A à L06E, avec tests,
+maximum. Reprends à la première mission incomplète, actuellement L06B, puis
+avance jusqu'à L06E avec tests,
 preuve, commit et intégration dans main avant la suivante. Classe les cas réels
 disponibles sans en faire une condition de départ. Sans nouveau GO, utilise
 l'oracle exact interne et les composants déjà présents ; n'installe aucune

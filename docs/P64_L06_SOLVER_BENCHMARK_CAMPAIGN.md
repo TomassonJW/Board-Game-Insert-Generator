@@ -19,8 +19,8 @@ de problème. L'objectif raisonnable est :
 - préparer des interfaces compatibles avec de futures formes sans les simuler
   prématurément.
 
-P64-L06A reste la première mission runtime : inventorier, valider et classifier
-les cas réels disponibles. ADR-0080 retire leur absence des conditions de départ.
+P64-L06A est terminée : 13/13 bundles classés et un cas réel anonymisé.
+P64-L06B est la prochaine mission runtime.
 Le lancement autonome, ses ressources, checkpoints, splits et arrêts sont normés par
 `docs/P64_L06_AUTONOMOUS_GOAL_RUNBOOK.md`.
 
@@ -205,7 +205,8 @@ précise subsiste.
 - produire un rapport d'inventaire même sans cas réel promouvable ;
 - ne modifier aucun solveur.
 
-Statut : `ready-after-ADR-0080`. L'absence d'une paire R1 exacte ne bloque plus L06B.
+Statut : `done`, `automated-validated`. Treize bundles classés, un seul cas anonymisé et rejoué ; aucun solveur modifié.
+
 ### P64-L06B — oracles et générateur T0/T1
 
 - étendre le manifest L05D1 sans casser ses digests historiques ;
@@ -213,7 +214,7 @@ Statut : `ready-after-ADR-0080`. L'absence d'une paire R1 exacte ne bloque plus 
   adversariales ;
 - définir le futur témoin humain assisté sans scène Fusion autoritaire.
 
-Statut : `planned-after-L06A`.
+Statut : `ready-after-L06A-integration`.
 
 ### P64-L06C — adapters comparatifs offline
 

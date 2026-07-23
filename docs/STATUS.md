@@ -3085,3 +3085,15 @@ Clôture locale : commit fonctionnel `31b867e` intégré dans `main` et vérifi�
 La gate de paire R1 est supersédée. Les bundles existants sont des observations complémentaires locales ; L06A les inventorie sans bloquer L06B. Aucun changement de solveur, budget, deadline, certificat, géométrie, finalisation, CAD ou scène.
 
 fusion-validated: false. print-validated: false.
+
+## P64-L06A - inventaire réel non bloquant (2026-07-23)
+
+Les 13 SolverCaseBundles présents localement passent le validateur canonique. Aucun journal automatique 0.1.59 n'était encore présent juste après l'installation ; cette absence n'est pas bloquante.
+
+Une seule paire récente est retenue : même empreinte de projet, 18 conteneurs, 20 contenus, plan devenu stale après ajout d'un contenu puis recherche globale fraîche en `no_solution_within_budget`, cache manqué et aucun cache négatif. Elle ne prétend pas être l'ancien cas d'ajout de conteneur.
+
+L'état final est anonymisé dans `tests/fixtures/p64_l06a_reviewed_real_case.v1.json`. Noms, identifiants, métadonnées différées, trace et contexte client personnels sont absents. Deux replays donnent la même empreinte fonctionnelle et satisfont les attentes. Les 12 autres bundles restent locaux et non promus.
+
+Livraison : anonymiseur déterministe, constructeur à sortie séparée pour revue, fixture étendue, tests et preuve `P64_L06A_REAL_CASE_INVENTORY_EVIDENCE.md`. Aucun changement de solveur, budget, délai, certificat, géométrie, finalisation, CAD ou scène.
+
+Statut : done, automated-validated. fusion-validated: false. print-validated: false. Prochaine mission : P64-L06B.

@@ -15,6 +15,7 @@ from board_game_insert_generator.solver_case_corpus import (
     CORPUS_TIER_EXTENDED,
     SOLVER_CASE_CORPUS_SCHEMA_V1,
     SolverCaseCorpusError,
+    anonymize_solver_case_project,
     build_solver_case,
     build_solver_case_corpus,
     compare_solver_case_replays,
@@ -106,6 +107,76 @@ class SolverCaseCorpusTests(unittest.TestCase):
         tampered["local_analysis"]["status"] = "tampered"
         with self.assertRaisesRegex(SolverCaseCorpusError, "digest mismatch"):
             validate_solver_case_bundle(tampered)
+
+    def test_anonymizes_project_labels_identifiers_and_deferred_metadata(self) -> None:
+        project = simple_success_project()
+        project["project_name"] = "Projet personnel PrivateOwner"
+        project["container_groups"][0]["id"] = "container-private"
+        project["container_groups"][0]["name"] = "Bac personnel"
+        project["contents"][0]["id"] = "content-private"
+        project["contents"][0]["name"] = "Pièce personnelle"
+        project["contents"][0]["container_group_id"] = "container-private"
+        project["flat_items"] = [
+            {
+                "id": "flat-private",
+                "name": "Livret personnel",
+                "kind": "rulebook",
+                "dimensions_mm": {"x": 80.0, "y": 60.0, "z": 2.0},
+                "quantity": 1,
+                "stack_order": 0,
+                "origin_mm": None,
+                "rotation_deg_z": None,
+            }
+        ]
+        project["fill_elements"] = [
+            {
+                "id": "fill-private",
+                "name": "Cale personnelle",
+                "kind": "separator",
+                "mode": "exact",
+                "dimensions_mm": {"x": 1.0, "y": 2.0, "z": 3.0},
+                "container_group_id": "container-private",
+            }
+        ]
+        project["deferred_features"] = {
+            "appearance": {"personal_label": "PrivateOwner"},
+            "mechanism": None,
+        }
+        original = deepcopy(project)
+
+        anonymized = anonymize_solver_case_project(project)
+        rendered = json.dumps(anonymized, ensure_ascii=False, sort_keys=True)
+
+        self.assertEqual(project, original)
+        self.assertEqual(anonymized["project_name"], "Cas solveur anonymisé")
+        self.assertEqual(anonymized["container_groups"][0]["id"], "container-001")
+        self.assertEqual(anonymized["contents"][0]["id"], "content-001")
+        self.assertEqual(
+            anonymized["contents"][0]["container_group_id"],
+            "container-001",
+        )
+        self.assertEqual(anonymized["flat_items"][0]["id"], "flat-001")
+        self.assertEqual(anonymized["fill_elements"][0]["id"], "fill-001")
+        self.assertEqual(
+            anonymized["fill_elements"][0]["container_group_id"],
+            "container-001",
+        )
+        self.assertEqual(
+            anonymized["contents"][0]["dimensions_mm"],
+            original["contents"][0]["dimensions_mm"],
+        )
+        self.assertEqual(
+            anonymized["deferred_features"],
+            {"appearance": None, "mechanism": None},
+        )
+        for personal_value in (
+            "PrivateOwner",
+            "container-private",
+            "content-private",
+            "flat-private",
+            "fill-private",
+        ):
+            self.assertNotIn(personal_value, rendered)
 
     def test_functional_digest_excludes_observed_wall_clock_samples(self) -> None:
         project = simple_success_project()

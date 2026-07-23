@@ -1,0 +1,1932 @@
+{
+  "cases": [
+    {
+      "baseline": {
+        "plan_digest": "8053135f355253ec944c64fc02ea890600e325915d8fecc7dbbfc4b0259d9cfd",
+        "status": "no_solution_within_budget",
+        "stop_reason": "hard_budget_reached"
+      },
+      "case_id": "real-18-containers-20-contents-normal",
+      "execution_tier": "extended",
+      "expectations": {
+        "accepted_statuses": [
+          "solution_found",
+          "no_solution_within_budget"
+        ],
+        "allow_solution_improvement": true,
+        "proven_impossible_claim_allowed": false,
+        "require_certificate_if_solution": true,
+        "required_lane_ids": [
+          "historical_legacy_corner",
+          "historical_bridge_edge",
+          "variant_corner_long_side",
+          "variant_center_footprint",
+          "variant_lowest_height",
+          "variant_edge_interleave"
+        ]
+      },
+      "project": {
+        "box": {
+          "inner_dimensions_mm": {
+            "x": 200.0,
+            "y": 150.0,
+            "z": 60.0
+          },
+          "lid_clearance_mm": 0.4,
+          "usable_height_mm": 59.6
+        },
+        "container_groups": [
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "container-001",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Conteneur anonymisé 001",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "container-002",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Conteneur anonymisé 002",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "container-003",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Conteneur anonymisé 003",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "container-004",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Conteneur anonymisé 004",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "container-005",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Conteneur anonymisé 005",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "container-006",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Conteneur anonymisé 006",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "container-007",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Conteneur anonymisé 007",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "container-008",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Conteneur anonymisé 008",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "container-009",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Conteneur anonymisé 009",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "container-010",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Conteneur anonymisé 010",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "container-011",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Conteneur anonymisé 011",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "container-012",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Conteneur anonymisé 012",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "container-013",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Conteneur anonymisé 013",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "container-014",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Conteneur anonymisé 014",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "container-015",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Conteneur anonymisé 015",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "container-016",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Conteneur anonymisé 016",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "container-017",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Conteneur anonymisé 017",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          },
+          {
+            "clearance_effective_v1": {
+              "between_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              },
+              "box_per_side_xy_mm": {
+                "x": 0.6,
+                "y": 0.6
+              },
+              "role": "external_container",
+              "source_by_vector": {
+                "between_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar",
+                  "z": "compatibility_legacy_scalar"
+                },
+                "box_per_side_xy_mm": {
+                  "x": "compatibility_legacy_scalar",
+                  "y": "compatibility_legacy_scalar"
+                }
+              }
+            },
+            "clearance_overrides_v1": {
+              "between_mm": {
+                "x": null,
+                "y": null,
+                "z": null
+              },
+              "box_per_side_xy_mm": {
+                "x": null,
+                "y": null
+              }
+            },
+            "dimension_modes": {
+              "x": "auto",
+              "y": "auto",
+              "z": "auto"
+            },
+            "expansion_axes": {
+              "x": true,
+              "y": true,
+              "z": true
+            },
+            "floor_thickness_mm": null,
+            "id": "container-018",
+            "locked_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "name": "Conteneur anonymisé 018",
+            "surplus_preference": "balanced",
+            "target_outer_dimensions_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "wall_thickness_mm": null
+          }
+        ],
+        "contents": [
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "container-001",
+            "content_clearance_mm": null,
+            "dimensions_mm": {
+              "x": 20.0,
+              "y": 20.0,
+              "z": 10.0
+            },
+            "id": "content-001",
+            "measurement_confidence": "exact",
+            "name": "Contenu anonymisé 001",
+            "quantity": 1,
+            "shape_kind": "rectangle"
+          },
+          {
+            "base_dimensions_mm": {
+              "x": 63.5,
+              "y": 88.9,
+              "z": 19.2
+            },
+            "card_format_id": "poker",
+            "card_stack_mode": "count",
+            "card_thickness_mm": 0.32,
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "container-002",
+            "content_clearance_mm": null,
+            "dimension_source": "catalog",
+            "dimensions_mm": {
+              "x": 63.5,
+              "y": 88.9,
+              "z": 19.2
+            },
+            "id": "content-002",
+            "measurement_confidence": "exact",
+            "name": "Contenu anonymisé 002",
+            "quantity": 60,
+            "resolved_orientation": "flat",
+            "shape_kind": "cards",
+            "sleeved": false,
+            "storage_orientation": "auto"
+          },
+          {
+            "base_dimensions_mm": {
+              "x": 63.5,
+              "y": 88.9,
+              "z": 19.2
+            },
+            "card_format_id": "poker",
+            "card_stack_mode": "count",
+            "card_thickness_mm": 0.32,
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "container-003",
+            "content_clearance_mm": null,
+            "dimension_source": "catalog",
+            "dimensions_mm": {
+              "x": 63.5,
+              "y": 88.9,
+              "z": 19.2
+            },
+            "id": "content-003",
+            "measurement_confidence": "exact",
+            "name": "Contenu anonymisé 003",
+            "quantity": 60,
+            "resolved_orientation": "flat",
+            "shape_kind": "cards",
+            "sleeved": false,
+            "storage_orientation": "auto"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "container-004",
+            "content_clearance_mm": null,
+            "dimensions_mm": {
+              "x": 16.0,
+              "y": 16.0,
+              "z": 16.0
+            },
+            "id": "content-004",
+            "measurement_confidence": "exact",
+            "name": "Contenu anonymisé 004",
+            "quantity": 5,
+            "shape_kind": "cube"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "container-005",
+            "content_clearance_mm": null,
+            "dimensions_mm": {
+              "x": 16.0,
+              "y": 16.0,
+              "z": 16.0
+            },
+            "id": "content-005",
+            "measurement_confidence": "exact",
+            "name": "Contenu anonymisé 005",
+            "quantity": 5,
+            "shape_kind": "cube"
+          },
+          {
+            "base_dimensions_mm": {
+              "x": 63.5,
+              "y": 88.9,
+              "z": 19.2
+            },
+            "card_format_id": "poker",
+            "card_stack_mode": "count",
+            "card_thickness_mm": 0.32,
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "container-006",
+            "content_clearance_mm": null,
+            "dimension_source": "catalog",
+            "dimensions_mm": {
+              "x": 63.5,
+              "y": 88.9,
+              "z": 19.2
+            },
+            "id": "content-006",
+            "measurement_confidence": "exact",
+            "name": "Contenu anonymisé 006",
+            "quantity": 60,
+            "resolved_orientation": "flat",
+            "shape_kind": "cards",
+            "sleeved": false,
+            "storage_orientation": "auto"
+          },
+          {
+            "base_dimensions_mm": {
+              "x": 63.5,
+              "y": 88.9,
+              "z": 19.2
+            },
+            "card_format_id": "poker",
+            "card_stack_mode": "count",
+            "card_thickness_mm": 0.32,
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "container-007",
+            "content_clearance_mm": null,
+            "dimension_source": "catalog",
+            "dimensions_mm": {
+              "x": 63.5,
+              "y": 88.9,
+              "z": 19.2
+            },
+            "id": "content-007",
+            "measurement_confidence": "exact",
+            "name": "Contenu anonymisé 007",
+            "quantity": 60,
+            "resolved_orientation": "flat",
+            "shape_kind": "cards",
+            "sleeved": false,
+            "storage_orientation": "auto"
+          },
+          {
+            "base_dimensions_mm": {
+              "x": 63.5,
+              "y": 88.9,
+              "z": 19.2
+            },
+            "card_format_id": "poker",
+            "card_stack_mode": "count",
+            "card_thickness_mm": 0.32,
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "container-008",
+            "content_clearance_mm": null,
+            "dimension_source": "catalog",
+            "dimensions_mm": {
+              "x": 63.5,
+              "y": 88.9,
+              "z": 19.2
+            },
+            "id": "content-008",
+            "measurement_confidence": "exact",
+            "name": "Contenu anonymisé 008",
+            "quantity": 60,
+            "resolved_orientation": "flat",
+            "shape_kind": "cards",
+            "sleeved": false,
+            "storage_orientation": "auto"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "container-009",
+            "content_clearance_mm": null,
+            "dimensions_mm": {
+              "x": 20.0,
+              "y": 20.0,
+              "z": 3.0
+            },
+            "id": "content-009",
+            "measurement_confidence": "exact",
+            "name": "Contenu anonymisé 009",
+            "quantity": 10,
+            "shape_kind": "round"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "container-010",
+            "content_clearance_mm": null,
+            "dimensions_mm": {
+              "x": 20.0,
+              "y": 20.0,
+              "z": 3.0
+            },
+            "id": "content-010",
+            "measurement_confidence": "exact",
+            "name": "Contenu anonymisé 010",
+            "quantity": 10,
+            "shape_kind": "round"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "container-011",
+            "content_clearance_mm": null,
+            "dimensions_mm": {
+              "x": 50.0,
+              "y": 20.0,
+              "z": 3.0
+            },
+            "id": "content-011",
+            "measurement_confidence": "exact",
+            "name": "Contenu anonymisé 011",
+            "quantity": 10,
+            "shape_kind": "round"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "container-011",
+            "content_clearance_mm": null,
+            "dimensions_mm": {
+              "x": 20.0,
+              "y": 20.0,
+              "z": 3.0
+            },
+            "id": "content-012",
+            "measurement_confidence": "exact",
+            "name": "Contenu anonymisé 012",
+            "quantity": 10,
+            "shape_kind": "round"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "container-012",
+            "content_clearance_mm": null,
+            "dimensions_mm": {
+              "x": 20.0,
+              "y": 20.0,
+              "z": 3.0
+            },
+            "id": "content-013",
+            "measurement_confidence": "exact",
+            "name": "Contenu anonymisé 013",
+            "quantity": 10,
+            "shape_kind": "round"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "container-013",
+            "content_clearance_mm": null,
+            "dimensions_mm": {
+              "x": 20.0,
+              "y": 20.0,
+              "z": 3.0
+            },
+            "id": "content-014",
+            "measurement_confidence": "exact",
+            "name": "Contenu anonymisé 014",
+            "quantity": 10,
+            "shape_kind": "round"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "container-014",
+            "content_clearance_mm": null,
+            "dimensions_mm": {
+              "x": 20.0,
+              "y": 20.0,
+              "z": 3.0
+            },
+            "id": "content-015",
+            "measurement_confidence": "exact",
+            "name": "Contenu anonymisé 015",
+            "quantity": 10,
+            "shape_kind": "round"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "container-011",
+            "content_clearance_mm": null,
+            "dimensions_mm": {
+              "x": 20.0,
+              "y": 20.0,
+              "z": 3.0
+            },
+            "id": "content-016",
+            "measurement_confidence": "exact",
+            "name": "Contenu anonymisé 016",
+            "quantity": 10,
+            "shape_kind": "round"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "container-015",
+            "content_clearance_mm": null,
+            "dimensions_mm": {
+              "x": 20.0,
+              "y": 20.0,
+              "z": 3.0
+            },
+            "id": "content-017",
+            "measurement_confidence": "exact",
+            "name": "Contenu anonymisé 017",
+            "quantity": 10,
+            "shape_kind": "round"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "container-016",
+            "content_clearance_mm": null,
+            "dimensions_mm": {
+              "x": 20.0,
+              "y": 20.0,
+              "z": 3.0
+            },
+            "id": "content-018",
+            "measurement_confidence": "exact",
+            "name": "Contenu anonymisé 018",
+            "quantity": 10,
+            "shape_kind": "round"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "container-017",
+            "content_clearance_mm": null,
+            "dimensions_mm": {
+              "x": 20.0,
+              "y": 20.0,
+              "z": 3.0
+            },
+            "id": "content-019",
+            "measurement_confidence": "exact",
+            "name": "Contenu anonymisé 019",
+            "quantity": 10,
+            "shape_kind": "round"
+          },
+          {
+            "clearance_effective_v1": {
+              "role": "asset_cavity",
+              "source_by_axis": {
+                "x": "compatibility_legacy_scalar",
+                "y": "compatibility_legacy_scalar",
+                "z": "compatibility_legacy_scalar"
+              },
+              "values_mm": {
+                "x": 0.6,
+                "y": 0.6,
+                "z": 0.6
+              }
+            },
+            "clearance_override_mm": {
+              "x": null,
+              "y": null,
+              "z": null
+            },
+            "container_group_id": "container-018",
+            "content_clearance_mm": null,
+            "dimensions_mm": {
+              "x": 20.0,
+              "y": 20.0,
+              "z": 3.0
+            },
+            "id": "content-020",
+            "measurement_confidence": "exact",
+            "name": "Contenu anonymisé 020",
+            "quantity": 10,
+            "shape_kind": "round"
+          }
+        ],
+        "deferred_features": {
+          "appearance": null,
+          "mechanism": null
+        },
+        "fill_elements": [],
+        "flat_items": [],
+        "layout": {
+          "clearance_default_sources_v1": {
+            "asset_cavity_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar",
+              "z": "compatibility_legacy_scalar"
+            },
+            "container_between_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar",
+              "z": "compatibility_legacy_scalar"
+            },
+            "container_box_per_side_xy_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar"
+            },
+            "flat_inset_mm": {
+              "x": "compatibility_legacy_scalar",
+              "y": "compatibility_legacy_scalar",
+              "z": "compatibility_legacy_scalar"
+            }
+          },
+          "clearance_defaults_v1": {
+            "asset_cavity_mm": {
+              "x": 0.6,
+              "y": 0.6,
+              "z": 0.6
+            },
+            "container_between_mm": {
+              "x": 0.6,
+              "y": 0.6,
+              "z": 0.6
+            },
+            "container_box_per_side_xy_mm": {
+              "x": 0.6,
+              "y": 0.6
+            },
+            "flat_inset_mm": {
+              "x": 0.6,
+              "y": 0.6,
+              "z": 0.0
+            }
+          },
+          "container_box_xy_clearance_mm": 0.6,
+          "container_z_clearance_mm": 0.6,
+          "default_content_clearance_mm": 0.6,
+          "default_floor_thickness_mm": 1.2,
+          "default_wall_thickness_mm": 1.2,
+          "layout_clearance_mm": 0.6
+        },
+        "project_name": "Cas solveur anonymisé",
+        "schema_version": "bgig.project.v1",
+        "solver_preference": "compact"
+      },
+      "project_digest": "b5948ab249aded6c553ec004ca7074e66b1a73cab2493a10f874fb10137b6699",
+      "solver_settings": {
+        "effort": "normal",
+        "method": "auto"
+      },
+      "source": {
+        "bundle_digest": "0693aef760d92fb7b42f21210ec36efdda4ee738effbf237861cb5899c3f508d",
+        "id": "reviewed-local-bundle-20260723-001",
+        "kind": "solver_case_bundle"
+      }
+    }
+  ],
+  "corpus_digest": "dafc18a5610fce524f69756c6001b652ac36c397ed17f2075ed5c760cb2a01e5",
+  "invariants": {
+    "automatic_solver_modification": false,
+    "cad_build_invocation_count": 0,
+    "finalization_invocation_count": 0,
+    "functional_evidence_deterministic": true,
+    "fusion_materialization_invocation_count": 0,
+    "personal_project_paths_embedded": false,
+    "wall_clock_samples_non_normative": true
+  },
+  "producer": {
+    "id": "solver_case_corpus_v1",
+    "version": "1"
+  },
+  "schema_version": "bgig.solver_case_corpus.v1",
+  "summary": {
+    "case_count": 1,
+    "ci_case_count": 0,
+    "extended_case_count": 1
+  }
+}
