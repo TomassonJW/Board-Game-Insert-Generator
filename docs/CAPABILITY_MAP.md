@@ -1751,3 +1751,14 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
 - C-FUSION-UI / C-GEOMETRY / C-CAD-IR : inchangées.
 - Statut runtime : P64-L06A reste bloqué par la confirmation R1 ;
   `fusion-validated: false`, `print-validated: false`.
+
+## Mise à jour P64-L06P — runbook Goal prêt
+
+- C-SOLVER / C-QUALITY : protocole d'expérience renforcé avec splits séparés,
+  holdout fermé, oracle interne et gate A/B avant toute vitesse.
+- C-PROJECT-CONTRACT : préflight exact des deux bundles post-R1, anonymisation
+  obligatoire et absence d'import automatique.
+- C-SAFETY : plafond 36 h / 2 Gio, reprise sans double exécution, aucune
+  dépendance externe installée sans gate et une seule amélioration intégrable.
+- C-FUSION-UI / C-GEOMETRY / C-CAD-IR : inchangées.
+- Statut runtime : inchangé ; L06A reste bloqué par la recapture humaine.

@@ -1217,3 +1217,14 @@ couleurs sémantiques, aperçu 3D léger et compositeur manuel sur grille 3D.
 Ce registre n'altère pas la séquence V0.2/V0.3 ni les dépendances P45-P50/P69.
 Les formes futures deviennent des familles de benchmark seulement après leur
 contrat ; l'UI et l'esthétique ne deviennent jamais des objectifs du solveur.
+
+## P64-L06P — préparation du run autonome (2026-07-23)
+
+Le premier Goal L06 est désormais exécutable depuis un runbook versionné :
+préflight R1, matrice multi-conteneurs/multi-contenus, corpus stratifié, oracle
+exact interne, tournoi progressif, holdout fermé, checkpoints et plafond de
+36 h. La campagne intègre au maximum une amélioration mesurée ; un résultat
+négatif honnête est acceptable.
+
+Cette préparation ne modifie pas l'ordre L06A -> L06E. La recapture post-R1 reste
+la condition d'entrée et les formes T2-T4 restent hors campagne initiale.

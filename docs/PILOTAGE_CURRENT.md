@@ -62,8 +62,9 @@ preuves archivées.
   global. P64-L05B, P64-L05C et P64-L05D1/D2 sont automated-validated.
   L05D1 fournit un corpus anonymise, un replay borne et une gate A/B.
   P64-L05D2 reduit les evaluations inutiles sans regression fonctionnelle.
-  P64-L05V-A est automated-validated et installe localement.
-  P64-L05 est la prochaine gate humaine de capture reelle.
+  P64-L05V-R1 est automated-validated et installe localement ; sa recapture
+  humaine exacte reste ouverte. P64-L06 est cadre et son runbook Goal est pret,
+  mais L06A reste bloque jusqu'a cette paire post-R1.
 
 ## Vue de séquence
 
@@ -107,7 +108,8 @@ preuves archivées.
 | Termine - automatise | P64-L05D1 | Corpus anonymise, replay borne et gate A/B fonctionnelle prioritaire. |
 | Termine - automatise | P64-L05D2 | Elagage sous ordre explicite, -44,355 % essais sur corpus, 0 regression fonctionnelle. |
 | Termine - automatise | P64-L05V-A | Preflight, add-in 0.1.58 et fixture installes et verifies. |
-| Prochaine gate humaine | P64-L05V | Observer Fusion et capturer le premier bundle reel. |
+| Prochaine gate humaine | P64-L05V-R1 | Recapturer le refus incremental puis l'echec global apres le correctif installe. |
+| Préparé — Goal | P64-L06 | Runbook 36 h, matrice T0/T1, splits, checkpoints et prompt canonique ; exécution encore verrouillée. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -151,6 +153,8 @@ preuves archivées.
 - P64_L05C_CERTIFIED_PLAN_WITNESS_EVIDENCE.md : preuves coeur, Deep, staged, bridge et DOM.
 - P64_L06_SOLVER_BENCHMARK_CAMPAIGN.md : tiers T0/T1, oracles, comparateurs,
   métriques, protocole goal et lots L06A à L06V.
+- P64_L06_AUTONOMOUS_GOAL_RUNBOOK.md : préflight R1, matrice P45/P64, splits,
+  budgets 36 h, checkpoints, arrêts et prompt `/goal` canonique.
 - FUTURE_PRODUCT_HORIZONS.md : registre différé des formes, mécanismes,
   visualisations et du futur compositeur manuel 3D.
 - ADR-0074 : supersession partielle d'ADR-0071 après le KO Fusion 0.1.56.
@@ -502,3 +506,14 @@ actuels, oracles certifiés, adapters offline, tiers CI/extended/soak et gate A/
 Il exclut l'auto-modification et ne rend aucune dépendance externe acceptable.
 La première mission runtime reste P64-L06A après confirmation des captures R1 ;
 ce cadrage documentaire ne lève aucune gate.
+
+## P64-L06P — runbook Goal prêt (2026-07-23)
+
+Le futur Goal est borné à 36 h, 2 Gio, deux workers fonctionnels et une seule
+amélioration intégrée. Le corpus sépare regression, discovery, tuning et holdout ;
+le holdout reste fermé avant la sélection d'une hypothèse. Un petit oracle exact
+interne évite toute dépendance externe bloquante.
+
+Ce lot est uniquement documentaire. La paire R1 postérieure à `e817432` manque
+encore dans `solver-cases` : L06A reste `blocked-by-human-recapture`. Aucun
+solveur, budget, deadline, schéma, géométrie, Fusion ou manifest ne change.

@@ -20,7 +20,9 @@ de problème. L'objectif raisonnable est :
   prématurément.
 
 P64-L06A reste la première mission runtime : anonymiser, rejouer et classifier la
-paire réelle R1. Le présent cadrage ne lève pas cette dépendance.
+paire réelle R1. Le présent cadrage ne lève pas cette dépendance. Le lancement
+autonome, ses ressources, checkpoints, splits et arrêts sont normés par
+`docs/P64_L06_AUTONOMOUS_GOAL_RUNBOOK.md`.
 
 ## 2. Réponse au besoin d'auto-amélioration
 
@@ -81,6 +83,13 @@ Le corpus étendu doit couvrir au minimum :
 Une marge volumique positive n'est jamais une preuve de faisabilité. À l'inverse,
 un `no_solution_within_budget` n'est jamais une preuve d'impossibilité.
 
+La matrice sépare explicitement les axes locaux P45 et globaux P64. Elle couvre
+les familles nombreux conteneurs/un contenu, peu de conteneurs/nombreux
+contenus, nombreux/nombreux, mélange hétérogène et modification incrémentale
+suivie d'une reconstruction froide. Les valeurs et la stratégie de couverture
+par paires sont fixées dans le runbook ; aucun produit cartésien exhaustif n'est
+requis.
+
 ## 5. Sources de vérité et oracles
 
 ### Validateur commun
@@ -130,6 +139,11 @@ réservations, supports, retraits, tolérances, identités ou certificats BGIG.
 ADR-0068 continue d'interdire son ajout direct au produit sans benchmark,
 analyse de licence/packaging, ADR de dépendance et GO humain.
 
+L'ordre d'exécution évite de bloquer la campagne sur un outil tiers : petit
+oracle exact interne sans dépendance, solveurs BGIG existants, puis au plus un
+adapter externe déjà autorisé. PackingSolver, Java/LAFF et CP-SAT ne sont jamais
+installés silencieusement et leur indisponibilité n'empêche pas L06D/L06E.
+
 ## 7. Mesures obligatoires
 
 La comparaison est lexicographique : la vérité fonctionnelle précède toujours
@@ -174,6 +188,12 @@ reprenable et écrit atomiquement :
 Une campagne ne reste jamais « en cours » sans heartbeat ni timeout métier. Elle
 s'arrête sur perte fonctionnelle, corruption, dérive de corpus, budget global ou
 demande utilisateur.
+
+Les cas versionnés sont séparés en `regression`, `discovery`, `tuning` et
+`holdout`. Le holdout reste fermé jusqu'au choix d'une seule hypothèse. La
+comparaison suit un tournoi progressif : CI, découverte, trois hypothèses
+maximum, réglage, choix unique, holdout, puis soak seulement si une incertitude
+précise subsiste.
 
 ## 9. Découpage de livraison
 
@@ -232,6 +252,11 @@ Statut : `future-human-gate`.
 
 ## 10. Protocole goal pour Codex
 
+Le runbook canonique est
+`docs/P64_L06_AUTONOMOUS_GOAL_RUNBOOK.md`. Le premier Goal est plafonné à 36 h,
+2 Gio d'artefacts temporaires, deux workers fonctionnels et une seule
+amélioration intégrée. Il reste reprenable après une pause sûre.
+
 Un goal autonome de campagne doit nommer :
 
 - tier et corpus exacts ;
@@ -262,6 +287,7 @@ Le programme est considéré opérationnel seulement lorsque :
 - le corpus distingue faisable, impossible prouvé et inconnu borné ;
 - au moins un oracle indépendant ou comparateur est recertifié par BGIG ;
 - les tiers CI/extended sont reprenables et déterministes fonctionnellement ;
+- les splits tuning/holdout sont séparés et le holdout reste fermé avant choix ;
 - les métriques de capacité précèdent les métriques de vitesse ;
 - chaque évolution du solveur est une mission atomique passée par A/B ;
 - les futures formes restent reliées à

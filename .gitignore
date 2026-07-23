@@ -48,6 +48,7 @@ generated/
 out/
 
 # Logs and temporary files
+.codex-work/
 *.log
 *.tmp
 *.bak

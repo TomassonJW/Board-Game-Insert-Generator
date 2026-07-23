@@ -1,6 +1,6 @@
 # Next Actions
 
-Dernière mise à jour : 2026-07-22
+Dernière mise à jour : 2026-07-23
 
 ## Version active
 
@@ -55,24 +55,29 @@ Preuve L05D1 : P64_L05D1_SOLVER_CORPUS_EVIDENCE.md.
 
 ## Prochaine action recommandée
 
-### P64-L05V - observation Fusion et capture du premier cas reel
+### P64-L05V-R1 — recapture humaine exacte avant Goal
 
-Type : gate humaine preparee.
+Type : gate humaine courte déjà préparée.
 
-Le package 0.1.58 du commit 261f7cc est installe localement. La fixture
-p64-l05v-global-void-baseline.bgig.json est prete dans Documents/BGIG/projects.
+Le correctif `e817432` est installé dans l'add-in Fusion 0.1.58. Les derniers
+bundles locaux présents datent encore de la séquence qui a révélé le défaut de
+capture ; aucune paire post-R1 n'est actuellement disponible.
 
-Thomas suit uniquement docs/P64_L05V_FUSION_GATE_CHECKLIST.md dans Fusion :
+Thomas doit seulement :
 
-1. calculer et materialiser la fixture ;
-2. ajouter le petit nouveau conteneur ;
-3. verifier insertion globale ou fallback honnete ;
-4. observer le witness apres changement d'effort ;
-5. capturer le bundle avec le bouton DEV ;
-6. renvoyer OK ou KO contextuel avec les faits visibles.
+1. repartir du plan certifié de `Mon insert` ;
+2. ajouter le même petit conteneur et cliquer DEV après le refus incrémental ;
+3. lancer le calcul global, puis cliquer DEV après l'échec ;
+4. conserver les deux chemins locaux et digests.
 
-La capture reste locale et ne declenche aucun auto-apprentissage. Aucune
-validation d'impression n'est impliquee.
+Aucune matérialisation ni impression n'est demandée. Les projets et bundles
+personnels restent locaux et ne sont jamais promus automatiquement.
+
+Le runbook `P64_L06_AUTONOMOUS_GOAL_RUNBOOK.md` et son prompt canonique sont
+prêts. Dès que la paire passe le préflight, la nouvelle tâche peut lancer le
+Goal de 36 h sans redemander de GO. L06A reste bloqué jusque-là ; L06B à L06E ne
+doivent pas être anticipés.
+
 ## Lots verrouillés
 
 - P64-F01A02 et F02A02 restent séparés : ils possèdent la finalisation du volume ;
@@ -210,3 +215,13 @@ documentés. Ils n'écrasent pas la prochaine action unique :
 Les formes complexes, couvercles avancés, couleurs, aperçu 3D et compositeur
 manuel restent des horizons différés. Ils ne sont pas injectés dans le benchmark
 rectangulaire T0/T1.
+
+## Préparation P64-L06P — Goal autonome
+
+Le paquet de reprise fixe la matrice P45/P64, les splits regression/discovery/
+tuning/holdout, un oracle exact interne sans dépendance, le tournoi progressif,
+les budgets, la pause sûre et les arrêts. Le premier Goal intègre au maximum une
+amélioration validée ; il peut conclure sans diff si aucune hypothèse ne passe.
+
+Cette préparation est `done-documentation`. Elle ne lève pas la gate R1 et ne
+change aucun comportement runtime.

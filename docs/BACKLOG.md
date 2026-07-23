@@ -2931,3 +2931,14 @@ P64-L05V-R1 installation : done sur 0.1.58 commit e817432. Statut courant : read
   compositeur manuel 3D.
 - Activation : P69 priorise et découpe ; aucune de ces directions n'est `ready`
   par sa seule présence dans le backlog.
+
+### P64-L06P — préparation du Goal autonome
+
+- Statut : done-documentation.
+- Livré : runbook 36 h, matrice P45/P64, splits, oracle interne prioritaire,
+  tournoi progressif, checkpoints, pause sûre, arrêts et prompt `/goal`.
+- Dépendance runtime inchangée : L06A reste
+  `blocked-by-P64-L05V-R1-human-recapture`.
+- Interdits : aucun solveur ou budget modifié, aucune dépendance externe
+  installée, aucun T2-T4, aucune promotion d'un projet personnel.
+- Suite : recapture R1, puis lancement du Goal dans la nouvelle tâche.

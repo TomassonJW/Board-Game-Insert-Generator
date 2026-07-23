@@ -3057,3 +3057,21 @@ ne change. `fusion-validated: false`, `print-validated: false`.
 Validation du cadrage : garde documentaire 2/2, Ruff ciblé, py_compile et suite
 complète 682/682. Le premier lancement sans `PYTHONPATH` a échoué sur deux
 imports ; la relance canonique avec `PYTHONPATH=src` est verte.
+
+## P64-L06P — préparation du Goal autonome (2026-07-23)
+
+Statut : `done-documentation`, aucun changement runtime.
+
+Le runbook canonique fixe un Goal de 36 h maximum avec matrice P45/P64, splits
+regression/discovery/tuning/holdout, petit oracle exact interne, tournoi
+progressif, checkpoints atomiques et une seule amélioration intégrable. Il évite
+qu'une dépendance externe ou un soak inutile bloque la campagne.
+
+L'état local vérifié ne contient encore que les trois bundles antérieurs à la
+recapture corrigée. P64-L06A reste donc `blocked-by-P64-L05V-R1-human-recapture`.
+Aucun solveur, lane, classement, budget, deadline, schéma, géométrie, Fusion,
+CAD IR, scène ou manifest ne change. `fusion-validated: false`,
+`print-validated: false`.
+
+Validation : garde documentaire 2/2, Ruff ciblé, py_compile et suite complète
+682/682 en 163,352 s.
