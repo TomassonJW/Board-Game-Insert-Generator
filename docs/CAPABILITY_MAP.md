@@ -1826,20 +1826,20 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
 - C-PROJECT-CONTRACT / C-FUSION-UI / C-GEOMETRY / C-CAD-IR : inchangées.
 - Statut : P64-L06A à P64-L06E done, automated-validated, negative-result-accepted ; fusion-validated: false, print-validated: false.
 
-## Mise à jour P64-L07 — audit et corpus V2 terminés
+## Mise à jour P64-L07 — audit, corpus V2 et adapters terminés
 
-- C-SOLVER : L07A audite dix solutions. PackingSolver, LAFF, OR-Tools CP-SAT,
-  SCIP et HiGHS restent en lice dans cinq familles distinctes.
+- C-SOLVER : L07A audite dix solutions ; L07C exécute OR-Tools, HiGHS, SCIP
+  et LAFF dans quatre familles sous des adapters isolés.
 - C-QUALITY : le manifest V2 conserve huit régressions et ajoute 192 cas BGIG,
-  quatre petits contrôles exacts et huit contrôles publics issus de deux sources.
-- C-SAFETY : licences, tailles et SHA-256 des données sont verrouillés ; le
-  holdout neuf garde recettes et graines hors dépôt et refuse toute ouverture
-  sans sidecar exact ni sélection liée au corpus ouvert.
+  quatre contrôles provisoires et huit contrôles publics ; les trois contrôles
+  sol L07C donnent 12/12 résultats conformes et huit certificats positifs.
+- C-SAFETY : licences, tailles et SHA-256 des données et 32 artefacts moteurs
+  sont verrouillés ; le holdout neuf reste fermé, SCIP et LAFF sont fermés au
+  produit par leurs gates de dépendances.
 - C-PROJECT-CONTRACT : les cas publics sont exclus du classement produit ;
   une contrainte perdue produit `unsupported` et toute sortie positive externe
   devra être recertifiée par BGIG.
 - C-GEOMETRY : le corpus reste T0/T1 ; aucune forme 3D arbitraire ni T2 à T4.
 - C-FUSION-UI / C-CAD-IR : inchangées.
-- Statut : P64-L07A/B done, automated-validated ; P64-L07C next ; aucun
-  candidat externe exécuté ou adopté ; fusion-validated: false,
-  print-validated: false.
+- Statut : P64-L07A/B/C done, automated-validated ; P64-L07D next ; aucun
+  candidat externe adopté ; fusion-validated: false, print-validated: false.

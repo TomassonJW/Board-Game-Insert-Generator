@@ -14,9 +14,10 @@ positif. Le manifest Fusion passe à 0.1.59 pour P64-L05V-R2. L05D1/D2 sont
 automated-validated.
 ADR-0080 remplace la gate humaine par un journal local automatique.
 P64-L06A à L06E sont terminées avec une décision négative interne. Le Goal
-P64-L07 est lancé. L07A et L07B sont automated-validated : dix candidats ont
-été audités, cinq familles passent la première gate, le corpus V2 est construit
-et son nouveau holdout est scellé ; aucun moteur externe n'est encore adopté.
+P64-L07 est lancé. L07A à L07C sont automated-validated : dix candidats ont
+été audités, le corpus V2 et son nouveau holdout sont scellés, puis OR-Tools,
+HiGHS, SCIP et LAFF passent 12/12 contrôles réels recertifiés. Aucun moteur
+externe n'est encore adopté.
 P64-V2H03V et P44-V sont fusion-validated sur 0.1.55. P45-M001V est
 architecture-accepted. P64-L03V est un KO contextuel sur 0.1.56 et n'accorde
 aucune validation Fusion à la correction minimal/final.
@@ -3261,7 +3262,9 @@ fidèlement à une décision de faisabilité, mais leurs données n'expriment pa
 toutes les contraintes BGIG : elles sont donc exclues du classement produit et
 du holdout.
 
-Quatre petits contrôles exacts positifs/négatifs préparent L07C. Le nouveau
+Quatre contrôles provisoires positifs/négatifs sont indexés par L07B. L07C
+constate qu'ils ne sont pas dans le petit modèle exact après matérialisation et
+ajoute trois contrôles BGIG explicites sans modifier le manifest. Le nouveau
 holdout est indépendant de L06, compte 64 cas et refuse toute ouverture sans
 le sidecar local exact et une sélection préalable liée au corpus ouvert. Ses
 recettes et graines sont absentes du dépôt. L'engagement des recettes est
@@ -3275,6 +3278,32 @@ documentaire 2/2, alignement Fusion-only 6/6 et suite complète 733/733 en
 225,722 s. Aucun moteur candidat ni holdout n'a été exécuté. Preuve :
 `docs/P64_L07B_CORPUS_V2_EVIDENCE.md`.
 
-Suite : P64-L07C adapte au moins trois moteurs externes distincts, passe les
-petits contrôles et les régressions, puis recertifie toutes les sorties positives
-avec BGIG. fusion-validated: false, print-validated: false.
+### P64-L07C — adapters externes isolés
+
+Statut : done, implemented-core, automated-validated. Aucun changement du
+solveur produit.
+
+OR-Tools CP-SAT 9.15.6755, HiGHS 1.15.1, SCIP 10.0.2 via PySCIPOpt 6.2.1 et
+LAFF 4.2.1 reçoivent la même entrée rectangulaire sur un niveau, la même graine,
+un thread et la même enveloppe totale. Les 32 artefacts sont vérifiés par taille
+et SHA-256 avant worker. Les packages et caches restent hors Git.
+
+Le contrôle réel passe 12/12 : huit placements positifs sont reconstruits et
+recertifiés par `bgig.minimal_layout_certificate.v1`, trois moteurs exacts
+publient `infeasible_proven` sur le cas négatif et LAFF conserve
+`bounded_unknown`. Aucun holdout n'est lu.
+
+L'inspection corrige SCIP 10.0.3 en 10.0.2 et révèle Eclipse Collections 13.0.0
+derrière LAFF. SCIP et LAFF restent donc `benchmark-only`; OR-Tools et HiGHS
+restent candidats produit. Aucun moteur n'est adopté avant L07D/E.
+
+Validation L07C : contrôle réel 12/12, tests externes ciblés 28/28,
+tests adapters et preuves 11/11, suite complète 744/744 en 223,411 s. Le
+wrapper Windows termine avec le code 0.
+
+Preuves : `docs/P64_L07C_EXTERNAL_ADAPTERS_CONTRACT.md` et
+`docs/P64_L07C_EXTERNAL_ADAPTERS_EVIDENCE.md`.
+
+Suite : P64-L07D exécute contrôles, régressions, discovery, tuning et sélection
+scellée avant l'ouverture unique du holdout. fusion-validated: false,
+print-validated: false.

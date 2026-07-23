@@ -1,0 +1,176 @@
+{
+  "artifact_lock_digest": "58736ecde2a6bfbc4d57c3e5bc4e947c9875fe9f7a3c654cb87594e91c552bc6",
+  "candidate_count": 4,
+  "controls_digest": "501f17b099ee7031f9f0f363b720a94601b8a353a45f1213063514b892c4712a",
+  "evidence_digest": "926afb91e3bf4e18a1d70af01e32f2cfd0d0bdf4c92d7a0b77120de201848dbb",
+  "family_count": 4,
+  "invariants": {
+    "global_install_count": 0,
+    "heavy_processes_run_concurrently": 1,
+    "holdout_case_count": 0,
+    "network_service_invocation_count": 0,
+    "product_solver_routing_changed": false
+  },
+  "limits": {
+    "memory_mebibytes": 1024,
+    "seed": 640707,
+    "threads": 1,
+    "wall_seconds": 10.0
+  },
+  "results": [
+    {
+      "candidate_id": "ortools_cp_sat",
+      "case_id": "l07c-exact-feasible-floor",
+      "certificate_schema": "bgig.minimal_layout_certificate.v1",
+      "certified": true,
+      "engine_status": "OPTIMAL",
+      "exact_truth": "feasible",
+      "observed_status": "solution_found",
+      "passed": true,
+      "placement_digest": "34a7fec00840d7e72e867a9e95c366a4e57bc2fcef5837a89a4bbfc06f15b052",
+      "report_digest": "6b26acdc75f667ed86d680652a55f546bd5898e4c77daf4247e874bb8dc072c2"
+    },
+    {
+      "candidate_id": "ortools_cp_sat",
+      "case_id": "l07c-exact-rotation-required",
+      "certificate_schema": "bgig.minimal_layout_certificate.v1",
+      "certified": true,
+      "engine_status": "OPTIMAL",
+      "exact_truth": "feasible",
+      "observed_status": "solution_found",
+      "passed": true,
+      "placement_digest": "022c734b706145e70cf826fa7ba020a1b64a3883496565252b08300a588f1b35",
+      "report_digest": "6e000244c64624fd495ec910d7d42b2dae0b71cf0e2d05fd23668c81929676d5"
+    },
+    {
+      "candidate_id": "ortools_cp_sat",
+      "case_id": "l07c-exact-infeasible-floor",
+      "certificate_schema": null,
+      "certified": false,
+      "engine_status": "INFEASIBLE",
+      "exact_truth": "infeasible",
+      "observed_status": "infeasible_proven",
+      "passed": true,
+      "placement_digest": null,
+      "report_digest": "1819fe9ec9db7dcc49d707bb11579f30256bb1f123c9ab1b8a709293923766e2"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07c-exact-feasible-floor",
+      "certificate_schema": "bgig.minimal_layout_certificate.v1",
+      "certified": true,
+      "engine_status": "kOptimal",
+      "exact_truth": "feasible",
+      "observed_status": "solution_found",
+      "passed": true,
+      "placement_digest": "e632e15182b4952b7a0bdbab48c470b1084212f8b1f271aa8add91d8547859ac",
+      "report_digest": "c2370e076edac80e90ab299dce1dbed4dae222badf212def0ec91176a8f49f35"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07c-exact-rotation-required",
+      "certificate_schema": "bgig.minimal_layout_certificate.v1",
+      "certified": true,
+      "engine_status": "kOptimal",
+      "exact_truth": "feasible",
+      "observed_status": "solution_found",
+      "passed": true,
+      "placement_digest": "022c734b706145e70cf826fa7ba020a1b64a3883496565252b08300a588f1b35",
+      "report_digest": "75e6a440b5094ff304c2f8b40ccdb5b337a8a93b103f9f02e0bd7980fe97b2bf"
+    },
+    {
+      "candidate_id": "highs",
+      "case_id": "l07c-exact-infeasible-floor",
+      "certificate_schema": null,
+      "certified": false,
+      "engine_status": "kInfeasible",
+      "exact_truth": "infeasible",
+      "observed_status": "infeasible_proven",
+      "passed": true,
+      "placement_digest": null,
+      "report_digest": "eda454be7649b780d0174170ca7004fb56b588919657c8f0f1460bbc253c65d9"
+    },
+    {
+      "candidate_id": "scip",
+      "case_id": "l07c-exact-feasible-floor",
+      "certificate_schema": "bgig.minimal_layout_certificate.v1",
+      "certified": true,
+      "engine_status": "optimal",
+      "exact_truth": "feasible",
+      "observed_status": "solution_found",
+      "passed": true,
+      "placement_digest": "e632e15182b4952b7a0bdbab48c470b1084212f8b1f271aa8add91d8547859ac",
+      "report_digest": "ba4109fb6226066c38496665f6cd927157258f0dfcb4d318ad752052cac9be17"
+    },
+    {
+      "candidate_id": "scip",
+      "case_id": "l07c-exact-rotation-required",
+      "certificate_schema": "bgig.minimal_layout_certificate.v1",
+      "certified": true,
+      "engine_status": "optimal",
+      "exact_truth": "feasible",
+      "observed_status": "solution_found",
+      "passed": true,
+      "placement_digest": "34a738dc9991312b7aa717a6a271e1c5ae7685c4868364211a25d57cefd07c6a",
+      "report_digest": "b9a770474ba967a5536f0cc9e10b151f63b96097396438177a27e5a8909a5003"
+    },
+    {
+      "candidate_id": "scip",
+      "case_id": "l07c-exact-infeasible-floor",
+      "certificate_schema": null,
+      "certified": false,
+      "engine_status": "infeasible",
+      "exact_truth": "infeasible",
+      "observed_status": "infeasible_proven",
+      "passed": true,
+      "placement_digest": null,
+      "report_digest": "b87431197d6ce1ba192f6de3581e02da3f6d2c27910308fae1b34ad726f6b6a0"
+    },
+    {
+      "candidate_id": "laff",
+      "case_id": "l07c-exact-feasible-floor",
+      "certificate_schema": "bgig.minimal_layout_certificate.v1",
+      "certified": true,
+      "engine_status": "complete_pack",
+      "exact_truth": "feasible",
+      "observed_status": "solution_found",
+      "passed": true,
+      "placement_digest": "e632e15182b4952b7a0bdbab48c470b1084212f8b1f271aa8add91d8547859ac",
+      "report_digest": "bd7cc23dfe7fd81f5bc4390772ff2b0b753c7d1e33579cc56dd8883287ef7cd7"
+    },
+    {
+      "candidate_id": "laff",
+      "case_id": "l07c-exact-rotation-required",
+      "certificate_schema": "bgig.minimal_layout_certificate.v1",
+      "certified": true,
+      "engine_status": "complete_pack",
+      "exact_truth": "feasible",
+      "observed_status": "solution_found",
+      "passed": true,
+      "placement_digest": "6d53e41433e90ca5d9f36bb4814cee36cd911d66744bd478f55fa188c7cf3a36",
+      "report_digest": "516f9fe6cef7b699163dd7e5049bceac82162624ef0416eb9b54a36c580bfa9e"
+    },
+    {
+      "candidate_id": "laff",
+      "case_id": "l07c-exact-infeasible-floor",
+      "certificate_schema": null,
+      "certified": false,
+      "engine_status": "no_complete_pack",
+      "exact_truth": "infeasible",
+      "observed_status": "bounded_unknown",
+      "passed": true,
+      "placement_digest": null,
+      "report_digest": "0e4df918d8804477ada5e56e2097153ba2473b67567333487a671c578952fc16"
+    }
+  ],
+  "schema_version": "bgig.external_adapter_control_evidence.v1",
+  "source_campaign_digest": "83c40101b29e26dd88a8bfba0e2d55cd9c8c34fbcc90e36f490a9585b692d6d2",
+  "summary": {
+    "expected_result_count": 12,
+    "failed": [],
+    "failed_count": 0,
+    "passed_count": 12,
+    "result_count": 12,
+    "status": "passed"
+  }
+}

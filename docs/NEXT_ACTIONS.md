@@ -16,9 +16,10 @@ recertifié. Le manifest Fusion passe à 0.1.59 pour le journal automatique. fus
 print-validated: false pour L05A, L05B et L05C. Le solveur reste inchangé.
 P64-L05B, P64-L05C, P64-L05D1/D2 et P64-L06A/B/C/D/E sont automated-validated. Le premier Goal L06 est terminé par la décision négative `no_algorithm_change_v1`.
 Cette décision ne compare aucun solveur externe mature. ADR-0081 et P64-L07
-encadrent désormais la vraie campagne externe. L07A et L07B sont terminées :
-dix candidats ont été audités, cinq familles passent la première gate, le
-corpus V2 est construit et le nouveau holdout est scellé.
+encadrent désormais la vraie campagne externe. L07A, L07B et L07C sont
+terminées : dix candidats ont été audités, le corpus V2 et son holdout sont
+scellés, puis OR-Tools, HiGHS, SCIP et LAFF passent 12/12 contrôles réels avec
+recertification BGIG.
 
 ## Dernier état réel
 
@@ -63,35 +64,39 @@ Preuve L06E : P64_L06E_ALGORITHM_DECISION_EVIDENCE.md.
 Rapport final : P64_L06_GOAL_FINAL_REPORT.md.
 Preuve L07A : P64_L07A_EXTERNAL_SOLVER_AUDIT_EVIDENCE.md.
 Preuve L07B : P64_L07B_CORPUS_V2_EVIDENCE.md.
+Contrat L07C : P64_L07C_EXTERNAL_ADAPTERS_CONTRACT.md.
+Preuve L07C : P64_L07C_EXTERNAL_ADAPTERS_EVIDENCE.md.
 
 ## Prochaine action recommandée
 
-### Exécuter P64-L07C — adapters d'au moins trois moteurs
+### Exécuter P64-L07D — tournoi externe progressif
 
 Type : mission autonome déjà autorisée par le Goal.
 
 La prochaine action exacte est :
 
-1. acquérir uniquement des artefacts dont version, licence et SHA-256 sont
-   verrouillés, dans des environnements isolés sous le workspace ;
-2. adapter au moins trois moteurs externes distincts représentant au moins
-   trois familles ; BGIG et le petit oracle ne comptent pas dans ce minimum ;
-3. traduire l'entrée V2 sans perte silencieuse de contrainte ; tout écart devient
-   `unsupported` et toute limite atteinte `bounded_unknown` ;
-4. normaliser les sorties et recertifier chaque résultat positif avec BGIG ;
-5. passer les petits contrôles exacts puis les régressions avant L07D, et
-   documenter versions, empreintes, packaging Windows et fonctionnement hors ligne.
+1. rejouer les trois contrôles exacts L07C puis les huit régressions ;
+2. mesurer la couverture réellement représentable avant de classer la qualité ;
+3. exécuter discovery pour les quatre moteurs sous la même enveloppe totale ;
+4. éliminer explicitement les sorties invalides, candidats dominés ou gates de
+   licence incompatibles avec une future intégration ;
+5. effectuer un tuning borné et identique dans son principe ;
+6. sceller le candidat seul ou le portefeuille, son routeur et ses réglages ;
+7. seulement alors ouvrir une fois le sidecar holdout, sans aucun réglage
+   postérieur ;
+8. comparer tout portefeuille au meilleur moteur seul sous ressources totales
+   comparables.
 
-La shortlist L07A contient PackingSolver, LAFF, OR-Tools CP-SAT, SCIP et HiGHS.
-Ce n'est ni un classement ni une adoption. Le nouveau holdout L07B reste fermé :
-ne pas lire son sidecar local avant la sélection scellée de L07D. Les cas
-publics servent uniquement de contrôles de méthode.
+OR-Tools et HiGHS restent candidats produit. SCIP et LAFF participent au vrai
+benchmark, mais restent `benchmark-only` tant que leurs gates de redistribution
+ne sont pas levées. Le holdout ne doit être lu qu'après production et
+versionnement de la sélection scellée.
 
-Modèle conseillé : `gpt-5.6-sol`, raisonnement `high`, car L07C combine builds
-externes, conversions de modèles, recertification et preuves de compatibilité
-Windows hors ligne. Option plus économique : `gpt-5.6-terra`, raisonnement
-`high`, acceptable pour un adapter déjà documenté ; le risque de reprise est
-plus élevé dès qu'un build natif ou une perte de contrainte doit être diagnostiqué.
+Modèle conseillé : `gpt-5.6-sol`, raisonnement `high`, car L07D combine une
+campagne longue, des checkpoints, une sélection non biaisée et des comparaisons
+de ressources. Option plus économique : `gpt-5.6-terra`, raisonnement `high`,
+acceptable si le runner et les gates restent inchangés ; le compromis est une
+revue plus fragile des biais de sélection et des statuts exacts.
 
 ## Lots verrouillés
 

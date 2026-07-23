@@ -2950,7 +2950,7 @@ implémentée et intégrée à la fois.
 - Dépendance runtime : L06A à L06E sont terminées ; le premier Goal est clôturé.
 - Interdits : aucun solveur ou budget modifié, aucune dépendance externe
   installée, aucun T2-T4, aucune promotion d'un projet personnel.
-- Suite : le `/goal` a lancé P64-L07 ; L07A/B sont terminés et L07C est la prochaine mission atomique.
+- Suite : le `/goal` a lancé P64-L07 ; L07A/B/C sont terminés et L07D est la prochaine mission atomique.
 
 ### P64-L07P — préparation du vrai benchmark externe
 
@@ -2980,8 +2980,11 @@ implémentée et intégrée à la fois.
 ### P64-L07B — corpus public et BGIG V2
 
 - Statut : done, implemented-core, automated-validated.
-- Livré : manifest V2, huit régressions, 192 nouveaux cas BGIG, quatre petits
-  contrôles exacts et huit contrôles publics issus de deux sources.
+- Livré : manifest V2, huit régressions, 192 nouveaux cas BGIG, quatre
+  contrôles provisoires et huit contrôles publics issus de deux sources.
+- Correction L07C : les quatre contrôles provisoires ne sont pas dans le modèle
+  exact sol après matérialisation ; trois contrôles BGIG propres à L07C les
+  remplacent pour la gate adapter sans réécrire le manifest.
 - Splits : discovery, tuning et nouveau holdout de 64 cas sans chevauchement
   d'identifiant, graine ou digest projet.
 - Protection : le holdout L06 reste consommé ; recettes et graines V2 sont
@@ -2993,18 +2996,19 @@ implémentée et intégrée à la fois.
 
 ### P64-L07C — adapters d'au moins trois moteurs
 
-- Statut : ready, in-progress-by-goal.
-- Objectif : environnements isolés, versions et SHA-256 verrouillés, entrée et
-  sortie communes.
+- Statut : done, implemented-core, automated-validated.
+- Livré : OR-Tools, HiGHS, SCIP et LAFF isolés sous une entrée et une sortie
+  communes ; 32 artefacts verrouillés avant exécution.
 - Vérité : toute solution repasse par le certificat BGIG ; contrainte perdue =
   `unsupported`, limite atteinte = `bounded_unknown`.
-- Acceptation : au moins trois concurrents externes distincts contrôlés sur les
-  petits cas exacts et les régressions.
-- Git : mission testée, commitée, intégrée et poussée avant L07D.
+- Acceptation : quatre concurrents, quatre familles, 12/12 contrôles réels,
+  huit sorties positives recertifiées et aucune lecture du holdout.
+- Gates : SCIP et LAFF restent `benchmark-only`; aucun moteur adopté.
+- Preuve : `docs/P64_L07C_EXTERNAL_ADAPTERS_EVIDENCE.md`.
 
 ### P64-L07D — tournoi externe progressif
 
-- Statut : blocked-by-P64-L07C.
+- Statut : ready, in-progress-by-goal.
 - Ordre : contrôles exacts, régressions, discovery, élimination, tuning, choix
   scellé, holdout unique, soak seulement si utile.
 - Équité : même entrée, limites annoncées et ressources totales comparables ;
