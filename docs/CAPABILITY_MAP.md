@@ -1713,3 +1713,11 @@ séparation géométrique minimal/final ; ADR-0074 porte la correction.
 - C-SAFETY : aucune scene BGIG n est trouvee par l inspection read-only ; la capture DEV et son absence d effet metier restent a observer sur un cas reel.
 - Limite : fixture de mecanisme uniquement, sans preuve de capacite, de reconstruction ou de performance sur `Mon insert.bgig.json`.
 - Statut : observation Fusion positive partielle ; fusion-validated: false, print-validated: false. Suite : preuve humaine de rechargement et capture, puis P64-L06A apres anonymisation/revue d un bundle reel.
+
+## Mise a jour P64-L05V-R1 - fidelite temporelle des preuves
+
+- C-PROJECT-CONTRACT : le SolverCaseBundle fige le dernier snapshot staged observe avant toute resynchronisation propre a la capture.
+- C-FUSION-UI : le refus visible et le bundle conservent le meme statut, la meme raison et les memes compteurs.
+- C-SAFETY : aucun solve, finaliseur, CAD, scene ou auto-modification ; aucun bundle personnel commite.
+- C-SOLVER : capacite strictement inchangee. Les trois captures confirment seulement un echec borne sur le cas reel.
+- Statut : automated-validated, fusion-validated: false, print-validated: false. Suite : recapture R1 puis P64-L06A.

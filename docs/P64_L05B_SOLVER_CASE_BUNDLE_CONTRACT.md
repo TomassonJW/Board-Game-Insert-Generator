@@ -123,3 +123,9 @@ ne reinterprete ni l'un ni l'autre ; il les fige comme preuves observees.
 - corpus versionne, apprentissage de lanes ou optimisation L05D ;
 - modification du cas dense 11 x 34 ;
 - nouvelle revendication fusion-validated ou print-validated.
+
+## Correctif P64-L05V-R1 - fidelite de transition
+
+Le bridge fige le `solver_case_snapshot` avant la resynchronisation technique de la requete DEV. Le rapport de transition qui a produit le message visible reste donc celui du bundle ; une synchronisation sans changement ne peut pas le remplacer par `dependencies_unchanged`.
+
+Ce correctif ne change ni le schema v1, ni le producteur pur, ni le solveur, ni les budgets. Il rend executable l exigence existante : capturer des faits deja observes sans les recalculer.

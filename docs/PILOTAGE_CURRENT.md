@@ -472,3 +472,11 @@ Thomas observe dans Fusion 0.1.58 le plan minimal a deux conteneurs, dont le nou
 La fixture confirme le mecanisme, pas la capacite sur un cas difficile. Le retour affiche `Warm start : non fourni` et `no_initial_incumbent` : seule la premiere persistance est observee, pas un rechargement compatible. Aucun bundle DEV reel n est encore fourni. La prochaine preuve humaine est donc de recharger ce witness et de capturer localement un cas representatif de `Mon insert` ; P64-L06A ne commencera qu apres anonymisation et revue du bundle.
 
 fusion-validated reste false globalement. print-validated: false.
+
+## P64-L05V-R1 - fidelite du bouton DEV (2026-07-23)
+
+Trois bundles reels valides etablissent la sequence plan certifie, ajout d exactement un conteneur, puis echec global borne. Ils revelent que la requete DEV ecrasait le rapport de refus incremental par dependencies_unchanged avant l export.
+
+Le bridge fige maintenant le snapshot observe avant cette resynchronisation. P64-L05V-R1 est automated-validated, 682/682. Aucun solveur, budget, lane, geometrie, finalisation, CAD ou scene ne change. L add-in doit etre reinstalle puis deux captures courtes doivent confirmer le rapport exact apres ajout et l echec apres calcul. P64-L06A reste verrouille jusqu a cette preuve.
+
+fusion-validated: false. print-validated: false.

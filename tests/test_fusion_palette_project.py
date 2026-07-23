@@ -1057,6 +1057,41 @@ class FusionPaletteProjectTests(unittest.TestCase):
             )
             self.assertEqual(solved["status"], "ready")
             self.assertIsNotNone(solved["partition"])
+            changed = deepcopy(project)
+            changed["container_groups"].append(
+                {
+                    "id": "g2",
+                    "name": "Bac hors limite",
+                    "wall_thickness_mm": None,
+                    "floor_thickness_mm": None,
+                }
+            )
+            changed["contents"].append(
+                {
+                    "id": "oversized",
+                    "name": "Hors limite",
+                    "shape_kind": "square",
+                    "dimensions_mm": {"x": 1000, "y": 1000, "z": 1000},
+                    "quantity": 1,
+                    "container_group_id": "g2",
+                    "content_clearance_mm": None,
+                    "measurement_confidence": "exact",
+                }
+            )
+            rejected = handle_palette_request(
+                request(
+                    "validate_project",
+                    project=changed,
+                    solver_settings=settings,
+                    source_revision=8,
+                ),
+                ADDIN,
+                ROOT,
+            )
+            rejected_reuse = deepcopy(
+                rejected["staged_calculation"]["global_void_reuse"]
+            )
+            self.assertEqual(rejected_reuse["status"], "global_solve_required")
             with (
                 patch.object(
                     StagedCalculationSession,
@@ -1081,9 +1116,9 @@ class FusionPaletteProjectTests(unittest.TestCase):
                 captured = handle_palette_request(
                     request(
                         "capture_solver_case",
-                        project=project,
+                        project=changed,
                         solver_settings=settings,
-                        source_revision=7,
+                        source_revision=8,
                         captured_at_ms=123456,
                         interaction_events=interaction_events,
                         client_context={
@@ -1133,6 +1168,9 @@ class FusionPaletteProjectTests(unittest.TestCase):
             captured["solver_case_capture"]["automatic_solver_modification"]
         )
         self.assertEqual(bundle["project"]["project_name"], "Mon insert")
+        captured_staged = bundle["solver_case_state"]["staged_calculation"]
+        self.assertEqual(captured_staged["global_void_reuse"], rejected_reuse)
+        self.assertEqual(captured_staged["minimal_layout"]["status"], "stale")
         self.assertEqual(bundle["interaction_trace"]["event_count"], 1)
         self.assertEqual(
             set(bundle["interaction_trace"]["events"][0]),

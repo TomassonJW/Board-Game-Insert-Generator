@@ -2867,3 +2867,16 @@ implémentée et intégrée à la fois.
 - Statut : planned ; depend de P64-L05V-B et d un bundle local anonymisable.
 - Scope : classification/replay deterministe du cas reel et proposition de sous-mission solveur ciblee, sans changement automatique des budgets ou lanes.
 - Limite : la fixture L05V valide le mecanisme, pas la capacite de reconstruction du projet personnel.
+
+### P64-L05V-R1 - fidelite de capture du refus
+
+- Statut : done-code, automated-validated, pending-install-and-human-recapture.
+- Defaut : la requete DEV remplacait le dernier rapport global_void_reuse par dependencies_unchanged avant l export.
+- Livre : snapshot staged fige avant resynchronisation, test bridge du rapport refuse exact, preuve des trois bundles reels.
+- Invariants : aucun changement solveur, budget, lane, geometrie, finalisation, CAD, scene ou schema bundle.
+- Preuve : docs/P64_L05V_R1_CAPTURE_FIDELITY_EVIDENCE.md ; 682/682.
+
+### P64-L06A - premier cas complexe anonymise et replaye
+
+- Statut : blocked-by-P64-L05V-R1-human-recapture.
+- Entree attendue : deux bundles R1, refus incremental puis echec global, avec projet identique entre les deux captures.

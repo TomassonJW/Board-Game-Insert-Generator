@@ -494,6 +494,11 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         effort_profile=solver_settings["effort"],
     )
     staged_session = _staged_calculation_session(project, addin_dir, solver_settings)
+    observed_solver_case_state = (
+        staged_session.solver_case_snapshot()
+        if action == "capture_solver_case"
+        else None
+    )
     staged_calculation = staged_session.synchronize(
         project,
         local_analysis,
@@ -596,7 +601,11 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         solver_case_bundle = build_solver_case_bundle(
             project,
             solver_settings=solver_settings,
-            solver_case_state=staged_session.solver_case_snapshot(),
+            solver_case_state=(
+                observed_solver_case_state
+                if observed_solver_case_state is not None
+                else staged_session.solver_case_snapshot()
+            ),
             local_analysis=local_analysis,
             container_frontiers=local_frontiers,
             interaction_events=request.get("interaction_events"),

@@ -108,3 +108,7 @@ Le bouton `DEV · Capturer le cas` est rouge, visible et adjacent a
 
 P64-L05C porte le witness certifie persistant et le warm start fail-closed.
 P64-L05D portera ensuite le corpus, les mesures et les optimisations de lanes.
+
+## Correctif P64-L05V-R1 (2026-07-23)
+
+La premiere sequence reelle a montre que la requete de capture resynchronisait la session avant de construire le bundle et pouvait remplacer le rapport de transition par `dependencies_unchanged`. Le bridge fige maintenant `solver_case_snapshot` avant cette resynchronisation. Un test reproduit un refus global-void et exige l egalite exacte du rapport stocke. Suite complete : 682/682. Le schema v1 et les invariants d absence d effet restent inchanges.

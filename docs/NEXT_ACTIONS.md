@@ -181,3 +181,11 @@ Le retour Fusion est positif pour l insertion dans le vide global de la fixture,
 La prochaine action unique est humaine et courte : produire un SolverCaseBundle DEV representatif du projet complexe apres une manipulation reelle, puis fournir son chemin et son digest. En parallele, recharger le witness sur le meme projet pour observer un warm start accepte. Aucun bundle personnel n entre dans le depot avant anonymisation et revue.
 
 La prochaine mission de code, non demarree, sera P64-L06A : anonymiser, rejouer et classifier ce premier cas reel avant de proposer une amelioration ciblee du solveur. Aucune promesse de capacite ou de vitesse n est faite avant cette preuve.
+
+## Apres P64-L05V-R1 - recapture fidele du cas reel (2026-07-23)
+
+Les trois bundles reels sont valides et prouvent le delta exact puis l echec global, mais le clic DEV 0.1.58 ecrasait la raison du refus incremental avant l export. R1 corrige cette instrumentation sans modifier le solveur.
+
+Prochaine action unique : installer le commit R1, reprendre l etat certifie de Mon insert, ajouter le meme petit conteneur, puis capturer deux fois : juste apres le refus incremental et juste apres le calcul global rate. Les nouveaux bundles doivent conserver le statut, la raison et les compteurs exacts.
+
+P64-L06A pourra ensuite anonymiser, rejouer et classifier la paire. Aucune optimisation de solveur ne commence avant cette recapture.

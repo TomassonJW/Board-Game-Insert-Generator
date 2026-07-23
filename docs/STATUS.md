@@ -3021,3 +3021,11 @@ Statut : observation positive partielle ; fusion-validated: false, print-validat
 Le package Fusion 0.1.58 issu de 261f7cc produit un plan a deux conteneurs, incluant `Bac 888`, et persiste le witness atomiquement. La palette indique que la recherche continue et ne revendique pas de cache. L inspection read-only ne trouve aucune scene BGIG, ce qui est attendu avant materialisation.
 
 La trace recue contient `exact_witness_file_not_found` puis `certified_witness_stored_atomically`, avec `Warm start : non fourni`. Elle prouve la premiere ecriture, non le rechargement. Aucun SolverCaseBundle DEV reel n est encore joint. Le cas personnel complexe reste hors corpus et hors preuve de capacite : la suite doit d abord capturer, anonymiser et rejouer ce cas, sans auto-modifier le solveur.
+
+## P64-L05V-R1 - snapshot DEV avant resynchronisation (2026-07-23)
+
+Statut : implemented-fusion-bridge, automated-validated ; fusion-validated: false ; print-validated: false.
+
+Trois bundles locaux valides montrent 17/19 avec plan certifie, puis 18/20 avec ancien plan stale, puis le meme projet en no_solution_within_budget / hard_budget_reached apres 2707 ms de recherche fraiche. La marge volumique necessaire reste positive mais ne prouve aucune disposition.
+
+Le defaut etait dans l instrumentation : capture_solver_case resynchronisait la session et remplacait le rapport du refus par dependencies_unchanged. Le snapshot est maintenant fige avant cette etape. Validation : 27/27 bridge, 3/3 bundle, 7/7 insertion globale, 38/38 DOM et 682/682 suite complete. Aucun fichier personnel n est commite.

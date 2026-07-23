@@ -1184,3 +1184,9 @@ La fixture installee confirme dans Fusion le flux L05A et la premiere ecriture a
 La trajectoire obligatoire reste empirique et revue : recharger un witness compatible, capturer un SolverCaseBundle local du projet complexe, anonymiser et rejouer ce cas, puis seulement cadrer une evolution ciblee du solveur. Aucune auto-amelioration ou modification automatique n est autorisee.
 
 fusion-validated: false tant que le warm start et la capture reelle ne sont pas observes. print-validated: false.
+
+## P64-L05V-R1 - correction de la preuve DEV (2026-07-23)
+
+La premiere sequence reelle de trois bundles valide le mecanisme de collecte et expose une lacune : la capture relancait une synchronisation avant de figer l etat, ce qui supprimait la raison exacte du refus incremental. R1 fige le snapshot d abord et ne change aucune capacite solveur.
+
+Ordre suivant : installation R1, recapture de la paire refus incremental / echec global, anonymisation et replay P64-L06A, puis seulement proposition d une evolution algorithmique mesuree. fusion-validated: false ; print-validated: false.

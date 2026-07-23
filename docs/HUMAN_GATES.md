@@ -1071,3 +1071,16 @@ Les traces recues indiquent `Warm start : non fourni` et `no_initial_incumbent`.
 Prochaine preuve humaine minimale : recharger le meme projet apres un changement temporaire d effort et verifier un witness/warm start acceptes ; puis, sur `Mon insert.bgig.json`, capturer explicitement un SolverCaseBundle DEV apres une manipulation representative et transmettre seulement son chemin local et son digest pour anonymisation/revue.
 
 Statut de gate : positif partiel ; L05V ne devient pas globalement fusion-validated. print-validated: false.
+
+## P64-L05V-R1 - gate de recapture fidele
+
+Statut : automated-validated, installation requise avant observation.
+
+Les trois bundles du 2026-07-23 sont valides et utiles, mais la version installee au moment de leur capture a perdu le rapport exact de l insertion locale. Apres installation de R1, Thomas ne refait pas tout le parcours :
+
+1. repartir du dernier plan certifie de Mon insert ;
+2. ajouter le meme petit conteneur et cliquer DEV apres le refus affiche ;
+3. lancer le calcul, puis cliquer DEV apres l echec ;
+4. transmettre les deux chemins et digests.
+
+Aucune materialisation ni impression n est requise. Aucun bundle n entre automatiquement dans le depot. fusion-validated: false avant ce retour ; print-validated: false.
