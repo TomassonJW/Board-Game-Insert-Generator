@@ -146,6 +146,80 @@ def build_solver_benchmark_manifest(
     return manifest
 
 
+def build_generated_benchmark_case_records(
+    *,
+    case_id_prefix: str,
+    split_seed_bases: Mapping[str, int],
+    split_offsets: Mapping[str, int],
+    splits: Sequence[str] = GENERATED_SPLITS,
+) -> list[dict[str, object]]:
+    """Construit une campagne fraîche avec les recettes T0/T1 certifiées.
+
+    Cette entrée publique permet à une nouvelle campagne de réutiliser le
+    générateur sans réutiliser les identifiants ni les graines du holdout L06.
+    Un appel peut produire un sous-ensemble explicite de splits afin de garder
+    les recettes d'un nouveau holdout hors du manifest ouvert.
+    """
+
+    prefix = _identifier(case_id_prefix, "generated case id prefix")
+    if isinstance(splits, (str, bytes)):
+        raise SolverBenchmarkCorpusError(
+            "Generated campaign splits must be a sequence."
+        )
+    selected_splits = tuple(splits)
+    if (
+        not selected_splits
+        or len(set(selected_splits)) != len(selected_splits)
+        or any(split not in GENERATED_SPLITS for split in selected_splits)
+    ):
+        raise SolverBenchmarkCorpusError(
+            "Generated campaign splits must be distinct known splits."
+        )
+    expected_splits = set(selected_splits)
+    if set(split_seed_bases) != expected_splits:
+        raise SolverBenchmarkCorpusError(
+            "Generated campaign seed bases must cover selected splits exactly."
+        )
+    if set(split_offsets) != expected_splits:
+        raise SolverBenchmarkCorpusError(
+            "Generated campaign offsets must cover selected splits exactly."
+        )
+    bases: dict[str, int] = {}
+    offsets: dict[str, int] = {}
+    for split in selected_splits:
+        seed_base = split_seed_bases[split]
+        offset = split_offsets[split]
+        if (
+            isinstance(seed_base, bool)
+            or not isinstance(seed_base, int)
+            or seed_base < 0
+        ):
+            raise SolverBenchmarkCorpusError(
+                "Generated campaign seed bases must be non-negative integers."
+            )
+        if isinstance(offset, bool) or not isinstance(offset, int) or offset < 0:
+            raise SolverBenchmarkCorpusError(
+                "Generated campaign offsets must be non-negative integers."
+            )
+        bases[split] = seed_base
+        offsets[split] = offset
+    if len(set(bases.values())) != len(selected_splits):
+        raise SolverBenchmarkCorpusError(
+            "Generated campaign seed bases must be distinct between splits."
+        )
+    return [
+        _build_generated_case_record(
+            split,
+            index,
+            case_id_prefix=prefix,
+            seed_base=bases[split],
+            split_offset=offsets[split],
+        )
+        for split in selected_splits
+        for index in range(GENERATED_CASES_PER_SPLIT)
+    ]
+
+
 def validate_solver_benchmark_manifest(manifest: object) -> dict[str, object]:
     """Valide le digest puis reconstruit entièrement le manifest canonique."""
 
@@ -291,7 +365,14 @@ def validate_materialized_benchmark_case(case: object) -> dict[str, object]:
     return deepcopy(value)
 
 
-def _build_generated_case_record(split: str, index: int) -> dict[str, object]:
+def _build_generated_case_record(
+    split: str,
+    index: int,
+    *,
+    case_id_prefix: str = "",
+    seed_base: int | None = None,
+    split_offset: int | None = None,
+) -> dict[str, object]:
     if split not in GENERATED_SPLITS:
         raise SolverBenchmarkCorpusError("Unknown generated split.")
     if isinstance(index, bool) or not isinstance(index, int) or not 0 <= index < 64:
@@ -304,8 +385,10 @@ def _build_generated_case_record(split: str, index: int) -> dict[str, object]:
     else:
         axis_ordinal = family_ordinal
         seed_ordinal = index
-    offset = _SPLIT_OFFSET[split]
-    seed = _SPLIT_SEED_BASE[split] + seed_ordinal
+    offset = _SPLIT_OFFSET[split] if split_offset is None else split_offset
+    seed = (
+        _SPLIT_SEED_BASE[split] if seed_base is None else seed_base
+    ) + seed_ordinal
     groups = _GROUP_CHOICES[family]
     group_count = groups[(axis_ordinal + offset) % len(groups)]
     layer_count = (1, 2, 3)[(axis_ordinal * 2 + offset) % 3]
@@ -360,7 +443,10 @@ def _build_generated_case_record(split: str, index: int) -> dict[str, object]:
         "execution_mode": execution_mode,
         "change_kind": change_kind,
     }
-    case_id = f"{split}-{chr(97 + FAMILIES.index(family))}-{index + 1:03d}"
+    case_id = (
+        f"{case_id_prefix}{split}-{chr(97 + FAMILIES.index(family))}"
+        f"-{index + 1:03d}"
+    )
     core = _materialize_recipe(
         case_id=case_id,
         split=split,

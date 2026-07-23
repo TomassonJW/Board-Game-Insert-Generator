@@ -14,9 +14,9 @@ positif. Le manifest Fusion passe à 0.1.59 pour P64-L05V-R2. L05D1/D2 sont
 automated-validated.
 ADR-0080 remplace la gate humaine par un journal local automatique.
 P64-L06A à L06E sont terminées avec une décision négative interne. Le Goal
-P64-L07 est lancé. L07A est automated-validated : dix candidats externes ont
-été audités et cinq familles passent la première gate ; aucun moteur n'est
-encore adopté.
+P64-L07 est lancé. L07A et L07B sont automated-validated : dix candidats ont
+été audités, cinq familles passent la première gate, le corpus V2 est construit
+et son nouveau holdout est scellé ; aucun moteur externe n'est encore adopté.
 P64-V2H03V et P44-V sont fusion-validated sur 0.1.55. P45-M001V est
 architecture-accepted. P64-L03V est un KO contextuel sur 0.1.56 et n'accorde
 aucune validation Fusion à la correction minimal/final.
@@ -3246,6 +3246,35 @@ Validation L07A : audit 5/5, garde de preuve 1/1, reconstruction portable
 worktree Windows neuf. Preuve :
 `docs/P64_L07A_EXTERNAL_SOLVER_AUDIT_EVIDENCE.md`.
 
-Suite : P64-L07B construit le corpus V2, ajoute au moins deux sources publiques
-indépendantes et scelle un nouveau holdout. fusion-validated: false,
-print-validated: false.
+### P64-L07B — corpus V2 et nouveau holdout
+
+Statut : done, implemented-core, automated-validated. Aucun changement du
+solveur produit.
+
+Le manifest `bgig.solver_benchmark_manifest.v2` conserve les huit régressions
+historiques et ajoute 192 nouveaux cas BGIG : 64 discovery, 64 tuning et 64
+holdout. Les splits ne partagent ni identifiant, ni graine, ni digest projet.
+
+OR-Library THPACK9 et Q4RealBPP v1 fournissent huit contrôles publics dont les
+licences, tailles et SHA-256 sont verrouillés. Leur objectif se réduit
+fidèlement à une décision de faisabilité, mais leurs données n'expriment pas
+toutes les contraintes BGIG : elles sont donc exclues du classement produit et
+du holdout.
+
+Quatre petits contrôles exacts positifs/négatifs préparent L07C. Le nouveau
+holdout est indépendant de L06, compte 64 cas et refuse toute ouverture sans
+le sidecar local exact et une sélection préalable liée au corpus ouvert. Ses
+recettes et graines sont absentes du dépôt. L'engagement des recettes est
+`706f0452410fb877d77a87f1df08a6f558167f5a5a98f30f421ccb37d1e0296a` et le
+digest du sidecar scellé est
+`4ec4eb2cc8cea01c71cd3073857d0c152b4f8a3e4c3d6b5fac25edc49b400bcc`.
+
+Validation L07B : compilation Python OK, sources et membres sélectionnés
+vérifiés, tests ciblés durcis 12/12 en 26,780 s, compatibilité L06 9/9, garde
+documentaire 2/2, alignement Fusion-only 6/6 et suite complète 733/733 en
+225,722 s. Aucun moteur candidat ni holdout n'a été exécuté. Preuve :
+`docs/P64_L07B_CORPUS_V2_EVIDENCE.md`.
+
+Suite : P64-L07C adapte au moins trois moteurs externes distincts, passe les
+petits contrôles et les régressions, puis recertifie toutes les sorties positives
+avec BGIG. fusion-validated: false, print-validated: false.

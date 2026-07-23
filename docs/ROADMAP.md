@@ -1315,10 +1315,11 @@ et licences verrouillées. Chaque mission est testée, documentée, intégrée d
 `main`, poussée et vérifiée avant la suivante. Le `/goal` de la tâche de reprise
 vaut GO complet, sans seconde autorisation dans ce périmètre.
 
-Avancement : L07A est done et automated-validated. Dix candidats ont été
-audités ; PackingSolver, LAFF, OR-Tools CP-SAT, SCIP et HiGHS passent la
-première gate dans cinq familles. Aucun moteur n'est encore intégré.
+Avancement : L07A et L07B sont done et automated-validated. Dix candidats
+ont été audités ; cinq familles passent la première gate. Le corpus V2 ajoute
+192 cas BGIG, deux sources publiques et un nouveau holdout indépendant scellé.
+Aucun moteur externe n'est encore exécuté ou intégré.
 
-Statut : Goal actif ; L07B est la prochaine mission atomique. Aucun benchmark
+Statut : Goal actif ; L07C est la prochaine mission atomique. Aucun benchmark
 comparatif L07 n'est encore exécuté. fusion-validated: false.
 print-validated: false.

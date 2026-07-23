@@ -2950,7 +2950,7 @@ implémentée et intégrée à la fois.
 - Dépendance runtime : L06A à L06E sont terminées ; le premier Goal est clôturé.
 - Interdits : aucun solveur ou budget modifié, aucune dépendance externe
   installée, aucun T2-T4, aucune promotion d'un projet personnel.
-- Suite : le `/goal` a lancé P64-L07 ; L07A est terminé et L07B est la prochaine mission atomique.
+- Suite : le `/goal` a lancé P64-L07 ; L07A/B sont terminés et L07C est la prochaine mission atomique.
 
 ### P64-L07P — préparation du vrai benchmark externe
 
@@ -2979,18 +2979,21 @@ implémentée et intégrée à la fois.
 
 ### P64-L07B — corpus public et BGIG V2
 
-- Statut : ready, in-progress-by-goal.
-- Objectif : manifest V2, familles BGIG, au moins deux sources publiques
-  indépendantes et petits cas exacts.
-- Splits : regression, discovery, tuning et nouveau holdout fermé.
-- Protection : aucune famille, graine ou projet corrélé entre tuning et holdout ;
-  holdout L06 consommé et interdit pour la sélection.
+- Statut : done, implemented-core, automated-validated.
+- Livré : manifest V2, huit régressions, 192 nouveaux cas BGIG, quatre petits
+  contrôles exacts et huit contrôles publics issus de deux sources.
+- Splits : discovery, tuning et nouveau holdout de 64 cas sans chevauchement
+  d'identifiant, graine ou digest projet.
+- Protection : le holdout L06 reste consommé ; recettes et graines V2 sont
+  absentes du dépôt, dans un sidecar local scellé qui exige une sélection
+  complète liée au corpus ouvert.
 - Acceptation : reconstruction déterministe, licences/empreintes des données,
   témoins et preuves négatives vérifiés.
+- Preuve : `docs/P64_L07B_CORPUS_V2_EVIDENCE.md`.
 
 ### P64-L07C — adapters d'au moins trois moteurs
 
-- Statut : blocked-by-P64-L07B.
+- Statut : ready, in-progress-by-goal.
 - Objectif : environnements isolés, versions et SHA-256 verrouillés, entrée et
   sortie communes.
 - Vérité : toute solution repasse par le certificat BGIG ; contrainte perdue =

@@ -72,9 +72,13 @@ preuves archivées.
   mesurée d'un à trois gagnants complémentaires.
 - P64-L07A est terminé et automated-validated : dix candidats ont été audités ;
   PackingSolver, LAFF, OR-Tools CP-SAT, SCIP et HiGHS restent en lice dans cinq
-  familles distinctes. Aucun moteur n'est encore adopté.
-- Le Goal P64-L07 est actif. La prochaine mission atomique est L07B : corpus
-  BGIG V2, deux sources publiques indépendantes et nouveau holdout scellé.
+  familles distinctes.
+- P64-L07B est terminé et automated-validated : le manifest V2 conserve huit
+  régressions, ajoute 192 cas BGIG, huit contrôles publics issus de deux sources
+  et scelle un nouveau holdout indépendant dont les recettes restent hors dépôt.
+  Aucun moteur externe n'est encore exécuté ou adopté.
+- Le Goal P64-L07 est actif. La prochaine mission atomique est L07C : adapter
+  au moins trois moteurs externes distincts dans des environnements isolés.
 
 ## Vue de séquence
 
@@ -125,7 +129,8 @@ preuves archivées.
 | Terminé — automatisé | P64-L06C | Deux comparateurs sans dépendance, recertification fraîche et petit oracle exact 6/6 dans sa portée. |
 | Terminé — résultat négatif | P64-L06D/E | 904 exécutions internes ; aucune amélioration intégrée ; holdout L06 consommé. |
 | Terminé — automatisé | P64-L07A | Dix candidats audités ; cinq moteurs et cinq familles passent la première gate, sans adoption. |
-| En cours — autonome | P64-L07B à L07E | Corpus V2, adapters réels, tournoi puis intégration conditionnelle de 1 à 3 gagnants. |
+| Terminé — automatisé | P64-L07B | Corpus V2 déterministe, deux sources publiques et nouveau holdout scellé, sans run candidat. |
+| En cours — autonome | P64-L07C à L07E | Adapters réels, tournoi puis intégration conditionnelle de 1 à 3 gagnants. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -184,6 +189,8 @@ preuves archivées.
   tournoi progressif, holdout neuf et prompt `/goal` canonique.
 - P64_L07A_EXTERNAL_SOLVER_AUDIT_EVIDENCE.md : dix candidats, shortlist de
   cinq familles, licences, limites de modèle et absence de formes 3D arbitraires.
+- P64_L07B_CORPUS_V2_EVIDENCE.md : corpus V2, sources publiques, petits
+  contrôles exacts, séparation des splits et nouveau holdout scellé.
 - FUTURE_PRODUCT_HORIZONS.md : registre différé des formes, mécanismes,
   visualisations et du futur compositeur manuel 3D.
 - ADR-0074 : supersession partielle d'ADR-0071 après le KO Fusion 0.1.56.
@@ -611,7 +618,7 @@ Le premier Goal P64-L06 est terminé. Son résultat utile est la chaîne de mesu
 
 Statut : P64-L06A à P64-L06E done, automated-validated, negative-result-accepted. Aucune action humaine requise. fusion-validated: false. print-validated: false.
 
-## P64-L07 — vrai benchmark externe prêt (2026-07-23)
+## P64-L07 — vrai benchmark externe en cours (2026-07-23)
 
 P64-L07 corrige explicitement la portée insuffisante du premier Goal : les trois
 variantes internes de L06 ne comptent pas comme des concurrents externes.
@@ -627,10 +634,10 @@ ADR-0081 et le nouveau runbook imposent :
   si chacun gagne une famille distincte et si le portefeuille bat le meilleur
   moteur seul.
 
-Le solveur courant reste la baseline. Aucun outil externe n'est encore adopté,
-aucun nouveau holdout n'est encore construit et aucun benchmark L07 n'est encore
-exécuté. Le `/goal` dans la tâche de reprise vaut GO complet pour L07A à L07E,
-sans seconde autorisation dans le périmètre accepté.
+Le solveur courant reste la baseline. L07A et L07B sont terminés : dix
+candidats sont audités, le corpus V2 est construit et son nouveau holdout est
+scellé. Aucun moteur externe n'est encore installé, adapté, exécuté ou adopté ;
+aucun benchmark comparatif L07 n'est donc encore exécuté.
 
-Statut : done-documentation, architecture-accepted, ready-for-explicit-go.
+Statut : Goal actif ; P64-L07A/B done, automated-validated ; P64-L07C next.
 fusion-validated: false. print-validated: false.

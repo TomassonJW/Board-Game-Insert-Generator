@@ -1826,20 +1826,20 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
 - C-PROJECT-CONTRACT / C-FUSION-UI / C-GEOMETRY / C-CAD-IR : inchangées.
 - Statut : P64-L06A à P64-L06E done, automated-validated, negative-result-accepted ; fusion-validated: false, print-validated: false.
 
-## Mise à jour P64-L07 — audit externe lancé
+## Mise à jour P64-L07 — audit et corpus V2 terminés
 
 - C-SOLVER : L07A audite dix solutions. PackingSolver, LAFF, OR-Tools CP-SAT,
   SCIP et HiGHS restent en lice dans cinq familles distinctes.
-- C-QUALITY : l'inventaire versionné et six gardes ciblés verrouillent le
-  minimum de concurrence, les sources, les licences et les pertes de modèle.
-- C-SAFETY : PackingSolver exclut CLP et Knitro ; CBC reste sous gate copyleft ;
-  tout artefact exige un SHA-256 avant exécution.
-- C-PROJECT-CONTRACT : une contrainte perdue produit `unsupported` et toute
-  sortie positive externe devra être recertifiée par BGIG.
-- C-GEOMETRY : aucun moteur n'apporte de formes 3D arbitraires ; T2 à T4
-  restent hors scope.
-- C-QUALITY : L07B doit encore créer le corpus V2, les sources publiques et le
-  nouveau holdout avant le tournoi.
+- C-QUALITY : le manifest V2 conserve huit régressions et ajoute 192 cas BGIG,
+  quatre petits contrôles exacts et huit contrôles publics issus de deux sources.
+- C-SAFETY : licences, tailles et SHA-256 des données sont verrouillés ; le
+  holdout neuf garde recettes et graines hors dépôt et refuse toute ouverture
+  sans sidecar exact ni sélection liée au corpus ouvert.
+- C-PROJECT-CONTRACT : les cas publics sont exclus du classement produit ;
+  une contrainte perdue produit `unsupported` et toute sortie positive externe
+  devra être recertifiée par BGIG.
+- C-GEOMETRY : le corpus reste T0/T1 ; aucune forme 3D arbitraire ni T2 à T4.
 - C-FUSION-UI / C-CAD-IR : inchangées.
-- Statut : P64-L07A done, automated-validated ; P64-L07B next ; aucun candidat
-  externe adopté ; fusion-validated: false, print-validated: false.
+- Statut : P64-L07A/B done, automated-validated ; P64-L07C next ; aucun
+  candidat externe exécuté ou adopté ; fusion-validated: false,
+  print-validated: false.
