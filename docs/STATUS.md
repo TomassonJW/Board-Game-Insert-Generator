@@ -3096,7 +3096,7 @@ L'état final est anonymisé dans `tests/fixtures/p64_l06a_reviewed_real_case.v1
 
 Livraison : anonymiseur déterministe, constructeur à sortie séparée pour revue, fixture étendue, tests et preuve `P64_L06A_REAL_CASE_INVENTORY_EVIDENCE.md`. Aucun changement de solveur, budget, délai, certificat, géométrie, finalisation, CAD ou scène.
 
-Statut : done, automated-validated. fusion-validated: false. print-validated: false. P64-L06B est désormais terminée ; prochaine mission : P64-L06C.
+Statut : done, automated-validated. fusion-validated: false. print-validated: false. P64-L06B et P64-L06C sont désormais terminées ; prochaine mission : P64-L06D.
 
 ## P64-L06B — corpus T0/T1 généré (2026-07-23)
 
@@ -3126,4 +3126,34 @@ discovery/tuning, Ruff ciblé et py_compile : OK. La suite complète est consign
 
 Aucun solveur, lane, budget, deadline, classement, certificat public, schéma
 projet, valeur physique, finalisation, CAD ou scène Fusion n'est modifié. L06C
-est la prochaine mission.
+est terminée ; L06D est la prochaine mission.
+
+## P64-L06C — comparateurs offline et petit oracle exact (2026-07-23)
+
+Statut : implemented-core, automated-validated. fusion-validated: false,
+print-validated: false.
+
+Le module `solver_benchmark_adapters.py` expose exactement deux candidats : le
+solveur minimal BGIG courant et `internal_exact_floor`. Aucun package, exécutable,
+service ou solveur externe n'est ajouté. Les rapports ont un schéma commun, un
+digest stable et ne recopient pas le projet complet.
+
+Toute réponse positive est reconstruite depuis ses placements et repasse par
+`bgig.minimal_layout_certificate.v1`. Le cas historique `simple-quick` est
+résolu puis recertifié à neuf. Une interdiction de rotation non représentable ou
+un contexte incrémental manquant reçoit `unsupported`.
+
+Le modèle exact interne couvre les cas générés d'un seul niveau, sans réservation,
+avec une variante locale et au plus quatre conteneurs. Il énumère les ordres,
+orientations et positions stables gauche/bas sous 250 000 états et 1 000 000
+essais. Sur discovery, les six cas de cette portée retrouvent 4 faisables et
+2 impossibles. Un cap forcé produit `bounded_unknown`. Le holdout reste fermé.
+
+Validation de clôture : tests ciblés, suite complète, Ruff, compilation, gardes
+documentaires et contrôles Git sont consignés dans
+`P64_L06C_OFFLINE_ADAPTER_AND_EXACT_ORACLE_EVIDENCE.md`.
+
+Aucun solveur produit, lane, budget, deadline, certificat public, schéma projet,
+tolérance, géométrie, finalisation, CAD, scène Fusion, manifest ou valeur physique
+n'est modifié. Le cas dense 11 × 34 ne reçoit aucune nouvelle revendication.
+P64-L06D est la prochaine mission.

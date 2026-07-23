@@ -1239,7 +1239,7 @@ fusion-validated: false. print-validated: false.
 
 Les 13 bundles locaux sont valides. Un seul cas 18 conteneurs / 20 contenus est anonymisé et versionné dans un corpus étendu autonome ; son replay répété reste stable en `no_solution_within_budget`. Les 12 autres captures restent des preuves locales non promues.
 
-L06A n'améliore pas le solveur et ne revendique aucune capacité générale depuis ce cas. L06B a depuis livré les générateurs T0/T1, les familles obligatoires et les splits fermés. L06C devient la prochaine mission. fusion-validated: false ; print-validated: false.
+L06A n'améliore pas le solveur et ne revendique aucune capacité générale depuis ce cas. L06B a livré les générateurs T0/T1 et L06C les deux comparateurs sans dépendance. L06D devient la prochaine mission. fusion-validated: false ; print-validated: false.
 
 ## P64-L06B — corpus T0/T1 livré (2026-07-23)
 
@@ -1251,7 +1251,24 @@ de rotation et permutations sont couvertes sans produit cartésien.
 Les cas possibles ont un témoin local P45 et un placement global vérifiés. Les
 cas impossibles ont une preuve stricte de volume ou de hauteur. Les fronts P45
 réels couvrent 1, 2, 4 et 8 variantes. Le holdout reste fermé et n'a reçu aucun
-run solveur. L06C devient la prochaine mission : interface offline, petit oracle
-exact interne et recertification commune, sans dépendance externe.
+run solveur. L06C a depuis livré l'interface offline, le petit oracle exact
+interne et la recertification commune. L06D devient la prochaine mission.
+
+fusion-validated: false. print-validated: false.
+
+## P64-L06C — comparateurs offline livrés (2026-07-23)
+
+Le protocole offline expose exactement deux candidats sans dépendance : le
+solveur minimal courant et un petit oracle exact interne. Les deux produisent le
+même schéma compact. Toute solution est reconstruite puis recertifiée par BGIG.
+
+L'oracle exact énumère les ordres, rotations autorisées et positions stables des
+petits cas à un niveau. Sa portée est volontairement limitée à quatre conteneurs,
+sans réservation et avec une variante locale. Il retrouve 4 cas faisables et
+2 impossibles sur 6 cas discovery indépendants. Les caps et contraintes hors
+portée restent visibles. Le holdout n'est pas ouvert.
+
+L06D peut maintenant exécuter régressions, CI, discovery puis tuning, choisir une
+seule hypothèse avant holdout et n'utiliser soak que si utile.
 
 fusion-validated: false. print-validated: false.

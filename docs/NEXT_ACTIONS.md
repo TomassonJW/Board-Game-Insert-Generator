@@ -14,7 +14,7 @@ le cache négatif. P64-L05A est automated-validated : exactement un nouveau
 conteneur peut être inséré dans le vide global à voisins figés et plan complet
 recertifié. Le manifest Fusion passe à 0.1.59 pour le journal automatique. fusion-validated: false et
 print-validated: false pour L05A, L05B et L05C. Le solveur reste inchangé.
-P64-L05B, P64-L05C et P64-L05D1/D2 sont automated-validated.
+P64-L05B, P64-L05C, P64-L05D1/D2 et P64-L06A/B/C sont automated-validated.
 
 ## Dernier état réel
 
@@ -52,29 +52,32 @@ Preuve L05A : P64_L05A_GLOBAL_VOID_CONTAINER_REUSE_EVIDENCE.md.
 Preuve L05B : P64_L05B_SOLVER_CASE_BUNDLE_EVIDENCE.md.
 Preuve L05C : P64_L05C_CERTIFIED_PLAN_WITNESS_EVIDENCE.md.
 Preuve L05D1 : P64_L05D1_SOLVER_CORPUS_EVIDENCE.md.
+Preuve L06B : P64_L06B_BENCHMARK_CORPUS_EVIDENCE.md.
+Preuve L06C : P64_L06C_OFFLINE_ADAPTER_AND_EXACT_ORACLE_EVIDENCE.md.
 
 ## Prochaine action recommandée
 
-### P64-L06C — comparateur offline et petit oracle exact
+### P64-L06D — campagne autonome progressive
 
 Type : mission autonome de benchmark, sans action humaine.
 
-P64-L06B est terminée : le manifest conserve huit cas de régression et ajoute
-64 cas discovery, 64 tuning et 64 holdout. Les cinq familles, les cardinalités
-P45/P64, les étages, réservations, rotations et ordres adversariaux sont couverts.
-Les cas faisables ont un témoin vérifié, les cas négatifs une preuve exacte, et
-le holdout reste fermé.
+P64-L06C est terminée : exactement deux candidats sont disponibles sans
+dépendance externe. Toute solution est recertifiée par BGIG. Le petit oracle
+exact retrouve 4 cas faisables et 2 impossibles sur les 6 cas discovery de sa
+portée déclarée. Le holdout n'a pas été ouvert.
 
-L06C doit maintenant :
+L06D doit maintenant :
 
-1. définir une entrée/sortie commune pour les solveurs offline ;
-2. livrer un petit oracle exact interne sans dépendance externe ;
-3. déclarer explicitement les contraintes non prises en charge ;
-4. recertifier toute solution par le certificat BGIG commun ;
-5. livrer tests, preuve, commit et intégration dans `main`, puis ouvrir L06D.
+1. livrer un runner reprenable avec checkpoint atomique par cas ;
+2. exécuter les régressions et le tier CI, puis discovery ;
+3. classer les lacunes et retenir au plus trois hypothèses ;
+4. utiliser tuning pour n'en sélectionner qu'une ;
+5. sceller ce choix avant d'ouvrir une seule fois le holdout ;
+6. lancer soak seulement si le résultat reste ambigu ou utile ;
+7. publier couverture, qualité, coûts et décision, puis ouvrir L06E.
 
-Le Goal déjà lancé reste valable. Il poursuit L06C à L06E sans nouveau GO et
-sans installer de dépendance externe.
+Le Goal déjà lancé reste valable. Il poursuit L06D et L06E sans nouveau GO,
+sans dépendance externe et sans forcer une amélioration algorithmique.
 
 ## Lots verrouillés
 

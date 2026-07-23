@@ -9,12 +9,13 @@ Statut courant :
 
 - `goal-launch-authorized-by-ADR-0080` ;
 - journal local automatique retenu pour les futurs parcours réels ;
-- P64-L06A et P64-L06B terminées : inventaire réel puis 192 cas T0/T1 ;
-- prochaine mission : P64-L06C ;
+- P64-L06A, P64-L06B et P64-L06C terminées : inventaire réel, 192 cas T0/T1 puis comparateurs offline ;
+- prochaine mission : P64-L06D ;
 - `fusion-validated: false` ;
 - `print-validated: false`.
 
 La décision humaine ADR-0080 retire la paire R1 des conditions de lancement. Les cas réels déjà présents sont classés honnêtement et restent locaux ; leur absence ou leur imperfection ne bloque plus le corpus, les générateurs ni les oracles autonomes. Aucune dépendance externe n'est autorisée par cette levée de gate.
+
 ## 2. Résultat attendu du premier Goal
 
 Le premier Goal doit, dans l'ordre :
@@ -292,7 +293,7 @@ Dans la nouvelle tâche préparée pour P64-L06, Thomas peut lancer :
 ```text
 /goal
 Exécute P64-L06 selon docs/P64_L06_AUTONOMOUS_GOAL_RUNBOOK.md, pendant 36 h
-maximum. Reprends à la première mission incomplète, actuellement L06C, puis
+maximum. Reprends à la première mission incomplète, actuellement L06D, puis
 avance jusqu'à L06E avec tests,
 preuve, commit et intégration dans main avant la suivante. Classe les cas réels
 disponibles sans en faire une condition de départ. Sans nouveau GO, utilise
@@ -317,4 +318,13 @@ L06B produit le manifest `bgig.solver_benchmark_manifest.v1` : huit cas de
 régression, 64 discovery, 64 tuning et 64 holdout. Les témoins positifs et
 preuves négatives sont validés, les fronts P45 réels couvrent 1, 2, 4 et 8
 variantes et le holdout reste fermé. Aucun solveur n'a été exécuté sur le
-holdout. L06C reprend sans nouveau GO et sans dépendance externe.
+holdout. L06D reprend sans nouveau GO et sans dépendance externe.
+
+## 17. Checkpoint P64-L06C intégré
+
+L06C expose exactement deux candidats sans dépendance : le solveur BGIG courant
+et l'oracle exact interne `canonical_minimum_envelopes_single_floor_v1`. Toute
+solution est recertifiée à neuf. Six cas discovery entrent dans la portée exacte
+et retrouvent quatre faisables et deux impossibles. Les refus de rotation,
+réservation, étages, variantes multiples et caps restent explicites. Le holdout
+n'a pas été ouvert. L06D reprend sans nouveau GO.

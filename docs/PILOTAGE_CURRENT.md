@@ -63,9 +63,9 @@ preuves archivées.
   L05D1 fournit un corpus anonymise, un replay borne et une gate A/B.
   P64-L05D2 reduit les evaluations inutiles sans regression fonctionnelle.
   P64-L05V-R2 remplace la recapture manuelle par un journal local automatique
-  dans l'add-in 0.1.59. ADR-0080 ferme la gate humaine. L06A et L06B sont terminées :
-  13/13 bundles classés, un cas réel anonymisé, puis 192 cas T0/T1 générés ;
-  L06C est la prochaine mission.
+  dans l'add-in 0.1.59. ADR-0080 ferme la gate humaine. L06A, L06B et L06C sont terminées :
+  13/13 bundles classés, un cas réel anonymisé, 192 cas T0/T1, deux comparateurs
+  offline et un petit oracle exact ; L06D est la prochaine mission.
 
 ## Vue de séquence
 
@@ -113,6 +113,7 @@ preuves archivées.
 | Autorisé — Goal | P64-L06 | Runbook 36 h, matrice T0/T1, splits et checkpoints ; exécution débloquée par ADR-0080. |
 | Terminé — automatisé | P64-L06A | 13/13 bundles classés ; un cas réel anonymisé et rejoué, 12 non promus. |
 | Terminé — automatisé | P64-L06B | 192 cas T0/T1, cinq familles, oracles vérifiés et holdout fermé. |
+| Terminé — automatisé | P64-L06C | Deux comparateurs sans dépendance, recertification fraîche et petit oracle exact 6/6 dans sa portée. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -157,6 +158,8 @@ preuves archivées.
 - P64_L05C_CERTIFIED_PLAN_WITNESS_EVIDENCE.md : preuves coeur, Deep, staged, bridge et DOM.
 - P64_L06B_BENCHMARK_CORPUS_CONTRACT.md : manifest, recettes, oracles, splits et holdout fermé.
 - P64_L06B_BENCHMARK_CORPUS_EVIDENCE.md : couverture réelle, audits P45 et reconstruction exacte.
+- P64_L06C_OFFLINE_ADAPTER_AND_EXACT_ORACLE_CONTRACT.md : protocole commun, portée exacte, caps et refus.
+- P64_L06C_OFFLINE_ADAPTER_AND_EXACT_ORACLE_EVIDENCE.md : deux candidats, 6/6 vérités et recertification fraîche.
 - P64_L06_SOLVER_BENCHMARK_CAMPAIGN.md : tiers T0/T1, oracles, comparateurs,
   métriques, protocole goal et lots L06A à L06V.
 - P64_L06_AUTONOMOUS_GOAL_RUNBOOK.md : préflight R1, matrice P45/P64, splits,
@@ -510,8 +513,8 @@ compositeur manuel sont conservés sans élargir le runtime.
 Le programme P64-L06 définit une campagne autonome reprenable : cas T0/T1
 actuels, oracles certifiés, adapters offline, tiers CI/extended/soak et gate A/B.
 Il exclut l'auto-modification et ne rend aucune dépendance externe acceptable.
-La première mission runtime reste P64-L06A après confirmation des captures R1 ;
-ce cadrage documentaire ne lève aucune gate.
+L06A, L06B et L06C sont désormais terminées. L06D exécute la campagne progressive ;
+les gates de dépendance et de holdout restent inchangées.
 
 ## P64-L06P — runbook Goal prêt (2026-07-23)
 
@@ -520,7 +523,8 @@ amélioration intégrée. Le corpus sépare regression, discovery, tuning et hol
 le holdout reste fermé avant la sélection d'une hypothèse. Un petit oracle exact
 interne évite toute dépendance externe bloquante.
 
-Historique : ce lot était documentaire et attendait encore la paire R1. ADR-0080 a levé cette attente ; L06A est désormais prête sans modifier solveur, budget, schéma, géométrie, Fusion ou manifest.
+Historique : ce lot était documentaire et attendait encore la paire R1. ADR-0080 a levé cette attente ; L06A à L06C sont terminées sans modifier les frontières produit. L06D est prête.
+
 ## P64-L05V-R2 — journal automatique et Goal débloqué (2026-07-23)
 
 Sur décision explicite de Thomas, le bouton DEV est supprimé. L'add-in 0.1.59 écrit automatiquement un fichier chronologique par session et conserve chaque état complet du projet une seule fois par empreinte. Les clics, champs, demandes, résultats, erreurs, documents et actions Fusion deviennent analysables sans manipulation spéciale.
@@ -537,7 +541,7 @@ Treize bundles locaux sur treize sont valides. La paire récente retenue décrit
 
 Un seul état final 18 conteneurs / 20 contenus est anonymisé, renormalisé et versionné au tier étendu. Deux replays sont fonctionnellement identiques et satisfont les attentes. Les douze autres bundles restent locaux ; aucun journal personnel n'est promu.
 
-Statut : P64-L06A et P64-L06B done, automated-validated ; P64-L06C prochaine. fusion-validated: false. print-validated: false.
+Statut : P64-L06A, P64-L06B et P64-L06C done, automated-validated ; P64-L06D prochaine. fusion-validated: false. print-validated: false.
 
 ## P64-L06B — corpus T0/T1 généré (2026-07-23)
 
@@ -553,5 +557,20 @@ reste fermé et aucun solveur n'y a été exécuté. Le schéma projet ne sachan
 interdire une rotation globale, cette politique reste une contrainte explicite
 du benchmark et un adapter incapable doit répondre unsupported.
 
-Statut : P64-L06B done, automated-validated ; P64-L06C prochaine mission.
+Statut : P64-L06B et P64-L06C done, automated-validated ; P64-L06D prochaine mission.
+fusion-validated: false. print-validated: false.
+
+## P64-L06C — comparateurs offline et petit oracle exact (2026-07-23)
+
+Deux candidats sont exposés sans dépendance externe : le solveur BGIG courant et
+un petit oracle exact interne. Les rapports ont une forme commune, un digest
+stable et ne publient une solution qu'après une nouvelle certification BGIG.
+
+Le modèle exact se limite à un niveau, sans réservation, une variante locale et
+au plus quatre conteneurs. Il retrouve 4 cas faisables et 2 impossibles sur les
+6 cas discovery de sa portée. Tout étage, réservation, variante multiple, cap ou
+interdiction de rotation non représentable reçoit un refus honnête. Le holdout
+reste fermé.
+
+Statut : P64-L06C done, automated-validated ; P64-L06D prochaine mission.
 fusion-validated: false. print-validated: false.

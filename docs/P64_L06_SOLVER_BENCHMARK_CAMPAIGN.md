@@ -19,8 +19,8 @@ de problème. L'objectif raisonnable est :
 - préparer des interfaces compatibles avec de futures formes sans les simuler
   prématurément.
 
-P64-L06A et P64-L06B sont terminées : 13/13 bundles classés, un cas réel anonymisé, puis 192 cas T0/T1 générés.
-P64-L06C est la prochaine mission runtime.
+P64-L06A, P64-L06B et P64-L06C sont terminées : 13/13 bundles classés, un cas réel anonymisé, 192 cas T0/T1 puis deux comparateurs offline.
+P64-L06D est la prochaine mission runtime.
 Le lancement autonome, ses ressources, checkpoints, splits et arrêts sont normés par
 `docs/P64_L06_AUTONOMOUS_GOAL_RUNBOOK.md`.
 
@@ -218,12 +218,12 @@ Statut : `done`, `automated-validated`. Huit régressions et 192 recettes ; hold
 
 ### P64-L06C — adapters comparatifs offline
 
-- normaliser l'entrée/sortie de deux candidats au maximum ;
-- commencer par PackingSolver et un petit oracle interne ou CP-SAT ;
-- recertifier chaque sortie par BGIG ;
-- garder toute dépendance hors runtime Fusion.
+- sortie commune pour exactement deux candidats : BGIG courant et oracle exact interne ;
+- petit modèle exact T0 sur un niveau, sans réservation et sous caps explicites ;
+- recertification fraîche de chaque solution par BGIG ;
+- aucune dépendance externe et refus explicite des contraintes non représentées.
 
-Statut : `ready-after-L06B-integration`. Le petit oracle interne sans dépendance est prioritaire ; toute installation reste soumise aux gates.
+Statut : `done`, `automated-validated`. Six cas discovery dans la portée exacte retrouvent 4 faisables et 2 impossibles ; holdout fermé.
 
 ### P64-L06D — campagne autonome
 
@@ -231,7 +231,7 @@ Statut : `ready-after-L06B-integration`. Le petit oracle interne sans dépendanc
 - publier couverture, qualité, coûts et familles de lacunes ;
 - sélectionner une seule hypothèse algorithmique suivante.
 
-Statut : `planned-after-L06B/L06C`.
+Statut : `ready-after-L06C-integration`.
 
 ### P64-L06E — amélioration ciblée
 

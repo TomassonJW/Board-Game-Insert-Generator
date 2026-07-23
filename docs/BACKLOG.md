@@ -2899,15 +2899,17 @@ implémentée et intégrée à la fois.
 
 ### P64-L06C — comparateurs solveur offline
 
-- Statut : ready-after-P64-L06B-integration.
-- Scope : adapters pour deux candidats maximum, priorité à PackingSolver et à un
-  petit oracle exact interne ou CP-SAT ; recertification BGIG obligatoire.
-- Gate : toute installation, dépendance versionnée ou intégration produit exige
-  analyse de licence/packaging, ADR et GO explicite.
+- Statut : done, automated-validated ; fusion-validated: false, print-validated: false.
+- Livré : exactement deux adapters sans dépendance, sortie commune déterministe,
+  recertification BGIG fraîche et petit oracle exact interne sur un niveau.
+- Preuve : `P64_L06C_OFFLINE_ADAPTER_AND_EXACT_ORACLE_EVIDENCE.md` ; 6/6 cas
+  discovery dans la portée exacte, dont 4 faisables et 2 impossibles.
+- Limites : rotation non exposée refusée par l'adapter courant ; étages,
+  réservations, variantes multiples et plus de quatre conteneurs hors petit modèle.
 
 ### P64-L06D — campagne autonome bornée
 
-- Statut : planned-after-P64-L06B/L06C.
+- Statut : ready-after-P64-L06C-integration.
 - Scope : tiers CI/extended/soak reprenables, métriques fonctionnelles,
   qualité, temps au premier incumbent, mémoire et stabilité.
 - Sortie : une classification des lacunes et une seule hypothèse L06E.
@@ -2943,7 +2945,7 @@ implémentée et intégrée à la fois.
 - Statut : done-documentation.
 - Livré : runbook 36 h, matrice P45/P64, splits, oracle interne prioritaire,
   tournoi progressif, checkpoints, pause sûre, arrêts et prompt `/goal`.
-- Dépendance runtime : L06A et L06B sont terminées ; L06C est prête après intégration du corpus généré.
+- Dépendance runtime : L06A, L06B et L06C sont terminées ; L06D est prête après intégration des comparateurs.
 - Interdits : aucun solveur ou budget modifié, aucune dépendance externe
   installée, aucun T2-T4, aucune promotion d'un projet personnel.
-- Suite : L06C à L06E sans nouvelle action humaine.
+- Suite : L06D à L06E sans nouvelle action humaine.
