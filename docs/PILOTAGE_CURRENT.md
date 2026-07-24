@@ -97,10 +97,15 @@ preuves archivées.
   variables entières/binaires, collisions X/Y/Z, étages, appuis, réservations,
   régions, variantes et retraits. Les sources SCIP 10.0.2, SoPlex 8.0.2,
   PySCIPOpt 6.2.1 et la toolchain `cp314` sont verrouillées avant build.
-- La prochaine mission recommandée est P64-L08J : construire sous `.codex-work`
-  le candidat SCIP + SoPlex sans Ipopt/MUMPS/METIS/Intel, inventorier les DLL et
-  prouver hors ligne son équivalence sur les seuls contrôles publics. Aucun
-  runtime produit ou paquet Fusion n'est encore ajouté ; le holdout reste scellé.
+- P64-L08J est terminée et automated-validated : le runtime minimal SCIP
+  `cp314` fait 56 491 565 octets, contient 26 binaires, n'a aucune dépendance
+  manquante ou interdite et repasse les six contrôles publics 3D sans perte. Une
+  reconstruction indépendante confirme la configuration et le comportement ;
+  les sorties MSVC ne sont pas promises identiques bit à bit.
+- La prochaine mission recommandée est P64-L08K : intégrer un build qualifié
+  précis dans BGIG, conserver les refus et fallbacks honnêtes, puis exécuter les
+  régressions complètes avant toute préparation de gate Fusion. Le holdout reste
+  interdit ; `fusion-validated=false` et `print-validated=false`.
 
 ## Vue de séquence
 
@@ -164,7 +169,8 @@ preuves archivées.
 | Terminé — résultat produit négatif | P64-L08G | ABI `cp310/cp314` incompatible et redistribution native incomplète ; aucun runtime ni gate Fusion. |
 | Terminé — ABI réparée, paquet refusé | P64-L08H | SCIP `cp314` fonctionne hors ligne ; avis natifs et autorités Intel/Microsoft incomplets, aucune intégration. |
 | Terminée — audit pré-build | P64-L08I | ADR-0084, modèle MIP 3D, sources et toolchain verrouillés ; aucune intégration produit. |
-| Prochaine — build et équivalence | P64-L08J | Construire SCIP + SoPlex `cp314`, auditer chaque DLL puis lancer les contrôles publics hors ligne. |
+| Terminée — build et équivalence | P64-L08J | Runtime SCIP minimal qualifié deux fois, 26 binaires résolus, six contrôles publics 3D sans perte. |
+| Prochaine — intégration produit | P64-L08K | Versionner le build qualifié, brancher SCIP, lancer les régressions complètes puis préparer la gate Fusion. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -223,6 +229,8 @@ preuves archivées.
   tournoi progressif, holdout neuf et prompt `/goal` canonique.
 - P64_L07A_EXTERNAL_SOLVER_AUDIT_EVIDENCE.md : dix candidats, shortlist de
   cinq familles, licences, limites de modèle et absence de formes 3D arbitraires.
+- P64_L08J_MINIMAL_SCIP_RUNTIME_BUILD_EVIDENCE.md : build minimal, dépendances,
+  avis, reconstruction indépendante et équivalence publique 3D.
 - P64_L07B_CORPUS_V2_EVIDENCE.md : corpus V2, sources publiques, petits
   contrôles exacts, séparation des splits et nouveau holdout scellé.
 - ADR-0082 : HiGHS 1.15.1 CLI comme lane produit Windows hors ligne.

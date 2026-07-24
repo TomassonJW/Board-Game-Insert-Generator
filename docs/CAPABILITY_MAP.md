@@ -1972,3 +1972,17 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
   l'équivalence publique et inventorier chaque binaire avant toute intégration.
 - `C-FUSION`, `C-FUSION-UI`, `C-PRINT` : aucun package, smoke test ou gate
   humaine ; `fusion-validated=false`, `print-validated=false`.
+## P64-L08J — fabrication du runtime SCIP minimal
+
+- Statut : `implemented-build`, `automated-validated`.
+- Capability servie : résoudre les cas limites 3D réels avec le gagnant SCIP du
+  tournoi, hors Fusion et sans dépendance globale.
+- Build : SCIP 10.0.2 + SoPlex 8.0.2 + PySCIPOpt 6.2.1 `cp314`, NumPy 2.5.1,
+  `/MD`, LTO, `snauty` et plugins MIP internes.
+- Preuve native : 26 binaires inventoriés, zéro dépendance manquante ou
+  interdite, avis complets et DLL Microsoft reliées à `VC/Redist`.
+- Preuve fonctionnelle : deux builds propres, probe exact et six contrôles
+  publics 3D sans perte face au runtime du tournoi.
+- Frontière : aucune intégration produit, aucun replay de holdout et aucune
+  validation Fusion ou impression dans L08J.
+- Suite : P64-L08K `ready`, intégration produit et régressions complètes.

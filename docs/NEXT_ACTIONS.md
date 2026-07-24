@@ -77,40 +77,40 @@ Preuve L08F : P64_L08F_REAL_3D_TOURNAMENT_EVIDENCE.md.
 Preuve L08G : P64_L08G_SCIP_PRODUCT_GATE_EVIDENCE.md.
 Preuve L08H : P64_L08H_SCIP_PACKAGE_REMEDIATION_EVIDENCE.md.
 Preuve L08I : P64_L08I_MINIMAL_SCIP_RUNTIME_AUDIT_EVIDENCE.md.
+Preuve L08J : P64_L08J_MINIMAL_SCIP_RUNTIME_BUILD_EVIDENCE.md.
 Rapport final L08 : P64_L08_GOAL_FINAL_REPORT.md.
 Rapport final L07 : P64_L07_GOAL_FINAL_REPORT.md.
 
 ## Prochaine action recommandée
 
-### Exécuter P64-L08J — construire et qualifier le runtime SCIP minimal
+### Exécuter P64-L08K — intégrer SCIP dans BGIG et lancer les régressions complètes
 
-Type : build reproductible et gate d'équivalence publique. Aucun tuning, replay
-ou lecture du holdout L08F n'est autorisé. Aucune intégration produit avant le
-verdict complet de cette mission.
+Type : intégration produit atomique, sans tuning ni replay du holdout L08F.
 
-P64-L08I est terminé. ADR-0084 conserve le vrai moteur 3D SCIP 10.0.2,
-PySCIPOpt 6.2.1 `cp314`, SoPlex 8.0.2, les plugins MIP internes, la symétrie
-`snauty` et LTO. Le worker scellé est prouvé entier et linéaire ; la chaîne
-Ipopt/MUMPS/METIS/Intel est donc exclue du candidat.
+P64-L08J est terminée. Le runtime minimal SCIP 10.0.2 `cp314` est construit,
+redistribuable, inventorié et équivalent au runtime du tournoi sur tous les
+contrôles publics 3D. La mission doit intégrer un build qualifié précis, pas
+recompiler implicitement pendant l'installation Fusion.
 
-P64-L08J doit :
+P64-L08K doit :
 
-1. vérifier les tailles et SHA-256 de toutes les sources et entrées L08I ;
-2. construire SoPlex, SCIP puis PySCIPOpt uniquement sous `.codex-work`, avec la
-   toolchain et les options exactes d'ADR-0084, au plus deux processus lourds ;
-3. inventorier chaque DLL/PYD final, ses dépendances, sa taille et son SHA-256 ;
-4. refuser toute DLL Ipopt, MUMPS/METIS, Intel, toute dépendance non résolue ou
-   toute DLL Microsoft extérieure au dossier officiel `VC/Redist` ;
-5. créer le paquet d'avis complet PySCIPOpt/SCIP/SoPlex/NumPy/Microsoft ;
-6. exécuter hors ligne l'import `cp314`, le contrôle exact, tous les contrôles
-   publics 3D et les régressions ouvertes, sans utiliser le holdout ;
-7. comparer les sorties au runtime du tournoi et refuser toute perte sémantique,
-   solution, certificat ou régression publique matérielle ;
-8. n'autoriser une mission d'intégration BGIG séparée que si toutes les gates
-   passent.
+1. versionner le build qualifié, son inventaire, ses avis et son empreinte dans
+   le paquet produit sans installation globale ;
+2. charger ce runtime uniquement depuis l'adaptateur produit, sans importer
+   Fusion dans le cœur Python ;
+3. brancher SCIP comme moteur prioritaire des problèmes 3D fidèlement
+   représentables, avec les mêmes entrées, budgets et recertification BGIG ;
+4. conserver un refus ou fallback honnête pour les contraintes non
+   représentables, les erreurs de chargement, les deadlines et les annulations ;
+5. vérifier que le worker n'altère ni dimensions, tolérances, certificats,
+   géométrie, finalisation, CAD, scène, manifest ni valeurs physiques ;
+6. exécuter les tests ciblés, la suite complète, les contrôles publics 3D et les
+   régressions produit sans lire ni rejouer le holdout ;
+7. préparer puis installer une gate Fusion humaine seulement si toutes les
+   validations automatisées et le paquet local passent.
 
-La gate humaine L08 n'est pas active. `fusion-validated=false` et
-`print-validated=false` restent inchangés.
+La validation humaine n'est pas encore acquise. `fusion-validated=false` et
+`print-validated=false` restent inchangés jusqu'au retour formel dans Fusion.
 
 ## Lots verrouillés
 

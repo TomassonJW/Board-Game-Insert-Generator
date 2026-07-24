@@ -2,6 +2,13 @@
 
 Date : 2026-07-24
 
+> Mise à jour post-rapport : la conclusion produit négative de L08G est
+> supersédée par les missions autorisées L08H à L08J. L'ABI `cp314` est réparée
+> et un runtime SCIP minimal redistribuable passe la gate de build et
+> d'équivalence publique. L'intégration produit reste à réaliser dans L08K ; ce
+> document conserve la preuve historique du tournoi A à G et ne décrit plus
+> l'état courant à lui seul.
+
 Statut : `done`, `automated-validated`, `benchmark-winner-scip`,
 `negative-no-product-integrable-winner`, `holdout-consumed`, `no-fusion-gate`.
 

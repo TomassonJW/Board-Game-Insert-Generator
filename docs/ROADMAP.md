@@ -1421,3 +1421,16 @@ toutes les DLL, avis complets, probe hors ligne et équivalence sur cas publics.
 L'intégration BGIG, les régressions complètes et la préparation Fusion restent
 des missions atomiques ultérieures, seulement si cette gate passe. Le holdout
 L08F est consommé et interdit à tout nouveau choix ou réglage.
+## Mise à jour P64-L08J — 2026-07-24
+
+P64-L08J est terminée. Le runtime SCIP minimal `cp314` est construit et qualifié
+hors ligne : 1 016 fichiers, 56 491 565 octets, 26 binaires, aucune dépendance
+manquante ou interdite, probe exact et six contrôles publics 3D sans perte. Une
+reconstruction indépendante confirme les options et le comportement, avec une
+variation binaire MSVC explicitement tracée.
+
+La trajectoire suivante devient P64-L08K : intégrer un build qualifié précis,
+brancher SCIP derrière les contrats et recertifications BGIG, exécuter les
+régressions complètes puis préparer une gate Fusion uniquement si tout passe.
+Aucun holdout n'est rejoué et aucune validation Fusion ou impression n'est
+revendiquée à ce stade.

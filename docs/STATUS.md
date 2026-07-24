@@ -3585,3 +3585,25 @@ Date : 2026-07-24
 - **Suite :** P64-L08J construit le candidat, inventorie les DLL et vérifie hors
   ligne l'équivalence sur contrôles publics et régressions ouvertes seulement.
 - `fusion-validated=false`. `print-validated=false`.
+## P64-L08J — runtime SCIP minimal construit et qualifié
+
+Statut : `implemented-build`, `automated-validated`, `done`.
+
+- Entrées L08I, toolchain, options CMake et limites de processus respectées.
+- SCIP 10.0.2, SoPlex 8.0.2 et PySCIPOpt 6.2.1 `cp314` construits hors ligne
+  sous `.codex-work`, sans installation globale.
+- Runtime principal : 1 016 fichiers, 56 491 565 octets et 26 binaires.
+- Dépendances manquantes : 0 ; familles interdites : 0 ; fichiers Microsoft
+  vérifiés contre `VC/Redist` : 4.
+- Probe exact et six contrôles publics 3D équivalents au runtime du tournoi ;
+  aucune perte de statut, solution ou certificat, aucune régression matérielle.
+- Une reconstruction indépendante depuis une racine vide repasse les mêmes
+  gates. Les sorties MSVC et le wheel ne sont pas identiques bit à bit ; le
+  build produit précis devra être verrouillé.
+- Holdout lu ou rejoué : non ; tuning : 0 ; runtime produit modifié : non.
+- Décision : `minimal_scip_runtime_build_and_public_equivalence_pass`.
+- Preuve : `docs/P64_L08J_MINIMAL_SCIP_RUNTIME_BUILD_EVIDENCE.md`.
+
+P64-L08K est `ready` pour intégrer le runtime qualifié et exécuter les
+régressions complètes. Aucune gate Fusion n'est encore acquise :
+`fusion-validated=false`, `print-validated=false`.

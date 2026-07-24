@@ -139,6 +139,7 @@ nommé, y compris 11 × 34, ne peut jamais résumer la capacité.
 | P64-L08H | remédiation du paquet `cp314` | probe technique puis audit complet des avis natifs |
 | P64-L08I | ADR et audit pré-build minimal | modèle, sources, toolchain, licences et options verrouillés |
 | P64-L08J | build et équivalence publique | DLL inventoriées, probe hors ligne, holdout scellé |
+| P64-L08K | intégration produit et régressions | build qualifié verrouillé, fallback honnête, package Fusion préparé |
 
 Une mission est committée et intégrée avant la suivante. Aucun run lourd ne
 démarre avant L08C/D : l'audit et le corpus doivent empêcher de brûler du temps
@@ -241,3 +242,23 @@ reproductible, inventaire réel des DLL, avis complets, probe hors ligne et
 équivalence sur cas publics. Aucun runtime produit ou add-in Fusion n'est
 modifié ; le holdout reste consommé et interdit. `fusion-validated=false` et
 `print-validated=false`.
+
+## 15. État exécuté après P64-L08J
+
+Le runtime minimal est construit et qualifié deux fois hors ligne depuis les
+entrées L08I. Le build principal contient 1 016 fichiers et 26 binaires pour
+56 491 565 octets, soit 69,65 % de moins que le candidat PyPI L08H. Toutes les
+dépendances sont résolues, aucune famille Ipopt/MUMPS/METIS/Intel n'est présente
+et les quatre DLL Microsoft sont reliées aux fichiers officiels `VC/Redist`.
+
+Le probe `cp314`, le contrôle exact et les six contrôles publics 3D conservent
+statuts, objectifs et preuves du runtime de tournoi, sans régression matérielle.
+Une seconde construction depuis une racine vide repasse les mêmes gates. Les
+sorties MSVC et le ZIP du wheel ne sont pas identiques bit à bit ; cette
+variation non fonctionnelle est tracée et impose de verrouiller le build précis
+qui sera intégré.
+
+Décision : `minimal_scip_runtime_build_and_public_equivalence_pass`. P64-L08K
+est autorisée pour l'intégration produit et les régressions complètes. Aucun
+runtime produit ou add-in Fusion n'est encore modifié ; le holdout reste
+interdit. `fusion-validated=false` et `print-validated=false`.

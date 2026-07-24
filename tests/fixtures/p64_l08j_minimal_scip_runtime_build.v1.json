@@ -1,0 +1,1498 @@
+{
+  "binary_inventory": [
+    {
+      "dependencies": [
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-conio-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-convert-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-environment-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-filesystem-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-heap-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-locale-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-math-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-private-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-runtime-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-stdio-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-string-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-time-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-utility-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "KERNEL32.dll",
+          "resolved_path": null
+        }
+      ],
+      "path": "site-packages/numpy.libs/libscipy_openblas64_-b788215d9d47792bcba3a2e2a7114320.dll",
+      "sha256": "b788215d9d47792bcba3a2e2a71143205a57282828a483f1fb071ca2c159f616",
+      "size_bytes": 20405760
+    },
+    {
+      "dependencies": [
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-convert-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-environment-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-filesystem-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-heap-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-locale-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-math-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-runtime-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-stdio-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-string-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-time-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-utility-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "KERNEL32.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "runtime_local",
+          "name": "VCRUNTIME140.dll",
+          "resolved_path": "site-packages/pyscipopt/vcruntime140.dll"
+        },
+        {
+          "classification": "runtime_local",
+          "name": "VCRUNTIME140_1.dll",
+          "resolved_path": "site-packages/pyscipopt/vcruntime140_1.dll"
+        }
+      ],
+      "path": "site-packages/numpy.libs/msvcp140-a4c2229bdc2a2a630acdc095b4d86008.dll",
+      "sha256": "1e2e2bcb916931f0ee6d0a567212511244e7442da574757c331c1b91087f2a0f",
+      "size_bytes": 557136
+    },
+    {
+      "dependencies": [
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-math-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-runtime-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-string-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-utility-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "KERNEL32.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "python_host",
+          "name": "python314.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "runtime_local",
+          "name": "VCRUNTIME140.dll",
+          "resolved_path": "site-packages/pyscipopt/vcruntime140.dll"
+        }
+      ],
+      "path": "site-packages/numpy/_core/_multiarray_tests.cp314-win_amd64.pyd",
+      "sha256": "7c6f3e0793c6ede96204639b5798693786efe9d35a5fab7a86d4a5f9d559e229",
+      "size_bytes": 66048
+    },
+    {
+      "dependencies": [
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-convert-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-environment-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-heap-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-locale-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-math-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-runtime-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-stdio-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-string-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-time-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-utility-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "KERNEL32.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "runtime_local",
+          "name": "libscipy_openblas64_-b788215d9d47792bcba3a2e2a7114320.dll",
+          "resolved_path": "site-packages/numpy.libs/libscipy_openblas64_-b788215d9d47792bcba3a2e2a7114320.dll"
+        },
+        {
+          "classification": "runtime_local",
+          "name": "msvcp140-a4c2229bdc2a2a630acdc095b4d86008.dll",
+          "resolved_path": "site-packages/numpy.libs/msvcp140-a4c2229bdc2a2a630acdc095b4d86008.dll"
+        },
+        {
+          "classification": "python_host",
+          "name": "python314.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "runtime_local",
+          "name": "VCRUNTIME140.dll",
+          "resolved_path": "site-packages/pyscipopt/vcruntime140.dll"
+        },
+        {
+          "classification": "runtime_local",
+          "name": "VCRUNTIME140_1.dll",
+          "resolved_path": "site-packages/pyscipopt/vcruntime140_1.dll"
+        }
+      ],
+      "path": "site-packages/numpy/_core/_multiarray_umath.cp314-win_amd64.pyd",
+      "sha256": "ab5cea76a0fad4fd1bc58667aefba1382a7ce8c147b51cf3bff53eec4efb4ab2",
+      "size_bytes": 3904512
+    },
+    {
+      "dependencies": [
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-runtime-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "KERNEL32.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "python_host",
+          "name": "python314.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "runtime_local",
+          "name": "VCRUNTIME140.dll",
+          "resolved_path": "site-packages/pyscipopt/vcruntime140.dll"
+        }
+      ],
+      "path": "site-packages/numpy/_core/_operand_flag_tests.cp314-win_amd64.pyd",
+      "sha256": "322d6717b0a56e29d303f993bdaa853bfa44f9bb189ee6709b8b3c208cc04efe",
+      "size_bytes": 12288
+    },
+    {
+      "dependencies": [
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-runtime-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-stdio-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-string-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "KERNEL32.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "python_host",
+          "name": "python314.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "runtime_local",
+          "name": "VCRUNTIME140.dll",
+          "resolved_path": "site-packages/pyscipopt/vcruntime140.dll"
+        }
+      ],
+      "path": "site-packages/numpy/_core/_rational_tests.cp314-win_amd64.pyd",
+      "sha256": "ea67ac1b1cf3d644e1f038a0b56bfe6a5770478956e2d55ae393549892edea78",
+      "size_bytes": 43520
+    },
+    {
+      "dependencies": [
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-environment-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-runtime-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-string-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "KERNEL32.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "python_host",
+          "name": "python314.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "runtime_local",
+          "name": "VCRUNTIME140.dll",
+          "resolved_path": "site-packages/pyscipopt/vcruntime140.dll"
+        }
+      ],
+      "path": "site-packages/numpy/_core/_simd.cp314-win_amd64.pyd",
+      "sha256": "27b44fa3be39216e416c529fad5f2af9196a02d1ca51d6d08abec41bf9fbdd09",
+      "size_bytes": 831488
+    },
+    {
+      "dependencies": [
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-runtime-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "KERNEL32.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "python_host",
+          "name": "python314.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "runtime_local",
+          "name": "VCRUNTIME140.dll",
+          "resolved_path": "site-packages/pyscipopt/vcruntime140.dll"
+        }
+      ],
+      "path": "site-packages/numpy/_core/_struct_ufunc_tests.cp314-win_amd64.pyd",
+      "sha256": "380216da0e2d51dcce8a973fdda3291beb7dee743e43802e0cc8710492c08cc4",
+      "size_bytes": 14336
+    },
+    {
+      "dependencies": [
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-environment-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-math-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-runtime-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-string-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "KERNEL32.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "python_host",
+          "name": "python314.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "runtime_local",
+          "name": "VCRUNTIME140.dll",
+          "resolved_path": "site-packages/pyscipopt/vcruntime140.dll"
+        }
+      ],
+      "path": "site-packages/numpy/_core/_umath_tests.cp314-win_amd64.pyd",
+      "sha256": "7b042f544cfe99e846fd188d0b0065ae6455a4c1c104578e69cb535727956214",
+      "size_bytes": 34304
+    },
+    {
+      "dependencies": [
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-heap-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-math-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-runtime-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "KERNEL32.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "runtime_local",
+          "name": "msvcp140-a4c2229bdc2a2a630acdc095b4d86008.dll",
+          "resolved_path": "site-packages/numpy.libs/msvcp140-a4c2229bdc2a2a630acdc095b4d86008.dll"
+        },
+        {
+          "classification": "python_host",
+          "name": "python314.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "runtime_local",
+          "name": "VCRUNTIME140.dll",
+          "resolved_path": "site-packages/pyscipopt/vcruntime140.dll"
+        },
+        {
+          "classification": "runtime_local",
+          "name": "VCRUNTIME140_1.dll",
+          "resolved_path": "site-packages/pyscipopt/vcruntime140_1.dll"
+        }
+      ],
+      "path": "site-packages/numpy/fft/_pocketfft_umath.cp314-win_amd64.pyd",
+      "sha256": "0fb0d660b2b608a270828d34fb79d4e14b2c33e1ba799aac7232b714e36a4742",
+      "size_bytes": 276480
+    },
+    {
+      "dependencies": [
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-math-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-runtime-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-stdio-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "KERNEL32.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "runtime_local",
+          "name": "libscipy_openblas64_-b788215d9d47792bcba3a2e2a7114320.dll",
+          "resolved_path": "site-packages/numpy.libs/libscipy_openblas64_-b788215d9d47792bcba3a2e2a7114320.dll"
+        },
+        {
+          "classification": "python_host",
+          "name": "python314.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "runtime_local",
+          "name": "VCRUNTIME140.dll",
+          "resolved_path": "site-packages/pyscipopt/vcruntime140.dll"
+        }
+      ],
+      "path": "site-packages/numpy/linalg/_umath_linalg.cp314-win_amd64.pyd",
+      "sha256": "8264d9d70a1a1d72793805a989fc5ebab8d55970e44a829e1262fd58335ff8d5",
+      "size_bytes": 112128
+    },
+    {
+      "dependencies": [
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-runtime-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "KERNEL32.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "runtime_local",
+          "name": "libscipy_openblas64_-b788215d9d47792bcba3a2e2a7114320.dll",
+          "resolved_path": "site-packages/numpy.libs/libscipy_openblas64_-b788215d9d47792bcba3a2e2a7114320.dll"
+        },
+        {
+          "classification": "python_host",
+          "name": "python314.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "runtime_local",
+          "name": "VCRUNTIME140.dll",
+          "resolved_path": "site-packages/pyscipopt/vcruntime140.dll"
+        }
+      ],
+      "path": "site-packages/numpy/linalg/lapack_lite.cp314-win_amd64.pyd",
+      "sha256": "4cef8f26be5895a6973b3c969d024cab1c3c777df675059ca20a69d22fdc7b49",
+      "size_bytes": 18944
+    },
+    {
+      "dependencies": [
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-math-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-runtime-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "KERNEL32.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "python_host",
+          "name": "python314.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "runtime_local",
+          "name": "VCRUNTIME140.dll",
+          "resolved_path": "site-packages/pyscipopt/vcruntime140.dll"
+        }
+      ],
+      "path": "site-packages/numpy/random/_bounded_integers.cp314-win_amd64.pyd",
+      "sha256": "52e8867a30524db560f6ffe9b3edb63beaa8160dd349ffa9cb8eaeeff786c486",
+      "size_bytes": 215040
+    },
+    {
+      "dependencies": [
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-math-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-runtime-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "KERNEL32.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "python_host",
+          "name": "python314.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "runtime_local",
+          "name": "VCRUNTIME140.dll",
+          "resolved_path": "site-packages/pyscipopt/vcruntime140.dll"
+        }
+      ],
+      "path": "site-packages/numpy/random/_common.cp314-win_amd64.pyd",
+      "sha256": "54809657fb43a25138617f9706ef781d9e9502b66a9a5366ea7bd76eed918f61",
+      "size_bytes": 173056
+    },
+    {
+      "dependencies": [
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-heap-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-math-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-runtime-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-stdio-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-string-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "KERNEL32.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "python_host",
+          "name": "python314.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "runtime_local",
+          "name": "VCRUNTIME140.dll",
+          "resolved_path": "site-packages/pyscipopt/vcruntime140.dll"
+        }
+      ],
+      "path": "site-packages/numpy/random/_generator.cp314-win_amd64.pyd",
+      "sha256": "15215ee2ae4c1ec0960c29d433871a8e6ba4c392b8dee367541fb736f9c6d4c6",
+      "size_bytes": 599040
+    },
+    {
+      "dependencies": [
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-runtime-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "KERNEL32.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "python_host",
+          "name": "python314.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "runtime_local",
+          "name": "VCRUNTIME140.dll",
+          "resolved_path": "site-packages/pyscipopt/vcruntime140.dll"
+        }
+      ],
+      "path": "site-packages/numpy/random/_mt19937.cp314-win_amd64.pyd",
+      "sha256": "434ab2857d104ff19c3b5008916197787fcc253339eabc66a16e4bdecfc1c74c",
+      "size_bytes": 86528
+    },
+    {
+      "dependencies": [
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-runtime-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "KERNEL32.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "python_host",
+          "name": "python314.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "runtime_local",
+          "name": "VCRUNTIME140.dll",
+          "resolved_path": "site-packages/pyscipopt/vcruntime140.dll"
+        }
+      ],
+      "path": "site-packages/numpy/random/_pcg64.cp314-win_amd64.pyd",
+      "sha256": "b469cbc850ee42a8ca5b5a9b58811d529fc0c7b65dbc7eb4b9d24b924b4b8d07",
+      "size_bytes": 96256
+    },
+    {
+      "dependencies": [
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-runtime-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "KERNEL32.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "python_host",
+          "name": "python314.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "runtime_local",
+          "name": "VCRUNTIME140.dll",
+          "resolved_path": "site-packages/pyscipopt/vcruntime140.dll"
+        }
+      ],
+      "path": "site-packages/numpy/random/_philox.cp314-win_amd64.pyd",
+      "sha256": "5b7ffd698d931acade2970fd318fa077e14f634ed08d32678a44c2997cebc600",
+      "size_bytes": 81408
+    },
+    {
+      "dependencies": [
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-runtime-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "KERNEL32.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "python_host",
+          "name": "python314.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "runtime_local",
+          "name": "VCRUNTIME140.dll",
+          "resolved_path": "site-packages/pyscipopt/vcruntime140.dll"
+        }
+      ],
+      "path": "site-packages/numpy/random/_sfc64.cp314-win_amd64.pyd",
+      "sha256": "1e4d72bccc8045c798d13529439d907ce1f1f2d40e6a635f7d4de93d1f4ca9e6",
+      "size_bytes": 60416
+    },
+    {
+      "dependencies": [
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-runtime-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "KERNEL32.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "python_host",
+          "name": "python314.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "runtime_local",
+          "name": "VCRUNTIME140.dll",
+          "resolved_path": "site-packages/pyscipopt/vcruntime140.dll"
+        }
+      ],
+      "path": "site-packages/numpy/random/bit_generator.cp314-win_amd64.pyd",
+      "sha256": "d481331eca4f875eb6e53a69d722c6bf03a915b6e2033f91daf2bad2efcb7133",
+      "size_bytes": 168448
+    },
+    {
+      "dependencies": [
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-math-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-runtime-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "KERNEL32.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "python_host",
+          "name": "python314.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "runtime_local",
+          "name": "VCRUNTIME140.dll",
+          "resolved_path": "site-packages/pyscipopt/vcruntime140.dll"
+        }
+      ],
+      "path": "site-packages/numpy/random/mtrand.cp314-win_amd64.pyd",
+      "sha256": "cd83271cc04fb0219fb5d5cb06c5117f60291866a88e332b7c8e8276375d1344",
+      "size_bytes": 500736
+    },
+    {
+      "dependencies": [
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-convert-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-filesystem-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-heap-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-math-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-runtime-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-stdio-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-string-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-time-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "KERNEL32.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "runtime_local",
+          "name": "MSVCP140.dll",
+          "resolved_path": "site-packages/pyscipopt/msvcp140.dll"
+        },
+        {
+          "classification": "runtime_local",
+          "name": "VCRUNTIME140.dll",
+          "resolved_path": "site-packages/pyscipopt/vcruntime140.dll"
+        },
+        {
+          "classification": "runtime_local",
+          "name": "VCRUNTIME140_1.dll",
+          "resolved_path": "site-packages/pyscipopt/vcruntime140_1.dll"
+        }
+      ],
+      "path": "site-packages/pyscipopt/libscip.dll",
+      "sha256": "6f46000d5dfb74098db33ba9319efade98fec7dce09cbff929b784b87079a50c",
+      "size_bytes": 10015744
+    },
+    {
+      "dependencies": [
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-convert-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-environment-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-filesystem-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-heap-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-locale-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-math-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-runtime-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-stdio-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-string-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-time-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-utility-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "KERNEL32.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "runtime_local",
+          "name": "VCRUNTIME140.dll",
+          "resolved_path": "site-packages/pyscipopt/vcruntime140.dll"
+        },
+        {
+          "classification": "runtime_local",
+          "name": "VCRUNTIME140_1.dll",
+          "resolved_path": "site-packages/pyscipopt/vcruntime140_1.dll"
+        }
+      ],
+      "path": "site-packages/pyscipopt/msvcp140.dll",
+      "sha256": "1e2e2bcb916931f0ee6d0a567212511244e7442da574757c331c1b91087f2a0f",
+      "size_bytes": 557136
+    },
+    {
+      "dependencies": [
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-heap-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-math-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-runtime-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-stdio-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "KERNEL32.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "runtime_local",
+          "name": "libscip.dll",
+          "resolved_path": "site-packages/pyscipopt/libscip.dll"
+        },
+        {
+          "classification": "python_host",
+          "name": "python314.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "runtime_local",
+          "name": "VCRUNTIME140.dll",
+          "resolved_path": "site-packages/pyscipopt/vcruntime140.dll"
+        }
+      ],
+      "path": "site-packages/pyscipopt/scip.cp314-win_amd64.pyd",
+      "sha256": "231541c65044bbe42efaa21f0abe87b8675e168058b450c1d1a3ba36d6800e93",
+      "size_bytes": 3210752
+    },
+    {
+      "dependencies": [
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-convert-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-heap-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-runtime-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-stdio-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-string-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "KERNEL32.dll",
+          "resolved_path": null
+        }
+      ],
+      "path": "site-packages/pyscipopt/vcruntime140.dll",
+      "sha256": "60b813f8b87ff4fa344f081c163c1a2234b5e3e41f748721c28fbdecbcfecb8a",
+      "size_bytes": 124520
+    },
+    {
+      "dependencies": [
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-heap-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-runtime-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "api-ms-win-crt-string-l1-1-0.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "windows_system",
+          "name": "KERNEL32.dll",
+          "resolved_path": null
+        },
+        {
+          "classification": "runtime_local",
+          "name": "VCRUNTIME140.dll",
+          "resolved_path": "site-packages/pyscipopt/vcruntime140.dll"
+        }
+      ],
+      "path": "site-packages/pyscipopt/vcruntime140_1.dll",
+      "sha256": "e30b3f4979b63b50438d061858c9cde962f4494e585c627a11c98b6c5b7b2592",
+      "size_bytes": 49792
+    }
+  ],
+  "built_wheel": {
+    "name": "pyscipopt-6.2.1-cp314-cp314-win_amd64.whl",
+    "sha256": "f0a39b9d386e09e287f7404c5a784c8907c1361574d1fc98d6a8ee81789cb370",
+    "size_bytes": 1091013
+  },
+  "cmake_contract": {
+    "configuration": "Release",
+    "generator": "Visual Studio 17 2022",
+    "lto": true,
+    "platform": "x64",
+    "runtime_library": "MultiThreadedDLL (/MD)",
+    "scip_cache_sha256": "ba379ddff4cb351f40994f2154a14b4926bd526bc1903ae580131603557ddb4b",
+    "scip_options": {
+      "AMPL": "OFF",
+      "AUTOBUILD": "OFF",
+      "CONOPT": "OFF",
+      "EXACTSOLVE": "OFF",
+      "EXPRINT": "none",
+      "GMP": "OFF",
+      "IPOPT": "OFF",
+      "LAPACK": "OFF",
+      "LPS": "spx",
+      "LPSCHECK": "OFF",
+      "LPSEXACT": "none",
+      "LTO": "ON",
+      "MPFR": "OFF",
+      "PAPILO": "OFF",
+      "READLINE": "OFF",
+      "SHARED": "ON",
+      "SYM": "snauty",
+      "TPI": "none",
+      "WORHP": "OFF",
+      "ZIMPL": "OFF",
+      "ZLIB": "OFF"
+    },
+    "soplex_cache_sha256": "6315741e37dda4adb048438ad61f03dc09da74862ea3bc1bb3b48220332b273d",
+    "soplex_options": {
+      "BOOST": "OFF",
+      "GMP": "OFF",
+      "MPFR": "OFF",
+      "PAPILO": "OFF",
+      "QUADMATH": "OFF",
+      "ZLIB": "OFF"
+    },
+    "toolset": "v143,version=14.44",
+    "windows_sdk": "10.0.26100.0"
+  },
+  "decision": {
+    "decision_code": "minimal_scip_runtime_build_and_public_equivalence_pass",
+    "minimal_runtime_build_passed": true,
+    "next_mission": "P64-L08K BGIG product integration and full regression",
+    "product_integration_authorized": true,
+    "public_equivalence_passed": true
+  },
+  "dependency_gate": {
+    "all_microsoft_runtime_from_vc_redist": true,
+    "binary_count": 26,
+    "dll_count": 6,
+    "forbidden_binary_count": 0,
+    "microsoft_provenance": [
+      {
+        "path": "site-packages/pyscipopt/msvcp140.dll",
+        "size_bytes": 557136,
+        "source_path": "VC/Redist/MSVC/14.44.35112/x64/Microsoft.VC143.CRT/msvcp140.dll",
+        "source_sha256": "1e2e2bcb916931f0ee6d0a567212511244e7442da574757c331c1b91087f2a0f"
+      },
+      {
+        "path": "site-packages/pyscipopt/vcruntime140.dll",
+        "size_bytes": 124520,
+        "source_path": "VC/Redist/MSVC/14.44.35112/x64/Microsoft.VC143.CRT/vcruntime140.dll",
+        "source_sha256": "60b813f8b87ff4fa344f081c163c1a2234b5e3e41f748721c28fbdecbcfecb8a"
+      },
+      {
+        "path": "site-packages/pyscipopt/vcruntime140_1.dll",
+        "size_bytes": 49792,
+        "source_path": "VC/Redist/MSVC/14.44.35112/x64/Microsoft.VC143.CRT/vcruntime140_1.dll",
+        "source_sha256": "e30b3f4979b63b50438d061858c9cde962f4494e585c627a11c98b6c5b7b2592"
+      },
+      {
+        "path": "site-packages/numpy.libs/msvcp140-a4c2229bdc2a2a630acdc095b4d86008.dll",
+        "size_bytes": 557136,
+        "source_path": "VC/Redist/MSVC/14.44.35112/x64/Microsoft.VC143.CRT/msvcp140.dll",
+        "source_sha256": "1e2e2bcb916931f0ee6d0a567212511244e7442da574757c331c1b91087f2a0f"
+      }
+    ],
+    "pyd_count": 20,
+    "unresolved_dependency_count": 0
+  },
+  "evidence_digest": "6fc5a141a809cf2db18f54c162e7f26dc1baf7947bf53ca50ffe6ecd36c94823",
+  "exact_probe": {
+    "numpy_version": "2.5.1",
+    "objective": 7.0,
+    "pyscipopt_version": "6.2.1",
+    "python_abi": "cp314",
+    "scip_version": "10.0.2",
+    "status": "optimal",
+    "x": 2.0,
+    "y": 1.0
+  },
+  "invariants": {
+    "benchmark_replayed": false,
+    "fusion_validated": false,
+    "global_install_count": 0,
+    "holdout_read": false,
+    "holdout_worker_invocation_count": 0,
+    "network_service_count": 0,
+    "post_holdout_tuning_count": 0,
+    "print_validated": false,
+    "product_runtime_modified": false
+  },
+  "l08i_evidence_digest": "51b89df9666bbb8b0272bf5e4c582dc2737e7733472e581bec685ae4102d38e5",
+  "locked_inputs": [
+    {
+      "name": "scip-v10.0.2.zip",
+      "sha256": "7225e8d493707ebb1b5c5d5696cf384a1cd6aeaf8820253ae260a5fdcc763308",
+      "size_bytes": 13725644
+    },
+    {
+      "name": "soplex-v8.0.2.zip",
+      "sha256": "f1a45c6338ad1cfb6c2950e91e4f854ed199c2e4039830b26dbe65d0dd67cd34",
+      "size_bytes": 1466934
+    },
+    {
+      "name": "pyscipopt-v6.2.1.zip",
+      "sha256": "0d53902150724665c2f2a22adb89fd1b3717c16b365819dfbdf137f65ab76588",
+      "size_bytes": 959233
+    },
+    {
+      "name": "python.3.14.0.nupkg",
+      "sha256": "620fb3527428fb354f093b0b8b634dfb8e3023115df68608fba7e91db69b4f4d",
+      "size_bytes": 14839285
+    },
+    {
+      "name": "cython-3.2.8-cp314-cp314-win_amd64.whl",
+      "sha256": "89b0fdc2ca0b502afedc4dd4ddbc4f9cb5a135245afacf9483e556e8ad3ada3b",
+      "size_bytes": 2807626
+    },
+    {
+      "name": "setuptools-83.0.0-py3-none-any.whl",
+      "sha256": "29b23c360f22f414dc7336bb39178cc7bcbf6021ed2733cde173f09dba19abb3",
+      "size_bytes": 1008090
+    },
+    {
+      "name": "wheel-0.47.0-py3-none-any.whl",
+      "sha256": "212281cab4dff978f6cedd499cd893e1f620791ca6ff7107cf270781e587eced",
+      "size_bytes": 32218
+    },
+    {
+      "name": "numpy-2.5.1-cp314-cp314-win_amd64.whl",
+      "sha256": "24d0eb82c0541d3415a33425db64ae439dffccd7b4dbcb30e7c35120205c506a",
+      "size_bytes": 12562177
+    }
+  ],
+  "mission": "P64-L08J",
+  "notice_inventory": [
+    {
+      "path": "Microsoft-Visual-Cpp-Runtime.txt",
+      "sha256": "f84c688e00151c5ff35b23265323103c93ca47fc9510f9548ab9d4bd59ca02db",
+      "size_bytes": 612
+    },
+    {
+      "path": "NumPy/LICENSE.txt",
+      "sha256": "a804dff0ead9fadc5293456410bcbfc32bf024be9c4513459663fb7b442d2341",
+      "size_bytes": 45831
+    },
+    {
+      "path": "NumPy/numpy/_core/include/numpy/libdivide/LICENSE.txt",
+      "sha256": "d544761558b510866c21f7e8a2d5716fca76e0b98117e3b6b86314db7244d150",
+      "size_bytes": 1039
+    },
+    {
+      "path": "NumPy/numpy/_core/src/common/pythoncapi-compat/COPYING",
+      "sha256": "aea41976c720f91bd19725c16916a1ace40eb1ea42620d340e587a5de4bbcea0",
+      "size_bytes": 704
+    },
+    {
+      "path": "NumPy/numpy/_core/src/highway/LICENSE",
+      "sha256": "d208152e2777ffd0126eacc1bd21c0320d69e4e6b622d21a2a12a47e8ef73763",
+      "size_bytes": 21155
+    },
+    {
+      "path": "NumPy/numpy/_core/src/multiarray/dragon4_LICENSE.txt",
+      "sha256": "b0fd592d4ead563148e3977e7b589169d46a5ef2ff133c755a81af880a3fc919",
+      "size_bytes": 1441
+    },
+    {
+      "path": "NumPy/numpy/_core/src/npysort/x86-simd-sort/LICENSE.md",
+      "sha256": "a732977853530066790c42817087f4829b518dd98d340c916acbfd227e39d3cb",
+      "size_bytes": 1542
+    },
+    {
+      "path": "NumPy/numpy/_core/src/umath/svml/LICENSE",
+      "sha256": "585483905b13d4b42f800c55ba99e89d6e2e33ccd5f503e201c07531d148ff41",
+      "size_bytes": 1573
+    },
+    {
+      "path": "NumPy/numpy/fft/pocketfft/LICENSE.md",
+      "sha256": "8db000e158c162e7249787852d8c69764706502ccee725c06641b31c1e95c8af",
+      "size_bytes": 1523
+    },
+    {
+      "path": "NumPy/numpy/linalg/lapack_lite/LICENSE.txt",
+      "sha256": "19060ef465e1797d682ee0fc3081bd25ab1395e995e43d25c9d13c95d9a3cd6b",
+      "size_bytes": 2314
+    },
+    {
+      "path": "NumPy/numpy/ma/LICENSE",
+      "sha256": "d78dbb208b80d92b4d333e41a4baae50d12444f46e53199fa7726a91de6e2da7",
+      "size_bytes": 1616
+    },
+    {
+      "path": "NumPy/numpy/random/LICENSE.md",
+      "sha256": "b4bc2f4fa1c95778f1ed3dd8f14706bece399475b978f9f34b5d3cd72521b48a",
+      "size_bytes": 3582
+    },
+    {
+      "path": "NumPy/numpy/random/src/distributions/LICENSE.md",
+      "sha256": "cf5619f25b112d5ce7c896efffc8e610bcb345dfadcc19f2c1460aa48fff2c9e",
+      "size_bytes": 2805
+    },
+    {
+      "path": "NumPy/numpy/random/src/mt19937/LICENSE.md",
+      "sha256": "92c10699884321f1c2947fe2a70ab23b0fbf1507f756d89dd08f38c61fc3d4fa",
+      "size_bytes": 2986
+    },
+    {
+      "path": "NumPy/numpy/random/src/pcg64/LICENSE.md",
+      "sha256": "41190663b77bee5302386495a07b7eabfbfa571aa0ae2f11da6764162062fc4f",
+      "size_bytes": 1176
+    },
+    {
+      "path": "NumPy/numpy/random/src/philox/LICENSE.md",
+      "sha256": "322ac46d870c8aeead6c53adcccc839296fb3c8e456eae155081297daf7f8013",
+      "size_bytes": 1540
+    },
+    {
+      "path": "NumPy/numpy/random/src/sfc64/LICENSE.md",
+      "sha256": "28cad82ce1379dc529df30da78ec012d7d0d1d576b03ddcb93388aee53659f59",
+      "size_bytes": 1253
+    },
+    {
+      "path": "NumPy/numpy/random/src/splitmix64/LICENSE.md",
+      "sha256": "454ec7350e478e037061850b67395753b425b1cb0a34bbc26290b020bf89d763",
+      "size_bytes": 340
+    },
+    {
+      "path": "PySCIPOpt-MIT.txt",
+      "sha256": "4b90f98e499cf8c1d0e28119ba5716e1987bb28ee4e872bd74c020ebf4f062a4",
+      "size_bytes": 1083
+    },
+    {
+      "path": "SCIP/dejavu/LICENSE",
+      "sha256": "46943ff10eb29930e7c9b7bd1f1ed882adf78a33ea06108dde3826c77d6f6d94",
+      "size_bytes": 1070
+    },
+    {
+      "path": "SCIP/LICENSE",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "size_bytes": 11358
+    },
+    {
+      "path": "SCIP/nauty/COPYRIGHT",
+      "sha256": "e9448f381ccd8b293fd325e5f6908a0e96384053c17ccc9c1c0f599df531cc8f",
+      "size_bytes": 2164
+    },
+    {
+      "path": "SCIP/tclique/LICENSE",
+      "sha256": "7ee95827e88d8957c60b0bd9e76b19f3f167d336c8385f77b0a1952e9bb0df8c",
+      "size_bytes": 577
+    },
+    {
+      "path": "SoPlex/fmt/LICENSE.rst",
+      "sha256": "825c9324e70f8c839c8ba910543dd4a7daee243b86ef960594c11381a19980b8",
+      "size_bytes": 1408
+    },
+    {
+      "path": "SoPlex/LICENSE",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "size_bytes": 11358
+    },
+    {
+      "path": "SoPlex/zstr/License.txt",
+      "sha256": "bd61d5fb15992f4c188a0f96dd836b20d449cd080b4e949ab89f9eda3f61c59a",
+      "size_bytes": 1117
+    }
+  ],
+  "public_equivalence": {
+    "certificate_loss_count": 0,
+    "exact_control_count": 6,
+    "exact_controls": [
+      {
+        "baseline_solve_milliseconds": 0.9033,
+        "baseline_status": "solution_found",
+        "candidate_solve_milliseconds": 1.2642,
+        "candidate_status": "solution_found",
+        "control_id": "stacking-feasible",
+        "expected": "feasible",
+        "objective_value": 440.0,
+        "proof_status": "complete",
+        "recertified": true
+      },
+      {
+        "baseline_solve_milliseconds": 0.6733,
+        "baseline_status": "infeasible_proven",
+        "candidate_solve_milliseconds": 0.6589,
+        "candidate_status": "infeasible_proven",
+        "control_id": "stacking-infeasible",
+        "expected": "infeasible",
+        "objective_value": null,
+        "proof_status": "complete",
+        "recertified": false
+      },
+      {
+        "baseline_solve_milliseconds": 2.0544,
+        "baseline_status": "solution_found",
+        "candidate_solve_milliseconds": 2.1562,
+        "candidate_status": "solution_found",
+        "control_id": "multi-support-feasible",
+        "expected": "feasible",
+        "objective_value": 1088.0,
+        "proof_status": "complete",
+        "recertified": true
+      },
+      {
+        "baseline_solve_milliseconds": 7.1434,
+        "baseline_status": "solution_found",
+        "candidate_solve_milliseconds": 11.1975,
+        "candidate_status": "solution_found",
+        "control_id": "reservation-feasible",
+        "expected": "feasible",
+        "objective_value": 1196.0,
+        "proof_status": "complete",
+        "recertified": true
+      },
+      {
+        "baseline_solve_milliseconds": 0.9931,
+        "baseline_status": "solution_found",
+        "candidate_solve_milliseconds": 0.9325,
+        "candidate_status": "solution_found",
+        "control_id": "fragmentation-feasible",
+        "expected": "feasible",
+        "objective_value": 1968.0,
+        "proof_status": "complete",
+        "recertified": true
+      },
+      {
+        "baseline_solve_milliseconds": 0.7463,
+        "baseline_status": "solution_found",
+        "candidate_solve_milliseconds": 0.6106,
+        "candidate_status": "solution_found",
+        "control_id": "variant-rotation-feasible",
+        "expected": "feasible",
+        "objective_value": 314.0,
+        "proof_status": "complete",
+        "recertified": true
+      }
+    ],
+    "open_regression": {
+      "case_id": "p64-l08d-regression-real-18-containers-20-contents",
+      "status": "unsupported",
+      "truth_pass": true,
+      "unsupported_constraints": [
+        "incomplete_real_3d_problem"
+      ],
+      "worker_invocation_count": 0
+    },
+    "performance": {
+      "baseline_total_solve_milliseconds": 12.5138,
+      "candidate_total_solve_milliseconds": 16.8199,
+      "material_regression": false,
+      "material_regression_threshold_milliseconds": 32.5138
+    },
+    "semantic_loss_count": 0,
+    "solution_loss_count": 0,
+    "tournament_baseline_receipt_digest": "a3c35ee1bddc5578aeb41e79639c507e1d8236d470a39769ace77d2303192d76"
+  },
+  "runtime_tree": {
+    "file_count": 1016,
+    "size_bytes": 56491565,
+    "tree_digest": "1feb512de4057bee10193a6b7cd769cfa4e61a45a87f7bb559ffea8ba91c72ca"
+  },
+  "schema_version": "bgig.minimal_scip_runtime_build_receipt.v1"
+}

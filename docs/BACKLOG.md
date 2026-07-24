@@ -3133,7 +3133,7 @@ implémentée et intégrée à la fois.
 
 ### P64-L08J — build reproductible et équivalence publique du runtime minimal
 
-- Statut : ready, dépend de L08I ; aucun holdout ni tuning.
+- Statut : done, automated-validated ; aucun holdout ni tuning.
 - Revalider toutes les entrées verrouillées puis construire SoPlex, SCIP et
   PySCIPOpt sous `.codex-work`, avec la toolchain exacte et au plus deux
   processus lourds.
@@ -3145,3 +3145,22 @@ implémentée et intégrée à la fois.
   ouvertes hors ligne ; comparer au runtime tournoi sans rouvrir le holdout.
 - Sortie : refus honnête à la première inconnue ou, si toutes les gates passent,
   autorisation d'une mission séparée d'intégration BGIG et de régressions.
+- Résultat : runtime de 56 491 565 octets, 26 binaires, zéro dépendance
+  manquante ou interdite, deux builds qualifiés et six contrôles publics 3D sans
+  perte.
+- Preuve : `docs/P64_L08J_MINIMAL_SCIP_RUNTIME_BUILD_EVIDENCE.md`.
+
+### P64-L08K — intégration produit SCIP et régressions complètes
+
+- Statut : ready, dépend de L08J ; aucun holdout ni tuning.
+- Versionner un build qualifié précis avec ses avis et son inventaire, sans
+  installation globale ni compilation pendant l'installation Fusion.
+- Charger le runtime depuis l'adaptateur produit et garder le cœur Python pur.
+- Utiliser SCIP en priorité uniquement lorsque le problème 3D est fidèlement
+  représentable ; conserver refus, timeout, annulation et fallback honnêtes.
+- Donner au moteur les mêmes entrées et budgets, puis recertifier tout résultat
+  par BGIG avant publication ou matérialisation.
+- Lancer les tests ciblés, la suite complète, les contrôles 3D publics et les
+  régressions produit.
+- Préparer et installer la gate Fusion suivante uniquement si tout est vert ;
+  `fusion-validated=false` et `print-validated=false` jusque-là.

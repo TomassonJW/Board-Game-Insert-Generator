@@ -1207,3 +1207,17 @@ régressions automatisées réussies et installation locale vérifiée de l'add-
 
 Statut : `no-human-action`, `no-fusion-gate`, `prebuild-audit-pass`.
 `fusion-validated=false`. `print-validated=false`.
+## État après P64-L08J — aucune action humaine active
+
+P64-L08J est terminée automatiquement : le runtime SCIP minimal `cp314` est
+construit, redistribuable, inventorié et équivalent sur les contrôles publics
+3D. Aucun runtime produit ni paquet Fusion n'est encore installé par cette
+mission.
+
+La prochaine mission P64-L08K doit intégrer le build qualifié et faire passer les
+régressions complètes. Codex préparera ensuite automatiquement le package, son
+installation locale et ses marqueurs. Thomas ne recevra que les actions restantes
+dans Fusion lorsque cette préparation sera réellement vérifiée.
+
+Jusque-là, aucune commande ni validation humaine n'est demandée.
+`fusion-validated=false` et `print-validated=false`.
