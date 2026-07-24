@@ -2013,7 +2013,26 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
 - `C-CERTIFICATE` : la proposition hybride complète repasse la projection, les
   appuis, les espaces et le certificat commun BGIG ; aucun raccourci de preuve.
 - `C-LIMIT-CASE` : `automated-validated` sur le projet local 28x30 et une
-  régression publique 28x30. La promotion Fusion attend encore P64-L08LV.
+  régression publique 28x30 ; `fusion-validated` après environ
+  25 s sur le cas préparé puis 34 s avec un bac de cartes complexe.
 - `C-FUSION` / `C-FUSION-UI` : paquet 0.1.62 et préparateur automatisés ; état
   SCIP réel visible et journalisé.
+- `C-PRINT` : inchangée, `print-validated=false`.
+
+## P64-L09A — appuis matériels et fermeture couplée
+
+- `C-SOLVER` / `C-STACKING` : `architecture-accepted` pour remplacer
+  l'intersection d'enveloppes XY par des régions de matière porteuse, une règle
+  anti-chute et un pontage stable.
+- `C-CERTIFICATE` : limite confirmée. Le certificat courant ne distingue pas
+  encore complètement rebords et ouverture ; P64-L09B doit durcir la vérité
+  commune avant toute nouvelle promotion.
+- `C-RESERVATION` : limite confirmée. La lane SCIP produit refuse encore
+  `top_inset_zones` ; P64-L09C devra les représenter fidèlement.
+- `C-LAYOUT` : `architecture-accepted` pour une boucle bornée incumbent,
+  réservations, expansion, réparation locale et certificat global.
+- `C-CLOSED-CONTAINER-POSE` : `planned`. `has_lid` reste insuffisant ; une
+  certification mécanique distincte est obligatoire.
+- `C-FUSION` : L08LV valide la correction de temps, pas ces nouvelles
+  sémantiques.
 - `C-PRINT` : inchangée, `print-validated=false`.

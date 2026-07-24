@@ -227,3 +227,15 @@ Tests, cartes backlog ou gates humaines a preparer.
 - ADR-0079-solver-case-corpus-and-measurement-gate.md - corpus exact, replay borné et comparaison fonctionnelle prioritaire.
 - ADR-0080-automatic-local-development-trail.md - journal local automatique, états dédupliqués et fin de la gate par bouton DEV.
 - ADR-0081-open-external-solver-tournament.md - audit de l'état de l'art, au moins trois concurrents externes et intégration mesurée de 1 à 3 gagnants.
+- ADR-0082-highs-offline-product-lane.md - lane HiGHS hors ligne issue du
+  benchmark de sol, ensuite requalifiée par ADR-0083.
+- ADR-0083-real-3d-solver-gate-and-l07-reclassification.md - gate réelle X/Y/Z,
+  appuis et réservations ; requalification du benchmark L07.
+- ADR-0084-minimal-redistributable-scip-runtime.md - runtime SCIP minimal
+  redistribuable, versions et toolchain verrouillées.
+- ADR-0085-scip-primary-product-lane.md - SCIP devient la lane produit 3D
+  prioritaire lorsque le problème est fidèlement représentable.
+- ADR-0086-feasibility-first-and-repeated-fill.md - faisabilité d'abord,
+  premier plan et remplissage 3D des petites familles répétées.
+- ADR-0087-material-support-and-bounded-coupled-finalization.md - appuis fondés
+  sur la matière, réservations SCIP et boucle bornée de fermeture couplée.

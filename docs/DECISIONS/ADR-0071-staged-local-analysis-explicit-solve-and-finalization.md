@@ -267,3 +267,14 @@ Il ne devient ni source projet, ni cache hit, ni certificat implicite : le coeur
 reconstruit la geometrie, rejoue le certificat commun et execute les lanes
 courantes avant toute selection. Toute autre forme de cache ou de variante
 persistante comme verite utilisateur reste refusee.
+
+## Amendement P64-L09A — finalisation couplée bornée
+
+ADR-0087 supersède la lecture d'une finalisation toujours exécutée comme une
+postproduction unique. Lorsqu'une réservation supérieure ou une enveloppe de
+mécanisme contraint l'expansion, le premier placement SCIP est un incumbent
+interne ; réservations, dimensions finales, réparations locales et certificat
+global sont résolus dans une boucle bornée avant publication.
+
+La séparation des actions, les digests, l'invalidation, le budget unique et le
+stale fail-closed restent normatifs. Les cavités et jeux restent fixes.

@@ -3644,7 +3644,8 @@ retour Fusion humain.
 
 ## P64-L08L — correction du solveur SCIP après gate humaine KO
 
-Statut : `implemented-product`, `automated-validated`, en attente de P64-L08LV.
+Statut : `implemented-product`, `automated-validated`,
+`fusion-validated` par P64-L08LV.
 
 - La gate 0.1.61 est KO : les cas public 18x20 et local 28x30 terminaient vers
   30 s sans solution ; l’arrêt générique masquait `bounded_unknown`.
@@ -3664,4 +3665,43 @@ Statut : `implemented-product`, `automated-validated`, en attente de P64-L08LV.
   plafond, l’arrêt au premier plan et la recertification SCIP réels.
 - Preuve : `docs/P64_L08L_HUMAN_GATE_CORRECTION_EVIDENCE.md`.
 - Gate : `docs/P64_L08L_FUSION_GATE_CHECKLIST.md`.
-- `globally_optimal=false`, `fusion-validated=false`, `print-validated=false`.
+- Retour humain P64-L08LV : environ 25 s sur le cas préparé, puis environ 34 s
+  après ajout d'un bac de cartes très compliqué. Le plafond 29–30 s est
+  réellement corrigé dans Fusion 0.1.62.
+- Portée : la preuve Fusion couvre la faisabilité et le plafond de L08L. Elle ne
+  certifie ni les appuis matériels sur les rebords, ni les réservations
+  supérieures dans SCIP.
+- `globally_optimal=false`, `print-validated=false`.
+
+## P64-L09A — vérité des appuis et fermeture couplée cadrées
+
+Statut : `done-documentation`, `architecture-accepted`.
+
+- ADR-0087 remplace l'appui fondé sur la seule enveloppe XY par des régions de
+  matière porteuse, une règle anti-chute et un pontage certifié.
+- Un classement grandes ouvertures vers le haut / petits XY dessous reste une
+  préférence, jamais une preuve.
+- `has_lid` ne crée ni surface pleine ni pose. Une future fermeture doit
+  certifier rétention, enveloppe extérieure, épaisseurs, surfaces porteuses,
+  stabilité, accès, retrait et poses autorisées.
+- `_prepare_product_problem` refuse actuellement toute réservation supérieure
+  avec `top_inset_reservations_not_supported`. Un échec avec plateau ne prouve
+  donc aucune impossibilité géométrique.
+- La finalisation cible devient une boucle bornée : incumbent SCIP minimal,
+  réservations, optimisation des dimensions finales, réparation locale,
+  répétition sous budget puis certificat global.
+- Les cavités, jeux, parois et fonds restent des contraintes dures. Une
+  compensation Z ne peut pas réduire ou percer une cavité.
+- Mission documentaire seulement : aucun runtime, benchmark, holdout, schéma,
+  tolérance ou valeur physique modifié.
+
+La prochaine mission unique est P64-L09B, certificat de support matériel et
+anti-chute. `print-validated=false`.
+
+## Correction de verrou HiGHS découverte pendant la validation
+
+Le checkout canonique impose LF, mais l'entrée `LICENSE.txt` du manifest HiGHS
+attendait encore 1083 octets et le SHA-256 CRLF. Le manifest attend désormais le
+fichier versionné exact : 1062 octets, SHA-256
+`795e6090936bcf2e1a0bfb339053de0c5bb6f3102035ead0ecc0ed4a7c41f1b7`.
+Licence, exécutables et runtime inchangés. Garde HiGHS 5/5 et suite 834/834.

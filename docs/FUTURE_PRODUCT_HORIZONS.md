@@ -37,7 +37,7 @@ d'acceptation du solveur P64 actuel.
 | F-SHAPE-COMPOSITE | Formes soudées, scindées ou adaptatives, par exemple un rectangle qui contourne un cercle | V2 / V3 | C-COMPOSITE puis P45 | primitives certifiées, unions, épaisseurs et accessibilité |
 | F-SHAPE-ARBITRARY-3D | Maillages ou solides 3D irréguliers avec orientations libres | V4+ recherche | futur moteur géométrique | représentation, collision robuste, discrétisation et ADR majeure |
 | F-ANGLED-HOLDERS | Rangeurs de cartes ou tuiles inclinés selon une liste d'angles explicites | V1.x / V2 | P45 | pose, hauteur, appui, retrait, accès et impression |
-| F-CLOSED-CONTAINER-POSE | Réorientation d'un conteneur fermé dans la boîte | V2 | P64 après certificat mécanisme | fermeture retenue, rétention, six poses, stabilité et accès |
+| F-CLOSED-CONTAINER-POSE | Réorientation d'un conteneur fermé dans la boîte | V2 | P64 après certificat mécanisme | fermeture retenue, rétention, enveloppe extérieure et épaisseurs, surfaces porteuses, poses autorisées, stabilité, retrait et accès ; `has_lid` seul est insuffisant |
 | F-DIVIDER-PROFILES | Épaisseur distincte pour cloisons internes, éventuellement par séparateur | V1.x / V2 | P45 / géométrie | modèle additif, résistance, migration et preuve physique |
 | F-LID-FAMILIES | Coulissant en rainures, encastré affleurant, sommet rétreint, appuis ou grips de coins | V1.x / V2 | P47-P50 puis P70+ | tolérances locales, friction, insertion, coupons et impression |
 | F-DUAL-ROLE-TRAY-LID | Plateau ou livret rigide employé comme couvercle et élément de retrait | V2 / V3 | mécanismes, P63 et P64 | rôle double, rainures, support, ordre de retrait et certificat |
@@ -66,7 +66,10 @@ Les formes sont introduites par paliers :
 P64 place des enveloppes et des poses déjà admissibles. Il ne dessine pas une
 forme locale et ne décide pas comment fabriquer un couvercle. La réorientation
 d'un conteneur fermé ne pourra devenir une pose globale que si le mécanisme
-certifie sa rétention, son volume fermé et ses directions de retrait.
+certifie sa fermeture, la rétention des contenus, son enveloppe extérieure et
+ses épaisseurs, ses surfaces porteuses, sa stabilité, son accès, ses poses
+autorisées et ses directions de retrait. Le booléen `has_lid` n'est jamais un
+certificat de pose ou d'appui.
 
 ### P47-P50 et suites — mécanismes
 

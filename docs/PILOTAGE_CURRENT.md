@@ -112,10 +112,13 @@ preuves archivées.
 - La régression publique 28x30 dérivée du cas revu produit également 28
   placements, moteur `hybrid_anchor_and_fill`, un appel SCIP et zéro voie
   interne. L’add-in devient 0.1.62.
-- La prochaine action est d’intégrer et installer 0.1.62, puis d’exécuter la
-  gate Fusion P64-L08LV sur le projet public 28x30 et le vrai projet de Thomas.
-  Le holdout reste interdit ; `fusion-validated=false` et
-  `print-validated=false`.
+- P64-L08LV est positive dans Fusion : environ 25 s sur le cas préparé, puis
+  34 s avec un bac de cartes très compliqué. La correction de performance est
+  `fusion-validated`; `print-validated=false`.
+- P64-L09A et ADR-0087 cadrent les limites révélées : appui sur matière réelle,
+  anti-chute, réservations plateaux dans SCIP et boucle bornée de fermeture.
+- La prochaine mission unique est P64-L09B, certificat de support matériel et
+  anti-chute. Aucun benchmark ni holdout n'est requis.
 
 ## Vue de séquence
 
@@ -182,7 +185,9 @@ preuves archivées.
 | Terminée — build et équivalence | P64-L08J | Runtime SCIP minimal qualifié deux fois, 26 binaires résolus, six contrôles publics 3D sans perte. |
 | Terminée — intégration produit automatisée | P64-L08K | SCIP prioritaire dans 0.1.61 ; première gate humaine KO sur les vrais cas limites. |
 | Terminée — correction automatisée | P64-L08L | Faisabilité d’abord, plafond 120 s, remplissage répété ; cas local et public 28x30 recertifiés. |
-| Prochaine — gate Fusion réelle | P64-L08LV | Intégrer, installer et vérifier 0.1.62, puis tester le public 28x30 et le vrai projet limite. |
+| Terminée — gate Fusion de performance | P64-L08LV | Environ 25 s puis 34 s dans Fusion 0.1.62 ; plafond corrigé, portée géométrique limitée. |
+| Terminée — architecture | P64-L09A | ADR-0087 : matière porteuse, réservations SCIP et fermeture couplée bornée. |
+| Prochaine — vérité géométrique | P64-L09B | Interdire la chute dans une ouverture et certifier le pontage sur matière réelle. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -198,6 +203,8 @@ preuves archivées.
 - P64_L01_INCREMENTAL_STATE_EVIDENCE.md : identités, cache et invalidation.
 - P64_L02_CONTEXTUAL_LOCAL_ANALYSIS_EVIDENCE.md : annotations, scores, Pareto,
   résumé progressif et absence de solve global.
+- P64_L09A_MATERIAL_SUPPORT_AND_COUPLED_FINALIZATION_CONTRACT.md : matière
+  porteuse, anti-chute, réservations SCIP, boucle bornée et lots L09/F01B/F02B.
 - P64_L03R_MINIMAL_LAYOUT_AND_MATERIALIZATION_CONTRACT.md : invariant minimal,
   portfolio multi-graines, matérialisation duale et remplacement de scène.
 - P64_L03R_B_MINIMAL_SOLVER_EVIDENCE.md : solveur minimal, certificats,

@@ -127,3 +127,14 @@ leur empreinte sans transformer la réservation en obstacle plein.
 Ces précisions corrigent la faisabilité ; elles ne constituent ni
 l'harmonisation modulaire P64-F02, ni une autorisation d'ajouter des cales ou de
 modifier des valeurs physiques.
+
+## Amendement P64-L09A — fermeture couplée et support matériel
+
+ADR-0087 supersède la séquence qui place toujours une fermeture continue unique
+entre faisabilité et certificat. Pour les projets où réservations et expansion
+interagissent, la fermeture devient une boucle bornée : incumbent minimal,
+contraintes actives, expansion, réparation locale puis certificat global.
+
+Le certificat de support doit en outre porter sur la matière réelle des rebords
+et faces pleines. Une préférence d'ordre ne peut pas certifier un appui, et
+`has_lid` ne crée aucune surface porteuse.

@@ -618,3 +618,15 @@ post-finalisation. NEXT_ACTIONS.md reste autoritaire pour le lot actif.
 
 Aucune valeur physique, forme P45, budget public, résultat dense, scène ou
 revendication d’impression ne change dans cet amendement.
+
+## Amendement P64-L09A — boucle de fermeture couplée
+
+ADR-0087 et `P64_L09A_MATERIAL_SUPPORT_AND_COUPLED_FINALIZATION_CONTRACT.md`
+supersèdent la séquence linéaire F01A02/F02A02 pour les projets où réservations
+et expansion interagissent. La trajectoire courante devient P64-L09B, P64-L09C,
+P64-F01B puis P64-F02B.
+
+Le placement minimal initial reste un incumbent. La boucle introduit les
+réservations, distribue le résiduel, tente une réparation locale, répète sous un
+budget unique puis exige le certificat global. Elle ne déplace ni ne réduit les
+cavités et ne rappelle le solveur global qu'après échec de la réparation locale.

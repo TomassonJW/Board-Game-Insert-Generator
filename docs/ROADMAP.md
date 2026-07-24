@@ -1464,3 +1464,24 @@ La trajectoire suivante devient P64-L08LV : intégrer et pousser 0.1.62, install
 le commit vérifié, puis exécuter la gate Fusion publique 28x30 et réelle 28x30.
 Le holdout reste consommé ; aucune optimalité globale, validation physique,
 finalisation ou modification de tolérance n’est revendiquée.
+
+## Mise à jour P64-L08LV / P64-L09A — 2026-07-24
+
+P64-L08LV confirme dans Fusion 0.1.62 la correction du plafond : environ 25 s
+sur le cas préparé, puis 34 s avec un bac de cartes complexe. L08L devient
+`fusion-validated` dans cette portée ; aucune impression n'est
+validée.
+
+L'observation révèle en parallèle deux limites de vérité : l'appui courant peut
+accepter un petit conteneur au-dessus d'une ouverture où il tombe, et la lane
+SCIP refuse tout `top_inset_zones` avant solve. ADR-0087 et P64-L09A cadrent la
+correction sans runtime :
+
+1. P64-L09B — support matériel, anti-chute et pontage stable ;
+2. P64-L09C — réservations supérieures fidèles dans SCIP ;
+3. P64-F01B — boucle bornée incumbent, expansion, réparation et certificat ;
+4. P64-F02B — objectifs équilibrés, proportionnels puis modulaires ;
+5. P64-L09V — gate Fusion combinée.
+
+P64-L09B devient la prochaine mission unique. Les cavités restent fixes,
+`has_lid` ne crée aucune pose et aucun nouveau benchmark ou holdout n'est requis.

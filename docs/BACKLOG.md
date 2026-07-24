@@ -2680,28 +2680,20 @@ P44-M007 est ready-for-explicit-go.
 
 ### P64-F01A02 — Finalisation simple autour des enveloppes
 
-- Dépendances : P64-L04V positive, P45/P46 selon leurs gates.
-- Objectif : répartir le volume admissible sur les faces extensibles sans
-  modifier topologie, cavités, minima, jeux ou pose monde.
-- Acceptation : conservation, déterminisme, certificat de finalisation et
-  fallback bit-à-bit vers le plan global de base.
-- Statut : planned-locked ; remplace le cadrage incomplet de P64-F01 sans
-  supprimer son historique.
+- Historique : première séparation d'une expansion post-solve unique.
+- Statut : `superseded-by-P64-F01B` ; ADR-0087 impose désormais une boucle
+  couplée avec réservations, réparation locale et certificat global.
 
 ### P64-F02A02 — Finalisation équilibrée et proportionnelle
 
-- Dépendance : P64-F01A02.
-- Objectif : proposer séparément égalité des volumes ajoutés et égalité des
-  ratios d'expansion ; les deux objectifs ne doivent jamais être confondus.
-- Extension : harmonisation modulaire et alignements structuraux seulement
-  lorsque les contrats P45/P46 rendent les faces admissibles explicites.
-- Acceptation : objectifs mesurés, contraintes dures prioritaires, résultat
-  total/partiel/rejeté et solution de base préservée.
-- Statut : planned-locked.
+- Historique : distinction correcte entre égalité des volumes ajoutés et
+  égalité des ratios d'expansion.
+- Statut : `superseded-by-P64-F02B` ; les objectifs sont conservés mais entrent
+  après la boucle couplée P64-F01B.
 
 ### P64-C01 — Carte de capacité post-solve en lecture seule
 
-- Dépendances : P64-F01A02 et P64-F02A02.
+- Dépendances : P64-F01B et P64-F02B.
 - Objectif : dériver une CapacityOpportunityMap depuis un plan finalisé certifié.
 - Livrables : InternalOpportunityZone, BoxReserveBay, digests, invalidation,
   classement dimensionnel, lecture seule et diagnostics de rejet.
@@ -2725,7 +2717,7 @@ P44-M007 est ready-for-explicit-go.
 
 ### P64-F03A02 — Cales explicites et stratégie hybride
 
-- Dépendances : P64-F02A02, P68 ou preuves physiques pertinentes.
+- Dépendances : P64-F02B, P68 ou preuves physiques pertinentes.
 - Objectif : proposer le moins de cales justifiées, ou un hybride
   expansion/cales, uniquement après confirmation.
 - Interdit : création silencieuse, promesse de tenue, print-validated sans
@@ -3194,11 +3186,62 @@ implémentée et intégrée à la fois.
 
 ### P64-L08LV — installation et nouvelle gate Fusion réelle
 
-- Statut : ready après intégration de L08L dans `main`.
-- Installer 0.1.62 depuis le commit poussé avec
-  `scripts/fusion/prepare_p64_l08l_solver_correction_gate.ps1`.
-- Vérifier version, artefact, runtime, code installé, fixture publique 28x30 et
-  marqueur du commit.
-- Thomas exécute un calcul public 28x30 puis un calcul sur son vrai projet 28x30
-  selon `docs/P64_L08L_FUSION_GATE_CHECKLIST.md`.
-- `fusion-validated=false` et `print-validated=false` avant retour formel.
+- Statut : `done-human-gate`, `fusion-validated`.
+- Add-in 0.1.62, artefact, runtime et commit installés puis vérifiés.
+- Retour humain : environ 25 s sur le cas préparé, puis environ 34 s avec un bac
+  de cartes très compliqué ; le plafond 29–30 s est corrigé.
+- Portée : faisabilité et temps L08L uniquement. Les appuis matériels et les
+  réservations SCIP ouvrent L09 ; `print-validated=false`.
+
+### P64-L09A — Support matériel et fermeture couplée
+
+- Capability : C-SOLVER, C-STACKING, C-RESERVATION, C-LAYOUT, C-QUALITY.
+- Livrables : ADR-0087, contrat L09A, preuve L08LV, pilotage et découpage.
+- Décisions : matière porteuse réelle, anti-chute, pontage certifié, réservations
+  SCIP, boucle bornée et certificat de fermeture distinct de `has_lid`.
+- Non-objectifs : runtime, benchmark, holdout, schéma, tolérance, CAD ou scène.
+- Statut : `done-documentation`, `architecture-accepted`.
+
+### P64-L09B — Certificat de support matériel et anti-chute
+
+- Dépendance : P64-L09A intégrée.
+- Objectif : remplacer l'appui par enveloppe XY dans le validateur commun par
+  des régions de rebords/corps pleins, une règle anti-chute et une stabilité de
+  pontage.
+- Acceptation : chute dans grande ouverture rejetée, pontage matériel valide
+  accepté, support instable rejeté, parité SCIP direct/hybride/interne et aucune
+  calibration physique nouvelle.
+- Statut : `ready`.
+
+### P64-L09C — Réservations supérieures dans SCIP
+
+- Dépendance : P64-L09B.
+- Objectif : représenter fidèlement `top_inset_zones` dans la lane produit au
+  lieu de retourner `top_inset_reservations_not_supported`.
+- Acceptation : le cas plateau atteint SCIP, empreinte/profondeur/retrait/prise
+  restent exacts, aucune cavité/paroi/fond percé et statut borné honnête.
+- Statut : `planned-after-P64-L09B`.
+
+### P64-F01B — Boucle bornée de fermeture et réparation
+
+- Dépendances : P64-L09B et P64-L09C.
+- Objectif : prendre l'incumbent SCIP, introduire les réservations, distribuer le
+  résiduel, réparer localement puis recertifier sous un budget unique.
+- Acceptation : cavités inchangées, expansions sur faces admissibles, réparation
+  locale avant solve global, itérations bornées et aucun plan incomplet
+  matérialisable.
+- Statut : `planned-after-P64-L09C`.
+
+### P64-F02B — Objectifs équilibrés, proportionnels et modulaires
+
+- Dépendance : P64-F01B.
+- Objectif : appliquer des objectifs secondaires distincts sans affaiblir les
+  contraintes dures ni perdre le plan de base certifié.
+- Statut : `planned-after-P64-F01B`.
+
+### P64-L09V — Gate Fusion combinée
+
+- Dépendances : P64-L09B, P64-L09C et P64-F01B automatisées.
+- Observer : anti-chute, pontage valide, plateau réellement traité, compensation
+  Z sans atteinte aux cavités et absence de pose implicite par couvercle.
+- Statut : `blocked-by-implementation`, `print-validated=false`.

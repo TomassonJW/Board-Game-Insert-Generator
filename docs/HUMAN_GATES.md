@@ -1246,3 +1246,30 @@ Après cette préparation vérifiée, la gate active suit exactement
 
 Statut avant installation : `human-gate-defined`, `local-install-pending`.
 `fusion-validated=false`. `print-validated=false`.
+
+## P64-L08LV acceptée et programme P64-L09 ouvert
+
+Thomas confirme la correction SCIP 0.1.62 : environ 25 secondes sur le cas
+préparé, puis environ 34 secondes avec un bac de cartes très compliqué. La gate
+L08LV est positive pour la recherche de faisabilité et le plafond ; elle ne
+valide aucune impression.
+
+La même observation révèle un défaut distinct : un appui peut être accepté sur
+l'enveloppe d'un conteneur ouvert alors que le corps supérieur peut tomber dans
+la cavité. L'ajout d'un plateau révèle aussi que SCIP n'est pas appelé lorsque
+`top_inset_zones` est présent.
+
+Le GO explicite de Thomas accepte ADR-0087 et le découpage P64-L09A/B/C,
+P64-F01B/F02B et P64-L09V. Aucune nouvelle gate humaine n'est requise entre les
+lots automatisés tant que le contrat, les cavités, les tolérances, les valeurs
+physiques et les mécanismes ne sont pas élargis.
+
+Une gate redevient obligatoire avant :
+
+- toute promotion Fusion de la boucle complète ;
+- toute nouvelle pose de conteneur fermé ;
+- toute utilisation de `has_lid` comme certificat ;
+- toute modification d'une valeur physique ou de tolérance.
+
+P64-L09B est autorisée comme prochaine mission unique.
+`print-validated=false`.

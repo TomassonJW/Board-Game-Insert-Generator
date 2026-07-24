@@ -213,3 +213,11 @@ des budgets et du certificat global.
 - P64-L03V est un KO contextuel 0.1.56, pas une validation Fusion.
 - P64-L03R-B est la prochaine mission runtime, après intégration de L03R-A.
 - `fusion-validated: false`, `print-validated: false` pour cette correction.
+
+## Amendement P64-L09A — incumbent minimal et contraintes couplées
+
+ADR-0087 conserve la matérialisation d'un `minimal_layout` lorsque toutes les
+contraintes actives sont déjà certifiées. Pour un projet avec réservation ou
+enveloppe de mécanisme qui exige une fermeture couplée, le placement minimal
+SCIP initial reste un incumbent interne : il n'est ni publié ni matérialisable
+avant intégration des contraintes, réparation et certificat global final.

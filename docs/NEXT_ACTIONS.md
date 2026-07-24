@@ -83,45 +83,45 @@ Rapport final L07 : P64_L07_GOAL_FINAL_REPORT.md.
 
 ## Prochaine action recommandée
 
-### Exécuter P64-L08LV — installer 0.1.62 puis valider dans Fusion
+### Exécuter P64-L09B — certifier la matière porteuse et interdire la chute
 
-Type : intégration Git, préparation locale automatisée et observation humaine ;
-aucun tuning ni nouveau benchmark.
+Type : correction de vérité géométrique dans le cœur et le certificat commun ;
+pas de benchmark, de tuning, de holdout, de CAD ou de nouvelle valeur physique.
 
-P64-L08L est automated-validated. La correction produit :
+P64-L08LV est positive pour la correction SCIP 0.1.62 : environ 25 s sur le cas
+préparé, puis 34 s avec un bac de cartes complexe. La gate ne couvre pas le
+défaut distinct d'un petit conteneur posé au-dessus d'une ouverture dans laquelle
+il peut tomber.
 
-- utilise l’emphase faisabilité de SCIP et s’arrête au premier plan ;
-- porte seulement le plafond Approfondi de 30 à 120 s ;
-- garde deux représentants des petites familles répétées dans SCIP puis remplit
-  les répétitions en X/Y/Z ;
-- recertifie le plan complet avec BGIG ;
-- expose l’état réel de SCIP dans la palette et le journal local ;
-- ne revendique jamais l’optimalité globale.
+ADR-0087 et le contrat P64-L09A imposent désormais :
 
-Le vrai projet local 28x30 de Thomas a produit 28 placements recertifiés en
-environ 20 s, un appel SCIP et zéro voie interne. Ses données restent locales.
-La régression publique 28x30 versionnée produit le même statut certifié.
+- des régions de matière porteuse, pas la seule enveloppe XY ;
+- une règle dure anti-chute ;
+- un pontage autorisé seulement avec appui et stabilité suffisants ;
+- `has_lid` sans aucun effet de support ou de pose ;
+- le même certificat pour SCIP direct, remplissage hybride et voies internes.
 
-P64-L08LV doit :
+P64-L09B doit :
 
-1. intégrer et pousser le commit L08L dans `main`, puis vérifier le SHA distant ;
-2. lancer `scripts/fusion/prepare_p64_l08l_solver_correction_gate.ps1` depuis ce
-   commit intégré ;
-3. vérifier l’add-in 0.1.62, le nouvel artefact worker, l’archive runtime
-   inchangée et le marqueur de commit ;
-4. préserver l’état local existant, installer la fixture publique 28x30 et
-   sélectionner `Auto intelligent + Approfondi` ;
-5. demander à Thomas uniquement les actions de
-   `docs/P64_L08L_FUSION_GATE_CHECKLIST.md` ;
-6. ne promouvoir `fusion-validated` qu’après son retour formel ; ne jamais
-   promouvoir `print-validated` sans impression dédiée.
+1. représenter les rebords rectangulaires et les faces pleines dans le cœur pur ;
+2. détecter qu'une empreinte supérieure peut descendre dans une ouverture avec
+   les jeux applicables ;
+3. calculer l'union de matière en contact et la stabilité du pontage ;
+4. rejeter les appuis sur le vide dans le validateur commun ;
+5. ajouter au minimum les fixtures chute, pontage valide et pontage instable ;
+6. vérifier la parité SCIP direct / hybride / solveurs internes ;
+7. conserver les budgets, tolérances, cavités, poses, runtime et UI inchangés ;
+8. mettre à jour le pilotage puis intégrer directement dans `main`.
 
-La vraie gate reste le projet limite de Thomas. Aucun agent n’est nécessaire
-pendant l’observation humaine.
+P64-L09C viendra ensuite pour supprimer honnêtement
+`top_inset_reservations_not_supported`. P64-F01B construira seulement après ces
+deux vérités la boucle bornée de fermeture, expansion et réparation.
+
+Aucune action humaine n'est requise pendant P64-L09B.
 
 ## Lots verrouillés
 
-- P64-F01A02 et F02A02 restent séparés : ils possèdent la finalisation du volume ;
+- P64-F01A02 et F02A02 sont supersédés par P64-F01B/F02B : la finalisation devient couplée et bornée ;
 - P64-C01/C02 restent post-finalisation et ne doivent pas absorber L04A ;
 - P45 conserve formes, intentions et certificat local ;
 - P46, P47-P50, P67-P69 et les valeurs physiques restent hors scope ;

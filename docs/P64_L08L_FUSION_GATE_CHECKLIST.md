@@ -50,3 +50,23 @@ Agencement 3D cohérent : <oui/non + remarque>
 ```
 
 Cette gate ne valide pas l’impression. `print-validated=false`.
+
+## Résultat humain du 2026-07-24
+
+La gate est positive pour la correction de temps et l'obtention d'un plan SCIP
+dans Fusion 0.1.62 :
+
+- environ 25 secondes sur le cas préparé ;
+- environ 34 secondes après ajout d'un bac de cartes jugé très compliqué ;
+- le défaut du plafond 29–30 secondes est réellement corrigé.
+
+Portée de la preuve :
+
+- `fusion-validated` pour la correction P64-L08L de faisabilité et de plafond ;
+- aucune validation d'impression ;
+- aucune validation générale des appuis matériels sur les rebords ;
+- aucune validation des réservations supérieures dans SCIP.
+
+Les deux dernières limites ouvrent P64-L09A et ADR-0087. Elles ne révoquent pas
+la preuve de performance L08LV, mais interdisent de l'étendre à toute la
+correction géométrique du solveur.
