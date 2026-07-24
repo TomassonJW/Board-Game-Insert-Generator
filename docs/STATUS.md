@@ -3471,4 +3471,28 @@ Date : 2026-07-24
   aucune intégration produit.
 - **Suite :** P64-L08F, régressions, discovery, tuning, sélection scellée puis
   ouverture unique du holdout.
+
+
+## P64-L08F — SCIP gagnant benchmark, gate produit fermée
+
+Date : 2026-07-24
+
+- **Statut :** done, automated-validated, holdout-consumed,
+  benchmark-winner-scip, product-integration-blocked.
+- **Comparaison externe :** quatre moteurs et quatre familles ; 24 contrôles
+  exacts, 120 lignes discovery et 80 lignes tuning, sans échec de worker.
+- **Sélection scellée :** SCIP principal, OR-Tools et LAFF compléments ; le
+  holdout de 40 cas est ouvert exactement une fois, sans tuning postérieur.
+- **Récupération :** 10 lignes baseline qui lisaient une borne de corpus sont
+  invalidées ; zéro worker rejoué, zéro secret rouvert, sélection et routes
+  inchangées.
+- **Holdout :** le portefeuille gagne 5 vérités et en perd 3 face à SCIP, donc
+  il est rejeté. SCIP seul gagne 18 vérités et n'en perd aucune face au
+  comportement BGIG corrigé.
+- **Décision :** `benchmark_winner_demonstrated=true`, mais
+  `product_integration_authorized=false` car les avis/dépendances natives SCIP
+  restent à fermer. Preuve récupérée :
+  `0dbf1b45ae9135c1316051ab7e0946dfbfeafac5c785ad96ccd5d7a620acd46d`.
+- **Suite :** P64-L08G audite la redistribution Windows puis intègre SCIP et
+  prépare Fusion uniquement si cette gate et les non-régressions passent.
 - **Validation :** `fusion-validated=false`, `print-validated=false`.

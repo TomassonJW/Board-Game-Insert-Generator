@@ -1,0 +1,2773 @@
+{
+  "artifact_bundle_digest": "1d557b77c3e1c9c4b4fd16e656e222a3928d917a4f6a9275915c7b47bd9f6932",
+  "code_bundle_digest": "b4072636f5f36fe3b42f6956398406aeeb4a86c6af34f63772e280ec65ab24be",
+  "config_digest": "1c257a41074d34163177679d8b71581b6673cb36a3f35d7b5e653b0976b463ea",
+  "evidence_digest": "0dbf1b45ae9135c1316051ab7e0946dfbfeafac5c785ad96ccd5d7a620acd46d",
+  "holdout_campaign_digest": "1b9e2c722e43632fa44c56046cbba6098d406577694bfd846c09730c895c448c",
+  "holdout_results": [
+    {
+      "candidate_id": "ortools_cp_sat",
+      "case_id": "p64-l08d-holdout-layers-holdout-small",
+      "certified": true,
+      "execution": {
+        "cpu_seconds": 0.8125,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "92d5a3fe086d00814aeb633f85d63780b065d4f6ad11f4a14ae99f84c896aef6",
+        "peak_working_set_bytes": 80142336,
+        "total_wall_seconds": 0.816263
+      },
+      "expected": "feasible",
+      "family": "layers",
+      "quality": {
+        "bounding_envelope_fill_ratio": 0.833333333,
+        "bounding_envelope_volume_mm3": 4050,
+        "complete_participant_count": 8,
+        "elevated_participant_count": 0,
+        "max_rear_mm": 9,
+        "max_right_mm": 75,
+        "max_top_mm": 6,
+        "occupied_volume_mm3": 3375,
+        "world_volume_mm3": 25245
+      },
+      "report_digest": "0a5a052d619433ee143b9041bea34cd9340841a74d60aefdd7091bea71e02337",
+      "row_digest": "633ce6b0eda279a3ddaabec2cfb1c1409b7757744df61ed6aa964de1fc15cc50",
+      "status": "solution_found",
+      "tier": "holdout-small",
+      "truth_pass": true
+    },
+    {
+      "candidate_id": "ortools_cp_sat",
+      "case_id": "p64-l08d-holdout-layers-holdout-large",
+      "certified": false,
+      "execution": {
+        "cpu_seconds": 29.96875,
+        "execution_status": "wall_time_limit_exceeded",
+        "exit_code": 1,
+        "input_digest": "5a4b8e2315d4dcdb822e0e93767661a1181564a96246ff9d4b11da3a4eec3128",
+        "peak_working_set_bytes": 115888128,
+        "total_wall_seconds": 30.011973
+      },
+      "expected": "feasible",
+      "family": "layers",
+      "quality": {},
+      "report_digest": "e377d80559bbb6007798c58609bb5e367abbf62eef5d329362ff955d758b59da",
+      "row_digest": "b651eaad3b692046bc0da5d6ea3c6d73c720d4d899825a850d27f5e4afaf44b0",
+      "status": "bounded_unknown",
+      "tier": "holdout-large",
+      "truth_pass": false
+    },
+    {
+      "candidate_id": "ortools_cp_sat",
+      "case_id": "p64-l08d-holdout-layers-holdout-xl",
+      "certified": false,
+      "execution": {
+        "cpu_seconds": 29.90625,
+        "execution_status": "wall_time_limit_exceeded",
+        "exit_code": 1,
+        "input_digest": "84ca98398980e2c4766fb2c5043cf9d84ab44891bdcdf3db318bb8f0e8dd046e",
+        "peak_working_set_bytes": 178712576,
+        "total_wall_seconds": 30.028654
+      },
+      "expected": "feasible",
+      "family": "layers",
+      "quality": {},
+      "report_digest": "9732e18ac8585b878d46c091d82b57674a6ebb4dd02d5877d042ddf58abd52f2",
+      "row_digest": "2497e7311df69ef464b987541b3c122a55c1a1409a261651bb0806cd6e680caf",
+      "status": "bounded_unknown",
+      "tier": "holdout-xl",
+      "truth_pass": false
+    },
+    {
+      "candidate_id": "ortools_cp_sat",
+      "case_id": "p64-l08d-holdout-layers-holdout-negative",
+      "certified": false,
+      "execution": {
+        "cpu_seconds": 0.625,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "ebb2ce82742b97430ec45731e715d554efdf422cbd57fc128ad4dc954fc3e1eb",
+        "peak_working_set_bytes": 96813056,
+        "total_wall_seconds": 0.659592
+      },
+      "expected": "infeasible",
+      "family": "layers",
+      "quality": {},
+      "report_digest": "70fbd27249eeacc8f8a9971b8faf7230905eab69f0705d8e52ca3a50a2a41511",
+      "row_digest": "bb167fb7d76417fc2329377158d37f6c88229968b1edadfc704ff08bfe9f3cb4",
+      "status": "infeasible_proven",
+      "tier": "holdout-negative",
+      "truth_pass": true
+    },
+    {
+      "candidate_id": "ortools_cp_sat",
+      "case_id": "p64-l08d-holdout-support-holdout-small",
+      "certified": true,
+      "execution": {
+        "cpu_seconds": 0.796875,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "0e7ea604b151c91462c8f27d0a8ee99fd2a99fd397d9be18a3771ffbdb7369c0",
+        "peak_working_set_bytes": 80625664,
+        "total_wall_seconds": 0.842072
+      },
+      "expected": "feasible",
+      "family": "support",
+      "quality": {
+        "bounding_envelope_fill_ratio": 0.786764706,
+        "bounding_envelope_volume_mm3": 4080,
+        "complete_participant_count": 8,
+        "elevated_participant_count": 0,
+        "max_rear_mm": 10,
+        "max_right_mm": 68,
+        "max_top_mm": 6,
+        "occupied_volume_mm3": 3210,
+        "world_volume_mm3": 25245
+      },
+      "report_digest": "26eea2c7833152048622160c0d29999beb7369f79742578933a2c1c137e25958",
+      "row_digest": "b0c2400ce9ed05cbbdca92444e4f46bc56057983d47431a4094b468ed30372e9",
+      "status": "solution_found",
+      "tier": "holdout-small",
+      "truth_pass": true
+    },
+    {
+      "candidate_id": "ortools_cp_sat",
+      "case_id": "p64-l08d-holdout-support-holdout-large",
+      "certified": false,
+      "execution": {
+        "cpu_seconds": 29.953125,
+        "execution_status": "wall_time_limit_exceeded",
+        "exit_code": 1,
+        "input_digest": "860572e43607eed629316ae3e10cc69ab4a559ddcf7e0067433787d2aedc6085",
+        "peak_working_set_bytes": 113020928,
+        "total_wall_seconds": 30.014888
+      },
+      "expected": "feasible",
+      "family": "support",
+      "quality": {},
+      "report_digest": "268057f9c06c21ec704167a296d7943b23ea9c608c4f254f83ce61b815426ab8",
+      "row_digest": "d6f5714a8168eb3ec57eecf68498175a44b7d23dd4de18099acb217b5c53561d",
+      "status": "bounded_unknown",
+      "tier": "holdout-large",
+      "truth_pass": false
+    },
+    {
+      "candidate_id": "ortools_cp_sat",
+      "case_id": "p64-l08d-holdout-support-holdout-xl",
+      "certified": false,
+      "execution": {
+        "cpu_seconds": 29.90625,
+        "execution_status": "wall_time_limit_exceeded",
+        "exit_code": 1,
+        "input_digest": "531092f3e9254751fe66acffa2dc67bdfac38cce28684fef0aaa628666d7ed66",
+        "peak_working_set_bytes": 174379008,
+        "total_wall_seconds": 30.029274
+      },
+      "expected": "feasible",
+      "family": "support",
+      "quality": {},
+      "report_digest": "884431b4317bc644d36306b873d39fcd12e6ec3b9141513d78db988a7c31b232",
+      "row_digest": "fa42904bd166268922c6c6231a9bb441f16862ac319fe3411125dee81117d4af",
+      "status": "bounded_unknown",
+      "tier": "holdout-xl",
+      "truth_pass": false
+    },
+    {
+      "candidate_id": "ortools_cp_sat",
+      "case_id": "p64-l08d-holdout-support-holdout-negative",
+      "certified": false,
+      "execution": {
+        "cpu_seconds": 0.59375,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "55c712870b875dfe3e375febd3ea49ede6c5a2c63bc18d028439c8f5529cca1d",
+        "peak_working_set_bytes": 100827136,
+        "total_wall_seconds": 0.661413
+      },
+      "expected": "infeasible",
+      "family": "support",
+      "quality": {},
+      "report_digest": "8f2ec23a01e82376a432caa49c7bc87b6fd600b6b3134f153d505553198d5052",
+      "row_digest": "13b2c25920f6f924fd36beee0538345f78692644e83526316fa959d3b88cb5d1",
+      "status": "infeasible_proven",
+      "tier": "holdout-negative",
+      "truth_pass": true
+    },
+    {
+      "candidate_id": "scip",
+      "case_id": "p64-l08d-holdout-reservations-holdout-small",
+      "certified": true,
+      "execution": {
+        "cpu_seconds": 5.765625,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "f12a23990b9113b506c308c5b32fa1665e76bde2a7da75dfa0e09ce0864656a4",
+        "peak_working_set_bytes": 66809856,
+        "total_wall_seconds": 5.798388
+      },
+      "expected": "feasible",
+      "family": "reservations",
+      "quality": {
+        "bounding_envelope_fill_ratio": 0.962666667,
+        "bounding_envelope_volume_mm3": 3000,
+        "complete_participant_count": 8,
+        "elevated_participant_count": 0,
+        "max_rear_mm": 10,
+        "max_right_mm": 75,
+        "max_top_mm": 4,
+        "occupied_volume_mm3": 2888,
+        "world_volume_mm3": 8910
+      },
+      "report_digest": "a7ea6e4573a15ab02ab4c1c1bf1145fe616cb40bf4a4013c72c75fb5bb8b265b",
+      "row_digest": "d4d0f0b9e27d883a5b517919dc6cdc205a45d0890157a3306c2f2edd99b5e620",
+      "status": "solution_found",
+      "tier": "holdout-small",
+      "truth_pass": true
+    },
+    {
+      "candidate_id": "scip",
+      "case_id": "p64-l08d-holdout-reservations-holdout-large",
+      "certified": true,
+      "execution": {
+        "cpu_seconds": 29.546875,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "c8162620e6e00fbf9aea3255ddd801bd57d195c8e5252925201f56964afe7a2d",
+        "peak_working_set_bytes": 189042688,
+        "total_wall_seconds": 29.782653
+      },
+      "expected": "feasible",
+      "family": "reservations",
+      "quality": {
+        "bounding_envelope_fill_ratio": 0.841812865,
+        "bounding_envelope_volume_mm3": 13680,
+        "complete_participant_count": 32,
+        "elevated_participant_count": 0,
+        "max_rear_mm": 38,
+        "max_right_mm": 90,
+        "max_top_mm": 4,
+        "occupied_volume_mm3": 11516,
+        "world_volume_mm3": 21385
+      },
+      "report_digest": "14524cc2dc215f2222c0baf62674b284e746a40db82e32fb672a2cbf9eaae15b",
+      "row_digest": "7f224c8c0ea65ef61e6f40b506898a63fbf6bb0b0ede1769025274cdafd906c8",
+      "status": "solution_found",
+      "tier": "holdout-large",
+      "truth_pass": true
+    },
+    {
+      "candidate_id": "scip",
+      "case_id": "p64-l08d-holdout-reservations-holdout-xl",
+      "certified": false,
+      "execution": {
+        "cpu_seconds": 29.875,
+        "execution_status": "wall_time_limit_exceeded",
+        "exit_code": 1,
+        "input_digest": "1be5aa4a2648a5eae6e3c710cda46023fad9ba1d5fc8bdaa912ca33494d2d64b",
+        "peak_working_set_bytes": 387117056,
+        "total_wall_seconds": 30.012285
+      },
+      "expected": "feasible",
+      "family": "reservations",
+      "quality": {},
+      "report_digest": "471eff1034d9c36f100796921c2a15f05bf25aefca880910548646f5f7a33249",
+      "row_digest": "cefc54f77954bf5ecaaf471dad0a113c5efa5d32ae34ee77d6562ffdfd8b5247",
+      "status": "bounded_unknown",
+      "tier": "holdout-xl",
+      "truth_pass": false
+    },
+    {
+      "candidate_id": "scip",
+      "case_id": "p64-l08d-holdout-reservations-holdout-negative",
+      "certified": false,
+      "execution": {
+        "cpu_seconds": 0.65625,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "dfdae88d435301d4b22a9299b8956b560cd8f2f3c852e56a6a422f3642f27ca4",
+        "peak_working_set_bytes": 228470784,
+        "total_wall_seconds": 0.694352
+      },
+      "expected": "infeasible",
+      "family": "reservations",
+      "quality": {},
+      "report_digest": "1ded19484ef8b41766f36f640cd200fec303ea449b2d4887eda2ddff15f278a1",
+      "row_digest": "bf1dac6b282055bdd2c5885cc49ddc849c9b18474478b4804d441a0216d59cdd",
+      "status": "infeasible_proven",
+      "tier": "holdout-negative",
+      "truth_pass": true
+    },
+    {
+      "candidate_id": "ortools_cp_sat",
+      "case_id": "p64-l08d-holdout-access-holdout-small",
+      "certified": true,
+      "execution": {
+        "cpu_seconds": 0.921875,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "85b099bc0e5567c73e42d4ef2e41927691b678857d2e9c554e478b8ac5cbdbbd",
+        "peak_working_set_bytes": 80347136,
+        "total_wall_seconds": 1.009411
+      },
+      "expected": "feasible",
+      "family": "access",
+      "quality": {
+        "bounding_envelope_fill_ratio": 0.853333333,
+        "bounding_envelope_volume_mm3": 4500,
+        "complete_participant_count": 8,
+        "elevated_participant_count": 0,
+        "max_rear_mm": 10,
+        "max_right_mm": 75,
+        "max_top_mm": 6,
+        "occupied_volume_mm3": 3840,
+        "world_volume_mm3": 25245
+      },
+      "report_digest": "53047204e62f104d33725135d64e668a6d7a7d369f0b8d00b928d55083e42718",
+      "row_digest": "46db01612a02985bbf9b84a6d1bdc9c95cd5e65eeae0c5ac7492db93f500e2d1",
+      "status": "solution_found",
+      "tier": "holdout-small",
+      "truth_pass": true
+    },
+    {
+      "candidate_id": "ortools_cp_sat",
+      "case_id": "p64-l08d-holdout-access-holdout-large",
+      "certified": false,
+      "execution": {
+        "cpu_seconds": 29.78125,
+        "execution_status": "wall_time_limit_exceeded",
+        "exit_code": 1,
+        "input_digest": "0e7c8ce841314f8c7bcfc12afd837caf780eb23ad4e6ab0d98fbc35a5782623d",
+        "peak_working_set_bytes": 114266112,
+        "total_wall_seconds": 30.036327
+      },
+      "expected": "feasible",
+      "family": "access",
+      "quality": {},
+      "report_digest": "d86c2e6c5a34c8e7acea4f7780cf66f752ac935f082f214b0dacf3bab50338a8",
+      "row_digest": "3704984d10f764a16c65b2d20f5f40888ffef6d19f25b8d25f95081b276e5890",
+      "status": "bounded_unknown",
+      "tier": "holdout-large",
+      "truth_pass": false
+    },
+    {
+      "candidate_id": "ortools_cp_sat",
+      "case_id": "p64-l08d-holdout-access-holdout-xl",
+      "certified": false,
+      "execution": {
+        "cpu_seconds": 29.953125,
+        "execution_status": "wall_time_limit_exceeded",
+        "exit_code": 1,
+        "input_digest": "f70ba780a8fc163ebc7143265d6e9bc833954b043b7ab9bcfbfbc6547a4b1549",
+        "peak_working_set_bytes": 172920832,
+        "total_wall_seconds": 30.032739
+      },
+      "expected": "feasible",
+      "family": "access",
+      "quality": {},
+      "report_digest": "62bfc3a94ebdbb43609e7a63355a915191ba306484741ebe3c8668889e336e07",
+      "row_digest": "296f4f58e9eed554bbe974f63571004d3e4cee479900cc86fb253db3bc2ce657",
+      "status": "bounded_unknown",
+      "tier": "holdout-xl",
+      "truth_pass": false
+    },
+    {
+      "candidate_id": "ortools_cp_sat",
+      "case_id": "p64-l08d-holdout-access-holdout-negative",
+      "certified": false,
+      "execution": {
+        "cpu_seconds": 0.625,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "f2bd0a380614a9892c4f114dc630c084e8ca773d50780cdec56430dc14fe9a4d",
+        "peak_working_set_bytes": 118333440,
+        "total_wall_seconds": 0.692627
+      },
+      "expected": "infeasible",
+      "family": "access",
+      "quality": {},
+      "report_digest": "d82b7ccd7a7e9d616aaec3ebe45e1fc3bbd9fac6d383f031db6d7a82ae91e017",
+      "row_digest": "f6a193193e213c1ac678778a15e8c76b26c587fadd947f3aed3a67d321b4d8d2",
+      "status": "infeasible_proven",
+      "tier": "holdout-negative",
+      "truth_pass": true
+    },
+    {
+      "candidate_id": "ortools_cp_sat",
+      "case_id": "p64-l08d-holdout-fragmentation-holdout-small",
+      "certified": true,
+      "execution": {
+        "cpu_seconds": 0.796875,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "514ece42df8e33f50642b6b5e093863b89f9acb71a58a3d8a8dc198d8af35b73",
+        "peak_working_set_bytes": 78909440,
+        "total_wall_seconds": 0.851313
+      },
+      "expected": "feasible",
+      "family": "fragmentation",
+      "quality": {
+        "bounding_envelope_fill_ratio": 0.624561404,
+        "bounding_envelope_volume_mm3": 4560,
+        "complete_participant_count": 8,
+        "elevated_participant_count": 0,
+        "max_rear_mm": 12,
+        "max_right_mm": 95,
+        "max_top_mm": 4,
+        "occupied_volume_mm3": 2848,
+        "world_volume_mm3": 8910
+      },
+      "report_digest": "7ab63e33c73815d47c1b3b2326e406ca6e0a5695bba71ff6435319ab0f6d8a85",
+      "row_digest": "834596d8b04f0f0dee4b19b3d1604d3027701b57e9ab5186edddcd2c7848ffa8",
+      "status": "solution_found",
+      "tier": "holdout-small",
+      "truth_pass": true
+    },
+    {
+      "candidate_id": "ortools_cp_sat",
+      "case_id": "p64-l08d-holdout-fragmentation-holdout-large",
+      "certified": false,
+      "execution": {
+        "cpu_seconds": 30.0,
+        "execution_status": "wall_time_limit_exceeded",
+        "exit_code": 1,
+        "input_digest": "a6f532a3152acaa4d145c37921b2d432d81ae466ef01d2eceb58ac000576a4ea",
+        "peak_working_set_bytes": 98775040,
+        "total_wall_seconds": 30.032702
+      },
+      "expected": "feasible",
+      "family": "fragmentation",
+      "quality": {},
+      "report_digest": "6fd9e7462bcb6a8a9abec22da0968faac15f34127702e828189a90e7c04da945",
+      "row_digest": "05fe8f0bcc6360bb936d67ee3c6c461b33da9b4e919a91beaf86ed977aa0daca",
+      "status": "bounded_unknown",
+      "tier": "holdout-large",
+      "truth_pass": false
+    },
+    {
+      "candidate_id": "ortools_cp_sat",
+      "case_id": "p64-l08d-holdout-fragmentation-holdout-xl",
+      "certified": false,
+      "execution": {
+        "cpu_seconds": 29.921875,
+        "execution_status": "wall_time_limit_exceeded",
+        "exit_code": 1,
+        "input_digest": "67028fa5fa1614ef7870f4611b81561cea2ff36fcf67c6ae553a2f4e77ced55d",
+        "peak_working_set_bytes": 149622784,
+        "total_wall_seconds": 30.010989
+      },
+      "expected": "feasible",
+      "family": "fragmentation",
+      "quality": {},
+      "report_digest": "fd9775d5e01e1a339308ce241352c64b0d65770d93df5ebb64d8ef1844f7ec8c",
+      "row_digest": "f8a6c761ee91fa1b79a2b3296d73581f8e03d887f82439374c6a6aba46ee38c8",
+      "status": "bounded_unknown",
+      "tier": "holdout-xl",
+      "truth_pass": false
+    },
+    {
+      "candidate_id": "ortools_cp_sat",
+      "case_id": "p64-l08d-holdout-fragmentation-holdout-negative",
+      "certified": false,
+      "execution": {
+        "cpu_seconds": 0.6875,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "6827e57d56becf6842a99c7f25a33fd6bd54c8b3ffedaf62b0550ee9ea0ce55c",
+        "peak_working_set_bytes": 128471040,
+        "total_wall_seconds": 0.754213
+      },
+      "expected": "infeasible",
+      "family": "fragmentation",
+      "quality": {},
+      "report_digest": "53dd9c5b0ad909b291f8eb448031791d7bfa588ff3536f69505205fe733e7424",
+      "row_digest": "e9f1902aaf485d27033b7f801ca85f12b86c89381138ccfb4d7e1c7ea1f59ca3",
+      "status": "infeasible_proven",
+      "tier": "holdout-negative",
+      "truth_pass": true
+    },
+    {
+      "candidate_id": "ortools_cp_sat",
+      "case_id": "p64-l08d-holdout-variants-holdout-small",
+      "certified": true,
+      "execution": {
+        "cpu_seconds": 0.765625,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "5f1d43b5866281d986cbbc9c26822b2e386d63d39c3976cc8ef0a272aeb69341",
+        "peak_working_set_bytes": 79343616,
+        "total_wall_seconds": 0.817196
+      },
+      "expected": "feasible",
+      "family": "variants",
+      "quality": {
+        "bounding_envelope_fill_ratio": 0.878333333,
+        "bounding_envelope_volume_mm3": 2400,
+        "complete_participant_count": 8,
+        "elevated_participant_count": 0,
+        "max_rear_mm": 10,
+        "max_right_mm": 60,
+        "max_top_mm": 4,
+        "occupied_volume_mm3": 2108,
+        "world_volume_mm3": 8910
+      },
+      "report_digest": "e64a11142aed47f61911d161161d50963a6080aa3777f9d6a4a29e87a2b744f4",
+      "row_digest": "c16d2eb8f63ae88efbbc4551183214f4d4b7d07f4a18947d44ddd1885be7a0f5",
+      "status": "solution_found",
+      "tier": "holdout-small",
+      "truth_pass": true
+    },
+    {
+      "candidate_id": "ortools_cp_sat",
+      "case_id": "p64-l08d-holdout-variants-holdout-large",
+      "certified": false,
+      "execution": {
+        "cpu_seconds": 30.015625,
+        "execution_status": "wall_time_limit_exceeded",
+        "exit_code": 1,
+        "input_digest": "2fe98a6a2b533aef9beec670975118262a434a9941d512e8a4d22be9d0522a4a",
+        "peak_working_set_bytes": 134414336,
+        "total_wall_seconds": 30.029044
+      },
+      "expected": "feasible",
+      "family": "variants",
+      "quality": {},
+      "report_digest": "6909e24be835012a99aa99f121f00cb502685d5e5ddc18514bb3a9bdfc02cf55",
+      "row_digest": "4dffaa68ea1525de90c50f8ccae57ee0692ee9fa9ef53e6742c3956bd82a4d87",
+      "status": "bounded_unknown",
+      "tier": "holdout-large",
+      "truth_pass": false
+    },
+    {
+      "candidate_id": "ortools_cp_sat",
+      "case_id": "p64-l08d-holdout-variants-holdout-xl",
+      "certified": false,
+      "execution": {
+        "cpu_seconds": 29.953125,
+        "execution_status": "wall_time_limit_exceeded",
+        "exit_code": 1,
+        "input_digest": "5dea34a46614ca394e95456a5afcd564c13d1eb6e38857972ad6d2001801c0ec",
+        "peak_working_set_bytes": 166244352,
+        "total_wall_seconds": 30.020704
+      },
+      "expected": "feasible",
+      "family": "variants",
+      "quality": {},
+      "report_digest": "baa8b8747dac326d175784a0bcdafce47c886df1f3028c0a84bcf597cc151ab7",
+      "row_digest": "c9f6483a44c9b1b9111fbf52992947d677d20872ca20d12d21676910ea23799a",
+      "status": "bounded_unknown",
+      "tier": "holdout-xl",
+      "truth_pass": false
+    },
+    {
+      "candidate_id": "ortools_cp_sat",
+      "case_id": "p64-l08d-holdout-variants-holdout-negative",
+      "certified": false,
+      "execution": {
+        "cpu_seconds": 0.640625,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "046efa4d6da5cb90e3ece64562afe1f539f9a0dac904f6b9e19c61f1397c3328",
+        "peak_working_set_bytes": 117624832,
+        "total_wall_seconds": 0.702249
+      },
+      "expected": "infeasible",
+      "family": "variants",
+      "quality": {},
+      "report_digest": "48147174af90674efcb542c53c9836dc2d0e8023301cc137e2928f7a20536702",
+      "row_digest": "114e65b5d9c3bcaea42689ea7b90cb673f86a54f45df86ed89aeeba4effece72",
+      "status": "infeasible_proven",
+      "tier": "holdout-negative",
+      "truth_pass": true
+    },
+    {
+      "candidate_id": "laff",
+      "case_id": "p64-l08d-holdout-many-containers-holdout-small",
+      "certified": true,
+      "execution": {
+        "cpu_seconds": 0.015625,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "bf89e946ca5fb91420add1a41e3513cd5820fa11405a352b0c35fec46792eefc",
+        "peak_working_set_bytes": 14897152,
+        "total_wall_seconds": 0.288476
+      },
+      "expected": "feasible",
+      "family": "many-containers",
+      "quality": {
+        "bounding_envelope_fill_ratio": 0.854202899,
+        "bounding_envelope_volume_mm3": 13800,
+        "complete_participant_count": 32,
+        "elevated_participant_count": 0,
+        "max_rear_mm": 50,
+        "max_right_mm": 69,
+        "max_top_mm": 4,
+        "occupied_volume_mm3": 11788,
+        "world_volume_mm3": 30294
+      },
+      "report_digest": "60509fb60347c2403a1bb42b4de37f18b27ca53620324a556688f3804a9c4f1a",
+      "row_digest": "b33092fc10d06dec64410a61d0b8c3121fd52fa9e9e0c0f916d80a791de3288c",
+      "status": "solution_found",
+      "tier": "holdout-small",
+      "truth_pass": true
+    },
+    {
+      "candidate_id": "laff",
+      "case_id": "p64-l08d-holdout-many-containers-holdout-large",
+      "certified": true,
+      "execution": {
+        "cpu_seconds": 0.046875,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "e5436a759baa24ee79179e4f0a96220fe5a2ba3ea2dc5a12d983634c212ae3e7",
+        "peak_working_set_bytes": 14921728,
+        "total_wall_seconds": 0.290233
+      },
+      "expected": "feasible",
+      "family": "many-containers",
+      "quality": {
+        "bounding_envelope_fill_ratio": 0.805390071,
+        "bounding_envelope_volume_mm3": 14100,
+        "complete_participant_count": 32,
+        "elevated_participant_count": 0,
+        "max_rear_mm": 47,
+        "max_right_mm": 75,
+        "max_top_mm": 4,
+        "occupied_volume_mm3": 11356,
+        "world_volume_mm3": 21385
+      },
+      "report_digest": "47362138065bc19a8acbb9a0265ec5a3e14cfd330837e36b215a1065b90ba8cf",
+      "row_digest": "09c274cd58709106038450968e9c25be10f299f71d18fd66803a6b1fffcf31ee",
+      "status": "solution_found",
+      "tier": "holdout-large",
+      "truth_pass": true
+    },
+    {
+      "candidate_id": "laff",
+      "case_id": "p64-l08d-holdout-many-containers-holdout-xl",
+      "certified": true,
+      "execution": {
+        "cpu_seconds": 0.046875,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "321bd81d9471d568f9d6e7e0f568d00e80e5ca646e2a69f3aa9f2cbf9632ee7f",
+        "peak_working_set_bytes": 15069184,
+        "total_wall_seconds": 0.290224
+      },
+      "expected": "feasible",
+      "family": "many-containers",
+      "quality": {
+        "bounding_envelope_fill_ratio": 0.835389752,
+        "bounding_envelope_volume_mm3": 27556,
+        "complete_participant_count": 64,
+        "elevated_participant_count": 0,
+        "max_rear_mm": 83,
+        "max_right_mm": 83,
+        "max_top_mm": 4,
+        "occupied_volume_mm3": 23020,
+        "world_volume_mm3": 27556
+      },
+      "report_digest": "6918dca83bee419c5d637bfc434f54b60524a6e737c1d917477776083821b0f2",
+      "row_digest": "f0fee3cf4d89c0d65cc0a9754dcc3ee8f4bb187b717175939a609f380718d4b8",
+      "status": "solution_found",
+      "tier": "holdout-xl",
+      "truth_pass": true
+    },
+    {
+      "candidate_id": "laff",
+      "case_id": "p64-l08d-holdout-many-containers-holdout-negative",
+      "certified": false,
+      "execution": {
+        "cpu_seconds": 0.03125,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "bc119f6d29e99fb1ac05277d373b374b1a2567471bc560e76e95ac2206d64799",
+        "peak_working_set_bytes": 15085568,
+        "total_wall_seconds": 0.25305
+      },
+      "expected": "infeasible",
+      "family": "many-containers",
+      "quality": {},
+      "report_digest": "eda1a8d3aa7eb17199afefe796e02fc2f612b0ea00e9c179b4183246cf506564",
+      "row_digest": "51b6449883c55f2d49ebbff9c5fd418ef086f7c797ee547f9ad8eb989babe219",
+      "status": "bounded_unknown",
+      "tier": "holdout-negative",
+      "truth_pass": false
+    },
+    {
+      "candidate_id": "scip",
+      "case_id": "p64-l08d-holdout-many-assets-holdout-small",
+      "certified": true,
+      "execution": {
+        "cpu_seconds": 4.90625,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "088e428f39963cd1cc8df97923e4834b4e8a577c6da030639b93e4e46f163045",
+        "peak_working_set_bytes": 61341696,
+        "total_wall_seconds": 5.001925
+      },
+      "expected": "feasible",
+      "family": "many-assets",
+      "quality": {
+        "bounding_envelope_fill_ratio": 1.0,
+        "bounding_envelope_volume_mm3": 3000,
+        "complete_participant_count": 8,
+        "elevated_participant_count": 0,
+        "max_rear_mm": 10,
+        "max_right_mm": 75,
+        "max_top_mm": 4,
+        "occupied_volume_mm3": 3000,
+        "world_volume_mm3": 8910
+      },
+      "report_digest": "6adee580aad3ffab5594e4697d3d69940a9f0d0d8d16b6b76a408b237426189a",
+      "row_digest": "82d272efc23dff76f5e670465f953e98488032ec7b10a050a3e25d6ed39ffcc2",
+      "status": "solution_found",
+      "tier": "holdout-small",
+      "truth_pass": true
+    },
+    {
+      "candidate_id": "scip",
+      "case_id": "p64-l08d-holdout-many-assets-holdout-large",
+      "certified": true,
+      "execution": {
+        "cpu_seconds": 29.9375,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "0d01d48cbd4a3a0f067d902c19f44dc6f9771437775bab468a45adf66be0b228",
+        "peak_working_set_bytes": 200572928,
+        "total_wall_seconds": 30.013938
+      },
+      "expected": "feasible",
+      "family": "many-assets",
+      "quality": {
+        "bounding_envelope_fill_ratio": 0.819103973,
+        "bounding_envelope_volume_mm3": 14196,
+        "complete_participant_count": 32,
+        "elevated_participant_count": 0,
+        "max_rear_mm": 39,
+        "max_right_mm": 91,
+        "max_top_mm": 4,
+        "occupied_volume_mm3": 11628,
+        "world_volume_mm3": 21385
+      },
+      "report_digest": "f390c9a42e7239a328cd85ea58b308dd83ccf9ed9a46362518ec332d7f701a3c",
+      "row_digest": "13517677c80e175457bb301bf5d57a7429f20cae24c712d31c711304382d522a",
+      "status": "solution_found",
+      "tier": "holdout-large",
+      "truth_pass": true
+    },
+    {
+      "candidate_id": "scip",
+      "case_id": "p64-l08d-holdout-many-assets-holdout-xl",
+      "certified": false,
+      "execution": {
+        "cpu_seconds": 29.921875,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "c28bbb0c7513a619c8b7e9dbe331716e724f2de99dc8eb45927c319b293551bb",
+        "peak_working_set_bytes": 396136448,
+        "total_wall_seconds": 30.010008
+      },
+      "expected": "feasible",
+      "family": "many-assets",
+      "quality": {},
+      "report_digest": "39653d827ae9c348f848be65659a5ce1788135cf683c91097825f0b3d8ec7783",
+      "row_digest": "8b95bb39a410af684694ff4e5a299616a9365cd85b1ab388cd1e6d3c0696ff9a",
+      "status": "bounded_unknown",
+      "tier": "holdout-xl",
+      "truth_pass": false
+    },
+    {
+      "candidate_id": "scip",
+      "case_id": "p64-l08d-holdout-many-assets-holdout-negative",
+      "certified": false,
+      "execution": {
+        "cpu_seconds": 0.640625,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "7c8de6a97d86cd97e177c34b38fd81e6be85a24646f1230f97b24586f9e803f2",
+        "peak_working_set_bytes": 225001472,
+        "total_wall_seconds": 0.641363
+      },
+      "expected": "infeasible",
+      "family": "many-assets",
+      "quality": {},
+      "report_digest": "e02e3b35b97b42c6c0a7995cd90c878238ccdc19bec65126b031f748dad23a2f",
+      "row_digest": "3ecd08d88557dddf968be09e15271961027192ab3844483efd1fec1536d5388d",
+      "status": "infeasible_proven",
+      "tier": "holdout-negative",
+      "truth_pass": true
+    },
+    {
+      "candidate_id": "ortools_cp_sat",
+      "case_id": "p64-l08d-holdout-mixed-extreme-holdout-small",
+      "certified": false,
+      "execution": {
+        "cpu_seconds": 29.96875,
+        "execution_status": "wall_time_limit_exceeded",
+        "exit_code": 1,
+        "input_digest": "bcb890b0671bfc0b7c5afccd2522ae3902c2dced807520277d9223616c00d63a",
+        "peak_working_set_bytes": 125128704,
+        "total_wall_seconds": 30.037798
+      },
+      "expected": "feasible",
+      "family": "mixed-extreme",
+      "quality": {},
+      "report_digest": "d964fa12430afdc91288c6d4fe68f1b098d1a7b92150f8f8b160f06ba1ab6b97",
+      "row_digest": "57cd246e8513c326c8a698e1305bc21c1cb95d12267dd3b5df4e6e64fa64a6db",
+      "status": "bounded_unknown",
+      "tier": "holdout-small",
+      "truth_pass": false
+    },
+    {
+      "candidate_id": "ortools_cp_sat",
+      "case_id": "p64-l08d-holdout-mixed-extreme-holdout-large",
+      "certified": false,
+      "execution": {
+        "cpu_seconds": 29.96875,
+        "execution_status": "wall_time_limit_exceeded",
+        "exit_code": 1,
+        "input_digest": "b98122f6f68f6b7e23b827f4a27ed6cb6728de24507edcfd9b6a20d794a967b3",
+        "peak_working_set_bytes": 219512832,
+        "total_wall_seconds": 30.031612
+      },
+      "expected": "feasible",
+      "family": "mixed-extreme",
+      "quality": {},
+      "report_digest": "c85e093853dc7d93e6abb807f50ccc29df13f459b5f0895b210583aa91caa8a7",
+      "row_digest": "8742b16499cc6b789936aa6f97631656a887e98cdaaf31dcf6809d7102013cad",
+      "status": "bounded_unknown",
+      "tier": "holdout-large",
+      "truth_pass": false
+    },
+    {
+      "candidate_id": "ortools_cp_sat",
+      "case_id": "p64-l08d-holdout-mixed-extreme-holdout-xl",
+      "certified": false,
+      "execution": {
+        "cpu_seconds": 30.0,
+        "execution_status": "wall_time_limit_exceeded",
+        "exit_code": 1,
+        "input_digest": "efd79c7b83a2591a05acf7f26683525c91e373cc17cb3a7ef9e0188504f9c9a2",
+        "peak_working_set_bytes": 613167104,
+        "total_wall_seconds": 30.056122
+      },
+      "expected": "feasible",
+      "family": "mixed-extreme",
+      "quality": {},
+      "report_digest": "c4e138fa25b4d87323812056630b98b996874ec845ee401511dc6b3cd50cb76c",
+      "row_digest": "33ef4dba589204b6d9a97ea2911b35c9c7dd5bd2627dd62df37be7c62bd19c0d",
+      "status": "bounded_unknown",
+      "tier": "holdout-xl",
+      "truth_pass": false
+    },
+    {
+      "candidate_id": "ortools_cp_sat",
+      "case_id": "p64-l08d-holdout-mixed-extreme-holdout-negative",
+      "certified": false,
+      "execution": {
+        "cpu_seconds": 2.875,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "9f85cb6b7f31d3b5f3faaca717ea8d526b76c85a9cc0c429a104422b8dc8cbbf",
+        "peak_working_set_bytes": 377389056,
+        "total_wall_seconds": 2.931296
+      },
+      "expected": "infeasible",
+      "family": "mixed-extreme",
+      "quality": {},
+      "report_digest": "44971e35f63ac1bf07dfdfa0a5619cfdbcd48c5c4724734041656a4f6bb935b9",
+      "row_digest": "5363061085fb588ebe4d99ec242539b2f2d216c47fd323c130a038a9a06ab091",
+      "status": "infeasible_proven",
+      "tier": "holdout-negative",
+      "truth_pass": true
+    },
+    {
+      "candidate_id": "scip",
+      "case_id": "p64-l08d-holdout-real-anonymized-holdout-small",
+      "certified": false,
+      "execution": {
+        "cpu_seconds": 29.96875,
+        "execution_status": "wall_time_limit_exceeded",
+        "exit_code": 1,
+        "input_digest": "f604139811f1537042d0c6c547aa32366ca9b26edff2c06eec892d5f6498c4e7",
+        "peak_working_set_bytes": 155914240,
+        "total_wall_seconds": 30.033393
+      },
+      "expected": "feasible",
+      "family": "real-anonymized",
+      "quality": {},
+      "report_digest": "785f624e907694cfa14abceb8462d0105d3103d0bee3f75f6211bcfb945b5bd3",
+      "row_digest": "d16a0e1397dc61e0ab839465c4181cc1c02915f289d4ef117eb29d74d1291769",
+      "status": "bounded_unknown",
+      "tier": "holdout-small",
+      "truth_pass": false
+    },
+    {
+      "candidate_id": "scip",
+      "case_id": "p64-l08d-holdout-real-anonymized-holdout-large",
+      "certified": false,
+      "execution": {
+        "cpu_seconds": 29.953125,
+        "execution_status": "wall_time_limit_exceeded",
+        "exit_code": 1,
+        "input_digest": "96cc52e70abb7bc5feba7482e530b433eacc8da5abcb5863e12060569d6ea7e3",
+        "peak_working_set_bytes": 191508480,
+        "total_wall_seconds": 30.011338
+      },
+      "expected": "feasible",
+      "family": "real-anonymized",
+      "quality": {},
+      "report_digest": "e9a055ef32d795140f64459687f1aa55adb1fe7099f1112e261d99917a18e812",
+      "row_digest": "865d4464f2d1c90efafd7adaa617f85516b973e824204eaafe5586695fc653a6",
+      "status": "bounded_unknown",
+      "tier": "holdout-large",
+      "truth_pass": false
+    },
+    {
+      "candidate_id": "scip",
+      "case_id": "p64-l08d-holdout-real-anonymized-holdout-xl",
+      "certified": false,
+      "execution": {
+        "cpu_seconds": 29.90625,
+        "execution_status": "wall_time_limit_exceeded",
+        "exit_code": 1,
+        "input_digest": "70321eb5725ce75ab217d0f9a4c8166b409400483360d1989f29442454c1ed94",
+        "peak_working_set_bytes": 486817792,
+        "total_wall_seconds": 30.043265
+      },
+      "expected": "feasible",
+      "family": "real-anonymized",
+      "quality": {},
+      "report_digest": "9d2cecde6900d4df2a663056900b38bf5b530e7d304c85f6a2c9fe335437b36a",
+      "row_digest": "625a467500e408cf0de90bd892df1c964c1ffd7b4deb0e6cf3f1d350e6b48707",
+      "status": "bounded_unknown",
+      "tier": "holdout-xl",
+      "truth_pass": false
+    },
+    {
+      "candidate_id": "scip",
+      "case_id": "p64-l08d-holdout-real-anonymized-holdout-negative",
+      "certified": false,
+      "execution": {
+        "cpu_seconds": 29.984375,
+        "execution_status": "wall_time_limit_exceeded",
+        "exit_code": 1,
+        "input_digest": "5caafd010a0b71075d98db4dd600860661cae51fa175e8f1d29bd790aa7fb5d8",
+        "peak_working_set_bytes": 462225408,
+        "total_wall_seconds": 30.029094
+      },
+      "expected": "infeasible",
+      "family": "real-anonymized",
+      "quality": {},
+      "report_digest": "8eecce30bbe6e671005a84f53ebff8a789206f4a2387f874b6b11e033125a891",
+      "row_digest": "b273ec030115979be741dc42c4b0029a4d1da46e71c9187c73cffd0da8a6d9f9",
+      "status": "bounded_unknown",
+      "tier": "holdout-negative",
+      "truth_pass": false
+    }
+  ],
+  "holdout_summaries": {
+    "baseline": {
+      "candidate_count": 1,
+      "candidates": [
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "current_bgig",
+          "case_count": 40,
+          "certified_solution_count": 0,
+          "p50_wall_seconds": 0.126045,
+          "p95_wall_seconds": 0.131445,
+          "representable_count": 40,
+          "statuses": {
+            "bounded_unknown": 40
+          },
+          "summary_digest": "2ee7d72cf467f3f26e5cbca213559e9ce2bbfe982277f8fb28056ac1bd8eda63",
+          "total_wall_seconds": 4.74809,
+          "truth_pass_count": 0,
+          "worker_invocation_count": 40
+        }
+      ],
+      "row_count": 40,
+      "summary_digest": "e18f29744b7f2de3133f2fc655027955fd73a7bce09ece0826b0040a5a4b37fd"
+    },
+    "portfolio": {
+      "candidate_count": 3,
+      "candidates": [
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "laff",
+          "case_count": 4,
+          "certified_solution_count": 3,
+          "p50_wall_seconds": 0.28935,
+          "p95_wall_seconds": 0.290233,
+          "representable_count": 4,
+          "statuses": {
+            "bounded_unknown": 1,
+            "solution_found": 3
+          },
+          "summary_digest": "8363570dddac8218cf0b816e16c06cffedb5444574330fb988f6181c3015f2c5",
+          "total_wall_seconds": 1.121983,
+          "truth_pass_count": 3,
+          "worker_invocation_count": 4
+        },
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "ortools_cp_sat",
+          "case_count": 24,
+          "certified_solution_count": 5,
+          "p50_wall_seconds": 30.011481,
+          "p95_wall_seconds": 30.037798,
+          "representable_count": 24,
+          "statuses": {
+            "bounded_unknown": 13,
+            "infeasible_proven": 6,
+            "solution_found": 5
+          },
+          "summary_digest": "70865f9a292bbc4e678968859f47cf9ccb3264c7bcaaeacbbfc3764123844207",
+          "total_wall_seconds": 401.110471,
+          "truth_pass_count": 11,
+          "worker_invocation_count": 24
+        },
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "scip",
+          "case_count": 12,
+          "certified_solution_count": 4,
+          "p50_wall_seconds": 30.010673,
+          "p95_wall_seconds": 30.043265,
+          "representable_count": 12,
+          "statuses": {
+            "bounded_unknown": 6,
+            "infeasible_proven": 2,
+            "solution_found": 4
+          },
+          "summary_digest": "96d243b34e018203e5da11a01b81eb84d3a80e5feeb6268ad7eee394cf013ad3",
+          "total_wall_seconds": 252.072002,
+          "truth_pass_count": 6,
+          "worker_invocation_count": 12
+        }
+      ],
+      "row_count": 40,
+      "summary_digest": "bea54ba549440ab6b69f85d0c5a0367c3d899c7c81728a3d61c62c87ed45dddd"
+    },
+    "primary": {
+      "candidate_count": 1,
+      "candidates": [
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "scip",
+          "case_count": 40,
+          "certified_solution_count": 12,
+          "p50_wall_seconds": 29.551167,
+          "p95_wall_seconds": 30.043759,
+          "representable_count": 40,
+          "statuses": {
+            "bounded_unknown": 22,
+            "infeasible_proven": 6,
+            "solution_found": 12
+          },
+          "summary_digest": "f3fbe4a5a78400c572d0b8b9211257b2d523f6ea8829ac57b006b5ca3bfc6039",
+          "total_wall_seconds": 771.490159,
+          "truth_pass_count": 18,
+          "worker_invocation_count": 40
+        }
+      ],
+      "row_count": 40,
+      "summary_digest": "2e9c6d55ce0689d71d1c00702a155baa610a9cfc1318566943477be8ff41389c"
+    },
+    "retained": {
+      "candidate_count": 1,
+      "candidates": [
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "scip",
+          "case_count": 40,
+          "certified_solution_count": 12,
+          "p50_wall_seconds": 29.551167,
+          "p95_wall_seconds": 30.043759,
+          "representable_count": 40,
+          "statuses": {
+            "bounded_unknown": 22,
+            "infeasible_proven": 6,
+            "solution_found": 12
+          },
+          "summary_digest": "f3fbe4a5a78400c572d0b8b9211257b2d523f6ea8829ac57b006b5ca3bfc6039",
+          "total_wall_seconds": 771.490159,
+          "truth_pass_count": 18,
+          "worker_invocation_count": 40
+        }
+      ],
+      "row_count": 40,
+      "summary_digest": "2e9c6d55ce0689d71d1c00702a155baa610a9cfc1318566943477be8ff41389c"
+    }
+  },
+  "invariants": {
+    "baseline_worker_reexecution_count": 0,
+    "external_worker_reexecution_count": 0,
+    "external_workers_referenced_oracle_metadata": false,
+    "fresh_bgig_recertification_required": true,
+    "future_worker_inputs_strip_oracle_metadata": true,
+    "heavy_processes_concurrently": 1,
+    "holdout_opening_count": 1,
+    "network_service_invocation_count": 0,
+    "one_engine_invocation_per_portfolio_case": true,
+    "positive_witness_transmitted": false,
+    "post_open_tuning_count": 0,
+    "postprocessing_recovery_count": 1,
+    "private_holdout_reopen_count": 0
+  },
+  "manifest_digest": "d4324eebbc0412b02b7ed6bdbd16eacf1b90146a9a45ed8ad6bff542e19fc0f9",
+  "open_campaign_digest": "4ee1c9d79bd2e3f5a0a4d6fbfde3b1b552e1b3039bb6cbc609639ca184bb2236",
+  "open_summaries": {
+    "baseline_discovery": {
+      "candidate_count": 1,
+      "candidates": [
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "current_bgig",
+          "case_count": 30,
+          "certified_solution_count": 0,
+          "p50_wall_seconds": 0.100551,
+          "p95_wall_seconds": 0.129385,
+          "representable_count": 30,
+          "statuses": {
+            "bounded_unknown": 20,
+            "infeasible_proven": 10
+          },
+          "summary_digest": "aea2f346faa0c96f8a5d6b5c9589d0b5ce1244c66a19dcd1be39d78816b23a1a",
+          "total_wall_seconds": 3.32807,
+          "truth_pass_count": 10,
+          "worker_invocation_count": 30
+        }
+      ],
+      "row_count": 30,
+      "summary_digest": "98030277952ac42150802547f4fc4be72232fc3a311e36c8f22f67c9622a6aca"
+    },
+    "baseline_tuning": {
+      "candidate_count": 1,
+      "candidates": [
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "current_bgig",
+          "case_count": 10,
+          "certified_solution_count": 0,
+          "p50_wall_seconds": 0.119885,
+          "p95_wall_seconds": 0.127777,
+          "representable_count": 10,
+          "statuses": {
+            "bounded_unknown": 10
+          },
+          "summary_digest": "ea7f13df433f3d184d6dd0513d3056b6014857ece64432487ea5713914a34257",
+          "total_wall_seconds": 1.148199,
+          "truth_pass_count": 0,
+          "worker_invocation_count": 10
+        }
+      ],
+      "row_count": 10,
+      "summary_digest": "56c99bdad1d2992607ff909d0114e0e7c9c3a5740e4c09624ccf1a16c2020918"
+    },
+    "discovery": {
+      "candidate_count": 4,
+      "candidates": [
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "laff",
+          "case_count": 30,
+          "certified_solution_count": 2,
+          "p50_wall_seconds": 0.0,
+          "p95_wall_seconds": 0.288925,
+          "representable_count": 3,
+          "statuses": {
+            "bounded_unknown": 1,
+            "solution_found": 2,
+            "unsupported": 27
+          },
+          "summary_digest": "90e41625bde9e2e196dbe22ea10b105fa325f772d295c9d27eac9110ff28275a",
+          "total_wall_seconds": 0.832369,
+          "truth_pass_count": 2,
+          "worker_invocation_count": 3
+        },
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "ortools_cp_sat",
+          "case_count": 30,
+          "certified_solution_count": 7,
+          "p50_wall_seconds": 2.033933,
+          "p95_wall_seconds": 15.039418,
+          "representable_count": 30,
+          "statuses": {
+            "bounded_unknown": 14,
+            "infeasible_proven": 9,
+            "solution_found": 7
+          },
+          "summary_digest": "d7e067c571fa11895b0609a5d7d14525cca8629aa3cccf04a21a72303ca2ca5a",
+          "total_wall_seconds": 224.712725,
+          "truth_pass_count": 16,
+          "worker_invocation_count": 30
+        },
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "packingsolver_box",
+          "case_count": 30,
+          "certified_solution_count": 2,
+          "p50_wall_seconds": 0.0,
+          "p95_wall_seconds": 1.101566,
+          "representable_count": 3,
+          "statuses": {
+            "bounded_unknown": 1,
+            "solution_found": 2,
+            "unsupported": 27
+          },
+          "summary_digest": "7c6abc68317ff57d7db8c3e51817c6d23727936bce1981c112b518656cf4ef69",
+          "total_wall_seconds": 17.175285,
+          "truth_pass_count": 2,
+          "worker_invocation_count": 3
+        },
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "scip",
+          "case_count": 30,
+          "certified_solution_count": 13,
+          "p50_wall_seconds": 11.447356,
+          "p95_wall_seconds": 15.044039,
+          "representable_count": 30,
+          "statuses": {
+            "bounded_unknown": 11,
+            "infeasible_proven": 6,
+            "solution_found": 13
+          },
+          "summary_digest": "c0aeb98caf43393e2d3023507554c9b4d31d6cda514cd120901b1f7292b85ece",
+          "total_wall_seconds": 279.581628,
+          "truth_pass_count": 19,
+          "worker_invocation_count": 30
+        }
+      ],
+      "row_count": 120,
+      "summary_digest": "b14ec187ee68f75a6df840e07540ae0f894f25e193258dd3481ae52a744ba7f2"
+    },
+    "exact_controls": {
+      "candidate_count": 4,
+      "candidates": [
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "laff",
+          "case_count": 6,
+          "certified_solution_count": 1,
+          "p50_wall_seconds": 0.0,
+          "p95_wall_seconds": 0.314377,
+          "representable_count": 2,
+          "statuses": {
+            "bounded_unknown": 1,
+            "solution_found": 1,
+            "unsupported": 4
+          },
+          "summary_digest": "7a8f490acb6fa1fda3e4d293475cd578626b2562372ac3adc32348a5d048fb3a",
+          "total_wall_seconds": 0.527679,
+          "truth_pass_count": 1,
+          "worker_invocation_count": 2
+        },
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "ortools_cp_sat",
+          "case_count": 6,
+          "certified_solution_count": 5,
+          "p50_wall_seconds": 0.341828,
+          "p95_wall_seconds": 0.374583,
+          "representable_count": 6,
+          "statuses": {
+            "infeasible_proven": 1,
+            "solution_found": 5
+          },
+          "summary_digest": "f6bb4e5d2711512b024e5b640e05592140e17feb4ef37c93d58f70dcc0197478",
+          "total_wall_seconds": 2.083391,
+          "truth_pass_count": 6,
+          "worker_invocation_count": 6
+        },
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "packingsolver_box",
+          "case_count": 6,
+          "certified_solution_count": 1,
+          "p50_wall_seconds": 0.0,
+          "p95_wall_seconds": 1.093992,
+          "representable_count": 2,
+          "statuses": {
+            "bounded_unknown": 1,
+            "solution_found": 1,
+            "unsupported": 4
+          },
+          "summary_digest": "634c185a68d8ab2bc4e2de05420ed08e05ae420ae219f3bf9fa06922f9bd9ac0",
+          "total_wall_seconds": 1.183726,
+          "truth_pass_count": 1,
+          "worker_invocation_count": 2
+        },
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "scip",
+          "case_count": 6,
+          "certified_solution_count": 5,
+          "p50_wall_seconds": 0.152833,
+          "p95_wall_seconds": 0.154367,
+          "representable_count": 6,
+          "statuses": {
+            "infeasible_proven": 1,
+            "solution_found": 5
+          },
+          "summary_digest": "411bb21584daf02a691f3bff69a8017ef4862e33261d771dbdab60fdafc5660c",
+          "total_wall_seconds": 0.916145,
+          "truth_pass_count": 6,
+          "worker_invocation_count": 6
+        }
+      ],
+      "row_count": 24,
+      "summary_digest": "e80d76f30d8869d5af9edd9f5bc9889375a145d45842570c4728f938283249e3"
+    },
+    "regression_reference": {
+      "candidate_count": 5,
+      "candidates": [
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "current_bgig",
+          "case_count": 1,
+          "certified_solution_count": 0,
+          "p50_wall_seconds": 0.0,
+          "p95_wall_seconds": 0.0,
+          "representable_count": 0,
+          "statuses": {
+            "unsupported": 1
+          },
+          "summary_digest": "8b4e8af80cb78cb37e26fd6aa677512ac9d67e0f7844463fe23106d513b8f97f",
+          "total_wall_seconds": 0.0,
+          "truth_pass_count": 1,
+          "worker_invocation_count": 0
+        },
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "laff",
+          "case_count": 1,
+          "certified_solution_count": 0,
+          "p50_wall_seconds": 0.0,
+          "p95_wall_seconds": 0.0,
+          "representable_count": 0,
+          "statuses": {
+            "unsupported": 1
+          },
+          "summary_digest": "33499438d637d05b2c73851204d05ccad7284a4fbef59b59fbf50a7c3dd0f704",
+          "total_wall_seconds": 0.0,
+          "truth_pass_count": 1,
+          "worker_invocation_count": 0
+        },
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "ortools_cp_sat",
+          "case_count": 1,
+          "certified_solution_count": 0,
+          "p50_wall_seconds": 0.0,
+          "p95_wall_seconds": 0.0,
+          "representable_count": 0,
+          "statuses": {
+            "unsupported": 1
+          },
+          "summary_digest": "0d8203021a1e6c614204bd700db54ab9e9d3fecf0558c02cdb088c09f69abd05",
+          "total_wall_seconds": 0.0,
+          "truth_pass_count": 1,
+          "worker_invocation_count": 0
+        },
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "packingsolver_box",
+          "case_count": 1,
+          "certified_solution_count": 0,
+          "p50_wall_seconds": 0.0,
+          "p95_wall_seconds": 0.0,
+          "representable_count": 0,
+          "statuses": {
+            "unsupported": 1
+          },
+          "summary_digest": "d1be07e57c296902a4f2efdd886164b66391bf1053cf0825545de82d0c187655",
+          "total_wall_seconds": 0.0,
+          "truth_pass_count": 1,
+          "worker_invocation_count": 0
+        },
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "scip",
+          "case_count": 1,
+          "certified_solution_count": 0,
+          "p50_wall_seconds": 0.0,
+          "p95_wall_seconds": 0.0,
+          "representable_count": 0,
+          "statuses": {
+            "unsupported": 1
+          },
+          "summary_digest": "f992926ac92baef8b104fbbf972c2cd9c2e1305c80c60dacd515b4986c3ee0e1",
+          "total_wall_seconds": 0.0,
+          "truth_pass_count": 1,
+          "worker_invocation_count": 0
+        }
+      ],
+      "row_count": 5,
+      "summary_digest": "430f59e30a9fed97d44520e79ef6319aa96bded240b09170cb4daab39ab69f1f"
+    },
+    "tuning": {
+      "candidate_count": 4,
+      "candidates": [
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "laff",
+          "case_count": 20,
+          "certified_solution_count": 2,
+          "p50_wall_seconds": 0.0,
+          "p95_wall_seconds": 0.282912,
+          "representable_count": 2,
+          "statuses": {
+            "solution_found": 2,
+            "unsupported": 18
+          },
+          "summary_digest": "9c6089fbc36290201f5793a453b5fdbf4fcc1386aa0cad9c589c38f4a30b9f8a",
+          "total_wall_seconds": 0.605844,
+          "truth_pass_count": 2,
+          "worker_invocation_count": 2
+        },
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "ortools_cp_sat",
+          "case_count": 20,
+          "certified_solution_count": 0,
+          "p50_wall_seconds": 30.025835,
+          "p95_wall_seconds": 30.040603,
+          "representable_count": 20,
+          "statuses": {
+            "bounded_unknown": 20
+          },
+          "summary_digest": "aed7db187394796c84d804e3fb1daef14b6ae6ac9627d4e3c35e54458e3d8876",
+          "total_wall_seconds": 600.553086,
+          "truth_pass_count": 0,
+          "worker_invocation_count": 20
+        },
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "packingsolver_box",
+          "case_count": 20,
+          "certified_solution_count": 2,
+          "p50_wall_seconds": 0.0,
+          "p95_wall_seconds": 1.096766,
+          "representable_count": 2,
+          "statuses": {
+            "solution_found": 2,
+            "unsupported": 18
+          },
+          "summary_digest": "e7d87f52a6903a7fe83ab142a521fb40f14e588cecdbdd59bb828fd7a56823ba",
+          "total_wall_seconds": 2.194983,
+          "truth_pass_count": 2,
+          "worker_invocation_count": 2
+        },
+        {
+          "candidate_failure_count": 0,
+          "candidate_id": "scip",
+          "case_count": 20,
+          "certified_solution_count": 0,
+          "p50_wall_seconds": 30.023105,
+          "p95_wall_seconds": 30.053685,
+          "representable_count": 20,
+          "statuses": {
+            "bounded_unknown": 20
+          },
+          "summary_digest": "98cb0c9c38eb5d35ac48f4e9f1ce117c730ea254f51d0c6034aeeb82cebe7b14",
+          "total_wall_seconds": 552.123781,
+          "truth_pass_count": 0,
+          "worker_invocation_count": 20
+        }
+      ],
+      "row_count": 80,
+      "summary_digest": "c139a848159dc7be5c47e8263dd2a4dbd5e913f6f03562e035cb62491fab7426"
+    }
+  },
+  "opening_receipt": {
+    "case_count": 40,
+    "holdout_opening_count": 1,
+    "manifest_digest": "d4324eebbc0412b02b7ed6bdbd16eacf1b90146a9a45ed8ad6bff542e19fc0f9",
+    "opening_receipt_digest": "e5a52f3ec34167e631cdf2109f5681cfb1b6ee9f2f1820334c011e481ba53444",
+    "post_open_tuning_allowed": false,
+    "schema_version": "bgig.real_3d_holdout_opening_receipt.v1",
+    "sealed_holdout_digest": "c5c23831d30396f56c265b5e6f79dad81fafd53600cd2e2f7e310e8e8cb8d0f8",
+    "selection_digest": "e061f9af67e9ce80974a8ea2c5fe705ba59a637dbba319464a412651b6fa7140"
+  },
+  "portfolio_vs_primary": {
+    "common_case_count": 40,
+    "comparison_digest": "c455aa6e121d4c6b7bbe4f4e10e4337bb744125a008f993a0f5e657caa747e4f",
+    "details": [
+      {
+        "case_id": "p64-l08d-holdout-access-holdout-large",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-access-holdout-negative",
+        "first_status": "infeasible_proven",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-access-holdout-small",
+        "first_status": "solution_found",
+        "quality_relation": "tie",
+        "second_status": "solution_found"
+      },
+      {
+        "case_id": "p64-l08d-holdout-access-holdout-xl",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-fragmentation-holdout-large",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-fragmentation-holdout-negative",
+        "first_status": "infeasible_proven",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-fragmentation-holdout-small",
+        "first_status": "solution_found",
+        "quality_relation": "tie",
+        "second_status": "solution_found"
+      },
+      {
+        "case_id": "p64-l08d-holdout-fragmentation-holdout-xl",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-layers-holdout-large",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-layers-holdout-negative",
+        "first_status": "infeasible_proven",
+        "quality_relation": "not_comparable",
+        "second_status": "infeasible_proven"
+      },
+      {
+        "case_id": "p64-l08d-holdout-layers-holdout-small",
+        "first_status": "solution_found",
+        "quality_relation": "tie",
+        "second_status": "solution_found"
+      },
+      {
+        "case_id": "p64-l08d-holdout-layers-holdout-xl",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-many-assets-holdout-large",
+        "first_status": "solution_found",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-many-assets-holdout-negative",
+        "first_status": "infeasible_proven",
+        "quality_relation": "not_comparable",
+        "second_status": "infeasible_proven"
+      },
+      {
+        "case_id": "p64-l08d-holdout-many-assets-holdout-small",
+        "first_status": "solution_found",
+        "quality_relation": "tie",
+        "second_status": "solution_found"
+      },
+      {
+        "case_id": "p64-l08d-holdout-many-assets-holdout-xl",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-many-containers-holdout-large",
+        "first_status": "solution_found",
+        "quality_relation": "second_better",
+        "second_status": "solution_found"
+      },
+      {
+        "case_id": "p64-l08d-holdout-many-containers-holdout-negative",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "infeasible_proven"
+      },
+      {
+        "case_id": "p64-l08d-holdout-many-containers-holdout-small",
+        "first_status": "solution_found",
+        "quality_relation": "first_better",
+        "second_status": "solution_found"
+      },
+      {
+        "case_id": "p64-l08d-holdout-many-containers-holdout-xl",
+        "first_status": "solution_found",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-mixed-extreme-holdout-large",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-mixed-extreme-holdout-negative",
+        "first_status": "infeasible_proven",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-mixed-extreme-holdout-small",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-mixed-extreme-holdout-xl",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-real-anonymized-holdout-large",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "solution_found"
+      },
+      {
+        "case_id": "p64-l08d-holdout-real-anonymized-holdout-negative",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-real-anonymized-holdout-small",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "solution_found"
+      },
+      {
+        "case_id": "p64-l08d-holdout-real-anonymized-holdout-xl",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-reservations-holdout-large",
+        "first_status": "solution_found",
+        "quality_relation": "tie",
+        "second_status": "solution_found"
+      },
+      {
+        "case_id": "p64-l08d-holdout-reservations-holdout-negative",
+        "first_status": "infeasible_proven",
+        "quality_relation": "not_comparable",
+        "second_status": "infeasible_proven"
+      },
+      {
+        "case_id": "p64-l08d-holdout-reservations-holdout-small",
+        "first_status": "solution_found",
+        "quality_relation": "tie",
+        "second_status": "solution_found"
+      },
+      {
+        "case_id": "p64-l08d-holdout-reservations-holdout-xl",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-support-holdout-large",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-support-holdout-negative",
+        "first_status": "infeasible_proven",
+        "quality_relation": "not_comparable",
+        "second_status": "infeasible_proven"
+      },
+      {
+        "case_id": "p64-l08d-holdout-support-holdout-small",
+        "first_status": "solution_found",
+        "quality_relation": "tie",
+        "second_status": "solution_found"
+      },
+      {
+        "case_id": "p64-l08d-holdout-support-holdout-xl",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-variants-holdout-large",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-variants-holdout-negative",
+        "first_status": "infeasible_proven",
+        "quality_relation": "not_comparable",
+        "second_status": "infeasible_proven"
+      },
+      {
+        "case_id": "p64-l08d-holdout-variants-holdout-small",
+        "first_status": "solution_found",
+        "quality_relation": "tie",
+        "second_status": "solution_found"
+      },
+      {
+        "case_id": "p64-l08d-holdout-variants-holdout-xl",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      }
+    ],
+    "first_total_wall_seconds": 654.304456,
+    "first_truth_gain_count": 5,
+    "first_truth_loss_count": 3,
+    "functional_gain_demonstrated": true,
+    "no_functional_loss": false,
+    "quality_gain_demonstrated": false,
+    "quality_loss_count": 1,
+    "quality_win_count": 1,
+    "second_total_wall_seconds": 771.490159
+  },
+  "recovery": {
+    "baseline_worker_reexecution_count": 0,
+    "candidate_settings_changed": false,
+    "contract_rule_reapplied": "portfolio_only_if_no_loss_and_better_than_primary",
+    "external_results_changed": false,
+    "external_worker_reexecution_count": 0,
+    "family_routes_changed": false,
+    "holdout_campaign_digest": "1b9e2c722e43632fa44c56046cbba6098d406577694bfd846c09730c895c448c",
+    "initial_evidence_digest": "508c9b1e8834051c22b9c168055d87abb8319785be7d0346cf7159b687db89bb",
+    "initial_open_baseline_comparison_invalidated": true,
+    "initial_selected_vs_current_bgig_invalidated": true,
+    "post_open_tuning_count": 0,
+    "private_holdout_reopen_count": 0,
+    "reason": "baseline_consumed_formal_corpus_bound_instead_of_solving",
+    "recovery_script_sha256": "056347fda74356fbbc3e703254ccc74a400a561bea7b8de573b98e1fb9097b08",
+    "sanitized_baseline_row_count": 10,
+    "selection_changed": false,
+    "selection_digest": "e061f9af67e9ce80974a8ea2c5fe705ba59a637dbba319464a412651b6fa7140"
+  },
+  "retained_vs_current_bgig": {
+    "common_case_count": 40,
+    "comparison_digest": "909afc69092f844d960310a13a4cbbac40e0bde73907db2aff9238f1320af450",
+    "details": [
+      {
+        "case_id": "p64-l08d-holdout-access-holdout-large",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-access-holdout-negative",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-access-holdout-small",
+        "first_status": "solution_found",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-access-holdout-xl",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-fragmentation-holdout-large",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-fragmentation-holdout-negative",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-fragmentation-holdout-small",
+        "first_status": "solution_found",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-fragmentation-holdout-xl",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-layers-holdout-large",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-layers-holdout-negative",
+        "first_status": "infeasible_proven",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-layers-holdout-small",
+        "first_status": "solution_found",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-layers-holdout-xl",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-many-assets-holdout-large",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-many-assets-holdout-negative",
+        "first_status": "infeasible_proven",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-many-assets-holdout-small",
+        "first_status": "solution_found",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-many-assets-holdout-xl",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-many-containers-holdout-large",
+        "first_status": "solution_found",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-many-containers-holdout-negative",
+        "first_status": "infeasible_proven",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-many-containers-holdout-small",
+        "first_status": "solution_found",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-many-containers-holdout-xl",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-mixed-extreme-holdout-large",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-mixed-extreme-holdout-negative",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-mixed-extreme-holdout-small",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-mixed-extreme-holdout-xl",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-real-anonymized-holdout-large",
+        "first_status": "solution_found",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-real-anonymized-holdout-negative",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-real-anonymized-holdout-small",
+        "first_status": "solution_found",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-real-anonymized-holdout-xl",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-reservations-holdout-large",
+        "first_status": "solution_found",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-reservations-holdout-negative",
+        "first_status": "infeasible_proven",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-reservations-holdout-small",
+        "first_status": "solution_found",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-reservations-holdout-xl",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-support-holdout-large",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-support-holdout-negative",
+        "first_status": "infeasible_proven",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-support-holdout-small",
+        "first_status": "solution_found",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-support-holdout-xl",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-variants-holdout-large",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-variants-holdout-negative",
+        "first_status": "infeasible_proven",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-variants-holdout-small",
+        "first_status": "solution_found",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      },
+      {
+        "case_id": "p64-l08d-holdout-variants-holdout-xl",
+        "first_status": "bounded_unknown",
+        "quality_relation": "not_comparable",
+        "second_status": "bounded_unknown"
+      }
+    ],
+    "first_total_wall_seconds": 771.490159,
+    "first_truth_gain_count": 18,
+    "first_truth_loss_count": 0,
+    "functional_gain_demonstrated": true,
+    "no_functional_loss": true,
+    "quality_gain_demonstrated": false,
+    "quality_loss_count": 0,
+    "quality_win_count": 0,
+    "second_total_wall_seconds": 4.74809
+  },
+  "schema_version": "bgig.real_3d_tournament_evidence.v1",
+  "selection": {
+    "artifact_bundle_digest": "1d557b77c3e1c9c4b4fd16e656e222a3928d917a4f6a9275915c7b47bd9f6932",
+    "code_bundle_digest": "b4072636f5f36fe3b42f6956398406aeeb4a86c6af34f63772e280ec65ab24be",
+    "complement_candidate_ids": [
+      "ortools_cp_sat",
+      "laff"
+    ],
+    "config_digest": "1c257a41074d34163177679d8b71581b6673cb36a3f35d7b5e653b0976b463ea",
+    "external_candidate_count": 4,
+    "external_candidate_ids": [
+      "ortools_cp_sat",
+      "scip",
+      "packingsolver_box",
+      "laff"
+    ],
+    "external_family_count": 4,
+    "family_metrics": {
+      "laff": {
+        "access": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 0,
+          "metric_digest": "ca11681507f7ca59cf64e9b39af4a191f5ab53c02802b581fdf32deaa75ecefd",
+          "representable_count": 0,
+          "semantically_complete": false,
+          "total_wall_seconds": 0.0,
+          "truth_pass_count": 0
+        },
+        "fragmentation": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 0,
+          "metric_digest": "ca11681507f7ca59cf64e9b39af4a191f5ab53c02802b581fdf32deaa75ecefd",
+          "representable_count": 0,
+          "semantically_complete": false,
+          "total_wall_seconds": 0.0,
+          "truth_pass_count": 0
+        },
+        "layers": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 0,
+          "metric_digest": "ca11681507f7ca59cf64e9b39af4a191f5ab53c02802b581fdf32deaa75ecefd",
+          "representable_count": 0,
+          "semantically_complete": false,
+          "total_wall_seconds": 0.0,
+          "truth_pass_count": 0
+        },
+        "many-assets": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 0,
+          "metric_digest": "ca11681507f7ca59cf64e9b39af4a191f5ab53c02802b581fdf32deaa75ecefd",
+          "representable_count": 0,
+          "semantically_complete": false,
+          "total_wall_seconds": 0.0,
+          "truth_pass_count": 0
+        },
+        "many-containers": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 3,
+          "metric_digest": "b5747568b84b7a7045d3e424dc1096fdde7d6cb79c835220d8b42083d20de97b",
+          "representable_count": 4,
+          "semantically_complete": true,
+          "total_wall_seconds": 1.115281,
+          "truth_pass_count": 3
+        },
+        "mixed-extreme": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 0,
+          "metric_digest": "ca11681507f7ca59cf64e9b39af4a191f5ab53c02802b581fdf32deaa75ecefd",
+          "representable_count": 0,
+          "semantically_complete": false,
+          "total_wall_seconds": 0.0,
+          "truth_pass_count": 0
+        },
+        "real-anonymized": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 0,
+          "metric_digest": "ca11681507f7ca59cf64e9b39af4a191f5ab53c02802b581fdf32deaa75ecefd",
+          "representable_count": 0,
+          "semantically_complete": false,
+          "total_wall_seconds": 0.0,
+          "truth_pass_count": 0
+        },
+        "reservations": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 0,
+          "metric_digest": "ca11681507f7ca59cf64e9b39af4a191f5ab53c02802b581fdf32deaa75ecefd",
+          "representable_count": 0,
+          "semantically_complete": false,
+          "total_wall_seconds": 0.0,
+          "truth_pass_count": 0
+        },
+        "support": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 0,
+          "metric_digest": "ca11681507f7ca59cf64e9b39af4a191f5ab53c02802b581fdf32deaa75ecefd",
+          "representable_count": 0,
+          "semantically_complete": false,
+          "total_wall_seconds": 0.0,
+          "truth_pass_count": 0
+        },
+        "variants": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 0,
+          "metric_digest": "ca11681507f7ca59cf64e9b39af4a191f5ab53c02802b581fdf32deaa75ecefd",
+          "representable_count": 0,
+          "semantically_complete": false,
+          "total_wall_seconds": 0.0,
+          "truth_pass_count": 0
+        }
+      },
+      "ortools_cp_sat": {
+        "access": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 1,
+          "metric_digest": "3462857df72554eb9077e43b1acedc52381f00b3de16f04e7e00eddd344c5a25",
+          "representable_count": 4,
+          "semantically_complete": true,
+          "total_wall_seconds": 46.674897,
+          "truth_pass_count": 2
+        },
+        "fragmentation": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 1,
+          "metric_digest": "7bada7e5bbb689cfee75ad8b69b79bd78a0eb3a9433f458ae60f178a4a821e9f",
+          "representable_count": 4,
+          "semantically_complete": true,
+          "total_wall_seconds": 46.588482,
+          "truth_pass_count": 2
+        },
+        "layers": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 1,
+          "metric_digest": "2de421f24a4828b6d74308011aa166903a2164ef5463fc27c240634746db560f",
+          "representable_count": 4,
+          "semantically_complete": true,
+          "total_wall_seconds": 46.790821,
+          "truth_pass_count": 2
+        },
+        "many-assets": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 1,
+          "metric_digest": "8f6466c8f97ba4da2aba0d53597988c64569074154f0400b1185af7c3f30a767",
+          "representable_count": 4,
+          "semantically_complete": true,
+          "total_wall_seconds": 46.424821,
+          "truth_pass_count": 2
+        },
+        "many-containers": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 0,
+          "metric_digest": "35be891de8be86337f17024baafe749069b804e5988f80751a1c08213348cc03",
+          "representable_count": 4,
+          "semantically_complete": true,
+          "total_wall_seconds": 60.806512,
+          "truth_pass_count": 1
+        },
+        "mixed-extreme": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 0,
+          "metric_digest": "db987a72a901e85a3a6ec4897f12f924367b88ac72dd9d01a69b45486477a5d9",
+          "representable_count": 4,
+          "semantically_complete": true,
+          "total_wall_seconds": 63.089448,
+          "truth_pass_count": 1
+        },
+        "real-anonymized": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 0,
+          "metric_digest": "bb138458510edfb7aff35ec7c8f259a0c087a17dc8c4f6f31d9146ff06d2e67f",
+          "representable_count": 4,
+          "semantically_complete": true,
+          "total_wall_seconds": 75.106751,
+          "truth_pass_count": 0
+        },
+        "reservations": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 1,
+          "metric_digest": "da97d9e58d8b3ef843af097b1d23da14ae735614a11f2b167b2d441b4157da9a",
+          "representable_count": 4,
+          "semantically_complete": true,
+          "total_wall_seconds": 46.470013,
+          "truth_pass_count": 2
+        },
+        "support": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 1,
+          "metric_digest": "c1d739596524aa6506f0582a8a6d4d40df33dd0c51c002ac3527b29cccb683cb",
+          "representable_count": 4,
+          "semantically_complete": true,
+          "total_wall_seconds": 46.551234,
+          "truth_pass_count": 2
+        },
+        "variants": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 1,
+          "metric_digest": "45fa372d0aefe51e8b790fdc8cd9db282424ec3e8109d5c5d5385e1f87cf5312",
+          "representable_count": 4,
+          "semantically_complete": true,
+          "total_wall_seconds": 46.460729,
+          "truth_pass_count": 2
+        }
+      },
+      "packingsolver_box": {
+        "access": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 0,
+          "metric_digest": "ca11681507f7ca59cf64e9b39af4a191f5ab53c02802b581fdf32deaa75ecefd",
+          "representable_count": 0,
+          "semantically_complete": false,
+          "total_wall_seconds": 0.0,
+          "truth_pass_count": 0
+        },
+        "fragmentation": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 0,
+          "metric_digest": "ca11681507f7ca59cf64e9b39af4a191f5ab53c02802b581fdf32deaa75ecefd",
+          "representable_count": 0,
+          "semantically_complete": false,
+          "total_wall_seconds": 0.0,
+          "truth_pass_count": 0
+        },
+        "layers": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 0,
+          "metric_digest": "ca11681507f7ca59cf64e9b39af4a191f5ab53c02802b581fdf32deaa75ecefd",
+          "representable_count": 0,
+          "semantically_complete": false,
+          "total_wall_seconds": 0.0,
+          "truth_pass_count": 0
+        },
+        "many-assets": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 0,
+          "metric_digest": "ca11681507f7ca59cf64e9b39af4a191f5ab53c02802b581fdf32deaa75ecefd",
+          "representable_count": 0,
+          "semantically_complete": false,
+          "total_wall_seconds": 0.0,
+          "truth_pass_count": 0
+        },
+        "many-containers": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 3,
+          "metric_digest": "e846a92f72d1453f783532adda5cb1f5d4a62f1051f39d84649bbb851efaa430",
+          "representable_count": 4,
+          "semantically_complete": true,
+          "total_wall_seconds": 18.272051,
+          "truth_pass_count": 3
+        },
+        "mixed-extreme": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 0,
+          "metric_digest": "ca11681507f7ca59cf64e9b39af4a191f5ab53c02802b581fdf32deaa75ecefd",
+          "representable_count": 0,
+          "semantically_complete": false,
+          "total_wall_seconds": 0.0,
+          "truth_pass_count": 0
+        },
+        "real-anonymized": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 0,
+          "metric_digest": "ca11681507f7ca59cf64e9b39af4a191f5ab53c02802b581fdf32deaa75ecefd",
+          "representable_count": 0,
+          "semantically_complete": false,
+          "total_wall_seconds": 0.0,
+          "truth_pass_count": 0
+        },
+        "reservations": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 0,
+          "metric_digest": "ca11681507f7ca59cf64e9b39af4a191f5ab53c02802b581fdf32deaa75ecefd",
+          "representable_count": 0,
+          "semantically_complete": false,
+          "total_wall_seconds": 0.0,
+          "truth_pass_count": 0
+        },
+        "support": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 0,
+          "metric_digest": "ca11681507f7ca59cf64e9b39af4a191f5ab53c02802b581fdf32deaa75ecefd",
+          "representable_count": 0,
+          "semantically_complete": false,
+          "total_wall_seconds": 0.0,
+          "truth_pass_count": 0
+        },
+        "variants": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 0,
+          "metric_digest": "ca11681507f7ca59cf64e9b39af4a191f5ab53c02802b581fdf32deaa75ecefd",
+          "representable_count": 0,
+          "semantically_complete": false,
+          "total_wall_seconds": 0.0,
+          "truth_pass_count": 0
+        }
+      },
+      "scip": {
+        "access": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 1,
+          "metric_digest": "ede3f18519cc7c1d0c539027512301bf3309aac58c0266af408ffff25e6c2623",
+          "representable_count": 4,
+          "semantically_complete": true,
+          "total_wall_seconds": 51.893701,
+          "truth_pass_count": 1
+        },
+        "fragmentation": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 1,
+          "metric_digest": "fd70898233382b88c5b16400f8225e14ee86cd94b341f4700be540bd80444831",
+          "representable_count": 4,
+          "semantically_complete": true,
+          "total_wall_seconds": 63.480052,
+          "truth_pass_count": 1
+        },
+        "layers": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 1,
+          "metric_digest": "fe44c29f2456b61128747c46d1eb2c416408bce783019fecd717e96112e46b80",
+          "representable_count": 4,
+          "semantically_complete": true,
+          "total_wall_seconds": 51.56293,
+          "truth_pass_count": 2
+        },
+        "many-assets": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 2,
+          "metric_digest": "1320fefe56cac7c2178a8ac42fa91a5a48e542e9f5e4ee14c73237a24a5453e0",
+          "representable_count": 4,
+          "semantically_complete": true,
+          "total_wall_seconds": 51.926285,
+          "truth_pass_count": 3
+        },
+        "many-containers": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 2,
+          "metric_digest": "8cfb7b1d71ea46b5222de389105a20c0b4d48ee792a480cc2ee91ea51e3b80a8",
+          "representable_count": 4,
+          "semantically_complete": true,
+          "total_wall_seconds": 60.42139,
+          "truth_pass_count": 3
+        },
+        "mixed-extreme": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 0,
+          "metric_digest": "08c9d7379fca17ddf8195f681746cc001b623698eb8aaca19f6789ea442282f1",
+          "representable_count": 4,
+          "semantically_complete": true,
+          "total_wall_seconds": 41.901112,
+          "truth_pass_count": 0
+        },
+        "real-anonymized": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 2,
+          "metric_digest": "3b8efaaa107a96622b7ed6dae8835c0744d7b25e0725230bf513496d68935b8d",
+          "representable_count": 4,
+          "semantically_complete": true,
+          "total_wall_seconds": 74.342887,
+          "truth_pass_count": 2
+        },
+        "reservations": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 2,
+          "metric_digest": "913f60eba77d39b5655cb3b9a3882b497700bd8243714e1a4525724f0a12acff",
+          "representable_count": 4,
+          "semantically_complete": true,
+          "total_wall_seconds": 51.891445,
+          "truth_pass_count": 3
+        },
+        "support": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 1,
+          "metric_digest": "1edee3e9184bb3390cc42b4beaa43d3331b6dda30d58ab949c931457779137f8",
+          "representable_count": 4,
+          "semantically_complete": true,
+          "total_wall_seconds": 54.013723,
+          "truth_pass_count": 2
+        },
+        "variants": {
+          "candidate_failure_count": 0,
+          "case_count": 4,
+          "certified_solution_count": 1,
+          "metric_digest": "d2434b16ba318ccaf277d77bc51598cd5707924ee2e1b8d0b32149339ed75b2b",
+          "representable_count": 4,
+          "semantically_complete": true,
+          "total_wall_seconds": 53.952502,
+          "truth_pass_count": 2
+        }
+      }
+    },
+    "family_routes": {
+      "access": "ortools_cp_sat",
+      "fragmentation": "ortools_cp_sat",
+      "layers": "ortools_cp_sat",
+      "many-assets": "scip",
+      "many-containers": "laff",
+      "mixed-extreme": "ortools_cp_sat",
+      "real-anonymized": "scip",
+      "reservations": "scip",
+      "support": "ortools_cp_sat",
+      "variants": "ortools_cp_sat"
+    },
+    "family_winners": {
+      "access": "ortools_cp_sat",
+      "fragmentation": "ortools_cp_sat",
+      "layers": "ortools_cp_sat",
+      "many-assets": "scip",
+      "many-containers": "laff",
+      "mixed-extreme": "ortools_cp_sat",
+      "real-anonymized": "scip",
+      "reservations": "scip",
+      "support": "ortools_cp_sat",
+      "variants": "ortools_cp_sat"
+    },
+    "holdout_limits": {
+      "memory_mebibytes": 1024,
+      "profile": "selected_tuning_seed",
+      "threads": 1,
+      "wall_seconds": 30.0
+    },
+    "holdout_opened": false,
+    "manifest_digest": "d4324eebbc0412b02b7ed6bdbd16eacf1b90146a9a45ed8ad6bff542e19fc0f9",
+    "open_portfolio_vs_current_bgig": {
+      "common_case_count": 40,
+      "comparison_digest": "e24cbc1d404e28977619b7ab9f56c43ad7373652a42fca9c8a16f80519afe3a7",
+      "details": [
+        {
+          "case_id": "p64-l08d-discovery-access-large",
+          "first_status": "bounded_unknown",
+          "quality_relation": "not_comparable",
+          "second_status": "bounded_unknown"
+        },
+        {
+          "case_id": "p64-l08d-discovery-access-negative",
+          "first_status": "infeasible_proven",
+          "quality_relation": "not_comparable",
+          "second_status": "infeasible_proven"
+        },
+        {
+          "case_id": "p64-l08d-discovery-access-small",
+          "first_status": "solution_found",
+          "quality_relation": "not_comparable",
+          "second_status": "bounded_unknown"
+        },
+        {
+          "case_id": "p64-l08d-discovery-fragmentation-large",
+          "first_status": "bounded_unknown",
+          "quality_relation": "not_comparable",
+          "second_status": "bounded_unknown"
+        },
+        {
+          "case_id": "p64-l08d-discovery-fragmentation-negative",
+          "first_status": "infeasible_proven",
+          "quality_relation": "not_comparable",
+          "second_status": "infeasible_proven"
+        },
+        {
+          "case_id": "p64-l08d-discovery-fragmentation-small",
+          "first_status": "solution_found",
+          "quality_relation": "not_comparable",
+          "second_status": "bounded_unknown"
+        },
+        {
+          "case_id": "p64-l08d-discovery-layers-large",
+          "first_status": "bounded_unknown",
+          "quality_relation": "not_comparable",
+          "second_status": "bounded_unknown"
+        },
+        {
+          "case_id": "p64-l08d-discovery-layers-negative",
+          "first_status": "infeasible_proven",
+          "quality_relation": "not_comparable",
+          "second_status": "infeasible_proven"
+        },
+        {
+          "case_id": "p64-l08d-discovery-layers-small",
+          "first_status": "solution_found",
+          "quality_relation": "not_comparable",
+          "second_status": "bounded_unknown"
+        },
+        {
+          "case_id": "p64-l08d-discovery-many-assets-large",
+          "first_status": "solution_found",
+          "quality_relation": "not_comparable",
+          "second_status": "bounded_unknown"
+        },
+        {
+          "case_id": "p64-l08d-discovery-many-assets-negative",
+          "first_status": "infeasible_proven",
+          "quality_relation": "not_comparable",
+          "second_status": "infeasible_proven"
+        },
+        {
+          "case_id": "p64-l08d-discovery-many-assets-small",
+          "first_status": "solution_found",
+          "quality_relation": "not_comparable",
+          "second_status": "bounded_unknown"
+        },
+        {
+          "case_id": "p64-l08d-discovery-many-containers-large",
+          "first_status": "solution_found",
+          "quality_relation": "not_comparable",
+          "second_status": "bounded_unknown"
+        },
+        {
+          "case_id": "p64-l08d-discovery-many-containers-negative",
+          "first_status": "bounded_unknown",
+          "quality_relation": "not_comparable",
+          "second_status": "infeasible_proven"
+        },
+        {
+          "case_id": "p64-l08d-discovery-many-containers-small",
+          "first_status": "solution_found",
+          "quality_relation": "not_comparable",
+          "second_status": "bounded_unknown"
+        },
+        {
+          "case_id": "p64-l08d-discovery-mixed-extreme-large",
+          "first_status": "bounded_unknown",
+          "quality_relation": "not_comparable",
+          "second_status": "bounded_unknown"
+        },
+        {
+          "case_id": "p64-l08d-discovery-mixed-extreme-negative",
+          "first_status": "infeasible_proven",
+          "quality_relation": "not_comparable",
+          "second_status": "infeasible_proven"
+        },
+        {
+          "case_id": "p64-l08d-discovery-mixed-extreme-small",
+          "first_status": "bounded_unknown",
+          "quality_relation": "not_comparable",
+          "second_status": "bounded_unknown"
+        },
+        {
+          "case_id": "p64-l08d-discovery-real-anonymized-large",
+          "first_status": "solution_found",
+          "quality_relation": "not_comparable",
+          "second_status": "bounded_unknown"
+        },
+        {
+          "case_id": "p64-l08d-discovery-real-anonymized-negative",
+          "first_status": "bounded_unknown",
+          "quality_relation": "not_comparable",
+          "second_status": "infeasible_proven"
+        },
+        {
+          "case_id": "p64-l08d-discovery-real-anonymized-small",
+          "first_status": "solution_found",
+          "quality_relation": "not_comparable",
+          "second_status": "bounded_unknown"
+        },
+        {
+          "case_id": "p64-l08d-discovery-reservations-large",
+          "first_status": "solution_found",
+          "quality_relation": "not_comparable",
+          "second_status": "bounded_unknown"
+        },
+        {
+          "case_id": "p64-l08d-discovery-reservations-negative",
+          "first_status": "infeasible_proven",
+          "quality_relation": "not_comparable",
+          "second_status": "infeasible_proven"
+        },
+        {
+          "case_id": "p64-l08d-discovery-reservations-small",
+          "first_status": "solution_found",
+          "quality_relation": "not_comparable",
+          "second_status": "bounded_unknown"
+        },
+        {
+          "case_id": "p64-l08d-discovery-support-large",
+          "first_status": "bounded_unknown",
+          "quality_relation": "not_comparable",
+          "second_status": "bounded_unknown"
+        },
+        {
+          "case_id": "p64-l08d-discovery-support-negative",
+          "first_status": "infeasible_proven",
+          "quality_relation": "not_comparable",
+          "second_status": "infeasible_proven"
+        },
+        {
+          "case_id": "p64-l08d-discovery-support-small",
+          "first_status": "solution_found",
+          "quality_relation": "not_comparable",
+          "second_status": "bounded_unknown"
+        },
+        {
+          "case_id": "p64-l08d-discovery-variants-large",
+          "first_status": "bounded_unknown",
+          "quality_relation": "not_comparable",
+          "second_status": "bounded_unknown"
+        },
+        {
+          "case_id": "p64-l08d-discovery-variants-negative",
+          "first_status": "infeasible_proven",
+          "quality_relation": "not_comparable",
+          "second_status": "infeasible_proven"
+        },
+        {
+          "case_id": "p64-l08d-discovery-variants-small",
+          "first_status": "solution_found",
+          "quality_relation": "not_comparable",
+          "second_status": "bounded_unknown"
+        },
+        {
+          "case_id": "p64-l08d-tuning-access-xl",
+          "first_status": "bounded_unknown",
+          "quality_relation": "not_comparable",
+          "second_status": "bounded_unknown"
+        },
+        {
+          "case_id": "p64-l08d-tuning-fragmentation-xl",
+          "first_status": "bounded_unknown",
+          "quality_relation": "not_comparable",
+          "second_status": "bounded_unknown"
+        },
+        {
+          "case_id": "p64-l08d-tuning-layers-xl",
+          "first_status": "bounded_unknown",
+          "quality_relation": "not_comparable",
+          "second_status": "bounded_unknown"
+        },
+        {
+          "case_id": "p64-l08d-tuning-many-assets-xl",
+          "first_status": "bounded_unknown",
+          "quality_relation": "not_comparable",
+          "second_status": "bounded_unknown"
+        },
+        {
+          "case_id": "p64-l08d-tuning-many-containers-xl",
+          "first_status": "solution_found",
+          "quality_relation": "not_comparable",
+          "second_status": "bounded_unknown"
+        },
+        {
+          "case_id": "p64-l08d-tuning-mixed-extreme-xl",
+          "first_status": "bounded_unknown",
+          "quality_relation": "not_comparable",
+          "second_status": "bounded_unknown"
+        },
+        {
+          "case_id": "p64-l08d-tuning-real-anonymized-xl",
+          "first_status": "bounded_unknown",
+          "quality_relation": "not_comparable",
+          "second_status": "bounded_unknown"
+        },
+        {
+          "case_id": "p64-l08d-tuning-reservations-xl",
+          "first_status": "bounded_unknown",
+          "quality_relation": "not_comparable",
+          "second_status": "bounded_unknown"
+        },
+        {
+          "case_id": "p64-l08d-tuning-support-xl",
+          "first_status": "bounded_unknown",
+          "quality_relation": "not_comparable",
+          "second_status": "bounded_unknown"
+        },
+        {
+          "case_id": "p64-l08d-tuning-variants-xl",
+          "first_status": "bounded_unknown",
+          "quality_relation": "not_comparable",
+          "second_status": "bounded_unknown"
+        }
+      ],
+      "first_total_wall_seconds": 475.431509,
+      "first_truth_gain_count": 14,
+      "first_truth_loss_count": 2,
+      "functional_gain_demonstrated": true,
+      "no_functional_loss": false,
+      "quality_gain_demonstrated": false,
+      "quality_loss_count": 0,
+      "quality_win_count": 0,
+      "second_total_wall_seconds": 4.476269
+    },
+    "post_selection_tuning_allowed": false,
+    "primary_candidate_id": "scip",
+    "primary_full_semantic_coverage": true,
+    "product_gate_by_selected_candidate": {
+      "laff": "benchmark_only_pending_epl_edl_review",
+      "ortools_cp_sat": "product_eligible_apache_2_0",
+      "scip": "benchmark_only_pending_native_notices"
+    },
+    "schema_version": "bgig.real_3d_tournament_selection.v1",
+    "selected_candidate_ids": [
+      "scip",
+      "ortools_cp_sat",
+      "laff"
+    ],
+    "selected_trial_by_candidate": {
+      "laff": "wide-seed-6419",
+      "ortools_cp_sat": "wide-seed-6419",
+      "packingsolver_box": "wide-seed-6419",
+      "scip": "balanced-seed-6408"
+    },
+    "selection_decision": "sealed_full_coverage_candidate",
+    "selection_digest": "e061f9af67e9ce80974a8ea2c5fe705ba59a637dbba319464a412651b6fa7140"
+  },
+  "verdict": {
+    "benchmark_winner_demonstrated": true,
+    "decision": "negative_no_product_integrable_winner",
+    "portfolio_beats_primary": false,
+    "product_integration_authorized": false,
+    "retained_candidate_ids": [
+      "scip"
+    ],
+    "retained_product_redistribution_ready": false,
+    "verdict_digest": "0a66249b68797b3d8b45cd920dcfad13fc2e6dd5c8293174923edec2a0794ebf"
+  }
+}

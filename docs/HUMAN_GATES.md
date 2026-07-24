@@ -1144,3 +1144,20 @@ fois un portefeuille gagnant sur le corpus 3D réel prêt à observer dans Fusio
 
 Statut : `superseded-by-P64-L08`, aucune action Fusion demandée maintenant.
 fusion-validated: false. print-validated: false.
+
+## P64-L08F — SCIP retenu, gate Fusion encore fermée
+
+Le holdout réel 3D a été ouvert une seule fois après sélection scellée. La
+récupération du verdict n'a rouvert aucun secret et n'a rappelé aucun worker.
+Le portefeuille est rejeté ; SCIP seul démontre 18 gains et 0 perte face au
+comportement BGIG corrigé.
+
+SCIP reste toutefois `benchmark-only` tant que la redistribution du paquet
+Windows, de ses dépendances natives et de ses avis n'est pas entièrement
+versionnée. P64-L08G peut fermer cette gate technique sans modifier le
+benchmark. Thomas n'a aucune manipulation à faire avant une intégration
+automatisée réussie et un package Fusion installé par Codex.
+
+Statut : aucune gate humaine active maintenant. Une gate Fusion sera ouverte
+uniquement si L08G intègre SCIP sans régression.
+`fusion-validated=false`. `print-validated=false`.

@@ -85,12 +85,13 @@ preuves archivées.
 - P64-L07E est conservée comme preuve d'une lane HiGHS de sol rectangulaire.
   ADR-0083 requalifie cependant L07 : ses quatre candidats ont été comparés sur
   un seul niveau et ne répondent pas à la gate de solvage 3D réel.
-- P64-L07V est suspendue. P64-L08A à L08E sont terminées : la lane
-  HiGHS de sol reste hors Auto, le corpus adversarial et son holdout sont
-  scellés, puis OR-Tools, SCIP, PackingSolver et LAFF ont réellement exécuté
-  des contrôles X/Y/Z recertifiés. Aucun gagnant n'est encore choisi et le
-  holdout reste fermé. La prochaine action est P64-L08F, tournoi ouvert,
-  sélection scellée puis ouverture unique du holdout.
+- P64-L07V est suspendue. P64-L08A à L08F sont terminées. Le tournoi a
+  réellement comparé OR-Tools, SCIP, PackingSolver et LAFF sur les cas limites
+  X/Y/Z, puis ouvert le holdout neuf une seule fois après sélection scellée.
+  Le portefeuille est rejeté car il perd trois vérités face à SCIP seul. SCIP
+  est le gagnant benchmark avec 18 gains et 0 perte face au vrai comportement
+  BGIG, mais sa redistribution Windows reste à fermer avant toute intégration.
+  P64-L08G possède cette gate produit ; aucune gate Fusion n'est encore ouverte.
 
 ## Vue de séquence
 
@@ -150,7 +151,8 @@ preuves archivées.
 | Terminé — audit | P64-L08C | Shortlist 3D conditionnelle ; aucun gagnant ni build lourd. |
 | Terminé — corpus | P64-L08D | 41 cas ouverts, 40 privés scellés, témoins 3D et bornes négatives. |
 | Terminé — adaptateurs | P64-L08E | Quatre moteurs/familles exécutés en X/Y/Z ; contrôles recertifiés, refus explicites, holdout fermé. |
-| Prochaine — tournoi | P64-L08F | Régressions, discovery, tuning, sélection scellée puis ouverture unique du holdout. |
+| Terminé — gagnant benchmark | P64-L08F | SCIP retenu : +18/−0 face à BGIG ; portefeuille rejeté à +5/−3 face à SCIP ; gate produit encore fermée. |
+| Prochaine — gate produit | P64-L08G | Fermer les avis/dépendances Windows SCIP sans changer le benchmark ; intégrer et préparer Fusion seulement si cette gate passe. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 

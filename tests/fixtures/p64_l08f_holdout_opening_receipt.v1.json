@@ -1,0 +1,10 @@
+{
+  "case_count": 40,
+  "holdout_opening_count": 1,
+  "manifest_digest": "d4324eebbc0412b02b7ed6bdbd16eacf1b90146a9a45ed8ad6bff542e19fc0f9",
+  "opening_receipt_digest": "e5a52f3ec34167e631cdf2109f5681cfb1b6ee9f2f1820334c011e481ba53444",
+  "post_open_tuning_allowed": false,
+  "schema_version": "bgig.real_3d_holdout_opening_receipt.v1",
+  "sealed_holdout_digest": "c5c23831d30396f56c265b5e6f79dad81fafd53600cd2e2f7e310e8e8cb8d0f8",
+  "selection_digest": "e061f9af67e9ce80974a8ea2c5fe705ba59a637dbba319464a412651b6fa7140"
+}

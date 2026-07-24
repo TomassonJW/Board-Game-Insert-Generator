@@ -157,6 +157,8 @@ def main(input_path: str, output_path: str) -> None:
     for load_index, load in enumerate(variables):
         ground = model.addVar(vtype="B", name=f"ground_{load_index}")
         ground_variables.append(ground)
+        if not participants[load_index].get("ground_allowed", True):
+            model.addCons(ground == 0)
         model.addCons(load["z"] <= world[2] * (1 - ground))
         model.addCons(load["z"] >= 1 - ground)
         supports = []
@@ -193,23 +195,49 @@ def main(input_path: str, output_path: str) -> None:
                     >= load["y"] + load["depth"] - big_m * (1 - selected)
                 )
         model.addCons(quicksum(supports) >= minimum * (1 - ground))
-        if minimum >= 2:
-            contributions = []
-            for support_index, support in enumerate(variables):
-                if support_index == load_index:
-                    continue
-                selected = support_variables[(load_index, support_index)]
-                for choice_index, choice in enumerate(support["options"]):
-                    combined = model.addVar(
-                        vtype="B",
-                        name=f"support_choice_{load_index}_{support_index}_{choice_index}",
-                    )
-                    choice_selected = support["selectors"][choice_index]
-                    model.addCons(combined <= selected)
-                    model.addCons(combined <= choice_selected)
-                    model.addCons(combined >= selected + choice_selected - 1)
-                    contributions.append(combined * choice["size"][0] * choice["size"][1])
-            model.addCons(quicksum(contributions) >= load["area"] - world[0] * world[1] * ground)
+        contributions = []
+        for support_index, support in enumerate(variables):
+            if support_index == load_index:
+                continue
+            selected = support_variables[(load_index, support_index)]
+            for choice_index, choice in enumerate(support["options"]):
+                combined = model.addVar(
+                    vtype="B",
+                    name=f"support_choice_{load_index}_{support_index}_{choice_index}",
+                )
+                choice_selected = support["selectors"][choice_index]
+                model.addCons(combined <= selected)
+                model.addCons(combined <= choice_selected)
+                model.addCons(combined >= selected + choice_selected - 1)
+                contributions.append(combined * choice["size"][0] * choice["size"][1])
+        required_support_area = int(participants[load_index].get("required_support_area_mm2", 0))
+        support_requirement = required_support_area if required_support_area else load["area"]
+        model.addCons(
+            quicksum(contributions)
+            >= support_requirement - world[0] * world[1] * len(participants) * ground
+        )
+    precedence_edges = problem.get("access_precedence_edges", [])
+    removal_ranks = []
+    if precedence_edges:
+        removal_ranks = [
+            model.addVar(
+                vtype="I",
+                lb=0,
+                ub=len(participants) - 1,
+                name=f"removal_rank_{index}",
+            )
+            for index in range(len(participants))
+        ]
+        participant_index = {
+            str(participant["participant_id"]): index
+            for index, participant in enumerate(participants)
+        }
+
+        for before_id, after_id in precedence_edges:
+            model.addCons(
+                removal_ranks[participant_index[str(before_id)]]
+                < removal_ranks[participant_index[str(after_id)]]
+            )
     max_top = model.addVar(vtype="I", lb=0, ub=world[2], name="max_top")
     max_right = model.addVar(vtype="I", lb=0, ub=world[0], name="max_right")
     max_rear = model.addVar(vtype="I", lb=0, ub=world[1], name="max_rear")
@@ -252,7 +280,11 @@ def main(input_path: str, output_path: str) -> None:
                     "selected_variant_id": option["variant_id"],
                     "assigned_content_count": participant["assigned_content_count"],
                     "support_ids": support_ids,
-                    "removal_rank": world[2] - z,
+                    "removal_rank": (
+                        int(round(model.getVal(removal_ranks[index])))
+                        if removal_ranks
+                        else world[2] - z
+                    ),
                 }
             )
         raw_status = "feasible"

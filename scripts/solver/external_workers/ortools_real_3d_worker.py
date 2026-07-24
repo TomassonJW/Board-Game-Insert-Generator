@@ -93,6 +93,8 @@ def main(input_path: str, output_path: str) -> None:
     support_variables = {}
     for load_index, load in enumerate(variables):
         ground = model.new_bool_var(f"ground_{load_index}")
+        if not participants[load_index].get("ground_allowed", True):
+            model.add(ground == 0)
         model.add(load["z"] == 0).only_enforce_if(ground)
         model.add(load["z"] >= 1).only_enforce_if(ground.negated())
         supports = []
@@ -124,19 +126,39 @@ def main(input_path: str, output_path: str) -> None:
                     support["y"] + support["depth"] >= load["y"] + load["depth"]
                 ).only_enforce_if(selected)
         model.add(sum(supports) >= minimum).only_enforce_if(ground.negated())
-        if minimum >= 2:
-            contributions = []
-            for support_index, support in enumerate(variables):
-                if support_index == load_index:
-                    continue
-                selected = support_variables[(load_index, support_index)]
-                contribution = model.new_int_var(
-                    0, world[0] * world[1], f"support_area_{load_index}_{support_index}"
-                )
-                model.add(contribution == support["area"]).only_enforce_if(selected)
-                model.add(contribution == 0).only_enforce_if(selected.negated())
-                contributions.append(contribution)
+        contributions = []
+        for support_index, support in enumerate(variables):
+            if support_index == load_index:
+                continue
+            selected = support_variables[(load_index, support_index)]
+            contribution = model.new_int_var(
+                0, world[0] * world[1], f"support_area_{load_index}_{support_index}"
+            )
+            model.add(contribution == support["area"]).only_enforce_if(selected)
+            model.add(contribution == 0).only_enforce_if(selected.negated())
+            contributions.append(contribution)
+        required_support_area = int(participants[load_index].get("required_support_area_mm2", 0))
+        if required_support_area:
+            model.add(sum(contributions) >= required_support_area).only_enforce_if(ground.negated())
+        else:
             model.add(sum(contributions) >= load["area"]).only_enforce_if(ground.negated())
+    precedence_edges = problem.get("access_precedence_edges", [])
+    removal_ranks = []
+    if precedence_edges:
+        removal_ranks = [
+            model.new_int_var(0, len(participants) - 1, f"removal_rank_{index}")
+            for index in range(len(participants))
+        ]
+        model.add_all_different(removal_ranks)
+        participant_index = {
+            str(participant["participant_id"]): index
+            for index, participant in enumerate(participants)
+        }
+        for before_id, after_id in precedence_edges:
+            model.add(
+                removal_ranks[participant_index[str(before_id)]]
+                < removal_ranks[participant_index[str(after_id)]]
+            )
     top_values = []
     right_values = []
     rear_values = []
@@ -189,7 +211,9 @@ def main(input_path: str, output_path: str) -> None:
                     "selected_variant_id": option["variant_id"],
                     "assigned_content_count": participant["assigned_content_count"],
                     "support_ids": support_ids,
-                    "removal_rank": world[2] - z,
+                    "removal_rank": (
+                        solver.value(removal_ranks[index]) if removal_ranks else world[2] - z
+                    ),
                 }
             )
         raw_status = "feasible"

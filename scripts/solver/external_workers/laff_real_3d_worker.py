@@ -48,7 +48,16 @@ def main(input_path: str, output_path: str) -> None:
     java = os.environ["BGIG_LAFF_JAVA"]
     classpath = os.environ["BGIG_LAFF_CLASSPATH"]
     completed = subprocess.run(
-        [java, "-cp", classpath, "LaffReal3DWorker", str(native_input), str(native_output)],
+        [
+            java,
+            f"-Xmx{int(payload['limits']['memory_mebibytes'])}m",
+            f"-XX:ActiveProcessorCount={int(payload['limits']['threads'])}",
+            "-cp",
+            classpath,
+            "LaffReal3DWorker",
+            str(native_input),
+            str(native_output),
+        ],
         capture_output=True,
         check=False,
         text=True,

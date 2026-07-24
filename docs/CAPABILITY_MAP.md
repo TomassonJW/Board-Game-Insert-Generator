@@ -1894,7 +1894,8 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
   réservations, fragmentation et variantes sont maintenant des gates de
   corpus, pas une revendication de performance.
 - Niveau de preuve inchangé : `fusion-validated=false`,
-  `print-validated=false`.
+
+
 
 ## Mise à jour P64-L08E — exécution externe 3D recertifiée
 
@@ -1909,4 +1910,18 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
 - `C-QUALITY` : aucun gain de qualité ou de performance n'est encore revendiqué.
   Les temps des petits contrôles ne classent pas les moteurs.
 - `C-FUSION`, `C-PRINT` : inchangées ; `fusion-validated=false`,
-  `print-validated=false`.
+
+
+## Mise à jour P64-L08F — SCIP gagnant benchmark, non encore produit
+
+- `C-SOLVER` : SCIP est le meilleur moteur externe mesuré, avec 18 gains et
+  0 perte face à la baseline corrigée. Le portefeuille à trois moteurs est
+  rejeté, car il perd 3 vérités face à SCIP seul.
+- `C-QUALITY` : la gate sans recul et le fallback vers le meilleur moteur seul
+  fonctionnent ; le statut produit reste inchangé tant que la redistribution
+  SCIP n'est pas fermée.
+- `C-GRID-3D`, `C-LAYERS`, `C-STACKING` : le benchmark couvre X/Y/Z, appuis,
+  réservations, accès, variantes et forte cardinalité, sans modifier les
+  capacités produit courantes.
+- `C-FUSION`, `C-PRINT` : aucune gate n'est encore ouverte ;
+  `fusion-validated=false`, `print-validated=false` pour P64-L08.

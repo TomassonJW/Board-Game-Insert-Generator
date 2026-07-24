@@ -73,35 +73,37 @@ Preuve L07D : P64_L07D_EXTERNAL_TOURNAMENT_EVIDENCE.md.
 Preuve L07E : P64_L07E_HIGHS_PRODUCT_INTEGRATION_EVIDENCE.md.
 Preuve L08D : P64_L08D_REAL_3D_CORPUS_EVIDENCE.md.
 Preuve L08E : P64_L08E_FAITHFUL_3D_ADAPTERS_EVIDENCE.md.
+Preuve L08F : P64_L08F_REAL_3D_TOURNAMENT_EVIDENCE.md.
 Rapport final L07 : P64_L07_GOAL_FINAL_REPORT.md.
 
 ## Prochaine action recommandée
 
-### Exécuter P64-L08F — tournoi 3D ouvert puis holdout unique
+### Exécuter P64-L08G — gate produit SCIP puis intégration conditionnelle
 
-Type : mission automatisée de benchmark externe. Le holdout privé reste fermé
-pendant régressions, discovery et tuning.
+Type : mission d'audit de redistribution, intégration mesurée et préparation
+Fusion conditionnelle. Aucun nouveau tuning ni réemploi du holdout n'est
+autorisé.
 
-Objectif : comparer OR-Tools CP-SAT, SCIP, PackingSolver et LAFF sur toutes les
-familles ouvertes qu'ils représentent sans perte, sous ressources totales
-comparables. Une sortie ne compte qu'après recertification X/Y/Z complète par
-BGIG. `unsupported`, timeout, certificat rejeté et absence de solution restent
-des résultats distincts.
+Le holdout L08F est consommé. Le portefeuille externe est rejeté, car il perd
+3 vérités face à SCIP seul. SCIP est le moteur retenu : 18 gains et 0 perte face
+au comportement BGIG corrigé sur 40 cas, mais la sélection le marque encore
+`benchmark_only_pending_native_notices`.
 
-Ordre obligatoire :
+P64-L08G doit :
 
-1. régressions et contrôles exacts ;
-2. discovery sur les cas ouverts small/large/XL ;
-3. tuning sans accès au holdout ;
-4. sélection et critères scellés avec versions, workers, caps et digests ;
-5. ouverture unique du sidecar privé L08D ;
-6. verdict : vainqueur démontré, portefeuille complémentaire démontré, ou
-   résultat négatif honnête.
+1. auditer et versionner les licences, avis, dépendances natives, taille et mode
+   de redistribution du runtime SCIP/PySCIPOpt Windows déjà acquis ;
+2. refuser l'intégration si un binaire, une dépendance ou un avis reste inconnu ;
+3. si la gate passe, intégrer SCIP seul comme lane hors ligne bornée, sans
+   changer caps, certificats, tolérances, schémas ni propriété P45/P64 ;
+4. vérifier sur régressions et corpus ouverts que Rapide/Normal ne reculent pas
+   et que la nouvelle lane reste recertifiée par BGIG ;
+5. préparer et installer la gate Fusion humaine seulement après ces preuves ;
+6. sinon publier la clôture négative sans moteur produit.
 
-Aucun moteur n'est intégré dans le produit pendant L08F. P64-L08G reste seule
-propriétaire de l'intégration mesurée et de la préparation Fusion. Le cas
-11 × 34 ne résume jamais la capacité et ne reçoit aucune revendication isolée.
-
+Les résultats privés L08F ne peuvent être ni relus pour régler le moteur, ni
+rejoués. OR-Tools, PackingSolver et LAFF ne peuvent pas remplacer SCIP après
+lecture du holdout.
 ## Lots verrouillés
 
 - P64-F01A02 et F02A02 restent séparés : ils possèdent la finalisation du volume ;

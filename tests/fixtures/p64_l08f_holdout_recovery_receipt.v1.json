@@ -1,0 +1,27 @@
+{
+  "baseline_worker_reexecution_count": 0,
+  "benchmark_winner_demonstrated": true,
+  "candidate_settings_changed": false,
+  "contract_rule_reapplied": "portfolio_only_if_no_loss_and_better_than_primary",
+  "external_results_changed": false,
+  "external_worker_reexecution_count": 0,
+  "family_routes_changed": false,
+  "holdout_campaign_digest": "1b9e2c722e43632fa44c56046cbba6098d406577694bfd846c09730c895c448c",
+  "initial_evidence_digest": "508c9b1e8834051c22b9c168055d87abb8319785be7d0346cf7159b687db89bb",
+  "initial_open_baseline_comparison_invalidated": true,
+  "initial_selected_vs_current_bgig_invalidated": true,
+  "post_open_tuning_count": 0,
+  "private_holdout_reopen_count": 0,
+  "product_integration_authorized": false,
+  "reason": "baseline_consumed_formal_corpus_bound_instead_of_solving",
+  "recovered_evidence_digest": "0dbf1b45ae9135c1316051ab7e0946dfbfeafac5c785ad96ccd5d7a620acd46d",
+  "recovery_receipt_digest": "0fc672b479074f446d333bf3a8ac4bd16f8e3caeadb8f70dec4fcd9a939e5001",
+  "recovery_script_sha256": "056347fda74356fbbc3e703254ccc74a400a561bea7b8de573b98e1fb9097b08",
+  "retained_candidate_ids": [
+    "scip"
+  ],
+  "sanitized_baseline_row_count": 10,
+  "schema_version": "bgig.real_3d_holdout_recovery_receipt.v1",
+  "selection_changed": false,
+  "selection_digest": "e061f9af67e9ce80974a8ea2c5fe705ba59a637dbba319464a412651b6fa7140"
+}

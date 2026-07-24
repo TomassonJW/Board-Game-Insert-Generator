@@ -1363,3 +1363,18 @@ multi-appui, réservations haut/bas, fragmentation et variantes. Une règle abse
 reste `unsupported`, jamais projetée au sol. Cette preuve ne choisit aucun
 moteur et n'ouvre pas le holdout. La roadmap continue par L08F : régressions,
 discovery, tuning, sélection scellée puis ouverture privée unique.
+
+## Addendum 2026-07-24 — P64-L08F, SCIP gagne le benchmark
+
+Le tournoi réel 3D est terminé. SCIP, OR-Tools, PackingSolver et LAFF ont été
+mesurés sur les dix familles adversariales ; le holdout neuf de 40 cas a été
+ouvert une seule fois après sélection scellée.
+
+Une récupération de postproduction retire 10 vérités baseline obtenues par
+lecture d'une borne de corpus, sans rouvrir le holdout ni rappeler un worker.
+Le portefeuille est rejeté à +5/−3 face à SCIP. SCIP seul est retenu à +18/−0
+face à BGIG, mais reste bloqué par la gate de redistribution native Windows.
+
+La roadmap continue par L08G : fermer cette gate, intégrer SCIP seul sans
+régression puis préparer Fusion ; à défaut, clore sans moteur produit. Aucun
+résultat privé L08F ne peut servir à un nouveau réglage.

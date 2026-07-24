@@ -1,6 +1,6 @@
 # P64-L08 — benchmark réel de solvage 3D des cas limites BGIG
 
-Statut : `architecture-accepted`, `ready-for-execution` après P64-L08A.
+Statut : `executed-through-L08F`, `benchmark-winner-scip`, product gate pending in L08G.
 Autorité : ADR-0083, ADR-0068, ADR-0079.
 Capability : `C-SOLVER`, `C-LAYOUT`, `C-GRID-3D`, `C-LAYERS`, `C-STACKING`,
 `C-QUALITY`.
@@ -159,3 +159,19 @@ La gate réelle est passée seulement lorsqu'un rapport montre, sur un corpus 3D
 à forte cardinalité, un gain fonctionnel et de performance reproductible contre
 la baseline BGIG, sans perte de certificat ni couverture perdue. À défaut, le
 projet conserve le portefeuille interne et publie honnêtement l'échec.
+
+## 11. État exécuté après P64-L08F
+
+Les quatre moteurs externes ont été exécutés sur les dix familles et le holdout
+indépendant a été ouvert exactement une fois. Une récupération conforme aux
+règles préenregistrées invalide 10 preuves baseline obtenues par lecture d'une
+borne de corpus, sans réexécuter de worker ni rouvrir le privé.
+
+Le portefeuille SCIP + OR-Tools + LAFF est rejeté, car il perd 3 vérités face à
+SCIP seul. SCIP est retenu avec 18 gains et 0 perte face au comportement BGIG
+corrigé : la gate benchmark est passée. La gate produit reste fermée tant que la
+redistribution Windows native n'est pas entièrement auditée et versionnée.
+
+P64-L08G possède cette gate. Il peut intégrer SCIP seul et préparer Fusion
+uniquement si la redistribution et les non-régressions passent ; sinon il doit
+clore sans moteur produit.

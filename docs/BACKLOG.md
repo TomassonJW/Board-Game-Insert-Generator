@@ -3084,16 +3084,19 @@ implémentée et intégrée à la fois.
 
 ### P64-L08F — tournoi, sélection scellée et holdout
 
-- Statut : ready.
-- Ordre : régressions, discovery, tuning ouvert, sélection scellée, puis une
-  seule ouverture du holdout privé L08D.
-- Gate : au moins trois moteurs externes réels ; ressources comparables ; aucune
-  solution sans recertification BGIG complète ; verdict positif ou négatif
-  honnête.
+- Statut : done, automated-validated, holdout-consumed,
+  benchmark-winner-scip, product-gate-closed.
+- Résultat : quatre moteurs externes réellement comparés ; portefeuille rejeté
+  à +5/−3 face à SCIP ; SCIP retenu à +18/−0 face à BGIG corrigé.
+- Récupération : 10 preuves baseline contaminées invalidées ; aucun worker
+  rejoué, aucun secret rouvert, sélection et routes inchangées.
+- Preuve : `docs/P64_L08F_REAL_3D_TOURNAMENT_EVIDENCE.md`.
 
 ### P64-L08G — intégration mesurée et gate Fusion
 
-- Statut : planned, dépend de L08F.
-- Intégrer uniquement un gain démontré sans régression. Préparer et installer la
-  gate Fusion humaine seulement après intégration d'un vainqueur ; sinon clore
-  honnêtement sans nouveau moteur.
+- Statut : ready, dépend de la gate de redistribution SCIP Windows.
+- Auditer avis, dépendances natives, taille et package hors ligne ; intégrer
+  SCIP seul uniquement si tout est connu et si les régressions produit passent.
+- Préparer la gate Fusion seulement après intégration vérifiée ; sinon clore
+  honnêtement sans moteur produit.
+- Interdit : régler ou réutiliser le holdout consommé.

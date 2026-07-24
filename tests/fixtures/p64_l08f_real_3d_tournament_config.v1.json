@@ -1,0 +1,83 @@
+{
+  "schema_version": "bgig.real_3d_tournament_config.v1",
+  "candidate_ids": [
+    "ortools_cp_sat",
+    "scip",
+    "packingsolver_box",
+    "laff"
+  ],
+  "stages": {
+    "exact_controls": {
+      "wall_seconds": 10.0,
+      "memory_mebibytes": 1024,
+      "threads": 1,
+      "seed": 6408,
+      "profile": "balanced"
+    },
+    "regression": {
+      "wall_seconds": 30.0,
+      "memory_mebibytes": 1024,
+      "threads": 1,
+      "seed": 6408,
+      "profile": "balanced"
+    },
+    "discovery": {
+      "wall_seconds": 15.0,
+      "memory_mebibytes": 1024,
+      "threads": 1,
+      "seed": 6408,
+      "profile": "balanced"
+    },
+    "tuning_trials": [
+      {
+        "trial_id": "balanced-seed-6408",
+        "wall_seconds": 30.0,
+        "memory_mebibytes": 1024,
+        "threads": 1,
+        "seed": 6408,
+        "profile": "balanced"
+      },
+      {
+        "trial_id": "wide-seed-6419",
+        "wall_seconds": 30.0,
+        "memory_mebibytes": 1024,
+        "threads": 1,
+        "seed": 6419,
+        "profile": "wide"
+      }
+    ],
+    "holdout": {
+      "wall_seconds": 30.0,
+      "memory_mebibytes": 1024,
+      "threads": 1,
+      "profile": "selected_tuning_seed"
+    }
+  },
+  "selection": {
+    "required_families": [
+      "layers",
+      "support",
+      "reservations",
+      "access",
+      "fragmentation",
+      "variants",
+      "many-containers",
+      "many-assets",
+      "mixed-extreme",
+      "real-anonymized"
+    ],
+    "maximum_complements": 2,
+    "semantic_coverage_before_speed": true,
+    "certified_solution_before_quality": true,
+    "quality_before_speed": true,
+    "post_selection_tuning_allowed": false
+  },
+  "invariants": {
+    "external_candidate_count": 4,
+    "external_family_count": 4,
+    "heavy_processes_concurrently": 1,
+    "holdout_openings": 1,
+    "network_service_invocations": 0,
+    "global_installations": 0
+  }
+}

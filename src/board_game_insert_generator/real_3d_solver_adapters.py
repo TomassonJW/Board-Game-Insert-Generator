@@ -52,7 +52,8 @@ _ALL_RULES = frozenset(
         "rotations",
         "high_container_cardinality",
         "high_content_cardinality",
-        "reviewed_anonymized_source",
+        "content_assignment",
+        "reviewed_bgig_source",
     }
 )
 
@@ -95,6 +96,12 @@ CANDIDATE_FIDELITY = {
         ),
         "model": "native_laff_3d_levels",
     },
+}
+
+_CURRENT_BGIG_FIDELITY = {
+    "family": "current_bgig_internal_portfolio",
+    "rules": _ALL_RULES,
+    "model": "current_bgig_free_3d_beam_and_common_recertification",
 }
 
 
@@ -185,7 +192,12 @@ def prepare_real_3d_problem(
 ) -> tuple[dict[str, object] | None, tuple[str, ...]]:
     """Valide l'entree et rend explicite toute regle non representee."""
 
-    if candidate_id not in CANDIDATE_FIDELITY:
+    fidelity = (
+        _CURRENT_BGIG_FIDELITY
+        if candidate_id == "current_bgig"
+        else CANDIDATE_FIDELITY.get(candidate_id)
+    )
+    if fidelity is None:
         return None, ("unknown_candidate",)
     payload = deepcopy(dict(problem))
     supplied_problem_digest = payload.pop("problem_digest", None)
@@ -204,7 +216,7 @@ def prepare_real_3d_problem(
         or not active <= _ALL_RULES
     ):
         return None, ("invalid_real_3d_problem",)
-    unsupported = sorted(active - CANDIDATE_FIDELITY[candidate_id]["rules"])
+    unsupported = sorted(active - fidelity["rules"])
     if candidate_id in {"laff", "packingsolver_box"}:
         if payload.get("reservation_volumes"):
             unsupported.append("reservation_volumes")
@@ -221,6 +233,26 @@ def prepare_real_3d_problem(
     for participant in participants:
         if not isinstance(participant, dict) or not participant.get("variants"):
             return None, ("participant_without_variant",)
+        ground_allowed = participant.get("ground_allowed", True)
+        required_support_area = participant.get("required_support_area_mm2")
+        if not isinstance(ground_allowed, bool):
+            return None, ("invalid_ground_policy",)
+        if required_support_area is not None and (
+            not isinstance(required_support_area, int)
+            or isinstance(required_support_area, bool)
+            or required_support_area <= 0
+        ):
+            return None, ("invalid_support_area_requirement",)
+    precedence_edges = payload.get("access_precedence_edges", [])
+    participant_ids = {str(participant["participant_id"]) for participant in participants}
+    if not isinstance(precedence_edges, list) or any(
+        not isinstance(edge, list)
+        or len(edge) != 2
+        or str(edge[0]) not in participant_ids
+        or str(edge[1]) not in participant_ids
+        for edge in precedence_edges
+    ):
+        return None, ("invalid_access_precedence",)
     computed_problem_digest = canonical_digest(payload)
     if supplied_problem_digest is not None and supplied_problem_digest != computed_problem_digest:
         return None, ("problem_digest_mismatch",)
@@ -416,6 +448,8 @@ def recertify_real_3d_solution(
         if item["z"] == 0:
             if support_ids:
                 errors.append(f"ground_support:{item['participant_id']}")
+            if not participants[str(item["participant_id"])].get("ground_allowed", True):
+                errors.append(f"ground_forbidden:{item['participant_id']}")
             continue
         supports = []
         for support_id in support_ids:
@@ -426,7 +460,12 @@ def recertify_real_3d_solution(
                 supports.append(support)
         if len(supports) < int(participants[str(item["participant_id"])]["minimum_support_count"]):
             errors.append(f"support_count:{item['participant_id']}")
-        required = item["size"][0] * item["size"][1]
+        required = int(
+            participants[str(item["participant_id"])].get(
+                "required_support_area_mm2",
+                item["size"][0] * item["size"][1],
+            )
+        )
         if _covered_area(item, supports) < required:
             errors.append(f"support_coverage:{item['participant_id']}")
     if "disjoint_regions" in problem.get("active_constraints", []):
@@ -453,6 +492,15 @@ def recertify_real_3d_solution(
                     and upper.get("removal_rank", 0) >= lower.get("removal_rank", 0)
                 ):
                     errors.append(f"access:{lower['participant_id']}:{upper['participant_id']}")
+    for before_id, after_id in problem.get("access_precedence_edges", []):
+        before = by_id[str(before_id)]
+        after = by_id[str(after_id)]
+        if (
+            not isinstance(before.get("removal_rank"), int)
+            or not isinstance(after.get("removal_rank"), int)
+            or before["removal_rank"] >= after["removal_rank"]
+        ):
+            errors.append(f"precedence:{before_id}:{after_id}")
     return tuple(sorted(set(errors)))
 
 
@@ -559,11 +607,16 @@ def _report(
     solution: Mapping[str, object] | None = None,
     certification_errors: Sequence[str] = (),
 ) -> dict[str, object]:
+    fidelity = (
+        _CURRENT_BGIG_FIDELITY
+        if candidate_id == "current_bgig"
+        else CANDIDATE_FIDELITY.get(candidate_id, {})
+    )
     report = {
         "schema_version": REAL_3D_ADAPTER_REPORT_SCHEMA_V1,
         "candidate_id": candidate_id,
-        "candidate_family": CANDIDATE_FIDELITY.get(candidate_id, {}).get("family"),
-        "translation_model": CANDIDATE_FIDELITY.get(candidate_id, {}).get("model"),
+        "candidate_family": fidelity.get("family"),
+        "translation_model": fidelity.get("model"),
         "problem_digest": problem.get("problem_digest") or canonical_digest(problem),
         "artifact_bundle_digest": receipt.get("bundle_digest"),
         "status": status,
@@ -574,6 +627,11 @@ def _report(
         "execution": deepcopy(dict(execution or {})),
         "engine": deepcopy(dict(engine or {})),
         "solution": deepcopy(dict(solution or {})),
+        "quality": (
+            _solution_quality(problem, solution["placements"])
+            if solution is not None and isinstance(solution.get("placements"), list)
+            else {}
+        ),
         "recertification": {
             "attempted": status in {STATUS_SOLUTION_FOUND, STATUS_CERTIFICATE_REJECTED},
             "certified": status == STATUS_SOLUTION_FOUND,
@@ -589,6 +647,34 @@ def _report(
     }
     report["report_digest"] = canonical_digest(report)
     return report
+
+
+def _solution_quality(
+    problem: Mapping[str, object],
+    placements: Sequence[Mapping[str, object]],
+) -> dict[str, object]:
+    """Mesures communes, independantes de l'objectif propre a chaque moteur."""
+
+    max_right = max(int(item["x"]) + int(item["size"][0]) for item in placements)
+    max_rear = max(int(item["y"]) + int(item["size"][1]) for item in placements)
+    max_top = max(int(item["z"]) + int(item["size"][2]) for item in placements)
+    occupied_volume = sum(
+        int(item["size"][0]) * int(item["size"][1]) * int(item["size"][2]) for item in placements
+    )
+    envelope_volume = max_right * max_rear * max_top
+    return {
+        "complete_participant_count": len(placements),
+        "occupied_volume_mm3": occupied_volume,
+        "max_right_mm": max_right,
+        "max_rear_mm": max_rear,
+        "max_top_mm": max_top,
+        "bounding_envelope_volume_mm3": envelope_volume,
+        "bounding_envelope_fill_ratio": round(occupied_volume / envelope_volume, 9),
+        "elevated_participant_count": sum(int(item["z"]) > 0 for item in placements),
+        "world_volume_mm3": (
+            int(problem["world_mm"][0]) * int(problem["world_mm"][1]) * int(problem["world_mm"][2])
+        ),
+    }
 
 
 def _control(
