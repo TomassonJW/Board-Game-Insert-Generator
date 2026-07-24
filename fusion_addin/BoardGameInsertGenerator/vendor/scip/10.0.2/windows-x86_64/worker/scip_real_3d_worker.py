@@ -24,7 +24,7 @@ def main(input_path: str, output_path: str) -> None:
     model.setParam("limits/memory", float(limits["memory_mebibytes"]))
     model.setParam("parallel/maxnthreads", int(limits["threads"]))
     model.setParam("randomization/randomseedshift", int(limits["seed"]))
-    big_m = max(world) * 3 + 1
+    big_m = _big_m_bound(problem, world)
     variables = []
     for index, participant in enumerate(participants):
         options = choices(participant)
@@ -115,6 +115,7 @@ def main(input_path: str, output_path: str) -> None:
             model.addCons(a["z"] + a["height"] <= b["z"] + big_m * (1 - separated[4]))
             model.addCons(b["z"] + b["height"] <= a["z"] + big_m * (1 - separated[5]))
             model.addCons(quicksum(separated) >= 1)
+    _add_top_inset_constraints(model, problem, variables, big_m)
     for index, values in enumerate(variables):
         for reservation_index, reservation in enumerate(problem.get("reservation_volumes", [])):
             rx, ry, rz = reservation["x"], reservation["y"], reservation["z"]
@@ -314,6 +315,149 @@ def main(input_path: str, output_path: str) -> None:
             "placements": placements,
         },
     )
+
+
+def _big_m_bound(problem, world) -> int:
+    extent = max(int(value) for value in world)
+    if problem.get("top_inset_zones"):
+        box_origin_x, box_origin_y = problem["box_origin_xy"]
+        for zone in problem["top_inset_zones"]:
+            zone_x = int(zone["origin_xy"][0]) - int(box_origin_x)
+            zone_y = int(zone["origin_xy"][1]) - int(box_origin_y)
+            zone_width, zone_depth = (int(value) for value in zone["size_xy"])
+            extent = max(
+                extent,
+                abs(zone_x),
+                abs(zone_y),
+                abs(zone_x + zone_width),
+                abs(zone_y + zone_depth),
+                int(zone["design_top_z"]),
+            )
+    return extent * 3 + 1
+
+
+def _add_top_inset_constraints(model, problem, variables, big_m) -> None:
+    zones = problem.get("top_inset_zones", [])
+    if not zones:
+        return
+    box_origin_x, box_origin_y = problem["box_origin_xy"]
+    for zone_index, zone in enumerate(zones):
+        zone_x = int(zone["origin_xy"][0]) - int(box_origin_x)
+        zone_y = int(zone["origin_xy"][1]) - int(box_origin_y)
+        zone_width, zone_depth = (int(value) for value in zone["size_xy"])
+        support_plane = int(zone["support_plane_z"])
+        inset_depth = int(zone["inset_depth"])
+        design_top = int(zone["design_top_z"])
+        zone_supports = []
+        for body_index, values in enumerate(variables):
+            for choice_index, choice in enumerate(values["options"]):
+                profile = choice.get("top_inset_support")
+                if not isinstance(profile, dict):
+                    raise ValueError("Missing exact top-inset support profile.")
+                selected = values["selectors"][choice_index]
+                physical_width, physical_depth, physical_height = (
+                    int(value) for value in profile["physical_size"]
+                )
+                alternatives = []
+                separation_specs = (
+                    (
+                        values["x"] + physical_width,
+                        zone_x,
+                        f"left_{zone_index}_{body_index}_{choice_index}",
+                    ),
+                    (
+                        zone_x + zone_width,
+                        values["x"],
+                        f"right_{zone_index}_{body_index}_{choice_index}",
+                    ),
+                    (
+                        values["y"] + physical_depth,
+                        zone_y,
+                        f"front_{zone_index}_{body_index}_{choice_index}",
+                    ),
+                    (
+                        zone_y + zone_depth,
+                        values["y"],
+                        f"rear_{zone_index}_{body_index}_{choice_index}",
+                    ),
+                    (
+                        values["z"] + physical_height,
+                        support_plane,
+                        f"below_{zone_index}_{body_index}_{choice_index}",
+                    ),
+                )
+                for left, right, suffix in separation_specs:
+                    separated = model.addVar(vtype="B", name=f"inset_{suffix}")
+                    model.addCons(separated <= selected)
+                    model.addCons(left <= right + big_m * (1 - separated))
+                    alternatives.append(separated)
+                supports_zone = model.addVar(
+                    vtype="B",
+                    name=(f"inset_support_{zone_index}_{body_index}_{choice_index}"),
+                )
+                model.addCons(supports_zone <= selected)
+                model.addCons(values["x"] <= zone_x + zone_width - 1 + big_m * (1 - supports_zone))
+                model.addCons(
+                    values["x"] + physical_width >= zone_x + 1 - big_m * (1 - supports_zone)
+                )
+                model.addCons(values["y"] <= zone_y + zone_depth - 1 + big_m * (1 - supports_zone))
+                model.addCons(
+                    values["y"] + physical_depth >= zone_y + 1 - big_m * (1 - supports_zone)
+                )
+                model.addCons(
+                    values["z"] + physical_height <= design_top + big_m * (1 - supports_zone)
+                )
+                model.addCons(
+                    values["z"] + physical_height >= design_top - big_m * (1 - supports_zone)
+                )
+                minimum_floor = int(profile["minimum_floor"])
+                if physical_height < minimum_floor + inset_depth:
+                    model.addCons(supports_zone == 0)
+                for cavity_index, cavity in enumerate(profile["cavities"]):
+                    if physical_height >= minimum_floor + int(cavity["depth"]) + inset_depth:
+                        continue
+                    cavity_x = int(cavity["origin_xy"][0])
+                    cavity_y = int(cavity["origin_xy"][1])
+                    cavity_width, cavity_depth = (int(value) for value in cavity["size_xy"])
+                    cavity_separations = []
+                    cavity_specs = (
+                        (
+                            values["x"] + cavity_x + cavity_width,
+                            zone_x,
+                            "left",
+                        ),
+                        (
+                            zone_x + zone_width,
+                            values["x"] + cavity_x,
+                            "right",
+                        ),
+                        (
+                            values["y"] + cavity_y + cavity_depth,
+                            zone_y,
+                            "front",
+                        ),
+                        (
+                            zone_y + zone_depth,
+                            values["y"] + cavity_y,
+                            "rear",
+                        ),
+                    )
+                    for left, right, side in cavity_specs:
+                        separated = model.addVar(
+                            vtype="B",
+                            name=(
+                                f"inset_cavity_{zone_index}_{body_index}_"
+                                f"{choice_index}_{cavity_index}_{side}"
+                            ),
+                        )
+                        model.addCons(separated <= supports_zone)
+                        model.addCons(left <= right + big_m * (1 - separated))
+                        cavity_separations.append(separated)
+                    model.addCons(quicksum(cavity_separations) >= supports_zone)
+                alternatives.append(supports_zone)
+                model.addCons(quicksum(alternatives) >= selected)
+                zone_supports.append(supports_zone)
+        model.addCons(quicksum(zone_supports) >= 1)
 
 
 if __name__ == "__main__":

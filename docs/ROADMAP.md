@@ -1487,3 +1487,20 @@ P64-L09B est terminée et automatisée : le certificat commun utilise la matièr
 réelle, interdit la chute, vérifie la stabilité du pontage et ignore `has_lid`.
 P64-L09C devient la prochaine mission unique pour représenter exactement les
 réservations supérieures dans SCIP. Aucun benchmark ou holdout n'est requis.
+
+## Mise à jour P64-L09C — 2026-07-24
+
+P64-L09C est terminée et automatisée. Les réservations supérieures représentables
+atteignent désormais le vrai worker SCIP avec leurs coordonnées entières exactes,
+leur plan d'appui, leur profondeur, les épaisseurs de fond et les cavités par
+rotation. Un corps doit rester hors du prisme, sous son plan d'appui ou devenir
+un support exact au sommet ; chaque réservation exige au moins un support.
+
+Le contrôle natif CPython 3.14 / SCIP trouve une solution en une invocation. Les
+formes non représentables restent refusées sans approximation. Budgets, runtime,
+UI, tolérances, poses, CAD, benchmark et holdout sont inchangés.
+
+P64-F01B devient la prochaine mission unique : partir de l'incumbent minimal,
+introduire les réservations avant la fermeture, distribuer le volume résiduel,
+tenter une réparation locale et ne publier qu'un plan globalement recertifié
+sous un budget borné.

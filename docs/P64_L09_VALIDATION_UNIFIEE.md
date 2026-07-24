@@ -13,7 +13,7 @@ faire dans Fusion.
 | Lot | État | Preuve principale |
 | --- | --- | --- |
 | P64-L09B | automatisé — terminé | support réel, chute, pontage, stabilité, parité des voies |
-| P64-L09C | à exécuter | réservations supérieures fidèles dans SCIP |
+| P64-L09C | automatisé — terminé | réservations supérieures fidèles dans SCIP et preuve native CPython 3.14 |
 | P64-F01B | à exécuter | fermeture couplée bornée et réparation locale |
 | P64-F02B admissible | à exécuter | volume ajouté égal et ratio d'expansion égal |
 | P64-L09V | bloqué par l'implémentation | gate Fusion combinée |
@@ -40,18 +40,23 @@ Preuves acquises :
 
 ## P64-L09C — réservations supérieures SCIP
 
-À prouver :
+Preuves acquises :
 
-- [ ] `_prepare_product_problem` accepte les `top_inset_zones` représentables ;
-- [ ] chaque zone conserve exactement son origine XY, sa taille XY, son plan
-  d'appui et sa profondeur ;
-- [ ] le modèle SCIP interdit tout corps incompatible dans le prisme réservé ;
-- [ ] une cavité compatible peut recevoir la compensation Z sans réduction de
+- [x] `_prepare_product_problem` accepte les `top_inset_zones` représentables ;
+- [x] chaque zone conserve exactement son origine XY, sa taille XY, son plan
+  d’appui et sa profondeur ;
+- [x] le modèle SCIP interdit tout corps incompatible dans le prisme réservé ;
+- [x] une cavité compatible peut recevoir la compensation Z sans réduction de
   son volume ;
-- [ ] retrait, prise, paroi et fond restent certifiés par le validateur final ;
-- [ ] un cas avec plateau atteint réellement la lane SCIP ;
-- [ ] un cas non représentable reste fail-closed avec un statut borné honnête ;
-- [ ] aucune approximation silencieuse ni fallback présenté comme preuve SCIP.
+- [x] retrait, prise, paroi et fond restent certifiés par le validateur final ;
+- [x] un cas avec plateau atteint réellement la lane SCIP sous CPython 3.14 ;
+- [x] un cas non représentable reste fail-closed avec un statut borné honnête ;
+- [x] aucune approximation silencieuse ni fallback présenté comme preuve SCIP ;
+- [x] worker natif : 1/1, `solution_found`, une invocation ;
+- [x] tests ciblés : SCIP 16 cas sous Python 3.10 avec le cas natif ignoré,
+  encastrements 8/8, placement minimal 14/14 ;
+- [x] suite complète : 847/847 en 242,868 s, un test natif ignoré sous
+  Python 3.10 puis exécuté séparément 1/1 sous CPython 3.14.
 
 ## P64-F01B — fermeture couplée bornée
 

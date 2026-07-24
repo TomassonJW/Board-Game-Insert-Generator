@@ -2054,3 +2054,22 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
   `top_inset_zones` à SCIP.
 - `C-FUSION` : non validée pour L09B ; la gate combinée reste P64-L09V.
 - `C-PRINT` : inchangée, `print-validated=false`.
+
+
+## P64-L09C — réservations supérieures SCIP
+
+- `C-RESERVATION` : `implemented-product`, `automated-validated`. Origine,
+  taille, plan d'appui et profondeur sont encodés exactement dans le MIP ; un
+  support au sommet est obligatoire pour chaque zone.
+- `C-SOLVER` / `C-SOLVER-3D` : les corps incompatibles restent hors du
+  prisme ou sous son plan d'appui. Les profils de variantes et rotations lient
+  dimensions physiques, fond et cavités au solve natif.
+- `C-CERTIFICATE` : inchangée comme autorité finale ; découpes, prises, parois,
+  fonds et compensations restent recertifiés par BGIG avant publication.
+- `C-SAFETY` : géométrie non représentable fail-closed ; aucun remplissage
+  hybride non contraint sur un problème avec réservation.
+- `C-LAYOUT` : la représentation des réservations est acquise ; la fermeture
+  couplée et la réparation restent à implémenter dans P64-F01B.
+- `C-FUSION` : worker natif CPython 3.14 testé hors scène ; observation produit
+  combinée différée à P64-L09V.
+- `C-PRINT` : inchangée, `print-validated=false`.

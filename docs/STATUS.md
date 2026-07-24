@@ -3730,3 +3730,39 @@ attendait encore 1083 octets et le SHA-256 CRLF. Le manifest attend désormais l
 fichier versionné exact : 1062 octets, SHA-256
 `795e6090936bcf2e1a0bfb339053de0c5bb6f3102035ead0ecc0ed4a7c41f1b7`.
 Licence, exécutables et runtime inchangés. Garde HiGHS 5/5 et suite 834/834.
+
+
+## P64-L09C — réservations supérieures fidèles dans SCIP
+
+Statut : `implemented-product`, `automated-validated`.
+
+- `_prepare_product_problem` accepte désormais les `top_inset_zones`
+  représentables au millième de millimètre.
+- Origine XY, taille XY, plan d'appui, profondeur et sommet de conception sont
+  liés au modèle entier sans approximation.
+- Chaque corps doit rester hors de l'empreinte, sous le plan d'appui ou devenir
+  un support qui chevauche l'empreinte et atteint exactement le sommet.
+- Chaque réservation exige au moins un support. Les corps trop minces et les
+  cavités qui ne conserveraient pas profondeur plus encastrement plus fond sont
+  exclus de ce rôle.
+- Les profils conservent les dimensions physiques, l'épaisseur de fond et les
+  cavités pour chaque variante et chaque rotation.
+- Le remplissage hybride est désactivé sur les problèmes avec réservation afin
+  qu'aucun corps ne soit ajouté après SCIP sans ces contraintes.
+- Un cas plateau exécute le vrai worker SCIP sous CPython 3.14 :
+  `solution_found`, une invocation, corps porteur au sommet.
+- Tests ciblés : SCIP 16 cas sous Python 3.10 avec 1 test natif ignoré,
+  encastrements 8/8, placement minimal 14/14 ; preuve native séparée 1/1.
+- Suite complète : 847/847 en 242,868 s, avec un test natif ignoré sous
+  Python 3.10 puis exécuté séparément sous CPython 3.14.
+- Artefact worker :
+  `2303d34a20bbe80059178614793f34bec31093560af447239ffa0ad7d1cd8258` ;
+  archive native inchangée.
+- Aucun benchmark, tuning, holdout, changement de budget, runtime, UI,
+  tolérance, pose, CAD ou valeur physique.
+- Preuve : `docs/P64_L09C_SCIP_TOP_INSET_EVIDENCE.md`.
+- Fusion produit non observée ; `fusion-validated=false`,
+  `print-validated=false`.
+
+La prochaine mission unique est P64-F01B, boucle bornée de fermeture et
+réparation locale.

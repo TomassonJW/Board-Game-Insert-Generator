@@ -44,6 +44,9 @@ def choices(participant: Mapping[str, object]) -> list[dict[str, object]]:
                 "orientation": orientation,
                 "size": size,
             }
+            profiles = variant.get("top_inset_support_profiles")
+            if isinstance(profiles, Mapping):
+                candidate["top_inset_support"] = profiles[orientation]
             if candidate not in result:
                 result.append(candidate)
     return result

@@ -4,7 +4,10 @@ from dataclasses import replace
 from hashlib import sha256
 import json
 from pathlib import Path
+import os
+import sys
 import unittest
+from unittest.mock import patch
 import zipfile
 
 from board_game_insert_generator.container_internal_variants import (
@@ -13,6 +16,7 @@ from board_game_insert_generator.container_internal_variants import (
 from board_game_insert_generator.container_variant_global_search import (
     _participants_with_variant_options,
 )
+from board_game_insert_generator.free_3d_greedy_solver import TopInsetZone
 from board_game_insert_generator.free_3d_plan_adapter import prepare_free_3d_problem
 from board_game_insert_generator.incremental_project_state import canonical_digest
 from board_game_insert_generator.minimal_layout_solver import (
@@ -23,10 +27,13 @@ from board_game_insert_generator.project_v1 import blank_project_v1
 from board_game_insert_generator.scip_product_solver import (
     SCIP_PRODUCT_ARCHIVE_SHA256,
     SCIP_PRODUCT_ARTIFACT_DIGEST,
+    STATUS_BOUNDED_UNKNOWN,
     STATUS_INVALID_RUNTIME,
+    STATUS_SOLUTION_FOUND,
     _hybrid_deferred_participant_ids,
     _participant_options,
     _prepare_product_problem,
+    _top_inset_support_profile,
     configure_scip_product_runtime,
     scip_product_limits,
     solve_scip_product_3d,
@@ -195,6 +202,41 @@ class ScipProductSolverTests(unittest.TestCase):
         )
         self.assertEqual(payload["world_mm"][0], expected_world_x)
 
+    def test_top_inset_profile_preserves_floor_and_rotated_cavity(self) -> None:
+        participant = {
+            "id": "container:profile",
+            "role": "container",
+            "name": "Profile",
+            "minimum_local_mm": {"x": 20.0, "y": 30.0, "z": 10.0},
+            "dimension_modes": {"x": "fixed", "y": "fixed", "z": "fixed"},
+            "target_local_mm": {"x": 24.0, "y": 34.0, "z": 15.0},
+            "top_inset_search_hint_v1": {
+                "floor_thickness_mm": 2.0,
+                "cavities": [
+                    {
+                        "local_origin_mm": {"x": 3.0, "y": 4.0, "z": 2.0},
+                        "inner_dimensions_mm": {"x": 5.0, "y": 6.0, "z": 7.0},
+                    }
+                ],
+            },
+        }
+
+        option = _participant_options(participant)[0]
+        profile = _top_inset_support_profile(option, "yxz")
+
+        self.assertEqual(profile["physical_size"], [34000, 24000, 15000])
+        self.assertEqual(profile["minimum_floor"], 2000)
+        self.assertEqual(
+            profile["cavities"],
+            [
+                {
+                    "origin_xy": [22000, 5000],
+                    "size_xy": [6000, 5000],
+                    "depth": 7000,
+                }
+            ],
+        )
+
     def test_hybrid_repeated_fill_keeps_two_anchor_representatives(self) -> None:
         project = _stacking_project()
         project["container_groups"] = [
@@ -265,15 +307,169 @@ class ScipProductSolverTests(unittest.TestCase):
         self.assertEqual([value.variant_id for value in options], ["fits"])
         self.assertEqual(options[0].local_size_mm, (12.0, 12.0, 12.0))
 
-    def test_localized_top_inset_is_rejected_without_approximation(self) -> None:
+    def test_localized_top_inset_is_encoded_exactly_without_approximation(self) -> None:
         preparation = prepare_free_3d_problem(_stacking_project())
-        problem = replace(preparation.problem, top_inset_zones=({"id": "zone"},))
+        zone = TopInsetZone((10.0, 12.0), (20.0, 18.0), 52.0, 3.0)
+        problem = replace(preparation.problem, top_inset_zones=(zone,))
+
         prepared, rejection = _prepare_product_problem(
             problem.participants,
             problem,
         )
+
+        self.assertEqual(rejection, "")
+        self.assertIsNotNone(prepared)
+        self.assertEqual(
+            prepared.payload["top_inset_zones"],
+            [
+                {
+                    "zone_id": "top-inset:0",
+                    "origin_xy": [10000, 12000],
+                    "size_xy": [20000, 18000],
+                    "support_plane_z": 52000,
+                    "inset_depth": 3000,
+                    "design_top_z": 55000,
+                }
+            ],
+        )
+        self.assertIn("top_inset_support", prepared.payload["active_constraints"])
+        self.assertEqual(_hybrid_deferred_participant_ids(prepared), ())
+        for participant in prepared.payload["participants"]:
+            for variant in participant["variants"]:
+                profiles = variant["top_inset_support_profiles"]
+                self.assertEqual(
+                    set(profiles),
+                    set(variant["allowed_rotations"]),
+                )
+                self.assertGreaterEqual(profiles["xyz"]["minimum_floor"], 0)
+
+    def test_non_representable_top_inset_fails_closed(self) -> None:
+        preparation = prepare_free_3d_problem(_stacking_project())
+        zone = TopInsetZone((10.0005, 12.0), (20.0, 18.0), 52.0, 3.0)
+        problem = replace(preparation.problem, top_inset_zones=(zone,))
+
+        prepared, rejection = _prepare_product_problem(
+            problem.participants,
+            problem,
+        )
+
         self.assertIsNone(prepared)
-        self.assertEqual(rejection, "top_inset_reservations_not_supported")
+        self.assertEqual(rejection, "product_geometry_not_exactly_representable")
+
+    def test_project_with_tray_reaches_the_scip_lane(self) -> None:
+        project = _stacking_project()
+        project["flat_items"] = [
+            {
+                "id": "tray",
+                "name": "Plateau",
+                "kind": "board",
+                "dimensions_mm": {"x": 20.0, "y": 18.0, "z": 3.0},
+                "quantity": 1,
+                "stack_order": None,
+                "origin_mm": {"x": 10.0, "y": 12.0},
+                "rotation_deg_z": 0,
+            }
+        ]
+        preparation = prepare_free_3d_problem(project)
+        self.assertEqual(preparation.status, "ready")
+        configure_scip_product_runtime(ROOT)
+        worker_output = {
+            "status": "unknown",
+            "proof_status": "bounded",
+            "engine_status": "timelimit",
+            "placements": [],
+            "worker_invocation_count": 1,
+        }
+
+        with (
+            patch.object(scip_product_module, "_runtime_error", return_value=None),
+            patch.object(
+                scip_product_module,
+                "_invoke_worker",
+                return_value=worker_output,
+            ) as worker,
+        ):
+            execution = solve_scip_product_3d(
+                preparation.problem.participants,
+                preparation.problem,
+                effort_profile="quick",
+            )
+
+        self.assertEqual(execution.status, STATUS_BOUNDED_UNKNOWN)
+        self.assertEqual(execution.stop_reason, "strict_product_model_no_solution_within_budget")
+        self.assertEqual(execution.invocation_count, 1)
+        worker.assert_called_once()
+
+    @unittest.skipUnless(
+        os.name == "nt" and sys.version_info[:2] == (3, 14),
+        "requires the Fusion CPython 3.14 runtime",
+    )
+    def test_real_cp314_top_inset_model_finds_a_supporting_body(self) -> None:
+        preparation = prepare_free_3d_problem(_stacking_project())
+        participant = {
+            "id": "container:tray-support",
+            "role": "container",
+            "container_group_id": "tray-support",
+            "name": "Support plateau",
+            "minimum_local_mm": {"x": 40.0, "y": 40.0, "z": 55.0},
+            "dimension_modes": {"x": "fixed", "y": "fixed", "z": "fixed"},
+            "target_local_mm": {"x": 40.0, "y": 40.0, "z": 55.0},
+            "top_inset_search_hint_v1": {
+                "floor_thickness_mm": 2.0,
+                "cavities": [],
+            },
+        }
+        zone = TopInsetZone((10.0, 12.0), (20.0, 18.0), 52.0, 3.0)
+        problem = replace(
+            preparation.problem,
+            participants=(participant,),
+            top_inset_zones=(zone,),
+        )
+        installed_runtime = (
+            Path(os.environ["APPDATA"])
+            / "Autodesk"
+            / "Autodesk Fusion 360"
+            / "API"
+            / "AddIns"
+            / "BoardGameInsertGenerator"
+            / "vendor"
+            / "scip"
+            / "10.0.2"
+            / "windows-x86_64"
+            / "runtime"
+        )
+        if not installed_runtime.is_dir():
+            self.skipTest("installed Fusion SCIP runtime is unavailable")
+        configure_scip_product_runtime(
+            installed_runtime,
+            artifact_path=VENDOR / "ARTIFACT.json",
+            worker_root=VENDOR / "worker",
+            scratch_root=ROOT / ".codex-work",
+        )
+
+        execution = solve_scip_product_3d(
+            problem.participants,
+            problem,
+            effort_profile="quick",
+        )
+        self.assertEqual(
+            execution.status,
+            STATUS_SOLUTION_FOUND,
+            execution.stop_reason,
+        )
+        self.assertEqual(execution.invocation_count, 1)
+        self.assertEqual(len(execution.placements), 1)
+        placement = execution.placements[0]
+        self.assertAlmostEqual(
+            placement.origin_mm[2] + placement.world_size_mm[2],
+            problem.storage_height_mm,
+            places=3,
+        )
+        self.assertLess(placement.origin_mm[0], zone.origin_xy_mm[0] + zone.size_xy_mm[0])
+        self.assertGreater(
+            placement.origin_mm[0] + placement.world_size_mm[0],
+            zone.origin_xy_mm[0],
+        )
 
     def test_cp314_runtime_fails_closed_then_internal_solver_remains_available(self) -> None:
         configure_scip_product_runtime(
@@ -347,7 +543,10 @@ class ScipProductSolverTests(unittest.TestCase):
         self.assertTrue(receipt["generated_from_public_data_only"])
         self.assertFalse(receipt["private_project_data_in_repo"])
         self.assertFalse(receipt["holdout_read"])
-        self.assertEqual(receipt["runtime_artifact_digest"], SCIP_PRODUCT_ARTIFACT_DIGEST)
+        self.assertEqual(
+            receipt["runtime_artifact_digest"],
+            "05d4566e93efef2b6606b0d1807abaaf29bc460c37accee31da20ae2a6462065",
+        )
         result = receipt["result"]
         self.assertEqual(result["status"], "solution_found")
         self.assertEqual(result["placement_count"], 28)

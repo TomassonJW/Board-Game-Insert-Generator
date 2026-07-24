@@ -122,8 +122,14 @@ preuves archivées.
   dans les voies internes, la fermeture continue, SCIP et le certificat commun.
   Les plans historiques non conformes sont rétrogradés sans faux impossible.
   Suite complète : 843/843.
-- La prochaine mission unique est P64-L09C : représenter fidèlement les
-  réservations supérieures dans SCIP. Aucun benchmark ni holdout n'est requis.
+- P64-L09C est implemented-product et automated-validated : les réservations
+  supérieures représentables atteignent le worker SCIP avec coordonnées entières,
+  fonds et cavités par rotation. Le contrôle natif CPython 3.14 trouve un corps
+  porteur au sommet en une invocation. Les formes non représentables restent
+  fail-closed ; benchmark et holdout non exécutés.
+- La prochaine mission unique est P64-F01B : boucle bornée depuis l'incumbent
+  minimal, introduction des réservations, expansion, réparation locale et
+  certificat global avant matérialisation.
 
 ## Vue de séquence
 
@@ -193,7 +199,8 @@ preuves archivées.
 | Terminée — gate Fusion de performance | P64-L08LV | Environ 25 s puis 34 s dans Fusion 0.1.62 ; plafond corrigé, portée géométrique limitée. |
 | Terminée — architecture | P64-L09A | ADR-0087 : matière porteuse, réservations SCIP et fermeture couplée bornée. |
 | Terminée — automatisée | P64-L09B | Chute interdite ; rebords, faces pleines et pontage stable certifiés sur matière réelle. |
-| Prochaine — réservations SCIP | P64-L09C | Représenter exactement les réservations supérieures dans la lane produit. |
+| Terminée — automatisée | P64-L09C | Réservations exactes dans SCIP, fonds et cavités protégés, preuve native CPython 3.14. |
+| Prochaine — fermeture couplée | P64-F01B | Incumbent, réservations, expansion, réparation locale et certificat global borné. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 

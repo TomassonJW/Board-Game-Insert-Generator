@@ -3218,12 +3218,17 @@ implémentée et intégrée à la fois.
 ### P64-L09C — Réservations supérieures dans SCIP
 
 - Dépendance : P64-L09B terminée.
-- Objectif : représenter fidèlement top_inset_zones dans la lane produit au lieu
-  de retourner top_inset_reservations_not_supported.
-- Acceptation : le cas plateau atteint SCIP, empreinte/profondeur/retrait/prise
-  restent exacts, aucune cavité/paroi/fond percé et statut borné honnête.
-- Validation à maintenir dans docs/P64_L09_VALIDATION_UNIFIEE.md.
-- Statut : ready.
+- Livré : zones entières exactes, profils de fond et de cavités par variante et
+  rotation, disjonction hors prisme/sous plan/support au sommet et au moins un
+  support par réservation.
+- Protection : corps trop mince et cavité non compensable exclus ; remplissage
+  hybride désactivé sur ce périmètre ; validation BGIG finale inchangée.
+- Preuves : cas plateau natif CPython 3.14/SCIP `solution_found` en une
+  invocation, non-représentable fail-closed, 16 tests SCIP, 8 encastrements et
+  14 placements minimaux.
+- Non-objectifs : aucun benchmark, holdout, budget, UI, tolérance, pose ou CAD.
+- Preuve : docs/P64_L09C_SCIP_TOP_INSET_EVIDENCE.md.
+- Statut : implemented-product, automated-validated, fusion-validated=false.
 
 ### P64-F01B — Boucle bornée de fermeture et réparation
 
@@ -3233,7 +3238,7 @@ implémentée et intégrée à la fois.
 - Acceptation : cavités inchangées, expansions sur faces admissibles, réparation
   locale avant solve global, itérations bornées et aucun plan incomplet
   matérialisable.
-- Statut : `planned-after-P64-L09C`.
+- Statut : ready.
 
 ### P64-F02B — Objectifs équilibrés, proportionnels et modulaires
 

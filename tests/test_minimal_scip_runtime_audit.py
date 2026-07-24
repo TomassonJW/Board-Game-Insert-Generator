@@ -38,14 +38,20 @@ class MinimalScipRuntimeAuditTests(unittest.TestCase):
             ["Model", "SCIP_PARAMEMPHASIS", "quicksum"],
         )
         for key in (
-            "add_var_call_count",
             "variable_types",
             "nonlinear_products",
             "forbidden_decision_operators",
             "banned_dependency_tokens_found",
-            "active_3d_semantics",
         ):
             self.assertEqual(live[key], recorded[key])
+        self.assertEqual(
+            live["add_var_call_count"],
+            recorded["add_var_call_count"] + 3,
+        )
+        self.assertEqual(
+            live["active_3d_semantics"],
+            [*recorded["active_3d_semantics"], "localized_top_inset_support"],
+        )
         self.assertTrue(live["linear_integer_model_gate_passed"])
         self.assertTrue(recorded["linear_integer_model_gate_passed"])
         self.assertEqual(recorded["variable_types"], ["B", "I"])
@@ -54,6 +60,7 @@ class MinimalScipRuntimeAuditTests(unittest.TestCase):
         self.assertEqual(len(recorded["active_3d_semantics"]), 7)
         self.assertIn("multi_level_z_placement", recorded["active_3d_semantics"])
         self.assertIn("support_count_and_area", recorded["active_3d_semantics"])
+        self.assertIn("localized_top_inset_support", live["active_3d_semantics"])
 
     def test_source_and_build_inputs_are_fully_locked(self) -> None:
         sources = self.evidence["source_artifacts"]

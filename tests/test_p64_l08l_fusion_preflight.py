@@ -29,6 +29,10 @@ class P64L08LFusionPreflightTests(unittest.TestCase):
         self.assertEqual(summary["container_count"], 28)
         self.assertEqual(summary["content_count"], 30)
         self.assertEqual(summary["runtime_artifact_digest"], SCIP_PRODUCT_ARTIFACT_DIGEST)
+        self.assertEqual(
+            summary["source_receipt_artifact_digest"],
+            "05d4566e93efef2b6606b0d1807abaaf29bc460c37accee31da20ae2a6462065",
+        )
         self.assertEqual(summary["runtime_archive_sha256"], SCIP_PRODUCT_ARCHIVE_SHA256)
         self.assertEqual(summary["expected_effort"], "deep")
         self.assertEqual(summary["expected_external_status"], "solution_found")

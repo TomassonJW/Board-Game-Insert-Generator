@@ -18,6 +18,7 @@ from typing import Callable, Mapping, Sequence
 from board_game_insert_generator.free_3d_beam_solver import VariantFree3DPlacement
 from board_game_insert_generator.free_3d_greedy_solver import (
     Free3DPlacement,
+    TopInsetZone,
     _support_at,
 )
 from board_game_insert_generator.free_3d_plan_adapter import Free3DPreparedProblem
@@ -29,8 +30,8 @@ SCIP_PRODUCT_PYSCIPOPT_VERSION = "6.2.1"
 SCIP_PRODUCT_SOPLEX_VERSION = "8.0.2"
 SCIP_PRODUCT_NUMPY_VERSION = "2.5.1"
 SCIP_PRODUCT_FAMILY = "constraint_integer_programming"
-SCIP_PRODUCT_MODEL = "integer_xyz_big_m_disjunction_and_explicit_support"
-SCIP_PRODUCT_ARTIFACT_DIGEST = "05d4566e93efef2b6606b0d1807abaaf29bc460c37accee31da20ae2a6462065"
+SCIP_PRODUCT_MODEL = "integer_xyz_big_m_disjunction_explicit_support_and_top_insets"
+SCIP_PRODUCT_ARTIFACT_DIGEST = "2303d34a20bbe80059178614793f34bec31093560af447239ffa0ad7d1cd8258"
 SCIP_PRODUCT_ARCHIVE_SHA256 = "0a718ea5884d6326d66777db0ab853a31fa981e6392b89f184342fde27d465c6"
 
 STATUS_NOT_CONFIGURED = "not_configured"
@@ -76,6 +77,9 @@ class _ProductOption:
     name: str
     variant_id: str
     local_size_mm: tuple[float, float, float]
+    minimum_local_size_mm: tuple[float, float, float]
+    floor_thickness_mm: float
+    cavities: tuple[tuple[float, float, float, float, float], ...]
     variant_digest: str
     variant_canonical: bool
 
@@ -378,8 +382,6 @@ def _prepare_product_problem(
     participants: Sequence[Mapping[str, object]],
     problem: Free3DPreparedProblem,
 ) -> tuple[_PreparedProductProblem | None, str]:
-    if problem.top_inset_zones:
-        return None, "top_inset_reservations_not_supported"
     if not 1 <= len(participants) <= _MAX_PARTICIPANT_COUNT:
         return None, "participant_count_outside_scip_product_cap"
     try:
@@ -400,6 +402,12 @@ def _prepare_product_problem(
         ]
         xy_ticks = _scaled_exact(xy_clearance)
         z_ticks = _scaled_exact(z_clearance)
+        box_origin_ticks = _scaled_exact(box_clearance)
+        top_inset_zones = _worker_top_inset_zones(problem)
+        layout = problem.project["layout"]
+        if not isinstance(layout, Mapping):
+            raise ValueError("Product layout must be a mapping.")
+        default_floor = _exact_mm(float(layout["default_floor_thickness_mm"]))
         worker_participants = []
         option_records: dict[tuple[str, str], _ProductOption] = {}
         participant_records: dict[str, dict[str, object]] = {}
@@ -409,7 +417,10 @@ def _prepare_product_problem(
             if participant_id in participant_records:
                 return None, "duplicate_participant_id"
             participant_records[participant_id] = participant
-            options = _participant_options(participant)
+            options = _participant_options(
+                participant,
+                default_floor_mm=default_floor,
+            )
             worker_variants = []
             for option in options:
                 key = (participant_id, option.variant_id)
@@ -430,6 +441,19 @@ def _prepare_product_problem(
                         "variant_id": option.variant_id,
                         "size": padded,
                         "allowed_rotations": rotations,
+                        **(
+                            {
+                                "top_inset_support_profiles": {
+                                    orientation: _top_inset_support_profile(
+                                        option,
+                                        orientation,
+                                    )
+                                    for orientation in rotations
+                                }
+                            }
+                            if top_inset_zones
+                            else {}
+                        ),
                     }
                 )
             worker_participants.append(
@@ -450,6 +474,8 @@ def _prepare_product_problem(
         "p45_variant_front",
         "rotations",
     ]
+    if top_inset_zones:
+        active_constraints.append("top_inset_support")
     if len(worker_participants) >= 24:
         active_constraints.append("high_container_cardinality")
     payload: dict[str, object] = {
@@ -458,6 +484,14 @@ def _prepare_product_problem(
         "participants": worker_participants,
         "active_constraints": active_constraints,
         "reservation_volumes": [],
+        **(
+            {
+                "top_inset_zones": top_inset_zones,
+                "box_origin_xy": [box_origin_ticks, box_origin_ticks],
+            }
+            if top_inset_zones
+            else {}
+        ),
         "access_policy": "unconstrained",
         "access_precedence_edges": [],
         "project_mode": "cold",
@@ -484,14 +518,23 @@ def _prepare_product_problem(
     )
 
 
-def _participant_options(participant: Mapping[str, object]) -> tuple[_ProductOption, ...]:
+def _participant_options(
+    participant: Mapping[str, object],
+    *,
+    default_floor_mm: float = 0.0,
+) -> tuple[_ProductOption, ...]:
     participant_id = str(participant["id"])
     role = str(participant["role"])
     name = str(participant["name"])
     raw_variants = participant.get("container_internal_variant_options_v1")
     variants = raw_variants if role == "container" and isinstance(raw_variants, list) else []
+    hint_value = participant.get("top_inset_search_hint_v1")
+    hint = hint_value if isinstance(hint_value, Mapping) else {}
+    floor = _exact_mm(float(hint.get("floor_thickness_mm", default_floor_mm)))
     if not variants:
-        local = _resolved_local_size(participant, participant["minimum_local_mm"])
+        minimum_value = participant["minimum_local_mm"]
+        local = _resolved_local_size(participant, minimum_value)
+        minimum = _dimension_tuple(minimum_value)
         return (
             _ProductOption(
                 participant_id=participant_id,
@@ -499,6 +542,9 @@ def _participant_options(participant: Mapping[str, object]) -> tuple[_ProductOpt
                 name=name,
                 variant_id=f"canonical:{participant_id}",
                 local_size_mm=local,
+                minimum_local_size_mm=minimum,
+                floor_thickness_mm=floor,
+                cavities=_cavity_specs(hint.get("cavities", [])),
                 variant_digest="",
                 variant_canonical=True,
             ),
@@ -508,6 +554,7 @@ def _participant_options(participant: Mapping[str, object]) -> tuple[_ProductOpt
         if not isinstance(value, Mapping):
             raise ValueError("Invalid product variant option.")
         try:
+            minimum = _dimension_tuple(value["minimum_outer_envelope_mm"])
             local = _resolved_local_size(
                 participant,
                 value["minimum_outer_envelope_mm"],
@@ -523,12 +570,124 @@ def _participant_options(participant: Mapping[str, object]) -> tuple[_ProductOpt
                 name=name,
                 variant_id=str(value["variant_id"]),
                 local_size_mm=local,
+                minimum_local_size_mm=minimum,
+                floor_thickness_mm=floor,
+                cavities=_cavity_specs(value.get("cavities", hint.get("cavities", []))),
                 variant_digest=str(value["geometry_digest"]),
                 variant_canonical=bool(value.get("canonical", False)),
             )
         )
     if not result:
         raise ValueError("No product variant satisfies the fixed dimensions.")
+    return tuple(result)
+
+
+def _worker_top_inset_zones(
+    problem: Free3DPreparedProblem,
+) -> list[dict[str, object]]:
+    result: list[dict[str, object]] = []
+    box_x = _scaled_exact(float(problem.box["x"]))
+    box_y = _scaled_exact(float(problem.box["y"]))
+    design_top = _scaled_exact(problem.storage_height_mm)
+    for index, zone in enumerate(problem.top_inset_zones):
+        if not isinstance(zone, TopInsetZone):
+            raise ValueError("Invalid top-inset zone.")
+        origin = [_scaled_exact(value) for value in zone.origin_xy_mm]
+        size = [_scaled_exact(value) for value in zone.size_xy_mm]
+        support_plane = _scaled_exact(zone.support_plane_z_mm)
+        inset_depth = _scaled_exact(zone.inset_depth_mm)
+        if (
+            any(value < 0 for value in origin)
+            or any(value <= 0 for value in size)
+            or origin[0] + size[0] > box_x
+            or origin[1] + size[1] > box_y
+            or support_plane < 0
+            or inset_depth <= 0
+            or support_plane + inset_depth != design_top
+        ):
+            raise ValueError("Top-inset zone is outside exact product bounds.")
+        result.append(
+            {
+                "zone_id": f"top-inset:{index}",
+                "origin_xy": origin,
+                "size_xy": size,
+                "support_plane_z": support_plane,
+                "inset_depth": inset_depth,
+                "design_top_z": design_top,
+            }
+        )
+    return result
+
+
+def _top_inset_support_profile(
+    option: _ProductOption,
+    orientation: str,
+) -> dict[str, object]:
+    local_x, local_y, local_z = option.local_size_mm
+    minimum_x, minimum_y, _ = option.minimum_local_size_mm
+    offset_x = max(0.0, local_x - minimum_x) / 2.0
+    offset_y = max(0.0, local_y - minimum_y) / 2.0
+    cavities = []
+    for cavity_x, cavity_y, size_x, size_y, size_z in option.cavities:
+        local_cavity_x = offset_x + cavity_x
+        local_cavity_y = offset_y + cavity_y
+        if orientation == "yxz":
+            origin_xy = (
+                local_y - local_cavity_y - size_y,
+                local_cavity_x,
+            )
+            size_xy = (size_y, size_x)
+            physical_size = (local_y, local_x, local_z)
+        else:
+            origin_xy = (local_cavity_x, local_cavity_y)
+            size_xy = (size_x, size_y)
+            physical_size = (local_x, local_y, local_z)
+        cavities.append(
+            {
+                "origin_xy": [_scaled_exact(value) for value in origin_xy],
+                "size_xy": [_scaled_exact(value) for value in size_xy],
+                "depth": _scaled_exact(size_z),
+            }
+        )
+    if orientation == "yxz":
+        physical_size = (local_y, local_x, local_z)
+    else:
+        physical_size = (local_x, local_y, local_z)
+    return {
+        "physical_size": [_scaled_exact(value) for value in physical_size],
+        "minimum_floor": _scaled_exact(option.floor_thickness_mm),
+        "cavities": cavities,
+    }
+
+
+def _dimension_tuple(value: object) -> tuple[float, float, float]:
+    if not isinstance(value, Mapping):
+        raise ValueError("Product dimensions must be a mapping.")
+    return tuple(_exact_mm(float(value[axis])) for axis in ("x", "y", "z"))  # type: ignore[return-value]
+
+
+def _cavity_specs(
+    values: object,
+) -> tuple[tuple[float, float, float, float, float], ...]:
+    if not isinstance(values, list):
+        raise ValueError("Product cavities must be a list.")
+    result = []
+    for value in values:
+        if not isinstance(value, Mapping):
+            raise ValueError("Product cavity must be a mapping.")
+        origin = value.get("local_origin_mm")
+        size = value.get("inner_dimensions_mm")
+        if not isinstance(origin, Mapping) or not isinstance(size, Mapping):
+            raise ValueError("Product cavity geometry is incomplete.")
+        result.append(
+            (
+                _exact_mm(float(origin["x"])),
+                _exact_mm(float(origin["y"])),
+                _exact_mm(float(size["x"])),
+                _exact_mm(float(size["y"])),
+                _exact_mm(float(size["z"])),
+            )
+        )
     return tuple(result)
 
 
@@ -686,6 +845,7 @@ def _hybrid_deferred_participant_ids(
         not isinstance(participants, list)
         or not isinstance(world, list)
         or payload.get("reservation_volumes")
+        or payload.get("top_inset_zones")
         or payload.get("access_precedence_edges")
         or "disjoint_regions" in payload.get("active_constraints", [])
     ):

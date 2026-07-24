@@ -19,6 +19,7 @@ from board_game_insert_generator.scip_product_solver import (
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURES = ROOT / "tests" / "fixtures"
 SOURCE_CASE_ID = "real-18-containers-20-contents-normal"
+L08L_RECEIPT_ARTIFACT_DIGEST = "05d4566e93efef2b6606b0d1807abaaf29bc460c37accee31da20ae2a6462065"
 
 
 def _load(path: Path) -> dict[str, object]:
@@ -62,8 +63,8 @@ def prepare_fixture() -> tuple[dict[str, object], dict[str, object]]:
     receipt = _load(FIXTURES / "p64_l08l_scip_repeated_fill_regression.v1.json")
     source = _load(FIXTURES / "p64_l06a_reviewed_real_case.v1.json")
     _verify_digest(receipt, "receipt_digest")
-    if receipt["runtime_artifact_digest"] != SCIP_PRODUCT_ARTIFACT_DIGEST:
-        raise RuntimeError("L08L receipt uses the wrong SCIP artifact.")
+    if receipt["runtime_artifact_digest"] != L08L_RECEIPT_ARTIFACT_DIGEST:
+        raise RuntimeError("L08L receipt uses the wrong historical SCIP artifact.")
     result = receipt["result"]
     if receipt["container_count"] != 28 or receipt["content_count"] != 30:
         raise RuntimeError("L08L receipt is not the public 28x30 regression.")
@@ -86,6 +87,7 @@ def prepare_fixture() -> tuple[dict[str, object], dict[str, object]]:
         "container_count": 28,
         "content_count": 30,
         "runtime_artifact_digest": SCIP_PRODUCT_ARTIFACT_DIGEST,
+        "source_receipt_artifact_digest": L08L_RECEIPT_ARTIFACT_DIGEST,
         "runtime_archive_sha256": SCIP_PRODUCT_ARCHIVE_SHA256,
         "repeated_fill_receipt_digest": receipt["receipt_digest"],
         "expected_effort": "deep",

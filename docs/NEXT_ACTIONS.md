@@ -79,43 +79,43 @@ Preuve L08H : P64_L08H_SCIP_PACKAGE_REMEDIATION_EVIDENCE.md.
 Preuve L08I : P64_L08I_MINIMAL_SCIP_RUNTIME_AUDIT_EVIDENCE.md.
 Preuve L08J : P64_L08J_MINIMAL_SCIP_RUNTIME_BUILD_EVIDENCE.md.
 Rapport final L08 : P64_L08_GOAL_FINAL_REPORT.md.
+Preuve L09B : P64_L09B_MATERIAL_SUPPORT_EVIDENCE.md.
+Preuve L09C : P64_L09C_SCIP_TOP_INSET_EVIDENCE.md.
+Matrice L09 : P64_L09_VALIDATION_UNIFIEE.md.
 Rapport final L07 : P64_L07_GOAL_FINAL_REPORT.md.
 
 ## Prochaine action recommandée
 
-### Exécuter P64-L09C — représenter les réservations supérieures dans SCIP
+### Exécuter P64-F01B — boucle bornée de fermeture et réparation
 
-Type : correction de fidélité du modèle produit SCIP ; pas de benchmark, de
-tuning, de holdout, de nouvelle valeur physique, de CAD ni de gate Fusion.
+Type : finalisation produit couplée ; aucun benchmark, tuning, holdout, nouvelle
+valeur physique, nouvelle pose ou changement d'UI.
 
-P64-L09B est automatisée et intégrée : le certificat commun raisonne sur les
-faces pleines et les rebords réels, rejette la chute et les pontages instables,
-et reste commun aux voies internes, à la fermeture continue et à SCIP. La suite
-complète passe 843 tests sur 843.
+P64-L09B et P64-L09C sont automatisées et intégrées dans leur périmètre : les
+appuis utilisent la matière réelle et les réservations supérieures représentables
+atteignent le worker SCIP avec leurs fonds et cavités protégés. La preuve native
+CPython 3.14 trouve un support au sommet en une invocation.
 
-Le blocage suivant est exact : _prepare_product_problem refuse aujourd'hui tout
-problem.top_inset_zones avec top_inset_reservations_not_supported. Le cas avec
-plateau n'atteint donc pas le moteur SCIP et son échec ne prouve rien sur la
-géométrie.
+P64-F01B doit :
 
-P64-L09C doit :
+1. prendre le placement minimal SCIP certifié comme incumbent initial ;
+2. introduire les réservations plateaux/livrets avant toute expansion ;
+3. distribuer le volume résiduel uniquement sur des faces admissibles ;
+4. garder fixes les cavités et leurs origines certifiées ;
+5. revalider collisions, jeux, support matériel et réservations après chaque
+   proposition ;
+6. tenter une réparation locale des placements ou hauteurs avant tout nouveau
+   placement global ;
+7. borner itérations, candidats et temps sous un budget unique ;
+8. retourner `no_solution_within_budget` si aucun plan global n'est certifié ;
+9. produire la CAD IR uniquement depuis le plan final certifié ;
+10. mettre à jour `P64_L09_VALIDATION_UNIFIEE.md`, le pilotage, puis intégrer
+    directement dans main.
 
-1. définir la représentation entière exacte d'une zone par origine XY, taille
-   XY, plan d'appui et profondeur ;
-2. transmettre ces données au worker scellé sans approximation silencieuse ;
-3. empêcher tout corps incompatible d'occuper le prisme réservé ;
-4. préserver les cas où une cavité compatible reçoit sa compensation Z ;
-5. recertifier empreinte, profondeur, retrait, prise, parois, fonds et cavités ;
-6. prouver qu'un projet avec plateau atteint réellement SCIP ;
-7. conserver un refus borné et explicite pour toute forme non représentable ;
-8. garder budgets, runtime, UI, tolérances et poses inchangés ;
-9. mettre à jour P64_L09_VALIDATION_UNIFIEE.md, le pilotage, puis intégrer
-   directement dans main.
+La répartition équilibrée et proportionnelle du volume appartient ensuite à la
+partie admissible de P64-F02B. L'harmonisation modulaire reste différée.
 
-P64-F01B viendra ensuite pour construire la boucle bornée incumbent,
-réservations, expansion, réparation locale et certificat global.
-
-Aucune action humaine n'est requise pendant P64-L09C.
+Aucune action humaine n'est requise pendant P64-F01B.
 
 ## Lots verrouillés
 
