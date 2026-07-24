@@ -239,6 +239,17 @@ Les validations P64 doivent couvrir au minimum :
   de faisabilité.
 - Aucune grille, cale, corps ou relaxation implicite ne peut être ajoutée par un
   profil d'effort.
+- Une dépendance externe produit est verrouillée par version, empreintes,
+  licence et avis ; elle ne se met jamais à jour automatiquement.
+- HiGHS est appelé au plus une fois par calcul et ne supprime aucune lane
+  interne. Deep réutilise l'appel du préfixe Normal.
+- Toute proposition HiGHS repasse par le certificat BGIG commun avant le
+  classement ; une sortie brute n'est jamais publiable.
+- Une infaisabilité du modèle de sol HiGHS reste `bounded_unknown` pour le
+  produit et ne devient jamais `proven_impossible`.
+- Runtime absent, altéré, expiré ou invalide conserve le fallback BGIG.
+- Un run soumis à une limite murale externe déclare `deterministic: false` ;
+  ses temps et mémoires volatils restent hors des digests certifiables.
 
 Les régressions P64-H04+ couvrent corpus simple/dense, déterminisme, budgets,
 annulation, validation commune, non-collision, appui, retrait, réservations,

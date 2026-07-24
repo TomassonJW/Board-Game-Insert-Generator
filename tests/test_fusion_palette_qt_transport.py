@@ -76,7 +76,7 @@ class FusionPaletteQtTransportTests(unittest.TestCase):
 
     def test_manifest_identifies_the_bootstrap_and_launcher_fix(self) -> None:
         manifest = json.loads((ADDIN / "BoardGameInsertGenerator.manifest").read_text(encoding="utf-8"))
-        self.assertEqual(manifest["version"], "0.1.59")
+        self.assertEqual(manifest["version"], "0.1.60")
 
     def test_uses_native_file_dialog_only_in_the_fusion_adapter(self) -> None:
         for marker in (

@@ -1845,7 +1845,16 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
   seul ; le holdout donne 5/7 certificats dans la portée représentable.
 - C-SAFETY : le holdout est consommé après une ouverture ; aucun tuning
   postérieur, aucune double exécution et aucun portefeuille sans gain distinct.
-- Limite produit : l'interdiction de rotation du benchmark n'est pas exposée
-  dans le schéma V1 ; `product_gain_demonstrated=false`.
-- Statut : P64-L07A/B/C/D done, automated-validated ; P64-L07E next ; aucun
-  candidat externe adopté ; fusion-validated: false, print-validated: false.
+- C-SOLVER / C-QUALITY : la gate L07E commune donne deux gains de qualité
+  HiGHS, aucune perte et `product_gain_demonstrated=true`. HiGHS 1.15.1 est
+  ajouté comme proposition T0/T1 recertifiée ; toutes les lanes internes
+  restent concurrentes.
+- C-SAFETY : CLI officiel MIT verrouillé, avis redistribués, un appel maximum,
+  caps propres, aucun réseau ou install global et fallback BGIG fail-closed.
+- C-FUSION-UI : package 0.1.60 configurant le binaire Windows embarqué ;
+  aucune observation Fusion encore enregistrée.
+- C-GEOMETRY / C-CAD-IR : inchangées ; aucune forme T2-T4 et aucune nouvelle
+  revendication dense 11 × 34.
+- Statut : P64-L07A/B/C/D/E done, automated-validated ; Goal clôturé ;
+  P64-L07V ready-human-gate ; fusion-validated: false,
+  print-validated: false.

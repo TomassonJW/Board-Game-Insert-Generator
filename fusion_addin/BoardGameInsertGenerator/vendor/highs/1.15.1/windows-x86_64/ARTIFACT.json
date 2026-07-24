@@ -1,0 +1,69 @@
+{
+  "schema_version": "bgig.highs_product_artifact.v1",
+  "candidate_id": "highs",
+  "version": "1.15.1",
+  "platform": "windows-x86_64",
+  "license": "MIT",
+  "source_release": "https://github.com/ERGO-Code/HiGHS/releases/tag/v1.15.1",
+  "source_asset": "highs-1.15.1-x86_64-windows-mit.zip",
+  "source_asset_byte_count": 5517021,
+  "source_asset_sha256": "26302d9024f307e09128a45a58898917287351dcf754c55aebc07742237f78bf",
+  "files": [
+    {
+      "path": "bin/highs.exe",
+      "byte_count": 906752,
+      "sha256": "4ff24abf4cfdd5f4e87e73edf6886d1b9333c13c388b328466ca15a502b4c46d"
+    },
+    {
+      "path": "bin/highs.dll",
+      "byte_count": 10392576,
+      "sha256": "722dfd5eb66e1de2fe306d8e6e9c68085ca1b454c04e1860dd22f636557e6de5"
+    },
+    {
+      "path": "LICENSE.txt",
+      "byte_count": 1083,
+      "sha256": "dd4cdc98726c5657e39129be5bc4c1c452e8e242325807f99aeaa38605af1ca4"
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.md",
+      "byte_count": 1386,
+      "sha256": "5e74d4f12b044ca6aefb64ad0b8127f2346a7ae150170055861c4a079498d1cd"
+    },
+    {
+      "path": "licenses/CLI11-LICENSE.txt",
+      "byte_count": 1586,
+      "sha256": "88cffe4600851e8dad1b8eb1e304d54286a89d2373a1b98f59cb969b9e967b90"
+    },
+    {
+      "path": "licenses/pdqsort-LICENSE.txt",
+      "byte_count": 875,
+      "sha256": "d549bb3bfa09b4df2307e516dedef349b8e41492e9b475130d7d0281e61953dc"
+    },
+    {
+      "path": "licenses/zstr-LICENSE.txt",
+      "byte_count": 1117,
+      "sha256": "bd61d5fb15992f4c188a0f96dd836b20d449cd080b4e949ab89f9eda3f61c59a"
+    }
+  ],
+  "native_dependencies": {
+    "architecture": "PE32+",
+    "bundled": [
+      "highs.dll"
+    ],
+    "preexisting_windows_runtime": [
+      "Universal CRT (api-ms-win-crt-*.dll)",
+      "Microsoft Visual C++ Runtime 14 (MSVCP140.dll, VCRUNTIME140.dll, VCRUNTIME140_1.dll)"
+    ],
+    "delay_imports": [],
+    "dependency_install_performed_by_bgig": false,
+    "missing_dependency_behavior": "fail_closed_to_internal_bgig"
+  },
+  "runtime_contract": {
+    "account_required": false,
+    "global_install_required": false,
+    "network_required": false,
+    "service_required": false,
+    "telemetry_enabled": false,
+    "subprocess_isolation": true
+  }
+}

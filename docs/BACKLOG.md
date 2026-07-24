@@ -2950,7 +2950,8 @@ implémentée et intégrée à la fois.
 - Dépendance runtime : L06A à L06E sont terminées ; le premier Goal est clôturé.
 - Interdits : aucun solveur ou budget modifié, aucune dépendance externe
   installée, aucun T2-T4, aucune promotion d'un projet personnel.
-- Suite : le `/goal` a lancé P64-L07 ; L07A/B/C/D sont terminés et L07E est la prochaine mission atomique.
+- Suite : le `/goal` P64-L07 est clôturé ; L07A/B/C/D/E sont terminés et
+  P64-L07V reste une observation Fusion humaine facultative.
 
 ### P64-L07P — préparation du vrai benchmark externe
 
@@ -3022,21 +3023,23 @@ implémentée et intégrée à la fois.
 
 ### P64-L07E — intégration du meilleur portefeuille
 
-- Statut : ready, in-progress-by-goal.
-- Objectif : intégrer le gagnant principal et jusqu'à deux compléments.
-- Condition multi-moteurs : chaque complément gagne une famille distincte et le
-  portefeuille bat le meilleur moteur seul sous ressources comparables.
-- Gate produit : licence et redistribution, Windows hors ligne, version,
-  empreinte, avis, taille, démarrage, fallback et plan de retrait.
-- Acceptation : aucune régression, suite complète verte, ADR factuelle par
-  dépendance, rapport final, `main` poussé et SHA distant vérifié.
-- Résultat négatif valide : aucun moteur intégré si les gates échouent ; moins
-  de trois moteurs externes testés ne vaut pas benchmark terminé.
+- Statut : done, implemented-core, implemented-fusion-bridge,
+  automated-validated, product-gain-demonstrated.
+- Gate produit : cinq cas communs, deux gains de qualité HiGHS, zéro perte,
+  vérité et nombre de certificats inchangés.
+- Décision : HiGHS 1.15.1 seul ; OR-Tools sans gain distinct, SCIP et LAFF
+  benchmark-only.
+- Runtime : CLI officiel Windows x86_64 MIT, add-in 0.1.60, un appel maximum,
+  0,75 s Rapide ou 3 s Normal/Approfondi, 1 thread, 1 024 Mio.
+- Sécurité : SHA-256, avis, hors ligne, sans compte ou install global, certificat
+  BGIG commun et fallback fail-closed.
+- Preuves : ADR-0082, `docs/P64_L07E_HIGHS_PRODUCT_INTEGRATION_EVIDENCE.md` et
+  `docs/P64_L07_GOAL_FINAL_REPORT.md`.
 
 ### P64-L07V — observation Fusion éventuelle
 
-- Statut : future-human-gate.
-- Dépendance : seulement après une intégration L07E.
+- Statut : ready-human-gate, optional, non-blocking.
+- Dépendance : L07E intégrée ; package cible 0.1.60.
 - Scope : observer le comportement produit du portefeuille intégré sans
   revendiquer de validation d'impression.
 - fusion-validated: false et print-validated: false avant preuve dédiée.

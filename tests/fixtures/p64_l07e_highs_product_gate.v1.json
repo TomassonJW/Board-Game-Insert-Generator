@@ -1,0 +1,89 @@
+{
+  "schema_version": "bgig.highs_product_gate_evidence.v1",
+  "candidate": {
+    "candidate_id": "highs",
+    "family": "mixed_integer_programming",
+    "version": "1.15.1",
+    "license": "MIT",
+    "source_release": "https://github.com/ERGO-Code/HiGHS/releases/tag/v1.15.1"
+  },
+  "bindings": {
+    "config_digest": "03b40e95e8bad5b11f2bfa2c669b4509e6743c62d068ad34107fb25a9e1ced7c",
+    "manifest_digest": "828c4df787b07b35040a6026db0cfd43efa20c5b9c01f42eefd63a3607a48c9c",
+    "open_campaign_digest": "5e135f0f83eb3396249934fc0a82b08bfb8b80e1ef09e14a85e4223edc01c035",
+    "full_product_gate_run_digest": "d3fafddce5de350c2d637c9f6fa3239d5576fd36b02dece8b1a5755927c872ed"
+  },
+  "cases": [
+    {
+      "case_id": "multi-cavity-normal",
+      "highs_status": "solution_found",
+      "bgig_status": "solution_found",
+      "quality_relation": "highs_better",
+      "highs_residual_fragmentation": 0.0,
+      "bgig_residual_fragmentation": 5.0
+    },
+    {
+      "case_id": "simple-quick",
+      "highs_status": "solution_found",
+      "bgig_status": "solution_found",
+      "quality_relation": "highs_better",
+      "highs_residual_fragmentation": 0.0,
+      "bgig_residual_fragmentation": 5.0
+    },
+    {
+      "case_id": "variant-dead-end-quick",
+      "highs_status": "bounded_unknown",
+      "bgig_status": "no_solution_within_budget",
+      "quality_relation": "not_comparable"
+    },
+    {
+      "case_id": "variant-unsolved-quick",
+      "highs_status": "bounded_unknown",
+      "bgig_status": "no_solution_within_budget",
+      "quality_relation": "not_comparable"
+    },
+    {
+      "case_id": "real-18-containers-20-contents-normal",
+      "highs_status": "bounded_unknown",
+      "bgig_status": "bounded_unknown",
+      "quality_relation": "not_comparable"
+    }
+  ],
+  "comparison": {
+    "common_case_count": 5,
+    "certified_solution_delta": 0,
+    "quality_wins": 2,
+    "quality_losses": 0,
+    "quality_ties": 0,
+    "truth_pass_delta": 0,
+    "highs_total_wall_seconds": 1.308987,
+    "bgig_total_wall_seconds": 4.077502,
+    "product_gain_demonstrated": true
+  },
+  "cli_equivalence_probe": {
+    "exact_control_count": 3,
+    "regression_case_count": 8,
+    "status_mismatch_count": 0,
+    "quality_mismatch_count": 0,
+    "probe_digest": "3ea1e213bf26cdc667e7f23abdc6ca0b8d730956af857005f24e177c858bed63"
+  },
+  "invariants": {
+    "holdout_reopened": false,
+    "post_holdout_tuning_count": 0,
+    "fresh_bgig_certificate_required": true,
+    "fusion_validated": false,
+    "print_validated": false
+  },
+  "integrated_runtime_gate": {
+    "schema_version": "bgig.highs_integrated_product_gate_run.v1",
+    "seed": 640708,
+    "case_count": 5,
+    "status_change_count": 0,
+    "quality_win_count": 2,
+    "quality_loss_count": 0,
+    "external_invocation_count": 5,
+    "external_certified_count": 2,
+    "holdout_opening_count": 0,
+    "functional_digest": "7596b00d83f38a5caa0b77367201b506dffdb6374ca68c6e8d719f3388e4cb7b"
+  }
+}

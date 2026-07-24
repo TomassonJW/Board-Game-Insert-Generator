@@ -13,13 +13,15 @@ Le retour humain L04V est globalement KO mais partiellement positif. R1 corrige
 le cache négatif. P64-L05A est automated-validated : exactement un nouveau
 conteneur peut être inséré dans le vide global à voisins figés et plan complet
 recertifié. Le manifest Fusion passe à 0.1.59 pour le journal automatique. fusion-validated: false et
-print-validated: false pour L05A, L05B et L05C. Le solveur reste inchangé.
+print-validated: false pour L05A, L05B et L05C. À ce stade historique, le
+solveur restait inchangé.
 P64-L05B, P64-L05C, P64-L05D1/D2 et P64-L06A/B/C/D/E sont automated-validated. Le premier Goal L06 est terminé par la décision négative `no_algorithm_change_v1`.
 Cette décision ne compare aucun solveur externe mature. ADR-0081 et P64-L07
-encadrent désormais la vraie campagne externe. L07A à L07D sont
-terminées : quatre moteurs externes de quatre familles ont été comparés, HiGHS
-est scellé seul puis confirme 5/7 cas représentables du holdout. Aucun gain
-produit n'est encore démontré et aucun moteur n'est encore adopté.
+encadrent désormais la vraie campagne externe. L07A à L07E sont terminées :
+quatre moteurs externes de quatre familles ont été comparés, HiGHS est scellé
+seul puis confirme 5/7 cas représentables du holdout. Une gate produit
+indépendante démontre ensuite deux gains de qualité sans perte. HiGHS 1.15.1
+est intégré hors ligne dans l'add-in 0.1.60 avec fallback BGIG.
 
 ## Dernier état réel
 
@@ -46,6 +48,9 @@ produit n'est encore démontré et aucun moteur n'est encore adopté.
   n'est exposée ;
 - un journal local automatique conserve clics, changements, demandes, résultats et états dédupliqués sans bouton spécial, sans solve supplémentaire, finalisation, CAD ou scène ;
 - un witness certifie persistant est recertifie comme incumbent sans ajouter de lane, court-circuiter la recherche ou revendiquer un cache hit ;
+- HiGHS est appelé au plus une fois, puis toute proposition positive repasse
+  par le certificat BGIG et concourt avec toutes les lanes internes ;
+- un runtime HiGHS absent, altéré ou en erreur conserve le fallback BGIG ;
 - le cas dense 11 × 34 ne reçoit aucune nouvelle revendication.
 
 Preuves :
@@ -67,39 +72,32 @@ Preuve L07B : P64_L07B_CORPUS_V2_EVIDENCE.md.
 Contrat L07C : P64_L07C_EXTERNAL_ADAPTERS_CONTRACT.md.
 Preuve L07C : P64_L07C_EXTERNAL_ADAPTERS_EVIDENCE.md.
 Preuve L07D : P64_L07D_EXTERNAL_TOURNAMENT_EVIDENCE.md.
+Preuve L07E : P64_L07E_HIGHS_PRODUCT_INTEGRATION_EVIDENCE.md.
+Rapport final L07 : P64_L07_GOAL_FINAL_REPORT.md.
 
 ## Prochaine action recommandée
 
-### Exécuter P64-L07E — intégration conditionnelle de HiGHS
+### Exécuter P64-L07V — observation humaine facultative dans Fusion
 
-Type : mission autonome déjà autorisée par le Goal.
+Type : gate humaine, non bloquante pour le Goal déjà clôturé.
 
-La prochaine action exacte est :
+Le package à observer est l'add-in 0.1.60 intégré dans `main`. La préparation
+locale et l'installation doivent être faites par Codex dans une tâche dédiée ;
+Thomas ne reçoit que les actions restantes dans Fusion :
 
-1. comparer HiGHS et le solveur BGIG sur les cinq régressions produit dans la
-   portée commune, sous limites mesurées et avec recertification fraîche ;
-2. démontrer un gain réel et répété avant de modifier le routage produit ;
-3. valider la licence MIT, les avis, le paquet Windows hors ligne, la version,
-   l'empreinte, la taille, le démarrage et l'arrêt ;
-4. concevoir un fallback BGIG fail-closed si HiGHS manque, échoue ou expire ;
-5. créer l'ADR factuelle de dépendance seulement si toutes les gates passent ;
-6. intégrer HiGHS seul : OR-Tools ne gagne aucune famille et aucun portefeuille
-   ne bat le meilleur moteur seul ;
-7. lancer les tests produit, packaging et hors ligne, puis publier le rapport
-   final du Goal ;
-8. si le gain produit ou une gate échoue, conserver honnêtement
-   `benchmark-winner-not-integrated` sans forcer l'adoption.
+1. ouvrir Fusion 360 et vérifier que l'add-in 0.1.60 démarre ;
+2. charger un projet simple puis un cas multi-cavités représentable ;
+3. lancer le calcul minimal et vérifier qu'une solution reste certifiée ;
+4. observer le fallback avec la lane externe volontairement indisponible dans
+   un smoke contrôlé préparé par Codex ;
+5. confirmer qu'aucune scène n'est modifiée avant l'action explicite prévue.
 
-Le holdout est consommé. Il ne doit être ni rouvert, ni réglé, ni rejoué.
-HiGHS a certifié 5/7 cas représentables ; la baseline BGIG ne pouvait pas
-exprimer leur interdiction de rotation. Ce résultat choisit le candidat de
-L07E, mais ne vaut pas encore preuve d'amélioration produit.
+Cette gate ne rouvre pas le holdout et ne valide ni impression, ni forme
+complexe, ni cas dense 11 × 34.
 
-Modèle conseillé : `gpt-5.6-sol`, raisonnement `high`, car L07E combine décision
-d'intégration, packaging Windows hors ligne, fallback, ADR et non-régression.
-Option plus économique : `gpt-5.6-terra`, raisonnement `high`, acceptable si la
-gate conclut rapidement à une décision négative documentaire ; le risque de
-reprise augmente si le routage produit ou le paquet natif doivent changer.
+Aucun modèle Codex n'est requis pour l'observation humaine elle-même. Si Thomas
+demande la préparation et l'installation de la gate, la tâche devra appliquer
+le protocole Fusion local puis s'arrêter avant toute interaction dans Fusion.
 
 ## Lots verrouillés
 

@@ -78,12 +78,15 @@ preuves archivées.
   et scelle un nouveau holdout indépendant dont les recettes restent hors dépôt.
 - P64-L07C est terminé et automated-validated : OR-Tools, HiGHS, SCIP et LAFF
   ont réellement exécuté 12 contrôles sur 12 avec recertification BGIG. SCIP et
-  LAFF restent benchmark-only ; aucun moteur n'est encore adopté.
+  LAFF restent benchmark-only ; aucun moteur n'était adopté à ce stade.
 - P64-L07D est terminé et automated-validated : quatre moteurs externes
   sont comparés, HiGHS est scellé seul puis certifie 5/7 cas représentables du
-  holdout. Le holdout est consommé ; aucun gain produit n'est encore démontré.
-- Le Goal P64-L07 est actif. La prochaine mission atomique est L07E :
-  intégration conditionnelle de HiGHS ou décision négative honnête.
+  holdout. Le holdout est consommé et ne sera jamais rouvert.
+- P64-L07E est terminé et automated-validated : la gate produit donne deux
+  gains de qualité HiGHS, aucune perte et un fallback BGIG conservé. Le CLI
+  officiel HiGHS 1.15.1 MIT est embarqué hors ligne dans l'add-in 0.1.60.
+- Le Goal P64-L07 est clôturé. La prochaine action est la gate humaine
+  facultative P64-L07V dans Fusion ; elle ne bloque pas l'intégration.
 
 ## Vue de séquence
 
@@ -137,7 +140,8 @@ preuves archivées.
 | Terminé — automatisé | P64-L07B | Corpus V2 déterministe, deux sources publiques et nouveau holdout scellé, sans run candidat. |
 | Terminé — automatisé | P64-L07C | Quatre moteurs externes, quatre familles et 12/12 contrôles réels recertifiés. |
 | Terminé — automatisé | P64-L07D | Quatre moteurs comparés ; HiGHS scellé seul, holdout 5/7 dans sa portée. |
-| En cours — autonome | P64-L07E | Gate produit, packaging, fallback puis intégration conditionnelle de HiGHS seul. |
+| Terminé — automatisé | P64-L07E | HiGHS 1.15.1 intégré seul, hors ligne, recertifié et fail-closed dans 0.1.60. |
+| Prête — gate humaine | P64-L07V | Observation Fusion facultative du package 0.1.60 ; aucune impression. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -198,6 +202,11 @@ preuves archivées.
   cinq familles, licences, limites de modèle et absence de formes 3D arbitraires.
 - P64_L07B_CORPUS_V2_EVIDENCE.md : corpus V2, sources publiques, petits
   contrôles exacts, séparation des splits et nouveau holdout scellé.
+- ADR-0082 : HiGHS 1.15.1 CLI comme lane produit Windows hors ligne.
+- P64_L07E_HIGHS_PRODUCT_INTEGRATION_EVIDENCE.md : gate produit, paquet,
+  équivalence CLI, fallback et limites de l'intégration.
+- P64_L07_GOAL_FINAL_REPORT.md : synthèse du vrai benchmark externe et de
+  la décision finale.
 - FUTURE_PRODUCT_HORIZONS.md : registre différé des formes, mécanismes,
   visualisations et du futur compositeur manuel 3D.
 - ADR-0074 : supersession partielle d'ADR-0071 après le KO Fusion 0.1.56.
@@ -649,8 +658,11 @@ produit, certifie 5/7 cas représentables du holdout ; deux restent
 
 SCIP et LAFF restent `benchmark-only`. OR-Tools ne gagne aucune famille face à
 HiGHS et aucun portefeuille n'est retenu. Les cas de sélection interdisent tous
-la rotation par une propriété absente du schéma produit : aucun gain produit
-n'est encore démontré et aucun moteur externe n'est adopté.
+la rotation par une propriété absente du schéma produit ; ce constat a imposé
+la gate produit distincte L07E. Cette gate donne ensuite deux gains de qualité,
+aucune perte et autorise l'intégration de HiGHS seul.
 
-Statut : Goal actif ; P64-L07A/B/C/D done, automated-validated ; P64-L07E next.
+Statut : Goal clôturé ; P64-L07A/B/C/D/E done et automated-validated. HiGHS
+1.15.1 est intégré seul dans l'add-in 0.1.60, avec certificat BGIG commun et
+fallback interne. P64-L07V est une observation Fusion humaine facultative.
 fusion-validated: false. print-validated: false.

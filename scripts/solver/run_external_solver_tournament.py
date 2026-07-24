@@ -748,6 +748,10 @@ def _compare_external_to_baseline(
     return comparison
 
 
+def _mapping_or_empty(value: object) -> dict[str, object]:
+    return dict(value) if isinstance(value, Mapping) else {}
+
+
 def _compare_result_sets(
     first_rows: Sequence[Mapping[str, object]],
     second_rows: Sequence[Mapping[str, object]],
@@ -778,11 +782,15 @@ def _compare_result_sets(
             )
             truth_delta += int(first_truth) - int(second_truth)
         first_certified = (
-            dict(first_report.get("recertification", {})).get("certified")
+            _mapping_or_empty(
+                first_report.get("recertification", {})
+            ).get("certified")
             is True
         )
         second_certified = (
-            dict(second_report.get("recertification", {})).get("certified")
+            _mapping_or_empty(
+                second_report.get("recertification", {})
+            ).get("certified")
             is True
         )
         certified_delta += int(first_certified) - int(second_certified)
@@ -800,13 +808,13 @@ def _compare_result_sets(
                 quality_ties += 1
                 relation = "tie"
         first_wall += float(
-            dict(first_report.get("timing", {})).get(
+            _mapping_or_empty(first_report.get("timing", {})).get(
                 "total_wall_seconds"
             )
             or 0.0
         )
         second_wall += float(
-            dict(second_report.get("timing", {})).get(
+            _mapping_or_empty(second_report.get("timing", {})).get(
                 "total_wall_seconds"
             )
             or 0.0
@@ -870,14 +878,16 @@ def _summarize_holdout_rows(
                 _truth_matches(str(row["expected_truth"]), status)
             )
         certified += int(
-            dict(report.get("recertification", {})).get("certified")
+            _mapping_or_empty(
+                report.get("recertification", {})
+            ).get("certified")
             is True
         )
         candidate_failures += int(
             status in {"certificate_rejected", "external_error"}
         )
         total_wall += float(
-            dict(report.get("timing", {})).get(
+            _mapping_or_empty(report.get("timing", {})).get(
                 "total_wall_seconds"
             )
             or 0.0
@@ -911,7 +921,7 @@ def _compact_evidence(
             "family": row["family"],
             "expected_truth": row["expected_truth"],
             "status": row["report"]["status"],
-            "certified": dict(
+            "certified": _mapping_or_empty(
                 row["report"].get("recertification", {})
             ).get("certified")
             is True,

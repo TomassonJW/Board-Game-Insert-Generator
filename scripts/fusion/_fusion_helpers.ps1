@@ -155,7 +155,16 @@ function Assert-BgigPaletteProjectRuntime {
         (Join-Path $AddinPath "lib\board_game_insert_generator\preview_explanations.py"),
         (Join-Path $AddinPath "lib\board_game_insert_generator\partition_result_view.py"),
         (Join-Path $AddinPath "lib\board_game_insert_generator\container_sizing_view.py"),
-        (Join-Path $AddinPath "lib\board_game_insert_generator\partition_cad.py")
+        (Join-Path $AddinPath "lib\board_game_insert_generator\partition_cad.py"),
+        (Join-Path $AddinPath "lib\board_game_insert_generator\highs_product_solver.py"),
+        (Join-Path $AddinPath "vendor\highs\1.15.1\windows-x86_64\bin\highs.exe"),
+        (Join-Path $AddinPath "vendor\highs\1.15.1\windows-x86_64\bin\highs.dll"),
+        (Join-Path $AddinPath "vendor\highs\1.15.1\windows-x86_64\ARTIFACT.json"),
+        (Join-Path $AddinPath "vendor\highs\1.15.1\windows-x86_64\LICENSE.txt"),
+        (Join-Path $AddinPath "vendor\highs\1.15.1\windows-x86_64\THIRD_PARTY_NOTICES.md"),
+        (Join-Path $AddinPath "vendor\highs\1.15.1\windows-x86_64\licenses\CLI11-LICENSE.txt"),
+        (Join-Path $AddinPath "vendor\highs\1.15.1\windows-x86_64\licenses\pdqsort-LICENSE.txt"),
+        (Join-Path $AddinPath "vendor\highs\1.15.1\windows-x86_64\licenses\zstr-LICENSE.txt")
     )
     foreach ($requiredPath in $required) {
         if (-not (Test-Path -LiteralPath $requiredPath -PathType Leaf)) {

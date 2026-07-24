@@ -343,6 +343,29 @@ Elle transforme les seules enveloppes extensibles, puis demande un nouveau
 certificat. Son échec restitue le candidat de base. Les assets, cavités, minima,
 jeux, tolérances et réservations demeurent immuables.
 
+## Lane produit externe HiGHS P64-L07E
+
+ADR-0082 ajoute une proposition externe bornée au portefeuille minimal sans
+déplacer l'autorité de vérité. `highs_product_solver.py` traduit seulement les
+participants rectangulaires représentables vers un modèle de sol entier et
+lance le CLI HiGHS embarqué dans un processus isolé.
+
+Le binaire n'est jamais importé dans le cœur. La palette configure son chemin
+local ; le modèle, les caps, le parsing et le fail-closed restent dans le cœur
+Python pur, sans `adsk`. Une sortie positive est décorée avec les variantes P45
+canoniques puis repasse par `certify_minimal_free_3d_plan`. Elle rejoint ensuite
+le même classement que les lanes internes.
+
+Un seul appel externe est permis : Rapide 0,75 s, Normal 3 s et Approfondi
+réutilise l'appel du préfixe Normal. Absence, altération, timeout, erreur,
+contrainte non représentable ou certificat refusé laissent le portefeuille
+interne poursuivre. Une infaisabilité du modèle de sol partiel reste
+`bounded_unknown`.
+
+Le package Windows embarque HiGHS 1.15.1, ses empreintes et ses licences. Mac
+conserve automatiquement le portefeuille interne. Fusion reste une surface
+d'orchestration et ne reçoit aucune logique de solveur.
+
 ## Frontière des variantes internes P64-V2H03
 
 ADR-0070 ajoute une frontière interne entre dérivation géométrique et placement

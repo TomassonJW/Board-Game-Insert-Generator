@@ -1126,5 +1126,22 @@ une installation globale, un dépassement de l'enveloppe 36 h / 8 Gio ou une
 extension T2-T4. Dans ce cas, conserver le résultat de benchmark sans intégrer
 le composant concerné.
 
-Statut : `ready-for-explicit-go`, en attente du `/goal` dans la nouvelle tâche.
+Le `/goal` a été reçu et L07A à L07E sont terminées. HiGHS 1.15.1 est
+intégré seul dans le package 0.1.60. Aucune licence ambiguë, installation
+globale, extension T2-T4 ou autre gate exceptionnelle n'a été rencontrée.
+
+Statut : Goal clôturé, aucune action humaine requise pour l'intégration.
+fusion-validated: false. print-validated: false.
+
+## P64-L07V — observation Fusion du moteur intégré
+
+Cette gate est désormais prête mais facultative. Thomas doit uniquement
+observer dans Fusion le package 0.1.60 après préparation et installation
+locales par Codex. Codex ne contrôle jamais Fusion à sa place.
+
+Retour attendu : `P64-L07V Fusion OK 0.1.60` ou un KO précis avec le projet,
+l'effort, le statut et le comportement observés. Cette preuve ne vaut aucune
+validation d'impression et ne rouvre pas le holdout.
+
+Statut : `ready-human-gate`, non bloquante pour le Goal.
 fusion-validated: false. print-validated: false.

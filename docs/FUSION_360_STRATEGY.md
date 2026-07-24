@@ -913,3 +913,19 @@ l inspection et a la tracabilite. Ils ne sont ni supprimes ni detagues. Apres un
 materialisation ou une regeneration, leur visibilite par defaut doit etre
 inactive afin de ne pas encombrer la scene utilisateur. L inspection doit
 continuer a les identifier avec le role `box_reference`.
+
+## P64-L07E — runtime HiGHS embarqué
+
+L'add-in 0.1.60 embarque le CLI officiel HiGHS 1.15.1 Windows x86_64, sa DLL,
+leurs empreintes et les avis de licence. L'installateur copie ces fichiers avec
+le cœur Python et refuse un runtime incomplet.
+
+`palette_project.py` configure uniquement le chemin du binaire sur Windows. Il
+ne lance pas HiGHS lui-même et ne contient aucune logique métier. Le solveur
+reste dans le cœur Python pur ; toute proposition repasse par le certificat
+BGIG. Sur Mac ou en cas de runtime absent ou invalide, les lanes internes
+continuent seules.
+
+Aucun service, compte, secret, réseau, télémétrie ou installation globale n'est
+requis. P64-L07V reste une observation humaine facultative ; aucune validation
+Fusion ou impression n'est revendiquée par L07E.

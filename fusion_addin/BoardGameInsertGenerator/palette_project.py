@@ -1133,6 +1133,25 @@ def _ensure_engine_available(addin_dir: Path, project_root: Path | None) -> None
             sys.path.insert(0, str(candidate))
     try:
         __import__("board_game_insert_generator.project_v1")
+        from board_game_insert_generator.highs_product_solver import (
+            configure_highs_product_runtime,
+        )
+        highs_executable = (
+            addin_dir / "vendor" / "highs" / "1.15.1"
+            / "windows-x86_64" / "bin" / "highs.exe"
+        )
+        installed_engine = (
+            addin_dir / "lib" / "board_game_insert_generator"
+            / "highs_product_solver.py"
+        )
+        configure_highs_product_runtime(
+            highs_executable
+            if os.name == "nt" and installed_engine.is_file()
+            else None,
+            scratch_root=(
+                current_project_path(addin_dir).parent / ".solver-temp"
+            ),
+        )
     except ImportError as exc:
         raise PaletteProjectError(
             "Le moteur BGIG est absent de l add-in. Reinstalle BGIG avant de reessayer."

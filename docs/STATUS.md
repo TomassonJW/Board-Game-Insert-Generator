@@ -3345,3 +3345,46 @@ Suite : P64-L07E compare HiGHS à BGIG sur des entrées produit représentables,
 valide licence, packaging hors ligne et fallback, puis intègre ou conserve
 `benchmark-winner-not-integrated`. fusion-validated: false,
 print-validated: false.
+
+### P64-L07E — HiGHS intégré et Goal externe clôturé
+
+Statut : done, implemented-core, implemented-fusion-bridge,
+automated-validated, product-gain-demonstrated. Le solveur produit change de
+façon bornée ; aucune géométrie, tolérance, finalisation, CAD ou scène ne change.
+
+La gate produit utilise cinq régressions ouvertes communes sans rouvrir le
+holdout. HiGHS et BGIG gardent la même vérité et le même nombre de solutions
+certifiées. HiGHS gagne les deux comparaisons de qualité, n'en perd aucune et
+réduit la fragmentation résiduelle de 5 à 0. Les temps observés sont 1,308987 s
+contre 4,077502 s ; ils ne constituent pas une promesse.
+
+Le CLI officiel HiGHS 1.15.1 Windows x86_64 MIT est embarqué dans l'add-in
+0.1.60. L'archive, l'exécutable, la DLL, les licences et les avis sont
+verrouillés. Le paquet versionné compte 11 307 594 octets. Il fonctionne sans
+service, compte, secret, réseau ou télémétrie. BGIG ne lance aucun
+installateur global ; Universal CRT et Visual C++ Runtime 14 doivent déjà
+être présents, sinon la lane échoue fermée vers le solveur interne.
+
+HiGHS est appelé au plus une fois. Sa proposition de sol T0/T1 repasse par le
+certificat BGIG commun avant le classement. Toutes les lanes internes continuent.
+Runtime absent, empreinte différente, erreur, limite ou certificat refusé
+laissent BGIG poursuivre. Une infaisabilité du modèle partiel reste
+`bounded_unknown`.
+
+La sonde CLI retrouve 3/3 contrôles exacts et 8/8 statuts de régression de
+l'adapter scellé, sans différence de qualité. La gate du runtime final au seed
+640708 conserve cinq statuts, deux gains et zéro perte ; digest fonctionnel
+`7596b00d83f38a5caa0b77367201b506dffdb6374ca68c6e8d719f3388e4cb7b`.
+Tests L07E ciblés : 9/9. Garde documentaire 2/2, alignement Fusion-only 6/6,
+Ruff et py_compile OK, package staging 0.1.60 OK, suite complète 765/765 en
+228,071 s. Le bug de post-traitement L07D sur `timing: null` est corrigé sans
+relancer le holdout.
+
+Preuves :
+`docs/DECISIONS/ADR-0082-highs-offline-product-lane.md`,
+`docs/P64_L07E_HIGHS_PRODUCT_INTEGRATION_EVIDENCE.md` et
+`docs/P64_L07_GOAL_FINAL_REPORT.md`.
+
+Suite : P64-L07V est une observation Fusion humaine facultative sur 0.1.60.
+Le Goal P64-L07 est clôturé. Le holdout reste consommé.
+fusion-validated: false. print-validated: false.

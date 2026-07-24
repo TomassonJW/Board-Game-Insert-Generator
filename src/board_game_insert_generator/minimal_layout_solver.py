@@ -51,6 +51,13 @@ from board_game_insert_generator.free_3d_plan_adapter import (
     certify_minimal_free_3d_plan,
     prepare_free_3d_problem,
 )
+from board_game_insert_generator.highs_product_solver import (
+    HIGHS_PRODUCT_FAMILY,
+    HIGHS_PRODUCT_VERSION,
+    STATUS_NOT_CONFIGURED as HIGHS_STATUS_NOT_CONFIGURED,
+    STATUS_SOLUTION_FOUND as HIGHS_STATUS_SOLUTION_FOUND,
+    solve_highs_product_floor,
+)
 from board_game_insert_generator.incremental_project_state import canonical_digest
 from board_game_insert_generator.partition_solver import (
     PARTITION_PLAN_SCHEMA_V1,
@@ -362,6 +369,7 @@ def _solve_minimal_layout_once(
     deadline_at_ms: float | None = None,
     frontier_source_override: str | None = None,
     initial_incumbent: Mapping[str, object] | None = None,
+    external_lane_enabled: bool = True,
 ) -> dict[str, object]:
     """Execute one explicit lane prefix or extension without orchestration."""
 
@@ -489,6 +497,118 @@ def _solve_minimal_layout_once(
         [warm_start_proposal] if warm_start_proposal is not None else []
     )
     rejection_codes: Counter[str] = Counter()
+    external_lane_report: dict[str, object] | None = None
+    if external_lane_enabled:
+        external_execution = solve_highs_product_floor(
+            canonical_search_participants,
+            certification_problem,
+            effort_profile=effort_profile,
+            cancel_check=cancel_check,
+        )
+        if external_execution.status != HIGHS_STATUS_NOT_CONFIGURED:
+            external_lane_report = external_execution.deterministic_report()
+            external_recertification: dict[str, object] = {
+                "attempted": False,
+                "certified": False,
+                "rejection_codes": [],
+                "placement_digest": "",
+            }
+            if external_execution.status == HIGHS_STATUS_SOLUTION_FOUND:
+                try:
+                    external_placements = _decorate_canonical_placements(
+                        external_execution.placements,
+                        participant_maps["certificate"],
+                        frontiers,
+                    )
+                    external_spaces = _rebuild_empty_spaces(
+                        external_placements,
+                        certification_problem,
+                        budget,
+                    )
+                    external_strategy = SolverStrategy(
+                        "highs_product_floor",
+                        HIGHS_PRODUCT_VERSION,
+                    )
+                    external_budget = SolverBudget(
+                        HIGHS_PRODUCT_FAMILY,
+                        effort_profile,
+                        tuple(
+                            sorted(
+                                external_execution.limits.to_dict().items()
+                            )
+                        ),
+                    )
+                    external_certified, external_rejections = (
+                        certify_minimal_free_3d_plan(
+                            certification_problem,
+                            strategy=external_strategy,
+                            budget=external_budget,
+                            candidate_id="external-highs-product-floor",
+                            placements=external_placements,
+                            empty_spaces=external_spaces,
+                            search_telemetry={
+                                "external_engine_invocation_count": 1,
+                                "external_network_invocation_count": 0,
+                            },
+                            search_provenance={
+                                "portfolio_schema": (
+                                    MINIMAL_LAYOUT_PORTFOLIO_SCHEMA_V1
+                                ),
+                                "effort_profile": effort_profile,
+                                "lane_id": _HIGHS_PRODUCT_LANE.lane_id,
+                                "candidate_source": "external_highs",
+                                "external_report_digest": (
+                                    external_lane_report["report_digest"]
+                                ),
+                                "frontier_source": frontier_source,
+                                "ordered_frontier_digests": [
+                                    {
+                                        "container_group_id": key,
+                                        "digest": value,
+                                    }
+                                    for key, value in ordered_digests
+                                ],
+                                "finalization_invocation_count": 0,
+                                "fusion_materialization_invocation_count": 0,
+                            },
+                        )
+                    )
+                except (KeyError, TypeError, ValueError, OverflowError) as exc:
+                    external_certified = None
+                    external_rejections = (
+                        f"external_proposal_projection_failed:{type(exc).__name__}",
+                    )
+                external_recertification = {
+                    "attempted": True,
+                    "certified": external_certified is not None,
+                    "rejection_codes": list(external_rejections),
+                    "placement_digest": (
+                        external_certified.placement_digest
+                        if external_certified is not None
+                        else ""
+                    ),
+                }
+                if external_certified is not None:
+                    proposals.append(
+                        _CertifiedProposal(
+                            lane=_HIGHS_PRODUCT_LANE,
+                            seed_participant_id="not_applicable",
+                            translation_id="highs_search_coordinates",
+                            placements=external_placements,
+                            empty_spaces=external_spaces,
+                            certified=external_certified,
+                            rank_key=_proposal_rank_key(
+                                external_certified
+                            ),
+                        )
+                    )
+            external_lane_report.pop("report_digest", None)
+            external_lane_report["recertification"] = (
+                external_recertification
+            )
+            external_lane_report["report_digest"] = canonical_digest(
+                external_lane_report
+            )
     deadline_reached = False
     for lane in lane_specs:
         deadline_remaining_ms = _remaining_deadline_ms(deadline_at_ms)
@@ -734,6 +854,7 @@ def _solve_minimal_layout_once(
             frontier_source=frontier_source,
             ordered_frontier_digests=ordered_digests,
             warm_start=warm_start_report,
+            external_lane=external_lane_report,
         )
 
     deduplicated = _deduplicate_proposals(proposals)
@@ -747,6 +868,7 @@ def _solve_minimal_layout_once(
         ),
     )
     witness_selected = selected.lane.lane_id == "certified_witness_incumbent"
+    external_selected = selected.lane.lane_id == _HIGHS_PRODUCT_LANE.lane_id
     warm_start_payload = {
         **warm_start_report,
         "selected": witness_selected,
@@ -773,15 +895,25 @@ def _solve_minimal_layout_once(
             == minimal_lane_specs(EFFORT_NORMAL)
         ),
         "budget": dict(budget.limits),
-        "wall_clock_limited": deadline_at_ms is not None,
+        "wall_clock_limited": (
+            deadline_at_ms is not None
+            or bool(
+                external_lane_report is not None
+                and external_lane_report.get("invocation_count")
+            )
+        ),
         "deadline_reached": deadline_reached,
         "stop_reason": (
             "deep_deadline_reached_with_candidate"
             if deadline_reached
             else (
-                "certified_witness_incumbent_preserved_after_lane_search"
-                if witness_selected
-                else "bounded_lane_prefix_completed"
+                "external_highs_proposal_selected_after_common_certification"
+                if external_selected
+                else (
+                    "certified_witness_incumbent_preserved_after_lane_search"
+                    if witness_selected
+                    else "bounded_lane_prefix_completed"
+                )
             )
         ),
         "frontier_source": frontier_source,
@@ -814,7 +946,13 @@ def _solve_minimal_layout_once(
         ],
         "selected": {
             "candidate_source": (
-                "certified_witness" if witness_selected else "portfolio_lane"
+                "external_highs"
+                if external_selected
+                else (
+                    "certified_witness"
+                    if witness_selected
+                    else "portfolio_lane"
+                )
             ),
             "lane_id": selected.lane.lane_id,
             "order_id": selected.lane.order_id,
@@ -838,6 +976,13 @@ def _solve_minimal_layout_once(
         "finalization_invocation_count": 0,
         "fusion_materialization_invocation_count": 0,
     }
+    if external_lane_report is not None:
+        external_lane_report["selected"] = external_selected
+        external_lane_report.pop("report_digest", None)
+        external_lane_report["report_digest"] = canonical_digest(
+            external_lane_report
+        )
+        portfolio["external_lane"] = deepcopy(external_lane_report)
     portfolio["deterministic_digest"] = _digest(portfolio)
     aggregate["lane_count"] = len(lane_reports)
     aggregate["certified_candidates_before_deduplication"] = len(proposals)
@@ -847,6 +992,18 @@ def _solve_minimal_layout_once(
         warm_start_report["status"] == "accepted"
     )
     aggregate["warm_start_selected"] = int(witness_selected)
+    if external_lane_report is not None:
+        aggregate["external_lane_invocation_count"] = int(
+            external_lane_report["invocation_count"]
+        )
+        aggregate["external_lane_certified_candidate_count"] = int(
+            bool(
+                _mapping(
+                    external_lane_report.get("recertification")
+                ).get("certified")
+            )
+        )
+        aggregate["external_lane_selected"] = int(external_selected)
 
     final, final_rejections = certify_minimal_free_3d_plan(
         certification_problem,
@@ -873,6 +1030,7 @@ def _solve_minimal_layout_once(
             lane_reports=tuple(lane_reports),
             frontier_source=frontier_source,
             ordered_frontier_digests=ordered_digests,
+            external_lane=external_lane_report,
         )
     return final.plan
 
@@ -1029,6 +1187,7 @@ def _solve_deep_anytime(
         ),
         frontier_source_override=deep_source,
         initial_incumbent=initial_incumbent,
+        external_lane_enabled=False,
     )
     elapsed_ms = max(0, int(_monotonic_ms() - deep_started_ms))
     deep_status = _solver_result_status(deep_plan)
@@ -1189,6 +1348,14 @@ _CERTIFIED_WITNESS_INCUMBENT_LANE = MinimalLaneSpec(
     "not_applicable",
     "not_applicable",
     "certified_witness",
+    0,
+)
+_HIGHS_PRODUCT_LANE = MinimalLaneSpec(
+    "external_highs_floor",
+    "not_applicable",
+    "not_applicable",
+    "not_applicable",
+    "external_mip_floor",
     0,
 )
 
@@ -1589,8 +1756,12 @@ def _combined_anytime_provenance(
         "finalization_invocation_count": 0,
         "fusion_materialization_invocation_count": 0,
     }
+    external_lane = normal_provenance.get("external_lane")
+    if isinstance(external_lane, Mapping):
+        provenance["external_lane"] = deepcopy(dict(external_lane))
     provenance["deterministic_digest"] = _digest(provenance)
     return provenance
+
 
 def _combine_anytime_results(
     *,
@@ -1766,6 +1937,11 @@ def _build_anytime_failure(
         lane_reports=lanes,
         frontier_source=deep_source,
         ordered_frontier_digests=deep_digests,
+        external_lane=(
+            normal_provenance.get("external_lane")
+            if isinstance(normal_provenance.get("external_lane"), Mapping)
+            else None
+        ),
     )
     solver = _mapping(failure["solver"])
     portfolio = deepcopy(_mapping(solver["search"]))
@@ -2436,6 +2612,7 @@ def _failure_plan(
     frontier_source: str,
     ordered_frontier_digests: Sequence[tuple[str, str]],
     warm_start: Mapping[str, object] | None = None,
+    external_lane: Mapping[str, object] | None = None,
 ) -> dict[str, object]:
     result = {
         "schema_version": SOLVER_RESULT_SCHEMA_V1,
@@ -2506,6 +2683,8 @@ def _failure_plan(
         "finalization_invocation_count": 0,
         "fusion_materialization_invocation_count": 0,
     }
+    if external_lane is not None:
+        portfolio["external_lane"] = deepcopy(dict(external_lane))
     portfolio["deterministic_digest"] = _digest(portfolio)
     plan: dict[str, object] = {
         "schema_version": PARTITION_PLAN_SCHEMA_V1,
