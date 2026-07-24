@@ -1343,3 +1343,13 @@ La mesure P64-L08B retire HiGHS du parcours Auto : son modèle de sol ne couvre
 pas les cas limites 3D et rallonge les cas rapides lorsqu'il est exécuté. La
 roadmap reprend donc par l'audit des solveurs 3D réellement représentatifs,
 avant toute nouvelle intégration produit.
+
+
+## Addendum 2026-07-24 — P64-L08D, corpus Gate A
+
+La Gate A dispose de 41 cas ouverts et d'un holdout privé neuf de 40 cas,
+chacun couvrant small/large/XL et les dix familles adversariales. Les témoins
+et bornes empêchent désormais de gagner en projetant au sol ou en retirant
+silencieusement une contrainte. La séquence continue par L08E, adaptateurs 3D
+fidèles et petits contrôles exacts ; le tournoi et l'ouverture unique du
+holdout restent L08F.

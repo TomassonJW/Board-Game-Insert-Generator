@@ -85,9 +85,10 @@ preuves archivées.
 - P64-L07E est conservée comme preuve d'une lane HiGHS de sol rectangulaire.
   ADR-0083 requalifie cependant L07 : ses quatre candidats ont été comparés sur
   un seul niveau et ne répondent pas à la gate de solvage 3D réel.
-- P64-L07V est suspendue. P64-L08A et L08B sont terminées : la lane HiGHS
-  de sol est retirée du parcours Auto après mesure. La prochaine action est
-  P64-L08D, corpus adversarial et holdout neuf après l'audit officiel des candidats 3D.
+- P64-L07V est suspendue. P64-L08A à L08D sont terminées : la lane
+  HiGHS de sol reste hors Auto, quatre candidats 3D sont conditionnellement
+  retenus et le corpus adversarial est scellé sans run de solveur. La prochaine
+  action est P64-L08E, adaptateurs fidèles et petits contrôles exacts.
 
 ## Vue de séquence
 
@@ -145,7 +146,8 @@ preuves archivées.
 | Supersédée | P64-L07V | Observation Fusion suspendue par ADR-0083 : elle ne teste pas la gate réelle. |
 | Terminé — diagnostic | P64-L08A/B | Gate 3D définie ; HiGHS de sol quarantiné hors Auto après mesure. |
 | Terminé — audit | P64-L08C | Shortlist 3D conditionnelle ; aucun gagnant ni build lourd. |
-| Prochaine — corpus | P64-L08D | Cas adversariaux 3D et holdout neuf, avant les adapters. |
+| Terminé — corpus | P64-L08D | 41 cas ouverts, 40 privés scellés, témoins 3D et bornes négatives. |
+| Prochaine — adaptateurs | P64-L08E | Traductions 3D fidèles et petits contrôles exacts, holdout fermé. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -213,6 +215,8 @@ preuves archivées.
   la lane de sol ; il prévaut sur toute formule de victoire globale.
 - ADR-0083 et P64_L08_REAL_3D_SOLVER_BENCHMARK_PROGRAM.md : gate obligatoire
   de solvage 3D des cas limites, portefeuille et critères de sélection.
+- P64_L08D_REAL_3D_CORPUS_EVIDENCE.md : familles adversariales, témoins,
+  bornes négatives et reçu public du holdout privé encore fermé.
 - FUTURE_PRODUCT_HORIZONS.md : registre différé des formes, mécanismes,
   visualisations et du futur compositeur manuel 3D.
 - ADR-0074 : supersession partielle d'ADR-0071 après le KO Fusion 0.1.56.

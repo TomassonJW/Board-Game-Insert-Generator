@@ -71,22 +71,25 @@ Contrat L07C : P64_L07C_EXTERNAL_ADAPTERS_CONTRACT.md.
 Preuve L07C : P64_L07C_EXTERNAL_ADAPTERS_EVIDENCE.md.
 Preuve L07D : P64_L07D_EXTERNAL_TOURNAMENT_EVIDENCE.md.
 Preuve L07E : P64_L07E_HIGHS_PRODUCT_INTEGRATION_EVIDENCE.md.
+Preuve L08D : P64_L08D_REAL_3D_CORPUS_EVIDENCE.md.
 Rapport final L07 : P64_L07_GOAL_FINAL_REPORT.md.
 
 ## Prochaine action recommandée
 
-### Exécuter P64-L08D — construire le corpus adversarial 3D et le holdout neuf
+### Exécuter P64-L08E — construire les adaptateurs 3D fidèles
 
-Type : mission automatisée, documentaire et de données locales, sans lancer les
-solveurs externes retenus.
+Type : mission automatisée de code et de petits contrôles exacts, sans ouvrir
+le holdout L08D.
 
-Objectif : définir les familles obligatoires du programme L08 (étages, appuis,
-réservations hautes, accès, fragmentation, variantes P45, 32/64 conteneurs et
-256 contenus), leurs témoins certifiables, les bornes négatives, puis un holdout
-nouveau et scellé. Aucun cas 11 × 34 ni corpus de sol ne peut servir de verdict.
+Objectif : traduire la même sémantique BGIG vers les candidats 3D retenus,
+déclarer chaque règle représentée ou `unsupported`, puis recertifier les sorties
+en X/Y/Z sur des contrôles petits dont la vérité est connue.
 
-Les candidats restent inactifs tant que chaque cas ne possède pas une sémantique
-BGIG et une recertification réalisable.
+PackingSolver, LAFF, OR-Tools CP-SAT et SCIP restent des candidats
+conditionnels. Aucun ne peut être classé sur une famille s'il retire un étage,
+un appui, une réservation, l'accès, une variante ou une rotation active.
+Le sidecar privé L08D reste fermé ; discovery, tuning et holdout appartiennent
+à L08F.
 
 ## Lots verrouillés
 

@@ -1882,3 +1882,16 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
   aucun n'est une capacité produit ni un gagnant global.
 - `C-QUALITY` : la prochaine preuve porte sur les familles adversariales 3D,
   pas sur un score de sol ou un benchmark de faible cardinalité.
+
+
+## Mise à jour P64-L08D — gate adversariale exécutable
+
+- `C-SOLVER` : le corpus commun et ses refus `unsupported` futurs sont
+  exécutables ; aucun moteur n'est encore une capacité produit.
+- `C-GRID-3D`, `C-LAYERS`, `C-STACKING` : témoins X/Y/Z, 3 à 5 niveaux,
+  hauteurs hétérogènes et appuis multiples sont recertifiés hors Fusion.
+- `C-LAYOUT`, `C-QUALITY` : 32/64 conteneurs, 256 contenus, accès,
+  réservations, fragmentation et variantes sont maintenant des gates de
+  corpus, pas une revendication de performance.
+- Niveau de preuve inchangé : `fusion-validated=false`,
+  `print-validated=false`.

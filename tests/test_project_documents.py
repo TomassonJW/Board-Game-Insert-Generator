@@ -49,6 +49,7 @@ REQUIRED_PROJECT_FILES = (
     "docs/P64_L08_REAL_3D_SOLVER_BENCHMARK_PROGRAM.md",
     "docs/P64_L08B_HIGHS_QUARANTINE_EVIDENCE.md",
     "docs/P64_L08C_OFFICIAL_3D_SOLVER_AUDIT.md",
+    "docs/P64_L08D_REAL_3D_CORPUS_EVIDENCE.md",
     "docs/DECISIONS/ADR-0083-real-3d-solver-gate-and-l07-reclassification.md",
     "docs/P64_L06C_OFFLINE_ADAPTER_AND_EXACT_ORACLE_CONTRACT.md",
     "docs/P64_L06C_OFFLINE_ADAPTER_AND_EXACT_ORACLE_EVIDENCE.md",
@@ -330,6 +331,13 @@ REQUIRED_SECTIONS = {
         "## 1. Règle de sélection",
         "## 3. Matrice d'audit initiale",
         "## 5. Filtres avant tout build ou téléchargement",
+    ),
+    "docs/P64_L08D_REAL_3D_CORPUS_EVIDENCE.md": (
+        "## 1. Résultat",
+        "## 2. Couverture Gate A",
+        "## 4. Holdout scellé",
+        "## 5. Limites honnêtes",
+        "## 7. Suite autorisée",
     ),
     "docs/P64_L08B_HIGHS_QUARANTINE_EVIDENCE.md": (
         "## 1. Question vérifiée",

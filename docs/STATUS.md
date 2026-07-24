@@ -3425,3 +3425,24 @@ Date : 2026-07-24
 - **Décision :** aucun moteur ne passe encore la gate ; les contraintes BGIG
   complètes seront d'abord rendues testables dans le corpus L08D.
 - **Suite :** corpus adversarial 3D et holdout neuf, puis adapters fidèles.
+
+
+## P64-L08D — corpus adversarial 3D scellé
+
+Date : 2026-07-24
+
+- **Statut :** `done`, `automated-validated`, `no-solver-run`.
+- **Corpus ouvert :** 40 cas de matrice, soit 10 familles avec
+  small/large/XL et un négatif formel, plus une régression BGIG intacte.
+- **Holdout neuf :** 40 cas privés, les trois paliers pour chaque famille,
+  `opened=false` et 0 invocation ; seul son reçu est versionné.
+- **Contraintes contrôlées :** X/Y/Z, hauteurs hétérogènes, empilement,
+  couverture d'appui multiple, réservations basses/hautes, accès top-down,
+  fragmentation, rotations, fronts P45 et affectation de 256 contenus.
+- **Source réelle :** le projet BGIG revu de 18 conteneurs/20 contenus est
+  conservé sans réduction et `bounded_unknown` ; les dérivés ×1/×2/×4
+  restent explicitement annoncés comme synthétiques.
+- **Limite :** aucun moteur n'est exécuté ou promu ; T2-T4, Fusion et
+  impression restent non validés.
+- **Suite :** P64-L08E, adaptateurs fidèles et petits contrôles exacts, sans
+  ouvrir le holdout.

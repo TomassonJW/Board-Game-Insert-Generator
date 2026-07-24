@@ -3059,12 +3059,24 @@ implémentée et intégrée à la fois.
   sans gain applicable au 3D réel.
 - Décision : HiGHS de sol ne s'exécute plus dans Auto ni Deep.
 
-### P64-L08C à P64-L08G — tournoi 3D réel
+### P64-L08C — audit officiel des candidats 3D
+
+- Statut : done, documentation-validated.
+- Résultat : PackingSolver, LAFF, OR-Tools CP-SAT et SCIP sont
+  conditionnellement shortlistés ; aucun gagnant ni build lourd.
+
+### P64-L08D — corpus adversarial, témoins et holdout neuf
+
+- Statut : done, automated-validated, no-solver-run.
+- Preuve : `docs/P64_L08D_REAL_3D_CORPUS_EVIDENCE.md`.
+- Résultat : 41 cas ouverts et 40 cas privés scellés couvrent les 10 familles,
+  les trois paliers, les témoins 3D et les bornes négatives.
+- Le holdout reste `opened=false` avec 0 invocation.
+
+### P64-L08E à P64-L08G — adaptateurs, tournoi et intégration
 
 - Statut : planned ; programme canonique dans
-  docs/P64_L08_REAL_3D_SOLVER_BENCHMARK_PROGRAM.md.
-- Audit L08C terminé : PackingSolver, LAFF, OR-Tools CP-SAT et SCIP sont
-  conditionnellement shortlistés ; aucun gagnant ni téléchargement produit.
-- Ordre : corpus V2 3D, adaptateurs fidèles,
-  tournoi scellé avec holdout neuf, puis intégration seulement si un gain 3D
-  réel est certifié.
+  `docs/P64_L08_REAL_3D_SOLVER_BENCHMARK_PROGRAM.md`.
+- Ordre : adaptateurs fidèles et petits contrôles exacts, discovery/tuning,
+  sélection scellée et ouverture unique du holdout, puis intégration seulement
+  si un gain 3D réel est certifié.

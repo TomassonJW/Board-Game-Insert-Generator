@@ -1,0 +1,3901 @@
+{
+  "schema_version": "bgig.real_3d_solver_corpus.v1",
+  "families": [
+    "layers",
+    "support",
+    "reservations",
+    "access",
+    "fragmentation",
+    "variants",
+    "many-containers",
+    "many-assets",
+    "mixed-extreme",
+    "real-anonymized"
+  ],
+  "family_features": {
+    "layers": [
+      "xyz",
+      "heterogeneous_layers",
+      "stacking",
+      "support"
+    ],
+    "support": [
+      "xyz",
+      "stacking",
+      "support",
+      "multi_support"
+    ],
+    "reservations": [
+      "xyz",
+      "lower_reservation",
+      "upper_reservation"
+    ],
+    "access": [
+      "xyz",
+      "stacking",
+      "support",
+      "top_down_access"
+    ],
+    "fragmentation": [
+      "xyz",
+      "disjoint_regions",
+      "near_saturation"
+    ],
+    "variants": [
+      "xyz",
+      "p45_variant_front",
+      "rotations"
+    ],
+    "many-containers": [
+      "xyz",
+      "high_container_cardinality"
+    ],
+    "many-assets": [
+      "xyz",
+      "high_content_cardinality",
+      "content_assignment"
+    ],
+    "mixed-extreme": [
+      "xyz",
+      "heterogeneous_layers",
+      "stacking",
+      "support",
+      "multi_support",
+      "lower_reservation",
+      "upper_reservation",
+      "top_down_access",
+      "disjoint_regions",
+      "p45_variant_front",
+      "rotations",
+      "high_container_cardinality",
+      "high_content_cardinality",
+      "content_assignment"
+    ],
+    "real-anonymized": [
+      "xyz",
+      "reviewed_bgig_source"
+    ]
+  },
+  "open_case_records": [
+    {
+      "case_id": "p64-l08d-discovery-layers-small",
+      "split": "discovery",
+      "family": "layers",
+      "tier": "small",
+      "expected": "feasible",
+      "recipe": {
+        "seed": 640800,
+        "container_count": 8,
+        "content_count": 32,
+        "layer_count": 3,
+        "layer_heights_mm": [
+          4,
+          5,
+          6
+        ],
+        "columns": 8,
+        "regular_rows": 1,
+        "cell_stride_mm": 12,
+        "difficulty_profile": "exact-control",
+        "world_mm": [
+          99,
+          15,
+          17
+        ],
+        "active_constraints": [
+          "xyz",
+          "heterogeneous_layers",
+          "stacking",
+          "support"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          6
+        ],
+        "fragment_gap_mm": 2,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "4e7685d4b707c7a0db8ae20582886773e58e0bdba1fd4f4d8896cd6bc32e11ba",
+      "witness_digest": "367a4f58281feead3a726671902ade81fb6b3eee01d1bd5cfc36416a3fc2360c",
+      "case_digest": "6a623f8f1c46eb95f2493622c355b03d2860657aceff770128a577de770e5be5"
+    },
+    {
+      "case_id": "p64-l08d-discovery-layers-large",
+      "split": "discovery",
+      "family": "layers",
+      "tier": "large",
+      "expected": "feasible",
+      "recipe": {
+        "seed": 640801,
+        "container_count": 32,
+        "content_count": 128,
+        "layer_count": 3,
+        "layer_heights_mm": [
+          5,
+          6,
+          4
+        ],
+        "columns": 8,
+        "regular_rows": 2,
+        "cell_stride_mm": 11,
+        "difficulty_profile": "adversarial",
+        "world_mm": [
+          91,
+          25,
+          16
+        ],
+        "active_constraints": [
+          "xyz",
+          "heterogeneous_layers",
+          "stacking",
+          "support"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          6
+        ],
+        "fragment_gap_mm": 1,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "16bed06ad5855ab5269058f6a43eaa9cbfb357292167bff2e39f5b2eacdcd4fd",
+      "witness_digest": "0381eaaa0c6019e136ae73bfd7de63207532d6d8b50260fed4855418b2726341",
+      "case_digest": "7fbb7559170763741a6f940a83167c4f9657d670673c27142847c6c44e9ae1e2"
+    },
+    {
+      "case_id": "p64-l08d-tuning-layers-xl",
+      "split": "tuning",
+      "family": "layers",
+      "tier": "xl",
+      "expected": "feasible",
+      "recipe": {
+        "seed": 640802,
+        "container_count": 64,
+        "content_count": 256,
+        "layer_count": 5,
+        "layer_heights_mm": [
+          6,
+          4,
+          5,
+          4,
+          5
+        ],
+        "columns": 8,
+        "regular_rows": 2,
+        "cell_stride_mm": 10,
+        "difficulty_profile": "adversarial-xl",
+        "world_mm": [
+          83,
+          23,
+          24
+        ],
+        "active_constraints": [
+          "xyz",
+          "heterogeneous_layers",
+          "stacking",
+          "support"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          6
+        ],
+        "fragment_gap_mm": 0,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "fe46d5a59b0c577c95e3a9124b1fb3fc5f9ee0df05e80b3d2ba1ab13a2d3ea26",
+      "witness_digest": "27d91599fa15f925ef7bc395ad5f1c79f43270614050360aed662ee58a9a8403",
+      "case_digest": "33c0e29d2ece7cc4c941d9b4b74a550af3365535b66160b67df71c419f4c9079"
+    },
+    {
+      "case_id": "p64-l08d-discovery-layers-negative",
+      "split": "discovery",
+      "family": "layers",
+      "tier": "negative",
+      "expected": "infeasible",
+      "recipe": {
+        "seed": 640899,
+        "container_count": 64,
+        "content_count": 256,
+        "layer_count": 3,
+        "layer_heights_mm": [
+          4,
+          5,
+          6
+        ],
+        "columns": 8,
+        "regular_rows": 3,
+        "cell_stride_mm": 10,
+        "difficulty_profile": "formal-negative",
+        "world_mm": [
+          83,
+          33,
+          15
+        ],
+        "active_constraints": [
+          "xyz",
+          "heterogeneous_layers",
+          "stacking",
+          "support"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          6
+        ],
+        "fragment_gap_mm": 0,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "17a8a3bfbe03d689fde3d871ec1834bbddb304c7b64e6c8a8f9db31991d84d73",
+      "infeasibility_bound": {
+        "kind": "required_stack_height_exceeds_world",
+        "world_height_mm": 15,
+        "required_stack_height_mm": 16
+      },
+      "case_digest": "884981509b582c6942c3da55c1df8b8bf2fcfa3b0b5cdcb3858dd3fec57075b3"
+    },
+    {
+      "case_id": "p64-l08d-discovery-support-small",
+      "split": "discovery",
+      "family": "support",
+      "tier": "small",
+      "expected": "feasible",
+      "recipe": {
+        "seed": 640900,
+        "container_count": 8,
+        "content_count": 32,
+        "layer_count": 3,
+        "layer_heights_mm": [
+          4,
+          5,
+          6
+        ],
+        "columns": 8,
+        "regular_rows": 1,
+        "cell_stride_mm": 12,
+        "difficulty_profile": "exact-control",
+        "world_mm": [
+          99,
+          15,
+          17
+        ],
+        "active_constraints": [
+          "xyz",
+          "stacking",
+          "support",
+          "multi_support"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          6
+        ],
+        "fragment_gap_mm": 2,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "ec13049e10c31143a0c3ae79158127e80271f44e30ce69e730f088ecb2c623a7",
+      "witness_digest": "d1732404fbd07b5b1fe588ec2dcc1dea036b784e43af9dc4a1fdc39f768c5a85",
+      "case_digest": "f34c34fcb95e4d5a34d322c407e616fc08e5697c45bf2dbb6c5bd9f4e06e05b4"
+    },
+    {
+      "case_id": "p64-l08d-discovery-support-large",
+      "split": "discovery",
+      "family": "support",
+      "tier": "large",
+      "expected": "feasible",
+      "recipe": {
+        "seed": 640901,
+        "container_count": 32,
+        "content_count": 128,
+        "layer_count": 3,
+        "layer_heights_mm": [
+          4,
+          5,
+          6
+        ],
+        "columns": 8,
+        "regular_rows": 2,
+        "cell_stride_mm": 11,
+        "difficulty_profile": "adversarial",
+        "world_mm": [
+          91,
+          25,
+          16
+        ],
+        "active_constraints": [
+          "xyz",
+          "stacking",
+          "support",
+          "multi_support"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          6
+        ],
+        "fragment_gap_mm": 1,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "26caf1e5cc6dec085342dcfb0772523fbb51aa46501885ed0c68874197198024",
+      "witness_digest": "e867a9bbf38e6bb22530d806034903adf69fb1d70bf68faf7348b1d6e590ce46",
+      "case_digest": "4ffbbb9d38fa146c4960adbeabf0f5ca35c481d3c7a092db3e0819a329150bdb"
+    },
+    {
+      "case_id": "p64-l08d-tuning-support-xl",
+      "split": "tuning",
+      "family": "support",
+      "tier": "xl",
+      "expected": "feasible",
+      "recipe": {
+        "seed": 640902,
+        "container_count": 64,
+        "content_count": 256,
+        "layer_count": 3,
+        "layer_heights_mm": [
+          4,
+          5,
+          6
+        ],
+        "columns": 8,
+        "regular_rows": 3,
+        "cell_stride_mm": 10,
+        "difficulty_profile": "adversarial-xl",
+        "world_mm": [
+          83,
+          33,
+          15
+        ],
+        "active_constraints": [
+          "xyz",
+          "stacking",
+          "support",
+          "multi_support"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          6
+        ],
+        "fragment_gap_mm": 0,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "e5bc7f7f97ee9850ae78d737dbfc87276c1e05854ca51fcc0b7ce97a3e0d14a5",
+      "witness_digest": "13b40d9f3cb02ef5763dce5532d574cbf80bf0f699b2a0477aa8eeade25788d8",
+      "case_digest": "e974cb42a858074d2d93c9d5959bd9e8de3bf02fff3ec69064bdb3a74d07ce17"
+    },
+    {
+      "case_id": "p64-l08d-discovery-support-negative",
+      "split": "discovery",
+      "family": "support",
+      "tier": "negative",
+      "expected": "infeasible",
+      "recipe": {
+        "seed": 640999,
+        "container_count": 64,
+        "content_count": 256,
+        "layer_count": 3,
+        "layer_heights_mm": [
+          4,
+          5,
+          6
+        ],
+        "columns": 8,
+        "regular_rows": 3,
+        "cell_stride_mm": 10,
+        "difficulty_profile": "formal-negative",
+        "world_mm": [
+          83,
+          33,
+          15
+        ],
+        "active_constraints": [
+          "xyz",
+          "stacking",
+          "support",
+          "multi_support"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          6
+        ],
+        "fragment_gap_mm": 0,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "4586068ec383f227f211f0055e4f18f9d3944d37755e1d81b158f82398140003",
+      "infeasibility_bound": {
+        "kind": "required_support_area_exceeds_available",
+        "available_support_area_mm2": 100,
+        "required_support_area_mm2": 101
+      },
+      "case_digest": "3232842f43b902348d828b38ccf812b2b585e1b999b9e1a466972faea57431f4"
+    },
+    {
+      "case_id": "p64-l08d-discovery-reservations-small",
+      "split": "discovery",
+      "family": "reservations",
+      "tier": "small",
+      "expected": "feasible",
+      "recipe": {
+        "seed": 641000,
+        "container_count": 8,
+        "content_count": 32,
+        "layer_count": 1,
+        "layer_heights_mm": [
+          4
+        ],
+        "columns": 8,
+        "regular_rows": 1,
+        "cell_stride_mm": 12,
+        "difficulty_profile": "exact-control",
+        "world_mm": [
+          99,
+          15,
+          6
+        ],
+        "active_constraints": [
+          "xyz",
+          "lower_reservation",
+          "upper_reservation"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [
+          {
+            "reservation_id": "lower-booklet-clearance",
+            "zone": "lower",
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "size": [
+              1,
+              15,
+              6
+            ]
+          },
+          {
+            "reservation_id": "upper-board-clearance",
+            "zone": "upper",
+            "x": 98,
+            "y": 0,
+            "z": 0,
+            "size": [
+              1,
+              15,
+              6
+            ]
+          }
+        ],
+        "fragment_cell_mm": [
+          10,
+          10,
+          4
+        ],
+        "fragment_gap_mm": 2,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "0be27425e89d665f7db0269d5b1ac9bc16f7aa5db566a650beb059b98427fc22",
+      "witness_digest": "e25b3a05195099135a2cb1dfb7bc01ee45d7b819016d313c0b90ff68dd254ad2",
+      "case_digest": "79a468b7ff8adc88b254eb35b7b9bd4d7444423fa7ff07f8ffb373ea0cfe086b"
+    },
+    {
+      "case_id": "p64-l08d-discovery-reservations-large",
+      "split": "discovery",
+      "family": "reservations",
+      "tier": "large",
+      "expected": "feasible",
+      "recipe": {
+        "seed": 641001,
+        "container_count": 32,
+        "content_count": 128,
+        "layer_count": 1,
+        "layer_heights_mm": [
+          4
+        ],
+        "columns": 8,
+        "regular_rows": 4,
+        "cell_stride_mm": 11,
+        "difficulty_profile": "adversarial",
+        "world_mm": [
+          91,
+          47,
+          5
+        ],
+        "active_constraints": [
+          "xyz",
+          "lower_reservation",
+          "upper_reservation"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [
+          {
+            "reservation_id": "lower-booklet-clearance",
+            "zone": "lower",
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "size": [
+              1,
+              47,
+              5
+            ]
+          },
+          {
+            "reservation_id": "upper-board-clearance",
+            "zone": "upper",
+            "x": 90,
+            "y": 0,
+            "z": 0,
+            "size": [
+              1,
+              47,
+              5
+            ]
+          }
+        ],
+        "fragment_cell_mm": [
+          10,
+          10,
+          4
+        ],
+        "fragment_gap_mm": 1,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "b517322fa70d1d019eaa56a1c500eea011147e46f43fa756f6c7b38928b17795",
+      "witness_digest": "d1dd94f308ed93824a1e120387d2fce3b5ba2d3e1765a1e7a409b5ceb0abda88",
+      "case_digest": "c31986c40473654f5c9193e40f8cec9519893e49ac3bbc67d4352f52bffaebae"
+    },
+    {
+      "case_id": "p64-l08d-tuning-reservations-xl",
+      "split": "tuning",
+      "family": "reservations",
+      "tier": "xl",
+      "expected": "feasible",
+      "recipe": {
+        "seed": 641002,
+        "container_count": 64,
+        "content_count": 256,
+        "layer_count": 1,
+        "layer_heights_mm": [
+          4
+        ],
+        "columns": 8,
+        "regular_rows": 8,
+        "cell_stride_mm": 10,
+        "difficulty_profile": "adversarial-xl",
+        "world_mm": [
+          83,
+          83,
+          4
+        ],
+        "active_constraints": [
+          "xyz",
+          "lower_reservation",
+          "upper_reservation"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [
+          {
+            "reservation_id": "lower-booklet-clearance",
+            "zone": "lower",
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "size": [
+              1,
+              83,
+              4
+            ]
+          },
+          {
+            "reservation_id": "upper-board-clearance",
+            "zone": "upper",
+            "x": 82,
+            "y": 0,
+            "z": 0,
+            "size": [
+              1,
+              83,
+              4
+            ]
+          }
+        ],
+        "fragment_cell_mm": [
+          10,
+          10,
+          4
+        ],
+        "fragment_gap_mm": 0,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "4719aaf0ec2e5cfa63d470795e694df23905dc04f1a322d1fbb68e87a72254bc",
+      "witness_digest": "da16195131a91ae164ba859176fb0df29da6998a82403d44ccf032cc27084de9",
+      "case_digest": "9a2e40663401d43559121abe55271b44919f97a62ad923018260bf428f42ba0e"
+    },
+    {
+      "case_id": "p64-l08d-discovery-reservations-negative",
+      "split": "discovery",
+      "family": "reservations",
+      "tier": "negative",
+      "expected": "infeasible",
+      "recipe": {
+        "seed": 641099,
+        "container_count": 64,
+        "content_count": 256,
+        "layer_count": 1,
+        "layer_heights_mm": [
+          4
+        ],
+        "columns": 8,
+        "regular_rows": 8,
+        "cell_stride_mm": 10,
+        "difficulty_profile": "formal-negative",
+        "world_mm": [
+          83,
+          83,
+          4
+        ],
+        "active_constraints": [
+          "xyz",
+          "lower_reservation",
+          "upper_reservation"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [
+          {
+            "reservation_id": "lower-booklet-clearance",
+            "zone": "lower",
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "size": [
+              1,
+              83,
+              4
+            ]
+          },
+          {
+            "reservation_id": "upper-board-clearance",
+            "zone": "upper",
+            "x": 82,
+            "y": 0,
+            "z": 0,
+            "size": [
+              1,
+              83,
+              4
+            ]
+          }
+        ],
+        "fragment_cell_mm": [
+          10,
+          10,
+          4
+        ],
+        "fragment_gap_mm": 0,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "cfbc86ab9531ab023734ab47ba4a8229d496016663bfe85e03dbcc61fddc37b9",
+      "infeasibility_bound": {
+        "kind": "required_volume_exceeds_unreserved_capacity",
+        "unreserved_capacity_mm3": 26892,
+        "required_volume_mm3": 26893
+      },
+      "case_digest": "3bd9ab006e39fe8b4a12f1d625d4bf323f56319c6fb7127cc239d4d886fb4d53"
+    },
+    {
+      "case_id": "p64-l08d-discovery-access-small",
+      "split": "discovery",
+      "family": "access",
+      "tier": "small",
+      "expected": "feasible",
+      "recipe": {
+        "seed": 641100,
+        "container_count": 8,
+        "content_count": 32,
+        "layer_count": 3,
+        "layer_heights_mm": [
+          4,
+          5,
+          6
+        ],
+        "columns": 8,
+        "regular_rows": 1,
+        "cell_stride_mm": 12,
+        "difficulty_profile": "exact-control",
+        "world_mm": [
+          99,
+          15,
+          17
+        ],
+        "active_constraints": [
+          "xyz",
+          "stacking",
+          "support",
+          "top_down_access"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          6
+        ],
+        "fragment_gap_mm": 2,
+        "access_policy": "top_down",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "80f231139b65df5047948f85ae1d3a578cd8fc57bb884f762f36488993656c05",
+      "witness_digest": "18fc2a4487540a1be2da33266c66170a207d80a6b4e393415a5d0384a5d38dcf",
+      "case_digest": "2270e8fdf3673a3660949b98b517f7244f3447c6dfc363ac1ec43fd455d1d571"
+    },
+    {
+      "case_id": "p64-l08d-discovery-access-large",
+      "split": "discovery",
+      "family": "access",
+      "tier": "large",
+      "expected": "feasible",
+      "recipe": {
+        "seed": 641101,
+        "container_count": 32,
+        "content_count": 128,
+        "layer_count": 3,
+        "layer_heights_mm": [
+          5,
+          6,
+          4
+        ],
+        "columns": 8,
+        "regular_rows": 2,
+        "cell_stride_mm": 11,
+        "difficulty_profile": "adversarial",
+        "world_mm": [
+          91,
+          25,
+          16
+        ],
+        "active_constraints": [
+          "xyz",
+          "stacking",
+          "support",
+          "top_down_access"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          6
+        ],
+        "fragment_gap_mm": 1,
+        "access_policy": "top_down",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "20172913f7074b6136451a0cd2a0c6566ef5651e80b35daff63405fd2e96e8cd",
+      "witness_digest": "11db36d4646422037b327aea30c2ec6498b734ba7f1c3451ae5aeb71c67150b9",
+      "case_digest": "782f1970d59bd2eeb81162783f8f16d1356fd9a4e750f892d96d129e6fc33329"
+    },
+    {
+      "case_id": "p64-l08d-tuning-access-xl",
+      "split": "tuning",
+      "family": "access",
+      "tier": "xl",
+      "expected": "feasible",
+      "recipe": {
+        "seed": 641102,
+        "container_count": 64,
+        "content_count": 256,
+        "layer_count": 3,
+        "layer_heights_mm": [
+          6,
+          4,
+          5
+        ],
+        "columns": 8,
+        "regular_rows": 3,
+        "cell_stride_mm": 10,
+        "difficulty_profile": "adversarial-xl",
+        "world_mm": [
+          83,
+          33,
+          15
+        ],
+        "active_constraints": [
+          "xyz",
+          "stacking",
+          "support",
+          "top_down_access"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          6
+        ],
+        "fragment_gap_mm": 0,
+        "access_policy": "top_down",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "b7a056285eb7f70fc0acfe3dc6b4110b126c30a47f6149ce443da454b0da9bda",
+      "witness_digest": "2200ac66125f25f8076399c157be073a7922ad2ee0a6b27a8d2a36dfc613601f",
+      "case_digest": "53c02e885dd4427fc5482e2ba21c128500a6352512bde876b394971f4575a972"
+    },
+    {
+      "case_id": "p64-l08d-discovery-access-negative",
+      "split": "discovery",
+      "family": "access",
+      "tier": "negative",
+      "expected": "infeasible",
+      "recipe": {
+        "seed": 641199,
+        "container_count": 64,
+        "content_count": 256,
+        "layer_count": 3,
+        "layer_heights_mm": [
+          4,
+          5,
+          6
+        ],
+        "columns": 8,
+        "regular_rows": 3,
+        "cell_stride_mm": 10,
+        "difficulty_profile": "formal-negative",
+        "world_mm": [
+          83,
+          33,
+          15
+        ],
+        "active_constraints": [
+          "xyz",
+          "stacking",
+          "support",
+          "top_down_access"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          6
+        ],
+        "fragment_gap_mm": 0,
+        "access_policy": "top_down",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "798c5365e327ae4a04aec5073d5dd506dbe98fe1c3ce7a8dc97d633340fa577d",
+      "infeasibility_bound": {
+        "kind": "top_down_precedence_cycle",
+        "cycle": [
+          "container-a",
+          "container-b",
+          "container-a"
+        ]
+      },
+      "case_digest": "f0596f9c2e4e51a2a41338607971b387b7418273ae1d75dc9193a70ffcc5e6df"
+    },
+    {
+      "case_id": "p64-l08d-discovery-fragmentation-small",
+      "split": "discovery",
+      "family": "fragmentation",
+      "tier": "small",
+      "expected": "feasible",
+      "recipe": {
+        "seed": 641200,
+        "container_count": 8,
+        "content_count": 32,
+        "layer_count": 1,
+        "layer_heights_mm": [
+          4
+        ],
+        "columns": 8,
+        "regular_rows": 1,
+        "cell_stride_mm": 12,
+        "difficulty_profile": "exact-control",
+        "world_mm": [
+          99,
+          15,
+          6
+        ],
+        "active_constraints": [
+          "xyz",
+          "disjoint_regions",
+          "near_saturation"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          4
+        ],
+        "fragment_gap_mm": 2,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "5761deb199c4e55c2738707ed52ba7734e9ff993dbfcd1cddd8fd4bd562467db",
+      "witness_digest": "1aacb5a81d5bc0691e725521a84d08b3bad4817cb769f7c4689c539d45f33be3",
+      "case_digest": "e1727da1f6a896151fbde35ba1495c3eeafb1d072c087e88f1561496d044d7c3"
+    },
+    {
+      "case_id": "p64-l08d-discovery-fragmentation-large",
+      "split": "discovery",
+      "family": "fragmentation",
+      "tier": "large",
+      "expected": "feasible",
+      "recipe": {
+        "seed": 641201,
+        "container_count": 32,
+        "content_count": 128,
+        "layer_count": 1,
+        "layer_heights_mm": [
+          4
+        ],
+        "columns": 8,
+        "regular_rows": 4,
+        "cell_stride_mm": 12,
+        "difficulty_profile": "adversarial",
+        "world_mm": [
+          99,
+          51,
+          5
+        ],
+        "active_constraints": [
+          "xyz",
+          "disjoint_regions",
+          "near_saturation"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          4
+        ],
+        "fragment_gap_mm": 2,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "ebdaf1ce415b8145b98c920b5da3b6be51a737f18cc898fa3e8383fb1253a1da",
+      "witness_digest": "c005c9440a7bb9ca356ef9beb72ffbc660d006bbafb674be8c32bb7f3fb3b2e2",
+      "case_digest": "1fb409004326aadb2d02e0574ad93fc8889889b79ec2e9b0f5d2cd2c6ac6a4c9"
+    },
+    {
+      "case_id": "p64-l08d-tuning-fragmentation-xl",
+      "split": "tuning",
+      "family": "fragmentation",
+      "tier": "xl",
+      "expected": "feasible",
+      "recipe": {
+        "seed": 641202,
+        "container_count": 64,
+        "content_count": 256,
+        "layer_count": 1,
+        "layer_heights_mm": [
+          4
+        ],
+        "columns": 8,
+        "regular_rows": 8,
+        "cell_stride_mm": 12,
+        "difficulty_profile": "adversarial-xl",
+        "world_mm": [
+          99,
+          99,
+          4
+        ],
+        "active_constraints": [
+          "xyz",
+          "disjoint_regions",
+          "near_saturation"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          4
+        ],
+        "fragment_gap_mm": 2,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "23f85fe71c31d9f1af8c6b6599cd34e5063b320032eab4b9b5685c8856fc4e33",
+      "witness_digest": "faf66f171437cdc467867802daf7933ef9ef4b36eb704c21fc6e7095ca7eb6db",
+      "case_digest": "29f5580ed9c9ac878dceace348ed1152425b734163b5cf1294815547a0421cf7"
+    },
+    {
+      "case_id": "p64-l08d-discovery-fragmentation-negative",
+      "split": "discovery",
+      "family": "fragmentation",
+      "tier": "negative",
+      "expected": "infeasible",
+      "recipe": {
+        "seed": 641299,
+        "container_count": 64,
+        "content_count": 256,
+        "layer_count": 1,
+        "layer_heights_mm": [
+          4
+        ],
+        "columns": 8,
+        "regular_rows": 8,
+        "cell_stride_mm": 12,
+        "difficulty_profile": "formal-negative",
+        "world_mm": [
+          99,
+          99,
+          4
+        ],
+        "active_constraints": [
+          "xyz",
+          "disjoint_regions",
+          "near_saturation"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          4
+        ],
+        "fragment_gap_mm": 2,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "30a1a6dc02719f782e42c8fe0bb38fb76391779a416e9d058c868756592a5151",
+      "infeasibility_bound": {
+        "kind": "item_axis_exceeds_every_fragment",
+        "largest_fragment_axis_mm": 10,
+        "required_item_axis_mm": 11
+      },
+      "case_digest": "e4e95733700ef54449b1c0990f3a87dc1898ca4308a888f48bc52955f03626a5"
+    },
+    {
+      "case_id": "p64-l08d-discovery-variants-small",
+      "split": "discovery",
+      "family": "variants",
+      "tier": "small",
+      "expected": "feasible",
+      "recipe": {
+        "seed": 641300,
+        "container_count": 8,
+        "content_count": 32,
+        "layer_count": 1,
+        "layer_heights_mm": [
+          4
+        ],
+        "columns": 8,
+        "regular_rows": 1,
+        "cell_stride_mm": 12,
+        "difficulty_profile": "exact-control",
+        "world_mm": [
+          99,
+          15,
+          6
+        ],
+        "active_constraints": [
+          "xyz",
+          "p45_variant_front",
+          "rotations"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1,
+          2,
+          4,
+          8
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          4
+        ],
+        "fragment_gap_mm": 2,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "9f49321fdb414928ec5ae035f5d4ed297c8fff3b68078a7b2a4fbe243a98f781",
+      "witness_digest": "c92016966b0d190265844d88b9dd46b60b84cda99f1351237b1f1dbca8828181",
+      "case_digest": "4586877476887d490b30c1454225d9caba1070fb204b13722fecf11a86c64898"
+    },
+    {
+      "case_id": "p64-l08d-discovery-variants-large",
+      "split": "discovery",
+      "family": "variants",
+      "tier": "large",
+      "expected": "feasible",
+      "recipe": {
+        "seed": 641301,
+        "container_count": 32,
+        "content_count": 128,
+        "layer_count": 1,
+        "layer_heights_mm": [
+          4
+        ],
+        "columns": 8,
+        "regular_rows": 4,
+        "cell_stride_mm": 11,
+        "difficulty_profile": "adversarial",
+        "world_mm": [
+          91,
+          47,
+          5
+        ],
+        "active_constraints": [
+          "xyz",
+          "p45_variant_front",
+          "rotations"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1,
+          2,
+          4,
+          8
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          4
+        ],
+        "fragment_gap_mm": 1,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "a95073deecd1429689d3166a5225502fd1f002450b6a13ed89851a15a57b1948",
+      "witness_digest": "ca8b0badb3c8d46f9333541c8c68381d5094f1073af1748fec4780158a3ff35e",
+      "case_digest": "6a4e5363bbfdc1b70de7d047f5e74d3fce2835e8dd15002a2d6bf58cb6fa49c8"
+    },
+    {
+      "case_id": "p64-l08d-tuning-variants-xl",
+      "split": "tuning",
+      "family": "variants",
+      "tier": "xl",
+      "expected": "feasible",
+      "recipe": {
+        "seed": 641302,
+        "container_count": 64,
+        "content_count": 256,
+        "layer_count": 1,
+        "layer_heights_mm": [
+          4
+        ],
+        "columns": 8,
+        "regular_rows": 8,
+        "cell_stride_mm": 10,
+        "difficulty_profile": "adversarial-xl",
+        "world_mm": [
+          83,
+          83,
+          4
+        ],
+        "active_constraints": [
+          "xyz",
+          "p45_variant_front",
+          "rotations"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1,
+          2,
+          4,
+          8
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          4
+        ],
+        "fragment_gap_mm": 0,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "fdbb4823e2295b4b0b2d123b8c78661f37a0ef3a0cec53eb18006bd1f8f2220e",
+      "witness_digest": "b04172d18a629ac9b8a19f27a519f02fd7eaa4a6220eca987f6a216a1bc6fa7a",
+      "case_digest": "d9cfea6cd888ab6aecdcfd38e1e1d14130aa0118a4ad154c5158aba8b6d4edb4"
+    },
+    {
+      "case_id": "p64-l08d-discovery-variants-negative",
+      "split": "discovery",
+      "family": "variants",
+      "tier": "negative",
+      "expected": "infeasible",
+      "recipe": {
+        "seed": 641399,
+        "container_count": 64,
+        "content_count": 256,
+        "layer_count": 1,
+        "layer_heights_mm": [
+          4
+        ],
+        "columns": 8,
+        "regular_rows": 8,
+        "cell_stride_mm": 10,
+        "difficulty_profile": "formal-negative",
+        "world_mm": [
+          83,
+          83,
+          4
+        ],
+        "active_constraints": [
+          "xyz",
+          "p45_variant_front",
+          "rotations"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1,
+          2,
+          4,
+          8
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          4
+        ],
+        "fragment_gap_mm": 0,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "53edd8d859c8e4cfe45a487e1d05bea8348aa6fced5a5dee2af7d9b67d67d2d9",
+      "infeasibility_bound": {
+        "kind": "no_certified_variant_fits_world",
+        "certified_variant_count": 8,
+        "fitting_variant_count": 0
+      },
+      "case_digest": "6a506e3a7a03614ab207c531a034e4b0a1df2f677eb3d42e4d934369d0a1d71e"
+    },
+    {
+      "case_id": "p64-l08d-discovery-many-containers-small",
+      "split": "discovery",
+      "family": "many-containers",
+      "tier": "small",
+      "expected": "feasible",
+      "recipe": {
+        "seed": 641400,
+        "container_count": 32,
+        "content_count": 128,
+        "layer_count": 1,
+        "layer_heights_mm": [
+          4
+        ],
+        "columns": 8,
+        "regular_rows": 4,
+        "cell_stride_mm": 12,
+        "difficulty_profile": "exact-control",
+        "world_mm": [
+          99,
+          51,
+          6
+        ],
+        "active_constraints": [
+          "xyz",
+          "high_container_cardinality"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          4
+        ],
+        "fragment_gap_mm": 2,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "5e271a8d0b73cde774b35d643fe0e60c5514aa2cafacb8b2d53f3e4b3b41ab12",
+      "witness_digest": "679ff1f3dcf439aed9b7d1e6fc8538aa467ea944e84b68f0f3980f6990e06215",
+      "case_digest": "3cf882b3ddd5cf3370c311ae39249bd0c246e5615119a3d04b86fcd43360cadf"
+    },
+    {
+      "case_id": "p64-l08d-discovery-many-containers-large",
+      "split": "discovery",
+      "family": "many-containers",
+      "tier": "large",
+      "expected": "feasible",
+      "recipe": {
+        "seed": 641401,
+        "container_count": 32,
+        "content_count": 128,
+        "layer_count": 1,
+        "layer_heights_mm": [
+          4
+        ],
+        "columns": 8,
+        "regular_rows": 4,
+        "cell_stride_mm": 11,
+        "difficulty_profile": "adversarial",
+        "world_mm": [
+          91,
+          47,
+          5
+        ],
+        "active_constraints": [
+          "xyz",
+          "high_container_cardinality"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          4
+        ],
+        "fragment_gap_mm": 1,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "2e50a1a1f59b5abae41c7135df2dc297771c8bbeaee92c4c7fd9be11115d517a",
+      "witness_digest": "745b291316c844187f0c31de7324ca6ee957454e3e240742217c7287b4fd9164",
+      "case_digest": "93f548a13dc28e744bee963b28065477f3ab61a27020b605e9372dcd130d6856"
+    },
+    {
+      "case_id": "p64-l08d-tuning-many-containers-xl",
+      "split": "tuning",
+      "family": "many-containers",
+      "tier": "xl",
+      "expected": "feasible",
+      "recipe": {
+        "seed": 641402,
+        "container_count": 64,
+        "content_count": 256,
+        "layer_count": 1,
+        "layer_heights_mm": [
+          4
+        ],
+        "columns": 8,
+        "regular_rows": 8,
+        "cell_stride_mm": 10,
+        "difficulty_profile": "adversarial-xl",
+        "world_mm": [
+          83,
+          83,
+          4
+        ],
+        "active_constraints": [
+          "xyz",
+          "high_container_cardinality"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          4
+        ],
+        "fragment_gap_mm": 0,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "409fb7de12bf6bbdbb98cdf2d4435a5d47d1ea98fc636919bd352e0040dcb76e",
+      "witness_digest": "10f5776a88b0119d3f3a879bfb6f96faae11cf573d399490d9417a872ca006df",
+      "case_digest": "0ad8b168baf86ef3893dd5e975b4689866cee294de0e5d84c486f0f246eab15d"
+    },
+    {
+      "case_id": "p64-l08d-discovery-many-containers-negative",
+      "split": "discovery",
+      "family": "many-containers",
+      "tier": "negative",
+      "expected": "infeasible",
+      "recipe": {
+        "seed": 641499,
+        "container_count": 64,
+        "content_count": 256,
+        "layer_count": 1,
+        "layer_heights_mm": [
+          4
+        ],
+        "columns": 8,
+        "regular_rows": 8,
+        "cell_stride_mm": 10,
+        "difficulty_profile": "formal-negative",
+        "world_mm": [
+          83,
+          83,
+          4
+        ],
+        "active_constraints": [
+          "xyz",
+          "high_container_cardinality"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          4
+        ],
+        "fragment_gap_mm": 0,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "73ba9f01390a63aff937f7c1b2a5527109c1563d461bc87ab5efe10850820d28",
+      "infeasibility_bound": {
+        "kind": "required_volume_exceeds_capacity",
+        "capacity_volume_mm3": 27556,
+        "required_volume_mm3": 27557
+      },
+      "case_digest": "4f64570ccda196fef1afb483d17e2766723535fd498efadcd76952707e54155a"
+    },
+    {
+      "case_id": "p64-l08d-discovery-many-assets-small",
+      "split": "discovery",
+      "family": "many-assets",
+      "tier": "small",
+      "expected": "feasible",
+      "recipe": {
+        "seed": 641500,
+        "container_count": 8,
+        "content_count": 256,
+        "layer_count": 1,
+        "layer_heights_mm": [
+          4
+        ],
+        "columns": 8,
+        "regular_rows": 1,
+        "cell_stride_mm": 12,
+        "difficulty_profile": "exact-control",
+        "world_mm": [
+          99,
+          15,
+          6
+        ],
+        "active_constraints": [
+          "xyz",
+          "high_content_cardinality",
+          "content_assignment"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          4
+        ],
+        "fragment_gap_mm": 2,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "93b349bc90ba0db7698accae2c248d91f098b8eb9e4c7a6ea771cfee81c2e2e5",
+      "witness_digest": "e4806b410a3c56a7159e68ba02b62ea280b8d7a7b5582bb66fddd2d440966ef3",
+      "case_digest": "ead16535ecebfb9f4632ca453f35f96d157eb3fd7858a273b0473411a30a3a45"
+    },
+    {
+      "case_id": "p64-l08d-discovery-many-assets-large",
+      "split": "discovery",
+      "family": "many-assets",
+      "tier": "large",
+      "expected": "feasible",
+      "recipe": {
+        "seed": 641501,
+        "container_count": 32,
+        "content_count": 256,
+        "layer_count": 1,
+        "layer_heights_mm": [
+          4
+        ],
+        "columns": 8,
+        "regular_rows": 4,
+        "cell_stride_mm": 11,
+        "difficulty_profile": "adversarial",
+        "world_mm": [
+          91,
+          47,
+          5
+        ],
+        "active_constraints": [
+          "xyz",
+          "high_content_cardinality",
+          "content_assignment"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          4
+        ],
+        "fragment_gap_mm": 1,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "e4c41b50cd23051d2713daae6650dba3d1b84a0d86c4798e093b452e90f4ae52",
+      "witness_digest": "45455d70fe31ea82abc8f6ce18682dee6edf99042db3949795008c976e93e7ba",
+      "case_digest": "9d08844643c7415f6ebf3835a49d266c90506683ccd98c3398feba5a6c0216e7"
+    },
+    {
+      "case_id": "p64-l08d-tuning-many-assets-xl",
+      "split": "tuning",
+      "family": "many-assets",
+      "tier": "xl",
+      "expected": "feasible",
+      "recipe": {
+        "seed": 641502,
+        "container_count": 64,
+        "content_count": 256,
+        "layer_count": 1,
+        "layer_heights_mm": [
+          4
+        ],
+        "columns": 8,
+        "regular_rows": 8,
+        "cell_stride_mm": 10,
+        "difficulty_profile": "adversarial-xl",
+        "world_mm": [
+          83,
+          83,
+          4
+        ],
+        "active_constraints": [
+          "xyz",
+          "high_content_cardinality",
+          "content_assignment"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          4
+        ],
+        "fragment_gap_mm": 0,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "da10a2fb545e94c61dfad117deabe2785fa57bf209dc225a050c9dc40d85b65c",
+      "witness_digest": "189a584feae9b1c6867df50c106274ff35f62b07fbd2f251050f767ad2da3b1f",
+      "case_digest": "481de27e6c51d2ef5e660898c2f4d68c29b102c6a302e65d4b600ae381fb646c"
+    },
+    {
+      "case_id": "p64-l08d-discovery-many-assets-negative",
+      "split": "discovery",
+      "family": "many-assets",
+      "tier": "negative",
+      "expected": "infeasible",
+      "recipe": {
+        "seed": 641599,
+        "container_count": 64,
+        "content_count": 256,
+        "layer_count": 1,
+        "layer_heights_mm": [
+          4
+        ],
+        "columns": 8,
+        "regular_rows": 8,
+        "cell_stride_mm": 10,
+        "difficulty_profile": "formal-negative",
+        "world_mm": [
+          83,
+          83,
+          4
+        ],
+        "active_constraints": [
+          "xyz",
+          "high_content_cardinality",
+          "content_assignment"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          4
+        ],
+        "fragment_gap_mm": 0,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "15e458830dc1254082776a49e96a48d22e78513bea9df0bcfbd5bdfa79e7c38b",
+      "infeasibility_bound": {
+        "kind": "required_volume_exceeds_capacity",
+        "capacity_volume_mm3": 27556,
+        "required_volume_mm3": 27557
+      },
+      "case_digest": "cc1d7c6d1b50188b47bbadeda98ba42ac0ca5567a23058cf3ee51d68370fe162"
+    },
+    {
+      "case_id": "p64-l08d-discovery-mixed-extreme-small",
+      "split": "discovery",
+      "family": "mixed-extreme",
+      "tier": "small",
+      "expected": "feasible",
+      "recipe": {
+        "seed": 641600,
+        "container_count": 32,
+        "content_count": 256,
+        "layer_count": 3,
+        "layer_heights_mm": [
+          4,
+          5,
+          6
+        ],
+        "columns": 8,
+        "regular_rows": 2,
+        "cell_stride_mm": 12,
+        "difficulty_profile": "exact-control",
+        "world_mm": [
+          99,
+          27,
+          17
+        ],
+        "active_constraints": [
+          "xyz",
+          "heterogeneous_layers",
+          "stacking",
+          "support",
+          "multi_support",
+          "lower_reservation",
+          "upper_reservation",
+          "top_down_access",
+          "disjoint_regions",
+          "p45_variant_front",
+          "rotations",
+          "high_container_cardinality",
+          "high_content_cardinality",
+          "content_assignment"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          8
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [
+          {
+            "reservation_id": "lower-booklet-clearance",
+            "zone": "lower",
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "size": [
+              1,
+              27,
+              6
+            ]
+          },
+          {
+            "reservation_id": "upper-board-clearance",
+            "zone": "upper",
+            "x": 98,
+            "y": 0,
+            "z": 11,
+            "size": [
+              1,
+              27,
+              6
+            ]
+          }
+        ],
+        "fragment_cell_mm": [
+          10,
+          10,
+          6
+        ],
+        "fragment_gap_mm": 2,
+        "access_policy": "top_down",
+        "project_mode": "cold_and_incremental_replay",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "b38d10cfd76d8a6bdea6cfcf39c5614682d722fc271805c6e455bd5cd9d43f1b",
+      "witness_digest": "f47e641fe679cacb2b48a79ee3ec196f111c2aade69af33ebc3dbfdce5221a9c",
+      "case_digest": "6a432febdbe06a0cd6f6daaba95f01574f5e727d9f23144ba3cf8a86686141b0"
+    },
+    {
+      "case_id": "p64-l08d-discovery-mixed-extreme-large",
+      "split": "discovery",
+      "family": "mixed-extreme",
+      "tier": "large",
+      "expected": "feasible",
+      "recipe": {
+        "seed": 641601,
+        "container_count": 64,
+        "content_count": 256,
+        "layer_count": 3,
+        "layer_heights_mm": [
+          4,
+          5,
+          6
+        ],
+        "columns": 8,
+        "regular_rows": 3,
+        "cell_stride_mm": 12,
+        "difficulty_profile": "adversarial",
+        "world_mm": [
+          99,
+          39,
+          16
+        ],
+        "active_constraints": [
+          "xyz",
+          "heterogeneous_layers",
+          "stacking",
+          "support",
+          "multi_support",
+          "lower_reservation",
+          "upper_reservation",
+          "top_down_access",
+          "disjoint_regions",
+          "p45_variant_front",
+          "rotations",
+          "high_container_cardinality",
+          "high_content_cardinality",
+          "content_assignment"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          8
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [
+          {
+            "reservation_id": "lower-booklet-clearance",
+            "zone": "lower",
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "size": [
+              1,
+              39,
+              6
+            ]
+          },
+          {
+            "reservation_id": "upper-board-clearance",
+            "zone": "upper",
+            "x": 98,
+            "y": 0,
+            "z": 10,
+            "size": [
+              1,
+              39,
+              6
+            ]
+          }
+        ],
+        "fragment_cell_mm": [
+          10,
+          10,
+          6
+        ],
+        "fragment_gap_mm": 2,
+        "access_policy": "top_down",
+        "project_mode": "cold_and_incremental_replay",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "3a410735b730849c6190e371fbb41b15f6070fc76195cfea5af851746e38f4b3",
+      "witness_digest": "6c992121d2b806fb58e856fd34a7ffa4eebe26f05678cfbaaee32c90aba2ddd4",
+      "case_digest": "74becf6b9ffd89fff49a61fdf8d1b55d1a6238cb90607d2e61aac82d558e25b3"
+    },
+    {
+      "case_id": "p64-l08d-tuning-mixed-extreme-xl",
+      "split": "tuning",
+      "family": "mixed-extreme",
+      "tier": "xl",
+      "expected": "feasible",
+      "recipe": {
+        "seed": 641602,
+        "container_count": 158,
+        "content_count": 632,
+        "layer_count": 5,
+        "layer_heights_mm": [
+          4,
+          5,
+          6,
+          4,
+          5
+        ],
+        "columns": 8,
+        "regular_rows": 4,
+        "cell_stride_mm": 12,
+        "difficulty_profile": "adversarial-xl",
+        "world_mm": [
+          99,
+          51,
+          24
+        ],
+        "active_constraints": [
+          "xyz",
+          "heterogeneous_layers",
+          "stacking",
+          "support",
+          "multi_support",
+          "lower_reservation",
+          "upper_reservation",
+          "top_down_access",
+          "disjoint_regions",
+          "p45_variant_front",
+          "rotations",
+          "high_container_cardinality",
+          "high_content_cardinality",
+          "content_assignment"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          8
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [
+          {
+            "reservation_id": "lower-booklet-clearance",
+            "zone": "lower",
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "size": [
+              1,
+              51,
+              6
+            ]
+          },
+          {
+            "reservation_id": "upper-board-clearance",
+            "zone": "upper",
+            "x": 98,
+            "y": 0,
+            "z": 18,
+            "size": [
+              1,
+              51,
+              6
+            ]
+          }
+        ],
+        "fragment_cell_mm": [
+          10,
+          10,
+          6
+        ],
+        "fragment_gap_mm": 2,
+        "access_policy": "top_down",
+        "project_mode": "cold_and_incremental_replay",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "b508b6cd5df82eab9e9e397f8fd24dd882daf02c5aa35c7ac728f38c699bd9db",
+      "witness_digest": "d8eb26fc7ade4111859aea3fbb662239919b427d71d5b218239705a5938890e1",
+      "case_digest": "5fd778e67f8a4faebe494531f0df59eeded8099fc4950e72eb8a37263d7c4280"
+    },
+    {
+      "case_id": "p64-l08d-discovery-mixed-extreme-negative",
+      "split": "discovery",
+      "family": "mixed-extreme",
+      "tier": "negative",
+      "expected": "infeasible",
+      "recipe": {
+        "seed": 641699,
+        "container_count": 158,
+        "content_count": 632,
+        "layer_count": 3,
+        "layer_heights_mm": [
+          4,
+          5,
+          6
+        ],
+        "columns": 8,
+        "regular_rows": 7,
+        "cell_stride_mm": 12,
+        "difficulty_profile": "formal-negative",
+        "world_mm": [
+          99,
+          87,
+          15
+        ],
+        "active_constraints": [
+          "xyz",
+          "heterogeneous_layers",
+          "stacking",
+          "support",
+          "multi_support",
+          "lower_reservation",
+          "upper_reservation",
+          "top_down_access",
+          "disjoint_regions",
+          "p45_variant_front",
+          "rotations",
+          "high_container_cardinality",
+          "high_content_cardinality",
+          "content_assignment"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          8
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [
+          {
+            "reservation_id": "lower-booklet-clearance",
+            "zone": "lower",
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "size": [
+              1,
+              87,
+              6
+            ]
+          },
+          {
+            "reservation_id": "upper-board-clearance",
+            "zone": "upper",
+            "x": 98,
+            "y": 0,
+            "z": 9,
+            "size": [
+              1,
+              87,
+              6
+            ]
+          }
+        ],
+        "fragment_cell_mm": [
+          10,
+          10,
+          6
+        ],
+        "fragment_gap_mm": 2,
+        "access_policy": "top_down",
+        "project_mode": "cold_and_incremental_replay",
+        "source_kind": "constructed_adversarial"
+      },
+      "problem_digest": "3a3f97a8c9e7fdc18ffd27fc5a892a1c2b746d9ae792409b4c60a24a779528da",
+      "infeasibility_bound": {
+        "kind": "required_volume_exceeds_capacity",
+        "capacity_volume_mm3": 128151,
+        "required_volume_mm3": 128152
+      },
+      "case_digest": "a4250a3db9cc970727ec9286a3d5fd98d73434e412084126ad33ceadc10d7942"
+    },
+    {
+      "case_id": "p64-l08d-discovery-real-anonymized-small",
+      "split": "discovery",
+      "family": "real-anonymized",
+      "tier": "small",
+      "expected": "feasible",
+      "recipe": {
+        "seed": 641700,
+        "container_count": 18,
+        "content_count": 20,
+        "layer_count": 1,
+        "layer_heights_mm": [
+          4
+        ],
+        "columns": 8,
+        "regular_rows": 3,
+        "cell_stride_mm": 12,
+        "difficulty_profile": "exact-control",
+        "world_mm": [
+          99,
+          39,
+          6
+        ],
+        "active_constraints": [
+          "xyz",
+          "reviewed_bgig_source"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          4
+        ],
+        "fragment_gap_mm": 2,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "reviewed_anonymized_bgig_case",
+        "source": {
+          "fixture": "tests/fixtures/p64_l06a_reviewed_real_case.v1.json",
+          "case_id": "real-18-containers-20-contents-normal",
+          "bundle_digest": "0693aef760d92fb7b42f21210ec36efdda4ee738effbf237861cb5899c3f508d",
+          "project_digest": "b5948ab249aded6c553ec004ca7074e66b1a73cab2493a10f874fb10137b6699",
+          "scale_factor": 1
+        }
+      },
+      "problem_digest": "4b7690769e79477094213e2c2177cdaa51e38727273c21d7024e00b07da03964",
+      "witness_digest": "86dacf0e752747f33945ff5d1a7eb154e983d87068b9764890088678057a9dd7",
+      "case_digest": "c559f97a7eaa6e3fd3758b93c3996c0133f27f845173ee3dd8a69515d2908c61"
+    },
+    {
+      "case_id": "p64-l08d-discovery-real-anonymized-large",
+      "split": "discovery",
+      "family": "real-anonymized",
+      "tier": "large",
+      "expected": "feasible",
+      "recipe": {
+        "seed": 641701,
+        "container_count": 36,
+        "content_count": 40,
+        "layer_count": 1,
+        "layer_heights_mm": [
+          4
+        ],
+        "columns": 8,
+        "regular_rows": 5,
+        "cell_stride_mm": 11,
+        "difficulty_profile": "adversarial",
+        "world_mm": [
+          91,
+          58,
+          5
+        ],
+        "active_constraints": [
+          "xyz",
+          "reviewed_bgig_source"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          4
+        ],
+        "fragment_gap_mm": 1,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "scaled_from_reviewed_anonymized_bgig_case",
+        "source": {
+          "fixture": "tests/fixtures/p64_l06a_reviewed_real_case.v1.json",
+          "case_id": "real-18-containers-20-contents-normal",
+          "bundle_digest": "0693aef760d92fb7b42f21210ec36efdda4ee738effbf237861cb5899c3f508d",
+          "project_digest": "b5948ab249aded6c553ec004ca7074e66b1a73cab2493a10f874fb10137b6699",
+          "scale_factor": 2
+        }
+      },
+      "problem_digest": "4643a81f272afb7b79f7646c56cc2caff641e47c08c10074f35e590f09f48275",
+      "witness_digest": "eb359001ca0fdce08cc4d3f550334e6ae9f264762d84dfdfc71bf217b2a8fc42",
+      "case_digest": "1398cfd6867a2ed09512ca10e0dfc91d0a6ad1bb285847b064a369331c05fa1f"
+    },
+    {
+      "case_id": "p64-l08d-tuning-real-anonymized-xl",
+      "split": "tuning",
+      "family": "real-anonymized",
+      "tier": "xl",
+      "expected": "feasible",
+      "recipe": {
+        "seed": 641702,
+        "container_count": 72,
+        "content_count": 80,
+        "layer_count": 1,
+        "layer_heights_mm": [
+          4
+        ],
+        "columns": 8,
+        "regular_rows": 9,
+        "cell_stride_mm": 10,
+        "difficulty_profile": "adversarial-xl",
+        "world_mm": [
+          83,
+          93,
+          4
+        ],
+        "active_constraints": [
+          "xyz",
+          "reviewed_bgig_source"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          4
+        ],
+        "fragment_gap_mm": 0,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "scaled_from_reviewed_anonymized_bgig_case",
+        "source": {
+          "fixture": "tests/fixtures/p64_l06a_reviewed_real_case.v1.json",
+          "case_id": "real-18-containers-20-contents-normal",
+          "bundle_digest": "0693aef760d92fb7b42f21210ec36efdda4ee738effbf237861cb5899c3f508d",
+          "project_digest": "b5948ab249aded6c553ec004ca7074e66b1a73cab2493a10f874fb10137b6699",
+          "scale_factor": 4
+        }
+      },
+      "problem_digest": "b69a2ac04e53483b8e767d1138ea84b498354898b2180d8f938e126c7821744b",
+      "witness_digest": "068c14811924865269b84a1a1842c94cb17e096cd0edcfe83f8c55bd4e9cdef4",
+      "case_digest": "12649380367c971ee2dc245c5737d783a2e11e718186aa67982fbc75fad5b762"
+    },
+    {
+      "case_id": "p64-l08d-discovery-real-anonymized-negative",
+      "split": "discovery",
+      "family": "real-anonymized",
+      "tier": "negative",
+      "expected": "infeasible",
+      "recipe": {
+        "seed": 641799,
+        "container_count": 72,
+        "content_count": 80,
+        "layer_count": 1,
+        "layer_heights_mm": [
+          4
+        ],
+        "columns": 8,
+        "regular_rows": 9,
+        "cell_stride_mm": 10,
+        "difficulty_profile": "formal-negative",
+        "world_mm": [
+          83,
+          93,
+          4
+        ],
+        "active_constraints": [
+          "xyz",
+          "reviewed_bgig_source"
+        ],
+        "allowed_rotations": [
+          "xyz",
+          "yxz"
+        ],
+        "variant_front_cycle": [
+          1
+        ],
+        "variant_outer_size_deltas_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            -1,
+            0
+          ],
+          [
+            -1,
+            -1
+          ],
+          [
+            -2,
+            -1
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            -3,
+            -2
+          ],
+          [
+            -3,
+            -3
+          ],
+          [
+            -4,
+            -3
+          ]
+        ],
+        "support_coverage_ratio": 1.0,
+        "reservation_volumes": [],
+        "fragment_cell_mm": [
+          10,
+          10,
+          4
+        ],
+        "fragment_gap_mm": 0,
+        "access_policy": "unconstrained",
+        "project_mode": "cold",
+        "source_kind": "scaled_from_reviewed_anonymized_bgig_case",
+        "source": {
+          "fixture": "tests/fixtures/p64_l06a_reviewed_real_case.v1.json",
+          "case_id": "real-18-containers-20-contents-normal",
+          "bundle_digest": "0693aef760d92fb7b42f21210ec36efdda4ee738effbf237861cb5899c3f508d",
+          "project_digest": "b5948ab249aded6c553ec004ca7074e66b1a73cab2493a10f874fb10137b6699",
+          "scale_factor": 4
+        }
+      },
+      "problem_digest": "7bfcb13d509bc07927e748d5a55db1030fa436da2dd46451fe57bb1173b03aa8",
+      "infeasibility_bound": {
+        "kind": "required_volume_exceeds_capacity",
+        "capacity_volume_mm3": 30876,
+        "required_volume_mm3": 30877
+      },
+      "case_digest": "0e0d1bf956fa2c2b63084ddd4f85f48dc689dec77e519f9a6a4c877d949e7bd7"
+    },
+    {
+      "case_id": "p64-l08d-regression-real-18-containers-20-contents",
+      "split": "regression",
+      "family": "real-anonymized",
+      "tier": "reviewed-real",
+      "expected": "bounded_unknown",
+      "baseline_status": "no_solution_within_budget",
+      "recipe": {
+        "input_kind": "reviewed_bgig_project_reference",
+        "source": {
+          "fixture": "tests/fixtures/p64_l06a_reviewed_real_case.v1.json",
+          "case_id": "real-18-containers-20-contents-normal",
+          "bundle_digest": "0693aef760d92fb7b42f21210ec36efdda4ee738effbf237861cb5899c3f508d",
+          "project_digest": "b5948ab249aded6c553ec004ca7074e66b1a73cab2493a10f874fb10137b6699"
+        },
+        "project_digest": "b5948ab249aded6c553ec004ca7074e66b1a73cab2493a10f874fb10137b6699",
+        "container_count": 18,
+        "content_count": 20,
+        "active_constraints": [
+          "xyz",
+          "reviewed_bgig_source"
+        ],
+        "source_kind": "reviewed_anonymized_bgig_case"
+      },
+      "problem_digest": "4ad00d4446d2178c8425853b2ff62c4ceac4f2e5df712d6c09ecb7624b285e4e",
+      "case_digest": "b9bc51bcc4170bb14065abd85f5ab2f3cfe7690a5b53cb7f5a1669fbe25c7090"
+    }
+  ],
+  "open_case_count": 41,
+  "sealed_holdout_receipt": {
+    "schema_version": "bgig.real_3d_solver_holdout_receipt.v1",
+    "sealed_holdout_digest": "c5c23831d30396f56c265b5e6f79dad81fafd53600cd2e2f7e310e8e8cb8d0f8",
+    "case_count": 40,
+    "family_count": 10,
+    "tier_counts": {
+      "small": 10,
+      "large": 10,
+      "xl": 10
+    },
+    "positive_case_count": 30,
+    "negative_case_count": 10,
+    "opened": false,
+    "solver_invocation_count": 0
+  },
+  "invariants": {
+    "full_3d_coordinates": true,
+    "positive_witness_required": true,
+    "negative_bound_required": true,
+    "holdout_all_load_tiers": true,
+    "holdout_recipes_embedded": false,
+    "l06_l07_holdouts_reused": false,
+    "solver_invocation_count": 0
+  },
+  "manifest_digest": "d4324eebbc0412b02b7ed6bdbd16eacf1b90146a9a45ed8ad6bff542e19fc0f9"
+}
