@@ -135,7 +135,10 @@ nommé, y compris 11 × 34, ne peut jamais résumer la capacité.
 | P64-L08D | corpus adversarial, témoins et nouveau holdout | chaque famille Gate A couverte |
 | P64-L08E | adapters 3D fidèles et petits contrôles exacts | aucun `unsupported` caché |
 | P64-L08F | discovery, tuning, sélection scellée et holdout | vainqueur ou résultat négatif honnête |
-| P64-L08G | intégration mesurée et gate Fusion humaine | aucune régression et observation humaine ciblée |
+| P64-L08G | audit du paquet gagnant | refus fail-closed si ABI ou redistribution échoue |
+| P64-L08H | remédiation du paquet `cp314` | probe technique puis audit complet des avis natifs |
+| P64-L08I | ADR et audit pré-build minimal | modèle, sources, toolchain, licences et options verrouillés |
+| P64-L08J | build et équivalence publique | DLL inventoriées, probe hors ligne, holdout scellé |
 
 Une mission est committée et intégrée avant la suivante. Aucun run lourd ne
 démarre avant L08C/D : l'audit et le corpus doivent empêcher de brûler du temps
@@ -217,4 +220,24 @@ Décision : `negative_package_redistribution_incomplete`. La suite P64-L08I doit
 cadrer par ADR et auditer une fabrication SCIP minimale `cp314`, sans les
 composants non requis Ipopt/MUMPS/Intel. Le holdout reste consommé et interdit
 à tout replay ou réglage ; `fusion-validated=false` et
+`print-validated=false`.
+
+## 14. État exécuté après P64-L08I
+
+ADR-0084 définit un candidat MIP minimal sans modifier le gagnant : SCIP 10.0.2,
+SoPlex 8.0.2, PySCIPOpt 6.2.1 `cp314`, plugins MIP internes, symétrie `snauty`
+et LTO. L'audit statique du worker scellé confirme uniquement des variables
+binaires ou entières et des expressions linéaires, tout en conservant les
+collisions X/Y/Z, étages, appuis, réservations, régions, variantes et retraits.
+
+Les trois archives source officielles, Python 3.14 de build, Cython, setuptools,
+wheel, NumPy, MSVC, Windows SDK et CMake sont verrouillés par version, taille et
+SHA-256. La cible exclut Ipopt, MUMPS/METIS, les runtimes Intel, PaPILO/TBB,
+GCG, ZIMPL, GMP et le mode exact. SoPlex reste obligatoire pour les relaxations
+LP.
+
+Décision : `minimal_scip_build_audit_pass`. Seul P64-L08J est autorisé : build
+reproductible, inventaire réel des DLL, avis complets, probe hors ligne et
+équivalence sur cas publics. Aucun runtime produit ou add-in Fusion n'est
+modifié ; le holdout reste consommé et interdit. `fusion-validated=false` et
 `print-validated=false`.

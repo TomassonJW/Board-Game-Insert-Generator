@@ -3557,3 +3557,31 @@ Date : 2026-07-24
 - **Suite :** P64-L08I doit cadrer par ADR puis auditer un runtime SCIP 10.0.2
   minimal `cp314` sans Ipopt/MUMPS/Intel avant toute intégration.
   `fusion-validated=false`, `print-validated=false`.
+
+## Mise à jour P64-L08I — runtime SCIP minimal cadré avant build
+
+- **Statut :** `done`, `automated-validated`, `prebuild-audit-pass`,
+  `build-only-authorized`, `no-product-integration`, `no-fusion-gate`.
+- **Décision :** ADR-0084 conserve SCIP 10.0.2, SoPlex 8.0.2 et PySCIPOpt 6.2.1
+  `cp314`; aucun changement du gagnant, du worker, des paramètres ou du holdout.
+- **Preuve modèle :** 18 sites `addVar`, uniquement `B`/`I`, aucun produit de
+  deux expressions de décision, aucun appel Ipopt/MUMPS/METIS ; les sept
+  familles 3D X/Y/Z, étages, appuis, réservations, régions, variantes et
+  retraits restent actives.
+- **Sources :** trois archives officielles et cinq entrées de build verrouillées
+  par version, commit le cas échéant, taille et SHA-256 ; Python 3.14 reste
+  strictement local au workspace.
+- **Toolchain :** Visual Studio 17.14.2, MSVC 19.44.35207.1, Windows SDK
+  10.0.26100.0 et CMake 4.0.2 ; deux processus lourds maximum.
+- **Runtime cible :** SCIP + SoPlex, plugins MIP, `snauty`, LTO et NumPy ;
+  Ipopt/MUMPS/METIS/Intel, PaPILO/TBB, GCG, ZIMPL et exact-solve exclus.
+- **Redistribution :** `/MD` et sélection post-build des seules DLL nécessaires
+  dans le dossier officiel Microsoft `VC/Redist`; toute dépendance inconnue ou
+  tout avis manquant ferme L08J.
+- **Exécution :** aucun solveur, benchmark, tuning ou holdout lancé ; aucun
+  runtime BGIG, add-in, CAD, scène, schéma, budget ou certificat modifié.
+- **Preuve :** `docs/P64_L08I_MINIMAL_SCIP_RUNTIME_AUDIT_EVIDENCE.md`, digest
+  `51b89df9666bbb8b0272bf5e4c582dc2737e7733472e581bec685ae4102d38e5`.
+- **Suite :** P64-L08J construit le candidat, inventorie les DLL et vérifie hors
+  ligne l'équivalence sur contrôles publics et régressions ouvertes seulement.
+- `fusion-validated=false`. `print-validated=false`.

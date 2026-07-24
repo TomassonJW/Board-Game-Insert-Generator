@@ -91,13 +91,16 @@ preuves archivées.
   SCIP reste le gagnant benchmark avec 18 gains et 0 perte face au vrai
   comportement BGIG ; le portefeuille est rejeté à +5/−3 face à SCIP seul.
 - L08H corrige le blocage ABI : le wheel officiel PySCIPOpt 6.2.1 `cp314`
-  charge SCIP 10.0.2 et résout un contrôle exact hors ligne dans Python 3.14
-  isolé. La gate produit reste cependant fermée : cinq familles natives n'ont
-  pas tous leurs avis dans le paquet et les autorités Intel/Microsoft restent
-  incomplètes. Aucun moteur produit ni package Fusion n'est ajouté.
-- La prochaine mission recommandée est P64-L08I : ADR puis audit d'un runtime
-  SCIP 10.0.2 minimal `cp314`, sans Ipopt/MUMPS/Intel inutiles au modèle BGIG.
-  Elle ne peut ni rouvrir le holdout, ni retuner, ni intégrer le moteur.
+  charge SCIP 10.0.2 et résout un contrôle exact hors ligne dans Python 3.14,
+  mais son paquet natif reste refusé pour redistribution incomplète.
+- P64-L08I et ADR-0084 sont terminées. Le worker scellé reste un vrai MIP 3D :
+  variables entières/binaires, collisions X/Y/Z, étages, appuis, réservations,
+  régions, variantes et retraits. Les sources SCIP 10.0.2, SoPlex 8.0.2,
+  PySCIPOpt 6.2.1 et la toolchain `cp314` sont verrouillées avant build.
+- La prochaine mission recommandée est P64-L08J : construire sous `.codex-work`
+  le candidat SCIP + SoPlex sans Ipopt/MUMPS/METIS/Intel, inventorier les DLL et
+  prouver hors ligne son équivalence sur les seuls contrôles publics. Aucun
+  runtime produit ou paquet Fusion n'est encore ajouté ; le holdout reste scellé.
 
 ## Vue de séquence
 
@@ -160,7 +163,8 @@ preuves archivées.
 | Terminé — gagnant benchmark | P64-L08F | SCIP retenu : +18/−0 face à BGIG ; portefeuille rejeté à +5/−3 face à SCIP. |
 | Terminé — résultat produit négatif | P64-L08G | ABI `cp310/cp314` incompatible et redistribution native incomplète ; aucun runtime ni gate Fusion. |
 | Terminé — ABI réparée, paquet refusé | P64-L08H | SCIP `cp314` fonctionne hors ligne ; avis natifs et autorités Intel/Microsoft incomplets, aucune intégration. |
-| Prochaine — ADR et runtime minimal | P64-L08I | Auditer une fabrication SCIP 10.0.2 `cp314` sans Ipopt/MUMPS/Intel, avant build et régression. |
+| Terminée — audit pré-build | P64-L08I | ADR-0084, modèle MIP 3D, sources et toolchain verrouillés ; aucune intégration produit. |
+| Prochaine — build et équivalence | P64-L08J | Construire SCIP + SoPlex `cp314`, auditer chaque DLL puis lancer les contrôles publics hors ligne. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 

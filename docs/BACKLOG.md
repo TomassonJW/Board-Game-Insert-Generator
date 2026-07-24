@@ -3118,16 +3118,30 @@ implémentée et intégrée à la fois.
 
 ### P64-L08I — ADR et audit du runtime SCIP minimal redistribuable
 
-- Statut : ready, dépend de L08H ; aucun benchmark, holdout ou runtime produit.
-- Créer l'ADR d'une fabrication SCIP 10.0.2 / PySCIPOpt 6.2.1 `cp314`
-  minimale, sans changer le modèle, les réglages ou le gagnant scellés.
-- Prouver que le modèle BGIG n'utilise pas Ipopt, MUMPS/METIS ou les runtimes
-  Intel, puis les retirer de la cible avant build.
-- Verrouiller la toolchain Windows, le runtime C/C++, les sources, versions,
-  licences, avis, obligations, empreintes et tailles.
-- Définir un build reproductible local au workspace et un produit hors ligne,
-  sans installation globale, compte, secret, service ou télémétrie.
-- Exécuter uniquement les contrôles publics et régressions ouvertes ; le
-  holdout L08F reste scellé et interdit au choix ou au réglage.
-- Sortie : refus honnête si une inconnue subsiste ; sinon proposer une mission
-  séparée d'intégration BGIG et de préparation Fusion.
+- Statut : done, automated-validated, prebuild-audit-pass, no-product-integration,
+  no-fusion-gate.
+- ADR-0084 conserve SCIP 10.0.2, SoPlex 8.0.2 et PySCIPOpt 6.2.1 `cp314` ; le
+  gagnant, le worker, les paramètres et le holdout scellés ne changent pas.
+- Le worker 3D est prouvé entier et linéaire : collisions X/Y/Z, étages, appuis,
+  réservations, régions, variantes et retraits restent couverts.
+- Les archives officielles, commits, tailles, SHA-256, licences, avis, Python
+  3.14 de build et toolchain MSVC sont verrouillés avant compilation.
+- La cible garde SoPlex, les plugins MIP, `snauty` et LTO ; elle exclut
+  Ipopt/MUMPS/METIS/Intel, PaPILO/TBB, GCG, ZIMPL et le mode exact inutilisés.
+- Holdout lu ou rejoué : non ; tuning : 0 ; runtime produit modifié : non.
+- Preuve : `docs/P64_L08I_MINIMAL_SCIP_RUNTIME_AUDIT_EVIDENCE.md`.
+
+### P64-L08J — build reproductible et équivalence publique du runtime minimal
+
+- Statut : ready, dépend de L08I ; aucun holdout ni tuning.
+- Revalider toutes les entrées verrouillées puis construire SoPlex, SCIP et
+  PySCIPOpt sous `.codex-work`, avec la toolchain exacte et au plus deux
+  processus lourds.
+- Inventorier chaque DLL/PYD, dépendance, taille et empreinte ; refuser toute
+  famille Ipopt/MUMPS/METIS/Intel, toute dépendance non résolue ou provenance
+  Microsoft hors `VC/Redist`.
+- Produire le paquet complet d'avis PySCIPOpt/SCIP/SoPlex/NumPy/Microsoft.
+- Exécuter import `cp314`, contrôle exact, contrôles publics 3D et régressions
+  ouvertes hors ligne ; comparer au runtime tournoi sans rouvrir le holdout.
+- Sortie : refus honnête à la première inconnue ou, si toutes les gates passent,
+  autorisation d'une mission séparée d'intégration BGIG et de régressions.

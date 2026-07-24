@@ -1407,3 +1407,17 @@ La roadmap continue par P64-L08I : ADR puis audit d'une fabrication SCIP
 10.0.2 minimale `cp314`, sans Ipopt/MUMPS/Intel non requis par le modèle BGIG.
 Si et seulement si licences, avis, build reproductible et équivalence publique
 passent, une mission séparée pourra intégrer puis préparer la gate Fusion.
+
+## Extension P64-L08I — voie de fabrication du gagnant
+
+ADR-0084 ouvre une voie de build contrôlée sans diluer la gate 3D : SCIP 10.0.2,
+SoPlex 8.0.2 et PySCIPOpt 6.2.1 `cp314` restent les composants du candidat. Le
+worker entier et linéaire conserve les contraintes X/Y/Z, étages, appuis,
+réservations, régions, variantes et retraits ; Ipopt/MUMPS/METIS/Intel sont
+retirés de la cible avant compilation.
+
+La roadmap continue par P64-L08J : build reproductible local, inventaire de
+toutes les DLL, avis complets, probe hors ligne et équivalence sur cas publics.
+L'intégration BGIG, les régressions complètes et la préparation Fusion restent
+des missions atomiques ultérieures, seulement si cette gate passe. Le holdout
+L08F est consommé et interdit à tout nouveau choix ou réglage.

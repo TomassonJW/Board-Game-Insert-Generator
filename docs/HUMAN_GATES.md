@@ -1192,3 +1192,18 @@ Statut : `no-human-action`, `no-fusion-gate`,
 `negative-package-redistribution-incomplete`. P64-L08I doit d'abord cadrer et
 auditer un runtime SCIP minimal redistribuable. `fusion-validated=false`.
 `print-validated=false`.
+
+## P64-L08I — audit pré-build positif, aucune gate Fusion
+
+ADR-0084 et la preuve L08I verrouillent un candidat SCIP 10.0.2 / SoPlex 8.0.2 /
+PySCIPOpt 6.2.1 `cp314` sans la chaîne Ipopt/MUMPS/METIS/Intel. Le worker reste
+le modèle MIP 3D complet du benchmark ; aucun holdout, tuning ou solve produit
+n'a été exécuté.
+
+L08I autorise uniquement la fabrication et l'équivalence publique P64-L08J.
+Thomas n'a aucune manipulation à faire. Codex ne pourra préparer une gate Fusion
+qu'après build reproductible, inventaire natif complet, intégration BGIG séparée,
+régressions automatisées réussies et installation locale vérifiée de l'add-in.
+
+Statut : `no-human-action`, `no-fusion-gate`, `prebuild-audit-pass`.
+`fusion-validated=false`. `print-validated=false`.

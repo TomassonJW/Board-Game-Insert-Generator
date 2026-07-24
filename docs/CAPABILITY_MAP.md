@@ -1956,3 +1956,19 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
   humaine ; `fusion-validated=false`, `print-validated=false`.
 - Suite : P64-L08I doit auditer un runtime SCIP minimal redistribuable avant
   toute modification produit.
+
+## Mise à jour P64-L08I — candidat MIP minimal autorisé au build seulement
+
+- `C-SOLVER` : le worker gagnant reste le modèle SCIP 3D complet ; l'audit
+  statique prouve variables entières/binaires et expressions linéaires, sans
+  dépendance fonctionnelle à Ipopt/MUMPS/METIS. Aucune capability produit n'est
+  encore promue.
+- `C-GRID-3D`, `C-LAYERS`, `C-STACKING`, `C-LAYOUT` : collisions X/Y/Z,
+  multi-niveaux, appuis, réservations, régions, variantes et retraits sont
+  explicitement protégés par la preuve L08I ; aucun retour au sol 2D.
+- `C-SAFETY` : sources, commits, tailles, SHA-256, toolchain, options CMake,
+  notices et provenance du runtime Microsoft sont fail-closed avant build.
+- `C-QUALITY` : aucun replay, tuning ou holdout ; L08J devra démontrer
+  l'équivalence publique et inventorier chaque binaire avant toute intégration.
+- `C-FUSION`, `C-FUSION-UI`, `C-PRINT` : aucun package, smoke test ou gate
+  humaine ; `fusion-validated=false`, `print-validated=false`.

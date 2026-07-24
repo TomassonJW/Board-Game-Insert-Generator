@@ -1,0 +1,254 @@
+{
+  "schema_version": "bgig.minimal_scip_runtime_audit.v1",
+  "mission": "P64-L08I",
+  "decision_context": {
+    "sealed_winner": "SCIP 10.0.2 via PySCIPOpt 6.2.1",
+    "sealed_holdout_reopened": false,
+    "benchmark_replayed": false,
+    "winner_changed": false,
+    "model_changed": false
+  },
+  "model_audit": {
+    "worker_path": "scripts/solver/external_workers/scip_real_3d_worker.py",
+    "worker_sha256": "2a1870dc65955e59d15720d4133e55a45da1205b7a72b1f9457632b193d13363",
+    "pyscipopt_imports": [
+      "Model",
+      "quicksum"
+    ],
+    "add_var_call_count": 18,
+    "variable_types": [
+      "B",
+      "I"
+    ],
+    "nonlinear_products": [],
+    "forbidden_decision_operators": [],
+    "banned_dependency_tokens_found": [],
+    "linear_integer_model_gate_passed": true,
+    "active_3d_semantics": [
+      "orthogonal_xyz_non_overlap",
+      "multi_level_z_placement",
+      "support_count_and_area",
+      "reservation_volumes",
+      "disjoint_regions",
+      "access_precedence",
+      "local_variant_selection"
+    ]
+  },
+  "source_artifacts": [
+    {
+      "component_id": "scip",
+      "version": "10.0.2",
+      "tag": "v10.0.2",
+      "commit": "b8eaf989f9168f966a471b2039ffb75d925d5202",
+      "archive_name": "scip-v10.0.2.zip",
+      "size_bytes": 13725644,
+      "sha256": "7225e8d493707ebb1b5c5d5696cf384a1cd6aeaf8820253ae260a5fdcc763308",
+      "official_source": "https://github.com/scipopt/scip/releases/tag/v10.0.2",
+      "license_id": "Apache-2.0"
+    },
+    {
+      "component_id": "soplex",
+      "version": "8.0.2",
+      "tag": "v8.0.2",
+      "commit": "cfadddc47e142fb21e040ff9dc564cbe2e8e3801",
+      "archive_name": "soplex-v8.0.2.zip",
+      "size_bytes": 1466934,
+      "sha256": "f1a45c6338ad1cfb6c2950e91e4f854ed199c2e4039830b26dbe65d0dd67cd34",
+      "official_source": "https://github.com/scipopt/soplex/tree/v8.0.2",
+      "license_id": "Apache-2.0"
+    },
+    {
+      "component_id": "pyscipopt",
+      "version": "6.2.1",
+      "tag": "v6.2.1",
+      "commit": "6ff33812155e6592e0a681b6a1967322428ac2db",
+      "archive_name": "pyscipopt-v6.2.1.zip",
+      "size_bytes": 959233,
+      "sha256": "0d53902150724665c2f2a22adb89fd1b3717c16b365819dfbdf137f65ab76588",
+      "official_source": "https://github.com/scipopt/PySCIPOpt/tree/v6.2.1",
+      "license_id": "MIT"
+    }
+  ],
+  "build_inputs": [
+    {
+      "component_id": "python-build-runtime",
+      "version": "3.14.0",
+      "name": "python.3.14.0.nupkg",
+      "size_bytes": 14839285,
+      "sha256": "620fb3527428fb354f093b0b8b634dfb8e3023115df68608fba7e91db69b4f4d",
+      "official_source": "https://www.nuget.org/packages/python/3.14.0",
+      "product_component": false
+    },
+    {
+      "component_id": "cython",
+      "version": "3.2.8",
+      "name": "cython-3.2.8-cp314-cp314-win_amd64.whl",
+      "size_bytes": 2807626,
+      "sha256": "89b0fdc2ca0b502afedc4dd4ddbc4f9cb5a135245afacf9483e556e8ad3ada3b",
+      "official_source": "https://pypi.org/project/Cython/3.2.8/",
+      "product_component": false
+    },
+    {
+      "component_id": "setuptools",
+      "version": "83.0.0",
+      "name": "setuptools-83.0.0-py3-none-any.whl",
+      "size_bytes": 1008090,
+      "sha256": "29b23c360f22f414dc7336bb39178cc7bcbf6021ed2733cde173f09dba19abb3",
+      "official_source": "https://pypi.org/project/setuptools/83.0.0/",
+      "product_component": false
+    },
+    {
+      "component_id": "wheel",
+      "version": "0.47.0",
+      "name": "wheel-0.47.0-py3-none-any.whl",
+      "size_bytes": 32218,
+      "sha256": "212281cab4dff978f6cedd499cd893e1f620791ca6ff7107cf270781e587eced",
+      "official_source": "https://pypi.org/project/wheel/0.47.0/",
+      "product_component": false
+    },
+    {
+      "component_id": "numpy",
+      "version": "2.5.1",
+      "name": "numpy-2.5.1-cp314-cp314-win_amd64.whl",
+      "size_bytes": 12562177,
+      "sha256": "24d0eb82c0541d3415a33425db64ae439dffccd7b4dbcb30e7c35120205c506a",
+      "official_source": "https://pypi.org/project/numpy/2.5.1/",
+      "product_component": true
+    }
+  ],
+  "toolchain": {
+    "generator": "Visual Studio 17 2022 x64",
+    "visual_studio": "17.14.2",
+    "msvc_toolset": "14.44.35207",
+    "cl_version": "19.44.35207.1",
+    "cl_sha256": "6aa39ae173cb8563d796359930b332a08b2fdc1745b70e5a4caa48a9779fdd07",
+    "windows_sdk": "10.0.26100.0",
+    "cmake_version": "4.0.2",
+    "cmake_sha256": "c5cecf8e663f105217ff5805bb1d748f7de2fe3767312974b677b3c818883d2c",
+    "ninja_version": "1.11.1.git.kitware.jobserver-1",
+    "ninja_sha256": "9ee2fc6bc8c0acd1de6e6dcadf009c0598e6336646b87cfb5ed2918604b81597",
+    "heavy_process_limit": 2,
+    "workspace_local_build": true,
+    "global_install_required": false
+  },
+  "build_contract": {
+    "architecture": "win_amd64",
+    "python_abi": "cp314",
+    "configuration": "Release",
+    "soplex_cmake_options": {
+      "BOOST": "OFF",
+      "CMAKE_BUILD_TYPE": "Release",
+      "GMP": "OFF",
+      "MPFR": "OFF",
+      "PAPILO": "OFF",
+      "QUADMATH": "OFF",
+      "ZLIB": "OFF"
+    },
+    "scip_cmake_options": {
+      "AMPL": "OFF",
+      "AUTOBUILD": "OFF",
+      "CMAKE_BUILD_TYPE": "Release",
+      "CONOPT": "OFF",
+      "EXACTSOLVE": "OFF",
+      "EXPRINT": "none",
+      "GMP": "OFF",
+      "IPOPT": "OFF",
+      "LAPACK": "OFF",
+      "LPS": "spx",
+      "LPSEXACT": "none",
+      "LPSCHECK": "OFF",
+      "LTO": "ON",
+      "MPFR": "OFF",
+      "PAPILO": "OFF",
+      "READLINE": "OFF",
+      "SHARED": "ON",
+      "SYM": "snauty",
+      "TPI": "none",
+      "WORHP": "OFF",
+      "ZIMPL": "OFF",
+      "ZLIB": "OFF"
+    },
+    "retained_runtime_components": [
+      "PySCIPOpt",
+      "SCIP",
+      "SoPlex",
+      "SCIP built-in MIP plugins",
+      "sassy+nauty symmetry",
+      "NumPy"
+    ],
+    "excluded_runtime_components": [
+      "Ipopt",
+      "MUMPS",
+      "METIS",
+      "Intel MKL",
+      "Intel Fortran runtime",
+      "Intel OpenMP runtime",
+      "PaPILO and Intel TBB",
+      "GCG",
+      "ZIMPL",
+      "GMP and exact-solve mode"
+    ],
+    "c_cpp_runtime": {
+      "linkage": "dynamic /MD",
+      "redistributable_source": "Visual Studio 2022 Community VC/Redist/MSVC/14.44.35112/x64/Microsoft.VC143.CRT",
+      "authority": "Microsoft Visual Studio redistribution list; exact DLL subset must be proven by dependency scan after build",
+      "version": "14.44.35112",
+      "candidate_dll_count": 10
+    },
+    "offline_product": true,
+    "service_required": false,
+    "account_required": false,
+    "secret_required": false,
+    "telemetry_required": false,
+    "private_holdout_allowed": false
+  },
+  "redistribution_contract": {
+    "all_source_versions_bound": true,
+    "all_source_hashes_bound": true,
+    "all_source_sizes_bound": true,
+    "required_notices": [
+      "PySCIPOpt MIT",
+      "SCIP Apache-2.0",
+      "SCIP tclique Apache-2.0",
+      "SCIP nauty Apache-2.0",
+      "SCIP dejavu MIT",
+      "SoPlex Apache-2.0",
+      "SoPlex fmt MIT",
+      "NumPy license and bundled notices",
+      "Microsoft Visual C++ redistribution terms"
+    ],
+    "forbidden_binary_families": [
+      "ipopt*",
+      "coinmumps*",
+      "libifcoremd*",
+      "libiomp5md*",
+      "libmmd*",
+      "svml_dispmd*"
+    ],
+    "fail_if_unresolved_dependency": true,
+    "fail_if_notice_missing": true,
+    "fail_if_runtime_dll_outside_redist_source": true
+  },
+  "decision": {
+    "prebuild_model_gate_passed": true,
+    "source_provenance_gate_passed": true,
+    "toolchain_gate_passed": true,
+    "redistribution_plan_gate_passed": true,
+    "minimal_build_authorized": true,
+    "product_integration_authorized": false,
+    "fusion_gate_prepared": false,
+    "fusion_gate_installed": false,
+    "decision_code": "minimal_scip_build_audit_pass",
+    "next_mission": "P64-L08J reproducible minimal SCIP build and public equivalence gate"
+  },
+  "invariants": {
+    "holdout_read": false,
+    "holdout_worker_invocation_count": 0,
+    "benchmark_replayed": false,
+    "post_holdout_tuning_count": 0,
+    "product_runtime_modified": false,
+    "fusion_validated": false,
+    "print_validated": false
+  },
+  "evidence_digest": "51b89df9666bbb8b0272bf5e4c582dc2737e7733472e581bec685ae4102d38e5"
+}

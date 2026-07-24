@@ -76,38 +76,38 @@ Preuve L08E : P64_L08E_FAITHFUL_3D_ADAPTERS_EVIDENCE.md.
 Preuve L08F : P64_L08F_REAL_3D_TOURNAMENT_EVIDENCE.md.
 Preuve L08G : P64_L08G_SCIP_PRODUCT_GATE_EVIDENCE.md.
 Preuve L08H : P64_L08H_SCIP_PACKAGE_REMEDIATION_EVIDENCE.md.
+Preuve L08I : P64_L08I_MINIMAL_SCIP_RUNTIME_AUDIT_EVIDENCE.md.
 Rapport final L08 : P64_L08_GOAL_FINAL_REPORT.md.
 Rapport final L07 : P64_L07_GOAL_FINAL_REPORT.md.
 
 ## Prochaine action recommandée
 
-### Exécuter P64-L08I — cadrer et auditer un runtime SCIP minimal redistribuable
+### Exécuter P64-L08J — construire et qualifier le runtime SCIP minimal
 
-Type : ADR et audit de fabrication isolé. Aucun tuning, aucun replay, aucune
-lecture du holdout L08F et aucune intégration produit ne sont autorisés.
+Type : build reproductible et gate d'équivalence publique. Aucun tuning, replay
+ou lecture du holdout L08F n'est autorisé. Aucune intégration produit avant le
+verdict complet de cette mission.
 
-P64-L08H est terminé avec un résultat mixte : le wheel officiel PySCIPOpt 6.2.1
-`cp314` charge bien SCIP 10.0.2 et résout un contrôle exact hors ligne dans un
-Python 3.14 isolé. Le paquet de 61 937 391 octets reste néanmoins refusé : les
-avis de cinq familles natives ne sont pas tous présents et les autorités de
-redistribution Intel/Microsoft ne sont pas entièrement établies.
+P64-L08I est terminé. ADR-0084 conserve le vrai moteur 3D SCIP 10.0.2,
+PySCIPOpt 6.2.1 `cp314`, SoPlex 8.0.2, les plugins MIP internes, la symétrie
+`snauty` et LTO. Le worker scellé est prouvé entier et linéaire ; la chaîne
+Ipopt/MUMPS/METIS/Intel est donc exclue du candidat.
 
-P64-L08I doit :
+P64-L08J doit :
 
-1. créer l'ADR du runtime SCIP minimal, toujours fondé sur SCIP 10.0.2 et
-   PySCIPOpt 6.2.1 `cp314`, sans changer le gagnant ni le modèle ;
-2. prouver avant build que le modèle discret BGIG n'a besoin ni d'Ipopt, ni de
-   MUMPS/METIS, ni des runtimes Intel correspondants ;
-3. verrouiller la toolchain Windows, le runtime C/C++, chaque source, version,
-   licence, avis et droit de redistribution ;
-4. définir un build reproductible, local au workspace, hors ligne dans le
-   produit, sans installation globale, compte, secret, service ou télémétrie ;
-5. exécuter seulement les contrôles publics et régressions ouvertes nécessaires
-   à l'équivalence ; le holdout privé reste scellé ;
-6. refuser immédiatement si une dépendance, une licence ou une équivalence
-   reste inconnue ;
-7. laisser l'intégration BGIG et la préparation Fusion à une mission séparée si
-   toutes les gates passent.
+1. vérifier les tailles et SHA-256 de toutes les sources et entrées L08I ;
+2. construire SoPlex, SCIP puis PySCIPOpt uniquement sous `.codex-work`, avec la
+   toolchain et les options exactes d'ADR-0084, au plus deux processus lourds ;
+3. inventorier chaque DLL/PYD final, ses dépendances, sa taille et son SHA-256 ;
+4. refuser toute DLL Ipopt, MUMPS/METIS, Intel, toute dépendance non résolue ou
+   toute DLL Microsoft extérieure au dossier officiel `VC/Redist` ;
+5. créer le paquet d'avis complet PySCIPOpt/SCIP/SoPlex/NumPy/Microsoft ;
+6. exécuter hors ligne l'import `cp314`, le contrôle exact, tous les contrôles
+   publics 3D et les régressions ouvertes, sans utiliser le holdout ;
+7. comparer les sorties au runtime du tournoi et refuser toute perte sémantique,
+   solution, certificat ou régression publique matérielle ;
+8. n'autoriser une mission d'intégration BGIG séparée que si toutes les gates
+   passent.
 
 La gate humaine L08 n'est pas active. `fusion-validated=false` et
 `print-validated=false` restent inchangés.
