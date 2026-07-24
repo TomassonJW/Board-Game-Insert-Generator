@@ -2,8 +2,10 @@
 
 Date : 2026-07-23
 
-Statut : `done`, `automated-validated`, `external-benchmark-complete`,
-`highs-integrated`.
+Statut historique : `done`, `automated-validated`, `partial-floor-benchmark`,
+`highs-specialized-lane`.
+
+> **Correction de portée — 2026-07-24.** ADR-0083 et le programme P64-L08 remplacent la conclusion `external-benchmark-complete` pour le solvage global BGIG. Les preuves ci-dessous restent valides pour le sous-problème rectangulaire à un niveau, mais ne classent plus un moteur 3D ni la performance des cas limites.
 
 `fusion-validated: false`
 
@@ -11,7 +13,7 @@ Statut : `done`, `automated-validated`, `external-benchmark-complete`,
 
 ## 1. Réponse courte
 
-Le vrai benchmark demandé est terminé.
+Le benchmark externe de lane de sol est terminé. Il est insuffisant pour la gate réelle de solvage 3D ; voir `docs/P64_L07_SCOPE_CORRECTION.md` et `docs/P64_L08_REAL_3D_SOLVER_BENCHMARK_PROGRAM.md`.
 
 - dix candidats crédibles ont été audités ;
 - quatre moteurs externes réels de quatre familles ont été exécutés ;

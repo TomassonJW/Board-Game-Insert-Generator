@@ -45,6 +45,9 @@ REQUIRED_PROJECT_FILES = (
     "docs/P64_L06_AUTONOMOUS_GOAL_RUNBOOK.md",
     "docs/P64_L07_OPEN_SOLVER_TOURNAMENT_PROGRAM.md",
     "docs/P64_L07_AUTONOMOUS_GOAL_RUNBOOK.md",
+    "docs/P64_L07_SCOPE_CORRECTION.md",
+    "docs/P64_L08_REAL_3D_SOLVER_BENCHMARK_PROGRAM.md",
+    "docs/DECISIONS/ADR-0083-real-3d-solver-gate-and-l07-reclassification.md",
     "docs/P64_L06C_OFFLINE_ADAPTER_AND_EXACT_ORACLE_CONTRACT.md",
     "docs/P64_L06C_OFFLINE_ADAPTER_AND_EXACT_ORACLE_EVIDENCE.md",
     "docs/FUTURE_PRODUCT_HORIZONS.md",
@@ -309,6 +312,23 @@ REQUIRED_SECTIONS = {
         "## 11. Mission P64-L07E",
         "## 12. Gate d'acceptation finale",
         "## 17. Prompt `/goal` canonique",
+    ),
+    "docs/P64_L07_SCOPE_CORRECTION.md": (
+        "## Faits vérifiés",
+        "## Ce que L07 reste autorisé à démontrer",
+        "## Action remplacée",
+    ),
+    "docs/P64_L08_REAL_3D_SOLVER_BENCHMARK_PROGRAM.md": (
+        "## 1. But produit non négociable",
+        "## 3. Corpus adversarial obligatoire",
+        "## 7. Nouveau holdout et montée en charge",
+        "## 9. Invariants",
+    ),
+    "docs/DECISIONS/ADR-0083-real-3d-solver-gate-and-l07-reclassification.md": (
+        "## Statut",
+        "## Contexte",
+        "## Décision",
+        "## Conséquences",
     ),
     "docs/P64_L06C_OFFLINE_ADAPTER_AND_EXACT_ORACLE_CONTRACT.md": (
         "## 1. Statut et objectif",

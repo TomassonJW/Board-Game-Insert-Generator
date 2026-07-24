@@ -3388,3 +3388,18 @@ Preuves :
 Suite : P64-L07V est une observation Fusion humaine facultative sur 0.1.60.
 Le Goal P64-L07 est clôturé. Le holdout reste consommé.
 fusion-validated: false. print-validated: false.
+
+## P64-L08A — correction de portée du benchmark externe
+
+Date : 2026-07-24
+
+- **Statut :** done, documentation-validated.
+- **Constat :** le contrat commun P64-L07 n'acceptait qu'un étage de rectangles ;
+  le holdout final n'a donc traduit que 7 cas sur 64 et a refusé 55 cas BGIG.
+- **Décision :** L07 reste une preuve historique pour une lane de sol, mais pas
+  un benchmark de solvage 3D. HiGHS redevient une lane expérimentale ; L07V est
+  suspendu.
+- **Suite :** P64-L08B mesure et, si nécessaire, met en quarantaine cette lane ;
+  le programme L08 impose ensuite un corpus 3D de cas limites et un holdout neuf.
+- **Portée inchangée :** aucune géométrie, tolérance, propriété P45, contrat de
+  certificat, finalisation, Fusion ou impression n'a été modifié.

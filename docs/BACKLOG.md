@@ -3024,7 +3024,7 @@ implémentée et intégrée à la fois.
 ### P64-L07E — intégration du meilleur portefeuille
 
 - Statut : done, implemented-core, implemented-fusion-bridge,
-  automated-validated, product-gain-demonstrated.
+  automated-validated, product-gain-demonstrated-for-floor-lane-only, superseded-for-global-3d-selection.
 - Gate produit : cinq cas communs, deux gains de qualité HiGHS, zéro perte,
   vérité et nombre de certificats inchangés.
 - Décision : HiGHS 1.15.1 seul ; OR-Tools sans gain distinct, SCIP et LAFF
@@ -3038,8 +3038,31 @@ implémentée et intégrée à la fois.
 
 ### P64-L07V — observation Fusion éventuelle
 
-- Statut : ready-human-gate, optional, non-blocking.
-- Dépendance : L07E intégrée ; package cible 0.1.60.
-- Scope : observer le comportement produit du portefeuille intégré sans
-  revendiquer de validation d'impression.
-- fusion-validated: false et print-validated: false avant preuve dédiée.
+- Statut : superseded par ADR-0083 et P64-L08.
+- Motif : une observation Fusion de la lane de sol ne valide ni le solvage 3D,
+  ni les cas limites BGIG. Elle n'est pas demandée tant que la nouvelle gate
+  3D n'a pas produit un candidat réellement recertifié.
+
+### P64-L08A — correction de portée du benchmark externe
+
+- Statut : done, documentation-validated.
+- Référence : ADR-0083, docs/P64_L07_SCOPE_CORRECTION.md et
+  docs/P64_L08_REAL_3D_SOLVER_BENCHMARK_PROGRAM.md.
+- Résultat : L07 est conservé comme benchmark partiel de lane de sol ; la
+  sélection globale reste ouverte et exige le solvage 3D réel des cas limites.
+
+### P64-L08B — mesure et quarantaine de la lane HiGHS
+
+- Statut : ready.
+- But : mesurer, sur les cas BGIG actuels, la latence complète et l'effet sur
+  les résultats de la lane HiGHS ; la retirer du chemin automatique si elle
+  ralentit ou dégrade le solvage sans bénéfice prouvé.
+- Dépendances : P64-L08A terminé.
+
+### P64-L08C à P64-L08G — tournoi 3D réel
+
+- Statut : planned ; programme canonique dans
+  docs/P64_L08_REAL_3D_SOLVER_BENCHMARK_PROGRAM.md.
+- Ordre : audit et filtres de licence, corpus V2 3D, adaptateurs fidèles,
+  tournoi scellé avec holdout neuf, puis intégration seulement si un gain 3D
+  réel est certifié.

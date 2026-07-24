@@ -1126,22 +1126,21 @@ une installation globale, un dépassement de l'enveloppe 36 h / 8 Gio ou une
 extension T2-T4. Dans ce cas, conserver le résultat de benchmark sans intégrer
 le composant concerné.
 
-Le `/goal` a été reçu et L07A à L07E sont terminées. HiGHS 1.15.1 est
-intégré seul dans le package 0.1.60. Aucune licence ambiguë, installation
-globale, extension T2-T4 ou autre gate exceptionnelle n'a été rencontrée.
+Le `/goal` a été reçu et L07A à L07E sont terminées historiquement. ADR-0083
+requalifie toutefois ce résultat : les adapters L07 n'ont couvert qu'un modèle
+de sol à un niveau. Aucun résultat L07 ne vaut décision sur le solvage 3D global.
 
-Statut : Goal clôturé, aucune action humaine requise pour l'intégration.
+Statut : L07 archivé comme benchmark partiel ; P64-L08 prend le relais.
 fusion-validated: false. print-validated: false.
 
-## P64-L07V — observation Fusion du moteur intégré
+## P64-L07V — gate Fusion suspendue
 
-Cette gate est désormais prête mais facultative. Thomas doit uniquement
-observer dans Fusion le package 0.1.60 après préparation et installation
-locales par Codex. Codex ne contrôle jamais Fusion à sa place.
+ADR-0083 suspend cette observation. Elle ne mesurerait que la lane HiGHS de sol
+et ne répondrait pas au besoin obligatoire de solvage 3D des cas limites.
 
-Retour attendu : `P64-L07V Fusion OK 0.1.60` ou un KO précis avec le projet,
-l'effort, le statut et le comportement observés. Cette preuve ne vaut aucune
-validation d'impression et ne rouvre pas le holdout.
+Le GO explicite de Thomas du 2026-07-24 autorise P64-L08A à P64-L08G dans le
+cadre du programme versionné. Une nouvelle gate humaine ne sera demandée qu'une
+fois un portefeuille gagnant sur le corpus 3D réel prêt à observer dans Fusion.
 
-Statut : `ready-human-gate`, non bloquante pour le Goal.
+Statut : `superseded-by-P64-L08`, aucune action Fusion demandée maintenant.
 fusion-validated: false. print-validated: false.

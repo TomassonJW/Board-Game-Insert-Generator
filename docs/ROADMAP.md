@@ -1327,3 +1327,12 @@ fail-closed dans l'add-in 0.1.60. Aucun complément n'est justifié.
 Statut : Goal clôturé ; `product_gain_demonstrated=true`. Le holdout est
 consommé. P64-L07V est la prochaine observation humaine facultative.
 fusion-validated: false. print-validated: false.
+
+## Addendum 2026-07-24 — P64-L08, gate de solvage 3D réel
+
+P64-L07 ne clôt pas le choix d'un solveur global : son adaptateur commun a
+réduit les candidats à un étage rectangulaire. Avant toute revendication de gain
+sur les cas limites BGIG, P64-L08 impose un tournoi sur les contraintes 3D
+réelles : empilement, appuis, réservations hautes, accès, variantes P45,
+beaucoup de conteneurs et beaucoup d'éléments. Le score par un seul cas 11×34
+n'est pas une preuve de capacité.

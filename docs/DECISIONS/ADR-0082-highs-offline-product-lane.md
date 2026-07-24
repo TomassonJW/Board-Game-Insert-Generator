@@ -4,6 +4,8 @@
 
 Accepté.
 
+> **Portée requalifiée — 2026-07-24.** ADR-0083 conserve cette décision pour une lane de sol rectangulaire, mais interdit de la lire comme un choix de solveur global. Cette lane est expérimentale ; P64-L08B mesure son impact avant toute nouvelle promotion.
+
 ## Date
 
 2026-07-23

@@ -82,11 +82,12 @@ preuves archivées.
 - P64-L07D est terminé et automated-validated : quatre moteurs externes
   sont comparés, HiGHS est scellé seul puis certifie 5/7 cas représentables du
   holdout. Le holdout est consommé et ne sera jamais rouvert.
-- P64-L07E est terminé et automated-validated : la gate produit donne deux
-  gains de qualité HiGHS, aucune perte et un fallback BGIG conservé. Le CLI
-  officiel HiGHS 1.15.1 MIT est embarqué hors ligne dans l'add-in 0.1.60.
-- Le Goal P64-L07 est clôturé. La prochaine action est la gate humaine
-  facultative P64-L07V dans Fusion ; elle ne bloque pas l'intégration.
+- P64-L07E est conservée comme preuve d'une lane HiGHS de sol rectangulaire.
+  ADR-0083 requalifie cependant L07 : ses quatre candidats ont été comparés sur
+  un seul niveau et ne répondent pas à la gate de solvage 3D réel.
+- P64-L07V est suspendue. La mission active est P64-L08A, terminée
+  documentairement : la prochaine action est P64-L08B, diagnostic de régression
+  et quarantaine éventuelle de la lane 2D avant le vrai benchmark 3D.
 
 ## Vue de séquence
 
@@ -140,8 +141,9 @@ preuves archivées.
 | Terminé — automatisé | P64-L07B | Corpus V2 déterministe, deux sources publiques et nouveau holdout scellé, sans run candidat. |
 | Terminé — automatisé | P64-L07C | Quatre moteurs externes, quatre familles et 12/12 contrôles réels recertifiés. |
 | Terminé — automatisé | P64-L07D | Quatre moteurs comparés ; HiGHS scellé seul, holdout 5/7 dans sa portée. |
-| Terminé — automatisé | P64-L07E | HiGHS 1.15.1 intégré seul, hors ligne, recertifié et fail-closed dans 0.1.60. |
-| Prête — gate humaine | P64-L07V | Observation Fusion facultative du package 0.1.60 ; aucune impression. |
+| Historique, portée corrigée | P64-L07E | HiGHS 1.15.1 est une lane de sol rectangulaire, pas un gagnant 3D global. |
+| Supersédée | P64-L07V | Observation Fusion suspendue par ADR-0083 : elle ne teste pas la gate réelle. |
+| Terminé — contrat correctif | P64-L08A | ADR-0083 et gate adversariale 3D complète ; P64-L08B devient prioritaire. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -205,8 +207,10 @@ preuves archivées.
 - ADR-0082 : HiGHS 1.15.1 CLI comme lane produit Windows hors ligne.
 - P64_L07E_HIGHS_PRODUCT_INTEGRATION_EVIDENCE.md : gate produit, paquet,
   équivalence CLI, fallback et limites de l'intégration.
-- P64_L07_GOAL_FINAL_REPORT.md : synthèse du vrai benchmark externe et de
-  la décision finale.
+- P64_L07_SCOPE_CORRECTION.md : requalification de L07 et limites exactes de
+  la lane de sol ; il prévaut sur toute formule de victoire globale.
+- ADR-0083 et P64_L08_REAL_3D_SOLVER_BENCHMARK_PROGRAM.md : gate obligatoire
+  de solvage 3D des cas limites, portefeuille et critères de sélection.
 - FUTURE_PRODUCT_HORIZONS.md : registre différé des formes, mécanismes,
   visualisations et du futur compositeur manuel 3D.
 - ADR-0074 : supersession partielle d'ADR-0071 après le KO Fusion 0.1.56.
@@ -666,3 +670,10 @@ Statut : Goal clôturé ; P64-L07A/B/C/D/E done et automated-validated. HiGHS
 1.15.1 est intégré seul dans l'add-in 0.1.60, avec certificat BGIG commun et
 fallback interne. P64-L07V est une observation Fusion humaine facultative.
 fusion-validated: false. print-validated: false.
+
+## Addendum 2026-07-24 — L07 requalifié, L08 actif
+
+Les sections historiques L07 de cette carte décrivent une lane de sol et ne
+doivent plus être lues comme une clôture du benchmark externe. ADR-0083 suspend
+L07V et ouvre P64-L08 : la gate réelle porte sur les cas limites 3D BGIG,
+notamment l'empilement, les appuis, les réservations et la forte cardinalité.

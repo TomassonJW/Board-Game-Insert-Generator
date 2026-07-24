@@ -16,12 +16,11 @@ recertifié. Le manifest Fusion passe à 0.1.59 pour le journal automatique. fus
 print-validated: false pour L05A, L05B et L05C. À ce stade historique, le
 solveur restait inchangé.
 P64-L05B, P64-L05C, P64-L05D1/D2 et P64-L06A/B/C/D/E sont automated-validated. Le premier Goal L06 est terminé par la décision négative `no_algorithm_change_v1`.
-Cette décision ne compare aucun solveur externe mature. ADR-0081 et P64-L07
-encadrent désormais la vraie campagne externe. L07A à L07E sont terminées :
-quatre moteurs externes de quatre familles ont été comparés, HiGHS est scellé
-seul puis confirme 5/7 cas représentables du holdout. Une gate produit
-indépendante démontre ensuite deux gains de qualité sans perte. HiGHS 1.15.1
-est intégré hors ligne dans l'add-in 0.1.60 avec fallback BGIG.
+Cette décision ne compare aucun solveur externe mature. P64-L07 a ensuite
+comparé quatre moteurs, mais uniquement après projection dans un modèle de sol
+à un seul niveau : il est requalifié par ADR-0083 comme benchmark partiel. La
+lane HiGHS 1.15.1 reste expérimentale et spécialisée ; elle ne vaut ni choix de
+solveur 3D global ni promesse de vitesse.
 
 ## Dernier état réel
 
@@ -48,9 +47,8 @@ est intégré hors ligne dans l'add-in 0.1.60 avec fallback BGIG.
   n'est exposée ;
 - un journal local automatique conserve clics, changements, demandes, résultats et états dédupliqués sans bouton spécial, sans solve supplémentaire, finalisation, CAD ou scène ;
 - un witness certifie persistant est recertifie comme incumbent sans ajouter de lane, court-circuiter la recherche ou revendiquer un cache hit ;
-- HiGHS est appelé au plus une fois, puis toute proposition positive repasse
-  par le certificat BGIG et concourt avec toutes les lanes internes ;
-- un runtime HiGHS absent, altéré ou en erreur conserve le fallback BGIG ;
+- HiGHS est une lane expérimentale de sol ; P64-L08B doit mesurer son coût réel
+  et la retirer du parcours Auto si elle ralentit ou perturbe les cas 3D ;
 - le cas dense 11 × 34 ne reçoit aucune nouvelle revendication.
 
 Preuves :
@@ -77,27 +75,19 @@ Rapport final L07 : P64_L07_GOAL_FINAL_REPORT.md.
 
 ## Prochaine action recommandée
 
-### Exécuter P64-L07V — observation humaine facultative dans Fusion
+### Exécuter P64-L08B — mesurer et mettre en quarantaine la lane HiGHS 2D
 
-Type : gate humaine, non bloquante pour le Goal déjà clôturé.
+Type : mission automatisée, prioritaire, sans contrôle Fusion.
 
-Le package à observer est l'add-in 0.1.60 intégré dans `main`. La préparation
-locale et l'installation doivent être faites par Codex dans une tâche dédiée ;
-Thomas ne reçoit que les actions restantes dans Fusion :
+Objectif : établir si la lane HiGHS 2D ajoutée par L07 ralentit ou perturbe les
+cas 3D existants, notamment les cas réels et les paliers de forte cardinalité.
+La mission mesure baseline contre runtime actuel, avec statut, certificat, temps
+au premier plan, P50/P95, mémoire et appels externes. Elle désactive la lane du
+parcours Auto si la régression est avérée ; aucun réglage silencieux ni nouveau
+benchmark 2D n'est admis.
 
-1. ouvrir Fusion 360 et vérifier que l'add-in 0.1.60 démarre ;
-2. charger un projet simple puis un cas multi-cavités représentable ;
-3. lancer le calcul minimal et vérifier qu'une solution reste certifiée ;
-4. observer le fallback avec la lane externe volontairement indisponible dans
-   un smoke contrôlé préparé par Codex ;
-5. confirmer qu'aucune scène n'est modifiée avant l'action explicite prévue.
-
-Cette gate ne rouvre pas le holdout et ne valide ni impression, ni forme
-complexe, ni cas dense 11 × 34.
-
-Aucun modèle Codex n'est requis pour l'observation humaine elle-même. Si Thomas
-demande la préparation et l'installation de la gate, la tâche devra appliquer
-le protocole Fusion local puis s'arrêter avant toute interaction dans Fusion.
+Le programme complet et les critères de la gate obligatoire sont dans
+`docs/P64_L08_REAL_3D_SOLVER_BENCHMARK_PROGRAM.md`.
 
 ## Lots verrouillés
 

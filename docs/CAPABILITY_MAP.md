@@ -1858,3 +1858,13 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
 - Statut : P64-L07A/B/C/D/E done, automated-validated ; Goal clôturé ;
   P64-L07V ready-human-gate ; fusion-validated: false,
   print-validated: false.
+
+## Mise à jour P64-L08A — gate de solvage 3D réel
+
+- C-SOLVER et C-QUALITY : aucun solveur externe 3D n'est encore prouvé.
+  Le résultat P64-L07 est reclassé comme lane de sol rectangulaire ; HiGHS y est
+  expérimental, non sélectionné comme moteur global.
+- C-GRID-3D, C-LAYERS et C-STACKING : les capacités internes existantes restent
+  inchangées. P64-L08 doit les exercer sans projection 2D silencieuse.
+- C-FUSION et C-PRINT : aucun statut ne change ; aucune observation Fusion n'est
+  due avant une preuve de candidat 3D réellement recertifiée.

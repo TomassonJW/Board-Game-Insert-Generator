@@ -566,3 +566,12 @@ Autorités :
 - `docs/DECISIONS/ADR-0081-open-external-solver-tournament.md` ;
 - `docs/P64_L07_OPEN_SOLVER_TOURNAMENT_PROGRAM.md` ;
 - `docs/P64_L07_AUTONOMOUS_GOAL_RUNBOOK.md`.
+
+## Addendum P64-L08 — remplacement de la clôture globale L07
+
+ADR-0083 requalifie P64-L07 : les résultats restent exploitables pour une lane
+de sol, mais non pour le choix d'un portefeuille de solvage BGIG. Le programme
+canonique pour la sélection globale est désormais
+docs/P64_L08_REAL_3D_SOLVER_BENCHMARK_PROGRAM.md. Il exige une fidélité
+sémantique 3D démontrée avant toute comparaison de performance et un nouveau
+holdout indépendant, sans projection 2D silencieuse.
