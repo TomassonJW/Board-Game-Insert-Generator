@@ -1391,3 +1391,19 @@ ouverte. La trajectoire produit peut reprendre par P64-L08H, remédiation isolé
 du paquet SCIP `cp314` ou CLI autonome, puis par une mission distincte d'ADR,
 intégration et régressions ouvertes uniquement si cette nouvelle gate passe.
 Le holdout L08F reste consommé et interdit à tout réglage ou replay.
+
+## Addendum 2026-07-24 — P64-L08H, ABI réparée mais paquet encore refusé
+
+Le wheel officiel PySCIPOpt 6.2.1 `cp314` corrige le blocage technique L08G.
+Dans un Python 3.14 isolé, NumPy 2.5.1 et SCIP 10.0.2 se chargent hors ligne et
+résolvent un contrôle binaire exact à l'optimal, sans installation globale.
+
+La trajectoire produit ne passe pas encore à l'intégration : cinq familles
+natives n'ont pas tous leurs avis dans le candidat et les droits applicables
+aux runtimes Intel/Microsoft ne sont pas entièrement établis. Le paquet reste
+refusé, aucun runtime Fusion n'est installé et le holdout reste scellé.
+
+La roadmap continue par P64-L08I : ADR puis audit d'une fabrication SCIP
+10.0.2 minimale `cp314`, sans Ipopt/MUMPS/Intel non requis par le modèle BGIG.
+Si et seulement si licences, avis, build reproductible et équivalence publique
+passent, une mission séparée pourra intégrer puis préparer la gate Fusion.

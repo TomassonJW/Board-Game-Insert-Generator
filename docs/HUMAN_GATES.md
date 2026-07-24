@@ -1176,3 +1176,19 @@ Statut : `no-human-action`, `no-fusion-gate`,
 `negative-no-product-integrable-winner`. Une future remédiation P64-L08H doit
 repasser la gate technique complète avant de pouvoir ouvrir une nouvelle gate
 humaine. `fusion-validated=false`. `print-validated=false`.
+
+## P64-L08H — ABI réparée, redistribution refusée
+
+Le wheel officiel PySCIPOpt 6.2.1 `cp314` passe le probe technique dans Python
+3.14 isolé : SCIP 10.0.2 résout un contrôle exact hors ligne et sans
+installation globale. L08H ne lit ni ne rejoue le holdout.
+
+La gate produit reste négative avant intégration. Le candidat ne livre pas tous
+les avis natifs et n'établit pas entièrement les autorités de redistribution
+Intel et Microsoft. Codex n'installe donc aucun moteur, ne modifie pas l'add-in
+et ne prépare aucun smoke test Fusion.
+
+Statut : `no-human-action`, `no-fusion-gate`,
+`negative-package-redistribution-incomplete`. P64-L08I doit d'abord cadrer et
+auditer un runtime SCIP minimal redistribuable. `fusion-validated=false`.
+`print-validated=false`.

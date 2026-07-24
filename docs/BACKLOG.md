@@ -3104,13 +3104,30 @@ implémentée et intégrée à la fois.
 
 ### P64-L08H — remédiation isolée du paquet SCIP
 
-- Statut : ready, dépend de L08G ; aucun benchmark ou holdout.
-- Auditer un wheel PySCIPOpt 6.2.1 `cp314` ou un exécutable SCIP 10.0.2
-  autonome, sans changer le moteur ni ses réglages scellés.
-- Verrouiller toutes les versions, sources, licences, avis, obligations,
-  empreintes et la taille avant toute intégration.
-- Prouver le chargement ou l'exécution hors ligne dans un environnement isolé
-  compatible Fusion, sans installation globale.
-- Sortie : refus honnête si une inconnue subsiste ; sinon proposer une ADR et
-  une mission séparée d'intégration, régressions ouvertes et gate Fusion.
-- Interdit : rouvrir, rejouer ou utiliser le holdout L08F pour régler ou choisir.
+- Statut : done, automated-validated, abi-pass, offline-probe-pass,
+  negative-package-redistribution-incomplete, no-fusion-gate.
+- Choix : wheels officiels PySCIPOpt 6.2.1 et NumPy 2.5.1 `cp314` ; CLI
+  autonome non retenu car il change la route, demande une identité et élargit
+  les dépendances.
+- Résultat technique : SCIP 10.0.2 charge et résout un contrôle exact à
+  l'optimal dans Python 3.14 isolé, hors ligne, sans installation globale.
+- Résultat produit : 30 binaires sont verrouillés, mais les avis natifs et les
+  autorités Intel/Microsoft restent incomplets ; aucune intégration.
+- Holdout lu ou rejoué : non ; tuning : 0 ; gagnant modifié : non.
+- Preuve : `docs/P64_L08H_SCIP_PACKAGE_REMEDIATION_EVIDENCE.md`.
+
+### P64-L08I — ADR et audit du runtime SCIP minimal redistribuable
+
+- Statut : ready, dépend de L08H ; aucun benchmark, holdout ou runtime produit.
+- Créer l'ADR d'une fabrication SCIP 10.0.2 / PySCIPOpt 6.2.1 `cp314`
+  minimale, sans changer le modèle, les réglages ou le gagnant scellés.
+- Prouver que le modèle BGIG n'utilise pas Ipopt, MUMPS/METIS ou les runtimes
+  Intel, puis les retirer de la cible avant build.
+- Verrouiller la toolchain Windows, le runtime C/C++, les sources, versions,
+  licences, avis, obligations, empreintes et tailles.
+- Définir un build reproductible local au workspace et un produit hors ligne,
+  sans installation globale, compte, secret, service ou télémétrie.
+- Exécuter uniquement les contrôles publics et régressions ouvertes ; le
+  holdout L08F reste scellé et interdit au choix ou au réglage.
+- Sortie : refus honnête si une inconnue subsiste ; sinon proposer une mission
+  séparée d'intégration BGIG et de préparation Fusion.

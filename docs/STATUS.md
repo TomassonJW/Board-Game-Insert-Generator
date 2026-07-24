@@ -3526,3 +3526,34 @@ Date : 2026-07-24
 - **Suite :** P64-L08H peut auditer un paquet `cp314` ou un CLI SCIP autonome
   sans refaire le benchmark. `fusion-validated=false`,
   `print-validated=false`.
+
+## P64-L08H — ABI réparée, paquet produit encore refusé
+
+Date : 2026-07-24
+
+- **Statut :** done, automated-validated, abi-pass, offline-probe-pass,
+  negative-package-redistribution-incomplete, no-fusion-gate.
+- **Choix :** wheels officiels PySCIPOpt 6.2.1 et NumPy 2.5.1 `cp314` ; le CLI
+  autonome est rejeté car il changerait la route benchmarkée, demande des
+  champs d'identité et élargit le paquet.
+- **Paquet :** 61 937 391 octets compressés, 186 127 316 octets décompressés et
+  30 binaires `.pyd`/`.dll` verrouillés par taille et SHA-256.
+- **Probe :** Python 3.14.0 isolé, aucun install global, index désactivé et
+  proxys bloqués ; NumPy 2.5.1, PySCIPOpt 6.2.1 et SCIP 10.0.2 chargés ; contrôle
+  binaire exact `optimal`, `x=1.0`.
+- **Provenance :** `scipoptsuite-deploy` v0.12.0 lie SCIP 10.0.2, SoPlex 8.0.2,
+  Ipopt 3.14.19 et GCG 4.0.2 ; le paquet Ipopt lie MUMPS 5.8.0, METIS 5.2.1 et
+  Intel MKL 2024.1.
+- **Redistribution :** toutes les versions et empreintes sont liées, mais les
+  avis de cinq familles natives ne sont pas tous présents et les autorités
+  Intel/Microsoft restent incomplètes. La gate échoue fermée.
+- **Décision :** `technical_abi_gate_passed=true`,
+  `isolated_offline_execution_passed=true`,
+  `product_integration_authorized=false`.
+- **Produit :** aucun runtime BGIG ou Fusion modifié ; aucune gate humaine.
+  Holdout lu/rejoué : non ; tuning : 0 ; gagnant modifié : non.
+- **Preuve :**
+  `d2de2bea96200c614270ae60e5fdbe2736a398701eb424ec57c61706ba8c9440`.
+- **Suite :** P64-L08I doit cadrer par ADR puis auditer un runtime SCIP 10.0.2
+  minimal `cp314` sans Ipopt/MUMPS/Intel avant toute intégration.
+  `fusion-validated=false`, `print-validated=false`.

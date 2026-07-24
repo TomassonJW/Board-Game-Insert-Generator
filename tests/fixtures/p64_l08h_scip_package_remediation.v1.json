@@ -1,0 +1,513 @@
+{
+  "schema_version": "bgig.scip_package_remediation_evidence.v1",
+  "mission": "P64-L08H",
+  "benchmark_binding": {
+    "winner": "SCIP 10.0.2 via PySCIPOpt 6.2.1",
+    "selection_digest": "e061f9af67e9ce80974a8ea2c5fe705ba59a637dbba319464a412651b6fa7140",
+    "benchmark_evidence_digest": "0dbf1b45ae9135c1316051ab7e0946dfbfeafac5c785ad96ccd5d7a620acd46d"
+  },
+  "packaging_decision": {
+    "selected_candidate": "official_pypi_cp314_wheels",
+    "selected_reason": [
+      "same PySCIPOpt worker route and SCIP version as the sealed benchmark",
+      "CPython 3.14 ABI matches the observed Fusion runtime",
+      "official direct artifacts with public immutable hashes and no identity form"
+    ],
+    "standalone_scip_10_0_2": {
+      "selected": false,
+      "downloaded": false,
+      "reasons": [
+        "would add an unbenchmarked CLI serialization route",
+        "official download requires personal identity fields",
+        "full suite and extra runtime prerequisites enlarge the package surface"
+      ]
+    }
+  },
+  "artifacts": {
+    "product_wheels": [
+      {
+        "name": "pyscipopt-6.2.1-cp314-cp314-win_amd64.whl",
+        "size_bytes": 49375214,
+        "uncompressed_size_bytes": 144482400,
+        "sha256": "6aed03b621decb09b38f399773bf8cf2c707e965990b778a24d28c8cc90a0756",
+        "python_tag": "cp314",
+        "binaries": [
+          {
+            "path": "pyscipopt.libs/coinmumps-3-179ba8bf43f95bbadacde7fbc058c4df.dll",
+            "size_bytes": 13915136,
+            "sha256": "81c4bf11e65768928aa141f81054688fa492a570b20d7532daa88902bd7d72b2"
+          },
+          {
+            "path": "pyscipopt.libs/ipopt-3-9948be002064791f542b117490eb329a.dll",
+            "size_bytes": 88645632,
+            "sha256": "e3acf4ff81319f2174e836f37f2bf7990f2810e25e060b90ff026db255ebfeb1"
+          },
+          {
+            "path": "pyscipopt.libs/libifcoremd-0f996d3c2ff10fe7dd667dc6228dd4f0.dll",
+            "size_bytes": 1270272,
+            "sha256": "ff9842aa45eff7b6c19ab03fb529c37f7343648ee95066c2f995ee0fcef9904a"
+          },
+          {
+            "path": "pyscipopt.libs/libiomp5md-999e2141f7e6c20e7b5fc78b0e0a47aa.dll",
+            "size_bytes": 1247360,
+            "sha256": "999e2141f7e6c20e7b5fc78b0e0a47aaf40e219f611e77d2423bbd4f0aaabd7e"
+          },
+          {
+            "path": "pyscipopt.libs/libmmd-d69808fff3d92cab6246b30c6fe90bd3.dll",
+            "size_bytes": 4146304,
+            "sha256": "d69808fff3d92cab6246b30c6fe90bd3f521a095e2d8bb9417f83f6fbde574d7"
+          },
+          {
+            "path": "pyscipopt.libs/libscip-124f84127289e961b10d4c9def2be268.dll",
+            "size_bytes": 12396032,
+            "sha256": "b6869b8681ddf252b9da93170fc689c67051fa4ed2f60bf6795e4bc8b5a9b5c2"
+          },
+          {
+            "path": "pyscipopt.libs/msvcp140-a4c2229bdc2a2a630acdc095b4d86008.dll",
+            "size_bytes": 575056,
+            "sha256": "a4c2229bdc2a2a630acdc095b4d86008e5c3e3bc7773174354f3da4f5beb9cde"
+          },
+          {
+            "path": "pyscipopt.libs/svml_dispmd-df5493fc29b0d98f8c0b06b852908b2b.dll",
+            "size_bytes": 18271360,
+            "sha256": "df5493fc29b0d98f8c0b06b852908b2bacb7130c5e634b4a9a53b97c6c970f27"
+          },
+          {
+            "path": "pyscipopt/scip.cp314-win_amd64.pyd",
+            "size_bytes": 3208192,
+            "sha256": "b89259cebb4474bfe2336affd30b98a9b10ca293e4f0f58d60ae3e6e5b83e9e3"
+          }
+        ],
+        "notices": [
+          {
+            "path": "pyscipopt-6.2.1.dist-info/licenses/LICENSE",
+            "size_bytes": 1092,
+            "sha256": "ca7b518687ae044007be36746bf677d7bcce96d04e94922b65202ffcabd76e95"
+          }
+        ]
+      },
+      {
+        "name": "numpy-2.5.1-cp314-cp314-win_amd64.whl",
+        "size_bytes": 12562177,
+        "uncompressed_size_bytes": 41644916,
+        "sha256": "24d0eb82c0541d3415a33425db64ae439dffccd7b4dbcb30e7c35120205c506a",
+        "python_tag": "cp314",
+        "binaries": [
+          {
+            "path": "numpy.libs/libscipy_openblas64_-b788215d9d47792bcba3a2e2a7114320.dll",
+            "size_bytes": 20405760,
+            "sha256": "b788215d9d47792bcba3a2e2a71143205a57282828a483f1fb071ca2c159f616"
+          },
+          {
+            "path": "numpy.libs/msvcp140-a4c2229bdc2a2a630acdc095b4d86008.dll",
+            "size_bytes": 575056,
+            "sha256": "a4c2229bdc2a2a630acdc095b4d86008e5c3e3bc7773174354f3da4f5beb9cde"
+          },
+          {
+            "path": "numpy/_core/_multiarray_tests.cp314-win_amd64.pyd",
+            "size_bytes": 66048,
+            "sha256": "7c6f3e0793c6ede96204639b5798693786efe9d35a5fab7a86d4a5f9d559e229"
+          },
+          {
+            "path": "numpy/_core/_multiarray_umath.cp314-win_amd64.pyd",
+            "size_bytes": 3904512,
+            "sha256": "ab5cea76a0fad4fd1bc58667aefba1382a7ce8c147b51cf3bff53eec4efb4ab2"
+          },
+          {
+            "path": "numpy/_core/_operand_flag_tests.cp314-win_amd64.pyd",
+            "size_bytes": 12288,
+            "sha256": "322d6717b0a56e29d303f993bdaa853bfa44f9bb189ee6709b8b3c208cc04efe"
+          },
+          {
+            "path": "numpy/_core/_rational_tests.cp314-win_amd64.pyd",
+            "size_bytes": 43520,
+            "sha256": "ea67ac1b1cf3d644e1f038a0b56bfe6a5770478956e2d55ae393549892edea78"
+          },
+          {
+            "path": "numpy/_core/_simd.cp314-win_amd64.pyd",
+            "size_bytes": 831488,
+            "sha256": "27b44fa3be39216e416c529fad5f2af9196a02d1ca51d6d08abec41bf9fbdd09"
+          },
+          {
+            "path": "numpy/_core/_struct_ufunc_tests.cp314-win_amd64.pyd",
+            "size_bytes": 14336,
+            "sha256": "380216da0e2d51dcce8a973fdda3291beb7dee743e43802e0cc8710492c08cc4"
+          },
+          {
+            "path": "numpy/_core/_umath_tests.cp314-win_amd64.pyd",
+            "size_bytes": 34304,
+            "sha256": "7b042f544cfe99e846fd188d0b0065ae6455a4c1c104578e69cb535727956214"
+          },
+          {
+            "path": "numpy/fft/_pocketfft_umath.cp314-win_amd64.pyd",
+            "size_bytes": 276480,
+            "sha256": "0fb0d660b2b608a270828d34fb79d4e14b2c33e1ba799aac7232b714e36a4742"
+          },
+          {
+            "path": "numpy/linalg/_umath_linalg.cp314-win_amd64.pyd",
+            "size_bytes": 112128,
+            "sha256": "8264d9d70a1a1d72793805a989fc5ebab8d55970e44a829e1262fd58335ff8d5"
+          },
+          {
+            "path": "numpy/linalg/lapack_lite.cp314-win_amd64.pyd",
+            "size_bytes": 18944,
+            "sha256": "4cef8f26be5895a6973b3c969d024cab1c3c777df675059ca20a69d22fdc7b49"
+          },
+          {
+            "path": "numpy/random/_bounded_integers.cp314-win_amd64.pyd",
+            "size_bytes": 215040,
+            "sha256": "52e8867a30524db560f6ffe9b3edb63beaa8160dd349ffa9cb8eaeeff786c486"
+          },
+          {
+            "path": "numpy/random/_common.cp314-win_amd64.pyd",
+            "size_bytes": 173056,
+            "sha256": "54809657fb43a25138617f9706ef781d9e9502b66a9a5366ea7bd76eed918f61"
+          },
+          {
+            "path": "numpy/random/_generator.cp314-win_amd64.pyd",
+            "size_bytes": 599040,
+            "sha256": "15215ee2ae4c1ec0960c29d433871a8e6ba4c392b8dee367541fb736f9c6d4c6"
+          },
+          {
+            "path": "numpy/random/_mt19937.cp314-win_amd64.pyd",
+            "size_bytes": 86528,
+            "sha256": "434ab2857d104ff19c3b5008916197787fcc253339eabc66a16e4bdecfc1c74c"
+          },
+          {
+            "path": "numpy/random/_pcg64.cp314-win_amd64.pyd",
+            "size_bytes": 96256,
+            "sha256": "b469cbc850ee42a8ca5b5a9b58811d529fc0c7b65dbc7eb4b9d24b924b4b8d07"
+          },
+          {
+            "path": "numpy/random/_philox.cp314-win_amd64.pyd",
+            "size_bytes": 81408,
+            "sha256": "5b7ffd698d931acade2970fd318fa077e14f634ed08d32678a44c2997cebc600"
+          },
+          {
+            "path": "numpy/random/_sfc64.cp314-win_amd64.pyd",
+            "size_bytes": 60416,
+            "sha256": "1e4d72bccc8045c798d13529439d907ce1f1f2d40e6a635f7d4de93d1f4ca9e6"
+          },
+          {
+            "path": "numpy/random/bit_generator.cp314-win_amd64.pyd",
+            "size_bytes": 168448,
+            "sha256": "d481331eca4f875eb6e53a69d722c6bf03a915b6e2033f91daf2bad2efcb7133"
+          },
+          {
+            "path": "numpy/random/mtrand.cp314-win_amd64.pyd",
+            "size_bytes": 500736,
+            "sha256": "cd83271cc04fb0219fb5d5cb06c5117f60291866a88e332b7c8e8276375d1344"
+          }
+        ],
+        "notices": [
+          {
+            "path": "numpy-2.5.1.dist-info/licenses/LICENSE.txt",
+            "size_bytes": 45831,
+            "sha256": "a804dff0ead9fadc5293456410bcbfc32bf024be9c4513459663fb7b442d2341"
+          },
+          {
+            "path": "numpy-2.5.1.dist-info/licenses/numpy/_core/include/numpy/libdivide/LICENSE.txt",
+            "size_bytes": 1039,
+            "sha256": "d544761558b510866c21f7e8a2d5716fca76e0b98117e3b6b86314db7244d150"
+          },
+          {
+            "path": "numpy-2.5.1.dist-info/licenses/numpy/_core/src/common/pythoncapi-compat/COPYING",
+            "size_bytes": 704,
+            "sha256": "aea41976c720f91bd19725c16916a1ace40eb1ea42620d340e587a5de4bbcea0"
+          },
+          {
+            "path": "numpy-2.5.1.dist-info/licenses/numpy/_core/src/highway/LICENSE",
+            "size_bytes": 21155,
+            "sha256": "d208152e2777ffd0126eacc1bd21c0320d69e4e6b622d21a2a12a47e8ef73763"
+          },
+          {
+            "path": "numpy-2.5.1.dist-info/licenses/numpy/_core/src/multiarray/dragon4_LICENSE.txt",
+            "size_bytes": 1441,
+            "sha256": "b0fd592d4ead563148e3977e7b589169d46a5ef2ff133c755a81af880a3fc919"
+          },
+          {
+            "path": "numpy-2.5.1.dist-info/licenses/numpy/_core/src/npysort/x86-simd-sort/LICENSE.md",
+            "size_bytes": 1542,
+            "sha256": "a732977853530066790c42817087f4829b518dd98d340c916acbfd227e39d3cb"
+          },
+          {
+            "path": "numpy-2.5.1.dist-info/licenses/numpy/_core/src/umath/svml/LICENSE",
+            "size_bytes": 1573,
+            "sha256": "585483905b13d4b42f800c55ba99e89d6e2e33ccd5f503e201c07531d148ff41"
+          },
+          {
+            "path": "numpy-2.5.1.dist-info/licenses/numpy/fft/pocketfft/LICENSE.md",
+            "size_bytes": 1523,
+            "sha256": "8db000e158c162e7249787852d8c69764706502ccee725c06641b31c1e95c8af"
+          },
+          {
+            "path": "numpy-2.5.1.dist-info/licenses/numpy/linalg/lapack_lite/LICENSE.txt",
+            "size_bytes": 2314,
+            "sha256": "19060ef465e1797d682ee0fc3081bd25ab1395e995e43d25c9d13c95d9a3cd6b"
+          },
+          {
+            "path": "numpy-2.5.1.dist-info/licenses/numpy/ma/LICENSE",
+            "size_bytes": 1616,
+            "sha256": "d78dbb208b80d92b4d333e41a4baae50d12444f46e53199fa7726a91de6e2da7"
+          },
+          {
+            "path": "numpy-2.5.1.dist-info/licenses/numpy/random/LICENSE.md",
+            "size_bytes": 3582,
+            "sha256": "b4bc2f4fa1c95778f1ed3dd8f14706bece399475b978f9f34b5d3cd72521b48a"
+          },
+          {
+            "path": "numpy-2.5.1.dist-info/licenses/numpy/random/src/distributions/LICENSE.md",
+            "size_bytes": 2805,
+            "sha256": "cf5619f25b112d5ce7c896efffc8e610bcb345dfadcc19f2c1460aa48fff2c9e"
+          },
+          {
+            "path": "numpy-2.5.1.dist-info/licenses/numpy/random/src/mt19937/LICENSE.md",
+            "size_bytes": 2986,
+            "sha256": "92c10699884321f1c2947fe2a70ab23b0fbf1507f756d89dd08f38c61fc3d4fa"
+          },
+          {
+            "path": "numpy-2.5.1.dist-info/licenses/numpy/random/src/pcg64/LICENSE.md",
+            "size_bytes": 1176,
+            "sha256": "41190663b77bee5302386495a07b7eabfbfa571aa0ae2f11da6764162062fc4f"
+          },
+          {
+            "path": "numpy-2.5.1.dist-info/licenses/numpy/random/src/philox/LICENSE.md",
+            "size_bytes": 1540,
+            "sha256": "322ac46d870c8aeead6c53adcccc839296fb3c8e456eae155081297daf7f8013"
+          },
+          {
+            "path": "numpy-2.5.1.dist-info/licenses/numpy/random/src/sfc64/LICENSE.md",
+            "size_bytes": 1253,
+            "sha256": "28cad82ce1379dc529df30da78ec012d7d0d1d576b03ddcb93388aee53659f59"
+          },
+          {
+            "path": "numpy-2.5.1.dist-info/licenses/numpy/random/src/splitmix64/LICENSE.md",
+            "size_bytes": 340,
+            "sha256": "454ec7350e478e037061850b67395753b425b1cb0a34bbc26290b020bf89d763"
+          },
+          {
+            "path": "numpy/_core/include/numpy/random/LICENSE.txt",
+            "size_bytes": 1039,
+            "sha256": "d544761558b510866c21f7e8a2d5716fca76e0b98117e3b6b86314db7244d150"
+          },
+          {
+            "path": "numpy/ma/LICENSE",
+            "size_bytes": 1616,
+            "sha256": "d78dbb208b80d92b4d333e41a4baae50d12444f46e53199fa7726a91de6e2da7"
+          },
+          {
+            "path": "numpy/random/LICENSE.md",
+            "size_bytes": 3582,
+            "sha256": "b4bc2f4fa1c95778f1ed3dd8f14706bece399475b978f9f34b5d3cd72521b48a"
+          }
+        ]
+      }
+    ],
+    "product_compressed_total_bytes": 61937391,
+    "product_uncompressed_total_bytes": 186127316,
+    "provenance": {
+      "scipoptsuite_deploy_v0_12_0": {
+        "name": "libscip-windows-v0.12.0.zip",
+        "size_bytes": 67130466,
+        "sha256": "a6461de7d8e20b3115e7bfe6439597acaeb803c259e22b22b74404ac4a6b4cad",
+        "official_source": "https://github.com/scipopt/scipoptsuite-deploy/releases/tag/v0.12.0"
+      },
+      "ipopt_3_14_19": {
+        "name": "Ipopt-3.14.19-win64-msvs2022-md.zip",
+        "size_bytes": 42026331,
+        "sha256": "bd7818a19c2a627f1dcd538358833fbcb17c35080e19b4228be3f66cadf8c8fd",
+        "official_source": "https://github.com/coin-or/Ipopt/releases/tag/releases/3.14.19"
+      }
+    },
+    "test_harness_only": {
+      "python_3_14_0_embed": {
+        "name": "python-3.14.0-embed-amd64.zip",
+        "size_bytes": 11994671,
+        "sha256": "8d4d3590c10449d78aa4375f534e6d5f3027d67fdc362dd1a882279db6f90fdf",
+        "official_source": "https://www.python.org/ftp/python/3.14.0/python-3.14.0-embed-amd64.zip"
+      }
+    }
+  },
+  "isolated_offline_probe": {
+    "probe_id": "p64_l08h_exact_binary_control",
+    "python_version": "3.14.0",
+    "python_cache_tag": "cpython-314",
+    "python_isolated_flag": true,
+    "numpy_version": "2.5.1",
+    "pyscipopt_version": "6.2.1",
+    "scip_version": "10.0.2",
+    "solve_status": "optimal",
+    "solution_x": 1.0,
+    "runtime_layout": "workspace_local_unpacked_wheels",
+    "global_install_used": false,
+    "network_required": false,
+    "offline_environment": {
+      "PIP_NO_INDEX": "1",
+      "HTTP_PROXY": "http://127.0.0.1:9",
+      "HTTPS_PROXY": "http://127.0.0.1:9"
+    },
+    "holdout_read": false,
+    "corpus_read": false
+  },
+  "redistribution_audit": {
+    "components": [
+      {
+        "component_id": "pyscipopt",
+        "files": [
+          "pyscipopt/scip.cp314-win_amd64.pyd"
+        ],
+        "version": "6.2.1",
+        "exact_version_bound": true,
+        "official_source": "https://github.com/scipopt/PySCIPOpt/tree/v6.2.1",
+        "license": "MIT",
+        "notice_present_in_candidate": true,
+        "redistribution_terms_bound": true,
+        "status": "complete",
+        "note": "Interface Python officielle."
+      },
+      {
+        "component_id": "scip",
+        "files": [
+          "pyscipopt.libs/libscip-124f84127289e961b10d4c9def2be268.dll"
+        ],
+        "version": "10.0.2 via scipoptsuite-deploy v0.12.0",
+        "exact_version_bound": true,
+        "official_source": "https://github.com/scipopt/scip/tree/v1002",
+        "license": "Apache-2.0",
+        "notice_present_in_candidate": false,
+        "redistribution_terms_bound": true,
+        "status": "incomplete",
+        "note": "La licence Apache-2.0 n'est pas livrée dans le wheel."
+      },
+      {
+        "component_id": "ipopt",
+        "files": [
+          "pyscipopt.libs/ipopt-3-9948be002064791f542b117490eb329a.dll"
+        ],
+        "version": "3.14.19",
+        "exact_version_bound": true,
+        "official_source": "https://github.com/coin-or/Ipopt/tree/releases/3.14.19",
+        "license": "EPL-2.0",
+        "notice_present_in_candidate": false,
+        "redistribution_terms_bound": true,
+        "status": "incomplete",
+        "note": "La licence EPL-2.0 existe dans l'archive Ipopt source du binaire, pas dans le wheel."
+      },
+      {
+        "component_id": "mumps_metis",
+        "files": [
+          "pyscipopt.libs/coinmumps-3-179ba8bf43f95bbadacde7fbc058c4df.dll"
+        ],
+        "version": "MUMPS 5.8.0; METIS 5.2.1",
+        "exact_version_bound": true,
+        "official_source": "https://github.com/coin-or/Ipopt/releases/tag/releases/3.14.19",
+        "license": "CeCILL-C avec exceptions; Apache-2.0",
+        "notice_present_in_candidate": false,
+        "redistribution_terms_bound": false,
+        "status": "incomplete",
+        "note": "Les avis complets et les exceptions de composants ne sont pas fournis par le wheel ni le paquet deploy."
+      },
+      {
+        "component_id": "intel_compiler_and_mkl_runtimes",
+        "files": [
+          "pyscipopt.libs/libifcoremd-0f996d3c2ff10fe7dd667dc6228dd4f0.dll",
+          "pyscipopt.libs/libiomp5md-999e2141f7e6c20e7b5fc78b0e0a47aa.dll",
+          "pyscipopt.libs/libmmd-d69808fff3d92cab6246b30c6fe90bd3.dll",
+          "pyscipopt.libs/svml_dispmd-df5493fc29b0d98f8c0b06b852908b2b.dll"
+        ],
+        "version": "Intel MKL 2024.1; Intel compilers 2021.8.0; DLL file versions locked by hash",
+        "exact_version_bound": true,
+        "official_source": "https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl-download.html",
+        "license": "Intel Simplified Software License / applicable runtime terms",
+        "notice_present_in_candidate": false,
+        "redistribution_terms_bound": false,
+        "status": "incomplete",
+        "note": "Le paquet ne fournit ni licence Intel applicable ni chaîne d'autorité de redistribution."
+      },
+      {
+        "component_id": "microsoft_visual_cpp_runtime",
+        "files": [
+          "pyscipopt.libs/msvcp140-a4c2229bdc2a2a630acdc095b4d86008.dll"
+        ],
+        "version": "14.40.33810.0",
+        "exact_version_bound": true,
+        "official_source": "https://learn.microsoft.com/en-us/cpp/windows/redistributing-visual-cpp-files?view=msvc-170",
+        "license": "Microsoft Visual Studio license terms",
+        "notice_present_in_candidate": false,
+        "redistribution_terms_bound": false,
+        "status": "incomplete",
+        "note": "La redistribution dépend d'une licence Visual Studio admissible, non établie par l'artefact."
+      },
+      {
+        "component_id": "numpy_and_bundled_libraries",
+        "files": [
+          "numpy.libs/libscipy_openblas64_-b788215d9d47792bcba3a2e2a7114320.dll",
+          "numpy.libs/msvcp140-a4c2229bdc2a2a630acdc095b4d86008.dll",
+          "numpy/_core/_multiarray_tests.cp314-win_amd64.pyd",
+          "numpy/_core/_multiarray_umath.cp314-win_amd64.pyd",
+          "numpy/_core/_operand_flag_tests.cp314-win_amd64.pyd",
+          "numpy/_core/_rational_tests.cp314-win_amd64.pyd",
+          "numpy/_core/_simd.cp314-win_amd64.pyd",
+          "numpy/_core/_struct_ufunc_tests.cp314-win_amd64.pyd",
+          "numpy/_core/_umath_tests.cp314-win_amd64.pyd",
+          "numpy/fft/_pocketfft_umath.cp314-win_amd64.pyd",
+          "numpy/linalg/_umath_linalg.cp314-win_amd64.pyd",
+          "numpy/linalg/lapack_lite.cp314-win_amd64.pyd",
+          "numpy/random/_bounded_integers.cp314-win_amd64.pyd",
+          "numpy/random/_common.cp314-win_amd64.pyd",
+          "numpy/random/_generator.cp314-win_amd64.pyd",
+          "numpy/random/_mt19937.cp314-win_amd64.pyd",
+          "numpy/random/_pcg64.cp314-win_amd64.pyd",
+          "numpy/random/_philox.cp314-win_amd64.pyd",
+          "numpy/random/_sfc64.cp314-win_amd64.pyd",
+          "numpy/random/bit_generator.cp314-win_amd64.pyd",
+          "numpy/random/mtrand.cp314-win_amd64.pyd"
+        ],
+        "version": "NumPy 2.5.1 and bundled set",
+        "exact_version_bound": true,
+        "official_source": "https://pypi.org/project/numpy/2.5.1/",
+        "license": "BSD variants and bundled notices",
+        "notice_present_in_candidate": true,
+        "redistribution_terms_bound": true,
+        "status": "complete",
+        "note": "Le wheel NumPy contient son inventaire de licences tierces."
+      }
+    ],
+    "incomplete_component_ids": [
+      "scip",
+      "ipopt",
+      "mumps_metis",
+      "intel_compiler_and_mkl_runtimes",
+      "microsoft_visual_cpp_runtime"
+    ],
+    "all_binary_hashes_bound": true,
+    "all_native_versions_bound": true,
+    "all_notices_present": false,
+    "all_redistribution_terms_bound": false
+  },
+  "decision": {
+    "technical_abi_gate_passed": true,
+    "isolated_offline_execution_passed": true,
+    "redistribution_gate_passed": false,
+    "product_integration_authorized": false,
+    "decision_code": "negative_package_redistribution_incomplete",
+    "blocking_reasons": [
+      "third_party_notices_incomplete",
+      "redistribution_authority_incomplete"
+    ],
+    "next_mission": "P64-L08I minimal redistributable SCIP runtime ADR and build audit",
+    "fusion_gate_prepared": false,
+    "fusion_gate_installed": false
+  },
+  "invariants": {
+    "holdout_reopened": false,
+    "holdout_worker_invocation_count": 0,
+    "benchmark_replayed": false,
+    "post_holdout_tuning_count": 0,
+    "benchmark_selection_changed": false,
+    "product_runtime_modified": false,
+    "fusion_validated": false,
+    "print_validated": false
+  },
+  "evidence_digest": "d2de2bea96200c614270ae60e5fdbe2736a398701eb424ec57c61706ba8c9440"
+}

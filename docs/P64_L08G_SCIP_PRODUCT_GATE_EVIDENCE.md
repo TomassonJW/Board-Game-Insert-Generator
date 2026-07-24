@@ -109,3 +109,12 @@ Une future mission séparée peut remédier au paquet sans refaire le benchmark 
 
 Cette remédiation ne pourra ni rouvrir le holdout L08F, ni retuner le moteur, ni
 changer le vainqueur après lecture du privé.
+
+## Mise à jour après P64-L08H
+
+L08H a exécuté cette remédiation sans toucher au holdout. Le wheel `cp314`
+passe désormais l'import et un contrôle exact hors ligne dans Python 3.14 ; le
+blocage ABI de cette preuve est donc historique. La gate produit reste
+négative pour les avis natifs absents et les autorités Intel/Microsoft
+incomplètes. La preuve canonique courante est
+`docs/P64_L08H_SCIP_PACKAGE_REMEDIATION_EVIDENCE.md`.

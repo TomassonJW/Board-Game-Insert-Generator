@@ -75,37 +75,42 @@ Preuve L08D : P64_L08D_REAL_3D_CORPUS_EVIDENCE.md.
 Preuve L08E : P64_L08E_FAITHFUL_3D_ADAPTERS_EVIDENCE.md.
 Preuve L08F : P64_L08F_REAL_3D_TOURNAMENT_EVIDENCE.md.
 Preuve L08G : P64_L08G_SCIP_PRODUCT_GATE_EVIDENCE.md.
+Preuve L08H : P64_L08H_SCIP_PACKAGE_REMEDIATION_EVIDENCE.md.
 Rapport final L08 : P64_L08_GOAL_FINAL_REPORT.md.
 Rapport final L07 : P64_L07_GOAL_FINAL_REPORT.md.
 
 ## Prochaine action recommandée
 
-### Exécuter P64-L08H — remédier le paquet SCIP sans refaire le benchmark
+### Exécuter P64-L08I — cadrer et auditer un runtime SCIP minimal redistribuable
 
-Type : mission d'audit et de packaging isolée. Aucun tuning, aucun replay et
-aucune lecture supplémentaire du holdout L08F ne sont autorisés.
+Type : ADR et audit de fabrication isolé. Aucun tuning, aucun replay, aucune
+lecture du holdout L08F et aucune intégration produit ne sont autorisés.
 
-P64-L08G est terminé avec un résultat produit négatif : SCIP 10.0.2 reste le
-vainqueur benchmark à +18/−0 face à BGIG corrigé, mais le runtime acquis ne peut
-pas entrer dans Fusion. Son wheel PySCIPOpt est `cp310` alors que Fusion
-2704.1.36 utilise `cp314` ; cinq familles natives restent incomplètes en version,
-avis ou autorité de redistribution.
+P64-L08H est terminé avec un résultat mixte : le wheel officiel PySCIPOpt 6.2.1
+`cp314` charge bien SCIP 10.0.2 et résout un contrôle exact hors ligne dans un
+Python 3.14 isolé. Le paquet de 61 937 391 octets reste néanmoins refusé : les
+avis de cinq familles natives ne sont pas tous présents et les autorités de
+redistribution Intel/Microsoft ne sont pas entièrement établies.
 
-P64-L08H doit :
+P64-L08I doit :
 
-1. choisir sans changer de moteur entre le wheel officiel PySCIPOpt 6.2.1
-   `cp314` et un exécutable SCIP 10.0.2 autonome ;
-2. verrouiller chaque binaire, version, source, licence, avis et obligation de
-   redistribution avant toute intégration ;
-3. mesurer la taille totale et prouver une exécution locale hors ligne dans un
-   environnement isolé compatible avec Fusion, sans installation globale ;
-4. refuser immédiatement si une dépendance ou un droit reste inconnu ;
-5. si et seulement si la gate passe, proposer l'ADR et la mission séparée
-   d'intégration/régression ouverte puis de préparation Fusion humaine.
+1. créer l'ADR du runtime SCIP minimal, toujours fondé sur SCIP 10.0.2 et
+   PySCIPOpt 6.2.1 `cp314`, sans changer le gagnant ni le modèle ;
+2. prouver avant build que le modèle discret BGIG n'a besoin ni d'Ipopt, ni de
+   MUMPS/METIS, ni des runtimes Intel correspondants ;
+3. verrouiller la toolchain Windows, le runtime C/C++, chaque source, version,
+   licence, avis et droit de redistribution ;
+4. définir un build reproductible, local au workspace, hors ligne dans le
+   produit, sans installation globale, compte, secret, service ou télémétrie ;
+5. exécuter seulement les contrôles publics et régressions ouvertes nécessaires
+   à l'équivalence ; le holdout privé reste scellé ;
+6. refuser immédiatement si une dépendance, une licence ou une équivalence
+   reste inconnue ;
+7. laisser l'intégration BGIG et la préparation Fusion à une mission séparée si
+   toutes les gates passent.
 
-La gate humaine L08 n'est donc pas active. OR-Tools, PackingSolver et LAFF ne
-peuvent pas remplacer SCIP après lecture du holdout. `fusion-validated=false`
-et `print-validated=false` restent inchangés.
+La gate humaine L08 n'est pas active. `fusion-validated=false` et
+`print-validated=false` restent inchangés.
 
 ## Lots verrouillés
 

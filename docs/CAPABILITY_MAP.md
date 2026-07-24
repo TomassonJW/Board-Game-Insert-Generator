@@ -1939,3 +1939,20 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
   Une remédiation P64-L08H doit précéder toute gate humaine.
 - `C-PRINT` : inchangée ; `fusion-validated=false`, `print-validated=false` pour
   L08G.
+
+## Mise à jour P64-L08H — ABI validée, redistribution encore fermée
+
+- `C-SOLVER` : le wheel PySCIPOpt 6.2.1 `cp314` charge réellement SCIP 10.0.2
+  dans Python 3.14 isolé et résout un contrôle exact hors ligne. Aucune
+  capability produit n'est promue car la redistribution reste incomplète.
+- `C-SAFETY` : 30 binaires et cinq artefacts de provenance sont verrouillés ;
+  la gate échoue automatiquement dès que les avis ou autorités restent
+  incomplets.
+- `C-QUALITY` : la correction ABI est prouvée sans replay, tuning ou lecture du
+  holdout ; le gagnant SCIP et les preuves L08F restent inchangés.
+- `C-LAYOUT`, `C-GRID-3D`, `C-LAYERS`, `C-STACKING` : aucune intégration ; les
+  capacités produit courantes ne changent pas.
+- `C-FUSION`, `C-FUSION-UI`, `C-PRINT` : aucun package, smoke test ou gate
+  humaine ; `fusion-validated=false`, `print-validated=false`.
+- Suite : P64-L08I doit auditer un runtime SCIP minimal redistribuable avant
+  toute modification produit.

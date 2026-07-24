@@ -85,18 +85,19 @@ preuves archivées.
 - P64-L07E est conservée comme preuve d'une lane HiGHS de sol rectangulaire.
   ADR-0083 requalifie cependant L07 : ses quatre candidats ont été comparés sur
   un seul niveau et ne répondent pas à la gate de solvage 3D réel.
-- P64-L07V est suspendue. P64-L08A à L08G sont terminées. Le tournoi a
+- P64-L07V est suspendue. P64-L08A à L08H sont terminées. Le tournoi a
   réellement comparé OR-Tools, SCIP, PackingSolver et LAFF sur les cas limites
   X/Y/Z, puis ouvert le holdout neuf une seule fois après sélection scellée.
   SCIP reste le gagnant benchmark avec 18 gains et 0 perte face au vrai
   comportement BGIG ; le portefeuille est rejeté à +5/−3 face à SCIP seul.
-- La gate produit L08G échoue fermée : wheel PySCIPOpt `cp310` incompatible
-  avec le Python `cp314` de Fusion 2704.1.36, versions natives incomplètes et
-  avis/autorités de redistribution non liés. Aucun moteur produit ni package
-  Fusion n'est ajouté ; aucune gate humaine L08 n'est active.
-- La prochaine mission recommandée est P64-L08H, remédiation isolée du paquet
-  SCIP `cp314` ou CLI autonome. Elle ne peut ni rouvrir le holdout, ni retuner,
-  ni remplacer SCIP après lecture du privé.
+- L08H corrige le blocage ABI : le wheel officiel PySCIPOpt 6.2.1 `cp314`
+  charge SCIP 10.0.2 et résout un contrôle exact hors ligne dans Python 3.14
+  isolé. La gate produit reste cependant fermée : cinq familles natives n'ont
+  pas tous leurs avis dans le paquet et les autorités Intel/Microsoft restent
+  incomplètes. Aucun moteur produit ni package Fusion n'est ajouté.
+- La prochaine mission recommandée est P64-L08I : ADR puis audit d'un runtime
+  SCIP 10.0.2 minimal `cp314`, sans Ipopt/MUMPS/Intel inutiles au modèle BGIG.
+  Elle ne peut ni rouvrir le holdout, ni retuner, ni intégrer le moteur.
 
 ## Vue de séquence
 
@@ -158,7 +159,8 @@ preuves archivées.
 | Terminé — adaptateurs | P64-L08E | Quatre moteurs/familles exécutés en X/Y/Z ; contrôles recertifiés, refus explicites, holdout fermé. |
 | Terminé — gagnant benchmark | P64-L08F | SCIP retenu : +18/−0 face à BGIG ; portefeuille rejeté à +5/−3 face à SCIP. |
 | Terminé — résultat produit négatif | P64-L08G | ABI `cp310/cp314` incompatible et redistribution native incomplète ; aucun runtime ni gate Fusion. |
-| Prochaine — remédiation paquet | P64-L08H | Auditer un runtime SCIP `cp314` ou CLI autonome complet, sans benchmark ni holdout. |
+| Terminé — ABI réparée, paquet refusé | P64-L08H | SCIP `cp314` fonctionne hors ligne ; avis natifs et autorités Intel/Microsoft incomplets, aucune intégration. |
+| Prochaine — ADR et runtime minimal | P64-L08I | Auditer une fabrication SCIP 10.0.2 `cp314` sans Ipopt/MUMPS/Intel, avant build et régression. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 

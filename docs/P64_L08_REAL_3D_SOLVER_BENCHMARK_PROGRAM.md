@@ -1,6 +1,6 @@
 # P64-L08 — benchmark réel de solvage 3D des cas limites BGIG
 
-Statut : `executed-through-L08G`, `benchmark-winner-scip`, `negative-no-product-integrable-winner`, `no-fusion-gate`.
+Statut : `executed-through-L08H`, `benchmark-winner-scip`, `abi-pass`, `negative-package-redistribution-incomplete`, `no-fusion-gate`.
 Autorité : ADR-0083, ADR-0068, ADR-0079.
 Capability : `C-SOLVER`, `C-LAYOUT`, `C-GRID-3D`, `C-LAYERS`, `C-STACKING`,
 `C-QUALITY`.
@@ -195,3 +195,26 @@ Fusion L08 n'est ni préparée ni installée.
 
 Décision : `negative_no_product_integrable_winner`. Le programme L08 est terminé
 honnêtement ; `fusion-validated=false` et `print-validated=false`.
+
+## 13. État exécuté après P64-L08H
+
+Le candidat officiel PyPI PySCIPOpt 6.2.1 `cp314` est retenu pour l'audit afin
+de conserver la route SCIP 10.0.2 du tournoi. Avec NumPy 2.5.1, il passe un
+probe exact dans Python 3.14 isolé, hors ligne et sans installation globale.
+L'ABI produit n'est donc plus le blocage.
+
+Les deux wheels totalisent 61 937 391 octets compressés et 186 127 316 octets
+décompressés. Leurs 30 binaires `.pyd` et `.dll`, ainsi que les artefacts de
+provenance `scipoptsuite-deploy` v0.12.0 et Ipopt 3.14.19, sont verrouillés par
+empreinte. Toutes les versions natives utiles à l'audit sont identifiées.
+
+La gate de redistribution échoue néanmoins : les avis SCIP, Ipopt,
+MUMPS/METIS, Intel et Microsoft ne sont pas tous présents dans le candidat et
+les autorités Intel/Microsoft ne sont pas entièrement établies. Aucun runtime
+n'est intégré et aucune gate Fusion n'est préparée.
+
+Décision : `negative_package_redistribution_incomplete`. La suite P64-L08I doit
+cadrer par ADR et auditer une fabrication SCIP minimale `cp314`, sans les
+composants non requis Ipopt/MUMPS/Intel. Le holdout reste consommé et interdit
+à tout replay ou réglage ; `fusion-validated=false` et
+`print-validated=false`.
