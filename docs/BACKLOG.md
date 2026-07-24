@@ -3247,16 +3247,23 @@ implémentée et intégrée à la fois.
 ### P64-F02B — Objectifs équilibrés, proportionnels et modulaires
 
 - Dépendance : P64-F01B terminée.
-- Partie maintenant admissible : candidats distincts pour équilibrer le volume
-  ajouté puis les ratios d’expansion, déterminisme, budget borné, contraintes
-  dures prioritaires et incumbent certifié préservé sans amélioration stricte.
-- Partie encore différée : trames globales/locales, cellules et harmonisation
-  modulaire, faute de contrats de faces P45/P46.
-- Statut : ready-partial-balanced-and-proportional ; modular-deferred.
+- Livré : candidats distincts pour équilibrer le volume ajouté puis les ratios
+  d’expansion, score déterministe, budget partagé, contraintes dures et
+  certificat commun prioritaires, provenance publiée.
+- Fallback : le plan F01B certifié est conservé exactement sans amélioration
+  stricte ; aucun solve global supplémentaire.
+- Preuves : fermeture 5/5, staged 14/14, palette 29/29 et suite 853/853.
+- Partie différée : trames globales/locales, cellules et harmonisation modulaire,
+  faute de contrats de faces P45/P46.
+- Preuve : docs/P64_F02B_BALANCED_PROPORTIONAL_EVIDENCE.md.
+- Statut : implemented-product, automated-validated,
+  modular-harmonization-deferred, fusion-validated=false,
+  print-validated=false.
 
 ### P64-L09V — Gate Fusion combinée
 
-- Dépendances : P64-L09B, P64-L09C et P64-F01B automatisées.
+- Dépendances : P64-L09B, P64-L09C, P64-F01B et P64-F02B admissible automatisées.
+- Préparer : fixture combinée, réglages, add-in local, marqueurs et checklist unique.
 - Observer : anti-chute, pontage valide, plateau réellement traité, compensation
   Z sans atteinte aux cavités et absence de pose implicite par couvercle.
-- Statut : `blocked-by-implementation`, `print-validated=false`.
+- Statut : `ready-for-local-gate-preparation`, `print-validated=false`.

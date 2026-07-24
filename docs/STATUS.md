@@ -3796,3 +3796,20 @@ Statut : implemented-product, automated-validated.
 
 La prochaine mission unique est la partie équilibrée et proportionnelle de
 P64-F02B. L’harmonisation modulaire reste différée.
+
+## P64-F02B admissible — objectifs équilibrés et proportionnels
+
+La partie admissible de P64-F02B est implemented-product et automated-validated.
+Le finaliseur conserve d'abord un plan P64-F01B fermé et certifié, puis emploie
+uniquement le budget restant pour comparer des répartitions de volume ajouté et
+de ratio d'expansion. Un candidat ne remplace la baseline que s'il reste fermé,
+recertifié et strictement meilleur ; sinon la baseline est conservée exactement.
+
+Les contraintes dures, les réservations, les cavités, les axes Fixed et le
+support matériel restent autoritaires. Aucun solve global additionnel n'est
+invoqué. Tests ciblés : fermeture 5/5, staged 14/14, palette 29/29. Suite
+complète : 853/853 en 224,573 s, un test natif ignoré sous Python 3.10.
+
+L'harmonisation modulaire reste différée faute de contrats P45/P46.
+fusion-validated=false ; print-validated=false. La prochaine mission unique est
+la préparation locale de P64-L09V.

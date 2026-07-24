@@ -15,8 +15,8 @@ faire dans Fusion.
 | P64-L09B | automatisé — terminé | support réel, chute, pontage, stabilité, parité des voies |
 | P64-L09C | automatisé — terminé | réservations supérieures fidèles dans SCIP et preuve native CPython 3.14 |
 | P64-F01B | automatisé — terminé | incumbent, réservations, fermeture, réparation locale et certificat final |
-| P64-F02B admissible | à exécuter | volume ajouté égal et ratio d'expansion égal |
-| P64-L09V | bloqué par l'implémentation | gate Fusion combinée |
+| P64-F02B admissible | automatisé — terminé | volume ajouté égal, ratio d’expansion égal et fallback certifié |
+| P64-L09V | préparation suivante | gate Fusion combinée |
 
 ## P64-L09B — support matériel
 
@@ -85,19 +85,24 @@ Preuves acquises :
 
 ## P64-F02B — partie admissible
 
-À prouver séparément :
+Preuves acquises :
 
-- [ ] objectif « volume ajouté égal » ;
-- [ ] objectif « ratio d'expansion égal » ;
-- [ ] déterminisme à entrée et budget identiques ;
-- [ ] aucune contrainte dure affaiblie par un objectif secondaire ;
-- [ ] l'incumbent certifié est conservé si l'objectif n'améliore rien ;
-- [ ] l'harmonisation modulaire reste différée tant que P45/P46 ne fournit pas
-  les contrats de faces nécessaires.
+- [x] objectif « volume ajouté égal » ;
+- [x] objectif « ratio d'expansion égal » ;
+- [x] déterminisme à entrée et budget identiques ;
+- [x] aucune contrainte dure affaiblie par un objectif secondaire ;
+- [x] l'incumbent certifié est conservé si l'objectif n'améliore rien ;
+- [x] l'harmonisation modulaire reste différée tant que P45/P46 ne fournit pas
+  les contrats de faces nécessaires ;
+- [x] tests ciblés : fermeture 5/5, staged 14/14, palette 29/29 ;
+- [x] suite complète : 853/853 en 224,573 s, 1 test natif ignoré sous Python
+  3.10 ;
+- [x] preuve : P64_F02B_BALANCED_PROPORTIONAL_EVIDENCE.md.
 
 ## P64-L09V — observations Fusion à remettre à Thomas
 
-Cette section ne sera marquée prête qu'après L09C et F01B automatisées.
+L09B, L09C, F01B et la partie admissible de F02B sont automatisées. La
+préparation locale de cette gate est la prochaine mission unique.
 
 Observations prévues :
 

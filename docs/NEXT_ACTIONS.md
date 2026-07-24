@@ -86,32 +86,24 @@ Rapport final L07 : P64_L07_GOAL_FINAL_REPORT.md.
 
 ## Prochaine action recommandée
 
-### Exécuter la partie admissible de P64-F02B — équilibre et proportion
+### Préparer P64-L09V — gate Fusion combinée
 
-Type : objectifs secondaires de finalisation ; aucun benchmark, tuning, holdout,
-nouvelle valeur physique, nouvelle pose, nouveau schéma produit ou changement
-d’UI.
+Type : préparation locale et checklist humaine ; aucun benchmark, tuning,
+holdout, changement de valeur physique ou ouverture d'un nouveau lot produit.
 
-P64-F01B est automatisée et intégrable : l’incumbent minimal est fermé sous un
-budget unique, une réparation locale précède tout solve global, le certificat
-commun reste autoritaire et aucun plan partiel n’est publiable.
+Les preuves automatisées P64-L09B, P64-L09C, P64-F01B et la partie admissible
+de P64-F02B sont terminées. La préparation doit maintenant :
 
-La partie admissible de P64-F02B doit :
+1. construire une fixture combinée anti-chute, pontage stable, réservation
+   supérieure et fermeture finale ;
+2. préparer les réglages Fusion sans affaiblir les cas privés existants ;
+3. installer et vérifier l'add-in courant ainsi que ses marqueurs locaux ;
+4. fournir à Thomas une seule checklist d'observation dans
+   P64_L09_VALIDATION_UNIFIEE.md ;
+5. conserver explicitement `print-validated=false` ;
+6. intégrer directement dans main après les preuves automatisées de préparation.
 
-1. représenter séparément l’objectif « volume ajouté égal » et l’objectif
-   « ratio d’expansion égal » ;
-2. générer des candidats de répartition compatibles avec les faces Auto/Target ;
-3. laisser toutes les contraintes dures et le certificat F01B prioritaires ;
-4. comparer les candidats avec des métriques explicites et déterministes ;
-5. ne remplacer l’incumbent final certifié que par une amélioration stricte ;
-6. conserver exactement le plan F01B si aucun objectif secondaire ne progresse ;
-7. rester sous les caps de la finalisation et publier la provenance de
-   l’objectif choisi ;
-8. garder l’harmonisation modulaire, les trames et les cellules différées ;
-9. mettre à jour P64_L09_VALIDATION_UNIFIEE.md et préparer ensuite P64-L09V ;
-10. intégrer directement dans main après les preuves complètes.
-
-Aucune action humaine n’est requise pendant cette partie de P64-F02B.
+L'intervention humaine ne commence qu'une fois le paquet local vérifié.
 
 ## Lots verrouillés
 

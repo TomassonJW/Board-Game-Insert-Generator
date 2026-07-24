@@ -132,9 +132,12 @@ preuves archivées.
   réparation locale précède tout solve global et seul le plan final recertifié
   devient matérialisable. Un échec rend no_solution_within_budget sans plan
   partiel. Suite complète : 851/851.
-- La prochaine mission unique est la partie admissible de P64-F02B : objectifs
-  distincts de volume ajouté égal et de ratio d’expansion égal. La modularité
-  reste différée.
+- La partie admissible de P64-F02B est implemented-product et
+  automated-validated : le volume ajouté puis le ratio d’expansion sont des
+  objectifs secondaires déterministes ; le plan F01B certifié reste prioritaire
+  sans amélioration stricte. Suite complète : 853/853.
+- La prochaine mission unique est la préparation de P64-L09V, gate Fusion
+  combinée. La modularité reste différée.
 
 ## Vue de séquence
 
@@ -206,7 +209,8 @@ preuves archivées.
 | Terminée — automatisée | P64-L09B | Chute interdite ; rebords, faces pleines et pontage stable certifiés sur matière réelle. |
 | Terminée — automatisée | P64-L09C | Réservations exactes dans SCIP, fonds et cavités protégés, preuve native CPython 3.14. |
 | Terminée — automatisée | P64-F01B | Fermeture bornée, réparation locale, échec honnête et certificat final avant CAD. |
-| Prochaine — objectifs secondaires | P64-F02B admissible | Volume ajouté égal puis ratio d’expansion égal ; modularité différée. |
+| Terminée — automatisée | P64-F02B admissible | Volume ajouté égal puis ratio d’expansion égal ; fallback F01B certifié et modularité différée. |
+| Prochaine — préparation locale | P64-L09V | Fixture et checklist Fusion combinées, add-in installé et vérifié avant observation humaine. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -224,6 +228,8 @@ preuves archivées.
   résumé progressif et absence de solve global.
 - P64_F01B_COUPLED_FINALIZATION_EVIDENCE.md : fermeture, réparation, budget,
   certificat final et non-publication des plans partiels.
+- P64_F02B_BALANCED_PROPORTIONAL_EVIDENCE.md : objectifs secondaires, score,
+  budget partagé, fallback F01B et modularité différée.
 - P64_L09A_MATERIAL_SUPPORT_AND_COUPLED_FINALIZATION_CONTRACT.md : matière
   porteuse, anti-chute, réservations SCIP, boucle bornée et lots L09/F01B/F02B.
 - P64_L09B_MATERIAL_SUPPORT_EVIDENCE.md : surfaces porteuses, chute, pontage,

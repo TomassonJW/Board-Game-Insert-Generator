@@ -1519,3 +1519,16 @@ La partie admissible de P64-F02B devient la prochaine mission unique : objectifs
 distincts de volume ajouté égal et de ratio d’expansion égal, sous contraintes
 dures inchangées et avec fallback exact. Les trames et l’harmonisation modulaire
 restent différées jusqu’aux contrats P45/P46.
+
+## Mise à jour P64-F02B admissible — 2026-07-24
+
+Les objectifs « volume ajouté égal » puis « ratio d'expansion égal » sont
+intégrés comme critères secondaires déterministes de la boucle P64-F01B. Le plan
+fermé et certifié F01B reste l'incumbent de sécurité ; le candidat F02B repart du
+même placement minimal, partage certains espaces entre faces Auto/Target et ne
+peut être retenu qu'après fermeture complète, certificat commun et amélioration
+stricte sous les caps restants.
+
+La partie modulaire de P64-F02B reste future jusqu'aux contrats P45/P46. La
+prochaine étape est la préparation P64-L09V, puis l'observation humaine combinée
+dans Fusion. Aucun benchmark, holdout ou recalibrage physique n'a été exécuté.

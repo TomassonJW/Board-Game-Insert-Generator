@@ -1277,3 +1277,15 @@ promotion Fusion produit. La partie admissible de P64-F02B reste autorisée par
 le GO déjà donné, sans intervention humaine. La prochaine gate est P64-L09V
 après préparation locale complète. `fusion-validated=false` pour L09 ;
 `print-validated=false`.
+
+## Préparation de la gate P64-L09V après P64-F02B
+
+P64-L09B, P64-L09C, P64-F01B et la partie admissible de P64-F02B sont
+automated-validated. Aucune nouvelle validation humaine n'était requise pendant
+leur implémentation. La prochaine intervention humaine reste P64-L09V, après
+préparation locale de la fixture, de l'add-in et de la checklist combinée.
+
+Cette gate devra observer anti-chute, pontage stable, traitement SCIP des
+réservations, compensation Z sans atteinte aux cavités, fermeture finale et
+absence de sémantique implicite liée à `has_lid`. Elle ne vaut pas validation
+d'impression ; `print-validated=false` reste obligatoire.

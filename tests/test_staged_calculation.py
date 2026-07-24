@@ -203,6 +203,25 @@ class StagedCalculationTests(unittest.TestCase):
             minimal["artifact_digest"],
         )
         self.assertEqual(finalization["global_resolve_invocation_count"], 0)
+        objectives = finalization["secondary_objectives"]
+        self.assertTrue(objectives["attempted"])
+        self.assertTrue(objectives["candidate_certified"])
+        self.assertFalse(objectives["strict_improvement"])
+        self.assertTrue(objectives["incumbent_preserved_without_strict_improvement"])
+        self.assertFalse(objectives["hard_constraints_weakened"])
+        self.assertFalse(objectives["modular_harmonization_attempted"])
+        self.assertEqual(
+            finalization["selected_plan_source"],
+            "f01b_certified_baseline",
+        )
+        self.assertLessEqual(
+            finalization["iterations"],
+            finalization["budget"]["limits"]["max_closure_iterations"],
+        )
+        self.assertLessEqual(
+            finalization["candidates_evaluated"],
+            finalization["budget"]["limits"]["max_closure_candidates"],
+        )
         self.assertGreaterEqual(finalization["active_top_inset_reservation_count"], 1)
         self.assertEqual(selection["artifact_kind"], ARTIFACT_KIND_FINALIZED)
         self.assertEqual(

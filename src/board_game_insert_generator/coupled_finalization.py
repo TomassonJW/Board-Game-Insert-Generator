@@ -9,12 +9,15 @@ shared global product certificate accepts the complete result.
 from __future__ import annotations
 
 from copy import deepcopy
+from time import perf_counter
 from typing import Mapping, Sequence
 
 from board_game_insert_generator.container_variant_global_search import (
     _selected_participants_for_placements,
 )
 from board_game_insert_generator.free_3d_continuous_closure import (
+    FINISHING_OBJECTIVE_BALANCED_THEN_PROPORTIONAL,
+    FINISHING_OBJECTIVE_CLOSURE_ONLY,
     FREE_3D_CONTINUOUS_CLOSURE_VERSION,
     Free3DClosureResult,
     close_free_3d_residual,
@@ -36,8 +39,8 @@ from board_game_insert_generator.solver_contract import SolverBudget, SolverStra
 
 COUPLED_FINALIZATION_SCHEMA_V1 = "bgig.coupled_finalization.v1"
 COUPLED_FINALIZATION_FAMILY_ID = "bounded_coupled_finalization"
-COUPLED_FINALIZATION_VERSION = "bgig.bounded_coupled_finalization.v1"
-COUPLED_FINALIZATION_POLICY = "bounded_growth_then_local_repair"
+COUPLED_FINALIZATION_VERSION = "bgig.bounded_coupled_finalization.v2"
+COUPLED_FINALIZATION_POLICY = "bounded_growth_local_repair_balanced_proportional"
 ARTIFACT_KIND_FINALIZED = "finalized_plan"
 
 _CLOSURE_CAPS = {
@@ -139,7 +142,8 @@ def finalize_coupled_volume(
         ) from exc
 
     budget = coupled_finalization_budget(effort_profile)
-    closure = close_free_3d_residual(
+    started = perf_counter()
+    baseline_closure = close_free_3d_residual(
         participants,
         placements,
         problem.box,
@@ -149,40 +153,100 @@ def finalize_coupled_volume(
         between_bodies_z_mm=problem.z_clearance_mm,
         budget=budget,
         top_inset_zones=problem.top_inset_zones,
+        finishing_objective=FINISHING_OBJECTIVE_CLOSURE_ONLY,
     )
-    if closure.empty_spaces:
+    if baseline_closure.empty_spaces:
         raise CoupledFinalizationError(
             "La fermeture bornee n a pas produit de plan complet certifiable.",
-            _closure_report(closure, stop_reason="printable_residual_remains"),
+            _closure_report(
+                baseline_closure,
+                stop_reason="printable_residual_remains",
+            ),
         )
 
     strategy = SolverStrategy(
         COUPLED_FINALIZATION_FAMILY_ID,
         COUPLED_FINALIZATION_VERSION,
     )
-    certified, rejection_codes = certify_free_3d_plan(
+    baseline_certified, rejection_codes = _certify_closed_plan(
         problem,
+        baseline_closure,
         strategy=strategy,
         budget=budget,
-        candidate_id=(
-            f"coupled-finalization:{closure.incumbent_digest[:16]}:"
-            f"{closure.deterministic_digest[:16]}"
-        ),
-        placements=closure.placements,
-        search_telemetry=_closure_telemetry(closure, problem),
+        phase="f01b_certified_baseline",
     )
-    if certified is None:
+    if baseline_certified is None:
         raise CoupledFinalizationError(
             "Le certificat global final a rejete le plan ferme.",
             _closure_report(
-                closure,
+                baseline_closure,
                 stop_reason="global_certificate_rejected",
                 rejection_codes=rejection_codes,
             ),
         )
+
+    selected_certified = baseline_certified
+    selected_closure = baseline_closure
+    selected_plan_source = "f01b_certified_baseline"
+    objective_attempted = False
+    objective_certified = False
+    objective_improved = False
+    objective_fallback_reason = "shared_budget_exhausted_after_baseline"
+    objective_closure: Free3DClosureResult | None = None
+    objective_budget = _remaining_objective_budget(
+        budget,
+        baseline_closure,
+        elapsed_ms=int((perf_counter() - started) * 1000.0),
+    )
+    if objective_budget is not None:
+        objective_attempted = True
+        objective_closure = close_free_3d_residual(
+            participants,
+            placements,
+            problem.box,
+            problem.storage_height_mm,
+            problem.xy_clearance_mm,
+            box_perimeter_xy_mm=problem.box_xy_clearance_mm,
+            between_bodies_z_mm=problem.z_clearance_mm,
+            budget=objective_budget,
+            top_inset_zones=problem.top_inset_zones,
+            finishing_objective=(FINISHING_OBJECTIVE_BALANCED_THEN_PROPORTIONAL),
+        )
+        if objective_closure.empty_spaces:
+            objective_fallback_reason = f"objective_{objective_closure.status}"
+        else:
+            candidate_certified, candidate_rejections = _certify_closed_plan(
+                problem,
+                objective_closure,
+                strategy=strategy,
+                budget=budget,
+                phase="f02b_balanced_proportional_candidate",
+            )
+            if candidate_certified is None:
+                objective_fallback_reason = "objective_global_certificate_rejected:" + ",".join(
+                    candidate_rejections
+                )
+            else:
+                objective_certified = True
+                if objective_closure.objective_score < baseline_closure.objective_score:
+                    selected_certified = candidate_certified
+                    selected_closure = objective_closure
+                    selected_plan_source = "f02b_balanced_proportional"
+                    objective_improved = True
+                    objective_fallback_reason = "strict_secondary_objective_improvement"
+                else:
+                    objective_fallback_reason = "no_strict_secondary_improvement"
+
     return _finalized_plan(
-        certified,
-        closure,
+        selected_certified,
+        selected_closure,
+        baseline_closure=baseline_closure,
+        objective_closure=objective_closure,
+        objective_attempted=objective_attempted,
+        objective_certified=objective_certified,
+        objective_improved=objective_improved,
+        selected_plan_source=selected_plan_source,
+        objective_fallback_reason=objective_fallback_reason,
         source_minimal_artifact_digest=source_minimal_artifact_digest,
         source_minimal_plan_digest=str(minimal_plan.get("plan_digest", "")),
         budget=budget,
@@ -190,10 +254,71 @@ def finalize_coupled_volume(
     )
 
 
+def _certify_closed_plan(
+    problem: Free3DPreparedProblem,
+    closure: Free3DClosureResult,
+    *,
+    strategy: SolverStrategy,
+    budget: SolverBudget,
+    phase: str,
+) -> tuple[CertifiedFree3DPlan | None, tuple[str, ...]]:
+    return certify_free_3d_plan(
+        problem,
+        strategy=strategy,
+        budget=budget,
+        candidate_id=(
+            f"coupled-finalization:{phase}:"
+            f"{closure.incumbent_digest[:12]}:"
+            f"{closure.deterministic_digest[:12]}"
+        ),
+        placements=closure.placements,
+        search_telemetry=_closure_telemetry(
+            closure,
+            problem,
+            phase=phase,
+        ),
+    )
+
+
+def _remaining_objective_budget(
+    budget: SolverBudget,
+    baseline: Free3DClosureResult,
+    *,
+    elapsed_ms: int,
+) -> SolverBudget | None:
+    limits = dict(budget.limits)
+    remaining_iterations = int(limits["max_closure_iterations"]) - (baseline.iterations)
+    remaining_candidates = int(limits["max_closure_candidates"]) - (baseline.candidates_evaluated)
+    remaining_repairs = int(limits["max_local_repairs"]) - (baseline.repair_attempts)
+    remaining_elapsed_ms = int(limits["max_closure_elapsed_ms"]) - (elapsed_ms)
+    if remaining_iterations <= 0 or remaining_candidates <= 0 or remaining_elapsed_ms <= 0:
+        return None
+    limits.update(
+        {
+            "max_closure_iterations": remaining_iterations,
+            "max_closure_candidates": remaining_candidates,
+            "max_local_repairs": max(0, remaining_repairs),
+            "max_closure_elapsed_ms": remaining_elapsed_ms,
+        }
+    )
+    return SolverBudget(
+        budget.family_id,
+        budget.effort_profile,
+        tuple(sorted(limits.items())),
+    )
+
+
 def _finalized_plan(
     certified: CertifiedFree3DPlan,
     closure: Free3DClosureResult,
     *,
+    baseline_closure: Free3DClosureResult,
+    objective_closure: Free3DClosureResult | None,
+    objective_attempted: bool,
+    objective_certified: bool,
+    objective_improved: bool,
+    selected_plan_source: str,
+    objective_fallback_reason: str,
     source_minimal_artifact_digest: str,
     source_minimal_plan_digest: str,
     budget: SolverBudget,
@@ -201,6 +326,11 @@ def _finalized_plan(
 ) -> dict[str, object]:
     plan = deepcopy(certified.plan)
     certificate = certified.certificate
+    objective_iterations = objective_closure.iterations if objective_closure is not None else 0
+    objective_candidates = (
+        objective_closure.candidates_evaluated if objective_closure is not None else 0
+    )
+    objective_repairs = objective_closure.repair_attempts if objective_closure is not None else 0
     plan["finalization"] = {
         "schema_version": COUPLED_FINALIZATION_SCHEMA_V1,
         "artifact_kind": ARTIFACT_KIND_FINALIZED,
@@ -211,13 +341,60 @@ def _finalized_plan(
         "source_minimal_plan_digest": source_minimal_plan_digest,
         "incumbent_digest": closure.incumbent_digest,
         "closure_digest": closure.deterministic_digest,
+        "baseline_closure_digest": baseline_closure.deterministic_digest,
+        "objective_closure_digest": (
+            objective_closure.deterministic_digest if objective_closure is not None else ""
+        ),
         "closure_status": closure.status,
-        "iterations": closure.iterations,
-        "candidates_evaluated": closure.candidates_evaluated,
-        "repair_attempts": closure.repair_attempts,
-        "repairs_applied": closure.repairs_applied,
-        "global_resolve_invocation_count": (closure.global_resolve_invocation_count),
-        "deadline_reached": closure.deadline_reached,
+        "iterations": baseline_closure.iterations + objective_iterations,
+        "candidates_evaluated": (baseline_closure.candidates_evaluated + objective_candidates),
+        "repair_attempts": (baseline_closure.repair_attempts + objective_repairs),
+        "repairs_applied": (
+            baseline_closure.repairs_applied
+            + (objective_closure.repairs_applied if objective_closure is not None else 0)
+        ),
+        "global_resolve_invocation_count": (
+            baseline_closure.global_resolve_invocation_count
+            + (
+                objective_closure.global_resolve_invocation_count
+                if objective_closure is not None
+                else 0
+            )
+        ),
+        "deadline_reached": bool(
+            baseline_closure.deadline_reached
+            or (objective_closure is not None and objective_closure.deadline_reached)
+        ),
+        "selected_plan_source": selected_plan_source,
+        "secondary_objectives": {
+            "schema_version": "bgig.finalization_secondary_objectives.v1",
+            "requested": [
+                "balanced_added_volume",
+                "proportional_expansion",
+            ],
+            "selection_order": [
+                "hard_constraints",
+                "complete_residual_closure",
+                "balanced_added_volume",
+                "proportional_expansion",
+            ],
+            "attempted": objective_attempted,
+            "candidate_certified": objective_certified,
+            "strict_improvement": objective_improved,
+            "fallback_reason": objective_fallback_reason,
+            "baseline_score": _objective_score_payload(baseline_closure.objective_score),
+            "candidate_score": (
+                _objective_score_payload(objective_closure.objective_score)
+                if objective_closure is not None
+                else None
+            ),
+            "selected_score": _objective_score_payload(closure.objective_score),
+            "selected_objective_id": closure.selected_objective_id,
+            "incumbent_preserved_without_strict_improvement": (not objective_improved),
+            "hard_constraints_weakened": False,
+            "modular_harmonization_attempted": False,
+            "modular_harmonization_status": "deferred",
+        },
         "active_top_inset_reservation_count": reservation_count,
         "active_certified_mechanism_envelope_count": 0,
         "budget": {
@@ -253,6 +430,9 @@ def _finalized_plan(
             "global_resolve_invocation_count": (closure.global_resolve_invocation_count),
             "materialization_from_final_certificate_only": True,
             "base_cavity_layouts_fixed": True,
+            "secondary_objectives_are_soft": True,
+            "f01b_baseline_preserved_without_strict_improvement": True,
+            "modular_harmonization_applied": False,
         }
     )
     plan["invariants"] = invariants
@@ -262,13 +442,31 @@ def _finalized_plan(
     return plan
 
 
+def _objective_score_payload(
+    score: tuple[float, float, float, float],
+) -> dict[str, float]:
+    return {
+        "added_volume_spread_mm3": score[0],
+        "added_volume_mean_absolute_deviation_mm3": score[1],
+        "expansion_ratio_spread": score[2],
+        "expansion_ratio_mean_absolute_deviation": score[3],
+    }
+
+
 def _closure_telemetry(
     closure: Free3DClosureResult,
     problem: Free3DPreparedProblem,
+    *,
+    phase: str,
 ) -> dict[str, object]:
     return {
         "closure_version": FREE_3D_CONTINUOUS_CLOSURE_VERSION,
+        "closure_phase": phase,
         "closure_status": closure.status,
+        "finishing_objective": closure.finishing_objective,
+        "objective_score": _objective_score_payload(closure.objective_score),
+        "objective_candidate_count": closure.objective_candidate_count,
+        "selected_objective_id": closure.selected_objective_id,
         "closure_iterations": closure.iterations,
         "closure_candidates_evaluated": closure.candidates_evaluated,
         "closure_repair_attempts": closure.repair_attempts,
@@ -308,6 +506,8 @@ def _closure_report(
         "global_resolve_invocation_count": (closure.global_resolve_invocation_count),
         "deadline_reached": closure.deadline_reached,
         "residual_metric": closure.final_residual_metric,
+        "finishing_objective": closure.finishing_objective,
+        "objective_score": _objective_score_payload(closure.objective_score),
     }
 
 

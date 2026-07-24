@@ -38,7 +38,17 @@ from board_game_insert_generator.solver_contract import (
 )
 
 
-FREE_3D_CONTINUOUS_CLOSURE_VERSION = "bgig.free_3d_continuous_closure.v2"
+FREE_3D_CONTINUOUS_CLOSURE_VERSION = "bgig.free_3d_continuous_closure.v3"
+FINISHING_OBJECTIVE_CLOSURE_ONLY = "closure_only"
+FINISHING_OBJECTIVE_BALANCED_ADDED_VOLUME = "balanced_added_volume"
+FINISHING_OBJECTIVE_PROPORTIONAL_EXPANSION = "proportional_expansion"
+FINISHING_OBJECTIVE_BALANCED_THEN_PROPORTIONAL = "balanced_then_proportional"
+_SUPPORTED_FINISHING_OBJECTIVES = {
+    FINISHING_OBJECTIVE_CLOSURE_ONLY,
+    FINISHING_OBJECTIVE_BALANCED_ADDED_VOLUME,
+    FINISHING_OBJECTIVE_PROPORTIONAL_EXPANSION,
+    FINISHING_OBJECTIVE_BALANCED_THEN_PROPORTIONAL,
+}
 _EPSILON = 0.0001
 _AXES = ("x", "y", "z")
 
@@ -60,6 +70,10 @@ class Free3DClosureResult:
     global_resolve_invocation_count: int
     deadline_reached: bool
     incumbent_digest: str
+    finishing_objective: str
+    objective_score: tuple[float, float, float, float]
+    objective_candidate_count: int
+    selected_objective_id: str
     deterministic_digest: str
 
 
@@ -75,6 +89,9 @@ class _GrowthCandidate:
     residual_metric: tuple[float, float, int]
     aligned_faces: int
     relative_growth: float
+    objective_score: tuple[float, float, float, float]
+    objective_id: str
+    growth_placement_ids: tuple[str, ...]
     repair_placement_id: str | None = None
 
 
@@ -90,6 +107,7 @@ def close_free_3d_residual(
     budget: SolverBudget,
     forbidden_spaces: Iterable[EmptySpace] = (),
     top_inset_zones: Iterable[TopInsetZone] = (),
+    finishing_objective: str = FINISHING_OBJECTIVE_CLOSURE_ONLY,
 ) -> Free3DClosureResult:
     """Close printable residuals with bounded growth then local repair."""
 
@@ -97,6 +115,9 @@ def close_free_3d_residual(
     values = tuple(dict(value) for value in participants)
     participants_by_id = {str(value["id"]): value for value in values}
     current = tuple(sorted(placements, key=lambda value: value.participant_id))
+    if finishing_objective not in _SUPPORTED_FINISHING_OBJECTIVES:
+        raise ValueError(f"Unsupported continuous closure objective: {finishing_objective}.")
+    incumbent_by_id = {value.participant_id: value for value in current}
     if set(participants_by_id) != {value.participant_id for value in current}:
         raise ValueError("Continuous closure requires one placement per participant.")
 
@@ -140,6 +161,8 @@ def close_free_3d_residual(
     candidates_evaluated = 0
     repair_attempts = 0
     repairs_applied = 0
+    objective_candidate_count = 0
+    selected_objective_id = "not_applied"
     iterations = 0
     deadline_reached = False
     status = "already_closed" if not spaces else "stalled"
@@ -163,6 +186,8 @@ def close_free_3d_residual(
             baseline,
             max_candidates - candidates_evaluated,
             deadline,
+            incumbent_by_id,
+            finishing_objective,
         )
         candidates_evaluated += evaluated
         if not candidates and repair_attempts < max_repairs:
@@ -180,6 +205,8 @@ def close_free_3d_residual(
                 max_candidates - candidates_evaluated,
                 deadline,
                 visited,
+                incumbent_by_id,
+                finishing_objective,
             )
             repair_attempts += attempted
             candidates_evaluated += evaluated
@@ -199,9 +226,12 @@ def close_free_3d_residual(
             candidates,
             key=lambda value: (
                 value.residual_metric,
+                _objective_rank(value.objective_score, finishing_objective),
                 -value.aligned_faces,
                 _round(value.relative_growth),
                 value.repair_placement_id or "",
+                value.objective_id,
+                value.growth_placement_ids,
                 value.placement.participant_id,
                 value.axis_index,
                 value.direction,
@@ -212,6 +242,10 @@ def close_free_3d_residual(
         spaces = list(chosen.spaces)
         visited.add(_placement_signature(current))
         repairs_applied += int(chosen.repair_placement_id is not None)
+        objective_candidate_count += int(
+            chosen.objective_id not in {"direct_growth", "not_applied"}
+        )
+        selected_objective_id = chosen.objective_id
         iterations += 1
     else:
         if not spaces:
@@ -222,6 +256,11 @@ def close_free_3d_residual(
     if not spaces and status not in {"already_closed", "closed"}:
         status = "closed"
     final_metric = _residual_metric(spaces)
+    final_objective_score = _objective_score(
+        current,
+        incumbent_by_id,
+        participants_by_id,
+    )
     aligned_faces = _aligned_faces(current, dimensions, box_clearance)
     digest = _digest(
         {
@@ -239,6 +278,10 @@ def close_free_3d_residual(
             "global_resolve_invocation_count": 0,
             "deadline_reached": deadline_reached,
             "incumbent_digest": incumbent_digest,
+            "finishing_objective": finishing_objective,
+            "objective_score": final_objective_score,
+            "objective_candidate_count": objective_candidate_count,
+            "selected_objective_id": selected_objective_id,
             "initial_residual_metric": initial_metric,
             "final_residual_metric": final_metric,
             "placements": [value.__dict__ for value in current],
@@ -260,6 +303,10 @@ def close_free_3d_residual(
         global_resolve_invocation_count=0,
         deadline_reached=deadline_reached,
         incumbent_digest=incumbent_digest,
+        finishing_objective=finishing_objective,
+        objective_score=final_objective_score,
+        objective_candidate_count=objective_candidate_count,
+        selected_objective_id=selected_objective_id,
         deterministic_digest=digest,
     )
 
@@ -276,6 +323,8 @@ def _growth_candidates(
     baseline: tuple[float, float, int],
     remaining_candidates: int,
     deadline: float,
+    incumbent_by_id: dict[str, Free3DPlacement],
+    finishing_objective: str,
     *,
     repair_placement_id: str | None = None,
 ) -> tuple[list[_GrowthCandidate], int]:
@@ -362,10 +411,265 @@ def _growth_candidates(
                         residual_metric=metric,
                         aligned_faces=_aligned_faces(candidate_tuple, dimensions, box_clearance),
                         relative_growth=_relative_growth(placement, grown),
+                        objective_score=_objective_score(
+                            candidate_tuple,
+                            incumbent_by_id,
+                            participants_by_id,
+                        ),
+                        objective_id="direct_growth",
+                        growth_placement_ids=(placement.participant_id,),
                         repair_placement_id=repair_placement_id,
                     )
                 )
+    if (
+        finishing_objective != FINISHING_OBJECTIVE_CLOSURE_ONLY
+        and evaluated < remaining_candidates
+        and perf_counter() < deadline
+    ):
+        paired, paired_evaluated = _paired_growth_candidates(
+            current,
+            participants_by_id,
+            dimensions,
+            box_clearance,
+            xy_clearance,
+            z_clearance,
+            forbidden,
+            inset_zones,
+            baseline,
+            remaining_candidates - evaluated,
+            deadline,
+            incumbent_by_id,
+            finishing_objective,
+            repair_placement_id=repair_placement_id,
+        )
+        candidates.extend(paired)
+        evaluated += paired_evaluated
     return candidates, evaluated
+
+
+def _paired_growth_candidates(
+    current: tuple[Free3DPlacement, ...],
+    participants_by_id: dict[str, dict[str, object]],
+    dimensions: tuple[float, float, float],
+    box_clearance: float,
+    xy_clearance: float,
+    z_clearance: float,
+    forbidden: tuple[EmptySpace, ...],
+    inset_zones: tuple[TopInsetZone, ...],
+    baseline: tuple[float, float, int],
+    remaining_candidates: int,
+    deadline: float,
+    incumbent_by_id: dict[str, Free3DPlacement],
+    finishing_objective: str,
+    *,
+    repair_placement_id: str | None = None,
+) -> tuple[list[_GrowthCandidate], int]:
+    candidates: list[_GrowthCandidate] = []
+    evaluated = 0
+    seen: set[tuple[object, ...]] = set()
+    objective_ids = _paired_objective_ids(finishing_objective)
+    for first_index, first in enumerate(current):
+        for second_index in range(first_index + 1, len(current)):
+            second = current[second_index]
+            for axis in range(3):
+                if evaluated >= remaining_candidates or perf_counter() >= deadline:
+                    return candidates, evaluated
+                if not _projections_need_axis_separation(
+                    first,
+                    second,
+                    axis,
+                    xy_clearance,
+                    z_clearance,
+                ):
+                    continue
+                if first.origin_mm[axis] <= second.origin_mm[axis]:
+                    left_index, left = first_index, first
+                    right_index, right = second_index, second
+                else:
+                    left_index, left = second_index, second
+                    right_index, right = first_index, first
+                left_participant = participants_by_id[left.participant_id]
+                right_participant = participants_by_id[right.participant_id]
+                if not (
+                    _world_axis_is_expandable(left_participant, left.rotation_deg_z, axis)
+                    and _world_axis_is_expandable(right_participant, right.rotation_deg_z, axis)
+                ):
+                    continue
+                clearance = z_clearance if axis == 2 else xy_clearance
+                left_upper = _upper_of_placement(left, axis)
+                gap = right.origin_mm[axis] - left_upper - clearance
+                if gap <= _EPSILON:
+                    continue
+                left_limit = _maximal_growth_boundary(
+                    left,
+                    axis,
+                    1,
+                    current,
+                    forbidden,
+                    dimensions,
+                    box_clearance,
+                    xy_clearance,
+                    z_clearance,
+                )
+                right_limit = _maximal_growth_boundary(
+                    right,
+                    axis,
+                    -1,
+                    current,
+                    forbidden,
+                    dimensions,
+                    box_clearance,
+                    xy_clearance,
+                    z_clearance,
+                )
+                if (
+                    left_limit + _EPSILON < right.origin_mm[axis] - clearance
+                    or right_limit - _EPSILON > left_upper + clearance
+                ):
+                    continue
+                for objective_id in objective_ids:
+                    if evaluated >= remaining_candidates or perf_counter() >= deadline:
+                        return candidates, evaluated
+                    left_delta = _paired_left_delta(
+                        objective_id,
+                        left,
+                        right,
+                        gap,
+                        axis,
+                        incumbent_by_id,
+                    )
+                    right_delta = gap - left_delta
+                    grown_left = _grow_placement(
+                        left,
+                        axis,
+                        1,
+                        left_upper + left_delta,
+                    )
+                    grown_right = _grow_placement(
+                        right,
+                        axis,
+                        -1,
+                        right.origin_mm[axis] - right_delta,
+                    )
+                    candidate_values = list(current)
+                    candidate_values[left_index] = grown_left
+                    candidate_values[right_index] = grown_right
+                    candidate_tuple = tuple(candidate_values)
+                    signature = _placement_signature(candidate_tuple)
+                    if signature in seen:
+                        continue
+                    seen.add(signature)
+                    evaluated += 1
+                    if not (
+                        _valid_geometry(
+                            candidate_tuple,
+                            left_index,
+                            participants_by_id,
+                            dimensions,
+                            box_clearance,
+                            xy_clearance,
+                            z_clearance,
+                            forbidden,
+                            inset_zones,
+                        )
+                        and _valid_geometry(
+                            candidate_tuple,
+                            right_index,
+                            participants_by_id,
+                            dimensions,
+                            box_clearance,
+                            xy_clearance,
+                            z_clearance,
+                            forbidden,
+                            inset_zones,
+                        )
+                    ):
+                        continue
+                    candidate_spaces = tuple(
+                        _empty_spaces_for(
+                            candidate_tuple,
+                            dimensions,
+                            box_clearance,
+                            xy_clearance,
+                            z_clearance,
+                            forbidden,
+                        )
+                    )
+                    metric = _residual_metric(candidate_spaces)
+                    if metric >= baseline:
+                        continue
+                    candidates.append(
+                        _GrowthCandidate(
+                            placement_index=left_index,
+                            axis_index=axis,
+                            direction=0,
+                            boundary_mm=_round(left_upper + left_delta),
+                            placement=grown_left,
+                            placements=candidate_tuple,
+                            spaces=candidate_spaces,
+                            residual_metric=metric,
+                            aligned_faces=_aligned_faces(
+                                candidate_tuple, dimensions, box_clearance
+                            ),
+                            relative_growth=(
+                                _relative_growth(left, grown_left)
+                                + _relative_growth(right, grown_right)
+                            ),
+                            objective_score=_objective_score(
+                                candidate_tuple,
+                                incumbent_by_id,
+                                participants_by_id,
+                            ),
+                            objective_id=objective_id,
+                            growth_placement_ids=(
+                                left.participant_id,
+                                right.participant_id,
+                            ),
+                            repair_placement_id=repair_placement_id,
+                        )
+                    )
+    return candidates, evaluated
+
+
+def _paired_objective_ids(finishing_objective: str) -> tuple[str, ...]:
+    if finishing_objective == FINISHING_OBJECTIVE_BALANCED_ADDED_VOLUME:
+        return (FINISHING_OBJECTIVE_BALANCED_ADDED_VOLUME,)
+    if finishing_objective == FINISHING_OBJECTIVE_PROPORTIONAL_EXPANSION:
+        return (FINISHING_OBJECTIVE_PROPORTIONAL_EXPANSION,)
+    if finishing_objective == FINISHING_OBJECTIVE_BALANCED_THEN_PROPORTIONAL:
+        return (
+            FINISHING_OBJECTIVE_BALANCED_ADDED_VOLUME,
+            FINISHING_OBJECTIVE_PROPORTIONAL_EXPANSION,
+        )
+    return ()
+
+
+def _paired_left_delta(
+    objective_id: str,
+    left: Free3DPlacement,
+    right: Free3DPlacement,
+    gap: float,
+    axis: int,
+    incumbent_by_id: dict[str, Free3DPlacement],
+) -> float:
+    left_base = incumbent_by_id[left.participant_id]
+    right_base = incumbent_by_id[right.participant_id]
+    left_area = _placement_volume(left) / left.world_size_mm[axis]
+    right_area = _placement_volume(right) / right.world_size_mm[axis]
+    left_added = _placement_volume(left) - _placement_volume(left_base)
+    right_added = _placement_volume(right) - _placement_volume(right_base)
+    if objective_id == FINISHING_OBJECTIVE_BALANCED_ADDED_VOLUME:
+        denominator = left_area + right_area
+        raw = (right_added - left_added + right_area * gap) / denominator
+    else:
+        left_base_volume = _placement_volume(left_base)
+        right_base_volume = _placement_volume(right_base)
+        left_ratio = left_added / left_base_volume
+        right_ratio = right_added / right_base_volume
+        left_rate = left_area / left_base_volume
+        right_rate = right_area / right_base_volume
+        raw = (right_ratio - left_ratio + right_rate * gap) / (left_rate + right_rate)
+    return _round(min(gap, max(0.0, raw)))
 
 
 def _local_repair_growth_candidates(
@@ -382,6 +686,8 @@ def _local_repair_growth_candidates(
     remaining_candidates: int,
     deadline: float,
     visited: set[tuple[object, ...]],
+    incumbent_by_id: dict[str, Free3DPlacement],
+    finishing_objective: str,
 ) -> tuple[list[_GrowthCandidate], int, int]:
     candidates: list[_GrowthCandidate] = []
     attempted = 0
@@ -430,6 +736,8 @@ def _local_repair_growth_candidates(
             baseline,
             remaining_candidates - evaluated,
             deadline,
+            incumbent_by_id,
+            finishing_objective,
             repair_placement_id=placement_id,
         )
         evaluated += growth_evaluated
@@ -753,6 +1061,58 @@ def _valid_geometry(
         if value.origin_mm[2] > _EPSILON and not support.certified:
             return False
     return True
+
+
+def _objective_score(
+    placements: tuple[Free3DPlacement, ...],
+    incumbent_by_id: dict[str, Free3DPlacement],
+    participants_by_id: dict[str, dict[str, object]],
+) -> tuple[float, float, float, float]:
+    added_volumes: list[float] = []
+    expansion_ratios: list[float] = []
+    for placement in placements:
+        participant = participants_by_id[placement.participant_id]
+        modes = _mapping(participant["dimension_modes"])
+        if all(str(modes[axis]) == "fixed" for axis in _AXES):
+            continue
+        base_volume = _placement_volume(incumbent_by_id[placement.participant_id])
+        added = max(0.0, _placement_volume(placement) - base_volume)
+        added_volumes.append(added)
+        expansion_ratios.append(added / base_volume)
+    return (
+        _spread(added_volumes),
+        _mean_absolute_deviation(added_volumes),
+        _spread(expansion_ratios),
+        _mean_absolute_deviation(expansion_ratios),
+    )
+
+
+def _objective_rank(
+    score: tuple[float, float, float, float],
+    finishing_objective: str,
+) -> tuple[float, ...]:
+    if finishing_objective == FINISHING_OBJECTIVE_CLOSURE_ONLY:
+        return ()
+    if finishing_objective == FINISHING_OBJECTIVE_PROPORTIONAL_EXPANSION:
+        return (score[2], score[3], score[0], score[1])
+    return score
+
+
+def _placement_volume(placement: Free3DPlacement) -> float:
+    return placement.world_size_mm[0] * placement.world_size_mm[1] * placement.world_size_mm[2]
+
+
+def _spread(values: list[float]) -> float:
+    if len(values) < 2:
+        return 0.0
+    return _round(max(values) - min(values))
+
+
+def _mean_absolute_deviation(values: list[float]) -> float:
+    if len(values) < 2:
+        return 0.0
+    mean = sum(values) / len(values)
+    return _round(sum(abs(value - mean) for value in values) / len(values))
 
 
 def _residual_metric(spaces: Iterable[EmptySpace]) -> tuple[float, float, int]:
