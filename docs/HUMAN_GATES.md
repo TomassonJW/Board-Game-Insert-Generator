@@ -1221,3 +1221,22 @@ dans Fusion lorsque cette préparation sera réellement vérifiée.
 
 Jusque-là, aucune commande ni validation humaine n'est demandée.
 `fusion-validated=false` et `print-validated=false`.
+## État après P64-L08K — gate définie, installation L08V requise
+
+L'intégration automatisée SCIP est prête dans l'add-in 0.1.61. Le contrôle
+forcé à trois niveaux Z est recertifié, mais le cas public réel 18 conteneurs /
+20 éléments reste `bounded_unknown` à 5 s et 30 s. Ce résultat ne ferme pas la
+gate de valeur demandée par Thomas.
+
+Avant toute action humaine, Codex doit intégrer le commit L08K dans `main`,
+installer ce commit avec
+`scripts/fusion/prepare_p64_l08k_scip_product_gate.ps1`, vérifier le runtime
+extrait et écrire le marqueur de commit. Thomas ne lance aucun script.
+
+Après cette préparation vérifiée, la gate active suit exactement
+`docs/P64_L08K_FUSION_GATE_CHECKLIST.md` : un calcul unique sur le cas public,
+puis un calcul unique sur le vrai projet limite de Thomas. La gate distingue le
+chargement réel de SCIP, la valeur du résultat et la réactivité de Fusion.
+
+Statut avant installation : `human-gate-defined`, `local-install-pending`.
+`fusion-validated=false`. `print-validated=false`.

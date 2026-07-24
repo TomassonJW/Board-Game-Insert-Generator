@@ -1434,3 +1434,20 @@ brancher SCIP derrière les contrats et recertifications BGIG, exécuter les
 régressions complètes puis préparer une gate Fusion uniquement si tout passe.
 Aucun holdout n'est rejoué et aucune validation Fusion ou impression n'est
 revendiquée à ce stade.
+## Mise à jour P64-L08K — 2026-07-24
+
+P64-L08K intègre le runtime SCIP minimal qualifié dans le produit et l'add-in
+0.1.61. SCIP est appelé avant les lanes internes, sous 1 / 5 / 30 secondes, puis
+BGIG recalcule les appuis et exige son certificat global. Le paquet reste local,
+hors ligne et sans installation globale.
+
+L'intégration 3D est démontrée par un cas forcé sur trois niveaux Z. La capacité
+limite n'est pas déclarée acquise : le cas public 18 conteneurs / 20 éléments
+reste `bounded_unknown` aux budgets Normal et Approfondi. Aucun nouveau tuning
+ni replay du holdout n'est autorisé pour transformer ce constat.
+
+La trajectoire suivante est P64-L08V : intégrer L08K dans `main`, installer et
+vérifier le paquet depuis ce commit, puis exécuter la gate Fusion sur le cas
+public et sur le vrai projet limite de Thomas. Une réussite technique de
+chargement ne suffit pas à revendiquer un gain de solvage ; l'impression reste
+une gate séparée.

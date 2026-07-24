@@ -51,13 +51,7 @@ from board_game_insert_generator.free_3d_plan_adapter import (
     certify_minimal_free_3d_plan,
     prepare_free_3d_problem,
 )
-from board_game_insert_generator.highs_product_solver import (
-    HIGHS_PRODUCT_FAMILY,
-    HIGHS_PRODUCT_VERSION,
-    STATUS_NOT_CONFIGURED as HIGHS_STATUS_NOT_CONFIGURED,
-    STATUS_SOLUTION_FOUND as HIGHS_STATUS_SOLUTION_FOUND,
-    solve_highs_product_floor,
-)
+
 from board_game_insert_generator.incremental_project_state import canonical_digest
 from board_game_insert_generator.partition_solver import (
     PARTITION_PLAN_SCHEMA_V1,
@@ -80,6 +74,16 @@ from board_game_insert_generator.solver_portfolio import (
     EFFORT_NORMAL,
     EFFORT_QUICK,
     portfolio_effort_profiles,
+)
+from board_game_insert_generator.scip_product_solver import (
+    SCIP_PRODUCT_FAMILY,
+    SCIP_PRODUCT_VERSION,
+    STATUS_BOUNDED_UNKNOWN as SCIP_STATUS_BOUNDED_UNKNOWN,
+    STATUS_CANCELLED as SCIP_STATUS_CANCELLED,
+    STATUS_CERTIFICATE_REJECTED as SCIP_STATUS_CERTIFICATE_REJECTED,
+    STATUS_SOLUTION_FOUND as SCIP_STATUS_SOLUTION_FOUND,
+    scip_product_runtime_configured,
+    solve_scip_product_3d,
 )
 
 
@@ -334,6 +338,32 @@ def solve_minimal_layout(
 ) -> dict[str, object]:
     """Build a placement-certified minimal layout under explicit hard caps."""
 
+    external_fallback_report: dict[str, object] | None = None
+    if scip_product_runtime_configured():
+        primary_plan = _solve_minimal_layout_once(
+            raw_project,
+            effort_profile=effort_profile,
+            request_id=request_id,
+            request_revision=request_revision,
+            cancel_check=cancel_check,
+            container_frontiers=container_frontiers,
+            frontier_digests=frontier_digests,
+            lane_specs_override=(),
+            initial_incumbent=initial_incumbent,
+            external_lane_enabled=True,
+        )
+        primary_status = _solver_result_status(primary_plan)
+        if primary_status in {
+            SOLUTION_FOUND,
+            INVALID_INPUT,
+            STALE_OR_CANCELLED,
+        }:
+            return primary_plan
+        external_status = _external_lane_status(primary_plan)
+        if external_status == SCIP_STATUS_BOUNDED_UNKNOWN:
+            return primary_plan
+        external_fallback_report = _external_lane_report(primary_plan)
+
     if effort_profile != EFFORT_DEEP:
         return _solve_minimal_layout_once(
             raw_project,
@@ -344,6 +374,7 @@ def solve_minimal_layout(
             container_frontiers=container_frontiers,
             frontier_digests=frontier_digests,
             initial_incumbent=initial_incumbent,
+            external_lane_report_override=external_fallback_report,
         )
     return _solve_deep_anytime(
         raw_project,
@@ -353,8 +384,8 @@ def solve_minimal_layout(
         container_frontiers=container_frontiers,
         frontier_digests=frontier_digests,
         initial_incumbent=initial_incumbent,
+        external_lane_report=external_fallback_report,
     )
-
 
 def _solve_minimal_layout_once(
     raw_project: object,
@@ -370,6 +401,7 @@ def _solve_minimal_layout_once(
     frontier_source_override: str | None = None,
     initial_incumbent: Mapping[str, object] | None = None,
     external_lane_enabled: bool = False,
+    external_lane_report_override: Mapping[str, object] | None = None,
 ) -> dict[str, object]:
     """Execute one explicit lane prefix or extension without orchestration."""
 
@@ -497,118 +529,133 @@ def _solve_minimal_layout_once(
         [warm_start_proposal] if warm_start_proposal is not None else []
     )
     rejection_codes: Counter[str] = Counter()
-    external_lane_report: dict[str, object] | None = None
+    external_lane_report: dict[str, object] | None = (
+        deepcopy(dict(external_lane_report_override))
+        if external_lane_report_override is not None
+        else None
+    )
     if external_lane_enabled:
-        external_execution = solve_highs_product_floor(
-            canonical_search_participants,
+        external_execution = solve_scip_product_3d(
+            participants_with_options,
             certification_problem,
             effort_profile=effort_profile,
             cancel_check=cancel_check,
         )
-        if external_execution.status != HIGHS_STATUS_NOT_CONFIGURED:
-            external_lane_report = external_execution.deterministic_report()
-            external_recertification: dict[str, object] = {
-                "attempted": False,
-                "certified": False,
-                "rejection_codes": [],
-                "placement_digest": "",
-            }
-            if external_execution.status == HIGHS_STATUS_SOLUTION_FOUND:
-                try:
-                    external_placements = _decorate_canonical_placements(
-                        external_execution.placements,
-                        participant_maps["certificate"],
-                        frontiers,
-                    )
-                    external_spaces = _rebuild_empty_spaces(
-                        external_placements,
-                        certification_problem,
-                        budget,
-                    )
-                    external_strategy = SolverStrategy(
-                        "highs_product_floor",
-                        HIGHS_PRODUCT_VERSION,
-                    )
-                    external_budget = SolverBudget(
-                        HIGHS_PRODUCT_FAMILY,
-                        effort_profile,
-                        tuple(
-                            sorted(
-                                external_execution.limits.to_dict().items()
-                            )
-                        ),
-                    )
-                    external_certified, external_rejections = (
-                        certify_minimal_free_3d_plan(
-                            certification_problem,
-                            strategy=external_strategy,
-                            budget=external_budget,
-                            candidate_id="external-highs-product-floor",
-                            placements=external_placements,
-                            empty_spaces=external_spaces,
-                            search_telemetry={
-                                "external_engine_invocation_count": 1,
-                                "external_network_invocation_count": 0,
-                            },
-                            search_provenance={
-                                "portfolio_schema": (
-                                    MINIMAL_LAYOUT_PORTFOLIO_SCHEMA_V1
-                                ),
-                                "effort_profile": effort_profile,
-                                "lane_id": _HIGHS_PRODUCT_LANE.lane_id,
-                                "candidate_source": "external_highs",
-                                "external_report_digest": (
-                                    external_lane_report["report_digest"]
-                                ),
-                                "frontier_source": frontier_source,
-                                "ordered_frontier_digests": [
-                                    {
-                                        "container_group_id": key,
-                                        "digest": value,
-                                    }
-                                    for key, value in ordered_digests
-                                ],
-                                "finalization_invocation_count": 0,
-                                "fusion_materialization_invocation_count": 0,
-                            },
-                        )
-                    )
-                except (KeyError, TypeError, ValueError, OverflowError) as exc:
-                    external_certified = None
-                    external_rejections = (
-                        f"external_proposal_projection_failed:{type(exc).__name__}",
-                    )
-                external_recertification = {
-                    "attempted": True,
-                    "certified": external_certified is not None,
-                    "rejection_codes": list(external_rejections),
-                    "placement_digest": (
-                        external_certified.placement_digest
-                        if external_certified is not None
-                        else ""
-                    ),
-                }
-                if external_certified is not None:
-                    proposals.append(
-                        _CertifiedProposal(
-                            lane=_HIGHS_PRODUCT_LANE,
-                            seed_participant_id="not_applicable",
-                            translation_id="highs_search_coordinates",
-                            placements=external_placements,
-                            empty_spaces=external_spaces,
-                            certified=external_certified,
-                            rank_key=_proposal_rank_key(
-                                external_certified
-                            ),
-                        )
-                    )
+        external_lane_report = external_execution.deterministic_report()
+        external_recertification: dict[str, object] = {
+            "attempted": False,
+            "certified": False,
+            "rejection_codes": [],
+            "placement_digest": "",
+        }
+        if external_execution.status == SCIP_STATUS_CANCELLED:
+            external_lane_report["recertification"] = external_recertification
             external_lane_report.pop("report_digest", None)
-            external_lane_report["recertification"] = (
-                external_recertification
-            )
             external_lane_report["report_digest"] = canonical_digest(
                 external_lane_report
             )
+            return _failure_plan(
+                status=STALE_OR_CANCELLED,
+                stop_reason=external_execution.stop_reason,
+                strategy=strategy,
+                budget=budget,
+                request=request,
+                project_name=str(base_problem.project["project_name"]),
+                requested_container_count=base_problem.requested_container_count,
+                rejection_codes=(),
+                lane_reports=(),
+                frontier_source=frontier_source,
+                ordered_frontier_digests=ordered_digests,
+                external_lane=external_lane_report,
+            )
+        if external_execution.status == SCIP_STATUS_SOLUTION_FOUND:
+            try:
+                external_placements = external_execution.placements
+                external_spaces = _rebuild_empty_spaces(
+                    external_placements,
+                    certification_problem,
+                    budget,
+                )
+                external_strategy = SolverStrategy(
+                    "scip_product_3d",
+                    SCIP_PRODUCT_VERSION,
+                )
+                external_budget = SolverBudget(
+                    SCIP_PRODUCT_FAMILY,
+                    effort_profile,
+                    tuple(sorted(external_execution.limits.to_dict().items())),
+                )
+                external_certified, external_rejections = (
+                    certify_minimal_free_3d_plan(
+                        certification_problem,
+                        strategy=external_strategy,
+                        budget=external_budget,
+                        candidate_id="external-scip-product-3d",
+                        placements=external_placements,
+                        empty_spaces=external_spaces,
+                        search_telemetry={
+                            "external_engine_invocation_count": 1,
+                            "external_network_invocation_count": 0,
+                        },
+                        search_provenance={
+                            "portfolio_schema": MINIMAL_LAYOUT_PORTFOLIO_SCHEMA_V1,
+                            "effort_profile": effort_profile,
+                            "lane_id": _SCIP_PRODUCT_LANE.lane_id,
+                            "candidate_source": "external_scip_real_3d",
+                            "external_report_digest": external_lane_report[
+                                "report_digest"
+                            ],
+                            "frontier_source": frontier_source,
+                            "ordered_frontier_digests": [
+                                {
+                                    "container_group_id": key,
+                                    "digest": value,
+                                }
+                                for key, value in ordered_digests
+                            ],
+                            "finalization_invocation_count": 0,
+                            "fusion_materialization_invocation_count": 0,
+                        },
+                    )
+                )
+            except (KeyError, TypeError, ValueError, OverflowError) as exc:
+                external_certified = None
+                external_rejections = (
+                    f"external_proposal_projection_failed:{type(exc).__name__}",
+                )
+            external_recertification = {
+                "attempted": True,
+                "certified": external_certified is not None,
+                "rejection_codes": list(external_rejections),
+                "placement_digest": (
+                    external_certified.placement_digest
+                    if external_certified is not None
+                    else ""
+                ),
+            }
+            if external_certified is not None:
+                proposals.append(
+                    _CertifiedProposal(
+                        lane=_SCIP_PRODUCT_LANE,
+                        seed_participant_id="not_applicable",
+                        translation_id="scip_search_coordinates",
+                        placements=external_placements,
+                        empty_spaces=external_spaces,
+                        certified=external_certified,
+                        rank_key=_proposal_rank_key(external_certified),
+                    )
+                )
+            else:
+                external_lane_report["status"] = SCIP_STATUS_CERTIFICATE_REJECTED
+                external_lane_report["stop_reason"] = (
+                    "bgig_common_certificate_rejected_scip_proposal"
+                )
+                rejection_codes.update(external_rejections)
+        external_lane_report.pop("report_digest", None)
+        external_lane_report["recertification"] = external_recertification
+        external_lane_report["report_digest"] = canonical_digest(
+            external_lane_report
+        )
     deadline_reached = False
     for lane in lane_specs:
         deadline_remaining_ms = _remaining_deadline_ms(deadline_at_ms)
@@ -868,7 +915,7 @@ def _solve_minimal_layout_once(
         ),
     )
     witness_selected = selected.lane.lane_id == "certified_witness_incumbent"
-    external_selected = selected.lane.lane_id == _HIGHS_PRODUCT_LANE.lane_id
+    external_selected = selected.lane.lane_id == _SCIP_PRODUCT_LANE.lane_id
     warm_start_payload = {
         **warm_start_report,
         "selected": witness_selected,
@@ -907,7 +954,7 @@ def _solve_minimal_layout_once(
             "deep_deadline_reached_with_candidate"
             if deadline_reached
             else (
-                "external_highs_proposal_selected_after_common_certification"
+                "external_scip_proposal_selected_after_common_certification"
                 if external_selected
                 else (
                     "certified_witness_incumbent_preserved_after_lane_search"
@@ -946,7 +993,7 @@ def _solve_minimal_layout_once(
         ],
         "selected": {
             "candidate_source": (
-                "external_highs"
+                "external_scip_real_3d"
                 if external_selected
                 else (
                     "certified_witness"
@@ -1044,6 +1091,7 @@ def _solve_deep_anytime(
     container_frontiers: Sequence[ContainerVariantFrontier] | None,
     frontier_digests: Sequence[tuple[str, str]],
     initial_incumbent: Mapping[str, object] | None,
+    external_lane_report: Mapping[str, object] | None = None,
 ) -> dict[str, object]:
     """Run the exact Normal prefix before a deadline-bounded Deep extension."""
 
@@ -1147,6 +1195,7 @@ def _solve_deep_anytime(
         container_frontiers=normal_frontiers,
         frontier_digests=normal_digests,
         frontier_source_override="derived_normal_incumbent",
+        external_lane_report_override=external_lane_report,
     )
     normal_status = _solver_result_status(normal_plan)
     if normal_status in {INVALID_INPUT, STALE_OR_CANCELLED}:
@@ -1242,6 +1291,16 @@ def _solver_stop_reason(plan: Mapping[str, object]) -> str:
             telemetry.get("stop_reason", ""),
         )
     )
+
+def _external_lane_report(plan: Mapping[str, object]) -> dict[str, object] | None:
+    provenance = _plan_search_provenance(plan)
+    value = provenance.get("external_lane")
+    return deepcopy(dict(value)) if isinstance(value, Mapping) else None
+
+
+def _external_lane_status(plan: Mapping[str, object]) -> str:
+    report = _external_lane_report(plan)
+    return str(report.get("status", "")) if report is not None else ""
 
 
 def _plan_search_provenance(
@@ -1350,12 +1409,12 @@ _CERTIFIED_WITNESS_INCUMBENT_LANE = MinimalLaneSpec(
     "certified_witness",
     0,
 )
-_HIGHS_PRODUCT_LANE = MinimalLaneSpec(
-    "external_highs_floor",
+_SCIP_PRODUCT_LANE = MinimalLaneSpec(
+    "external_scip_real_3d",
     "not_applicable",
     "not_applicable",
     "not_applicable",
-    "external_mip_floor",
+    "external_constraint_integer_programming",
     0,
 )
 

@@ -3607,3 +3607,37 @@ Statut : `implemented-build`, `automated-validated`, `done`.
 P64-L08K est `ready` pour intégrer le runtime qualifié et exécuter les
 régressions complètes. Aucune gate Fusion n'est encore acquise :
 `fusion-validated=false`, `print-validated=false`.
+## P64-L08K — SCIP intégré au produit, gate limite encore ouverte
+
+Statut : `implemented-product`, `automated-validated`, en attente de L08V et du
+retour Fusion humain.
+
+- ADR-0085 fait de SCIP 10.0.2 la lane produit prioritaire lorsque le problème
+  BGIG est fidèlement représentable.
+- Le paquet Fusion 0.1.61 embarque l'archive L08J exacte : 18 319 793 octets,
+  SHA-256 `0a718ea5884d6326d66777db0ab853a31fa981e6392b89f184342fde27d465c6`,
+  artefact `540e2fe6b9324f2d58afbdaab827760f98b6b0e4ab9f626efdaee69d2c6d2786`.
+- L'installateur extrait 1 016 fichiers / 56 491 565 octets sans compilation ni
+  installation globale ; l'adaptateur vérifie l'arbre complet avant import.
+- Le modèle transporte X/Y/Z, jeux, rotations et variantes locales. BGIG
+  recalcule les appuis, reconstruit les espaces et recertifie tout plan.
+- Rapide / Normal / Approfondi donnent 1 / 5 / 30 s à SCIP, 1 024 Mio, un
+  thread. Un timeout n'enchaîne pas silencieusement une seconde recherche.
+- Contrôle produit positif : trois conteneurs forcés sur trois niveaux Z,
+  `solution_found`, source `external_scip_real_3d`, une invocation, zéro lane
+  interne, certificat BGIG et deux runs identiques.
+- Régression publique limite : le cas revu 18 conteneurs / 20 éléments atteint
+  bien SCIP, mais reste `bounded_unknown` à 5 s et 30 s. Aucun gain de solution
+  ni preuve d'impossibilité n'est revendiqué sur ce cas.
+- Runtime absent/invalide, contrainte non représentable, erreur native ou
+  certificat refusé : fallback interne explicite. Top inset localisé : aucun
+  arrondi ni approximation.
+- Staging installateur 0.1.61 et préflight Fusion : OK. L'installation réelle
+  depuis le commit intégré appartient à P64-L08V.
+- Validation finale : 828/828 tests en 252,471 s ; Ruff, format ciblé,
+  compilation Python, parse PowerShell, garde documentaire 2/2 et alignement
+  Fusion-only 6/6 : OK.
+- Preuve : `docs/P64_L08K_SCIP_PRODUCT_INTEGRATION_EVIDENCE.md`.
+- Gate : `docs/P64_L08K_FUSION_GATE_CHECKLIST.md`.
+- Holdout rejoué : non. Tuning post-holdout : 0.
+- `fusion-validated=false`. `print-validated=false`.

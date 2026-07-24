@@ -3152,15 +3152,25 @@ implémentée et intégrée à la fois.
 
 ### P64-L08K — intégration produit SCIP et régressions complètes
 
-- Statut : ready, dépend de L08J ; aucun holdout ni tuning.
-- Versionner un build qualifié précis avec ses avis et son inventaire, sans
-  installation globale ni compilation pendant l'installation Fusion.
-- Charger le runtime depuis l'adaptateur produit et garder le cœur Python pur.
-- Utiliser SCIP en priorité uniquement lorsque le problème 3D est fidèlement
-  représentable ; conserver refus, timeout, annulation et fallback honnêtes.
-- Donner au moteur les mêmes entrées et budgets, puis recertifier tout résultat
-  par BGIG avant publication ou matérialisation.
-- Lancer les tests ciblés, la suite complète, les contrôles 3D publics et les
-  régressions produit.
-- Préparer et installer la gate Fusion suivante uniquement si tout est vert ;
-  `fusion-validated=false` et `print-validated=false` jusque-là.
+- Statut : done, `implemented-product`, `automated-validated` ; aucun holdout ni
+  tuning.
+- Build L08J exact versionné dans l'add-in 0.1.61, extrait et vérifié localement,
+  sans installation globale ni compilation pendant l'installation Fusion.
+- SCIP prioritaire en vrai X/Y/Z, budgets 1 / 5 / 30 s, une invocation et
+  recertification BGIG obligatoire.
+- Contrôle trois niveaux Z : solution externe déterministe, zéro lane interne.
+- Cas public 18 conteneurs / 20 éléments : `bounded_unknown` en Normal et Deep ;
+  aucune fausse victoire, aucune preuve d'impossibilité.
+- Preuve : `docs/P64_L08K_SCIP_PRODUCT_INTEGRATION_EVIDENCE.md`.
+
+### P64-L08V — installation et gate Fusion réelle
+
+- Statut : ready après intégration de L08K dans `main`.
+- Installer l'add-in 0.1.61 depuis le commit poussé et vérifier archive, runtime,
+  avis, code installé, version et marqueur de commit.
+- Préserver l'état local, installer le cas public 18x20 et sélectionner
+  `Auto intelligent + Approfondi`.
+- Thomas exécute un calcul public puis un calcul sur son vrai projet limite selon
+  `docs/P64_L08K_FUSION_GATE_CHECKLIST.md`.
+- Distinguer chargement SCIP, gain réel, certificat, empilement et réactivité.
+- `fusion-validated=false` et `print-validated=false` avant retour formel.

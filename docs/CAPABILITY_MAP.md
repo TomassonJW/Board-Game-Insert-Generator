@@ -1986,3 +1986,20 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
 - Frontière : aucune intégration produit, aucun replay de holdout et aucune
   validation Fusion ou impression dans L08J.
 - Suite : P64-L08K `ready`, intégration produit et régressions complètes.
+## P64-L08K — lane SCIP produit 3D
+
+- `C-SOLVER` : `implemented-product`, `automated-validated`. SCIP 10.0.2 est
+  prioritaire sur les problèmes fidèlement représentables ; solution recertifiée
+  ou résultat borné honnête, sans portefeuille interne ajouté après timeout.
+- `C-SOLVER-3D` : X/Y/Z, rotations, variantes locales et appuis complets sont
+  réellement exécutés. Le contrôle produit atteint trois niveaux Z distincts.
+- `C-CERTIFICATE` : appuis recalculés, espaces reconstruits et certificat BGIG
+  commun obligatoires avant publication.
+- `C-SAFETY` : runtime `cp314` exact, hors ligne, arbre et workers verrouillés,
+  conflits natifs fail-closed, aucun service ou secret.
+- `C-FUSION` / `C-FUSION-UI` : package et préparateur 0.1.61 automatisés ;
+  installation du commit intégré et observation humaine encore requises.
+- `C-LIMIT-CASE` : non acquise. Le cas public réel 18 conteneurs / 20 éléments
+  reste `bounded_unknown` en Normal et Approfondi ; la valeur sur le vrai projet
+  limite de Thomas est la gate P64-L08V.
+- `C-PRINT` : inchangée, `print-validated=false`.

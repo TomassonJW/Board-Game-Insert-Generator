@@ -1,0 +1,106 @@
+{
+  "control_kind": "forced_three_level_product_stacking",
+  "effort_profile": "quick",
+  "internal_lane_count_after_scip_solution": 0,
+  "invariants": {
+    "bgig_certificate_required": true,
+    "fusion_validated": false,
+    "holdout_read": false,
+    "network_invocation_count": 0,
+    "print_validated": false
+  },
+  "mission": "P64-L08K",
+  "public_entrypoint": "solve_minimal_layout",
+  "python_version": "3.14.0",
+  "real_3d": {
+    "distinct_z_level_count": 3,
+    "stacking_required_by_footprint": true,
+    "supported_placement_count": 2,
+    "z_levels_mm": [
+      0.0,
+      16.4,
+      32.8
+    ]
+  },
+  "receipt_digest": "4ef82b167dab28892bee663eb0c9a2264a9d174504a9ca9908713574b808829e",
+  "repeat_count": 2,
+  "result": {
+    "candidate_source": "external_scip_real_3d",
+    "external_engine_status": "optimal",
+    "external_invocation_count": 1,
+    "external_recertified": true,
+    "external_rejection_codes": [],
+    "external_status": "solution_found",
+    "internal_lane_count": 0,
+    "lane_prefix_ids": [],
+    "placement_digest": "812c24b70f5d9b590ace093e905eed4ea45580eff755d411d99423ccfe5c79b8",
+    "placements": [
+      {
+        "origin_mm": {
+          "x": 0.6,
+          "y": 0.6,
+          "z": 16.4
+        },
+        "participant_id": "container:stack-0",
+        "variant": {
+          "canonical": true,
+          "geometry_digest": "4fd6f71d7f1dbe4a66211e5294830a660f18c9354b09f0a5b0e8a82d3de75bd9",
+          "local_certificate_schema": "bgig.container_local_variant_certificate.v1",
+          "variant_id": "stack-0:canonical_v1"
+        },
+        "world_size_mm": {
+          "x": 61.6,
+          "y": 61.6,
+          "z": 15.8
+        }
+      },
+      {
+        "origin_mm": {
+          "x": 0.6,
+          "y": 0.6,
+          "z": 0.0
+        },
+        "participant_id": "container:stack-1",
+        "variant": {
+          "canonical": true,
+          "geometry_digest": "956d3703375f16606024fb298b76f92fcc402160b7d3c5901b3657f1dcf4d645",
+          "local_certificate_schema": "bgig.container_local_variant_certificate.v1",
+          "variant_id": "stack-1:canonical_v1"
+        },
+        "world_size_mm": {
+          "x": 61.6,
+          "y": 61.6,
+          "z": 15.8
+        }
+      },
+      {
+        "origin_mm": {
+          "x": 0.6,
+          "y": 0.6,
+          "z": 32.8
+        },
+        "participant_id": "container:stack-2",
+        "variant": {
+          "canonical": true,
+          "geometry_digest": "dd5cfb4b57eeef91308355691607b97a88616f0cc72812f0e8fcff672e738b91",
+          "local_certificate_schema": "bgig.container_local_variant_certificate.v1",
+          "variant_id": "stack-2:canonical_v1"
+        },
+        "world_size_mm": {
+          "x": 61.6,
+          "y": 61.6,
+          "z": 15.8
+        }
+      }
+    ],
+    "plan_digest": "86d574e29c4d379999bbef61cc9dccdea53c3f8424a7d1ea7a132ba2b5151853",
+    "result_status": "solution_found",
+    "runtime_artifact_digest": "540e2fe6b9324f2d58afbdaab827760f98b6b0e4ab9f626efdaee69d2c6d2786",
+    "selected_lane_id": "external_scip_real_3d"
+  },
+  "runs_identical": true,
+  "runtime_archive_sha256": "0a718ea5884d6326d66777db0ab853a31fa981e6392b89f184342fde27d465c6",
+  "runtime_artifact_digest": "540e2fe6b9324f2d58afbdaab827760f98b6b0e4ab9f626efdaee69d2c6d2786",
+  "schema_version": "bgig.scip_product_integration_receipt.v1",
+  "scip_invocations_per_calculation": 1
+}

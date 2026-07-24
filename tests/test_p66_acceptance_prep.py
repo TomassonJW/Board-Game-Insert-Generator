@@ -227,7 +227,7 @@ class P66AcceptancePreparationTests(unittest.TestCase):
         self.assertIn("ExpectedVersion", checker)
         self.assertIn("manifestText", checker)
         self.assertNotIn("ConvertFrom-Json", checker)
-        self.assertEqual(manifest["version"], "0.1.60")
+        self.assertEqual(manifest["version"], "0.1.61")
         self.assertIn("mvp-accepted", document)
         self.assertIn("P66 Fusion OK 0.1.20 - commit 6e351bb", document)
         self.assertIn("P66 Fusion OK 0.1.20 - commit <sha>", document)

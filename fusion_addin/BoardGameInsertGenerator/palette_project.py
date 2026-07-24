@@ -1136,6 +1136,11 @@ def _ensure_engine_available(addin_dir: Path, project_root: Path | None) -> None
         from board_game_insert_generator.highs_product_solver import (
             configure_highs_product_runtime,
         )
+        from board_game_insert_generator.scip_product_solver import (
+            configure_scip_product_runtime,
+        )
+
+        scratch_root = current_project_path(addin_dir).parent / ".solver-temp"
         highs_executable = (
             addin_dir / "vendor" / "highs" / "1.15.1"
             / "windows-x86_64" / "bin" / "highs.exe"
@@ -1148,9 +1153,29 @@ def _ensure_engine_available(addin_dir: Path, project_root: Path | None) -> None
             highs_executable
             if os.name == "nt" and installed_engine.is_file()
             else None,
-            scratch_root=(
-                current_project_path(addin_dir).parent / ".solver-temp"
+            scratch_root=scratch_root,
+        )
+        scip_vendor = (
+            addin_dir / "vendor" / "scip" / "10.0.2" / "windows-x86_64"
+        )
+        installed_scip_engine = (
+            addin_dir / "lib" / "board_game_insert_generator"
+            / "scip_product_solver.py"
+        )
+        scip_available = (
+            os.name == "nt"
+            and installed_scip_engine.is_file()
+            and (scip_vendor / "runtime").is_dir()
+            and (scip_vendor / "ARTIFACT.json").is_file()
+            and (scip_vendor / "worker").is_dir()
+        )
+        configure_scip_product_runtime(
+            scip_vendor / "runtime" if scip_available else None,
+            artifact_path=(
+                scip_vendor / "ARTIFACT.json" if scip_available else None
             ),
+            worker_root=scip_vendor / "worker" if scip_available else None,
+            scratch_root=scratch_root,
         )
     except ImportError as exc:
         raise PaletteProjectError(

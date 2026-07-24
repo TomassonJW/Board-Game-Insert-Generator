@@ -83,35 +83,43 @@ Rapport final L07 : P64_L07_GOAL_FINAL_REPORT.md.
 
 ## Prochaine action recommandée
 
-### Exécuter P64-L08K — intégrer SCIP dans BGIG et lancer les régressions complètes
+### Exécuter P64-L08V — installer 0.1.61 puis ouvrir la gate Fusion réelle
 
-Type : intégration produit atomique, sans tuning ni replay du holdout L08F.
+Type : préparation locale et observation humaine ; aucun tuning ni nouveau
+benchmark.
 
-P64-L08J est terminée. Le runtime minimal SCIP 10.0.2 `cp314` est construit,
-redistribuable, inventorié et équivalent au runtime du tournoi sur tous les
-contrôles publics 3D. La mission doit intégrer un build qualifié précis, pas
-recompiler implicitement pendant l'installation Fusion.
+P64-L08K est automated-validated. Le build SCIP L08J exact est empaqueté dans
+l'add-in 0.1.61 et l'entrée produit BGIG :
 
-P64-L08K doit :
+- choisit SCIP avant les lanes internes pour les problèmes fidèlement
+  représentables ;
+- transporte dimensions, jeux, rotations et variantes locales ;
+- recalcule les appuis, reconstruit les espaces et exige le certificat BGIG ;
+- arrête sans double budget sur `bounded_unknown` ;
+- conserve un fallback explicite pour runtime invalide, règle non représentable,
+  erreur native ou certificat refusé.
 
-1. versionner le build qualifié, son inventaire, ses avis et son empreinte dans
-   le paquet produit sans installation globale ;
-2. charger ce runtime uniquement depuis l'adaptateur produit, sans importer
-   Fusion dans le cœur Python ;
-3. brancher SCIP comme moteur prioritaire des problèmes 3D fidèlement
-   représentables, avec les mêmes entrées, budgets et recertification BGIG ;
-4. conserver un refus ou fallback honnête pour les contraintes non
-   représentables, les erreurs de chargement, les deadlines et les annulations ;
-5. vérifier que le worker n'altère ni dimensions, tolérances, certificats,
-   géométrie, finalisation, CAD, scène, manifest ni valeurs physiques ;
-6. exécuter les tests ciblés, la suite complète, les contrôles publics 3D et les
-   régressions produit sans lire ni rejouer le holdout ;
-7. préparer puis installer une gate Fusion humaine seulement si toutes les
-   validations automatisées et le paquet local passent.
+Le contrôle automatisé à trois niveaux Z réussit deux fois de façon déterministe.
+Le cas public réel 18 conteneurs / 20 éléments reste cependant
+`bounded_unknown` à 5 s et 30 s. Il ne constitue donc pas une preuve de gain sur
+les cas limites.
 
-La validation humaine n'est pas encore acquise. `fusion-validated=false` et
-`print-validated=false` restent inchangés jusqu'au retour formel dans Fusion.
+P64-L08V doit :
 
+1. intégrer et pousser le commit L08K dans `main`, puis vérifier le SHA distant ;
+2. lancer `scripts/fusion/prepare_p64_l08k_scip_product_gate.ps1` depuis ce
+   commit intégré ;
+3. vérifier l'add-in 0.1.61, l'archive, le runtime extrait, les avis et le
+   marqueur de commit ;
+4. préserver l'état local existant, installer la fixture publique 18x20 et
+   sélectionner `Auto intelligent + Approfondi` ;
+5. demander à Thomas uniquement les actions de
+   `docs/P64_L08K_FUSION_GATE_CHECKLIST.md` ;
+6. ne promouvoir `fusion-validated` qu'après son retour formel ; ne jamais
+   promouvoir `print-validated` sans impression dédiée.
+
+La vraie gate de valeur est le projet limite de Thomas, pas le petit contrôle
+automatisé. Aucun agent n'est nécessaire pendant l'observation humaine.
 ## Lots verrouillés
 
 - P64-F01A02 et F02A02 restent séparés : ils possèdent la finalisation du volume ;

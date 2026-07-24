@@ -102,9 +102,15 @@ preuves archivées.
   manquante ou interdite et repasse les six contrôles publics 3D sans perte. Une
   reconstruction indépendante confirme la configuration et le comportement ;
   les sorties MSVC ne sont pas promises identiques bit à bit.
-- La prochaine mission recommandée est P64-L08K : intégrer un build qualifié
-  précis dans BGIG, conserver les refus et fallbacks honnêtes, puis exécuter les
-  régressions complètes avant toute préparation de gate Fusion. Le holdout reste
+- P64-L08K est automated-validated : l'add-in 0.1.61 embarque le runtime SCIP
+  qualifié, le charge en `cp314`, l'utilise en priorité en vrai X/Y/Z et exige le
+  certificat BGIG. Le contrôle forcé atteint trois niveaux Z sans lane interne.
+- Limite honnête : le cas public réel 18 conteneurs / 20 éléments atteint SCIP,
+  mais reste `bounded_unknown` à 5 s et 30 s. Aucun gain n'est revendiqué sur ce
+  cas et aucune impossibilité n'est déduite.
+- La prochaine mission est P64-L08V : intégrer L08K dans `main`, installer le
+  paquet et la fixture 18x20 depuis le commit poussé, vérifier les marqueurs,
+  puis demander uniquement la gate Fusion réelle à Thomas. Le holdout reste
   interdit ; `fusion-validated=false` et `print-validated=false`.
 
 ## Vue de séquence
@@ -170,7 +176,8 @@ preuves archivées.
 | Terminé — ABI réparée, paquet refusé | P64-L08H | SCIP `cp314` fonctionne hors ligne ; avis natifs et autorités Intel/Microsoft incomplets, aucune intégration. |
 | Terminée — audit pré-build | P64-L08I | ADR-0084, modèle MIP 3D, sources et toolchain verrouillés ; aucune intégration produit. |
 | Terminée — build et équivalence | P64-L08J | Runtime SCIP minimal qualifié deux fois, 26 binaires résolus, six contrôles publics 3D sans perte. |
-| Prochaine — intégration produit | P64-L08K | Versionner le build qualifié, brancher SCIP, lancer les régressions complètes puis préparer la gate Fusion. |
+| Terminée — intégration produit automatisée | P64-L08K | SCIP prioritaire et recertifié dans 0.1.61 ; vrai empilement Z positif, cas public 18x20 encore borné inconnu. |
+| Prochaine — gate Fusion réelle | P64-L08V | Intégrer, installer et vérifier 0.1.61, puis tester dans Fusion le cas public et le vrai projet limite de Thomas. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -231,6 +238,10 @@ preuves archivées.
   cinq familles, licences, limites de modèle et absence de formes 3D arbitraires.
 - P64_L08J_MINIMAL_SCIP_RUNTIME_BUILD_EVIDENCE.md : build minimal, dépendances,
   avis, reconstruction indépendante et équivalence publique 3D.
+- ADR-0085 et P64_L08K_SCIP_PRODUCT_INTEGRATION_EVIDENCE.md : lane SCIP
+  prioritaire, paquet 0.1.61, preuves 3D, régression 18x20 et limites honnêtes.
+- P64_L08K_FUSION_GATE_CHECKLIST.md : gate séparant chargement réel, valeur sur
+  le projet limite et validation d'impression.
 - P64_L07B_CORPUS_V2_EVIDENCE.md : corpus V2, sources publiques, petits
   contrôles exacts, séparation des splits et nouveau holdout scellé.
 - ADR-0082 : HiGHS 1.15.1 CLI comme lane produit Windows hors ligne.

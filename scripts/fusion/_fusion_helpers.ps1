@@ -164,7 +164,20 @@ function Assert-BgigPaletteProjectRuntime {
         (Join-Path $AddinPath "vendor\highs\1.15.1\windows-x86_64\THIRD_PARTY_NOTICES.md"),
         (Join-Path $AddinPath "vendor\highs\1.15.1\windows-x86_64\licenses\CLI11-LICENSE.txt"),
         (Join-Path $AddinPath "vendor\highs\1.15.1\windows-x86_64\licenses\pdqsort-LICENSE.txt"),
-        (Join-Path $AddinPath "vendor\highs\1.15.1\windows-x86_64\licenses\zstr-LICENSE.txt")
+        (Join-Path $AddinPath "vendor\highs\1.15.1\windows-x86_64\licenses\zstr-LICENSE.txt"),
+        (Join-Path $AddinPath "lib\board_game_insert_generator\scip_product_solver.py"),
+        (Join-Path $AddinPath "vendor\scip\10.0.2\windows-x86_64\ARTIFACT.json"),
+        (Join-Path $AddinPath "vendor\scip\10.0.2\windows-x86_64\scip-runtime-cp314.zip"),
+        (Join-Path $AddinPath "vendor\scip\10.0.2\windows-x86_64\worker\scip_real_3d_worker.py"),
+        (Join-Path $AddinPath "vendor\scip\10.0.2\windows-x86_64\worker\_real_3d_worker_common.py"),
+        (Join-Path $AddinPath "vendor\scip\10.0.2\windows-x86_64\runtime\site-packages\pyscipopt\scip.cp314-win_amd64.pyd"),
+        (Join-Path $AddinPath "vendor\scip\10.0.2\windows-x86_64\runtime\site-packages\pyscipopt\libscip.dll"),
+        (Join-Path $AddinPath "vendor\scip\10.0.2\windows-x86_64\runtime\site-packages\numpy\__init__.py"),
+        (Join-Path $AddinPath "vendor\scip\10.0.2\windows-x86_64\runtime\notices\SCIP\LICENSE"),
+        (Join-Path $AddinPath "vendor\scip\10.0.2\windows-x86_64\runtime\notices\SoPlex\LICENSE"),
+        (Join-Path $AddinPath "vendor\scip\10.0.2\windows-x86_64\runtime\notices\PySCIPOpt-MIT.txt"),
+        (Join-Path $AddinPath "vendor\scip\10.0.2\windows-x86_64\runtime\notices\NumPy\LICENSE.txt"),
+        (Join-Path $AddinPath "vendor\scip\10.0.2\windows-x86_64\runtime\notices\Microsoft-Visual-Cpp-Runtime.txt")
     )
     foreach ($requiredPath in $required) {
         if (-not (Test-Path -LiteralPath $requiredPath -PathType Leaf)) {
@@ -228,6 +241,68 @@ function Assert-BgigTargetUnderAppData {
     }
 }
 
+function Expand-BgigScipRuntime {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $AddinPath
+    )
+    Assert-BgigTargetUnderAppData -TargetPath $AddinPath
+
+
+    $vendorRoot = Join-Path $AddinPath "vendor\scip\10.0.2\windows-x86_64"
+    $artifactPath = Join-Path $vendorRoot "ARTIFACT.json"
+    $archivePath = Join-Path $vendorRoot "scip-runtime-cp314.zip"
+    $expectedSha256 = "0a718ea5884d6326d66777db0ab853a31fa981e6392b89f184342fde27d465c6"
+    $expectedSize = 18319793
+    $expectedFileCount = 1016
+    $expectedRuntimeSize = 56491565
+    if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) {
+        throw "SCIP product artifact manifest missing: $artifactPath"
+    }
+    if (-not (Test-Path -LiteralPath $archivePath -PathType Leaf)) {
+        throw "SCIP product runtime archive missing: $archivePath"
+    }
+    $manifest = Get-Content -LiteralPath $artifactPath -Raw -Encoding UTF8 | ConvertFrom-Json
+    if ($manifest.archive.sha256 -ne $expectedSha256 -or [int64]$manifest.archive.size_bytes -ne $expectedSize) {
+        throw "SCIP product archive manifest contract mismatch."
+    }
+    $archive = Get-Item -LiteralPath $archivePath -ErrorAction Stop
+    if ($archive.Length -ne $expectedSize) {
+        throw "SCIP product archive size mismatch."
+    }
+    $actualSha256 = (Get-FileHash -LiteralPath $archivePath -Algorithm SHA256).Hash.ToLowerInvariant()
+    if ($actualSha256 -ne $expectedSha256) {
+        throw "SCIP product archive SHA-256 mismatch."
+    }
+
+    $temporaryRoot = Join-Path $vendorRoot ".runtime-extract"
+    $runtimeTarget = Join-Path $vendorRoot "runtime"
+    try {
+        if (Test-Path -LiteralPath $temporaryRoot) {
+            Remove-Item -LiteralPath $temporaryRoot -Recurse -Force
+        }
+        New-Item -ItemType Directory -Force -Path $temporaryRoot | Out-Null
+        Expand-Archive -LiteralPath $archivePath -DestinationPath $temporaryRoot -Force
+        $extractedRuntime = Join-Path $temporaryRoot "runtime"
+        if (-not (Test-Path -LiteralPath $extractedRuntime -PathType Container)) {
+            throw "SCIP product archive content root missing."
+        }
+        $runtimeFiles = @(Get-ChildItem -LiteralPath $extractedRuntime -Recurse -File)
+        $runtimeSize = ($runtimeFiles | Measure-Object -Property Length -Sum).Sum
+        if ($runtimeFiles.Count -ne $expectedFileCount -or [int64]$runtimeSize -ne $expectedRuntimeSize) {
+            throw "SCIP product extracted runtime contract mismatch."
+        }
+        if (Test-Path -LiteralPath $runtimeTarget) {
+            Remove-Item -LiteralPath $runtimeTarget -Recurse -Force
+        }
+        Move-Item -LiteralPath $extractedRuntime -Destination $runtimeTarget
+    }
+    finally {
+        if (Test-Path -LiteralPath $temporaryRoot) {
+            Remove-Item -LiteralPath $temporaryRoot -Recurse -Force
+        }
+    }
+}
 function Copy-BgigFusionAddin {
     param(
         [Parameter(Mandatory = $true)]
@@ -263,6 +338,7 @@ function Copy-BgigFusionAddin {
         }
         New-Item -ItemType Directory -Force -Path $engineTarget | Out-Null
         Get-ChildItem -LiteralPath $engineSource -File -Filter "*.py" | Copy-Item -Destination $engineTarget -Force
+        Expand-BgigScipRuntime -AddinPath $TargetPath
     }
     catch [System.UnauthorizedAccessException] {
         Write-Error $script:BgigAppDataBlockedMessage

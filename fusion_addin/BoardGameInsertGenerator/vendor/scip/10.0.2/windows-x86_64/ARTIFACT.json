@@ -1,0 +1,51 @@
+{
+  "archive": {
+    "content_root": "runtime",
+    "deterministic_timestamp": "2026-07-24T00:00:00Z",
+    "path": "scip-runtime-cp314.zip",
+    "sha256": "0a718ea5884d6326d66777db0ab853a31fa981e6392b89f184342fde27d465c6",
+    "size_bytes": 18319793
+  },
+  "artifact_digest": "540e2fe6b9324f2d58afbdaab827760f98b6b0e4ab9f626efdaee69d2c6d2786",
+  "candidate_id": "scip",
+  "invariants": {
+    "benchmark_replayed": false,
+    "fusion_validated": false,
+    "holdout_read": false,
+    "post_holdout_tuning_count": 0,
+    "print_validated": false
+  },
+  "numpy_version": "2.5.1",
+  "pyscipopt_version": "6.2.1",
+  "python_tag": "cp314",
+  "runtime_contract": {
+    "account_required": false,
+    "bgig_recertification_required": true,
+    "fusion_cp314_in_process": true,
+    "global_install_required": false,
+    "network_required": false,
+    "service_required": false,
+    "telemetry_enabled": false
+  },
+  "runtime_tree": {
+    "file_count": 1016,
+    "size_bytes": 56491565,
+    "tree_digest": "1feb512de4057bee10193a6b7cd769cfa4e61a45a87f7bb559ffea8ba91c72ca"
+  },
+  "schema_version": "bgig.scip_product_artifact.v1",
+  "soplex_version": "8.0.2",
+  "source_build_evidence_digest": "6fc5a141a809cf2db18f54c162e7f26dc1baf7947bf53ca50ffe6ecd36c94823",
+  "version": "10.0.2",
+  "worker_files": [
+    {
+      "path": "worker/scip_real_3d_worker.py",
+      "sha256": "2a1870dc65955e59d15720d4133e55a45da1205b7a72b1f9457632b193d13363",
+      "size_bytes": 14001
+    },
+    {
+      "path": "worker/_real_3d_worker_common.py",
+      "sha256": "babf07e1a91e70787dd5075e198e620a3d5979440a48b093c1521757f53c51e1",
+      "size_bytes": 2010
+    }
+  ]
+}
