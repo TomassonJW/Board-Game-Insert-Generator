@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import sys
 
-from pyscipopt import Model, quicksum
+from pyscipopt import Model, SCIP_PARAMEMPHASIS, quicksum
 
 from _real_3d_worker_common import choices, load_input, timer, write_output
 
@@ -17,6 +17,9 @@ def main(input_path: str, output_path: str) -> None:
     world = problem["world_mm"]
     model = Model("bgig-real-3d")
     model.hideOutput(True)
+    if "solution_limit" in limits:
+        model.setEmphasis(SCIP_PARAMEMPHASIS.FEASIBILITY)
+        model.setParam("limits/solutions", int(limits["solution_limit"]))
     model.setParam("limits/time", float(limits["wall_seconds"]))
     model.setParam("limits/memory", float(limits["memory_mebibytes"]))
     model.setParam("parallel/maxnthreads", int(limits["threads"]))

@@ -229,7 +229,11 @@ def audit_worker(path: Path) -> dict[str, object]:
                 forbidden_operators.append(ast.unparse(node))
     banned_tokens_found = [token for token in BANNED_MODEL_TOKENS if token in source]
     gate_passed = (
-        sorted(set(imports)) == ["Model", "quicksum"]
+        set(imports)
+        in (
+            {"Model", "quicksum"},
+            {"Model", "SCIP_PARAMEMPHASIS", "quicksum"},
+        )
         and bool(add_var_types)
         and set(add_var_types) <= {"B", "I"}
         and not nonlinear_products

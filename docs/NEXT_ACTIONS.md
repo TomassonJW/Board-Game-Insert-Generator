@@ -83,43 +83,42 @@ Rapport final L07 : P64_L07_GOAL_FINAL_REPORT.md.
 
 ## Prochaine action recommandée
 
-### Exécuter P64-L08V — installer 0.1.61 puis ouvrir la gate Fusion réelle
+### Exécuter P64-L08LV — installer 0.1.62 puis valider dans Fusion
 
-Type : préparation locale et observation humaine ; aucun tuning ni nouveau
-benchmark.
+Type : intégration Git, préparation locale automatisée et observation humaine ;
+aucun tuning ni nouveau benchmark.
 
-P64-L08K est automated-validated. Le build SCIP L08J exact est empaqueté dans
-l'add-in 0.1.61 et l'entrée produit BGIG :
+P64-L08L est automated-validated. La correction produit :
 
-- choisit SCIP avant les lanes internes pour les problèmes fidèlement
-  représentables ;
-- transporte dimensions, jeux, rotations et variantes locales ;
-- recalcule les appuis, reconstruit les espaces et exige le certificat BGIG ;
-- arrête sans double budget sur `bounded_unknown` ;
-- conserve un fallback explicite pour runtime invalide, règle non représentable,
-  erreur native ou certificat refusé.
+- utilise l’emphase faisabilité de SCIP et s’arrête au premier plan ;
+- porte seulement le plafond Approfondi de 30 à 120 s ;
+- garde deux représentants des petites familles répétées dans SCIP puis remplit
+  les répétitions en X/Y/Z ;
+- recertifie le plan complet avec BGIG ;
+- expose l’état réel de SCIP dans la palette et le journal local ;
+- ne revendique jamais l’optimalité globale.
 
-Le contrôle automatisé à trois niveaux Z réussit deux fois de façon déterministe.
-Le cas public réel 18 conteneurs / 20 éléments reste cependant
-`bounded_unknown` à 5 s et 30 s. Il ne constitue donc pas une preuve de gain sur
-les cas limites.
+Le vrai projet local 28x30 de Thomas a produit 28 placements recertifiés en
+environ 20 s, un appel SCIP et zéro voie interne. Ses données restent locales.
+La régression publique 28x30 versionnée produit le même statut certifié.
 
-P64-L08V doit :
+P64-L08LV doit :
 
-1. intégrer et pousser le commit L08K dans `main`, puis vérifier le SHA distant ;
-2. lancer `scripts/fusion/prepare_p64_l08k_scip_product_gate.ps1` depuis ce
+1. intégrer et pousser le commit L08L dans `main`, puis vérifier le SHA distant ;
+2. lancer `scripts/fusion/prepare_p64_l08l_solver_correction_gate.ps1` depuis ce
    commit intégré ;
-3. vérifier l'add-in 0.1.61, l'archive, le runtime extrait, les avis et le
-   marqueur de commit ;
-4. préserver l'état local existant, installer la fixture publique 18x20 et
+3. vérifier l’add-in 0.1.62, le nouvel artefact worker, l’archive runtime
+   inchangée et le marqueur de commit ;
+4. préserver l’état local existant, installer la fixture publique 28x30 et
    sélectionner `Auto intelligent + Approfondi` ;
 5. demander à Thomas uniquement les actions de
-   `docs/P64_L08K_FUSION_GATE_CHECKLIST.md` ;
-6. ne promouvoir `fusion-validated` qu'après son retour formel ; ne jamais
+   `docs/P64_L08L_FUSION_GATE_CHECKLIST.md` ;
+6. ne promouvoir `fusion-validated` qu’après son retour formel ; ne jamais
    promouvoir `print-validated` sans impression dédiée.
 
-La vraie gate de valeur est le projet limite de Thomas, pas le petit contrôle
-automatisé. Aucun agent n'est nécessaire pendant l'observation humaine.
+La vraie gate reste le projet limite de Thomas. Aucun agent n’est nécessaire
+pendant l’observation humaine.
+
 ## Lots verrouillés
 
 - P64-F01A02 et F02A02 restent séparés : ils possèdent la finalisation du volume ;

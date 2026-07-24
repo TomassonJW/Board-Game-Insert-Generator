@@ -24,6 +24,7 @@ from board_game_insert_generator.scip_product_solver import (
     SCIP_PRODUCT_ARCHIVE_SHA256,
     SCIP_PRODUCT_ARTIFACT_DIGEST,
     STATUS_INVALID_RUNTIME,
+    _hybrid_deferred_participant_ids,
     _participant_options,
     _prepare_product_problem,
     configure_scip_product_runtime,
@@ -140,7 +141,7 @@ class ScipProductSolverTests(unittest.TestCase):
         deep = scip_product_limits("deep")
         self.assertEqual(
             (quick.wall_seconds, normal.wall_seconds, deep.wall_seconds),
-            (1.0, 5.0, 30.0),
+            (1.0, 5.0, 120.0),
         )
         self.assertEqual({quick.threads, normal.threads, deep.threads}, {1})
         self.assertEqual(
@@ -194,6 +195,41 @@ class ScipProductSolverTests(unittest.TestCase):
             * 1000
         )
         self.assertEqual(payload["world_mm"][0], expected_world_x)
+
+    def test_hybrid_repeated_fill_keeps_two_anchor_representatives(self) -> None:
+        project = _stacking_project()
+        project["container_groups"] = [
+            {
+                "id": f"repeat-{index}",
+                "name": f"Repeat {index}",
+                "wall_thickness_mm": None,
+                "floor_thickness_mm": None,
+            }
+            for index in range(5)
+        ]
+        project["contents"] = [
+            {
+                "id": f"repeat-content-{index}",
+                "name": f"Repeat content {index}",
+                "shape_kind": "custom",
+                "dimensions_mm": {"x": 10.0, "y": 10.0, "z": 4.0},
+                "quantity": 1,
+                "container_group_id": f"repeat-{index}",
+                "content_clearance_mm": None,
+                "measurement_confidence": "exact",
+            }
+            for index in range(5)
+        ]
+        problem = prepare_free_3d_problem(project).problem
+        prepared, rejection = _prepare_product_problem(problem.participants, problem)
+        self.assertEqual(rejection, "")
+        self.assertIsNotNone(prepared)
+        deferred = _hybrid_deferred_participant_ids(prepared)
+        self.assertEqual(len(deferred), 3)
+        self.assertEqual(
+            deferred,
+            tuple(value["participant_id"] for value in prepared.payload["participants"][2:]),
+        )
 
     def test_fixed_dimensions_filter_only_incompatible_local_variants(self) -> None:
         participant = {
@@ -298,6 +334,28 @@ class ScipProductSolverTests(unittest.TestCase):
             self.assertEqual(run["external_status"], "bounded_unknown")
             self.assertEqual(run["result_status"], "no_solution_within_budget")
 
+    def test_public_28_by_30_repeated_fill_receipt_is_certified(self) -> None:
+        path = ROOT / "tests" / "fixtures" / "p64_l08l_scip_repeated_fill_regression.v1.json"
+        receipt = json.loads(path.read_text(encoding="utf-8"))
+        supplied_digest = receipt.pop("receipt_digest")
+        self.assertEqual(canonical_digest(receipt), supplied_digest)
+        self.assertEqual(receipt["container_count"], 28)
+        self.assertEqual(receipt["content_count"], 30)
+        self.assertTrue(receipt["generated_from_public_data_only"])
+        self.assertFalse(receipt["private_project_data_in_repo"])
+        self.assertFalse(receipt["holdout_read"])
+        self.assertEqual(receipt["runtime_artifact_digest"], SCIP_PRODUCT_ARTIFACT_DIGEST)
+        result = receipt["result"]
+        self.assertEqual(result["status"], "solution_found")
+        self.assertEqual(result["placement_count"], 28)
+        self.assertEqual(result["external_engine_status"], "hybrid_anchor_and_fill")
+        self.assertTrue(result["external_recertified"])
+        self.assertEqual(result["external_invocation_count"], 1)
+        self.assertEqual(result["internal_lane_count"], 0)
+        self.assertFalse(result["globally_optimal"])
+        self.assertEqual(receipt["limits"]["wall_seconds"], 120.0)
+        self.assertEqual(receipt["limits"]["solution_limit"], 1)
+
     def test_packaging_and_fusion_bootstrap_declare_scip_runtime(self) -> None:
         helper = (ROOT / "scripts" / "fusion" / "_fusion_helpers.ps1").read_text(encoding="utf-8")
         palette = (
@@ -315,7 +373,7 @@ class ScipProductSolverTests(unittest.TestCase):
         self.assertIn(SCIP_PRODUCT_ARCHIVE_SHA256, helper)
         self.assertIn("configure_scip_product_runtime", palette)
         self.assertIn('scip_vendor / "runtime"', palette)
-        self.assertEqual(manifest["version"], "0.1.61")
+        self.assertEqual(manifest["version"], "0.1.62")
 
 
 if __name__ == "__main__":

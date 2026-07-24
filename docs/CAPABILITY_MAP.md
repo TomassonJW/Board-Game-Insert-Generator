@@ -2003,3 +2003,17 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
   reste `bounded_unknown` en Normal et Approfondi ; la valeur sur le vrai projet
   limite de Thomas est la gate P64-L08V.
 - `C-PRINT` : inchangée, `print-validated=false`.
+
+## P64-L08L — cas limites 3D répétés corrigés
+
+- `C-SOLVER` : SCIP cherche d’abord un plan faisable, s’arrête au premier plan
+  et dispose d’un plafond Approfondi de 120 s sans durée minimale imposée.
+- `C-SOLVER-3D` / `C-STACKING` : le remplissage répété utilise réellement X/Y/Z
+  et exige un appui couvrant pour tout départ au-dessus du sol.
+- `C-CERTIFICATE` : la proposition hybride complète repasse la projection, les
+  appuis, les espaces et le certificat commun BGIG ; aucun raccourci de preuve.
+- `C-LIMIT-CASE` : `automated-validated` sur le projet local 28x30 et une
+  régression publique 28x30. La promotion Fusion attend encore P64-L08LV.
+- `C-FUSION` / `C-FUSION-UI` : paquet 0.1.62 et préparateur automatisés ; état
+  SCIP réel visible et journalisé.
+- `C-PRINT` : inchangée, `print-validated=false`.

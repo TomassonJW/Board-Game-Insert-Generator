@@ -1,0 +1,42 @@
+{
+  "case_fixture": "p64_l06a_reviewed_real_case.v1.json",
+  "case_id": "public-28-containers-30-contents-repeated-fill",
+  "container_count": 28,
+  "content_count": 30,
+  "generated_from_public_data_only": true,
+  "holdout_read": false,
+  "invariants": {
+    "finalization_invocation_count": 0,
+    "fusion_materialization_invocation_count": 0,
+    "fusion_validated": false,
+    "network_invocation_count": 0,
+    "print_validated": false
+  },
+  "limits": {
+    "memory_mebibytes": 1024,
+    "seed": 6408,
+    "solution_limit": 1,
+    "threads": 1,
+    "wall_seconds": 120.0
+  },
+  "mission": "P64-L08L",
+  "private_project_data_in_repo": false,
+  "public_case": true,
+  "receipt_digest": "dfddeb7ea6d179bf513b32e79c234668ed25b0694889fc339be42afc8f8f98b6",
+  "result": {
+    "candidate_source": "external_scip_real_3d",
+    "external_engine_status": "hybrid_anchor_and_fill",
+    "external_invocation_count": 1,
+    "external_recertified": true,
+    "external_status": "solution_found",
+    "globally_optimal": false,
+    "internal_lane_count": 0,
+    "maximum_top_mm": 53.4,
+    "placement_count": 28,
+    "solution_digest": "d78234dff4edd329f3ed9e5ef905284d14f9f472a08012d8f90030e57966cb92",
+    "status": "solution_found"
+  },
+  "runtime_artifact_digest": "05d4566e93efef2b6606b0d1807abaaf29bc460c37accee31da20ae2a6462065",
+  "schema_version": "bgig.scip_repeated_fill_regression_receipt.v1",
+  "source_case_id": "real-18-containers-20-contents-normal"
+}

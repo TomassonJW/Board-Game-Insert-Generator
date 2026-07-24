@@ -30,7 +30,7 @@ SCIP_PRODUCT_SOPLEX_VERSION = "8.0.2"
 SCIP_PRODUCT_NUMPY_VERSION = "2.5.1"
 SCIP_PRODUCT_FAMILY = "constraint_integer_programming"
 SCIP_PRODUCT_MODEL = "integer_xyz_big_m_disjunction_and_explicit_support"
-SCIP_PRODUCT_ARTIFACT_DIGEST = "540e2fe6b9324f2d58afbdaab827760f98b6b0e4ab9f626efdaee69d2c6d2786"
+SCIP_PRODUCT_ARTIFACT_DIGEST = "05d4566e93efef2b6606b0d1807abaaf29bc460c37accee31da20ae2a6462065"
 SCIP_PRODUCT_ARCHIVE_SHA256 = "0a718ea5884d6326d66777db0ab853a31fa981e6392b89f184342fde27d465c6"
 
 STATUS_NOT_CONFIGURED = "not_configured"
@@ -63,6 +63,7 @@ class ScipProductLimits:
     memory_mebibytes: int = 1024
     threads: int = 1
     seed: int = 6408
+    solution_limit: int = 1
 
     def to_dict(self) -> dict[str, object]:
         return asdict(self)
@@ -182,7 +183,7 @@ def scip_product_limits(effort_profile: str) -> ScipProductLimits:
     if effort_profile == "normal":
         return ScipProductLimits(wall_seconds=5.0)
     if effort_profile == "deep":
-        return ScipProductLimits(wall_seconds=30.0)
+        return ScipProductLimits(wall_seconds=120.0)
     raise ValueError(f"Unknown effort profile {effort_profile!r}.")
 
 
@@ -233,13 +234,14 @@ def solve_scip_product_3d(
             invocation_count=1,
         )
     elapsed = perf_counter() - started
+    invocation_count = int(output.get("worker_invocation_count", 1))
     if cancel_check is not None and cancel_check():
         return _empty_execution(
             limits,
             status=STATUS_CANCELLED,
             stop_reason="cancelled_after_native_solve",
             problem_digest=prepared.problem_digest,
-            invocation_count=1,
+            invocation_count=invocation_count,
             engine_status=str(output.get("engine_status", "")),
             total_wall_seconds=elapsed,
         )
@@ -257,7 +259,7 @@ def solve_scip_product_3d(
             status=STATUS_BOUNDED_UNKNOWN,
             stop_reason="strict_product_model_no_solution_within_budget",
             problem_digest=prepared.problem_digest,
-            invocation_count=1,
+            invocation_count=invocation_count,
             engine_status=str(output.get("engine_status", "")),
             model_digest=model_digest,
             total_wall_seconds=elapsed,
@@ -270,7 +272,7 @@ def solve_scip_product_3d(
             status=STATUS_EXTERNAL_ERROR,
             stop_reason="scip_solution_projection_failed",
             problem_digest=prepared.problem_digest,
-            invocation_count=1,
+            invocation_count=invocation_count,
             engine_status=str(output.get("engine_status", "")),
             model_digest=model_digest,
             total_wall_seconds=elapsed,
@@ -285,7 +287,7 @@ def solve_scip_product_3d(
         placements=placements,
         model_digest=model_digest,
         solution_digest=solution_digest,
-        invocation_count=1,
+        invocation_count=invocation_count,
         total_wall_seconds=elapsed,
     )
 
@@ -560,18 +562,67 @@ def _invoke_worker(
     prepared: _PreparedProductProblem,
     limits: ScipProductLimits,
 ) -> dict[str, object]:
+    deferred_ids = _hybrid_deferred_participant_ids(prepared)
+    if not deferred_ids:
+        output = _invoke_worker_once(prepared, limits)
+        output["worker_invocation_count"] = 1
+        return _rebind_worker_output(output, prepared, limits)
+    started = perf_counter()
+    anchor = _prepared_without_participants(prepared, deferred_ids)
+    output = _invoke_worker_once(anchor, limits)
+    if output.get("status") != "feasible":
+        output["worker_invocation_count"] = 1
+        return _rebind_worker_output(output, prepared, limits)
+    placements = [dict(value) for value in output.get("placements", [])]
+    participants = prepared.payload["participants"]
+    if not isinstance(participants, list):
+        raise RuntimeError("SCIP product participants must be a list.")
+    by_id = {str(value["participant_id"]): value for value in participants}
+    world = tuple(int(value) for value in prepared.payload["world_mm"])
+    for participant_id in deferred_ids:
+        placement = _place_deferred_participant(by_id[participant_id], placements, world)
+        if placement is None:
+            remaining = limits.wall_seconds - (perf_counter() - started)
+            if remaining >= 0.1:
+                fallback = _invoke_worker_once(
+                    prepared,
+                    replace(limits, wall_seconds=remaining),
+                )
+                fallback["worker_invocation_count"] = 2
+                return _rebind_worker_output(fallback, prepared, limits)
+            output.update(
+                {
+                    "status": "unknown",
+                    "proof_status": "bounded",
+                    "engine_status": "hybrid_fill_failed",
+                    "placements": [],
+                    "worker_invocation_count": 1,
+                }
+            )
+            return _rebind_worker_output(output, prepared, limits)
+        placements.append(placement)
+    output.update(
+        {
+            "status": "feasible",
+            "proof_status": "incumbent",
+            "engine_status": "hybrid_anchor_and_fill",
+            "placements": placements,
+            "hybrid_deferred_count": len(deferred_ids),
+            "worker_invocation_count": 1,
+        }
+    )
+    return _rebind_worker_output(output, prepared, limits)
+
+
+def _invoke_worker_once(
+    prepared: _PreparedProductProblem,
+    limits: ScipProductLimits,
+) -> dict[str, object]:
     worker = _load_worker()
     scratch = _configured_scratch_root
     if scratch is not None:
         scratch.mkdir(parents=True, exist_ok=True)
-    worker_input: dict[str, object] = {
-        "schema_version": _INPUT_SCHEMA,
-        "candidate_id": "scip",
-        "problem": prepared.payload,
-        "limits": limits.to_dict(),
-        "exact_control": False,
-    }
-    worker_input["input_digest"] = canonical_digest(worker_input)
+    worker_input = _worker_input(prepared, limits)
     with tempfile.TemporaryDirectory(
         prefix="bgig-scip-product-",
         dir=str(scratch) if scratch is not None else None,
@@ -596,6 +647,198 @@ def _invoke_worker(
         raise RuntimeError("SCIP worker output binding mismatch.")
     output["output_digest"] = supplied_output_digest
     return output
+
+
+def _worker_input(
+    prepared: _PreparedProductProblem,
+    limits: ScipProductLimits,
+) -> dict[str, object]:
+    value: dict[str, object] = {
+        "schema_version": _INPUT_SCHEMA,
+        "candidate_id": "scip",
+        "problem": prepared.payload,
+        "limits": limits.to_dict(),
+        "exact_control": False,
+    }
+    value["input_digest"] = canonical_digest(value)
+    return value
+
+
+def _rebind_worker_output(
+    output: dict[str, object],
+    prepared: _PreparedProductProblem,
+    limits: ScipProductLimits,
+) -> dict[str, object]:
+    rebound = dict(output)
+    rebound.pop("output_digest", None)
+    rebound["input_digest"] = _worker_input(prepared, limits)["input_digest"]
+    rebound["output_digest"] = canonical_digest(rebound)
+    return rebound
+
+
+def _hybrid_deferred_participant_ids(
+    prepared: _PreparedProductProblem,
+) -> tuple[str, ...]:
+    payload = prepared.payload
+    participants = payload.get("participants")
+    world = payload.get("world_mm")
+    if (
+        not isinstance(participants, list)
+        or not isinstance(world, list)
+        or payload.get("reservation_volumes")
+        or payload.get("access_precedence_edges")
+        or "disjoint_regions" in payload.get("active_constraints", [])
+    ):
+        return ()
+    groups: dict[tuple[object, ...], list[str]] = {}
+    for participant in participants:
+        if not isinstance(participant, Mapping):
+            return ()
+        variants = participant.get("variants")
+        if (
+            not isinstance(variants, list)
+            or len(variants) != 1
+            or int(participant.get("minimum_support_count", 1)) != 1
+            or not bool(participant.get("ground_allowed", True))
+            or int(participant.get("required_support_area_mm2", 0)) != 0
+        ):
+            continue
+        variant = variants[0]
+        if not isinstance(variant, Mapping):
+            continue
+        size = tuple(int(value) for value in variant.get("size", []))
+        rotations = tuple(str(value) for value in variant.get("allowed_rotations", ["xyz"]))
+        if len(size) != 3 or not rotations:
+            continue
+        horizontal = (max(size[0], size[1]), max(size[0], size[1]))
+        if (
+            horizontal[0] * 4 > int(world[0])
+            or horizontal[1] * 4 > int(world[1])
+            or size[2] * 4 > int(world[2])
+        ):
+            continue
+        key = (
+            size,
+            rotations,
+            int(participant.get("assigned_content_count", 0)),
+        )
+        groups.setdefault(key, []).append(str(participant["participant_id"]))
+    deferred: set[str] = set()
+    for participant_ids in groups.values():
+        if len(participant_ids) >= 4:
+            deferred.update(participant_ids[2:])
+    return tuple(
+        str(value["participant_id"])
+        for value in participants
+        if str(value["participant_id"]) in deferred
+    )
+
+
+def _prepared_without_participants(
+    prepared: _PreparedProductProblem,
+    deferred_ids: Sequence[str],
+) -> _PreparedProductProblem:
+    payload = deepcopy(prepared.payload)
+    deferred = set(deferred_ids)
+    payload["participants"] = [
+        value for value in payload["participants"] if str(value["participant_id"]) not in deferred
+    ]
+    payload.pop("problem_digest", None)
+    payload["problem_digest"] = canonical_digest(payload)
+    return replace(
+        prepared,
+        payload=payload,
+        problem_digest=str(payload["problem_digest"]),
+    )
+
+
+def _place_deferred_participant(
+    participant: Mapping[str, object],
+    placements: Sequence[Mapping[str, object]],
+    world: tuple[int, int, int],
+) -> dict[str, object] | None:
+    variants = participant["variants"]
+    if not isinstance(variants, list):
+        return None
+    x_values = sorted({0, *(int(value["x"]) + int(value["size"][0]) for value in placements)})
+    y_values = sorted({0, *(int(value["y"]) + int(value["size"][1]) for value in placements)})
+    z_values = sorted({0, *(int(value["z"]) + int(value["size"][2]) for value in placements)})
+    candidates: list[tuple[tuple[object, ...], dict[str, object]]] = []
+    for variant in variants:
+        if not isinstance(variant, Mapping):
+            continue
+        base_size = tuple(int(value) for value in variant["size"])
+        for orientation in variant.get("allowed_rotations", ["xyz"]):
+            size = base_size if orientation == "xyz" else (base_size[1], base_size[0], base_size[2])
+            width, depth, height = size
+            for z in z_values:
+                for y in y_values:
+                    for x in x_values:
+                        if x + width > world[0] or y + depth > world[1] or z + height > world[2]:
+                            continue
+                        candidate = (x, y, z, width, depth, height)
+                        if any(_raw_placements_overlap(candidate, value) for value in placements):
+                            continue
+                        supports = _raw_support_ids(x, y, z, width, depth, placements)
+                        if z != 0 and not supports:
+                            continue
+                        record = {
+                            "participant_id": participant["participant_id"],
+                            "x": x,
+                            "y": y,
+                            "z": z,
+                            "size": list(size),
+                            "orientation": str(orientation),
+                            "selected_variant_id": variant["variant_id"],
+                            "assigned_content_count": participant.get("assigned_content_count", 0),
+                            "support_ids": supports,
+                            "removal_rank": world[2] - z,
+                        }
+                        rank = (
+                            z + height,
+                            z,
+                            y,
+                            x,
+                            str(orientation),
+                            str(variant["variant_id"]),
+                        )
+                        candidates.append((rank, record))
+    return min(candidates, key=lambda value: value[0])[1] if candidates else None
+
+
+def _raw_placements_overlap(
+    candidate: tuple[int, int, int, int, int, int],
+    placed: Mapping[str, object],
+) -> bool:
+    x, y, z, width, depth, height = candidate
+    placed_size = placed["size"]
+    return not (
+        x + width <= int(placed["x"])
+        or int(placed["x"]) + int(placed_size[0]) <= x
+        or y + depth <= int(placed["y"])
+        or int(placed["y"]) + int(placed_size[1]) <= y
+        or z + height <= int(placed["z"])
+        or int(placed["z"]) + int(placed_size[2]) <= z
+    )
+
+
+def _raw_support_ids(
+    x: int,
+    y: int,
+    z: int,
+    width: int,
+    depth: int,
+    placements: Sequence[Mapping[str, object]],
+) -> list[str]:
+    return [
+        str(value["participant_id"])
+        for value in placements
+        if int(value["z"]) + int(value["size"][2]) == z
+        and int(value["x"]) <= x
+        and int(value["y"]) <= y
+        and int(value["x"]) + int(value["size"][0]) >= x + width
+        and int(value["y"]) + int(value["size"][1]) >= y + depth
+    ]
 
 
 def _load_worker() -> ModuleType:

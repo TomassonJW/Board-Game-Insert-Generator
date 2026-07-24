@@ -3641,3 +3641,27 @@ retour Fusion humain.
 - Gate : `docs/P64_L08K_FUSION_GATE_CHECKLIST.md`.
 - Holdout rejoué : non. Tuning post-holdout : 0.
 - `fusion-validated=false`. `print-validated=false`.
+
+## P64-L08L — correction du solveur SCIP après gate humaine KO
+
+Statut : `implemented-product`, `automated-validated`, en attente de P64-L08LV.
+
+- La gate 0.1.61 est KO : les cas public 18x20 et local 28x30 terminaient vers
+  30 s sans solution ; l’arrêt générique masquait `bounded_unknown`.
+- ADR-0086 active l’emphase faisabilité SCIP, `limits/solutions=1` et un plafond
+  Approfondi de 120 s avec retour anticipé dès le premier plan.
+- Les petites familles strictement identiques gardent deux représentants dans
+  SCIP ; les répétitions restantes sont placées en X/Y/Z puis recertifiées avec
+  le plan complet.
+- Cas local privé 28x30 : `solution_found`, 28 placements, moteur hybride,
+  certificat BGIG positif, un appel SCIP, zéro voie interne, environ 20 s. Les
+  données privées ne sont pas versionnées.
+- Régression publique 28x30 : mêmes statut, nombre de placements, moteur,
+  certificat et absence de voie interne ; holdout non lu.
+- Add-in 0.1.62 ; archive runtime inchangée ; artefact worker
+  `05d4566e93efef2b6606b0d1807abaaf29bc460c37accee31da20ae2a6462065`.
+- Le diagnostic palette et le journal local exposent l’état, le moteur, le
+  plafond, l’arrêt au premier plan et la recertification SCIP réels.
+- Preuve : `docs/P64_L08L_HUMAN_GATE_CORRECTION_EVIDENCE.md`.
+- Gate : `docs/P64_L08L_FUSION_GATE_CHECKLIST.md`.
+- `globally_optimal=false`, `fusion-validated=false`, `print-validated=false`.

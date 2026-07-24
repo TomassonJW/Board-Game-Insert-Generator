@@ -6,7 +6,7 @@
     "sha256": "0a718ea5884d6326d66777db0ab853a31fa981e6392b89f184342fde27d465c6",
     "size_bytes": 18319793
   },
-  "artifact_digest": "540e2fe6b9324f2d58afbdaab827760f98b6b0e4ab9f626efdaee69d2c6d2786",
+  "artifact_digest": "05d4566e93efef2b6606b0d1807abaaf29bc460c37accee31da20ae2a6462065",
   "candidate_id": "scip",
   "invariants": {
     "benchmark_replayed": false,
@@ -39,8 +39,8 @@
   "worker_files": [
     {
       "path": "worker/scip_real_3d_worker.py",
-      "sha256": "2a1870dc65955e59d15720d4133e55a45da1205b7a72b1f9457632b193d13363",
-      "size_bytes": 14001
+      "sha256": "dca8f8c46f5c9a494d6ac3772a461d6553b0de56a1dca80577952b8b872cc55a",
+      "size_bytes": 14188
     },
     {
       "path": "worker/_real_3d_worker_common.py",

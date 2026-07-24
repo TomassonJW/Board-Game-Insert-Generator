@@ -227,6 +227,18 @@ def _operation_stop_reason(action: str, response: dict[str, object]) -> str:
         return "local_analysis_ready"
     if action == "solve_project":
         result = response.get("solver_result") or {}
+        partition = response.get("partition") or {}
+        solver = partition.get("solver") if isinstance(partition, dict) else {}
+        search = solver.get("search") if isinstance(solver, dict) else {}
+        external = search.get("external_lane") if isinstance(search, dict) else {}
+        result_status = result.get("status") if isinstance(result, dict) else ""
+        if result_status == "no_solution_within_budget" and isinstance(external, dict):
+            if external.get("status") == "bounded_unknown":
+                return "scip_3d_time_limit_without_certified_solution"
+            if external.get("status") == "certificate_rejected":
+                return "scip_3d_solution_rejected_by_bgig_certificate"
+            if external.get("status") in {"external_error", "invalid_runtime"}:
+                return "scip_3d_runtime_failure"
         if isinstance(result, dict):
             telemetry = result.get("telemetry") or {}
             if isinstance(telemetry, dict) and telemetry.get("stop_reason"):

@@ -1451,3 +1451,16 @@ vérifier le paquet depuis ce commit, puis exécuter la gate Fusion sur le cas
 public et sur le vrai projet limite de Thomas. Une réussite technique de
 chargement ne suffit pas à revendiquer un gain de solvage ; l'impression reste
 une gate séparée.
+
+## Mise à jour P64-L08L — 2026-07-24
+
+La première gate humaine 0.1.61 est KO et supersède la trajectoire P64-L08V.
+P64-L08L corrige la recherche produit : faisabilité d’abord, premier plan,
+plafond Approfondi 120 s et remplissage certifié des petites familles répétées.
+Le cas local privé 28x30 et une régression publique 28x30 produisent chacun 28
+placements recertifiés, un appel SCIP et zéro voie interne.
+
+La trajectoire suivante devient P64-L08LV : intégrer et pousser 0.1.62, installer
+le commit vérifié, puis exécuter la gate Fusion publique 28x30 et réelle 28x30.
+Le holdout reste consommé ; aucune optimalité globale, validation physique,
+finalisation ou modification de tolérance n’est revendiquée.

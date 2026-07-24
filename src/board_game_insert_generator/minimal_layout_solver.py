@@ -594,7 +594,9 @@ def _solve_minimal_layout_once(
                         placements=external_placements,
                         empty_spaces=external_spaces,
                         search_telemetry={
-                            "external_engine_invocation_count": 1,
+                            "external_engine_invocation_count": (
+                                external_execution.invocation_count
+                            ),
                             "external_network_invocation_count": 0,
                         },
                         search_provenance={

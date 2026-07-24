@@ -708,6 +708,25 @@ class FusionPaletteProjectTests(unittest.TestCase):
             "analysis-active",
         )
 
+    def test_operation_reason_exposes_scip_timeout_instead_of_generic_portfolio(self) -> None:
+        response = {
+            "status": "ready",
+            "solver_result": {
+                "status": "no_solution_within_budget",
+                "telemetry": {"stop_reason": "bounded_portfolio_exhausted"},
+            },
+            "partition": {
+                "solver": {
+                    "search": {
+                        "external_lane": {"status": "bounded_unknown"},
+                    }
+                }
+            },
+        }
+        self.assertEqual(
+            palette_project_module._operation_stop_reason("solve_project", response),
+            "scip_3d_time_limit_without_certified_solution",
+        )
     def test_bridge_exposes_exact_terminal_activity_without_fake_progress(self) -> None:
         project = blank_project_v1()
         with (

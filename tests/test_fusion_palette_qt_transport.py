@@ -76,7 +76,7 @@ class FusionPaletteQtTransportTests(unittest.TestCase):
 
     def test_manifest_identifies_the_bootstrap_and_launcher_fix(self) -> None:
         manifest = json.loads((ADDIN / "BoardGameInsertGenerator.manifest").read_text(encoding="utf-8"))
-        self.assertEqual(manifest["version"], "0.1.61")
+        self.assertEqual(manifest["version"], "0.1.62")
 
     def test_uses_native_file_dialog_only_in_the_fusion_adapter(self) -> None:
         for marker in (
@@ -94,6 +94,16 @@ class FusionPaletteQtTransportTests(unittest.TestCase):
         self.assertNotIn("import adsk", bridge)
         self.assertIn("project_document_directory", bridge)
 
+    def test_scip_3d_diagnostics_are_visible_and_logged_without_paths(self) -> None:
+        for marker in (
+            "SCIP 3D externe",
+            "Recertifié BGIG",
+            "solution_limit",
+            "external_solver",
+            "scip_3d_time_limit_without_certified_solution",
+        ):
+            self.assertIn(marker, self.markup)
+        self.assertIn("plafond atteint sans plan certifié", self.markup)
     def test_palette_opens_at_a_product_sized_minimum(self) -> None:
         self.assertEqual(entrypoint.BGIG_PALETTE_DEFAULT_WIDTH, 1280)
         self.assertEqual(entrypoint.BGIG_PALETTE_DEFAULT_HEIGHT, 1100)

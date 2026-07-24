@@ -1221,22 +1221,28 @@ dans Fusion lorsque cette préparation sera réellement vérifiée.
 
 Jusque-là, aucune commande ni validation humaine n'est demandée.
 `fusion-validated=false` et `print-validated=false`.
-## État après P64-L08K — gate définie, installation L08V requise
+## État après P64-L08K — première gate KO
 
-L'intégration automatisée SCIP est prête dans l'add-in 0.1.61. Le contrôle
-forcé à trois niveaux Z est recertifié, mais le cas public réel 18 conteneurs /
-20 éléments reste `bounded_unknown` à 5 s et 30 s. Ce résultat ne ferme pas la
-gate de valeur demandée par Thomas.
+La gate 0.1.61 a été exécutée dans Fusion. Approfondi s’est arrêté vers 30 s sans
+plan sur le cas public 18x20 et sur le vrai projet local 28x30. Cette gate est
+KO ; `bounded_portfolio_exhausted` n’est pas une preuve d’impossibilité.
 
-Avant toute action humaine, Codex doit intégrer le commit L08K dans `main`,
-installer ce commit avec
-`scripts/fusion/prepare_p64_l08k_scip_product_gate.ps1`, vérifier le runtime
-extrait et écrire le marqueur de commit. Thomas ne lance aucun script.
+## État après P64-L08L — correction prête, installation L08LV requise
+
+La correction automatisée 0.1.62 cherche d’abord la faisabilité, s’arrête au
+premier plan, autorise jusqu’à 120 s en Approfondi et traite séparément les
+petites familles répétées. Le vrai cas local 28x30 et une régression publique
+28x30 produisent chacun 28 placements recertifiés par BGIG, avec un appel SCIP
+et aucune voie interne.
+
+Avant toute nouvelle action humaine, Codex doit intégrer le commit L08L dans
+`main`, vérifier le SHA distant, puis installer ce commit avec
+`scripts/fusion/prepare_p64_l08l_solver_correction_gate.ps1`. Thomas ne lance
+aucun script.
 
 Après cette préparation vérifiée, la gate active suit exactement
-`docs/P64_L08K_FUSION_GATE_CHECKLIST.md` : un calcul unique sur le cas public,
-puis un calcul unique sur le vrai projet limite de Thomas. La gate distingue le
-chargement réel de SCIP, la valeur du résultat et la réactivité de Fusion.
+`docs/P64_L08L_FUSION_GATE_CHECKLIST.md` : un calcul unique sur le cas public
+28x30, puis un calcul unique sur le vrai projet limite de Thomas.
 
 Statut avant installation : `human-gate-defined`, `local-install-pending`.
 `fusion-validated=false`. `print-validated=false`.

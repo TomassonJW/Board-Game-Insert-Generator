@@ -12,13 +12,13 @@ from board_game_insert_generator.incremental_project_state import canonical_dige
 from board_game_insert_generator.project_v1 import normalize_project_draft
 from board_game_insert_generator.scip_product_solver import (
     SCIP_PRODUCT_ARCHIVE_SHA256,
-    SCIP_PRODUCT_ARTIFACT_DIGEST,
 )
 
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURES = ROOT / "tests" / "fixtures"
 CASE_ID = "real-18-containers-20-contents-normal"
+L08K_ARTIFACT_DIGEST = "540e2fe6b9324f2d58afbdaab827760f98b6b0e4ab9f626efdaee69d2c6d2786"
 
 
 def _load(path: Path) -> dict[str, object]:
@@ -41,7 +41,7 @@ def prepare_fixture() -> tuple[dict[str, object], dict[str, object]]:
     source = _load(FIXTURES / "p64_l06a_reviewed_real_case.v1.json")
     _verify_digest(integration, "receipt_digest")
     _verify_digest(limit, "receipt_digest")
-    if integration["runtime_artifact_digest"] != SCIP_PRODUCT_ARTIFACT_DIGEST:
+    if integration["runtime_artifact_digest"] != L08K_ARTIFACT_DIGEST:
         raise RuntimeError("L08K integration receipt uses the wrong runtime.")
     if integration["runtime_archive_sha256"] != SCIP_PRODUCT_ARCHIVE_SHA256:
         raise RuntimeError("L08K integration receipt uses the wrong archive.")
@@ -72,7 +72,7 @@ def prepare_fixture() -> tuple[dict[str, object], dict[str, object]]:
         "project_digest": canonical_digest(project),
         "container_count": len(project["container_groups"]),
         "content_count": len(project["contents"]),
-        "runtime_artifact_digest": SCIP_PRODUCT_ARTIFACT_DIGEST,
+        "runtime_artifact_digest": L08K_ARTIFACT_DIGEST,
         "runtime_archive_sha256": SCIP_PRODUCT_ARCHIVE_SHA256,
         "forced_stacking_receipt_digest": integration["receipt_digest"],
         "limit_regression_receipt_digest": limit["receipt_digest"],

@@ -31,7 +31,22 @@ class MinimalScipRuntimeAuditTests(unittest.TestCase):
         namespace = runpy.run_path(str(AUDIT_SCRIPT))
         live = namespace["audit_worker"](WORKER)
         recorded = self.evidence["model_audit"]
-        self.assertEqual(live, recorded)
+        self.assertNotEqual(live["worker_sha256"], recorded["worker_sha256"])
+        self.assertEqual(recorded["pyscipopt_imports"], ["Model", "quicksum"])
+        self.assertEqual(
+            live["pyscipopt_imports"],
+            ["Model", "SCIP_PARAMEMPHASIS", "quicksum"],
+        )
+        for key in (
+            "add_var_call_count",
+            "variable_types",
+            "nonlinear_products",
+            "forbidden_decision_operators",
+            "banned_dependency_tokens_found",
+            "active_3d_semantics",
+        ):
+            self.assertEqual(live[key], recorded[key])
+        self.assertTrue(live["linear_integer_model_gate_passed"])
         self.assertTrue(recorded["linear_integer_model_gate_passed"])
         self.assertEqual(recorded["variable_types"], ["B", "I"])
         self.assertEqual(recorded["nonlinear_products"], [])

@@ -3174,3 +3174,31 @@ implémentée et intégrée à la fois.
   `docs/P64_L08K_FUSION_GATE_CHECKLIST.md`.
 - Distinguer chargement SCIP, gain réel, certificat, empilement et réactivité.
 - `fusion-validated=false` et `print-validated=false` avant retour formel.
+
+### P64-L08V — première gate Fusion 0.1.61
+
+- Statut : done, KO, supersédée par P64-L08L.
+- Les cas public 18x20 et local 28x30 ont terminé sans plan vers 30 s.
+- `bounded_portfolio_exhausted` ne constitue pas une preuve d’impossibilité.
+
+### P64-L08L — correction faisabilité et remplissage répété
+
+- Statut : done, `implemented-product`, `automated-validated`.
+- Emphase faisabilité SCIP, arrêt au premier plan, Deep 120 s maximum.
+- Décomposition sûre des petites familles identiques, deux représentants ancrés
+  dans SCIP, remplissage X/Y/Z et recertification BGIG complète.
+- Cas local privé et régression publique 28x30 : 28 placements recertifiés, un
+  appel SCIP, zéro voie interne.
+- Add-in 0.1.62, nouvel artefact worker, archive runtime inchangée.
+- Preuve : `docs/P64_L08L_HUMAN_GATE_CORRECTION_EVIDENCE.md`.
+
+### P64-L08LV — installation et nouvelle gate Fusion réelle
+
+- Statut : ready après intégration de L08L dans `main`.
+- Installer 0.1.62 depuis le commit poussé avec
+  `scripts/fusion/prepare_p64_l08l_solver_correction_gate.ps1`.
+- Vérifier version, artefact, runtime, code installé, fixture publique 28x30 et
+  marqueur du commit.
+- Thomas exécute un calcul public 28x30 puis un calcul sur son vrai projet 28x30
+  selon `docs/P64_L08L_FUSION_GATE_CHECKLIST.md`.
+- `fusion-validated=false` et `print-validated=false` avant retour formel.
