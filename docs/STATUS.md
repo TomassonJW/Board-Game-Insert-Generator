@@ -3695,8 +3695,33 @@ Statut : `done-documentation`, `architecture-accepted`.
 - Mission documentaire seulement : aucun runtime, benchmark, holdout, schéma,
   tolérance ou valeur physique modifié.
 
-La prochaine mission unique est P64-L09B, certificat de support matériel et
-anti-chute. `print-validated=false`.
+La mission suivante P64-L09B est désormais terminée. `print-validated=false`.
+
+## P64-L09B — certificat de support matériel et anti-chute
+
+Statut : `implemented-core`, `automated-validated`.
+
+- Le nouveau cœur pur calcule la matière au plan supérieur : face complète pour
+  un solide, enveloppe extérieure moins les cavités ouvertes pour un conteneur.
+- Les décisions sont explicites : `supported_on_material`,
+  `bridged_on_material`, `falls_through_opening`,
+  `insufficient_material_support` et `unstable_support_polygon`.
+- Le seuil existant de 25 % est conservé. Un pont doit aussi entourer la
+  projection du centre dans l'enveloppe convexe des contacts matériels.
+- `has_lid` est ignoré et ne crée ni surface pleine ni pose.
+- Greedy, beam, fermeture continue, conversion SCIP, stage-stack et validateur
+  commun utilisent la même autorité.
+- Une proposition historique non conforme devient `no_solution_within_budget`,
+  sans exception, plan partiel matérialisable ou faux impossible.
+- Fixtures : chute, pont stable, appui unilatéral, solide, couvercle non certifié,
+  validateur commun et chemin de recherche.
+- Suite complète : 843/843 en 241,984 s. Benchmark et holdout non exécutés.
+- Preuve : `docs/P64_L09B_MATERIAL_SUPPORT_EVIDENCE.md`.
+- Matrice : `docs/P64_L09_VALIDATION_UNIFIEE.md`.
+- Fusion et impression non exécutées ; `print-validated=false`.
+
+La prochaine mission unique est P64-L09C, réservations supérieures fidèles dans
+SCIP.
 
 ## Correction de verrou HiGHS découverte pendant la validation
 

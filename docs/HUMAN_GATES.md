@@ -1271,5 +1271,5 @@ Une gate redevient obligatoire avant :
 - toute utilisation de `has_lid` comme certificat ;
 - toute modification d'une valeur physique ou de tolérance.
 
-P64-L09B est autorisée comme prochaine mission unique.
-`print-validated=false`.
+P64-L09B est terminée et automated-validated. P64-L09C est autorisée comme
+prochaine mission unique dans le GO déjà donné. `print-validated=false`.

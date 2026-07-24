@@ -13,6 +13,10 @@ import hashlib
 import json
 from typing import Any, Iterable, Mapping
 
+from board_game_insert_generator.material_support import (
+    MaterialSupportEvaluation,
+    evaluate_search_support,
+)
 from board_game_insert_generator.solver_contract import (
     PlacementSnapshot,
     SolverBudget,
@@ -170,6 +174,7 @@ def solve_free_3d_greedy(
     strategy = SolverStrategy(FREE_3D_GREEDY_FAMILY_ID, FREE_3D_GREEDY_VERSION)
     limits = _budget_limits(budget)
     values = tuple(_participant(value, index) for index, value in enumerate(participants))
+    participants_by_id = {str(value["id"]): value for value in values}
     dimensions = _box_dimensions(box, storage_height_mm)
     xy_clearance = _non_negative(between_bodies_xy_mm, "between_bodies_xy_mm")
     box_clearance = _non_negative(box_perimeter_xy_mm, "box_perimeter_xy_mm")
@@ -254,6 +259,7 @@ def solve_free_3d_greedy(
             counters,
             limits,
             inset_zones,
+            participants_by_id,
         )
         if counters.budget_exhausted:
             break
@@ -331,6 +337,7 @@ def _most_constrained_current_participant(
     counters: _Counters,
     limits: dict[str, int],
     top_inset_zones: tuple[TopInsetZone, ...],
+    participants_by_id: Mapping[str, Mapping[str, object]],
 ) -> tuple[dict[str, object] | None, list[_Option]]:
     """Choose the fewest-current-options participant, deferring zero-option ones.
 
@@ -353,6 +360,7 @@ def _most_constrained_current_participant(
             counters,
             limits,
             top_inset_zones,
+            participants_by_id,
         )
         if counters.budget_exhausted:
             return None, []
@@ -387,6 +395,7 @@ def _placement_options(
     counters: _Counters,
     limits: dict[str, int],
     top_inset_zones: tuple[TopInsetZone, ...],
+    participants_by_id: Mapping[str, Mapping[str, object]],
 ) -> list[_Option]:
     result: dict[tuple[object, ...], _Option] = {}
     for rotation, world_size, local_size in _orientations(participant):
@@ -419,14 +428,16 @@ def _placement_options(
                     z_clearance,
                 ):
                     continue
-                supporting_ids, support_ratio = _support_at(
+                support = _support_at(
                     point,
                     world_size,
                     placements,
                     participant,
+                    participants_by_id,
+                    xy_clearance,
                     z_clearance,
                 )
-                if point[2] > _EPSILON and support_ratio + _EPSILON < 0.25:
+                if point[2] > _EPSILON and not support.certified:
                     continue
                 option = _Option(
                     participant=participant,
@@ -434,8 +445,8 @@ def _placement_options(
                     world_size=world_size,
                     local_size=local_size,
                     rotation_deg_z=rotation,
-                    supporting_ids=supporting_ids,
-                    support_ratio=support_ratio,
+                    supporting_ids=support.supporting_ids,
+                    support_ratio=support.coverage_ratio,
                     containing_space_volume=space.volume_mm3,
                 )
                 key = (point, world_size, rotation)
@@ -831,58 +842,19 @@ def _support_at(
     size: tuple[float, float, float],
     placements: list[Free3DPlacement],
     participant: dict[str, object],
+    participants_by_id: Mapping[str, Mapping[str, object]],
+    fallback_xy_clearance: float,
     fallback_z_clearance: float,
-) -> tuple[tuple[str, ...], float]:
-    if origin[2] <= _EPSILON:
-        return ("box-floor",), 1.0
-    rectangles: list[tuple[float, float, float, float, str]] = []
-    for lower in placements:
-        clearance = max(
-            _participant_clearance(participant, "z", fallback_z_clearance),
-            _placement_clearance(lower, "z", fallback_z_clearance),
-        )
-        lower_top = lower.origin_mm[2] + lower.world_size_mm[2]
-        if abs(origin[2] - (lower_top + clearance)) > 0.001:
-            continue
-        x0 = max(origin[0], lower.origin_mm[0])
-        y0 = max(origin[1], lower.origin_mm[1])
-        x1 = min(origin[0] + size[0], lower.origin_mm[0] + lower.world_size_mm[0])
-        y1 = min(origin[1] + size[1], lower.origin_mm[1] + lower.world_size_mm[1])
-        if x1 > x0 + _EPSILON and y1 > y0 + _EPSILON:
-            rectangles.append((x0, y0, x1, y1, lower.participant_id))
-    area = _rectangle_union_area(rectangles)
-    footprint = size[0] * size[1]
-    ratio = min(1.0, area / footprint) if footprint > _EPSILON else 1.0
-    support_ids = tuple(sorted({value[4] for value in rectangles}))
-    return support_ids, ratio
-
-
-def _rectangle_union_area(rectangles: list[tuple[float, float, float, float, str]]) -> float:
-    if not rectangles:
-        return 0.0
-    xs = sorted({value for rectangle in rectangles for value in (rectangle[0], rectangle[2])})
-    area = 0.0
-    for left, right in zip(xs, xs[1:]):
-        if right <= left + _EPSILON:
-            continue
-        intervals = sorted(
-            (rectangle[1], rectangle[3])
-            for rectangle in rectangles
-            if rectangle[0] < right - _EPSILON and rectangle[2] > left + _EPSILON
-        )
-        if not intervals:
-            continue
-        covered = 0.0
-        start, end = intervals[0]
-        for next_start, next_end in intervals[1:]:
-            if next_start <= end + _EPSILON:
-                end = max(end, next_end)
-            else:
-                covered += end - start
-                start, end = next_start, next_end
-        covered += end - start
-        area += (right - left) * covered
-    return area
+) -> MaterialSupportEvaluation:
+    return evaluate_search_support(
+        origin,
+        size,
+        placements,
+        participant,
+        participants_by_id,
+        fallback_xy_clearance,
+        fallback_z_clearance,
+    )
 
 
 def _separated_from_placements(

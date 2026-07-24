@@ -1483,5 +1483,7 @@ correction sans runtime :
 4. P64-F02B — objectifs équilibrés, proportionnels puis modulaires ;
 5. P64-L09V — gate Fusion combinée.
 
-P64-L09B devient la prochaine mission unique. Les cavités restent fixes,
-`has_lid` ne crée aucune pose et aucun nouveau benchmark ou holdout n'est requis.
+P64-L09B est terminée et automatisée : le certificat commun utilise la matière
+réelle, interdit la chute, vérifie la stabilité du pontage et ignore `has_lid`.
+P64-L09C devient la prochaine mission unique pour représenter exactement les
+réservations supérieures dans SCIP. Aucun benchmark ou holdout n'est requis.

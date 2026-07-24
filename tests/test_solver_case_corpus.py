@@ -274,7 +274,7 @@ class SolverCaseCorpusTests(unittest.TestCase):
         )
         self.assertEqual(
             report["functional_digest"],
-            "3aacd2eb29edf4414190bd0622c3b5539b6579430d5800bfbe52cd2419250338",
+            "e47777eaa4f0baba693371418c4fabfedd94c593386c1d05406adba89a3016f5",
         )
         self.assertTrue(report["summary"]["all_expectations_met"])
         self.assertEqual(report["summary"]["executed_case_count"], 5)

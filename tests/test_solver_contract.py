@@ -10,7 +10,6 @@ from board_game_insert_generator.partition_solver import (
 )
 from board_game_insert_generator.solver_contract import (
     SolverBudget,
-    SolverContractViolation,
     inspect_stage_stack_plan,
     run_stage_stack_adapter,
 )
@@ -23,17 +22,23 @@ from p64_h04_fixture_cases import (
 
 
 class SolverContractTests(unittest.TestCase):
-    def test_stage_stack_adapter_preserves_the_h04_reference_plans_bit_for_bit(self) -> None:
-        for fixture in (simple_success_project, h01_dense_project, h02_reservations_project):
+    def test_stage_stack_adapter_preserves_geometry_and_adds_material_certificate(self) -> None:
+        for fixture in (simple_success_project, h01_dense_project):
             with self.subTest(fixture=fixture.__name__):
                 baseline = _solve_stage_stack_baseline(fixture())
                 adapted = solve_partition_plan(fixture())
 
-                self.assertEqual(adapted, baseline)
-                self.assertEqual(adapted["plan_digest"], baseline["plan_digest"])
+                self.assertEqual(adapted["placements"], baseline["placements"])
+                self.assertEqual(
+                    adapted["stage_support"]["certificate_kind"],
+                    "material_surface_v1",
+                )
+                self.assertEqual(adapted["stage_support"]["status"], "supported")
+                self.assertTrue(adapted["validation"]["material_support_certified"])
+                self.assertTrue(adapted["invariants"]["material_support_certified"])
 
     def test_complete_h04_plan_gets_one_immutable_candidate_and_certificate(self) -> None:
-        run = inspect_stage_stack_plan(solve_partition_plan(h02_reservations_project()))
+        run = inspect_stage_stack_plan(solve_partition_plan(h01_dense_project()))
 
         self.assertEqual(run.strategy.family_id, "stage_stack")
         self.assertEqual(run.budget.effort_profile, "baseline")
@@ -60,7 +65,7 @@ class SolverContractTests(unittest.TestCase):
         with self.assertRaises(FrozenInstanceError):
             quick.effort_profile = "changed"  # type: ignore[misc]
 
-    def test_adapter_rejects_a_solution_that_fails_the_common_certificate(self) -> None:
+    def test_adapter_demotes_a_solution_that_fails_the_common_certificate(self) -> None:
         malformed = _solve_stage_stack_baseline(simple_success_project())
         malformed = deepcopy(malformed)
         malformed["placements"][0]["origin_mm"]["x"] = -1.0
@@ -68,8 +73,31 @@ class SolverContractTests(unittest.TestCase):
         def dishonest_strategy(*args: object, **kwargs: object) -> dict[str, object]:
             return malformed
 
-        with self.assertRaisesRegex(SolverContractViolation, "without a common certificate"):
-            run_stage_stack_adapter(dishonest_strategy, simple_success_project())
+        result = run_stage_stack_adapter(
+            dishonest_strategy,
+            simple_success_project(),
+        )
+
+        self.assertEqual(
+            result["solver"]["result"]["status"],
+            "no_solution_within_budget",
+        )
+        self.assertFalse(result["summary"]["materializable"])
+        self.assertEqual(result["placements"], [])
+        self.assertEqual(result["diagnostics"][0]["code"], "COMMON_CERTIFICATE_REJECTED")
+
+    def test_h02_void_support_is_demoted_instead_of_published(self) -> None:
+        result = solve_partition_plan(h02_reservations_project())
+
+        self.assertEqual(
+            result["solver"]["result"]["status"],
+            "no_solution_within_budget",
+        )
+        self.assertFalse(result["summary"]["materializable"])
+        self.assertIn(
+            "insufficient_material_support",
+            result["stage_support"]["rejection_statuses"],
+        )
 
 
 if __name__ == "__main__":

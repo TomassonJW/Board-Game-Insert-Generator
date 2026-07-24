@@ -117,8 +117,13 @@ preuves archivées.
   `fusion-validated`; `print-validated=false`.
 - P64-L09A et ADR-0087 cadrent les limites révélées : appui sur matière réelle,
   anti-chute, réservations plateaux dans SCIP et boucle bornée de fermeture.
-- La prochaine mission unique est P64-L09B, certificat de support matériel et
-  anti-chute. Aucun benchmark ni holdout n'est requis.
+- P64-L09B est implemented-core et automated-validated : solides, rebords
+  ouverts, chute, couverture matérielle et stabilité utilisent une seule autorité
+  dans les voies internes, la fermeture continue, SCIP et le certificat commun.
+  Les plans historiques non conformes sont rétrogradés sans faux impossible.
+  Suite complète : 843/843.
+- La prochaine mission unique est P64-L09C : représenter fidèlement les
+  réservations supérieures dans SCIP. Aucun benchmark ni holdout n'est requis.
 
 ## Vue de séquence
 
@@ -187,7 +192,8 @@ preuves archivées.
 | Terminée — correction automatisée | P64-L08L | Faisabilité d’abord, plafond 120 s, remplissage répété ; cas local et public 28x30 recertifiés. |
 | Terminée — gate Fusion de performance | P64-L08LV | Environ 25 s puis 34 s dans Fusion 0.1.62 ; plafond corrigé, portée géométrique limitée. |
 | Terminée — architecture | P64-L09A | ADR-0087 : matière porteuse, réservations SCIP et fermeture couplée bornée. |
-| Prochaine — vérité géométrique | P64-L09B | Interdire la chute dans une ouverture et certifier le pontage sur matière réelle. |
+| Terminée — automatisée | P64-L09B | Chute interdite ; rebords, faces pleines et pontage stable certifiés sur matière réelle. |
+| Prochaine — réservations SCIP | P64-L09C | Représenter exactement les réservations supérieures dans la lane produit. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -205,6 +211,10 @@ preuves archivées.
   résumé progressif et absence de solve global.
 - P64_L09A_MATERIAL_SUPPORT_AND_COUPLED_FINALIZATION_CONTRACT.md : matière
   porteuse, anti-chute, réservations SCIP, boucle bornée et lots L09/F01B/F02B.
+- P64_L09B_MATERIAL_SUPPORT_EVIDENCE.md : surfaces porteuses, chute, pontage,
+  parité des voies et changements de vérité historiques.
+- P64_L09_VALIDATION_UNIFIEE.md : matrice canonique des preuves automatisées et
+  des observations Fusion de toute la chaîne L09.
 - P64_L03R_MINIMAL_LAYOUT_AND_MATERIALIZATION_CONTRACT.md : invariant minimal,
   portfolio multi-graines, matérialisation duale et remplacement de scène.
 - P64_L03R_B_MINIMAL_SOLVER_EVIDENCE.md : solveur minimal, certificats,

@@ -510,14 +510,16 @@ def _valid_geometry(
     for index, value in enumerate(placements):
         participant = participants_by_id[value.participant_id]
         others = [item for other_index, item in enumerate(placements) if other_index != index]
-        _, ratio = _support_at(
+        support = _support_at(
             value.origin_mm,
             value.world_size_mm,
             others,
             participant,
+            participants_by_id,
+            xy_clearance,
             z_clearance,
         )
-        if value.origin_mm[2] > _EPSILON and ratio + _EPSILON < 0.25:
+        if value.origin_mm[2] > _EPSILON and not support.certified:
             return False
     return True
 

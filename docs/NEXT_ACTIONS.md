@@ -83,41 +83,39 @@ Rapport final L07 : P64_L07_GOAL_FINAL_REPORT.md.
 
 ## Prochaine action recommandée
 
-### Exécuter P64-L09B — certifier la matière porteuse et interdire la chute
+### Exécuter P64-L09C — représenter les réservations supérieures dans SCIP
 
-Type : correction de vérité géométrique dans le cœur et le certificat commun ;
-pas de benchmark, de tuning, de holdout, de CAD ou de nouvelle valeur physique.
+Type : correction de fidélité du modèle produit SCIP ; pas de benchmark, de
+tuning, de holdout, de nouvelle valeur physique, de CAD ni de gate Fusion.
 
-P64-L08LV est positive pour la correction SCIP 0.1.62 : environ 25 s sur le cas
-préparé, puis 34 s avec un bac de cartes complexe. La gate ne couvre pas le
-défaut distinct d'un petit conteneur posé au-dessus d'une ouverture dans laquelle
-il peut tomber.
+P64-L09B est automatisée et intégrée : le certificat commun raisonne sur les
+faces pleines et les rebords réels, rejette la chute et les pontages instables,
+et reste commun aux voies internes, à la fermeture continue et à SCIP. La suite
+complète passe 843 tests sur 843.
 
-ADR-0087 et le contrat P64-L09A imposent désormais :
+Le blocage suivant est exact : _prepare_product_problem refuse aujourd'hui tout
+problem.top_inset_zones avec top_inset_reservations_not_supported. Le cas avec
+plateau n'atteint donc pas le moteur SCIP et son échec ne prouve rien sur la
+géométrie.
 
-- des régions de matière porteuse, pas la seule enveloppe XY ;
-- une règle dure anti-chute ;
-- un pontage autorisé seulement avec appui et stabilité suffisants ;
-- `has_lid` sans aucun effet de support ou de pose ;
-- le même certificat pour SCIP direct, remplissage hybride et voies internes.
+P64-L09C doit :
 
-P64-L09B doit :
+1. définir la représentation entière exacte d'une zone par origine XY, taille
+   XY, plan d'appui et profondeur ;
+2. transmettre ces données au worker scellé sans approximation silencieuse ;
+3. empêcher tout corps incompatible d'occuper le prisme réservé ;
+4. préserver les cas où une cavité compatible reçoit sa compensation Z ;
+5. recertifier empreinte, profondeur, retrait, prise, parois, fonds et cavités ;
+6. prouver qu'un projet avec plateau atteint réellement SCIP ;
+7. conserver un refus borné et explicite pour toute forme non représentable ;
+8. garder budgets, runtime, UI, tolérances et poses inchangés ;
+9. mettre à jour P64_L09_VALIDATION_UNIFIEE.md, le pilotage, puis intégrer
+   directement dans main.
 
-1. représenter les rebords rectangulaires et les faces pleines dans le cœur pur ;
-2. détecter qu'une empreinte supérieure peut descendre dans une ouverture avec
-   les jeux applicables ;
-3. calculer l'union de matière en contact et la stabilité du pontage ;
-4. rejeter les appuis sur le vide dans le validateur commun ;
-5. ajouter au minimum les fixtures chute, pontage valide et pontage instable ;
-6. vérifier la parité SCIP direct / hybride / solveurs internes ;
-7. conserver les budgets, tolérances, cavités, poses, runtime et UI inchangés ;
-8. mettre à jour le pilotage puis intégrer directement dans `main`.
+P64-F01B viendra ensuite pour construire la boucle bornée incumbent,
+réservations, expansion, réparation locale et certificat global.
 
-P64-L09C viendra ensuite pour supprimer honnêtement
-`top_inset_reservations_not_supported`. P64-F01B construira seulement après ces
-deux vérités la boucle bornée de fermeture, expansion et réparation.
-
-Aucune action humaine n'est requise pendant P64-L09B.
+Aucune action humaine n'est requise pendant P64-L09C.
 
 ## Lots verrouillés
 

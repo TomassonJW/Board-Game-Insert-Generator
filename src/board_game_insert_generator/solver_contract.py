@@ -12,10 +12,13 @@ until this module certifies it.
 
 from __future__ import annotations
 
+from copy import deepcopy
 from dataclasses import dataclass
 import hashlib
 import json
 from typing import Any, Callable, Mapping
+
+from board_game_insert_generator.material_support import material_support_contract
 
 
 STAGE_STACK_FAMILY_ID = "stage_stack"
@@ -168,10 +171,153 @@ def run_stage_stack_adapter(
     )
     run = inspect_stage_stack_plan(plan)
     if _solution_found(plan) and (len(run.certificates) != 1 or not run.certificates[0].certified):
-        raise SolverContractViolation(
-            "stage_stack attempted to expose a materializable proposal without a common certificate."
+        rejection_codes = (
+            run.certificates[0].rejection_codes
+            if run.certificates
+            else ("COMMON_CERTIFICATE_MISSING",)
         )
+        return _demote_uncertified_stage_plan(plan, rejection_codes)
+    if _solution_found(plan):
+        return _attach_material_support_to_certified_plan(plan)
     return plan
+
+
+def _attach_material_support_to_certified_plan(
+    plan: Mapping[str, object],
+) -> dict[str, object]:
+    projected = deepcopy(dict(plan))
+    placements = _mappings(projected.get("placements"))
+    policy = _mapping(projected.get("clearance_policy"))
+    support = material_support_contract(
+        placements,
+        fallback_xy_clearance=_number(policy.get("between_bodies_xy_mm")),
+        fallback_z_clearance=_number(policy.get("between_bodies_z_mm")),
+    )
+    projected["stage_support"] = support
+    validation = _mapping(projected.get("validation"))
+    validation["material_support_certified"] = support["status"] == "supported"
+    validation["material_support_contract"] = deepcopy(support)
+    projected["validation"] = validation
+    invariants = _mapping(projected.get("invariants"))
+    invariants["material_support_certified"] = support["status"] == "supported"
+    projected["invariants"] = invariants
+    return _refresh_plan_digest(projected)
+
+
+def _refresh_plan_digest(plan: dict[str, object]) -> dict[str, object]:
+    plan.pop("plan_digest", None)
+    canonical = deepcopy(plan)
+    summary = _mapping(canonical.get("summary"))
+    summary.pop("result_status", None)
+    summary.pop("result_label", None)
+    solver = _mapping(canonical.get("solver"))
+    solver.pop("result", None)
+    solver.pop("telemetry", None)
+    encoded = json.dumps(
+        canonical,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=True,
+    )
+    plan["plan_digest"] = hashlib.sha256(encoded.encode("utf-8")).hexdigest()
+    return plan
+
+
+def _demote_uncertified_stage_plan(
+    plan: Mapping[str, object],
+    rejection_codes: tuple[str, ...],
+) -> dict[str, object]:
+    """Fail closed without turning a rejected bounded proposal into a crash."""
+
+    projected = deepcopy(dict(plan))
+    diagnostic_code = (
+        "MATERIAL_SUPPORT_CONTRACT"
+        if "MATERIAL_SUPPORT_CONTRACT" in rejection_codes
+        else "COMMON_CERTIFICATE_REJECTED"
+    )
+    diagnostic_message = (
+        "La disposition trouvee s appuie sur une ouverture ou sur des "
+        "rebords materiels insuffisants."
+        if diagnostic_code == "MATERIAL_SUPPORT_CONTRACT"
+        else "La disposition trouvee a echoue au certificat commun."
+    )
+    original_placements = _mappings(projected.get("placements"))
+    policy = _mapping(projected.get("clearance_policy"))
+    if original_placements:
+        projected["stage_support"] = material_support_contract(
+            original_placements,
+            fallback_xy_clearance=_number(
+                policy.get("between_bodies_xy_mm")
+            ),
+            fallback_z_clearance=_number(
+                policy.get("between_bodies_z_mm")
+            ),
+        )
+    projected["placements"] = []
+    projected["stages"] = []
+    projected["removal_sequence"] = []
+    projected["support"] = {
+        "status": "unresolved",
+        "top_support_count": 0,
+        "coverage_ratio": 0.0,
+    }
+    projected["residuals"] = {
+        "status": "unresolved",
+        "zones": [],
+        "residual_volume_mm3": 0.0,
+    }
+    projected["suggestions"] = []
+    projected["validation"] = {
+        "inside_box": False,
+        "box_xy_clearance_respected": False,
+        "no_collisions": False,
+        "clearances_respected": False,
+        "material_support_certified": False,
+    }
+    projected["diagnostics"] = [
+        {
+            "code": diagnostic_code,
+            "severity": "blocker",
+            "message": diagnostic_message,
+            "action": (
+                "Essayer Placement 3D libre ou modifier la disposition ; ce "
+                "resultat borne ne prouve pas une impossibilite geometrique."
+            ),
+            "rejection_codes": list(rejection_codes),
+        }
+    ]
+    summary = _mapping(projected.get("summary"))
+    summary.update(
+        {
+            "status": "unresolved",
+            "solution_status": "unresolved",
+            "materializable": False,
+            "placed_container_count": 0,
+            "final_body_count": 0,
+            "stage_count": 0,
+            "complete_printable_partition": False,
+            "technical_voids_are_clearances_only": False,
+        }
+    )
+    solver = _mapping(projected.get("solver"))
+    result = _mapping(solver.get("result"))
+    result.update(
+        {
+            "status": "no_solution_within_budget",
+            "label": "Aucune solution trouvée dans le budget",
+            "legacy_summary_status": "unresolved",
+            "proof": None,
+            "materializable": False,
+        }
+    )
+    summary["result_status"] = "no_solution_within_budget"
+    summary["result_label"] = result["label"]
+    solver["result"] = result
+    telemetry = _mapping(solver.get("telemetry"))
+    telemetry["stop_reason"] = "material_support_certificate_rejected"
+    telemetry["diagnostic_code_counts"] = {diagnostic_code: 1}
+    solver["telemetry"] = telemetry
+    return _refresh_plan_digest(projected)
 
 
 def inspect_stage_stack_plan(plan: Mapping[str, object]) -> StrategyRun:
@@ -256,6 +402,11 @@ def certify_partition_candidate(
         ValidationCheck("box_xy_clearance", bool(geometry["box_xy_clearance_respected"]), "BOX_XY_CLEARANCE"),
         ValidationCheck("no_collisions", bool(geometry["no_collisions"]), "BODY_COLLISION"),
         ValidationCheck("between_body_clearance", bool(geometry["clearances_respected"]), "BODY_CLEARANCE"),
+        ValidationCheck(
+            "material_support",
+            bool(geometry["material_support_certified"]),
+            "MATERIAL_SUPPORT_CONTRACT",
+        ),
         ValidationCheck("envelope_contract", envelope_ready, "ENVELOPE_CONTRACT"),
         ValidationCheck("cavities_walls_floors", cavities_walls_floors, "CAVITY_WALL_FLOOR_CONTRACT"),
         ValidationCheck("reservations_and_support", reservations_and_support, "RESERVATION_OR_SUPPORT_CONTRACT"),
@@ -432,11 +583,18 @@ def validate_placement_geometry(
     )
     body_volume = sum(_volume(_mapping(item.get("world_size_mm"))) for item in placements)
     storage_volume = box["x"] * box["y"] * storage_height
+    material_support = material_support_contract(
+        placements,
+        fallback_xy_clearance=xy_clearance,
+        fallback_z_clearance=z_clearance,
+    )
     return {
         "inside_box": inside,
         "box_xy_clearance_respected": box_xy_clearance_respected,
         "no_collisions": no_collisions,
         "clearances_respected": clearances,
+        "material_support_certified": material_support["status"] == "supported",
+        "material_support_contract": material_support,
         "body_volume_mm3": _round(body_volume),
         "storage_volume_mm3": _round(storage_volume),
         "technical_void_volume_mm3": _round(max(0.0, storage_volume - body_volume)),

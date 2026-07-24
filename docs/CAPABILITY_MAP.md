@@ -2036,3 +2036,21 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
 - `C-FUSION` : L08LV valide la correction de temps, pas ces nouvelles
   sémantiques.
 - `C-PRINT` : inchangée, `print-validated=false`.
+
+
+## P64-L09B — support matériel certifié
+
+- `C-SOLVER` / `C-STACKING` : `implemented-core`, `automated-validated`. Les
+  options de recherche au-dessus du sol sont admises uniquement sur matière
+  réelle avec couverture suffisante et stabilité du polygone d'appui.
+- `C-CERTIFICATE` : `implemented-core`, `automated-validated`. Faces pleines,
+  rebords ouverts, chute, pontage, insuffisance et instabilité sont recalculés
+  par le validateur commun avant publication.
+- `C-SAFETY` : les anciennes géométries non conformes sont fail-closed avec
+  `no_solution_within_budget` ; aucune impossibilité formelle n'est inventée.
+- `C-CLOSED-CONTAINER-POSE` : inchangée, `planned`. `has_lid` est explicitement
+  sans effet tant qu'un certificat mécanique distinct n'existe pas.
+- `C-RESERVATION` : inchangée ; P64-L09C reste nécessaire pour transmettre les
+  `top_inset_zones` à SCIP.
+- `C-FUSION` : non validée pour L09B ; la gate combinée reste P64-L09V.
+- `C-PRINT` : inchangée, `print-validated=false`.

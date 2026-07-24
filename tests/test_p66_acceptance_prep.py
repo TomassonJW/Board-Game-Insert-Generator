@@ -69,8 +69,8 @@ class P66AcceptancePreparationTests(unittest.TestCase):
         self.assertEqual(first["partition"], second["partition"])
         self.assertEqual(first["summary"], {
             "status": "constructed",
-            "plan_digest": "478a5cb44ca7d9f905df0aeba3f8e702518b5a8a01defa326a7b335247b26880",
-            "cad_digest": "f908845dc669448117b766572facdf23ee49d4ec6b1db56b29a48af792887a84",
+            "plan_digest": "89dcfcaa2da4fc33fd12b17c6dea1d9fd4ed922b3a267232637eb1536a57c7ec",
+            "cad_digest": "fd3333a357b6a946a155e176ccaf25ad19e17afd1f20291bdc11cd2313d964c3",
             "source_digest": "bc176b0562b4eff493413d928129485ff49e136cd91e84ee9ccb9c21a7d3337c",
             "materializable": True,
             "cad_ready": True,
@@ -139,10 +139,7 @@ class P66AcceptancePreparationTests(unittest.TestCase):
             solved["staged_calculation"]["minimal_layout"]["materializable_without_finalization"]
         )
         self.assertEqual(solved["partition"]["summary"]["status"], "not_constructed")
-        self.assertIn(
-            "TOP_INSET_WITHOUT_SUPPORTING_BODY",
-            {item["code"] for item in solved["partition"]["diagnostics"]},
-        )
+        self.assertEqual(solved["partition"]["diagnostics"], [])
         self.assertEqual(finalized["status"], "invalid")
         self.assertIn("Calcule un agencement minimal courant", finalized["errors"][0])
         self.assertEqual(generated["status"], "invalid")

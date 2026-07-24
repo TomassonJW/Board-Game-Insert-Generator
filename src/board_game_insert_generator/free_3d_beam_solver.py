@@ -477,6 +477,7 @@ def _participant_branches(
             limits,
             top_inset_zones,
             search_variant,
+            participants_by_id,
         )
         if counters.budget_exhausted:
             break
@@ -535,6 +536,7 @@ def _placement_options(
     limits: dict[str, int],
     top_inset_zones: tuple[TopInsetZone, ...],
     search_variant: str,
+    participants_by_id: Mapping[str, Mapping[str, object]],
 ) -> list[_BeamOption]:
     result: dict[tuple[object, ...], _BeamOption] = {}
     for selected_participant in _variant_participants(
@@ -608,14 +610,16 @@ def _placement_options(
                             z_clearance,
                         ):
                             continue
-                        supporting_ids, support_ratio = _support_at(
+                        support = _support_at(
                             point,
                             world_size,
                             placements,
                             selected_participant,
+                            participants_by_id,
+                            xy_clearance,
                             z_clearance,
                         )
-                        if point[2] > _EPSILON and support_ratio + _EPSILON < 0.25:
+                        if point[2] > _EPSILON and not support.certified:
                             continue
                         option = _BeamOption(
                             participant=selected_participant,
@@ -623,8 +627,8 @@ def _placement_options(
                             world_size=world_size,
                             local_size=local_size,
                             rotation_deg_z=rotation,
-                            supporting_ids=supporting_ids,
-                            support_ratio=support_ratio,
+                            supporting_ids=support.supporting_ids,
+                            support_ratio=support.coverage_ratio,
                             containing_space_volume=space.volume_mm3,
                             container_variant_id=str(variant.get("variant_id", "")),
                             container_variant_digest=str(

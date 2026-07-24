@@ -99,14 +99,24 @@ class SolverOutcomeTests(unittest.TestCase):
         )
         self.assertIn("n est pas une preuve", result["diagnostics"][0]["message"])
 
-    def test_anonymised_h01_and_h02_regressions_remain_complete_and_observable(self) -> None:
-        for fixture in (h01_dense_project, h02_reservations_project):
-            with self.subTest(fixture=fixture.__name__):
-                result = solve_partition_plan(fixture())
-                telemetry = result["solver"]["telemetry"]
-                self.assertEqual(result["summary"]["result_status"], SOLUTION_FOUND)
-                self.assertGreaterEqual(telemetry["counters"]["candidate_proposals"], 1)
-                self.assertIn(telemetry["stop_reason"], {"validated_complete_proposal"})
+    def test_anonymised_h01_and_h02_regressions_are_material_aware(self) -> None:
+        accepted = solve_partition_plan(h01_dense_project())
+        rejected = solve_partition_plan(h02_reservations_project())
+
+        self.assertEqual(accepted["summary"]["result_status"], SOLUTION_FOUND)
+        self.assertEqual(
+            accepted["solver"]["telemetry"]["stop_reason"],
+            "validated_complete_proposal",
+        )
+        self.assertEqual(
+            rejected["summary"]["result_status"],
+            NO_SOLUTION_WITHIN_BUDGET,
+        )
+        self.assertEqual(
+            rejected["solver"]["telemetry"]["stop_reason"],
+            "material_support_certificate_rejected",
+        )
+        self.assertFalse(rejected["summary"]["materializable"])
 
     def test_contextual_h03_fixture_is_not_presented_as_an_impossibility_proof(self) -> None:
         result = solve_partition_plan(h03_contextual_unresolved_project())
@@ -116,8 +126,14 @@ class SolverOutcomeTests(unittest.TestCase):
         self.assertIn("stop_reason", result["solver"]["telemetry"])
         if result["summary"]["result_status"] == NO_SOLUTION_WITHIN_BUDGET:
             self.assertEqual(result["summary"]["status"], "unresolved")
-            self.assertEqual(result["diagnostics"][0]["code"], "PORTFOLIO_NO_SOLUTION_WITHIN_BUDGET")
-            self.assertIn("n est pas une preuve", result["diagnostics"][0]["message"])
+            self.assertIn(
+                result["diagnostics"][0]["code"],
+                {
+                    "PORTFOLIO_NO_SOLUTION_WITHIN_BUDGET",
+                    "MATERIAL_SUPPORT_CONTRACT",
+                },
+            )
+            self.assertIn("ne prouve pas", result["diagnostics"][0]["action"])
 
     def test_formal_volume_proof_includes_exact_explicit_complements(self) -> None:
         project = simple_success_project()

@@ -355,8 +355,9 @@ class PartitionSolverTests(unittest.TestCase):
     def test_retries_diversified_orders_when_top_insets_reject_the_canonical_portfolio(self) -> None:
         result = solve_partition_plan(localized_top_inset_order_project())
 
-        self.assertEqual(result["summary"]["status"], "constructed")
-        self.assertEqual(result["summary"]["placed_container_count"], 8)
+        self.assertEqual(result["summary"]["status"], "unresolved")
+        self.assertEqual(result["summary"]["placed_container_count"], 0)
+        self.assertEqual(result["diagnostics"][0]["code"], "MATERIAL_SUPPORT_CONTRACT")
         self.assertGreater(result["solver"]["search"]["portfolios_evaluated"], 1)
         self.assertGreater(result["solver"]["search"]["diversified_portfolios_evaluated"], 0)
         self.assertNotIn(
@@ -385,15 +386,16 @@ class PartitionSolverTests(unittest.TestCase):
 
         result = solve_partition_plan(project)
 
-        self.assertEqual(result["summary"]["status"], "constructed")
-        self.assertEqual(result["summary"]["placed_container_count"], 8)
+        self.assertEqual(result["summary"]["status"], "unresolved")
+        self.assertEqual(result["summary"]["placed_container_count"], 0)
+        self.assertEqual(result["diagnostics"][0]["code"], "MATERIAL_SUPPORT_CONTRACT")
         self.assertEqual(
             result["solver"]["search"]["structured_order_strategy"],
             "top_inset_headroom_asc",
         )
         self.assertEqual(result["solver"]["search"]["directed_portfolios_evaluated"], 1)
         self.assertEqual(result["solver"]["search"]["hash_portfolios_evaluated"], 0)
-        self.assertTrue(result["validation"]["no_collisions"])
+        self.assertFalse(result["validation"]["no_collisions"])
         self.assertNotIn(
             "TOP_INSET_PIERCES_CAVITY_FLOOR",
             {item["code"] for item in result["diagnostics"]},
@@ -438,14 +440,15 @@ class PartitionSolverTests(unittest.TestCase):
 
         result = solve_partition_plan(project)
 
-        self.assertEqual(result["summary"]["status"], "constructed")
-        self.assertEqual(result["summary"]["placed_container_count"], 14)
+        self.assertEqual(result["summary"]["status"], "unresolved")
+        self.assertEqual(result["summary"]["placed_container_count"], 0)
+        self.assertEqual(result["diagnostics"][0]["code"], "MATERIAL_SUPPORT_CONTRACT")
         self.assertEqual(
             result["solver"]["search"]["structured_order_strategy"],
             "top_inset_safe_top_asc",
         )
         self.assertEqual(result["solver"]["search"]["hash_portfolios_evaluated"], 0)
-        self.assertTrue(result["validation"]["no_collisions"])
+        self.assertFalse(result["validation"]["no_collisions"])
         self.assertNotIn(
             "TOP_INSET_PIERCES_CAVITY_FLOOR",
             {item["code"] for item in result["diagnostics"]},

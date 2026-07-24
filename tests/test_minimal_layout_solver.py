@@ -319,7 +319,7 @@ class MinimalLayoutSolverTests(unittest.TestCase):
             0,
         )
 
-    def test_tall_body_stays_beside_a_supported_thin_stack(self) -> None:
+    def test_open_thin_stack_is_rejected_when_only_void_supports_it(self) -> None:
         project = _project_from_dimensions(
             {
                 "tall": (20.0, 20.0, 50.0),
@@ -331,30 +331,11 @@ class MinimalLayoutSolverTests(unittest.TestCase):
 
         plan = solve_minimal_layout(project, effort_profile="normal")
 
-        self.assertEqual(plan["solver"]["result"]["status"], SOLUTION_FOUND)
-        by_id = {value["id"]: value for value in plan["placements"]}
-        self.assertEqual(by_id["container:tall"]["origin_mm"]["z"], 0.0)
-        thin_z = sorted(
-            (
-                by_id["container:thin-a"]["origin_mm"]["z"],
-                by_id["container:thin-b"]["origin_mm"]["z"],
-            )
+        self.assertEqual(
+            plan["solver"]["result"]["status"],
+            "no_solution_within_budget",
         )
-        self.assertEqual(thin_z[0], 0.0)
-        self.assertGreater(thin_z[1], 0.0)
-        self.assertEqual(plan["stage_support"]["status"], "supported")
-        stacked = next(
-            value
-            for value in plan["stage_support"]["supports"]
-            if value["placement_id"]
-            == (
-                "container:thin-a"
-                if by_id["container:thin-a"]["origin_mm"]["z"] > 0.0
-                else "container:thin-b"
-            )
-        )
-        self.assertTrue(stacked["supported"])
-        self.assertEqual(stacked["coverage_ratio"], 1.0)
+        self.assertFalse(plan["summary"]["materializable"])
 
     def test_floating_body_is_rejected_by_the_common_support_contract(self) -> None:
         project = simple_success_project()

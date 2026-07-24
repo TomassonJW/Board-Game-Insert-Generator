@@ -7,7 +7,7 @@ from p64_h04_fixture_cases import p64_v2_continuous_closure_project
 
 
 class P64V2H01RealCaseSolverTests(unittest.TestCase):
-    def test_contextual_case_distinguishes_stage_and_free_3d_and_certifies_closure(self) -> None:
+    def test_contextual_case_is_not_published_with_void_support(self) -> None:
         project = p64_v2_continuous_closure_project()
 
         stage = solve_partition_plan(
@@ -26,32 +26,21 @@ class P64V2H01RealCaseSolverTests(unittest.TestCase):
             effort_profile="deep",
         )
 
-        self.assertEqual(
-            stage["solver"]["result"]["status"],
-            "no_solution_within_budget",
-        )
-        self.assertFalse(stage["summary"]["materializable"])
-        self.assertEqual(free_3d["solver"]["result"]["status"], "solution_found")
-        self.assertTrue(free_3d["summary"]["materializable"])
-        self.assertEqual(free_3d["solver"]["portfolio"]["selected_family_id"], "free_3d_beam")
-        self.assertEqual(len(free_3d["placements"]), 9)
-        self.assertGreaterEqual(free_3d["summary"]["stage_count"], 2)
-        self.assertEqual(free_3d["solver"]["search"]["closure_status"], "closed")
-        self.assertEqual(
-            free_3d["solver"]["search"]["closure_final_residual_metric"],
-            (0.0, 0.0, 0),
-        )
+        for plan in (stage, free_3d, auto):
+            self.assertEqual(
+                plan["solver"]["result"]["status"],
+                "no_solution_within_budget",
+            )
+            self.assertFalse(plan["summary"]["materializable"])
+            self.assertEqual(plan["placements"], [])
         reports = free_3d["solver"]["portfolio"]["family_reports"]
-        beam = next(value for value in reports if value["family_id"] == "free_3d_beam")
-        self.assertEqual(beam["certified_candidate_count"], 1)
-        self.assertEqual(free_3d["validation"]["unassigned_printable_volume_mm3"], 0.0)
-        self.assertEqual(auto["solver"]["result"]["status"], "solution_found")
-        self.assertTrue(auto["summary"]["materializable"])
-        self.assertEqual(
-            auto["solver"]["portfolio"]["selected_family_id"],
-            "free_3d_beam",
+        beam = next(
+            value for value in reports
+            if value["family_id"] == "free_3d_beam"
         )
-        self.assertEqual(auto["placements"], free_3d["placements"])
+        self.assertEqual(beam["certified_candidate_count"], 0)
+        self.assertEqual(beam["status"], "no_solution_within_budget")
+
 
 
 if __name__ == "__main__":

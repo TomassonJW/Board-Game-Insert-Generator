@@ -3205,22 +3205,25 @@ implémentée et intégrée à la fois.
 ### P64-L09B — Certificat de support matériel et anti-chute
 
 - Dépendance : P64-L09A intégrée.
-- Objectif : remplacer l'appui par enveloppe XY dans le validateur commun par
-  des régions de rebords/corps pleins, une règle anti-chute et une stabilité de
-  pontage.
-- Acceptation : chute dans grande ouverture rejetée, pontage matériel valide
-  accepté, support instable rejeté, parité SCIP direct/hybride/interne et aucune
-  calibration physique nouvelle.
-- Statut : `ready`.
+- Livré : faces pleines, rebords ouverts, union de contact, chute, couverture de
+  25 %, stabilité du polygone d'appui et statuts explicites.
+- Autorité : même calcul dans greedy, beam, fermeture continue, conversion SCIP,
+  stage-stack et validateur commun.
+- Preuves : chute rejetée, pontage stable accepté, appui unilatéral rejeté,
+  has_lid ignoré, anciennes propositions non conformes rétrogradées proprement.
+- Validation : 843/843 ; aucun benchmark, holdout, Fusion ou impression.
+- Preuve : docs/P64_L09B_MATERIAL_SUPPORT_EVIDENCE.md.
+- Statut : implemented-core, automated-validated, print-validated=false.
 
 ### P64-L09C — Réservations supérieures dans SCIP
 
-- Dépendance : P64-L09B.
-- Objectif : représenter fidèlement `top_inset_zones` dans la lane produit au
-  lieu de retourner `top_inset_reservations_not_supported`.
+- Dépendance : P64-L09B terminée.
+- Objectif : représenter fidèlement top_inset_zones dans la lane produit au lieu
+  de retourner top_inset_reservations_not_supported.
 - Acceptation : le cas plateau atteint SCIP, empreinte/profondeur/retrait/prise
   restent exacts, aucune cavité/paroi/fond percé et statut borné honnête.
-- Statut : `planned-after-P64-L09B`.
+- Validation à maintenir dans docs/P64_L09_VALIDATION_UNIFIEE.md.
+- Statut : ready.
 
 ### P64-F01B — Boucle bornée de fermeture et réparation
 

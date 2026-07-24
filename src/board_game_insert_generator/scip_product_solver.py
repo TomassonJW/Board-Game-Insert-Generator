@@ -951,18 +951,20 @@ def _convert_placements(
     resolved = []
     for placement in preliminary:
         participant = prepared.participants[placement.participant_id]
-        support_ids, support_ratio = _support_at(
+        support = _support_at(
             placement.origin_mm,
             placement.world_size_mm,
             [other for other in preliminary if other.participant_id != placement.participant_id],
             participant,
+            prepared.participants,
+            prepared.xy_clearance_mm,
             prepared.z_clearance_mm,
         )
         resolved.append(
             replace(
                 placement,
-                supporting_ids=support_ids,
-                support_coverage_ratio=round(support_ratio, 6),
+                supporting_ids=support.supporting_ids,
+                support_coverage_ratio=round(support.coverage_ratio, 6),
             )
         )
     return tuple(sorted(resolved, key=lambda value: value.participant_id))

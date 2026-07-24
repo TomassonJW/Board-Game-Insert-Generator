@@ -14,6 +14,8 @@ from itertools import product
 from math import ceil, isclose
 from typing import Any
 
+from board_game_insert_generator.material_support import material_support_contract
+
 
 VOLUMETRIC_STAGE_SOLVER_SCHEMA_V1 = "bgig.volumetric_stage_solver.v1"
 SOLUTION_COMPLETE = "complete"
@@ -29,8 +31,6 @@ MAX_STACK_ASSIGNMENT_BEAM = 128
 MAX_CANDIDATES = 192
 MAX_RETURNED_CANDIDATES = 64
 MAX_ORIENTATION_COMBINATIONS = 1024
-MIN_SUPPORT_RATIO = 0.25
-
 STRUCTURED_ORDER_STRATEGIES = (
     "top_inset_headroom_asc",
     "top_inset_safe_top_asc",
@@ -2028,9 +2028,12 @@ def _orient_row(
         if width > box["x"] + _EPSILON or height > box["y"] + _EPSILON:
             continue
         rotations = sum(int(bool(item["rotated_xy"])) for item in combination)
-        if strategy == "width": key = (width, height, rotations)
-        elif strategy == "height": key = (height, width, rotations)
-        else: key = (width / box["x"] + height / box["y"], rotations, width)
+        if strategy == "width":
+            key = (width, height, rotations)
+        elif strategy == "height":
+            key = (height, width, rotations)
+        else:
+            key = (width / box["x"] + height / box["y"], rotations, width)
         feasible.append((key, combination))
     return min(feasible, key=lambda item: item[0])[1] if feasible else None
 
@@ -2090,71 +2093,12 @@ def _support_contract(
     stages: list[dict[str, object]],
     vertical_clearance: float,
 ) -> dict[str, object]:
-    supports: list[dict[str, object]] = []
-    minimum_ratio = 1.0
-    for placement in placements:
-        origin = _mapping(placement["origin_mm"])
-        footprint = _area(_mapping(placement["world_size_mm"]))
-        if isclose(float(origin["z"]), 0.0, abs_tol=0.001):
-            ratio = 1.0
-            supporting_ids = ["box-floor"]
-        else:
-            size = _mapping(placement["world_size_mm"])
-            area = 0.0
-            supporting_ids: list[str] = []
-            for lower in placements:
-                if lower is placement:
-                    continue
-                lower_origin = _mapping(lower["origin_mm"])
-                lower_size = _mapping(lower["world_size_mm"])
-                actual_gap = float(origin["z"]) - (
-                    float(lower_origin["z"]) + float(lower_size["z"])
-                )
-                required_gap = _placement_pair_clearance(
-                    lower, placement, "z", vertical_clearance
-                )
-                if actual_gap + _EPSILON < required_gap:
-                    continue
-                overlap = _xy_overlap(origin, size, lower_origin, lower_size)
-                if overlap > _EPSILON:
-                    area += overlap
-                    supporting_ids.append(str(lower["id"]))
-            ratio = min(1.0, area / footprint) if footprint else 1.0
-        minimum_ratio = min(minimum_ratio, ratio)
-        supports.append(
-            {
-                "placement_id": placement["id"],
-                "stage_id": placement["stage_id"],
-                "supporting_ids": supporting_ids,
-                "coverage_ratio": _round(ratio),
-                "supported": ratio + _EPSILON >= MIN_SUPPORT_RATIO,
-                "vertical_gap_mm": (
-                    0.0
-                    if not supporting_ids or supporting_ids == ["box-floor"]
-                    else _round(
-                        min(
-                            float(origin["z"])
-                            - (
-                                float(_mapping(lower["origin_mm"])["z"])
-                                + float(_mapping(lower["world_size_mm"])["z"])
-                            )
-                            for lower in placements
-                            if str(lower["id"]) in supporting_ids
-                        )
-                    )
-                ),
-            }
-        )
-    unsupported = [item for item in supports if not item["supported"]]
-    return {
-        "status": "unsupported" if unsupported else "supported",
-        "minimum_coverage_ratio": _round(minimum_ratio),
-        "minimum_required_ratio": MIN_SUPPORT_RATIO,
-        "vertical_gap_mm": _round(vertical_clearance),
-        "supports": supports,
-        "unsupported_body_ids": [str(item["placement_id"]) for item in unsupported],
-    }
-
+    del stages
+    return material_support_contract(
+        placements,
+        fallback_xy_clearance=0.0,
+        fallback_z_clearance=vertical_clearance,
+    )
 
 def _removal_sequence(placements: list[dict[str, object]]) -> list[dict[str, object]]:
     ordered = sorted(

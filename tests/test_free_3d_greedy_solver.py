@@ -189,7 +189,7 @@ class Free3DGreedySolverTests(unittest.TestCase):
         self.assertLess(crossing.origin_mm[2], tall_top)
         self.assertGreater(crossing.origin_mm[2] + crossing.world_size_mm[2], tall_top)
 
-    def test_upper_body_can_be_supported_by_multiple_lower_bodies(self) -> None:
+    def test_upper_body_is_rejected_when_multiple_supports_stay_on_one_side(self) -> None:
         participants = [
             _participant("a-lower", (20.0, 20.0, 60.0)),
             _participant("b-lower", (20.0, 20.0, 60.0)),
@@ -205,11 +205,11 @@ class Free3DGreedySolverTests(unittest.TestCase):
             budget=_budget(),
         )
 
-        self.assertEqual(execution.status, "solution_found")
-        upper = next(value for value in execution.placements if value.participant_id == "z-upper")
-        self.assertGreater(upper.origin_mm[2], 0.0)
-        self.assertEqual(upper.supporting_ids, ("a-lower", "b-lower"))
-        self.assertAlmostEqual(upper.support_coverage_ratio, 0.4)
+        self.assertEqual(execution.status, "no_solution_within_budget")
+        self.assertNotIn(
+            "z-upper",
+            {value.participant_id for value in execution.placements},
+        )
 
     def test_execution_is_deterministic_and_deduplicates_ems_and_points(self) -> None:
         participants = [

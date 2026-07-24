@@ -101,7 +101,7 @@ class SolverPortfolioTests(unittest.TestCase):
         self.assertTrue(execution.certified_candidates[0].certificate.certified)
         self.assertTrue(all(report.skipped_by_fast_path for report in execution.family_reports[1:]))
 
-    def test_non_trivial_auto_compares_all_families_and_beam_plan_is_certified(self) -> None:
+    def test_non_trivial_auto_keeps_only_material_certified_families(self) -> None:
         execution = solve_partition_portfolio(_two_level_project(), effort_profile=EFFORT_NORMAL)
 
         self.assertEqual(execution.status, "solution_found")
@@ -111,7 +111,8 @@ class SolverPortfolioTests(unittest.TestCase):
             ("stage_stack", "free_3d_greedy", "free_3d_beam"),
         )
         beam_report = execution.family_reports[2]
-        self.assertGreaterEqual(beam_report.certified_candidate_count, 1)
+        self.assertEqual(beam_report.certified_candidate_count, 0)
+        self.assertEqual(beam_report.status, "no_solution_within_budget")
         self.assertTrue(execution.certified_candidates)
         self.assertTrue(
             all(value.certificate.certified for value in execution.certified_candidates)
@@ -131,20 +132,25 @@ class SolverPortfolioTests(unittest.TestCase):
             all(report.status == "stale_or_cancelled" for report in execution.family_reports)
         )
 
-    def test_h04_dense_corpus_keeps_at_least_one_certified_auto_candidate(self) -> None:
-        for fixture in (h01_dense_project, h02_reservations_project):
-            with self.subTest(fixture=fixture.__name__):
-                execution = solve_partition_portfolio(
-                    fixture(),
-                    effort_profile=EFFORT_NORMAL,
-                )
+    def test_h04_dense_corpus_keeps_only_material_certified_candidates(self) -> None:
+        accepted = solve_partition_portfolio(
+            h01_dense_project(),
+            effort_profile=EFFORT_NORMAL,
+        )
+        rejected = solve_partition_portfolio(
+            h02_reservations_project(),
+            effort_profile=EFFORT_NORMAL,
+        )
 
-                self.assertEqual(execution.status, "solution_found")
-                self.assertIsNotNone(execution.selected_plan)
-                self.assertTrue(execution.certified_candidates)
-                self.assertTrue(
-                    all(value.certificate.certified for value in execution.certified_candidates)
-                )
+        self.assertEqual(accepted.status, "solution_found")
+        self.assertIsNotNone(accepted.selected_plan)
+        self.assertTrue(accepted.certified_candidates)
+        self.assertTrue(
+            all(value.certificate.certified for value in accepted.certified_candidates)
+        )
+        self.assertEqual(rejected.status, "no_solution_within_budget")
+        self.assertIsNone(rejected.selected_plan)
+        self.assertEqual(rejected.certified_candidates, ())
 
 
 if __name__ == "__main__":

@@ -31,7 +31,6 @@ from board_game_insert_generator.scip_product_solver import (
     scip_product_limits,
     solve_scip_product_3d,
 )
-from board_game_insert_generator.solver_outcome import SOLUTION_FOUND
 import board_game_insert_generator.scip_product_solver as scip_product_module
 
 
@@ -296,10 +295,14 @@ class ScipProductSolverTests(unittest.TestCase):
         )
 
         plan = solve_minimal_layout(_stacking_project(), effort_profile="quick")
-        self.assertEqual(plan["solver"]["result"]["status"], SOLUTION_FOUND)
+        self.assertEqual(
+            plan["solver"]["result"]["status"],
+            "no_solution_within_budget",
+        )
         provenance = plan["minimal_layout"]["search_provenance"]
         self.assertEqual(provenance["external_lane"]["status"], STATUS_INVALID_RUNTIME)
         self.assertTrue(provenance["lanes"])
+        self.assertFalse(plan["summary"]["materializable"])
 
     def test_real_cp314_integration_receipt_proves_forced_z_stacking(self) -> None:
         path = ROOT / "tests" / "fixtures" / "p64_l08k_scip_product_integration.v1.json"
