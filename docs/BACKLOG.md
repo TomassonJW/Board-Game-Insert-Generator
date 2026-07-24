@@ -3063,6 +3063,8 @@ implémentée et intégrée à la fois.
 
 - Statut : planned ; programme canonique dans
   docs/P64_L08_REAL_3D_SOLVER_BENCHMARK_PROGRAM.md.
-- Ordre : audit et filtres de licence, corpus V2 3D, adaptateurs fidèles,
+- Audit L08C terminé : PackingSolver, LAFF, OR-Tools CP-SAT et SCIP sont
+  conditionnellement shortlistés ; aucun gagnant ni téléchargement produit.
+- Ordre : corpus V2 3D, adaptateurs fidèles,
   tournoi scellé avec holdout neuf, puis intégration seulement si un gain 3D
   réel est certifié.

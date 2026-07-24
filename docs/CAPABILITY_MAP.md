@@ -1875,3 +1875,10 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
   matériel expérimental de sol, non une capacité 3D.
 - `C-QUALITY` : aucune amélioration globale n'est revendiquée ; la sélection
   reste ouverte jusqu'au tournoi P64-L08 réellement fidèle.
+
+## Mise à jour P64-L08C — candidats 3D sans promotion
+
+- `C-SOLVER` : quatre candidats de familles distinctes sont auditables, mais
+  aucun n'est une capacité produit ni un gagnant global.
+- `C-QUALITY` : la prochaine preuve porte sur les familles adversariales 3D,
+  pas sur un score de sol ou un benchmark de faible cardinalité.

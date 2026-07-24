@@ -3415,3 +3415,13 @@ Date : 2026-07-24
 - **Décision :** la lane de sol ne part plus dans Auto ni Deep, même si le
   runtime est configuré. Le portefeuille interne redevient déterministe.
 - **Suite :** P64-L08C, audit des candidats réellement 3D.
+
+## P64-L08C — audit des moteurs 3D
+
+Date : 2026-07-24
+
+- **Statut :** `done`, `documentation-validated`, `no-winner-selected`.
+- **Shortlist conditionnelle :** PackingSolver, LAFF, OR-Tools CP-SAT et SCIP.
+- **Décision :** aucun moteur ne passe encore la gate ; les contraintes BGIG
+  complètes seront d'abord rendues testables dans le corpus L08D.
+- **Suite :** corpus adversarial 3D et holdout neuf, puis adapters fidèles.

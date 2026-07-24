@@ -75,18 +75,18 @@ Rapport final L07 : P64_L07_GOAL_FINAL_REPORT.md.
 
 ## Prochaine action recommandée
 
-### Exécuter P64-L08C — auditer les moteurs réellement 3D
+### Exécuter P64-L08D — construire le corpus adversarial 3D et le holdout neuf
 
-Type : mission automatisée, sans build ni téléchargement coûteux avant filtre.
+Type : mission automatisée, documentaire et de données locales, sans lancer les
+solveurs externes retenus.
 
-Objectif : réauditer depuis leurs sources officielles les moteurs capables de
-représenter les cas limites BGIG T0/T1 complets : empilement, appuis,
-réservations hautes, accès, variantes locales et forte cardinalité. PackingSolver,
-LAFF, OR-Tools, SCIP et HiGHS repartent comme candidats sans gagnant préchoisi.
+Objectif : définir les familles obligatoires du programme L08 (étages, appuis,
+réservations hautes, accès, fragmentation, variantes P45, 32/64 conteneurs et
+256 contenus), leurs témoins certifiables, les bornes négatives, puis un holdout
+nouveau et scellé. Aucun cas 11 × 34 ni corpus de sol ne peut servir de verdict.
 
-La sortie attendue est une matrice de fidélité, licence, Windows, hors ligne,
-maintenance et coût de build. Tout candidat qui réduit le 3D à un sol est écarté
-du classement global avant consommation de temps ou de stockage.
+Les candidats restent inactifs tant que chaque cas ne possède pas une sémantique
+BGIG et une recertification réalisable.
 
 ## Lots verrouillés
 
