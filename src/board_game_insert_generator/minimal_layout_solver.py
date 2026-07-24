@@ -369,7 +369,7 @@ def _solve_minimal_layout_once(
     deadline_at_ms: float | None = None,
     frontier_source_override: str | None = None,
     initial_incumbent: Mapping[str, object] | None = None,
-    external_lane_enabled: bool = True,
+    external_lane_enabled: bool = False,
 ) -> dict[str, object]:
     """Execute one explicit lane prefix or extension without orchestration."""
 

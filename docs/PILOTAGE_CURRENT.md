@@ -85,9 +85,9 @@ preuves archivées.
 - P64-L07E est conservée comme preuve d'une lane HiGHS de sol rectangulaire.
   ADR-0083 requalifie cependant L07 : ses quatre candidats ont été comparés sur
   un seul niveau et ne répondent pas à la gate de solvage 3D réel.
-- P64-L07V est suspendue. La mission active est P64-L08A, terminée
-  documentairement : la prochaine action est P64-L08B, diagnostic de régression
-  et quarantaine éventuelle de la lane 2D avant le vrai benchmark 3D.
+- P64-L07V est suspendue. P64-L08A et L08B sont terminées : la lane HiGHS
+  de sol est retirée du parcours Auto après mesure. La prochaine action est
+  P64-L08C, audit actuel des candidats réellement capables de solvage 3D.
 
 ## Vue de séquence
 
@@ -143,7 +143,8 @@ preuves archivées.
 | Terminé — automatisé | P64-L07D | Quatre moteurs comparés ; HiGHS scellé seul, holdout 5/7 dans sa portée. |
 | Historique, portée corrigée | P64-L07E | HiGHS 1.15.1 est une lane de sol rectangulaire, pas un gagnant 3D global. |
 | Supersédée | P64-L07V | Observation Fusion suspendue par ADR-0083 : elle ne teste pas la gate réelle. |
-| Terminé — contrat correctif | P64-L08A | ADR-0083 et gate adversariale 3D complète ; P64-L08B devient prioritaire. |
+| Terminé — diagnostic | P64-L08A/B | Gate 3D définie ; HiGHS de sol quarantiné hors Auto après mesure. |
+| Prochaine — audit | P64-L08C | Réauditer les candidats réellement 3D avant tout build coûteux. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 

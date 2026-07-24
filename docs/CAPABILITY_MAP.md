@@ -1868,3 +1868,10 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
   inchangées. P64-L08 doit les exercer sans projection 2D silencieuse.
 - C-FUSION et C-PRINT : aucun statut ne change ; aucune observation Fusion n'est
   due avant une preuve de candidat 3D réellement recertifiée.
+
+## Mise à jour P64-L08B — HiGHS hors du parcours Auto
+
+- `C-SOLVER` : HiGHS ne contribue plus au chemin automatique. Il reste un
+  matériel expérimental de sol, non une capacité 3D.
+- `C-QUALITY` : aucune amélioration globale n'est revendiquée ; la sélection
+  reste ouverte jusqu'au tournoi P64-L08 réellement fidèle.

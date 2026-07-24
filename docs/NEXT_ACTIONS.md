@@ -47,8 +47,8 @@ solveur 3D global ni promesse de vitesse.
   n'est exposée ;
 - un journal local automatique conserve clics, changements, demandes, résultats et états dédupliqués sans bouton spécial, sans solve supplémentaire, finalisation, CAD ou scène ;
 - un witness certifie persistant est recertifie comme incumbent sans ajouter de lane, court-circuiter la recherche ou revendiquer un cache hit ;
-- HiGHS est une lane expérimentale de sol ; P64-L08B doit mesurer son coût réel
-  et la retirer du parcours Auto si elle ralentit ou perturbe les cas 3D ;
+- HiGHS est une lane expérimentale de sol, désormais retirée du parcours Auto
+  après P64-L08B ; elle n'est pas un moteur de solvage 3D global ;
 - le cas dense 11 × 34 ne reçoit aucune nouvelle revendication.
 
 Preuves :
@@ -75,19 +75,18 @@ Rapport final L07 : P64_L07_GOAL_FINAL_REPORT.md.
 
 ## Prochaine action recommandée
 
-### Exécuter P64-L08B — mesurer et mettre en quarantaine la lane HiGHS 2D
+### Exécuter P64-L08C — auditer les moteurs réellement 3D
 
-Type : mission automatisée, prioritaire, sans contrôle Fusion.
+Type : mission automatisée, sans build ni téléchargement coûteux avant filtre.
 
-Objectif : établir si la lane HiGHS 2D ajoutée par L07 ralentit ou perturbe les
-cas 3D existants, notamment les cas réels et les paliers de forte cardinalité.
-La mission mesure baseline contre runtime actuel, avec statut, certificat, temps
-au premier plan, P50/P95, mémoire et appels externes. Elle désactive la lane du
-parcours Auto si la régression est avérée ; aucun réglage silencieux ni nouveau
-benchmark 2D n'est admis.
+Objectif : réauditer depuis leurs sources officielles les moteurs capables de
+représenter les cas limites BGIG T0/T1 complets : empilement, appuis,
+réservations hautes, accès, variantes locales et forte cardinalité. PackingSolver,
+LAFF, OR-Tools, SCIP et HiGHS repartent comme candidats sans gagnant préchoisi.
 
-Le programme complet et les critères de la gate obligatoire sont dans
-`docs/P64_L08_REAL_3D_SOLVER_BENCHMARK_PROGRAM.md`.
+La sortie attendue est une matrice de fidélité, licence, Windows, hors ligne,
+maintenance et coût de build. Tout candidat qui réduit le 3D à un sol est écarté
+du classement global avant consommation de temps ou de stockage.
 
 ## Lots verrouillés
 

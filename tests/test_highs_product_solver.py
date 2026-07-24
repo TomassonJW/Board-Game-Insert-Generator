@@ -12,14 +12,9 @@ from board_game_insert_generator.highs_product_solver import (
     HIGHS_PRODUCT_EXECUTABLE_SHA256,
     HIGHS_PRODUCT_SOURCE_ASSET_SHA256,
     HIGHS_PRODUCT_VERSION,
-    STATUS_INVALID_RUNTIME,
-    STATUS_SOLUTION_FOUND,
     configure_highs_product_runtime,
 )
-from board_game_insert_generator.minimal_layout_solver import (
-    _plan_rank_axes,
-    solve_minimal_layout,
-)
+from board_game_insert_generator.minimal_layout_solver import solve_minimal_layout
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -105,40 +100,24 @@ class HighsProductSolverTests(unittest.TestCase):
             },
         )
 
-    def test_real_product_lane_wins_after_common_certificate(self) -> None:
+    def test_configured_product_lane_is_quarantined_from_auto(self) -> None:
         case = _case("multi-cavity-normal")
-        baseline = solve_minimal_layout(
-            case["project"],
-            effort_profile=case["solver_settings"]["effort"],
-        )
-
         self._configure_vendor()
-        integrated = solve_minimal_layout(
+
+        result = solve_minimal_layout(
             case["project"],
             effort_profile=case["solver_settings"]["effort"],
         )
 
-        provenance = integrated["minimal_layout"]["search_provenance"]
-        external = provenance["external_lane"]
-        self.assertEqual(external["status"], STATUS_SOLUTION_FOUND)
-        self.assertEqual(external["invocation_count"], 1)
-        self.assertTrue(external["recertification"]["certified"])
-        self.assertTrue(external["selected"])
-        self.assertEqual(
-            provenance["selected"]["candidate_source"],
+        provenance = result["minimal_layout"]["search_provenance"]
+        self.assertNotIn("external_lane", provenance)
+        self.assertNotEqual(
+            provenance["selected"].get("candidate_source"),
             "external_highs",
         )
-        self.assertLess(
-            _plan_rank_axes(integrated),
-            _plan_rank_axes(baseline),
-        )
-        self.assertFalse(integrated["solver"]["deterministic"])
-        self.assertEqual(
-            external["invariants"]["network_invocation_count"],
-            0,
-        )
+        self.assertTrue(result["solver"]["deterministic"])
 
-    def test_deep_profile_invokes_highs_once_and_keeps_provenance(self) -> None:
+    def test_deep_profile_keeps_highs_quarantined_from_auto(self) -> None:
         case = _case("simple-quick")
         self._configure_vendor()
 
@@ -148,18 +127,15 @@ class HighsProductSolverTests(unittest.TestCase):
         )
 
         provenance = result["minimal_layout"]["search_provenance"]
-        self.assertEqual(
-            provenance["external_lane"]["invocation_count"],
-            1,
-        )
-        self.assertTrue(
-            provenance["external_lane"]["recertification"]["certified"]
-        )
+        self.assertNotIn("external_lane", provenance)
         self.assertIn(
             provenance["selected"]["source_phase"],
             {"normal_incumbent", "deep_extension"},
         )
-        self.assertFalse(result["solver"]["deterministic"])
+        self.assertNotEqual(
+            provenance["selected"].get("candidate_source"),
+            "external_highs",
+        )
 
     def test_corrupted_runtime_fails_closed_to_internal_portfolio(self) -> None:
         runtime = Path(self.temporary.name)
@@ -179,14 +155,7 @@ class HighsProductSolverTests(unittest.TestCase):
         )
 
         provenance = result["minimal_layout"]["search_provenance"]
-        self.assertEqual(
-            provenance["external_lane"]["status"],
-            STATUS_INVALID_RUNTIME,
-        )
-        self.assertEqual(
-            provenance["external_lane"]["invocation_count"],
-            0,
-        )
+        self.assertNotIn("external_lane", provenance)
         self.assertNotEqual(
             provenance["selected"]["candidate_source"],
             "external_highs",

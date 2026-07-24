@@ -1336,3 +1336,10 @@ sur les cas limites BGIG, P64-L08 impose un tournoi sur les contraintes 3D
 réelles : empilement, appuis, réservations hautes, accès, variantes P45,
 beaucoup de conteneurs et beaucoup d'éléments. Le score par un seul cas 11×34
 n'est pas une preuve de capacité.
+
+## Addendum 2026-07-24 — P64-L08B, lane de sol quarantinée
+
+La mesure P64-L08B retire HiGHS du parcours Auto : son modèle de sol ne couvre
+pas les cas limites 3D et rallonge les cas rapides lorsqu'il est exécuté. La
+roadmap reprend donc par l'audit des solveurs 3D réellement représentatifs,
+avant toute nouvelle intégration produit.

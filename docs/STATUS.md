@@ -3403,3 +3403,15 @@ Date : 2026-07-24
   le programme L08 impose ensuite un corpus 3D de cas limites et un holdout neuf.
 - **Portée inchangée :** aucune géométrie, tolérance, propriété P45, contrat de
   certificat, finalisation, Fusion ou impression n'a été modifié.
+
+## P64-L08B — lane HiGHS retirée du parcours automatique
+
+Date : 2026-07-24
+
+- **Statut :** `done`, `automated-validated`, `quarantined-from-auto`.
+- **Mesure :** trois répétitions sur sept cas existants ; quand la lane exécute
+  HiGHS, elle ajoute 34 à 53 ms P50 aux cas rapides et reste sans proposition
+  sur les deux cas de variantes.
+- **Décision :** la lane de sol ne part plus dans Auto ni Deep, même si le
+  runtime est configuré. Le portefeuille interne redevient déterministe.
+- **Suite :** P64-L08C, audit des candidats réellement 3D.

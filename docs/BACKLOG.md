@@ -3053,11 +3053,11 @@ implémentée et intégrée à la fois.
 
 ### P64-L08B — mesure et quarantaine de la lane HiGHS
 
-- Statut : ready.
-- But : mesurer, sur les cas BGIG actuels, la latence complète et l'effet sur
-  les résultats de la lane HiGHS ; la retirer du chemin automatique si elle
-  ralentit ou dégrade le solvage sans bénéfice prouvé.
-- Dépendances : P64-L08A terminé.
+- Statut : done, automated-validated, quarantined-from-auto.
+- Preuve : `docs/P64_L08B_HIGHS_QUARANTINE_EVIDENCE.md` ; trois répétitions
+  sur sept cas, avec ralentissement P50 de 34 à 53 ms quand la lane est active
+  sans gain applicable au 3D réel.
+- Décision : HiGHS de sol ne s'exécute plus dans Auto ni Deep.
 
 ### P64-L08C à P64-L08G — tournoi 3D réel
 
