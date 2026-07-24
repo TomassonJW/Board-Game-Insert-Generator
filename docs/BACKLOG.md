@@ -3263,7 +3263,9 @@ implémentée et intégrée à la fois.
 ### P64-L09V — Gate Fusion combinée
 
 - Dépendances : P64-L09B, P64-L09C, P64-F01B et P64-F02B admissible automatisées.
-- Préparer : fixture combinée, réglages, add-in local, marqueurs et checklist unique.
+- Préparé : add-in 0.1.63, trois projets publics distincts, résumé à digest,
+  sauvegarde d’état, réglages Auto/Deep, marqueurs runtime et checklist unique.
 - Observer : anti-chute, pontage valide, plateau réellement traité, compensation
   Z sans atteinte aux cavités et absence de pose implicite par couvercle.
-- Statut : `ready-for-local-gate-preparation`, `print-validated=false`.
+- Preuve : docs/P64_L09V_FUSION_GATE_PREPARATION.md.
+- Statut : `ready-for-human-fusion-gate`, `print-validated=false`.

@@ -3813,3 +3813,17 @@ complète : 853/853 en 224,573 s, un test natif ignoré sous Python 3.10.
 L'harmonisation modulaire reste différée faute de contrats P45/P46.
 fusion-validated=false ; print-validated=false. La prochaine mission unique est
 la préparation locale de P64-L09V.
+
+## P64-L09V — préparation de la gate Fusion combinée
+
+La gate est prepared-local sur l'add-in 0.1.63. Trois projets publics séparent
+le refus anti-chute, le pontage stable et le parcours réservation SCIP puis
+finalisation. Le préflight vérifie les contrats matériels, l'unique réservation
+supérieure, les digests SCIP et les marqueurs du finaliseur. Le préparateur
+préserve l'état documentaire précédent, sélectionne le cas plateau et règle Auto
+intelligent + Approfondi.
+
+La simulation complète passe 74 contrôles ciblés. La suite complète passe
+855/855 en 225 s, avec un test natif ignoré sous Python 3.10. L’installation
+locale réelle est vérifiée avant l’intégration. fusion-validated=false ; print-validated=false. La prochaine
+action est l'observation humaine selon P64_L09_VALIDATION_UNIFIEE.md.

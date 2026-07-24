@@ -1532,3 +1532,14 @@ stricte sous les caps restants.
 La partie modulaire de P64-F02B reste future jusqu'aux contrats P45/P46. La
 prochaine étape est la préparation P64-L09V, puis l'observation humaine combinée
 dans Fusion. Aucun benchmark, holdout ou recalibrage physique n'a été exécuté.
+
+## Mise à jour P64-L09V — préparation 2026-07-24
+
+La gate combinée est préparée sur l'add-in 0.1.63 avec trois cas publics :
+anti-chute négatif, pontage stable et réservation plateau suivie de la fermeture
+finale. Le préparateur installe et vérifie le runtime, conserve l'état local
+précédent et remet à Thomas une checklist unique.
+
+La prochaine étape est exclusivement humaine dans Fusion. Elle peut promouvoir
+les lots L09/F01B/F02B vers fusion-validated dans leur portée observée, mais ne
+vaut jamais validation d'impression et ne débloque pas la modularité P45/P46.

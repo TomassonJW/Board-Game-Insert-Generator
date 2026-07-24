@@ -16,7 +16,7 @@ faire dans Fusion.
 | P64-L09C | automatisé — terminé | réservations supérieures fidèles dans SCIP et preuve native CPython 3.14 |
 | P64-F01B | automatisé — terminé | incumbent, réservations, fermeture, réparation locale et certificat final |
 | P64-F02B admissible | automatisé — terminé | volume ajouté égal, ratio d’expansion égal et fallback certifié |
-| P64-L09V | préparation suivante | gate Fusion combinée |
+| P64-L09V | préparation automatisée — observation humaine suivante | add-in 0.1.63, trois projets publics et checklist combinée |
 
 ## P64-L09B — support matériel
 
@@ -99,24 +99,48 @@ Preuves acquises :
   3.10 ;
 - [x] preuve : P64_F02B_BALANCED_PROPORTIONAL_EVIDENCE.md.
 
-## P64-L09V — observations Fusion à remettre à Thomas
+## P64-L09V — actions restantes dans Fusion
 
-L09B, L09C, F01B et la partie admissible de F02B sont automatisées. La
-préparation locale de cette gate est la prochaine mission unique.
+Préparation automatisée :
 
-Observations prévues :
+- [x] add-in 0.1.63 versionné ;
+- [x] trois projets publics et résumé à digest générés ;
+- [x] préflight anti-chute, pontage, réservation et finalisation ;
+- [x] préparateur local avec sauvegarde de l'état précédent ;
+- [x] réglage Auto intelligent + Approfondi ;
+- [x] vérification des marqueurs installés et du runtime SCIP ;
+- [x] suite complète : 855/855 en 225 s, 1 test natif ignoré sous Python
+  3.10 ;
+- [x] preuve : P64_L09V_FUSION_GATE_PREPARATION.md.
 
-- [ ] le petit conteneur ne peut plus être empilé au-dessus d'une ouverture
-  dans laquelle il tombe ;
-- [ ] un pontage réellement stable reste accepté ;
-- [ ] le projet avec plateau atteint le solveur et ne produit plus le refus
-  `top_inset_reservations_not_supported` ;
-- [ ] l'encastrement du plateau augmente Z sans réduire ni percer les cavités ;
-- [ ] le plan final remplit le volume utile selon l'objectif choisi ;
-- [ ] aucune scène n'est créée depuis un plan partiel ou non certifié ;
-- [ ] `has_lid` seul n'autorise ni support plein ni nouvelle pose ;
-- [ ] temps observé, statut, moteur et diagnostic sont consignés ;
-- [ ] `print-validated=false` reste affiché.
+Thomas, il te restera uniquement ceci après confirmation de l'installation :
+
+1. recharge l'add-in BGIG 0.1.63 et ouvre la palette ;
+2. ouvre le projet `01 anti-fall negative`, lance un seul calcul et vérifie
+   qu'aucun petit conteneur n'est certifié au-dessus d'une ouverture qui peut
+   l'avaler ;
+3. ouvre `02 stable bridge`, lance un seul calcul et vérifie qu'un pontage
+   matériel stable reste accepté ;
+4. ouvre `03 tray finalization`, lance un seul calcul puis la finalisation ;
+   vérifie que SCIP traite la réservation, que l'encastrement augmente Z sans
+   réduire ni percer les cavités, puis matérialise uniquement le plan final ;
+5. confirme que le volume utile est fermé proprement selon le plan final, que
+   `has_lid` seul ne crée ni surface pleine ni nouvelle pose, et que
+   `print-validated=false` reste affiché ;
+6. donne pour chaque cas le statut, le moteur, le temps observé et tout
+   diagnostic visible.
+
+Observations à cocher après ton retour :
+
+- [ ] anti-chute confirmée ;
+- [ ] pontage stable confirmé ;
+- [ ] réservation plateau réellement traitée par SCIP ;
+- [ ] compensation Z sans atteinte aux cavités ;
+- [ ] volume utile fermé par un finalized_plan certifié ;
+- [ ] aucune scène issue d'un plan partiel ou non certifié ;
+- [ ] aucune sémantique implicite de couvercle ;
+- [ ] temps, statut, moteur et diagnostic consignés ;
+- [ ] `print-validated=false` confirmé.
 
 ## Commandes canoniques
 

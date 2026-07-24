@@ -1289,3 +1289,15 @@ Cette gate devra observer anti-chute, pontage stable, traitement SCIP des
 réservations, compensation Z sans atteinte aux cavités, fermeture finale et
 absence de sémantique implicite liée à `has_lid`. Elle ne vaut pas validation
 d'impression ; `print-validated=false` reste obligatoire.
+
+## Gate P64-L09V prête à observer
+
+Le paquet 0.1.63, les trois projets publics et la checklist
+`P64_L09_VALIDATION_UNIFIEE.md` sont préparés. La gate doit rester une
+observation : aucune modification de projet, valeur physique, solveur ou
+périmètre n'est autorisée pendant son exécution.
+
+Les résultats attendus ne sont pas tous « solution trouvée » : le cas anti-chute
+peut honnêtement rester sans solution certifiée si la seule pile possible tombe
+dans une ouverture. Le pontage stable doit rester admissible. Le cas plateau doit
+atteindre SCIP, finaliser avant matérialisation et préserver les cavités.

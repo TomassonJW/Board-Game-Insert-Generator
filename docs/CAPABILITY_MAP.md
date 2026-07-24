@@ -2073,3 +2073,11 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
 - `C-FUSION` : worker natif CPython 3.14 testé hors scène ; observation produit
   combinée différée à P64-L09V.
 - `C-PRINT` : inchangée, `print-validated=false`.
+
+## Mise à jour P64-L09V — préparation Fusion 0.1.63
+
+- `C-FUSION` / `C-FUSION-UI` : paquet 0.1.63 et préparateur combiné
+  automatisés ; observation Fusion restante.
+- `C-PARTITION` : support matériel L09B, réservations SCIP L09C et fermeture
+  F01B/F02B couplés dans les trois cas de gate.
+- Aucune capability d'impression ou de couvercle certifié n'est promue.

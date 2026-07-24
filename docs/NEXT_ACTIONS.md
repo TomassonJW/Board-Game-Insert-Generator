@@ -86,24 +86,25 @@ Rapport final L07 : P64_L07_GOAL_FINAL_REPORT.md.
 
 ## Prochaine action recommandée
 
-### Préparer P64-L09V — gate Fusion combinée
+### Exécuter la gate humaine P64-L09V dans Fusion
 
-Type : préparation locale et checklist humaine ; aucun benchmark, tuning,
-holdout, changement de valeur physique ou ouverture d'un nouveau lot produit.
+Type : observation produit préparée ; aucune modification de code, benchmark,
+tuning, holdout ou nouvelle valeur physique pendant la gate.
 
-Les preuves automatisées P64-L09B, P64-L09C, P64-F01B et la partie admissible
-de P64-F02B sont terminées. La préparation doit maintenant :
+Le paquet local 0.1.63 contient trois projets publics distincts : anti-chute
+négatif, pontage stable et plateau avec finalisation. La checklist canonique est
+`P64_L09_VALIDATION_UNIFIEE.md`.
 
-1. construire une fixture combinée anti-chute, pontage stable, réservation
-   supérieure et fermeture finale ;
-2. préparer les réglages Fusion sans affaiblir les cas privés existants ;
-3. installer et vérifier l'add-in courant ainsi que ses marqueurs locaux ;
-4. fournir à Thomas une seule checklist d'observation dans
-   P64_L09_VALIDATION_UNIFIEE.md ;
-5. conserver explicitement `print-validated=false` ;
-6. intégrer directement dans main après les preuves automatisées de préparation.
+Thomas doit uniquement :
 
-L'intervention humaine ne commence qu'une fois le paquet local vérifié.
+1. recharger l'add-in et ouvrir la palette ;
+2. exécuter une fois chacun des trois cas dans l'ordre indiqué ;
+3. matérialiser uniquement le plan final certifié du cas plateau ;
+4. rendre statut, moteur, temps et diagnostic visibles ;
+5. confirmer les observations sans promouvoir la validation d'impression.
+
+Aucun agent n'est requis pendant l'observation. Après le retour humain, un lot
+documentaire court consignera la gate et déterminera la mission suivante.
 
 ## Lots verrouillés
 
