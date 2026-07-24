@@ -1271,8 +1271,9 @@ Une gate redevient obligatoire avant :
 - toute utilisation de `has_lid` comme certificat ;
 - toute modification d'une valeur physique ou de tolérance.
 
-P64-L09B et P64-L09C sont terminées et automated-validated. Le test natif
-CPython 3.14 de L09C ne vaut pas promotion Fusion produit. P64-F01B puis la
-partie admissible de P64-F02B restent autorisées par le GO déjà donné, sans
-intervention humaine. La prochaine gate est P64-L09V après préparation locale
-complète. `fusion-validated=false` pour L09 ; `print-validated=false`.
+P64-L09B, P64-L09C et P64-F01B sont terminées et automated-validated. Le
+test natif CPython 3.14 de L09C et les preuves hors Fusion de F01B ne valent pas
+promotion Fusion produit. La partie admissible de P64-F02B reste autorisée par
+le GO déjà donné, sans intervention humaine. La prochaine gate est P64-L09V
+après préparation locale complète. `fusion-validated=false` pour L09 ;
+`print-validated=false`.

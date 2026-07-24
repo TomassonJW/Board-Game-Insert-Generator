@@ -1504,3 +1504,18 @@ P64-F01B devient la prochaine mission unique : partir de l'incumbent minimal,
 introduire les réservations avant la fermeture, distribuer le volume résiduel,
 tenter une réparation locale et ne publier qu'un plan globalement recertifié
 sous un budget borné.
+
+
+## Mise à jour P64-F01B — 2026-07-24
+
+P64-F01B est terminée et automatisée. L’incumbent minimal alimente une boucle
+de fermeture bornée qui introduit les réservations avant l’expansion, ne touche
+qu’aux axes admissibles, tente une réparation locale après stagnation puis
+rejoue le certificat produit commun. Un projet réservé ne publie aucune CAD
+depuis le seed minimal. Une fermeture épuisée rend no_solution_within_budget et
+conserve le plan de base sans artefact partiel matérialisable.
+
+La partie admissible de P64-F02B devient la prochaine mission unique : objectifs
+distincts de volume ajouté égal et de ratio d’expansion égal, sous contraintes
+dures inchangées et avec fallback exact. Les trames et l’harmonisation modulaire
+restent différées jusqu’aux contrats P45/P46.

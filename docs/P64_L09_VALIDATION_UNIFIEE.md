@@ -14,7 +14,7 @@ faire dans Fusion.
 | --- | --- | --- |
 | P64-L09B | automatisé — terminé | support réel, chute, pontage, stabilité, parité des voies |
 | P64-L09C | automatisé — terminé | réservations supérieures fidèles dans SCIP et preuve native CPython 3.14 |
-| P64-F01B | à exécuter | fermeture couplée bornée et réparation locale |
+| P64-F01B | automatisé — terminé | incumbent, réservations, fermeture, réparation locale et certificat final |
 | P64-F02B admissible | à exécuter | volume ajouté égal et ratio d'expansion égal |
 | P64-L09V | bloqué par l'implémentation | gate Fusion combinée |
 
@@ -60,20 +60,28 @@ Preuves acquises :
 
 ## P64-F01B — fermeture couplée bornée
 
-À prouver :
+Preuves acquises :
 
-- [ ] le placement minimal SCIP devient l'incumbent initial ;
-- [ ] réservations et futures enveloppes mécaniques sont introduites avant la
-  fermeture ;
-- [ ] seules les faces admissibles reçoivent du volume ;
-- [ ] les cavités et leurs origines certifiées restent fixes ;
-- [ ] toute expansion est revalidée contre collisions, jeux, support matériel
-  et réservations ;
-- [ ] une réparation locale est tentée avant tout nouveau placement global ;
-- [ ] itérations, candidats et temps sont bornés par un budget unique ;
-- [ ] l'épuisement rend `no_solution_within_budget`, jamais un plan partiel
-  matérialisable ;
-- [ ] seul le plan final globalement certifié peut produire la CAD IR.
+- [x] le placement minimal certifié devient l’incumbent initial ;
+- [x] les réservations plateaux/livrets entrent avant toute expansion ; les
+  futures enveloppes mécaniques restent explicitement à zéro ;
+- [x] seules les faces Auto/Target admissibles reçoivent du volume ;
+- [x] les cavités et leurs origines dans le repère minimal certifié restent
+  fixes ;
+- [x] chaque proposition repasse collisions, jeux, support matériel, boîte et
+  réservations ;
+- [x] une réparation locale est tentée après stagnation directe et avant tout
+  nouveau placement global ;
+- [x] itérations, candidats, réparations et temps partagent un budget unique ;
+- [x] l’épuisement rend no_solution_within_budget, avec plan partiel non publié
+  et non matérialisable ;
+- [x] un projet avec réservation ne publie pas son incumbent minimal comme
+  artefact sélectionnable ou witness ;
+- [x] seule la CAD IR du finalized_plan globalement certifié est admise ;
+- [x] tests ciblés : fermeture 3/3, staged 14/14, palette 29/29, DOM 39/39 ;
+- [x] suite complète : 851/851 en 233,473 s, 1 test natif ignoré sous Python
+  3.10 ;
+- [x] preuve : P64_F01B_COUPLED_FINALIZATION_EVIDENCE.md.
 
 ## P64-F02B — partie admissible
 

@@ -3232,20 +3232,27 @@ implémentée et intégrée à la fois.
 
 ### P64-F01B — Boucle bornée de fermeture et réparation
 
-- Dépendances : P64-L09B et P64-L09C.
-- Objectif : prendre l'incumbent SCIP, introduire les réservations, distribuer le
-  résiduel, réparer localement puis recertifier sous un budget unique.
-- Acceptation : cavités inchangées, expansions sur faces admissibles, réparation
-  locale avant solve global, itérations bornées et aucun plan incomplet
-  matérialisable.
-- Statut : ready.
+- Dépendances : P64-L09B et P64-L09C terminées.
+- Livré : incumbent minimal, réservations actives avant expansion, croissance
+  Auto/Target, réparation locale sur faces de boîte/voisins, caps uniques,
+  certificat global et sélection exclusive du plan final lorsque requise.
+- Échec : no_solution_within_budget, incumbent conservé, aucun plan partiel
+  publié ou matérialisable.
+- Preuves : fermeture 3/3, staged 14/14, palette 29/29, DOM 39/39 et suite
+  851/851 ; aucun benchmark ou holdout.
+- Preuve : docs/P64_F01B_COUPLED_FINALIZATION_EVIDENCE.md.
+- Statut : implemented-product, automated-validated, fusion-validated=false,
+  print-validated=false.
 
 ### P64-F02B — Objectifs équilibrés, proportionnels et modulaires
 
-- Dépendance : P64-F01B.
-- Objectif : appliquer des objectifs secondaires distincts sans affaiblir les
-  contraintes dures ni perdre le plan de base certifié.
-- Statut : `planned-after-P64-F01B`.
+- Dépendance : P64-F01B terminée.
+- Partie maintenant admissible : candidats distincts pour équilibrer le volume
+  ajouté puis les ratios d’expansion, déterminisme, budget borné, contraintes
+  dures prioritaires et incumbent certifié préservé sans amélioration stricte.
+- Partie encore différée : trames globales/locales, cellules et harmonisation
+  modulaire, faute de contrats de faces P45/P46.
+- Statut : ready-partial-balanced-and-proportional ; modular-deferred.
 
 ### P64-L09V — Gate Fusion combinée
 

@@ -1,10 +1,10 @@
-"""Explicit minimal layout, optional finishing, and dual materialization.
+"""Explicit minimal layout, bounded finalization, and dual materialization.
 
 The session consumes the versioned L01 dependency state, the L02 local
-frontiers, and the L03R-B minimal solver. A certified ``minimal_layout`` is a
-first-class artifact: it can produce CAD without a finalized plan. Finishing
-remains an optional, separately certified transformation and is never invoked
-implicitly by calculation, local edits, or materialization.
+frontiers, and the L03R-B minimal solver. A certified minimal layout remains
+materializable for projects without coupled reservations. With active top
+reservations it becomes an internal incumbent: explicit bounded finalization
+and its global certificate are required before CAD selection.
 """
 
 from __future__ import annotations
@@ -14,6 +14,14 @@ from dataclasses import dataclass
 import time
 from typing import Callable, Mapping, Sequence
 
+from board_game_insert_generator.coupled_finalization import (
+    COUPLED_FINALIZATION_FAMILY_ID,
+    COUPLED_FINALIZATION_POLICY,
+    COUPLED_FINALIZATION_VERSION,
+    CoupledFinalizationError,
+    coupled_finalization_budget_digest,
+    finalize_coupled_volume,
+)
 from board_game_insert_generator.incremental_project_state import (
     STAGE_FINALIZED_PLAN,
     STAGE_GLOBAL_LAYOUT,
@@ -36,6 +44,7 @@ from board_game_insert_generator.incremental_layout_reuse import (
 from board_game_insert_generator.minimal_layout_solver import MINIMAL_LAYOUT_SOLVER_VERSION
 from board_game_insert_generator.project_v1 import normalize_project_draft
 from board_game_insert_generator.solver_outcome import (
+    NO_SOLUTION_WITHIN_BUDGET,
     SOLUTION_FOUND,
     SOLVER_RESULT_SCHEMA_V1,
     SOLVER_TELEMETRY_SCHEMA_V1,
@@ -126,6 +135,13 @@ class StagedCalculationSession:
         self._finalization_key_digest = ""
         self._finalization_cache_status = "not_queried"
         self._finalization_policy = "not_selected"
+        self._finalization_attempt: dict[str, object] = {
+            "schema_version": "bgig.coupled_finalization.v1",
+            "status": "not_attempted",
+            "stop_reason": "finalization_not_requested",
+            "materializable": False,
+            "partial_plan_published": False,
+        }
         self._cad_status = STATUS_NOT_MATERIALIZED
         self._cad_build_digest = ""
         self._cad_identity: dict[str, object] | None = None
@@ -158,9 +174,7 @@ class StagedCalculationSession:
         self._local_analysis_digest = canonical_digest(
             {
                 "containers": self._local_analysis.get("containers", []),
-                "reactive_global_bounds": self._local_analysis.get(
-                    "reactive_global_bounds", {}
-                ),
+                "reactive_global_bounds": self._local_analysis.get("reactive_global_bounds", {}),
             }
         )
         self._container_frontiers = tuple(container_frontiers)
@@ -171,14 +185,10 @@ class StagedCalculationSession:
             self._local_analysis_digest != previous_local_analysis_digest
             or self._frontier_digests != previous_frontier_digests
         )
-        dependencies_changed = bool(
-            delta.changed or settings_changed or local_dependencies_changed
-        )
+        dependencies_changed = bool(delta.changed or settings_changed or local_dependencies_changed)
         self._local_reuse = empty_local_reuse_report(
             stop_reason=(
-                "dependencies_unchanged"
-                if not dependencies_changed
-                else "no_eligible_local_edit"
+                "dependencies_unchanged" if not dependencies_changed else "no_eligible_local_edit"
             )
         )
         self._global_void_reuse = empty_global_void_reuse_report(
@@ -235,6 +245,7 @@ class StagedCalculationSession:
                 )
                 self._global_status = STATUS_CURRENT
                 self._global_partition = partition
+                self._reset_finalization_attempt("minimal_layout_changed")
                 self._global_artifact_digest = artifact_digest
                 self._global_key_digest = key.digest
                 self._global_cache_status = "local_reuse_not_cached"
@@ -243,9 +254,7 @@ class StagedCalculationSession:
                 self._global_search_elapsed_ms = "not_applicable"
                 self._global_request_elapsed_ms = "not_applicable"
                 self._global_retrieval_elapsed_ms = "not_applicable"
-                self._global_request_id = (
-                    f"local-reuse-revision-{self.state.source_revision}"
-                )
+                self._global_request_id = f"local-reuse-revision-{self.state.source_revision}"
                 self._global_stop_reason = str(
                     reuse.report.get(
                         "stop_reason",
@@ -270,14 +279,12 @@ class StagedCalculationSession:
             and previous_partition is not None
         ):
             try:
-                global_void_reuse = (
-                    attempt_incremental_global_void_container_reuse(
-                        previous_project,
-                        project,
-                        previous_partition,
-                        container_frontiers=self._container_frontiers,
-                        effort_profile=str(self._settings["effort"]),
-                    )
+                global_void_reuse = attempt_incremental_global_void_container_reuse(
+                    previous_project,
+                    project,
+                    previous_partition,
+                    container_frontiers=self._container_frontiers,
+                    effort_profile=str(self._settings["effort"]),
                 )
                 self._global_void_reuse = deepcopy(global_void_reuse.report)
             except (KeyError, TypeError, ValueError) as exc:
@@ -285,15 +292,12 @@ class StagedCalculationSession:
                     status="global_solve_required",
                     stop_reason="global_void_reuse_input_rejected",
                 )
-                self._global_void_reuse["rejection_codes"] = [
-                    type(exc).__name__
-                ]
+                self._global_void_reuse["rejection_codes"] = [type(exc).__name__]
                 global_void_reuse = None
 
             if (
                 global_void_reuse is not None
-                and global_void_reuse.report.get("status")
-                == STATUS_GLOBAL_VOID_CONTAINER_PLACED
+                and global_void_reuse.report.get("status") == STATUS_GLOBAL_VOID_CONTAINER_PLACED
                 and global_void_reuse.partition is not None
             ):
                 key = self._global_layout_key()
@@ -314,6 +318,7 @@ class StagedCalculationSession:
                 )
                 self._global_status = STATUS_CURRENT
                 self._global_partition = partition
+                self._reset_finalization_attempt("minimal_layout_changed")
                 self._global_artifact_digest = artifact_digest
                 self._global_key_digest = key.digest
                 self._global_cache_status = "global_void_reuse_not_cached"
@@ -322,9 +327,7 @@ class StagedCalculationSession:
                 self._global_search_elapsed_ms = "not_applicable"
                 self._global_request_elapsed_ms = "not_applicable"
                 self._global_retrieval_elapsed_ms = "not_applicable"
-                self._global_request_id = (
-                    f"global-void-reuse-revision-{self.state.source_revision}"
-                )
+                self._global_request_id = f"global-void-reuse-revision-{self.state.source_revision}"
                 self._global_stop_reason = str(
                     global_void_reuse.report.get(
                         "stop_reason",
@@ -410,9 +413,7 @@ class StagedCalculationSession:
                     "effort_profile": self._settings["effort"],
                 }
                 if initial_incumbent is not None:
-                    solver_kwargs["initial_incumbent"] = deepcopy(
-                        dict(initial_incumbent)
-                    )
+                    solver_kwargs["initial_incumbent"] = deepcopy(dict(initial_incumbent))
                 partition = solver(self._project, **solver_kwargs)
             artifact_digest = canonical_digest(
                 {
@@ -462,6 +463,7 @@ class StagedCalculationSession:
         self.state.mark_lifecycle_current(STAGE_GLOBAL_LAYOUT, artifact_digest)
         self._global_status = STATUS_CURRENT
         self._global_partition = deepcopy(partition)
+        self._reset_finalization_attempt("minimal_layout_changed")
         self._global_artifact_digest = artifact_digest
         self._global_key_digest = key.digest
         self._global_cache_status = lookup.status
@@ -477,9 +479,7 @@ class StagedCalculationSession:
         else:
             self._finalized_status = STATUS_NOT_FINALIZED
         self._cad_status = (
-            STATUS_DESYNCHRONIZED
-            if self._cad_identity is not None
-            else STATUS_NOT_MATERIALIZED
+            STATUS_DESYNCHRONIZED if self._cad_identity is not None else STATUS_NOT_MATERIALIZED
         )
         return {
             "partition": deepcopy(partition),
@@ -501,22 +501,30 @@ class StagedCalculationSession:
         finalizer_version: str = "",
         certify: FinalCertificateCallable | None = None,
     ) -> dict[str, object]:
-        """Create a distinct finalized artifact through an explicit policy.
-
-        L03R-C deliberately ships no finishing transformation. Callers must
-        provide one; a missing or rejected transformation leaves the current
-        minimal layout untouched and materializable.
-        """
+        """Create a distinct final artifact through one explicit bounded run."""
 
         if not self._minimal_current():
             raise StagedCalculationError(
                 "Calcule un agencement minimal courant avant de choisir une finition."
             )
+        uses_default_finalizer = finalizer is None
         if finalizer is None:
-            raise StagedCalculationError(
-                "Aucune methode de finition n est encore disponible dans ce lot ; "
-                "les volumes minimaux restent materialisables."
+            finishing_policy = COUPLED_FINALIZATION_POLICY
+            finishing_budget_digest = coupled_finalization_budget_digest(
+                str(self._settings["effort"])
             )
+            finalizer_id = COUPLED_FINALIZATION_FAMILY_ID
+            finalizer_version = COUPLED_FINALIZATION_VERSION
+
+            def finalizer(plan: dict[str, object]) -> dict[str, object]:
+                return finalize_coupled_volume(
+                    self._project,
+                    plan,
+                    source_minimal_artifact_digest=(self._global_artifact_digest),
+                    effort_profile=str(self._settings["effort"]),
+                    container_frontiers=self._container_frontiers,
+                )
+
         if not all(
             isinstance(value, str) and value.strip()
             for value in (
@@ -530,23 +538,6 @@ class StagedCalculationSession:
                 "La politique, le budget et la version du finaliseur doivent etre explicites."
             )
 
-        candidate = finalizer(deepcopy(self._global_partition))
-        if not isinstance(candidate, dict):
-            raise StagedCalculationError(
-                "La methode de finition n a pas produit un plan exploitable."
-            )
-        validator = certify or (
-            lambda value: _finalized_certified(
-                value,
-                source_minimal_artifact_digest=self._global_artifact_digest,
-            )
-        )
-        if not validator(candidate):
-            self._global_stop_reason = "finalization_certificate_rejected"
-            raise StagedCalculationError(
-                "La finalisation a ete rejetee ; le plan minimal courant est conserve."
-            )
-
         key = FinalizationKey(
             global_layout_digest=self._global_artifact_digest,
             finishing_policy=finishing_policy,
@@ -555,19 +546,58 @@ class StagedCalculationSession:
             finalizer_version=finalizer_version,
         )
         lookup = self.cache.lookup(key)
+        validator = certify or (
+            lambda value: _finalized_certified(
+                value,
+                source_minimal_artifact_digest=self._global_artifact_digest,
+            )
+        )
         if lookup.status == "hit":
             if not isinstance(lookup.value, dict):
                 raise TypeError("Cached finalized plan has an unexpected type.")
             finalized = deepcopy(lookup.value)
             artifact_digest = lookup.artifact_digest or ""
+            if not validator(finalized):
+                raise StagedCalculationError(
+                    "Le plan finalise en cache ne porte plus un certificat valide."
+                )
         else:
+            try:
+                candidate = finalizer(deepcopy(self._global_partition))
+            except CoupledFinalizationError as exc:
+                self._global_stop_reason = str(
+                    exc.report.get(
+                        "stop_reason",
+                        "coupled_finalization_rejected",
+                    )
+                )
+                if not uses_default_finalizer:
+                    raise
+                self._finalization_attempt = {
+                    **deepcopy(exc.report),
+                    "source_minimal_artifact_digest": (self._global_artifact_digest),
+                }
+                return {
+                    "partition": None,
+                    "solver_result": _finalization_solver_result(exc.report),
+                    "staged_calculation": self.snapshot(),
+                }
+            if not isinstance(candidate, dict):
+                raise StagedCalculationError(
+                    "La methode de finition n a pas produit un plan exploitable."
+                )
+            if not validator(candidate):
+                self._global_stop_reason = "finalization_certificate_rejected"
+                raise StagedCalculationError(
+                    "La finalisation a ete rejetee ; le plan minimal courant est conserve."
+                )
             finalized = deepcopy(candidate)
             artifact_digest = canonical_digest(
                 {
                     "schema_version": FINALIZED_PLAN_ARTIFACT_SCHEMA_V1,
                     "artifact_kind": ARTIFACT_KIND_FINALIZED,
                     "finalization_key_digest": key.digest,
-                    "source_minimal_artifact_digest": self._global_artifact_digest,
+                    "source_minimal_artifact_digest": (self._global_artifact_digest),
                     "partition_plan_digest": finalized.get("plan_digest"),
                     "partition": finalized,
                 }
@@ -581,6 +611,27 @@ class StagedCalculationSession:
         self._finalization_key_digest = key.digest
         self._finalization_cache_status = lookup.status
         self._finalization_policy = finishing_policy
+        finalization = _mapping(finalized.get("finalization", {}))
+        self._finalization_attempt = {
+            "schema_version": str(
+                finalization.get(
+                    "schema_version",
+                    "bgig.coupled_finalization.v1",
+                )
+            ),
+            "status": SOLUTION_FOUND,
+            "stop_reason": "global_finalization_certified",
+            "materializable": True,
+            "partial_plan_published": False,
+            "source_minimal_artifact_digest": self._global_artifact_digest,
+            "closure_status": finalization.get("closure_status", "not_reported"),
+            "iterations": finalization.get("iterations", 0),
+            "repair_attempts": finalization.get("repair_attempts", 0),
+            "repairs_applied": finalization.get("repairs_applied", 0),
+            "global_resolve_invocation_count": finalization.get(
+                "global_resolve_invocation_count", 0
+            ),
+        }
         return {
             "partition": deepcopy(finalized),
             "solver_result": _partition_solver_result(finalized),
@@ -602,14 +653,16 @@ class StagedCalculationSession:
                 raise StagedCalculationError(
                     "Calcule un agencement minimal certifie avant de le materialiser."
                 )
+            if self._coupled_finalization_required():
+                raise StagedCalculationError(
+                    "Les reservations actives exigent un plan finalise certifie "
+                    "avant toute materialisation."
+                )
             partition = self._global_partition
             artifact_digest = self._global_artifact_digest
         else:
             if not self._finalized_current():
-                raise StagedCalculationError(
-                    "Aucun plan finalise courant n est disponible ; "
-                    "le plan minimal peut rester materialisable."
-                )
+                raise StagedCalculationError("Aucun plan finalise courant n est disponible.")
             partition = self._finalized_partition
             artifact_digest = self._finalized_artifact_digest
         if partition is None:
@@ -668,6 +721,9 @@ class StagedCalculationSession:
 
         minimal_current = self._minimal_current()
         finalized_current = self._finalized_current()
+        coupled_required = self._coupled_finalization_required()
+        finalization_pending = bool(minimal_current and coupled_required and not finalized_current)
+        minimal_materializable = bool(minimal_current and not coupled_required)
         minimal_payload = {
             "status": self._global_status,
             "artifact_kind": ARTIFACT_KIND_MINIMAL,
@@ -693,8 +749,9 @@ class StagedCalculationSession:
                 else ""
             ),
             "source_revision": self.state.source_revision,
-            "materializable_without_finalization": minimal_current,
-            "finalization_required": False,
+            "materializable_without_finalization": minimal_materializable,
+            "finalization_required": finalization_pending,
+            "coupled_finalization_constraint_active": coupled_required,
         }
         finalized_payload = {
             "status": self._finalized_status,
@@ -713,10 +770,18 @@ class StagedCalculationSession:
             ),
             "source_revision": self.state.source_revision,
             "materializable": finalized_current,
+            "last_attempt": deepcopy(self._finalization_attempt),
         }
         next_action = "calculate_layout"
-        if minimal_current:
-            if not self._cad_identity_matches_artifact(ARTIFACT_KIND_MINIMAL):
+        if finalized_current:
+            if not self._cad_identity_matches_artifact(ARTIFACT_KIND_FINALIZED):
+                next_action = "materialize_finalized_in_fusion"
+            else:
+                next_action = "export_or_edit_project"
+        elif minimal_current:
+            if coupled_required:
+                next_action = "finalize_volume"
+            elif not self._cad_identity_matches_artifact(ARTIFACT_KIND_MINIMAL):
                 next_action = "materialize_minimal_in_fusion"
             else:
                 next_action = "choose_optional_finishing_or_export"
@@ -726,7 +791,7 @@ class StagedCalculationSession:
             "local_analysis_digest": self._local_analysis_digest,
             "local_reuse": deepcopy(self._local_reuse),
             "global_void_reuse": deepcopy(self._global_void_reuse),
-            # ``global_layout`` remains as an additive compatibility alias.
+            # global_layout remains as an additive compatibility alias.
             "global_layout": deepcopy(minimal_payload),
             "minimal_layout": minimal_payload,
             "finalized_plan": finalized_payload,
@@ -737,7 +802,7 @@ class StagedCalculationSession:
                 "fusion_observed": False,
             },
             "available_artifacts": {
-                ARTIFACT_KIND_MINIMAL: minimal_current,
+                ARTIFACT_KIND_MINIMAL: minimal_materializable,
                 ARTIFACT_KIND_FINALIZED: finalized_current,
             },
             "next_action": next_action,
@@ -746,8 +811,8 @@ class StagedCalculationSession:
                 "global_solve_is_explicit": True,
                 "global_solve_uses_minimal_layout_portfolio": True,
                 "finalization_is_explicit": True,
-                "finalization_is_optional": True,
-                "minimal_materialization_requires_finalized_plan": False,
+                "finalization_is_optional": not coupled_required,
+                "minimal_materialization_requires_finalized_plan": coupled_required,
                 "artifact_selection_is_explicit": True,
                 "automatic_body_count_added_by_orchestrator": 0,
                 "solver_method_or_budget_changed": False,
@@ -759,7 +824,11 @@ class StagedCalculationSession:
     def current_minimal_partition(self) -> dict[str, object] | None:
         """Return the current certified minimal plan without computing it."""
 
-        return deepcopy(self._global_partition) if self._minimal_current() else None
+        return (
+            deepcopy(self._global_partition)
+            if self._minimal_current() and not self._coupled_finalization_required()
+            else None
+        )
 
     def solver_case_snapshot(self) -> dict[str, object]:
         """Expose observed staged facts without running any domain operation."""
@@ -776,6 +845,10 @@ class StagedCalculationSession:
                 "fusion_materialization_invocation_count": 0,
             },
         }
+
+    def _coupled_finalization_required(self) -> bool:
+        flat_items = self._project.get("flat_items", [])
+        return bool(_mappings(flat_items))
 
     def _minimal_current(self) -> bool:
         return bool(
@@ -811,8 +884,18 @@ class StagedCalculationSession:
             )
         ) and bool(self._cad_identity.get("cad_ir_digest"))
 
+    def _reset_finalization_attempt(self, stop_reason: str) -> None:
+        self._finalization_attempt = {
+            "schema_version": "bgig.coupled_finalization.v1",
+            "status": "not_attempted",
+            "stop_reason": stop_reason,
+            "materializable": False,
+            "partial_plan_published": False,
+        }
+
     def _invalidate_downstream(self) -> None:
         self._active_global_request = None
+        self._reset_finalization_attempt("dependencies_changed")
         if self._global_partition is not None:
             self._global_status = STATUS_STALE
         if self._finalized_partition is not None:
@@ -844,9 +927,7 @@ class StagedCalculationSession:
             effort_profile=self._settings["effort"],
             ranking_digest=canonical_digest(
                 {
-                    "solver_preference": self._project.get(
-                        "solver_preference", "balanced"
-                    ),
+                    "solver_preference": self._project.get("solver_preference", "balanced"),
                     "project_solver_input_digest": canonical_digest(self._project),
                 }
             ),
@@ -892,10 +973,14 @@ def _partition_warm_start(
     minimal = _mapping(partition.get("minimal_layout", {}))
     provenance = _mapping(minimal.get("search_provenance", {}))
     warm_start = provenance.get("warm_start")
-    return deepcopy(dict(warm_start)) if isinstance(warm_start, Mapping) else {
-        "status": "not_available",
-        "stop_reason": "warm_start_not_reported",
-    }
+    return (
+        deepcopy(dict(warm_start))
+        if isinstance(warm_start, Mapping)
+        else {
+            "status": "not_available",
+            "stop_reason": "warm_start_not_reported",
+        }
+    )
 
 
 def _minimal_placement_certified(partition: dict[str, object]) -> bool:
@@ -930,8 +1015,7 @@ def _finalized_certified(
         and summary.get("status") == "constructed"
         and summary.get("materializable") is True
         and finalization.get("artifact_kind") == ARTIFACT_KIND_FINALIZED
-        and finalization.get("source_minimal_artifact_digest")
-        == source_minimal_artifact_digest
+        and finalization.get("source_minimal_artifact_digest") == source_minimal_artifact_digest
         and certificate.get("certified") is True
     )
 
@@ -954,11 +1038,7 @@ def _partition_solver_result(
         artifact_request = deepcopy(telemetry.get("request"))
         current_request = {
             "id": request_id,
-            "revision": (
-                request_revision
-                if request_revision is not None
-                else "not_applicable"
-            ),
+            "revision": (request_revision if request_revision is not None else "not_applicable"),
         }
         if artifact_request != current_request:
             telemetry["artifact_request"] = artifact_request
@@ -979,6 +1059,50 @@ def _solver_stop_reason(partition: dict[str, object]) -> str:
     return str(telemetry.get("stop_reason", "not_available"))
 
 
+def _finalization_solver_result(
+    report: Mapping[str, object],
+) -> dict[str, object]:
+    status = str(report.get("status", NO_SOLUTION_WITHIN_BUDGET))
+    if status != NO_SOLUTION_WITHIN_BUDGET:
+        status = NO_SOLUTION_WITHIN_BUDGET
+    counters = {
+        key: value
+        for key, value in report.items()
+        if key
+        in {
+            "iterations",
+            "candidates_evaluated",
+            "repair_attempts",
+            "repairs_applied",
+            "global_resolve_invocation_count",
+        }
+        and isinstance(value, int)
+        and not isinstance(value, bool)
+    }
+    return {
+        "schema_version": SOLVER_RESULT_SCHEMA_V1,
+        "status": status,
+        "label": result_label(status),
+        "legacy_summary_status": "not_constructed",
+        "proof": None,
+        "materializable": False,
+        "telemetry": {
+            "schema_version": SOLVER_TELEMETRY_SCHEMA_V1,
+            "family": {
+                "id": COUPLED_FINALIZATION_FAMILY_ID,
+                "version": COUPLED_FINALIZATION_VERSION,
+            },
+            "request": {"id": "not_applicable", "revision": "not_applicable"},
+            "elapsed_ms": "not_applicable",
+            "budgets": {},
+            "counters": counters,
+            "prunes": {},
+            "diagnostic_code_counts": {str(code): 1 for code in report.get("rejection_codes", [])},
+            "stop_reason": str(report.get("stop_reason", "coupled_finalization_rejected")),
+        },
+    }
+
+
 def _stale_solver_result(
     request_id: str,
     request_revision: int | None,
@@ -997,9 +1121,7 @@ def _stale_solver_result(
             "request": {
                 "id": request_id,
                 "revision": (
-                    request_revision
-                    if request_revision is not None
-                    else "not_applicable"
+                    request_revision if request_revision is not None else "not_applicable"
                 ),
             },
             "elapsed_ms": "not_applicable",

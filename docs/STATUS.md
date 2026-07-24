@@ -3766,3 +3766,33 @@ Statut : `implemented-product`, `automated-validated`.
 
 La prochaine mission unique est P64-F01B, boucle bornée de fermeture et
 réparation locale.
+
+
+## P64-F01B — fermeture couplée bornée et réparation locale
+
+Statut : implemented-product, automated-validated.
+
+- Le plan minimal certifié est repris comme incumbent, sans corps ajouté.
+- Les réservations supérieures et variantes internes sélectionnées sont
+  restaurées avant la fermeture.
+- Les axes Auto/Target absorbent le résiduel ; les axes Fixe restent inchangés.
+- Une stagnation directe ouvre une recherche locale bornée sur les faces de
+  boîte et de voisins, puis exige une réduction stricte du résiduel.
+- Géométrie, jeux, support matériel et réservations sont revalidés après chaque
+  proposition ; le plan fermé repasse dans le certificat produit commun.
+- Les projets avec réservations ne peuvent ni sélectionner, ni matérialiser, ni
+  persister comme witness leur incumbent minimal.
+- Un échec rend no_solution_within_budget avec partial_plan_published=false et
+  materializable=false ; aucun faux impossible et aucune CAD partielle.
+- La palette active Finaliser le volume puis sélectionne l’identité exacte du
+  finalized_plan pour matérialiser ou régénérer la scène.
+- Tests ciblés : fermeture 3/3, staged 14/14, palette 29/29 et DOM 39/39.
+- Suite complète : 851/851 en 233,473 s, avec 1 test natif ignoré sous Python
+  3.10.
+- Aucun benchmark, holdout, runtime, tolérance, valeur physique, pose ou
+  sémantique de couvercle modifié.
+- Preuve : docs/P64_F01B_COUPLED_FINALIZATION_EVIDENCE.md.
+- Fusion non observée ; fusion-validated=false, print-validated=false.
+
+La prochaine mission unique est la partie équilibrée et proportionnelle de
+P64-F02B. L’harmonisation modulaire reste différée.

@@ -102,6 +102,59 @@ class Free3DContinuousClosureTests(unittest.TestCase):
         self.assertEqual(by_id["auto"].world_size_mm[0], 80.0)
         self.assertGreater(result.aligned_face_count, 0)
 
+    def test_local_repair_moves_one_incumbent_before_growth_closes_volume(self) -> None:
+        participants = (
+            _participant("fixed", (20.0, 40.0, 20.0), x_mode="fixed"),
+            _participant("auto", (20.0, 40.0, 20.0)),
+        )
+        placements = (
+            Free3DPlacement(
+                "auto",
+                "container",
+                "auto",
+                (0.0, 0.0, 0.0),
+                (20.0, 40.0, 20.0),
+                (20.0, 40.0, 20.0),
+                0,
+                ("box-floor",),
+                1.0,
+            ),
+            Free3DPlacement(
+                "fixed",
+                "container",
+                "fixed",
+                (40.0, 0.0, 0.0),
+                (20.0, 40.0, 20.0),
+                (20.0, 40.0, 20.0),
+                0,
+                ("box-floor",),
+                1.0,
+            ),
+        )
+
+        result = close_free_3d_residual(
+            participants,
+            placements,
+            {"x": 100.0, "y": 40.0, "z": 20.0},
+            20.0,
+            0.0,
+            box_perimeter_xy_mm=0.0,
+            between_bodies_z_mm=0.0,
+            budget=_budget(),
+        )
+
+        self.assertEqual(result.status, "closed")
+        self.assertFalse(result.empty_spaces)
+        self.assertGreaterEqual(result.repair_attempts, 1)
+        self.assertGreaterEqual(result.repairs_applied, 1)
+        self.assertEqual(result.global_resolve_invocation_count, 0)
+        self.assertFalse(result.deadline_reached)
+        self.assertTrue(result.incumbent_digest)
+        by_id = {value.participant_id: value for value in result.placements}
+        self.assertEqual(by_id["fixed"].origin_mm[0], 80.0)
+        self.assertEqual(by_id["fixed"].world_size_mm[0], 20.0)
+        self.assertEqual(by_id["auto"].world_size_mm[0], 80.0)
+
     def test_top_inset_constraint_routes_incompatible_tall_body_outside_footprint(self) -> None:
         participants = (
             _participant("tall", (50.0, 60.0, 35.0)),

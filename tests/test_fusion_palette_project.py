@@ -504,6 +504,70 @@ class FusionPaletteProjectTests(unittest.TestCase):
             generated["cad_build"]["cad_ir"]["metadata"]["artifact_identity"],
         )
 
+    def test_finalize_then_materialize_uses_exact_finalized_artifact(self) -> None:
+        project = blank_project_v1()
+        project["container_groups"] = [
+            {
+                "id": "g",
+                "name": "Bac",
+                "wall_thickness_mm": None,
+                "floor_thickness_mm": None,
+            }
+        ]
+        project["contents"] = [
+            {
+                "id": "c",
+                "name": "Pieces",
+                "shape_kind": "square",
+                "dimensions_mm": {"x": 12, "y": 12, "z": 3},
+                "quantity": 2,
+                "container_group_id": "g",
+                "content_clearance_mm": None,
+                "measurement_confidence": "exact",
+            }
+        ]
+        with tempfile.TemporaryDirectory() as temp_dir, patch.dict(
+            "os.environ", {"BGIG_USER_DATA_DIR": temp_dir}
+        ):
+            handle_palette_request(
+                request("solve_project", project=project), ADDIN, ROOT
+            )
+            finalized = handle_palette_request(
+                request("finalize_project", project=project), ADDIN, ROOT
+            )
+            materialized = handle_palette_request(
+                request(
+                    "materialize_project",
+                    project=project,
+                    artifact_kind="finalized_plan",
+                ),
+                ADDIN,
+                ROOT,
+            )
+
+        self.assertEqual(finalized["status"], "ready")
+        self.assertEqual(
+            finalized["staged_calculation"]["finalized_plan"]["status"],
+            "current",
+        )
+        self.assertEqual(finalized["result_view"]["artifact_kind"], "finalized_plan")
+        self.assertTrue(
+            finalized["result_view"]["invariants"][
+                "coupled_finalization_globally_certified"
+            ]
+        )
+        self.assertEqual(materialized["cad_build"]["status"], "ready_for_fusion")
+        self.assertEqual(
+            materialized["cad_build"]["artifact_identity"]["artifact_kind"],
+            "finalized_plan",
+        )
+        self.assertEqual(
+            materialized["partition"]["finalization"][
+                "global_resolve_invocation_count"
+            ],
+            0,
+        )
+
     def test_materialization_is_rejected_without_an_explicit_minimal_calculation(self) -> None:
         project = blank_project_v1()
         project["container_groups"] = [{"id": "g", "name": "Bac", "wall_thickness_mm": None, "floor_thickness_mm": None}]
@@ -569,7 +633,18 @@ class FusionPaletteProjectTests(unittest.TestCase):
         self.assertTrue(response["result_view"]["materializable"])
         self.assertFalse(response["partition"]["invariants"]["residual_distributed"])
         self.assertEqual(response["partition"]["residuals"]["status"], "unassigned")
-        self.assertEqual(finalized["status"], "invalid")
+        self.assertEqual(finalized["status"], "ready")
+        self.assertIsNone(finalized["partition"])
+        self.assertEqual(
+            finalized["solver_result"]["status"],
+            "no_solution_within_budget",
+        )
+        attempt = finalized["staged_calculation"]["finalized_plan"][
+            "last_attempt"
+        ]
+        self.assertEqual(attempt["status"], "no_solution_within_budget")
+        self.assertFalse(attempt["partial_plan_published"])
+        self.assertFalse(attempt["materializable"])
         self.assertEqual(materialized["cad_build"]["status"], "ready_for_fusion")
 
     def test_bridge_quarantines_complement_presets_without_changing_the_response_schema(self) -> None:

@@ -127,9 +127,14 @@ preuves archivées.
   fonds et cavités par rotation. Le contrôle natif CPython 3.14 trouve un corps
   porteur au sommet en une invocation. Les formes non représentables restent
   fail-closed ; benchmark et holdout non exécutés.
-- La prochaine mission unique est P64-F01B : boucle bornée depuis l'incumbent
-  minimal, introduction des réservations, expansion, réparation locale et
-  certificat global avant matérialisation.
+- P64-F01B est implemented-product et automated-validated : l’incumbent minimal
+  alimente une fermeture bornée, les réservations précèdent l’expansion, une
+  réparation locale précède tout solve global et seul le plan final recertifié
+  devient matérialisable. Un échec rend no_solution_within_budget sans plan
+  partiel. Suite complète : 851/851.
+- La prochaine mission unique est la partie admissible de P64-F02B : objectifs
+  distincts de volume ajouté égal et de ratio d’expansion égal. La modularité
+  reste différée.
 
 ## Vue de séquence
 
@@ -200,7 +205,8 @@ preuves archivées.
 | Terminée — architecture | P64-L09A | ADR-0087 : matière porteuse, réservations SCIP et fermeture couplée bornée. |
 | Terminée — automatisée | P64-L09B | Chute interdite ; rebords, faces pleines et pontage stable certifiés sur matière réelle. |
 | Terminée — automatisée | P64-L09C | Réservations exactes dans SCIP, fonds et cavités protégés, preuve native CPython 3.14. |
-| Prochaine — fermeture couplée | P64-F01B | Incumbent, réservations, expansion, réparation locale et certificat global borné. |
+| Terminée — automatisée | P64-F01B | Fermeture bornée, réparation locale, échec honnête et certificat final avant CAD. |
+| Prochaine — objectifs secondaires | P64-F02B admissible | Volume ajouté égal puis ratio d’expansion égal ; modularité différée. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -216,6 +222,8 @@ preuves archivées.
 - P64_L01_INCREMENTAL_STATE_EVIDENCE.md : identités, cache et invalidation.
 - P64_L02_CONTEXTUAL_LOCAL_ANALYSIS_EVIDENCE.md : annotations, scores, Pareto,
   résumé progressif et absence de solve global.
+- P64_F01B_COUPLED_FINALIZATION_EVIDENCE.md : fermeture, réparation, budget,
+  certificat final et non-publication des plans partiels.
 - P64_L09A_MATERIAL_SUPPORT_AND_COUPLED_FINALIZATION_CONTRACT.md : matière
   porteuse, anti-chute, réservations SCIP, boucle bornée et lots L09/F01B/F02B.
 - P64_L09B_MATERIAL_SUPPORT_EVIDENCE.md : surfaces porteuses, chute, pontage,

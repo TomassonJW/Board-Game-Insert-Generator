@@ -9,6 +9,7 @@ adds a body, moves a cavity, changes a fixed axis or alters physical defaults.
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
+from time import perf_counter
 from typing import Iterable, Mapping
 
 from board_game_insert_generator.free_3d_greedy_solver import (
@@ -37,7 +38,7 @@ from board_game_insert_generator.solver_contract import (
 )
 
 
-FREE_3D_CONTINUOUS_CLOSURE_VERSION = "bgig.free_3d_continuous_closure.v1"
+FREE_3D_CONTINUOUS_CLOSURE_VERSION = "bgig.free_3d_continuous_closure.v2"
 _EPSILON = 0.0001
 _AXES = ("x", "y", "z")
 
@@ -54,6 +55,11 @@ class Free3DClosureResult:
     initial_residual_metric: tuple[float, float, int]
     final_residual_metric: tuple[float, float, int]
     aligned_face_count: int
+    repair_attempts: int
+    repairs_applied: int
+    global_resolve_invocation_count: int
+    deadline_reached: bool
+    incumbent_digest: str
     deterministic_digest: str
 
 
@@ -69,6 +75,7 @@ class _GrowthCandidate:
     residual_metric: tuple[float, float, int]
     aligned_faces: int
     relative_growth: float
+    repair_placement_id: str | None = None
 
 
 def close_free_3d_residual(
@@ -84,8 +91,9 @@ def close_free_3d_residual(
     forbidden_spaces: Iterable[EmptySpace] = (),
     top_inset_zones: Iterable[TopInsetZone] = (),
 ) -> Free3DClosureResult:
-    """Expand feasible requested bodies until no printable EMS remains."""
+    """Close printable residuals with bounded growth then local repair."""
 
+    started = perf_counter()
     values = tuple(dict(value) for value in participants)
     participants_by_id = {str(value["id"]): value for value in values}
     current = tuple(sorted(placements, key=lambda value: value.participant_id))
@@ -111,101 +119,81 @@ def close_free_3d_residual(
         forbidden,
     )
     initial_metric = _residual_metric(spaces)
-    max_iterations = max(12, min(256, len(current) * 8))
-    placement_limit = int(dict(budget.limits).get("max_placement_trials", 20_000))
-    max_candidates = max(1_000, min(500_000, placement_limit // 2))
+    incumbent_digest = _digest(
+        {
+            "placements": [value.__dict__ for value in current],
+            "top_inset_zones": [value.__dict__ for value in inset_zones],
+        }
+    )
+    limits = dict(budget.limits)
+    default_iterations = max(12, min(256, len(current) * 8))
+    max_iterations = max(1, int(limits.get("max_closure_iterations", default_iterations)))
+    placement_limit = int(limits.get("max_placement_trials", 20_000))
+    max_candidates = max(
+        1, int(limits.get("max_closure_candidates", max(1_000, min(500_000, placement_limit // 2))))
+    )
+    max_repairs = max(0, int(limits.get("max_local_repairs", min(256, max(16, len(current) * 8)))))
+    max_elapsed_ms = max(
+        1, int(limits.get("max_closure_elapsed_ms", limits.get("max_elapsed_ms", 30_000)))
+    )
+    deadline = started + max_elapsed_ms / 1000.0
     candidates_evaluated = 0
+    repair_attempts = 0
+    repairs_applied = 0
     iterations = 0
+    deadline_reached = False
     status = "already_closed" if not spaces else "stalled"
+    visited = {_placement_signature(current)}
 
     while spaces and iterations < max_iterations and candidates_evaluated < max_candidates:
-        candidates: list[_GrowthCandidate] = []
-        for placement_index, placement in enumerate(current):
-            participant = participants_by_id[placement.participant_id]
-            for axis_index in range(3):
-                if not _world_axis_is_expandable(
-                    participant,
-                    placement.rotation_deg_z,
-                    axis_index,
-                ):
-                    continue
-                for direction in (-1, 1):
-                    if candidates_evaluated >= max_candidates:
-                        break
-                    boundary = _maximal_growth_boundary(
-                        placement,
-                        axis_index,
-                        direction,
-                        current,
-                        forbidden,
-                        dimensions,
-                        box_clearance,
-                        xy_clearance,
-                        z_clearance,
-                    )
-                    origin = placement.origin_mm[axis_index]
-                    upper = origin + placement.world_size_mm[axis_index]
-                    if (
-                        direction > 0
-                        and boundary <= upper + _EPSILON
-                        or direction < 0
-                        and boundary >= origin - _EPSILON
-                    ):
-                        continue
-                    grown = _grow_placement(
-                        placement,
-                        axis_index,
-                        direction,
-                        boundary,
-                    )
-                    candidates_evaluated += 1
-                    candidate_values = list(current)
-                    candidate_values[placement_index] = grown
-                    candidate_tuple = tuple(candidate_values)
-                    if not _valid_geometry(
-                        candidate_tuple,
-                        placement_index,
-                        participants_by_id,
-                        dimensions,
-                        box_clearance,
-                        xy_clearance,
-                        z_clearance,
-                        forbidden,
-                        inset_zones,
-                    ):
-                        continue
-                    candidate_spaces = tuple(
-                        _empty_spaces_for(
-                            candidate_tuple,
-                            dimensions,
-                            box_clearance,
-                            xy_clearance,
-                            z_clearance,
-                            forbidden,
-                        )
-                    )
-                    metric = _residual_metric(candidate_spaces)
-                    if metric >= _residual_metric(spaces):
-                        continue
-                    candidates.append(
-                        _GrowthCandidate(
-                            placement_index=placement_index,
-                            axis_index=axis_index,
-                            direction=direction,
-                            boundary_mm=_round(boundary),
-                            placement=grown,
-                            placements=candidate_tuple,
-                            spaces=candidate_spaces,
-                            residual_metric=metric,
-                            aligned_faces=_aligned_faces(candidate_tuple, dimensions, box_clearance),
-                            relative_growth=_relative_growth(placement, grown),
-                        )
-                    )
-            if candidates_evaluated >= max_candidates:
-                break
-
+        if perf_counter() >= deadline:
+            deadline_reached = True
+            status = "budget_exhausted"
+            break
+        baseline = _residual_metric(spaces)
+        candidates, evaluated = _growth_candidates(
+            current,
+            participants_by_id,
+            dimensions,
+            box_clearance,
+            xy_clearance,
+            z_clearance,
+            forbidden,
+            inset_zones,
+            baseline,
+            max_candidates - candidates_evaluated,
+            deadline,
+        )
+        candidates_evaluated += evaluated
+        if not candidates and repair_attempts < max_repairs:
+            repaired, attempted, evaluated = _local_repair_growth_candidates(
+                current,
+                participants_by_id,
+                dimensions,
+                box_clearance,
+                xy_clearance,
+                z_clearance,
+                forbidden,
+                inset_zones,
+                baseline,
+                max_repairs - repair_attempts,
+                max_candidates - candidates_evaluated,
+                deadline,
+                visited,
+            )
+            repair_attempts += attempted
+            candidates_evaluated += evaluated
+            candidates.extend(repaired)
         if not candidates:
-            status = "budget_exhausted" if candidates_evaluated >= max_candidates else "stalled"
+            if perf_counter() >= deadline:
+                deadline_reached = True
+            status = (
+                "budget_exhausted"
+                if deadline_reached
+                or candidates_evaluated >= max_candidates
+                or repair_attempts >= max_repairs
+                else "stalled"
+            )
             break
         chosen = min(
             candidates,
@@ -213,6 +201,7 @@ def close_free_3d_residual(
                 value.residual_metric,
                 -value.aligned_faces,
                 _round(value.relative_growth),
+                value.repair_placement_id or "",
                 value.placement.participant_id,
                 value.axis_index,
                 value.direction,
@@ -221,6 +210,8 @@ def close_free_3d_residual(
         )
         current = chosen.placements
         spaces = list(chosen.spaces)
+        visited.add(_placement_signature(current))
+        repairs_applied += int(chosen.repair_placement_id is not None)
         iterations += 1
     else:
         if not spaces:
@@ -243,6 +234,11 @@ def close_free_3d_residual(
             "status": status,
             "iterations": iterations,
             "candidates_evaluated": candidates_evaluated,
+            "repair_attempts": repair_attempts,
+            "repairs_applied": repairs_applied,
+            "global_resolve_invocation_count": 0,
+            "deadline_reached": deadline_reached,
+            "incumbent_digest": incumbent_digest,
             "initial_residual_metric": initial_metric,
             "final_residual_metric": final_metric,
             "placements": [value.__dict__ for value in current],
@@ -259,7 +255,244 @@ def close_free_3d_residual(
         initial_residual_metric=initial_metric,
         final_residual_metric=final_metric,
         aligned_face_count=aligned_faces,
+        repair_attempts=repair_attempts,
+        repairs_applied=repairs_applied,
+        global_resolve_invocation_count=0,
+        deadline_reached=deadline_reached,
+        incumbent_digest=incumbent_digest,
         deterministic_digest=digest,
+    )
+
+
+def _growth_candidates(
+    current: tuple[Free3DPlacement, ...],
+    participants_by_id: dict[str, dict[str, object]],
+    dimensions: tuple[float, float, float],
+    box_clearance: float,
+    xy_clearance: float,
+    z_clearance: float,
+    forbidden: tuple[EmptySpace, ...],
+    inset_zones: tuple[TopInsetZone, ...],
+    baseline: tuple[float, float, int],
+    remaining_candidates: int,
+    deadline: float,
+    *,
+    repair_placement_id: str | None = None,
+) -> tuple[list[_GrowthCandidate], int]:
+    candidates: list[_GrowthCandidate] = []
+    evaluated = 0
+    if remaining_candidates <= 0:
+        return candidates, evaluated
+    for placement_index, placement in enumerate(current):
+        participant = participants_by_id[placement.participant_id]
+        for axis_index in range(3):
+            if not _world_axis_is_expandable(
+                participant,
+                placement.rotation_deg_z,
+                axis_index,
+            ):
+                continue
+            for direction in (-1, 1):
+                if evaluated >= remaining_candidates or perf_counter() >= deadline:
+                    return candidates, evaluated
+                boundary = _maximal_growth_boundary(
+                    placement,
+                    axis_index,
+                    direction,
+                    current,
+                    forbidden,
+                    dimensions,
+                    box_clearance,
+                    xy_clearance,
+                    z_clearance,
+                )
+                origin = placement.origin_mm[axis_index]
+                upper = origin + placement.world_size_mm[axis_index]
+                if (
+                    direction > 0
+                    and boundary <= upper + _EPSILON
+                    or direction < 0
+                    and boundary >= origin - _EPSILON
+                ):
+                    continue
+                grown = _grow_placement(
+                    placement,
+                    axis_index,
+                    direction,
+                    boundary,
+                )
+                evaluated += 1
+                candidate_values = list(current)
+                candidate_values[placement_index] = grown
+                candidate_tuple = tuple(candidate_values)
+                if not _valid_geometry(
+                    candidate_tuple,
+                    placement_index,
+                    participants_by_id,
+                    dimensions,
+                    box_clearance,
+                    xy_clearance,
+                    z_clearance,
+                    forbidden,
+                    inset_zones,
+                ):
+                    continue
+                candidate_spaces = tuple(
+                    _empty_spaces_for(
+                        candidate_tuple,
+                        dimensions,
+                        box_clearance,
+                        xy_clearance,
+                        z_clearance,
+                        forbidden,
+                    )
+                )
+                metric = _residual_metric(candidate_spaces)
+                if metric >= baseline:
+                    continue
+                candidates.append(
+                    _GrowthCandidate(
+                        placement_index=placement_index,
+                        axis_index=axis_index,
+                        direction=direction,
+                        boundary_mm=_round(boundary),
+                        placement=grown,
+                        placements=candidate_tuple,
+                        spaces=candidate_spaces,
+                        residual_metric=metric,
+                        aligned_faces=_aligned_faces(candidate_tuple, dimensions, box_clearance),
+                        relative_growth=_relative_growth(placement, grown),
+                        repair_placement_id=repair_placement_id,
+                    )
+                )
+    return candidates, evaluated
+
+
+def _local_repair_growth_candidates(
+    current: tuple[Free3DPlacement, ...],
+    participants_by_id: dict[str, dict[str, object]],
+    dimensions: tuple[float, float, float],
+    box_clearance: float,
+    xy_clearance: float,
+    z_clearance: float,
+    forbidden: tuple[EmptySpace, ...],
+    inset_zones: tuple[TopInsetZone, ...],
+    baseline: tuple[float, float, int],
+    remaining_repairs: int,
+    remaining_candidates: int,
+    deadline: float,
+    visited: set[tuple[object, ...]],
+) -> tuple[list[_GrowthCandidate], int, int]:
+    candidates: list[_GrowthCandidate] = []
+    attempted = 0
+    evaluated = 0
+    for repaired, changed_index, placement_id in _repair_states(
+        current,
+        participants_by_id,
+        dimensions,
+        box_clearance,
+        xy_clearance,
+        z_clearance,
+        forbidden,
+        inset_zones,
+    ):
+        if (
+            attempted >= remaining_repairs
+            or evaluated >= remaining_candidates
+            or perf_counter() >= deadline
+        ):
+            break
+        signature = _placement_signature(repaired)
+        if signature in visited:
+            continue
+        attempted += 1
+        if not _valid_geometry(
+            repaired,
+            changed_index,
+            participants_by_id,
+            dimensions,
+            box_clearance,
+            xy_clearance,
+            z_clearance,
+            forbidden,
+            inset_zones,
+        ):
+            continue
+        growths, growth_evaluated = _growth_candidates(
+            repaired,
+            participants_by_id,
+            dimensions,
+            box_clearance,
+            xy_clearance,
+            z_clearance,
+            forbidden,
+            inset_zones,
+            baseline,
+            remaining_candidates - evaluated,
+            deadline,
+            repair_placement_id=placement_id,
+        )
+        evaluated += growth_evaluated
+        candidates.extend(growths)
+    return candidates, attempted, evaluated
+
+
+def _repair_states(
+    current: tuple[Free3DPlacement, ...],
+    participants_by_id: dict[str, dict[str, object]],
+    dimensions: tuple[float, float, float],
+    box_clearance: float,
+    xy_clearance: float,
+    z_clearance: float,
+    forbidden: tuple[EmptySpace, ...],
+    inset_zones: tuple[TopInsetZone, ...],
+) -> Iterable[tuple[tuple[Free3DPlacement, ...], int, str]]:
+    del participants_by_id, forbidden, inset_zones
+    for index, placement in enumerate(current):
+        for axis in range(3):
+            clearance = z_clearance if axis == 2 else xy_clearance
+            low = 0.0 if axis == 2 else box_clearance
+            high = dimensions[axis] if axis == 2 else dimensions[axis] - box_clearance
+            candidates = {
+                _round(low),
+                _round(high - placement.world_size_mm[axis]),
+            }
+            for other in current:
+                if other.participant_id == placement.participant_id:
+                    continue
+                candidates.add(
+                    _round(other.origin_mm[axis] - clearance - placement.world_size_mm[axis])
+                )
+                candidates.add(
+                    _round(other.origin_mm[axis] + other.world_size_mm[axis] + clearance)
+                )
+            for candidate_origin in sorted(candidates):
+                if (
+                    candidate_origin < low - _EPSILON
+                    or candidate_origin + placement.world_size_mm[axis] > high + _EPSILON
+                    or abs(candidate_origin - placement.origin_mm[axis]) <= _EPSILON
+                ):
+                    continue
+                origin = list(placement.origin_mm)
+                origin[axis] = candidate_origin
+                moved = replace(placement, origin_mm=_rounded_point(tuple(origin)))
+                repaired = list(current)
+                repaired[index] = moved
+                yield tuple(repaired), index, placement.participant_id
+
+
+def _placement_signature(
+    placements: tuple[Free3DPlacement, ...],
+) -> tuple[object, ...]:
+    return tuple(
+        (
+            value.participant_id,
+            value.origin_mm,
+            value.world_size_mm,
+            value.local_size_mm,
+            value.rotation_deg_z,
+        )
+        for value in placements
     )
 
 
@@ -362,10 +595,8 @@ def _projections_need_axis_separation(
             continue
         clearance = z_clearance if axis == 2 else xy_clearance
         if (
-            _upper_of_placement(left, axis) + clearance
-            <= right.origin_mm[axis] + _EPSILON
-            or _upper_of_placement(right, axis) + clearance
-            <= left.origin_mm[axis] + _EPSILON
+            _upper_of_placement(left, axis) + clearance <= right.origin_mm[axis] + _EPSILON
+            or _upper_of_placement(right, axis) + clearance <= left.origin_mm[axis] + _EPSILON
         ):
             return False
     return True
@@ -550,9 +781,7 @@ def _aligned_faces(
                 placement.origin_mm[axis] + placement.world_size_mm[axis],
             )
             count += sum(
-                abs(face - boundary) <= _EPSILON
-                for face in faces
-                for boundary in boundaries[axis]
+                abs(face - boundary) <= _EPSILON for face in faces for boundary in boundaries[axis]
             )
             for other in placements[index + 1 :]:
                 other_faces = (

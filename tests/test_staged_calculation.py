@@ -50,6 +50,22 @@ def _project() -> dict[str, object]:
     return project
 
 
+def _project_with_flat_reservation() -> dict[str, object]:
+    project = _project()
+    project["flat_items"] = [
+        {
+            "id": "board",
+            "name": "Plateau",
+            "kind": "board",
+            "dimensions_mm": {"x": 40.0, "y": 30.0, "z": 2.0},
+            "quantity": 1,
+            "stack_order": 0,
+            "origin_mm": {"x": 5.0, "y": 5.0},
+        }
+    ]
+    return project
+
+
 def _engine(project: object) -> IncrementalLocalAnalysisEngine:
     return IncrementalLocalAnalysisEngine(project, effort_profile="quick")
 
@@ -118,22 +134,90 @@ class StagedCalculationTests(unittest.TestCase):
 
         self.assertEqual(calculated["solver_result"]["status"], "solution_found")
         self.assertTrue(calculated["staged_calculation"]["minimal_layout"]["placement_certified"])
-        self.assertFalse(calculated["staged_calculation"]["minimal_layout"]["finalization_required"])
-        self.assertEqual(calculated["staged_calculation"]["finalized_plan"]["status"], "not_finalized")
+        self.assertFalse(
+            calculated["staged_calculation"]["minimal_layout"]["finalization_required"]
+        )
+        self.assertEqual(
+            calculated["staged_calculation"]["finalized_plan"]["status"], "not_finalized"
+        )
         self.assertEqual(selection["artifact_kind"], ARTIFACT_KIND_MINIMAL)
         self.assertEqual(selection["partition_plan_digest"], calculated["partition"]["plan_digest"])
         self.assertEqual(cad["status"], "ready_for_fusion")
         self.assertEqual(cad["artifact_identity"]["artifact_kind"], ARTIFACT_KIND_MINIMAL)
         self.assertFalse(cad["partition"]["invariants"]["residual_distributed"])
 
+    def test_active_top_reservation_requires_and_materializes_final_plan(self) -> None:
+        project = _project_with_flat_reservation()
+        engine = _engine(project)
+        session = StagedCalculationSession(project, solver_settings=SETTINGS)
+        _synchronize(session, project, engine)
+
+        seed_project = _project()
+        seed_engine = _engine(seed_project)
+        seed_plan = solve_minimal_layout(
+            seed_project,
+            effort_profile="quick",
+            request_id="seed-incumbent",
+            request_revision=0,
+            container_frontiers=seed_engine.certified_frontiers(),
+            frontier_digests=seed_engine.frontier_digests(),
+        )
+
+        def certified_incumbent(_raw_project: object, **_kwargs: object) -> dict[str, object]:
+            return deepcopy(seed_plan)
+
+        calculated = session.calculate_layout(
+            request_id="solve-with-flat",
+            request_revision=0,
+            solver=certified_incumbent,
+        )
+        minimal = calculated["staged_calculation"]["minimal_layout"]
+
+        self.assertTrue(minimal["placement_certified"])
+        self.assertTrue(minimal["finalization_required"])
+        self.assertFalse(minimal["materializable_without_finalization"])
+        self.assertEqual(
+            calculated["staged_calculation"]["next_action"],
+            "finalize_volume",
+        )
+        self.assertFalse(
+            calculated["staged_calculation"]["available_artifacts"][ARTIFACT_KIND_MINIMAL]
+        )
+        self.assertIsNone(session.current_minimal_partition())
+        with self.assertRaisesRegex(StagedCalculationError, "reservations actives"):
+            session.select_materializable_artifact(ARTIFACT_KIND_MINIMAL)
+
+        finalized = session.finalize_volume()
+        plan = finalized["partition"]
+        finalization = plan["finalization"]
+        selection = session.select_materializable_artifact(ARTIFACT_KIND_FINALIZED)
+
+        self.assertEqual(
+            finalized["staged_calculation"]["finalized_plan"]["status"],
+            STATUS_CURRENT,
+        )
+        self.assertTrue(plan["summary"]["materializable"])
+        self.assertTrue(finalization["certificate"]["certified"])
+        self.assertEqual(
+            finalization["source_minimal_artifact_digest"],
+            minimal["artifact_digest"],
+        )
+        self.assertEqual(finalization["global_resolve_invocation_count"], 0)
+        self.assertGreaterEqual(finalization["active_top_inset_reservation_count"], 1)
+        self.assertEqual(selection["artifact_kind"], ARTIFACT_KIND_FINALIZED)
+        self.assertEqual(
+            finalized["staged_calculation"]["next_action"],
+            "materialize_finalized_in_fusion",
+        )
+
     def test_certified_witness_is_forwarded_as_recertified_fresh_search(self) -> None:
         project = _project()
         source_engine = _engine(project)
         source = StagedCalculationSession(project, solver_settings=SETTINGS)
         _synchronize(source, project, source_engine)
-        witness_plan = source.calculate_layout(
-            request_id="source-witness", request_revision=0
-        )["partition"]
+        witness_plan = source.calculate_layout(request_id="source-witness", request_revision=0)[
+            "partition"
+        ]
 
         engine = _engine(project)
         session = StagedCalculationSession(project, solver_settings=SETTINGS)
@@ -152,9 +236,7 @@ class StagedCalculationTests(unittest.TestCase):
         self.assertEqual(minimal["warm_start"]["status"], "accepted")
         self.assertTrue(minimal["warm_start"]["search_continued"])
         self.assertTrue(minimal["placement_certified"])
-        self.assertEqual(
-            calculated["solver_result"]["status"], "solution_found"
-        )
+        self.assertEqual(calculated["solver_result"]["status"], "solution_found")
 
     def test_identical_explicit_calculation_reuses_only_a_certified_plan(self) -> None:
         project = _project()
@@ -303,8 +385,17 @@ class StagedCalculationTests(unittest.TestCase):
         _synchronize(session, project, engine)
         calculated = session.calculate_layout(request_id="solve-1", request_revision=0)
 
-        with self.assertRaisesRegex(StagedCalculationError, "Aucune methode de finition"):
-            session.finalize_volume()
+        def rejected_finalizer(plan: dict[str, object]) -> dict[str, object]:
+            return deepcopy(plan)
+
+        with self.assertRaisesRegex(StagedCalculationError, "a ete rejetee"):
+            session.finalize_volume(
+                finalizer=rejected_finalizer,
+                finishing_policy="test_rejected_policy",
+                finishing_budget_digest=canonical_digest({"budget": "test"}),
+                finalizer_id="test-rejected-finalizer",
+                finalizer_version="1",
+            )
 
         selection = session.select_materializable_artifact(ARTIFACT_KIND_MINIMAL)
         snapshot = session.snapshot()
@@ -345,7 +436,9 @@ class StagedCalculationTests(unittest.TestCase):
         )
         selection = session.select_materializable_artifact(ARTIFACT_KIND_FINALIZED)
 
-        self.assertEqual(finalized["staged_calculation"]["finalized_plan"]["status"], STATUS_CURRENT)
+        self.assertEqual(
+            finalized["staged_calculation"]["finalized_plan"]["status"], STATUS_CURRENT
+        )
         self.assertEqual(selection["artifact_kind"], ARTIFACT_KIND_FINALIZED)
         self.assertNotEqual(
             selection["artifact_digest"],
@@ -412,6 +505,7 @@ class StagedCalculationTests(unittest.TestCase):
 
         self.assertEqual(changed["minimal_layout"]["status"], STATUS_STALE)
         self.assertEqual(changed["next_action"], "calculate_layout")
+
     def test_solver_setting_change_stales_minimal_and_finalized_artifacts(self) -> None:
         project = _project()
         engine = _engine(project)
@@ -428,15 +522,12 @@ class StagedCalculationTests(unittest.TestCase):
         self.assertEqual(changed["minimal_layout"]["status"], STATUS_STALE)
         self.assertEqual(changed["next_action"], "calculate_layout")
 
-
     def test_solver_case_snapshot_preserves_observed_facts_without_operations(self) -> None:
         project = _project()
         engine = _engine(project)
         session = StagedCalculationSession(project, solver_settings=SETTINGS)
         _synchronize(session, project, engine)
-        calculated = session.calculate_layout(
-            request_id="solve-case", request_revision=4
-        )
+        calculated = session.calculate_layout(request_id="solve-case", request_revision=4)
 
         snapshot = session.solver_case_snapshot()
 
@@ -448,9 +539,7 @@ class StagedCalculationTests(unittest.TestCase):
             snapshot["current_minimal_partition"]["plan_digest"],
             calculated["partition"]["plan_digest"],
         )
-        self.assertEqual(
-            snapshot["staged_calculation"], calculated["staged_calculation"]
-        )
+        self.assertEqual(snapshot["staged_calculation"], calculated["staged_calculation"])
         self.assertEqual(
             snapshot["invariants"],
             {
@@ -461,6 +550,7 @@ class StagedCalculationTests(unittest.TestCase):
                 "fusion_materialization_invocation_count": 0,
             },
         )
+
 
 if __name__ == "__main__":
     unittest.main()

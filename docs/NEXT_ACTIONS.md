@@ -86,36 +86,32 @@ Rapport final L07 : P64_L07_GOAL_FINAL_REPORT.md.
 
 ## Prochaine action recommandée
 
-### Exécuter P64-F01B — boucle bornée de fermeture et réparation
+### Exécuter la partie admissible de P64-F02B — équilibre et proportion
 
-Type : finalisation produit couplée ; aucun benchmark, tuning, holdout, nouvelle
-valeur physique, nouvelle pose ou changement d'UI.
+Type : objectifs secondaires de finalisation ; aucun benchmark, tuning, holdout,
+nouvelle valeur physique, nouvelle pose, nouveau schéma produit ou changement
+d’UI.
 
-P64-L09B et P64-L09C sont automatisées et intégrées dans leur périmètre : les
-appuis utilisent la matière réelle et les réservations supérieures représentables
-atteignent le worker SCIP avec leurs fonds et cavités protégés. La preuve native
-CPython 3.14 trouve un support au sommet en une invocation.
+P64-F01B est automatisée et intégrable : l’incumbent minimal est fermé sous un
+budget unique, une réparation locale précède tout solve global, le certificat
+commun reste autoritaire et aucun plan partiel n’est publiable.
 
-P64-F01B doit :
+La partie admissible de P64-F02B doit :
 
-1. prendre le placement minimal SCIP certifié comme incumbent initial ;
-2. introduire les réservations plateaux/livrets avant toute expansion ;
-3. distribuer le volume résiduel uniquement sur des faces admissibles ;
-4. garder fixes les cavités et leurs origines certifiées ;
-5. revalider collisions, jeux, support matériel et réservations après chaque
-   proposition ;
-6. tenter une réparation locale des placements ou hauteurs avant tout nouveau
-   placement global ;
-7. borner itérations, candidats et temps sous un budget unique ;
-8. retourner `no_solution_within_budget` si aucun plan global n'est certifié ;
-9. produire la CAD IR uniquement depuis le plan final certifié ;
-10. mettre à jour `P64_L09_VALIDATION_UNIFIEE.md`, le pilotage, puis intégrer
-    directement dans main.
+1. représenter séparément l’objectif « volume ajouté égal » et l’objectif
+   « ratio d’expansion égal » ;
+2. générer des candidats de répartition compatibles avec les faces Auto/Target ;
+3. laisser toutes les contraintes dures et le certificat F01B prioritaires ;
+4. comparer les candidats avec des métriques explicites et déterministes ;
+5. ne remplacer l’incumbent final certifié que par une amélioration stricte ;
+6. conserver exactement le plan F01B si aucun objectif secondaire ne progresse ;
+7. rester sous les caps de la finalisation et publier la provenance de
+   l’objectif choisi ;
+8. garder l’harmonisation modulaire, les trames et les cellules différées ;
+9. mettre à jour P64_L09_VALIDATION_UNIFIEE.md et préparer ensuite P64-L09V ;
+10. intégrer directement dans main après les preuves complètes.
 
-La répartition équilibrée et proportionnelle du volume appartient ensuite à la
-partie admissible de P64-F02B. L'harmonisation modulaire reste différée.
-
-Aucune action humaine n'est requise pendant P64-F01B.
+Aucune action humaine n’est requise pendant cette partie de P64-F02B.
 
 ## Lots verrouillés
 

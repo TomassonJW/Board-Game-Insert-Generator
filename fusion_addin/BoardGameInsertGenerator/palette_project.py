@@ -643,14 +643,25 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
     )
     if result_view is not None:
         if action in {"solve_project", "validate_project"}:
-            minimal_current = bool(
-                staged_calculation.get("minimal_layout", {}).get("placement_certified")
+            minimal_payload = staged_calculation.get("minimal_layout", {})
+            minimal_materializable = bool(
+                minimal_payload.get("placement_certified")
+                and minimal_payload.get("materializable_without_finalization")
             )
             result_view["artifact_kind"] = "minimal_layout"
-            result_view["materializable"] = minimal_current
+            result_view["materializable"] = minimal_materializable
             result_view.setdefault("invariants", {})[
                 "minimal_materialization_without_finalization"
-            ] = minimal_current
+            ] = minimal_materializable
+        elif action == "finalize_project":
+            finalized_current = bool(
+                staged_calculation.get("finalized_plan", {}).get("materializable")
+            )
+            result_view["artifact_kind"] = "finalized_plan"
+            result_view["materializable"] = finalized_current
+            result_view.setdefault("invariants", {})[
+                "coupled_finalization_globally_certified"
+            ] = finalized_current
         elif artifact_selection is not None:
             result_view["artifact_kind"] = artifact_selection["artifact_kind"]
             result_view["materializable"] = True

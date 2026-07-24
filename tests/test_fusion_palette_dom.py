@@ -333,6 +333,18 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertIn('Calcul&eacute;e automatiquement', self.markup)
         self.assertIn('id="design-height" readonly aria-readonly="true" tabindex="-1"', self.markup)
 
+    def test_routes_required_finalization_then_the_exact_final_artifact(self) -> None:
+        for marker in (
+            "currentMaterializableArtifactIdentity",
+            "finalized.status==='current'&&finalized.materializable",
+            "minimal.finalization_required===true",
+            "button.dataset.artifactKind='finalized_plan'",
+            "Matérialiser le plan final",
+            "Ferme le volume sous budget",
+        ):
+            self.assertIn(marker, self.markup)
+        self.assertNotIn("currentMinimalArtifactIdentity", self.markup)
+
     def test_keeps_background_updates_out_of_editable_dom_and_defers_layout_paint(self) -> None:
         quiet_start = self.markup.index("if(pendingRequest?.quiet)")
         quiet_end = self.markup.index("if(payload.partition)", quiet_start)
