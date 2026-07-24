@@ -74,36 +74,39 @@ Preuve L07E : P64_L07E_HIGHS_PRODUCT_INTEGRATION_EVIDENCE.md.
 Preuve L08D : P64_L08D_REAL_3D_CORPUS_EVIDENCE.md.
 Preuve L08E : P64_L08E_FAITHFUL_3D_ADAPTERS_EVIDENCE.md.
 Preuve L08F : P64_L08F_REAL_3D_TOURNAMENT_EVIDENCE.md.
+Preuve L08G : P64_L08G_SCIP_PRODUCT_GATE_EVIDENCE.md.
+Rapport final L08 : P64_L08_GOAL_FINAL_REPORT.md.
 Rapport final L07 : P64_L07_GOAL_FINAL_REPORT.md.
 
 ## Prochaine action recommandée
 
-### Exécuter P64-L08G — gate produit SCIP puis intégration conditionnelle
+### Exécuter P64-L08H — remédier le paquet SCIP sans refaire le benchmark
 
-Type : mission d'audit de redistribution, intégration mesurée et préparation
-Fusion conditionnelle. Aucun nouveau tuning ni réemploi du holdout n'est
-autorisé.
+Type : mission d'audit et de packaging isolée. Aucun tuning, aucun replay et
+aucune lecture supplémentaire du holdout L08F ne sont autorisés.
 
-Le holdout L08F est consommé. Le portefeuille externe est rejeté, car il perd
-3 vérités face à SCIP seul. SCIP est le moteur retenu : 18 gains et 0 perte face
-au comportement BGIG corrigé sur 40 cas, mais la sélection le marque encore
-`benchmark_only_pending_native_notices`.
+P64-L08G est terminé avec un résultat produit négatif : SCIP 10.0.2 reste le
+vainqueur benchmark à +18/−0 face à BGIG corrigé, mais le runtime acquis ne peut
+pas entrer dans Fusion. Son wheel PySCIPOpt est `cp310` alors que Fusion
+2704.1.36 utilise `cp314` ; cinq familles natives restent incomplètes en version,
+avis ou autorité de redistribution.
 
-P64-L08G doit :
+P64-L08H doit :
 
-1. auditer et versionner les licences, avis, dépendances natives, taille et mode
-   de redistribution du runtime SCIP/PySCIPOpt Windows déjà acquis ;
-2. refuser l'intégration si un binaire, une dépendance ou un avis reste inconnu ;
-3. si la gate passe, intégrer SCIP seul comme lane hors ligne bornée, sans
-   changer caps, certificats, tolérances, schémas ni propriété P45/P64 ;
-4. vérifier sur régressions et corpus ouverts que Rapide/Normal ne reculent pas
-   et que la nouvelle lane reste recertifiée par BGIG ;
-5. préparer et installer la gate Fusion humaine seulement après ces preuves ;
-6. sinon publier la clôture négative sans moteur produit.
+1. choisir sans changer de moteur entre le wheel officiel PySCIPOpt 6.2.1
+   `cp314` et un exécutable SCIP 10.0.2 autonome ;
+2. verrouiller chaque binaire, version, source, licence, avis et obligation de
+   redistribution avant toute intégration ;
+3. mesurer la taille totale et prouver une exécution locale hors ligne dans un
+   environnement isolé compatible avec Fusion, sans installation globale ;
+4. refuser immédiatement si une dépendance ou un droit reste inconnu ;
+5. si et seulement si la gate passe, proposer l'ADR et la mission séparée
+   d'intégration/régression ouverte puis de préparation Fusion humaine.
 
-Les résultats privés L08F ne peuvent être ni relus pour régler le moteur, ni
-rejoués. OR-Tools, PackingSolver et LAFF ne peuvent pas remplacer SCIP après
-lecture du holdout.
+La gate humaine L08 n'est donc pas active. OR-Tools, PackingSolver et LAFF ne
+peuvent pas remplacer SCIP après lecture du holdout. `fusion-validated=false`
+et `print-validated=false` restent inchangés.
+
 ## Lots verrouillés
 
 - P64-F01A02 et F02A02 restent séparés : ils possèdent la finalisation du volume ;

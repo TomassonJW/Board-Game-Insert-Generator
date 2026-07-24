@@ -1161,3 +1161,18 @@ automatisée réussie et un package Fusion installé par Codex.
 Statut : aucune gate humaine active maintenant. Une gate Fusion sera ouverte
 uniquement si L08G intègre SCIP sans régression.
 `fusion-validated=false`. `print-validated=false`.
+
+## P64-L08G — résultat produit négatif, aucune gate Fusion
+
+L'audit du runtime acquis échoue avant intégration : PySCIPOpt `cp310` est
+incompatible avec le Python `cp314` de Fusion 2704.1.36 et les versions, avis ou
+droits de redistribution de cinq familles natives restent incomplets.
+
+Conformément au programme, Codex n'installe aucun moteur, ne prépare aucun
+smoke test et ne demande aucune manipulation Fusion. SCIP reste le gagnant du
+benchmark, mais pas un composant produit intégrable dans cet état.
+
+Statut : `no-human-action`, `no-fusion-gate`,
+`negative-no-product-integrable-winner`. Une future remédiation P64-L08H doit
+repasser la gate technique complète avant de pouvoir ouvrir une nouvelle gate
+humaine. `fusion-validated=false`. `print-validated=false`.

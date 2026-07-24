@@ -1,6 +1,6 @@
 # P64-L08 — benchmark réel de solvage 3D des cas limites BGIG
 
-Statut : `executed-through-L08F`, `benchmark-winner-scip`, product gate pending in L08G.
+Statut : `executed-through-L08G`, `benchmark-winner-scip`, `negative-no-product-integrable-winner`, `no-fusion-gate`.
 Autorité : ADR-0083, ADR-0068, ADR-0079.
 Capability : `C-SOLVER`, `C-LAYOUT`, `C-GRID-3D`, `C-LAYERS`, `C-STACKING`,
 `C-QUALITY`.
@@ -175,3 +175,23 @@ redistribution Windows native n'est pas entièrement auditée et versionnée.
 P64-L08G possède cette gate. Il peut intégrer SCIP seul et préparer Fusion
 uniquement si la redistribution et les non-régressions passent ; sinon il doit
 clore sans moteur produit.
+
+## 12. État exécuté après P64-L08G
+
+Le runtime SCIP/PySCIPOpt Windows acquis est entièrement inventorié : deux
+wheels, 61 194 406 octets compressés, 187 848 352 octets décompressés et dix
+DLL verrouillées par SHA-256. La gate produit échoue fermée pour quatre raisons :
+
+- ABI PySCIPOpt `cp310` incompatible avec le Python `cp314` observé dans Fusion
+  2704.1.36 ;
+- versions exactes incomplètes pour plusieurs dépendances natives ;
+- avis tiers absents du wheel PySCIPOpt ;
+- autorité de redistribution des binaires précis non entièrement liée.
+
+SCIP reste le gagnant benchmark à +18/−0 face à BGIG corrigé. Aucun autre moteur
+ne le remplace après lecture du holdout. Aucun runtime produit, package Fusion,
+cap, certificat, schéma, tolérance ou comportement BGIG ne change. La gate
+Fusion L08 n'est ni préparée ni installée.
+
+Décision : `negative_no_product_integrable_winner`. Le programme L08 est terminé
+honnêtement ; `fusion-validated=false` et `print-validated=false`.

@@ -1378,3 +1378,16 @@ face à BGIG, mais reste bloqué par la gate de redistribution native Windows.
 La roadmap continue par L08G : fermer cette gate, intégrer SCIP seul sans
 régression puis préparer Fusion ; à défaut, clore sans moteur produit. Aucun
 résultat privé L08F ne peut servir à un nouveau réglage.
+
+## Addendum 2026-07-24 — P64-L08G, gate produit négative
+
+L08G ferme le Goal benchmark sans falsifier son résultat : SCIP 10.0.2 reste le
+vainqueur 3D réel, mais le paquet acquis n'est pas intégrable. PySCIPOpt `cp310`
+ne correspond pas au Python `cp314` de Fusion 2704.1.36 et cinq familles natives
+restent incomplètes en version, avis ou autorité de redistribution.
+
+Aucun moteur externe n'est donc ajouté à BGIG et aucune gate Fusion L08 n'est
+ouverte. La trajectoire produit peut reprendre par P64-L08H, remédiation isolée
+du paquet SCIP `cp314` ou CLI autonome, puis par une mission distincte d'ADR,
+intégration et régressions ouvertes uniquement si cette nouvelle gate passe.
+Le holdout L08F reste consommé et interdit à tout réglage ou replay.

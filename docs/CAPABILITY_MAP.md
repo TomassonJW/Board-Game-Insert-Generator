@@ -1925,3 +1925,17 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
   capacités produit courantes.
 - `C-FUSION`, `C-PRINT` : aucune gate n'est encore ouverte ;
   `fusion-validated=false`, `print-validated=false` pour P64-L08.
+
+## Mise à jour P64-L08G — gagnant benchmark non intégrable dans le paquet courant
+
+- `C-SOLVER` : SCIP reste le meilleur moteur externe réel mesuré (+18/−0 face
+  à BGIG corrigé), mais aucune capability produit n'est promue : le runtime
+  acquis échoue aux gates ABI et redistribution.
+- `C-LAYOUT`, `C-GRID-3D`, `C-LAYERS`, `C-STACKING` : preuve benchmark L08F
+  conservée ; aucun moteur 3D externe n'entre dans Auto ou les lanes produit.
+- `C-QUALITY` : la décision fail-closed est automatisée et versionnée ; aucune
+  régression produit n'est possible car le runtime reste inchangé.
+- `C-FUSION`, `C-FUSION-UI` : aucun package ou smoke test L08G n'est installé.
+  Une remédiation P64-L08H doit précéder toute gate humaine.
+- `C-PRINT` : inchangée ; `fusion-validated=false`, `print-validated=false` pour
+  L08G.

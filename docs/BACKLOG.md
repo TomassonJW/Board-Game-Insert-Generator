@@ -3092,11 +3092,25 @@ implémentée et intégrée à la fois.
   rejoué, aucun secret rouvert, sélection et routes inchangées.
 - Preuve : `docs/P64_L08F_REAL_3D_TOURNAMENT_EVIDENCE.md`.
 
-### P64-L08G — intégration mesurée et gate Fusion
+### P64-L08G — gate produit SCIP et intégration conditionnelle
 
-- Statut : ready, dépend de la gate de redistribution SCIP Windows.
-- Auditer avis, dépendances natives, taille et package hors ligne ; intégrer
-  SCIP seul uniquement si tout est connu et si les régressions produit passent.
-- Préparer la gate Fusion seulement après intégration vérifiée ; sinon clore
-  honnêtement sans moteur produit.
-- Interdit : régler ou réutiliser le holdout consommé.
+- Statut : done, automated-validated,
+  negative-no-product-integrable-winner, no-fusion-gate.
+- Résultat : ABI `cp310/cp314` incompatible ; versions, avis ou droits natifs
+  incomplets pour SCIP, Ipopt, MUMPS, Intel et Visual C++.
+- Décision : aucun runtime produit, aucune substitution post-holdout et aucune
+  gate Fusion. SCIP reste le gagnant benchmark.
+- Preuve : `docs/P64_L08G_SCIP_PRODUCT_GATE_EVIDENCE.md`.
+
+### P64-L08H — remédiation isolée du paquet SCIP
+
+- Statut : ready, dépend de L08G ; aucun benchmark ou holdout.
+- Auditer un wheel PySCIPOpt 6.2.1 `cp314` ou un exécutable SCIP 10.0.2
+  autonome, sans changer le moteur ni ses réglages scellés.
+- Verrouiller toutes les versions, sources, licences, avis, obligations,
+  empreintes et la taille avant toute intégration.
+- Prouver le chargement ou l'exécution hors ligne dans un environnement isolé
+  compatible Fusion, sans installation globale.
+- Sortie : refus honnête si une inconnue subsiste ; sinon proposer une ADR et
+  une mission séparée d'intégration, régressions ouvertes et gate Fusion.
+- Interdit : rouvrir, rejouer ou utiliser le holdout L08F pour régler ou choisir.

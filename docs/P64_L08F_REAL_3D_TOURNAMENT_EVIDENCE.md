@@ -5,6 +5,11 @@ Date : 2026-07-24
 Statut : `done`, `automated-validated`, `benchmark-winner-scip`,
 `portfolio-rejected`, `product-integration-blocked`, `holdout-consumed`.
 
+> **Clôture L08G — 2026-07-24.** SCIP reste le gagnant benchmark, mais le
+> runtime Windows acquis échoue aux gates ABI `cp310/cp314` et redistribution
+> native. Décision produit finale : `negative_no_product_integrable_winner` ;
+> aucun moteur ni gate Fusion. Voir `docs/P64_L08G_SCIP_PRODUCT_GATE_EVIDENCE.md`.
+
 ## Verdict
 
 SCIP est le meilleur moteur externe retenu par P64-L08F. Sur le holdout de

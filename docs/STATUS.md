@@ -3496,3 +3496,33 @@ Date : 2026-07-24
 - **Suite :** P64-L08G audite la redistribution Windows puis intègre SCIP et
   prépare Fusion uniquement si cette gate et les non-régressions passent.
 - **Validation :** `fusion-validated=false`, `print-validated=false`.
+
+## P64-L08G — gate produit SCIP refusée honnêtement
+
+Date : 2026-07-24
+
+- **Statut :** done, automated-validated, benchmark-winner-scip,
+  negative-no-product-integrable-winner, no-fusion-gate.
+- **Runtime audité :** PySCIPOpt 6.2.1 et NumPy 2.2.6, deux wheels verrouillés,
+  61 194 406 octets compressés, 187 848 352 octets décompressés et dix DLL
+  inventoriées par empreinte.
+- **Compatibilité :** le wheel acquis est `cp310`; Fusion 2704.1.36 embarque
+  `python314.dll` (`cp314`). L'extension native ne peut pas être chargée dans
+  l'add-in courant.
+- **Redistribution :** PySCIPOpt fournit sa licence MIT et NumPy son inventaire
+  tiers, mais SCIP, Ipopt, MUMPS, les runtimes Intel et Visual C++ restent
+  incomplets en version, avis ou autorité de redistribution pour ces binaires
+  précis.
+- **Décision :** `product_integration_authorized=false` et
+  `negative_no_product_integrable_winner`. SCIP reste le gagnant benchmark ;
+  aucun autre moteur ne le remplace après lecture du holdout.
+- **Produit :** aucun runtime, package, cap, certificat, schéma, tolérance,
+  propriété P45/P64, finalisation, CAD ou scène ne change. Aucune gate Fusion
+  n'est préparée ou installée.
+- **Intégrité privée :** holdout rouvert : non ; worker privé rappelé : 0 ;
+  tuning post-holdout : 0 ; sélection modifiée : non.
+- **Preuve :**
+  `a8ddb80e48ba83f9e3869f0bd3fffc7447be997b2c5932daf781775a7cbcc09a`.
+- **Suite :** P64-L08H peut auditer un paquet `cp314` ou un CLI SCIP autonome
+  sans refaire le benchmark. `fusion-validated=false`,
+  `print-validated=false`.
