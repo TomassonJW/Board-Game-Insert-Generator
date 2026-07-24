@@ -1895,3 +1895,18 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
   corpus, pas une revendication de performance.
 - Niveau de preuve inchangé : `fusion-validated=false`,
   `print-validated=false`.
+
+## Mise à jour P64-L08E — exécution externe 3D recertifiée
+
+- `C-SOLVER` : quatre moteurs externes et quatre familles disposent d'un worker
+  X/Y/Z réel. Ce statut prouve les adaptateurs, pas un gagnant produit.
+- `C-GRID-3D`, `C-LAYERS`, `C-STACKING` : les quatre moteurs ont produit un
+  empilement à deux niveaux recertifié ; OR-Tools et SCIP portent aussi
+  multi-appui, réservations, fragmentation et variantes sur les contrôles.
+- `C-SAFETY` : versions, binaire, licences, SHA-256, caps et absence de réseau
+  sont verrouillés ; tout manque de traduction devient `unsupported` avant
+  exécution. Le holdout reste fermé.
+- `C-QUALITY` : aucun gain de qualité ou de performance n'est encore revendiqué.
+  Les temps des petits contrôles ne classent pas les moteurs.
+- `C-FUSION`, `C-PRINT` : inchangées ; `fusion-validated=false`,
+  `print-validated=false`.

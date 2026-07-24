@@ -1353,3 +1353,13 @@ et bornes empêchent désormais de gagner en projetant au sol ou en retirant
 silencieusement une contrainte. La séquence continue par L08E, adaptateurs 3D
 fidèles et petits contrôles exacts ; le tournoi et l'ouverture unique du
 holdout restent L08F.
+
+## Addendum 2026-07-24 — P64-L08E, adapters 3D exécutables
+
+PackingSolver, LAFF, OR-Tools CP-SAT et SCIP ont désormais quatre chemins
+d'exécution hors ligne distincts. Les quatre produisent un empilement X/Y/Z
+recertifié ; les deux formulations générales passent aussi les contrôles
+multi-appui, réservations haut/bas, fragmentation et variantes. Une règle absente
+reste `unsupported`, jamais projetée au sol. Cette preuve ne choisit aucun
+moteur et n'ouvre pas le holdout. La roadmap continue par L08F : régressions,
+discovery, tuning, sélection scellée puis ouverture privée unique.

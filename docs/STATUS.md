@@ -3446,3 +3446,29 @@ Date : 2026-07-24
   impression restent non validés.
 - **Suite :** P64-L08E, adaptateurs fidèles et petits contrôles exacts, sans
   ouvrir le holdout.
+
+## P64-L08E — quatre adaptateurs externes en 3D réelle
+
+Date : 2026-07-24
+
+- **Statut :** `done`, `automated-validated`, `no-winner-selected`,
+  `holdout-closed`.
+- **Moteurs exécutés :** OR-Tools CP-SAT 9.15.6755, SCIP 10.0.2 via
+  PySCIPOpt 6.2.1, PackingSolver `box` au SHA `0cae9d0` et LAFF 4.2.1 ; quatre
+  moteurs et quatre familles externes.
+- **Preuve 3D :** chacun produit un monde recertifié avec deux coordonnées Z
+  distinctes. OR-Tools et SCIP passent les six contrôles, dont multi-appui,
+  réservations basses/hautes, fragmentation, variantes et impossibilité exacte.
+- **Refus honnêtes :** PackingSolver et LAFF exécutent l'empilement mais
+  renvoient `unsupported` avant appel sur quatre règles non traduites et
+  `bounded_unknown` sur le contrôle négatif.
+- **Packages :** artefacts, binaire PackingSolver, versions, SHA-256, licences,
+  caps et environnements locaux sont verrouillés. Aucune installation globale,
+  aucun service, compte, secret ou réseau à l'exécution.
+- **Reçu :**
+  `a3c35ee1bddc5578aeb41e79639c507e1d8236d470a39769ace77d2303192d76`.
+- **Holdout :** toujours `opened=false`, zéro invocation ; aucun classement et
+  aucune intégration produit.
+- **Suite :** P64-L08F, régressions, discovery, tuning, sélection scellée puis
+  ouverture unique du holdout.
+- **Validation :** `fusion-validated=false`, `print-validated=false`.

@@ -85,10 +85,12 @@ preuves archivées.
 - P64-L07E est conservée comme preuve d'une lane HiGHS de sol rectangulaire.
   ADR-0083 requalifie cependant L07 : ses quatre candidats ont été comparés sur
   un seul niveau et ne répondent pas à la gate de solvage 3D réel.
-- P64-L07V est suspendue. P64-L08A à L08D sont terminées : la lane
-  HiGHS de sol reste hors Auto, quatre candidats 3D sont conditionnellement
-  retenus et le corpus adversarial est scellé sans run de solveur. La prochaine
-  action est P64-L08E, adaptateurs fidèles et petits contrôles exacts.
+- P64-L07V est suspendue. P64-L08A à L08E sont terminées : la lane
+  HiGHS de sol reste hors Auto, le corpus adversarial et son holdout sont
+  scellés, puis OR-Tools, SCIP, PackingSolver et LAFF ont réellement exécuté
+  des contrôles X/Y/Z recertifiés. Aucun gagnant n'est encore choisi et le
+  holdout reste fermé. La prochaine action est P64-L08F, tournoi ouvert,
+  sélection scellée puis ouverture unique du holdout.
 
 ## Vue de séquence
 
@@ -147,7 +149,8 @@ preuves archivées.
 | Terminé — diagnostic | P64-L08A/B | Gate 3D définie ; HiGHS de sol quarantiné hors Auto après mesure. |
 | Terminé — audit | P64-L08C | Shortlist 3D conditionnelle ; aucun gagnant ni build lourd. |
 | Terminé — corpus | P64-L08D | 41 cas ouverts, 40 privés scellés, témoins 3D et bornes négatives. |
-| Prochaine — adaptateurs | P64-L08E | Traductions 3D fidèles et petits contrôles exacts, holdout fermé. |
+| Terminé — adaptateurs | P64-L08E | Quatre moteurs/familles exécutés en X/Y/Z ; contrôles recertifiés, refus explicites, holdout fermé. |
+| Prochaine — tournoi | P64-L08F | Régressions, discovery, tuning, sélection scellée puis ouverture unique du holdout. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 

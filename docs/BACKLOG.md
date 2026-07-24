@@ -3073,10 +3073,27 @@ implémentée et intégrée à la fois.
   les trois paliers, les témoins 3D et les bornes négatives.
 - Le holdout reste `opened=false` avec 0 invocation.
 
-### P64-L08E à P64-L08G — adaptateurs, tournoi et intégration
+### P64-L08E — adaptateurs et petits contrôles exacts
 
-- Statut : planned ; programme canonique dans
-  `docs/P64_L08_REAL_3D_SOLVER_BENCHMARK_PROGRAM.md`.
-- Ordre : adaptateurs fidèles et petits contrôles exacts, discovery/tuning,
-  sélection scellée et ouverture unique du holdout, puis intégration seulement
-  si un gain 3D réel est certifié.
+- Statut : done, automated-validated, holdout-closed.
+- Preuve : `docs/P64_L08E_FAITHFUL_3D_ADAPTERS_EVIDENCE.md`.
+- Résultat : OR-Tools, SCIP, PackingSolver et LAFF exécutent quatre workers 3D
+  réels ; quatre empilements sont recertifiés. Les règles absentes donnent
+  `unsupported` avant appel.
+- Aucun gagnant, aucune intégration et aucune ouverture du holdout.
+
+### P64-L08F — tournoi, sélection scellée et holdout
+
+- Statut : ready.
+- Ordre : régressions, discovery, tuning ouvert, sélection scellée, puis une
+  seule ouverture du holdout privé L08D.
+- Gate : au moins trois moteurs externes réels ; ressources comparables ; aucune
+  solution sans recertification BGIG complète ; verdict positif ou négatif
+  honnête.
+
+### P64-L08G — intégration mesurée et gate Fusion
+
+- Statut : planned, dépend de L08F.
+- Intégrer uniquement un gain démontré sans régression. Préparer et installer la
+  gate Fusion humaine seulement après intégration d'un vainqueur ; sinon clore
+  honnêtement sans nouveau moteur.

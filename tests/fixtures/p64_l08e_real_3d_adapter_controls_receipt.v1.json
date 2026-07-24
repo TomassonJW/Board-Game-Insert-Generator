@@ -1,0 +1,1436 @@
+{
+  "artifact_lock_digest": "58736ecde2a6bfbc4d57c3e5bc4e947c9875fe9f7a3c654cb87594e91c552bc6",
+  "artifact_receipts": {
+    "laff": {
+      "artifact_count": 17,
+      "artifacts": [
+        {
+          "artifact_group": "laff",
+          "byte_count": 190807860,
+          "filename": "OpenJDK17U-jdk_x64_windows_hotspot_17.0.19_10.zip",
+          "sha256": "b5b235c48adf6a081874b812c630b9f4b5f637b7a5ed18b9174d08a41ec4c235"
+        },
+        {
+          "artifact_group": "laff",
+          "byte_count": 116,
+          "filename": "OpenJDK17U-jdk_x64_windows_hotspot_17.0.19_10.zip.sha256.txt",
+          "sha256": "bb65646dc142409107d6a191632b2eaf6c90305a40b9be5c789bcb8a5d809137"
+        },
+        {
+          "artifact_group": "laff",
+          "byte_count": 39574,
+          "filename": "api-4.2.1-sources.jar",
+          "sha256": "337db83e1f41c628e608d1b166d599ac148c9bef02982bc3dca92b045f0cc50d"
+        },
+        {
+          "artifact_group": "laff",
+          "byte_count": 78201,
+          "filename": "api-4.2.1.jar",
+          "sha256": "727981a3b90e178a3c3bfdf92faaa244092b90d4f387af37fe4e73ab65d89ee8"
+        },
+        {
+          "artifact_group": "laff",
+          "byte_count": 1628,
+          "filename": "api-4.2.1.pom",
+          "sha256": "ff36ee2d0a54368c3e379f9d0f6c11c08a9a6c3b056939f6b8182214f56f4262"
+        },
+        {
+          "artifact_group": "laff",
+          "byte_count": 115093,
+          "filename": "core-4.2.1-sources.jar",
+          "sha256": "28cb7e7c14dee0682183462e206e06a814109f4f170a134a5fb2b656ca7fc956"
+        },
+        {
+          "artifact_group": "laff",
+          "byte_count": 242271,
+          "filename": "core-4.2.1.jar",
+          "sha256": "1faddf8e1da6c5c61dfbc6a93b59d266457d508dc998659da3afc9f52bedd573"
+        },
+        {
+          "artifact_group": "laff",
+          "byte_count": 2379,
+          "filename": "core-4.2.1.pom",
+          "sha256": "1f8e56529e9f954a2a8f3687d1acc007da2f2a630163f53a986f00db1e82f010"
+        },
+        {
+          "artifact_group": "laff",
+          "byte_count": 10617521,
+          "filename": "eclipse-collections-13.0.0.jar",
+          "sha256": "4c1d2fc77eeb52325893337f4080c9f73cc53670956f80489b5f375fdc5bb6e1"
+        },
+        {
+          "artifact_group": "laff",
+          "byte_count": 5741,
+          "filename": "eclipse-collections-13.0.0.pom",
+          "sha256": "137ecf579f1dc28591125dc54e4ce6e23670cd5297cfd2e54cb08e6632bf3f92"
+        },
+        {
+          "artifact_group": "laff",
+          "byte_count": 1879018,
+          "filename": "eclipse-collections-api-13.0.0.jar",
+          "sha256": "2ede735db355b079fc08b0bc7657bd4f95d045416bdaa7ec5235853cf6f364d2"
+        },
+        {
+          "artifact_group": "laff",
+          "byte_count": 5524,
+          "filename": "eclipse-collections-api-13.0.0.pom",
+          "sha256": "b544a4647120c2acfffcfdd7b326e780a8a4e0b4dc58304b612ef5aa73ba631e"
+        },
+        {
+          "artifact_group": "laff",
+          "byte_count": 52233,
+          "filename": "eclipse-collections-parent-13.0.0.pom",
+          "sha256": "749466ca00fd99e9bf474d6734063ddefb6cf2f8cd0640a49c26fb1864659232"
+        },
+        {
+          "artifact_group": "laff",
+          "byte_count": 18986,
+          "filename": "parent-4.2.1.pom",
+          "sha256": "096f6295c8d361d7cd2cbca4acb4c0884dea4272328bf7a841127d388035e551"
+        },
+        {
+          "artifact_group": "laff",
+          "byte_count": 52685,
+          "filename": "points-4.2.1-sources.jar",
+          "sha256": "5fb623425b18ac1b1df88205da55b68dcc33986df99194ee80d3066ed1d80e10"
+        },
+        {
+          "artifact_group": "laff",
+          "byte_count": 94950,
+          "filename": "points-4.2.1.jar",
+          "sha256": "9d39a1757537067e4bce8e43953a071fab71fd2926e796d62f1c62d7215c9598"
+        },
+        {
+          "artifact_group": "laff",
+          "byte_count": 2092,
+          "filename": "points-4.2.1.pom",
+          "sha256": "9791dfb7e1f2320e895a5b3566ddd9ea75eef2e1790e0a35c283a4379167a16b"
+        }
+      ],
+      "bundle_byte_count": 204015872,
+      "bundle_digest": "87bec5e3a3d789ae72bad1aff33d59b0749ebf8939452c1fd5eec1f8476c63bf",
+      "candidate_id": "laff",
+      "lock_digest": "58736ecde2a6bfbc4d57c3e5bc4e947c9875fe9f7a3c654cb87594e91c552bc6",
+      "schema_version": "bgig.external_solver_artifact_receipt.v1",
+      "verified_before_execution": true
+    },
+    "ortools_cp_sat": {
+      "artifact_count": 11,
+      "artifacts": [
+        {
+          "artifact_group": "ortools",
+          "byte_count": 137410,
+          "filename": "absl_py-2.5.0-py3-none-any.whl",
+          "sha256": "0f17b89f2a4eaaedc4f28c622998aa690564b3012a396a4ffad0821007fe03ba"
+        },
+        {
+          "artifact_group": "ortools",
+          "byte_count": 5000,
+          "filename": "immutabledict-4.3.1-py3-none-any.whl",
+          "sha256": "c9facdc0ff30fdb8e35bd16532026cac472a549e182c94fa201b51b25e4bf7bf"
+        },
+        {
+          "artifact_group": "ortools",
+          "byte_count": 12904620,
+          "filename": "numpy-2.2.6-cp310-cp310-win_amd64.whl",
+          "sha256": "f0fd6321b839904e15c46e0d257fdd101dd7f530fe03fd6359c1ea63738703f3"
+        },
+        {
+          "artifact_group": "ortools",
+          "byte_count": 23846401,
+          "filename": "ortools-9.15.6755-cp310-cp310-win_amd64.whl",
+          "sha256": "4f4964f8ed47ac76b5cfd23238618299f5a3c289d8e0ed66a75885ba9766eb6f"
+        },
+        {
+          "artifact_group": "ortools",
+          "byte_count": 11346086,
+          "filename": "pandas-2.3.3-cp310-cp310-win_amd64.whl",
+          "sha256": "503cf027cf9940d2ceaa1a93cfb5f8c8c7e6e90720a2850378f0b3f3b1e06826"
+        },
+        {
+          "artifact_group": "ortools",
+          "byte_count": 437089,
+          "filename": "protobuf-6.33.6-cp310-abi3-win_amd64.whl",
+          "sha256": "0cd27b587afca21b7cfa59a74dcbd48a50f0a6400cfb59391340ad729d91d326"
+        },
+        {
+          "artifact_group": "ortools",
+          "byte_count": 229892,
+          "filename": "python_dateutil-2.9.0.post0-py2.py3-none-any.whl",
+          "sha256": "a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427"
+        },
+        {
+          "artifact_group": "ortools",
+          "byte_count": 510141,
+          "filename": "pytz-2026.2-py2.py3-none-any.whl",
+          "sha256": "04156e608bee23d3792fd45c94ae47fae1036688e75032eea2e3bf0323d1f126"
+        },
+        {
+          "artifact_group": "ortools",
+          "byte_count": 11050,
+          "filename": "six-1.17.0-py2.py3-none-any.whl",
+          "sha256": "4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274"
+        },
+        {
+          "artifact_group": "ortools",
+          "byte_count": 45571,
+          "filename": "typing_extensions-4.16.0-py3-none-any.whl",
+          "sha256": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8"
+        },
+        {
+          "artifact_group": "ortools",
+          "byte_count": 348168,
+          "filename": "tzdata-2026.3-py2.py3-none-any.whl",
+          "sha256": "dc096730c87af6cab1b171c9d532be840741ff5d459015e7f6947bd7d7e54931"
+        }
+      ],
+      "bundle_byte_count": 49821428,
+      "bundle_digest": "dd4d2967209e5413d818cd979a7b25c85290a477238541361c5554c50c9c7d6d",
+      "candidate_id": "ortools_cp_sat",
+      "lock_digest": "58736ecde2a6bfbc4d57c3e5bc4e947c9875fe9f7a3c654cb87594e91c552bc6",
+      "schema_version": "bgig.external_solver_artifact_receipt.v1",
+      "verified_before_execution": true
+    },
+    "packingsolver_box": {
+      "binary_byte_count": 1335296,
+      "binary_sha256": "84f79749ecda5f0c03f0930fc0522104cb4225d4e8370dc502e8bf6137ba79bd",
+      "build_lock_digest": "30b60fcd375cadaf39f9d187e6059fdbf1763d746491c7b727d071542af64473",
+      "bundle_digest": "8d008a66233233869633fd553b7689720c19e87419082d00a7d1e476726541c8",
+      "candidate_id": "packingsolver_box",
+      "product_gate": "benchmark_only_pending_redistribution_notice_and_binary_dependency_audit",
+      "source_commit": "0cae9d04d5d361c496074ea633b1a3955b6543ec",
+      "verified_before_execution": true
+    },
+    "scip": {
+      "artifact_count": 2,
+      "artifacts": [
+        {
+          "artifact_group": "scip",
+          "byte_count": 12904620,
+          "filename": "numpy-2.2.6-cp310-cp310-win_amd64.whl",
+          "sha256": "f0fd6321b839904e15c46e0d257fdd101dd7f530fe03fd6359c1ea63738703f3"
+        },
+        {
+          "artifact_group": "scip",
+          "byte_count": 48289786,
+          "filename": "pyscipopt-6.2.1-cp310-cp310-win_amd64.whl",
+          "sha256": "d83d1cc9cc6d9a840cee71f4b19174cf01a54f004148a29725e2464e17011f59"
+        }
+      ],
+      "bundle_byte_count": 61194406,
+      "bundle_digest": "9995078f64fb814f68381781df56f8c3223761a9ffc34956c9559e0589e578fd",
+      "candidate_id": "scip",
+      "lock_digest": "58736ecde2a6bfbc4d57c3e5bc4e947c9875fe9f7a3c654cb87594e91c552bc6",
+      "schema_version": "bgig.external_solver_artifact_receipt.v1",
+      "verified_before_execution": true
+    }
+  },
+  "candidate_count": 4,
+  "candidate_family_count": 4,
+  "control_count": 6,
+  "invariants": {
+    "external_engines_executed": 4,
+    "fresh_bgig_recertification_required": true,
+    "global_install_count": 0,
+    "holdout_opened": false,
+    "positive_witness_transmitted": false,
+    "real_xyz_output_required": true,
+    "unsupported_hidden_count": 0
+  },
+  "packingsolver_build_lock_digest": "30b60fcd375cadaf39f9d187e6059fdbf1763d746491c7b727d071542af64473",
+  "receipt_digest": "a3c35ee1bddc5578aeb41e79639c507e1d8236d470a39769ace77d2303192d76",
+  "record_count": 24,
+  "records": [
+    {
+      "candidate_id": "ortools_cp_sat",
+      "control_id": "stacking-feasible",
+      "engine": {
+        "best_objective_bound": 439.99999999999994,
+        "candidate_id": "ortools_cp_sat",
+        "engine_status": "OPTIMAL",
+        "input_digest": "9faae3f5d270dfaebfc7be9720e4700d949d2e76fac8d460809f9237a435a2a8",
+        "objective_value": 439.99999999999994,
+        "output_digest": "665f0bb80131c1f6ecb42ef501fe7d45c17aa675846f18d7dbd665d32824a0fe",
+        "placements": [
+          {
+            "assigned_content_count": 1,
+            "orientation": "xyz",
+            "participant_id": "a",
+            "removal_rank": 3,
+            "selected_variant_id": "v0",
+            "size": [
+              6,
+              6,
+              3
+            ],
+            "support_ids": [
+              "b"
+            ],
+            "x": 0,
+            "y": 0,
+            "z": 5
+          },
+          {
+            "assigned_content_count": 1,
+            "orientation": "xyz",
+            "participant_id": "b",
+            "removal_rank": 8,
+            "selected_variant_id": "v0",
+            "size": [
+              6,
+              6,
+              5
+            ],
+            "support_ids": [],
+            "x": 0,
+            "y": 0,
+            "z": 0
+          }
+        ],
+        "proof_status": "complete",
+        "schema_version": "bgig.real_3d_worker_output.v1",
+        "solve_milliseconds": 2.8302,
+        "status": "feasible"
+      },
+      "execution": {
+        "cpu_seconds": 0.3125,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "91ad411b67cd3efd8ed528907a9b24e9725102ae70e0278ed26a98a5d7a54b42",
+        "peak_working_set_bytes": 74842112,
+        "total_wall_seconds": 0.352054
+      },
+      "expected": "feasible",
+      "recertification": {
+        "attempted": true,
+        "certified": true,
+        "errors": []
+      },
+      "report_digest": "6fbe28903d896d2b01b0a37913ef37019314bc8d56220ccf899046d75cb0440e",
+      "status": "solution_found",
+      "stop_reason": "fresh_bgig_recertification_accepted",
+      "unsupported_constraints": [],
+      "worker_invocation_count": 1
+    },
+    {
+      "candidate_id": "ortools_cp_sat",
+      "control_id": "stacking-infeasible",
+      "engine": {
+        "best_objective_bound": null,
+        "candidate_id": "ortools_cp_sat",
+        "engine_status": "INFEASIBLE",
+        "input_digest": "ac7f91da77639eb1f001619057a54261f9e41dbce0f129532465965303fc40b5",
+        "objective_value": null,
+        "output_digest": "122219c417f7edd0ea71d291c8ab4dcbe1fa28d3f220f33d569b2ab7b40f2a07",
+        "placements": [],
+        "proof_status": "complete",
+        "schema_version": "bgig.real_3d_worker_output.v1",
+        "solve_milliseconds": 1.1929,
+        "status": "infeasible"
+      },
+      "execution": {
+        "cpu_seconds": 0.28125,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "3a2083d485b74c649d4428f96741bb7d54ed92557826d16825644b502c27caec",
+        "peak_working_set_bytes": 72695808,
+        "total_wall_seconds": 0.344281
+      },
+      "expected": "infeasible",
+      "recertification": {
+        "attempted": false,
+        "certified": false,
+        "errors": []
+      },
+      "report_digest": "588ef02398de62ac223b6979c8ae27269e331f791e8ae8aad4e23ad8a7a5a32f",
+      "status": "infeasible_proven",
+      "stop_reason": "complete_external_search",
+      "unsupported_constraints": [],
+      "worker_invocation_count": 1
+    },
+    {
+      "candidate_id": "ortools_cp_sat",
+      "control_id": "multi-support-feasible",
+      "engine": {
+        "best_objective_bound": 1088.0,
+        "candidate_id": "ortools_cp_sat",
+        "engine_status": "OPTIMAL",
+        "input_digest": "2237729113069580ee33209a4ca1a3b85bbc18f7f0a2ee7eff47557df5de496a",
+        "objective_value": 1088.0,
+        "output_digest": "e1d2961390ef5e6d1fedf757c7545bf102615e2558cc9b71aa2fd3feb84ec100",
+        "placements": [
+          {
+            "assigned_content_count": 1,
+            "orientation": "yxz",
+            "participant_id": "left",
+            "removal_rank": 4,
+            "selected_variant_id": "v0",
+            "size": [
+              10,
+              5,
+              4
+            ],
+            "support_ids": [
+              "load"
+            ],
+            "x": 0,
+            "y": 0,
+            "z": 4
+          },
+          {
+            "assigned_content_count": 1,
+            "orientation": "yxz",
+            "participant_id": "right",
+            "removal_rank": 4,
+            "selected_variant_id": "v0",
+            "size": [
+              10,
+              5,
+              4
+            ],
+            "support_ids": [
+              "load"
+            ],
+            "x": 0,
+            "y": 5,
+            "z": 4
+          },
+          {
+            "assigned_content_count": 1,
+            "orientation": "xyz",
+            "participant_id": "load",
+            "removal_rank": 8,
+            "selected_variant_id": "v0",
+            "size": [
+              10,
+              10,
+              4
+            ],
+            "support_ids": [],
+            "x": 0,
+            "y": 0,
+            "z": 0
+          }
+        ],
+        "proof_status": "complete",
+        "schema_version": "bgig.real_3d_worker_output.v1",
+        "solve_milliseconds": 3.9601,
+        "status": "feasible"
+      },
+      "execution": {
+        "cpu_seconds": 0.296875,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "727eb30b7f268862ff598a2325770db6eb07fdad06494423fe92ed81d087a4e3",
+        "peak_working_set_bytes": 75018240,
+        "total_wall_seconds": 0.346749
+      },
+      "expected": "feasible",
+      "recertification": {
+        "attempted": true,
+        "certified": true,
+        "errors": []
+      },
+      "report_digest": "a99bb812ac8fb22fcbc5771c6fe7b9a7e8650558cc297f3d02452e977b3be471",
+      "status": "solution_found",
+      "stop_reason": "fresh_bgig_recertification_accepted",
+      "unsupported_constraints": [],
+      "worker_invocation_count": 1
+    },
+    {
+      "candidate_id": "ortools_cp_sat",
+      "control_id": "reservation-feasible",
+      "engine": {
+        "best_objective_bound": 1196.0,
+        "candidate_id": "ortools_cp_sat",
+        "engine_status": "OPTIMAL",
+        "input_digest": "c9e514d2e4f142ddbf6198a869768b6a1ae8a6cea03fba3f155a2ba075581f66",
+        "objective_value": 1196.0,
+        "output_digest": "7a22470cf3a65e25071a095df0c1a38e768a2c0352c27fff9e976aec9694ad59",
+        "placements": [
+          {
+            "assigned_content_count": 1,
+            "orientation": "xyz",
+            "participant_id": "a",
+            "removal_rank": 8,
+            "selected_variant_id": "v0",
+            "size": [
+              6,
+              6,
+              4
+            ],
+            "support_ids": [],
+            "x": 6,
+            "y": 0,
+            "z": 0
+          },
+          {
+            "assigned_content_count": 1,
+            "orientation": "xyz",
+            "participant_id": "b",
+            "removal_rank": 8,
+            "selected_variant_id": "v0",
+            "size": [
+              6,
+              6,
+              4
+            ],
+            "support_ids": [],
+            "x": 12,
+            "y": 0,
+            "z": 0
+          },
+          {
+            "assigned_content_count": 1,
+            "orientation": "xyz",
+            "participant_id": "c",
+            "removal_rank": 4,
+            "selected_variant_id": "v0",
+            "size": [
+              6,
+              6,
+              4
+            ],
+            "support_ids": [
+              "a"
+            ],
+            "x": 6,
+            "y": 0,
+            "z": 4
+          }
+        ],
+        "proof_status": "complete",
+        "schema_version": "bgig.real_3d_worker_output.v1",
+        "solve_milliseconds": 5.9146,
+        "status": "feasible"
+      },
+      "execution": {
+        "cpu_seconds": 0.3125,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "9fb41f35e6a755054e34df9fe20f244724b084992b764b40cf3bb2ffc649f1af",
+        "peak_working_set_bytes": 75911168,
+        "total_wall_seconds": 0.347455
+      },
+      "expected": "feasible",
+      "recertification": {
+        "attempted": true,
+        "certified": true,
+        "errors": []
+      },
+      "report_digest": "bce8774a6b83f12f6f4227bdd70cca8da9c57763626e9bbba28996ff7fcb111b",
+      "status": "solution_found",
+      "stop_reason": "fresh_bgig_recertification_accepted",
+      "unsupported_constraints": [],
+      "worker_invocation_count": 1
+    },
+    {
+      "candidate_id": "ortools_cp_sat",
+      "control_id": "fragmentation-feasible",
+      "engine": {
+        "best_objective_bound": 1968.0,
+        "candidate_id": "ortools_cp_sat",
+        "engine_status": "OPTIMAL",
+        "input_digest": "44fed81d804bafacb5adadccb15bb23e34a66904b5f0b9a5d071b9730cc427f0",
+        "objective_value": 1968.0,
+        "output_digest": "6f7640663d834d47291e7f8870abf0c866bf230cc5f9acd622eb8f783554c614",
+        "placements": [
+          {
+            "assigned_content_count": 1,
+            "orientation": "xyz",
+            "participant_id": "a",
+            "removal_rank": 4,
+            "selected_variant_id": "v0",
+            "size": [
+              10,
+              10,
+              4
+            ],
+            "support_ids": [],
+            "x": 14,
+            "y": 2,
+            "z": 0
+          },
+          {
+            "assigned_content_count": 1,
+            "orientation": "xyz",
+            "participant_id": "b",
+            "removal_rank": 4,
+            "selected_variant_id": "v0",
+            "size": [
+              10,
+              10,
+              4
+            ],
+            "support_ids": [],
+            "x": 2,
+            "y": 2,
+            "z": 0
+          }
+        ],
+        "proof_status": "complete",
+        "schema_version": "bgig.real_3d_worker_output.v1",
+        "solve_milliseconds": 3.5269,
+        "status": "feasible"
+      },
+      "execution": {
+        "cpu_seconds": 0.34375,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "ea26c506989022904378c84253b652e5619c2e55f94c169ec154e7a47aafe43a",
+        "peak_working_set_bytes": 74276864,
+        "total_wall_seconds": 0.378864
+      },
+      "expected": "feasible",
+      "recertification": {
+        "attempted": true,
+        "certified": true,
+        "errors": []
+      },
+      "report_digest": "031571003623addf8291c198bdb81baf884262aca1e4224330d6c176dd48143f",
+      "status": "solution_found",
+      "stop_reason": "fresh_bgig_recertification_accepted",
+      "unsupported_constraints": [],
+      "worker_invocation_count": 1
+    },
+    {
+      "candidate_id": "ortools_cp_sat",
+      "control_id": "variant-rotation-feasible",
+      "engine": {
+        "best_objective_bound": 314.0,
+        "candidate_id": "ortools_cp_sat",
+        "engine_status": "OPTIMAL",
+        "input_digest": "5e31d4543d46314d4393450a83711c91cb3238b348e78ed5b7755c8d21730b45",
+        "objective_value": 314.0,
+        "output_digest": "0d9c6a91a7dcdc35792d7c863643e65ac06311723466f33fa483657c7eef5254",
+        "placements": [
+          {
+            "assigned_content_count": 1,
+            "orientation": "yxz",
+            "participant_id": "item",
+            "removal_rank": 4,
+            "selected_variant_id": "v1",
+            "size": [
+              8,
+              6,
+              4
+            ],
+            "support_ids": [],
+            "x": 0,
+            "y": 0,
+            "z": 0
+          }
+        ],
+        "proof_status": "complete",
+        "schema_version": "bgig.real_3d_worker_output.v1",
+        "solve_milliseconds": 2.4954,
+        "status": "feasible"
+      },
+      "execution": {
+        "cpu_seconds": 0.3125,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "510b6e3f64e3960bf4af6b2248fbc9b0a4a929cb6f1e613779ff2fc954842662",
+        "peak_working_set_bytes": 74694656,
+        "total_wall_seconds": 0.345974
+      },
+      "expected": "feasible",
+      "recertification": {
+        "attempted": true,
+        "certified": true,
+        "errors": []
+      },
+      "report_digest": "830673a523a8fbec347e7e6a90b5c8b6a56afd87acb9d80e5fd00a1412cee86d",
+      "status": "solution_found",
+      "stop_reason": "fresh_bgig_recertification_accepted",
+      "unsupported_constraints": [],
+      "worker_invocation_count": 1
+    },
+    {
+      "candidate_id": "scip",
+      "control_id": "stacking-feasible",
+      "engine": {
+        "best_objective_bound": 440.0,
+        "candidate_id": "scip",
+        "engine_status": "optimal",
+        "input_digest": "f7c7dd99b23348f668e1ebda02c4463d2a958e8ff346f0eabf28010b017ca80a",
+        "objective_value": 440.0,
+        "output_digest": "b4b3b3ed0adf8304f24da07cc1654f35058e4a704f44c9ec41be8d30a75d3352",
+        "placements": [
+          {
+            "assigned_content_count": 1,
+            "orientation": "xyz",
+            "participant_id": "a",
+            "removal_rank": 8,
+            "selected_variant_id": "v0",
+            "size": [
+              6,
+              6,
+              3
+            ],
+            "support_ids": [],
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          {
+            "assigned_content_count": 1,
+            "orientation": "xyz",
+            "participant_id": "b",
+            "removal_rank": 5,
+            "selected_variant_id": "v0",
+            "size": [
+              6,
+              6,
+              5
+            ],
+            "support_ids": [
+              "a"
+            ],
+            "x": 0,
+            "y": 0,
+            "z": 3
+          }
+        ],
+        "proof_status": "complete",
+        "schema_version": "bgig.real_3d_worker_output.v1",
+        "solve_milliseconds": 0.9033,
+        "status": "feasible"
+      },
+      "execution": {
+        "cpu_seconds": 0.09375,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "49293bec1d01e52e9430f3a113fa6f0c5a2f9eecfb88a0a97a299021b3aca646",
+        "peak_working_set_bytes": 31916032,
+        "total_wall_seconds": 0.123668
+      },
+      "expected": "feasible",
+      "recertification": {
+        "attempted": true,
+        "certified": true,
+        "errors": []
+      },
+      "report_digest": "19954e3e3d7e47acb5926cbfc96e1e003e6772109f4b8ac157c9e9a5d646860e",
+      "status": "solution_found",
+      "stop_reason": "fresh_bgig_recertification_accepted",
+      "unsupported_constraints": [],
+      "worker_invocation_count": 1
+    },
+    {
+      "candidate_id": "scip",
+      "control_id": "stacking-infeasible",
+      "engine": {
+        "best_objective_bound": null,
+        "candidate_id": "scip",
+        "engine_status": "infeasible",
+        "input_digest": "ec790e5ddbde9cab63ca711acb9e5e4daeff2f4d0c45c4d483a145787fdc3194",
+        "objective_value": null,
+        "output_digest": "2dff922ad1b53562009d7f1544e1a764e68cde1cf8552334af875073ae175d5b",
+        "placements": [],
+        "proof_status": "complete",
+        "schema_version": "bgig.real_3d_worker_output.v1",
+        "solve_milliseconds": 0.6733,
+        "status": "infeasible"
+      },
+      "execution": {
+        "cpu_seconds": 0.09375,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "753358377b9985863a385a60329013cc857cdc3137a3f3c0af393f16b5d1b7fe",
+        "peak_working_set_bytes": 31645696,
+        "total_wall_seconds": 0.124684
+      },
+      "expected": "infeasible",
+      "recertification": {
+        "attempted": false,
+        "certified": false,
+        "errors": []
+      },
+      "report_digest": "cdfbf6175cfbfcf077efad6eb2753dc7cfc967122582d448984f71cc2b0619d7",
+      "status": "infeasible_proven",
+      "stop_reason": "complete_external_search",
+      "unsupported_constraints": [],
+      "worker_invocation_count": 1
+    },
+    {
+      "candidate_id": "scip",
+      "control_id": "multi-support-feasible",
+      "engine": {
+        "best_objective_bound": 1088.0,
+        "candidate_id": "scip",
+        "engine_status": "optimal",
+        "input_digest": "9088ee1a3168cf2945d6e10d350cd9b6b7926814db86df4dcea5d05b8a3fb90d",
+        "objective_value": 1088.0,
+        "output_digest": "5aea0e03c55149d28033b3d88c21dfb1850ebc48a08d4a2ee9eea9cd0c9cb5d9",
+        "placements": [
+          {
+            "assigned_content_count": 1,
+            "orientation": "yxz",
+            "participant_id": "left",
+            "removal_rank": 4,
+            "selected_variant_id": "v0",
+            "size": [
+              10,
+              5,
+              4
+            ],
+            "support_ids": [
+              "load"
+            ],
+            "x": 0,
+            "y": 0,
+            "z": 4
+          },
+          {
+            "assigned_content_count": 1,
+            "orientation": "yxz",
+            "participant_id": "right",
+            "removal_rank": 4,
+            "selected_variant_id": "v0",
+            "size": [
+              10,
+              5,
+              4
+            ],
+            "support_ids": [
+              "load"
+            ],
+            "x": 0,
+            "y": 5,
+            "z": 4
+          },
+          {
+            "assigned_content_count": 1,
+            "orientation": "xyz",
+            "participant_id": "load",
+            "removal_rank": 8,
+            "selected_variant_id": "v0",
+            "size": [
+              10,
+              10,
+              4
+            ],
+            "support_ids": [],
+            "x": 0,
+            "y": 0,
+            "z": 0
+          }
+        ],
+        "proof_status": "complete",
+        "schema_version": "bgig.real_3d_worker_output.v1",
+        "solve_milliseconds": 2.0544,
+        "status": "feasible"
+      },
+      "execution": {
+        "cpu_seconds": 0.078125,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "96450d998b3976ba204123c8d78c06b7044e08af0a88f1347bd80303ad7bb659",
+        "peak_working_set_bytes": 32870400,
+        "total_wall_seconds": 0.125118
+      },
+      "expected": "feasible",
+      "recertification": {
+        "attempted": true,
+        "certified": true,
+        "errors": []
+      },
+      "report_digest": "9f4b7572bc7df8d491d780941c7139f759d4224051abf356dbc70a6fb6a11162",
+      "status": "solution_found",
+      "stop_reason": "fresh_bgig_recertification_accepted",
+      "unsupported_constraints": [],
+      "worker_invocation_count": 1
+    },
+    {
+      "candidate_id": "scip",
+      "control_id": "reservation-feasible",
+      "engine": {
+        "best_objective_bound": 1196.0,
+        "candidate_id": "scip",
+        "engine_status": "optimal",
+        "input_digest": "c9a63cd706ab61442f91875fda79bf78645ae2c64b6926d7191a1aef5e2e69c0",
+        "objective_value": 1196.0,
+        "output_digest": "9cce2934063939f98efeae5136be76c2db926c37289e6a7bbf4a34b64541086e",
+        "placements": [
+          {
+            "assigned_content_count": 1,
+            "orientation": "xyz",
+            "participant_id": "a",
+            "removal_rank": 8,
+            "selected_variant_id": "v0",
+            "size": [
+              6,
+              6,
+              4
+            ],
+            "support_ids": [],
+            "x": 12,
+            "y": 0,
+            "z": 0
+          },
+          {
+            "assigned_content_count": 1,
+            "orientation": "xyz",
+            "participant_id": "b",
+            "removal_rank": 4,
+            "selected_variant_id": "v0",
+            "size": [
+              6,
+              6,
+              4
+            ],
+            "support_ids": [
+              "c"
+            ],
+            "x": 6,
+            "y": 0,
+            "z": 4
+          },
+          {
+            "assigned_content_count": 1,
+            "orientation": "xyz",
+            "participant_id": "c",
+            "removal_rank": 8,
+            "selected_variant_id": "v0",
+            "size": [
+              6,
+              6,
+              4
+            ],
+            "support_ids": [],
+            "x": 6,
+            "y": 0,
+            "z": 0
+          }
+        ],
+        "proof_status": "complete",
+        "schema_version": "bgig.real_3d_worker_output.v1",
+        "solve_milliseconds": 7.1434,
+        "status": "feasible"
+      },
+      "execution": {
+        "cpu_seconds": 0.078125,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "94b2ca69dc2219845911e3143b37e16c3616064941389f1ff38341a90f574c4b",
+        "peak_working_set_bytes": 45494272,
+        "total_wall_seconds": 0.15464
+      },
+      "expected": "feasible",
+      "recertification": {
+        "attempted": true,
+        "certified": true,
+        "errors": []
+      },
+      "report_digest": "0e10d4309c27a19b4ee9492c9f0d81fc7e9ed35071e60f7e7c3ee24ffc7551bf",
+      "status": "solution_found",
+      "stop_reason": "fresh_bgig_recertification_accepted",
+      "unsupported_constraints": [],
+      "worker_invocation_count": 1
+    },
+    {
+      "candidate_id": "scip",
+      "control_id": "fragmentation-feasible",
+      "engine": {
+        "best_objective_bound": 1968.0,
+        "candidate_id": "scip",
+        "engine_status": "optimal",
+        "input_digest": "d608cf6d55c3de38c2622d023bbb43d1f3044b939d069c3d98f076e995967748",
+        "objective_value": 1968.0,
+        "output_digest": "61528c036a75e3e932834756053ba78946baf9351c1043f78ff16967de1d0f03",
+        "placements": [
+          {
+            "assigned_content_count": 1,
+            "orientation": "xyz",
+            "participant_id": "a",
+            "removal_rank": 4,
+            "selected_variant_id": "v0",
+            "size": [
+              10,
+              10,
+              4
+            ],
+            "support_ids": [],
+            "x": 2,
+            "y": 2,
+            "z": 0
+          },
+          {
+            "assigned_content_count": 1,
+            "orientation": "xyz",
+            "participant_id": "b",
+            "removal_rank": 4,
+            "selected_variant_id": "v0",
+            "size": [
+              10,
+              10,
+              4
+            ],
+            "support_ids": [],
+            "x": 14,
+            "y": 2,
+            "z": 0
+          }
+        ],
+        "proof_status": "complete",
+        "schema_version": "bgig.real_3d_worker_output.v1",
+        "solve_milliseconds": 0.9931,
+        "status": "feasible"
+      },
+      "execution": {
+        "cpu_seconds": 0.046875,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "d75540788cc570905c6fd8bee1c374c30c056b3f6eb6cde72fac379494946475",
+        "peak_working_set_bytes": 31641600,
+        "total_wall_seconds": 0.121827
+      },
+      "expected": "feasible",
+      "recertification": {
+        "attempted": true,
+        "certified": true,
+        "errors": []
+      },
+      "report_digest": "4d00a1ae5ab7a3e32e2e60cb8e74c12e276d1af06cf13a7c8d5cf1dade58de27",
+      "status": "solution_found",
+      "stop_reason": "fresh_bgig_recertification_accepted",
+      "unsupported_constraints": [],
+      "worker_invocation_count": 1
+    },
+    {
+      "candidate_id": "scip",
+      "control_id": "variant-rotation-feasible",
+      "engine": {
+        "best_objective_bound": 314.0,
+        "candidate_id": "scip",
+        "engine_status": "optimal",
+        "input_digest": "53d66d03c593e741482c89318016938b1cfc5f3b05659d3037ed9ca2dbfb07d8",
+        "objective_value": 314.0,
+        "output_digest": "ef6dd8c464070398f74d80a29ee0a7d613a82060bc0690e3ab5f3e1c95878eac",
+        "placements": [
+          {
+            "assigned_content_count": 1,
+            "orientation": "yxz",
+            "participant_id": "item",
+            "removal_rank": 4,
+            "selected_variant_id": "v1",
+            "size": [
+              8,
+              6,
+              4
+            ],
+            "support_ids": [],
+            "x": 0,
+            "y": 0,
+            "z": 0
+          }
+        ],
+        "proof_status": "complete",
+        "schema_version": "bgig.real_3d_worker_output.v1",
+        "solve_milliseconds": 0.7463,
+        "status": "feasible"
+      },
+      "execution": {
+        "cpu_seconds": 0.09375,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "6feaa36fcc1c163799e7ca27e381c41cd9005ca461117bca6407f1153eac3ad7",
+        "peak_working_set_bytes": 31883264,
+        "total_wall_seconds": 0.124777
+      },
+      "expected": "feasible",
+      "recertification": {
+        "attempted": true,
+        "certified": true,
+        "errors": []
+      },
+      "report_digest": "7e54b328bf155888864188bcd86f00e266dd784de1795ee4929c4c91e0835903",
+      "status": "solution_found",
+      "stop_reason": "fresh_bgig_recertification_accepted",
+      "unsupported_constraints": [],
+      "worker_invocation_count": 1
+    },
+    {
+      "candidate_id": "packingsolver_box",
+      "control_id": "stacking-feasible",
+      "engine": {
+        "best_objective_bound": null,
+        "candidate_id": "packingsolver_box",
+        "engine_status": "complete_certificate",
+        "input_digest": "23830dd82410e057e60e75d1094201278aa760440beb75941ed1015b416825c3",
+        "objective_value": null,
+        "output_digest": "b3342c80ad446b77e19c60e391f553364420b917a720a2f3beb31eb7a22d26ed",
+        "placements": [
+          {
+            "assigned_content_count": 1,
+            "orientation": "xyz",
+            "participant_id": "b",
+            "removal_rank": 8,
+            "selected_variant_id": "v0",
+            "size": [
+              6,
+              6,
+              5
+            ],
+            "support_ids": [],
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          {
+            "assigned_content_count": 1,
+            "orientation": "xyz",
+            "participant_id": "a",
+            "removal_rank": 3,
+            "selected_variant_id": "v0",
+            "size": [
+              6,
+              6,
+              3
+            ],
+            "support_ids": [
+              "b"
+            ],
+            "x": 0,
+            "y": 0,
+            "z": 5
+          }
+        ],
+        "proof_status": "incumbent",
+        "schema_version": "bgig.real_3d_worker_output.v1",
+        "solve_milliseconds": 7.3854,
+        "status": "feasible"
+      },
+      "execution": {
+        "cpu_seconds": 0.03125,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "464f621b2043664b8f423ac7491abd7002a4a6f5a984deabfadd817efea62cc3",
+        "peak_working_set_bytes": 11857920,
+        "total_wall_seconds": 0.060284
+      },
+      "expected": "feasible",
+      "recertification": {
+        "attempted": true,
+        "certified": true,
+        "errors": []
+      },
+      "report_digest": "c45e2aa18be4029004810567568aef99a6cc28403cb7d4cf1616ddb513320060",
+      "status": "solution_found",
+      "stop_reason": "fresh_bgig_recertification_accepted",
+      "unsupported_constraints": [],
+      "worker_invocation_count": 1
+    },
+    {
+      "candidate_id": "packingsolver_box",
+      "control_id": "stacking-infeasible",
+      "engine": {
+        "best_objective_bound": null,
+        "candidate_id": "packingsolver_box",
+        "engine_status": "incomplete_certificate",
+        "input_digest": "3c3974d691f54746efa7e492cc851cd0b4808dc2813c77f5a715c0616d2a6908",
+        "objective_value": null,
+        "output_digest": "934bd224e887bb15a8e37538c7ec6c4696d5d3f21485f1e5238df45e434fb3d8",
+        "placements": [],
+        "proof_status": "bounded",
+        "schema_version": "bgig.real_3d_worker_output.v1",
+        "solve_milliseconds": 1017.7479,
+        "status": "unknown"
+      },
+      "execution": {
+        "cpu_seconds": 0.015625,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "89f146e1290581804ab73a7e2161f6faf9418b178a23cb82460e860fb6100c33",
+        "peak_working_set_bytes": 14950400,
+        "total_wall_seconds": 1.075194
+      },
+      "expected": "infeasible",
+      "recertification": {
+        "attempted": false,
+        "certified": false,
+        "errors": []
+      },
+      "report_digest": "15d2a3af64f86644caf3ca61fe1b5d9baa3249698f447ad59133a7d598b881e1",
+      "status": "bounded_unknown",
+      "stop_reason": "no_certified_plan_within_budget",
+      "unsupported_constraints": [],
+      "worker_invocation_count": 1
+    },
+    {
+      "candidate_id": "packingsolver_box",
+      "control_id": "multi-support-feasible",
+      "engine": {},
+      "execution": {},
+      "expected": "feasible",
+      "recertification": {
+        "attempted": false,
+        "certified": false,
+        "errors": []
+      },
+      "report_digest": "c4909645ccab2d23606391f5dcfea28a7b029577a2b104981d24b3da5de51c0e",
+      "status": "unsupported",
+      "stop_reason": "unsupported_semantics",
+      "unsupported_constraints": [
+        "multi_support",
+        "multi_support_count",
+        "support"
+      ],
+      "worker_invocation_count": 0
+    },
+    {
+      "candidate_id": "packingsolver_box",
+      "control_id": "reservation-feasible",
+      "engine": {},
+      "execution": {},
+      "expected": "feasible",
+      "recertification": {
+        "attempted": false,
+        "certified": false,
+        "errors": []
+      },
+      "report_digest": "5f52f1318bf5edb79e1dbe59f3a7d573a8b5aa1794cbc0596a69fc0bb9e3fb09",
+      "status": "unsupported",
+      "stop_reason": "unsupported_semantics",
+      "unsupported_constraints": [
+        "lower_reservation",
+        "reservation_volumes",
+        "support",
+        "upper_reservation"
+      ],
+      "worker_invocation_count": 0
+    },
+    {
+      "candidate_id": "packingsolver_box",
+      "control_id": "fragmentation-feasible",
+      "engine": {},
+      "execution": {},
+      "expected": "feasible",
+      "recertification": {
+        "attempted": false,
+        "certified": false,
+        "errors": []
+      },
+      "report_digest": "00d2353f7c402ed0d476eeeb4b13217f907dfa730dee217cb236aa48b2944f8c",
+      "status": "unsupported",
+      "stop_reason": "unsupported_semantics",
+      "unsupported_constraints": [
+        "disjoint_regions",
+        "near_saturation"
+      ],
+      "worker_invocation_count": 0
+    },
+    {
+      "candidate_id": "packingsolver_box",
+      "control_id": "variant-rotation-feasible",
+      "engine": {},
+      "execution": {},
+      "expected": "feasible",
+      "recertification": {
+        "attempted": false,
+        "certified": false,
+        "errors": []
+      },
+      "report_digest": "83009e66706e3c63cf0fa95d4502daaec9bf37d4fdf64356370178652a1aec5f",
+      "status": "unsupported",
+      "stop_reason": "unsupported_semantics",
+      "unsupported_constraints": [
+        "p45_variant_front",
+        "variant_choice"
+      ],
+      "worker_invocation_count": 0
+    },
+    {
+      "candidate_id": "laff",
+      "control_id": "stacking-feasible",
+      "engine": {
+        "best_objective_bound": null,
+        "candidate_id": "laff",
+        "engine_status": "complete_pack",
+        "input_digest": "e2e526a3782e980642c984ecae09186ffeb4fbbb542c7493d39187fbe443f653",
+        "objective_value": null,
+        "output_digest": "49ef01ba8d6579ee3238dede6890b87208edf7d7927b743d25acd4093e72ae4c",
+        "placements": [
+          {
+            "assigned_content_count": 1,
+            "orientation": "xyz",
+            "participant_id": "b",
+            "removal_rank": 8,
+            "selected_variant_id": "v0",
+            "size": [
+              6,
+              6,
+              5
+            ],
+            "support_ids": [],
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          {
+            "assigned_content_count": 1,
+            "orientation": "xyz",
+            "participant_id": "a",
+            "removal_rank": 3,
+            "selected_variant_id": "v0",
+            "size": [
+              6,
+              6,
+              3
+            ],
+            "support_ids": [
+              "b"
+            ],
+            "x": 0,
+            "y": 0,
+            "z": 5
+          }
+        ],
+        "proof_status": "incumbent",
+        "schema_version": "bgig.real_3d_worker_output.v1",
+        "solve_milliseconds": 68.1902,
+        "status": "feasible"
+      },
+      "execution": {
+        "cpu_seconds": 0.046875,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "9e846c0663c025649cc2a065f11f8251f91aef01d8ab846e885bec09bdcfec9a",
+        "peak_working_set_bytes": 14761984,
+        "total_wall_seconds": 0.313487
+      },
+      "expected": "feasible",
+      "recertification": {
+        "attempted": true,
+        "certified": true,
+        "errors": []
+      },
+      "report_digest": "3adeba939b79eac409a9141ba64c00225031e1ce7ce179d1409ed1fd336b486c",
+      "status": "solution_found",
+      "stop_reason": "fresh_bgig_recertification_accepted",
+      "unsupported_constraints": [],
+      "worker_invocation_count": 1
+    },
+    {
+      "candidate_id": "laff",
+      "control_id": "stacking-infeasible",
+      "engine": {
+        "best_objective_bound": null,
+        "candidate_id": "laff",
+        "engine_status": "no_complete_pack",
+        "input_digest": "1771a9fecf93cd03437d5e14b72b45f4e5ec8b1a2fcb4fd8b16c72d650fe7d01",
+        "objective_value": null,
+        "output_digest": "3ce84c3e4bed2292b94485e4e5e40395935d14b86dce65112d7acfeca4e6daf0",
+        "placements": [],
+        "proof_status": "bounded",
+        "schema_version": "bgig.real_3d_worker_output.v1",
+        "solve_milliseconds": 3.602,
+        "status": "unknown"
+      },
+      "execution": {
+        "cpu_seconds": 0.046875,
+        "execution_status": "completed",
+        "exit_code": 0,
+        "input_digest": "4374ec78c6e7f0f2124f9f69d53aadedd465a60267d068781e69a09b7fe88a45",
+        "peak_working_set_bytes": 14827520,
+        "total_wall_seconds": 0.218078
+      },
+      "expected": "infeasible",
+      "recertification": {
+        "attempted": false,
+        "certified": false,
+        "errors": []
+      },
+      "report_digest": "c698ea0e95d28917bd436591eea77c895fd1e216af810bb028244da8a9d6074a",
+      "status": "bounded_unknown",
+      "stop_reason": "no_certified_plan_within_budget",
+      "unsupported_constraints": [],
+      "worker_invocation_count": 1
+    },
+    {
+      "candidate_id": "laff",
+      "control_id": "multi-support-feasible",
+      "engine": {},
+      "execution": {},
+      "expected": "feasible",
+      "recertification": {
+        "attempted": false,
+        "certified": false,
+        "errors": []
+      },
+      "report_digest": "6683a2efc2a2a845a346a117398c6e2fd16a604a29d64b44eaf2c6774446c135",
+      "status": "unsupported",
+      "stop_reason": "unsupported_semantics",
+      "unsupported_constraints": [
+        "multi_support",
+        "multi_support_count",
+        "support"
+      ],
+      "worker_invocation_count": 0
+    },
+    {
+      "candidate_id": "laff",
+      "control_id": "reservation-feasible",
+      "engine": {},
+      "execution": {},
+      "expected": "feasible",
+      "recertification": {
+        "attempted": false,
+        "certified": false,
+        "errors": []
+      },
+      "report_digest": "e5963fac480d1b3d3eb2b082907289f54324a05a1318200a56c82ab0525d910c",
+      "status": "unsupported",
+      "stop_reason": "unsupported_semantics",
+      "unsupported_constraints": [
+        "lower_reservation",
+        "reservation_volumes",
+        "support",
+        "upper_reservation"
+      ],
+      "worker_invocation_count": 0
+    },
+    {
+      "candidate_id": "laff",
+      "control_id": "fragmentation-feasible",
+      "engine": {},
+      "execution": {},
+      "expected": "feasible",
+      "recertification": {
+        "attempted": false,
+        "certified": false,
+        "errors": []
+      },
+      "report_digest": "7fa003aa2224113ae975282f37304e3a3adc3429ad060ae451591faa9e71f5c2",
+      "status": "unsupported",
+      "stop_reason": "unsupported_semantics",
+      "unsupported_constraints": [
+        "disjoint_regions",
+        "near_saturation"
+      ],
+      "worker_invocation_count": 0
+    },
+    {
+      "candidate_id": "laff",
+      "control_id": "variant-rotation-feasible",
+      "engine": {},
+      "execution": {},
+      "expected": "feasible",
+      "recertification": {
+        "attempted": false,
+        "certified": false,
+        "errors": []
+      },
+      "report_digest": "5d6b723bbdbeb4975bb2e17d7d25e5da8959ef487003d9a05464415088d37798",
+      "status": "unsupported",
+      "stop_reason": "unsupported_semantics",
+      "unsupported_constraints": [
+        "p45_variant_front",
+        "variant_choice"
+      ],
+      "worker_invocation_count": 0
+    }
+  ],
+  "schema_version": "bgig.real_3d_adapter_controls_receipt.v1"
+}

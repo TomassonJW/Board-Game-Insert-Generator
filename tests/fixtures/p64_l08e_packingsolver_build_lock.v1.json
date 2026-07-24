@@ -1,0 +1,92 @@
+{
+  "build": {
+    "architecture": "x64",
+    "binary_byte_count": 1335296,
+    "binary_filename": "packingsolver_box.exe",
+    "binary_sha256": "84f79749ecda5f0c03f0930fc0522104cb4225d4e8370dc502e8bf6137ba79bd",
+    "compiler": "MSVC 19.44.35207.1",
+    "configuration": "Release",
+    "flags": [
+      "PACKINGSOLVER_BUILD_TEST=OFF",
+      "PACKINGSOLVER_USE_CLP=OFF",
+      "PACKINGSOLVER_USE_HIGHS=OFF"
+    ],
+    "generator": "Visual Studio 17 2022",
+    "target": "PackingSolver_box_main"
+  },
+  "candidate_id": "packingsolver_box",
+  "dependencies": [
+    {
+      "license": "BSL-1.0",
+      "license_sha256": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "name": "Boost",
+      "version": "1.84.0"
+    },
+    {
+      "license": "MIT",
+      "license_sha256": "86b998c792894ccb911a1cb7994f7a9652894e7a094c0b5e45be2f553f45cf14",
+      "name": "nlohmann-json",
+      "version": "3.11.3"
+    },
+    {
+      "license": "MIT",
+      "license_sha256": "11f5fd1935484bee977b7cf358dd262edf194f3884930eed98eb011f1cd41ad5",
+      "name": "optimizationtools",
+      "version": "7e29ad3e2dab11a44887fbcc9382188c5d0ead12"
+    },
+    {
+      "license": "MIT",
+      "license_sha256": "e95d917aad0166631178daa80e3d0fad84a9da8d726a6e2c412883ce9b90f950",
+      "name": "shape",
+      "version": "20cf454450c2bb1a0086ee93d29e0ff3cbd0a5ef"
+    },
+    {
+      "license": "MIT",
+      "license_sha256": "50309d621524af8b5416a8eab271bbbc29f5254d5d9932fade69b37b5f347d0a",
+      "name": "mathoptsolverscmake",
+      "version": "94b28a403a9f8b6a4ca130b820b5f21ae313b520"
+    },
+    {
+      "license": "MIT",
+      "license_sha256": "de525857db62b60ad15578e41c99716eb82e4f8a40d78a7d331e5272c2e3ba45",
+      "name": "knapsacksolver",
+      "version": "605153f85b0781ae0c2b7548a18639ef77d25c09"
+    },
+    {
+      "license": "MIT",
+      "license_sha256": "de525857db62b60ad15578e41c99716eb82e4f8a40d78a7d331e5272c2e3ba45",
+      "name": "multiplechoicesubsetsumsolver",
+      "version": "83406f59044425aef1391030db0b29333c208d7f"
+    },
+    {
+      "license": "MIT",
+      "license_sha256": "9fda4ad88830a204fd5cb92c429d4cfcdbbed353fb53d5ab92640d7b18e0a1f1",
+      "name": "treesearchsolver",
+      "version": "b7254420989dd804144d16b898f323f1d606dda4"
+    },
+    {
+      "license": "MIT",
+      "license_sha256": "9fda4ad88830a204fd5cb92c429d4cfcdbbed353fb53d5ab92640d7b18e0a1f1",
+      "name": "columngenerationsolver",
+      "version": "4fe217ef30355b9cf7cdf7eddb8d93542fa7583a"
+    }
+  ],
+  "family": "specialized_3d_tree_search",
+  "invariants": {
+    "account_secret_telemetry_required": false,
+    "global_install_count": 0,
+    "network_service_count": 0,
+    "offline_execution_required": true,
+    "source_and_build_outside_versioned_tree": true
+  },
+  "lock_digest": "30b60fcd375cadaf39f9d187e6059fdbf1763d746491c7b727d071542af64473",
+  "product_gate": "benchmark_only_pending_redistribution_notice_and_binary_dependency_audit",
+  "schema_version": "bgig.packingsolver_build_lock.v1",
+  "source": {
+    "commit": "0cae9d04d5d361c496074ea633b1a3955b6543ec",
+    "license": "MIT",
+    "license_sha256": "5f91f8cb5b7b56b2acfa04dbec4022917448cf8a62f9cb7be02fe312ef866f3f",
+    "repository_url": "https://github.com/fontanf/packingsolver",
+    "tree": "94bcba1a9916b37bcc9cd0bf15a2b0900f9f5429"
+  }
+}

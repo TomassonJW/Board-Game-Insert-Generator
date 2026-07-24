@@ -1,6 +1,6 @@
 # Next Actions
 
-Dernière mise à jour : 2026-07-23
+Dernière mise à jour : 2026-07-24
 
 ## Version active
 
@@ -72,24 +72,35 @@ Preuve L07C : P64_L07C_EXTERNAL_ADAPTERS_EVIDENCE.md.
 Preuve L07D : P64_L07D_EXTERNAL_TOURNAMENT_EVIDENCE.md.
 Preuve L07E : P64_L07E_HIGHS_PRODUCT_INTEGRATION_EVIDENCE.md.
 Preuve L08D : P64_L08D_REAL_3D_CORPUS_EVIDENCE.md.
+Preuve L08E : P64_L08E_FAITHFUL_3D_ADAPTERS_EVIDENCE.md.
 Rapport final L07 : P64_L07_GOAL_FINAL_REPORT.md.
 
 ## Prochaine action recommandée
 
-### Exécuter P64-L08E — construire les adaptateurs 3D fidèles
+### Exécuter P64-L08F — tournoi 3D ouvert puis holdout unique
 
-Type : mission automatisée de code et de petits contrôles exacts, sans ouvrir
-le holdout L08D.
+Type : mission automatisée de benchmark externe. Le holdout privé reste fermé
+pendant régressions, discovery et tuning.
 
-Objectif : traduire la même sémantique BGIG vers les candidats 3D retenus,
-déclarer chaque règle représentée ou `unsupported`, puis recertifier les sorties
-en X/Y/Z sur des contrôles petits dont la vérité est connue.
+Objectif : comparer OR-Tools CP-SAT, SCIP, PackingSolver et LAFF sur toutes les
+familles ouvertes qu'ils représentent sans perte, sous ressources totales
+comparables. Une sortie ne compte qu'après recertification X/Y/Z complète par
+BGIG. `unsupported`, timeout, certificat rejeté et absence de solution restent
+des résultats distincts.
 
-PackingSolver, LAFF, OR-Tools CP-SAT et SCIP restent des candidats
-conditionnels. Aucun ne peut être classé sur une famille s'il retire un étage,
-un appui, une réservation, l'accès, une variante ou une rotation active.
-Le sidecar privé L08D reste fermé ; discovery, tuning et holdout appartiennent
-à L08F.
+Ordre obligatoire :
+
+1. régressions et contrôles exacts ;
+2. discovery sur les cas ouverts small/large/XL ;
+3. tuning sans accès au holdout ;
+4. sélection et critères scellés avec versions, workers, caps et digests ;
+5. ouverture unique du sidecar privé L08D ;
+6. verdict : vainqueur démontré, portefeuille complémentaire démontré, ou
+   résultat négatif honnête.
+
+Aucun moteur n'est intégré dans le produit pendant L08F. P64-L08G reste seule
+propriétaire de l'intégration mesurée et de la préparation Fusion. Le cas
+11 × 34 ne résume jamais la capacité et ne reçoit aucune revendication isolée.
 
 ## Lots verrouillés
 
