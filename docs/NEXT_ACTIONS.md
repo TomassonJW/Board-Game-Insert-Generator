@@ -122,9 +122,9 @@ Recette : `docs/P64_L09R_V_FUSION_GATE_RECIPE.md`.
 
 ### P64-L09R-V — gate Fusion du parcours calcul / finition séparés
 
-Type : gate humaine obligatoire, `corrective-package-ready-for-install`.
+Type : gate humaine obligatoire, `installed-awaiting-human-retest`.
 
-1. Codex publie le correctif intégré puis exécute le préparateur sans `-DryRun` et installe exactement 0.1.65.
+1. Terminé : Codex a publié puis installé exactement 0.1.65 depuis le commit `2dbc272` ; runtime, fixtures et marqueurs sont vérifiés.
 2. Thomas vérifie d’abord le rafraîchissement immédiat des cinq budgets de calcul.
 3. Thomas recalcule son cas 60 / 59,6 / 52,8 mm avec plateau de 1 mm, puis matérialise le minimal sans finition.
 4. Si ces contrôles passent, la recette reprend avec préférence souple, finition séparée, plan final et jauge.

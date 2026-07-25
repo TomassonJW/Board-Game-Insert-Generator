@@ -3347,12 +3347,12 @@ implémentée et intégrée à la fois.
 
 - Dépendances : P64-L09R-B à F automated-validated et correctif C1 intégré.
 - La première ouverture 0.1.64 est suspendue sans acceptation après un faux échec plateau/Z et un défaut de rafraîchissement du budget de calcul.
-- Codex installe le package correctif 0.1.65 et vérifie runtime, marqueurs, fichiers, fixtures et réglages.
+- Le package correctif 0.1.65 du commit `2dbc272` est publié et installé ; runtime, marqueurs, fichiers, fixtures et réglages sont vérifiés.
 - Thomas vérifie d’abord les cinq budgets, son cas 60 / 59,6 / 52,8 mm avec plateau de 1 mm, puis la matérialisation minimale sans finition.
 - La recette reprend ensuite ordre préférentiel, finition séparée, matérialisation finale et jauge totalement absente au repos.
 - Recette : `docs/P64_L09R_V_FUSION_GATE_RECIPE.md`.
 - La gate ne qualifie ni impression, ni tolérance, ni couvercle fermé.
-- Statut : `ready-human-gate`, `corrective-package-ready-for-install`, `print-validated=false`.
+- Statut : `ready-human-gate`, `installed-awaiting-human-retest`, `print-validated=false`.
 
 ### P64-L09R-V-C1 — Correctif compensation Z et budget
 
@@ -3362,4 +3362,4 @@ implémentée et intégrée à la fois.
 - Preuve native locale : 18 placements, sommet 59,6 mm, plan certifié et matérialisable, sans snapshot versionné.
 - Package : 0.1.65.
 - Preuve : `docs/P64_L09R_V_CORRECTIVE_0165_EVIDENCE.md`.
-- Statut : `implemented-product`, `automated-validated`, `corrective-gate-package-ready`.
+- Statut : `implemented-product`, `automated-validated`, `installed-awaiting-human-retest`.

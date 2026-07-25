@@ -1345,7 +1345,7 @@ La gate 0.1.64 a été installée et ouverte, mais elle n’est ni acceptée ni 
 
 Le correctif 0.1.65 est automatisé-validé. Le rejeu natif local exact retrouve 18 placements, atteint exactement 59,6 mm, reste certifié et matérialisable. Le budget de calcul redessine désormais immédiatement son libellé. Aucune donnée locale n’est versionnée.
 
-La gate reste obligatoire et doit reprendre dans cet ordre après installation de 0.1.65 :
+Le package du commit `2dbc272` est publié puis installé ; version, runtime, fixtures et marqueurs correctifs sont vérifiés. La gate reste obligatoire et doit reprendre dans cet ordre :
 
 1. vérifier les cinq budgets de calcul et leurs durées adjacentes ;
 2. recalculer le cas réel avec le plateau de 1 mm ;

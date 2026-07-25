@@ -2,7 +2,7 @@
 
 Date : 2026-07-25
 
-Statut : `implemented-product`, `automated-validated`, `corrective-gate-package-ready`, `print-validated=false`.
+Statut : `implemented-product`, `automated-validated`, `installed-awaiting-human-retest`, `print-validated=false`.
 
 ## Incident observé pendant la gate 0.1.64
 
@@ -48,7 +48,7 @@ Le worker couplé porte aussi une hauteur Z variable limitée aux conteneurs non
 
 ## Suite
 
-Codex publie et installe 0.1.65, puis Thomas recharge l’add-in et vérifie d’abord :
+Le package 0.1.65 du commit `2dbc272` est publié sur `origin/main`, installé localement et vérifié. Thomas recharge maintenant l’add-in et vérifie d’abord :
 
 1. le rafraîchissement immédiat des cinq budgets de calcul ;
 2. le recalcul de son cas 60 / 59,6 / 52,8 mm avec le plateau de 1 mm ;

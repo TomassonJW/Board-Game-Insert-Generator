@@ -1632,4 +1632,4 @@ La prochaine et unique étape est P64-L09R-V, gate Fusion humaine obligatoire. A
 
 La première ouverture de P64-L09R-V sur 0.1.64 est suspendue sans acceptation. Le correctif 0.1.65 rétablit la compensation Z exacte et recertifiée exigée par ADR-0088 pour un plateau supérieur, et rend immédiatement visible tout changement du budget de calcul. Le cas local exact 18 conteneurs / plateau 1 mm repasse en natif avec 18 placements, sommet 59,6 mm, plan certifié et matérialisable ; aucune donnée locale n’est versionnée.
 
-La trajectoire produit ne change pas : P64-L09R-V reste la prochaine gate humaine obligatoire. Aucun nouveau lot produit ne commence avant son résultat ; `print-validated=false`.
+Le package 0.1.65 du commit `2dbc272` est publié, installé et vérifié. La trajectoire produit ne change pas : P64-L09R-V reste la prochaine gate humaine obligatoire. Aucun nouveau lot produit ne commence avant son résultat ; `print-validated=false`.

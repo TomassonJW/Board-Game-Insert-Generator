@@ -22,11 +22,12 @@ visibles, le worker pur et la jauge temporaire sont durcis sur cas publics.
 La gate P64-L09R-V a été ouverte avec 0.1.64 puis suspendue sans acceptation :
 un plateau de 1 mm pouvait rendre le modèle infaisable malgré 6,8 mm de marge
 utile, et le budget de calcul ne rafraîchissait pas toujours sa durée. Le
-correctif 0.1.65 est `implemented-product`, `automated-validated` et prêt à être
-installé. Le rejeu natif local exact retrouve 18 placements certifiés,
+correctif 0.1.65 est `implemented-product`, `automated-validated`, publié puis
+installé depuis le commit `2dbc272`. Runtime, fixtures, version et marqueurs sont
+vérifiés. Le rejeu natif local exact retrouve 18 placements certifiés,
 matérialisables, avec un sommet à 59,6 mm pour 59,6 mm utiles. Aucun snapshot
-local n'est versionné. La prochaine action unique reste la reprise humaine de
-P64-L09R-V après installation de 0.1.65 ; `print-validated=false`.
+local n'est versionné. La prochaine action unique est la reprise humaine de
+P64-L09R-V dans Fusion 360 ; `print-validated=false`.
 - Dernière preuve : P64-V2H03V Fusion OK 0.1.55 ; P64-V2H03 est
   fusion-validated pour la coordination des variantes internes.
 - print-validated: false ; aucune valeur physique n'est calibrée par cette preuve.

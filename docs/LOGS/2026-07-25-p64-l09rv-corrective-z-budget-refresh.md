@@ -16,7 +16,7 @@ La gate Fusion 0.1.64 a été suspendue après deux observations de Thomas : un 
 
 Le cas local exact repasse en `solution_found` avec 18 placements, sommet à 59,6 mm, plan certifié et matérialisable. Le contrôle natif CPython 3.14 passe. Le dry-run du préparateur 0.1.65 passe sans écrire dans AppData.
 
-Aucun snapshot local, benchmark, holdout, recalibrage physique ou fait impression n’est ajouté. La correction reste à observer dans Fusion avant acceptation de P64-L09R-V.
+Le commit `2dbc272` est publié sur `origin/main`, puis le préparateur réel installe 0.1.65 avec runtime, fixtures, réglages et marqueurs correctifs vérifiés. Aucun snapshot local, benchmark, holdout, recalibrage physique ou fait impression n’est ajouté. La correction reste à observer dans Fusion avant acceptation de P64-L09R-V.
 
 ## Référence
 

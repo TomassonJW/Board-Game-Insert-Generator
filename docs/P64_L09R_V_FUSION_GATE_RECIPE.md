@@ -2,7 +2,7 @@
 
 Date de préparation : 2026-07-25
 
-Statut : `corrective-package-ready-for-install`, `human-gate-required`, `print-validated=false`.
+Statut : `installed-awaiting-human-retest`, `human-gate-required`, `print-validated=false`.
 
 Cette recette remplace entièrement P64-L09V 0.1.63, annulée sans observation. Elle ne réactive ni l’anti-chute dure, ni la finalisation obligatoire.
 

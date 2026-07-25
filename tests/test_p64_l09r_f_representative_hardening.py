@@ -123,7 +123,7 @@ class P64L09RFRepresentativeHardeningTests(unittest.TestCase):
         evidence = EVIDENCE.read_text(encoding="utf-8")
 
         for marker in (
-            "corrective-package-ready-for-install",
+            "installed-awaiting-human-retest",
             "prepare_p64_l09rv_gate.ps1",
             "Local AppData write blocked. Use Local/Handoff or approve filesystem write.",
             "Observation au repos",

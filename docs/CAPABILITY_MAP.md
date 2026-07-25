@@ -2163,6 +2163,6 @@ Preuve : `docs/P64_L09R_B_MINIMAL_CALCULATION_EVIDENCE.md`.
 - `C-SOLVER` : `implemented-product`, `automated-validated`. Une réservation supérieure peut demander une compensation Z au seul conteneur automatique admissible après le placement minimal SCIP ; le certificat commun reste l’autorité finale.
 - `C-STAGED-CALCULATION` : inchangée sur la séparation minimal/finition ; le plan minimal compensé reste directement matérialisable et la finition n’est pas invoquée.
 - `C-FUSION-UI` : `implemented-product`, `automated-validated`. Le budget de calcul et sa limite réelle adjacente sont rendus immédiatement à chaque changement, indépendamment du budget de finition.
-- `C-FUSION` : `corrective-package-ready-for-install`. Le package devient 0.1.65 ; la première ouverture 0.1.64 est suspendue sans acceptation.
+- `C-FUSION` : `installed-awaiting-human-retest`. Le package 0.1.65 du commit `2dbc272` est installé et vérifié ; la première ouverture 0.1.64 reste suspendue sans acceptation.
 - `C-PRINT` : inchangée, `print-validated=false`.
-- Prochaine action unique : installer 0.1.65 puis reprendre la gate P64-L09R-V.
+- Prochaine action unique : reprendre la gate P64-L09R-V dans Fusion 360.
