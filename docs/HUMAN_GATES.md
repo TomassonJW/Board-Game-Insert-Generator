@@ -1321,9 +1321,9 @@ Le GO produit couvre les lots automatisés suivants, un par un :
 4. P64-L09R-E — progression temporaire et réactivité ;
 5. P64-L09R-F — durcissement représentatif et préparation.
 
-P64-L09R-B et C sont `automated-validated` sans gate humaine, conformément à
-ce GO. P64-L09R-D est le prochain lot automatisé ; la gate L09R-V reste
-inactive avant intégration et preuve complète de D, E et F.
+P64-L09R-B, C et D sont `automated-validated` sans gate humaine, conformément à
+ce GO. P64-L09R-E est le prochain lot automatisé ; la gate L09R-V reste
+inactive avant intégration et preuve complète de E et F.
 
 Aucune intervention humaine n'est requise entre ces lots tant qu'ils ne changent
 ni tolérances, valeurs physiques, pose de couvercle, dépendance majeure ou North

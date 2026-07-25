@@ -706,6 +706,30 @@ class StagedCalculationSession:
             "solver_result": _partition_solver_result(finalized),
             "staged_calculation": self.snapshot(),
         }
+
+    def select_finishing_effort_profile(
+        self,
+        effort_profile: object,
+    ) -> dict[str, object]:
+        """Select one finish-only budget and invalidate no minimal artifact."""
+
+        normalized = normalize_effort_profile(effort_profile)
+        if normalized == self._finalization_effort_profile:
+            return self.snapshot()
+        self._active_finalization_request = None
+        self._finalization_effort_profile = normalized
+        self._reset_finalization_attempt("finishing_settings_changed")
+        if self._finalized_partition is not None:
+            self._finalized_status = STATUS_STALE
+        else:
+            self._finalized_status = STATUS_NOT_FINALIZED
+        if (
+            self._cad_identity is not None
+            and self._cad_identity.get("artifact_kind") == ARTIFACT_KIND_FINALIZED
+        ):
+            self._cad_status = STATUS_DESYNCHRONIZED
+        return self.snapshot()
+
     def select_materializable_artifact(
         self,
         artifact_kind: str = ARTIFACT_KIND_MINIMAL,

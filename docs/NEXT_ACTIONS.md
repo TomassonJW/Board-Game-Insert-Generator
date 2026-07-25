@@ -94,31 +94,34 @@ Rapport final L07 : P64_L07_GOAL_FINAL_REPORT.md.
 
 ## Dernier lot terminé
 
-### P64-L09R-C — finition séparée et non destructive
+### P64-L09R-D — trois actions et budgets visibles
 
-- Action `Finaliser` distincte du calcul minimal, jamais implicite.
-- Budget de finition indépendant parmi 3, 10, 20, 60 et 180 secondes.
-- Deadline totale partagée par préparation, fermeture, réparation et certificats.
-- Timeout, rejet ou résultat obsolète : aucun plan partiel publié.
-- Plan minimal conservé bit à bit et toujours matérialisable.
-- Suite complète : 859/859 ; un test natif ignoré sous Python 3.10.
+- Trois boutons distincts toujours rendus : `Calculer`, `Finaliser`, `Matérialiser`.
+- Activation exacte selon source, plan minimal, plan final et opération active.
+- Matérialisation minimale par défaut, finale seulement si le plan final est courant.
+- Deux sélecteurs indépendants avec cinq niveaux chacun.
+- Limites adjacentes non éditables : 3 s, 10 s, 20 s, 60 s, 3 min max.
+- Changement de finition : seul le plan final devient obsolète.
+- Suite complète : 861/861 ; un test natif ignoré sous Python 3.10.
 
-Preuve : `docs/P64_L09R_C_SEPARATE_FINISHING_EVIDENCE.md`.
+Preuve : `docs/P64_L09R_D_VISIBLE_ACTIONS_BUDGETS_EVIDENCE.md`.
 
 ## Prochaine action recommandée
 
-### P64-L09R-D — trois actions et budgets visibles
+### P64-L09R-E — progression temporaire et interface réactive
 
 Type : mission de code produit et UI bornée, sans gate humaine préalable.
 
 Objectifs exacts :
 
-1. garder `Calculer`, `Finaliser` et `Matérialiser` toujours visibles ;
-2. appliquer la matrice exacte des états actifs et inactifs du contrat L09R ;
-3. afficher deux sélecteurs indépendants pour le calcul et la finition ;
-4. afficher à côté de chacun un champ non éditable donnant la limite réelle : 3 s, 10 s, 20 s, 60 s ou 3 min max ;
-5. invalider seulement le plan final après un changement propre à la finition, mais les deux plans après une modification du calcul ou de la source ;
-6. matérialiser le plan minimal tant que le plan final courant manque, puis le plan final courant.
+1. placer une jauge pleine largeur immédiatement au-dessus des trois boutons ;
+2. ne rendre aucune zone ni aucun espace de progression au repos ;
+3. rafraîchir environ une fois par seconde le temps écoulé et le budget total du calcul ou de la finition ;
+4. faire disparaître immédiatement la jauge après résultat, timeout ou erreur ;
+5. utiliser une jauge indéterminée ou des phases CAD réelles pour la matérialisation, sans pourcentage inventé ;
+6. exécuter le calcul minimal et la finition purs hors thread UI ;
+7. garantir que le worker ne charge ni ne reçoit aucun objet `adsk` ;
+8. conserver la matérialisation Fusion sur le thread autorisé et rejeter tout résultat stale par identité.
 
 Contrat : `docs/P64_L09R_CALCUL_FINITION_PROGRESS_CONTRACT.md`.
 Décision : `docs/DECISIONS/ADR-0088-calcul-minimal-finition-optionnelle-et-budgets-visibles.md`.
@@ -126,11 +129,10 @@ Décision : `docs/DECISIONS/ADR-0088-calcul-minimal-finition-optionnelle-et-budg
 Aucune manipulation de Thomas requise avant la future gate P64-L09R-V.
 P64-L09V sur 0.1.63 reste annulée et ne doit pas être exécutée.
 
-## Lots ordonnés après P64-L09R-D
+## Lots ordonnés après P64-L09R-E
 
-1. P64-L09R-E — jauge visible uniquement pendant une activité et exécution réactive sans `adsk` dans le worker ;
-2. P64-L09R-F — durcissement sur cas représentatifs, plateaux et limites de budget ;
-3. P64-L09R-V — installation puis gate Fusion combinée, sans validation impression.
+1. P64-L09R-F — durcissement sur cas représentatifs, plateaux et limites de budget ;
+2. P64-L09R-V — installation puis gate Fusion combinée, sans validation impression.
 
 ## Lots verrouillés ou différés
 

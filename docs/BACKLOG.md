@@ -3318,7 +3318,8 @@ implémentée et intégrée à la fois.
 - Afficher, à côté de chaque niveau de calcul et de finition, un champ non
   éditable avec la limite réelle : 3 s, 10 s, 20 s, 60 s ou 3 min max.
 - Montrer si la matérialisation cible le plan minimal ou final.
-- Statut : `ready`, prochaine mission unique.
+- Preuve : `docs/P64_L09R_D_VISIBLE_ACTIONS_BUDGETS_EVIDENCE.md`.
+- Statut : `implemented-product`, `automated-validated`.
 
 ### P64-L09R-E — Progression temporaire et interface réactive
 
@@ -3329,7 +3330,7 @@ implémentée et intégrée à la fois.
   budget, matérialisation indéterminée ou par phases réelles.
 - Calcul et finition purs hors thread UI ; aucun `adsk` dans le worker ; retour
   stale rejeté par digest.
-- Statut : `planned-after-P64-L09R-D`.
+- Statut : `ready`, prochaine mission unique.
 
 ### P64-L09R-F — Durcissement représentatif et préparation
 

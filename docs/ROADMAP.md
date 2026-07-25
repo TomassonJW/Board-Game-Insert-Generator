@@ -1603,3 +1603,11 @@ P64-L09R-C rend la fermeture F01B/F02B facultative et distincte du calcul minima
 Le plan minimal courant reste la base certifiée. Timeout, rejet ou résultat obsolète ne publient aucun plan partiel, ne polluent pas le cache et conservent ce plan bit à bit pour la matérialisation. Une fermeture de base certifiée avant deadline reste le résultat sûr lorsque seul objectif secondaire expire.
 
 La prochaine étape est P64-L09R-D : exposer les trois actions permanentes, la matrice activation/invalidation, les deux budgets et leurs limites réelles adjacentes. E et F suivront avant P64-L09R-V. Aucun benchmark, package Fusion ou fait impression produit par C.
+
+## Mise à jour P64-L09R-D — 2026-07-25
+
+P64-L09R-D remplace le bouton progressif unique par trois actions toujours visibles. Leur activation suit le contrat : calcul sur source à recalculer, finition et matérialisation sur plan minimal courant, finition relançable et matérialisation finale sur plan final courant, puis verrouillage des trois pendant une opération produit.
+
+Les cinq niveaux sont disponibles séparément pour calcul et finition. Les limites réelles 3 s, 10 s, 20 s, 60 s et 3 min max sont affichées dans des champs adjacents non éditables et persistent localement. Une modification propre à la finition conserve le minimal courant et rend uniquement le final obsolète.
+
+La prochaine étape est P64-L09R-E : activité temporaire pleine largeur au-dessus des boutons, rafraîchissement temporel proche de la seconde et calcul/finition purs hors thread UI sans `adsk`. F suivra avant P64-L09R-V.

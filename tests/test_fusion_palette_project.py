@@ -955,6 +955,15 @@ class FusionPaletteProjectTests(unittest.TestCase):
                 ADDIN,
                 ROOT,
             )
+            saved_finishing = handle_palette_request(
+                request(
+                    "save_finishing_settings",
+                    project=project,
+                    finishing_effort="long",
+                ),
+                ADDIN,
+                ROOT,
+            )
             raw_state = json.loads((Path(temp_dir) / "bgig_document_state_v1.json").read_text(encoding="utf-8"))
             solved = handle_palette_request(
                 request(
@@ -970,10 +979,13 @@ class FusionPaletteProjectTests(unittest.TestCase):
             self.assertFalse((Path(temp_dir) / CURRENT_PROJECT_FILENAME).exists())
         self.assertEqual(saved_settings["solver_settings"], {"method": "stage_stack", "effort": "deep"})
         self.assertEqual(raw_state["solver_settings"], {"method": "stage_stack", "effort": "deep"})
+        self.assertEqual(saved_finishing["finishing_effort"], "long")
+        self.assertEqual(raw_state["finishing_effort"], "long")
         self.assertEqual(solved["solver_settings"], {"method": "stage_stack", "effort": "deep"})
         self.assertEqual(solved["partition"]["solver"]["kind"], "bounded_minimal_layout_solver")
         self.assertEqual(solved["partition"]["minimal_layout"]["search_provenance"]["effort_profile"], "deep")
         self.assertEqual(reloaded["solver_settings"], {"method": "stage_stack", "effort": "deep"})
+        self.assertEqual(reloaded["finishing_effort"], "long")
 
     def test_p64_l05c_persists_and_reloads_exact_certified_witness(self) -> None:
         project = blank_project_v1()

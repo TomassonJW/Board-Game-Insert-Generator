@@ -327,7 +327,7 @@ class FusionPaletteDomTests(unittest.TestCase):
         ):
             self.assertNotIn(forbidden, self.markup)
         self.assertNotIn('data-bridge="validate_project"', self.markup)
-        self.assertEqual(self.markup.count('data-bridge="materialize_project"'), 0)
+        self.assertEqual(self.markup.count('data-bridge="materialize_project"'), 1)
         self.assertLess(self.markup.index('id="preview-status"'), self.markup.index('id="preview-explanations"'))
         self.assertLess(self.markup.index('class="plan-grid"', self.markup.index("function renderResult")), self.markup.index('id="preview-explanations"'))
         self.assertIn('Calcul&eacute;e automatiquement', self.markup)
@@ -337,10 +337,11 @@ class FusionPaletteDomTests(unittest.TestCase):
         for marker in (
             "currentMaterializableArtifactIdentity",
             "finalized.status==='current'&&finalized.materializable",
-            "minimal.finalization_required===true",
-            "button.dataset.artifactKind='finalized_plan'",
+            'id="finalization-action"',
+            'id="materialization-action"',
+            "const artifactKind=finalizedCurrent?'finalized_plan':'minimal_layout'",
+            "materialization.dataset.artifactKind=artifactKind",
             "Matérialiser le plan final",
-            "Ferme le volume sous budget",
         ):
             self.assertIn(marker, self.markup)
         self.assertNotIn("currentMinimalArtifactIdentity", self.markup)
@@ -436,7 +437,7 @@ class FusionPaletteDomTests(unittest.TestCase):
             self.assertNotIn(malformed, self.markup)
 
     def test_routes_validation_persistence_and_native_documents_to_the_versioned_bridge(self) -> None:
-        self.assertEqual(self.dom.bridge_actions, {"save_document", "export_project", "export_personal_presets", "solve_project"})
+        self.assertEqual(self.dom.bridge_actions, {"save_document", "export_project", "export_personal_presets", "solve_project", "finalize_project", "materialize_project"})
         for marker in ("bgig.palette.request.v1", "bgig.palette.response.v1", "bgig_palette_project", "bgig_palette_document", "DOCUMENT_ACTION", "sendDocument", "8000"):
             self.assertIn(marker, self.markup)
 
@@ -465,10 +466,14 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertNotIn('data-path="layout.container_box_xy_clearance_mm"', self.markup)
         self.assertNotIn('data-path="layout.container_z_clearance_mm"', self.markup)
         self.assertNotIn('data-path="box.usable_height_mm"', self.markup)
-        self.assertEqual(self.markup.count('data-bridge="materialize_project"'), 0)
+        self.assertEqual(self.markup.count('data-bridge="materialize_project"'), 1)
         self.assertIn('id="primary-calculation-action"', self.markup)
         self.assertIn("renderPersistentActions", self.markup)
-        for marker in ("sceneKnown?'regenerate_project':'materialize_project'", "button.dataset.artifactKind='minimal_layout'", "Finaliser le volume", "artifact_kind"):
+        for marker in (
+            'id="finalization-action"', 'id="materialization-action"',
+            "materialization.dataset.bridge=scenePresent?'regenerate_project':'materialize_project'",
+            "materialization.dataset.artifactKind=artifactKind", "Finaliser", "Matérialiser",
+        ):
             self.assertIn(marker, self.markup)
         self.assertLess(
             self.markup.index('id="primary-calculation-action"'),
@@ -625,7 +630,7 @@ class FusionPaletteDomTests(unittest.TestCase):
             ".top-layer .plan-body{opacity:1}", '<g class="top-layer">',
             "layeredTop", "function topViewY(item,box)",
             "Number(box.height||0)-Number(item.y_mm||0)-Number(item.height_mm||0)",
-            "item.z_from_top_mm:topViewY(item,box)", "Deux efforts peuvent produire le même résultat",
+            "item.z_from_top_mm:topViewY(item,box)", "Les deux budgets sont indépendants.",
             "EMS historique + ponts multi-EMS",
         ):
             self.assertIn(marker, self.markup)
@@ -648,6 +653,47 @@ class FusionPaletteDomTests(unittest.TestCase):
         script = (ROOT / "scripts" / "fusion" / "prepare_p64_v2h02_capacity_search_test.ps1").read_text(encoding="utf-8")
         for marker in ("0.1.54", "function capacityCard", "PARTITION_CAPACITY_SCHEMA_V1", "function topViewY(item,box)", "P64-V2H02R Fusion OK"):
             self.assertIn(marker, script)
+
+    def test_exposes_p64_l09r_d_actions_and_independent_visible_budgets(self) -> None:
+        for marker in (
+            'id="primary-calculation-action"',
+            'id="finalization-action"',
+            'id="materialization-action"',
+            'id="finishing-effort"',
+            'id="calculation-budget-limit" class="budget-limit" readonly',
+            'id="finishing-budget-limit" class="budget-limit" readonly',
+            "quick:'3 s max'",
+            "short:'10 s max'",
+            "normal:'20 s max'",
+            "long:'60 s max'",
+            "deep:'3 min max'",
+            "function saveFinishingSetting",
+            "save_finishing_settings",
+            "materialization.dataset.artifactKind=artifactKind",
+            "calculation.disabled=!hasGroups||minimalCurrent||operationActive",
+            "finalization.disabled=!minimalCurrent||operationActive",
+            "materialization.disabled=!minimalCurrent||operationActive",
+        ):
+            self.assertIn(marker, self.markup)
+        for effort, label in (
+            ("quick", "Rapide"),
+            ("short", "Court"),
+            ("normal", "Normal"),
+            ("long", "Long"),
+            ("deep", "Approfondi"),
+        ):
+            self.assertEqual(
+                self.markup.count(f'<option value="{effort}">{label}</option>'),
+                2,
+            )
+        self.assertLess(
+            self.markup.index('id="primary-calculation-action"'),
+            self.markup.index('id="finalization-action"'),
+        )
+        self.assertLess(
+            self.markup.index('id="finalization-action"'),
+            self.markup.index('id="materialization-action"'),
+        )
 
     def test_exposes_p64_l04a_local_reuse_feedback_without_fake_progress(self) -> None:
         for marker in (

@@ -2134,3 +2134,12 @@ Preuve : `docs/P64_L09R_B_MINIMAL_CALCULATION_EVIDENCE.md`.
 - `C-QUALITY` : timeout, rejet de certificat et résultat obsolète ne publient aucun plan partiel et conservent le plan minimal bit à bit.
 - `C-FUSION-UI` : le pont accepte le budget de finition ; sélecteurs, activation et durées visibles restent `planned-by-P64-L09R-D`.
 - `C-FUSION` et `C-PRINT` : inchangées ; aucune observation Fusion et `print-validated=false`.
+
+## Mise à jour P64-L09R-D — actions et budgets visibles
+
+- `C-FUSION-UI` : `implemented-product`, `automated-validated`. Trois actions permanentes et matrice exacte source/minimal/final/opération.
+- `C-SOLVER` / `C-FUSION-UI` : les cinq deadlines calcul et finition sont visibles dans deux sélecteurs indépendants avec limite adjacente non éditable.
+- `C-LAYOUT` : la sélection de matérialisation préfère le final seulement si courant, sinon le minimal courant.
+- `C-QUALITY` : une préférence de finition invalide seulement le final ; une préférence de calcul ou source invalide minimal, final et scène.
+- `C-FUSION` et `C-PRINT` : inchangées ; aucune observation Fusion et `print-validated=false`.
+- Progression et exécution hors thread UI restent `planned-by-P64-L09R-E`.

@@ -278,6 +278,47 @@ class StagedCalculationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Unsupported effort profile"):
             coupled_finalization_budget("unbounded")
 
+    def test_finish_only_setting_invalidates_only_final_plan(self) -> None:
+        project = _project()
+        engine = _engine(project)
+        session = StagedCalculationSession(project, solver_settings=SETTINGS)
+        _synchronize(session, project, engine)
+        calculated = session.calculate_layout(
+            request_id="solve-before-finish-setting",
+            request_revision=0,
+        )
+        minimal = calculated["staged_calculation"]["minimal_layout"]
+        finalized = session.finalize_volume(
+            finishing_effort_profile="normal",
+        )
+        self.assertEqual(
+            finalized["staged_calculation"]["finalized_plan"]["status"],
+            STATUS_CURRENT,
+        )
+
+        changed = session.select_finishing_effort_profile("long")
+
+        self.assertEqual(changed["minimal_layout"]["status"], STATUS_CURRENT)
+        self.assertEqual(
+            changed["minimal_layout"]["artifact_digest"],
+            minimal["artifact_digest"],
+        )
+        self.assertEqual(changed["finalized_plan"]["status"], STATUS_STALE)
+        self.assertEqual(
+            changed["finalized_plan"]["finishing_effort_profile"],
+            "long",
+        )
+        self.assertEqual(
+            changed["finalized_plan"]["last_attempt"]["stop_reason"],
+            "finishing_settings_changed",
+        )
+        selection = session.select_materializable_artifact(
+            ARTIFACT_KIND_MINIMAL
+        )
+        self.assertEqual(selection["artifact_digest"], minimal["artifact_digest"])
+        with self.assertRaises(StagedCalculationError):
+            session.select_materializable_artifact(ARTIFACT_KIND_FINALIZED)
+
     def test_total_finishing_timeout_preserves_exact_minimal_artifact(self) -> None:
         project = _project()
         engine = _engine(project)

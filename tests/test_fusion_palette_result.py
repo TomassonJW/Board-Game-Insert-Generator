@@ -41,10 +41,12 @@ class FusionPaletteResultTests(unittest.TestCase):
         self.assertIn("proposal_with_residuals", self.markup)
         self.assertIn("materializable=complete", self.markup)
         self.assertIn("finalizedCurrent", self.markup)
-        self.assertIn("button.dataset.artifactKind='minimal_layout'", self.markup)
-        self.assertIn("action='materialize_project'", self.markup)
-        self.assertNotIn('data-bridge="materialize_project"', self.markup)
-        self.assertIn("sceneKnown?'regenerate_project':'materialize_project'", self.markup)
+        self.assertIn("materialization.dataset.artifactKind=artifactKind", self.markup)
+        self.assertIn('data-bridge="materialize_project"', self.markup)
+        self.assertIn(
+            "materialization.dataset.bridge=scenePresent?'regenerate_project':'materialize_project'",
+            self.markup,
+        )
         self.assertIn("Plan minimal certifi", self.markup)
         self.assertIn("Volume résiduel à décider", self.markup)
 

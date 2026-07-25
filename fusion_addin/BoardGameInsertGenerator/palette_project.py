@@ -34,6 +34,7 @@ SUPPORTED_ACTIONS = frozenset({
     "solve_project", "finalize_project", "materialize_project", "regenerate_project",
     "save_personal_preset", "delete_personal_preset",
     "import_personal_presets", "export_personal_presets", "save_solver_settings",
+    "save_finishing_settings",
     "capture_solver_case",
 })
 _LOCAL_ANALYSIS_ENGINE_LIMIT = 8
@@ -310,6 +311,7 @@ def load_document_state(addin_dir: str | Path) -> dict[str, object]:
         "current_path": "",
         "recent_paths": [],
         "solver_settings": _normalize_solver_settings(None),
+        "finishing_effort": "normal",
     }
     if not path.is_file():
         return default
@@ -326,6 +328,7 @@ def load_document_state(addin_dir: str | Path) -> dict[str, object]:
         "current_path": current if isinstance(current, str) else "",
         "recent_paths": [item for item in recent if isinstance(item, str)] if isinstance(recent, list) else [],
         "solver_settings": _normalize_solver_settings(raw.get("solver_settings")),
+        "finishing_effort": _normalize_effort_profile(raw.get("finishing_effort")),
     }
 
 
@@ -335,8 +338,17 @@ def _write_document_state(addin_dir: Path, state: dict[str, object]) -> None:
         "current_path": str(state.get("current_path") or ""),
         "recent_paths": [str(item) for item in state.get("recent_paths", []) if isinstance(item, str)][:12],
         "solver_settings": _normalize_solver_settings(state.get("solver_settings")),
+        "finishing_effort": _normalize_effort_profile(state.get("finishing_effort")),
     }
     _write_json_atomic(document_state_path(addin_dir), payload)
+
+
+def _normalize_effort_profile(value: object) -> str:
+    """Keep one palette-local effort within the core public vocabulary."""
+
+    from board_game_insert_generator.solver_settings import normalize_effort_profile
+
+    return normalize_effort_profile(value)
 
 
 def _normalize_solver_settings(value: object) -> dict[str, str]:
@@ -431,8 +443,11 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         request.get("solver_settings", document_state.get("solver_settings"))
     )
     finishing_effort_profile = normalize_effort_profile(
-        request.get("finishing_effort")
+        request.get("finishing_effort", document_state.get("finishing_effort"))
     )
+    if action == "save_finishing_settings" or "finishing_effort" in request:
+        document_state["finishing_effort"] = finishing_effort_profile
+        _write_document_state(addin_dir, document_state)
     if action == "save_solver_settings":
         document_state["solver_settings"] = solver_settings
         _write_document_state(addin_dir, document_state)
@@ -440,6 +455,7 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
             request_id,
             "ready",
             solver_settings=solver_settings,
+            finishing_effort=finishing_effort_profile,
             document=_document_info(addin_dir, document_state),
         )
     if action == "load_project":
@@ -454,6 +470,7 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
             recovery_saved=current_project_path(addin_dir).is_file(),
             document=_document_info(addin_dir, document_state),
             solver_settings=solver_settings,
+            finishing_effort=finishing_effort_profile,
         )
     if action == "new_project":
         project = blank_project_v1()
@@ -462,6 +479,7 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
             "current_path": "",
             "recent_paths": document_state.get("recent_paths", []),
             "solver_settings": solver_settings,
+            "finishing_effort": finishing_effort_profile,
         }
         _write_document_state(addin_dir, fresh_state)
         return _response(
@@ -472,6 +490,7 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
             personal_presets=load_personal_presets(current_personal_presets_path(addin_dir)),
             document=_document_info(addin_dir, fresh_state),
             solver_settings=solver_settings,
+            finishing_effort=finishing_effort_profile,
         )
 
     project_value = request.get("project")
@@ -523,6 +542,9 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         solver_settings=solver_settings,
         container_frontiers=local_frontiers,
         frontier_digests=local_frontier_digests,
+    )
+    staged_calculation = staged_session.select_finishing_effort_profile(
+        finishing_effort_profile
     )
     creation_presets = build_creation_presets(
         project,
@@ -782,6 +804,7 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         export_path=export_path,
         document=_document_info(addin_dir, document_state),
         solver_settings=solver_settings,
+        finishing_effort=finishing_effort_profile,
         solver_case_capture=solver_case_capture,
         certified_plan_witness=certified_plan_witness,
     )
@@ -811,6 +834,7 @@ def _response(
     recovery_saved: bool = False,
     solver_result: dict[str, object] | None = None,
     solver_settings: dict[str, str] | None = None,
+    finishing_effort: str = "normal",
     solver_case_capture: dict[str, object] | None = None,
     certified_plan_witness: dict[str, object] | None = None,
 ) -> dict[str, object]:
@@ -843,6 +867,7 @@ def _response(
         "result_view": deepcopy(result_view),
         "solver_result": deepcopy(solver_result),
         "solver_settings": deepcopy(solver_settings),
+        "finishing_effort": finishing_effort,
         "solver_case_capture": deepcopy(solver_case_capture),
         "certified_plan_witness": deepcopy(certified_plan_witness),
         "cad_build": deepcopy(cad_build),

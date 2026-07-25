@@ -3893,3 +3893,18 @@ Statut : `implemented-product`, `automated-validated`.
 
 Preuve : `docs/P64_L09R_C_SEPARATE_FINISHING_EVIDENCE.md`.
 Prochaine mission unique : P64-L09R-D.
+
+## P64-L09R-D — trois actions et budgets visibles
+
+Statut : `implemented-product`, `automated-validated`.
+
+- La barre persistante rend toujours `Calculer`, `Finaliser` et `Matérialiser`.
+- La matrice active uniquement le calcul sur source à recalculer, puis finition et matérialisation sur plan minimal ou final courant ; toute opération produit active grise les trois.
+- `Matérialiser` sélectionne `minimal_layout` avant finition et `finalized_plan` seulement après finition courante certifiée.
+- Calcul et finition exposent chacun cinq niveaux et un champ adjacent non éditable : 3 s, 10 s, 20 s, 60 s, 3 min max.
+- Les choix persistent localement. Un changement du calcul invalide les deux plans ; un changement de finition invalide seulement le plan final.
+- Validation : cycle 18/18, pont 29/29, DOM 40/40, autres tests palette 28/28, JavaScript vérifié ; suite complète 861/861 en 252,858 s, un test natif ignoré sous Python 3.10.
+- Aucun benchmark, package Fusion, réglage Fusion, observation Fusion ou fait impression produit.
+
+Preuve : `docs/P64_L09R_D_VISIBLE_ACTIONS_BUDGETS_EVIDENCE.md`.
+Prochaine mission unique : P64-L09R-E.
