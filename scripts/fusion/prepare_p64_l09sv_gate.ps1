@@ -128,9 +128,16 @@ else {
             }
         }
         $installedPalette = Get-Content -LiteralPath (Join-Path $target "palette.html") -Raw -Encoding UTF8
-        foreach ($marker in @("#1769aa", "#b85f14", "#237a4b", "finalized_plan_ready", "printable_residual_remains")) {
+        foreach ($marker in @("#1769aa", "#b85f14", "#237a4b")) {
             if (-not $installedPalette.Contains($marker)) {
                 throw "Installed P64-L09S-V palette marker missing: $marker"
+            }
+        }
+
+        $installedPaletteProject = Get-Content -LiteralPath (Join-Path $target "palette_project.py") -Raw -Encoding UTF8
+        foreach ($marker in @("finalized_plan_ready", "finalized_plan_not_published", "materializable", "last_attempt")) {
+            if (-not $installedPaletteProject.Contains($marker)) {
+                throw "Installed P64-L09S-V palette truth marker missing: $marker"
             }
         }
 

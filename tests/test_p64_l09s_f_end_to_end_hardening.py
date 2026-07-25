@@ -105,6 +105,8 @@ class P64L09SFEndToEndHardeningTests(unittest.TestCase):
             "bgig.xy_composite_cad_body.v1",
             "bounded_xy_composite_v1",
             "Bounded XY-composite",
+            "palette_project.py",
+            "finalized_plan_not_published",
             "bgig_installed_commit.txt",
             "Local AppData write blocked. Use Local/Handoff or approve filesystem write.",
             "one user component per owner",
