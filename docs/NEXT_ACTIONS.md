@@ -1,5 +1,11 @@
 # Next Actions
 
+<!-- P64-L09S-F -->
+## Action courante : P64-L09S-V
+
+P64-L09S-F est automatisee-validee. Apres installation locale confirmee du package 0.1.66 et de la fixture, Thomas execute uniquement la recette humaine V. Aucun nouveau developpement, benchmark, holdout ou changement d'architecture avant le verdict `OK` ou `KO`.
+
+
 <!-- P64-L09S-E -->
 ## Action courante : P64-L09S-F
 

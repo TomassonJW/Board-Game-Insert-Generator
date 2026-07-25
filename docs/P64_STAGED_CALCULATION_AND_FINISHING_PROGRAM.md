@@ -1,5 +1,11 @@
 # P64-A02 — Programme de calcul étagé et finalisation explicite
 
+<!-- P64-L09S-F -->
+## Durcissement P64-L09S-F
+
+Le preflight de release controle separement le contrat minimal recent et un flux composite reproductible. Il exige des identites distinctes minimal/final, une source minimale conservee, un certificat composite positif, un CAD IR exact et un plan Fusion a composant unique. Aucun resultat de benchmark ou holdout n'entre dans cette preuve.
+
+
 <!-- P64-L09S-E -->
 ## Contrat ajoute par P64-L09S-E
 

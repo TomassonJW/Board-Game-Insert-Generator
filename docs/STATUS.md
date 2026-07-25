@@ -1,5 +1,11 @@
 # Status
 
+<!-- P64-L09S-F -->
+## P64-L09S-F automatisee et gate V preparee
+
+Le package 0.1.66, le preflight recent et le preparateur V sont automatises-valides. Le dry-run deterministe prouve 23,2 x 23,2 x 31,6 mm, gap 5,8 mm, croissance artificielle nulle, quatre unions, deux coupes, un composant et residuel nul. Suite autorisee : 826/826 ; aucun benchmark/holdout. L'installation reelle intervient apres integration F, puis le projet s'arrete a P64-L09S-V pour observation humaine. `fusion-observed=false`, `print-validated=false`.
+
+
 <!-- P64-L09S-E -->
 ## P64-L09S-E terminee : plan composite materialisable
 

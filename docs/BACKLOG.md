@@ -1,5 +1,13 @@
 # Backlog
 
+<!-- P64-L09S-F -->
+## Cloture automatisee P64-L09S
+
+- P64-L09S-F : terminee cote code, tests, preflight et recette ; installation reelle apres integration.
+- P64-L09S-V : prochaine et unique gate, humaine, package 0.1.66.
+- Toute suite depend du verdict humain ; aucune impression n'est revendiquee.
+
+
 <!-- P64-L09S-E -->
 ## Avancement P64-L09S apres E
 

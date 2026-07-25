@@ -1,5 +1,11 @@
 # Fusion 360 Strategy
 
+<!-- P64-L09S-F -->
+## Gate P64-L09S-V 0.1.66
+
+Le package installe est produit par le commit F integre et accompagne d'une fixture publique, d'un recu local et de reglages Normal/Normal. La validation automatique s'arrete au plan Fusion pur. La creation reelle, les unions, les coupes et l'identite de scene sont observees manuellement selon la recette V.
+
+
 <!-- P64-L09S-E -->
 ## Strategie P64-L09S-E
 

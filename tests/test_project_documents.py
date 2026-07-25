@@ -750,5 +750,34 @@ class P64L09SEDocumentEvidenceTests(unittest.TestCase):
         ):
             self.assertIn(marker, evidence)
 
+class P64L09SFDocumentEvidenceTests(unittest.TestCase):
+    def test_end_to_end_hardening_evidence_is_guarded(self) -> None:
+        from pathlib import Path
+
+        root = Path(__file__).resolve().parents[1]
+        evidence = (root / "docs" / "P64_L09S_F_END_TO_END_HARDENING_EVIDENCE.md").read_text(encoding="utf-8")
+        recipe = (root / "docs" / "P64_L09S_V_FUSION_GATE_RECIPE.md").read_text(encoding="utf-8")
+        for marker in (
+            "mission: P64-L09S-F",
+            "status: automated-validated",
+            "package_version: 0.1.66",
+            "gap_below_tray_mm=5.8",
+            "artificial_growth_mm=0",
+            "authorized_suite: 826/826",
+            "fusion-observed=false",
+            "print-validated=false",
+        ):
+            self.assertIn(marker, evidence)
+        for marker in (
+            "P64-L09S-V",
+            "0.1.66",
+            "0.1.65",
+            "human-KO",
+            "do-not-run",
+            "un composant utilisateur par proprietaire",
+            "print-validated=false",
+        ):
+            self.assertIn(marker, recipe)
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,5 +1,11 @@
 # P64-L09S — Runbook du Goal de stabilisation de bout en bout
 
+<!-- P64-L09S-F -->
+## Point de passage P64-L09S-F
+
+F est automatisee-validee avec le package 0.1.66. Le preflight reproduit les dimensions critiques, prouve l'absence de croissance liee au plateau et traverse minimal, finalisation, CAD IR et plan Fusion. Apres installation du commit integre, la boucle autonome s'arrete obligatoirement a V.
+
+
 <!-- P64-L09S-E -->
 ## Point de passage P64-L09S-E
 

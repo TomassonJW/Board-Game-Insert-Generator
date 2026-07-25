@@ -1,5 +1,11 @@
 # Capability Map
 
+<!-- P64-L09S-F -->
+## Increment P64-L09S-F
+
+Le parcours complexe est automatise de bout en bout jusqu'au plan Fusion pur et dispose d'un preflight public reproductible. La capability reste `automated-validated` tant que la gate V n'a pas observe l'execution Fusion reelle ; aucune validation d'impression.
+
+
 <!-- P64-L09S-E -->
 ## Increment P64-L09S-E
 

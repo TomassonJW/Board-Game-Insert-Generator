@@ -1,5 +1,15 @@
 # Pilotage courant
 
+<!-- P64-L09S-F -->
+## Reprise canonique a la gate P64-L09S-V
+
+- A a F sont implementees, testees et documentees.
+- Package cible : 0.1.66 ; ancien 0.1.65 `human-KO` et `do-not-run`.
+- Le preparateur reel doit installer le commit F integre, la fixture recente et ses reglages.
+- Prochaine et unique action : observation humaine Fusion selon `P64_L09S_V_FUSION_GATE_RECIPE.md`.
+- Aucun benchmark/holdout ; `print-validated=false`.
+
+
 <!-- P64-L09S-E -->
 ## Reprise canonique apres P64-L09S-E
 
