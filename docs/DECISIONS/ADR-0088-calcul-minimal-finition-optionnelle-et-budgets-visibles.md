@@ -245,3 +245,17 @@ découpage exécutable. La prochaine mission unique est P64-L09R-B.
 Une nouvelle gate Fusion P64-L09R-V sera préparée seulement après les preuves
 automatisées du calcul, de la finition optionnelle, de l'interface et de la
 réactivité. `print-validated=false` reste inchangé.
+
+## Amendement proposé P64-L09S
+
+La gate humaine 0.1.65 invalide la compensation Z décrite aux sections 3 et 4 :
+un petit conteneur est allongé arbitrairement pour soutenir 0,75 % du plateau.
+La finition échoue ensuite sans plan final tout en annonçant un succès.
+
+ADR-0089 propose de remplacer uniquement ces clauses par : réservations sans
+croissance de support, fermeture globale exacte, annexes XY composites en repli
+et résultat UI fidèle. Les budgets, la séparation calcul/finition, le support
+par enveloppe et la conservation du plan minimal restent acquis.
+
+Cet amendement devient normatif seulement lorsque Thomas lance explicitement le
+Goal P64-L09S. Avant ce lancement, aucune implémentation n'est autorisée.

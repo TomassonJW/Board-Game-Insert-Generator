@@ -1,6 +1,6 @@
 # Status
 
-Derniere mise a jour : 2026-07-23
+Derniere mise a jour : 2026-07-25
 
 ## Etat global
 
@@ -8,16 +8,12 @@ Statut produit : **MVP V0.1 Fusion-only accepte ; validation d impression non ac
 
 Surface produit active : **add-in Fusion 360 uniquement** selon ADR-0055.
 La palette embarquee est l editeur principal ; frontend, Vite et loopback sont historiques et hors runtime.
-Phase active : P64-L04A/B/C, P64-L04R1 et P64-L05A/B/C/D1/D2 sont
-automated-validated. Le retour humain L04V est globalement KO mais partiellement
-positif. Le manifest Fusion passe à 0.1.59 pour P64-L05V-R2. L05D1/D2 sont
-automated-validated.
-ADR-0080 remplace la gate humaine par un journal local automatique.
-P64-L06A à L06E sont terminées avec une décision négative interne. Le Goal
-P64-L07 est lancé. L07A à L07D sont automated-validated : quatre moteurs
-externes de quatre familles sont comparés, HiGHS est scellé seul puis certifie
-5/7 cas représentables du holdout. Le holdout est consommé. Aucun gain produit
-n'est encore démontré et aucun moteur externe n'est encore adopté.
+Phase active : P64-L09R-V 0.1.65 est `human-KO`. Le rafraîchissement
+du budget est acquis, mais le calcul allonge un conteneur pour soutenir une
+fraction du plateau et la finition incomplète est présentée comme un succès.
+ADR-0089 et le runbook P64-L09S sont prêts. Le Goal n'est pas lancé : Thomas le
+lancera lui-même dans le clavardage de reprise. Avant ce déclencheur, aucune
+mutation produit n'est autorisée.
 P64-V2H03V et P44-V sont fusion-validated sur 0.1.55. P45-M001V est
 architecture-accepted. P64-L03V est un KO contextuel sur 0.1.56 et n'accorde
 aucune validation Fusion à la correction minimal/final.
@@ -3951,9 +3947,49 @@ Date : 2026-07-25.
 - Rejeu natif local exact : `solution_found`, 18 placements, sommet 59,6 mm pour 59,6 mm utiles, `placement_certified=true`, `materializable=true`, environ 4 s en Normal. Aucune donnée locale n’est ajoutée au dépôt.
 - Contrôle natif CPython 3.14 + SCIP 10.0.2 : OK.
 - Préparateur 0.1.65 en dry-run : OK, deux fixtures, deux réservations, aucune écriture AppData.
-- Installation réelle : package 0.1.65 du commit `2dbc272`, version, runtime, fixtures et marqueurs correctifs vérifiés ; gate en attente du rejeu humain.
+- Installation réelle historique : package 0.1.65 du commit `2dbc272`, version, runtime, fixtures et marqueurs vérifiés ; le rejeu humain ultérieur est KO.
 - Suite complète : 875/875 en 261,340 s ; un test natif SCIP ignoré sous Python 3.10, puis exécuté séparément avec le CPython 3.14 de Fusion et passé.
 - Aucun benchmark, holdout, recalibrage physique, fait impression ou acceptation Fusion n’est revendiqué.
 
 Preuve : `docs/P64_L09R_V_CORRECTIVE_0165_EVIDENCE.md`.
-Prochaine action unique : Thomas reprend P64-L09R-V dans Fusion 360 avec les trois contrôles correctifs en premier.
+Suite historique supersédée par le KO humain 0.1.65 et P64-L09S-P ci-dessous.
+
+## P64-L09S-P — préparation du Goal de stabilisation de bout en bout
+
+Date : 2026-07-25.
+
+Statut : `done-documentation`, `ready-for-user-goal-launch`.
+
+- P64-L09R-V 0.1.65 est reclassée `human-KO`. Elle n'est ni acceptée, ni à
+  reprendre avec l'architecture courante.
+- Le correctif du budget de calcul reste acquis.
+- Le cas réel montre qu'un conteneur 23,2 × 23,2 mm est allongé de 31,6 à
+  38,4 mm pour atteindre 59,6 mm et soutenir seulement 0,75 % du plateau.
+- Le volume artificiellement attribué est 3 660,032 mm³, exactement l'écart de
+  résiduel avec le plan sans plateau.
+- Trois finitions récentes laissent `printable_residual_remains`, ne publient
+  aucun `finalized_plan` et déclenchent pourtant `finalized_plan_ready` et
+  `Projet accepté`.
+- ADR-0089 propose de conserver SCIP pour le minimal, de retirer tout support
+  artificiel de plateau, puis d'effectuer une fermeture globale exacte et
+  équilibrée avec annexes XY composites seulement en repli.
+- Le principe de partition complète du solveur P57 historique est conservé ;
+  son modèle 2D par lignes n'est pas restauré.
+- Le runbook P64-L09S découpe A minimal, B vérité/UX, C fermeture rectangulaire,
+  D annexes composites, E CAD/unions, F durcissement et V gate Fusion.
+- Le Goal n'est ni créé ni lancé par P. Thomas le lancera lui-même dans le
+  clavardage de reprise ; ce lancement acceptera ADR-0089.
+- Aucun code produit, benchmark, holdout, package Fusion, installation,
+  tolérance ou valeur physique n'est modifié par cette mission.
+- Validation : garde documentaire 2/2, garde de recette 6/6, suite complète
+  875/875 en 287,519 s, un test natif SCIP ignoré sous Python 3.10.
+- `print-validated=false`.
+
+Autorités :
+
+- `docs/DECISIONS/ADR-0089-reservations-minimales-et-fermeture-globale-composee.md` ;
+- `docs/P64_L09R_V_0165_HUMAN_KO_EVIDENCE.md` ;
+- `docs/P64_L09S_END_TO_END_GOAL_RUNBOOK.md`.
+
+Prochaine action unique : Thomas lance le Goal P64-L09S dans le clavardage de
+reprise. Avant ce lancement, aucune mutation produit n'est autorisée.

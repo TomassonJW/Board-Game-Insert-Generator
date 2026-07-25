@@ -1353,3 +1353,32 @@ Le package du commit `2dbc272` est publié puis installé ; version, runtime, fi
 4. reprendre ensuite le reste de `docs/P64_L09R_V_FUSION_GATE_RECIPE.md`.
 
 Aucune observation de correction dans Fusion n’est encore revendiquée par les tests automatisés. `print-validated=false` reste obligatoire.
+
+## P64-L09R-V 0.1.65 KO et gate de lancement P64-L09S — 2026-07-25
+
+La gate 0.1.65 est `human-KO`. Elle ne doit pas être reprise : le calcul
+allonge arbitrairement un petit conteneur pour soutenir une fraction du plateau,
+la finition ne ferme pas le volume et l'interface annonce malgré tout un succès.
+La preuve canonique est
+`docs/P64_L09R_V_0165_HUMAN_KO_EVIDENCE.md`.
+
+ADR-0089 est proposée. Elle introduit une décision structurante bornée : les
+annexes XY de fermeture deviennent des parties composites d'un conteneur, avec
+contact par face verticale, bas Z commun, connexité, propriétaire unique,
+certificat et union CAD. Elle n'autorise ni formes P45 générales, ni cales, ni
+mécanisme, ni valeur physique nouvelle.
+
+La prochaine action humaine n'est pas une observation Fusion : Thomas lance
+lui-même le Goal P64-L09S dans le clavardage de reprise. Ce lancement :
+
+1. accepte ADR-0089 et ce périmètre composite précis ;
+2. autorise les missions automatisées P64-L09S-A à F, une par une ;
+3. dispense de nouveau GO entre A et F tant que le périmètre ne s'élargit pas ;
+4. laisse P64-L09S-V comme gate Fusion humaine obligatoire.
+
+Avant ce lancement, le successeur reste en lecture seule et ne crée pas lui-même
+le Goal. Après lancement, une nouvelle gate humaine redevient obligatoire si le
+travail élargit les composites au-delà des annexes XY, change une tolérance ou
+une valeur physique, ajoute un mécanisme ou modifie la North Star.
+
+`print-validated=false` reste obligatoire.

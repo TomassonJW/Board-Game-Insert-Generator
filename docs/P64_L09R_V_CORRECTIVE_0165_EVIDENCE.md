@@ -2,7 +2,7 @@
 
 Date : 2026-07-25
 
-Statut : `implemented-product`, `automated-validated`, `installed-awaiting-human-retest`, `print-validated=false`.
+Statut : preuve corrective historique, `human-KO-after-install`, `superseded-by-ADR-0089`, `print-validated=false`.
 
 ## Incident observé pendant la gate 0.1.64
 
@@ -48,10 +48,6 @@ Le worker couplé porte aussi une hauteur Z variable limitée aux conteneurs non
 
 ## Suite
 
-Le package 0.1.65 du commit `2dbc272` est publié sur `origin/main`, installé localement et vérifié. Thomas recharge maintenant l’add-in et vérifie d’abord :
+Le package 0.1.65 du commit `2dbc272` a été publié, installé et observé. Le rafraîchissement du budget est acquis, mais la gate est KO : le calcul allonge arbitrairement un conteneur sous plateau et la finition reste incomplète.
 
-1. le rafraîchissement immédiat des cinq budgets de calcul ;
-2. le recalcul de son cas 60 / 59,6 / 52,8 mm avec le plateau de 1 mm ;
-3. la matérialisation du plan minimal sans finition.
-
-La suite de la recette P64-L09R-V ne reprend qu’après ces trois observations. `print-validated=false` reste obligatoire.
+La suite canonique est `docs/P64_L09R_V_0165_HUMAN_KO_EVIDENCE.md`, ADR-0089 puis le Goal P64-L09S. L’ancienne recette ne reprend pas. `print-validated=false` reste obligatoire.

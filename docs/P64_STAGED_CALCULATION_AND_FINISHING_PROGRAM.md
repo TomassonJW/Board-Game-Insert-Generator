@@ -666,3 +666,40 @@ P64-L09R-A
 P64-L09V 0.1.63 est supersédée sans observation. P64-U01 est absorbée par
 L09R-D/E. Les lots de modularité, de capacité post-solve, de cales et de poses
 fermées restent distincts. `print-validated=false`.
+
+## Amendement P64-L09S-P — minimal sans porteur et fermeture globale
+
+ADR-0089 et `docs/P64_L09S_END_TO_END_GOAL_RUNBOOK.md` remplacent les
+clauses L09R qui autorisent une compensation Z de support dans le plan minimal
+et celles qui confient la fermeture complète à une croissance gloutonne locale.
+
+Le calcul minimal conserve les dimensions minimales. Plateaux et livrets sont
+des prismes réservés : ils peuvent imposer un rejet ou un retry sous la deadline
+restante, jamais l'allongement d'un conteneur. Un espace sous plateau reste
+matérialisable.
+
+La finition devient une partition globale : elle couvre exactement une fois tout
+le domaine imprimable, d'abord avec une enveloppe rectangulaire finale par
+conteneur. Elle optimise ensuite volumes ajoutés, ratios de croissance et
+complexité. Si aucune couverture rectangulaire complète n'est obtenue, un repli
+borné peut souder des annexes XY à un propriétaire adjacent, avec bas Z commun
+et certificat de connexité.
+
+Le principe de fermeture complète du solveur P57 historique est réutilisé comme
+invariant et fixture. Son solveur 2D par lignes ne remplace pas SCIP.
+
+La séquence proposée devient :
+
+```text
+P64-L09S-A
+  -> P64-L09S-B
+  -> P64-L09S-C
+  -> P64-L09S-D
+  -> P64-L09S-E
+  -> P64-L09S-F
+  -> P64-L09S-V
+```
+
+Elle ne devient exécutable qu'après le lancement explicite du Goal par Thomas,
+qui vaut acceptation d'ADR-0089. Avant ce lancement, aucune mutation produit
+n'est autorisée. `print-validated=false`.

@@ -2,7 +2,9 @@
 
 Date de préparation : 2026-07-25
 
-Statut : `installed-awaiting-human-retest`, `human-gate-required`, `print-validated=false`.
+Statut : `human-KO`, `suspended`, `do-not-run`, `print-validated=false`.
+
+Cette recette est archivée comme preuve de la gate 0.1.65. Elle ne doit plus être exécutée. La trajectoire active est ADR-0089 puis P64-L09S.
 
 Cette recette remplace entièrement P64-L09V 0.1.63, annulée sans observation. Elle ne réactive ni l’anti-chute dure, ni la finalisation obligatoire.
 

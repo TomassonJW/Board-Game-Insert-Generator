@@ -1632,4 +1632,38 @@ La prochaine et unique étape est P64-L09R-V, gate Fusion humaine obligatoire. A
 
 La première ouverture de P64-L09R-V sur 0.1.64 est suspendue sans acceptation. Le correctif 0.1.65 rétablit la compensation Z exacte et recertifiée exigée par ADR-0088 pour un plateau supérieur, et rend immédiatement visible tout changement du budget de calcul. Le cas local exact 18 conteneurs / plateau 1 mm repasse en natif avec 18 placements, sommet 59,6 mm, plan certifié et matérialisable ; aucune donnée locale n’est versionnée.
 
-Le package 0.1.65 du commit `2dbc272` est publié, installé et vérifié. La trajectoire produit ne change pas : P64-L09R-V reste la prochaine gate humaine obligatoire. Aucun nouveau lot produit ne commence avant son résultat ; `print-validated=false`.
+Le package 0.1.65 du commit `2dbc272` a été publié, installé et vérifié. Cette formulation est historique : l’observation humaine ultérieure est KO et remplace la reprise de P64-L09R-V par la préparation P64-L09S ci-dessous. `print-validated=false`.
+
+## Mise à jour P64-L09S-P — 2026-07-25
+
+L'observation humaine 0.1.65 invalide la reprise directe de P64-L09R-V. Le
+budget de calcul est réactif, mais la compensation Z transforme un petit
+conteneur en support arbitraire du plateau. La finition gloutonne ne couvre pas
+le volume résiduel et son échec est présenté comme un succès.
+
+ADR-0089 propose une architecture hybride :
+
+1. SCIP reste le solveur de faisabilité minimale X/Y/Z ;
+2. les réservations n'agrandissent aucun conteneur ;
+3. une partition rectangulaire globale ferme d'abord tout le domaine imprimable ;
+4. des annexes XY composites, soudées et certifiées, servent seulement de repli ;
+5. le CAD IR matérialise exactement corps, unions et encoches ;
+6. l'UI publie le résultat métier réel.
+
+La trajectoire préparée est :
+
+```text
+P64-L09S-A minimal sans support artificiel
+  -> P64-L09S-B vérité du cycle et couleurs
+  -> P64-L09S-C fermeture rectangulaire globale
+  -> P64-L09S-D annexes XY composites
+  -> P64-L09S-E CAD IR, unions et encoches
+  -> P64-L09S-F durcissement de bout en bout
+  -> P64-L09S-V gate Fusion humaine
+```
+
+
+Le Goal n'est pas lancé par la préparation. Thomas le lance lui-même dans le
+clavardage de reprise ; ce lancement accepte ADR-0089. Aucun autre GO n'est
+requis entre A et F. Aucun benchmark, holdout, changement physique ou
+installation Fusion n'est autorisé avant la préparation de V.

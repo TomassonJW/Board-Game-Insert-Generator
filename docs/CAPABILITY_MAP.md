@@ -2163,6 +2163,31 @@ Preuve : `docs/P64_L09R_B_MINIMAL_CALCULATION_EVIDENCE.md`.
 - `C-SOLVER` : `implemented-product`, `automated-validated`. Une réservation supérieure peut demander une compensation Z au seul conteneur automatique admissible après le placement minimal SCIP ; le certificat commun reste l’autorité finale.
 - `C-STAGED-CALCULATION` : inchangée sur la séparation minimal/finition ; le plan minimal compensé reste directement matérialisable et la finition n’est pas invoquée.
 - `C-FUSION-UI` : `implemented-product`, `automated-validated`. Le budget de calcul et sa limite réelle adjacente sont rendus immédiatement à chaque changement, indépendamment du budget de finition.
-- `C-FUSION` : `installed-awaiting-human-retest`. Le package 0.1.65 du commit `2dbc272` est installé et vérifié ; la première ouverture 0.1.64 reste suspendue sans acceptation.
+- `C-FUSION` : état historique après installation. L’observation ultérieure est `human-KO` et remplace `installed-awaiting-human-retest`.
 - `C-PRINT` : inchangée, `print-validated=false`.
-- Prochaine action unique : reprendre la gate P64-L09R-V dans Fusion 360.
+- Suite historique supersédée : voir P64-L09S-P ci-dessous.
+
+## Mise à jour P64-L09S-P — Goal prêt, aucune capability runtime promue
+
+- `C-SOLVER` / `C-RESERVATION` : limite humaine confirmée. La
+  compensation Z 0.1.65 produit un support arbitraire ; ADR-0089 propose des
+  réservations interdites sans croissance du plan minimal.
+- `C-LAYOUT` / `C-PARTITION` : la fermeture gloutonne actuelle ne
+  garantit ni couverture complète ni équilibre. P64-L09S-C devra sélectionner
+  globalement une partition rectangulaire exacte.
+- `C-COMPOSITE` : `architecture-proposed` pour le seul repli d'annexes
+  XY soudées, à propriétaire unique, bas Z commun et contact par face verticale.
+  Le lancement du Goal par Thomas vaudra acceptation de ce périmètre borné.
+- `C-CERTIFICATE` : le futur certificat devra attribuer chaque cellule
+  imprimable exactement une fois, prouver connexité, unions, réservations et
+  résiduel nul.
+- `C-CAD-IR` / `C-FUSION` : planifiés pour unions composites et
+  encoches exactes ; aucune implémentation ou installation dans P64-L09S-P.
+- `C-FUSION-UI` : défaut confirmé. Une finition sans plan final ne peut plus
+  annoncer `finalized_plan_ready` ou `Projet accepté`. Les trois actions
+  auront une couleur de base distincte.
+- `C-QUALITY` : P64-L09R-V devient `human-KO` ; P64-L09S est
+  `ready-for-user-goal-launch`.
+- `C-PRINT` : inchangée, `print-validated=false`.
+
+Aucune capability runtime n'est promue par cette préparation documentaire.

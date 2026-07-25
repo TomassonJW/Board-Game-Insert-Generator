@@ -15,19 +15,22 @@ preuves archivées.
 
 ## État actif
 
-**État autoritaire du 2026-07-25 :** ADR-0088 reste la décision produit.
-P64-L09R-B à F sont `implemented-product` et `automated-validated`. Le calcul
-minimal, la finition indépendante, les trois actions permanentes, les budgets
-visibles, le worker pur et la jauge temporaire sont durcis sur cas publics.
-La gate P64-L09R-V a été ouverte avec 0.1.64 puis suspendue sans acceptation :
-un plateau de 1 mm pouvait rendre le modèle infaisable malgré 6,8 mm de marge
-utile, et le budget de calcul ne rafraîchissait pas toujours sa durée. Le
-correctif 0.1.65 est `implemented-product`, `automated-validated`, publié puis
-installé depuis le commit `2dbc272`. Runtime, fixtures, version et marqueurs sont
-vérifiés. Le rejeu natif local exact retrouve 18 placements certifiés,
-matérialisables, avec un sommet à 59,6 mm pour 59,6 mm utiles. Aucun snapshot
-local n'est versionné. La prochaine action unique est la reprise humaine de
-P64-L09R-V dans Fusion 360 ; `print-validated=false`.
+**État autoritaire du 2026-07-25 :** P64-L09R-V 0.1.65 est un KO humain et ne
+doit pas être reprise avec l'architecture courante. Le rafraîchissement du
+budget est corrigé, mais le calcul minimal allonge arbitrairement un petit
+conteneur de 6,8 mm pour en faire un support à seulement 0,75 % du plateau. La
+finition laisse ensuite 775 266,384 mm³ de résiduel et ne publie aucun plan
+final, tandis que l'interface annonce à tort un succès.
+
+ADR-0089 est proposée. Elle conserve SCIP pour le solve minimal 3D, interdit
+toute croissance de support liée aux plateaux, transforme les réservations en
+prismes à respecter, puis impose une fermeture globale complète et équilibrée.
+Des annexes XY soudées et certifiées sont permises seulement en repli. Le Goal
+P64-L09S est préparé mais non lancé. Sa prochaine action unique est le lancement
+explicite par Thomas dans le clavardage de reprise ; ce lancement acceptera
+ADR-0089. Aucun code, benchmark ou package Fusion ne commence avant ce
+déclencheur. `print-validated=false`.
+
 - Dernière preuve : P64-V2H03V Fusion OK 0.1.55 ; P64-V2H03 est
   fusion-validated pour la coordination des variantes internes.
 - print-validated: false ; aucune valeur physique n'est calibrée par cette preuve.
@@ -150,10 +153,10 @@ P64-L09R-V dans Fusion 360 ; `print-validated=false`.
   objectifs secondaires déterministes ; le plan F01B certifié reste prioritaire
   sans amélioration stricte. Suite complète : 853/853.
 - P64-L09V 0.1.63 reste archivée sans observation. P64-L09R-B à F sont
-  `implemented-product`, `automated-validated`. P64-L09R-V 0.1.64 est suspendue
-  sans acceptation après les deux défauts plateau/Z et rafraîchissement du budget
-  de calcul. Le correctif 0.1.65 est automatisé-validé ; le cas local exact passe
-  en natif, mais l'observation Fusion doit être rejouée. La modularité reste différée.
+  `implemented-product` et `automated-validated`, mais leur gate 0.1.65 est KO :
+  compensation Z non viable, finalisation incomplète et message de succès faux.
+  P64-L09S est `ready-for-user-goal-launch`. Son périmètre composite est limité
+  aux annexes XY de fermeture décrites par ADR-0089.
 
 ## Vue de séquence
 
@@ -233,7 +236,8 @@ P64-L09R-V dans Fusion 360 ; `print-validated=false`.
 | Terminée — automatisée | P64-L09R-D | Trois actions permanentes, activation exacte, budgets séparés et durées adjacentes. |
 | Terminée — automatisée | P64-L09R-E | Jauge temporaire pleine largeur, cadence 1 s, worker pur, matérialisation sur thread Fusion et stale fail-closed. |
 | Terminée — automatisée | P64-L09R-F | Reçu public 28x30, plateau, préférence souple, timeouts et conservation du minimal durcis ; package 0.1.64 préparé sans installation. |
-| Prochaine action — gate humaine | P64-L09R-V | Installer 0.1.65, vérifier budget et cas plateau corrigé, puis reprendre le parcours séparé ; `print-validated=false`. |
+| KO humain | P64-L09R-V | 0.1.65 allonge arbitrairement un conteneur sous plateau et la finition échoue avec un succès UI trompeur. |
+| Prochaine action — lancement humain | P64-L09S | Thomas lance le Goal préparé ; A à F s’enchaînent ensuite sans nouveau GO, puis V reste humaine. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -258,8 +262,11 @@ P64-L09R-V dans Fusion 360 ; `print-validated=false`.
 - P64_L09R_B_MINIMAL_CALCULATION_EVIDENCE.md : support enveloppe, plan minimal
   matérialisable, compensation Z, préférence souple et deadlines totales.
 - P64_L09R_F_REPRESENTATIVE_HARDENING_EVIDENCE.md : cas publics, mesures séparées, contrôles négatifs et préparation 0.1.64 sans installation.
-- P64_L09R_V_FUSION_GATE_RECIPE.md : préparation Codex et observations humaines exactes de la gate obligatoire.
-- ADR-0088 : décision autoritaire du retour sélectif et de l'UX staged.
+- P64_L09R_V_0165_HUMAN_KO_EVIDENCE.md : faits Fusion, causes du support arbitraire, échecs de finition et faux succès UI.
+- ADR-0089-reservations-minimales-et-fermeture-globale-composee.md : décision proposée, acceptée seulement par le lancement explicite du Goal.
+- P64_L09S_END_TO_END_GOAL_RUNBOOK.md : missions A à F, gate V, certificats, interdits et prompt canonique.
+- P64_L09R_V_FUSION_GATE_RECIPE.md : recette 0.1.65 archivée, `do-not-run`.
+- ADR-0088 : acquis du retour sélectif et de l’UX staged, avec amendement proposé par ADR-0089.
 - P64_L09V_FUSION_GATE_PREPARATION.md : preuve historique 0.1.63 supersédée ;
   aucune action humaine à exécuter.
 - P64_L09A_MATERIAL_SUPPORT_AND_COUPLED_FINALIZATION_CONTRACT.md : matière

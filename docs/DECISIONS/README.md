@@ -243,3 +243,4 @@ Tests, cartes backlog ou gates humaines a preparer.
   sélectif au support par enveloppe, préférence petits-dessous, finition
   optionnelle, budgets explicites et jauge active seulement pendant les
   opérations.
+- ADR-0089-reservations-minimales-et-fermeture-globale-composee.md - proposition P64-L09S : réservations sans croissance de support, fermeture globale exacte, annexes XY composites bornées, CAD fidèle et vérité UI.

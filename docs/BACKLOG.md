@@ -3343,23 +3343,100 @@ implémentée et intégrée à la fois.
 - Preuve : `docs/P64_L09R_F_REPRESENTATIVE_HARDENING_EVIDENCE.md`.
 - Statut : `implemented-product`, `automated-validated`, `gate-prepared-not-installed`.
 
-### P64-L09R-V — Gate Fusion du parcours séparé
+### P64-L09R-V — Gate Fusion 0.1.65 en KO
 
-- Dépendances : P64-L09R-B à F automated-validated et correctif C1 intégré.
-- La première ouverture 0.1.64 est suspendue sans acceptation après un faux échec plateau/Z et un défaut de rafraîchissement du budget de calcul.
-- Le package correctif 0.1.65 du commit `2dbc272` est publié et installé ; runtime, marqueurs, fichiers, fixtures et réglages sont vérifiés.
-- Thomas vérifie d’abord les cinq budgets, son cas 60 / 59,6 / 52,8 mm avec plateau de 1 mm, puis la matérialisation minimale sans finition.
-- La recette reprend ensuite ordre préférentiel, finition séparée, matérialisation finale et jauge totalement absente au repos.
-- Recette : `docs/P64_L09R_V_FUSION_GATE_RECIPE.md`.
-- La gate ne qualifie ni impression, ni tolérance, ni couvercle fermé.
-- Statut : `ready-human-gate`, `installed-awaiting-human-retest`, `print-validated=false`.
+- Dépendances : P64-L09R-B à F et correctif C1 automatisés.
+- Le budget de calcul se rafraîchit correctement.
+- Le cas plateau allonge arbitrairement `container-018` de 6,8 mm pour une
+  couverture de seulement 0,75 %.
+- La finition laisse 775 266,384 mm³ de résiduel sans plan final, mais l'UI
+  annonce encore un succès.
+- Preuve : `docs/P64_L09R_V_0165_HUMAN_KO_EVIDENCE.md`.
+- Ancienne recette : archivée, `do-not-run`.
+- Statut : `human-KO`, `suspended`, `print-validated=false`.
 
 ### P64-L09R-V-C1 — Correctif compensation Z et budget
 
-- Cause solveur : hauteur minimale figée face au sommet de conception imposé par la réservation plateau.
-- Cause UI : absence de rendu immédiat dans `saveSolverSetting`.
-- Correction : solve SCIP minimal, compensation Z exacte et recertifiée, repli couplé dans le temps restant ; budget de calcul redessiné avant persistance.
-- Preuve native locale : 18 placements, sommet 59,6 mm, plan certifié et matérialisable, sans snapshot versionné.
-- Package : 0.1.65.
-- Preuve : `docs/P64_L09R_V_CORRECTIVE_0165_EVIDENCE.md`.
-- Statut : `implemented-product`, `automated-validated`, `installed-awaiting-human-retest`.
+- Acquis conservé : rendu immédiat du budget de calcul.
+- Dette confirmée : la compensation Z transforme un conteneur minimal en porteur
+  de plateau et doit être retirée par P64-L09S-A.
+- Preuve historique : `docs/P64_L09R_V_CORRECTIVE_0165_EVIDENCE.md`.
+- Statut : `automated-validated-historical`,
+  `human-KO-after-install`, `superseded-by-ADR-0089`.
+
+### P64-L09S-P — Préparation du Goal de stabilisation de bout en bout
+
+- Livrables : ADR-0089, preuve KO 0.1.65, runbook Goal, pilotage et gate.
+- Objectif : préparer sans lancer le Goal qui corrige minimal, finition,
+  composites, CAD et UX.
+- Non-objectifs : code produit, benchmark, holdout, package ou installation
+  Fusion, tolérance, valeur physique.
+- Statut : `done-documentation`, `ready-for-user-goal-launch`.
+- Déclencheur suivant : Thomas lance lui-même le Goal ; ce lancement accepte
+  ADR-0089.
+
+### P64-L09S-A — Minimal sans support artificiel
+
+- Dépendance : lancement humain du Goal et acceptation d'ADR-0089.
+- Retirer la compensation Z et l'obligation SCIP de support de plateau.
+- Garder plateaux/livrets comme prismes réservés et post-certifier l'incumbent.
+- Réessayer sous le temps restant avec prismes interdits si nécessaire.
+- Prouver le cas 60 / 59,6 / 52,8 + plateau 1 mm sans croissance de conteneur.
+- Statut : `ready-after-goal-launch`.
+
+### P64-L09S-B — Vérité du cycle et couleurs
+
+- Dépendance : P64-L09S-A intégrée.
+- Publier un succès seulement avec `finalized_plan` courant et recertifié.
+- Distinguer timeout, résiduel, certificat, stale et erreur dans message et log.
+- Conserver la réactivité des budgets.
+- Colorer Calculer en bleu, Finaliser en orange ou violet et Matérialiser en vert,
+  avec état désactivé accessible.
+- Statut : `planned-by-goal`.
+
+### P64-L09S-C — Fermeture rectangulaire globale
+
+- Dépendance : P64-L09S-B intégrée.
+- Décomposer le domaine imprimable en cellules orthogonales bornées.
+- Sélectionner globalement une enveloppe rectangulaire finale par conteneur.
+- Couvrir chaque cellule exactement une fois puis optimiser équilibre et
+  déformation de façon déterministe.
+- Réutiliser le principe de partition complète P57 sans restaurer son solveur 2D.
+- Statut : `planned-by-goal`.
+
+### P64-L09S-D — Annexes XY composites bornées
+
+- Dépendance : P64-L09S-C intégrée.
+- Repli seulement lorsque la fermeture rectangulaire complète n'est pas obtenue.
+- Annexe propriétaire unique, face verticale X/Y, bas Z commun, connexité et
+  union ; liaison par Z, arête ou point interdite.
+- Minimiser nombre et complexité, puis rééquilibrer.
+- Le lancement du Goal vaut gate humaine pour ce seul périmètre composite.
+- Statut : `planned-by-goal`.
+
+### P64-L09S-E — CAD IR, unions et encoches exactes
+
+- Dépendance : P64-L09S-D intégrée.
+- Représenter et unir les annexes au corps propriétaire.
+- Couper plateaux/livrets uniquement sur les corps finaux qui atteignent leur
+  plan et chevauchent leur empreinte.
+- Préserver la scène précédente à toute erreur d'union ou de coupe.
+- Statut : `planned-by-goal`.
+
+### P64-L09S-F — Durcissement de bout en bout
+
+- Dépendance : P64-L09S-E intégrée.
+- Rejouer minimal, matérialisation minimale, finition, matérialisation finale,
+  timeouts, rejets et stale sur fixtures simples, 3D, plateau et composite.
+- Aucun benchmark, holdout ou installation Fusion.
+- Préparer P64-L09S-V seulement si toutes les preuves passent.
+- Statut : `planned-by-goal`.
+
+### P64-L09S-V — Gate Fusion finale
+
+- Dépendance : P64-L09S-A à F intégrées et package préparé.
+- Codex installe et vérifie ; Thomas observe le parcours complet dans Fusion.
+- Vérifier absence de croissance plateau au minimal, fermeture complète,
+  équilibre, éventuelle annexe unie, encoches exactes et messages honnêtes.
+- Aucune validation d'impression, tolérance ou résistance mécanique.
+- Statut : `planned-human-gate`, `print-validated=false`.

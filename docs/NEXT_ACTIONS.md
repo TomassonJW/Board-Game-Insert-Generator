@@ -4,32 +4,20 @@ Dernière mise à jour : 2026-07-25
 
 ## Version active
 
-**Décision autoritaire du 2026-07-25 :** ADR-0088 annule la gate P64-L09V
-préparée sur 0.1.63. Le support dur revient aux enveloppes XY ; la préférence
-petits-dessous/grands-dessus reste souple ; les réservations SCIP sont
-conservées ; la finition redevient facultative et séparée. Les budgets du
-calcul et de la finition seront visibles à côté de leur niveau. La jauge
-n'apparaîtra que pendant une opération et ne réservera aucun espace au repos.
+**Décision autoritaire du 2026-07-25 :** P64-L09R-V 0.1.65 est un KO humain.
+ADR-0088 reste acquise pour le support par enveloppe, les budgets, la séparation
+calcul/finition et le cycle UI, mais sa compensation Z et sa stratégie de
+fermeture sont remises en cause par les faits Fusion.
 
-V0.1 reste `mvp-accepted`, `fusion-validated: true` pour son périmètre
-historique et `print-validated: false`. La surface MVP reste exclusivement
-l’add-in Fusion 360.
+ADR-0089 est proposée. Elle sera acceptée uniquement lorsque Thomas lancera le
+Goal P64-L09S préparé. Avant ce lancement, aucun runtime ne change.
 
-P64-L04A/B/C restent automated-validated dans le package 0.1.58.
-Le retour humain L04V est globalement KO mais partiellement positif. R1 corrige
-le cache négatif. P64-L05A est automated-validated : exactement un nouveau
-conteneur peut être inséré dans le vide global à voisins figés et plan complet
-recertifié. Le manifest Fusion passe à 0.1.59 pour le journal automatique. fusion-validated: false et
-print-validated: false pour L05A, L05B et L05C. À ce stade historique, le
-solveur restait inchangé.
-P64-L05B, P64-L05C, P64-L05D1/D2 et P64-L06A/B/C/D/E sont automated-validated. Le premier Goal L06 est terminé par la décision négative `no_algorithm_change_v1`.
-Cette décision ne compare aucun solveur externe mature. P64-L07 a ensuite
-comparé quatre moteurs, mais uniquement après projection dans un modèle de sol
-à un seul niveau : il est requalifié par ADR-0083 comme benchmark partiel. La
-lane HiGHS 1.15.1 reste expérimentale et spécialisée ; elle ne vaut ni choix de
-solveur 3D global ni promesse de vitesse.
+V0.1 reste `mvp-accepted` et `fusion-validated: true` pour son périmètre
+historique. P64-L08L reste `fusion-validated` pour la correction de
+performance observée en environ 25 s puis 34 s dans Fusion 0.1.62. Aucun fait
+récent ne vaut validation d'impression ; `print-validated=false`.
 
-## Dernier état runtime avant implémentation de P64-L09R
+## Acquis runtime historiques conservés
 
 - une édition continue de recalculer uniquement ses dérivations locales ;
 - une insertion interne admissible peut republier un `minimal_layout` courant
@@ -92,61 +80,69 @@ Preuve L09R-B : P64_L09R_B_MINIMAL_CALCULATION_EVIDENCE.md.
 Matrice L09 : P64_L09_VALIDATION_UNIFIEE.md.
 Rapport final L07 : P64_L07_GOAL_FINAL_REPORT.md.
 
-## Correctif de gate terminé
+## Gate P64-L09R-V clôturée en KO
 
-### P64-L09R-V-C1 — compensation Z plateau et rafraîchissement du budget
+La 0.1.65 corrige le rafraîchissement du budget et retrouve un plan, mais ce plan
+n'est pas minimal au sens produit : un conteneur 23,2 × 23,2 mm est allongé de
+6,8 mm pour soutenir seulement 0,75 % du plateau. La finition conserve ensuite
+775 266,384 mm³ de résiduel, ne publie aucun plan final et produit pourtant un
+message et un stop reason de succès.
 
-- La gate 0.1.64 est suspendue sans acceptation après deux observations réelles.
-- SCIP résout le plan minimal puis une passe exacte applique uniquement la compensation Z nécessaire sous une réservation supérieure ; toute collision, cavité insuffisante, axe figé ou expansion injustifiée est rejeté avant le certificat commun.
-- Le cas local exact repasse à 18 placements, sommet 59,6 mm, plan certifié et matérialisable en environ 4 s avec le budget Normal ; aucune donnée locale n'est ajoutée au dépôt.
-- Le budget de calcul et sa durée adjacente se rafraîchissent immédiatement, sans dépendre du budget de finition.
-- Le package correctif est 0.1.65 ; le préflight et le préparateur passent en dry-run sans écriture AppData.
+Preuve : `docs/P64_L09R_V_0165_HUMAN_KO_EVIDENCE.md`.
 
-Preuve : `docs/P64_L09R_V_CORRECTIVE_0165_EVIDENCE.md`.
-## Dernier lot terminé
+P64-L09R-V est `human-KO`, non acceptée et ne doit pas être rejouée avec
+l'architecture 0.1.65. Le correctif UI de budget reste acquis.
 
-### P64-L09R-F — durcissement représentatif et préparation
+## Préparation P64-L09S-P terminée
 
-- Cas public 28x30 recertifié depuis son reçu public, sans lecture du holdout.
-- Deux fixtures publiques exécutées : préférence souple par enveloppe et parcours avec plateau/réservations.
-- Calcul minimal Normal mesuré séparément de la finition Rapide ; le CAD minimal est construit avant toute finition.
-- Inversion nécessaire, ouverture admissible, collisions/réservations négatives, fin anticipée, timeout honnête et conservation du minimal sont couverts.
-- Préflight et préparateur P64-L09R-V versionnés 0.1.64 ; simulation validée sans écriture AppData.
-- Validation : 126/126 ciblés, 2/2 documentaires, 873/873 complets en 239,310 s ; un test natif SCIP ignoré.
-- Aucun benchmark, holdout, recalibrage physique, package installé, fait Fusion ou fait impression produit par F.
+ADR-0089 propose la trajectoire hybride suivante :
 
-Preuve : `docs/P64_L09R_F_REPRESENTATIVE_HARDENING_EVIDENCE.md`.
-Recette : `docs/P64_L09R_V_FUSION_GATE_RECIPE.md`.
+1. SCIP conserve le calcul minimal 3D complexe ;
+2. plateaux et livrets sont des réservations sans conteneur porteur artificiel ;
+3. la finition construit une partition globale complète et équilibrée ;
+4. des annexes XY soudées sont admises seulement en repli borné ;
+5. le CAD IR et Fusion unissent chaque annexe à son propriétaire ;
+6. l'interface ne déclare un succès qu'avec un plan final certifié.
+
+Le principe historique de partition complète est repris sans restaurer le
+solveur 2D par lignes. Le Goal est préparé par
+`docs/P64_L09S_END_TO_END_GOAL_RUNBOOK.md`, mais il n'est ni créé ni lancé dans
+cette mission documentaire.
 
 ## Prochaine action recommandée
 
-### P64-L09R-V — gate Fusion du parcours calcul / finition séparés
+### P64-L09S — lancement humain du Goal de stabilisation de bout en bout
 
-Type : gate humaine obligatoire, `installed-awaiting-human-retest`.
+Type : lancement explicite par Thomas, `ready-for-user-goal-launch`.
 
-1. Terminé : Codex a publié puis installé exactement 0.1.65 depuis le commit `2dbc272` ; runtime, fixtures et marqueurs sont vérifiés.
-2. Thomas vérifie d’abord le rafraîchissement immédiat des cinq budgets de calcul.
-3. Thomas recalcule son cas 60 / 59,6 / 52,8 mm avec plateau de 1 mm, puis matérialise le minimal sans finition.
-4. Si ces contrôles passent, la recette reprend avec préférence souple, finition séparée, plan final et jauge.
-5. Le retour reste `print-validated=false` et ne calibre aucune valeur physique.
+1. Thomas lance lui-même le Goal dans le clavardage de reprise.
+2. Ce lancement accepte ADR-0089 et son périmètre composite borné.
+3. Le Goal exécute une seule mission à la fois, A à F, avec tests, documentation,
+   commit et intégration directe dans `main`.
+4. Aucun nouveau GO humain n'est requis entre A et F.
+5. P64-L09S-V reste la gate Fusion humaine obligatoire.
 
-P64-L09V 0.1.63 reste annulée sans observation et ne doit jamais être exécutée.
-Aucun autre lot produit ne commence avant le résultat de P64-L09R-V.
+Avant ce lancement, le successeur reste en lecture seule : aucun code,
+benchmark, package Fusion, installation ou mutation de projet.
 
-## Lot ordonné après P64-L09R-V
+## Programme ordonné après lancement
 
-La suite produit sera réévaluée à partir du retour humain ; aucune mission automatisée n'est présélectionnée devant cette gate.
+1. P64-L09S-A — plan minimal sans support ou compensation Z artificiels ;
+2. P64-L09S-B — vérité du résultat, budgets réactifs et trois boutons colorés ;
+3. P64-L09S-C — fermeture rectangulaire globale complète et équilibrée ;
+4. P64-L09S-D — annexes XY composites bornées et certificat de connexité ;
+5. P64-L09S-E — CAD IR, unions et encoches exactes de plateaux/livrets ;
+6. P64-L09S-F — durcissement de bout en bout et préparation de gate ;
+7. P64-L09S-V — observation Fusion humaine, sans validation d'impression.
 
 ## Lots verrouillés ou différés
 
 - P64-U01 est absorbée par P64-L09R-D/E ;
 - P64-L09B reste une preuve historique, mais sa règle anti-chute dure est
   remplacée par ADR-0088 ;
-- P64-F01B/F02B restent réutilisables comme moteur de finition, mais leur
-  obligation avant matérialisation est remplacée ;
+- P64-F01B/F02B restent des preuves historiques et des briques réutilisables, mais leur fermeture gloutonne n’est plus l’autorité de succès ;
 - P64-C01/C02/C03 et P64-CV restent post-finalisation et verrouillés ;
-- la modularité P64-F02, le résiduel/cales P64-F03 et le mode exact P64-X01
-  restent différés selon leurs préconditions ;
+- la modularité générale P64-F02, le résiduel/cales P64-F03 et P64-X01 restent différés ; seule l’annexe XY bornée d’ADR-0089 entre dans P64-L09S-D ;
 - P45 conserve formes, intentions et certificat local ; son runtime n'est pas
   commencé ;
 - P46, P47-P50 et P69 restent bloqués par l'ordre V0.2/V0.3 ;

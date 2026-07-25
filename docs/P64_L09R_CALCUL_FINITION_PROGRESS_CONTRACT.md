@@ -326,3 +326,20 @@ post-solve C01-C03 et les horizons P70+ ne sont pas absorbés dans ce programme.
 - dépendance ou service externe supplémentaire ;
 - logique métier JavaScript ou `adsk` dans le cœur ;
 - validation d'impression.
+
+## 16. Limites observées et proposition P64-L09S
+
+La gate 0.1.65 montre que deux clauses de ce contrat ne sont pas viables :
+
+- la compensation Z du plan minimal choisit et allonge un conteneur porteur ;
+- la fermeture gloutonne peut laisser un résiduel important sans jamais atteindre
+  les objectifs équilibré et proportionnel.
+
+ADR-0089 et `docs/P64_L09S_END_TO_END_GOAL_RUNBOOK.md` proposent de les
+remplacer par une réservation sans croissance, une partition globale complète
+et un repli d'annexes XY composites bornées. La vérité UI fait partie de la
+correction.
+
+P64-L09R-V devient `human-KO`. P64-L09S reste
+`ready-for-user-goal-launch` et n'est pas exécutable avant le lancement
+explicite du Goal par Thomas.
