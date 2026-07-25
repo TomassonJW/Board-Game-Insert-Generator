@@ -1,5 +1,15 @@
 # Status
 
+## P64-L09S-B - etat autoritaire au 2026-07-25
+
+- Mission B terminee : verite du cycle, budgets reactifs et couleurs.
+- `finalized_plan_ready` exige une partition finale courante et materialisable.
+- Un echec de finition publie son vrai stop reason et conserve le plan minimal sans faux succes.
+- Budgets calcul et finition visibles et independants conserves.
+- Boutons : Calculer bleu, Finaliser orange, Materialiser vert ; desactivation explicite.
+- Preuve autorisee : 806/806 tests, 1 test natif SCIP ignore, 72 tests interdits exclus.
+- Prochaine mission : P64-L09S-C, fermeture rectangulaire globale.
+
 ## P64-L09S-A - etat autoritaire au 2026-07-25
 
 - Goal P64-L09S lance explicitement par Thomas.

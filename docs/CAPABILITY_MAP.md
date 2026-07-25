@@ -1,5 +1,13 @@
 # Capability Map
 
+## Mise a jour P64-L09S-B
+
+- Verite de finalisation : `implemente`.
+- Publication finale conditionnee par un artefact courant et materialisable.
+- Echec de finition visible avec plan minimal preserve.
+- Budgets reactifs et couleurs des actions : `implemente`.
+- Fermeture globale complete : prochaine capability C.
+
 ## Mise a jour P64-L09S-A
 
 - Calcul minimal sans support artificiel : `implemente`.

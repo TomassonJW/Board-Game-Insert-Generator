@@ -1,5 +1,13 @@
 # Next Actions
 
+## Prochaine mission autoritaire - P64-L09S-C
+
+P64-L09S-A et B sont terminees et integrees mission par mission.
+
+- P64-L09S-C : construire une fermeture rectangulaire globale, complete et equilibree de tout le volume imprimable.
+- Une reussite doit publier un `finalized_plan` courant et recertifie.
+- Aucun benchmark ou holdout. Aucune installation Fusion avant V.
+
 ## Prochaine mission autoritaire - P64-L09S-B
 
 P64-L09S-A est terminee. Toute mention plus bas indiquant un Goal non lance est un historique de preparation.

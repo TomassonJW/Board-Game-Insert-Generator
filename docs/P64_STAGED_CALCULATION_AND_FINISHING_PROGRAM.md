@@ -1,5 +1,9 @@
 # P64-A02 — Programme de calcul étagé et finalisation explicite
 
+## Mise en oeuvre P64-L09S-B
+
+Le transport `ready` ne vaut plus succes de finition. Seul un `finalized_plan` courant et materialisable produit `finalized_plan_ready`. Toute tentative bornee sans fermeture conserve le plan minimal et expose son stop reason.
+
 ## Mise en oeuvre P64-L09S-A
 
 Le calcul minimal conserve exactement les enveloppes minimales. Les plateaux et livrets sont des prismes superieurs interdits post-certifies. Les encoches restent une responsabilite de la finition C a E.

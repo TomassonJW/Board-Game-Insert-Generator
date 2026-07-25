@@ -553,6 +553,10 @@ class FusionPaletteProjectTests(unittest.TestCase):
 
         self.assertEqual(finalized["status"], "ready")
         self.assertEqual(
+            finalized["operation_activity"]["stop_reason"],
+            "finalized_plan_ready",
+        )
+        self.assertEqual(
             finalized["staged_calculation"]["finalized_plan"]["status"],
             "current",
         )
@@ -652,7 +656,18 @@ class FusionPaletteProjectTests(unittest.TestCase):
         self.assertFalse(response["partition"]["invariants"]["residual_distributed"])
         self.assertEqual(response["partition"]["residuals"]["status"], "unassigned")
         self.assertEqual(finalized["status"], "ready")
+        self.assertEqual(
+            finalized["operation_activity"]["stop_reason"],
+            "printable_residual_remains",
+        )
         self.assertIsNone(finalized["partition"])
+        self.assertNotEqual(
+            finalized["staged_calculation"]["finalized_plan"]["status"],
+            "current",
+        )
+        self.assertFalse(
+            finalized["staged_calculation"]["finalized_plan"]["materializable"]
+        )
         self.assertEqual(
             finalized["solver_result"]["status"],
             "no_solution_within_budget",

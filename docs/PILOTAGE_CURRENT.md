@@ -1,5 +1,12 @@
 # Pilotage courant
 
+## Carte active - P64-L09S-C
+
+- A terminee : reservations minimales sans support artificiel.
+- B terminee : cycle honnete, budgets reactifs et couleurs.
+- C active apres integration : fermeture rectangulaire globale.
+- Prochaine gate humaine : V apres A a F.
+
 ## Carte active - P64-L09S-B
 
 - Goal P64-L09S en cours.

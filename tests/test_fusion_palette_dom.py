@@ -346,6 +346,24 @@ class FusionPaletteDomTests(unittest.TestCase):
             self.assertIn(marker, self.markup)
         self.assertNotIn("currentMinimalArtifactIdentity", self.markup)
 
+    def test_truthful_finalization_colors_and_reactive_budgets_are_explicit(self) -> None:
+        for marker in (
+            "#primary-calculation-action{background:#1769aa",
+            "#finalization-action{background:#b85f14",
+            "#materialization-action{background:#237a4b",
+            "#primary-calculation-action:disabled",
+            "#finalization-action:disabled",
+            "#materialization-action:disabled",
+            "finalizationReady=action==='finalize_project'",
+            "finalizationFailed=action==='finalize_project'&&!finalizationReady",
+            "Finition arrêtée sans plan final",
+            "incomplète, plan minimal conservé",
+            "calculationLimit.value=budgetLimitLabel(solverSettings.effort)",
+            "finishingLimit.value=budgetLimitLabel(finishingEffort)",
+            "budget_ms:operationBudgetMs(action)",
+        ):
+            self.assertIn(marker, self.markup)
+
     def test_keeps_background_updates_out_of_editable_dom_and_defers_layout_paint(self) -> None:
         quiet_start = self.markup.index("if(pendingRequest?.quiet)")
         quiet_end = self.markup.index("if(payload.partition)", quiet_start)

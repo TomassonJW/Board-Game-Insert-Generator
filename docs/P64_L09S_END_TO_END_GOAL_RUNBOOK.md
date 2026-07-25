@@ -1,5 +1,13 @@
 # P64-L09S — Runbook du Goal de stabilisation de bout en bout
 
+## Avancement apres P64-L09S-B
+
+- A et B terminees.
+- Aucun faux `finalized_plan_ready` sans certificat final courant.
+- Interface : calcul bleu, finition orange, materialisation verte.
+- Budgets visibles et reactifs conserves.
+- Prochaine mission : C, fermeture rectangulaire globale.
+
 ## Avancement execution au 2026-07-25
 
 - Goal lance et ADR-0089 acceptee.

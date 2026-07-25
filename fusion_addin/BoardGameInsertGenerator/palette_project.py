@@ -246,7 +246,31 @@ def _operation_stop_reason(action: str, response: dict[str, object]) -> str:
                 return str(telemetry["stop_reason"])
         return "minimal_layout_calculation_completed"
     if action == "finalize_project":
-        return "finalized_plan_ready"
+        staged = response.get("staged_calculation") or {}
+        finalized = (
+            staged.get("finalized_plan")
+            if isinstance(staged, dict)
+            else {}
+        ) or {}
+        partition = response.get("partition")
+        if (
+            isinstance(partition, dict)
+            and isinstance(finalized, dict)
+            and finalized.get("status") == "current"
+            and finalized.get("materializable") is True
+        ):
+            return "finalized_plan_ready"
+        attempt = (
+            finalized.get("last_attempt")
+            if isinstance(finalized, dict)
+            else {}
+        ) or {}
+        if isinstance(attempt, dict) and attempt.get("stop_reason"):
+            return str(attempt["stop_reason"])
+        result = response.get("solver_result") or {}
+        if isinstance(result, dict) and result.get("status"):
+            return str(result["status"])
+        return "finalized_plan_not_published"
     if action in {"materialize_project", "regenerate_project"}:
         cad_build = response.get("cad_build") or {}
         if isinstance(cad_build, dict) and cad_build.get("status"):
