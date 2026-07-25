@@ -15,6 +15,14 @@ preuves archivées.
 
 ## État actif
 
+**Décision autoritaire du 2026-07-25 :** ADR-0088 et P64-L09R-A remplacent la
+trajectoire de gate P64-L09V préparée sur 0.1.63. Aucun test Fusion de cette
+ancienne gate ne doit être demandé. Le prochain lot est P64-L09R-B : support dur
+par enveloppe, préférence souple petits-dessous/grands-dessus, réservations SCIP
+conservées, plan minimal avec plateau matérialisable et budgets globaux
+3/10/20/60/180 s. La finition, les trois boutons et la jauge sont livrés ensuite
+par L09R-C/D/E/F, puis seulement observés dans L09R-V.
+
 - Dernière preuve : P64-V2H03V Fusion OK 0.1.55 ; P64-V2H03 est
   fusion-validated pour la coordination des variantes internes.
 - print-validated: false ; aucune valeur physique n'est calibrée par cette preuve.
@@ -136,9 +144,10 @@ preuves archivées.
   automated-validated : le volume ajouté puis le ratio d’expansion sont des
   objectifs secondaires déterministes ; le plan F01B certifié reste prioritaire
   sans amélioration stricte. Suite complète : 853/853.
-- P64-L09V est préparée localement avec l’add-in 0.1.63, trois projets publics,
-  un résumé à digest et une checklist unique. La prochaine action est la gate
-  humaine dans Fusion. La modularité reste différée.
+- P64-L09V 0.1.63 est archivée sans observation : ses critères anti-chute et
+  finalisation obligatoire sont remplacés par ADR-0088. P64-L09R-A est
+  `done-documentation`; P64-L09R-B est la prochaine mission unique. La
+  modularité reste différée.
 
 ## Vue de séquence
 
@@ -211,7 +220,9 @@ preuves archivées.
 | Terminée — automatisée | P64-L09C | Réservations exactes dans SCIP, fonds et cavités protégés, preuve native CPython 3.14. |
 | Terminée — automatisée | P64-F01B | Fermeture bornée, réparation locale, échec honnête et certificat final avant CAD. |
 | Terminée — automatisée | P64-F02B admissible | Volume ajouté égal puis ratio d’expansion égal ; fallback F01B certifié et modularité différée. |
-| Prête — gate humaine | P64-L09V | Add-in 0.1.63, trois projets publics et checklist unifiée ; observation Fusion restante. |
+| Supersédée sans observation | P64-L09V | Gate 0.1.63 annulée par ADR-0088 ; ne pas l’exécuter. |
+| Terminée — décision | P64-L09R-A | Support enveloppe, finition optionnelle, budgets visibles et jauge active seulement pendant les opérations. |
+| Prochaine mission | P64-L09R-B | Calcul minimal fiable, plateaux compris, préférence petits-dessous et deadlines 3/10/20/60/180 s. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -231,8 +242,11 @@ preuves archivées.
   certificat final et non-publication des plans partiels.
 - P64_F02B_BALANCED_PROPORTIONAL_EVIDENCE.md : objectifs secondaires, score,
   budget partagé, fallback F01B et modularité différée.
-- P64_L09V_FUSION_GATE_PREPARATION.md : add-in 0.1.63, trois projets publics,
-  vérifications locales et actions humaines restantes.
+- P64_L09R_CALCUL_FINITION_PROGRESS_CONTRACT.md : calcul minimal, finition
+  optionnelle, budgets, boutons, invalidation, jauge et découpage L09R.
+- ADR-0088 : décision autoritaire du retour sélectif et de l'UX staged.
+- P64_L09V_FUSION_GATE_PREPARATION.md : preuve historique 0.1.63 supersédée ;
+  aucune action humaine à exécuter.
 - P64_L09A_MATERIAL_SUPPORT_AND_COUPLED_FINALIZATION_CONTRACT.md : matière
   porteuse, anti-chute, réservations SCIP, boucle bornée et lots L09/F01B/F02B.
 - P64_L09B_MATERIAL_SUPPORT_EVIDENCE.md : surfaces porteuses, chute, pontage,

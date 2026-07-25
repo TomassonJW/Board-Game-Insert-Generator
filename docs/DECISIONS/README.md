@@ -239,3 +239,7 @@ Tests, cartes backlog ou gates humaines a preparer.
   premier plan et remplissage 3D des petites familles répétées.
 - ADR-0087-material-support-and-bounded-coupled-finalization.md - appuis fondés
   sur la matière, réservations SCIP et boucle bornée de fermeture couplée.
+- ADR-0088-calcul-minimal-finition-optionnelle-et-budgets-visibles.md - retour
+  sélectif au support par enveloppe, préférence petits-dessous, finition
+  optionnelle, budgets explicites et jauge active seulement pendant les
+  opérations.

@@ -3811,10 +3811,10 @@ invoqué. Tests ciblés : fermeture 5/5, staged 14/14, palette 29/29. Suite
 complète : 853/853 en 224,573 s, un test natif ignoré sous Python 3.10.
 
 L'harmonisation modulaire reste différée faute de contrats P45/P46.
-fusion-validated=false ; print-validated=false. La prochaine mission unique est
-la préparation locale de P64-L09V.
+fusion-validated=false ; print-validated=false. À cette date, la mission
+suivante prévue était la préparation locale de P64-L09V, depuis supersédée.
 
-## P64-L09V — préparation de la gate Fusion combinée
+## Historique — préparation P64-L09V ensuite supersédée
 
 La gate est prepared-local sur l'add-in 0.1.63. Trois projets publics séparent
 le refus anti-chute, le pontage stable et le parcours réservation SCIP puis
@@ -3825,5 +3825,39 @@ intelligent + Approfondi.
 
 La simulation complète passe 74 contrôles ciblés. La suite complète passe
 855/855 en 225 s, avec un test natif ignoré sous Python 3.10. L’installation
-locale réelle est vérifiée avant l’intégration. fusion-validated=false ; print-validated=false. La prochaine
-action est l'observation humaine selon P64_L09_VALIDATION_UNIFIEE.md.
+locale réelle était vérifiée avant l’intégration. Cette préparation est désormais
+supersédée sans observation par ADR-0088 ; fusion-validated=false et
+print-validated=false restent inchangés.
+
+## P64-L09R-A — recadrage calcul, finition et progression
+
+Statut : `done-documentation`, `architecture-accepted`.
+
+- La validation P64-L08LV reste acquise : environ 25 s puis 34 s dans Fusion
+  0.1.62 pour la correction de faisabilité et de plafond.
+- ADR-0088 remplace la règle anti-chute dure de P64-L09B par le support produit
+  sur enveloppe XY. La matière réelle peut rester diagnostique.
+- La recherche devra préférer, sans l'imposer, les petites empreintes sous les
+  grandes. Une inversion nécessaire reste admissible.
+- P64-L09C reste acquise : plateaux et livrets représentables atteignent SCIP.
+  Le futur plan minimal intégrera leur compensation Z et sera matérialisable
+  sans finition.
+- La finition redevient facultative, conserve le plan minimal en cas d'échec et
+  possède un budget indépendant.
+- Les budgets initiaux du calcul et de la finition sont Rapide 3 s, Court 10 s,
+  Normal 20 s, Long 60 s et Approfondi 180 s. Chaque niveau sera accompagné
+  d'un champ adjacent affichant la limite réelle.
+- `Calculer`, `Finaliser` et `Matérialiser` resteront toujours visibles avec des
+  états d'activation explicites.
+- La jauge prendra toute la largeur au-dessus des boutons pendant une opération,
+  sera rafraîchie environ chaque seconde et sera totalement absente du layout
+  au repos.
+- La gate P64-L09V 0.1.63 est annulée sans observation. Une nouvelle gate
+  P64-L09R-V sera préparée après L09R-B/C/D/E/F.
+- Aucun code produit, benchmark, package Fusion, tolérance ou valeur physique
+  n'est modifié par L09R-A. `print-validated=false`.
+- Validation : tests documentaires 2/2 ; suite complète 855/855 en 226,902 s,
+  un test natif ignoré sous Python 3.10 ; `git diff --check` OK.
+
+Contrat : `docs/P64_L09R_CALCUL_FINITION_PROGRESS_CONTRACT.md`.
+Prochaine mission unique : P64-L09R-B.

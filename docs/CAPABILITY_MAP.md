@@ -2074,10 +2074,36 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
   combinée différée à P64-L09V.
 - `C-PRINT` : inchangée, `print-validated=false`.
 
-## Mise à jour P64-L09V — préparation Fusion 0.1.63
+## Historique — préparation Fusion P64-L09V 0.1.63 supersédée
 
 - `C-FUSION` / `C-FUSION-UI` : paquet 0.1.63 et préparateur combiné
-  automatisés ; observation Fusion restante.
+  automatisés ; observation ensuite annulée par ADR-0088.
 - `C-PARTITION` : support matériel L09B, réservations SCIP L09C et fermeture
   F01B/F02B couplés dans les trois cas de gate.
 - Aucune capability d'impression ou de couvercle certifié n'est promue.
+
+## Mise à jour P64-L09R-A — trajectoire produit remplacée
+
+- `C-SOLVER` / `C-STACKING` : ADR-0088 rétablit l'enveloppe XY comme support
+  dur. La matière réelle L09B devient diagnostique ; une préférence souple doit
+  placer les petites empreintes sous les grandes sans perte de faisabilité.
+- `C-RESERVATION` : P64-L09C reste `implemented-product` et
+  `automated-validated`. Les réservations doivent appartenir au calcul minimal,
+  qui redevient matérialisable avant finition.
+- `C-LAYOUT` : la fermeture F01B/F02B devient une finition facultative et
+  séparée. Son échec ne doit plus invalider le plan minimal.
+- `C-SOLVER` / `C-FUSION-UI` : `planned-by-P64-L09R-B/D`. Cinq deadlines globales
+  3/10/20/60/180 s et leur limite réelle seront visibles dans les réglages.
+- `C-FUSION-UI` : `planned-by-P64-L09R-D/E`. Trois boutons permanents, budget
+  adjacent, target minimal/final explicite et jauge pleine largeur uniquement
+  pendant une opération.
+- `C-QUALITY` / `C-FUSION-UI` : la jauge temporelle n'est pas un pourcentage de résolution.
+  Elle disparaît complètement au repos ; la matérialisation reste indéterminée
+  ou fondée sur des phases CAD réelles.
+- `C-CLOSED-CONTAINER-POSE` : inchangée, `planned`. `has_lid` reste insuffisant
+  et ne crée ni pose ni surface porteuse certifiée.
+- `C-FUSION` : P64-L09V 0.1.63 est supersédée sans observation. La prochaine
+  gate sera P64-L09R-V après les lots automatisés.
+- `C-PRINT` : inchangée, `print-validated=false`.
+
+Aucune capability runtime n'est promue par cette mission documentaire.

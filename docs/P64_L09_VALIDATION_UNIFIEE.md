@@ -1,8 +1,14 @@
 # P64-L09 — validation unifiée
 
-Date de mise à jour : 2026-07-24
+Date de mise à jour : 2026-07-25
 Périmètre : P64-L09B, P64-L09C, P64-F01B, partie admissible de P64-F02B,
 préparation P64-L09V.
+
+> **Statut historique — ne pas exécuter la gate 0.1.63.** ADR-0088 et
+> P64-L09R-A remplacent la règle anti-chute dure et la finalisation obligatoire.
+> Les preuves automatisées ci-dessous restent archivées, mais la checklist
+> humaine P64-L09V est supersédée sans observation. La future gate est
+> P64-L09R-V.
 
 Ce fichier est la liste canonique des preuves à exécuter pendant le Goal. Il
 sépare les preuves automatisées déjà acquises des observations qui resteront à
@@ -16,7 +22,7 @@ faire dans Fusion.
 | P64-L09C | automatisé — terminé | réservations supérieures fidèles dans SCIP et preuve native CPython 3.14 |
 | P64-F01B | automatisé — terminé | incumbent, réservations, fermeture, réparation locale et certificat final |
 | P64-F02B admissible | automatisé — terminé | volume ajouté égal, ratio d’expansion égal et fallback certifié |
-| P64-L09V | préparation automatisée — observation humaine suivante | add-in 0.1.63, trois projets publics et checklist combinée |
+| P64-L09V | supersédée sans observation | add-in 0.1.63 archivé ; ne pas exécuter |
 
 ## P64-L09B — support matériel
 

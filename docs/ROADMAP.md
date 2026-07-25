@@ -1529,17 +1529,48 @@ même placement minimal, partage certains espaces entre faces Auto/Target et ne
 peut être retenu qu'après fermeture complète, certificat commun et amélioration
 stricte sous les caps restants.
 
-La partie modulaire de P64-F02B reste future jusqu'aux contrats P45/P46. La
-prochaine étape est la préparation P64-L09V, puis l'observation humaine combinée
+La partie modulaire de P64-F02B reste future jusqu'aux contrats P45/P46. À
+cette date, l'étape prévue était P64-L09V puis une observation humaine combinée
 dans Fusion. Aucun benchmark, holdout ou recalibrage physique n'a été exécuté.
 
-## Mise à jour P64-L09V — préparation 2026-07-24
+## Historique P64-L09V — préparation 2026-07-24, supersédée
 
 La gate combinée est préparée sur l'add-in 0.1.63 avec trois cas publics :
 anti-chute négatif, pontage stable et réservation plateau suivie de la fermeture
 finale. Le préparateur installe et vérifie le runtime, conserve l'état local
 précédent et remet à Thomas une checklist unique.
 
-La prochaine étape est exclusivement humaine dans Fusion. Elle peut promouvoir
-les lots L09/F01B/F02B vers fusion-validated dans leur portée observée, mais ne
-vaut jamais validation d'impression et ne débloque pas la modularité P45/P46.
+À cette date, l'étape suivante devait être humaine dans Fusion. ADR-0088 l'a
+depuis annulée sans observation. Aucune promotion `fusion-validated` n'a donc eu
+lieu pour L09/F01B/F02B, et la modularité P45/P46 reste verrouillée.
+
+## Mise à jour P64-L09R-A — 2026-07-25
+
+Thomas remplace la trajectoire L09/F01B obligatoire par ADR-0088. La gate
+P64-L09V préparée sur 0.1.63 est annulée sans observation : l'anti-chute dure et
+la finalisation obligatoire ne correspondent plus au produit décidé.
+
+Les acquis conservés sont la lane SCIP 3D de P64-L08L, la validation Fusion de
+son plafond à environ 25 s puis 34 s, et les réservations supérieures exactes de
+P64-L09C. Le support produit revient aux enveloppes XY. La recherche préfère les
+petites empreintes sous les grandes, sans transformer cette préférence en
+contrainte de faisabilité.
+
+La nouvelle trajectoire est :
+
+1. P64-L09R-B — calcul minimal, plateaux compris, préférence souple et deadlines
+   globales Rapide 3 s, Court 10 s, Normal 20 s, Long 60 s, Approfondi 180 s ;
+2. P64-L09R-C — finition facultative, budget indépendant et plan minimal conservé
+   en cas d'échec ;
+3. P64-L09R-D — trois boutons toujours visibles, invalidation exacte et budget
+   réel affiché à côté de chaque niveau ;
+4. P64-L09R-E — jauge pleine largeur uniquement pendant une opération, mise à
+   jour proche d'une seconde et calcul pur hors thread UI ;
+5. P64-L09R-F — durcissement sur cas représentatifs et préparation ;
+6. P64-L09R-V — nouvelle gate Fusion combinée, sans validation d'impression.
+
+Après L09R-V, l'ordre produit canonique reste inchangé : runtime P45 et gate
+V0.2 P46, couvercles P47-P50 et gate V0.3, retours P68, revue P69 puis horizons
+P70+ priorisés humainement. Les capacités post-solve C01-C03, la modularité, les
+cales et le mode exact restent des programmes distincts et verrouillés par leurs
+préconditions.

@@ -630,3 +630,39 @@ Le placement minimal initial reste un incumbent. La boucle introduit les
 réservations, distribue le résiduel, tente une réparation locale, répète sous un
 budget unique puis exige le certificat global. Elle ne déplace ni ne réduit les
 cavités et ne rappelle le solveur global qu'après échec de la réparation locale.
+
+## Amendement P64-L09R-A — calcul minimal matérialisable et finition optionnelle
+
+ADR-0088 et `docs/P64_L09R_CALCUL_FINITION_PROGRESS_CONTRACT.md` remplacent les
+clauses de L09A/F01B qui rendaient le certificat de matière réelle dur et la
+fermeture obligatoire avant matérialisation d'un projet avec réservation.
+
+Le calcul minimal conserve les réservations SCIP de L09C, compense leur
+profondeur sans toucher aux cavités et publie un `minimal_layout` matérialisable.
+Le support dur revient aux enveloppes XY. La recherche préfère les petites
+empreintes sous les grandes, sans refuser une solution inversée nécessaire.
+
+La finition redevient une action indépendante. Elle reprend l'incumbent minimal,
+distribue le résiduel, répare localement avant un éventuel rappel global et ne
+publie qu'un plan final recertifié. Son échec laisse le plan minimal courant.
+
+Le cycle UI cible trois boutons toujours visibles. Les niveaux du calcul et de
+la finition possèdent chacun un budget adjacent explicite. La jauge pleine
+largeur est rendue uniquement pendant une opération, environ une fois par
+seconde, puis disparaît complètement sans conserver d'espace terminal.
+
+La séquence autoritaire devient :
+
+```text
+P64-L09R-A
+  -> P64-L09R-B calcul minimal et budgets
+  -> P64-L09R-C finition séparée
+  -> P64-L09R-D cycle UI et budgets visibles
+  -> P64-L09R-E progression et réactivité
+  -> P64-L09R-F durcissement
+  -> P64-L09R-V gate Fusion
+```
+
+P64-L09V 0.1.63 est supersédée sans observation. P64-U01 est absorbée par
+L09R-D/E. Les lots de modularité, de capacité post-solve, de cales et de poses
+fermées restent distincts. `print-validated=false`.

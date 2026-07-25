@@ -1,6 +1,6 @@
 # ADR-0087 — Support matériel réel et finalisation couplée bornée
 
-- Statut : acceptée
+- Statut : acceptée historiquement, partiellement remplacée par ADR-0088
 - Date : 2026-07-24
 - Mission : P64-L09A
 

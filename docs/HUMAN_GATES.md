@@ -1278,7 +1278,7 @@ le GO déjà donné, sans intervention humaine. La prochaine gate est P64-L09V
 après préparation locale complète. `fusion-validated=false` pour L09 ;
 `print-validated=false`.
 
-## Préparation de la gate P64-L09V après P64-F02B
+## Historique — préparation de P64-L09V avant ADR-0088
 
 P64-L09B, P64-L09C, P64-F01B et la partie admissible de P64-F02B sont
 automated-validated. Aucune nouvelle validation humaine n'était requise pendant
@@ -1290,7 +1290,7 @@ réservations, compensation Z sans atteinte aux cavités, fermeture finale et
 absence de sémantique implicite liée à `has_lid`. Elle ne vaut pas validation
 d'impression ; `print-validated=false` reste obligatoire.
 
-## Gate P64-L09V prête à observer
+## Historique — P64-L09V prête avant son annulation
 
 Le paquet 0.1.63, les trois projets publics et la checklist
 `P64_L09_VALIDATION_UNIFIEE.md` sont préparés. La gate doit rester une
@@ -1301,3 +1301,32 @@ Les résultats attendus ne sont pas tous « solution trouvée » : le cas anti-c
 peut honnêtement rester sans solution certifiée si la seule pile possible tombe
 dans une ouverture. Le pontage stable doit rester admissible. Le cas plateau doit
 atteindre SCIP, finaliser avant matérialisation et préserver les cavités.
+
+## P64-L09V annulée et P64-L09R autorisée — 2026-07-25
+
+Thomas abandonne explicitement la règle dure qui interdisait un conteneur
+au-dessus de l'ouverture d'un autre conteneur. ADR-0088 accepte le retour au
+support par enveloppe, conserve les réservations supérieures SCIP et rend la
+finition facultative après un calcul minimal matérialisable.
+
+La gate P64-L09V préparée sur l'add-in 0.1.63 est `superseded-without-run`. Elle
+ne doit pas être exécutée, car son cas anti-chute négatif et sa finalisation
+obligatoire testent désormais un comportement refusé.
+
+Le GO produit couvre les lots automatisés suivants, un par un :
+
+1. P64-L09R-B — solve minimal, ordre préférentiel et budgets ;
+2. P64-L09R-C — finition séparée et non destructive ;
+3. P64-L09R-D — boutons permanents et budgets visibles ;
+4. P64-L09R-E — progression temporaire et réactivité ;
+5. P64-L09R-F — durcissement représentatif et préparation.
+
+Aucune intervention humaine n'est requise entre ces lots tant qu'ils ne changent
+ni tolérances, valeurs physiques, pose de couvercle, dépendance majeure ou North
+Star. Une nouvelle gate P64-L09R-V sera ouverte seulement après installation du
+commit intégré et preuves automatisées complètes.
+
+Cette future gate devra observer : calcul avec plateau, matérialisation minimale
+sans finition, finition séparée, matérialisation finale, budgets visibles et
+jauge totalement absente au repos. Elle ne validera aucune impression.
+`print-validated=false` reste obligatoire.

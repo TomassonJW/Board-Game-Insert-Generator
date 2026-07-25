@@ -1,8 +1,15 @@
 # Next Actions
 
-Dernière mise à jour : 2026-07-24
+Dernière mise à jour : 2026-07-25
 
 ## Version active
+
+**Décision autoritaire du 2026-07-25 :** ADR-0088 annule la gate P64-L09V
+préparée sur 0.1.63. Le support dur revient aux enveloppes XY ; la préférence
+petits-dessous/grands-dessus reste souple ; les réservations SCIP sont
+conservées ; la finition redevient facultative et séparée. Les budgets du
+calcul et de la finition seront visibles à côté de leur niveau. La jauge
+n'apparaîtra que pendant une opération et ne réservera aucun espace au repos.
 
 V0.1 reste `mvp-accepted`, `fusion-validated: true` pour son périmètre
 historique et `print-validated: false`. La surface MVP reste exclusivement
@@ -22,7 +29,7 @@ comparé quatre moteurs, mais uniquement après projection dans un modèle de so
 lane HiGHS 1.15.1 reste expérimentale et spécialisée ; elle ne vaut ni choix de
 solveur 3D global ni promesse de vitesse.
 
-## Dernier état réel
+## Dernier état runtime avant implémentation de P64-L09R
 
 - une édition continue de recalculer uniquement ses dérivations locales ;
 - une insertion interne admissible peut republier un `minimal_layout` courant
@@ -86,34 +93,77 @@ Rapport final L07 : P64_L07_GOAL_FINAL_REPORT.md.
 
 ## Prochaine action recommandée
 
-### Exécuter la gate humaine P64-L09V dans Fusion
+### P64-L09R-B — rétablir un calcul minimal fiable
 
-Type : observation produit préparée ; aucune modification de code, benchmark,
-tuning, holdout ou nouvelle valeur physique pendant la gate.
+Type : mission de code produit bornée, sans gate humaine préalable.
 
-Le paquet local 0.1.63 contient trois projets publics distincts : anti-chute
-négatif, pontage stable et plateau avec finalisation. La checklist canonique est
-`P64_L09_VALIDATION_UNIFIEE.md`.
+Objectifs exacts :
 
-Thomas doit uniquement :
+1. rétablir l'appui dur par enveloppe XY et retirer l'anti-chute matérielle de la
+   faisabilité produit ;
+2. conserver les réservations supérieures exactes dans SCIP ;
+3. rendre un plan minimal avec plateau directement matérialisable ;
+4. préférer, sans l'imposer, les petites empreintes sous les grandes ;
+5. remplacer les caps fragmentés par cinq deadlines globales : Rapide 3 s,
+   Court 10 s, Normal 20 s, Long 60 s et Approfondi 180 s ;
+6. prouver qu'une inversion reste autorisée lorsqu'elle est nécessaire et qu'un
+   timeout n'est jamais présenté comme une impossibilité.
 
-1. recharger l'add-in et ouvrir la palette ;
-2. exécuter une fois chacun des trois cas dans l'ordre indiqué ;
-3. matérialiser uniquement le plan final certifié du cas plateau ;
-4. rendre statut, moteur, temps et diagnostic visibles ;
-5. confirmer les observations sans promouvoir la validation d'impression.
+Contrat : `docs/P64_L09R_CALCUL_FINITION_PROGRESS_CONTRACT.md`.
+Décision : `docs/DECISIONS/ADR-0088-calcul-minimal-finition-optionnelle-et-budgets-visibles.md`.
 
-Aucun agent n'est requis pendant l'observation. Après le retour humain, un lot
-documentaire court consignera la gate et déterminera la mission suivante.
+Aucune manipulation de Thomas n'est requise avant la future gate P64-L09R-V.
+L'ancienne gate P64-L09V sur 0.1.63 est annulée et ne doit pas être exécutée.
 
-## Lots verrouillés
+## Lots ordonnés après P64-L09R-B
 
-- P64-F01A02 et F02A02 sont supersédés par P64-F01B/F02B : la finalisation devient couplée et bornée ;
-- P64-C01/C02 restent post-finalisation et ne doivent pas absorber L04A ;
-- P45 conserve formes, intentions et certificat local ;
-- P46, P47-P50, P67-P69 et les valeurs physiques restent hors scope ;
-- aucune résolution du cas dense n’est implicite.
+1. P64-L09R-C — finition séparée, facultative, budget indépendant et échec non
+   destructif ;
+2. P64-L09R-D — trois boutons permanents, invalidation exacte et champs de
+   budget adjacents ;
+3. P64-L09R-E — jauge visible uniquement pendant l'activité et exécution
+   réactive sans `adsk` dans le worker ;
+4. P64-L09R-F — durcissement sur cas représentatifs, plateaux et limites de
+   budget ;
+5. P64-L09R-V — installation puis gate Fusion combinée, sans validation
+   d'impression.
 
+## Lots verrouillés ou différés
+
+- P64-U01 est absorbée par P64-L09R-D/E ;
+- P64-L09B reste une preuve historique, mais sa règle anti-chute dure est
+  remplacée par ADR-0088 ;
+- P64-F01B/F02B restent réutilisables comme moteur de finition, mais leur
+  obligation avant matérialisation est remplacée ;
+- P64-C01/C02/C03 et P64-CV restent post-finalisation et verrouillés ;
+- la modularité P64-F02, le résiduel/cales P64-F03 et le mode exact P64-X01
+  restent différés selon leurs préconditions ;
+- P45 conserve formes, intentions et certificat local ; son runtime n'est pas
+  commencé ;
+- P46, P47-P50 et P69 restent bloqués par l'ordre V0.2/V0.3 ;
+- P68 reste disponible pour recueillir des faits réels sans recalibrage ;
+- P70+ et les horizons produit restent différés jusqu'à la revue P69 ;
+- aucune nouvelle valeur physique, pose de couvercle ou validation d'impression
+  n'est implicite.
+
+## Dette de pilotage historique à réconcilier
+
+Ces anciennes cartes apparaissent encore ouvertes dans les phases historiques,
+mais ne sont pas `ready` devant P64-L09R. Elles devront être réévaluées contre
+les acquis plus récents avant toute activation :
+
+- P0-M006 et P14-M002 — nomenclature puis processus de release stable ;
+- P6-M003 — taxonomie d'aides de prise, probablement en partie couverte par
+  ADR-0015 et les contrats ultérieurs ;
+- P8-M003 — support abstrait, largement dépassé par les certificats P64 ;
+- P11-C001 — vrais modules composites et primitives soudées ;
+- P12-M001 — modèle abstrait de couvercle posé, à réconcilier avec P47-P50 et
+  `F-CLOSED-CONTAINER-POSE` ;
+- P13-M001/M002 — langage visuel, labels et gravure ;
+- P14-M001 — exemple réel complet avec impression.
+
+Leur présence conserve la vision, mais ne contourne ni L09R, ni l'ordre
+P45/P46/P47-P50/P69, ni leurs gates humaines.
 ## Fin de chaque mission
 
 Mettre à jour le pilotage, relire le diff, exécuter les preuves, committer puis

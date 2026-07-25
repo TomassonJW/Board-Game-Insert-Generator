@@ -2,8 +2,12 @@
 
 Date : 2026-07-24
 Paquet : BGIG 0.1.63
-Statut : préparation automatisée ; observation humaine non commencée ;
-print-validated=false.
+Statut : supersédée sans observation par ADR-0088 et P64-L09R-A ;
+ne pas exécuter cette gate ; print-validated=false.
+
+> Cette préparation reste une preuve historique de 0.1.63. Ses critères
+> anti-chute et finalisation obligatoire ne correspondent plus au produit décidé.
+> La prochaine gate sera P64-L09R-V après les lots L09R-B à F.
 
 ## Paquet préparé
 

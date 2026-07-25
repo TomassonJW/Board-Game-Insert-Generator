@@ -2487,7 +2487,7 @@ P44-M007 est ready-for-explicit-go.
 
 ### P64-U01 — Progression de calcul non modale
 
-- Statut : planned-after-solver-truth ; non bloquant pour P64-V2H02.
+- Statut : superseded-by-P64-L09R-D-E ; acquis historiques conservés.
 - Objectif : afficher progression, méthode active, temps et annulation sans
   voler le focus, sans modal bloquant et sans matérialisation automatique.
 - Dépendance : métriques d'avancement stables et contrat d'annulation du moteur.
@@ -2693,7 +2693,7 @@ P44-M007 est ready-for-explicit-go.
 
 ### P64-C01 — Carte de capacité post-solve en lecture seule
 
-- Dépendances : P64-F01B et P64-F02B.
+- Dépendances : P64-L09R-C automated-validated et contrat de finalisation stable.
 - Objectif : dériver une CapacityOpportunityMap depuis un plan finalisé certifié.
 - Livrables : InternalOpportunityZone, BoxReserveBay, digests, invalidation,
   classement dimensionnel, lecture seule et diagnostics de rejet.
@@ -2717,7 +2717,7 @@ P44-M007 est ready-for-explicit-go.
 
 ### P64-F03A02 — Cales explicites et stratégie hybride
 
-- Dépendances : P64-F02B, P68 ou preuves physiques pertinentes.
+- Dépendances : P64-L09R-C, puis P68 ou preuves physiques pertinentes.
 - Objectif : proposer le moins de cales justifiées, ou un hybride
   expansion/cales, uniquement après confirmation.
 - Interdit : création silencieuse, promesse de tenue, print-validated sans
@@ -2918,7 +2918,7 @@ implémentée et intégrée à la fois.
 
 ### P64-L06V — confirmation Fusion des cas retenus
 
-- Statut : future-human-gate.
+- Statut : superseded-by-P64-L08LV-and-P64-L09R-V.
 - Scope : rejouer les cas réels difficiles, distinguer capacité, UX, temps et
   matérialisation.
 - `print-validated: false` tant qu'aucune impression réelle n'est mesurée.
@@ -3260,7 +3260,7 @@ implémentée et intégrée à la fois.
   modular-harmonization-deferred, fusion-validated=false,
   print-validated=false.
 
-### P64-L09V — Gate Fusion combinée
+### P64-L09V — Gate Fusion combinée supersédée sans exécution
 
 - Dépendances : P64-L09B, P64-L09C, P64-F01B et P64-F02B admissible automatisées.
 - Préparé : add-in 0.1.63, trois projets publics distincts, résumé à digest,
@@ -3268,4 +3268,85 @@ implémentée et intégrée à la fois.
 - Observer : anti-chute, pontage valide, plateau réellement traité, compensation
   Z sans atteinte aux cavités et absence de pose implicite par couvercle.
 - Preuve : docs/P64_L09V_FUSION_GATE_PREPARATION.md.
-- Statut : `ready-for-human-fusion-gate`, `print-validated=false`.
+- Statut : `superseded-without-run-by-P64-L09R-A`, `print-validated=false`.
+
+### P64-L09R-A — Recadrage calcul, finition et progression
+
+- Capability : C-SOLVER, C-STACKING, C-RESERVATION, C-LAYOUT, C-FUSION-UI,
+  C-QUALITY.
+- Livrables : ADR-0088, contrat L09R, pilotage, backlog, roadmap et gates.
+- Décisions : support par enveloppe, préférence souple petits-dessous,
+  réservations dans le plan minimal, finition optionnelle, budgets visibles,
+  trois boutons permanents et jauge absente au repos.
+- Effet : P64-L09V 0.1.63 est annulée sans observation ; P64-U01 est absorbée.
+- Non-objectifs : code produit, benchmark, package Fusion, tolérance, valeur
+  physique, CAD ou scène.
+- Statut : `done-documentation`, `architecture-accepted`.
+
+### P64-L09R-B — Calcul minimal fiable et budgets globaux
+
+- Dépendance : P64-L09R-A intégrée.
+- Rétablir l'enveloppe XY comme support dur et retirer l'anti-chute matérielle de
+  la faisabilité produit.
+- Conserver P64-L09C et rendre un plan minimal avec plateau directement
+  matérialisable.
+- Préférer les petits XY sous les grands par ordre, warm start, priorité ou score
+  secondaire, sans perte de faisabilité.
+- Remplacer les caps fragmentés par une deadline totale Rapide 3 s, Court 10 s,
+  Normal 20 s, Long 60 s ou Approfondi 180 s.
+- Tests : inversion nécessaire admise, déterminisme, plateaux, cas 28x30,
+  certificats et timeout honnête.
+- Statut : `ready`, prochaine mission unique.
+
+### P64-L09R-C — Finition séparée et non destructive
+
+- Dépendance : P64-L09R-B automated-validated.
+- Découpler F01B/F02B du calcul minimal et leur donner un budget indépendant.
+- Répartir le volume résiduel, protéger cavités/réservations, réparer localement
+  avant rappel global et republier seulement un plan final recertifié.
+- Un échec conserve le plan minimal courant et matérialisable.
+- Aucun corps, cale, micro-conteneur ou valeur physique implicite.
+- Statut : `planned-after-P64-L09R-B`.
+
+### P64-L09R-D — Trois actions et budgets visibles
+
+- Dépendance : P64-L09R-C automated-validated.
+- Rendre `Calculer`, `Finaliser` et `Matérialiser` toujours visibles.
+- Appliquer la matrice d'activation et d'invalidation du contrat L09R.
+- Afficher, à côté de chaque niveau de calcul et de finition, un champ non
+  éditable avec la limite réelle : 3 s, 10 s, 20 s, 60 s ou 3 min max.
+- Montrer si la matérialisation cible le plan minimal ou final.
+- Statut : `planned-after-P64-L09R-C`.
+
+### P64-L09R-E — Progression temporaire et interface réactive
+
+- Dépendance : P64-L09R-D automated-validated.
+- Jauge horizontale pleine largeur juste au-dessus des boutons, visible seulement
+  pendant une opération et sans espace réservé au repos.
+- Rafraîchissement proche d'une seconde ; calcul/finition sur temps écoulé et
+  budget, matérialisation indéterminée ou par phases réelles.
+- Calcul et finition purs hors thread UI ; aucun `adsk` dans le worker ; retour
+  stale rejeté par digest.
+- Statut : `planned-after-P64-L09R-D`.
+
+### P64-L09R-F — Durcissement représentatif et préparation
+
+- Dépendance : P64-L09R-E automated-validated.
+- Vérifier cas public 28x30, plateau, empilement au-dessus d'une ouverture,
+  collisions négatives, fin anticipée, deadline et échec de finition non
+  destructif.
+- Mesurer séparément calcul et finition sans rouvrir un holdout consommé ni
+  recalibrer des valeurs physiques.
+- Préparer installation, fixtures et checklist seulement si toutes les preuves
+  passent.
+- Statut : `planned-after-P64-L09R-E`.
+
+### P64-L09R-V — Gate Fusion du parcours séparé
+
+- Dépendances : P64-L09R-B à F automated-validated et commit intégré.
+- Codex installe le package et vérifie runtime, marqueurs, fichiers et réglages.
+- Thomas observe calcul avec plateau, ordre préférentiel, matérialisation minimale
+  sans finition, finition séparée, matérialisation finale, budgets visibles et
+  jauge totalement absente au repos.
+- La gate ne qualifie ni impression, ni tolérance, ni couvercle fermé.
+- Statut : `future-human-gate`, inactive avant préparation vérifiée.
