@@ -22,7 +22,7 @@ from board_game_insert_generator.staged_calculation import (
 )
 
 
-ADDIN_VERSION = "0.1.64"
+ADDIN_VERSION = "0.1.65"
 REQUESTED_SETTINGS = {"method": "auto", "effort": "normal"}
 FINISHING_EFFORT = "quick"
 FIXTURE_FILENAMES = {

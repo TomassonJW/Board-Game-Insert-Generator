@@ -3345,9 +3345,21 @@ implémentée et intégrée à la fois.
 
 ### P64-L09R-V — Gate Fusion du parcours séparé
 
-- Dépendances : P64-L09R-B à F automated-validated et commit F intégré.
-- Codex installe le package 0.1.64 et vérifie runtime, marqueurs, fichiers, fixtures et réglages.
-- Thomas observe calcul avec plateau, ordre préférentiel, matérialisation minimale sans finition, finition séparée, matérialisation finale, budgets visibles et jauge totalement absente au repos.
+- Dépendances : P64-L09R-B à F automated-validated et correctif C1 intégré.
+- La première ouverture 0.1.64 est suspendue sans acceptation après un faux échec plateau/Z et un défaut de rafraîchissement du budget de calcul.
+- Codex installe le package correctif 0.1.65 et vérifie runtime, marqueurs, fichiers, fixtures et réglages.
+- Thomas vérifie d’abord les cinq budgets, son cas 60 / 59,6 / 52,8 mm avec plateau de 1 mm, puis la matérialisation minimale sans finition.
+- La recette reprend ensuite ordre préférentiel, finition séparée, matérialisation finale et jauge totalement absente au repos.
 - Recette : `docs/P64_L09R_V_FUSION_GATE_RECIPE.md`.
 - La gate ne qualifie ni impression, ni tolérance, ni couvercle fermé.
-- Statut : `ready-human-gate`, `prepared-not-installed`, `print-validated=false`.
+- Statut : `ready-human-gate`, `corrective-package-ready-for-install`, `print-validated=false`.
+
+### P64-L09R-V-C1 — Correctif compensation Z et budget
+
+- Cause solveur : hauteur minimale figée face au sommet de conception imposé par la réservation plateau.
+- Cause UI : absence de rendu immédiat dans `saveSolverSetting`.
+- Correction : solve SCIP minimal, compensation Z exacte et recertifiée, repli couplé dans le temps restant ; budget de calcul redessiné avant persistance.
+- Preuve native locale : 18 placements, sommet 59,6 mm, plan certifié et matérialisable, sans snapshot versionné.
+- Package : 0.1.65.
+- Preuve : `docs/P64_L09R_V_CORRECTIVE_0165_EVIDENCE.md`.
+- Statut : `implemented-product`, `automated-validated`, `corrective-gate-package-ready`.

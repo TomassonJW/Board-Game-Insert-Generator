@@ -2158,3 +2158,11 @@ Preuve : `docs/P64_L09R_B_MINIMAL_CALCULATION_EVIDENCE.md`.
 - `C-FUSION-UI` : `automated-validated`. Trois actions permanentes, budgets adjacents, activité temporaire à 1 s et worker pur sont inclus dans le préflight public.
 - `C-FUSION` : `gate-prepared-not-installed`. Le package 0.1.64, deux fixtures publiques, un préparateur vérifié en dry-run et la recette P64-L09R-V sont prêts. Aucun fait Fusion ni impression n'est encore produit.
 - Prochaine action unique : P64-L09R-V, gate humaine obligatoire.
+## Mise à jour P64-L09R-V-C1 — correctif 0.1.65
+
+- `C-SOLVER` : `implemented-product`, `automated-validated`. Une réservation supérieure peut demander une compensation Z au seul conteneur automatique admissible après le placement minimal SCIP ; le certificat commun reste l’autorité finale.
+- `C-STAGED-CALCULATION` : inchangée sur la séparation minimal/finition ; le plan minimal compensé reste directement matérialisable et la finition n’est pas invoquée.
+- `C-FUSION-UI` : `implemented-product`, `automated-validated`. Le budget de calcul et sa limite réelle adjacente sont rendus immédiatement à chaque changement, indépendamment du budget de finition.
+- `C-FUSION` : `corrective-package-ready-for-install`. Le package devient 0.1.65 ; la première ouverture 0.1.64 est suspendue sans acceptation.
+- `C-PRINT` : inchangée, `print-validated=false`.
+- Prochaine action unique : installer 0.1.65 puis reprendre la gate P64-L09R-V.

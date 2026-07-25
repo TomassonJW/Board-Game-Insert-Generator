@@ -107,9 +107,9 @@ class P64L09RFRepresentativeHardeningTests(unittest.TestCase):
         preparer = PREPARER.read_text(encoding="utf-8")
         historical = HISTORICAL_PREPARER.read_text(encoding="utf-8")
 
-        self.assertEqual(manifest["version"], "0.1.64")
-        self.assertEqual(self.summary["addin_version"], "0.1.64")
-        self.assertIn('expectedVersion -ne "0.1.64"', preparer)
+        self.assertEqual(manifest["version"], "0.1.65")
+        self.assertEqual(self.summary["addin_version"], "0.1.65")
+        self.assertIn('expectedVersion -ne "0.1.65"', preparer)
         self.assertIn("p64_l09rv_preflight.py", preparer)
         self.assertIn("p64-l09rv-01-preference-envelope.bgig.json", preparer)
         self.assertIn("p64-l09rv-02-tray-separated-flow.bgig.json", preparer)
@@ -123,10 +123,12 @@ class P64L09RFRepresentativeHardeningTests(unittest.TestCase):
         evidence = EVIDENCE.read_text(encoding="utf-8")
 
         for marker in (
-            "prepared-not-installed",
+            "corrective-package-ready-for-install",
             "prepare_p64_l09rv_gate.ps1",
             "Local AppData write blocked. Use Local/Handoff or approve filesystem write.",
             "Observation au repos",
+            "Contrôle correctif sur le cas qui a révélé le défaut",
+            "sans toucher au budget de finition",
             "Fixture 01",
             "Fixture 02",
             "Matérialisation minimale avant finition",

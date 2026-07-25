@@ -33,8 +33,8 @@ if (-not $versionMatch.Success) {
     throw "Source add-in manifest has no readable version: $manifestPath"
 }
 $expectedVersion = $versionMatch.Groups["version"].Value
-if ($expectedVersion -ne "0.1.64") {
-    throw "P64-L09R-V package version mismatch: expected 0.1.64, got $expectedVersion."
+if ($expectedVersion -ne "0.1.65") {
+    throw "P64-L09R-V package version mismatch: expected 0.1.65, got $expectedVersion."
 }
 
 Write-Output "BGIG P64-L09R-V Fusion gate preparation"
@@ -105,7 +105,18 @@ else {
         if ($installedWorker.Contains("import adsk")) {
             throw "Installed P64-L09R-V worker imports adsk."
         }
-        $installedPalette = Get-Content -LiteralPath (Join-Path $target "palette.html") -Raw -Encoding UTF8
+        $installedScipSolver = Get-Content -LiteralPath (Join-Path $target "lib\board_game_insert_generator\scip_product_solver.py") -Raw -Encoding UTF8
+        foreach ($marker in @("_invoke_worker_with_top_inset_compensation", "_apply_required_top_inset_z_compensation", "Unexpected SCIP Z expansion")) {
+            if (-not $installedScipSolver.Contains($marker)) {
+                throw "Installed P64-L09R-V SCIP correction marker missing: $marker"
+            }
+        }
+        $installedScipWorker = Get-Content -LiteralPath (Join-Path $target "vendor\scip\10.0.2\windows-x86_64\worker\scip_real_3d_worker.py") -Raw -Encoding UTF8
+        foreach ($marker in @("expandable_z", "expansion_supports", "required_height")) {
+            if (-not $installedScipWorker.Contains($marker)) {
+                throw "Installed P64-L09R-V SCIP worker marker missing: $marker"
+            }
+        }        $installedPalette = Get-Content -LiteralPath (Join-Path $target "palette.html") -Raw -Encoding UTF8
         foreach ($marker in @(
             "primary-calculation-action",
             "finalization-action",
@@ -114,7 +125,8 @@ else {
             "setInterval(renderOperationActivity,1000)",
             "setInterval(pollAsyncProjectOperations,1000)",
             "3 s max",
-            "3 min max"
+            "3 min max",
+            "renderSolverSettings();sourceRevision+=1"
         )) {
             if (-not $installedPalette.Contains($marker)) {
                 throw "Installed P64-L09R-V palette marker missing: $marker"
@@ -184,11 +196,13 @@ Write-Output ""
 Write-Output "P64-L09R-V Fusion actions remaining for Thomas:"
 Write-Output "1. Fully reload BGIG $expectedVersion and open Atelier de rangement."
 Write-Output "2. Confirm the activity area is entirely absent at rest and all three product buttons stay visible."
-Write-Output "3. Open fixture 01, calculate with Normal, and observe the soft small-below-large preference without treating it as a certificate."
-Write-Output "4. Open fixture 02, run Quick then Normal calculation, and record elapsed time, displayed budget, result status and engine."
-Write-Output "5. Materialize the current minimal plan before any finishing and inspect the tray reservation and cavities."
-Write-Output "6. Run Quick finishing separately; confirm the minimal plan remains available if finishing fails."
-Write-Output "7. When finishing succeeds, materialize the finalized plan and compare the scene identity."
-Write-Output "8. During each operation, observe the full-width activity bar; at rest confirm it leaves no space."
-Write-Output "9. Report OK or KO with screenshots and diagnostics; keep print-validated=false."
+Write-Output "3. Change every calculation budget and confirm its adjacent time updates immediately without touching finishing."
+Write-Output "4. Reopen the local 60 / 59.6 / 52.8 mm case with the 1 mm tray, calculate Normal, then materialize the minimal plan without finishing."
+Write-Output "5. Open fixture 01, calculate with Normal, and observe the soft small-below-large preference without treating it as a certificate."
+Write-Output "6. Open fixture 02, run Quick then Normal calculation, and record elapsed time, displayed budget, result status and engine."
+Write-Output "7. Materialize the current minimal plan before any finishing and inspect the tray reservation and cavities."
+Write-Output "8. Run Quick finishing separately; confirm the minimal plan remains available if finishing fails."
+Write-Output "9. When finishing succeeds, materialize the finalized plan and compare the scene identity."
+Write-Output "10. During each operation, observe the full-width activity bar; at rest confirm it leaves no space."
+Write-Output "11. Report OK or KO with screenshots and diagnostics; keep print-validated=false."
 Write-Output "Prepared P64-L09R-V gate: $(-not $DryRun)"

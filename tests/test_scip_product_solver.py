@@ -30,6 +30,8 @@ from board_game_insert_generator.scip_product_solver import (
     STATUS_BOUNDED_UNKNOWN,
     STATUS_INVALID_RUNTIME,
     STATUS_SOLUTION_FOUND,
+    _apply_required_top_inset_z_compensation,
+    _convert_placements,
     _hybrid_deferred_participant_ids,
     _participant_options,
     _prepare_product_problem,
@@ -354,6 +356,110 @@ class ScipProductSolverTests(unittest.TestCase):
                 )
                 self.assertGreaterEqual(profiles["xyz"]["minimum_floor"], 0)
 
+    def test_top_inset_marks_auto_z_container_as_expandable(self) -> None:
+        preparation = prepare_free_3d_problem(_stacking_project())
+        participant = {
+            "id": "container:auto-z",
+            "role": "container",
+            "container_group_id": "auto-z",
+            "name": "Support extensible",
+            "minimum_local_mm": {"x": 40.0, "y": 40.0, "z": 52.8},
+            "dimension_modes": {"x": "fixed", "y": "fixed", "z": "auto"},
+            "target_local_mm": {"x": 40.0, "y": 40.0, "z": None},
+            "top_inset_search_hint_v1": {
+                "floor_thickness_mm": 2.0,
+                "cavities": [],
+            },
+        }
+        problem = replace(
+            preparation.problem,
+            participants=(participant,),
+            top_inset_zones=(TopInsetZone((10.0, 12.0), (20.0, 18.0), 54.0, 1.0),),
+        )
+
+        prepared, rejection = _prepare_product_problem(problem.participants, problem)
+
+        self.assertEqual(rejection, "")
+        self.assertIsNotNone(prepared)
+        self.assertTrue(prepared.payload["participants"][0]["expandable_z"])
+
+    def test_converts_worker_z_expansion_for_auto_container_only(self) -> None:
+        preparation = prepare_free_3d_problem(_stacking_project())
+        participant = {
+            "id": "container:auto-z",
+            "role": "container",
+            "container_group_id": "auto-z",
+            "name": "Support extensible",
+            "minimum_local_mm": {"x": 40.0, "y": 40.0, "z": 52.8},
+            "dimension_modes": {"x": "fixed", "y": "fixed", "z": "auto"},
+            "target_local_mm": {"x": 40.0, "y": 40.0, "z": None},
+            "top_inset_search_hint_v1": {
+                "floor_thickness_mm": 2.0,
+                "cavities": [],
+            },
+        }
+        problem = replace(
+            preparation.problem,
+            participants=(participant,),
+            top_inset_zones=(TopInsetZone((10.0, 12.0), (20.0, 18.0), 54.0, 1.0),),
+        )
+        prepared, rejection = _prepare_product_problem(problem.participants, problem)
+        self.assertEqual(rejection, "")
+        self.assertIsNotNone(prepared)
+        worker_variant = prepared.payload["participants"][0]["variants"][0]
+        raw_placements = [
+            {
+                "participant_id": participant["id"],
+                "selected_variant_id": worker_variant["variant_id"],
+                "orientation": "xyz",
+                "x": 0,
+                "y": 0,
+                "z": 0,
+                "size": list(worker_variant["size"]),
+            }
+        ]
+        compensated = _apply_required_top_inset_z_compensation(
+            raw_placements,
+            prepared,
+        )
+        self.assertIsNotNone(compensated)
+
+        placements = _convert_placements(compensated, prepared)
+
+        self.assertAlmostEqual(placements[0].local_size_mm[2], 55.0, places=3)
+        self.assertAlmostEqual(placements[0].world_size_mm[2], 55.0, places=3)
+
+        fixed_participant = {
+            **participant,
+            "dimension_modes": {"x": "fixed", "y": "fixed", "z": "fixed"},
+            "target_local_mm": {"x": 40.0, "y": 40.0, "z": 52.8},
+        }
+        fixed_problem = replace(problem, participants=(fixed_participant,))
+        fixed_prepared, fixed_rejection = _prepare_product_problem(
+            fixed_problem.participants,
+            fixed_problem,
+        )
+        self.assertEqual(fixed_rejection, "")
+        self.assertIsNotNone(fixed_prepared)
+        fixed_variant = fixed_prepared.payload["participants"][0]["variants"][0]
+        invalid_size = list(fixed_variant["size"])
+        invalid_size[2] += 1000
+        with self.assertRaisesRegex(ValueError, "Unexpected SCIP Z expansion"):
+            _convert_placements(
+                [
+                    {
+                        "participant_id": fixed_participant["id"],
+                        "selected_variant_id": fixed_variant["variant_id"],
+                        "orientation": "xyz",
+                        "x": 0,
+                        "y": 0,
+                        "z": 0,
+                        "size": invalid_size,
+                    }
+                ],
+                fixed_prepared,
+            )
+
     def test_non_representable_top_inset_fails_closed(self) -> None:
         preparation = prepare_free_3d_problem(_stacking_project())
         zone = TopInsetZone((10.0005, 12.0), (20.0, 18.0), 52.0, 3.0)
@@ -422,9 +528,9 @@ class ScipProductSolverTests(unittest.TestCase):
             "role": "container",
             "container_group_id": "tray-support",
             "name": "Support plateau",
-            "minimum_local_mm": {"x": 40.0, "y": 40.0, "z": 55.0},
-            "dimension_modes": {"x": "fixed", "y": "fixed", "z": "fixed"},
-            "target_local_mm": {"x": 40.0, "y": 40.0, "z": 55.0},
+            "minimum_local_mm": {"x": 40.0, "y": 40.0, "z": 52.8},
+            "dimension_modes": {"x": "fixed", "y": "fixed", "z": "auto"},
+            "target_local_mm": {"x": 40.0, "y": 40.0, "z": None},
             "top_inset_search_hint_v1": {
                 "floor_thickness_mm": 2.0,
                 "cavities": [],
@@ -583,7 +689,7 @@ class ScipProductSolverTests(unittest.TestCase):
         self.assertIn(SCIP_PRODUCT_ARCHIVE_SHA256, helper)
         self.assertIn("configure_scip_product_runtime", palette)
         self.assertIn('scip_vendor / "runtime"', palette)
-        self.assertEqual(manifest["version"], "0.1.64")
+        self.assertEqual(manifest["version"], "0.1.65")
 
 
 if __name__ == "__main__":

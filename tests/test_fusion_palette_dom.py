@@ -673,6 +673,7 @@ class FusionPaletteDomTests(unittest.TestCase):
             "calculation.disabled=!hasGroups||minimalCurrent||operationActive",
             "finalization.disabled=!minimalCurrent||operationActive",
             "materialization.disabled=!minimalCurrent||operationActive",
+            "solverSettings=normalizeSolverSettings({...solverSettings,[key]:value});renderSolverSettings();sourceRevision+=1",
         ):
             self.assertIn(marker, self.markup)
         for effort, label in (

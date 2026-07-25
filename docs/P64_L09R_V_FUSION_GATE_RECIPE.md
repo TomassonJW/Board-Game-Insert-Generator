@@ -2,7 +2,7 @@
 
 Date de préparation : 2026-07-25
 
-Statut : `prepared-not-installed`, `human-gate-required`, `print-validated=false`.
+Statut : `corrective-package-ready-for-install`, `human-gate-required`, `print-validated=false`.
 
 Cette recette remplace entièrement P64-L09V 0.1.63, annulée sans observation. Elle ne réactive ni l’anti-chute dure, ni la finalisation obligatoire.
 
@@ -12,8 +12,8 @@ Thomas ne lance aucune commande PowerShell. Dans la mission P64-L09R-V, Codex do
 
 1. partir du commit P64-L09R-F intégré et propre sur `origin/main` ;
 2. exécuter `scripts/fusion/prepare_p64_l09rv_gate.ps1` sans `-DryRun` ;
-3. installer exactement l’add-in BGIG 0.1.64 et le runtime SCIP scellé ;
-4. vérifier le marqueur `bgig_installed_commit.txt`, la version 0.1.64 et les marqueurs worker/UI ;
+3. installer exactement l’add-in BGIG 0.1.65 et le runtime SCIP scellé ;
+4. vérifier le marqueur `bgig_installed_commit.txt`, la version 0.1.65 et les marqueurs worker/UI ;
 5. installer les deux fixtures publiques dans `Documents\BGIG\projects` ;
 6. sélectionner la fixture plateau avec calcul Normal et finition Rapide ;
 7. confirmer le reçu `p64-l09rv-preflight-summary.json` et son digest ;
@@ -45,15 +45,29 @@ Avant installation, toutes ces preuves doivent être vertes :
 
 Après confirmation d’installation par Codex :
 
-1. recharge complètement l’add-in BGIG 0.1.64 ;
+1. recharge complètement l’add-in BGIG 0.1.65 ;
 2. ouvre **BGIG — Atelier de rangement** ;
 3. ne lance encore aucune opération ;
 4. confirme que `Calculer`, `Finaliser` et `Matérialiser` sont tous visibles ;
 5. confirme que la jauge est totalement absente et ne laisse aucun espace vide ;
 6. ouvre Réglages et confirme les deux sélecteurs indépendants ;
-7. vérifie pour chacun les couples exacts : Rapide — `3 s max`, Court — `10 s max`, Normal — `20 s max`, Long — `60 s max`, Approfondi — `3 min max`.
+7. change successivement le budget de calcul vers Rapide, Court, Normal, Long et Approfondi ; confirme que le champ adjacent devient immédiatement `3 s max`, `10 s max`, `20 s max`, `60 s max`, puis `3 min max`, sans toucher au budget de finition ;
+8. change ensuite uniquement le budget de finition et confirme qu’il ne modifie ni la sélection ni le temps affiché du calcul.
 
-KO si un bouton disparaît, si un budget est éditable ou faux, ou si une zone de jauge reste réservée au repos.
+KO si un bouton disparaît, si un budget est éditable ou faux, si le temps de calcul attend une autre action pour se rafraîchir, ou si une zone de jauge reste réservée au repos.
+
+## 3 bis. Contrôle correctif sur le cas qui a révélé le défaut
+
+Avant les fixtures publiques, reprends le projet local observé : boîte de 60 mm, hauteur utile 59,6 mm, plan sans plateau culminant à 52,8 mm, plateau 100 × 100 × 1 mm.
+
+1. sélectionne Calcul Normal — `20 s max` ;
+2. clique `Calculer` une seule fois ;
+3. confirme que le résultat devient une solution certifiée et matérialisable, et non un faux impossible ;
+4. relève la durée, le moteur et le nombre de placements ;
+5. sans finition, clique `Matérialiser` ;
+6. vérifie que le plan minimal atteint le support du plateau, que la réservation est présente et que les cavités restent ouvertes.
+
+KO si le cas reste sans solution à tous les budgets, si la hauteur dépasse 59,6 mm, si une cavité est bouchée ou si une finition est exigée avant matérialisation.
 
 ## 4. Fixture 01 — préférence souple et ouvertures
 

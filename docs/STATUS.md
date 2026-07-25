@@ -3939,3 +3939,20 @@ Date : 2026-07-25.
 Preuve : `docs/P64_L09R_F_REPRESENTATIVE_HARDENING_EVIDENCE.md`.
 Recette : `docs/P64_L09R_V_FUSION_GATE_RECIPE.md`.
 Prochaine action unique : P64-L09R-V, gate humaine `prepared-not-installed`.
+## P64-L09R-V-C1 — correctif plateau/Z et budget de calcul
+
+Date : 2026-07-25.
+
+- La gate Fusion 0.1.64 est suspendue sans acceptation après deux défauts observés : faux échec avec plateau malgré une marge Z suffisante, et durée du budget de calcul non rafraîchie immédiatement.
+- Le solveur SCIP résout désormais le plan minimal puis applique une compensation Z exacte au seul conteneur automatique admissible sous la réservation ; collision, cavité insuffisante, axe figé, dépassement et expansion injustifiée restent fail-closed.
+- Le modèle couplé reste disponible dans la deadline restante si la compensation exacte ne s’applique pas.
+- La projection native restitue la hauteur réelle et refuse réduction Z, expansion X/Y ou expansion Z non autorisée.
+- `saveSolverSetting` redessine immédiatement les deux contrôles de calcul avant la persistance asynchrone.
+- Rejeu natif local exact : `solution_found`, 18 placements, sommet 59,6 mm pour 59,6 mm utiles, `placement_certified=true`, `materializable=true`, environ 4 s en Normal. Aucune donnée locale n’est ajoutée au dépôt.
+- Contrôle natif CPython 3.14 + SCIP 10.0.2 : OK.
+- Préparateur 0.1.65 en dry-run : OK, deux fixtures, deux réservations, aucune écriture AppData.
+- Suite complète : 875/875 en 261,340 s ; un test natif SCIP ignoré sous Python 3.10, puis exécuté séparément avec le CPython 3.14 de Fusion et passé.
+- Aucun benchmark, holdout, recalibrage physique, fait impression ou acceptation Fusion n’est revendiqué.
+
+Preuve : `docs/P64_L09R_V_CORRECTIVE_0165_EVIDENCE.md`.
+Prochaine action unique : publier et installer 0.1.65, puis reprendre P64-L09R-V avec les trois contrôles correctifs en premier.

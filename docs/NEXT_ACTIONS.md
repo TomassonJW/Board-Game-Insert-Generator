@@ -92,6 +92,17 @@ Preuve L09R-B : P64_L09R_B_MINIMAL_CALCULATION_EVIDENCE.md.
 Matrice L09 : P64_L09_VALIDATION_UNIFIEE.md.
 Rapport final L07 : P64_L07_GOAL_FINAL_REPORT.md.
 
+## Correctif de gate terminé
+
+### P64-L09R-V-C1 — compensation Z plateau et rafraîchissement du budget
+
+- La gate 0.1.64 est suspendue sans acceptation après deux observations réelles.
+- SCIP résout le plan minimal puis une passe exacte applique uniquement la compensation Z nécessaire sous une réservation supérieure ; toute collision, cavité insuffisante, axe figé ou expansion injustifiée est rejeté avant le certificat commun.
+- Le cas local exact repasse à 18 placements, sommet 59,6 mm, plan certifié et matérialisable en environ 4 s avec le budget Normal ; aucune donnée locale n'est ajoutée au dépôt.
+- Le budget de calcul et sa durée adjacente se rafraîchissent immédiatement, sans dépendre du budget de finition.
+- Le package correctif est 0.1.65 ; le préflight et le préparateur passent en dry-run sans écriture AppData.
+
+Preuve : `docs/P64_L09R_V_CORRECTIVE_0165_EVIDENCE.md`.
 ## Dernier lot terminé
 
 ### P64-L09R-F — durcissement représentatif et préparation
@@ -111,12 +122,13 @@ Recette : `docs/P64_L09R_V_FUSION_GATE_RECIPE.md`.
 
 ### P64-L09R-V — gate Fusion du parcours calcul / finition séparés
 
-Type : gate humaine obligatoire, `prepared-not-installed`.
+Type : gate humaine obligatoire, `corrective-package-ready-for-install`.
 
-1. Codex repart du commit F intégré sur `origin/main`.
-2. Codex exécute le préparateur sans `-DryRun`, installe exactement 0.1.64, vérifie les marqueurs et place les deux fixtures publiques.
-3. Thomas réalise uniquement les observations Fusion décrites dans la recette : repos UI, préférence souple, budgets Quick/Normal, matérialisation minimale avant finition, finition séparée puis matérialisation finale.
-4. Le retour reste `print-validated=false` et ne calibre aucune valeur physique.
+1. Codex publie le correctif intégré puis exécute le préparateur sans `-DryRun` et installe exactement 0.1.65.
+2. Thomas vérifie d’abord le rafraîchissement immédiat des cinq budgets de calcul.
+3. Thomas recalcule son cas 60 / 59,6 / 52,8 mm avec plateau de 1 mm, puis matérialise le minimal sans finition.
+4. Si ces contrôles passent, la recette reprend avec préférence souple, finition séparée, plan final et jauge.
+5. Le retour reste `print-validated=false` et ne calibre aucune valeur physique.
 
 P64-L09V 0.1.63 reste annulée sans observation et ne doit jamais être exécutée.
 Aucun autre lot produit ne commence avant le résultat de P64-L09R-V.

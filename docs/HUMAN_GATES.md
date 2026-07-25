@@ -1336,3 +1336,20 @@ Quick/Normal avec budgets réels, préférence souple par enveloppe, plateau,
 matérialisation minimale avant finition, finition séparée non destructive puis
 matérialisation finale. Elle ne valide aucune impression, tolérance ni pose de
 couvercle. `print-validated=false` reste obligatoire.
+## P64-L09R-V suspendue sur 0.1.64 et correctif 0.1.65 — 2026-07-25
+
+La gate 0.1.64 a été installée et ouverte, mais elle n’est ni acceptée ni close. Thomas a observé deux défauts bloquants :
+
+- un cas à 18 conteneurs dans 59,6 mm utiles, culminant à 52,8 mm sans plateau, ne trouvait plus de solution après ajout d’un plateau 100 × 100 × 1 mm, quel que soit le budget essayé ;
+- le sélecteur du budget de calcul et son champ de durée adjacent ne se rafraîchissaient pas de façon fiable ; changer le budget de finition pouvait déclencher indirectement ce rafraîchissement.
+
+Le correctif 0.1.65 est automatisé-validé. Le rejeu natif local exact retrouve 18 placements, atteint exactement 59,6 mm, reste certifié et matérialisable. Le budget de calcul redessine désormais immédiatement son libellé. Aucune donnée locale n’est versionnée.
+
+La gate reste obligatoire et doit reprendre dans cet ordre après installation de 0.1.65 :
+
+1. vérifier les cinq budgets de calcul et leurs durées adjacentes ;
+2. recalculer le cas réel avec le plateau de 1 mm ;
+3. matérialiser le plan minimal sans finition ;
+4. reprendre ensuite le reste de `docs/P64_L09R_V_FUSION_GATE_RECIPE.md`.
+
+Aucune observation de correction dans Fusion n’est encore revendiquée par les tests automatisés. `print-validated=false` reste obligatoire.

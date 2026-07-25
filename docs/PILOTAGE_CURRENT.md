@@ -19,9 +19,14 @@ preuves archivées.
 P64-L09R-B à F sont `implemented-product` et `automated-validated`. Le calcul
 minimal, la finition indépendante, les trois actions permanentes, les budgets
 visibles, le worker pur et la jauge temporaire sont durcis sur cas publics.
-Le package de gate est versionné 0.1.64 et sa préparation est validée seulement
-en simulation, sans écriture AppData. La prochaine action unique est la gate
-humaine P64-L09R-V, actuellement `prepared-not-installed`.
+La gate P64-L09R-V a été ouverte avec 0.1.64 puis suspendue sans acceptation :
+un plateau de 1 mm pouvait rendre le modèle infaisable malgré 6,8 mm de marge
+utile, et le budget de calcul ne rafraîchissait pas toujours sa durée. Le
+correctif 0.1.65 est `implemented-product`, `automated-validated` et prêt à être
+installé. Le rejeu natif local exact retrouve 18 placements certifiés,
+matérialisables, avec un sommet à 59,6 mm pour 59,6 mm utiles. Aucun snapshot
+local n'est versionné. La prochaine action unique reste la reprise humaine de
+P64-L09R-V après installation de 0.1.65 ; `print-validated=false`.
 - Dernière preuve : P64-V2H03V Fusion OK 0.1.55 ; P64-V2H03 est
   fusion-validated pour la coordination des variantes internes.
 - print-validated: false ; aucune valeur physique n'est calibrée par cette preuve.
@@ -144,10 +149,10 @@ humaine P64-L09R-V, actuellement `prepared-not-installed`.
   objectifs secondaires déterministes ; le plan F01B certifié reste prioritaire
   sans amélioration stricte. Suite complète : 853/853.
 - P64-L09V 0.1.63 reste archivée sans observation. P64-L09R-B à F sont
-  `implemented-product`, `automated-validated`. F recertifie le reçu public
-  28x30, les réservations plateau, la préférence souple et les échecs honnêtes,
-  puis prépare 0.1.64 sans l'installer. P64-L09R-V est la prochaine action
-  unique et reste une gate humaine obligatoire. La modularité reste différée.
+  `implemented-product`, `automated-validated`. P64-L09R-V 0.1.64 est suspendue
+  sans acceptation après les deux défauts plateau/Z et rafraîchissement du budget
+  de calcul. Le correctif 0.1.65 est automatisé-validé ; le cas local exact passe
+  en natif, mais l'observation Fusion doit être rejouée. La modularité reste différée.
 
 ## Vue de séquence
 
@@ -227,7 +232,7 @@ humaine P64-L09R-V, actuellement `prepared-not-installed`.
 | Terminée — automatisée | P64-L09R-D | Trois actions permanentes, activation exacte, budgets séparés et durées adjacentes. |
 | Terminée — automatisée | P64-L09R-E | Jauge temporaire pleine largeur, cadence 1 s, worker pur, matérialisation sur thread Fusion et stale fail-closed. |
 | Terminée — automatisée | P64-L09R-F | Reçu public 28x30, plateau, préférence souple, timeouts et conservation du minimal durcis ; package 0.1.64 préparé sans installation. |
-| Prochaine action — gate humaine | P64-L09R-V | Installer 0.1.64 puis observer dans Fusion le parcours calcul minimal / finition séparée ; `print-validated=false`. |
+| Prochaine action — gate humaine | P64-L09R-V | Installer 0.1.65, vérifier budget et cas plateau corrigé, puis reprendre le parcours séparé ; `print-validated=false`. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 

@@ -1628,3 +1628,8 @@ Le parcours construit et mesure le plan minimal Normal avant toute finition Rapi
 Le package de future gate devient 0.1.64. Préflight, deux fixtures publiques, préparateur et recette humaine sont prêts ; seul le dry-run a été exécuté, sans installation ni écriture AppData. Aucun benchmark, holdout, fait Fusion ou fait impression n'est produit.
 
 La prochaine et unique étape est P64-L09R-V, gate Fusion humaine obligatoire. Aucun lot automatisé supplémentaire ne la contourne.
+### Correctif P64-L09R-V-C1 — 2026-07-25
+
+La première ouverture de P64-L09R-V sur 0.1.64 est suspendue sans acceptation. Le correctif 0.1.65 rétablit la compensation Z exacte et recertifiée exigée par ADR-0088 pour un plateau supérieur, et rend immédiatement visible tout changement du budget de calcul. Le cas local exact 18 conteneurs / plateau 1 mm repasse en natif avec 18 placements, sommet 59,6 mm, plan certifié et matérialisable ; aucune donnée locale n’est versionnée.
+
+La trajectoire produit ne change pas : P64-L09R-V reste la prochaine gate humaine obligatoire. Aucun nouveau lot produit ne commence avant son résultat ; `print-validated=false`.

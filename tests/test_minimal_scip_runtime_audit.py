@@ -46,7 +46,7 @@ class MinimalScipRuntimeAuditTests(unittest.TestCase):
             self.assertEqual(live[key], recorded[key])
         self.assertEqual(
             live["add_var_call_count"],
-            recorded["add_var_call_count"] + 3,
+            recorded["add_var_call_count"] + 4,
         )
         self.assertEqual(
             live["active_3d_semantics"],
