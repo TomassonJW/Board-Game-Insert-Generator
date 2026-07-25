@@ -16,13 +16,13 @@ preuves archivées.
 ## État actif
 
 **État autoritaire du 2026-07-25 :** ADR-0088 reste la décision produit.
-P64-L09R-B, C et D sont `implemented-product` et `automated-validated`.
+P64-L09R-B à E sont `implemented-product` et `automated-validated`.
 Le calcul minimal et la finition utilisent deux budgets indépendants visibles,
 les trois actions restent toujours rendues, et la matérialisation choisit le plan
-final seulement quand celui-ci est courant. Un changement propre à la finition
-conserve le plan minimal. La prochaine mission unique est P64-L09R-E : jauge
-temporaire, rafraîchissement proche de la seconde et exécution réactive sans
-`adsk` dans le worker. F suit avant la gate humaine L09R-V.
+final seulement quand celui-ci est courant. La jauge temporaire reflète le temps
+écoulé sur le budget ou une phase CAD indéterminée, disparaît au repos, et le
+worker calcul/finition ne reçoit aucune API Fusion. La prochaine mission unique
+est P64-L09R-F : durcissement représentatif et préparation de la gate L09R-V.
 - Dernière preuve : P64-V2H03V Fusion OK 0.1.55 ; P64-V2H03 est
   fusion-validated pour la coordination des variantes internes.
 - print-validated: false ; aucune valeur physique n'est calibrée par cette preuve.
@@ -144,10 +144,11 @@ temporaire, rafraîchissement proche de la seconde et exécution réactive sans
   automated-validated : le volume ajouté puis le ratio d’expansion sont des
   objectifs secondaires déterministes ; le plan F01B certifié reste prioritaire
   sans amélioration stricte. Suite complète : 853/853.
-- P64-L09V 0.1.63 reste archivée sans observation. P64-L09R-B à D sont
+- P64-L09V 0.1.63 reste archivée sans observation. P64-L09R-B à E sont
   `implemented-product`, `automated-validated` : plan minimal, finition séparée,
-  actions permanentes, budgets visibles et invalidation exacte. Suite complète D :
-  861/861. P64-L09R-E est la prochaine mission unique. La modularité reste différée.
+  actions permanentes, budgets visibles, jauge temporaire, worker pur et rejet
+  stale par identité. P64-L09R-F est la prochaine mission unique. La modularité
+  reste différée.
 
 ## Vue de séquence
 
@@ -225,7 +226,8 @@ temporaire, rafraîchissement proche de la seconde et exécution réactive sans
 | Terminée — automatisée | P64-L09R-B | Support enveloppe, réservations, plan minimal matérialisable, préférence souple et deadlines totales 3/10/20/60/180 s. |
 | Terminée — automatisée | P64-L09R-C | Finition facultative à budget indépendant ; timeout, rejet et résultat obsolète conservent le plan minimal. |
 | Terminée — automatisée | P64-L09R-D | Trois actions permanentes, activation exacte, budgets séparés et durées adjacentes. |
-| Prochaine mission | P64-L09R-E | Jauge temporaire pleine largeur, rafraîchissement temporel et worker pur sans `adsk`. |
+| Terminée — automatisée | P64-L09R-E | Jauge temporaire pleine largeur, cadence 1 s, worker pur, matérialisation sur thread Fusion et stale fail-closed. |
+| Prochaine mission | P64-L09R-F | Durcissement représentatif, mesures séparées et préparation de la gate L09R-V. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 

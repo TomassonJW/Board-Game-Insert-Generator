@@ -2142,4 +2142,11 @@ Preuve : `docs/P64_L09R_B_MINIMAL_CALCULATION_EVIDENCE.md`.
 - `C-LAYOUT` : la sélection de matérialisation préfère le final seulement si courant, sinon le minimal courant.
 - `C-QUALITY` : une préférence de finition invalide seulement le final ; une préférence de calcul ou source invalide minimal, final et scène.
 - `C-FUSION` et `C-PRINT` : inchangées ; aucune observation Fusion et `print-validated=false`.
-- Progression et exécution hors thread UI restent `planned-by-P64-L09R-E`.
+## Mise à jour P64-L09R-E — progression et réactivité
+
+- `C-FUSION-UI` : `implemented-product`, `automated-validated`. La jauge pleine largeur est rendue seulement pendant une opération, à cadence 1 s, puis supprimée sans état terminal.
+- `C-SOLVER` : calcul minimal et finition passent dans une voie worker unique qui ne reçoit que des données pures ; projet et deux profils budgétaires appartiennent à l’identité d’entrée.
+- `C-QUALITY` : double lancement et mutation concurrente sont fail-closed ; révision ou digest différent rejette le résultat stale avant publication.
+- `C-FUSION` : la matérialisation et la publication HTML restent sur le callback Fusion autorisé ; le worker n’importe pas `adsk`.
+- `C-PRINT` : inchangée ; aucune observation Fusion et `print-validated=false`.
+- Le durcissement représentatif reste `ready-by-P64-L09R-F` avant la gate humaine L09R-V.

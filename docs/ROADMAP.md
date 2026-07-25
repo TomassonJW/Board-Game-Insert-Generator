@@ -1611,3 +1611,10 @@ P64-L09R-D remplace le bouton progressif unique par trois actions toujours visib
 Les cinq niveaux sont disponibles séparément pour calcul et finition. Les limites réelles 3 s, 10 s, 20 s, 60 s et 3 min max sont affichées dans des champs adjacents non éditables et persistent localement. Une modification propre à la finition conserve le minimal courant et rend uniquement le final obsolète.
 
 La prochaine étape est P64-L09R-E : activité temporaire pleine largeur au-dessus des boutons, rafraîchissement temporel proche de la seconde et calcul/finition purs hors thread UI sans `adsk`. F suivra avant P64-L09R-V.
+## Mise à jour P64-L09R-E — 2026-07-25
+
+P64-L09R-E rend l’activité temporaire et explicite. La zone pleine largeur est immédiatement au-dessus des trois actions, se rafraîchit chaque seconde et disparaît entièrement au repos. Calcul et finition montrent le temps écoulé sur leur budget total ; la matérialisation conserve une progression indéterminée sans pourcentage inventé.
+
+Calcul minimal et finition sont exécutés dans un worker de données pures. Le callback Fusion reste propriétaire du polling, de la publication HTML et du CAD. Une identité SHA-256 couvrant projet et profils budgétaires, complétée par la révision, rejette les retours obsolètes avant application.
+
+La prochaine étape est P64-L09R-F : durcissement représentatif, mesures séparées et préparation du dossier de gate. P64-L09R-V reste la gate humaine obligatoire ensuite. Aucun benchmark, package Fusion ou fait impression produit par E.

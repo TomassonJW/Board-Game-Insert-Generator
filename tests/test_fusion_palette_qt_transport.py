@@ -104,6 +104,23 @@ class FusionPaletteQtTransportTests(unittest.TestCase):
         ):
             self.assertIn(marker, self.markup)
         self.assertIn("plafond atteint sans plan certifié", self.markup)
+    def test_routes_calculation_to_pure_worker_and_keeps_cad_on_fusion_thread(self) -> None:
+        project_route = self.source.index("if action == BGIG_PALETTE_PROJECT_ACTION:")
+        route = self.source[project_route : self.source.index('if action in {"refresh", "preview", "inspect"}', project_route)]
+        self.assertIn("_palette_worker_poll_action", route)
+        self.assertIn("_poll_palette_project_operation", route)
+        self.assertIn("_is_async_palette_project_action", route)
+        self.assertIn("_submit_palette_project_operation", route)
+        self.assertIn('{"materialize_project", "regenerate_project"}', route)
+        self.assertIn("_synchronize_palette_cad_response", route)
+        self.assertLess(
+            route.index("_is_async_palette_project_action"),
+            route.index("_handle_palette_project_request"),
+        )
+        worker = (ADDIN / "palette_worker.py").read_text(encoding="utf-8")
+        self.assertIn('frozenset({"solve_project", "finalize_project"})', worker)
+        self.assertNotIn("import adsk", worker)
+        self.assertNotIn("sendInfoToHTML", worker)
     def test_palette_opens_at_a_product_sized_minimum(self) -> None:
         self.assertEqual(entrypoint.BGIG_PALETTE_DEFAULT_WIDTH, 1280)
         self.assertEqual(entrypoint.BGIG_PALETTE_DEFAULT_HEIGHT, 1100)

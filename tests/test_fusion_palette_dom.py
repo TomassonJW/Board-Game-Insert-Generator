@@ -749,14 +749,22 @@ class FusionPaletteDomTests(unittest.TestCase):
             "déjà en cours",
             "current_step",
             "formatOperationElapsed",
-            "formatCalculationMs",
             "operationTimingSummary",
-            "repris du cache",
-            "Recherche initiale",
-            "Restitution cache",
-            "Raison d’arrêt",
-            "Annulation utilisateur : non disponible",
-            "Réponse obsolète ou invalidée",
+            "operationBudgetMs",
+            "quick:3000",
+            "deep:180000",
+            "setInterval(renderOperationActivity,1000)",
+            'class="operation-activity-progress"',
+            'max="${budget}"',
+            "Progression indéterminée",
+            "pollAsyncProjectOperations",
+            "setInterval(pollAsyncProjectOperations,1000)",
+            "poll_project_operation",
+            "source_revision:sourceRevision",
+            "solver_settings:solverSettings",
+            "finishing_effort:finishingEffort",
+            "project",
+            "Résultat périmé rejeté",
             "operationWatchdogMs",
             "240000",
             "prefers-reduced-motion",
@@ -765,12 +773,24 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertIn("if(existing){message", self.markup)
         self.assertIn("different_operation_kinds", (ROOT / "src" / "board_game_insert_generator" / "operation_activity.py").read_text(encoding="utf-8"))
         self.assertNotIn('data-action="cancel-operation"', self.markup)
-        self.assertNotIn("Réponse obsolète ou annulée", self.markup)
+        self.assertNotIn("lastOperationActivity", self.markup)
+        activity = self.markup.index('id="operation-activity"')
+        sticky = self.markup.rindex('<div class="sticky-actions">', 0, activity)
+        buttons = self.markup.index('id="primary-calculation-action"', activity)
+        self.assertLess(sticky, activity)
+        self.assertLess(activity, buttons)
+        render_start = self.markup.index("function renderOperationActivity")
+        render_end = self.markup.index("function operationWatchdogMs", render_start)
+        render = self.markup[render_start:render_end]
+        self.assertIn("root.hidden=!active.length", render)
+        self.assertNotIn("terminal", render)
+        self.assertNotIn("lastOperation", render)
         activity_start = self.markup.index("function operationActivityMarkup")
         activity_end = self.markup.index("function renderOperationActivity", activity_start)
-        self.assertNotIn("percentage", self.markup[activity_start:activity_end])
-        self.assertNotIn("<details open", self.markup[activity_start:activity_end])
-
+        activity_markup = self.markup[activity_start:activity_end]
+        self.assertNotIn("percentage", activity_markup)
+        self.assertNotIn("ETA", activity_markup)
+        self.assertNotIn("<details open", activity_markup)
     def test_exposes_p64_l05c_certified_witness_without_cache_claim(self) -> None:
         for marker in (
             "function certifiedWitnessDetails",

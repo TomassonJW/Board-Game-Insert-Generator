@@ -3908,3 +3908,18 @@ Statut : `implemented-product`, `automated-validated`.
 
 Preuve : `docs/P64_L09R_D_VISIBLE_ACTIONS_BUDGETS_EVIDENCE.md`.
 Prochaine mission unique : P64-L09R-E.
+## P64-L09R-E — progression temporaire et interface réactive
+
+Statut : `implemented-product`, `automated-validated`.
+
+- La jauge pleine largeur est placée juste au-dessus des trois actions et n’occupe aucun espace au repos.
+- Calcul et finition affichent toutes les secondes le temps écoulé sur 3/10/20/60/180 s ; la matérialisation reste honnêtement indéterminée.
+- `solve_project` et `finalize_project` s’exécutent dans un worker Python pur, sans import `adsk`, objet Fusion, publication HTML ou synchronisation CAD.
+- Le callback Fusion effectue le polling, publie le résultat et conserve `materialize_project` / `regenerate_project` sur le thread autorisé.
+- Une voie longue unique évite les courses sur l’état partagé. Les validations, sauvegardes et réglages refusés pendant le calcul sont repris après sa fin.
+- Révision, projet, réglages solveur et budget de finition composent l’identité vérifiée au retour ; toute différence produit un rejet stale.
+- Validation ciblée : 130/130, JavaScript et compilation Python OK. Suite complète 867/867 en 243,972 s, un test natif ignoré ; tests documentaires 2/2 et `git diff --check` OK.
+- Aucun benchmark, package Fusion, réglage Fusion, observation Fusion ou fait impression produit.
+
+Preuve : `docs/P64_L09R_E_PROGRESS_RESPONSIVENESS_EVIDENCE.md`.
+Prochaine mission unique : P64-L09R-F.

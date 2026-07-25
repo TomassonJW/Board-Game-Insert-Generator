@@ -586,6 +586,13 @@ if adsk is not None:
                 if action == BGIG_PALETTE_DOCUMENT_ACTION:
                     raw_request = json.loads(str(getattr(args, "data", "{}") or "{}"))
                     try:
+                        response = _palette_async_busy_response(raw_request)
+                        if response is not None:
+                            self.palette.sendInfoToHTML(
+                                BGIG_PALETTE_PROJECT_RESPONSE_ACTION,
+                                json.dumps(response, ensure_ascii=False),
+                            )
+                            return
                         request = _safe_default_command_request(self.addin_dir)
                         response = _handle_palette_document_request(
                             raw_request,
@@ -602,13 +609,35 @@ if adsk is not None:
                 if action == BGIG_PALETTE_PROJECT_ACTION:
                     raw_request = json.loads(str(getattr(args, "data", "{}") or "{}"))
                     try:
-                        request = _safe_default_command_request(self.addin_dir)
-                        response = _handle_palette_project_request(
-                            raw_request,
-                            self.addin_dir,
-                            project_root=request.project_root,
-                        )
                         project_action = str(raw_request.get("action", "")) if isinstance(raw_request, dict) else ""
+                        if project_action == _palette_worker_poll_action():
+                            response = _poll_palette_project_operation(raw_request)
+                            if response is not None:
+                                self.palette.sendInfoToHTML(
+                                    BGIG_PALETTE_PROJECT_RESPONSE_ACTION,
+                                    json.dumps(response, ensure_ascii=False),
+                                )
+                            return
+                        request = _safe_default_command_request(self.addin_dir)
+                        if _is_async_palette_project_action(project_action):
+                            response = _submit_palette_project_operation(
+                                raw_request,
+                                self.addin_dir,
+                                project_root=request.project_root,
+                            )
+                            if response is not None:
+                                self.palette.sendInfoToHTML(
+                                    BGIG_PALETTE_PROJECT_RESPONSE_ACTION,
+                                    json.dumps(response, ensure_ascii=False),
+                                )
+                            return
+                        response = _palette_async_busy_response(raw_request)
+                        if response is None:
+                            response = _handle_palette_project_request(
+                                raw_request,
+                                self.addin_dir,
+                                project_root=request.project_root,
+                            )
                         if project_action in {"materialize_project", "regenerate_project"}:
                             response = _synchronize_palette_cad_response(response, project_action, self.addin_dir)
                             response = _refresh_palette_fusion_activity(response)
@@ -815,6 +844,53 @@ def _handle_palette_document_request(
     request["document_path"] = str(selected)
     return _handle_palette_project_request(request, addin_dir, project_root=project_root)
 
+
+def _palette_worker_poll_action() -> str:
+    try:
+        from .palette_worker import POLL_PROJECT_OPERATION_ACTION
+    except ImportError:  # pragma: no cover - Fusion may load the add-in as a script.
+        from palette_worker import POLL_PROJECT_OPERATION_ACTION  # type: ignore[no-redef]
+    return POLL_PROJECT_OPERATION_ACTION
+
+
+def _is_async_palette_project_action(action: object) -> bool:
+    try:
+        from .palette_worker import is_async_project_action
+    except ImportError:  # pragma: no cover - Fusion may load the add-in as a script.
+        from palette_worker import is_async_project_action  # type: ignore[no-redef]
+    return is_async_project_action(action)
+
+
+def _palette_async_busy_response(raw_request: object) -> dict[str, object] | None:
+    try:
+        from .palette_worker import busy_response_while_project_operation_active
+    except ImportError:  # pragma: no cover - Fusion may load the add-in as a script.
+        from palette_worker import busy_response_while_project_operation_active  # type: ignore[no-redef]
+    return busy_response_while_project_operation_active(raw_request)
+
+def _submit_palette_project_operation(
+    raw_request: object,
+    addin_dir: Path,
+    *,
+    project_root: Path | None,
+) -> dict[str, object] | None:
+    """Start pure calculation work without passing any Fusion object to it."""
+
+    try:
+        from .palette_worker import submit_project_operation
+    except ImportError:  # pragma: no cover - Fusion may load the add-in as a script.
+        from palette_worker import submit_project_operation  # type: ignore[no-redef]
+    return submit_project_operation(raw_request, addin_dir, project_root)
+
+
+def _poll_palette_project_operation(raw_request: object) -> dict[str, object] | None:
+    """Consume a worker response only from the Fusion-authorised callback."""
+
+    try:
+        from .palette_worker import poll_project_operation
+    except ImportError:  # pragma: no cover - Fusion may load the add-in as a script.
+        from palette_worker import poll_project_operation  # type: ignore[no-redef]
+    return poll_project_operation(raw_request)
 
 def _handle_palette_project_request(
     raw_request: object,
