@@ -2150,3 +2150,11 @@ Preuve : `docs/P64_L09R_B_MINIMAL_CALCULATION_EVIDENCE.md`.
 - `C-FUSION` : la matérialisation et la publication HTML restent sur le callback Fusion autorisé ; le worker n’importe pas `adsk`.
 - `C-PRINT` : inchangée ; aucune observation Fusion et `print-validated=false`.
 - Le durcissement représentatif reste `ready-by-P64-L09R-F` avant la gate humaine L09R-V.
+
+## Mise à jour P64-L09R-F — durcissement et gate préparée
+
+- `C-SOLVER` : `implemented-product`, `automated-validated`. Le reçu public 28x30, l'inversion nécessaire, l'ouverture admissible, les collisions, les réservations, la fin anticipée et les deadlines honnêtes sont recouverts sans benchmark ni holdout.
+- `C-STAGED-CALCULATION` : `implemented-product`, `automated-validated`. Un plan minimal avec plateau est sélectionné et construit en CAD avant une finition indépendante ; un échec de finition conserve son identité.
+- `C-FUSION-UI` : `automated-validated`. Trois actions permanentes, budgets adjacents, activité temporaire à 1 s et worker pur sont inclus dans le préflight public.
+- `C-FUSION` : `gate-prepared-not-installed`. Le package 0.1.64, deux fixtures publiques, un préparateur vérifié en dry-run et la recette P64-L09R-V sont prêts. Aucun fait Fusion ni impression n'est encore produit.
+- Prochaine action unique : P64-L09R-V, gate humaine obligatoire.

@@ -16,13 +16,12 @@ preuves archivées.
 ## État actif
 
 **État autoritaire du 2026-07-25 :** ADR-0088 reste la décision produit.
-P64-L09R-B à E sont `implemented-product` et `automated-validated`.
-Le calcul minimal et la finition utilisent deux budgets indépendants visibles,
-les trois actions restent toujours rendues, et la matérialisation choisit le plan
-final seulement quand celui-ci est courant. La jauge temporaire reflète le temps
-écoulé sur le budget ou une phase CAD indéterminée, disparaît au repos, et le
-worker calcul/finition ne reçoit aucune API Fusion. La prochaine mission unique
-est P64-L09R-F : durcissement représentatif et préparation de la gate L09R-V.
+P64-L09R-B à F sont `implemented-product` et `automated-validated`. Le calcul
+minimal, la finition indépendante, les trois actions permanentes, les budgets
+visibles, le worker pur et la jauge temporaire sont durcis sur cas publics.
+Le package de gate est versionné 0.1.64 et sa préparation est validée seulement
+en simulation, sans écriture AppData. La prochaine action unique est la gate
+humaine P64-L09R-V, actuellement `prepared-not-installed`.
 - Dernière preuve : P64-V2H03V Fusion OK 0.1.55 ; P64-V2H03 est
   fusion-validated pour la coordination des variantes internes.
 - print-validated: false ; aucune valeur physique n'est calibrée par cette preuve.
@@ -144,11 +143,11 @@ est P64-L09R-F : durcissement représentatif et préparation de la gate L09R-V.
   automated-validated : le volume ajouté puis le ratio d’expansion sont des
   objectifs secondaires déterministes ; le plan F01B certifié reste prioritaire
   sans amélioration stricte. Suite complète : 853/853.
-- P64-L09V 0.1.63 reste archivée sans observation. P64-L09R-B à E sont
-  `implemented-product`, `automated-validated` : plan minimal, finition séparée,
-  actions permanentes, budgets visibles, jauge temporaire, worker pur et rejet
-  stale par identité. P64-L09R-F est la prochaine mission unique. La modularité
-  reste différée.
+- P64-L09V 0.1.63 reste archivée sans observation. P64-L09R-B à F sont
+  `implemented-product`, `automated-validated`. F recertifie le reçu public
+  28x30, les réservations plateau, la préférence souple et les échecs honnêtes,
+  puis prépare 0.1.64 sans l'installer. P64-L09R-V est la prochaine action
+  unique et reste une gate humaine obligatoire. La modularité reste différée.
 
 ## Vue de séquence
 
@@ -227,7 +226,8 @@ est P64-L09R-F : durcissement représentatif et préparation de la gate L09R-V.
 | Terminée — automatisée | P64-L09R-C | Finition facultative à budget indépendant ; timeout, rejet et résultat obsolète conservent le plan minimal. |
 | Terminée — automatisée | P64-L09R-D | Trois actions permanentes, activation exacte, budgets séparés et durées adjacentes. |
 | Terminée — automatisée | P64-L09R-E | Jauge temporaire pleine largeur, cadence 1 s, worker pur, matérialisation sur thread Fusion et stale fail-closed. |
-| Prochaine mission | P64-L09R-F | Durcissement représentatif, mesures séparées et préparation de la gate L09R-V. |
+| Terminée — automatisée | P64-L09R-F | Reçu public 28x30, plateau, préférence souple, timeouts et conservation du minimal durcis ; package 0.1.64 préparé sans installation. |
+| Prochaine action — gate humaine | P64-L09R-V | Installer 0.1.64 puis observer dans Fusion le parcours calcul minimal / finition séparée ; `print-validated=false`. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 
@@ -251,6 +251,8 @@ est P64-L09R-F : durcissement représentatif et préparation de la gate L09R-V.
   optionnelle, budgets, boutons, invalidation, jauge et découpage L09R.
 - P64_L09R_B_MINIMAL_CALCULATION_EVIDENCE.md : support enveloppe, plan minimal
   matérialisable, compensation Z, préférence souple et deadlines totales.
+- P64_L09R_F_REPRESENTATIVE_HARDENING_EVIDENCE.md : cas publics, mesures séparées, contrôles négatifs et préparation 0.1.64 sans installation.
+- P64_L09R_V_FUSION_GATE_RECIPE.md : préparation Codex et observations humaines exactes de la gate obligatoire.
 - ADR-0088 : décision autoritaire du retour sélectif et de l'UX staged.
 - P64_L09V_FUSION_GATE_PREPARATION.md : preuve historique 0.1.63 supersédée ;
   aucune action humaine à exécuter.

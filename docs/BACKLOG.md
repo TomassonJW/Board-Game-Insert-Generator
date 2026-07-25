@@ -3336,21 +3336,18 @@ implémentée et intégrée à la fois.
 ### P64-L09R-F — Durcissement représentatif et préparation
 
 - Dépendance : P64-L09R-E automated-validated.
-- Vérifier cas public 28x30, plateau, empilement au-dessus d'une ouverture,
-  collisions négatives, fin anticipée, deadline et échec de finition non
-  destructif.
-- Mesurer séparément calcul et finition sans rouvrir un holdout consommé ni
-  recalibrer des valeurs physiques.
-- Préparer installation, fixtures et checklist seulement si toutes les preuves
-  passent.
-- Statut : `ready`, prochaine mission unique.
+- Reçu public 28x30 recertifié sans lecture du holdout ; fixtures publiques de préférence souple et de plateau exécutées.
+- Inversion nécessaire, ouverture admissible, collisions/réservations négatives, fin anticipée, deadline honnête et échec de finition non destructif couverts.
+- Calcul minimal Normal et finition Rapide mesurés séparément ; CAD minimal construit avant finition.
+- Add-in 0.1.64, préflight, préparateur et recette humaine préparés ; dry-run sans écriture AppData validé.
+- Preuve : `docs/P64_L09R_F_REPRESENTATIVE_HARDENING_EVIDENCE.md`.
+- Statut : `implemented-product`, `automated-validated`, `gate-prepared-not-installed`.
 
 ### P64-L09R-V — Gate Fusion du parcours séparé
 
-- Dépendances : P64-L09R-B à F automated-validated et commit intégré.
-- Codex installe le package et vérifie runtime, marqueurs, fichiers et réglages.
-- Thomas observe calcul avec plateau, ordre préférentiel, matérialisation minimale
-  sans finition, finition séparée, matérialisation finale, budgets visibles et
-  jauge totalement absente au repos.
+- Dépendances : P64-L09R-B à F automated-validated et commit F intégré.
+- Codex installe le package 0.1.64 et vérifie runtime, marqueurs, fichiers, fixtures et réglages.
+- Thomas observe calcul avec plateau, ordre préférentiel, matérialisation minimale sans finition, finition séparée, matérialisation finale, budgets visibles et jauge totalement absente au repos.
+- Recette : `docs/P64_L09R_V_FUSION_GATE_RECIPE.md`.
 - La gate ne qualifie ni impression, ni tolérance, ni couvercle fermé.
-- Statut : `future-human-gate`, inactive avant préparation vérifiée.
+- Statut : `ready-human-gate`, `prepared-not-installed`, `print-validated=false`.

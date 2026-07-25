@@ -94,45 +94,37 @@ Rapport final L07 : P64_L07_GOAL_FINAL_REPORT.md.
 
 ## Dernier lot terminé
 
-### P64-L09R-E — progression temporaire et interface réactive
+### P64-L09R-F — durcissement représentatif et préparation
 
-- Jauge pleine largeur immédiatement au-dessus des trois actions produit.
-- Aucun rendu, dernier état terminal ni espace réservé au repos.
-- Rafraîchissement à 1 000 ms ; calcul et finition montrent temps écoulé / budget réel.
-- Matérialisation indéterminée, sans pourcentage ni délai inventé.
-- Calcul et finition dans un worker alimenté seulement par JSON et chemins texte, sans `adsk`.
-- Publication et matérialisation restent sur le callback Fusion autorisé.
-- Double lancement et mutations concurrentes fail-closed ; stale rejeté par révision et digest projet/réglages.
-- Tests ciblés : 130/130 ; suite complète 867/867 en 243,972 s, un test natif ignoré.
+- Cas public 28x30 recertifié depuis son reçu public, sans lecture du holdout.
+- Deux fixtures publiques exécutées : préférence souple par enveloppe et parcours avec plateau/réservations.
+- Calcul minimal Normal mesuré séparément de la finition Rapide ; le CAD minimal est construit avant toute finition.
+- Inversion nécessaire, ouverture admissible, collisions/réservations négatives, fin anticipée, timeout honnête et conservation du minimal sont couverts.
+- Préflight et préparateur P64-L09R-V versionnés 0.1.64 ; simulation validée sans écriture AppData.
+- Validation : 126/126 ciblés, 2/2 documentaires, 873/873 complets en 239,310 s ; un test natif SCIP ignoré.
+- Aucun benchmark, holdout, recalibrage physique, package installé, fait Fusion ou fait impression produit par F.
 
-Preuve : `docs/P64_L09R_E_PROGRESS_RESPONSIVENESS_EVIDENCE.md`.
+Preuve : `docs/P64_L09R_F_REPRESENTATIVE_HARDENING_EVIDENCE.md`.
+Recette : `docs/P64_L09R_V_FUSION_GATE_RECIPE.md`.
 
 ## Prochaine action recommandée
 
-### P64-L09R-F — durcissement représentatif et préparation
+### P64-L09R-V — gate Fusion du parcours calcul / finition séparés
 
-Type : mission de tests, mesures et préparation bornée, sans gate humaine préalable.
+Type : gate humaine obligatoire, `prepared-not-installed`.
 
-Objectifs exacts :
+1. Codex repart du commit F intégré sur `origin/main`.
+2. Codex exécute le préparateur sans `-DryRun`, installe exactement 0.1.64, vérifie les marqueurs et place les deux fixtures publiques.
+3. Thomas réalise uniquement les observations Fusion décrites dans la recette : repos UI, préférence souple, budgets Quick/Normal, matérialisation minimale avant finition, finition séparée puis matérialisation finale.
+4. Le retour reste `print-validated=false` et ne calibre aucune valeur physique.
 
-1. vérifier le cas public 28x30 et au moins un projet représentatif avec plateau ;
-2. prouver qu’un empilement au-dessus d’une ouverture reste admissible quand les enveloppes XY et collisions sont valides ;
-3. couvrir les cas négatifs de collision, de réservation et d’entrée invalide ;
-4. vérifier fin anticipée, deadline totale et présentation honnête des timeouts ;
-5. confirmer qu’un échec de finition ne modifie jamais le plan minimal matérialisable ;
-6. mesurer séparément calcul minimal et finition, sans rouvrir de holdout consommé ;
-7. corriger uniquement les régressions observées dans ce périmètre, sans recalibrer de valeur physique ;
-8. préparer fixtures, installation et checklist P64-L09R-V seulement si toutes les preuves automatisées passent.
+P64-L09V 0.1.63 reste annulée sans observation et ne doit jamais être exécutée.
+Aucun autre lot produit ne commence avant le résultat de P64-L09R-V.
 
-Contrat : `docs/P64_L09R_CALCUL_FINITION_PROGRESS_CONTRACT.md`.
-Décision : `docs/DECISIONS/ADR-0088-calcul-minimal-finition-optionnelle-et-budgets-visibles.md`.
+## Lot ordonné après P64-L09R-V
 
-Aucune manipulation de Thomas requise pendant P64-L09R-F.
-P64-L09V sur 0.1.63 reste annulée et ne doit pas être exécutée.
+La suite produit sera réévaluée à partir du retour humain ; aucune mission automatisée n'est présélectionnée devant cette gate.
 
-## Lot ordonné après P64-L09R-F
-
-1. P64-L09R-V — installation puis gate Fusion combinée, sans validation impression.
 ## Lots verrouillés ou différés
 
 - P64-U01 est absorbée par P64-L09R-D/E ;

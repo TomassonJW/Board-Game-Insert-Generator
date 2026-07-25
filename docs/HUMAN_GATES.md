@@ -1321,16 +1321,18 @@ Le GO produit couvre les lots automatisés suivants, un par un :
 4. P64-L09R-E — progression temporaire et réactivité ;
 5. P64-L09R-F — durcissement représentatif et préparation.
 
-P64-L09R-B, C et D sont `automated-validated` sans gate humaine, conformément à
-ce GO. P64-L09R-E est le prochain lot automatisé ; la gate L09R-V reste
-inactive avant intégration et preuve complète de E et F.
+P64-L09R-B à F sont `automated-validated` sans gate humaine, conformément au GO.
+Le préflight public et la simulation du préparateur 0.1.64 passent ; aucune
+installation Fusion ni écriture AppData n'a été réalisée pendant F.
 
-Aucune intervention humaine n'est requise entre ces lots tant qu'ils ne changent
-ni tolérances, valeurs physiques, pose de couvercle, dépendance majeure ou North
-Star. Une nouvelle gate P64-L09R-V sera ouverte seulement après installation du
-commit intégré et preuves automatisées complètes.
+P64-L09R-V est désormais la prochaine et unique gate humaine, au statut
+`prepared-not-installed`. Sa recette canonique est
+`docs/P64_L09R_V_FUSION_GATE_RECIPE.md`. Codex doit d'abord installer le commit
+F intégré et vérifier runtime, marqueurs, fixtures et réglages ; Thomas ne lance
+aucune commande PowerShell.
 
-Cette future gate devra observer : calcul avec plateau, matérialisation minimale
-sans finition, finition séparée, matérialisation finale, budgets visibles et
-jauge totalement absente au repos. Elle ne validera aucune impression.
-`print-validated=false` reste obligatoire.
+La gate observe : repos UI sans espace réservé, trois boutons visibles, calcul
+Quick/Normal avec budgets réels, préférence souple par enveloppe, plateau,
+matérialisation minimale avant finition, finition séparée non destructive puis
+matérialisation finale. Elle ne valide aucune impression, tolérance ni pose de
+couvercle. `print-validated=false` reste obligatoire.

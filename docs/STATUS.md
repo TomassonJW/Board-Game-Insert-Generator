@@ -3923,3 +3923,19 @@ Statut : `implemented-product`, `automated-validated`.
 
 Preuve : `docs/P64_L09R_E_PROGRESS_RESPONSIVENESS_EVIDENCE.md`.
 Prochaine mission unique : P64-L09R-F.
+
+## P64-L09R-F — durcissement représentatif et préparation
+
+Date : 2026-07-25.
+
+- Le reçu public 28x30 reste `solution_found` avec 28 placements recertifiés ; aucun holdout n'est lu.
+- Deux fixtures publiques prouvent la préférence souple petits-dessous/grand-dessus et le parcours plateau avec deux réservations.
+- Le calcul minimal Normal est mesuré séparément de la finition Rapide ; le CAD minimal est prêt avant toute finition et le plan final n'est sélectionné qu'après certificat.
+- Les régressions couvrent inversion nécessaire, ouverture admissible, collisions/réservations négatives, fin anticipée, deadline globale honnête et conservation exacte du minimal après timeout de finition.
+- Le package passe à 0.1.64. Préflight, préparateur et recette P64-L09R-V sont prêts ; la simulation confirme qu'aucun fichier AppData n'est modifié.
+- Aucun benchmark, tournoi, holdout, recalibrage physique, package Fusion installé, observation Fusion ou impression n'est revendiqué.
+- Validation : 126/126 tests ciblés ; 2/2 tests documentaires ; suite complète 873/873 en 239,310 s ; un test natif SCIP ignoré sous Python 3.10 ; `git diff --check` OK.
+
+Preuve : `docs/P64_L09R_F_REPRESENTATIVE_HARDENING_EVIDENCE.md`.
+Recette : `docs/P64_L09R_V_FUSION_GATE_RECIPE.md`.
+Prochaine action unique : P64-L09R-V, gate humaine `prepared-not-installed`.

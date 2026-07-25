@@ -1618,3 +1618,13 @@ P64-L09R-E rend l’activité temporaire et explicite. La zone pleine largeur es
 Calcul minimal et finition sont exécutés dans un worker de données pures. Le callback Fusion reste propriétaire du polling, de la publication HTML et du CAD. Une identité SHA-256 couvrant projet et profils budgétaires, complétée par la révision, rejette les retours obsolètes avant application.
 
 La prochaine étape est P64-L09R-F : durcissement représentatif, mesures séparées et préparation du dossier de gate. P64-L09R-V reste la gate humaine obligatoire ensuite. Aucun benchmark, package Fusion ou fait impression produit par E.
+
+## Mise à jour P64-L09R-F — 2026-07-25
+
+P64-L09R-F ferme la séquence automatisée B à F. Les cas publics recouvrent le reçu 28x30, un empilement préférentiel par enveloppe et un projet avec plateau/réservations. Les preuves négatives gardent collisions et réservations fail-closed, tandis qu'une ouverture matérielle ne redevient jamais une interdiction dure.
+
+Le parcours construit et mesure le plan minimal Normal avant toute finition Rapide, puis ne sélectionne le plan final qu'après certificat. Les deadlines restent globales et un timeout ne devient jamais une preuve d'impossibilité ; un échec de finition conserve le plan minimal matérialisable.
+
+Le package de future gate devient 0.1.64. Préflight, deux fixtures publiques, préparateur et recette humaine sont prêts ; seul le dry-run a été exécuté, sans installation ni écriture AppData. Aucun benchmark, holdout, fait Fusion ou fait impression n'est produit.
+
+La prochaine et unique étape est P64-L09R-V, gate Fusion humaine obligatoire. Aucun lot automatisé supplémentaire ne la contourne.
