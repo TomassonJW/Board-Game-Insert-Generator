@@ -350,26 +350,20 @@ def _add_top_inset_constraints(model, problem, variables, big_m) -> None:
     if not zones:
         return
     box_origin_x, box_origin_y = problem["box_origin_xy"]
-    expansion_supports = [[] for _ in variables]
     for zone_index, zone in enumerate(zones):
         zone_x = int(zone["origin_xy"][0]) - int(box_origin_x)
         zone_y = int(zone["origin_xy"][1]) - int(box_origin_y)
         zone_width, zone_depth = (int(value) for value in zone["size_xy"])
         support_plane = int(zone["support_plane_z"])
-        inset_depth = int(zone["inset_depth"])
-        design_top = int(zone["design_top_z"])
-        zone_supports = []
         for body_index, values in enumerate(variables):
             for choice_index, choice in enumerate(values["options"]):
-                profile = choice.get("top_inset_support")
+                profile = choice.get("top_inset_reservation")
                 if not isinstance(profile, dict):
-                    raise ValueError("Missing exact top-inset support profile.")
+                    raise ValueError("Missing exact top-inset reservation profile.")
                 selected = values["selectors"][choice_index]
-                physical_width, physical_depth, minimum_physical_height = (
+                physical_width, physical_depth, physical_height = (
                     int(value) for value in profile["physical_size"]
                 )
-                padding_z = int(choice["size"][2]) - minimum_physical_height
-                physical_height = values["height"] - padding_z
                 alternatives = []
                 separation_specs = (
                     (
@@ -403,101 +397,8 @@ def _add_top_inset_constraints(model, problem, variables, big_m) -> None:
                     model.addCons(separated <= selected)
                     model.addCons(left <= right + big_m * (1 - separated))
                     alternatives.append(separated)
-                supports_zone = model.addVar(
-                    vtype="B",
-                    name=(f"inset_support_{zone_index}_{body_index}_{choice_index}"),
-                )
-                model.addCons(supports_zone <= selected)
-                model.addCons(values["x"] <= zone_x + zone_width - 1 + big_m * (1 - supports_zone))
-                model.addCons(
-                    values["x"] + physical_width >= zone_x + 1 - big_m * (1 - supports_zone)
-                )
-                model.addCons(values["y"] <= zone_y + zone_depth - 1 + big_m * (1 - supports_zone))
-                model.addCons(
-                    values["y"] + physical_depth >= zone_y + 1 - big_m * (1 - supports_zone)
-                )
-                model.addCons(
-                    values["z"] + physical_height <= design_top + big_m * (1 - supports_zone)
-                )
-                model.addCons(
-                    values["z"] + physical_height >= design_top - big_m * (1 - supports_zone)
-                )
-                minimum_floor = int(profile["minimum_floor"])
-                minimum_support_height = minimum_floor + inset_depth
-                if values["expandable_z"]:
-                    model.addCons(
-                        physical_height
-                        >= minimum_support_height - big_m * (1 - supports_zone)
-                    )
-                elif minimum_physical_height < minimum_support_height:
-                    model.addCons(supports_zone == 0)
-                for cavity_index, cavity in enumerate(profile["cavities"]):
-                    required_height = minimum_floor + int(cavity["depth"]) + inset_depth
-                    if minimum_physical_height >= required_height:
-                        continue
-                    cavity_x = int(cavity["origin_xy"][0])
-                    cavity_y = int(cavity["origin_xy"][1])
-                    cavity_width, cavity_depth = (int(value) for value in cavity["size_xy"])
-                    cavity_alternatives = []
-                    cavity_specs = (
-                        (
-                            values["x"] + cavity_x + cavity_width,
-                            zone_x,
-                            "left",
-                        ),
-                        (
-                            zone_x + zone_width,
-                            values["x"] + cavity_x,
-                            "right",
-                        ),
-                        (
-                            values["y"] + cavity_y + cavity_depth,
-                            zone_y,
-                            "front",
-                        ),
-                        (
-                            zone_y + zone_depth,
-                            values["y"] + cavity_y,
-                            "rear",
-                        ),
-                    )
-                    for left, right, side in cavity_specs:
-                        separated = model.addVar(
-                            vtype="B",
-                            name=(
-                                f"inset_cavity_{zone_index}_{body_index}_"
-                                f"{choice_index}_{cavity_index}_{side}"
-                            ),
-                        )
-                        model.addCons(separated <= supports_zone)
-                        model.addCons(left <= right + big_m * (1 - separated))
-                        cavity_alternatives.append(separated)
-                    if values["expandable_z"]:
-                        safe_height = model.addVar(
-                            vtype="B",
-                            name=(
-                                f"inset_cavity_safe_height_{zone_index}_{body_index}_"
-                                f"{choice_index}_{cavity_index}"
-                            ),
-                        )
-                        model.addCons(safe_height <= supports_zone)
-                        model.addCons(
-                            physical_height >= required_height - big_m * (1 - safe_height)
-                        )
-                        cavity_alternatives.append(safe_height)
-                    model.addCons(quicksum(cavity_alternatives) >= supports_zone)
-                alternatives.append(supports_zone)
                 model.addCons(quicksum(alternatives) >= selected)
-                zone_supports.append(supports_zone)
-                expansion_supports[body_index].append(supports_zone)
-        model.addCons(quicksum(zone_supports) >= 1)
-    for body_index, values in enumerate(variables):
-        if values["expandable_z"]:
-            model.addCons(
-                values["height"]
-                <= values["selected_height"]
-                + big_m * quicksum(expansion_supports[body_index])
-            )
+
 
 if __name__ == "__main__":
     main(sys.argv[1], sys.argv[2])

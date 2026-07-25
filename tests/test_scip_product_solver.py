@@ -30,12 +30,11 @@ from board_game_insert_generator.scip_product_solver import (
     STATUS_BOUNDED_UNKNOWN,
     STATUS_INVALID_RUNTIME,
     STATUS_SOLUTION_FOUND,
-    _apply_required_top_inset_z_compensation,
     _convert_placements,
     _hybrid_deferred_participant_ids,
     _participant_options,
     _prepare_product_problem,
-    _top_inset_support_profile,
+    _top_inset_reservation_profile,
     configure_scip_product_runtime,
     scip_product_limits,
     solve_scip_product_3d,
@@ -215,7 +214,7 @@ class ScipProductSolverTests(unittest.TestCase):
         )
         self.assertEqual(payload["world_mm"][0], expected_world_x)
 
-    def test_top_inset_profile_preserves_floor_and_rotated_cavity(self) -> None:
+    def test_top_inset_reservation_profile_preserves_rotated_outer_size(self) -> None:
         participant = {
             "id": "container:profile",
             "role": "container",
@@ -235,20 +234,10 @@ class ScipProductSolverTests(unittest.TestCase):
         }
 
         option = _participant_options(participant)[0]
-        profile = _top_inset_support_profile(option, "yxz")
+        profile = _top_inset_reservation_profile(option, "yxz")
 
         self.assertEqual(profile["physical_size"], [34000, 24000, 15000])
-        self.assertEqual(profile["minimum_floor"], 2000)
-        self.assertEqual(
-            profile["cavities"],
-            [
-                {
-                    "origin_xy": [22000, 5000],
-                    "size_xy": [6000, 5000],
-                    "depth": 7000,
-                }
-            ],
-        )
+        self.assertEqual(set(profile), {"physical_size"})
 
     def test_hybrid_repeated_fill_keeps_two_anchor_representatives(self) -> None:
         project = _stacking_project()
@@ -345,18 +334,19 @@ class ScipProductSolverTests(unittest.TestCase):
                 }
             ],
         )
-        self.assertIn("top_inset_support", prepared.payload["active_constraints"])
+        self.assertIn("upper_reservation", prepared.payload["active_constraints"])
         self.assertEqual(_hybrid_deferred_participant_ids(prepared), ())
         for participant in prepared.payload["participants"]:
+            self.assertFalse(participant["expandable_z"])
             for variant in participant["variants"]:
-                profiles = variant["top_inset_support_profiles"]
+                profiles = variant["top_inset_reservation_profiles"]
                 self.assertEqual(
                     set(profiles),
                     set(variant["allowed_rotations"]),
                 )
-                self.assertGreaterEqual(profiles["xyz"]["minimum_floor"], 0)
+                self.assertEqual(set(profiles["xyz"]), {"physical_size"})
 
-    def test_top_inset_marks_auto_z_container_as_expandable(self) -> None:
+    def test_top_inset_never_marks_auto_z_container_as_expandable(self) -> None:
         preparation = prepare_free_3d_problem(_stacking_project())
         participant = {
             "id": "container:auto-z",
@@ -381,9 +371,9 @@ class ScipProductSolverTests(unittest.TestCase):
 
         self.assertEqual(rejection, "")
         self.assertIsNotNone(prepared)
-        self.assertTrue(prepared.payload["participants"][0]["expandable_z"])
+        self.assertFalse(prepared.payload["participants"][0]["expandable_z"])
 
-    def test_converts_worker_z_expansion_for_auto_container_only(self) -> None:
+    def test_rejects_worker_z_expansion_even_for_auto_container(self) -> None:
         preparation = prepare_free_3d_problem(_stacking_project())
         participant = {
             "id": "container:auto-z",
@@ -407,49 +397,14 @@ class ScipProductSolverTests(unittest.TestCase):
         self.assertEqual(rejection, "")
         self.assertIsNotNone(prepared)
         worker_variant = prepared.payload["participants"][0]["variants"][0]
-        raw_placements = [
-            {
-                "participant_id": participant["id"],
-                "selected_variant_id": worker_variant["variant_id"],
-                "orientation": "xyz",
-                "x": 0,
-                "y": 0,
-                "z": 0,
-                "size": list(worker_variant["size"]),
-            }
-        ]
-        compensated = _apply_required_top_inset_z_compensation(
-            raw_placements,
-            prepared,
-        )
-        self.assertIsNotNone(compensated)
-
-        placements = _convert_placements(compensated, prepared)
-
-        self.assertAlmostEqual(placements[0].local_size_mm[2], 55.0, places=3)
-        self.assertAlmostEqual(placements[0].world_size_mm[2], 55.0, places=3)
-
-        fixed_participant = {
-            **participant,
-            "dimension_modes": {"x": "fixed", "y": "fixed", "z": "fixed"},
-            "target_local_mm": {"x": 40.0, "y": 40.0, "z": 52.8},
-        }
-        fixed_problem = replace(problem, participants=(fixed_participant,))
-        fixed_prepared, fixed_rejection = _prepare_product_problem(
-            fixed_problem.participants,
-            fixed_problem,
-        )
-        self.assertEqual(fixed_rejection, "")
-        self.assertIsNotNone(fixed_prepared)
-        fixed_variant = fixed_prepared.payload["participants"][0]["variants"][0]
-        invalid_size = list(fixed_variant["size"])
+        invalid_size = list(worker_variant["size"])
         invalid_size[2] += 1000
         with self.assertRaisesRegex(ValueError, "Unexpected SCIP Z expansion"):
             _convert_placements(
                 [
                     {
-                        "participant_id": fixed_participant["id"],
-                        "selected_variant_id": fixed_variant["variant_id"],
+                        "participant_id": participant["id"],
+                        "selected_variant_id": worker_variant["variant_id"],
                         "orientation": "xyz",
                         "x": 0,
                         "y": 0,
@@ -457,7 +412,7 @@ class ScipProductSolverTests(unittest.TestCase):
                         "size": invalid_size,
                     }
                 ],
-                fixed_prepared,
+                prepared,
             )
 
     def test_non_representable_top_inset_fails_closed(self) -> None:
@@ -521,7 +476,7 @@ class ScipProductSolverTests(unittest.TestCase):
         os.name == "nt" and sys.version_info[:2] == (3, 14),
         "requires the Fusion CPython 3.14 runtime",
     )
-    def test_real_cp314_top_inset_model_finds_a_supporting_body(self) -> None:
+    def test_real_cp314_top_inset_model_keeps_body_outside_reserved_prism(self) -> None:
         preparation = prepare_free_3d_problem(_stacking_project())
         participant = {
             "id": "container:tray-support",
@@ -577,15 +532,19 @@ class ScipProductSolverTests(unittest.TestCase):
         self.assertEqual(execution.invocation_count, 1)
         self.assertEqual(len(execution.placements), 1)
         placement = execution.placements[0]
-        self.assertAlmostEqual(
-            placement.origin_mm[2] + placement.world_size_mm[2],
-            problem.storage_height_mm,
-            places=3,
+        overlaps_xy = (
+            placement.origin_mm[0] < zone.origin_xy_mm[0] + zone.size_xy_mm[0]
+            and zone.origin_xy_mm[0]
+            < placement.origin_mm[0] + placement.world_size_mm[0]
+            and placement.origin_mm[1]
+            < zone.origin_xy_mm[1] + zone.size_xy_mm[1]
+            and zone.origin_xy_mm[1]
+            < placement.origin_mm[1] + placement.world_size_mm[1]
         )
-        self.assertLess(placement.origin_mm[0], zone.origin_xy_mm[0] + zone.size_xy_mm[0])
-        self.assertGreater(
-            placement.origin_mm[0] + placement.world_size_mm[0],
-            zone.origin_xy_mm[0],
+        self.assertTrue(
+            not overlaps_xy
+            or placement.origin_mm[2] + placement.world_size_mm[2]
+            <= zone.support_plane_z_mm,
         )
 
     def test_cp314_runtime_fails_closed_then_internal_solver_remains_available(self) -> None:

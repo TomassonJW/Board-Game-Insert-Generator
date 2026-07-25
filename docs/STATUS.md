@@ -1,5 +1,16 @@
 # Status
 
+## P64-L09S-A - etat autoritaire au 2026-07-25
+
+- Goal P64-L09S lance explicitement par Thomas.
+- ADR-0089 et perimetre composite borne acceptes.
+- Mission A terminee : enveloppes minimales XYZ inchangees et prismes superieurs reserves post-certifies.
+- Aucun conteneur ne grandit pour fabriquer un support ; un gap sous plateau est admis.
+- SCIP reste le solveur 3D complexe et interdit toute expansion Z.
+- Preuve autorisee : 804/804 tests, 1 test natif SCIP ignore, 72 tests interdits exclus.
+- Fusion non installee ; `fusion-validated=false` ; `print-validated=false`.
+- Prochaine mission : P64-L09S-B.
+
 Derniere mise a jour : 2026-07-25
 
 ## Etat global

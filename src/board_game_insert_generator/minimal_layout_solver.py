@@ -645,10 +645,7 @@ def _solve_minimal_layout_once(
             )
         elif external_execution.status == SCIP_STATUS_SOLUTION_FOUND:
             try:
-                external_placements = _compensate_required_top_reservations(
-                    external_execution.placements,
-                    certification_problem,
-                )
+                external_placements = external_execution.placements
                 external_spaces = _rebuild_empty_spaces(
                     external_placements,
                     certification_problem,
@@ -887,10 +884,6 @@ def _solve_minimal_layout_once(
                 if _deadline_has_expired(deadline_at_ms):
                     deadline_reached_after_lane = True
                     break
-                translated = _compensate_required_top_reservations(
-                    translated,
-                    certification_problem,
-                )
                 spaces = _rebuild_empty_spaces(
                     translated,
                     certification_problem,
@@ -2614,120 +2607,6 @@ def _translation_candidates(
         )
     return tuple(retained)
 
-
-def _compensate_required_top_reservations(
-    placements: tuple[Free3DPlacement, ...],
-    problem: Free3DPreparedProblem,
-) -> tuple[Free3DPlacement, ...]:
-    """Extend only unobstructed non-fixed bodies needed by a top reservation."""
-
-    if not problem.top_inset_zones:
-        return placements
-    result = list(placements)
-    participants = {
-        str(value["id"]): value for value in problem.participants
-    }
-    design_top = float(problem.storage_height_mm)
-    for zone in problem.top_inset_zones:
-        if any(
-            abs(value.origin_mm[2] + value.world_size_mm[2] - design_top)
-            <= 0.001
-            and _placement_zone_overlap_area(value, zone) > _EPSILON
-            for value in result
-        ):
-            continue
-        candidates: list[tuple[object, ...]] = []
-        for placement_index, placement in enumerate(result):
-            participant = participants[placement.participant_id]
-            modes = _mapping(participant["dimension_modes"])
-            if (
-                str(participant["role"]) != "container"
-                or str(modes["z"]) == "fixed"
-            ):
-                continue
-            overlap_area = _placement_zone_overlap_area(placement, zone)
-            if overlap_area <= _EPSILON:
-                continue
-            current_top = placement.origin_mm[2] + placement.world_size_mm[2]
-            compensated_height = design_top - placement.origin_mm[2]
-            if compensated_height <= placement.world_size_mm[2] + _EPSILON:
-                continue
-            if _top_extension_is_blocked(
-                placement_index, result, current_top
-            ):
-                continue
-            candidates.append(
-                (
-                    -overlap_area,
-                    -current_top,
-                    placement.participant_id,
-                    placement_index,
-                    compensated_height,
-                )
-            )
-        if not candidates:
-            continue
-        *_, placement_index, compensated_height = min(candidates)
-        selected = result[int(placement_index)]
-        world_size = selected.world_size_mm
-        local_size = selected.local_size_mm
-        result[int(placement_index)] = replace(
-            selected,
-            world_size_mm=(
-                world_size[0],
-                world_size[1],
-                _round(float(compensated_height)),
-            ),
-            local_size_mm=(
-                local_size[0],
-                local_size[1],
-                _round(float(compensated_height)),
-            ),
-        )
-    return tuple(result)
-
-
-def _placement_zone_overlap_area(
-    placement: Free3DPlacement,
-    zone: TopInsetZone,
-) -> float:
-    zone_origin = zone.origin_xy_mm
-    zone_size = zone.size_xy_mm
-    overlap_x = max(
-        0.0,
-        min(placement.origin_mm[0] + placement.world_size_mm[0], zone_origin[0] + zone_size[0])
-        - max(placement.origin_mm[0], zone_origin[0]),
-    )
-    overlap_y = max(
-        0.0,
-        min(placement.origin_mm[1] + placement.world_size_mm[1], zone_origin[1] + zone_size[1])
-        - max(placement.origin_mm[1], zone_origin[1]),
-    )
-    return overlap_x * overlap_y
-
-
-def _top_extension_is_blocked(
-    placement_index: int,
-    placements: Sequence[Free3DPlacement],
-    current_top: float,
-) -> bool:
-    placement = placements[placement_index]
-    for other_index, other in enumerate(placements):
-        if other_index == placement_index:
-            continue
-        if other.origin_mm[2] < current_top - _EPSILON:
-            continue
-        overlap_x = min(
-            placement.origin_mm[0] + placement.world_size_mm[0],
-            other.origin_mm[0] + other.world_size_mm[0],
-        ) - max(placement.origin_mm[0], other.origin_mm[0])
-        overlap_y = min(
-            placement.origin_mm[1] + placement.world_size_mm[1],
-            other.origin_mm[1] + other.world_size_mm[1],
-        ) - max(placement.origin_mm[1], other.origin_mm[1])
-        if overlap_x > _EPSILON and overlap_y > _EPSILON:
-            return True
-    return False
 
 def _rebuild_empty_spaces(
     placements: tuple[Free3DPlacement, ...],

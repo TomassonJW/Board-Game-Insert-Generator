@@ -405,10 +405,16 @@ def certify_partition_candidate(
         and all(_contract_preserves_cavity_wall_and_floor(item) for item in envelope_containers)
     )
     reservations_and_support = (
-        _text(top_insets.get("status")) in {"applied", "not_required"}
+        _text(top_insets.get("status"))
+        in {"applied", "not_required", "reserved_prisms_certified"}
         and not _mappings(top_insets.get("blockers"))
         and _text(stage_support.get("status")) == "supported"
-        and _text(top_support.get("status")) in {"supported_by_requested_bodies", "not_required"}
+        and _text(top_support.get("status"))
+        in {
+            "supported_by_requested_bodies",
+            "not_required",
+            "not_required_for_minimal_layout",
+        }
     )
     removal = _removal_sequence_is_complete(plan, placements)
     conservation = _conservation_is_complete(summary, _mapping(plan.get("validation")))
@@ -469,7 +475,7 @@ def certify_minimal_layout_candidate(
         for check in common.checks
     ) + (
         ValidationCheck(
-            "minimum_or_required_reservation_z_compensation",
+            "strict_minimum_envelopes",
             _placements_are_minimal(placements),
             "MINIMAL_ENVELOPE_EXPANDED",
         ),
@@ -505,30 +511,16 @@ def _placements_are_minimal(placements: list[dict[str, object]]) -> bool:
         expected_faces = {"left", "right", "front", "back", "below", "above"}
         if set(surplus) != expected_faces:
             return False
-        if any(abs(final[axis] - minimum[axis]) > _EPSILON for axis in ("x", "y")):
+        if any(abs(final[axis] - minimum[axis]) > _EPSILON for axis in ("x", "y", "z")):
             return False
         z_compensation = _number(
             placement.get("reservation_required_z_compensation_mm")
         )
-        actual_z_surplus = final["z"] - minimum["z"]
-        if z_compensation < -_EPSILON:
-            return False
-        if abs(actual_z_surplus - z_compensation) > _EPSILON:
+        if abs(z_compensation) > _EPSILON:
             return False
         if any(
             abs(_number(surplus.get(face))) > _EPSILON
-            for face in ("left", "right", "front", "back")
-        ):
-            return False
-        if abs(
-            _number(surplus.get("below"))
-            + _number(surplus.get("above"))
-            - z_compensation
-        ) > _EPSILON:
-            return False
-        if any(
-            _number(surplus.get(face)) < -_EPSILON
-            for face in ("below", "above")
+            for face in expected_faces
         ):
             return False
     return True

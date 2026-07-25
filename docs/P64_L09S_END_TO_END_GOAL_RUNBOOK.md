@@ -1,5 +1,13 @@
 # P64-L09S — Runbook du Goal de stabilisation de bout en bout
 
+## Avancement execution au 2026-07-25
+
+- Goal lance et ADR-0089 acceptee.
+- A terminee : aucune reservation ne fabrique un porteur.
+- Cas recent : corps 23,2 x 23,2 x 31,6 mm a Z 21,2 ; sommet 52,8 ; plan sous plateau 58,6 ; gap 5,8 mm.
+- Prochaine mission : B.
+- Aucun benchmark, holdout ou package Fusion installe.
+
 ## 1. Rôle et statut
 
 - Statut : `ready-for-user-goal-launch`, `done-documentation`.

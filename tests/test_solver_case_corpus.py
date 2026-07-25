@@ -274,20 +274,18 @@ class SolverCaseCorpusTests(unittest.TestCase):
         )
         self.assertEqual(
             report["functional_digest"],
-            "3fd467b7a2397810da999d81f52771c370e7ac3292504c4b2e20b2eac0a36086",
+            "1d67acd202997b7562d66f4992c1aeae77fcc0bfc36099abaa2595d3bba7d0e3",
         )
         self.assertTrue(report["summary"]["all_expectations_met"])
         self.assertEqual(report["summary"]["executed_case_count"], 5)
-        self.assertEqual(report["summary"]["solution_found_count"], 3)
-        self.assertEqual(report["summary"]["no_solution_within_budget_count"], 2)
+        self.assertEqual(report["summary"]["solution_found_count"], 2)
+        self.assertEqual(report["summary"]["no_solution_within_budget_count"], 3)
         improved = [
             value for value in report["cases"]
             if value["comparison"]["baseline_transition"]
             == "improved_to_solution"
         ]
-        self.assertEqual([value["case_id"] for value in improved], [
-            "localized-reservation-normal"
-        ])
+        self.assertEqual(improved, [])
         for result in report["cases"]:
             self.assertTrue(result["comparison"]["checks"]["lane_prefix_exact"])
             self.assertIn(

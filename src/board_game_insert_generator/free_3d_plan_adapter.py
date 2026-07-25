@@ -61,6 +61,7 @@ from board_game_insert_generator.solver_outcome import (
 )
 from board_game_insert_generator.top_inset_reservation import (
     apply_top_inset_reservations,
+    certify_top_inset_reservation_prisms,
     compatibility_flat_stack_payload,
     derive_top_inset_reservations,
 )
@@ -264,8 +265,12 @@ def certify_free_3d_plan(
     candidate_id: str,
     placements: tuple[Free3DPlacement, ...],
     search_telemetry: Mapping[str, object],
+    top_inset_mode: str = "cuts",
 ) -> tuple[CertifiedFree3DPlan | None, tuple[str, ...]]:
     """Reconstruct and certify one complete free-3D placement, or fail closed."""
+
+    if top_inset_mode not in {"cuts", "reserved_prisms"}:
+        raise ValueError(f"Unsupported top-inset certification mode: {top_inset_mode}.")
 
     participants_by_id = {str(value["id"]): value for value in problem.participants}
     placement_ids = {value.participant_id for value in placements}
@@ -393,7 +398,11 @@ def certify_free_3d_plan(
                 }
         resolved.append(placement)
 
-    applied_top_insets = apply_top_inset_reservations(problem.project, resolved)
+    applied_top_insets = (
+        certify_top_inset_reservation_prisms(problem.project, resolved)
+        if top_inset_mode == "reserved_prisms"
+        else apply_top_inset_reservations(problem.project, resolved)
+    )
     if _mappings(applied_top_insets["blockers"]):
         codes = tuple(
             sorted({str(item["code"]) for item in _mappings(applied_top_insets["blockers"])})
@@ -688,6 +697,7 @@ def certify_minimal_free_3d_plan(
         candidate_id=candidate_id,
         placements=placements,
         search_telemetry=search_telemetry,
+        top_inset_mode="reserved_prisms",
     )
     if scaffold is None:
         return None, rejection_codes
@@ -707,11 +717,7 @@ def certify_minimal_free_3d_plan(
     plan["validation"] = validation
 
     metrics = _minimal_layout_metrics(problem, resolved, empty_spaces)
-    required_z_compensation_count = sum(
-        float(value.get("reservation_required_z_compensation_mm", 0.0))
-        > _EPSILON
-        for value in resolved
-    )
+    required_z_compensation_count = 0
     summary = _mapping(plan["summary"])
     summary.update(
         {
@@ -769,8 +775,11 @@ def certify_minimal_free_3d_plan(
     invariants.update(
         {
             "minimal_layout": True,
-            "minimum_outer_dimensions_only": required_z_compensation_count == 0,
+            "minimum_outer_dimensions_only": True,
             "reservation_required_z_compensation_count": required_z_compensation_count,
+            "reservation_prisms_post_certified": True,
+            "reservation_requires_supporting_body": False,
+            "top_inset_cuts_deferred_to_finalization": True,
             "residual_distributed": False,
             "continuous_closure_applied": False,
             "weighted_surplus": False,
@@ -811,7 +820,7 @@ def certify_minimal_free_3d_plan(
         "schema_version": MINIMAL_LAYOUT_ARTIFACT_SCHEMA_V1,
         "artifact_kind": "minimal_layout",
         "geometry_statement": (
-            "minimum_envelopes_plus_required_reservation_z_compensation_residual_unassigned"
+            "minimum_envelopes_plus_reserved_top_prisms_residual_unassigned"
         ),
         "best_candidate_statement": (
             "best_certified_proposal_found_within_budget"

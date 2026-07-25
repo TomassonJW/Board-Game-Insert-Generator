@@ -833,26 +833,16 @@ def _legacy_top_inset_option_allowed(
     storage_height_mm: float,
     zones: tuple[TopInsetZone, ...],
 ) -> bool:
-    """Keep the validated H01 search ordering as a portfolio baseline."""
+    """Keep legacy ordering while enforcing the current reserved-prism rule."""
 
-    body_top = origin[2] + world_size[2]
-    minimum_height = _minimum_local(participant)[2]
-    z_mode = str(_mapping(participant["dimension_modes"])["z"])
-    for zone in zones:
-        if not (
-            origin[0] < zone.origin_xy_mm[0] + zone.size_xy_mm[0] - _EPSILON
-            and zone.origin_xy_mm[0] < origin[0] + world_size[0] - _EPSILON
-            and origin[1] < zone.origin_xy_mm[1] + zone.size_xy_mm[1] - _EPSILON
-            and zone.origin_xy_mm[1] < origin[1] + world_size[1] - _EPSILON
-        ):
-            continue
-        if body_top <= zone.support_plane_z_mm + _EPSILON:
-            continue
-        if storage_height_mm - origin[2] + _EPSILON < minimum_height + zone.inset_depth_mm:
-            return False
-        if z_mode == "fixed" and abs(body_top - storage_height_mm) > 0.001:
-            return False
-    return True
+    return _top_inset_option_allowed(
+        participant,
+        origin,
+        world_size,
+        0,
+        storage_height_mm,
+        zones,
+    )
 
 
 def _solution(

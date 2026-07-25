@@ -1,5 +1,14 @@
 # Backlog
 
+## Avancement P64-L09S
+
+- P64-L09S-A : `completed`.
+- P64-L09S-B : `ready`.
+- P64-L09S-C a F : attente sequentielle.
+- P64-L09S-V : gate Fusion humaine.
+
+Cette section remplace les anciens statuts de preparation plus bas.
+
 Derniere mise a jour : 2026-07-22
 
 Le backlog transforme la North Star en missions atomiques. Voir

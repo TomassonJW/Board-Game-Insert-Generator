@@ -1,5 +1,13 @@
 # Next Actions
 
+## Prochaine mission autoritaire - P64-L09S-B
+
+P64-L09S-A est terminee. Toute mention plus bas indiquant un Goal non lance est un historique de preparation.
+
+- P64-L09S-B : verite du cycle, budgets reactifs et couleurs.
+- Aucun nouveau GO requis.
+- Aucun benchmark ou holdout. Aucune installation Fusion avant V.
+
 Dernière mise à jour : 2026-07-25
 
 ## Version active

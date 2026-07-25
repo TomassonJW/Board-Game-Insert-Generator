@@ -112,7 +112,7 @@ class Free3DGreedySolverTests(unittest.TestCase):
                 self.assertTrue(execution.geometry_admission.admitted)
                 self.assertEqual(execution.geometry_admission.rejection_codes, ())
 
-    def test_top_inset_boundaries_are_seeded_and_only_overlapping_cavities_add_depth(self) -> None:
+    def test_top_inset_boundaries_are_seeded_and_upper_prism_rejects_any_overlap(self) -> None:
         spaces = (EmptySpace((0.6, 0.6, 0.0), (248.8, 178.8, 69.8)),)
         seed_zone = TopInsetZone((9.4, 9.4), (116.2, 111.2), 60.8, 9.0)
         points = _initial_extreme_points(spaces, (seed_zone,))
@@ -131,7 +131,7 @@ class Free3DGreedySolverTests(unittest.TestCase):
         }
         clear_solid_zone = TopInsetZone((60.0, 60.0), (10.0, 10.0), 60.0, 9.0)
         overlapping_cavity_zone = TopInsetZone((10.0, 10.0), (10.0, 10.0), 60.0, 9.0)
-        self.assertTrue(
+        self.assertFalse(
             _top_inset_option_allowed(
                 participant, (0.0, 0.0, 0.0), (80.0, 80.0, 65.0), 0, 69.8, (clear_solid_zone,)
             )

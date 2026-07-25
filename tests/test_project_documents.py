@@ -55,6 +55,7 @@ REQUIRED_PROJECT_FILES = (
     "docs/DECISIONS/ADR-0089-reservations-minimales-et-fermeture-globale-composee.md",
     "docs/P64_L09R_CALCUL_FINITION_PROGRESS_CONTRACT.md",
     "docs/P64_L09R_V_0165_HUMAN_KO_EVIDENCE.md",
+    "docs/P64_L09S_A_MINIMAL_RESERVATION_EVIDENCE.md",
     "docs/P64_L09S_END_TO_END_GOAL_RUNBOOK.md",
     "docs/P64_L06C_OFFLINE_ADAPTER_AND_EXACT_ORACLE_CONTRACT.md",
     "docs/P64_L06C_OFFLINE_ADAPTER_AND_EXACT_ORACLE_EVIDENCE.md",
@@ -634,6 +635,28 @@ class ProjectDocumentsTests(unittest.TestCase):
         if missing_sections:
             self.fail("Sections de pilotage manquantes: " + "; ".join(missing_sections))
 
+
+
+
+class P64L09SADocumentEvidenceTests(unittest.TestCase):
+    def test_minimal_reservation_evidence_is_guarded(self) -> None:
+        from pathlib import Path
+
+        evidence = (
+            Path(__file__).resolve().parents[1]
+            / "docs"
+            / "P64_L09S_A_MINIMAL_RESERVATION_EVIDENCE.md"
+        ).read_text(encoding="utf-8")
+        for marker in (
+            "mission: P64-L09S-A",
+            "status: implemented-and-tested",
+            "reserved_prisms_certified",
+            "not_required_for_minimal_layout",
+            "gap_below_tray_mm: 5.8",
+            "authorized_suite: 804/804",
+            "print-validated=false",
+        ):
+            self.assertIn(marker, evidence)
 
 if __name__ == "__main__":
     unittest.main()

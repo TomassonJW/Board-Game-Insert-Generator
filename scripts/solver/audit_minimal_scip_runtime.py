@@ -258,7 +258,7 @@ def audit_worker(path: Path) -> dict[str, object]:
             "disjoint_regions",
             "access_precedence",
             "local_variant_selection",
-            "localized_top_inset_support",
+            "localized_top_inset_reserved_prism",
         ],
     }
 

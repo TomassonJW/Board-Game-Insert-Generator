@@ -1,5 +1,9 @@
 # P64-A02 — Programme de calcul étagé et finalisation explicite
 
+## Mise en oeuvre P64-L09S-A
+
+Le calcul minimal conserve exactement les enveloppes minimales. Les plateaux et livrets sont des prismes superieurs interdits post-certifies. Les encoches restent une responsabilite de la finition C a E.
+
 Statut : architecture amendée ; P64-L01, P64-L02 et P64-L03 restent validés
 automatiquement pour leurs acquis. P64-L03V est un KO contextuel sur Fusion
 0.1.56. ADR-0074 et P64-L03R-A corrigent la frontière minimal/final ;

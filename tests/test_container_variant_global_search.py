@@ -116,7 +116,7 @@ class ContainerVariantGlobalSearchTests(unittest.TestCase):
         self.assertTrue(payload["global_certificate"]["certified"])
         json.dumps(payload, sort_keys=True)
 
-    def test_localized_top_inset_is_decided_by_global_variant_certificate(self) -> None:
+    def test_localized_top_reservation_rejects_full_height_variants(self) -> None:
         project = localized_variant_compatibility_project()
         frontier = derive_container_internal_variant_frontiers(
             project,
@@ -132,20 +132,13 @@ class ContainerVariantGlobalSearchTests(unittest.TestCase):
             effort_profile=EFFORT_NORMAL,
         )
 
-        self.assertEqual(execution.status, SOLUTION_FOUND)
+        self.assertEqual(execution.status, NO_SOLUTION_WITHIN_BUDGET)
         self.assertIsNotNone(execution.container_variant_search)
-        quick_lane = execution.container_variant_search.lane_reports[0]
-        self.assertEqual(quick_lane.status, NO_SOLUTION_WITHIN_BUDGET)
         self.assertEqual(
-            quick_lane.stop_reason,
-            "variant_geometry_not_common_certified",
+            execution.container_variant_search.lane_reports[0].status,
+            NO_SOLUTION_WITHIN_BUDGET,
         )
-        selected = execution.container_variant_search.candidates[0]
-        self.assertEqual(len(selected.selected_container_variants), 1)
-        self.assertFalse(selected.selected_container_variants[0].canonical)
-        self.assertTrue(
-            selected.container_variant_global_certificate.certified
-        )
+
     def test_normal_replays_quick_lane_with_identical_trace_prefix(self) -> None:
         project = multi_container_variant_dead_end_project()
         quick = run_container_variant_global_search(

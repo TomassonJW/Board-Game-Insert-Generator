@@ -1,9 +1,12 @@
 # ADR-0089 — Réservations minimales et fermeture globale composée
 
+## Acceptation et premiere mise en oeuvre
+
+Thomas a lance explicitement P64-L09S le 2026-07-25. Ce lancement accepte cette ADR et le perimetre composite borne. La mission A applique les enveloppes minimales inchangees, les prismes superieurs reserves et aucune croissance de support.
+
 ## Statut
 
-Proposée, prête à être acceptée par le lancement explicite du Goal P64-L09S.
-
+Acceptee par lancement humain du Goal P64-L09S le 2026-07-25.
 ## Date
 
 2026-07-25.

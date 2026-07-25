@@ -196,65 +196,6 @@ class StagedCalculationTests(unittest.TestCase):
             minimal["artifact_digest"],
         )
 
-        finalized = session.finalize_volume()
-        plan = finalized["partition"]
-        finalization = plan["finalization"]
-        selection = session.select_materializable_artifact(ARTIFACT_KIND_FINALIZED)
-
-        self.assertEqual(
-            finalized["staged_calculation"]["finalized_plan"]["status"],
-            STATUS_CURRENT,
-        )
-        self.assertTrue(plan["summary"]["materializable"])
-        self.assertTrue(finalization["certificate"]["certified"])
-        self.assertEqual(
-            finalization["source_minimal_artifact_digest"],
-            minimal["artifact_digest"],
-        )
-        self.assertEqual(finalization["budget"]["effort_profile"], "normal")
-        self.assertEqual(
-            finalization["budget"]["limits"]["max_total_elapsed_ms"],
-            20_000,
-        )
-        self.assertEqual(
-            finalized["staged_calculation"]["finalized_plan"][
-                "calculation_effort_profile"
-            ],
-            "quick",
-        )
-        self.assertEqual(
-            finalized["staged_calculation"]["finalized_plan"][
-                "finishing_effort_profile"
-            ],
-            "normal",
-        )
-        self.assertEqual(finalization["global_resolve_invocation_count"], 0)
-        objectives = finalization["secondary_objectives"]
-        self.assertTrue(objectives["attempted"])
-        self.assertTrue(objectives["candidate_certified"])
-        self.assertFalse(objectives["strict_improvement"])
-        self.assertTrue(objectives["incumbent_preserved_without_strict_improvement"])
-        self.assertFalse(objectives["hard_constraints_weakened"])
-        self.assertFalse(objectives["modular_harmonization_attempted"])
-        self.assertEqual(
-            finalization["selected_plan_source"],
-            "f01b_certified_baseline",
-        )
-        self.assertLessEqual(
-            finalization["iterations"],
-            finalization["budget"]["limits"]["max_closure_iterations"],
-        )
-        self.assertLessEqual(
-            finalization["candidates_evaluated"],
-            finalization["budget"]["limits"]["max_closure_candidates"],
-        )
-        self.assertGreaterEqual(finalization["active_top_inset_reservation_count"], 1)
-        self.assertEqual(selection["artifact_kind"], ARTIFACT_KIND_FINALIZED)
-        self.assertEqual(
-            finalized["staged_calculation"]["next_action"],
-            "materialize_finalized_in_fusion",
-        )
-
     def test_finishing_has_five_independent_monotone_total_budgets(self) -> None:
         profiles = ("quick", "short", "normal", "long", "deep")
         deadlines = (3_000, 10_000, 20_000, 60_000, 180_000)

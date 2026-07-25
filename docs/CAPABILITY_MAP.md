@@ -1,5 +1,13 @@
 # Capability Map
 
+## Mise a jour P64-L09S-A
+
+- Calcul minimal sans support artificiel : `implemente`.
+- Certificat : `reserved_prisms_certified`.
+- Support minimal : `not_required_for_minimal_layout`.
+- Encoches differees a la finition.
+- C a V restent a realiser.
+
 ## Objectif
 
 Ce document relie la North Star aux missions executables. Il evite que Codex

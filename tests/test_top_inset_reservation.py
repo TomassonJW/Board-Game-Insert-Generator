@@ -9,6 +9,7 @@ from board_game_insert_generator.top_inset_reservation import (
     TOP_INSET_CUT_KIND,
     TOP_INSET_RESERVATION_SCHEMA_V1,
     apply_top_inset_reservations,
+    certify_top_inset_reservation_prisms,
     derive_top_inset_reservations,
 )
 
@@ -192,6 +193,46 @@ class TopInsetReservationTests(unittest.TestCase):
 
         self.assertEqual(base, original)
         self.assertEqual(first, second)
+
+
+    def test_recent_limit_case_keeps_31_6_mm_body_and_allows_gap_under_tray(self) -> None:
+        value = project()
+        value["box"] = {
+            "inner_dimensions_mm": {"x": 200.0, "y": 150.0, "z": 60.0},
+            "usable_height_mm": 59.6,
+            "lid_clearance_mm": 0.4,
+        }
+        value["flat_items"] = [
+            flat(
+                "tray",
+                x=100.0,
+                y=80.0,
+                z=1.0,
+                origin={"x": 10.0, "y": 10.0},
+            )
+        ]
+        placements = [
+            {
+                "id": "container:018",
+                "name": "Conteneur limite",
+                "origin_mm": {"x": 20.0, "y": 20.0, "z": 21.2},
+                "world_size_mm": {"x": 23.2, "y": 23.2, "z": 31.6},
+            }
+        ]
+
+        result = certify_top_inset_reservation_prisms(value, placements)
+
+        self.assertEqual(result["status"], "reserved_prisms_certified")
+        self.assertEqual(result["placements"][0]["world_size_mm"]["z"], 31.6)
+        self.assertNotEqual(result["placements"][0]["world_size_mm"]["z"], 38.4)
+        support_plane = result["reserved_prisms"][0]["origin_mm"]["z"]
+        body_top = 21.2 + result["placements"][0]["world_size_mm"]["z"]
+        self.assertAlmostEqual(support_plane - body_top, 5.8)
+        self.assertTrue(result["reservation_certificates"][0]["certified"])
+        self.assertEqual(
+            result["support"]["status"],
+            "not_required_for_minimal_layout",
+        )
 
 
 if __name__ == "__main__":

@@ -110,6 +110,148 @@ def derive_top_inset_reservations(raw_project: object) -> dict[str, object]:
     }
 
 
+def certify_top_inset_reservation_prisms(
+    raw_project: object,
+    placements: list[dict[str, object]],
+) -> dict[str, object]:
+    """Post-certify reserved top prisms without manufacturing support.
+
+    Minimal calculation keeps every requested body at its certified minimum
+    envelope. Flat items occupy explicit upper prisms; a body may touch the
+    lower plane of a prism but may not enter it. Cuts and cavity compensation
+    are deliberately deferred to finalization.
+    """
+
+    plan = derive_top_inset_reservations(raw_project)
+    result_placements = deepcopy(placements)
+    for placement in result_placements:
+        placement["top_inset_cuts"] = []
+
+    blockers = [deepcopy(item) for item in _mappings(plan["blockers"])]
+    design_top = float(plan["design_top_z_mm"])
+    reserved_prisms: list[dict[str, object]] = []
+    certificates: list[dict[str, object]] = []
+
+    for reservation in _mappings(plan["reservations"]):
+        origin_xy = _xy(reservation["cut_origin_mm"])
+        size_xy = _xy(reservation["cut_size_mm"])
+        support_plane = float(reservation["support_plane_z_mm"])
+        prism_height = design_top - support_plane
+        colliding_ids: list[str] = []
+        footprint = _xy_rect(reservation["cut_origin_mm"], reservation["cut_size_mm"])
+
+        for placement in result_placements:
+            body_origin = _dimension(placement["origin_mm"])
+            body_size = _dimension(placement["world_size_mm"])
+            body_rect = {
+                "x": body_origin["x"],
+                "y": body_origin["y"],
+                "width": body_size["x"],
+                "height": body_size["y"],
+            }
+            if (
+                _intersection(body_rect, footprint) is not None
+                and body_origin["z"] < design_top - _EPSILON
+                and support_plane < body_origin["z"] + body_size["z"] - _EPSILON
+            ):
+                colliding_ids.append(str(placement["id"]))
+
+        prism = {
+            "id": f"reserved-prism:{reservation['id']}",
+            "reservation_id": reservation["id"],
+            "flat_item_id": reservation["flat_item_id"],
+            "origin_mm": {
+                "x": _round(origin_xy["x"]),
+                "y": _round(origin_xy["y"]),
+                "z": _round(support_plane),
+            },
+            "size_mm": {
+                "x": _round(size_xy["x"]),
+                "y": _round(size_xy["y"]),
+                "z": _round(prism_height),
+            },
+            "printable": False,
+            "semantics": "flat_item_reserved_volume",
+        }
+        reserved_prisms.append(prism)
+        certificates.append(
+            {
+                "reservation_id": reservation["id"],
+                "flat_item_id": reservation["flat_item_id"],
+                "reserved_prism_id": prism["id"],
+                "collision_count": len(colliding_ids),
+                "colliding_placement_ids": colliding_ids,
+                "certified": not colliding_ids,
+                "support_required": False,
+            }
+        )
+        if colliding_ids:
+            blockers.append(
+                _blocker(
+                    "TOP_INSET_RESERVED_PRISM_COLLISION",
+                    f"Le prisme reserve pour '{reservation['name']}' est traverse par "
+                    f"{', '.join(colliding_ids)}.",
+                    "Place le corps hors du prisme ou sous son plan inferieur sans l allonger.",
+                    str(reservation["flat_item_id"]),
+                )
+            )
+
+    status = (
+        "blocked"
+        if blockers
+        else ("not_required" if not reserved_prisms else "reserved_prisms_certified")
+    )
+    return {
+        **deepcopy(plan),
+        "status": status,
+        "placements": result_placements,
+        "cuts": [],
+        "supports": [],
+        "reserved_prisms": reserved_prisms,
+        "reservation_certificates": certificates,
+        "cavity_depth_compensations": [],
+        "support": {
+            "status": (
+                "blocked"
+                if blockers
+                else (
+                    "not_required"
+                    if not reserved_prisms
+                    else "not_required_for_minimal_layout"
+                )
+            ),
+            "top_support_count": 0,
+            "coverage_ratio": 0.0 if reserved_prisms else 1.0,
+            "reservations": [],
+            "note": (
+                "Le calcul minimal reserve les prismes des elements plats sans "
+                "fabriquer de corps porteur. Les encoches appartiennent a la finition."
+            ),
+        },
+        "blockers": blockers,
+        "warnings": [],
+        "summary": {
+            **deepcopy(_mapping(plan["summary"])),
+            "status": status,
+            "cut_count": 0,
+            "support_count": 0,
+            "reserved_prism_count": len(reserved_prisms),
+            "certified_reserved_prism_count": sum(
+                int(bool(item["certified"])) for item in certificates
+            ),
+            "cavity_depth_compensation_count": 0,
+            "maximum_cavity_depth_compensation_mm": 0.0,
+        },
+        "invariants": {
+            **deepcopy(_mapping(plan["invariants"])),
+            "reservation_prisms_post_certified": not blockers,
+            "reservation_requires_supporting_body": False,
+            "top_inset_cuts_deferred_to_finalization": True,
+            "container_envelopes_unchanged": True,
+        },
+    }
+
+
 def apply_top_inset_reservations(
     raw_project: object,
     placements: list[dict[str, object]],

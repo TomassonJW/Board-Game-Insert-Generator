@@ -36,7 +36,7 @@ def multi_container_variant_dead_end_project() -> dict[str, object]:
 
 
 def localized_variant_compatibility_project() -> dict[str, object]:
-    """A top inset rejects the canonical cavity position, not every relayout."""
+    """A full-height envelope cannot intersect a reserved upper prism."""
 
     project = multi_cavity_tradeoff_project()
     project["project_name"] = "P64-V2H03C localized variant compatibility"

@@ -580,27 +580,9 @@ def _top_inset_option_allowed(
     storage_height_mm: float,
     zones: tuple[TopInsetZone, ...],
 ) -> bool:
-    """Apply top cuts only to cavities that their XY footprint intersects.
-
-    The final reservation validator compensates the depth of overlapping
-    cavities, not the deepest cavity anywhere in the container.  Search must
-    use the same localized lower bound or a cut above solid material can
-    falsely route an otherwise feasible tall body out of the reservation.
-    """
+    """Keep minimum bodies outside every reserved upper prism."""
 
     body_top = origin[2] + world_size[2]
-    minimum_local = _minimum_local(participant)
-    minimum_height = minimum_local[2]
-    z_mode = str(_mapping(participant["dimension_modes"])["z"])
-    hint_value = participant.get("top_inset_search_hint_v1")
-    hint = hint_value if isinstance(hint_value, dict) else {}
-    floor_thickness = float(hint.get("floor_thickness_mm", 0.0))
-    cavities_value = hint.get("cavities", [])
-    cavities = cavities_value if isinstance(cavities_value, list) else []
-    final_local_x = world_size[1] if rotation_deg_z == 90 else world_size[0]
-    final_local_y = world_size[0] if rotation_deg_z == 90 else world_size[1]
-    minimum_origin_x = max(0.0, final_local_x - minimum_local[0]) / 2.0
-    minimum_origin_y = max(0.0, final_local_y - minimum_local[1]) / 2.0
     for zone in zones:
         zone_rect = (
             zone.origin_xy_mm[0],
@@ -609,47 +591,10 @@ def _top_inset_option_allowed(
             zone.size_xy_mm[1],
         )
         body_rect = (origin[0], origin[1], world_size[0], world_size[1])
-        if not _xy_rectangles_overlap(body_rect, zone_rect):
-            continue
-        if body_top <= zone.support_plane_z_mm + _EPSILON:
-            continue
-        if z_mode == "fixed" and abs(body_top - storage_height_mm) > 0.001:
-            return False
-        required_height = max(
-            minimum_height,
-            floor_thickness + zone.inset_depth_mm,
-        )
-        for cavity_value in cavities:
-            if not isinstance(cavity_value, dict):
-                continue
-            cavity_origin = _mapping(cavity_value["local_origin_mm"])
-            cavity_size = _mapping(cavity_value["inner_dimensions_mm"])
-            local_x = minimum_origin_x + float(cavity_origin["x"])
-            local_y = minimum_origin_y + float(cavity_origin["y"])
-            size_x = float(cavity_size["x"])
-            size_y = float(cavity_size["y"])
-            if rotation_deg_z == 90:
-                cavity_rect = (
-                    origin[0] + final_local_y - local_y - size_y,
-                    origin[1] + local_x,
-                    size_y,
-                    size_x,
-                )
-            else:
-                cavity_rect = (
-                    origin[0] + local_x,
-                    origin[1] + local_y,
-                    size_x,
-                    size_y,
-                )
-            if _xy_rectangles_overlap(cavity_rect, zone_rect):
-                required_height = max(
-                    required_height,
-                    floor_thickness
-                    + float(cavity_size["z"])
-                    + zone.inset_depth_mm,
-                )
-        if storage_height_mm - origin[2] + _EPSILON < required_height:
+        if (
+            _xy_rectangles_overlap(body_rect, zone_rect)
+            and body_top > zone.support_plane_z_mm + _EPSILON
+        ):
             return False
     return True
 

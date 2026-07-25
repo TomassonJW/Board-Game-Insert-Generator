@@ -427,9 +427,12 @@ class MinimalLayoutSolverTests(unittest.TestCase):
             SOLUTION_FOUND,
         )
         self.assertTrue(plan["summary"]["materializable"])
-        self.assertEqual(plan["top_inset_reservations"]["status"], "applied")
+        self.assertEqual(
+            plan["top_inset_reservations"]["status"],
+            "reserved_prisms_certified",
+        )
         self.assertNotIn(
-            "TOP_INSET_WITHOUT_SUPPORTING_BODY",
+            "TOP_INSET_RESERVED_PRISM_COLLISION",
             {value["code"] for value in plan["diagnostics"]},
         )
         self.assertTrue(
@@ -445,10 +448,15 @@ class MinimalLayoutSolverTests(unittest.TestCase):
         )
         self.assertGreater(bridge["anchor_point_count"], 0)
         self.assertEqual(len(plan["placements"]), 1)
-        self.assertGreater(
-            plan["placements"][0]["reservation_required_z_compensation_mm"],
-            0.0,
+        placement = plan["placements"][0]
+        self.assertEqual(
+            placement["final_outer_dimensions_mm"],
+            placement["minimum_outer_envelope_mm"],
         )
+        self.assertNotIn("reservation_required_z_compensation_mm", placement)
+        self.assertTrue(plan["invariants"]["minimum_outer_dimensions_only"])
+        self.assertTrue(plan["invariants"]["reservation_prisms_post_certified"])
+        self.assertFalse(plan["top_inset_reservations"]["cuts"])
 
     def test_dense_11_by_34_case_stays_bounded_and_truthful(self) -> None:
         plan = solve_minimal_layout(

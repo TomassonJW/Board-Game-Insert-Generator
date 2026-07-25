@@ -33,7 +33,7 @@ SCIP_PRODUCT_SOPLEX_VERSION = "8.0.2"
 SCIP_PRODUCT_NUMPY_VERSION = "2.5.1"
 SCIP_PRODUCT_FAMILY = "constraint_integer_programming"
 SCIP_PRODUCT_MODEL = "integer_xyz_support_then_bounded_exact_top_inset_z_compensation"
-SCIP_PRODUCT_ARTIFACT_DIGEST = "2c2f58bdea37efc6a9172e641f3e348997d7c76152358780b8a69bf277abac9c"
+SCIP_PRODUCT_ARTIFACT_DIGEST = "be3b02bfe9591c72b7a25367e4b55aae8b08462ba543eff9a70d552229aff54a"
 SCIP_PRODUCT_ARCHIVE_SHA256 = "0a718ea5884d6326d66777db0ab853a31fa981e6392b89f184342fde27d465c6"
 
 STATUS_NOT_CONFIGURED = "not_configured"
@@ -447,8 +447,8 @@ def _prepare_product_problem(
                         "allowed_rotations": rotations,
                         **(
                             {
-                                "top_inset_support_profiles": {
-                                    orientation: _top_inset_support_profile(
+                                "top_inset_reservation_profiles": {
+                                    orientation: _top_inset_reservation_profile(
                                         option,
                                         orientation,
                                     )
@@ -460,13 +460,6 @@ def _prepare_product_problem(
                         ),
                     }
                 )
-            dimension_modes = participant.get("dimension_modes")
-            expandable_z = bool(
-                top_inset_zones
-                and participant.get("role") == "container"
-                and isinstance(dimension_modes, Mapping)
-                and str(dimension_modes.get("z")) != "fixed"
-            )
             worker_participants.append(
                 {
                     "participant_id": participant_id,
@@ -474,7 +467,7 @@ def _prepare_product_problem(
                     "variants": worker_variants,
                     "minimum_support_count": 1,
                     "ground_allowed": True,
-                    "expandable_z": expandable_z,
+                    "expandable_z": False,
                 }
             )
     except (KeyError, TypeError, ValueError, OverflowError):
@@ -487,7 +480,7 @@ def _prepare_product_problem(
         "rotations",
     ]
     if top_inset_zones:
-        active_constraints.append("top_inset_support")
+        active_constraints.append("upper_reservation")
     if len(worker_participants) >= 24:
         active_constraints.append("high_container_cardinality")
     payload: dict[str, object] = {
@@ -647,45 +640,17 @@ def _worker_top_inset_zones(
     return result
 
 
-def _top_inset_support_profile(
+def _top_inset_reservation_profile(
     option: _ProductOption,
     orientation: str,
 ) -> dict[str, object]:
     local_x, local_y, local_z = option.local_size_mm
-    minimum_x, minimum_y, _ = option.minimum_local_size_mm
-    offset_x = max(0.0, local_x - minimum_x) / 2.0
-    offset_y = max(0.0, local_y - minimum_y) / 2.0
-    cavities = []
-    for cavity_x, cavity_y, size_x, size_y, size_z in option.cavities:
-        local_cavity_x = offset_x + cavity_x
-        local_cavity_y = offset_y + cavity_y
-        if orientation == "yxz":
-            origin_xy = (
-                local_y - local_cavity_y - size_y,
-                local_cavity_x,
-            )
-            size_xy = (size_y, size_x)
-            physical_size = (local_y, local_x, local_z)
-        else:
-            origin_xy = (local_cavity_x, local_cavity_y)
-            size_xy = (size_x, size_y)
-            physical_size = (local_x, local_y, local_z)
-        cavities.append(
-            {
-                "origin_xy": [_scaled_exact(value) for value in origin_xy],
-                "size_xy": [_scaled_exact(value) for value in size_xy],
-                "depth": _scaled_exact(size_z),
-            }
-        )
-    if orientation == "yxz":
-        physical_size = (local_y, local_x, local_z)
-    else:
-        physical_size = (local_x, local_y, local_z)
-    return {
-        "physical_size": [_scaled_exact(value) for value in physical_size],
-        "minimum_floor": _scaled_exact(option.floor_thickness_mm),
-        "cavities": cavities,
-    }
+    physical_size = (
+        (local_y, local_x, local_z)
+        if orientation == "yxz"
+        else (local_x, local_y, local_z)
+    )
+    return {"physical_size": [_scaled_exact(value) for value in physical_size]}
 
 
 def _dimension_tuple(value: object) -> tuple[float, float, float]:
@@ -749,8 +714,6 @@ def _invoke_worker(
     prepared: _PreparedProductProblem,
     limits: ScipProductLimits,
 ) -> dict[str, object]:
-    if prepared.payload.get("top_inset_zones"):
-        return _invoke_worker_with_top_inset_compensation(prepared, limits)
     deferred_ids = _hybrid_deferred_participant_ids(prepared)
     if not deferred_ids:
         output = _invoke_worker_once(prepared, limits)
@@ -802,316 +765,6 @@ def _invoke_worker(
     )
     return _rebind_worker_output(output, prepared, limits)
 
-
-def _invoke_worker_with_top_inset_compensation(
-    prepared: _PreparedProductProblem,
-    limits: ScipProductLimits,
-) -> dict[str, object]:
-    started = perf_counter()
-    base = _prepared_without_top_insets(prepared)
-    output = _invoke_worker_once(base, limits)
-    if output.get("status") == "feasible":
-        compensated = _apply_required_top_inset_z_compensation(
-            output.get("placements"),
-            prepared,
-        )
-        if compensated is not None:
-            output["placements"] = compensated
-            output["engine_status"] = (
-                f"{output.get('engine_status', '')}+required_z_compensation"
-            )
-            output["worker_invocation_count"] = 1
-            return _rebind_worker_output(output, prepared, limits)
-    remaining = limits.wall_seconds - (perf_counter() - started)
-    if remaining < 0.1:
-        output.update(
-            {
-                "status": "unknown",
-                "proof_status": "bounded",
-                "engine_status": "top_inset_compensation_budget_exhausted",
-                "placements": [],
-                "worker_invocation_count": 1,
-            }
-        )
-        return _rebind_worker_output(output, prepared, limits)
-    fallback = _invoke_worker_once(
-        prepared,
-        replace(limits, wall_seconds=remaining),
-    )
-    fallback["worker_invocation_count"] = 2
-    return _rebind_worker_output(fallback, prepared, limits)
-
-
-def _prepared_without_top_insets(
-    prepared: _PreparedProductProblem,
-) -> _PreparedProductProblem:
-    payload = deepcopy(prepared.payload)
-    payload.pop("top_inset_zones", None)
-    payload.pop("box_origin_xy", None)
-    payload["active_constraints"] = [
-        value
-        for value in payload.get("active_constraints", [])
-        if value != "top_inset_support"
-    ]
-    for participant in payload.get("participants", []):
-        participant["expandable_z"] = False
-    payload.pop("problem_digest", None)
-    payload["problem_digest"] = canonical_digest(payload)
-    return replace(
-        prepared,
-        payload=payload,
-        problem_digest=str(payload["problem_digest"]),
-    )
-
-
-def _apply_required_top_inset_z_compensation(
-    raw_placements: object,
-    prepared: _PreparedProductProblem,
-) -> list[dict[str, object]] | None:
-    if not isinstance(raw_placements, list):
-        return None
-    placements = [dict(value) for value in raw_placements if isinstance(value, Mapping)]
-    if len(placements) != len(raw_placements):
-        return None
-    payload_participants = prepared.payload.get("participants")
-    zones = prepared.payload.get("top_inset_zones")
-    box_origin = prepared.payload.get("box_origin_xy")
-    if (
-        not isinstance(payload_participants, list)
-        or not isinstance(zones, list)
-        or not isinstance(box_origin, list)
-        or len(box_origin) != 2
-    ):
-        return None
-    participants_by_id = {
-        str(value["participant_id"]): value
-        for value in payload_participants
-        if isinstance(value, Mapping)
-    }
-    for zone in zones:
-        if not isinstance(zone, Mapping):
-            return None
-        zone_x = int(zone["origin_xy"][0]) - int(box_origin[0])
-        zone_y = int(zone["origin_xy"][1]) - int(box_origin[1])
-        zone_width, zone_depth = (int(value) for value in zone["size_xy"])
-        design_top = int(zone["design_top_z"])
-        inset_depth = int(zone["inset_depth"])
-        candidates: list[tuple[int, int, str, dict[str, object], int]] = []
-        already_supported = False
-        for placement in placements:
-            participant_id = str(placement.get("participant_id", ""))
-            participant = participants_by_id.get(participant_id)
-            if participant is None:
-                return None
-            profile = _raw_top_inset_profile(placement, participant)
-            if profile is None:
-                return None
-            physical_width, physical_depth, minimum_physical_height = (
-                int(value) for value in profile["physical_size"]
-            )
-            raw_size = placement.get("size")
-            if not isinstance(raw_size, list) or len(raw_size) != 3:
-                return None
-            padding_z = int(raw_size[2]) - minimum_physical_height
-            x = int(placement["x"])
-            y = int(placement["y"])
-            z = int(placement["z"])
-            if not _raw_xy_overlaps(
-                x,
-                y,
-                physical_width,
-                physical_depth,
-                zone_x,
-                zone_y,
-                zone_width,
-                zone_depth,
-            ):
-                continue
-            physical_top = z + int(raw_size[2]) - padding_z
-            if physical_top == design_top:
-                minimum_floor = int(profile["minimum_floor"])
-                if (
-                    int(raw_size[2]) - padding_z < minimum_floor + inset_depth
-                    or not _raw_cavities_are_safe_for_top_inset(
-                        profile,
-                        x,
-                        y,
-                        zone_x,
-                        zone_y,
-                        zone_width,
-                        zone_depth,
-                        int(raw_size[2]) - padding_z,
-                        inset_depth,
-                    )
-                ):
-                    return None
-                already_supported = True
-                break
-            if not bool(participant.get("expandable_z")):
-                continue
-            required_physical_height = design_top - z
-            if required_physical_height < minimum_physical_height:
-                continue
-            minimum_floor = int(profile["minimum_floor"])
-            if required_physical_height < minimum_floor + inset_depth:
-                continue
-            if not _raw_cavities_are_safe_for_top_inset(
-                profile,
-                x,
-                y,
-                zone_x,
-                zone_y,
-                zone_width,
-                zone_depth,
-                required_physical_height,
-                inset_depth,
-            ):
-                continue
-            required_padded_height = required_physical_height + padding_z
-            if z + required_padded_height > int(prepared.payload["world_mm"][2]):
-                continue
-            if _raw_z_expansion_collides(
-                placement,
-                required_padded_height,
-                placements,
-            ):
-                continue
-            overlap_width = min(x + physical_width, zone_x + zone_width) - max(x, zone_x)
-            overlap_depth = min(y + physical_depth, zone_y + zone_depth) - max(y, zone_y)
-            candidates.append(
-                (
-                    -(z + minimum_physical_height),
-                    -(overlap_width * overlap_depth),
-                    participant_id,
-                    placement,
-                    required_padded_height,
-                )
-            )
-        if already_supported:
-            continue
-        if not candidates:
-            return None
-        _, _, _, selected, required_height = min(candidates)
-        selected["size"] = [
-            int(selected["size"][0]),
-            int(selected["size"][1]),
-            required_height,
-        ]
-    return placements
-
-
-def _raw_top_inset_profile(
-    placement: Mapping[str, object],
-    participant: Mapping[str, object],
-) -> Mapping[str, object] | None:
-    variant_id = str(placement.get("selected_variant_id", ""))
-    orientation = str(placement.get("orientation", ""))
-    variants = participant.get("variants")
-    if not isinstance(variants, list):
-        return None
-    variant = next(
-        (
-            value
-            for value in variants
-            if isinstance(value, Mapping) and str(value.get("variant_id")) == variant_id
-        ),
-        None,
-    )
-    if variant is None:
-        return None
-    profiles = variant.get("top_inset_support_profiles")
-    if not isinstance(profiles, Mapping):
-        return None
-    profile = profiles.get(orientation)
-    return profile if isinstance(profile, Mapping) else None
-
-
-def _raw_xy_overlaps(
-    left_x: int,
-    left_y: int,
-    left_width: int,
-    left_depth: int,
-    right_x: int,
-    right_y: int,
-    right_width: int,
-    right_depth: int,
-) -> bool:
-    return (
-        left_x < right_x + right_width
-        and right_x < left_x + left_width
-        and left_y < right_y + right_depth
-        and right_y < left_y + left_depth
-    )
-
-
-def _raw_cavities_are_safe_for_top_inset(
-    profile: Mapping[str, object],
-    body_x: int,
-    body_y: int,
-    zone_x: int,
-    zone_y: int,
-    zone_width: int,
-    zone_depth: int,
-    physical_height: int,
-    inset_depth: int,
-) -> bool:
-    minimum_floor = int(profile["minimum_floor"])
-    cavities = profile.get("cavities")
-    if not isinstance(cavities, list):
-        return False
-    for cavity in cavities:
-        if not isinstance(cavity, Mapping):
-            return False
-        cavity_x = body_x + int(cavity["origin_xy"][0])
-        cavity_y = body_y + int(cavity["origin_xy"][1])
-        cavity_width, cavity_depth = (int(value) for value in cavity["size_xy"])
-        if not _raw_xy_overlaps(
-            cavity_x,
-            cavity_y,
-            cavity_width,
-            cavity_depth,
-            zone_x,
-            zone_y,
-            zone_width,
-            zone_depth,
-        ):
-            continue
-        if physical_height < minimum_floor + int(cavity["depth"]) + inset_depth:
-            return False
-    return True
-
-
-def _raw_z_expansion_collides(
-    placement: Mapping[str, object],
-    required_height: int,
-    placements: Sequence[Mapping[str, object]],
-) -> bool:
-    x = int(placement["x"])
-    y = int(placement["y"])
-    z = int(placement["z"])
-    width, depth = (int(value) for value in placement["size"][:2])
-    participant_id = str(placement["participant_id"])
-    for other in placements:
-        if str(other.get("participant_id")) == participant_id:
-            continue
-        other_size = other.get("size")
-        if not isinstance(other_size, list) or len(other_size) != 3:
-            return True
-        if not _raw_xy_overlaps(
-            x,
-            y,
-            width,
-            depth,
-            int(other["x"]),
-            int(other["y"]),
-            int(other_size[0]),
-            int(other_size[1]),
-        ):
-            continue
-        other_z = int(other["z"])
-        if z < other_z + int(other_size[2]) and other_z < z + required_height:
-            return True
-    return False
 
 def _invoke_worker_once(
     prepared: _PreparedProductProblem,
@@ -1438,15 +1091,7 @@ def _convert_placements(
         if raw_size[2] < base_padded_z:
             raise ValueError("SCIP placement shrinks below its selected variant.")
         expands_z = raw_size[2] > base_padded_z
-        participant = prepared.participants[participant_id]
-        dimension_modes = participant.get("dimension_modes")
-        allows_z_expansion = bool(
-            option.role == "container"
-            and prepared.payload.get("top_inset_zones")
-            and isinstance(dimension_modes, Mapping)
-            and str(dimension_modes.get("z")) != "fixed"
-        )
-        if expands_z and not allows_z_expansion:
+        if expands_z:
             raise ValueError("Unexpected SCIP Z expansion.")
         raw_z = int(raw["z"])
         if raw_z + raw_size[2] > int(prepared.payload["world_mm"][2]):

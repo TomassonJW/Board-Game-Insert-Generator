@@ -1,5 +1,13 @@
 # Human Gates
 
+## Mise a jour des gates P64-L09S
+
+- Gate de lancement franchie le 2026-07-25.
+- ADR-0089 et annexes XY composites bornees acceptees.
+- Aucun GO requis entre A et F.
+- Prochaine gate humaine : P64-L09S-V.
+- P64-L09R-V 0.1.65 reste `human-KO`, non acceptee et `do-not-run`.
+
 Les gates humaines protegent les decisions qui changent la vision, l'architecture
 ou la credibilite physique du projet. Codex peut preparer les analyses, rapports,
 options et prototypes hors gate, mais ne valide pas ces passages seul.

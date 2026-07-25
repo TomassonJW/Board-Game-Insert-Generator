@@ -1154,8 +1154,8 @@ def _top_inset_payload(value: dict[str, object]) -> dict[str, object]:
     keys = (
         "schema_version", "status", "design_top_z_mm", "total_flat_height_mm",
         "clearance_mm", "reservations", "removal_sequence", "cuts", "supports",
-        "cavity_depth_compensations", "support", "blockers", "warnings", "summary",
-        "invariants",
+        "reserved_prisms", "reservation_certificates", "cavity_depth_compensations",
+        "support", "blockers", "warnings", "summary", "invariants",
     )
     return {key: deepcopy(value[key]) for key in keys if key in value}
 

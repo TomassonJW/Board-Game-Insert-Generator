@@ -1,5 +1,13 @@
 # Pilotage courant
 
+## Carte active - P64-L09S-B
+
+- Goal P64-L09S en cours.
+- A terminee : calcul minimal sans support artificiel.
+- B suivante : verite du cycle, budgets reactifs et couleurs.
+- Prochaine gate humaine : P64-L09S-V apres A a F.
+- `print-validated=false`.
+
 Ce document est le point d'entrée court de reprise. Il indique l'état actif et
 les renvois canoniques ; il ne remplace ni les contrats, ni les ADR, ni les
 preuves archivées.
