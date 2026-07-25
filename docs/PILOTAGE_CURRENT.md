@@ -1,5 +1,14 @@
 # Pilotage courant
 
+<!-- P64-L09S-E -->
+## Reprise canonique apres P64-L09S-E
+
+- A a E sont implementees, testees, documentees et integrees dans le parcours produit.
+- Le cas plateau recent atteint un plan final composite courant, un CAD IR fidele et un plan Fusion pur.
+- Prochaine mission unique : P64-L09S-F, durcissement de bout en bout et preparation locale de la gate V.
+- Aucun benchmark/holdout ; aucune installation Fusion avant la preparation V ; `print-validated=false`.
+
+
 <!-- P64-L09S-D -->
 ## Reprise canonique apres P64-L09S-D
 

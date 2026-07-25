@@ -1,5 +1,11 @@
 # P64-A02 — Programme de calcul étagé et finalisation explicite
 
+<!-- P64-L09S-E -->
+## Contrat ajoute par P64-L09S-E
+
+Un resultat composite certifie par D n'est publie qu'apres recertification E. L'artefact final contient l'identite de la fermeture composite, le certificat de traduction CAD et l'ordre obligatoire coeur, unions, cavites, encoches. Une fois courant, cet artefact est la seule source admissible de la materialisation finale.
+
+
 <!-- P64-L09S-D -->
 ## Contrat ajoute par P64-L09S-D
 

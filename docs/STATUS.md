@@ -1,5 +1,11 @@
 # Status
 
+<!-- P64-L09S-E -->
+## P64-L09S-E terminee : plan composite materialisable
+
+Le cas plateau recent publie maintenant un `finalized_plan` courant seulement apres recertification produit, composite et CAD. Le CAD IR cree un coeur, unit les annexes dans un composant unique, puis applique les cavites et encoches exactes. Suite autorisee : 820/820 ; benchmark/holdout non lances ; aucune installation ou observation Fusion ; `print-validated=false`. P64-L09S-F est la mission active.
+
+
 <!-- P64-L09S-D -->
 ## P64-L09S-D terminee : fermeture composite XY certifiee
 

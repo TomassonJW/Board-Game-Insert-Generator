@@ -393,6 +393,8 @@ class FusionSolidPlan:
     body_size_may_be_smaller_than_grid_span: str | None = None
     grid_body_relationship: str | None = None
     asset_fit_cavity: dict[str, Any] | None = None
+    geometry_frame_origin_mm: FusionVectorMm | None = None
+    geometry_frame_size_mm: FusionVectorMm | None = None
 
     def to_dict(self) -> dict[str, Any]:
         payload = {
@@ -441,6 +443,10 @@ class FusionSolidPlan:
             payload["grid_body_relationship"] = self.grid_body_relationship
         if self.asset_fit_cavity is not None:
             payload["asset_fit_cavity"] = dict(self.asset_fit_cavity)
+        if self.geometry_frame_origin_mm is not None:
+            payload["geometry_frame_origin_mm"] = self.geometry_frame_origin_mm.to_dict()
+        if self.geometry_frame_size_mm is not None:
+            payload["geometry_frame_size_mm"] = self.geometry_frame_size_mm.to_dict()
         return payload
 
 @dataclass(frozen=True)
@@ -455,6 +461,10 @@ class FusionAdditivePrismPlan:
     local_origin_mm: FusionVectorMm
     size_mm: FusionVectorMm
     policy: str | None = None
+    prism_id: str | None = None
+    core_prism_id: str | None = None
+    attached_to_prism_id: str | None = None
+    attachment_axis: str | None = None
     operation_kind: str = ADDITIVE_PRISM_JOIN_OPERATION_KIND
     validation_status: str = FUSION_MANUAL_VALIDATION_REQUIRED
 
@@ -472,6 +482,14 @@ class FusionAdditivePrismPlan:
         }
         if self.policy is not None:
             payload["policy"] = self.policy
+        if self.prism_id is not None:
+            payload["prism_id"] = self.prism_id
+        if self.core_prism_id is not None:
+            payload["core_prism_id"] = self.core_prism_id
+        if self.attached_to_prism_id is not None:
+            payload["attached_to_prism_id"] = self.attached_to_prism_id
+        if self.attachment_axis is not None:
+            payload["attachment_axis"] = self.attachment_axis
         return payload
 
 @dataclass(frozen=True)
@@ -569,6 +587,7 @@ class FusionCavityCutPlan:
         }
         if self.policy is not None:
             payload["policy"] = self.policy
+
         return payload
 
 
@@ -2867,7 +2886,7 @@ def generation_plan_from_cad_ir(
             )
 
         body_kind = _required_text(body, "kind", f"component {component_id} body")
-        if body_kind != "rectangular_blank":
+        if body_kind not in {"rectangular_blank", "composite_rectangular_union"}:
             raise FusionSkeletonError(
                 f"CAD IR body kind {body_kind!r} is not supported by current Fusion generation."
             )
@@ -2878,38 +2897,85 @@ def generation_plan_from_cad_ir(
                 f"CAD IR body for component {component_id!r} must contain operations."
             )
         operation = _single_rectangular_prism_operation(operations, component_id)
+        operation_parameters = operation.get("parameters")
+        if not isinstance(operation_parameters, dict):
+            raise FusionSkeletonError(
+                f"CAD IR core operation for component {component_id!r} must contain parameters."
+            )
+        geometry_origin = _vector_from_payload(
+            body,
+            "printable_origin_mm",
+            f"component {component_id} printable origin",
+        )
+        geometry_size = _positive_vector_from_payload(
+            body,
+            "printable_size_mm",
+            f"component {component_id} printable size",
+        )
+        if body_kind == "composite_rectangular_union":
+            core_origin = _vector_from_payload(
+                operation_parameters,
+                "origin_mm",
+                f"component {component_id} composite core origin",
+            )
+            core_size = _positive_vector_from_payload(
+                operation_parameters,
+                "size_mm",
+                f"component {component_id} composite core size",
+            )
+        else:
+            core_origin = geometry_origin
+            core_size = geometry_size
         body_id = _required_text(body, "id", f"component {component_id} body")
         blank = FusionSolidPlan(
             cad_id=body_id,
             component_name=component_name,
             body_name=_fusion_name(_optional_text(body, "name") or body_id),
-            origin_mm=_vector_from_payload(
-                body,
-                "printable_origin_mm",
-                f"component {component_id} printable origin",
-            ),
-            size_mm=_vector_from_payload(
-                body,
-                "printable_size_mm",
-                f"component {component_id} printable size",
-            ),
-            role="rectangular_blank",
+            origin_mm=core_origin,
+            size_mm=core_size,
+            role=body_kind,
             printable=True,
             operation_kind=_required_text(
                 operation,
                 "kind",
                 f"component {component_id} operation",
             ),
-            module_source="legacy_blank",
+            module_source=(
+                "bounded_xy_composite"
+                if body_kind == "composite_rectangular_union"
+                else "legacy_blank"
+            ),
             placement_source="cad_ir_component",
             clearance_applied=_clearance_summary_from_cad_body(body),
-            body_size_source="printable_size_mm",
+            printable_body_size_mm=(
+                geometry_size
+                if body_kind == "composite_rectangular_union"
+                else None
+            ),
+            body_size_source=(
+                "composite_union_bounding_box"
+                if body_kind == "composite_rectangular_union"
+                else "printable_size_mm"
+            ),
+            geometry_frame_origin_mm=geometry_origin,
+            geometry_frame_size_mm=geometry_size,
         )
         blanks.append(blank)
-        additive_prism_joins.extend(
-            _additive_prism_join_plans(component_id, component_name, blank, operations)
+        component_joins = _additive_prism_join_plans(
+            component_id,
+            component_name,
+            blank,
+            operations,
         )
-        cavity_cuts.extend(_cavity_cut_plans(component_id, component_name, blank, operations))
+        additive_prism_joins.extend(component_joins)
+        cavity_cuts.extend(
+            _cavity_cut_plans(
+                component_id,
+                component_name,
+                blank,
+                operations,
+            )
+        )
         finger_notch_cuts.extend(
             _finger_notch_cut_plans(component_id, component_name, blank, body, operations)
         )
@@ -3516,7 +3582,8 @@ def _asset_cavity_cut_plan_from_payload(
         f"{label} {cavity_id} size",
     )
     _validate_cavity_cut_bounds(blank, local_origin, cavity_size, cavity_id)
-    retained_floor_mm = blank.size_mm.z - cavity_size.z
+    geometry_size = _geometry_frame_size(blank)
+    retained_floor_mm = geometry_size.z - cavity_size.z
     return FusionCavityCutPlan(
         component_id=blank.cad_id,
         component_name=blank.component_name,
@@ -3527,7 +3594,7 @@ def _asset_cavity_cut_plan_from_payload(
         cut_origin_mm=FusionVectorMm(
             x=blank.origin_mm.x + local_origin.x,
             y=blank.origin_mm.y + local_origin.y,
-            z=blank.origin_mm.z + blank.size_mm.z,
+            z=_geometry_frame_origin(blank).z + _geometry_frame_size(blank).z,
         ),
         cut_size_mm=cavity_size,
         requested_local_origin_mm=local_origin,
@@ -3644,6 +3711,7 @@ def _additive_prism_join_plans(
     operations: list[Any],
 ) -> list[FusionAdditivePrismPlan]:
     joins: list[FusionAdditivePrismPlan] = []
+    composite_boxes: dict[str, tuple[FusionVectorMm, FusionVectorMm]] = {}
     for operation in operations:
         if not isinstance(operation, dict) or operation.get("kind") != ADDITIVE_PRISM_JOIN_OPERATION_KIND:
             continue
@@ -3662,7 +3730,49 @@ def _additive_prism_join_plans(
         size = _positive_vector_from_payload(
             parameters, "size_mm", f"body {blank.cad_id} additive prism size"
         )
-        _validate_additive_prism_join_bounds(blank, local_origin, size)
+        policy = _optional_text(parameters, "mechanism_policy")
+        prism_id = None
+        core_prism_id = None
+        attached_to_prism_id = None
+        attachment_axis = None
+        if policy == "bounded_xy_composite_v1":
+            prism_id = _required_text(
+                parameters, "prism_id", f"body {blank.cad_id} composite prism"
+            )
+            core_prism_id = _required_text(
+                parameters, "core_prism_id", f"body {blank.cad_id} composite prism"
+            )
+            attached_to_prism_id = _required_text(
+                parameters,
+                "attached_to_prism_id",
+                f"body {blank.cad_id} composite prism",
+            )
+            attachment_axis = _required_text(
+                parameters, "attachment_axis", f"body {blank.cad_id} composite prism"
+            )
+            if not composite_boxes:
+                composite_boxes[core_prism_id] = (
+                    FusionVectorMm(0.0, 0.0, 0.0),
+                    blank.size_mm,
+                )
+            parent = composite_boxes.get(attached_to_prism_id)
+            if parent is None:
+                raise FusionSkeletonError(
+                    f"Composite prism {prism_id!r} references an unresolved parent."
+                )
+            actual_axis = _true_vertical_face_axis(
+                parent[0],
+                parent[1],
+                local_origin,
+                size,
+            )
+            if abs(local_origin.z) > 0.0001 or actual_axis != attachment_axis:
+                raise FusionSkeletonError(
+                    f"Composite prism {prism_id!r} must share the common lower Z and one true declared X/Y face."
+                )
+            composite_boxes[prism_id] = (local_origin, size)
+        else:
+            _validate_additive_prism_join_bounds(blank, local_origin, size)
         joins.append(
             FusionAdditivePrismPlan(
                 component_id=component_id,
@@ -3674,11 +3784,44 @@ def _additive_prism_join_plans(
                 ),
                 local_origin_mm=local_origin,
                 size_mm=size,
-                policy=_optional_text(parameters, "mechanism_policy"),
+                policy=policy,
+                prism_id=prism_id,
+                core_prism_id=core_prism_id,
+                attached_to_prism_id=attached_to_prism_id,
+                attachment_axis=attachment_axis,
             )
         )
     return joins
 
+
+def _true_vertical_face_axis(
+    left_origin: FusionVectorMm,
+    left_size: FusionVectorMm,
+    right_origin: FusionVectorMm,
+    right_size: FusionVectorMm,
+) -> str:
+    lx1 = left_origin.x + left_size.x
+    ly1 = left_origin.y + left_size.y
+    lz1 = left_origin.z + left_size.z
+    rx1 = right_origin.x + right_size.x
+    ry1 = right_origin.y + right_size.y
+    rz1 = right_origin.z + right_size.z
+    overlap_z = min(lz1, rz1) - max(left_origin.z, right_origin.z)
+    if overlap_z <= 0.0001:
+        return ""
+    overlap_y = min(ly1, ry1) - max(left_origin.y, right_origin.y)
+    if overlap_y > 0.0001 and (
+        abs(lx1 - right_origin.x) <= 0.0001
+        or abs(rx1 - left_origin.x) <= 0.0001
+    ):
+        return "x"
+    overlap_x = min(lx1, rx1) - max(left_origin.x, right_origin.x)
+    if overlap_x > 0.0001 and (
+        abs(ly1 - right_origin.y) <= 0.0001
+        or abs(ry1 - left_origin.y) <= 0.0001
+    ):
+        return "y"
+    return ""
 
 def _validate_additive_prism_join_bounds(
     blank: FusionSolidPlan,
@@ -3744,13 +3887,15 @@ def _cavity_cut_plans(
             f"body {blank.cad_id} {'top inset' if is_top_inset else 'cavity'} operation",
         )
         _validate_cavity_cut_bounds(blank, local_origin, cavity_size, cavity_id)
-        retained_floor_mm = blank.size_mm.z - cavity_size.z
+        geometry_size = _geometry_frame_size(blank)
+        geometry_origin = _geometry_frame_origin(blank)
+        retained_floor_mm = geometry_size.z - cavity_size.z
         if is_top_inset:
             if parameters.get("non_perforating") is not True:
                 raise FusionSkeletonError(
                     f"Top inset {cavity_id!r} for {blank.body_name!r} must be marked non_perforating."
                 )
-            if abs(local_origin.z + cavity_size.z - blank.size_mm.z) > 0.0001:
+            if abs(local_origin.z + cavity_size.z - geometry_size.z) > 0.0001:
                 raise FusionSkeletonError(
                     f"Top inset {cavity_id!r} for {blank.body_name!r} must open on the top face."
                 )
@@ -3772,9 +3917,9 @@ def _cavity_cut_plans(
                 ),
                 cavity_id=cavity_id,
                 cut_origin_mm=FusionVectorMm(
-                    x=blank.origin_mm.x + local_origin.x,
-                    y=blank.origin_mm.y + local_origin.y,
-                    z=blank.origin_mm.z + blank.size_mm.z,
+                    x=geometry_origin.x + local_origin.x,
+                    y=geometry_origin.y + local_origin.y,
+                    z=geometry_origin.z + geometry_size.z,
                 ),
                 cut_size_mm=cavity_size,
                 requested_local_origin_mm=local_origin,
@@ -3799,20 +3944,21 @@ def _validate_cavity_cut_bounds(
     cavity_size: FusionVectorMm,
     cavity_id: str,
 ) -> None:
-    if local_origin.x + cavity_size.x > blank.size_mm.x + 0.0001:
+    geometry_size = _geometry_frame_size(blank)
+    if local_origin.x < -0.0001 or local_origin.x + cavity_size.x > geometry_size.x + 0.0001:
         raise FusionSkeletonError(
             f"Cavity {cavity_id!r} exceeds printable blank width for {blank.body_name!r}."
         )
-    if local_origin.y + cavity_size.y > blank.size_mm.y + 0.0001:
+    if local_origin.y < -0.0001 or local_origin.y + cavity_size.y > geometry_size.y + 0.0001:
         raise FusionSkeletonError(
             f"Cavity {cavity_id!r} exceeds printable blank depth for {blank.body_name!r}."
         )
-    if cavity_size.z >= blank.size_mm.z:
+    if cavity_size.z >= geometry_size.z:
         raise FusionSkeletonError(
             f"Cavity {cavity_id!r} depth must be lower than printable blank height for {blank.body_name!r}."
         )
 
-    retained_floor_mm = blank.size_mm.z - cavity_size.z
+    retained_floor_mm = geometry_size.z - cavity_size.z
     if retained_floor_mm + 0.0001 < local_origin.z:
         raise FusionSkeletonError(
             f"Cavity {cavity_id!r} would leave {retained_floor_mm:.2f} mm of floor, "
@@ -3989,8 +4135,8 @@ def _finger_notch_cut_geometry(
             wall,
         )
         cut_origin = FusionVectorMm(
-            x=blank.origin_mm.x + cavity_origin.x + feature_position.x,
-            y=blank.origin_mm.y + cavity_origin.y - feature_size.y,
+            x=_geometry_frame_origin(blank).x + cavity_origin.x + feature_position.x,
+            y=_geometry_frame_origin(blank).y + cavity_origin.y - feature_size.y,
             z=profile_bottom_z,
         )
         return {
@@ -4020,8 +4166,8 @@ def _finger_notch_cut_geometry(
             wall,
         )
         cut_origin = FusionVectorMm(
-            x=blank.origin_mm.x + cavity_origin.x + feature_position.x,
-            y=blank.origin_mm.y + cavity_origin.y + cavity_size.y,
+            x=_geometry_frame_origin(blank).x + cavity_origin.x + feature_position.x,
+            y=_geometry_frame_origin(blank).y + cavity_origin.y + cavity_size.y,
             z=profile_bottom_z,
         )
         plane_y = cut_origin.y + feature_size.y
@@ -4052,8 +4198,8 @@ def _finger_notch_cut_geometry(
             wall,
         )
         cut_origin = FusionVectorMm(
-            x=blank.origin_mm.x + cavity_origin.x - feature_size.x,
-            y=blank.origin_mm.y + cavity_origin.y + feature_position.y,
+            x=_geometry_frame_origin(blank).x + cavity_origin.x - feature_size.x,
+            y=_geometry_frame_origin(blank).y + cavity_origin.y + feature_position.y,
             z=profile_bottom_z,
         )
         return {
@@ -4083,8 +4229,8 @@ def _finger_notch_cut_geometry(
             wall,
         )
         cut_origin = FusionVectorMm(
-            x=blank.origin_mm.x + cavity_origin.x + cavity_size.x,
-            y=blank.origin_mm.y + cavity_origin.y + feature_position.y,
+            x=_geometry_frame_origin(blank).x + cavity_origin.x + cavity_size.x,
+            y=_geometry_frame_origin(blank).y + cavity_origin.y + feature_position.y,
             z=profile_bottom_z,
         )
         plane_x = cut_origin.x + feature_size.x
@@ -4113,8 +4259,8 @@ def _top_open_notch_z_range(
     cavity_origin: FusionVectorMm,
     feature_size: FusionVectorMm,
 ) -> tuple[float, float]:
-    body_top_z = blank.origin_mm.z + blank.size_mm.z
-    cavity_floor_z = blank.origin_mm.z + cavity_origin.z
+    body_top_z = _geometry_frame_origin(blank).z + _geometry_frame_size(blank).z
+    cavity_floor_z = _geometry_frame_origin(blank).z + cavity_origin.z
     profile_bottom_z = body_top_z - feature_size.z
     if profile_bottom_z < cavity_floor_z:
         raise FusionSkeletonError(
@@ -4168,7 +4314,7 @@ def _validate_front_or_back_finger_notch_bounds(
             raise FusionSkeletonError(
                 f"Finger notch {feature_id!r} for cavity {cavity_id!r} must end on the cavity back edge."
             )
-        wall_thickness = blank.size_mm.y - (cavity_origin.y + cavity_size.y)
+        wall_thickness = _geometry_frame_size(blank).y - (cavity_origin.y + cavity_size.y)
         if feature_size.y > wall_thickness:
             raise FusionSkeletonError(
                 f"Finger notch {feature_id!r} exceeds the back wall thickness after cavity {cavity_id!r}."
@@ -4206,7 +4352,7 @@ def _validate_left_or_right_finger_notch_bounds(
             raise FusionSkeletonError(
                 f"Finger notch {feature_id!r} for cavity {cavity_id!r} must end on the cavity right edge."
             )
-        wall_thickness = blank.size_mm.x - (cavity_origin.x + cavity_size.x)
+        wall_thickness = _geometry_frame_size(blank).x - (cavity_origin.x + cavity_size.x)
         if feature_size.x > wall_thickness:
             raise FusionSkeletonError(
                 f"Finger notch {feature_id!r} exceeds the right wall thickness after cavity {cavity_id!r}."
@@ -4214,6 +4360,13 @@ def _validate_left_or_right_finger_notch_bounds(
     else:
         raise FusionSkeletonError(f"Unsupported left/right finger notch wall {wall!r}.")
 
+
+def _geometry_frame_origin(blank: FusionSolidPlan) -> FusionVectorMm:
+    return blank.geometry_frame_origin_mm or blank.origin_mm
+
+
+def _geometry_frame_size(blank: FusionSolidPlan) -> FusionVectorMm:
+    return blank.geometry_frame_size_mm or blank.size_mm
 
 def _almost_equal_mm(left: float, right: float) -> bool:
     return abs(left - right) <= 1e-9

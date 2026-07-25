@@ -1,5 +1,11 @@
 # Quality Rules
 
+<!-- P64-L09S-E -->
+## Garde P64-L09S-E
+
+Un plan composite materialisable exige un certificat produit, un certificat composite et un certificat CAD tous positifs. Les unions precedent toujours les coupes. Chaque annexe declare un parent deja resolu, un Z bas commun et une vraie face verticale X ou Y. Les coupes plateau/livret ciblent uniquement les intersections des corps qui atteignent le plan demande.
+
+
 <!-- P64-L09S-D -->
 ## Garde P64-L09S-D
 

@@ -1,5 +1,11 @@
 # Fusion 360 Strategy
 
+<!-- P64-L09S-E -->
+## Strategie P64-L09S-E
+
+Fusion ne resout aucune geometrie composite. Il recoit le coeur, les annexes deja ordonnees, leurs vraies attaches X/Y et les coupes exactes. Chaque proprietaire cree un seul composant utilisateur ; les annexes sont jointes au meme corps avant cavites et encoches. La conformite reelle de cette execution reste a observer pendant P64-L09S-V.
+
+
 ## Decision centrale
 
 Fusion 360 heberge l add-in produit et reste la cible CAD, pas le coeur de calcul.

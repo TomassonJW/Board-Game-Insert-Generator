@@ -48,7 +48,7 @@ from board_game_insert_generator.solver_settings import solver_deadline_seconds
 
 COUPLED_FINALIZATION_SCHEMA_V1 = "bgig.coupled_finalization.v1"
 COUPLED_FINALIZATION_FAMILY_ID = "bounded_coupled_finalization"
-COUPLED_FINALIZATION_VERSION = "bgig.bounded_coupled_finalization.v5"
+COUPLED_FINALIZATION_VERSION = "bgig.bounded_coupled_finalization.v6"
 COUPLED_FINALIZATION_POLICY = "global_rectangular_then_bounded_xy_composite"
 ARTIFACT_KIND_FINALIZED = "finalized_plan"
 
@@ -234,28 +234,68 @@ def finalize_coupled_volume(
             composite.status == "closed"
             and composite.certificate.get("certified") is True
         )
-        if composite_certified:
+        if not composite_certified:
             raise CoupledFinalizationError(
-                "La fermeture composite XY est certifiee et attend sa traduction CAD IR.",
+                "Aucune fermeture complete rectangulaire ou composite XY n a ete certifiee.",
                 _xy_composite_report(
                     closure,
                     composite,
                     budget=budget,
-                    stop_reason="xy_composite_candidate_ready_for_cad_ir",
+                    stop_reason=(
+                        "global_deadline_reached_during_xy_composite_fallback"
+                        if composite.gross_closure.deadline_reached
+                        else composite.stop_reason
+                    ),
                 ),
             )
-        raise CoupledFinalizationError(
-            "Aucune fermeture complete rectangulaire ou composite XY n a ete certifiee.",
-            _xy_composite_report(
-                closure,
-                composite,
-                budget=budget,
-                stop_reason=(
-                    "global_deadline_reached_during_xy_composite_fallback"
-                    if composite.gross_closure.deadline_reached
-                    else composite.stop_reason
+        if _deadline_reached(deadline_at):
+            raise CoupledFinalizationError(
+                "La deadline totale est atteinte avant la recertification composite.",
+                _xy_composite_report(
+                    closure,
+                    composite,
+                    budget=budget,
+                    stop_reason="global_deadline_reached_before_xy_composite_certificate",
                 ),
-            ),
+            )
+        composite_strategy = SolverStrategy(
+            COUPLED_FINALIZATION_FAMILY_ID,
+            COUPLED_FINALIZATION_VERSION,
+        )
+        composite_plan, composite_rejections = _certify_closed_plan(
+            problem,
+            composite.gross_closure,
+            strategy=composite_strategy,
+            budget=budget,
+            phase="e_xy_composite_gross_partition_with_exact_insets",
+        )
+        if composite_plan is None:
+            raise CoupledFinalizationError(
+                "Le certificat produit a rejete la fermeture composite XY.",
+                _xy_composite_report(
+                    closure,
+                    composite,
+                    budget=budget,
+                    stop_reason="xy_composite_product_certificate_rejected",
+                    rejection_codes=composite_rejections,
+                ),
+            )
+        return _finalized_plan(
+            composite_plan,
+            composite.gross_closure,
+            baseline_closure=composite.gross_closure,
+            objective_closure=None,
+            objective_attempted=True,
+            objective_certified=True,
+            objective_improved=False,
+            selected_plan_source="e_xy_composite_union_and_exact_insets",
+            objective_fallback_reason="bounded_xy_composite_required",
+            source_minimal_artifact_digest=source_minimal_artifact_digest,
+            source_minimal_plan_digest=str(minimal_plan.get("plan_digest", "")),
+            budget=budget,
+            reservation_count=len(problem.top_inset_zones),
+            global_deadline_reached=composite.gross_closure.deadline_reached,
+            composite_closure=composite,
         )
     if closure.partition_certificate.get("certified") is not True:
         raise CoupledFinalizationError(
@@ -430,9 +470,30 @@ def _finalized_plan(
     budget: SolverBudget,
     reservation_count: int,
     global_deadline_reached: bool,
+    composite_closure: XYCompositeClosureResult | None = None,
 ) -> dict[str, object]:
     plan = deepcopy(certified.plan)
     certificate = certified.certificate
+    composite_certificate = (
+        _attach_xy_composite_geometry(plan, composite_closure)
+        if composite_closure is not None
+        else None
+    )
+    if (
+        composite_certificate is not None
+        and composite_certificate.get("certified") is not True
+    ):
+        raise CoupledFinalizationError(
+            "Le contrat CAD de la fermeture composite XY est invalide.",
+            {
+                "schema_version": COUPLED_FINALIZATION_SCHEMA_V1,
+                "status": "rejected",
+                "stop_reason": "xy_composite_cad_contract_rejected",
+                "composite_materialization_certificate": composite_certificate,
+                "partial_plan_published": False,
+                "materializable": False,
+            },
+        )
     objective_iterations = objective_closure.iterations if objective_closure is not None else 0
     objective_candidates = (
         objective_closure.candidates_evaluated if objective_closure is not None else 0
@@ -447,8 +508,18 @@ def _finalized_plan(
         "source_minimal_artifact_digest": source_minimal_artifact_digest,
         "source_minimal_plan_digest": source_minimal_plan_digest,
         "incumbent_digest": closure.incumbent_digest,
-        "closure_digest": closure.deterministic_digest,
+        "closure_digest": (
+            composite_closure.deterministic_digest
+            if composite_closure is not None
+            else closure.deterministic_digest
+        ),
         "baseline_closure_digest": baseline_closure.deterministic_digest,
+        "xy_composite_closure": (
+            xy_composite_closure_to_dict(composite_closure)
+            if composite_closure is not None
+            else None
+        ),
+        "composite_materialization_certificate": composite_certificate,
         "objective_closure_digest": (
             objective_closure.deterministic_digest if objective_closure is not None else ""
         ),
@@ -518,7 +589,13 @@ def _finalized_plan(
         "certificate": {
             "schema_version": certificate.schema_version,
             "candidate_digest": certificate.candidate_digest,
-            "certified": certificate.certified,
+            "certified": bool(
+                certificate.certified
+                and (
+                    composite_certificate is None
+                    or composite_certificate.get("certified") is True
+                )
+            ),
             "checks": [
                 {
                     "name": check.name,
@@ -526,7 +603,18 @@ def _finalized_plan(
                     "rejection_code": check.rejection_code,
                 }
                 for check in certificate.checks
-            ],
+            ]
+            + (
+                [
+                    {
+                        "name": "xy_composite_partition_and_cad_materialization",
+                        "passed": composite_certificate.get("certified") is True,
+                        "rejection_code": None,
+                    }
+                ]
+                if composite_certificate is not None
+                else []
+            ),
         },
     }
     summary = dict(plan["summary"])
@@ -540,8 +628,8 @@ def _finalized_plan(
             "residual_distributed": True,
             "continuous_closure_applied": False,
             "global_rectangular_partition_by_construction": True,
-            "rectangular_bodies_only": True,
-            "composite_annexes_applied": False,
+            "rectangular_bodies_only": composite_closure is None,
+            "composite_annexes_applied": composite_closure is not None,
             "bounded_local_repair_before_global_resolve": False,
             "global_resolve_invocation_count": (closure.global_resolve_invocation_count),
             "materialization_from_final_certificate_only": True,
@@ -560,6 +648,207 @@ def _finalized_plan(
     plan["plan_digest"] = canonical_digest(plan)
     return plan
 
+
+def _attach_xy_composite_geometry(
+    plan: dict[str, object],
+    composite: XYCompositeClosureResult,
+) -> dict[str, object]:
+    placements = plan.get("placements")
+    if not isinstance(placements, list):
+        return _rejected_composite_materialization("composite_plan_placements_missing")
+    owners = {value.owner_id: value for value in composite.owner_bodies}
+    gross_by_id = {
+        value.participant_id: value for value in composite.gross_closure.placements
+    }
+    placement_ids = {
+        str(value.get("id", "")) for value in placements if isinstance(value, dict)
+    }
+    if placement_ids != set(owners) or placement_ids != set(gross_by_id):
+        return _rejected_composite_materialization(
+            "composite_owner_set_does_not_match_plan"
+        )
+
+    total_cad_gross_volume = 0.0
+    total_join_count = 0
+    for placement in placements:
+        if not isinstance(placement, dict):
+            return _rejected_composite_materialization(
+                "composite_plan_placement_invalid"
+            )
+        owner_id = str(placement["id"])
+        owner = owners[owner_id]
+        gross = gross_by_id[owner_id]
+        ordered = _ordered_composite_prisms(owner)
+        if not ordered:
+            return _rejected_composite_materialization(
+                "composite_prism_attachment_order_invalid"
+            )
+        core = ordered[0]
+        gross_top = gross.origin_mm[2] + gross.world_size_mm[2]
+        core_origin = core.origin_mm
+        cad_prisms: list[dict[str, object]] = []
+        for prism in ordered:
+            cad_height = gross_top - prism.origin_mm[2]
+            if cad_height <= 0.0:
+                return _rejected_composite_materialization(
+                    "composite_cad_prism_height_invalid"
+                )
+            cad_size = (prism.size_mm[0], prism.size_mm[1], cad_height)
+            total_cad_gross_volume += _size_volume(cad_size)
+            cad_prisms.append(
+                {
+                    "prism_id": prism.prism_id,
+                    "owner_id": prism.owner_id,
+                    "kind": prism.kind,
+                    "final_origin_mm": _xyz_payload(prism.origin_mm),
+                    "final_size_mm": _xyz_payload(prism.size_mm),
+                    "cad_origin_mm": _xyz_payload(prism.origin_mm),
+                    "cad_size_mm": _xyz_payload(cad_size),
+                    "local_origin_from_core_mm": _xyz_payload(
+                        tuple(
+                            prism.origin_mm[index] - core_origin[index]
+                            for index in range(3)
+                        )
+                    ),
+                    "attached_to_prism_id": prism.attached_to_prism_id,
+                    "attachment_axis": prism.attachment_axis,
+                }
+            )
+        total_join_count += max(0, len(cad_prisms) - 1)
+        placement["composite_body"] = {
+            "schema_version": "bgig.xy_composite_cad_body.v1",
+            "policy": "bounded_xy_composite_v1",
+            "certified": True,
+            "owner_id": owner_id,
+            "core_prism_id": owner.core_prism_id,
+            "gross_origin_mm": _xyz_payload(gross.origin_mm),
+            "gross_size_mm": _xyz_payload(gross.world_size_mm),
+            "prisms": cad_prisms,
+            "source_owner_certificate": deepcopy(owner.certificate),
+            "operation_order": [
+                "create_core_prism",
+                "join_xy_annexes",
+                "subtract_content_cavities",
+                "subtract_exact_top_insets",
+            ],
+        }
+
+    gross_body_volume = float(
+        composite.certificate.get("gross_body_volume_mm3", 0.0)
+    )
+    reserved_volume = float(
+        composite.certificate.get("reserved_subtraction_volume_mm3", 0.0)
+    )
+    composite_volume = float(
+        composite.certificate.get("composite_body_volume_mm3", 0.0)
+    )
+    grip_void_volume = sum(
+        _mapping_size_volume(cut.get("size_mm"))
+        for placement in placements
+        if isinstance(placement, dict)
+        for cut in placement.get("top_inset_cuts", [])
+        if isinstance(cut, dict) and cut.get("kind") == "top_inset_grip"
+    )
+    cad_gross_error = abs(total_cad_gross_volume - gross_body_volume)
+    final_material_volume = composite_volume - grip_void_volume
+    target_material_volume = gross_body_volume - reserved_volume - grip_void_volume
+    final_error = abs(final_material_volume - target_material_volume)
+    all_top_cuts_are_exact = all(
+        isinstance(cut, dict)
+        and cut.get("non_perforating") is True
+        and str(cut.get("placement_id", "")) == str(placement.get("id", ""))
+        for placement in placements
+        if isinstance(placement, dict)
+        for cut in placement.get("top_inset_cuts", [])
+    )
+    certified = bool(
+        composite.certificate.get("certified") is True
+        and cad_gross_error <= max(0.0001, gross_body_volume * 1e-9)
+        and final_error <= max(0.0001, gross_body_volume * 1e-9)
+        and all_top_cuts_are_exact
+    )
+    return {
+        "schema_version": "bgig.xy_composite_cad_materialization_certificate.v1",
+        "certified": certified,
+        "owner_count": len(owners),
+        "user_component_count": len(owners),
+        "joined_annex_count": total_join_count,
+        "one_user_component_per_owner": len(owners) == len(placements),
+        "joins_precede_cuts": True,
+        "all_top_inset_cuts_target_exact_owner_intersections": all_top_cuts_are_exact,
+        "gross_body_volume_mm3": round(gross_body_volume, 6),
+        "cad_union_gross_volume_mm3": round(total_cad_gross_volume, 6),
+        "reserved_subtraction_volume_mm3": round(reserved_volume, 6),
+        "certified_grip_technical_void_volume_mm3": round(grip_void_volume, 6),
+        "final_material_volume_mm3": round(final_material_volume, 6),
+        "coverage_error_mm3": round(final_error, 9),
+        "cad_gross_coverage_error_mm3": round(cad_gross_error, 9),
+        "printable_residual_volume_mm3": 0.0 if certified else round(final_error, 6),
+        "stop_reason": (
+            "xy_composite_cad_materialization_certified"
+            if certified
+            else "xy_composite_cad_materialization_rejected"
+        ),
+    }
+
+
+def _ordered_composite_prisms(owner: object) -> tuple[object, ...]:
+    prisms = {value.prism_id: value for value in owner.prisms}
+    core = prisms.get(owner.core_prism_id)
+    if core is None or core.kind != "core":
+        return ()
+    ordered = [core]
+    resolved = {core.prism_id}
+    remaining = {
+        prism_id: value
+        for prism_id, value in prisms.items()
+        if prism_id != core.prism_id
+    }
+    while remaining:
+        candidates = sorted(
+            (
+                value
+                for value in remaining.values()
+                if value.attached_to_prism_id in resolved
+                and value.attachment_axis in {"x", "y"}
+            ),
+            key=lambda value: value.prism_id,
+        )
+        if not candidates:
+            return ()
+        selected = candidates[0]
+        ordered.append(selected)
+        resolved.add(selected.prism_id)
+        remaining.pop(selected.prism_id)
+    return tuple(ordered)
+
+
+def _rejected_composite_materialization(reason: str) -> dict[str, object]:
+    return {
+        "schema_version": "bgig.xy_composite_cad_materialization_certificate.v1",
+        "certified": False,
+        "stop_reason": reason,
+    }
+
+
+def _xyz_payload(values: Sequence[float]) -> dict[str, float]:
+    return {
+        axis: round(float(values[index]), 6)
+        for index, axis in enumerate(("x", "y", "z"))
+    }
+
+
+def _size_volume(values: Sequence[float]) -> float:
+    return float(values[0]) * float(values[1]) * float(values[2])
+
+
+def _mapping_size_volume(value: object) -> float:
+    if not isinstance(value, Mapping):
+        return 0.0
+    try:
+        return float(value["x"]) * float(value["y"]) * float(value["z"])
+    except (KeyError, TypeError, ValueError):
+        return 0.0
 
 def _objective_score_payload(
     score: tuple[float, float, float, float],
@@ -671,6 +960,7 @@ def _xy_composite_report(
     *,
     budget: SolverBudget,
     stop_reason: str,
+    rejection_codes: Sequence[str] = (),
 ) -> dict[str, object]:
     certified = bool(
         composite.status == "closed"
@@ -679,6 +969,7 @@ def _xy_composite_report(
     report = _closure_report(
         rectangular,
         stop_reason=stop_reason,
+        rejection_codes=rejection_codes,
         budget=budget,
         deadline_reached=bool(composite.gross_closure.deadline_reached),
     )

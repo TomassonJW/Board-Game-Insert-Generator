@@ -1,5 +1,11 @@
 # P64-L09S — Runbook du Goal de stabilisation de bout en bout
 
+<!-- P64-L09S-E -->
+## Point de passage P64-L09S-E
+
+E est acquise : la proposition D devient un plan final seulement apres trois preuves concordantes. Le CAD IR conserve un composant utilisateur par proprietaire, cree le coeur, unit les annexes par vraies faces X/Y, puis applique les cavites et les coupes plateau/livret exactes. Le squelette Fusion refuse toute attache composite invalide et transporte le repere global sans recalcul.
+
+
 <!-- P64-L09S-D -->
 ## Point de passage P64-L09S-D
 

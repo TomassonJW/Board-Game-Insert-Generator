@@ -1,5 +1,11 @@
 # Capability Map
 
+<!-- P64-L09S-E -->
+## Increment P64-L09S-E
+
+La capability de finition composite est maintenant materialisable : certificat combine, un composant par proprietaire, unions topologiques, cavites puis encoches exactes. Le plan Fusion est construit hors Fusion sans recalcul metier. Le statut Fusion reste non observe jusqu'a V et l'impression reste non validee.
+
+
 <!-- P64-L09S-D -->
 ## Increment P64-L09S-D
 

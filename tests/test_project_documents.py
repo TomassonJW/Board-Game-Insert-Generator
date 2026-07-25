@@ -728,5 +728,27 @@ class P64L09SDDocumentEvidenceTests(unittest.TestCase):
         ):
             self.assertIn(marker, evidence)
 
+class P64L09SEDocumentEvidenceTests(unittest.TestCase):
+    def test_composite_cad_evidence_is_guarded(self) -> None:
+        from pathlib import Path
+
+        evidence = (
+            Path(__file__).resolve().parents[1]
+            / "docs"
+            / "P64_L09S_E_CAD_COMPOSITE_EVIDENCE.md"
+        ).read_text(encoding="utf-8")
+        for marker in (
+            "mission: P64-L09S-E",
+            "status: implemented-and-tested",
+            "one_user_component_per_owner=true",
+            "joins_precede_cuts=true",
+            "printable_residual_volume_mm3=0",
+            "finalized_plan",
+            "authorized_suite: 820/820",
+            "fusion-observed=false",
+            "print-validated=false",
+        ):
+            self.assertIn(marker, evidence)
+
 if __name__ == "__main__":
     unittest.main()

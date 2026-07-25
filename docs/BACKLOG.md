@@ -1,5 +1,13 @@
 # Backlog
 
+<!-- P64-L09S-E -->
+## Avancement P64-L09S apres E
+
+- P64-L09S-E : terminee, testee et documentee ; CAD IR composite, unions, encoches exactes et publication apres recertification.
+- P64-L09S-F : ready et prochaine mission unique ; durcissement de bout en bout, preuves finales et preparation de V.
+- P64-L09S-V : gate humaine Fusion obligatoire apres F ; aucune validation d'impression.
+
+
 <!-- P64-L09S-D -->
 ## Avancement P64-L09S
 

@@ -13,6 +13,10 @@ from board_game_insert_generator.coupled_finalization import (
 from board_game_insert_generator.incremental_project_state import canonical_digest
 from board_game_insert_generator.minimal_layout_solver import solve_minimal_layout
 from board_game_insert_generator.partition_cad import build_partition_cad
+from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
+    FUSION_GENERATION_MODE_COMPACT_ONLY,
+    generation_plan_from_cad_ir,
+)
 from board_game_insert_generator.project_v1 import blank_project_v1
 from board_game_insert_generator.staged_calculation import (
     ARTIFACT_KIND_FINALIZED,
@@ -260,7 +264,7 @@ class StagedCalculationTests(unittest.TestCase):
         with self.assertRaises(StagedCalculationError):
             session.select_materializable_artifact(ARTIFACT_KIND_FINALIZED)
 
-    def test_non_slicing_top_reservation_produces_certified_composite_candidate(self) -> None:
+    def test_non_slicing_top_reservation_materializes_one_exact_composite_owner(self) -> None:
         project = _project_with_flat_reservation()
         engine = _engine(project)
         session = StagedCalculationSession(project, solver_settings=SETTINGS)
@@ -289,48 +293,84 @@ class StagedCalculationTests(unittest.TestCase):
             solver=certified_incumbent,
         )
         finalized = session.finalize_volume(finishing_effort_profile="normal")
-        attempt = finalized["staged_calculation"]["finalized_plan"][
-            "last_attempt"
-        ]
+        partition = finalized["partition"]
+        selected = session.select_materializable_artifact(ARTIFACT_KIND_FINALIZED)
+        cad = build_partition_cad(
+            project,
+            partition=selected["partition"],
+            artifact_identity=selected,
+            effort_profile="quick",
+        )
+        fusion = generation_plan_from_cad_ir(
+            cad["cad_ir"],
+            FUSION_GENERATION_MODE_COMPACT_ONLY,
+        )
 
         self.assertTrue(
             calculated["staged_calculation"]["minimal_layout"][
                 "placement_certified"
             ]
         )
-        self.assertIsNone(finalized["partition"])
-        self.assertNotEqual(
+        self.assertIsNotNone(partition)
+        self.assertEqual(
             finalized["staged_calculation"]["finalized_plan"]["status"],
             STATUS_CURRENT,
         )
+        self.assertTrue(partition["summary"]["materializable"])
+        self.assertTrue(partition["finalization"]["certificate"]["certified"])
         self.assertEqual(
-            attempt["stop_reason"],
-            "xy_composite_candidate_ready_for_cad_ir",
+            partition["finalization"]["selected_plan_source"],
+            "e_xy_composite_union_and_exact_insets",
         )
-        self.assertFalse(
-            attempt["global_partition_certificate"]["certified"]
-        )
-        self.assertTrue(attempt["composite_candidate_certified"])
-        self.assertTrue(
-            attempt["xy_composite_closure"]["certificate"]["certified"]
-        )
+        composite_certificate = partition["finalization"][
+            "composite_materialization_certificate"
+        ]
+        self.assertTrue(composite_certificate["certified"])
         self.assertEqual(
-            attempt["xy_composite_closure"]["certificate"]
-            ["printable_residual_volume_mm3"],
+            composite_certificate["printable_residual_volume_mm3"],
             0.0,
         )
+        self.assertGreater(composite_certificate["joined_annex_count"], 0)
+        self.assertTrue(partition["invariants"]["composite_annexes_applied"])
+        self.assertEqual(cad["status"], "ready_for_fusion")
+        self.assertEqual(cad["materialization"]["component_count"], 1)
+        self.assertEqual(cad["materialization"]["composite_owner_count"], 1)
         self.assertGreater(
-            sum(
-                owner["certificate"]["annex_count"]
-                for owner in attempt["xy_composite_closure"]["owners"]
-            ),
+            cad["materialization"]["joined_composite_prism_count"],
             0,
         )
-        self.assertTrue(attempt["cad_ir_union_required"])
-        self.assertTrue(attempt["reservation_notches_required"])
-        self.assertFalse(attempt["materializable"])
-        self.assertFalse(attempt["partial_plan_published"])
-        self.assertTrue(attempt["minimal_artifact_preserved"])
+        self.assertGreater(cad["materialization"]["top_inset_cut_count"], 0)
+        operations = cad["cad_ir"]["components"][0]["body"]["operations"]
+        kinds = [value["kind"] for value in operations]
+        first_cut = min(
+            index for index, kind in enumerate(kinds) if kind.startswith("subtract_")
+        )
+        last_join = max(
+            index for index, kind in enumerate(kinds) if kind == "join_rectangular_prism"
+        )
+        self.assertLess(last_join, first_cut)
+        self.assertEqual(fusion.module_component_count, 1)
+        self.assertEqual(
+            len(fusion.additive_prism_joins),
+            cad["materialization"]["joined_composite_prism_count"],
+        )
+        self.assertTrue(
+            all(
+                value.policy == "bounded_xy_composite_v1"
+                and value.attachment_axis in {"x", "y"}
+                for value in fusion.additive_prism_joins
+            )
+        )
+        self.assertEqual(
+            len(
+                [
+                    value
+                    for value in fusion.cavity_cuts
+                    if value.cavity_source.startswith("top_inset")
+                ]
+            ),
+            cad["materialization"]["top_inset_cut_count"],
+        )
 
     def test_total_finishing_timeout_preserves_exact_minimal_artifact(self) -> None:
         project = _project()

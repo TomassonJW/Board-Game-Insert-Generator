@@ -1,5 +1,11 @@
 # Architecture
 
+<!-- P64-L09S-E -->
+## Chaine composite materialisable
+
+Le coeur Python recertifie et enrichit le plan final. `partition_cad.py` traduit ce plan sans adsk en operations coeur, unions et coupes. `fusion_skeleton.py` valide ces operations et produit un plan d'execution pur. L'adaptateur Fusion existant execute les unions avant les coupes et conserve un composant physique par proprietaire.
+
+
 <!-- P64-L09S-D -->
 ## Frontiere D vers E
 

@@ -1,5 +1,11 @@
 # Geometry Model
 
+<!-- P64-L09S-E -->
+## Traduction CAD d'un corps composite
+
+Le repere geometrique du corps couvre le volume brut rectangulaire certifie. Le prisme coeur est cree explicitement, les annexes sont unies dans un ordre topologique, puis les coupes retirent exactement les reservations et vides de prise. Le volume final obtenu doit egaler la decomposition composite D hors vides techniques certifies.
+
+
 <!-- P64-L09S-D -->
 ## Corps composites XY bornes
 

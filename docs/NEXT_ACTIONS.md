@@ -1,5 +1,11 @@
 # Next Actions
 
+<!-- P64-L09S-E -->
+## Action courante : P64-L09S-F
+
+P64-L09S-E est terminee. Durcir maintenant le parcours complet calcul minimal, finalisation composite, selection de l'artefact final et preparation de materialisation. Verifier les erreurs fail-closed, les identites courantes, les preuves du cas limite recent et preparer la gate Fusion V sans lancer de benchmark/holdout. L'installation Fusion n'intervient qu'en fin de F pour preparer V.
+
+
 <!-- P64-L09S-D -->
 ## Action courante : P64-L09S-E
 

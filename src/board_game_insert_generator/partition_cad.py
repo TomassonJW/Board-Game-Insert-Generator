@@ -39,6 +39,8 @@ PARTITION_CAD_STATUS_READY = "ready_for_fusion"
 SCENE_ARTIFACT_IDENTITY_SCHEMA_V1 = "bgig.scene_artifact_identity.v1"
 ARTIFACT_KIND_MINIMAL = "minimal_layout"
 ARTIFACT_KIND_FINALIZED = "finalized_plan"
+COMPOSITE_PRISM_JOIN_OPERATION_KIND = "join_rectangular_prism"
+COMPOSITE_BODY_SCHEMA_V1 = "bgig.xy_composite_cad_body.v1"
 _EPSILON = 0.0001
 
 
@@ -215,6 +217,17 @@ def build_partition_cad(
         for operation in component.body.operations
         if operation.kind in {TOP_INSET_OPERATION_KIND, TOP_INSET_GRIP_OPERATION_KIND}
     )
+    composite_join_count = sum(
+        1
+        for component in build.components
+        for operation in component.body.operations
+        if operation.kind == COMPOSITE_PRISM_JOIN_OPERATION_KIND
+    )
+    composite_owner_count = sum(
+        1
+        for component in build.components
+        if component.body.kind == "composite_rectangular_union"
+    )
     return {
         **base,
         "status": PARTITION_CAD_STATUS_READY,
@@ -228,6 +241,8 @@ def build_partition_cad(
             "explicit_complement_component_count": sum(1 for item in build.components if item.functional_type != "v0_1_storage_container"),
             "cavity_count": cavity_count,
             "top_inset_cut_count": top_inset_cut_count,
+            "composite_owner_count": composite_owner_count,
+            "joined_composite_prism_count": composite_join_count,
             "automatic_body_count": 0,
             "source_plan_digest": plan.get("plan_digest"),
             "artifact_kind": identity.get("artifact_kind") if identity else "legacy_partition",
@@ -239,6 +254,15 @@ def build_partition_cad(
             "cavities_from_p55_only": True,
             "top_insets_are_reservations_not_cavities": True,
             "top_inset_cut_count_matches_plan": top_inset_cut_count == len(_mappings(_mapping(plan.get("top_inset_reservations"), "partition.top_inset_reservations").get("cuts", []), "partition.top_inset_reservations.cuts")),
+            "composite_owners_are_single_user_components": (
+                composite_owner_count == 0
+                or composite_owner_count == sum(
+                    1
+                    for item in _mappings(plan.get("placements", []), "partition.placements")
+                    if isinstance(item.get("composite_body"), dict)
+                )
+            ),
+            "composite_joins_precede_all_cuts": True,
             "automatic_body_count": 0,
             "free_regions_materialized": False,
             "selected_artifact_identity_exact": identity is None or full_identity is not None,
@@ -424,6 +448,11 @@ def _container_component(placement: dict[str, object], index: int) -> CadCompone
             "surplus_distribution_mm": placement.get("surplus_distribution_mm"),
             "automatic": False,
         },
+        composite_body=(
+            _mapping(placement["composite_body"], f"placement[{index}].composite_body")
+            if isinstance(placement.get("composite_body"), dict)
+            else None
+        ),
     )
 
 
@@ -505,24 +534,75 @@ def _assert_cavity(name: str, cavity_id: str, origin: dict[str, float], size: di
 def _component(
     *, placement: dict[str, object], index: int, functional_type: str,
     origin: dict[str, float], size: dict[str, float], cavities: tuple[CadCavity, ...],
-    metadata: dict[str, object],
+    metadata: dict[str, object], composite_body: dict[str, object] | None = None,
 ) -> CadComponent:
     instance_id = str(placement["id"])
     body_id = f"body:{instance_id}"
     name = str(placement["name"])
+    body_kind = "rectangular_blank"
+    create_parameters: dict[str, object] = {
+        "origin_source": "printable_origin_mm",
+        "size_source": "printable_size_mm",
+        "coordinate_frame": "scene.frame",
+    }
+    join_operations: tuple[CadOperation, ...] = ()
+    if composite_body is not None:
+        if composite_body.get("schema_version") != COMPOSITE_BODY_SCHEMA_V1:
+            raise PartitionCadBuildError(
+                f"Schema composite inconnu pour {instance_id!r}."
+            )
+        if composite_body.get("certified") is not True:
+            raise PartitionCadBuildError(
+                f"Le corps composite {instance_id!r} n est pas certifie."
+            )
+        prisms = _mappings(
+            composite_body.get("prisms", []),
+            f"placement[{index}].composite_body.prisms",
+        )
+        if not prisms or prisms[0].get("kind") != "core":
+            raise PartitionCadBuildError(
+                f"Le corps composite {instance_id!r} exige un coeur en premier."
+            )
+        core = prisms[0]
+        create_parameters = {
+            "origin_mm": deepcopy(core["cad_origin_mm"]),
+            "size_mm": deepcopy(core["cad_size_mm"]),
+            "origin_source": "composite_core_prism",
+            "size_source": "composite_core_prism",
+            "core_prism_id": core["prism_id"],
+            "coordinate_frame": "scene.frame",
+        }
+        join_operations = _composite_join_operations(
+            body_id,
+            composite_body,
+            prisms,
+        )
+        body_kind = "composite_rectangular_union"
+        metadata = {
+            **metadata,
+            "composite_body_schema": COMPOSITE_BODY_SCHEMA_V1,
+            "composite_owner_id": composite_body.get("owner_id"),
+            "composite_core_prism_id": composite_body.get("core_prism_id"),
+            "composite_prism_count": len(prisms),
+            "composite_annex_count": max(0, len(prisms) - 1),
+            "one_user_component_for_composite_owner": True,
+        }
     body = CadBody(
         id=body_id,
         name=f"{name} - corps BGIG {index + 1}",
-        kind="rectangular_blank",
+        kind=body_kind,
         source_cell_instance_id=instance_id,
         theoretical_origin=_as_point(origin), theoretical_size=_as_dimension(size),
         printable_origin=_as_point(origin), printable_size=_as_dimension(size),
         cavities=cavities, face_classifications=(), applied_tolerances=(),
         operations=(
             CadOperation(
-                id=f"{body_id}:create_rectangular_prism", kind="create_rectangular_prism", target_id=body_id,
-                parameters={"origin_source": "printable_origin_mm", "size_source": "printable_size_mm", "coordinate_frame": "scene.frame"},
+                id=f"{body_id}:create_rectangular_prism",
+                kind="create_rectangular_prism",
+                target_id=body_id,
+                parameters=create_parameters,
             ),
+            *join_operations,
             *tuple(_cavity_operation(body_id, cavity) for cavity in cavities),
             *tuple(
                 _top_inset_operation(body_id, cut)
@@ -536,6 +616,47 @@ def _component(
         functional_type=functional_type, body=body, metadata=metadata,
     )
 
+
+def _composite_join_operations(
+    body_id: str,
+    composite_body: dict[str, object],
+    prisms: list[dict[str, Any]],
+) -> tuple[CadOperation, ...]:
+    core_prism_id = str(composite_body.get("core_prism_id", ""))
+    if str(prisms[0].get("prism_id", "")) != core_prism_id:
+        raise PartitionCadBuildError("Le premier prisme composite ne correspond pas au coeur.")
+    resolved = {core_prism_id}
+    operations: list[CadOperation] = []
+    for prism in prisms[1:]:
+        prism_id = str(prism.get("prism_id", ""))
+        parent_id = str(prism.get("attached_to_prism_id", ""))
+        axis = str(prism.get("attachment_axis", ""))
+        if not prism_id or parent_id not in resolved or axis not in {"x", "y"}:
+            raise PartitionCadBuildError(
+                f"Ordre ou attache composite invalide pour {prism_id!r}."
+            )
+        operations.append(
+            CadOperation(
+                id=f"{body_id}:{prism_id}:{COMPOSITE_PRISM_JOIN_OPERATION_KIND}",
+                kind=COMPOSITE_PRISM_JOIN_OPERATION_KIND,
+                target_id=body_id,
+                parameters={
+                    "mechanism_policy": "bounded_xy_composite_v1",
+                    "prism_id": prism_id,
+                    "core_prism_id": core_prism_id,
+                    "attached_to_prism_id": parent_id,
+                    "attachment_axis": axis,
+                    "local_origin_mm": deepcopy(prism["local_origin_from_core_mm"]),
+                    "size_mm": deepcopy(prism["cad_size_mm"]),
+                    "final_size_mm": deepcopy(prism["final_size_mm"]),
+                    "coordinate_frame": "body.local",
+                    "execution_status": PARTITION_CAD_STATUS_READY,
+                    "fusion_generation": PARTITION_CAD_STATUS_READY,
+                },
+            )
+        )
+        resolved.add(prism_id)
+    return tuple(operations)
 
 def _cavity_operation(body_id: str, cavity: CadCavity) -> CadOperation:
     return CadOperation(
