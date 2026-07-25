@@ -2,9 +2,13 @@ from __future__ import annotations
 
 from copy import deepcopy
 import unittest
+from unittest.mock import patch
 
 from board_game_insert_generator.contextual_local_analysis import (
     IncrementalLocalAnalysisEngine,
+)
+from board_game_insert_generator.coupled_finalization import (
+    coupled_finalization_budget,
 )
 from board_game_insert_generator.incremental_project_state import canonical_digest
 from board_game_insert_generator.minimal_layout_solver import solve_minimal_layout
@@ -207,6 +211,23 @@ class StagedCalculationTests(unittest.TestCase):
             finalization["source_minimal_artifact_digest"],
             minimal["artifact_digest"],
         )
+        self.assertEqual(finalization["budget"]["effort_profile"], "normal")
+        self.assertEqual(
+            finalization["budget"]["limits"]["max_total_elapsed_ms"],
+            20_000,
+        )
+        self.assertEqual(
+            finalized["staged_calculation"]["finalized_plan"][
+                "calculation_effort_profile"
+            ],
+            "quick",
+        )
+        self.assertEqual(
+            finalized["staged_calculation"]["finalized_plan"][
+                "finishing_effort_profile"
+            ],
+            "normal",
+        )
         self.assertEqual(finalization["global_resolve_invocation_count"], 0)
         objectives = finalization["secondary_objectives"]
         self.assertTrue(objectives["attempted"])
@@ -233,6 +254,85 @@ class StagedCalculationTests(unittest.TestCase):
             finalized["staged_calculation"]["next_action"],
             "materialize_finalized_in_fusion",
         )
+
+    def test_finishing_has_five_independent_monotone_total_budgets(self) -> None:
+        profiles = ("quick", "short", "normal", "long", "deep")
+        deadlines = (3_000, 10_000, 20_000, 60_000, 180_000)
+        budgets = [coupled_finalization_budget(value) for value in profiles]
+
+        self.assertEqual(
+            [dict(value.limits)["max_total_elapsed_ms"] for value in budgets],
+            list(deadlines),
+        )
+        self.assertEqual(
+            [dict(value.limits)["max_closure_elapsed_ms"] for value in budgets],
+            list(deadlines),
+        )
+        for key in (
+            "max_closure_iterations",
+            "max_closure_candidates",
+            "max_local_repairs",
+        ):
+            values = [int(dict(value.limits)[key]) for value in budgets]
+            self.assertEqual(values, sorted(values))
+        with self.assertRaisesRegex(ValueError, "Unsupported effort profile"):
+            coupled_finalization_budget("unbounded")
+
+    def test_total_finishing_timeout_preserves_exact_minimal_artifact(self) -> None:
+        project = _project()
+        engine = _engine(project)
+        session = StagedCalculationSession(project, solver_settings=SETTINGS)
+        _synchronize(session, project, engine)
+        calculated = session.calculate_layout(
+            request_id="solve-before-timeout",
+            request_revision=0,
+        )
+        minimal = calculated["staged_calculation"]["minimal_layout"]
+        minimal_value_digest = canonical_digest(session.current_minimal_partition())
+
+        with patch(
+            "board_game_insert_generator.coupled_finalization.perf_counter",
+            side_effect=(0.0, 0.0, 0.0, 3.0),
+        ):
+            failed = session.finalize_volume(
+                finishing_effort_profile="quick",
+            )
+
+        snapshot = failed["staged_calculation"]
+        self.assertIsNone(failed["partition"])
+        self.assertEqual(
+            failed["solver_result"]["status"],
+            "no_solution_within_budget",
+        )
+        self.assertEqual(
+            failed["solver_result"]["telemetry"]["stop_reason"],
+            "global_deadline_reached_before_baseline_certificate",
+        )
+        self.assertEqual(snapshot["minimal_layout"]["status"], STATUS_CURRENT)
+        self.assertEqual(
+            snapshot["minimal_layout"]["artifact_digest"],
+            minimal["artifact_digest"],
+        )
+        self.assertEqual(
+            canonical_digest(session.current_minimal_partition()),
+            minimal_value_digest,
+        )
+        self.assertEqual(snapshot["finalized_plan"]["status"], "not_finalized")
+        self.assertEqual(
+            snapshot["finalized_plan"]["last_attempt"][
+                "finishing_effort_profile"
+            ],
+            "quick",
+        )
+        self.assertTrue(
+            snapshot["finalized_plan"]["last_attempt"][
+                "minimal_artifact_preserved"
+            ]
+        )
+        selection = session.select_materializable_artifact(
+            ARTIFACT_KIND_MINIMAL
+        )
+        self.assertEqual(selection["artifact_digest"], minimal["artifact_digest"])
 
     def test_certified_witness_is_forwarded_as_recertified_fresh_search(self) -> None:
         project = _project()
@@ -402,12 +502,55 @@ class StagedCalculationTests(unittest.TestCase):
         )
         self.assertEqual(result["staged_calculation"]["minimal_layout"]["status"], "not_computed")
 
+    def test_source_change_during_finishing_rejects_stale_result(self) -> None:
+        project = _project()
+        engine = _engine(project)
+        session = StagedCalculationSession(project, solver_settings=SETTINGS)
+        _synchronize(session, project, engine)
+        session.calculate_layout(request_id="solve-before-stale", request_revision=0)
+
+        def stale_finalizer(plan: dict[str, object]) -> dict[str, object]:
+            changed = deepcopy(project)
+            changed["contents"][0]["quantity"] = 3
+            changed_engine = _engine(changed)
+            _synchronize(session, changed, changed_engine)
+            return deepcopy(plan)
+
+        stale = session.finalize_volume(
+            finishing_effort_profile="long",
+            finalizer=stale_finalizer,
+            finishing_policy="test_stale_policy",
+            finishing_budget_digest=canonical_digest({"budget": "long"}),
+            finalizer_id="test-stale-finalizer",
+            finalizer_version="1",
+        )
+
+        self.assertIsNone(stale["partition"])
+        self.assertEqual(stale["solver_result"]["status"], "stale_or_cancelled")
+        self.assertEqual(
+            stale["solver_result"]["telemetry"]["stop_reason"],
+            "finalization_result_stale",
+        )
+        snapshot = stale["staged_calculation"]
+        self.assertEqual(snapshot["minimal_layout"]["status"], STATUS_STALE)
+        self.assertNotEqual(snapshot["finalized_plan"]["status"], STATUS_CURRENT)
+        self.assertFalse(snapshot["available_artifacts"][ARTIFACT_KIND_FINALIZED])
+        self.assertFalse(
+            snapshot["finalized_plan"]["last_attempt"]["partial_plan_published"]
+        )
+        self.assertTrue(
+            snapshot["finalized_plan"]["last_attempt"][
+                "minimal_artifact_preserved"
+            ]
+        )
+
     def test_fixture_12_failed_finalization_preserves_minimal_materialization(self) -> None:
         project = _project()
         engine = _engine(project)
         session = StagedCalculationSession(project, solver_settings=SETTINGS)
         _synchronize(session, project, engine)
         calculated = session.calculate_layout(request_id="solve-1", request_revision=0)
+        minimal_value_digest = canonical_digest(session.current_minimal_partition())
 
         def rejected_finalizer(plan: dict[str, object]) -> dict[str, object]:
             return deepcopy(plan)
@@ -429,6 +572,15 @@ class StagedCalculationTests(unittest.TestCase):
             calculated["staged_calculation"]["minimal_layout"]["artifact_digest"],
         )
         self.assertEqual(snapshot["finalized_plan"]["status"], "not_finalized")
+        self.assertEqual(
+            canonical_digest(session.current_minimal_partition()),
+            minimal_value_digest,
+        )
+        self.assertTrue(
+            snapshot["finalized_plan"]["last_attempt"][
+                "minimal_artifact_preserved"
+            ]
+        )
         self.assertEqual(selection["partition_plan_digest"], calculated["partition"]["plan_digest"])
 
     def test_dual_selection_accepts_a_separately_certified_finalized_plan(self) -> None:

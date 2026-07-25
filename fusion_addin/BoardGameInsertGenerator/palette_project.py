@@ -422,10 +422,16 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         build_solver_case_bundle,
         solver_case_capture_summary,
     )
+    from board_game_insert_generator.solver_settings import (
+        normalize_effort_profile,
+    )
 
     document_state = load_document_state(addin_dir)
     solver_settings = _normalize_solver_settings(
         request.get("solver_settings", document_state.get("solver_settings"))
+    )
+    finishing_effort_profile = normalize_effort_profile(
+        request.get("finishing_effort")
     )
     if action == "save_solver_settings":
         document_state["solver_settings"] = solver_settings
@@ -593,7 +599,9 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
         staged_solver_result = staged_action["solver_result"]
         staged_calculation = staged_action["staged_calculation"]
     elif action == "finalize_project":
-        staged_action = staged_session.finalize_volume()
+        staged_action = staged_session.finalize_volume(
+            finishing_effort_profile=finishing_effort_profile,
+        )
         partition = staged_action["partition"]
         staged_solver_result = staged_action["solver_result"]
         staged_calculation = staged_action["staged_calculation"]

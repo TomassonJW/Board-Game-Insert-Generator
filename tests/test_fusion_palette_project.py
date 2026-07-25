@@ -533,7 +533,13 @@ class FusionPaletteProjectTests(unittest.TestCase):
                 request("solve_project", project=project), ADDIN, ROOT
             )
             finalized = handle_palette_request(
-                request("finalize_project", project=project), ADDIN, ROOT
+                request(
+                    "finalize_project",
+                    project=project,
+                    finishing_effort="long",
+                ),
+                ADDIN,
+                ROOT
             )
             materialized = handle_palette_request(
                 request(
@@ -549,6 +555,18 @@ class FusionPaletteProjectTests(unittest.TestCase):
         self.assertEqual(
             finalized["staged_calculation"]["finalized_plan"]["status"],
             "current",
+        )
+        self.assertEqual(
+            finalized["staged_calculation"]["finalized_plan"][
+                "finishing_effort_profile"
+            ],
+            "long",
+        )
+        self.assertEqual(
+            finalized["partition"]["finalization"]["budget"]["limits"][
+                "max_total_elapsed_ms"
+            ],
+            60_000,
         )
         self.assertEqual(finalized["result_view"]["artifact_kind"], "finalized_plan")
         self.assertTrue(

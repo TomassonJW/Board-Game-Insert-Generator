@@ -2125,3 +2125,12 @@ Aucune capability runtime n'est promue par cette mission documentaire.
 - `C-FUSION` / `C-PRINT` : inchangées ; aucune installation, observation Fusion ou impression n'a eu lieu.
 
 Preuve : `docs/P64_L09R_B_MINIMAL_CALCULATION_EVIDENCE.md`.
+
+## Mise à jour P64-L09R-C — finition séparée
+
+- `C-LAYOUT` : `implemented-product`, `automated-validated`. La fermeture F01B/F02B est une action facultative séparée du calcul minimal.
+- `C-SOLVER` : cinq deadlines totales indépendantes pour la finition, 3/10/20/60/180 s ; timeout avant certificat reste `no_solution_within_budget`.
+- `C-RESERVATION` : cavités et réservations du plan minimal sont protégées pendant fermeture, réparation et recertification.
+- `C-QUALITY` : timeout, rejet de certificat et résultat obsolète ne publient aucun plan partiel et conservent le plan minimal bit à bit.
+- `C-FUSION-UI` : le pont accepte le budget de finition ; sélecteurs, activation et durées visibles restent `planned-by-P64-L09R-D`.
+- `C-FUSION` et `C-PRINT` : inchangées ; aucune observation Fusion et `print-validated=false`.

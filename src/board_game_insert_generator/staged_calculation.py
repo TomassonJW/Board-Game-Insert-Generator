@@ -50,7 +50,11 @@ from board_game_insert_generator.solver_outcome import (
     STALE_OR_CANCELLED,
     result_label,
 )
-from board_game_insert_generator.solver_settings import normalize_solver_settings
+from board_game_insert_generator.solver_settings import (
+    EFFORT_NORMAL,
+    normalize_effort_profile,
+    normalize_solver_settings,
+)
 
 
 STAGED_CALCULATION_SCHEMA_V1 = "bgig.staged_calculation.v1"
@@ -86,6 +90,16 @@ class GlobalRequestToken:
     settings_digest: str
 
 
+@dataclass(frozen=True)
+class FinalizationRequestToken:
+    sequence: int
+    source_revision: int
+    source_minimal_artifact_digest: str
+    source_minimal_value_digest: str
+    finalization_key_digest: str
+    effort_profile: str
+
+
 SolverCallable = Callable[..., dict[str, object]]
 FinalizerCallable = Callable[[dict[str, object]], dict[str, object]]
 FinalCertificateCallable = Callable[[dict[str, object]], bool]
@@ -114,6 +128,8 @@ class StagedCalculationSession:
         self._frontier_digests: tuple[tuple[str, str], ...] = ()
         self._request_sequence = 0
         self._active_global_request: GlobalRequestToken | None = None
+        self._finalization_request_sequence = 0
+        self._active_finalization_request: FinalizationRequestToken | None = None
         self._global_status = STATUS_NOT_COMPUTED
         self._global_partition: dict[str, object] | None = None
         self._global_artifact_digest = ""
@@ -134,6 +150,7 @@ class StagedCalculationSession:
         self._finalization_key_digest = ""
         self._finalization_cache_status = "not_queried"
         self._finalization_policy = "not_selected"
+        self._finalization_effort_profile = EFFORT_NORMAL
         self._finalization_attempt: dict[str, object] = {
             "schema_version": "bgig.coupled_finalization.v1",
             "status": "not_attempted",
@@ -185,6 +202,8 @@ class StagedCalculationSession:
             or self._frontier_digests != previous_frontier_digests
         )
         dependencies_changed = bool(delta.changed or settings_changed or local_dependencies_changed)
+        if dependencies_changed:
+            self._active_finalization_request = None
         self._local_reuse = empty_local_reuse_report(
             stop_reason=(
                 "dependencies_unchanged" if not dependencies_changed else "no_eligible_local_edit"
@@ -493,6 +512,7 @@ class StagedCalculationSession:
     def finalize_volume(
         self,
         *,
+        finishing_effort_profile: str = EFFORT_NORMAL,
         finalizer: FinalizerCallable | None = None,
         finishing_policy: str = "not_selected",
         finishing_budget_digest: str = "",
@@ -506,11 +526,14 @@ class StagedCalculationSession:
             raise StagedCalculationError(
                 "Calcule un agencement minimal courant avant de choisir une finition."
             )
+        effort_profile = normalize_effort_profile(finishing_effort_profile)
+        source_minimal_artifact_digest = self._global_artifact_digest
+        source_minimal_value_digest = canonical_digest(self._global_partition)
         uses_default_finalizer = finalizer is None
         if finalizer is None:
             finishing_policy = COUPLED_FINALIZATION_POLICY
             finishing_budget_digest = coupled_finalization_budget_digest(
-                str(self._settings["effort"])
+                effort_profile
             )
             finalizer_id = COUPLED_FINALIZATION_FAMILY_ID
             finalizer_version = COUPLED_FINALIZATION_VERSION
@@ -519,8 +542,10 @@ class StagedCalculationSession:
                 return finalize_coupled_volume(
                     self._project,
                     plan,
-                    source_minimal_artifact_digest=(self._global_artifact_digest),
-                    effort_profile=str(self._settings["effort"]),
+                    source_minimal_artifact_digest=(
+                        source_minimal_artifact_digest
+                    ),
+                    effort_profile=effort_profile,
                     container_frontiers=self._container_frontiers,
                 )
 
@@ -538,25 +563,33 @@ class StagedCalculationSession:
             )
 
         key = FinalizationKey(
-            global_layout_digest=self._global_artifact_digest,
+            global_layout_digest=source_minimal_artifact_digest,
             finishing_policy=finishing_policy,
             finishing_budget_digest=finishing_budget_digest,
             finalizer_id=finalizer_id,
             finalizer_version=finalizer_version,
         )
+        token = self._begin_finalization_request(
+            key,
+            effort_profile=effort_profile,
+            source_minimal_value_digest=source_minimal_value_digest,
+        )
+        self._finalization_effort_profile = effort_profile
         lookup = self.cache.lookup(key)
         validator = certify or (
             lambda value: _finalized_certified(
                 value,
-                source_minimal_artifact_digest=self._global_artifact_digest,
+                source_minimal_artifact_digest=source_minimal_artifact_digest,
             )
         )
         if lookup.status == "hit":
             if not isinstance(lookup.value, dict):
+                self._finish_finalization_request(token)
                 raise TypeError("Cached finalized plan has an unexpected type.")
             finalized = deepcopy(lookup.value)
             artifact_digest = lookup.artifact_digest or ""
             if not validator(finalized):
+                self._finish_finalization_request(token)
                 raise StagedCalculationError(
                     "Le plan finalise en cache ne porte plus un certificat valide."
                 )
@@ -564,6 +597,9 @@ class StagedCalculationSession:
             try:
                 candidate = finalizer(deepcopy(self._global_partition))
             except CoupledFinalizationError as exc:
+                if not self._accept_finalization_request(token):
+                    return self._stale_finalization_result(token)
+                self._finish_finalization_request(token)
                 self._global_stop_reason = str(
                     exc.report.get(
                         "stop_reason",
@@ -574,7 +610,11 @@ class StagedCalculationSession:
                     raise
                 self._finalization_attempt = {
                     **deepcopy(exc.report),
-                    "source_minimal_artifact_digest": (self._global_artifact_digest),
+                    "source_minimal_artifact_digest": (
+                        source_minimal_artifact_digest
+                    ),
+                    "finishing_effort_profile": effort_profile,
+                    "minimal_artifact_preserved": self._minimal_current(),
                 }
                 return {
                     "partition": None,
@@ -582,27 +622,50 @@ class StagedCalculationSession:
                     "staged_calculation": self.snapshot(),
                 }
             if not isinstance(candidate, dict):
+                self._finish_finalization_request(token)
                 raise StagedCalculationError(
                     "La methode de finition n a pas produit un plan exploitable."
                 )
+            if not self._accept_finalization_request(token):
+                return self._stale_finalization_result(token)
             if not validator(candidate):
+                self._finish_finalization_request(token)
                 self._global_stop_reason = "finalization_certificate_rejected"
+                self._finalization_attempt = {
+                    "schema_version": "bgig.coupled_finalization.v1",
+                    "status": NO_SOLUTION_WITHIN_BUDGET,
+                    "stop_reason": "finalization_certificate_rejected",
+                    "materializable": False,
+                    "partial_plan_published": False,
+                    "source_minimal_artifact_digest": (
+                        source_minimal_artifact_digest
+                    ),
+                    "finishing_effort_profile": effort_profile,
+                    "minimal_artifact_preserved": self._minimal_current(),
+                }
                 raise StagedCalculationError(
                     "La finalisation a ete rejetee ; le plan minimal courant est conserve."
                 )
+            if not self._accept_finalization_request(token):
+                return self._stale_finalization_result(token)
             finalized = deepcopy(candidate)
             artifact_digest = canonical_digest(
                 {
                     "schema_version": FINALIZED_PLAN_ARTIFACT_SCHEMA_V1,
                     "artifact_kind": ARTIFACT_KIND_FINALIZED,
                     "finalization_key_digest": key.digest,
-                    "source_minimal_artifact_digest": (self._global_artifact_digest),
+                    "source_minimal_artifact_digest": (
+                        source_minimal_artifact_digest
+                    ),
                     "partition_plan_digest": finalized.get("plan_digest"),
                     "partition": finalized,
                 }
             )
             self.cache.put(key, artifact_digest, finalized)
 
+        if not self._accept_finalization_request(token):
+            return self._stale_finalization_result(token)
+        self._finish_finalization_request(token)
         self.state.mark_lifecycle_current(STAGE_FINALIZED_PLAN, artifact_digest)
         self._finalized_status = STATUS_CURRENT
         self._finalized_partition = deepcopy(finalized)
@@ -622,7 +685,14 @@ class StagedCalculationSession:
             "stop_reason": "global_finalization_certified",
             "materializable": True,
             "partial_plan_published": False,
-            "source_minimal_artifact_digest": self._global_artifact_digest,
+            "source_minimal_artifact_digest": (
+                source_minimal_artifact_digest
+            ),
+            "finishing_effort_profile": effort_profile,
+            "minimal_artifact_preserved": (
+                canonical_digest(self._global_partition)
+                == source_minimal_value_digest
+            ),
             "closure_status": finalization.get("closure_status", "not_reported"),
             "iterations": finalization.get("iterations", 0),
             "repair_attempts": finalization.get("repair_attempts", 0),
@@ -636,7 +706,6 @@ class StagedCalculationSession:
             "solver_result": _partition_solver_result(finalized),
             "staged_calculation": self.snapshot(),
         }
-
     def select_materializable_artifact(
         self,
         artifact_kind: str = ARTIFACT_KIND_MINIMAL,
@@ -759,6 +828,9 @@ class StagedCalculationSession:
             "key_digest": self._finalization_key_digest,
             "cache_status": self._finalization_cache_status,
             "finishing_policy": self._finalization_policy,
+            "finishing_effort_profile": self._finalization_effort_profile,
+            "calculation_effort_profile": self._settings["effort"],
+            "budget_is_independent_from_calculation": True,
             "source_minimal_artifact_digest": (
                 self._global_artifact_digest if finalized_current else ""
             ),
@@ -811,6 +883,8 @@ class StagedCalculationSession:
                 "global_solve_uses_minimal_layout_portfolio": True,
                 "finalization_is_explicit": True,
                 "finalization_is_optional": not coupled_required,
+                "finishing_budget_is_independent": True,
+                "failed_or_stale_finishing_preserves_minimal": True,
                 "minimal_materialization_requires_finalized_plan": coupled_required,
                 "top_reservations_preserved_in_minimal_solver": True,
                 "artifact_selection_is_explicit": True,
@@ -900,6 +974,7 @@ class StagedCalculationSession:
 
     def _invalidate_downstream(self) -> None:
         self._active_global_request = None
+        self._active_finalization_request = None
         self._reset_finalization_attempt("dependencies_changed")
         if self._global_partition is not None:
             self._global_status = STATUS_STALE
@@ -907,6 +982,77 @@ class StagedCalculationSession:
             self._finalized_status = STATUS_STALE
         if self._cad_identity is not None:
             self._cad_status = STATUS_DESYNCHRONIZED
+
+    def _begin_finalization_request(
+        self,
+        key: FinalizationKey,
+        *,
+        effort_profile: str,
+        source_minimal_value_digest: str,
+    ) -> FinalizationRequestToken:
+        self._finalization_request_sequence += 1
+        token = FinalizationRequestToken(
+            sequence=self._finalization_request_sequence,
+            source_revision=self.state.source_revision,
+            source_minimal_artifact_digest=self._global_artifact_digest,
+            source_minimal_value_digest=source_minimal_value_digest,
+            finalization_key_digest=key.digest,
+            effort_profile=effort_profile,
+        )
+        self._active_finalization_request = token
+        return token
+
+    def _accept_finalization_request(
+        self,
+        token: FinalizationRequestToken,
+    ) -> bool:
+        return bool(
+            token == self._active_finalization_request
+            and token.source_revision == self.state.source_revision
+            and token.source_minimal_artifact_digest
+            == self._global_artifact_digest
+            and self._minimal_current()
+            and self._global_partition is not None
+            and token.source_minimal_value_digest
+            == canonical_digest(self._global_partition)
+        )
+
+    def _finish_finalization_request(
+        self,
+        token: FinalizationRequestToken,
+    ) -> None:
+        if token == self._active_finalization_request:
+            self._active_finalization_request = None
+
+    def _stale_finalization_result(
+        self,
+        token: FinalizationRequestToken,
+    ) -> dict[str, object]:
+        self._finish_finalization_request(token)
+        self._global_stop_reason = "finalization_result_stale"
+        self._finalization_attempt = {
+            "schema_version": "bgig.coupled_finalization.v1",
+            "status": STALE_OR_CANCELLED,
+            "stop_reason": "finalization_result_stale",
+            "materializable": False,
+            "partial_plan_published": False,
+            "source_minimal_artifact_digest": (
+                token.source_minimal_artifact_digest
+            ),
+            "finishing_effort_profile": token.effort_profile,
+            "minimal_artifact_preserved": bool(
+                self._global_partition is not None
+                and token.source_minimal_value_digest
+                == canonical_digest(self._global_partition)
+            ),
+        }
+        return {
+            "partition": None,
+            "solver_result": _finalization_solver_result(
+                self._finalization_attempt
+            ),
+            "staged_calculation": self.snapshot(),
+        }
 
     def _global_layout_key(self) -> GlobalLayoutKey:
         frontier_digests = list(self._frontier_digests)
@@ -953,6 +1099,7 @@ class StagedCalculationSession:
             global_key_digest=key.digest,
             settings_digest=self._settings_digest,
         )
+        self._active_finalization_request = None
         self._active_global_request = token
         return token
 
@@ -1068,7 +1215,7 @@ def _finalization_solver_result(
     report: Mapping[str, object],
 ) -> dict[str, object]:
     status = str(report.get("status", NO_SOLUTION_WITHIN_BUDGET))
-    if status != NO_SOLUTION_WITHIN_BUDGET:
+    if status not in {NO_SOLUTION_WITHIN_BUDGET, STALE_OR_CANCELLED}:
         status = NO_SOLUTION_WITHIN_BUDGET
     counters = {
         key: value
@@ -1099,7 +1246,7 @@ def _finalization_solver_result(
             },
             "request": {"id": "not_applicable", "revision": "not_applicable"},
             "elapsed_ms": "not_applicable",
-            "budgets": {},
+            "budgets": deepcopy(_mapping(report.get("budget", {}))),
             "counters": counters,
             "prunes": {},
             "diagnostic_code_counts": {str(code): 1 for code in report.get("rejection_codes", [])},

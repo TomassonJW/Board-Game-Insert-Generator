@@ -35,11 +35,12 @@ from board_game_insert_generator.minimal_layout_solver import (
     _problem_with_frontiers,
 )
 from board_game_insert_generator.solver_contract import SolverBudget, SolverStrategy
+from board_game_insert_generator.solver_settings import solver_deadline_seconds
 
 
 COUPLED_FINALIZATION_SCHEMA_V1 = "bgig.coupled_finalization.v1"
 COUPLED_FINALIZATION_FAMILY_ID = "bounded_coupled_finalization"
-COUPLED_FINALIZATION_VERSION = "bgig.bounded_coupled_finalization.v2"
+COUPLED_FINALIZATION_VERSION = "bgig.bounded_coupled_finalization.v3"
 COUPLED_FINALIZATION_POLICY = "bounded_growth_local_repair_balanced_proportional"
 ARTIFACT_KIND_FINALIZED = "finalized_plan"
 
@@ -48,19 +49,26 @@ _CLOSURE_CAPS = {
         "max_closure_iterations": 64,
         "max_closure_candidates": 7_500,
         "max_local_repairs": 32,
-        "max_closure_elapsed_ms": 5_000,
+    },
+    "short": {
+        "max_closure_iterations": 96,
+        "max_closure_candidates": 20_000,
+        "max_local_repairs": 48,
     },
     "normal": {
         "max_closure_iterations": 128,
         "max_closure_candidates": 37_500,
         "max_local_repairs": 64,
-        "max_closure_elapsed_ms": 12_000,
+    },
+    "long": {
+        "max_closure_iterations": 192,
+        "max_closure_candidates": 75_000,
+        "max_local_repairs": 96,
     },
     "deep": {
         "max_closure_iterations": 256,
         "max_closure_candidates": 125_000,
         "max_local_repairs": 128,
-        "max_closure_elapsed_ms": 30_000,
     },
 }
 
@@ -74,13 +82,16 @@ class CoupledFinalizationError(ValueError):
 
 
 def coupled_finalization_budget(effort_profile: str) -> SolverBudget:
-    """Return the unique bounded budget shared by closure and repair."""
+    """Return one independent five-level budget for the complete finishing run."""
 
     if effort_profile not in _CLOSURE_CAPS:
         raise ValueError(f"Unsupported effort profile: {effort_profile}.")
     source = _minimal_budget(effort_profile)
+    deadline_ms = int(solver_deadline_seconds(effort_profile) * 1000.0)
     limits = dict(source.limits)
     limits.update(_CLOSURE_CAPS[effort_profile])
+    limits["max_total_elapsed_ms"] = deadline_ms
+    limits["max_closure_elapsed_ms"] = deadline_ms
     return SolverBudget(
         COUPLED_FINALIZATION_FAMILY_ID,
         effort_profile,
@@ -109,9 +120,23 @@ def finalize_coupled_volume(
     effort_profile: str,
     container_frontiers: Sequence[object] = (),
 ) -> dict[str, object]:
-    """Close one minimal incumbent and return only a globally certified plan."""
+    """Finish one minimal incumbent under one independent total deadline."""
 
+    started = perf_counter()
+    budget = coupled_finalization_budget(effort_profile)
+    deadline_at = started + float(
+        dict(budget.limits)["max_total_elapsed_ms"]
+    ) / 1000.0
     _require_certified_minimal(minimal_plan)
+    if _deadline_reached(deadline_at):
+        raise CoupledFinalizationError(
+            "La deadline totale est atteinte avant la preparation de la finition.",
+            _deadline_failure_report(
+                "global_deadline_reached_before_preparation",
+                budget,
+            ),
+        )
+
     preparation = prepare_free_3d_problem(raw_project)
     if preparation.problem is None:
         raise CoupledFinalizationError(
@@ -141,8 +166,15 @@ def finalize_coupled_volume(
             ),
         ) from exc
 
-    budget = coupled_finalization_budget(effort_profile)
-    started = perf_counter()
+    baseline_budget = _remaining_phase_budget(budget, deadline_at)
+    if baseline_budget is None:
+        raise CoupledFinalizationError(
+            "La deadline totale est atteinte avant la fermeture de base.",
+            _deadline_failure_report(
+                "global_deadline_reached_before_baseline_closure",
+                budget,
+            ),
+        )
     baseline_closure = close_free_3d_residual(
         participants,
         placements,
@@ -151,16 +183,35 @@ def finalize_coupled_volume(
         problem.xy_clearance_mm,
         box_perimeter_xy_mm=problem.box_xy_clearance_mm,
         between_bodies_z_mm=problem.z_clearance_mm,
-        budget=budget,
+        budget=baseline_budget,
         top_inset_zones=problem.top_inset_zones,
         finishing_objective=FINISHING_OBJECTIVE_CLOSURE_ONLY,
     )
     if baseline_closure.empty_spaces:
+        deadline_reached = bool(
+            baseline_closure.deadline_reached or _deadline_reached(deadline_at)
+        )
         raise CoupledFinalizationError(
             "La fermeture bornee n a pas produit de plan complet certifiable.",
             _closure_report(
                 baseline_closure,
-                stop_reason="printable_residual_remains",
+                stop_reason=(
+                    "global_deadline_reached_during_baseline_closure"
+                    if deadline_reached
+                    else "printable_residual_remains"
+                ),
+                budget=budget,
+                deadline_reached=deadline_reached,
+            ),
+        )
+    if _deadline_reached(deadline_at):
+        raise CoupledFinalizationError(
+            "La deadline totale est atteinte avant le certificat de base.",
+            _closure_report(
+                baseline_closure,
+                stop_reason="global_deadline_reached_before_baseline_certificate",
+                budget=budget,
+                deadline_reached=True,
             ),
         )
 
@@ -175,6 +226,17 @@ def finalize_coupled_volume(
         budget=budget,
         phase="f01b_certified_baseline",
     )
+    if _deadline_reached(deadline_at):
+        raise CoupledFinalizationError(
+            "La deadline totale est atteinte pendant le certificat de base.",
+            _closure_report(
+                baseline_closure,
+                stop_reason="global_deadline_reached_during_baseline_certificate",
+                rejection_codes=rejection_codes,
+                budget=budget,
+                deadline_reached=True,
+            ),
+        )
     if baseline_certified is None:
         raise CoupledFinalizationError(
             "Le certificat global final a rejete le plan ferme.",
@@ -182,6 +244,7 @@ def finalize_coupled_volume(
                 baseline_closure,
                 stop_reason="global_certificate_rejected",
                 rejection_codes=rejection_codes,
+                budget=budget,
             ),
         )
 
@@ -193,10 +256,11 @@ def finalize_coupled_volume(
     objective_improved = False
     objective_fallback_reason = "shared_budget_exhausted_after_baseline"
     objective_closure: Free3DClosureResult | None = None
+    global_deadline_reached = False
     objective_budget = _remaining_objective_budget(
         budget,
         baseline_closure,
-        elapsed_ms=int((perf_counter() - started) * 1000.0),
+        remaining_elapsed_ms=_remaining_deadline_ms(deadline_at),
     )
     if objective_budget is not None:
         objective_attempted = True
@@ -212,8 +276,19 @@ def finalize_coupled_volume(
             top_inset_zones=problem.top_inset_zones,
             finishing_objective=(FINISHING_OBJECTIVE_BALANCED_THEN_PROPORTIONAL),
         )
+        global_deadline_reached = bool(
+            objective_closure.deadline_reached or _deadline_reached(deadline_at)
+        )
         if objective_closure.empty_spaces:
-            objective_fallback_reason = f"objective_{objective_closure.status}"
+            objective_fallback_reason = (
+                "global_deadline_reached_during_secondary_objective"
+                if global_deadline_reached
+                else f"objective_{objective_closure.status}"
+            )
+        elif global_deadline_reached:
+            objective_fallback_reason = (
+                "global_deadline_reached_before_secondary_certificate"
+            )
         else:
             candidate_certified, candidate_rejections = _certify_closed_plan(
                 problem,
@@ -222,18 +297,29 @@ def finalize_coupled_volume(
                 budget=budget,
                 phase="f02b_balanced_proportional_candidate",
             )
-            if candidate_certified is None:
-                objective_fallback_reason = "objective_global_certificate_rejected:" + ",".join(
-                    candidate_rejections
+            if _deadline_reached(deadline_at):
+                global_deadline_reached = True
+                objective_fallback_reason = (
+                    "global_deadline_reached_during_secondary_certificate"
+                )
+            elif candidate_certified is None:
+                objective_fallback_reason = (
+                    "objective_global_certificate_rejected:"
+                    + ",".join(candidate_rejections)
                 )
             else:
                 objective_certified = True
-                if objective_closure.objective_score < baseline_closure.objective_score:
+                if (
+                    objective_closure.objective_score
+                    < baseline_closure.objective_score
+                ):
                     selected_certified = candidate_certified
                     selected_closure = objective_closure
                     selected_plan_source = "f02b_balanced_proportional"
                     objective_improved = True
-                    objective_fallback_reason = "strict_secondary_objective_improvement"
+                    objective_fallback_reason = (
+                        "strict_secondary_objective_improvement"
+                    )
                 else:
                     objective_fallback_reason = "no_strict_secondary_improvement"
 
@@ -251,6 +337,7 @@ def finalize_coupled_volume(
         source_minimal_plan_digest=str(minimal_plan.get("plan_digest", "")),
         budget=budget,
         reservation_count=len(problem.top_inset_zones),
+        global_deadline_reached=global_deadline_reached,
     )
 
 
@@ -284,14 +371,23 @@ def _remaining_objective_budget(
     budget: SolverBudget,
     baseline: Free3DClosureResult,
     *,
-    elapsed_ms: int,
+    remaining_elapsed_ms: int,
 ) -> SolverBudget | None:
     limits = dict(budget.limits)
-    remaining_iterations = int(limits["max_closure_iterations"]) - (baseline.iterations)
-    remaining_candidates = int(limits["max_closure_candidates"]) - (baseline.candidates_evaluated)
-    remaining_repairs = int(limits["max_local_repairs"]) - (baseline.repair_attempts)
-    remaining_elapsed_ms = int(limits["max_closure_elapsed_ms"]) - (elapsed_ms)
-    if remaining_iterations <= 0 or remaining_candidates <= 0 or remaining_elapsed_ms <= 0:
+    remaining_iterations = int(limits["max_closure_iterations"]) - (
+        baseline.iterations
+    )
+    remaining_candidates = int(limits["max_closure_candidates"]) - (
+        baseline.candidates_evaluated
+    )
+    remaining_repairs = int(limits["max_local_repairs"]) - (
+        baseline.repair_attempts
+    )
+    if (
+        remaining_iterations <= 0
+        or remaining_candidates <= 0
+        or remaining_elapsed_ms <= 0
+    ):
         return None
     limits.update(
         {
@@ -306,6 +402,30 @@ def _remaining_objective_budget(
         budget.effort_profile,
         tuple(sorted(limits.items())),
     )
+
+
+def _remaining_phase_budget(
+    budget: SolverBudget,
+    deadline_at: float,
+) -> SolverBudget | None:
+    remaining_elapsed_ms = _remaining_deadline_ms(deadline_at)
+    if remaining_elapsed_ms <= 0:
+        return None
+    limits = dict(budget.limits)
+    limits["max_closure_elapsed_ms"] = remaining_elapsed_ms
+    return SolverBudget(
+        budget.family_id,
+        budget.effort_profile,
+        tuple(sorted(limits.items())),
+    )
+
+
+def _remaining_deadline_ms(deadline_at: float) -> int:
+    return max(0, int((deadline_at - perf_counter()) * 1000.0))
+
+
+def _deadline_reached(deadline_at: float) -> bool:
+    return perf_counter() >= deadline_at
 
 
 def _finalized_plan(
@@ -323,6 +443,7 @@ def _finalized_plan(
     source_minimal_plan_digest: str,
     budget: SolverBudget,
     reservation_count: int,
+    global_deadline_reached: bool,
 ) -> dict[str, object]:
     plan = deepcopy(certified.plan)
     certificate = certified.certificate
@@ -362,9 +483,12 @@ def _finalized_plan(
             )
         ),
         "deadline_reached": bool(
-            baseline_closure.deadline_reached
+            global_deadline_reached
+            or baseline_closure.deadline_reached
             or (objective_closure is not None and objective_closure.deadline_reached)
         ),
+        "global_deadline_enforced": True,
+        "calculation_budget_independent": True,
         "selected_plan_source": selected_plan_source,
         "secondary_objectives": {
             "schema_version": "bgig.finalization_secondary_objectives.v1",
@@ -432,6 +556,9 @@ def _finalized_plan(
             "base_cavity_layouts_fixed": True,
             "secondary_objectives_are_soft": True,
             "f01b_baseline_preserved_without_strict_improvement": True,
+            "finishing_budget_independent_from_calculation": True,
+            "global_finishing_deadline_enforced": True,
+            "minimal_incumbent_preserved_by_value": True,
             "modular_harmonization_applied": False,
         }
     )
@@ -488,8 +615,10 @@ def _closure_report(
     *,
     stop_reason: str,
     rejection_codes: Sequence[str] = (),
+    budget: SolverBudget | None = None,
+    deadline_reached: bool | None = None,
 ) -> dict[str, object]:
-    return {
+    report: dict[str, object] = {
         "schema_version": COUPLED_FINALIZATION_SCHEMA_V1,
         "status": "no_solution_within_budget",
         "stop_reason": stop_reason,
@@ -503,12 +632,43 @@ def _closure_report(
         "candidates_evaluated": closure.candidates_evaluated,
         "repair_attempts": closure.repair_attempts,
         "repairs_applied": closure.repairs_applied,
-        "global_resolve_invocation_count": (closure.global_resolve_invocation_count),
-        "deadline_reached": closure.deadline_reached,
+        "global_resolve_invocation_count": closure.global_resolve_invocation_count,
+        "deadline_reached": (
+            closure.deadline_reached
+            if deadline_reached is None
+            else deadline_reached
+        ),
         "residual_metric": closure.final_residual_metric,
         "finishing_objective": closure.finishing_objective,
         "objective_score": _objective_score_payload(closure.objective_score),
     }
+    if budget is not None:
+        report["budget"] = {
+            "family_id": budget.family_id,
+            "effort_profile": budget.effort_profile,
+            "limits": dict(budget.limits),
+        }
+    return report
+
+
+def _deadline_failure_report(
+    stop_reason: str,
+    budget: SolverBudget,
+    rejection_codes: Sequence[str] = (),
+) -> dict[str, object]:
+    report = _failure_report(stop_reason, rejection_codes)
+    report.update(
+        {
+            "status": "no_solution_within_budget",
+            "deadline_reached": True,
+            "budget": {
+                "family_id": budget.family_id,
+                "effort_profile": budget.effort_profile,
+                "limits": dict(budget.limits),
+            },
+        }
+    )
+    return report
 
 
 def _failure_report(

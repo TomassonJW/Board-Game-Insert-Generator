@@ -94,44 +94,43 @@ Rapport final L07 : P64_L07_GOAL_FINAL_REPORT.md.
 
 ## Dernier lot terminé
 
-### P64-L09R-B — calcul minimal fiable et budgets globaux
+### P64-L09R-C — finition séparée et non destructive
 
-- Support dur par enveloppe XY ; matière réelle diagnostique.
-- Réservations SCIP conservées et compensation Z nécessaire certifiée.
-- Plan minimal avec plateau ou livret directement matérialisable.
-- Préférence petits-dessous/grands-dessus non dure.
-- Deadlines totales Rapide 3 s, Court 10 s, Normal 20 s, Long 60 s et Approfondi 180 s.
-- Timeout honnête : `no_solution_within_budget`, jamais impossibilité.
+- Action `Finaliser` distincte du calcul minimal, jamais implicite.
+- Budget de finition indépendant parmi 3, 10, 20, 60 et 180 secondes.
+- Deadline totale partagée par préparation, fermeture, réparation et certificats.
+- Timeout, rejet ou résultat obsolète : aucun plan partiel publié.
+- Plan minimal conservé bit à bit et toujours matérialisable.
+- Suite complète : 859/859 ; un test natif ignoré sous Python 3.10.
 
-Preuve : `docs/P64_L09R_B_MINIMAL_CALCULATION_EVIDENCE.md`.
+Preuve : `docs/P64_L09R_C_SEPARATE_FINISHING_EVIDENCE.md`.
 
 ## Prochaine action recommandée
 
-### P64-L09R-C — séparer la finition sans détruire le plan minimal
+### P64-L09R-D — trois actions et budgets visibles
 
-Type : mission de code produit bornée, sans gate humaine préalable.
+Type : mission de code produit et UI bornée, sans gate humaine préalable.
 
 Objectifs exacts :
 
-1. découpler la fermeture F01B/F02B du calcul minimal et ne l'exécuter que sur action `Finaliser` ;
-2. appliquer à la finition un profil et une deadline totale indépendants parmi 3/10/20/60/180 s ;
-3. partir du plan minimal courant, protéger cavités et réservations, tenter la réparation locale avant tout rappel global ;
-4. publier un plan final seulement après recertification complète ;
-5. conserver sans mutation le plan minimal sélectionné si la finition échoue, expire ou devient stale ;
-6. maintenir la matérialisation minimale disponible avant et après un échec de finition.
+1. garder `Calculer`, `Finaliser` et `Matérialiser` toujours visibles ;
+2. appliquer la matrice exacte des états actifs et inactifs du contrat L09R ;
+3. afficher deux sélecteurs indépendants pour le calcul et la finition ;
+4. afficher à côté de chacun un champ non éditable donnant la limite réelle : 3 s, 10 s, 20 s, 60 s ou 3 min max ;
+5. invalider seulement le plan final après un changement propre à la finition, mais les deux plans après une modification du calcul ou de la source ;
+6. matérialiser le plan minimal tant que le plan final courant manque, puis le plan final courant.
 
 Contrat : `docs/P64_L09R_CALCUL_FINITION_PROGRESS_CONTRACT.md`.
 Décision : `docs/DECISIONS/ADR-0088-calcul-minimal-finition-optionnelle-et-budgets-visibles.md`.
 
-Aucune manipulation de Thomas n'est requise avant la future gate P64-L09R-V.
-L'ancienne gate P64-L09V sur 0.1.63 reste annulée et ne doit pas être exécutée.
+Aucune manipulation de Thomas requise avant la future gate P64-L09R-V.
+P64-L09V sur 0.1.63 reste annulée et ne doit pas être exécutée.
 
-## Lots ordonnés après P64-L09R-C
+## Lots ordonnés après P64-L09R-D
 
-1. P64-L09R-D — trois boutons permanents, invalidation exacte et champs de budget adjacents ;
-2. P64-L09R-E — jauge visible uniquement pendant l'activité et exécution réactive sans `adsk` dans le worker ;
-3. P64-L09R-F — durcissement sur cas représentatifs, plateaux et limites de budget ;
-4. P64-L09R-V — installation puis gate Fusion combinée, sans validation d'impression.
+1. P64-L09R-E — jauge visible uniquement pendant une activité et exécution réactive sans `adsk` dans le worker ;
+2. P64-L09R-F — durcissement sur cas représentatifs, plateaux et limites de budget ;
+3. P64-L09R-V — installation puis gate Fusion combinée, sans validation impression.
 
 ## Lots verrouillés ou différés
 

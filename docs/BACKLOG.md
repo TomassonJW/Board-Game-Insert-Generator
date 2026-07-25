@@ -3307,7 +3307,8 @@ implémentée et intégrée à la fois.
   avant rappel global et republier seulement un plan final recertifié.
 - Un échec conserve le plan minimal courant et matérialisable.
 - Aucun corps, cale, micro-conteneur ou valeur physique implicite.
-- Statut : `ready`, prochaine mission unique.
+- Preuve : `docs/P64_L09R_C_SEPARATE_FINISHING_EVIDENCE.md`.
+- Statut : `implemented-product`, `automated-validated`.
 
 ### P64-L09R-D — Trois actions et budgets visibles
 
@@ -3317,7 +3318,7 @@ implémentée et intégrée à la fois.
 - Afficher, à côté de chaque niveau de calcul et de finition, un champ non
   éditable avec la limite réelle : 3 s, 10 s, 20 s, 60 s ou 3 min max.
 - Montrer si la matérialisation cible le plan minimal ou final.
-- Statut : `planned-after-P64-L09R-C`.
+- Statut : `ready`, prochaine mission unique.
 
 ### P64-L09R-E — Progression temporaire et interface réactive
 

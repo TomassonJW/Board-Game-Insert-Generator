@@ -16,13 +16,13 @@ preuves archivées.
 ## État actif
 
 **État autoritaire du 2026-07-25 :** ADR-0088 reste la décision produit.
-P64-L09R-B implémente le support dur par enveloppe XY, les réservations du plan
-minimal, la préférence souple petits-dessous/grands-dessus et les deadlines
-totales 3/10/20/60/180 s. Le plan minimal avec plateau ou livret devient
-directement matérialisable. La matière réelle reste diagnostique et une échéance
-ne vaut jamais impossibilité. Après intégration de B, la prochaine mission unique
-est P64-L09R-C : finition séparée, facultative, à budget
-indépendant et non destructive. D/E/F suivent avant la gate humaine L09R-V.
+P64-L09R-B et C sont `implemented-product` et `automated-validated` : le calcul
+minimal est matérialisable, la finition est une action facultative à budget
+indépendant, et un timeout, un rejet ou un résultat obsolète ne détruit jamais le
+plan minimal courant. Les deadlines totales sont 3/10/20/60/180 s pour les deux
+opérations. La prochaine mission unique est P64-L09R-D : trois actions toujours
+visibles, activation exacte et budgets réels adjacents. E/F suivent
+avant la gate humaine L09R-V.
 - Dernière preuve : P64-V2H03V Fusion OK 0.1.55 ; P64-V2H03 est
   fusion-validated pour la coordination des variantes internes.
 - print-validated: false ; aucune valeur physique n'est calibrée par cette preuve.
@@ -144,11 +144,10 @@ indépendant et non destructive. D/E/F suivent avant la gate humaine L09R-V.
   automated-validated : le volume ajouté puis le ratio d’expansion sont des
   objectifs secondaires déterministes ; le plan F01B certifié reste prioritaire
   sans amélioration stricte. Suite complète : 853/853.
-- P64-L09V 0.1.63 reste archivée sans observation. P64-L09R-B est
-  `implemented-product` : enveloppe dure, réservations, matérialisation minimale,
-  préférence souple et budgets totaux sont `automated-validated`.
-  P64-L09R-C est la prochaine mission unique après intégration. La modularité
-  reste différée.
+- P64-L09V 0.1.63 reste archivée sans observation. P64-L09R-B et C sont
+  `implemented-product`, `automated-validated` : plan minimal certifié,
+  finition séparée, budget indépendant et repli non destructif. Suite complète C :
+  859/859. P64-L09R-D est la prochaine mission unique. La modularité reste différée.
 
 ## Vue de séquence
 
@@ -224,7 +223,8 @@ indépendant et non destructive. D/E/F suivent avant la gate humaine L09R-V.
 | Supersédée sans observation | P64-L09V | Gate 0.1.63 annulée par ADR-0088 ; ne pas l’exécuter. |
 | Terminée — décision | P64-L09R-A | Support enveloppe, finition optionnelle, budgets visibles et jauge active seulement pendant les opérations. |
 | Terminée — automatisée | P64-L09R-B | Support enveloppe, réservations, plan minimal matérialisable, préférence souple et deadlines totales 3/10/20/60/180 s. |
-| Prochaine mission | P64-L09R-C | Finition séparée, facultative, budget indépendant et échec non destructif. |
+| Terminée — automatisée | P64-L09R-C | Finition facultative à budget indépendant ; timeout, rejet et résultat obsolète conservent le plan minimal. |
+| Prochaine mission | P64-L09R-D | Trois actions permanentes, activation exacte, budgets séparés et durées adjacentes. |
 | Bloqué | P45 runtime, P46-P50, P69 | Dépendances et gates de version non satisfaites. |
 | Disponible sans recalibrage | P68 | Recueillir des faits d'impression réels sans modifier les defaults. |
 

@@ -40,15 +40,26 @@ DEFAULT_SOLVER_SETTINGS = {
 }
 
 
+def normalize_effort_profile(
+    value: object,
+    *,
+    default: str = EFFORT_NORMAL,
+) -> str:
+    """Normalize one calculation or finishing effort without coupling them."""
+
+    if default not in EFFORT_PROFILES:
+        raise ValueError("default effort profile must be a public profile")
+    return value if isinstance(value, str) and value in EFFORT_PROFILES else default
+
+
 def normalize_solver_settings(value: object) -> dict[str, str]:
     """Return the safe local product defaults for one untrusted settings object."""
 
     raw = value if isinstance(value, Mapping) else {}
     method = raw.get("method")
-    effort = raw.get("effort")
     return {
         "method": method if isinstance(method, str) and method in SOLVER_METHODS else SOLVER_METHOD_AUTO,
-        "effort": effort if isinstance(effort, str) and effort in EFFORT_PROFILES else EFFORT_NORMAL,
+        "effort": normalize_effort_profile(raw.get("effort")),
     }
 
 
@@ -60,6 +71,7 @@ def solver_deadline_seconds(effort_profile: str) -> float:
             "effort_profile must be quick, short, normal, long or deep"
         )
     return SOLVER_DEADLINE_SECONDS[effort_profile]
+
 
 def solver_method_label(method: str) -> str:
     """Return the short French product label without making Fusion the authority."""

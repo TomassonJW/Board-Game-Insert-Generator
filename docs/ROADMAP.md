@@ -1595,3 +1595,11 @@ finition ni corps automatique n'est ajouté.
 La prochaine étape est P64-L09R-C : isoler la finition dans une action
 facultative, avec budget indépendant et conservation du plan minimal en cas
 d'échec. Aucun benchmark, package Fusion ou fait d'impression n'est produit par B.
+
+## Mise à jour P64-L09R-C — 2026-07-25
+
+P64-L09R-C rend la fermeture F01B/F02B facultative et distincte du calcul minimal. Chaque finition choisit un profil indépendant Rapide, Court, Normal, Long ou Approfondi, avec une deadline totale exacte de 3, 10, 20, 60 ou 180 secondes couvrant préparation, fermeture, réparation et certificats.
+
+Le plan minimal courant reste la base certifiée. Timeout, rejet ou résultat obsolète ne publient aucun plan partiel, ne polluent pas le cache et conservent ce plan bit à bit pour la matérialisation. Une fermeture de base certifiée avant deadline reste le résultat sûr lorsque seul objectif secondaire expire.
+
+La prochaine étape est P64-L09R-D : exposer les trois actions permanentes, la matrice activation/invalidation, les deux budgets et leurs limites réelles adjacentes. E et F suivront avant P64-L09R-V. Aucun benchmark, package Fusion ou fait impression produit par C.

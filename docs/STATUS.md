@@ -3878,3 +3878,18 @@ Statut : `implemented-product`, `automated-validated`.
 
 Preuve : `docs/P64_L09R_B_MINIMAL_CALCULATION_EVIDENCE.md`.
 Prochaine mission unique : P64-L09R-C.
+
+## P64-L09R-C — finition séparée et non destructive
+
+Statut : `implemented-product`, `automated-validated`.
+
+- `Finaliser` est distinct du calcul minimal et possède son propre profil parmi 3/10/20/60/180 s.
+- Une deadline totale couvre préparation, fermeture, réparation locale, certificats et objectif secondaire.
+- Le plan minimal courant est capturé par digests avant finition ; timeout, rejet et résultat obsolète ne publient aucun plan partiel et le laissent matérialisable.
+- Un résultat obsolète est rejeté avant cache et publication. Une base certifiée avant deadline reste disponible si seul objectif secondaire expire.
+- Le pont palette accepte `finishing_effort`; le sélecteur visible appartient à P64-L09R-D.
+- Validation : 17/17 session, 29/29 palette, 5/5 fermeture continue ; suite complète 859/859 en 240,829 s, un test natif ignoré sous Python 3.10 ; compilation et `git diff --check` OK.
+- Aucun benchmark, package Fusion, réglage local, observation Fusion ou fait impression produit.
+
+Preuve : `docs/P64_L09R_C_SEPARATE_FINISHING_EVIDENCE.md`.
+Prochaine mission unique : P64-L09R-D.
