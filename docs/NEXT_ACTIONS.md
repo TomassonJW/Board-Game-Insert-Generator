@@ -1,5 +1,11 @@
 # Next Actions
 
+<!-- P64-L09S-D -->
+## Action courante : P64-L09S-E
+
+P64-L09S-D est terminee. Implementer maintenant la traduction fidele de chaque proprietaire composite dans le CAD IR : unir coeur et annexes en un seul composant utilisateur, puis appliquer les encoches plateau/livret uniquement aux corps finaux qui atteignent leur plan et chevauchent leur empreinte. Recertifier le plan courant avant toute publication finale.
+
+
 ## Prochaine mission autoritaire - P64-L09S-D
 
 P64-L09S-A, B et C sont terminees et integrees mission par mission.

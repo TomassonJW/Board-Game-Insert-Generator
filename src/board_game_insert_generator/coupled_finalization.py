@@ -25,6 +25,11 @@ from board_game_insert_generator.global_rectangular_closure import (
     GlobalRectangularClosureResult,
     close_global_rectangular_partition,
 )
+from board_game_insert_generator.xy_composite_closure import (
+    XYCompositeClosureResult,
+    close_xy_composite_partition,
+    xy_composite_closure_to_dict,
+)
 from board_game_insert_generator.free_3d_plan_adapter import (
     CertifiedFree3DPlan,
     Free3DPreparedProblem,
@@ -43,8 +48,8 @@ from board_game_insert_generator.solver_settings import solver_deadline_seconds
 
 COUPLED_FINALIZATION_SCHEMA_V1 = "bgig.coupled_finalization.v1"
 COUPLED_FINALIZATION_FAMILY_ID = "bounded_coupled_finalization"
-COUPLED_FINALIZATION_VERSION = "bgig.bounded_coupled_finalization.v4"
-COUPLED_FINALIZATION_POLICY = "global_rectangular_partition_balanced_proportional"
+COUPLED_FINALIZATION_VERSION = "bgig.bounded_coupled_finalization.v5"
+COUPLED_FINALIZATION_POLICY = "global_rectangular_then_bounded_xy_composite"
 ARTIFACT_KIND_FINALIZED = "finalized_plan"
 
 _CLOSURE_CAPS = {
@@ -193,22 +198,63 @@ def finalize_coupled_volume(
         deadline_reached = bool(
             closure.deadline_reached or _deadline_reached(deadline_at)
         )
-        raise CoupledFinalizationError(
-            "La partition rectangulaire globale ne couvre pas tout le volume imprimable.",
-            _closure_report(
-                closure,
-                stop_reason=(
-                    "global_deadline_reached_during_rectangular_partition"
-                    if deadline_reached
-                    else str(
-                        closure.partition_certificate.get(
-                            "stop_reason",
-                            "global_rectangular_partition_not_found",
-                        )
-                    )
+        if deadline_reached:
+            raise CoupledFinalizationError(
+                "La deadline totale est atteinte pendant la partition rectangulaire globale.",
+                _closure_report(
+                    closure,
+                    stop_reason="global_deadline_reached_during_rectangular_partition",
+                    budget=budget,
+                    deadline_reached=True,
                 ),
+            )
+        composite_budget = _remaining_phase_budget(budget, deadline_at)
+        if composite_budget is None:
+            raise CoupledFinalizationError(
+                "La deadline totale est atteinte avant le repli composite XY.",
+                _closure_report(
+                    closure,
+                    stop_reason="global_deadline_reached_before_xy_composite_fallback",
+                    budget=budget,
+                    deadline_reached=True,
+                ),
+            )
+        composite = close_xy_composite_partition(
+            participants,
+            placements,
+            problem.box,
+            problem.storage_height_mm,
+            problem.xy_clearance_mm,
+            box_perimeter_xy_mm=problem.box_xy_clearance_mm,
+            between_bodies_z_mm=problem.z_clearance_mm,
+            budget=composite_budget,
+            top_inset_zones=problem.top_inset_zones,
+        )
+        composite_certified = bool(
+            composite.status == "closed"
+            and composite.certificate.get("certified") is True
+        )
+        if composite_certified:
+            raise CoupledFinalizationError(
+                "La fermeture composite XY est certifiee et attend sa traduction CAD IR.",
+                _xy_composite_report(
+                    closure,
+                    composite,
+                    budget=budget,
+                    stop_reason="xy_composite_candidate_ready_for_cad_ir",
+                ),
+            )
+        raise CoupledFinalizationError(
+            "Aucune fermeture complete rectangulaire ou composite XY n a ete certifiee.",
+            _xy_composite_report(
+                closure,
+                composite,
                 budget=budget,
-                deadline_reached=deadline_reached,
+                stop_reason=(
+                    "global_deadline_reached_during_xy_composite_fallback"
+                    if composite.gross_closure.deadline_reached
+                    else composite.stop_reason
+                ),
             ),
         )
     if closure.partition_certificate.get("certified") is not True:
@@ -618,6 +664,41 @@ def _closure_report(
         }
     return report
 
+
+def _xy_composite_report(
+    rectangular: GlobalRectangularClosureResult,
+    composite: XYCompositeClosureResult,
+    *,
+    budget: SolverBudget,
+    stop_reason: str,
+) -> dict[str, object]:
+    certified = bool(
+        composite.status == "closed"
+        and composite.certificate.get("certified") is True
+    )
+    report = _closure_report(
+        rectangular,
+        stop_reason=stop_reason,
+        budget=budget,
+        deadline_reached=bool(composite.gross_closure.deadline_reached),
+    )
+    report.update(
+        {
+            "status": (
+                "certified_candidate_not_materializable"
+                if certified
+                else "no_solution_within_budget"
+            ),
+            "stop_reason": stop_reason,
+            "partial_plan_published": False,
+            "materializable": False,
+            "composite_candidate_certified": certified,
+            "xy_composite_closure": xy_composite_closure_to_dict(composite),
+            "cad_ir_union_required": True,
+            "reservation_notches_required": True,
+        }
+    )
+    return report
 
 def _deadline_failure_report(
     stop_reason: str,

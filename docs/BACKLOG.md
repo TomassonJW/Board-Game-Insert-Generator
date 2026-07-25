@@ -1,5 +1,13 @@
 # Backlog
 
+<!-- P64-L09S-D -->
+## Avancement P64-L09S
+
+- P64-L09S-D : terminee, testee et documentee ; annexes XY bornees, proprietaire unique, base Z commune, connexions par vraies faces X/Y, residuel nul.
+- P64-L09S-E : ready et prochaine mission unique ; CAD IR composite, unions, encoches exactes et publication uniquement apres recertification.
+- P64-L09S-F puis P64-L09S-V restent ordonnees apres E.
+
+
 ## Avancement P64-L09S apres C
 
 - P64-L09S-A : `completed`.

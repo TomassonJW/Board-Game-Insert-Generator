@@ -1,5 +1,11 @@
 # Geometry Model
 
+<!-- P64-L09S-D -->
+## Corps composites XY bornes
+
+Un corps final composite est un ensemble de prismes rectangulaires possedant tous le meme proprietaire et le meme Z bas. Un prisme annexe est admis seulement s'il rejoint le coeur par une chaine de contacts sur de vraies faces verticales X ou Y d'aire positive. Un contact par face horizontale seule, arete ou point est invalide. L'union doit contenir l'enveloppe minimale et couvrir exactement sa part du volume imprimable hors reservations certifiees.
+
+
 ## P64-L09S-C - partition rectangulaire globale
 
 Une finition rectangulaire valide est un arbre BSP 3D couvrant le domaine utile. Chaque feuille imprimable a un proprietaire unique et contient son enveloppe minimale. Les feuilles de reservation et les intervalles de jeu sont non imprimables et certifies separement.

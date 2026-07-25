@@ -1,5 +1,14 @@
 # Pilotage courant
 
+<!-- P64-L09S-D -->
+## Reprise canonique apres P64-L09S-D
+
+- A, B, C et D sont implementees et testees.
+- D certifie la fermeture composite XY bornee du cas plateau recent, mais la garde non materialisable.
+- Prochaine mission unique : P64-L09S-E, traduction CAD IR, unions par proprietaire et encoches exactes.
+- Aucun package Fusion installe ; aucun benchmark/holdout ; `print-validated=false`.
+
+
 ## Carte active - P64-L09S-D
 
 - A terminee : reservations minimales.

@@ -1,5 +1,11 @@
 # Quality Rules
 
+<!-- P64-L09S-D -->
+## Garde P64-L09S-D
+
+Une fermeture composite n'est certifiee que si chaque prisme a un proprietaire unique, si toutes les bases Z coincident, si l'enveloppe minimale est conservee, si chaque annexe est reliee par une vraie face X/Y et si le residuel imprimable vaut zero. Une proposition geometrique certifiee mais non traduite dans le CAD IR ne peut jamais etre annoncee comme plan final pret.
+
+
 ## Regles P64-L09S-C
 
 - Aucun plan final sans `printable_residual_volume_mm3 = 0`.

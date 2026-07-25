@@ -1,5 +1,11 @@
 # Capability Map
 
+<!-- P64-L09S-D -->
+## Increment P64-L09S-D
+
+La capability de finition sait desormais produire une fermeture composite XY bornee et certifiee lorsque la fermeture rectangulaire globale est impossible a cause d'une reservation haute non decoupable. Le statut reste non materialisable jusqu'a P64-L09S-E ; aucune validation Fusion ou impression n'est revendiquee.
+
+
 ## Mise a jour P64-L09S-C
 
 - Fermeture rectangulaire globale : `implemente`.

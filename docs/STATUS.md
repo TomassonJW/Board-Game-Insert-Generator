@@ -1,5 +1,11 @@
 # Status
 
+<!-- P64-L09S-D -->
+## P64-L09S-D terminee : fermeture composite XY certifiee
+
+Le repli borne apres C couvre exactement le volume imprimable par des prismes de meme base Z, a proprietaire unique et relies uniquement par de vraies faces verticales X/Y. Le cas plateau recent atteint `xy_composite_candidate_ready_for_cad_ir` avec residuel nul, sans publier de faux `finalized_plan`. Suite autorisee : 817/817 ; benchmark/holdout non lances ; `print-validated=false`. P64-L09S-E est la mission active.
+
+
 ## P64-L09S-C - etat autoritaire au 2026-07-25
 
 - Mission C terminee : fermeture rectangulaire globale par construction.

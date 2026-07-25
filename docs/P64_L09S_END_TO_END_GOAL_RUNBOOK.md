@@ -1,5 +1,11 @@
 # P64-L09S — Runbook du Goal de stabilisation de bout en bout
 
+<!-- P64-L09S-D -->
+## Point de passage P64-L09S-D
+
+D est acquise : apres l'echec honnete de C, le repli construit une partition brute complete, soustrait exactement les reservations hautes ouvertes et certifie des corps logiques composites de meme base Z. Toute annexe possede un proprietaire unique et une chaine de vraies faces verticales X/Y ; les liaisons Z seules, par arete ou par point sont refusees. La proposition reste non publiable jusqu'a E.
+
+
 ## Avancement apres P64-L09S-C
 
 - A, B et C terminees.

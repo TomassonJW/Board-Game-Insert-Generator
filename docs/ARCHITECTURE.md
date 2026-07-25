@@ -1,5 +1,11 @@
 # Architecture
 
+<!-- P64-L09S-D -->
+## Frontiere D vers E
+
+`xy_composite_closure.py` reste dans le coeur Python pur. Il produit la decomposition et ses certificats sans dependance Fusion. Le finaliseur expose cette proposition sans la publier. `partition_cad.py` et l'adaptateur Fusion devront, en E, unir les prismes par proprietaire et appliquer les encoches exactes avant qu'un plan recertifie devienne materialisable.
+
+
 ## Finalisation rectangulaire P64-L09S-C
 
 `global_rectangular_closure.py` construit et certifie la partition BSP 3D. `coupled_finalization.py` orchestre le budget, appelle ce moteur une seule fois et soumet uniquement une partition complete au certificat produit commun. Fusion reste un adaptateur de sortie.

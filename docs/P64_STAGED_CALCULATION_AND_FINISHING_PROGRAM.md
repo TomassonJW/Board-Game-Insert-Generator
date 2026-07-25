@@ -1,5 +1,11 @@
 # P64-A02 — Programme de calcul étagé et finalisation explicite
 
+<!-- P64-L09S-D -->
+## Contrat ajoute par P64-L09S-D
+
+Le cycle etage distingue maintenant une proposition composite certifiee d'un plan final materialisable. `xy_composite_candidate_ready_for_cad_ir` conserve le minimal courant, expose le certificat et interdit `finalized_plan_ready`. E devra transformer cette proposition en CAD IR uni, appliquer les encoches exactes et relancer la certification produit avant publication.
+
+
 ## Mise en oeuvre P64-L09S-C
 
 Le finaliseur utilise une partition BSP 3D globale. Chaque feuille est un corps rectangulaire demande ou une reservation fixe ; chaque coupe porte un vide technique certifie. Le bilan volume racine = corps + reservations + vides techniques est recalcule avant le certificat produit final.

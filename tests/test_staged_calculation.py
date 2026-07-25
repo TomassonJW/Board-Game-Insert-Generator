@@ -260,7 +260,7 @@ class StagedCalculationTests(unittest.TestCase):
         with self.assertRaises(StagedCalculationError):
             session.select_materializable_artifact(ARTIFACT_KIND_FINALIZED)
 
-    def test_global_rectangular_finalization_defers_non_slicing_top_reservation_to_composite_fallback(self) -> None:
+    def test_non_slicing_top_reservation_produces_certified_composite_candidate(self) -> None:
         project = _project_with_flat_reservation()
         engine = _engine(project)
         session = StagedCalculationSession(project, solver_settings=SETTINGS)
@@ -305,11 +305,31 @@ class StagedCalculationTests(unittest.TestCase):
         )
         self.assertEqual(
             attempt["stop_reason"],
-            "global_rectangular_partition_not_found",
+            "xy_composite_candidate_ready_for_cad_ir",
         )
         self.assertFalse(
             attempt["global_partition_certificate"]["certified"]
         )
+        self.assertTrue(attempt["composite_candidate_certified"])
+        self.assertTrue(
+            attempt["xy_composite_closure"]["certificate"]["certified"]
+        )
+        self.assertEqual(
+            attempt["xy_composite_closure"]["certificate"]
+            ["printable_residual_volume_mm3"],
+            0.0,
+        )
+        self.assertGreater(
+            sum(
+                owner["certificate"]["annex_count"]
+                for owner in attempt["xy_composite_closure"]["owners"]
+            ),
+            0,
+        )
+        self.assertTrue(attempt["cad_ir_union_required"])
+        self.assertTrue(attempt["reservation_notches_required"])
+        self.assertFalse(attempt["materializable"])
+        self.assertFalse(attempt["partial_plan_published"])
         self.assertTrue(attempt["minimal_artifact_preserved"])
 
     def test_total_finishing_timeout_preserves_exact_minimal_artifact(self) -> None:

@@ -707,5 +707,26 @@ class P64L09SCDocumentEvidenceTests(unittest.TestCase):
         ):
             self.assertIn(marker, evidence)
 
+class P64L09SDDocumentEvidenceTests(unittest.TestCase):
+    def test_xy_composite_closure_evidence_is_guarded(self) -> None:
+        from pathlib import Path
+
+        evidence = (
+            Path(__file__).resolve().parents[1]
+            / "docs"
+            / "P64_L09S_D_XY_COMPOSITE_CLOSURE_EVIDENCE.md"
+        ).read_text(encoding="utf-8")
+        for marker in (
+            "mission: P64-L09S-D",
+            "status: implemented-and-tested",
+            "xy_composite_candidate_ready_for_cad_ir",
+            "printable_residual_volume_mm3=0",
+            "z_only_attachment_count=0",
+            "edge_or_point_attachment_count=0",
+            "authorized_suite: 817/817",
+            "print-validated=false",
+        ):
+            self.assertIn(marker, evidence)
+
 if __name__ == "__main__":
     unittest.main()
