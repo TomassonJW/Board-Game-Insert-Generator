@@ -22,7 +22,7 @@ from p64_h04_fixture_cases import (
 
 
 class SolverContractTests(unittest.TestCase):
-    def test_stage_stack_adapter_preserves_geometry_and_adds_material_certificate(self) -> None:
+    def test_stage_stack_adapter_preserves_geometry_and_adds_envelope_certificate(self) -> None:
         for fixture in (simple_success_project, h01_dense_project):
             with self.subTest(fixture=fixture.__name__):
                 baseline = _solve_stage_stack_baseline(fixture())
@@ -31,11 +31,12 @@ class SolverContractTests(unittest.TestCase):
                 self.assertEqual(adapted["placements"], baseline["placements"])
                 self.assertEqual(
                     adapted["stage_support"]["certificate_kind"],
-                    "material_surface_v1",
+                    "outer_envelope_v1",
                 )
                 self.assertEqual(adapted["stage_support"]["status"], "supported")
-                self.assertTrue(adapted["validation"]["material_support_certified"])
-                self.assertTrue(adapted["invariants"]["material_support_certified"])
+                self.assertTrue(adapted["validation"]["envelope_support_certified"])
+                self.assertTrue(adapted["invariants"]["envelope_support_certified"])
+                self.assertIn("material_support_diagnostic", adapted)
 
     def test_complete_h04_plan_gets_one_immutable_candidate_and_certificate(self) -> None:
         run = inspect_stage_stack_plan(solve_partition_plan(h01_dense_project()))
@@ -86,17 +87,19 @@ class SolverContractTests(unittest.TestCase):
         self.assertEqual(result["placements"], [])
         self.assertEqual(result["diagnostics"][0]["code"], "COMMON_CERTIFICATE_REJECTED")
 
-    def test_h02_void_support_is_demoted_instead_of_published(self) -> None:
+    def test_h02_opening_is_diagnostic_and_envelope_plan_is_published(self) -> None:
         result = solve_partition_plan(h02_reservations_project())
 
+        self.assertEqual(result["solver"]["result"]["status"], "solution_found")
+        self.assertTrue(result["summary"]["materializable"])
+        self.assertEqual(result["stage_support"]["status"], "supported")
         self.assertEqual(
-            result["solver"]["result"]["status"],
-            "no_solution_within_budget",
+            result["stage_support"]["certificate_kind"],
+            "outer_envelope_v1",
         )
-        self.assertFalse(result["summary"]["materializable"])
-        self.assertIn(
-            "insufficient_material_support",
-            result["stage_support"]["rejection_statuses"],
+        self.assertEqual(
+            result["material_support_diagnostic"]["status"],
+            "unsupported",
         )
 
 

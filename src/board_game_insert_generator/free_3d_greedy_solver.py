@@ -15,7 +15,7 @@ from typing import Any, Iterable, Mapping
 
 from board_game_insert_generator.material_support import (
     MaterialSupportEvaluation,
-    evaluate_search_support,
+    evaluate_envelope_search_support as evaluate_search_support,
 )
 from board_game_insert_generator.solver_contract import (
     PlacementSnapshot,

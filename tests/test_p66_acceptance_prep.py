@@ -69,8 +69,8 @@ class P66AcceptancePreparationTests(unittest.TestCase):
         self.assertEqual(first["partition"], second["partition"])
         self.assertEqual(first["summary"], {
             "status": "constructed",
-            "plan_digest": "89dcfcaa2da4fc33fd12b17c6dea1d9fd4ed922b3a267232637eb1536a57c7ec",
-            "cad_digest": "fd3333a357b6a946a155e176ccaf25ad19e17afd1f20291bdc11cd2313d964c3",
+            "plan_digest": "c5f4ebf79558bbfb13cf54052625248fb479027fe8bbb6a1af08739bb6ab36ea",
+            "cad_digest": "97dd93141a670c0f74c6f20ec7812acfbb719b7e062f18f267a0031a7a53c617",
             "source_digest": "bc176b0562b4eff493413d928129485ff49e136cd91e84ee9ccb9c21a7d3337c",
             "materializable": True,
             "cad_ready": True,
@@ -135,17 +135,16 @@ class P66AcceptancePreparationTests(unittest.TestCase):
         self.assertEqual(axes["c0"]["x"]["mode"], "target")
         self.assertEqual(axes["c2"]["x"]["mode"], "fixed")
         self.assertEqual(solved["staged_calculation"]["minimal_layout"]["status"], "current")
-        self.assertFalse(
+        self.assertTrue(
             solved["staged_calculation"]["minimal_layout"]["materializable_without_finalization"]
         )
-        self.assertEqual(solved["partition"]["summary"]["status"], "not_constructed")
+        self.assertEqual(solved["partition"]["summary"]["status"], "constructed")
         self.assertEqual(solved["partition"]["diagnostics"], [])
-        self.assertEqual(finalized["status"], "invalid")
-        self.assertIn("Calcule un agencement minimal courant", finalized["errors"][0])
-        self.assertEqual(generated["status"], "invalid")
-        self.assertEqual(regenerated["status"], "invalid")
-        self.assertIsNone(generated["cad_build"])
-        self.assertIsNone(regenerated["cad_build"])
+        self.assertEqual(finalized["status"], "ready")
+        self.assertEqual(generated["status"], "ready")
+        self.assertEqual(regenerated["status"], "ready")
+        self.assertEqual(generated["cad_build"]["status"], PARTITION_CAD_STATUS_READY)
+        self.assertEqual(regenerated["cad_build"]["status"], PARTITION_CAD_STATUS_READY)
         self.assertNotEqual(solved["project_digest"], solved["partition"]["plan_digest"])
         self.assertNotEqual(solved["project_digest"], edited_response["project_digest"])
         self.assertEqual(edited_response["lifecycle"]["solved"], "not_computed")

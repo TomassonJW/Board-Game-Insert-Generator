@@ -19,9 +19,20 @@ SOLVER_METHODS = frozenset(
 )
 
 EFFORT_QUICK = "quick"
+EFFORT_SHORT = "short"
 EFFORT_NORMAL = "normal"
+EFFORT_LONG = "long"
 EFFORT_DEEP = "deep"
-EFFORT_PROFILES = frozenset({EFFORT_QUICK, EFFORT_NORMAL, EFFORT_DEEP})
+EFFORT_PROFILES = frozenset(
+    {EFFORT_QUICK, EFFORT_SHORT, EFFORT_NORMAL, EFFORT_LONG, EFFORT_DEEP}
+)
+SOLVER_DEADLINE_SECONDS = {
+    EFFORT_QUICK: 3.0,
+    EFFORT_SHORT: 10.0,
+    EFFORT_NORMAL: 20.0,
+    EFFORT_LONG: 60.0,
+    EFFORT_DEEP: 180.0,
+}
 
 DEFAULT_SOLVER_SETTINGS = {
     "method": SOLVER_METHOD_AUTO,
@@ -40,6 +51,15 @@ def normalize_solver_settings(value: object) -> dict[str, str]:
         "effort": effort if isinstance(effort, str) and effort in EFFORT_PROFILES else EFFORT_NORMAL,
     }
 
+
+def solver_deadline_seconds(effort_profile: str) -> float:
+    """Return the public total calculation deadline for one effort profile."""
+
+    if effort_profile not in EFFORT_PROFILES:
+        raise ValueError(
+            "effort_profile must be quick, short, normal, long or deep"
+        )
+    return SOLVER_DEADLINE_SECONDS[effort_profile]
 
 def solver_method_label(method: str) -> str:
     """Return the short French product label without making Fusion the authority."""

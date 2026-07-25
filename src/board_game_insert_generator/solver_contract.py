@@ -18,7 +18,10 @@ import hashlib
 import json
 from typing import Any, Callable, Mapping
 
-from board_game_insert_generator.material_support import material_support_contract
+from board_game_insert_generator.material_support import (
+    envelope_support_contract,
+    material_support_contract,
+)
 
 
 STAGE_STACK_FAMILY_ID = "stage_stack"
@@ -178,28 +181,45 @@ def run_stage_stack_adapter(
         )
         return _demote_uncertified_stage_plan(plan, rejection_codes)
     if _solution_found(plan):
-        return _attach_material_support_to_certified_plan(plan)
+        return _attach_support_contracts_to_certified_plan(plan)
     return plan
 
 
-def _attach_material_support_to_certified_plan(
+def _attach_support_contracts_to_certified_plan(
     plan: Mapping[str, object],
 ) -> dict[str, object]:
     projected = deepcopy(dict(plan))
     placements = _mappings(projected.get("placements"))
     policy = _mapping(projected.get("clearance_policy"))
-    support = material_support_contract(
+    xy_clearance = _number(policy.get("between_bodies_xy_mm"))
+    z_clearance = _number(policy.get("between_bodies_z_mm"))
+    envelope_support = envelope_support_contract(
         placements,
-        fallback_xy_clearance=_number(policy.get("between_bodies_xy_mm")),
-        fallback_z_clearance=_number(policy.get("between_bodies_z_mm")),
+        fallback_xy_clearance=xy_clearance,
+        fallback_z_clearance=z_clearance,
     )
-    projected["stage_support"] = support
+    material_diagnostic = material_support_contract(
+        placements,
+        fallback_xy_clearance=xy_clearance,
+        fallback_z_clearance=z_clearance,
+    )
+    projected["stage_support"] = envelope_support
+    projected["material_support_diagnostic"] = material_diagnostic
     validation = _mapping(projected.get("validation"))
-    validation["material_support_certified"] = support["status"] == "supported"
-    validation["material_support_contract"] = deepcopy(support)
+    validation["envelope_support_certified"] = (
+        envelope_support["status"] == "supported"
+    )
+    validation["envelope_support_contract"] = deepcopy(envelope_support)
+    validation["material_support_certified"] = (
+        material_diagnostic["status"] == "supported"
+    )
+    validation["material_support_contract"] = deepcopy(material_diagnostic)
     projected["validation"] = validation
     invariants = _mapping(projected.get("invariants"))
-    invariants["material_support_certified"] = support["status"] == "supported"
+    invariants["envelope_support_certified"] = (
+        envelope_support["status"] == "supported"
+    )
+    invariants["openings_are_diagnostic_only"] = True
     projected["invariants"] = invariants
     return _refresh_plan_digest(projected)
 
@@ -231,27 +251,30 @@ def _demote_uncertified_stage_plan(
 
     projected = deepcopy(dict(plan))
     diagnostic_code = (
-        "MATERIAL_SUPPORT_CONTRACT"
-        if "MATERIAL_SUPPORT_CONTRACT" in rejection_codes
+        "ENVELOPE_SUPPORT_CONTRACT"
+        if "ENVELOPE_SUPPORT_CONTRACT" in rejection_codes
         else "COMMON_CERTIFICATE_REJECTED"
     )
     diagnostic_message = (
-        "La disposition trouvee s appuie sur une ouverture ou sur des "
-        "rebords materiels insuffisants."
-        if diagnostic_code == "MATERIAL_SUPPORT_CONTRACT"
+        "La disposition trouvee ne possede pas un appui XY suffisant sur "
+        "les enveloppes des corps inferieurs."
+        if diagnostic_code == "ENVELOPE_SUPPORT_CONTRACT"
         else "La disposition trouvee a echoue au certificat commun."
     )
     original_placements = _mappings(projected.get("placements"))
     policy = _mapping(projected.get("clearance_policy"))
     if original_placements:
-        projected["stage_support"] = material_support_contract(
+        xy_clearance = _number(policy.get("between_bodies_xy_mm"))
+        z_clearance = _number(policy.get("between_bodies_z_mm"))
+        projected["stage_support"] = envelope_support_contract(
             original_placements,
-            fallback_xy_clearance=_number(
-                policy.get("between_bodies_xy_mm")
-            ),
-            fallback_z_clearance=_number(
-                policy.get("between_bodies_z_mm")
-            ),
+            fallback_xy_clearance=xy_clearance,
+            fallback_z_clearance=z_clearance,
+        )
+        projected["material_support_diagnostic"] = material_support_contract(
+            original_placements,
+            fallback_xy_clearance=xy_clearance,
+            fallback_z_clearance=z_clearance,
         )
     projected["placements"] = []
     projected["stages"] = []
@@ -272,7 +295,7 @@ def _demote_uncertified_stage_plan(
         "box_xy_clearance_respected": False,
         "no_collisions": False,
         "clearances_respected": False,
-        "material_support_certified": False,
+        "envelope_support_certified": False,
     }
     projected["diagnostics"] = [
         {
@@ -314,7 +337,7 @@ def _demote_uncertified_stage_plan(
     summary["result_label"] = result["label"]
     solver["result"] = result
     telemetry = _mapping(solver.get("telemetry"))
-    telemetry["stop_reason"] = "material_support_certificate_rejected"
+    telemetry["stop_reason"] = "envelope_support_certificate_rejected"
     telemetry["diagnostic_code_counts"] = {diagnostic_code: 1}
     solver["telemetry"] = telemetry
     return _refresh_plan_digest(projected)
@@ -403,9 +426,9 @@ def certify_partition_candidate(
         ValidationCheck("no_collisions", bool(geometry["no_collisions"]), "BODY_COLLISION"),
         ValidationCheck("between_body_clearance", bool(geometry["clearances_respected"]), "BODY_CLEARANCE"),
         ValidationCheck(
-            "material_support",
-            bool(geometry["material_support_certified"]),
-            "MATERIAL_SUPPORT_CONTRACT",
+            "envelope_support",
+            bool(geometry["envelope_support_certified"]),
+            "ENVELOPE_SUPPORT_CONTRACT",
         ),
         ValidationCheck("envelope_contract", envelope_ready, "ENVELOPE_CONTRACT"),
         ValidationCheck("cavities_walls_floors", cavities_walls_floors, "CAVITY_WALL_FLOOR_CONTRACT"),
@@ -446,7 +469,7 @@ def certify_minimal_layout_candidate(
         for check in common.checks
     ) + (
         ValidationCheck(
-            "minimum_outer_dimensions",
+            "minimum_or_required_reservation_z_compensation",
             _placements_are_minimal(placements),
             "MINIMAL_ENVELOPE_EXPANDED",
         ),
@@ -482,11 +505,30 @@ def _placements_are_minimal(placements: list[dict[str, object]]) -> bool:
         expected_faces = {"left", "right", "front", "back", "below", "above"}
         if set(surplus) != expected_faces:
             return False
-        if any(abs(final[axis] - minimum[axis]) > _EPSILON for axis in _AXES):
+        if any(abs(final[axis] - minimum[axis]) > _EPSILON for axis in ("x", "y")):
+            return False
+        z_compensation = _number(
+            placement.get("reservation_required_z_compensation_mm")
+        )
+        actual_z_surplus = final["z"] - minimum["z"]
+        if z_compensation < -_EPSILON:
+            return False
+        if abs(actual_z_surplus - z_compensation) > _EPSILON:
             return False
         if any(
             abs(_number(surplus.get(face))) > _EPSILON
-            for face in ("left", "right", "front", "back", "below", "above")
+            for face in ("left", "right", "front", "back")
+        ):
+            return False
+        if abs(
+            _number(surplus.get("below"))
+            + _number(surplus.get("above"))
+            - z_compensation
+        ) > _EPSILON:
+            return False
+        if any(
+            _number(surplus.get(face)) < -_EPSILON
+            for face in ("below", "above")
         ):
             return False
     return True
@@ -583,7 +625,12 @@ def validate_placement_geometry(
     )
     body_volume = sum(_volume(_mapping(item.get("world_size_mm"))) for item in placements)
     storage_volume = box["x"] * box["y"] * storage_height
-    material_support = material_support_contract(
+    envelope_support = envelope_support_contract(
+        placements,
+        fallback_xy_clearance=xy_clearance,
+        fallback_z_clearance=z_clearance,
+    )
+    material_diagnostic = material_support_contract(
         placements,
         fallback_xy_clearance=xy_clearance,
         fallback_z_clearance=z_clearance,
@@ -593,8 +640,10 @@ def validate_placement_geometry(
         "box_xy_clearance_respected": box_xy_clearance_respected,
         "no_collisions": no_collisions,
         "clearances_respected": clearances,
-        "material_support_certified": material_support["status"] == "supported",
-        "material_support_contract": material_support,
+        "envelope_support_certified": envelope_support["status"] == "supported",
+        "envelope_support_contract": envelope_support,
+        "material_support_certified": material_diagnostic["status"] == "supported",
+        "material_support_contract": material_diagnostic,
         "body_volume_mm3": _round(body_volume),
         "storage_volume_mm3": _round(storage_volume),
         "technical_void_volume_mm3": _round(max(0.0, storage_volume - body_volume)),

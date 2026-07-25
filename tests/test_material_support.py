@@ -219,7 +219,7 @@ class MaterialSupportTests(unittest.TestCase):
         self.assertEqual(evaluation.status, FALLS_THROUGH_OPENING)
         self.assertFalse(evaluation.certified)
 
-    def test_common_geometry_validator_rejects_void_support(self) -> None:
+    def test_common_validator_allows_large_below_small_on_outer_envelope(self) -> None:
         placements = [
             _placement(
                 "lower", (0.0, 0.0, 0.0), (100.0, 100.0, 20.0), cavity=(10.0, 10.0, 80.0, 80.0)
@@ -236,6 +236,11 @@ class MaterialSupportTests(unittest.TestCase):
             0.0,
         )
 
+        self.assertTrue(validation["envelope_support_certified"])
+        self.assertEqual(
+            validation["envelope_support_contract"]["certificate_kind"],
+            "outer_envelope_v1",
+        )
         self.assertFalse(validation["material_support_certified"])
         self.assertEqual(
             validation["material_support_contract"]["rejection_statuses"],

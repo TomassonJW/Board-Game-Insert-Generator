@@ -1574,3 +1574,24 @@ V0.2 P46, couvercles P47-P50 et gate V0.3, retours P68, revue P69 puis horizons
 P70+ priorisés humainement. Les capacités post-solve C01-C03, la modularité, les
 cales et le mode exact restent des programmes distincts et verrouillés par leurs
 préconditions.
+
+## Mise à jour P64-L09R-B — 2026-07-25
+
+P64-L09R-B implémente le premier incrément de la trajectoire ADR-0088 :
+support dur par enveloppe XY, diagnostic matière non bloquant, réservations
+supérieures conservées, plan minimal directement matérialisable et préférence
+souple petits-dessous/grands-dessus.
+
+Les cinq profils partagent désormais une deadline totale de 3, 10, 20, 60 ou
+180 secondes depuis l'entrée publique. La préparation, SCIP, le repli interne et
+la première certification restent sous la même limite. Un arrêt au budget demeure
+un résultat borné inconnu, jamais une impossibilité.
+
+La compensation Z nécessaire à un plateau ou livret est appliquée seulement après
+un placement minimal complet, sur un corps non fixe sans obstacle au-dessus. Elle
+est certifiée explicitement et acceptée par le garde CAD ; aucun volume de
+finition ni corps automatique n'est ajouté.
+
+La prochaine étape est P64-L09R-C : isoler la finition dans une action
+facultative, avec budget indépendant et conservation du plan minimal en cas
+d'échec. Aucun benchmark, package Fusion ou fait d'impression n'est produit par B.

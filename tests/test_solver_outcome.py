@@ -99,25 +99,18 @@ class SolverOutcomeTests(unittest.TestCase):
         )
         self.assertIn("n est pas une preuve", result["diagnostics"][0]["message"])
 
-    def test_anonymised_h01_and_h02_regressions_are_material_aware(self) -> None:
-        accepted = solve_partition_plan(h01_dense_project())
-        rejected = solve_partition_plan(h02_reservations_project())
+    def test_anonymised_h01_and_h02_use_envelope_support_with_material_diagnostic(self) -> None:
+        solid = solve_partition_plan(h01_dense_project())
+        open_stack = solve_partition_plan(h02_reservations_project())
 
-        self.assertEqual(accepted["summary"]["result_status"], SOLUTION_FOUND)
+        self.assertEqual(solid["summary"]["result_status"], SOLUTION_FOUND)
+        self.assertEqual(open_stack["summary"]["result_status"], SOLUTION_FOUND)
+        self.assertTrue(open_stack["summary"]["materializable"])
+        self.assertEqual(open_stack["stage_support"]["status"], "supported")
         self.assertEqual(
-            accepted["solver"]["telemetry"]["stop_reason"],
-            "validated_complete_proposal",
+            open_stack["material_support_diagnostic"]["status"],
+            "unsupported",
         )
-        self.assertEqual(
-            rejected["summary"]["result_status"],
-            NO_SOLUTION_WITHIN_BUDGET,
-        )
-        self.assertEqual(
-            rejected["solver"]["telemetry"]["stop_reason"],
-            "material_support_certificate_rejected",
-        )
-        self.assertFalse(rejected["summary"]["materializable"])
-
     def test_contextual_h03_fixture_is_not_presented_as_an_impossibility_proof(self) -> None:
         result = solve_partition_plan(h03_contextual_unresolved_project())
 
@@ -130,7 +123,7 @@ class SolverOutcomeTests(unittest.TestCase):
                 result["diagnostics"][0]["code"],
                 {
                     "PORTFOLIO_NO_SOLUTION_WITHIN_BUDGET",
-                    "MATERIAL_SUPPORT_CONTRACT",
+                    "ENVELOPE_SUPPORT_CONTRACT",
                 },
             )
             self.assertIn("ne prouve pas", result["diagnostics"][0]["action"])

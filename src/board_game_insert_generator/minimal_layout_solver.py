@@ -41,6 +41,7 @@ from board_game_insert_generator.free_3d_beam_solver import (
 )
 from board_game_insert_generator.free_3d_greedy_solver import (
     EmptySpace,
+    TopInsetZone,
     _Counters,
     _subtract_placement_from_spaces,
 )
@@ -69,11 +70,14 @@ from board_game_insert_generator.solver_outcome import (
     STALE_OR_CANCELLED,
     result_label,
 )
-from board_game_insert_generator.solver_portfolio import (
+from board_game_insert_generator.solver_portfolio import portfolio_effort_profiles
+from board_game_insert_generator.solver_settings import (
     EFFORT_DEEP,
+    EFFORT_LONG,
     EFFORT_NORMAL,
     EFFORT_QUICK,
-    portfolio_effort_profiles,
+    EFFORT_SHORT,
+    solver_deadline_seconds,
 )
 from board_game_insert_generator.scip_product_solver import (
     SCIP_PRODUCT_FAMILY,
@@ -88,7 +92,7 @@ from board_game_insert_generator.scip_product_solver import (
 
 
 MINIMAL_LAYOUT_FAMILY_ID = "minimal_layout_portfolio"
-MINIMAL_LAYOUT_SOLVER_VERSION = "p64-l04b-v1"
+MINIMAL_LAYOUT_SOLVER_VERSION = "p64-l09r-b-v1"
 MINIMAL_LAYOUT_PORTFOLIO_SCHEMA_V1 = "bgig.minimal_layout_portfolio.v1"
 _AXES = ("x", "y", "z")
 _EPSILON = 0.0001
@@ -194,7 +198,9 @@ _LANES = (
 )
 _LANE_COUNTS = {
     EFFORT_QUICK: 3,
+    EFFORT_SHORT: 4,
     EFFORT_NORMAL: 6,
+    EFFORT_LONG: 8,
     EFFORT_DEEP: 9,
 }
 _MINIMAL_CAPS = {
@@ -202,20 +208,31 @@ _MINIMAL_CAPS = {
         "beam_width": 8,
         "max_search_states": 256,
         "max_placement_trials": 15_000,
-        "max_elapsed_ms": 5_000,
+        "max_elapsed_ms": 3_000,
+    },
+    EFFORT_SHORT: {
+        "beam_width": 16,
+        "max_search_states": 768,
+        "max_placement_trials": 40_000,
+        "max_elapsed_ms": 10_000,
     },
     EFFORT_NORMAL: {
         "beam_width": 24,
         "max_search_states": 1_500,
         "max_placement_trials": 75_000,
-        "max_elapsed_ms": 12_000,
+        "max_elapsed_ms": 20_000,
+    },
+    EFFORT_LONG: {
+        "beam_width": 40,
+        "max_search_states": 3_000,
+        "max_placement_trials": 150_000,
+        "max_elapsed_ms": 60_000,
     },
     EFFORT_DEEP: {
         "beam_width": 64,
         "max_search_states": 5_000,
         "max_placement_trials": 250_000,
-        "max_elapsed_ms": 30_000,
-        "max_deep_extension_elapsed_ms": _DEEP_EXTENSION_DEADLINE_MS,
+        "max_elapsed_ms": 180_000,
     },
 }
 
@@ -228,17 +245,23 @@ def minimal_lane_specs(
     count = _LANE_COUNTS.get(effort_profile)
     if count is None:
         raise ValueError(
-            "Unknown minimal-layout effort profile; expected quick, normal or deep."
+            "Unknown minimal-layout effort profile; expected quick, short, normal, long or deep."
         )
     return _LANES[:count]
 
 
 def minimal_effort_budgets() -> tuple[SolverBudget, ...]:
-    """Return Quick, Normal, and Deep hard caps in monotone order."""
+    """Return the five hard calculation caps in monotone order."""
 
     return tuple(
         _minimal_budget(effort_profile)
-        for effort_profile in (EFFORT_QUICK, EFFORT_NORMAL, EFFORT_DEEP)
+        for effort_profile in (
+            EFFORT_QUICK,
+            EFFORT_SHORT,
+            EFFORT_NORMAL,
+            EFFORT_LONG,
+            EFFORT_DEEP,
+        )
     )
 
 
@@ -282,6 +305,14 @@ def minimal_participant_orderings(
         upper -= 1
 
     return {
+        "small_footprint_base": ordered(
+            lambda participant_id: (
+                facts[participant_id]["footprint_mm2"],
+                facts[participant_id]["min_side_xy_mm"],
+                facts[participant_id]["volume_mm3"],
+                participant_id,
+            )
+        ),
         "placement_rarity": ordered(
             lambda participant_id: (
                 facts[participant_id]["orientation_count"],
@@ -336,8 +367,11 @@ def solve_minimal_layout(
     frontier_digests: Sequence[tuple[str, str]] = (),
     initial_incumbent: Mapping[str, object] | None = None,
 ) -> dict[str, object]:
-    """Build a placement-certified minimal layout under explicit hard caps."""
+    """Build a certified minimal layout under one total calculation deadline."""
 
+    deadline_at_ms = (
+        _monotonic_ms() + solver_deadline_seconds(effort_profile) * 1000.0
+    )
     external_fallback_report: dict[str, object] | None = None
     if scip_product_runtime_configured():
         primary_plan = _solve_minimal_layout_once(
@@ -349,6 +383,7 @@ def solve_minimal_layout(
             container_frontiers=container_frontiers,
             frontier_digests=frontier_digests,
             lane_specs_override=(),
+            deadline_at_ms=deadline_at_ms,
             initial_incumbent=initial_incumbent,
             external_lane_enabled=True,
         )
@@ -359,32 +394,21 @@ def solve_minimal_layout(
             STALE_OR_CANCELLED,
         }:
             return primary_plan
-        external_status = _external_lane_status(primary_plan)
-        if external_status == SCIP_STATUS_BOUNDED_UNKNOWN:
+        if _deadline_has_expired(deadline_at_ms):
             return primary_plan
         external_fallback_report = _external_lane_report(primary_plan)
 
-    if effort_profile != EFFORT_DEEP:
-        return _solve_minimal_layout_once(
-            raw_project,
-            effort_profile=effort_profile,
-            request_id=request_id,
-            request_revision=request_revision,
-            cancel_check=cancel_check,
-            container_frontiers=container_frontiers,
-            frontier_digests=frontier_digests,
-            initial_incumbent=initial_incumbent,
-            external_lane_report_override=external_fallback_report,
-        )
-    return _solve_deep_anytime(
+    return _solve_minimal_layout_once(
         raw_project,
+        effort_profile=effort_profile,
         request_id=request_id,
         request_revision=request_revision,
         cancel_check=cancel_check,
         container_frontiers=container_frontiers,
         frontier_digests=frontier_digests,
+        deadline_at_ms=deadline_at_ms,
         initial_incumbent=initial_incumbent,
-        external_lane_report=external_fallback_report,
+        external_lane_report_override=external_fallback_report,
     )
 
 def _solve_minimal_layout_once(
@@ -528,20 +552,65 @@ def _solve_minimal_layout_once(
     proposals: list[_CertifiedProposal] = (
         [warm_start_proposal] if warm_start_proposal is not None else []
     )
+    if _deadline_has_expired(deadline_at_ms):
+        return _failure_plan(
+            status=NO_SOLUTION_WITHIN_BUDGET,
+            stop_reason="global_deadline_reached_during_preparation",
+            strategy=strategy,
+            budget=budget,
+            request=request,
+            project_name=str(base_problem.project["project_name"]),
+            requested_container_count=base_problem.requested_container_count,
+            rejection_codes=(),
+            lane_reports=(),
+            frontier_source=frontier_source,
+            ordered_frontier_digests=ordered_digests,
+            warm_start=warm_start_report,
+        )
     rejection_codes: Counter[str] = Counter()
     external_lane_report: dict[str, object] | None = (
         deepcopy(dict(external_lane_report_override))
         if external_lane_report_override is not None
         else None
     )
+    deadline_reached = False
     if external_lane_enabled:
+        external_remaining_ms = _remaining_deadline_ms(deadline_at_ms)
+        if external_remaining_ms is not None and external_remaining_ms < 1.0:
+            return _failure_plan(
+                status=NO_SOLUTION_WITHIN_BUDGET,
+                stop_reason="global_deadline_reached_before_external_search",
+                strategy=strategy,
+                budget=budget,
+                request=request,
+                project_name=str(base_problem.project["project_name"]),
+                requested_container_count=base_problem.requested_container_count,
+                rejection_codes=(),
+                lane_reports=(),
+                frontier_source=frontier_source,
+                ordered_frontier_digests=ordered_digests,
+            )
         external_execution = solve_scip_product_3d(
             participants_with_options,
             certification_problem,
             effort_profile=effort_profile,
             cancel_check=cancel_check,
+            wall_seconds=(
+                external_remaining_ms / 1000.0
+                if external_remaining_ms is not None
+                else None
+            ),
         )
         external_lane_report = external_execution.deterministic_report()
+        external_report_limits = _mapping(external_lane_report.get("limits"))
+        external_report_limits["wall_seconds"] = solver_deadline_seconds(
+            effort_profile
+        )
+        external_lane_report["limits"] = external_report_limits
+        external_lane_report.pop("report_digest", None)
+        external_lane_report["report_digest"] = canonical_digest(
+            external_lane_report
+        )
         external_recertification: dict[str, object] = {
             "attempted": False,
             "certified": False,
@@ -568,9 +637,18 @@ def _solve_minimal_layout_once(
                 ordered_frontier_digests=ordered_digests,
                 external_lane=external_lane_report,
             )
-        if external_execution.status == SCIP_STATUS_SOLUTION_FOUND:
+        if _deadline_has_expired(deadline_at_ms):
+            deadline_reached = True
+            external_lane_report["status"] = SCIP_STATUS_BOUNDED_UNKNOWN
+            external_lane_report["stop_reason"] = (
+                "global_deadline_reached_after_external_search"
+            )
+        elif external_execution.status == SCIP_STATUS_SOLUTION_FOUND:
             try:
-                external_placements = external_execution.placements
+                external_placements = _compensate_required_top_reservations(
+                    external_execution.placements,
+                    certification_problem,
+                )
                 external_spaces = _rebuild_empty_spaces(
                     external_placements,
                     certification_problem,
@@ -580,10 +658,14 @@ def _solve_minimal_layout_once(
                     "scip_product_3d",
                     SCIP_PRODUCT_VERSION,
                 )
+                external_limits = external_execution.limits.to_dict()
+                external_limits["wall_seconds"] = solver_deadline_seconds(
+                    effort_profile
+                )
                 external_budget = SolverBudget(
                     SCIP_PRODUCT_FAMILY,
                     effort_profile,
-                    tuple(sorted(external_execution.limits.to_dict().items())),
+                    tuple(sorted(external_limits.items())),
                 )
                 external_certified, external_rejections = (
                     certify_minimal_free_3d_plan(
@@ -625,6 +707,11 @@ def _solve_minimal_layout_once(
                 external_rejections = (
                     f"external_proposal_projection_failed:{type(exc).__name__}",
                 )
+            external_deadline_reached = _deadline_has_expired(deadline_at_ms)
+            if external_deadline_reached:
+                deadline_reached = True
+                external_certified = None
+                external_rejections = ()
             external_recertification = {
                 "attempted": True,
                 "certified": external_certified is not None,
@@ -647,6 +734,11 @@ def _solve_minimal_layout_once(
                         rank_key=_proposal_rank_key(external_certified),
                     )
                 )
+            elif external_deadline_reached:
+                external_lane_report["status"] = SCIP_STATUS_BOUNDED_UNKNOWN
+                external_lane_report["stop_reason"] = (
+                    "global_deadline_reached_during_external_certification"
+                )
             else:
                 external_lane_report["status"] = SCIP_STATUS_CERTIFICATE_REJECTED
                 external_lane_report["stop_reason"] = (
@@ -658,8 +750,8 @@ def _solve_minimal_layout_once(
         external_lane_report["report_digest"] = canonical_digest(
             external_lane_report
         )
-    deadline_reached = False
     for lane in lane_specs:
+
         deadline_remaining_ms = _remaining_deadline_ms(deadline_at_ms)
         if (
             deadline_remaining_ms is not None
@@ -749,11 +841,9 @@ def _solve_minimal_layout_once(
                     "status": execution.status,
                     "stop_reason": execution.stop_reason,
                     "budget": dict(lane_budget.limits),
-                    "deadline_remaining_ms_at_start": (
-                        int(deadline_remaining_ms)
-                        if deadline_remaining_ms is not None
-                        else "not_applicable"
-                    ),
+                    "global_deadline_ms": dict(budget.limits)[
+                        "max_total_elapsed_ms"
+                    ],
                     "deadline_reached_after_lane": False,
                     "telemetry": telemetry,
                     "geometric_solution_count": len(execution.solutions),
@@ -797,6 +887,10 @@ def _solve_minimal_layout_once(
                 if _deadline_has_expired(deadline_at_ms):
                     deadline_reached_after_lane = True
                     break
+                translated = _compensate_required_top_reservations(
+                    translated,
+                    certification_problem,
+                )
                 spaces = _rebuild_empty_spaces(
                     translated,
                     certification_problem,
@@ -834,6 +928,9 @@ def _solve_minimal_layout_once(
                     search_telemetry=telemetry,
                     search_provenance=provisional_provenance,
                 )
+                if _deadline_has_expired(deadline_at_ms):
+                    deadline_reached_after_lane = True
+                    break
                 if certified is None:
                     lane_rejections.update(rejections)
                     rejection_codes.update(rejections)
@@ -868,11 +965,9 @@ def _solve_minimal_layout_once(
                 "status": execution.status,
                 "stop_reason": execution.stop_reason,
                 "budget": dict(lane_budget.limits),
-                "deadline_remaining_ms_at_start": (
-                    int(deadline_remaining_ms)
-                    if deadline_remaining_ms is not None
-                    else "not_applicable"
-                ),
+                "global_deadline_ms": dict(budget.limits)[
+                    "max_total_elapsed_ms"
+                ],
                 "deadline_reached_after_lane": deadline_reached_after_lane,
                 "telemetry": telemetry,
                 "geometric_solution_count": len(execution.solutions),
@@ -885,11 +980,12 @@ def _solve_minimal_layout_once(
             deadline_reached = True
             break
 
+    deadline_reached = deadline_reached or _deadline_has_expired(deadline_at_ms)
     if not proposals:
         return _failure_plan(
             status=NO_SOLUTION_WITHIN_BUDGET,
             stop_reason=(
-                "deep_deadline_reached_without_candidate"
+                "global_deadline_reached_without_candidate"
                 if deadline_reached
                 else _portfolio_stop_reason(lane_reports)
             ),
@@ -944,8 +1040,13 @@ def _solve_minimal_layout_once(
             == minimal_lane_specs(EFFORT_NORMAL)
         ),
         "budget": dict(budget.limits),
+        "global_deadline_enforced": deadline_at_ms is not None,
         "wall_clock_limited": (
-            deadline_at_ms is not None
+            deadline_reached
+            or any(
+                bool(_mapping(value.get("telemetry")).get("timed_out"))
+                for value in lane_reports
+            )
             or bool(
                 external_lane_report is not None
                 and external_lane_report.get("invocation_count")
@@ -953,7 +1054,7 @@ def _solve_minimal_layout_once(
         ),
         "deadline_reached": deadline_reached,
         "stop_reason": (
-            "deep_deadline_reached_with_candidate"
+            "global_deadline_reached_with_candidate"
             if deadline_reached
             else (
                 "external_scip_proposal_selected_after_common_certification"
@@ -992,6 +1093,11 @@ def _solve_minimal_layout_once(
             {"name": "residual_fragmentation", "direction": "minimize"},
             {"name": "contact_count", "direction": "maximize"},
             {"name": "minimum_support_ratio", "direction": "maximize"},
+            {
+                "name": "stacking_preference_violation_count",
+                "direction": "minimize",
+                "hard_constraint": False,
+            },
         ],
         "selected": {
             "candidate_source": (
@@ -2225,6 +2331,9 @@ def _minimal_budget(effort_profile: str) -> SolverBudget:
             if key in limits
             else cap
         )
+    limits["max_total_elapsed_ms"] = int(
+        solver_deadline_seconds(effort_profile) * 1000.0
+    )
     return SolverBudget(
         source.family_id,
         effort_profile,
@@ -2278,7 +2387,6 @@ def _force_minimum_dimensions(
         }
         result.append(projected)
     return tuple(result)
-
 
 def _canonical_search_participants(
     participants: tuple[dict[str, object], ...],
@@ -2349,6 +2457,9 @@ def _participant_pressure_facts(
             dimensions[0] / usable[0],
             dimensions[1] / usable[1],
         ),
+        "footprint_mm2": dimensions[0] * dimensions[1],
+        "min_side_xy_mm": min(dimensions[0], dimensions[1]),
+        "volume_mm3": dimensions[0] * dimensions[1] * dimensions[2],
         "footprint_ratio": (
             dimensions[0] * dimensions[1] / (usable[0] * usable[1])
         ),
@@ -2504,6 +2615,120 @@ def _translation_candidates(
     return tuple(retained)
 
 
+def _compensate_required_top_reservations(
+    placements: tuple[Free3DPlacement, ...],
+    problem: Free3DPreparedProblem,
+) -> tuple[Free3DPlacement, ...]:
+    """Extend only unobstructed non-fixed bodies needed by a top reservation."""
+
+    if not problem.top_inset_zones:
+        return placements
+    result = list(placements)
+    participants = {
+        str(value["id"]): value for value in problem.participants
+    }
+    design_top = float(problem.storage_height_mm)
+    for zone in problem.top_inset_zones:
+        if any(
+            abs(value.origin_mm[2] + value.world_size_mm[2] - design_top)
+            <= 0.001
+            and _placement_zone_overlap_area(value, zone) > _EPSILON
+            for value in result
+        ):
+            continue
+        candidates: list[tuple[object, ...]] = []
+        for placement_index, placement in enumerate(result):
+            participant = participants[placement.participant_id]
+            modes = _mapping(participant["dimension_modes"])
+            if (
+                str(participant["role"]) != "container"
+                or str(modes["z"]) == "fixed"
+            ):
+                continue
+            overlap_area = _placement_zone_overlap_area(placement, zone)
+            if overlap_area <= _EPSILON:
+                continue
+            current_top = placement.origin_mm[2] + placement.world_size_mm[2]
+            compensated_height = design_top - placement.origin_mm[2]
+            if compensated_height <= placement.world_size_mm[2] + _EPSILON:
+                continue
+            if _top_extension_is_blocked(
+                placement_index, result, current_top
+            ):
+                continue
+            candidates.append(
+                (
+                    -overlap_area,
+                    -current_top,
+                    placement.participant_id,
+                    placement_index,
+                    compensated_height,
+                )
+            )
+        if not candidates:
+            continue
+        *_, placement_index, compensated_height = min(candidates)
+        selected = result[int(placement_index)]
+        world_size = selected.world_size_mm
+        local_size = selected.local_size_mm
+        result[int(placement_index)] = replace(
+            selected,
+            world_size_mm=(
+                world_size[0],
+                world_size[1],
+                _round(float(compensated_height)),
+            ),
+            local_size_mm=(
+                local_size[0],
+                local_size[1],
+                _round(float(compensated_height)),
+            ),
+        )
+    return tuple(result)
+
+
+def _placement_zone_overlap_area(
+    placement: Free3DPlacement,
+    zone: TopInsetZone,
+) -> float:
+    zone_origin = zone.origin_xy_mm
+    zone_size = zone.size_xy_mm
+    overlap_x = max(
+        0.0,
+        min(placement.origin_mm[0] + placement.world_size_mm[0], zone_origin[0] + zone_size[0])
+        - max(placement.origin_mm[0], zone_origin[0]),
+    )
+    overlap_y = max(
+        0.0,
+        min(placement.origin_mm[1] + placement.world_size_mm[1], zone_origin[1] + zone_size[1])
+        - max(placement.origin_mm[1], zone_origin[1]),
+    )
+    return overlap_x * overlap_y
+
+
+def _top_extension_is_blocked(
+    placement_index: int,
+    placements: Sequence[Free3DPlacement],
+    current_top: float,
+) -> bool:
+    placement = placements[placement_index]
+    for other_index, other in enumerate(placements):
+        if other_index == placement_index:
+            continue
+        if other.origin_mm[2] < current_top - _EPSILON:
+            continue
+        overlap_x = min(
+            placement.origin_mm[0] + placement.world_size_mm[0],
+            other.origin_mm[0] + other.world_size_mm[0],
+        ) - max(placement.origin_mm[0], other.origin_mm[0])
+        overlap_y = min(
+            placement.origin_mm[1] + placement.world_size_mm[1],
+            other.origin_mm[1] + other.world_size_mm[1],
+        ) - max(placement.origin_mm[1], other.origin_mm[1])
+        if overlap_x > _EPSILON and overlap_y > _EPSILON:
+            return True
+    return False
+
 def _rebuild_empty_spaces(
     placements: tuple[Free3DPlacement, ...],
     problem: Free3DPreparedProblem,
@@ -2567,8 +2792,42 @@ def _proposal_rank_key(
         float(metrics["residual_fragmentation"]),
         -float(metrics["contact_count"]),
         -float(metrics["minimum_support_ratio"]),
+        _stacking_preference_violation_count(certified.plan),
         certified.placement_digest,
     )
+
+
+def _stacking_preference_violation_count(
+    plan: Mapping[str, object],
+) -> int:
+    placements = {
+        str(value.get("id") or value.get("placement_id")): value
+        for value in _mapping_items(plan.get("placements"))
+    }
+    supports = _mapping_items(_mapping(plan.get("stage_support")).get("supports"))
+    violations = 0
+    for support in supports:
+        upper = placements.get(str(support.get("placement_id", "")))
+        if upper is None:
+            continue
+        upper_size = _mapping(upper.get("world_size_mm"))
+        upper_area = float(upper_size.get("x", 0.0)) * float(
+            upper_size.get("y", 0.0)
+        )
+        supporting_ids = support.get("supporting_ids")
+        if not isinstance(supporting_ids, list):
+            continue
+        for lower_id in supporting_ids:
+            lower = placements.get(str(lower_id))
+            if lower is None:
+                continue
+            lower_size = _mapping(lower.get("world_size_mm"))
+            lower_area = float(lower_size.get("x", 0.0)) * float(
+                lower_size.get("y", 0.0)
+            )
+            if lower_area > upper_area + _EPSILON:
+                violations += 1
+    return violations
 
 
 def _deduplicate_proposals(

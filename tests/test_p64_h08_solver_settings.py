@@ -4,7 +4,10 @@ import unittest
 
 from board_game_insert_generator.partition_solver import solve_partition_plan
 from board_game_insert_generator.project_v1 import blank_project_v1
-from board_game_insert_generator.solver_settings import normalize_solver_settings
+from board_game_insert_generator.solver_settings import (
+    normalize_solver_settings,
+    solver_deadline_seconds,
+)
 
 
 def _simple_project() -> dict[str, object]:
@@ -37,6 +40,20 @@ class P64H08SolverSettingsTests(unittest.TestCase):
         self.assertEqual(
             normalize_solver_settings({"method": "unknown", "effort": "unsafe"}),
             {"method": "auto", "effort": "normal"},
+        )
+        for effort in ("quick", "short", "normal", "long", "deep"):
+            self.assertEqual(
+                normalize_solver_settings({"method": "auto", "effort": effort})[
+                    "effort"
+                ],
+                effort,
+            )
+        self.assertEqual(
+            [
+                solver_deadline_seconds(value)
+                for value in ("quick", "short", "normal", "long", "deep")
+            ],
+            [3.0, 10.0, 20.0, 60.0, 180.0],
         )
 
     def test_public_auto_and_stage_methods_report_the_selected_product_method(self) -> None:

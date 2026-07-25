@@ -75,6 +75,7 @@ from board_game_insert_generator.volumetric_stage_solver import (
 )
 
 MINIMAL_LAYOUT_ARTIFACT_SCHEMA_V1 = "bgig.minimal_layout.v1"
+_EPSILON = 0.0001
 
 
 @dataclass(frozen=True)
@@ -355,6 +356,22 @@ def certify_free_3d_plan(
             placement["minimum_envelope_origin_in_final_mm"] = deepcopy(
                 contract["minimum_envelope_origin_in_final_mm"]
             )
+            minimum_outer = _mapping(placement["minimum_outer_envelope_mm"])
+            z_compensation = max(
+                0.0,
+                float(final_local["z"]) - float(minimum_outer["z"]),
+            )
+            if (
+                z_compensation > _EPSILON
+                and bool(placement["reaches_stage_top"])
+                and _placement_overlaps_top_inset(
+                    placement,
+                    problem.top_inset_zones,
+                )
+            ):
+                placement["reservation_required_z_compensation_mm"] = _round(
+                    z_compensation
+                )
             placement["source_content_ids"] = [
                 str(cavity["content_id"]) for cavity in _mappings(contract["cavity_layout"])
             ]
@@ -690,12 +707,17 @@ def certify_minimal_free_3d_plan(
     plan["validation"] = validation
 
     metrics = _minimal_layout_metrics(problem, resolved, empty_spaces)
+    required_z_compensation_count = sum(
+        float(value.get("reservation_required_z_compensation_mm", 0.0))
+        > _EPSILON
+        for value in resolved
+    )
     summary = _mapping(plan["summary"])
     summary.update(
         {
             "status": "constructed",
             "solution_status": "minimal_layout_certified",
-            "materializable": False,
+            "materializable": True,
             "placement_certified": True,
             "minimal_layout_core_ready": True,
             "complete_printable_partition": False,
@@ -747,13 +769,15 @@ def certify_minimal_free_3d_plan(
     invariants.update(
         {
             "minimal_layout": True,
-            "minimum_outer_dimensions_only": True,
+            "minimum_outer_dimensions_only": required_z_compensation_count == 0,
+            "reservation_required_z_compensation_count": required_z_compensation_count,
             "residual_distributed": False,
             "continuous_closure_applied": False,
             "weighted_surplus": False,
             "free_3d_final_envelopes": False,
             "automatic_body_count": 0,
             "free_space_materialized": False,
+            "minimal_artifact_directly_materializable": True,
         }
     )
     plan["invariants"] = invariants
@@ -770,7 +794,7 @@ def certify_minimal_free_3d_plan(
         }
     )
     result = _mapping(solver["result"])
-    result["materializable"] = False
+    result["materializable"] = True
     solver["result"] = result
     telemetry = _mapping(solver["telemetry"])
     telemetry["stop_reason"] = "minimal_placement_certified"
@@ -786,7 +810,9 @@ def certify_minimal_free_3d_plan(
     plan["minimal_layout"] = {
         "schema_version": MINIMAL_LAYOUT_ARTIFACT_SCHEMA_V1,
         "artifact_kind": "minimal_layout",
-        "geometry_statement": "minimum_envelopes_only_residual_unassigned",
+        "geometry_statement": (
+            "minimum_envelopes_plus_required_reservation_z_compensation_residual_unassigned"
+        ),
         "best_candidate_statement": (
             "best_certified_proposal_found_within_budget"
         ),
@@ -887,6 +913,24 @@ def _dimension_tuple(
         dimensions["z"],
     )
 
+
+def _placement_overlaps_top_inset(
+    placement: Mapping[str, object],
+    zones: tuple[TopInsetZone, ...],
+) -> bool:
+    origin = _mapping(placement.get("origin_mm"))
+    size = _mapping(placement.get("world_size_mm"))
+    left = float(origin.get("x", 0.0))
+    front = float(origin.get("y", 0.0))
+    right = left + float(size.get("x", 0.0))
+    back = front + float(size.get("y", 0.0))
+    return any(
+        left < zone.origin_xy_mm[0] + zone.size_xy_mm[0] - _EPSILON
+        and zone.origin_xy_mm[0] < right - _EPSILON
+        and front < zone.origin_xy_mm[1] + zone.size_xy_mm[1] - _EPSILON
+        and zone.origin_xy_mm[1] < back - _EPSILON
+        for zone in zones
+    )
 
 def _minimal_layout_metrics(
     problem: Free3DPreparedProblem,

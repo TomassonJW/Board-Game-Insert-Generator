@@ -14,7 +14,7 @@ from itertools import product
 from math import ceil, isclose
 from typing import Any
 
-from board_game_insert_generator.material_support import material_support_contract
+from board_game_insert_generator.material_support import envelope_support_contract
 
 
 VOLUMETRIC_STAGE_SOLVER_SCHEMA_V1 = "bgig.volumetric_stage_solver.v1"
@@ -2094,7 +2094,7 @@ def _support_contract(
     vertical_clearance: float,
 ) -> dict[str, object]:
     del stages
-    return material_support_contract(
+    return envelope_support_contract(
         placements,
         fallback_xy_clearance=0.0,
         fallback_z_clearance=vertical_clearance,

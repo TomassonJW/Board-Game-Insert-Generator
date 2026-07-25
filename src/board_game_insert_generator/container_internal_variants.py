@@ -23,6 +23,13 @@ from board_game_insert_generator.container_derivation import (
     derive_container_plan,
 )
 from board_game_insert_generator.project_v1 import normalize_project_draft
+from board_game_insert_generator.solver_settings import (
+    EFFORT_DEEP,
+    EFFORT_LONG,
+    EFFORT_NORMAL,
+    EFFORT_QUICK,
+    EFFORT_SHORT,
+)
 
 
 INTERNAL_VARIANT_SCHEMA_V1 = "bgig.container_internal_variants.v1"
@@ -31,9 +38,7 @@ LOCAL_GEOMETRY_CONTRACT_V1 = "container_internal_geometry.v1"
 CANONICAL_PRODUCER_ID = "canonical_v1"
 RECTANGULAR_RELAYOUT_PRODUCER_ID = "bounded_rectangular_relayout_v1"
 PRODUCER_VERSION_V1 = "1"
-EFFORT_QUICK = "quick"
-EFFORT_NORMAL = "normal"
-EFFORT_DEEP = "deep"
+
 _AXES = ("x", "y", "z")
 _EPSILON = 0.0001
 
@@ -266,7 +271,9 @@ def standard_variant_budgets() -> tuple[ContainerVariantBudget, ...]:
 
     return (
         ContainerVariantBudget(EFFORT_QUICK, 24, 24, 4, 2, 32, 128),
+        ContainerVariantBudget(EFFORT_SHORT, 36, 36, 6, 3, 128, 1_024),
         ContainerVariantBudget(EFFORT_NORMAL, 48, 48, 8, 4, 384, 3_072),
+        ContainerVariantBudget(EFFORT_LONG, 72, 72, 10, 5, 1_536, 12_288),
         ContainerVariantBudget(EFFORT_DEEP, 96, 96, 12, 6, 3_072, 36_864),
     )
 
@@ -276,7 +283,7 @@ def variant_budget_for_effort(effort_profile: str) -> ContainerVariantBudget:
         if budget.effort_profile == effort_profile:
             return budget
     raise ValueError(
-        f"Unknown container variant effort profile {effort_profile!r}; expected quick, normal or deep."
+        f"Unknown container variant effort profile {effort_profile!r}; expected quick, short, normal, long or deep."
     )
 
 

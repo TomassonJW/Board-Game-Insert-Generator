@@ -146,7 +146,7 @@ class StagedCalculationTests(unittest.TestCase):
         self.assertEqual(cad["artifact_identity"]["artifact_kind"], ARTIFACT_KIND_MINIMAL)
         self.assertFalse(cad["partition"]["invariants"]["residual_distributed"])
 
-    def test_active_top_reservation_requires_and_materializes_final_plan(self) -> None:
+    def test_active_top_reservation_keeps_minimal_materializable_before_optional_finish(self) -> None:
         project = _project_with_flat_reservation()
         engine = _engine(project)
         session = StagedCalculationSession(project, solver_settings=SETTINGS)
@@ -174,18 +174,23 @@ class StagedCalculationTests(unittest.TestCase):
         minimal = calculated["staged_calculation"]["minimal_layout"]
 
         self.assertTrue(minimal["placement_certified"])
-        self.assertTrue(minimal["finalization_required"])
-        self.assertFalse(minimal["materializable_without_finalization"])
+        self.assertFalse(minimal["finalization_required"])
+        self.assertTrue(minimal["materializable_without_finalization"])
         self.assertEqual(
             calculated["staged_calculation"]["next_action"],
-            "finalize_volume",
+            "materialize_minimal_in_fusion",
         )
-        self.assertFalse(
+        self.assertTrue(
             calculated["staged_calculation"]["available_artifacts"][ARTIFACT_KIND_MINIMAL]
         )
-        self.assertIsNone(session.current_minimal_partition())
-        with self.assertRaisesRegex(StagedCalculationError, "reservations actives"):
-            session.select_materializable_artifact(ARTIFACT_KIND_MINIMAL)
+        self.assertIsNotNone(session.current_minimal_partition())
+        minimal_selection = session.select_materializable_artifact(
+            ARTIFACT_KIND_MINIMAL
+        )
+        self.assertEqual(
+            minimal_selection["artifact_digest"],
+            minimal["artifact_digest"],
+        )
 
         finalized = session.finalize_volume()
         plan = finalized["partition"]

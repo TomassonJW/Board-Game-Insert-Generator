@@ -128,10 +128,13 @@ class HighsProductSolverTests(unittest.TestCase):
 
         provenance = result["minimal_layout"]["search_provenance"]
         self.assertNotIn("external_lane", provenance)
-        self.assertIn(
-            provenance["selected"]["source_phase"],
-            {"normal_incumbent", "deep_extension"},
+        self.assertNotIn("source_phase", provenance["selected"])
+        self.assertEqual(
+            provenance["selected"]["candidate_source"],
+            "portfolio_lane",
         )
+        self.assertEqual(provenance["budget"]["max_total_elapsed_ms"], 180_000)
+        self.assertTrue(provenance["global_deadline_enforced"])
         self.assertNotEqual(
             provenance["selected"].get("candidate_source"),
             "external_highs",

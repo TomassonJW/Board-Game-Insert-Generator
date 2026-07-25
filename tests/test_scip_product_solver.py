@@ -142,19 +142,17 @@ class ScipProductSolverTests(unittest.TestCase):
         )
 
     def test_effort_limits_are_monotone_and_single_threaded(self) -> None:
-        quick = scip_product_limits("quick")
-        normal = scip_product_limits("normal")
-        deep = scip_product_limits("deep")
+        limits = [
+            scip_product_limits(value)
+            for value in ("quick", "short", "normal", "long", "deep")
+        ]
         self.assertEqual(
-            (quick.wall_seconds, normal.wall_seconds, deep.wall_seconds),
-            (1.0, 5.0, 120.0),
+            [value.wall_seconds for value in limits],
+            [3.0, 10.0, 20.0, 60.0, 180.0],
         )
-        self.assertEqual({quick.threads, normal.threads, deep.threads}, {1})
-        self.assertEqual(
-            {quick.memory_mebibytes, normal.memory_mebibytes, deep.memory_mebibytes},
-            {1024},
-        )
-        self.assertEqual({quick.seed, normal.seed, deep.seed}, {6408})
+        self.assertEqual({value.threads for value in limits}, {1})
+        self.assertEqual({value.memory_mebibytes for value in limits}, {1024})
+        self.assertEqual({value.seed for value in limits}, {6408})
 
     def test_product_model_preserves_variants_and_exact_clearances(self) -> None:
         project = _stacking_project()
@@ -185,6 +183,19 @@ class ScipProductSolverTests(unittest.TestCase):
         self.assertIn("stacking", payload["active_constraints"])
         self.assertIn("support", payload["active_constraints"])
         self.assertIn("p45_variant_front", payload["active_constraints"])
+        self.assertFalse(payload["stacking_preference"]["hard_constraint"])
+        preferred_order = [
+            value["participant_id"] for value in payload["participants"]
+        ]
+        self.assertEqual(preferred_order, sorted(preferred_order, key=lambda value: (
+            next(
+                float(participant["minimum_local_mm"]["x"])
+                * float(participant["minimum_local_mm"]["y"])
+                for participant in participants
+                if participant["id"] == value
+            ),
+            value,
+        )))
         self.assertEqual(len(payload["participants"]), 3)
         self.assertTrue(all(value["variants"] for value in payload["participants"]))
         self.assertEqual(
@@ -491,14 +502,11 @@ class ScipProductSolverTests(unittest.TestCase):
         )
 
         plan = solve_minimal_layout(_stacking_project(), effort_profile="quick")
-        self.assertEqual(
-            plan["solver"]["result"]["status"],
-            "no_solution_within_budget",
-        )
+        self.assertEqual(plan["solver"]["result"]["status"], "solution_found")
         provenance = plan["minimal_layout"]["search_provenance"]
         self.assertEqual(provenance["external_lane"]["status"], STATUS_INVALID_RUNTIME)
         self.assertTrue(provenance["lanes"])
-        self.assertFalse(plan["summary"]["materializable"])
+        self.assertTrue(plan["summary"]["materializable"])
 
     def test_real_cp314_integration_receipt_proves_forced_z_stacking(self) -> None:
         path = ROOT / "tests" / "fixtures" / "p64_l08k_scip_product_integration.v1.json"

@@ -52,14 +52,19 @@ from board_game_insert_generator.solver_outcome import (
     SOLUTION_FOUND,
     STALE_OR_CANCELLED,
 )
+from board_game_insert_generator.solver_settings import (
+    EFFORT_DEEP,
+    EFFORT_LONG,
+    EFFORT_NORMAL,
+    EFFORT_QUICK,
+    EFFORT_SHORT,
+)
 
 
 PORTFOLIO_AUTO_FAMILY_ID = "portfolio_auto"
 PORTFOLIO_AUTO_VERSION = "bgig.portfolio_auto.v2"
 CONTAINER_VARIANT_SEARCH_REPORT_ID = "container_variant_global_search"
-EFFORT_QUICK = "quick"
-EFFORT_NORMAL = "normal"
-EFFORT_DEEP = "deep"
+
 _ALLOWED_FAMILIES = (
     STAGE_STACK_FAMILY_ID,
     FREE_3D_GREEDY_FAMILY_ID,
@@ -131,7 +136,7 @@ class PortfolioExecution:
 
 
 def portfolio_effort_profiles() -> tuple[PortfolioEffortProfile, ...]:
-    """Return Rapide, Normal and Approfondi in monotone order."""
+    """Return the five product efforts in monotone order."""
 
     return (
         _profile(
@@ -141,10 +146,22 @@ def portfolio_effort_profiles() -> tuple[PortfolioEffortProfile, ...]:
             beam=(8, 2, 1_000, 512, 512, 12, 1, 30_000, 512),
         ),
         _profile(
+            EFFORT_SHORT,
+            "Court",
+            greedy=(1_024, 1_024, 250_000, 384),
+            beam=(16, 4, 2_500, 1_024, 1_024, 18, 1, 100_000, 2_048),
+        ),
+        _profile(
             EFFORT_NORMAL,
             "Normal",
             greedy=(2_048, 2_048, 500_000, 512),
             beam=(24, 6, 5_000, 2_048, 2_048, 24, 2, 250_000, 4_096),
+        ),
+        _profile(
+            EFFORT_LONG,
+            "Long",
+            greedy=(3_072, 3_072, 1_000_000, 768),
+            beam=(40, 9, 10_000, 3_072, 3_072, 36, 3, 600_000, 12_000),
         ),
         _profile(
             EFFORT_DEEP,

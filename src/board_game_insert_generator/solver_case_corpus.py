@@ -34,7 +34,7 @@ SOLVER_CASE_CORPUS_PRODUCER_VERSION = "1"
 CORPUS_TIER_CI = "ci"
 CORPUS_TIER_EXTENDED = "extended"
 _ALLOWED_TIERS = (CORPUS_TIER_CI, CORPUS_TIER_EXTENDED)
-_ALLOWED_EFFORTS = ("quick", "normal", "deep")
+_ALLOWED_EFFORTS = ("quick", "short", "normal", "long", "deep")
 _REPLAYABLE_STATUSES = (SOLUTION_FOUND, NO_SOLUTION_WITHIN_BUDGET)
 _SECRET_KEY_FRAGMENTS = (
     "api_key",
@@ -685,7 +685,7 @@ def _solver_settings(value: Mapping[str, object]) -> dict[str, str]:
     method = _identifier(str(value.get("method", "auto")), "solver method")
     effort = str(value.get("effort", "normal"))
     if effort not in _ALLOWED_EFFORTS:
-        raise SolverCaseCorpusError("Solver effort must be quick, normal, or deep.")
+        raise SolverCaseCorpusError("Solver effort must be quick, short, normal, long, or deep.")
     return {"method": method, "effort": effort}
 
 

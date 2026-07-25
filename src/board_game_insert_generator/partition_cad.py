@@ -314,7 +314,7 @@ def _selected_plan_is_cad_eligible(
         and isinstance(result, Mapping)
         and result.get("status") == "solution_found"
         and isinstance(invariants, Mapping)
-        and invariants.get("minimum_outer_dimensions_only") is True
+        and invariants.get("minimal_artifact_directly_materializable") is True
         and invariants.get("residual_distributed") is False
         and invariants.get("automatic_body_count") == 0
     ):
@@ -336,7 +336,22 @@ def _selected_plan_is_cad_eligible(
             placement.get("final_outer_dimensions_mm"),
             "placement.final_outer_dimensions_mm",
         )
-        if any(abs(minimum[axis] - final[axis]) > _EPSILON for axis in ("x", "y", "z")):
+        if any(
+            abs(minimum[axis] - final[axis]) > _EPSILON
+            for axis in ("x", "y")
+        ):
+            return False
+        compensation = placement.get(
+            "reservation_required_z_compensation_mm", 0.0
+        )
+        if (
+            not isinstance(compensation, (int, float))
+            or isinstance(compensation, bool)
+            or float(compensation) < 0.0
+            or abs(
+                final["z"] - minimum["z"] - float(compensation)
+            ) > _EPSILON
+        ):
             return False
     return True
 

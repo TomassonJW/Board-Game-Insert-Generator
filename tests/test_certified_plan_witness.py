@@ -229,7 +229,7 @@ class CertifiedPlanWitnessTests(unittest.TestCase):
         self.assertGreater(calls_without_witness, 0)
         self.assertGreater(calls, calls_without_witness)
 
-    def test_deep_recertifies_witness_only_in_extension_after_normal_prefix(self) -> None:
+    def test_deep_recertifies_witness_under_one_total_deadline(self) -> None:
         project = _project()
         deep_engine = IncrementalLocalAnalysisEngine(
             project,
@@ -265,15 +265,15 @@ class CertifiedPlanWitnessTests(unittest.TestCase):
             SOLUTION_FOUND,
         )
         provenance = rebuilt["minimal_layout"]["search_provenance"]
-        normal_phase = provenance["phases"]["normal_prefix"]
-        deep_phase = provenance["phases"]["deep_extension"]
-        self.assertEqual(normal_phase["warm_start"]["status"], "not_supplied")
-        self.assertEqual(deep_phase["warm_start"]["status"], "accepted")
-        self.assertEqual(deep_phase["warm_start"]["lane_count_added"], 0)
-        self.assertEqual(len(normal_phase["attempted_lane_ids"]), 6)
-        self.assertEqual(len(deep_phase["attempted_lane_ids"]), 3)
+        self.assertNotIn("phases", provenance)
+        self.assertEqual(provenance["warm_start"]["status"], "accepted")
+        self.assertEqual(provenance["warm_start"]["lane_count_added"], 0)
+        self.assertEqual(len(provenance["lane_prefix_ids"]), 9)
+        self.assertEqual(provenance["budget"]["max_total_elapsed_ms"], 180_000)
+        self.assertTrue(provenance["global_deadline_enforced"])
+        self.assertEqual(provenance["finalization_invocation_count"], 0)
         self.assertEqual(calls, 9)
-        self.assertTrue(deep_phase["warm_start"]["search_continued"])
+        self.assertTrue(provenance["warm_start"]["search_continued"])
 
 
 if __name__ == "__main__":

@@ -88,45 +88,50 @@ Preuve L08J : P64_L08J_MINIMAL_SCIP_RUNTIME_BUILD_EVIDENCE.md.
 Rapport final L08 : P64_L08_GOAL_FINAL_REPORT.md.
 Preuve L09B : P64_L09B_MATERIAL_SUPPORT_EVIDENCE.md.
 Preuve L09C : P64_L09C_SCIP_TOP_INSET_EVIDENCE.md.
+Preuve L09R-B : P64_L09R_B_MINIMAL_CALCULATION_EVIDENCE.md.
 Matrice L09 : P64_L09_VALIDATION_UNIFIEE.md.
 Rapport final L07 : P64_L07_GOAL_FINAL_REPORT.md.
 
+## Dernier lot terminé
+
+### P64-L09R-B — calcul minimal fiable et budgets globaux
+
+- Support dur par enveloppe XY ; matière réelle diagnostique.
+- Réservations SCIP conservées et compensation Z nécessaire certifiée.
+- Plan minimal avec plateau ou livret directement matérialisable.
+- Préférence petits-dessous/grands-dessus non dure.
+- Deadlines totales Rapide 3 s, Court 10 s, Normal 20 s, Long 60 s et Approfondi 180 s.
+- Timeout honnête : `no_solution_within_budget`, jamais impossibilité.
+
+Preuve : `docs/P64_L09R_B_MINIMAL_CALCULATION_EVIDENCE.md`.
+
 ## Prochaine action recommandée
 
-### P64-L09R-B — rétablir un calcul minimal fiable
+### P64-L09R-C — séparer la finition sans détruire le plan minimal
 
 Type : mission de code produit bornée, sans gate humaine préalable.
 
 Objectifs exacts :
 
-1. rétablir l'appui dur par enveloppe XY et retirer l'anti-chute matérielle de la
-   faisabilité produit ;
-2. conserver les réservations supérieures exactes dans SCIP ;
-3. rendre un plan minimal avec plateau directement matérialisable ;
-4. préférer, sans l'imposer, les petites empreintes sous les grandes ;
-5. remplacer les caps fragmentés par cinq deadlines globales : Rapide 3 s,
-   Court 10 s, Normal 20 s, Long 60 s et Approfondi 180 s ;
-6. prouver qu'une inversion reste autorisée lorsqu'elle est nécessaire et qu'un
-   timeout n'est jamais présenté comme une impossibilité.
+1. découpler la fermeture F01B/F02B du calcul minimal et ne l'exécuter que sur action `Finaliser` ;
+2. appliquer à la finition un profil et une deadline totale indépendants parmi 3/10/20/60/180 s ;
+3. partir du plan minimal courant, protéger cavités et réservations, tenter la réparation locale avant tout rappel global ;
+4. publier un plan final seulement après recertification complète ;
+5. conserver sans mutation le plan minimal sélectionné si la finition échoue, expire ou devient stale ;
+6. maintenir la matérialisation minimale disponible avant et après un échec de finition.
 
 Contrat : `docs/P64_L09R_CALCUL_FINITION_PROGRESS_CONTRACT.md`.
 Décision : `docs/DECISIONS/ADR-0088-calcul-minimal-finition-optionnelle-et-budgets-visibles.md`.
 
 Aucune manipulation de Thomas n'est requise avant la future gate P64-L09R-V.
-L'ancienne gate P64-L09V sur 0.1.63 est annulée et ne doit pas être exécutée.
+L'ancienne gate P64-L09V sur 0.1.63 reste annulée et ne doit pas être exécutée.
 
-## Lots ordonnés après P64-L09R-B
+## Lots ordonnés après P64-L09R-C
 
-1. P64-L09R-C — finition séparée, facultative, budget indépendant et échec non
-   destructif ;
-2. P64-L09R-D — trois boutons permanents, invalidation exacte et champs de
-   budget adjacents ;
-3. P64-L09R-E — jauge visible uniquement pendant l'activité et exécution
-   réactive sans `adsk` dans le worker ;
-4. P64-L09R-F — durcissement sur cas représentatifs, plateaux et limites de
-   budget ;
-5. P64-L09R-V — installation puis gate Fusion combinée, sans validation
-   d'impression.
+1. P64-L09R-D — trois boutons permanents, invalidation exacte et champs de budget adjacents ;
+2. P64-L09R-E — jauge visible uniquement pendant l'activité et exécution réactive sans `adsk` dans le worker ;
+3. P64-L09R-F — durcissement sur cas représentatifs, plateaux et limites de budget ;
+4. P64-L09R-V — installation puis gate Fusion combinée, sans validation d'impression.
 
 ## Lots verrouillés ou différés
 

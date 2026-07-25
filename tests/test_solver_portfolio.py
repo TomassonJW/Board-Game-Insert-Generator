@@ -54,16 +54,17 @@ def _two_level_project() -> dict[str, object]:
 
 class SolverPortfolioTests(unittest.TestCase):
     def test_effort_profiles_are_monotone_and_never_remove_a_family(self) -> None:
-        quick, normal, deep = portfolio_effort_profiles()
+        profiles = portfolio_effort_profiles()
 
-        self.assertTrue(normal.is_at_least_as_permissive_as(quick))
-        self.assertTrue(deep.is_at_least_as_permissive_as(normal))
-        self.assertEqual(quick.allowed_family_ids, normal.allowed_family_ids)
-        self.assertEqual(normal.allowed_family_ids, deep.allowed_family_ids)
-        self.assertEqual(dict(quick.beam_budget.limits)["max_participant_branches"], 1)
-        self.assertEqual(dict(normal.beam_budget.limits)["max_participant_branches"], 2)
-        self.assertEqual(dict(deep.beam_budget.limits)["max_participant_branches"], 4)
-        for profile, maximum in ((quick, 1), (normal, 2), (deep, 4)):
+        self.assertEqual(
+            [value.profile_id for value in profiles],
+            ["quick", "short", "normal", "long", "deep"],
+        )
+        for previous, current in zip(profiles, profiles[1:]):
+            self.assertTrue(current.is_at_least_as_permissive_as(previous))
+            self.assertEqual(previous.allowed_family_ids, current.allowed_family_ids)
+        expected_branches = [1, 1, 2, 3, 4]
+        for profile, maximum in zip(profiles, expected_branches):
             runs = _beam_search_runs(profile)
             self.assertEqual(
                 tuple(search_variant for _, search_variant in runs),
@@ -74,7 +75,6 @@ class SolverPortfolioTests(unittest.TestCase):
                 dict(runs[1][0].limits)["max_participant_branches"],
                 maximum,
             )
-
     def test_simple_stage_solution_keeps_the_fast_path(self) -> None:
         project = blank_project_v1()
         project["container_groups"] = [
@@ -101,7 +101,7 @@ class SolverPortfolioTests(unittest.TestCase):
         self.assertTrue(execution.certified_candidates[0].certificate.certified)
         self.assertTrue(all(report.skipped_by_fast_path for report in execution.family_reports[1:]))
 
-    def test_non_trivial_auto_keeps_only_material_certified_families(self) -> None:
+    def test_non_trivial_auto_keeps_only_envelope_certified_families(self) -> None:
         execution = solve_partition_portfolio(_two_level_project(), effort_profile=EFFORT_NORMAL)
 
         self.assertEqual(execution.status, "solution_found")
@@ -111,8 +111,8 @@ class SolverPortfolioTests(unittest.TestCase):
             ("stage_stack", "free_3d_greedy", "free_3d_beam"),
         )
         beam_report = execution.family_reports[2]
-        self.assertEqual(beam_report.certified_candidate_count, 0)
-        self.assertEqual(beam_report.status, "no_solution_within_budget")
+        self.assertGreater(beam_report.certified_candidate_count, 0)
+        self.assertEqual(beam_report.status, "solution_found")
         self.assertTrue(execution.certified_candidates)
         self.assertTrue(
             all(value.certificate.certified for value in execution.certified_candidates)
@@ -132,7 +132,7 @@ class SolverPortfolioTests(unittest.TestCase):
             all(report.status == "stale_or_cancelled" for report in execution.family_reports)
         )
 
-    def test_h04_dense_corpus_keeps_only_material_certified_candidates(self) -> None:
+    def test_h04_dense_corpus_keeps_only_envelope_certified_candidates(self) -> None:
         accepted = solve_partition_portfolio(
             h01_dense_project(),
             effort_profile=EFFORT_NORMAL,
@@ -148,9 +148,12 @@ class SolverPortfolioTests(unittest.TestCase):
         self.assertTrue(
             all(value.certificate.certified for value in accepted.certified_candidates)
         )
-        self.assertEqual(rejected.status, "no_solution_within_budget")
-        self.assertIsNone(rejected.selected_plan)
-        self.assertEqual(rejected.certified_candidates, ())
+        self.assertEqual(rejected.status, "solution_found")
+        self.assertIsNotNone(rejected.selected_plan)
+        self.assertTrue(rejected.certified_candidates)
+        self.assertTrue(
+            all(value.certificate.certified for value in rejected.certified_candidates)
+        )
 
 
 if __name__ == "__main__":

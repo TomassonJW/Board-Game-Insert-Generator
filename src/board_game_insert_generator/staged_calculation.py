@@ -1,10 +1,9 @@
 """Explicit minimal layout, bounded finalization, and dual materialization.
 
 The session consumes the versioned L01 dependency state, the L02 local
-frontiers, and the L03R-B minimal solver. A certified minimal layout remains
-materializable for projects without coupled reservations. With active top
-reservations it becomes an internal incumbent: explicit bounded finalization
-and its global certificate are required before CAD selection.
+frontiers, and the minimal solver. A certified minimal layout remains directly
+materializable, including when top reservations are active. Finalization is a
+separate optional operation and never gates selection of that minimal artifact.
 """
 
 from __future__ import annotations
@@ -813,6 +812,7 @@ class StagedCalculationSession:
                 "finalization_is_explicit": True,
                 "finalization_is_optional": not coupled_required,
                 "minimal_materialization_requires_finalized_plan": coupled_required,
+                "top_reservations_preserved_in_minimal_solver": True,
                 "artifact_selection_is_explicit": True,
                 "automatic_body_count_added_by_orchestrator": 0,
                 "solver_method_or_budget_changed": False,
@@ -847,8 +847,13 @@ class StagedCalculationSession:
         }
 
     def _coupled_finalization_required(self) -> bool:
-        flat_items = self._project.get("flat_items", [])
-        return bool(_mappings(flat_items))
+        """Return the historical gate, disabled by ADR-0088.
+
+        Top reservations stay in the minimal SCIP model; their presence no
+        longer converts optional finishing into a materialization prerequisite.
+        """
+
+        return False
 
     def _minimal_current(self) -> bool:
         return bool(

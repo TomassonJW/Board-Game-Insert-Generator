@@ -42,10 +42,18 @@ class ContainerVariantGlobalSearchTests(unittest.TestCase):
 
     def test_effort_profiles_are_prefix_monotone(self) -> None:
         self.assertEqual(effort_prefix("quick"), ("quick",))
-        self.assertEqual(effort_prefix("normal"), ("quick", "normal"))
+        self.assertEqual(effort_prefix("short"), ("quick", "short"))
+        self.assertEqual(
+            effort_prefix("normal"),
+            ("quick", "short", "normal"),
+        )
+        self.assertEqual(
+            effort_prefix("long"),
+            ("quick", "short", "normal", "long"),
+        )
         self.assertEqual(
             effort_prefix("deep"),
-            ("quick", "normal", "deep"),
+            ("quick", "short", "normal", "long", "deep"),
         )
 
     def test_quick_lane_solves_true_multi_container_canonical_dead_end(self) -> None:
@@ -151,7 +159,7 @@ class ContainerVariantGlobalSearchTests(unittest.TestCase):
             beam_budgets_by_effort=self._budgets(),
         )
 
-        self.assertEqual(len(normal.lane_reports), 2)
+        self.assertEqual(len(normal.lane_reports), 3)
         self.assertEqual(
             normal.lane_reports[0].deterministic_digest,
             quick.lane_reports[0].deterministic_digest,

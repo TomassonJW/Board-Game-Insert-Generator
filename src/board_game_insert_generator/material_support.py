@@ -18,6 +18,9 @@ BRIDGED_ON_MATERIAL = "bridged_on_material"
 FALLS_THROUGH_OPENING = "falls_through_opening"
 INSUFFICIENT_MATERIAL_SUPPORT = "insufficient_material_support"
 UNSTABLE_SUPPORT_POLYGON = "unstable_support_polygon"
+SUPPORTED_ON_ENVELOPE = "supported_on_envelope"
+BRIDGED_ON_ENVELOPES = "bridged_on_envelopes"
+INSUFFICIENT_ENVELOPE_SUPPORT = "insufficient_envelope_support"
 
 MIN_SUPPORT_RATIO = 0.25
 _EPSILON = 0.0001
@@ -38,7 +41,12 @@ class MaterialSupportEvaluation:
 
     @property
     def certified(self) -> bool:
-        return self.status in {SUPPORTED_ON_MATERIAL, BRIDGED_ON_MATERIAL}
+        return self.status in {
+            SUPPORTED_ON_MATERIAL,
+            BRIDGED_ON_MATERIAL,
+            SUPPORTED_ON_ENVELOPE,
+            BRIDGED_ON_ENVELOPES,
+        }
 
 
 @dataclass(frozen=True)
@@ -87,6 +95,142 @@ def evaluate_search_support(
         xy_clearance,
     )
 
+
+def evaluate_envelope_search_support(
+    origin: tuple[float, float, float],
+    size: tuple[float, float, float],
+    placements: Sequence[object],
+    participant: Mapping[str, object],
+    participants_by_id: Mapping[str, Mapping[str, object]],
+    fallback_xy_clearance: float,
+    fallback_z_clearance: float,
+) -> MaterialSupportEvaluation:
+    """Evaluate hard support on lower bodies' complete outer XY envelopes."""
+
+    if origin[2] <= _EPSILON:
+        return _as_envelope_evaluation(_floor_evaluation())
+    surfaces: list[_Surface] = []
+    for lower in placements:
+        lower_id = str(getattr(lower, "participant_id"))
+        lower_participant = participants_by_id.get(lower_id)
+        if lower_participant is None:
+            continue
+        clearance = max(
+            _participant_clearance(participant, "z", fallback_z_clearance),
+            _participant_clearance(lower_participant, "z", fallback_z_clearance),
+        )
+        lower_origin = tuple(float(value) for value in getattr(lower, "origin_mm"))
+        lower_world = tuple(float(value) for value in getattr(lower, "world_size_mm"))
+        lower_top = lower_origin[2] + lower_world[2]
+        if abs(origin[2] - (lower_top + clearance)) > 0.001:
+            continue
+        surface = _search_surface(lower, lower_participant)
+        surfaces.append(
+            _Surface(
+                placement_id=surface.placement_id,
+                outer=surface.outer,
+                openings=(),
+            )
+        )
+    xy_clearance = max(
+        _participant_clearance(participant, "x", fallback_xy_clearance),
+        _participant_clearance(participant, "y", fallback_xy_clearance),
+    )
+    return _as_envelope_evaluation(
+        _evaluate(
+            (origin[0], origin[1], origin[0] + size[0], origin[1] + size[1]),
+            tuple(surfaces),
+            xy_clearance,
+        )
+    )
+
+
+def envelope_support_contract(
+    placements: Sequence[Mapping[str, object]],
+    *,
+    fallback_xy_clearance: float,
+    fallback_z_clearance: float,
+) -> dict[str, object]:
+    """Build the hard plan-level support contract from complete XY envelopes."""
+
+    supports: list[dict[str, object]] = []
+    minimum_ratio = 1.0
+    for placement in placements:
+        placement_id = str(placement.get("id") or placement.get("placement_id"))
+        origin = _vector(placement.get("origin_mm"))
+        size = _vector(placement.get("world_size_mm"))
+        if origin[2] <= _EPSILON:
+            evaluation = _as_envelope_evaluation(_floor_evaluation())
+            vertical_gap = 0.0
+        else:
+            surfaces: list[_Surface] = []
+            gaps: list[float] = []
+            for lower in placements:
+                lower_id = str(lower.get("id") or lower.get("placement_id"))
+                if lower_id == placement_id:
+                    continue
+                lower_origin = _vector(lower.get("origin_mm"))
+                lower_size = _vector(lower.get("world_size_mm"))
+                required_gap = max(
+                    _plan_clearance(placement, "z", fallback_z_clearance),
+                    _plan_clearance(lower, "z", fallback_z_clearance),
+                )
+                actual_gap = origin[2] - (lower_origin[2] + lower_size[2])
+                if abs(actual_gap - required_gap) > 0.001:
+                    continue
+                surface = _plan_surface(lower)
+                surfaces.append(
+                    _Surface(
+                        placement_id=surface.placement_id,
+                        outer=surface.outer,
+                        openings=(),
+                    )
+                )
+                gaps.append(actual_gap)
+            xy_clearance = max(
+                _plan_clearance(placement, "x", fallback_xy_clearance),
+                _plan_clearance(placement, "y", fallback_xy_clearance),
+            )
+            evaluation = _as_envelope_evaluation(
+                _evaluate(
+                    (origin[0], origin[1], origin[0] + size[0], origin[1] + size[1]),
+                    tuple(surfaces),
+                    xy_clearance,
+                )
+            )
+            vertical_gap = min(gaps) if gaps else 0.0
+        minimum_ratio = min(minimum_ratio, evaluation.coverage_ratio)
+        supports.append(
+            {
+                "placement_id": placement_id,
+                "stage_id": str(placement.get("stage_id", "")),
+                "supporting_ids": list(evaluation.supporting_ids),
+                "coverage_ratio": _round(evaluation.coverage_ratio),
+                "envelope_contact_area_mm2": _round(
+                    evaluation.material_contact_area_mm2
+                ),
+                "status": evaluation.status,
+                "supported": evaluation.certified,
+                "stable_support_polygon": evaluation.stable_support_polygon,
+                "vertical_gap_mm": _round(vertical_gap),
+            }
+        )
+    rejected = [value for value in supports if not bool(value["supported"])]
+    return {
+        "status": "unsupported" if rejected else "supported",
+        "certificate_kind": "outer_envelope_v1",
+        "minimum_coverage_ratio": _round(minimum_ratio),
+        "minimum_required_ratio": MIN_SUPPORT_RATIO,
+        "vertical_gap_mm": _round(fallback_z_clearance),
+        "supports": supports,
+        "unsupported_body_ids": [str(value["placement_id"]) for value in rejected],
+        "rejection_statuses": sorted({str(value["status"]) for value in rejected}),
+        "invariants": {
+            "outer_envelope_is_hard_support": True,
+            "openings_are_diagnostic_only": True,
+            "support_polygon_contains_center_of_mass_projection": True,
+        },
+    }
 
 def material_support_contract(
     placements: Sequence[Mapping[str, object]],
@@ -177,6 +321,23 @@ def _floor_evaluation() -> MaterialSupportEvaluation:
         falls_through_opening=False,
     )
 
+
+def _as_envelope_evaluation(
+    evaluation: MaterialSupportEvaluation,
+) -> MaterialSupportEvaluation:
+    status = {
+        SUPPORTED_ON_MATERIAL: SUPPORTED_ON_ENVELOPE,
+        BRIDGED_ON_MATERIAL: BRIDGED_ON_ENVELOPES,
+        INSUFFICIENT_MATERIAL_SUPPORT: INSUFFICIENT_ENVELOPE_SUPPORT,
+    }.get(evaluation.status, evaluation.status)
+    return MaterialSupportEvaluation(
+        status=status,
+        supporting_ids=evaluation.supporting_ids,
+        coverage_ratio=evaluation.coverage_ratio,
+        material_contact_area_mm2=evaluation.material_contact_area_mm2,
+        stable_support_polygon=evaluation.stable_support_polygon,
+        falls_through_opening=False,
+    )
 
 def _evaluate(
     upper: _Rect,

@@ -8,8 +8,10 @@ import unittest
 from board_game_insert_generator.container_derivation import derive_container_plan
 from board_game_insert_generator.container_internal_variants import (
     EFFORT_DEEP,
+    EFFORT_LONG,
     EFFORT_NORMAL,
     EFFORT_QUICK,
+    EFFORT_SHORT,
     certify_container_variant_draft,
     compute_variant_geometry_digest,
     container_internal_variant_to_dict,
@@ -37,27 +39,28 @@ from p64_v2h03b_fixture_cases import (
 
 class ContainerInternalVariantTests(unittest.TestCase):
     def test_standard_budgets_are_finite_monotone_and_serializable(self) -> None:
-        quick, normal, deep = standard_variant_budgets()
+        budgets = standard_variant_budgets()
 
         self.assertEqual(
-            (quick.effort_profile, normal.effort_profile, deep.effort_profile),
-            (EFFORT_QUICK, EFFORT_NORMAL, EFFORT_DEEP),
+            tuple(value.effort_profile for value in budgets),
+            (EFFORT_QUICK, EFFORT_SHORT, EFFORT_NORMAL, EFFORT_LONG, EFFORT_DEEP),
         )
         self.assertEqual(
-            tuple(tuple(value for _, value in budget.limit_items()) for budget in (quick, normal, deep)),
+            tuple(tuple(value for _, value in budget.limit_items()) for budget in budgets),
             (
                 (24, 24, 4, 2, 32, 128),
+                (36, 36, 6, 3, 128, 1_024),
                 (48, 48, 8, 4, 384, 3_072),
+                (72, 72, 10, 5, 1_536, 12_288),
                 (96, 96, 12, 6, 3_072, 36_864),
             ),
         )
-        self.assertTrue(normal.is_at_least_as_permissive_as(quick))
-        self.assertTrue(deep.is_at_least_as_permissive_as(normal))
-        self.assertFalse(quick.is_at_least_as_permissive_as(normal))
-        for budget in (quick, normal, deep):
+        for previous, current in zip(budgets, budgets[1:]):
+            self.assertTrue(current.is_at_least_as_permissive_as(previous))
+            self.assertFalse(previous.is_at_least_as_permissive_as(current))
+        for budget in budgets:
             self.assertTrue(all(value >= 0 for _, value in budget.limit_items()))
             json.dumps(budget.to_dict(), sort_keys=True)
-
     def test_canonical_extraction_keeps_public_derivation_bit_identical(self) -> None:
         projects = (
             simple_success_project(),
@@ -256,7 +259,7 @@ class ContainerInternalVariantTests(unittest.TestCase):
             profile: derive_container_internal_variant_frontiers(
                 project, effort_profile=profile
             )
-            for profile in (EFFORT_QUICK, EFFORT_NORMAL, EFFORT_DEEP)
+            for profile in (EFFORT_QUICK, EFFORT_SHORT, EFFORT_NORMAL, EFFORT_LONG, EFFORT_DEEP)
         }
 
         self.assertEqual(len(project["container_groups"]), 11)

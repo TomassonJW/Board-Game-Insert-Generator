@@ -7,6 +7,7 @@ from dataclasses import asdict, dataclass, replace
 from hashlib import sha256
 import importlib.util
 import json
+from math import ceil
 import os
 from pathlib import Path
 import sys
@@ -23,6 +24,7 @@ from board_game_insert_generator.free_3d_greedy_solver import (
 )
 from board_game_insert_generator.free_3d_plan_adapter import Free3DPreparedProblem
 from board_game_insert_generator.incremental_project_state import canonical_digest
+from board_game_insert_generator.solver_settings import solver_deadline_seconds
 
 SCIP_PRODUCT_SCHEMA_V1 = "bgig.scip_product_lane.v1"
 SCIP_PRODUCT_VERSION = "10.0.2"
@@ -109,6 +111,10 @@ class ScipProductExecution:
     total_wall_seconds: float | None = None
 
     def deterministic_report(self) -> dict[str, object]:
+        reported_limits = self.limits.to_dict()
+        reported_limits["wall_seconds"] = float(
+            ceil(float(reported_limits["wall_seconds"]))
+        )
         report: dict[str, object] = {
             "schema_version": SCIP_PRODUCT_SCHEMA_V1,
             "candidate": {
@@ -125,7 +131,7 @@ class ScipProductExecution:
                 "model_digest": self.model_digest,
                 "scale_per_mm": _SCALE_PER_MM,
             },
-            "limits": self.limits.to_dict(),
+            "limits": reported_limits,
             "status": self.status,
             "stop_reason": self.stop_reason,
             "engine_status": self.engine_status,
@@ -139,6 +145,7 @@ class ScipProductExecution:
                 "subprocess_isolated": False,
                 "telemetry_enabled": False,
                 "volatile_runtime_metrics_in_certifiable_payload": False,
+                "remaining_deadline_is_ceiled_in_report": True,
                 "holdout_read": False,
             },
         }
@@ -182,13 +189,7 @@ def scip_product_runtime_configured() -> bool:
 
 
 def scip_product_limits(effort_profile: str) -> ScipProductLimits:
-    if effort_profile == "quick":
-        return ScipProductLimits(wall_seconds=1.0)
-    if effort_profile == "normal":
-        return ScipProductLimits(wall_seconds=5.0)
-    if effort_profile == "deep":
-        return ScipProductLimits(wall_seconds=120.0)
-    raise ValueError(f"Unknown effort profile {effort_profile!r}.")
+    return ScipProductLimits(wall_seconds=solver_deadline_seconds(effort_profile))
 
 
 def solve_scip_product_3d(
@@ -197,8 +198,11 @@ def solve_scip_product_3d(
     *,
     effort_profile: str,
     cancel_check: Callable[[], bool] | None = None,
+    wall_seconds: float | None = None,
 ) -> ScipProductExecution:
     limits = scip_product_limits(effort_profile)
+    if wall_seconds is not None:
+        limits = replace(limits, wall_seconds=max(0.001, float(wall_seconds)))
     if _configured_runtime_root is None:
         return _empty_execution(
             limits,
@@ -411,7 +415,7 @@ def _prepare_product_problem(
         worker_participants = []
         option_records: dict[tuple[str, str], _ProductOption] = {}
         participant_records: dict[str, dict[str, object]] = {}
-        for raw in participants:
+        for raw in sorted(participants, key=_participant_stacking_preference_key):
             participant = deepcopy(dict(raw))
             participant_id = str(participant["id"])
             if participant_id in participant_records:
@@ -502,6 +506,11 @@ def _prepare_product_problem(
             "between_z_mm": z_clearance,
             "positive_axis_padding": True,
         },
+        "stacking_preference": {
+            "kind": "small_footprint_below_large_footprint",
+            "hard_constraint": False,
+            "participant_order_is_warm_start_only": True,
+        },
     }
     payload["problem_digest"] = canonical_digest(payload)
     return (
@@ -517,6 +526,17 @@ def _prepare_product_problem(
         "",
     )
 
+
+def _participant_stacking_preference_key(
+    participant: Mapping[str, object],
+) -> tuple[float, float, float, str]:
+    size = _dimension_tuple(participant["minimum_local_mm"])
+    return (
+        size[0] * size[1],
+        min(size[0], size[1]),
+        size[0] * size[1] * size[2],
+        str(participant["id"]),
+    )
 
 def _participant_options(
     participant: Mapping[str, object],

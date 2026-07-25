@@ -2107,3 +2107,21 @@ Le détail et les prérequis sont dans `docs/FUTURE_PRODUCT_HORIZONS.md`.
 - `C-PRINT` : inchangée, `print-validated=false`.
 
 Aucune capability runtime n'est promue par cette mission documentaire.
+
+## Mise à jour P64-L09R-B — calcul minimal fiable
+
+- `C-SOLVER` / `C-STACKING` : `implemented-product`. Le support dur est
+  l'enveloppe XY ; le support matériel reste diagnostique. La préférence
+  petits-dessous/grands-dessus est secondaire et n'interdit aucune inversion.
+- `C-RESERVATION` / `C-LAYOUT` : `implemented-product`. Les réservations SCIP
+  sont conservées. Une compensation Z strictement nécessaire peut être ajoutée
+  après le placement minimal, sans finition ni corps automatique.
+- `C-PARTITION` / `C-CAD-IR` : `implemented-product`. Un plan minimal certifié
+  avec plateau ou livret est directement matérialisable ; le garde CAD vérifie X/Y
+  minimaux et toute compensation Z déclarée.
+- `C-SOLVER` : les deadlines totales 3/10/20/60/180 s sont implémentées depuis
+  l'entrée publique. Un épuisement reste `no_solution_within_budget`.
+- `C-FUSION-UI` : inchangée par B. Les champs visibles, les trois boutons et la jauge restent prévus par D/E.
+- `C-FUSION` / `C-PRINT` : inchangées ; aucune installation, observation Fusion ou impression n'a eu lieu.
+
+Preuve : `docs/P64_L09R_B_MINIMAL_CALCULATION_EVIDENCE.md`.

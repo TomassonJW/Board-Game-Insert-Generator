@@ -3860,4 +3860,21 @@ Statut : `done-documentation`, `architecture-accepted`.
   un test natif ignoré sous Python 3.10 ; `git diff --check` OK.
 
 Contrat : `docs/P64_L09R_CALCUL_FINITION_PROGRESS_CONTRACT.md`.
-Prochaine mission unique : P64-L09R-B.
+Lot exécuté ensuite : P64-L09R-B.
+
+## P64-L09R-B — calcul minimal fiable et budgets globaux
+
+Statut : `implemented-product`, `automated-validated`.
+
+- La faisabilité dure utilise l'enveloppe XY ; l'anti-chute liée aux ouvertures est retirée du verdict produit et conservée comme diagnostic matière.
+- Les réservations SCIP restent actives. Une compensation Z bornée est appliquée après un placement minimal complet, uniquement à un corps non fixe, recouvrant la réservation et sans obstacle au-dessus.
+- Le plan minimal certifié devient directement matérialisable. Le garde CAD exige X/Y minimaux et vérifie exactement toute compensation Z déclarée.
+- La préférence petits-dessous/grands-dessus est un axe secondaire non dur ; les inversions nécessaires restent admissibles.
+- Les profils Rapide, Court, Normal, Long et Approfondi partagent une deadline totale de 3, 10, 20, 60 ou 180 secondes depuis l'entrée publique.
+- Un budget épuisé reste `no_solution_within_budget` et ne devient jamais `proven_impossible`.
+- Le cas P66 complet avec plateaux/livret est calculé puis préparé CAD sans finition. Le corpus CI améliore un cas de réservation localisée sans perdre les préfixes historiques.
+- Validation : tests documentaires 2/2 ; suite complète 856/856 en 238,361 s, un test natif ignoré sous Python 3.10.
+- Aucun benchmark, package Fusion, réglage local, observation Fusion ou fait d'impression n'est produit par ce lot.
+
+Preuve : `docs/P64_L09R_B_MINIMAL_CALCULATION_EVIDENCE.md`.
+Prochaine mission unique : P64-L09R-C.

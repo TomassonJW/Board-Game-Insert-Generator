@@ -42,15 +42,25 @@ from board_game_insert_generator.solver_outcome import (
     SOLUTION_FOUND,
     STALE_OR_CANCELLED,
 )
+from board_game_insert_generator.solver_settings import (
+    EFFORT_DEEP,
+    EFFORT_LONG,
+    EFFORT_NORMAL,
+    EFFORT_QUICK,
+    EFFORT_SHORT,
+)
 
 
 CONTAINER_VARIANT_GLOBAL_SEARCH_SCHEMA_V1 = (
     "bgig.container_variant_global_search.v1"
 )
-EFFORT_QUICK = "quick"
-EFFORT_NORMAL = "normal"
-EFFORT_DEEP = "deep"
-_EFFORT_ORDER = (EFFORT_QUICK, EFFORT_NORMAL, EFFORT_DEEP)
+_EFFORT_ORDER = (
+    EFFORT_QUICK,
+    EFFORT_SHORT,
+    EFFORT_NORMAL,
+    EFFORT_LONG,
+    EFFORT_DEEP,
+)
 _AXES = ("x", "y", "z")
 
 

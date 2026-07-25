@@ -3296,7 +3296,8 @@ implémentée et intégrée à la fois.
   Normal 20 s, Long 60 s ou Approfondi 180 s.
 - Tests : inversion nécessaire admise, déterminisme, plateaux, cas 28x30,
   certificats et timeout honnête.
-- Statut : `ready`, prochaine mission unique.
+- Preuve : `docs/P64_L09R_B_MINIMAL_CALCULATION_EVIDENCE.md`.
+- Statut : `implemented-product`, `automated-validated`.
 
 ### P64-L09R-C — Finition séparée et non destructive
 
@@ -3306,7 +3307,7 @@ implémentée et intégrée à la fois.
   avant rappel global et republier seulement un plan final recertifié.
 - Un échec conserve le plan minimal courant et matérialisable.
 - Aucun corps, cale, micro-conteneur ou valeur physique implicite.
-- Statut : `planned-after-P64-L09R-B`.
+- Statut : `ready`, prochaine mission unique.
 
 ### P64-L09R-D — Trois actions et budgets visibles
 

@@ -90,7 +90,7 @@ class MinimalLayoutSolverTests(unittest.TestCase):
         )
 
         self.assertEqual(plan["solver"]["result"]["status"], SOLUTION_FOUND)
-        self.assertFalse(plan["solver"]["result"]["materializable"])
+        self.assertTrue(plan["solver"]["result"]["materializable"])
         self.assertTrue(plan["summary"]["placement_certified"])
         self.assertFalse(plan["summary"]["complete_printable_partition"])
         self.assertGreater(plan["summary"]["residual_volume_mm3"], 0.0)
@@ -187,85 +187,57 @@ class MinimalLayoutSolverTests(unittest.TestCase):
             "rare-footprint",
         )
         self.assertEqual(orderings["height"][0], "absolute-tall")
+        self.assertEqual(orderings["small_footprint_base"][0], "absolute-tall")
 
-    def test_effort_lanes_and_hard_caps_are_monotone_prefixes(self) -> None:
-        quick_lanes = minimal_lane_specs("quick")
-        normal_lanes = minimal_lane_specs("normal")
-        deep_lanes = minimal_lane_specs("deep")
-        quick, normal, deep = minimal_effort_budgets()
+    def test_effort_lanes_and_total_deadlines_are_monotone_prefixes(self) -> None:
+        efforts = ("quick", "short", "normal", "long", "deep")
+        lanes = [minimal_lane_specs(value) for value in efforts]
+        budgets = minimal_effort_budgets()
 
-        self.assertEqual(normal_lanes[: len(quick_lanes)], quick_lanes)
-        self.assertEqual(deep_lanes[: len(normal_lanes)], normal_lanes)
-        self.assertTrue(normal.is_at_least_as_permissive_as(quick))
-        self.assertTrue(deep.is_at_least_as_permissive_as(normal))
+        for previous, current in zip(lanes, lanes[1:]):
+            self.assertEqual(current[: len(previous)], previous)
+        for previous, current in zip(budgets, budgets[1:]):
+            self.assertTrue(current.is_at_least_as_permissive_as(previous))
+        self.assertEqual([len(value) for value in lanes], [3, 4, 6, 8, 9])
         self.assertEqual(
-            [len(quick_lanes), len(normal_lanes), len(deep_lanes)],
-            [3, 6, 9],
-        )
-        self.assertNotIn(
-            "max_deep_extension_elapsed_ms",
-            dict(normal.limits),
-        )
-        self.assertEqual(
-            dict(deep.limits)["max_deep_extension_elapsed_ms"],
-            30_000,
+            [dict(value.limits)["max_total_elapsed_ms"] for value in budgets],
+            [3_000, 10_000, 20_000, 60_000, 180_000],
         )
 
-    def test_deep_deadline_preserves_the_normal_incumbent(self) -> None:
+    def test_global_deadline_preserves_a_certified_incumbent(self) -> None:
         project = simple_success_project()
-        clock_values = [0.0, 0.0]
+        incumbent = solve_minimal_layout(project, effort_profile="normal")
+        clock_values = [0.0, 0.0, 180_000.0]
 
         def deadline_clock() -> float:
-            return clock_values.pop(0) if clock_values else 30_000.0
+            return clock_values.pop(0) if clock_values else 180_000.0
 
         with patch(
             "board_game_insert_generator.minimal_layout_solver._monotonic_ms",
             side_effect=deadline_clock,
         ):
-            plan = solve_minimal_layout(project, effort_profile="deep")
+            plan = solve_minimal_layout(
+                project,
+                effort_profile="deep",
+                initial_incumbent=incumbent,
+            )
 
         self.assertEqual(plan["solver"]["result"]["status"], SOLUTION_FOUND)
         provenance = plan["minimal_layout"]["search_provenance"]
-        anytime = provenance["anytime"]
-        self.assertTrue(anytime["initial_incumbent_available"])
-        self.assertTrue(anytime["deep_extension_deadline_reached"])
+        self.assertTrue(provenance["deadline_reached"])
         self.assertEqual(
-            anytime["selected_phase"],
-            "normal_incumbent",
+            provenance["stop_reason"],
+            "global_deadline_reached_with_candidate",
         )
-        self.assertTrue(anytime["incumbent_preserved"])
-        self.assertEqual(
-            anytime["stop_reason"],
-            "deep_deadline_reached_incumbent_preserved",
-        )
-        self.assertEqual(
-            provenance["selected"]["placement_digest"],
-            anytime["initial_incumbent_placement_digest"],
-        )
-        self.assertEqual(
-            len(provenance["phases"]["normal_prefix"]["attempted_lane_ids"]),
-            6,
-        )
-        self.assertEqual(
-            len(provenance["phases"]["deep_extension"]["attempted_lane_ids"]),
-            1,
-        )
-        self.assertFalse(plan["solver"]["deterministic"])
-        self.assertEqual(plan["solver"]["telemetry"]["elapsed_ms"], 30_000)
-        self.assertEqual(
-            plan["solver"]["telemetry"]["search_stop_reason"],
-            "deep_deadline_reached_incumbent_preserved",
-        )
-        self.assertTrue(
-            plan["minimal_layout"]["global_certificate"]["certified"]
-        )
+        self.assertEqual(provenance["selected"]["candidate_source"], "certified_witness")
+        self.assertTrue(plan["minimal_layout"]["global_certificate"]["certified"])
 
-    def test_deep_deadline_without_incumbent_stays_truthful(self) -> None:
+    def test_global_deadline_without_incumbent_is_not_impossibility(self) -> None:
         project = localized_reservation_project()
-        clock_values = [0.0, 0.0]
+        clock_values = [0.0, 0.0, 180_000.0]
 
         def deadline_clock() -> float:
-            return clock_values.pop(0) if clock_values else 30_000.0
+            return clock_values.pop(0) if clock_values else 180_000.0
 
         with patch(
             "board_game_insert_generator.minimal_layout_solver._monotonic_ms",
@@ -277,49 +249,23 @@ class MinimalLayoutSolverTests(unittest.TestCase):
             plan["solver"]["result"]["status"],
             NO_SOLUTION_WITHIN_BUDGET,
         )
+        self.assertIsNone(plan["solver"]["result"]["proof"])
+        self.assertEqual(
+            plan["solver"]["telemetry"]["stop_reason"],
+            "global_deadline_reached_without_candidate",
+        )
+        self.assertFalse(plan["summary"]["materializable"])
+
+    def test_deep_uses_one_prefix_without_hidden_finishing(self) -> None:
+        plan = solve_minimal_layout(simple_success_project(), effort_profile="deep")
+
+        self.assertEqual(plan["solver"]["result"]["status"], SOLUTION_FOUND)
         provenance = plan["minimal_layout"]["search_provenance"]
-        anytime = provenance["anytime"]
-        self.assertFalse(anytime["initial_incumbent_available"])
-        self.assertTrue(anytime["deep_extension_deadline_reached"])
-        self.assertIsNone(anytime["selected_phase"])
-        self.assertEqual(
-            anytime["stop_reason"],
-            "deep_deadline_reached_without_incumbent",
-        )
-        self.assertFalse(plan["solver"]["result"]["materializable"])
+        self.assertEqual(provenance["budget"]["max_total_elapsed_ms"], 180_000)
+        self.assertLessEqual(len(provenance["lanes"]), 9)
+        self.assertEqual(provenance["finalization_invocation_count"], 0)
 
-    def test_deep_completion_preserves_or_improves_normal(self) -> None:
-        project = simple_success_project()
-        deep = solve_minimal_layout(project, effort_profile="deep")
-
-        self.assertEqual(deep["solver"]["result"]["status"], SOLUTION_FOUND)
-        anytime = deep["minimal_layout"]["search_provenance"]["anytime"]
-        self.assertIn(
-            anytime["selected_phase"],
-            {"normal_incumbent", "deep_extension"},
-        )
-        metrics = deep["minimal_layout"]["metrics"]
-        selected_rank_axes = (
-            metrics["cluster_volume_mm3"],
-            metrics["internal_gap_mm3"],
-            metrics["cluster_height_mm"],
-            metrics["cluster_footprint_mm2"],
-            metrics["residual_fragmentation"],
-            -metrics["contact_count"],
-            -metrics["minimum_support_ratio"],
-        )
-        self.assertLessEqual(
-            selected_rank_axes,
-            tuple(anytime["initial_incumbent_rank_axes"]),
-        )
-        self.assertEqual(
-            deep["minimal_layout"]["search_provenance"][
-                "finalization_invocation_count"
-            ],
-            0,
-        )
-
-    def test_open_thin_stack_is_rejected_when_only_void_supports_it(self) -> None:
+    def test_open_thin_stack_is_allowed_by_envelope_support(self) -> None:
         project = _project_from_dimensions(
             {
                 "tall": (20.0, 20.0, 50.0),
@@ -331,11 +277,39 @@ class MinimalLayoutSolverTests(unittest.TestCase):
 
         plan = solve_minimal_layout(project, effort_profile="normal")
 
-        self.assertEqual(
-            plan["solver"]["result"]["status"],
-            "no_solution_within_budget",
+        self.assertEqual(plan["solver"]["result"]["status"], SOLUTION_FOUND)
+        self.assertTrue(plan["summary"]["materializable"])
+        self.assertEqual(plan["stage_support"]["status"], "supported")
+        self.assertEqual(plan["stage_support"]["certificate_kind"], "outer_envelope_v1")
+
+    def test_necessary_large_below_small_inversion_remains_admissible(self) -> None:
+        project = _project_from_dimensions(
+            {
+                "large": (20.0, 20.0, 10.0),
+                "small": (4.0, 4.0, 10.0),
+            },
+            box=(25.6, 25.6, 25.0),
         )
-        self.assertFalse(plan["summary"]["materializable"])
+
+        plan = solve_minimal_layout(project, effort_profile="normal")
+
+        self.assertEqual(plan["solver"]["result"]["status"], SOLUTION_FOUND)
+        placements = {value["container_group_id"]: value for value in plan["placements"]}
+        self.assertLess(
+            placements["large"]["origin_mm"]["z"],
+            placements["small"]["origin_mm"]["z"],
+        )
+        small_support = next(
+            value for value in plan["stage_support"]["supports"]
+            if value["placement_id"] == "container:small"
+        )
+        self.assertEqual(small_support["supporting_ids"], ["container:large"])
+        ranking = plan["minimal_layout"]["search_provenance"]["ranking_axes"]
+        preference = next(
+            value for value in ranking
+            if value["name"] == "stacking_preference_violation_count"
+        )
+        self.assertFalse(preference["hard_constraint"])
 
     def test_floating_body_is_rejected_by_the_common_support_contract(self) -> None:
         project = simple_success_project()
@@ -450,12 +424,18 @@ class MinimalLayoutSolverTests(unittest.TestCase):
 
         self.assertEqual(
             plan["solver"]["result"]["status"],
-            NO_SOLUTION_WITHIN_BUDGET,
+            SOLUTION_FOUND,
         )
-        self.assertIsNone(plan["solver"]["result"]["proof"])
-        self.assertIn(
+        self.assertTrue(plan["summary"]["materializable"])
+        self.assertEqual(plan["top_inset_reservations"]["status"], "applied")
+        self.assertNotIn(
             "TOP_INSET_WITHOUT_SUPPORTING_BODY",
             {value["code"] for value in plan["diagnostics"]},
+        )
+        self.assertTrue(
+            plan["minimal_layout"]["search_provenance"][
+                "global_deadline_enforced"
+            ]
         )
         lanes = plan["minimal_layout"]["search_provenance"]["lanes"]
         bridge = next(
@@ -464,7 +444,11 @@ class MinimalLayoutSolverTests(unittest.TestCase):
             if value["lane_id"] == "historical_bridge_edge"
         )
         self.assertGreater(bridge["anchor_point_count"], 0)
-        self.assertEqual(len(plan["placements"]), 0)
+        self.assertEqual(len(plan["placements"]), 1)
+        self.assertGreater(
+            plan["placements"][0]["reservation_required_z_compensation_mm"],
+            0.0,
+        )
 
     def test_dense_11_by_34_case_stays_bounded_and_truthful(self) -> None:
         plan = solve_minimal_layout(
