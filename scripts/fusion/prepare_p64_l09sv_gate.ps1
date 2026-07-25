@@ -110,7 +110,7 @@ else {
             }
         }
         $installedComposite = Get-Content -LiteralPath (Join-Path $target "lib\board_game_insert_generator\xy_composite_closure.py") -Raw -Encoding UTF8
-        foreach ($marker in @("bounded XY-composite", "all_annexes_use_true_vertical_xy_faces", "edge_or_point_attachment_count")) {
+        foreach ($marker in @("Bounded XY-composite", "all_annexes_use_true_vertical_xy_faces", "edge_or_point_attachment_count")) {
             if (-not $installedComposite.Contains($marker)) {
                 throw "Installed P64-L09S-V composite marker missing: $marker"
             }
