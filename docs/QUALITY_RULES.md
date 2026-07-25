@@ -1,5 +1,13 @@
 # Quality Rules
 
+## Regles P64-L09S-C
+
+- Aucun plan final sans `printable_residual_volume_mm3 = 0`.
+- Chaque corps rectangulaire final apparait exactement une fois.
+- Le volume racine est egal aux corps, reservations et vides techniques certifies.
+- Equilibre et proportion ne peuvent jamais affaiblir la fermeture complete.
+- Une partition non tranchable reste un echec honnete pour le repli D.
+
 ## Regles de conception
 
 - Toutes les dimensions sont en millimetres.

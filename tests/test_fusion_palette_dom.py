@@ -571,6 +571,7 @@ class FusionPaletteDomTests(unittest.TestCase):
         smoke = (ROOT / "scripts" / "fusion" / "prepare_p56_palette_test.ps1").read_text(encoding="utf-8")
         self.assertIn("lib\\board_game_insert_generator", helpers)
         self.assertIn("top_inset_reservation.py", helpers)
+        self.assertIn("global_rectangular_closure.py", helpers)
         self.assertIn("volumetric_stage_solver.py", helpers)
         self.assertIn("free_3d_continuous_closure.py", helpers)
         self.assertIn("Assert-BgigPaletteProjectRuntime", helpers)

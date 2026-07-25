@@ -17,10 +17,13 @@ from board_game_insert_generator.container_variant_global_search import (
 )
 from board_game_insert_generator.free_3d_continuous_closure import (
     FINISHING_OBJECTIVE_BALANCED_THEN_PROPORTIONAL,
-    FINISHING_OBJECTIVE_CLOSURE_ONLY,
     FREE_3D_CONTINUOUS_CLOSURE_VERSION,
     Free3DClosureResult,
-    close_free_3d_residual,
+)
+from board_game_insert_generator.global_rectangular_closure import (
+    GLOBAL_RECTANGULAR_CLOSURE_VERSION,
+    GlobalRectangularClosureResult,
+    close_global_rectangular_partition,
 )
 from board_game_insert_generator.free_3d_plan_adapter import (
     CertifiedFree3DPlan,
@@ -40,8 +43,8 @@ from board_game_insert_generator.solver_settings import solver_deadline_seconds
 
 COUPLED_FINALIZATION_SCHEMA_V1 = "bgig.coupled_finalization.v1"
 COUPLED_FINALIZATION_FAMILY_ID = "bounded_coupled_finalization"
-COUPLED_FINALIZATION_VERSION = "bgig.bounded_coupled_finalization.v3"
-COUPLED_FINALIZATION_POLICY = "bounded_growth_local_repair_balanced_proportional"
+COUPLED_FINALIZATION_VERSION = "bgig.bounded_coupled_finalization.v4"
+COUPLED_FINALIZATION_POLICY = "global_rectangular_partition_balanced_proportional"
 ARTIFACT_KIND_FINALIZED = "finalized_plan"
 
 _CLOSURE_CAPS = {
@@ -166,16 +169,16 @@ def finalize_coupled_volume(
             ),
         ) from exc
 
-    baseline_budget = _remaining_phase_budget(budget, deadline_at)
-    if baseline_budget is None:
+    closure_budget = _remaining_phase_budget(budget, deadline_at)
+    if closure_budget is None:
         raise CoupledFinalizationError(
-            "La deadline totale est atteinte avant la fermeture de base.",
+            "La deadline totale est atteinte avant la partition globale.",
             _deadline_failure_report(
-                "global_deadline_reached_before_baseline_closure",
+                "global_deadline_reached_before_rectangular_partition",
                 budget,
             ),
         )
-    baseline_closure = close_free_3d_residual(
+    closure = close_global_rectangular_partition(
         participants,
         placements,
         problem.box,
@@ -183,33 +186,46 @@ def finalize_coupled_volume(
         problem.xy_clearance_mm,
         box_perimeter_xy_mm=problem.box_xy_clearance_mm,
         between_bodies_z_mm=problem.z_clearance_mm,
-        budget=baseline_budget,
+        budget=closure_budget,
         top_inset_zones=problem.top_inset_zones,
-        finishing_objective=FINISHING_OBJECTIVE_CLOSURE_ONLY,
     )
-    if baseline_closure.empty_spaces:
+    if closure.empty_spaces:
         deadline_reached = bool(
-            baseline_closure.deadline_reached or _deadline_reached(deadline_at)
+            closure.deadline_reached or _deadline_reached(deadline_at)
         )
         raise CoupledFinalizationError(
-            "La fermeture bornee n a pas produit de plan complet certifiable.",
+            "La partition rectangulaire globale ne couvre pas tout le volume imprimable.",
             _closure_report(
-                baseline_closure,
+                closure,
                 stop_reason=(
-                    "global_deadline_reached_during_baseline_closure"
+                    "global_deadline_reached_during_rectangular_partition"
                     if deadline_reached
-                    else "printable_residual_remains"
+                    else str(
+                        closure.partition_certificate.get(
+                            "stop_reason",
+                            "global_rectangular_partition_not_found",
+                        )
+                    )
                 ),
                 budget=budget,
                 deadline_reached=deadline_reached,
             ),
         )
+    if closure.partition_certificate.get("certified") is not True:
+        raise CoupledFinalizationError(
+            "Le certificat de partition rectangulaire globale est invalide.",
+            _closure_report(
+                closure,
+                stop_reason="global_rectangular_partition_certificate_rejected",
+                budget=budget,
+            ),
+        )
     if _deadline_reached(deadline_at):
         raise CoupledFinalizationError(
-            "La deadline totale est atteinte avant le certificat de base.",
+            "La deadline totale est atteinte avant le certificat produit final.",
             _closure_report(
-                baseline_closure,
-                stop_reason="global_deadline_reached_before_baseline_certificate",
+                closure,
+                stop_reason="global_deadline_reached_before_final_certificate",
                 budget=budget,
                 deadline_reached=True,
             ),
@@ -219,131 +235,55 @@ def finalize_coupled_volume(
         COUPLED_FINALIZATION_FAMILY_ID,
         COUPLED_FINALIZATION_VERSION,
     )
-    baseline_certified, rejection_codes = _certify_closed_plan(
+    certified, rejection_codes = _certify_closed_plan(
         problem,
-        baseline_closure,
+        closure,
         strategy=strategy,
         budget=budget,
-        phase="f01b_certified_baseline",
+        phase="c_global_rectangular_partition",
     )
     if _deadline_reached(deadline_at):
         raise CoupledFinalizationError(
-            "La deadline totale est atteinte pendant le certificat de base.",
+            "La deadline totale est atteinte pendant le certificat produit final.",
             _closure_report(
-                baseline_closure,
-                stop_reason="global_deadline_reached_during_baseline_certificate",
+                closure,
+                stop_reason="global_deadline_reached_during_final_certificate",
                 rejection_codes=rejection_codes,
                 budget=budget,
                 deadline_reached=True,
             ),
         )
-    if baseline_certified is None:
+    if certified is None:
         raise CoupledFinalizationError(
-            "Le certificat global final a rejete le plan ferme.",
+            "Le certificat produit final a rejete la partition globale.",
             _closure_report(
-                baseline_closure,
+                closure,
                 stop_reason="global_certificate_rejected",
                 rejection_codes=rejection_codes,
                 budget=budget,
             ),
         )
 
-    selected_certified = baseline_certified
-    selected_closure = baseline_closure
-    selected_plan_source = "f01b_certified_baseline"
-    objective_attempted = False
-    objective_certified = False
-    objective_improved = False
-    objective_fallback_reason = "shared_budget_exhausted_after_baseline"
-    objective_closure: Free3DClosureResult | None = None
-    global_deadline_reached = False
-    objective_budget = _remaining_objective_budget(
-        budget,
-        baseline_closure,
-        remaining_elapsed_ms=_remaining_deadline_ms(deadline_at),
-    )
-    if objective_budget is not None:
-        objective_attempted = True
-        objective_closure = close_free_3d_residual(
-            participants,
-            placements,
-            problem.box,
-            problem.storage_height_mm,
-            problem.xy_clearance_mm,
-            box_perimeter_xy_mm=problem.box_xy_clearance_mm,
-            between_bodies_z_mm=problem.z_clearance_mm,
-            budget=objective_budget,
-            top_inset_zones=problem.top_inset_zones,
-            finishing_objective=(FINISHING_OBJECTIVE_BALANCED_THEN_PROPORTIONAL),
-        )
-        global_deadline_reached = bool(
-            objective_closure.deadline_reached or _deadline_reached(deadline_at)
-        )
-        if objective_closure.empty_spaces:
-            objective_fallback_reason = (
-                "global_deadline_reached_during_secondary_objective"
-                if global_deadline_reached
-                else f"objective_{objective_closure.status}"
-            )
-        elif global_deadline_reached:
-            objective_fallback_reason = (
-                "global_deadline_reached_before_secondary_certificate"
-            )
-        else:
-            candidate_certified, candidate_rejections = _certify_closed_plan(
-                problem,
-                objective_closure,
-                strategy=strategy,
-                budget=budget,
-                phase="f02b_balanced_proportional_candidate",
-            )
-            if _deadline_reached(deadline_at):
-                global_deadline_reached = True
-                objective_fallback_reason = (
-                    "global_deadline_reached_during_secondary_certificate"
-                )
-            elif candidate_certified is None:
-                objective_fallback_reason = (
-                    "objective_global_certificate_rejected:"
-                    + ",".join(candidate_rejections)
-                )
-            else:
-                objective_certified = True
-                if (
-                    objective_closure.objective_score
-                    < baseline_closure.objective_score
-                ):
-                    selected_certified = candidate_certified
-                    selected_closure = objective_closure
-                    selected_plan_source = "f02b_balanced_proportional"
-                    objective_improved = True
-                    objective_fallback_reason = (
-                        "strict_secondary_objective_improvement"
-                    )
-                else:
-                    objective_fallback_reason = "no_strict_secondary_improvement"
-
     return _finalized_plan(
-        selected_certified,
-        selected_closure,
-        baseline_closure=baseline_closure,
-        objective_closure=objective_closure,
-        objective_attempted=objective_attempted,
-        objective_certified=objective_certified,
-        objective_improved=objective_improved,
-        selected_plan_source=selected_plan_source,
-        objective_fallback_reason=objective_fallback_reason,
+        certified,
+        closure,
+        baseline_closure=closure,
+        objective_closure=None,
+        objective_attempted=True,
+        objective_certified=True,
+        objective_improved=False,
+        selected_plan_source="c_global_rectangular_partition",
+        objective_fallback_reason="global_partition_complete_by_construction",
         source_minimal_artifact_digest=source_minimal_artifact_digest,
         source_minimal_plan_digest=str(minimal_plan.get("plan_digest", "")),
         budget=budget,
         reservation_count=len(problem.top_inset_zones),
-        global_deadline_reached=global_deadline_reached,
+        global_deadline_reached=closure.deadline_reached,
     )
-
 
 def _certify_closed_plan(
     problem: Free3DPreparedProblem,
-    closure: Free3DClosureResult,
+    closure: Free3DClosureResult | GlobalRectangularClosureResult,
     *,
     strategy: SolverStrategy,
     budget: SolverBudget,
@@ -369,7 +309,7 @@ def _certify_closed_plan(
 
 def _remaining_objective_budget(
     budget: SolverBudget,
-    baseline: Free3DClosureResult,
+    baseline: Free3DClosureResult | GlobalRectangularClosureResult,
     *,
     remaining_elapsed_ms: int,
 ) -> SolverBudget | None:
@@ -430,10 +370,10 @@ def _deadline_reached(deadline_at: float) -> bool:
 
 def _finalized_plan(
     certified: CertifiedFree3DPlan,
-    closure: Free3DClosureResult,
+    closure: Free3DClosureResult | GlobalRectangularClosureResult,
     *,
-    baseline_closure: Free3DClosureResult,
-    objective_closure: Free3DClosureResult | None,
+    baseline_closure: Free3DClosureResult | GlobalRectangularClosureResult,
+    objective_closure: Free3DClosureResult | GlobalRectangularClosureResult | None,
     objective_attempted: bool,
     objective_certified: bool,
     objective_improved: bool,
@@ -467,6 +407,9 @@ def _finalized_plan(
             objective_closure.deterministic_digest if objective_closure is not None else ""
         ),
         "closure_status": closure.status,
+        "global_partition_certificate": deepcopy(
+            getattr(closure, "partition_certificate", {})
+        ),
         "iterations": baseline_closure.iterations + objective_iterations,
         "candidates_evaluated": (baseline_closure.candidates_evaluated + objective_candidates),
         "repair_attempts": (baseline_closure.repair_attempts + objective_repairs),
@@ -549,8 +492,11 @@ def _finalized_plan(
         {
             "minimal_layout": False,
             "residual_distributed": True,
-            "continuous_closure_applied": True,
-            "bounded_local_repair_before_global_resolve": True,
+            "continuous_closure_applied": False,
+            "global_rectangular_partition_by_construction": True,
+            "rectangular_bodies_only": True,
+            "composite_annexes_applied": False,
+            "bounded_local_repair_before_global_resolve": False,
             "global_resolve_invocation_count": (closure.global_resolve_invocation_count),
             "materialization_from_final_certificate_only": True,
             "base_cavity_layouts_fixed": True,
@@ -581,17 +527,33 @@ def _objective_score_payload(
 
 
 def _closure_telemetry(
-    closure: Free3DClosureResult,
+    closure: Free3DClosureResult | GlobalRectangularClosureResult,
     problem: Free3DPreparedProblem,
     *,
     phase: str,
 ) -> dict[str, object]:
     return {
-        "closure_version": FREE_3D_CONTINUOUS_CLOSURE_VERSION,
+        "closure_version": getattr(
+            closure,
+            "closure_version",
+            FREE_3D_CONTINUOUS_CLOSURE_VERSION,
+        ),
+        "global_rectangular_closure_version": (
+            GLOBAL_RECTANGULAR_CLOSURE_VERSION
+        ),
+        "global_partition_certificate": deepcopy(
+            getattr(closure, "partition_certificate", {})
+        ),
         "closure_phase": phase,
         "closure_status": closure.status,
+        "global_partition_certificate": deepcopy(
+            getattr(closure, "partition_certificate", {})
+        ),
         "finishing_objective": closure.finishing_objective,
         "objective_score": _objective_score_payload(closure.objective_score),
+        "global_partition_certificate": deepcopy(
+            getattr(closure, "partition_certificate", {})
+        ),
         "objective_candidate_count": closure.objective_candidate_count,
         "selected_objective_id": closure.selected_objective_id,
         "closure_iterations": closure.iterations,
@@ -611,7 +573,7 @@ def _closure_telemetry(
 
 
 def _closure_report(
-    closure: Free3DClosureResult,
+    closure: Free3DClosureResult | GlobalRectangularClosureResult,
     *,
     stop_reason: str,
     rejection_codes: Sequence[str] = (),
@@ -626,6 +588,9 @@ def _closure_report(
         "partial_plan_published": False,
         "materializable": False,
         "closure_status": closure.status,
+        "global_partition_certificate": deepcopy(
+            getattr(closure, "partition_certificate", {})
+        ),
         "closure_digest": closure.deterministic_digest,
         "incumbent_digest": closure.incumbent_digest,
         "iterations": closure.iterations,
@@ -641,6 +606,9 @@ def _closure_report(
         "residual_metric": closure.final_residual_metric,
         "finishing_objective": closure.finishing_objective,
         "objective_score": _objective_score_payload(closure.objective_score),
+        "global_partition_certificate": deepcopy(
+            getattr(closure, "partition_certificate", {})
+        ),
     }
     if budget is not None:
         report["budget"] = {

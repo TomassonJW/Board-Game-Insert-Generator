@@ -1,5 +1,9 @@
 # Geometry Model
 
+## P64-L09S-C - partition rectangulaire globale
+
+Une finition rectangulaire valide est un arbre BSP 3D couvrant le domaine utile. Chaque feuille imprimable a un proprietaire unique et contient son enveloppe minimale. Les feuilles de reservation et les intervalles de jeu sont non imprimables et certifies separement.
+
 ## Axes et unites
 
 Toutes les dimensions sont en millimetres.

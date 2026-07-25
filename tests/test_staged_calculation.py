@@ -260,6 +260,58 @@ class StagedCalculationTests(unittest.TestCase):
         with self.assertRaises(StagedCalculationError):
             session.select_materializable_artifact(ARTIFACT_KIND_FINALIZED)
 
+    def test_global_rectangular_finalization_defers_non_slicing_top_reservation_to_composite_fallback(self) -> None:
+        project = _project_with_flat_reservation()
+        engine = _engine(project)
+        session = StagedCalculationSession(project, solver_settings=SETTINGS)
+        _synchronize(session, project, engine)
+
+        seed_project = _project()
+        seed_engine = _engine(seed_project)
+        seed_plan = solve_minimal_layout(
+            seed_project,
+            effort_profile="quick",
+            request_id="global-closure-seed",
+            request_revision=0,
+            container_frontiers=seed_engine.certified_frontiers(),
+            frontier_digests=seed_engine.frontier_digests(),
+        )
+
+        def certified_incumbent(
+            _raw_project: object,
+            **_kwargs: object,
+        ) -> dict[str, object]:
+            return deepcopy(seed_plan)
+
+        calculated = session.calculate_layout(
+            request_id="global-closure-with-flat",
+            request_revision=0,
+            solver=certified_incumbent,
+        )
+        finalized = session.finalize_volume(finishing_effort_profile="normal")
+        attempt = finalized["staged_calculation"]["finalized_plan"][
+            "last_attempt"
+        ]
+
+        self.assertTrue(
+            calculated["staged_calculation"]["minimal_layout"][
+                "placement_certified"
+            ]
+        )
+        self.assertIsNone(finalized["partition"])
+        self.assertNotEqual(
+            finalized["staged_calculation"]["finalized_plan"]["status"],
+            STATUS_CURRENT,
+        )
+        self.assertEqual(
+            attempt["stop_reason"],
+            "global_rectangular_partition_not_found",
+        )
+        self.assertFalse(
+            attempt["global_partition_certificate"]["certified"]
+        )
+        self.assertTrue(attempt["minimal_artifact_preserved"])
+
     def test_total_finishing_timeout_preserves_exact_minimal_artifact(self) -> None:
         project = _project()
         engine = _engine(project)
@@ -288,7 +340,7 @@ class StagedCalculationTests(unittest.TestCase):
         )
         self.assertEqual(
             failed["solver_result"]["telemetry"]["stop_reason"],
-            "global_deadline_reached_before_baseline_certificate",
+            "global_deadline_reached_before_final_certificate",
         )
         self.assertEqual(snapshot["minimal_layout"]["status"], STATUS_CURRENT)
         self.assertEqual(

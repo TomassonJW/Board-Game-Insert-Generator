@@ -1,5 +1,9 @@
 # Architecture
 
+## Finalisation rectangulaire P64-L09S-C
+
+`global_rectangular_closure.py` construit et certifie la partition BSP 3D. `coupled_finalization.py` orchestre le budget, appelle ce moteur une seule fois et soumet uniquement une partition complete au certificat produit commun. Fusion reste un adaptateur de sortie.
+
 ## Principe directeur
 
 Le moteur pur decide. Les adaptateurs exportent.

@@ -1,5 +1,14 @@
 # Backlog
 
+## Avancement P64-L09S apres C
+
+- P64-L09S-A : `completed`.
+- P64-L09S-B : `completed`.
+- P64-L09S-C : `completed`.
+- P64-L09S-D : `ready`.
+- P64-L09S-E et F : attente sequentielle.
+- P64-L09S-V : gate Fusion humaine.
+
 ## Avancement P64-L09S apres B
 
 - P64-L09S-A : `completed`.

@@ -1,5 +1,9 @@
 # P64-A02 — Programme de calcul étagé et finalisation explicite
 
+## Mise en oeuvre P64-L09S-C
+
+Le finaliseur utilise une partition BSP 3D globale. Chaque feuille est un corps rectangulaire demande ou une reservation fixe ; chaque coupe porte un vide technique certifie. Le bilan volume racine = corps + reservations + vides techniques est recalcule avant le certificat produit final.
+
 ## Mise en oeuvre P64-L09S-B
 
 Le transport `ready` ne vaut plus succes de finition. Seul un `finalized_plan` courant et materialisable produit `finalized_plan_ready`. Toute tentative bornee sans fermeture conserve le plan minimal et expose son stop reason.

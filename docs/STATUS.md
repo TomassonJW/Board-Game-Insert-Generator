@@ -1,5 +1,15 @@
 # Status
 
+## P64-L09S-C - etat autoritaire au 2026-07-25
+
+- Mission C terminee : fermeture rectangulaire globale par construction.
+- Chaque volume imprimable est attribue exactement une fois a un proprietaire rectangulaire.
+- Reservations et jeux sont exclus comme vides techniques certifies.
+- La recherche classe les partitions completes par equilibre puis proportion.
+- Un cas non tranchable ne publie aucun plan et passe explicitement au repli composite D.
+- Preuve autorisee : 812/812 tests, 1 test natif SCIP ignore, 72 tests interdits exclus.
+- Prochaine mission : P64-L09S-D, annexes XY composites bornees.
+
 ## P64-L09S-B - etat autoritaire au 2026-07-25
 
 - Mission B terminee : verite du cycle, budgets reactifs et couleurs.

@@ -1,5 +1,14 @@
 # Next Actions
 
+## Prochaine mission autoritaire - P64-L09S-D
+
+P64-L09S-A, B et C sont terminees et integrees mission par mission.
+
+- P64-L09S-D : couvrir les partitions non tranchables par annexes XY soudees bornees.
+- Proprietaire unique, vraie face verticale X ou Y, bas Z commun et corps connexe obligatoires.
+- Aucune liaison Z seule, arete seule ou point seul.
+- Aucun benchmark ou holdout. Aucune installation Fusion avant V.
+
 ## Prochaine mission autoritaire - P64-L09S-C
 
 P64-L09S-A et B sont terminees et integrees mission par mission.

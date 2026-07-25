@@ -1,5 +1,13 @@
 # P64-L09S — Runbook du Goal de stabilisation de bout en bout
 
+## Avancement apres P64-L09S-C
+
+- A, B et C terminees.
+- Fermeture globale BSP 3D complete par construction.
+- Equilibre et proportion compares uniquement entre partitions completes.
+- Zero residuel imprimable avant publication.
+- Cas non tranchable dirige vers D sans plan partiel.
+
 ## Avancement apres P64-L09S-B
 
 - A et B terminees.

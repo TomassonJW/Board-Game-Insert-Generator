@@ -587,8 +587,14 @@ class FusionPaletteProjectTests(unittest.TestCase):
             materialized["partition"]["finalization"][
                 "global_resolve_invocation_count"
             ],
-            0,
+            1,
         )
+        certificate = materialized["partition"]["finalization"][
+            "global_partition_certificate"
+        ]
+        self.assertTrue(certificate["certified"])
+        self.assertTrue(certificate["partition_complete_by_construction"])
+        self.assertEqual(certificate["printable_residual_volume_mm3"], 0.0)
 
     def test_materialization_is_rejected_without_an_explicit_minimal_calculation(self) -> None:
         project = blank_project_v1()
@@ -658,7 +664,7 @@ class FusionPaletteProjectTests(unittest.TestCase):
         self.assertEqual(finalized["status"], "ready")
         self.assertEqual(
             finalized["operation_activity"]["stop_reason"],
-            "printable_residual_remains",
+            "global_rectangular_partition_not_found",
         )
         self.assertIsNone(finalized["partition"])
         self.assertNotEqual(

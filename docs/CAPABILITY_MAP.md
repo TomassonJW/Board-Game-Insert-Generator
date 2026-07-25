@@ -1,5 +1,13 @@
 # Capability Map
 
+## Mise a jour P64-L09S-C
+
+- Fermeture rectangulaire globale : `implemente`.
+- Certificat de partition complete par construction : `implemente`.
+- Proprietaire unique et zero residuel imprimable : recertifies.
+- Reservations et vides techniques comptes separement.
+- Repli composite non tranchable : prochaine capability D.
+
 ## Mise a jour P64-L09S-B
 
 - Verite de finalisation : `implemente`.

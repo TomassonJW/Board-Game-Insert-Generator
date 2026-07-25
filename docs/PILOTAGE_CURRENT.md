@@ -1,5 +1,13 @@
 # Pilotage courant
 
+## Carte active - P64-L09S-D
+
+- A terminee : reservations minimales.
+- B terminee : cycle honnete.
+- C terminee : partition rectangulaire globale complete par construction.
+- D active apres integration : annexes XY composites bornees.
+- Prochaine gate humaine : V apres A a F.
+
 ## Carte active - P64-L09S-C
 
 - A terminee : reservations minimales sans support artificiel.
