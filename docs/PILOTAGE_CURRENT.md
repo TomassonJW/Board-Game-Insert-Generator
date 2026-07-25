@@ -5,7 +5,7 @@
 
 - A a F sont implementees, testees et documentees.
 - Package cible : 0.1.66 ; ancien 0.1.65 `human-KO` et `do-not-run`.
-- Le preparateur reel doit installer le commit F integre, la fixture recente et ses reglages.
+- Le preparateur reel a installe 0.1.66 au commit `12c9f93`, la fixture recente et ses reglages ; statut `prepared-not-human-observed`.
 - Prochaine et unique action : observation humaine Fusion selon `P64_L09S_V_FUSION_GATE_RECIPE.md`.
 - Aucun benchmark/holdout ; `print-validated=false`.
 

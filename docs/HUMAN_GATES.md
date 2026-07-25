@@ -1,11 +1,11 @@
 # Human Gates
 
 <!-- P64-L09S-F -->
-## P64-L09S-V 0.1.66 preparee - 2026-07-25
+## P64-L09S-V 0.1.66 preparee - 2026-07-26
 
 P64-L09S-A a F sont automatisees-validees. Le nouveau package 0.1.66 est distinct du package 0.1.65 `human-KO` et `do-not-run`. Le preflight sec du cas recent passe avec enveloppe minimale 23,2 x 23,2 x 31,6 mm, gap 5,8 mm, quatre unions, deux coupes, un composant et residuel nul.
 
-Codex execute `scripts/fusion/prepare_p64_l09sv_gate.ps1` apres integration F, verifie l'installation, la fixture, les reglages et le commit, puis s'arrete. Thomas suit uniquement `docs/P64_L09S_V_FUSION_GATE_RECIPE.md`. Statut avant observation : `prepared-not-human-observed`, `fusion-observed=false`, `print-validated=false`.
+Codex a execute `scripts/fusion/prepare_p64_l09sv_gate.ps1` apres integration F. L'installation 0.1.66, la fixture, les reglages, le preflight et le marqueur `12c9f93` sont confirmes ; le commit publie est `12c9f93abd7b65b98755ef8d7a0499838716bfcc`. Thomas suit uniquement `docs/P64_L09S_V_FUSION_GATE_RECIPE.md`. Statut avant observation : `prepared-not-human-observed`, `fusion-observed=false`, `print-validated=false`.
 
 
 ## Mise a jour des gates P64-L09S
