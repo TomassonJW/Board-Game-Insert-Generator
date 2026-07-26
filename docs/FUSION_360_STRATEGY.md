@@ -947,4 +947,4 @@ Fusion ou impression n'est revendiquée par L07E.
 
 Le CAD IR et l'adaptateur Fusion recoivent uniquement des corps finaux issus d'un `finalized_plan` courant et recertifie. Les annexes XY restent soudees a leur proprietaire et ne creent aucun composant utilisateur supplementaire. Les encoches plateau/livret sont appliquees seulement aux corps finaux qui atteignent le plan reserve et chevauchent son empreinte.
 
-Le package `0.1.67` ne doit etre installe qu'apres integration du correctif dans `main`. Sa gate humaine doit rejouer le projet complexe qui a invalide `0.1.66`.
+Le package `0.1.67` est installe depuis le commit publie `832c9d5`, avec preflight `85c578d`. Sa gate humaine doit rejouer le projet complexe a 28 conteneurs qui a invalide `0.1.66`.

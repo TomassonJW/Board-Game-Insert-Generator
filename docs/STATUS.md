@@ -4050,4 +4050,4 @@ Le KO humain de `0.1.66` a revele deux defauts distincts : une variante interne 
 
 Le correctif impose le minimum source sur chaque axe, ajoute une garde globale independante, utilise une construction dense au sol par etageres guillotine quand elle est certifiable, puis ordonne les replis de finition par fermeture globale, croissance verticale bornee et annexes XY bornees. Le rejeu prive exact du cas recent obtient `solution_found`, `minimum_violation_count=0`, `materializable=true` et `printable_residual_volume_mm3=0.0`.
 
-Etat courant : validation automatisee finale reussie (`833/833`, `68` exclusions benchmark/holdout/corpus, `1` test SCIP natif ignore sous Python 3.10). Aucune nouvelle validation Fusion ni impression n'est revendiquee.
+Etat courant : validation automatisee finale reussie (`833/833`, `68` exclusions benchmark/holdout/corpus, `1` test SCIP natif ignore sous Python 3.10), package Fusion `0.1.67` installe depuis `832c9d5`, preflight `85c578d`. Gate `prepared-not-human-observed` ; aucune nouvelle validation Fusion ni impression n'est revendiquee.

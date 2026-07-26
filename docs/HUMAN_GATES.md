@@ -1403,7 +1403,7 @@ une valeur physique, ajoute un mécanisme ou modifie la North Star.
 ## P64-L09S-V corrective - package 0.1.67
 
 La gate `0.1.66` est close en `human-KO` et son package est `do-not-run`.
-La nouvelle gate devient `prepared-not-human-observed` seulement apres integration dans `main`, preflight local et installation verifiee du package `0.1.67`.
+La nouvelle gate est `prepared-not-human-observed` : package `0.1.67`, commit installe `832c9d5`, preflight `85c578d051b83fcd71b6b3c6eeaed7601748b1b95e5e942377faf9f52ef3e528`, manifeste/reglages/marqueur verifies.
 
 L'observation humaine doit confirmer sur le projet complexe recent :
 

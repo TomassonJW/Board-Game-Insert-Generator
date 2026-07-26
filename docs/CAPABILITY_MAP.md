@@ -2240,4 +2240,4 @@ Aucune capability runtime n'est promue par cette préparation documentaire.
 - calcul minimal dense : correctif implemente, rejeu recent certifie sans reduction des minima ;
 - finition complete : correctif implemente, rejeu recent ferme avec residuel nul ;
 - materialisation Fusion : reste a observer sur le package `0.1.67` ;
-- statut global : `automated-validated`, ni `fusion-validated` ni `print-validated`.
+- statut global : `prepared-not-human-observed` sur le package `0.1.67`, ni `fusion-validated` ni `print-validated`.

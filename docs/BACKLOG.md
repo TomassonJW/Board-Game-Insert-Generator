@@ -3495,6 +3495,6 @@ implémentée et intégrée à la fois.
 ## P64-L09S-V corrective
 
 - `done` : validation automatisee du correctif `0.1.67`, `833/833` tests autorises ;
-- `pending` : integrer dans `main`, preparer le package Fusion puis arreter a la gate humaine ;
+- `blocked-human-gate` : package `0.1.67` prepare ; attendre l'observation Fusion de Thomas ;
 - `forbidden` : reutiliser `0.1.66`, reduire une enveloppe minimale source ou annoncer une finition sans plan recertifie ;
 - hors scope : benchmark, holdout, corpus et validation d'impression physique.

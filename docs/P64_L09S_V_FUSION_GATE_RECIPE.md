@@ -69,3 +69,13 @@ Ouvre le projet complexe recent qui a invalide `0.1.66`, puis verifie :
 6. la materialisation conserve les volumes, les unions et les encoches attendus.
 
 Tout rabotage d'un minimum, residuel imprimable, faux succes UI, composant supplementaire ou encoche hors cible vaut `human-KO` immediat.
+
+<!-- P64-L09S-0167-PREPARED -->
+## Preparation Fusion 0.1.67 confirmee
+
+- statut : `prepared-not-human-observed` ;
+- commit installe : `832c9d5` ;
+- preflight : `85c578d051b83fcd71b6b3c6eeaed7601748b1b95e5e942377faf9f52ef3e528` ;
+- package/manifeste/reglages/marqueur : verifies ;
+- cas humain obligatoire : projet recent a 28 conteneurs, avec controle du minimum `76 x 76 x 31.8 mm` ;
+- `fusion-validated=false` et `print-validated=false` jusqu'au verdict humain.

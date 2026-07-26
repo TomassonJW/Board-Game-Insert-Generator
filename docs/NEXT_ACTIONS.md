@@ -355,7 +355,7 @@ Cette préparation est `done-documentation`. ADR-0080 lève ensuite la gate R1 s
 ## Prochaine action canonique corrective
 
 1. Suite automatisee autorisee terminee : `833/833`, sans benchmark, holdout ni corpus.
-2. Integrer le correctif P64-L09S-V `0.1.67` dans `main`.
-3. Preparer et installer le package Fusion `0.1.67` seulement apres cette integration.
+2. Correctif integre dans `main` au commit `832c9d5`.
+3. Package Fusion `0.1.67` prepare et installe ; marqueurs locaux verifies.
 4. Arreter l'autonomie a la gate humaine P64-L09S-V et faire rejouer le cas complexe recent par Thomas.
 5. Ne declarer `fusion-validated` qu'apres observation humaine conforme ; conserver `print-validated=false`.

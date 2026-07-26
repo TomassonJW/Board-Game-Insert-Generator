@@ -407,3 +407,13 @@ Le package `0.1.66` est `human-KO` et `do-not-run`. La reprise `0.1.67` protege 
 6. post-certification complete avant publication et materialisation.
 
 Une variante interne peut reorganiser ses cavites, mais ne peut reduire aucune dimension de l'enveloppe minimale canonique source. Si une reutilisation incrementale ne respecte plus ce contrat, elle doit demander un calcul global explicite.
+
+<!-- P64-L09S-0167-PREPARED -->
+## Preparation Fusion 0.1.67 confirmee
+
+- statut : `prepared-not-human-observed` ;
+- commit installe : `832c9d5` ;
+- preflight : `85c578d051b83fcd71b6b3c6eeaed7601748b1b95e5e942377faf9f52ef3e528` ;
+- package/manifeste/reglages/marqueur : verifies ;
+- cas humain obligatoire : projet recent a 28 conteneurs, avec controle du minimum `76 x 76 x 31.8 mm` ;
+- `fusion-validated=false` et `print-validated=false` jusqu'au verdict humain.

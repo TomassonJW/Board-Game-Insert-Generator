@@ -31,3 +31,13 @@ Le rejeu exact du projet prive recent obtient :
 - source finale : `c_global_rectangular_partition`.
 
 La suite automatisee autorisee passe `833/833`, avec `68` tests benchmark/holdout/corpus exclus et `1` test SCIP natif ignore sous Python 3.10. `fusion-validated=false`, `print-validated=false`.
+
+<!-- P64-L09S-0167-PREPARED -->
+## Preparation Fusion 0.1.67 confirmee
+
+- statut : `prepared-not-human-observed` ;
+- commit installe : `832c9d5` ;
+- preflight : `85c578d051b83fcd71b6b3c6eeaed7601748b1b95e5e942377faf9f52ef3e528` ;
+- package/manifeste/reglages/marqueur : verifies ;
+- cas humain obligatoire : projet recent a 28 conteneurs, avec controle du minimum `76 x 76 x 31.8 mm` ;
+- `fusion-validated=false` et `print-validated=false` jusqu'au verdict humain.

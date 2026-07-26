@@ -863,5 +863,5 @@ notamment l'empilement, les appuis, les réservations et la forte cardinalité.
 - la reduction d'une enveloppe minimale canonique est interdite et corrigee ;
 - le rejeu exact du projet complexe recent passe le calcul et la finalisation avec un residuel de `0.0 mm3` ;
 - la suite automatisee autorisee est verte : `833/833`, avec `68` exclusions benchmark/holdout/corpus et `1` test SCIP natif ignore sous Python 3.10 ;
-- la prochaine frontiere est la preparation puis l'observation humaine Fusion de `0.1.67` ;
+- la gate Fusion `0.1.67` est `prepared-not-human-observed` au commit `832c9d5`, preflight `85c578d`, et la prochaine frontiere est l'observation humaine ;
 - `fusion-validated=false` et `print-validated=false`.
