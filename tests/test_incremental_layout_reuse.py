@@ -134,7 +134,7 @@ def _synchronize(
 
 
 class IncrementalLayoutReuseTests(unittest.TestCase):
-    def test_inserts_one_cavity_without_moving_world_or_existing_cavities(self) -> None:
+    def test_insert_requiring_a_smaller_variant_requests_a_global_solve(self) -> None:
         project = _pocket_project()
         initial_engine = _engine(project)
         initial = _solve(project, initial_engine)
@@ -149,31 +149,13 @@ class IncrementalLayoutReuseTests(unittest.TestCase):
             effort_profile="quick",
         )
 
-        self.assertEqual(attempt.report["status"], STATUS_PLACEMENT_REUSED)
-        self.assertEqual(attempt.report["global_solver_invocation_count"], 0)
-        self.assertEqual(attempt.report["local_recertification_attempt_count"], 1)
-        self.assertFalse(attempt.report["world_placements_changed"])
-        self.assertIsNotNone(attempt.partition)
-        assert attempt.partition is not None
-        self.assertEqual(_world_signature(initial), _world_signature(attempt.partition))
-        before = _cavity_origins(initial)
-        after = _cavity_origins(attempt.partition)
-        self.assertEqual(after["compartment:a"], before["compartment:a"])
-        self.assertEqual(after["compartment:b"], before["compartment:b"])
         self.assertEqual(
-            after["compartment:c"],
-            {"x": 44.0, "y": 24.0, "z": 2.0},
+            attempt.report["status"],
+            STATUS_GLOBAL_SOLVE_REQUIRED,
         )
-        self.assertNotEqual(initial["plan_digest"], attempt.partition["plan_digest"])
-        self.assertTrue(
-            attempt.partition["minimal_layout"]["global_certificate"]["certified"]
-        )
-        self.assertTrue(
-            attempt.partition["minimal_layout"]["container_variant_certificate"][
-                "certified"
-            ]
-        )
-
+        self.assertEqual(attempt.report["global_solver_invocation_count"], 0)
+        self.assertEqual(attempt.report["local_recertification_attempt_count"], 0)
+        self.assertIsNone(attempt.partition)
     def test_reuse_is_deterministic_under_observable_caps(self) -> None:
         project = _pocket_project()
         engine = _engine(project)
@@ -359,46 +341,12 @@ class IncrementalLayoutReuseTests(unittest.TestCase):
         assert attempt.partition is not None
         self.assertEqual(_world_signature(initial), _world_signature(attempt.partition))
         self.assertNotEqual(_cavity_origins(initial), _cavity_origins(attempt.partition))
-    def test_staged_session_promotes_reuse_without_calling_global_solver(self) -> None:
+    def test_staged_session_keeps_old_plan_stale_until_explicit_global_solve(self) -> None:
         project = _pocket_project()
         engine = _engine(project)
         session = StagedCalculationSession(project, solver_settings=SETTINGS)
         _synchronize(session, project, engine)
-        calculated = session.calculate_layout(
-            request_id="initial",
-            request_revision=0,
-        )
-        initial_artifact = calculated["staged_calculation"]["minimal_layout"][
-            "artifact_digest"
-        ]
-
-        def finalizer(plan: dict[str, object]) -> dict[str, object]:
-            finalized = deepcopy(plan)
-            finalized["summary"]["materializable"] = True
-            finalized["finalization"] = {
-                "artifact_kind": "finalized_plan",
-                "source_minimal_artifact_digest": initial_artifact,
-                "certificate": {"certified": True},
-            }
-            finalized.pop("plan_digest", None)
-            finalized["plan_digest"] = canonical_digest(finalized)
-            return finalized
-
-        session.finalize_volume(
-            finalizer=finalizer,
-            finishing_policy="test-policy",
-            finishing_budget_digest=canonical_digest({"budget": "test"}),
-            finalizer_id="test-finalizer",
-            finalizer_version="1",
-        )
-        selection = session.select_materializable_artifact(ARTIFACT_KIND_MINIMAL)
-        cad = build_partition_cad(
-            project,
-            partition=selection["partition"],
-            artifact_identity=selection,
-            effort_profile="quick",
-        )
-        session.record_cad_ready(cad)
+        session.calculate_layout(request_id="initial", request_revision=0)
 
         changed = _with_insert(project)
         changed_engine = _engine(changed)
@@ -408,31 +356,16 @@ class IncrementalLayoutReuseTests(unittest.TestCase):
         ):
             snapshot = _synchronize(session, changed, changed_engine)
 
-        self.assertEqual(snapshot["minimal_layout"]["status"], STATUS_CURRENT)
-        self.assertTrue(snapshot["minimal_layout"]["placement_certified"])
-        self.assertNotEqual(
-            snapshot["minimal_layout"]["artifact_digest"],
-            initial_artifact,
-        )
-        self.assertEqual(
-            snapshot["minimal_layout"]["cache_status"],
-            "local_reuse_not_cached",
-        )
+        self.assertEqual(snapshot["minimal_layout"]["status"], STATUS_STALE)
         self.assertEqual(
             snapshot["local_reuse"]["status"],
-            STATUS_PLACEMENT_REUSED,
+            STATUS_GLOBAL_SOLVE_REQUIRED,
         )
         self.assertEqual(
             snapshot["local_reuse"]["global_solver_invocation_count"],
             0,
         )
-        self.assertEqual(
-            snapshot["materialization"]["status"],
-            STATUS_DESYNCHRONIZED,
-        )
-        self.assertEqual(snapshot["finalized_plan"]["status"], STATUS_STALE)
-        self.assertIsNotNone(session.current_minimal_partition())
-
+        self.assertIsNone(session.current_minimal_partition())
     def test_staged_failure_keeps_old_plan_stale(self) -> None:
         project = _pocket_project()
         engine = _engine(project)

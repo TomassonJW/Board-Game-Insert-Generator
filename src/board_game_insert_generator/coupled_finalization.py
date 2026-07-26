@@ -17,8 +17,10 @@ from board_game_insert_generator.container_variant_global_search import (
 )
 from board_game_insert_generator.free_3d_continuous_closure import (
     FINISHING_OBJECTIVE_BALANCED_THEN_PROPORTIONAL,
+    FINISHING_OBJECTIVE_CLOSURE_ONLY,
     FREE_3D_CONTINUOUS_CLOSURE_VERSION,
     Free3DClosureResult,
+    close_free_3d_residual,
 )
 from board_game_insert_generator.global_rectangular_closure import (
     GLOBAL_RECTANGULAR_CLOSURE_VERSION,
@@ -48,8 +50,10 @@ from board_game_insert_generator.solver_settings import solver_deadline_seconds
 
 COUPLED_FINALIZATION_SCHEMA_V1 = "bgig.coupled_finalization.v1"
 COUPLED_FINALIZATION_FAMILY_ID = "bounded_coupled_finalization"
-COUPLED_FINALIZATION_VERSION = "bgig.bounded_coupled_finalization.v6"
-COUPLED_FINALIZATION_POLICY = "global_rectangular_then_bounded_xy_composite"
+COUPLED_FINALIZATION_VERSION = "bgig.bounded_coupled_finalization.v7"
+COUPLED_FINALIZATION_POLICY = (
+    "global_rectangular_then_vertical_first_continuous_then_bounded_xy_composite"
+)
 ARTIFACT_KIND_FINALIZED = "finalized_plan"
 
 _CLOSURE_CAPS = {
@@ -208,6 +212,77 @@ def finalize_coupled_volume(
                     deadline_reached=True,
                 ),
             )
+        continuous_budget = _continuous_phase_budget(budget, deadline_at)
+        if continuous_budget is None:
+            raise CoupledFinalizationError(
+                "La deadline totale est atteinte avant la croissance continue.",
+                _closure_report(
+                    closure,
+                    stop_reason="global_deadline_reached_before_continuous_closure",
+                    budget=budget,
+                    deadline_reached=True,
+                ),
+            )
+        continuous = close_free_3d_residual(
+            participants,
+            placements,
+            problem.box,
+            problem.storage_height_mm,
+            problem.xy_clearance_mm,
+            box_perimeter_xy_mm=problem.box_xy_clearance_mm,
+            between_bodies_z_mm=problem.z_clearance_mm,
+            budget=continuous_budget,
+            top_inset_zones=problem.top_inset_zones,
+            finishing_objective=FINISHING_OBJECTIVE_CLOSURE_ONLY,
+        )
+        if not continuous.empty_spaces:
+            if _deadline_reached(deadline_at):
+                raise CoupledFinalizationError(
+                    "La deadline totale est atteinte avant le certificat continu.",
+                    _closure_report(
+                        continuous,
+                        stop_reason="global_deadline_reached_before_continuous_certificate",
+                        budget=budget,
+                        deadline_reached=True,
+                    ),
+                )
+            continuous_strategy = SolverStrategy(
+                COUPLED_FINALIZATION_FAMILY_ID,
+                COUPLED_FINALIZATION_VERSION,
+            )
+            continuous_plan, continuous_rejections = _certify_closed_plan(
+                problem,
+                continuous,
+                strategy=continuous_strategy,
+                budget=budget,
+                phase="v7_vertical_first_continuous_closure",
+            )
+            if continuous_plan is None:
+                raise CoupledFinalizationError(
+                    "Le certificat produit a rejete la fermeture continue.",
+                    _closure_report(
+                        continuous,
+                        stop_reason="continuous_product_certificate_rejected",
+                        rejection_codes=continuous_rejections,
+                        budget=budget,
+                    ),
+                )
+            return _finalized_plan(
+                continuous_plan,
+                continuous,
+                baseline_closure=continuous,
+                objective_closure=None,
+                objective_attempted=True,
+                objective_certified=True,
+                objective_improved=False,
+                selected_plan_source="v7_vertical_first_continuous_closure",
+                objective_fallback_reason="vertical_first_continuous_partition_complete",
+                source_minimal_artifact_digest=source_minimal_artifact_digest,
+                source_minimal_plan_digest=str(minimal_plan.get("plan_digest", "")),
+                budget=budget,
+                reservation_count=len(problem.top_inset_zones),
+                global_deadline_reached=continuous.deadline_reached,
+            )
         composite_budget = _remaining_phase_budget(budget, deadline_at)
         if composite_budget is None:
             raise CoupledFinalizationError(
@@ -221,7 +296,7 @@ def finalize_coupled_volume(
             )
         composite = close_xy_composite_partition(
             participants,
-            placements,
+            continuous.placements,
             problem.box,
             problem.storage_height_mm,
             problem.xy_clearance_mm,
@@ -296,6 +371,7 @@ def finalize_coupled_volume(
             reservation_count=len(problem.top_inset_zones),
             global_deadline_reached=composite.gross_closure.deadline_reached,
             composite_closure=composite,
+            continuous_prefill=continuous,
         )
     if closure.partition_certificate.get("certified") is not True:
         raise CoupledFinalizationError(
@@ -446,6 +522,24 @@ def _remaining_phase_budget(
     )
 
 
+def _continuous_phase_budget(
+    budget: SolverBudget,
+    deadline_at: float,
+) -> SolverBudget | None:
+    phase = _remaining_phase_budget(budget, deadline_at)
+    if phase is None:
+        return None
+    limits = dict(phase.limits)
+    available_ms = int(limits["max_closure_elapsed_ms"])
+    reserve_ms = min(1_000, max(100, available_ms // 10))
+    limits["max_closure_elapsed_ms"] = max(1, available_ms - reserve_ms)
+    return SolverBudget(
+        budget.family_id,
+        budget.effort_profile,
+        tuple(sorted(limits.items())),
+    )
+
+
 def _remaining_deadline_ms(deadline_at: float) -> int:
     return max(0, int((deadline_at - perf_counter()) * 1000.0))
 
@@ -471,6 +565,7 @@ def _finalized_plan(
     reservation_count: int,
     global_deadline_reached: bool,
     composite_closure: XYCompositeClosureResult | None = None,
+    continuous_prefill: Free3DClosureResult | None = None,
 ) -> dict[str, object]:
     plan = deepcopy(certified.plan)
     certificate = certified.certificate
@@ -517,6 +612,11 @@ def _finalized_plan(
         "xy_composite_closure": (
             xy_composite_closure_to_dict(composite_closure)
             if composite_closure is not None
+            else None
+        ),
+        "continuous_prefill": (
+            _continuous_closure_payload(continuous_prefill)
+            if continuous_prefill is not None
             else None
         ),
         "composite_materialization_certificate": composite_certificate,
@@ -626,8 +726,14 @@ def _finalized_plan(
         {
             "minimal_layout": False,
             "residual_distributed": True,
-            "continuous_closure_applied": False,
-            "global_rectangular_partition_by_construction": True,
+            "continuous_closure_applied": isinstance(
+                closure,
+                Free3DClosureResult,
+            ),
+            "global_rectangular_partition_by_construction": not isinstance(
+                closure,
+                Free3DClosureResult,
+            ),
             "rectangular_bodies_only": composite_closure is None,
             "composite_annexes_applied": composite_closure is not None,
             "bounded_local_repair_before_global_resolve": False,
@@ -647,6 +753,24 @@ def _finalized_plan(
     plan.pop("plan_digest", None)
     plan["plan_digest"] = canonical_digest(plan)
     return plan
+
+
+def _continuous_closure_payload(
+    closure: Free3DClosureResult,
+) -> dict[str, object]:
+    return {
+        "schema_version": FREE_3D_CONTINUOUS_CLOSURE_VERSION,
+        "status": closure.status,
+        "iterations": closure.iterations,
+        "candidates_evaluated": closure.candidates_evaluated,
+        "repair_attempts": closure.repair_attempts,
+        "repairs_applied": closure.repairs_applied,
+        "deadline_reached": closure.deadline_reached,
+        "initial_residual_metric": closure.initial_residual_metric,
+        "final_residual_metric": closure.final_residual_metric,
+        "deterministic_digest": closure.deterministic_digest,
+        "vertical_first": True,
+    }
 
 
 def _attach_xy_composite_geometry(

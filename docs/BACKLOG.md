@@ -4,7 +4,7 @@
 ## Cloture automatisee P64-L09S
 
 - P64-L09S-F : terminee cote code, tests, preflight et recette ; installation reelle apres integration.
-- P64-L09S-V : prochaine et unique gate, humaine, package 0.1.66.
+- P64-L09S-V : prochaine et unique gate, humaine, package 0.1.67.
 - Toute suite depend du verdict humain ; aucune impression n'est revendiquee.
 
 
@@ -3490,3 +3490,11 @@ implémentée et intégrée à la fois.
   équilibre, éventuelle annexe unie, encoches exactes et messages honnêtes.
 - Aucune validation d'impression, tolérance ou résistance mécanique.
 - Statut : `planned-human-gate`, `print-validated=false`.
+
+<!-- P64-L09S-0167-BACKLOG -->
+## P64-L09S-V corrective
+
+- `done` : validation automatisee du correctif `0.1.67`, `833/833` tests autorises ;
+- `pending` : integrer dans `main`, preparer le package Fusion puis arreter a la gate humaine ;
+- `forbidden` : reutiliser `0.1.66`, reduire une enveloppe minimale source ou annoncer une finition sans plan recertifie ;
+- hors scope : benchmark, holdout, corpus et validation d'impression physique.

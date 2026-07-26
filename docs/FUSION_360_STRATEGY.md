@@ -1,7 +1,7 @@
 # Fusion 360 Strategy
 
 <!-- P64-L09S-F -->
-## Gate P64-L09S-V 0.1.66
+## Gate P64-L09S-V 0.1.67
 
 Le package installe est produit par le commit F integre et accompagne d'une fixture publique, d'un recu local et de reglages Normal/Normal. La validation automatique s'arrete au plan Fusion pur. La creation reelle, les unions, les coupes et l'identite de scene sont observees manuellement selon la recette V.
 
@@ -941,3 +941,10 @@ continuent seules.
 Aucun service, compte, secret, réseau, télémétrie ou installation globale n'est
 requis. P64-L07V reste une observation humaine facultative ; aucune validation
 Fusion ou impression n'est revendiquée par L07E.
+
+<!-- P64-L09S-0167-FUSION -->
+## Strategie corrective P64-L09S-V 0.1.67
+
+Le CAD IR et l'adaptateur Fusion recoivent uniquement des corps finaux issus d'un `finalized_plan` courant et recertifie. Les annexes XY restent soudees a leur proprietaire et ne creent aucun composant utilisateur supplementaire. Les encoches plateau/livret sont appliquees seulement aux corps finaux qui atteignent le plan reserve et chevauchent son empreinte.
+
+Le package `0.1.67` ne doit etre installe qu'apres integration du correctif dans `main`. Sa gate humaine doit rejouer le projet complexe qui a invalide `0.1.66`.

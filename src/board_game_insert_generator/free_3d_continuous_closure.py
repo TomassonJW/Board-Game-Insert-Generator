@@ -38,7 +38,7 @@ from board_game_insert_generator.solver_contract import (
 )
 
 
-FREE_3D_CONTINUOUS_CLOSURE_VERSION = "bgig.free_3d_continuous_closure.v3"
+FREE_3D_CONTINUOUS_CLOSURE_VERSION = "bgig.free_3d_continuous_closure.v4"
 FINISHING_OBJECTIVE_CLOSURE_ONLY = "closure_only"
 FINISHING_OBJECTIVE_BALANCED_ADDED_VOLUME = "balanced_added_volume"
 FINISHING_OBJECTIVE_PROPORTIONAL_EXPANSION = "proportional_expansion"
@@ -138,6 +138,7 @@ def close_free_3d_residual(
         xy_clearance,
         z_clearance,
         forbidden,
+        inset_zones,
     )
     initial_metric = _residual_metric(spaces)
     incumbent_digest = _digest(
@@ -188,8 +189,31 @@ def close_free_3d_residual(
             deadline,
             incumbent_by_id,
             finishing_objective,
+            axis_indices=(2,),
         )
         candidates_evaluated += evaluated
+        if (
+            not candidates
+            and candidates_evaluated < max_candidates
+            and perf_counter() < deadline
+        ):
+            candidates, evaluated = _growth_candidates(
+                current,
+                participants_by_id,
+                dimensions,
+                box_clearance,
+                xy_clearance,
+                z_clearance,
+                forbidden,
+                inset_zones,
+                baseline,
+                max_candidates - candidates_evaluated,
+                deadline,
+                incumbent_by_id,
+                finishing_objective,
+                axis_indices=(0, 1),
+            )
+            candidates_evaluated += evaluated
         if not candidates and repair_attempts < max_repairs:
             repaired, attempted, evaluated = _local_repair_growth_candidates(
                 current,
@@ -327,6 +351,7 @@ def _growth_candidates(
     finishing_objective: str,
     *,
     repair_placement_id: str | None = None,
+    axis_indices: tuple[int, ...] = (0, 1, 2),
 ) -> tuple[list[_GrowthCandidate], int]:
     candidates: list[_GrowthCandidate] = []
     evaluated = 0
@@ -334,14 +359,15 @@ def _growth_candidates(
         return candidates, evaluated
     for placement_index, placement in enumerate(current):
         participant = participants_by_id[placement.participant_id]
-        for axis_index in range(3):
+        for axis_index in axis_indices:
             if not _world_axis_is_expandable(
                 participant,
                 placement.rotation_deg_z,
                 axis_index,
             ):
                 continue
-            for direction in (-1, 1):
+            directions = (1,) if axis_index == 2 else (-1, 1)
+            for direction in directions:
                 if evaluated >= remaining_candidates or perf_counter() >= deadline:
                     return candidates, evaluated
                 boundary = _maximal_growth_boundary(
@@ -354,6 +380,7 @@ def _growth_candidates(
                     box_clearance,
                     xy_clearance,
                     z_clearance,
+                    inset_zones,
                 )
                 origin = placement.origin_mm[axis_index]
                 upper = origin + placement.world_size_mm[axis_index]
@@ -394,6 +421,7 @@ def _growth_candidates(
                         xy_clearance,
                         z_clearance,
                         forbidden,
+                        inset_zones,
                     )
                 )
                 metric = _residual_metric(candidate_spaces)
@@ -463,6 +491,7 @@ def _paired_growth_candidates(
     finishing_objective: str,
     *,
     repair_placement_id: str | None = None,
+    axis_indices: tuple[int, ...] = (0, 1, 2),
 ) -> tuple[list[_GrowthCandidate], int]:
     candidates: list[_GrowthCandidate] = []
     evaluated = 0
@@ -510,6 +539,7 @@ def _paired_growth_candidates(
                     box_clearance,
                     xy_clearance,
                     z_clearance,
+                    inset_zones,
                 )
                 right_limit = _maximal_growth_boundary(
                     right,
@@ -521,6 +551,7 @@ def _paired_growth_candidates(
                     box_clearance,
                     xy_clearance,
                     z_clearance,
+                    inset_zones,
                 )
                 if (
                     left_limit + _EPSILON < right.origin_mm[axis] - clearance
@@ -593,6 +624,7 @@ def _paired_growth_candidates(
                             xy_clearance,
                             z_clearance,
                             forbidden,
+                            inset_zones,
                         )
                     )
                     metric = _residual_metric(candidate_spaces)
@@ -811,6 +843,7 @@ def _empty_spaces_for(
     xy_clearance: float,
     z_clearance: float,
     forbidden: tuple[EmptySpace, ...],
+    inset_zones: tuple[TopInsetZone, ...] = (),
 ) -> list[EmptySpace]:
     root = EmptySpace(
         _rounded_point((box_clearance, box_clearance, 0.0)),
@@ -823,6 +856,23 @@ def _empty_spaces_for(
         ),
     )
     spaces = _subtract_forbidden_spaces([root], forbidden)
+    reserved_top_prisms = tuple(
+        EmptySpace(
+            (
+                zone.origin_xy_mm[0],
+                zone.origin_xy_mm[1],
+                zone.support_plane_z_mm,
+            ),
+            (
+                zone.size_xy_mm[0],
+                zone.size_xy_mm[1],
+                max(0.0, dimensions[2] - zone.support_plane_z_mm),
+            ),
+        )
+        for zone in inset_zones
+        if zone.support_plane_z_mm < dimensions[2] - _EPSILON
+    )
+    spaces = _subtract_forbidden_spaces(spaces, reserved_top_prisms)
     limits = {
         "max_empty_spaces": 100_000,
         "max_extreme_points": 100_000,
@@ -853,6 +903,7 @@ def _maximal_growth_boundary(
     box_clearance: float,
     xy_clearance: float,
     z_clearance: float,
+    inset_zones: tuple[TopInsetZone, ...] = (),
 ) -> float:
     """Return the nearest face that can stop a maximal one-axis expansion."""
 
@@ -881,6 +932,22 @@ def _maximal_growth_boundary(
                 _upper_of_placement(other, axis) + axis_clearance,
             )
     placement_space = EmptySpace(placement.origin_mm, placement.world_size_mm)
+    if axis == 2 and direction > 0:
+        for zone in inset_zones:
+            reserved = EmptySpace(
+                (
+                    zone.origin_xy_mm[0],
+                    zone.origin_xy_mm[1],
+                    zone.support_plane_z_mm,
+                ),
+                (
+                    zone.size_xy_mm[0],
+                    zone.size_xy_mm[1],
+                    max(0.0, dimensions[2] - zone.support_plane_z_mm),
+                ),
+            )
+            if _projected_spaces_overlap(placement_space, reserved, axis):
+                boundary = min(boundary, zone.support_plane_z_mm)
     for obstacle in forbidden:
         if not _projected_spaces_overlap(placement_space, obstacle, axis):
             continue

@@ -95,7 +95,7 @@ def initial_session(project: dict[str, object]) -> StagedCalculationSession:
 
 
 def assert_preflight() -> dict[str, object]:
-    """Exercise the exact local-success and fail-closed fallback gate paths."""
+    """Exercise minimum-preserving fail-closed incremental gate paths."""
 
     baseline = pocket_project()
 
@@ -103,12 +103,12 @@ def assert_preflight() -> dict[str, object]:
     success_project = with_insert(baseline, (8.0, 16.0, 8.0))
     success_snapshot = synchronize(success_session, success_project, engine(success_project))
     reuse = success_snapshot["local_reuse"]
-    if reuse["status"] != "placement_reused":
-        raise RuntimeError("P64-L04V expected local placement reuse.")
+    if reuse["status"] != "global_solve_required":
+        raise RuntimeError("P64-L04V must not reduce the new canonical minimum.")
     if reuse["global_solver_invocation_count"] != 0:
-        raise RuntimeError("P64-L04V local reuse unexpectedly invoked the global solver.")
-    if reuse["world_placements_changed"]:
-        raise RuntimeError("P64-L04V local reuse unexpectedly moved a world placement.")
+        raise RuntimeError("P64-L04V minimum-floor fallback invoked the global solver implicitly.")
+    if success_snapshot["minimal_layout"]["status"] != STATUS_STALE:
+        raise RuntimeError("P64-L04V minimum-floor fallback did not leave the old layout stale.")
 
     fallback_session = initial_session(baseline)
     fallback_project = with_insert(baseline, (20.0, 20.0, 10.0))
@@ -147,7 +147,7 @@ def main() -> int:
         write_fixture(args.write_fixture, result["baseline_project"])
         print(f"P64_L04V_FIXTURE={args.write_fixture}")
     print("P64_L04V_PREFLIGHT=OK")
-    print("LOCAL_REUSE_STATUS=placement_reused")
+    print("LOCAL_REUSE_STATUS=global_solve_required")
     print("LOCAL_REUSE_GLOBAL_SOLVER_INVOCATIONS=0")
     print("FALLBACK_STATUS=global_solve_required")
     print("FALLBACK_GLOBAL_SOLVER_INVOCATIONS=0")

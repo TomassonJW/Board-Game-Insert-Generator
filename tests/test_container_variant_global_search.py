@@ -56,66 +56,17 @@ class ContainerVariantGlobalSearchTests(unittest.TestCase):
             ("quick", "short", "normal", "long", "deep"),
         )
 
-    def test_quick_lane_solves_true_multi_container_canonical_dead_end(self) -> None:
+    def test_quick_lane_does_not_use_minimum_reduction_as_packing_escape(self) -> None:
         execution = run_container_variant_global_search(
             multi_container_variant_dead_end_project(),
             requested_effort_profile=EFFORT_QUICK,
             beam_budgets_by_effort=self._budgets(),
         )
 
-        self.assertEqual(execution.status, SOLUTION_FOUND)
-        self.assertEqual(len(execution.candidates), 1)
-        candidate = execution.candidates[0]
-        self.assertEqual(len(candidate.selected_container_variants), 2)
-        self.assertTrue(
-            all(
-                not value.canonical
-                for value in candidate.selected_container_variants
-            )
-        )
-        certificate = candidate.container_variant_global_certificate
-        self.assertIsNotNone(certificate)
-        self.assertTrue(certificate.certified)
-        self.assertTrue(candidate.certificate.certified)
-        self.assertTrue(candidate.plan["summary"]["materializable"])
-        frontiers = {
-            value.container_group_id: value
-            for value in derive_container_internal_variant_frontiers(
-                multi_container_variant_dead_end_project(),
-                effort_profile=EFFORT_QUICK,
-            ).frontiers
-        }
-        contracts = {
-            value["container_group_id"]: value
-            for value in candidate.plan["envelope_contract"]["containers"]
-        }
-        for selected in candidate.selected_container_variants:
-            local = next(
-                value
-                for value in frontiers[selected.container_group_id].variants
-                if value.geometry_digest == selected.geometry_digest
-            )
-            actual = contracts[selected.container_group_id]["cavity_layout"]
-            self.assertEqual(
-                [value["local_origin_mm"] for value in actual],
-                [
-                    dict(zip(("x", "y", "z"), value.local_origin_mm))
-                    for value in local.draft.cavities
-                ],
-            )
-            self.assertEqual(
-                [value["inner_dimensions_mm"] for value in actual],
-                [
-                    dict(zip(("x", "y", "z"), value.inner_dimensions_mm))
-                    for value in local.draft.cavities
-                ],
-            )
-        payload = container_variant_global_execution_to_dict(execution)
-        self.assertTrue(payload["canonical_portfolio_completed_first"])
-        self.assertFalse(payload["cartesian_product_materialized"])
-        self.assertTrue(payload["global_certificate"]["certified"])
-        json.dumps(payload, sort_keys=True)
-
+        self.assertEqual(execution.status, NO_SOLUTION_WITHIN_BUDGET)
+        self.assertEqual(execution.candidates, ())
+        self.assertTrue(execution.lane_reports)
+        self.assertNotEqual(execution.status, "proven_impossible")
     def test_localized_top_reservation_rejects_full_height_variants(self) -> None:
         project = localized_variant_compatibility_project()
         frontier = derive_container_internal_variant_frontiers(
@@ -240,13 +191,13 @@ class ContainerVariantGlobalSearchTests(unittest.TestCase):
             {value.family_id for value in execution.family_reports},
         )
 
-    def test_portfolio_runs_variant_fallback_only_after_canonical_failure(self) -> None:
+    def test_portfolio_fallback_remains_truthful_without_undersized_variants(self) -> None:
         execution = solve_partition_portfolio(
             multi_container_variant_dead_end_project(),
             effort_profile=EFFORT_QUICK,
         )
 
-        self.assertEqual(execution.status, SOLUTION_FOUND)
+        self.assertEqual(execution.status, NO_SOLUTION_WITHIN_BUDGET)
         self.assertIsNotNone(execution.container_variant_search)
         self.assertEqual(
             execution.family_reports[-1].family_id,
@@ -255,44 +206,24 @@ class ContainerVariantGlobalSearchTests(unittest.TestCase):
         self.assertTrue(
             all(
                 report.certified_candidate_count == 0
-                for report in execution.family_reports[:-1]
+                for report in execution.family_reports
             )
         )
-        self.assertEqual(execution.selected_family_id, "free_3d_beam")
-
-    def test_public_plan_exposes_selected_variants_budgets_and_certificate(self) -> None:
+    def test_public_plan_refuses_to_publish_an_undersized_variant_solution(self) -> None:
         plan = solve_partition_plan(
             multi_container_variant_dead_end_project(),
             solver_method="auto",
             effort_profile=EFFORT_QUICK,
         )
 
-        self.assertEqual(plan["solver"]["result"]["status"], SOLUTION_FOUND)
-        self.assertTrue(plan["summary"]["materializable"])
-        trace = plan["solver"]["portfolio"]["container_variant_search"]
-        self.assertEqual(len(trace["selected_variants"]), 2)
-        self.assertTrue(trace["global_certificate"]["certified"])
-        self.assertFalse(trace["cartesian_product_materialized"])
-        self.assertIn("container_variants", plan["solver"]["budgets"])
         self.assertEqual(
-            plan["solver"]["telemetry"]["portfolio"][
-                "container_variant_search"
-            ]["deterministic_digest"],
-            trace["deterministic_digest"],
+            plan["solver"]["result"]["status"],
+            NO_SOLUTION_WITHIN_BUDGET,
         )
-        placements = {
-            value["container_group_id"]: value
-            for value in plan["placements"]
-            if value["role"] == "container"
-        }
-        for selected in trace["selected_variants"]:
-            self.assertEqual(
-                placements[selected["container_group_id"]][
-                    "container_internal_variant_v1"
-                ]["geometry_digest"],
-                selected["geometry_digest"],
-            )
+        self.assertFalse(plan["summary"]["materializable"])
+        self.assertIn("container_variants", plan["solver"]["budgets"])
         json.dumps(plan, sort_keys=True)
+
 
 
 if __name__ == "__main__":

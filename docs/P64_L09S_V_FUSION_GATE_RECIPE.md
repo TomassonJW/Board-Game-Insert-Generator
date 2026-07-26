@@ -1,9 +1,9 @@
-# P64-L09S-V - recette de gate Fusion humaine 0.1.66
+# P64-L09S-V - recette de gate Fusion humaine 0.1.67
 
 ## Statut
 
 - Gate : obligatoire, humaine, non encore observee.
-- Package : `0.1.66`.
+- Package : `0.1.67`.
 - Preparateur canonique : `scripts/fusion/prepare_p64_l09sv_gate.ps1`.
 - Ancienne gate 0.1.65 : `human-KO`, `do-not-run`.
 - Benchmark/holdout : interdits.
@@ -28,7 +28,7 @@ Le recu local `p64-l09sv-preflight-summary.json` contient aussi le contrat exact
 
 ## Actions restantes dans Fusion
 
-1. Recharge completement BGIG 0.1.66 et ouvre Atelier de rangement.
+1. Recharge completement BGIG 0.1.67 et ouvre Atelier de rangement.
 2. Verifie les couleurs : Calculer bleu, Finaliser orange, Materialiser vert ; les etats desactives doivent rester explicites.
 3. Ouvre la fixture preparee, calcule en Normal et verifie que l'enveloppe minimale reste 23,2 x 23,2 x 31,6 mm, sans support artificiel.
 4. Materialise l'artefact minimal : les cavites restent ouvertes et le plateau n'etire aucun corps.
@@ -52,6 +52,20 @@ Le recu local `p64-l09sv-preflight-summary.json` contient aussi le contrat exact
 
 ## Criteres KO
 
-Tout ecart geometrique, residuel non nul, faux succes, composant annexe separe, corps minimal etire, encoche sur mauvais corps, identite stale, erreur Fusion ou absence de marqueur 0.1.66 rend la gate `human-KO`.
+Tout ecart geometrique, residuel non nul, faux succes, composant annexe separe, corps minimal etire, encoche sur mauvais corps, identite stale, erreur Fusion ou absence de marqueur 0.1.67 rend la gate `human-KO`.
 
 La gate ne vaut jamais validation d'impression : `print-validated=false`.
+
+<!-- P64-L09S-0167-RECENT-KO -->
+## Cas complexe recent obligatoire pour 0.1.67
+
+Ouvre le projet complexe recent qui a invalide `0.1.66`, puis verifie :
+
+1. le conteneur dont le minimum canonique est `76 x 76 x 31.8 mm` ne devient jamais `53.6 x 76 x 31.8 mm` ni toute autre enveloppe inferieure sur un axe ;
+2. le calcul aboutit avec les plateaux sans creer de porteur artificiel ;
+3. la finalisation ne se termine pas apres environ deux secondes avec un faux echec de recherche approfondie ;
+4. la finalisation publie un plan courant recertifie et un residuel imprimable nul ;
+5. le bouton de materialisation n'est active qu'apres ce succes reel ;
+6. la materialisation conserve les volumes, les unions et les encoches attendus.
+
+Tout rabotage d'un minimum, residuel imprimable, faux succes UI, composant supplementaire ou encoche hors cible vaut `human-KO` immediat.

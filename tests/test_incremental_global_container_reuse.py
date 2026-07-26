@@ -272,7 +272,7 @@ class IncrementalGlobalContainerReuseTests(unittest.TestCase):
         )
         self.assertIsNotNone(session.current_minimal_partition())
 
-    def test_chains_after_local_fixed_envelope_reuse(self) -> None:
+    def test_does_not_chain_after_a_local_relayout_would_reduce_the_new_minimum(self) -> None:
         project = _project()
         project["contents"].append(_content("b", (10.0, 20.0, 10.0), "g"))
         initial_engine = _engine(project)
@@ -290,29 +290,10 @@ class IncrementalGlobalContainerReuseTests(unittest.TestCase):
             container_frontiers=local_engine.certified_frontiers(),
             effort_profile="quick",
         )
-        self.assertEqual(local.report["status"], STATUS_PLACEMENT_REUSED)
-        assert local.partition is not None
 
-        changed = _with_new_container(local_project)
-        changed_engine = _engine(changed)
-        attempt = attempt_incremental_global_void_container_reuse(
-            local_project,
-            changed,
-            local.partition,
-            container_frontiers=changed_engine.certified_frontiers(),
-            effort_profile="quick",
-        )
-
-        self.assertEqual(attempt.report["status"], STATUS_CONTAINER_PLACED)
-        self.assertIsNotNone(attempt.partition)
-        self.assertEqual(attempt.report["global_solver_invocation_count"], 0)
-        old_ids = {value["id"] for value in local.partition["placements"]}
-        assert attempt.partition is not None
-        self.assertEqual(
-            _world_signature(local.partition),
-            _world_signature(attempt.partition, old_ids),
-        )
-
+        self.assertEqual(local.report["status"], STATUS_GLOBAL_SOLVE_REQUIRED)
+        self.assertEqual(local.report["global_solver_invocation_count"], 0)
+        self.assertIsNone(local.partition)
     def test_global_layout_change_is_not_attempted(self) -> None:
         project = _project()
         initial_engine = _engine(project)

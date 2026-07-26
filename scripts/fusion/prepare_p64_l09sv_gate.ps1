@@ -31,8 +31,8 @@ if (-not $versionMatch.Success) {
     throw "Source add-in manifest has no readable version: $manifestPath"
 }
 $expectedVersion = $versionMatch.Groups["version"].Value
-if ($expectedVersion -ne "0.1.66") {
-    throw "P64-L09S-V package version mismatch: expected 0.1.66, got $expectedVersion."
+if ($expectedVersion -ne "0.1.67") {
+    throw "P64-L09S-V package version mismatch: expected 0.1.67, got $expectedVersion."
 }
 
 Write-Output "BGIG P64-L09S-V Fusion gate preparation"
@@ -46,7 +46,8 @@ $previousPythonPath = $env:PYTHONPATH
 try {
     $env:PYTHONPATH = ".;$(Join-Path $root 'src')"
     foreach ($pattern in @(
-        "test_top_inset_reservation.py",
+        "test_floor_maxrects_solver.py",
+        "test_top_inset_reservation.py,
         "test_xy_composite_closure.py",
         "test_composite_fusion_contract.py",
         "test_staged_calculation.py",
@@ -104,7 +105,7 @@ else {
         }
 
         $installedFinalizer = Get-Content -LiteralPath (Join-Path $target "lib\board_game_insert_generator\coupled_finalization.py") -Raw -Encoding UTF8
-        foreach ($marker in @("bgig.bounded_coupled_finalization.v6", "e_xy_composite_union_and_exact_insets", "xy_composite_cad_materialization_certified")) {
+        foreach ($marker in @("bgig.bounded_coupled_finalization.v7", "e_xy_composite_union_and_exact_insets", "xy_composite_cad_materialization_certified")) {
             if (-not $installedFinalizer.Contains($marker)) {
                 throw "Installed P64-L09S-V finalizer marker missing: $marker"
             }

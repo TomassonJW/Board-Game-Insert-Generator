@@ -22,14 +22,13 @@ _SPEC.loader.exec_module(_PREFLIGHT)
 
 
 class P64L04VPreflightTests(unittest.TestCase):
-    def test_preflight_exercises_local_success_and_explicit_fallback(self) -> None:
+    def test_preflight_rejects_both_undersized_incremental_relayouts(self) -> None:
         result = _PREFLIGHT.assert_preflight()
 
-        self.assertEqual("placement_reused", result["local_reuse"]["status"])
+        self.assertEqual("global_solve_required", result["local_reuse"]["status"])
         self.assertEqual("global_solve_required", result["fallback"]["status"])
         self.assertEqual(0, result["local_reuse"]["global_solver_invocation_count"])
         self.assertEqual(0, result["fallback"]["global_solver_invocation_count"])
-
     def test_fixture_is_a_portable_baseline_project(self) -> None:
         with TemporaryDirectory() as directory:
             fixture_path = Path(directory) / "p64-l04v-pocket-baseline.bgig.json"

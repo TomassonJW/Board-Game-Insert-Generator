@@ -770,7 +770,7 @@ class P64L09SFDocumentEvidenceTests(unittest.TestCase):
             self.assertIn(marker, evidence)
         for marker in (
             "P64-L09S-V",
-            "0.1.66",
+            "0.1.67",
             "0.1.65",
             "human-KO",
             "do-not-run",

@@ -311,7 +311,7 @@ class FusionPaletteProjectTests(unittest.TestCase):
         }
         self.assertEqual(before, after)
 
-    def test_validate_inserts_locally_without_reinvoking_global_solver(self) -> None:
+    def test_validate_requests_global_solve_when_local_relayout_would_reduce_minimum(self) -> None:
         project = blank_project_v1()
         project["box"]["inner_dimensions_mm"] = {
             "x": 120.0,
@@ -328,10 +328,7 @@ class FusionPaletteProjectTests(unittest.TestCase):
             }
         ]
 
-        def content(
-            identifier: str,
-            dimensions: tuple[float, float, float],
-        ) -> dict[str, object]:
+        def content(identifier: str, dimensions: tuple[float, float, float]) -> dict[str, object]:
             return {
                 "id": identifier,
                 "name": identifier.upper(),
@@ -353,7 +350,7 @@ class FusionPaletteProjectTests(unittest.TestCase):
             "os.environ",
             {"BGIG_USER_DATA_DIR": temp_dir},
         ):
-            solved = handle_palette_request(
+            handle_palette_request(
                 request(
                     "solve_project",
                     project=project,
@@ -366,7 +363,7 @@ class FusionPaletteProjectTests(unittest.TestCase):
                 "board_game_insert_generator.minimal_layout_solver.solve_minimal_layout",
                 side_effect=AssertionError("validate must not run the global solver"),
             ):
-                reused = handle_palette_request(
+                response = handle_palette_request(
                     request(
                         "validate_project",
                         project=changed,
@@ -376,44 +373,15 @@ class FusionPaletteProjectTests(unittest.TestCase):
                     ROOT,
                 )
 
-        self.assertIsNotNone(reused["partition"])
+        self.assertIsNone(response["partition"])
         self.assertEqual(
-            reused["staged_calculation"]["local_reuse"]["status"],
-            "placement_reused",
+            response["staged_calculation"]["local_reuse"]["status"],
+            "global_solve_required",
         )
         self.assertEqual(
-            reused["staged_calculation"]["local_reuse"][
-                "global_solver_invocation_count"
-            ],
+            response["staged_calculation"]["local_reuse"]["global_solver_invocation_count"],
             0,
         )
-        self.assertNotEqual(
-            reused["partition"]["plan_digest"],
-            solved["partition"]["plan_digest"],
-        )
-        before = [
-            (
-                value["id"],
-                value["origin_mm"],
-                value["world_size_mm"],
-                value["rotation_deg_z"],
-            )
-            for value in solved["partition"]["placements"]
-        ]
-        after = [
-            (
-                value["id"],
-                value["origin_mm"],
-                value["world_size_mm"],
-                value["rotation_deg_z"],
-            )
-            for value in reused["partition"]["placements"]
-        ]
-        self.assertEqual(after, before)
-        self.assertEqual(reused["lifecycle"]["solved"], "current")
-        self.assertEqual(reused["result_view"]["artifact_kind"], "minimal_layout")
-        self.assertIsNone(reused["cad_build"])
-
     def test_solve_project_returns_the_minimal_layout_without_saving_implicitly(self) -> None:
         project = blank_project_v1()
         project["container_groups"] = [{"id": "g", "name": "Bac", "wall_thickness_mm": None, "floor_thickness_mm": None}]

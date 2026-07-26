@@ -3,7 +3,7 @@
 <!-- P64-L09S-F -->
 ## Point de passage P64-L09S-F
 
-F est automatisee-validee avec le package 0.1.66. Le preflight reproduit les dimensions critiques, prouve l'absence de croissance liee au plateau et traverse minimal, finalisation, CAD IR et plan Fusion. Apres installation du commit integre, la boucle autonome s'arrete obligatoirement a V.
+F est automatisee-validee avec le package 0.1.67. Le preflight reproduit les dimensions critiques, prouve l'absence de croissance liee au plateau et traverse minimal, finalisation, CAD IR et plan Fusion. Apres installation du commit integre, la boucle autonome s'arrete obligatoirement a V.
 
 
 <!-- P64-L09S-E -->
@@ -393,3 +393,17 @@ la gate V. Arrête-toi à P64-L09S-V pour mon observation humaine.
 - Option économique : `gpt-5.6-terra`, raisonnement `high`, acceptable pour un
   lot documentaire ou UI isolé, mais déconseillée pour C à E où une erreur de
   modèle coûterait probablement une reprise complète.
+
+<!-- P64-L09S-0167-RUNBOOK -->
+## Reprise corrective apres le KO humain de 0.1.66
+
+Le package `0.1.66` est `human-KO` et `do-not-run`. La reprise `0.1.67` protege le minimum canonique par axe et applique la sequence suivante :
+
+1. construction minimale dense au sol quand une partition guillotine certifiee existe ;
+2. solveur 3D SCIP pour la faisabilite complexe lorsque ce chemin rapide ne suffit pas ;
+3. fermeture rectangulaire globale ;
+4. croissance continue d'abord vers `+Z`, bornee par les reservations superieures ;
+5. extensions XY composites bornees si le residuel persiste ;
+6. post-certification complete avant publication et materialisation.
+
+Une variante interne peut reorganiser ses cavites, mais ne peut reduire aucune dimension de l'enveloppe minimale canonique source. Si une reutilisation incrementale ne respecte plus ce contrat, elle doit demander un calcul global explicite.

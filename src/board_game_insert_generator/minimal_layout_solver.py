@@ -45,6 +45,10 @@ from board_game_insert_generator.free_3d_greedy_solver import (
     _Counters,
     _subtract_placement_from_spaces,
 )
+from board_game_insert_generator.floor_maxrects_solver import (
+    FLOOR_MAXRECTS_VERSION,
+    solve_floor_maxrects,
+)
 from board_game_insert_generator.free_3d_plan_adapter import (
     MINIMAL_LAYOUT_ARTIFACT_SCHEMA_V1,
     CertifiedFree3DPlan,
@@ -120,6 +124,16 @@ class _CertifiedProposal:
     empty_spaces: tuple[EmptySpace, ...]
     certified: CertifiedFree3DPlan
     rank_key: tuple[object, ...]
+
+
+_FLOOR_MAXRECTS_LANE = MinimalLaneSpec(
+    "canonical_floor_maxrects",
+    "footprint_xy",
+    "compact_corner",
+    PROPAGATION_LOWEST_SUPPORTED_SURFACE,
+    BEAM_SEARCH_BRIDGE_EMS,
+    0,
+)
 
 
 _LANES = (
@@ -574,7 +588,117 @@ def _solve_minimal_layout_once(
         else None
     )
     deadline_reached = False
-    if external_lane_enabled:
+    floor_fast_path_used = False
+    if len(canonical_search_participants) >= 12:
+        floor_execution = solve_floor_maxrects(
+            canonical_search_participants,
+            certification_problem.box,
+            certification_problem.storage_height_mm,
+            certification_problem.xy_clearance_mm,
+            box_perimeter_xy_mm=certification_problem.box_xy_clearance_mm,
+            top_inset_zones=certification_problem.top_inset_zones,
+        )
+        floor_telemetry = {
+            "solver_version": FLOOR_MAXRECTS_VERSION,
+            "order_attempts": floor_execution.order_attempts,
+            "placement_trials": floor_execution.placement_trials,
+            "deterministic_digest": floor_execution.deterministic_digest,
+            "floor_only": True,
+            "minimum_envelopes_immutable": True,
+        }
+        floor_rejections: tuple[str, ...] = ()
+        if floor_execution.status == SOLUTION_FOUND:
+            floor_placements = _decorate_canonical_placements(
+                floor_execution.placements,
+                participant_maps["certificate"],
+                frontiers,
+            )
+            floor_spaces = _rebuild_empty_spaces(
+                floor_placements,
+                certification_problem,
+                budget,
+            )
+            floor_provenance = {
+                "portfolio_schema": MINIMAL_LAYOUT_PORTFOLIO_SCHEMA_V1,
+                "effort_profile": effort_profile,
+                "lane_id": _FLOOR_MAXRECTS_LANE.lane_id,
+                "order_id": _FLOOR_MAXRECTS_LANE.order_id,
+                "seed_participant_id": floor_placements[0].participant_id,
+                "seed_rank": 0,
+                "anchor_id": _FLOOR_MAXRECTS_LANE.anchor_id,
+                "propagation_id": _FLOOR_MAXRECTS_LANE.propagation_id,
+                "search_variant": _FLOOR_MAXRECTS_LANE.search_variant,
+                "translation_id": "floor_origin",
+                "frontier_source": frontier_source,
+                "ordered_frontier_digests": [
+                    {"container_group_id": key, "digest": value}
+                    for key, value in ordered_digests
+                ],
+                "finalization_invocation_count": 0,
+                "fusion_materialization_invocation_count": 0,
+            }
+            floor_certified, floor_rejections = certify_minimal_free_3d_plan(
+                certification_problem,
+                strategy=strategy,
+                budget=budget,
+                candidate_id="canonical-floor-maxrects",
+                placements=floor_placements,
+                empty_spaces=floor_spaces,
+                search_telemetry=floor_telemetry,
+                search_provenance=floor_provenance,
+            )
+            if floor_certified is not None:
+                proposals.append(
+                    _CertifiedProposal(
+                        lane=_FLOOR_MAXRECTS_LANE,
+                        seed_participant_id=floor_placements[0].participant_id,
+                        translation_id="floor_origin",
+                        placements=floor_placements,
+                        empty_spaces=floor_spaces,
+                        certified=floor_certified,
+                        rank_key=_proposal_rank_key(floor_certified),
+                    )
+                )
+                floor_fast_path_used = True
+            else:
+                rejection_codes.update(floor_rejections)
+        lane_reports.append(
+            {
+                "lane_id": _FLOOR_MAXRECTS_LANE.lane_id,
+                "order_id": _FLOOR_MAXRECTS_LANE.order_id,
+                "seed_participant_id": (
+                    floor_execution.placements[0].participant_id
+                    if floor_execution.placements
+                    else "not_applicable"
+                ),
+                "seed_rank": 0,
+                "anchor_id": _FLOOR_MAXRECTS_LANE.anchor_id,
+                "anchor_point_count": 1,
+                "propagation_id": _FLOOR_MAXRECTS_LANE.propagation_id,
+                "search_variant": _FLOOR_MAXRECTS_LANE.search_variant,
+                "status": (
+                    SOLUTION_FOUND
+                    if floor_fast_path_used
+                    else NO_SOLUTION_WITHIN_BUDGET
+                ),
+                "stop_reason": (
+                    "common_certificate_accepted_floor_partition"
+                    if floor_fast_path_used
+                    else "floor_partition_not_found_or_rejected"
+                ),
+                "budget": {"max_order_attempts": 18},
+                "global_deadline_ms": dict(budget.limits)["max_total_elapsed_ms"],
+                "deadline_reached_after_lane": False,
+                "telemetry": floor_telemetry,
+                "geometric_solution_count": int(bool(floor_execution.placements)),
+                "certified_candidate_count": int(floor_fast_path_used),
+                "rejection_code_counts": {
+                    code: 1 for code in floor_rejections
+                },
+                "deterministic_digest": floor_execution.deterministic_digest,
+            }
+        )
+    if external_lane_enabled and not floor_fast_path_used:
         external_remaining_ms = _remaining_deadline_ms(deadline_at_ms)
         if external_remaining_ms is not None and external_remaining_ms < 1.0:
             return _failure_plan(
@@ -747,7 +871,7 @@ def _solve_minimal_layout_once(
         external_lane_report["report_digest"] = canonical_digest(
             external_lane_report
         )
-    for lane in lane_specs:
+    for lane in (() if floor_fast_path_used else lane_specs):
 
         deadline_remaining_ms = _remaining_deadline_ms(deadline_at_ms)
         if (
@@ -1019,7 +1143,10 @@ def _solve_minimal_layout_once(
         "solver_version": MINIMAL_LAYOUT_SOLVER_VERSION,
         "effort_profile": effort_profile,
         "request": request,
-        "lane_prefix_ids": [lane.lane_id for lane in lane_specs],
+        "lane_prefix_ids": [
+            str(value["lane_id"])
+            for value in lane_reports
+        ],
         "quick_is_prefix_of_normal": (
             minimal_lane_specs(EFFORT_NORMAL)[
                 : len(minimal_lane_specs(EFFORT_QUICK))
@@ -1050,12 +1177,16 @@ def _solve_minimal_layout_once(
             "global_deadline_reached_with_candidate"
             if deadline_reached
             else (
-                "external_scip_proposal_selected_after_common_certification"
-                if external_selected
+                "canonical_floor_maxrects_certified_fast_path"
+                if floor_fast_path_used
                 else (
-                    "certified_witness_incumbent_preserved_after_lane_search"
-                    if witness_selected
-                    else "bounded_lane_prefix_completed"
+                    "external_scip_proposal_selected_after_common_certification"
+                    if external_selected
+                    else (
+                        "certified_witness_incumbent_preserved_after_lane_search"
+                        if witness_selected
+                        else "bounded_lane_prefix_completed"
+                    )
                 )
             )
         ),

@@ -282,5 +282,43 @@ class Free3DContinuousClosureTests(unittest.TestCase):
         self.assertEqual(by_id["short"].origin_mm[0], 0.0)
 
 
+    def test_vertical_first_closure_stops_at_reserved_plane_and_excludes_reserved_prism(self) -> None:
+        participant = _participant("low", (100.0, 80.0, 10.0))
+        placement = Free3DPlacement(
+            "low",
+            "container",
+            "low",
+            (0.0, 0.0, 0.0),
+            (100.0, 80.0, 10.0),
+            (100.0, 80.0, 10.0),
+            0,
+            ("box-floor",),
+            1.0,
+        )
+        result = close_free_3d_residual(
+            (participant,),
+            (placement,),
+            {"x": 100.0, "y": 80.0, "z": 40.0},
+            40.0,
+            0.0,
+            box_perimeter_xy_mm=0.0,
+            between_bodies_z_mm=0.0,
+            budget=_budget(),
+            top_inset_zones=(
+                TopInsetZone(
+                    origin_xy_mm=(0.0, 0.0),
+                    size_xy_mm=(100.0, 80.0),
+                    support_plane_z_mm=30.0,
+                    inset_depth_mm=10.0,
+                ),
+            ),
+        )
+
+        self.assertEqual(result.status, "closed")
+        self.assertFalse(result.empty_spaces)
+        self.assertEqual(result.placements[0].world_size_mm[2], 30.0)
+        self.assertEqual(result.final_residual_metric, (0.0, 0.0, 0))
+
+
 if __name__ == "__main__":
     unittest.main()

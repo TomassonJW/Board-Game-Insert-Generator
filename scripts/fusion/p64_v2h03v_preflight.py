@@ -36,34 +36,20 @@ def _solve(raw_project: object) -> dict[str, object]:
 
 
 def build_preflight(variant_project: object, control_project: object) -> dict[str, object]:
-    """Assert the visible variant case and its canonical non-regression control."""
+    """Reclassify the old shrinking-variant gate and keep its canonical control."""
 
     variant_plan = _solve(variant_project)
     variant_summary = variant_plan["summary"]
     variant_solver = variant_plan["solver"]
     variant_portfolio = variant_solver["portfolio"]
+    if variant_summary["status"] == "constructed":
+        raise AssertionError("H03V must not construct a plan by reducing source minima.")
+    if variant_solver["result"]["status"] != "no_solution_within_budget":
+        raise AssertionError("H03V shrinking-variant fixture must fail honestly.")
     trace = variant_portfolio.get("container_variant_search")
-    if variant_summary["status"] != "constructed":
-        raise AssertionError("H03V variant fixture must be constructed.")
-    if variant_solver["result"]["status"] != "solution_found":
-        raise AssertionError("H03V variant fixture must expose solution_found.")
-    if variant_portfolio["selected_family_id"] != "free_3d_beam":
-        raise AssertionError("H03V variant fixture must select free_3d_beam.")
-    if not isinstance(trace, dict):
-        raise AssertionError("H03V variant fixture lacks its secondary trace.")
-    selected_variants = trace.get("selected_variants", [])
-    if len(selected_variants) != 2 or any(value.get("canonical") for value in selected_variants):
-        raise AssertionError("H03V must select two certified non-canonical variants.")
-    if trace.get("canonical_portfolio_completed_first") is not True:
-        raise AssertionError("H03V must preserve canonical-first execution.")
-    if trace.get("cartesian_product_materialized") is not False:
-        raise AssertionError("H03V must not materialize a Cartesian product.")
-    certificate = trace.get("global_certificate")
-    if not isinstance(certificate, dict) or certificate.get("certified") is not True:
-        raise AssertionError("H03V selected variants need a global certificate.")
-    lanes = trace.get("lanes", [])
-    if len(lanes) != 1 or lanes[0].get("effort_profile") != "quick":
-        raise AssertionError("H03V quick gate must expose exactly the quick prefix lane.")
+    selected_variants = trace.get("selected_variants", []) if isinstance(trace, dict) else []
+    if selected_variants:
+        raise AssertionError("H03V must not select an undersized internal variant.")
 
     control_plan = _solve(control_project)
     control_summary = control_plan["summary"]
@@ -82,13 +68,10 @@ def build_preflight(variant_project: object, control_project: object) -> dict[st
         "schema_version": P64_V2H03V_PREFLIGHT_SCHEMA,
         "variant": {
             "status": variant_solver["result"]["status"],
-            "selected_family_id": variant_portfolio["selected_family_id"],
+            "selected_family_id": variant_portfolio.get("selected_family_id"),
             "selected_variant_count": len(selected_variants),
-            "all_selected_variants_noncanonical": True,
-            "global_certificate": True,
-            "lane_count": len(lanes),
+            "source_minimum_floor_enforced": True,
             "plan_digest": variant_plan["plan_digest"],
-            "trace_digest": trace["deterministic_digest"],
         },
         "control": {
             "status": control_solver["result"]["status"],
@@ -99,7 +82,6 @@ def build_preflight(variant_project: object, control_project: object) -> dict[st
         "fusion_materialized": False,
         "print_validated": False,
     }
-
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)

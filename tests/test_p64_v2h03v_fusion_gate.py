@@ -36,22 +36,20 @@ class P64V2H03VFusionGateTests(unittest.TestCase):
         actual = json.loads(CONTROL_FIXTURE.read_text(encoding="utf-8"))
         self.assertEqual(actual, expected)
 
-    def test_preflight_proves_variant_fallback_and_canonical_control(self) -> None:
+    def test_preflight_reclassifies_shrinking_variants_and_keeps_control(self) -> None:
         module = _load_preflight_module()
         report = module.build_preflight(
             json.loads(VARIANT_FIXTURE.read_text(encoding="utf-8")),
             json.loads(CONTROL_FIXTURE.read_text(encoding="utf-8")),
         )
         self.assertEqual(report["schema_version"], "bgig.p64_v2h03v.preflight.v1")
-        self.assertEqual(report["variant"]["selected_family_id"], "free_3d_beam")
-        self.assertEqual(report["variant"]["selected_variant_count"], 2)
-        self.assertTrue(report["variant"]["all_selected_variants_noncanonical"])
-        self.assertTrue(report["variant"]["global_certificate"])
+        self.assertEqual(report["variant"]["status"], "no_solution_within_budget")
+        self.assertEqual(report["variant"]["selected_variant_count"], 0)
+        self.assertTrue(report["variant"]["source_minimum_floor_enforced"])
         self.assertEqual(report["control"]["selected_family_id"], "stage_stack")
         self.assertTrue(report["control"]["variant_trace_absent"])
         self.assertFalse(report["fusion_materialized"])
         self.assertFalse(report["print_validated"])
-
     def test_preparer_keeps_the_gate_bounded_and_observable(self) -> None:
         script = PREPARER.read_text(encoding="utf-8")
         for marker in (

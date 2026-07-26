@@ -150,6 +150,10 @@ class ContainerInternalVariantTests(unittest.TestCase):
             "LOCAL_CAVITY_OUT_OF_BOUNDS",
             rejected_bounds.local_certificate.rejection_codes,
         )
+        self.assertIn(
+            "LOCAL_SOURCE_MINIMUM_UNDERSIZED",
+            rejected_bounds.local_certificate.rejection_codes,
+        )
         self.assertFalse(rejected_digest.local_certificate.certified)
         self.assertIn(
             "LOCAL_GEOMETRY_DIGEST_MISMATCH",
@@ -232,6 +236,17 @@ class ContainerInternalVariantTests(unittest.TestCase):
         self.assertGreaterEqual(len(frontier.variants), 2)
         self.assertTrue(all(value.local_certificate.certified for value in frontier.variants))
         envelopes = [value.draft.minimum_outer_envelope_mm for value in frontier.variants]
+        canonical = next(
+            value.draft.minimum_outer_envelope_mm
+            for value in frontier.variants
+            if value.canonical
+        )
+        self.assertTrue(
+            all(
+                all(envelope[index] >= canonical[index] for index in range(3))
+                for envelope in envelopes
+            )
+        )
         self.assertTrue(
             any(
                 left[0] < right[0] and left[1] > right[1]

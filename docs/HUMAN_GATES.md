@@ -1,11 +1,11 @@
 # Human Gates
 
 <!-- P64-L09S-F -->
-## P64-L09S-V 0.1.66 preparee - 2026-07-26
+## P64-L09S-V 0.1.67 preparee - 2026-07-26
 
-P64-L09S-A a F sont automatisees-validees. Le nouveau package 0.1.66 est distinct du package 0.1.65 `human-KO` et `do-not-run`. Le preflight sec du cas recent passe avec enveloppe minimale 23,2 x 23,2 x 31,6 mm, gap 5,8 mm, quatre unions, deux coupes, un composant et residuel nul.
+P64-L09S-A a F sont automatisees-validees. Le nouveau package 0.1.67 est distinct du package 0.1.65 `human-KO` et `do-not-run`. Le preflight sec du cas recent passe avec enveloppe minimale 23,2 x 23,2 x 31,6 mm, gap 5,8 mm, quatre unions, deux coupes, un composant et residuel nul.
 
-Codex a execute `scripts/fusion/prepare_p64_l09sv_gate.ps1` apres integration F. L'installation 0.1.66, la fixture, les reglages, le preflight et le marqueur `12c9f93` sont confirmes ; le commit publie est `12c9f93abd7b65b98755ef8d7a0499838716bfcc`. Thomas suit uniquement `docs/P64_L09S_V_FUSION_GATE_RECIPE.md`. Statut avant observation : `prepared-not-human-observed`, `fusion-observed=false`, `print-validated=false`.
+Codex a execute `scripts/fusion/prepare_p64_l09sv_gate.ps1` apres integration F. L'installation 0.1.67, la fixture, les reglages, le preflight et le marqueur `12c9f93` sont confirmes ; le commit publie est `12c9f93abd7b65b98755ef8d7a0499838716bfcc`. Thomas suit uniquement `docs/P64_L09S_V_FUSION_GATE_RECIPE.md`. Statut avant observation : `prepared-not-human-observed`, `fusion-observed=false`, `print-validated=false`.
 
 
 ## Mise a jour des gates P64-L09S
@@ -1398,3 +1398,21 @@ travail élargit les composites au-delà des annexes XY, change une tolérance o
 une valeur physique, ajoute un mécanisme ou modifie la North Star.
 
 `print-validated=false` reste obligatoire.
+
+<!-- P64-L09S-0167-GATE -->
+## P64-L09S-V corrective - package 0.1.67
+
+La gate `0.1.66` est close en `human-KO` et son package est `do-not-run`.
+La nouvelle gate devient `prepared-not-human-observed` seulement apres integration dans `main`, preflight local et installation verifiee du package `0.1.67`.
+
+L'observation humaine doit confirmer sur le projet complexe recent :
+
+- aucune dimension minimale d'element ou de conteneur n'est reduite ;
+- le calcul aboutit sans deformation artificielle liee aux plateaux ;
+- la finalisation couvre exactement le volume imprimable et publie un plan courant recertifie ;
+- le residuel imprimable est nul ;
+- les encoches plateau/livret ne concernent que les corps qui atteignent reellement leur plan ;
+- la materialisation conserve un composant utilisateur par conteneur ;
+- l'UI ne declare jamais un succes sans `finalized_plan` courant.
+
+Statuts avant observation : `fusion-validated=false`, `print-validated=false`.

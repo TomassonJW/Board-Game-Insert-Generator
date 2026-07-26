@@ -1143,9 +1143,23 @@ def _selected_variant_envelope_contract(
         if source is None or final is None:
             rejections.add("GLOBAL_VARIANT_ENVELOPE_SOURCE_MISSING")
             continue
-        minimum = dict(
+        source_minimum = {
+            axis: float(_mapping(source["minimum_outer_envelope_mm"])[axis])
+            for axis in ("x", "y", "z")
+        }
+        variant_minimum = dict(
             zip(("x", "y", "z"), variant.draft.minimum_outer_envelope_mm)
         )
+        if any(
+            variant_minimum[axis] + 0.0001 < source_minimum[axis]
+            for axis in ("x", "y", "z")
+        ):
+            rejections.add("GLOBAL_VARIANT_SOURCE_MINIMUM_UNDERSIZED")
+            continue
+        minimum = {
+            axis: max(source_minimum[axis], variant_minimum[axis])
+            for axis in ("x", "y", "z")
+        }
         if any(final[axis] + 0.0001 < minimum[axis] for axis in ("x", "y", "z")):
             rejections.add("GLOBAL_VARIANT_ENVELOPE_UNDERSIZED")
             continue

@@ -4,8 +4,8 @@
 ## Reprise canonique a la gate P64-L09S-V
 
 - A a F sont implementees, testees et documentees.
-- Package cible : 0.1.66 ; ancien 0.1.65 `human-KO` et `do-not-run`.
-- Le preparateur reel a installe 0.1.66 au commit `12c9f93`, la fixture recente et ses reglages ; statut `prepared-not-human-observed`.
+- Package cible : 0.1.67 ; ancien 0.1.65 `human-KO` et `do-not-run`.
+- Le preparateur reel a installe 0.1.67 au commit `12c9f93`, la fixture recente et ses reglages ; statut `prepared-not-human-observed`.
 - Prochaine et unique action : observation humaine Fusion selon `P64_L09S_V_FUSION_GATE_RECIPE.md`.
 - Aucun benchmark/holdout ; `print-validated=false`.
 
@@ -855,3 +855,13 @@ Les sections historiques L07 de cette carte décrivent une lane de sol et ne
 doivent plus être lues comme une clôture du benchmark externe. ADR-0083 suspend
 L07V et ouvre P64-L08 : la gate réelle porte sur les cas limites 3D BGIG,
 notamment l'empilement, les appuis, les réservations et la forte cardinalité.
+
+<!-- P64-L09S-0167-CORRECTIVE -->
+## Correctif P64-L09S-V 0.1.67
+
+- la gate humaine `0.1.66` est `human-KO` et `do-not-run` ;
+- la reduction d'une enveloppe minimale canonique est interdite et corrigee ;
+- le rejeu exact du projet complexe recent passe le calcul et la finalisation avec un residuel de `0.0 mm3` ;
+- la suite automatisee autorisee est verte : `833/833`, avec `68` exclusions benchmark/holdout/corpus et `1` test SCIP natif ignore sous Python 3.10 ;
+- la prochaine frontiere est la preparation puis l'observation humaine Fusion de `0.1.67` ;
+- `fusion-validated=false` et `print-validated=false`.

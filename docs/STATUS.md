@@ -3,7 +3,7 @@
 <!-- P64-L09S-F -->
 ## P64-L09S-F automatisee et gate V preparee
 
-Le package 0.1.66, le preflight recent et le preparateur V sont automatises-valides. Le preflight deterministe prouve 23,2 x 23,2 x 31,6 mm, gap 5,8 mm, croissance artificielle nulle, quatre unions, deux coupes, un composant et residuel nul. Suite autorisee : 826/826 ; preparation ciblee : 81/81 ; aucun benchmark/holdout. L'installation reelle est confirmee au marqueur `12c9f93`, correspondant au commit publie `12c9f93abd7b65b98755ef8d7a0499838716bfcc`. Le projet est arrete a P64-L09S-V : `prepared-not-human-observed`, `fusion-observed=false`, `print-validated=false`.
+Le package 0.1.67, le preflight recent et le preparateur V sont automatises-valides. Le preflight deterministe prouve 23,2 x 23,2 x 31,6 mm, gap 5,8 mm, croissance artificielle nulle, quatre unions, deux coupes, un composant et residuel nul. Suite autorisee : 826/826 ; preparation ciblee : 81/81 ; aucun benchmark/holdout. L'installation reelle est confirmee au marqueur `12c9f93`, correspondant au commit publie `12c9f93abd7b65b98755ef8d7a0499838716bfcc`. Le projet est arrete a P64-L09S-V : `prepared-not-human-observed`, `fusion-observed=false`, `print-validated=false`.
 
 
 <!-- P64-L09S-E -->
@@ -4042,3 +4042,12 @@ Autorités :
 
 Prochaine action unique : Thomas lance le Goal P64-L09S dans le clavardage de
 reprise. Avant ce lancement, aucune mutation produit n'est autorisée.
+
+<!-- P64-L09S-0167-STATUS -->
+## Correctif P64-L09S-V 0.1.67
+
+Le KO humain de `0.1.66` a revele deux defauts distincts : une variante interne pouvait reduire une enveloppe minimale canonique, et la finition complexe quittait prematurement apres ses partitions guillotine.
+
+Le correctif impose le minimum source sur chaque axe, ajoute une garde globale independante, utilise une construction dense au sol par etageres guillotine quand elle est certifiable, puis ordonne les replis de finition par fermeture globale, croissance verticale bornee et annexes XY bornees. Le rejeu prive exact du cas recent obtient `solution_found`, `minimum_violation_count=0`, `materializable=true` et `printable_residual_volume_mm3=0.0`.
+
+Etat courant : validation automatisee finale reussie (`833/833`, `68` exclusions benchmark/holdout/corpus, `1` test SCIP natif ignore sous Python 3.10). Aucune nouvelle validation Fusion ni impression n'est revendiquee.

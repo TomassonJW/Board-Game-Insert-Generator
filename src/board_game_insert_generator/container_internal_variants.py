@@ -424,7 +424,16 @@ def certify_container_variant_draft(
     origins_ok = _origins_match_local_frame(draft)
     contained = origins_ok and _cavities_are_contained(draft)
     separated = contained and _cavities_are_separated(draft)
-    tight_envelope = contained and _envelope_is_tight(draft)
+    source_minimum = _dimension_tuple(source_container["outer_dimensions_mm"])
+    source_minimum_preserved = all(
+        draft.minimum_outer_envelope_mm[index] + _EPSILON
+        >= source_minimum[index]
+        for index in range(3)
+    )
+    tight_envelope = contained and _envelope_is_tight(
+        draft,
+        source_minimum=source_minimum,
+    )
     fixed_axes_ok = _fixed_axes_accept(draft, group)
     digest_ok = draft.geometry_digest == compute_variant_geometry_digest(draft)
     checks = (
@@ -436,6 +445,11 @@ def certify_container_variant_draft(
         _check("local_frame", origins_ok, "LOCAL_FRAME_INVALID"),
         _check("contained_cavities", contained, "LOCAL_CAVITY_OUT_OF_BOUNDS"),
         _check("separated_cavities", separated, "LOCAL_CAVITY_OVERLAP_OR_WALL_MISSING"),
+        _check(
+            "source_minimum_envelope",
+            source_minimum_preserved,
+            "LOCAL_SOURCE_MINIMUM_UNDERSIZED",
+        ),
         _check("tight_minimum_envelope", tight_envelope, "LOCAL_MINIMUM_ENVELOPE_MISMATCH"),
         _check("automatic_body_count", draft.automatic_body_count == 0, "LOCAL_AUTOMATIC_BODY_FORBIDDEN"),
         _check("fixed_axes", fixed_axes_ok, "LOCAL_FIXED_AXIS_EXCEEDED"),
@@ -625,10 +639,17 @@ def _rectangular_relayout_drafts(
     result: list[ContainerInternalVariantDraft] = []
     for generation_index, (signature, candidate) in enumerate(selected, start=1):
         cavities = _candidate_cavities(candidate, wall, floor)
+        source_outer = _dimension_tuple(container["outer_dimensions_mm"])
         outer = (
-            _round(_number(_mapping(candidate["size_mm"])["x"]) + wall * 2.0),
-            _round(_number(_mapping(candidate["size_mm"])["y"]) + wall * 2.0),
-            _dimension_tuple(container["outer_dimensions_mm"])[2],
+            max(
+                source_outer[0],
+                _round(_number(_mapping(candidate["size_mm"])["x"]) + wall * 2.0),
+            ),
+            max(
+                source_outer[1],
+                _round(_number(_mapping(candidate["size_mm"])["y"]) + wall * 2.0),
+            ),
+            source_outer[2],
         )
         provenance = tuple(
             VariantProvenance(RECTANGULAR_RELAYOUT_PRODUCER_ID, PRODUCER_VERSION_V1, path)
@@ -859,7 +880,11 @@ def _cavities_are_separated(draft: ContainerInternalVariantDraft) -> bool:
     return True
 
 
-def _envelope_is_tight(draft: ContainerInternalVariantDraft) -> bool:
+def _envelope_is_tight(
+    draft: ContainerInternalVariantDraft,
+    *,
+    source_minimum: tuple[float, float, float],
+) -> bool:
     if not draft.cavities:
         return False
     expected = (
@@ -867,7 +892,14 @@ def _envelope_is_tight(draft: ContainerInternalVariantDraft) -> bool:
         _round(max(value.local_origin_mm[1] + value.inner_dimensions_mm[1] for value in draft.cavities) + draft.wall_thickness_mm),
         _round(max(value.local_origin_mm[2] + value.inner_dimensions_mm[2] for value in draft.cavities)),
     )
-    return all(_same(value, expected[index]) for index, value in enumerate(draft.minimum_outer_envelope_mm))
+    expected_with_floor = tuple(
+        max(expected[index], source_minimum[index])
+        for index in range(3)
+    )
+    return all(
+        _same(value, expected_with_floor[index])
+        for index, value in enumerate(draft.minimum_outer_envelope_mm)
+    )
 
 
 def _fixed_axes_accept(

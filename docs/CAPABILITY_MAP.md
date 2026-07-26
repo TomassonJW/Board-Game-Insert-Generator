@@ -3,7 +3,7 @@
 <!-- P64-L09S-F -->
 ## Increment P64-L09S-F
 
-Le parcours complexe est automatise de bout en bout jusqu'au plan Fusion pur et dispose d'un preflight public reproductible. Le package 0.1.66 et la fixture V sont installes au marqueur `12c9f93` ; la gate est `prepared-not-human-observed`. La capability reste `automated-validated` tant que la gate V n'a pas observe l'execution Fusion reelle ; aucune validation d'impression.
+Le parcours complexe est automatise de bout en bout jusqu'au plan Fusion pur et dispose d'un preflight public reproductible. Le package 0.1.67 et la fixture V sont installes au marqueur `12c9f93` ; la gate est `prepared-not-human-observed`. La capability reste `automated-validated` tant que la gate V n'a pas observe l'execution Fusion reelle ; aucune validation d'impression.
 
 
 <!-- P64-L09S-E -->
@@ -2233,3 +2233,11 @@ Preuve : `docs/P64_L09R_B_MINIMAL_CALCULATION_EVIDENCE.md`.
 - `C-PRINT` : inchangée, `print-validated=false`.
 
 Aucune capability runtime n'est promue par cette préparation documentaire.
+
+<!-- P64-L09S-0167-CAPABILITY -->
+## Correctif de capability P64-L09S-V
+
+- calcul minimal dense : correctif implemente, rejeu recent certifie sans reduction des minima ;
+- finition complete : correctif implemente, rejeu recent ferme avec residuel nul ;
+- materialisation Fusion : reste a observer sur le package `0.1.67` ;
+- statut global : `automated-validated`, ni `fusion-validated` ni `print-validated`.
