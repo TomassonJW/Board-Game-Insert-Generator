@@ -29,7 +29,7 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
 )
 
 
-ADDIN_VERSION = "0.1.67"
+ADDIN_VERSION = "0.1.68"
 REQUESTED_SETTINGS = {"method": "auto", "effort": "normal"}
 FINISHING_EFFORT = "normal"
 FIXTURE_FILENAME = "p64-l09sv-01-recent-tray-composite.bgig.json"

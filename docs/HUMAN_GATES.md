@@ -1,5 +1,10 @@
 # Human Gates
 
+<!-- P64-L09S-0168-GATE -->
+## P64-L09S-V corrective - package 0.1.68
+
+`0.1.67` est clos en `human-KO` et `do-not-run`. La gate successeur exige trois parcours sans acceptation partielle : smoke public, `CasLimite01` avec un puis plusieurs plateaux, `CasLimite02` avec ses deux plateaux. Calcul, finalisation et materialisation doivent tous etre reels et coherents. Tout minimum rabote, axe fixe modifie, support artificiel, residuel, faux succes ou erreur Fusion vaut KO. `fusion-validated=false` jusqu au retour de Thomas ; `print-validated=false` dans tous les cas.
+
 <!-- P64-L09S-F -->
 ## P64-L09S-V 0.1.67 preparee - 2026-07-26
 

@@ -1,5 +1,10 @@
 # Fusion 360 Strategy
 
+<!-- P64-L09S-0168-FUSION -->
+## Gate corrective P64-L09S-V 0.1.68
+
+Fusion recoit le solveur minimal `p64-l09s-v2` et le finaliseur `v8`. SCIP traite une seule fois la projection complexe sans reservations hautes ; le coeur recertifie ensuite les vrais prismes avant tout plan materialisable. Le finaliseur reconstruit les variantes et peut choisir dans le pool minimal borne. La gate reelle porte obligatoirement sur `CasLimite01` et `CasLimite02`. Les packages `0.1.65` et `0.1.67` restent `human-KO`, `do-not-run`.
+
 <!-- P64-L09S-F -->
 ## Gate P64-L09S-V 0.1.67
 

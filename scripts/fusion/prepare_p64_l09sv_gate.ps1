@@ -1,4 +1,4 @@
-﻿param(
+param(
     [string] $RepoRoot,
     [string] $TargetPath,
     [switch] $DryRun
@@ -31,8 +31,8 @@ if (-not $versionMatch.Success) {
     throw "Source add-in manifest has no readable version: $manifestPath"
 }
 $expectedVersion = $versionMatch.Groups["version"].Value
-if ($expectedVersion -ne "0.1.67") {
-    throw "P64-L09S-V package version mismatch: expected 0.1.67, got $expectedVersion."
+if ($expectedVersion -ne "0.1.68") {
+    throw "P64-L09S-V package version mismatch: expected 0.1.68, got $expectedVersion."
 }
 
 Write-Output "BGIG P64-L09S-V Fusion gate preparation"
@@ -104,8 +104,15 @@ else {
             throw "Installed P64-L09S-V worker imports adsk."
         }
 
+        $installedMinimalSolver = Get-Content -LiteralPath (Join-Path $target "lib\board_game_insert_generator\minimal_layout_solver.py") -Raw -Encoding UTF8
+        foreach ($marker in @("p64-l09s-v2", "finishing_candidate_pool", "_merge_projected_finishing_candidates")) {
+            if (-not $installedMinimalSolver.Contains($marker)) {
+                throw "Installed P64-L09S-V minimal solver marker missing: $marker"
+            }
+        }
+
         $installedFinalizer = Get-Content -LiteralPath (Join-Path $target "lib\board_game_insert_generator\coupled_finalization.py") -Raw -Encoding UTF8
-        foreach ($marker in @("bgig.bounded_coupled_finalization.v7", "e_xy_composite_union_and_exact_insets", "xy_composite_cad_materialization_certified")) {
+        foreach ($marker in @("bgig.bounded_coupled_finalization.v8", "_resolve_frontiers", "minimal_candidate_selection", "e_xy_composite_union_and_exact_insets", "xy_composite_cad_materialization_certified")) {
             if (-not $installedFinalizer.Contains($marker)) {
                 throw "Installed P64-L09S-V finalizer marker missing: $marker"
             }
@@ -200,10 +207,10 @@ Write-Output ""
 Write-Output "P64-L09S-V Fusion actions remaining for Thomas:"
 Write-Output "1. Fully reload BGIG $expectedVersion and open Atelier de rangement."
 Write-Output "2. Confirm Calculer is blue, Finaliser orange, Materialiser green, with explicit disabled states."
-Write-Output "3. Open $fixtureName, calculate Normal, and confirm the minimum body remains 23.2 x 23.2 x 31.6 mm without artificial tray support."
-Write-Output "4. Materialize the minimal artifact and confirm its cavities stay open and the tray reservation does not stretch the body."
-Write-Output "5. Finalize Normal; require a current finalized plan, zero printable residual, and no false success message."
-Write-Output "6. Materialize the finalized artifact; inspect one user component per owner, welded annexes, and exact tray/grip notches."
-Write-Output "7. Reopen the local 18-container 60 / 59.6 / 52.8 mm case, repeat steps 3-6, and confirm the 31.6 mm body is never changed to 38.4 mm."
-Write-Output "8. Report OK or KO with screenshots, scene identity and diagnostics; keep print-validated=false."
+Write-Output "3. Open $fixtureName and complete the public Normal calculation/finalization/materialization smoke with zero printable residual."
+Write-Output "4. Open CasLimite01; with one tray, then with several trays, calculate in Approfondi and require a certified solution from the SCIP lane."
+Write-Output "5. On CasLimite01, verify every source minimum and fixed axis, no artificial tray-support growth, then finalize and materialize without false success."
+Write-Output "6. Open CasLimite02 with its two trays, calculate, then finalize under the visible shared budget; require a current finalized plan and zero printable residual."
+Write-Output "7. On CasLimite02, verify the bounded candidate selection, c2 fixed X, every minimum envelope, welded XY annexes, exact notches and one user component per owner."
+Write-Output "8. Report OK or KO for each case with screenshots, scene identity and diagnostics; keep print-validated=false."
 Write-Output "Prepared P64-L09S-V gate: $(-not $DryRun)"

@@ -1,5 +1,10 @@
 # Next Actions
 
+<!-- P64-L09S-0168-NEXT -->
+## Action courante : cloture corrective et gate P64-L09S-V
+
+Codex termine la validation autorisee, integre `0.1.68`, installe le package et prepare la gate. Thomas observe ensuite le parcours complet sur `CasLimite01` avec un puis plusieurs plateaux et sur `CasLimite02` avec deux plateaux. Aucun nouveau GO Git n est requis. Aucun benchmark, holdout ou corpus. La gate reste humaine et `print-validated=false`.
+
 <!-- P64-L09S-F -->
 ## Action courante : P64-L09S-V
 

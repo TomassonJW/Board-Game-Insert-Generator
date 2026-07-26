@@ -3498,3 +3498,13 @@ implémentée et intégrée à la fois.
 - `blocked-human-gate` : package `0.1.67` prepare ; attendre l'observation Fusion de Thomas ;
 - `forbidden` : reutiliser `0.1.66`, reduire une enveloppe minimale source ou annoncer une finition sans plan recertifie ;
 - hors scope : benchmark, holdout, corpus et validation d'impression physique.
+
+<!-- P64-L09S-0168-BACKLOG -->
+## P64-L09S-V corrective 0.1.68
+
+- `done-code` : projection plateau avec unique appel SCIP et recertification des reservations.
+- `done-code` : pool minimal borne, date limite partagee et reconstruction des variantes de finition.
+- `done-tests` : minima, axes fixes, residuel nul, materialisation composite et timeout historique couverts.
+- `human-KO` : package `0.1.67`, interdit d execution.
+- `human-gate-required` : package `0.1.68`, smoke public, `CasLimite01` et `CasLimite02` obligatoires.
+- Interdits : benchmark, holdout, corpus, support artificiel, rabotage des minima et validation d impression.

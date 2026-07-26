@@ -1,5 +1,15 @@
 # Capability Map
 
+<!-- P64-L09S-0168-CAPABILITY -->
+## Correctif de capability plateau et finition complexe
+
+- `C-SOLVER` : projection plateau et unique appel SCIP, puis recertification reservee fail-closed.
+- `C-RESERVATION` : aucun support fabrique ; minima et axes fixes immuables.
+- `C-PARTITION` : pool borne de douze plans minimaux certifies sous une date limite partagee.
+- `C-COMPOSITE` : variantes reconstruites, enveloppe minimale contenue par l union finale, residuel nul exige.
+- `C-FUSION` : package cible `0.1.68`, observation humaine encore requise.
+- `C-PRINT` : `print-validated=false`.
+
 <!-- P64-L09S-F -->
 ## Increment P64-L09S-F
 

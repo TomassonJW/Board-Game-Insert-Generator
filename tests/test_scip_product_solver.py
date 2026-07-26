@@ -472,6 +472,67 @@ class ScipProductSolverTests(unittest.TestCase):
         self.assertEqual(execution.invocation_count, 1)
         worker.assert_called_once()
 
+    def test_tray_projection_uses_one_scip_run_then_recertifies_reservations(self) -> None:
+        project = _stacking_project()
+        project["flat_items"] = [
+            {
+                "id": "tray",
+                "name": "Plateau",
+                "kind": "board",
+                "dimensions_mm": {"x": 20.0, "y": 18.0, "z": 3.0},
+                "quantity": 1,
+                "stack_order": None,
+                "origin_mm": {"x": 10.0, "y": 12.0},
+                "rotation_deg_z": 0,
+            }
+        ]
+        configure_scip_product_runtime(ROOT)
+        prepared_calls = []
+
+        def fake_worker(prepared, _limits):
+            prepared_calls.append(prepared)
+            placements = []
+            for index, participant in enumerate(prepared.payload["participants"]):
+                variant = participant["variants"][0]
+                placements.append(
+                    {
+                        "participant_id": participant["participant_id"],
+                        "selected_variant_id": variant["variant_id"],
+                        "orientation": "xyz",
+                        "x": 600,
+                        "y": 600,
+                        "z": index * 17_000,
+                        "size": list(variant["size"]),
+                    }
+                )
+            return {
+                "status": "feasible",
+                "proof_status": "bounded",
+                "engine_status": "optimal",
+                "placements": placements,
+                "worker_invocation_count": 1,
+            }
+
+        with (
+            patch.object(scip_product_module, "_runtime_error", return_value=None),
+            patch.object(
+                scip_product_module,
+                "_invoke_worker",
+                side_effect=fake_worker,
+            ) as worker,
+        ):
+            plan = solve_minimal_layout(project, effort_profile="quick")
+
+        self.assertEqual(plan["solver"]["result"]["status"], "solution_found")
+        self.assertEqual(worker.call_count, 1)
+        self.assertEqual(len(prepared_calls), 1)
+        self.assertNotIn("top_inset_zones", prepared_calls[0].payload)
+        search = plan["solver"]["search_origin"]
+        self.assertTrue(search["top_reservation_projection_recertified"])
+        self.assertEqual(search["warm_start"]["status"], "accepted")
+        self.assertTrue(plan["minimal_layout"]["global_certificate"]["certified"])
+        self.assertEqual(plan["support"]["top_support_count"], 0)
+
     @unittest.skipUnless(
         os.name == "nt" and sys.version_info[:2] == (3, 14),
         "requires the Fusion CPython 3.14 runtime",
@@ -648,7 +709,7 @@ class ScipProductSolverTests(unittest.TestCase):
         self.assertIn(SCIP_PRODUCT_ARCHIVE_SHA256, helper)
         self.assertIn("configure_scip_product_runtime", palette)
         self.assertIn('scip_vendor / "runtime"', palette)
-        self.assertEqual(manifest["version"], "0.1.67")
+        self.assertEqual(manifest["version"], "0.1.68")
 
 
 if __name__ == "__main__":

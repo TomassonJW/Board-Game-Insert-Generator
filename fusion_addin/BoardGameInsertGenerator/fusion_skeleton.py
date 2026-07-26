@@ -1055,6 +1055,8 @@ def default_fusion_ui_settings(addin_dir: str | Path) -> dict[str, str]:
     if project_root is None and config_path is not None:
         project_root = detect_bgig_project_root(config_path, root)
     if project_root is None:
+        project_root = detect_bgig_project_root(root, root)
+    if project_root is None:
         project_root = _env_project_root_or_none()
     if project_root is None:
         project_root = _valid_project_root_or_none(BGIG_DEFAULT_DEV_PROJECT_ROOT)
@@ -2484,11 +2486,11 @@ def resolve_bgig_project_root(
 def detect_bgig_project_root(config_path: Path, addin_dir: str | Path) -> Path | None:
     """Find a repo root containing src/board_game_insert_generator."""
 
-    candidates: list[Path] = []
+    candidates: list[Path] = [config_path, Path(addin_dir)]
     env_root = _env_project_root_or_none()
     if env_root is not None:
         candidates.append(env_root)
-    candidates.extend([config_path, Path(addin_dir), BGIG_DEFAULT_DEV_PROJECT_ROOT])
+    candidates.append(BGIG_DEFAULT_DEV_PROJECT_ROOT)
     for candidate in candidates:
         for parent in [candidate, *candidate.parents]:
             valid = _valid_project_root_or_none(parent)

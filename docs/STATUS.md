@@ -1,5 +1,14 @@
 # Status
 
+<!-- P64-L09S-0168-STATUS -->
+## Correctif P64-L09S-V 0.1.68
+
+Le retour humain `0.1.67` est `human-KO`. Le calcul projette maintenant les cas plateau sur le probleme sans reservations hautes, conserve SCIP pour la forte cardinalite, puis recertifie les vrais prismes sans second appel SCIP. La finition essaie un pool borne de plans minimaux certifies sous une date limite partagee et reconstruit les variantes internes avant certification. Les minima et axes fixes sont proteges jusque dans l union composite finale.
+
+Preuves cibles deja vertes : contrat de timeout `1/1`, noyau finalisation/composite/Fusion/pool `25/25`, solveur SCIP `19/19` avec un test natif ignore sous Python 3.10, et rejeu prive exact de `CasLimite02` avec residuel nul. La suite autorisee est reussie : `847/847` en `204.032 s`, avec un test SCIP natif ignore sous Python 3.10, sans benchmark/holdout/corpus. Package cible `0.1.68`, gate Fusion non encore observee, `print-validated=false`.
+
+Les sections suivantes sont le journal historique et ne reclassent pas `0.1.67` en succes.
+
 <!-- P64-L09S-F -->
 ## P64-L09S-F automatisee et gate V preparee
 

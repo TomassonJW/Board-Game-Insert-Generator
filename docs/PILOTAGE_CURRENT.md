@@ -1,5 +1,18 @@
 # Pilotage courant
 
+<!-- P64-L09S-0168-CURRENT -->
+## Reprise canonique corrective 0.1.68
+
+- Le package `0.1.67` est `human-KO`, non accepte et `do-not-run`.
+- `CasLimite01` exige une projection sans reservations hautes, un unique solve SCIP puis une recertification obligatoire contre les vrais plateaux.
+- `CasLimite02` exige un pool borne de plans minimaux certifies et la reconstruction des variantes avant finition.
+- Minima et axes fixes sont invariants ; aucun plateau ne fabrique un support.
+- Correctifs et tests cibles termines. La cloture exige la suite autorisee complete, l integration dans `main`, l installation `0.1.68`, puis l observation humaine.
+- Prochaine frontiere unique : P64-L09S-V sur `CasLimite01` et `CasLimite02`.
+- Aucun benchmark/holdout/corpus ; `fusion-validated=false`, `print-validated=false`.
+
+Les sections suivantes conservent le journal historique des missions et packages precedents.
+
 <!-- P64-L09S-F -->
 ## Reprise canonique a la gate P64-L09S-V
 

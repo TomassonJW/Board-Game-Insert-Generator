@@ -53,8 +53,10 @@ REQUIRED_PROJECT_FILES = (
     "docs/DECISIONS/ADR-0083-real-3d-solver-gate-and-l07-reclassification.md",
     "docs/DECISIONS/ADR-0088-calcul-minimal-finition-optionnelle-et-budgets-visibles.md",
     "docs/DECISIONS/ADR-0089-reservations-minimales-et-fermeture-globale-composee.md",
+    "docs/DECISIONS/ADR-0091-projection-reservations-et-pool-minimal-finition.md",
     "docs/P64_L09R_CALCUL_FINITION_PROGRESS_CONTRACT.md",
     "docs/P64_L09R_V_0165_HUMAN_KO_EVIDENCE.md",
+    "docs/P64_L09S_V_0167_HUMAN_KO_EVIDENCE.md",
     "docs/P64_L09S_A_MINIMAL_RESERVATION_EVIDENCE.md",
     "docs/P64_L09S_B_CYCLE_TRUTH_EVIDENCE.md",
     "docs/P64_L09S_C_GLOBAL_RECTANGULAR_CLOSURE_EVIDENCE.md",
@@ -394,7 +396,22 @@ REQUIRED_SECTIONS = {
         "## 6. Résultat UI trompeur",
         "## 8. Conclusion",
     ),
-    "docs/P64_L09S_END_TO_END_GOAL_RUNBOOK.md": (
+    "docs/DECISIONS/ADR-0091-projection-reservations-et-pool-minimal-finition.md": (
+        "## 1. Statut",
+        "## 2. Contexte",
+        "## 3. Decision",
+        "## 4. Consequences",
+        "## 5. Alternatives rejetees",
+        "## 6. Validation",
+    ),
+    "docs/P64_L09S_V_0167_HUMAN_KO_EVIDENCE.md": (
+        "## 1. Statut",
+        "## 2. Faits observes",
+        "## 3. Diagnostic CasLimite01",
+        "## 4. Diagnostic CasLimite02",
+        "## 5. Protection des minima",
+        "## 7. Gate successeur",
+    ),    "docs/P64_L09S_END_TO_END_GOAL_RUNBOOK.md": (
         "## 1. Rôle et statut",
         "## 2. Objectif exact du Goal",
         "## 3. Préflight bloquant après lancement",
@@ -770,7 +787,7 @@ class P64L09SFDocumentEvidenceTests(unittest.TestCase):
             self.assertIn(marker, evidence)
         for marker in (
             "P64-L09S-V",
-            "0.1.67",
+            "0.1.68",
             "0.1.65",
             "human-KO",
             "do-not-run",

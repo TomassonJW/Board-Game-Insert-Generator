@@ -39,9 +39,9 @@ class P64L09SFEndToEndHardeningTests(unittest.TestCase):
         cls.manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
 
     def test_0166_is_distinct_from_frozen_human_ko_0165(self) -> None:
-        self.assertEqual(self.manifest["version"], "0.1.67")
-        self.assertEqual(self.summary["addin_version"], "0.1.67")
-        self.assertIn('expectedVersion -ne "0.1.67"', self.preparer)
+        self.assertEqual(self.manifest["version"], "0.1.68")
+        self.assertEqual(self.summary["addin_version"], "0.1.68")
+        self.assertIn('expectedVersion -ne "0.1.68"', self.preparer)
         self.assertIn('expectedVersion -ne "0.1.65"', self.historical_preparer)
         self.assertIn("human-KO", self.historical_evidence)
         self.assertIn("ne doit pas", self.historical_evidence)
@@ -100,7 +100,7 @@ class P64L09SFEndToEndHardeningTests(unittest.TestCase):
 
     def test_preparer_installs_exact_commit_and_leaves_only_human_gate(self) -> None:
         for marker in (
-            "bgig.bounded_coupled_finalization.v7",
+            "bgig.bounded_coupled_finalization.v8",
             "e_xy_composite_union_and_exact_insets",
             "bgig.xy_composite_cad_body.v1",
             "bounded_xy_composite_v1",
