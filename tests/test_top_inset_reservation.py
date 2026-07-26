@@ -8,6 +8,7 @@ from board_game_insert_generator.project_v1 import blank_project_v1
 from board_game_insert_generator.top_inset_reservation import (
     TOP_INSET_CUT_KIND,
     TOP_INSET_RESERVATION_SCHEMA_V1,
+    _apply_cavity_depth_compensations,
     apply_top_inset_reservations,
     certify_top_inset_reservation_prisms,
     derive_top_inset_reservations,
@@ -65,6 +66,61 @@ def flat(
 
 
 class TopInsetReservationTests(unittest.TestCase):
+    def test_upright_cavity_keeps_its_canonical_depth_before_tray_cut(self) -> None:
+        placements = [
+            {
+                "id": "container:upright-cards",
+                "name": "Cartes debout",
+                "container_group_id": "upright-cards",
+                "world_size_mm": {"x": 101.4, "y": 51.4, "z": 69.8},
+                "cavity_layout": [
+                    {
+                        "cavity_id": "cavity:upright-cards",
+                        "base_inner_dimensions_mm": {
+                            "x": 89.2,
+                            "y": 63.6,
+                            "z": 24.0,
+                        },
+                        "inner_dimensions_mm": {
+                            "x": 89.2,
+                            "y": 25.2,
+                            "z": 63.6,
+                        },
+                    }
+                ],
+            }
+        ]
+
+        compensations, blockers = _apply_cavity_depth_compensations(
+            placements,
+            {
+                "container:upright-cards": {
+                    "cavity:upright-cards": 4.0,
+                }
+            },
+            {"upright-cards": 1.2},
+            1.2,
+        )
+
+        cavity = placements[0]["cavity_layout"][0]
+        self.assertFalse(blockers)
+        self.assertEqual(cavity["base_inner_dimensions_mm"]["z"], 63.6)
+        self.assertEqual(cavity["inner_dimensions_mm"]["z"], 67.6)
+        self.assertEqual(cavity["top_inset_compensation_mm"], 4.0)
+        self.assertEqual(compensations[0]["retained_floor_mm"], 2.2)
+
+        _apply_cavity_depth_compensations(
+            placements,
+            {
+                "container:upright-cards": {
+                    "cavity:upright-cards": 4.0,
+                }
+            },
+            {"upright-cards": 1.2},
+            1.2,
+        )
+        self.assertEqual(cavity["inner_dimensions_mm"]["z"], 67.6)
+
     def test_auto_centres_a_board_and_keeps_the_container_design_height(self) -> None:
         value = project()
         value["flat_items"] = [flat("board")]

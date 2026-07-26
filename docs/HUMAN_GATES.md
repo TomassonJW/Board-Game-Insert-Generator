@@ -1421,3 +1421,23 @@ L'observation humaine doit confirmer sur le projet complexe recent :
 - l'UI ne declare jamais un succes sans `finalized_plan` courant.
 
 Statuts avant observation : `fusion-validated=false`, `print-validated=false`.
+
+<!-- P64-L09S-0169-HUMAN-GATE -->
+## P64-L09S-V 0.1.69 - gate humaine courante
+
+`0.1.68` est `human-KO` et `do-not-run`. Le seul package autorise est
+`0.1.69`, construit depuis le SHA integre dans `main`.
+
+Thomas doit observer :
+
+- `CasLimite01` avec son plateau central : calcul Normal, finition Normal,
+  jauge visible chaque seconde sans saut 4 -> 10 ni gel, 18 minima conserves,
+  residuel nul puis materialisation ;
+- `CasLimite02` avec plateau/livret : cavite cartes debout conservee, profondeur
+  finale attendue `67.6 mm`, unions avant coupes et encoches uniquement sur les
+  corps finaux concernes ;
+- aucun faux `finalized_plan_ready`, aucun support artificiel et un seul
+  composant utilisateur par conteneur.
+
+La recette canonique est `docs/P64_L09S_V_FUSION_GATE_RECIPE.md`.
+Avant le verdict : `fusion-validated=false`, `print-validated=false`.

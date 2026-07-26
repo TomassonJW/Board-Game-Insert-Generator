@@ -39,9 +39,9 @@ class P64L09SFEndToEndHardeningTests(unittest.TestCase):
         cls.manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
 
     def test_0166_is_distinct_from_frozen_human_ko_0165(self) -> None:
-        self.assertEqual(self.manifest["version"], "0.1.68")
-        self.assertEqual(self.summary["addin_version"], "0.1.68")
-        self.assertIn('expectedVersion -ne "0.1.68"', self.preparer)
+        self.assertEqual(self.manifest["version"], "0.1.69")
+        self.assertEqual(self.summary["addin_version"], "0.1.69")
+        self.assertIn('expectedVersion -ne "0.1.69"', self.preparer)
         self.assertIn('expectedVersion -ne "0.1.65"', self.historical_preparer)
         self.assertIn("human-KO", self.historical_evidence)
         self.assertIn("ne doit pas", self.historical_evidence)

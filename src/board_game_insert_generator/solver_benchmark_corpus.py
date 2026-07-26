@@ -8,7 +8,7 @@ ouverture exige la trace d'un unique candidat sélectionné avant consultation.
 from __future__ import annotations
 
 from copy import deepcopy
-from math import ceil, isclose, sqrt
+from math import ceil, floor, isclose, sqrt
 from random import Random
 from typing import Mapping, Sequence
 
@@ -55,6 +55,35 @@ _ALLOWED_EXECUTION_MODES = ("cold", "incremental")
 _ALLOWED_CHANGE_KINDS = ("none", "internal_modification", "new_container", "full_rebuild")
 _SECRET_KEY_FRAGMENTS = ("api_key", "authorization", "password", "secret", "token")
 _EPSILON = 0.0001
+
+
+def _strict_fixed_volume_z_mm(
+    *,
+    required_volume_mm3: float,
+    box_x_mm: float,
+    box_y_mm: float,
+    proposed_z_mm: float,
+) -> float:
+    """Keep an existing conflict or build one with a strict one-percent gap."""
+
+    available_volume = box_x_mm * box_y_mm * proposed_z_mm
+    if required_volume_mm3 > available_volume + _EPSILON:
+        return round(proposed_z_mm, 3)
+    target_z_mm = (
+        required_volume_mm3 * 0.99 / (box_x_mm * box_y_mm)
+    )
+    adjusted_z_mm = max(
+        0.001,
+        floor(target_z_mm * 1000.0) / 1000.0,
+    )
+    if (
+        required_volume_mm3
+        <= box_x_mm * box_y_mm * adjusted_z_mm + _EPSILON
+    ):
+        raise SolverBenchmarkCorpusError(
+            "Unable to construct a strict fixed-volume conflict."
+        )
+    return round(adjusted_z_mm, 3)
 
 _SPLIT_SEED_BASE = {"discovery": 640_610_000, "tuning": 640_620_000, "holdout": 640_630_000}
 _SPLIT_OFFSET = {"discovery": 0, "tuning": 1, "holdout": 2}
@@ -838,7 +867,12 @@ def _build_project_and_oracle(
             )
             box_dimensions["x"] = round(longest_xy + 0.4, 3)
             box_dimensions["y"] = round(shortest_xy + 0.4, 3)
-            box_dimensions["z"] = round(maximum_z + 0.4, 3)
+            box_dimensions["z"] = _strict_fixed_volume_z_mm(
+                required_volume_mm3=locked_volume,
+                box_x_mm=box_dimensions["x"],
+                box_y_mm=box_dimensions["y"],
+                proposed_z_mm=round(maximum_z + 0.4, 3),
+            )
             available_volume = (
                 box_dimensions["x"] * box_dimensions["y"] * box_dimensions["z"]
             )

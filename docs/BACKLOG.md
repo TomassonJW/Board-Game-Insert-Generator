@@ -3508,3 +3508,17 @@ implémentée et intégrée à la fois.
 - `human-KO` : package `0.1.67`, interdit d execution.
 - `human-gate-required` : package `0.1.68`, smoke public, `CasLimite01` et `CasLimite02` obligatoires.
 - Interdits : benchmark, holdout, corpus, support artificiel, rabotage des minima et validation d impression.
+
+<!-- P64-L09S-0169-BACKLOG -->
+## P64-L09S-V corrective 0.1.69
+
+- `human-KO` : package `0.1.68`, interdit d'execution.
+- `done-code` : reservations virtuelles superieures et piles au sol bornees.
+- `done-code` : cavites canoniques, repli composite depuis le minimal certifie,
+  evenement de fin Fusion et identite de budget stable.
+- `done-tests` : rejeux exacts `CasLimite01/02` et suite `910/910`.
+- `blocked-human-gate` : package `0.1.69`, smoke public et deux cas limites
+  obligatoires.
+- `forbidden` : support artificiel, rabotage d'un minimum, faux succes,
+  polling periodique du pont Python, benchmark/holdout solveur et validation
+  d'impression implicite.

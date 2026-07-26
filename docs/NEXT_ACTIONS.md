@@ -364,3 +364,16 @@ Cette préparation est `done-documentation`. ADR-0080 lève ensuite la gate R1 s
 3. Package Fusion `0.1.67` prepare et installe ; marqueurs locaux verifies.
 4. Arreter l'autonomie a la gate humaine P64-L09S-V et faire rejouer le cas complexe recent par Thomas.
 5. Ne declarer `fusion-validated` qu'apres observation humaine conforme ; conserver `print-validated=false`.
+
+<!-- P64-L09S-0169-NEXT -->
+## Prochaine action canonique P64-L09S-V 0.1.69
+
+1. Utiliser uniquement le package `0.1.69` construit depuis le SHA integre dans
+   `main`.
+2. Rejouer dans Fusion le smoke public, `CasLimite01` puis `CasLimite02` selon
+   `docs/P64_L09S_V_FUSION_GATE_RECIPE.md`.
+3. Verifier la jauge seconde par seconde, les minima, le residuel nul, les
+   encoches finales et le composant utilisateur unique par conteneur.
+4. Arreter toute autonomie a cette observation humaine.
+5. Conserver `0.1.65` a `0.1.68` en `human-KO` / `do-not-run` et
+   `print-validated=false`.

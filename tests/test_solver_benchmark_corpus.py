@@ -17,6 +17,7 @@ from board_game_insert_generator.solver_benchmark_corpus import (
     GENERATED_CASES_PER_SPLIT,
     PROVEN_IMPOSSIBLE_SMALL_EXACT,
     SolverBenchmarkCorpusError,
+    _strict_fixed_volume_z_mm,
     build_holdout_selection,
     build_solver_benchmark_manifest,
     materialize_benchmark_split,
@@ -70,6 +71,17 @@ class SolverBenchmarkCorpusTests(unittest.TestCase):
         self.assertFalse(
             validated["invariants"]["rotation_disable_control_exposed_by_project_v1"]
         )
+
+    def test_fixed_volume_oracle_builds_a_strict_conflict_when_margins_fit(self) -> None:
+        adjusted_z_mm = _strict_fixed_volume_z_mm(
+            required_volume_mm3=1000.0,
+            box_x_mm=11.0,
+            box_y_mm=11.0,
+            proposed_z_mm=11.0,
+        )
+
+        self.assertEqual(adjusted_z_mm, 8.181)
+        self.assertLess(11.0 * 11.0 * adjusted_z_mm, 1000.0)
 
     def test_each_generated_split_covers_the_required_matrix(self) -> None:
         validated = validate_solver_benchmark_manifest(self.manifest)

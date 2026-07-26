@@ -417,3 +417,30 @@ Une variante interne peut reorganiser ses cavites, mais ne peut reduire aucune d
 - package/manifeste/reglages/marqueur : verifies ;
 - cas humain obligatoire : projet recent a 28 conteneurs, avec controle du minimum `76 x 76 x 31.8 mm` ;
 - `fusion-validated=false` et `print-validated=false` jusqu'au verdict humain.
+
+<!-- P64-L09S-0169-RUNBOOK -->
+## Reprise corrective apres le KO humain de 0.1.68
+
+Le package `0.1.68` est `human-KO` et `do-not-run`. Le candidat `0.1.69`
+applique la sequence suivante :
+
+1. construire uniquement les enveloppes minimales canoniques ;
+2. traiter plateau et livret comme des prismes virtuels superieurs interdits ;
+3. pour les grands cas reserves, construire des piles legales puis ranger leurs
+   bases sur le fond sous une borne de 1024 etats ;
+4. recertifier le plan minimal avec le certificat BGIG commun ;
+5. fermer globalement depuis ce plan minimal original ;
+6. utiliser les annexes XY bornees seulement si la fermeture continue ne suffit
+   pas ;
+7. unir les corps finaux, puis appliquer uniquement les coupes de reservation
+   qui les concernent ;
+8. publier un succes seulement avec un `finalized_plan` courant, recertifie et
+   un residuel nul.
+
+La progression reste locale dans la palette et recoit un seul evenement de fin
+du worker. Le budget choisi reste stable ; la deadline globale ne modifie pas
+son identite.
+
+Automatisation : `910/910`, `CasLimite01/02` verts, un test SCIP natif ignore
+sous Python 3.10. Frontiere suivante : gate Fusion humaine `0.1.69`.
+`fusion-validated=false`, `print-validated=false`.

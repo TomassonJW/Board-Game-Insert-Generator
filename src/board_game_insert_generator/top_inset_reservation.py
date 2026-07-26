@@ -741,10 +741,19 @@ def _apply_cavity_depth_compensations(
             compensation = float(requested.get(cavity_id, 0.0))
             if compensation <= _EPSILON:
                 continue
-            base_dimensions = _dimension(
-                cavity.get("base_inner_dimensions_mm", cavity["inner_dimensions_mm"])
+            current_dimensions = _dimension(cavity["inner_dimensions_mm"])
+            previous_compensation = float(
+                cavity.get("top_inset_compensation_mm", 0.0)
             )
-            compensated_depth = base_dimensions["z"] + compensation
+            canonical_depth = (
+                current_dimensions["z"] - previous_compensation
+            )
+            base_dimensions = {
+                "x": current_dimensions["x"],
+                "y": current_dimensions["y"],
+                "z": canonical_depth,
+            }
+            compensated_depth = canonical_depth + compensation
             retained_floor = body_height - compensated_depth
             if retained_floor + _EPSILON < minimum_floor:
                 blockers.append(
@@ -764,7 +773,9 @@ def _apply_cavity_depth_compensations(
             }
             _mapping(cavity["inner_dimensions_mm"])["z"] = _round(compensated_depth)
             cavity["top_inset_compensation_mm"] = _round(compensation)
-            cavity["depth_semantics"] = "asset_depth_below_localized_top_inset"
+            cavity["depth_semantics"] = (
+                "canonical_asset_depth_plus_localized_top_inset"
+            )
             compensations.append(
                 {
                     "placement_id": placement["id"],

@@ -54,9 +54,11 @@ REQUIRED_PROJECT_FILES = (
     "docs/DECISIONS/ADR-0088-calcul-minimal-finition-optionnelle-et-budgets-visibles.md",
     "docs/DECISIONS/ADR-0089-reservations-minimales-et-fermeture-globale-composee.md",
     "docs/DECISIONS/ADR-0091-projection-reservations-et-pool-minimal-finition.md",
+    "docs/DECISIONS/ADR-0092-reservations-virtuelles-piles-au-sol-et-identite-stable.md",
     "docs/P64_L09R_CALCUL_FINITION_PROGRESS_CONTRACT.md",
     "docs/P64_L09R_V_0165_HUMAN_KO_EVIDENCE.md",
     "docs/P64_L09S_V_0167_HUMAN_KO_EVIDENCE.md",
+    "docs/P64_L09S_V_0168_HUMAN_KO_EVIDENCE.md",
     "docs/P64_L09S_A_MINIMAL_RESERVATION_EVIDENCE.md",
     "docs/P64_L09S_B_CYCLE_TRUTH_EVIDENCE.md",
     "docs/P64_L09S_C_GLOBAL_RECTANGULAR_CLOSURE_EVIDENCE.md",
@@ -787,11 +789,65 @@ class P64L09SFDocumentEvidenceTests(unittest.TestCase):
             self.assertIn(marker, evidence)
         for marker in (
             "P64-L09S-V",
-            "0.1.68",
+            "0.1.69",
             "0.1.65",
             "human-KO",
             "do-not-run",
             "un composant utilisateur par proprietaire",
+            "print-validated=false",
+        ):
+            self.assertIn(marker, recipe)
+
+
+class P64L09SV0168DocumentEvidenceTests(unittest.TestCase):
+    def test_human_ko_and_successor_gate_are_guarded(self) -> None:
+        from pathlib import Path
+
+        root = Path(__file__).resolve().parents[1]
+        evidence = (
+            root / "docs" / "P64_L09S_V_0168_HUMAN_KO_EVIDENCE.md"
+        ).read_text(encoding="utf-8")
+        decision = (
+            root
+            / "docs"
+            / "DECISIONS"
+            / "ADR-0092-reservations-virtuelles-piles-au-sol-et-identite-stable.md"
+        ).read_text(encoding="utf-8")
+        recipe = (
+            root / "docs" / "P64_L09S_V_FUSION_GATE_RECIPE.md"
+        ).read_text(encoding="utf-8")
+        for marker in (
+            "failed-package: 0.1.68",
+            "candidate-package: 0.1.69",
+            "human-KO",
+            "do-not-run",
+            "CasLimite01",
+            "CasLimite02",
+            "67.6 mm",
+            "printable_residual_volume_mm3=0",
+            "authorized-suite: 910/910",
+            "solver_invocation_count=0",
+            "fusion-validated=false",
+            "print-validated=false",
+        ):
+            self.assertIn(marker, evidence)
+        for marker in (
+            "## Statut",
+            "## Contexte",
+            "## Decision",
+            "## Consequences",
+            "## Alternatives rejetees",
+            "## Validation",
+            "reservations virtuelles",
+            "wall_clock_cap_ms",
+        ):
+            self.assertIn(marker, decision)
+        for marker in (
+            "Package unique autorise : `0.1.69`",
+            "bgig_palette_operation_ready",
+            "Calcul Normal",
+            "Finition Normal",
+            "67.6 mm",
             "print-validated=false",
         ):
             self.assertIn(marker, recipe)

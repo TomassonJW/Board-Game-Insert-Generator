@@ -31,8 +31,8 @@ if (-not $versionMatch.Success) {
     throw "Source add-in manifest has no readable version: $manifestPath"
 }
 $expectedVersion = $versionMatch.Groups["version"].Value
-if ($expectedVersion -ne "0.1.68") {
-    throw "P64-L09S-V package version mismatch: expected 0.1.68, got $expectedVersion."
+if ($expectedVersion -ne "0.1.69") {
+    throw "P64-L09S-V package version mismatch: expected 0.1.69, got $expectedVersion."
 }
 
 Write-Output "BGIG P64-L09S-V Fusion gate preparation"
@@ -47,12 +47,17 @@ try {
     $env:PYTHONPATH = ".;$(Join-Path $root 'src')"
     foreach ($pattern in @(
         "test_floor_maxrects_solver.py",
+        "test_reserved_floor_stack_solver.py",
         "test_top_inset_reservation.py",
         "test_xy_composite_closure.py",
+        "test_plateau_candidate_pool.py",
         "test_composite_fusion_contract.py",
         "test_staged_calculation.py",
         "test_partition_cad.py",
         "test_fusion_palette_project.py",
+        "test_fusion_palette_dom.py",
+        "test_palette_worker.py",
+        "test_fusion_palette_qt_transport.py",
         "test_p64_l09s_f_end_to_end_hardening.py"
     )) {
         & $python -m unittest discover -s (Join-Path $root "tests") -p $pattern
@@ -95,7 +100,7 @@ else {
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
         $installedWorker = Get-Content -LiteralPath (Join-Path $target "palette_worker.py") -Raw -Encoding UTF8
-        foreach ($marker in @("solve_project", "finalize_project", "source_identity_changed", "worker_pure_data_only")) {
+        foreach ($marker in @("solve_project", "finalize_project", "source_identity_changed", "worker_pure_data_only", "on_completed")) {
             if (-not $installedWorker.Contains($marker)) {
                 throw "Installed P64-L09S-V worker marker missing: $marker"
             }
@@ -105,7 +110,7 @@ else {
         }
 
         $installedMinimalSolver = Get-Content -LiteralPath (Join-Path $target "lib\board_game_insert_generator\minimal_layout_solver.py") -Raw -Encoding UTF8
-        foreach ($marker in @("p64-l09s-v2", "finishing_candidate_pool", "_merge_projected_finishing_candidates")) {
+        foreach ($marker in @("p64-l09s-v3", "solve_reserved_floor_stacks", "finishing_candidate_pool", "_merge_projected_finishing_candidates")) {
             if (-not $installedMinimalSolver.Contains($marker)) {
                 throw "Installed P64-L09S-V minimal solver marker missing: $marker"
             }
@@ -136,10 +141,13 @@ else {
             }
         }
         $installedPalette = Get-Content -LiteralPath (Join-Path $target "palette.html") -Raw -Encoding UTF8
-        foreach ($marker in @("#1769aa", "#b85f14", "#237a4b")) {
+        foreach ($marker in @("#1769aa", "#b85f14", "#237a4b", "bgig_palette_operation_ready")) {
             if (-not $installedPalette.Contains($marker)) {
                 throw "Installed P64-L09S-V palette marker missing: $marker"
             }
+        }
+        if ($installedPalette.Contains("setInterval(pollAsyncProjectOperations,1000)")) {
+            throw "Installed P64-L09S-V palette still polls Python every second."
         }
 
         $installedPaletteProject = Get-Content -LiteralPath (Join-Path $target "palette_project.py") -Raw -Encoding UTF8

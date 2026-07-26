@@ -4060,3 +4060,34 @@ Le KO humain de `0.1.66` a revele deux defauts distincts : une variante interne 
 Le correctif impose le minimum source sur chaque axe, ajoute une garde globale independante, utilise une construction dense au sol par etageres guillotine quand elle est certifiable, puis ordonne les replis de finition par fermeture globale, croissance verticale bornee et annexes XY bornees. Le rejeu prive exact du cas recent obtient `solution_found`, `minimum_violation_count=0`, `materializable=true` et `printable_residual_volume_mm3=0.0`.
 
 Etat courant : validation automatisee finale reussie (`833/833`, `68` exclusions benchmark/holdout/corpus, `1` test SCIP natif ignore sous Python 3.10), package Fusion `0.1.67` installe depuis `832c9d5`, preflight `85c578d`. Gate `prepared-not-human-observed` ; aucune nouvelle validation Fusion ni impression n'est revendiquee.
+
+<!-- P64-L09S-0169-STATUS -->
+## Correctif P64-L09S-V 0.1.69
+
+Date : 2026-07-26.
+
+Statut : `implemented-product`, `automated-validated`,
+`awaiting-human-fusion-gate`.
+
+- `0.1.68` est reclassifie `human-KO`, `do-not-run`.
+- `CasLimite01` dispose d'une voie bornee de piles posees au sol qui respecte
+  les reservations superieures sans croissance artificielle des conteneurs.
+- `CasLimite02` reconstruit les cavites dans leur orientation canonique avant
+  compensation : `63.6 + 4.0 = 67.6 mm`, fond `2.2 mm`.
+- La fermeture composite repart du plan minimal certifie original.
+- Le worker signale sa fin par evenement Fusion ; la jauge locale ne poll plus
+  le pont Python toutes les secondes.
+- Le budget contractuel et la limite murale restante sont separes, ce qui
+  restaure une identite fonctionnelle stable.
+- Rejeu exact `CasLimite01` : calcul `3.321 s`, finition `11.132 s`,
+  `18/18` corps, `printable_residual_volume_mm3=0`, CAD complet.
+- Rejeu exact `CasLimite02` : calcul, finition et CAD complets, aucune reduction
+  de minimum.
+- Suite complete : `910/910` en `329.251 s`, un test SCIP natif ignore sous
+  Python 3.10. Le sidecar synthetique rapporte `solver_invocation_count=0`.
+- Aucun benchmark, tuning, holdout solveur ou impression n'est revendique.
+
+Preuve : `docs/P64_L09S_V_0168_HUMAN_KO_EVIDENCE.md`.
+Decision : `docs/DECISIONS/ADR-0092-reservations-virtuelles-piles-au-sol-et-identite-stable.md`.
+Prochaine action unique : P64-L09S-V humaine sur le package `0.1.69`.
+`fusion-validated=false`, `print-validated=false`.

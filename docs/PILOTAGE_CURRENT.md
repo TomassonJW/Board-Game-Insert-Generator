@@ -878,3 +878,25 @@ notamment l'empilement, les appuis, les réservations et la forte cardinalité.
 - la suite automatisee autorisee est verte : `833/833`, avec `68` exclusions benchmark/holdout/corpus et `1` test SCIP natif ignore sous Python 3.10 ;
 - la gate Fusion `0.1.67` est `prepared-not-human-observed` au commit `832c9d5`, preflight `85c578d`, et la prochaine frontiere est l'observation humaine ;
 - `fusion-validated=false` et `print-validated=false`.
+
+<!-- P64-L09S-0169-CURRENT -->
+## Correctif P64-L09S-V 0.1.69
+
+- `0.1.68` est `human-KO` et `do-not-run` apres les observations
+  `CasLimite01` et `CasLimite02`.
+- Le calcul traite les plateaux/livrets comme des reservations virtuelles
+  superieures et ajoute une voie bornee de piles posees au sol pour les grands
+  cas.
+- Les cavites orientees conservent leur profondeur canonique ; le bac de cartes
+  debout passe de `63.6 mm` a `67.6 mm` avec la compensation locale, jamais a
+  `24 mm`.
+- Le repli composite repart du plan minimal certifie original et la jauge
+  n'interroge plus Python toutes les secondes.
+- Rejeux locaux exacts : `CasLimite01` calcule, finalise avec residuel nul et
+  produit 18 composants CAD ; `CasLimite02` calcule, finalise et conserve tous
+  ses minima.
+- Validation finale : `910/910` en `329.251 s`, un test SCIP natif ignore sous
+  Python 3.10, aucun solveur de holdout invoque.
+- Package candidat unique : `0.1.69`. Prochaine frontiere : gate Fusion humaine
+  P64-L09S-V.
+- `fusion-validated=false`, `print-validated=false`.

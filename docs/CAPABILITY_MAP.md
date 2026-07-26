@@ -2251,3 +2251,20 @@ Aucune capability runtime n'est promue par cette préparation documentaire.
 - finition complete : correctif implemente, rejeu recent ferme avec residuel nul ;
 - materialisation Fusion : reste a observer sur le package `0.1.67` ;
 - statut global : `prepared-not-human-observed` sur le package `0.1.67`, ni `fusion-validated` ni `print-validated`.
+
+<!-- P64-L09S-0169-CAPABILITY -->
+## Correctif de capability P64-L09S-V 0.1.69
+
+- `C-SOLVER` / `C-RESERVATION` : `implemented-product`,
+  `automated-validated`. Les reservations superieures restent virtuelles et la
+  voie de piles au sol ne modifie aucun minimum.
+- `C-LAYOUT` / `C-PARTITION` : `implemented-product`,
+  `automated-validated`. Le repli composite repart du minimal certifie et exige
+  un residuel imprimable nul.
+- `C-CAD-IR` : `implemented-product`, `automated-validated`. Les cavites
+  canoniques, unions puis coupes exactes sont couvertes sur `CasLimite02`.
+- `C-FUSION-UI` : `automated-validated`. Progression locale a une seconde et
+  evenement unique de fin ; observation Qt/HTML encore humaine.
+- `C-QUALITY` : identite fonctionnelle stable sur deux replays de corpus.
+- `C-FUSION` : `awaiting-human-gate` sur le package `0.1.69`.
+- `C-PRINT` : inchangee, `print-validated=false`.

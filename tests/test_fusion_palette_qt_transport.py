@@ -76,7 +76,7 @@ class FusionPaletteQtTransportTests(unittest.TestCase):
 
     def test_manifest_identifies_the_bootstrap_and_launcher_fix(self) -> None:
         manifest = json.loads((ADDIN / "BoardGameInsertGenerator.manifest").read_text(encoding="utf-8"))
-        self.assertEqual(manifest["version"], "0.1.68")
+        self.assertEqual(manifest["version"], "0.1.69")
 
     def test_uses_native_file_dialog_only_in_the_fusion_adapter(self) -> None:
         for marker in (
@@ -121,6 +121,25 @@ class FusionPaletteQtTransportTests(unittest.TestCase):
         self.assertIn('frozenset({"solve_project", "finalize_project"})', worker)
         self.assertNotIn("import adsk", worker)
         self.assertNotIn("sendInfoToHTML", worker)
+
+    def test_worker_completion_wakes_the_palette_without_bridge_polling(self) -> None:
+        for marker in (
+            "registerCustomEvent",
+            "fireCustomEvent",
+            "BGIG_PALETTE_OPERATION_READY_ACTION",
+            "on_completed=_fire_palette_worker_completion",
+        ):
+            self.assertIn(marker, self.source)
+        self.assertIn("bgig_palette_operation_ready", self.markup)
+        self.assertIn(
+            "setInterval(renderOperationActivity,1000)",
+            self.markup,
+        )
+        self.assertIn("completionFallback", self.markup)
+        self.assertNotIn(
+            "setInterval(pollAsyncProjectOperations,1000)",
+            self.markup,
+        )
     def test_palette_opens_at_a_product_sized_minimum(self) -> None:
         self.assertEqual(entrypoint.BGIG_PALETTE_DEFAULT_WIDTH, 1280)
         self.assertEqual(entrypoint.BGIG_PALETTE_DEFAULT_HEIGHT, 1100)

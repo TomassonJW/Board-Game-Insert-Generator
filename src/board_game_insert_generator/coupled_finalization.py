@@ -467,7 +467,7 @@ def _finalize_coupled_volume_candidate(
             )
         composite = close_xy_composite_partition(
             participants,
-            continuous.placements,
+            placements,
             problem.box,
             problem.storage_height_mm,
             problem.xy_clearance_mm,

@@ -13,6 +13,21 @@ FIXTURE = ROOT / "scripts" / "fusion" / "p66_mvp_complete_project.json"
 
 
 class PlateauCandidatePoolTests(unittest.TestCase):
+    def test_composite_fallback_restarts_from_certified_minimal_placements(
+        self,
+    ) -> None:
+        source = (
+            ROOT
+            / "src"
+            / "board_game_insert_generator"
+            / "coupled_finalization.py"
+        ).read_text(encoding="utf-8")
+        start = source.index("composite = close_xy_composite_partition(")
+        block = source[start : source.index("composite_certified =", start)]
+
+        self.assertIn("participants,\n            placements,", block)
+        self.assertNotIn("continuous.placements", block)
+
     def test_tray_case_uses_bounded_minimal_candidate_pool(self) -> None:
         project = json.loads(FIXTURE.read_text(encoding="utf-8"))
 

@@ -93,10 +93,16 @@ from board_game_insert_generator.scip_product_solver import (
     scip_product_runtime_configured,
     solve_scip_product_3d,
 )
+from board_game_insert_generator.reserved_floor_stack_solver import (
+    DEFAULT_MAX_PACK_ATTEMPTS as RESERVED_FLOOR_STACK_MAX_PACK_ATTEMPTS,
+    DEFAULT_MAX_STATES as RESERVED_FLOOR_STACK_MAX_STATES,
+    RESERVED_FLOOR_STACK_VERSION,
+    solve_reserved_floor_stacks,
+)
 
 
 MINIMAL_LAYOUT_FAMILY_ID = "minimal_layout_portfolio"
-MINIMAL_LAYOUT_SOLVER_VERSION = "p64-l09s-v2"
+MINIMAL_LAYOUT_SOLVER_VERSION = "p64-l09s-v3"
 MINIMAL_LAYOUT_PORTFOLIO_SCHEMA_V1 = "bgig.minimal_layout_portfolio.v1"
 _AXES = ("x", "y", "z")
 _EPSILON = 0.0001
@@ -132,6 +138,15 @@ _FLOOR_MAXRECTS_LANE = MinimalLaneSpec(
     "compact_corner",
     PROPAGATION_LOWEST_SUPPORTED_SURFACE,
     BEAM_SEARCH_BRIDGE_EMS,
+    0,
+)
+
+_RESERVED_FLOOR_STACK_LANE = MinimalLaneSpec(
+    "reserved_top_floor_stacks",
+    "minimum_variants_by_footprint",
+    "box_floor",
+    PROPAGATION_LOWEST_SUPPORTED_SURFACE,
+    BEAM_SEARCH_INTERNAL_VARIANTS,
     0,
 )
 
@@ -726,6 +741,7 @@ def _solve_minimal_layout_once(
     )
     deadline_reached = False
     floor_fast_path_used = False
+    floor_stack_fast_path_used = False
     if len(canonical_search_participants) >= 12:
         floor_execution = solve_floor_maxrects(
             canonical_search_participants,
@@ -835,7 +851,133 @@ def _solve_minimal_layout_once(
                 "deterministic_digest": floor_execution.deterministic_digest,
             }
         )
-    if external_lane_enabled and not floor_fast_path_used:
+    if (
+        certification_problem.top_inset_zones
+        and len(participants_with_options) >= 12
+        and not floor_fast_path_used
+        and not _deadline_has_expired(deadline_at_ms)
+    ):
+        floor_stack_execution = solve_reserved_floor_stacks(
+            participants_with_options,
+            certification_problem,
+            should_stop=lambda: (
+                _deadline_has_expired(deadline_at_ms)
+                or (cancel_check is not None and cancel_check())
+            ),
+        )
+        floor_stack_rejections: Counter[str] = Counter()
+        floor_stack_seed = "not_applicable"
+        for candidate_index, floor_stack_placements in enumerate(
+            floor_stack_execution.candidates,
+            start=1,
+        ):
+            floor_stack_seed = floor_stack_placements[0].participant_id
+            floor_stack_spaces = _rebuild_empty_spaces(
+                floor_stack_placements,
+                certification_problem,
+                budget,
+            )
+            floor_stack_provenance = {
+                "portfolio_schema": MINIMAL_LAYOUT_PORTFOLIO_SCHEMA_V1,
+                "effort_profile": effort_profile,
+                "lane_id": _RESERVED_FLOOR_STACK_LANE.lane_id,
+                "order_id": _RESERVED_FLOOR_STACK_LANE.order_id,
+                "seed_participant_id": floor_stack_seed,
+                "seed_rank": 0,
+                "anchor_id": _RESERVED_FLOOR_STACK_LANE.anchor_id,
+                "propagation_id": _RESERVED_FLOOR_STACK_LANE.propagation_id,
+                "search_variant": _RESERVED_FLOOR_STACK_LANE.search_variant,
+                "translation_id": "floor_stack_coordinates",
+                "frontier_source": frontier_source,
+                "ordered_frontier_digests": [
+                    {"container_group_id": key, "digest": value}
+                    for key, value in ordered_digests
+                ],
+                "finalization_invocation_count": 0,
+                "fusion_materialization_invocation_count": 0,
+            }
+            floor_stack_certified, candidate_rejections = (
+                certify_minimal_free_3d_plan(
+                    certification_problem,
+                    strategy=strategy,
+                    budget=budget,
+                    candidate_id=(
+                        f"reserved-top-floor-stacks-{candidate_index}"
+                    ),
+                    placements=floor_stack_placements,
+                    empty_spaces=floor_stack_spaces,
+                    search_telemetry=floor_stack_execution.telemetry(),
+                    search_provenance=floor_stack_provenance,
+                )
+            )
+            if floor_stack_certified is None:
+                floor_stack_rejections.update(candidate_rejections)
+                rejection_codes.update(candidate_rejections)
+                continue
+            proposals.append(
+                _CertifiedProposal(
+                    lane=_RESERVED_FLOOR_STACK_LANE,
+                    seed_participant_id=floor_stack_seed,
+                    translation_id="floor_stack_coordinates",
+                    placements=floor_stack_placements,
+                    empty_spaces=floor_stack_spaces,
+                    certified=floor_stack_certified,
+                    rank_key=_proposal_rank_key(floor_stack_certified),
+                )
+            )
+            floor_stack_fast_path_used = True
+            break
+        lane_reports.append(
+            {
+                "lane_id": _RESERVED_FLOOR_STACK_LANE.lane_id,
+                "order_id": _RESERVED_FLOOR_STACK_LANE.order_id,
+                "seed_participant_id": floor_stack_seed,
+                "seed_rank": 0,
+                "anchor_id": _RESERVED_FLOOR_STACK_LANE.anchor_id,
+                "anchor_point_count": 1,
+                "propagation_id": _RESERVED_FLOOR_STACK_LANE.propagation_id,
+                "search_variant": _RESERVED_FLOOR_STACK_LANE.search_variant,
+                "status": (
+                    SOLUTION_FOUND
+                    if floor_stack_fast_path_used
+                    else NO_SOLUTION_WITHIN_BUDGET
+                ),
+                "stop_reason": (
+                    "common_certificate_accepted_reserved_floor_stacks"
+                    if floor_stack_fast_path_used
+                    else floor_stack_execution.stop_reason
+                ),
+                "budget": {
+                    "max_states": RESERVED_FLOOR_STACK_MAX_STATES,
+                    "max_pack_attempts": (
+                        RESERVED_FLOOR_STACK_MAX_PACK_ATTEMPTS
+                    ),
+                },
+                "global_deadline_ms": dict(budget.limits)[
+                    "max_total_elapsed_ms"
+                ],
+                "deadline_reached_after_lane": _deadline_has_expired(
+                    deadline_at_ms
+                ),
+                "telemetry": floor_stack_execution.telemetry(),
+                "geometric_solution_count": len(
+                    floor_stack_execution.candidates
+                ),
+                "certified_candidate_count": int(
+                    floor_stack_fast_path_used
+                ),
+                "rejection_code_counts": dict(floor_stack_rejections),
+                "deterministic_digest": (
+                    floor_stack_execution.deterministic_digest
+                ),
+                "solver_version": RESERVED_FLOOR_STACK_VERSION,
+            }
+        )
+    if (
+        external_lane_enabled
+        and not floor_fast_path_used
+        and not floor_stack_fast_path_used
+    ):
         external_remaining_ms = _remaining_deadline_ms(deadline_at_ms)
         if external_remaining_ms is not None and external_remaining_ms < 1.0:
             return _failure_plan(
@@ -1008,7 +1150,11 @@ def _solve_minimal_layout_once(
         external_lane_report["report_digest"] = canonical_digest(
             external_lane_report
         )
-    for lane in (() if floor_fast_path_used else lane_specs):
+    for lane in (
+        ()
+        if floor_fast_path_used or floor_stack_fast_path_used
+        else lane_specs
+    ):
 
         deadline_remaining_ms = _remaining_deadline_ms(deadline_at_ms)
         if (
@@ -1059,11 +1205,11 @@ def _solve_minimal_layout_once(
             if internal_variants
             else budget
         )
-        if deadline_remaining_ms is not None:
-            lane_budget = _budget_with_elapsed_cap(
-                lane_budget,
-                deadline_remaining_ms,
-            )
+        wall_clock_cap_ms = (
+            max(1, int(deadline_remaining_ms))
+            if deadline_remaining_ms is not None
+            else None
+        )
         execution = solve_free_3d_beam(
             search_participants,
             certification_problem.box,
@@ -1073,6 +1219,7 @@ def _solve_minimal_layout_once(
             between_bodies_z_mm=certification_problem.z_clearance_mm,
             budget=lane_budget,
             cancel_check=cancel_check,
+            wall_clock_cap_ms=wall_clock_cap_ms,
             top_inset_zones=certification_problem.top_inset_zones,
             search_variant=lane.search_variant,
             participant_order=participant_order,
@@ -2642,22 +2789,6 @@ def _remaining_deadline_ms(
 def _deadline_has_expired(deadline_at_ms: float | None) -> bool:
     remaining = _remaining_deadline_ms(deadline_at_ms)
     return remaining is not None and remaining < 1.0
-
-
-def _budget_with_elapsed_cap(
-    budget: SolverBudget,
-    remaining_ms: float,
-) -> SolverBudget:
-    limits = dict(budget.limits)
-    limits["max_elapsed_ms"] = min(
-        int(limits["max_elapsed_ms"]),
-        max(1, int(remaining_ms)),
-    )
-    return SolverBudget(
-        budget.family_id,
-        budget.effort_profile,
-        tuple(sorted(limits.items())),
-    )
 
 
 def _force_minimum_dimensions(

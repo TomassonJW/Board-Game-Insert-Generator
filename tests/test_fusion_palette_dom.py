@@ -778,8 +778,10 @@ class FusionPaletteDomTests(unittest.TestCase):
             'class="operation-activity-progress"',
             'max="${budget}"',
             "Progression indéterminée",
-            "pollAsyncProjectOperations",
-            "setInterval(pollAsyncProjectOperations,1000)",
+            "pollAsyncProjectOperation",
+            "handleAsyncOperationReady",
+            "bgig_palette_operation_ready",
+            "completionFallback",
             "poll_project_operation",
             "source_revision:sourceRevision",
             "solver_settings:solverSettings",
@@ -791,6 +793,10 @@ class FusionPaletteDomTests(unittest.TestCase):
             "prefers-reduced-motion",
         ):
             self.assertIn(marker, self.markup)
+        self.assertNotIn(
+            "setInterval(pollAsyncProjectOperations,1000)",
+            self.markup,
+        )
         self.assertIn("if(existing){message", self.markup)
         self.assertIn("different_operation_kinds", (ROOT / "src" / "board_game_insert_generator" / "operation_activity.py").read_text(encoding="utf-8"))
         self.assertNotIn('data-action="cancel-operation"', self.markup)

@@ -23,6 +23,7 @@ ASYNC_EXECUTION_SCHEMA = "bgig.palette.async_execution.v1"
 _MAX_RETAINED_JOBS = 16
 
 PaletteHandler = Callable[[object, str | Path, str | Path | None], dict[str, object]]
+CompletionCallback = Callable[[str], None]
 
 
 @dataclass
@@ -35,6 +36,7 @@ class _ProjectJob:
     addin_dir: str
     project_root: str | None
     handler: PaletteHandler | None
+    on_completed: CompletionCallback | None
     response: dict[str, object] | None = None
     done: bool = False
 
@@ -57,6 +59,7 @@ def submit_project_operation(
     project_root: str | Path | None,
     *,
     handler: PaletteHandler | None = None,
+    on_completed: CompletionCallback | None = None,
 ) -> dict[str, object] | None:
     """Start one bounded worker job or return an immediate fail-closed response."""
 
@@ -75,6 +78,7 @@ def submit_project_operation(
         addin_dir=str(Path(addin_dir)),
         project_root=None if project_root is None else str(Path(project_root)),
         handler=handler,
+        on_completed=on_completed,
     )
     with _LOCK:
         existing = _JOBS.get(operation_id)
@@ -152,6 +156,11 @@ def _run_project_job(job: _ProjectJob) -> None:
             job.done = True
             if _ACTIVE_ACTIONS.get(_ASYNC_LANE) == job.operation_id:
                 _ACTIVE_ACTIONS.pop(_ASYNC_LANE, None)
+    if job.on_completed is not None:
+        try:
+            job.on_completed(job.operation_id)
+        except Exception:
+            pass
 
 
 def _pure_palette_handler() -> PaletteHandler:

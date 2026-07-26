@@ -109,6 +109,10 @@ class PartitionCadTests(unittest.TestCase):
         self.assertEqual(cavity["top_inset_compensation_mm"], 2.0)
         self.assertEqual(
             operation["parameters"]["size_mm"]["z"],
+            cavity["inner_dimensions_mm"]["z"],
+        )
+        self.assertEqual(
+            cavity["inner_dimensions_mm"]["z"],
             cavity["base_inner_dimensions_mm"]["z"] + 2.0,
         )
         self.assertAlmostEqual(

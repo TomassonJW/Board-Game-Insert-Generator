@@ -255,8 +255,10 @@ BGIG_PALETTE_PROJECT_ACTION = "bgig_palette_project"
 BGIG_PALETTE_DOCUMENT_ACTION = "bgig_palette_document"
 BGIG_PALETTE_DEV_LOG_ACTION = "bgig_palette_dev_log"
 BGIG_PALETTE_PROJECT_RESPONSE_ACTION = "bgig_palette_project_response"
+BGIG_PALETTE_OPERATION_READY_ACTION = "bgig_palette_operation_ready"
 BGIG_PALETTE_TRANSPORT_RESPONSE_ACTION = "response"
 BGIG_PALETTE_READY_ACTION = "bgig_palette_ready"
+BGIG_WORKER_COMPLETION_EVENT_ID = "bgig.palette.worker.completed"
 BGIG_PALETTE_BOOTSTRAP_REQUEST_ID = "palette-bootstrap"
 BGIG_PALETTE_REQUEST_SCHEMA = "bgig.palette.request.v1"
 BGIG_COMMAND_RESOURCE_FOLDER = "resources"
@@ -278,6 +280,8 @@ PARAMETER_INPUT_PREFIX = "bgig_param_"
 _app = None
 _ui = None
 _handlers = []
+_worker_completion_event = None
+_worker_completion_handler = None
 
 
 def run(context) -> None:  # noqa: ANN001 - Fusion controls the signature.
@@ -301,6 +305,7 @@ def run(context) -> None:  # noqa: ANN001 - Fusion controls the signature.
         return
 
     try:
+        _register_worker_completion_event()
         _register_command_and_show_palette(Path(__file__).resolve().parent)
     except FusionSkeletonError as exc:
         _show_message(
@@ -317,6 +322,7 @@ def stop(context) -> None:  # noqa: ANN001 - Fusion controls the signature.
 
     global _handlers
     if adsk is not None and _ui is not None:
+        _unregister_worker_completion_event()
         _delete_palette()
         _delete_command_control(BGIG_COMMAND_ID)
         _delete_command_definition(BGIG_COMMAND_ID)
@@ -325,6 +331,31 @@ def stop(context) -> None:  # noqa: ANN001 - Fusion controls the signature.
     _show_message("Board Game Insert Generator adapter stopped.")
 
 if adsk is not None:
+    class _BgigWorkerCompletionHandler(adsk.core.CustomEventHandler):  # type: ignore[misc]
+        """Publishes completion only after Fusion returns to its event thread."""
+
+        def notify(self, args) -> None:  # noqa: ANN001 - Fusion event args.
+            try:
+                payload = json.loads(
+                    str(getattr(args, "additionalInfo", "{}") or "{}")
+                )
+                operation_id = str(payload.get("operation_id", "")).strip()
+                if not operation_id or _ui is None:
+                    return
+                palette = _ui.palettes.itemById(BGIG_PALETTE_ID)
+                if palette is None:
+                    return
+                palette.sendInfoToHTML(
+                    BGIG_PALETTE_OPERATION_READY_ACTION,
+                    json.dumps(
+                        {"operation_id": operation_id},
+                        ensure_ascii=False,
+                    ),
+                )
+            except Exception:
+                return
+
+
     class _BgigPaletteCommandExecuteHandler(adsk.core.CommandEventHandler):  # type: ignore[misc]
         def __init__(self, addin_dir: Path) -> None:
             super().__init__()
@@ -880,7 +911,59 @@ def _submit_palette_project_operation(
         from .palette_worker import submit_project_operation
     except ImportError:  # pragma: no cover - Fusion may load the add-in as a script.
         from palette_worker import submit_project_operation  # type: ignore[no-redef]
-    return submit_project_operation(raw_request, addin_dir, project_root)
+    return submit_project_operation(
+        raw_request,
+        addin_dir,
+        project_root,
+        on_completed=_fire_palette_worker_completion,
+    )
+
+
+def _fire_palette_worker_completion(operation_id: str) -> None:
+    """Wake Fusion after pure work; no palette object crosses the worker."""
+
+    if _app is None:
+        return
+    try:
+        _app.fireCustomEvent(
+            BGIG_WORKER_COMPLETION_EVENT_ID,
+            json.dumps({"operation_id": operation_id}, ensure_ascii=False),
+        )
+    except Exception:
+        return
+
+
+def _register_worker_completion_event() -> None:
+    global _worker_completion_event, _worker_completion_handler
+
+    if _app is None or adsk is None:
+        return
+    _unregister_worker_completion_event()
+    event = _app.registerCustomEvent(BGIG_WORKER_COMPLETION_EVENT_ID)
+    handler = _BgigWorkerCompletionHandler()
+    event.add(handler)
+    _worker_completion_event = event
+    _worker_completion_handler = handler
+    _handlers.append(handler)
+
+
+def _unregister_worker_completion_event() -> None:
+    global _worker_completion_event, _worker_completion_handler
+
+    event = _worker_completion_event
+    handler = _worker_completion_handler
+    _worker_completion_event = None
+    _worker_completion_handler = None
+    if event is not None and handler is not None:
+        try:
+            event.remove(handler)
+        except Exception:
+            pass
+    if _app is not None:
+        try:
+            _app.unregisterCustomEvent(BGIG_WORKER_COMPLETION_EVENT_ID)
+        except Exception:
+            pass
 
 
 def _poll_palette_project_operation(raw_request: object) -> dict[str, object] | None:

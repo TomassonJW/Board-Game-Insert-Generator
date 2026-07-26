@@ -19,7 +19,10 @@ from board_game_insert_generator.solver_case_corpus import (
     replay_solver_case_corpus,
     validate_solver_case_corpus,
 )
-from board_game_insert_generator.solver_outcome import NO_SOLUTION_WITHIN_BUDGET
+from board_game_insert_generator.solver_outcome import (
+    NO_SOLUTION_WITHIN_BUDGET,
+    SOLUTION_FOUND,
+)
 from p64_h04_fixture_cases import simple_success_project
 
 
@@ -131,8 +134,21 @@ class AnonymizedSolverCaseCorpusBuilderTests(unittest.TestCase):
         self.assertEqual(validated["summary"]["case_count"], 1)
         self.assertTrue(report["summary"]["all_expectations_met"])
         self.assertEqual(
+            report["cases"][0]["functional"]["lane_ids"][0],
+            "canonical_floor_maxrects",
+        )
+        self.assertTrue(
+            report["cases"][0]["comparison"]["checks"][
+                "required_lane_suffix_exact"
+            ]
+        )
+        self.assertIn(
             report["cases"][0]["functional"]["status"],
-            NO_SOLUTION_WITHIN_BUDGET,
+            {NO_SOLUTION_WITHIN_BUDGET, SOLUTION_FOUND},
+        )
+        self.assertIn(
+            report["cases"][0]["comparison"]["baseline_transition"],
+            {"stable", "improved_to_solution"},
         )
         for personal_marker in ("PrivateOwner", "mrv", "C:\\Users"):
             self.assertNotIn(personal_marker.lower(), rendered.lower())

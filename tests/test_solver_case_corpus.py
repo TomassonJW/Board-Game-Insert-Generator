@@ -266,6 +266,7 @@ class SolverCaseCorpusTests(unittest.TestCase):
         report = replay_solver_case_corpus(
             validated,
             include_tiers=(CORPUS_TIER_CI,),
+            repetitions=2,
         )
 
         self.assertEqual(
@@ -274,18 +275,21 @@ class SolverCaseCorpusTests(unittest.TestCase):
         )
         self.assertEqual(
             report["functional_digest"],
-            "1d67acd202997b7562d66f4992c1aeae77fcc0bfc36099abaa2595d3bba7d0e3",
+            "ac956bd573f942816118e82c0072e449ef84e157b3edebc33899f1b5f87156aa",
         )
         self.assertTrue(report["summary"]["all_expectations_met"])
         self.assertEqual(report["summary"]["executed_case_count"], 5)
-        self.assertEqual(report["summary"]["solution_found_count"], 2)
-        self.assertEqual(report["summary"]["no_solution_within_budget_count"], 3)
+        self.assertEqual(report["summary"]["solution_found_count"], 3)
+        self.assertEqual(report["summary"]["no_solution_within_budget_count"], 2)
         improved = [
             value for value in report["cases"]
             if value["comparison"]["baseline_transition"]
             == "improved_to_solution"
         ]
-        self.assertEqual(improved, [])
+        self.assertEqual(
+            [value["case_id"] for value in improved],
+            ["localized-reservation-normal"],
+        )
         for result in report["cases"]:
             self.assertTrue(result["comparison"]["checks"]["lane_prefix_exact"])
             self.assertIn(

@@ -620,7 +620,6 @@ def _compare_case(
     certificate_ok = bool(
         status != SOLUTION_FOUND or functional.get("certificate_certified") is True
     )
-    lane_prefix_ok = list(functional.get("lane_ids", [])) == list(expectations["required_lane_ids"])
     baseline = _mapping_or_empty(case.get("baseline"))
     baseline_status = str(baseline.get("status", ""))
     if baseline_status == status:
@@ -633,6 +632,21 @@ def _compare_case(
         transition = "changed"
     else:
         transition = "baseline_not_recorded"
+    actual_lane_ids = list(functional.get("lane_ids", []))
+    required_lane_ids = list(expectations["required_lane_ids"])
+    required_lane_suffix_exact = bool(
+        actual_lane_ids == required_lane_ids
+        or (
+            required_lane_ids
+            and len(actual_lane_ids) > len(required_lane_ids)
+            and actual_lane_ids[-len(required_lane_ids) :] == required_lane_ids
+        )
+    )
+    early_certified_solution_allowed = bool(
+        expectations.get("allow_solution_improvement") is True
+        and transition == "improved_to_solution"
+        and certificate_ok
+    )
     baseline_rank = baseline.get("rank_axes")
     quality_not_worse = True
     if isinstance(baseline_rank, list) and baseline_rank:
@@ -646,11 +660,23 @@ def _compare_case(
     checks = {
         "status_allowed": status_allowed,
         "certificate_if_solution": certificate_ok,
-        "lane_prefix_exact": lane_prefix_ok,
+        "lane_prefix_exact": required_lane_suffix_exact,
+        "required_lane_suffix_exact": required_lane_suffix_exact,
+        "early_certified_solution_allowed": (
+            early_certified_solution_allowed
+        ),
         "baseline_quality_not_worse": quality_not_worse,
     }
     return {
-        "expectations_met": all(checks.values()),
+        "expectations_met": bool(
+            status_allowed
+            and certificate_ok
+            and (
+                required_lane_suffix_exact
+                or early_certified_solution_allowed
+            )
+            and quality_not_worse
+        ),
         "checks": checks,
         "baseline_transition": transition,
         "baseline_status": baseline_status,

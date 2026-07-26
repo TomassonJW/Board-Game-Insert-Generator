@@ -102,6 +102,43 @@ class PaletteWorkerTests(unittest.TestCase):
         self.assertTrue(response["async_execution"]["worker_pure_data_only"])
         self.assertFalse(response["async_execution"]["fusion_side_effects_in_worker"])
 
+    def test_notifies_completion_once_after_the_result_is_stored(self) -> None:
+        completed = threading.Event()
+        operation_ids: list[str] = []
+
+        def handler(
+            raw_request: object,
+            _addin_dir: str | Path,
+            _project_root: str | Path | None,
+        ) -> dict[str, object]:
+            request = raw_request if isinstance(raw_request, dict) else {}
+            return {
+                "schema": "bgig.palette.response.v1",
+                "request_id": request.get("request_id"),
+                "status": "ready",
+            }
+
+        def on_completed(operation_id: str) -> None:
+            with palette_worker._LOCK:
+                self.assertTrue(
+                    palette_worker._JOBS[operation_id].done
+                )
+            operation_ids.append(operation_id)
+            completed.set()
+
+        palette_worker.submit_project_operation(
+            self._request("solve-completion-event"),
+            ADDIN,
+            ROOT,
+            handler=handler,
+            on_completed=on_completed,
+        )
+
+        self.assertTrue(completed.wait(2.0))
+        response = self._poll_until_ready("solve-completion-event")
+        self.assertEqual(response["status"], "ready")
+        self.assertEqual(operation_ids, ["solve-completion-event"])
+
     def test_rejects_completed_result_when_revision_or_input_digest_changed(self) -> None:
         def handler(raw_request: object, _addin_dir: str | Path, _project_root: str | Path | None) -> dict[str, object]:
             request = raw_request if isinstance(raw_request, dict) else {}

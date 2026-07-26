@@ -189,6 +189,7 @@ def solve_free_3d_beam(
     between_bodies_z_mm: float,
     budget: SolverBudget,
     cancel_check: Callable[[], bool] | None = None,
+    wall_clock_cap_ms: int | None = None,
     forbidden_spaces: Iterable[EmptySpace] = (),
     top_inset_zones: Iterable[TopInsetZone] = (),
     search_variant: str = BEAM_SEARCH_BRIDGE_EMS,
@@ -214,6 +215,20 @@ def solve_free_3d_beam(
             f"Unsupported propagation policy: {propagation_policy}."
         )
     limits = _budget_limits(budget)
+    runtime_limits = dict(limits)
+    if wall_clock_cap_ms is not None:
+        if (
+            isinstance(wall_clock_cap_ms, bool)
+            or not isinstance(wall_clock_cap_ms, int)
+            or wall_clock_cap_ms < 1
+        ):
+            raise Free3DBeamError(
+                "wall_clock_cap_ms must be a positive integer when supplied."
+            )
+        runtime_limits["max_elapsed_ms"] = min(
+            runtime_limits["max_elapsed_ms"],
+            wall_clock_cap_ms,
+        )
     values = tuple(_participant(value, index) for index, value in enumerate(participants))
     dimensions = _box_dimensions(box, storage_height_mm)
     xy_clearance = _non_negative(between_bodies_xy_mm, "between_bodies_xy_mm")
@@ -310,7 +325,7 @@ def solve_free_3d_beam(
     solutions: list[Free3DBeamSolution] = []
     best_state = initial
     while beam and not solutions_at_limit(solutions, limits):
-        if _should_stop(cancel_check, started_at, limits, counters):
+        if _should_stop(cancel_check, started_at, runtime_limits, counters):
             break
         next_states: list[_BeamState] = []
         for state in beam:
@@ -318,7 +333,7 @@ def solve_free_3d_beam(
                 (best_state, state),
                 key=lambda value: _state_score(value, propagation_policy),
             )
-            if _should_stop(cancel_check, started_at, limits, counters):
+            if _should_stop(cancel_check, started_at, runtime_limits, counters):
                 break
             participant_options = _participant_branches(
                 state,
