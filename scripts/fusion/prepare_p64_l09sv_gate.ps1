@@ -1,4 +1,4 @@
-param(
+﻿param(
     [string] $RepoRoot,
     [string] $TargetPath,
     [switch] $DryRun
@@ -47,7 +47,7 @@ try {
     $env:PYTHONPATH = ".;$(Join-Path $root 'src')"
     foreach ($pattern in @(
         "test_floor_maxrects_solver.py",
-        "test_top_inset_reservation.py,
+        "test_top_inset_reservation.py",
         "test_xy_composite_closure.py",
         "test_composite_fusion_contract.py",
         "test_staged_calculation.py",
