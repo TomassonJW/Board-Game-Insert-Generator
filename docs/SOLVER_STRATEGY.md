@@ -297,3 +297,19 @@ heuristique par niveaux, CP/SAT, CIP et MIP. Il ne préjuge pas du gagnant.
 PackingSolver ne couvre pas les réservations en mode `box` ; les moteurs
 génériques doivent prouver une traduction entière sans perte. Aucun candidat
 ne fournit de formes 3D arbitraires : T2 à T4 restent hors programme.
+
+## Stratégie P64-L09T-D — classement global plancher d'abord
+
+Le rang produit ne s'applique qu'après le certificat commun d'un plan complet.
+Il minimise dans l'ordre : conteneurs élevés, somme des bases Z, volume élevé,
+gêne sous les réservations, empreinte, piles, puis mesures de compacité,
+contacts et appui.
+
+Les heuristiques de propagation et le pruning intermédiaire conservent leur
+diversité. Ils peuvent donc explorer un regroupement compact indispensable
+sans que ce regroupement gagne automatiquement le résultat final. La lane
+réservée fournit jusqu'à huit candidats complets au portefeuille ; une pile
+reste autorisée quand le plan au sol ne peut pas être certifié.
+
+Les axes du candidat retenu et du pool de finition sont visibles et persistés
+dans le witness. Ils ne contiennent ni temps mural ni métrique volatile.

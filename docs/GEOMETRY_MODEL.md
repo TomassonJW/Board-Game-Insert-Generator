@@ -16,6 +16,19 @@ de bord sans exiger qu'une partition rectangulaire brute soit deja complete.
 Une coupe de plateau/livret est admissible seulement si la matiere restante
 entre elle et toute cavite atteint l'epaisseur de paroi resolue du conteneur.
 
+## Mesures géométriques P64-L09T-D
+
+Le niveau bas admissible est la plus basse base Z soutenue du plan complet. Un
+conteneur est élevé lorsque sa base est strictement au-dessus de ce niveau. Le
+volume élevé est la somme des volumes extérieurs de ces conteneurs ; la somme
+des bases Z porte sur tous les conteneurs demandés.
+
+La gêne sous réservations est, pour chaque empreinte plate résolue, le sommet Z
+le plus haut des corps qui la chevauchent, puis la somme de ces hauteurs. Le
+nombre de piles élevées compte les composantes reliées par un recouvrement XY.
+Ces mesures classent la géométrie déjà certifiée ; elles ne déplacent aucun
+corps, ne modifient aucune cavité et n'affaiblissent ni appui ni réservation.
+
 <!-- P64-L09S-E -->
 ## Traduction CAD d'un corps composite
 

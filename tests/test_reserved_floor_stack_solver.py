@@ -5,6 +5,11 @@ import unittest
 
 from board_game_insert_generator.reserved_floor_stack_solver import (
     RESERVED_FLOOR_STACK_VERSION,
+    _Item,
+    _complete_state_rank,
+    _new_stack,
+    _on_stack,
+    _state_rank,
     solve_reserved_floor_stacks,
 )
 from board_game_insert_generator.solver_outcome import (
@@ -93,7 +98,77 @@ def _problem() -> SimpleNamespace:
     )
 
 
+def _open_floor_problem() -> SimpleNamespace:
+    return SimpleNamespace(
+        box={"x": 60.0, "y": 30.0, "z": 50.0},
+        storage_height_mm=50.0,
+        z_clearance_mm=0.6,
+        xy_clearance_mm=0.6,
+        box_xy_clearance_mm=0.6,
+        top_inset_zones=(),
+    )
+
+
 class ReservedFloorStackSolverTests(unittest.TestCase):
+    def test_complete_rank_prefers_floor_without_pruning_compact_search_states(self) -> None:
+        lower = _Item(
+            "container:lower",
+            "container",
+            "lower",
+            (20.0, 20.0, 10.0),
+            "lower-v1",
+            "lower-digest",
+            True,
+        )
+        upper = _Item(
+            "container:upper",
+            "container",
+            "upper",
+            (20.0, 20.0, 10.0),
+            "upper-v1",
+            "upper-digest",
+            True,
+        )
+        floor_state = (
+            _new_stack(lower, 0, 20.0, 20.0),
+            _new_stack(upper, 0, 20.0, 20.0),
+        )
+        stacked = _on_stack(
+            floor_state[0],
+            upper,
+            0,
+            20.0,
+            20.0,
+            0.6,
+            50.0,
+        )
+        self.assertIsNotNone(stacked)
+        assert stacked is not None
+
+        self.assertLess(_state_rank((stacked,)), _state_rank(floor_state))
+        self.assertLess(
+            _complete_state_rank(floor_state),
+            _complete_state_rank((stacked,)),
+        )
+
+    def test_all_floor_candidate_precedes_a_compact_stack_when_both_fit(self) -> None:
+        execution = solve_reserved_floor_stacks(
+            [
+                _participant("container:a", (20.0, 20.0, 10.0)),
+                _participant("container:b", (20.0, 20.0, 10.0)),
+            ],
+            _open_floor_problem(),
+        )
+
+        self.assertEqual(execution.status, SOLUTION_FOUND)
+        self.assertGreaterEqual(len(execution.candidates), 2)
+        self.assertTrue(
+            all(
+                placement.origin_mm[2] == 0.0
+                for placement in execution.candidates[0]
+            )
+        )
+
     def test_limit_case_builds_floor_stacks_below_the_virtual_tray(self) -> None:
         first = solve_reserved_floor_stacks(
             _limit_case_participants(),
@@ -107,6 +182,25 @@ class ReservedFloorStackSolverTests(unittest.TestCase):
         self.assertEqual(first.status, SOLUTION_FOUND)
         self.assertEqual(first.deterministic_digest, second.deterministic_digest)
         self.assertEqual(len(first.candidates[0]), 18)
+        self.assertGreater(len(first.candidates), 1)
+        floor_ranks = [
+            (
+                sum(value.origin_mm[2] > 0.0001 for value in candidate),
+                round(sum(value.origin_mm[2] for value in candidate), 4),
+                round(
+                    sum(
+                        value.world_size_mm[0]
+                        * value.world_size_mm[1]
+                        * value.world_size_mm[2]
+                        for value in candidate
+                        if value.origin_mm[2] > 0.0001
+                    ),
+                    4,
+                ),
+            )
+            for candidate in first.candidates
+        ]
+        self.assertEqual(floor_ranks, sorted(floor_ranks))
         self.assertEqual(
             first.telemetry()["solver_version"],
             RESERVED_FLOOR_STACK_VERSION,

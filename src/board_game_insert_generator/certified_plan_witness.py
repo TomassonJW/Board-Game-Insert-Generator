@@ -183,10 +183,15 @@ def certified_plan_witness_rank_axes(
     metrics = _mapping(_mapping(partition.get("minimal_layout")).get("metrics"))
     try:
         axes = (
+            float(metrics["elevated_container_count"]),
+            float(metrics["base_z_sum_mm"]),
+            float(metrics["elevated_volume_mm3"]),
+            float(metrics["top_inset_obstructive_height_mm"]),
+            float(metrics["cluster_footprint_mm2"]),
+            float(metrics["elevated_stack_count"]),
             float(metrics["cluster_volume_mm3"]),
             float(metrics["internal_gap_mm3"]),
             float(metrics["cluster_height_mm"]),
-            float(metrics["cluster_footprint_mm2"]),
             float(metrics["residual_fragmentation"]),
             -float(metrics["contact_count"]),
             -float(metrics["minimum_support_ratio"]),

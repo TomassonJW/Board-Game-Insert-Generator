@@ -1,7 +1,7 @@
 # Next Actions
 
 <!-- P64-L09T-NEXT -->
-## Action courante : executer P64-L09T-D
+## Action courante : executer P64-L09T-E
 
 Thomas a accepte ADR-0093 et autorise l'execution autonome sequentielle du
 programme P64-L09T :
@@ -9,8 +9,8 @@ programme P64-L09T :
 1. P64-L09T-A : `done`, automatisee-validee et integree ;
 2. P64-L09T-B : `done`, diagnostics d'arret structures et UI explicable ;
 3. P64-L09T-C : `done`, poses automatiques, migration et parois certifiees ;
-4. P64-L09T-D : mission suivante, priorite globale aux couches basses ;
-5. P64-L09T-E : fermeture hybride reelle ;
+4. P64-L09T-D : `done`, classement lexicographique plancher d'abord ;
+5. P64-L09T-E : mission suivante, fermeture hybride reelle ;
 6. P64-L09T-F : certificat composite et CAD fidele ;
 7. P64-L09T-G : durcissement, nouvelle candidate, installation et preflight ;
 8. P64-L09T-V : observation Fusion humaine.
@@ -40,6 +40,11 @@ Validation C : `135/135`, `17/17`, `47/47`, syntaxe JavaScript
 `node --check` verte, puis gate globale autorisee `859/859` en `282.881 s`.
 Les onze modules benchmark/corpus/tournoi restent exclus conformement au
 contrat du Goal.
+
+Preuve D : `docs/P64_L09T_D_FLOOR_FIRST_RANKING_EVIDENCE.md`.
+Validation D : `107/107` tests cibles, `19/19` pour la lane SCIP avec une
+integration native ignoree, puis gate globale autorisee `863/863` en
+`286.898 s`. Les onze modules benchmark/corpus/tournoi restent exclus.
 
 <!-- P64-L09S-0168-NEXT -->
 ## Action courante : cloture corrective et gate P64-L09S-V

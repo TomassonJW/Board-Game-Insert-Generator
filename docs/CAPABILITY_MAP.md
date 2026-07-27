@@ -1,15 +1,16 @@
 # Capability Map
 
 <!-- P64-L09T-CAPABILITY -->
-## P64-L09T — missions A, B et C automatisees-validees
+## P64-L09T — missions A a D automatisees-validees
 
 - `C-STAGED-CALCULATION` : `automated-validated`. Toute edition geometrique
   rend minimal et final obsoletes ; seul Calculer peut republier un minimal.
   La scene devient aussi desynchronisee. Les dependances, digests, cache
   certifie exact, witness compatible et rejets stale restent acquis.
 - `C-SOLVER` / `C-LAYOUT` : `automated-validated` pour les poses X/Y des
-  reservations. La recherche est bornee, deterministe et conjointe ; la
-  priorite basse des plans complets reste a livrer en D.
+  reservations et le classement plancher d'abord. Entre plans complets
+  certifies, conteneurs eleves, bases Z, volume eleve et gene sous reservation
+  precedent empreinte, piles et compacite. Une pile necessaire reste admise.
 - `C-RESERVATION` / `C-CERTIFICATE` : `automated-validated`. La pose haute,
   l'ordre, les prismes et l'enveloppe de paroi existante sont certifies. Le
   plan minimal fige la pose reutilisee par la finition.
@@ -28,10 +29,10 @@
   l'UI affiche seulement la pose automatique calculee.
 - `C-FINISHING-COMPLEMENTS` : `deferred`. Cales separees, separateurs sans fond
   et conteneurs generes appartiennent a P64-F03.
-- `C-QUALITY` : P64-L09T-C passe `135/135`, `17/17`, `47/47`, la syntaxe
-  JavaScript et la gate globale autorisee `859/859`. Onze modules
-  benchmark/corpus/tournoi restent exclus par le contrat. 0.1.69 reste
-  `human-KO`, `do-not-run`. P64-L09T-D devient la mission suivante.
+- `C-QUALITY` : P64-L09T-D passe `107/107`, puis `19/19` avec une integration
+  SCIP native ignoree, et la gate globale autorisee `863/863` en `286.898 s`.
+  Onze modules benchmark/corpus/tournoi restent exclus par le contrat. 0.1.69
+  reste `human-KO`, `do-not-run`. P64-L09T-E devient la mission suivante.
 - `C-PRINT` : inchangee, `print-validated=false`.
 
 Cette validation reste automatisee : `fusion-validated=false`,

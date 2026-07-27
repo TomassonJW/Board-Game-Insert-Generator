@@ -20,10 +20,11 @@ from board_game_insert_generator.solver_outcome import (
 )
 
 
-RESERVED_FLOOR_STACK_VERSION = "reserved-floor-stacks-v1"
+RESERVED_FLOOR_STACK_VERSION = "reserved-floor-stacks-v2"
 DEFAULT_MAX_STATES = 1_024
 DEFAULT_MAX_PACK_ATTEMPTS = 1_024
 DEFAULT_MAX_BACKTRACK_NODES = 50_000
+DEFAULT_MAX_CANDIDATES = 8
 _EPSILON = 0.0001
 
 StopCheck = Callable[[], bool]
@@ -59,6 +60,14 @@ class ReservedFloorStackExecution:
             "minimum_envelopes_immutable": True,
             "flat_items_are_virtual_top_reservations": True,
             "floor_first_stack_bases": True,
+            "complete_state_ranking_axes": [
+                "elevated_container_count",
+                "base_z_sum_mm",
+                "elevated_volume_mm3",
+                "maximum_stack_height_mm",
+                "floor_footprint_mm2",
+                "stack_count",
+            ],
             "deterministic_digest": self.deterministic_digest,
         }
 
@@ -143,10 +152,42 @@ def _state_signature(stacks: tuple[_Stack, ...]) -> tuple[object, ...]:
 
 
 def _state_rank(stacks: tuple[_Stack, ...]) -> tuple[object, ...]:
+    """Search-only rank preserving the historical diversified feasibility lane."""
+
     return (
         round(sum(stack.base_size[0] * stack.base_size[1] for stack in stacks), 4),
         len(stacks),
         round(max((stack.height for stack in stacks), default=0.0), 4),
+        tuple(
+            sorted(
+                (round(stack.base_size[0], 4), round(stack.base_size[1], 4))
+                for stack in stacks
+            )
+        ),
+        _state_signature(stacks),
+    )
+
+
+def _complete_state_rank(stacks: tuple[_Stack, ...]) -> tuple[object, ...]:
+    """Product rank applied only after every requested container is assigned."""
+
+    layers = tuple(layer for stack in stacks for layer in stack.layers)
+    elevated = tuple(layer for layer in layers if layer.z > _EPSILON)
+    return (
+        len(elevated),
+        round(sum(layer.z for layer in layers), 4),
+        round(
+            sum(
+                layer.world_size[0]
+                * layer.world_size[1]
+                * layer.world_size[2]
+                for layer in elevated
+            ),
+            4,
+        ),
+        round(max((stack.height for stack in stacks), default=0.0), 4),
+        round(sum(stack.base_size[0] * stack.base_size[1] for stack in stacks), 4),
+        len(stacks),
         tuple(
             sorted(
                 (round(stack.base_size[0], 4), round(stack.base_size[1], 4))
@@ -681,7 +722,7 @@ def solve_reserved_floor_stacks(
     max_states: int = DEFAULT_MAX_STATES,
     max_pack_attempts: int = DEFAULT_MAX_PACK_ATTEMPTS,
     max_backtrack_nodes: int = DEFAULT_MAX_BACKTRACK_NODES,
-    max_candidates: int = 1,
+    max_candidates: int = DEFAULT_MAX_CANDIDATES,
 ) -> ReservedFloorStackExecution:
     """Return deterministic floor-stack candidates under the caller deadline."""
 
@@ -715,7 +756,8 @@ def solve_reserved_floor_stacks(
     attempts = 0
     backtrack_nodes = 0
     stopped = build.stopped
-    for stacks in build.states[: max(1, int(max_pack_attempts))]:
+    complete_states = sorted(build.states, key=_complete_state_rank)
+    for stacks in complete_states[: max(1, int(max_pack_attempts))]:
         if _stopped(should_stop):
             stopped = True
             break

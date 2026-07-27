@@ -17,6 +17,24 @@ brute lorsqu'il publie des corps composites. La couture annexe/proprietaire est
 interne au meme corps. Fusion reste un adaptateur : unions, cavites puis coupes,
 sur le thread autorise.
 
+## Classement plancher d'abord P64-L09T-D
+
+Le portefeuille minimal certifie d'abord chaque proposition avec le certificat
+commun, puis applique un rang lexicographique partage. Ce rang minimise :
+conteneurs eleves, somme des bases Z, volume eleve, gene sous les reservations,
+puis empreinte, piles et compacite.
+
+La lane de piles sous reservation conserve son classement historique pour
+l'exploration intermediaire bornee. Elle ne transforme donc pas « au sol
+d'abord » en contrainte gloutonne susceptible d'eliminer une solution. Lorsque
+tous les conteneurs sont affectes, elle ordonne plusieurs etats complets selon
+la politique produit et les soumet tous au certificat commun dans la limite
+fixee.
+
+Le même rang alimente la selection du portefeuille, le comparatif Normal/Deep,
+le pool de finition et le witness persistant. Les composantes sont des faits
+deterministes du plan ; aucun temps mural n'y participe.
+
 <!-- P64-L09S-E -->
 ## Chaine composite materialisable
 

@@ -1,11 +1,11 @@
 # Status
 
 <!-- P64-L09T-STATUS -->
-## P64-L09T — Goal actif, missions A, B et C automatisees-validees
+## P64-L09T — Goal actif, missions A a D automatisees-validees
 
 Date : 2026-07-27.
 
-Statut : `goal-active`, `P64-L09T-C-automated-validated`.
+Statut : `goal-active`, `P64-L09T-D-automated-validated`.
 
 - La gate 0.1.69 est `human-KO`, `do-not-run`. La jauge fluide, les minima et
   la cavite orientee restent des acquis positifs partiels.
@@ -38,7 +38,14 @@ Statut : `goal-active`, `P64-L09T-C-automated-validated`.
 - Les bandes de matiere entre cavite et coupe sont certifiees avec
   `wall_thickness_mm` ou le default projet existant. Aucune cavite n'est
   reduite ou translatee pour rendre une pose acceptable.
-- La priorite basse compare des plans complets avant la compacite.
+- La priorite basse compare maintenant des plans complets certifies. Elle
+  minimise conteneurs eleves, bases Z, volume eleve et gene sous reservation
+  avant empreinte, piles et compacite.
+- Les etats intermediaires conservent leur exploration de faisabilite : une
+  pile necessaire reste admissible et une tentative au sol qui ne se compacte
+  pas n'est jamais une conclusion d'impossibilite.
+- Les axes du rang sont visibles dans les metriques, le portefeuille, les
+  candidats de finition et le witness persistant.
 - Le certificat devra proteger l'epaisseur de paroi existante entre cavite et
   reservation.
 - La finition cible extensions rectangulaires puis annexes soudees ; la couture
@@ -58,6 +65,10 @@ Statut : `goal-active`, `P64-L09T-C-automated-validated`.
   `859/859` en `282.881 s`, avec un test SCIP natif ignore. Onze modules
   benchmark/corpus/tournoi restent exclus conformement au contrat du Goal et
   leurs artefacts canoniques ne sont pas recalcules dans C.
+- Validation D : `107/107` tests cibles et `19/19` pour la lane SCIP, avec une
+  integration native ignoree. La gate globale autorisee passe `863/863` en
+  `286.898 s`, avec un test ignore. Les onze modules benchmark/corpus/tournoi
+  restent exclus et aucun de leurs artefacts n'est recalcule.
 
 Programme : `docs/P64_L09T_END_TO_END_GOAL_RUNBOOK.md`.
 Preuve : `docs/P64_L09S_V_0169_HUMAN_KO_EVIDENCE.md`.
@@ -67,9 +78,10 @@ Preuve B :
 `docs/P64_L09T_B_EXPLAINABLE_FINALIZATION_STOPS_EVIDENCE.md`.
 Preuve C :
 `docs/P64_L09T_C_AUTOMATIC_TOP_RESERVATIONS_EVIDENCE.md`.
+Preuve D : `docs/P64_L09T_D_FLOOR_FIRST_RANKING_EVIDENCE.md`.
 
-Prochaine action : integrer P64-L09T-C dans `main`, puis executer P64-L09T-D
-sur la priorite lexicographique aux couches basses.
+Prochaine action : integrer P64-L09T-D dans `main`, puis executer P64-L09T-E
+sur la fermeture hybride reelle.
 `fusion-validated=false`, `print-validated=false`.
 
 <!-- P64-L09S-0168-STATUS -->

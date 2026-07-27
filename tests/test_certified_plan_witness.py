@@ -127,7 +127,7 @@ class CertifiedPlanWitnessTests(unittest.TestCase):
 
         self.assertEqual(first, second)
         self.assertEqual(first["schema_version"], CERTIFIED_PLAN_WITNESS_SCHEMA_V1)
-        self.assertEqual(len(first["source"]["rank_axes"]), 7)
+        self.assertEqual(len(first["source"]["rank_axes"]), 12)
         self.assertEqual(accepted["status"], WITNESS_ACCEPTED)
         self.assertEqual(accepted["partition"]["plan_digest"], plan["plan_digest"])
         self.assertTrue(first["invariants"]["effort_profile_is_not_a_compatibility_key"])

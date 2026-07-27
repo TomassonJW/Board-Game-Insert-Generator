@@ -37,14 +37,16 @@
 
 ### P64-L09T-D — Priorite aux couches basses
 
-- Statut : `ready-after-P64-L09T-C-integration`.
+- Statut : `done`, `automated-validated`.
 - Classer les plans complets par conteneurs eleves, bases Z, volume eleve et
   gene sous reservation avant compacite et nombre de piles.
 - Garder les piles necessaires et eviter la regle gloutonne locale.
+- Exposer le rang dans les metriques, diagnostics de portefeuille et witness.
+- Preuve : `docs/P64_L09T_D_FLOOR_FIRST_RANKING_EVIDENCE.md`.
 
 ### P64-L09T-E — Fermeture hybride
 
-- Statut : `waiting-for-P64-L09T-D`.
+- Statut : `ready-after-P64-L09T-D-integration`.
 - Extensions rectangulaires, puis decomposition et attribution du residuel.
 - Couture interne sans jeu ; jeux externes, cavites et reservations preserves.
 - Annexes soutenues, face X/Y reelle, bas Z commun et proprietaire unique.

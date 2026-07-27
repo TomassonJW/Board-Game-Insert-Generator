@@ -739,7 +739,12 @@ def certify_minimal_free_3d_plan(
     validation["unassigned_printable_volume_mm3"] = volume["residual_volume_mm3"]
     plan["validation"] = validation
 
-    metrics = _minimal_layout_metrics(problem, resolved, empty_spaces)
+    metrics = _minimal_layout_metrics(
+        problem,
+        resolved,
+        empty_spaces,
+        _mapping(plan.get("top_inset_reservations")),
+    )
     required_z_compensation_count = 0
     summary = _mapping(plan["summary"])
     summary.update(
@@ -968,6 +973,7 @@ def _minimal_layout_metrics(
     problem: Free3DPreparedProblem,
     placements: list[dict[str, object]],
     empty_spaces: tuple[EmptySpace, ...],
+    top_inset_plan: Mapping[str, object],
 ) -> dict[str, float]:
     origins = [_dimension_tuple(_mapping(item["origin_mm"])) for item in placements]
     sizes = [_dimension_tuple(_mapping(item["world_size_mm"])) for item in placements]
@@ -982,12 +988,48 @@ def _minimal_layout_metrics(
     spans = [upper[index] - lower[index] for index in range(3)]
     body_volume = sum(size[0] * size[1] * size[2] for size in sizes)
     cluster_volume = spans[0] * spans[1] * spans[2]
+    containers = [
+        (placement, origin, size)
+        for placement, origin, size in zip(placements, origins, sizes)
+        if str(placement.get("role", "")) == "container"
+    ]
+    floor_z = min(origin[2] for origin in origins)
+    elevated_containers = [
+        (placement, origin, size)
+        for placement, origin, size in containers
+        if origin[2] > floor_z + _EPSILON
+    ]
+    elevated_bodies = [
+        placement
+        for placement, origin in zip(placements, origins)
+        if origin[2] > floor_z + _EPSILON
+    ]
     support_ratios = [
         float(item.get("support_coverage_ratio", 1.0))
         for item in placements
     ]
     return {
-        "lowest_z_mm": _round(min(origin[2] for origin in origins)),
+        "lowest_z_mm": _round(floor_z),
+        "elevated_container_count": float(len(elevated_containers)),
+        "elevated_body_count": float(len(elevated_bodies)),
+        "base_z_sum_mm": _round(
+            sum(origin[2] for _, origin, _ in containers)
+        ),
+        "elevated_volume_mm3": _round(
+            sum(
+                size[0] * size[1] * size[2]
+                for _, _, size in elevated_containers
+            )
+        ),
+        "top_inset_obstructive_height_mm": _round(
+            _top_inset_obstructive_height(placements, top_inset_plan)
+        ),
+        "elevated_stack_count": float(
+            _elevated_stack_count(
+                [placement for placement, _, _ in containers],
+                floor_z,
+            )
+        ),
         "cluster_height_mm": _round(upper[2]),
         "cluster_footprint_mm2": _round(spans[0] * spans[1]),
         "cluster_volume_mm3": _round(cluster_volume),
@@ -1004,6 +1046,94 @@ def _minimal_layout_metrics(
         "top_compatibility_certified": 1.0,
         "removal_sequence_certified": 1.0,
     }
+
+
+def _top_inset_obstructive_height(
+    placements: list[dict[str, object]],
+    top_inset_plan: Mapping[str, object],
+) -> float:
+    """Sum the tallest requested-body top below each resolved flat footprint."""
+
+    total = 0.0
+    for reservation in _mappings(top_inset_plan.get("reservations")):
+        cut_origin = _mapping(reservation.get("cut_origin_mm"))
+        cut_size = _mapping(reservation.get("cut_size_mm"))
+        left = float(cut_origin.get("x", 0.0))
+        front = float(cut_origin.get("y", 0.0))
+        right = left + float(cut_size.get("x", 0.0))
+        back = front + float(cut_size.get("y", 0.0))
+        tallest = 0.0
+        for placement in placements:
+            origin = _mapping(placement.get("origin_mm"))
+            size = _mapping(placement.get("world_size_mm"))
+            body_left = float(origin.get("x", 0.0))
+            body_front = float(origin.get("y", 0.0))
+            body_right = body_left + float(size.get("x", 0.0))
+            body_back = body_front + float(size.get("y", 0.0))
+            if (
+                body_left < right - _EPSILON
+                and left < body_right - _EPSILON
+                and body_front < back - _EPSILON
+                and front < body_back - _EPSILON
+            ):
+                tallest = max(
+                    tallest,
+                    float(origin.get("z", 0.0))
+                    + float(size.get("z", 0.0)),
+                )
+        total += tallest
+    return total
+
+
+def _elevated_stack_count(
+    placements: list[dict[str, object]],
+    floor_z: float,
+) -> int:
+    """Count XY-connected elevated columns without changing support validity."""
+
+    elevated = [
+        placement
+        for placement in placements
+        if float(_mapping(placement.get("origin_mm")).get("z", 0.0))
+        > floor_z + _EPSILON
+    ]
+    remaining = set(range(len(elevated)))
+    components = 0
+    while remaining:
+        components += 1
+        pending = [remaining.pop()]
+        while pending:
+            current = elevated[pending.pop()]
+            current_origin = _mapping(current.get("origin_mm"))
+            current_size = _mapping(current.get("world_size_mm"))
+            current_left = float(current_origin.get("x", 0.0))
+            current_front = float(current_origin.get("y", 0.0))
+            current_right = current_left + float(current_size.get("x", 0.0))
+            current_back = current_front + float(current_size.get("y", 0.0))
+            adjacent: list[int] = []
+            for index in remaining:
+                candidate = elevated[index]
+                candidate_origin = _mapping(candidate.get("origin_mm"))
+                candidate_size = _mapping(candidate.get("world_size_mm"))
+                candidate_left = float(candidate_origin.get("x", 0.0))
+                candidate_front = float(candidate_origin.get("y", 0.0))
+                candidate_right = candidate_left + float(
+                    candidate_size.get("x", 0.0)
+                )
+                candidate_back = candidate_front + float(
+                    candidate_size.get("y", 0.0)
+                )
+                if (
+                    current_left < candidate_right - _EPSILON
+                    and candidate_left < current_right - _EPSILON
+                    and current_front < candidate_back - _EPSILON
+                    and candidate_front < current_back - _EPSILON
+                ):
+                    adjacent.append(index)
+            for index in adjacent:
+                remaining.remove(index)
+                pending.append(index)
+    return components
 
 
 def _contact_count(

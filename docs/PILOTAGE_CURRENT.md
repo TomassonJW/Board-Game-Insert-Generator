@@ -15,7 +15,8 @@
   cavites, reservations, unions, coupes et residuel nul certifies.
 - Les cales separees, separateurs sans fond et conteneurs de finition generes
   sont inscrits dans P64-F03 et restent differes.
-- P64-L09T est lance. Les missions A, B et C sont automatisees-validees. A rend
+- P64-L09T est lance. Les missions A, B, C et D sont
+  automatisees-validees. A rend
   toute edition geometrique explicite : elle rend
   minimal, final et scene obsoletes ; aucun placement n'est republie avant un
   clic explicite sur `Calculer`.
@@ -39,6 +40,14 @@
   sans reduire ni translater la cavite.
 - La finition recharge exactement la pose du plan minimal ; elle ne recentre
   plus les plateaux ou livrets.
+- D remplace le classement compact-first entre plans complets certifies. Il
+  minimise d'abord les conteneurs eleves, la somme de leurs bases Z, leur
+  volume eleve et la gene sous les reservations, puis seulement empreinte,
+  piles et compacite.
+- Ce classement n'est pas une contrainte gloutonne : les etats intermediaires
+  diversifies restent explores et une pile necessaire reste admissible.
+- Les composantes du rang sont exposees dans les metriques, le portefeuille,
+  le candidat selectionne, les candidats de finition et le witness.
 - Validation A : `912/912` en `329.039 s`, un test SCIP natif ignore sous
   Python 3.10, aucun benchmark/holdout solveur invoque.
 - Validation B : `99/99` tests cibles, syntaxe JavaScript `node --check`
@@ -48,8 +57,11 @@
   `17/17` solveur par etages et `47/47` CAD/resultat. La gate globale autorisee
   passe `859/859` en `282.881 s`, avec un test SCIP natif ignore. Les onze
   modules benchmark/corpus/tournoi restent exclus par le contrat du Goal.
-- Prochaine mission apres integration C : P64-L09T-D, priorite
-  lexicographique aux couches basses. Le Goal poursuit ensuite E a G puis
+- Validation D : `107/107` tests cibles, puis `19/19` pour la lane SCIP avec
+  une integration native ignoree. La gate globale autorisee passe `863/863`
+  en `286.898 s`, avec un test ignore et les onze modules interdits exclus.
+- Prochaine mission apres integration D : P64-L09T-E, fermeture hybride
+  reelle. Le Goal poursuit ensuite F et G puis
   s'arrete a P64-L09T-V.
 - Aucun benchmark/holdout, aucune valeur physique nouvelle ;
   `fusion-validated=false`, `print-validated=false`.
@@ -61,7 +73,8 @@ Autorites :
 - `docs/P64_L09T_END_TO_END_GOAL_RUNBOOK.md` ;
 - `docs/P64_L09T_A_EXPLICIT_RECALCULATION_EVIDENCE.md` ;
 - `docs/P64_L09T_B_EXPLAINABLE_FINALIZATION_STOPS_EVIDENCE.md` ;
-- `docs/P64_L09T_C_AUTOMATIC_TOP_RESERVATIONS_EVIDENCE.md`.
+- `docs/P64_L09T_C_AUTOMATIC_TOP_RESERVATIONS_EVIDENCE.md` ;
+- `docs/P64_L09T_D_FLOOR_FIRST_RANKING_EVIDENCE.md`.
 
 <!-- P64-L09S-0168-CURRENT -->
 ## Reprise canonique corrective 0.1.68

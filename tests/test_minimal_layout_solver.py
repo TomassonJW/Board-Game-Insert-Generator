@@ -22,6 +22,7 @@ from board_game_insert_generator.free_3d_plan_adapter import (
     prepare_free_3d_problem,
 )
 from board_game_insert_generator.minimal_layout_solver import (
+    _floor_first_rank_axes,
     minimal_effort_budgets,
     minimal_lane_specs,
     minimal_participant_orderings,
@@ -83,6 +84,92 @@ def _project_from_dimensions(
 
 
 class MinimalLayoutSolverTests(unittest.TestCase):
+    def test_floor_first_rank_precedes_compactness_between_complete_plans(self) -> None:
+        common = {
+            "base_z_sum_mm": 0.0,
+            "elevated_volume_mm3": 0.0,
+            "top_inset_obstructive_height_mm": 0.0,
+            "cluster_footprint_mm2": 10_000.0,
+            "elevated_stack_count": 0.0,
+            "cluster_volume_mm3": 100_000.0,
+            "internal_gap_mm3": 20_000.0,
+            "cluster_height_mm": 10.0,
+            "residual_fragmentation": 12.0,
+            "contact_count": 0.0,
+            "minimum_support_ratio": 1.0,
+        }
+        floor_plan = {
+            "minimal_layout": {
+                "metrics": {
+                    **common,
+                    "elevated_container_count": 0.0,
+                }
+            }
+        }
+        compact_stack_plan = {
+            "minimal_layout": {
+                "metrics": {
+                    **common,
+                    "elevated_container_count": 1.0,
+                    "base_z_sum_mm": 10.6,
+                    "elevated_volume_mm3": 4_000.0,
+                    "cluster_footprint_mm2": 400.0,
+                    "cluster_volume_mm3": 8_240.0,
+                    "internal_gap_mm3": 240.0,
+                    "cluster_height_mm": 20.6,
+                    "elevated_stack_count": 1.0,
+                }
+            }
+        }
+
+        self.assertLess(
+            _floor_first_rank_axes(floor_plan),
+            _floor_first_rank_axes(compact_stack_plan),
+        )
+        low_obstruction_plan = deepcopy(compact_stack_plan)
+        low_obstruction_metrics = low_obstruction_plan["minimal_layout"]["metrics"]
+        low_obstruction_metrics["top_inset_obstructive_height_mm"] = 5.0
+        low_obstruction_metrics["cluster_footprint_mm2"] = 8_000.0
+        obstructive_compact_plan = deepcopy(compact_stack_plan)
+        obstructive_metrics = obstructive_compact_plan["minimal_layout"]["metrics"]
+        obstructive_metrics["top_inset_obstructive_height_mm"] = 20.0
+        obstructive_metrics["cluster_footprint_mm2"] = 400.0
+        self.assertLess(
+            _floor_first_rank_axes(low_obstruction_plan),
+            _floor_first_rank_axes(obstructive_compact_plan),
+        )
+
+    def test_every_container_stays_on_floor_when_the_complete_plan_fits(self) -> None:
+        plan = solve_minimal_layout(
+            _project_from_dimensions(
+                {
+                    "a": (15.0, 15.0, 8.0),
+                    "b": (15.0, 15.0, 8.0),
+                    "c": (15.0, 15.0, 8.0),
+                },
+                box=(90.0, 50.0, 30.0),
+            ),
+            effort_profile="quick",
+        )
+
+        self.assertEqual(plan["solver"]["result"]["status"], SOLUTION_FOUND)
+        metrics = plan["minimal_layout"]["metrics"]
+        self.assertEqual(metrics["elevated_container_count"], 0.0)
+        self.assertEqual(metrics["base_z_sum_mm"], 0.0)
+        self.assertEqual(metrics["elevated_volume_mm3"], 0.0)
+        self.assertTrue(
+            all(
+                placement["origin_mm"]["z"] == 0.0
+                for placement in plan["placements"]
+                if placement["role"] == "container"
+            )
+        )
+        selected = plan["minimal_layout"]["search_provenance"]["selected"]
+        self.assertEqual(
+            selected["floor_first_rank"]["elevated_container_count"],
+            0.0,
+        )
+
     def test_single_container_stays_minimal_and_residual_is_unassigned(self) -> None:
         plan = solve_minimal_layout(
             simple_success_project(),
@@ -155,6 +242,34 @@ class MinimalLayoutSolverTests(unittest.TestCase):
         self.assertEqual(
             portfolio["selected"]["statement"],
             "best_certified_proposal_found_within_budget",
+        )
+        self.assertEqual(
+            [item["name"] for item in portfolio["ranking_axes"][:6]],
+            [
+                "elevated_container_count",
+                "base_z_sum_mm",
+                "elevated_volume_mm3",
+                "top_inset_obstructive_height_mm",
+                "cluster_footprint_mm2",
+                "elevated_stack_count",
+            ],
+        )
+        self.assertEqual(
+            set(portfolio["selected"]["floor_first_rank"]),
+            {
+                "elevated_container_count",
+                "base_z_sum_mm",
+                "elevated_volume_mm3",
+                "top_inset_obstructive_height_mm",
+                "cluster_footprint_mm2",
+                "elevated_stack_count",
+                "cluster_volume_mm3",
+                "internal_gap_mm3",
+                "cluster_height_mm",
+                "residual_fragmentation",
+                "contact_count",
+                "minimum_support_ratio",
+            },
         )
         self.assertNotIn("opaque_total", portfolio)
         self.assertFalse(portfolio["finalization_invocation_count"])
@@ -310,6 +425,10 @@ class MinimalLayoutSolverTests(unittest.TestCase):
             if value["name"] == "stacking_preference_violation_count"
         )
         self.assertFalse(preference["hard_constraint"])
+        metrics = plan["minimal_layout"]["metrics"]
+        self.assertEqual(metrics["elevated_container_count"], 1.0)
+        self.assertGreater(metrics["base_z_sum_mm"], 0.0)
+        self.assertGreater(metrics["elevated_volume_mm3"], 0.0)
 
     def test_floating_body_is_rejected_by_the_common_support_contract(self) -> None:
         project = simple_success_project()

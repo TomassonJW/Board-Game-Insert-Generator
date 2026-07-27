@@ -17,6 +17,25 @@
   une recherche bornee en impossibilite.
 - Aucun succes de finition sans plan final courant et residuel nul.
 
+## Gardes P64-L09T-D — priorité aux couches basses
+
+- Seuls des plans complets déjà certifiés peuvent être comparés par le rang
+  plancher d'abord.
+- Le nombre de conteneurs élevés précède toute mesure de compacité.
+- La somme des bases Z puis le volume élevé précèdent la gêne cumulée sous les
+  réservations supérieures.
+- Empreinte, nombre de piles, volume compact, vide interne, fragmentation,
+  contacts et appui ne départagent qu'après ces axes.
+- Une pile reste autorisée et certifiée lorsqu'elle est nécessaire au meilleur
+  plan complet.
+- Le pruning intermédiaire ne doit jamais transformer une préférence de rang
+  en décision gloutonne irréversible.
+- Les axes exacts et les valeurs du candidat retenu sont exposés dans le
+  portefeuille et le witness ; le temps mural reste hors identité
+  fonctionnelle.
+- Entrées et budget contractuel identiques produisent le même rang, la même
+  sélection et le même digest fonctionnel.
+
 <!-- P64-L09S-E -->
 ## Garde P64-L09S-E
 

@@ -94,6 +94,7 @@ from board_game_insert_generator.scip_product_solver import (
     solve_scip_product_3d,
 )
 from board_game_insert_generator.reserved_floor_stack_solver import (
+    DEFAULT_MAX_CANDIDATES as RESERVED_FLOOR_STACK_MAX_CANDIDATES,
     DEFAULT_MAX_PACK_ATTEMPTS as RESERVED_FLOOR_STACK_MAX_PACK_ATTEMPTS,
     DEFAULT_MAX_STATES as RESERVED_FLOOR_STACK_MAX_STATES,
     RESERVED_FLOOR_STACK_VERSION,
@@ -102,11 +103,12 @@ from board_game_insert_generator.reserved_floor_stack_solver import (
 
 
 MINIMAL_LAYOUT_FAMILY_ID = "minimal_layout_portfolio"
-MINIMAL_LAYOUT_SOLVER_VERSION = "p64-l09s-v3"
+MINIMAL_LAYOUT_SOLVER_VERSION = "p64-l09t-d-v1"
 MINIMAL_LAYOUT_PORTFOLIO_SCHEMA_V1 = "bgig.minimal_layout_portfolio.v1"
 _AXES = ("x", "y", "z")
 _EPSILON = 0.0001
 _DEEP_EXTENSION_DEADLINE_MS = 30_000
+_FLOOR_FIRST_NUMERIC_AXIS_COUNT = 12
 
 
 @dataclass(frozen=True)
@@ -867,6 +869,7 @@ def _solve_minimal_layout_once(
         )
         floor_stack_rejections: Counter[str] = Counter()
         floor_stack_seed = "not_applicable"
+        floor_stack_certified_count = 0
         for candidate_index, floor_stack_placements in enumerate(
             floor_stack_execution.candidates,
             start=1,
@@ -926,7 +929,7 @@ def _solve_minimal_layout_once(
                 )
             )
             floor_stack_fast_path_used = True
-            break
+            floor_stack_certified_count += 1
         lane_reports.append(
             {
                 "lane_id": _RESERVED_FLOOR_STACK_LANE.lane_id,
@@ -952,6 +955,9 @@ def _solve_minimal_layout_once(
                     "max_pack_attempts": (
                         RESERVED_FLOOR_STACK_MAX_PACK_ATTEMPTS
                     ),
+                    "max_complete_candidates": (
+                        RESERVED_FLOOR_STACK_MAX_CANDIDATES
+                    ),
                 },
                 "global_deadline_ms": dict(budget.limits)[
                     "max_total_elapsed_ms"
@@ -963,9 +969,7 @@ def _solve_minimal_layout_once(
                 "geometric_solution_count": len(
                     floor_stack_execution.candidates
                 ),
-                "certified_candidate_count": int(
-                    floor_stack_fast_path_used
-                ),
+                "certified_candidate_count": floor_stack_certified_count,
                 "rejection_code_counts": dict(floor_stack_rejections),
                 "deterministic_digest": (
                     floor_stack_execution.deterministic_digest
@@ -1511,6 +1515,9 @@ def _solve_minimal_layout_once(
                 "lane_id": value.lane.lane_id,
                 "order_id": value.lane.order_id,
                 "translation_id": value.translation_id,
+                "floor_first_rank": _floor_first_rank_diagnostic(
+                    value.certified.plan
+                ),
                 "plan": deepcopy(value.certified.plan),
             }
             for value in finishing_candidates
@@ -1519,10 +1526,18 @@ def _solve_minimal_layout_once(
         "finishing_candidate_pool_bounded": True,
         "finishing_candidate_pool_limit": 12,
         "ranking_axes": [
+            {"name": "elevated_container_count", "direction": "minimize"},
+            {"name": "base_z_sum_mm", "direction": "minimize"},
+            {"name": "elevated_volume_mm3", "direction": "minimize"},
+            {
+                "name": "top_inset_obstructive_height_mm",
+                "direction": "minimize",
+            },
+            {"name": "cluster_footprint_mm2", "direction": "minimize"},
+            {"name": "elevated_stack_count", "direction": "minimize"},
             {"name": "cluster_volume_mm3", "direction": "minimize"},
             {"name": "internal_gap_mm3", "direction": "minimize"},
             {"name": "cluster_height_mm", "direction": "minimize"},
-            {"name": "cluster_footprint_mm2", "direction": "minimize"},
             {"name": "residual_fragmentation", "direction": "minimize"},
             {"name": "contact_count", "direction": "maximize"},
             {"name": "minimum_support_ratio", "direction": "maximize"},
@@ -1550,6 +1565,9 @@ def _solve_minimal_layout_once(
             "translation_id": selected.translation_id,
             "placement_digest": selected.certified.placement_digest,
             "statement": "best_certified_proposal_found_within_budget",
+            "floor_first_rank": _floor_first_rank_diagnostic(
+                selected.certified.plan
+            ),
         },
         "symmetry": {
             "canonical_box_anchors_deduplicated": (
@@ -1854,16 +1872,48 @@ def _plan_search_provenance(
 
 
 def _plan_rank_axes(plan: Mapping[str, object]) -> tuple[float, ...]:
+    return _floor_first_rank_axes(plan)
+
+
+def _floor_first_rank_axes(
+    plan: Mapping[str, object],
+) -> tuple[float, ...]:
     metrics = _mapping(_mapping(plan.get("minimal_layout")).get("metrics"))
     return (
+        float(metrics["elevated_container_count"]),
+        float(metrics["base_z_sum_mm"]),
+        float(metrics["elevated_volume_mm3"]),
+        float(metrics["top_inset_obstructive_height_mm"]),
+        float(metrics["cluster_footprint_mm2"]),
+        float(metrics["elevated_stack_count"]),
         float(metrics["cluster_volume_mm3"]),
         float(metrics["internal_gap_mm3"]),
         float(metrics["cluster_height_mm"]),
-        float(metrics["cluster_footprint_mm2"]),
         float(metrics["residual_fragmentation"]),
         -float(metrics["contact_count"]),
         -float(metrics["minimum_support_ratio"]),
     )
+
+
+def _floor_first_rank_diagnostic(
+    plan: Mapping[str, object],
+) -> dict[str, float]:
+    metrics = _mapping(_mapping(plan.get("minimal_layout")).get("metrics"))
+    names = (
+        "elevated_container_count",
+        "base_z_sum_mm",
+        "elevated_volume_mm3",
+        "top_inset_obstructive_height_mm",
+        "cluster_footprint_mm2",
+        "elevated_stack_count",
+        "cluster_volume_mm3",
+        "internal_gap_mm3",
+        "cluster_height_mm",
+        "residual_fragmentation",
+        "contact_count",
+        "minimum_support_ratio",
+    )
+    return {name: float(metrics[name]) for name in names}
 
 
 def _phase_summary(
@@ -3084,17 +3134,8 @@ def _telemetry_payload(
 def _proposal_rank_key(
     certified: CertifiedFree3DPlan,
 ) -> tuple[object, ...]:
-    metrics = _mapping(
-        _mapping(certified.plan["minimal_layout"])["metrics"]
-    )
     return (
-        float(metrics["cluster_volume_mm3"]),
-        float(metrics["internal_gap_mm3"]),
-        float(metrics["cluster_height_mm"]),
-        float(metrics["cluster_footprint_mm2"]),
-        float(metrics["residual_fragmentation"]),
-        -float(metrics["contact_count"]),
-        -float(metrics["minimum_support_ratio"]),
+        *_floor_first_rank_axes(certified.plan),
         _stacking_preference_violation_count(certified.plan),
         certified.placement_digest,
     )
@@ -3165,7 +3206,8 @@ def _pareto_frontier(
 ) -> tuple[_CertifiedProposal, ...]:
     vectors = {
         value.certified.placement_digest: tuple(
-            float(item) for item in value.rank_key[:7]
+            float(item)
+            for item in value.rank_key[:_FLOOR_FIRST_NUMERIC_AXIS_COUNT]
         )
         for value in proposals
     }
