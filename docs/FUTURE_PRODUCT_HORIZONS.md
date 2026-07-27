@@ -137,3 +137,17 @@ Avant de rendre une capacité de ce registre `ready`, le lot qui l'active doit :
 
 Le programme de mesure algorithmique associé est
 `docs/P64_L06_SOLVER_BENCHMARK_CAMPAIGN.md`.
+
+## 8. Pieces de finition differees par P64-L09T
+
+ADR-0093 conserve trois familles apres la gate P64-L09T-V :
+
+| ID | Capacite | Prerequis |
+| --- | --- | --- |
+| F-FINISHING-SPACERS | Cales solides imprimees comme pieces separees | quantite minimale, marquage, tenue, retrait et gate d'impression |
+| F-FINISHING-DIVIDERS | Separateurs sans fond | parois, appuis, accessibilite, CAD et gate d'impression |
+| F-FINISHING-CONTAINERS | Conteneurs de finition generes | semantique, propriete, migration, certificat et UX |
+
+Ces pieces appartiendront a une surface future « Pieces de finition »,
+distincte de « Conteneurs et elements ». Elles ne sont ni `ready`, ni des
+criteres du Goal P64-L09T.

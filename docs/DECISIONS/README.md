@@ -1,5 +1,11 @@
 # Decisions techniques
 
+## Derniere decision active
+
+- ADR-0093-recalcul-explicite-reservations-optimisees-et-fermeture-hybride.md :
+  recalcul explicite, poses automatiques des reservations, priorite aux couches
+  basses, parois minimales et vraie fermeture hybride certifiee.
+
 Ce dossier contient les ADR (Architecture Decision Records) du projet.
 
 Une ADR est obligatoire pour toute decision structurante, notamment :

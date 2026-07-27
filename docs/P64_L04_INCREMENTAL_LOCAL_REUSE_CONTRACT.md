@@ -2,6 +2,10 @@
 
 Statut : contrat accepté ; P64-L04A, L04B et L04C automated-validated ; L04V ready-human-gate.
 
+Amendement P64-L09T : ADR-0093 supersede la republication automatique de ce
+chemin. Le document reste une preuve historique ; toute edition rend maintenant
+le plan obsolete et exige Calculer.
+
 ADR :
 [ADR-0075](DECISIONS/ADR-0075-pre-final-local-layout-reuse.md).
 

@@ -5,6 +5,31 @@ operationnel vit dans `docs/BACKLOG.md`, l'etat courant dans `docs/STATUS.md`,
 et la lecture par capabilities dans `docs/CAPABILITY_MAP.md`. La nomenclature
 et le role de ces documents sont definis dans `docs/PILOTAGE_GLOSSARY.md`.
 
+<!-- P64-L09T-ROADMAP -->
+## Correctif actif P64-L09T
+
+P64-L09T est un correctif de robustesse du parcours P64 existant. Il ne change
+pas l'ordre V0.2/V0.3 et n'ouvre aucune capability P45-P50 ou P70+.
+
+Trajectoire active :
+
+```text
+P64-L09T-A recalcul explicite
+  -> B diagnostics d'arret
+  -> C reservations automatiques et parois minimales
+  -> D priorite globale aux couches basses
+  -> E fermeture hybride reelle
+  -> F certificat composite et CAD fidele
+  -> G durcissement, package et preflight
+  -> V gate Fusion humaine
+```
+
+La seule finition automatique immediate est l'hybride
+extension rectangulaire puis annexes soudees. P64-F03 conserve ensuite trois
+familles distinctes, toutes differees : cales solides separees, separateurs
+sans fond et conteneurs de finition generes. Elles exigent une future surface
+« Pieces de finition », des contrats propres et des preuves physiques.
+
 ## Ordre canonique actif, amende par P67-V le 2026-07-14
 
 Les phases historiques ci-dessous decrivent les briques construites, pas l'ordre

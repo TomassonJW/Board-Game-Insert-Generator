@@ -1,5 +1,39 @@
 # Status
 
+<!-- P64-L09T-STATUS -->
+## P64-L09T — Goal correctif pret a etre delegue
+
+Date : 2026-07-27.
+
+Statut : `done-documentation`, `architecture-accepted`,
+`ready-for-delegated-goal-launch`.
+
+- La gate 0.1.69 est `human-KO`, `do-not-run`. La jauge fluide, les minima et
+  la cavite orientee restent des acquis positifs partiels.
+- `CasLimite01+` atteint le certificat composite puis est rejete ;
+  `CasLimite02+` ne trouve pas la fermeture rectangulaire brute exigee par le
+  repli actuel.
+- ADR-0093 supersede les reutilisations automatiques d'ADR-0075/0076 dans le
+  parcours produit. Les digests, invalidations, statuts et caches explicites
+  restent acquis.
+- Les reservations superieures restent virtuelles mais leurs poses X/Y
+  deviennent des decisions du calcul.
+- La priorite basse compare des plans complets avant la compacite.
+- Le certificat devra proteger l'epaisseur de paroi existante entre cavite et
+  reservation.
+- La finition cible extensions rectangulaires puis annexes soudees ; la couture
+  interne a un jeu nul et toutes les frontieres externes conservent leurs jeux.
+- P64-F03 conserve trois horizons : cales separees, separateurs sans fond et
+  conteneurs de finition generes.
+- Aucun code produit n'est modifie par cette preparation.
+
+Programme : `docs/P64_L09T_END_TO_END_GOAL_RUNBOOK.md`.
+Preuve : `docs/P64_L09S_V_0169_HUMAN_KO_EVIDENCE.md`.
+Decision : `docs/DECISIONS/ADR-0093-recalcul-explicite-reservations-optimisees-et-fermeture-hybride.md`.
+
+Prochaine action : executer P64-L09T-A a G dans le Goal delegue, puis arret a
+P64-L09T-V. `fusion-validated=false`, `print-validated=false`.
+
 <!-- P64-L09S-0168-STATUS -->
 ## Correctif P64-L09S-V 0.1.68
 
@@ -4067,7 +4101,7 @@ Etat courant : validation automatisee finale reussie (`833/833`, `68` exclusions
 Date : 2026-07-26.
 
 Statut : `implemented-product`, `automated-validated`,
-`awaiting-human-fusion-gate`.
+`human-KO`, `superseded-by-P64-L09T`.
 
 - `0.1.68` est reclassifie `human-KO`, `do-not-run`.
 - `CasLimite01` dispose d'une voie bornee de piles posees au sol qui respecte
@@ -4089,5 +4123,5 @@ Statut : `implemented-product`, `automated-validated`,
 
 Preuve : `docs/P64_L09S_V_0168_HUMAN_KO_EVIDENCE.md`.
 Decision : `docs/DECISIONS/ADR-0092-reservations-virtuelles-piles-au-sol-et-identite-stable.md`.
-Prochaine action unique : P64-L09S-V humaine sur le package `0.1.69`.
+Prochaine action : Goal P64-L09T selon ADR-0093 et son runbook.
 `fusion-validated=false`, `print-validated=false`.

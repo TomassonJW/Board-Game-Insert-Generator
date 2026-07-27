@@ -1,5 +1,12 @@
 # ADR-0076 — Insertion pré-finalisation d’un nouveau conteneur dans le vide global
 
+## Supersession
+
+ADR-0093 supersede l'insertion automatique d'un nouveau conteneur dans le
+parcours produit a compter du 2026-07-27. L'ajout rend le plan obsolete et
+requiert Calculer. Une future action explicite ne pourra revenir qu'apres une
+nouvelle decision produit.
+
 ## Statut
 
 Acceptée le 2026-07-22 après le retour humain globalement KO de P64-L04V et le

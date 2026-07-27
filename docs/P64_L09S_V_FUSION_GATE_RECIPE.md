@@ -1,9 +1,19 @@
 # P64-L09S-V - recette de gate Fusion humaine
 
-## Statut courant
+## Statut historique clos
 
-- Gate : obligatoire, humaine, non encore observee.
-- Package unique autorise : `0.1.69`.
+- Gate : `human-KO` apres les observations et variantes locales du 2026-07-26.
+- Package `0.1.69` : `do-not-run`.
+- Acquis conserves : jauge fluide, minima des cas de base et cavite orientee.
+- Successeur : P64-L09T, puis nouvelle gate humaine P64-L09T-V.
+- Preuve : `docs/P64_L09S_V_0169_HUMAN_KO_EVIDENCE.md`.
+- `fusion-validated=false`, `print-validated=false`.
+
+La recette ci-dessous est conservee comme historique de l'observation 0.1.69.
+Elle ne doit plus etre executee.
+
+- Gate : historique, observee puis refusee.
+- Ancien package observe : `0.1.69`.
 - Packages `0.1.65`, `0.1.66`, `0.1.67` et `0.1.68` :
   `human-KO`, `do-not-run`.
 - Preparateur canonique : `scripts/fusion/prepare_p64_l09sv_gate.ps1`.
@@ -73,7 +83,7 @@ Codex installe le package, la fixture publique, le runtime SCIP et les reglages 
 
 ## 5. Verdict
 
-La gate est `human-OK` seulement si le smoke public, `CasLimite01` avec un puis plusieurs plateaux, et `CasLimite02` avec deux plateaux passent tous du calcul a la materialisation.
+La gate aurait ete `human-OK` seulement si le smoke public, `CasLimite01` avec un puis plusieurs plateaux, et `CasLimite02` avec deux plateaux passaient tous du calcul a la materialisation.
 
 Tout echec de calcul avec plateau, rabotage de minimum, croissance de support, residuel non nul, faux succes, annexe separee, encoche hors cible, identite stale ou erreur Fusion donne `human-KO` immediat.
 

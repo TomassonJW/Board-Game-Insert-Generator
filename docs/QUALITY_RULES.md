@@ -1,5 +1,22 @@
 # Quality Rules
 
+<!-- P64-L09T-QUALITY -->
+## Gardes P64-L09T
+
+- Une edition geometrique ne peut jamais republier automatiquement un minimal.
+- Un placement « automatique » de reservation doit etre cherche et certifie,
+  pas seulement centre.
+- Entre plans certifies, la priorite aux couches basses precede la compacite.
+- Toute coupe de reservation respecte l'epaisseur de paroi existante autour des
+  cavites.
+- Une annexe a un proprietaire unique, une couture interne sans jeu et des
+  frontieres externes avec jeux preserves.
+- Le certificat produit, le certificat composite et le CAD IR portent sur la
+  meme geometrie finale.
+- Un arret avant plafond affiche temps, plafond, phase et motif sans transformer
+  une recherche bornee en impossibilite.
+- Aucun succes de finition sans plan final courant et residuel nul.
+
 <!-- P64-L09S-E -->
 ## Garde P64-L09S-E
 

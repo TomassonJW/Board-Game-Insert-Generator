@@ -1,5 +1,21 @@
 # Geometry Model
 
+<!-- P64-L09T-GEOMETRY -->
+## Geometrie figee et annexes hybrides
+
+Le plan minimal fige le coeur de chaque conteneur, sa pose monde, sa variante,
+ses cavites et les poses des reservations superieures. La finition n'a pas le
+droit de translater une cavite ou de redistribuer ses contenus.
+
+Une annexe est un prisme ajoute a l'exterieur du coeur. Sa face de contact avec
+le proprietaire devient une face interne sans jeu. Les autres faces restent
+soumises aux jeux externes, aux reservations et a l'enveloppe de paroi autour
+des cavites. La decomposition composite peut partir d'un residuel interieur ou
+de bord sans exiger qu'une partition rectangulaire brute soit deja complete.
+
+Une coupe de plateau/livret est admissible seulement si la matiere restante
+entre elle et toute cavite atteint l'epaisseur de paroi resolue du conteneur.
+
 <!-- P64-L09S-E -->
 ## Traduction CAD d'un corps composite
 

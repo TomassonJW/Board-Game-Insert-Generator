@@ -2,6 +2,12 @@
 
 Date : 2026-07-26
 
+## Supersession de gate
+
+La decision technique reste acquise, mais la gate Fusion 0.1.69 est
+`human-KO`. ADR-0093 et P64-L09T corrigent la pose seulement centree des
+reservations, la priorite de piles et la fermeture composite incomplete.
+
 ## Statut
 
 `accepted`, `implemented`, `automated-validated`, gate Fusion humaine requise.

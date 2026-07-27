@@ -1,5 +1,30 @@
 # Next Actions
 
+<!-- P64-L09T-NEXT -->
+## Action courante : lancer et executer le Goal P64-L09T
+
+Thomas a accepte ADR-0093 et autorise l'execution autonome sequentielle du
+programme P64-L09T :
+
+1. P64-L09T-A : recalcul explicite et suppression des reutilisations
+   automatiques ;
+2. P64-L09T-B : diagnostics d'arret anticipe ;
+3. P64-L09T-C : poses automatiques des reservations et parois minimales ;
+4. P64-L09T-D : priorite globale aux couches basses ;
+5. P64-L09T-E : fermeture hybride reelle ;
+6. P64-L09T-F : certificat composite et CAD fidele ;
+7. P64-L09T-G : durcissement, nouvelle candidate, installation et preflight ;
+8. P64-L09T-V : observation Fusion humaine.
+
+Le successeur suit `docs/P64_L09T_END_TO_END_GOAL_RUNBOOK.md`, travaille une
+mission a la fois et integre chaque lot dans `main` avant le suivant. Aucun
+nouveau GO n'est requis entre A et G. Il preserve les worktrees etrangers,
+n'execute aucun benchmark/holdout, ne change aucune valeur physique et
+n'implemente pas les trois familles P64-F03 differees.
+
+Le package `0.1.69` est `human-KO`, `do-not-run`.
+`fusion-validated=false`, `print-validated=false`.
+
 <!-- P64-L09S-0168-NEXT -->
 ## Action courante : cloture corrective et gate P64-L09S-V
 
@@ -366,14 +391,10 @@ Cette préparation est `done-documentation`. ADR-0080 lève ensuite la gate R1 s
 5. Ne declarer `fusion-validated` qu'apres observation humaine conforme ; conserver `print-validated=false`.
 
 <!-- P64-L09S-0169-NEXT -->
-## Prochaine action canonique P64-L09S-V 0.1.69
+## Historique clos P64-L09S-V 0.1.69
 
-1. Utiliser uniquement le package `0.1.69` construit depuis le SHA integre dans
-   `main`.
-2. Rejouer dans Fusion le smoke public, `CasLimite01` puis `CasLimite02` selon
-   `docs/P64_L09S_V_FUSION_GATE_RECIPE.md`.
-3. Verifier la jauge seconde par seconde, les minima, le residuel nul, les
-   encoches finales et le composant utilisateur unique par conteneur.
-4. Arreter toute autonomie a cette observation humaine.
-5. Conserver `0.1.65` a `0.1.68` en `human-KO` / `do-not-run` et
-   `print-validated=false`.
+1. Ne plus executer le package `0.1.69` : `human-KO`, `do-not-run`.
+2. Conserver ses acquis partiels et la preuve
+   `docs/P64_L09S_V_0169_HUMAN_KO_EVIDENCE.md`.
+3. Suivre uniquement l'action courante P64-L09T en tete de ce document.
+4. Conserver `fusion-validated=false`, `print-validated=false`.

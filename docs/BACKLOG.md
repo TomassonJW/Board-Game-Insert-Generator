@@ -1,5 +1,106 @@
 # Backlog
 
+<!-- P64-L09T-BACKLOG -->
+## Programme correctif P64-L09T
+
+### P64-L09T-P — Pilotage et delegation
+
+- Statut : `done-documentation`.
+- Livrables : KO 0.1.69, ADR-0093, runbook, roadmap, backlog, capabilities,
+  gate et handoff autonome.
+- Aucun code produit, benchmark, package ou installation Fusion.
+
+### P64-L09T-A — Recalcul explicite
+
+- Statut : `ready`.
+- Supprimer les reutilisations automatiques locales et globales.
+- Conserver invalidation, digests, statuts, cache explicite et witness.
+- Apres toute edition geometrique, exiger Calculer.
+
+### P64-L09T-B — Diagnostics d'arret
+
+- Statut : `waiting-for-P64-L09T-A`.
+- Exposer temps/plafond, phase, motif traduit, candidats et nature du verdict.
+- Ne jamais presenter une recherche bornee comme une impossibilite.
+
+### P64-L09T-C — Reservations automatiques et parois
+
+- Statut : `waiting-for-P64-L09T-B`.
+- Chercher les poses X/Y des plateaux/livrets, maintenir leur Z haut et leur
+  nature virtuelle.
+- Retirer les origines X/Y du parcours normal et migrer les anciens projets.
+- Proteger l'epaisseur de paroi existante entre cavite et coupe.
+
+### P64-L09T-D — Priorite aux couches basses
+
+- Statut : `waiting-for-P64-L09T-C`.
+- Classer les plans complets par conteneurs eleves, bases Z, volume eleve et
+  gene sous reservation avant compacite et nombre de piles.
+- Garder les piles necessaires et eviter la regle gloutonne locale.
+
+### P64-L09T-E — Fermeture hybride
+
+- Statut : `waiting-for-P64-L09T-D`.
+- Extensions rectangulaires, puis decomposition et attribution du residuel.
+- Couture interne sans jeu ; jeux externes, cavites et reservations preserves.
+- Annexes soutenues, face X/Y reelle, bas Z commun et proprietaire unique.
+
+### P64-L09T-F — Certificat composite et CAD
+
+- Statut : `waiting-for-P64-L09T-E`.
+- Certifier les vrais corps composites, pas seulement la fermeture brute.
+- Figer les cavites, unir avant cavites/coupes et publier un composant par
+  proprietaire seulement avec residuel nul.
+
+### P64-L09T-G — Durcissement et preparation Fusion
+
+- Statut : `waiting-for-P64-L09T-F`.
+- Couvrir les deux cas de base, les deux cas « + », les deltas isoles, les
+  parois, couches basses, annexes, rejets et stale.
+- Suite complete, integration, nouvelle candidate, installation et preflight.
+- Aucun benchmark/holdout.
+
+### P64-L09T-V — Gate humaine Fusion
+
+- Statut : `planned-human-gate`.
+- Depend de A a G integrees et du package candidat verifie.
+- Observe cycle explicite, poses automatiques, priorite basse, parois, annexes,
+  jeux, cavites, diagnostics, materialisation et residuel nul.
+- `fusion-validated=false`, `print-validated=false` avant verdict.
+
+## P64-F03 — Pieces de finition differees
+
+- Dependances : P64-L09T-V, puis P68 ou preuves physiques pertinentes selon la
+  famille.
+- Surface future : « Pieces de finition », distincte de « Conteneurs et
+  elements ».
+- Interdit commun : creation silencieuse, promesse de tenue,
+  `print-validated` sans impression reelle.
+- Statut : `deferred`, non inclus dans P64-L09T.
+
+### P64-F03A — Cales solides separees
+
+- Produire le moins de cales rectangulaires justifiees.
+- Chaque cale est une piece imprimable identifiee, sans cavite implicite.
+- Exiger contrat de marquage, retrait, tenue et gate d'impression.
+- Statut : `blocked-by-P64-L09T-V-and-physical-feedback`.
+
+### P64-F03B — Separateurs sans fond
+
+- Produire une piece de parois sans fond, jamais un conteneur vide ambigu.
+- Certifier epaisseurs, appuis, accessibilite et fabricabilite.
+- Statut : `blocked-by-P64-L09T-V-and-physical-feedback`.
+
+### P64-F03C — Conteneurs de finition generes
+
+- Produire un conteneur nouveau, identifie comme genere par la finition.
+- Ne pas l'ajouter silencieusement aux conteneurs et elements source.
+- Exiger semantique de contenu, propriete, migration, UX et certificat dedies.
+- Statut : `blocked-by-P64-L09T-V-and-new-ADR`.
+
+L'ancienne carte P64-F03A02 reste historique et est supersedee par cette
+decomposition.
+
 <!-- P64-L09S-F -->
 ## Cloture automatisee P64-L09S
 
@@ -3510,15 +3611,16 @@ implémentée et intégrée à la fois.
 - Interdits : benchmark, holdout, corpus, support artificiel, rabotage des minima et validation d impression.
 
 <!-- P64-L09S-0169-BACKLOG -->
-## P64-L09S-V corrective 0.1.69
+## Historique P64-L09S-V corrective 0.1.69
 
 - `human-KO` : package `0.1.68`, interdit d'execution.
+- `human-KO` : package `0.1.69`, `do-not-run`, supersede par P64-L09T.
 - `done-code` : reservations virtuelles superieures et piles au sol bornees.
 - `done-code` : cavites canoniques, repli composite depuis le minimal certifie,
   evenement de fin Fusion et identite de budget stable.
 - `done-tests` : rejeux exacts `CasLimite01/02` et suite `910/910`.
-- `blocked-human-gate` : package `0.1.69`, smoke public et deux cas limites
-  obligatoires.
+- `historical-gate-closed` : observations et deux cas « + » conserves dans la
+  preuve 0.1.69.
 - `forbidden` : support artificiel, rabotage d'un minimum, faux succes,
   polling periodique du pont Python, benchmark/holdout solveur et validation
   d'impression implicite.

@@ -1,5 +1,22 @@
 # Architecture
 
+<!-- P64-L09T-ARCHITECTURE -->
+## Frontiere P64-L09T
+
+Le cycle produit separe quatre autorites :
+
+1. l'edition invalide les artefacts sans republier de placement ;
+2. le calcul choisit et certifie corps minimaux, cavites et poses des
+   reservations virtuelles ;
+3. la finition conserve cette source immuable, puis ajoute extensions et
+   annexes ;
+4. le CAD IR traduit les vrais corps composites certifies sans recalcul.
+
+Le finaliseur ne peut plus certifier seulement une fermeture rectangulaire
+brute lorsqu'il publie des corps composites. La couture annexe/proprietaire est
+interne au meme corps. Fusion reste un adaptateur : unions, cavites puis coupes,
+sur le thread autorise.
+
 <!-- P64-L09S-E -->
 ## Chaine composite materialisable
 

@@ -1,5 +1,12 @@
 # P64-L09S — Runbook du Goal de stabilisation de bout en bout
 
+<!-- P64-L09T-SUPERSESSION -->
+## Statut historique apres 0.1.69
+
+P64-L09S-A a F restent des preuves historiques. La gate 0.1.69 est desormais
+`human-KO`, `do-not-run`. Le programme actif est P64-L09T, defini par ADR-0093
+et `docs/P64_L09T_END_TO_END_GOAL_RUNBOOK.md`.
+
 <!-- P64-L09S-F -->
 ## Point de passage P64-L09S-F
 

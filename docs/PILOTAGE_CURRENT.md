@@ -1,5 +1,32 @@
 # Pilotage courant
 
+<!-- P64-L09T-CURRENT -->
+## Reprise canonique P64-L09T
+
+- Le package `0.1.69` est `human-KO`, `do-not-run`, avec trois acquis
+  conserves : jauge fluide, minima des cas de base et cavite orientee corrigee.
+- Les variantes locales `CasLimite01+` et `CasLimite02+` calculent mais ne
+  finalisent pas de facon robuste.
+- ADR-0093 est acceptee. Elle impose un recalcul explicite apres toute edition,
+  des reservations plateau/livret automatiquement placees, une priorite globale
+  aux couches basses et une paroi minimale entre cavite et encoche.
+- La seule finition automatique immediate est hybride : extensions
+  rectangulaires, puis annexes soudables sans jeu interne, avec jeux externes,
+  cavites, reservations, unions, coupes et residuel nul certifies.
+- Les cales separees, separateurs sans fond et conteneurs de finition generes
+  sont inscrits dans P64-F03 et restent differes.
+- P64-L09T est `ready-for-delegated-goal-launch`. Le Goal execute A a G une
+  mission a la fois, avec integration directe dans `main`, puis s'arrete a la
+  gate humaine P64-L09T-V.
+- Aucun benchmark/holdout, aucune valeur physique nouvelle ;
+  `fusion-validated=false`, `print-validated=false`.
+
+Autorites :
+
+- `docs/DECISIONS/ADR-0093-recalcul-explicite-reservations-optimisees-et-fermeture-hybride.md` ;
+- `docs/P64_L09S_V_0169_HUMAN_KO_EVIDENCE.md` ;
+- `docs/P64_L09T_END_TO_END_GOAL_RUNBOOK.md`.
+
 <!-- P64-L09S-0168-CURRENT -->
 ## Reprise canonique corrective 0.1.68
 
@@ -880,10 +907,10 @@ notamment l'empilement, les appuis, les réservations et la forte cardinalité.
 - `fusion-validated=false` et `print-validated=false`.
 
 <!-- P64-L09S-0169-CURRENT -->
-## Correctif P64-L09S-V 0.1.69
+## Historique clos du correctif P64-L09S-V 0.1.69
 
-- `0.1.68` est `human-KO` et `do-not-run` apres les observations
-  `CasLimite01` et `CasLimite02`.
+- `0.1.69` est maintenant `human-KO`, `do-not-run`, supersede par P64-L09T.
+- `0.1.68` reste `human-KO` et `do-not-run`.
 - Le calcul traite les plateaux/livrets comme des reservations virtuelles
   superieures et ajoute une voie bornee de piles posees au sol pour les grands
   cas.
@@ -897,6 +924,7 @@ notamment l'empilement, les appuis, les réservations et la forte cardinalité.
   ses minima.
 - Validation finale : `910/910` en `329.251 s`, un test SCIP natif ignore sous
   Python 3.10, aucun solveur de holdout invoque.
-- Package candidat unique : `0.1.69`. Prochaine frontiere : gate Fusion humaine
-  P64-L09S-V.
+- Package observe : `0.1.69`. Preuve du KO :
+  `docs/P64_L09S_V_0169_HUMAN_KO_EVIDENCE.md`.
+- Prochaine frontiere : Goal P64-L09T, puis gate Fusion humaine P64-L09T-V.
 - `fusion-validated=false`, `print-validated=false`.

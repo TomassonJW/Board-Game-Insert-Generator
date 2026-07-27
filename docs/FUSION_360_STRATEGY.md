@@ -1,5 +1,21 @@
 # Fusion 360 Strategy
 
+<!-- P64-L09T-FUSION -->
+## Strategie P64-L09T
+
+La palette retire les origines X/Y des plateaux/livrets du parcours normal et
+affiche leurs poses resolues en lecture seule apres Calculer. Toute edition
+rend les plans obsoletes ; aucune insertion locale ou globale n'est presentee
+comme un calcul courant.
+
+La materialisation finale execute, pour chaque proprietaire : coeur, annexes,
+unions, cavites puis coupes de reservations. L'interface interne d'une annexe
+n'ajoute aucun jeu. Un echec d'union, de paroi ou de coupe conserve la scene
+precedente.
+
+La future gate P64-L09T-V utilise seulement le package prepare et installe par
+Codex. `0.1.69` est `human-KO`, `do-not-run`.
+
 <!-- P64-L09S-0168-FUSION -->
 ## Gate corrective P64-L09S-V 0.1.68
 

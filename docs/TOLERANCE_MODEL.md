@@ -1,5 +1,21 @@
 # Tolerance Model
 
+<!-- P64-L09T-TOLERANCE -->
+## Couture interne et paroi sous reservation
+
+P64-L09T ne modifie aucune valeur physique ou tolerance par defaut.
+
+- Une annexe et son conteneur proprietaire forment un seul corps : le jeu a
+  leur couture interne vaut zero.
+- Un chevauchement de construction borne peut fiabiliser l'union CAD, mais ne
+  change jamais l'enveloppe exterieure certifiee.
+- Les jeux entre corps distincts, contre la boite et autour des vides
+  techniques restent obligatoires.
+- Une cavite possede une enveloppe de matiere minimale egale a l'epaisseur de
+  paroi deja resolue pour le conteneur.
+- Une reservation ou une coupe de plateau/livret ne peut penetrer cette
+  enveloppe ; le solveur deplace la reservation ou refuse honnetement le plan.
+
 ## Objectif
 
 Le modele de tolerance evite de confondre volume theorique et volume imprime.

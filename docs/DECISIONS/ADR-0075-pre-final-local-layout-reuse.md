@@ -1,5 +1,12 @@
 # ADR-0075 — Réutilisation locale pré-finalisation d’un agencement minimal
 
+## Supersession
+
+ADR-0093 supersede ce comportement dans le parcours produit a compter du
+2026-07-27. Toute edition geometrique exige desormais un calcul global
+explicite. Les preuves et le socle d'identite/invalidation restent historiques
+et reutilisables ; la republication automatique du plan est retiree.
+
 ## Statut
 
 Acceptée le 2026-07-22 après observation humaine de P64-L03R-C dans Fusion et

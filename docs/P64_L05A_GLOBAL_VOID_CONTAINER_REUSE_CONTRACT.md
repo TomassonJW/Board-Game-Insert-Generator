@@ -1,5 +1,11 @@
 # P64-L05A — Contrat de réutilisation du vide global
 
+## Supersession P64-L09T
+
+ADR-0093 retire ce chemin du cycle automatique. L'ajout d'un conteneur rend le
+plan obsolete et exige un Calculer explicite. Le contrat ci-dessous reste une
+preuve historique.
+
 ## Statut
 
 Contrat implémenté et validé automatiquement le 2026-07-22.

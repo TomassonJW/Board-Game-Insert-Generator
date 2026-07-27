@@ -1,5 +1,28 @@
 # P64-A02 — Programme de calcul étagé et finalisation explicite
 
+<!-- P64-L09T-AMENDMENT -->
+## Amendement P64-L09T — cycle explicite et finition hybride
+
+ADR-0093 supersede les chemins produit de reutilisation automatique
+pre-finalisation. Une edition geometrique rend le minimal et le final obsoletes ;
+seul un clic Calculer peut republier un plan minimal. Le suivi de dependances,
+les digests, l'invalidation ciblee, les caches exacts sur action explicite et le
+rejet stale restent normatifs.
+
+Le minimal publie desormais une decision complete : corps, cavites et poses
+automatiques des reservations superieures. Ces donnees sont figees avant la
+finition. Le classement prefere les couches basses entre plans certifies avant
+la compacite.
+
+La finition immediate est unique : extensions rectangulaires puis attribution
+directe du residuel a des annexes soudees. La couture interne n'a pas de jeu ;
+les jeux externes et l'epaisseur de paroi autour des cavites restent
+obligatoires. Le certificat porte sur les vrais corps composites et exige un
+residuel nul.
+
+Les cales separees, separateurs sans fond et conteneurs generes restent dans
+P64-F03 et ne participent pas au runtime P64-L09T.
+
 <!-- P64-L09S-F -->
 ## Durcissement P64-L09S-F
 

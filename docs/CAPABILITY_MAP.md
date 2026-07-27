@@ -1,5 +1,34 @@
 # Capability Map
 
+<!-- P64-L09T-CAPABILITY -->
+## P64-L09T — capabilities correctives planifiees
+
+- `C-STAGED-CALCULATION` : `architecture-accepted`. Toute edition geometrique
+  rend minimal et final obsoletes ; seul Calculer peut republier un minimal.
+  Les dependances, digests, caches explicites et rejets stale restent acquis.
+- `C-SOLVER` / `C-LAYOUT` : `architecture-accepted`. Les poses X/Y des
+  reservations deviennent des variables du calcul et les plans complets
+  minimisent les conteneurs eleves avant la compacite.
+- `C-RESERVATION` / `C-CERTIFICATE` : `architecture-accepted`. La pose haute,
+  l'ordre et l'enveloppe de paroi autour des cavites deviennent certifiables.
+- `C-PARTITION` / `C-COMPOSITE` : `architecture-accepted`. La finition hybride
+  peut attribuer directement le residuel a des annexes, sans exiger d'abord une
+  fermeture brute complete.
+- `C-TOLERANCE` : aucun default ne change. La couture annexe/proprietaire est
+  interne, sans jeu ; tous les jeux externes et l'epaisseur de paroi existante
+  restent normatifs.
+- `C-CAD-IR` / `C-FUSION` : planifies pour certifier et materialiser les vrais
+  corps composites, unions avant cavites et coupes.
+- `C-FUSION-UI` : planifiee pour retirer les origines X/Y et le bruit de
+  reutilisation, puis expliquer les arrets anticipes.
+- `C-FINISHING-COMPLEMENTS` : `deferred`. Cales separees, separateurs sans fond
+  et conteneurs generes appartiennent a P64-F03.
+- `C-QUALITY` : 0.1.69 `human-KO`; P64-L09T
+  `ready-for-delegated-goal-launch`.
+- `C-PRINT` : inchangee, `print-validated=false`.
+
+Aucune capability runtime n'est promue par la preparation documentaire.
+
 <!-- P64-L09S-0168-CAPABILITY -->
 ## Correctif de capability plateau et finition complexe
 
@@ -2266,5 +2295,5 @@ Aucune capability runtime n'est promue par cette préparation documentaire.
 - `C-FUSION-UI` : `automated-validated`. Progression locale a une seconde et
   evenement unique de fin ; observation Qt/HTML encore humaine.
 - `C-QUALITY` : identite fonctionnelle stable sur deux replays de corpus.
-- `C-FUSION` : `awaiting-human-gate` sur le package `0.1.69`.
+- `C-FUSION` : package `0.1.69` `human-KO`, supersede par P64-L09T.
 - `C-PRINT` : inchangee, `print-validated=false`.

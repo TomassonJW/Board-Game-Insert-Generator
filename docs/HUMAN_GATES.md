@@ -1,5 +1,38 @@
 # Human Gates
 
+<!-- P64-L09T-GATE -->
+## P64-L09T — programme autorise, gate V future
+
+Decision humaine du 2026-07-27 :
+
+- `0.1.69` est `human-KO`, `do-not-run`, avec acquis partiels positifs ;
+- ADR-0093 est acceptee ;
+- P64-L09T-A a G sont autorisees sequentiellement, sans nouveau GO ;
+- la finition hybride est la seule strategie automatique immediate ;
+- les cales separees, separateurs sans fond et conteneurs generes restent
+  differes ;
+- P64-L09T-V reste la seule prochaine gate humaine.
+
+Le Goal peut modifier le runtime, les contrats, tests, CAD IR, palette et
+adaptateur Fusion dans le perimetre exact du runbook. Une nouvelle gate est
+requise avant toute modification d'une valeur physique ou de tolerance, toute
+extension aux annexes flottantes/Z seules, tout mecanisme ou toute
+implementation des familles P64-F03.
+
+P64-L09T-V observera au minimum :
+
+1. absence de reutilisation automatique apres edition ;
+2. calcul explicite et poses automatiques des plateaux/livrets ;
+3. preference reelle pour les couches basses ;
+4. paroi minimale entre cavites et encoches ;
+5. finalisation et materialisation de `CasLimite01+` et `CasLimite02+` ;
+6. annexes soudees sans jeu interne et jeux externes preserves ;
+7. cavites figees, unions avant coupes et residuel nul ;
+8. raison lisible de tout arret avant plafond.
+
+Avant cette observation : `fusion-validated=false`,
+`print-validated=false`.
+
 <!-- P64-L09S-0168-GATE -->
 ## P64-L09S-V corrective - package 0.1.68
 
@@ -1423,10 +1456,10 @@ L'observation humaine doit confirmer sur le projet complexe recent :
 Statuts avant observation : `fusion-validated=false`, `print-validated=false`.
 
 <!-- P64-L09S-0169-HUMAN-GATE -->
-## P64-L09S-V 0.1.69 - gate humaine courante
+## P64-L09S-V 0.1.69 - gate humaine close en KO
 
-`0.1.68` est `human-KO` et `do-not-run`. Le seul package autorise est
-`0.1.69`, construit depuis le SHA integre dans `main`.
+`0.1.68` et `0.1.69` sont `human-KO`, `do-not-run`. Les observations suivantes
+sont conservees comme recette historique, pas comme actions a rejouer.
 
 Thomas doit observer :
 
@@ -1439,5 +1472,6 @@ Thomas doit observer :
 - aucun faux `finalized_plan_ready`, aucun support artificiel et un seul
   composant utilisateur par conteneur.
 
-La recette canonique est `docs/P64_L09S_V_FUSION_GATE_RECIPE.md`.
-Avant le verdict : `fusion-validated=false`, `print-validated=false`.
+La preuve canonique est `docs/P64_L09S_V_0169_HUMAN_KO_EVIDENCE.md`.
+Le successeur est P64-L09T. `fusion-validated=false`,
+`print-validated=false`.

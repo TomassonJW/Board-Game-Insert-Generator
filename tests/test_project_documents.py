@@ -55,14 +55,17 @@ REQUIRED_PROJECT_FILES = (
     "docs/DECISIONS/ADR-0089-reservations-minimales-et-fermeture-globale-composee.md",
     "docs/DECISIONS/ADR-0091-projection-reservations-et-pool-minimal-finition.md",
     "docs/DECISIONS/ADR-0092-reservations-virtuelles-piles-au-sol-et-identite-stable.md",
+    "docs/DECISIONS/ADR-0093-recalcul-explicite-reservations-optimisees-et-fermeture-hybride.md",
     "docs/P64_L09R_CALCUL_FINITION_PROGRESS_CONTRACT.md",
     "docs/P64_L09R_V_0165_HUMAN_KO_EVIDENCE.md",
     "docs/P64_L09S_V_0167_HUMAN_KO_EVIDENCE.md",
     "docs/P64_L09S_V_0168_HUMAN_KO_EVIDENCE.md",
+    "docs/P64_L09S_V_0169_HUMAN_KO_EVIDENCE.md",
     "docs/P64_L09S_A_MINIMAL_RESERVATION_EVIDENCE.md",
     "docs/P64_L09S_B_CYCLE_TRUTH_EVIDENCE.md",
     "docs/P64_L09S_C_GLOBAL_RECTANGULAR_CLOSURE_EVIDENCE.md",
     "docs/P64_L09S_END_TO_END_GOAL_RUNBOOK.md",
+    "docs/P64_L09T_END_TO_END_GOAL_RUNBOOK.md",
     "docs/P64_L06C_OFFLINE_ADAPTER_AND_EXACT_ORACLE_CONTRACT.md",
     "docs/P64_L06C_OFFLINE_ADAPTER_AND_EXACT_ORACLE_EVIDENCE.md",
     "docs/FUTURE_PRODUCT_HORIZONS.md",
@@ -843,7 +846,8 @@ class P64L09SV0168DocumentEvidenceTests(unittest.TestCase):
         ):
             self.assertIn(marker, decision)
         for marker in (
-            "Package unique autorise : `0.1.69`",
+            "Package `0.1.69` : `do-not-run`",
+            "Successeur : P64-L09T",
             "bgig_palette_operation_ready",
             "Calcul Normal",
             "Finition Normal",
@@ -851,6 +855,74 @@ class P64L09SV0168DocumentEvidenceTests(unittest.TestCase):
             "print-validated=false",
         ):
             self.assertIn(marker, recipe)
+
+
+class P64L09TDocumentPilotageTests(unittest.TestCase):
+    def test_goal_program_and_decision_are_guarded(self) -> None:
+        from pathlib import Path
+
+        root = Path(__file__).resolve().parents[1]
+        decision = (
+            root
+            / "docs"
+            / "DECISIONS"
+            / "ADR-0093-recalcul-explicite-reservations-optimisees-et-fermeture-hybride.md"
+        ).read_text(encoding="utf-8")
+        evidence = (
+            root / "docs" / "P64_L09S_V_0169_HUMAN_KO_EVIDENCE.md"
+        ).read_text(encoding="utf-8")
+        runbook = (
+            root / "docs" / "P64_L09T_END_TO_END_GOAL_RUNBOOK.md"
+        ).read_text(encoding="utf-8")
+        next_actions = (root / "docs" / "NEXT_ACTIONS.md").read_text(
+            encoding="utf-8"
+        )
+
+        for marker in (
+            "## Statut",
+            "## Contexte",
+            "## Options",
+            "## Décision",
+            "## Conséquences",
+            "## Alternatives refusées",
+            "## Suivi",
+            "Toute édition géométrique exige un calcul explicite",
+            "Une annexe soudée n'a pas de jeu interne",
+            "Les autres familles de finition sont différées",
+        ):
+            self.assertIn(marker, decision)
+
+        for marker in (
+            "package observé : `0.1.69`",
+            "verdict : `human-KO`",
+            "CasLimite01+",
+            "CasLimite02+",
+            "xy_composite_product_certificate_rejected",
+            "xy_composite_gross_partition_not_found",
+            "fusion-validated=false",
+            "print-validated=false",
+        ):
+            self.assertIn(marker, evidence)
+
+        for marker in (
+            "ready-for-delegated-goal-launch",
+            "P64-L09T-A",
+            "P64-L09T-G",
+            "P64-L09T-V",
+            "Recalcul explicite",
+            "Pose automatique des réservations",
+            "Fermeture hybride réelle",
+            "gpt-5.6-sol",
+            "xhigh",
+        ):
+            self.assertIn(marker, runbook)
+
+        for marker in (
+            "Action courante : lancer et executer le Goal P64-L09T",
+            "nouveau GO n'est requis entre A et G",
+            "0.1.69` est `human-KO",
+        ):
+            self.assertIn(marker, next_actions)
 
 if __name__ == "__main__":
     unittest.main()
