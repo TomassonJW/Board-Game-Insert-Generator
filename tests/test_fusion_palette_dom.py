@@ -60,7 +60,9 @@ class FusionPaletteDomTests(unittest.TestCase):
             self.assertIn(marker, self.markup)
         self.assertIn("['dimension_modes','target_outer_dimensions_mm','locked_outer_dimensions_mm','expansion_axes']", self.markup)
         self.assertNotIn('data-bridge="swap_', self.markup)
-        self.assertIn("project.flat_items[index].origin_mm=values.x==null||values.y==null", self.markup)
+        self.assertNotIn('data-row="flat-origin"', self.markup)
+        self.assertNotIn("project.flat_items[index].origin_mm=values.x==null||values.y==null", self.markup)
+        self.assertIn("Position automatique", self.markup)
         self.assertIn("rotation_deg_z", self.markup)
 
     def test_uses_utf8_french_copy_without_mojibake(self) -> None:

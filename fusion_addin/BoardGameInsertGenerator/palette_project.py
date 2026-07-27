@@ -305,18 +305,27 @@ def _now_ms() -> int:
 def load_current_project(addin_dir: str | Path, project_root: str | Path | None = None) -> dict[str, object]:
     """Load and normalize the current project, or return a valid blank project."""
 
+    return _load_current_project_normalization(addin_dir, project_root).project
+
+
+def _load_current_project_normalization(
+    addin_dir: str | Path,
+    project_root: str | Path | None = None,
+) -> Any:
+    """Keep migration provenance available without rewriting the source."""
+
     root = Path(addin_dir)
     _ensure_engine_available(root, None if project_root is None else Path(project_root))
     from board_game_insert_generator.project_v1 import blank_project_v1, normalize_project_draft
 
     path = current_project_path(root)
     if not path.is_file():
-        return blank_project_v1()
+        return normalize_project_draft(blank_project_v1())
     try:
         raw = json.loads(path.read_text(encoding="utf-8-sig"))
     except (OSError, json.JSONDecodeError) as exc:
         raise PaletteProjectError(f"Le projet local est illisible : {exc}.") from exc
-    return normalize_project_draft(raw).project
+    return normalize_project_draft(raw)
 
 
 def current_project_path(addin_dir: str | Path) -> Path:
@@ -502,7 +511,17 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
             document=_document_info(addin_dir, document_state),
         )
     if action == "load_project":
-        project = load_current_project(addin_dir)
+        current_normalization = _load_current_project_normalization(addin_dir)
+        project = current_normalization.project
+        migration_warnings = (
+            [
+                "Les anciennes origines XY des plateaux et livrets ont ete "
+                "migrees vers le placement automatique. Le fichier source ne "
+                "sera reecrit qu a l enregistrement explicite."
+            ]
+            if current_normalization.migrated
+            else []
+        )
         return _response(
             request_id,
             "ready",
@@ -514,6 +533,8 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
             document=_document_info(addin_dir, document_state),
             solver_settings=solver_settings,
             finishing_effort=finishing_effort_profile,
+            migrated=current_normalization.migrated,
+            warnings=migration_warnings,
         )
     if action == "new_project":
         project = blank_project_v1()
@@ -813,7 +834,14 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
 
     warnings: list[str] = []
     if normalization.migrated:
-        warnings.append(f"Projet migre depuis {normalization.source_schema} vers bgig.project.v1.")
+        if normalization.source_schema == "bgig.project.v1":
+            warnings.append(
+                "Les anciennes origines XY des plateaux et livrets ont ete "
+                "migrees vers le placement automatique. Le fichier source ne "
+                "sera reecrit qu a l enregistrement explicite."
+            )
+        else:
+            warnings.append(f"Projet migre depuis {normalization.source_schema} vers bgig.project.v1.")
     return _response(
         request_id,
         "ready",

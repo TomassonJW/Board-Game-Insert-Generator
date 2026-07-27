@@ -97,6 +97,7 @@ class Free3DPreparedProblem:
     participants: tuple[dict[str, object], ...]
     top_inset_zones: tuple[TopInsetZone, ...]
     requested_container_count: int
+    top_inset_pose_resolved: bool = False
     container_variant_frontiers: tuple[ContainerVariantFrontier, ...] = ()
 
 
@@ -150,14 +151,23 @@ class CertifiedFree3DPlan:
     container_variant_global_certificate: ContainerVariantGlobalCertificate | None = None
 
 
-def prepare_free_3d_problem(raw_project: object) -> Free3DPreparation:
+def prepare_free_3d_problem(
+    raw_project: object,
+    *,
+    top_inset_plan: Mapping[str, object] | None = None,
+) -> Free3DPreparation:
     """Derive the same canonical participants as the stage-stack baseline."""
 
     normalization = normalize_project_draft(raw_project)
     project = normalization.project
-    top_inset_plan = derive_top_inset_reservations(project)
+    pose_resolved = top_inset_plan is not None
+    resolved_top_inset_plan = (
+        deepcopy(dict(top_inset_plan))
+        if top_inset_plan is not None
+        else derive_top_inset_reservations(project)
+    )
     box = _dimension(_mapping(project["box"])["inner_dimensions_mm"])
-    storage_height = float(top_inset_plan["design_top_z_mm"])
+    storage_height = float(resolved_top_inset_plan["design_top_z_mm"])
     layout = _mapping(project["layout"])
     xy_clearance = float(layout["layout_clearance_mm"])
     box_xy_clearance = float(layout["container_box_xy_clearance_mm"])
@@ -167,7 +177,7 @@ def prepare_free_3d_problem(raw_project: object) -> Free3DPreparation:
         max_container_height_mm=max(storage_height, 0.001),
     )
     rejection_codes: list[str] = []
-    if _mappings(top_inset_plan["blockers"]):
+    if _mappings(resolved_top_inset_plan["blockers"]):
         rejection_codes.append("TOP_INSET_INPUT_BLOCKED")
     if _mapping(envelope_report["summary"])["status"] == "blocked":
         rejection_codes.append("CONTAINER_MINIMUM_BLOCKED")
@@ -188,7 +198,7 @@ def prepare_free_3d_problem(raw_project: object) -> Free3DPreparation:
         _container_participant(
             item,
             groups_by_id[str(item["container_group_id"])],
-            top_inset_plan=top_inset_plan,
+            top_inset_plan=resolved_top_inset_plan,
             default_floor_mm=default_floor,
             storage_height_mm=storage_height,
         )
@@ -236,14 +246,14 @@ def prepare_free_3d_problem(raw_project: object) -> Free3DPreparation:
             support_plane_z_mm=float(item["support_plane_z_mm"]),
             inset_depth_mm=float(item["inset_depth_from_top_mm"]),
         )
-        for item in _mappings(top_inset_plan["reservations"])
-    )
+        for item in _mappings(resolved_top_inset_plan["reservations"])
+    ) if pose_resolved else ()
     problem = Free3DPreparedProblem(
         normalization_source_schema=normalization.source_schema,
         normalization_migrated=normalization.migrated,
         project=project,
-        top_inset_plan=top_inset_plan,
-        flat_stack=compatibility_flat_stack_payload(top_inset_plan),
+        top_inset_plan=resolved_top_inset_plan,
+        flat_stack=compatibility_flat_stack_payload(resolved_top_inset_plan),
         envelope_report=envelope_report,
         box=box,
         storage_height_mm=storage_height,
@@ -253,6 +263,7 @@ def prepare_free_3d_problem(raw_project: object) -> Free3DPreparation:
         participants=tuple(participants),
         top_inset_zones=top_inset_zones,
         requested_container_count=requested_count,
+        top_inset_pose_resolved=pose_resolved,
     )
     return Free3DPreparation(status="ready", problem=problem, rejection_codes=())
 
@@ -399,9 +410,21 @@ def certify_free_3d_plan(
         resolved.append(placement)
 
     applied_top_insets = (
-        certify_top_inset_reservation_prisms(problem.project, resolved)
+        certify_top_inset_reservation_prisms(
+            problem.project,
+            resolved,
+            top_inset_plan=(
+                problem.top_inset_plan if problem.top_inset_pose_resolved else None
+            ),
+        )
         if top_inset_mode == "reserved_prisms"
-        else apply_top_inset_reservations(problem.project, resolved)
+        else apply_top_inset_reservations(
+            problem.project,
+            resolved,
+            top_inset_plan=(
+                problem.top_inset_plan if problem.top_inset_pose_resolved else None
+            ),
+        )
     )
     if _mappings(applied_top_insets["blockers"]):
         codes = tuple(
@@ -527,7 +550,7 @@ def certify_free_3d_plan(
             "storage_height_mm": _round(problem.storage_height_mm),
         },
         "clearance_policy": _clearance_policy(problem.project),
-        "flat_stack": deepcopy(problem.flat_stack),
+        "flat_stack": compatibility_flat_stack_payload(applied_top_insets),
         "top_inset_reservations": _top_inset_payload(applied_top_insets),
         "support": deepcopy(applied_top_insets["support"]),
         "stage_support": support,

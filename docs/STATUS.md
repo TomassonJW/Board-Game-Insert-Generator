@@ -1,11 +1,11 @@
 # Status
 
 <!-- P64-L09T-STATUS -->
-## P64-L09T — Goal actif, missions A et B automatisees-validees
+## P64-L09T — Goal actif, missions A, B et C automatisees-validees
 
 Date : 2026-07-27.
 
-Statut : `goal-active`, `P64-L09T-B-automated-validated`.
+Statut : `goal-active`, `P64-L09T-C-automated-validated`.
 
 - La gate 0.1.69 est `human-KO`, `do-not-run`. La jauge fluide, les minima et
   la cavite orientee restent des acquis positifs partiels.
@@ -29,8 +29,15 @@ Statut : `goal-active`, `P64-L09T-B-automated-validated`.
   volet technique replie.
 - Une raison bornee inconnue ne peut jamais devenir visuellement une
   impossibilite sans `proof_of_impossibility=true`.
-- Les reservations superieures restent virtuelles mais leurs poses X/Y
-  deviennent des decisions du calcul.
+- Les reservations superieures restent virtuelles. Leurs poses X/Y sont
+  maintenant des decisions bornees et deterministes du calcul, figees dans le
+  plan minimal puis reutilisees a l'identique par la finition.
+- Les origines X/Y manuelles ont disparu de la palette. Les anciens projets
+  sont normalises vers le placement automatique sans reecriture avant une
+  sauvegarde explicite.
+- Les bandes de matiere entre cavite et coupe sont certifiees avec
+  `wall_thickness_mm` ou le default projet existant. Aucune cavite n'est
+  reduite ou translatee pour rendre une pose acceptable.
 - La priorite basse compare des plans complets avant la compacite.
 - Le certificat devra proteger l'epaisseur de paroi existante entre cavite et
   reservation.
@@ -46,6 +53,11 @@ Statut : `goal-active`, `P64-L09T-B-automated-validated`.
   validee par `node --check`. La suite complete finale passe `922/922` en
   `299.3 s`, avec un test SCIP natif ignore sous Python 3.10. Aucun benchmark
   ou holdout solveur n'a ete invoque.
+- Validation C ciblee : `135/135`, `17/17` et `47/47`, avec syntaxe JavaScript
+  embarquee validee par `node --check`. La gate globale autorisee passe
+  `859/859` en `282.881 s`, avec un test SCIP natif ignore. Onze modules
+  benchmark/corpus/tournoi restent exclus conformement au contrat du Goal et
+  leurs artefacts canoniques ne sont pas recalcules dans C.
 
 Programme : `docs/P64_L09T_END_TO_END_GOAL_RUNBOOK.md`.
 Preuve : `docs/P64_L09S_V_0169_HUMAN_KO_EVIDENCE.md`.
@@ -53,9 +65,11 @@ Decision : `docs/DECISIONS/ADR-0093-recalcul-explicite-reservations-optimisees-e
 Preuve A : `docs/P64_L09T_A_EXPLICIT_RECALCULATION_EVIDENCE.md`.
 Preuve B :
 `docs/P64_L09T_B_EXPLAINABLE_FINALIZATION_STOPS_EVIDENCE.md`.
+Preuve C :
+`docs/P64_L09T_C_AUTOMATIC_TOP_RESERVATIONS_EVIDENCE.md`.
 
-Prochaine action : integrer P64-L09T-B dans `main`, puis executer P64-L09T-C
-sur les reservations automatiques et la paroi minimale certifiee.
+Prochaine action : integrer P64-L09T-C dans `main`, puis executer P64-L09T-D
+sur la priorite lexicographique aux couches basses.
 `fusion-validated=false`, `print-validated=false`.
 
 <!-- P64-L09S-0168-STATUS -->

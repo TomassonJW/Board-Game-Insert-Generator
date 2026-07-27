@@ -1,16 +1,15 @@
 # Next Actions
 
 <!-- P64-L09T-NEXT -->
-## Action courante : executer P64-L09T-C
+## Action courante : executer P64-L09T-D
 
 Thomas a accepte ADR-0093 et autorise l'execution autonome sequentielle du
 programme P64-L09T :
 
 1. P64-L09T-A : `done`, automatisee-validee et integree ;
 2. P64-L09T-B : `done`, diagnostics d'arret structures et UI explicable ;
-3. P64-L09T-C : mission suivante, poses automatiques des reservations et
-   parois minimales ;
-4. P64-L09T-D : priorite globale aux couches basses ;
+3. P64-L09T-C : `done`, poses automatiques, migration et parois certifiees ;
+4. P64-L09T-D : mission suivante, priorite globale aux couches basses ;
 5. P64-L09T-E : fermeture hybride reelle ;
 6. P64-L09T-F : certificat composite et CAD fidele ;
 7. P64-L09T-G : durcissement, nouvelle candidate, installation et preflight ;
@@ -34,6 +33,13 @@ Preuve B :
 Validation B ciblee : `99/99` et syntaxe JavaScript `node --check` verte.
 Suite complete : `922/922` en `299.3 s`, un test SCIP natif ignore sous
 Python 3.10, aucun benchmark ou holdout solveur invoque.
+
+Preuve C :
+`docs/P64_L09T_C_AUTOMATIC_TOP_RESERVATIONS_EVIDENCE.md`.
+Validation C : `135/135`, `17/17`, `47/47`, syntaxe JavaScript
+`node --check` verte, puis gate globale autorisee `859/859` en `282.881 s`.
+Les onze modules benchmark/corpus/tournoi restent exclus conformement au
+contrat du Goal.
 
 <!-- P64-L09S-0168-NEXT -->
 ## Action courante : cloture corrective et gate P64-L09S-V

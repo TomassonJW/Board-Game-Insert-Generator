@@ -95,14 +95,29 @@ def normalize_project_draft(raw_project: object) -> ProjectNormalization:
     raw = _mapping(raw_project, "project")
     schema_version = _required_text(raw, "schema_version", "project")
     if schema_version == PROJECT_SCHEMA_V1:
+        project = _validate_v1(raw)
+        flat_items = _list(project["flat_items"], "project.flat_items")
+        migrated_manual_flat_origins = any(
+            item.get("origin_mm") is not None
+            for item in (_mapping(value, "project.flat_items") for value in flat_items)
+        )
+        if migrated_manual_flat_origins:
+            for item in (_mapping(value, "project.flat_items") for value in flat_items):
+                item["origin_mm"] = None
         return ProjectNormalization(
-            project=_validate_v1(raw),
+            project=project,
             source_schema=PROJECT_SCHEMA_V1,
-            migrated=False,
+            migrated=migrated_manual_flat_origins,
         )
     if schema_version == LEGACY_LOCAL_COMPOSER_SCHEMA_V0:
+        project = migrate_local_composer_v0(raw)
+        for item in (
+            _mapping(value, "project.flat_items")
+            for value in _list(project["flat_items"], "project.flat_items")
+        ):
+            item["origin_mm"] = None
         return ProjectNormalization(
-            project=migrate_local_composer_v0(raw),
+            project=project,
             source_schema=LEGACY_LOCAL_COMPOSER_SCHEMA_V0,
             migrated=True,
         )

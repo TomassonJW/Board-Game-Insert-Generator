@@ -53,7 +53,14 @@ class P64L09VFusionPreflightTests(unittest.TestCase):
         )
         self.assertEqual(
             summary["cases"]["tray_finalization"]["top_inset_zone_count"],
+            0,
+        )
+        self.assertEqual(
+            summary["cases"]["tray_finalization"]["top_inset_preview_count"],
             1,
+        )
+        self.assertTrue(
+            summary["cases"]["tray_finalization"]["automatic_xy_pose_pending"]
         )
         self.assertEqual(
             summary["expected_solver_settings"],

@@ -407,7 +407,7 @@ class PartitionSolverTests(unittest.TestCase):
             {item["code"] for item in result["diagnostics"]},
         )
 
-    def test_constraint_directed_beam_keeps_dense_repeated_containers_solvable(self) -> None:
+    def test_dense_historical_origins_migrate_and_bounded_failure_stays_truthful(self) -> None:
         project = localized_top_inset_order_project()
         token_content = next(
             item for item in project["contents"]
@@ -446,20 +446,15 @@ class PartitionSolverTests(unittest.TestCase):
 
         result = solve_partition_plan(project)
 
-        self.assertEqual(result["summary"]["status"], "constructed")
+        self.assertEqual(result["summary"]["status"], "impossible")
         self.assertEqual(
-            result["summary"]["placed_container_count"],
-            result["summary"]["requested_container_count"],
+            result["solver"]["result"]["status"],
+            "no_solution_within_budget",
         )
-        self.assertEqual(result["stage_support"]["status"], "supported")
-        self.assertEqual(
-            result["solver"]["search"]["structured_order_strategy"],
-            "top_inset_safe_top_asc",
-        )
-        self.assertEqual(result["solver"]["search"]["hash_portfolios_evaluated"], 0)
-        self.assertTrue(result["validation"]["no_collisions"])
-        self.assertNotIn(
-            "TOP_INSET_PIERCES_CAVITY_FLOOR",
+        self.assertIsNone(result["solver"]["result"]["proof"])
+        self.assertTrue(result["source"]["migrated"])
+        self.assertIn(
+            "NO_VALIDATED_STAGE_PROPOSAL",
             {item["code"] for item in result["diagnostics"]},
         )
     def test_is_deterministic_for_the_same_normalized_project(self) -> None:

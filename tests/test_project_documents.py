@@ -918,8 +918,8 @@ class P64L09TDocumentPilotageTests(unittest.TestCase):
             self.assertIn(marker, runbook)
 
         for marker in (
-            "Action courante : executer P64-L09T-C",
-            "P64-L09T-B : `done`",
+            "Action courante : executer P64-L09T-D",
+            "P64-L09T-C : `done`",
             "nouveau GO n'est requis entre A et G",
             "0.1.69` est `human-KO",
         ):

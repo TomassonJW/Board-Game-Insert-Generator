@@ -303,7 +303,19 @@ def _finalize_coupled_volume_candidate(
             ),
         )
 
-    preparation = prepare_free_3d_problem(raw_project)
+    frozen_top_inset_plan = minimal_plan.get("top_inset_reservations")
+    if not isinstance(frozen_top_inset_plan, Mapping):
+        raise CoupledFinalizationError(
+            "Le plan minimal ne contient pas ses reservations superieures figees.",
+            _failure_report(
+                "minimal_top_inset_plan_missing",
+                ("MINIMAL_TOP_INSET_PLAN_MISSING",),
+            ),
+        )
+    preparation = prepare_free_3d_problem(
+        raw_project,
+        top_inset_plan=frozen_top_inset_plan,
+    )
     if preparation.problem is None:
         raise CoupledFinalizationError(
             "Le probleme produit ne peut pas etre prepare pour la finalisation.",

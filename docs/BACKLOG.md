@@ -28,15 +28,16 @@
 
 ### P64-L09T-C — Reservations automatiques et parois
 
-- Statut : `ready-after-P64-L09T-B-integration`.
+- Statut : `done`, `automated-validated`.
 - Chercher les poses X/Y des plateaux/livrets, maintenir leur Z haut et leur
   nature virtuelle.
 - Retirer les origines X/Y du parcours normal et migrer les anciens projets.
 - Proteger l'epaisseur de paroi existante entre cavite et coupe.
+- Preuve : `docs/P64_L09T_C_AUTOMATIC_TOP_RESERVATIONS_EVIDENCE.md`.
 
 ### P64-L09T-D — Priorite aux couches basses
 
-- Statut : `waiting-for-P64-L09T-C`.
+- Statut : `ready-after-P64-L09T-C-integration`.
 - Classer les plans complets par conteneurs eleves, bases Z, volume eleve et
   gene sous reservation avant compacite et nombre de piles.
 - Garder les piles necessaires et eviter la regle gloutonne locale.

@@ -64,6 +64,39 @@ class FusionPaletteProjectTests(unittest.TestCase):
         self.assertTrue(saved["saved"])
         self.assertEqual(loaded["project"]["project_name"], project_name)
 
+    def test_load_migrates_historical_flat_origin_without_rewriting_named_source(self) -> None:
+        project = blank_project_v1()
+        project["flat_items"] = [
+            {
+                "id": "board",
+                "name": "Plateau",
+                "kind": "board",
+                "dimensions_mm": {"x": 100.0, "y": 80.0, "z": 2.0},
+                "quantity": 1,
+                "stack_order": None,
+                "origin_mm": {"x": 12.0, "y": 8.0},
+                "rotation_deg_z": 0,
+            }
+        ]
+        with tempfile.TemporaryDirectory() as temp_dir, patch.dict(
+            "os.environ",
+            {"BGIG_USER_DATA_DIR": temp_dir},
+        ):
+            source = Path(temp_dir) / CURRENT_PROJECT_FILENAME
+            source.write_text(json.dumps(project), encoding="utf-8")
+            before = source.read_text(encoding="utf-8")
+
+            loaded = handle_palette_request(request("load_project"), ADDIN, ROOT)
+
+            self.assertEqual(source.read_text(encoding="utf-8"), before)
+
+        self.assertTrue(loaded["migrated"])
+        self.assertIsNone(loaded["project"]["flat_items"][0]["origin_mm"])
+        self.assertEqual(loaded["lifecycle"]["derived"], "pending")
+        self.assertTrue(
+            any("placement automatique" in warning for warning in loaded["warnings"])
+        )
+
     def test_validate_delegates_project_rules_and_p55_envelopes_to_python(self) -> None:
         project = blank_project_v1()
         project["container_groups"] = [{"id": "tokens", "name": "Jetons", "wall_thickness_mm": None, "floor_thickness_mm": None}]

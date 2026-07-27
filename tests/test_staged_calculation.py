@@ -229,24 +229,9 @@ class StagedCalculationTests(unittest.TestCase):
         session = StagedCalculationSession(project, solver_settings=SETTINGS)
         _synchronize(session, project, engine)
 
-        seed_project = _project()
-        seed_engine = _engine(seed_project)
-        seed_plan = solve_minimal_layout(
-            seed_project,
-            effort_profile="quick",
-            request_id="seed-incumbent",
-            request_revision=0,
-            container_frontiers=seed_engine.certified_frontiers(),
-            frontier_digests=seed_engine.frontier_digests(),
-        )
-
-        def certified_incumbent(_raw_project: object, **_kwargs: object) -> dict[str, object]:
-            return deepcopy(seed_plan)
-
         calculated = session.calculate_layout(
             request_id="solve-with-flat",
             request_revision=0,
-            solver=certified_incumbent,
         )
         minimal = calculated["staged_calculation"]["minimal_layout"]
 
@@ -267,6 +252,13 @@ class StagedCalculationTests(unittest.TestCase):
         self.assertEqual(
             minimal_selection["artifact_digest"],
             minimal["artifact_digest"],
+        )
+        reservations = calculated["partition"]["top_inset_reservations"][
+            "reservations"
+        ]
+        self.assertTrue(reservations)
+        self.assertTrue(
+            all(item["placement_source"] == "automatic_xy" for item in reservations)
         )
 
     def test_finishing_has_five_independent_monotone_total_budgets(self) -> None:
@@ -339,27 +331,9 @@ class StagedCalculationTests(unittest.TestCase):
         session = StagedCalculationSession(project, solver_settings=SETTINGS)
         _synchronize(session, project, engine)
 
-        seed_project = _project()
-        seed_engine = _engine(seed_project)
-        seed_plan = solve_minimal_layout(
-            seed_project,
-            effort_profile="quick",
-            request_id="global-closure-seed",
-            request_revision=0,
-            container_frontiers=seed_engine.certified_frontiers(),
-            frontier_digests=seed_engine.frontier_digests(),
-        )
-
-        def certified_incumbent(
-            _raw_project: object,
-            **_kwargs: object,
-        ) -> dict[str, object]:
-            return deepcopy(seed_plan)
-
         calculated = session.calculate_layout(
             request_id="global-closure-with-flat",
             request_revision=0,
-            solver=certified_incumbent,
         )
         finalized = session.finalize_volume(finishing_effort_profile="normal")
         partition = finalized["partition"]
@@ -387,6 +361,28 @@ class StagedCalculationTests(unittest.TestCase):
         )
         self.assertTrue(partition["summary"]["materializable"])
         self.assertTrue(partition["finalization"]["certificate"]["certified"])
+        self.assertEqual(
+            [
+                (
+                    item["flat_item_id"],
+                    item["rotation_deg_z"],
+                    item["cut_origin_mm"],
+                    item["cut_size_mm"],
+                )
+                for item in partition["top_inset_reservations"]["reservations"]
+            ],
+            [
+                (
+                    item["flat_item_id"],
+                    item["rotation_deg_z"],
+                    item["cut_origin_mm"],
+                    item["cut_size_mm"],
+                )
+                for item in calculated["partition"]["top_inset_reservations"][
+                    "reservations"
+                ]
+            ],
+        )
         self.assertEqual(
             partition["finalization"]["selected_plan_source"],
             "e_xy_composite_union_and_exact_insets",

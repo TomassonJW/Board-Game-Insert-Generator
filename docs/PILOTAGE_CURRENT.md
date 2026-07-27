@@ -15,7 +15,7 @@
   cavites, reservations, unions, coupes et residuel nul certifies.
 - Les cales separees, separateurs sans fond et conteneurs de finition generes
   sont inscrits dans P64-F03 et restent differes.
-- P64-L09T est lance. Les missions A et B sont automatisees-validees. A rend
+- P64-L09T est lance. Les missions A, B et C sont automatisees-validees. A rend
   toute edition geometrique explicite : elle rend
   minimal, final et scene obsoletes ; aucun placement n'est republie avant un
   clic explicite sur `Calculer`.
@@ -29,14 +29,28 @@
 - La palette ne presente une impossibilite que si
   `proof_of_impossibility=true`. Une strategie bornee epuisee reste
   explicitement `inconnu, pas impossible`.
+- C remplace l'origine XY manuelle par une recherche automatique bornee et
+  deterministe. Les reservations sont placees conjointement, leur Z reste le
+  plus haut admissible et la pose certifiee appartient au plan minimal.
+- Les anciens projets avec origine XY sont lus sans reecriture, normalises vers
+  le placement automatique et leur etat derive redevient a calculer.
+- Le certificat reutilise l'epaisseur de paroi deja resolue par conteneur. Il
+  rejette les bandes de matiere trop minces entre une cavite et une coupe,
+  sans reduire ni translater la cavite.
+- La finition recharge exactement la pose du plan minimal ; elle ne recentre
+  plus les plateaux ou livrets.
 - Validation A : `912/912` en `329.039 s`, un test SCIP natif ignore sous
   Python 3.10, aucun benchmark/holdout solveur invoque.
 - Validation B : `99/99` tests cibles, syntaxe JavaScript `node --check`
   verte, puis suite complete `922/922` en `299.3 s`, avec un test SCIP natif
   ignore sous Python 3.10.
-- Prochaine mission apres integration B : P64-L09T-C, pose automatique des
-  reservations et certification des parois. Le Goal poursuit ensuite D a G
-  puis s'arrete a P64-L09T-V.
+- Validation C : `135/135` tests reservation/migration/palette/minimal/finition,
+  `17/17` solveur par etages et `47/47` CAD/resultat. La gate globale autorisee
+  passe `859/859` en `282.881 s`, avec un test SCIP natif ignore. Les onze
+  modules benchmark/corpus/tournoi restent exclus par le contrat du Goal.
+- Prochaine mission apres integration C : P64-L09T-D, priorite
+  lexicographique aux couches basses. Le Goal poursuit ensuite E a G puis
+  s'arrete a P64-L09T-V.
 - Aucun benchmark/holdout, aucune valeur physique nouvelle ;
   `fusion-validated=false`, `print-validated=false`.
 
@@ -46,7 +60,8 @@ Autorites :
 - `docs/P64_L09S_V_0169_HUMAN_KO_EVIDENCE.md` ;
 - `docs/P64_L09T_END_TO_END_GOAL_RUNBOOK.md` ;
 - `docs/P64_L09T_A_EXPLICIT_RECALCULATION_EVIDENCE.md` ;
-- `docs/P64_L09T_B_EXPLAINABLE_FINALIZATION_STOPS_EVIDENCE.md`.
+- `docs/P64_L09T_B_EXPLAINABLE_FINALIZATION_STOPS_EVIDENCE.md` ;
+- `docs/P64_L09T_C_AUTOMATIC_TOP_RESERVATIONS_EVIDENCE.md`.
 
 <!-- P64-L09S-0168-CURRENT -->
 ## Reprise canonique corrective 0.1.68

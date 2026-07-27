@@ -12,6 +12,7 @@ from board_game_insert_generator.top_inset_reservation import (
     apply_top_inset_reservations,
     certify_top_inset_reservation_prisms,
     derive_top_inset_reservations,
+    resolve_top_inset_reservations,
 )
 
 
@@ -121,7 +122,7 @@ class TopInsetReservationTests(unittest.TestCase):
         )
         self.assertEqual(cavity["inner_dimensions_mm"]["z"], 67.6)
 
-    def test_auto_centres_a_board_and_keeps_the_container_design_height(self) -> None:
+    def test_automatic_xy_places_a_board_and_keeps_the_container_design_height(self) -> None:
         value = project()
         value["flat_items"] = [flat("board")]
 
@@ -131,12 +132,12 @@ class TopInsetReservationTests(unittest.TestCase):
         self.assertEqual(result["status"], "ready_for_intersection")
         self.assertEqual(result["design_top_z_mm"], 66.0)
         reservation = result["reservations"][0]
-        self.assertEqual(reservation["placement_source"], "auto_center")
+        self.assertEqual(reservation["placement_source"], "automatic_xy")
         self.assertEqual(reservation["layer_top_z_mm"], 66.0)
         self.assertEqual(reservation["inset_depth_from_top_mm"], 3.0)
         self.assertEqual(reservation["grip_zone"]["status"], "planned")
 
-    def test_explicit_origins_and_rotations_allow_side_by_side_flat_items(self) -> None:
+    def test_historical_origins_migrate_and_joint_search_places_flats_side_by_side(self) -> None:
         value = project()
         value["flat_items"] = [
             flat("left-board", x=70.0, y=120.0, order=0, origin={"x": 5.0, "y": 30.0}),
@@ -147,9 +148,132 @@ class TopInsetReservationTests(unittest.TestCase):
 
         self.assertEqual(result["status"], "ready_for_intersection")
         self.assertEqual([item["rotation_deg_z"] for item in result["reservations"]], [0, 90])
-        self.assertEqual([item["placement_source"] for item in result["reservations"]], ["explicit_origin", "explicit_origin"])
+        self.assertTrue(result["source"]["migrated"])
+        self.assertEqual([item["placement_source"] for item in result["reservations"]], ["automatic_xy", "automatic_xy"])
         self.assertEqual([item["removal_order"] for item in result["reservations"]], [2, 1])
         self.assertEqual(result["total_flat_height_mm"], 3.0)
+
+    def test_center_collision_is_replaced_by_a_lateral_automatic_pose(self) -> None:
+        value = project()
+        value["box"] = {
+            "inner_dimensions_mm": {"x": 100.0, "y": 60.0, "z": 12.0},
+            "usable_height_mm": 10.0,
+            "lid_clearance_mm": 2.0,
+        }
+        value["flat_items"] = [flat("board", x=30.0, y=20.0, z=2.0)]
+        preview = derive_top_inset_reservations(value)
+        preview_origin = deepcopy(preview["reservations"][0]["cut_origin_mm"])
+        placements = [
+            {
+                "id": "container:blocker",
+                "origin_mm": {"x": 35.0, "y": 20.0, "z": 0.0},
+                "world_size_mm": {"x": 30.0, "y": 20.0, "z": 9.0},
+            }
+        ]
+
+        result = resolve_top_inset_reservations(value, placements)
+
+        self.assertEqual(result["status"], "ready_for_intersection")
+        self.assertNotEqual(result["reservations"][0]["cut_origin_mm"], preview_origin)
+        self.assertEqual(
+            result["automatic_xy_search"]["placement_context"],
+            "frozen_bodies",
+        )
+
+    def test_no_admissible_xy_pose_returns_an_honest_blocker_without_moving_body(self) -> None:
+        value = project()
+        value["box"] = {
+            "inner_dimensions_mm": {"x": 60.0, "y": 40.0, "z": 12.0},
+            "usable_height_mm": 10.0,
+            "lid_clearance_mm": 2.0,
+        }
+        value["flat_items"] = [flat("board", x=30.0, y=20.0, z=2.0)]
+        placements = [
+            {
+                "id": "container:blocker",
+                "origin_mm": {"x": 0.0, "y": 0.0, "z": 0.0},
+                "world_size_mm": {"x": 60.0, "y": 40.0, "z": 9.0},
+            }
+        ]
+        original = deepcopy(placements)
+
+        result = resolve_top_inset_reservations(value, placements)
+
+        self.assertEqual(result["status"], "blocked")
+        self.assertIn(
+            "TOP_INSET_AUTOMATIC_PLACEMENT_NOT_FOUND",
+            {item["code"] for item in result["blockers"]},
+        )
+        self.assertEqual(placements, original)
+
+    def test_near_cavity_uses_existing_wall_thickness_and_keeps_cavity_frozen(self) -> None:
+        value = project()
+        value["box"] = {
+            "inner_dimensions_mm": {"x": 100.0, "y": 60.0, "z": 12.0},
+            "usable_height_mm": 10.0,
+            "lid_clearance_mm": 2.0,
+        }
+        value["container_groups"] = [
+            {
+                "id": "owner",
+                "name": "Bac",
+                "wall_thickness_mm": 2.0,
+                "floor_thickness_mm": 1.2,
+            }
+        ]
+        value["contents"] = []
+        value["flat_items"] = [flat("booklet", x=20.0, y=20.0, z=1.0)]
+        placements = [
+            {
+                "id": "container:owner",
+                "container_group_id": "owner",
+                "origin_mm": {"x": 0.0, "y": 0.0, "z": 0.0},
+                "world_size_mm": {"x": 100.0, "y": 60.0, "z": 10.0},
+                "final_outer_dimensions_mm": {"x": 100.0, "y": 60.0, "z": 10.0},
+                "minimum_envelope_origin_in_final_mm": {"x": 0.0, "y": 0.0, "z": 0.0},
+                "rotation_deg_z": 0,
+                "cavity_layout": [
+                    {
+                        "cavity_id": "cavity:owner",
+                        "local_origin_mm": {"x": 61.1, "y": 20.0, "z": 1.2},
+                        "inner_dimensions_mm": {"x": 20.0, "y": 20.0, "z": 2.0},
+                    }
+                ],
+            }
+        ]
+        original = deepcopy(placements)
+
+        result = resolve_top_inset_reservations(
+            value,
+            placements,
+            require_reserved_prisms=False,
+        )
+
+        self.assertEqual(result["status"], "ready_for_intersection")
+        reservation = result["reservations"][0]
+        self.assertTrue(reservation["wall_envelope_certificate"]["certified"])
+        self.assertGreater(result["automatic_xy_search"]["wall_rejection_count"], 0)
+        self.assertEqual(placements, original)
+
+    def test_large_overlapping_flats_keep_deterministic_vertical_order(self) -> None:
+        value = project()
+        value["flat_items"] = [
+            flat("lower", x=220.0, y=160.0, z=2.0, order=0),
+            flat("upper", x=220.0, y=160.0, z=3.0, order=1),
+        ]
+
+        first = derive_top_inset_reservations(value)
+        second = derive_top_inset_reservations(value)
+
+        self.assertEqual(first, second)
+        self.assertEqual(
+            [item["inset_depth_from_top_mm"] for item in first["reservations"]],
+            [5.0, 3.0],
+        )
+        self.assertEqual(
+            [item["removal_order"] for item in first["reservations"]],
+            [2, 1],
+        )
 
     def test_solver_intersects_the_inset_across_requested_bodies_without_reducing_all_heights(self) -> None:
         value = project()

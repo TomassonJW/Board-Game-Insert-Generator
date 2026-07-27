@@ -316,3 +316,23 @@ zéro corps automatique et parité du baseline.
 - Aucun asset, séparateur, conteneur, corps ou cale n'est créé automatiquement.
 - Les gates Fusion et impression restent distinctes ; aucune valeur physique
   n'est calibrée par une observation UI.
+
+## Règles P64-L09T-C — réservations supérieures automatiques
+
+- Un plateau ou livret plat n'expose plus d'origine XY manuelle dans le
+  comportement produit.
+- La recherche XY est jointe, bornée, déterministe et compare rotations,
+  placement côte à côte et chevauchement ordonné avant de conclure.
+- Les anciens projets sont normalisés vers le placement automatique sans
+  réécriture du fichier avant une sauvegarde explicite.
+- La pose retenue est figée dans le plan minimal et réutilisée à l'identique
+  pendant la finition et la matérialisation.
+- Aucun calcul de réservation ne déplace, réduit ou réoriente une cavité
+  dérivée.
+- Toute bande de matière disjointe respecte la paroi minimale déjà résolue ; un
+  vide partagé n'est jamais maquillé en paroi.
+- Support supérieur, fond minimal, paroi et prismes réservés sont des contraintes
+  dures. Une absence de pose certifiable produit un blocage explicite, jamais
+  une approximation silencieuse.
+- La réservation reste virtuelle et prioritaire au sommet en Z ; elle ne devient
+  ni corps utilisateur, ni support, ni cale.

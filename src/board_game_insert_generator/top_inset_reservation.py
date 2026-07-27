@@ -25,18 +25,46 @@ _PREFERRED_GRIP_DEPTH_MM = 8.0
 _MIN_GRIP_DEPTH_MM = 2.0
 _MIN_GRIP_WIDTH_MM = 16.0
 _MAX_GRIP_WIDTH_MM = 32.0
+_MAX_AUTOMATIC_LAYOUT_STATES = 64
+_MAX_AUTOMATIC_AXIS_POSITIONS = 10
+_MAX_AUTOMATIC_POSES_PER_STATE = 24
 
 
 def derive_top_inset_reservations(raw_project: object) -> dict[str, object]:
     """Resolve flat items into deterministic top-inset reservations.
 
-    Items without an explicit XY origin are centred.  Items without an
-    explicit rotation keep their declared orientation when it fits, otherwise
-    a 90-degree rotation is attempted.  The returned order is bottom-to-top;
-    ``removal_order`` is one-based and top-first.
+    XY placement is always automatic.  The bounded search first minimizes the
+    required Z stack, then uses stable geometry keys.  This preview does not
+    yet know the calculated bodies; the common certificate resolves the same
+    search again against their frozen cavities.
     """
 
     normalization = normalize_project_draft(raw_project)
+    return _derive_top_inset_reservations(normalization, placements=[])
+
+
+def resolve_top_inset_reservations(
+    raw_project: object,
+    placements: list[dict[str, object]],
+    *,
+    require_reserved_prisms: bool = True,
+) -> dict[str, object]:
+    """Resolve automatic XY poses against frozen bodies and cavities."""
+
+    normalization = normalize_project_draft(raw_project)
+    return _derive_top_inset_reservations(
+        normalization,
+        placements=placements,
+        require_reserved_prisms=require_reserved_prisms,
+    )
+
+
+def _derive_top_inset_reservations(
+    normalization: ProjectNormalization,
+    *,
+    placements: list[dict[str, object]],
+    require_reserved_prisms: bool = False,
+) -> dict[str, object]:
     project = normalization.project
     box_payload = _mapping(project["box"])
     box = _dimension(box_payload["inner_dimensions_mm"])
@@ -49,15 +77,15 @@ def derive_top_inset_reservations(raw_project: object) -> dict[str, object]:
         "z": 0.0,
     }
     ordered = _ordered_flat_items(_mappings(project["flat_items"]))
-    blockers: list[dict[str, object]] = []
-
-    resolved: list[dict[str, object]] = []
-    for item in ordered:
-        reservation, item_blockers = _resolve_item(item, box, default_clearance)
-        resolved.append(reservation)
-        blockers.extend(item_blockers)
-
-    reservations = _resolve_vertical_layers(resolved, design_top_z)
+    reservations, blockers, search = _resolve_automatic_xy_layout(
+        ordered,
+        box=box,
+        design_top_z=design_top_z,
+        default_clearance=default_clearance,
+        project=project,
+        placements=placements,
+        require_reserved_prisms=require_reserved_prisms,
+    )
     total_stack_height = max(
         (float(item["inset_depth_from_top_mm"]) for item in reservations),
         default=0.0,
@@ -94,6 +122,7 @@ def derive_top_inset_reservations(raw_project: object) -> dict[str, object]:
         "reservations": reservations,
         "removal_sequence": removal_sequence,
         "blockers": blockers,
+        "automatic_xy_search": search,
         "summary": {
             "status": status,
             "reservation_count": len(reservations),
@@ -106,6 +135,9 @@ def derive_top_inset_reservations(raw_project: object) -> dict[str, object]:
             "containers_keep_design_top_outside_footprints": True,
             "reservation_is_not_printable_body": True,
             "automatic_body_count": 0,
+            "automatic_xy_placement": True,
+            "manual_xy_origin_ignored": True,
+            "minimum_cavity_wall_envelope_certified": not blockers,
         },
     }
 
@@ -113,6 +145,8 @@ def derive_top_inset_reservations(raw_project: object) -> dict[str, object]:
 def certify_top_inset_reservation_prisms(
     raw_project: object,
     placements: list[dict[str, object]],
+    *,
+    top_inset_plan: dict[str, object] | None = None,
 ) -> dict[str, object]:
     """Post-certify reserved top prisms without manufacturing support.
 
@@ -122,7 +156,12 @@ def certify_top_inset_reservation_prisms(
     are deliberately deferred to finalization.
     """
 
-    plan = derive_top_inset_reservations(raw_project)
+    plan = (
+        deepcopy(top_inset_plan)
+        if top_inset_plan is not None
+        else resolve_top_inset_reservations(raw_project, placements)
+    )
+    plan = _refresh_wall_envelope_certificates(raw_project, plan, placements)
     result_placements = deepcopy(placements)
     for placement in result_placements:
         placement["top_inset_cuts"] = []
@@ -255,12 +294,23 @@ def certify_top_inset_reservation_prisms(
 def apply_top_inset_reservations(
     raw_project: object,
     placements: list[dict[str, object]],
+    *,
+    top_inset_plan: dict[str, object] | None = None,
 ) -> dict[str, object]:
     """Intersect resolved reservations with placed bodies and validate cuts."""
 
     normalization = normalize_project_draft(raw_project)
     project = normalization.project
-    plan = derive_top_inset_reservations(project)
+    plan = (
+        deepcopy(top_inset_plan)
+        if top_inset_plan is not None
+        else resolve_top_inset_reservations(
+            project,
+            placements,
+            require_reserved_prisms=False,
+        )
+    )
+    plan = _refresh_wall_envelope_certificates(project, plan, placements)
     result_placements = deepcopy(placements)
     for placement in result_placements:
         placement["top_inset_cuts"] = []
@@ -487,6 +537,641 @@ def compatibility_flat_stack_payload(top_inset_plan: dict[str, object]) -> dict[
         "items": deepcopy(reservations),
         "semantics": "localized_top_insets",
     }
+
+
+def _resolve_automatic_xy_layout(
+    items: list[dict[str, object]],
+    *,
+    box: dict[str, float],
+    design_top_z: float,
+    default_clearance: dict[str, float],
+    project: dict[str, object],
+    placements: list[dict[str, object]],
+    require_reserved_prisms: bool,
+) -> tuple[list[dict[str, object]], list[dict[str, object]], dict[str, object]]:
+    """Keep a bounded deterministic beam of joint XY arrangements."""
+
+    cavity_constraints = _cavity_wall_constraints(project, placements)
+    states: list[list[dict[str, object]]] = [[]]
+    evaluated = 0
+    wall_rejections = 0
+    geometry_rejections: list[dict[str, object]] = []
+
+    for item in items:
+        expanded: list[list[dict[str, object]]] = []
+        rotations = (
+            [int(item["rotation_deg_z"])]
+            if item.get("rotation_deg_z") is not None
+            else [0, 90]
+        )
+        for state in states:
+            state_expanded: list[list[dict[str, object]]] = []
+            for rotation in rotations:
+                variant = deepcopy(item)
+                variant["rotation_deg_z"] = rotation
+                variant["origin_mm"] = None
+                template, template_blockers = _resolve_item(
+                    variant,
+                    box,
+                    default_clearance,
+                )
+                footprint_blockers = [
+                    blocker
+                    for blocker in template_blockers
+                    if blocker["code"] == "TOP_INSET_FOOTPRINT_EXCEEDS_BOX"
+                ]
+                if footprint_blockers:
+                    geometry_rejections.extend(footprint_blockers)
+                    continue
+                size = _xy(template["cut_size_mm"])
+                x_values = _automatic_axis_positions(
+                    axis="x",
+                    limit=box["x"],
+                    size=size["x"],
+                    reservations=state,
+                    cavity_constraints=cavity_constraints,
+                )
+                y_values = _automatic_axis_positions(
+                    axis="y",
+                    limit=box["y"],
+                    size=size["y"],
+                    reservations=state,
+                    cavity_constraints=cavity_constraints,
+                )
+                for x in x_values:
+                    for y in y_values:
+                        evaluated += 1
+                        candidate, relocation_blockers = _relocate_reservation(
+                            template,
+                            x=x,
+                            y=y,
+                            box=box,
+                        )
+                        if relocation_blockers:
+                            continue
+                        wall_certificate = _reservation_wall_certificate(
+                            candidate,
+                            cavity_constraints,
+                        )
+                        candidate["wall_envelope_certificate"] = wall_certificate
+                        if not bool(wall_certificate["certified"]):
+                            wall_rejections += 1
+                            continue
+                        state_expanded.append(state + [candidate])
+            expanded.extend(
+                sorted(
+                    state_expanded,
+                    key=lambda value: _automatic_layout_rank(
+                        value,
+                        design_top_z,
+                        box,
+                        project=project,
+                        placements=placements,
+                        require_reserved_prisms=require_reserved_prisms,
+                    ),
+                )[:_MAX_AUTOMATIC_POSES_PER_STATE]
+            )
+        if not expanded:
+            blockers = _unique_blockers(geometry_rejections)
+            if wall_rejections:
+                blockers.append(
+                    _blocker(
+                        "TOP_INSET_MINIMUM_WALL_NOT_CERTIFIED",
+                        f"Aucune position automatique de '{item['name']}' ne conserve "
+                        "l epaisseur de paroi deja definie autour des cavites.",
+                        "Reduis son empreinte ou son jeu ; les cavites restent inchangees.",
+                        str(item["id"]),
+                    )
+                )
+            if not blockers:
+                blockers.append(
+                    _blocker(
+                        "TOP_INSET_AUTOMATIC_PLACEMENT_NOT_FOUND",
+                        f"Aucune position XY automatique admissible n a ete trouvee pour '{item['name']}'.",
+                        "Reduis son empreinte, son jeu ou le nombre d elements plats.",
+                        str(item["id"]),
+                    )
+                )
+            return [], blockers, {
+                "status": "blocked",
+                "bounded": True,
+                "evaluated_pose_count": evaluated,
+                "retained_state_count": 0,
+                "wall_rejection_count": wall_rejections,
+                "placement_context": "frozen_bodies" if placements else "box_preview",
+            }
+        deduplicated: dict[tuple[object, ...], list[dict[str, object]]] = {}
+        for candidate_state in expanded:
+            signature = _automatic_layout_signature(candidate_state)
+            deduplicated.setdefault(signature, candidate_state)
+        states = sorted(
+            deduplicated.values(),
+            key=lambda value: _automatic_layout_rank(
+                value,
+                design_top_z,
+                box,
+                project=project,
+                placements=placements,
+                require_reserved_prisms=require_reserved_prisms,
+            ),
+        )[:_MAX_AUTOMATIC_LAYOUT_STATES]
+
+    collision_rejections = 0
+    application_rejections: list[dict[str, object]] = []
+    selected: list[dict[str, object]] | None = None
+    for state in sorted(
+        states,
+        key=lambda value: _automatic_layout_rank(
+            value,
+            design_top_z,
+            box,
+            project=project,
+            placements=placements,
+            require_reserved_prisms=require_reserved_prisms,
+        ),
+    ):
+        layered = _resolve_vertical_layers(state, design_top_z)
+        if (
+            require_reserved_prisms
+            and _reserved_prism_collision_ids(layered, placements, design_top_z)
+        ):
+            collision_rejections += 1
+            continue
+        if not require_reserved_prisms:
+            pose_blockers = _top_inset_application_pose_blockers(
+                layered,
+                placements,
+                project,
+                design_top_z,
+            )
+            if pose_blockers:
+                application_rejections.extend(pose_blockers)
+                continue
+        selected = layered
+        break
+    if selected is None and items:
+        blockers = _unique_blockers(application_rejections)
+        if not blockers:
+            blockers = [
+                _blocker(
+                    "TOP_INSET_AUTOMATIC_PLACEMENT_NOT_FOUND",
+                    "Les positions XY candidates entrent toutes dans un prisme superieur reserve.",
+                    "Laisse un autre emplacement superieur disponible ; aucun corps ni aucune cavite "
+                    "n a ete deplace.",
+                )
+            ]
+        return [], blockers, {
+            "status": "blocked",
+            "bounded": True,
+            "evaluated_pose_count": evaluated,
+            "retained_state_count": len(states),
+            "wall_rejection_count": wall_rejections,
+            "reserved_prism_rejection_count": collision_rejections,
+            "application_rejection_count": len(application_rejections),
+            "placement_context": "frozen_bodies" if placements else "box_preview",
+        }
+    return selected or [], [], {
+        "status": "resolved" if items else "not_required",
+        "bounded": True,
+        "evaluated_pose_count": evaluated,
+        "retained_state_count": len(states),
+        "wall_rejection_count": wall_rejections,
+        "reserved_prism_rejection_count": collision_rejections,
+        "application_rejection_count": len(application_rejections),
+        "placement_context": "frozen_bodies" if placements else "box_preview",
+        "selected_signature": list(_automatic_layout_signature(selected or [])),
+    }
+
+
+def _automatic_axis_positions(
+    *,
+    axis: str,
+    limit: float,
+    size: float,
+    reservations: list[dict[str, object]],
+    cavity_constraints: list[dict[str, object]],
+) -> list[float]:
+    axis_size = "width" if axis == "x" else "height"
+    values = {0.0, (limit - size) / 2.0, limit - size}
+    for reservation in reservations:
+        rect = _xy_rect(reservation["cut_origin_mm"], reservation["cut_size_mm"])
+        start = rect[axis]
+        extent = rect[axis_size]
+        values.update({start - size, start, start + extent - size, start + extent})
+    for constraint in cavity_constraints:
+        rect = _mapping(constraint["bounds"])
+        wall = float(constraint["minimum_wall_mm"])
+        start = float(rect[axis])
+        extent = float(rect[axis_size])
+        values.update(
+            {
+                start - size - wall,
+                start - wall,
+                start + extent + wall - size,
+                start + extent + wall,
+            }
+        )
+    admissible = {
+        _round(min(max(value, 0.0), limit - size))
+        for value in values
+        if value >= -_EPSILON and value + size <= limit + _EPSILON
+    }
+    center = (limit - size) / 2.0
+    anchors = [_round(0.0), _round(center), _round(limit - size)]
+    ordered = [value for value in anchors if value in admissible]
+    spread = sorted(admissible)
+    remaining_slots = _MAX_AUTOMATIC_AXIS_POSITIONS - len(ordered)
+    if remaining_slots > 0 and spread:
+        for index in range(remaining_slots):
+            spread_index = round(
+                index * (len(spread) - 1) / max(remaining_slots - 1, 1)
+            )
+            value = spread[spread_index]
+            if value not in ordered:
+                ordered.append(value)
+    ordered.extend(
+        value
+        for value in sorted(admissible, key=lambda value: (abs(value - center), value))
+        if value not in ordered
+    )
+    return ordered[:_MAX_AUTOMATIC_AXIS_POSITIONS]
+
+
+def _relocate_reservation(
+    template: dict[str, object],
+    *,
+    x: float,
+    y: float,
+    box: dict[str, float],
+) -> tuple[dict[str, object], list[dict[str, object]]]:
+    result = deepcopy(template)
+    old_cut_origin = _xy(result["cut_origin_mm"])
+    physical_origin = _xy(result["physical_origin_mm"])
+    clearance_x = physical_origin["x"] - old_cut_origin["x"]
+    clearance_y = physical_origin["y"] - old_cut_origin["y"]
+    size = _xy(result["cut_size_mm"])
+    result["placement_source"] = "automatic_xy"
+    result["cut_origin_mm"] = {"x": _round(x), "y": _round(y)}
+    result["physical_origin_mm"] = {
+        "x": _round(x + clearance_x),
+        "y": _round(y + clearance_y),
+    }
+    grip, grip_blocker = _grip_zone(x, y, size["x"], size["y"], box)
+    result["grip_zone"] = grip
+    blockers: list[dict[str, object]] = []
+    if grip_blocker is not None:
+        blockers.append(
+            _blocker(
+                "TOP_INSET_GRIP_UNAVAILABLE",
+                f"Aucune zone de prise rectangulaire ne tient autour de '{result['name']}'.",
+                "Laisse au moins 2 mm libres sur un cote.",
+                str(result["flat_item_id"]),
+            )
+        )
+    return result, blockers
+
+
+def _automatic_layout_rank(
+    reservations: list[dict[str, object]],
+    design_top_z: float,
+    box: dict[str, float],
+    *,
+    project: dict[str, object],
+    placements: list[dict[str, object]],
+    require_reserved_prisms: bool,
+) -> tuple[object, ...]:
+    layered = _resolve_vertical_layers(reservations, design_top_z)
+    reserved_prism_violation_count = (
+        len(_reserved_prism_collision_ids(layered, placements, design_top_z))
+        if require_reserved_prisms
+        else 0
+    )
+    application_violation_count = (
+        0
+        if require_reserved_prisms
+        else len(
+            _top_inset_application_pose_blockers(
+                layered,
+                placements,
+                project,
+                design_top_z,
+            )
+        )
+    )
+    depth = max(
+        (float(value["inset_depth_from_top_mm"]) for value in layered),
+        default=0.0,
+    )
+    rectangles = [
+        _xy_rect(value["cut_origin_mm"], value["cut_size_mm"])
+        for value in reservations
+    ]
+    overlaps = sum(
+        1
+        for index, left in enumerate(rectangles)
+        for right in rectangles[index + 1 :]
+        if _intersection(left, right) is not None
+    )
+    center_distance = sum(
+        abs(rect["x"] + rect["width"] / 2.0 - box["x"] / 2.0)
+        + abs(rect["y"] + rect["height"] / 2.0 - box["y"] / 2.0)
+        for rect in rectangles
+    )
+    return (
+        reserved_prism_violation_count,
+        application_violation_count,
+        _round(depth),
+        overlaps,
+        _round(center_distance),
+        _automatic_layout_signature(reservations),
+    )
+
+
+def _top_inset_application_pose_blockers(
+    reservations: list[dict[str, object]],
+    placements: list[dict[str, object]],
+    project: dict[str, object],
+    design_top_z: float,
+) -> list[dict[str, object]]:
+    if not placements:
+        return []
+    layout = _mapping(project["layout"])
+    default_floor = float(layout["default_floor_thickness_mm"])
+    group_floor = {
+        str(group["id"]): float(group["floor_thickness_mm"] or default_floor)
+        for group in _mappings(project["container_groups"])
+    }
+    blockers: list[dict[str, object]] = []
+    for reservation in reservations:
+        footprint = _xy_rect(reservation["cut_origin_mm"], reservation["cut_size_mm"])
+        grip = _mapping(reservation["grip_zone"])
+        grip_rect = _xy_rect(grip["origin_mm"], grip["size_mm"])
+        depth = float(reservation["inset_depth_from_top_mm"])
+        footprint_supported = False
+        for placement in placements:
+            if "origin_mm" not in placement or "world_size_mm" not in placement:
+                continue
+            body_origin = _dimension(placement["origin_mm"])
+            body_size = _dimension(placement["world_size_mm"])
+            body_top = body_origin["z"] + body_size["z"]
+            if not isclose(body_top, design_top_z, abs_tol=0.001):
+                continue
+            body_rect = {
+                "x": body_origin["x"],
+                "y": body_origin["y"],
+                "width": body_size["x"],
+                "height": body_size["y"],
+            }
+            minimum_floor = group_floor.get(
+                str(placement.get("container_group_id", "")),
+                default_floor,
+            )
+            for cut_kind, requested_rect in (
+                (TOP_INSET_CUT_KIND, footprint),
+                (TOP_INSET_GRIP_CUT_KIND, grip_rect),
+            ):
+                intersection = _intersection(body_rect, requested_rect)
+                if intersection is None:
+                    continue
+                if cut_kind == TOP_INSET_CUT_KIND:
+                    footprint_supported = True
+                retained_body = body_size["z"] - depth
+                if retained_body + _EPSILON < minimum_floor:
+                    blockers.append(
+                        _blocker(
+                            "TOP_INSET_PIERCES_BODY_FLOOR",
+                            f"L encastrement '{reservation['name']}' laisserait "
+                            f"{_round(retained_body)} mm sous le corps '{placement.get('name', placement['id'])}', "
+                            f"minimum {_round(minimum_floor)} mm.",
+                            "Choisis une autre pose XY ou reduis l epaisseur des elements plats.",
+                            str(placement["id"]),
+                        )
+                    )
+                    continue
+                if cut_kind != TOP_INSET_CUT_KIND:
+                    continue
+                _, cavity_ids = _cavity_interactions(placement, intersection)
+                cavities = {
+                    str(cavity["cavity_id"]): cavity
+                    for cavity in _mappings(placement.get("cavity_layout", []))
+                }
+                for cavity_id in cavity_ids:
+                    cavity = cavities[cavity_id]
+                    cavity_depth = float(_mapping(cavity["inner_dimensions_mm"])["z"])
+                    retained_cavity_floor = body_size["z"] - cavity_depth - depth
+                    if retained_cavity_floor + _EPSILON < minimum_floor:
+                        blockers.append(
+                            _blocker(
+                                "TOP_INSET_PIERCES_CAVITY_FLOOR",
+                                f"La pose de '{reservation['name']}' au-dessus de la cavite "
+                                f"'{cavity_id}' ne laisserait que "
+                                f"{_round(retained_cavity_floor)} mm de fond.",
+                                "Choisis une autre pose XY ; la cavite reste inchangee.",
+                                str(placement["id"]),
+                            )
+                        )
+        if not footprint_supported:
+            blockers.append(
+                _blocker(
+                    "TOP_INSET_WITHOUT_SUPPORTING_BODY",
+                    f"Aucun corps au sommet ne porte l element plat '{reservation['name']}'.",
+                    "Choisis une autre pose XY automatique.",
+                    str(reservation["flat_item_id"]),
+                )
+            )
+    return _unique_blockers(blockers)
+
+
+def _automatic_layout_signature(
+    reservations: list[dict[str, object]],
+) -> tuple[object, ...]:
+    return tuple(
+        (
+            str(value["flat_item_id"]),
+            int(value["rotation_deg_z"]),
+            float(_mapping(value["cut_origin_mm"])["x"]),
+            float(_mapping(value["cut_origin_mm"])["y"]),
+        )
+        for value in reservations
+    )
+
+
+def _cavity_wall_constraints(
+    project: dict[str, object],
+    placements: list[dict[str, object]],
+) -> list[dict[str, object]]:
+    layout = _mapping(project["layout"])
+    default_wall = float(layout["default_wall_thickness_mm"])
+    walls = {
+        str(group["id"]): float(group["wall_thickness_mm"] or default_wall)
+        for group in _mappings(project["container_groups"])
+    }
+    result: list[dict[str, object]] = []
+    for placement in placements:
+        if not all(
+            key in placement
+            for key in (
+                "origin_mm",
+                "final_outer_dimensions_mm",
+                "minimum_envelope_origin_in_final_mm",
+            )
+        ):
+            continue
+        wall = walls.get(str(placement.get("container_group_id", "")), default_wall)
+        for cavity in _mappings(placement.get("cavity_layout", [])):
+            result.append(
+                {
+                    "placement_id": placement["id"],
+                    "cavity_id": cavity["cavity_id"],
+                    "minimum_wall_mm": _round(wall),
+                    "bounds": _cavity_world_bounds(placement, cavity),
+                }
+            )
+    return result
+
+
+def _reservation_wall_certificate(
+    reservation: dict[str, object],
+    constraints: list[dict[str, object]],
+) -> dict[str, object]:
+    footprint = _xy_rect(reservation["cut_origin_mm"], reservation["cut_size_mm"])
+    grip = _mapping(reservation["grip_zone"])
+    grip_rect = _xy_rect(grip["origin_mm"], grip["size_mm"])
+    failures: list[dict[str, object]] = []
+    shared_void_count = 0
+    for constraint in constraints:
+        cavity = _mapping(constraint["bounds"])
+        wall = float(constraint["minimum_wall_mm"])
+        footprint_overlap = _intersection(footprint, cavity)
+        if footprint_overlap is not None:
+            shared_void_count += 1
+        elif _rect_distance(footprint, cavity) + _EPSILON < wall:
+            failures.append(
+                {
+                    "placement_id": constraint["placement_id"],
+                    "cavity_id": constraint["cavity_id"],
+                    "cut_kind": TOP_INSET_CUT_KIND,
+                    "minimum_wall_mm": _round(wall),
+                    "reason": "separation_below_required_wall",
+                }
+            )
+        grip_overlap = _intersection(grip_rect, cavity)
+        if grip_overlap is not None:
+            shared_void_count += 1
+        elif _rect_distance(grip_rect, cavity) + _EPSILON < wall:
+            failures.append(
+                {
+                    "placement_id": constraint["placement_id"],
+                    "cavity_id": constraint["cavity_id"],
+                    "cut_kind": TOP_INSET_GRIP_CUT_KIND,
+                    "minimum_wall_mm": _round(wall),
+                    "reason": "grip_cut_penetrates_cavity_wall_envelope",
+                }
+            )
+    return {
+        "certified": not failures,
+        "constraint_count": len(constraints),
+        "minimum_wall_source": "container_group_or_project_default",
+        "cavities_unchanged": True,
+        "shared_void_count": shared_void_count,
+        "shared_void_semantics": "merged_cut_not_claimed_as_separating_wall",
+        "failures": failures,
+    }
+
+
+def _refresh_wall_envelope_certificates(
+    raw_project: object,
+    plan: dict[str, object],
+    placements: list[dict[str, object]],
+) -> dict[str, object]:
+    result = deepcopy(plan)
+    project = normalize_project_draft(raw_project).project
+    constraints = _cavity_wall_constraints(project, placements)
+    blockers = [deepcopy(value) for value in _mappings(result.get("blockers", []))]
+    failed_ids: list[str] = []
+    for reservation in _mappings(result.get("reservations", [])):
+        certificate = _reservation_wall_certificate(reservation, constraints)
+        reservation["wall_envelope_certificate"] = certificate
+        if not bool(certificate["certified"]):
+            failed_ids.append(str(reservation["flat_item_id"]))
+    if failed_ids:
+        blockers.append(
+            _blocker(
+                "TOP_INSET_MINIMUM_WALL_NOT_CERTIFIED",
+                "La pose superieure figee ne conserve plus l epaisseur de paroi "
+                f"des cavites pour : {', '.join(sorted(set(failed_ids)))}.",
+                "Conserve les corps et cavites du plan minimal ou relance un calcul complet.",
+            )
+        )
+    result["blockers"] = _unique_blockers(blockers)
+    result["status"] = (
+        "blocked"
+        if result["blockers"]
+        else ("not_required" if not result.get("reservations") else result.get("status", "ready_for_intersection"))
+    )
+    invariants = _mapping(result.setdefault("invariants", {}))
+    invariants["minimum_cavity_wall_envelope_certified"] = not failed_ids
+    return result
+
+
+def _reserved_prism_collision_ids(
+    reservations: list[dict[str, object]],
+    placements: list[dict[str, object]],
+    design_top_z: float,
+) -> list[str]:
+    result: list[str] = []
+    for reservation in reservations:
+        footprint = _xy_rect(reservation["cut_origin_mm"], reservation["cut_size_mm"])
+        support_plane = float(reservation["support_plane_z_mm"])
+        for placement in placements:
+            if "origin_mm" not in placement or "world_size_mm" not in placement:
+                continue
+            body_origin = _dimension(placement["origin_mm"])
+            body_size = _dimension(placement["world_size_mm"])
+            body_rect = {
+                "x": body_origin["x"],
+                "y": body_origin["y"],
+                "width": body_size["x"],
+                "height": body_size["y"],
+            }
+            if (
+                _intersection(body_rect, footprint) is not None
+                and body_origin["z"] < design_top_z - _EPSILON
+                and support_plane < body_origin["z"] + body_size["z"] - _EPSILON
+            ):
+                result.append(str(placement["id"]))
+    return sorted(set(result))
+
+
+def _rect_distance(
+    left: dict[str, Any],
+    right: dict[str, Any],
+) -> float:
+    dx = max(
+        float(left["x"]) - (float(right["x"]) + float(right["width"])),
+        float(right["x"]) - (float(left["x"]) + float(left["width"])),
+        0.0,
+    )
+    dy = max(
+        float(left["y"]) - (float(right["y"]) + float(right["height"])),
+        float(right["y"]) - (float(left["y"]) + float(left["height"])),
+        0.0,
+    )
+    return (dx * dx + dy * dy) ** 0.5
+
+
+def _unique_blockers(
+    blockers: list[dict[str, object]],
+) -> list[dict[str, object]]:
+    result: list[dict[str, object]] = []
+    seen: set[tuple[str, str]] = set()
+    for blocker in blockers:
+        key = (str(blocker["code"]), str(blocker.get("reference_id", "")))
+        if key in seen:
+            continue
+        seen.add(key)
+        result.append(deepcopy(blocker))
+    return result
 
 
 

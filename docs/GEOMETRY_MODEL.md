@@ -456,14 +456,28 @@ une cavite de contenu ni un corps. Hors de son empreinte, chaque corps demande
 conserve son sommet au plan de conception.
 
 Pour chaque plateau ou livret, le contrat fixe : empreinte physique, jeu XY,
-rotation 0/90, origine XY, epaisseur cumulee, profondeur depuis le sommet, ordre
-de retrait, plan d appui et prise rectangulaire. Deux empreintes qui se
-chevauchent se composent en Z selon leur ordre ; deux empreintes disjointes
-partagent le meme plan superieur.
+rotation 0/90, epaisseur cumulee, profondeur depuis le sommet, ordre de retrait,
+plan d appui et prise rectangulaire. La pose XY n'est plus une entree
+utilisateur : P64-L09T-C la resout automatiquement par une recherche jointe,
+bornee et deterministe des orientations et positions candidates. Deux
+empreintes qui se chevauchent se composent en Z selon leur ordre ; deux
+empreintes disjointes partagent le meme plan superieur. Le calcul peut placer
+des reservations cote a cote ou superposees selon la meilleure pose certifiee.
+
+Le plan minimal fige la pose retenue. La finition doit reutiliser exactement
+cette pose et ne peut ni relancer une recherche divergente, ni deplacer ou
+reduire une cavite. Les anciens projets qui portent une origine XY explicite
+sont normalises vers cette semantique automatique ; leur fichier source n'est
+reecrit qu'a la prochaine sauvegarde explicite.
 
 La coupe locale doit rester dans le blank, laisser au moins le fond minimal du
 corps et ne jamais descendre sous le fond d une cavite intersectee. Les surfaces
 de cavite presentes au plan d appui sont retranchees de la couverture support.
+Toute bande de matiere disjointe entre une cavite et une coupe superieure doit
+respecter l'epaisseur de paroi deja applicable au conteneur. Un recouvrement
+entre les deux coupes est classe comme vide partage, jamais comme une fausse
+paroi separatrice. Une pose sans support, fond ou paroi certifiable est rejetee
+explicitement.
 La CAD IR transporte les operations `subtract_top_inset_reservation` et
 `subtract_top_inset_grip` dans le repere `body.local`. Fusion execute ces
 operations sans recalculer placement, profondeur ou support.

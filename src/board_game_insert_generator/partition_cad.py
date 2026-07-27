@@ -709,6 +709,10 @@ def _plan_for_semantic_comparison(plan: dict[str, object]) -> dict[str, object]:
     """Ignore additive H04 observability when guarding a materializable plan."""
 
     canonical = deepcopy(plan)
+    canonical.pop("plan_digest", None)
+    source = canonical.get("source")
+    if isinstance(source, dict):
+        source.pop("migrated", None)
     summary = canonical.get("summary")
     if isinstance(summary, dict):
         summary.pop("result_status", None)

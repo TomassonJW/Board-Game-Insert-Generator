@@ -393,3 +393,22 @@ sémantique P45. Il exige contrat, migration additive, source effective visible,
 tests géométriques et validation physique avant toute valeur par défaut. Les
 jeux externes de conteneurs restent exclusivement globaux conformément à
 ADR-0064 ; les overrides asset, plateau et livret restent inchangés.
+
+## P64-L09T-C — paroi certifiée autour des réservations supérieures
+
+P64-L09T-C n'ajoute et ne recale aucune valeur physique. La paroi minimale
+appliquée entre une cavité et une découpe supérieure vient de
+`wall_thickness_mm` sur le groupe, ou du default projet déjà résolu lorsque cet
+override est absent.
+
+Une bande de matière réellement séparatrice et plus mince que cette valeur
+invalide la pose automatique. Un chevauchement cavité-réservation correspond à
+un vide partagé et ne peut pas être présenté comme une paroi. Le certificat
+expose la source, la valeur demandée, la distance mesurée et le verdict pour
+chaque relation pertinente.
+
+Le solveur cherche alors une autre pose bornée ; s'il n'en existe aucune, il
+rend un blocage explicite. Il ne réduit, ne translate et ne réoriente jamais une
+cavité déjà dérivée pour satisfaire la réservation. Ces règles sont
+`automated-validated` seulement : `fusion-validated=false` et
+`print-validated=false`.

@@ -44,6 +44,30 @@ class ProjectV1Tests(unittest.TestCase):
 
         self.assertFalse(normalized.migrated)
         self.assertEqual(normalized.project["layout"]["container_box_xy_clearance_mm"], 0.85)
+
+    def test_native_historical_flat_origin_migrates_to_automatic_without_mutating_source(self) -> None:
+        project = blank_project_v1()
+        project["flat_items"] = [
+            {
+                "id": "board",
+                "name": "Plateau",
+                "kind": "board",
+                "dimensions_mm": {"x": 100.0, "y": 80.0, "z": 2.0},
+                "quantity": 1,
+                "stack_order": None,
+                "origin_mm": {"x": 12.0, "y": 8.0},
+                "rotation_deg_z": 0,
+            }
+        ]
+        source = deepcopy(project)
+
+        normalized = normalize_project_draft(project)
+
+        self.assertTrue(normalized.migrated)
+        self.assertEqual(normalized.source_schema, PROJECT_SCHEMA_V1)
+        self.assertIsNone(normalized.project["flat_items"][0]["origin_mm"])
+        self.assertEqual(project, source)
+
     def test_native_project_supports_groups_flat_items_and_fill_elements(self) -> None:
         project = blank_project_v1()
         project["container_groups"] = [

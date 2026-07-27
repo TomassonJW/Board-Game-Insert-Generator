@@ -209,8 +209,13 @@ def prepare_fixtures() -> tuple[dict[str, dict[str, object]], dict[str, object]]
         raise RuntimeError("P64-L09V stable bridge public fixture is not solved in quick control.")
     tray_problem = preparations["tray_finalization"].problem
     assert tray_problem is not None
-    if len(tray_problem.top_inset_zones) != 1:
-        raise RuntimeError("P64-L09V tray fixture must expose exactly one top inset zone.")
+    tray_preview_count = len(tray_problem.top_inset_plan["reservations"])
+    if tray_preview_count != 1:
+        raise RuntimeError("P64-L09V tray fixture must expose exactly one top inset preview.")
+    if tray_problem.top_inset_pose_resolved or tray_problem.top_inset_zones:
+        raise RuntimeError(
+            "P64-L09V preparation must leave automatic XY pose unresolved until certification."
+        )
 
     summary: dict[str, object] = {
         "schema_version": "bgig.p64_l09v_fusion_preflight.v1",
@@ -231,7 +236,9 @@ def prepare_fixtures() -> tuple[dict[str, dict[str, object]], dict[str, object]]
             "tray_finalization": {
                 "filename": FIXTURE_FILENAMES["tray_finalization"],
                 "expected_product_observation": "scip_then_certified_finalized_plan",
+                "top_inset_preview_count": tray_preview_count,
                 "top_inset_zone_count": len(tray_problem.top_inset_zones),
+                "automatic_xy_pose_pending": not tray_problem.top_inset_pose_resolved,
             },
         },
         "support_proofs": _support_proofs(),

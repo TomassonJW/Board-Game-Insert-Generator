@@ -118,15 +118,11 @@ class SolverOutcomeTests(unittest.TestCase):
         self.assertIn(result["summary"]["result_status"], {SOLUTION_FOUND, NO_SOLUTION_WITHIN_BUDGET})
         self.assertIn("stop_reason", result["solver"]["telemetry"])
         if result["summary"]["result_status"] == NO_SOLUTION_WITHIN_BUDGET:
-            self.assertEqual(result["summary"]["status"], "unresolved")
-            self.assertIn(
-                result["diagnostics"][0]["code"],
-                {
-                    "PORTFOLIO_NO_SOLUTION_WITHIN_BUDGET",
-                    "ENVELOPE_SUPPORT_CONTRACT",
-                },
+            self.assertIsNone(result["solver"]["result"]["proof"])
+            self.assertTrue(
+                result["solver"]["result"]["label"].startswith("Aucune solution")
             )
-            self.assertIn("ne prouve pas", result["diagnostics"][0]["action"])
+            self.assertIn("budget", result["solver"]["result"]["label"])
 
     def test_formal_volume_proof_includes_exact_explicit_complements(self) -> None:
         project = simple_success_project()

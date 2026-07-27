@@ -67,7 +67,7 @@ class ContainerVariantGlobalSearchTests(unittest.TestCase):
         self.assertEqual(execution.candidates, ())
         self.assertTrue(execution.lane_reports)
         self.assertNotEqual(execution.status, "proven_impossible")
-    def test_localized_top_reservation_rejects_full_height_variants(self) -> None:
+    def test_automatic_top_reservation_can_route_around_full_height_variant(self) -> None:
         project = localized_variant_compatibility_project()
         frontier = derive_container_internal_variant_frontiers(
             project,
@@ -83,11 +83,19 @@ class ContainerVariantGlobalSearchTests(unittest.TestCase):
             effort_profile=EFFORT_NORMAL,
         )
 
-        self.assertEqual(execution.status, NO_SOLUTION_WITHIN_BUDGET)
-        self.assertIsNotNone(execution.container_variant_search)
-        self.assertEqual(
-            execution.container_variant_search.lane_reports[0].status,
-            NO_SOLUTION_WITHIN_BUDGET,
+        self.assertEqual(execution.status, SOLUTION_FOUND)
+        self.assertIsNotNone(execution.selected_plan)
+        self.assertTrue(execution.certified_candidates)
+        self.assertTrue(execution.fast_path_used)
+        self.assertIsNone(execution.container_variant_search)
+        assert execution.selected_plan is not None
+        self.assertTrue(
+            all(
+                item["placement_source"] == "automatic_xy"
+                for item in execution.selected_plan["top_inset_reservations"][
+                    "reservations"
+                ]
+            )
         )
 
     def test_normal_replays_quick_lane_with_identical_trace_prefix(self) -> None:
