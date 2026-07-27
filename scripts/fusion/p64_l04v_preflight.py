@@ -95,20 +95,17 @@ def initial_session(project: dict[str, object]) -> StagedCalculationSession:
 
 
 def assert_preflight() -> dict[str, object]:
-    """Exercise minimum-preserving fail-closed incremental gate paths."""
+    """Confirm that the historical reuse gate is superseded fail-closed."""
 
     baseline = pocket_project()
 
     success_session = initial_session(baseline)
     success_project = with_insert(baseline, (8.0, 16.0, 8.0))
     success_snapshot = synchronize(success_session, success_project, engine(success_project))
-    reuse = success_snapshot["local_reuse"]
-    if reuse["status"] != "global_solve_required":
-        raise RuntimeError("P64-L04V must not reduce the new canonical minimum.")
-    if reuse["global_solver_invocation_count"] != 0:
-        raise RuntimeError("P64-L04V minimum-floor fallback invoked the global solver implicitly.")
     if success_snapshot["minimal_layout"]["status"] != STATUS_STALE:
-        raise RuntimeError("P64-L04V minimum-floor fallback did not leave the old layout stale.")
+        raise RuntimeError("P64-L09T-A did not leave the old layout stale.")
+    if "local_reuse" in success_snapshot:
+        raise RuntimeError("P64-L09T-A still exposes the historical local reuse path.")
 
     fallback_session = initial_session(baseline)
     fallback_project = with_insert(baseline, (20.0, 20.0, 10.0))
@@ -117,18 +114,16 @@ def assert_preflight() -> dict[str, object]:
         fallback_project,
         engine(fallback_project),
     )
-    fallback = fallback_snapshot["local_reuse"]
-    if fallback["status"] != "global_solve_required":
-        raise RuntimeError("P64-L04V expected an explicit global-solve fallback.")
-    if fallback["global_solver_invocation_count"] != 0:
-        raise RuntimeError("P64-L04V fallback invoked the global solver implicitly.")
     if fallback_snapshot["minimal_layout"]["status"] != STATUS_STALE:
-        raise RuntimeError("P64-L04V fallback did not leave the old layout stale.")
+        raise RuntimeError("P64-L09T-A did not leave the second old layout stale.")
+    if "local_reuse" in fallback_snapshot:
+        raise RuntimeError("P64-L09T-A still exposes local reuse diagnostics.")
 
     return {
         "baseline_project": baseline,
-        "local_reuse": reuse,
-        "fallback": fallback,
+        "status": "superseded_by_explicit_recalculation",
+        "first_edit": success_snapshot["minimal_layout"],
+        "second_edit": fallback_snapshot["minimal_layout"],
     }
 
 
@@ -147,10 +142,8 @@ def main() -> int:
         write_fixture(args.write_fixture, result["baseline_project"])
         print(f"P64_L04V_FIXTURE={args.write_fixture}")
     print("P64_L04V_PREFLIGHT=OK")
-    print("LOCAL_REUSE_STATUS=global_solve_required")
-    print("LOCAL_REUSE_GLOBAL_SOLVER_INVOCATIONS=0")
-    print("FALLBACK_STATUS=global_solve_required")
-    print("FALLBACK_GLOBAL_SOLVER_INVOCATIONS=0")
+    print("AUTOMATIC_REUSE=disabled")
+    print("NEXT_ACTION=calculate_layout")
     return 0
 
 

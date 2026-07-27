@@ -1,21 +1,25 @@
 # Status
 
 <!-- P64-L09T-STATUS -->
-## P64-L09T — Goal correctif pret a etre delegue
+## P64-L09T — Goal actif, mission A automatisee-validee
 
 Date : 2026-07-27.
 
-Statut : `done-documentation`, `architecture-accepted`,
-`ready-for-delegated-goal-launch`.
+Statut : `goal-active`, `P64-L09T-A-automated-validated`.
 
 - La gate 0.1.69 est `human-KO`, `do-not-run`. La jauge fluide, les minima et
   la cavite orientee restent des acquis positifs partiels.
 - `CasLimite01+` atteint le certificat composite puis est rejete ;
   `CasLimite02+` ne trouve pas la fermeture rectangulaire brute exigee par le
   repli actuel.
-- ADR-0093 supersede les reutilisations automatiques d'ADR-0075/0076 dans le
-  parcours produit. Les digests, invalidations, statuts et caches explicites
-  restent acquis.
+- P64-L09T-A retire les deux integrations automatiques d'ADR-0075/0076 du
+  parcours produit. Toute edition geometrique rend minimal, final et scene
+  obsoletes ; seul `Calculer` peut republier un plan minimal.
+- Les digests, invalidations, statuts, cache certifie exact et witness
+  compatible restent acquis pendant un calcul explicite.
+- La palette et le journal produit n'exposent plus les statuts, messages ou
+  preuves de reutilisation locale et d'insertion dans le vide global. Les
+  producteurs historiques restent seulement testables hors parcours produit.
 - Les reservations superieures restent virtuelles mais leurs poses X/Y
   deviennent des decisions du calcul.
 - La priorite basse compare des plans complets avant la compacite.
@@ -25,14 +29,19 @@ Statut : `done-documentation`, `architecture-accepted`,
   interne a un jeu nul et toutes les frontieres externes conservent leurs jeux.
 - P64-F03 conserve trois horizons : cales separees, separateurs sans fond et
   conteneurs de finition generes.
-- Aucun code produit n'est modifie par cette preparation.
+- Validation A : `89/89` tests cibles, `20/20` regressions historiques
+  recadrees, syntaxe JavaScript `node --check` verte, puis suite complete
+  `912/912` en `329.039 s` avec un test SCIP natif ignore sous Python 3.10.
+  Aucun benchmark ou holdout solveur n'a ete invoque.
 
 Programme : `docs/P64_L09T_END_TO_END_GOAL_RUNBOOK.md`.
 Preuve : `docs/P64_L09S_V_0169_HUMAN_KO_EVIDENCE.md`.
 Decision : `docs/DECISIONS/ADR-0093-recalcul-explicite-reservations-optimisees-et-fermeture-hybride.md`.
+Preuve A : `docs/P64_L09T_A_EXPLICIT_RECALCULATION_EVIDENCE.md`.
 
-Prochaine action : executer P64-L09T-A a G dans le Goal delegue, puis arret a
-P64-L09T-V. `fusion-validated=false`, `print-validated=false`.
+Prochaine action : integrer P64-L09T-A dans `main`, puis executer P64-L09T-B
+sur les diagnostics d'arret anticipe. `fusion-validated=false`,
+`print-validated=false`.
 
 <!-- P64-L09S-0168-STATUS -->
 ## Correctif P64-L09S-V 0.1.68

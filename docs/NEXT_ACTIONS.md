@@ -1,14 +1,13 @@
 # Next Actions
 
 <!-- P64-L09T-NEXT -->
-## Action courante : lancer et executer le Goal P64-L09T
+## Action courante : integrer A puis executer P64-L09T-B
 
 Thomas a accepte ADR-0093 et autorise l'execution autonome sequentielle du
 programme P64-L09T :
 
-1. P64-L09T-A : recalcul explicite et suppression des reutilisations
-   automatiques ;
-2. P64-L09T-B : diagnostics d'arret anticipe ;
+1. P64-L09T-A : automatisee-validee ; integrer son commit dans `main` ;
+2. P64-L09T-B : mission suivante, diagnostics d'arret anticipe ;
 3. P64-L09T-C : poses automatiques des reservations et parois minimales ;
 4. P64-L09T-D : priorite globale aux couches basses ;
 5. P64-L09T-E : fermeture hybride reelle ;
@@ -24,6 +23,10 @@ n'implemente pas les trois familles P64-F03 differees.
 
 Le package `0.1.69` est `human-KO`, `do-not-run`.
 `fusion-validated=false`, `print-validated=false`.
+
+Preuve A : `docs/P64_L09T_A_EXPLICIT_RECALCULATION_EVIDENCE.md`.
+Validation A : `912/912`, un test SCIP natif ignore sous Python 3.10, aucun
+benchmark/holdout solveur invoque.
 
 <!-- P64-L09S-0168-NEXT -->
 ## Action courante : cloture corrective et gate P64-L09S-V

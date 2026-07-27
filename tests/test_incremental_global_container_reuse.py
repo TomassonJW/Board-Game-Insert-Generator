@@ -19,7 +19,7 @@ from board_game_insert_generator.incremental_layout_reuse import (
 from board_game_insert_generator.minimal_layout_solver import solve_minimal_layout
 from board_game_insert_generator.project_v1 import blank_project_v1
 from board_game_insert_generator.staged_calculation import (
-    STATUS_CURRENT,
+    STATUS_STALE,
     StagedCalculationSession,
 )
 
@@ -225,7 +225,7 @@ class IncrementalGlobalContainerReuseTests(unittest.TestCase):
             },
         )
 
-    def test_staged_session_promotes_new_container_without_global_solve(self) -> None:
+    def test_staged_session_never_promotes_new_container_automatically(self) -> None:
         project = _project()
         engine = _engine(project)
         session = StagedCalculationSession(project, solver_settings=SETTINGS)
@@ -252,25 +252,12 @@ class IncrementalGlobalContainerReuseTests(unittest.TestCase):
                 frontier_digests=changed_engine.frontier_digests(),
             )
 
-        self.assertEqual(snapshot["minimal_layout"]["status"], STATUS_CURRENT)
-        self.assertTrue(snapshot["minimal_layout"]["placement_certified"])
-        self.assertEqual(
-            snapshot["minimal_layout"]["cache_status"],
-            "global_void_reuse_not_cached",
-        )
-        self.assertEqual(
-            snapshot["minimal_layout"]["calculation_timing"]["result_source"],
-            "global_void_container_reuse",
-        )
-        self.assertEqual(
-            snapshot["global_void_reuse"]["status"],
-            STATUS_CONTAINER_PLACED,
-        )
-        self.assertEqual(
-            snapshot["global_void_reuse"]["global_solver_invocation_count"],
-            0,
-        )
-        self.assertIsNotNone(session.current_minimal_partition())
+        self.assertEqual(snapshot["minimal_layout"]["status"], STATUS_STALE)
+        self.assertFalse(snapshot["minimal_layout"]["placement_certified"])
+        self.assertEqual(snapshot["next_action"], "calculate_layout")
+        self.assertTrue(snapshot["invariants"]["automatic_plan_reuse_disabled"])
+        self.assertNotIn("global_void_reuse", snapshot)
+        self.assertIsNone(session.current_minimal_partition())
 
     def test_does_not_chain_after_a_local_relayout_would_reduce_the_new_minimum(self) -> None:
         project = _project()

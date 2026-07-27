@@ -357,14 +357,8 @@ class IncrementalLayoutReuseTests(unittest.TestCase):
             snapshot = _synchronize(session, changed, changed_engine)
 
         self.assertEqual(snapshot["minimal_layout"]["status"], STATUS_STALE)
-        self.assertEqual(
-            snapshot["local_reuse"]["status"],
-            STATUS_GLOBAL_SOLVE_REQUIRED,
-        )
-        self.assertEqual(
-            snapshot["local_reuse"]["global_solver_invocation_count"],
-            0,
-        )
+        self.assertTrue(snapshot["invariants"]["automatic_plan_reuse_disabled"])
+        self.assertNotIn("local_reuse", snapshot)
         self.assertIsNone(session.current_minimal_partition())
     def test_staged_failure_keeps_old_plan_stale(self) -> None:
         project = _pocket_project()
@@ -378,10 +372,7 @@ class IncrementalLayoutReuseTests(unittest.TestCase):
         snapshot = _synchronize(session, changed, changed_engine)
 
         self.assertEqual(snapshot["minimal_layout"]["status"], STATUS_STALE)
-        self.assertEqual(
-            snapshot["local_reuse"]["status"],
-            STATUS_GLOBAL_SOLVE_REQUIRED,
-        )
+        self.assertNotIn("local_reuse", snapshot)
         self.assertEqual(snapshot["next_action"], "calculate_layout")
         self.assertIsNone(session.current_minimal_partition())
 

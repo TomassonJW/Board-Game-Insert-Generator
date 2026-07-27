@@ -716,47 +716,27 @@ class FusionPaletteDomTests(unittest.TestCase):
             self.markup.index('id="materialization-action"'),
         )
 
-    def test_exposes_p64_l04a_local_reuse_feedback_without_fake_progress(self) -> None:
+    def test_requires_explicit_calculation_after_every_geometric_edit(self) -> None:
         for marker in (
-            "localReuse.status==='placement_reused'",
+            "localReuse",
+            "globalVoidReuse",
+            "local_reuse",
+            "global_void_reuse",
+            "placement_reused",
+            "container_placed_in_global_void",
             "Élément intégré localement",
-            "Placement global conservé",
+            "Nouveau conteneur intégré",
             "mis à jour localement",
-            "Détails de la recertification",
-            "global_solver_invocation_count",
-            "max_search_states_per_container",
-            "max_positions_per_cavity",
-            "localReuse.stop_reason",
-            "localReuse.source_plan_digest",
-            "localReuse.result_plan_digest",
-            "Le plan courant ne peut pas être conservé après cette modification",
         ):
-            self.assertIn(marker, self.markup)
+            self.assertNotIn(marker, self.markup)
         self.assertIn(
-            "action==='validate_project'&&(localReuse.status==='global_solve_required'||payload.staged_calculation?.minimal_layout?.status==='stale')",
+            "Les placements calculés sont obsolètes. Lance Calculer pour obtenir un nouveau plan minimal.",
             self.markup,
         )
-        self.assertNotIn("localReuse.percentage", self.markup)
-
-    def test_exposes_p64_l05a_global_void_container_feedback(self) -> None:
-        for marker in (
-            "globalVoidReuse.status==='container_placed_in_global_void'",
-            "global_void_reuse",
-            "Nouveau conteneur int",
-            "volume global disponible",
-            "Tous les placements existants sont conserv",
-            "globalVoidReuse.new_container_group_id",
-            "globalVoidReuse.new_placement_id",
-            "globalVoidReuse.counters?.variant_options_considered",
-            "globalVoidReuse.counters?.position_trials",
-            "globalVoidReuse.counters?.global_recertification_count",
-            "globalVoidReuse.budget?.max_position_trials",
-            "globalVoidReuse.stop_reason",
-            "globalVoidReuse.source_plan_digest",
-            "globalVoidReuse.result_plan_digest",
-        ):
-            self.assertIn(marker, self.markup)
-        self.assertNotIn("globalVoidReuse.percentage", self.markup)
+        self.assertIn(
+            "action==='validate_project'&&payload.staged_calculation?.minimal_layout?.status==='stale'",
+            self.markup,
+        )
 
     def test_exposes_truthful_operation_activity_and_blocks_only_duplicates(self) -> None:
         for marker in (

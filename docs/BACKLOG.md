@@ -12,14 +12,15 @@
 
 ### P64-L09T-A — Recalcul explicite
 
-- Statut : `ready`.
+- Statut : `done`, `automated-validated`.
 - Supprimer les reutilisations automatiques locales et globales.
 - Conserver invalidation, digests, statuts, cache explicite et witness.
 - Apres toute edition geometrique, exiger Calculer.
+- Preuve : `docs/P64_L09T_A_EXPLICIT_RECALCULATION_EVIDENCE.md`.
 
 ### P64-L09T-B — Diagnostics d'arret
 
-- Statut : `waiting-for-P64-L09T-A`.
+- Statut : `ready-after-P64-L09T-A-integration`.
 - Exposer temps/plafond, phase, motif traduit, candidats et nature du verdict.
 - Ne jamais presenter une recherche bornee comme une impossibilite.
 

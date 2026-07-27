@@ -130,6 +130,75 @@ class StagedCalculationTests(unittest.TestCase):
         self.assertEqual(refreshed["next_action"], "calculate_layout")
         self.assertTrue(refreshed["invariants"]["global_solve_is_explicit"])
 
+    def test_every_geometric_edit_stales_minimal_final_and_scene(self) -> None:
+        project = _project()
+        edits: list[tuple[str, dict[str, object]]] = []
+
+        changed_content = deepcopy(project)
+        changed_content["contents"][0]["quantity"] = 3
+        edits.append(("content", changed_content))
+
+        added_container = deepcopy(project)
+        added_container["container_groups"].append(
+            {
+                "id": "g2",
+                "name": "Second bac",
+                "wall_thickness_mm": None,
+                "floor_thickness_mm": None,
+            }
+        )
+        edits.append(("container", added_container))
+
+        changed_box = deepcopy(project)
+        changed_box["box"]["inner_dimensions_mm"]["x"] = 210.0
+        edits.append(("box", changed_box))
+
+        changed_clearance = deepcopy(project)
+        changed_clearance["layout"]["layout_clearance_mm"] = 0.8
+        edits.append(("clearance", changed_clearance))
+
+        added_reservation = deepcopy(project)
+        added_reservation["flat_items"] = [
+            {
+                "id": "board",
+                "name": "Plateau",
+                "kind": "board",
+                "dimensions_mm": {"x": 40.0, "y": 30.0, "z": 2.0},
+                "quantity": 1,
+                "stack_order": 0,
+                "origin_mm": None,
+            }
+        ]
+        edits.append(("reservation", added_reservation))
+
+        for label, changed in edits:
+            with self.subTest(edit=label):
+                engine = _engine(project)
+                session = StagedCalculationSession(project, solver_settings=SETTINGS)
+                _synchronize(session, project, engine)
+                session.calculate_layout(
+                    request_id=f"solve-before-{label}",
+                    request_revision=0,
+                )
+                session.finalize_volume(finishing_effort_profile="quick")
+                session.record_cad_ready(_minimal_cad(session, project))
+
+                changed_engine = _engine(changed)
+                snapshot = _synchronize(session, changed, changed_engine)
+
+                self.assertEqual(snapshot["minimal_layout"]["status"], STATUS_STALE)
+                self.assertEqual(snapshot["finalized_plan"]["status"], STATUS_STALE)
+                self.assertEqual(
+                    snapshot["materialization"]["status"],
+                    STATUS_DESYNCHRONIZED,
+                )
+                self.assertEqual(snapshot["next_action"], "calculate_layout")
+                self.assertTrue(
+                    snapshot["invariants"]["automatic_plan_reuse_disabled"]
+                )
+                self.assertNotIn("local_reuse", snapshot)
+                self.assertNotIn("global_void_reuse", snapshot)
+
     def test_fixture_11_minimal_materialization_is_selected_before_finalization(self) -> None:
         project = _project()
         engine = _engine(project)

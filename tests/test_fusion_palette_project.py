@@ -209,7 +209,7 @@ class FusionPaletteProjectTests(unittest.TestCase):
         self.assertIsNone(sizing["calculated_outer_dimensions_mm"])
         self.assertFalse(response["saved"])
 
-    def test_validate_inserts_new_container_in_global_void_without_global_solver(self) -> None:
+    def test_validate_new_container_stales_plan_until_explicit_calculation(self) -> None:
         project = blank_project_v1()
         project["box"]["inner_dimensions_mm"] = {
             "x": 120.0,
@@ -272,7 +272,7 @@ class FusionPaletteProjectTests(unittest.TestCase):
                 "board_game_insert_generator.minimal_layout_solver.solve_minimal_layout",
                 side_effect=AssertionError("validate must not run the global solver"),
             ):
-                reused = handle_palette_request(
+                invalidated = handle_palette_request(
                     request(
                         "validate_project",
                         project=changed,
@@ -282,36 +282,21 @@ class FusionPaletteProjectTests(unittest.TestCase):
                     ROOT,
                 )
 
-        self.assertIsNotNone(reused["partition"])
-        report = reused["staged_calculation"]["global_void_reuse"]
-        self.assertEqual(report["status"], "container_placed_in_global_void")
-        self.assertEqual(report["global_solver_invocation_count"], 0)
-        self.assertFalse(report["existing_world_placements_changed"])
+        self.assertIsNotNone(solved["partition"])
+        self.assertIsNone(invalidated["partition"])
+        staged = invalidated["staged_calculation"]
+        self.assertEqual(staged["minimal_layout"]["status"], "stale")
+        self.assertEqual(staged["finalized_plan"]["status"], "not_finalized")
+        self.assertEqual(staged["next_action"], "calculate_layout")
+        self.assertTrue(staged["invariants"]["automatic_plan_reuse_disabled"])
+        self.assertNotIn("local_reuse", staged)
+        self.assertNotIn("global_void_reuse", staged)
         self.assertEqual(
-            reused["operation_activity"]["stop_reason"],
-            "new_container_inserted_and_plan_recertified",
+            invalidated["operation_activity"]["stop_reason"],
+            "local_analysis_ready",
         )
-        old_ids = {value["id"] for value in solved["partition"]["placements"]}
-        before = {
-            value["id"]: (
-                value["origin_mm"],
-                value["world_size_mm"],
-                value["rotation_deg_z"],
-            )
-            for value in solved["partition"]["placements"]
-        }
-        after = {
-            value["id"]: (
-                value["origin_mm"],
-                value["world_size_mm"],
-                value["rotation_deg_z"],
-            )
-            for value in reused["partition"]["placements"]
-            if value["id"] in old_ids
-        }
-        self.assertEqual(before, after)
 
-    def test_validate_requests_global_solve_when_local_relayout_would_reduce_minimum(self) -> None:
+    def test_validate_added_content_stales_plan_without_republishing_placements(self) -> None:
         project = blank_project_v1()
         project["box"]["inner_dimensions_mm"] = {
             "x": 120.0,
@@ -374,14 +359,12 @@ class FusionPaletteProjectTests(unittest.TestCase):
                 )
 
         self.assertIsNone(response["partition"])
-        self.assertEqual(
-            response["staged_calculation"]["local_reuse"]["status"],
-            "global_solve_required",
-        )
-        self.assertEqual(
-            response["staged_calculation"]["local_reuse"]["global_solver_invocation_count"],
-            0,
-        )
+        staged = response["staged_calculation"]
+        self.assertEqual(staged["minimal_layout"]["status"], "stale")
+        self.assertEqual(staged["next_action"], "calculate_layout")
+        self.assertTrue(staged["invariants"]["automatic_plan_reuse_disabled"])
+        self.assertNotIn("local_reuse", staged)
+        self.assertNotIn("global_void_reuse", staged)
     def test_solve_project_returns_the_minimal_layout_without_saving_implicitly(self) -> None:
         project = blank_project_v1()
         project["container_groups"] = [{"id": "g", "name": "Bac", "wall_thickness_mm": None, "floor_thickness_mm": None}]
@@ -1201,10 +1184,10 @@ class FusionPaletteProjectTests(unittest.TestCase):
                 ADDIN,
                 ROOT,
             )
-            rejected_reuse = deepcopy(
-                rejected["staged_calculation"]["global_void_reuse"]
+            self.assertEqual(
+                rejected["staged_calculation"]["minimal_layout"]["status"],
+                "stale",
             )
-            self.assertEqual(rejected_reuse["status"], "global_solve_required")
             with (
                 patch.object(
                     StagedCalculationSession,
@@ -1282,8 +1265,9 @@ class FusionPaletteProjectTests(unittest.TestCase):
         )
         self.assertEqual(bundle["project"]["project_name"], "Mon insert")
         captured_staged = bundle["solver_case_state"]["staged_calculation"]
-        self.assertEqual(captured_staged["global_void_reuse"], rejected_reuse)
         self.assertEqual(captured_staged["minimal_layout"]["status"], "stale")
+        self.assertNotIn("local_reuse", captured_staged)
+        self.assertNotIn("global_void_reuse", captured_staged)
         self.assertEqual(bundle["interaction_trace"]["event_count"], 1)
         self.assertEqual(
             set(bundle["interaction_trace"]["events"][0]),

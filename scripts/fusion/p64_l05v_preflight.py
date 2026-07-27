@@ -106,7 +106,7 @@ def initial_session(project: dict[str, object]) -> StagedCalculationSession:
 
 
 def assert_preflight() -> dict[str, object]:
-    """Exercise global-void success and explicit fallback without Fusion."""
+    """Confirm that the historical global-void insertion is superseded."""
 
     baseline = global_void_project()
 
@@ -115,33 +115,26 @@ def assert_preflight() -> dict[str, object]:
         success_session,
         with_new_container(baseline, (8.0, 8.0, 8.0)),
     )
-    success = success_snapshot["global_void_reuse"]
-    if success["status"] != "container_placed_in_global_void":
-        raise RuntimeError("P64-L05V expected global-void container insertion.")
-    if success["global_solver_invocation_count"] != 0:
-        raise RuntimeError("P64-L05V insertion invoked the global solver.")
-    if success["existing_world_placements_changed"]:
-        raise RuntimeError("P64-L05V insertion moved an existing placement.")
-    if success_snapshot["minimal_layout"]["status"] != STATUS_CURRENT:
-        raise RuntimeError("P64-L05V insertion did not publish a current layout.")
+    if success_snapshot["minimal_layout"]["status"] != STATUS_STALE:
+        raise RuntimeError("P64-L09T-A republished a plan after adding a container.")
+    if "global_void_reuse" in success_snapshot:
+        raise RuntimeError("P64-L09T-A still exposes global-void reuse.")
 
     fallback_session = initial_session(baseline)
     fallback_snapshot = synchronize(
         fallback_session,
         with_new_container(baseline, (110.0, 110.0, 20.0)),
     )
-    fallback = fallback_snapshot["global_void_reuse"]
-    if fallback["status"] != "global_solve_required":
-        raise RuntimeError("P64-L05V expected explicit global-solve fallback.")
-    if fallback["global_solver_invocation_count"] != 0:
-        raise RuntimeError("P64-L05V fallback invoked the global solver.")
     if fallback_snapshot["minimal_layout"]["status"] != STATUS_STALE:
-        raise RuntimeError("P64-L05V fallback did not leave the layout stale.")
+        raise RuntimeError("P64-L09T-A did not leave the second layout stale.")
+    if "global_void_reuse" in fallback_snapshot:
+        raise RuntimeError("P64-L09T-A still exposes global-void diagnostics.")
 
     return {
         "baseline_project": baseline,
-        "global_void_success": success,
-        "global_void_fallback": fallback,
+        "status": "superseded_by_explicit_recalculation",
+        "small_container_edit": success_snapshot["minimal_layout"],
+        "oversized_container_edit": fallback_snapshot["minimal_layout"],
     }
 
 
@@ -163,10 +156,8 @@ def main() -> int:
         write_fixture(args.write_fixture, result["baseline_project"])
         print(f"P64_L05V_FIXTURE={args.write_fixture}")
     print("P64_L05V_PREFLIGHT=OK")
-    print("GLOBAL_VOID_SUCCESS=container_placed_in_global_void")
-    print("GLOBAL_VOID_SUCCESS_GLOBAL_SOLVER_INVOCATIONS=0")
-    print("GLOBAL_VOID_FALLBACK=global_solve_required")
-    print("GLOBAL_VOID_FALLBACK_GLOBAL_SOLVER_INVOCATIONS=0")
+    print("AUTOMATIC_GLOBAL_VOID_REUSE=disabled")
+    print("NEXT_ACTION=calculate_layout")
     return 0
 
 

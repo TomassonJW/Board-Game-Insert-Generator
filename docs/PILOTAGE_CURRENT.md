@@ -15,9 +15,16 @@
   cavites, reservations, unions, coupes et residuel nul certifies.
 - Les cales separees, separateurs sans fond et conteneurs de finition generes
   sont inscrits dans P64-F03 et restent differes.
-- P64-L09T est `ready-for-delegated-goal-launch`. Le Goal execute A a G une
-  mission a la fois, avec integration directe dans `main`, puis s'arrete a la
-  gate humaine P64-L09T-V.
+- P64-L09T est lance. La mission A est automatisee-validee : une edition rend
+  minimal, final et scene obsoletes ; aucun placement n'est republie avant un
+  clic explicite sur `Calculer`.
+- Le cache certifie exact et le witness restent limites au calcul explicite ;
+  la palette et le journal courant ne transportent plus les anciens statuts de
+  reutilisation.
+- Validation A : `912/912` en `329.039 s`, un test SCIP natif ignore sous
+  Python 3.10, aucun benchmark/holdout solveur invoque.
+- Prochaine mission apres integration A : P64-L09T-B, diagnostics d'arret
+  anticipe. Le Goal poursuit ensuite C a G puis s'arrete a P64-L09T-V.
 - Aucun benchmark/holdout, aucune valeur physique nouvelle ;
   `fusion-validated=false`, `print-validated=false`.
 
@@ -25,7 +32,8 @@ Autorites :
 
 - `docs/DECISIONS/ADR-0093-recalcul-explicite-reservations-optimisees-et-fermeture-hybride.md` ;
 - `docs/P64_L09S_V_0169_HUMAN_KO_EVIDENCE.md` ;
-- `docs/P64_L09T_END_TO_END_GOAL_RUNBOOK.md`.
+- `docs/P64_L09T_END_TO_END_GOAL_RUNBOOK.md` ;
+- `docs/P64_L09T_A_EXPLICIT_RECALCULATION_EVIDENCE.md`.
 
 <!-- P64-L09S-0168-CURRENT -->
 ## Reprise canonique corrective 0.1.68

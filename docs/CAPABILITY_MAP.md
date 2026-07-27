@@ -1,11 +1,12 @@
 # Capability Map
 
 <!-- P64-L09T-CAPABILITY -->
-## P64-L09T — capabilities correctives planifiees
+## P64-L09T — mission A automatisee-validee
 
-- `C-STAGED-CALCULATION` : `architecture-accepted`. Toute edition geometrique
+- `C-STAGED-CALCULATION` : `automated-validated`. Toute edition geometrique
   rend minimal et final obsoletes ; seul Calculer peut republier un minimal.
-  Les dependances, digests, caches explicites et rejets stale restent acquis.
+  La scene devient aussi desynchronisee. Les dependances, digests, cache
+  certifie exact, witness compatible et rejets stale restent acquis.
 - `C-SOLVER` / `C-LAYOUT` : `architecture-accepted`. Les poses X/Y des
   reservations deviennent des variables du calcul et les plans complets
   minimisent les conteneurs eleves avant la compacite.
@@ -19,15 +20,17 @@
   restent normatifs.
 - `C-CAD-IR` / `C-FUSION` : planifies pour certifier et materialiser les vrais
   corps composites, unions avant cavites et coupes.
-- `C-FUSION-UI` : planifiee pour retirer les origines X/Y et le bruit de
-  reutilisation, puis expliquer les arrets anticipes.
+- `C-FUSION-UI` : le bruit de reutilisation est retire et l'edition demande
+  explicitement `Calculer`. Les origines X/Y et les diagnostics d'arret restent
+  respectivement a traiter en C et B.
 - `C-FINISHING-COMPLEMENTS` : `deferred`. Cales separees, separateurs sans fond
   et conteneurs generes appartiennent a P64-F03.
-- `C-QUALITY` : 0.1.69 `human-KO`; P64-L09T
-  `ready-for-delegated-goal-launch`.
+- `C-QUALITY` : P64-L09T-A passe `912/912`; 0.1.69 reste `human-KO` et
+  `do-not-run`. P64-L09T-B devient la mission suivante.
 - `C-PRINT` : inchangee, `print-validated=false`.
 
-Aucune capability runtime n'est promue par la preparation documentaire.
+Cette validation reste automatisee : `fusion-validated=false`,
+`print-validated=false`.
 
 <!-- P64-L09S-0168-CAPABILITY -->
 ## Correctif de capability plateau et finition complexe

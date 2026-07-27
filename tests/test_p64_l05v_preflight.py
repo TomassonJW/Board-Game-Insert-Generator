@@ -17,16 +17,15 @@ _SPEC.loader.exec_module(_PREFLIGHT)
 
 
 class P64L05VPreflightTests(unittest.TestCase):
-    def test_preflight_exercises_global_void_success_and_fallback(self) -> None:
+    def test_historical_preflight_confirms_explicit_recalculation(self) -> None:
         result = _PREFLIGHT.assert_preflight()
 
-        success = result["global_void_success"]
-        fallback = result["global_void_fallback"]
-        self.assertEqual("container_placed_in_global_void", success["status"])
-        self.assertEqual("global_solve_required", fallback["status"])
-        self.assertEqual(0, success["global_solver_invocation_count"])
-        self.assertEqual(0, fallback["global_solver_invocation_count"])
-        self.assertFalse(success["existing_world_placements_changed"])
+        self.assertEqual(
+            "superseded_by_explicit_recalculation",
+            result["status"],
+        )
+        self.assertEqual("stale", result["small_container_edit"]["status"])
+        self.assertEqual("stale", result["oversized_container_edit"]["status"])
 
     def test_fixture_is_portable_and_starts_without_the_new_container(self) -> None:
         with TemporaryDirectory() as directory:
