@@ -1,7 +1,7 @@
 # Capability Map
 
 <!-- P64-L09U-CAPABILITY -->
-## P64-L09U — correction de session et matérialisation
+## P64-L09U-R1 — correction de session et matérialisation
 
 - `C-STAGED-CALCULATION` : `automated-validated`. Un redémarrage ne recharge
   plus de projet ou de témoin certifié ; Calculer déclenche un calcul frais.
@@ -12,14 +12,26 @@
   circulaire sur une pose déjà résolue.
 - `C-CAD-IR` : inchangée et `automated-validated`. Toutes les unions et coupes
   logiques, identités, digests et certificats sont conservés.
-- `C-FUSION` : adaptateur pur `automated-validated`. Les BRep outils sont
-  groupés par propriétaire dans une BaseFeature, puis un Combine Join et un
-  Combine Cut appliquent les opérations rectangulaires.
-- `C-QUALITY` : six replays locaux exacts en lecture seule, tests ciblés verts
-  et suite globale autorisée `880/880` en `384.051 s`. Une intégration SCIP
-  native est ignorée et douze modules benchmark/corpus/tournoi sont exclus.
-- `C-RELEASE` : candidate `0.1.71`, preflight et préparateur disponibles.
-- `C-FUSION` reste non observée réellement sur 0.1.71 avant P64-L09U-V.
+- `C-FUSION` : 0.1.71 est `human-KO`. Le premier Combine recevait les corps
+  sources d'une BaseFeature après `finishEdit`.
+- `C-FUSION` : adaptateur R1 `automated-validated`. Les BRep outils sont
+  groupés, puis seuls les corps résultats de `baseFeature.bodies` alimentent
+  Join et Cut.
+- `C-SCENE-SAFETY` : `automated-validated`. Une erreur de génération déclenche
+  un rollback global des seuls objets BGIG et refuse tout nettoyage incomplet.
+- `C-QUALITY` : `149/149` tests ciblés, six replays locaux exacts en lecture
+  seule et suite globale autorisée `881/881` en `408.131 s`. Une intégration
+  SCIP native est ignorée et douze modules benchmark/corpus/tournoi sont
+  exclus.
+- `C-RELEASE` : candidate `0.1.72`, preflight et préparateur disponibles.
+- `C-FUSION` reste non validée humainement sur 0.1.72 avant P64-L09U-R1-V.
+- `C-FUSION-UI` : les vrais jobs annulables et la progression par lot sont
+  seulement proposés par ADR-0095.
+- `C-LOCAL-LAYOUT` : la sélection explicite de variantes est seulement
+  proposée par ADR-0096 ; `CasLimite01++` n'est pas revendiqué comme résolu
+  automatiquement.
+- `C-TOLERANCE` : ADR-0097 propose un séparateur d'assets distinct, sans valeur
+  physique nouvelle ni runtime.
 - `C-PRINT` : `print-validated=false`.
 
 `fusion-validated=false`, `print-validated=false`.

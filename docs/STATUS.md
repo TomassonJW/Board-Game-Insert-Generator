@@ -1,48 +1,49 @@
 # Status
 
 <!-- P64-L09U-STATUS -->
-## P64-L09U — correction du human-KO 0.1.70
+## P64-L09U-R1 — correction du human-KO 0.1.71
 
 Date : 2026-07-27.
 
-Statut : `P64-L09U-automated-validated`,
-`P64-L09U-V-prepared-not-human-observed`.
+Statut : `P64-L09U-R1-automated-validated`,
+`P64-L09U-R1-V-prepared-not-human-observed`.
 
-- 0.1.70 est `human-KO`, `do-not-run`.
-- La matérialisation de `CasLimite01+` a fini par réussir, mais après environ
-  douze à quinze minutes et un état « Fusion ne répond pas ».
-- La session précédente était restaurée au démarrage et un témoin certifié
-  intersession pouvait produire un calcul quasi instantané.
-- 0.1.71 démarre sur un projet vierge non enregistré et laisse les anciens
-  brouillons de récupération inertes.
-- Les fichiers nommés et récents restent ouverts uniquement par action
-  explicite.
-- Le chargement et l'écriture des témoins certifiés intersession sont
-  désactivés dans le parcours produit.
-- Le calcul frais des projets denses résout la réservation automatique dans la
-  voie plancher/piles avant certification.
-- Le replay local passe six variantes en lecture seule, avec cavités figées,
-  CAD IR prête et résiduel nul.
-- Les opérations CAD logiques restent intactes.
-- Fusion reçoit désormais un lot d'union puis un lot de coupes rectangulaires
-  par corps propriétaire.
-- `CasLimite01+` passe de plusieurs centaines de features potentielles à `19`
-  lots d'union et `19` lots de coupe.
-- `CasLimite02+` passe à `8` lots d'union et `8` lots de coupe.
-- Candidate : `0.1.71`.
-- Preflight :
-  `53fc3f5adce84e51a2477113c171b11fbe723b12315ff01af185a19a502cb565`.
-- Suite globale autorisée : `880/880` en `384.051 s`, une intégration SCIP
+- 0.1.70 et 0.1.71 sont `human-KO`, `do-not-run`.
+- 0.1.71 confirme le démarrage vierge, le calcul explicite et la finalisation.
+- La matérialisation minimale ou finale échoue immédiatement avec
+  `ALL_TOOL_BODY_REFERENCE_LOST`.
+- La capture humaine montre des corps outils persistés et non une géométrie
+  certifiée.
+- Le journal local confirme deux échecs en environ `513 ms` et `697 ms`, avant
+  toute synchronisation de scène.
+- La cause est la conservation des corps sources d'une BaseFeature après
+  `finishEdit`.
+- 0.1.72 relit exactement les corps résultats depuis `baseFeature.bodies` et
+  les utilise seuls dans les Combine Join/Cut.
+- Toute erreur de génération déclenche un rollback des objets BGIG ; un
+  nettoyage incomplet devient une erreur explicite.
+- Les tests ciblés adaptateur/release passent et les six replays exacts passent
+  en lecture seule.
+- `CasLimite01++` génère 18 variantes locales, en retient 7 et atteint les
+  plafonds globaux. Une restriction contrôlée en mémoire à sa variante
+  canonique produit un plan certifié en environ `15,8 s`.
+- ADR-0095 à ADR-0097 cadrent la progression/annulation, la sélection visuelle
+  et l'épaisseur de séparateur sans les inclure dans 0.1.72.
+- Candidate : `0.1.72`.
+- Preflight source :
+  `b3f8c6cfc183c4a929516d46d44e03e4cbb22cafd6f2c1f9a35a958cc80e555b`.
+- Tests ciblés : `149/149`, une intégration SCIP native ignorée.
+- Suite globale autorisée : `881/881` en `408.131 s`, une intégration SCIP
   native ignorée et douze modules benchmark/corpus/tournoi exclus.
 - Aucun benchmark, holdout ou changement de valeur physique.
 
-Preuve KO : `docs/P64_L09T_V_0170_HUMAN_KO_EVIDENCE.md`.
+Preuve KO : `docs/P64_L09U_V_0171_HUMAN_KO_EVIDENCE.md`.
 Décision :
 `docs/DECISIONS/ADR-0094-session-vierge-et-materialisation-fusion-par-lots.md`.
-Preuve corrective : `docs/P64_L09U_RELEASE_GATE_EVIDENCE.md`.
-Recette : `docs/P64_L09U_V_FUSION_GATE_RECIPE.md`.
+Preuve corrective : `docs/P64_L09U_R1_RELEASE_GATE_EVIDENCE.md`.
+Recette : `docs/P64_L09U_R1_V_FUSION_GATE_RECIPE.md`.
 
-Prochaine action : observation humaine P64-L09U-V.
+Prochaine action : observation humaine P64-L09U-R1-V.
 `fusion-validated=false`, `print-validated=false`.
 
 <!-- P64-L09T-STATUS -->

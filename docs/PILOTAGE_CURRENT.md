@@ -1,43 +1,50 @@
 # Pilotage courant
 
 <!-- P64-L09U-CURRENT -->
-## Reprise canonique P64-L09U
+## Reprise canonique P64-L09U-R1
 
-- La gate humaine de `0.1.70` est `human-KO` et `do-not-run`.
-- Les acquis calcul, finalisation, réservation, paroi, priorité plancher et
-  fermeture composite restent conservés.
-- Le défaut bloquant est la matérialisation finale : `706205 ms` mesurés côté
-  passerelle pour `CasLimite01+`, environ quinze minutes ressenties et Fusion
-  temporairement « ne répond pas ».
-- Un second défaut rouvrait le dernier projet au redémarrage et réinjectait un
-  témoin intersession ; un résultat observé en environ `102 ms` n'était donc
-  pas un recalcul complet.
-- ADR-0094 impose désormais une session vierge non enregistrée, l'ouverture
-  explicite des fichiers nommés et la désactivation des témoins intersession.
-- La voie dense « piles au sol » reçoit la réservation supérieure automatique
-  avant certification ; elle n'attend plus une pose déjà résolue dans le
-  problème de base.
-- Le CAD IR conserve toutes ses opérations logiques. Fusion les exécute par
-  corps avec un lot d'union et un lot de coupes rectangulaires.
-- Replay local en lecture seule : les six variantes passent, sources
-  personnelles inchangées.
-- `CasLimite01+` observé hors Fusion : calcul frais environ `3.4 s`, `19`
-  composants, `349` unions en `19` lots et `113` coupes en `19` lots.
-- `CasLimite02+` observé hors Fusion : `8` composants, `331` unions en `8`
-  lots et `129` coupes en `8` lots.
-- La candidate corrective est `0.1.71`. Son preflight public porte le digest
-  `53fc3f5adce84e51a2477113c171b11fbe723b12315ff01af185a19a502cb565`.
-- Prochaine action unique : gate humaine P64-L09U-V selon
-  `docs/P64_L09U_V_FUSION_GATE_RECIPE.md`.
+- `0.1.70` et `0.1.71` sont `human-KO`, `do-not-run`.
+- 0.1.71 confirme le démarrage vierge, le calcul explicite et la finalisation.
+- Sa matérialisation échoue en moins d'une seconde sur
+  `ALL_TOOL_BODY_REFERENCE_LOST` et laisse des volumes outils visibles.
+- La cause est précise : après `BaseFeature.finishEdit`, l'adaptateur passait
+  encore les corps sources au Combine au lieu des corps résultats exposés par
+  `baseFeature.bodies`.
+- R1 relit et vérifie les corps résultats avant Join/Cut.
+- Toute erreur de génération déclenche désormais un rollback de tous les objets
+  BGIG du job ; un nettoyage incomplet est signalé explicitement.
+- Les acquis réservation, paroi, priorité plancher, cavités figées, fermeture
+  composite et opérations CAD logiques restent inchangés.
+- Les six variantes personnelles exactes repassent en lecture seule.
+- `CasLimite01++` est logeable : 18 variantes locales sont générées, 7 retenues
+  et une restriction contrôlée en mémoire à la variante canonique trouve un
+  plan complet en environ `15,8 s`.
+- Cette preuve motive ADR-0096, mais la sélection visuelle n'est pas livrée
+  dans le correctif atomique 0.1.72.
+- ADR-0095 cadre les vrais jobs annulables et la progression Fusion par lots.
+- ADR-0097 sépare la future épaisseur de séparateur sans choisir de nouvelle
+  valeur physique.
+- Candidate corrective : `0.1.72`.
+- Preflight source :
+  `b3f8c6cfc183c4a929516d46d44e03e4cbb22cafd6f2c1f9a35a958cc80e555b`.
+- Validation : `149/149` tests ciblés, six replays exacts en lecture seule,
+  puis suite globale autorisée `881/881` en `408.131 s`.
+- Une intégration SCIP native est ignorée ; douze modules
+  benchmark/corpus/tournoi sont exclus.
+- Prochaine action unique : gate humaine P64-L09U-R1-V selon
+  `docs/P64_L09U_R1_V_FUSION_GATE_RECIPE.md`.
 - Aucun benchmark/holdout, aucune valeur physique nouvelle ;
   `fusion-validated=false`, `print-validated=false`.
 
 Autorités :
 
-- `docs/P64_L09T_V_0170_HUMAN_KO_EVIDENCE.md` ;
+- `docs/P64_L09U_V_0171_HUMAN_KO_EVIDENCE.md` ;
 - `docs/DECISIONS/ADR-0094-session-vierge-et-materialisation-fusion-par-lots.md` ;
-- `docs/P64_L09U_RELEASE_GATE_EVIDENCE.md` ;
-- `docs/P64_L09U_V_FUSION_GATE_RECIPE.md`.
+- `docs/P64_L09U_R1_RELEASE_GATE_EVIDENCE.md` ;
+- `docs/P64_L09U_R1_V_FUSION_GATE_RECIPE.md` ;
+- `docs/DECISIONS/ADR-0095-operations-cancellables-et-progression-fusion-par-lots.md` ;
+- `docs/DECISIONS/ADR-0096-selection-explicite-des-agencements-locaux-certifies.md` ;
+- `docs/DECISIONS/ADR-0097-epaisseur-minimale-distincte-des-separateurs-d-assets.md`.
 
 <!-- P64-L09T-CURRENT -->
 ## Reprise canonique P64-L09T

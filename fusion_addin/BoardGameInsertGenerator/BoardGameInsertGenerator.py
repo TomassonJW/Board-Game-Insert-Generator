@@ -1429,10 +1429,20 @@ def _execute_generation_request(request, addin_dir: Path) -> str:  # noqa: ANN00
             )
 
     scene_id = registry.create_scene_id()
-    result = _generate_from_plan(design, generation_plan, registry, scene_id)
-    validation = registry.inspect()
-    result["registry_validation"] = validation
-    result["registry_validation_status"] = _validate_generated_scene_registry(validation)
+    try:
+        result = _generate_from_plan(design, generation_plan, registry, scene_id)
+        validation = registry.inspect()
+        result["registry_validation"] = validation
+        result["registry_validation_status"] = _validate_generated_scene_registry(validation)
+    except Exception as generation_error:
+        rollback = _rollback_failed_generation(registry)
+        if not rollback["clean"]:
+            raise RuntimeError(
+                f"{generation_error} "
+                "La scène BGIG partielle n'a pas pu être supprimée complètement : "
+                f"{rollback['remaining']} objet(s) BGIG restent dans le document."
+            ) from generation_error
+        raise
     scene_roots_after = int(validation["bgig_scene_roots_total"])
     settings_saved = _save_command_settings(addin_dir, request, cad_ir_path)
     return _generation_result_message(
@@ -1447,6 +1457,29 @@ def _execute_generation_request(request, addin_dir: Path) -> str:  # noqa: ANN00
         quick_parametric_payload,
         quick_asset_payload,
     )
+
+
+def _rollback_failed_generation(
+    registry: "BgigFusionRegistry",
+) -> dict[str, object]:
+    """Remove every partial BGIG entity after a failed Fusion generation."""
+
+    try:
+        clear_result = registry.clear()
+    except Exception as cleanup_error:
+        return {
+            "clean": False,
+            "remaining": "inconnu",
+            "cleanup_error": str(cleanup_error),
+        }
+    remaining = int(clear_result.get("bgig_objects_remaining", 0))
+    scene_roots_after = int(clear_result.get("scene_roots_after", 0))
+    return {
+        "clean": remaining == 0 and scene_roots_after == 0,
+        "remaining": max(remaining, scene_roots_after),
+        "cleanup_error": "",
+        "clear_result": clear_result,
+    }
 
 
 def _export_printables_from_scene(design, registry: BgigFusionRegistry, addin_dir: Path, inspection: dict[str, object]) -> dict[str, object]:  # noqa: ANN001
@@ -3470,7 +3503,7 @@ def _persist_temporary_box_tools(
     base_feature.name = feature_name
     if not base_feature.startEdit():
         raise RuntimeError("Fusion base feature edit mode failed.")
-    source_bodies = []
+    source_body_count = 0
     finished = False
     try:
         for origin_mm, size_mm in boxes:
@@ -3485,15 +3518,30 @@ def _persist_temporary_box_tools(
             )
             if persisted is None:
                 raise RuntimeError("Fusion temporary tool persistence failed.")
-            source_bodies.append(persisted)
+            source_body_count += 1
     finally:
         finished = base_feature.finishEdit()
     if not finished:
         raise RuntimeError("Fusion base feature edit completion failed.")
+    if source_body_count != len(boxes):
+        raise RuntimeError(
+            "Fusion base feature did not receive every temporary tool body."
+        )
+    # BRepBodies.add returns source bodies while the BaseFeature is being
+    # edited. Fusion replaces them with distinct result bodies at finishEdit;
+    # only those result bodies are valid inputs for subsequent features.
+    persisted_result_bodies = base_feature.bodies
+    if persisted_result_bodies.count != len(boxes):
+        raise RuntimeError(
+            "Fusion base feature did not expose every result tool body."
+        )
     result_bodies = adsk.core.ObjectCollection.create()
-    for body in source_bodies:
+    for index in range(persisted_result_bodies.count):
+        body = persisted_result_bodies.item(index)
+        if body is None:
+            raise RuntimeError("Fusion base feature exposed an invalid result tool body.")
         result_bodies.add(body)
-    if result_bodies.count != len(source_bodies):
+    if result_bodies.count != len(boxes):
         raise RuntimeError(
             "Fusion base feature did not preserve every temporary tool body."
         )

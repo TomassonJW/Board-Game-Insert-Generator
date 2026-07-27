@@ -1,5 +1,10 @@
 # P64-L09U — preuve corrective et candidate 0.1.71
 
+> Preuve historique supersédée : la gate réelle de 0.1.71 est
+> `human-KO`, `do-not-run`. Voir
+> `docs/P64_L09U_V_0171_HUMAN_KO_EVIDENCE.md` et la candidate 0.1.72 dans
+> `docs/P64_L09U_R1_RELEASE_GATE_EVIDENCE.md`.
+
 ## 1. Statut
 
 - mission corrective : `automated-validated` ;

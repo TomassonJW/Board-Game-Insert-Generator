@@ -1,36 +1,33 @@
 # Human Gates
 
 <!-- P64-L09U-GATE -->
-## P64-L09U-V — gate humaine corrective 0.1.71
+## P64-L09U-R1-V — gate humaine corrective 0.1.72
 
-La gate 0.1.70 est close en `human-KO`, `do-not-run` :
+0.1.71 est close en `human-KO`, `do-not-run`.
 
-- matérialisation finale mesurée à `706205 ms` côté passerelle et environ
-  quinze minutes ressenties ;
-- Fusion temporairement « ne répond pas » ;
-- dernier projet rouvert automatiquement ;
-- témoin intersession masquant le vrai recalcul.
+Acquis humains conservés :
 
-La candidate 0.1.71 est préparée avec :
+- démarrage vierge non enregistré ;
+- vrai calcul explicite ;
+- finalisation et aperçu disponibles.
 
-- session vierge non enregistrée ;
-- témoins intersession désactivés ;
-- calcul frais des cas denses sous réservation ;
-- unions et coupes rectangulaires Fusion groupées par propriétaire ;
-- six replays locaux exacts en lecture seule ;
-- preflight
-  `53fc3f5adce84e51a2477113c171b11fbe723b12315ff01af185a19a502cb565`.
+Défaut bloquant 0.1.71 :
 
-Thomas observe :
+- `ALL_TOOL_BODY_REFERENCE_LOST` sur le premier Combine ;
+- corps sources réutilisés après `BaseFeature.finishEdit` ;
+- scène partielle composée de volumes outils.
 
-1. démarrage vierge après fermeture complète de Fusion ;
-2. vrai calcul frais de `CasLimite01+` et `CasLimite02+` ;
-3. finalisation certifiée ;
-4. temps exact et réactivité pendant chaque matérialisation ;
-5. scène synchronisée, comptes de composants et fidélité géométrique ;
-6. second redémarrage vierge sans réouverture automatique.
+La candidate 0.1.72 utilise les corps résultats et ajoute un rollback global de
+la scène BGIG en cas d'échec. Thomas observe :
 
-Recette : `docs/P64_L09U_V_FUSION_GATE_RECIPE.md`.
+1. version 0.1.72 après fermeture complète de Fusion ;
+2. matérialisation minimale sans référence perdue ;
+3. absence de corps BGIG partiels après toute erreur ;
+4. matérialisation finale de `CasLimite01+` et `CasLimite02+` ;
+5. temps, réactivité, scène synchronisée et fidélité à l'aperçu ;
+6. second démarrage vierge.
+
+Recette : `docs/P64_L09U_R1_V_FUSION_GATE_RECIPE.md`.
 
 Avant ce verdict : `fusion-validated=false`, `print-validated=false`.
 

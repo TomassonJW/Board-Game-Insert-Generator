@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prépare la fixture publique et le reçu correctif P64-L09U-V."""
+"""Prépare la fixture publique et le reçu correctif P64-L09U-R1-V."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ from scripts.fusion.p64_l09sv_preflight import (
 from scripts.fusion.p64_l09tv_preflight import gate_project
 
 
-ADDIN_VERSION = "0.1.71"
+ADDIN_VERSION = "0.1.72"
 FIXTURE_FILENAME = "p64-l09uv-01-fresh-batched-composite.bgig.json"
 SUMMARY_FILENAME = "p64-l09uv-preflight-summary.json"
 TARGETED_MATRIX = (
@@ -29,6 +29,8 @@ TARGETED_MATRIX = (
     "dense_floor_stack_with_automatic_top_reservation",
     "batched_additive_prisms",
     "batched_rectangular_cuts",
+    "base_feature_result_body_references",
+    "failed_generation_partial_scene_rollback",
     "logical_cad_operations_preserved",
     "case_01_plus_read_only_replay",
     "case_02_plus_read_only_replay",
@@ -93,6 +95,8 @@ def build_preflight() -> tuple[dict[str, object], dict[str, object]]:
             "floor_first_rank_policy": True,
             "logical_cad_operations_preserved": True,
             "fusion_features_batched_per_owner": True,
+            "base_feature_result_bodies_used_after_finish_edit": True,
+            "failed_generation_partial_scene_rollback": True,
             "composite_cavities_frozen": True,
             "composite_unions_before_cuts": True,
             "printable_residual_volume_mm3": 0.0,

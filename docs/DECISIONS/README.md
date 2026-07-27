@@ -260,3 +260,9 @@ Tests, cartes backlog ou gates humaines a preparer.
   recalcul explicite, priorité plancher et fermeture composite hybride.
 - ADR-0094-session-vierge-et-materialisation-fusion-par-lots.md - session
   vierge sans témoin intersession et booléens Fusion groupés par propriétaire.
+- ADR-0095-operations-cancellables-et-progression-fusion-par-lots.md - proposition
+  de jobs coopératifs, progression par unité métier et rollback d'annulation.
+- ADR-0096-selection-explicite-des-agencements-locaux-certifies.md - proposition
+  de miniatures vues du dessus et allowlist utilisateur de variantes certifiées.
+- ADR-0097-epaisseur-minimale-distincte-des-separateurs-d-assets.md - proposition
+  d'une épaisseur intérieure distincte, avec valeur par défaut sous gate humaine.

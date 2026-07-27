@@ -22,7 +22,7 @@ class P64L09UCorrectiveGateTests(unittest.TestCase):
     def test_preflight_proves_batched_features_without_claiming_human_gates(
         self,
     ) -> None:
-        self.assertEqual(ADDIN_VERSION, "0.1.71")
+        self.assertEqual(ADDIN_VERSION, "0.1.72")
         self.assertEqual(self.preflight["addin_version"], ADDIN_VERSION)
         self.assertEqual(
             set(self.preflight["targeted_matrix"]["required_case_ids"]),
@@ -58,8 +58,12 @@ class P64L09UCorrectiveGateTests(unittest.TestCase):
         self.assertTrue(contract["explicit_calculation_required"])
         self.assertTrue(contract["logical_cad_operations_preserved"])
         self.assertTrue(contract["fusion_features_batched_per_owner"])
+        self.assertTrue(
+            contract["base_feature_result_bodies_used_after_finish_edit"]
+        )
+        self.assertTrue(contract["failed_generation_partial_scene_rollback"])
 
-    def test_package_and_preparer_pin_the_0171_candidate(self) -> None:
+    def test_package_and_preparer_pin_the_0172_candidate(self) -> None:
         addin = ROOT / "fusion_addin" / "BoardGameInsertGenerator"
         manifest = json.loads(
             (addin / "BoardGameInsertGenerator.manifest").read_text(
@@ -69,13 +73,15 @@ class P64L09UCorrectiveGateTests(unittest.TestCase):
         preparer = (
             ROOT / "scripts" / "fusion" / "prepare_p64_l09uv_gate.ps1"
         ).read_text(encoding="utf-8")
-        self.assertEqual(manifest["version"], "0.1.71")
+        self.assertEqual(manifest["version"], "0.1.72")
         for marker in (
-            'expectedVersion -ne "0.1.71"',
+            'expectedVersion -ne "0.1.72"',
             "p64_l09uv_preflight.py",
             "p64_l09t_local_replay.py",
             "fresh_unsaved_project",
             "_persist_temporary_box_tools",
+            "persisted_result_bodies = base_feature.bodies",
+            "_rollback_failed_generation",
             "current_path = \"\"",
             "fusion-validated=false",
             "print-validated=false",

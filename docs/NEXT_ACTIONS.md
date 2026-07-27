@@ -1,27 +1,37 @@
 # Next Actions
 
 <!-- P64-L09U-NEXT -->
-## Action courante : exécuter la gate humaine P64-L09U-V
+## Action courante : exécuter la gate humaine P64-L09U-R1-V
 
-La gate 0.1.70 est `human-KO` et `do-not-run`. P64-L09U corrige les deux
-causes observées sans changer les valeurs physiques ni déplacer les cavités :
+0.1.71 est `human-KO` et `do-not-run`. Le démarrage vierge, le calcul et la
+finalisation restent acquis, mais les corps sources d'une BaseFeature étaient
+réutilisés après `finishEdit`, ce qui provoquait
+`ALL_TOOL_BODY_REFERENCE_LOST`.
 
-1. démarrage sur un projet vierge non enregistré ;
-2. ouverture des fichiers nommés uniquement sur action explicite ;
-3. aucun témoin certifié lu ou écrit entre deux sessions ;
-4. vrai calcul frais, y compris pour les piles sous réservation supérieure ;
-5. opérations CAD logiques conservées mais booléens Fusion groupés par corps ;
-6. candidate corrective `0.1.71` et preflight public préparés.
+0.1.72 :
+
+1. utilise uniquement les corps résultats de la BaseFeature ;
+2. vérifie leur nombre avant Combine ;
+3. supprime toute scène BGIG partielle après une erreur ;
+4. conserve les six replays exacts en lecture seule ;
+5. ne change aucune cavité, réservation ou valeur physique.
 
 Thomas suit uniquement
-`docs/P64_L09U_V_FUSION_GATE_RECIPE.md`. Il chronomètre séparément calcul,
-finalisation et matérialisation sur `CasLimite01+` et `CasLimite02+`, puis
-vérifie un second redémarrage vierge.
+`docs/P64_L09U_R1_V_FUSION_GATE_RECIPE.md`. Il vérifie d'abord l'absence de
+corps outils et le rollback, puis matérialise les plans minimal et final des
+cas « + ».
 
-Preflight :
-`53fc3f5adce84e51a2477113c171b11fbe723b12315ff01af185a19a502cb565`.
+Preflight source :
+`b3f8c6cfc183c4a929516d46d44e03e4cbb22cafd6f2c1f9a35a958cc80e555b`.
 
 `fusion-validated=false`, `print-validated=false`.
+
+Après le verdict R1, le prochain programme proposé est strictement séquentiel :
+
+1. jobs coopératifs, progression Fusion par lots et vraie annulation ;
+2. miniatures vues du dessus et allowlist de variantes locales certifiées ;
+3. épaisseur distincte de séparateur d'assets après choix humain du défaut
+   physique.
 
 <!-- P64-L09T-NEXT -->
 ## Action courante : executer la gate humaine P64-L09T-V

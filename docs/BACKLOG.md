@@ -1,7 +1,7 @@
 # Backlog
 
 <!-- P64-L09U-BACKLOG -->
-## Correctif P64-L09U
+## Correctif P64-L09U-R1
 
 ### P64-L09U-A — Session vierge et recalcul frais
 
@@ -21,7 +21,7 @@
 
 ### P64-L09U-C — Candidate corrective
 
-- Statut : `done`, `automated-validated`.
+- Statut : `superseded-human-KO`.
 - Classer 0.1.70 `human-KO`, `do-not-run`.
 - Rejouer les six variantes locales en lecture seule.
 - Produire la candidate 0.1.71, le preflight, le préparateur et la recette.
@@ -29,11 +29,51 @@
 
 ### P64-L09U-V — Gate humaine Fusion
 
-- Statut : `ready-human-gate`, `prepared-not-human-observed`.
+- Statut : `done-human-KO`, `do-not-run`.
 - Chronométrer calcul, finalisation et matérialisation des deux cas « + ».
 - Vérifier réactivité, scène, composants, géométrie et second démarrage vierge.
-- Recette : `docs/P64_L09U_V_FUSION_GATE_RECIPE.md`.
+- Preuve : `docs/P64_L09U_V_0171_HUMAN_KO_EVIDENCE.md`.
 - `fusion-validated=false`, `print-validated=false`.
+
+### P64-L09U-R1 — Corps résultats et rollback
+
+- Statut : `done`, `automated-validated`.
+- Relire `baseFeature.bodies` après `finishEdit`.
+- Refuser un nombre incomplet de corps outils.
+- N'accepter que des corps résultats dans Join et Cut.
+- Supprimer toute scène BGIG partielle après une erreur.
+- Candidate : `0.1.72`.
+
+### P64-L09U-R1-V — Gate humaine Fusion
+
+- Statut : `ready-human-gate`, `prepared-not-human-observed`.
+- Vérifier l'absence de `ALL_TOOL_BODY_REFERENCE_LOST`.
+- Vérifier l'absence de corps BGIG partiels après une erreur.
+- Matérialiser les plans minimal et final des deux cas « + ».
+- Recette : `docs/P64_L09U_R1_V_FUSION_GATE_RECIPE.md`.
+- `fusion-validated=false`, `print-validated=false`.
+
+### P64-L10-A — Jobs, progression réelle et annulation
+
+- Statut : `proposed`, après P64-L09U-R1-V.
+- Contrat : ADR-0095.
+- Exposer une progression par lot métier et un vrai bouton Annuler.
+- Rollback obligatoire des scènes annulées.
+
+### P64-L10-B — Choix visuel des agencements locaux
+
+- Statut : `proposed`, après P64-L10-A.
+- Contrat : ADR-0096.
+- Miniatures SVG vues du dessus et sélection d'une ou plusieurs variantes.
+- Sans sélection, la frontière moteur complète reste admissible.
+- Ajouter une fixture publique dérivée et anonymisée de `CasLimite01++`.
+
+### P64-L10-C — Épaisseur de séparateur d'assets
+
+- Statut : `proposed-human-physical-gate`, après P64-L10-B.
+- Contrat : ADR-0097.
+- Séparer paroi extérieure, fond et matière entre cavités.
+- Ne choisir aucune nouvelle valeur par défaut sans validation humaine.
 
 <!-- P64-L09T-BACKLOG -->
 ## Programme correctif P64-L09T

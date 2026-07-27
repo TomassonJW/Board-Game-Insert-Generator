@@ -1,5 +1,9 @@
 # P64-L09U-V — recette Fusion humaine 0.1.71
 
+> Recette historique close en `human-KO`, `do-not-run`. Ne réinstalle pas
+> 0.1.71. La recette active est
+> `docs/P64_L09U_R1_V_FUSION_GATE_RECIPE.md`.
+
 ## 1. Statut
 
 - package candidat : `0.1.71` ;
