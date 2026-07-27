@@ -103,7 +103,7 @@ class P66AcceptancePreparationTests(unittest.TestCase):
         self.assertEqual(len(fusion["cavity_cuts"]), 19)
         self.assertTrue(all(item["linked_component"] for item in fusion["compact_occurrences"]))
 
-    def test_bridge_lifecycle_axes_roundtrip_and_minimal_gate_are_explicit(self) -> None:
+    def test_bridge_lifecycle_axes_import_session_and_minimal_gate_are_explicit(self) -> None:
         raw = json.loads(COMPLETE_FIXTURE.read_text(encoding="utf-8"))
         edited = deepcopy(raw)
         edited["contents"][0]["dimensions_mm"]["x"] = 19.0
@@ -150,9 +150,15 @@ class P66AcceptancePreparationTests(unittest.TestCase):
         self.assertEqual(edited_response["lifecycle"]["solved"], "not_computed")
         self.assertEqual(edited_response["lifecycle"]["materialized"], "not_materialized")
         self.assertFalse(edited_response["saved"])
-        self.assertTrue(persisted)
-        self.assertTrue(imported["saved"])
-        self.assertEqual(loaded["project"], solved["project"])
+        self.assertFalse(persisted)
+        self.assertFalse(imported["saved"])
+        self.assertFalse(imported["recovery_saved"])
+        self.assertNotEqual(loaded["project"], solved["project"])
+        self.assertEqual(loaded["project"]["container_groups"], [])
+        self.assertEqual(
+            loaded["document"]["session_start_policy"],
+            "fresh_unsaved_project",
+        )
 
     def test_impossible_fixture_has_a_local_blocker_and_never_emits_cad(self) -> None:
         raw = json.loads(IMPOSSIBLE_FIXTURE.read_text(encoding="utf-8"))
@@ -238,7 +244,7 @@ class P66AcceptancePreparationTests(unittest.TestCase):
         self.assertIn("ExpectedVersion", checker)
         self.assertIn("manifestText", checker)
         self.assertNotIn("ConvertFrom-Json", checker)
-        self.assertEqual(manifest["version"], "0.1.70")
+        self.assertEqual(manifest["version"], "0.1.71")
         self.assertIn("mvp-accepted", document)
         self.assertIn("P66 Fusion OK 0.1.20 - commit 6e351bb", document)
         self.assertIn("P66 Fusion OK 0.1.20 - commit <sha>", document)

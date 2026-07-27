@@ -17,7 +17,7 @@ import time
 from collections import OrderedDict
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 
 PALETTE_REQUEST_SCHEMA = "bgig.palette.request.v1"
@@ -29,7 +29,7 @@ DOCUMENT_STATE_FILENAME = "bgig_document_state_v1.json"
 DOCUMENT_STATE_SCHEMA = "bgig.document_state.v1"
 SUPPORTED_ACTIONS = frozenset({
     "load_project", "new_project", "validate_project",
-    "save_project", "autosave_project", "save_document", "save_project_as",
+    "save_document", "save_project_as",
     "open_project_file", "open_recent_project", "import_project", "export_project",
     "solve_project", "finalize_project", "materialize_project", "regenerate_project",
     "save_personal_preset", "delete_personal_preset",
@@ -303,7 +303,7 @@ def _now_ms() -> int:
 
 
 def load_current_project(addin_dir: str | Path, project_root: str | Path | None = None) -> dict[str, object]:
-    """Load and normalize the current project, or return a valid blank project."""
+    """Return a fresh unsaved project for every Fusion palette session."""
 
     return _load_current_project_normalization(addin_dir, project_root).project
 
@@ -312,20 +312,13 @@ def _load_current_project_normalization(
     addin_dir: str | Path,
     project_root: str | Path | None = None,
 ) -> Any:
-    """Keep migration provenance available without rewriting the source."""
+    """Build a fresh session without reading the legacy recovery project."""
 
     root = Path(addin_dir)
     _ensure_engine_available(root, None if project_root is None else Path(project_root))
     from board_game_insert_generator.project_v1 import blank_project_v1, normalize_project_draft
 
-    path = current_project_path(root)
-    if not path.is_file():
-        return normalize_project_draft(blank_project_v1())
-    try:
-        raw = json.loads(path.read_text(encoding="utf-8-sig"))
-    except (OSError, json.JSONDecodeError) as exc:
-        raise PaletteProjectError(f"Le projet local est illisible : {exc}.") from exc
-    return normalize_project_draft(raw)
+    return normalize_project_draft(blank_project_v1())
 
 
 def current_project_path(addin_dir: str | Path) -> Path:
@@ -430,8 +423,9 @@ def _document_info(addin_dir: Path, state: dict[str, object]) -> dict[str, objec
         "current_path": current,
         "current_name": Path(current).name if current else "",
         "project_directory": str(project_document_directory(addin_dir)),
-        "recovery_path": str(current_project_path(addin_dir)),
-        "recovery_available": current_project_path(addin_dir).is_file(),
+        "recovery_path": "",
+        "recovery_available": False,
+        "session_start_policy": "fresh_unsaved_project",
         "recent_documents": [
             {"path": item, "name": Path(item).name}
             for item in existing_recent
@@ -480,7 +474,6 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
     from board_game_insert_generator.project_v1 import blank_project_v1, normalize_project_draft
     from board_game_insert_generator.certified_plan_witness import (
         CERTIFIED_PLAN_WITNESS_SCHEMA_V1,
-        WITNESS_ACCEPTED,
     )
     from board_game_insert_generator.solver_case_bundle import (
         build_solver_case_bundle,
@@ -513,28 +506,21 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
     if action == "load_project":
         current_normalization = _load_current_project_normalization(addin_dir)
         project = current_normalization.project
-        migration_warnings = (
-            [
-                "Les anciennes origines XY des plateaux et livrets ont ete "
-                "migrees vers le placement automatique. Le fichier source ne "
-                "sera reecrit qu a l enregistrement explicite."
-            ]
-            if current_normalization.migrated
-            else []
-        )
+        document_state["current_path"] = ""
+        _write_document_state(addin_dir, document_state)
         return _response(
             request_id,
             "ready",
             project=project,
             creation_presets=build_creation_presets(project),
             personal_presets=load_personal_presets(current_personal_presets_path(addin_dir)),
-            saved=current_project_path(addin_dir).is_file(),
-            recovery_saved=current_project_path(addin_dir).is_file(),
+            saved=False,
+            recovery_saved=False,
             document=_document_info(addin_dir, document_state),
             solver_settings=solver_settings,
             finishing_effort=finishing_effort_profile,
-            migrated=current_normalization.migrated,
-            warnings=migration_warnings,
+            migrated=False,
+            warnings=[],
         )
     if action == "new_project":
         project = blank_project_v1()
@@ -643,32 +629,16 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
     solver_case_capture: dict[str, object] | None = None
     solver_case_export_path = ""
     artifact_kind = str(request.get("artifact_kind") or "minimal_layout")
-    witness_load_result: dict[str, object] = {
-        "status": "not_attempted",
-        "stop_reason": "action_does_not_run_global_solver",
-        "partition": None,
-    }
     witness_load_summary: dict[str, object] = {
         "schema_version": CERTIFIED_PLAN_WITNESS_SCHEMA_V1,
-        "status": "not_attempted",
-        "stop_reason": "action_does_not_run_global_solver",
+        "status": "disabled",
+        "stop_reason": "cross_session_witness_reuse_disabled",
     }
-    if action == "solve_project":
-        witness_load_result, witness_load_summary = _load_certified_witness(
-            addin_dir,
-            project,
-            frontier_digests=local_frontier_digests,
-        )
     if action == "solve_project":
         staged_action = staged_session.calculate_layout(
             request_id=request_id,
             request_revision=_request_revision(request),
-            initial_incumbent=(
-                witness_load_result.get("partition")
-                if witness_load_result.get("status") == WITNESS_ACCEPTED
-                and isinstance(witness_load_result.get("partition"), dict)
-                else None
-            ),
+            initial_incumbent=None,
         )
         partition = staged_action["partition"]
         staged_solver_result = staged_action["solver_result"]
@@ -768,43 +738,35 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
     saved = False
     recovery_saved = False
     export_path = solver_case_export_path
-    if action in {"save_project", "autosave_project"}:
-        _write_json_atomic(current_project_path(addin_dir), project)
-        recovery_saved = True
-        saved = action == "save_project"
-    elif action == "import_project":
-        _write_json_atomic(current_project_path(addin_dir), project)
+    if action == "import_project":
         document_state["current_path"] = ""
         _write_document_state(addin_dir, document_state)
-        recovery_saved = True
-        saved = True
+        recovery_saved = False
+        saved = False
     elif action == "save_document":
         current = str(document_state.get("current_path") or "")
         if not current:
             raise PaletteProjectError("Ce nouveau projet n a pas encore de fichier. Utilise Enregistrer sous.")
         named_path = Path(current)
         _write_json_atomic(named_path, project)
-        _write_json_atomic(current_project_path(addin_dir), project)
         _record_current_document(document_state, named_path)
         _write_document_state(addin_dir, document_state)
         saved = True
-        recovery_saved = True
+        recovery_saved = False
     elif action == "save_project_as":
         named_path = _document_path_from_request(request)
         _write_json_atomic(named_path, project)
-        _write_json_atomic(current_project_path(addin_dir), project)
         _record_current_document(document_state, named_path)
         _write_document_state(addin_dir, document_state)
         saved = True
-        recovery_saved = True
+        recovery_saved = False
         export_path = str(named_path)
     elif action in {"open_project_file", "open_recent_project"}:
         if opened_document is None:
             raise PaletteProjectError("Le document choisi est introuvable.")
-        _write_json_atomic(current_project_path(addin_dir), project)
         _record_current_document(document_state, opened_document)
         _write_document_state(addin_dir, document_state)
-        recovery_saved = True
+        recovery_saved = False
     elif action == "export_project":
         export_path = str(_export_project(addin_dir, project))
     elif action == "export_personal_presets":
@@ -814,18 +776,9 @@ def _dispatch(action: str, request: dict[str, object], addin_dir: Path, request_
 
     witness_store_summary: dict[str, object] = {
         "schema_version": CERTIFIED_PLAN_WITNESS_SCHEMA_V1,
-        "status": "not_attempted",
-        "stop_reason": "no_current_certified_plan_to_store",
+        "status": "disabled",
+        "stop_reason": "cross_session_witness_persistence_disabled",
     }
-    if action in {"validate_project", "solve_project"}:
-        current_minimal = staged_session.current_minimal_partition()
-        if current_minimal is not None:
-            witness_store_summary = _persist_certified_witness(
-                addin_dir,
-                project,
-                current_minimal,
-                frontier_digests=local_frontier_digests,
-            )
     certified_plan_witness = {
         "schema_version": CERTIFIED_PLAN_WITNESS_SCHEMA_V1,
         "load": witness_load_summary,
@@ -1052,173 +1005,6 @@ def _export_project(addin_dir: Path, project: dict[str, object]) -> Path:
     path = current_project_path(addin_dir).parent / f"{slug}.bgig.json"
     _write_json_atomic(path, project)
     return path
-
-
-def _certified_witness_path(
-    addin_dir: Path,
-    identity: Mapping[str, object],
-) -> Path:
-    compatibility_digest = str(identity.get("compatibility_digest", ""))
-    if len(compatibility_digest) != 64:
-        raise PaletteProjectError("Identite de witness certifie invalide.")
-    return (
-        current_project_path(addin_dir).parent
-        / "certified-witnesses"
-        / f"witness-{compatibility_digest}.bgig.json"
-    )
-
-
-def _load_certified_witness(
-    addin_dir: Path,
-    project: dict[str, object],
-    *,
-    frontier_digests: tuple[tuple[str, str], ...],
-) -> tuple[dict[str, object], dict[str, object]]:
-    from board_game_insert_generator.certified_plan_witness import (
-        CERTIFIED_PLAN_WITNESS_SCHEMA_V1,
-        certified_plan_witness_identity,
-        certified_plan_witness_summary,
-        validate_certified_plan_witness,
-    )
-
-    identity = certified_plan_witness_identity(project, frontier_digests)
-    path = _certified_witness_path(addin_dir, identity)
-    if not path.is_file():
-        result = {
-            "schema_version": CERTIFIED_PLAN_WITNESS_SCHEMA_V1,
-            "status": "not_available",
-            "stop_reason": "exact_witness_file_not_found",
-            "witness_digest": "",
-            "compatibility_digest": str(identity["compatibility_digest"]),
-            "plan_digest": "",
-            "partition": None,
-        }
-    else:
-        try:
-            raw = json.loads(path.read_text(encoding="utf-8-sig"))
-        except (OSError, json.JSONDecodeError):
-            result = {
-                "schema_version": CERTIFIED_PLAN_WITNESS_SCHEMA_V1,
-                "status": "rejected",
-                "stop_reason": "witness_file_unreadable",
-                "witness_digest": "",
-                "compatibility_digest": str(identity["compatibility_digest"]),
-                "plan_digest": "",
-                "partition": None,
-            }
-        else:
-            result = validate_certified_plan_witness(
-                raw,
-                project,
-                frontier_digests=frontier_digests,
-            )
-    summary = certified_plan_witness_summary(result)
-    summary["path"] = str(path)
-    return result, summary
-
-
-def _persist_certified_witness(
-    addin_dir: Path,
-    project: dict[str, object],
-    partition: dict[str, object],
-    *,
-    frontier_digests: tuple[tuple[str, str], ...],
-) -> dict[str, object]:
-    from board_game_insert_generator.certified_plan_witness import (
-        WITNESS_ACCEPTED,
-        build_certified_plan_witness,
-        certified_plan_witness_rank_axes,
-        certified_plan_witness_summary,
-        validate_certified_plan_witness,
-    )
-
-    witness = build_certified_plan_witness(
-        project,
-        partition,
-        frontier_digests=frontier_digests,
-    )
-    identity = witness["identity"]
-    if not isinstance(identity, Mapping):
-        raise PaletteProjectError("Identite de witness certifie absente.")
-    path = _certified_witness_path(addin_dir, identity)
-    existing: dict[str, object] | None = None
-    existing_partition: dict[str, object] | None = None
-    existing_requires_rank_migration = False
-    if path.is_file():
-        try:
-            loaded = json.loads(path.read_text(encoding="utf-8-sig"))
-        except (OSError, json.JSONDecodeError):
-            loaded = None
-        if isinstance(loaded, dict):
-            validation = validate_certified_plan_witness(
-                loaded,
-                project,
-                frontier_digests=frontier_digests,
-            )
-            validated_partition = validation.get("partition")
-            if validation.get("status") == WITNESS_ACCEPTED and isinstance(
-                validated_partition, dict
-            ):
-                existing = loaded
-                existing_partition = validated_partition
-                validation_invariants = validation.get("invariants")
-                existing_requires_rank_migration = bool(
-                    isinstance(validation_invariants, dict)
-                    and validation_invariants.get(
-                        "legacy_rank_policy_migration_required"
-                    )
-                )
-    exact_match = bool(
-        existing is not None and existing.get("witness_digest") == witness["witness_digest"]
-    )
-    existing_source = existing.get("source") if existing is not None else None
-    new_source = witness.get("source")
-    same_geometry = bool(
-        isinstance(existing_source, dict)
-        and isinstance(new_source, dict)
-        and not existing_requires_rank_migration
-        and existing_source.get("placement_geometry_digest")
-        == new_source.get("placement_geometry_digest")
-    )
-    stronger_or_equal = bool(
-        existing_partition is not None
-        and not existing_requires_rank_migration
-        and not exact_match
-        and not same_geometry
-        and certified_plan_witness_rank_axes(existing_partition)
-        <= certified_plan_witness_rank_axes(partition)
-    )
-    unchanged = exact_match or same_geometry or stronger_or_equal
-    persisted = existing if unchanged and existing is not None else witness
-    if not unchanged:
-        _write_json_atomic(path, witness)
-    persisted_source = persisted.get("source")
-    persisted_plan_digest = (
-        str(persisted_source.get("plan_digest", "")) if isinstance(persisted_source, dict) else ""
-    )
-    summary = certified_plan_witness_summary(
-        {
-            "status": "unchanged" if unchanged else "stored",
-            "stop_reason": (
-                "identical_certified_witness_already_stored"
-                if exact_match
-                else (
-                    "same_geometry_witness_preserved"
-                    if same_geometry
-                    else (
-                        "stronger_or_equal_certified_witness_preserved"
-                        if stronger_or_equal
-                        else "certified_witness_stored_atomically"
-                    )
-                )
-            ),
-            "witness_digest": persisted["witness_digest"],
-            "compatibility_digest": identity["compatibility_digest"],
-            "plan_digest": persisted_plan_digest,
-        }
-    )
-    summary["path"] = str(path)
-    return summary
 
 
 def _export_solver_case(

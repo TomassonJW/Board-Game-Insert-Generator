@@ -723,6 +723,14 @@ class FusionGenerationPlan:
             + len(self.finger_notch_cuts)
         )
 
+    @property
+    def additive_prism_join_batch_count(self) -> int:
+        return len(additive_prism_join_batches(self.additive_prism_joins))
+
+    @property
+    def cavity_cut_batch_count(self) -> int:
+        return len(cavity_cut_batches(self))
+
     def to_dict(self) -> dict[str, Any]:
         return {
             "project_name": self.project_name,
@@ -739,11 +747,49 @@ class FusionGenerationPlan:
             "rejected_grid_modules": [module.to_dict() for module in self.rejected_grid_modules],
             "cavity_cuts": [cut.to_dict() for cut in self.cavity_cuts],
             "additive_prism_joins": [join.to_dict() for join in self.additive_prism_joins],
+            "fusion_materialization_batches": {
+                "additive_prism_join_batches": self.additive_prism_join_batch_count,
+                "cavity_cut_batches": self.cavity_cut_batch_count,
+                "logical_additive_prism_joins": len(self.additive_prism_joins),
+                "logical_cavity_cuts": len(self.cavity_cuts),
+            },
             "finger_notch_cuts": [cut.to_dict() for cut in self.finger_notch_cuts],
             "artifact_identity": self.artifact_identity,
             "generation_mode": self.generation_mode,
             "validation_status": self.validation_status,
         }
+
+
+def additive_prism_join_batches(
+    joins: tuple[FusionAdditivePrismPlan, ...],
+) -> tuple[tuple[FusionAdditivePrismPlan, ...], ...]:
+    """Group every additive tool of one body into one Fusion combine."""
+
+    batches: dict[str, list[FusionAdditivePrismPlan]] = {}
+    for join in joins:
+        batches.setdefault(join.target_body_id, []).append(join)
+    return tuple(tuple(values) for values in batches.values())
+
+
+def cavity_cut_batches(
+    plan: FusionGenerationPlan,
+) -> tuple[tuple[FusionCavityCutPlan, ...], ...]:
+    """Group every rectangular cutting tool of one body into one combine."""
+
+    body_origins = {
+        blank.cad_id: blank.origin_mm
+        for blank in (*plan.blanks, *plan.grid_positioned_blanks)
+    }
+    batches: dict[str, list[FusionCavityCutPlan]] = {}
+    for cut in plan.cavity_cuts:
+        body_origin = body_origins.get(cut.target_body_id)
+        if body_origin is None:
+            raise FusionSkeletonError(
+                f"Cavity {cut.cavity_id!r} targets unknown body "
+                f"{cut.target_body_id!r}."
+            )
+        batches.setdefault(cut.target_body_id, []).append(cut)
+    return tuple(tuple(values) for values in batches.values())
 
 
 def _grid_units_tuple_to_dict(units: tuple[int, int, int]) -> dict[str, int]:

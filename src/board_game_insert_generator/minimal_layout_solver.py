@@ -409,6 +409,7 @@ def solve_minimal_layout(
         initial_incumbent is None
         and isinstance(raw_project, Mapping)
         and raw_project.get("flat_items")
+        and len(_mapping_items(raw_project.get("container_groups"))) < 12
     ):
         projected_project = deepcopy(dict(raw_project))
         projected_project["flat_items"] = []
@@ -681,6 +682,19 @@ def _solve_minimal_layout_once(
         participants=participants_with_options,
         container_variant_frontiers=frontiers,
     )
+    reserved_floor_stack_preparation = prepare_free_3d_problem(
+        raw_project,
+        top_inset_plan=base_problem.top_inset_plan,
+    )
+    reserved_floor_stack_problem = (
+        replace(
+            reserved_floor_stack_preparation.problem,
+            participants=participants_with_options,
+            container_variant_frontiers=frontiers,
+        )
+        if reserved_floor_stack_preparation.problem is not None
+        else certification_problem
+    )
     variant_search_participants = _force_minimum_dimensions(
         participants_with_options
     )
@@ -853,15 +867,17 @@ def _solve_minimal_layout_once(
                 "deterministic_digest": floor_execution.deterministic_digest,
             }
         )
+    # The automatic XY pose is resolved by ``reserved_floor_stack_problem``.
+    # Requiring a zone on the unresolved base problem would make this lane
+    # unreachable precisely when a dense project needs stacks below a tray.
     if (
-        certification_problem.top_inset_zones
-        and len(participants_with_options) >= 12
+        len(participants_with_options) >= 12
         and not floor_fast_path_used
         and not _deadline_has_expired(deadline_at_ms)
     ):
         floor_stack_execution = solve_reserved_floor_stacks(
             participants_with_options,
-            certification_problem,
+            reserved_floor_stack_problem,
             should_stop=lambda: (
                 _deadline_has_expired(deadline_at_ms)
                 or (cancel_check is not None and cancel_check())
@@ -877,7 +893,7 @@ def _solve_minimal_layout_once(
             floor_stack_seed = floor_stack_placements[0].participant_id
             floor_stack_spaces = _rebuild_empty_spaces(
                 floor_stack_placements,
-                certification_problem,
+                reserved_floor_stack_problem,
                 budget,
             )
             floor_stack_provenance = {
@@ -901,7 +917,7 @@ def _solve_minimal_layout_once(
             }
             floor_stack_certified, candidate_rejections = (
                 certify_minimal_free_3d_plan(
-                    certification_problem,
+                    reserved_floor_stack_problem,
                     strategy=strategy,
                     budget=budget,
                     candidate_id=(
@@ -930,6 +946,7 @@ def _solve_minimal_layout_once(
             )
             floor_stack_fast_path_used = True
             floor_stack_certified_count += 1
+            break
         lane_reports.append(
             {
                 "lane_id": _RESERVED_FLOOR_STACK_LANE.lane_id,

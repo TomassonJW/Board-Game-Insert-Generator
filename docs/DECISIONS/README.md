@@ -250,3 +250,13 @@ Tests, cartes backlog ou gates humaines a preparer.
   optionnelle, budgets explicites et jauge active seulement pendant les
   opérations.
 - ADR-0089-reservations-minimales-et-fermeture-globale-composee.md - proposition P64-L09S : réservations sans croissance de support, fermeture globale exacte, annexes XY composites bornées, CAD fidèle et vérité UI.
+- ADR-0090-protection-minima-et-repli-dense-de-finalisation.md - protection
+  stricte des minima et repli borné pour les finalisations denses.
+- ADR-0091-projection-reservations-et-pool-minimal-finition.md - projection
+  sans réservation puis recertification, avec pool borné de plans minimaux.
+- ADR-0092-reservations-virtuelles-piles-au-sol-et-identite-stable.md -
+  réservations supérieures virtuelles, piles au sol et identité stable.
+- ADR-0093-recalcul-explicite-reservations-optimisees-et-fermeture-hybride.md -
+  recalcul explicite, priorité plancher et fermeture composite hybride.
+- ADR-0094-session-vierge-et-materialisation-fusion-par-lots.md - session
+  vierge sans témoin intersession et booléens Fusion groupés par propriétaire.

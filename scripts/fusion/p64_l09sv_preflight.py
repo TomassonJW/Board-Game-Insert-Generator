@@ -122,7 +122,11 @@ def recent_limit_contract(project: dict[str, object]) -> dict[str, object]:
     }
 
 
-def run_end_to_end(project: dict[str, object]) -> dict[str, object]:
+def run_end_to_end(
+    project: dict[str, object],
+    *,
+    include_materialization_batches: bool = False,
+) -> dict[str, object]:
     engine = IncrementalLocalAnalysisEngine(project, effort_profile="normal")
     session = StagedCalculationSession(project, solver_settings=REQUESTED_SETTINGS)
     session.synchronize(
@@ -199,7 +203,7 @@ def run_end_to_end(project: dict[str, object]) -> dict[str, object]:
     ):
         raise RuntimeError("The recent Fusion plan lost its owner, unions, or tray cut.")
 
-    return {
+    result = {
         "minimal": {
             "artifact_digest": minimal_selection["artifact_digest"],
             "partition_plan_digest": minimal_selection["partition_plan_digest"],
@@ -238,6 +242,20 @@ def run_end_to_end(project: dict[str, object]) -> dict[str, object]:
             "fusion_observed": False,
         },
     }
+    if include_materialization_batches:
+        result["fusion_plan"]["logical_additive_prism_join_count"] = len(
+            fusion.additive_prism_joins
+        )
+        result["fusion_plan"]["additive_prism_join_batch_count"] = (
+            fusion.additive_prism_join_batch_count
+        )
+        result["fusion_plan"]["logical_cavity_cut_count"] = len(
+            fusion.cavity_cuts
+        )
+        result["fusion_plan"]["cavity_cut_batch_count"] = (
+            fusion.cavity_cut_batch_count
+        )
+    return result
 
 
 def _preflight_digest(summary: dict[str, object]) -> str:

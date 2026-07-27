@@ -5,6 +5,26 @@ operationnel vit dans `docs/BACKLOG.md`, l'etat courant dans `docs/STATUS.md`,
 et la lecture par capabilities dans `docs/CAPABILITY_MAP.md`. La nomenclature
 et le role de ces documents sont definis dans `docs/PILOTAGE_GLOSSARY.md`.
 
+<!-- P64-L09U-ROADMAP -->
+## Correctif P64-L09U arrivé à la gate humaine
+
+La gate 0.1.70 a révélé une matérialisation de douze à quinze minutes et une
+persistance de session contraire au recalcul explicite.
+
+Trajectoire corrective :
+
+```text
+P64-L09T-V human-KO 0.1.70
+  -> P64-L09U-A session vierge et calcul frais
+  -> P64-L09U-B booléens Fusion groupés
+  -> P64-L09U-C candidate 0.1.71
+  -> P64-L09U-V gate Fusion humaine chronométrée
+```
+
+Les corrections sont `automated-validated`. La prochaine frontière reste
+strictement l'observation humaine de 0.1.71. P64-F03 et les valeurs physiques
+ne changent pas. `fusion-validated=false`, `print-validated=false`.
+
 <!-- P64-L09T-ROADMAP -->
 ## Correctif P64-L09T arrive a la gate humaine V
 

@@ -23,6 +23,8 @@ from board_game_insert_generator.staged_calculation import (
 )
 from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     FUSION_GENERATION_MODE_COMPACT_ONLY,
+    additive_prism_join_batches,
+    cavity_cut_batches,
     generation_plan_from_cad_ir,
 )
 from scripts.fusion.p64_l09sv_preflight import (
@@ -234,6 +236,40 @@ class P64L09TFCompositeCadTests(unittest.TestCase):
                 and value.attachment_axis in {"x", "y"}
                 for value in self.fusion.additive_prism_joins
             )
+        )
+
+    def test_fusion_materialization_batches_preserve_every_logical_operation(self) -> None:
+        join_batches = additive_prism_join_batches(
+            self.fusion.additive_prism_joins
+        )
+        cut_batches = cavity_cut_batches(self.fusion)
+
+        self.assertEqual(
+            sum(len(batch) for batch in join_batches),
+            len(self.fusion.additive_prism_joins),
+        )
+        self.assertEqual(
+            sum(len(batch) for batch in cut_batches),
+            len(self.fusion.cavity_cuts),
+        )
+        self.assertLess(
+            len(join_batches),
+            len(self.fusion.additive_prism_joins),
+        )
+        self.assertLess(
+            len(cut_batches),
+            len(self.fusion.cavity_cuts),
+        )
+        self.assertEqual(
+            self.fusion.to_dict()["fusion_materialization_batches"],
+            {
+                "additive_prism_join_batches": len(join_batches),
+                "cavity_cut_batches": len(cut_batches),
+                "logical_additive_prism_joins": len(
+                    self.fusion.additive_prism_joins
+                ),
+                "logical_cavity_cuts": len(self.fusion.cavity_cuts),
+            },
         )
 
     def test_cad_refuses_a_composite_geometry_digest_divergence(self) -> None:

@@ -10,11 +10,6 @@ import json
 from pathlib import Path
 from time import perf_counter
 
-from board_game_insert_generator.certified_plan_witness import (
-    WITNESS_ACCEPTED,
-    certified_plan_witness_identity,
-    validate_certified_plan_witness,
-)
 from board_game_insert_generator.contextual_local_analysis import (
     IncrementalLocalAnalysisEngine,
 )
@@ -63,32 +58,6 @@ def _case_02_variants(
     }
 
 
-def _initial_incumbent(
-    project: dict[str, object],
-    engine: IncrementalLocalAnalysisEngine,
-) -> tuple[dict[str, object] | None, str]:
-    frontier_digests = engine.frontier_digests()
-    identity = certified_plan_witness_identity(project, frontier_digests)
-    witness_path = (
-        PROJECT_DIRECTORY
-        / "certified-witnesses"
-        / f"witness-{identity['compatibility_digest']}.bgig.json"
-    )
-    if not witness_path.is_file():
-        return None, "not_available"
-    result = validate_certified_plan_witness(
-        _load_raw(witness_path),
-        project,
-        frontier_digests=frontier_digests,
-    )
-    if (
-        result.get("status") == WITNESS_ACCEPTED
-        and isinstance(result.get("partition"), dict)
-    ):
-        return result["partition"], str(result["status"])
-    return None, str(result.get("status", "rejected"))
-
-
 def _run_case(
     case_id: str,
     raw_project: dict[str, object],
@@ -96,7 +65,6 @@ def _run_case(
     project = normalize_project_draft(raw_project).project
     settings = {"method": "auto", "effort": "normal"}
     engine = IncrementalLocalAnalysisEngine(project, effort_profile="normal")
-    initial_incumbent, witness_status = _initial_incumbent(project, engine)
     session = StagedCalculationSession(project, solver_settings=settings)
     session.synchronize(
         project,
@@ -109,7 +77,7 @@ def _run_case(
     calculated = session.calculate_layout(
         request_id=f"p64-l09t-local-{case_id}",
         request_revision=0,
-        initial_incumbent=initial_incumbent,
+        initial_incumbent=None,
     )
     calculation_ms = round((perf_counter() - started) * 1000.0, 3)
     if calculated["solver_result"]["status"] != "solution_found":
@@ -155,12 +123,14 @@ def _run_case(
         "calculation_status": "solution_found",
         "finalization_status": "solution_found",
         "cad_status": cad["status"],
-        "witness_status": witness_status,
+        "witness_status": "disabled",
         "cavities_frozen": True,
         "printable_residual_volume_mm3": 0.0,
         "component_count": fusion.module_component_count,
         "join_count": len(fusion.additive_prism_joins),
+        "join_feature_batch_count": fusion.additive_prism_join_batch_count,
         "cut_count": len(fusion.cavity_cuts),
+        "cut_feature_batch_count": fusion.cavity_cut_batch_count,
         "calculation_observed_ms": calculation_ms,
         "finishing_observed_ms": finishing_ms,
     }

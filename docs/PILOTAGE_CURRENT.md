@@ -1,5 +1,44 @@
 # Pilotage courant
 
+<!-- P64-L09U-CURRENT -->
+## Reprise canonique P64-L09U
+
+- La gate humaine de `0.1.70` est `human-KO` et `do-not-run`.
+- Les acquis calcul, finalisation, réservation, paroi, priorité plancher et
+  fermeture composite restent conservés.
+- Le défaut bloquant est la matérialisation finale : `706205 ms` mesurés côté
+  passerelle pour `CasLimite01+`, environ quinze minutes ressenties et Fusion
+  temporairement « ne répond pas ».
+- Un second défaut rouvrait le dernier projet au redémarrage et réinjectait un
+  témoin intersession ; un résultat observé en environ `102 ms` n'était donc
+  pas un recalcul complet.
+- ADR-0094 impose désormais une session vierge non enregistrée, l'ouverture
+  explicite des fichiers nommés et la désactivation des témoins intersession.
+- La voie dense « piles au sol » reçoit la réservation supérieure automatique
+  avant certification ; elle n'attend plus une pose déjà résolue dans le
+  problème de base.
+- Le CAD IR conserve toutes ses opérations logiques. Fusion les exécute par
+  corps avec un lot d'union et un lot de coupes rectangulaires.
+- Replay local en lecture seule : les six variantes passent, sources
+  personnelles inchangées.
+- `CasLimite01+` observé hors Fusion : calcul frais environ `3.4 s`, `19`
+  composants, `349` unions en `19` lots et `113` coupes en `19` lots.
+- `CasLimite02+` observé hors Fusion : `8` composants, `331` unions en `8`
+  lots et `129` coupes en `8` lots.
+- La candidate corrective est `0.1.71`. Son preflight public porte le digest
+  `53fc3f5adce84e51a2477113c171b11fbe723b12315ff01af185a19a502cb565`.
+- Prochaine action unique : gate humaine P64-L09U-V selon
+  `docs/P64_L09U_V_FUSION_GATE_RECIPE.md`.
+- Aucun benchmark/holdout, aucune valeur physique nouvelle ;
+  `fusion-validated=false`, `print-validated=false`.
+
+Autorités :
+
+- `docs/P64_L09T_V_0170_HUMAN_KO_EVIDENCE.md` ;
+- `docs/DECISIONS/ADR-0094-session-vierge-et-materialisation-fusion-par-lots.md` ;
+- `docs/P64_L09U_RELEASE_GATE_EVIDENCE.md` ;
+- `docs/P64_L09U_V_FUSION_GATE_RECIPE.md`.
+
 <!-- P64-L09T-CURRENT -->
 ## Reprise canonique P64-L09T
 

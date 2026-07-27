@@ -1,5 +1,50 @@
 # Status
 
+<!-- P64-L09U-STATUS -->
+## P64-L09U — correction du human-KO 0.1.70
+
+Date : 2026-07-27.
+
+Statut : `P64-L09U-automated-validated`,
+`P64-L09U-V-prepared-not-human-observed`.
+
+- 0.1.70 est `human-KO`, `do-not-run`.
+- La matérialisation de `CasLimite01+` a fini par réussir, mais après environ
+  douze à quinze minutes et un état « Fusion ne répond pas ».
+- La session précédente était restaurée au démarrage et un témoin certifié
+  intersession pouvait produire un calcul quasi instantané.
+- 0.1.71 démarre sur un projet vierge non enregistré et laisse les anciens
+  brouillons de récupération inertes.
+- Les fichiers nommés et récents restent ouverts uniquement par action
+  explicite.
+- Le chargement et l'écriture des témoins certifiés intersession sont
+  désactivés dans le parcours produit.
+- Le calcul frais des projets denses résout la réservation automatique dans la
+  voie plancher/piles avant certification.
+- Le replay local passe six variantes en lecture seule, avec cavités figées,
+  CAD IR prête et résiduel nul.
+- Les opérations CAD logiques restent intactes.
+- Fusion reçoit désormais un lot d'union puis un lot de coupes rectangulaires
+  par corps propriétaire.
+- `CasLimite01+` passe de plusieurs centaines de features potentielles à `19`
+  lots d'union et `19` lots de coupe.
+- `CasLimite02+` passe à `8` lots d'union et `8` lots de coupe.
+- Candidate : `0.1.71`.
+- Preflight :
+  `53fc3f5adce84e51a2477113c171b11fbe723b12315ff01af185a19a502cb565`.
+- Suite globale autorisée : `880/880` en `384.051 s`, une intégration SCIP
+  native ignorée et douze modules benchmark/corpus/tournoi exclus.
+- Aucun benchmark, holdout ou changement de valeur physique.
+
+Preuve KO : `docs/P64_L09T_V_0170_HUMAN_KO_EVIDENCE.md`.
+Décision :
+`docs/DECISIONS/ADR-0094-session-vierge-et-materialisation-fusion-par-lots.md`.
+Preuve corrective : `docs/P64_L09U_RELEASE_GATE_EVIDENCE.md`.
+Recette : `docs/P64_L09U_V_FUSION_GATE_RECIPE.md`.
+
+Prochaine action : observation humaine P64-L09U-V.
+`fusion-validated=false`, `print-validated=false`.
+
 <!-- P64-L09T-STATUS -->
 ## P64-L09T — missions A a G automatisees-validees, gate V preparee
 

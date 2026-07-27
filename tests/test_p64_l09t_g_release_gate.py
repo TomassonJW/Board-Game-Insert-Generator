@@ -203,7 +203,7 @@ class P64L09TGReleaseGateTests(unittest.TestCase):
         ]
         self.assertEqual(offenders, [])
 
-    def test_package_and_preparer_pin_the_0170_candidate(self) -> None:
+    def test_historical_preparer_remains_pinned_to_the_0170_candidate(self) -> None:
         addin = ROOT / "fusion_addin" / "BoardGameInsertGenerator"
         manifest = json.loads(
             (addin / "BoardGameInsertGenerator.manifest").read_text(
@@ -216,7 +216,7 @@ class P64L09TGReleaseGateTests(unittest.TestCase):
         local_replay = (
             ROOT / "scripts" / "fusion" / "p64_l09t_local_replay.py"
         ).read_text(encoding="utf-8")
-        self.assertEqual(manifest["version"], "0.1.70")
+        self.assertEqual(manifest["version"], "0.1.71")
         for marker in (
             'expectedVersion -ne "0.1.70"',
             "p64_l09t_local_replay.py",

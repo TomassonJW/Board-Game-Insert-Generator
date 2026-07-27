@@ -1,5 +1,40 @@
 # Backlog
 
+<!-- P64-L09U-BACKLOG -->
+## Correctif P64-L09U
+
+### P64-L09U-A — Session vierge et recalcul frais
+
+- Statut : `done`, `automated-validated`.
+- Ne plus rouvrir le dernier projet au démarrage.
+- Désactiver lecture et écriture des témoins intersession.
+- Conserver l'ouverture et l'enregistrement nommés explicites.
+- Rendre la voie dense admissible et certifiable sous réservation automatique.
+
+### P64-L09U-B — Matérialisation Fusion par lots
+
+- Statut : `done`, `automated-validated`.
+- Préserver chaque opération logique du CAD IR.
+- Construire les outils rectangulaires comme BRep transitoires.
+- Appliquer un lot d'union et un lot de coupe par propriétaire.
+- Exposer séparément comptes logiques et comptes de features.
+
+### P64-L09U-C — Candidate corrective
+
+- Statut : `done`, `automated-validated`.
+- Classer 0.1.70 `human-KO`, `do-not-run`.
+- Rejouer les six variantes locales en lecture seule.
+- Produire la candidate 0.1.71, le preflight, le préparateur et la recette.
+- Aucun benchmark/holdout.
+
+### P64-L09U-V — Gate humaine Fusion
+
+- Statut : `ready-human-gate`, `prepared-not-human-observed`.
+- Chronométrer calcul, finalisation et matérialisation des deux cas « + ».
+- Vérifier réactivité, scène, composants, géométrie et second démarrage vierge.
+- Recette : `docs/P64_L09U_V_FUSION_GATE_RECIPE.md`.
+- `fusion-validated=false`, `print-validated=false`.
+
 <!-- P64-L09T-BACKLOG -->
 ## Programme correctif P64-L09T
 

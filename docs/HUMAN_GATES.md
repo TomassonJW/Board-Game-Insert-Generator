@@ -1,5 +1,39 @@
 # Human Gates
 
+<!-- P64-L09U-GATE -->
+## P64-L09U-V — gate humaine corrective 0.1.71
+
+La gate 0.1.70 est close en `human-KO`, `do-not-run` :
+
+- matérialisation finale mesurée à `706205 ms` côté passerelle et environ
+  quinze minutes ressenties ;
+- Fusion temporairement « ne répond pas » ;
+- dernier projet rouvert automatiquement ;
+- témoin intersession masquant le vrai recalcul.
+
+La candidate 0.1.71 est préparée avec :
+
+- session vierge non enregistrée ;
+- témoins intersession désactivés ;
+- calcul frais des cas denses sous réservation ;
+- unions et coupes rectangulaires Fusion groupées par propriétaire ;
+- six replays locaux exacts en lecture seule ;
+- preflight
+  `53fc3f5adce84e51a2477113c171b11fbe723b12315ff01af185a19a502cb565`.
+
+Thomas observe :
+
+1. démarrage vierge après fermeture complète de Fusion ;
+2. vrai calcul frais de `CasLimite01+` et `CasLimite02+` ;
+3. finalisation certifiée ;
+4. temps exact et réactivité pendant chaque matérialisation ;
+5. scène synchronisée, comptes de composants et fidélité géométrique ;
+6. second redémarrage vierge sans réouverture automatique.
+
+Recette : `docs/P64_L09U_V_FUSION_GATE_RECIPE.md`.
+
+Avant ce verdict : `fusion-validated=false`, `print-validated=false`.
+
 <!-- P64-L09T-GATE -->
 ## P64-L09T-V — gate humaine 0.1.70 preparee
 

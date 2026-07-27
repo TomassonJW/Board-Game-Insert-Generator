@@ -529,18 +529,20 @@ class FusionPaletteDomTests(unittest.TestCase):
         self.assertIn("derived:quiet||Boolean(derivedKey),derivedKey,sourceRevision", self.markup)
         self.assertIn("renderAll({preserve:!(['load_project','import_project','new_project','open_project_file','open_recent_project'].includes(action)||bootstrap)})", self.markup)
         self.assertIn("if(['load_project','import_project','new_project','open_project_file','open_recent_project'].includes(action)||bootstrap)sourceRevision+=1", self.markup)
-        self.assertIn("if(action==='autosave_project')state('Modifications non sauvegardées - récupération enregistrée','ok')", self.markup)
+        self.assertNotIn("autosave_project", self.markup)
+        self.assertNotIn("scheduleRecovery", self.markup)
         self.assertNotIn("renderPresets();renderContents();renderFlats();renderGroups();renderContainerSizing();renderLifecycle();return", self.markup)
 
-    def test_supports_p44_m006_named_documents_recovery_and_discrete_diagnostics(self) -> None:
+    def test_supports_named_documents_fresh_sessions_and_discrete_diagnostics(self) -> None:
         for marker in (
             'data-action="new-project"', 'data-action="open-project"',
             'data-action="save-project-as"', 'id="save-document-action"',
             'id="document-status"', 'id="document-description"',
             'id="recent-documents"', 'id="design-height"',
             'id="diagnostic-tools"', 'data-confirm="Effacer uniquement les corps BGIG',
-            "scheduleRecovery", "autosave_project", "open_recent_project",
+            "open_recent_project",
             "save_project_as", "save_document", "new_project",
+            "BGIG démarre toujours sur un projet vierge",
         ):
             self.assertIn(marker, self.markup)
         self.assertIn("Hauteur de conception", self.markup)
@@ -551,7 +553,7 @@ class FusionPaletteDomTests(unittest.TestCase):
     def test_p44_m006_h01_guards_fusion_state_and_unsaved_document_transitions(self) -> None:
         for marker in (
             "function hasUnsavedEdition()",
-            "documentInfo?.recovery_available",
+            "function hasUnsavedEdition(){return Boolean(dirty)}",
             "function confirmDiscardUnsavedEdition(actionLabel)",
             "confirmDiscardUnsavedEdition('Créer un nouveau projet')",
             "confirmDiscardUnsavedEdition('Ouvrir un autre projet')",

@@ -46,25 +46,40 @@ class FusionPaletteProjectTests(unittest.TestCase):
         self.assertEqual(response["lifecycle"]["source"], "current")
         self.assertEqual(response["lifecycle"]["derived"], "pending")
 
-    def test_save_is_atomic_and_load_restores_the_normalized_project(self) -> None:
+    def test_explicit_save_is_atomic_but_next_session_starts_blank(self) -> None:
         project = blank_project_v1()
         project_name = "Éléments d’été — boîte à dés"
         project["project_name"] = project_name
         with tempfile.TemporaryDirectory() as temp_dir, patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}):
-            saved = handle_palette_request(request("save_project", project=project), ADDIN, ROOT)
+            path = Path(temp_dir) / "projet-explicite.bgig.json"
+            saved = handle_palette_request(
+                request(
+                    "save_project_as",
+                    project=project,
+                    document_path=str(path),
+                ),
+                ADDIN,
+                ROOT,
+            )
             loaded = handle_palette_request(request("load_project"), ADDIN, ROOT)
-            path = Path(temp_dir) / CURRENT_PROJECT_FILENAME
             raw = path.read_text(encoding="utf-8")
 
             self.assertTrue(path.is_file())
             self.assertFalse(path.with_suffix(path.suffix + ".tmp").exists())
             self.assertIn(project_name, raw)
             self.assertEqual(json.loads(raw)["project_name"], project_name)
+            self.assertFalse((Path(temp_dir) / CURRENT_PROJECT_FILENAME).exists())
 
         self.assertTrue(saved["saved"])
-        self.assertEqual(loaded["project"]["project_name"], project_name)
+        self.assertFalse(saved["recovery_saved"])
+        self.assertNotEqual(loaded["project"]["project_name"], project_name)
+        self.assertEqual(loaded["document"]["current_path"], "")
+        self.assertEqual(
+            loaded["document"]["session_start_policy"],
+            "fresh_unsaved_project",
+        )
 
-    def test_load_migrates_historical_flat_origin_without_rewriting_named_source(self) -> None:
+    def test_open_migrates_historical_flat_origin_without_rewriting_named_source(self) -> None:
         project = blank_project_v1()
         project["flat_items"] = [
             {
@@ -82,17 +97,24 @@ class FusionPaletteProjectTests(unittest.TestCase):
             "os.environ",
             {"BGIG_USER_DATA_DIR": temp_dir},
         ):
-            source = Path(temp_dir) / CURRENT_PROJECT_FILENAME
+            source = Path(temp_dir) / "historique.bgig.json"
             source.write_text(json.dumps(project), encoding="utf-8")
             before = source.read_text(encoding="utf-8")
 
-            loaded = handle_palette_request(request("load_project"), ADDIN, ROOT)
+            loaded = handle_palette_request(
+                request(
+                    "open_project_file",
+                    document_path=str(source),
+                ),
+                ADDIN,
+                ROOT,
+            )
 
             self.assertEqual(source.read_text(encoding="utf-8"), before)
 
         self.assertTrue(loaded["migrated"])
         self.assertIsNone(loaded["project"]["flat_items"][0]["origin_mm"])
-        self.assertEqual(loaded["lifecycle"]["derived"], "pending")
+        self.assertEqual(loaded["lifecycle"]["derived"], "current")
         self.assertTrue(
             any("placement automatique" in warning for warning in loaded["warnings"])
         )
@@ -660,7 +682,7 @@ class FusionPaletteProjectTests(unittest.TestCase):
         self.assertIsNone(response["cad_build"])
         self.assertIn("calcule", " ".join(response["errors"]).lower())
 
-    def test_bridge_round_trip_and_materializes_an_explicit_legacy_complement(self) -> None:
+    def test_bridge_import_and_materialize_an_explicit_legacy_complement_in_session(self) -> None:
         project = blank_project_v1()
         project["container_groups"] = [{
             "id": "g", "name": "Bac", "wall_thickness_mm": None, "floor_thickness_mm": None,
@@ -679,13 +701,18 @@ class FusionPaletteProjectTests(unittest.TestCase):
             imported = handle_palette_request(
                 request("import_project", project_json=json.dumps(project)), ADDIN, ROOT
             )
-            loaded = handle_palette_request(request("load_project"), ADDIN, ROOT)
-            handle_palette_request(request("solve_project", project=loaded["project"]), ADDIN, ROOT)
+            handle_palette_request(
+                request("solve_project", project=imported["project"]),
+                ADDIN,
+                ROOT,
+            )
             materialized = handle_palette_request(
-                request("materialize_project", project=loaded["project"]), ADDIN, ROOT
+                request("materialize_project", project=imported["project"]),
+                ADDIN,
+                ROOT,
             )
 
-        legacy = loaded["project"]["fill_elements"]
+        legacy = imported["project"]["fill_elements"]
         self.assertEqual(imported["status"], "ready")
         self.assertEqual(legacy[0]["id"], "legacy-solid")
         self.assertEqual(legacy[0]["kind"], "solid")
@@ -800,11 +827,24 @@ class FusionPaletteProjectTests(unittest.TestCase):
     def test_invalid_project_returns_an_actionable_response_without_overwriting_saved_data(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir, patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}):
             valid = blank_project_v1()
-            handle_palette_request(request("save_project", project=valid), ADDIN, ROOT)
+            document_path = Path(temp_dir) / "projet-valide.bgig.json"
+            handle_palette_request(
+                request(
+                    "save_project_as",
+                    project=valid,
+                    document_path=str(document_path),
+                ),
+                ADDIN,
+                ROOT,
+            )
             invalid = dict(valid)
             invalid["project_name"] = ""
-            response = handle_palette_request(request("save_project", project=invalid), ADDIN, ROOT)
-            persisted = json.loads((Path(temp_dir) / CURRENT_PROJECT_FILENAME).read_text(encoding="utf-8"))
+            response = handle_palette_request(
+                request("save_document", project=invalid),
+                ADDIN,
+                ROOT,
+            )
+            persisted = json.loads(document_path.read_text(encoding="utf-8"))
 
         self.assertEqual(response["status"], "invalid")
         self.assertTrue(response["errors"])
@@ -823,7 +863,8 @@ class FusionPaletteProjectTests(unittest.TestCase):
 
             self.assertTrue(Path(exported["export_path"]).is_file())
 
-        self.assertTrue(imported["saved"])
+        self.assertFalse(imported["saved"])
+        self.assertFalse(imported["recovery_saved"])
         self.assertEqual(exported["status"], "ready")
 
     def test_bridge_keeps_fifty_stable_container_identifiers(self) -> None:
@@ -944,14 +985,20 @@ class FusionPaletteProjectTests(unittest.TestCase):
             missing_id = handle_palette_request({"schema": PALETTE_REQUEST_SCHEMA, "action": "load_project"}, ADDIN, ROOT)
             missing_schema = handle_palette_request({"request_id": "x", "action": "load_project"}, ADDIN, ROOT)
             unknown = handle_palette_request(request("delete_everything"), ADDIN, ROOT)
+            autosave = handle_palette_request(
+                request("autosave_project", project=blank_project_v1()),
+                ADDIN,
+                ROOT,
+            )
 
         self.assertEqual(malformed["status"], "invalid")
         self.assertEqual(missing_id["status"], "invalid")
         self.assertEqual(missing_schema["status"], "invalid")
         self.assertEqual(unknown["status"], "invalid")
+        self.assertEqual(autosave["status"], "invalid")
 
 
-    def test_named_document_save_open_and_recovery_round_trip_preserves_accents(self) -> None:
+    def test_named_document_save_preserves_accents_but_restart_is_blank(self) -> None:
         project = blank_project_v1()
         project["project_name"] = "Éléments d’été — boîte à dés"
         with tempfile.TemporaryDirectory() as temp_dir, patch.dict("os.environ", {"BGIG_USER_DATA_DIR": temp_dir}):
@@ -966,15 +1013,16 @@ class FusionPaletteProjectTests(unittest.TestCase):
 
             self.assertTrue(document_path.is_file())
             self.assertEqual(json.loads(document_path.read_text(encoding="utf-8"))["project_name"], changed["project_name"])
-            self.assertTrue((Path(temp_dir) / CURRENT_PROJECT_FILENAME).is_file())
-            self.assertEqual(loaded["document"]["current_path"], str(document_path.resolve()))
-            self.assertEqual(loaded["document"]["current_name"], document_path.name)
+            self.assertFalse((Path(temp_dir) / CURRENT_PROJECT_FILENAME).exists())
+            self.assertEqual(loaded["document"]["current_path"], "")
+            self.assertEqual(loaded["document"]["current_name"], "")
             self.assertIn(str(document_path.resolve()), [item["path"] for item in loaded["document"]["recent_documents"]])
 
         self.assertTrue(saved_as["saved"])
-        self.assertTrue(saved_as["recovery_saved"])
+        self.assertFalse(saved_as["recovery_saved"])
         self.assertTrue(saved["saved"])
-        self.assertEqual(loaded["project"]["project_name"], changed["project_name"])
+        self.assertFalse(saved["recovery_saved"])
+        self.assertNotEqual(loaded["project"]["project_name"], changed["project_name"])
 
     def test_new_project_clears_current_named_document_without_overwriting_it(self) -> None:
         project = blank_project_v1()
@@ -1075,9 +1123,9 @@ class FusionPaletteProjectTests(unittest.TestCase):
         self.assertEqual(reloaded["solver_settings"], {"method": "stage_stack", "effort": "deep"})
         self.assertEqual(reloaded["finishing_effort"], "long")
 
-    def test_p64_l05c_persists_and_reloads_exact_certified_witness(self) -> None:
+    def test_cross_session_certified_witness_reuse_and_storage_are_disabled(self) -> None:
         project = blank_project_v1()
-        project["project_name"] = "Witness persistant"
+        project["project_name"] = "Calcul frais"
         project["container_groups"] = [
             {
                 "id": "g",
@@ -1113,25 +1161,8 @@ class FusionPaletteProjectTests(unittest.TestCase):
                 ADDIN,
                 ROOT,
             )
-            first_store = first["certified_plan_witness"]["store"]
-            witness_path = Path(first_store["path"])
-            first_witness = json.loads(witness_path.read_text(encoding="utf-8"))
             palette_project_module._STAGED_CALCULATION_SESSIONS.clear()
             palette_project_module._LOCAL_ANALYSIS_ENGINES.clear()
-            normal = handle_palette_request(
-                request(
-                    "solve_project",
-                    project=project,
-                    solver_settings={"method": "auto", "effort": "normal"},
-                    source_revision=2,
-                ),
-                ADDIN,
-                ROOT,
-            )
-            normal_witness_path = Path(normal["certified_plan_witness"]["store"]["path"])
-            palette_project_module._STAGED_CALCULATION_SESSIONS.clear()
-            palette_project_module._LOCAL_ANALYSIS_ENGINES.clear()
-
             second = handle_palette_request(
                 request(
                     "solve_project",
@@ -1142,74 +1173,28 @@ class FusionPaletteProjectTests(unittest.TestCase):
                 ADDIN,
                 ROOT,
             )
-            second_witness = json.loads(witness_path.read_text(encoding="utf-8"))
-
-            self.assertEqual(first_store["status"], "stored")
-            self.assertTrue(witness_path.is_file())
-            self.assertTrue(normal_witness_path.is_file())
-            self.assertNotEqual(normal_witness_path, witness_path)
-            self.assertEqual(witness_path.parent, Path(temp_dir) / "certified-witnesses")
-            self.assertFalse(witness_path.with_suffix(witness_path.suffix + ".tmp").exists())
+            self.assertEqual(first["status"], "ready")
+            self.assertEqual(second["status"], "ready")
             self.assertEqual(
-                second["certified_plan_witness"]["load"]["status"],
-                "accepted",
+                first["certified_plan_witness"]["load"],
+                second["certified_plan_witness"]["load"],
             )
             self.assertEqual(
-                second["staged_calculation"]["minimal_layout"]["warm_start"]["status"],
-                "accepted",
-            )
-            self.assertTrue(
-                second["staged_calculation"]["minimal_layout"]["warm_start"]["search_continued"]
+                first["certified_plan_witness"]["load"]["status"],
+                "disabled",
             )
             self.assertEqual(
-                second["staged_calculation"]["minimal_layout"]["calculation_timing"][
-                    "result_source"
-                ],
-                "fresh_search_with_certified_witness",
+                first["certified_plan_witness"]["store"]["status"],
+                "disabled",
             )
             self.assertEqual(
-                second["certified_plan_witness"]["store"]["stop_reason"],
-                "same_geometry_witness_preserved",
+                second["staged_calculation"]["minimal_layout"][
+                    "calculation_timing"
+                ]["result_source"],
+                "fresh_search",
             )
-            self.assertEqual(first_witness["witness_digest"], second_witness["witness_digest"])
-            self.assertEqual(
-                first_witness["source"]["placement_geometry_digest"],
-                second_witness["source"]["placement_geometry_digest"],
-            )
-            tampered = deepcopy(second_witness)
-            tampered["partition"]["placements"][0]["origin_mm"]["x"] += 1
-            witness_path.write_text(
-                json.dumps(tampered, ensure_ascii=False, indent=2),
-                encoding="utf-8",
-            )
-            palette_project_module._STAGED_CALCULATION_SESSIONS.clear()
-            palette_project_module._LOCAL_ANALYSIS_ENGINES.clear()
-            repaired = handle_palette_request(
-                request(
-                    "solve_project",
-                    project=project,
-                    solver_settings=settings,
-                    source_revision=3,
-                ),
-                ADDIN,
-                ROOT,
-            )
-            repaired_witness = json.loads(witness_path.read_text(encoding="utf-8"))
-            self.assertEqual(
-                repaired["certified_plan_witness"]["load"]["status"],
-                "rejected",
-            )
-            self.assertEqual(
-                repaired["certified_plan_witness"]["load"]["stop_reason"],
-                "witness_digest_mismatch",
-            )
-            self.assertEqual(
-                repaired["certified_plan_witness"]["store"]["status"],
-                "stored",
-            )
-            self.assertNotEqual(
-                tampered["partition"]["placements"],
-                repaired_witness["partition"]["placements"],
+            self.assertFalse(
+                (Path(temp_dir) / "certified-witnesses").exists()
             )
         palette_project_module._STAGED_CALCULATION_SESSIONS.clear()
         palette_project_module._LOCAL_ANALYSIS_ENGINES.clear()

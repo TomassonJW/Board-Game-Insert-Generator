@@ -1,5 +1,28 @@
 # Next Actions
 
+<!-- P64-L09U-NEXT -->
+## Action courante : exécuter la gate humaine P64-L09U-V
+
+La gate 0.1.70 est `human-KO` et `do-not-run`. P64-L09U corrige les deux
+causes observées sans changer les valeurs physiques ni déplacer les cavités :
+
+1. démarrage sur un projet vierge non enregistré ;
+2. ouverture des fichiers nommés uniquement sur action explicite ;
+3. aucun témoin certifié lu ou écrit entre deux sessions ;
+4. vrai calcul frais, y compris pour les piles sous réservation supérieure ;
+5. opérations CAD logiques conservées mais booléens Fusion groupés par corps ;
+6. candidate corrective `0.1.71` et preflight public préparés.
+
+Thomas suit uniquement
+`docs/P64_L09U_V_FUSION_GATE_RECIPE.md`. Il chronomètre séparément calcul,
+finalisation et matérialisation sur `CasLimite01+` et `CasLimite02+`, puis
+vérifie un second redémarrage vierge.
+
+Preflight :
+`53fc3f5adce84e51a2477113c171b11fbe723b12315ff01af185a19a502cb565`.
+
+`fusion-validated=false`, `print-validated=false`.
+
 <!-- P64-L09T-NEXT -->
 ## Action courante : executer la gate humaine P64-L09T-V
 

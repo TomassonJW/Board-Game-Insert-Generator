@@ -1,5 +1,29 @@
 # Capability Map
 
+<!-- P64-L09U-CAPABILITY -->
+## P64-L09U — correction de session et matérialisation
+
+- `C-STAGED-CALCULATION` : `automated-validated`. Un redémarrage ne recharge
+  plus de projet ou de témoin certifié ; Calculer déclenche un calcul frais.
+- `C-DOCUMENT` : `automated-validated`. La session commence vierge et non
+  enregistrée ; les fichiers nommés et récents restent explicites.
+- `C-SOLVER` / `C-RESERVATION` : `automated-validated`. La voie dense de piles
+  au sol utilise la réservation supérieure automatique sans condition
+  circulaire sur une pose déjà résolue.
+- `C-CAD-IR` : inchangée et `automated-validated`. Toutes les unions et coupes
+  logiques, identités, digests et certificats sont conservés.
+- `C-FUSION` : adaptateur pur `automated-validated`. Les BRep outils sont
+  groupés par propriétaire dans une BaseFeature, puis un Combine Join et un
+  Combine Cut appliquent les opérations rectangulaires.
+- `C-QUALITY` : six replays locaux exacts en lecture seule, tests ciblés verts
+  et suite globale autorisée `880/880` en `384.051 s`. Une intégration SCIP
+  native est ignorée et douze modules benchmark/corpus/tournoi sont exclus.
+- `C-RELEASE` : candidate `0.1.71`, preflight et préparateur disponibles.
+- `C-FUSION` reste non observée réellement sur 0.1.71 avant P64-L09U-V.
+- `C-PRINT` : `print-validated=false`.
+
+`fusion-validated=false`, `print-validated=false`.
+
 <!-- P64-L09T-CAPABILITY -->
 ## P64-L09T — missions A a G automatisees-validees
 
