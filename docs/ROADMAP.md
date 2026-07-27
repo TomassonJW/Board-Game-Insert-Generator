@@ -6,7 +6,27 @@ et la lecture par capabilities dans `docs/CAPABILITY_MAP.md`. La nomenclature
 et le role de ces documents sont definis dans `docs/PILOTAGE_GLOSSARY.md`.
 
 <!-- P64-L09U-ROADMAP -->
-## Correctif P64-L09U-R2 arrivé à sa clôture automatisée
+## Correctif P64-L09U-R3 — calibre, réservations locales et budget
+
+0.1.73 est `human-KO`, mais confirme le nouveau socle de matérialisation rapide,
+progressive et fidèle. R3 corrige la géométrie fonctionnelle sans régresser ce
+socle.
+
+```text
+P64-L09U-R2-V human-KO 0.1.73
+  -> R3 profondeur calibrée et ancrage Z final
+  -> R3 plateaux/livrets par empreintes et paliers locaux
+  -> R3 plafond mural et mesure honnête des phases
+  -> validation, package 0.1.74 et nouvelle gate humaine
+```
+
+Les jobs annulables, miniatures de variantes et l'épaisseur distincte de
+séparateur restent sous ADR-0095 à ADR-0097 et hors de R3.
+`fusion-validated=false`, `print-validated=false`.
+
+### Historique R2 clôturé en human-KO
+
+#### Correctif P64-L09U-R2 arrivé à sa clôture automatisée
 
 0.1.72 est `human-KO` : la finalisation pouvait utiliser un minimum alternatif,
 l'aperçu composite ne représentait pas les vrais prismes et les Combine Fusion

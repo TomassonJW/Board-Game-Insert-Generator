@@ -1,7 +1,36 @@
 # Next Actions
 
 <!-- P64-L09U-NEXT -->
-## Action courante : exécuter la gate P64-L09U-R2-V
+## Action courante : exécuter P64-L09U-R3
+
+0.1.73 est `human-KO`, `do-not-run`, malgré une matérialisation désormais
+rapide, progressive, réactive et fidèle à l'aperçu.
+
+Mission unique :
+
+1. tracer la profondeur de cavité du minimum au plan Fusion ;
+2. conserver le calibre exact et résoudre seulement l'origine Z finale ;
+3. composer les plateaux/livrets par empreintes et intervalles Z locaux ;
+4. séparer budget contractuel, plafond mural et terminaison ;
+5. préserver le corps BRep transitoire et toutes les performances humaines
+   acquises ;
+6. valider, empaqueter la cible initiale 0.1.74, installer et préparer la gate.
+
+Contrat canonique :
+`docs/P64_L09U_R3_END_TO_END_RUNBOOK.md`.
+
+Preuve humaine :
+`docs/P64_L09U_R2_V_0173_HUMAN_KO_EVIDENCE.md`.
+
+Décision :
+`docs/DECISIONS/ADR-0099-profondeur-calibree-et-reservations-superieures-locales.md`.
+
+Aucun benchmark/holdout. Les projets personnels restent en lecture seule.
+`fusion-validated=false`, `print-validated=false`.
+
+### Historique R2 clôturé en human-KO
+
+#### Ancienne action : exécuter la gate P64-L09U-R2-V
 
 0.1.72 est `human-KO`, `do-not-run`. Son calcul et sa finalisation pouvaient
 réussir, mais la matérialisation finale n'était ni fidèle ni robuste.

@@ -1,13 +1,42 @@
 # Status
 
 <!-- P64-L09U-STATUS -->
-## P64-L09U-R2 — fidélité finale et matérialisation transitoire
+## P64-L09U-R3 — profondeur calibrée et réservations locales
+
+Date : 2026-07-28.
+
+Statut : `P64-L09U-R2-V-human-KO`, `P64-L09U-R3-ready`,
+`fusion-validated=false`, `print-validated=false`.
+
+- 0.1.73 est `human-KO`, `do-not-run`.
+- La matérialisation transitoire est humainement confirmée rapide, progressive,
+  réactive et fidèle à l'aperçu.
+- Une cavité attendue à `10,6 mm` a été mesurée à `18,2 mm` après finalisation.
+- Deux plateaux différents de `CasLimite02+` donnent un encastrement
+  apparemment global et cumulé.
+- Une variante locale non sauvegardée a affiché environ `24 s` pour un plafond
+  de calcul annoncé à `20 s`.
+- ADR-0099 corrige la sémantique : calibre, X/Y et orientation figés ; origine Z
+  finale déterministe ; réservations composées uniquement selon leurs
+  empreintes et intervalles Z réels.
+- P64-L09U-R3 est la seule mission prête, cible initiale 0.1.74.
+- Aucun benchmark/holdout ; projets personnels en lecture seule.
+
+Preuve :
+`docs/P64_L09U_R2_V_0173_HUMAN_KO_EVIDENCE.md`.
+Décision :
+`docs/DECISIONS/ADR-0099-profondeur-calibree-et-reservations-superieures-locales.md`.
+Runbook :
+`docs/P64_L09U_R3_END_TO_END_RUNBOOK.md`.
+
+### Historique R2 clôturé en human-KO
+
+#### P64-L09U-R2 — fidélité finale et matérialisation transitoire
 
 Date : 2026-07-27.
 
-Statut : `P64-L09U-R2-automated-validated`,
-`P64-L09U-R2-V-ready-human-gate`,
-`prepared-not-human-observed`.
+Statut historique : `P64-L09U-R2-automated-validated`,
+`P64-L09U-R2-V-human-KO`, `do-not-run`.
 
 - 0.1.72 est `human-KO`, `do-not-run`.
 - La finalisation utilise exactement le plan minimal courant ; la sélection

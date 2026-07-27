@@ -97,4 +97,9 @@ ne crée aucune feature Combine rectangulaire.
   visible de l'API Fusion.
 - `fusion-validated=false`.
 - `print-validated=false`.
-- Gate : `ready-human-gate`, `prepared-not-human-observed`.
+- Gate rejouée le 2026-07-28 : `human-KO`, `do-not-run`.
+- Les performances et la fidélité générale de matérialisation sont confirmées,
+  mais la profondeur des cavités et la composition de plusieurs plateaux sont
+  bloquantes.
+- Preuve humaine :
+  `docs/P64_L09U_R2_V_0173_HUMAN_KO_EVIDENCE.md`.

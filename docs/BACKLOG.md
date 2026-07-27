@@ -1,7 +1,35 @@
 # Backlog
 
 <!-- P64-L09U-BACKLOG -->
-## Correctif P64-L09U-R2
+## Correctif P64-L09U-R3
+
+### P64-L09U-R2-V — Gate humaine Fusion 0.1.73
+
+- Statut : `done-human-KO`, `do-not-run`.
+- Acquis : matérialisation rapide, progressive et fidèle à l'aperçu.
+- Bloquants : profondeur de cavité finale, plusieurs plateaux et plafond
+  affiché dépassé.
+- Preuve : `docs/P64_L09U_R2_V_0173_HUMAN_KO_EVIDENCE.md`.
+
+### P64-L09U-R3 — Profondeur, réservations locales et budget
+
+- Statut : `ready`.
+- Conserver la profondeur calibrée et résoudre l'origine Z finale.
+- Composer plusieurs réservations uniquement sur leurs empreintes locales.
+- Séparer budget contractuel, plafond mural et terminaison.
+- Préserver le chemin Fusion BRep transitoire progressif.
+- Cible initiale : `0.1.74`.
+- Runbook : `docs/P64_L09U_R3_END_TO_END_RUNBOOK.md`.
+
+### P64-L09U-R3-V — Gate humaine Fusion
+
+- Statut : `planned-human-gate`, inactive.
+- Dépend de R3 intégrée, validée, empaquetée et installée.
+- `fusion-validated=false`, `print-validated=false`.
+
+### Historique R2
+
+#### Correctif P64-L09U-R2
 
 ### P64-L09U-R1-V — Gate humaine Fusion 0.1.72
 
@@ -17,9 +45,9 @@
 - Remplacer les Combine rectangulaires par un corps transitoire stable.
 - Candidate : `0.1.73`.
 
-### P64-L09U-R2-V — Gate humaine Fusion 0.1.73
+#### P64-L09U-R2-V — Gate humaine Fusion 0.1.73
 
-- Statut : `ready-human-gate`, `prepared-not-human-observed`.
+- Statut historique : `done-human-KO`, `do-not-run`.
 - Package 0.1.73 du commit `b5fb15b` installé et vérifié.
 - Vérifier fidélité aperçu/Fusion et dimensions des cavités.
 - Chronométrer les matérialisations minimale et finale.

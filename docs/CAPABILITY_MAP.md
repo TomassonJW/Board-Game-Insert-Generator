@@ -1,7 +1,26 @@
 # Capability Map
 
 <!-- P64-L09U-CAPABILITY -->
-## P64-L09U-R2 — fidélité calcul, aperçu et Fusion
+## P64-L09U-R3 — profondeur calibrée et réservations locales
+
+- `C-FUSION` : acquis humain partiel à préserver. Corps transitoires,
+  matérialisation progressive, réactivité et fidélité aperçu/scène confirmés.
+- `C-CAVITY` : `human-KO`. La profondeur calibrée peut être allongée après
+  finalisation ; attendu `10,6 mm`, mesuré `18,2 mm`.
+- `C-RESERVATION` : `human-KO`. Deux plateaux différents peuvent produire un
+  encastrement global/cumulé au lieu de coupes locales étagées.
+- `C-STAGED-CALCULATION` : défaut observé. Environ `24 s` affichées pour un
+  plafond annoncé à `20 s` sur une variante locale non sauvegardée.
+- `C-FINALIZATION`, `C-CAD-IR`, `C-PREVIEW` : R3 doit aligner profondeur,
+  ancrage Z et identité de chaque réservation de bout en bout.
+- `C-RELEASE` : 0.1.73 `human-KO`, `do-not-run`; cible initiale 0.1.74.
+- `C-PRINT` : `print-validated=false`.
+
+`fusion-validated=false`, `print-validated=false`.
+
+### Historique R2 clôturé en human-KO
+
+#### P64-L09U-R2 — fidélité calcul, aperçu et Fusion
 
 - `C-STAGED-CALCULATION` : `automated-validated`. La finalisation conserve
   l'identité et les placements du minimum exact sélectionné.
@@ -20,8 +39,7 @@
   annulation restent seulement proposées par ADR-0095.
 - `C-QUALITY` : `109/109` tests du préparateur, six replays exacts en lecture
   seule et suite globale autorisée `886/886` en `363.209 s`.
-- `C-RELEASE` : candidate `0.1.73`, preflight et préparateur disponibles ;
-  installation réelle encore à clôturer.
+- `C-RELEASE` : 0.1.73 installée puis classée `human-KO`, `do-not-run`.
 - `C-PRINT` : `print-validated=false`.
 
 `fusion-validated=false`, `print-validated=false`.

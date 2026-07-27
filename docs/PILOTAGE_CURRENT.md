@@ -1,7 +1,41 @@
 # Pilotage courant
 
 <!-- P64-L09U-CURRENT -->
-## Reprise canonique P64-L09U-R2
+## Reprise canonique P64-L09U-R3
+
+- `0.1.73` est `human-KO`, `do-not-run` pour une utilisation finale.
+- Acquis humains à préserver : calcul rapide, finalisation utilisable,
+  matérialisation en quelques secondes, progressive, réactive et fidèle à
+  l'aperçu, sans `ALL_TOOL_BODY_REFERENCE_LOST`.
+- Défaut bloquant 1 : une cavité attendue à `10,6 mm` mesure `18,2 mm` après
+  finalisation. Le corps gagne de la hauteur et la cavité est allongée au lieu
+  de conserver son calibre et de résoudre son origine Z finale.
+- Défaut bloquant 2 : les deux plateaux différents de `CasLimite02+` produisent
+  un encastrement apparemment global et cumulé au lieu de découpes locales et
+  étagées par empreinte.
+- Défaut complémentaire : une variante locale non sauvegardée a affiché environ
+  `24 s` pour un plafond annoncé à `20 s`.
+- ADR-0099 fige dimensions, X/Y, orientation et identité de la cavité, mais
+  impose une résolution Z finale déterministe : ouverte au sommet hors
+  réservation, ou sous la découpe locale avec paroi canonique.
+- P64-L09U-R3 corrige ces trois points sans modifier le nouveau chemin BRep
+  transitoire, le rendu progressif, le rollback ni la session vierge.
+- Cible initiale : `0.1.74`.
+- Prochaine action unique : exécuter
+  `docs/P64_L09U_R3_END_TO_END_RUNBOOK.md`, puis préparer une nouvelle gate
+  humaine.
+- Aucun benchmark/holdout ; projets personnels en lecture seule ;
+  `fusion-validated=false`, `print-validated=false`.
+
+Autorités R3 :
+
+- `docs/P64_L09U_R2_V_0173_HUMAN_KO_EVIDENCE.md` ;
+- `docs/DECISIONS/ADR-0099-profondeur-calibree-et-reservations-superieures-locales.md` ;
+- `docs/P64_L09U_R3_END_TO_END_RUNBOOK.md`.
+
+### Historique R2 clôturé en human-KO
+
+#### Reprise canonique P64-L09U-R2
 
 - `0.1.70`, `0.1.71` et `0.1.72` sont `human-KO`, `do-not-run`.
 - 0.1.72 confirme le démarrage vierge, le calcul explicite et une

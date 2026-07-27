@@ -1,5 +1,8 @@
 # P64-L09U-R2-V — recette Fusion 0.1.73
 
+Statut historique : gate exécutée le 2026-07-28, `human-KO`, `do-not-run`.
+Preuve : `docs/P64_L09U_R2_V_0173_HUMAN_KO_EVIDENCE.md`.
+
 ## But
 
 Vérifier dans Fusion réel que le calcul, l'aperçu et la matérialisation

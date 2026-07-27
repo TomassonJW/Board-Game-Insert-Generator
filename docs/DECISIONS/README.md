@@ -266,3 +266,8 @@ Tests, cartes backlog ou gates humaines a preparer.
   de miniatures vues du dessus et allowlist utilisateur de variantes certifiées.
 - ADR-0097-epaisseur-minimale-distincte-des-separateurs-d-assets.md - proposition
   d'une épaisseur intérieure distincte, avec valeur par défaut sous gate humaine.
+- ADR-0098-plan-minimal-exact-et-corps-fusion-transitoire.md - finalisation du
+  minimum sélectionné et matérialisation par corps BRep transitoire.
+- ADR-0099-profondeur-calibree-et-reservations-superieures-locales.md - calibre
+  de cavité figé, ancrage Z final déterministe et composition locale des
+  plateaux et livrets.

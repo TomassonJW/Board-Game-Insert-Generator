@@ -1,7 +1,42 @@
 # Human Gates
 
 <!-- P64-L09U-GATE -->
-## P64-L09U-R2-V — gate humaine corrective 0.1.73
+## P64-L09U-R3-V — future gate profondeur et réservations locales
+
+Statut : `planned-human-gate`, inactive avant l'implémentation, la validation
+automatisée, l'intégration et l'installation de P64-L09U-R3.
+
+La future candidate doit préserver les acquis de matérialisation 0.1.73 et
+prouver :
+
+1. profondeur calibrée inchangée après finalisation ;
+2. origine Z correcte sans réservation supérieure ;
+3. origine Z sous la découpe locale avec paroi canonique lorsqu'un plateau
+   recouvre la cavité ;
+4. deux plateaux différents matérialisés par coupes locales et paliers exacts ;
+5. aucun cumul hors de l'intersection réelle de leurs empreintes ;
+6. plafond de calcul respecté ou phases supplémentaires affichées séparément ;
+7. fidélité aperçu/Fusion, rendu progressif et absence de Combine perdu.
+
+Contrat : `docs/P64_L09U_R3_END_TO_END_RUNBOOK.md`.
+
+Avant verdict : `fusion-validated=false`, `print-validated=false`.
+
+### P64-L09U-R2-V — gate humaine 0.1.73 close en KO
+
+Verdict : `human-KO`, `do-not-run`.
+
+Acquis confirmés : calcul et finalisation rapides, matérialisation progressive
+en quelques secondes, scène fidèle à l'aperçu et absence de référence Fusion
+perdue.
+
+Défauts bloquants : profondeur calibrée allongée après finalisation et
+composition globale incorrecte de deux plateaux différents. Un dépassement
+inexpliqué de `24 s` pour un plafond affiché de `20 s` est aussi consigné.
+
+Preuve : `docs/P64_L09U_R2_V_0173_HUMAN_KO_EVIDENCE.md`.
+
+#### Recette historique P64-L09U-R2-V
 
 0.1.72 est close en `human-KO`, `do-not-run`.
 
