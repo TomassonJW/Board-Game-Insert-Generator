@@ -38,6 +38,10 @@ from board_game_insert_generator.free_3d_plan_adapter import (
     certify_free_3d_plan,
     prepare_free_3d_problem,
 )
+from board_game_insert_generator.free_3d_greedy_solver import (
+    Free3DPlacement,
+    TopInsetZone,
+)
 from board_game_insert_generator.incremental_project_state import canonical_digest
 from board_game_insert_generator.minimal_layout_solver import (
     _minimal_budget,
@@ -51,7 +55,7 @@ from board_game_insert_generator.solver_settings import solver_deadline_seconds
 
 COUPLED_FINALIZATION_SCHEMA_V1 = "bgig.coupled_finalization.v1"
 COUPLED_FINALIZATION_FAMILY_ID = "bounded_coupled_finalization"
-COUPLED_FINALIZATION_VERSION = "bgig.bounded_coupled_finalization.v9"
+COUPLED_FINALIZATION_VERSION = "bgig.bounded_coupled_finalization.v10"
 COUPLED_FINALIZATION_POLICY = (
     "global_rectangular_then_vertical_first_continuous_then_bounded_xy_composite"
 )
@@ -360,6 +364,12 @@ def _finalize_coupled_volume_candidate(
                 (type(exc).__name__,),
             ),
         ) from exc
+    frozen_cavities = _frozen_cavity_contracts(
+        minimal_plan,
+        placements,
+        problem.storage_height_mm,
+    )
+    finishing_zones = problem.top_inset_zones
 
     closure_budget = _remaining_phase_budget(budget, deadline_at)
     if closure_budget is None:
@@ -379,7 +389,7 @@ def _finalize_coupled_volume_candidate(
         box_perimeter_xy_mm=problem.box_xy_clearance_mm,
         between_bodies_z_mm=problem.z_clearance_mm,
         budget=closure_budget,
-        top_inset_zones=problem.top_inset_zones,
+        top_inset_zones=finishing_zones,
     )
     if closure.empty_spaces:
         deadline_reached = bool(
@@ -415,7 +425,7 @@ def _finalize_coupled_volume_candidate(
             box_perimeter_xy_mm=problem.box_xy_clearance_mm,
             between_bodies_z_mm=problem.z_clearance_mm,
             budget=continuous_budget,
-            top_inset_zones=problem.top_inset_zones,
+            top_inset_zones=finishing_zones,
             finishing_objective=FINISHING_OBJECTIVE_CLOSURE_ONLY,
         )
         if not continuous.empty_spaces:
@@ -465,6 +475,7 @@ def _finalize_coupled_volume_candidate(
                 budget=budget,
                 reservation_count=len(problem.top_inset_zones),
                 global_deadline_reached=continuous.deadline_reached,
+                frozen_cavities=frozen_cavities,
             )
         composite_budget = _remaining_phase_budget(budget, deadline_at)
         if composite_budget is None:
@@ -518,45 +529,32 @@ def _finalize_coupled_volume_candidate(
                     stop_reason="global_deadline_reached_before_xy_composite_certificate",
                 ),
             )
-        if (
-            composite.certificate.get("source_mode")
-            == "continuous_prefill_residual_cells"
-        ):
-            hybrid_candidate = composite
-            composite = close_xy_composite_partition(
-                participants,
-                placements,
-                problem.box,
-                problem.storage_height_mm,
-                problem.xy_clearance_mm,
-                box_perimeter_xy_mm=problem.box_xy_clearance_mm,
-                between_bodies_z_mm=problem.z_clearance_mm,
-                budget=composite_budget,
-                top_inset_zones=problem.top_inset_zones,
-            )
-            if not (
-                composite.status == "closed"
-                and composite.certificate.get("certified") is True
-            ):
-                raise CoupledFinalizationError(
-                    "La fermeture hybride est certifiee, mais son certificat produit et CAD IR relevent de la mission F.",
-                    _xy_composite_report(
-                        closure,
-                        hybrid_candidate,
-                        budget=budget,
-                        stop_reason="xy_composite_product_certificate_v2_required",
-                    ),
-                )
         composite_strategy = SolverStrategy(
             COUPLED_FINALIZATION_FAMILY_ID,
             COUPLED_FINALIZATION_VERSION,
         )
-        composite_plan, composite_rejections = _certify_closed_plan(
+        composite_plan, composite_rejections = certify_free_3d_plan(
             problem,
-            composite.gross_closure,
             strategy=composite_strategy,
             budget=budget,
-            phase="e_xy_composite_gross_partition_with_exact_insets",
+            candidate_id=(
+                "coupled-finalization:"
+                "f_xy_composite_v2_union_cavities_insets:"
+                f"{composite.deterministic_digest[:12]}"
+            ),
+            placements=tuple(placements),
+            search_telemetry={
+                "closure_phase": "f_xy_composite_v2_union_cavities_insets",
+                "closure_status": composite.status,
+                "closure_digest": composite.deterministic_digest,
+                "composite_certificate_schema": composite.certificate.get(
+                    "schema_version"
+                ),
+                "composite_residual_volume_mm3": composite.certificate.get(
+                    "printable_residual_volume_mm3"
+                ),
+            },
+            top_inset_mode="reserved_prisms",
         )
         if composite_plan is None:
             raise CoupledFinalizationError(
@@ -577,8 +575,8 @@ def _finalize_coupled_volume_candidate(
             objective_attempted=True,
             objective_certified=True,
             objective_improved=False,
-            selected_plan_source="e_xy_composite_union_and_exact_insets",
-            objective_fallback_reason="bounded_xy_composite_required",
+            selected_plan_source="f_xy_composite_v2_union_cavities_insets",
+            objective_fallback_reason="hybrid_composite_closure_required",
             source_minimal_artifact_digest=source_minimal_artifact_digest,
             source_minimal_plan_digest=str(minimal_plan.get("plan_digest", "")),
             budget=budget,
@@ -586,6 +584,7 @@ def _finalize_coupled_volume_candidate(
             global_deadline_reached=composite.gross_closure.deadline_reached,
             composite_closure=composite,
             continuous_prefill=continuous,
+            frozen_cavities=frozen_cavities,
         )
     if closure.partition_certificate.get("certified") is not True:
         raise CoupledFinalizationError(
@@ -655,6 +654,7 @@ def _finalize_coupled_volume_candidate(
         budget=budget,
         reservation_count=len(problem.top_inset_zones),
         global_deadline_reached=closure.deadline_reached,
+        frozen_cavities=frozen_cavities,
     )
 
 def _certify_closed_plan(
@@ -681,6 +681,145 @@ def _certify_closed_plan(
             phase=phase,
         ),
     )
+
+
+def _frozen_cavity_contracts(
+    minimal_plan: Mapping[str, object],
+    placements: Sequence[Free3DPlacement],
+    storage_height_mm: float,
+) -> tuple[dict[str, object], ...]:
+    """Freeze cavity world poses and protect their vertical removal access."""
+
+    raw_plan_placements = minimal_plan.get("placements", ())
+    if not isinstance(raw_plan_placements, (list, tuple)):
+        raw_plan_placements = ()
+    plan_by_id = {
+        str(value["id"]): value
+        for value in raw_plan_placements
+        if isinstance(value, Mapping)
+    }
+    contracts: list[dict[str, object]] = []
+    for placement in sorted(
+        placements,
+        key=lambda value: value.participant_id,
+    ):
+        plan_placement = plan_by_id.get(placement.participant_id)
+        if plan_placement is None or placement.role != "container":
+            continue
+        cavities = plan_placement.get("cavity_layout", ())
+        if not isinstance(cavities, (list, tuple)):
+            continue
+        final_local = plan_placement.get(
+            "final_outer_dimensions_mm",
+            {},
+        )
+        minimum_origin = plan_placement.get(
+            "minimum_envelope_origin_in_final_mm",
+            {},
+        )
+        if not isinstance(final_local, Mapping) or not isinstance(
+            minimum_origin,
+            Mapping,
+        ):
+            continue
+        for cavity_index, raw_cavity in enumerate(cavities):
+            if not isinstance(raw_cavity, Mapping):
+                continue
+            raw_origin = raw_cavity.get("local_origin_mm")
+            raw_size = raw_cavity.get("inner_dimensions_mm")
+            if not isinstance(raw_origin, Mapping) or not isinstance(
+                raw_size,
+                Mapping,
+            ):
+                continue
+            local_origin = (
+                float(minimum_origin["x"]) + float(raw_origin["x"]),
+                float(minimum_origin["y"]) + float(raw_origin["y"]),
+                float(final_local["z"]) - float(raw_size["z"]),
+            )
+            local_size = tuple(
+                float(raw_size[axis]) for axis in ("x", "y", "z")
+            )
+            if placement.rotation_deg_z == 0:
+                rotated_origin = local_origin
+                rotated_size = local_size
+            elif placement.rotation_deg_z == 90:
+                rotated_origin = (
+                    float(final_local["y"])
+                    - local_origin[1]
+                    - local_size[1],
+                    local_origin[0],
+                    local_origin[2],
+                )
+                rotated_size = (
+                    local_size[1],
+                    local_size[0],
+                    local_size[2],
+                )
+            else:
+                raise CoupledFinalizationError(
+                    "Une cavite figee utilise une rotation non prise en charge.",
+                    _failure_report(
+                        "frozen_cavity_rotation_unsupported",
+                        ("FROZEN_CAVITY_ROTATION_UNSUPPORTED",),
+                    ),
+                )
+            world_origin = tuple(
+                placement.origin_mm[axis] + rotated_origin[axis]
+                for axis in range(3)
+            )
+            cavity_top = world_origin[2] + rotated_size[2]
+            source_top = (
+                placement.origin_mm[2] + placement.world_size_mm[2]
+            )
+            if abs(cavity_top - source_top) > 0.001:
+                raise CoupledFinalizationError(
+                    "La pose minimale d une cavite n est pas ouverte sur le dessus.",
+                    _failure_report(
+                        "frozen_cavity_not_top_open",
+                        ("FROZEN_CAVITY_NOT_TOP_OPEN",),
+                    ),
+                )
+            access_height = max(0.0, storage_height_mm - cavity_top)
+            access_zone = TopInsetZone(
+                origin_xy_mm=(world_origin[0], world_origin[1]),
+                size_xy_mm=(rotated_size[0], rotated_size[1]),
+                support_plane_z_mm=cavity_top,
+                inset_depth_mm=access_height,
+            )
+            identity = {
+                "owner_id": placement.participant_id,
+                "cavity_index": cavity_index,
+                "world_origin_mm": _xyz_payload(world_origin),
+                "world_size_mm": _xyz_payload(rotated_size),
+                "source_owner_origin_mm": _xyz_payload(
+                    placement.origin_mm
+                ),
+                "source_owner_world_size_mm": _xyz_payload(
+                    placement.world_size_mm
+                ),
+                "source_rotation_deg_z": placement.rotation_deg_z,
+            }
+            contracts.append(
+                {
+                    **identity,
+                    "cavity_key": (
+                        str(
+                            raw_cavity.get(
+                                "cavity_id",
+                                (
+                                    f"{placement.participant_id}:"
+                                    f"cavity:{cavity_index:04d}"
+                                ),
+                            )
+                        )
+                    ),
+                    "pose_digest": canonical_digest(identity),
+                    "top_open": True,
+                    "access_zone": access_zone,
+                }
+            )
+    return tuple(contracts)
 
 
 def _remaining_objective_budget(
@@ -780,11 +919,16 @@ def _finalized_plan(
     global_deadline_reached: bool,
     composite_closure: XYCompositeClosureResult | None = None,
     continuous_prefill: Free3DClosureResult | None = None,
+    frozen_cavities: Sequence[Mapping[str, object]] = (),
 ) -> dict[str, object]:
     plan = deepcopy(certified.plan)
     certificate = certified.certificate
     composite_certificate = (
-        _attach_xy_composite_geometry(plan, composite_closure)
+        _attach_xy_composite_geometry(
+            plan,
+            composite_closure,
+            frozen_cavities=frozen_cavities,
+        )
         if composite_closure is not None
         else None
     )
@@ -792,6 +936,10 @@ def _finalized_plan(
         composite_certificate is not None
         and composite_certificate.get("certified") is not True
     ):
+        rejection_subcodes = composite_certificate.get(
+            "rejection_subcodes",
+            (),
+        )
         raise CoupledFinalizationError(
             "Le contrat CAD de la fermeture composite XY est invalide.",
             {
@@ -799,6 +947,9 @@ def _finalized_plan(
                 "status": "rejected",
                 "stop_reason": "xy_composite_cad_contract_rejected",
                 "composite_materialization_certificate": composite_certificate,
+                "rejection_subcodes": list(rejection_subcodes)
+                if isinstance(rejection_subcodes, (list, tuple))
+                else [],
                 "partial_plan_published": False,
                 "materializable": False,
             },
@@ -834,6 +985,24 @@ def _finalized_plan(
             else None
         ),
         "composite_materialization_certificate": composite_certificate,
+        "frozen_cavities": [
+            {
+                key: deepcopy(value[key])
+                for key in (
+                    "cavity_key",
+                    "owner_id",
+                    "cavity_index",
+                    "world_origin_mm",
+                    "world_size_mm",
+                    "source_owner_origin_mm",
+                    "source_owner_world_size_mm",
+                    "source_rotation_deg_z",
+                    "pose_digest",
+                    "top_open",
+                )
+            }
+            for value in frozen_cavities
+        ],
         "objective_closure_digest": (
             objective_closure.deterministic_digest if objective_closure is not None else ""
         ),
@@ -940,13 +1109,17 @@ def _finalized_plan(
         {
             "minimal_layout": False,
             "residual_distributed": True,
-            "continuous_closure_applied": isinstance(
-                closure,
-                Free3DClosureResult,
+            "continuous_closure_applied": bool(
+                isinstance(closure, Free3DClosureResult)
+                or continuous_prefill is not None
             ),
-            "global_rectangular_partition_by_construction": not isinstance(
-                closure,
-                Free3DClosureResult,
+            "global_rectangular_partition_by_construction": bool(
+                not isinstance(closure, Free3DClosureResult)
+                and not (
+                    composite_closure is not None
+                    and composite_closure.certificate.get("source_mode")
+                    == "continuous_prefill_residual_cells"
+                )
             ),
             "rectangular_bodies_only": composite_closure is None,
             "composite_annexes_applied": composite_closure is not None,
@@ -959,6 +1132,8 @@ def _finalized_plan(
             "finishing_budget_independent_from_calculation": True,
             "global_finishing_deadline_enforced": True,
             "minimal_incumbent_preserved_by_value": True,
+            "cavity_world_poses_frozen": True,
+            "cavity_vertical_access_protected": True,
             "modular_harmonization_applied": False,
         }
     )
@@ -990,24 +1165,53 @@ def _continuous_closure_payload(
 def _attach_xy_composite_geometry(
     plan: dict[str, object],
     composite: XYCompositeClosureResult,
+    *,
+    frozen_cavities: Sequence[Mapping[str, object]],
 ) -> dict[str, object]:
     placements = plan.get("placements")
     if not isinstance(placements, list):
         return _rejected_composite_materialization("composite_plan_placements_missing")
     owners = {value.owner_id: value for value in composite.owner_bodies}
-    gross_by_id = {
-        value.participant_id: value for value in composite.gross_closure.placements
-    }
     placement_ids = {
         str(value.get("id", "")) for value in placements if isinstance(value, dict)
     }
-    if placement_ids != set(owners) or placement_ids != set(gross_by_id):
+    if placement_ids != set(owners):
         return _rejected_composite_materialization(
             "composite_owner_set_does_not_match_plan"
         )
+    top_insets = plan.get("top_inset_reservations")
+    if not isinstance(top_insets, Mapping):
+        return _rejected_composite_materialization(
+            "composite_top_inset_contract_missing"
+        )
+    raw_reservations = top_insets.get("reservations", ())
+    if not isinstance(raw_reservations, (list, tuple)):
+        return _rejected_composite_materialization(
+            "composite_top_inset_reservations_invalid"
+        )
+    reservations = tuple(
+        value for value in raw_reservations if isinstance(value, Mapping)
+    )
+    design_top = float(top_insets.get("design_top_z_mm", 0.0))
+    frozen_by_owner: dict[str, list[Mapping[str, object]]] = {}
+    for value in frozen_cavities:
+        frozen_by_owner.setdefault(str(value["owner_id"]), []).append(value)
 
-    total_cad_gross_volume = 0.0
+    total_cad_union_volume = 0.0
+    total_final_composite_volume = 0.0
+    total_content_cavity_volume = 0.0
+    total_cut_volume = 0.0
+    total_cut_intersection_with_final = 0.0
     total_join_count = 0
+    all_owners_connected = True
+    all_frozen_poses_match = True
+    all_cavity_access_open = True
+    all_reservation_walls_certified = all(
+        isinstance(value.get("wall_envelope_certificate"), Mapping)
+        and value["wall_envelope_certificate"].get("certified") is True
+        and value["wall_envelope_certificate"].get("cavities_unchanged") is True
+        for value in reservations
+    )
     for placement in placements:
         if not isinstance(placement, dict):
             return _rejected_composite_materialization(
@@ -1015,81 +1219,286 @@ def _attach_xy_composite_geometry(
             )
         owner_id = str(placement["id"])
         owner = owners[owner_id]
-        gross = gross_by_id[owner_id]
-        ordered = _ordered_composite_prisms(owner)
+        source_placement_origin = tuple(
+            float(_mapping_value(placement["origin_mm"], axis))
+            for axis in ("x", "y", "z")
+        )
+        source_placement_size = tuple(
+            float(_mapping_value(placement["world_size_mm"], axis))
+            for axis in ("x", "y", "z")
+        )
+        owner_frozen = frozen_by_owner.get(owner_id, [])
+        total_content_cavity_volume += sum(
+            _mapping_size_volume(value["world_size_mm"])
+            for value in owner_frozen
+        )
+        cells = _split_composite_owner_prisms(
+            owner,
+            reservations,
+            owner_frozen,
+        )
+        ordered = _ordered_composite_cad_cells(owner, cells)
         if not ordered:
             return _rejected_composite_materialization(
                 "composite_prism_attachment_order_invalid"
             )
         core = ordered[0]
-        gross_top = gross.origin_mm[2] + gross.world_size_mm[2]
-        core_origin = core.origin_mm
+        core_origin = core["final_origin_mm"]
         cad_prisms: list[dict[str, object]] = []
-        for prism in ordered:
-            cad_height = gross_top - prism.origin_mm[2]
-            if cad_height <= 0.0:
+        placement_cuts: list[dict[str, object]] = []
+        placement_access_cuts: list[dict[str, object]] = []
+        for prism_index, prism in enumerate(ordered):
+            final_origin = prism["final_origin_mm"]
+            final_size = prism["final_size_mm"]
+            selected_reservation = _deepest_reservation_at_cell(
+                final_origin,
+                final_size,
+                reservations,
+                kind="footprint",
+            )
+            selected_access = _frozen_access_at_cell(
+                final_origin,
+                final_size,
+                owner_frozen,
+            )
+            final_top = final_origin[2] + final_size[2]
+            cad_top = final_top
+            if (
+                selected_reservation is not None
+                and abs(
+                    final_top
+                    - float(
+                        selected_reservation["support_plane_z_mm"]
+                    )
+                )
+                <= 0.0001
+            ):
+                cad_top = max(cad_top, design_top)
+            cad_size = (
+                final_size[0],
+                final_size[1],
+                cad_top - final_origin[2],
+            )
+            if min(cad_size) <= 0.0:
                 return _rejected_composite_materialization(
                     "composite_cad_prism_height_invalid"
                 )
-            cad_size = (prism.size_mm[0], prism.size_mm[1], cad_height)
-            total_cad_gross_volume += _size_volume(cad_size)
+            total_cad_union_volume += _size_volume(cad_size)
+            total_final_composite_volume += _size_volume(final_size)
             cad_prisms.append(
                 {
-                    "prism_id": prism.prism_id,
-                    "owner_id": prism.owner_id,
-                    "kind": prism.kind,
-                    "final_origin_mm": _xyz_payload(prism.origin_mm),
-                    "final_size_mm": _xyz_payload(prism.size_mm),
-                    "cad_origin_mm": _xyz_payload(prism.origin_mm),
+                    "prism_id": prism["prism_id"],
+                    "owner_id": owner_id,
+                    "kind": "core" if prism_index == 0 else "annex",
+                    "final_origin_mm": _xyz_payload(final_origin),
+                    "final_size_mm": _xyz_payload(final_size),
+                    "cad_origin_mm": _xyz_payload(final_origin),
                     "cad_size_mm": _xyz_payload(cad_size),
                     "local_origin_from_core_mm": _xyz_payload(
                         tuple(
-                            prism.origin_mm[index] - core_origin[index]
+                            final_origin[index] - core_origin[index]
                             for index in range(3)
                         )
                     ),
-                    "attached_to_prism_id": prism.attached_to_prism_id,
-                    "attachment_axis": prism.attachment_axis,
+                    "attached_to_prism_id": prism["attached_to_prism_id"],
+                    "attachment_axis": prism["attachment_axis"],
                 }
             )
+            cuts = _composite_cell_cuts(
+                owner_id,
+                prism["prism_id"],
+                final_origin,
+                final_size,
+                cad_size,
+                reservations,
+                design_top,
+                source_placement_origin,
+                owner_frozen,
+            )
+            access_zone = (
+                selected_access.get("access_zone")
+                if selected_access is not None
+                else None
+            )
+            if (
+                isinstance(access_zone, TopInsetZone)
+                and cad_top
+                > float(access_zone.support_plane_z_mm) + 0.0001
+                and not any(
+                    value["kind"] == "frozen_cavity_access"
+                    for value in cuts
+                )
+            ):
+                all_cavity_access_open = False
+            for cut in cuts:
+                cut_volume = _mapping_size_volume(cut["size_mm"])
+                total_cut_volume += cut_volume
+                total_cut_intersection_with_final += (
+                    _cut_intersection_with_final_volume(
+                        cut,
+                        final_origin,
+                        final_size,
+                    )
+                )
+                if cut["kind"] == "frozen_cavity_access":
+                    placement_access_cuts.append(cut)
+                else:
+                    placement_cuts.append(cut)
         total_join_count += max(0, len(cad_prisms) - 1)
-        placement["composite_body"] = {
-            "schema_version": "bgig.xy_composite_cad_body.v1",
-            "policy": "bounded_xy_composite_v1",
+        all_owners_connected = bool(
+            all_owners_connected
+            and len(cad_prisms) == 1 + max(0, len(cad_prisms) - 1)
+            and all(
+                value["kind"] == "core"
+                or (
+                    value["attached_to_prism_id"]
+                    and value["attachment_axis"] in {"x", "y"}
+                )
+                for value in cad_prisms
+            )
+        )
+        for cavity in owner_frozen:
+            expected_origin = tuple(
+                float(_mapping_value(cavity["source_owner_origin_mm"], axis))
+                for axis in ("x", "y", "z")
+            )
+            expected_size = tuple(
+                float(_mapping_value(cavity["source_owner_world_size_mm"], axis))
+                for axis in ("x", "y", "z")
+            )
+            all_frozen_poses_match = bool(
+                all_frozen_poses_match
+                and _tuple_close(
+                    source_placement_origin,
+                    expected_origin,
+                )
+                and _tuple_close(source_placement_size, expected_size)
+                and int(placement.get("rotation_deg_z", 0))
+                == int(cavity["source_rotation_deg_z"])
+            )
+        component_origin = tuple(
+            min(
+                float(_mapping_value(value["cad_origin_mm"], axis))
+                for value in cad_prisms
+            )
+            for axis in ("x", "y", "z")
+        )
+        component_upper = tuple(
+            max(
+                float(_mapping_value(value["cad_origin_mm"], axis))
+                + float(_mapping_value(value["cad_size_mm"], axis))
+                for value in cad_prisms
+            )
+            for axis in ("x", "y", "z")
+        )
+        component_size = tuple(
+            component_upper[index] - component_origin[index]
+            for index in range(3)
+        )
+        for cut in (*placement_cuts, *placement_access_cuts):
+            world_origin = tuple(
+                float(_mapping_value(cut["world_origin_mm"], axis))
+                for axis in ("x", "y", "z")
+            )
+            cut["local_origin_mm"] = _xyz_payload(
+                tuple(
+                    world_origin[index] - component_origin[index]
+                    for index in range(3)
+                )
+            )
+            cut["retained_body_below_mm"] = round(
+                world_origin[2] - component_origin[2],
+                6,
+            )
+        placement["origin_mm"] = _xyz_payload(component_origin)
+        placement["world_size_mm"] = _xyz_payload(component_size)
+        rotation = int(placement.get("rotation_deg_z", 0))
+        placement["final_outer_dimensions_mm"] = _xyz_payload(
+            (
+                component_size[0],
+                component_size[1],
+                component_size[2],
+            )
+            if rotation == 0
+            else (
+                component_size[1],
+                component_size[0],
+                component_size[2],
+            )
+        )
+        placement["composite_bounds_v2"] = {
+            "semantics": "bounding_box_not_solid",
+            "origin_mm": _xyz_payload(component_origin),
+            "size_mm": _xyz_payload(component_size),
+            "source_minimum_origin_mm": _xyz_payload(
+                source_placement_origin
+            ),
+            "source_minimum_size_mm": _xyz_payload(
+                source_placement_size
+            ),
+        }
+        placement["top_inset_cuts"] = placement_cuts
+        placement["frozen_cavities_v1"] = [
+            {
+                key: deepcopy(value[key])
+                for key in (
+                    "cavity_key",
+                    "cavity_index",
+                    "owner_id",
+                    "world_origin_mm",
+                    "world_size_mm",
+                    "source_owner_origin_mm",
+                    "source_owner_world_size_mm",
+                    "source_rotation_deg_z",
+                    "pose_digest",
+                    "top_open",
+                )
+            }
+            for value in owner_frozen
+        ]
+        composite_body = {
+            "schema_version": "bgig.xy_composite_cad_body.v2",
+            "policy": "hybrid_xy_composite_v2",
             "certified": True,
             "owner_id": owner_id,
-            "core_prism_id": owner.core_prism_id,
-            "gross_origin_mm": _xyz_payload(gross.origin_mm),
-            "gross_size_mm": _xyz_payload(gross.world_size_mm),
+            "core_prism_id": cad_prisms[0]["prism_id"],
             "prisms": cad_prisms,
             "source_owner_certificate": deepcopy(owner.certificate),
+            "source_composite_digest": composite.deterministic_digest,
+            "frozen_cavity_pose_digests": [
+                str(value["pose_digest"]) for value in owner_frozen
+            ],
+            "frozen_cavity_access_cuts": placement_access_cuts,
             "operation_order": [
                 "create_core_prism",
                 "join_xy_annexes",
                 "subtract_content_cavities",
+                "subtract_frozen_cavity_access",
                 "subtract_exact_top_insets",
             ],
         }
+        composite_body["geometry_digest"] = canonical_digest(
+            composite_body
+        )
+        placement["composite_body"] = composite_body
 
-    gross_body_volume = float(
-        composite.certificate.get("gross_body_volume_mm3", 0.0)
-    )
-    reserved_volume = float(
-        composite.certificate.get("reserved_subtraction_volume_mm3", 0.0)
-    )
-    composite_volume = float(
+    certified_composite_volume = float(
         composite.certificate.get("composite_body_volume_mm3", 0.0)
     )
-    grip_void_volume = sum(
-        _mapping_size_volume(cut.get("size_mm"))
-        for placement in placements
-        if isinstance(placement, dict)
-        for cut in placement.get("top_inset_cuts", [])
-        if isinstance(cut, dict) and cut.get("kind") == "top_inset_grip"
+    composite_source_error = abs(
+        total_final_composite_volume - certified_composite_volume
     )
-    cad_gross_error = abs(total_cad_gross_volume - gross_body_volume)
-    final_material_volume = composite_volume - grip_void_volume
-    target_material_volume = gross_body_volume - reserved_volume - grip_void_volume
+    total_all_cut_volume = (
+        total_content_cavity_volume + total_cut_volume
+    )
+    final_material_volume = (
+        total_cad_union_volume - total_all_cut_volume
+    )
+    target_material_volume = (
+        total_final_composite_volume
+        - total_content_cavity_volume
+        - total_cut_intersection_with_final
+    )
     final_error = abs(final_material_volume - target_material_volume)
     all_top_cuts_are_exact = all(
         isinstance(cut, dict)
@@ -1101,27 +1510,99 @@ def _attach_xy_composite_geometry(
     )
     certified = bool(
         composite.certificate.get("certified") is True
-        and cad_gross_error <= max(0.0001, gross_body_volume * 1e-9)
-        and final_error <= max(0.0001, gross_body_volume * 1e-9)
+        and composite.certificate.get("printable_residual_volume_mm3") == 0.0
+        and composite_source_error
+        <= max(0.0001, certified_composite_volume * 1e-9)
+        and final_error
+        <= max(0.0001, certified_composite_volume * 1e-9)
         and all_top_cuts_are_exact
+        and all_owners_connected
+        and all_frozen_poses_match
+        and all_cavity_access_open
+        and all_reservation_walls_certified
     )
+    rejection_subcodes = [
+        code
+        for passed, code in (
+            (
+                composite.certificate.get("certified") is True
+                and composite.certificate.get(
+                    "printable_residual_volume_mm3"
+                )
+                == 0.0,
+                "COMPOSITE_SOURCE_CERTIFICATE_REJECTED",
+            ),
+            (
+                composite_source_error
+                <= max(0.0001, certified_composite_volume * 1e-9),
+                "COMPOSITE_SOURCE_VOLUME_DIVERGENCE",
+            ),
+            (
+                final_error
+                <= max(0.0001, certified_composite_volume * 1e-9),
+                "COMPOSITE_CAD_FINAL_VOLUME_DIVERGENCE",
+            ),
+            (all_top_cuts_are_exact, "COMPOSITE_TOP_CUT_INVALID"),
+            (all_owners_connected, "COMPOSITE_OWNER_UNION_DISCONNECTED"),
+            (
+                all_frozen_poses_match,
+                "COMPOSITE_CAVITY_WORLD_POSE_DIVERGENCE",
+            ),
+            (
+                all_cavity_access_open,
+                "COMPOSITE_CAVITY_ACCESS_BLOCKED",
+            ),
+            (
+                all_reservation_walls_certified,
+                "COMPOSITE_RESERVATION_WALL_UNCERTIFIED",
+            ),
+        )
+        if not passed
+    ]
     return {
-        "schema_version": "bgig.xy_composite_cad_materialization_certificate.v1",
+        "schema_version": "bgig.xy_composite_cad_materialization_certificate.v2",
         "certified": certified,
         "owner_count": len(owners),
         "user_component_count": len(owners),
         "joined_annex_count": total_join_count,
         "one_user_component_per_owner": len(owners) == len(placements),
         "joins_precede_cuts": True,
+        "cavities_precede_top_inset_cuts": True,
+        "owner_unions_connected": all_owners_connected,
+        "cavity_world_poses_match_frozen_contract": all_frozen_poses_match,
+        "cavity_vertical_access_open": all_cavity_access_open,
+        "minimum_reservation_wall_certified": all_reservation_walls_certified,
         "all_top_inset_cuts_target_exact_owner_intersections": all_top_cuts_are_exact,
-        "gross_body_volume_mm3": round(gross_body_volume, 6),
-        "cad_union_gross_volume_mm3": round(total_cad_gross_volume, 6),
-        "reserved_subtraction_volume_mm3": round(reserved_volume, 6),
-        "certified_grip_technical_void_volume_mm3": round(grip_void_volume, 6),
+        "source_composite_volume_mm3": round(
+            certified_composite_volume,
+            6,
+        ),
+        "cad_union_before_cuts_volume_mm3": round(
+            total_cad_union_volume,
+            6,
+        ),
+        "exact_cut_volume_mm3": round(total_all_cut_volume, 6),
+        "content_cavity_cut_volume_mm3": round(
+            total_content_cavity_volume,
+            6,
+        ),
+        "access_and_top_cut_volume_mm3": round(
+            total_cut_volume,
+            6,
+        ),
+        "cut_intersection_with_final_volume_mm3": round(
+            total_cut_intersection_with_final,
+            6,
+        ),
         "final_material_volume_mm3": round(final_material_volume, 6),
         "coverage_error_mm3": round(final_error, 9),
-        "cad_gross_coverage_error_mm3": round(cad_gross_error, 9),
+        "source_composite_coverage_error_mm3": round(
+            composite_source_error,
+            9,
+        ),
         "printable_residual_volume_mm3": 0.0 if certified else round(final_error, 6),
+        "source_composite_digest": composite.deterministic_digest,
+        "rejection_subcodes": rejection_subcodes,
         "stop_reason": (
             "xy_composite_cad_materialization_certified"
             if certified
@@ -1130,41 +1611,460 @@ def _attach_xy_composite_geometry(
     }
 
 
-def _ordered_composite_prisms(owner: object) -> tuple[object, ...]:
-    prisms = {value.prism_id: value for value in owner.prisms}
-    core = prisms.get(owner.core_prism_id)
-    if core is None or core.kind != "core":
-        return ()
-    ordered = [core]
-    resolved = {core.prism_id}
-    remaining = {
-        prism_id: value
-        for prism_id, value in prisms.items()
-        if prism_id != core.prism_id
-    }
-    while remaining:
-        candidates = sorted(
-            (
-                value
-                for value in remaining.values()
-                if value.attached_to_prism_id in resolved
-                and value.attachment_axis in {"x", "y"}
+def _split_composite_owner_prisms(
+    owner: object,
+    reservations: Sequence[Mapping[str, object]],
+    frozen_cavities: Sequence[Mapping[str, object]],
+) -> tuple[dict[str, object], ...]:
+    cells: list[dict[str, object]] = []
+    for prism in owner.prisms:
+        x0, y0, z0 = prism.origin_mm
+        x1 = x0 + prism.size_mm[0]
+        y1 = y0 + prism.size_mm[1]
+        xs = {x0, x1}
+        ys = {y0, y1}
+        for reservation in reservations:
+            for kind in ("footprint", "grip"):
+                rect = _reservation_rectangle(reservation, kind)
+                rx0, ry0, rx1, ry1 = rect
+                if rx0 < x1 - 0.0001 and x0 < rx1 - 0.0001:
+                    xs.update({max(x0, rx0), min(x1, rx1)})
+                if ry0 < y1 - 0.0001 and y0 < ry1 - 0.0001:
+                    ys.update({max(y0, ry0), min(y1, ry1)})
+        for cavity in frozen_cavities:
+            access_zone = cavity.get("access_zone")
+            if not isinstance(access_zone, TopInsetZone):
+                continue
+            rx0, ry0 = access_zone.origin_xy_mm
+            rx1 = rx0 + access_zone.size_xy_mm[0]
+            ry1 = ry0 + access_zone.size_xy_mm[1]
+            if rx0 < x1 - 0.0001 and x0 < rx1 - 0.0001:
+                xs.update({max(x0, rx0), min(x1, rx1)})
+            if ry0 < y1 - 0.0001 and y0 < ry1 - 0.0001:
+                ys.update({max(y0, ry0), min(y1, ry1)})
+        ordered_x = sorted(xs)
+        ordered_y = sorted(ys)
+        for x_index in range(len(ordered_x) - 1):
+            for y_index in range(len(ordered_y) - 1):
+                cell_x0, cell_x1 = (
+                    ordered_x[x_index],
+                    ordered_x[x_index + 1],
+                )
+                cell_y0, cell_y1 = (
+                    ordered_y[y_index],
+                    ordered_y[y_index + 1],
+                )
+                if (
+                    cell_x1 - cell_x0 <= 0.0001
+                    or cell_y1 - cell_y0 <= 0.0001
+                ):
+                    continue
+                cells.append(
+                    {
+                        "final_origin_mm": (
+                            cell_x0,
+                            cell_y0,
+                            z0,
+                        ),
+                        "final_size_mm": (
+                            cell_x1 - cell_x0,
+                            cell_y1 - cell_y0,
+                            prism.size_mm[2],
+                        ),
+                    }
+                )
+    return tuple(
+        sorted(
+            cells,
+            key=lambda value: (
+                *value["final_origin_mm"],
+                *value["final_size_mm"],
             ),
-            key=lambda value: value.prism_id,
         )
-        if not candidates:
+    )
+
+
+def _ordered_composite_cad_cells(
+    owner: object,
+    cells: Sequence[Mapping[str, object]],
+) -> tuple[dict[str, object], ...]:
+    if not cells:
+        return ()
+    source = owner.source_placement
+    source_center = tuple(
+        source.origin_mm[index] + source.world_size_mm[index] / 2.0
+        for index in range(3)
+    )
+    core_index = max(
+        range(len(cells)),
+        key=lambda index: (
+            _point_inside_prism_xy(source_center, cells[index]),
+            _prism_overlap_volume_with_placement(cells[index], source),
+            _size_volume(cells[index]["final_size_mm"]),
+            tuple(-value for value in cells[index]["final_origin_mm"]),
+        ),
+    )
+    remaining = set(range(len(cells)))
+    remaining.remove(core_index)
+    resolved = {core_index}
+    ordered_indexes = [core_index]
+    parents: dict[int, tuple[int, str]] = {}
+    while remaining:
+        options: list[tuple[int, int, str]] = []
+        for child_index in sorted(remaining):
+            for parent_index in sorted(resolved):
+                axis = _cad_cell_vertical_face_axis(
+                    cells[parent_index],
+                    cells[child_index],
+                )
+                if axis:
+                    options.append((child_index, parent_index, axis))
+        if not options:
             return ()
-        selected = candidates[0]
-        ordered.append(selected)
-        resolved.add(selected.prism_id)
-        remaining.pop(selected.prism_id)
-    return tuple(ordered)
+        child_index, parent_index, axis = min(options)
+        parents[child_index] = (parent_index, axis)
+        resolved.add(child_index)
+        remaining.remove(child_index)
+        ordered_indexes.append(child_index)
+    prism_ids = {
+        cell_index: f"{owner.owner_id}:cad-prism:{order:04d}"
+        for order, cell_index in enumerate(ordered_indexes)
+    }
+    result: list[dict[str, object]] = []
+    for order, cell_index in enumerate(ordered_indexes):
+        value = cells[cell_index]
+        parent = parents.get(cell_index)
+        result.append(
+            {
+                **dict(value),
+                "prism_id": prism_ids[cell_index],
+                "attached_to_prism_id": (
+                    prism_ids[parent[0]] if parent is not None else ""
+                ),
+                "attachment_axis": parent[1] if parent is not None else "",
+                "kind": "core" if order == 0 else "annex",
+            }
+        )
+    return tuple(result)
+
+
+def _composite_cell_cuts(
+    owner_id: str,
+    prism_id: str,
+    final_origin: Sequence[float],
+    final_size: Sequence[float],
+    cad_size: Sequence[float],
+    reservations: Sequence[Mapping[str, object]],
+    design_top: float,
+    owner_origin: Sequence[float],
+    frozen_cavities: Sequence[Mapping[str, object]],
+) -> tuple[dict[str, object], ...]:
+    cuts: list[dict[str, object]] = []
+    access = _frozen_access_at_cell(
+        final_origin,
+        final_size,
+        frozen_cavities,
+    )
+    footprint = _deepest_reservation_at_cell(
+        final_origin,
+        final_size,
+        reservations,
+        kind="footprint",
+    )
+    selected: list[tuple[str, Mapping[str, object]]] = []
+    if access is not None:
+        selected.append(("frozen_cavity_access", access))
+    elif footprint is not None:
+        selected.append(("top_inset", footprint))
+    else:
+        grip = _deepest_reservation_at_cell(
+            final_origin,
+            final_size,
+            reservations,
+            kind="grip",
+        )
+        if grip is not None:
+            selected.append(("top_inset_grip", grip))
+    cad_top = final_origin[2] + cad_size[2]
+    for cut_index, (kind, reservation) in enumerate(selected):
+        if kind == "frozen_cavity_access":
+            access_zone = reservation.get("access_zone")
+            if not isinstance(access_zone, TopInsetZone):
+                continue
+            cut_bottom = float(access_zone.support_plane_z_mm)
+            reservation_id = str(reservation["cavity_key"])
+            flat_item_id = ""
+            removal_order = -1
+        else:
+            cut_bottom = design_top - float(
+                reservation["inset_depth_from_top_mm"]
+            )
+            reservation_id = str(reservation["id"])
+            flat_item_id = str(reservation["flat_item_id"])
+            removal_order = int(reservation["removal_order"])
+        cut_bottom = max(float(final_origin[2]), cut_bottom)
+        if cad_top <= cut_bottom + 0.0001:
+            continue
+        cut_size_z = cad_top - cut_bottom
+        world_origin = (
+            final_origin[0],
+            final_origin[1],
+            cut_bottom,
+        )
+        size = (
+            final_size[0],
+            final_size[1],
+            cut_size_z,
+        )
+        cuts.append(
+            {
+                "id": (
+                    f"{reservation_id}:{owner_id}:{prism_id}:"
+                    f"{kind}:{cut_index}"
+                ),
+                "kind": kind,
+                "reservation_id": reservation_id,
+                "flat_item_id": flat_item_id,
+                "placement_id": owner_id,
+                "removal_order": removal_order,
+                "world_origin_mm": _xyz_payload(world_origin),
+                "local_origin_mm": _xyz_payload(
+                    tuple(
+                        world_origin[index] - owner_origin[index]
+                        for index in range(3)
+                    )
+                ),
+                "size_mm": _xyz_payload(size),
+                "retained_body_below_mm": round(
+                    cut_bottom - final_origin[2],
+                    6,
+                ),
+                "minimum_floor_mm": 0.0,
+                "cavity_overlap_area_mm2": 0.0,
+                "non_perforating": cut_bottom
+                >= final_origin[2] - 0.0001,
+                "target_prism_id": prism_id,
+            }
+        )
+    return tuple(cuts)
+
+
+def _frozen_access_at_cell(
+    origin: Sequence[float],
+    size: Sequence[float],
+    frozen_cavities: Sequence[Mapping[str, object]],
+) -> Mapping[str, object] | None:
+    center = (
+        origin[0] + size[0] / 2.0,
+        origin[1] + size[1] / 2.0,
+    )
+    candidates: list[Mapping[str, object]] = []
+    for value in frozen_cavities:
+        zone = value.get("access_zone")
+        if not isinstance(zone, TopInsetZone):
+            continue
+        rectangle = (
+            zone.origin_xy_mm[0],
+            zone.origin_xy_mm[1],
+            zone.origin_xy_mm[0] + zone.size_xy_mm[0],
+            zone.origin_xy_mm[1] + zone.size_xy_mm[1],
+        )
+        if _point_in_rectangle(center, rectangle):
+            candidates.append(value)
+    if not candidates:
+        return None
+    return min(
+        candidates,
+        key=lambda value: (
+            float(
+                value["access_zone"].support_plane_z_mm
+            ),
+            str(value["cavity_key"]),
+        ),
+    )
+
+
+def _deepest_reservation_at_cell(
+    origin: Sequence[float],
+    size: Sequence[float],
+    reservations: Sequence[Mapping[str, object]],
+    *,
+    kind: str,
+) -> Mapping[str, object] | None:
+    center = (
+        origin[0] + size[0] / 2.0,
+        origin[1] + size[1] / 2.0,
+    )
+    candidates = [
+        value
+        for value in reservations
+        if _point_in_rectangle(center, _reservation_rectangle(value, kind))
+    ]
+    if not candidates:
+        return None
+    return min(
+        candidates,
+        key=lambda value: (
+            float(value["support_plane_z_mm"]),
+            str(value["id"]),
+        ),
+    )
+
+
+def _reservation_rectangle(
+    reservation: Mapping[str, object],
+    kind: str,
+) -> tuple[float, float, float, float]:
+    if kind == "footprint":
+        raw_origin = reservation["cut_origin_mm"]
+        raw_size = reservation["cut_size_mm"]
+    elif kind == "grip":
+        grip = reservation["grip_zone"]
+        if not isinstance(grip, Mapping):
+            return (0.0, 0.0, 0.0, 0.0)
+        raw_origin = grip["origin_mm"]
+        raw_size = grip["size_mm"]
+    else:
+        raise ValueError(f"Unknown reservation rectangle kind: {kind}.")
+    if not isinstance(raw_origin, Mapping) or not isinstance(
+        raw_size,
+        Mapping,
+    ):
+        return (0.0, 0.0, 0.0, 0.0)
+    x0 = float(raw_origin["x"])
+    y0 = float(raw_origin["y"])
+    return (
+        x0,
+        y0,
+        x0 + float(raw_size["x"]),
+        y0 + float(raw_size["y"]),
+    )
+
+
+def _point_in_rectangle(
+    point: Sequence[float],
+    rectangle: Sequence[float],
+) -> bool:
+    return bool(
+        rectangle[0] - 0.0001 <= point[0] <= rectangle[2] + 0.0001
+        and rectangle[1] - 0.0001 <= point[1] <= rectangle[3] + 0.0001
+    )
+
+
+def _cad_cell_vertical_face_axis(
+    left: Mapping[str, object],
+    right: Mapping[str, object],
+) -> str:
+    left_origin = left["final_origin_mm"]
+    left_size = left["final_size_mm"]
+    right_origin = right["final_origin_mm"]
+    right_size = right["final_size_mm"]
+    for axis in (0, 1):
+        orthogonal = 1 - axis
+        face_contact = bool(
+            abs(
+                left_origin[axis]
+                + left_size[axis]
+                - right_origin[axis]
+            )
+            <= 0.0001
+            or abs(
+                right_origin[axis]
+                + right_size[axis]
+                - left_origin[axis]
+            )
+            <= 0.0001
+        )
+        overlap_orthogonal = min(
+            left_origin[orthogonal] + left_size[orthogonal],
+            right_origin[orthogonal] + right_size[orthogonal],
+        ) - max(left_origin[orthogonal], right_origin[orthogonal])
+        overlap_z = min(
+            left_origin[2] + left_size[2],
+            right_origin[2] + right_size[2],
+        ) - max(left_origin[2], right_origin[2])
+        if face_contact and overlap_orthogonal > 0.0001 and overlap_z > 0.0001:
+            return "x" if axis == 0 else "y"
+    return ""
+
+
+def _point_inside_prism_xy(
+    point: Sequence[float],
+    prism: Mapping[str, object],
+) -> bool:
+    origin = prism["final_origin_mm"]
+    size = prism["final_size_mm"]
+    return bool(
+        origin[0] - 0.0001 <= point[0] <= origin[0] + size[0] + 0.0001
+        and origin[1] - 0.0001 <= point[1] <= origin[1] + size[1] + 0.0001
+    )
+
+
+def _prism_overlap_volume_with_placement(
+    prism: Mapping[str, object],
+    placement: Free3DPlacement,
+) -> float:
+    origin = prism["final_origin_mm"]
+    size = prism["final_size_mm"]
+    volume = 1.0
+    for axis in range(3):
+        lower = max(origin[axis], placement.origin_mm[axis])
+        upper = min(
+            origin[axis] + size[axis],
+            placement.origin_mm[axis] + placement.world_size_mm[axis],
+        )
+        volume *= max(0.0, upper - lower)
+    return volume
+
+
+def _cut_intersection_with_final_volume(
+    cut: Mapping[str, object],
+    final_origin: Sequence[float],
+    final_size: Sequence[float],
+) -> float:
+    cut_origin = tuple(
+        float(_mapping_value(cut["world_origin_mm"], axis))
+        for axis in ("x", "y", "z")
+    )
+    cut_size = tuple(
+        float(_mapping_value(cut["size_mm"], axis))
+        for axis in ("x", "y", "z")
+    )
+    volume = 1.0
+    for axis in range(3):
+        lower = max(cut_origin[axis], final_origin[axis])
+        upper = min(
+            cut_origin[axis] + cut_size[axis],
+            final_origin[axis] + final_size[axis],
+        )
+        volume *= max(0.0, upper - lower)
+    return volume
+
+
+def _mapping_value(value: object, key: str) -> object:
+    if not isinstance(value, Mapping):
+        raise TypeError(f"Expected mapping for {key}.")
+    return value[key]
+
+
+def _tuple_close(
+    left: Sequence[float],
+    right: Sequence[float],
+) -> bool:
+    return all(
+        abs(float(left[index]) - float(right[index])) <= 0.0001
+        for index in range(len(left))
+    )
 
 
 def _rejected_composite_materialization(reason: str) -> dict[str, object]:
     return {
-        "schema_version": "bgig.xy_composite_cad_materialization_certificate.v1",
+        "schema_version": "bgig.xy_composite_cad_materialization_certificate.v2",
         "certified": False,
+        "rejection_subcodes": [
+            "COMPOSITE_CAD_CONTRACT_"
+            + reason.upper().replace("-", "_")
+        ],
         "stop_reason": reason,
     }
 

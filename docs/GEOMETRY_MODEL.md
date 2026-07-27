@@ -16,6 +16,16 @@ de bord sans exiger qu'une partition rectangulaire brute soit deja complete.
 Une coupe de plateau/livret est admissible seulement si la matiere restante
 entre elle et toute cavite atteint l'epaisseur de paroi resolue du conteneur.
 
+La pose monde de chaque cavite est derivee une fois du plan minimal, puis
+empreintee. Un corps composite conserve son volume exterieur jusqu'a l'union :
+l'ouverture depuis le sommet de la cavite est ensuite soustraite uniquement du
+composant proprietaire. Elle ne devient ni un vide global qui casse le coeur,
+ni une coupe appliquee aux corps voisins.
+
+La boite englobante d'un corps composite est une mesure de scene, pas une
+primitive pleine. La matiere est exactement l'union de ses prismes v2 moins les
+cavites, acces et reservations certifies.
+
 ## Mesures géométriques P64-L09T-D
 
 Le niveau bas admissible est la plus basse base Z soutenue du plan complet. Un

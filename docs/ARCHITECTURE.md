@@ -17,6 +17,13 @@ brute lorsqu'il publie des corps composites. La couture annexe/proprietaire est
 interne au meme corps. Fusion reste un adaptateur : unions, cavites puis coupes,
 sur le thread autorise.
 
+Depuis P64-L09T-F, le finaliseur `v10` recertifie les placements minimaux
+exacts et publie directement la fermeture hybride v2. Chaque cavite porte un
+contrat de pose monde fige. `partition_cad.py` verifie les empreintes de pose et
+de geometrie, puis produit un corps composite v2 dont la boite englobante n'est
+jamais confondue avec un solide. Les unions precedent les cavites, les acces
+verticaux proprietaires et les reservations.
+
 ## Classement plancher d'abord P64-L09T-D
 
 Le portefeuille minimal certifie d'abord chaque proposition avec le certificat

@@ -385,7 +385,7 @@ class StagedCalculationTests(unittest.TestCase):
         )
         self.assertEqual(
             partition["finalization"]["selected_plan_source"],
-            "e_xy_composite_union_and_exact_insets",
+            "f_xy_composite_v2_union_cavities_insets",
         )
         composite_certificate = partition["finalization"][
             "composite_materialization_certificate"
@@ -421,7 +421,7 @@ class StagedCalculationTests(unittest.TestCase):
         )
         self.assertTrue(
             all(
-                value.policy == "bounded_xy_composite_v1"
+                value.policy == "hybrid_xy_composite_v2"
                 and value.attachment_axis in {"x", "y"}
                 for value in fusion.additive_prism_joins
             )

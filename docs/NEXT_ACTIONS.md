@@ -1,7 +1,7 @@
 # Next Actions
 
 <!-- P64-L09T-NEXT -->
-## Action courante : executer P64-L09T-F
+## Action courante : executer P64-L09T-G
 
 Thomas a accepte ADR-0093 et autorise l'execution autonome sequentielle du
 programme P64-L09T :
@@ -11,8 +11,9 @@ programme P64-L09T :
 3. P64-L09T-C : `done`, poses automatiques, migration et parois certifiees ;
 4. P64-L09T-D : `done`, classement lexicographique plancher d'abord ;
 5. P64-L09T-E : `done`, fermeture hybride v2 automatisee-validee ;
-6. P64-L09T-F : mission suivante, certificat composite et CAD fidele ;
-7. P64-L09T-G : durcissement, nouvelle candidate, installation et preflight ;
+6. P64-L09T-F : `done`, certificat composite et CAD fidele ;
+7. P64-L09T-G : mission suivante, durcissement, nouvelle candidate,
+   installation et preflight ;
 8. P64-L09T-V : observation Fusion humaine.
 
 Le successeur suit `docs/P64_L09T_END_TO_END_GOAL_RUNBOOK.md`, travaille une
@@ -51,6 +52,12 @@ Validation E : `45/45` tests cibles, regression produit `1/1`, puis gate
 globale autorisee `860/860` en `280.807 s`, avec une integration SCIP native
 ignoree. Douze modules benchmark/corpus/tournoi sont exclus a partir de E :
 l'adaptateur benchmark lie a l'identite v9 n'est pas regenere pendant le Goal.
+
+Preuve F : `docs/P64_L09T_F_COMPOSITE_CAD_EVIDENCE.md`.
+Validation F : `157/157` tests cibles, puis gate globale autorisee `866/866`
+en `285.542 s`, avec une integration SCIP native ignoree. Les douze modules
+interdits restent exclus. La fermeture hybride v2 est maintenant la geometrie
+produit et CAD ; aucune installation Fusion n'a lieu avant G.
 
 <!-- P64-L09S-0168-NEXT -->
 ## Action courante : cloture corrective et gate P64-L09S-V

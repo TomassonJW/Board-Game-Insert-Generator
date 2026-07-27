@@ -1,11 +1,11 @@
 # Status
 
 <!-- P64-L09T-STATUS -->
-## P64-L09T — Goal actif, missions A a E automatisees-validees
+## P64-L09T — Goal actif, missions A a F automatisees-validees
 
 Date : 2026-07-27.
 
-Statut : `goal-active`, `P64-L09T-E-automated-validated`.
+Statut : `goal-active`, `P64-L09T-F-automated-validated`.
 
 - La gate 0.1.69 est `human-KO`, `do-not-run`. La jauge fluide, les minima et
   la cavite orientee restent des acquis positifs partiels.
@@ -55,11 +55,18 @@ Statut : `goal-active`, `P64-L09T-E-automated-validated`.
 - Les coutures internes ont un jeu nul. Les corridors entre proprietaires,
   reservations hautes, minima et poses de cavite restent inchanges et
   certifies par `bgig.xy_composite_partition_certificate.v2`.
-- Le certificat produit commun et le CAD IR v2 restent la frontiere F. E
-  conserve le chemin materialisable v1 lorsqu'il existe et refuse toute
-  publication partielle si seule la proposition v2 reussit.
-- Le certificat devra proteger l'epaisseur de paroi existante entre cavite et
-  reservation.
+- F supprime le pont temporaire v1 : la fermeture hybride v2 devient
+  directement la geometrie produit et CAD recertifiee depuis les placements
+  minimaux exacts.
+- Les poses monde des cavites sont figees avec une empreinte stable, y compris
+  apres rotation Z a 90 degres. Elles ne sont ni recalculees, ni translatees
+  pendant la finition ou la materialisation.
+- Le corps CAD v2 est une union de vrais prismes, pas sa boite englobante. Le
+  coeur et les annexes sont unis avant les cavites, les acces verticaux du seul
+  proprietaire puis les reservations superieures.
+- Le certificat de materialisation v2 compare volumes source/CAD/final,
+  unions, poses, acces et enveloppes de paroi. Une empreinte de geometrie ou de
+  cavite divergente est refusee avant tout plan Fusion.
 - La finition cible extensions rectangulaires puis annexes soudees ; la couture
   interne a un jeu nul et toutes les frontieres externes conservent leurs jeux.
 - P64-F03 conserve trois horizons : cales separees, separateurs sans fond et
@@ -85,6 +92,10 @@ Statut : `goal-active`, `P64-L09T-E-automated-validated`.
   globale autorisee `860/860` en `280.807 s`, avec un test SCIP natif ignore.
   Douze modules benchmark/corpus/tournoi sont exclus ; l'adaptateur lie a
   l'identite v9 est ajoute sans regenerer son artefact canonique.
+- Validation F : `157/157` tests cibles, puis gate globale autorisee `866/866`
+  en `285.542 s`, avec un test SCIP natif ignore. Les douze modules interdits
+  restent exclus ; aucun benchmark, holdout ou artefact associe n'est execute
+  ou regenere.
 
 Programme : `docs/P64_L09T_END_TO_END_GOAL_RUNBOOK.md`.
 Preuve : `docs/P64_L09S_V_0169_HUMAN_KO_EVIDENCE.md`.
@@ -96,9 +107,10 @@ Preuve C :
 `docs/P64_L09T_C_AUTOMATIC_TOP_RESERVATIONS_EVIDENCE.md`.
 Preuve D : `docs/P64_L09T_D_FLOOR_FIRST_RANKING_EVIDENCE.md`.
 Preuve E : `docs/P64_L09T_E_HYBRID_COMPOSITE_CLOSURE_EVIDENCE.md`.
+Preuve F : `docs/P64_L09T_F_COMPOSITE_CAD_EVIDENCE.md`.
 
-Prochaine action : integrer P64-L09T-E dans `main`, puis executer P64-L09T-F
-sur le certificat composite et le CAD fidele.
+Prochaine action : integrer P64-L09T-F dans `main`, puis executer P64-L09T-G
+pour le durcissement, le package candidat, l'installation et le preflight.
 `fusion-validated=false`, `print-validated=false`.
 
 <!-- P64-L09S-0168-STATUS -->

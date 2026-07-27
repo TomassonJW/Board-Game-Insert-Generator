@@ -3737,7 +3737,10 @@ def _additive_prism_join_plans(
         core_prism_id = None
         attached_to_prism_id = None
         attachment_axis = None
-        if policy == "bounded_xy_composite_v1":
+        if policy in {
+            "bounded_xy_composite_v1",
+            "hybrid_xy_composite_v2",
+        }:
             prism_id = _required_text(
                 parameters, "prism_id", f"body {blank.cad_id} composite prism"
             )
@@ -3891,7 +3894,41 @@ def _cavity_cut_plans(
         _validate_cavity_cut_bounds(blank, local_origin, cavity_size, cavity_id)
         geometry_size = _geometry_frame_size(blank)
         geometry_origin = _geometry_frame_origin(blank)
+        declared_cavity_source = _optional_text(
+            parameters,
+            "cavity_source",
+        )
+        cavity_source = (
+            "top_inset_grip"
+            if operation_kind == TOP_INSET_GRIP_OPERATION_KIND
+            else "top_inset_reservation"
+            if operation_kind == TOP_INSET_CUT_OPERATION_KIND
+            else declared_cavity_source or "cad_ir_cavity"
+        )
+        cut_plane_world_z = geometry_origin.z + geometry_size.z
         retained_floor_mm = geometry_size.z - cavity_size.z
+        if cavity_source in {
+            "frozen_content_cavity",
+            "frozen_cavity_vertical_access",
+        }:
+            raw_cut_plane = parameters.get("cut_plane_local_z_mm")
+            if not isinstance(raw_cut_plane, (int, float)):
+                raise FusionSkeletonError(
+                    f"Frozen cavity {cavity_id!r} must declare its local cut plane."
+                )
+            cut_plane_local_z = float(raw_cut_plane)
+            expected_cut_plane = local_origin.z + cavity_size.z
+            if (
+                abs(cut_plane_local_z - expected_cut_plane)
+                > 0.0001
+            ):
+                raise FusionSkeletonError(
+                    f"Frozen cavity {cavity_id!r} cut plane diverges from its world pose."
+                )
+            cut_plane_world_z = (
+                geometry_origin.z + cut_plane_local_z
+            )
+            retained_floor_mm = local_origin.z
         if is_top_inset:
             if parameters.get("non_perforating") is not True:
                 raise FusionSkeletonError(
@@ -3921,19 +3958,13 @@ def _cavity_cut_plans(
                 cut_origin_mm=FusionVectorMm(
                     x=geometry_origin.x + local_origin.x,
                     y=geometry_origin.y + local_origin.y,
-                    z=geometry_origin.z + geometry_size.z,
+                    z=cut_plane_world_z,
                 ),
                 cut_size_mm=cavity_size,
                 requested_local_origin_mm=local_origin,
                 retained_floor_mm=retained_floor_mm,
                 operation_kind=str(operation_kind),
-                cavity_source=(
-                    "top_inset_grip"
-                    if operation_kind == TOP_INSET_GRIP_OPERATION_KIND
-                    else "top_inset_reservation"
-                    if operation_kind == TOP_INSET_CUT_OPERATION_KIND
-                    else "cad_ir_cavity"
-                ),
+                cavity_source=cavity_source,
                 policy="localized_top_inset_v1" if is_top_inset else None,
             )
         )

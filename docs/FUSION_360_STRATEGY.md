@@ -9,9 +9,14 @@ rend les plans obsoletes ; aucune insertion locale ou globale n'est presentee
 comme un calcul courant.
 
 La materialisation finale execute, pour chaque proprietaire : coeur, annexes,
-unions, cavites puis coupes de reservations. L'interface interne d'une annexe
-n'ajoute aucun jeu. Un echec d'union, de paroi ou de coupe conserve la scene
-precedente.
+unions, cavites, acces verticaux de ces cavites, puis coupes de reservations.
+L'interface interne d'une annexe n'ajoute aucun jeu. Les acces ciblent
+uniquement le composant proprietaire. Un echec d'union, de pose, de paroi ou de
+coupe conserve la scene precedente.
+
+L'adaptateur pur accepte `hybrid_xy_composite_v2`, controle les attaches X/Y et
+maintient un composant utilisateur par proprietaire. Cette preuve hors Fusion
+ne vaut pas observation B-Rep : `fusion-validated=false` jusqu'a la gate V.
 
 La future gate P64-L09T-V utilise seulement le package prepare et installe par
 Codex. `0.1.69` est `human-KO`, `do-not-run`.

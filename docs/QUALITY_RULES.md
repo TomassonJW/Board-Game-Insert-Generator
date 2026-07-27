@@ -13,6 +13,12 @@
   frontieres externes avec jeux preserves.
 - Le certificat produit, le certificat composite et le CAD IR portent sur la
   meme geometrie finale.
+- La boite englobante d'un composite n'est jamais materialisee comme un solide.
+- Toute cavite composite conserve sa pose monde et son empreinte du plan
+  minimal ; son acces vertical est coupe seulement dans son proprietaire apres
+  les unions.
+- Une divergence de digest composite ou de pose de cavite bloque la CAD IR
+  avant tout plan Fusion.
 - Un arret avant plafond affiche temps, plafond, phase et motif sans transformer
   une recherche bornee en impossibilite.
 - Aucun succes de finition sans plan final courant et residuel nul.

@@ -249,6 +249,11 @@ rectangulaire ne couvre pas.
 
 ## 11. P64-L09T-F — Certificat composite et CAD fidèle
 
+Statut au 2026-07-27 : `done`, `automated-validated`.
+
+Preuve :
+`docs/P64_L09T_F_COMPOSITE_CAD_EVIDENCE.md`.
+
 ### Objectif
 
 Certifier et matérialiser la géométrie réellement publiée.
@@ -274,6 +279,8 @@ Certifier et matérialiser la géométrie réellement publiée.
 - `printable_residual_volume_mm3=0`.
 
 ## 12. P64-L09T-G — Durcissement, package et préparation de gate
+
+Statut au 2026-07-27 : `ready-after-P64-L09T-F-integration`.
 
 ### Objectif
 

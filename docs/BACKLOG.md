@@ -54,14 +54,15 @@
 
 ### P64-L09T-F — Certificat composite et CAD
 
-- Statut : `ready-after-P64-L09T-E-integration`.
+- Statut : `done`, `automated-validated`.
 - Certifier les vrais corps composites, pas seulement la fermeture brute.
 - Figer les cavites, unir avant cavites/coupes et publier un composant par
   proprietaire seulement avec residuel nul.
+- Preuve : `docs/P64_L09T_F_COMPOSITE_CAD_EVIDENCE.md`.
 
 ### P64-L09T-G — Durcissement et preparation Fusion
 
-- Statut : `waiting-for-P64-L09T-F`.
+- Statut : `ready-after-P64-L09T-F-integration`.
 - Couvrir les deux cas de base, les deux cas « + », les deltas isoles, les
   parois, couches basses, annexes, rejets et stale.
 - Suite complete, integration, nouvelle candidate, installation et preflight.

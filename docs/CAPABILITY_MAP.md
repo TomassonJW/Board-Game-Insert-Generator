@@ -1,7 +1,7 @@
 # Capability Map
 
 <!-- P64-L09T-CAPABILITY -->
-## P64-L09T — missions A a E automatisees-validees
+## P64-L09T — missions A a F automatisees-validees
 
 - `C-STAGED-CALCULATION` : `automated-validated`. Toute edition geometrique
   rend minimal et final obsoletes ; seul Calculer peut republier un minimal.
@@ -21,8 +21,13 @@
 - `C-TOLERANCE` : aucun default ne change. La couture annexe/proprietaire est
   interne, sans jeu ; tous les jeux externes et l'epaisseur de paroi existante
   restent normatifs.
-- `C-CAD-IR` / `C-FUSION` : planifies pour F. E fournit le certificat
-  geometrique v2 mais ne publie pas encore ces corps dans le CAD IR.
+- `C-CAD-IR` : `automated-validated`. Le corps composite v2 publie ses vrais
+  prismes, son arbre d'unions, ses cavites figees, leurs acces proprietaires et
+  les coupes superieures exactes. Les digests de geometrie et de pose sont
+  verifies fail-closed.
+- `C-FUSION` : adaptateur pur `automated-validated` pour
+  `hybrid_xy_composite_v2`, avec un composant par proprietaire et unions avant
+  coupes. Aucune execution reelle dans Fusion n'est revendiquee en F.
 - `C-FUSION-UI` : `automated-validated` pour le cycle explicite et les
   diagnostics d'arret. La palette expose phase, temps/plafond et nature du
   verdict, garde les compteurs techniques replies et refuse de transformer un
@@ -30,11 +35,11 @@
   l'UI affiche seulement la pose automatique calculee.
 - `C-FINISHING-COMPLEMENTS` : `deferred`. Cales separees, separateurs sans fond
   et conteneurs generes appartiennent a P64-F03.
-- `C-QUALITY` : P64-L09T-E passe `45/45`, une regression produit `1/1`, puis
-  la gate globale autorisee `860/860` en `280.807 s`, avec un test SCIP natif
-  ignore. Douze modules benchmark/corpus/tournoi sont exclus sans regenerer
-  d'artefact. 0.1.69 reste `human-KO`, `do-not-run`. P64-L09T-F devient la
-  mission suivante.
+- `C-QUALITY` : P64-L09T-F passe `157/157` tests cibles, puis la gate globale
+  autorisee `866/866` en `285.542 s`, avec un test SCIP natif ignore. Douze
+  modules benchmark/corpus/tournoi sont exclus sans regenerer d'artefact.
+  0.1.69 reste `human-KO`, `do-not-run`. P64-L09T-G devient la mission
+  suivante.
 - `C-PRINT` : inchangee, `print-validated=false`.
 
 Cette validation reste automatisee : `fusion-validated=false`,

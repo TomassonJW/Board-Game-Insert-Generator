@@ -71,6 +71,11 @@ géométrie v2 réussit, le résultat expose honnêtement
 `xy_composite_product_certificate_v2_required` et ne publie aucun plan
 partiel.
 
+Cette frontière décrit l'état livré par E. P64-L09T-F la ferme désormais :
+la v2 est recertifiée directement, publiée dans le plan produit et traduite
+dans la CAD IR sans retour à la fermeture v1. La preuve courante est
+`docs/P64_L09T_F_COMPOSITE_CAD_EVIDENCE.md`.
+
 ## Preuves automatisées
 
 | Cas | Résultat |
@@ -113,7 +118,8 @@ n'a été exécuté ou recalculé.
 
 ## Limites et suite
 
-- E ne publie pas encore la nouvelle géométrie v2 dans le CAD IR.
+- Au commit E, la nouvelle géométrie v2 n'était pas encore publiée dans le
+  CAD IR ; cette limite historique est levée par F.
 - Aucun package ou add-in Fusion n'est installé en E.
 - 0.1.69 reste `human-KO`, `do-not-run`.
 - P64-L09T-F doit maintenant certifier et matérialiser fidèlement ces corps

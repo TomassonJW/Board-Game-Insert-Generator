@@ -24,6 +24,7 @@ from board_game_insert_generator.cad_ir import (
     CadSceneMetadata,
 )
 from board_game_insert_generator.models import Dimension3D, Point3D
+from board_game_insert_generator.incremental_project_state import canonical_digest
 from board_game_insert_generator.partition_solver import PARTITION_PLAN_SCHEMA_V1, solve_partition_plan
 from board_game_insert_generator.project_v1 import normalize_project_draft
 from board_game_insert_generator.top_inset_reservation import (
@@ -41,6 +42,7 @@ ARTIFACT_KIND_MINIMAL = "minimal_layout"
 ARTIFACT_KIND_FINALIZED = "finalized_plan"
 COMPOSITE_PRISM_JOIN_OPERATION_KIND = "join_rectangular_prism"
 COMPOSITE_BODY_SCHEMA_V1 = "bgig.xy_composite_cad_body.v1"
+COMPOSITE_BODY_SCHEMA_V2 = "bgig.xy_composite_cad_body.v2"
 _EPSILON = 0.0001
 
 
@@ -402,11 +404,67 @@ def _container_component(placement: dict[str, object], index: int) -> CadCompone
     final_local = _dimension(placement["final_outer_dimensions_mm"], f"placement[{index}].final_outer_dimensions_mm")
     minimum_origin = _dimension(placement["minimum_envelope_origin_in_final_mm"], f"placement[{index}].minimum_envelope_origin_in_final_mm")
     rotation = int(placement.get("rotation_deg_z", 0))
+    composite_body = (
+        _mapping(
+            placement["composite_body"],
+            f"placement[{index}].composite_body",
+        )
+        if isinstance(placement.get("composite_body"), dict)
+        else None
+    )
+    composite_v2 = bool(
+        composite_body is not None
+        and composite_body.get("schema_version")
+        == COMPOSITE_BODY_SCHEMA_V2
+    )
+    frozen_contracts = (
+        _mappings(
+            placement.get("frozen_cavities_v1", []),
+            f"placement[{index}].frozen_cavities_v1",
+        )
+        if composite_v2
+        else []
+    )
+    raw_cavities = _mappings(
+        placement.get("cavity_layout", []),
+        f"placement[{index}].cavity_layout",
+    )
+    if composite_v2 and len(frozen_contracts) != len(raw_cavities):
+        raise PartitionCadBuildError(
+            f"Le nombre de cavites figees diverge pour {placement['id']!r}."
+        )
     cavities: list[CadCavity] = []
-    for cavity_index, cavity in enumerate(_mappings(placement.get("cavity_layout", []), f"placement[{index}].cavity_layout")):
-        local_origin, local_size = _transformed_cavity(cavity, final_local, minimum_origin, rotation)
+    for cavity_index, cavity in enumerate(raw_cavities):
+        if composite_v2:
+            frozen = frozen_contracts[cavity_index]
+            world_origin = _dimension(
+                frozen["world_origin_mm"],
+                f"placement[{index}].frozen_cavities_v1[{cavity_index}].world_origin_mm",
+            )
+            local_origin = {
+                axis: _round(world_origin[axis] - body_origin[axis])
+                for axis in ("x", "y", "z")
+            }
+            local_size = _dimension(
+                frozen["world_size_mm"],
+                f"placement[{index}].frozen_cavities_v1[{cavity_index}].world_size_mm",
+            )
+        else:
+            local_origin, local_size = _transformed_cavity(
+                cavity,
+                final_local,
+                minimum_origin,
+                rotation,
+            )
         cavity_id = str(cavity["cavity_id"])
-        _assert_cavity(str(placement["name"]), cavity_id, local_origin, local_size, body_size)
+        _assert_cavity(
+            str(placement["name"]),
+            cavity_id,
+            local_origin,
+            local_size,
+            body_size,
+            require_top_open=not composite_v2,
+        )
         effective = cavity.get("clearance_effective_v1")
         values = _mapping(effective["values_mm"], "cavity.clearance_effective_v1.values_mm") if isinstance(effective, dict) else {"x": cavity["content_clearance_mm"], "y": cavity["content_clearance_mm"], "z": cavity["content_clearance_mm"]}
         sources = _mapping(effective["source_by_axis"], "cavity.clearance_effective_v1.source_by_axis") if isinstance(effective, dict) else {"x": "legacy_content_clearance_mm", "y": "legacy_content_clearance_mm", "z": "legacy_content_clearance_mm"}
@@ -430,6 +488,14 @@ def _container_component(placement: dict[str, object], index: int) -> CadCompone
                 fusion_generation=PARTITION_CAD_STATUS_READY,
             )
         )
+    if composite_body is not None:
+        if composite_body.get("schema_version") == COMPOSITE_BODY_SCHEMA_V2:
+            _validate_frozen_cavities(
+                placement,
+                body_origin,
+                tuple(cavities),
+                index,
+            )
     return _component(
         placement=placement,
         index=index,
@@ -448,11 +514,7 @@ def _container_component(placement: dict[str, object], index: int) -> CadCompone
             "surplus_distribution_mm": placement.get("surplus_distribution_mm"),
             "automatic": False,
         },
-        composite_body=(
-            _mapping(placement["composite_body"], f"placement[{index}].composite_body")
-            if isinstance(placement.get("composite_body"), dict)
-            else None
-        ),
+        composite_body=composite_body,
     )
 
 
@@ -522,12 +584,23 @@ def _transformed_cavity(
     raise PartitionCadBuildError(f"Rotation Z P59 non prise en charge : {rotation}.")
 
 
-def _assert_cavity(name: str, cavity_id: str, origin: dict[str, float], size: dict[str, float], body: dict[str, float]) -> None:
+def _assert_cavity(
+    name: str,
+    cavity_id: str,
+    origin: dict[str, float],
+    size: dict[str, float],
+    body: dict[str, float],
+    *,
+    require_top_open: bool = True,
+) -> None:
     if min(size.values()) <= 0.0 or min(origin.values()) < -_EPSILON:
         raise PartitionCadBuildError(f"La cavite {cavity_id!r} du bac {name!r} a des dimensions invalides.")
     if any(origin[axis] + size[axis] > body[axis] + _EPSILON for axis in ("x", "y", "z")):
         raise PartitionCadBuildError(f"La cavite {cavity_id!r} depasse le corps {name!r}.")
-    if abs(origin["z"] + size["z"] - body["z"]) > _EPSILON:
+    if (
+        require_top_open
+        and abs(origin["z"] + size["z"] - body["z"]) > _EPSILON
+    ):
         raise PartitionCadBuildError(f"La cavite {cavity_id!r} du bac {name!r} n est pas ouverte sur la face superieure.")
 
 
@@ -546,8 +619,13 @@ def _component(
         "coordinate_frame": "scene.frame",
     }
     join_operations: tuple[CadOperation, ...] = ()
+    composite_schema = ""
     if composite_body is not None:
-        if composite_body.get("schema_version") != COMPOSITE_BODY_SCHEMA_V1:
+        composite_schema = str(composite_body.get("schema_version", ""))
+        if composite_schema not in {
+            COMPOSITE_BODY_SCHEMA_V1,
+            COMPOSITE_BODY_SCHEMA_V2,
+        }:
             raise PartitionCadBuildError(
                 f"Schema composite inconnu pour {instance_id!r}."
             )
@@ -555,6 +633,22 @@ def _component(
             raise PartitionCadBuildError(
                 f"Le corps composite {instance_id!r} n est pas certifie."
             )
+        if composite_schema == COMPOSITE_BODY_SCHEMA_V2:
+            declared_digest = str(
+                composite_body.get("geometry_digest", "")
+            )
+            digest_payload = {
+                key: deepcopy(value)
+                for key, value in composite_body.items()
+                if key != "geometry_digest"
+            }
+            if (
+                not declared_digest
+                or declared_digest != canonical_digest(digest_payload)
+            ):
+                raise PartitionCadBuildError(
+                    f"Le corps composite {instance_id!r} diverge de son certificat."
+                )
         prisms = _mappings(
             composite_body.get("prisms", []),
             f"placement[{index}].composite_body.prisms",
@@ -580,7 +674,7 @@ def _component(
         body_kind = "composite_rectangular_union"
         metadata = {
             **metadata,
-            "composite_body_schema": COMPOSITE_BODY_SCHEMA_V1,
+            "composite_body_schema": composite_schema,
             "composite_owner_id": composite_body.get("owner_id"),
             "composite_core_prism_id": composite_body.get("core_prism_id"),
             "composite_prism_count": len(prisms),
@@ -603,7 +697,27 @@ def _component(
                 parameters=create_parameters,
             ),
             *join_operations,
-            *tuple(_cavity_operation(body_id, cavity) for cavity in cavities),
+            *tuple(
+                _cavity_operation(
+                    body_id,
+                    cavity,
+                    frozen_world_pose=(
+                        composite_schema == COMPOSITE_BODY_SCHEMA_V2
+                    ),
+                )
+                for cavity in cavities
+            ),
+            *tuple(
+                _frozen_cavity_access_operation(body_id, cut)
+                for cut in _mappings(
+                    (
+                        composite_body.get("frozen_cavity_access_cuts", [])
+                        if composite_body is not None
+                        else []
+                    ),
+                    f"placement[{index}].composite_body.frozen_cavity_access_cuts",
+                )
+            ),
             *tuple(
                 _top_inset_operation(body_id, cut)
                 for cut in _mappings(placement.get("top_inset_cuts", []), f"placement[{index}].top_inset_cuts")
@@ -627,6 +741,14 @@ def _composite_join_operations(
         raise PartitionCadBuildError("Le premier prisme composite ne correspond pas au coeur.")
     resolved = {core_prism_id}
     operations: list[CadOperation] = []
+    policy = str(composite_body.get("policy", ""))
+    if policy not in {
+        "bounded_xy_composite_v1",
+        "hybrid_xy_composite_v2",
+    }:
+        raise PartitionCadBuildError(
+            f"Politique composite inconnue : {policy!r}."
+        )
     for prism in prisms[1:]:
         prism_id = str(prism.get("prism_id", ""))
         parent_id = str(prism.get("attached_to_prism_id", ""))
@@ -641,7 +763,7 @@ def _composite_join_operations(
                 kind=COMPOSITE_PRISM_JOIN_OPERATION_KIND,
                 target_id=body_id,
                 parameters={
-                    "mechanism_policy": "bounded_xy_composite_v1",
+                    "mechanism_policy": policy,
                     "prism_id": prism_id,
                     "core_prism_id": core_prism_id,
                     "attached_to_prism_id": parent_id,
@@ -658,14 +780,164 @@ def _composite_join_operations(
         resolved.add(prism_id)
     return tuple(operations)
 
-def _cavity_operation(body_id: str, cavity: CadCavity) -> CadOperation:
+
+def _validate_frozen_cavities(
+    placement: dict[str, object],
+    body_origin: dict[str, float],
+    cavities: tuple[CadCavity, ...],
+    index: int,
+) -> None:
+    raw_contracts = _mappings(
+        placement.get("frozen_cavities_v1", []),
+        f"placement[{index}].frozen_cavities_v1",
+    )
+    composite_body = _mapping(
+        placement["composite_body"],
+        f"placement[{index}].composite_body",
+    )
+    declared_pose_digests = [
+        str(value)
+        for value in composite_body.get(
+            "frozen_cavity_pose_digests",
+            [],
+        )
+    ]
+    if len(raw_contracts) != len(cavities):
+        raise PartitionCadBuildError(
+            f"Le nombre de cavites figees diverge pour {placement['id']!r}."
+        )
+    if len(declared_pose_digests) != len(raw_contracts):
+        raise PartitionCadBuildError(
+            f"Le certificat des cavites figees diverge pour {placement['id']!r}."
+        )
+    for cavity_index, (contract, cavity) in enumerate(
+        zip(raw_contracts, cavities)
+    ):
+        if int(contract.get("cavity_index", -1)) != cavity_index:
+            raise PartitionCadBuildError(
+                f"L identite de cavite figee diverge pour {placement['id']!r}."
+            )
+        expected_origin = _dimension(
+            contract["world_origin_mm"],
+            f"placement[{index}].frozen_cavities_v1[{cavity_index}].world_origin_mm",
+        )
+        expected_size = _dimension(
+            contract["world_size_mm"],
+            f"placement[{index}].frozen_cavities_v1[{cavity_index}].world_size_mm",
+        )
+        source_origin = _dimension(
+            contract["source_owner_origin_mm"],
+            (
+                f"placement[{index}].frozen_cavities_v1"
+                f"[{cavity_index}].source_owner_origin_mm"
+            ),
+        )
+        source_size = _dimension(
+            contract["source_owner_world_size_mm"],
+            (
+                f"placement[{index}].frozen_cavities_v1"
+                f"[{cavity_index}].source_owner_world_size_mm"
+            ),
+        )
+        identity = {
+            "owner_id": str(contract.get("owner_id", "")),
+            "cavity_index": cavity_index,
+            "world_origin_mm": _rounded(expected_origin),
+            "world_size_mm": _rounded(expected_size),
+            "source_owner_origin_mm": _rounded(source_origin),
+            "source_owner_world_size_mm": _rounded(source_size),
+            "source_rotation_deg_z": int(
+                contract.get("source_rotation_deg_z", -1)
+            ),
+        }
+        pose_digest = str(contract.get("pose_digest", ""))
+        if (
+            identity["owner_id"] != str(placement["id"])
+            or pose_digest != canonical_digest(identity)
+            or pose_digest != declared_pose_digests[cavity_index]
+        ):
+            raise PartitionCadBuildError(
+                f"L empreinte de cavite figee diverge pour {placement['id']!r}."
+            )
+        actual_origin = {
+            "x": body_origin["x"] + cavity.local_origin.x,
+            "y": body_origin["y"] + cavity.local_origin.y,
+            "z": body_origin["z"] + cavity.local_origin.z,
+        }
+        actual_size = _dimension_dict(cavity.size)
+        if any(
+            abs(actual_origin[axis] - expected_origin[axis]) > _EPSILON
+            or abs(actual_size[axis] - expected_size[axis]) > _EPSILON
+            for axis in ("x", "y", "z")
+        ):
+            raise PartitionCadBuildError(
+                f"La pose monde de la cavite figee {cavity.id!r} diverge."
+            )
+        if contract.get("top_open") is not True:
+            raise PartitionCadBuildError(
+                f"La cavite figee {cavity.id!r} n est pas certifiee ouverte."
+            )
+
+def _cavity_operation(
+    body_id: str,
+    cavity: CadCavity,
+    *,
+    frozen_world_pose: bool = False,
+) -> CadOperation:
+    parameters = {
+        "cavity_id": cavity.id,
+        "functional_type": cavity.functional_type,
+        "local_origin_mm": _point_dict(cavity.local_origin),
+        "size_mm": _dimension_dict(cavity.size),
+        "clearance_mm": cavity.clearance_mm,
+        "clearance_source": cavity.clearance_source,
+        "coordinate_frame": "body.local",
+        "execution_status": PARTITION_CAD_STATUS_READY,
+        "fusion_generation": PARTITION_CAD_STATUS_READY,
+    }
+    if frozen_world_pose:
+        parameters.update(
+            {
+                "cavity_source": "frozen_content_cavity",
+                "cut_plane_local_z_mm": _round(
+                    cavity.local_origin.z + cavity.size.z
+                ),
+            }
+        )
     return CadOperation(
-        id=f"{body_id}:{cavity.id}:{CAVITY_OPERATION_KIND}", kind=CAVITY_OPERATION_KIND, target_id=body_id,
+        id=f"{body_id}:{cavity.id}:{CAVITY_OPERATION_KIND}",
+        kind=CAVITY_OPERATION_KIND,
+        target_id=body_id,
+        parameters=parameters,
+    )
+
+
+def _frozen_cavity_access_operation(
+    body_id: str,
+    cut: dict[str, object],
+) -> CadOperation:
+    if cut.get("kind") != "frozen_cavity_access":
+        raise PartitionCadBuildError(
+            "Type de coupe d acces de cavite composite inconnu."
+        )
+    return CadOperation(
+        id=f"{body_id}:{cut['id']}:{CAVITY_OPERATION_KIND}",
+        kind=CAVITY_OPERATION_KIND,
+        target_id=body_id,
         parameters={
-            "cavity_id": cavity.id, "functional_type": cavity.functional_type,
-            "local_origin_mm": _point_dict(cavity.local_origin), "size_mm": _dimension_dict(cavity.size),
-            "clearance_mm": cavity.clearance_mm, "clearance_source": cavity.clearance_source,
-            "coordinate_frame": "body.local", "execution_status": PARTITION_CAD_STATUS_READY,
+            "cavity_id": cut["reservation_id"],
+            "functional_type": "frozen_cavity_vertical_access",
+            "local_origin_mm": deepcopy(cut["local_origin_mm"]),
+            "size_mm": deepcopy(cut["size_mm"]),
+            "clearance_mm": 0.0,
+            "clearance_source": "frozen_cavity_world_pose_v1",
+            "cavity_source": "frozen_cavity_vertical_access",
+            "cut_plane_local_z_mm": _round(
+                float(cut["local_origin_mm"]["z"])
+                + float(cut["size_mm"]["z"])
+            ),
+            "coordinate_frame": "body.local",
+            "execution_status": PARTITION_CAD_STATUS_READY,
             "fusion_generation": PARTITION_CAD_STATUS_READY,
         },
     )

@@ -77,7 +77,7 @@ class P64L09SFEndToEndHardeningTests(unittest.TestCase):
         self.assertTrue(flow["minimal"]["materializable"])
         self.assertEqual(
             flow["finalization"]["selected_plan_source"],
-            "e_xy_composite_union_and_exact_insets",
+            "f_xy_composite_v2_union_cavities_insets",
         )
         self.assertTrue(
             flow["finalization"]["composite_certificate"]["certified"]
@@ -86,6 +86,14 @@ class P64L09SFEndToEndHardeningTests(unittest.TestCase):
             flow["finalization"]["composite_certificate"]
             ["printable_residual_volume_mm3"],
             0.0,
+        )
+        self.assertTrue(
+            flow["finalization"]["composite_certificate"]
+            ["cavity_world_poses_match_frozen_contract"]
+        )
+        self.assertTrue(
+            flow["finalization"]["composite_certificate"]
+            ["cavity_vertical_access_open"]
         )
         self.assertEqual(flow["fusion_plan"]["user_component_count"], 1)
         self.assertGreater(flow["fusion_plan"]["joined_annex_count"], 0)

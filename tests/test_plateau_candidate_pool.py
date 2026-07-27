@@ -6,6 +6,11 @@ from pathlib import Path
 
 from board_game_insert_generator.coupled_finalization import finalize_coupled_volume
 from board_game_insert_generator.minimal_layout_solver import solve_minimal_layout
+from board_game_insert_generator.partition_cad import build_partition_cad
+from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
+    FUSION_GENERATION_MODE_COMPACT_ONLY,
+    generation_plan_from_cad_ir,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -81,6 +86,33 @@ class PlateauCandidatePoolTests(unittest.TestCase):
         self.assertEqual(
             fixed["final_outer_dimensions_mm"]["x"],
             fixed["minimum_outer_envelope_mm"]["x"],
+        )
+        cad = build_partition_cad(
+            project,
+            partition=finalized,
+            artifact_identity={
+                "artifact_kind": "finalized_plan",
+                "artifact_digest": "test-tray-candidate-pool",
+                "partition_plan_digest": finalized["plan_digest"],
+                "source_revision": 0,
+            },
+            effort_profile="normal",
+        )
+        self.assertEqual(cad["status"], "ready_for_fusion")
+        fusion = generation_plan_from_cad_ir(
+            cad["cad_ir"],
+            FUSION_GENERATION_MODE_COMPACT_ONLY,
+        )
+        self.assertEqual(
+            fusion.module_component_count,
+            len(finalized["placements"]),
+        )
+        self.assertTrue(
+            any(
+                value.cavity_source
+                == "frozen_cavity_vertical_access"
+                for value in fusion.cavity_cuts
+            )
         )
 
 

@@ -15,7 +15,7 @@
   cavites, reservations, unions, coupes et residuel nul certifies.
 - Les cales separees, separateurs sans fond et conteneurs de finition generes
   sont inscrits dans P64-F03 et restent differes.
-- P64-L09T est lance. Les missions A, B, C, D et E sont
+- P64-L09T est lance. Les missions A, B, C, D, E et F sont
   automatisees-validees. A rend
   toute edition geometrique explicite : elle rend
   minimal, final et scene obsoletes ; aucun placement n'est republie avant un
@@ -54,9 +54,15 @@
 - Le certificat composite v2 attribue chaque cellule imprimable a un
   proprietaire unique, supprime seulement le jeu interne et conserve les
   corridors externes et les reservations comme vides techniques.
-- La publication produit et CAD de cette nouvelle geometrie reste fail-closed
-  jusqu'a F. L'ancien chemin v1 materialisable reste le pont de compatibilite
-  lorsqu'il existe.
+- F publie directement la fermeture hybride v2 : le pont temporaire vers la
+  fermeture v1 est retire. Le finaliseur recertifie les placements minimaux
+  exacts, puis attache les vrais prismes composites au plan produit.
+- Chaque cavite recoit une pose monde figee et une empreinte stable. La CAD IR
+  cree le coeur, unit les annexes, coupe seulement les cavites et acces de leur
+  proprietaire, puis applique les reservations superieures.
+- `bgig.xy_composite_cad_materialization_certificate.v2` certifie volumes,
+  unions, poses, acces, parois et residuel nul. Les divergences de geometrie ou
+  de pose sont refusees avant le plan Fusion.
 - Validation A : `912/912` en `329.039 s`, un test SCIP natif ignore sous
   Python 3.10, aucun benchmark/holdout solveur invoque.
 - Validation B : `99/99` tests cibles, syntaxe JavaScript `node --check`
@@ -73,8 +79,11 @@
   globale autorisee `860/860` en `280.807 s`, avec un test ignore. Douze
   modules interdits sont exclus, dont l'adaptateur benchmark devenu non
   canonique avec l'identite v9 et non regenere.
-- Prochaine mission apres integration E : P64-L09T-F, certificat composite et
-  CAD fidele. Le Goal poursuit ensuite G puis s'arrete a P64-L09T-V.
+- Validation F : `157/157` tests cibles, puis gate globale autorisee `866/866`
+  en `285.542 s`, avec un test ignore. Les douze modules interdits restent
+  exclus et aucun artefact associe n'est regenere.
+- Prochaine mission apres integration F : P64-L09T-G, durcissement, package,
+  installation et preparation de gate. Le Goal s'arrete ensuite a P64-L09T-V.
 - Aucun benchmark/holdout, aucune valeur physique nouvelle ;
   `fusion-validated=false`, `print-validated=false`.
 
@@ -87,7 +96,8 @@ Autorites :
 - `docs/P64_L09T_B_EXPLAINABLE_FINALIZATION_STOPS_EVIDENCE.md` ;
 - `docs/P64_L09T_C_AUTOMATIC_TOP_RESERVATIONS_EVIDENCE.md` ;
 - `docs/P64_L09T_D_FLOOR_FIRST_RANKING_EVIDENCE.md` ;
-- `docs/P64_L09T_E_HYBRID_COMPOSITE_CLOSURE_EVIDENCE.md`.
+- `docs/P64_L09T_E_HYBRID_COMPOSITE_CLOSURE_EVIDENCE.md` ;
+- `docs/P64_L09T_F_COMPOSITE_CAD_EVIDENCE.md`.
 
 <!-- P64-L09S-0168-CURRENT -->
 ## Reprise canonique corrective 0.1.68

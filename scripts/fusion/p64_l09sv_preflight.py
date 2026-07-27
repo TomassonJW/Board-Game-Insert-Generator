@@ -169,9 +169,12 @@ def run_end_to_end(project: dict[str, object]) -> dict[str, object]:
     certificate = finalization["composite_materialization_certificate"]
     if (
         finalization["selected_plan_source"]
-        != "e_xy_composite_union_and_exact_insets"
+        != "f_xy_composite_v2_union_cavities_insets"
         or certificate.get("certified") is not True
         or certificate.get("printable_residual_volume_mm3") != 0.0
+        or certificate.get("cavity_world_poses_match_frozen_contract")
+        is not True
+        or certificate.get("cavity_vertical_access_open") is not True
     ):
         raise RuntimeError("The recent composite finalization is not exact.")
     final_cad = build_partition_cad(
@@ -229,7 +232,7 @@ def run_end_to_end(project: dict[str, object]) -> dict[str, object]:
             ),
             "all_annexes_xy": all(
                 join.attachment_axis in {"x", "y"}
-                and join.policy == "bounded_xy_composite_v1"
+                and join.policy == "hybrid_xy_composite_v2"
                 for join in fusion.additive_prism_joins
             ),
             "fusion_observed": False,
