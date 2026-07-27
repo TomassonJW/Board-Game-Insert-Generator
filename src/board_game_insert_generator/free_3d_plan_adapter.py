@@ -60,6 +60,7 @@ from board_game_insert_generator.solver_outcome import (
     result_label,
 )
 from board_game_insert_generator.top_inset_reservation import (
+    _local_depth_regions,
     apply_top_inset_reservations,
     certify_top_inset_reservation_prisms,
     compatibility_flat_stack_payload,
@@ -233,21 +234,56 @@ def prepare_free_3d_problem(
         box_xy_clearance,
         z_clearance,
     )
+    local_zone_cells: dict[
+        tuple[float, float, float, float], dict[str, float]
+    ] = {}
+    if pose_resolved:
+        for item in _mappings(resolved_top_inset_plan["reservations"]):
+            for region in _local_depth_regions(item):
+                origin = _mapping(region["cut_origin_mm"])
+                size = _mapping(region["cut_size_mm"])
+                key = (
+                    float(origin["x"]),
+                    float(origin["y"]),
+                    float(size["x"]),
+                    float(size["y"]),
+                )
+                current = local_zone_cells.get(key)
+                candidate = {
+                    "support_plane_z_mm": float(
+                        region["layer_bottom_z_mm"]
+                    ),
+                    "inset_depth_mm": float(
+                        region["inset_depth_from_top_mm"]
+                    ),
+                }
+                if (
+                    current is None
+                    or candidate["support_plane_z_mm"]
+                    < current["support_plane_z_mm"]
+                ):
+                    local_zone_cells[key] = candidate
+    merged_zone_cells = _merge_top_inset_zone_cells(
+        [
+            {
+                "x": key[0],
+                "y": key[1],
+                "width": key[2],
+                "height": key[3],
+                **value,
+            }
+            for key, value in sorted(local_zone_cells.items())
+        ]
+    )
     top_inset_zones = tuple(
         TopInsetZone(
-            origin_xy_mm=(
-                float(_mapping(item["cut_origin_mm"])["x"]),
-                float(_mapping(item["cut_origin_mm"])["y"]),
-            ),
-            size_xy_mm=(
-                float(_mapping(item["cut_size_mm"])["x"]),
-                float(_mapping(item["cut_size_mm"])["y"]),
-            ),
-            support_plane_z_mm=float(item["support_plane_z_mm"]),
-            inset_depth_mm=float(item["inset_depth_from_top_mm"]),
+            origin_xy_mm=(value["x"], value["y"]),
+            size_xy_mm=(value["width"], value["height"]),
+            support_plane_z_mm=value["support_plane_z_mm"],
+            inset_depth_mm=value["inset_depth_mm"],
         )
-        for item in _mappings(resolved_top_inset_plan["reservations"])
-    ) if pose_resolved else ()
+        for value in merged_zone_cells
+    )
     problem = Free3DPreparedProblem(
         normalization_source_schema=normalization.source_schema,
         normalization_migrated=normalization.migrated,
@@ -586,6 +622,10 @@ def certify_free_3d_plan(
             "fixed_cavity_layouts": cavity_compensation_count == 0,
             "base_cavity_layouts_fixed": True,
             "top_inset_cavity_depth_compensated": cavity_compensation_count > 0,
+            "cavity_calibrated_depths_unchanged": (
+                cavity_compensation_count == 0
+            ),
+            "cavity_z_anchor_deferred_to_finalization": True,
             "localized_top_insets": True,
             "volumetric_stages": False,
             "free_3d_final_envelopes": True,
@@ -1474,4 +1514,75 @@ def _container_variant_global_certificate(
         selection_digest=selection_digest,
         certified=all(value.passed for value in checks),
         checks=checks,
+    )
+
+
+def _merge_top_inset_zone_cells(
+    cells: list[dict[str, float]],
+) -> list[dict[str, float]]:
+    """Merge adjacent atomic cells carrying the exact same Z contract."""
+
+    merged = [dict(value) for value in cells]
+    changed = True
+    while changed:
+        changed = False
+        for left_index, left in enumerate(merged):
+            for right_index in range(left_index + 1, len(merged)):
+                right = merged[right_index]
+                if (
+                    abs(
+                        left["support_plane_z_mm"]
+                        - right["support_plane_z_mm"]
+                    )
+                    > 1e-9
+                    or abs(left["inset_depth_mm"] - right["inset_depth_mm"])
+                    > 1e-9
+                ):
+                    continue
+                horizontal = (
+                    abs(left["y"] - right["y"]) <= 1e-9
+                    and abs(left["height"] - right["height"]) <= 1e-9
+                    and (
+                        abs(left["x"] + left["width"] - right["x"])
+                        <= 1e-9
+                        or abs(
+                            right["x"] + right["width"] - left["x"]
+                        )
+                        <= 1e-9
+                    )
+                )
+                vertical = (
+                    abs(left["x"] - right["x"]) <= 1e-9
+                    and abs(left["width"] - right["width"]) <= 1e-9
+                    and (
+                        abs(left["y"] + left["height"] - right["y"])
+                        <= 1e-9
+                        or abs(
+                            right["y"] + right["height"] - left["y"]
+                        )
+                        <= 1e-9
+                    )
+                )
+                if not horizontal and not vertical:
+                    continue
+                if horizontal:
+                    left["x"] = min(left["x"], right["x"])
+                    left["width"] += right["width"]
+                else:
+                    left["y"] = min(left["y"], right["y"])
+                    left["height"] += right["height"]
+                merged.pop(right_index)
+                changed = True
+                break
+            if changed:
+                break
+    return sorted(
+        merged,
+        key=lambda value: (
+            value["support_plane_z_mm"],
+            value["x"],
+            value["y"],
+            value["width"],
+            value["height"],
+        ),
     )

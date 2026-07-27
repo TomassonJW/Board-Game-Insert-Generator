@@ -5,29 +5,27 @@
 
 Date : 2026-07-28.
 
-Statut : `P64-L09U-R2-V-human-KO`, `P64-L09U-R3-ready`,
+Statut : `P64-L09U-R3-automated-validated`, `P64-L09U-R3-V-ready-human-gate`,
 `fusion-validated=false`, `print-validated=false`.
 
 - 0.1.73 est `human-KO`, `do-not-run`.
-- La matérialisation transitoire est humainement confirmée rapide, progressive,
-  réactive et fidèle à l'aperçu.
-- Une cavité attendue à `10,6 mm` a été mesurée à `18,2 mm` après finalisation.
-- Deux plateaux différents de `CasLimite02+` donnent un encastrement
-  apparemment global et cumulé.
-- Une variante locale non sauvegardée a affiché environ `24 s` pour un plafond
-  de calcul annoncé à `20 s`.
-- ADR-0099 corrige la sémantique : calibre, X/Y et orientation figés ; origine Z
-  finale déterministe ; réservations composées uniquement selon leurs
-  empreintes et intervalles Z réels.
-- P64-L09U-R3 est la seule mission prête, cible initiale 0.1.74.
+- 0.1.74 conserve automatiquement le calibre exact et résout Z sans changer
+  X/Y, orientation ni dimensions.
+- Les réservations disjointes ne cumulent plus leurs hauteurs ; les
+  recouvrements créent des paliers uniquement dans leur intersection.
+- Aperçu, CAD IR et plan Fusion portent les ancrages et intervalles locaux.
+- L'interface sépare recherche, plafond, terminaison et temps mural total.
+- Préparateur `126/126`, suite autorisée `895/895`, un test SCIP ignoré.
+- Trois replays personnels passés en lecture seule, SHA-256 inchangés.
+- Candidate : `0.1.74`, prête pour la gate humaine R3-V.
 - Aucun benchmark/holdout ; projets personnels en lecture seule.
 
 Preuve :
-`docs/P64_L09U_R2_V_0173_HUMAN_KO_EVIDENCE.md`.
+`docs/P64_L09U_R3_0174_CORRECTIVE_EVIDENCE.md`.
 Décision :
 `docs/DECISIONS/ADR-0099-profondeur-calibree-et-reservations-superieures-locales.md`.
-Runbook :
-`docs/P64_L09U_R3_END_TO_END_RUNBOOK.md`.
+Recette :
+`docs/P64_L09U_R3_V_0174_FUSION_GATE_RECIPE.md`.
 
 ### Historique R2 clôturé en human-KO
 

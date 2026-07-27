@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-"""Rejoue en lecture seule les cas locaux P64-L09T s'ils sont présents."""
+"""Rejoue en lecture seule les trois cas personnels exigés par P64-L09U-R3."""
 
 from __future__ import annotations
 
 import argparse
-from copy import deepcopy
 from hashlib import sha256
 import json
 from pathlib import Path
@@ -27,9 +26,8 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
 
 PROJECT_DIRECTORY = Path.home() / "Documents" / "BGIG" / "projects"
 BASE_FILENAMES = {
-    "case01": "CasLimite01.bgig.json",
     "case01_plus": "CasLimite01+.bgig.json",
-    "case02": "CasLimite02.bgig.json",
+    "case01_plus_plus": "CasLimite01++.bgig.json",
     "case02_plus": "CasLimite02+.bgig.json",
 }
 
@@ -40,22 +38,6 @@ def _file_digest(path: Path) -> str:
 
 def _load_raw(path: Path) -> dict[str, object]:
     return json.loads(path.read_text(encoding="utf-8-sig"))
-
-
-def _case_02_variants(
-    base: dict[str, object],
-    plus: dict[str, object],
-) -> dict[str, dict[str, object]]:
-    content_only = deepcopy(base)
-    content_only["contents"] = deepcopy(plus["contents"])
-    clearance_only = deepcopy(base)
-    clearance_only["layout"] = deepcopy(plus["layout"])
-    return {
-        "case02": base,
-        "case02_content_only": content_only,
-        "case02_clearance_only": clearance_only,
-        "case02_combined": plus,
-    }
 
 
 def _run_case(
@@ -99,6 +81,9 @@ def _run_case(
     certificate = plan["finalization"][
         "composite_materialization_certificate"
     ]
+    cavity_anchors = plan["finalization"][
+        "cavity_anchor_certificate"
+    ]
     cad = build_partition_cad(
         project,
         partition=plan,
@@ -114,10 +99,16 @@ def _run_case(
     if (
         certificate.get("certified") is not True
         or certificate.get("printable_residual_volume_mm3") != 0.0
-        or certificate.get("cavity_world_poses_match_frozen_contract")
-        is not True
+        or cavity_anchors.get("certified") is not True
+        or cavity_anchors.get("calibrated_depths_unchanged") is not True
     ):
         raise RuntimeError(f"{case_id}: final certificate is not exact")
+    anchored_cavities = list(cavity_anchors.get("cavities", ()))
+    local_regions = [
+        region
+        for reservation in plan["top_inset_reservations"]["reservations"]
+        for region in reservation.get("local_depth_regions", ())
+    ]
     return {
         "case_id": case_id,
         "calculation_status": "solution_found",
@@ -125,6 +116,28 @@ def _run_case(
         "cad_status": cad["status"],
         "witness_status": "disabled",
         "cavities_frozen": True,
+        "calibrated_cavity_depths_unchanged": True,
+        "cavity_anchor_count": len(anchored_cavities),
+        "cavity_anchors": [
+            {
+                "cavity_id": item["cavity_key"],
+                "anchor_kind": item["anchor_kind"],
+                "source_depth_mm": item["calibrated_depth_source_mm"],
+                "final_depth_mm": item["calibrated_depth_final_mm"],
+                "minimum_origin_z_mm": item[
+                    "minimum_world_origin_mm"
+                ]["z"],
+                "final_origin_z_mm": item["world_origin_mm"]["z"],
+            }
+            for item in anchored_cavities
+        ],
+        "top_inset_local_region_count": len(local_regions),
+        "top_inset_local_depths_mm": sorted(
+            {
+                float(item["inset_depth_from_top_mm"])
+                for item in local_regions
+            }
+        ),
         "printable_residual_volume_mm3": 0.0,
         "component_count": fusion.module_component_count,
         "join_count": len(fusion.additive_prism_joins),
@@ -146,18 +159,14 @@ def run_local_replay() -> dict[str, object]:
     ]
     if missing:
         return {
-            "schema_version": "bgig.p64_l09t_local_replay.v1",
+            "schema_version": "bgig.p64_l09u_r3_local_replay.v1",
             "status": "skipped_local_projects_missing",
             "missing_case_ids": missing,
             "read_only": True,
         }
     before = {case_id: _file_digest(path) for case_id, path in paths.items()}
     raw = {case_id: _load_raw(path) for case_id, path in paths.items()}
-    cases = {
-        "case01": raw["case01"],
-        "case01_plus": raw["case01_plus"],
-        **_case_02_variants(raw["case02"], raw["case02_plus"]),
-    }
+    cases = dict(raw)
     results = [
         _run_case(case_id, project)
         for case_id, project in cases.items()
@@ -166,10 +175,12 @@ def run_local_replay() -> dict[str, object]:
     if before != after:
         raise RuntimeError("A local source project changed during replay.")
     return {
-        "schema_version": "bgig.p64_l09t_local_replay.v1",
+        "schema_version": "bgig.p64_l09u_r3_local_replay.v1",
         "status": "passed",
         "read_only": True,
         "source_projects_unchanged": True,
+        "source_sha256_before": before,
+        "source_sha256_after": after,
         "case_count": len(results),
         "results": results,
         "repository_payload_written": False,

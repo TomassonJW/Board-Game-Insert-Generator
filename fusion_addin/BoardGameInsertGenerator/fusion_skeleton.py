@@ -12,7 +12,7 @@ import json
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Mapping
 
 
 SUPPORTED_CAD_IR_SCHEMA_VERSION = "cad_ir.v0"
@@ -568,6 +568,12 @@ class FusionCavityCutPlan:
     validation_status: str = FUSION_MANUAL_VALIDATION_REQUIRED
     cavity_source: str = "cad_ir_cavity"
     policy: str | None = None
+    local_region_id: str = ""
+    overlapping_reservation_ids: tuple[str, ...] = ()
+    anchor_kind: str = ""
+    calibrated_depth_source_mm: float | None = None
+    calibrated_depth_final_mm: float | None = None
+    top_separation_mm: float | None = None
 
     def to_dict(self) -> dict[str, Any]:
         payload = {
@@ -587,6 +593,24 @@ class FusionCavityCutPlan:
         }
         if self.policy is not None:
             payload["policy"] = self.policy
+        if self.local_region_id:
+            payload["local_region_id"] = self.local_region_id
+        if self.overlapping_reservation_ids:
+            payload["overlapping_reservation_ids"] = list(
+                self.overlapping_reservation_ids
+            )
+        if self.anchor_kind:
+            payload["anchor_kind"] = self.anchor_kind
+        if self.calibrated_depth_source_mm is not None:
+            payload["calibrated_depth_source_mm"] = (
+                self.calibrated_depth_source_mm
+            )
+        if self.calibrated_depth_final_mm is not None:
+            payload["calibrated_depth_final_mm"] = (
+                self.calibrated_depth_final_mm
+            )
+        if self.top_separation_mm is not None:
+            payload["top_separation_mm"] = self.top_separation_mm
 
         return payload
 
@@ -3980,15 +4004,62 @@ def _cavity_cut_plans(
                 raise FusionSkeletonError(
                     f"Top inset {cavity_id!r} for {blank.body_name!r} must be marked non_perforating."
                 )
-            if abs(local_origin.z + cavity_size.z - geometry_size.z) > 0.0001:
-                raise FusionSkeletonError(
-                    f"Top inset {cavity_id!r} for {blank.body_name!r} must open on the top face."
+            raw_interval = parameters.get("local_interval_z_mm")
+            raw_overlap_ids = parameters.get(
+                "overlapping_reservation_ids",
+                (),
+            )
+            stacked_local_interval = bool(
+                isinstance(raw_interval, Mapping)
+                and isinstance(raw_overlap_ids, (list, tuple))
+                and len(raw_overlap_ids) > 1
+                and abs(
+                    float(raw_interval.get("bottom", -1.0))
+                    - (geometry_origin.z + local_origin.z)
                 )
+                <= 0.0001
+                and abs(
+                    float(raw_interval.get("top", -1.0))
+                    - (
+                        geometry_origin.z
+                        + local_origin.z
+                        + cavity_size.z
+                    )
+                )
+                <= 0.0001
+            )
+            if (
+                abs(
+                    local_origin.z
+                    + cavity_size.z
+                    - geometry_size.z
+                )
+                > 0.0001
+                and not stacked_local_interval
+            ):
+                raise FusionSkeletonError(
+                    f"Top inset {cavity_id!r} for {blank.body_name!r} must open on the top face or join a certified local stack."
+                )
+            if stacked_local_interval:
+                retained_floor_mm = local_origin.z
             declared_retained = float(parameters.get("retained_body_below_mm", -1.0))
             if abs(declared_retained - retained_floor_mm) > 0.0001:
                 raise FusionSkeletonError(
                     f"Top inset {cavity_id!r} retained-body declaration does not match its cut depth."
                 )
+        raw_overlapping_reservations = parameters.get(
+            "overlapping_reservation_ids",
+            (),
+        )
+        if not isinstance(raw_overlapping_reservations, (list, tuple)):
+            raise FusionSkeletonError(
+                f"CAD IR cut {cavity_id!r} overlapping reservations must be a list."
+            )
+        overlapping_reservation_ids = tuple(
+            str(value)
+            for value in raw_overlapping_reservations
+            if isinstance(value, str) and value
+        )
         cut_plans.append(
             FusionCavityCutPlan(
                 component_id=component_id,
@@ -4012,6 +4083,31 @@ def _cavity_cut_plans(
                 operation_kind=str(operation_kind),
                 cavity_source=cavity_source,
                 policy="localized_top_inset_v1" if is_top_inset else None,
+                local_region_id=str(
+                    parameters.get(
+                        "local_region_id",
+                        parameters.get(
+                            "responsible_local_region_id",
+                            "",
+                        ),
+                    )
+                ),
+                overlapping_reservation_ids=(
+                    overlapping_reservation_ids
+                ),
+                anchor_kind=str(parameters.get("anchor_kind", "")),
+                calibrated_depth_source_mm=_optional_number(
+                    parameters,
+                    "calibrated_depth_source_mm",
+                ),
+                calibrated_depth_final_mm=_optional_number(
+                    parameters,
+                    "calibrated_depth_final_mm",
+                ),
+                top_separation_mm=_optional_number(
+                    parameters,
+                    "top_separation_mm",
+                ),
             )
         )
     return cut_plans
@@ -4571,6 +4667,18 @@ def _required_number(source: dict[str, Any], key: str, label: str) -> float:
     if number < 0:
         raise FusionSkeletonError(f"CAD IR {label} {key} must be non-negative.")
     return number
+
+
+def _optional_number(
+    source: dict[str, Any],
+    key: str,
+) -> float | None:
+    value = source.get(key)
+    if value is None:
+        return None
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise FusionSkeletonError(f"CAD IR {key} must be numeric when present.")
+    return float(value)
 
 
 def _required_non_negative_int(source: dict[str, Any], key: str, label: str) -> int:

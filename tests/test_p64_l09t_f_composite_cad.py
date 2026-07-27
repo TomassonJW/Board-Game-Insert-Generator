@@ -127,34 +127,40 @@ class P64L09TFCompositeCadTests(unittest.TestCase):
             places=6,
         )
 
-    def test_cavity_world_pose_is_exact_and_vertical_access_is_open(self) -> None:
+    def test_cavity_depth_is_exact_and_final_z_anchor_is_certified(self) -> None:
         minimal = self.minimal_selection["partition"]["placements"][0]
         cavity = minimal["cavity_layout"][0]
-        expected_origin = {
-            axis: round(
-                float(minimal["origin_mm"][axis])
-                + float(cavity["local_origin_mm"][axis]),
-                6,
-            )
-            for axis in ("x", "y", "z")
-        }
-        frozen = self.plan["finalization"]["frozen_cavities"][0]
+        frozen = self.plan["placements"][0]["frozen_cavities_v1"][0]
         certificate = self.plan["finalization"][
             "composite_materialization_certificate"
         ]
 
-        self.assertEqual(frozen["world_origin_mm"], expected_origin)
         self.assertEqual(
             frozen["world_size_mm"],
             cavity["inner_dimensions_mm"],
         )
-        self.assertTrue(frozen["top_open"])
-        self.assertTrue(
-            certificate["cavity_world_poses_match_frozen_contract"]
+        self.assertEqual(
+            frozen["calibrated_depth_source_mm"],
+            cavity["inner_dimensions_mm"]["z"],
         )
-        self.assertTrue(certificate["cavity_vertical_access_open"])
+        self.assertEqual(
+            frozen["calibrated_depth_final_mm"],
+            cavity["inner_dimensions_mm"]["z"],
+        )
+        self.assertTrue(frozen["anchor_certified"])
         self.assertTrue(
-            self.plan["invariants"]["cavity_world_poses_frozen"]
+            certificate["cavity_calibrations_match_source_contract"]
+        )
+        self.assertTrue(
+            certificate["cavity_anchor_certificate"]["certified"]
+        )
+        self.assertTrue(
+            self.plan["invariants"][
+                "cavity_xy_pose_orientation_and_dimensions_frozen"
+            ]
+        )
+        self.assertTrue(
+            self.plan["invariants"]["cavity_final_z_anchor_resolved"]
         )
         content_cuts = [
             value
@@ -168,8 +174,16 @@ class P64L09TFCompositeCadTests(unittest.TestCase):
             == "frozen_cavity_vertical_access"
         ]
         self.assertEqual(len(content_cuts), 1)
-        self.assertTrue(access_cuts)
+        self.assertFalse(access_cuts)
         content_cut = content_cuts[0]
+        self.assertEqual(
+            content_cut.anchor_kind,
+            frozen["anchor_kind"],
+        )
+        self.assertEqual(
+            content_cut.calibrated_depth_source_mm,
+            content_cut.calibrated_depth_final_mm,
+        )
         self.assertAlmostEqual(
             content_cut.cut_origin_mm.x,
             frozen["world_origin_mm"]["x"],
@@ -186,17 +200,6 @@ class P64L09TFCompositeCadTests(unittest.TestCase):
             + frozen["world_size_mm"]["z"],
             places=6,
         )
-        geometry_origin_z = (
-            self.fusion.blanks[0].geometry_frame_origin_mm.z
-        )
-        for access_cut in access_cuts:
-            self.assertAlmostEqual(
-                access_cut.cut_origin_mm.z,
-                geometry_origin_z
-                + access_cut.requested_local_origin_mm.z
-                + access_cut.cut_size_mm.z,
-                places=6,
-            )
 
     def test_cad_ir_joins_before_cavities_and_exact_top_cuts(self) -> None:
         self.assertEqual(self.cad["status"], "ready_for_fusion")

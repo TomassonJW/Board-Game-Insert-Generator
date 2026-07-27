@@ -69,8 +69,8 @@ class P66AcceptancePreparationTests(unittest.TestCase):
         self.assertEqual(first["partition"], second["partition"])
         self.assertEqual(first["summary"], {
             "status": "constructed",
-            "plan_digest": "1f567ddd2b9db5ac87843f37255fa451ae21466874915958016396ef62ac8e63",
-            "cad_digest": "64d0de89de6a049cee61265eb65ea4fe3a7412a1ed86377a9ab8fdedf5e17e3f",
+            "plan_digest": "5d899fd96e1a02df42404c96b863686ead89f17663e7d105ced5914b7af572d8",
+            "cad_digest": "7822eb866fb20e0ddf5c4ac0eda9669d9b8d69fb45d2efbc93df6c379262807b",
             "source_digest": "b50079b71a9d8efe76c94c563992d293897177561ccccfff46068213b1afa640",
             "materializable": True,
             "cad_ready": True,
@@ -90,17 +90,17 @@ class P66AcceptancePreparationTests(unittest.TestCase):
         self.assertEqual([stage["origin_z_mm"] for stage in plan["stages"]], [0.0, 35.6])
         self.assertEqual(plan["stage_support"]["status"], "supported")
         self.assertEqual(plan["top_inset_reservations"]["summary"]["reservation_count"], 2)
-        self.assertEqual(plan["top_inset_reservations"]["summary"]["cut_count"], 10)
-        self.assertEqual(plan["top_inset_reservations"]["summary"]["cavity_depth_compensation_count"], 4)
+        self.assertEqual(plan["top_inset_reservations"]["summary"]["cut_count"], 16)
+        self.assertEqual(plan["top_inset_reservations"]["summary"]["cavity_depth_compensation_count"], 0)
         self.assertEqual(cad["status"], PARTITION_CAD_STATUS_READY)
         self.assertEqual(cad["materialization"]["component_count"], 8)
         self.assertEqual(cad["materialization"]["cavity_count"], 9)
-        self.assertEqual(cad["materialization"]["top_inset_cut_count"], 10)
+        self.assertEqual(cad["materialization"]["top_inset_cut_count"], 16)
         body_names = [item["body"]["name"] for item in cad["cad_ir"]["components"]]
         self.assertEqual(len(body_names), len(set(body_names)))
         self.assertEqual(len(fusion["compact_occurrences"]), 8)
         self.assertEqual(fusion["exploded_occurrences"], [])
-        self.assertEqual(len(fusion["cavity_cuts"]), 19)
+        self.assertEqual(len(fusion["cavity_cuts"]), 25)
         self.assertTrue(all(item["linked_component"] for item in fusion["compact_occurrences"]))
 
     def test_bridge_lifecycle_axes_import_session_and_minimal_gate_are_explicit(self) -> None:
@@ -244,7 +244,7 @@ class P66AcceptancePreparationTests(unittest.TestCase):
         self.assertIn("ExpectedVersion", checker)
         self.assertIn("manifestText", checker)
         self.assertNotIn("ConvertFrom-Json", checker)
-        self.assertEqual(manifest["version"], "0.1.73")
+        self.assertEqual(manifest["version"], "0.1.74")
         self.assertIn("mvp-accepted", document)
         self.assertIn("P66 Fusion OK 0.1.20 - commit 6e351bb", document)
         self.assertIn("P66 Fusion OK 0.1.20 - commit <sha>", document)

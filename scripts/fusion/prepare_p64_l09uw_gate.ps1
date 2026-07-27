@@ -27,7 +27,7 @@ $tempLocalReceipt = Join-Path $workspaceTemp $localReceiptName
 
 foreach ($required in @($preflight, $localReplay, $manifestPath)) {
     if (-not (Test-Path -LiteralPath $required -PathType Leaf)) {
-        throw "P64-L09U-R2-V required source missing: $required"
+        throw "P64-L09U-R3-V required source missing: $required"
     }
 }
 $manifestText = Get-Content -LiteralPath $manifestPath -Raw -Encoding UTF8
@@ -39,11 +39,11 @@ if (-not $versionMatch.Success) {
     throw "Source add-in manifest has no readable version: $manifestPath"
 }
 $expectedVersion = $versionMatch.Groups["version"].Value
-if ($expectedVersion -ne "0.1.73") {
-    throw "P64-L09U-R2-V package version mismatch: expected 0.1.73, got $expectedVersion."
+if ($expectedVersion -ne "0.1.74") {
+    throw "P64-L09U-R3-V package version mismatch: expected 0.1.74, got $expectedVersion."
 }
 
-Write-Output "BGIG P64-L09U-R2-V corrective Fusion gate preparation"
+Write-Output "BGIG P64-L09U-R3-V corrective Fusion gate preparation"
 Write-Output "Repo root: $root"
 Write-Output "Commit: $commit"
 Write-Output "Package version: $expectedVersion"
@@ -58,9 +58,11 @@ try {
         "test_fusion_palette_dom.py",
         "test_reserved_floor_stack_solver.py",
         "test_top_inset_reservation.py",
+        "test_finalization_stop_diagnostics.py",
         "test_p64_l09t_f_composite_cad.py",
         "test_p64_l09t_g_release_gate.py",
-        "test_p64_l09u_corrective_gate.py"
+        "test_p64_l09u_corrective_gate.py",
+        "test_p64_l09u_r3_depth_local_insets.py"
     )) {
         & $python -m unittest discover -s (Join-Path $root "tests") -p $pattern
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -105,7 +107,7 @@ Write-BgigFusionUiSettings `
     -DryRun:$DryRun
 
 if ($DryRun) {
-    Write-Output "Dry run: would install the P64-L09U-R2-V fixture and receipts."
+    Write-Output "Dry run: would install the P64-L09U-R3-V fixture and receipts."
     Write-Output "Dry run: would preserve named projects and legacy recovery files."
     Write-Output "Dry run: would force a fresh unsaved startup with no current path."
 }
@@ -131,7 +133,7 @@ else {
             "parametric_combine_feature_count"
         )) {
             if (-not $installedAdapter.Contains($marker)) {
-                throw "Installed P64-L09U-R2-V materialization marker missing: $marker"
+                throw "Installed P64-L09U-R3-V materialization marker missing: $marker"
             }
         }
         $installedSkeleton = Get-Content -LiteralPath (
@@ -143,7 +145,7 @@ else {
             "fusion_materialization_batches"
         )) {
             if (-not $installedSkeleton.Contains($marker)) {
-                throw "Installed P64-L09U-R2-V CAD marker missing: $marker"
+                throw "Installed P64-L09U-R3-V CAD marker missing: $marker"
             }
         }
         $installedPalette = Get-Content -LiteralPath (
@@ -155,11 +157,11 @@ else {
             "cross_session_witness_persistence_disabled"
         )) {
             if (-not $installedPalette.Contains($marker)) {
-                throw "Installed P64-L09U-R2-V startup marker missing: $marker"
+                throw "Installed P64-L09U-R3-V startup marker missing: $marker"
             }
         }
         if ($installedPalette.Contains('"autosave_project"')) {
-            throw "Installed P64-L09U-R2-V still exposes autosave_project."
+            throw "Installed P64-L09U-R3-V still exposes autosave_project."
         }
         $installedSolver = Get-Content -LiteralPath (
             Join-Path $target "lib\board_game_insert_generator\minimal_layout_solver.py"
@@ -169,7 +171,7 @@ else {
             "dense project needs stacks below a tray"
         )) {
             if (-not $installedSolver.Contains($marker)) {
-                throw "Installed P64-L09U-R2-V fresh-solve marker missing: $marker"
+                throw "Installed P64-L09U-R3-V fresh-solve marker missing: $marker"
             }
         }
 
@@ -252,7 +254,7 @@ else {
             Get-Content -LiteralPath $commitMarker -Raw -Encoding UTF8
         ).Trim()
         if ($installedCommit -ne $commit) {
-            throw "Installed P64-L09U-R2-V commit marker mismatch."
+            throw "Installed P64-L09U-R3-V commit marker mismatch."
         }
     }
     catch [UnauthorizedAccessException] {
@@ -271,7 +273,7 @@ else {
                 $resolvedRoot + [IO.Path]::DirectorySeparatorChar,
                 [StringComparison]::OrdinalIgnoreCase
             )) {
-                throw "Refusing to remove a P64-L09U-R2-V temp path outside the repository."
+                throw "Refusing to remove a P64-L09U-R3-V temp path outside the repository."
             }
             Remove-Item -LiteralPath $resolvedTemp -Recurse -Force
         }
@@ -279,16 +281,16 @@ else {
 }
 
 Write-Output ""
-Write-Output "P64-L09U-R2-V actions remaining for Thomas:"
+Write-Output "P64-L09U-R3-V actions remaining for Thomas:"
 Write-Output "1. Fully close and reopen Fusion, then reload BGIG $expectedVersion."
 Write-Output "2. Confirm BGIG opens on a fresh unsaved empty project."
-Write-Output "3. Open CasLimite01+ explicitly, calculate in Normal, then materialize the minimal plan."
-Write-Output "4. Require no ALL_TOOL_BODY_REFERENCE_LOST, no Combine feature and no partial BGIG scene."
-Write-Output "5. Clear the BGIG scene, finalize in Normal and materialize the final plan while timing it."
-Write-Output "6. Require a synchronized scene, frozen cavities, no visible residual and no partial tools."
-Write-Output "7. Repeat calculation, finalization and timed materialization with CasLimite02+."
+Write-Output "3. Open CasLimite01+, calculate and finalize in Normal; measure 10.6 mm for the 10 mm + 0.6 mm cavity."
+Write-Output "4. Require separate search, cap, termination and total wall times; never an unexplained 24 s / 20 s max."
+Write-Output "5. Materialize and require no ALL_TOOL_BODY_REFERENCE_LOST, no Combine feature and no partial scene."
+Write-Output "6. Repeat CasLimite01+ without its flat item, without saving; require top-open calibrated cavities."
+Write-Output "7. Open CasLimite02+; require two exact local footprints, no disjoint accumulation and local overlap steps."
 Write-Output "8. Open CasLimite01++, then calculate, finalize and materialize it without saving the source."
-Write-Output "9. Close and reopen Fusion; require another blank project and a real fresh calculation."
-Write-Output "10. Report exact elapsed times, OK or KO, and screenshots; keep print-validated=false."
+Write-Output "9. Require synchronized preview/Fusion geometry, progressive modules and unchanged calibrated depths."
+Write-Output "10. Follow docs/P64_L09U_R3_V_0174_FUSION_GATE_RECIPE.md and report exact times, measurements and screenshots."
 Write-Output "Prepared status: fusion-validated=false; print-validated=false."
-Write-Output "Prepared P64-L09U-R2-V gate: $(-not $DryRun)"
+Write-Output "Prepared P64-L09U-R3-V gate: $(-not $DryRun)"

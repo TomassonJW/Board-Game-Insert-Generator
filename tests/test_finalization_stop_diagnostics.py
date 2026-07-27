@@ -69,6 +69,20 @@ class FinalizationStopDiagnosticsTests(unittest.TestCase):
         self.assertFalse(result["stopped_before_cap"])
         self.assertFalse(result["proof_of_impossibility"])
 
+    def test_slow_termination_is_separate_from_the_search_cap(self) -> None:
+        result = self.diagnostics(
+            "global_deadline_reached_before_final_certificate",
+            elapsed_ms=4_200,
+            deadline_reached=True,
+        )
+
+        self.assertEqual(result["budget_elapsed_ms"], 3_000)
+        self.assertEqual(result["termination_elapsed_ms"], 1_200)
+        self.assertEqual(result["wall_clock_elapsed_ms"], 4_200)
+        self.assertEqual(result["wall_clock_cap_ms"], 3_000)
+        self.assertTrue(result["wall_clock_cap_exceeded"])
+        self.assertTrue(result["elapsed_is_search_plus_termination"])
+
     def test_certificate_rejection_preserves_technical_counters(self) -> None:
         result = self.diagnostics(
             "xy_composite_product_certificate_rejected",

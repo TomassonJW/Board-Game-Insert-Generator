@@ -216,7 +216,7 @@ class P64L09TGReleaseGateTests(unittest.TestCase):
         local_replay = (
             ROOT / "scripts" / "fusion" / "p64_l09t_local_replay.py"
         ).read_text(encoding="utf-8")
-        self.assertEqual(manifest["version"], "0.1.73")
+        self.assertEqual(manifest["version"], "0.1.74")
         for marker in (
             'expectedVersion -ne "0.1.70"',
             "p64_l09t_local_replay.py",
@@ -237,7 +237,7 @@ class P64L09TGReleaseGateTests(unittest.TestCase):
         self.assertTrue(certificate["certified"])
         self.assertEqual(certificate["printable_residual_volume_mm3"], 0.0)
         self.assertTrue(
-            certificate["cavity_world_poses_match_frozen_contract"]
+            certificate["cavity_calibrations_match_source_contract"]
         )
         self.assertTrue(certificate["minimum_reservation_wall_certified"])
         self.assertEqual(result["cad"]["status"], "ready_for_fusion")

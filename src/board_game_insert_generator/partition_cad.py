@@ -422,20 +422,20 @@ def _container_component(placement: dict[str, object], index: int) -> CadCompone
             placement.get("frozen_cavities_v1", []),
             f"placement[{index}].frozen_cavities_v1",
         )
-        if composite_v2
+        if isinstance(placement.get("frozen_cavities_v1"), list)
         else []
     )
     raw_cavities = _mappings(
         placement.get("cavity_layout", []),
         f"placement[{index}].cavity_layout",
     )
-    if composite_v2 and len(frozen_contracts) != len(raw_cavities):
+    if frozen_contracts and len(frozen_contracts) != len(raw_cavities):
         raise PartitionCadBuildError(
             f"Le nombre de cavites figees diverge pour {placement['id']!r}."
         )
     cavities: list[CadCavity] = []
     for cavity_index, cavity in enumerate(raw_cavities):
-        if composite_v2:
+        if frozen_contracts:
             frozen = frozen_contracts[cavity_index]
             world_origin = _dimension(
                 frozen["world_origin_mm"],
@@ -463,7 +463,11 @@ def _container_component(placement: dict[str, object], index: int) -> CadCompone
             local_origin,
             local_size,
             body_size,
-            require_top_open=not composite_v2,
+            require_top_open=(
+                not frozen_contracts
+                or frozen_contracts[cavity_index].get("anchor_kind")
+                == "open_top"
+            ),
         )
         effective = cavity.get("clearance_effective_v1")
         values = _mapping(effective["values_mm"], "cavity.clearance_effective_v1.values_mm") if isinstance(effective, dict) else {"x": cavity["content_clearance_mm"], "y": cavity["content_clearance_mm"], "z": cavity["content_clearance_mm"]}
@@ -488,14 +492,13 @@ def _container_component(placement: dict[str, object], index: int) -> CadCompone
                 fusion_generation=PARTITION_CAD_STATUS_READY,
             )
         )
-    if composite_body is not None:
-        if composite_body.get("schema_version") == COMPOSITE_BODY_SCHEMA_V2:
-            _validate_frozen_cavities(
-                placement,
-                body_origin,
-                tuple(cavities),
-                index,
-            )
+    if frozen_contracts:
+        _validate_frozen_cavities(
+            placement,
+            body_origin,
+            tuple(cavities),
+            index,
+        )
     return _component(
         placement=placement,
         index=index,
@@ -512,6 +515,7 @@ def _container_component(placement: dict[str, object], index: int) -> CadCompone
             "minimum_outer_envelope_mm": placement.get("minimum_outer_envelope_mm"),
             "final_outer_dimensions_mm": placement.get("final_outer_dimensions_mm"),
             "surplus_distribution_mm": placement.get("surplus_distribution_mm"),
+            "final_cavity_anchors": bool(frozen_contracts),
             "automatic": False,
         },
         composite_body=composite_body,
@@ -613,6 +617,15 @@ def _component(
     body_id = f"body:{instance_id}"
     name = str(placement["name"])
     body_kind = "rectangular_blank"
+    frozen_cavity_anchors = bool(metadata.get("final_cavity_anchors"))
+    anchor_contracts = (
+        _mappings(
+            placement.get("frozen_cavities_v1", []),
+            f"placement[{index}].frozen_cavities_v1",
+        )
+        if frozen_cavity_anchors
+        else []
+    )
     create_parameters: dict[str, object] = {
         "origin_source": "printable_origin_mm",
         "size_source": "printable_size_mm",
@@ -703,9 +716,15 @@ def _component(
                     cavity,
                     frozen_world_pose=(
                         composite_schema == COMPOSITE_BODY_SCHEMA_V2
+                        or frozen_cavity_anchors
+                    ),
+                    frozen_contract=(
+                        anchor_contracts[cavity_index]
+                        if cavity_index < len(anchor_contracts)
+                        else None
                     ),
                 )
-                for cavity in cavities
+                for cavity_index, cavity in enumerate(cavities)
             ),
             *tuple(
                 _frozen_cavity_access_operation(body_id, cut)
@@ -791,17 +810,25 @@ def _validate_frozen_cavities(
         placement.get("frozen_cavities_v1", []),
         f"placement[{index}].frozen_cavities_v1",
     )
-    composite_body = _mapping(
-        placement["composite_body"],
-        f"placement[{index}].composite_body",
-    )
-    declared_pose_digests = [
-        str(value)
-        for value in composite_body.get(
-            "frozen_cavity_pose_digests",
-            [],
+    composite_body = (
+        _mapping(
+            placement["composite_body"],
+            f"placement[{index}].composite_body",
         )
-    ]
+        if isinstance(placement.get("composite_body"), dict)
+        else None
+    )
+    declared_pose_digests = (
+        [
+            str(value)
+            for value in composite_body.get(
+                "frozen_cavity_pose_digests",
+                [],
+            )
+        ]
+        if composite_body is not None
+        else [str(value.get("pose_digest", "")) for value in raw_contracts]
+    )
     if len(raw_contracts) != len(cavities):
         raise PartitionCadBuildError(
             f"Le nombre de cavites figees diverge pour {placement['id']!r}."
@@ -850,6 +877,38 @@ def _validate_frozen_cavities(
                 contract.get("source_rotation_deg_z", -1)
             ),
         }
+        if "anchor_kind" in contract:
+            for key in (
+                "minimum_world_origin_mm",
+                "minimum_world_size_mm",
+                "final_owner_origin_mm",
+                "final_owner_world_size_mm",
+            ):
+                identity[key] = _rounded(
+                    _dimension(
+                        contract[key],
+                        (
+                            f"placement[{index}].frozen_cavities_v1"
+                            f"[{cavity_index}].{key}"
+                        ),
+                    )
+                )
+            identity.update(
+                {
+                    key: contract[key]
+                    for key in (
+                        "anchor_kind",
+                        "responsible_reservation_id",
+                        "responsible_local_region_id",
+                        "calibrated_depth_source_mm",
+                        "calibrated_depth_final_mm",
+                        "retained_floor_mm",
+                        "minimum_floor_mm",
+                        "top_separation_mm",
+                        "minimum_top_separation_mm",
+                    )
+                }
+            )
         pose_digest = str(contract.get("pose_digest", ""))
         if (
             identity["owner_id"] != str(placement["id"])
@@ -873,9 +932,33 @@ def _validate_frozen_cavities(
             raise PartitionCadBuildError(
                 f"La pose monde de la cavite figee {cavity.id!r} diverge."
             )
-        if contract.get("top_open") is not True:
+        anchor_kind = str(contract.get("anchor_kind", "open_top"))
+        if anchor_kind not in {"open_top", "below_top_inset"}:
             raise PartitionCadBuildError(
-                f"La cavite figee {cavity.id!r} n est pas certifiee ouverte."
+                f"L ancrage final de la cavite {cavity.id!r} est inconnu."
+            )
+        if (
+            anchor_kind == "open_top"
+            and contract.get("top_open") is not True
+        ):
+            raise PartitionCadBuildError(
+                f"La cavite figee {cavity.id!r} n est pas ouverte."
+            )
+        if (
+            anchor_kind == "below_top_inset"
+            and (
+                float(contract.get("top_separation_mm", -1.0))
+                + _EPSILON
+                < float(
+                    contract.get(
+                        "minimum_top_separation_mm",
+                        0.0,
+                    )
+                )
+            )
+        ):
+            raise PartitionCadBuildError(
+                f"La separation superieure de {cavity.id!r} est insuffisante."
             )
 
 def _cavity_operation(
@@ -883,6 +966,7 @@ def _cavity_operation(
     cavity: CadCavity,
     *,
     frozen_world_pose: bool = False,
+    frozen_contract: dict[str, object] | None = None,
 ) -> CadOperation:
     parameters = {
         "cavity_id": cavity.id,
@@ -901,6 +985,35 @@ def _cavity_operation(
                 "cavity_source": "frozen_content_cavity",
                 "cut_plane_local_z_mm": _round(
                     cavity.local_origin.z + cavity.size.z
+                ),
+            }
+        )
+    if frozen_contract is not None:
+        parameters.update(
+            {
+                "anchor_kind": frozen_contract.get(
+                    "anchor_kind",
+                    "open_top",
+                ),
+                "calibrated_depth_source_mm": frozen_contract.get(
+                    "calibrated_depth_source_mm",
+                    cavity.size.z,
+                ),
+                "calibrated_depth_final_mm": frozen_contract.get(
+                    "calibrated_depth_final_mm",
+                    cavity.size.z,
+                ),
+                "top_separation_mm": frozen_contract.get(
+                    "top_separation_mm",
+                    0.0,
+                ),
+                "responsible_reservation_id": frozen_contract.get(
+                    "responsible_reservation_id",
+                    "",
+                ),
+                "responsible_local_region_id": frozen_contract.get(
+                    "responsible_local_region_id",
+                    "",
                 ),
             }
         )
@@ -961,6 +1074,13 @@ def _top_inset_operation(body_id: str, cut: dict[str, object]) -> CadOperation:
             "cut_kind": cut_kind,
             "reservation_id": cut["reservation_id"],
             "flat_item_id": cut["flat_item_id"],
+            "local_region_id": cut.get("local_region_id", ""),
+            "overlapping_reservation_ids": deepcopy(
+                cut.get("overlapping_reservation_ids", [])
+            ),
+            "local_interval_z_mm": deepcopy(
+                cut.get("local_interval_z_mm")
+            ),
             "removal_order": cut["removal_order"],
             "local_origin_mm": deepcopy(cut["local_origin_mm"]),
             "size_mm": deepcopy(cut["size_mm"]),

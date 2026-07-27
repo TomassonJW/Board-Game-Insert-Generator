@@ -13,7 +13,7 @@
 
 ### P64-L09U-R3 — Profondeur, réservations locales et budget
 
-- Statut : `ready`.
+- Statut : `done`, `automated-validated`.
 - Conserver la profondeur calibrée et résoudre l'origine Z finale.
 - Composer plusieurs réservations uniquement sur leurs empreintes locales.
 - Séparer budget contractuel, plafond mural et terminaison.
@@ -23,8 +23,10 @@
 
 ### P64-L09U-R3-V — Gate humaine Fusion
 
-- Statut : `planned-human-gate`, inactive.
-- Dépend de R3 intégrée, validée, empaquetée et installée.
+- Statut : `ready-human-gate`.
+- Candidate : `0.1.74`.
+- Recette : `docs/P64_L09U_R3_V_0174_FUSION_GATE_RECIPE.md`.
+- Preuve : `docs/P64_L09U_R3_0174_CORRECTIVE_EVIDENCE.md`.
 - `fusion-validated=false`, `print-validated=false`.
 
 ### Historique R2

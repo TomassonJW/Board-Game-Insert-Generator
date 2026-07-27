@@ -143,10 +143,20 @@ class ExactMinimalFinalizationTests(unittest.TestCase):
             fusion.module_component_count,
             len(finalized["placements"]),
         )
-        self.assertTrue(
+        self.assertFalse(
             any(
                 value.cavity_source
                 == "frozen_cavity_vertical_access"
+                for value in fusion.cavity_cuts
+            )
+        )
+        self.assertTrue(
+            any(
+                value.cavity_source == "frozen_content_cavity"
+                and value.anchor_kind
+                in {"open_top", "below_top_inset"}
+                and value.calibrated_depth_source_mm
+                == value.calibrated_depth_final_mm
                 for value in fusion.cavity_cuts
             )
         )

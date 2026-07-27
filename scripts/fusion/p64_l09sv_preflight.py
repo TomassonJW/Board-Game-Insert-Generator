@@ -176,9 +176,12 @@ def run_end_to_end(
         != "f_xy_composite_v2_union_cavities_insets"
         or certificate.get("certified") is not True
         or certificate.get("printable_residual_volume_mm3") != 0.0
-        or certificate.get("cavity_world_poses_match_frozen_contract")
+        or certificate.get("cavity_calibrations_match_source_contract")
         is not True
-        or certificate.get("cavity_vertical_access_open") is not True
+        or certificate.get("cavity_anchor_certificate", {}).get(
+            "certified"
+        )
+        is not True
     ):
         raise RuntimeError("The recent composite finalization is not exact.")
     final_cad = build_partition_cad(

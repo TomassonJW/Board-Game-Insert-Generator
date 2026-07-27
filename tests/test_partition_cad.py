@@ -85,7 +85,7 @@ class PartitionCadTests(unittest.TestCase):
         self.assertEqual(len(body_names), len(set(body_names)))
         self.assertEqual(fusion.module_component_count, 4)
 
-    def test_compensated_cavity_depth_is_transported_to_fusion(self) -> None:
+    def test_calibrated_cavity_depth_is_transported_without_compensation(self) -> None:
         value = project(1)
         value["flat_items"] = [{
             "id": "board",
@@ -106,14 +106,13 @@ class PartitionCadTests(unittest.TestCase):
             if item["kind"] == "subtract_rectangular_cavity"
         )
 
-        self.assertEqual(cavity["top_inset_compensation_mm"], 2.0)
+        self.assertNotIn("top_inset_compensation_mm", cavity)
+        self.assertTrue(
+            plan["invariants"]["cavity_calibrated_depths_unchanged"]
+        )
         self.assertEqual(
             operation["parameters"]["size_mm"]["z"],
             cavity["inner_dimensions_mm"]["z"],
-        )
-        self.assertEqual(
-            cavity["inner_dimensions_mm"]["z"],
-            cavity["base_inner_dimensions_mm"]["z"] + 2.0,
         )
         self.assertAlmostEqual(
             operation["parameters"]["local_origin_mm"]["z"]

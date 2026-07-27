@@ -92,7 +92,14 @@ class ExpandableEnvelopeContractTests(unittest.TestCase):
         self.assertEqual(expanded["final_outer_envelope_mm"], final)
         self.assertEqual(expanded["surplus_distribution_mm"]["below"], 10.0)
         self.assertEqual(expanded["minimum_envelope_origin_in_final_mm"]["x"], 20.0)
-        self.assertTrue(expanded["invariants"]["cavity_local_origins_fixed"])
+        self.assertTrue(
+            expanded["invariants"]["cavity_local_xy_origins_fixed"]
+        )
+        self.assertTrue(
+            expanded["invariants"][
+                "cavity_local_z_origin_resolved_after_finalization"
+            ]
+        )
 
     def test_schema_defaults_are_additive_and_legacy_safe(self) -> None:
         normalized = normalize_project_draft(_project_for()).project

@@ -129,6 +129,51 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
                 "z_mm": _round(bounds["z"]), "depth_mm": _round(bounds["depth"]),
                 "stage_id": body["stage_id"], "stage_index": body["stage_index"],
             }
+            if frozen_cavities:
+                frozen = frozen_cavities[cavity_index]
+                cavity_view.update(
+                    {
+                        "anchor_kind": frozen.get(
+                            "anchor_kind",
+                            "open_top",
+                        ),
+                        "minimum_z_mm": (
+                            _round(
+                                float(
+                                    frozen["minimum_world_origin_mm"]["z"]
+                                )
+                            )
+                            if isinstance(
+                                frozen.get("minimum_world_origin_mm"),
+                                dict,
+                            )
+                            else _round(bounds["z"])
+                        ),
+                        "final_z_mm": _round(bounds["z"]),
+                        "calibrated_depth_source_mm": frozen.get(
+                            "calibrated_depth_source_mm",
+                            _round(bounds["depth"]),
+                        ),
+                        "calibrated_depth_final_mm": frozen.get(
+                            "calibrated_depth_final_mm",
+                            _round(bounds["depth"]),
+                        ),
+                        "responsible_reservation_id": frozen.get(
+                            "responsible_reservation_id",
+                            "",
+                        ),
+                        "responsible_local_region_id": frozen.get(
+                            "responsible_local_region_id",
+                            "",
+                        ),
+                        "retained_floor_mm": frozen.get(
+                            "retained_floor_mm"
+                        ),
+                        "top_separation_mm": frozen.get(
+                            "top_separation_mm"
+                        ),
+                    }
+                )
             top_cavities.append(cavity_view)
             if _crosses(section_y, bounds["y"], bounds["height"]):
                 cut_cavities.append(
@@ -185,6 +230,7 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
                 "source_content_ids": deepcopy(placement.get("source_content_ids", [])),
                 "source_contents": deepcopy(placement.get("source_contents", [])),
                 "cavity_count": len(cavities),
+                "cavity_anchors": deepcopy(frozen_cavities),
                 "composite_prism_count": len(composite_prisms),
                 "top_inset_cut_count": len(_mappings(placement.get("top_inset_cuts", []), f"placement[{index}].top_inset_cuts")),
                 "requested_complement_id": placement.get("requested_complement_id"),
@@ -206,15 +252,71 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
             "width_mm": _round(size["x"]), "height_mm": _round(size["y"]),
             "depth_mm": _round(depth), "removal_order": int(reservation["removal_order"]),
             "grip_zone": deepcopy(reservation.get("grip_zone")),
+            "local_depth_regions": deepcopy(
+                reservation.get("local_depth_regions", [])
+            ),
         }
         reservation_tops.append(top_item)
-        if _crosses(section_y, origin["y"], size["y"]):
+        raw_regions = reservation.get("local_depth_regions", [])
+        regions = (
+            _mappings(
+                raw_regions,
+                f"top_inset[{index}].local_depth_regions",
+            )
+            if isinstance(raw_regions, list) and raw_regions
+            else [
+                {
+                    "id": f"{top_item['id']}:legacy-region",
+                    "cut_origin_mm": reservation["cut_origin_mm"],
+                    "cut_size_mm": reservation["cut_size_mm"],
+                    "inset_depth_from_top_mm": depth,
+                    "layer_bottom_z_mm": (
+                        float(top_insets.get("design_top_z_mm", storage_height))
+                        - depth
+                    ),
+                    "overlapping_reservation_ids": [top_item["id"]],
+                }
+            ]
+        )
+        for region in regions:
+            region_origin = _xy(
+                region["cut_origin_mm"],
+                f"top_inset[{index}].region.cut_origin_mm",
+            )
+            region_size = _xy(
+                region["cut_size_mm"],
+                f"top_inset[{index}].region.cut_size_mm",
+            )
+            if not _crosses(
+                section_y,
+                region_origin["y"],
+                region_size["y"],
+            ):
+                continue
             reservation_cuts.append({
-                "id": top_item["id"], "kind": "top_inset_reservation", "label": top_item["label"],
-                "flat_item_id": top_item["flat_item_id"], "x_mm": top_item["x_mm"],
-                "z_from_top_mm": _round(box["z"] - float(top_insets.get("design_top_z_mm", storage_height))),
-                "width_mm": top_item["width_mm"], "height_mm": _round(depth),
+                "id": str(region["id"]),
+                "reservation_id": top_item["id"],
+                "kind": "top_inset_reservation",
+                "label": top_item["label"],
+                "flat_item_id": top_item["flat_item_id"],
+                "x_mm": _round(region_origin["x"]),
+                "z_from_top_mm": _round(
+                    box["z"]
+                    - float(
+                        top_insets.get(
+                            "design_top_z_mm",
+                            storage_height,
+                        )
+                    )
+                ),
+                "width_mm": _round(region_size["x"]),
+                "height_mm": _round(
+                    float(region["inset_depth_from_top_mm"])
+                ),
                 "removal_order": top_item["removal_order"],
+                "overlapping_reservation_ids": deepcopy(
+                    region.get("overlapping_reservation_ids", [])
+                ),
             })
 
     residual_contract = _mapping(plan.get("residuals", {}), "partition.residuals")
@@ -286,6 +388,20 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
             "localized_top_insets": True,
             "stage_aware": True,
             "frozen_cavity_world_poses_projected": True,
+            "final_cavity_anchors_projected": all(
+                not _optional_mappings(
+                    placement.get("frozen_cavities_v1"),
+                    f"placement[{index}].frozen_cavities_v1",
+                )
+                or all(
+                    value.get("anchor_certified") is True
+                    for value in _optional_mappings(
+                        placement.get("frozen_cavities_v1"),
+                        f"placement[{index}].frozen_cavities_v1",
+                    )
+                )
+                for index, placement in enumerate(placements)
+            ),
             "composite_prisms_projected": all(
                 not isinstance(placement.get("composite_body"), dict)
                 or bool(_composite_prisms(placement, index))

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prépare la fixture publique et le reçu correctif P64-L09U-R2-V."""
+"""Prépare la fixture publique et le reçu correctif P64-L09U-R3-V."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ from scripts.fusion.p64_l09sv_preflight import (
 from scripts.fusion.p64_l09tv_preflight import gate_project
 
 
-ADDIN_VERSION = "0.1.73"
+ADDIN_VERSION = "0.1.74"
 FIXTURE_FILENAME = "p64-l09uw-01-exact-composite.bgig.json"
 SUMMARY_FILENAME = "p64-l09uw-preflight-summary.json"
 TARGETED_MATRIX = (
@@ -26,8 +26,13 @@ TARGETED_MATRIX = (
     "explicit_fresh_calculation",
     "exact_selected_minimal_finalization",
     "frozen_cavity_world_pose",
+    "calibrated_cavity_depth_unchanged",
+    "deterministic_final_cavity_z_anchor",
+    "local_disjoint_top_insets",
+    "local_overlapping_top_inset_steps",
+    "truthful_budget_wall_and_cleanup_timing",
     "composite_preview_uses_real_prisms",
-    "vertical_access_distinct_from_calibrated_cavity",
+    "final_z_anchor_distinct_from_calibrated_depth",
     "residual_multi_cell_consumption",
     "emergent_clearance_corridor_preserved",
     "late_wider_stack_support_insertion",
@@ -103,6 +108,10 @@ def build_preflight() -> tuple[dict[str, object], dict[str, object]]:
             "floor_first_rank_policy": True,
             "late_support_insertion_supported": True,
             "composite_cavities_frozen": True,
+            "calibrated_cavity_depths_unchanged": True,
+            "final_cavity_z_anchor_deterministic": True,
+            "top_inset_depth_is_local_by_xy_region": True,
+            "budget_wall_and_cleanup_times_separated": True,
             "composite_preview_uses_cad_prisms": True,
             "composite_unions_before_cuts": True,
             "transient_boolean_body_per_module": True,

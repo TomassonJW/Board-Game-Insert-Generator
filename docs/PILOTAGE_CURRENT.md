@@ -4,26 +4,22 @@
 ## Reprise canonique P64-L09U-R3
 
 - `0.1.73` est `human-KO`, `do-not-run` pour une utilisation finale.
-- Acquis humains à préserver : calcul rapide, finalisation utilisable,
-  matérialisation en quelques secondes, progressive, réactive et fidèle à
-  l'aperçu, sans `ALL_TOOL_BODY_REFERENCE_LOST`.
-- Défaut bloquant 1 : une cavité attendue à `10,6 mm` mesure `18,2 mm` après
-  finalisation. Le corps gagne de la hauteur et la cavité est allongée au lieu
-  de conserver son calibre et de résoudre son origine Z finale.
-- Défaut bloquant 2 : les deux plateaux différents de `CasLimite02+` produisent
-  un encastrement apparemment global et cumulé au lieu de découpes locales et
-  étagées par empreinte.
-- Défaut complémentaire : une variante locale non sauvegardée a affiché environ
-  `24 s` pour un plafond annoncé à `20 s`.
-- ADR-0099 fige dimensions, X/Y, orientation et identité de la cavité, mais
-  impose une résolution Z finale déterministe : ouverte au sommet hors
-  réservation, ou sous la découpe locale avec paroi canonique.
-- P64-L09U-R3 corrige ces trois points sans modifier le nouveau chemin BRep
-  transitoire, le rendu progressif, le rollback ni la session vierge.
-- Cible initiale : `0.1.74`.
-- Prochaine action unique : exécuter
-  `docs/P64_L09U_R3_END_TO_END_RUNBOOK.md`, puis préparer une nouvelle gate
-  humaine.
+- P64-L09U-R3 est `automated-validated` et la candidate `0.1.74` est
+  `ready-human-gate`.
+- La profondeur calibrée reste inchangée ; l'exemple `10 mm + 0,6 mm` reste
+  `10,6 mm` du minimum au plan Fusion.
+- La finalisation ne change ni X/Y, ni orientation, ni dimensions. Elle résout
+  seulement Z avec un fond et une séparation supérieure certifiés.
+- Les plateaux/livrets produisent des régions XY et intervalles Z locaux :
+  aucun cumul hors intersection, paliers exacts dans les recouvrements.
+- L'affichage distingue recherche, plafond, terminaison et temps mural total.
+- Le BRep transitoire, le rendu progressif, le rollback et l'absence de Combine
+  rectangulaire sont préservés.
+- Validation : préparateur `126/126`, suite autorisée `895/895`, un test SCIP
+  ignoré et douze modules interdits exclus.
+- Les trois replays personnels passent en lecture seule avec SHA-256 inchangés.
+- Prochaine action unique : gate humaine P64-L09U-R3-V selon
+  `docs/P64_L09U_R3_V_0174_FUSION_GATE_RECIPE.md`.
 - Aucun benchmark/holdout ; projets personnels en lecture seule ;
   `fusion-validated=false`, `print-validated=false`.
 
@@ -31,7 +27,8 @@ Autorités R3 :
 
 - `docs/P64_L09U_R2_V_0173_HUMAN_KO_EVIDENCE.md` ;
 - `docs/DECISIONS/ADR-0099-profondeur-calibree-et-reservations-superieures-locales.md` ;
-- `docs/P64_L09U_R3_END_TO_END_RUNBOOK.md`.
+- `docs/P64_L09U_R3_0174_CORRECTIVE_EVIDENCE.md` ;
+- `docs/P64_L09U_R3_V_0174_FUSION_GATE_RECIPE.md`.
 
 ### Historique R2 clôturé en human-KO
 

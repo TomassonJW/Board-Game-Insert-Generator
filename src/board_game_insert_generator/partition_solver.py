@@ -863,6 +863,10 @@ def _solve_partition_plan_once(
             "fixed_cavity_layouts": cavity_compensation_count == 0,
             "base_cavity_layouts_fixed": True,
             "top_inset_cavity_depth_compensated": cavity_compensation_count > 0,
+            "cavity_calibrated_depths_unchanged": (
+                cavity_compensation_count == 0
+            ),
+            "cavity_z_anchor_deferred_to_finalization": True,
             "localized_top_insets": True,
             "volumetric_stages": True,
             "weighted_surplus": True,

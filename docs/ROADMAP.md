@@ -8,16 +8,17 @@ et le role de ces documents sont definis dans `docs/PILOTAGE_GLOSSARY.md`.
 <!-- P64-L09U-ROADMAP -->
 ## Correctif P64-L09U-R3 — calibre, réservations locales et budget
 
-0.1.73 est `human-KO`, mais confirme le nouveau socle de matérialisation rapide,
-progressive et fidèle. R3 corrige la géométrie fonctionnelle sans régresser ce
-socle.
+0.1.73 reste `human-KO`, mais confirme le nouveau socle de matérialisation
+rapide, progressive et fidèle. R3 est terminé et validé automatiquement dans
+0.1.74 ; la trajectoire attend maintenant la gate humaine.
 
 ```text
 P64-L09U-R2-V human-KO 0.1.73
   -> R3 profondeur calibrée et ancrage Z final
   -> R3 plateaux/livrets par empreintes et paliers locaux
   -> R3 plafond mural et mesure honnête des phases
-  -> validation, package 0.1.74 et nouvelle gate humaine
+  -> validation et package 0.1.74 terminés
+  -> P64-L09U-R3-V gate Fusion humaine
 ```
 
 Les jobs annulables, miniatures de variantes et l'épaisseur distincte de

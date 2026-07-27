@@ -8,7 +8,6 @@ from board_game_insert_generator.project_v1 import blank_project_v1
 from board_game_insert_generator.top_inset_reservation import (
     TOP_INSET_CUT_KIND,
     TOP_INSET_RESERVATION_SCHEMA_V1,
-    _apply_cavity_depth_compensations,
     apply_top_inset_reservations,
     certify_top_inset_reservation_prisms,
     derive_top_inset_reservations,
@@ -67,60 +66,28 @@ def flat(
 
 
 class TopInsetReservationTests(unittest.TestCase):
-    def test_upright_cavity_keeps_its_canonical_depth_before_tray_cut(self) -> None:
-        placements = [
-            {
-                "id": "container:upright-cards",
-                "name": "Cartes debout",
-                "container_group_id": "upright-cards",
-                "world_size_mm": {"x": 101.4, "y": 51.4, "z": 69.8},
-                "cavity_layout": [
-                    {
-                        "cavity_id": "cavity:upright-cards",
-                        "base_inner_dimensions_mm": {
-                            "x": 89.2,
-                            "y": 63.6,
-                            "z": 24.0,
-                        },
-                        "inner_dimensions_mm": {
-                            "x": 89.2,
-                            "y": 25.2,
-                            "z": 63.6,
-                        },
-                    }
-                ],
-            }
+    def test_upright_cavity_keeps_its_calibrated_depth_before_tray_cut(self) -> None:
+        value = project()
+        value["flat_items"] = [
+            flat("board", x=220.0, y=160.0, z=4.0)
         ]
 
-        compensations, blockers = _apply_cavity_depth_compensations(
-            placements,
-            {
-                "container:upright-cards": {
-                    "cavity:upright-cards": 4.0,
-                }
-            },
-            {"upright-cards": 1.2},
-            1.2,
-        )
+        result = solve_partition_plan(value)
 
-        cavity = placements[0]["cavity_layout"][0]
-        self.assertFalse(blockers)
-        self.assertEqual(cavity["base_inner_dimensions_mm"]["z"], 63.6)
-        self.assertEqual(cavity["inner_dimensions_mm"]["z"], 67.6)
-        self.assertEqual(cavity["top_inset_compensation_mm"], 4.0)
-        self.assertEqual(compensations[0]["retained_floor_mm"], 2.2)
-
-        _apply_cavity_depth_compensations(
-            placements,
-            {
-                "container:upright-cards": {
-                    "cavity:upright-cards": 4.0,
-                }
-            },
-            {"upright-cards": 1.2},
-            1.2,
+        self.assertEqual(result["summary"]["status"], "constructed")
+        self.assertEqual(
+            result["top_inset_reservations"][
+                "cavity_depth_compensations"
+            ],
+            [],
         )
-        self.assertEqual(cavity["inner_dimensions_mm"]["z"], 67.6)
+        self.assertTrue(
+            result["invariants"]["cavity_calibrated_depths_unchanged"]
+        )
+        for placement in result["placements"]:
+            for cavity in placement.get("cavity_layout", []):
+                self.assertNotIn("top_inset_compensation_mm", cavity)
+                self.assertNotIn("depth_semantics", cavity)
 
     def test_automatic_xy_places_a_board_and_keeps_the_container_design_height(self) -> None:
         value = project()
@@ -275,6 +242,60 @@ class TopInsetReservationTests(unittest.TestCase):
             [2, 1],
         )
 
+    def test_disjoint_flats_never_accumulate_their_depths(self) -> None:
+        value = project()
+        value["flat_items"] = [
+            flat("left-flat", x=70.0, y=60.0, z=2.0, order=0),
+            flat("right-flat", x=70.0, y=60.0, z=3.0, order=1),
+        ]
+
+        result = derive_top_inset_reservations(value)
+
+        depths = [
+            {
+                region["inset_depth_from_top_mm"]
+                for region in reservation["local_depth_regions"]
+            }
+            for reservation in result["reservations"]
+        ]
+        self.assertEqual(depths, [{2.0}, {3.0}])
+        self.assertEqual(result["total_flat_height_mm"], 3.0)
+
+    def test_partial_overlap_accumulates_only_inside_the_intersection(self) -> None:
+        value = project()
+        value["box"] = {
+            "inner_dimensions_mm": {"x": 140.0, "y": 100.0, "z": 40.0},
+            "usable_height_mm": 40.0,
+            "lid_clearance_mm": 0.0,
+        }
+        value["flat_items"] = [
+            flat("lower", x=110.0, y=80.0, z=2.0, order=0),
+            flat("upper", x=60.0, y=50.0, z=3.0, order=1),
+        ]
+
+        result = derive_top_inset_reservations(value)
+        lower = result["reservations"][0]
+        lower_depths = {
+            region["inset_depth_from_top_mm"]
+            for region in lower["local_depth_regions"]
+        }
+
+        self.assertEqual(lower_depths, {2.0, 5.0})
+        self.assertTrue(
+            any(
+                region["overlap_count"] == 1
+                and region["inset_depth_from_top_mm"] == 2.0
+                for region in lower["local_depth_regions"]
+            )
+        )
+        self.assertTrue(
+            any(
+                region["overlap_count"] == 2
+                and region["inset_depth_from_top_mm"] == 5.0
+                for region in lower["local_depth_regions"]
+            )
+        )
+
     def test_solver_intersects_the_inset_across_requested_bodies_without_reducing_all_heights(self) -> None:
         value = project()
         value["flat_items"] = [flat("board", x=220.0, y=160.0, z=3.0)]
@@ -319,7 +340,7 @@ class TopInsetReservationTests(unittest.TestCase):
         self.assertTrue(any(item.get("top_inset_cuts") for item in upper))
         self.assertEqual(result["stage_support"]["status"], "supported")
 
-    def test_overlapping_boards_preserve_asset_depth_with_cumulative_compensation(self) -> None:
+    def test_overlapping_boards_preserve_asset_depth_without_compensation(self) -> None:
         value = project()
         value["flat_items"] = [
             flat("lower-board", x=220.0, y=160.0, z=2.0, order=0),
@@ -330,17 +351,13 @@ class TopInsetReservationTests(unittest.TestCase):
         compensations = result["top_inset_reservations"]["cavity_depth_compensations"]
 
         self.assertEqual(result["summary"]["status"], "constructed")
-        self.assertTrue(compensations)
-        self.assertEqual({item["compensation_mm"] for item in compensations}, {5.0})
-        self.assertTrue(
-            all(
-                item["final_depth_mm"] == item["base_depth_mm"] + item["compensation_mm"]
-                for item in compensations
-            )
-        )
-        self.assertFalse(result["invariants"]["fixed_cavity_layouts"])
+        self.assertEqual(compensations, [])
+        self.assertTrue(result["invariants"]["fixed_cavity_layouts"])
         self.assertTrue(result["invariants"]["base_cavity_layouts_fixed"])
-        self.assertTrue(result["invariants"]["top_inset_cavity_depth_compensated"])
+        self.assertFalse(result["invariants"]["top_inset_cavity_depth_compensated"])
+        self.assertTrue(
+            result["invariants"]["cavity_z_anchor_deferred_to_finalization"]
+        )
     def test_rejects_an_inset_that_would_cut_below_an_intersected_cavity_floor(self) -> None:
         value = project()
         value["flat_items"] = [flat("too-deep", x=220.0, y=160.0, z=30.0)]

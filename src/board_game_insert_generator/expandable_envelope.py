@@ -207,7 +207,8 @@ def _contract_for_container(
         "constraints": constraints,
         "invariants": {
             "cavity_dimensions_fixed": True,
-            "cavity_local_origins_fixed": True,
+            "cavity_local_xy_origins_fixed": True,
+            "cavity_local_z_origin_resolved_after_finalization": True,
             "external_envelope_expansion_only": True,
             "automatic_body_created": False,
         },
@@ -256,8 +257,8 @@ def _proposal_mapping(value: object | None) -> dict[str, object]:
 
 
 def _surplus_distribution(surplus: dict[str, float]) -> dict[str, float]:
-    # The minimum-envelope frame and all cavity-local coordinates stay frozen.
-    # XY surplus is balanced around that frame; Z surplus becomes material below it.
+    # The minimum-envelope XY frame stays frozen.  Z surplus remains material
+    # until finalization deterministically anchors each calibrated cavity.
     left = _round(surplus["x"] / 2.0)
     front = _round(surplus["y"] / 2.0)
     return {

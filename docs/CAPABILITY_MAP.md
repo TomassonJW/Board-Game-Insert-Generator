@@ -3,17 +3,19 @@
 <!-- P64-L09U-CAPABILITY -->
 ## P64-L09U-R3 — profondeur calibrée et réservations locales
 
-- `C-FUSION` : acquis humain partiel à préserver. Corps transitoires,
-  matérialisation progressive, réactivité et fidélité aperçu/scène confirmés.
-- `C-CAVITY` : `human-KO`. La profondeur calibrée peut être allongée après
-  finalisation ; attendu `10,6 mm`, mesuré `18,2 mm`.
-- `C-RESERVATION` : `human-KO`. Deux plateaux différents peuvent produire un
-  encastrement global/cumulé au lieu de coupes locales étagées.
-- `C-STAGED-CALCULATION` : défaut observé. Environ `24 s` affichées pour un
-  plafond annoncé à `20 s` sur une variante locale non sauvegardée.
-- `C-FINALIZATION`, `C-CAD-IR`, `C-PREVIEW` : R3 doit aligner profondeur,
-  ancrage Z et identité de chaque réservation de bout en bout.
-- `C-RELEASE` : 0.1.73 `human-KO`, `do-not-run`; cible initiale 0.1.74.
+- `C-CAVITY` : `automated-validated`. Calibre, X/Y et orientation figés ;
+  ancrage Z final et épaisseurs restantes certifiés.
+- `C-RESERVATION` : `automated-validated`. Régions XY exactes et intervalles Z
+  locaux, sans cumul hors recouvrement.
+- `C-STAGED-CALCULATION` : `automated-validated`. Recherche, plafond,
+  terminaison et temps mural total sont distincts.
+- `C-FINALIZATION`, `C-CAD-IR`, `C-PREVIEW` : `automated-validated`, preuves
+  d'ancrage et paliers alignées de bout en bout.
+- `C-FUSION` : `implemented`, `automated-validated`; observation réelle encore
+  humaine. BRep transitoire et rendu progressif préservés.
+- `C-QUALITY` : préparateur `126/126`, suite autorisée `895/895`, trois replays
+  personnels exacts en lecture seule.
+- `C-RELEASE` : 0.1.74 `ready-human-gate`.
 - `C-PRINT` : `print-validated=false`.
 
 `fusion-validated=false`, `print-validated=false`.

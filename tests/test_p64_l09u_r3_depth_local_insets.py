@@ -1,0 +1,325 @@
+from __future__ import annotations
+
+from copy import deepcopy
+import unittest
+
+from board_game_insert_generator.contextual_local_analysis import (
+    IncrementalLocalAnalysisEngine,
+)
+from board_game_insert_generator.partition_cad import build_partition_cad
+from board_game_insert_generator.partition_result_view import (
+    build_partition_result_view,
+)
+from board_game_insert_generator.staged_calculation import (
+    ARTIFACT_KIND_FINALIZED,
+    StagedCalculationSession,
+)
+from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
+    FUSION_GENERATION_MODE_COMPACT_ONLY,
+    generation_plan_from_cad_ir,
+)
+from scripts.fusion.p64_l09sv_preflight import (
+    FINISHING_EFFORT,
+    REQUESTED_SETTINGS,
+    recent_tray_project,
+)
+
+
+def _calibrated_project(*, with_reservation: bool) -> dict[str, object]:
+    project = recent_tray_project()
+    project["project_name"] = (
+        "P64-L09U-R3 calibrated cavity with reservation"
+        if with_reservation
+        else "P64-L09U-R3 calibrated cavity without reservation"
+    )
+    project["contents"][0]["dimensions_mm"]["z"] = 10.0
+    if not with_reservation:
+        project["flat_items"] = []
+    return project
+
+
+def _stepped_reservation_project() -> dict[str, object]:
+    project = _calibrated_project(with_reservation=True)
+    project["project_name"] = "P64-L09U-R3 local stepped reservations"
+    project["box"] = {
+        "inner_dimensions_mm": {"x": 150.0, "y": 110.0, "z": 60.0},
+        "usable_height_mm": 59.6,
+        "lid_clearance_mm": 0.4,
+    }
+    project["flat_items"] = [
+        {
+            "id": "lower-board",
+            "name": "Grand plateau",
+            "kind": "board",
+            "dimensions_mm": {"x": 130.0, "y": 90.0, "z": 2.0},
+            "quantity": 1,
+            "stack_order": 0,
+        },
+        {
+            "id": "upper-booklet",
+            "name": "Petit livret",
+            "kind": "rulebook",
+            "dimensions_mm": {"x": 80.0, "y": 60.0, "z": 3.0},
+            "quantity": 1,
+            "stack_order": 1,
+        },
+    ]
+    return project
+
+
+def _finalized_artifacts(
+    project: dict[str, object],
+) -> tuple[dict[str, object], dict[str, object], object]:
+    engine = IncrementalLocalAnalysisEngine(
+        project,
+        effort_profile="normal",
+    )
+    session = StagedCalculationSession(
+        project,
+        solver_settings=REQUESTED_SETTINGS,
+    )
+    session.synchronize(
+        project,
+        engine.snapshot(),
+        solver_settings=REQUESTED_SETTINGS,
+        container_frontiers=engine.certified_frontiers(),
+        frontier_digests=engine.frontier_digests(),
+    )
+    calculated = session.calculate_layout(
+        request_id="p64-l09u-r3-calibrated",
+        request_revision=0,
+    )
+    if calculated["solver_result"]["status"] != "solution_found":
+        raise RuntimeError("The R3 calibrated fixture has no minimal plan.")
+    finalized = session.finalize_volume(
+        finishing_effort_profile=FINISHING_EFFORT
+    )
+    if finalized["solver_result"]["status"] != "solution_found":
+        raise RuntimeError("The R3 calibrated fixture has no final plan.")
+    selection = session.select_materializable_artifact(
+        ARTIFACT_KIND_FINALIZED
+    )
+    plan = selection["partition"]
+    cad = build_partition_cad(
+        project,
+        partition=plan,
+        artifact_identity=selection,
+        effort_profile="normal",
+    )
+    fusion = generation_plan_from_cad_ir(
+        cad["cad_ir"],
+        FUSION_GENERATION_MODE_COMPACT_ONLY,
+    )
+    return plan, cad, fusion
+
+
+class P64L09UR3DepthLocalInsetsTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.open_project = _calibrated_project(with_reservation=False)
+        cls.open_plan, cls.open_cad, cls.open_fusion = _finalized_artifacts(
+            cls.open_project
+        )
+        cls.inset_project = _calibrated_project(with_reservation=True)
+        cls.inset_plan, cls.inset_cad, cls.inset_fusion = (
+            _finalized_artifacts(cls.inset_project)
+        )
+        cls.stepped_project = _stepped_reservation_project()
+        cls.stepped_plan, cls.stepped_cad, cls.stepped_fusion = (
+            _finalized_artifacts(cls.stepped_project)
+        )
+
+    def test_ten_plus_clearance_remains_ten_point_six_end_to_end(self) -> None:
+        for label, plan, cad, fusion in (
+            (
+                "open",
+                self.open_plan,
+                self.open_cad,
+                self.open_fusion,
+            ),
+            (
+                "inset",
+                self.inset_plan,
+                self.inset_cad,
+                self.inset_fusion,
+            ),
+        ):
+            with self.subTest(label=label):
+                cavity = plan["placements"][0]["frozen_cavities_v1"][0]
+                self.assertEqual(
+                    cavity["calibrated_depth_source_mm"],
+                    10.6,
+                )
+                self.assertEqual(
+                    cavity["calibrated_depth_final_mm"],
+                    10.6,
+                )
+                cad_cavity = cad["cad_ir"]["components"][0]["body"][
+                    "cavities"
+                ][0]
+                self.assertEqual(cad_cavity["size_mm"]["z"], 10.6)
+                fusion_cavity = next(
+                    value
+                    for value in fusion.cavity_cuts
+                    if value.cavity_source == "frozen_content_cavity"
+                )
+                self.assertEqual(fusion_cavity.cut_size_mm.z, 10.6)
+                self.assertEqual(
+                    fusion_cavity.calibrated_depth_source_mm,
+                    10.6,
+                )
+                self.assertEqual(
+                    fusion_cavity.calibrated_depth_final_mm,
+                    10.6,
+                )
+
+    def test_open_top_moves_only_z_and_keeps_surplus_as_floor(self) -> None:
+        placement = self.open_plan["placements"][0]
+        cavity = placement["frozen_cavities_v1"][0]
+
+        self.assertEqual(cavity["anchor_kind"], "open_top")
+        self.assertTrue(cavity["top_open"])
+        self.assertEqual(cavity["responsible_reservation_id"], "")
+        self.assertGreaterEqual(
+            cavity["retained_floor_mm"],
+            cavity["minimum_floor_mm"],
+        )
+        self.assertEqual(
+            cavity["world_origin_mm"]["x"],
+            cavity["minimum_world_origin_mm"]["x"],
+        )
+        self.assertEqual(
+            cavity["world_origin_mm"]["y"],
+            cavity["minimum_world_origin_mm"]["y"],
+        )
+
+    def test_local_inset_moves_only_z_below_the_canonical_wall(self) -> None:
+        placement = self.inset_plan["placements"][0]
+        cavity = placement["frozen_cavities_v1"][0]
+
+        self.assertEqual(cavity["anchor_kind"], "below_top_inset")
+        self.assertFalse(cavity["top_open"])
+        self.assertTrue(cavity["responsible_reservation_id"])
+        self.assertTrue(cavity["responsible_local_region_id"])
+        self.assertEqual(
+            cavity["top_separation_mm"],
+            cavity["minimum_top_separation_mm"],
+        )
+        self.assertGreaterEqual(
+            cavity["retained_floor_mm"],
+            cavity["minimum_floor_mm"],
+        )
+        self.assertEqual(
+            cavity["world_origin_mm"]["x"],
+            cavity["minimum_world_origin_mm"]["x"],
+        )
+        self.assertEqual(
+            cavity["world_origin_mm"]["y"],
+            cavity["minimum_world_origin_mm"]["y"],
+        )
+
+    def test_result_view_cad_ir_and_fusion_share_the_same_anchor(self) -> None:
+        view = build_partition_result_view(self.inset_plan)
+        cavity = self.inset_plan["placements"][0][
+            "frozen_cavities_v1"
+        ][0]
+        preview = view["top_view"]["cavities"][0]
+        cad_operation = next(
+            value
+            for value in self.inset_cad["cad_ir"]["components"][0][
+                "body"
+            ]["operations"]
+            if value["kind"] == "subtract_rectangular_cavity"
+        )
+        fusion_cut = next(
+            value
+            for value in self.inset_fusion.cavity_cuts
+            if value.cavity_source == "frozen_content_cavity"
+        )
+
+        self.assertEqual(preview["anchor_kind"], "below_top_inset")
+        self.assertEqual(
+            preview["calibrated_depth_final_mm"],
+            cavity["calibrated_depth_final_mm"],
+        )
+        self.assertEqual(
+            cad_operation["parameters"]["anchor_kind"],
+            "below_top_inset",
+        )
+        self.assertEqual(
+            cad_operation["parameters"]["calibrated_depth_final_mm"],
+            cavity["calibrated_depth_final_mm"],
+        )
+        self.assertEqual(fusion_cut.anchor_kind, "below_top_inset")
+        self.assertEqual(
+            fusion_cut.top_separation_mm,
+            cavity["top_separation_mm"],
+        )
+
+    def test_local_steps_reach_preview_cad_ir_and_fusion(self) -> None:
+        reservations = self.stepped_plan["top_inset_reservations"][
+            "reservations"
+        ]
+        lower = next(
+            value
+            for value in reservations
+            if value["flat_item_id"] == "lower-board"
+        )
+        lower_depths = {
+            region["inset_depth_from_top_mm"]
+            for region in lower["local_depth_regions"]
+        }
+        view = build_partition_result_view(self.stepped_plan)
+        cad_top_cuts = [
+            operation
+            for component in self.stepped_cad["cad_ir"]["components"]
+            for operation in component["body"]["operations"]
+            if operation["kind"] == "subtract_top_inset_reservation"
+        ]
+        fusion_top_cuts = [
+            value
+            for value in self.stepped_fusion.cavity_cuts
+            if value.cavity_source == "top_inset_reservation"
+        ]
+
+        self.assertEqual(lower_depths, {2.0, 5.0})
+        self.assertTrue(
+            all(
+                value["local_depth_regions"]
+                for value in view["top_view"]["top_inset_reservations"]
+            )
+        )
+        self.assertTrue(
+            all(
+                operation["parameters"]["local_region_id"]
+                for operation in cad_top_cuts
+            )
+        )
+        self.assertEqual(
+            {
+                operation["parameters"]["local_region_id"]
+                for operation in cad_top_cuts
+            },
+            {
+                value.local_region_id
+                for value in fusion_top_cuts
+            },
+        )
+        self.assertTrue(
+            any(
+                len(value.overlapping_reservation_ids) == 2
+                for value in fusion_top_cuts
+            )
+        )
+
+    def test_source_project_is_not_mutated_by_the_artifact_build(self) -> None:
+        source = _calibrated_project(with_reservation=True)
+        before = deepcopy(source)
+
+        _finalized_artifacts(source)
+
+        self.assertEqual(source, before)
+
+
+if __name__ == "__main__":
+    unittest.main()

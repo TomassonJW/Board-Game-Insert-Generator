@@ -32,6 +32,14 @@ def build_finalization_stop_diagnostics(
     )
     elapsed = max(0, int(elapsed_ms))
     cap = max(0, int(budget_cap_ms))
+    declared_budget_elapsed = report.get("budget_elapsed_ms")
+    budget_elapsed = (
+        max(0, int(declared_budget_elapsed))
+        if isinstance(declared_budget_elapsed, int)
+        and not isinstance(declared_budget_elapsed, bool)
+        else min(elapsed, cap) if cap > 0 else elapsed
+    )
+    termination_elapsed = max(0, elapsed - budget_elapsed)
     deadline_reached = bool(
         report.get("deadline_reached") is True
         or "deadline" in stop_reason
@@ -95,9 +103,15 @@ def build_finalization_stop_diagnostics(
         "user_title": title,
         "user_summary": summary,
         "elapsed_ms": elapsed,
+        "wall_clock_elapsed_ms": elapsed,
+        "budget_elapsed_ms": budget_elapsed,
+        "termination_elapsed_ms": termination_elapsed,
         "budget_cap_ms": cap,
+        "wall_clock_cap_ms": cap,
+        "wall_clock_cap_exceeded": bool(cap > 0 and elapsed > cap),
+        "elapsed_is_search_plus_termination": True,
         "stopped_before_cap": bool(
-            cap > 0 and elapsed < cap and not deadline_reached
+            cap > 0 and budget_elapsed < cap and not deadline_reached
         ),
         "deadline_reached": deadline_reached,
         "proof_of_impossibility": outcome_kind == OUTCOME_PROVEN_IMPOSSIBLE,

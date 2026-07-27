@@ -87,7 +87,11 @@ def _derive_top_inset_reservations(
         require_reserved_prisms=require_reserved_prisms,
     )
     total_stack_height = max(
-        (float(item["inset_depth_from_top_mm"]) for item in reservations),
+        (
+            float(region["inset_depth_from_top_mm"])
+            for item in reservations
+            for region in _mappings(item.get("local_depth_regions", []))
+        ),
         default=0.0,
     )
     if total_stack_height > design_top_z + _EPSILON:
@@ -132,6 +136,9 @@ def _derive_top_inset_reservations(
         },
         "invariants": {
             "localized_top_down_cuts": True,
+            "local_depth_regions_certified": True,
+            "disjoint_reservations_do_not_accumulate": True,
+            "overlap_accumulates_only_inside_intersection": True,
             "containers_keep_design_top_outside_footprints": True,
             "reservation_is_not_printable_body": True,
             "automatic_body_count": 0,
@@ -172,68 +179,76 @@ def certify_top_inset_reservation_prisms(
     certificates: list[dict[str, object]] = []
 
     for reservation in _mappings(plan["reservations"]):
-        origin_xy = _xy(reservation["cut_origin_mm"])
-        size_xy = _xy(reservation["cut_size_mm"])
-        support_plane = float(reservation["support_plane_z_mm"])
-        prism_height = design_top - support_plane
-        colliding_ids: list[str] = []
-        footprint = _xy_rect(reservation["cut_origin_mm"], reservation["cut_size_mm"])
+        for region in _local_depth_regions(reservation):
+            origin_xy = _xy(region["cut_origin_mm"])
+            size_xy = _xy(region["cut_size_mm"])
+            support_plane = float(region["layer_bottom_z_mm"])
+            prism_height = design_top - support_plane
+            colliding_ids: list[str] = []
+            footprint = _xy_rect(
+                region["cut_origin_mm"],
+                region["cut_size_mm"],
+            )
 
-        for placement in result_placements:
-            body_origin = _dimension(placement["origin_mm"])
-            body_size = _dimension(placement["world_size_mm"])
-            body_rect = {
-                "x": body_origin["x"],
-                "y": body_origin["y"],
-                "width": body_size["x"],
-                "height": body_size["y"],
-            }
-            if (
-                _intersection(body_rect, footprint) is not None
-                and body_origin["z"] < design_top - _EPSILON
-                and support_plane < body_origin["z"] + body_size["z"] - _EPSILON
-            ):
-                colliding_ids.append(str(placement["id"]))
+            for placement in result_placements:
+                body_origin = _dimension(placement["origin_mm"])
+                body_size = _dimension(placement["world_size_mm"])
+                body_rect = {
+                    "x": body_origin["x"],
+                    "y": body_origin["y"],
+                    "width": body_size["x"],
+                    "height": body_size["y"],
+                }
+                if (
+                    _intersection(body_rect, footprint) is not None
+                    and body_origin["z"] < design_top - _EPSILON
+                    and support_plane
+                    < body_origin["z"] + body_size["z"] - _EPSILON
+                ):
+                    colliding_ids.append(str(placement["id"]))
 
-        prism = {
-            "id": f"reserved-prism:{reservation['id']}",
-            "reservation_id": reservation["id"],
-            "flat_item_id": reservation["flat_item_id"],
-            "origin_mm": {
-                "x": _round(origin_xy["x"]),
-                "y": _round(origin_xy["y"]),
-                "z": _round(support_plane),
-            },
-            "size_mm": {
-                "x": _round(size_xy["x"]),
-                "y": _round(size_xy["y"]),
-                "z": _round(prism_height),
-            },
-            "printable": False,
-            "semantics": "flat_item_reserved_volume",
-        }
-        reserved_prisms.append(prism)
-        certificates.append(
-            {
+            prism = {
+                "id": f"reserved-prism:{region['id']}",
                 "reservation_id": reservation["id"],
                 "flat_item_id": reservation["flat_item_id"],
-                "reserved_prism_id": prism["id"],
-                "collision_count": len(colliding_ids),
-                "colliding_placement_ids": colliding_ids,
-                "certified": not colliding_ids,
-                "support_required": False,
+                "local_region_id": region["id"],
+                "origin_mm": {
+                    "x": _round(origin_xy["x"]),
+                    "y": _round(origin_xy["y"]),
+                    "z": _round(support_plane),
+                },
+                "size_mm": {
+                    "x": _round(size_xy["x"]),
+                    "y": _round(size_xy["y"]),
+                    "z": _round(prism_height),
+                },
+                "printable": False,
+                "semantics": "flat_item_local_reserved_volume",
             }
-        )
-        if colliding_ids:
-            blockers.append(
-                _blocker(
-                    "TOP_INSET_RESERVED_PRISM_COLLISION",
-                    f"Le prisme reserve pour '{reservation['name']}' est traverse par "
-                    f"{', '.join(colliding_ids)}.",
-                    "Place le corps hors du prisme ou sous son plan inferieur sans l allonger.",
-                    str(reservation["flat_item_id"]),
-                )
+            reserved_prisms.append(prism)
+            certificates.append(
+                {
+                    "reservation_id": reservation["id"],
+                    "flat_item_id": reservation["flat_item_id"],
+                    "local_region_id": region["id"],
+                    "reserved_prism_id": prism["id"],
+                    "collision_count": len(colliding_ids),
+                    "colliding_placement_ids": colliding_ids,
+                    "certified": not colliding_ids,
+                    "support_required": False,
+                }
             )
+            if colliding_ids:
+                blockers.append(
+                    _blocker(
+                        "TOP_INSET_RESERVED_PRISM_COLLISION",
+                        f"Le prisme local reserve pour '{reservation['name']}' "
+                        f"est traverse par {', '.join(colliding_ids)}.",
+                        "Place le corps hors du prisme local ou sous son plan "
+                        "inferieur sans l allonger.",
+                        str(reservation["flat_item_id"]),
+                    )
+                )
 
     status = (
         "blocked"
@@ -287,6 +302,7 @@ def certify_top_inset_reservation_prisms(
             "reservation_requires_supporting_body": False,
             "top_inset_cuts_deferred_to_finalization": True,
             "container_envelopes_unchanged": True,
+            "reserved_prisms_follow_local_depth_regions": True,
         },
     }
 
@@ -325,7 +341,7 @@ def apply_top_inset_reservations(
     }
     cuts: list[dict[str, object]] = []
     supports: list[dict[str, object]] = []
-    cavity_compensation_by_placement: dict[str, dict[str, float]] = {}
+    cavity_anchor_requests: list[dict[str, object]] = []
 
     for reservation in _mappings(plan["reservations"]):
         reservation_cuts: list[dict[str, object]] = []
@@ -333,6 +349,28 @@ def apply_top_inset_reservations(
         footprint = _xy_rect(reservation["cut_origin_mm"], reservation["cut_size_mm"])
         grip = _mapping(reservation["grip_zone"])
         grip_rect = _xy_rect(grip["origin_mm"], grip["size_mm"])
+        requested_regions = [
+            (
+                TOP_INSET_CUT_KIND,
+                _xy_rect(region["cut_origin_mm"], region["cut_size_mm"]),
+                float(region["layer_top_z_mm"])
+                - float(region["layer_bottom_z_mm"]),
+                str(region["id"]),
+                float(region["layer_bottom_z_mm"]),
+                tuple(str(value) for value in region["overlapping_reservation_ids"]),
+            )
+            for region in _local_depth_regions(reservation)
+        ]
+        requested_regions.append(
+            (
+                TOP_INSET_GRIP_CUT_KIND,
+                grip_rect,
+                float(reservation["total_thickness_mm"]),
+                f"{reservation['id']}:grip-region",
+                design_top - float(reservation["total_thickness_mm"]),
+                (str(reservation["id"]),),
+            )
+        )
         for placement in result_placements:
             body_origin = _dimension(placement["origin_mm"])
             body_size = _dimension(placement["world_size_mm"])
@@ -343,10 +381,14 @@ def apply_top_inset_reservations(
                 "width": body_size["x"],
                 "height": body_size["y"],
             }
-            for cut_kind, requested_rect in (
-                (TOP_INSET_CUT_KIND, footprint),
-                (TOP_INSET_GRIP_CUT_KIND, grip_rect),
-            ):
+            for (
+                cut_kind,
+                requested_rect,
+                depth,
+                local_region_id,
+                local_layer_bottom,
+                overlapping_reservation_ids,
+            ) in requested_regions:
                 intersection = _intersection(body_rect, requested_rect)
                 if intersection is None:
                     continue
@@ -355,12 +397,11 @@ def apply_top_inset_reservations(
                     # Only bodies opening on the design top receive the local cut;
                     # missing top coverage is diagnosed after all stages are scanned.
                     continue
-                depth = float(reservation["inset_depth_from_top_mm"])
                 minimum_floor = group_floor.get(
                     str(placement.get("container_group_id", "")),
                     float(layout["default_floor_thickness_mm"]),
                 )
-                retained = body_size["z"] - depth
+                retained = local_layer_bottom - body_origin["z"]
                 if retained + _EPSILON < minimum_floor:
                     blockers.append(
                         _blocker(
@@ -377,13 +418,18 @@ def apply_top_inset_reservations(
                     intersection,
                 )
                 if cut_kind == TOP_INSET_CUT_KIND:
-                    placement_compensation = cavity_compensation_by_placement.setdefault(
-                        str(placement["id"]), {}
-                    )
                     for cavity_id in overlapping_cavity_ids:
-                        placement_compensation[cavity_id] = max(
-                            placement_compensation.get(cavity_id, 0.0),
-                            depth,
+                        cavity_anchor_requests.append(
+                            {
+                                "placement_id": placement["id"],
+                                "cavity_id": cavity_id,
+                                "reservation_id": reservation["id"],
+                                "local_region_id": local_region_id,
+                                "cut_bottom_z_mm": _round(
+                                    local_layer_bottom
+                                ),
+                                "required_anchor": "below_top_inset",
+                            }
                         )
                 cut = {
                     "id": f"{reservation['id']}:{placement['id']}:{cut_kind}:{len(reservation_cuts)}",
@@ -391,16 +437,22 @@ def apply_top_inset_reservations(
                     "reservation_id": reservation["id"],
                     "flat_item_id": reservation["flat_item_id"],
                     "placement_id": placement["id"],
+                    "local_region_id": local_region_id,
+                    "overlapping_reservation_ids": list(
+                        overlapping_reservation_ids
+                    ),
                     "removal_order": reservation["removal_order"],
                     "world_origin_mm": {
                         "x": _round(intersection["x"]),
                         "y": _round(intersection["y"]),
-                        "z": _round(design_top - depth),
+                        "z": _round(local_layer_bottom),
                     },
                     "local_origin_mm": {
                         "x": _round(intersection["x"] - body_origin["x"]),
                         "y": _round(intersection["y"] - body_origin["y"]),
-                        "z": _round(body_size["z"] - depth),
+                        "z": _round(
+                            local_layer_bottom - body_origin["z"]
+                        ),
                     },
                     "size_mm": {
                         "x": _round(intersection["width"]),
@@ -410,6 +462,10 @@ def apply_top_inset_reservations(
                     "retained_body_below_mm": _round(retained),
                     "minimum_floor_mm": _round(minimum_floor),
                     "cavity_overlap_area_mm2": _round(cavity_overlap_area),
+                    "local_interval_z_mm": {
+                        "bottom": _round(local_layer_bottom),
+                        "top": _round(local_layer_bottom + depth),
+                    },
                     "non_perforating": True,
                 }
                 _values(placement["top_inset_cuts"]).append(cut)
@@ -455,13 +511,6 @@ def apply_top_inset_reservations(
             }
         )
 
-    compensations, compensation_blockers = _apply_cavity_depth_compensations(
-        result_placements,
-        cavity_compensation_by_placement,
-        group_floor,
-        float(layout["default_floor_thickness_mm"]),
-    )
-    blockers.extend(compensation_blockers)
     status = "blocked" if blockers else ("not_required" if not plan["reservations"] else "applied")
     ratios = [float(item["coverage_ratio"]) for item in supports]
     return {
@@ -470,7 +519,8 @@ def apply_top_inset_reservations(
         "placements": result_placements,
         "cuts": cuts,
         "supports": supports,
-        "cavity_depth_compensations": compensations,
+        "cavity_depth_compensations": [],
+        "cavity_anchor_requests": cavity_anchor_requests,
         "support": {
             "status": "blocked" if blockers else ("not_required" if not supports else "supported_by_requested_bodies"),
             "top_support_count": sum(int(item["footprint_cut_count"]) for item in supports),
@@ -488,10 +538,15 @@ def apply_top_inset_reservations(
             "status": status,
             "cut_count": len(cuts),
             "support_count": len(supports),
-            "cavity_depth_compensation_count": len(compensations),
-            "maximum_cavity_depth_compensation_mm": _round(
-                max((float(item["compensation_mm"]) for item in compensations), default=0.0)
-            ),
+            "cavity_depth_compensation_count": 0,
+            "maximum_cavity_depth_compensation_mm": 0.0,
+            "cavity_anchor_request_count": len(cavity_anchor_requests),
+        },
+        "invariants": {
+            **deepcopy(_mapping(plan["invariants"])),
+            "cavity_calibrated_depths_unchanged": True,
+            "cavity_z_anchor_deferred_to_finalization": True,
+            "local_depth_regions_applied": True,
         },
     }
 
@@ -1121,25 +1176,33 @@ def _reserved_prism_collision_ids(
 ) -> list[str]:
     result: list[str] = []
     for reservation in reservations:
-        footprint = _xy_rect(reservation["cut_origin_mm"], reservation["cut_size_mm"])
-        support_plane = float(reservation["support_plane_z_mm"])
-        for placement in placements:
-            if "origin_mm" not in placement or "world_size_mm" not in placement:
-                continue
-            body_origin = _dimension(placement["origin_mm"])
-            body_size = _dimension(placement["world_size_mm"])
-            body_rect = {
-                "x": body_origin["x"],
-                "y": body_origin["y"],
-                "width": body_size["x"],
-                "height": body_size["y"],
-            }
-            if (
-                _intersection(body_rect, footprint) is not None
-                and body_origin["z"] < design_top_z - _EPSILON
-                and support_plane < body_origin["z"] + body_size["z"] - _EPSILON
-            ):
-                result.append(str(placement["id"]))
+        for region in _local_depth_regions(reservation):
+            footprint = _xy_rect(
+                region["cut_origin_mm"],
+                region["cut_size_mm"],
+            )
+            support_plane = float(region["layer_bottom_z_mm"])
+            for placement in placements:
+                if (
+                    "origin_mm" not in placement
+                    or "world_size_mm" not in placement
+                ):
+                    continue
+                body_origin = _dimension(placement["origin_mm"])
+                body_size = _dimension(placement["world_size_mm"])
+                body_rect = {
+                    "x": body_origin["x"],
+                    "y": body_origin["y"],
+                    "width": body_size["x"],
+                    "height": body_size["y"],
+                }
+                if (
+                    _intersection(body_rect, footprint) is not None
+                    and body_origin["z"] < design_top_z - _EPSILON
+                    and support_plane
+                    < body_origin["z"] + body_size["z"] - _EPSILON
+                ):
+                    result.append(str(placement["id"]))
     return sorted(set(result))
 
 
@@ -1178,35 +1241,120 @@ def _unique_blockers(
 def _resolve_vertical_layers(
     resolved: list[dict[str, object]], design_top_z: float
 ) -> list[dict[str, object]]:
-    """Compose only overlapping flat footprints in Z.
+    """Compose the Z depth on exact XY cells, never on a global envelope.
 
-    The input order is bottom-to-top.  Side-by-side footprints therefore share
-    the same top plane instead of consuming one global stack height.
+    The input order is bottom-to-top.  Every atomic XY cell records only the
+    reservations that really cover it.  A lower reservation therefore gains
+    the thickness of an upper one only inside their actual intersection.
     """
 
-    depths = [0.0 for _ in resolved]
-    rectangles = [
-        _xy_rect(item["cut_origin_mm"], item["cut_size_mm"])
-        for item in resolved
+    regions_by_index: list[list[dict[str, object]]] = [
+        [] for _ in resolved
     ]
-    for index in range(len(resolved) - 1, -1, -1):
-        above_depth = max(
-            (
-                depths[other]
-                for other in range(index + 1, len(resolved))
-                if _intersection(rectangles[index], rectangles[other]) is not None
-            ),
-            default=0.0,
+    if resolved:
+        rectangles = [
+            _xy_rect(item["cut_origin_mm"], item["cut_size_mm"])
+            for item in resolved
+        ]
+        xs = sorted(
+            {
+                value
+                for rectangle in rectangles
+                for value in (
+                    rectangle["x"],
+                    rectangle["x"] + rectangle["width"],
+                )
+            }
         )
-        depths[index] = above_depth + float(resolved[index]["total_thickness_mm"])
+        ys = sorted(
+            {
+                value
+                for rectangle in rectangles
+                for value in (
+                    rectangle["y"],
+                    rectangle["y"] + rectangle["height"],
+                )
+            }
+        )
+        region_sequence = 0
+        for x_index in range(len(xs) - 1):
+            for y_index in range(len(ys) - 1):
+                x0, x1 = xs[x_index], xs[x_index + 1]
+                y0, y1 = ys[y_index], ys[y_index + 1]
+                if x1 - x0 <= _EPSILON or y1 - y0 <= _EPSILON:
+                    continue
+                center = {"x": (x0 + x1) / 2.0, "y": (y0 + y1) / 2.0}
+                active = [
+                    index
+                    for index, rectangle in enumerate(rectangles)
+                    if (
+                        rectangle["x"] - _EPSILON
+                        <= center["x"]
+                        <= rectangle["x"] + rectangle["width"] + _EPSILON
+                        and rectangle["y"] - _EPSILON
+                        <= center["y"]
+                        <= rectangle["y"] + rectangle["height"] + _EPSILON
+                    )
+                ]
+                if not active:
+                    continue
+                depth = 0.0
+                active_ids = [str(resolved[index]["id"]) for index in active]
+                for index in reversed(active):
+                    thickness = float(resolved[index]["total_thickness_mm"])
+                    depth += thickness
+                    layer_bottom = design_top_z - depth
+                    regions_by_index[index].append(
+                        {
+                            "id": (
+                                f"{resolved[index]['id']}:local-region:"
+                                f"{region_sequence:04d}"
+                            ),
+                            "cut_origin_mm": {
+                                "x": _round(x0),
+                                "y": _round(y0),
+                            },
+                            "cut_size_mm": {
+                                "x": _round(x1 - x0),
+                                "y": _round(y1 - y0),
+                            },
+                            "layer_bottom_z_mm": _round(layer_bottom),
+                            "layer_top_z_mm": _round(
+                                layer_bottom + thickness
+                            ),
+                            "inset_depth_from_top_mm": _round(depth),
+                            "overlapping_reservation_ids": active_ids,
+                            "overlap_count": len(active),
+                        }
+                    )
+                region_sequence += 1
 
     count = len(resolved)
     reservations: list[dict[str, object]] = []
     for index, reservation in enumerate(resolved):
         thickness = float(reservation["total_thickness_mm"])
-        depth = depths[index]
-        layer_bottom = design_top_z - depth
-        layer_top = layer_bottom + thickness
+        local_regions = regions_by_index[index]
+        depth = max(
+            (
+                float(value["inset_depth_from_top_mm"])
+                for value in local_regions
+            ),
+            default=thickness,
+        )
+        layer_bottom = min(
+            (
+                float(value["layer_bottom_z_mm"])
+                for value in local_regions
+            ),
+            default=design_top_z - thickness,
+        )
+        layer_top = max(
+            (
+                float(value["layer_top_z_mm"])
+                for value in local_regions
+            ),
+            default=design_top_z,
+        )
         final = deepcopy(reservation)
         final.update(
             {
@@ -1216,6 +1364,7 @@ def _resolve_vertical_layers(
                 "inset_depth_from_top_mm": _round(depth),
                 "removal_order": count - index,
                 "support_plane_z_mm": _round(layer_bottom),
+                "local_depth_regions": local_regions,
             }
         )
         reservations.append(final)
@@ -1386,6 +1535,31 @@ def _grip_zone(
     }, None
 
 
+def _local_depth_regions(
+    reservation: dict[str, object],
+) -> list[dict[str, object]]:
+    """Return exact local cut regions with a compatibility fallback."""
+
+    raw_regions = reservation.get("local_depth_regions")
+    if isinstance(raw_regions, list) and raw_regions:
+        return _mappings(raw_regions)
+    depth = float(reservation["inset_depth_from_top_mm"])
+    layer_bottom = float(reservation["support_plane_z_mm"])
+    thickness = float(reservation.get("total_thickness_mm", depth))
+    return [
+        {
+            "id": f"{reservation['id']}:local-region:legacy",
+            "cut_origin_mm": deepcopy(reservation["cut_origin_mm"]),
+            "cut_size_mm": deepcopy(reservation["cut_size_mm"]),
+            "layer_bottom_z_mm": _round(layer_bottom),
+            "layer_top_z_mm": _round(layer_bottom + thickness),
+            "inset_depth_from_top_mm": _round(depth),
+            "overlapping_reservation_ids": [str(reservation["id"])],
+            "overlap_count": 1,
+        }
+    ]
+
+
 def _cavity_interactions(
     placement: dict[str, object],
     cut_rect: dict[str, float],
@@ -1401,77 +1575,6 @@ def _cavity_interactions(
         cavity_ids.append(str(cavity["cavity_id"]))
     return min(cut_rect["width"] * cut_rect["height"], overlap_area), cavity_ids
 
-
-def _apply_cavity_depth_compensations(
-    placements: list[dict[str, object]],
-    compensation_by_placement: dict[str, dict[str, float]],
-    group_floor: dict[str, float],
-    default_floor: float,
-) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
-    """Preserve useful asset depth below localized top insets."""
-
-    compensations: list[dict[str, object]] = []
-    blockers: list[dict[str, object]] = []
-    for placement in placements:
-        requested = compensation_by_placement.get(str(placement["id"]), {})
-        if not requested:
-            continue
-        body_height = float(_mapping(placement["world_size_mm"])["z"])
-        minimum_floor = group_floor.get(
-            str(placement.get("container_group_id", "")),
-            default_floor,
-        )
-        for cavity in _mappings(placement.get("cavity_layout", [])):
-            cavity_id = str(cavity["cavity_id"])
-            compensation = float(requested.get(cavity_id, 0.0))
-            if compensation <= _EPSILON:
-                continue
-            current_dimensions = _dimension(cavity["inner_dimensions_mm"])
-            previous_compensation = float(
-                cavity.get("top_inset_compensation_mm", 0.0)
-            )
-            canonical_depth = (
-                current_dimensions["z"] - previous_compensation
-            )
-            base_dimensions = {
-                "x": current_dimensions["x"],
-                "y": current_dimensions["y"],
-                "z": canonical_depth,
-            }
-            compensated_depth = canonical_depth + compensation
-            retained_floor = body_height - compensated_depth
-            if retained_floor + _EPSILON < minimum_floor:
-                blockers.append(
-                    _blocker(
-                        "TOP_INSET_PIERCES_CAVITY_FLOOR",
-                        f"La cavite '{cavity_id}' dans '{placement['name']}' doit gagner "
-                        f"{_round(compensation)} mm sous le plateau, mais ne laisserait que "
-                        f"{_round(retained_floor)} mm de fond.",
-                        "Augmente la hauteur du corps, reduis l epaisseur des elements plats "
-                        "ou deplace leur empreinte.",
-                        str(placement["id"]),
-                    )
-                )
-                continue
-            cavity["base_inner_dimensions_mm"] = {
-                axis: _round(base_dimensions[axis]) for axis in ("x", "y", "z")
-            }
-            _mapping(cavity["inner_dimensions_mm"])["z"] = _round(compensated_depth)
-            cavity["top_inset_compensation_mm"] = _round(compensation)
-            cavity["depth_semantics"] = (
-                "canonical_asset_depth_plus_localized_top_inset"
-            )
-            compensations.append(
-                {
-                    "placement_id": placement["id"],
-                    "cavity_id": cavity_id,
-                    "base_depth_mm": _round(base_dimensions["z"]),
-                    "compensation_mm": _round(compensation),
-                    "final_depth_mm": _round(compensated_depth),
-                    "retained_floor_mm": _round(retained_floor),
-                }
-            )
-    return compensations, blockers
 
 def _cavity_world_bounds(
     placement: dict[str, object], cavity: dict[str, object]

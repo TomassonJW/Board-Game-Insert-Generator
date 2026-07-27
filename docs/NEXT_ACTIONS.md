@@ -1,29 +1,24 @@
 # Next Actions
 
 <!-- P64-L09U-NEXT -->
-## Action courante : exécuter P64-L09U-R3
+## Action courante : exécuter la gate P64-L09U-R3-V
 
-0.1.73 est `human-KO`, `do-not-run`, malgré une matérialisation désormais
-rapide, progressive, réactive et fidèle à l'aperçu.
+0.1.73 reste `human-KO`, `do-not-run`. P64-L09U-R3 est terminé et validé
+automatiquement dans la candidate 0.1.74.
 
-Mission unique :
+Thomas vérifie maintenant uniquement :
 
-1. tracer la profondeur de cavité du minimum au plan Fusion ;
-2. conserver le calibre exact et résoudre seulement l'origine Z finale ;
-3. composer les plateaux/livrets par empreintes et intervalles Z locaux ;
-4. séparer budget contractuel, plafond mural et terminaison ;
-5. préserver le corps BRep transitoire et toutes les performances humaines
-   acquises ;
-6. valider, empaqueter la cible initiale 0.1.74, installer et préparer la gate.
+1. profondeur `10,6 mm` avant/après finalisation ;
+2. origine Z avec et sans plateau ;
+3. coupes et paliers locaux de `CasLimite02+` ;
+4. affichage séparé du budget, de la terminaison et du temps total ;
+5. fidélité aperçu/Fusion et matérialisation progressive des trois cas.
 
-Contrat canonique :
-`docs/P64_L09U_R3_END_TO_END_RUNBOOK.md`.
+Recette unique :
+`docs/P64_L09U_R3_V_0174_FUSION_GATE_RECIPE.md`.
 
-Preuve humaine :
-`docs/P64_L09U_R2_V_0173_HUMAN_KO_EVIDENCE.md`.
-
-Décision :
-`docs/DECISIONS/ADR-0099-profondeur-calibree-et-reservations-superieures-locales.md`.
+Preuve automatisée :
+`docs/P64_L09U_R3_0174_CORRECTIVE_EVIDENCE.md`.
 
 Aucun benchmark/holdout. Les projets personnels restent en lecture seule.
 `fusion-validated=false`, `print-validated=false`.

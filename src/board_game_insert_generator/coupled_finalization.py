@@ -180,6 +180,11 @@ def finalize_coupled_volume(
             }
         ],
     }
+    finalized_plan = result.get("plan")
+    if isinstance(finalized_plan, Mapping):
+        finalization["final_cavity_anchors"] = deepcopy(
+            _object_mapping(finalized_plan.get("cavity_anchor_certificate"))
+        )
     result["finalization"] = finalization
     solver = deepcopy(_object_mapping(result.get("solver")))
     telemetry = deepcopy(_object_mapping(solver.get("telemetry")))
@@ -286,7 +291,10 @@ def _finalize_coupled_volume_candidate(
         placements,
         problem.storage_height_mm,
     )
-    finishing_zones = problem.top_inset_zones
+    finishing_zones = _conservative_closure_guard_zones(
+        problem.top_inset_plan,
+        problem.storage_height_mm,
+    )
 
     closure_budget = _remaining_phase_budget(budget, deadline_at)
     if closure_budget is None:
@@ -393,6 +401,7 @@ def _finalize_coupled_volume_candidate(
                 reservation_count=len(problem.top_inset_zones),
                 global_deadline_reached=continuous.deadline_reached,
                 frozen_cavities=frozen_cavities,
+                project=problem.project,
             )
         composite_budget = _remaining_phase_budget(budget, deadline_at)
         if composite_budget is None:
@@ -414,7 +423,7 @@ def _finalize_coupled_volume_candidate(
             box_perimeter_xy_mm=problem.box_xy_clearance_mm,
             between_bodies_z_mm=problem.z_clearance_mm,
             budget=composite_budget,
-            top_inset_zones=problem.top_inset_zones,
+            top_inset_zones=finishing_zones,
             rectangular_attempt=closure,
             continuous_prefill=continuous,
         )
@@ -502,6 +511,7 @@ def _finalize_coupled_volume_candidate(
             composite_closure=composite,
             continuous_prefill=continuous,
             frozen_cavities=frozen_cavities,
+            project=problem.project,
         )
     if closure.partition_certificate.get("certified") is not True:
         raise CoupledFinalizationError(
@@ -572,6 +582,7 @@ def _finalize_coupled_volume_candidate(
         reservation_count=len(problem.top_inset_zones),
         global_deadline_reached=closure.deadline_reached,
         frozen_cavities=frozen_cavities,
+        project=problem.project,
     )
 
 def _certify_closed_plan(
@@ -818,6 +829,51 @@ def _deadline_reached(deadline_at: float) -> bool:
     return perf_counter() >= deadline_at
 
 
+def _conservative_closure_guard_zones(
+    top_inset_plan: Mapping[str, object],
+    design_top_z: float,
+) -> tuple[TopInsetZone, ...]:
+    """Keep the proven closure search bounded without defining final cuts.
+
+    The final CAD contract is always rebuilt from the exact local regions.
+    These conservative zones only prevent the legacy closure search from
+    growing material into volume that any ordered flat item may reserve.
+    """
+
+    reservations = [
+        value
+        for value in top_inset_plan.get("reservations", ())
+        if isinstance(value, Mapping)
+    ]
+    ordered = sorted(
+        reservations,
+        key=lambda value: int(value.get("level", 0)),
+    )
+    zones: list[TopInsetZone] = []
+    for index, reservation in enumerate(ordered):
+        guarded_depth = sum(
+            float(value["total_thickness_mm"])
+            for value in ordered[index:]
+        )
+        origin = _object_mapping(reservation["cut_origin_mm"])
+        size = _object_mapping(reservation["cut_size_mm"])
+        zones.append(
+            TopInsetZone(
+                origin_xy_mm=(
+                    float(origin["x"]),
+                    float(origin["y"]),
+                ),
+                size_xy_mm=(
+                    float(size["x"]),
+                    float(size["y"]),
+                ),
+                support_plane_z_mm=design_top_z - guarded_depth,
+                inset_depth_mm=guarded_depth,
+            )
+        )
+    return tuple(zones)
+
+
 def _finalized_plan(
     certified: CertifiedFree3DPlan,
     closure: Free3DClosureResult | GlobalRectangularClosureResult,
@@ -837,6 +893,7 @@ def _finalized_plan(
     composite_closure: XYCompositeClosureResult | None = None,
     continuous_prefill: Free3DClosureResult | None = None,
     frozen_cavities: Sequence[Mapping[str, object]] = (),
+    project: Mapping[str, object],
 ) -> dict[str, object]:
     plan = deepcopy(certified.plan)
     certificate = certified.certificate
@@ -845,10 +902,35 @@ def _finalized_plan(
             plan,
             composite_closure,
             frozen_cavities=frozen_cavities,
+            project=project,
         )
         if composite_closure is not None
         else None
     )
+    cavity_anchor_certificate = (
+        composite_certificate.get("cavity_anchor_certificate")
+        if isinstance(composite_certificate, Mapping)
+        else _attach_rectangular_cavity_anchors(
+            plan,
+            frozen_cavities=frozen_cavities,
+            project=project,
+        )
+    )
+    if (
+        not isinstance(cavity_anchor_certificate, Mapping)
+        or cavity_anchor_certificate.get("certified") is not True
+    ):
+        raise CoupledFinalizationError(
+            "L ancrage final des cavites calibrees est invalide.",
+            {
+                "schema_version": COUPLED_FINALIZATION_SCHEMA_V1,
+                "status": "rejected",
+                "stop_reason": "final_cavity_anchor_certificate_rejected",
+                "cavity_anchor_certificate": cavity_anchor_certificate,
+                "partial_plan_published": False,
+                "materializable": False,
+            },
+        )
     if (
         composite_certificate is not None
         and composite_certificate.get("certified") is not True
@@ -902,6 +984,9 @@ def _finalized_plan(
             else None
         ),
         "composite_materialization_certificate": composite_certificate,
+        "cavity_anchor_certificate": deepcopy(
+            cavity_anchor_certificate
+        ),
         "frozen_cavities": [
             {
                 key: deepcopy(value[key])
@@ -995,6 +1080,7 @@ def _finalized_plan(
                     composite_certificate is None
                     or composite_certificate.get("certified") is True
                 )
+                and cavity_anchor_certificate.get("certified") is True
             ),
             "checks": [
                 {
@@ -1014,7 +1100,16 @@ def _finalized_plan(
                 ]
                 if composite_certificate is not None
                 else []
-            ),
+            )
+            + [
+                {
+                    "name": "final_cavity_calibration_and_z_anchors",
+                    "passed": (
+                        cavity_anchor_certificate.get("certified") is True
+                    ),
+                    "rejection_code": None,
+                }
+            ],
         },
     }
     summary = dict(plan["summary"])
@@ -1049,8 +1144,17 @@ def _finalized_plan(
             "finishing_budget_independent_from_calculation": True,
             "global_finishing_deadline_enforced": True,
             "minimal_incumbent_preserved_by_value": True,
-            "cavity_world_poses_frozen": True,
-            "cavity_vertical_access_protected": True,
+            "cavity_xy_pose_orientation_and_dimensions_frozen": True,
+            "cavity_final_z_anchor_resolved": True,
+            "cavity_calibrated_depths_unchanged": (
+                cavity_anchor_certificate.get(
+                    "calibrated_depths_unchanged"
+                )
+                is True
+            ),
+            "cavity_vertical_access_protected": False,
+            "closure_search_guard_is_conservative_not_cad_geometry": True,
+            "final_top_inset_geometry_uses_local_regions": True,
             "modular_harmonization_applied": False,
         }
     )
@@ -1084,6 +1188,7 @@ def _attach_xy_composite_geometry(
     composite: XYCompositeClosureResult,
     *,
     frozen_cavities: Sequence[Mapping[str, object]],
+    project: Mapping[str, object],
 ) -> dict[str, object]:
     placements = plan.get("placements")
     if not isinstance(placements, list):
@@ -1121,8 +1226,7 @@ def _attach_xy_composite_geometry(
     total_cut_intersection_with_final = 0.0
     total_join_count = 0
     all_owners_connected = True
-    all_frozen_poses_match = True
-    all_cavity_access_open = True
+    all_frozen_calibrations_match = True
     all_reservation_walls_certified = all(
         isinstance(value.get("wall_envelope_certificate"), Mapping)
         and value["wall_envelope_certificate"].get("certified") is True
@@ -1172,11 +1276,6 @@ def _attach_xy_composite_geometry(
                 final_size,
                 reservations,
                 kind="footprint",
-            )
-            selected_access = _frozen_access_at_cell(
-                final_origin,
-                final_size,
-                owner_frozen,
             )
             final_top = final_origin[2] + final_size[2]
             cad_top = final_top
@@ -1232,21 +1331,6 @@ def _attach_xy_composite_geometry(
                 source_placement_origin,
                 owner_frozen,
             )
-            access_zone = (
-                selected_access.get("access_zone")
-                if selected_access is not None
-                else None
-            )
-            if (
-                isinstance(access_zone, TopInsetZone)
-                and cad_top
-                > float(access_zone.support_plane_z_mm) + 0.0001
-                and not any(
-                    value["kind"] == "frozen_cavity_access"
-                    for value in cuts
-                )
-            ):
-                all_cavity_access_open = False
             for cut in cuts:
                 cut_volume = _mapping_size_volume(cut["size_mm"])
                 total_cut_volume += cut_volume
@@ -1257,10 +1341,7 @@ def _attach_xy_composite_geometry(
                         final_size,
                     )
                 )
-                if cut["kind"] == "frozen_cavity_access":
-                    placement_access_cuts.append(cut)
-                else:
-                    placement_cuts.append(cut)
+                placement_cuts.append(cut)
         total_join_count += max(0, len(cad_prisms) - 1)
         all_owners_connected = bool(
             all_owners_connected
@@ -1279,17 +1360,45 @@ def _attach_xy_composite_geometry(
                 float(_mapping_value(cavity["source_owner_origin_mm"], axis))
                 for axis in ("x", "y", "z")
             )
-            expected_size = tuple(
-                float(_mapping_value(cavity["source_owner_world_size_mm"], axis))
+            raw_cavities = placement.get("cavity_layout", ())
+            cavity_index = int(cavity["cavity_index"])
+            raw_cavity = (
+                raw_cavities[cavity_index]
+                if isinstance(raw_cavities, (list, tuple))
+                and 0 <= cavity_index < len(raw_cavities)
+                and isinstance(raw_cavities[cavity_index], Mapping)
+                else None
+            )
+            raw_size = (
+                tuple(
+                    float(
+                        _mapping_value(
+                            raw_cavity["inner_dimensions_mm"],
+                            axis,
+                        )
+                    )
+                    for axis in ("x", "y", "z")
+                )
+                if raw_cavity is not None
+                else ()
+            )
+            expected_cavity_size = tuple(
+                float(_mapping_value(cavity["world_size_mm"], axis))
                 for axis in ("x", "y", "z")
             )
-            all_frozen_poses_match = bool(
-                all_frozen_poses_match
+            if (
+                raw_size
+                and int(placement.get("rotation_deg_z", 0)) == 90
+            ):
+                raw_size = (raw_size[1], raw_size[0], raw_size[2])
+            all_frozen_calibrations_match = bool(
+                all_frozen_calibrations_match
                 and _tuple_close(
-                    source_placement_origin,
-                    expected_origin,
+                    source_placement_origin[:2],
+                    expected_origin[:2],
                 )
-                and _tuple_close(source_placement_size, expected_size)
+                and bool(raw_size)
+                and _tuple_close(raw_size, expected_cavity_size)
                 and int(placement.get("rotation_deg_z", 0))
                 == int(cavity["source_rotation_deg_z"])
             )
@@ -1355,24 +1464,21 @@ def _attach_xy_composite_geometry(
             ),
         }
         placement["top_inset_cuts"] = placement_cuts
-        placement["frozen_cavities_v1"] = [
-            {
-                key: deepcopy(value[key])
-                for key in (
-                    "cavity_key",
-                    "cavity_index",
-                    "owner_id",
-                    "world_origin_mm",
-                    "world_size_mm",
-                    "source_owner_origin_mm",
-                    "source_owner_world_size_mm",
-                    "source_rotation_deg_z",
-                    "pose_digest",
-                    "top_open",
-                )
-            }
-            for value in owner_frozen
-        ]
+        anchor_certificate = _resolve_final_cavity_contracts(
+            placement,
+            owner_frozen,
+            placement_cuts,
+            project=project,
+            cad_prisms=cad_prisms,
+            top_inset_reservations=reservations,
+        )
+        if anchor_certificate.get("certified") is not True:
+            return _rejected_composite_materialization(
+                "composite_final_cavity_anchor_rejected"
+            )
+        placement["frozen_cavities_v1"] = deepcopy(
+            anchor_certificate["cavities"]
+        )
         composite_body = {
             "schema_version": "bgig.xy_composite_cad_body.v2",
             "policy": "hybrid_xy_composite_v2",
@@ -1383,14 +1489,14 @@ def _attach_xy_composite_geometry(
             "source_owner_certificate": deepcopy(owner.certificate),
             "source_composite_digest": composite.deterministic_digest,
             "frozen_cavity_pose_digests": [
-                str(value["pose_digest"]) for value in owner_frozen
+                str(value["pose_digest"])
+                for value in placement["frozen_cavities_v1"]
             ],
-            "frozen_cavity_access_cuts": placement_access_cuts,
+            "frozen_cavity_access_cuts": [],
             "operation_order": [
                 "create_core_prism",
                 "join_xy_annexes",
                 "subtract_content_cavities",
-                "subtract_frozen_cavity_access",
                 "subtract_exact_top_insets",
             ],
         }
@@ -1434,8 +1540,7 @@ def _attach_xy_composite_geometry(
         <= max(0.0001, certified_composite_volume * 1e-9)
         and all_top_cuts_are_exact
         and all_owners_connected
-        and all_frozen_poses_match
-        and all_cavity_access_open
+        and all_frozen_calibrations_match
         and all_reservation_walls_certified
     )
     rejection_subcodes = [
@@ -1462,12 +1567,8 @@ def _attach_xy_composite_geometry(
             (all_top_cuts_are_exact, "COMPOSITE_TOP_CUT_INVALID"),
             (all_owners_connected, "COMPOSITE_OWNER_UNION_DISCONNECTED"),
             (
-                all_frozen_poses_match,
-                "COMPOSITE_CAVITY_WORLD_POSE_DIVERGENCE",
-            ),
-            (
-                all_cavity_access_open,
-                "COMPOSITE_CAVITY_ACCESS_BLOCKED",
+                all_frozen_calibrations_match,
+                "COMPOSITE_CAVITY_CALIBRATION_DIVERGENCE",
             ),
             (
                 all_reservation_walls_certified,
@@ -1486,8 +1587,13 @@ def _attach_xy_composite_geometry(
         "joins_precede_cuts": True,
         "cavities_precede_top_inset_cuts": True,
         "owner_unions_connected": all_owners_connected,
-        "cavity_world_poses_match_frozen_contract": all_frozen_poses_match,
-        "cavity_vertical_access_open": all_cavity_access_open,
+        "cavity_calibrations_match_source_contract": (
+            all_frozen_calibrations_match
+        ),
+        "cavity_vertical_access_open": False,
+        "cavity_anchor_certificate": _aggregate_cavity_anchor_certificates(
+            placements
+        ),
         "minimum_reservation_wall_certified": all_reservation_walls_certified,
         "all_top_inset_cuts_target_exact_owner_intersections": all_top_cuts_are_exact,
         "source_composite_volume_mm3": round(
@@ -1528,6 +1634,392 @@ def _attach_xy_composite_geometry(
     }
 
 
+def _attach_rectangular_cavity_anchors(
+    plan: dict[str, object],
+    *,
+    frozen_cavities: Sequence[Mapping[str, object]],
+    project: Mapping[str, object],
+) -> dict[str, object]:
+    placements = plan.get("placements")
+    if not isinstance(placements, list):
+        return {
+            "schema_version": "bgig.final_cavity_anchor_certificate.v1",
+            "certified": False,
+            "rejection_codes": ["FINAL_PLACEMENTS_MISSING"],
+            "cavities": [],
+        }
+    frozen_by_owner: dict[str, list[Mapping[str, object]]] = {}
+    for value in frozen_cavities:
+        frozen_by_owner.setdefault(str(value["owner_id"]), []).append(value)
+    for placement in placements:
+        if not isinstance(placement, dict) or placement.get("role") != "container":
+            continue
+        certificate = _resolve_final_cavity_contracts(
+            placement,
+            frozen_by_owner.get(str(placement["id"]), ()),
+            tuple(
+                value
+                for value in placement.get("top_inset_cuts", ())
+                if isinstance(value, Mapping)
+            ),
+            project=project,
+            cad_prisms=None,
+        )
+        if certificate.get("certified") is not True:
+            return certificate
+        placement["frozen_cavities_v1"] = deepcopy(
+            certificate["cavities"]
+        )
+    return _aggregate_cavity_anchor_certificates(placements)
+
+
+def _local_reservation_anchor_cuts(
+    cavity_rect: Sequence[float],
+    reservations: Sequence[Mapping[str, object]],
+) -> list[dict[str, object]]:
+    """Expose exact local reservation intervals to the cavity anchor."""
+
+    cuts: list[dict[str, object]] = []
+    for reservation in reservations:
+        raw_regions = reservation.get("local_depth_regions", ())
+        if not isinstance(raw_regions, (list, tuple)):
+            continue
+        for raw_region in raw_regions:
+            if not isinstance(raw_region, Mapping):
+                continue
+            origin = _object_mapping(raw_region["cut_origin_mm"])
+            size = _object_mapping(raw_region["cut_size_mm"])
+            region_rect = (
+                float(origin["x"]),
+                float(origin["y"]),
+                float(origin["x"]) + float(size["x"]),
+                float(origin["y"]) + float(size["y"]),
+            )
+            if not _rectangles_overlap(cavity_rect, region_rect):
+                continue
+            bottom = float(raw_region["layer_bottom_z_mm"])
+            top = float(raw_region["layer_top_z_mm"])
+            cuts.append(
+                {
+                    "kind": "top_inset",
+                    "reservation_id": str(reservation["id"]),
+                    "local_region_id": str(raw_region["id"]),
+                    "world_origin_mm": {
+                        "x": float(origin["x"]),
+                        "y": float(origin["y"]),
+                        "z": bottom,
+                    },
+                    "size_mm": {
+                        "x": float(size["x"]),
+                        "y": float(size["y"]),
+                        "z": top - bottom,
+                    },
+                }
+            )
+    return cuts
+
+
+def _resolve_final_cavity_contracts(
+    placement: Mapping[str, object],
+    frozen_cavities: Sequence[Mapping[str, object]],
+    top_inset_cuts: Sequence[Mapping[str, object]],
+    *,
+    project: Mapping[str, object],
+    cad_prisms: Sequence[Mapping[str, object]] | None,
+    top_inset_reservations: Sequence[Mapping[str, object]] = (),
+) -> dict[str, object]:
+    owner_id = str(placement["id"])
+    owner_origin = tuple(
+        float(_mapping_value(placement["origin_mm"], axis))
+        for axis in ("x", "y", "z")
+    )
+    owner_size = tuple(
+        float(_mapping_value(placement["world_size_mm"], axis))
+        for axis in ("x", "y", "z")
+    )
+    wall, floor = _resolved_owner_wall_and_floor(project, placement)
+    contracts: list[dict[str, object]] = []
+    rejection_codes: list[str] = []
+    for source in sorted(
+        frozen_cavities,
+        key=lambda value: int(value["cavity_index"]),
+    ):
+        source_origin = tuple(
+            float(_mapping_value(source["world_origin_mm"], axis))
+            for axis in ("x", "y", "z")
+        )
+        calibrated_size = tuple(
+            float(_mapping_value(source["world_size_mm"], axis))
+            for axis in ("x", "y", "z")
+        )
+        cavity_rect = (
+            source_origin[0],
+            source_origin[1],
+            source_origin[0] + calibrated_size[0],
+            source_origin[1] + calibrated_size[1],
+        )
+        functional_top = _functional_top_at_cavity(
+            cavity_rect,
+            owner_origin,
+            owner_size,
+            cad_prisms,
+        )
+        overlapping_cuts = [
+            value
+            for value in top_inset_cuts
+            if value.get("kind") == "top_inset"
+            and _rectangles_overlap(
+                cavity_rect,
+                _world_xy_rectangle(value),
+            )
+        ]
+        overlapping_cuts.extend(
+            _local_reservation_anchor_cuts(
+                cavity_rect,
+                top_inset_reservations,
+            )
+        )
+        overlapping_cuts = [
+            value
+            for value in overlapping_cuts
+            if float(
+                _mapping_value(value["world_origin_mm"], "z")
+            )
+            < owner_origin[2] + owner_size[2] - 0.0001
+        ]
+        responsible: Mapping[str, object] | None = None
+        if overlapping_cuts:
+            responsible = min(
+                overlapping_cuts,
+                key=lambda value: (
+                    float(_mapping_value(value["world_origin_mm"], "z")),
+                    str(value.get("reservation_id", "")),
+                    str(value.get("local_region_id", "")),
+                ),
+            )
+            cut_bottom = float(
+                _mapping_value(responsible["world_origin_mm"], "z")
+            )
+            cavity_top = cut_bottom - wall
+            anchor_kind = "below_top_inset"
+            separation = wall
+        else:
+            cavity_top = functional_top
+            anchor_kind = "open_top"
+            separation = 0.0
+        final_origin = (
+            source_origin[0],
+            source_origin[1],
+            cavity_top - calibrated_size[2],
+        )
+        retained_floor = final_origin[2] - owner_origin[2]
+        calibrated_depth = calibrated_size[2]
+        anchor_certified = bool(
+            min(calibrated_size) > 0.0
+            and retained_floor + 0.0001 >= floor
+            and final_origin[2] >= owner_origin[2] - 0.0001
+            and cavity_top
+            <= owner_origin[2] + owner_size[2] + 0.0001
+        )
+        if not anchor_certified:
+            rejection_codes.append(
+                "FINAL_CAVITY_FLOOR_OR_TOP_CLEARANCE_FAILED"
+            )
+        identity = {
+            "owner_id": owner_id,
+            "cavity_index": int(source["cavity_index"]),
+            "world_origin_mm": _xyz_payload(final_origin),
+            "world_size_mm": _xyz_payload(calibrated_size),
+            "source_owner_origin_mm": deepcopy(
+                source["source_owner_origin_mm"]
+            ),
+            "source_owner_world_size_mm": deepcopy(
+                source["source_owner_world_size_mm"]
+            ),
+            "source_rotation_deg_z": int(
+                source["source_rotation_deg_z"]
+            ),
+            "minimum_world_origin_mm": deepcopy(
+                source["world_origin_mm"]
+            ),
+            "minimum_world_size_mm": deepcopy(source["world_size_mm"]),
+            "final_owner_origin_mm": _xyz_payload(owner_origin),
+            "final_owner_world_size_mm": _xyz_payload(owner_size),
+            "anchor_kind": anchor_kind,
+            "responsible_reservation_id": (
+                str(responsible.get("reservation_id", ""))
+                if responsible is not None
+                else ""
+            ),
+            "responsible_local_region_id": (
+                str(responsible.get("local_region_id", ""))
+                if responsible is not None
+                else ""
+            ),
+            "calibrated_depth_source_mm": round(calibrated_depth, 6),
+            "calibrated_depth_final_mm": round(calibrated_depth, 6),
+            "retained_floor_mm": round(retained_floor, 6),
+            "minimum_floor_mm": round(floor, 6),
+            "top_separation_mm": round(separation, 6),
+            "minimum_top_separation_mm": (
+                round(wall, 6) if responsible is not None else 0.0
+            ),
+        }
+        contracts.append(
+            {
+                **identity,
+                "cavity_key": str(source["cavity_key"]),
+                "pose_digest": canonical_digest(identity),
+                "top_open": anchor_kind == "open_top",
+                "anchor_certified": anchor_certified,
+                "calibrated_dimensions_unchanged": True,
+                "xy_pose_unchanged": True,
+                "orientation_unchanged": True,
+            }
+        )
+    return {
+        "schema_version": "bgig.final_cavity_anchor_certificate.v1",
+        "certified": not rejection_codes,
+        "owner_id": owner_id,
+        "cavity_count": len(contracts),
+        "open_top_count": sum(
+            value["anchor_kind"] == "open_top" for value in contracts
+        ),
+        "below_top_inset_count": sum(
+            value["anchor_kind"] == "below_top_inset"
+            for value in contracts
+        ),
+        "calibrated_depths_unchanged": all(
+            value["calibrated_depth_source_mm"]
+            == value["calibrated_depth_final_mm"]
+            for value in contracts
+        ),
+        "rejection_codes": sorted(set(rejection_codes)),
+        "cavities": contracts,
+    }
+
+
+def _aggregate_cavity_anchor_certificates(
+    placements: Sequence[Mapping[str, object]],
+) -> dict[str, object]:
+    cavities = [
+        value
+        for placement in placements
+        for value in placement.get("frozen_cavities_v1", ())
+        if isinstance(value, Mapping)
+    ]
+    return {
+        "schema_version": "bgig.final_cavity_anchor_certificate.v1",
+        "certified": all(
+            value.get("anchor_certified") is True
+            and value.get("calibrated_dimensions_unchanged") is True
+            for value in cavities
+        ),
+        "cavity_count": len(cavities),
+        "open_top_count": sum(
+            value.get("anchor_kind") == "open_top" for value in cavities
+        ),
+        "below_top_inset_count": sum(
+            value.get("anchor_kind") == "below_top_inset"
+            for value in cavities
+        ),
+        "calibrated_depths_unchanged": all(
+            value.get("calibrated_depth_source_mm")
+            == value.get("calibrated_depth_final_mm")
+            for value in cavities
+        ),
+        "cavities": deepcopy(cavities),
+        "rejection_codes": [],
+    }
+
+
+def _resolved_owner_wall_and_floor(
+    project: Mapping[str, object],
+    placement: Mapping[str, object],
+) -> tuple[float, float]:
+    layout = project.get("layout")
+    if not isinstance(layout, Mapping):
+        raise CoupledFinalizationError(
+            "Les epaisseurs canoniques du projet sont absentes.",
+            _failure_report(
+                "canonical_thicknesses_missing",
+                ("CANONICAL_THICKNESSES_MISSING",),
+            ),
+        )
+    wall = float(layout["default_wall_thickness_mm"])
+    floor = float(layout["default_floor_thickness_mm"])
+    group_id = str(placement.get("container_group_id", ""))
+    raw_groups = project.get("container_groups", ())
+    if isinstance(raw_groups, (list, tuple)):
+        for group in raw_groups:
+            if not isinstance(group, Mapping) or str(group.get("id")) != group_id:
+                continue
+            if group.get("wall_thickness_mm") is not None:
+                wall = float(group["wall_thickness_mm"])
+            if group.get("floor_thickness_mm") is not None:
+                floor = float(group["floor_thickness_mm"])
+            break
+    return wall, floor
+
+
+def _functional_top_at_cavity(
+    cavity_rect: Sequence[float],
+    owner_origin: Sequence[float],
+    owner_size: Sequence[float],
+    cad_prisms: Sequence[Mapping[str, object]] | None,
+) -> float:
+    if not cad_prisms:
+        return owner_origin[2] + owner_size[2]
+    center = (
+        (cavity_rect[0] + cavity_rect[2]) / 2.0,
+        (cavity_rect[1] + cavity_rect[3]) / 2.0,
+    )
+    tops = [
+        float(_mapping_value(value["cad_origin_mm"], "z"))
+        + float(_mapping_value(value["cad_size_mm"], "z"))
+        for value in cad_prisms
+        if _point_in_rectangle(
+            center,
+            _mapping_xy_rectangle(
+                value["cad_origin_mm"],
+                value["cad_size_mm"],
+            ),
+        )
+    ]
+    return max(tops, default=owner_origin[2] + owner_size[2])
+
+
+def _mapping_xy_rectangle(
+    origin: object,
+    size: object,
+) -> tuple[float, float, float, float]:
+    if not isinstance(origin, Mapping) or not isinstance(size, Mapping):
+        return (0.0, 0.0, 0.0, 0.0)
+    x0, y0 = float(origin["x"]), float(origin["y"])
+    return (x0, y0, x0 + float(size["x"]), y0 + float(size["y"]))
+
+
+def _world_xy_rectangle(
+    value: Mapping[str, object],
+) -> tuple[float, float, float, float]:
+    return _mapping_xy_rectangle(
+        value["world_origin_mm"],
+        value["size_mm"],
+    )
+
+
+def _rectangles_overlap(
+    left: Sequence[float],
+    right: Sequence[float],
+) -> bool:
+    return bool(
+        left[0] < right[2] - 0.0001
+        and right[0] < left[2] - 0.0001
+        and left[1] < right[3] - 0.0001
+        and right[1] < left[3] - 0.0001
+    )
+
+
 def _split_composite_owner_prisms(
     owner: object,
     reservations: Sequence[Mapping[str, object]],
@@ -1541,24 +2033,27 @@ def _split_composite_owner_prisms(
         xs = {x0, x1}
         ys = {y0, y1}
         for reservation in reservations:
-            for kind in ("footprint", "grip"):
-                rect = _reservation_rectangle(reservation, kind)
+            local_regions = reservation.get(
+                "local_depth_regions",
+                (),
+            )
+            local_rectangles = [
+                _mapping_xy_rectangle(
+                    value["cut_origin_mm"],
+                    value["cut_size_mm"],
+                )
+                for value in local_regions
+                if isinstance(value, Mapping)
+            ]
+            for rect in (
+                *local_rectangles,
+                _reservation_rectangle(reservation, "grip"),
+            ):
                 rx0, ry0, rx1, ry1 = rect
                 if rx0 < x1 - 0.0001 and x0 < rx1 - 0.0001:
                     xs.update({max(x0, rx0), min(x1, rx1)})
                 if ry0 < y1 - 0.0001 and y0 < ry1 - 0.0001:
                     ys.update({max(y0, ry0), min(y1, ry1)})
-        for cavity in frozen_cavities:
-            access_zone = cavity.get("access_zone")
-            if not isinstance(access_zone, TopInsetZone):
-                continue
-            rx0, ry0 = access_zone.origin_xy_mm
-            rx1 = rx0 + access_zone.size_xy_mm[0]
-            ry1 = ry0 + access_zone.size_xy_mm[1]
-            if rx0 < x1 - 0.0001 and x0 < rx1 - 0.0001:
-                xs.update({max(x0, rx0), min(x1, rx1)})
-            if ry0 < y1 - 0.0001 and y0 < ry1 - 0.0001:
-                ys.update({max(y0, ry0), min(y1, ry1)})
         ordered_x = sorted(xs)
         ordered_y = sorted(ys)
         for x_index in range(len(ordered_x) - 1):
@@ -1677,11 +2172,6 @@ def _composite_cell_cuts(
     frozen_cavities: Sequence[Mapping[str, object]],
 ) -> tuple[dict[str, object], ...]:
     cuts: list[dict[str, object]] = []
-    access = _frozen_access_at_cell(
-        final_origin,
-        final_size,
-        frozen_cavities,
-    )
     footprint = _deepest_reservation_at_cell(
         final_origin,
         final_size,
@@ -1689,9 +2179,7 @@ def _composite_cell_cuts(
         kind="footprint",
     )
     selected: list[tuple[str, Mapping[str, object]]] = []
-    if access is not None:
-        selected.append(("frozen_cavity_access", access))
-    elif footprint is not None:
+    if footprint is not None:
         selected.append(("top_inset", footprint))
     else:
         grip = _deepest_reservation_at_cell(
@@ -1704,21 +2192,12 @@ def _composite_cell_cuts(
             selected.append(("top_inset_grip", grip))
     cad_top = final_origin[2] + cad_size[2]
     for cut_index, (kind, reservation) in enumerate(selected):
-        if kind == "frozen_cavity_access":
-            access_zone = reservation.get("access_zone")
-            if not isinstance(access_zone, TopInsetZone):
-                continue
-            cut_bottom = float(access_zone.support_plane_z_mm)
-            reservation_id = str(reservation["cavity_key"])
-            flat_item_id = ""
-            removal_order = -1
-        else:
-            cut_bottom = design_top - float(
-                reservation["inset_depth_from_top_mm"]
-            )
-            reservation_id = str(reservation["id"])
-            flat_item_id = str(reservation["flat_item_id"])
-            removal_order = int(reservation["removal_order"])
+        cut_bottom = design_top - float(
+            reservation["inset_depth_from_top_mm"]
+        )
+        reservation_id = str(reservation["id"])
+        flat_item_id = str(reservation["flat_item_id"])
+        removal_order = int(reservation["removal_order"])
         cut_bottom = max(float(final_origin[2]), cut_bottom)
         if cad_top <= cut_bottom + 0.0001:
             continue
@@ -1743,6 +2222,22 @@ def _composite_cell_cuts(
                 "reservation_id": reservation_id,
                 "flat_item_id": flat_item_id,
                 "placement_id": owner_id,
+                "local_region_id": str(
+                    reservation.get("local_region_id", "")
+                ),
+                "overlapping_reservation_ids": deepcopy(
+                    (
+                        reservation.get("local_region", {}).get(
+                            "overlapping_reservation_ids",
+                            [reservation_id],
+                        )
+                        if isinstance(
+                            reservation.get("local_region"),
+                            Mapping,
+                        )
+                        else [reservation_id]
+                    )
+                ),
                 "removal_order": removal_order,
                 "world_origin_mm": _xyz_payload(world_origin),
                 "local_origin_mm": _xyz_payload(
@@ -1758,6 +2253,10 @@ def _composite_cell_cuts(
                 ),
                 "minimum_floor_mm": 0.0,
                 "cavity_overlap_area_mm2": 0.0,
+                "local_interval_z_mm": {
+                    "bottom": round(cut_bottom, 6),
+                    "top": round(cad_top, 6),
+                },
                 "non_perforating": cut_bottom
                 >= final_origin[2] - 0.0001,
                 "target_prism_id": prism_id,
@@ -1812,11 +2311,60 @@ def _deepest_reservation_at_cell(
         origin[0] + size[0] / 2.0,
         origin[1] + size[1] / 2.0,
     )
-    candidates = [
-        value
-        for value in reservations
-        if _point_in_rectangle(center, _reservation_rectangle(value, kind))
-    ]
+    candidates: list[Mapping[str, object]] = []
+    for value in reservations:
+        if kind != "footprint":
+            if _point_in_rectangle(
+                center,
+                _reservation_rectangle(value, kind),
+            ):
+                candidates.append(value)
+            continue
+        raw_regions = value.get("local_depth_regions", ())
+        if not isinstance(raw_regions, (list, tuple)):
+            raw_regions = ()
+        matched = False
+        for raw_region in raw_regions:
+            if not isinstance(raw_region, Mapping):
+                continue
+            raw_origin = raw_region.get("cut_origin_mm")
+            raw_size = raw_region.get("cut_size_mm")
+            if not isinstance(raw_origin, Mapping) or not isinstance(
+                raw_size,
+                Mapping,
+            ):
+                continue
+            rectangle = (
+                float(raw_origin["x"]),
+                float(raw_origin["y"]),
+                float(raw_origin["x"]) + float(raw_size["x"]),
+                float(raw_origin["y"]) + float(raw_size["y"]),
+            )
+            if _point_in_rectangle(center, rectangle):
+                candidates.append(
+                    {
+                        **dict(value),
+                        "support_plane_z_mm": float(
+                            raw_region["layer_bottom_z_mm"]
+                        ),
+                        "inset_depth_from_top_mm": float(
+                            raw_region["inset_depth_from_top_mm"]
+                        ),
+                        "local_region_id": str(raw_region["id"]),
+                        "local_region": deepcopy(dict(raw_region)),
+                    }
+                )
+                matched = True
+                break
+        if (
+            not matched
+            and not raw_regions
+            and _point_in_rectangle(
+                center,
+                _reservation_rectangle(value, kind),
+            )
+        ):
+            candidates.append(value)
     if not candidates:
         return None
     return min(

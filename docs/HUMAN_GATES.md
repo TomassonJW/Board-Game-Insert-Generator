@@ -1,13 +1,11 @@
 # Human Gates
 
 <!-- P64-L09U-GATE -->
-## P64-L09U-R3-V — future gate profondeur et réservations locales
+## P64-L09U-R3-V — gate profondeur et réservations locales
 
-Statut : `planned-human-gate`, inactive avant l'implémentation, la validation
-automatisée, l'intégration et l'installation de P64-L09U-R3.
+Statut : `ready-human-gate`, candidate 0.1.74.
 
-La future candidate doit préserver les acquis de matérialisation 0.1.73 et
-prouver :
+La candidate préserve les acquis de matérialisation 0.1.73. Thomas vérifie :
 
 1. profondeur calibrée inchangée après finalisation ;
 2. origine Z correcte sans réservation supérieure ;
@@ -19,6 +17,8 @@ prouver :
 7. fidélité aperçu/Fusion, rendu progressif et absence de Combine perdu.
 
 Contrat : `docs/P64_L09U_R3_END_TO_END_RUNBOOK.md`.
+Preuve : `docs/P64_L09U_R3_0174_CORRECTIVE_EVIDENCE.md`.
+Recette : `docs/P64_L09U_R3_V_0174_FUSION_GATE_RECIPE.md`.
 
 Avant verdict : `fusion-validated=false`, `print-validated=false`.
 
