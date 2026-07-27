@@ -717,7 +717,7 @@ class FusionPaletteProjectTests(unittest.TestCase):
         self.assertEqual(finalized["status"], "ready")
         self.assertEqual(
             finalized["operation_activity"]["stop_reason"],
-            "xy_composite_gross_partition_not_found",
+            "xy_composite_residual_owner_not_found",
         )
         self.assertIsNone(finalized["partition"])
         self.assertNotEqual(

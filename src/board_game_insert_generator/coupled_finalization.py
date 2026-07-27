@@ -51,7 +51,7 @@ from board_game_insert_generator.solver_settings import solver_deadline_seconds
 
 COUPLED_FINALIZATION_SCHEMA_V1 = "bgig.coupled_finalization.v1"
 COUPLED_FINALIZATION_FAMILY_ID = "bounded_coupled_finalization"
-COUPLED_FINALIZATION_VERSION = "bgig.bounded_coupled_finalization.v8"
+COUPLED_FINALIZATION_VERSION = "bgig.bounded_coupled_finalization.v9"
 COUPLED_FINALIZATION_POLICY = (
     "global_rectangular_then_vertical_first_continuous_then_bounded_xy_composite"
 )
@@ -487,6 +487,8 @@ def _finalize_coupled_volume_candidate(
             between_bodies_z_mm=problem.z_clearance_mm,
             budget=composite_budget,
             top_inset_zones=problem.top_inset_zones,
+            rectangular_attempt=closure,
+            continuous_prefill=continuous,
         )
         composite_certified = bool(
             composite.status == "closed"
@@ -516,6 +518,35 @@ def _finalize_coupled_volume_candidate(
                     stop_reason="global_deadline_reached_before_xy_composite_certificate",
                 ),
             )
+        if (
+            composite.certificate.get("source_mode")
+            == "continuous_prefill_residual_cells"
+        ):
+            hybrid_candidate = composite
+            composite = close_xy_composite_partition(
+                participants,
+                placements,
+                problem.box,
+                problem.storage_height_mm,
+                problem.xy_clearance_mm,
+                box_perimeter_xy_mm=problem.box_xy_clearance_mm,
+                between_bodies_z_mm=problem.z_clearance_mm,
+                budget=composite_budget,
+                top_inset_zones=problem.top_inset_zones,
+            )
+            if not (
+                composite.status == "closed"
+                and composite.certificate.get("certified") is True
+            ):
+                raise CoupledFinalizationError(
+                    "La fermeture hybride est certifiee, mais son certificat produit et CAD IR relevent de la mission F.",
+                    _xy_composite_report(
+                        closure,
+                        hybrid_candidate,
+                        budget=budget,
+                        stop_reason="xy_composite_product_certificate_v2_required",
+                    ),
+                )
         composite_strategy = SolverStrategy(
             COUPLED_FINALIZATION_FAMILY_ID,
             COUPLED_FINALIZATION_VERSION,
@@ -1278,7 +1309,10 @@ def _xy_composite_report(
         stop_reason=stop_reason,
         rejection_codes=rejection_codes,
         budget=budget,
-        deadline_reached=bool(composite.gross_closure.deadline_reached),
+        deadline_reached=bool(
+            composite.gross_closure.deadline_reached
+            or composite.stop_reason == "xy_composite_deadline_reached"
+        ),
     )
     report.update(
         {

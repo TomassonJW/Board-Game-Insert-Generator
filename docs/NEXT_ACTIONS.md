@@ -1,7 +1,7 @@
 # Next Actions
 
 <!-- P64-L09T-NEXT -->
-## Action courante : executer P64-L09T-E
+## Action courante : executer P64-L09T-F
 
 Thomas a accepte ADR-0093 et autorise l'execution autonome sequentielle du
 programme P64-L09T :
@@ -10,8 +10,8 @@ programme P64-L09T :
 2. P64-L09T-B : `done`, diagnostics d'arret structures et UI explicable ;
 3. P64-L09T-C : `done`, poses automatiques, migration et parois certifiees ;
 4. P64-L09T-D : `done`, classement lexicographique plancher d'abord ;
-5. P64-L09T-E : mission suivante, fermeture hybride reelle ;
-6. P64-L09T-F : certificat composite et CAD fidele ;
+5. P64-L09T-E : `done`, fermeture hybride v2 automatisee-validee ;
+6. P64-L09T-F : mission suivante, certificat composite et CAD fidele ;
 7. P64-L09T-G : durcissement, nouvelle candidate, installation et preflight ;
 8. P64-L09T-V : observation Fusion humaine.
 
@@ -45,6 +45,12 @@ Preuve D : `docs/P64_L09T_D_FLOOR_FIRST_RANKING_EVIDENCE.md`.
 Validation D : `107/107` tests cibles, `19/19` pour la lane SCIP avec une
 integration native ignoree, puis gate globale autorisee `863/863` en
 `286.898 s`. Les onze modules benchmark/corpus/tournoi restent exclus.
+
+Preuve E : `docs/P64_L09T_E_HYBRID_COMPOSITE_CLOSURE_EVIDENCE.md`.
+Validation E : `45/45` tests cibles, regression produit `1/1`, puis gate
+globale autorisee `860/860` en `280.807 s`, avec une integration SCIP native
+ignoree. Douze modules benchmark/corpus/tournoi sont exclus a partir de E :
+l'adaptateur benchmark lie a l'identite v9 n'est pas regenere pendant le Goal.
 
 <!-- P64-L09S-0168-NEXT -->
 ## Action courante : cloture corrective et gate P64-L09S-V

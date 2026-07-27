@@ -3,9 +3,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from time import perf_counter
 from typing import Mapping, Sequence
 
+from board_game_insert_generator.free_3d_continuous_closure import (
+    Free3DClosureResult,
+)
 from board_game_insert_generator.free_3d_greedy_solver import (
+    EmptySpace,
     Free3DPlacement,
     TopInsetZone,
 )
@@ -17,9 +22,12 @@ from board_game_insert_generator.incremental_project_state import canonical_dige
 from board_game_insert_generator.solver_contract import SolverBudget
 
 
-XY_COMPOSITE_CLOSURE_VERSION = "bgig.xy_composite_closure.v1"
+XY_COMPOSITE_CLOSURE_VERSION = "bgig.xy_composite_closure.v2"
 XY_COMPOSITE_CERTIFICATE_SCHEMA_V1 = (
     "bgig.xy_composite_partition_certificate.v1"
+)
+XY_COMPOSITE_CERTIFICATE_SCHEMA_V2 = (
+    "bgig.xy_composite_partition_certificate.v2"
 )
 _EPSILON = 0.0001
 
@@ -64,6 +72,26 @@ class _RawPrism:
         return self.size[0] * self.size[1] * self.size[2]
 
 
+@dataclass(frozen=True)
+class _AttachmentOption:
+    residual_index: int
+    owner_id: str
+    parent_index: int
+    axis: str
+    annex: _RawPrism
+    seam_area_mm2: float
+    internal_gap_mm: float
+
+
+@dataclass(frozen=True)
+class _VerticalExtensionOption:
+    residual_index: int
+    owner_id: str
+    parent_index: int
+    replacement: tuple[_RawPrism, ...]
+    vertical_gap_mm: float
+
+
 def close_xy_composite_partition(
     participants: Sequence[Mapping[str, object]],
     placements: Sequence[Free3DPlacement],
@@ -75,8 +103,35 @@ def close_xy_composite_partition(
     between_bodies_z_mm: float,
     budget: SolverBudget,
     top_inset_zones: Sequence[TopInsetZone] = (),
+    rectangular_attempt: GlobalRectangularClosureResult | None = None,
+    continuous_prefill: Free3DClosureResult | None = None,
 ) -> XYCompositeClosureResult:
-    """Build connected same-base XY prisms after one gross rectangular solve."""
+    """Build connected XY annexes after rectangular extensions."""
+
+    if continuous_prefill is not None and continuous_prefill.empty_spaces:
+        gross_attempt = rectangular_attempt or close_global_rectangular_partition(
+            participants,
+            placements,
+            box,
+            storage_height_mm,
+            xy_clearance_mm,
+            box_perimeter_xy_mm=box_perimeter_xy_mm,
+            between_bodies_z_mm=between_bodies_z_mm,
+            budget=budget,
+            top_inset_zones=top_inset_zones,
+        )
+        return _close_hybrid_residual(
+            placements,
+            continuous_prefill,
+            gross_attempt,
+            box,
+            storage_height_mm,
+            xy_clearance_mm,
+            box_perimeter_xy_mm=box_perimeter_xy_mm,
+            between_bodies_z_mm=between_bodies_z_mm,
+            budget=budget,
+            top_inset_zones=top_inset_zones,
+        )
 
     gross = close_global_rectangular_partition(
         participants,
@@ -178,6 +233,1166 @@ def xy_composite_closure_to_dict(
             result.gross_closure.partition_certificate
         ),
     }
+
+
+def _close_hybrid_residual(
+    source_placements: Sequence[Free3DPlacement],
+    prefill: Free3DClosureResult,
+    gross_attempt: GlobalRectangularClosureResult,
+    box: Mapping[str, object],
+    storage_height_mm: float,
+    xy_clearance_mm: float,
+    *,
+    box_perimeter_xy_mm: float,
+    between_bodies_z_mm: float,
+    budget: SolverBudget,
+    top_inset_zones: Sequence[TopInsetZone],
+) -> XYCompositeClosureResult:
+    deadline_at = perf_counter() + max(
+        0.001,
+        float(
+            dict(budget.limits).get(
+                "max_closure_elapsed_ms",
+                1_000,
+            )
+        )
+        / 1_000.0,
+    )
+    max_cells = max(
+        1,
+        int(dict(budget.limits).get("max_closure_candidates", 10_000)),
+    )
+    all_residual_cells, cell_rejection = _disjoint_residual_cells(
+        prefill.empty_spaces,
+        prefill.placements,
+        top_inset_zones,
+        max_cells=max_cells,
+        deadline_at=deadline_at,
+    )
+    if cell_rejection:
+        return _failure(cell_rejection, gross_attempt)
+    source_by_id = {
+        value.participant_id: value for value in source_placements
+    }
+    prefill_by_id = {
+        value.participant_id: value for value in prefill.placements
+    }
+    if set(source_by_id) != set(prefill_by_id):
+        return _failure(
+            "xy_composite_prefill_owner_set_mismatch",
+            gross_attempt,
+        )
+    raw_by_owner: dict[str, list[_RawPrism]] = {
+        owner_id: [
+            _RawPrism(
+                tuple(prefill_by_id[owner_id].origin_mm),
+                tuple(prefill_by_id[owner_id].world_size_mm),
+            )
+        ]
+        for owner_id in sorted(prefill_by_id)
+    }
+    technical_corridors = tuple(
+        value
+        for value in all_residual_cells
+        if _is_external_clearance_corridor(
+            value,
+            raw_by_owner,
+            float(xy_clearance_mm),
+        )
+    )
+    residual_cells = tuple(
+        value
+        for value in all_residual_cells
+        if value not in technical_corridors
+    )
+    pending = list(residual_cells)
+    initial_residual_volume = sum(value.volume() for value in pending)
+    assigned_residual_volume = 0.0
+    removed_internal_clearance_volume = 0.0
+    assignment_trace: list[dict[str, object]] = []
+
+    while pending:
+        if perf_counter() >= deadline_at:
+            return _failure(
+                "xy_composite_deadline_reached",
+                gross_attempt,
+                certificate={
+                    "residual_cell_count": len(residual_cells),
+                    "unassigned_residual_cell_count": len(pending),
+                    "source_minimum_envelopes_frozen": True,
+                    "continuous_prefill_digest": prefill.deterministic_digest,
+                    "assignment_trace": assignment_trace,
+                    "unassigned_residual_signatures": [
+                        list(_raw_signature(value)) for value in pending
+                    ],
+                },
+            )
+        vertical_options: list[
+            tuple[tuple[object, ...], _VerticalExtensionOption]
+        ] = []
+        for residual_index, residual in enumerate(pending):
+            for option in _vertical_extension_options(
+                residual_index,
+                residual,
+                raw_by_owner,
+                float(xy_clearance_mm),
+                float(between_bodies_z_mm),
+                top_inset_zones,
+            ):
+                current = raw_by_owner[option.owner_id]
+                projected = _merge_prisms(
+                    (
+                        *current[: option.parent_index],
+                        *option.replacement,
+                        *current[option.parent_index + 1 :],
+                    )
+                )
+                vertical_options.append(
+                    (
+                        (
+                            round(option.vertical_gap_mm, 6),
+                            max(0, len(projected) - 1),
+                            option.owner_id,
+                            _raw_signature(residual),
+                            option.parent_index,
+                        ),
+                        option,
+                    )
+                )
+        if vertical_options:
+            _, selected_vertical = min(
+                vertical_options,
+                key=lambda value: value[0],
+            )
+            residual = pending.pop(selected_vertical.residual_index)
+            current = raw_by_owner[selected_vertical.owner_id]
+            previous_volume = sum(value.volume() for value in current)
+            projected = _merge_prisms(
+                (
+                    *current[: selected_vertical.parent_index],
+                    *selected_vertical.replacement,
+                    *current[selected_vertical.parent_index + 1 :],
+                )
+            )
+            raw_by_owner[selected_vertical.owner_id] = list(projected)
+            added_volume = (
+                sum(value.volume() for value in projected)
+                - previous_volume
+            )
+            bridge_volume = max(0.0, added_volume - residual.volume())
+            assigned_residual_volume += residual.volume()
+            removed_internal_clearance_volume += bridge_volume
+            assignment_trace.append(
+                {
+                    "residual_signature": list(_raw_signature(residual)),
+                    "owner_id": selected_vertical.owner_id,
+                    "attachment_axis": "rectangular_z_extension",
+                    "seam_area_mm2": 0.0,
+                    "internal_gap_removed_mm": round(
+                        selected_vertical.vertical_gap_mm,
+                        6,
+                    ),
+                    "internal_gap_removed_volume_mm3": round(
+                        bridge_volume,
+                        6,
+                    ),
+                }
+            )
+            if (
+                sum(len(values) for values in raw_by_owner.values())
+                > max_cells
+            ):
+                return _failure(
+                    "xy_composite_prism_budget_exhausted",
+                    gross_attempt,
+                )
+            continue
+        options: list[
+            tuple[
+                tuple[object, ...],
+                _AttachmentOption,
+            ]
+        ] = []
+        options_by_residual: dict[int, int] = {}
+        for residual_index, residual in enumerate(pending):
+            residual_options = _attachment_options(
+                residual_index,
+                residual,
+                raw_by_owner,
+                float(xy_clearance_mm),
+                float(between_bodies_z_mm),
+                top_inset_zones,
+            )
+            options_by_residual[residual_index] = len(residual_options)
+            for option in residual_options:
+                current = raw_by_owner[option.owner_id]
+                projected = _merge_prisms((*current, option.annex))
+                added_by_owner = {
+                    owner_id: sum(value.volume() for value in values)
+                    - _volume(prefill_by_id[owner_id].world_size_mm)
+                    for owner_id, values in raw_by_owner.items()
+                }
+                projected_added = (
+                    sum(value.volume() for value in projected)
+                    - _volume(
+                        prefill_by_id[option.owner_id].world_size_mm
+                    )
+                )
+                added_by_owner[option.owner_id] = projected_added
+                added_values = tuple(added_by_owner.values())
+                imbalance = (
+                    max(added_values) - min(added_values)
+                    if added_values
+                    else 0.0
+                )
+                annex_count = max(0, len(projected) - 1)
+                corner_proxy = annex_count * 8
+                longest_face = max(
+                    option.annex.size[0],
+                    option.annex.size[1],
+                )
+                rank = (
+                    options_by_residual[residual_index],
+                    annex_count,
+                    corner_proxy,
+                    round(option.seam_area_mm2, 6),
+                    round(imbalance, 6),
+                    -round(longest_face, 6),
+                    option.owner_id,
+                    _raw_signature(residual),
+                    option.parent_index,
+                    option.axis,
+                )
+                options.append((rank, option))
+        if not options:
+            unassigned_volume = sum(value.volume() for value in pending)
+            return _failure(
+                "xy_composite_residual_owner_not_found",
+                gross_attempt,
+                certificate={
+                    "residual_cell_count": len(residual_cells),
+                    "unassigned_residual_cell_count": len(pending),
+                    "printable_residual_volume_mm3": round(
+                        unassigned_volume,
+                        6,
+                    ),
+                    "source_minimum_envelopes_frozen": True,
+                    "continuous_prefill_digest": prefill.deterministic_digest,
+                    "assignment_trace": assignment_trace,
+                    "unassigned_residual_signatures": [
+                        list(_raw_signature(value)) for value in pending
+                    ],
+                },
+            )
+        _, selected = min(options, key=lambda value: value[0])
+        residual = pending.pop(selected.residual_index)
+        owner_prisms = raw_by_owner[selected.owner_id]
+        owner_prisms.append(selected.annex)
+        raw_by_owner[selected.owner_id] = list(
+            _merge_prisms(owner_prisms)
+        )
+        assigned_residual_volume += residual.volume()
+        bridge_volume = max(
+            0.0,
+            selected.annex.volume() - residual.volume(),
+        )
+        removed_internal_clearance_volume += bridge_volume
+        assignment_trace.append(
+            {
+                "residual_signature": list(_raw_signature(residual)),
+                "owner_id": selected.owner_id,
+                "attachment_axis": selected.axis,
+                "seam_area_mm2": round(selected.seam_area_mm2, 6),
+                "internal_gap_removed_mm": round(
+                    selected.internal_gap_mm,
+                    6,
+                ),
+                "internal_gap_removed_volume_mm3": round(
+                    bridge_volume,
+                    6,
+                ),
+            }
+        )
+        if sum(len(values) for values in raw_by_owner.values()) > max_cells:
+            return _failure(
+                "xy_composite_prism_budget_exhausted",
+                gross_attempt,
+            )
+
+    owners: list[CompositeOwnerBody] = []
+    for owner_id in sorted(raw_by_owner):
+        raw = tuple(raw_by_owner[owner_id])
+        owner = _owner_contract(
+            source_by_id[owner_id],
+            prefill_by_id[owner_id],
+            raw,
+            0.0,
+            expected_composite_volume=sum(
+                value.volume() for value in raw
+            ),
+        )
+        if owner.certificate.get("certified") is not True:
+            return _failure(
+                str(
+                    owner.certificate.get(
+                        "stop_reason",
+                        "xy_composite_owner_certificate_rejected",
+                    )
+                ),
+                gross_attempt,
+                certificate=owner.certificate,
+            )
+        owners.append(owner)
+    certificate = _hybrid_certificate(
+        owners,
+        source_placements,
+        prefill.placements,
+        box,
+        storage_height_mm,
+        box_perimeter_xy_mm,
+        xy_clearance_mm,
+        between_bodies_z_mm,
+        top_inset_zones,
+        residual_cell_count=len(residual_cells),
+        initial_residual_volume=initial_residual_volume,
+        assigned_residual_volume=assigned_residual_volume,
+        internal_clearance_removed_volume=(
+            removed_internal_clearance_volume
+        ),
+        external_corridor_count=len(technical_corridors),
+        external_corridor_volume=sum(
+            value.volume() for value in technical_corridors
+        ),
+        assignment_trace=assignment_trace,
+    )
+    if certificate.get("certified") is not True:
+        return _failure(
+            str(
+                certificate.get(
+                    "stop_reason",
+                    "xy_composite_hybrid_certificate_rejected",
+                )
+            ),
+            gross_attempt,
+            certificate=certificate,
+        )
+    digest = canonical_digest(
+        {
+            "schema_version": XY_COMPOSITE_CLOSURE_VERSION,
+            "source_mode": "continuous_prefill_residual_cells",
+            "continuous_prefill_digest": prefill.deterministic_digest,
+            "owners": [_owner_payload(value) for value in owners],
+            "certificate": certificate,
+        }
+    )
+    return XYCompositeClosureResult(
+        status="closed",
+        owner_bodies=tuple(owners),
+        gross_closure=gross_attempt,
+        certificate=certificate,
+        deterministic_digest=digest,
+        stop_reason="xy_composite_residual_partition_complete",
+    )
+
+
+def _disjoint_residual_cells(
+    spaces: Sequence[EmptySpace],
+    placements: Sequence[Free3DPlacement],
+    zones: Sequence[TopInsetZone],
+    *,
+    max_cells: int,
+    deadline_at: float,
+) -> tuple[tuple[_RawPrism, ...], str]:
+    if not spaces:
+        return (), ""
+    x_values: set[float] = set()
+    y_values: set[float] = set()
+    z_values: set[float] = set()
+    for space in spaces:
+        for axis, values in enumerate((x_values, y_values, z_values)):
+            values.add(_coordinate(space.origin_mm[axis]))
+            values.add(
+                _coordinate(
+                    space.origin_mm[axis] + space.size_mm[axis]
+                )
+            )
+    for placement in placements:
+        for axis, values in enumerate((x_values, y_values, z_values)):
+            values.add(_coordinate(placement.origin_mm[axis]))
+            values.add(
+                _coordinate(
+                    placement.origin_mm[axis]
+                    + placement.world_size_mm[axis]
+                )
+            )
+    for zone in zones:
+        x_values.update(
+            {
+                _coordinate(zone.origin_xy_mm[0]),
+                _coordinate(
+                    zone.origin_xy_mm[0] + zone.size_xy_mm[0]
+                ),
+            }
+        )
+        y_values.update(
+            {
+                _coordinate(zone.origin_xy_mm[1]),
+                _coordinate(
+                    zone.origin_xy_mm[1] + zone.size_xy_mm[1]
+                ),
+            }
+        )
+        z_values.update(
+            {
+                _coordinate(zone.support_plane_z_mm),
+                _coordinate(
+                    zone.support_plane_z_mm + zone.inset_depth_mm
+                ),
+            }
+        )
+    axes = (
+        tuple(sorted(x_values)),
+        tuple(sorted(y_values)),
+        tuple(sorted(z_values)),
+    )
+    indexes = [
+        {value: index for index, value in enumerate(axis_values)}
+        for axis_values in axes
+    ]
+    occupied: set[tuple[int, int, int]] = set()
+    for space in spaces:
+        if perf_counter() >= deadline_at:
+            return (), "xy_composite_deadline_reached"
+        lower = tuple(
+            indexes[axis][_coordinate(space.origin_mm[axis])]
+            for axis in range(3)
+        )
+        upper = tuple(
+            indexes[axis][
+                _coordinate(
+                    space.origin_mm[axis] + space.size_mm[axis]
+                )
+            ]
+            for axis in range(3)
+        )
+        for x_index in range(lower[0], upper[0]):
+            for y_index in range(lower[1], upper[1]):
+                for z_index in range(lower[2], upper[2]):
+                    if perf_counter() >= deadline_at:
+                        return (), "xy_composite_deadline_reached"
+                    occupied.add((x_index, y_index, z_index))
+                    if len(occupied) > max_cells:
+                        return (), "xy_composite_residual_cell_budget_exhausted"
+    raw = [
+        _RawPrism(
+            (
+                axes[0][index[0]],
+                axes[1][index[1]],
+                axes[2][index[2]],
+            ),
+            (
+                axes[0][index[0] + 1] - axes[0][index[0]],
+                axes[1][index[1] + 1] - axes[1][index[1]],
+                axes[2][index[2] + 1] - axes[2][index[2]],
+            ),
+        )
+        for index in sorted(occupied)
+        if all(
+            axes[axis][index[axis] + 1]
+            - axes[axis][index[axis]]
+            > _EPSILON
+            for axis in range(3)
+        )
+    ]
+    return tuple(sorted(raw, key=_raw_signature)), ""
+
+
+def _vertical_extension_options(
+    residual_index: int,
+    residual: _RawPrism,
+    raw_by_owner: Mapping[str, Sequence[_RawPrism]],
+    xy_clearance_mm: float,
+    z_clearance_mm: float,
+    zones: Sequence[TopInsetZone],
+) -> tuple[_VerticalExtensionOption, ...]:
+    options: list[_VerticalExtensionOption] = []
+    residual_upper_z = residual.origin[2] + residual.size[2]
+    for owner_id in sorted(raw_by_owner):
+        owner_prisms = raw_by_owner[owner_id]
+        for parent_index, parent in enumerate(owner_prisms):
+            parent_upper_z = parent.origin[2] + parent.size[2]
+            gap = residual.origin[2] - parent_upper_z
+            if gap < -_EPSILON or gap > z_clearance_mm + _EPSILON:
+                continue
+            if not _contains_xy(parent, residual):
+                continue
+            replacement = _split_and_raise(
+                parent,
+                residual,
+                residual_upper_z,
+            )
+            projected = (
+                *owner_prisms[:parent_index],
+                *replacement,
+                *owner_prisms[parent_index + 1 :],
+            )
+            if any(
+                _raw_intersection_volume(left, right) > _EPSILON
+                for left_index, left in enumerate(projected)
+                for right in projected[left_index + 1 :]
+            ):
+                continue
+            if any(
+                _raw_intersects_zone(value, zone)
+                for value in replacement
+                for zone in zones
+            ):
+                continue
+            if any(
+                not _raw_prisms_separated(
+                    value,
+                    other,
+                    xy_clearance_mm,
+                    z_clearance_mm,
+                )
+                for value in replacement
+                for other_owner, other_values in raw_by_owner.items()
+                if other_owner != owner_id
+                for other in other_values
+            ):
+                continue
+            options.append(
+                _VerticalExtensionOption(
+                    residual_index,
+                    owner_id,
+                    parent_index,
+                    replacement,
+                    max(0.0, gap),
+                )
+            )
+    return tuple(options)
+
+
+def _is_external_clearance_corridor(
+    residual: _RawPrism,
+    raw_by_owner: Mapping[str, Sequence[_RawPrism]],
+    xy_clearance_mm: float,
+) -> bool:
+    if xy_clearance_mm <= _EPSILON:
+        return False
+    for axis in (0, 1):
+        if abs(residual.size[axis] - xy_clearance_mm) > _EPSILON:
+            continue
+        orthogonal = 1 - axis
+        lower_owners: set[str] = set()
+        upper_owners: set[str] = set()
+        residual_lower = residual.origin[axis]
+        residual_upper = residual_lower + residual.size[axis]
+        residual_orthogonal_lower = residual.origin[orthogonal]
+        residual_orthogonal_upper = (
+            residual_orthogonal_lower + residual.size[orthogonal]
+        )
+        for owner_id, values in raw_by_owner.items():
+            for value in values:
+                value_orthogonal_lower = value.origin[orthogonal]
+                value_orthogonal_upper = (
+                    value_orthogonal_lower + value.size[orthogonal]
+                )
+                covers_orthogonal = bool(
+                    value_orthogonal_lower
+                    <= residual_orthogonal_lower + _EPSILON
+                    and value_orthogonal_upper
+                    >= residual_orthogonal_upper - _EPSILON
+                )
+                if not covers_orthogonal:
+                    continue
+                value_lower = value.origin[axis]
+                value_upper = value_lower + value.size[axis]
+                if abs(value_upper - residual_lower) <= _EPSILON:
+                    lower_owners.add(owner_id)
+                if abs(value_lower - residual_upper) <= _EPSILON:
+                    upper_owners.add(owner_id)
+        if any(
+            lower_owner != upper_owner
+            for lower_owner in lower_owners
+            for upper_owner in upper_owners
+        ):
+            return True
+    return False
+
+
+def _contains_xy(parent: _RawPrism, child: _RawPrism) -> bool:
+    return bool(
+        parent.origin[0] <= child.origin[0] + _EPSILON
+        and parent.origin[1] <= child.origin[1] + _EPSILON
+        and parent.origin[0] + parent.size[0]
+        >= child.origin[0] + child.size[0] - _EPSILON
+        and parent.origin[1] + parent.size[1]
+        >= child.origin[1] + child.size[1] - _EPSILON
+    )
+
+
+def _split_and_raise(
+    parent: _RawPrism,
+    residual: _RawPrism,
+    target_upper_z: float,
+) -> tuple[_RawPrism, ...]:
+    x_values = sorted(
+        {
+            parent.origin[0],
+            residual.origin[0],
+            residual.origin[0] + residual.size[0],
+            parent.origin[0] + parent.size[0],
+        }
+    )
+    y_values = sorted(
+        {
+            parent.origin[1],
+            residual.origin[1],
+            residual.origin[1] + residual.size[1],
+            parent.origin[1] + parent.size[1],
+        }
+    )
+    values: list[_RawPrism] = []
+    for x_index in range(len(x_values) - 1):
+        for y_index in range(len(y_values) - 1):
+            x0, x1 = x_values[x_index], x_values[x_index + 1]
+            y0, y1 = y_values[y_index], y_values[y_index + 1]
+            if x1 - x0 <= _EPSILON or y1 - y0 <= _EPSILON:
+                continue
+            inside_residual_xy = bool(
+                x0 >= residual.origin[0] - _EPSILON
+                and x1
+                <= residual.origin[0] + residual.size[0] + _EPSILON
+                and y0 >= residual.origin[1] - _EPSILON
+                and y1
+                <= residual.origin[1] + residual.size[1] + _EPSILON
+            )
+            upper_z = (
+                target_upper_z
+                if inside_residual_xy
+                else parent.origin[2] + parent.size[2]
+            )
+            values.append(
+                _RawPrism(
+                    (x0, y0, parent.origin[2]),
+                    (
+                        x1 - x0,
+                        y1 - y0,
+                        upper_z - parent.origin[2],
+                    ),
+                )
+            )
+    return _merge_prisms(values)
+
+
+def _attachment_options(
+    residual_index: int,
+    residual: _RawPrism,
+    raw_by_owner: Mapping[str, Sequence[_RawPrism]],
+    xy_clearance_mm: float,
+    z_clearance_mm: float,
+    zones: Sequence[TopInsetZone],
+) -> tuple[_AttachmentOption, ...]:
+    options: list[_AttachmentOption] = []
+    for owner_id in sorted(raw_by_owner):
+        owner_prisms = raw_by_owner[owner_id]
+        if not owner_prisms:
+            continue
+        owner_base = owner_prisms[0].origin[2]
+        residual_upper_z = residual.origin[2] + residual.size[2]
+        if residual_upper_z <= owner_base + _EPSILON:
+            continue
+        lowered_residual = _RawPrism(
+            (
+                residual.origin[0],
+                residual.origin[1],
+                owner_base,
+            ),
+            (
+                residual.size[0],
+                residual.size[1],
+                residual_upper_z - owner_base,
+            ),
+        )
+        for parent_index, parent in enumerate(owner_prisms):
+            for axis, annex, seam_area, gap in _bridge_options(
+                parent,
+                lowered_residual,
+                xy_clearance_mm,
+            ):
+                if any(
+                    _raw_intersection_volume(annex, value) > _EPSILON
+                    for index, value in enumerate(owner_prisms)
+                    if index != parent_index
+                ):
+                    continue
+                if any(_raw_intersects_zone(annex, zone) for zone in zones):
+                    continue
+                if any(
+                    not _raw_prisms_separated(
+                        annex,
+                        other,
+                        xy_clearance_mm,
+                        z_clearance_mm,
+                    )
+                    for other_owner, other_values in raw_by_owner.items()
+                    if other_owner != owner_id
+                    for other in other_values
+                ):
+                    continue
+                options.append(
+                    _AttachmentOption(
+                        residual_index,
+                        owner_id,
+                        parent_index,
+                        axis,
+                        annex,
+                        seam_area,
+                        gap,
+                    )
+                )
+    return tuple(options)
+
+
+def _bridge_options(
+    parent: _RawPrism,
+    residual: _RawPrism,
+    maximum_gap: float,
+) -> tuple[tuple[str, _RawPrism, float, float], ...]:
+    parent_upper = tuple(
+        parent.origin[axis] + parent.size[axis] for axis in range(3)
+    )
+    residual_upper = tuple(
+        residual.origin[axis] + residual.size[axis] for axis in range(3)
+    )
+    overlap_z = min(parent_upper[2], residual_upper[2]) - max(
+        parent.origin[2],
+        residual.origin[2],
+    )
+    if overlap_z <= _EPSILON:
+        return ()
+    options: list[tuple[str, _RawPrism, float, float]] = []
+    overlap_y = min(parent_upper[1], residual_upper[1]) - max(
+        parent.origin[1],
+        residual.origin[1],
+    )
+    if overlap_y > _EPSILON:
+        if parent_upper[0] <= residual.origin[0] + _EPSILON:
+            gap = residual.origin[0] - parent_upper[0]
+            if -_EPSILON <= gap <= maximum_gap + _EPSILON:
+                options.append(
+                    (
+                        "x",
+                        _RawPrism(
+                            (
+                                parent_upper[0],
+                                residual.origin[1],
+                                residual.origin[2],
+                            ),
+                            (
+                                residual_upper[0] - parent_upper[0],
+                                residual.size[1],
+                                residual.size[2],
+                            ),
+                        ),
+                        overlap_y * overlap_z,
+                        max(0.0, gap),
+                    )
+                )
+        if residual_upper[0] <= parent.origin[0] + _EPSILON:
+            gap = parent.origin[0] - residual_upper[0]
+            if -_EPSILON <= gap <= maximum_gap + _EPSILON:
+                options.append(
+                    (
+                        "x",
+                        _RawPrism(
+                            residual.origin,
+                            (
+                                parent.origin[0] - residual.origin[0],
+                                residual.size[1],
+                                residual.size[2],
+                            ),
+                        ),
+                        overlap_y * overlap_z,
+                        max(0.0, gap),
+                    )
+                )
+    overlap_x = min(parent_upper[0], residual_upper[0]) - max(
+        parent.origin[0],
+        residual.origin[0],
+    )
+    if overlap_x > _EPSILON:
+        if parent_upper[1] <= residual.origin[1] + _EPSILON:
+            gap = residual.origin[1] - parent_upper[1]
+            if -_EPSILON <= gap <= maximum_gap + _EPSILON:
+                options.append(
+                    (
+                        "y",
+                        _RawPrism(
+                            (
+                                residual.origin[0],
+                                parent_upper[1],
+                                residual.origin[2],
+                            ),
+                            (
+                                residual.size[0],
+                                residual_upper[1] - parent_upper[1],
+                                residual.size[2],
+                            ),
+                        ),
+                        overlap_x * overlap_z,
+                        max(0.0, gap),
+                    )
+                )
+        if residual_upper[1] <= parent.origin[1] + _EPSILON:
+            gap = parent.origin[1] - residual_upper[1]
+            if -_EPSILON <= gap <= maximum_gap + _EPSILON:
+                options.append(
+                    (
+                        "y",
+                        _RawPrism(
+                            residual.origin,
+                            (
+                                residual.size[0],
+                                parent.origin[1] - residual.origin[1],
+                                residual.size[2],
+                            ),
+                        ),
+                        overlap_x * overlap_z,
+                        max(0.0, gap),
+                    )
+                )
+    return tuple(
+        sorted(
+            options,
+            key=lambda value: (
+                round(value[2], 6),
+                value[0],
+                _raw_signature(value[1]),
+            ),
+        )
+    )
+
+
+def _hybrid_certificate(
+    owners: Sequence[CompositeOwnerBody],
+    source_placements: Sequence[Free3DPlacement],
+    prefill_placements: Sequence[Free3DPlacement],
+    box: Mapping[str, object],
+    storage_height_mm: float,
+    box_perimeter_xy_mm: float,
+    xy_clearance_mm: float,
+    z_clearance_mm: float,
+    zones: Sequence[TopInsetZone],
+    *,
+    residual_cell_count: int,
+    initial_residual_volume: float,
+    assigned_residual_volume: float,
+    internal_clearance_removed_volume: float,
+    external_corridor_count: int,
+    external_corridor_volume: float,
+    assignment_trace: Sequence[Mapping[str, object]],
+) -> dict[str, object]:
+    owner_prisms = {
+        owner.owner_id: tuple(
+            _RawPrism(value.origin_mm, value.size_mm)
+            for value in owner.prisms
+        )
+        for owner in owners
+    }
+    external_clearances = all(
+        _raw_prisms_separated(
+            left,
+            right,
+            xy_clearance_mm,
+            z_clearance_mm,
+        )
+        for left_index, left_owner in enumerate(sorted(owner_prisms))
+        for right_owner in sorted(owner_prisms)[left_index + 1 :]
+        for left in owner_prisms[left_owner]
+        for right in owner_prisms[right_owner]
+    )
+    reservations_excluded = all(
+        not _raw_intersects_zone(prism, zone)
+        for values in owner_prisms.values()
+        for prism in values
+        for zone in zones
+    )
+    sources_frozen = all(
+        owner.certificate.get("minimum_envelope_contained_by_union") is True
+        and owner.source_placement == next(
+            value
+            for value in source_placements
+            if value.participant_id == owner.owner_id
+        )
+        for owner in owners
+    )
+    owner_connections = all(
+        owner.certificate.get(
+            "all_annexes_connected_by_vertical_xy_faces"
+        )
+        is True
+        for owner in owners
+    )
+    support_certified = all(
+        value.origin_mm[2] <= _EPSILON
+        or value.support_coverage_ratio + _EPSILON >= 0.25
+        for value in prefill_placements
+    )
+    residual = max(
+        0.0,
+        initial_residual_volume - assigned_residual_volume,
+    )
+    composite_volume = sum(
+        _volume(prism.size_mm)
+        for owner in owners
+        for prism in owner.prisms
+    )
+    root_volume = max(
+        0.0,
+        (float(box["x"]) - 2.0 * box_perimeter_xy_mm)
+        * (float(box["y"]) - 2.0 * box_perimeter_xy_mm)
+        * float(storage_height_mm),
+    )
+    reservation_volume = _reservation_union_volume(
+        zones,
+        box,
+        storage_height_mm,
+        box_perimeter_xy_mm,
+    )
+    technical_void_volume = max(
+        0.0,
+        root_volume - reservation_volume - composite_volume,
+    )
+    certified = bool(
+        owners
+        and all(
+            owner.certificate.get("certified") is True for owner in owners
+        )
+        and external_clearances
+        and reservations_excluded
+        and sources_frozen
+        and owner_connections
+        and support_certified
+        and residual <= _EPSILON
+    )
+    return {
+        "schema_version": XY_COMPOSITE_CERTIFICATE_SCHEMA_V2,
+        "certified": certified,
+        "source_mode": "continuous_prefill_residual_cells",
+        "owner_count": len(owners),
+        "residual_cell_count": residual_cell_count,
+        "assigned_residual_cell_count": len(assignment_trace),
+        "initial_printable_residual_volume_mm3": round(
+            initial_residual_volume,
+            6,
+        ),
+        "assigned_residual_volume_mm3": round(
+            assigned_residual_volume,
+            6,
+        ),
+        "printable_residual_volume_mm3": (
+            0.0 if residual <= _EPSILON else round(residual, 6)
+        ),
+        "internal_clearance_removed_volume_mm3": round(
+            internal_clearance_removed_volume,
+            6,
+        ),
+        "preserved_external_corridor_count": external_corridor_count,
+        "preserved_external_corridor_volume_mm3": round(
+            external_corridor_volume,
+            6,
+        ),
+        "composite_body_volume_mm3": round(composite_volume, 6),
+        "reserved_subtraction_volume_mm3": round(
+            reservation_volume,
+            6,
+        ),
+        "technical_void_volume_mm3": round(
+            technical_void_volume,
+            6,
+        ),
+        "source_minimum_envelopes_frozen": sources_frozen,
+        "cavity_world_poses_unchanged": sources_frozen,
+        "external_clearances_certified": external_clearances,
+        "top_reservations_excluded": reservations_excluded,
+        "owner_unions_connected": owner_connections,
+        "annex_support_certified": support_certified,
+        "internal_owner_annex_clearance_mm": 0.0,
+        "unions_before_cavities_and_reservation_cuts": True,
+        "partition_complete_by_construction": certified,
+        "assignment_policy": [
+            "fewest_owner_options",
+            "fewest_annexes",
+            "fewest_corner_proxy",
+            "smallest_seam_area",
+            "lowest_added_volume_imbalance",
+            "longest_common_face",
+            "stable_owner_and_cell_identity",
+        ],
+        "assignment_trace": [dict(value) for value in assignment_trace],
+        "stop_reason": (
+            "xy_composite_hybrid_certificate_accepted"
+            if certified
+            else "xy_composite_hybrid_certificate_rejected"
+        ),
+    }
+
+
+def _raw_prisms_separated(
+    left: _RawPrism,
+    right: _RawPrism,
+    xy_clearance_mm: float,
+    z_clearance_mm: float,
+) -> bool:
+    gaps = []
+    for axis in range(3):
+        left_upper = left.origin[axis] + left.size[axis]
+        right_upper = right.origin[axis] + right.size[axis]
+        if left_upper <= right.origin[axis] + _EPSILON:
+            gaps.append(max(0.0, right.origin[axis] - left_upper))
+        elif right_upper <= left.origin[axis] + _EPSILON:
+            gaps.append(max(0.0, left.origin[axis] - right_upper))
+        else:
+            gaps.append(-1.0)
+    return bool(
+        gaps[0] + _EPSILON >= xy_clearance_mm
+        or gaps[1] + _EPSILON >= xy_clearance_mm
+        or gaps[2] + _EPSILON >= z_clearance_mm
+    )
+
+
+def _raw_intersects_zone(
+    prism: _RawPrism,
+    zone: TopInsetZone,
+) -> bool:
+    zone_origin = (
+        float(zone.origin_xy_mm[0]),
+        float(zone.origin_xy_mm[1]),
+        float(zone.support_plane_z_mm),
+    )
+    zone_size = (
+        float(zone.size_xy_mm[0]),
+        float(zone.size_xy_mm[1]),
+        float(zone.inset_depth_mm),
+    )
+    return all(
+        prism.origin[axis]
+        < zone_origin[axis] + zone_size[axis] - _EPSILON
+        and zone_origin[axis]
+        < prism.origin[axis] + prism.size[axis] - _EPSILON
+        for axis in range(3)
+    )
+
+
+def _raw_intersection_volume(
+    left: _RawPrism,
+    right: _RawPrism,
+) -> float:
+    volume = 1.0
+    for axis in range(3):
+        lower = max(left.origin[axis], right.origin[axis])
+        upper = min(
+            left.origin[axis] + left.size[axis],
+            right.origin[axis] + right.size[axis],
+        )
+        volume *= max(0.0, upper - lower)
+    return volume
+
+
+def _reservation_union_volume(
+    zones: Sequence[TopInsetZone],
+    box: Mapping[str, object],
+    storage_height_mm: float,
+    perimeter: float,
+) -> float:
+    prisms: list[_RawPrism] = []
+    for zone in zones:
+        lower = (
+            max(perimeter, float(zone.origin_xy_mm[0])),
+            max(perimeter, float(zone.origin_xy_mm[1])),
+            max(0.0, float(zone.support_plane_z_mm)),
+        )
+        upper = (
+            min(
+                float(box["x"]) - perimeter,
+                float(zone.origin_xy_mm[0] + zone.size_xy_mm[0]),
+            ),
+            min(
+                float(box["y"]) - perimeter,
+                float(zone.origin_xy_mm[1] + zone.size_xy_mm[1]),
+            ),
+            min(
+                float(storage_height_mm),
+                float(zone.support_plane_z_mm + zone.inset_depth_mm),
+            ),
+        )
+        if all(upper[axis] > lower[axis] + _EPSILON for axis in range(3)):
+            prisms.append(
+                _RawPrism(
+                    lower,
+                    tuple(
+                        upper[axis] - lower[axis] for axis in range(3)
+                    ),
+                )
+            )
+    return _orthogonal_union_volume(prisms)
+
+
+def _orthogonal_union_volume(prisms: Sequence[_RawPrism]) -> float:
+    if not prisms:
+        return 0.0
+    axes = tuple(
+        sorted(
+            {
+                _coordinate(value.origin[axis])
+                for value in prisms
+            }
+            | {
+                _coordinate(value.origin[axis] + value.size[axis])
+                for value in prisms
+            }
+        )
+        for axis in range(3)
+    )
+    volume = 0.0
+    for x_index in range(len(axes[0]) - 1):
+        for y_index in range(len(axes[1]) - 1):
+            for z_index in range(len(axes[2]) - 1):
+                center = (
+                    (axes[0][x_index] + axes[0][x_index + 1]) / 2.0,
+                    (axes[1][y_index] + axes[1][y_index + 1]) / 2.0,
+                    (axes[2][z_index] + axes[2][z_index + 1]) / 2.0,
+                )
+                if not any(
+                    all(
+                        value.origin[axis] - _EPSILON
+                        <= center[axis]
+                        <= value.origin[axis]
+                        + value.size[axis]
+                        + _EPSILON
+                        for axis in range(3)
+                    )
+                    for value in prisms
+                ):
+                    continue
+                volume += (
+                    (axes[0][x_index + 1] - axes[0][x_index])
+                    * (axes[1][y_index + 1] - axes[1][y_index])
+                    * (axes[2][z_index + 1] - axes[2][z_index])
+                )
+    return volume
+
+
+def _raw_signature(value: _RawPrism) -> tuple[float, ...]:
+    return tuple(
+        _coordinate(number) for number in value.origin + value.size
+    )
+
+
+def _coordinate(value: float) -> float:
+    return round(float(value), 6)
 
 
 def _decompose_owner(
@@ -311,6 +1526,8 @@ def _owner_contract(
     gross: Free3DPlacement,
     raw: Sequence[_RawPrism],
     subtracted_volume: float,
+    *,
+    expected_composite_volume: float | None = None,
 ) -> CompositeOwnerBody:
     if not raw:
         certificate = {
@@ -385,7 +1602,11 @@ def _owner_contract(
         sum(_intersection_volume_raw(value, source) for value in raw)
         - _volume(source.world_size_mm)
     ) <= max(_EPSILON, _volume(source.world_size_mm) * 1e-9)
-    gross_volume = _volume(gross.world_size_mm)
+    gross_volume = (
+        float(expected_composite_volume)
+        if expected_composite_volume is not None
+        else _volume(gross.world_size_mm)
+    )
     composite_volume = sum(value.volume() for value in raw)
     volume_error = abs(gross_volume - subtracted_volume - composite_volume)
     certified = bool(

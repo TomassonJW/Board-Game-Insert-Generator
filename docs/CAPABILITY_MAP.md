@@ -1,7 +1,7 @@
 # Capability Map
 
 <!-- P64-L09T-CAPABILITY -->
-## P64-L09T — missions A a D automatisees-validees
+## P64-L09T — missions A a E automatisees-validees
 
 - `C-STAGED-CALCULATION` : `automated-validated`. Toute edition geometrique
   rend minimal et final obsoletes ; seul Calculer peut republier un minimal.
@@ -14,14 +14,15 @@
 - `C-RESERVATION` / `C-CERTIFICATE` : `automated-validated`. La pose haute,
   l'ordre, les prismes et l'enveloppe de paroi existante sont certifies. Le
   plan minimal fige la pose reutilisee par la finition.
-- `C-PARTITION` / `C-COMPOSITE` : `architecture-accepted`. La finition hybride
-  peut attribuer directement le residuel a des annexes, sans exiger d'abord une
-  fermeture brute complete.
+- `C-PARTITION` / `C-COMPOSITE` : `automated-validated`. La finition hybride
+  reprend le pre-remplissage continu, decompose les EMS en cellules disjointes,
+  tente les extensions rectangulaires puis attribue directement le residuel
+  aux annexes sans exiger une fermeture brute complete.
 - `C-TOLERANCE` : aucun default ne change. La couture annexe/proprietaire est
   interne, sans jeu ; tous les jeux externes et l'epaisseur de paroi existante
   restent normatifs.
-- `C-CAD-IR` / `C-FUSION` : planifies pour certifier et materialiser les vrais
-  corps composites, unions avant cavites et coupes.
+- `C-CAD-IR` / `C-FUSION` : planifies pour F. E fournit le certificat
+  geometrique v2 mais ne publie pas encore ces corps dans le CAD IR.
 - `C-FUSION-UI` : `automated-validated` pour le cycle explicite et les
   diagnostics d'arret. La palette expose phase, temps/plafond et nature du
   verdict, garde les compteurs techniques replies et refuse de transformer un
@@ -29,10 +30,11 @@
   l'UI affiche seulement la pose automatique calculee.
 - `C-FINISHING-COMPLEMENTS` : `deferred`. Cales separees, separateurs sans fond
   et conteneurs generes appartiennent a P64-F03.
-- `C-QUALITY` : P64-L09T-D passe `107/107`, puis `19/19` avec une integration
-  SCIP native ignoree, et la gate globale autorisee `863/863` en `286.898 s`.
-  Onze modules benchmark/corpus/tournoi restent exclus par le contrat. 0.1.69
-  reste `human-KO`, `do-not-run`. P64-L09T-E devient la mission suivante.
+- `C-QUALITY` : P64-L09T-E passe `45/45`, une regression produit `1/1`, puis
+  la gate globale autorisee `860/860` en `280.807 s`, avec un test SCIP natif
+  ignore. Douze modules benchmark/corpus/tournoi sont exclus sans regenerer
+  d'artefact. 0.1.69 reste `human-KO`, `do-not-run`. P64-L09T-F devient la
+  mission suivante.
 - `C-PRINT` : inchangee, `print-validated=false`.
 
 Cette validation reste automatisee : `fusion-validated=false`,

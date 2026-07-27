@@ -1,11 +1,11 @@
 # Status
 
 <!-- P64-L09T-STATUS -->
-## P64-L09T — Goal actif, missions A a D automatisees-validees
+## P64-L09T — Goal actif, missions A a E automatisees-validees
 
 Date : 2026-07-27.
 
-Statut : `goal-active`, `P64-L09T-D-automated-validated`.
+Statut : `goal-active`, `P64-L09T-E-automated-validated`.
 
 - La gate 0.1.69 est `human-KO`, `do-not-run`. La jauge fluide, les minima et
   la cavite orientee restent des acquis positifs partiels.
@@ -46,6 +46,18 @@ Statut : `goal-active`, `P64-L09T-D-automated-validated`.
   pas n'est jamais une conclusion d'impossibilite.
 - Les axes du rang sont visibles dans les metriques, le portefeuille, les
   candidats de finition et le witness persistant.
+- La fermeture hybride v2 part du pre-remplissage continu reel, conserve ses
+  extensions rectangulaires, decompose les espaces vides qui se chevauchent
+  puis attribue les cellules imprimables sans partition brute prealable.
+- Les cellules superieures admissibles deviennent d'abord des extensions
+  rectangulaires locales. Les autres annexes exigent une vraie face X/Y, un
+  bas Z commun et un proprietaire unique.
+- Les coutures internes ont un jeu nul. Les corridors entre proprietaires,
+  reservations hautes, minima et poses de cavite restent inchanges et
+  certifies par `bgig.xy_composite_partition_certificate.v2`.
+- Le certificat produit commun et le CAD IR v2 restent la frontiere F. E
+  conserve le chemin materialisable v1 lorsqu'il existe et refuse toute
+  publication partielle si seule la proposition v2 reussit.
 - Le certificat devra proteger l'epaisseur de paroi existante entre cavite et
   reservation.
 - La finition cible extensions rectangulaires puis annexes soudees ; la couture
@@ -69,6 +81,10 @@ Statut : `goal-active`, `P64-L09T-D-automated-validated`.
   integration native ignoree. La gate globale autorisee passe `863/863` en
   `286.898 s`, avec un test ignore. Les onze modules benchmark/corpus/tournoi
   restent exclus et aucun de leurs artefacts n'est recalcule.
+- Validation E : `45/45` tests cibles, regression produit `1/1`, puis gate
+  globale autorisee `860/860` en `280.807 s`, avec un test SCIP natif ignore.
+  Douze modules benchmark/corpus/tournoi sont exclus ; l'adaptateur lie a
+  l'identite v9 est ajoute sans regenerer son artefact canonique.
 
 Programme : `docs/P64_L09T_END_TO_END_GOAL_RUNBOOK.md`.
 Preuve : `docs/P64_L09S_V_0169_HUMAN_KO_EVIDENCE.md`.
@@ -79,9 +95,10 @@ Preuve B :
 Preuve C :
 `docs/P64_L09T_C_AUTOMATIC_TOP_RESERVATIONS_EVIDENCE.md`.
 Preuve D : `docs/P64_L09T_D_FLOOR_FIRST_RANKING_EVIDENCE.md`.
+Preuve E : `docs/P64_L09T_E_HYBRID_COMPOSITE_CLOSURE_EVIDENCE.md`.
 
-Prochaine action : integrer P64-L09T-D dans `main`, puis executer P64-L09T-E
-sur la fermeture hybride reelle.
+Prochaine action : integrer P64-L09T-E dans `main`, puis executer P64-L09T-F
+sur le certificat composite et le CAD fidele.
 `fusion-validated=false`, `print-validated=false`.
 
 <!-- P64-L09S-0168-STATUS -->

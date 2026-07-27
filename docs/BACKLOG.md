@@ -46,14 +46,15 @@
 
 ### P64-L09T-E — Fermeture hybride
 
-- Statut : `ready-after-P64-L09T-D-integration`.
+- Statut : `done`, `automated-validated`.
 - Extensions rectangulaires, puis decomposition et attribution du residuel.
 - Couture interne sans jeu ; jeux externes, cavites et reservations preserves.
 - Annexes soutenues, face X/Y reelle, bas Z commun et proprietaire unique.
+- Preuve : `docs/P64_L09T_E_HYBRID_COMPOSITE_CLOSURE_EVIDENCE.md`.
 
 ### P64-L09T-F — Certificat composite et CAD
 
-- Statut : `waiting-for-P64-L09T-E`.
+- Statut : `ready-after-P64-L09T-E-integration`.
 - Certifier les vrais corps composites, pas seulement la fermeture brute.
 - Figer les cavites, unir avant cavites/coupes et publier un composant par
   proprietaire seulement avec residuel nul.
