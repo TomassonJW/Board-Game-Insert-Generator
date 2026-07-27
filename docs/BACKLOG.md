@@ -19,7 +19,8 @@
 
 ### P64-L09U-R2-V — Gate humaine Fusion 0.1.73
 
-- Statut : `pending-installation`.
+- Statut : `ready-human-gate`, `prepared-not-human-observed`.
+- Package 0.1.73 du commit `b5fb15b` installé et vérifié.
 - Vérifier fidélité aperçu/Fusion et dimensions des cavités.
 - Chronométrer les matérialisations minimale et finale.
 - Rejouer `CasLimite01+`, sa variante sans plateau, `CasLimite02+` et

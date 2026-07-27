@@ -78,7 +78,16 @@ ne crée aucune feature Combine rectangulaire.
 - modules benchmark/holdout/corpus/tournoi exclus : `12` ;
 - test ignoré : `1`, intégration SCIP native indisponible sous Python 3.10.
 
-L'installation réelle est consignée ici après l'intégration du commit.
+## Installation et préparation de la gate
+
+- package installé : `0.1.73` ;
+- commit du paquet : `b5fb15b` ;
+- manifeste, marqueur de commit et quatre marqueurs du chemin booléen
+  transitoire : vérifiés ;
+- réglages installés : aucun projet courant persistant ;
+- fixture, résumé de preflight et résumé des replays : préparés dans le dossier
+  personnel de projets ;
+- SHA-256 des trois projets personnels : inchangés après installation.
 
 ## Limites et statut
 
@@ -88,4 +97,4 @@ L'installation réelle est consignée ici après l'intégration du commit.
   visible de l'API Fusion.
 - `fusion-validated=false`.
 - `print-validated=false`.
-- Gate : `prepared-not-human-observed` après intégration et installation.
+- Gate : `ready-human-gate`, `prepared-not-human-observed`.

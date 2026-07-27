@@ -1,7 +1,7 @@
 # Next Actions
 
 <!-- P64-L09U-NEXT -->
-## Action courante : clôturer puis exécuter la gate P64-L09U-R2-V
+## Action courante : exécuter la gate P64-L09U-R2-V
 
 0.1.72 est `human-KO`, `do-not-run`. Son calcul et sa finalisation pouvaient
 réussir, mais la matérialisation finale n'était ni fidèle ni robuste.
@@ -16,8 +16,9 @@ réussir, mais la matérialisation finale n'était ni fidèle ni robuste.
    module, persisté une seule fois ;
 6. conserve le rollback et rend la main à l'interface entre les modules.
 
-Codex termine la suite globale, intègre, installe puis vérifie 0.1.73. Thomas
-suit ensuite uniquement
+La suite globale est passée, 0.1.73 est intégrée dans `origin/main`, puis le
+package du commit `b5fb15b` a été installé et vérifié. Thomas suit maintenant
+uniquement
 `docs/P64_L09U_R2_V_0173_FUSION_GATE_RECIPE.md`.
 
 Preflight source :

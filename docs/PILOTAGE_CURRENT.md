@@ -33,10 +33,11 @@
 - Le préparateur sec passe avec `109/109` tests ciblés et six replays exacts en
   lecture seule. La suite globale autorisée passe `886/886` en `363.209 s`,
   avec une intégration SCIP native ignorée et douze modules interdits exclus.
-- L'installation réelle après intégration est la dernière clôture automatisée.
+- Le package 0.1.73 du commit `b5fb15b` est installé et vérifié dans Fusion ;
+  la session démarre sans projet courant et les artefacts de recette sont prêts.
 - Les jobs annulables, miniatures de variantes et épaisseur distincte de
   séparateur restent cadrés par ADR-0095 à ADR-0097 et hors de R2.
-- Prochaine action unique après intégration : gate humaine P64-L09U-R2-V selon
+- Prochaine action unique : gate humaine P64-L09U-R2-V selon
   `docs/P64_L09U_R2_V_0173_FUSION_GATE_RECIPE.md`.
 - Aucun benchmark/holdout, aucune valeur physique nouvelle ;
   `fusion-validated=false`, `print-validated=false`.

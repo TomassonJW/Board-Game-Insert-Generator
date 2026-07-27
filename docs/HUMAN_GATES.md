@@ -20,6 +20,10 @@ jeux de fermeture et l'empilement tardif, puis matérialise un seul corps
 transitoire booléenné par module sans feature Combine rectangulaire. Thomas
 observe :
 
+Préparation automatique : `ready-human-gate`, package 0.1.73 du commit
+`b5fb15b` installé et vérifié. Fermer complètement Fusion avant le replay pour
+ne pas conserver l'ancien code Python en mémoire.
+
 1. version 0.1.73 après fermeture complète de Fusion ;
 2. second démarrage vierge et calcul réellement explicite ;
 3. matérialisation minimale puis finale de `CasLimite01+` ;

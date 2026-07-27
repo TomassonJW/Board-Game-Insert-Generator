@@ -6,7 +6,8 @@
 Date : 2026-07-27.
 
 Statut : `P64-L09U-R2-automated-validated`,
-`P64-L09U-R2-V-pending-installation`.
+`P64-L09U-R2-V-ready-human-gate`,
+`prepared-not-human-observed`.
 
 - 0.1.72 est `human-KO`, `do-not-run`.
 - La finalisation utilise exactement le plan minimal courant ; la sélection
@@ -31,7 +32,11 @@ Statut : `P64-L09U-R2-automated-validated`,
 - Matrice ciblée du préparateur : `109/109`.
 - Suite globale autorisée : `886/886` en `363.209 s`, avec une intégration
   SCIP native ignorée et douze modules benchmark/holdout/corpus/tournoi exclus.
-- Installation locale : à exécuter après intégration du commit.
+- Installation locale : package 0.1.73 du commit `b5fb15b` installé et vérifié ;
+  manifeste, marqueur de commit, code transitoire et démarrage sans projet
+  courant conformes.
+- Artefacts de gate préparés dans le dossier personnel de projets ; les SHA-256
+  de `CasLimite01+`, `CasLimite01++` et `CasLimite02+` restent inchangés.
 - Aucun benchmark/holdout et aucune valeur physique nouvelle.
 
 Décision :
@@ -41,7 +46,7 @@ Preuve :
 Recette :
 `docs/P64_L09U_R2_V_0173_FUSION_GATE_RECIPE.md`.
 
-Prochaine action : clôture automatisée, installation, puis P64-L09U-R2-V.
+Prochaine action : P64-L09U-R2-V, observation humaine dans Fusion.
 `fusion-validated=false`, `print-validated=false`.
 
 ### Historique R1 supersédé
