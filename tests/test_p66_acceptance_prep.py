@@ -170,7 +170,22 @@ class P66AcceptancePreparationTests(unittest.TestCase):
         self.assertIsNone(preflight["fusion_generation_plan"])
         self.assertIn("CONTAINER_MINIMUM_BLOCKED", {item["code"] for item in preflight["partition"]["diagnostics"]})
         self.assertEqual(response["partition"]["summary"]["status"], "not_constructed")
-        self.assertEqual(finalized["status"], "invalid")
+        self.assertEqual(finalized["status"], "ready")
+        self.assertIsNone(finalized["partition"])
+        self.assertEqual(
+            finalized["solver_result"]["status"],
+            "no_solution_within_budget",
+        )
+        diagnostics = finalized["solver_result"]["stop_diagnostics"]
+        self.assertEqual(
+            diagnostics["outcome_kind"],
+            "prerequisite_missing",
+        )
+        self.assertEqual(
+            diagnostics["phase"],
+            "prerequis",
+        )
+        self.assertFalse(diagnostics["proof_of_impossibility"])
         self.assertEqual(materialized["status"], "invalid")
         self.assertIsNone(materialized["cad_build"])
         self.assertFalse(persisted)

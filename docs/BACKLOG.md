@@ -20,13 +20,15 @@
 
 ### P64-L09T-B — Diagnostics d'arret
 
-- Statut : `ready-after-P64-L09T-A-integration`.
+- Statut : `done`, `automated-validated`.
 - Exposer temps/plafond, phase, motif traduit, candidats et nature du verdict.
 - Ne jamais presenter une recherche bornee comme une impossibilite.
+- Preuve :
+  `docs/P64_L09T_B_EXPLAINABLE_FINALIZATION_STOPS_EVIDENCE.md`.
 
 ### P64-L09T-C — Reservations automatiques et parois
 
-- Statut : `waiting-for-P64-L09T-B`.
+- Statut : `ready-after-P64-L09T-B-integration`.
 - Chercher les poses X/Y des plateaux/livrets, maintenir leur Z haut et leur
   nature virtuelle.
 - Retirer les origines X/Y du parcours normal et migrer les anciens projets.

@@ -180,16 +180,48 @@ def _finish_bridge_operation(
         succeeded=succeeded,
         stop_reason=_operation_stop_reason(action, response),
     )
-    result_timing = _calculation_result_timing(action, response)
+    result_timing = _operation_result_timing(action, response)
     if result_timing is not None:
         terminal["result_timing"] = result_timing
     return terminal
 
 
-def _calculation_result_timing(
+def _operation_result_timing(
     action: str,
     response: dict[str, object],
 ) -> dict[str, object] | None:
+    if action == "finalize_project":
+        result = response.get("solver_result")
+        diagnostics = (
+            result.get("stop_diagnostics")
+            if isinstance(result, dict)
+            else None
+        )
+        if not isinstance(diagnostics, dict):
+            staged = response.get("staged_calculation")
+            finalized = (
+                staged.get("finalized_plan")
+                if isinstance(staged, dict)
+                else None
+            )
+            attempt = (
+                finalized.get("last_attempt")
+                if isinstance(finalized, dict)
+                else None
+            )
+            diagnostics = (
+                attempt.get("stop_diagnostics")
+                if isinstance(attempt, dict)
+                else None
+            )
+        if not isinstance(diagnostics, dict):
+            return None
+        if (
+            diagnostics.get("schema_version")
+            != "bgig.finalization_stop_diagnostics.v1"
+        ):
+            return None
+        return deepcopy(diagnostics)
     if action != "solve_project":
         return None
     staged = response.get("staged_calculation")

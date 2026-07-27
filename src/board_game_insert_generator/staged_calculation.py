@@ -18,8 +18,12 @@ from board_game_insert_generator.coupled_finalization import (
     COUPLED_FINALIZATION_POLICY,
     COUPLED_FINALIZATION_VERSION,
     CoupledFinalizationError,
+    coupled_finalization_budget,
     coupled_finalization_budget_digest,
     finalize_coupled_volume,
+)
+from board_game_insert_generator.finalization_stop_diagnostics import (
+    attach_finalization_stop_diagnostics,
 )
 from board_game_insert_generator.incremental_project_state import (
     STAGE_FINALIZED_PLAN,
@@ -88,6 +92,7 @@ class FinalizationRequestToken:
     source_minimal_value_digest: str
     finalization_key_digest: str
     effort_profile: str
+    started_at_ms: int
 
 
 SolverCallable = Callable[..., dict[str, object]]
@@ -340,11 +345,37 @@ class StagedCalculationSession:
     ) -> dict[str, object]:
         """Create a distinct final artifact through one explicit bounded run."""
 
-        if not self._minimal_current():
-            raise StagedCalculationError(
-                "Calcule un agencement minimal courant avant de choisir une finition."
-            )
         effort_profile = normalize_effort_profile(finishing_effort_profile)
+        budget = coupled_finalization_budget(effort_profile)
+        budget_cap_ms = int(dict(budget.limits)["max_total_elapsed_ms"])
+        if not self._minimal_current():
+            self._finalization_effort_profile = effort_profile
+            report = attach_finalization_stop_diagnostics(
+                {
+                    "schema_version": "bgig.coupled_finalization.v1",
+                    "status": NO_SOLUTION_WITHIN_BUDGET,
+                    "stop_reason": "minimal_layout_missing_or_stale",
+                    "rejection_codes": [],
+                    "materializable": False,
+                    "partial_plan_published": False,
+                    "minimal_artifact_preserved": False,
+                    "finishing_effort_profile": effort_profile,
+                    "budget": {
+                        "family_id": budget.family_id,
+                        "effort_profile": budget.effort_profile,
+                        "limits": dict(budget.limits),
+                    },
+                },
+                elapsed_ms=0,
+                budget_cap_ms=budget_cap_ms,
+            )
+            self._global_stop_reason = "minimal_layout_missing_or_stale"
+            self._finalization_attempt = report
+            return {
+                "partition": None,
+                "solver_result": _finalization_solver_result(report),
+                "staged_calculation": self.snapshot(),
+            }
         source_minimal_artifact_digest = self._global_artifact_digest
         source_minimal_value_digest = canonical_digest(self._global_partition)
         uses_default_finalizer = finalizer is None
@@ -418,8 +449,17 @@ class StagedCalculationSession:
                 if not self._accept_finalization_request(token):
                     return self._stale_finalization_result(token)
                 self._finish_finalization_request(token)
+                elapsed_ms = max(
+                    0,
+                    self._monotonic_ms() - token.started_at_ms,
+                )
+                report = attach_finalization_stop_diagnostics(
+                    exc.report,
+                    elapsed_ms=elapsed_ms,
+                    budget_cap_ms=budget_cap_ms,
+                )
                 self._global_stop_reason = str(
-                    exc.report.get(
+                    report.get(
                         "stop_reason",
                         "coupled_finalization_rejected",
                     )
@@ -427,7 +467,7 @@ class StagedCalculationSession:
                 if not uses_default_finalizer:
                     raise
                 self._finalization_attempt = {
-                    **deepcopy(exc.report),
+                    **report,
                     "source_minimal_artifact_digest": (
                         source_minimal_artifact_digest
                     ),
@@ -436,7 +476,7 @@ class StagedCalculationSession:
                 }
                 return {
                     "partition": None,
-                    "solver_result": _finalization_solver_result(exc.report),
+                    "solver_result": _finalization_solver_result(report),
                     "staged_calculation": self.snapshot(),
                 }
             if not isinstance(candidate, dict):
@@ -449,18 +489,31 @@ class StagedCalculationSession:
             if not validator(candidate):
                 self._finish_finalization_request(token)
                 self._global_stop_reason = "finalization_certificate_rejected"
-                self._finalization_attempt = {
-                    "schema_version": "bgig.coupled_finalization.v1",
-                    "status": NO_SOLUTION_WITHIN_BUDGET,
-                    "stop_reason": "finalization_certificate_rejected",
-                    "materializable": False,
-                    "partial_plan_published": False,
-                    "source_minimal_artifact_digest": (
-                        source_minimal_artifact_digest
+                self._finalization_attempt = attach_finalization_stop_diagnostics(
+                    {
+                        "schema_version": "bgig.coupled_finalization.v1",
+                        "status": NO_SOLUTION_WITHIN_BUDGET,
+                        "stop_reason": "finalization_certificate_rejected",
+                        "rejection_codes": [],
+                        "materializable": False,
+                        "partial_plan_published": False,
+                        "source_minimal_artifact_digest": (
+                            source_minimal_artifact_digest
+                        ),
+                        "finishing_effort_profile": effort_profile,
+                        "minimal_artifact_preserved": self._minimal_current(),
+                        "budget": {
+                            "family_id": budget.family_id,
+                            "effort_profile": budget.effort_profile,
+                            "limits": dict(budget.limits),
+                        },
+                    },
+                    elapsed_ms=max(
+                        0,
+                        self._monotonic_ms() - token.started_at_ms,
                     ),
-                    "finishing_effort_profile": effort_profile,
-                    "minimal_artifact_preserved": self._minimal_current(),
-                }
+                    budget_cap_ms=budget_cap_ms,
+                )
                 raise StagedCalculationError(
                     "La finalisation a ete rejetee ; le plan minimal courant est conserve."
                 )
@@ -492,33 +545,50 @@ class StagedCalculationSession:
         self._finalization_cache_status = lookup.status
         self._finalization_policy = finishing_policy
         finalization = _mapping(finalized.get("finalization", {}))
-        self._finalization_attempt = {
-            "schema_version": str(
-                finalization.get(
-                    "schema_version",
-                    "bgig.coupled_finalization.v1",
-                )
+        self._finalization_attempt = attach_finalization_stop_diagnostics(
+            {
+                "schema_version": str(
+                    finalization.get(
+                        "schema_version",
+                        "bgig.coupled_finalization.v1",
+                    )
+                ),
+                "status": SOLUTION_FOUND,
+                "stop_reason": "global_finalization_certified",
+                "materializable": True,
+                "partial_plan_published": False,
+                "source_minimal_artifact_digest": (
+                    source_minimal_artifact_digest
+                ),
+                "finishing_effort_profile": effort_profile,
+                "minimal_artifact_preserved": (
+                    canonical_digest(self._global_partition)
+                    == source_minimal_value_digest
+                ),
+                "closure_status": finalization.get(
+                    "closure_status", "not_reported"
+                ),
+                "iterations": finalization.get("iterations", 0),
+                "candidates_evaluated": finalization.get(
+                    "candidates_evaluated", 0
+                ),
+                "repair_attempts": finalization.get("repair_attempts", 0),
+                "repairs_applied": finalization.get("repairs_applied", 0),
+                "global_resolve_invocation_count": finalization.get(
+                    "global_resolve_invocation_count", 0
+                ),
+                "budget": {
+                    "family_id": budget.family_id,
+                    "effort_profile": budget.effort_profile,
+                    "limits": dict(budget.limits),
+                },
+            },
+            elapsed_ms=max(
+                0,
+                self._monotonic_ms() - token.started_at_ms,
             ),
-            "status": SOLUTION_FOUND,
-            "stop_reason": "global_finalization_certified",
-            "materializable": True,
-            "partial_plan_published": False,
-            "source_minimal_artifact_digest": (
-                source_minimal_artifact_digest
-            ),
-            "finishing_effort_profile": effort_profile,
-            "minimal_artifact_preserved": (
-                canonical_digest(self._global_partition)
-                == source_minimal_value_digest
-            ),
-            "closure_status": finalization.get("closure_status", "not_reported"),
-            "iterations": finalization.get("iterations", 0),
-            "repair_attempts": finalization.get("repair_attempts", 0),
-            "repairs_applied": finalization.get("repairs_applied", 0),
-            "global_resolve_invocation_count": finalization.get(
-                "global_resolve_invocation_count", 0
-            ),
-        }
+            budget_cap_ms=budget_cap_ms,
+        )
         return {
             "partition": deepcopy(finalized),
             "solver_result": _partition_solver_result(finalized),
@@ -839,6 +909,7 @@ class StagedCalculationSession:
             source_minimal_value_digest=source_minimal_value_digest,
             finalization_key_digest=key.digest,
             effort_profile=effort_profile,
+            started_at_ms=self._monotonic_ms(),
         )
         self._active_finalization_request = token
         return token
@@ -871,22 +942,37 @@ class StagedCalculationSession:
     ) -> dict[str, object]:
         self._finish_finalization_request(token)
         self._global_stop_reason = "finalization_result_stale"
-        self._finalization_attempt = {
-            "schema_version": "bgig.coupled_finalization.v1",
-            "status": STALE_OR_CANCELLED,
-            "stop_reason": "finalization_result_stale",
-            "materializable": False,
-            "partial_plan_published": False,
-            "source_minimal_artifact_digest": (
-                token.source_minimal_artifact_digest
+        budget = coupled_finalization_budget(token.effort_profile)
+        self._finalization_attempt = attach_finalization_stop_diagnostics(
+            {
+                "schema_version": "bgig.coupled_finalization.v1",
+                "status": STALE_OR_CANCELLED,
+                "stop_reason": "finalization_result_stale",
+                "materializable": False,
+                "partial_plan_published": False,
+                "source_minimal_artifact_digest": (
+                    token.source_minimal_artifact_digest
+                ),
+                "finishing_effort_profile": token.effort_profile,
+                "minimal_artifact_preserved": bool(
+                    self._global_partition is not None
+                    and token.source_minimal_value_digest
+                    == canonical_digest(self._global_partition)
+                ),
+                "budget": {
+                    "family_id": budget.family_id,
+                    "effort_profile": budget.effort_profile,
+                    "limits": dict(budget.limits),
+                },
+            },
+            elapsed_ms=max(
+                0,
+                self._monotonic_ms() - token.started_at_ms,
             ),
-            "finishing_effort_profile": token.effort_profile,
-            "minimal_artifact_preserved": bool(
-                self._global_partition is not None
-                and token.source_minimal_value_digest
-                == canonical_digest(self._global_partition)
+            budget_cap_ms=int(
+                dict(budget.limits)["max_total_elapsed_ms"]
             ),
-        }
+        )
         return {
             "partition": None,
             "solver_result": _finalization_solver_result(
@@ -1058,6 +1144,7 @@ def _finalization_solver_result(
     status = str(report.get("status", NO_SOLUTION_WITHIN_BUDGET))
     if status not in {NO_SOLUTION_WITHIN_BUDGET, STALE_OR_CANCELLED}:
         status = NO_SOLUTION_WITHIN_BUDGET
+    diagnostics = _mapping(report.get("stop_diagnostics", {}))
     counters = {
         key: value
         for key, value in report.items()
@@ -1072,6 +1159,9 @@ def _finalization_solver_result(
         and isinstance(value, int)
         and not isinstance(value, bool)
     }
+    counters.update(
+        deepcopy(_mapping(diagnostics.get("counters", {})))
+    )
     return {
         "schema_version": SOLVER_RESULT_SCHEMA_V1,
         "status": status,
@@ -1079,6 +1169,7 @@ def _finalization_solver_result(
         "legacy_summary_status": "not_constructed",
         "proof": None,
         "materializable": False,
+        "stop_diagnostics": deepcopy(diagnostics),
         "telemetry": {
             "schema_version": SOLVER_TELEMETRY_SCHEMA_V1,
             "family": {
@@ -1086,12 +1177,15 @@ def _finalization_solver_result(
                 "version": COUPLED_FINALIZATION_VERSION,
             },
             "request": {"id": "not_applicable", "revision": "not_applicable"},
-            "elapsed_ms": "not_applicable",
+            "elapsed_ms": diagnostics.get(
+                "elapsed_ms", "not_applicable"
+            ),
             "budgets": deepcopy(_mapping(report.get("budget", {}))),
             "counters": counters,
             "prunes": {},
             "diagnostic_code_counts": {str(code): 1 for code in report.get("rejection_codes", [])},
             "stop_reason": str(report.get("stop_reason", "coupled_finalization_rejected")),
+            "stop_diagnostics": deepcopy(diagnostics),
         },
     }
 

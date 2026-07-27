@@ -441,6 +441,43 @@ class StagedCalculationTests(unittest.TestCase):
             cad["materialization"]["top_inset_cut_count"],
         )
 
+    def test_finishing_without_current_minimal_returns_explainable_result(
+        self,
+    ) -> None:
+        project = _project()
+        session = StagedCalculationSession(project, solver_settings=SETTINGS)
+        _synchronize(session, project, _engine(project))
+
+        result = session.finalize_volume(
+            finishing_effort_profile="quick",
+        )
+
+        self.assertIsNone(result["partition"])
+        self.assertEqual(
+            result["solver_result"]["status"],
+            "no_solution_within_budget",
+        )
+        diagnostics = result["solver_result"]["stop_diagnostics"]
+        self.assertEqual(
+            diagnostics["schema_version"],
+            "bgig.finalization_stop_diagnostics.v1",
+        )
+        self.assertEqual(
+            diagnostics["outcome_kind"],
+            "prerequisite_missing",
+        )
+        self.assertEqual(diagnostics["phase"], "prerequis")
+        self.assertEqual(diagnostics["elapsed_ms"], 0)
+        self.assertEqual(diagnostics["budget_cap_ms"], 3_000)
+        self.assertTrue(diagnostics["stopped_before_cap"])
+        self.assertFalse(diagnostics["proof_of_impossibility"])
+        self.assertEqual(
+            result["staged_calculation"]["finalized_plan"][
+                "finishing_effort_profile"
+            ],
+            "quick",
+        )
+
     def test_total_finishing_timeout_preserves_exact_minimal_artifact(self) -> None:
         project = _project()
         engine = _engine(project)
@@ -471,6 +508,16 @@ class StagedCalculationTests(unittest.TestCase):
             failed["solver_result"]["telemetry"]["stop_reason"],
             "global_deadline_reached_before_final_certificate",
         )
+        diagnostics = failed["solver_result"]["stop_diagnostics"]
+        self.assertEqual(diagnostics["outcome_kind"], "deadline_reached")
+        self.assertEqual(diagnostics["phase"], "certificat_final")
+        self.assertEqual(diagnostics["budget_cap_ms"], 3_000)
+        self.assertFalse(diagnostics["stopped_before_cap"])
+        self.assertFalse(diagnostics["proof_of_impossibility"])
+        self.assertEqual(
+            failed["solver_result"]["telemetry"]["stop_diagnostics"],
+            diagnostics,
+        )
         self.assertEqual(snapshot["minimal_layout"]["status"], STATUS_CURRENT)
         self.assertEqual(
             snapshot["minimal_layout"]["artifact_digest"],
@@ -491,6 +538,12 @@ class StagedCalculationTests(unittest.TestCase):
             snapshot["finalized_plan"]["last_attempt"][
                 "minimal_artifact_preserved"
             ]
+        )
+        self.assertEqual(
+            snapshot["finalized_plan"]["last_attempt"]["stop_diagnostics"][
+                "outcome_kind"
+            ],
+            "deadline_reached",
         )
         selection = session.select_materializable_artifact(
             ARTIFACT_KIND_MINIMAL
@@ -706,6 +759,12 @@ class StagedCalculationTests(unittest.TestCase):
                 "minimal_artifact_preserved"
             ]
         )
+        self.assertEqual(
+            snapshot["finalized_plan"]["last_attempt"]["stop_diagnostics"][
+                "outcome_kind"
+            ],
+            "stale",
+        )
 
     def test_fixture_12_failed_finalization_preserves_minimal_materialization(self) -> None:
         project = _project()
@@ -744,6 +803,11 @@ class StagedCalculationTests(unittest.TestCase):
                 "minimal_artifact_preserved"
             ]
         )
+        diagnostics = snapshot["finalized_plan"]["last_attempt"][
+            "stop_diagnostics"
+        ]
+        self.assertEqual(diagnostics["outcome_kind"], "certificate_rejected")
+        self.assertFalse(diagnostics["proof_of_impossibility"])
         self.assertEqual(selection["partition_plan_digest"], calculated["partition"]["plan_digest"])
 
     def test_dual_selection_accepts_a_separately_certified_finalized_plan(self) -> None:
@@ -786,6 +850,12 @@ class StagedCalculationTests(unittest.TestCase):
         self.assertEqual(
             session.select_materializable_artifact(ARTIFACT_KIND_MINIMAL)["partition_plan_digest"],
             calculated["partition"]["plan_digest"],
+        )
+        self.assertEqual(
+            finalized["staged_calculation"]["finalized_plan"]["last_attempt"][
+                "stop_diagnostics"
+            ]["outcome_kind"],
+            "success",
         )
 
     def test_cad_ready_requires_the_exact_selected_identity(self) -> None:

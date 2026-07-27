@@ -1,11 +1,11 @@
 # Status
 
 <!-- P64-L09T-STATUS -->
-## P64-L09T — Goal actif, mission A automatisee-validee
+## P64-L09T — Goal actif, missions A et B automatisees-validees
 
 Date : 2026-07-27.
 
-Statut : `goal-active`, `P64-L09T-A-automated-validated`.
+Statut : `goal-active`, `P64-L09T-B-automated-validated`.
 
 - La gate 0.1.69 est `human-KO`, `do-not-run`. La jauge fluide, les minima et
   la cavite orientee restent des acquis positifs partiels.
@@ -20,6 +20,15 @@ Statut : `goal-active`, `P64-L09T-A-automated-validated`.
 - La palette et le journal produit n'exposent plus les statuts, messages ou
   preuves de reutilisation locale et d'insertion dans le vide global. Les
   producteurs historiques restent seulement testables hors parcours produit.
+- P64-L09T-B publie
+  `bgig.finalization_stop_diagnostics.v1` pour chaque succes, prerequis absent,
+  rejet de certificat, strategie epuisee, deadline, resultat stale ou
+  impossibilite explicitement prouvee.
+- Le resultat et la palette exposent la phase, le temps, le plafond, les
+  candidats et rejets utiles. Le motif brut et les compteurs restent dans le
+  volet technique replie.
+- Une raison bornee inconnue ne peut jamais devenir visuellement une
+  impossibilite sans `proof_of_impossibility=true`.
 - Les reservations superieures restent virtuelles mais leurs poses X/Y
   deviennent des decisions du calcul.
 - La priorite basse compare des plans complets avant la compacite.
@@ -33,15 +42,21 @@ Statut : `goal-active`, `P64-L09T-A-automated-validated`.
   recadrees, syntaxe JavaScript `node --check` verte, puis suite complete
   `912/912` en `329.039 s` avec un test SCIP natif ignore sous Python 3.10.
   Aucun benchmark ou holdout solveur n'a ete invoque.
+- Validation B ciblee : `99/99` en `2.201 s`, syntaxe JavaScript embarquee
+  validee par `node --check`. La suite complete finale passe `922/922` en
+  `299.3 s`, avec un test SCIP natif ignore sous Python 3.10. Aucun benchmark
+  ou holdout solveur n'a ete invoque.
 
 Programme : `docs/P64_L09T_END_TO_END_GOAL_RUNBOOK.md`.
 Preuve : `docs/P64_L09S_V_0169_HUMAN_KO_EVIDENCE.md`.
 Decision : `docs/DECISIONS/ADR-0093-recalcul-explicite-reservations-optimisees-et-fermeture-hybride.md`.
 Preuve A : `docs/P64_L09T_A_EXPLICIT_RECALCULATION_EVIDENCE.md`.
+Preuve B :
+`docs/P64_L09T_B_EXPLAINABLE_FINALIZATION_STOPS_EVIDENCE.md`.
 
-Prochaine action : integrer P64-L09T-A dans `main`, puis executer P64-L09T-B
-sur les diagnostics d'arret anticipe. `fusion-validated=false`,
-`print-validated=false`.
+Prochaine action : integrer P64-L09T-B dans `main`, puis executer P64-L09T-C
+sur les reservations automatiques et la paroi minimale certifiee.
+`fusion-validated=false`, `print-validated=false`.
 
 <!-- P64-L09S-0168-STATUS -->
 ## Correctif P64-L09S-V 0.1.68

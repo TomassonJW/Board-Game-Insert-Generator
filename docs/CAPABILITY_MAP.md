@@ -1,7 +1,7 @@
 # Capability Map
 
 <!-- P64-L09T-CAPABILITY -->
-## P64-L09T — mission A automatisee-validee
+## P64-L09T — missions A et B automatisees-validees
 
 - `C-STAGED-CALCULATION` : `automated-validated`. Toute edition geometrique
   rend minimal et final obsoletes ; seul Calculer peut republier un minimal.
@@ -20,13 +20,15 @@
   restent normatifs.
 - `C-CAD-IR` / `C-FUSION` : planifies pour certifier et materialiser les vrais
   corps composites, unions avant cavites et coupes.
-- `C-FUSION-UI` : le bruit de reutilisation est retire et l'edition demande
-  explicitement `Calculer`. Les origines X/Y et les diagnostics d'arret restent
-  respectivement a traiter en C et B.
+- `C-FUSION-UI` : `automated-validated` pour le cycle explicite et les
+  diagnostics d'arret. La palette expose phase, temps/plafond et nature du
+  verdict, garde les compteurs techniques replies et refuse de transformer un
+  inconnu borne en impossibilite. Les origines X/Y restent a traiter en C.
 - `C-FINISHING-COMPLEMENTS` : `deferred`. Cales separees, separateurs sans fond
   et conteneurs generes appartiennent a P64-F03.
-- `C-QUALITY` : P64-L09T-A passe `912/912`; 0.1.69 reste `human-KO` et
-  `do-not-run`. P64-L09T-B devient la mission suivante.
+- `C-QUALITY` : P64-L09T-B passe `99/99` tests cibles et la syntaxe JavaScript
+  est verte. La suite complete passe `922/922` ; 0.1.69 reste `human-KO` et
+  `do-not-run`. P64-L09T-C devient la mission suivante.
 - `C-PRINT` : inchangee, `print-validated=false`.
 
 Cette validation reste automatisee : `fusion-validated=false`,

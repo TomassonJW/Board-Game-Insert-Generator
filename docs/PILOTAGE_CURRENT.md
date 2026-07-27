@@ -15,16 +15,28 @@
   cavites, reservations, unions, coupes et residuel nul certifies.
 - Les cales separees, separateurs sans fond et conteneurs de finition generes
   sont inscrits dans P64-F03 et restent differes.
-- P64-L09T est lance. La mission A est automatisee-validee : une edition rend
+- P64-L09T est lance. Les missions A et B sont automatisees-validees. A rend
+  toute edition geometrique explicite : elle rend
   minimal, final et scene obsoletes ; aucun placement n'est republie avant un
   clic explicite sur `Calculer`.
 - Le cache certifie exact et le witness restent limites au calcul explicite ;
   la palette et le journal courant ne transportent plus les anciens statuts de
   reutilisation.
+- B attache a chaque tentative de finition un diagnostic stable : nature du
+  verdict, phase, temps ecoule, plafond, candidats, rejets et raison technique.
+  Le resultat solveur, l'activite de palette et le volet technique transportent
+  la meme preuve.
+- La palette ne presente une impossibilite que si
+  `proof_of_impossibility=true`. Une strategie bornee epuisee reste
+  explicitement `inconnu, pas impossible`.
 - Validation A : `912/912` en `329.039 s`, un test SCIP natif ignore sous
   Python 3.10, aucun benchmark/holdout solveur invoque.
-- Prochaine mission apres integration A : P64-L09T-B, diagnostics d'arret
-  anticipe. Le Goal poursuit ensuite C a G puis s'arrete a P64-L09T-V.
+- Validation B : `99/99` tests cibles, syntaxe JavaScript `node --check`
+  verte, puis suite complete `922/922` en `299.3 s`, avec un test SCIP natif
+  ignore sous Python 3.10.
+- Prochaine mission apres integration B : P64-L09T-C, pose automatique des
+  reservations et certification des parois. Le Goal poursuit ensuite D a G
+  puis s'arrete a P64-L09T-V.
 - Aucun benchmark/holdout, aucune valeur physique nouvelle ;
   `fusion-validated=false`, `print-validated=false`.
 
@@ -33,7 +45,8 @@ Autorites :
 - `docs/DECISIONS/ADR-0093-recalcul-explicite-reservations-optimisees-et-fermeture-hybride.md` ;
 - `docs/P64_L09S_V_0169_HUMAN_KO_EVIDENCE.md` ;
 - `docs/P64_L09T_END_TO_END_GOAL_RUNBOOK.md` ;
-- `docs/P64_L09T_A_EXPLICIT_RECALCULATION_EVIDENCE.md`.
+- `docs/P64_L09T_A_EXPLICIT_RECALCULATION_EVIDENCE.md` ;
+- `docs/P64_L09T_B_EXPLAINABLE_FINALIZATION_STOPS_EVIDENCE.md`.
 
 <!-- P64-L09S-0168-CURRENT -->
 ## Reprise canonique corrective 0.1.68
