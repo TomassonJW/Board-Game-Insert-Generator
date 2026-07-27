@@ -1,7 +1,56 @@
 # Pilotage courant
 
 <!-- P64-L09U-CURRENT -->
-## Reprise canonique P64-L09U-R1
+## Reprise canonique P64-L09U-R2
+
+- `0.1.70`, `0.1.71` et `0.1.72` sont `human-KO`, `do-not-run`.
+- 0.1.72 confirme le démarrage vierge, le calcul explicite et une
+  matérialisation minimale possible, mais pas la fidélité ni la robustesse du
+  plan final.
+- Les faits humains bloquants sont : aperçu final différent de Fusion, cavités
+  hautes apparemment agrandies ou approfondies, fermeture sans plateau arrêtée
+  avant budget, `CasLimite01++` non résolu, matérialisation très longue et
+  `Combine1 / ALL_TOOL_BODY_REFERENCE_LOST`.
+- R2 finalise uniquement le plan minimal sélectionné. Aucun candidat minimal
+  alternatif n'est substitué silencieusement.
+- L'aperçu composite projette les vrais prismes CAD et les poses monde exactes
+  des cavités gelées ; les accès verticaux restent visuellement distincts.
+- La fermeture attribue toutes les cellules couvertes, distingue les jeux
+  externes XY et Z du résiduel imprimable et scinde leurs jonctions si
+  nécessaire. Elle ne déplace ni ne redimensionne les cavités.
+- Le solveur de piles sait insérer tardivement un support plus large sous une
+  pile déjà construite. `CasLimite01++` calcule et finalise ainsi sans sélection
+  manuelle de variante.
+- Fusion ne crée plus de features paramétriques Combine pour les unions et
+  coupes rectangulaires : un corps BRep transitoire complet est booléenné puis
+  persisté une seule fois par module dans une BaseFeature.
+- L'adaptateur rend la main à l'interface entre les modules et conserve le
+  rollback global après erreur. Cette respiration n'est pas encore une jauge
+  déterminée ni une annulation utilisateur.
+- Candidate corrective : `0.1.73`.
+- Preflight source :
+  `e8392bc12c69074e654d1d9cecf99656df5fe9ac187eb17d1b981a713584b6fd`.
+- Le préparateur sec passe avec `109/109` tests ciblés et six replays exacts en
+  lecture seule. La suite globale autorisée passe `886/886` en `363.209 s`,
+  avec une intégration SCIP native ignorée et douze modules interdits exclus.
+- L'installation réelle après intégration est la dernière clôture automatisée.
+- Les jobs annulables, miniatures de variantes et épaisseur distincte de
+  séparateur restent cadrés par ADR-0095 à ADR-0097 et hors de R2.
+- Prochaine action unique après intégration : gate humaine P64-L09U-R2-V selon
+  `docs/P64_L09U_R2_V_0173_FUSION_GATE_RECIPE.md`.
+- Aucun benchmark/holdout, aucune valeur physique nouvelle ;
+  `fusion-validated=false`, `print-validated=false`.
+
+Autorités R2 :
+
+- `docs/P64_L09U_R1_V_0172_HUMAN_KO_EVIDENCE.md` ;
+- `docs/DECISIONS/ADR-0098-plan-minimal-exact-et-corps-fusion-transitoire.md` ;
+- `docs/P64_L09U_R2_0173_CORRECTIVE_EVIDENCE.md` ;
+- `docs/P64_L09U_R2_V_0173_FUSION_GATE_RECIPE.md`.
+
+### Historique R1 supersédé
+
+#### Reprise canonique P64-L09U-R1
 
 - `0.1.70` et `0.1.71` sont `human-KO`, `do-not-run`.
 - 0.1.71 confirme le démarrage vierge, le calcul explicite et la finalisation.

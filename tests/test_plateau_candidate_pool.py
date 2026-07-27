@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "scripts" / "fusion" / "p66_mvp_complete_project.json"
 
 
-class PlateauCandidatePoolTests(unittest.TestCase):
+class ExactMinimalFinalizationTests(unittest.TestCase):
     def test_composite_fallback_restarts_from_certified_minimal_placements(
         self,
     ) -> None:
@@ -33,7 +33,7 @@ class PlateauCandidatePoolTests(unittest.TestCase):
         self.assertIn("participants,\n            placements,", block)
         self.assertNotIn("continuous.placements", block)
 
-    def test_tray_case_uses_bounded_minimal_candidate_pool(self) -> None:
+    def test_tray_case_finalizes_only_the_selected_minimal_plan(self) -> None:
         project = json.loads(FIXTURE.read_text(encoding="utf-8"))
 
         minimal = solve_minimal_layout(project, effort_profile="normal")
@@ -41,8 +41,11 @@ class PlateauCandidatePoolTests(unittest.TestCase):
 
         self.assertEqual(minimal["solver"]["result"]["status"], "solution_found")
         self.assertTrue(search_origin["finishing_candidate_pool_bounded"])
-        self.assertGreater(search_origin["finishing_candidate_pool_count"], 0)
-        self.assertLessEqual(search_origin["finishing_candidate_pool_count"], 12)
+        self.assertEqual(search_origin["finishing_candidate_pool_count"], 0)
+        self.assertEqual(search_origin["finishing_candidate_pool_limit"], 0)
+        self.assertTrue(
+            search_origin["finalization_uses_exact_selected_minimal_plan"]
+        )
 
         finalized = finalize_coupled_volume(
             project,
@@ -61,10 +64,43 @@ class PlateauCandidatePoolTests(unittest.TestCase):
             composite["printable_residual_volume_mm3"],
             0.0,
         )
-        self.assertGreaterEqual(selection["selected_candidate_index"], 0)
-        self.assertGreaterEqual(selection["attempt_count"], 1)
+        self.assertEqual(selection["candidate_pool_count"], 1)
+        self.assertEqual(selection["selected_candidate_index"], 0)
+        self.assertEqual(selection["attempt_count"], 1)
         self.assertTrue(selection["shared_deadline_enforced"])
+        self.assertTrue(selection["exact_selected_minimal_plan"])
+        self.assertFalse(selection["alternate_candidate_attempted"])
+        self.assertEqual(
+            selection["selected_placement_digest"],
+            minimal["plan_digest"],
+        )
         self.assertTrue(materialization["certified"])
+        minimal_by_id = {
+            placement["id"]: placement for placement in minimal["placements"]
+        }
+        for placement in finalized["placements"]:
+            source = minimal_by_id[placement["id"]]
+            self.assertEqual(
+                placement["composite_bounds_v2"][
+                    "source_minimum_origin_mm"
+                ],
+                source["origin_mm"],
+            )
+            self.assertEqual(
+                placement["composite_bounds_v2"][
+                    "source_minimum_size_mm"
+                ],
+                source["world_size_mm"],
+            )
+            for cavity in placement["frozen_cavities_v1"]:
+                self.assertEqual(
+                    cavity["source_owner_origin_mm"],
+                    source["origin_mm"],
+                )
+                self.assertEqual(
+                    cavity["source_owner_world_size_mm"],
+                    source["world_size_mm"],
+                )
         owners = finalized["finalization"]["xy_composite_closure"]["owners"]
         self.assertTrue(
             all(

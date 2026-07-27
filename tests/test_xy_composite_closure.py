@@ -254,6 +254,36 @@ class XYCompositeClosureTests(unittest.TestCase):
         )
         self.assertTrue(result.certificate["owner_unions_connected"])
 
+    def test_annex_consumes_every_covered_residual_cell(self) -> None:
+        source = _placement_for(
+            "container:a",
+            (0.0, 0.0, 0.0),
+            (10.0, 10.0, 20.0),
+        )
+        spaces = (
+            EmptySpace((12.0, 0.0, 0.0), (8.0, 10.0, 15.0)),
+            EmptySpace((12.0, 0.0, 15.0), (8.0, 10.0, 5.0)),
+        )
+
+        result = _hybrid_result(
+            (source,),
+            spaces,
+            box={"x": 20.0, "y": 10.0, "z": 20.0},
+        )
+
+        self.assertEqual(result.status, "closed")
+        trace = result.certificate["assignment_trace"]
+        self.assertEqual(len(trace), 1)
+        self.assertEqual(trace[0]["covered_residual_cell_count"], 2)
+        self.assertEqual(
+            result.certificate["assigned_residual_cell_count"],
+            2,
+        )
+        self.assertEqual(
+            result.certificate["printable_residual_volume_mm3"],
+            0.0,
+        )
+
     def test_hybrid_closes_an_inner_hole_without_moving_any_source(self) -> None:
         placements = (
             _placement_for("container:a", (0.0, 0.0, 0.0), (10.0, 30.0, 10.0)),
@@ -365,6 +395,65 @@ class XYCompositeClosureTests(unittest.TestCase):
         )
         self.assertEqual(left_upper_x, 18.0)
         self.assertEqual(right.origin_mm[0] - left_upper_x, 2.0)
+
+    def test_vertical_inter_owner_clearance_is_not_printable_residual(
+        self,
+    ) -> None:
+        lower = _placement_for(
+            "container:lower",
+            (0.0, 0.0, 0.0),
+            (10.0, 10.0, 10.0),
+        )
+        upper = _placement_for(
+            "container:upper",
+            (0.0, 0.0, 12.0),
+            (10.0, 10.0, 8.0),
+        )
+
+        result = _hybrid_result(
+            (lower, upper),
+            (EmptySpace((0.0, 0.0, 10.0), (10.0, 10.0, 2.0)),),
+            box={"x": 10.0, "y": 10.0, "z": 20.0},
+        )
+
+        self.assertEqual(result.status, "closed")
+        self.assertEqual(
+            result.certificate["printable_residual_volume_mm3"],
+            0.0,
+        )
+        self.assertEqual(result.certificate["assignment_trace"], [])
+        self.assertTrue(result.certificate["external_clearances_certified"])
+
+    def test_xy_z_clearance_junction_is_split_and_kept_void(self) -> None:
+        lower = _placement_for(
+            "container:lower",
+            (0.0, 0.0, 0.0),
+            (10.0, 5.4, 10.0),
+        )
+        upper = _placement_for(
+            "container:upper",
+            (0.0, 0.0, 12.0),
+            (10.0, 6.0, 8.0),
+        )
+        side = _placement_for(
+            "container:side",
+            (0.0, 6.0, 0.0),
+            (10.0, 4.0, 10.0),
+        )
+
+        result = _hybrid_result(
+            (lower, upper, side),
+            (EmptySpace((0.0, 0.0, 10.0), (10.0, 6.0, 2.0)),),
+            box={"x": 10.0, "y": 10.0, "z": 20.0},
+            xy_clearance_mm=0.6,
+        )
+
+        self.assertEqual(result.status, "closed")
+        self.assertEqual(
+            result.certificate["printable_residual_volume_mm3"],
+            0.0,
+        )
+        self.assertTrue(result.certificate["external_clearances_certified"])
 
     def test_hybrid_rejects_z_only_edge_point_and_floating_cells(self) -> None:
         source = _placement_for(

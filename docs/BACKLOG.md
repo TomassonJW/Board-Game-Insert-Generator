@@ -1,7 +1,35 @@
 # Backlog
 
 <!-- P64-L09U-BACKLOG -->
-## Correctif P64-L09U-R1
+## Correctif P64-L09U-R2
+
+### P64-L09U-R1-V — Gate humaine Fusion 0.1.72
+
+- Statut : `done-human-KO`, `do-not-run`.
+- Preuve : `docs/P64_L09U_R1_V_0172_HUMAN_KO_EVIDENCE.md`.
+
+### P64-L09U-R2 — Fidélité finale et corps Fusion transitoire
+
+- Statut : `done`, `automated-validated`.
+- Finaliser le minimum exact et projeter les vrais prismes composites.
+- Préserver les jeux externes XY/Z sans résiduel imprimable.
+- Résoudre l'insertion tardive d'un support large.
+- Remplacer les Combine rectangulaires par un corps transitoire stable.
+- Candidate : `0.1.73`.
+
+### P64-L09U-R2-V — Gate humaine Fusion 0.1.73
+
+- Statut : `pending-installation`.
+- Vérifier fidélité aperçu/Fusion et dimensions des cavités.
+- Chronométrer les matérialisations minimale et finale.
+- Rejouer `CasLimite01+`, sa variante sans plateau, `CasLimite02+` et
+  `CasLimite01++`.
+- Recette : `docs/P64_L09U_R2_V_0173_FUSION_GATE_RECIPE.md`.
+- `fusion-validated=false`, `print-validated=false`.
+
+### Historique R1 supersédé
+
+#### Correctif P64-L09U-R1
 
 ### P64-L09U-A — Session vierge et recalcul frais
 

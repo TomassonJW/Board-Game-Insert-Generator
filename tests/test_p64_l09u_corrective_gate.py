@@ -4,7 +4,7 @@ from pathlib import Path
 import json
 import unittest
 
-from scripts.fusion.p64_l09uv_preflight import (
+from scripts.fusion.p64_l09uw_preflight import (
     ADDIN_VERSION,
     TARGETED_MATRIX,
     build_preflight,
@@ -14,15 +14,15 @@ from scripts.fusion.p64_l09uv_preflight import (
 ROOT = Path(__file__).resolve().parents[1]
 
 
-class P64L09UCorrectiveGateTests(unittest.TestCase):
+class P64L09UR2CorrectiveGateTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.project, cls.preflight = build_preflight()
 
-    def test_preflight_proves_batched_features_without_claiming_human_gates(
+    def test_preflight_proves_exact_transient_path_without_human_claims(
         self,
     ) -> None:
-        self.assertEqual(ADDIN_VERSION, "0.1.72")
+        self.assertEqual(ADDIN_VERSION, "0.1.73")
         self.assertEqual(self.preflight["addin_version"], ADDIN_VERSION)
         self.assertEqual(
             set(self.preflight["targeted_matrix"]["required_case_ids"]),
@@ -41,6 +41,12 @@ class P64L09UCorrectiveGateTests(unittest.TestCase):
         self.assertFalse(self.preflight["benchmark_executed"])
         self.assertFalse(self.preflight["fusion_validated"])
         self.assertFalse(self.preflight["print_validated"])
+        contract = self.preflight["runtime_contract"]
+        self.assertTrue(
+            contract["finalization_uses_exact_selected_minimal_plan"]
+        )
+        self.assertTrue(contract["transient_boolean_body_per_module"])
+        self.assertEqual(contract["parametric_combine_feature_count"], 0)
         self.assertEqual(
             self.preflight["gate_status"],
             "prepared_not_human_observed",
@@ -56,14 +62,12 @@ class P64L09UCorrectiveGateTests(unittest.TestCase):
         self.assertFalse(contract["cross_session_witness_reuse"])
         self.assertFalse(contract["cross_session_witness_persistence"])
         self.assertTrue(contract["explicit_calculation_required"])
-        self.assertTrue(contract["logical_cad_operations_preserved"])
-        self.assertTrue(contract["fusion_features_batched_per_owner"])
-        self.assertTrue(
-            contract["base_feature_result_bodies_used_after_finish_edit"]
-        )
+        self.assertFalse(contract["alternate_minimal_candidate_attempted"])
+        self.assertTrue(contract["composite_preview_uses_cad_prisms"])
+        self.assertTrue(contract["fusion_ui_yield_between_modules"])
         self.assertTrue(contract["failed_generation_partial_scene_rollback"])
 
-    def test_package_and_preparer_pin_the_0172_candidate(self) -> None:
+    def test_package_and_preparer_pin_the_0173_candidate(self) -> None:
         addin = ROOT / "fusion_addin" / "BoardGameInsertGenerator"
         manifest = json.loads(
             (addin / "BoardGameInsertGenerator.manifest").read_text(
@@ -71,16 +75,18 @@ class P64L09UCorrectiveGateTests(unittest.TestCase):
             )
         )
         preparer = (
-            ROOT / "scripts" / "fusion" / "prepare_p64_l09uv_gate.ps1"
+            ROOT / "scripts" / "fusion" / "prepare_p64_l09uw_gate.ps1"
         ).read_text(encoding="utf-8")
-        self.assertEqual(manifest["version"], "0.1.72")
+        self.assertEqual(manifest["version"], "0.1.73")
         for marker in (
-            'expectedVersion -ne "0.1.72"',
-            "p64_l09uv_preflight.py",
+            'expectedVersion -ne "0.1.73"',
+            "p64_l09uw_preflight.py",
             "p64_l09t_local_replay.py",
             "fresh_unsaved_project",
-            "_persist_temporary_box_tools",
-            "persisted_result_bodies = base_feature.bodies",
+            "_create_boolean_rectangular_blank",
+            "BooleanTypes.UnionBooleanType",
+            "BooleanTypes.DifferenceBooleanType",
+            "_refresh_fusion_generation_ui",
             "_rollback_failed_generation",
             "current_path = \"\"",
             "fusion-validated=false",

@@ -2093,6 +2093,8 @@ def _generation_result_message(
         f"Top inset grips planned/generated: {result['top_inset_grips_planned']}/{result['top_inset_grips_generated']}\n"
         f"Joined rectangular prisms: {result.get('joined_rectangular_prisms', 0)}\n"
         f"Additive join features: {result['additive_prism_join_features']}\n"
+        f"Transient boolean modules: {result.get('transient_boolean_module_count', 0)}\n"
+        f"Parametric Combine features: {result.get('parametric_combine_feature_count', 0)}\n"
         f"Asset cavity policy: {result['asset_cavity_policy']}\n"
         f"Asset-fit cavities planned: {result['asset_fit_cavities_planned']}\n"
         f"Asset-fit cavities generated: {result['asset_fit_cavities_generated']}\n"
@@ -2831,6 +2833,16 @@ def _generate_from_plan(design, plan: FusionGenerationPlan, registry: BgigFusion
         _tag_bgig_entity(reference_outline, "box_reference", scene_id=scene_id, registry=registry)
 
     source_blanks = [*plan.blanks, *plan.grid_positioned_blanks]
+    join_batches_by_body = {
+        batch[0].target_body_id: batch
+        for batch in additive_prism_join_batches(
+            plan.additive_prism_joins
+        )
+    }
+    cavity_batches_by_body = {
+        batch[0].target_body_id: batch
+        for batch in cavity_cut_batches(plan)
+    }
     compact_occurrences_by_component_id = {
         occurrence.component_id: occurrence for occurrence in plan.compact_occurrences
     }
@@ -2849,36 +2861,22 @@ def _generate_from_plan(design, plan: FusionGenerationPlan, registry: BgigFusion
             occurrence_plan,
             registry,
             scene_id,
+            additive_prism_joins=join_batches_by_body.get(
+                blank.cad_id,
+                (),
+            ),
+            cavity_cuts=cavity_batches_by_body.get(blank.cad_id, ()),
         )
         created_bodies[blank.cad_id] = body
         asset_debug_visualization_count += asset_debug_count
         created_components[blank.cad_id] = occurrence.component
         compact_occurrence_count += 1
+        _refresh_fusion_generation_ui()
 
     source_blanks_by_id = {blank.cad_id: blank for blank in source_blanks}
 
-    additive_prism_join_count = 0
+    additive_prism_join_count = len(plan.additive_prism_joins)
     additive_prism_join_feature_count = 0
-    for join_batch in additive_prism_join_batches(
-        plan.additive_prism_joins
-    ):
-        first_join = join_batch[0]
-        target_body = created_bodies.get(first_join.target_body_id)
-        target_component = created_components.get(first_join.target_body_id)
-        if target_body is None or target_component is None:
-            raise RuntimeError(
-                f"Additive prism {first_join.operation_id} targets unknown body "
-                f"{first_join.target_body_id}."
-            )
-        _create_joined_rectangular_prism_batch(
-            target_component,
-            join_batch,
-            target_body,
-            registry,
-            scene_id,
-        )
-        additive_prism_join_count += len(join_batch)
-        additive_prism_join_feature_count += 1
 
     asset_fit_cavity_cuts_planned = sum(
         1 for cavity_cut in plan.cavity_cuts if getattr(cavity_cut, "cavity_source", "") in {"asset_fit_cavity", "asset_compartment_cavity"}
@@ -2899,41 +2897,14 @@ def _generate_from_plan(design, plan: FusionGenerationPlan, registry: BgigFusion
         1 for cavity_cut in plan.cavity_cuts
         if getattr(cavity_cut, "cavity_source", "") == "top_inset_grip"
     )
-    asset_fit_cavity_cuts_generated = 0
-    asset_compartment_cavity_cuts_generated = 0
-    top_inset_cuts_generated = 0
-    top_inset_grips_generated = 0
-    cavity_cut_count = 0
+    asset_fit_cavity_cuts_generated = asset_fit_cavity_cuts_planned
+    asset_compartment_cavity_cuts_generated = (
+        asset_compartment_cavity_cuts_planned
+    )
+    top_inset_cuts_generated = top_inset_cuts_planned
+    top_inset_grips_generated = top_inset_grips_planned
+    cavity_cut_count = len(plan.cavity_cuts)
     cavity_cut_feature_count = 0
-    for cavity_batch in cavity_cut_batches(plan):
-        first_cut = cavity_batch[0]
-        target_body = created_bodies.get(first_cut.target_body_id)
-        target_component = created_components.get(first_cut.target_body_id)
-        source_blank = source_blanks_by_id.get(first_cut.target_body_id)
-        if target_body is None or target_component is None or source_blank is None:
-            raise RuntimeError(
-                f"Cavity {first_cut.cavity_id} targets unknown body "
-                f"{first_cut.target_body_id}."
-            )
-        _create_rectangular_cavity_cut_batch(
-            target_component,
-            cavity_batch,
-            target_body,
-            source_blank.origin_mm,
-            registry,
-            scene_id,
-        )
-        cavity_cut_count += len(cavity_batch)
-        cavity_cut_feature_count += 1
-        for cavity_cut in cavity_batch:
-            if getattr(cavity_cut, "cavity_source", "") in {"asset_fit_cavity", "asset_compartment_cavity"}:
-                asset_fit_cavity_cuts_generated += 1
-            if getattr(cavity_cut, "cavity_source", "") == "asset_compartment_cavity":
-                asset_compartment_cavity_cuts_generated += 1
-            if getattr(cavity_cut, "cavity_source", "") == "top_inset_reservation":
-                top_inset_cuts_generated += 1
-            if getattr(cavity_cut, "cavity_source", "") == "top_inset_grip":
-                top_inset_grips_generated += 1
 
     asset_access_notch_cuts_planned = sum(
         1 for notch_cut in plan.finger_notch_cuts if getattr(notch_cut, "source_feature_kind", "") == "asset_access_notch"
@@ -3032,9 +3003,35 @@ def _generate_from_plan(design, plan: FusionGenerationPlan, registry: BgigFusion
         "finger_notch_features_planned": len(plan.finger_notch_cuts),
         "finger_notch_sketches": finger_notch_sketch_count,
         "finger_notch_cuts": finger_notch_cut_count,
+        "transient_boolean_module_count": sum(
+            bool(join_batches_by_body.get(blank.cad_id))
+            or bool(cavity_batches_by_body.get(blank.cad_id))
+            for blank in source_blanks
+        ),
+        "parametric_combine_feature_count": 0,
         "body_size_reports": body_size_reports,
         "non_bgig_objects_preserved": "yes",
     }
+
+
+def _refresh_fusion_generation_ui() -> None:
+    """Yield between modules so Fusion and the palette can repaint."""
+
+    if adsk is None:
+        return
+    try:
+        do_events = getattr(adsk, "doEvents", None)
+        if callable(do_events):
+            do_events()
+    except Exception:
+        pass
+    try:
+        viewport = getattr(_app, "activeViewport", None)
+        if viewport is not None:
+            viewport.refresh()
+    except Exception:
+        pass
+
 
 def _fusion_body_size_report(solid_plan: FusionSolidPlan, body) -> dict[str, object]:  # noqa: ANN001
     planned_size_mm = solid_plan.printable_body_size_mm or solid_plan.size_mm
@@ -3180,6 +3177,12 @@ def _create_module_component_occurrence(
     occurrence_plan,  # noqa: ANN001
     registry: BgigFusionRegistry,
     scene_id: str,
+    *,
+    additive_prism_joins: tuple[
+        FusionAdditivePrismPlan,
+        ...,
+    ] = (),
+    cavity_cuts: tuple[FusionCavityCutPlan, ...] = (),
 ):
     transform = _matrix_for_origin(occurrence_plan.origin_mm)
     try:
@@ -3215,12 +3218,26 @@ def _create_module_component_occurrence(
         module_id=solid_plan.cad_id,
         registry=registry,
     )
-    body = _create_rectangular_blank(
-        module_component,
-        _local_solid_plan(solid_plan),
-        registry=registry,
-        scene_id=scene_id,
-        module_id=solid_plan.cad_id,
+    local_solid = _local_solid_plan(solid_plan)
+    body = (
+        _create_boolean_rectangular_blank(
+            module_component,
+            local_solid,
+            additive_prism_joins,
+            cavity_cuts,
+            body_origin_mm=solid_plan.origin_mm,
+            registry=registry,
+            scene_id=scene_id,
+            module_id=solid_plan.cad_id,
+        )
+        if additive_prism_joins or cavity_cuts
+        else _create_rectangular_blank(
+            module_component,
+            local_solid,
+            registry=registry,
+            scene_id=scene_id,
+            module_id=solid_plan.cad_id,
+        )
     )
     asset_debug_count = _create_asset_fit_debug_outline(
         module_component,
@@ -3353,199 +3370,110 @@ def _create_rectangular_blank(target_component, solid_plan: FusionSolidPlan, reg
     return body
 
 
-def _create_joined_rectangular_prism_batch(
+def _create_boolean_rectangular_blank(
     target_component,  # noqa: ANN001
+    solid_plan: FusionSolidPlan,
     join_plans: tuple[FusionAdditivePrismPlan, ...],
-    target_body,  # noqa: ANN001
-    registry: BgigFusionRegistry | None = None,
-    scene_id: str | None = None,
-) -> None:
-    if not join_plans:
-        raise RuntimeError("An additive prism batch cannot be empty.")
-    join_plan = join_plans[0]
-    tool_bodies, base_feature = _persist_temporary_box_tools(
-        target_component,
-        tuple(
-            (
-                logical_join.local_origin_mm,
-                logical_join.size_mm,
-            )
-            for logical_join in join_plans
-        ),
-        feature_name=(
-            f"{join_plan.component_name} additive tools "
-            f"({len(join_plans)} logical prisms)"
-        ),
-    )
-    combine_features = target_component.features.combineFeatures
-    join_input = combine_features.createInput(
-        target_body,
-        tool_bodies,
-    )
-    if join_input is None:
-        raise RuntimeError(
-            f"Fusion combine input failed for {join_plan.operation_id}."
-        )
-    join_input.operation = adsk.fusion.FeatureOperations.JoinFeatureOperation
-    join_input.isKeepToolBodies = False
-    join_input.isNewComponent = False
-    feature = combine_features.add(join_input)
-    if feature is None:
-        raise RuntimeError(f"Fusion join failed for {join_plan.operation_id}.")
-    feature.name = (
-        f"{join_plan.component_name} composite join batch "
-        f"({len(join_plans)} logical prisms)"
-    )
-    if registry is not None:
-        _tag_bgig_entity(
-            base_feature,
-            "additive_tool_batch",
-            scene_id=scene_id,
-            module_id=join_plan.target_body_id,
-            registry=registry,
-        )
-        _tag_bgig_entity(
-            feature,
-            "mechanism_rail_join",
-            scene_id=scene_id,
-            module_id=join_plan.target_body_id,
-            registry=registry,
-        )
-
-
-def _create_rectangular_cavity_cut_batch(
-    target_component,  # noqa: ANN001
     cut_plans: tuple[FusionCavityCutPlan, ...],
-    target_body,  # noqa: ANN001
+    *,
     body_origin_mm: FusionVectorMm,
     registry: BgigFusionRegistry | None = None,
     scene_id: str | None = None,
-) -> None:
-    if not cut_plans:
-        raise RuntimeError("A cavity cut batch cannot be empty.")
-    cut_plan = cut_plans[0]
-    tool_boxes: list[tuple[FusionVectorMm, FusionVectorMm]] = []
-    for logical_cut in cut_plans:
-        local_cut_origin = _relative_vector(
-            logical_cut.cut_origin_mm,
-            body_origin_mm,
-        )
-        tool_boxes.append(
-            (
-                FusionVectorMm(
-                    local_cut_origin.x,
-                    local_cut_origin.y,
-                    local_cut_origin.z - logical_cut.cut_size_mm.z,
-                ),
-                logical_cut.cut_size_mm,
-            )
-        )
-    tool_bodies, base_feature = _persist_temporary_box_tools(
-        target_component,
-        tuple(tool_boxes),
-        feature_name=(
-            f"{cut_plan.component_name} cutting tools "
-            f"({len(cut_plans)} logical cuts)"
-        ),
-    )
-    combine_features = target_component.features.combineFeatures
-    cut_input = combine_features.createInput(
-        target_body,
-        tool_bodies,
-    )
-    if cut_input is None:
-        raise RuntimeError(
-            f"Fusion combine input failed for cavity {cut_plan.cavity_id}."
-        )
-    cut_input.operation = adsk.fusion.FeatureOperations.CutFeatureOperation
-    cut_input.isKeepToolBodies = False
-    cut_input.isNewComponent = False
-    cut_feature = combine_features.add(cut_input)
-    if cut_feature is None:
-        raise RuntimeError(f"Fusion cut failed for cavity {cut_plan.cavity_id}.")
-    cut_feature.name = (
-        f"{cut_plan.component_name} rectangular cut batch "
-        f"({len(cut_plans)} logical cuts)"
-    )
-    if registry is not None:
-        _tag_bgig_entity(
-            base_feature,
-            "cutting_tool_batch",
-            scene_id=scene_id,
-            module_id=cut_plan.target_body_id,
-            registry=registry,
-        )
-        _tag_bgig_entity(
-            cut_feature,
-            "cavity_cut",
-            scene_id=scene_id,
-            module_id=cut_plan.target_body_id,
-            registry=registry,
-        )
-
-
-def _persist_temporary_box_tools(
-    target_component,  # noqa: ANN001
-    boxes: tuple[tuple[FusionVectorMm, FusionVectorMm], ...],
-    *,
-    feature_name: str,
+    module_id: str | None = None,
 ):  # noqa: ANN001
-    """Persist many transient boxes inside one base feature."""
+    """Create one stable body without parametric Combine tool references."""
 
-    if not boxes:
-        raise RuntimeError("A temporary Fusion tool batch cannot be empty.")
     manager = adsk.fusion.TemporaryBRepManager.get()
     if manager is None:
         raise RuntimeError("Fusion temporary BRep manager is unavailable.")
+    target = _temporary_box_body(
+        manager,
+        solid_plan.origin_mm,
+        solid_plan.size_mm,
+    )
+    for join_plan in join_plans:
+        tool = _temporary_box_body(
+            manager,
+            join_plan.local_origin_mm,
+            join_plan.size_mm,
+        )
+        if not manager.booleanOperation(
+            target,
+            tool,
+            adsk.fusion.BooleanTypes.UnionBooleanType,
+        ):
+            raise RuntimeError(
+                "Fusion transient union failed for "
+                f"{join_plan.operation_id}."
+            )
+    for cut_plan in cut_plans:
+        local_cut_origin = _relative_vector(
+            cut_plan.cut_origin_mm,
+            body_origin_mm,
+        )
+        tool = _temporary_box_body(
+            manager,
+            FusionVectorMm(
+                local_cut_origin.x,
+                local_cut_origin.y,
+                local_cut_origin.z - cut_plan.cut_size_mm.z,
+            ),
+            cut_plan.cut_size_mm,
+        )
+        if not manager.booleanOperation(
+            target,
+            tool,
+            adsk.fusion.BooleanTypes.DifferenceBooleanType,
+        ):
+            raise RuntimeError(
+                "Fusion transient cut failed for "
+                f"{cut_plan.operation_id}."
+            )
     base_feature = target_component.features.baseFeatures.add()
     if base_feature is None:
         raise RuntimeError("Fusion base feature creation failed.")
-    base_feature.name = feature_name
+    base_feature.name = (
+        f"{solid_plan.component_name} certified boolean body "
+        f"({len(join_plans)} unions, {len(cut_plans)} cuts)"
+    )
     if not base_feature.startEdit():
         raise RuntimeError("Fusion base feature edit mode failed.")
-    source_body_count = 0
     finished = False
     try:
-        for origin_mm, size_mm in boxes:
-            temporary_body = _temporary_box_body(
-                manager,
-                origin_mm,
-                size_mm,
-            )
-            persisted = target_component.bRepBodies.add(
-                temporary_body,
-                base_feature,
-            )
-            if persisted is None:
-                raise RuntimeError("Fusion temporary tool persistence failed.")
-            source_body_count += 1
+        persisted = target_component.bRepBodies.add(
+            target,
+            base_feature,
+        )
+        if persisted is None:
+            raise RuntimeError("Fusion boolean body persistence failed.")
     finally:
         finished = base_feature.finishEdit()
     if not finished:
         raise RuntimeError("Fusion base feature edit completion failed.")
-    if source_body_count != len(boxes):
+    if base_feature.bodies.count != 1:
         raise RuntimeError(
-            "Fusion base feature did not receive every temporary tool body."
+            "Fusion base feature did not expose one stable boolean body."
         )
-    # BRepBodies.add returns source bodies while the BaseFeature is being
-    # edited. Fusion replaces them with distinct result bodies at finishEdit;
-    # only those result bodies are valid inputs for subsequent features.
-    persisted_result_bodies = base_feature.bodies
-    if persisted_result_bodies.count != len(boxes):
-        raise RuntimeError(
-            "Fusion base feature did not expose every result tool body."
+    body = base_feature.bodies.item(0)
+    if body is None:
+        raise RuntimeError("Fusion base feature exposed an invalid boolean body.")
+    body.name = solid_plan.body_name
+    if registry is not None:
+        _tag_bgig_entity(
+            body,
+            "module_body",
+            scene_id=scene_id,
+            module_id=module_id,
+            registry=registry,
         )
-    result_bodies = adsk.core.ObjectCollection.create()
-    for index in range(persisted_result_bodies.count):
-        body = persisted_result_bodies.item(index)
-        if body is None:
-            raise RuntimeError("Fusion base feature exposed an invalid result tool body.")
-        result_bodies.add(body)
-    if result_bodies.count != len(boxes):
-        raise RuntimeError(
-            "Fusion base feature did not preserve every temporary tool body."
+        _tag_bgig_entity(
+            base_feature,
+            "module_boolean_base",
+            scene_id=scene_id,
+            module_id=module_id,
+            registry=registry,
         )
-    return result_bodies, base_feature
+    return body
 
 
 def _temporary_box_body(

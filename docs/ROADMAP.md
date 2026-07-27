@@ -6,7 +6,29 @@ et la lecture par capabilities dans `docs/CAPABILITY_MAP.md`. La nomenclature
 et le role de ces documents sont definis dans `docs/PILOTAGE_GLOSSARY.md`.
 
 <!-- P64-L09U-ROADMAP -->
-## Correctif P64-L09U-R1 arrivé à la gate humaine
+## Correctif P64-L09U-R2 arrivé à sa clôture automatisée
+
+0.1.72 est `human-KO` : la finalisation pouvait utiliser un minimum alternatif,
+l'aperçu composite ne représentait pas les vrais prismes et les Combine Fusion
+restaient fragiles.
+
+Trajectoire corrective :
+
+```text
+P64-L09U-R1-V human-KO 0.1.72
+  -> R2 plan minimal exact et aperçu fidèle
+  -> R2 jeux externes XY/Z et support tardif
+  -> R2 corps Fusion transitoire sans Combine rectangulaire
+  -> P64-L09U-R2-V gate Fusion humaine 0.1.73
+```
+
+R2 ne livre pas encore les jobs coopératifs annulables, les miniatures de
+variantes ni une nouvelle épaisseur de séparateur. Ces lots restent sous
+ADR-0095 à ADR-0097. `fusion-validated=false`, `print-validated=false`.
+
+### Historique R1 supersédé
+
+#### Correctif P64-L09U-R1 arrivé à la gate humaine
 
 0.1.70 a révélé la matérialisation trop lente et la persistance de session.
 0.1.71 a corrigé ces deux points, mais la gate a révélé une référence de corps

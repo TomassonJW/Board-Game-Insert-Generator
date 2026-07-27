@@ -103,7 +103,7 @@ from board_game_insert_generator.reserved_floor_stack_solver import (
 
 
 MINIMAL_LAYOUT_FAMILY_ID = "minimal_layout_portfolio"
-MINIMAL_LAYOUT_SOLVER_VERSION = "p64-l09t-d-v1"
+MINIMAL_LAYOUT_SOLVER_VERSION = "p64-l09u-r2-v1"
 MINIMAL_LAYOUT_PORTFOLIO_SCHEMA_V1 = "bgig.minimal_layout_portfolio.v1"
 _AXES = ("x", "y", "z")
 _EPSILON = 0.0001
@@ -404,7 +404,6 @@ def solve_minimal_layout(
     deadline_at_ms = (
         started_at_ms + solver_deadline_seconds(effort_profile) * 1000.0
     )
-    projected_finishing_candidates: list[Mapping[str, object]] = []
     if (
         initial_incumbent is None
         and isinstance(raw_project, Mapping)
@@ -434,14 +433,6 @@ def solve_minimal_layout(
             external_lane_enabled=scip_product_runtime_configured(),
         )
         if _solver_result_status(projected_plan) == SOLUTION_FOUND:
-            projected_finishing_candidates.append(projected_plan)
-            projected_origin = _plan_search_provenance(projected_plan)
-            for projected_entry in _mapping_items(
-                projected_origin.get("finishing_candidate_pool")
-            ):
-                projected_candidate = projected_entry.get("plan")
-                if isinstance(projected_candidate, Mapping):
-                    projected_finishing_candidates.append(projected_candidate)
             initial_incumbent = projected_plan
     external_fallback_report: dict[str, object] | None = None
     if scip_product_runtime_configured():
@@ -464,23 +455,12 @@ def solve_minimal_layout(
             INVALID_INPUT,
             STALE_OR_CANCELLED,
         }:
-            return _merge_projected_finishing_candidates(
-                primary_plan,
-                projected_finishing_candidates,
-                raw_project=raw_project,
-                effort_profile=effort_profile,
-                request_id=request_id,
-                request_revision=request_revision,
-                cancel_check=cancel_check,
-                container_frontiers=container_frontiers,
-                frontier_digests=frontier_digests,
-                deadline_at_ms=deadline_at_ms,
-            )
+            return primary_plan
         if _deadline_has_expired(deadline_at_ms):
             return primary_plan
         external_fallback_report = _external_lane_report(primary_plan)
 
-    result = _solve_minimal_layout_once(
+    return _solve_minimal_layout_once(
         raw_project,
         effort_profile=effort_profile,
         request_id=request_id,
@@ -492,93 +472,6 @@ def solve_minimal_layout(
         initial_incumbent=initial_incumbent,
         external_lane_report_override=external_fallback_report,
     )
-    return _merge_projected_finishing_candidates(
-        result,
-        projected_finishing_candidates,
-        raw_project=raw_project,
-        effort_profile=effort_profile,
-        request_id=request_id,
-        request_revision=request_revision,
-        cancel_check=cancel_check,
-        container_frontiers=container_frontiers,
-        frontier_digests=frontier_digests,
-        deadline_at_ms=deadline_at_ms,
-    )
-
-
-def _merge_projected_finishing_candidates(
-    plan: dict[str, object],
-    projected_candidates: Sequence[Mapping[str, object]],
-    *,
-    raw_project: object,
-    effort_profile: str,
-    request_id: str | None,
-    request_revision: int | None,
-    cancel_check: Callable[[], bool] | None,
-    container_frontiers: Sequence[ContainerVariantFrontier] | None,
-    frontier_digests: Sequence[tuple[str, str]],
-    deadline_at_ms: float,
-) -> dict[str, object]:
-    if not projected_candidates or _solver_result_status(plan) != SOLUTION_FOUND:
-        return plan
-    solver = deepcopy(_mapping(plan.get("solver")))
-    search_origin = deepcopy(_mapping(solver.get("search_origin")))
-    selected_digest = str(
-        _mapping(search_origin.get("selected")).get("placement_digest", "")
-    )
-    seen = {selected_digest}
-    projected_entries: list[dict[str, object]] = []
-    for candidate in projected_candidates:
-        if len(projected_entries) >= 12 or _deadline_has_expired(deadline_at_ms):
-            break
-        recertified = _solve_minimal_layout_once(
-            raw_project,
-            effort_profile=effort_profile,
-            request_id=request_id,
-            request_revision=request_revision,
-            cancel_check=cancel_check,
-            container_frontiers=container_frontiers,
-            frontier_digests=frontier_digests,
-            lane_specs_override=(),
-            deadline_at_ms=deadline_at_ms,
-            initial_incumbent=candidate,
-            external_lane_enabled=False,
-        )
-        if _solver_result_status(recertified) != SOLUTION_FOUND:
-            continue
-        recertified_origin = _plan_search_provenance(recertified)
-        placement_digest = str(
-            _mapping(recertified_origin.get("selected")).get("placement_digest", "")
-        )
-        if not placement_digest or placement_digest in seen:
-            continue
-        seen.add(placement_digest)
-        projected_entries.append(
-            {
-                "placement_digest": placement_digest,
-                "lane_id": "top_reservation_projection",
-                "order_id": "recertified_without_top_reservations",
-                "translation_id": "projected_witness_identity",
-                "plan": recertified,
-            }
-        )
-    existing = [
-        value
-        for value in _mapping_items(search_origin.get("finishing_candidate_pool"))
-        if str(value.get("placement_digest", "")) not in seen
-    ]
-    merged = (projected_entries + existing)[:12]
-    search_origin["finishing_candidate_pool"] = merged
-    search_origin["finishing_candidate_pool_count"] = len(merged)
-    search_origin["top_reservation_projection_candidate_count"] = len(projected_entries)
-    search_origin["top_reservation_projection_recertified"] = True
-    search_origin.pop("deterministic_digest", None)
-    search_origin["deterministic_digest"] = _digest(search_origin)
-    solver["search_origin"] = search_origin
-    plan["solver"] = solver
-    plan.pop("plan_digest", None)
-    plan["plan_digest"] = canonical_digest(plan)
-    return plan
 
 def _solve_minimal_layout_once(
     raw_project: object,
@@ -1434,18 +1327,6 @@ def _solve_minimal_layout_once(
             value.lane.lane_id,
         ),
     )
-    finishing_candidates = [
-        value
-        for value in sorted(
-            deduplicated,
-            key=lambda value: (
-                value.rank_key,
-                value.certified.placement_digest,
-                value.lane.lane_id,
-            ),
-        )
-        if value.certified.placement_digest != selected.certified.placement_digest
-    ][:12]
     witness_selected = selected.lane.lane_id == "certified_witness_incumbent"
     external_selected = selected.lane.lane_id == _SCIP_PRODUCT_LANE.lane_id
     warm_start_payload = {
@@ -1526,22 +1407,11 @@ def _solve_minimal_layout_once(
             value.certified.placement_digest
             for value in pareto
         ],
-        "finishing_candidate_pool": [
-            {
-                "placement_digest": value.certified.placement_digest,
-                "lane_id": value.lane.lane_id,
-                "order_id": value.lane.order_id,
-                "translation_id": value.translation_id,
-                "floor_first_rank": _floor_first_rank_diagnostic(
-                    value.certified.plan
-                ),
-                "plan": deepcopy(value.certified.plan),
-            }
-            for value in finishing_candidates
-        ],
-        "finishing_candidate_pool_count": len(finishing_candidates),
+        "finishing_candidate_pool": [],
+        "finishing_candidate_pool_count": 0,
         "finishing_candidate_pool_bounded": True,
-        "finishing_candidate_pool_limit": 12,
+        "finishing_candidate_pool_limit": 0,
+        "finalization_uses_exact_selected_minimal_plan": True,
         "ranking_axes": [
             {"name": "elevated_container_count", "direction": "minimize"},
             {"name": "base_z_sum_mm", "direction": "minimize"},

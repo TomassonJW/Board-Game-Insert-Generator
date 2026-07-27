@@ -528,8 +528,11 @@ class ScipProductSolverTests(unittest.TestCase):
         self.assertEqual(len(prepared_calls), 1)
         self.assertNotIn("top_inset_zones", prepared_calls[0].payload)
         search = plan["solver"]["search_origin"]
-        self.assertTrue(search["top_reservation_projection_recertified"])
         self.assertEqual(search["warm_start"]["status"], "accepted")
+        self.assertTrue(
+            search["finalization_uses_exact_selected_minimal_plan"]
+        )
+        self.assertEqual(search["finishing_candidate_pool_count"], 0)
         self.assertTrue(plan["minimal_layout"]["global_certificate"]["certified"])
         self.assertEqual(plan["support"]["top_support_count"], 0)
 
@@ -709,7 +712,7 @@ class ScipProductSolverTests(unittest.TestCase):
         self.assertIn(SCIP_PRODUCT_ARCHIVE_SHA256, helper)
         self.assertIn("configure_scip_product_runtime", palette)
         self.assertIn('scip_vendor / "runtime"', palette)
-        self.assertEqual(manifest["version"], "0.1.72")
+        self.assertEqual(manifest["version"], "0.1.73")
 
 
 if __name__ == "__main__":

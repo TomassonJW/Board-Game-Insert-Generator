@@ -22,7 +22,7 @@ from board_game_insert_generator.incremental_project_state import canonical_dige
 from board_game_insert_generator.solver_contract import SolverBudget
 
 
-XY_COMPOSITE_CLOSURE_VERSION = "bgig.xy_composite_closure.v2"
+XY_COMPOSITE_CLOSURE_VERSION = "bgig.xy_composite_closure.v3"
 XY_COMPOSITE_CERTIFICATE_SCHEMA_V1 = (
     "bgig.xy_composite_partition_certificate.v1"
 )
@@ -85,6 +85,7 @@ class _AttachmentOption:
     annex: _RawPrism
     seam_area_mm2: float
     internal_gap_mm: float
+    external_corridors: tuple[_RawPrism, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -355,13 +356,14 @@ def _close_hybrid_residual(
         ]
         for owner_id in sorted(prefill_by_id)
     }
-    technical_corridors = tuple(
+    technical_corridors = list(
         value
         for value in all_residual_cells
         if _is_external_clearance_corridor(
             value,
             raw_by_owner,
             float(xy_clearance_mm),
+            float(between_bodies_z_mm),
         )
     )
     residual_cells = tuple(
@@ -370,6 +372,7 @@ def _close_hybrid_residual(
         if value not in technical_corridors
     )
     pending = list(residual_cells)
+    printable_residual_cell_count = len(residual_cells)
     initial_residual_volume = sum(value.volume() for value in pending)
     assigned_residual_volume = 0.0
     removed_internal_clearance_volume = 0.0
@@ -428,7 +431,7 @@ def _close_hybrid_residual(
                 vertical_options,
                 key=lambda value: value[0],
             )
-            residual = pending.pop(selected_vertical.residual_index)
+            residual = pending[selected_vertical.residual_index]
             current = raw_by_owner[selected_vertical.owner_id]
             previous_volume = sum(value.volume() for value in current)
             projected = _merge_prisms(
@@ -438,13 +441,41 @@ def _close_hybrid_residual(
                     *current[selected_vertical.parent_index + 1 :],
                 )
             )
+            covered_indexes, partial_coverage = (
+                _covered_residual_indexes(
+                    pending,
+                    selected_vertical.replacement,
+                )
+            )
+            if (
+                partial_coverage
+                or selected_vertical.residual_index
+                not in covered_indexes
+            ):
+                return _failure(
+                    "xy_composite_partial_residual_consumption",
+                    gross_attempt,
+                )
+            covered_residuals = [
+                value
+                for index, value in enumerate(pending)
+                if index in covered_indexes
+            ]
+            pending = [
+                value
+                for index, value in enumerate(pending)
+                if index not in covered_indexes
+            ]
             raw_by_owner[selected_vertical.owner_id] = list(projected)
             added_volume = (
                 sum(value.volume() for value in projected)
                 - previous_volume
             )
-            bridge_volume = max(0.0, added_volume - residual.volume())
-            assigned_residual_volume += residual.volume()
+            covered_volume = sum(
+                value.volume() for value in covered_residuals
+            )
+            bridge_volume = max(0.0, added_volume - covered_volume)
+            assigned_residual_volume += covered_volume
             removed_internal_clearance_volume += bridge_volume
             assignment_trace.append(
                 {
@@ -458,6 +489,13 @@ def _close_hybrid_residual(
                     ),
                     "internal_gap_removed_volume_mm3": round(
                         bridge_volume,
+                        6,
+                    ),
+                    "covered_residual_cell_count": len(
+                        covered_residuals
+                    ),
+                    "covered_residual_volume_mm3": round(
+                        covered_volume,
                         6,
                     ),
                 }
@@ -529,6 +567,119 @@ def _close_hybrid_residual(
                 )
                 options.append((rank, option))
         if not options:
+            emergent_corridors = [
+                value
+                for value in pending
+                if _is_external_clearance_corridor(
+                    value,
+                    raw_by_owner,
+                    float(xy_clearance_mm),
+                    float(between_bodies_z_mm),
+                )
+                or _is_clearance_corridor_junction(
+                    value,
+                    technical_corridors,
+                    float(xy_clearance_mm),
+                )
+            ]
+            if emergent_corridors:
+                emergent_volume = sum(
+                    value.volume() for value in emergent_corridors
+                )
+                pending = [
+                    value
+                    for value in pending
+                    if value not in emergent_corridors
+                ]
+                technical_corridors.extend(emergent_corridors)
+                printable_residual_cell_count -= len(
+                    emergent_corridors
+                )
+                initial_residual_volume -= emergent_volume
+                continue
+            split_corridor = next(
+                (
+                    (
+                        residual_index,
+                        pieces,
+                    )
+                    for residual_index, residual in enumerate(pending)
+                    if (
+                        pieces := _split_certified_external_corridor(
+                            residual,
+                            raw_by_owner,
+                            float(xy_clearance_mm),
+                            float(between_bodies_z_mm),
+                            technical_corridors,
+                        )
+                    )
+                ),
+                None,
+            )
+            if split_corridor is not None:
+                residual_index, pieces = split_corridor
+                corridor = pending.pop(residual_index)
+                technical_corridors.extend(pieces)
+                printable_residual_cell_count -= 1
+                initial_residual_volume -= corridor.volume()
+                continue
+            trimmed_options: list[
+                tuple[tuple[object, ...], _AttachmentOption]
+            ] = []
+            for residual_index, residual in enumerate(pending):
+                for option in _trimmed_attachment_options(
+                    residual_index,
+                    residual,
+                    raw_by_owner,
+                    float(xy_clearance_mm),
+                    float(between_bodies_z_mm),
+                    top_inset_zones,
+                    technical_corridors,
+                ):
+                    corridor_volume = sum(
+                        value.volume()
+                        for value in option.external_corridors
+                    )
+                    trimmed_options.append(
+                        (
+                            (
+                                round(corridor_volume, 6),
+                                len(option.external_corridors),
+                                option.owner_id,
+                                _raw_signature(residual),
+                                option.parent_index,
+                                option.axis,
+                            ),
+                            option,
+                        )
+                    )
+            if trimmed_options:
+                _, selected_trimmed = min(
+                    trimmed_options,
+                    key=lambda value: value[0],
+                )
+                options.append(
+                    (
+                        (
+                            0,
+                            0,
+                            0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            selected_trimmed.owner_id,
+                            _raw_signature(
+                                pending[
+                                    selected_trimmed.residual_index
+                                ]
+                            ),
+                            selected_trimmed.parent_index,
+                            selected_trimmed.axis,
+                        ),
+                        selected_trimmed,
+                    )
+                )
+        if not options:
             unassigned_volume = sum(value.volume() for value in pending)
             return _failure(
                 "xy_composite_residual_owner_not_found",
@@ -549,16 +700,56 @@ def _close_hybrid_residual(
                 },
             )
         _, selected = min(options, key=lambda value: value[0])
-        residual = pending.pop(selected.residual_index)
+        residual = pending[selected.residual_index]
+        consumed_shapes = (
+            selected.annex,
+            *selected.external_corridors,
+        )
+        covered_indexes, partial_coverage = _covered_residual_indexes(
+            pending,
+            consumed_shapes,
+        )
+        if partial_coverage or selected.residual_index not in covered_indexes:
+            return _failure(
+                "xy_composite_partial_residual_consumption",
+                gross_attempt,
+            )
+        covered_residuals = [
+            value
+            for index, value in enumerate(pending)
+            if index in covered_indexes
+        ]
+        pending = [
+            value
+            for index, value in enumerate(pending)
+            if index not in covered_indexes
+        ]
         owner_prisms = raw_by_owner[selected.owner_id]
         owner_prisms.append(selected.annex)
         raw_by_owner[selected.owner_id] = list(
             _merge_prisms(owner_prisms)
         )
-        assigned_residual_volume += residual.volume()
+        assigned_volume = sum(
+            _raw_intersection_volume(value, selected.annex)
+            for value in covered_residuals
+        )
+        corridor_volume = sum(
+            _raw_intersection_volume(value, corridor)
+            for value in covered_residuals
+            for corridor in selected.external_corridors
+        )
+        assigned_residual_volume += assigned_volume
+        initial_residual_volume -= corridor_volume
+        technical_corridors.extend(selected.external_corridors)
+        printable_residual_cell_count -= sum(
+            1
+            for value in covered_residuals
+            if _raw_intersection_volume(value, selected.annex)
+            <= _EPSILON
+        )
         bridge_volume = max(
             0.0,
-            selected.annex.volume() - residual.volume(),
+            selected.annex.volume() - assigned_volume,
         )
         removed_internal_clearance_volume += bridge_volume
         assignment_trace.append(
@@ -573,6 +764,17 @@ def _close_hybrid_residual(
                 ),
                 "internal_gap_removed_volume_mm3": round(
                     bridge_volume,
+                    6,
+                ),
+                "covered_residual_cell_count": len(
+                    covered_residuals
+                ),
+                "covered_residual_volume_mm3": round(
+                    assigned_volume,
+                    6,
+                ),
+                "external_clearance_split_volume_mm3": round(
+                    corridor_volume,
                     6,
                 ),
             }
@@ -617,7 +819,7 @@ def _close_hybrid_residual(
         xy_clearance_mm,
         between_bodies_z_mm,
         top_inset_zones,
-        residual_cell_count=len(residual_cells),
+        residual_cell_count=printable_residual_cell_count,
         initial_residual_volume=initial_residual_volume,
         assigned_residual_volume=assigned_residual_volume,
         internal_clearance_removed_volume=(
@@ -771,6 +973,28 @@ def _disjoint_residual_cells(
     return tuple(sorted(raw, key=_raw_signature)), ""
 
 
+def _covered_residual_indexes(
+    pending: Sequence[_RawPrism],
+    added_prisms: Sequence[_RawPrism],
+) -> tuple[set[int], bool]:
+    """Identify every residual cell entirely consumed by new owner material."""
+
+    covered: set[int] = set()
+    partial_coverage = False
+    for index, residual in enumerate(pending):
+        residual_volume = residual.volume()
+        covered_volume = sum(
+            _raw_intersection_volume(residual, prism)
+            for prism in added_prisms
+        )
+        tolerance = max(_EPSILON, residual_volume * 1e-9)
+        if covered_volume >= residual_volume - tolerance:
+            covered.add(index)
+        elif covered_volume > tolerance:
+            partial_coverage = True
+    return covered, partial_coverage
+
+
 def _vertical_extension_options(
     residual_index: int,
     residual: _RawPrism,
@@ -841,32 +1065,39 @@ def _is_external_clearance_corridor(
     residual: _RawPrism,
     raw_by_owner: Mapping[str, Sequence[_RawPrism]],
     xy_clearance_mm: float,
+    z_clearance_mm: float,
 ) -> bool:
-    if xy_clearance_mm <= _EPSILON:
+    clearances = (
+        float(xy_clearance_mm),
+        float(xy_clearance_mm),
+        float(z_clearance_mm),
+    )
+    if all(value <= _EPSILON for value in clearances):
         return False
-    for axis in (0, 1):
-        if abs(residual.size[axis] - xy_clearance_mm) > _EPSILON:
+    for axis, clearance in enumerate(clearances):
+        if (
+            clearance <= _EPSILON
+            or abs(residual.size[axis] - clearance) > _EPSILON
+        ):
             continue
-        orthogonal = 1 - axis
+        orthogonal_axes = tuple(
+            candidate for candidate in range(3) if candidate != axis
+        )
         lower_owners: set[str] = set()
         upper_owners: set[str] = set()
         residual_lower = residual.origin[axis]
         residual_upper = residual_lower + residual.size[axis]
-        residual_orthogonal_lower = residual.origin[orthogonal]
-        residual_orthogonal_upper = (
-            residual_orthogonal_lower + residual.size[orthogonal]
-        )
         for owner_id, values in raw_by_owner.items():
             for value in values:
-                value_orthogonal_lower = value.origin[orthogonal]
-                value_orthogonal_upper = (
-                    value_orthogonal_lower + value.size[orthogonal]
-                )
-                covers_orthogonal = bool(
-                    value_orthogonal_lower
-                    <= residual_orthogonal_lower + _EPSILON
-                    and value_orthogonal_upper
-                    >= residual_orthogonal_upper - _EPSILON
+                covers_orthogonal = all(
+                    value.origin[orthogonal]
+                    <= residual.origin[orthogonal] + _EPSILON
+                    and value.origin[orthogonal]
+                    + value.size[orthogonal]
+                    >= residual.origin[orthogonal]
+                    + residual.size[orthogonal]
+                    - _EPSILON
+                    for orthogonal in orthogonal_axes
                 )
                 if not covers_orthogonal:
                     continue
@@ -883,6 +1114,61 @@ def _is_external_clearance_corridor(
         ):
             return True
     return False
+
+
+def _is_clearance_corridor_junction(
+    residual: _RawPrism,
+    corridors: Sequence[_RawPrism],
+    xy_clearance_mm: float,
+) -> bool:
+    """Preserve XY clearance intersections once an adjacent corridor is known."""
+
+    if xy_clearance_mm <= _EPSILON or not any(
+        abs(residual.size[axis] - xy_clearance_mm) <= _EPSILON
+        for axis in (0, 1)
+    ):
+        return False
+    return any(
+        _raw_vertical_face_axis(residual, corridor)
+        for corridor in corridors
+    )
+
+
+def _raw_vertical_face_axis(
+    left: _RawPrism,
+    right: _RawPrism,
+) -> str:
+    left_upper = tuple(
+        left.origin[axis] + left.size[axis] for axis in range(3)
+    )
+    right_upper = tuple(
+        right.origin[axis] + right.size[axis] for axis in range(3)
+    )
+    overlap_z = min(left_upper[2], right_upper[2]) - max(
+        left.origin[2],
+        right.origin[2],
+    )
+    if overlap_z <= _EPSILON:
+        return ""
+    overlap_y = min(left_upper[1], right_upper[1]) - max(
+        left.origin[1],
+        right.origin[1],
+    )
+    if overlap_y > _EPSILON and (
+        abs(left_upper[0] - right.origin[0]) <= _EPSILON
+        or abs(right_upper[0] - left.origin[0]) <= _EPSILON
+    ):
+        return "x"
+    overlap_x = min(left_upper[0], right_upper[0]) - max(
+        left.origin[0],
+        right.origin[0],
+    )
+    if overlap_x > _EPSILON and (
+        abs(left_upper[1] - right.origin[1]) <= _EPSILON
+        or abs(right_upper[1] - left.origin[1]) <= _EPSILON
+    ):
+        return "y"
+    return ""
 
 
 def _contains_xy(parent: _RawPrism, child: _RawPrism) -> bool:
@@ -1017,6 +1303,377 @@ def _attachment_options(
                     )
                 )
     return tuple(options)
+
+
+def _trimmed_attachment_options(
+    residual_index: int,
+    residual: _RawPrism,
+    raw_by_owner: Mapping[str, Sequence[_RawPrism]],
+    xy_clearance_mm: float,
+    z_clearance_mm: float,
+    zones: Sequence[TopInsetZone],
+    known_corridors: Sequence[_RawPrism],
+) -> tuple[_AttachmentOption, ...]:
+    """Split a residual cell only to preserve a certified external gap."""
+
+    options: list[_AttachmentOption] = []
+    for owner_id in sorted(raw_by_owner):
+        owner_prisms = raw_by_owner[owner_id]
+        if not owner_prisms:
+            continue
+        owner_base = owner_prisms[0].origin[2]
+        residual_upper_z = residual.origin[2] + residual.size[2]
+        if residual_upper_z <= owner_base + _EPSILON:
+            continue
+        lowered_residual = _RawPrism(
+            (residual.origin[0], residual.origin[1], owner_base),
+            (
+                residual.size[0],
+                residual.size[1],
+                residual_upper_z - owner_base,
+            ),
+        )
+        other_prisms = tuple(
+            value
+            for other_owner, values in raw_by_owner.items()
+            if other_owner != owner_id
+            for value in values
+        )
+        for parent_index, parent in enumerate(owner_prisms):
+            for axis, annex, seam_area, gap in _bridge_options(
+                parent,
+                lowered_residual,
+                xy_clearance_mm,
+            ):
+                for trimmed in _externally_separated_xy_trims(
+                    annex,
+                    other_prisms,
+                    xy_clearance_mm,
+                    z_clearance_mm,
+                ):
+                    if _raw_signature(trimmed) == _raw_signature(annex):
+                        continue
+                    if not _raw_vertical_face_axis(parent, trimmed):
+                        continue
+                    if any(
+                        _raw_intersection_volume(trimmed, value) > _EPSILON
+                        for index, value in enumerate(owner_prisms)
+                        if index != parent_index
+                    ):
+                        continue
+                    if any(
+                        _raw_intersects_zone(trimmed, zone)
+                        for zone in zones
+                    ):
+                        continue
+                    assigned = _raw_intersection_prism(
+                        residual,
+                        trimmed,
+                    )
+                    if assigned is None:
+                        continue
+                    corridors = _subtract_raw_prism(residual, assigned)
+                    if not corridors:
+                        continue
+                    prospective = {
+                        candidate_owner: tuple(values)
+                        for candidate_owner, values in raw_by_owner.items()
+                    }
+                    prospective[owner_id] = _merge_prisms(
+                        (*owner_prisms, trimmed)
+                    )
+                    if not _technical_corridors_certified(
+                        corridors,
+                        prospective,
+                        xy_clearance_mm,
+                        z_clearance_mm,
+                        known_corridors,
+                    ):
+                        continue
+                    options.append(
+                        _AttachmentOption(
+                            residual_index,
+                            owner_id,
+                            parent_index,
+                            axis,
+                            trimmed,
+                            seam_area,
+                            gap,
+                            corridors,
+                        )
+                    )
+    return tuple(
+        sorted(
+            options,
+            key=lambda value: (
+                round(
+                    sum(
+                        corridor.volume()
+                        for corridor in value.external_corridors
+                    ),
+                    6,
+                ),
+                value.owner_id,
+                value.parent_index,
+                value.axis,
+                _raw_signature(value.annex),
+            ),
+        )
+    )
+
+
+def _externally_separated_xy_trims(
+    annex: _RawPrism,
+    other_prisms: Sequence[_RawPrism],
+    xy_clearance_mm: float,
+    z_clearance_mm: float,
+) -> tuple[_RawPrism, ...]:
+    candidates = (annex,)
+    for other in other_prisms:
+        next_candidates: dict[
+            tuple[float, float, float, float, float, float],
+            _RawPrism,
+        ] = {}
+        for candidate in candidates:
+            if _raw_prisms_separated(
+                candidate,
+                other,
+                xy_clearance_mm,
+                z_clearance_mm,
+            ):
+                next_candidates[_raw_signature(candidate)] = candidate
+                continue
+            for trimmed in _xy_clearance_trims(
+                candidate,
+                other,
+                xy_clearance_mm,
+            ):
+                next_candidates[_raw_signature(trimmed)] = trimmed
+        if not next_candidates:
+            return ()
+        candidates = tuple(
+            sorted(
+                next_candidates.values(),
+                key=lambda value: (
+                    -round(value.volume(), 6),
+                    _raw_signature(value),
+                ),
+            )[:64]
+        )
+    return tuple(
+        value
+        for value in candidates
+        if all(
+            _raw_prisms_separated(
+                value,
+                other,
+                xy_clearance_mm,
+                z_clearance_mm,
+            )
+            for other in other_prisms
+        )
+    )
+
+
+def _xy_clearance_trims(
+    prism: _RawPrism,
+    obstacle: _RawPrism,
+    clearance_mm: float,
+) -> tuple[_RawPrism, ...]:
+    lower = prism.origin
+    upper = tuple(
+        prism.origin[axis] + prism.size[axis] for axis in range(3)
+    )
+    obstacle_upper = tuple(
+        obstacle.origin[axis] + obstacle.size[axis]
+        for axis in range(3)
+    )
+    candidates: list[_RawPrism] = []
+    for axis in (0, 1):
+        positive_upper = obstacle.origin[axis] - clearance_mm
+        if lower[axis] + _EPSILON < positive_upper < upper[axis] - _EPSILON:
+            size = list(prism.size)
+            size[axis] = positive_upper - lower[axis]
+            candidates.append(_RawPrism(prism.origin, tuple(size)))
+        negative_lower = obstacle_upper[axis] + clearance_mm
+        if lower[axis] + _EPSILON < negative_lower < upper[axis] - _EPSILON:
+            origin = list(prism.origin)
+            size = list(prism.size)
+            origin[axis] = negative_lower
+            size[axis] = upper[axis] - negative_lower
+            candidates.append(_RawPrism(tuple(origin), tuple(size)))
+    return tuple(candidates)
+
+
+def _raw_intersection_prism(
+    left: _RawPrism,
+    right: _RawPrism,
+) -> _RawPrism | None:
+    lower = tuple(
+        max(left.origin[axis], right.origin[axis])
+        for axis in range(3)
+    )
+    upper = tuple(
+        min(
+            left.origin[axis] + left.size[axis],
+            right.origin[axis] + right.size[axis],
+        )
+        for axis in range(3)
+    )
+    if any(
+        upper[axis] - lower[axis] <= _EPSILON
+        for axis in range(3)
+    ):
+        return None
+    return _RawPrism(
+        lower,
+        tuple(upper[axis] - lower[axis] for axis in range(3)),
+    )
+
+
+def _subtract_raw_prism(
+    source: _RawPrism,
+    removed: _RawPrism,
+) -> tuple[_RawPrism, ...]:
+    axes = tuple(
+        tuple(
+            sorted(
+                {
+                    source.origin[axis],
+                    removed.origin[axis],
+                    removed.origin[axis] + removed.size[axis],
+                    source.origin[axis] + source.size[axis],
+                }
+            )
+        )
+        for axis in range(3)
+    )
+    values: list[_RawPrism] = []
+    for x_index in range(len(axes[0]) - 1):
+        for y_index in range(len(axes[1]) - 1):
+            for z_index in range(len(axes[2]) - 1):
+                lower = (
+                    axes[0][x_index],
+                    axes[1][y_index],
+                    axes[2][z_index],
+                )
+                upper = (
+                    axes[0][x_index + 1],
+                    axes[1][y_index + 1],
+                    axes[2][z_index + 1],
+                )
+                cell = _RawPrism(
+                    lower,
+                    tuple(
+                        upper[axis] - lower[axis]
+                        for axis in range(3)
+                    ),
+                )
+                if cell.volume() <= _EPSILON:
+                    continue
+                if _raw_intersection_volume(cell, removed) > _EPSILON:
+                    continue
+                values.append(cell)
+    return _merge_prisms(values)
+
+
+def _technical_corridors_certified(
+    corridors: Sequence[_RawPrism],
+    raw_by_owner: Mapping[str, Sequence[_RawPrism]],
+    xy_clearance_mm: float,
+    z_clearance_mm: float,
+    known_corridors: Sequence[_RawPrism],
+) -> bool:
+    pending = list(corridors)
+    accepted = list(known_corridors)
+    while pending:
+        selected_index = next(
+            (
+                index
+                for index, corridor in enumerate(pending)
+                if _is_external_clearance_corridor(
+                    corridor,
+                    raw_by_owner,
+                    xy_clearance_mm,
+                    z_clearance_mm,
+                )
+                or _is_clearance_corridor_junction(
+                    corridor,
+                    accepted,
+                    xy_clearance_mm,
+                )
+            ),
+            None,
+        )
+        if selected_index is None:
+            return False
+        accepted.append(pending.pop(selected_index))
+    return True
+
+
+def _split_certified_external_corridor(
+    residual: _RawPrism,
+    raw_by_owner: Mapping[str, Sequence[_RawPrism]],
+    xy_clearance_mm: float,
+    z_clearance_mm: float,
+    known_corridors: Sequence[_RawPrism],
+) -> tuple[_RawPrism, ...]:
+    """Split a mixed XY/Z clearance junction into certified void cells."""
+
+    clearances = (
+        float(xy_clearance_mm),
+        float(xy_clearance_mm),
+        float(z_clearance_mm),
+    )
+    axes: list[tuple[float, ...]] = []
+    for axis, clearance in enumerate(clearances):
+        lower = residual.origin[axis]
+        upper = lower + residual.size[axis]
+        coordinates = {lower, upper}
+        if clearance > _EPSILON:
+            for values in raw_by_owner.values():
+                for value in values:
+                    value_upper = value.origin[axis] + value.size[axis]
+                    for candidate in (
+                        value.origin[axis] - clearance,
+                        value_upper + clearance,
+                    ):
+                        if lower + _EPSILON < candidate < upper - _EPSILON:
+                            coordinates.add(candidate)
+        axes.append(tuple(sorted(coordinates)))
+    cell_count = (
+        (len(axes[0]) - 1)
+        * (len(axes[1]) - 1)
+        * (len(axes[2]) - 1)
+    )
+    if cell_count <= 1 or cell_count > 4096:
+        return ()
+    pieces = tuple(
+        _RawPrism(
+            (
+                axes[0][x_index],
+                axes[1][y_index],
+                axes[2][z_index],
+            ),
+            (
+                axes[0][x_index + 1] - axes[0][x_index],
+                axes[1][y_index + 1] - axes[1][y_index],
+                axes[2][z_index + 1] - axes[2][z_index],
+            ),
+        )
+        for x_index in range(len(axes[0]) - 1)
+        for y_index in range(len(axes[1]) - 1)
+        for z_index in range(len(axes[2]) - 1)
+    )
+    if not _technical_corridors_certified(
+        pieces,
+        raw_by_owner,
+        xy_clearance_mm,
+        z_clearance_mm,
+        known_corridors,
+    ):
+        return ()
+    return pieces
 
 
 def _bridge_options(
@@ -1247,7 +1904,10 @@ def _hybrid_certificate(
         "source_mode": "continuous_prefill_residual_cells",
         "owner_count": len(owners),
         "residual_cell_count": residual_cell_count,
-        "assigned_residual_cell_count": len(assignment_trace),
+        "assigned_residual_cell_count": sum(
+            int(value.get("covered_residual_cell_count", 1))
+            for value in assignment_trace
+        ),
         "initial_printable_residual_volume_mm3": round(
             initial_residual_volume,
             6,

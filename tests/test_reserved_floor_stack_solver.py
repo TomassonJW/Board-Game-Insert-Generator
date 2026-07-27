@@ -109,6 +109,17 @@ def _open_floor_problem() -> SimpleNamespace:
     )
 
 
+def _support_insertion_problem() -> SimpleNamespace:
+    return SimpleNamespace(
+        box={"x": 60.0, "y": 60.0, "z": 50.0},
+        storage_height_mm=50.0,
+        z_clearance_mm=0.6,
+        xy_clearance_mm=0.6,
+        box_xy_clearance_mm=0.6,
+        top_inset_zones=(),
+    )
+
+
 class ReservedFloorStackSolverTests(unittest.TestCase):
     def test_complete_rank_prefers_floor_without_pruning_compact_search_states(self) -> None:
         lower = _Item(
@@ -230,6 +241,36 @@ class ReservedFloorStackSolverTests(unittest.TestCase):
                     z + height,
                     zone.support_plane_z_mm + 0.0001,
                 )
+
+    def test_wide_optional_variant_does_not_prevent_a_later_support(self) -> None:
+        execution = solve_reserved_floor_stacks(
+            [
+                _participant(
+                    "container:shallow",
+                    (40.0, 40.0, 10.0),
+                    alternatives=(("shallow-wide", (100.0, 100.0, 10.0)),),
+                ),
+                _participant("container:support", (50.0, 50.0, 20.0)),
+            ],
+            _support_insertion_problem(),
+        )
+
+        self.assertEqual(execution.status, SOLUTION_FOUND)
+        placements = {
+            value.participant_id: value for value in execution.candidates[0]
+        }
+        self.assertEqual(
+            placements["container:support"].supporting_ids,
+            ("box-floor",),
+        )
+        self.assertEqual(
+            placements["container:shallow"].supporting_ids,
+            ("container:support",),
+        )
+        self.assertAlmostEqual(
+            placements["container:shallow"].origin_mm[2],
+            20.6,
+        )
 
     def test_stops_without_claiming_impossibility(self) -> None:
         execution = solve_reserved_floor_stacks(

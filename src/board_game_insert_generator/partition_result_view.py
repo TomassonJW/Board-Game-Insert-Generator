@@ -36,10 +36,12 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
     top_cavities: list[dict[str, object]] = []
     cut_bodies: list[dict[str, object]] = []
     cut_cavities: list[dict[str, object]] = []
+    cut_cavity_accesses: list[dict[str, object]] = []
     details: list[dict[str, object]] = []
     for index, placement in enumerate(placements):
         origin = _dimension(placement.get("origin_mm"), f"placement[{index}].origin_mm")
         size = _dimension(placement.get("world_size_mm"), f"placement[{index}].world_size_mm")
+        composite_prisms = _composite_prisms(placement, index)
         body = {
             "id": str(placement["id"]),
             "kind": "body",
@@ -56,8 +58,39 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
             "stage_index": int(placement.get("stage_index", 0)),
             "color_slot": index % 8,
         }
+        if composite_prisms:
+            body["geometry_kind"] = "composite_rectangular_union"
+            body["rectangles"] = _top_prism_rectangles(
+                composite_prisms
+            )
+            body["composite_prism_count"] = len(composite_prisms)
         top_bodies.append(body)
-        if _crosses(section_y, origin["y"], size["y"]):
+        if composite_prisms:
+            section_rectangles = _section_prism_rectangles(
+                composite_prisms,
+                section_y,
+                box["z"],
+            )
+            if section_rectangles:
+                cut_bodies.append(
+                    {
+                        "id": body["id"], "kind": "body",
+                        "role": body["role"], "label": body["label"],
+                        "stage_id": body["stage_id"],
+                        "stage_index": body["stage_index"],
+                        "x_mm": body["x_mm"],
+                        "z_from_top_mm": _round(
+                            box["z"] - origin["z"] - size["z"]
+                        ),
+                        "width_mm": body["width_mm"],
+                        "height_mm": body["depth_mm"],
+                        "color_slot": body["color_slot"],
+                        "geometry_kind": "composite_rectangular_union",
+                        "rectangles": section_rectangles,
+                        "composite_prism_count": len(composite_prisms),
+                    }
+                )
+        elif _crosses(section_y, origin["y"], size["y"]):
             cut_bodies.append(
                 {
                     "id": body["id"], "kind": "body", "role": body["role"], "label": body["label"],
@@ -68,8 +101,22 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
             )
         content_names = {str(item["id"]): str(item["name"]) for item in _mappings(placement.get("source_contents", []), f"placement[{index}].source_contents")}
         cavities = _mappings(placement.get("cavity_layout", []), f"placement[{index}].cavity_layout")
-        for cavity in cavities:
-            bounds = _cavity_world_bounds(placement, cavity)
+        frozen_cavities = _optional_mappings(
+            placement.get("frozen_cavities_v1"),
+            f"placement[{index}].frozen_cavities_v1",
+        )
+        if frozen_cavities and len(frozen_cavities) != len(cavities):
+            raise PartitionResultViewError(
+                "Le nombre de cavites figees diverge du plan affiche."
+            )
+        for cavity_index, cavity in enumerate(cavities):
+            bounds = (
+                _frozen_cavity_world_bounds(
+                    frozen_cavities[cavity_index]
+                )
+                if frozen_cavities
+                else _cavity_world_bounds(placement, cavity)
+            )
             cavity_view = {
                 "id": str(cavity["cavity_id"]),
                 "parent_id": body["id"],
@@ -94,6 +141,36 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
                         "width_mm": cavity_view["width_mm"], "height_mm": cavity_view["depth_mm"],
                     }
                 )
+        for access in _composite_access_cuts(placement, index):
+            access_origin = _dimension(
+                access.get("world_origin_mm"),
+                f"placement[{index}].composite_access.world_origin_mm",
+            )
+            access_size = _dimension(
+                access.get("size_mm"),
+                f"placement[{index}].composite_access.size_mm",
+            )
+            if _crosses(
+                section_y,
+                access_origin["y"],
+                access_size["y"],
+            ):
+                cut_cavity_accesses.append(
+                    {
+                        "id": str(access["id"]),
+                        "parent_id": body["id"],
+                        "kind": "cavity_vertical_access",
+                        "cavity_id": str(access["reservation_id"]),
+                        "x_mm": _round(access_origin["x"]),
+                        "z_from_top_mm": _round(
+                            box["z"]
+                            - access_origin["z"]
+                            - access_size["z"]
+                        ),
+                        "width_mm": _round(access_size["x"]),
+                        "height_mm": _round(access_size["z"]),
+                    }
+                )
         details.append(
             {
                 "id": body["id"], "role": body["role"], "name": body["label"],
@@ -108,6 +185,7 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
                 "source_content_ids": deepcopy(placement.get("source_content_ids", [])),
                 "source_contents": deepcopy(placement.get("source_contents", [])),
                 "cavity_count": len(cavities),
+                "composite_prism_count": len(composite_prisms),
                 "top_inset_cut_count": len(_mappings(placement.get("top_inset_cuts", []), f"placement[{index}].top_inset_cuts")),
                 "requested_complement_id": placement.get("requested_complement_id"),
                 "complement_kind": placement.get("complement_kind"),
@@ -184,6 +262,7 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
             "view_box_mm": {"x": 0.0, "y": 0.0, "width": _round(box["x"]), "height": _round(box["z"])},
             "bodies": cut_bodies,
             "cavities": cut_cavities,
+            "cavity_vertical_accesses": cut_cavity_accesses,
             "flat_stack_reservation": reservation_cut,
             "top_inset_reservations": reservation_cuts,
             "residuals": residual_cuts,
@@ -206,6 +285,12 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
             "source_plan_unchanged": True,
             "localized_top_insets": True,
             "stage_aware": True,
+            "frozen_cavity_world_poses_projected": True,
+            "composite_prisms_projected": all(
+                not isinstance(placement.get("composite_body"), dict)
+                or bool(_composite_prisms(placement, index))
+                for index, placement in enumerate(placements)
+            ),
             "residuals_are_non_printable": all(
                 not bool(item.get("printable", False))
                 for item in _mappings(residual_contract.get("zones", []), "partition.residuals.zones")
@@ -213,12 +298,129 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
             "partial_never_materializable": plan_status != "proposal_with_residuals" or not materializable,
         },
         "limitations": [
-            "La vue dessus projette les placements, etages, residus et encastrements superieurs resolus.",
+            "La vue dessus projette les vrais prismes composites, les cavites figees, les etages, les residus et les encastrements superieurs resolus.",
             "La coupe X/Z traverse le plan a Y = box.y / 2 et peut ne pas couper tous les corps.",
+            "Le degagement vertical au-dessus d une cavite est distingue de la profondeur calibree de l asset.",
             "Les residus sont des volumes non imprimes ; une suggestion exige toujours confirmation.",
             "Cette vue ne constitue ni une CAD IR, ni une validation Fusion ou impression.",
         ],
     }
+
+
+def _composite_prisms(
+    placement: dict[str, object],
+    index: int,
+) -> list[dict[str, Any]]:
+    composite = placement.get("composite_body")
+    if not isinstance(composite, dict):
+        return []
+    if composite.get("schema_version") != "bgig.xy_composite_cad_body.v2":
+        return []
+    return _mappings(
+        composite.get("prisms"),
+        f"placement[{index}].composite_body.prisms",
+    )
+
+
+def _composite_access_cuts(
+    placement: dict[str, object],
+    index: int,
+) -> list[dict[str, Any]]:
+    composite = placement.get("composite_body")
+    if not isinstance(composite, dict):
+        return []
+    return _optional_mappings(
+        composite.get("frozen_cavity_access_cuts"),
+        f"placement[{index}].composite_body.frozen_cavity_access_cuts",
+    )
+
+
+def _top_prism_rectangles(
+    prisms: list[dict[str, Any]],
+) -> list[dict[str, float]]:
+    rectangles: dict[
+        tuple[float, float, float, float],
+        dict[str, float],
+    ] = {}
+    for index, prism in enumerate(prisms):
+        origin = _dimension(
+            prism.get("cad_origin_mm"),
+            f"composite.prisms[{index}].cad_origin_mm",
+        )
+        size = _dimension(
+            prism.get("cad_size_mm"),
+            f"composite.prisms[{index}].cad_size_mm",
+        )
+        key = (
+            _round(origin["x"]),
+            _round(origin["y"]),
+            _round(size["x"]),
+            _round(size["y"]),
+        )
+        rectangles[key] = {
+            "x_mm": key[0],
+            "y_mm": key[1],
+            "width_mm": key[2],
+            "height_mm": key[3],
+        }
+    return [rectangles[key] for key in sorted(rectangles)]
+
+
+def _section_prism_rectangles(
+    prisms: list[dict[str, Any]],
+    section_y: float,
+    box_height: float,
+) -> list[dict[str, float]]:
+    rectangles: dict[
+        tuple[float, float, float, float],
+        dict[str, float],
+    ] = {}
+    for index, prism in enumerate(prisms):
+        origin = _dimension(
+            prism.get("cad_origin_mm"),
+            f"composite.prisms[{index}].cad_origin_mm",
+        )
+        size = _dimension(
+            prism.get("cad_size_mm"),
+            f"composite.prisms[{index}].cad_size_mm",
+        )
+        if not _crosses(section_y, origin["y"], size["y"]):
+            continue
+        key = (
+            _round(origin["x"]),
+            _round(box_height - origin["z"] - size["z"]),
+            _round(size["x"]),
+            _round(size["z"]),
+        )
+        rectangles[key] = {
+            "x_mm": key[0],
+            "z_from_top_mm": key[1],
+            "width_mm": key[2],
+            "height_mm": key[3],
+        }
+    return [rectangles[key] for key in sorted(rectangles)]
+
+
+def _frozen_cavity_world_bounds(
+    frozen: dict[str, Any],
+) -> dict[str, float]:
+    origin = _dimension(
+        frozen.get("world_origin_mm"),
+        "frozen_cavity.world_origin_mm",
+    )
+    size = _dimension(
+        frozen.get("world_size_mm"),
+        "frozen_cavity.world_size_mm",
+    )
+    return {
+        "x": origin["x"],
+        "y": origin["y"],
+        "z": origin["z"],
+        "width": size["x"],
+        "height": size["y"],
+        "depth": size["z"],
+    }
+
 
 def _cavity_world_bounds(placement: dict[str, Any], cavity: dict[str, Any]) -> dict[str, float]:
     origin = _dimension(placement["origin_mm"], "placement.origin_mm")
@@ -260,6 +462,15 @@ def _mappings(value: object, field: str) -> list[dict[str, Any]]:
     if not isinstance(value, list):
         raise PartitionResultViewError(f"{field} doit etre une liste.")
     return [_mapping(item, f"{field}[{index}]") for index, item in enumerate(value)]
+
+
+def _optional_mappings(
+    value: object,
+    field: str,
+) -> list[dict[str, Any]]:
+    if value is None:
+        return []
+    return _mappings(value, field)
 
 
 def _dimension(value: object, field: str) -> dict[str, float]:

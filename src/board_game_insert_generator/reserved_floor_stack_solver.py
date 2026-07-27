@@ -20,7 +20,7 @@ from board_game_insert_generator.solver_outcome import (
 )
 
 
-RESERVED_FLOOR_STACK_VERSION = "reserved-floor-stacks-v2"
+RESERVED_FLOOR_STACK_VERSION = "reserved-floor-stacks-v4"
 DEFAULT_MAX_STATES = 1_024
 DEFAULT_MAX_PACK_ATTEMPTS = 1_024
 DEFAULT_MAX_BACKTRACK_NODES = 50_000
@@ -261,6 +261,73 @@ def _on_stack(
     )
 
 
+def _under_stack(
+    stack: _Stack,
+    item: _Item,
+    rotation: int,
+    width: float,
+    depth: float,
+    z_clearance: float,
+    storage_height: float,
+) -> _Stack | None:
+    """Insert a newly visited wider item below an existing legal stack.
+
+    Variant ordering must not decide which body can become a support: an
+    optional wide relayout may make a compact shallow container visit before a
+    taller support.  This symmetric operation preserves the stack geometry
+    while moving the already frozen minimum envelopes together.
+    """
+
+    if (
+        stack.base_size[0] > width + _EPSILON
+        or stack.base_size[1] > depth + _EPSILON
+    ):
+        return None
+    shift_z = item.local_size[2] + z_clearance
+    height = shift_z + stack.height
+    if height > storage_height + _EPSILON:
+        return None
+    shift_x = (width - stack.base_size[0]) / 2.0
+    shift_y = (depth - stack.base_size[1]) / 2.0
+    shifted_layers: list[_Layer] = []
+    for index, layer in enumerate(stack.layers):
+        shifted_layers.append(
+            _Layer(
+                item=layer.item,
+                x=layer.x + shift_x,
+                y=layer.y + shift_y,
+                z=layer.z + shift_z,
+                world_size=layer.world_size,
+                rotation=layer.rotation,
+                support_id=(
+                    item.participant_id
+                    if index == 0
+                    else layer.support_id
+                ),
+            )
+        )
+    bottom = _Layer(
+        item=item,
+        x=0.0,
+        y=0.0,
+        z=0.0,
+        world_size=(width, depth, item.local_size[2]),
+        rotation=rotation,
+        support_id="box-floor",
+    )
+    return _Stack(
+        layers=(bottom, *shifted_layers),
+        base_size=(width, depth),
+        top_origin=(
+            stack.top_origin[0] + shift_x,
+            stack.top_origin[1] + shift_y,
+        ),
+        top_size=stack.top_size,
+        top_id=stack.top_id,
+        height=height,
+    )
+
+
 def _stack_has_floor_position(
     stack: _Stack,
     box: tuple[float, float],
@@ -348,31 +415,42 @@ def _build_states(
                             continue
                         seen_targets.add(stack_geometry)
                         expansion_count += 1
-                        changed = _on_stack(
-                            stack,
-                            item,
-                            rotation,
-                            width,
-                            depth,
-                            z_clearance,
-                            storage_height,
-                        )
-                        if changed is None or not _stack_has_floor_position(
-                            changed,
-                            box,
-                            margin,
-                            zones,
+                        for changed in (
+                            _on_stack(
+                                stack,
+                                item,
+                                rotation,
+                                width,
+                                depth,
+                                z_clearance,
+                                storage_height,
+                            ),
+                            _under_stack(
+                                stack,
+                                item,
+                                rotation,
+                                width,
+                                depth,
+                                z_clearance,
+                                storage_height,
+                            ),
                         ):
-                            continue
-                        placed = list(stacks)
-                        placed[index] = changed
-                        changed_state = tuple(
-                            sorted(placed, key=_geometry_signature)
-                        )
-                        candidates.setdefault(
-                            _state_signature(changed_state),
-                            changed_state,
-                        )
+                            if changed is None or not _stack_has_floor_position(
+                                changed,
+                                box,
+                                margin,
+                                zones,
+                            ):
+                                continue
+                            placed = list(stacks)
+                            placed[index] = changed
+                            changed_state = tuple(
+                                sorted(placed, key=_geometry_signature)
+                            )
+                            candidates.setdefault(
+                                _state_signature(changed_state),
+                                changed_state,
+                            )
         if not candidates:
             return _StateBuild(
                 states=(),
@@ -757,7 +835,13 @@ def solve_reserved_floor_stacks(
     backtrack_nodes = 0
     stopped = build.stopped
     complete_states = sorted(build.states, key=_complete_state_rank)
-    for stacks in complete_states[: max(1, int(max_pack_attempts))]:
+    states_to_pack = complete_states[: max(1, int(max_pack_attempts))]
+
+    # Scan every retained stack state with the cheap deterministic packer
+    # before spending the bounded backtracking budget.  The previous
+    # interleaving could burn 50k nodes on each early floor-heavy state and
+    # never reach a later directly packable state.
+    for stacks in states_to_pack:
         if _stopped(should_stop):
             stopped = True
             break
@@ -771,32 +855,41 @@ def solve_reserved_floor_stacks(
             box_perimeter_xy_mm=problem.box_xy_clearance_mm,
             top_inset_zones=problem.top_inset_zones,
         )
-        packed_placements = packed.placements
-        if not packed_placements:
+        if packed.placements:
+            expanded = _expand(tuple(packed.placements), by_id)
+            digest = _execution_digest((expanded,))
+            if digest not in seen:
+                seen.add(digest)
+                candidates.append(expanded)
+        if len(candidates) >= max(1, int(max_candidates)):
+            break
+    if not candidates and not stopped:
+        remaining_nodes = max(1, int(max_backtrack_nodes))
+        for stacks in states_to_pack:
+            if _stopped(should_stop) or remaining_nodes <= 0:
+                stopped = _stopped(should_stop)
+                break
+            pseudo, by_id = _pseudo_participants(stacks)
             fallback = _pack_floor_backtracking(
                 pseudo,
                 problem.box,
                 problem.box_xy_clearance_mm,
                 problem.xy_clearance_mm,
                 problem.top_inset_zones,
-                max_nodes=max_backtrack_nodes,
+                max_nodes=remaining_nodes,
                 should_stop=should_stop,
             )
             backtrack_nodes += fallback.node_count
+            remaining_nodes -= fallback.node_count
             stopped = stopped or fallback.stopped
-            packed_placements = fallback.placements
-        if not packed_placements:
-            if stopped:
+            if fallback.placements:
+                expanded = _expand(tuple(fallback.placements), by_id)
+                digest = _execution_digest((expanded,))
+                if digest not in seen:
+                    seen.add(digest)
+                    candidates.append(expanded)
+            if len(candidates) >= max(1, int(max_candidates)):
                 break
-            continue
-        expanded = _expand(tuple(packed_placements), by_id)
-        digest = _execution_digest((expanded,))
-        if digest in seen:
-            continue
-        seen.add(digest)
-        candidates.append(expanded)
-        if len(candidates) >= max(1, int(max_candidates)):
-            break
     status = SOLUTION_FOUND if candidates else NO_SOLUTION_WITHIN_BUDGET
     stop_reason = (
         "reserved_top_floor_stacks_found"

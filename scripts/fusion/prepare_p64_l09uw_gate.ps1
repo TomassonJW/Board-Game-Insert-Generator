@@ -11,23 +11,23 @@ $root = Resolve-BgigRepoRoot -RepoRoot $RepoRoot
 $target = Get-BgigFusionAddinTargetPath -TargetPath $TargetPath
 $commit = Get-BgigCurrentCommit -RepoRoot $root
 $python = (Get-Command python -ErrorAction Stop).Source
-$preflight = Join-Path $root "scripts\fusion\p64_l09uv_preflight.py"
+$preflight = Join-Path $root "scripts\fusion\p64_l09uw_preflight.py"
 $localReplay = Join-Path $root "scripts\fusion\p64_l09t_local_replay.py"
 $manifestPath = Join-Path $root "fusion_addin\BoardGameInsertGenerator\BoardGameInsertGenerator.manifest"
 $projectDirectory = Join-Path ([Environment]::GetFolderPath("MyDocuments")) "BGIG\projects"
-$fixtureName = "p64-l09uv-01-fresh-batched-composite.bgig.json"
-$summaryName = "p64-l09uv-preflight-summary.json"
-$localReceiptName = "p64-l09uv-local-replay-summary.json"
+$fixtureName = "p64-l09uw-01-exact-composite.bgig.json"
+$summaryName = "p64-l09uw-preflight-summary.json"
+$localReceiptName = "p64-l09uw-local-replay-summary.json"
 $documentStatePath = Join-Path $projectDirectory "bgig_document_state_v1.json"
 $commitMarker = Join-Path $target "bgig_installed_commit.txt"
-$workspaceTemp = Join-Path $root ".codex-work\p64-l09uv-fusion-gate"
+$workspaceTemp = Join-Path $root ".codex-work\p64-l09uw-fusion-gate"
 $tempFixture = Join-Path $workspaceTemp $fixtureName
 $tempSummary = Join-Path $workspaceTemp $summaryName
 $tempLocalReceipt = Join-Path $workspaceTemp $localReceiptName
 
 foreach ($required in @($preflight, $localReplay, $manifestPath)) {
     if (-not (Test-Path -LiteralPath $required -PathType Leaf)) {
-        throw "P64-L09U-R1-V required source missing: $required"
+        throw "P64-L09U-R2-V required source missing: $required"
     }
 }
 $manifestText = Get-Content -LiteralPath $manifestPath -Raw -Encoding UTF8
@@ -39,11 +39,11 @@ if (-not $versionMatch.Success) {
     throw "Source add-in manifest has no readable version: $manifestPath"
 }
 $expectedVersion = $versionMatch.Groups["version"].Value
-if ($expectedVersion -ne "0.1.72") {
-    throw "P64-L09U-R1-V package version mismatch: expected 0.1.72, got $expectedVersion."
+if ($expectedVersion -ne "0.1.73") {
+    throw "P64-L09U-R2-V package version mismatch: expected 0.1.73, got $expectedVersion."
 }
 
-Write-Output "BGIG P64-L09U-R1-V corrective Fusion gate preparation"
+Write-Output "BGIG P64-L09U-R2-V corrective Fusion gate preparation"
 Write-Output "Repo root: $root"
 Write-Output "Commit: $commit"
 Write-Output "Package version: $expectedVersion"
@@ -105,7 +105,7 @@ Write-BgigFusionUiSettings `
     -DryRun:$DryRun
 
 if ($DryRun) {
-    Write-Output "Dry run: would install the P64-L09U-R1-V fixture and receipts."
+    Write-Output "Dry run: would install the P64-L09U-R2-V fixture and receipts."
     Write-Output "Dry run: would preserve named projects and legacy recovery files."
     Write-Output "Dry run: would force a fresh unsaved startup with no current path."
 }
@@ -121,15 +121,17 @@ else {
             Join-Path $target "BoardGameInsertGenerator.py"
         ) -Raw -Encoding UTF8
         foreach ($marker in @(
-            "_persist_temporary_box_tools",
+            "_create_boolean_rectangular_blank",
             "TemporaryBRepManager.get",
-            "persisted_result_bodies = base_feature.bodies",
+            "BooleanTypes.UnionBooleanType",
+            "BooleanTypes.DifferenceBooleanType",
+            "_refresh_fusion_generation_ui",
             "_rollback_failed_generation",
-            "additive_prism_join_features",
-            "cavity_cut_features"
+            "transient_boolean_module_count",
+            "parametric_combine_feature_count"
         )) {
             if (-not $installedAdapter.Contains($marker)) {
-                throw "Installed P64-L09U-R1-V materialization marker missing: $marker"
+                throw "Installed P64-L09U-R2-V materialization marker missing: $marker"
             }
         }
         $installedSkeleton = Get-Content -LiteralPath (
@@ -141,7 +143,7 @@ else {
             "fusion_materialization_batches"
         )) {
             if (-not $installedSkeleton.Contains($marker)) {
-                throw "Installed P64-L09U-R1-V batch marker missing: $marker"
+                throw "Installed P64-L09U-R2-V CAD marker missing: $marker"
             }
         }
         $installedPalette = Get-Content -LiteralPath (
@@ -153,11 +155,11 @@ else {
             "cross_session_witness_persistence_disabled"
         )) {
             if (-not $installedPalette.Contains($marker)) {
-                throw "Installed P64-L09U-R1-V startup marker missing: $marker"
+                throw "Installed P64-L09U-R2-V startup marker missing: $marker"
             }
         }
         if ($installedPalette.Contains('"autosave_project"')) {
-            throw "Installed P64-L09U-R1-V still exposes autosave_project."
+            throw "Installed P64-L09U-R2-V still exposes autosave_project."
         }
         $installedSolver = Get-Content -LiteralPath (
             Join-Path $target "lib\board_game_insert_generator\minimal_layout_solver.py"
@@ -167,7 +169,7 @@ else {
             "dense project needs stacks below a tray"
         )) {
             if (-not $installedSolver.Contains($marker)) {
-                throw "Installed P64-L09U-R1-V fresh-solve marker missing: $marker"
+                throw "Installed P64-L09U-R2-V fresh-solve marker missing: $marker"
             }
         }
 
@@ -199,7 +201,7 @@ else {
                 Get-FileHash -LiteralPath $documentStatePath -Algorithm SHA256
             ).Hash.ToLowerInvariant()
             $stateBackup = Join-Path $projectDirectory (
-                "bgig_document_state_v1.before-p64-l09uv-" +
+                "bgig_document_state_v1.before-p64-l09uw-" +
                 "$($stateHash.Substring(0, 12)).json"
             )
             if (-not (Test-Path -LiteralPath $stateBackup -PathType Leaf)) {
@@ -250,7 +252,7 @@ else {
             Get-Content -LiteralPath $commitMarker -Raw -Encoding UTF8
         ).Trim()
         if ($installedCommit -ne $commit) {
-            throw "Installed P64-L09U-R1-V commit marker mismatch."
+            throw "Installed P64-L09U-R2-V commit marker mismatch."
         }
     }
     catch [UnauthorizedAccessException] {
@@ -269,7 +271,7 @@ else {
                 $resolvedRoot + [IO.Path]::DirectorySeparatorChar,
                 [StringComparison]::OrdinalIgnoreCase
             )) {
-                throw "Refusing to remove a P64-L09U-R1-V temp path outside the repository."
+                throw "Refusing to remove a P64-L09U-R2-V temp path outside the repository."
             }
             Remove-Item -LiteralPath $resolvedTemp -Recurse -Force
         }
@@ -277,15 +279,16 @@ else {
 }
 
 Write-Output ""
-Write-Output "P64-L09U-R1-V actions remaining for Thomas:"
+Write-Output "P64-L09U-R2-V actions remaining for Thomas:"
 Write-Output "1. Fully close and reopen Fusion, then reload BGIG $expectedVersion."
 Write-Output "2. Confirm BGIG opens on a fresh unsaved empty project."
 Write-Output "3. Open CasLimite01+ explicitly, calculate in Normal, then materialize the minimal plan."
-Write-Output "4. Require no ALL_TOOL_BODY_REFERENCE_LOST, no tool blocks and no partial BGIG scene."
+Write-Output "4. Require no ALL_TOOL_BODY_REFERENCE_LOST, no Combine feature and no partial BGIG scene."
 Write-Output "5. Clear the BGIG scene, finalize in Normal and materialize the final plan while timing it."
 Write-Output "6. Require a synchronized scene, frozen cavities, no visible residual and no partial tools."
 Write-Output "7. Repeat calculation, finalization and timed materialization with CasLimite02+."
-Write-Output "8. Close and reopen Fusion; require another blank project and a real fresh calculation."
-Write-Output "9. Report exact elapsed times, OK or KO, and screenshots; keep print-validated=false."
+Write-Output "8. Open CasLimite01++, then calculate, finalize and materialize it without saving the source."
+Write-Output "9. Close and reopen Fusion; require another blank project and a real fresh calculation."
+Write-Output "10. Report exact elapsed times, OK or KO, and screenshots; keep print-validated=false."
 Write-Output "Prepared status: fusion-validated=false; print-validated=false."
-Write-Output "Prepared P64-L09U-R1-V gate: $(-not $DryRun)"
+Write-Output "Prepared P64-L09U-R2-V gate: $(-not $DryRun)"

@@ -1,7 +1,34 @@
 # Capability Map
 
 <!-- P64-L09U-CAPABILITY -->
-## P64-L09U-R1 — correction de session et matérialisation
+## P64-L09U-R2 — fidélité calcul, aperçu et Fusion
+
+- `C-STAGED-CALCULATION` : `automated-validated`. La finalisation conserve
+  l'identité et les placements du minimum exact sélectionné.
+- `C-PREVIEW` : `automated-validated`. Les propriétaires composites sont
+  projetés prisme par prisme ; cavités gelées et accès sont distingués.
+- `C-GLOBAL-LAYOUT` : `automated-validated`. L'insertion tardive d'un support
+  large permet le calcul de `CasLimite01++`.
+- `C-FINALIZATION` : `automated-validated`. Les jeux externes XY/Z, y compris
+  leurs jonctions, ne sont plus comptés comme résiduel imprimable.
+- `C-CAD-IR` : inchangée et recertifiée ; unions, coupes, poses et volumes
+  logiques restent l'autorité.
+- `C-FUSION` : `implemented`, `automated-validated`. Un corps transitoire
+  booléenné puis persisté remplace les Combine rectangulaires. La validation
+  réelle dans Fusion reste humaine.
+- `C-FUSION-UI` : respiration entre modules implémentée ; jauge déterminée et
+  annulation restent seulement proposées par ADR-0095.
+- `C-QUALITY` : `109/109` tests du préparateur, six replays exacts en lecture
+  seule et suite globale autorisée `886/886` en `363.209 s`.
+- `C-RELEASE` : candidate `0.1.73`, preflight et préparateur disponibles ;
+  installation réelle encore à clôturer.
+- `C-PRINT` : `print-validated=false`.
+
+`fusion-validated=false`, `print-validated=false`.
+
+### Historique R1 supersédé
+
+#### P64-L09U-R1 — correction de session et matérialisation
 
 - `C-STAGED-CALCULATION` : `automated-validated`. Un redémarrage ne recharge
   plus de projet ou de témoin certifié ; Calculer déclenche un calcul frais.

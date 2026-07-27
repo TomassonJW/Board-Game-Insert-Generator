@@ -55,7 +55,7 @@ from board_game_insert_generator.solver_settings import solver_deadline_seconds
 
 COUPLED_FINALIZATION_SCHEMA_V1 = "bgig.coupled_finalization.v1"
 COUPLED_FINALIZATION_FAMILY_ID = "bounded_coupled_finalization"
-COUPLED_FINALIZATION_VERSION = "bgig.bounded_coupled_finalization.v10"
+COUPLED_FINALIZATION_VERSION = "bgig.bounded_coupled_finalization.v11"
 COUPLED_FINALIZATION_POLICY = (
     "global_rectangular_then_vertical_first_continuous_then_bounded_xy_composite"
 )
@@ -141,141 +141,58 @@ def finalize_coupled_volume(
     effort_profile: str,
     container_frontiers: Sequence[object] = (),
 ) -> dict[str, object]:
-    """Try one bounded pool of certified minimal candidates under one deadline."""
+    """Finish only the exact certified minimal plan selected by the user."""
 
     budget = coupled_finalization_budget(effort_profile)
     deadline_at = perf_counter() + float(
         dict(budget.limits)["max_total_elapsed_ms"]
     ) / 1000.0
-    candidates = [
-        {
-            "candidate_index": 0,
-            "placement_digest": str(minimal_plan.get("plan_digest", "")),
-            "lane_id": "selected_minimal_plan",
-            "plan": minimal_plan,
-        },
-        *_finishing_candidate_entries(minimal_plan),
-    ]
-    attempts: list[dict[str, object]] = []
-    last_error: CoupledFinalizationError | None = None
-    pool_deadline_reached = False
-    for candidate in candidates:
-        if attempts and _deadline_reached(deadline_at):
-            pool_deadline_reached = True
-            break
-        candidate_plan = candidate["plan"]
-        if not isinstance(candidate_plan, Mapping):
-            continue
-        try:
-            result = _finalize_coupled_volume_candidate(
-                raw_project,
-                candidate_plan,
-                source_minimal_artifact_digest=source_minimal_artifact_digest,
-                effort_profile=effort_profile,
-                container_frontiers=container_frontiers,
-                _deadline_at=deadline_at,
-            )
-        except CoupledFinalizationError as exc:
-            report = deepcopy(exc.report)
-            attempts.append(
-                {
-                    "candidate_index": candidate["candidate_index"],
-                    "placement_digest": candidate["placement_digest"],
-                    "lane_id": candidate["lane_id"],
-                    "status": str(report.get("status", "rejected")),
-                    "stop_reason": str(report.get("stop_reason", "rejected")),
-                }
-            )
-            last_error = exc
-            fatal_stop_reasons = {
-                "input_validation_failed",
-                "minimal_incumbent_reconstruction_failed",
-                "minimal_plan_not_certified",
-            }
-            if str(report.get("stop_reason", "")) in fatal_stop_reasons:
-                raise
-            continue
-
-        attempts.append(
-            {
-                "candidate_index": candidate["candidate_index"],
-                "placement_digest": candidate["placement_digest"],
-                "lane_id": candidate["lane_id"],
-                "status": "solution_found",
-                "stop_reason": "candidate_finalization_certified",
-            }
-        )
-        finalization = deepcopy(_object_mapping(result.get("finalization")))
-        finalization["minimal_candidate_selection"] = {
-            "schema_version": "bgig.finalization_minimal_candidate_selection.v1",
-            "candidate_pool_count": len(candidates),
-            "attempt_count": len(attempts),
-            "selected_candidate_index": candidate["candidate_index"],
-            "selected_placement_digest": candidate["placement_digest"],
-            "selected_lane_id": candidate["lane_id"],
-            "shared_deadline_enforced": True,
-            "attempts": attempts,
-        }
-        result["finalization"] = finalization
-        solver = deepcopy(_object_mapping(result.get("solver")))
-        telemetry = deepcopy(_object_mapping(solver.get("telemetry")))
-        telemetry["minimal_candidate_pool_count"] = len(candidates)
-        telemetry["minimal_candidate_attempt_count"] = len(attempts)
-        telemetry["selected_minimal_candidate_index"] = candidate["candidate_index"]
-        solver["telemetry"] = telemetry
-        result["solver"] = solver
-        result.pop("plan_digest", None)
-        result["plan_digest"] = canonical_digest(result)
-        return result
-
-    if last_error is not None:
-        report = deepcopy(last_error.report)
-        report["candidate_pool_count"] = len(candidates)
-        report["candidate_attempt_count"] = len(attempts)
-        report["candidate_pool_attempts"] = attempts
-        report["shared_deadline_enforced"] = True
-        if pool_deadline_reached or report.get("deadline_reached") is True:
-            report["deadline_reached"] = True
-        raise CoupledFinalizationError(
-            "Aucun plan minimal certifie du pool borne ne permet une finition complete.",
-            report,
-        ) from last_error
-    raise CoupledFinalizationError(
-        "Aucun candidat minimal certifie n est disponible pour la finition.",
-        _failure_report("minimal_candidate_pool_empty", ()),
+    result = _finalize_coupled_volume_candidate(
+        raw_project,
+        minimal_plan,
+        source_minimal_artifact_digest=source_minimal_artifact_digest,
+        effort_profile=effort_profile,
+        container_frontiers=container_frontiers,
+        _deadline_at=deadline_at,
     )
-
-
-def _finishing_candidate_entries(
-    minimal_plan: Mapping[str, object],
-) -> list[dict[str, object]]:
-    solver = _object_mapping(minimal_plan.get("solver"))
-    search_origin = _object_mapping(solver.get("search_origin"))
-    raw_candidates = search_origin.get("finishing_candidate_pool")
-    if not isinstance(raw_candidates, list):
-        return []
-    result: list[dict[str, object]] = []
-    seen = {str(minimal_plan.get("plan_digest", ""))}
-    for raw in raw_candidates[:12]:
-        if not isinstance(raw, Mapping):
-            continue
-        plan = raw.get("plan")
-        if not isinstance(plan, Mapping):
-            continue
-        placement_digest = str(raw.get("placement_digest", ""))
-        if not placement_digest or placement_digest in seen:
-            continue
-        seen.add(placement_digest)
-        result.append(
+    finalization = deepcopy(_object_mapping(result.get("finalization")))
+    finalization["minimal_candidate_selection"] = {
+        "schema_version": "bgig.finalization_minimal_candidate_selection.v2",
+        "candidate_pool_count": 1,
+        "attempt_count": 1,
+        "selected_candidate_index": 0,
+        "selected_placement_digest": str(
+            minimal_plan.get("plan_digest", "")
+        ),
+        "selected_lane_id": "selected_minimal_plan",
+        "shared_deadline_enforced": True,
+        "exact_selected_minimal_plan": True,
+        "alternate_candidate_attempted": False,
+        "attempts": [
             {
-                "candidate_index": len(result) + 1,
-                "placement_digest": placement_digest,
-                "lane_id": str(raw.get("lane_id", "bounded_candidate")),
-                "plan": plan,
+                "candidate_index": 0,
+                "placement_digest": str(
+                    minimal_plan.get("plan_digest", "")
+                ),
+                "lane_id": "selected_minimal_plan",
+                "status": "solution_found",
+                "stop_reason": "selected_minimal_finalization_certified",
             }
-        )
+        ],
+    }
+    result["finalization"] = finalization
+    solver = deepcopy(_object_mapping(result.get("solver")))
+    telemetry = deepcopy(_object_mapping(solver.get("telemetry")))
+    telemetry["minimal_candidate_pool_count"] = 1
+    telemetry["minimal_candidate_attempt_count"] = 1
+    telemetry["selected_minimal_candidate_index"] = 0
+    telemetry["exact_selected_minimal_plan"] = True
+    telemetry["alternate_candidate_attempted"] = False
+    solver["telemetry"] = telemetry
+    result["solver"] = solver
+    result.pop("plan_digest", None)
+    result["plan_digest"] = canonical_digest(result)
     return result
-
 
 def _finalize_coupled_volume_candidate(
     raw_project: object,

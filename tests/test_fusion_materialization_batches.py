@@ -52,9 +52,18 @@ class _TemporaryBRepManager:
         return cls.instance
 
     def createBox(self, box):  # noqa: ANN001, N802 - Fusion API spelling.
-        body = SimpleNamespace(box=box)
+        body = SimpleNamespace(box=box, operations=[])
         self.boxes.append(body)
         return body
+
+    def booleanOperation(  # noqa: ANN001, N802 - Fusion API spelling.
+        self,
+        target,
+        tool,
+        operation,
+    ) -> bool:
+        target.operations.append((operation, tool.box))
+        return True
 
 
 class _BaseFeature:
@@ -75,7 +84,9 @@ class _BaseFeature:
             self.bodies.add(
                 SimpleNamespace(
                     box=source_body.box,
+                    operations=list(source_body.operations),
                     body_kind="result",
+                    name="",
                 )
             )
         return True
@@ -95,6 +106,7 @@ class _BRepBodies:
     def add(self, body, base_feature):  # noqa: ANN001
         source_body = SimpleNamespace(
             box=body.box,
+            operations=list(body.operations),
             body_kind="source",
         )
         base_feature.sourceBodies.add(source_body)
@@ -142,6 +154,10 @@ def _fake_adsk(manager: _TemporaryBRepManager):
         ),
         fusion=SimpleNamespace(
             TemporaryBRepManager=_TemporaryBRepManager,
+            BooleanTypes=SimpleNamespace(
+                UnionBooleanType="union",
+                DifferenceBooleanType="difference",
+            ),
             FeatureOperations=SimpleNamespace(
                 JoinFeatureOperation="join",
                 CutFeatureOperation="cut",
@@ -163,9 +179,15 @@ def _component():
 
 
 class FusionMaterializationBatchTests(unittest.TestCase):
-    def test_additive_prisms_use_one_base_feature_and_one_combine(self) -> None:
+    def test_additive_prisms_use_transient_unions_and_one_stable_body(self) -> None:
         component = _component()
         manager = _TemporaryBRepManager()
+        solid = SimpleNamespace(
+            origin_mm=FusionVectorMm(0.0, 0.0, 0.0),
+            size_mm=FusionVectorMm(10.0, 10.0, 20.0),
+            component_name="A",
+            body_name="A body",
+        )
         joins = tuple(
             FusionAdditivePrismPlan(
                 component_id="component:a",
@@ -184,29 +206,32 @@ class FusionMaterializationBatchTests(unittest.TestCase):
             "adsk",
             _fake_adsk(manager),
         ):
-            fusion_entrypoint._create_joined_rectangular_prism_batch(
+            body = fusion_entrypoint._create_boolean_rectangular_blank(
                 component,
+                solid,
                 joins,
-                object(),
+                (),
+                body_origin_mm=FusionVectorMm(0.0, 0.0, 0.0),
             )
 
-        self.assertEqual(len(manager.boxes), 3)
+        self.assertEqual(len(manager.boxes), 4)
         self.assertEqual(len(component.features.baseFeatures.created), 1)
-        self.assertEqual(len(component.features.combineFeatures.inputs), 1)
-        combine = component.features.combineFeatures.inputs[0]
-        self.assertEqual(combine.toolBodies.count, 3)
-        self.assertTrue(
-            all(
-                tool_body.body_kind == "result"
-                for tool_body in combine.toolBodies.items
-            )
+        self.assertEqual(len(component.features.combineFeatures.inputs), 0)
+        self.assertEqual(
+            [operation for operation, _ in body.operations],
+            ["union", "union", "union"],
         )
-        self.assertEqual(combine.operation, "join")
-        self.assertFalse(combine.isKeepToolBodies)
+        self.assertEqual(body.name, "A body")
 
-    def test_cavities_keep_negative_depth_and_use_one_combine(self) -> None:
+    def test_cavities_keep_negative_depth_in_one_stable_boolean_body(self) -> None:
         component = _component()
         manager = _TemporaryBRepManager()
+        solid = SimpleNamespace(
+            origin_mm=FusionVectorMm(0.0, 0.0, 0.0),
+            size_mm=FusionVectorMm(50.0, 30.0, 30.0),
+            component_name="A",
+            body_name="A body",
+        )
         cuts = tuple(
             FusionCavityCutPlan(
                 component_id="component:a",
@@ -232,28 +257,23 @@ class FusionMaterializationBatchTests(unittest.TestCase):
             "adsk",
             _fake_adsk(manager),
         ):
-            fusion_entrypoint._create_rectangular_cavity_cut_batch(
+            body = fusion_entrypoint._create_boolean_rectangular_blank(
                 component,
+                solid,
+                (),
                 cuts,
-                object(),
-                FusionVectorMm(0.0, 0.0, 0.0),
+                body_origin_mm=FusionVectorMm(0.0, 0.0, 0.0),
             )
 
-        self.assertEqual(len(manager.boxes), 2)
-        first_obb = manager.boxes[0].box
+        self.assertEqual(len(manager.boxes), 3)
+        first_obb = manager.boxes[1].box
         self.assertAlmostEqual(first_obb[0][2], 2.4)
         self.assertAlmostEqual(first_obb[5], 1.2)
-        self.assertEqual(len(component.features.combineFeatures.inputs), 1)
-        combine = component.features.combineFeatures.inputs[0]
-        self.assertEqual(combine.toolBodies.count, 2)
-        self.assertTrue(
-            all(
-                tool_body.body_kind == "result"
-                for tool_body in combine.toolBodies.items
-            )
+        self.assertEqual(
+            [operation for operation, _ in body.operations],
+            ["difference", "difference"],
         )
-        self.assertEqual(combine.operation, "cut")
-        self.assertFalse(combine.isKeepToolBodies)
+        self.assertEqual(len(component.features.combineFeatures.inputs), 0)
 
     def test_failed_generation_cleanup_reports_clean_and_incomplete_rollbacks(self) -> None:
         class _Registry:

@@ -96,6 +96,156 @@ class PartitionResultViewTests(unittest.TestCase):
         self.assertEqual((cavity["width_mm"], cavity["height_mm"]), (6.0, 4.0))
         self.assertEqual((cavity["z_mm"], cavity["depth_mm"]), (35.0, 5.0))
 
+    def test_composite_view_uses_real_prisms_and_frozen_cavity_pose(self) -> None:
+        plan = {
+            "schema_version": PARTITION_PLAN_SCHEMA_V1,
+            "plan_digest": "composite-view-test",
+            "project_name": "Composite",
+            "box": {
+                "inner_dimensions_mm": {
+                    "x": 100.0,
+                    "y": 30.0,
+                    "z": 40.0,
+                },
+                "storage_height_mm": 40.0,
+            },
+            "flat_stack": {"reservation_size_mm": None},
+            "support": {},
+            "diagnostics": [],
+            "summary": {
+                "status": "constructed",
+                "automatic_body_count": 0,
+            },
+            "placements": [
+                {
+                    "id": "container:g",
+                    "role": "container",
+                    "name": "Bac composite",
+                    "origin_mm": {"x": 10.0, "y": 0.0, "z": 0.0},
+                    "world_size_mm": {"x": 50.0, "y": 30.0, "z": 40.0},
+                    "rotation_deg_z": 0,
+                    "final_outer_dimensions_mm": {
+                        "x": 50.0,
+                        "y": 30.0,
+                        "z": 40.0,
+                    },
+                    "minimum_outer_envelope_mm": {
+                        "x": 20.0,
+                        "y": 20.0,
+                        "z": 10.0,
+                    },
+                    "minimum_envelope_origin_in_final_mm": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                    },
+                    "surplus_distribution_mm": {},
+                    "source_content_ids": ["c"],
+                    "source_contents": [{"id": "c", "name": "Asset"}],
+                    "cavity_layout": [
+                        {
+                            "cavity_id": "cavity:c",
+                            "content_id": "c",
+                            "shape_kind": "rectangle",
+                            "local_origin_mm": {
+                                "x": 1.0,
+                                "y": 2.0,
+                                "z": 1.0,
+                            },
+                            "inner_dimensions_mm": {
+                                "x": 4.0,
+                                "y": 6.0,
+                                "z": 5.0,
+                            },
+                        }
+                    ],
+                    "frozen_cavities_v1": [
+                        {
+                            "cavity_key": "container:g:cavity:c",
+                            "cavity_index": 0,
+                            "owner_id": "container:g",
+                            "world_origin_mm": {
+                                "x": 45.0,
+                                "y": 12.0,
+                                "z": 8.0,
+                            },
+                            "world_size_mm": {
+                                "x": 6.0,
+                                "y": 4.0,
+                                "z": 5.0,
+                            },
+                        }
+                    ],
+                    "composite_body": {
+                        "schema_version": "bgig.xy_composite_cad_body.v2",
+                        "prisms": [
+                            {
+                                "cad_origin_mm": {
+                                    "x": 10.0,
+                                    "y": 0.0,
+                                    "z": 0.0,
+                                },
+                                "cad_size_mm": {
+                                    "x": 20.0,
+                                    "y": 30.0,
+                                    "z": 40.0,
+                                },
+                            },
+                            {
+                                "cad_origin_mm": {
+                                    "x": 30.0,
+                                    "y": 10.0,
+                                    "z": 0.0,
+                                },
+                                "cad_size_mm": {
+                                    "x": 30.0,
+                                    "y": 10.0,
+                                    "z": 20.0,
+                                },
+                            },
+                        ],
+                        "frozen_cavity_access_cuts": [
+                            {
+                                "id": "access:c",
+                                "reservation_id": "cavity:c",
+                                "world_origin_mm": {
+                                    "x": 45.0,
+                                    "y": 12.0,
+                                    "z": 13.0,
+                                },
+                                "size_mm": {
+                                    "x": 6.0,
+                                    "y": 4.0,
+                                    "z": 27.0,
+                                },
+                            }
+                        ],
+                    },
+                }
+            ],
+        }
+
+        view = build_partition_result_view(plan)
+        body = view["top_view"]["bodies"][0]
+        cavity = view["top_view"]["cavities"][0]
+
+        self.assertEqual(body["geometry_kind"], "composite_rectangular_union")
+        self.assertEqual(body["composite_prism_count"], 2)
+        self.assertEqual(len(body["rectangles"]), 2)
+        self.assertEqual((cavity["x_mm"], cavity["y_mm"]), (45.0, 12.0))
+        self.assertEqual(
+            (cavity["width_mm"], cavity["height_mm"], cavity["depth_mm"]),
+            (6.0, 4.0, 5.0),
+        )
+        self.assertEqual(
+            len(view["section_xz"]["cavity_vertical_accesses"]),
+            1,
+        )
+        self.assertTrue(
+            view["invariants"]["frozen_cavity_world_poses_projected"]
+        )
+        self.assertTrue(view["invariants"]["composite_prisms_projected"])
+
     def test_section_is_declared_at_box_center_and_contains_only_crossed_real_bodies(self) -> None:
         plan = solve_partition_plan(project())
         view = build_partition_result_view(plan)

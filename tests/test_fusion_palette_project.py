@@ -720,7 +720,7 @@ class FusionPaletteProjectTests(unittest.TestCase):
         self.assertEqual(materialized["cad_build"]["status"], "ready_for_fusion")
         self.assertEqual(materialized["cad_build"]["materialization"]["explicit_complement_component_count"], 1)
 
-    def test_fixed_minima_stay_constructed_with_unassigned_residual_and_can_materialize(self) -> None:
+    def test_fixed_minima_can_close_the_residual_and_materialize(self) -> None:
         project = blank_project_v1()
         project["container_groups"] = [{"id": "g", "name": "Bac", "wall_thickness_mm": None, "floor_thickness_mm": None}]
         project["contents"] = [{"id": "c", "name": "Pieces", "shape_kind": "square", "dimensions_mm": {"x": 12, "y": 12, "z": 3}, "quantity": 2, "container_group_id": "g", "content_clearance_mm": None, "measurement_confidence": "exact"}]
@@ -744,40 +744,27 @@ class FusionPaletteProjectTests(unittest.TestCase):
         self.assertEqual(finalized["status"], "ready")
         self.assertEqual(
             finalized["operation_activity"]["stop_reason"],
-            "xy_composite_residual_owner_not_found",
+            "finalized_plan_ready",
         )
-        self.assertIsNone(finalized["partition"])
-        self.assertNotEqual(
+        self.assertIsNotNone(finalized["partition"])
+        self.assertEqual(
             finalized["staged_calculation"]["finalized_plan"]["status"],
             "current",
         )
-        self.assertFalse(
+        self.assertTrue(
             finalized["staged_calculation"]["finalized_plan"]["materializable"]
         )
         self.assertEqual(
             finalized["solver_result"]["status"],
-            "no_solution_within_budget",
+            "solution_found",
         )
-        diagnostics = finalized["solver_result"]["stop_diagnostics"]
-        self.assertEqual(
-            diagnostics["outcome_kind"],
-            "strategy_exhausted",
+        self.assertTrue(
+            finalized["partition"]["invariants"]["residual_distributed"]
         )
         self.assertEqual(
-            diagnostics["phase"],
-            "fermeture_composite",
+            finalized["partition"]["residuals"]["residual_volume_mm3"],
+            0.0,
         )
-        self.assertFalse(diagnostics["proof_of_impossibility"])
-        self.assertEqual(
-            finalized["operation_activity"]["result_timing"],
-            diagnostics,
-        )
-        attempt = finalized["staged_calculation"]["finalized_plan"][
-            "last_attempt"
-        ]
-        self.assertEqual(attempt["status"], "no_solution_within_budget")
-        self.assertFalse(attempt["partial_plan_published"])
-        self.assertFalse(attempt["materializable"])
         self.assertEqual(materialized["cad_build"]["status"], "ready_for_fusion")
 
     def test_bridge_quarantines_complement_presets_without_changing_the_response_schema(self) -> None:

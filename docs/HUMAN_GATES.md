@@ -1,7 +1,41 @@
 # Human Gates
 
 <!-- P64-L09U-GATE -->
-## P64-L09U-R1-V — gate humaine corrective 0.1.72
+## P64-L09U-R2-V — gate humaine corrective 0.1.73
+
+0.1.72 est close en `human-KO`, `do-not-run`.
+
+Les acquis de session vierge, calcul explicite, finalisation et aperçu restent
+conservés. Les défauts bloquants observés sont :
+
+- aperçu final et scène Fusion différents ;
+- cavités hautes apparemment déplacées, agrandies ou approfondies ;
+- fermeture sans plateau arrêtée sur un résiduel non attribué ;
+- `CasLimite01++` non résolu ;
+- matérialisation longue, Fusion non réactive et
+  `Combine1 / ALL_TOOL_BODY_REFERENCE_LOST`.
+
+La candidate 0.1.73 fige le plan minimal exact, corrige l'aperçu composite, les
+jeux de fermeture et l'empilement tardif, puis matérialise un seul corps
+transitoire booléenné par module sans feature Combine rectangulaire. Thomas
+observe :
+
+1. version 0.1.73 après fermeture complète de Fusion ;
+2. second démarrage vierge et calcul réellement explicite ;
+3. matérialisation minimale puis finale de `CasLimite01+` ;
+4. finalisation du même cas sans plateau, sans sauvegarder le projet source ;
+5. matérialisation minimale puis finale de `CasLimite02+` ;
+6. calcul, finalisation et matérialisation de `CasLimite01++` ;
+7. absence de Combine perdu, de scène partielle et de cavité divergente ;
+8. temps exacts et réactivité observée pendant chaque matérialisation.
+
+Recette : `docs/P64_L09U_R2_V_0173_FUSION_GATE_RECIPE.md`.
+
+Avant ce verdict : `fusion-validated=false`, `print-validated=false`.
+
+### Historique R1 supersédé
+
+#### P64-L09U-R1-V — gate humaine corrective 0.1.72
 
 0.1.71 est close en `human-KO`, `do-not-run`.
 

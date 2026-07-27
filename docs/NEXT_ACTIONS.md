@@ -1,7 +1,37 @@
 # Next Actions
 
 <!-- P64-L09U-NEXT -->
-## Action courante : exécuter la gate humaine P64-L09U-R1-V
+## Action courante : clôturer puis exécuter la gate P64-L09U-R2-V
+
+0.1.72 est `human-KO`, `do-not-run`. Son calcul et sa finalisation pouvaient
+réussir, mais la matérialisation finale n'était ni fidèle ni robuste.
+
+0.1.73 :
+
+1. finalise exactement le plan minimal affiché ;
+2. projette dans l'aperçu les vrais prismes composites et cavités gelées ;
+3. ferme les résiduels sans consommer les jeux externes XY/Z ;
+4. résout l'insertion tardive d'un support large dans `CasLimite01++` ;
+5. remplace les Combine rectangulaires par un corps transitoire unique par
+   module, persisté une seule fois ;
+6. conserve le rollback et rend la main à l'interface entre les modules.
+
+Codex termine la suite globale, intègre, installe puis vérifie 0.1.73. Thomas
+suit ensuite uniquement
+`docs/P64_L09U_R2_V_0173_FUSION_GATE_RECIPE.md`.
+
+Preflight source :
+`e8392bc12c69074e654d1d9cecf99656df5fe9ac187eb17d1b981a713584b6fd`.
+
+`fusion-validated=false`, `print-validated=false`.
+
+Après le verdict R2, le prochain programme proposé reste strictement
+séquentiel : jobs coopératifs et annulation, choix visuel des variantes, puis
+épaisseur distincte de séparateur après gate physique.
+
+### Historique R1 supersédé
+
+#### Ancienne action : gate humaine P64-L09U-R1-V
 
 0.1.71 est `human-KO` et `do-not-run`. Le démarrage vierge, le calcul et la
 finalisation restent acquis, mais les corps sources d'une BaseFeature étaient

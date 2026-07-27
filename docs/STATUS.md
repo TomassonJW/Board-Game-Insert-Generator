@@ -1,7 +1,52 @@
 # Status
 
 <!-- P64-L09U-STATUS -->
-## P64-L09U-R1 — correction du human-KO 0.1.71
+## P64-L09U-R2 — fidélité finale et matérialisation transitoire
+
+Date : 2026-07-27.
+
+Statut : `P64-L09U-R2-automated-validated`,
+`P64-L09U-R2-V-pending-installation`.
+
+- 0.1.72 est `human-KO`, `do-not-run`.
+- La finalisation utilise exactement le plan minimal courant ; la sélection
+  silencieuse d'un autre minimum est supprimée.
+- Les cavités gelées restent identiques du minimum au plan final, au CAD IR et
+  au plan Fusion.
+- L'aperçu final affiche les prismes composites réels et sépare les accès des
+  cavités calibrées.
+- La fermeture composite consomme toutes les cellules réellement couvertes,
+  préserve les jeux externes XY/Z et sait scinder une jonction de jeux.
+- Le solveur de piles peut insérer tardivement un support plus large sous une
+  pile existante ; `CasLimite01++` calcule et finalise.
+- Les unions et coupes rectangulaires Fusion sont exécutées sur un BRep
+  transitoire par module, persisté une fois ; aucune feature Combine
+  paramétrique n'est créée pour ces opérations.
+- L'interface Fusion reçoit des événements entre modules. Le vrai suivi par
+  commande et l'annulation restent hors du correctif, sous ADR-0095.
+- Candidate : `0.1.73`.
+- Preflight :
+  `e8392bc12c69074e654d1d9cecf99656df5fe9ac187eb17d1b981a713584b6fd`.
+- Préparateur sec : `OK`, six replays personnels exacts en lecture seule.
+- Matrice ciblée du préparateur : `109/109`.
+- Suite globale autorisée : `886/886` en `363.209 s`, avec une intégration
+  SCIP native ignorée et douze modules benchmark/holdout/corpus/tournoi exclus.
+- Installation locale : à exécuter après intégration du commit.
+- Aucun benchmark/holdout et aucune valeur physique nouvelle.
+
+Décision :
+`docs/DECISIONS/ADR-0098-plan-minimal-exact-et-corps-fusion-transitoire.md`.
+Preuve :
+`docs/P64_L09U_R2_0173_CORRECTIVE_EVIDENCE.md`.
+Recette :
+`docs/P64_L09U_R2_V_0173_FUSION_GATE_RECIPE.md`.
+
+Prochaine action : clôture automatisée, installation, puis P64-L09U-R2-V.
+`fusion-validated=false`, `print-validated=false`.
+
+### Historique R1 supersédé
+
+#### P64-L09U-R1 — correction du human-KO 0.1.71
 
 Date : 2026-07-27.
 
