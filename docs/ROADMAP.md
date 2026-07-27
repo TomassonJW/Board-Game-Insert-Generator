@@ -6,7 +6,7 @@ et la lecture par capabilities dans `docs/CAPABILITY_MAP.md`. La nomenclature
 et le role de ces documents sont definis dans `docs/PILOTAGE_GLOSSARY.md`.
 
 <!-- P64-L09T-ROADMAP -->
-## Correctif actif P64-L09T
+## Correctif P64-L09T arrive a la gate humaine V
 
 P64-L09T est un correctif de robustesse du parcours P64 existant. Il ne change
 pas l'ordre V0.2/V0.3 et n'ouvre aucune capability P45-P50 ou P70+.
@@ -23,6 +23,11 @@ P64-L09T-A recalcul explicite
   -> G durcissement, package et preflight
   -> V gate Fusion humaine
 ```
+
+Les missions A a G sont `automated-validated`. La candidate `0.1.70`, son
+preflight public et sa recette sont prepares ; seule l'observation humaine
+P64-L09T-V reste a realiser. Tant que Thomas n'a pas rendu son verdict,
+`fusion-validated=false` et `print-validated=false`.
 
 La seule finition automatique immediate est l'hybride
 extension rectangulaire puis annexes soudees. P64-F03 conserve ensuite trois

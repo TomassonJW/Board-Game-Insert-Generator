@@ -1,7 +1,7 @@
 # Human Gates
 
 <!-- P64-L09T-GATE -->
-## P64-L09T — programme autorise, gate V future
+## P64-L09T-V — gate humaine 0.1.70 preparee
 
 Decision humaine du 2026-07-27 :
 
@@ -12,6 +12,12 @@ Decision humaine du 2026-07-27 :
 - les cales separees, separateurs sans fond et conteneurs generes restent
   differes ;
 - P64-L09T-V reste la seule prochaine gate humaine.
+
+P64-L09T-A a G sont maintenant automatisees-validees. La candidate `0.1.70`,
+la fixture publique, le rejeu local en lecture seule et le preflight
+`f78017e31ff18ad81d0a2aef6e9e1e7d52e624372779f56482ad472ec069fa65`
+sont prepares. Thomas suit
+`docs/P64_L09T_V_FUSION_GATE_RECIPE.md` sans lancer de script.
 
 Le Goal peut modifier le runtime, les contrats, tests, CAD IR, palette et
 adaptateur Fusion dans le perimetre exact du runbook. Une nouvelle gate est

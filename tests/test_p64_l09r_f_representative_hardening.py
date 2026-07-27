@@ -41,8 +41,8 @@ class P64L09RFRepresentativeHardeningTests(unittest.TestCase):
         self.assertIn("do-not-run", self.recipe)
         self.assertIn("print-validated=false", self.recipe)
 
-    def test_historical_package_version_is_frozen(self) -> None:
-        self.assertEqual(self.manifest["version"], "0.1.69")
+    def test_current_manifest_preserves_the_historical_preparer(self) -> None:
+        self.assertEqual(self.manifest["version"], "0.1.70")
         self.assertIn('expectedVersion -ne "0.1.65"', self.preparer)
 
     def test_older_combined_gate_stays_distinct(self) -> None:

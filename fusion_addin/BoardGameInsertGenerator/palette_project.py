@@ -1143,6 +1143,7 @@ def _persist_certified_witness(
     path = _certified_witness_path(addin_dir, identity)
     existing: dict[str, object] | None = None
     existing_partition: dict[str, object] | None = None
+    existing_requires_rank_migration = False
     if path.is_file():
         try:
             loaded = json.loads(path.read_text(encoding="utf-8-sig"))
@@ -1160,6 +1161,13 @@ def _persist_certified_witness(
             ):
                 existing = loaded
                 existing_partition = validated_partition
+                validation_invariants = validation.get("invariants")
+                existing_requires_rank_migration = bool(
+                    isinstance(validation_invariants, dict)
+                    and validation_invariants.get(
+                        "legacy_rank_policy_migration_required"
+                    )
+                )
     exact_match = bool(
         existing is not None and existing.get("witness_digest") == witness["witness_digest"]
     )
@@ -1168,11 +1176,13 @@ def _persist_certified_witness(
     same_geometry = bool(
         isinstance(existing_source, dict)
         and isinstance(new_source, dict)
+        and not existing_requires_rank_migration
         and existing_source.get("placement_geometry_digest")
         == new_source.get("placement_geometry_digest")
     )
     stronger_or_equal = bool(
         existing_partition is not None
+        and not existing_requires_rank_migration
         and not exact_match
         and not same_geometry
         and certified_plan_witness_rank_axes(existing_partition)

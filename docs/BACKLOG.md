@@ -62,18 +62,22 @@
 
 ### P64-L09T-G — Durcissement et preparation Fusion
 
-- Statut : `ready-after-P64-L09T-F-integration`.
+- Statut : `done`, `automated-validated`.
 - Couvrir les deux cas de base, les deux cas « + », les deltas isoles, les
   parois, couches basses, annexes, rejets et stale.
-- Suite complete, integration, nouvelle candidate, installation et preflight.
+- Six replays locaux exacts en lecture seule, matrice publique anonymisee,
+  suite cible `158/158` et suite globale autorisee `873/873`.
+- Candidate `0.1.70` et preflight public prepares.
+- Preuve : `docs/P64_L09T_G_RELEASE_GATE_EVIDENCE.md`.
 - Aucun benchmark/holdout.
 
 ### P64-L09T-V — Gate humaine Fusion
 
-- Statut : `planned-human-gate`.
-- Depend de A a G integrees et du package candidat verifie.
+- Statut : `ready-human-gate`, `prepared-not-human-observed`.
+- Depend de A a G integrees et du package candidat verifie et installe.
 - Observe cycle explicite, poses automatiques, priorite basse, parois, annexes,
   jeux, cavites, diagnostics, materialisation et residuel nul.
+- Recette : `docs/P64_L09T_V_FUSION_GATE_RECIPE.md`.
 - `fusion-validated=false`, `print-validated=false` avant verdict.
 
 ## P64-F03 — Pieces de finition differees

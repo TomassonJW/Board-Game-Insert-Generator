@@ -1,7 +1,7 @@
 # Next Actions
 
 <!-- P64-L09T-NEXT -->
-## Action courante : executer P64-L09T-G
+## Action courante : executer la gate humaine P64-L09T-V
 
 Thomas a accepte ADR-0093 et autorise l'execution autonome sequentielle du
 programme P64-L09T :
@@ -12,15 +12,12 @@ programme P64-L09T :
 4. P64-L09T-D : `done`, classement lexicographique plancher d'abord ;
 5. P64-L09T-E : `done`, fermeture hybride v2 automatisee-validee ;
 6. P64-L09T-F : `done`, certificat composite et CAD fidele ;
-7. P64-L09T-G : mission suivante, durcissement, nouvelle candidate,
-   installation et preflight ;
-8. P64-L09T-V : observation Fusion humaine.
+7. P64-L09T-G : `done`, durcissement, candidate 0.1.70, replays et preflight ;
+8. P64-L09T-V : action courante, observation Fusion humaine.
 
-Le successeur suit `docs/P64_L09T_END_TO_END_GOAL_RUNBOOK.md`, travaille une
-mission a la fois et integre chaque lot dans `main` avant le suivant. Aucun
-nouveau GO n'est requis entre A et G. Il preserve les worktrees etrangers,
-n'execute aucun benchmark/holdout, ne change aucune valeur physique et
-n'implemente pas les trois familles P64-F03 differees.
+Thomas suit uniquement `docs/P64_L09T_V_FUSION_GATE_RECIPE.md`. Aucun nouveau
+developpement, benchmark, holdout, changement de valeur physique ou famille
+P64-F03 ne commence avant son verdict.
 
 Le package `0.1.69` est `human-KO`, `do-not-run`.
 `fusion-validated=false`, `print-validated=false`.
@@ -58,6 +55,14 @@ Validation F : `157/157` tests cibles, puis gate globale autorisee `866/866`
 en `285.542 s`, avec une integration SCIP native ignoree. Les douze modules
 interdits restent exclus. La fermeture hybride v2 est maintenant la geometrie
 produit et CAD ; aucune installation Fusion n'a lieu avant G.
+
+Preuve G : `docs/P64_L09T_G_RELEASE_GATE_EVIDENCE.md`.
+Validation G : `158/158` tests cibles, six replays locaux exacts en lecture
+seule, puis gate globale autorisee `873/873` en `374.311 s`, avec une
+integration SCIP native ignoree. Candidate `0.1.70`, preflight
+`f78017e31ff18ad81d0a2aef6e9e1e7d52e624372779f56482ad472ec069fa65`.
+Statut : `prepared-not-human-observed`, `fusion-validated=false`,
+`print-validated=false`.
 
 <!-- P64-L09S-0168-NEXT -->
 ## Action courante : cloture corrective et gate P64-L09S-V

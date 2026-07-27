@@ -190,6 +190,45 @@ def _zone(*, support_plane_z_mm: float, inset_depth_mm: float) -> TopInsetZone:
 
 
 class XYCompositeClosureTests(unittest.TestCase):
+    def test_dense_reserved_composition_tries_rectangular_closure_first(
+        self,
+    ) -> None:
+        placements = tuple(
+            _placement_for(
+                f"container:{index:02d}",
+                (float(index * 10), 0.0, 0.0),
+                (10.0, 10.0, 5.0),
+            )
+            for index in range(12)
+        )
+        spaces = (EmptySpace((0.0, 0.0, 5.0), (120.0, 10.0, 3.0)),)
+
+        result = _hybrid_result(
+            placements,
+            spaces,
+            box={"x": 120.0, "y": 10.0, "z": 10.0},
+            xy_clearance_mm=0.0,
+            top_inset_zones=(
+                TopInsetZone((0.0, 0.0), (120.0, 10.0), 8.0, 2.0),
+            ),
+        )
+
+        self.assertEqual(result.status, "closed")
+        self.assertEqual(
+            result.stop_reason,
+            "xy_composite_partition_complete",
+        )
+        self.assertEqual(
+            result.certificate["schema_version"],
+            "bgig.xy_composite_partition_certificate.v1",
+        )
+        self.assertEqual(len(result.owner_bodies), 12)
+        self.assertTrue(
+            result.certificate[
+                "reservation_subtractions_deferred_to_cad_ir"
+            ]
+        )
+
     def test_hybrid_uses_rectangular_extension_before_xy_annexes(self) -> None:
         source = _placement_for(
             "container:a",

@@ -103,6 +103,38 @@ def _empty_execution(*args: object, **kwargs: object) -> Free3DBeamExecution:
     )
 
 
+def _legacy_floor_policy_witness(
+    witness: dict[str, object],
+) -> dict[str, object]:
+    legacy = deepcopy(witness)
+    partition = legacy["partition"]
+    metrics = partition["minimal_layout"]["metrics"]
+    for key in (
+        "elevated_container_count",
+        "base_z_sum_mm",
+        "elevated_volume_mm3",
+        "top_inset_obstructive_height_mm",
+        "elevated_stack_count",
+        "elevated_body_count",
+    ):
+        metrics.pop(key, None)
+    partition.pop("plan_digest", None)
+    partition["plan_digest"] = canonical_digest(partition)
+    legacy["source"]["plan_digest"] = partition["plan_digest"]
+    legacy["source"]["rank_axes"] = [
+        float(metrics["cluster_volume_mm3"]),
+        float(metrics["internal_gap_mm3"]),
+        float(metrics["cluster_height_mm"]),
+        float(metrics["cluster_footprint_mm2"]),
+        float(metrics["residual_fragmentation"]),
+        -float(metrics["contact_count"]),
+        -float(metrics["minimum_support_ratio"]),
+    ]
+    legacy.pop("witness_digest", None)
+    legacy["witness_digest"] = canonical_digest(legacy)
+    return legacy
+
+
 class CertifiedPlanWitnessTests(unittest.TestCase):
     def test_witness_is_deterministic_and_effort_agnostic_but_frontier_exact(self) -> None:
         project = _project()
@@ -133,6 +165,37 @@ class CertifiedPlanWitnessTests(unittest.TestCase):
         self.assertTrue(first["invariants"]["effort_profile_is_not_a_compatibility_key"])
         identity = certified_plan_witness_identity(project, engine.frontier_digests())
         self.assertEqual(first["identity"], identity)
+
+    def test_legacy_rank_policy_is_accepted_only_for_recertification(self) -> None:
+        project = _project()
+        engine = _engine(project)
+        witness = build_certified_plan_witness(
+            project,
+            _certified_plan(project, engine),
+            frontier_digests=engine.frontier_digests(),
+        )
+
+        accepted = validate_certified_plan_witness(
+            _legacy_floor_policy_witness(witness),
+            project,
+            frontier_digests=engine.frontier_digests(),
+        )
+
+        self.assertEqual(accepted["status"], WITNESS_ACCEPTED)
+        self.assertEqual(
+            accepted["stop_reason"],
+            "exact_dependencies_and_legacy_rank_axes_match",
+        )
+        self.assertTrue(
+            accepted["invariants"][
+                "legacy_rank_policy_migration_required"
+            ]
+        )
+        self.assertTrue(
+            accepted["invariants"]["future_recertification_required"]
+        )
+        self.assertTrue(accepted["invariants"]["search_must_continue"])
+        self.assertFalse(accepted["invariants"]["cache_hit_claimed"])
 
     def test_changed_project_frontier_or_payload_is_rejected_fail_closed(self) -> None:
         project = _project()

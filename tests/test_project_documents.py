@@ -905,7 +905,8 @@ class P64L09TDocumentPilotageTests(unittest.TestCase):
             self.assertIn(marker, evidence)
 
         for marker in (
-            "ready-for-delegated-goal-launch",
+            "A-to-G-automated-validated",
+            "V-prepared-not-human-observed",
             "P64-L09T-A",
             "P64-L09T-G",
             "P64-L09T-V",
@@ -918,12 +919,13 @@ class P64L09TDocumentPilotageTests(unittest.TestCase):
             self.assertIn(marker, runbook)
 
         for marker in (
-            "Action courante : executer P64-L09T-G",
+            "Action courante : executer la gate humaine P64-L09T-V",
             "P64-L09T-D : `done`",
             "P64-L09T-E : `done`",
             "P64-L09T-F : `done`",
-            "P64_L09T_F_COMPOSITE_CAD_EVIDENCE.md",
-            "nouveau GO n'est requis entre A et G",
+            "P64-L09T-G : `done`",
+            "P64_L09T_G_RELEASE_GATE_EVIDENCE.md",
+            "0.1.70",
             "0.1.69` est `human-KO",
         ):
             self.assertIn(marker, next_actions)

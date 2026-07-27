@@ -30,6 +30,10 @@ XY_COMPOSITE_CERTIFICATE_SCHEMA_V2 = (
     "bgig.xy_composite_partition_certificate.v2"
 )
 _EPSILON = 0.0001
+# Above this bounded branching point, try the already-certified rectangular
+# partition before assigning residual cells owner by owner. Reservations remain
+# deferred CAD cuts and the residual strategy keeps the unused wall-clock budget.
+_RESERVATION_DEFERRED_FIRST_OWNER_COUNT = 12
 
 
 @dataclass(frozen=True)
@@ -107,6 +111,66 @@ def close_xy_composite_partition(
     continuous_prefill: Free3DClosureResult | None = None,
 ) -> XYCompositeClosureResult:
     """Build connected XY annexes after rectangular extensions."""
+
+    if (
+        continuous_prefill is not None
+        and continuous_prefill.empty_spaces
+        and top_inset_zones
+        and len(placements) >= _RESERVATION_DEFERRED_FIRST_OWNER_COUNT
+    ):
+        started_at = perf_counter()
+        reservation_deferred = close_xy_composite_partition(
+            participants,
+            placements,
+            box,
+            storage_height_mm,
+            xy_clearance_mm,
+            box_perimeter_xy_mm=box_perimeter_xy_mm,
+            between_bodies_z_mm=between_bodies_z_mm,
+            budget=budget,
+            top_inset_zones=top_inset_zones,
+            rectangular_attempt=None,
+            continuous_prefill=None,
+        )
+        if reservation_deferred.status == "closed":
+            return reservation_deferred
+        limits = dict(budget.limits)
+        remaining_elapsed_ms = max(
+            0,
+            int(limits.get("max_closure_elapsed_ms", 1_000))
+            - int((perf_counter() - started_at) * 1_000.0),
+        )
+        if remaining_elapsed_ms <= 0:
+            return reservation_deferred
+        limits["max_closure_elapsed_ms"] = remaining_elapsed_ms
+        residual_budget = SolverBudget(
+            budget.family_id,
+            budget.effort_profile,
+            tuple(sorted(limits.items())),
+        )
+        gross_attempt = rectangular_attempt or close_global_rectangular_partition(
+            participants,
+            placements,
+            box,
+            storage_height_mm,
+            xy_clearance_mm,
+            box_perimeter_xy_mm=box_perimeter_xy_mm,
+            between_bodies_z_mm=between_bodies_z_mm,
+            budget=residual_budget,
+            top_inset_zones=top_inset_zones,
+        )
+        return _close_hybrid_residual(
+            placements,
+            continuous_prefill,
+            gross_attempt,
+            box,
+            storage_height_mm,
+            xy_clearance_mm,
+            box_perimeter_xy_mm=box_perimeter_xy_mm,
+            between_bodies_z_mm=between_bodies_z_mm,
+            budget=residual_budget,
+            top_inset_zones=top_inset_zones,
+        )
 
     if continuous_prefill is not None and continuous_prefill.empty_spaces:
         gross_attempt = rectangular_attempt or close_global_rectangular_partition(

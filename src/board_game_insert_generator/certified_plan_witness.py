@@ -139,12 +139,30 @@ def validate_certified_plan_witness(
         return _rejection("witness_plan_digest_mismatch", current_identity)
     if source.get("placement_geometry_digest") != canonical_digest(plan.get("placements", [])):
         return _rejection("witness_placement_digest_mismatch", current_identity)
-    if source.get("rank_axes") != list(certified_plan_witness_rank_axes(plan)):
+    legacy_rank_policy = False
+    try:
+        expected_rank_axes = list(certified_plan_witness_rank_axes(plan))
+    except ValueError:
+        try:
+            expected_rank_axes = list(
+                _legacy_certified_plan_witness_rank_axes(plan)
+            )
+        except ValueError:
+            return _rejection(
+                "witness_partition_rank_axes_incomplete",
+                current_identity,
+            )
+        legacy_rank_policy = True
+    if source.get("rank_axes") != expected_rank_axes:
         return _rejection("witness_rank_axes_mismatch", current_identity)
     return {
         "schema_version": CERTIFIED_PLAN_WITNESS_SCHEMA_V1,
         "status": WITNESS_ACCEPTED,
-        "stop_reason": "exact_dependencies_and_certificate_flags_match",
+        "stop_reason": (
+            "exact_dependencies_and_legacy_rank_axes_match"
+            if legacy_rank_policy
+            else "exact_dependencies_and_certificate_flags_match"
+        ),
         "witness_digest": supplied_digest,
         "compatibility_digest": str(current_identity["compatibility_digest"]),
         "plan_digest": str(plan["plan_digest"]),
@@ -153,6 +171,7 @@ def validate_certified_plan_witness(
             "future_recertification_required": True,
             "search_must_continue": True,
             "cache_hit_claimed": False,
+            "legacy_rank_policy_migration_required": legacy_rank_policy,
         },
     }
 
@@ -201,6 +220,31 @@ def certified_plan_witness_rank_axes(
         return axes
     except (KeyError, TypeError, ValueError, OverflowError) as exc:
         raise ValueError("A witness requires complete finite ranking axes.") from exc
+
+
+def _legacy_certified_plan_witness_rank_axes(
+    partition: Mapping[str, object],
+) -> tuple[float, ...]:
+    """Read the seven ranking axes persisted before floor-first priority."""
+
+    metrics = _mapping(_mapping(partition.get("minimal_layout")).get("metrics"))
+    try:
+        axes = (
+            float(metrics["cluster_volume_mm3"]),
+            float(metrics["internal_gap_mm3"]),
+            float(metrics["cluster_height_mm"]),
+            float(metrics["cluster_footprint_mm2"]),
+            float(metrics["residual_fragmentation"]),
+            -float(metrics["contact_count"]),
+            -float(metrics["minimum_support_ratio"]),
+        )
+        if not all(isfinite(value) for value in axes):
+            raise ValueError("Legacy witness ranking axes must be finite.")
+        return axes
+    except (KeyError, TypeError, ValueError, OverflowError) as exc:
+        raise ValueError(
+            "A legacy witness requires complete finite ranking axes."
+        ) from exc
 
 
 def is_certified_minimal_partition(partition: Mapping[str, object]) -> bool:

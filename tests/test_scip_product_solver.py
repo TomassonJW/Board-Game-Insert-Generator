@@ -709,7 +709,7 @@ class ScipProductSolverTests(unittest.TestCase):
         self.assertIn(SCIP_PRODUCT_ARCHIVE_SHA256, helper)
         self.assertIn("configure_scip_product_runtime", palette)
         self.assertIn('scip_vendor / "runtime"', palette)
-        self.assertEqual(manifest["version"], "0.1.69")
+        self.assertEqual(manifest["version"], "0.1.70")
 
 
 if __name__ == "__main__":

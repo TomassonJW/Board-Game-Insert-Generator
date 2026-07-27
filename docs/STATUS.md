@@ -1,17 +1,18 @@
 # Status
 
 <!-- P64-L09T-STATUS -->
-## P64-L09T — Goal actif, missions A a F automatisees-validees
+## P64-L09T — missions A a G automatisees-validees, gate V preparee
 
 Date : 2026-07-27.
 
-Statut : `goal-active`, `P64-L09T-F-automated-validated`.
+Statut : `P64-L09T-G-automated-validated`,
+`P64-L09T-V-prepared-not-human-observed`.
 
 - La gate 0.1.69 est `human-KO`, `do-not-run`. La jauge fluide, les minima et
   la cavite orientee restent des acquis positifs partiels.
-- `CasLimite01+` atteint le certificat composite puis est rejete ;
-  `CasLimite02+` ne trouve pas la fermeture rectangulaire brute exigee par le
-  repli actuel.
+- `CasLimite01+` et `CasLimite02+` calculent et finalisent en profil Normal.
+  Leur certificat est exact, leurs cavites restent figees, le residuel est nul
+  et leur CAD IR est prete pour Fusion.
 - P64-L09T-A retire les deux integrations automatiques d'ADR-0075/0076 du
   parcours produit. Toute edition geometrique rend minimal, final et scene
   obsoletes ; seul `Calculer` peut republier un plan minimal.
@@ -67,6 +68,16 @@ Statut : `goal-active`, `P64-L09T-F-automated-validated`.
 - Le certificat de materialisation v2 compare volumes source/CAD/final,
   unions, poses, acces et enveloppes de paroi. Une empreinte de geometrie ou de
   cavite divergente est refusee avant tout plan Fusion.
+- G recertifie et migre les witnesses historiques a sept axes sans jamais
+  publier leur plan automatiquement ni revendiquer un cache hit.
+- Une composition reservee de douze corps ou plus tente d'abord la fermeture
+  rectangulaire avec reservation differee, puis conserve le repli par annexes
+  dans le budget restant.
+- Les six replays locaux exacts passent en lecture seule. Les fixtures
+  publiques anonymisees couvrent le cas dense 01+ et les deltas contenu/jeux
+  isoles de 02.
+- Le package candidat est `0.1.70`. Son preflight public porte le digest
+  `f78017e31ff18ad81d0a2aef6e9e1e7d52e624372779f56482ad472ec069fa65`.
 - La finition cible extensions rectangulaires puis annexes soudees ; la couture
   interne a un jeu nul et toutes les frontieres externes conservent leurs jeux.
 - P64-F03 conserve trois horizons : cales separees, separateurs sans fond et
@@ -96,6 +107,9 @@ Statut : `goal-active`, `P64-L09T-F-automated-validated`.
   en `285.542 s`, avec un test SCIP natif ignore. Les douze modules interdits
   restent exclus ; aucun benchmark, holdout ou artefact associe n'est execute
   ou regenere.
+- Validation G : `158/158` tests cibles, six replays locaux exacts en lecture
+  seule, puis gate globale autorisee `873/873` en `374.311 s`, avec un test
+  SCIP natif ignore. Les douze modules interdits restent exclus.
 
 Programme : `docs/P64_L09T_END_TO_END_GOAL_RUNBOOK.md`.
 Preuve : `docs/P64_L09S_V_0169_HUMAN_KO_EVIDENCE.md`.
@@ -108,9 +122,10 @@ Preuve C :
 Preuve D : `docs/P64_L09T_D_FLOOR_FIRST_RANKING_EVIDENCE.md`.
 Preuve E : `docs/P64_L09T_E_HYBRID_COMPOSITE_CLOSURE_EVIDENCE.md`.
 Preuve F : `docs/P64_L09T_F_COMPOSITE_CAD_EVIDENCE.md`.
+Preuve G : `docs/P64_L09T_G_RELEASE_GATE_EVIDENCE.md`.
+Recette V : `docs/P64_L09T_V_FUSION_GATE_RECIPE.md`.
 
-Prochaine action : integrer P64-L09T-F dans `main`, puis executer P64-L09T-G
-pour le durcissement, le package candidat, l'installation et le preflight.
+Prochaine action : observation humaine P64-L09T-V selon la recette preparee.
 `fusion-validated=false`, `print-validated=false`.
 
 <!-- P64-L09S-0168-STATUS -->

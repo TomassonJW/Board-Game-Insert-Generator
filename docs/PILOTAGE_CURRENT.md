@@ -5,8 +5,9 @@
 
 - Le package `0.1.69` est `human-KO`, `do-not-run`, avec trois acquis
   conserves : jauge fluide, minima des cas de base et cavite orientee corrigee.
-- Les variantes locales `CasLimite01+` et `CasLimite02+` calculent mais ne
-  finalisent pas de facon robuste.
+- Les variantes locales `CasLimite01+` et `CasLimite02+` calculent, finalisent
+  et produisent une CAD IR materialisable en profil Normal, avec cavites
+  figees et residuel nul. Les fichiers personnels sont restes inchanges.
 - ADR-0093 est acceptee. Elle impose un recalcul explicite apres toute edition,
   des reservations plateau/livret automatiquement placees, une priorite globale
   aux couches basses et une paroi minimale entre cavite et encoche.
@@ -15,7 +16,7 @@
   cavites, reservations, unions, coupes et residuel nul certifies.
 - Les cales separees, separateurs sans fond et conteneurs de finition generes
   sont inscrits dans P64-F03 et restent differes.
-- P64-L09T est lance. Les missions A, B, C, D, E et F sont
+- P64-L09T est lance. Les missions A, B, C, D, E, F et G sont
   automatisees-validees. A rend
   toute edition geometrique explicite : elle rend
   minimal, final et scene obsoletes ; aucun placement n'est republie avant un
@@ -63,6 +64,16 @@
 - `bgig.xy_composite_cad_materialization_certificate.v2` certifie volumes,
   unions, poses, acces, parois et residuel nul. Les divergences de geometrie ou
   de pose sont refusees avant le plan Fusion.
+- G migre les witnesses anterieurs au rang plancher d'abord sans les traiter
+  comme des caches : ils amorcent un calcul explicite, sont recertifies et la
+  recherche continue.
+- Pour douze corps ou plus sous reservation haute, la fermeture essaie d'abord
+  la partition rectangulaire certifiable avec coupe differee, puis transmet le
+  temps restant au repli par annexes.
+- La matrice publique couvre un cas 01+ dense, les quatre variantes isolees de
+  02, reservations, couches, fermetures, rejets, stale et arrets.
+- La candidate `0.1.70`, son preflight public et son preparateur Fusion sont
+  prets. La gate reste `prepared-not-human-observed`.
 - Validation A : `912/912` en `329.039 s`, un test SCIP natif ignore sous
   Python 3.10, aucun benchmark/holdout solveur invoque.
 - Validation B : `99/99` tests cibles, syntaxe JavaScript `node --check`
@@ -82,8 +93,13 @@
 - Validation F : `157/157` tests cibles, puis gate globale autorisee `866/866`
   en `285.542 s`, avec un test ignore. Les douze modules interdits restent
   exclus et aucun artefact associe n'est regenere.
-- Prochaine mission apres integration F : P64-L09T-G, durcissement, package,
-  installation et preparation de gate. Le Goal s'arrete ensuite a P64-L09T-V.
+- Validation G : `158/158` tests cibles, six replays locaux exacts en lecture
+  seule, puis gate globale autorisee `873/873` en `374.311 s`, avec un test
+  ignore. Les douze modules interdits restent exclus.
+- Preflight 0.1.70 :
+  `f78017e31ff18ad81d0a2aef6e9e1e7d52e624372779f56482ad472ec069fa65`.
+- Prochaine action : P64-L09T-V, observation Fusion humaine selon
+  `docs/P64_L09T_V_FUSION_GATE_RECIPE.md`.
 - Aucun benchmark/holdout, aucune valeur physique nouvelle ;
   `fusion-validated=false`, `print-validated=false`.
 
@@ -97,7 +113,9 @@ Autorites :
 - `docs/P64_L09T_C_AUTOMATIC_TOP_RESERVATIONS_EVIDENCE.md` ;
 - `docs/P64_L09T_D_FLOOR_FIRST_RANKING_EVIDENCE.md` ;
 - `docs/P64_L09T_E_HYBRID_COMPOSITE_CLOSURE_EVIDENCE.md` ;
-- `docs/P64_L09T_F_COMPOSITE_CAD_EVIDENCE.md`.
+- `docs/P64_L09T_F_COMPOSITE_CAD_EVIDENCE.md` ;
+- `docs/P64_L09T_G_RELEASE_GATE_EVIDENCE.md` ;
+- `docs/P64_L09T_V_FUSION_GATE_RECIPE.md`.
 
 <!-- P64-L09S-0168-CURRENT -->
 ## Reprise canonique corrective 0.1.68

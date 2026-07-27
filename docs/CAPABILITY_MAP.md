@@ -1,7 +1,7 @@
 # Capability Map
 
 <!-- P64-L09T-CAPABILITY -->
-## P64-L09T — missions A a F automatisees-validees
+## P64-L09T — missions A a G automatisees-validees
 
 - `C-STAGED-CALCULATION` : `automated-validated`. Toute edition geometrique
   rend minimal et final obsoletes ; seul Calculer peut republier un minimal.
@@ -35,11 +35,15 @@
   l'UI affiche seulement la pose automatique calculee.
 - `C-FINISHING-COMPLEMENTS` : `deferred`. Cales separees, separateurs sans fond
   et conteneurs generes appartiennent a P64-F03.
-- `C-QUALITY` : P64-L09T-F passe `157/157` tests cibles, puis la gate globale
-  autorisee `866/866` en `285.542 s`, avec un test SCIP natif ignore. Douze
-  modules benchmark/corpus/tournoi sont exclus sans regenerer d'artefact.
-  0.1.69 reste `human-KO`, `do-not-run`. P64-L09T-G devient la mission
-  suivante.
+- `C-QUALITY` : P64-L09T-G passe `158/158` tests cibles, six replays locaux
+  exacts en lecture seule, puis la gate globale autorisee `873/873` en
+  `374.311 s`, avec un test SCIP natif ignore. Douze modules
+  benchmark/corpus/tournoi sont exclus sans regenerer d'artefact.
+- `C-RELEASE` : candidate `0.1.70`, fixture et preflight publics, preparateur
+  Fusion et recette humaine disponibles. Statut
+  `prepared-not-human-observed`.
+- `C-FUSION` reste `automated-validated` seulement : l'observation reelle est
+  la gate P64-L09T-V.
 - `C-PRINT` : inchangee, `print-validated=false`.
 
 Cette validation reste automatisee : `fusion-validated=false`,

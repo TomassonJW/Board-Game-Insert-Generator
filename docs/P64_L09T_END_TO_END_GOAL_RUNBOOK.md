@@ -2,7 +2,8 @@
 
 ## 1. Rôle et statut
 
-- Statut : `ready-for-delegated-goal-launch`.
+- Statut autonome : `A-to-G-automated-validated`.
+- Statut gate : `V-prepared-not-human-observed`.
 - Décision : ADR-0093 acceptée par Thomas le 2026-07-27.
 - Entrée : KO humain 0.1.69 et cas locaux `CasLimite01+` / `CasLimite02+`.
 - Sortie autonome : nouvelle candidate Fusion installée et gate humaine prête.
@@ -12,6 +13,10 @@
 Le Goal est explicitement autorisé à enchaîner les missions A à G, une seule à
 la fois. Chaque mission doit être testée, documentée, committée, intégrée dans
 `main` et poussée avant la suivante.
+
+Au 2026-07-27, A à G sont terminées et validées automatiquement. La candidate
+`0.1.70` et la recette V sont prêtes ; le verdict Fusion reste exclusivement
+humain.
 
 ## 2. Objectif exact du Goal
 
@@ -280,7 +285,7 @@ Certifier et matérialiser la géométrie réellement publiée.
 
 ## 12. P64-L09T-G — Durcissement, package et préparation de gate
 
-Statut au 2026-07-27 : `ready-after-P64-L09T-F-integration`.
+Statut au 2026-07-27 : `done`, `automated-validated`.
 
 ### Objectif
 
