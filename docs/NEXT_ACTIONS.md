@@ -1,6 +1,44 @@
 # Next Actions
 
 <!-- P64-L09U-NEXT -->
+## Action courante : P64-L09U-R8-A — preuve, profil et première divergence
+
+0.1.78 est `human-KO`, `do-not-run`.
+
+Le nouvel objectif n'est pas une réparation de rendu en aval. Il faut vérifier
+puis imposer le pipeline produit suivant :
+
+1. assembler les enveloppes minimales dans la boîte ;
+2. finaliser les conteneurs pour remplir le volume disponible ;
+3. appliquer les plateaux et livrets comme des coupes locales seulement ;
+4. ne créer aucun volume positif, corps, plaque, rail ou support pour eux.
+
+R8-A est la seule mission `ready` :
+
+- conserver le journal et les trois captures humaines ;
+- rejouer `CasLimite02+` et `CasLimite02++` en lecture seule ;
+- tracer frontière minimale, poses, finalisation, cellules XY, coupes, cavités,
+  CAD IR, plan Fusion et BRep ;
+- localiser la première apparition d'une matière positive attribuable à un
+  élément plat ;
+- profiler chaque phase du calcul et compter candidats, rejets et solveurs ;
+- expliquer les échecs Normal/intermédiaire et les recherches de `87–91 s` ;
+- ne coder aucun correctif avant ce diagnostic.
+
+R8-B rédigera ensuite l'ADR structurelle. R8-C à R8-G restent `blocked` par A
+puis B.
+
+Preuve :
+`docs/P64_L09U_R7_V_0178_HUMAN_KO_EVIDENCE.md`.
+
+Hand-off :
+`docs/P64_L09U_R8_SUBTRACTIVE_FLAT_INSETS_HANDOFF.md`.
+
+Aucun benchmark/holdout/corpus/tournoi. Les projets personnels restent en
+lecture seule. `fusion-validated=false`, `print-validated=false`.
+
+### Historique R7 clôturé en human-KO
+
 ## Action courante : P64-L09U-R7-F — validation et candidate
 
 0.1.77 est `human-KO`, `do-not-run`. Sa correction de profondeur est confirmée
@@ -81,8 +119,7 @@ Candidate 0.1.78 préparée :
 Candidate 0.1.78 installée et vérifiée depuis `35b17d7`. Suite autorisée finale :
 `928/928`, un test ignoré.
 
-Prochaine action unique : Thomas exécute la gate humaine R7-V selon
-`docs/P64_L09U_R7_V_0178_FUSION_GATE_RECIPE.md`.
+Gate R7-V close en `human-KO`; cette section est historique.
 
 Contrat : `docs/P64_L09U_R7_END_TO_END_RUNBOOK.md`.
 Preuve : `docs/P64_L09U_R6_V_0177_HUMAN_KO_EVIDENCE.md`.

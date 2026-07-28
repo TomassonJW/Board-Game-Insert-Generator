@@ -1,6 +1,65 @@
 # Backlog
 
 <!-- P64-L09U-BACKLOG -->
+## Correctif P64-L09U-R8
+
+### P64-L09U-R7-V — Gate humaine Fusion 0.1.78
+
+- Statut : `done-human-KO`, `do-not-run`.
+- Bloquants : calcul de `87–91 s` au niveau approfondi maximal, plaques et
+  supports ajoutés, cavités fermées, encoches parasites et surplombs.
+- Preuve : `docs/P64_L09U_R7_V_0178_HUMAN_KO_EVIDENCE.md`.
+
+### P64-L09U-R8-A — Preuve, profil et première divergence
+
+- Statut : `ready`.
+- Rejouer les deux projets personnels en lecture seule.
+- Tracer chaque étape jusqu'aux opérations BRep.
+- Localiser la première matière positive liée à un élément plat.
+- Profiler phases, candidats, rejets, solveurs, temps et mémoire.
+- Aucun correctif avant le diagnostic.
+
+### P64-L09U-R8-B — ADR du pipeline soustractif
+
+- Statut : `blocked-by-R8-A`.
+- Comparer correction locale, séparation de modèle et reconstruction bornée.
+- Formaliser enveloppes, finalisation, cellules XY et coupes seulement.
+
+### P64-L09U-R8-C — Calcul minimal séparé
+
+- Statut : `blocked-by-R8-B`.
+- Ne conserver que poses, enveloppes, ordre, intervalles et couvertures.
+- Supprimer toute fabrication de support liée aux éléments plats.
+
+### P64-L09U-R8-D — Conteneurs finalisés avant encastrement
+
+- Statut : `blocked-by-R8-C`.
+- Remplir la boîte avec les conteneurs tout en réservant les hauteurs locales.
+- Recertifier fonds, parois, cavités et accès.
+
+### P64-L09U-R8-E — Passe d'encastrement soustractive
+
+- Statut : `blocked-by-R8-D`.
+- Profondeurs locales exactes `4/2/6 mm`.
+- Zéro union, zéro corps et zéro volume positif attribuables aux éléments plats.
+
+### P64-L09U-R8-F — Fidélité et régressions
+
+- Statut : `blocked-by-R8-E`.
+- Prouver aperçu, CAD IR, plan Fusion et BRep identiques.
+- Préserver R6, parois, ordre automatique et grille `0,1 mm`.
+
+### P64-L09U-R8-G — Candidate et nouvelle gate humaine
+
+- Statut : `blocked-by-R8-F`.
+- Suite autorisée, intégration directe, installation automatique.
+- La dernière validation reste humaine.
+
+Hand-off :
+`docs/P64_L09U_R8_SUBTRACTIVE_FLAT_INSETS_HANDOFF.md`.
+
+### Historique R7
+
 ## Correctif P64-L09U-R7
 
 ### P64-L09U-R6-V — Gate humaine Fusion 0.1.77
@@ -80,8 +139,9 @@
 
 ### P64-L09U-R7-V — Gate humaine Fusion 0.1.78
 
-- Statut : `ready-human-gate`.
+- Statut : `done-human-KO`, `do-not-run`.
 - Recette : `docs/P64_L09U_R7_V_0178_FUSION_GATE_RECIPE.md`.
+- Preuve : `docs/P64_L09U_R7_V_0178_HUMAN_KO_EVIDENCE.md`.
 
 ### Historique R6
 

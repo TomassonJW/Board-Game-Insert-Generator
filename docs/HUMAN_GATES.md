@@ -1,7 +1,37 @@
 # Human Gates
 
 <!-- P64-L09U-GATE -->
-## P64-L09U-R7-V — gate 0.1.78 préparée
+## P64-L09U-R7-V — gate 0.1.78 close en KO
+
+Verdict : `human-KO`, `do-not-run`.
+
+Bloquants :
+
+- `CasLimite02+` exige Normal, un effort intermédiaire puis Approfondi maximal,
+  soit environ trois minutes cumulées avant une solution ;
+- `CasLimite02++` exige encore `87,192 s` en Approfondi maximal ;
+- grandes plaques, rails ou appuis ajoutés sous les éléments plats ;
+- cavités fermées, non creusées ou rendues inaccessibles ;
+- encoches parasites et grands surplombs ;
+- contradiction entre `Ajouts automatiques : 0`, le certificat réussi et la
+  matière réellement visible.
+
+La nouvelle règle à formaliser est strictement soustractive : les conteneurs
+sont finalisés d'abord, puis les éléments plats ne font que creuser leurs
+empreintes et profondeurs locales exactes. Ils ne créent aucune matière.
+
+Preuve :
+`docs/P64_L09U_R7_V_0178_HUMAN_KO_EVIDENCE.md`.
+
+R8 est autorisé sans nouvelle gate intermédiaire. Une nouvelle gate humaine ne
+sera ouverte qu'après diagnostic, ADR, corrections automatisées, intégration et
+installation d'une nouvelle candidate.
+
+`fusion-validated=false`, `print-validated=false`.
+
+### Préparation R7 historique
+
+## P64-L09U-R7-V — préparation historique de la gate 0.1.78
 
 Statut : `ready-human-gate`, candidate 0.1.78 installée et vérifiée depuis
 `35b17d7`,

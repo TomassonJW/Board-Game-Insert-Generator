@@ -1,6 +1,28 @@
 # Capability Map
 
 <!-- P64-L09U-CAPABILITY -->
+## P64-L09U-R8 — pipeline soustractif des éléments plats
+
+- `C-CAVITY` : régression humaine en 0.1.78 ; certaines cavités sont fermées,
+  non creusées ou inaccessibles dans la scène finale.
+- `C-TOP-RESERVATION` : `human-KO`. Une réservation produit encore de grandes
+  plaques, rails ou appuis au lieu d'une coupe seulement.
+- `C-STAGED-CALCULATION` : `human-KO`. Le calcul minimal exige jusqu'à
+  `90,991 s` et deux efforts préalables échouent sur `CasLimite02+`.
+- `C-FINALIZATION` : `human-KO`. Le certificat publie un succès malgré une
+  géométrie positive interdite liée aux éléments plats.
+- `C-CAD-IR` : à diagnostiquer ; la première apparition de la matière positive
+  entre plan minimal, finalisation, CAD IR et plan Fusion n'est pas localisée.
+- `C-FUSION` : `human-KO`. Aperçu, certificat et corps Fusion ne racontent pas
+  le même contrat.
+- `C-PRODUCT-GRID` : acquis automatisé à préserver, résolution `0,1 mm`.
+- `C-RELEASE` : 0.1.78 `human-KO`, `do-not-run`; R8-A `ready`.
+- `C-PRINT` : `print-validated=false`.
+
+Prochaine frontière : R8-A, preuve instrumentée et première divergence.
+
+### Historique R7 clôturé en human-KO
+
 ## P64-L09U-R7 — placement canonique et pile automatique
 
 - `C-CAVITY` : acquis R6 humainement confirmé pour la profondeur et les accès ;

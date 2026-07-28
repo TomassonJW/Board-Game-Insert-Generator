@@ -2,9 +2,13 @@
 
 Date : 2026-07-28.
 
-Statut : `automated-validated`, `installed-local`,
-`ready-human-gate`, `fusion-validated=false`,
+Statut historique : `automated-validated`, `installed-local`,
+`superseded-human-KO`, `do-not-run`, `fusion-validated=false`,
 `print-validated=false`.
+
+La gate humaine R7-V a depuis classé 0.1.78 `human-KO`. Cette preuve
+automatisée reste utile comme historique, mais ne justifie plus aucune
+promotion. Voir `docs/P64_L09U_R7_V_0178_HUMAN_KO_EVIDENCE.md`.
 
 ## Verdict remplacé
 
@@ -83,8 +87,8 @@ Fusion :
 - réglages UI : écrits ;
 - deux replays personnels : verts et SHA inchangés.
 
-## Limite restante
+## Limite résolue par un verdict humain KO
 
-Le package n'est pas encore observé dans une scène Fusion réelle. La promotion
-reste bloquée par la gate humaine
-`docs/P64_L09U_R7_V_0178_FUSION_GATE_RECIPE.md`.
+Le package a été observé dans une scène Fusion réelle et rejeté. La promotion
+est close en KO ; la prochaine mission est cadrée par
+`docs/P64_L09U_R8_SUBTRACTIVE_FLAT_INSETS_HANDOFF.md`.

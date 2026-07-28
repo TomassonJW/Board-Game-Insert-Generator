@@ -1,6 +1,37 @@
 # Status
 
 <!-- P64-L09U-STATUS -->
+## P64-L09U-R8 — éléments plats strictement soustractifs
+
+Date : 2026-07-28.
+
+Statut : `P64-L09U-R7-V-human-KO`, `do-not-run`,
+`P64-L09U-R8-A-ready`,
+`fusion-validated=false`, `print-validated=false`.
+
+- 0.1.78 est `human-KO`, `do-not-run`.
+- `CasLimite02+` ne trouve rien en Normal (`22,823 s`) ni en effort
+  intermédiaire (`61,799 s`), puis réussit en approfondi maximal (`90,991 s`).
+- `CasLimite02++` réussit en approfondi maximal après `87,192 s`.
+- Les deux scènes sont certifiées et synchronisées, mais montrent encore des
+  plaques, rails ou appuis ajoutés, des cavités fermées et des surplombs.
+- `Ajouts automatiques : 0` contredit la matière visible.
+- Le contrat R8 proposé sépare enveloppes minimales, assemblage, finalisation
+  des conteneurs et encastrements strictement soustractifs.
+- Un plateau ou livret ne doit créer aucun volume imprimable positif.
+- R8-A doit localiser la première divergence et profiler le calcul avant tout
+  changement structurel.
+- Les acquis de profondeur, accès, parois, ordre, grille `0,1 mm` et BRep
+  transitoire restent obligatoires.
+- Aucun benchmark/holdout/corpus/tournoi ; aucune UI manuelle.
+
+Preuve humaine :
+`docs/P64_L09U_R7_V_0178_HUMAN_KO_EVIDENCE.md`.
+Hand-off :
+`docs/P64_L09U_R8_SUBTRACTIVE_FLAT_INSETS_HANDOFF.md`.
+
+### Historique R7 clôturé en human-KO
+
 ## P64-L09U-R7 — placement canonique et pile automatique
 
 Date : 2026-07-28.
@@ -14,7 +45,7 @@ Statut : `P64-L09U-R6-V-human-KO`, `do-not-run`,
 `P64-L09U-R7-E-automated-validated`,
 `P64-L09U-R7-E2-automated-validated`,
 `P64-L09U-R7-F-automated-validated`, `installed-local`,
-`P64-L09U-R7-V-ready-human-gate`,
+`P64-L09U-R7-V-human-KO`, `do-not-run`,
 `fusion-validated=false`, `print-validated=false`.
 
 - 0.1.77 est `human-KO`, `do-not-run`.
@@ -63,7 +94,7 @@ Statut : `P64-L09U-R6-V-human-KO`, `do-not-run`,
   `30ea1b1055d7eec38b6824cb7e575f86e6e1557aa9a43abfe705fa8af802f59f`.
 - Matrice release : `59/59`, un test ignoré ; préparateur à blanc `84/84`.
 - Suite autorisée finale : `928/928`, un test ignoré.
-- Prochaine action : gate humaine R7-V dans Fusion.
+- Gate R7-V close en `human-KO`; R8-A est la prochaine action.
 - Aucun benchmark/holdout/corpus/tournoi ; aucune UI manuelle.
 
 Preuve humaine :
@@ -88,6 +119,8 @@ Preuve candidate :
 `docs/P64_L09U_R7_0178_CORRECTIVE_EVIDENCE.md`.
 Recette :
 `docs/P64_L09U_R7_V_0178_FUSION_GATE_RECIPE.md`.
+Verdict :
+`docs/P64_L09U_R7_V_0178_HUMAN_KO_EVIDENCE.md`.
 
 ### Historique R6 clôturé en human-KO
 

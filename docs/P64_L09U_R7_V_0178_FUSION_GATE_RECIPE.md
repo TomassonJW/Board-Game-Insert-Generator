@@ -1,6 +1,10 @@
 # P64-L09U-R7-V — recette Fusion 0.1.78
 
-Statut : `ready-human-gate`, 0.1.78 installée et vérifiée depuis `35b17d7`.
+Statut historique : `done-human-KO`, `do-not-run`.
+
+La gate a été exécutée et rejetée. Cette recette ne doit plus être rejouée
+comme une validation active. Preuve :
+`docs/P64_L09U_R7_V_0178_HUMAN_KO_EVIDENCE.md`.
 
 Cette gate doit être faite dans Fusion 360. Ne sauvegarde ni
 `CasLimite02+` ni `CasLimite02++`.

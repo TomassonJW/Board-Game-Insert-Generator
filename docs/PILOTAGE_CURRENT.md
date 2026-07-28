@@ -1,6 +1,39 @@
 # Pilotage courant
 
 <!-- P64-L09U-CURRENT -->
+## Reprise canonique P64-L09U-R8
+
+- `0.1.78` est `human-KO`, `do-not-run`.
+- `CasLimite02+` échoue en Normal (`22,823 s`) puis en effort intermédiaire
+  (`61,799 s`) avant de réussir en approfondi maximal (`90,991 s`).
+- `CasLimite02++` réussit en approfondi maximal après `87,192 s`.
+- Fusion montre de grandes plaques, des rails ou des appuis sous les éléments
+  plats, des cavités fermées ou non creusées, des encoches parasites et de
+  grands surplombs.
+- L'interface annonce pourtant `Ajouts automatiques : 0`, `Plan final prêt` et
+  `scene_synchronized` : le certificat et le corps imprimable se contredisent.
+- R8 doit vérifier puis formaliser un pipeline strict en quatre étapes :
+  enveloppes minimales, assemblage minimal, finalisation des conteneurs, puis
+  encastrements soustractifs.
+- Un plateau ou livret ne peut créer aucun volume imprimable positif. Son
+  support provient uniquement de la matière déjà présente dans les conteneurs.
+- La profondeur de coupe locale est la somme exacte des épaisseurs couvrantes :
+  `4 mm`, `2 mm` ou `6 mm` dans le cas forcé.
+- R8-A localise la première apparition de matière positive et profile la
+  recherche avant tout correctif. R8-B portera l'ADR structurelle.
+- Les acquis R6/R7 restent à préserver : profondeurs, accès, parois minimales,
+  ordre automatique, grille `0,1 mm`, BRep transitoire et projets personnels en
+  lecture seule.
+- Aucun benchmark/holdout/corpus/tournoi, aucune UI manuelle ;
+  `fusion-validated=false`, `print-validated=false`.
+
+Autorités R8 :
+
+- `docs/P64_L09U_R7_V_0178_HUMAN_KO_EVIDENCE.md` ;
+- `docs/P64_L09U_R8_SUBTRACTIVE_FLAT_INSETS_HANDOFF.md`.
+
+### Historique R7 clôturé en human-KO
+
 ## Reprise canonique P64-L09U-R7
 
 - `0.1.77` est `human-KO`, `do-not-run`.
@@ -41,7 +74,7 @@
 - La candidate 0.1.78 est installée depuis `35b17d7` : matrice release
   `59/59`, préparateur `84/84`, suite autorisée finale `928/928`, préflight
   `30ea1b10...f59f`.
-- La prochaine action unique est la gate humaine R7-V dans Fusion.
+- La gate humaine R7-V est close en `human-KO`; cette section est historique.
 - Aucun benchmark/holdout/corpus/tournoi, aucune UI manuelle ;
   `fusion-validated=false`, `print-validated=false`.
 

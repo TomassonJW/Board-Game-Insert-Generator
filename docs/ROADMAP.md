@@ -6,6 +6,31 @@ et la lecture par capabilities dans `docs/CAPABILITY_MAP.md`. La nomenclature
 et le role de ces documents sont definis dans `docs/PILOTAGE_GLOSSARY.md`.
 
 <!-- P64-L09U-ROADMAP -->
+## Correctif P64-L09U-R8 — pipeline soustractif des éléments plats
+
+0.1.78 est `human-KO`. Malgré les contrats R7 automatisés, la scène contient
+encore de grandes plaques et des appuis liés aux éléments plats, ferme des
+cavités et exige des recherches de `87–91 s`.
+
+```text
+P64-L09U-R7-V human-KO 0.1.78
+  -> R8-A preuve, profil, première divergence [ready]
+  -> R8-B ADR pipeline strictement soustractif
+  -> R8-C calcul minimal séparé
+  -> R8-D finalisation des conteneurs
+  -> R8-E encastrements par coupes seulement
+  -> R8-F fidélité et régressions de bout en bout
+  -> R8-G candidate, installation et nouvelle gate humaine
+```
+
+Le futur placement manuel des plateaux/livrets reste compatible avec les
+contrats, mais demeure hors scope. ADR-0095 à ADR-0097 restent différées.
+
+Preuve : `docs/P64_L09U_R7_V_0178_HUMAN_KO_EVIDENCE.md`.
+Hand-off : `docs/P64_L09U_R8_SUBTRACTIVE_FLAT_INSETS_HANDOFF.md`.
+
+### Historique R7 clôturé en human-KO
+
 ## Correctif P64-L09U-R7 — placement et pile canoniques
 
 0.1.77 est `human-KO`. La profondeur et les accès R6 sont acquis, mais le plan
