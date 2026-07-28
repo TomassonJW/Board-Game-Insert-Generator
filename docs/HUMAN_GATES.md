@@ -1,27 +1,36 @@
 # Human Gates
 
 <!-- P64-L09U-GATE -->
-## P64-L09U-R5-V — gate accès des cavités partiellement recouvertes
+## P64-L09U-R6-V — gate empilement local exact
 
-Statut : `ready-human-gate`, candidate 0.1.76 installée et vérifiée.
+Statut : `installation-pending`, candidate 0.1.77 automatisée-validée.
 
-0.1.75 est close en `human-KO`, `do-not-run`. Acquis : cavités bien placées et
-ouvertes directement sous plateau. Bloquant : leur portion hors plateau reste
-presque fermée lorsqu'elles sont partiellement recouvertes.
+0.1.76 est close en `human-KO`, `do-not-run`. Les portions hors plateau restent
+désormais ouvertes, mais une micro-partie de cavité perd `6 mm` et deux
+empreintes différentes ne gardent pas leurs intervalles locaux distincts.
 
-Thomas vérifie maintenant :
+Après installation confirmée par Codex, Thomas vérifie :
 
-1. aucune matière entre plateau et cavité dans la région recouverte ;
-2. aucun plafond au-dessus de l'asset dans la région hors plateau ;
-3. parois latérales, fond et appuis conservés hors de la cavité ;
-4. profondeur, position et aperçu inchangés ;
-5. plusieurs paliers, temps, rendu progressif et robustesse Fusion préservés.
+1. profondeur utile `10 mm` sous et hors plateau dans `c4` ;
+2. aucune régression d'accès pour les cavités partiellement recouvertes ;
+3. palier plateau `4 mm`, palier livret `2 mm`, intersection locale `6 mm` ;
+4. aucun cumul dans les zones disjointes ;
+5. aperçu, scène Fusion, temps et rendu progressif cohérents.
 
-Contrat : `docs/P64_L09U_R5_END_TO_END_RUNBOOK.md`.
-Preuve : `docs/P64_L09U_R5_0176_CORRECTIVE_EVIDENCE.md`.
-Recette : `docs/P64_L09U_R5_V_0176_FUSION_GATE_RECIPE.md`.
+Contrat : `docs/P64_L09U_R6_END_TO_END_RUNBOOK.md`.
+Preuve : `docs/P64_L09U_R6_0177_CORRECTIVE_EVIDENCE.md`.
+Recette : `docs/P64_L09U_R6_V_0177_FUSION_GATE_RECIPE.md`.
 
 Avant verdict : `fusion-validated=false`, `print-validated=false`.
+
+### P64-L09U-R5-V — gate humaine 0.1.76 close en KO
+
+Verdict : `human-KO`, `do-not-run`.
+
+Acquis : accès sous et hors plateau généralement conformes. Bloquants :
+micro-chevauchement de cavité tronqué et empilement local de deux éléments plats
+incorrect. Preuve :
+`docs/P64_L09U_R5_V_0176_HUMAN_KO_EVIDENCE.md`.
 
 ### P64-L09U-R4-V — gate humaine 0.1.75 close en KO
 

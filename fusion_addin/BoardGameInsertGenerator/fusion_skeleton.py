@@ -568,8 +568,11 @@ class FusionCavityCutPlan:
     validation_status: str = FUSION_MANUAL_VALIDATION_REQUIRED
     cavity_source: str = "cad_ir_cavity"
     policy: str | None = None
+    flat_item_id: str = ""
     local_region_id: str = ""
     overlapping_reservation_ids: tuple[str, ...] = ()
+    local_interval_bottom_z_mm: float | None = None
+    local_interval_top_z_mm: float | None = None
     anchor_kind: str = ""
     calibrated_depth_source_mm: float | None = None
     calibrated_depth_final_mm: float | None = None
@@ -598,12 +601,19 @@ class FusionCavityCutPlan:
         }
         if self.policy is not None:
             payload["policy"] = self.policy
+        if self.flat_item_id:
+            payload["flat_item_id"] = self.flat_item_id
         if self.local_region_id:
             payload["local_region_id"] = self.local_region_id
         if self.overlapping_reservation_ids:
             payload["overlapping_reservation_ids"] = list(
                 self.overlapping_reservation_ids
             )
+        if self.local_interval_bottom_z_mm is not None:
+            payload["local_interval_z_mm"] = {
+                "bottom": self.local_interval_bottom_z_mm,
+                "top": self.local_interval_top_z_mm,
+            }
         if self.anchor_kind:
             payload["anchor_kind"] = self.anchor_kind
         if self.calibrated_depth_source_mm is not None:
@@ -4058,12 +4068,21 @@ def _cavity_cut_plans(
             raise FusionSkeletonError(
                 f"Frozen cavity {cavity_id!r} must open on its certified local functional top."
             )
+        local_interval_bottom_z_mm: float | None = None
+        local_interval_top_z_mm: float | None = None
         if is_top_inset:
             if parameters.get("non_perforating") is not True:
                 raise FusionSkeletonError(
                     f"Top inset {cavity_id!r} for {blank.body_name!r} must be marked non_perforating."
                 )
             raw_interval = parameters.get("local_interval_z_mm")
+            if isinstance(raw_interval, Mapping):
+                local_interval_bottom_z_mm = float(
+                    raw_interval.get("bottom", -1.0)
+                )
+                local_interval_top_z_mm = float(
+                    raw_interval.get("top", -1.0)
+                )
             raw_overlap_ids = parameters.get(
                 "overlapping_reservation_ids",
                 (),
@@ -4142,6 +4161,7 @@ def _cavity_cut_plans(
                 operation_kind=str(operation_kind),
                 cavity_source=cavity_source,
                 policy="localized_top_inset_v1" if is_top_inset else None,
+                flat_item_id=str(parameters.get("flat_item_id", "")),
                 local_region_id=str(
                     parameters.get(
                         "local_region_id",
@@ -4154,6 +4174,10 @@ def _cavity_cut_plans(
                 overlapping_reservation_ids=(
                     overlapping_reservation_ids
                 ),
+                local_interval_bottom_z_mm=(
+                    local_interval_bottom_z_mm
+                ),
+                local_interval_top_z_mm=local_interval_top_z_mm,
                 anchor_kind=str(parameters.get("anchor_kind", "")),
                 calibrated_depth_source_mm=_optional_number(
                     parameters,

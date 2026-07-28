@@ -16,6 +16,9 @@ from board_game_insert_generator.global_rectangular_closure import (
 )
 from board_game_insert_generator.solver_contract import SolverBudget
 from board_game_insert_generator.xy_composite_closure import (
+    _RawPrism,
+    _is_union_z_clearance_corridor,
+    _is_xy_clearance_cross_junction,
     close_xy_composite_partition,
     xy_composite_closure_to_dict,
 )
@@ -454,6 +457,102 @@ class XYCompositeClosureTests(unittest.TestCase):
             0.0,
         )
         self.assertTrue(result.certificate["external_clearances_certified"])
+
+    def test_four_way_xy_clearance_cross_is_kept_void(self) -> None:
+        residual = _RawPrism(
+            (10.0, 10.0, 5.0),
+            (0.4, 0.4, 3.0),
+        )
+        owners = {
+            "left": (_RawPrism((0.0, 10.4, 0.0), (10.0, 5.0, 10.0)),),
+            "right": (
+                _RawPrism((10.4, 10.4, 0.0), (5.0, 5.0, 10.0)),
+            ),
+            "bottom": (
+                _RawPrism((10.0, 0.0, 0.0), (0.4, 10.0, 10.0)),
+            ),
+        }
+
+        self.assertTrue(
+            _is_xy_clearance_cross_junction(
+                residual,
+                owners,
+                0.4,
+            )
+        )
+
+    def test_clearance_sized_floating_cell_is_not_a_cross_junction(
+        self,
+    ) -> None:
+        residual = _RawPrism(
+            (10.0, 10.0, 5.0),
+            (0.4, 0.4, 3.0),
+        )
+        owners = {
+            "bottom": (
+                _RawPrism((10.0, 0.0, 0.0), (0.4, 10.0, 10.0)),
+            ),
+        }
+
+        self.assertFalse(
+            _is_xy_clearance_cross_junction(
+                residual,
+                owners,
+                0.4,
+            )
+        )
+
+    def test_z_clearance_between_owner_mosaics_is_kept_void(self) -> None:
+        residual = _RawPrism(
+            (0.0, 0.0, 10.0),
+            (20.0, 10.0, 0.6),
+        )
+        owners = {
+            "lower-left": (
+                _RawPrism((0.0, 0.0, 0.0), (10.0, 10.0, 10.0)),
+            ),
+            "lower-right": (
+                _RawPrism((10.0, 0.0, 0.0), (10.0, 10.0, 10.0)),
+            ),
+            "upper-left": (
+                _RawPrism((0.0, 0.0, 10.6), (8.0, 10.0, 5.0)),
+            ),
+            "upper-right": (
+                _RawPrism((8.0, 0.0, 10.6), (12.0, 10.0, 5.0)),
+            ),
+        }
+
+        self.assertTrue(
+            _is_union_z_clearance_corridor(
+                residual,
+                owners,
+                0.6,
+            )
+        )
+
+    def test_z_clearance_with_an_uncovered_face_is_not_certified(
+        self,
+    ) -> None:
+        residual = _RawPrism(
+            (0.0, 0.0, 10.0),
+            (20.0, 10.0, 0.6),
+        )
+        owners = {
+            "lower": (
+                _RawPrism((0.0, 0.0, 0.0), (20.0, 10.0, 10.0)),
+            ),
+            "upper-partial": (
+                _RawPrism((0.0, 0.0, 10.6), (8.0, 10.0, 5.0)),
+            ),
+        }
+
+        self.assertFalse(
+            _is_union_z_clearance_corridor(
+                residual,
+                owners,
+                0.6,
+            )
+        )
 
     def test_hybrid_rejects_z_only_edge_point_and_floating_cells(self) -> None:
         source = _placement_for(

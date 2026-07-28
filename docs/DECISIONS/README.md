@@ -271,3 +271,9 @@ Tests, cartes backlog ou gates humaines a preparer.
 - ADR-0099-profondeur-calibree-et-reservations-superieures-locales.md - calibre
   de cavité figé, ancrage Z final déterministe et composition locale des
   plateaux et livrets.
+- ADR-0100-plateau-amovible-et-cavite-sans-paroi-intermediaire.md - continuité
+  directe entre cavité et plateau amovible, sans paroi intermédiaire.
+- ADR-0101-acces-local-des-cavites-partiellement-recouvertes.md - accès
+  verticaux bornés pour les portions sous et hors plateau.
+- ADR-0102-empilement-local-exact-des-reservations-superieures.md - partition
+  XY atomique, intervalles Z locaux et conservation jusqu'au plan Fusion.

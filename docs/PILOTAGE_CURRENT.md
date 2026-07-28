@@ -1,38 +1,38 @@
 # Pilotage courant
 
 <!-- P64-L09U-CURRENT -->
-## Reprise canonique P64-L09U-R5
+## Reprise canonique P64-L09U-R6
 
-- `0.1.75` est `human-KO`, `do-not-run`.
-- Acquis humain : cavités bien placées et directement ouvertes sous les
-  plateaux, sans paroi intermédiaire.
-- Défaut humain : lorsqu'une cavité n'est que partiellement recouverte, sa
-  portion hors plateau reste presque fermée par le volume plein supérieur du
-  conteneur.
-- Cause confirmée : l'ancrage abaissait toute la cavité, mais les accès
-  verticaux hors plateau étaient désactivés.
-- R5 conserve l'ancrage, le calibre, X/Y et l'orientation, puis ouvre chaque
-  région jusqu'au dessous de sa découpe ou jusqu'au sommet fonctionnel local.
-- Chaque accès reste strictement dans l'empreinte de la cavité ; fonds, parois,
-  appuis, paliers, budgets et solveur restent inchangés.
-- L'aperçu, la CAD IR et le plan Fusion transportent les mêmes coupes
-  `frozen_cavity_vertical_access`.
-- Validation : préparateur `133/133`, suite autorisée `902/902`, un test SCIP
+- `0.1.76` est `human-KO`, `do-not-run`.
+- Acquis R5 : parties sous et hors plateau accessibles, profondeurs
+  majoritairement conformes, calcul/finalisation/matérialisation rapides, BRep
+  transitoire, rendu progressif et rollback.
+- Défaut A : une micro-partie de cavité dans `c4` ne garde que `4,4 mm` au lieu
+  de `10 mm`, avec une perte exacte de `6 mm`.
+- Défaut B : deux éléments plats de tailles différentes ne produisent pas deux
+  encastrements locaux cohérents.
+- Première divergence : finalisation composite. La garde Z cumulait les
+  éléments hors de leur intersection, le centre de la cavité masquait un vrai
+  chevauchement et une seule réservation survivait jusqu'à Fusion.
+- ADR-0102 impose une partition XY atomique, des intervalles Z par élément et
+  aucun cumul entre zones disjointes.
+- R6 conserve chaque coupe jusqu'au plan Fusion et rattache toute cavité par
+  intersection réelle supérieure à l'epsilon.
+- Validation : préparateur `136/136`, suite autorisée `909/909`, un test SCIP
   ignoré et trois replays personnels exacts en lecture seule.
-- Candidate `0.1.76` intégrée, installée et prête pour la gate R5-V.
-- Installation initiale : commit `07dcabf`, manifeste, runtime, réglages et
-  marqueur vérifiés.
-- Prochaine action unique : observation humaine selon
-  `docs/P64_L09U_R5_V_0176_FUSION_GATE_RECIPE.md`.
-- Aucun benchmark/holdout ; projets personnels en lecture seule ;
+- Candidate `0.1.77`, digest
+  `de55e8e85652ecb6d01e44b7494b7adc7f92ee2472c8e3c6874836f93823f6b6`.
+- Prochaine action unique Codex : intégration et installation locale, puis
+  Thomas suit `docs/P64_L09U_R6_V_0177_FUSION_GATE_RECIPE.md`.
+- Aucun benchmark/holdout/corpus/tournoi, aucune valeur physique nouvelle ;
   `fusion-validated=false`, `print-validated=false`.
 
-Autorités R5 :
+Autorités R6 :
 
-- `docs/P64_L09U_R4_V_0175_HUMAN_KO_EVIDENCE.md` ;
-- `docs/DECISIONS/ADR-0101-acces-local-des-cavites-partiellement-recouvertes.md` ;
-- `docs/P64_L09U_R5_0176_CORRECTIVE_EVIDENCE.md` ;
-- `docs/P64_L09U_R5_END_TO_END_RUNBOOK.md`.
+- `docs/P64_L09U_R5_V_0176_HUMAN_KO_EVIDENCE.md` ;
+- `docs/DECISIONS/ADR-0102-empilement-local-exact-des-reservations-superieures.md` ;
+- `docs/P64_L09U_R6_0177_CORRECTIVE_EVIDENCE.md` ;
+- `docs/P64_L09U_R6_END_TO_END_RUNBOOK.md`.
 
 ### Historique R4 clôturé en human-KO
 

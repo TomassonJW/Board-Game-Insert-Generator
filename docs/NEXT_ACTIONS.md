@@ -1,27 +1,27 @@
 # Next Actions
 
 <!-- P64-L09U-NEXT -->
-## Action courante : exécuter la gate P64-L09U-R5-V
+## Action courante : intégrer et installer P64-L09U-R6
 
-0.1.75 est `human-KO`, `do-not-run`. Elle ouvre correctement la jonction sous
-plateau, mais ferme presque la portion hors plateau des cavités partiellement
-recouvertes.
+0.1.76 est `human-KO`, `do-not-run`. Les accès R5 restent acquis, mais une
+micro-partie de cavité perd `6 mm` et deux éléments plats de tailles différentes
+ne gardent pas leurs deux encastrements locaux.
 
-La candidate automatisée-validée 0.1.76 est intégrée, installée et vérifiée.
-Thomas suit maintenant uniquement la recette R5-V, en commençant par une cavité
-partiellement recouverte.
+La candidate 0.1.77 est automatisée-validée. La seule action Codex restante est
+son intégration puis son installation locale vérifiée. Thomas n'agit qu'après
+confirmation de cette installation, selon la recette R6-V.
 
 Contrat :
-`docs/P64_L09U_R5_END_TO_END_RUNBOOK.md`.
+`docs/P64_L09U_R6_END_TO_END_RUNBOOK.md`.
 
-Preuve en cours :
-`docs/P64_L09U_R5_0176_CORRECTIVE_EVIDENCE.md`.
+Preuve :
+`docs/P64_L09U_R6_0177_CORRECTIVE_EVIDENCE.md`.
 
 Recette :
-`docs/P64_L09U_R5_V_0176_FUSION_GATE_RECIPE.md`.
+`docs/P64_L09U_R6_V_0177_FUSION_GATE_RECIPE.md`.
 
-Aucun benchmark/holdout. Les projets personnels restent en lecture seule.
-`fusion-validated=false`, `print-validated=false`.
+Aucun benchmark/holdout/corpus/tournoi. Les projets personnels restent en
+lecture seule. `fusion-validated=false`, `print-validated=false`.
 
 ### Historique R2 clôturé en human-KO
 

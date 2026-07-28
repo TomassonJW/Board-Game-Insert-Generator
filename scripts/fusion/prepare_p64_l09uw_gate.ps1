@@ -27,7 +27,7 @@ $tempLocalReceipt = Join-Path $workspaceTemp $localReceiptName
 
 foreach ($required in @($preflight, $localReplay, $manifestPath)) {
     if (-not (Test-Path -LiteralPath $required -PathType Leaf)) {
-        throw "P64-L09U-R5-V required source missing: $required"
+        throw "P64-L09U-R6-V required source missing: $required"
     }
 }
 $manifestText = Get-Content -LiteralPath $manifestPath -Raw -Encoding UTF8
@@ -39,11 +39,11 @@ if (-not $versionMatch.Success) {
     throw "Source add-in manifest has no readable version: $manifestPath"
 }
 $expectedVersion = $versionMatch.Groups["version"].Value
-if ($expectedVersion -ne "0.1.76") {
-    throw "P64-L09U-R5-V package version mismatch: expected 0.1.76, got $expectedVersion."
+if ($expectedVersion -ne "0.1.77") {
+    throw "P64-L09U-R6-V package version mismatch: expected 0.1.77, got $expectedVersion."
 }
 
-Write-Output "BGIG P64-L09U-R5-V corrective Fusion gate preparation"
+Write-Output "BGIG P64-L09U-R6-V corrective Fusion gate preparation"
 Write-Output "Repo root: $root"
 Write-Output "Commit: $commit"
 Write-Output "Package version: $expectedVersion"
@@ -107,7 +107,7 @@ Write-BgigFusionUiSettings `
     -DryRun:$DryRun
 
 if ($DryRun) {
-    Write-Output "Dry run: would install the P64-L09U-R5-V fixture and receipts."
+    Write-Output "Dry run: would install the P64-L09U-R6-V fixture and receipts."
     Write-Output "Dry run: would preserve named projects and legacy recovery files."
     Write-Output "Dry run: would force a fresh unsaved startup with no current path."
 }
@@ -133,7 +133,7 @@ else {
             "parametric_combine_feature_count"
         )) {
             if (-not $installedAdapter.Contains($marker)) {
-                throw "Installed P64-L09U-R5-V materialization marker missing: $marker"
+                throw "Installed P64-L09U-R6-V materialization marker missing: $marker"
             }
         }
         $installedSkeleton = Get-Content -LiteralPath (
@@ -148,7 +148,7 @@ else {
             "without intermediate material"
         )) {
             if (-not $installedSkeleton.Contains($marker)) {
-                throw "Installed P64-L09U-R5-V CAD marker missing: $marker"
+                throw "Installed P64-L09U-R6-V CAD marker missing: $marker"
             }
         }
         $installedFinalization = Get-Content -LiteralPath (
@@ -160,7 +160,7 @@ else {
             "COMPOSITE_CAVITY_VERTICAL_ACCESS_UNCERTIFIED"
         )) {
             if (-not $installedFinalization.Contains($marker)) {
-                throw "Installed P64-L09U-R5-V local access marker missing: $marker"
+                throw "Installed P64-L09U-R6-V local access marker missing: $marker"
             }
         }
         $installedPalette = Get-Content -LiteralPath (
@@ -172,11 +172,11 @@ else {
             "cross_session_witness_persistence_disabled"
         )) {
             if (-not $installedPalette.Contains($marker)) {
-                throw "Installed P64-L09U-R5-V startup marker missing: $marker"
+                throw "Installed P64-L09U-R6-V startup marker missing: $marker"
             }
         }
         if ($installedPalette.Contains('"autosave_project"')) {
-            throw "Installed P64-L09U-R5-V still exposes autosave_project."
+            throw "Installed P64-L09U-R6-V still exposes autosave_project."
         }
         $installedSolver = Get-Content -LiteralPath (
             Join-Path $target "lib\board_game_insert_generator\minimal_layout_solver.py"
@@ -186,7 +186,7 @@ else {
             "dense project needs stacks below a tray"
         )) {
             if (-not $installedSolver.Contains($marker)) {
-                throw "Installed P64-L09U-R5-V fresh-solve marker missing: $marker"
+                throw "Installed P64-L09U-R6-V fresh-solve marker missing: $marker"
             }
         }
 
@@ -269,7 +269,7 @@ else {
             Get-Content -LiteralPath $commitMarker -Raw -Encoding UTF8
         ).Trim()
         if ($installedCommit -ne $commit) {
-            throw "Installed P64-L09U-R5-V commit marker mismatch."
+            throw "Installed P64-L09U-R6-V commit marker mismatch."
         }
     }
     catch [UnauthorizedAccessException] {
@@ -288,7 +288,7 @@ else {
                 $resolvedRoot + [IO.Path]::DirectorySeparatorChar,
                 [StringComparison]::OrdinalIgnoreCase
             )) {
-                throw "Refusing to remove a P64-L09U-R5-V temp path outside the repository."
+                throw "Refusing to remove a P64-L09U-R6-V temp path outside the repository."
             }
             Remove-Item -LiteralPath $resolvedTemp -Recurse -Force
         }
@@ -296,7 +296,7 @@ else {
 }
 
 Write-Output ""
-Write-Output "P64-L09U-R5-V actions remaining for Thomas:"
+Write-Output "P64-L09U-R6-V actions remaining for Thomas:"
 Write-Output "1. Fully close and reopen Fusion, then reload BGIG $expectedVersion."
 Write-Output "2. Confirm BGIG opens on a fresh unsaved empty project."
 Write-Output "3. Open CasLimite01+, calculate and finalize in Normal; require every partially covered cavity to stay open both under and outside the tray, with its surrounding walls preserved."
@@ -306,6 +306,6 @@ Write-Output "6. Repeat CasLimite01+ without its flat item, without saving; requ
 Write-Output "7. Open CasLimite02+; require every covered cavity to remain accessible under the two exact local tray footprints and steps."
 Write-Output "8. Open CasLimite01++, then calculate, finalize and materialize it without saving the source."
 Write-Output "9. Require synchronized preview/Fusion geometry, progressive modules and unchanged calibrated depths."
-Write-Output "10. Follow docs/P64_L09U_R5_V_0176_FUSION_GATE_RECIPE.md and report exact times, measurements and screenshots."
+Write-Output "10. Follow docs/P64_L09U_R6_V_0177_FUSION_GATE_RECIPE.md and report exact times, measurements and screenshots."
 Write-Output "Prepared status: fusion-validated=false; print-validated=false."
-Write-Output "Prepared P64-L09U-R5-V gate: $(-not $DryRun)"
+Write-Output "Prepared P64-L09U-R6-V gate: $(-not $DryRun)"

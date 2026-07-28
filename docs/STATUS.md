@@ -1,38 +1,43 @@
 # Status
 
 <!-- P64-L09U-STATUS -->
-## P64-L09U-R5 — accès local des cavités partiellement recouvertes
+## P64-L09U-R6 — empilement local exact des réservations
 
 Date : 2026-07-28.
 
-Statut : `P64-L09U-R4-V-human-KO`, `P64-L09U-R5-automated-validated`,
-`installed-local`, `P64-L09U-R5-V-ready-human-gate`,
+Statut : `P64-L09U-R5-V-human-KO`, `do-not-run`,
+`P64-L09U-R6-automated-validated`, `installation-pending`,
 `fusion-validated=false`, `print-validated=false`.
 
-- 0.1.75 est `human-KO`, `do-not-run`.
-- Acquis humain : positions et profondeurs correctes, aucune paroi entre
-  plateau et cavité.
-- Défaut humain : la portion hors plateau d'une cavité partiellement recouverte
-  reste fermée par le volume plein supérieur du conteneur.
-- Cause confirmée : l'ancrage abaissait toute la cavité, mais les accès
-  verticaux hors plateau étaient désactivés.
-- R5 rétablit des accès bornés à l'empreinte de la cavité, jusqu'au dessous de
-  chaque découpe locale ou jusqu'au sommet fonctionnel hors plateau.
-- Les parois, fonds, appuis, dimensions, poses et profondeurs restent inchangés.
-- Validation : préparateur `133/133`, suite autorisée `902/902`, un test SCIP
+- 0.1.76 est `human-KO`, `do-not-run`.
+- Acquis 0.1.76 : accès sous et hors plateau, profondeur de la plupart des
+  cavités, temps, BRep transitoire, rendu progressif et rollback.
+- Défaut A : dans `c4`, une micro-partie sous plateau réduisait une cavité
+  attendue à `10 mm` à environ `4,4 mm`, soit exactement `6 mm` perdus.
+- Défaut B : deux empreintes différentes ne transportaient pas leurs deux
+  intervalles Z locaux jusqu'à Fusion ; `60×80` et `60×82` échouaient en
+  fermeture, tandis que `60×85` perdait un encastrement.
+- Première divergence : finalisation composite, avant CAD IR. La garde Z était
+  cumulée globalement, le chevauchement de cavité testé au centre et une seule
+  réservation retenue par cellule.
+- ADR-0102 impose des cellules XY atomiques, le cumul des seuls éléments
+  présents et la conservation de chaque intervalle jusqu'au plan Fusion.
+- Les cavités sont rattachées par intersection réelle, même sous une paroi ;
+  leur calibre, X/Y, orientation et identité restent figés.
+- Validation : préparateur `136/136`, suite autorisée `909/909`, un test SCIP
   ignoré, trois replays personnels exacts en lecture seule.
-- Candidate : `0.1.76`, intégrée, installée et prête pour la gate R5-V.
-- Installation initiale vérifiée au commit `07dcabf`.
-- Aucun benchmark/holdout ; projets personnels en lecture seule.
+- Candidate : `0.1.77`, preflight
+  `de55e8e85652ecb6d01e44b7494b7adc7f92ee2472c8e3c6874836f93823f6b6`.
+- Aucun benchmark/holdout/corpus/tournoi ; aucune valeur physique modifiée.
 
 Preuve humaine :
-`docs/P64_L09U_R4_V_0175_HUMAN_KO_EVIDENCE.md`.
+`docs/P64_L09U_R5_V_0176_HUMAN_KO_EVIDENCE.md`.
 Décision :
-`docs/DECISIONS/ADR-0101-acces-local-des-cavites-partiellement-recouvertes.md`.
+`docs/DECISIONS/ADR-0102-empilement-local-exact-des-reservations-superieures.md`.
 Preuve corrective :
-`docs/P64_L09U_R5_0176_CORRECTIVE_EVIDENCE.md`.
+`docs/P64_L09U_R6_0177_CORRECTIVE_EVIDENCE.md`.
 Runbook :
-`docs/P64_L09U_R5_END_TO_END_RUNBOOK.md`.
+`docs/P64_L09U_R6_END_TO_END_RUNBOOK.md`.
 
 ### Historique R2 clôturé en human-KO
 

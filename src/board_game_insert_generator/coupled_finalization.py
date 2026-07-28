@@ -55,7 +55,7 @@ from board_game_insert_generator.solver_settings import solver_deadline_seconds
 
 COUPLED_FINALIZATION_SCHEMA_V1 = "bgig.coupled_finalization.v1"
 COUPLED_FINALIZATION_FAMILY_ID = "bounded_coupled_finalization"
-COUPLED_FINALIZATION_VERSION = "bgig.bounded_coupled_finalization.v11"
+COUPLED_FINALIZATION_VERSION = "bgig.bounded_coupled_finalization.v12"
 COUPLED_FINALIZATION_POLICY = (
     "global_rectangular_then_vertical_first_continuous_then_bounded_xy_composite"
 )
@@ -833,11 +833,12 @@ def _conservative_closure_guard_zones(
     top_inset_plan: Mapping[str, object],
     design_top_z: float,
 ) -> tuple[TopInsetZone, ...]:
-    """Keep the proven closure search bounded without defining final cuts.
+    """Reserve the exact union of the local flat-item stack regions.
 
-    The final CAD contract is always rebuilt from the exact local regions.
-    These conservative zones only prevent the legacy closure search from
-    growing material into volume that any ordered flat item may reserve.
+    Several reservations may describe the same atomic XY cell because each
+    item keeps its own Z interval.  The closure only needs the union void for
+    that cell, so the deepest local bottom is retained once.  Disjoint
+    footprints consequently never inherit an artificial cumulative depth.
     """
 
     reservations = [
@@ -845,33 +846,62 @@ def _conservative_closure_guard_zones(
         for value in top_inset_plan.get("reservations", ())
         if isinstance(value, Mapping)
     ]
-    ordered = sorted(
-        reservations,
-        key=lambda value: int(value.get("level", 0)),
-    )
-    zones: list[TopInsetZone] = []
-    for index, reservation in enumerate(ordered):
-        guarded_depth = sum(
-            float(value["total_thickness_mm"])
-            for value in ordered[index:]
-        )
-        origin = _object_mapping(reservation["cut_origin_mm"])
-        size = _object_mapping(reservation["cut_size_mm"])
-        zones.append(
-            TopInsetZone(
-                origin_xy_mm=(
-                    float(origin["x"]),
-                    float(origin["y"]),
-                ),
-                size_xy_mm=(
-                    float(size["x"]),
-                    float(size["y"]),
-                ),
-                support_plane_z_mm=design_top_z - guarded_depth,
-                inset_depth_mm=guarded_depth,
+    atomic_regions: dict[
+        tuple[float, float, float, float],
+        float,
+    ] = {}
+    for reservation in reservations:
+        raw_regions = reservation.get("local_depth_regions", ())
+        regions = (
+            tuple(
+                value
+                for value in raw_regions
+                if isinstance(value, Mapping)
             )
+            if isinstance(raw_regions, (list, tuple))
+            else ()
         )
-    return tuple(zones)
+        if not regions:
+            regions = (reservation,)
+        for region in regions:
+            origin = _object_mapping(
+                region.get(
+                    "cut_origin_mm",
+                    reservation["cut_origin_mm"],
+                )
+            )
+            size = _object_mapping(
+                region.get(
+                    "cut_size_mm",
+                    reservation["cut_size_mm"],
+                )
+            )
+            key = (
+                round(float(origin["x"]), 6),
+                round(float(origin["y"]), 6),
+                round(float(size["x"]), 6),
+                round(float(size["y"]), 6),
+            )
+            layer_bottom = float(
+                region.get(
+                    "layer_bottom_z_mm",
+                    design_top_z
+                    - float(reservation["inset_depth_from_top_mm"]),
+                )
+            )
+            atomic_regions[key] = min(
+                layer_bottom,
+                atomic_regions.get(key, design_top_z),
+            )
+    return tuple(
+        TopInsetZone(
+            origin_xy_mm=(key[0], key[1]),
+            size_xy_mm=(key[2], key[3]),
+            support_plane_z_mm=round(layer_bottom, 6),
+            inset_depth_mm=round(design_top_z - layer_bottom, 6),
+        )
+        for key, layer_bottom in sorted(atomic_regions.items())
+    )
 
 
 def _finalized_plan(
@@ -2004,16 +2034,12 @@ def _functional_top_at_cavity(
 ) -> float:
     if not cad_prisms:
         return owner_origin[2] + owner_size[2]
-    center = (
-        (cavity_rect[0] + cavity_rect[2]) / 2.0,
-        (cavity_rect[1] + cavity_rect[3]) / 2.0,
-    )
     tops = [
         float(_mapping_value(value["cad_origin_mm"], "z"))
         + float(_mapping_value(value["cad_size_mm"], "z"))
         for value in cad_prisms
-        if _point_in_rectangle(
-            center,
+        if _rectangles_overlap(
+            cavity_rect,
             _mapping_xy_rectangle(
                 value["cad_origin_mm"],
                 value["cad_size_mm"],
@@ -2206,15 +2232,18 @@ def _composite_cell_cuts(
     frozen_cavities: Sequence[Mapping[str, object]],
 ) -> tuple[dict[str, object], ...]:
     cuts: list[dict[str, object]] = []
-    footprint = _deepest_reservation_at_cell(
+    footprints = _reservations_at_cell(
         final_origin,
         final_size,
         reservations,
         kind="footprint",
     )
     selected: list[tuple[str, Mapping[str, object]]] = []
-    if footprint is not None:
-        selected.append(("top_inset", footprint))
+    if footprints:
+        selected.extend(
+            ("top_inset", reservation)
+            for reservation in footprints
+        )
     else:
         grip = _deepest_reservation_at_cell(
             final_origin,
@@ -2226,16 +2255,26 @@ def _composite_cell_cuts(
             selected.append(("top_inset_grip", grip))
     cad_top = final_origin[2] + cad_size[2]
     for cut_index, (kind, reservation) in enumerate(selected):
-        cut_bottom = design_top - float(
-            reservation["inset_depth_from_top_mm"]
-        )
+        local_region = reservation.get("local_region")
+        if kind == "top_inset" and isinstance(
+            local_region,
+            Mapping,
+        ):
+            cut_bottom = float(local_region["layer_bottom_z_mm"])
+            cut_top = float(local_region["layer_top_z_mm"])
+        else:
+            cut_bottom = design_top - float(
+                reservation["inset_depth_from_top_mm"]
+            )
+            cut_top = cad_top
         reservation_id = str(reservation["id"])
         flat_item_id = str(reservation["flat_item_id"])
         removal_order = int(reservation["removal_order"])
         cut_bottom = max(float(final_origin[2]), cut_bottom)
-        if cad_top <= cut_bottom + 0.0001:
+        cut_top = min(cad_top, cut_top)
+        if cut_top <= cut_bottom + 0.0001:
             continue
-        cut_size_z = cad_top - cut_bottom
+        cut_size_z = cut_top - cut_bottom
         world_origin = (
             final_origin[0],
             final_origin[1],
@@ -2289,7 +2328,7 @@ def _composite_cell_cuts(
                 "cavity_overlap_area_mm2": 0.0,
                 "local_interval_z_mm": {
                     "bottom": round(cut_bottom, 6),
-                    "top": round(cad_top, 6),
+                    "top": round(cut_top, 6),
                 },
                 "non_perforating": cut_bottom
                 >= final_origin[2] - 0.0001,
@@ -2490,6 +2529,22 @@ def _deepest_reservation_at_cell(
     *,
     kind: str,
 ) -> Mapping[str, object] | None:
+    candidates = _reservations_at_cell(
+        origin,
+        size,
+        reservations,
+        kind=kind,
+    )
+    return candidates[0] if candidates else None
+
+
+def _reservations_at_cell(
+    origin: Sequence[float],
+    size: Sequence[float],
+    reservations: Sequence[Mapping[str, object]],
+    *,
+    kind: str,
+) -> tuple[Mapping[str, object], ...]:
     center = (
         origin[0] + size[0] / 2.0,
         origin[1] + size[1] / 2.0,
@@ -2549,14 +2604,14 @@ def _deepest_reservation_at_cell(
         ):
             candidates.append(value)
     if not candidates:
-        return None
-    return min(
+        return ()
+    return tuple(sorted(
         candidates,
         key=lambda value: (
             float(value["support_plane_z_mm"]),
             str(value["id"]),
         ),
-    )
+    ))
 
 
 def _reservation_rectangle(

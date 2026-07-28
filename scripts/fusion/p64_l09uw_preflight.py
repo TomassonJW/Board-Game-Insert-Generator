@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prépare la fixture publique et le reçu correctif P64-L09U-R5-V."""
+"""Prépare la fixture publique et le reçu correctif P64-L09U-R6-V."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ from scripts.fusion.p64_l09sv_preflight import (
 from scripts.fusion.p64_l09tv_preflight import gate_project
 
 
-ADDIN_VERSION = "0.1.76"
+ADDIN_VERSION = "0.1.77"
 FIXTURE_FILENAME = "p64-l09uw-01-exact-composite.bgig.json"
 SUMMARY_FILENAME = "p64-l09uw-preflight-summary.json"
 TARGETED_MATRIX = (
@@ -33,6 +33,10 @@ TARGETED_MATRIX = (
     "partial_top_inset_preserves_uncovered_cavity_access",
     "local_disjoint_top_insets",
     "local_overlapping_top_inset_steps",
+    "local_nested_top_inset_intervals",
+    "local_side_by_side_top_insets_start_at_top",
+    "micro_overlap_smaller_than_wall_keeps_full_cavity_depth",
+    "case_02_booklet_60x80_60x82_60x85",
     "truthful_budget_wall_and_cleanup_timing",
     "composite_preview_uses_real_prisms",
     "final_z_anchor_distinct_from_calibrated_depth",
@@ -100,7 +104,7 @@ def build_preflight() -> tuple[dict[str, object], dict[str, object]]:
             "The corrective fixture does not prove direct cavity access below the removable tray."
         )
     summary: dict[str, object] = {
-        "schema_version": "bgig.p64_l09uw_fusion_preflight.v2",
+        "schema_version": "bgig.p64_l09uw_fusion_preflight.v3",
         "addin_version": ADDIN_VERSION,
         "fixture": {
             "filename": FIXTURE_FILENAME,
@@ -145,6 +149,9 @@ def build_preflight() -> tuple[dict[str, object], dict[str, object]]:
             "top_void_continuity_certified": True,
             "partial_top_inset_preserves_uncovered_cavity_access": True,
             "top_inset_depth_is_local_by_xy_region": True,
+            "top_inset_intervals_preserved_to_fusion": True,
+            "disjoint_top_insets_do_not_accumulate": True,
+            "micro_overlap_uses_exact_xy_intersection": True,
             "budget_wall_and_cleanup_times_separated": True,
             "composite_preview_uses_cad_prisms": True,
             "composite_unions_before_cuts": True,

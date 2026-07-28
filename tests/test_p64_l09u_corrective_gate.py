@@ -22,7 +22,7 @@ class P64L09UR5CorrectiveGateTests(unittest.TestCase):
     def test_preflight_proves_exact_transient_path_without_human_claims(
         self,
     ) -> None:
-        self.assertEqual(ADDIN_VERSION, "0.1.76")
+        self.assertEqual(ADDIN_VERSION, "0.1.77")
         self.assertEqual(self.preflight["addin_version"], ADDIN_VERSION)
         self.assertEqual(
             set(self.preflight["targeted_matrix"]["required_case_ids"]),
@@ -91,9 +91,9 @@ class P64L09UR5CorrectiveGateTests(unittest.TestCase):
         preparer = (
             ROOT / "scripts" / "fusion" / "prepare_p64_l09uw_gate.ps1"
         ).read_text(encoding="utf-8")
-        self.assertEqual(manifest["version"], "0.1.76")
+        self.assertEqual(manifest["version"], "0.1.77")
         for marker in (
-            'expectedVersion -ne "0.1.76"',
+            'expectedVersion -ne "0.1.77"',
             "p64_l09uw_preflight.py",
             "p64_l09t_local_replay.py",
             "fresh_unsaved_project",

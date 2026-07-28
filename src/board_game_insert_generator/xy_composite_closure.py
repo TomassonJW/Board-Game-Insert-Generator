@@ -581,6 +581,16 @@ def _close_hybrid_residual(
                     technical_corridors,
                     float(xy_clearance_mm),
                 )
+                or _is_xy_clearance_cross_junction(
+                    value,
+                    raw_by_owner,
+                    float(xy_clearance_mm),
+                )
+                or _is_union_z_clearance_corridor(
+                    value,
+                    raw_by_owner,
+                    float(between_bodies_z_mm),
+                )
             ]
             if emergent_corridors:
                 emergent_volume = sum(
@@ -705,25 +715,18 @@ def _close_hybrid_residual(
             selected.annex,
             *selected.external_corridors,
         )
-        covered_indexes, partial_coverage = _covered_residual_indexes(
-            pending,
-            consumed_shapes,
-        )
-        if partial_coverage or selected.residual_index not in covered_indexes:
+        (
+            remaining_residuals,
+            consumed_residuals,
+            fully_consumed_indexes,
+            split_residual_count,
+        ) = _consume_pending_residuals(pending, consumed_shapes)
+        if selected.residual_index not in fully_consumed_indexes:
             return _failure(
                 "xy_composite_partial_residual_consumption",
                 gross_attempt,
             )
-        covered_residuals = [
-            value
-            for index, value in enumerate(pending)
-            if index in covered_indexes
-        ]
-        pending = [
-            value
-            for index, value in enumerate(pending)
-            if index not in covered_indexes
-        ]
+        pending = list(remaining_residuals)
         owner_prisms = raw_by_owner[selected.owner_id]
         owner_prisms.append(selected.annex)
         raw_by_owner[selected.owner_id] = list(
@@ -731,11 +734,11 @@ def _close_hybrid_residual(
         )
         assigned_volume = sum(
             _raw_intersection_volume(value, selected.annex)
-            for value in covered_residuals
+            for value in consumed_residuals
         )
         corridor_volume = sum(
             _raw_intersection_volume(value, corridor)
-            for value in covered_residuals
+            for value in consumed_residuals
             for corridor in selected.external_corridors
         )
         assigned_residual_volume += assigned_volume
@@ -743,7 +746,7 @@ def _close_hybrid_residual(
         technical_corridors.extend(selected.external_corridors)
         printable_residual_cell_count -= sum(
             1
-            for value in covered_residuals
+            for value in consumed_residuals
             if _raw_intersection_volume(value, selected.annex)
             <= _EPSILON
         )
@@ -767,8 +770,9 @@ def _close_hybrid_residual(
                     6,
                 ),
                 "covered_residual_cell_count": len(
-                    covered_residuals
+                    consumed_residuals
                 ),
+                "split_residual_cell_count": split_residual_count,
                 "covered_residual_volume_mm3": round(
                     assigned_volume,
                     6,
@@ -995,6 +999,54 @@ def _covered_residual_indexes(
     return covered, partial_coverage
 
 
+def _consume_pending_residuals(
+    pending: Sequence[_RawPrism],
+    added_prisms: Sequence[_RawPrism],
+) -> tuple[
+    tuple[_RawPrism, ...],
+    tuple[_RawPrism, ...],
+    set[int],
+    int,
+]:
+    """Consume added material while keeping exact leftover residual pieces."""
+
+    remaining: list[_RawPrism] = []
+    consumed: list[_RawPrism] = []
+    fully_consumed: set[int] = set()
+    split_count = 0
+    for index, residual in enumerate(pending):
+        pieces = (residual,)
+        for added in added_prisms:
+            next_pieces: list[_RawPrism] = []
+            for piece in pieces:
+                intersection = _raw_intersection_prism(piece, added)
+                if intersection is None:
+                    next_pieces.append(piece)
+                    continue
+                next_pieces.extend(
+                    _subtract_raw_prism(piece, intersection)
+                )
+            pieces = tuple(next_pieces)
+        remaining_volume = sum(value.volume() for value in pieces)
+        tolerance = max(_EPSILON, residual.volume() * 1e-9)
+        consumed_volume = residual.volume() - remaining_volume
+        if consumed_volume <= tolerance:
+            remaining.append(residual)
+            continue
+        consumed.append(residual)
+        if remaining_volume <= tolerance:
+            fully_consumed.add(index)
+            continue
+        split_count += 1
+        remaining.extend(pieces)
+    return (
+        _merge_prisms(remaining),
+        tuple(consumed),
+        fully_consumed,
+        split_count,
+    )
+
+
 def _vertical_extension_options(
     residual_index: int,
     residual: _RawPrism,
@@ -1131,6 +1183,174 @@ def _is_clearance_corridor_junction(
     return any(
         _raw_vertical_face_axis(residual, corridor)
         for corridor in corridors
+    )
+
+
+def _is_xy_clearance_cross_junction(
+    residual: _RawPrism,
+    raw_by_owner: Mapping[str, Sequence[_RawPrism]],
+    xy_clearance_mm: float,
+) -> bool:
+    """Keep the square where two certified XY clearance lanes cross.
+
+    At a four-way junction no single neighbouring owner spans the whole
+    opposite face, so the ordinary corridor test cannot identify either
+    lane.  The cell is technical when both XY dimensions equal the configured
+    clearance and the XY projections of material touch all four sides.  The
+    projection is intentional: an external XY lane stays void above a lower
+    neighbouring body as well.
+    """
+
+    if (
+        xy_clearance_mm <= _EPSILON
+        or abs(residual.size[0] - xy_clearance_mm) > _EPSILON
+        or abs(residual.size[1] - xy_clearance_mm) > _EPSILON
+    ):
+        return False
+    lower = residual.origin
+    upper = tuple(
+        residual.origin[axis] + residual.size[axis]
+        for axis in range(3)
+    )
+    touching: dict[str, set[str]] = {
+        "left": set(),
+        "right": set(),
+        "bottom": set(),
+        "top": set(),
+    }
+    for owner_id, values in raw_by_owner.items():
+        for value in values:
+            value_upper = tuple(
+                value.origin[axis] + value.size[axis]
+                for axis in range(3)
+            )
+            y_touches = bool(
+                value.origin[1] <= upper[1] + _EPSILON
+                and value_upper[1] >= lower[1] - _EPSILON
+            )
+            x_touches = bool(
+                value.origin[0] <= upper[0] + _EPSILON
+                and value_upper[0] >= lower[0] - _EPSILON
+            )
+            if (
+                y_touches
+                and abs(value_upper[0] - lower[0]) <= _EPSILON
+            ):
+                touching["left"].add(owner_id)
+            if (
+                y_touches
+                and abs(value.origin[0] - upper[0]) <= _EPSILON
+            ):
+                touching["right"].add(owner_id)
+            if (
+                x_touches
+                and abs(value_upper[1] - lower[1]) <= _EPSILON
+            ):
+                touching["bottom"].add(owner_id)
+            if (
+                x_touches
+                and abs(value.origin[1] - upper[1]) <= _EPSILON
+            ):
+                touching["top"].add(owner_id)
+    return bool(
+        all(touching.values())
+        and len(set().union(*touching.values())) >= 2
+    )
+
+
+def _is_union_z_clearance_corridor(
+    residual: _RawPrism,
+    raw_by_owner: Mapping[str, Sequence[_RawPrism]],
+    z_clearance_mm: float,
+) -> bool:
+    """Certify a Z gap whose two faces are mosaics of several owners."""
+
+    if (
+        z_clearance_mm <= _EPSILON
+        or abs(residual.size[2] - z_clearance_mm) > _EPSILON
+    ):
+        return False
+    lower_z = residual.origin[2]
+    upper_z = lower_z + residual.size[2]
+    below: list[tuple[str, _RawPrism]] = []
+    above: list[tuple[str, _RawPrism]] = []
+    for owner_id, values in raw_by_owner.items():
+        for value in values:
+            value_upper_z = value.origin[2] + value.size[2]
+            if abs(value_upper_z - lower_z) <= _EPSILON:
+                below.append((owner_id, value))
+            if abs(value.origin[2] - upper_z) <= _EPSILON:
+                above.append((owner_id, value))
+    if not below or not above:
+        return False
+    x0, y0 = residual.origin[:2]
+    x1 = x0 + residual.size[0]
+    y1 = y0 + residual.size[1]
+    xs = {x0, x1}
+    ys = {y0, y1}
+    for _, value in (*below, *above):
+        vx0, vy0 = value.origin[:2]
+        vx1 = vx0 + value.size[0]
+        vy1 = vy0 + value.size[1]
+        if vx0 < x1 - _EPSILON and x0 < vx1 - _EPSILON:
+            xs.update({max(x0, vx0), min(x1, vx1)})
+        if vy0 < y1 - _EPSILON and y0 < vy1 - _EPSILON:
+            ys.update({max(y0, vy0), min(y1, vy1)})
+    ordered_x = sorted(xs)
+    ordered_y = sorted(ys)
+    for x_index in range(len(ordered_x) - 1):
+        for y_index in range(len(ordered_y) - 1):
+            cell_x0, cell_x1 = (
+                ordered_x[x_index],
+                ordered_x[x_index + 1],
+            )
+            cell_y0, cell_y1 = (
+                ordered_y[y_index],
+                ordered_y[y_index + 1],
+            )
+            if (
+                cell_x1 - cell_x0 <= _EPSILON
+                or cell_y1 - cell_y0 <= _EPSILON
+            ):
+                continue
+            center = (
+                (cell_x0 + cell_x1) / 2.0,
+                (cell_y0 + cell_y1) / 2.0,
+            )
+            lower_owners = {
+                owner_id
+                for owner_id, value in below
+                if _point_in_raw_xy(center, value)
+            }
+            upper_owners = {
+                owner_id
+                for owner_id, value in above
+                if _point_in_raw_xy(center, value)
+            }
+            if (
+                not lower_owners
+                or not upper_owners
+                or not any(
+                    lower_owner != upper_owner
+                    for lower_owner in lower_owners
+                    for upper_owner in upper_owners
+                )
+            ):
+                return False
+    return True
+
+
+def _point_in_raw_xy(
+    point: Sequence[float],
+    prism: _RawPrism,
+) -> bool:
+    return bool(
+        prism.origin[0] - _EPSILON
+        <= point[0]
+        <= prism.origin[0] + prism.size[0] + _EPSILON
+        and prism.origin[1] - _EPSILON
+        <= point[1]
+        <= prism.origin[1] + prism.size[1] + _EPSILON
     )
 
 
@@ -1601,6 +1821,16 @@ def _technical_corridors_certified(
                     corridor,
                     accepted,
                     xy_clearance_mm,
+                )
+                or _is_xy_clearance_cross_junction(
+                    corridor,
+                    raw_by_owner,
+                    xy_clearance_mm,
+                )
+                or _is_union_z_clearance_corridor(
+                    corridor,
+                    raw_by_owner,
+                    z_clearance_mm,
                 )
             ),
             None,

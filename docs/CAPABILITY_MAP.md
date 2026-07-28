@@ -1,24 +1,31 @@
 # Capability Map
 
 <!-- P64-L09U-CAPABILITY -->
-## P64-L09U-R5 — accès local des cavités partiellement recouvertes
+## P64-L09U-R6 — empilement local exact
 
-- `C-CAVITY` : `automated-validated`. Calibre, X/Y,
-  orientation et profondeur figés ; accès supérieur résolu par région XY.
-- `C-RESERVATION` : acquis R4 préservé sous plateau ; R5 ouvre la portion hors
-  plateau sans étendre l'encastrement.
-- `C-FINALIZATION`, `C-CAD-IR`, `C-PREVIEW` : coupes d'accès vertical locales
-  implémentées et transportées de bout en bout.
-- `C-FUSION` : plan de coupes verticales implémenté ; nouvelle observation
-  réelle obligatoire.
-- `C-STAGED-CALCULATION` et chemin BRep transitoire : acquis R3 préservés.
-- `C-QUALITY` : préparateur `133/133`, suite autorisée `902/902`, un test SCIP
+- `C-CAVITY` : `automated-validated`. Tout chevauchement XY réel supérieur à
+  l'epsilon ancre la cavité ; calibre, X/Y, orientation et identité restent
+  figés.
+- `C-RESERVATION` : `automated-validated`. Cellules XY atomiques, intervalles Z
+  par élément et cumul limité aux intersections réelles.
+- `C-FINALIZATION` : `automated-validated`. Garde Z locale exacte, croix de
+  jeux XY, mosaïques de jeu Z et résiduels partiels certifiés.
+- `C-CAD-IR`, `C-PREVIEW`, `C-FUSION` : toutes les coupes actives conservent
+  élément, région et intervalle Z ; observation Fusion réelle obligatoire.
+- `C-STAGED-CALCULATION` et chemin BRep transitoire : acquis R5 préservés.
+- `C-QUALITY` : préparateur `136/136`, suite autorisée `909/909`, un test SCIP
   ignoré et trois replays personnels exacts en lecture seule.
-- `C-RELEASE` : 0.1.75 `human-KO`, `do-not-run`; 0.1.76 installée et
-  `ready-human-gate`.
+- `C-RELEASE` : 0.1.76 `human-KO`, `do-not-run`; 0.1.77
+  `automated-validated`, installation locale en attente.
 - `C-PRINT` : `print-validated=false`.
 
 `fusion-validated=false`, `print-validated=false`.
+
+### Historique R5 clôturé en human-KO
+
+- `C-RELEASE` : 0.1.76 `human-KO`, `do-not-run`.
+- `C-CAVITY` : accès généralement conforme, mais micro-chevauchement tronqué.
+- `C-RESERVATION` : plusieurs empreintes locales incomplètement matérialisées.
 
 ### Historique R4 clôturé en human-KO
 

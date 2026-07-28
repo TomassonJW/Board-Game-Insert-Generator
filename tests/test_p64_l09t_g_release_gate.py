@@ -21,8 +21,10 @@ from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     generation_plan_from_cad_ir,
 )
 from scripts.fusion.p64_l09t_g_fixture_cases import (
+    CASE_02_LOCAL_STACK_BOOKLET_HEIGHTS_MM,
     CASE_02_VARIANTS,
     anonymized_case_01_plus_project,
+    anonymized_case_02_local_stack_variant,
     anonymized_case_02_variant,
 )
 from scripts.fusion.p64_l09tv_preflight import (
@@ -129,6 +131,19 @@ class P64L09TGReleaseGateTests(unittest.TestCase):
             )
             for kind in CASE_02_VARIANTS
         }
+        cls.case_02_local_stacks = {
+            booklet_height_mm: _run_end_to_end(
+                anonymized_case_02_local_stack_variant(
+                    booklet_height_mm
+                ),
+                request_id=(
+                    "p64-l09u-r6-local-stack-"
+                    f"{int(booklet_height_mm)}"
+                ),
+            )
+            for booklet_height_mm
+            in CASE_02_LOCAL_STACK_BOOKLET_HEIGHTS_MM
+        }
         cls.gate_project, cls.preflight = build_preflight()
 
     def test_anonymized_case_01_plus_is_fully_materializable(self) -> None:
@@ -194,6 +209,52 @@ class P64L09TGReleaseGateTests(unittest.TestCase):
         self.assertNotIn("caslimite02", serialized)
         self.assertNotIn(r"c:\users", serialized)
 
+    def test_case_02_booklet_60x80_60x82_60x85_reaches_fusion(
+        self,
+    ) -> None:
+        self.assertEqual(
+            set(self.case_02_local_stacks),
+            {80.0, 82.0, 85.0},
+        )
+        for height_mm, result in self.case_02_local_stacks.items():
+            with self.subTest(height_mm=height_mm):
+                self._assert_exact_result(result)
+                top_insets = [
+                    value
+                    for value in result["fusion"].cavity_cuts
+                    if value.policy == "localized_top_inset_v1"
+                ]
+                self.assertEqual(
+                    {
+                        value.flat_item_id
+                        for value in top_insets
+                    },
+                    {"flat-001", "flat-002"},
+                )
+                interval_depths = {
+                    round(
+                        value.local_interval_top_z_mm
+                        - value.local_interval_bottom_z_mm,
+                        6,
+                    )
+                    for value in top_insets
+                    if value.local_interval_bottom_z_mm is not None
+                    and value.local_interval_top_z_mm is not None
+                }
+                self.assertEqual(interval_depths, {2.0, 4.0})
+                calibrated_ten_mm = [
+                    value
+                    for value in result["fusion"].cavity_cuts
+                    if value.calibrated_depth_source_mm == 10.4
+                ]
+                self.assertTrue(calibrated_ten_mm)
+                self.assertTrue(
+                    all(
+                        value.calibrated_depth_final_mm == 10.4
+                        for value in calibrated_ten_mm
+                    )
+                )
+
     def test_release_sources_keep_core_independent_from_adsk(self) -> None:
         core = ROOT / "src" / "board_game_insert_generator"
         offenders = [
@@ -216,7 +277,7 @@ class P64L09TGReleaseGateTests(unittest.TestCase):
         local_replay = (
             ROOT / "scripts" / "fusion" / "p64_l09t_local_replay.py"
         ).read_text(encoding="utf-8")
-        self.assertEqual(manifest["version"], "0.1.76")
+        self.assertEqual(manifest["version"], "0.1.77")
         for marker in (
             'expectedVersion -ne "0.1.70"',
             "p64_l09t_local_replay.py",

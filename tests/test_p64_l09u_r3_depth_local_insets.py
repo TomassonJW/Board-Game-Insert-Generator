@@ -8,6 +8,7 @@ from board_game_insert_generator.contextual_local_analysis import (
 )
 from board_game_insert_generator.coupled_finalization import (
     _build_frozen_cavity_access_cuts,
+    _conservative_closure_guard_zones,
     _resolve_final_cavity_contracts,
 )
 from board_game_insert_generator.partition_cad import build_partition_cad
@@ -386,6 +387,118 @@ class P64L09UR3DepthLocalInsetsTests(unittest.TestCase):
                 len(value.overlapping_reservation_ids) == 2
                 for value in fusion_top_cuts
             )
+        )
+        overlap_cuts = [
+            value
+            for value in fusion_top_cuts
+            if len(value.overlapping_reservation_ids) == 2
+        ]
+        self.assertEqual(
+            {
+                (
+                    value.flat_item_id,
+                    value.local_interval_bottom_z_mm,
+                    value.local_interval_top_z_mm,
+                )
+                for value in overlap_cuts
+            },
+            {
+                ("lower-board", 54.6, 56.6),
+                ("upper-booklet", 56.6, 59.6),
+            },
+        )
+
+    def test_closure_guard_uses_exact_local_regions_not_global_stack(
+        self,
+    ) -> None:
+        reservations = self.stepped_plan["top_inset_reservations"]
+        zones = _conservative_closure_guard_zones(
+            reservations,
+            float(reservations["design_top_z_mm"]),
+        )
+
+        depths_by_rect = {
+            (
+                zone.origin_xy_mm,
+                zone.size_xy_mm,
+            ): zone.inset_depth_mm
+            for zone in zones
+        }
+        self.assertIn(2.0, depths_by_rect.values())
+        self.assertIn(5.0, depths_by_rect.values())
+        self.assertEqual(
+            max(depths_by_rect.values()),
+            5.0,
+        )
+
+    def test_micro_overlap_smaller_than_a_wall_anchors_the_full_cavity(
+        self,
+    ) -> None:
+        project = _calibrated_project(with_reservation=True)
+        group_id = project["container_groups"][0]["id"]
+        placement = {
+            "id": "micro-owner",
+            "container_group_id": group_id,
+            "origin_mm": {"x": 0.0, "y": 0.0, "z": 0.0},
+            "world_size_mm": {"x": 20.0, "y": 20.0, "z": 20.0},
+        }
+        source_cavity = {
+            "owner_id": "micro-owner",
+            "cavity_index": 0,
+            "cavity_key": "micro-cavity",
+            "world_origin_mm": {"x": 2.0, "y": 2.0, "z": 8.0},
+            "world_size_mm": {"x": 8.0, "y": 8.0, "z": 10.0},
+            "source_owner_origin_mm": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+            },
+            "source_owner_world_size_mm": {
+                "x": 20.0,
+                "y": 20.0,
+                "z": 20.0,
+            },
+            "source_rotation_deg_z": 0,
+        }
+        top_inset_cuts = [
+            {
+                "kind": "top_inset",
+                "reservation_id": "micro-board",
+                "local_region_id": "micro-region",
+                "world_origin_mm": {
+                    "x": 9.5,
+                    "y": 2.0,
+                    "z": 14.0,
+                },
+                "size_mm": {
+                    "x": 4.0,
+                    "y": 8.0,
+                    "z": 4.0,
+                },
+            }
+        ]
+
+        certificate = _resolve_final_cavity_contracts(
+            placement,
+            [source_cavity],
+            top_inset_cuts,
+            project=project,
+            cad_prisms=None,
+        )
+        cavity = certificate["cavities"][0]
+
+        self.assertTrue(certificate["certified"])
+        self.assertEqual(cavity["anchor_kind"], "below_top_inset")
+        self.assertEqual(cavity["calibrated_depth_final_mm"], 10.0)
+        self.assertEqual(cavity["world_origin_mm"]["z"], 4.0)
+        self.assertEqual(
+            cavity["world_origin_mm"]["z"]
+            + cavity["world_size_mm"]["z"],
+            14.0,
+        )
+        self.assertEqual(
+            cavity["responsible_local_region_id"],
+            "micro-region",
         )
 
     def test_every_tray_anchored_cavity_has_a_direct_void_path(self) -> None:

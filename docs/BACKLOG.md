@@ -1,31 +1,32 @@
 # Backlog
 
 <!-- P64-L09U-BACKLOG -->
-## Correctif P64-L09U-R5
+## Correctif P64-L09U-R6
 
-### P64-L09U-R4-V — Gate humaine Fusion 0.1.75
+### P64-L09U-R5-V — Gate humaine Fusion 0.1.76
 
 - Statut : `done-human-KO`, `do-not-run`.
-- Acquis : cavités au bon endroit et jonction directe sous plateau.
-- Bloquant : portion hors plateau presque fermée pour une cavité partiellement
-  recouverte.
-- Preuve : `docs/P64_L09U_R4_V_0175_HUMAN_KO_EVIDENCE.md`.
+- Acquis : accès sous et hors plateau généralement conformes.
+- Bloquants : micro-chevauchement de cavité tronqué et plusieurs encastrements
+  locaux incorrects.
+- Preuve : `docs/P64_L09U_R5_V_0176_HUMAN_KO_EVIDENCE.md`.
 
-### P64-L09U-R5 — Accès local hors plateau
+### P64-L09U-R6 — Empilement local exact
 
-- Statut : `done`, `automated-validated`, `installed-local`.
-- Conserver l'ancrage calibré de la cavité.
-- Ouvrir chaque région jusqu'à sa découpe locale ou sa face fonctionnelle.
-- Limiter les coupes à l'empreinte de la cavité et préserver ses parois.
-- Cible : `0.1.76`.
-- Runbook : `docs/P64_L09U_R5_END_TO_END_RUNBOOK.md`.
+- Statut : `done`, `automated-validated`, `installation-pending`.
+- Décomposer les empreintes en cellules XY atomiques.
+- Cumuler uniquement les éléments réellement présents dans chaque cellule.
+- Conserver chaque intervalle Z jusqu'au plan Fusion.
+- Reconnaître tout chevauchement réel de cavité supérieur à l'epsilon.
+- Cible : `0.1.77`.
+- Runbook : `docs/P64_L09U_R6_END_TO_END_RUNBOOK.md`.
 
-### P64-L09U-R5-V — Gate humaine Fusion
+### P64-L09U-R6-V — Gate humaine Fusion
 
-- Statut : `ready-human-gate`.
-- Candidate : `0.1.76`.
-- Recette : `docs/P64_L09U_R5_V_0176_FUSION_GATE_RECIPE.md`.
-- Preuve : `docs/P64_L09U_R5_0176_CORRECTIVE_EVIDENCE.md`.
+- Statut : `blocked-by-local-installation`.
+- Candidate : `0.1.77`.
+- Recette : `docs/P64_L09U_R6_V_0177_FUSION_GATE_RECIPE.md`.
+- Preuve : `docs/P64_L09U_R6_0177_CORRECTIVE_EVIDENCE.md`.
 - `fusion-validated=false`, `print-validated=false`.
 
 ### Historique R4

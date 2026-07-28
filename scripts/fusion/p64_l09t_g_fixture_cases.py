@@ -16,6 +16,7 @@ CASE_02_VARIANTS = (
     "clearance_only",
     "combined",
 )
+CASE_02_LOCAL_STACK_BOOKLET_HEIGHTS_MM = (80.0, 82.0, 85.0)
 
 
 def anonymized_case_01_plus_project() -> dict[str, object]:
@@ -193,6 +194,31 @@ def anonymized_case_02_variant(kind: str) -> dict[str, object]:
             rotation_deg_z=90,
         ),
     ]
+    return normalize_project_draft(project).project
+
+
+def anonymized_case_02_local_stack_variant(
+    booklet_height_mm: float,
+) -> dict[str, object]:
+    """Reproduit publiquement la discontinuité locale 60 × 80/82/85."""
+
+    if booklet_height_mm not in CASE_02_LOCAL_STACK_BOOKLET_HEIGHTS_MM:
+        raise ValueError(
+            "Unsupported P64-L09U-R6 booklet height: "
+            f"{booklet_height_mm!r}."
+        )
+    project = deepcopy(anonymized_case_02_variant("combined"))
+    project["project_name"] = (
+        "P64-L09U-R6 empilement local public "
+        f"60x{int(booklet_height_mm)}"
+    )
+    booklet = project["flat_items"][1]
+    booklet["dimensions_mm"] = {
+        "x": 60.0,
+        "y": booklet_height_mm,
+        "z": 2.0,
+    }
+    booklet["rotation_deg_z"] = 0
     return normalize_project_draft(project).project
 
 
