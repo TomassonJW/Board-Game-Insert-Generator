@@ -7,7 +7,7 @@ Corriger les deux défauts humains de 0.1.76 sans perdre les acquis R5 :
 1. profondeur réelle d’une cavité sous un micro-chevauchement ;
 2. empilement local de plusieurs plateaux ou livrets de tailles différentes.
 
-Candidate cible : version suivant 0.1.76.
+Candidate livrée : 0.1.77.
 
 ## Autorités
 

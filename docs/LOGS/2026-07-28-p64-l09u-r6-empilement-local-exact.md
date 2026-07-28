@@ -26,5 +26,6 @@ zones disjointes ne cumulent rien ; les intersections cumulent uniquement les
 
 ## Statut
 
-`P64-L09U-R6-automated-validated`, `installation-pending`,
+`P64-L09U-R6-automated-validated`, `installed-local`,
+`P64-L09U-R6-V-ready-human-gate`, package 0.1.77 du commit `e81737d`,
 `fusion-validated=false`, `print-validated=false`.

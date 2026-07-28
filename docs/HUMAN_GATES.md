@@ -3,13 +3,14 @@
 <!-- P64-L09U-GATE -->
 ## P64-L09U-R6-V — gate empilement local exact
 
-Statut : `installation-pending`, candidate 0.1.77 automatisée-validée.
+Statut : `ready-human-gate`, candidate 0.1.77 installée et vérifiée depuis
+`e81737d`.
 
 0.1.76 est close en `human-KO`, `do-not-run`. Les portions hors plateau restent
 désormais ouvertes, mais une micro-partie de cavité perd `6 mm` et deux
 empreintes différentes ne gardent pas leurs intervalles locaux distincts.
 
-Après installation confirmée par Codex, Thomas vérifie :
+Thomas vérifie :
 
 1. profondeur utile `10 mm` sous et hors plateau dans `c4` ;
 2. aucune régression d'accès pour les cavités partiellement recouvertes ;

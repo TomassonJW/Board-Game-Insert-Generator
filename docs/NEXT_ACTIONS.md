@@ -1,15 +1,14 @@
 # Next Actions
 
 <!-- P64-L09U-NEXT -->
-## Action courante : intégrer et installer P64-L09U-R6
+## Action courante : exécuter la gate P64-L09U-R6-V
 
 0.1.76 est `human-KO`, `do-not-run`. Les accès R5 restent acquis, mais une
 micro-partie de cavité perd `6 mm` et deux éléments plats de tailles différentes
 ne gardent pas leurs deux encastrements locaux.
 
-La candidate 0.1.77 est automatisée-validée. La seule action Codex restante est
-son intégration puis son installation locale vérifiée. Thomas n'agit qu'après
-confirmation de cette installation, selon la recette R6-V.
+La candidate 0.1.77 est automatisée-validée, intégrée et installée depuis le
+commit `e81737d`. Thomas suit maintenant uniquement la recette R6-V.
 
 Contrat :
 `docs/P64_L09U_R6_END_TO_END_RUNBOOK.md`.

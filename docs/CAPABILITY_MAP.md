@@ -15,8 +15,8 @@
 - `C-STAGED-CALCULATION` et chemin BRep transitoire : acquis R5 préservés.
 - `C-QUALITY` : préparateur `136/136`, suite autorisée `909/909`, un test SCIP
   ignoré et trois replays personnels exacts en lecture seule.
-- `C-RELEASE` : 0.1.76 `human-KO`, `do-not-run`; 0.1.77
-  `automated-validated`, installation locale en attente.
+- `C-RELEASE` : 0.1.76 `human-KO`, `do-not-run`; 0.1.77 intégrée, installée
+  depuis `e81737d` et `ready-human-gate`.
 - `C-PRINT` : `print-validated=false`.
 
 `fusion-validated=false`, `print-validated=false`.

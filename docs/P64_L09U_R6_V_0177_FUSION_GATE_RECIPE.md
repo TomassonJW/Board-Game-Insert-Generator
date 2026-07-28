@@ -1,14 +1,13 @@
 # P64-L09U-R6-V — recette Fusion 0.1.77
 
-Statut avant installation : `installation-pending`.
+Statut : `ready-human-gate`, 0.1.77 installée et vérifiée depuis `e81737d`.
 
 Avant verdict : `fusion-validated=false`, `print-validated=false`.
 
 ## Précondition
 
-Codex installe et vérifie 0.1.77 avec son marqueur de commit. Lorsque Codex
-confirme cette installation, ferme complètement Fusion, rouvre-le puis recharge
-l'add-in BGIG.
+Codex a installé et vérifié 0.1.77 avec le marqueur `e81737d`. Ferme
+complètement Fusion, rouvre-le puis recharge l'add-in BGIG.
 
 Ne modifie et ne sauvegarde aucun projet personnel pendant cette gate.
 

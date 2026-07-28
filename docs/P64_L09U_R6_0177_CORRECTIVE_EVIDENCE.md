@@ -2,7 +2,7 @@
 
 Date : 2026-07-28.
 
-Statut : `automated-validated`, `installation-pending`.
+Statut : `automated-validated`, `installed-local`, `ready-human-gate`.
 
 `fusion-validated=false`, `print-validated=false`.
 
@@ -132,8 +132,18 @@ de55e8e85652ecb6d01e44b7494b7adc7f92ee2472c8e3c6874836f93823f6b6
 Le préparateur à blanc passe, sans écrire dans AppData ni dans les projets
 personnels.
 
+## Installation
+
+Le commit `e81737d` est intégré dans `origin/main`. Son package 0.1.77 est
+installé et vérifié localement :
+
+- manifeste : `0.1.77` ;
+- marqueur installé : `e81737d` ;
+- runtime embarqué, réglages et marqueurs CAD : conformes ;
+- fixture publique et reçus : installés ;
+- projet personnel `CasLimite02+` : SHA-256 inchangé après installation.
+
 ## Limite restante
 
-La géométrie réelle dans Fusion n'a pas encore été observée. L'installation
-locale et la nouvelle gate humaine restent obligatoires avant toute promotion
-de statut.
+La géométrie réelle dans Fusion n'a pas encore été observée. La nouvelle gate
+humaine reste obligatoire avant toute promotion de statut.

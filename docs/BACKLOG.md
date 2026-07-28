@@ -13,7 +13,7 @@
 
 ### P64-L09U-R6 — Empilement local exact
 
-- Statut : `done`, `automated-validated`, `installation-pending`.
+- Statut : `done`, `automated-validated`, `installed-local`.
 - Décomposer les empreintes en cellules XY atomiques.
 - Cumuler uniquement les éléments réellement présents dans chaque cellule.
 - Conserver chaque intervalle Z jusqu'au plan Fusion.
@@ -23,7 +23,7 @@
 
 ### P64-L09U-R6-V — Gate humaine Fusion
 
-- Statut : `blocked-by-local-installation`.
+- Statut : `ready-human-gate`.
 - Candidate : `0.1.77`.
 - Recette : `docs/P64_L09U_R6_V_0177_FUSION_GATE_RECIPE.md`.
 - Preuve : `docs/P64_L09U_R6_0177_CORRECTIVE_EVIDENCE.md`.

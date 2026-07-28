@@ -20,10 +20,10 @@
   intersection réelle supérieure à l'epsilon.
 - Validation : préparateur `136/136`, suite autorisée `909/909`, un test SCIP
   ignoré et trois replays personnels exacts en lecture seule.
-- Candidate `0.1.77`, digest
+- Candidate `0.1.77` intégrée et installée depuis `e81737d`, digest
   `de55e8e85652ecb6d01e44b7494b7adc7f92ee2472c8e3c6874836f93823f6b6`.
-- Prochaine action unique Codex : intégration et installation locale, puis
-  Thomas suit `docs/P64_L09U_R6_V_0177_FUSION_GATE_RECIPE.md`.
+- Prochaine action unique : Thomas suit
+  `docs/P64_L09U_R6_V_0177_FUSION_GATE_RECIPE.md`.
 - Aucun benchmark/holdout/corpus/tournoi, aucune valeur physique nouvelle ;
   `fusion-validated=false`, `print-validated=false`.
 

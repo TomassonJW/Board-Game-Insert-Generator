@@ -6,7 +6,8 @@
 Date : 2026-07-28.
 
 Statut : `P64-L09U-R5-V-human-KO`, `do-not-run`,
-`P64-L09U-R6-automated-validated`, `installation-pending`,
+`P64-L09U-R6-automated-validated`, `installed-local`,
+`P64-L09U-R6-V-ready-human-gate`,
 `fusion-validated=false`, `print-validated=false`.
 
 - 0.1.76 est `human-KO`, `do-not-run`.
@@ -26,7 +27,7 @@ Statut : `P64-L09U-R5-V-human-KO`, `do-not-run`,
   leur calibre, X/Y, orientation et identité restent figés.
 - Validation : préparateur `136/136`, suite autorisée `909/909`, un test SCIP
   ignoré, trois replays personnels exacts en lecture seule.
-- Candidate : `0.1.77`, preflight
+- Candidate : `0.1.77`, intégrée et installée depuis `e81737d`, preflight
   `de55e8e85652ecb6d01e44b7494b7adc7f92ee2472c8e3c6874836f93823f6b6`.
 - Aucun benchmark/holdout/corpus/tournoi ; aucune valeur physique modifiée.
 
