@@ -7,6 +7,7 @@ from board_game_insert_generator.contextual_local_analysis import (
     IncrementalLocalAnalysisEngine,
 )
 from board_game_insert_generator.coupled_finalization import (
+    _build_frozen_cavity_access_cuts,
     _resolve_final_cavity_contracts,
 )
 from board_game_insert_generator.partition_cad import build_partition_cad
@@ -128,6 +129,17 @@ class P64L09UR3DepthLocalInsetsTests(unittest.TestCase):
         cls.inset_plan, cls.inset_cad, cls.inset_fusion = (
             _finalized_artifacts(cls.inset_project)
         )
+        cls.partial_inset_project = _calibrated_project(
+            with_reservation=True
+        )
+        cls.partial_inset_project["flat_items"][0]["dimensions_mm"][
+            "x"
+        ] = 15.0
+        (
+            cls.partial_inset_plan,
+            cls.partial_inset_cad,
+            cls.partial_inset_fusion,
+        ) = _finalized_artifacts(cls.partial_inset_project)
         cls.stepped_project = _stepped_reservation_project()
         cls.stepped_plan, cls.stepped_cad, cls.stepped_fusion = (
             _finalized_artifacts(cls.stepped_project)
@@ -523,6 +535,178 @@ class P64L09UR3DepthLocalInsetsTests(unittest.TestCase):
         self.assertEqual(cavity["functional_top_z_mm"], 10.0)
         self.assertEqual(cavity["world_origin_mm"]["z"], 5.0)
         self.assertTrue(cavity["functional_top_access_certified"])
+
+    def test_partial_tray_overlap_opens_only_the_uncovered_cavity_area(
+        self,
+    ) -> None:
+        cad_prisms = [
+            {
+                "prism_id": "owner:under-tray",
+                "cad_origin_mm": {"x": 0.0, "y": 0.0, "z": 0.0},
+                "cad_size_mm": {"x": 5.0, "y": 10.0, "z": 20.0},
+            },
+            {
+                "prism_id": "owner:outside-tray",
+                "cad_origin_mm": {"x": 5.0, "y": 0.0, "z": 0.0},
+                "cad_size_mm": {"x": 5.0, "y": 10.0, "z": 20.0},
+            },
+        ]
+        top_inset_cuts = [
+            {
+                "kind": "top_inset",
+                "target_prism_id": "owner:under-tray",
+                "world_origin_mm": {"x": 0.0, "y": 0.0, "z": 10.0},
+            }
+        ]
+        frozen_cavities = [
+            {
+                "cavity_key": "partial-cavity",
+                "world_origin_mm": {"x": 2.0, "y": 2.0, "z": 5.0},
+                "world_size_mm": {"x": 6.0, "y": 6.0, "z": 5.0},
+            }
+        ]
+
+        result = _build_frozen_cavity_access_cuts(
+            "owner",
+            cad_prisms,
+            top_inset_cuts,
+            frozen_cavities,
+            (0.0, 0.0, 0.0),
+        )
+
+        self.assertTrue(result["certified"])
+        self.assertEqual(result["required_count"], 1)
+        self.assertEqual(len(result["cuts"]), 1)
+        access = result["cuts"][0]
+        self.assertEqual(
+            access["target_prism_id"],
+            "owner:outside-tray",
+        )
+        self.assertEqual(
+            access["world_origin_mm"],
+            {"x": 5.0, "y": 2.0, "z": 10.0},
+        )
+        self.assertEqual(
+            access["size_mm"],
+            {"x": 3.0, "y": 6.0, "z": 10.0},
+        )
+        self.assertEqual(access["cavity_overlap_area_mm2"], 18.0)
+
+    def test_partial_tray_overlap_reaches_cad_ir_and_fusion(self) -> None:
+        placement = self.partial_inset_plan["placements"][0]
+        cavity = placement["frozen_cavities_v1"][0]
+        access_cuts = placement["composite_body"][
+            "frozen_cavity_access_cuts"
+        ]
+        certificate = self.partial_inset_plan["finalization"][
+            "composite_materialization_certificate"
+        ]
+        fusion_access_cuts = [
+            value
+            for value in self.partial_inset_fusion.cavity_cuts
+            if value.cavity_source
+            == "frozen_cavity_vertical_access"
+        ]
+
+        self.assertEqual(cavity["anchor_kind"], "below_top_inset")
+        self.assertTrue(access_cuts)
+        self.assertTrue(certificate["cavity_vertical_access_open"])
+        self.assertEqual(
+            certificate["cavity_vertical_access_required_count"],
+            len(access_cuts),
+        )
+        self.assertEqual(len(fusion_access_cuts), len(access_cuts))
+        cavity_rect = (
+            cavity["world_origin_mm"]["x"],
+            cavity["world_origin_mm"]["y"],
+            cavity["world_origin_mm"]["x"]
+            + cavity["world_size_mm"]["x"],
+            cavity["world_origin_mm"]["y"]
+            + cavity["world_size_mm"]["y"],
+        )
+        for access in access_cuts:
+            access_rect = (
+                access["world_origin_mm"]["x"],
+                access["world_origin_mm"]["y"],
+                access["world_origin_mm"]["x"]
+                + access["size_mm"]["x"],
+                access["world_origin_mm"]["y"]
+                + access["size_mm"]["y"],
+            )
+            self.assertGreaterEqual(access_rect[0], cavity_rect[0])
+            self.assertGreaterEqual(access_rect[1], cavity_rect[1])
+            self.assertLessEqual(
+                access_rect[2],
+                cavity_rect[2] + 0.0001,
+            )
+            self.assertLessEqual(
+                access_rect[3],
+                cavity_rect[3] + 0.0001,
+            )
+            self.assertEqual(
+                access["world_origin_mm"]["z"],
+                cavity["world_origin_mm"]["z"]
+                + cavity["world_size_mm"]["z"],
+            )
+
+    def test_local_higher_inset_is_joined_without_cutting_cavity_walls(
+        self,
+    ) -> None:
+        result = _build_frozen_cavity_access_cuts(
+            "owner",
+            [
+                {
+                    "prism_id": "owner:shallow-inset",
+                    "cad_origin_mm": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                    },
+                    "cad_size_mm": {
+                        "x": 10.0,
+                        "y": 10.0,
+                        "z": 20.0,
+                    },
+                }
+            ],
+            [
+                {
+                    "kind": "top_inset",
+                    "target_prism_id": "owner:shallow-inset",
+                    "world_origin_mm": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 12.0,
+                    },
+                }
+            ],
+            [
+                {
+                    "cavity_key": "stepped-cavity",
+                    "world_origin_mm": {
+                        "x": 2.0,
+                        "y": 2.0,
+                        "z": 5.0,
+                    },
+                    "world_size_mm": {
+                        "x": 6.0,
+                        "y": 6.0,
+                        "z": 5.0,
+                    },
+                }
+            ],
+            (0.0, 0.0, 0.0),
+        )
+
+        access = result["cuts"][0]
+        self.assertEqual(
+            access["world_origin_mm"],
+            {"x": 2.0, "y": 2.0, "z": 10.0},
+        )
+        self.assertEqual(
+            access["size_mm"],
+            {"x": 6.0, "y": 6.0, "z": 2.0},
+        )
 
     def test_source_project_is_not_mutated_by_the_artifact_build(self) -> None:
         source = _calibrated_project(with_reservation=True)

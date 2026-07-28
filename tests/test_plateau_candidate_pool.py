@@ -143,12 +143,24 @@ class ExactMinimalFinalizationTests(unittest.TestCase):
             fusion.module_component_count,
             len(finalized["placements"]),
         )
-        self.assertFalse(
-            any(
-                value.cavity_source
-                == "frozen_cavity_vertical_access"
-                for value in fusion.cavity_cuts
-            )
+        access_cuts = [
+            value
+            for value in fusion.cavity_cuts
+            if value.cavity_source
+            == "frozen_cavity_vertical_access"
+        ]
+        materialization = finalized["finalization"][
+            "composite_materialization_certificate"
+        ]
+        self.assertTrue(access_cuts)
+        self.assertTrue(
+            materialization["cavity_vertical_access_open"]
+        )
+        self.assertEqual(
+            len(access_cuts),
+            materialization[
+                "cavity_vertical_access_required_count"
+            ],
         )
         self.assertTrue(
             any(

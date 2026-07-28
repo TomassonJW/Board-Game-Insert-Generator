@@ -14,7 +14,7 @@ from scripts.fusion.p64_l09uw_preflight import (
 ROOT = Path(__file__).resolve().parents[1]
 
 
-class P64L09UR4CorrectiveGateTests(unittest.TestCase):
+class P64L09UR5CorrectiveGateTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.project, cls.preflight = build_preflight()
@@ -22,7 +22,7 @@ class P64L09UR4CorrectiveGateTests(unittest.TestCase):
     def test_preflight_proves_exact_transient_path_without_human_claims(
         self,
     ) -> None:
-        self.assertEqual(ADDIN_VERSION, "0.1.75")
+        self.assertEqual(ADDIN_VERSION, "0.1.76")
         self.assertEqual(self.preflight["addin_version"], ADDIN_VERSION)
         self.assertEqual(
             set(self.preflight["targeted_matrix"]["required_case_ids"]),
@@ -56,6 +56,11 @@ class P64L09UR4CorrectiveGateTests(unittest.TestCase):
             0.0,
         )
         self.assertTrue(contract["top_void_continuity_certified"])
+        self.assertTrue(
+            contract[
+                "partial_top_inset_preserves_uncovered_cavity_access"
+            ]
+        )
         self.assertEqual(
             self.preflight["gate_status"],
             "prepared_not_human_observed",
@@ -76,7 +81,7 @@ class P64L09UR4CorrectiveGateTests(unittest.TestCase):
         self.assertTrue(contract["fusion_ui_yield_between_modules"])
         self.assertTrue(contract["failed_generation_partial_scene_rollback"])
 
-    def test_package_and_preparer_pin_the_0175_candidate(self) -> None:
+    def test_package_and_preparer_pin_the_0176_candidate(self) -> None:
         addin = ROOT / "fusion_addin" / "BoardGameInsertGenerator"
         manifest = json.loads(
             (addin / "BoardGameInsertGenerator.manifest").read_text(
@@ -86,9 +91,9 @@ class P64L09UR4CorrectiveGateTests(unittest.TestCase):
         preparer = (
             ROOT / "scripts" / "fusion" / "prepare_p64_l09uw_gate.ps1"
         ).read_text(encoding="utf-8")
-        self.assertEqual(manifest["version"], "0.1.75")
+        self.assertEqual(manifest["version"], "0.1.76")
         for marker in (
-            'expectedVersion -ne "0.1.75"',
+            'expectedVersion -ne "0.1.76"',
             "p64_l09uw_preflight.py",
             "p64_l09t_local_replay.py",
             "fresh_unsaved_project",
@@ -97,6 +102,8 @@ class P64L09UR4CorrectiveGateTests(unittest.TestCase):
             "BooleanTypes.DifferenceBooleanType",
             "_refresh_fusion_generation_ui",
             "_rollback_failed_generation",
+            "_build_frozen_cavity_access_cuts",
+            "subtract_frozen_cavity_access",
             "direct_void_to_removable_top_inset",
             "without intermediate material",
             "current_path = \"\"",

@@ -1,24 +1,35 @@
 # Human Gates
 
 <!-- P64-L09U-GATE -->
-## P64-L09U-R4-V — gate cavités ouvertes sous plateaux
+## P64-L09U-R5-V — gate accès des cavités partiellement recouvertes
 
-Statut : `ready-human-gate`, candidate 0.1.75.
+Statut : `blocked-by-R5-integration-and-installation`, candidate 0.1.76.
 
-0.1.74 est close en `human-KO`, `do-not-run`. Thomas vérifie :
+0.1.75 est close en `human-KO`, `do-not-run`. Acquis : cavités bien placées et
+ouvertes directement sous plateau. Bloquant : leur portion hors plateau reste
+presque fermée lorsqu'elles sont partiellement recouvertes.
 
-1. aucune paroi imprimée entre un plateau et la cavité qu'il recouvre ;
-2. sommet de cavité au dessous exact de l'encastrement local ;
-3. cavité directement accessible après retrait du plateau ;
-4. cavités sans coupe locale toujours ouvertes sur leur face fonctionnelle ;
-5. profondeurs calibrées, deux plateaux, paliers et budgets inchangés ;
-6. fidélité aperçu/Fusion, rendu progressif et absence de Combine perdu.
+Après préparation complète de 0.1.76, Thomas vérifiera :
 
-Contrat : `docs/P64_L09U_R4_END_TO_END_RUNBOOK.md`.
-Preuve : `docs/P64_L09U_R4_0175_CORRECTIVE_EVIDENCE.md`.
-Recette : `docs/P64_L09U_R4_V_0175_FUSION_GATE_RECIPE.md`.
+1. aucune matière entre plateau et cavité dans la région recouverte ;
+2. aucun plafond au-dessus de l'asset dans la région hors plateau ;
+3. parois latérales, fond et appuis conservés hors de la cavité ;
+4. profondeur, position et aperçu inchangés ;
+5. plusieurs paliers, temps, rendu progressif et robustesse Fusion préservés.
+
+Contrat : `docs/P64_L09U_R5_END_TO_END_RUNBOOK.md`.
+Preuve : `docs/P64_L09U_R5_0176_CORRECTIVE_EVIDENCE.md`.
+Recette : `docs/P64_L09U_R5_V_0176_FUSION_GATE_RECIPE.md`.
 
 Avant verdict : `fusion-validated=false`, `print-validated=false`.
+
+### P64-L09U-R4-V — gate humaine 0.1.75 close en KO
+
+Verdict : `human-KO`, `do-not-run`.
+
+La jonction sous plateau est conforme, mais la portion hors plateau des cavités
+partiellement recouvertes reste presque fermée. Preuve :
+`docs/P64_L09U_R4_V_0175_HUMAN_KO_EVIDENCE.md`.
 
 ### P64-L09U-R3-V — gate humaine 0.1.74 close en KO
 

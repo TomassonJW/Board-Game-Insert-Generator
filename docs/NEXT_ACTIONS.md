@@ -1,25 +1,26 @@
 # Next Actions
 
 <!-- P64-L09U-NEXT -->
-## Action courante : exécuter la gate P64-L09U-R4-V
+## Action courante : terminer P64-L09U-R5 puis préparer R5-V
 
-0.1.74 est `human-KO`, `do-not-run`. P64-L09U-R4 est terminé et validé
-automatiquement dans la candidate 0.1.75.
+0.1.75 est `human-KO`, `do-not-run`. Elle ouvre correctement la jonction sous
+plateau, mais ferme presque la portion hors plateau des cavités partiellement
+recouvertes.
 
-Thomas vérifie maintenant uniquement :
+Ordre unique :
 
-1. absence de dalle entre plateau et cavité dans `CasLimite01+` ;
-2. cavités sous coupe directement accessibles après retrait du plateau ;
-3. cavités sans coupe locale ouvertes sur leur propre face fonctionnelle ;
-4. même comportement dans `CasLimite02+` et `CasLimite01++` ;
-5. profondeurs, paliers, temps, aperçu/Fusion et matérialisation progressive
-   toujours conformes.
+1. intégrer la candidate automatisée-validée 0.1.76 ;
+2. installer et vérifier l'add-in 0.1.76 ;
+3. ouvrir la gate humaine R5-V.
 
-Recette unique :
-`docs/P64_L09U_R4_V_0175_FUSION_GATE_RECIPE.md`.
+Contrat :
+`docs/P64_L09U_R5_END_TO_END_RUNBOOK.md`.
 
-Preuve automatisée :
-`docs/P64_L09U_R4_0175_CORRECTIVE_EVIDENCE.md`.
+Preuve en cours :
+`docs/P64_L09U_R5_0176_CORRECTIVE_EVIDENCE.md`.
+
+Recette future :
+`docs/P64_L09U_R5_V_0176_FUSION_GATE_RECIPE.md`.
 
 Aucun benchmark/holdout. Les projets personnels restent en lecture seule.
 `fusion-validated=false`, `print-validated=false`.

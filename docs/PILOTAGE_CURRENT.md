@@ -1,39 +1,40 @@
 # Pilotage courant
 
 <!-- P64-L09U-CURRENT -->
-## Reprise canonique P64-L09U-R4
+## Reprise canonique P64-L09U-R5
 
-- `0.1.74` est `human-KO`, `do-not-run` : les cavités sous plateau étaient
-  enfermées par une paroi intermédiaire.
-- P64-L09U-R4 est `automated-validated` et la candidate `0.1.75` est
-  `ready-human-gate`.
-- Une cavité n'est abaissée que si son propre conteneur porte une coupe locale
-  réelle. Son sommet coïncide alors avec le dessous de la coupe :
-  séparation et matière intermédiaire `0 mm`.
-- Un conteneur situé sous l'empreinte globale mais sans coupe locale garde sa
-  cavité ouverte sur sa face fonctionnelle locale.
-- Profondeur, X/Y, orientation et dimensions restent figés ; le fond canonique,
-  les parois latérales et les paliers locaux restent certifiés.
-- L'aperçu, la CAD IR et le plan Fusion portent la continuité du vide et
-  refusent une dalle réintroduite.
-- Le BRep transitoire, le rendu progressif, le rollback, les temps honnêtes et
-  l'absence de Combine rectangulaire sont préservés.
-- Validation : préparateur `130/130`, suite autorisée `899/899`, un test SCIP
-  ignoré et douze modules interdits exclus.
-- Les trois replays personnels passent en lecture seule : `21` cavités sous
-  coupe directement accessibles, `43` cavités ouvertes localement, SHA-256
-  inchangés.
-- Prochaine action unique : gate humaine P64-L09U-R4-V selon
-  `docs/P64_L09U_R4_V_0175_FUSION_GATE_RECIPE.md`.
+- `0.1.75` est `human-KO`, `do-not-run`.
+- Acquis humain : cavités bien placées et directement ouvertes sous les
+  plateaux, sans paroi intermédiaire.
+- Défaut humain : lorsqu'une cavité n'est que partiellement recouverte, sa
+  portion hors plateau reste presque fermée par le volume plein supérieur du
+  conteneur.
+- Cause confirmée : l'ancrage abaissait toute la cavité, mais les accès
+  verticaux hors plateau étaient désactivés.
+- R5 conserve l'ancrage, le calibre, X/Y et l'orientation, puis ouvre chaque
+  région jusqu'au dessous de sa découpe ou jusqu'au sommet fonctionnel local.
+- Chaque accès reste strictement dans l'empreinte de la cavité ; fonds, parois,
+  appuis, paliers, budgets et solveur restent inchangés.
+- L'aperçu, la CAD IR et le plan Fusion transportent les mêmes coupes
+  `frozen_cavity_vertical_access`.
+- Validation : préparateur `133/133`, suite autorisée `902/902`, un test SCIP
+  ignoré et trois replays personnels exacts en lecture seule.
+- Candidate `0.1.76` prête pour intégration, installation et gate R5-V.
 - Aucun benchmark/holdout ; projets personnels en lecture seule ;
   `fusion-validated=false`, `print-validated=false`.
 
-Autorités R4 :
+Autorités R5 :
 
-- `docs/P64_L09U_R3_V_0174_HUMAN_KO_EVIDENCE.md` ;
-- `docs/DECISIONS/ADR-0100-plateau-amovible-et-cavite-sans-paroi-intermediaire.md` ;
-- `docs/P64_L09U_R4_0175_CORRECTIVE_EVIDENCE.md` ;
-- `docs/P64_L09U_R4_V_0175_FUSION_GATE_RECIPE.md`.
+- `docs/P64_L09U_R4_V_0175_HUMAN_KO_EVIDENCE.md` ;
+- `docs/DECISIONS/ADR-0101-acces-local-des-cavites-partiellement-recouvertes.md` ;
+- `docs/P64_L09U_R5_0176_CORRECTIVE_EVIDENCE.md` ;
+- `docs/P64_L09U_R5_END_TO_END_RUNBOOK.md`.
+
+### Historique R4 clôturé en human-KO
+
+- 0.1.75 a supprimé la paroi sous plateau, mais a laissé la portion hors
+  plateau des cavités partiellement recouvertes presque fermée.
+- Preuve : `docs/P64_L09U_R4_V_0175_HUMAN_KO_EVIDENCE.md`.
 
 ### Historique R3 clôturé en human-KO
 

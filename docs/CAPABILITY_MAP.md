@@ -1,24 +1,29 @@
 # Capability Map
 
 <!-- P64-L09U-CAPABILITY -->
-## P64-L09U-R4 — cavités ouvertes sous plateaux
+## P64-L09U-R5 — accès local des cavités partiellement recouvertes
 
-- `C-CAVITY` : `automated-validated`. Calibre, X/Y et orientation figés ;
-  accès local supérieur et fond certifiés.
-- `C-RESERVATION` : `automated-validated`. Seule une coupe locale réelle du
-  propriétaire peut abaisser une cavité ; la jonction contient `0 mm` de
-  matière intermédiaire.
-- `C-FINALIZATION`, `C-CAD-IR`, `C-PREVIEW` : `automated-validated`, continuité
-  du vide et face fonctionnelle locale alignées de bout en bout.
-- `C-FUSION` : `implemented`, `automated-validated`; le plan refuse une dalle
-  réintroduite. Observation réelle encore humaine.
+- `C-CAVITY` : `automated-validated`. Calibre, X/Y,
+  orientation et profondeur figés ; accès supérieur résolu par région XY.
+- `C-RESERVATION` : acquis R4 préservé sous plateau ; R5 ouvre la portion hors
+  plateau sans étendre l'encastrement.
+- `C-FINALIZATION`, `C-CAD-IR`, `C-PREVIEW` : coupes d'accès vertical locales
+  implémentées et transportées de bout en bout.
+- `C-FUSION` : plan de coupes verticales implémenté ; nouvelle observation
+  réelle obligatoire.
 - `C-STAGED-CALCULATION` et chemin BRep transitoire : acquis R3 préservés.
-- `C-QUALITY` : préparateur `130/130`, suite autorisée `899/899`, trois replays
-  personnels exacts en lecture seule.
-- `C-RELEASE` : 0.1.75 `ready-human-gate`.
+- `C-QUALITY` : préparateur `133/133`, suite autorisée `902/902`, un test SCIP
+  ignoré et trois replays personnels exacts en lecture seule.
+- `C-RELEASE` : 0.1.75 `human-KO`, `do-not-run`; 0.1.76 prête à installer.
 - `C-PRINT` : `print-validated=false`.
 
 `fusion-validated=false`, `print-validated=false`.
+
+### Historique R4 clôturé en human-KO
+
+- `C-RELEASE` : 0.1.75 `human-KO`, `do-not-run`.
+- `C-CAVITY` : accès direct correct sous plateau, mais portion hors plateau
+  presque fermée pour les cavités partiellement recouvertes.
 
 ### Historique R3 clôturé en human-KO
 

@@ -6,23 +6,23 @@ et la lecture par capabilities dans `docs/CAPABILITY_MAP.md`. La nomenclature
 et le role de ces documents sont definis dans `docs/PILOTAGE_GLOSSARY.md`.
 
 <!-- P64-L09U-ROADMAP -->
-## Correctif P64-L09U-R4 — accès direct sous les plateaux
+## Correctif P64-L09U-R5 — accès des cavités partiellement recouvertes
 
-0.1.74 est `human-KO` : elle conserve les cavités mais les enferme sous une
-paroi intermédiaire. R4 est terminé et validé automatiquement dans 0.1.75 ; la
-trajectoire attend maintenant la gate humaine.
+0.1.75 est `human-KO` : elle ouvre correctement les cavités sous plateau, mais
+laisse leur portion hors plateau presque fermée lorsqu'elles ne sont que
+partiellement recouvertes. R5 est borné à cette continuité locale.
 
 ```text
-P64-L09U-R3-V human-KO 0.1.74
-  -> R4 ancrage depuis la coupe réelle du propriétaire
-  -> R4 jonction plateau/cavité sans matière intermédiaire
-  -> R4 ouverture sur la face fonctionnelle locale sans coupe
-  -> validation et package 0.1.75 terminés
-  -> P64-L09U-R4-V gate Fusion humaine
+P64-L09U-R4-V human-KO 0.1.75
+  -> R5 ancrage calibré conservé
+  -> R5 accès verticaux par région dans l'empreinte de la cavité
+  -> R5 dessous de découpe sous plateau, sommet fonctionnel hors plateau
+  -> validation et package 0.1.76
+  -> P64-L09U-R5-V gate Fusion humaine
 ```
 
 Les jobs annulables, miniatures de variantes et l'épaisseur distincte de
-séparateur restent sous ADR-0095 à ADR-0097 et hors de R4.
+séparateur restent sous ADR-0095 à ADR-0097 et hors de R5.
 `fusion-validated=false`, `print-validated=false`.
 
 ### Historique R2 clôturé en human-KO

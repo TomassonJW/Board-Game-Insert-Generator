@@ -1225,8 +1225,10 @@ def _attach_xy_composite_geometry(
     total_cut_volume = 0.0
     total_cut_intersection_with_final = 0.0
     total_join_count = 0
+    total_cavity_access_required = 0
     all_owners_connected = True
     all_frozen_calibrations_match = True
+    all_cavity_access_open = True
     all_reservation_walls_certified = all(
         isinstance(value.get("wall_envelope_certificate"), Mapping)
         and value["wall_envelope_certificate"].get("certified") is True
@@ -1478,6 +1480,53 @@ def _attach_xy_composite_geometry(
         placement["frozen_cavities_v1"] = deepcopy(
             anchor_certificate["cavities"]
         )
+        access_result = _build_frozen_cavity_access_cuts(
+            owner_id,
+            cad_prisms,
+            placement_cuts,
+            placement["frozen_cavities_v1"],
+            component_origin,
+        )
+        placement_access_cuts = list(access_result["cuts"])
+        total_cavity_access_required += int(
+            access_result["required_count"]
+        )
+        all_cavity_access_open = bool(
+            all_cavity_access_open
+            and access_result.get("certified") is True
+            and len(placement_access_cuts)
+            == int(access_result["required_count"])
+        )
+        prisms_by_id = {
+            str(value["prism_id"]): value for value in cad_prisms
+        }
+        for cut in placement_access_cuts:
+            target_prism = prisms_by_id[str(cut["target_prism_id"])]
+            cut_volume = _mapping_size_volume(cut["size_mm"])
+            total_cut_volume += cut_volume
+            total_cut_intersection_with_final += (
+                _cut_intersection_with_final_volume(
+                    cut,
+                    tuple(
+                        float(
+                            _mapping_value(
+                                target_prism["final_origin_mm"],
+                                axis,
+                            )
+                        )
+                        for axis in ("x", "y", "z")
+                    ),
+                    tuple(
+                        float(
+                            _mapping_value(
+                                target_prism["final_size_mm"],
+                                axis,
+                            )
+                        )
+                        for axis in ("x", "y", "z")
+                    ),
+                )
+            )
         composite_body = {
             "schema_version": "bgig.xy_composite_cad_body.v2",
             "policy": "hybrid_xy_composite_v2",
@@ -1491,11 +1540,12 @@ def _attach_xy_composite_geometry(
                 str(value["pose_digest"])
                 for value in placement["frozen_cavities_v1"]
             ],
-            "frozen_cavity_access_cuts": [],
+            "frozen_cavity_access_cuts": placement_access_cuts,
             "operation_order": [
                 "create_core_prism",
                 "join_xy_annexes",
                 "subtract_content_cavities",
+                "subtract_frozen_cavity_access",
                 "subtract_exact_top_insets",
             ],
         }
@@ -1540,6 +1590,7 @@ def _attach_xy_composite_geometry(
         and all_top_cuts_are_exact
         and all_owners_connected
         and all_frozen_calibrations_match
+        and all_cavity_access_open
         and all_reservation_walls_certified
     )
     rejection_subcodes = [
@@ -1570,6 +1621,10 @@ def _attach_xy_composite_geometry(
                 "COMPOSITE_CAVITY_CALIBRATION_DIVERGENCE",
             ),
             (
+                all_cavity_access_open,
+                "COMPOSITE_CAVITY_VERTICAL_ACCESS_UNCERTIFIED",
+            ),
+            (
                 all_reservation_walls_certified,
                 "COMPOSITE_RESERVATION_WALL_UNCERTIFIED",
             ),
@@ -1589,7 +1644,10 @@ def _attach_xy_composite_geometry(
         "cavity_calibrations_match_source_contract": (
             all_frozen_calibrations_match
         ),
-        "cavity_vertical_access_open": False,
+        "cavity_vertical_access_open": all_cavity_access_open,
+        "cavity_vertical_access_required_count": (
+            total_cavity_access_required
+        ),
         "cavity_anchor_certificate": _aggregate_cavity_anchor_certificates(
             placements
         ),
@@ -2239,6 +2297,155 @@ def _composite_cell_cuts(
             }
         )
     return tuple(cuts)
+
+
+def _build_frozen_cavity_access_cuts(
+    owner_id: str,
+    cad_prisms: Sequence[Mapping[str, object]],
+    top_inset_cuts: Sequence[Mapping[str, object]],
+    frozen_cavities: Sequence[Mapping[str, object]],
+    component_origin: Sequence[float],
+) -> dict[str, object]:
+    """Open only the cavity footprint between its top and the local free face.
+
+    A cavity may be lowered as a whole because one part lies under a removable
+    tray.  Every other XY part must still reach either its own local top face or
+    the bottom of another local inset.  These access cuts remove only the
+    cavity footprint; the surrounding canonical walls remain printable.
+    """
+
+    cuts: list[dict[str, object]] = []
+    required_count = 0
+    for prism in cad_prisms:
+        prism_id = str(prism["prism_id"])
+        prism_origin = tuple(
+            float(_mapping_value(prism["cad_origin_mm"], axis))
+            for axis in ("x", "y", "z")
+        )
+        prism_size = tuple(
+            float(_mapping_value(prism["cad_size_mm"], axis))
+            for axis in ("x", "y", "z")
+        )
+        prism_rect = (
+            prism_origin[0],
+            prism_origin[1],
+            prism_origin[0] + prism_size[0],
+            prism_origin[1] + prism_size[1],
+        )
+        local_opening_top = prism_origin[2] + prism_size[2]
+        matching_top_cuts = [
+            value
+            for value in top_inset_cuts
+            if str(value.get("target_prism_id", "")) == prism_id
+            and value.get("kind") in {"top_inset", "top_inset_grip"}
+        ]
+        if matching_top_cuts:
+            local_opening_top = min(
+                float(_mapping_value(value["world_origin_mm"], "z"))
+                for value in matching_top_cuts
+            )
+        for cavity in frozen_cavities:
+            cavity_origin = tuple(
+                float(_mapping_value(cavity["world_origin_mm"], axis))
+                for axis in ("x", "y", "z")
+            )
+            cavity_size = tuple(
+                float(_mapping_value(cavity["world_size_mm"], axis))
+                for axis in ("x", "y", "z")
+            )
+            cavity_rect = (
+                cavity_origin[0],
+                cavity_origin[1],
+                cavity_origin[0] + cavity_size[0],
+                cavity_origin[1] + cavity_size[1],
+            )
+            intersection = _rectangle_intersection(
+                prism_rect,
+                cavity_rect,
+            )
+            if intersection is None:
+                continue
+            access_bottom = max(
+                prism_origin[2],
+                cavity_origin[2] + cavity_size[2],
+            )
+            access_top = min(
+                prism_origin[2] + prism_size[2],
+                local_opening_top,
+            )
+            if access_top <= access_bottom + 0.0001:
+                continue
+            required_count += 1
+            world_origin = (
+                intersection[0],
+                intersection[1],
+                access_bottom,
+            )
+            size = (
+                intersection[2] - intersection[0],
+                intersection[3] - intersection[1],
+                access_top - access_bottom,
+            )
+            cavity_key = str(cavity["cavity_key"])
+            cuts.append(
+                {
+                    "id": (
+                        f"{cavity_key}:{owner_id}:{prism_id}:"
+                        f"frozen_cavity_access:{len(cuts)}"
+                    ),
+                    "kind": "frozen_cavity_access",
+                    "reservation_id": cavity_key,
+                    "flat_item_id": "",
+                    "placement_id": owner_id,
+                    "removal_order": -1,
+                    "world_origin_mm": _xyz_payload(world_origin),
+                    "local_origin_mm": _xyz_payload(
+                        tuple(
+                            world_origin[index] - component_origin[index]
+                            for index in range(3)
+                        )
+                    ),
+                    "size_mm": _xyz_payload(size),
+                    "retained_body_below_mm": round(
+                        access_bottom - prism_origin[2],
+                        6,
+                    ),
+                    "minimum_floor_mm": 0.0,
+                    "cavity_overlap_area_mm2": round(
+                        size[0] * size[1],
+                        6,
+                    ),
+                    "local_interval_z_mm": {
+                        "bottom": round(access_bottom, 6),
+                        "top": round(access_top, 6),
+                    },
+                    "non_perforating": True,
+                    "target_prism_id": prism_id,
+                }
+            )
+    return {
+        "certified": len(cuts) == required_count,
+        "required_count": required_count,
+        "cuts": tuple(cuts),
+    }
+
+
+def _rectangle_intersection(
+    left: Sequence[float],
+    right: Sequence[float],
+) -> tuple[float, float, float, float] | None:
+    intersection = (
+        max(left[0], right[0]),
+        max(left[1], right[1]),
+        min(left[2], right[2]),
+        min(left[3], right[3]),
+    )
+    if (
+        intersection[2] - intersection[0] <= 0.0001
+        or intersection[3] - intersection[1] <= 0.0001
+    ):
+        return None
+    return intersection
 
 
 def _frozen_access_at_cell(

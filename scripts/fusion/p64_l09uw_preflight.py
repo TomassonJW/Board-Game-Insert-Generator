@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prépare la fixture publique et le reçu correctif P64-L09U-R4-V."""
+"""Prépare la fixture publique et le reçu correctif P64-L09U-R5-V."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ from scripts.fusion.p64_l09sv_preflight import (
 from scripts.fusion.p64_l09tv_preflight import gate_project
 
 
-ADDIN_VERSION = "0.1.75"
+ADDIN_VERSION = "0.1.76"
 FIXTURE_FILENAME = "p64-l09uw-01-exact-composite.bgig.json"
 SUMMARY_FILENAME = "p64-l09uw-preflight-summary.json"
 TARGETED_MATRIX = (
@@ -30,6 +30,7 @@ TARGETED_MATRIX = (
     "deterministic_final_cavity_z_anchor",
     "direct_void_between_top_inset_and_cavity",
     "zero_intermediate_material_under_removable_tray",
+    "partial_top_inset_preserves_uncovered_cavity_access",
     "local_disjoint_top_insets",
     "local_overlapping_top_inset_steps",
     "truthful_budget_wall_and_cleanup_timing",
@@ -142,6 +143,7 @@ def build_preflight() -> tuple[dict[str, object], dict[str, object]]:
             ),
             "intermediate_material_thickness_mm": 0.0,
             "top_void_continuity_certified": True,
+            "partial_top_inset_preserves_uncovered_cavity_access": True,
             "top_inset_depth_is_local_by_xy_region": True,
             "budget_wall_and_cleanup_times_separated": True,
             "composite_preview_uses_cad_prisms": True,

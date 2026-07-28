@@ -1,31 +1,37 @@
 # Status
 
 <!-- P64-L09U-STATUS -->
-## P64-L09U-R4 — cavités ouvertes sous plateaux
+## P64-L09U-R5 — accès local des cavités partiellement recouvertes
 
 Date : 2026-07-28.
 
-Statut : `P64-L09U-R4-automated-validated`, `P64-L09U-R4-V-ready-human-gate`,
+Statut : `P64-L09U-R4-V-human-KO`, `P64-L09U-R5-automated-validated`,
+`installation-pending`,
 `fusion-validated=false`, `print-validated=false`.
 
-- 0.1.74 est `human-KO`, `do-not-run`.
-- Une cavité sous une coupe locale rejoint directement le dessous de cette
-  coupe, sans paroi intermédiaire.
-- Une empreinte globale sans coupe réelle ne déplace plus la cavité ; celle-ci
-  reste ouverte sur la face fonctionnelle locale de son corps composite.
-- Résultat, aperçu, CAD IR et plan Fusion transportent et vérifient ces preuves.
-- Préparateur `130/130`, suite autorisée `899/899`, un test SCIP ignoré.
-- Trois replays personnels passés en lecture seule : 21 cavités sous coupe,
-  43 cavités ouvertes localement, SHA-256 inchangés.
-- Candidate : `0.1.75`, prête pour la gate humaine R4-V.
+- 0.1.75 est `human-KO`, `do-not-run`.
+- Acquis humain : positions et profondeurs correctes, aucune paroi entre
+  plateau et cavité.
+- Défaut humain : la portion hors plateau d'une cavité partiellement recouverte
+  reste fermée par le volume plein supérieur du conteneur.
+- Cause confirmée : l'ancrage abaissait toute la cavité, mais les accès
+  verticaux hors plateau étaient désactivés.
+- R5 rétablit des accès bornés à l'empreinte de la cavité, jusqu'au dessous de
+  chaque découpe locale ou jusqu'au sommet fonctionnel hors plateau.
+- Les parois, fonds, appuis, dimensions, poses et profondeurs restent inchangés.
+- Validation : préparateur `133/133`, suite autorisée `902/902`, un test SCIP
+  ignoré, trois replays personnels exacts en lecture seule.
+- Candidate : `0.1.76`, prête pour intégration et installation.
 - Aucun benchmark/holdout ; projets personnels en lecture seule.
 
-Preuve :
-`docs/P64_L09U_R4_0175_CORRECTIVE_EVIDENCE.md`.
+Preuve humaine :
+`docs/P64_L09U_R4_V_0175_HUMAN_KO_EVIDENCE.md`.
 Décision :
-`docs/DECISIONS/ADR-0100-plateau-amovible-et-cavite-sans-paroi-intermediaire.md`.
-Recette :
-`docs/P64_L09U_R4_V_0175_FUSION_GATE_RECIPE.md`.
+`docs/DECISIONS/ADR-0101-acces-local-des-cavites-partiellement-recouvertes.md`.
+Preuve corrective :
+`docs/P64_L09U_R5_0176_CORRECTIVE_EVIDENCE.md`.
+Runbook :
+`docs/P64_L09U_R5_END_TO_END_RUNBOOK.md`.
 
 ### Historique R2 clôturé en human-KO
 
