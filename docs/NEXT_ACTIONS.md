@@ -1,7 +1,7 @@
 # Next Actions
 
 <!-- P64-L09U-NEXT -->
-## Action courante : P64-L09U-R7-C3 — recertification finale
+## Action courante : P64-L09U-R7-D — empilement automatique exact
 
 0.1.77 est `human-KO`, `do-not-run`. Sa correction de profondeur est confirmée
 et doit être conservée, mais le placement automatique, les parois finales et
@@ -37,9 +37,17 @@ R7-C2 est terminé :
 - `62/62` tests ciblés ;
 - deux replays personnels exacts et SHA inchangés.
 
-Prochaine mission unique : recertifier les fragments sur la géométrie composite
-finale, conserver ou refuser la pose minimale sans la déplacer, et empêcher les
-micro-coupes sous `1,2 mm`.
+R7-C3 est terminé :
+
+- jeu de boîte puis paroi minimale certifiés ;
+- fragments et composantes de coupe sous `1,2 mm` refusés ;
+- aucun déplacement silencieux en finalisation ;
+- `66/66`, deux SHA personnels inchangés ;
+- zéro micro-prisme et zéro micro-coupe sur les deux replays.
+
+Prochaine mission unique : imposer l'ordre automatique fondé sur l'empreinte
+orientée, petit-dessous/grand-dessus, puis prouver les intervalles Z jusqu'au
+plan Fusion.
 
 Contrat : `docs/P64_L09U_R7_END_TO_END_RUNBOOK.md`.
 Preuve : `docs/P64_L09U_R6_V_0177_HUMAN_KO_EVIDENCE.md`.
@@ -47,6 +55,8 @@ Décisions : ADR-0103 et ADR-0104.
 Preuve C1 : `docs/P64_L09U_R7_C1_PRODUCT_GRID_CANDIDATES_EVIDENCE.md`.
 Preuve C2 :
 `docs/P64_L09U_R7_C2_CANONICAL_WALLS_AND_SCORE_EVIDENCE.md`.
+Preuve C3 :
+`docs/P64_L09U_R7_C3_FINAL_MATERIAL_RECERTIFICATION_EVIDENCE.md`.
 
 Aucun benchmark/holdout/corpus/tournoi. Les projets personnels restent en
 lecture seule. `fusion-validated=false`, `print-validated=false`.

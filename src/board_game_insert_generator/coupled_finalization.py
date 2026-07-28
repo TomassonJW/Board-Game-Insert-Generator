@@ -51,6 +51,9 @@ from board_game_insert_generator.minimal_layout_solver import (
 )
 from board_game_insert_generator.solver_contract import SolverBudget, SolverStrategy
 from board_game_insert_generator.solver_settings import solver_deadline_seconds
+from board_game_insert_generator.top_inset_reservation import (
+    certify_top_inset_material_fragments,
+)
 
 
 COUPLED_FINALIZATION_SCHEMA_V1 = "bgig.coupled_finalization.v1"
@@ -1265,6 +1268,22 @@ def _attach_xy_composite_geometry(
         and value["wall_envelope_certificate"].get("cavities_unchanged") is True
         for value in reservations
     )
+    minimum_wall = float(
+        _mapping_value(
+            _mapping_value(project, "layout"),
+            "default_wall_thickness_mm",
+        )
+    )
+    final_material_envelope_certificate = (
+        certify_top_inset_material_fragments(
+            list(reservations),
+            _composite_owner_material_envelopes(owners),
+            minimum_wall_mm=minimum_wall,
+        )
+    )
+    all_final_material_fragments_certified = bool(
+        final_material_envelope_certificate["certified"]
+    )
     for placement in placements:
         if not isinstance(placement, dict):
             return _rejected_composite_materialization(
@@ -1622,6 +1641,7 @@ def _attach_xy_composite_geometry(
         and all_frozen_calibrations_match
         and all_cavity_access_open
         and all_reservation_walls_certified
+        and all_final_material_fragments_certified
     )
     rejection_subcodes = [
         code
@@ -1658,6 +1678,10 @@ def _attach_xy_composite_geometry(
                 all_reservation_walls_certified,
                 "COMPOSITE_RESERVATION_WALL_UNCERTIFIED",
             ),
+            (
+                all_final_material_fragments_certified,
+                "COMPOSITE_FINAL_MATERIAL_FRAGMENT_UNCERTIFIED",
+            ),
         )
         if not passed
     ]
@@ -1682,6 +1706,12 @@ def _attach_xy_composite_geometry(
             placements
         ),
         "minimum_reservation_wall_certified": all_reservation_walls_certified,
+        "final_material_fragments_certified": (
+            all_final_material_fragments_certified
+        ),
+        "final_material_envelope_certificate": (
+            final_material_envelope_certificate
+        ),
         "all_top_inset_cuts_target_exact_owner_intersections": all_top_cuts_are_exact,
         "source_composite_volume_mm3": round(
             certified_composite_volume,
@@ -2080,6 +2110,36 @@ def _rectangles_overlap(
     )
 
 
+def _composite_owner_material_envelopes(
+    owners: Mapping[str, object],
+) -> list[dict[str, object]]:
+    envelopes: list[dict[str, object]] = []
+    for owner_id, owner in sorted(owners.items()):
+        prisms = tuple(owner.prisms)
+        if not prisms:
+            continue
+        min_x = min(float(prism.origin_mm[0]) for prism in prisms)
+        min_y = min(float(prism.origin_mm[1]) for prism in prisms)
+        max_x = max(
+            float(prism.origin_mm[0] + prism.size_mm[0])
+            for prism in prisms
+        )
+        max_y = max(
+            float(prism.origin_mm[1] + prism.size_mm[1])
+            for prism in prisms
+        )
+        envelopes.append(
+            {
+                "material_id": owner_id,
+                "x": min_x,
+                "y": min_y,
+                "width": max_x - min_x,
+                "height": max_y - min_y,
+            }
+        )
+    return envelopes
+
+
 def _split_composite_owner_prisms(
     owner: object,
     reservations: Sequence[Mapping[str, object]],
@@ -2104,11 +2164,30 @@ def _split_composite_owner_prisms(
                 )
                 for value in local_regions
                 if isinstance(value, Mapping)
+                and _z_intervals_overlap(
+                    z0,
+                    z0 + prism.size_mm[2],
+                    float(value["layer_bottom_z_mm"]),
+                    float(value["layer_top_z_mm"]),
+                )
             ]
-            for rect in (
-                *local_rectangles,
-                _reservation_rectangle(reservation, "grip"),
-            ):
+            design_top = float(
+                reservation["support_plane_z_mm"]
+            ) + float(reservation["inset_depth_from_top_mm"])
+            grip_bottom = design_top - float(
+                reservation["total_thickness_mm"]
+            )
+            grip_rectangles = (
+                [_reservation_rectangle(reservation, "grip")]
+                if _z_intervals_overlap(
+                    z0,
+                    z0 + prism.size_mm[2],
+                    grip_bottom,
+                    design_top,
+                )
+                else []
+            )
+            for rect in (*local_rectangles, *grip_rectangles):
                 rx0, ry0, rx1, ry1 = rect
                 if rx0 < x1 - 0.0001 and x0 < rx1 - 0.0001:
                     xs.update({max(x0, rx0), min(x1, rx1)})
@@ -2153,6 +2232,18 @@ def _split_composite_owner_prisms(
                 *value["final_size_mm"],
             ),
         )
+    )
+
+
+def _z_intervals_overlap(
+    left_bottom: float,
+    left_top: float,
+    right_bottom: float,
+    right_top: float,
+) -> bool:
+    return (
+        left_bottom < right_top - 0.0001
+        and right_bottom < left_top - 0.0001
     )
 
 

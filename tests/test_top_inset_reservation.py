@@ -12,6 +12,7 @@ from board_game_insert_generator.top_inset_reservation import (
     _automatic_axis_positions,
     _reservation_wall_certificate,
     apply_top_inset_reservations,
+    certify_top_inset_material_fragments,
     certify_top_inset_reservation_prisms,
     derive_top_inset_reservations,
     resolve_top_inset_reservations,
@@ -69,6 +70,97 @@ def flat(
 
 
 class TopInsetReservationTests(unittest.TestCase):
+    def test_final_material_certificate_rejects_point_eight_strip(
+        self,
+    ) -> None:
+        reservation = {
+            "id": "top-inset:board",
+            "flat_item_id": "board",
+            "cut_origin_mm": {"x": 1.2, "y": 4.0},
+            "cut_size_mm": {"x": 10.0, "y": 10.0},
+            "support_plane_z_mm": 8.0,
+            "inset_depth_from_top_mm": 2.0,
+            "total_thickness_mm": 2.0,
+            "grip_zone": {
+                "origin_mm": {"x": 5.0, "y": 15.0},
+                "size_mm": {"x": 8.0, "y": 4.0},
+            },
+        }
+
+        certificate = certify_top_inset_material_fragments(
+            [reservation],
+            [
+                {
+                    "material_id": "container:test",
+                    "x": 0.4,
+                    "y": 0.4,
+                    "width": 40.0,
+                    "height": 30.0,
+                }
+            ],
+            minimum_wall_mm=1.2,
+        )
+
+        self.assertFalse(certificate["certified"])
+        self.assertIn(
+            {
+                "side": "left",
+                "observed_mm": 0.8,
+                "reason": (
+                    "residual_material_strip_below_minimum_wall"
+                ),
+            },
+            [
+                {
+                    key: failure[key]
+                    for key in ("side", "observed_mm", "reason")
+                }
+                for failure in certificate["failures"]
+                if "side" in failure
+            ],
+        )
+
+    def test_final_material_certificate_rejects_half_mm_cut_component(
+        self,
+    ) -> None:
+        reservation = {
+            "id": "top-inset:booklet",
+            "flat_item_id": "booklet",
+            "cut_origin_mm": {"x": 4.0, "y": 4.0},
+            "cut_size_mm": {"x": 0.5, "y": 12.0},
+            "support_plane_z_mm": 4.0,
+            "inset_depth_from_top_mm": 6.0,
+            "total_thickness_mm": 6.0,
+            "grip_zone": {
+                "origin_mm": {"x": 8.0, "y": 18.0},
+                "size_mm": {"x": 8.0, "y": 4.0},
+            },
+        }
+
+        certificate = certify_top_inset_material_fragments(
+            [reservation],
+            [
+                {
+                    "material_id": "container:test",
+                    "x": 0.0,
+                    "y": 0.0,
+                    "width": 30.0,
+                    "height": 30.0,
+                }
+            ],
+            minimum_wall_mm=1.2,
+        )
+
+        self.assertFalse(certificate["certified"])
+        self.assertTrue(
+            any(
+                failure["reason"]
+                == "cut_component_below_minimum_wall"
+                and failure["observed_mm"] == 0.5
+                for failure in certificate["failures"]
+            )
+        )
+
     def test_wall_certificate_rejects_box_edge_and_point_four_gap(
         self,
     ) -> None:
@@ -92,6 +184,7 @@ class TopInsetReservationTests(unittest.TestCase):
             [],
             box={"x": 100.0, "y": 60.0, "z": 12.0},
             minimum_boundary_wall_mm=1.2,
+            minimum_box_boundary_margin_mm=1.2,
             sibling_reservations=[sibling],
         )
 

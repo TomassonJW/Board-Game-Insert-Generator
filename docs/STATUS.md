@@ -8,7 +8,8 @@ Date : 2026-07-28.
 Statut : `P64-L09U-R6-V-human-KO`, `do-not-run`,
 `P64-L09U-R7-A-done`, `P64-L09U-R7-B-done`,
 `P64-L09U-R7-C1-automated-validated`,
-`P64-L09U-R7-C2-automated-validated`, `P64-L09U-R7-C3-ready`,
+`P64-L09U-R7-C2-automated-validated`,
+`P64-L09U-R7-C3-automated-validated`, `P64-L09U-R7-D-ready`,
 `fusion-validated=false`, `print-validated=false`.
 
 - 0.1.77 est `human-KO`, `do-not-run`.
@@ -34,7 +35,12 @@ Statut : `P64-L09U-R6-V-human-KO`, `do-not-run`,
 - C2 impose `1,2 mm` au bord de boîte et entre zones disjointes, puis classe
   les poses par couverture, recouvrement sain et centrage utile.
 - Validation C2 : `62/62`; les deux projets personnels sont inchangés.
-- Prochaine mission : recertification des fragments de matière composites.
+- C3 additionne jeu de boîte et paroi, puis recertifie les fragments contre
+  l'enveloppe composite finale sans déplacement silencieux.
+- Sur `CasLimite02++` : prismes `118 -> 56`, micro-prismes `14 -> 0`,
+  coupes supérieures `45 -> 18`, micro-coupes `0`.
+- Validation C3 : `66/66`; certificat propagé jusqu'au plan Fusion.
+- Prochaine mission : ordre automatique petit-dessous/grand-dessus.
 - Aucun benchmark/holdout/corpus/tournoi ; aucune UI manuelle.
 
 Preuve humaine :
@@ -47,6 +53,8 @@ Preuve C1 :
 `docs/P64_L09U_R7_C1_PRODUCT_GRID_CANDIDATES_EVIDENCE.md`.
 Preuve C2 :
 `docs/P64_L09U_R7_C2_CANONICAL_WALLS_AND_SCORE_EVIDENCE.md`.
+Preuve C3 :
+`docs/P64_L09U_R7_C3_FINAL_MATERIAL_RECERTIFICATION_EVIDENCE.md`.
 
 ### Historique R6 clôturé en human-KO
 

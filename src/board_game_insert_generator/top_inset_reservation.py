@@ -635,8 +635,13 @@ def _resolve_automatic_xy_layout(
         placements,
         design_top_z=design_top_z,
     )
+    project_layout = _mapping(project["layout"])
     minimum_boundary_wall = float(
-        _mapping(project["layout"])["default_wall_thickness_mm"]
+        project_layout["default_wall_thickness_mm"]
+    )
+    minimum_box_boundary_margin = (
+        minimum_boundary_wall
+        + float(project_layout["container_box_xy_clearance_mm"])
     )
     states: list[list[dict[str, object]]] = [[]]
     evaluated = 0
@@ -664,7 +669,7 @@ def _resolve_automatic_xy_layout(
                     variant,
                     box,
                     default_clearance,
-                    minimum_boundary_wall_mm=minimum_boundary_wall,
+                    minimum_boundary_wall_mm=minimum_box_boundary_margin,
                 )
                 footprint_blockers = [
                     blocker
@@ -682,7 +687,7 @@ def _resolve_automatic_xy_layout(
                     reservations=state,
                     cavity_constraints=cavity_constraints,
                     useful_rectangles=useful_rectangles,
-                    boundary_margin_mm=minimum_boundary_wall,
+                    boundary_margin_mm=minimum_box_boundary_margin,
                     grid_metrics=grid_metrics,
                 )
                 y_values = _automatic_axis_positions(
@@ -692,7 +697,7 @@ def _resolve_automatic_xy_layout(
                     reservations=state,
                     cavity_constraints=cavity_constraints,
                     useful_rectangles=useful_rectangles,
-                    boundary_margin_mm=minimum_boundary_wall,
+                    boundary_margin_mm=minimum_box_boundary_margin,
                     grid_metrics=grid_metrics,
                 )
                 for x in x_values:
@@ -703,7 +708,7 @@ def _resolve_automatic_xy_layout(
                             x=x,
                             y=y,
                             box=box,
-                            minimum_boundary_wall_mm=minimum_boundary_wall,
+                            minimum_boundary_wall_mm=minimum_box_boundary_margin,
                         )
                         if relocation_blockers:
                             continue
@@ -712,6 +717,9 @@ def _resolve_automatic_xy_layout(
                             cavity_constraints,
                             box=box,
                             minimum_boundary_wall_mm=minimum_boundary_wall,
+                            minimum_box_boundary_margin_mm=(
+                                minimum_box_boundary_margin
+                            ),
                             sibling_reservations=state,
                         )
                         candidate["wall_envelope_certificate"] = wall_certificate
@@ -780,6 +788,7 @@ def _resolve_automatic_xy_layout(
 
     collision_rejections = 0
     application_rejections: list[dict[str, object]] = []
+    material_fragment_rejections = 0
     selected: list[dict[str, object]] | None = None
     for state in sorted(
         states,
@@ -809,6 +818,26 @@ def _resolve_automatic_xy_layout(
             if pose_blockers:
                 application_rejections.extend(pose_blockers)
                 continue
+        material_certificate = _material_fragment_certificate(
+            layered,
+            _placement_material_rectangles(placements),
+            minimum_wall_mm=minimum_boundary_wall,
+        )
+        if not bool(material_certificate["certified"]):
+            material_fragment_rejections += 1
+            application_rejections.append(
+                _blocker(
+                    "TOP_INSET_FINAL_MATERIAL_FRAGMENT_UNCERTIFIED",
+                    "La pose automatique laisserait un fragment de matiere "
+                    f"inferieur a {_round(minimum_boundary_wall)} mm.",
+                    "Choisis une autre pose certifiee ; la finalisation ne deplace pas la reservation.",
+                )
+            )
+            continue
+        for reservation in layered:
+            reservation["final_material_envelope_certificate"] = deepcopy(
+                material_certificate
+            )
         selected = layered
         break
     if selected is None and items:
@@ -830,6 +859,7 @@ def _resolve_automatic_xy_layout(
             "wall_rejection_count": wall_rejections,
             "reserved_prism_rejection_count": collision_rejections,
             "application_rejection_count": len(application_rejections),
+            "material_fragment_rejection_count": material_fragment_rejections,
             "placement_context": "frozen_bodies" if placements else "box_preview",
             **_grid_search_metrics(grid_metrics),
         }
@@ -841,6 +871,7 @@ def _resolve_automatic_xy_layout(
         "wall_rejection_count": wall_rejections,
         "reserved_prism_rejection_count": collision_rejections,
         "application_rejection_count": len(application_rejections),
+        "material_fragment_rejection_count": material_fragment_rejections,
         "placement_context": "frozen_bodies" if placements else "box_preview",
         "selected_signature": list(_automatic_layout_signature(selected or [])),
         "selected_score_v1": _automatic_layout_score_components(
@@ -900,7 +931,9 @@ def _automatic_axis_positions(
             {
                 start - size,
                 start,
+                start + boundary_margin_mm,
                 start + extent - size,
+                start + extent - boundary_margin_mm - size,
                 start + extent,
                 start + (extent - size) / 2.0,
             }
@@ -1043,6 +1076,17 @@ def _automatic_layout_rank(
             )
         )
     )
+    material_fragment_violation_count = int(
+        _material_fragment_certificate(
+            layered,
+            _placement_material_rectangles(placements),
+            minimum_wall_mm=float(
+                _mapping(project["layout"])[
+                    "default_wall_thickness_mm"
+                ]
+            ),
+        )["failure_count"]
+    )
     depth = max(
         (float(value["inset_depth_from_top_mm"]) for value in layered),
         default=0.0,
@@ -1072,6 +1116,7 @@ def _automatic_layout_rank(
         return (
             reserved_prism_violation_count,
             application_violation_count,
+            material_fragment_violation_count,
             -float(score["useful_coverage_area_mm2"]),
             -float(score["healthy_stack_overlap_area_mm2"]),
             float(score["useful_center_distance_mm"]),
@@ -1082,6 +1127,7 @@ def _automatic_layout_rank(
     return (
         reserved_prism_violation_count,
         application_violation_count,
+        material_fragment_violation_count,
         _round(depth),
         overlaps,
         _round(center_distance),
@@ -1358,12 +1404,197 @@ def _useful_placement_rectangles(
     return result
 
 
+def _placement_material_rectangles(
+    placements: list[dict[str, object]],
+) -> list[dict[str, object]]:
+    result: list[dict[str, object]] = []
+    for placement in placements:
+        if (
+            "origin_mm" not in placement
+            or "world_size_mm" not in placement
+        ):
+            continue
+        origin = _dimension(placement["origin_mm"])
+        size = _dimension(placement["world_size_mm"])
+        result.append(
+            {
+                "material_id": str(placement.get("id", "")),
+                "x": origin["x"],
+                "y": origin["y"],
+                "width": size["x"],
+                "height": size["y"],
+            }
+        )
+    return result
+
+
+def certify_top_inset_material_fragments(
+    reservations: list[dict[str, object]],
+    material_rectangles: list[dict[str, object]],
+    *,
+    minimum_wall_mm: float,
+) -> dict[str, object]:
+    """Certify cut components and residual strips against real material."""
+
+    return _material_fragment_certificate(
+        reservations,
+        material_rectangles,
+        minimum_wall_mm=minimum_wall_mm,
+    )
+
+
+def _material_fragment_certificate(
+    reservations: list[dict[str, object]],
+    material_rectangles: list[dict[str, object]],
+    *,
+    minimum_wall_mm: float,
+) -> dict[str, object]:
+    failures: list[dict[str, object]] = []
+    checked_intersection_count = 0
+    for reservation in reservations:
+        cut_rectangles = [
+            (
+                TOP_INSET_CUT_KIND,
+                str(region.get("id", "")),
+                _xy_rect(
+                    region["cut_origin_mm"],
+                    region["cut_size_mm"],
+                ),
+            )
+            for region in _local_depth_regions(reservation)
+        ]
+        grip = _mapping(reservation["grip_zone"])
+        cut_rectangles.append(
+            (
+                TOP_INSET_GRIP_CUT_KIND,
+                f"{reservation['id']}:grip-region",
+                _xy_rect(grip["origin_mm"], grip["size_mm"]),
+            )
+        )
+        for cut_kind, local_region_id, cut_rect in cut_rectangles:
+            for material in material_rectangles:
+                material_rect = {
+                    "x": float(material["x"]),
+                    "y": float(material["y"]),
+                    "width": float(material["width"]),
+                    "height": float(material["height"]),
+                }
+                intersection = _intersection(cut_rect, material_rect)
+                if intersection is None:
+                    continue
+                checked_intersection_count += 1
+                for axis, extent_key in (
+                    ("x", "width"),
+                    ("y", "height"),
+                ):
+                    cut_extent = float(intersection[extent_key])
+                    if (
+                        cut_extent > _EPSILON
+                        and cut_extent + _EPSILON < minimum_wall_mm
+                    ):
+                        failures.append(
+                            {
+                                "reservation_id": reservation["id"],
+                                "flat_item_id": reservation["flat_item_id"],
+                                "local_region_id": local_region_id,
+                                "cut_kind": cut_kind,
+                                "material_id": material.get(
+                                    "material_id",
+                                    "",
+                                ),
+                                "axis": axis,
+                                "observed_mm": _round(cut_extent),
+                                "minimum_wall_mm": _round(
+                                    minimum_wall_mm
+                                ),
+                                "reason": (
+                                    "cut_component_below_minimum_wall"
+                                ),
+                            }
+                        )
+                for side, residual in _interior_residual_strips(
+                    cut_rect,
+                    material_rect,
+                ).items():
+                    if (
+                        residual > _EPSILON
+                        and residual + _EPSILON < minimum_wall_mm
+                    ):
+                        failures.append(
+                            {
+                                "reservation_id": reservation["id"],
+                                "flat_item_id": reservation["flat_item_id"],
+                                "local_region_id": local_region_id,
+                                "cut_kind": cut_kind,
+                                "material_id": material.get(
+                                    "material_id",
+                                    "",
+                                ),
+                                "side": side,
+                                "observed_mm": _round(residual),
+                                "minimum_wall_mm": _round(
+                                    minimum_wall_mm
+                                ),
+                                "reason": (
+                                    "residual_material_strip_below_minimum_wall"
+                                ),
+                            }
+                        )
+    unique_failures = _unique_fragment_failures(failures)
+    return {
+        "schema_version": "bgig.flat_material_envelope_certificate.v1",
+        "certified": not unique_failures,
+        "minimum_wall_mm": _round(minimum_wall_mm),
+        "material_rectangle_count": len(material_rectangles),
+        "checked_intersection_count": checked_intersection_count,
+        "failure_count": len(unique_failures),
+        "failures": unique_failures,
+    }
+
+
+def _interior_residual_strips(
+    cut: dict[str, float],
+    material: dict[str, float],
+) -> dict[str, float]:
+    cut_right = cut["x"] + cut["width"]
+    cut_back = cut["y"] + cut["height"]
+    material_right = material["x"] + material["width"]
+    material_back = material["y"] + material["height"]
+    result: dict[str, float] = {}
+    if material["x"] + _EPSILON < cut["x"] < material_right - _EPSILON:
+        result["left"] = cut["x"] - material["x"]
+    if material["x"] + _EPSILON < cut_right < material_right - _EPSILON:
+        result["right"] = material_right - cut_right
+    if material["y"] + _EPSILON < cut["y"] < material_back - _EPSILON:
+        result["front"] = cut["y"] - material["y"]
+    if material["y"] + _EPSILON < cut_back < material_back - _EPSILON:
+        result["back"] = material_back - cut_back
+    return result
+
+
+def _unique_fragment_failures(
+    failures: list[dict[str, object]],
+) -> list[dict[str, object]]:
+    result: list[dict[str, object]] = []
+    seen: set[tuple[tuple[str, str], ...]] = set()
+    for failure in failures:
+        signature = tuple(
+            sorted((str(key), str(value)) for key, value in failure.items())
+        )
+        if signature in seen:
+            continue
+        seen.add(signature)
+        result.append(failure)
+    return result
+
+
 def _reservation_wall_certificate(
     reservation: dict[str, object],
     constraints: list[dict[str, object]],
     *,
     box: dict[str, float],
     minimum_boundary_wall_mm: float,
+    minimum_box_boundary_margin_mm: float,
     sibling_reservations: list[dict[str, object]],
 ) -> dict[str, object]:
     footprint = _xy_rect(reservation["cut_origin_mm"], reservation["cut_size_mm"])
@@ -1378,15 +1609,21 @@ def _reservation_wall_certificate(
     ):
         for side, margin in _rect_box_margins(rect, box).items():
             observed_wall_slacks.append(
-                margin - minimum_boundary_wall_mm
+                margin - minimum_box_boundary_margin_mm
             )
-            if margin + _EPSILON < minimum_boundary_wall_mm:
+            if (
+                margin + _EPSILON
+                < minimum_box_boundary_margin_mm
+            ):
                 failures.append(
                     {
                         "cut_kind": cut_kind,
                         "box_side": side,
                         "minimum_wall_mm": _round(
                             minimum_boundary_wall_mm
+                        ),
+                        "minimum_box_boundary_margin_mm": _round(
+                            minimum_box_boundary_margin_mm
                         ),
                         "observed_wall_mm": _round(margin),
                         "reason": "box_boundary_below_required_wall",
@@ -1467,6 +1704,9 @@ def _reservation_wall_certificate(
         "minimum_box_boundary_wall_mm": _round(
             minimum_boundary_wall_mm
         ),
+        "minimum_box_boundary_margin_mm": _round(
+            minimum_box_boundary_margin_mm
+        ),
         "minimum_observed_wall_slack_mm": _round(
             min(observed_wall_slacks, default=0.0)
         ),
@@ -1488,8 +1728,13 @@ def _refresh_wall_envelope_certificates(
     box = _dimension(
         _mapping(project["box"])["inner_dimensions_mm"]
     )
+    project_layout = _mapping(project["layout"])
     minimum_boundary_wall = float(
-        _mapping(project["layout"])["default_wall_thickness_mm"]
+        project_layout["default_wall_thickness_mm"]
+    )
+    minimum_box_boundary_margin = (
+        minimum_boundary_wall
+        + float(project_layout["container_box_xy_clearance_mm"])
     )
     blockers = [deepcopy(value) for value in _mappings(result.get("blockers", []))]
     failed_ids: list[str] = []
@@ -1500,6 +1745,9 @@ def _refresh_wall_envelope_certificates(
             constraints,
             box=box,
             minimum_boundary_wall_mm=minimum_boundary_wall,
+            minimum_box_boundary_margin_mm=(
+                minimum_box_boundary_margin
+            ),
             sibling_reservations=[
                 sibling
                 for sibling in reservations
@@ -1518,6 +1766,24 @@ def _refresh_wall_envelope_certificates(
                 "Conserve la pose et les corps certifies ou relance un calcul complet.",
             )
         )
+    material_certificate = _material_fragment_certificate(
+        reservations,
+        _placement_material_rectangles(placements),
+        minimum_wall_mm=minimum_boundary_wall,
+    )
+    for reservation in reservations:
+        reservation["final_material_envelope_certificate"] = deepcopy(
+            material_certificate
+        )
+    if not bool(material_certificate["certified"]):
+        blockers.append(
+            _blocker(
+                "TOP_INSET_FINAL_MATERIAL_FRAGMENT_UNCERTIFIED",
+                "La geometrie finale laisserait un fragment de matiere "
+                f"inferieur a {_round(minimum_boundary_wall)} mm.",
+                "Conserve la pose minimale ou refuse-la ; ne deplace pas la reservation en finalisation.",
+            )
+        )
     result["blockers"] = _unique_blockers(blockers)
     result["status"] = (
         "blocked"
@@ -1529,6 +1795,12 @@ def _refresh_wall_envelope_certificates(
     invariants["minimum_box_boundary_wall_certified"] = not failed_ids
     invariants["minimum_separated_flat_zone_wall_certified"] = (
         not failed_ids
+    )
+    invariants["final_material_fragments_certified"] = bool(
+        material_certificate["certified"]
+    )
+    result["final_material_envelope_certificate"] = (
+        material_certificate
     )
     return result
 

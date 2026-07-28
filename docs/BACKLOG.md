@@ -43,9 +43,10 @@
 
 ### P64-L09U-R7-C3 — Recertification finale
 
-- Statut : `ready`.
+- Statut : `done`, `automated-validated`.
 - Refuser tout fragment de matière final sous le minimum.
 - Conserver ou refuser la pose minimale, jamais la déplacer.
+- Validation : `66/66`; zéro micro-prisme/coupe sur les deux replays.
 
 ### P64-L09U-R7-C — Placement et parois
 

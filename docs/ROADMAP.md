@@ -18,8 +18,8 @@ P64-L09U-R6-V human-KO 0.1.77
   -> R7-B ADR placement, pile et grille 0,1 mm
   -> R7-C1 grille candidats [done]
   -> R7-C2 placement/parois minimales [done]
-  -> R7-C3 recertification composite [current]
-  -> R7-D empilement et matérialisation exacts
+  -> R7-C3 recertification composite [done]
+  -> R7-D empilement et matérialisation exacts [current]
   -> R7-E quantification, migrations et mesures
   -> R7-F validation, candidate et installation
   -> P64-L09U-R7-V gate Fusion humaine

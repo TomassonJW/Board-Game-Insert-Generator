@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from types import SimpleNamespace
 import unittest
 
 from board_game_insert_generator.contextual_local_analysis import (
@@ -10,6 +11,7 @@ from board_game_insert_generator.coupled_finalization import (
     _build_frozen_cavity_access_cuts,
     _conservative_closure_guard_zones,
     _resolve_final_cavity_contracts,
+    _split_composite_owner_prisms,
 )
 from board_game_insert_generator.partition_cad import build_partition_cad
 from board_game_insert_generator.partition_result_view import (
@@ -429,6 +431,59 @@ class P64L09UR3DepthLocalInsetsTests(unittest.TestCase):
         self.assertEqual(
             max(depths_by_rect.values()),
             5.0,
+        )
+
+    def test_low_body_is_not_split_by_unreachable_top_cut(self) -> None:
+        owner = SimpleNamespace(
+            prisms=(
+                SimpleNamespace(
+                    origin_mm=(0.4, 0.4, 0.0),
+                    size_mm=(40.0, 30.0, 10.0),
+                ),
+            )
+        )
+        reservation = {
+            "id": "top-inset:board",
+            "flat_item_id": "board",
+            "cut_origin_mm": {"x": 1.6, "y": 1.6},
+            "cut_size_mm": {"x": 20.0, "y": 15.0},
+            "support_plane_z_mm": 18.0,
+            "inset_depth_from_top_mm": 2.0,
+            "total_thickness_mm": 2.0,
+            "grip_zone": {
+                "origin_mm": {"x": 21.6, "y": 6.0},
+                "size_mm": {"x": 8.0, "y": 4.0},
+            },
+            "local_depth_regions": [
+                {
+                    "id": "top-inset:board:local-region:0000",
+                    "cut_origin_mm": {"x": 1.6, "y": 1.6},
+                    "cut_size_mm": {"x": 20.0, "y": 15.0},
+                    "layer_bottom_z_mm": 18.0,
+                    "layer_top_z_mm": 20.0,
+                }
+            ],
+        }
+
+        cells = _split_composite_owner_prisms(
+            owner,
+            [reservation],
+            [],
+        )
+
+        self.assertEqual(len(cells), 1)
+        self.assertEqual(cells[0]["final_size_mm"], (40.0, 30.0, 10.0))
+
+    def test_final_material_certificate_reaches_fusion_plan(self) -> None:
+        certificate = self.stepped_plan["finalization"][
+            "composite_materialization_certificate"
+        ]["final_material_envelope_certificate"]
+
+        self.assertTrue(certificate["certified"])
+        self.assertEqual(certificate["failure_count"], 0)
+        self.assertEqual(
+            self.stepped_fusion.final_material_envelope_certificate,
+            certificate,
         )
 
     def test_micro_overlap_smaller_than_a_wall_anchors_the_full_cavity(

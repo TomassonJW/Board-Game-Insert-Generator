@@ -10,6 +10,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping
@@ -723,6 +724,7 @@ class FusionGenerationPlan:
     additive_prism_joins: tuple[FusionAdditivePrismPlan, ...] = ()
     finger_notch_cuts: tuple[FusionFingerNotchCutPlan, ...] = ()
     artifact_identity: dict[str, object] | None = None
+    final_material_envelope_certificate: dict[str, object] | None = None
     generation_mode: str = DEFAULT_FUSION_GENERATION_MODE
     validation_status: str = FUSION_MANUAL_VALIDATION_REQUIRED
 
@@ -806,6 +808,9 @@ class FusionGenerationPlan:
             },
             "finger_notch_cuts": [cut.to_dict() for cut in self.finger_notch_cuts],
             "artifact_identity": self.artifact_identity,
+            "final_material_envelope_certificate": (
+                self.final_material_envelope_certificate
+            ),
             "generation_mode": self.generation_mode,
             "validation_status": self.validation_status,
         }
@@ -2940,6 +2945,41 @@ def generation_plan_from_cad_ir(
     generation_mode = _validated_generation_mode(generation_mode)
     metadata = validated_payload.get("metadata", {})
     artifact_identity = _artifact_identity_from_metadata(metadata)
+    final_material_envelope_certificate = None
+    if isinstance(metadata, dict):
+        box_fill_plan = metadata.get("box_fill_plan")
+        if isinstance(box_fill_plan, dict):
+            composite_certificate = box_fill_plan.get(
+                "composite_materialization_certificate"
+            )
+            if isinstance(composite_certificate, dict):
+                raw_certificate = composite_certificate.get(
+                    "final_material_envelope_certificate"
+                )
+                if isinstance(raw_certificate, dict):
+                    if raw_certificate.get("certified") is not True:
+                        raise FusionSkeletonError(
+                            "CAD IR final material envelope is not certified."
+                        )
+                    final_material_envelope_certificate = deepcopy(
+                        raw_certificate
+                    )
+            top_insets = box_fill_plan.get("top_inset_reservations")
+            if isinstance(top_insets, dict):
+                raw_certificate = top_insets.get(
+                    "final_material_envelope_certificate"
+                )
+                if (
+                    final_material_envelope_certificate is None
+                    and isinstance(raw_certificate, dict)
+                ):
+                    if raw_certificate.get("certified") is not True:
+                        raise FusionSkeletonError(
+                            "CAD IR final material envelope is not certified."
+                        )
+                    final_material_envelope_certificate = deepcopy(
+                        raw_certificate
+                    )
     _validate_artifact_cad_ir_digest(validated_payload, artifact_identity)
     project_name = (
         metadata.get("project_name")
@@ -3108,6 +3148,9 @@ def generation_plan_from_cad_ir(
         additive_prism_joins=tuple(additive_prism_joins),
         finger_notch_cuts=tuple(finger_notch_cuts),
         artifact_identity=artifact_identity,
+        final_material_envelope_certificate=(
+            final_material_envelope_certificate
+        ),
         generation_mode=generation_mode,
     )
 

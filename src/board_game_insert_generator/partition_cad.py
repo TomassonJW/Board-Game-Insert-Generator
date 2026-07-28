@@ -196,6 +196,13 @@ def build_partition_cad(
                 "score_breakdown": plan.get("score_breakdown"),
                 "volume_conservation": plan.get("validation"),
                 "top_inset_reservations": plan.get("top_inset_reservations"),
+                "composite_materialization_certificate": (
+                    _mapping(plan.get("finalization"), "partition.finalization").get(
+                        "composite_materialization_certificate"
+                    )
+                    if isinstance(plan.get("finalization"), dict)
+                    else None
+                ),
                 "invariants": plan.get("invariants"),
                 "free_regions_materialized": False,
                 "automatic_body_count": 0,

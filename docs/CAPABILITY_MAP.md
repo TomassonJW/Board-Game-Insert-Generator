@@ -5,17 +5,17 @@
 
 - `C-CAVITY` : acquis R6 humainement confirmé pour la profondeur et les accès ;
   régressions obligatoires pendant R7.
-- `C-RESERVATION` : marges de boîte, séparation des zones et score utile
-  `automated-validated`; fragments composites et ordre vertical restent ouverts.
+- `C-RESERVATION` : placement, marges et fragments composites
+  `automated-validated`; ordre vertical automatique encore ouvert.
 - `C-GLOBAL-LAYOUT` : contrat incomplet ; la frontière minimale ne porte pas
   encore toute la compatibilité de placement finale.
-- `C-FINALIZATION` : recertifie des poses incomplètement contraintes et
-  transmet des micro-coupes.
+- `C-FINALIZATION` : certificat final de matière `automated-validated`, sans
+  déplacement silencieux ni micro-prisme/coupe sur les deux replays.
 - `C-CAD-IR`, `C-PREVIEW`, `C-FUSION` : propagation observable mais résultat
   humain faux ; `fusion-validated=false`.
 - `C-QUANTIZATION` : `implemented-core` pour candidats, empreintes et prises
   XY ; propagation finale encore partielle.
-- `C-QUALITY` : C2 passe `62/62`; deux replays personnels exacts, SHA inchangés.
+- `C-QUALITY` : C3 passe `66/66`; deux replays personnels exacts, SHA inchangés.
 - `C-RELEASE` : 0.1.77 `human-KO`, `do-not-run`; aucune candidate R7 encore.
 - `C-PRINT` : `print-validated=false`.
 
