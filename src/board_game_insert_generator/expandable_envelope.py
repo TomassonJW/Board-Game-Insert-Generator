@@ -11,6 +11,13 @@ from copy import deepcopy
 from math import isfinite
 
 from board_game_insert_generator.container_derivation import derive_container_plan
+from board_game_insert_generator.product_grid import (
+    ceil_mm,
+    floor_mm,
+    nearest_mm,
+    nearest_ticks,
+    ticks_to_mm,
+)
 from board_game_insert_generator.project_v1 import normalize_project_draft
 
 
@@ -101,9 +108,29 @@ def _contract_for_container(
 ) -> dict[str, object]:
     group_id = str(container["container_group_id"])
     expansion_axes = {axis: bool(_mapping(group["expansion_axes"])[axis]) for axis in _AXES}
-    locked = _nullable_dimension(group["locked_outer_dimensions_mm"])
+    source_locked = _source_nullable_dimension(
+        group["locked_outer_dimensions_mm"]
+    )
+    locked = {
+        axis: (
+            nearest_mm(value)
+            if value is not None
+            else None
+        )
+        for axis, value in source_locked.items()
+    }
     dimension_modes = {axis: str(_mapping(group["dimension_modes"])[axis]) for axis in _AXES}
-    target_dimensions = _nullable_dimension(group["target_outer_dimensions_mm"])
+    source_target_dimensions = _source_nullable_dimension(
+        group["target_outer_dimensions_mm"]
+    )
+    target_dimensions = {
+        axis: (
+            nearest_mm(value)
+            if value is not None
+            else None
+        )
+        for axis, value in source_target_dimensions.items()
+    }
     constraints = {
         "expansion_axes": expansion_axes,
         "locked_outer_dimensions_mm": locked,
@@ -131,13 +158,35 @@ def _contract_for_container(
             "warnings": deepcopy(container["warnings"]),
         }
 
-    minimum = _dimension(container["outer_dimensions_mm"])
+    source_minimum = _dimension(container["outer_dimensions_mm"])
+    minimum = {
+        axis: ceil_mm(value)
+        for axis, value in source_minimum.items()
+    }
+    constraints["product_grid_migration_v1"] = {
+        "schema_version": "bgig.product_grid_migration.v1",
+        "source_minimum_outer_envelope_mm": source_minimum,
+        "effective_minimum_outer_envelope_mm": deepcopy(minimum),
+        "source_locked_outer_dimensions_mm": source_locked,
+        "effective_locked_outer_dimensions_mm": deepcopy(locked),
+        "source_target_outer_dimensions_mm": source_target_dimensions,
+        "effective_target_outer_dimensions_mm": deepcopy(target_dimensions),
+        "source_project_written": False,
+    }
     final = _resolve_final(minimum, locked, proposal, group_id)
     blockers = list(base_blockers)
-    limits = _dimension(_mapping(derived["box_limits_mm"])["inner_dimensions_mm"])
+    limits = {
+        axis: floor_mm(value)
+        for axis, value in _dimension(
+            _mapping(derived["box_limits_mm"])["inner_dimensions_mm"]
+        ).items()
+    }
     limits["z"] = float(_mapping(derived["box_limits_mm"])["usable_height_mm"])
     if available_outer_dimensions is not None:
-        limits = _dimension(available_outer_dimensions)
+        limits = {
+            axis: floor_mm(value)
+            for axis, value in _dimension(available_outer_dimensions).items()
+        }
     for axis in _AXES:
         if locked[axis] is not None and locked[axis] + _EPSILON < minimum[axis]:
             blockers.append(
@@ -259,13 +308,15 @@ def _proposal_mapping(value: object | None) -> dict[str, object]:
 def _surplus_distribution(surplus: dict[str, float]) -> dict[str, float]:
     # The minimum-envelope XY frame stays frozen.  Z surplus remains material
     # until finalization deterministically anchors each calibrated cavity.
-    left = _round(surplus["x"] / 2.0)
-    front = _round(surplus["y"] / 2.0)
+    surplus_x_ticks = nearest_ticks(surplus["x"])
+    surplus_y_ticks = nearest_ticks(surplus["y"])
+    left = ticks_to_mm(surplus_x_ticks // 2)
+    front = ticks_to_mm(surplus_y_ticks // 2)
     return {
         "left": left,
-        "right": _round(surplus["x"] - left),
+        "right": ticks_to_mm(surplus_x_ticks - surplus_x_ticks // 2),
         "front": front,
-        "back": _round(surplus["y"] - front),
+        "back": ticks_to_mm(surplus_y_ticks - surplus_y_ticks // 2),
         "below": surplus["z"],
         "above": 0.0,
     }
@@ -300,5 +351,13 @@ def _nullable_dimension(value: object) -> dict[str, float | None]:
     }
 
 
+def _source_nullable_dimension(value: object) -> dict[str, float | None]:
+    raw = _mapping(value)
+    return {
+        axis: None if raw[axis] is None else float(raw[axis])
+        for axis in _AXES
+    }
+
+
 def _round(value: float) -> float:
-    return round(float(value), 4)
+    return nearest_mm(float(value))

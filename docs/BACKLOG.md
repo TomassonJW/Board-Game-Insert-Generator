@@ -66,11 +66,13 @@
 - Statut : `done`, `automated-validated`.
 - Zéro longueur effective hors grille sur les deux replays.
 - Migration sans écriture et digest fonctionnel en ticks.
-- Validation : `77/77`; aucun gain de temps revendiqué.
+- Extension E2 : allocation volumétrique et surplus en ticks entiers.
+- Validation : `120/120` ciblés et `926/926` autorisés ; aucun gain de temps
+  revendiqué.
 
 ### P64-L09U-R7-F — Candidate et gate
 
-- Statut : `ready`.
+- Statut : `in-progress`, suite autorisée verte.
 - La gate Fusion finale reste humaine.
 
 ### Historique R6

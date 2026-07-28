@@ -1056,14 +1056,21 @@ def _container_participant(
         default_floor_mm=default_floor_mm,
         storage_height_mm=storage_height_mm,
     )
+    grid_migration = _mapping(constraints["product_grid_migration_v1"])
     return {
         "id": f"container:{contract['container_group_id']}",
         "role": "container",
         "container_group_id": contract["container_group_id"],
         "name": contract["container_name"],
         "minimum_local_mm": minimum,
+        "product_grid_source_minimum_local_mm": deepcopy(
+            grid_migration["source_minimum_outer_envelope_mm"]
+        ),
         "dimension_modes": deepcopy(constraints["dimension_modes"]),
         "target_local_mm": deepcopy(constraints["target_outer_dimensions_mm"]),
+        "product_grid_source_target_local_mm": deepcopy(
+            grid_migration["source_target_outer_dimensions_mm"]
+        ),
         "surplus_preference": constraints["surplus_preference"],
         "external_clearance_effective_v1": deepcopy(group["clearance_effective_v1"]),
         "top_inset_search_hint_v1": search_hint,

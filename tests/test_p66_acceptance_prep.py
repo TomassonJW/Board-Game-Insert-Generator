@@ -11,6 +11,7 @@ from unittest.mock import patch
 
 from board_game_insert_generator.partition_cad import PARTITION_CAD_STATUS_READY
 from board_game_insert_generator.partition_solver import solve_partition_plan
+from board_game_insert_generator.product_grid import is_on_product_grid
 from board_game_insert_generator.project_v1 import blank_project_v1, normalize_project_draft
 
 
@@ -69,8 +70,8 @@ class P66AcceptancePreparationTests(unittest.TestCase):
         self.assertEqual(first["partition"], second["partition"])
         self.assertEqual(first["summary"], {
             "status": "constructed",
-            "plan_digest": "5d899fd96e1a02df42404c96b863686ead89f17663e7d105ced5914b7af572d8",
-            "cad_digest": "7822eb866fb20e0ddf5c4ac0eda9669d9b8d69fb45d2efbc93df6c379262807b",
+            "plan_digest": "367c7e252cdb38dca08158374fca681817a43ba5661c8a75440c4299c6e12550",
+            "cad_digest": "4213ef613be05094f94d9ad5ca94275104b1744c70ac1cb1a3a264d00576aad6",
             "source_digest": "b50079b71a9d8efe76c94c563992d293897177561ccccfff46068213b1afa640",
             "materializable": True,
             "cad_ready": True,
@@ -90,18 +91,45 @@ class P66AcceptancePreparationTests(unittest.TestCase):
         self.assertEqual([stage["origin_z_mm"] for stage in plan["stages"]], [0.0, 35.6])
         self.assertEqual(plan["stage_support"]["status"], "supported")
         self.assertEqual(plan["top_inset_reservations"]["summary"]["reservation_count"], 2)
-        self.assertEqual(plan["top_inset_reservations"]["summary"]["cut_count"], 16)
+        self.assertEqual(plan["top_inset_reservations"]["summary"]["cut_count"], 14)
         self.assertEqual(plan["top_inset_reservations"]["summary"]["cavity_depth_compensation_count"], 0)
         self.assertEqual(cad["status"], PARTITION_CAD_STATUS_READY)
         self.assertEqual(cad["materialization"]["component_count"], 8)
         self.assertEqual(cad["materialization"]["cavity_count"], 9)
-        self.assertEqual(cad["materialization"]["top_inset_cut_count"], 16)
+        self.assertEqual(cad["materialization"]["top_inset_cut_count"], 14)
         body_names = [item["body"]["name"] for item in cad["cad_ir"]["components"]]
         self.assertEqual(len(body_names), len(set(body_names)))
         self.assertEqual(len(fusion["compact_occurrences"]), 8)
         self.assertEqual(fusion["exploded_occurrences"], [])
-        self.assertEqual(len(fusion["cavity_cuts"]), 25)
+        self.assertEqual(len(fusion["cavity_cuts"]), 23)
         self.assertTrue(all(item["linked_component"] for item in fusion["compact_occurrences"]))
+        c2 = next(
+            item
+            for item in plan["placements"]
+            if item.get("container_group_id") == "c2"
+        )
+        migration = c2["product_grid_migration_v1"]
+        self.assertEqual(migration["source_target_local_mm"]["x"], 79.0667)
+        self.assertEqual(migration["effective_target_local_mm"]["x"], 79.1)
+        self.assertIn("x", migration["changed_axes"])
+        self.assertFalse(migration["source_project_written"])
+        self.assertEqual(raw["container_groups"][3]["locked_outer_dimensions_mm"]["x"], 79.0667)
+        for placement in plan["placements"]:
+            for field in ("origin_mm", "world_size_mm"):
+                self.assertTrue(
+                    all(
+                        is_on_product_grid(float(value))
+                        for value in placement[field].values()
+                    )
+                )
+        for cut in fusion["cavity_cuts"]:
+            for field in ("cut_origin_mm", "cut_size_mm"):
+                self.assertTrue(
+                    all(
+                        is_on_product_grid(float(value))
+                        for value in cut[field].values()
+                    )
+                )
 
     def test_bridge_lifecycle_axes_import_session_and_minimal_gate_are_explicit(self) -> None:
         raw = json.loads(COMPLETE_FIXTURE.read_text(encoding="utf-8"))

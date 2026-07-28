@@ -33,8 +33,13 @@
   intervalles Z exacts jusqu'au plan Fusion et résiduel additif nul.
 - R7-E est terminé : zéro longueur effective hors grille sur les deux replays,
   migrations sans écriture, digest en ticks et finaliseur v13.
-- La prochaine mission est R7-F : suite autorisée, package, installation et
-  ouverture de la gate humaine.
+- R7-E2 est terminé : l'allocation volumétrique générale distribue aussi les
+  surplus en ticks ; la source P66 `79,0667 mm` reste tracée et l'effectif vaut
+  `79,1 mm`.
+- La suite autorisée passe `926/926`, un test ignoré et les douze modules
+  benchmark/corpus/tournoi exclus avant import.
+- La prochaine mission est la fin de R7-F : package, installation et ouverture
+  de la gate humaine.
 - Aucun benchmark/holdout/corpus/tournoi, aucune UI manuelle ;
   `fusion-validated=false`, `print-validated=false`.
 
@@ -49,6 +54,7 @@ Autorités R7 :
 - `docs/P64_L09U_R7_C3_FINAL_MATERIAL_RECERTIFICATION_EVIDENCE.md`.
 - `docs/P64_L09U_R7_D_AUTOMATIC_STACK_AND_MATERIALIZATION_EVIDENCE.md`.
 - `docs/P64_L09U_R7_E_PRODUCT_GRID_AND_MIGRATION_EVIDENCE.md`.
+- `docs/P64_L09U_R7_E2_FULL_LAYOUT_GRID_EVIDENCE.md`.
 
 ### Historique R6 clôturé en human-KO
 

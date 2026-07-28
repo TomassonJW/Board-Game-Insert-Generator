@@ -21,6 +21,7 @@ P64-L09U-R6-V human-KO 0.1.77
   -> R7-C3 recertification composite [done]
   -> R7-D empilement et matérialisation exacts [done]
   -> R7-E quantification, migrations et mesures [done]
+  -> R7-E2 dispositions volumétriques en ticks [done]
   -> R7-F validation, candidate et installation [current]
   -> P64-L09U-R7-V gate Fusion humaine
 ```

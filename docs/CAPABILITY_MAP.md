@@ -7,20 +7,21 @@
   régressions obligatoires pendant R7.
 - `C-RESERVATION` : placement, marges, fragments et ordre vertical automatique
   `automated-validated`.
-- `C-GLOBAL-LAYOUT` : contrat incomplet ; la frontière minimale ne porte pas
-  encore toute la compatibilité de placement finale.
+- `C-GLOBAL-LAYOUT` : placement, enveloppes, allocations de surplus et
+  frontières finales `automated-validated` sur la grille produit.
 - `C-FINALIZATION` : certificat final de matière `automated-validated`, sans
   déplacement silencieux ni micro-prisme/coupe sur les deux replays.
 - `C-CAD-IR`, `C-PREVIEW`, `C-FUSION` : ordre, intervalles et certificat final
   propagés ; observation réelle encore requise, `fusion-validated=false`.
 - `C-QUANTIZATION` : `automated-validated`, zéro valeur effective hors grille
   dans le plan, la finalisation, la CAD IR et le plan Fusion des deux replays.
-- `C-QUALITY` : E passe `77/77`; deux replays personnels exacts, SHA inchangés.
+- `C-QUALITY` : `120/120` ciblés et `926/926` autorisés ; deux replays
+  personnels exacts, SHA inchangés.
 - `C-RELEASE` : 0.1.77 `human-KO`, `do-not-run`; aucune candidate R7 encore.
 - `C-PRINT` : `print-validated=false`.
 
-ADR-0103 et ADR-0104 sont acceptées. R7-C et R7-D sont validés
-automatiquement ; R7-F est la prochaine mission.
+ADR-0103 et ADR-0104 sont acceptées. R7-C à R7-E2 sont validés
+automatiquement ; le package et l'installation R7-F restent à faire.
 
 ### Historique R6 clôturé en human-KO
 

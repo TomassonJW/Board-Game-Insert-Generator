@@ -61,9 +61,18 @@ R7-E est terminé :
 - aucun gain de performance revendiqué ;
 - `77/77`, deux SHA personnels inchangés.
 
-Prochaine mission unique : exécuter la suite autorisée complète, relire le
-diff, construire et installer la candidate Fusion, puis ouvrir uniquement la
-nouvelle gate humaine.
+R7-E2 et la validation complète sont terminés :
+
+- allocation volumétrique et surplus d'enveloppe en ticks entiers ;
+- migration P66 `79,0667 -> 79,1 mm` sans écrire le projet source ;
+- `120/120` tests ciblés élargis ;
+- `926/926` tests autorisés, un test ignoré ;
+- douze modules benchmark/corpus/tournoi exclus avant import ;
+- audits `5 453/5 453` et `5 888/5 888` sur la grille ;
+- deux SHA personnels inchangés.
+
+Prochaine mission unique : relire le diff, construire et installer la candidate
+Fusion, puis ouvrir uniquement la nouvelle gate humaine.
 
 Contrat : `docs/P64_L09U_R7_END_TO_END_RUNBOOK.md`.
 Preuve : `docs/P64_L09U_R6_V_0177_HUMAN_KO_EVIDENCE.md`.
@@ -77,6 +86,8 @@ Preuve D :
 `docs/P64_L09U_R7_D_AUTOMATIC_STACK_AND_MATERIALIZATION_EVIDENCE.md`.
 Preuve E :
 `docs/P64_L09U_R7_E_PRODUCT_GRID_AND_MIGRATION_EVIDENCE.md`.
+Preuve E2 :
+`docs/P64_L09U_R7_E2_FULL_LAYOUT_GRID_EVIDENCE.md`.
 
 Aucun benchmark/holdout/corpus/tournoi. Les projets personnels restent en
 lecture seule. `fusion-validated=false`, `print-validated=false`.

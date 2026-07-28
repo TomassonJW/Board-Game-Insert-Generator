@@ -11,7 +11,8 @@ Statut : `P64-L09U-R6-V-human-KO`, `do-not-run`,
 `P64-L09U-R7-C2-automated-validated`,
 `P64-L09U-R7-C3-automated-validated`,
 `P64-L09U-R7-D-automated-validated`,
-`P64-L09U-R7-E-automated-validated`, `P64-L09U-R7-F-ready`,
+`P64-L09U-R7-E-automated-validated`,
+`P64-L09U-R7-E2-automated-validated`, `P64-L09U-R7-F-in-progress`,
 `fusion-validated=false`, `print-validated=false`.
 
 - 0.1.77 est `human-KO`, `do-not-run`.
@@ -48,11 +49,14 @@ Statut : `P64-L09U-R6-V-human-KO`, `do-not-run`,
   `[65,8 ; 69,8]`, identiques jusqu'au plan Fusion.
 - Volume additif résiduel au-dessus des corps finaux : `0 mm³`.
 - Validation D : `75/75`; deux SHA personnels inchangés.
-- E audite `5451` puis `5886` longueurs effectives, zéro hors grille.
+- E2 audite `5453` puis `5888` longueurs effectives, zéro hors grille.
 - Migrations sans écriture, digest fonctionnel en ticks et finaliseur v13.
 - `131` puis `156` ancres fusionnées ; aucun gain de temps revendiqué.
-- Validation E : `77/77`; deux SHA personnels inchangés.
-- Prochaine mission : suite autorisée complète, package et installation.
+- L'allocation volumétrique P66 distribue les surplus en ticks et trace
+  `79,0667 -> 79,1 mm` sans écrire la source.
+- Validation : `120/120` ciblés, `926/926` autorisés, un test ignoré et douze
+  modules interdits exclus avant import ; deux SHA personnels inchangés.
+- Prochaine mission : package et installation.
 - Aucun benchmark/holdout/corpus/tournoi ; aucune UI manuelle.
 
 Preuve humaine :
@@ -71,6 +75,8 @@ Preuve D :
 `docs/P64_L09U_R7_D_AUTOMATIC_STACK_AND_MATERIALIZATION_EVIDENCE.md`.
 Preuve E :
 `docs/P64_L09U_R7_E_PRODUCT_GRID_AND_MIGRATION_EVIDENCE.md`.
+Preuve E2 :
+`docs/P64_L09U_R7_E2_FULL_LAYOUT_GRID_EVIDENCE.md`.
 
 ### Historique R6 clôturé en human-KO
 

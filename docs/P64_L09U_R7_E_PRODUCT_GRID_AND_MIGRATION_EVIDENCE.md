@@ -80,8 +80,8 @@ Résultats :
 
 | Cas | longueurs effectives contrôlées | hors grille |
 |---|---:|---:|
-| CasLimite02++ | 5 451 | 0 |
-| CasLimite02+ | 5 886 | 0 |
+| CasLimite02++ | 5 453 | 0 |
+| CasLimite02+ | 5 888 | 0 |
 
 Les valeurs physiques sources et les valeurs « avant grille » sont exclues de
 l'audit effectif, mais restent visibles dans le rapport de migration.
@@ -132,3 +132,10 @@ SHA-256 personnels avant/après :
   `83e9e90a6bfd86b18d3a157077a0e63dc2f543ddab626adb2151e269e01d9743`
 
 Ils sont strictement inchangés.
+
+## Extension E2 après suite autorisée
+
+La suite autorisée a détecté un ancien chemin volumétrique qui répartissait
+encore des surplus à quatre décimales. La correction et les identités
+actualisées sont consignées dans
+`docs/P64_L09U_R7_E2_FULL_LAYOUT_GRID_EVIDENCE.md`.

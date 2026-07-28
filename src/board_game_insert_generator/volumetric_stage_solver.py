@@ -15,7 +15,12 @@ from math import ceil, isclose
 from typing import Any
 
 from board_game_insert_generator.material_support import envelope_support_contract
-from board_game_insert_generator.product_grid import ceil_mm, nearest_mm
+from board_game_insert_generator.product_grid import (
+    ceil_mm,
+    nearest_mm,
+    nearest_ticks,
+    ticks_to_mm,
+)
 
 
 VOLUMETRIC_STAGE_SOLVER_SCHEMA_V1 = "bgig.volumetric_stage_solver.v1"
@@ -439,9 +444,9 @@ def _candidate_for_groups(
             reaches_top = isclose(body_height, stage_height, abs_tol=0.001)
             all_reach_stage_top = all_reach_stage_top and reaches_top
             world_size = {
-                "x": _round(float(item_layout["world_size_mm"]["x"])),
-                "y": _round(float(item_layout["world_size_mm"]["y"])),
-                "z": _round(body_height),
+                "x": _grid_mm(float(item_layout["world_size_mm"]["x"])),
+                "y": _grid_mm(float(item_layout["world_size_mm"]["y"])),
+                "z": _grid_mm(body_height),
             }
             rotated = bool(item_layout["rotated_xy"])
             local_final = {
@@ -454,17 +459,17 @@ def _candidate_for_groups(
                 "role": item["role"],
                 "name": item["name"],
                 "origin_mm": {
-                    "x": _round(float(item_layout["origin_mm"]["x"])),
-                    "y": _round(float(item_layout["origin_mm"]["y"])),
-                    "z": _round(stage_bottom),
+                    "x": _grid_mm(float(item_layout["origin_mm"]["x"])),
+                    "y": _grid_mm(float(item_layout["origin_mm"]["y"])),
+                    "z": _grid_mm(stage_bottom),
                 },
                 "world_size_mm": world_size,
                 "rotation_deg_z": 90 if rotated else 0,
                 "final_outer_dimensions_mm": _rounded(local_final),
                 "stage_id": stage_id,
                 "stage_index": stage_index,
-                "stage_bottom_z_mm": _round(stage_bottom),
-                "stage_top_z_mm": _round(stage_top),
+                "stage_bottom_z_mm": _grid_mm(stage_bottom),
+                "stage_top_z_mm": _grid_mm(stage_top),
                 "reaches_stage_top": reaches_top,
                 "dimension_contract": _dimension_contract(item, local_final),
                 "printable": True,
@@ -472,6 +477,10 @@ def _candidate_for_groups(
             }
             if "external_clearance_effective_v1" in item:
                 placement["external_clearance_effective_v1"] = deepcopy(item["external_clearance_effective_v1"])
+            if "product_grid_migration_v1" in item:
+                placement["product_grid_migration_v1"] = deepcopy(
+                    item["product_grid_migration_v1"]
+                )
             for key in ("container_group_id", "requested_complement_id", "complement_kind"):
                 if key in item:
                     placement[key] = item[key]
@@ -485,12 +494,12 @@ def _candidate_for_groups(
                         {
                             "x": placement["origin_mm"]["x"],
                             "y": placement["origin_mm"]["y"],
-                            "z": _round(stage_bottom + body_height),
+                            "z": _grid_mm(stage_bottom + body_height),
                         },
                         {
                             "x": world_size["x"],
                             "y": world_size["y"],
-                            "z": _round(stage_height - body_height),
+                            "z": _grid_mm(stage_height - body_height),
                         },
                         "above_fixed_body",
                     )
@@ -500,8 +509,8 @@ def _candidate_for_groups(
                 _residual_zone(
                     f"residual:{stage_id}:xy:{zone['id']}",
                     stage_id,
-                    {"x": zone["x"], "y": zone["y"], "z": _round(stage_bottom)},
-                    {"x": zone["width"], "y": zone["height"], "z": _round(stage_height)},
+                    {"x": zone["x"], "y": zone["y"], "z": _grid_mm(stage_bottom)},
+                    {"x": zone["width"], "y": zone["height"], "z": _grid_mm(stage_height)},
                     str(zone["kind"]),
                 )
             )
@@ -509,14 +518,14 @@ def _candidate_for_groups(
             {
                 "id": stage_id,
                 "index": stage_index,
-                "origin_z_mm": _round(stage_bottom),
-                "height_mm": _round(stage_height),
-                "top_z_mm": _round(stage_top),
+                "origin_z_mm": _grid_mm(stage_bottom),
+                "height_mm": _grid_mm(stage_height),
+                "top_z_mm": _grid_mm(stage_top),
                 "body_ids": [str(item["id"]) for item in stage_placements],
                 "body_count": len(stage_placements),
                 "row_count": int(layout["row_count"]),
                 "xy_status": "complete" if layout["complete"] else "with_residuals",
-                "clearance_above_mm": _round(stage_gaps[stage_index] if stage_index < len(stage_gaps) else 0.0),
+                "clearance_above_mm": _grid_mm(stage_gaps[stage_index] if stage_index < len(stage_gaps) else 0.0),
             }
         )
         cursor_z = stage_top + (stage_gaps[stage_index] if stage_index < len(stage_gaps) else 0.0)
@@ -695,9 +704,9 @@ def _candidate_for_stacks(
             participant = _mapping(member["participant"])
             rotated = bool(member["rotated_xy"])
             world_size = {
-                "x": _round(float(world_xy["x"])),
-                "y": _round(float(world_xy["y"])),
-                "z": _round(body_height),
+                "x": _grid_mm(float(world_xy["x"])),
+                "y": _grid_mm(float(world_xy["y"])),
+                "z": _grid_mm(body_height),
             }
             local_final = {
                 "x": world_size["y"] if rotated else world_size["x"],
@@ -709,17 +718,17 @@ def _candidate_for_stacks(
                 "role": participant["role"],
                 "name": participant["name"],
                 "origin_mm": {
-                    "x": _round(float(stack_origin["x"])),
-                    "y": _round(float(stack_origin["y"])),
-                    "z": _round(cursor_z),
+                    "x": _grid_mm(float(stack_origin["x"])),
+                    "y": _grid_mm(float(stack_origin["y"])),
+                    "z": _grid_mm(cursor_z),
                 },
                 "world_size_mm": world_size,
                 "rotation_deg_z": 90 if rotated else 0,
                 "final_outer_dimensions_mm": _rounded(local_final),
                 "stage_id": "",
                 "stage_index": -1,
-                "stage_bottom_z_mm": _round(cursor_z),
-                "stage_top_z_mm": _round(cursor_z + body_height),
+                "stage_bottom_z_mm": _grid_mm(cursor_z),
+                "stage_top_z_mm": _grid_mm(cursor_z + body_height),
                 "reaches_stage_top": True,
                 "stack_id": descriptor["id"],
                 "stack_index": stack_index,
@@ -730,6 +739,10 @@ def _candidate_for_stacks(
             }
             if "external_clearance_effective_v1" in participant:
                 placement["external_clearance_effective_v1"] = deepcopy(participant["external_clearance_effective_v1"])
+            if "product_grid_migration_v1" in participant:
+                placement["product_grid_migration_v1"] = deepcopy(
+                    participant["product_grid_migration_v1"]
+                )
             for key in ("container_group_id", "requested_complement_id", "complement_kind"):
                 if key in participant:
                     placement[key] = participant[key]
@@ -1742,7 +1755,7 @@ def _rebalance_stack_top_height_for_inset(
             break
     if remaining > _EPSILON:
         return None
-    return [_round(value) for value in adjusted]
+    return [_grid_mm(value) for value in adjusted]
 
 def _rectangles_intersect(
     left: dict[str, float],
@@ -1970,31 +1983,31 @@ def _layout_rows(
             body_height = row_height if fill else float(item["base_world_mm"]["y"])
             placements.append({
                 "participant": item["participant"],
-                "origin_mm": {"x": _round(cursor_x), "y": _round(cursor_y)},
-                "world_size_mm": {"x": _round(width), "y": _round(body_height)},
+                "origin_mm": {"x": _grid_mm(cursor_x), "y": _grid_mm(cursor_y)},
+                "world_size_mm": {"x": _grid_mm(width), "y": _grid_mm(body_height)},
                 "rotated_xy": bool(item["rotated_xy"]),
             })
             if not fill and body_height < row_height - _EPSILON:
                 residuals.append({
-                    "id": f"r{row_index}-i{item_index}-above", "x": _round(cursor_x),
-                    "y": _round(cursor_y + body_height), "width": _round(width),
-                    "height": _round(row_height - body_height), "kind": "row_height_residual",
+                    "id": f"r{row_index}-i{item_index}-above", "x": _grid_mm(cursor_x),
+                    "y": _grid_mm(cursor_y + body_height), "width": _grid_mm(width),
+                    "height": _grid_mm(row_height - body_height), "kind": "row_height_residual",
                 })
             cursor_x += width + (gaps[item_index] if item_index < len(gaps) else 0.0)
             rotations += int(bool(item["rotated_xy"]))
         used_x = cursor_x
         if not fill and used_x < box["x"] - right_margin - _EPSILON:
             residuals.append({
-                "id": f"r{row_index}-right", "x": _round(used_x), "y": _round(cursor_y),
-                "width": _round(box["x"] - right_margin - used_x),
-                "height": _round(row_height), "kind": "row_right_residual",
+                "id": f"r{row_index}-right", "x": _grid_mm(used_x), "y": _grid_mm(cursor_y),
+                "width": _grid_mm(box["x"] - right_margin - used_x),
+                "height": _grid_mm(row_height), "kind": "row_right_residual",
             })
         cursor_y += row_height + (row_gaps[row_index] if row_index < len(row_gaps) else 0.0)
     used_y = cursor_y
     if not fill and used_y < box["y"] - back_margin - _EPSILON:
         residuals.append({
-            "id": "back", "x": _round(0.0), "y": _round(used_y),
-            "width": _round(box["x"]), "height": _round(box["y"] - back_margin - used_y),
+            "id": "back", "x": _grid_mm(0.0), "y": _grid_mm(used_y),
+            "width": _grid_mm(box["x"]), "height": _grid_mm(box["y"] - back_margin - used_y),
             "kind": "stage_back_residual",
         })
     target_error = sum(
@@ -2068,25 +2081,37 @@ def _allocate(
     targets: list[float],
     weights: list[float],
 ) -> None:
-    """Distribute amount toward soft targets, then proportionally by minimum size."""
+    """Distribute whole 0.1 mm ticks toward targets, then by minimum size."""
 
-    remaining = max(0.0, amount)
-    if remaining <= _EPSILON or not indexes:
+    remaining_ticks = max(0, nearest_ticks(amount))
+    if remaining_ticks == 0 or not indexes:
         return
     for index in indexes:
-        deficit = max(0.0, float(targets[index]) - values[index])
-        addition = min(deficit, remaining)
-        values[index] += addition
-        remaining -= addition
-        if remaining <= _EPSILON:
+        deficit_ticks = max(
+            0,
+            nearest_ticks(float(targets[index]))
+            - nearest_ticks(values[index]),
+        )
+        addition_ticks = min(deficit_ticks, remaining_ticks)
+        values[index] = ticks_to_mm(
+            nearest_ticks(values[index]) + addition_ticks
+        )
+        remaining_ticks -= addition_ticks
+        if remaining_ticks == 0:
             return
     positive = [max(_EPSILON, float(weights[index])) for index in indexes]
     total = sum(positive)
-    distributed = 0.0
+    distributed_ticks = 0
     for position, (index, weight) in enumerate(zip(indexes, positive)):
-        addition = remaining - distributed if position == len(indexes) - 1 else remaining * weight / total
-        values[index] += addition
-        distributed += addition
+        addition_ticks = (
+            remaining_ticks - distributed_ticks
+            if position == len(indexes) - 1
+            else int(remaining_ticks * weight / total)
+        )
+        values[index] = ticks_to_mm(
+            nearest_ticks(values[index]) + addition_ticks
+        )
+        distributed_ticks += addition_ticks
 
 
 def _support_contract(
@@ -2248,6 +2273,16 @@ def _dimension_contract(
     minimum = _dimension(participant["minimum_local_mm"], "participant.minimum_local_mm")
     modes = _mapping(participant["dimension_modes"])
     targets = _mapping(participant["target_local_mm"])
+    migration_payload = participant.get("product_grid_migration_v1")
+    migration = (
+        _mapping(migration_payload)
+        if isinstance(migration_payload, dict)
+        else {
+            "source_target_local_mm": deepcopy(targets),
+            "changed_axes": [],
+        }
+    )
+    source_targets = _mapping(migration["source_target_local_mm"])
     axes: dict[str, object] = {}
     for axis in _AXES:
         target = targets[axis]
@@ -2261,7 +2296,13 @@ def _dimension_contract(
                 if target is not None
                 else None
             ),
+            "source_target_mm": (
+                float(source_targets[axis])
+                if source_targets[axis] is not None
+                else None
+            ),
             "calculated_mm": nearest_mm(calculated),
+            "product_grid_quantized": axis in migration["changed_axes"],
             "status": "deviated" if deviated else "satisfied",
             "reason": (
                 "La cible souple a ete ajustee pour fermer l etage."
@@ -2323,11 +2364,27 @@ def _participant(value: dict[str, object], index: int) -> dict[str, object]:
     if missing:
         raise VolumetricStageSolverError(f"Participant {index} misses: {', '.join(missing)}.")
     result = deepcopy(value)
-    result["minimum_local_mm"] = _dimension(value["minimum_local_mm"], f"participant[{index}].minimum")
+    source_minimum = _dimension(
+        value.get(
+            "product_grid_source_minimum_local_mm",
+            value["minimum_local_mm"],
+        ),
+        f"participant[{index}].minimum",
+    )
+    result["minimum_local_mm"] = {
+        axis: ceil_mm(source_minimum[axis])
+        for axis in _AXES
+    }
     modes = _mapping(value["dimension_modes"])
     targets = _mapping(value["target_local_mm"])
+    source_target_payload = value.get(
+        "product_grid_source_target_local_mm",
+        value["target_local_mm"],
+    )
+    source_target_values = _mapping(source_target_payload)
     result["dimension_modes"] = {}
     result["target_local_mm"] = {}
+    source_targets: dict[str, float | None] = {}
     for axis in _AXES:
         mode = str(modes.get(axis, "auto"))
         if mode not in {"auto", "target", "fixed"}:
@@ -2335,8 +2392,36 @@ def _participant(value: dict[str, object], index: int) -> dict[str, object]:
         target = targets.get(axis)
         if target is not None and (isinstance(target, bool) or float(target) <= 0.0):
             raise VolumetricStageSolverError(f"Participant {index} has invalid {axis} target.")
+        raw_source_target = source_target_values.get(axis)
+        source_target = (
+            float(raw_source_target)
+            if raw_source_target is not None
+            else None
+        )
+        source_targets[axis] = source_target
         result["dimension_modes"][axis] = mode
-        result["target_local_mm"][axis] = float(target) if target is not None else None
+        result["target_local_mm"][axis] = (
+            nearest_mm(source_target)
+            if source_target is not None
+            else None
+        )
+    changed_axes = [
+        axis
+        for axis in _AXES
+        if (
+            source_minimum[axis] != result["minimum_local_mm"][axis]
+            or source_targets[axis] != result["target_local_mm"][axis]
+        )
+    ]
+    result["product_grid_migration_v1"] = {
+        "schema_version": "bgig.product_grid_migration.v1",
+        "source_minimum_local_mm": source_minimum,
+        "effective_minimum_local_mm": deepcopy(result["minimum_local_mm"]),
+        "source_target_local_mm": source_targets,
+        "effective_target_local_mm": deepcopy(result["target_local_mm"]),
+        "changed_axes": changed_axes,
+        "source_project_written": False,
+    }
     return result
 
 
@@ -2636,7 +2721,7 @@ def _mappings(value: object) -> list[dict[str, Any]]:
 
 
 def _rounded(value: dict[str, object]) -> dict[str, float]:
-    return {axis: _round(float(value[axis])) for axis in _AXES}
+    return {axis: _grid_mm(float(value[axis])) for axis in _AXES}
 
 
 def _area(value: dict[str, object]) -> float:
@@ -2649,3 +2734,7 @@ def _volume(value: dict[str, object]) -> float:
 
 def _round(value: float) -> float:
     return round(float(value), 4)
+
+
+def _grid_mm(value: float) -> float:
+    return nearest_mm(float(value))
