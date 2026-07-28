@@ -120,7 +120,7 @@ if (-not $DryRun) {
             )
             "lib\board_game_insert_generator\coupled_finalization.py" = @(
                 "final_material_envelope_certificate",
-                "material_fragment_rejections"
+                "final_material_fragments_certified"
             )
         }
         foreach ($relativePath in $requiredMarkers.Keys) {
