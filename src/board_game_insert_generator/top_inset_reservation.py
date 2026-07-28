@@ -88,7 +88,10 @@ def _derive_top_inset_reservations(
         "y": clearance,
         "z": 0.0,
     }
-    ordered = _ordered_flat_items(_mappings(project["flat_items"]))
+    ordered = _ordered_flat_items(
+        _mappings(project["flat_items"]),
+        default_clearance=default_clearance,
+    )
     reservations, blockers, search = _resolve_automatic_xy_layout(
         ordered,
         box=box,
@@ -167,6 +170,9 @@ def _derive_top_inset_reservations(
             "minimum_cavity_wall_envelope_certified": not blockers,
             "minimum_box_boundary_wall_certified": not blockers,
             "minimum_separated_flat_zone_wall_certified": not blockers,
+            "automatic_stack_order_by_oriented_footprint": True,
+            "legacy_stack_order_is_not_automatic_authority": True,
+            "manual_stack_mode_implemented": False,
             "automatic_xy_candidates_on_product_grid": True,
             "required_xy_envelopes_not_rounded_inward": True,
         },
@@ -2170,7 +2176,34 @@ def _resolve_item(
             "name": item["name"],
             "kind": item["kind"],
             "quantity": item["quantity"],
-            "stack_order": item["stack_order"],
+            "stack_order": item["_automatic_stack_order"],
+            "source_stack_order": item["stack_order"],
+            "automatic_stack_order": item[
+                "_automatic_stack_order"
+            ],
+            "stack_order_policy": (
+                "automatic_oriented_footprint_ascending_v1"
+            ),
+            "automatic_stack_key_v1": {
+                "oriented_footprint_area_mm2": item[
+                    "_automatic_stack_key"
+                ][0],
+                "oriented_long_side_mm": item[
+                    "_automatic_stack_key"
+                ][1],
+                "oriented_short_side_mm": item[
+                    "_automatic_stack_key"
+                ][2],
+                "total_thickness_mm": item[
+                    "_automatic_stack_key"
+                ][3],
+                "kind": item["_automatic_stack_key"][4],
+                "flat_item_id": item["_automatic_stack_key"][5],
+            },
+            "stack_order_migration": item[
+                "_stack_order_migration"
+            ],
+            "manual_stack_mode_implemented": False,
             "rotation_deg_z": rotation,
             "placement_source": placement_source,
             "physical_size_mm": {
@@ -2339,15 +2372,65 @@ def _cavity_world_bounds(
     return {"x": x, "y": y, "width": width, "height": height, "depth": cavity_size["z"]}
 
 
-def _ordered_flat_items(items: list[dict[str, object]]) -> list[dict[str, object]]:
-    return sorted(
+def _ordered_flat_items(
+    items: list[dict[str, object]],
+    *,
+    default_clearance: dict[str, float],
+) -> list[dict[str, object]]:
+    ordered = sorted(
         items,
-        key=lambda item: (
-            item["stack_order"] is None,
-            int(item["stack_order"]) if item["stack_order"] is not None else 0,
-            -_area(_dimension(item["dimensions_mm"])),
-            str(item["id"]),
+        key=lambda item: _automatic_flat_stack_key(
+            item,
+            default_clearance=default_clearance,
         ),
+    )
+    result: list[dict[str, object]] = []
+    for automatic_order, source in enumerate(ordered):
+        item = deepcopy(source)
+        item["_automatic_stack_key"] = _automatic_flat_stack_key(
+            item,
+            default_clearance=default_clearance,
+        )
+        source_order = item.get("stack_order")
+        item["_automatic_stack_order"] = automatic_order
+        item["_stack_order_migration"] = (
+            "automatic_assigned"
+            if source_order is None
+            else (
+                "legacy_matches_automatic"
+                if int(source_order) == automatic_order
+                else "legacy_overridden_by_automatic"
+            )
+        )
+        result.append(item)
+    return result
+
+
+def _automatic_flat_stack_key(
+    item: dict[str, object],
+    *,
+    default_clearance: dict[str, float],
+) -> tuple[object, ...]:
+    dimensions = _dimension(item["dimensions_mm"])
+    effective = item.get("clearance_effective_v1")
+    clearance = (
+        _dimension(_mapping(effective["values_mm"]))
+        if isinstance(effective, dict)
+        else default_clearance
+    )
+    oriented_x = outward_size_mm(
+        dimensions["x"] + 2.0 * clearance["x"]
+    )
+    oriented_y = outward_size_mm(
+        dimensions["y"] + 2.0 * clearance["y"]
+    )
+    return (
+        _round(oriented_x * oriented_y),
+        _round(max(oriented_x, oriented_y)),
+        _round(min(oriented_x, oriented_y)),
+        _round(dimensions["z"] * int(item["quantity"])),
+        str(item["kind"]),
+        str(item["id"]),
     )
 
 

@@ -50,15 +50,20 @@
 
 ### P64-L09U-R7-C — Placement et parois
 
-- Statut : `in-progress` via C1 à C3.
+- Statut : `done`, `automated-validated` via C1 à C3.
 
 ### P64-L09U-R7-D — Pile et matérialisation
 
-- Statut : `pending`, dépend de R7-B et R7-C.
+- Statut : `done`, `automated-validated`.
+- Petit élément sous le grand selon l'empreinte orientée.
+- Ordre source tracé, migration explicite.
+- Intervalles Z identiques jusqu'au plan Fusion.
+- Volume additif résiduel au-dessus des corps finaux : `0 mm³`.
+- Validation : `75/75`; deux replays personnels SHA inchangés.
 
 ### P64-L09U-R7-E — Quantification et migrations
 
-- Statut : `pending`, dépend de R7-B.
+- Statut : `ready`.
 
 ### P64-L09U-R7-F — Candidate et gate
 

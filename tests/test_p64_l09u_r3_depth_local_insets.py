@@ -344,9 +344,18 @@ class P64L09UR3DepthLocalInsetsTests(unittest.TestCase):
             for value in reservations
             if value["flat_item_id"] == "lower-board"
         )
-        lower_depths = {
+        large_top_depths = {
             region["inset_depth_from_top_mm"]
             for region in lower["local_depth_regions"]
+        }
+        booklet = next(
+            value
+            for value in reservations
+            if value["flat_item_id"] == "upper-booklet"
+        )
+        small_bottom_depths = {
+            region["inset_depth_from_top_mm"]
+            for region in booklet["local_depth_regions"]
         }
         view = build_partition_result_view(self.stepped_plan)
         cad_top_cuts = [
@@ -361,7 +370,8 @@ class P64L09UR3DepthLocalInsetsTests(unittest.TestCase):
             if value.cavity_source == "top_inset_reservation"
         ]
 
-        self.assertEqual(lower_depths, {2.0, 5.0})
+        self.assertEqual(large_top_depths, {2.0})
+        self.assertEqual(small_bottom_depths, {5.0})
         self.assertTrue(
             all(
                 value["local_depth_regions"]
@@ -405,8 +415,8 @@ class P64L09UR3DepthLocalInsetsTests(unittest.TestCase):
                 for value in overlap_cuts
             },
             {
-                ("lower-board", 54.6, 56.6),
-                ("upper-booklet", 56.6, 59.6),
+                ("upper-booklet", 54.6, 57.6),
+                ("lower-board", 57.6, 59.6),
             },
         )
 
@@ -481,6 +491,20 @@ class P64L09UR3DepthLocalInsetsTests(unittest.TestCase):
 
         self.assertTrue(certificate["certified"])
         self.assertEqual(certificate["failure_count"], 0)
+        composite_certificate = self.stepped_plan["finalization"][
+            "composite_materialization_certificate"
+        ]
+        self.assertTrue(
+            composite_certificate[
+                "no_additive_volume_above_final_bodies"
+            ]
+        )
+        self.assertEqual(
+            composite_certificate[
+                "additive_above_final_residual_volume_mm3"
+            ],
+            0.0,
+        )
         self.assertEqual(
             self.stepped_fusion.final_material_envelope_certificate,
             certificate,

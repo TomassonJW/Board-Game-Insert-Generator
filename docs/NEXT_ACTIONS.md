@@ -1,7 +1,7 @@
 # Next Actions
 
 <!-- P64-L09U-NEXT -->
-## Action courante : P64-L09U-R7-D — empilement automatique exact
+## Action courante : P64-L09U-R7-E — quantification finale et migrations
 
 0.1.77 est `human-KO`, `do-not-run`. Sa correction de profondeur est confirmée
 et doit être conservée, mais le placement automatique, les parois finales et
@@ -45,9 +45,17 @@ R7-C3 est terminé :
 - `66/66`, deux SHA personnels inchangés ;
 - zéro micro-prisme et zéro micro-coupe sur les deux replays.
 
-Prochaine mission unique : imposer l'ordre automatique fondé sur l'empreinte
-orientée, petit-dessous/grand-dessus, puis prouver les intervalles Z jusqu'au
-plan Fusion.
+R7-D est terminé :
+
+- petit élément sous le grand selon l'empreinte orientée ;
+- ordre historique tracé puis surchargé explicitement ;
+- intervalles Z exacts propagés jusqu'au plan Fusion ;
+- zéro volume additif résiduel au-dessus des corps finaux ;
+- `75/75`, deux SHA personnels inchangés.
+
+Prochaine mission unique : achever la grille `0,1 mm` sur les dimensions
+dérivées publiées, vérifier certificats/digests/migrations et consolider les
+mesures sans benchmark interdit.
 
 Contrat : `docs/P64_L09U_R7_END_TO_END_RUNBOOK.md`.
 Preuve : `docs/P64_L09U_R6_V_0177_HUMAN_KO_EVIDENCE.md`.
@@ -57,6 +65,8 @@ Preuve C2 :
 `docs/P64_L09U_R7_C2_CANONICAL_WALLS_AND_SCORE_EVIDENCE.md`.
 Preuve C3 :
 `docs/P64_L09U_R7_C3_FINAL_MATERIAL_RECERTIFICATION_EVIDENCE.md`.
+Preuve D :
+`docs/P64_L09U_R7_D_AUTOMATIC_STACK_AND_MATERIALIZATION_EVIDENCE.md`.
 
 Aucun benchmark/holdout/corpus/tournoi. Les projets personnels restent en
 lecture seule. `fusion-validated=false`, `print-validated=false`.

@@ -29,8 +29,10 @@
   couverture/recouvrement/centrage utile, `62/62` tests ciblés.
 - R7-C3 est terminé : marge `jeu boîte + paroi`, certificat final sans
   déplacement, zéro prisme/coupe sous `1,2 mm` sur les deux replays.
-- La prochaine mission est R7-D : ordre petit-dessous/grand-dessus et
-  intervalles Z exacts.
+- R7-D est terminé : livret sous plateau selon l'empreinte orientée,
+  intervalles Z exacts jusqu'au plan Fusion et résiduel additif nul.
+- La prochaine mission est R7-E : quantification finale, digests, migrations
+  et mesures.
 - Aucun benchmark/holdout/corpus/tournoi, aucune UI manuelle ;
   `fusion-validated=false`, `print-validated=false`.
 
@@ -43,6 +45,7 @@ Autorités R7 :
 - `docs/P64_L09U_R7_C1_PRODUCT_GRID_CANDIDATES_EVIDENCE.md`.
 - `docs/P64_L09U_R7_C2_CANONICAL_WALLS_AND_SCORE_EVIDENCE.md`.
 - `docs/P64_L09U_R7_C3_FINAL_MATERIAL_RECERTIFICATION_EVIDENCE.md`.
+- `docs/P64_L09U_R7_D_AUTOMATIC_STACK_AND_MATERIALIZATION_EVIDENCE.md`.
 
 ### Historique R6 clôturé en human-KO
 

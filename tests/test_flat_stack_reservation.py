@@ -87,7 +87,7 @@ class FlatStackReservationTests(unittest.TestCase):
         self.assertGreater(after_piles, before_piles)
         self.assertLessEqual(after_container["outer_dimensions_mm"]["z"], result["flat_stack"]["storage_height_mm"])
 
-    def test_explicit_stack_order_precedes_unspecified_items(self) -> None:
+    def test_automatic_tie_breaker_overrides_legacy_stack_order(self) -> None:
         project = _project()
         project["flat_items"] = [
             _flat_item("board", kind="board", stack_order=None),
@@ -96,7 +96,17 @@ class FlatStackReservationTests(unittest.TestCase):
 
         result = derive_flat_stack_reservation(project)
 
-        self.assertEqual([item["id"] for item in result["flat_stack"]["items"]], ["rules", "board"])
+        items = result["flat_stack"]["items"]
+        self.assertEqual([item["id"] for item in items], ["board", "rules"])
+        self.assertEqual([item["stack_order"] for item in items], [0, 1])
+        self.assertEqual(
+            [item["source_stack_order"] for item in items],
+            [None, 0],
+        )
+        self.assertEqual(
+            items[1]["stack_order_migration"],
+            "legacy_overridden_by_automatic",
+        )
 
     def test_rejects_a_stack_that_exceeds_the_usable_height(self) -> None:
         project = _project()

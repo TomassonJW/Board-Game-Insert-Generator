@@ -9,7 +9,8 @@ Statut : `P64-L09U-R6-V-human-KO`, `do-not-run`,
 `P64-L09U-R7-A-done`, `P64-L09U-R7-B-done`,
 `P64-L09U-R7-C1-automated-validated`,
 `P64-L09U-R7-C2-automated-validated`,
-`P64-L09U-R7-C3-automated-validated`, `P64-L09U-R7-D-ready`,
+`P64-L09U-R7-C3-automated-validated`,
+`P64-L09U-R7-D-automated-validated`, `P64-L09U-R7-E-ready`,
 `fusion-validated=false`, `print-validated=false`.
 
 - 0.1.77 est `human-KO`, `do-not-run`.
@@ -40,7 +41,13 @@ Statut : `P64-L09U-R6-V-human-KO`, `do-not-run`,
 - Sur `CasLimite02++` : prismes `118 -> 56`, micro-prismes `14 -> 0`,
   coupes supérieures `45 -> 18`, micro-coupes `0`.
 - Validation C3 : `66/66`; certificat propagé jusqu'au plan Fusion.
-- Prochaine mission : ordre automatique petit-dessous/grand-dessus.
+- D impose l'ordre par empreinte orientée : livret sous plateau sur le cas
+  forcé, malgré l'ordre source inverse.
+- Intervalles de recouvrement : livret `[63,8 ; 65,8]`, plateau
+  `[65,8 ; 69,8]`, identiques jusqu'au plan Fusion.
+- Volume additif résiduel au-dessus des corps finaux : `0 mm³`.
+- Validation D : `75/75`; deux SHA personnels inchangés.
+- Prochaine mission : propagation finale de la grille, digests et mesures.
 - Aucun benchmark/holdout/corpus/tournoi ; aucune UI manuelle.
 
 Preuve humaine :
@@ -55,6 +62,8 @@ Preuve C2 :
 `docs/P64_L09U_R7_C2_CANONICAL_WALLS_AND_SCORE_EVIDENCE.md`.
 Preuve C3 :
 `docs/P64_L09U_R7_C3_FINAL_MATERIAL_RECERTIFICATION_EVIDENCE.md`.
+Preuve D :
+`docs/P64_L09U_R7_D_AUTOMATIC_STACK_AND_MATERIALIZATION_EVIDENCE.md`.
 
 ### Historique R6 clôturé en human-KO
 

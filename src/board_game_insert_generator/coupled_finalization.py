@@ -1621,6 +1621,19 @@ def _attach_xy_composite_geometry(
         - total_cut_intersection_with_final
     )
     final_error = abs(final_material_volume - target_material_volume)
+    additive_above_final_volume = (
+        total_cad_union_volume - total_final_composite_volume
+    )
+    cut_above_final_volume = (
+        total_cut_volume - total_cut_intersection_with_final
+    )
+    additive_above_final_residual = abs(
+        additive_above_final_volume - cut_above_final_volume
+    )
+    material_volume_tolerance = max(
+        0.0001,
+        certified_composite_volume * 1e-9,
+    )
     all_top_cuts_are_exact = all(
         isinstance(cut, dict)
         and cut.get("non_perforating") is True
@@ -1635,7 +1648,9 @@ def _attach_xy_composite_geometry(
         and composite_source_error
         <= max(0.0001, certified_composite_volume * 1e-9)
         and final_error
-        <= max(0.0001, certified_composite_volume * 1e-9)
+        <= material_volume_tolerance
+        and additive_above_final_residual
+        <= material_volume_tolerance
         and all_top_cuts_are_exact
         and all_owners_connected
         and all_frozen_calibrations_match
@@ -1661,8 +1676,13 @@ def _attach_xy_composite_geometry(
             ),
             (
                 final_error
-                <= max(0.0001, certified_composite_volume * 1e-9),
+                <= material_volume_tolerance,
                 "COMPOSITE_CAD_FINAL_VOLUME_DIVERGENCE",
+            ),
+            (
+                additive_above_final_residual
+                <= material_volume_tolerance,
+                "COMPOSITE_ADDITIVE_ABOVE_FINAL_RESIDUAL",
             ),
             (all_top_cuts_are_exact, "COMPOSITE_TOP_CUT_INVALID"),
             (all_owners_connected, "COMPOSITE_OWNER_UNION_DISCONNECTED"),
@@ -1733,6 +1753,24 @@ def _attach_xy_composite_geometry(
         "cut_intersection_with_final_volume_mm3": round(
             total_cut_intersection_with_final,
             6,
+        ),
+        "additive_above_final_volume_mm3": round(
+            additive_above_final_volume,
+            6,
+        ),
+        "cut_above_final_volume_mm3": round(
+            cut_above_final_volume,
+            6,
+        ),
+        "additive_above_final_residual_volume_mm3": (
+            0.0
+            if additive_above_final_residual
+            <= material_volume_tolerance
+            else round(additive_above_final_residual, 6)
+        ),
+        "no_additive_volume_above_final_bodies": (
+            additive_above_final_residual
+            <= material_volume_tolerance
         ),
         "final_material_volume_mm3": round(final_material_volume, 6),
         "coverage_error_mm3": round(final_error, 9),

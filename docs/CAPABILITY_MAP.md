@@ -5,22 +5,22 @@
 
 - `C-CAVITY` : acquis R6 humainement confirmé pour la profondeur et les accès ;
   régressions obligatoires pendant R7.
-- `C-RESERVATION` : placement, marges et fragments composites
-  `automated-validated`; ordre vertical automatique encore ouvert.
+- `C-RESERVATION` : placement, marges, fragments et ordre vertical automatique
+  `automated-validated`.
 - `C-GLOBAL-LAYOUT` : contrat incomplet ; la frontière minimale ne porte pas
   encore toute la compatibilité de placement finale.
 - `C-FINALIZATION` : certificat final de matière `automated-validated`, sans
   déplacement silencieux ni micro-prisme/coupe sur les deux replays.
-- `C-CAD-IR`, `C-PREVIEW`, `C-FUSION` : propagation observable mais résultat
-  humain faux ; `fusion-validated=false`.
+- `C-CAD-IR`, `C-PREVIEW`, `C-FUSION` : ordre, intervalles et certificat final
+  propagés ; observation réelle encore requise, `fusion-validated=false`.
 - `C-QUANTIZATION` : `implemented-core` pour candidats, empreintes et prises
   XY ; propagation finale encore partielle.
-- `C-QUALITY` : C3 passe `66/66`; deux replays personnels exacts, SHA inchangés.
+- `C-QUALITY` : D passe `75/75`; deux replays personnels exacts, SHA inchangés.
 - `C-RELEASE` : 0.1.77 `human-KO`, `do-not-run`; aucune candidate R7 encore.
 - `C-PRINT` : `print-validated=false`.
 
-ADR-0103 et ADR-0104 sont acceptées. R7-C1 et R7-C2 sont validés
-automatiquement ; R7-C3 est la prochaine mission.
+ADR-0103 et ADR-0104 sont acceptées. R7-C et R7-D sont validés
+automatiquement ; R7-E est la prochaine mission.
 
 ### Historique R6 clôturé en human-KO
 

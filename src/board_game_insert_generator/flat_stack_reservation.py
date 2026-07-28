@@ -26,7 +26,10 @@ def derive_flat_stack_reservation(raw_project: object) -> dict[str, object]:
     box_inner = _dimension(box["inner_dimensions_mm"])
     usable_height_mm = min(float(box["usable_height_mm"]), box_inner["z"])
     clearance_mm = float(layout["layout_clearance_mm"])
-    items = _ordered_flat_items(_values(project["flat_items"]))
+    items = _ordered_flat_items(
+        _values(project["flat_items"]),
+        clearance_mm=clearance_mm,
+    )
     flat_stack, flat_blockers = _reserve_flat_stack(
         items=items,
         box_inner=box_inner,
@@ -69,15 +72,62 @@ def derive_flat_stack_reservation(raw_project: object) -> dict[str, object]:
     }
 
 
-def _ordered_flat_items(values: list[object]) -> list[dict[str, object]]:
+def _ordered_flat_items(
+    values: list[object],
+    *,
+    clearance_mm: float,
+) -> list[dict[str, object]]:
     items = [_mapping(value) for value in values]
-    return sorted(
+    ordered = sorted(
         items,
-        key=lambda item: (
-            item["stack_order"] is None,
-            int(item["stack_order"]) if item["stack_order"] is not None else 0,
-            str(item["id"]),
+        key=lambda item: _automatic_flat_stack_key(
+            item,
+            fallback_clearance_mm=clearance_mm,
         ),
+    )
+    result: list[dict[str, object]] = []
+    for automatic_order, source in enumerate(ordered):
+        item = dict(source)
+        source_order = item.get("stack_order")
+        item["_automatic_stack_order"] = automatic_order
+        item["_stack_order_migration"] = (
+            "automatic_assigned"
+            if source_order is None
+            else (
+                "legacy_matches_automatic"
+                if int(source_order) == automatic_order
+                else "legacy_overridden_by_automatic"
+            )
+        )
+        result.append(item)
+    return result
+
+
+def _automatic_flat_stack_key(
+    item: dict[str, object],
+    *,
+    fallback_clearance_mm: float,
+) -> tuple[object, ...]:
+    dimensions = _dimension(item["dimensions_mm"])
+    effective = item.get("clearance_effective_v1")
+    values = (
+        _dimension(_mapping(effective)["values_mm"])
+        if isinstance(effective, dict)
+        else {
+            "x": fallback_clearance_mm,
+            "y": fallback_clearance_mm,
+            "z": 0.0,
+        }
+    )
+    oriented_x = dimensions["x"] + 2.0 * values["x"]
+    oriented_y = dimensions["y"] + 2.0 * values["y"]
+    return (
+        _round(oriented_x * oriented_y),
+        _round(max(oriented_x, oriented_y)),
+        _round(min(oriented_x, oriented_y)),
+        _round(dimensions["z"] * int(item["quantity"])),
+        str(item["kind"]),
+        str(item["id"]),
     )
 
 
@@ -128,6 +178,10 @@ def _reserve_flat_stack(
     stack_items: list[dict[str, object]] = []
     for item in items:
         dimensions = _dimension(item["dimensions_mm"])
+        automatic_key = _automatic_flat_stack_key(
+            item,
+            fallback_clearance_mm=clearance_mm,
+        )
         total_thickness = dimensions["z"] * int(item["quantity"])
         stack_items.append(
             {
@@ -135,7 +189,23 @@ def _reserve_flat_stack(
                 "name": item["name"],
                 "kind": item["kind"],
                 "quantity": item["quantity"],
-                "stack_order": item["stack_order"],
+                "stack_order": item["_automatic_stack_order"],
+                "source_stack_order": item["stack_order"],
+                "stack_order_policy": (
+                    "automatic_oriented_footprint_ascending_v1"
+                ),
+                "automatic_stack_key_v1": {
+                    "oriented_footprint_area_mm2": automatic_key[0],
+                    "oriented_long_side_mm": automatic_key[1],
+                    "oriented_short_side_mm": automatic_key[2],
+                    "total_thickness_mm": automatic_key[3],
+                    "kind": automatic_key[4],
+                    "flat_item_id": automatic_key[5],
+                },
+                "stack_order_migration": item[
+                    "_stack_order_migration"
+                ],
+                "manual_stack_mode_implemented": False,
                 "physical_size_mm": _rounded_dimension(dimensions),
                 "total_thickness_mm": _round(total_thickness),
                 "stack_origin_z_mm": _round(cursor_z),

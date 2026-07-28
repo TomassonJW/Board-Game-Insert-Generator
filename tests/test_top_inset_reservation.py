@@ -271,6 +271,104 @@ class TopInsetReservationTests(unittest.TestCase):
             small["cut_origin_mm"]["x"] + small["cut_size_mm"]["x"],
         )
 
+    def test_forced_stack_puts_smaller_oriented_footprint_below(
+        self,
+    ) -> None:
+        value = project()
+        value["box"] = {
+            "inner_dimensions_mm": {
+                "x": 240.0,
+                "y": 180.0,
+                "z": 70.0,
+            },
+            "usable_height_mm": 69.8,
+            "lid_clearance_mm": 0.2,
+        }
+        value["contents"] = []
+        value["flat_items"] = [
+            flat(
+                "board",
+                x=140.0,
+                y=160.0,
+                z=4.0,
+                order=0,
+                rotation=0,
+            ),
+            flat(
+                "booklet",
+                x=110.0,
+                y=155.0,
+                z=2.0,
+                order=1,
+                rotation=90,
+            ),
+        ]
+        placements = [
+            {
+                "id": "container:top",
+                "origin_mm": {"x": 0.4, "y": 0.4, "z": 0.0},
+                "world_size_mm": {
+                    "x": 239.2,
+                    "y": 179.2,
+                    "z": 69.8,
+                },
+            }
+        ]
+
+        result = resolve_top_inset_reservations(
+            value,
+            placements,
+            require_reserved_prisms=False,
+        )
+
+        self.assertEqual(result["status"], "ready_for_intersection")
+        booklet, board = result["reservations"]
+        self.assertEqual(
+            [booklet["flat_item_id"], board["flat_item_id"]],
+            ["booklet", "board"],
+        )
+        self.assertEqual(
+            [booklet["stack_order"], board["stack_order"]],
+            [0, 1],
+        )
+        self.assertEqual(
+            [booklet["source_stack_order"], board["source_stack_order"]],
+            [1, 0],
+        )
+        self.assertEqual(
+            booklet["stack_order_migration"],
+            "legacy_overridden_by_automatic",
+        )
+        self.assertEqual(
+            board["stack_order_migration"],
+            "legacy_overridden_by_automatic",
+        )
+        self.assertLess(
+            booklet["automatic_stack_key_v1"][
+                "oriented_footprint_area_mm2"
+            ],
+            board["automatic_stack_key_v1"][
+                "oriented_footprint_area_mm2"
+            ],
+        )
+        overlap_intervals = {
+            (
+                reservation["flat_item_id"],
+                region["layer_bottom_z_mm"],
+                region["layer_top_z_mm"],
+            )
+            for reservation in result["reservations"]
+            for region in reservation["local_depth_regions"]
+            if region["overlap_count"] == 2
+        }
+        self.assertEqual(
+            overlap_intervals,
+            {
+                ("booklet", 63.8, 65.8),
+                ("board", 65.8, 69.8),
+            },
+        )
+
     def test_useful_body_center_beats_arbitrary_box_center(self) -> None:
         value = project()
         value["box"] = {
@@ -453,10 +551,32 @@ class TopInsetReservationTests(unittest.TestCase):
         result = derive_top_inset_reservations(value)
 
         self.assertEqual(result["status"], "ready_for_intersection")
-        self.assertEqual([item["rotation_deg_z"] for item in result["reservations"]], [0, 90])
+        self.assertEqual(
+            [item["flat_item_id"] for item in result["reservations"]],
+            ["right-booklet", "left-board"],
+        )
+        self.assertEqual(
+            [item["rotation_deg_z"] for item in result["reservations"]],
+            [90, 0],
+        )
         self.assertTrue(result["source"]["migrated"])
         self.assertEqual([item["placement_source"] for item in result["reservations"]], ["automatic_xy", "automatic_xy"])
         self.assertEqual([item["removal_order"] for item in result["reservations"]], [2, 1])
+        self.assertEqual(
+            [item["stack_order"] for item in result["reservations"]],
+            [0, 1],
+        )
+        self.assertEqual(
+            [item["source_stack_order"] for item in result["reservations"]],
+            [1, 0],
+        )
+        self.assertTrue(
+            all(
+                item["stack_order_migration"]
+                == "legacy_overridden_by_automatic"
+                for item in result["reservations"]
+            )
+        )
         self.assertEqual(result["total_flat_height_mm"], 3.0)
 
     def test_center_collision_is_replaced_by_a_lateral_automatic_pose(self) -> None:
@@ -621,25 +741,39 @@ class TopInsetReservationTests(unittest.TestCase):
         ]
 
         result = derive_top_inset_reservations(value)
-        lower = result["reservations"][0]
-        lower_depths = {
+        large = next(
+            item
+            for item in result["reservations"]
+            if item["flat_item_id"] == "lower"
+        )
+        small = next(
+            item
+            for item in result["reservations"]
+            if item["flat_item_id"] == "upper"
+        )
+        large_depths = {
             region["inset_depth_from_top_mm"]
-            for region in lower["local_depth_regions"]
+            for region in large["local_depth_regions"]
+        }
+        small_depths = {
+            region["inset_depth_from_top_mm"]
+            for region in small["local_depth_regions"]
         }
 
-        self.assertEqual(lower_depths, {2.0, 5.0})
+        self.assertEqual(large_depths, {2.0})
+        self.assertEqual(small_depths, {5.0})
         self.assertTrue(
             any(
                 region["overlap_count"] == 1
                 and region["inset_depth_from_top_mm"] == 2.0
-                for region in lower["local_depth_regions"]
+                for region in large["local_depth_regions"]
             )
         )
         self.assertTrue(
             any(
                 region["overlap_count"] == 2
                 and region["inset_depth_from_top_mm"] == 5.0
-                for region in lower["local_depth_regions"]
+                for region in small["local_depth_regions"]
             )
         )
 
