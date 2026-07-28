@@ -35,14 +35,15 @@
 
 ### P64-L09U-R7-C2 — Parois et score utile
 
-- Statut : `ready`.
+- Statut : `done`, `automated-validated`.
 - Marge canonique au bord de boîte.
 - Séparations entre zones plates.
 - Score couverture/recouvrement/centrage.
+- Validation : `62/62`; deux replays personnels SHA inchangés.
 
 ### P64-L09U-R7-C3 — Recertification finale
 
-- Statut : `pending`, dépend de R7-C2.
+- Statut : `ready`.
 - Refuser tout fragment de matière final sous le minimum.
 - Conserver ou refuser la pose minimale, jamais la déplacer.
 

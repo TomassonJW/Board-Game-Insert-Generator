@@ -10,6 +10,7 @@ from board_game_insert_generator.top_inset_reservation import (
     TOP_INSET_CUT_KIND,
     TOP_INSET_RESERVATION_SCHEMA_V1,
     _automatic_axis_positions,
+    _reservation_wall_certificate,
     apply_top_inset_reservations,
     certify_top_inset_reservation_prisms,
     derive_top_inset_reservations,
@@ -68,6 +69,161 @@ def flat(
 
 
 class TopInsetReservationTests(unittest.TestCase):
+    def test_wall_certificate_rejects_box_edge_and_point_four_gap(
+        self,
+    ) -> None:
+        reservation = {
+            "flat_item_id": "booklet",
+            "cut_origin_mm": {"x": 0.8, "y": 10.0},
+            "cut_size_mm": {"x": 20.0, "y": 20.0},
+            "grip_zone": {
+                "origin_mm": {"x": 10.0, "y": 32.0},
+                "size_mm": {"x": 8.0, "y": 4.0},
+            },
+        }
+        sibling = {
+            "flat_item_id": "board",
+            "cut_origin_mm": {"x": 21.2, "y": 10.0},
+            "cut_size_mm": {"x": 20.0, "y": 20.0},
+        }
+
+        certificate = _reservation_wall_certificate(
+            reservation,
+            [],
+            box={"x": 100.0, "y": 60.0, "z": 12.0},
+            minimum_boundary_wall_mm=1.2,
+            sibling_reservations=[sibling],
+        )
+
+        self.assertFalse(certificate["certified"])
+        failures = {
+            failure["reason"] for failure in certificate["failures"]
+        }
+        self.assertIn("box_boundary_below_required_wall", failures)
+        self.assertIn(
+            "flat_zone_separation_below_required_wall",
+            failures,
+        )
+
+    def test_automatic_pose_keeps_box_and_grip_boundary_wall(self) -> None:
+        value = project()
+        value["flat_items"] = [
+            flat("board", x=200.0, y=140.0, z=2.0)
+        ]
+
+        result = derive_top_inset_reservations(value)
+
+        self.assertEqual(result["status"], "ready_for_intersection")
+        reservation = result["reservations"][0]
+        certificate = reservation["wall_envelope_certificate"]
+        self.assertTrue(certificate["certified"])
+        self.assertGreaterEqual(
+            certificate["minimum_observed_wall_slack_mm"],
+            0.0,
+        )
+        self.assertTrue(
+            result["invariants"][
+                "minimum_box_boundary_wall_certified"
+            ]
+        )
+
+    def test_frozen_bodies_make_healthy_overlap_preferable(self) -> None:
+        value = project()
+        value["box"] = {
+            "inner_dimensions_mm": {
+                "x": 100.0,
+                "y": 60.0,
+                "z": 12.0,
+            },
+            "usable_height_mm": 10.0,
+            "lid_clearance_mm": 2.0,
+        }
+        value["contents"] = []
+        value["flat_items"] = [
+            flat("large", x=30.0, y=20.0, z=2.0, order=0),
+            flat("small", x=20.0, y=10.0, z=1.0, order=1),
+        ]
+        placements = [
+            {
+                "id": "container:top",
+                "origin_mm": {"x": 0.0, "y": 0.0, "z": 0.0},
+                "world_size_mm": {
+                    "x": 100.0,
+                    "y": 60.0,
+                    "z": 10.0,
+                },
+            }
+        ]
+
+        result = resolve_top_inset_reservations(
+            value,
+            placements,
+            require_reserved_prisms=False,
+        )
+
+        self.assertEqual(result["status"], "ready_for_intersection")
+        self.assertGreater(
+            result["automatic_xy_search"]["selected_score_v1"][
+                "healthy_stack_overlap_area_mm2"
+            ],
+            0.0,
+        )
+        large, small = result["reservations"]
+        self.assertLess(
+            small["cut_origin_mm"]["x"],
+            large["cut_origin_mm"]["x"] + large["cut_size_mm"]["x"],
+        )
+        self.assertLess(
+            large["cut_origin_mm"]["x"],
+            small["cut_origin_mm"]["x"] + small["cut_size_mm"]["x"],
+        )
+
+    def test_useful_body_center_beats_arbitrary_box_center(self) -> None:
+        value = project()
+        value["box"] = {
+            "inner_dimensions_mm": {
+                "x": 100.0,
+                "y": 60.0,
+                "z": 12.0,
+            },
+            "usable_height_mm": 10.0,
+            "lid_clearance_mm": 2.0,
+        }
+        value["contents"] = []
+        value["flat_items"] = [
+            flat("booklet", x=20.0, y=10.0, z=1.0)
+        ]
+        placements = [
+            {
+                "id": "container:top",
+                "origin_mm": {"x": 60.0, "y": 20.0, "z": 0.0},
+                "world_size_mm": {
+                    "x": 30.0,
+                    "y": 20.0,
+                    "z": 10.0,
+                },
+            }
+        ]
+
+        result = resolve_top_inset_reservations(
+            value,
+            placements,
+            require_reserved_prisms=False,
+        )
+
+        self.assertEqual(result["status"], "ready_for_intersection")
+        reservation = result["reservations"][0]
+        center_x = (
+            reservation["cut_origin_mm"]["x"]
+            + reservation["cut_size_mm"]["x"] / 2.0
+        )
+        center_y = (
+            reservation["cut_origin_mm"]["y"]
+            + reservation["cut_size_mm"]["y"] / 2.0
+        )
+        self.assertAlmostEqual(center_x, 75.0, places=1)
+        self.assertAlmostEqual(center_y, 30.0, places=1)
+
     def test_automatic_candidates_and_xy_geometry_use_the_product_grid(
         self,
     ) -> None:

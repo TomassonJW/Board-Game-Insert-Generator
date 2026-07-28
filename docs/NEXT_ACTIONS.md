@@ -1,7 +1,7 @@
 # Next Actions
 
 <!-- P64-L09U-NEXT -->
-## Action courante : P64-L09U-R7-C2 — parois et score utile
+## Action courante : P64-L09U-R7-C3 — recertification finale
 
 0.1.77 est `human-KO`, `do-not-run`. Sa correction de profondeur est confirmée
 et doit être conservée, mais le placement automatique, les parois finales et
@@ -30,15 +30,23 @@ R7-C1 est terminé :
   évaluées ;
 - aucun gain de temps revendiqué.
 
-Prochaine mission unique : imposer la marge canonique au bord de boîte,
-certifier les séparations de zones, puis remplacer le score qui pénalise les
-recouvrements utiles. La recertification des fragments sur la géométrie finale
-reste le lot C3 suivant.
+R7-C2 est terminé :
+
+- marge canonique dure au bord de boîte et entre zones plates disjointes ;
+- score couverture/recouvrement/centrage utile ;
+- `62/62` tests ciblés ;
+- deux replays personnels exacts et SHA inchangés.
+
+Prochaine mission unique : recertifier les fragments sur la géométrie composite
+finale, conserver ou refuser la pose minimale sans la déplacer, et empêcher les
+micro-coupes sous `1,2 mm`.
 
 Contrat : `docs/P64_L09U_R7_END_TO_END_RUNBOOK.md`.
 Preuve : `docs/P64_L09U_R6_V_0177_HUMAN_KO_EVIDENCE.md`.
 Décisions : ADR-0103 et ADR-0104.
 Preuve C1 : `docs/P64_L09U_R7_C1_PRODUCT_GRID_CANDIDATES_EVIDENCE.md`.
+Preuve C2 :
+`docs/P64_L09U_R7_C2_CANONICAL_WALLS_AND_SCORE_EVIDENCE.md`.
 
 Aucun benchmark/holdout/corpus/tournoi. Les projets personnels restent en
 lecture seule. `fusion-validated=false`, `print-validated=false`.

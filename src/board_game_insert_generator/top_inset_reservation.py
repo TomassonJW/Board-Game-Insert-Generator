@@ -165,6 +165,8 @@ def _derive_top_inset_reservations(
             "automatic_xy_placement": True,
             "manual_xy_origin_ignored": True,
             "minimum_cavity_wall_envelope_certified": not blockers,
+            "minimum_box_boundary_wall_certified": not blockers,
+            "minimum_separated_flat_zone_wall_certified": not blockers,
             "automatic_xy_candidates_on_product_grid": True,
             "required_xy_envelopes_not_rounded_inward": True,
         },
@@ -629,6 +631,13 @@ def _resolve_automatic_xy_layout(
     """Keep a bounded deterministic beam of joint XY arrangements."""
 
     cavity_constraints = _cavity_wall_constraints(project, placements)
+    useful_rectangles = _useful_placement_rectangles(
+        placements,
+        design_top_z=design_top_z,
+    )
+    minimum_boundary_wall = float(
+        _mapping(project["layout"])["default_wall_thickness_mm"]
+    )
     states: list[list[dict[str, object]]] = [[]]
     evaluated = 0
     wall_rejections = 0
@@ -655,6 +664,7 @@ def _resolve_automatic_xy_layout(
                     variant,
                     box,
                     default_clearance,
+                    minimum_boundary_wall_mm=minimum_boundary_wall,
                 )
                 footprint_blockers = [
                     blocker
@@ -671,6 +681,8 @@ def _resolve_automatic_xy_layout(
                     size=size["x"],
                     reservations=state,
                     cavity_constraints=cavity_constraints,
+                    useful_rectangles=useful_rectangles,
+                    boundary_margin_mm=minimum_boundary_wall,
                     grid_metrics=grid_metrics,
                 )
                 y_values = _automatic_axis_positions(
@@ -679,6 +691,8 @@ def _resolve_automatic_xy_layout(
                     size=size["y"],
                     reservations=state,
                     cavity_constraints=cavity_constraints,
+                    useful_rectangles=useful_rectangles,
+                    boundary_margin_mm=minimum_boundary_wall,
                     grid_metrics=grid_metrics,
                 )
                 for x in x_values:
@@ -689,12 +703,16 @@ def _resolve_automatic_xy_layout(
                             x=x,
                             y=y,
                             box=box,
+                            minimum_boundary_wall_mm=minimum_boundary_wall,
                         )
                         if relocation_blockers:
                             continue
                         wall_certificate = _reservation_wall_certificate(
                             candidate,
                             cavity_constraints,
+                            box=box,
+                            minimum_boundary_wall_mm=minimum_boundary_wall,
+                            sibling_reservations=state,
                         )
                         candidate["wall_envelope_certificate"] = wall_certificate
                         if not bool(wall_certificate["certified"]):
@@ -721,8 +739,8 @@ def _resolve_automatic_xy_layout(
                     _blocker(
                         "TOP_INSET_MINIMUM_WALL_NOT_CERTIFIED",
                         f"Aucune position automatique de '{item['name']}' ne conserve "
-                        "l epaisseur de paroi deja definie autour des cavites.",
-                        "Reduis son empreinte ou son jeu ; les cavites restent inchangees.",
+                        "les parois de boite, de cavites et de zones separees.",
+                        "Reduis son empreinte ou son jeu ; les cavites et parois restent inchangees.",
                         str(item["id"]),
                     )
                 )
@@ -825,6 +843,12 @@ def _resolve_automatic_xy_layout(
         "application_rejection_count": len(application_rejections),
         "placement_context": "frozen_bodies" if placements else "box_preview",
         "selected_signature": list(_automatic_layout_signature(selected or [])),
+        "selected_score_v1": _automatic_layout_score_components(
+            selected or [],
+            box=box,
+            placements=placements,
+            design_top_z=design_top_z,
+        ),
         "selected_pose_on_product_grid": _automatic_layout_on_product_grid(
             selected or []
         ),
@@ -839,10 +863,18 @@ def _automatic_axis_positions(
     size: float,
     reservations: list[dict[str, object]],
     cavity_constraints: list[dict[str, object]],
+    useful_rectangles: list[dict[str, float]] | None = None,
+    boundary_margin_mm: float = 0.0,
     grid_metrics: dict[str, int] | None = None,
 ) -> list[float]:
     axis_size = "width" if axis == "x" else "height"
-    values = {0.0, (limit - size) / 2.0, limit - size}
+    values = {
+        0.0,
+        boundary_margin_mm,
+        (limit - size) / 2.0,
+        limit - size - boundary_margin_mm,
+        limit - size,
+    }
     for reservation in reservations:
         rect = _xy_rect(reservation["cut_origin_mm"], reservation["cut_size_mm"])
         start = rect[axis]
@@ -861,14 +893,36 @@ def _automatic_axis_positions(
                 start + extent + wall,
             }
         )
-    maximum_origin_tick = floor_ticks(limit - size)
+    for rect in useful_rectangles or []:
+        start = float(rect[axis])
+        extent = float(rect[axis_size])
+        values.update(
+            {
+                start - size,
+                start,
+                start + extent - size,
+                start + extent,
+                start + (extent - size) / 2.0,
+            }
+        )
+    minimum_origin_tick = nearest_ticks(ceil_mm(boundary_margin_mm))
+    maximum_origin_tick = floor_ticks(
+        limit - size - boundary_margin_mm
+    )
     admissible_before_quantization = {
         value
         for value in values
-        if value >= -_EPSILON and value + size <= limit + _EPSILON
+        if (
+            value >= boundary_margin_mm - _EPSILON
+            and value + size
+            <= limit - boundary_margin_mm + _EPSILON
+        )
     }
     admissible_ticks = {
-        min(max(nearest_ticks(value), 0), maximum_origin_tick)
+        min(
+            max(nearest_ticks(value), minimum_origin_tick),
+            maximum_origin_tick,
+        )
         for value in admissible_before_quantization
     }
     admissible = {ticks_to_mm(value) for value in admissible_ticks}
@@ -886,7 +940,11 @@ def _automatic_axis_positions(
             "axis_anchor_occurrence_count_after_quantization"
         ] += len(admissible)
     center = (limit - size) / 2.0
-    anchors = [0.0, nearest_mm(center), ticks_to_mm(maximum_origin_tick)]
+    anchors = [
+        ticks_to_mm(minimum_origin_tick),
+        nearest_mm(center),
+        ticks_to_mm(maximum_origin_tick),
+    ]
     ordered = [value for value in anchors if value in admissible]
     spread = sorted(admissible)
     remaining_slots = _MAX_AUTOMATIC_AXIS_POSITIONS - len(ordered)
@@ -912,6 +970,7 @@ def _relocate_reservation(
     x: float,
     y: float,
     box: dict[str, float],
+    minimum_boundary_wall_mm: float,
 ) -> tuple[dict[str, object], list[dict[str, object]]]:
     result = deepcopy(template)
     old_cut_origin = _xy(result["cut_origin_mm"])
@@ -935,7 +994,14 @@ def _relocate_reservation(
             "y": nearest_ticks(size["y"]),
         },
     }
-    grip, grip_blocker = _grip_zone(x, y, size["x"], size["y"], box)
+    grip, grip_blocker = _grip_zone(
+        x,
+        y,
+        size["x"],
+        size["y"],
+        box,
+        minimum_boundary_wall_mm=minimum_boundary_wall_mm,
+    )
     result["grip_zone"] = grip
     blockers: list[dict[str, object]] = []
     if grip_blocker is not None:
@@ -996,6 +1062,23 @@ def _automatic_layout_rank(
         + abs(rect["y"] + rect["height"] / 2.0 - box["y"] / 2.0)
         for rect in rectangles
     )
+    if placements:
+        score = _automatic_layout_score_components(
+            layered,
+            box=box,
+            placements=placements,
+            design_top_z=design_top_z,
+        )
+        return (
+            reserved_prism_violation_count,
+            application_violation_count,
+            -float(score["useful_coverage_area_mm2"]),
+            -float(score["healthy_stack_overlap_area_mm2"]),
+            float(score["useful_center_distance_mm"]),
+            -float(score["minimum_wall_slack_mm"]),
+            float(score["box_center_distance_mm"]),
+            _automatic_layout_signature(reservations),
+        )
     return (
         reserved_prism_violation_count,
         application_violation_count,
@@ -1004,6 +1087,105 @@ def _automatic_layout_rank(
         _round(center_distance),
         _automatic_layout_signature(reservations),
     )
+
+
+def _automatic_layout_score_components(
+    reservations: list[dict[str, object]],
+    *,
+    box: dict[str, float],
+    placements: list[dict[str, object]],
+    design_top_z: float,
+) -> dict[str, object]:
+    rectangles = [
+        _xy_rect(value["cut_origin_mm"], value["cut_size_mm"])
+        for value in reservations
+    ]
+    useful_rectangles = _useful_placement_rectangles(
+        placements,
+        design_top_z=design_top_z,
+    )
+    useful_coverage_area = 0.0
+    useful_center_distance = 0.0
+    for rectangle in rectangles:
+        intersections = [
+            (intersection, useful)
+            for useful in useful_rectangles
+            if (
+                intersection := _intersection(rectangle, useful)
+            )
+            is not None
+        ]
+        weighted_area = sum(
+            intersection["width"] * intersection["height"]
+            for intersection, _ in intersections
+        )
+        rectangle_area = rectangle["width"] * rectangle["height"]
+        useful_coverage_area += min(rectangle_area, weighted_area)
+        center_x = rectangle["x"] + rectangle["width"] / 2.0
+        center_y = rectangle["y"] + rectangle["height"] / 2.0
+        if weighted_area > _EPSILON:
+            useful_center_x = sum(
+                (useful["x"] + useful["width"] / 2.0)
+                * intersection["width"]
+                * intersection["height"]
+                for intersection, useful in intersections
+            ) / weighted_area
+            useful_center_y = sum(
+                (useful["y"] + useful["height"] / 2.0)
+                * intersection["width"]
+                * intersection["height"]
+                for intersection, useful in intersections
+            ) / weighted_area
+            useful_center_distance += (
+                abs(center_x - useful_center_x)
+                + abs(center_y - useful_center_y)
+            )
+        else:
+            useful_center_distance += box["x"] + box["y"]
+    healthy_stack_overlap_area = sum(
+        overlap["width"] * overlap["height"]
+        for index, left in enumerate(rectangles)
+        for right in rectangles[index + 1 :]
+        if (overlap := _intersection(left, right)) is not None
+    )
+    wall_slacks = [
+        float(
+            _mapping(
+                reservation.get("wall_envelope_certificate", {})
+            ).get("minimum_observed_wall_slack_mm", 0.0)
+        )
+        for reservation in reservations
+    ]
+    box_center_distance = sum(
+        abs(
+            rectangle["x"]
+            + rectangle["width"] / 2.0
+            - box["x"] / 2.0
+        )
+        + abs(
+            rectangle["y"]
+            + rectangle["height"] / 2.0
+            - box["y"] / 2.0
+        )
+        for rectangle in rectangles
+    )
+    return {
+        "schema_version": "bgig.automatic_flat_layout_score.v1",
+        "useful_coverage_area_mm2": _round(useful_coverage_area),
+        "healthy_stack_overlap_area_mm2": _round(
+            healthy_stack_overlap_area
+        ),
+        "minimum_wall_slack_mm": _round(
+            min(wall_slacks, default=0.0)
+        ),
+        "useful_center_distance_mm": _round(
+            useful_center_distance
+        ),
+        "box_center_distance_mm": _round(box_center_distance),
+        "deterministic_signature": list(
+            _automatic_layout_signature(reservations)
+        ),
+    }
 
 
 def _top_inset_application_pose_blockers(
@@ -1149,48 +1331,145 @@ def _cavity_wall_constraints(
     return result
 
 
+def _useful_placement_rectangles(
+    placements: list[dict[str, object]],
+    *,
+    design_top_z: float,
+) -> list[dict[str, float]]:
+    result: list[dict[str, float]] = []
+    for placement in placements:
+        if (
+            "origin_mm" not in placement
+            or "world_size_mm" not in placement
+        ):
+            continue
+        origin = _dimension(placement["origin_mm"])
+        size = _dimension(placement["world_size_mm"])
+        if origin["z"] + size["z"] > design_top_z + _EPSILON:
+            continue
+        result.append(
+            {
+                "x": origin["x"],
+                "y": origin["y"],
+                "width": size["x"],
+                "height": size["y"],
+            }
+        )
+    return result
+
+
 def _reservation_wall_certificate(
     reservation: dict[str, object],
     constraints: list[dict[str, object]],
+    *,
+    box: dict[str, float],
+    minimum_boundary_wall_mm: float,
+    sibling_reservations: list[dict[str, object]],
 ) -> dict[str, object]:
     footprint = _xy_rect(reservation["cut_origin_mm"], reservation["cut_size_mm"])
     grip = _mapping(reservation["grip_zone"])
     grip_rect = _xy_rect(grip["origin_mm"], grip["size_mm"])
     failures: list[dict[str, object]] = []
     shared_void_count = 0
+    observed_wall_slacks: list[float] = []
+    for cut_kind, rect in (
+        (TOP_INSET_CUT_KIND, footprint),
+        (TOP_INSET_GRIP_CUT_KIND, grip_rect),
+    ):
+        for side, margin in _rect_box_margins(rect, box).items():
+            observed_wall_slacks.append(
+                margin - minimum_boundary_wall_mm
+            )
+            if margin + _EPSILON < minimum_boundary_wall_mm:
+                failures.append(
+                    {
+                        "cut_kind": cut_kind,
+                        "box_side": side,
+                        "minimum_wall_mm": _round(
+                            minimum_boundary_wall_mm
+                        ),
+                        "observed_wall_mm": _round(margin),
+                        "reason": "box_boundary_below_required_wall",
+                    }
+                )
+    for sibling in sibling_reservations:
+        sibling_footprint = _xy_rect(
+            sibling["cut_origin_mm"],
+            sibling["cut_size_mm"],
+        )
+        if _intersection(footprint, sibling_footprint) is not None:
+            continue
+        distance = _rect_distance(footprint, sibling_footprint)
+        observed_wall_slacks.append(
+            distance - minimum_boundary_wall_mm
+        )
+        if distance + _EPSILON < minimum_boundary_wall_mm:
+            failures.append(
+                {
+                    "cut_kind": TOP_INSET_CUT_KIND,
+                    "other_flat_item_id": sibling["flat_item_id"],
+                    "minimum_wall_mm": _round(
+                        minimum_boundary_wall_mm
+                    ),
+                    "observed_wall_mm": _round(distance),
+                    "reason": (
+                        "flat_zone_separation_below_required_wall"
+                    ),
+                }
+            )
     for constraint in constraints:
         cavity = _mapping(constraint["bounds"])
         wall = float(constraint["minimum_wall_mm"])
         footprint_overlap = _intersection(footprint, cavity)
         if footprint_overlap is not None:
             shared_void_count += 1
-        elif _rect_distance(footprint, cavity) + _EPSILON < wall:
-            failures.append(
-                {
-                    "placement_id": constraint["placement_id"],
-                    "cavity_id": constraint["cavity_id"],
-                    "cut_kind": TOP_INSET_CUT_KIND,
-                    "minimum_wall_mm": _round(wall),
-                    "reason": "separation_below_required_wall",
-                }
-            )
+        else:
+            distance = _rect_distance(footprint, cavity)
+            observed_wall_slacks.append(distance - wall)
+            if distance + _EPSILON < wall:
+                failures.append(
+                    {
+                        "placement_id": constraint["placement_id"],
+                        "cavity_id": constraint["cavity_id"],
+                        "cut_kind": TOP_INSET_CUT_KIND,
+                        "minimum_wall_mm": _round(wall),
+                        "observed_wall_mm": _round(distance),
+                        "reason": "separation_below_required_wall",
+                    }
+                )
         grip_overlap = _intersection(grip_rect, cavity)
         if grip_overlap is not None:
             shared_void_count += 1
-        elif _rect_distance(grip_rect, cavity) + _EPSILON < wall:
-            failures.append(
-                {
-                    "placement_id": constraint["placement_id"],
-                    "cavity_id": constraint["cavity_id"],
-                    "cut_kind": TOP_INSET_GRIP_CUT_KIND,
-                    "minimum_wall_mm": _round(wall),
-                    "reason": "grip_cut_penetrates_cavity_wall_envelope",
-                }
-            )
+        else:
+            distance = _rect_distance(grip_rect, cavity)
+            observed_wall_slacks.append(distance - wall)
+            if distance + _EPSILON < wall:
+                failures.append(
+                    {
+                        "placement_id": constraint["placement_id"],
+                        "cavity_id": constraint["cavity_id"],
+                        "cut_kind": TOP_INSET_GRIP_CUT_KIND,
+                        "minimum_wall_mm": _round(wall),
+                        "observed_wall_mm": _round(distance),
+                        "reason": (
+                            "grip_cut_penetrates_cavity_wall_envelope"
+                        ),
+                    }
+                )
     return {
         "certified": not failures,
         "constraint_count": len(constraints),
+        "box_boundary_constraint_count": 8,
+        "sibling_flat_constraint_count": len(
+            sibling_reservations
+        ),
         "minimum_wall_source": "container_group_or_project_default",
+        "minimum_box_boundary_wall_mm": _round(
+            minimum_boundary_wall_mm
+        ),
+        "minimum_observed_wall_slack_mm": _round(
+            min(observed_wall_slacks, default=0.0)
+        ),
         "cavities_unchanged": True,
         "shared_void_count": shared_void_count,
         "shared_void_semantics": "merged_cut_not_claimed_as_separating_wall",
@@ -1206,10 +1485,27 @@ def _refresh_wall_envelope_certificates(
     result = deepcopy(plan)
     project = normalize_project_draft(raw_project).project
     constraints = _cavity_wall_constraints(project, placements)
+    box = _dimension(
+        _mapping(project["box"])["inner_dimensions_mm"]
+    )
+    minimum_boundary_wall = float(
+        _mapping(project["layout"])["default_wall_thickness_mm"]
+    )
     blockers = [deepcopy(value) for value in _mappings(result.get("blockers", []))]
     failed_ids: list[str] = []
-    for reservation in _mappings(result.get("reservations", [])):
-        certificate = _reservation_wall_certificate(reservation, constraints)
+    reservations = _mappings(result.get("reservations", []))
+    for reservation in reservations:
+        certificate = _reservation_wall_certificate(
+            reservation,
+            constraints,
+            box=box,
+            minimum_boundary_wall_mm=minimum_boundary_wall,
+            sibling_reservations=[
+                sibling
+                for sibling in reservations
+                if sibling is not reservation
+            ],
+        )
         reservation["wall_envelope_certificate"] = certificate
         if not bool(certificate["certified"]):
             failed_ids.append(str(reservation["flat_item_id"]))
@@ -1217,9 +1513,9 @@ def _refresh_wall_envelope_certificates(
         blockers.append(
             _blocker(
                 "TOP_INSET_MINIMUM_WALL_NOT_CERTIFIED",
-                "La pose superieure figee ne conserve plus l epaisseur de paroi "
-                f"des cavites pour : {', '.join(sorted(set(failed_ids)))}.",
-                "Conserve les corps et cavites du plan minimal ou relance un calcul complet.",
+                "La pose superieure figee ne conserve plus toutes les parois "
+                f"canoniques pour : {', '.join(sorted(set(failed_ids)))}.",
+                "Conserve la pose et les corps certifies ou relance un calcul complet.",
             )
         )
     result["blockers"] = _unique_blockers(blockers)
@@ -1230,6 +1526,10 @@ def _refresh_wall_envelope_certificates(
     )
     invariants = _mapping(result.setdefault("invariants", {}))
     invariants["minimum_cavity_wall_envelope_certified"] = not failed_ids
+    invariants["minimum_box_boundary_wall_certified"] = not failed_ids
+    invariants["minimum_separated_flat_zone_wall_certified"] = (
+        not failed_ids
+    )
     return result
 
 
@@ -1285,6 +1585,26 @@ def _rect_distance(
         0.0,
     )
     return (dx * dx + dy * dy) ** 0.5
+
+
+def _rect_box_margins(
+    rect: dict[str, Any],
+    box: dict[str, float],
+) -> dict[str, float]:
+    return {
+        "left": float(rect["x"]),
+        "right": (
+            box["x"]
+            - float(rect["x"])
+            - float(rect["width"])
+        ),
+        "front": float(rect["y"]),
+        "back": (
+            box["y"]
+            - float(rect["y"])
+            - float(rect["height"])
+        ),
+    }
 
 
 def _unique_blockers(
@@ -1473,6 +1793,8 @@ def _resolve_item(
     item: dict[str, object],
     box: dict[str, float],
     default_clearance: dict[str, float],
+    *,
+    minimum_boundary_wall_mm: float,
 ) -> tuple[dict[str, object], list[dict[str, object]]]:
     dimensions = _dimension(item["dimensions_mm"])
     effective = item.get("clearance_effective_v1")
@@ -1553,7 +1875,12 @@ def _resolve_item(
             )
         )
     grip, grip_blocker = _grip_zone(
-        cut_origin_x, cut_origin_y, cut_x, cut_y, box,
+        cut_origin_x,
+        cut_origin_y,
+        cut_x,
+        cut_y,
+        box,
+        minimum_boundary_wall_mm=minimum_boundary_wall_mm,
     )
     if grip_blocker is not None:
         blockers.append(
@@ -1616,6 +1943,8 @@ def _grip_zone(
     width: float,
     height: float,
     box: dict[str, float],
+    *,
+    minimum_boundary_wall_mm: float,
 ) -> tuple[dict[str, object], str | None]:
     margins = {
         "front": y,
@@ -1623,7 +1952,12 @@ def _grip_zone(
         "left": x,
         "right": box["x"] - (x + width),
     }
-    available = [(side, value) for side, value in margins.items() if value >= _MIN_GRIP_DEPTH_MM - _EPSILON]
+    available = [
+        (side, value)
+        for side, value in margins.items()
+        if value - minimum_boundary_wall_mm
+        >= _MIN_GRIP_DEPTH_MM - _EPSILON
+    ]
     if not available:
         return {
             "status": "blocked",
@@ -1632,7 +1966,10 @@ def _grip_zone(
             "size_mm": {"x": 0.0, "y": 0.0},
         }, "no_margin"
     side, margin = max(available, key=lambda entry: (entry[1], -list(margins).index(entry[0])))
-    depth = min(_PREFERRED_GRIP_DEPTH_MM, margin)
+    depth = min(
+        _PREFERRED_GRIP_DEPTH_MM,
+        margin - minimum_boundary_wall_mm,
+    )
     if side in {"front", "back"}:
         grip_width = min(_MAX_GRIP_WIDTH_MM, max(_MIN_GRIP_WIDTH_MM, width * 0.2), width)
         grip_x = x + (width - grip_width) / 2.0

@@ -41,8 +41,8 @@ Les candidats faisables sont comparés, dans l'ordre :
 
 1. couverture intérieure utile maximale ;
 2. recouvrement sain de pile maximal ;
-3. marge minimale de matière maximale ;
-4. centrage sur la couverture utile ;
+3. centrage sur la couverture utile ;
+4. marge minimale de matière maximale ;
 5. centrage de boîte ;
 6. signature stable.
 

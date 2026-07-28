@@ -25,7 +25,10 @@
   candidats/prises quantifiés et compteurs avant/après.
 - Le replay fusionne `74` ancres admissibles, mais conserve `2450` poses
   évaluées ; aucun gain de temps n'est revendiqué.
-- La prochaine mission est R7-C2 : marges de boîte/parois dures et score utile.
+- R7-C2 est terminé : paroi dure de `1,2 mm` au bord et entre zones disjointes,
+  couverture/recouvrement/centrage utile, `62/62` tests ciblés.
+- La prochaine mission est R7-C3 : recertification des fragments composites,
+  sans déplacement silencieux.
 - Aucun benchmark/holdout/corpus/tournoi, aucune UI manuelle ;
   `fusion-validated=false`, `print-validated=false`.
 
@@ -36,6 +39,7 @@ Autorités R7 :
 - `docs/DECISIONS/ADR-0103-placement-automatique-canonique-et-ordre-de-pile.md` ;
 - `docs/DECISIONS/ADR-0104-grille-produit-de-0-1-mm.md`.
 - `docs/P64_L09U_R7_C1_PRODUCT_GRID_CANDIDATES_EVIDENCE.md`.
+- `docs/P64_L09U_R7_C2_CANONICAL_WALLS_AND_SCORE_EVIDENCE.md`.
 
 ### Historique R6 clôturé en human-KO
 

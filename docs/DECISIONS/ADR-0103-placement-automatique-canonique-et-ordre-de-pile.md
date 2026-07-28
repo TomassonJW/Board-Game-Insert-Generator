@@ -101,9 +101,9 @@ Entre poses entièrement certifiées, le classement est lexicographique :
    cavités finalisables ;
 2. maximiser le recouvrement sain entre éléments plats lorsqu'une vraie pile
    est possible ;
-3. maximiser la plus petite marge de matière au-delà du minimum ;
-4. minimiser la distance entre le centre de chaque encoche et le centre de sa
+3. minimiser la distance entre le centre de chaque encoche et le centre de sa
    couverture utile ;
+4. maximiser la plus petite marge de matière au-delà du minimum ;
 5. minimiser la distance résiduelle au centre de boîte ;
 6. départager par la signature canonique : identifiant, rotation, X, Y.
 

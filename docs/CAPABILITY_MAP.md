@@ -5,8 +5,8 @@
 
 - `C-CAVITY` : acquis R6 humainement confirmé pour la profondeur et les accès ;
   régressions obligatoires pendant R7.
-- `C-RESERVATION` : `human-KO` sur position automatique, fragments de paroi et
-  ordre vertical automatique.
+- `C-RESERVATION` : marges de boîte, séparation des zones et score utile
+  `automated-validated`; fragments composites et ordre vertical restent ouverts.
 - `C-GLOBAL-LAYOUT` : contrat incomplet ; la frontière minimale ne porte pas
   encore toute la compatibilité de placement finale.
 - `C-FINALIZATION` : recertifie des poses incomplètement contraintes et
@@ -15,13 +15,12 @@
   humain faux ; `fusion-validated=false`.
 - `C-QUANTIZATION` : `implemented-core` pour candidats, empreintes et prises
   XY ; propagation finale encore partielle.
-- `C-QUALITY` : deux replays personnels exacts, SHA inchangés ; les tests R7
-  restent à écrire.
+- `C-QUALITY` : C2 passe `62/62`; deux replays personnels exacts, SHA inchangés.
 - `C-RELEASE` : 0.1.77 `human-KO`, `do-not-run`; aucune candidate R7 encore.
 - `C-PRINT` : `print-validated=false`.
 
-ADR-0103 et ADR-0104 sont acceptées. R7-C1 passe `58/58`; R7-C2 est la
-prochaine mission.
+ADR-0103 et ADR-0104 sont acceptées. R7-C1 et R7-C2 sont validés
+automatiquement ; R7-C3 est la prochaine mission.
 
 ### Historique R6 clôturé en human-KO
 
