@@ -34,6 +34,9 @@ TOP_INSET_CUT_KIND = "top_inset"
 TOP_INSET_GRIP_CUT_KIND = "top_inset_grip"
 TOP_INSET_OPERATION_KIND = "subtract_top_inset_reservation"
 TOP_INSET_GRIP_OPERATION_KIND = "subtract_top_inset_grip"
+MINIMAL_FLAT_GEOMETRY_CERTIFICATE_SCHEMA_V1 = (
+    "bgig.minimal_flat_geometry_certificate.v1"
+)
 _EPSILON = 0.0001
 _PREFERRED_GRIP_DEPTH_MM = 8.0
 _MIN_GRIP_DEPTH_MM = 2.0
@@ -230,6 +233,59 @@ def certify_top_inset_reservation_prisms(
         placement["top_inset_cuts"] = []
 
     blockers = [deepcopy(item) for item in _mappings(plan["blockers"])]
+    positive_compensations: list[dict[str, object]] = []
+    for placement in result_placements:
+        raw_compensation = placement.get(
+            "reservation_required_z_compensation_mm"
+        )
+        if raw_compensation is None:
+            continue
+        placement_id = str(placement.get("id", ""))
+        if (
+            not isinstance(raw_compensation, (int, float))
+            or isinstance(raw_compensation, bool)
+            or float(raw_compensation) < 0.0
+        ):
+            blockers.append(
+                _blocker(
+                    "MINIMAL_FLAT_Z_COMPENSATION_INVALID",
+                    "Le plan minimal déclare une compensation Z de réservation "
+                    f"invalide pour '{placement_id}'.",
+                    "Recalcule le plan sans modifier l'enveloppe minimale.",
+                    placement_id,
+                )
+            )
+            positive_compensations.append(
+                {
+                    "placement_id": placement_id,
+                    "compensation_mm": raw_compensation,
+                    "positive_volume_mm3": "invalid",
+                }
+            )
+            continue
+        compensation = float(raw_compensation)
+        if compensation <= _EPSILON:
+            continue
+        size = _dimension(placement["world_size_mm"])
+        positive_volume = size["x"] * size["y"] * compensation
+        positive_compensations.append(
+            {
+                "placement_id": placement_id,
+                "compensation_mm": _round(compensation),
+                "positive_volume_mm3": _round(positive_volume),
+            }
+        )
+        blockers.append(
+            _blocker(
+                "MINIMAL_FLAT_POSITIVE_Z_COMPENSATION_FORBIDDEN",
+                "Le plan minimal essaie d'allonger "
+                f"'{placement_id}' de {_round(compensation)} mm pour une "
+                "réservation plate.",
+                "Conserve l'enveloppe minimale et la réservation non imprimable.",
+                placement_id,
+            )
+        )
+
     design_top = float(plan["design_top_z_mm"])
     reserved_prisms: list[dict[str, object]] = []
     certificates: list[dict[str, object]] = []
@@ -306,6 +362,84 @@ def certify_top_inset_reservation_prisms(
                     )
                 )
 
+    flat_positive_body_ids = [
+        str(placement.get("id", ""))
+        for placement in result_placements
+        if str(placement.get("role", "")) == "flat_item"
+        or (
+            placement.get("printable") is True
+            and bool(placement.get("flat_item_id"))
+        )
+    ]
+    printable_reserved_prisms = [
+        prism
+        for prism in reserved_prisms
+        if prism.get("printable") is True
+    ]
+    flat_positive_body_ids.extend(
+        str(prism["id"]) for prism in printable_reserved_prisms
+    )
+    positive_compensation_volume = sum(
+        float(value["positive_volume_mm3"])
+        for value in positive_compensations
+        if isinstance(value.get("positive_volume_mm3"), (int, float))
+        and not isinstance(value.get("positive_volume_mm3"), bool)
+    )
+    printable_reserved_volume = sum(
+        _dimension(prism["size_mm"])["x"]
+        * _dimension(prism["size_mm"])["y"]
+        * _dimension(prism["size_mm"])["z"]
+        for prism in printable_reserved_prisms
+    )
+    flat_positive_volume = (
+        positive_compensation_volume + printable_reserved_volume
+    )
+    minimal_flat_geometry_certificate = {
+        "schema_version": MINIMAL_FLAT_GEOMETRY_CERTIFICATE_SCHEMA_V1,
+        "certified": (
+            not positive_compensations
+            and not flat_positive_body_ids
+            and flat_positive_volume <= _EPSILON
+        ),
+        "flat_item_count": len(
+            {
+                str(value["flat_item_id"])
+                for value in _mappings(plan["reservations"])
+            }
+        ),
+        "reserved_prism_count": len(reserved_prisms),
+        "non_printable_reserved_prism_count": sum(
+            int(prism.get("printable") is False)
+            for prism in reserved_prisms
+        ),
+        "all_reserved_prisms_non_printable": not printable_reserved_prisms,
+        "flat_positive_body_count": len(flat_positive_body_ids),
+        "flat_positive_body_ids": flat_positive_body_ids,
+        "flat_positive_union_count": 0,
+        "flat_positive_volume_mm3": (
+            0.0
+            if flat_positive_volume <= _EPSILON
+            else _round(flat_positive_volume)
+        ),
+        "positive_geometry_operation_count": (
+            len(flat_positive_body_ids) + len(positive_compensations)
+        ),
+        "reservation_required_z_compensation_count": len(
+            positive_compensations
+        ),
+        "reservation_required_z_compensations": positive_compensations,
+        "support_count": 0,
+        "cut_count": 0,
+        "stop_reason": (
+            "minimal_flat_geometry_certified"
+            if (
+                not positive_compensations
+                and not flat_positive_body_ids
+                and flat_positive_volume <= _EPSILON
+            )
+            else "minimal_flat_positive_geometry_forbidden"
+        ),
+    }
     status = (
         "blocked"
         if blockers
@@ -319,6 +453,9 @@ def certify_top_inset_reservation_prisms(
         "supports": [],
         "reserved_prisms": reserved_prisms,
         "reservation_certificates": certificates,
+        "minimal_flat_geometry_certificate": (
+            minimal_flat_geometry_certificate
+        ),
         "cavity_depth_compensations": [],
         "support": {
             "status": (
@@ -351,6 +488,17 @@ def certify_top_inset_reservation_prisms(
             ),
             "cavity_depth_compensation_count": 0,
             "maximum_cavity_depth_compensation_mm": 0.0,
+            "flat_positive_body_count": (
+                minimal_flat_geometry_certificate[
+                    "flat_positive_body_count"
+                ]
+            ),
+            "flat_positive_union_count": 0,
+            "flat_positive_volume_mm3": (
+                minimal_flat_geometry_certificate[
+                    "flat_positive_volume_mm3"
+                ]
+            ),
         },
         "invariants": {
             **deepcopy(_mapping(plan["invariants"])),
@@ -359,6 +507,23 @@ def certify_top_inset_reservation_prisms(
             "top_inset_cuts_deferred_to_finalization": True,
             "container_envelopes_unchanged": True,
             "reserved_prisms_follow_local_depth_regions": True,
+            "minimal_flat_geometry_certified": (
+                minimal_flat_geometry_certificate["certified"]
+            ),
+            "flat_items_create_positive_geometry": (
+                minimal_flat_geometry_certificate["certified"] is not True
+            ),
+            "flat_positive_body_count": (
+                minimal_flat_geometry_certificate[
+                    "flat_positive_body_count"
+                ]
+            ),
+            "flat_positive_union_count": 0,
+            "flat_positive_volume_mm3": (
+                minimal_flat_geometry_certificate[
+                    "flat_positive_volume_mm3"
+                ]
+            ),
         },
     }
 

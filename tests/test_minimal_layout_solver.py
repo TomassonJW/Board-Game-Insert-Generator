@@ -575,6 +575,38 @@ class MinimalLayoutSolverTests(unittest.TestCase):
         self.assertNotIn("reservation_required_z_compensation_mm", placement)
         self.assertTrue(plan["invariants"]["minimum_outer_dimensions_only"])
         self.assertTrue(plan["invariants"]["reservation_prisms_post_certified"])
+        self.assertTrue(
+            plan["invariants"]["minimal_flat_geometry_certified"]
+        )
+        self.assertFalse(
+            plan["invariants"]["flat_items_create_positive_geometry"]
+        )
+        self.assertEqual(plan["summary"]["flat_positive_body_count"], 0)
+        self.assertEqual(plan["summary"]["flat_positive_union_count"], 0)
+        self.assertEqual(
+            plan["summary"]["flat_positive_volume_mm3"],
+            0.0,
+        )
+        flat_certificate = plan["minimal_layout"][
+            "flat_geometry_certificate"
+        ]
+        self.assertTrue(flat_certificate["certified"])
+        self.assertEqual(
+            flat_certificate[
+                "reservation_required_z_compensation_count"
+            ],
+            0,
+        )
+        self.assertIn(
+            "minimal_flat_geometry_strictly_non_positive",
+            {
+                check["name"]
+                for check in plan["minimal_layout"][
+                    "global_certificate"
+                ]["checks"]
+                if check["passed"]
+            },
+        )
         self.assertFalse(plan["top_inset_reservations"]["cuts"])
 
     def test_dense_11_by_34_case_stays_bounded_and_truthful(self) -> None:

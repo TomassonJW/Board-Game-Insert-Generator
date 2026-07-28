@@ -786,7 +786,17 @@ def certify_minimal_free_3d_plan(
         empty_spaces,
         _mapping(plan.get("top_inset_reservations")),
     )
-    required_z_compensation_count = 0
+    flat_geometry_certificate = _mapping(
+        _mapping(plan.get("top_inset_reservations")).get(
+            "minimal_flat_geometry_certificate"
+        )
+    )
+    required_z_compensation_count = int(
+        flat_geometry_certificate.get(
+            "reservation_required_z_compensation_count",
+            0,
+        )
+    )
     summary = _mapping(plan["summary"])
     summary.update(
         {
@@ -801,6 +811,27 @@ def certify_minimal_free_3d_plan(
             "quality_score": None,
             "simplicity_score": None,
             "score_breakdown": deepcopy(metrics),
+            "minimal_flat_geometry_certified": (
+                flat_geometry_certificate.get("certified") is True
+            ),
+            "flat_positive_body_count": int(
+                flat_geometry_certificate.get(
+                    "flat_positive_body_count",
+                    0,
+                )
+            ),
+            "flat_positive_union_count": int(
+                flat_geometry_certificate.get(
+                    "flat_positive_union_count",
+                    0,
+                )
+            ),
+            "flat_positive_volume_mm3": float(
+                flat_geometry_certificate.get(
+                    "flat_positive_volume_mm3",
+                    0.0,
+                )
+            ),
         }
     )
     plan["summary"] = summary
@@ -849,6 +880,30 @@ def certify_minimal_free_3d_plan(
             "reservation_prisms_post_certified": True,
             "reservation_requires_supporting_body": False,
             "top_inset_cuts_deferred_to_finalization": True,
+            "minimal_flat_geometry_certified": (
+                flat_geometry_certificate.get("certified") is True
+            ),
+            "flat_items_create_positive_geometry": (
+                flat_geometry_certificate.get("certified") is not True
+            ),
+            "flat_positive_body_count": int(
+                flat_geometry_certificate.get(
+                    "flat_positive_body_count",
+                    0,
+                )
+            ),
+            "flat_positive_union_count": int(
+                flat_geometry_certificate.get(
+                    "flat_positive_union_count",
+                    0,
+                )
+            ),
+            "flat_positive_volume_mm3": float(
+                flat_geometry_certificate.get(
+                    "flat_positive_volume_mm3",
+                    0.0,
+                )
+            ),
             "residual_distributed": False,
             "continuous_closure_applied": False,
             "weighted_surplus": False,
@@ -904,6 +959,9 @@ def certify_minimal_free_3d_plan(
         },
         "finalization_applied": False,
         "automatic_body_count": 0,
+        "flat_geometry_certificate": deepcopy(
+            flat_geometry_certificate
+        ),
     }
     plan.pop("plan_digest", None)
     certifiable_payload_digest = _digest(plan)

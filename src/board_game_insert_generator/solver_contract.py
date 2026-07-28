@@ -462,6 +462,36 @@ def certify_minimal_layout_candidate(
     summary = _mapping(plan.get("summary"))
     validation = _mapping(plan.get("validation"))
     placements = _mappings(plan.get("placements"))
+    top_insets = _mapping(plan.get("top_inset_reservations"))
+    flat_geometry = _mapping(
+        top_insets.get("minimal_flat_geometry_certificate")
+    )
+    flat_geometry_is_strictly_non_positive = bool(
+        flat_geometry.get("schema_version")
+        == "bgig.minimal_flat_geometry_certificate.v1"
+        and flat_geometry.get("certified") is True
+        and flat_geometry.get("all_reserved_prisms_non_printable") is True
+        and _integer(flat_geometry.get("reserved_prism_count"))
+        == _integer(
+            flat_geometry.get("non_printable_reserved_prism_count")
+        )
+        and _integer(flat_geometry.get("flat_positive_body_count")) == 0
+        and _integer(flat_geometry.get("flat_positive_union_count")) == 0
+        and abs(_number(flat_geometry.get("flat_positive_volume_mm3")))
+        <= _EPSILON
+        and _integer(
+            flat_geometry.get("positive_geometry_operation_count")
+        )
+        == 0
+        and _integer(
+            flat_geometry.get(
+                "reservation_required_z_compensation_count"
+            )
+        )
+        == 0
+        and _integer(flat_geometry.get("support_count")) == 0
+        and _integer(flat_geometry.get("cut_count")) == 0
+    )
     checks = tuple(
         (
             ValidationCheck(
@@ -491,6 +521,11 @@ def certify_minimal_layout_candidate(
             not bool(summary.get("complete_printable_partition"))
             and not bool(_mapping(plan.get("invariants")).get("residual_distributed")),
             "RESIDUAL_WAS_DISTRIBUTED",
+        ),
+        ValidationCheck(
+            "minimal_flat_geometry_strictly_non_positive",
+            flat_geometry_is_strictly_non_positive,
+            "MINIMAL_FLAT_POSITIVE_GEOMETRY",
         ),
     )
     return ValidationCertificate(

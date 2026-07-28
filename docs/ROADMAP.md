@@ -16,8 +16,8 @@ cavités et exige des recherches de `87–91 s`.
 P64-L09U-R7-V human-KO 0.1.78
   -> R8-A preuve, profil, première divergence [done]
   -> R8-B ADR pipeline strictement soustractif [done]
-  -> R8-C calcul minimal séparé [ready]
-  -> R8-D finalisation des conteneurs
+  -> R8-C calcul minimal séparé [done]
+  -> R8-D finalisation des conteneurs [ready]
   -> R8-E encastrements par coupes seulement
   -> R8-F fidélité et régressions de bout en bout
   -> R8-G candidate, installation et nouvelle gate humaine

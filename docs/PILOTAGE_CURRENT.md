@@ -34,8 +34,16 @@
   et figée, puis une passe distincte ne produit que des soustractions.
 - Le certificat cible impose `0 mm³`, `0` corps et `0` union positifs liés aux
   éléments plats, sans compensation de volumes.
-- R8-C est maintenant la mission unique `ready`. Elle doit rendre explicite et
-  testable la frontière minimale sans aucune géométrie positive plate.
+- R8-C est terminée : le plan minimal publie
+  `bgig.minimal_flat_geometry_certificate.v1` et prouve
+  `0 mm³ / 0 corps / 0 union` positifs liés aux éléments plats.
+- Toute compensation Z plate positive est rejetée ; la régression de `6,8 mm`
+  mesure exactement `3 660,032 mm³` interdits.
+- Le certificat produit global contrôle cette frontière. Le solveur garde le
+  même algorithme et les mêmes budgets sous l'identité
+  `p64-l09u-r8-c-v1`.
+- R8-D est maintenant la mission unique `ready`. Elle doit figer la géométrie
+  positive des conteneurs finalisés et supprimer l'extension `cad_*`.
 - Les acquis R6/R7 restent à préserver : profondeurs, accès, parois minimales,
   ordre automatique, grille `0,1 mm`, BRep transitoire et projets personnels en
   lecture seule.
@@ -48,7 +56,8 @@ Autorités R8 :
 - `docs/P64_L09U_R8_SUBTRACTIVE_FLAT_INSETS_HANDOFF.md` ;
 - `docs/P64_L09U_R8_A_SUBTRACTIVE_PIPELINE_DIAGNOSTIC_EVIDENCE.md` ;
 - `docs/DECISIONS/ADR-0105-conteneurs-finalises-et-encastrements-strictement-soustractifs.md` ;
-- `docs/P64_L09U_R8_B_SUBTRACTIVE_PIPELINE_DECISION_EVIDENCE.md`.
+- `docs/P64_L09U_R8_B_SUBTRACTIVE_PIPELINE_DECISION_EVIDENCE.md` ;
+- `docs/P64_L09U_R8_C_MINIMAL_SUBTRACTIVE_BOUNDARY_EVIDENCE.md`.
 
 ### Historique R7 clôturé en human-KO
 

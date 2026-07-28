@@ -36,13 +36,17 @@
 
 ### P64-L09U-R8-C — Calcul minimal séparé
 
-- Statut : `ready`.
+- Statut : `done-automated-validated`.
 - Ne conserver que poses, enveloppes, ordre, intervalles et couvertures.
 - Supprimer toute fabrication de support liée aux éléments plats.
+- Certificat : `0 mm³`, `0` corps, `0` union et `0` compensation Z positifs
+  liés aux éléments plats.
+- Preuve :
+  `docs/P64_L09U_R8_C_MINIMAL_SUBTRACTIVE_BOUNDARY_EVIDENCE.md`.
 
 ### P64-L09U-R8-D — Conteneurs finalisés avant encastrement
 
-- Statut : `blocked-by-R8-C`.
+- Statut : `ready`.
 - Remplir la boîte avec les conteneurs tout en réservant les hauteurs locales.
 - Recertifier fonds, parois, cavités et accès.
 

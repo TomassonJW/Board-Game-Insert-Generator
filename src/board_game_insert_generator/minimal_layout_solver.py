@@ -103,7 +103,7 @@ from board_game_insert_generator.reserved_floor_stack_solver import (
 
 
 MINIMAL_LAYOUT_FAMILY_ID = "minimal_layout_portfolio"
-MINIMAL_LAYOUT_SOLVER_VERSION = "p64-l09u-r2-v1"
+MINIMAL_LAYOUT_SOLVER_VERSION = "p64-l09u-r8-c-v1"
 MINIMAL_LAYOUT_PORTFOLIO_SCHEMA_V1 = "bgig.minimal_layout_portfolio.v1"
 _AXES = ("x", "y", "z")
 _EPSILON = 0.0001

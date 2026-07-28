@@ -7,7 +7,7 @@ Date : 2026-07-28.
 
 Statut : `P64-L09U-R7-V-human-KO`, `do-not-run`,
 `P64-L09U-R8-A-done-diagnostic`, `P64-L09U-R8-B-done-architecture`,
-`P64-L09U-R8-C-ready`,
+`P64-L09U-R8-C-automated-validated`, `P64-L09U-R8-D-ready`,
 `fusion-validated=false`, `print-validated=false`.
 
 - 0.1.78 est `human-KO`, `do-not-run`.
@@ -34,8 +34,16 @@ Statut : `P64-L09U-R7-V-human-KO`, `do-not-run`,
   soustractive partagée jusqu'à la BRep.
 - Le certificat cible impose `0 mm³`, `0` corps et `0` union positifs liés aux
   éléments plats ; le digest positif est figé avant la passe.
-- R8-C doit certifier que le plan minimal ne publie que poses, enveloppes et
-  réservations non imprimables, sans compensation Z attribuée aux plats.
+- R8-C publie `bgig.minimal_flat_geometry_certificate.v1` et prouve
+  `0 mm³`, `0` corps, `0` union, `0` support et `0` coupe positifs liés aux
+  éléments plats.
+- Une compensation Z plate de `6,8 mm` est rejetée avec un volume interdit de
+  `3 660,032 mm³`.
+- L'identité du solveur devient `p64-l09u-r8-c-v1`; algorithme, lanes et
+  budgets restent inchangés.
+- Validation R8-C : `67/67` tests ciblés et compilation Python OK.
+- R8-D doit figer la géométrie positive des conteneurs finalisés avant toute
+  passe plate.
 - Les acquis de profondeur, accès, parois, ordre, grille `0,1 mm` et BRep
   transitoire restent obligatoires.
 - Aucun benchmark/holdout/corpus/tournoi ; aucune UI manuelle.
@@ -50,6 +58,8 @@ Décision :
 `docs/DECISIONS/ADR-0105-conteneurs-finalises-et-encastrements-strictement-soustractifs.md`.
 Preuve R8-B :
 `docs/P64_L09U_R8_B_SUBTRACTIVE_PIPELINE_DECISION_EVIDENCE.md`.
+Preuve R8-C :
+`docs/P64_L09U_R8_C_MINIMAL_SUBTRACTIVE_BOUNDARY_EVIDENCE.md`.
 
 ### Historique R7 clôturé en human-KO
 

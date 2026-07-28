@@ -7,6 +7,7 @@ from board_game_insert_generator.partition_solver import solve_partition_plan
 from board_game_insert_generator.product_grid import is_on_product_grid
 from board_game_insert_generator.project_v1 import blank_project_v1
 from board_game_insert_generator.top_inset_reservation import (
+    MINIMAL_FLAT_GEOMETRY_CERTIFICATE_SCHEMA_V1,
     TOP_INSET_CUT_KIND,
     TOP_INSET_RESERVATION_SCHEMA_V1,
     _automatic_axis_positions,
@@ -975,6 +976,75 @@ class TopInsetReservationTests(unittest.TestCase):
         self.assertEqual(
             result["support"]["status"],
             "not_required_for_minimal_layout",
+        )
+        certificate = result["minimal_flat_geometry_certificate"]
+        self.assertEqual(
+            certificate["schema_version"],
+            MINIMAL_FLAT_GEOMETRY_CERTIFICATE_SCHEMA_V1,
+        )
+        self.assertTrue(certificate["certified"])
+        self.assertTrue(certificate["all_reserved_prisms_non_printable"])
+        self.assertEqual(certificate["flat_positive_body_count"], 0)
+        self.assertEqual(certificate["flat_positive_union_count"], 0)
+        self.assertEqual(certificate["flat_positive_volume_mm3"], 0.0)
+        self.assertEqual(
+            certificate[
+                "reservation_required_z_compensation_count"
+            ],
+            0,
+        )
+        self.assertEqual(certificate["support_count"], 0)
+        self.assertEqual(certificate["cut_count"], 0)
+
+    def test_minimal_boundary_rejects_flat_attributed_z_compensation(
+        self,
+    ) -> None:
+        value = project()
+        value["box"] = {
+            "inner_dimensions_mm": {"x": 200.0, "y": 150.0, "z": 60.0},
+            "usable_height_mm": 59.6,
+            "lid_clearance_mm": 0.4,
+        }
+        value["flat_items"] = [
+            flat(
+                "tray",
+                x=100.0,
+                y=80.0,
+                z=1.0,
+                origin={"x": 10.0, "y": 10.0},
+            )
+        ]
+        placements = [
+            {
+                "id": "container:018",
+                "name": "Conteneur limite",
+                "origin_mm": {"x": 20.0, "y": 20.0, "z": 21.2},
+                "world_size_mm": {"x": 23.2, "y": 23.2, "z": 31.6},
+                "reservation_required_z_compensation_mm": 6.8,
+            }
+        ]
+
+        result = certify_top_inset_reservation_prisms(
+            value,
+            placements,
+        )
+
+        certificate = result["minimal_flat_geometry_certificate"]
+        self.assertEqual(result["status"], "blocked")
+        self.assertFalse(certificate["certified"])
+        self.assertEqual(
+            certificate[
+                "reservation_required_z_compensation_count"
+            ],
+            1,
+        )
+        self.assertAlmostEqual(
+            certificate["flat_positive_volume_mm3"],
+            3660.032,
+        )
+        self.assertIn(
+            "MINIMAL_FLAT_POSITIVE_Z_COMPENSATION_FORBIDDEN",
+            {value["code"] for value in result["blockers"]},
         )
 
 

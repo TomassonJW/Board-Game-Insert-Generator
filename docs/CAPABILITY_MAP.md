@@ -20,12 +20,15 @@
 - `C-PRODUCT-GRID` : acquis automatisé à préserver, résolution `0,1 mm`.
 - `C-ARCHITECTURE` : ADR-0105 acceptée. Les conteneurs finalisés figent toute
   géométrie positive avant une passe plate uniquement soustractive.
+- `C-MINIMAL-LAYOUT` : R8-C `automated-validated`. Le certificat minimal
+  prouve `0 mm³`, `0` corps, `0` union, `0` support et `0` coupe positifs liés
+  aux éléments plats ; toute compensation Z est rejetée.
 - `C-RELEASE` : 0.1.78 `human-KO`, `do-not-run`; R8-A `done-diagnostic`,
-  R8-B `done-architecture`, R8-C `ready`.
+  R8-B `done-architecture`, R8-C `automated-validated`, R8-D `ready`.
 - `C-PRINT` : `print-validated=false`.
 
-Prochaine frontière : R8-C, certificat explicite de la frontière minimale sans
-géométrie positive plate.
+Prochaine frontière : R8-D, géométrie positive explicite et figée des
+conteneurs finalisés.
 
 ### Historique R7 clôturé en human-KO
 
