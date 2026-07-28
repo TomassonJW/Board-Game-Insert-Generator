@@ -6,7 +6,8 @@
 Date : 2026-07-28.
 
 Statut : `P64-L09U-R7-V-human-KO`, `do-not-run`,
-`P64-L09U-R8-A-done-diagnostic`, `P64-L09U-R8-B-ready`,
+`P64-L09U-R8-A-done-diagnostic`, `P64-L09U-R8-B-done-architecture`,
+`P64-L09U-R8-C-ready`,
 `fusion-validated=false`, `print-validated=false`.
 
 - 0.1.78 est `human-KO`, `do-not-run`.
@@ -29,8 +30,12 @@ Statut : `P64-L09U-R7-V-human-KO`, `do-not-run`,
   `[67,8 ; 69,8]`; la BRep laisse `31 209,20 mm³` du vide demandé non retiré.
 - Les replays locaux sans SCIP natif comptent `818`, `9 019` et `649` états
   sans complétion selon cas et effort. Ils ne remplacent pas les temps Fusion.
-- R8-B doit fixer par ADR le conteneur finalisé explicite, puis une passe
-  uniquement soustractive partagée jusqu'à la BRep.
+- ADR-0105 fixe le conteneur finalisé explicite, puis une passe uniquement
+  soustractive partagée jusqu'à la BRep.
+- Le certificat cible impose `0 mm³`, `0` corps et `0` union positifs liés aux
+  éléments plats ; le digest positif est figé avant la passe.
+- R8-C doit certifier que le plan minimal ne publie que poses, enveloppes et
+  réservations non imprimables, sans compensation Z attribuée aux plats.
 - Les acquis de profondeur, accès, parois, ordre, grille `0,1 mm` et BRep
   transitoire restent obligatoires.
 - Aucun benchmark/holdout/corpus/tournoi ; aucune UI manuelle.
@@ -41,6 +46,10 @@ Hand-off :
 `docs/P64_L09U_R8_SUBTRACTIVE_FLAT_INSETS_HANDOFF.md`.
 Diagnostic :
 `docs/P64_L09U_R8_A_SUBTRACTIVE_PIPELINE_DIAGNOSTIC_EVIDENCE.md`.
+Décision :
+`docs/DECISIONS/ADR-0105-conteneurs-finalises-et-encastrements-strictement-soustractifs.md`.
+Preuve R8-B :
+`docs/P64_L09U_R8_B_SUBTRACTIVE_PIPELINE_DECISION_EVIDENCE.md`.
 
 ### Historique R7 clôturé en human-KO
 

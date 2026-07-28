@@ -27,6 +27,9 @@ R8 est autorisé sans nouvelle gate intermédiaire. Une nouvelle gate humaine ne
 sera ouverte qu'après diagnostic, ADR, corrections automatisées, intégration et
 installation d'une nouvelle candidate.
 
+R8-A et R8-B sont terminées. ADR-0105 est acceptée ; R8-C à R8-G restent
+autorisées sans nouvelle observation de 0.1.78.
+
 `fusion-validated=false`, `print-validated=false`.
 
 ### Préparation R7 historique

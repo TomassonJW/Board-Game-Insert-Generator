@@ -30,8 +30,12 @@
 - Les replays locaux sans SCIP natif ne trouvent aucune complétion :
   `818` états en Normal, puis `9 019` en Approfondi sur `CasLimite02+`;
   `649` états en Normal sur `CasLimite02++`.
-- R8-B est maintenant la mission unique `ready`. Elle doit fixer par ADR un
-  conteneur finalisé explicite puis une passe de coupes uniquement.
+- ADR-0105 est acceptée : la géométrie positive des conteneurs est finalisée
+  et figée, puis une passe distincte ne produit que des soustractions.
+- Le certificat cible impose `0 mm³`, `0` corps et `0` union positifs liés aux
+  éléments plats, sans compensation de volumes.
+- R8-C est maintenant la mission unique `ready`. Elle doit rendre explicite et
+  testable la frontière minimale sans aucune géométrie positive plate.
 - Les acquis R6/R7 restent à préserver : profondeurs, accès, parois minimales,
   ordre automatique, grille `0,1 mm`, BRep transitoire et projets personnels en
   lecture seule.
@@ -42,7 +46,9 @@ Autorités R8 :
 
 - `docs/P64_L09U_R7_V_0178_HUMAN_KO_EVIDENCE.md` ;
 - `docs/P64_L09U_R8_SUBTRACTIVE_FLAT_INSETS_HANDOFF.md` ;
-- `docs/P64_L09U_R8_A_SUBTRACTIVE_PIPELINE_DIAGNOSTIC_EVIDENCE.md`.
+- `docs/P64_L09U_R8_A_SUBTRACTIVE_PIPELINE_DIAGNOSTIC_EVIDENCE.md` ;
+- `docs/DECISIONS/ADR-0105-conteneurs-finalises-et-encastrements-strictement-soustractifs.md` ;
+- `docs/P64_L09U_R8_B_SUBTRACTIVE_PIPELINE_DECISION_EVIDENCE.md`.
 
 ### Historique R7 clôturé en human-KO
 

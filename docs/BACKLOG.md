@@ -25,13 +25,18 @@
 
 ### P64-L09U-R8-B — ADR du pipeline soustractif
 
-- Statut : `ready`.
+- Statut : `done-architecture`.
 - Comparer correction locale, séparation de modèle et reconstruction bornée.
 - Formaliser enveloppes, finalisation, cellules XY et coupes seulement.
+- Décision : conteneurs finalisés et figés, puis passe uniquement
+  soustractive ; certificat `0 mm³ / 0 corps / 0 union` positifs liés aux
+  éléments plats.
+- ADR :
+  `docs/DECISIONS/ADR-0105-conteneurs-finalises-et-encastrements-strictement-soustractifs.md`.
 
 ### P64-L09U-R8-C — Calcul minimal séparé
 
-- Statut : `blocked-by-R8-B`.
+- Statut : `ready`.
 - Ne conserver que poses, enveloppes, ordre, intervalles et couvertures.
 - Supprimer toute fabrication de support liée aux éléments plats.
 

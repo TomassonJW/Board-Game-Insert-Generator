@@ -18,12 +18,14 @@
 - `C-FUSION` : `human-KO`, cause mesurée. Trois coupes livret sont décalées de
   `+4 mm`; la BRep laisse `31 209,20 mm³` du vide demandé non retiré.
 - `C-PRODUCT-GRID` : acquis automatisé à préserver, résolution `0,1 mm`.
+- `C-ARCHITECTURE` : ADR-0105 acceptée. Les conteneurs finalisés figent toute
+  géométrie positive avant une passe plate uniquement soustractive.
 - `C-RELEASE` : 0.1.78 `human-KO`, `do-not-run`; R8-A `done-diagnostic`,
-  R8-B `ready`.
+  R8-B `done-architecture`, R8-C `ready`.
 - `C-PRINT` : `print-validated=false`.
 
-Prochaine frontière : R8-B, ADR du conteneur finalisé puis de la passe
-strictement soustractive.
+Prochaine frontière : R8-C, certificat explicite de la frontière minimale sans
+géométrie positive plate.
 
 ### Historique R7 clôturé en human-KO
 

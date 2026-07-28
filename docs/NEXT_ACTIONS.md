@@ -1,7 +1,7 @@
 # Next Actions
 
 <!-- P64-L09U-NEXT -->
-## Action courante : P64-L09U-R8-B — ADR du pipeline strictement soustractif
+## Action courante : P64-L09U-R8-C — frontière minimale séparée
 
 0.1.78 est `human-KO`, `do-not-run`.
 
@@ -24,22 +24,34 @@ R8-A est terminée :
 - recherche, lanes, candidats, rejets, temps et mémoire profilés ;
 - aucune modification de code produit.
 
-R8-B est la seule mission `ready` :
+R8-B est terminée :
 
-- formaliser `matière finale = conteneur finalisé - union des encastrements` ;
-- rendre illégaux tout volume, union ou corps positif lié à un élément plat ;
-- choisir la séparation explicite du conteneur finalisé et de la passe de
-  soustraction, ou documenter une meilleure option ;
-- préciser les contrats de l'aperçu, du certificat, de la CAD IR, du plan
-  Fusion et de la BRep ;
-- découper R8-C à R8-F en incréments bornés et testables.
+- ADR-0105 retient le conteneur finalisé puis la passe uniquement soustractive ;
+- la matière finale vaut
+  `conteneurs finalisés - union des encastrements` ;
+- tout volume, corps ou union positifs liés à un élément plat sont interdits ;
+- le digest positif est figé avant la passe plate ;
+- les intervalles métier, CAD IR, Fusion et BRep doivent être identiques ;
+- aucun solveur, budget ou valeur physique ne change.
 
-R8-C à R8-G restent `blocked-by-R8-B`.
+R8-C est la seule mission `ready` :
+
+- publier un certificat minimal explicite de zéro géométrie positive plate ;
+- conserver uniquement poses, enveloppes, ordre, régions et réservations
+  non imprimables ;
+- interdire toute compensation Z attribuée à une réservation plate ;
+- prouver `support_count=0`, `flat_positive_body_count=0`,
+  `flat_positive_union_count=0` et `flat_positive_volume_mm3=0` ;
+- préserver le solveur, les budgets et la grille produit.
+
+R8-D à R8-G restent `blocked-by-R8-C`.
 
 Preuves :
 
 - `docs/P64_L09U_R7_V_0178_HUMAN_KO_EVIDENCE.md` ;
-- `docs/P64_L09U_R8_A_SUBTRACTIVE_PIPELINE_DIAGNOSTIC_EVIDENCE.md`.
+- `docs/P64_L09U_R8_A_SUBTRACTIVE_PIPELINE_DIAGNOSTIC_EVIDENCE.md` ;
+- `docs/DECISIONS/ADR-0105-conteneurs-finalises-et-encastrements-strictement-soustractifs.md` ;
+- `docs/P64_L09U_R8_B_SUBTRACTIVE_PIPELINE_DECISION_EVIDENCE.md`.
 
 Hand-off :
 `docs/P64_L09U_R8_SUBTRACTIVE_FLAT_INSETS_HANDOFF.md`.
