@@ -4,10 +4,12 @@ from copy import deepcopy
 import unittest
 
 from board_game_insert_generator.partition_solver import solve_partition_plan
+from board_game_insert_generator.product_grid import is_on_product_grid
 from board_game_insert_generator.project_v1 import blank_project_v1
 from board_game_insert_generator.top_inset_reservation import (
     TOP_INSET_CUT_KIND,
     TOP_INSET_RESERVATION_SCHEMA_V1,
+    _automatic_axis_positions,
     apply_top_inset_reservations,
     certify_top_inset_reservation_prisms,
     derive_top_inset_reservations,
@@ -66,6 +68,94 @@ def flat(
 
 
 class TopInsetReservationTests(unittest.TestCase):
+    def test_automatic_candidates_and_xy_geometry_use_the_product_grid(
+        self,
+    ) -> None:
+        value = project()
+        value["box"] = {
+            "inner_dimensions_mm": {
+                "x": 100.0,
+                "y": 60.0,
+                "z": 12.0,
+            },
+            "usable_height_mm": 10.0,
+            "lid_clearance_mm": 2.0,
+        }
+        value["flat_items"] = [
+            flat("board", x=20.03, y=19.97, z=2.0)
+        ]
+
+        result = derive_top_inset_reservations(value)
+
+        self.assertEqual(result["status"], "ready_for_intersection")
+        search = result["automatic_xy_search"]
+        self.assertEqual(search["product_grid_step_mm"], 0.1)
+        self.assertTrue(search["selected_pose_on_product_grid"])
+        reservation = result["reservations"][0]
+        self.assertEqual(reservation["cut_size_mm"]["x"], 21.3)
+        for payload in (
+            reservation["cut_origin_mm"],
+            reservation["cut_size_mm"],
+            reservation["grip_zone"]["origin_mm"],
+            reservation["grip_zone"]["size_mm"],
+        ):
+            self.assertTrue(
+                all(
+                    is_on_product_grid(payload[axis])
+                    for axis in ("x", "y")
+                )
+            )
+        self.assertIn("product_grid_ticks_v1", reservation)
+        self.assertTrue(
+            result["invariants"][
+                "automatic_xy_candidates_on_product_grid"
+            ]
+        )
+
+    def test_axis_anchors_are_deduplicated_after_grid_quantization(
+        self,
+    ) -> None:
+        metrics: dict[str, int] = {
+            "axis_anchor_occurrence_count_before_quantization": 0,
+            "axis_anchor_occurrence_count_after_quantization": 0,
+        }
+
+        positions = _automatic_axis_positions(
+            axis="x",
+            limit=100.0,
+            size=20.0,
+            reservations=[],
+            cavity_constraints=[
+                {
+                    "bounds": {
+                        "x": 30.01,
+                        "y": 0.0,
+                        "width": 10.0,
+                        "height": 10.0,
+                    },
+                    "minimum_wall_mm": 1.2,
+                },
+                {
+                    "bounds": {
+                        "x": 30.04,
+                        "y": 0.0,
+                        "width": 10.0,
+                        "height": 10.0,
+                    },
+                    "minimum_wall_mm": 1.2,
+                },
+            ],
+            grid_metrics=metrics,
+        )
+
+        self.assertTrue(all(is_on_product_grid(value) for value in positions))
+        self.assertGreater(
+            metrics[
+                "admissible_axis_anchor_occurrence_count_before_quantization"
+            ],
+            metrics["axis_anchor_occurrence_count_after_quantization"],
+        )
+
     def test_upright_cavity_keeps_its_calibrated_depth_before_tray_cut(self) -> None:
         value = project()
         value["flat_items"] = [
@@ -142,6 +232,14 @@ class TopInsetReservationTests(unittest.TestCase):
 
         self.assertEqual(result["status"], "ready_for_intersection")
         self.assertNotEqual(result["reservations"][0]["cut_origin_mm"], preview_origin)
+        reservation = result["reservations"][0]
+        self.assertEqual(
+            reservation["product_grid_ticks_v1"]["origin"],
+            {
+                axis: int(reservation["cut_origin_mm"][axis] * 10)
+                for axis in ("x", "y")
+            },
+        )
         self.assertEqual(
             result["automatic_xy_search"]["placement_context"],
             "frozen_bodies",

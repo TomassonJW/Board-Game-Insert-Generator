@@ -12,6 +12,18 @@ from copy import deepcopy
 from math import isclose
 from typing import Any
 
+from board_game_insert_generator.product_grid import (
+    PRODUCT_GRID_SCHEMA_V1,
+    PRODUCT_GRID_STEP_MM,
+    ceil_mm,
+    floor_mm,
+    floor_ticks,
+    is_on_product_grid,
+    nearest_mm,
+    nearest_ticks,
+    outward_size_mm,
+    ticks_to_mm,
+)
 from board_game_insert_generator.project_v1 import ProjectNormalization, normalize_project_draft
 
 
@@ -127,6 +139,14 @@ def _derive_top_inset_reservations(
         "removal_sequence": removal_sequence,
         "blockers": blockers,
         "automatic_xy_search": search,
+        "product_grid_v1": {
+            "schema_version": PRODUCT_GRID_SCHEMA_V1,
+            "step_mm": PRODUCT_GRID_STEP_MM,
+            "candidate_origins_quantized": True,
+            "required_xy_envelopes_quantized_outward": True,
+            "numeric_epsilon_mm": _EPSILON,
+            "epsilon_is_not_search_resolution": True,
+        },
         "summary": {
             "status": status,
             "reservation_count": len(reservations),
@@ -145,6 +165,8 @@ def _derive_top_inset_reservations(
             "automatic_xy_placement": True,
             "manual_xy_origin_ignored": True,
             "minimum_cavity_wall_envelope_certified": not blockers,
+            "automatic_xy_candidates_on_product_grid": True,
+            "required_xy_envelopes_not_rounded_inward": True,
         },
     }
 
@@ -611,6 +633,10 @@ def _resolve_automatic_xy_layout(
     evaluated = 0
     wall_rejections = 0
     geometry_rejections: list[dict[str, object]] = []
+    grid_metrics = {
+        "axis_anchor_occurrence_count_before_quantization": 0,
+        "axis_anchor_occurrence_count_after_quantization": 0,
+    }
 
     for item in items:
         expanded: list[list[dict[str, object]]] = []
@@ -645,6 +671,7 @@ def _resolve_automatic_xy_layout(
                     size=size["x"],
                     reservations=state,
                     cavity_constraints=cavity_constraints,
+                    grid_metrics=grid_metrics,
                 )
                 y_values = _automatic_axis_positions(
                     axis="y",
@@ -652,6 +679,7 @@ def _resolve_automatic_xy_layout(
                     size=size["y"],
                     reservations=state,
                     cavity_constraints=cavity_constraints,
+                    grid_metrics=grid_metrics,
                 )
                 for x in x_values:
                     for y in y_values:
@@ -714,6 +742,7 @@ def _resolve_automatic_xy_layout(
                 "retained_state_count": 0,
                 "wall_rejection_count": wall_rejections,
                 "placement_context": "frozen_bodies" if placements else "box_preview",
+                **_grid_search_metrics(grid_metrics),
             }
         deduplicated: dict[tuple[object, ...], list[dict[str, object]]] = {}
         for candidate_state in expanded:
@@ -784,6 +813,7 @@ def _resolve_automatic_xy_layout(
             "reserved_prism_rejection_count": collision_rejections,
             "application_rejection_count": len(application_rejections),
             "placement_context": "frozen_bodies" if placements else "box_preview",
+            **_grid_search_metrics(grid_metrics),
         }
     return selected or [], [], {
         "status": "resolved" if items else "not_required",
@@ -795,6 +825,10 @@ def _resolve_automatic_xy_layout(
         "application_rejection_count": len(application_rejections),
         "placement_context": "frozen_bodies" if placements else "box_preview",
         "selected_signature": list(_automatic_layout_signature(selected or [])),
+        "selected_pose_on_product_grid": _automatic_layout_on_product_grid(
+            selected or []
+        ),
+        **_grid_search_metrics(grid_metrics),
     }
 
 
@@ -805,6 +839,7 @@ def _automatic_axis_positions(
     size: float,
     reservations: list[dict[str, object]],
     cavity_constraints: list[dict[str, object]],
+    grid_metrics: dict[str, int] | None = None,
 ) -> list[float]:
     axis_size = "width" if axis == "x" else "height"
     values = {0.0, (limit - size) / 2.0, limit - size}
@@ -826,13 +861,32 @@ def _automatic_axis_positions(
                 start + extent + wall,
             }
         )
-    admissible = {
-        _round(min(max(value, 0.0), limit - size))
+    maximum_origin_tick = floor_ticks(limit - size)
+    admissible_before_quantization = {
+        value
         for value in values
         if value >= -_EPSILON and value + size <= limit + _EPSILON
     }
+    admissible_ticks = {
+        min(max(nearest_ticks(value), 0), maximum_origin_tick)
+        for value in admissible_before_quantization
+    }
+    admissible = {ticks_to_mm(value) for value in admissible_ticks}
+    if grid_metrics is not None:
+        grid_metrics[
+            "axis_anchor_occurrence_count_before_quantization"
+        ] += len(values)
+        grid_metrics[
+            "admissible_axis_anchor_occurrence_count_before_quantization"
+        ] = grid_metrics.get(
+            "admissible_axis_anchor_occurrence_count_before_quantization",
+            0,
+        ) + len(admissible_before_quantization)
+        grid_metrics[
+            "axis_anchor_occurrence_count_after_quantization"
+        ] += len(admissible)
     center = (limit - size) / 2.0
-    anchors = [_round(0.0), _round(center), _round(limit - size)]
+    anchors = [0.0, nearest_mm(center), ticks_to_mm(maximum_origin_tick)]
     ordered = [value for value in anchors if value in admissible]
     spread = sorted(admissible)
     remaining_slots = _MAX_AUTOMATIC_AXIS_POSITIONS - len(ordered)
@@ -866,10 +920,20 @@ def _relocate_reservation(
     clearance_y = physical_origin["y"] - old_cut_origin["y"]
     size = _xy(result["cut_size_mm"])
     result["placement_source"] = "automatic_xy"
-    result["cut_origin_mm"] = {"x": _round(x), "y": _round(y)}
+    result["cut_origin_mm"] = {"x": nearest_mm(x), "y": nearest_mm(y)}
     result["physical_origin_mm"] = {
-        "x": _round(x + clearance_x),
-        "y": _round(y + clearance_y),
+        "x": nearest_mm(x + clearance_x),
+        "y": nearest_mm(y + clearance_y),
+    }
+    result["product_grid_ticks_v1"] = {
+        "origin": {
+            "x": nearest_ticks(x),
+            "y": nearest_ticks(y),
+        },
+        "size": {
+            "x": nearest_ticks(size["x"]),
+            "y": nearest_ticks(size["y"]),
+        },
     }
     grip, grip_blocker = _grip_zone(x, y, size["x"], size["y"], box)
     result["grip_zone"] = grip
@@ -1237,6 +1301,41 @@ def _unique_blockers(
     return result
 
 
+def _grid_search_metrics(metrics: dict[str, int]) -> dict[str, object]:
+    admissible_before = metrics.get(
+        "admissible_axis_anchor_occurrence_count_before_quantization",
+        0,
+    )
+    after = metrics[
+        "axis_anchor_occurrence_count_after_quantization"
+    ]
+    return {
+        "product_grid_schema": PRODUCT_GRID_SCHEMA_V1,
+        "product_grid_step_mm": PRODUCT_GRID_STEP_MM,
+        **metrics,
+        "axis_anchor_quantized_duplicate_count": max(
+            0,
+            admissible_before - after,
+        ),
+    }
+
+
+def _automatic_layout_on_product_grid(
+    reservations: list[dict[str, object]],
+) -> bool:
+    for reservation in reservations:
+        for payload_name in ("cut_origin_mm", "cut_size_mm"):
+            payload = _xy(reservation[payload_name])
+            if not all(is_on_product_grid(payload[axis]) for axis in ("x", "y")):
+                return False
+        grip = _mapping(reservation["grip_zone"])
+        for payload_name in ("origin_mm", "size_mm"):
+            payload = _xy(grip[payload_name])
+            if not all(is_on_product_grid(payload[axis]) for axis in ("x", "y")):
+                return False
+    return True
+
+
 
 def _resolve_vertical_layers(
     resolved: list[dict[str, object]], design_top_z: float
@@ -1399,7 +1498,12 @@ def _resolve_item(
         )
         clearance_x = clearance_values['x'] if rotation == 0 else clearance_values['y']
         clearance_y = clearance_values['y'] if rotation == 0 else clearance_values['x']
-        if physical_x + 2.0 * clearance_x <= box["x"] + _EPSILON and physical_y + 2.0 * clearance_y <= box["y"] + _EPSILON:
+        if (
+            outward_size_mm(physical_x + 2.0 * clearance_x)
+            <= box["x"] + _EPSILON
+            and outward_size_mm(physical_y + 2.0 * clearance_y)
+            <= box["y"] + _EPSILON
+        ):
             chosen = (rotation, physical_x, physical_y)
             break
     if chosen is None:
@@ -1422,17 +1526,17 @@ def _resolve_item(
     rotation, physical_x, physical_y = chosen
     clearance_x = clearance_values['x'] if rotation == 0 else clearance_values['y']
     clearance_y = clearance_values['y'] if rotation == 0 else clearance_values['x']
-    cut_x = physical_x + 2.0 * clearance_x
-    cut_y = physical_y + 2.0 * clearance_y
+    cut_x = outward_size_mm(physical_x + 2.0 * clearance_x)
+    cut_y = outward_size_mm(physical_y + 2.0 * clearance_y)
     origin_value = item.get("origin_mm")
     if origin_value is None:
-        cut_origin_x = (box["x"] - cut_x) / 2.0
-        cut_origin_y = (box["y"] - cut_y) / 2.0
+        cut_origin_x = nearest_mm((box["x"] - cut_x) / 2.0)
+        cut_origin_y = nearest_mm((box["y"] - cut_y) / 2.0)
         placement_source = "auto_center"
     else:
         physical_origin = _xy(origin_value)
-        cut_origin_x = physical_origin["x"] - clearance_x
-        cut_origin_y = physical_origin["y"] - clearance_y
+        cut_origin_x = nearest_mm(physical_origin["x"] - clearance_x)
+        cut_origin_y = nearest_mm(physical_origin["y"] - clearance_y)
         placement_source = "explicit_origin"
     if (
         cut_origin_x < -_EPSILON
@@ -1476,8 +1580,8 @@ def _resolve_item(
                 "z": _round(dimensions["z"]),
             },
             "physical_origin_mm": {
-                "x": _round(cut_origin_x + clearance_x),
-                "y": _round(cut_origin_y + clearance_y),
+                "x": nearest_mm(cut_origin_x + clearance_x),
+                "y": nearest_mm(cut_origin_y + clearance_y),
             },
             "total_thickness_mm": _round(dimensions["z"] * int(item["quantity"]) + clearance_values["z"]),
             "clearance_effective_v1": {
@@ -1485,8 +1589,21 @@ def _resolve_item(
                 "values_mm": _rounded_dimension(clearance_values),
                 "source_by_axis": clearance_sources,
             },
-            "cut_origin_mm": {"x": _round(cut_origin_x), "y": _round(cut_origin_y)},
-            "cut_size_mm": {"x": _round(cut_x), "y": _round(cut_y)},
+            "cut_origin_mm": {
+                "x": nearest_mm(cut_origin_x),
+                "y": nearest_mm(cut_origin_y),
+            },
+            "cut_size_mm": {"x": cut_x, "y": cut_y},
+            "product_grid_ticks_v1": {
+                "origin": {
+                    "x": nearest_ticks(cut_origin_x),
+                    "y": nearest_ticks(cut_origin_y),
+                },
+                "size": {
+                    "x": nearest_ticks(cut_x),
+                    "y": nearest_ticks(cut_y),
+                },
+            },
             "grip_zone": grip,
         },
         blockers,
@@ -1526,12 +1643,26 @@ def _grip_zone(
         grip_x = x - depth if side == "left" else x + width
         grip_y = y + (height - grip_width) / 2.0
         size_x, size_y = depth, grip_width
+    x0 = max(0.0, floor_mm(grip_x))
+    y0 = max(0.0, floor_mm(grip_y))
+    x1 = min(floor_mm(box["x"]), ceil_mm(grip_x + size_x))
+    y1 = min(floor_mm(box["y"]), ceil_mm(grip_y + size_y))
     return {
         "status": "planned",
         "side": side,
-        "origin_mm": {"x": _round(grip_x), "y": _round(grip_y)},
-        "size_mm": {"x": _round(size_x), "y": _round(size_y)},
+        "origin_mm": {"x": x0, "y": y0},
+        "size_mm": {
+            "x": nearest_mm(max(0.0, x1 - x0)),
+            "y": nearest_mm(max(0.0, y1 - y0)),
+        },
         "shape": "rectangle",
+        "product_grid_ticks_v1": {
+            "origin": {"x": nearest_ticks(x0), "y": nearest_ticks(y0)},
+            "size": {
+                "x": nearest_ticks(max(0.0, x1 - x0)),
+                "y": nearest_ticks(max(0.0, y1 - y0)),
+            },
+        },
     }, None
 
 

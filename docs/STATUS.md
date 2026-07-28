@@ -7,7 +7,7 @@ Date : 2026-07-28.
 
 Statut : `P64-L09U-R6-V-human-KO`, `do-not-run`,
 `P64-L09U-R7-A-done`, `P64-L09U-R7-B-done`,
-`P64-L09U-R7-C1-ready`,
+`P64-L09U-R7-C1-automated-validated`, `P64-L09U-R7-C2-ready`,
 `fusion-validated=false`, `print-validated=false`.
 
 - 0.1.77 est `human-KO`, `do-not-run`.
@@ -26,7 +26,11 @@ Statut : `P64-L09U-R6-V-human-KO`, `do-not-run`,
   score utile/centré.
 - ADR-0104 retient des ticks de `0,1 mm` aux frontières de disposition, sans
   remplacer tous les floats.
-- Prochaine mission : primitives de grille et candidats automatiques.
+- C1 publie des ticks `0,1 mm`, quantifie les empreintes/prises et fusionne
+  `74` ancres admissibles sur `CasLimite02++`.
+- Le nombre de poses reste `2450` et les temps ne démontrent aucun gain.
+- Validation C1 : `58/58`, compilation Python OK ; Ruff absent.
+- Prochaine mission : marges/parois dures et score utile.
 - Aucun benchmark/holdout/corpus/tournoi ; aucune UI manuelle.
 
 Preuve humaine :
@@ -35,6 +39,8 @@ Runbook :
 `docs/P64_L09U_R7_END_TO_END_RUNBOOK.md`.
 Décisions :
 ADR-0103 et ADR-0104.
+Preuve C1 :
+`docs/P64_L09U_R7_C1_PRODUCT_GRID_CANDIDATES_EVIDENCE.md`.
 
 ### Historique R6 clôturé en human-KO
 

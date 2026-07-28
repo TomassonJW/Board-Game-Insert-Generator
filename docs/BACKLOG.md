@@ -27,14 +27,28 @@
 
 ### P64-L09U-R7-C1 — Grille et candidats
 
-- Statut : `ready`.
+- Statut : `done`, `automated-validated`.
 - Introduire les ticks `0,1 mm`.
 - Quantifier/dédupliquer les ancres candidates.
 - Publier les compteurs avant/après et les migrations.
+- Validation : `58/58`; `74` ancres fusionnées, poses évaluées inchangées.
+
+### P64-L09U-R7-C2 — Parois et score utile
+
+- Statut : `ready`.
+- Marge canonique au bord de boîte.
+- Séparations entre zones plates.
+- Score couverture/recouvrement/centrage.
+
+### P64-L09U-R7-C3 — Recertification finale
+
+- Statut : `pending`, dépend de R7-C2.
+- Refuser tout fragment de matière final sous le minimum.
+- Conserver ou refuser la pose minimale, jamais la déplacer.
 
 ### P64-L09U-R7-C — Placement et parois
 
-- Statut : `pending`, dépend de R7-C1.
+- Statut : `in-progress` via C1 à C3.
 
 ### P64-L09U-R7-D — Pile et matérialisation
 

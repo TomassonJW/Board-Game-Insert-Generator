@@ -21,8 +21,11 @@
   petit-dessous/grand-dessus et la compatibilité historique.
 - ADR-0104 fixe la grille produit `0,1 mm`, les ticks canoniques, migrations,
   digests et mesures honnêtes.
-- R7-B est terminé. La prochaine mission est R7-C1 : primitives de grille et
-  génération/déduplication des candidats.
+- R7-C1 est terminé : primitives de ticks, enveloppes XY conservatrices,
+  candidats/prises quantifiés et compteurs avant/après.
+- Le replay fusionne `74` ancres admissibles, mais conserve `2450` poses
+  évaluées ; aucun gain de temps n'est revendiqué.
+- La prochaine mission est R7-C2 : marges de boîte/parois dures et score utile.
 - Aucun benchmark/holdout/corpus/tournoi, aucune UI manuelle ;
   `fusion-validated=false`, `print-validated=false`.
 
@@ -32,6 +35,7 @@ Autorités R7 :
 - `docs/P64_L09U_R7_END_TO_END_RUNBOOK.md` ;
 - `docs/DECISIONS/ADR-0103-placement-automatique-canonique-et-ordre-de-pile.md` ;
 - `docs/DECISIONS/ADR-0104-grille-produit-de-0-1-mm.md`.
+- `docs/P64_L09U_R7_C1_PRODUCT_GRID_CANDIDATES_EVIDENCE.md`.
 
 ### Historique R6 clôturé en human-KO
 

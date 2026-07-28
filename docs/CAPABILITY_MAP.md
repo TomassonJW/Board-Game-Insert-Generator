@@ -13,14 +13,15 @@
   transmet des micro-coupes.
 - `C-CAD-IR`, `C-PREVIEW`, `C-FUSION` : propagation observable mais résultat
   humain faux ; `fusion-validated=false`.
-- `C-QUANTIZATION` : `ADR-accepted`, résolution produit `0,1 mm`, ticks
-  canoniques et epsilon interne distinct ; implémentation en attente.
+- `C-QUANTIZATION` : `implemented-core` pour candidats, empreintes et prises
+  XY ; propagation finale encore partielle.
 - `C-QUALITY` : deux replays personnels exacts, SHA inchangés ; les tests R7
   restent à écrire.
 - `C-RELEASE` : 0.1.77 `human-KO`, `do-not-run`; aucune candidate R7 encore.
 - `C-PRINT` : `print-validated=false`.
 
-ADR-0103 et ADR-0104 sont acceptées. R7-C1 est la prochaine mission.
+ADR-0103 et ADR-0104 sont acceptées. R7-C1 passe `58/58`; R7-C2 est la
+prochaine mission.
 
 ### Historique R6 clôturé en human-KO
 
