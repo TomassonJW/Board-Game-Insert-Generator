@@ -13,7 +13,8 @@ Statut : `P64-L09U-R6-V-human-KO`, `do-not-run`,
 `P64-L09U-R7-D-automated-validated`,
 `P64-L09U-R7-E-automated-validated`,
 `P64-L09U-R7-E2-automated-validated`,
-`P64-L09U-R7-F-candidate-prepared`,
+`P64-L09U-R7-F-automated-validated`, `installed-local`,
+`P64-L09U-R7-V-ready-human-gate`,
 `fusion-validated=false`, `print-validated=false`.
 
 - 0.1.77 est `human-KO`, `do-not-run`.
@@ -57,11 +58,12 @@ Statut : `P64-L09U-R6-V-human-KO`, `do-not-run`,
   `79,0667 -> 79,1 mm` sans écrire la source.
 - Validation : `120/120` ciblés, `926/926` autorisés, un test ignoré et douze
   modules interdits exclus avant import ; deux SHA personnels inchangés.
-- Candidate 0.1.78 : manifeste, préflight, préparateur et recette prêts.
-- Préflight à blanc :
-  `bbb4a2e6dccf1b5e84a0d5268cd9b7792e52d8bb3134e07004a5935532e4e537`.
+- Candidate 0.1.78 installée depuis `35b17d7`.
+- Préflight final :
+  `30ea1b1055d7eec38b6824cb7e575f86e6e1557aa9a43abfe705fa8af802f59f`.
 - Matrice release : `59/59`, un test ignoré ; préparateur à blanc `84/84`.
-- Prochaine mission : installation et vérification locales.
+- Suite autorisée finale : `928/928`, un test ignoré.
+- Prochaine action : gate humaine R7-V dans Fusion.
 - Aucun benchmark/holdout/corpus/tournoi ; aucune UI manuelle.
 
 Preuve humaine :

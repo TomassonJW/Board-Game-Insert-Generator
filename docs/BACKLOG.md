@@ -72,10 +72,16 @@
 
 ### P64-L09U-R7-F — Candidate et gate
 
-- Statut : `in-progress`, candidate 0.1.78 préparée ; installation restante.
-- Validation : suite autorisée `926/926`, matrice release `59/59`,
+- Statut : `done`, `automated-validated`, `installed-local`.
+- Candidate : 0.1.78, commit installé `35b17d7`.
+- Validation : suite autorisée finale `928/928`, matrice release `59/59`,
   préparateur à blanc `84/84`.
 - La gate Fusion finale reste humaine.
+
+### P64-L09U-R7-V — Gate humaine Fusion 0.1.78
+
+- Statut : `ready-human-gate`.
+- Recette : `docs/P64_L09U_R7_V_0178_FUSION_GATE_RECIPE.md`.
 
 ### Historique R6
 

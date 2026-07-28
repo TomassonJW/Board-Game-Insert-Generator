@@ -2,8 +2,8 @@
 
 Date : 2026-07-28.
 
-Statut avant installation : `automated-validated`,
-`candidate-prepared`, `fusion-validated=false`,
+Statut : `automated-validated`, `installed-local`,
+`ready-human-gate`, `fusion-validated=false`,
 `print-validated=false`.
 
 ## Verdict remplacé
@@ -56,7 +56,7 @@ temps stable. Aucun gain de performance n'est revendiqué.
 ## Validation automatisée
 
 - gate ciblée élargie : `120/120` ;
-- suite autorisée : `926/926`, un test ignoré ;
+- suite autorisée finale : `928/928`, un test ignoré ;
 - matrice release 0.1.78 : `59/59`, un test ignoré ;
 - préparateur à blanc : `84/84`, deux replays personnels ;
 - douze modules benchmark/corpus/tournoi exclus avant import de la suite
@@ -67,10 +67,21 @@ Préflight :
 
 ```text
 version=0.1.78
-digest=bbb4a2e6dccf1b5e84a0d5268cd9b7792e52d8bb3134e07004a5935532e4e537
+digest=30ea1b1055d7eec38b6824cb7e575f86e6e1557aa9a43abfe705fa8af802f59f
 fusion-validated=false
 print-validated=false
 ```
+
+## Installation locale
+
+Le package du commit `35b17d7` est installé et vérifié dans le dossier add-in
+Fusion :
+
+- manifeste installé : `0.1.78` ;
+- marqueur installé : `35b17d7` ;
+- runtime embarqué et marqueurs R7 : conformes ;
+- réglages UI : écrits ;
+- deux replays personnels : verts et SHA inchangés.
 
 ## Limite restante
 

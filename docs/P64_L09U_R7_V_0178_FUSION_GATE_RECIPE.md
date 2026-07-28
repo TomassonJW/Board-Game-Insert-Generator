@@ -1,6 +1,6 @@
 # P64-L09U-R7-V — recette Fusion 0.1.78
 
-Statut : `prepared-not-human-observed`.
+Statut : `ready-human-gate`, 0.1.78 installée et vérifiée depuis `35b17d7`.
 
 Cette gate doit être faite dans Fusion 360. Ne sauvegarde ni
 `CasLimite02+` ni `CasLimite02++`.

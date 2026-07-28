@@ -3,7 +3,8 @@
 <!-- P64-L09U-GATE -->
 ## P64-L09U-R7-V — gate 0.1.78 préparée
 
-Statut : `candidate-prepared-not-installed`,
+Statut : `ready-human-gate`, candidate 0.1.78 installée et vérifiée depuis
+`35b17d7`,
 `fusion-validated=false`, `print-validated=false`.
 
 La recette est
@@ -16,8 +17,7 @@ La gate demande deux replays sans sauvegarde :
   paliers Z et l'absence de micro-encoche/plaque/surplomb.
 
 La profondeur R6 et les accès partiels restent des acquis à confirmer sans
-régression. L'installation locale doit être vérifiée avant de confier la gate
-à Thomas.
+régression. Thomas peut maintenant exécuter uniquement la recette humaine.
 
 ### Historique R6 clos
 

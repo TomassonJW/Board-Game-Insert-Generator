@@ -17,12 +17,12 @@
   dans le plan, la finalisation, la CAD IR et le plan Fusion des deux replays.
 - `C-QUALITY` : `120/120` ciblés et `926/926` autorisés ; deux replays
   personnels exacts, SHA inchangés.
-- `C-RELEASE` : 0.1.77 `human-KO`, `do-not-run`; candidate 0.1.78 préparée,
-  installation locale restante.
+- `C-RELEASE` : 0.1.77 `human-KO`, `do-not-run`; candidate 0.1.78 installée
+  depuis `35b17d7`, gate humaine prête.
 - `C-PRINT` : `print-validated=false`.
 
-ADR-0103 et ADR-0104 sont acceptées. R7-C à R7-E2 sont validés
-automatiquement ; le package et l'installation R7-F restent à faire.
+ADR-0103 et ADR-0104 sont acceptées. R7-C à R7-F sont validés
+automatiquement ; R7-V reste une gate humaine.
 
 ### Historique R6 clôturé en human-KO
 

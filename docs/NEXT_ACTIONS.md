@@ -76,11 +76,13 @@ Candidate 0.1.78 préparée :
 - matrice release `59/59`, un test ignoré ;
 - préparateur à blanc `84/84` ;
 - préflight
-  `bbb4a2e6dccf1b5e84a0d5268cd9b7792e52d8bb3134e07004a5935532e4e537`.
+  `30ea1b1055d7eec38b6824cb7e575f86e6e1557aa9a43abfe705fa8af802f59f`.
 
-Prochaine mission unique : committer la candidate, relancer la suite autorisée
-sur ce commit, installer et vérifier l'add-in, puis ouvrir uniquement la
-nouvelle gate humaine.
+Candidate 0.1.78 installée et vérifiée depuis `35b17d7`. Suite autorisée finale :
+`928/928`, un test ignoré.
+
+Prochaine action unique : Thomas exécute la gate humaine R7-V selon
+`docs/P64_L09U_R7_V_0178_FUSION_GATE_RECIPE.md`.
 
 Contrat : `docs/P64_L09U_R7_END_TO_END_RUNBOOK.md`.
 Preuve : `docs/P64_L09U_R6_V_0177_HUMAN_KO_EVIDENCE.md`.
