@@ -71,8 +71,16 @@ R7-E2 et la validation complète sont terminés :
 - audits `5 453/5 453` et `5 888/5 888` sur la grille ;
 - deux SHA personnels inchangés.
 
-Prochaine mission unique : relire le diff, construire et installer la candidate
-Fusion, puis ouvrir uniquement la nouvelle gate humaine.
+Candidate 0.1.78 préparée :
+
+- matrice release `59/59`, un test ignoré ;
+- préparateur à blanc `84/84` ;
+- préflight
+  `bbb4a2e6dccf1b5e84a0d5268cd9b7792e52d8bb3134e07004a5935532e4e537`.
+
+Prochaine mission unique : committer la candidate, relancer la suite autorisée
+sur ce commit, installer et vérifier l'add-in, puis ouvrir uniquement la
+nouvelle gate humaine.
 
 Contrat : `docs/P64_L09U_R7_END_TO_END_RUNBOOK.md`.
 Preuve : `docs/P64_L09U_R6_V_0177_HUMAN_KO_EVIDENCE.md`.
@@ -88,6 +96,10 @@ Preuve E :
 `docs/P64_L09U_R7_E_PRODUCT_GRID_AND_MIGRATION_EVIDENCE.md`.
 Preuve E2 :
 `docs/P64_L09U_R7_E2_FULL_LAYOUT_GRID_EVIDENCE.md`.
+Preuve candidate :
+`docs/P64_L09U_R7_0178_CORRECTIVE_EVIDENCE.md`.
+Recette :
+`docs/P64_L09U_R7_V_0178_FUSION_GATE_RECIPE.md`.
 
 Aucun benchmark/holdout/corpus/tournoi. Les projets personnels restent en
 lecture seule. `fusion-validated=false`, `print-validated=false`.

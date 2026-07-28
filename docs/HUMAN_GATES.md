@@ -1,6 +1,26 @@
 # Human Gates
 
 <!-- P64-L09U-GATE -->
+## P64-L09U-R7-V — gate 0.1.78 préparée
+
+Statut : `candidate-prepared-not-installed`,
+`fusion-validated=false`, `print-validated=false`.
+
+La recette est
+`docs/P64_L09U_R7_V_0178_FUSION_GATE_RECIPE.md`.
+
+La gate demande deux replays sans sauvegarde :
+
+- `CasLimite02+` pour les parois, le bord de boîte et les encoches utiles ;
+- `CasLimite02++` pour la pile automatique petit-dessous/grand-dessus, les
+  paliers Z et l'absence de micro-encoche/plaque/surplomb.
+
+La profondeur R6 et les accès partiels restent des acquis à confirmer sans
+régression. L'installation locale doit être vérifiée avant de confier la gate
+à Thomas.
+
+### Historique R6 clos
+
 ## P64-L09U-R6-V — gate 0.1.77 close en KO
 
 Verdict : `human-KO`, `do-not-run`.

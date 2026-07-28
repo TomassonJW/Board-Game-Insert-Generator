@@ -72,7 +72,9 @@
 
 ### P64-L09U-R7-F — Candidate et gate
 
-- Statut : `in-progress`, suite autorisée verte.
+- Statut : `in-progress`, candidate 0.1.78 préparée ; installation restante.
+- Validation : suite autorisée `926/926`, matrice release `59/59`,
+  préparateur à blanc `84/84`.
 - La gate Fusion finale reste humaine.
 
 ### Historique R6

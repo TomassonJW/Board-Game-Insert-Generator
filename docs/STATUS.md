@@ -12,7 +12,8 @@ Statut : `P64-L09U-R6-V-human-KO`, `do-not-run`,
 `P64-L09U-R7-C3-automated-validated`,
 `P64-L09U-R7-D-automated-validated`,
 `P64-L09U-R7-E-automated-validated`,
-`P64-L09U-R7-E2-automated-validated`, `P64-L09U-R7-F-in-progress`,
+`P64-L09U-R7-E2-automated-validated`,
+`P64-L09U-R7-F-candidate-prepared`,
 `fusion-validated=false`, `print-validated=false`.
 
 - 0.1.77 est `human-KO`, `do-not-run`.
@@ -56,7 +57,11 @@ Statut : `P64-L09U-R6-V-human-KO`, `do-not-run`,
   `79,0667 -> 79,1 mm` sans écrire la source.
 - Validation : `120/120` ciblés, `926/926` autorisés, un test ignoré et douze
   modules interdits exclus avant import ; deux SHA personnels inchangés.
-- Prochaine mission : package et installation.
+- Candidate 0.1.78 : manifeste, préflight, préparateur et recette prêts.
+- Préflight à blanc :
+  `bbb4a2e6dccf1b5e84a0d5268cd9b7792e52d8bb3134e07004a5935532e4e537`.
+- Matrice release : `59/59`, un test ignoré ; préparateur à blanc `84/84`.
+- Prochaine mission : installation et vérification locales.
 - Aucun benchmark/holdout/corpus/tournoi ; aucune UI manuelle.
 
 Preuve humaine :
@@ -77,6 +82,10 @@ Preuve E :
 `docs/P64_L09U_R7_E_PRODUCT_GRID_AND_MIGRATION_EVIDENCE.md`.
 Preuve E2 :
 `docs/P64_L09U_R7_E2_FULL_LAYOUT_GRID_EVIDENCE.md`.
+Preuve candidate :
+`docs/P64_L09U_R7_0178_CORRECTIVE_EVIDENCE.md`.
+Recette :
+`docs/P64_L09U_R7_V_0178_FUSION_GATE_RECIPE.md`.
 
 ### Historique R6 clôturé en human-KO
 

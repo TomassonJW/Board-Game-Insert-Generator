@@ -17,7 +17,8 @@
   dans le plan, la finalisation, la CAD IR et le plan Fusion des deux replays.
 - `C-QUALITY` : `120/120` ciblés et `926/926` autorisés ; deux replays
   personnels exacts, SHA inchangés.
-- `C-RELEASE` : 0.1.77 `human-KO`, `do-not-run`; aucune candidate R7 encore.
+- `C-RELEASE` : 0.1.77 `human-KO`, `do-not-run`; candidate 0.1.78 préparée,
+  installation locale restante.
 - `C-PRINT` : `print-validated=false`.
 
 ADR-0103 et ADR-0104 sont acceptées. R7-C à R7-E2 sont validés

@@ -38,8 +38,10 @@
   `79,1 mm`.
 - La suite autorisée passe `926/926`, un test ignoré et les douze modules
   benchmark/corpus/tournoi exclus avant import.
-- La prochaine mission est la fin de R7-F : package, installation et ouverture
-  de la gate humaine.
+- La candidate 0.1.78 est préparée : matrice release `59/59`, préparateur à
+  blanc `84/84`, préflight `bbb4a2e6...e537`.
+- La prochaine mission est la fin de R7-F : commit de candidate, suite
+  autorisée sur ce commit, installation et ouverture de la gate humaine.
 - Aucun benchmark/holdout/corpus/tournoi, aucune UI manuelle ;
   `fusion-validated=false`, `print-validated=false`.
 
@@ -55,6 +57,8 @@ Autorités R7 :
 - `docs/P64_L09U_R7_D_AUTOMATIC_STACK_AND_MATERIALIZATION_EVIDENCE.md`.
 - `docs/P64_L09U_R7_E_PRODUCT_GRID_AND_MIGRATION_EVIDENCE.md`.
 - `docs/P64_L09U_R7_E2_FULL_LAYOUT_GRID_EVIDENCE.md`.
+- `docs/P64_L09U_R7_0178_CORRECTIVE_EVIDENCE.md`.
+- `docs/P64_L09U_R7_V_0178_FUSION_GATE_RECIPE.md`.
 
 ### Historique R6 clôturé en human-KO
 

@@ -91,7 +91,7 @@ class P64L09UR5CorrectiveGateTests(unittest.TestCase):
         preparer = (
             ROOT / "scripts" / "fusion" / "prepare_p64_l09uw_gate.ps1"
         ).read_text(encoding="utf-8")
-        self.assertEqual(manifest["version"], "0.1.77")
+        self.assertEqual(manifest["version"], "0.1.78")
         for marker in (
             'expectedVersion -ne "0.1.77"',
             "p64_l09uw_preflight.py",
