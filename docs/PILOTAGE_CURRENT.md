@@ -17,15 +17,21 @@
   `0,5 mm` de large et `6 mm` de profondeur jusqu'à la CAD IR.
 - Décision structurante acquise : grille produit `0,1 mm`, distincte de
   l'epsilon numérique interne ; ADR obligatoire avant changement.
-- R7 est lancé en missions atomiques séquentielles. La prochaine mission est
-  R7-B, contrats et ADR.
+- ADR-0103 fixe les contraintes dures, le score utile, l'ordre automatique
+  petit-dessous/grand-dessus et la compatibilité historique.
+- ADR-0104 fixe la grille produit `0,1 mm`, les ticks canoniques, migrations,
+  digests et mesures honnêtes.
+- R7-B est terminé. La prochaine mission est R7-C1 : primitives de grille et
+  génération/déduplication des candidats.
 - Aucun benchmark/holdout/corpus/tournoi, aucune UI manuelle ;
   `fusion-validated=false`, `print-validated=false`.
 
 Autorités R7 :
 
 - `docs/P64_L09U_R6_V_0177_HUMAN_KO_EVIDENCE.md` ;
-- `docs/P64_L09U_R7_END_TO_END_RUNBOOK.md`.
+- `docs/P64_L09U_R7_END_TO_END_RUNBOOK.md` ;
+- `docs/DECISIONS/ADR-0103-placement-automatique-canonique-et-ordre-de-pile.md` ;
+- `docs/DECISIONS/ADR-0104-grille-produit-de-0-1-mm.md`.
 
 ### Historique R6 clôturé en human-KO
 

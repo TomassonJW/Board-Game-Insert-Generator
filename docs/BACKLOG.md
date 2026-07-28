@@ -20,13 +20,21 @@
 
 ### P64-L09U-R7-B — Contrats et ADR
 
-- Statut : `ready`.
+- Statut : `done`.
 - Formaliser score, enveloppes finales, ordre automatique, compatibilité
   historique et grille produit `0,1 mm`.
+- Décisions : ADR-0103 et ADR-0104.
+
+### P64-L09U-R7-C1 — Grille et candidats
+
+- Statut : `ready`.
+- Introduire les ticks `0,1 mm`.
+- Quantifier/dédupliquer les ancres candidates.
+- Publier les compteurs avant/après et les migrations.
 
 ### P64-L09U-R7-C — Placement et parois
 
-- Statut : `pending`, dépend de R7-B.
+- Statut : `pending`, dépend de R7-C1.
 
 ### P64-L09U-R7-D — Pile et matérialisation
 

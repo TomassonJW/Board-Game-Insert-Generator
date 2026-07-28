@@ -1,7 +1,7 @@
 # Next Actions
 
 <!-- P64-L09U-NEXT -->
-## Action courante : P64-L09U-R7-B — contrats et ADR
+## Action courante : P64-L09U-R7-C1 — grille et candidats
 
 0.1.77 est `human-KO`, `do-not-run`. Sa correction de profondeur est confirmée
 et doit être conservée, mais le placement automatique, les parois finales et
@@ -15,12 +15,20 @@ R7-A est terminé :
 4. micro-coupes `0,5 mm × ... × 6 mm` retrouvées avant Fusion ;
 5. absence de quantification produit complète démontrée.
 
-Prochaine mission unique : formaliser par ADR le score de placement, la
-recertification des parois finales, l'ordre automatique petit-dessous/
-grand-dessus, la compatibilité de `stack_order` et la grille produit `0,1 mm`.
+R7-B est terminé :
+
+- ADR-0103 : contraintes dures, score lexicographique, ordre automatique et
+  migration de `stack_order` ;
+- ADR-0104 : ticks `0,1 mm`, arrondis conservateurs, digests et migrations ;
+- contrat automatique testable du minimum au plan Fusion.
+
+Prochaine mission unique : introduire les primitives de grille, quantifier et
+dédupliquer les positions candidates, publier les compteurs avant/après sans
+encore modifier la géométrie finale.
 
 Contrat : `docs/P64_L09U_R7_END_TO_END_RUNBOOK.md`.
 Preuve : `docs/P64_L09U_R6_V_0177_HUMAN_KO_EVIDENCE.md`.
+Décisions : ADR-0103 et ADR-0104.
 
 Aucun benchmark/holdout/corpus/tournoi. Les projets personnels restent en
 lecture seule. `fusion-validated=false`, `print-validated=false`.

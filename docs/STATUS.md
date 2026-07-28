@@ -6,7 +6,8 @@
 Date : 2026-07-28.
 
 Statut : `P64-L09U-R6-V-human-KO`, `do-not-run`,
-`P64-L09U-R7-A-done`, `P64-L09U-R7-B-ready`,
+`P64-L09U-R7-A-done`, `P64-L09U-R7-B-done`,
+`P64-L09U-R7-C1-ready`,
 `fusion-validated=false`, `print-validated=false`.
 
 - 0.1.77 est `human-KO`, `do-not-run`.
@@ -21,13 +22,19 @@ Statut : `P64-L09U-R6-V-human-KO`, `do-not-run`,
   produit `0,1 mm` n'est pas encore canonique.
 - `CasLimite02+` et `CasLimite02++` ont été rejoués en lecture seule avec SHA
   avant/après identiques.
-- Prochaine mission : ADR de placement, pile automatique et quantification.
+- ADR-0103 retient une recherche bornée par ancres, des contraintes dures et un
+  score utile/centré.
+- ADR-0104 retient des ticks de `0,1 mm` aux frontières de disposition, sans
+  remplacer tous les floats.
+- Prochaine mission : primitives de grille et candidats automatiques.
 - Aucun benchmark/holdout/corpus/tournoi ; aucune UI manuelle.
 
 Preuve humaine :
 `docs/P64_L09U_R6_V_0177_HUMAN_KO_EVIDENCE.md`.
 Runbook :
 `docs/P64_L09U_R7_END_TO_END_RUNBOOK.md`.
+Décisions :
+ADR-0103 et ADR-0104.
 
 ### Historique R6 clôturé en human-KO
 

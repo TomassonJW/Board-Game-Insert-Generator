@@ -1017,5 +1017,59 @@ class P64L09TDocumentPilotageTests(unittest.TestCase):
         ):
             self.assertIn(marker, next_actions)
 
+
+class P64L09UR7DocumentContractTests(unittest.TestCase):
+    def test_automatic_flat_layout_and_grid_decisions_are_explicit(self) -> None:
+        from pathlib import Path
+
+        root = Path(__file__).resolve().parents[1]
+        placement = (
+            root
+            / "docs"
+            / "DECISIONS"
+            / "ADR-0103-placement-automatique-canonique-et-ordre-de-pile.md"
+        ).read_text(encoding="utf-8")
+        grid = (
+            root
+            / "docs"
+            / "DECISIONS"
+            / "ADR-0104-grille-produit-de-0-1-mm.md"
+        ).read_text(encoding="utf-8")
+        contract = (
+            root
+            / "docs"
+            / "P64_L09U_R7_AUTOMATIC_FLAT_LAYOUT_CONTRACT.md"
+        ).read_text(encoding="utf-8")
+
+        for marker in (
+            "Option C — ancres bornées",
+            "maximiser la couverture intérieure utile",
+            "aire orientée croissante",
+            "legacy_stack_order_normalized",
+            "déplacer silencieusement.",
+            "futur mode manuel",
+        ):
+            self.assertIn(marker, placement)
+
+        for marker in (
+            "ticks entiers de 0,1 mm",
+            "epsilon numérique interne",
+            "empreinte de vide ou de jeu minimal",
+            "aucun fichier source",
+            "candidats uniques après quantification",
+            "n'est pas présentée comme un gain de performance",
+        ):
+            self.assertIn(marker, grid)
+
+        for marker in (
+            "chaque bord d'empreinte conserve la paroi minimale",
+            "petit élément est toujours sous un grand",
+            "aucun déplacement silencieux",
+            "nombre de micro-fragments : `0`",
+            "volume additif hors enveloppe finale : `0`",
+        ):
+            self.assertIn(marker, contract)
+
+
 if __name__ == "__main__":
     unittest.main()
