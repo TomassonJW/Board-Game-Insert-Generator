@@ -1,6 +1,32 @@
 # Next Actions
 
 <!-- P64-L09U-NEXT -->
+## Action courante : P64-L09U-R7-B — contrats et ADR
+
+0.1.77 est `human-KO`, `do-not-run`. Sa correction de profondeur est confirmée
+et doit être conservée, mais le placement automatique, les parois finales et
+l'ordre de pile restent faux.
+
+R7-A est terminé :
+
+1. verdict humain consigné fidèlement ;
+2. `CasLimite02+` et `CasLimite02++` rejoués en lecture seule ;
+3. première divergence localisée dans le plan minimal des réservations ;
+4. micro-coupes `0,5 mm × ... × 6 mm` retrouvées avant Fusion ;
+5. absence de quantification produit complète démontrée.
+
+Prochaine mission unique : formaliser par ADR le score de placement, la
+recertification des parois finales, l'ordre automatique petit-dessous/
+grand-dessus, la compatibilité de `stack_order` et la grille produit `0,1 mm`.
+
+Contrat : `docs/P64_L09U_R7_END_TO_END_RUNBOOK.md`.
+Preuve : `docs/P64_L09U_R6_V_0177_HUMAN_KO_EVIDENCE.md`.
+
+Aucun benchmark/holdout/corpus/tournoi. Les projets personnels restent en
+lecture seule. `fusion-validated=false`, `print-validated=false`.
+
+### Historique R6 clôturé en human-KO
+
 ## Action courante : exécuter la gate P64-L09U-R6-V
 
 0.1.76 est `human-KO`, `do-not-run`. Les accès R5 restent acquis, mais une

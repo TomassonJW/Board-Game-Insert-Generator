@@ -6,6 +6,29 @@ et la lecture par capabilities dans `docs/CAPABILITY_MAP.md`. La nomenclature
 et le role de ces documents sont definis dans `docs/PILOTAGE_GLOSSARY.md`.
 
 <!-- P64-L09U-ROADMAP -->
+## Correctif P64-L09U-R7 — placement et pile canoniques
+
+0.1.77 est `human-KO`. La profondeur et les accès R6 sont acquis, mais le plan
+minimal ne certifie pas la structure finale des parois et conserve un ordre de
+pile historique contraire à la règle automatique.
+
+```text
+P64-L09U-R6-V human-KO 0.1.77
+  -> R7-A verdict et première divergence
+  -> R7-B ADR placement, pile et grille 0,1 mm
+  -> R7-C placement/parois canoniques
+  -> R7-D empilement et matérialisation exacts
+  -> R7-E quantification, migrations et mesures
+  -> R7-F validation, candidate et installation
+  -> P64-L09U-R7-V gate Fusion humaine
+```
+
+Le futur placement manuel des plateaux/livrets reste compatible avec les
+contrats, mais hors de R7. ADR-0095 à ADR-0097 restent hors périmètre.
+`fusion-validated=false`, `print-validated=false`.
+
+### Historique R6 clôturé en human-KO
+
 ## Correctif P64-L09U-R6 — empilement local exact
 
 0.1.76 est `human-KO` : elle ouvre les parties sous et hors plateau, mais une

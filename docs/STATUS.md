@@ -1,6 +1,36 @@
 # Status
 
 <!-- P64-L09U-STATUS -->
+## P64-L09U-R7 — placement canonique et pile automatique
+
+Date : 2026-07-28.
+
+Statut : `P64-L09U-R6-V-human-KO`, `do-not-run`,
+`P64-L09U-R7-A-done`, `P64-L09U-R7-B-ready`,
+`fusion-validated=false`, `print-validated=false`.
+
+- 0.1.77 est `human-KO`, `do-not-run`.
+- Profondeur, micro-chevauchements et accès R6 sont humainement confirmés.
+- Le plan minimal place encore selon le `stack_order` historique et inverse la
+  règle automatique petit-dessous/grand-dessus.
+- Le score pénalise les recouvrements utiles et le certificat de paroi ne
+  couvre pas toutes les frontières de matière finales.
+- Des coupes de prise de `0,5 mm` de large et `6 mm` de profondeur sont déjà
+  présentes avant le plan Fusion.
+- Des coordonnées/dimensions dérivées au centième démontrent que la grille
+  produit `0,1 mm` n'est pas encore canonique.
+- `CasLimite02+` et `CasLimite02++` ont été rejoués en lecture seule avec SHA
+  avant/après identiques.
+- Prochaine mission : ADR de placement, pile automatique et quantification.
+- Aucun benchmark/holdout/corpus/tournoi ; aucune UI manuelle.
+
+Preuve humaine :
+`docs/P64_L09U_R6_V_0177_HUMAN_KO_EVIDENCE.md`.
+Runbook :
+`docs/P64_L09U_R7_END_TO_END_RUNBOOK.md`.
+
+### Historique R6 clôturé en human-KO
+
 ## P64-L09U-R6 — empilement local exact des réservations
 
 Date : 2026-07-28.

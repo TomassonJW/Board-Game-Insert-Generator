@@ -122,6 +122,8 @@ class P64L09UR5CorrectiveGateTests(unittest.TestCase):
         self.assertIn("source_sha256_before", replay)
         self.assertIn("source_sha256_after", replay)
         self.assertIn("CasLimite01++.bgig.json", replay)
+        self.assertIn("CasLimite02++.bgig.json", replay)
+        self.assertIn("--include-diagnostics", replay)
         self.assertIn("calibrated_cavity_depths_unchanged", replay)
         self.assertNotIn(r"C:\Users", replay)
 

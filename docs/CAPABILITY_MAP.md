@@ -1,6 +1,27 @@
 # Capability Map
 
 <!-- P64-L09U-CAPABILITY -->
+## P64-L09U-R7 — placement canonique et pile automatique
+
+- `C-CAVITY` : acquis R6 humainement confirmé pour la profondeur et les accès ;
+  régressions obligatoires pendant R7.
+- `C-RESERVATION` : `human-KO` sur position automatique, fragments de paroi et
+  ordre vertical automatique.
+- `C-GLOBAL-LAYOUT` : contrat incomplet ; la frontière minimale ne porte pas
+  encore toute la compatibilité de placement finale.
+- `C-FINALIZATION` : recertifie des poses incomplètement contraintes et
+  transmet des micro-coupes.
+- `C-CAD-IR`, `C-PREVIEW`, `C-FUSION` : propagation observable mais résultat
+  humain faux ; `fusion-validated=false`.
+- `C-QUANTIZATION` : `ready-ADR`, résolution produit `0,1 mm` décidée, epsilon
+  interne distinct.
+- `C-QUALITY` : deux replays personnels exacts, SHA inchangés ; les tests R7
+  restent à écrire.
+- `C-RELEASE` : 0.1.77 `human-KO`, `do-not-run`; aucune candidate R7 encore.
+- `C-PRINT` : `print-validated=false`.
+
+### Historique R6 clôturé en human-KO
+
 ## P64-L09U-R6 — empilement local exact
 
 - `C-CAVITY` : `automated-validated`. Tout chevauchement XY réel supérieur à

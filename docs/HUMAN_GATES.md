@@ -1,6 +1,32 @@
 # Human Gates
 
 <!-- P64-L09U-GATE -->
+## P64-L09U-R6-V — gate 0.1.77 close en KO
+
+Verdict : `human-KO`, `do-not-run`.
+
+Acquis confirmé : profondeur correcte des cavités, y compris sur les
+micro-chevauchements, accès sous/hors plateau et continuité directe.
+
+Bloquants :
+
+- parois résiduelles ou séparations pouvant tomber sous `1,2 mm` ;
+- placement de livret pouvant atteindre le bord de boîte ;
+- empilement automatique inverse de la règle petit-dessous/grand-dessus ;
+- micro-encoches `0,5–0,6 mm` et `6 mm` de profondeur ;
+- plaques/surplombs observés dans la scène Fusion.
+
+Preuve :
+`docs/P64_L09U_R6_V_0177_HUMAN_KO_EVIDENCE.md`.
+
+R7 est autorisé sans nouvelle gate intermédiaire pour les corrections
+automatiques et la grille produit `0,1 mm`. Une nouvelle gate humaine restera
+obligatoire après installation de la candidate.
+
+`fusion-validated=false`, `print-validated=false`.
+
+### Historique de préparation R6
+
 ## P64-L09U-R6-V — gate empilement local exact
 
 Statut : `ready-human-gate`, candidate 0.1.77 installée et vérifiée depuis

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Rejoue en lecture seule les trois cas personnels exigés par P64-L09U-R4."""
+"""Rejoue en lecture seule les cas personnels exigés par P64-L09U."""
 
 from __future__ import annotations
 
@@ -29,6 +29,7 @@ BASE_FILENAMES = {
     "case01_plus": "CasLimite01+.bgig.json",
     "case01_plus_plus": "CasLimite01++.bgig.json",
     "case02_plus": "CasLimite02+.bgig.json",
+    "case02_plus_plus": "CasLimite02++.bgig.json",
 }
 
 
@@ -43,6 +44,8 @@ def _load_raw(path: Path) -> dict[str, object]:
 def _run_case(
     case_id: str,
     raw_project: dict[str, object],
+    *,
+    include_diagnostics: bool = False,
 ) -> dict[str, object]:
     project = normalize_project_draft(raw_project).project
     settings = {"method": "auto", "effort": "normal"}
@@ -202,7 +205,7 @@ def _run_case(
         for reservation in plan["top_inset_reservations"]["reservations"]
         for region in reservation.get("local_depth_regions", ())
     ]
-    return {
+    result = {
         "case_id": case_id,
         "calculation_status": "solution_found",
         "finalization_status": "solution_found",
@@ -250,10 +253,20 @@ def _run_case(
         "calculation_observed_ms": calculation_ms,
         "finishing_observed_ms": finishing_ms,
     }
+    if include_diagnostics:
+        result["diagnostics"] = {
+            "flat_items": project["flat_items"],
+            "minimal_plan": plan,
+            "cad_ir": cad["cad_ir"],
+            "fusion_plan": fusion.to_dict(),
+        }
+    return result
 
 
 def run_local_replay(
     case_ids: tuple[str, ...] | None = None,
+    *,
+    include_diagnostics: bool = False,
 ) -> dict[str, object]:
     selected_ids = case_ids or tuple(BASE_FILENAMES)
     paths = {
@@ -275,7 +288,11 @@ def run_local_replay(
     raw = {case_id: _load_raw(path) for case_id, path in paths.items()}
     cases = dict(raw)
     results = [
-        _run_case(case_id, project)
+        _run_case(
+            case_id,
+            project,
+            include_diagnostics=include_diagnostics,
+        )
         for case_id, project in cases.items()
     ]
     after = {case_id: _file_digest(path) for case_id, path in paths.items()}
@@ -302,9 +319,11 @@ def main() -> int:
         action="append",
         choices=tuple(BASE_FILENAMES),
     )
+    parser.add_argument("--include-diagnostics", action="store_true")
     args = parser.parse_args()
     receipt = run_local_replay(
-        tuple(args.case_id) if args.case_id else None
+        tuple(args.case_id) if args.case_id else None,
+        include_diagnostics=args.include_diagnostics,
     )
     if args.write_summary is not None:
         args.write_summary.parent.mkdir(parents=True, exist_ok=True)

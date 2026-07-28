@@ -1,6 +1,34 @@
 # Pilotage courant
 
 <!-- P64-L09U-CURRENT -->
+## Reprise canonique P64-L09U-R7
+
+- `0.1.77` est `human-KO`, `do-not-run`.
+- Acquis humain à préserver : profondeur correcte des cavités, y compris les
+  micro-chevauchements, accès sous/hors plateau et continuité directe.
+- Défaut A : le placement automatique ne certifie ni la paroi externe, ni les
+  frontières finales, ni les fragments de matière ; une paroi peut tomber à
+  environ `0,4 mm` au lieu de `1,2 mm`.
+- Défaut B : `CasLimite02++` conserve l'ordre historique plateau-dessous,
+  livret-dessus, inverse de la règle automatique petit-dessous/grand-dessus.
+- Première divergence : plan minimal des réservations. Le score pénalise les
+  recouvrements utiles et le certificat de paroi reste limité aux cavités.
+- La finalisation propage ensuite des micro-coupes de prise de seulement
+  `0,5 mm` de large et `6 mm` de profondeur jusqu'à la CAD IR.
+- Décision structurante acquise : grille produit `0,1 mm`, distincte de
+  l'epsilon numérique interne ; ADR obligatoire avant changement.
+- R7 est lancé en missions atomiques séquentielles. La prochaine mission est
+  R7-B, contrats et ADR.
+- Aucun benchmark/holdout/corpus/tournoi, aucune UI manuelle ;
+  `fusion-validated=false`, `print-validated=false`.
+
+Autorités R7 :
+
+- `docs/P64_L09U_R6_V_0177_HUMAN_KO_EVIDENCE.md` ;
+- `docs/P64_L09U_R7_END_TO_END_RUNBOOK.md`.
+
+### Historique R6 clôturé en human-KO
+
 ## Reprise canonique P64-L09U-R6
 
 - `0.1.76` est `human-KO`, `do-not-run`.

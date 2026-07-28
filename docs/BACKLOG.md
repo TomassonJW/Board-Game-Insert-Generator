@@ -1,6 +1,48 @@
 # Backlog
 
 <!-- P64-L09U-BACKLOG -->
+## Correctif P64-L09U-R7
+
+### P64-L09U-R6-V — Gate humaine Fusion 0.1.77
+
+- Statut : `done-human-KO`, `do-not-run`.
+- Acquis : profondeurs et accès R6 conformes.
+- Bloquants : placement/parois, ordre de pile, micro-encoches et
+  plaques/surplombs.
+- Preuve : `docs/P64_L09U_R6_V_0177_HUMAN_KO_EVIDENCE.md`.
+
+### P64-L09U-R7-A — Verdict et diagnostic initial
+
+- Statut : `done`.
+- Deux replays personnels en lecture seule, SHA inchangés.
+- Première divergence localisée au plan minimal des réservations.
+- Runbook : `docs/P64_L09U_R7_END_TO_END_RUNBOOK.md`.
+
+### P64-L09U-R7-B — Contrats et ADR
+
+- Statut : `ready`.
+- Formaliser score, enveloppes finales, ordre automatique, compatibilité
+  historique et grille produit `0,1 mm`.
+
+### P64-L09U-R7-C — Placement et parois
+
+- Statut : `pending`, dépend de R7-B.
+
+### P64-L09U-R7-D — Pile et matérialisation
+
+- Statut : `pending`, dépend de R7-B et R7-C.
+
+### P64-L09U-R7-E — Quantification et migrations
+
+- Statut : `pending`, dépend de R7-B.
+
+### P64-L09U-R7-F — Candidate et gate
+
+- Statut : `pending`, dépend de R7-C à R7-E.
+- La gate Fusion finale reste humaine.
+
+### Historique R6
+
 ## Correctif P64-L09U-R6
 
 ### P64-L09U-R5-V — Gate humaine Fusion 0.1.76
