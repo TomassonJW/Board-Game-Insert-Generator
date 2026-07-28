@@ -2,7 +2,7 @@
 
 Date : 2026-07-28.
 
-Statut : `automated-validated`, `installation-pending`,
+Statut : `automated-validated`, `installed-local`, `ready-human-gate`,
 `fusion-validated=false`, `print-validated=false`.
 
 ## Correction
@@ -68,10 +68,16 @@ ignoré est l'intégration SCIP native indisponible dans cet environnement.
 Les trois projets personnels passent en lecture seule. Le script exige les
 SHA-256 avant/après identiques et n'écrit aucun témoin.
 
-## Validations restantes
+## Intégration et installation
 
-- intégration dans `main` ;
-- installation locale et vérification du marqueur 0.1.76 ;
+- Commit correctif initial : `07dcabf`.
+- Intégration : fast-forward direct dans `origin/main`.
+- Add-in 0.1.76 installé localement.
+- Manifeste, runtime, réglages et marqueur de commit vérifiés.
+- Reçus de preflight et replays écrits dans le dossier local de projets.
+
+## Validation restante
+
 - observation humaine Fusion R5-V.
 
 Aucune validation Fusion ou impression n'est revendiquée.

@@ -6,7 +6,7 @@
 Date : 2026-07-28.
 
 Statut : `P64-L09U-R4-V-human-KO`, `P64-L09U-R5-automated-validated`,
-`installation-pending`,
+`installed-local`, `P64-L09U-R5-V-ready-human-gate`,
 `fusion-validated=false`, `print-validated=false`.
 
 - 0.1.75 est `human-KO`, `do-not-run`.
@@ -21,7 +21,8 @@ Statut : `P64-L09U-R4-V-human-KO`, `P64-L09U-R5-automated-validated`,
 - Les parois, fonds, appuis, dimensions, poses et profondeurs restent inchangés.
 - Validation : préparateur `133/133`, suite autorisée `902/902`, un test SCIP
   ignoré, trois replays personnels exacts en lecture seule.
-- Candidate : `0.1.76`, prête pour intégration et installation.
+- Candidate : `0.1.76`, intégrée, installée et prête pour la gate R5-V.
+- Installation initiale vérifiée au commit `07dcabf`.
 - Aucun benchmark/holdout ; projets personnels en lecture seule.
 
 Preuve humaine :

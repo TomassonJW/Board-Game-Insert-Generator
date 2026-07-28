@@ -13,7 +13,7 @@
 
 ### P64-L09U-R5 — Accès local hors plateau
 
-- Statut : `done`, `automated-validated`, installation en attente.
+- Statut : `done`, `automated-validated`, `installed-local`.
 - Conserver l'ancrage calibré de la cavité.
 - Ouvrir chaque région jusqu'à sa découpe locale ou sa face fonctionnelle.
 - Limiter les coupes à l'empreinte de la cavité et préserver ses parois.
@@ -22,7 +22,7 @@
 
 ### P64-L09U-R5-V — Gate humaine Fusion
 
-- Statut : `blocked-by-R5-integration-and-installation`.
+- Statut : `ready-human-gate`.
 - Candidate : `0.1.76`.
 - Recette : `docs/P64_L09U_R5_V_0176_FUSION_GATE_RECIPE.md`.
 - Preuve : `docs/P64_L09U_R5_0176_CORRECTIVE_EVIDENCE.md`.

@@ -1,17 +1,15 @@
 # Next Actions
 
 <!-- P64-L09U-NEXT -->
-## Action courante : terminer P64-L09U-R5 puis préparer R5-V
+## Action courante : exécuter la gate P64-L09U-R5-V
 
 0.1.75 est `human-KO`, `do-not-run`. Elle ouvre correctement la jonction sous
 plateau, mais ferme presque la portion hors plateau des cavités partiellement
 recouvertes.
 
-Ordre unique :
-
-1. intégrer la candidate automatisée-validée 0.1.76 ;
-2. installer et vérifier l'add-in 0.1.76 ;
-3. ouvrir la gate humaine R5-V.
+La candidate automatisée-validée 0.1.76 est intégrée, installée et vérifiée.
+Thomas suit maintenant uniquement la recette R5-V, en commençant par une cavité
+partiellement recouverte.
 
 Contrat :
 `docs/P64_L09U_R5_END_TO_END_RUNBOOK.md`.
@@ -19,7 +17,7 @@ Contrat :
 Preuve en cours :
 `docs/P64_L09U_R5_0176_CORRECTIVE_EVIDENCE.md`.
 
-Recette future :
+Recette :
 `docs/P64_L09U_R5_V_0176_FUSION_GATE_RECIPE.md`.
 
 Aucun benchmark/holdout. Les projets personnels restent en lecture seule.

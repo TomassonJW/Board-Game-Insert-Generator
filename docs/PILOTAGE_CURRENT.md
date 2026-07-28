@@ -19,7 +19,11 @@
   `frozen_cavity_vertical_access`.
 - Validation : préparateur `133/133`, suite autorisée `902/902`, un test SCIP
   ignoré et trois replays personnels exacts en lecture seule.
-- Candidate `0.1.76` prête pour intégration, installation et gate R5-V.
+- Candidate `0.1.76` intégrée, installée et prête pour la gate R5-V.
+- Installation initiale : commit `07dcabf`, manifeste, runtime, réglages et
+  marqueur vérifiés.
+- Prochaine action unique : observation humaine selon
+  `docs/P64_L09U_R5_V_0176_FUSION_GATE_RECIPE.md`.
 - Aucun benchmark/holdout ; projets personnels en lecture seule ;
   `fusion-validated=false`, `print-validated=false`.
 

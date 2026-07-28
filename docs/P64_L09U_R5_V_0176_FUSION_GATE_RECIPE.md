@@ -1,13 +1,13 @@
 # P64-L09U-R5-V — recette Fusion 0.1.76
 
-Statut : `automated-validated`, `installation-pending`.
+Statut : `ready-human-gate`, 0.1.76 installée et vérifiée.
 
 Avant verdict : `fusion-validated=false`, `print-validated=false`.
 
 ## Précondition
 
-Codex doit avoir installé et vérifié 0.1.76 avec son marqueur de commit. Ferme
-ensuite complètement Fusion avant le replay.
+Codex a installé et vérifié 0.1.76 avec son marqueur de commit. Ferme
+complètement Fusion avant le replay.
 
 ## Vérification prioritaire
 

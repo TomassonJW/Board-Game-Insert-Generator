@@ -27,6 +27,7 @@ coupes restent bornées à l'empreinte de la cavité.
 
 ## État
 
-Le code, la CAD IR, le plan Fusion et les tests partiels sont corrigés sur la
-branche de mission. La suite autorisée, les replays personnels, l'intégration,
-l'installation 0.1.76 et la gate R5-V restent à terminer.
+Le code, la CAD IR et le plan Fusion sont corrigés. Le préparateur passe
+`133/133`, la suite autorisée `902/902`, et les trois replays personnels passent
+en lecture seule. La candidate 0.1.76 est intégrée et installée ; seule la gate
+humaine R5-V reste à exécuter.

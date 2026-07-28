@@ -3,13 +3,13 @@
 <!-- P64-L09U-GATE -->
 ## P64-L09U-R5-V — gate accès des cavités partiellement recouvertes
 
-Statut : `blocked-by-R5-integration-and-installation`, candidate 0.1.76.
+Statut : `ready-human-gate`, candidate 0.1.76 installée et vérifiée.
 
 0.1.75 est close en `human-KO`, `do-not-run`. Acquis : cavités bien placées et
 ouvertes directement sous plateau. Bloquant : leur portion hors plateau reste
 presque fermée lorsqu'elles sont partiellement recouvertes.
 
-Après préparation complète de 0.1.76, Thomas vérifiera :
+Thomas vérifie maintenant :
 
 1. aucune matière entre plateau et cavité dans la région recouverte ;
 2. aucun plafond au-dessus de l'asset dans la région hors plateau ;
