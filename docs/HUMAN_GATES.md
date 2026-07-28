@@ -1,26 +1,32 @@
 # Human Gates
 
 <!-- P64-L09U-GATE -->
-## P64-L09U-R3-V — gate profondeur et réservations locales
+## P64-L09U-R4-V — gate cavités ouvertes sous plateaux
 
-Statut : `ready-human-gate`, candidate 0.1.74.
+Statut : `ready-human-gate`, candidate 0.1.75.
 
-La candidate préserve les acquis de matérialisation 0.1.73. Thomas vérifie :
+0.1.74 est close en `human-KO`, `do-not-run`. Thomas vérifie :
 
-1. profondeur calibrée inchangée après finalisation ;
-2. origine Z correcte sans réservation supérieure ;
-3. origine Z sous la découpe locale avec paroi canonique lorsqu'un plateau
-   recouvre la cavité ;
-4. deux plateaux différents matérialisés par coupes locales et paliers exacts ;
-5. aucun cumul hors de l'intersection réelle de leurs empreintes ;
-6. plafond de calcul respecté ou phases supplémentaires affichées séparément ;
-7. fidélité aperçu/Fusion, rendu progressif et absence de Combine perdu.
+1. aucune paroi imprimée entre un plateau et la cavité qu'il recouvre ;
+2. sommet de cavité au dessous exact de l'encastrement local ;
+3. cavité directement accessible après retrait du plateau ;
+4. cavités sans coupe locale toujours ouvertes sur leur face fonctionnelle ;
+5. profondeurs calibrées, deux plateaux, paliers et budgets inchangés ;
+6. fidélité aperçu/Fusion, rendu progressif et absence de Combine perdu.
 
-Contrat : `docs/P64_L09U_R3_END_TO_END_RUNBOOK.md`.
-Preuve : `docs/P64_L09U_R3_0174_CORRECTIVE_EVIDENCE.md`.
-Recette : `docs/P64_L09U_R3_V_0174_FUSION_GATE_RECIPE.md`.
+Contrat : `docs/P64_L09U_R4_END_TO_END_RUNBOOK.md`.
+Preuve : `docs/P64_L09U_R4_0175_CORRECTIVE_EVIDENCE.md`.
+Recette : `docs/P64_L09U_R4_V_0175_FUSION_GATE_RECIPE.md`.
 
 Avant verdict : `fusion-validated=false`, `print-validated=false`.
+
+### P64-L09U-R3-V — gate humaine 0.1.74 close en KO
+
+Verdict : `human-KO`, `do-not-run`.
+
+Défaut bloquant : les cavités sous plateau existent mais restent enfermées sous
+une paroi intermédiaire égale à la paroi canonique. Preuve :
+`docs/P64_L09U_R3_V_0174_HUMAN_KO_EVIDENCE.md`.
 
 ### P64-L09U-R2-V — gate humaine 0.1.73 close en KO
 

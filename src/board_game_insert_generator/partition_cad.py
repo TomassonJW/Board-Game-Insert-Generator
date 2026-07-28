@@ -465,8 +465,13 @@ def _container_component(placement: dict[str, object], index: int) -> CadCompone
             body_size,
             require_top_open=(
                 not frozen_contracts
-                or frozen_contracts[cavity_index].get("anchor_kind")
-                == "open_top"
+                or (
+                    not composite_v2
+                    and frozen_contracts[cavity_index].get(
+                        "anchor_kind"
+                    )
+                    == "open_top"
+                )
             ),
         )
         effective = cavity.get("clearance_effective_v1")
@@ -906,6 +911,11 @@ def _validate_frozen_cavities(
                         "minimum_floor_mm",
                         "top_separation_mm",
                         "minimum_top_separation_mm",
+                        "intermediate_material_thickness_mm",
+                        "top_interface_kind",
+                        "top_void_continuity_certified",
+                        "functional_top_z_mm",
+                        "functional_top_access_certified",
                     )
                 }
             )
@@ -944,6 +954,22 @@ def _validate_frozen_cavities(
             raise PartitionCadBuildError(
                 f"La cavite figee {cavity.id!r} n est pas ouverte."
             )
+        if anchor_kind == "open_top":
+            actual_top = expected_origin["z"] + expected_size["z"]
+            if (
+                contract.get("functional_top_access_certified")
+                is not True
+                or abs(
+                    actual_top
+                    - float(
+                        contract.get("functional_top_z_mm", -1.0)
+                    )
+                )
+                > _EPSILON
+            ):
+                raise PartitionCadBuildError(
+                    f"L ouverture fonctionnelle de {cavity.id!r} diverge."
+                )
         if (
             anchor_kind == "below_top_inset"
             and (
@@ -959,6 +985,31 @@ def _validate_frozen_cavities(
         ):
             raise PartitionCadBuildError(
                 f"La separation superieure de {cavity.id!r} est insuffisante."
+            )
+        if (
+            anchor_kind == "below_top_inset"
+            and (
+                abs(
+                    float(
+                        contract.get(
+                            "intermediate_material_thickness_mm",
+                            -1.0,
+                        )
+                    )
+                )
+                > _EPSILON
+                or abs(
+                    float(contract.get("top_separation_mm", -1.0))
+                )
+                > _EPSILON
+                or contract.get("top_interface_kind")
+                != "direct_void_to_removable_top_inset"
+                or contract.get("top_void_continuity_certified")
+                is not True
+            )
+        ):
+            raise PartitionCadBuildError(
+                f"La cavite figee {cavity.id!r} est fermee sous son plateau."
             )
 
 def _cavity_operation(
@@ -1006,6 +1057,25 @@ def _cavity_operation(
                 "top_separation_mm": frozen_contract.get(
                     "top_separation_mm",
                     0.0,
+                ),
+                "intermediate_material_thickness_mm": frozen_contract.get(
+                    "intermediate_material_thickness_mm",
+                    0.0,
+                ),
+                "top_interface_kind": frozen_contract.get(
+                    "top_interface_kind",
+                    "open_functional_face",
+                ),
+                "top_void_continuity_certified": frozen_contract.get(
+                    "top_void_continuity_certified",
+                    False,
+                ),
+                "functional_top_z_mm": frozen_contract.get(
+                    "functional_top_z_mm",
+                ),
+                "functional_top_access_certified": frozen_contract.get(
+                    "functional_top_access_certified",
+                    False,
                 ),
                 "responsible_reservation_id": frozen_contract.get(
                     "responsible_reservation_id",

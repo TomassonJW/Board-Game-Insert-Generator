@@ -1,31 +1,31 @@
 # Status
 
 <!-- P64-L09U-STATUS -->
-## P64-L09U-R3 — profondeur calibrée et réservations locales
+## P64-L09U-R4 — cavités ouvertes sous plateaux
 
 Date : 2026-07-28.
 
-Statut : `P64-L09U-R3-automated-validated`, `P64-L09U-R3-V-ready-human-gate`,
+Statut : `P64-L09U-R4-automated-validated`, `P64-L09U-R4-V-ready-human-gate`,
 `fusion-validated=false`, `print-validated=false`.
 
-- 0.1.73 est `human-KO`, `do-not-run`.
-- 0.1.74 conserve automatiquement le calibre exact et résout Z sans changer
-  X/Y, orientation ni dimensions.
-- Les réservations disjointes ne cumulent plus leurs hauteurs ; les
-  recouvrements créent des paliers uniquement dans leur intersection.
-- Aperçu, CAD IR et plan Fusion portent les ancrages et intervalles locaux.
-- L'interface sépare recherche, plafond, terminaison et temps mural total.
-- Préparateur `126/126`, suite autorisée `895/895`, un test SCIP ignoré.
-- Trois replays personnels passés en lecture seule, SHA-256 inchangés.
-- Candidate : `0.1.74`, prête pour la gate humaine R3-V.
+- 0.1.74 est `human-KO`, `do-not-run`.
+- Une cavité sous une coupe locale rejoint directement le dessous de cette
+  coupe, sans paroi intermédiaire.
+- Une empreinte globale sans coupe réelle ne déplace plus la cavité ; celle-ci
+  reste ouverte sur la face fonctionnelle locale de son corps composite.
+- Résultat, aperçu, CAD IR et plan Fusion transportent et vérifient ces preuves.
+- Préparateur `130/130`, suite autorisée `899/899`, un test SCIP ignoré.
+- Trois replays personnels passés en lecture seule : 21 cavités sous coupe,
+  43 cavités ouvertes localement, SHA-256 inchangés.
+- Candidate : `0.1.75`, prête pour la gate humaine R4-V.
 - Aucun benchmark/holdout ; projets personnels en lecture seule.
 
 Preuve :
-`docs/P64_L09U_R3_0174_CORRECTIVE_EVIDENCE.md`.
+`docs/P64_L09U_R4_0175_CORRECTIVE_EVIDENCE.md`.
 Décision :
-`docs/DECISIONS/ADR-0099-profondeur-calibree-et-reservations-superieures-locales.md`.
+`docs/DECISIONS/ADR-0100-plateau-amovible-et-cavite-sans-paroi-intermediaire.md`.
 Recette :
-`docs/P64_L09U_R3_V_0174_FUSION_GATE_RECIPE.md`.
+`docs/P64_L09U_R4_V_0175_FUSION_GATE_RECIPE.md`.
 
 ### Historique R2 clôturé en human-KO
 

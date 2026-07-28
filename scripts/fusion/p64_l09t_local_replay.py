@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Rejoue en lecture seule les trois cas personnels exigés par P64-L09U-R3."""
+"""Rejoue en lecture seule les trois cas personnels exigés par P64-L09U-R4."""
 
 from __future__ import annotations
 
@@ -91,7 +91,10 @@ def _run_case(
         effort_profile="normal",
     )
     if cad["status"] != "ready_for_fusion":
-        raise RuntimeError(f"{case_id}: CAD IR={cad['status']}")
+        raise RuntimeError(
+            f"{case_id}: CAD IR={cad['status']} "
+            f"blockers={cad.get('blockers')}"
+        )
     fusion = generation_plan_from_cad_ir(
         cad["cad_ir"],
         FUSION_GENERATION_MODE_COMPACT_ONLY,
@@ -104,6 +107,96 @@ def _run_case(
     ):
         raise RuntimeError(f"{case_id}: final certificate is not exact")
     anchored_cavities = list(cavity_anchors.get("cavities", ()))
+    tray_cavities = [
+        item
+        for item in anchored_cavities
+        if item["anchor_kind"] == "below_top_inset"
+    ]
+    open_cavities = [
+        item
+        for item in anchored_cavities
+        if item["anchor_kind"] == "open_top"
+    ]
+    for item in open_cavities:
+        cavity_top = (
+            float(item["world_origin_mm"]["z"])
+            + float(item["world_size_mm"]["z"])
+        )
+        if (
+            item["top_interface_kind"] != "open_functional_face"
+            or item["functional_top_access_certified"] is not True
+            or abs(
+                cavity_top - float(item["functional_top_z_mm"])
+            )
+            > 0.0001
+        ):
+            raise RuntimeError(
+                f"{case_id}: cavity {item['cavity_key']} is not open "
+                "on its local functional top"
+            )
+    for item in tray_cavities:
+        placement = next(
+            value
+            for value in plan["placements"]
+            if value["id"] == item["owner_id"]
+        )
+        responsible_cut = next(
+            (
+                value
+                for value in placement["top_inset_cuts"]
+                if value["kind"] == "top_inset"
+                and value["reservation_id"]
+                == item["responsible_reservation_id"]
+                and value["local_region_id"]
+                == item["responsible_local_region_id"]
+            ),
+            None,
+        )
+        if responsible_cut is None:
+            available = [
+                (
+                    value["reservation_id"],
+                    value["local_region_id"],
+                )
+                for value in placement["top_inset_cuts"]
+                if value["kind"] == "top_inset"
+            ]
+            raise RuntimeError(
+                f"{case_id}: cavity {item['cavity_key']} has no matching "
+                f"top inset cut for "
+                f"{item['responsible_reservation_id']}/"
+                f"{item['responsible_local_region_id']}; "
+                f"available={available}"
+            )
+        cavity_top = (
+            float(item["world_origin_mm"]["z"])
+            + float(item["world_size_mm"]["z"])
+        )
+        if (
+            abs(
+                cavity_top
+                - float(responsible_cut["world_origin_mm"]["z"])
+            )
+            > 0.0001
+            or item["top_interface_kind"]
+            != "direct_void_to_removable_top_inset"
+            or item["intermediate_material_thickness_mm"] != 0.0
+            or item["top_separation_mm"] != 0.0
+            or item["top_void_continuity_certified"] is not True
+        ):
+            raise RuntimeError(
+                f"{case_id}: cavity remains closed below a removable tray"
+            )
+    if (
+        cavity_anchors.get("top_void_continuity_certified") is not True
+        or cavity_anchors.get("direct_top_inset_void_count")
+        != cavity_anchors.get("below_top_inset_count")
+        or len(tray_cavities)
+        != cavity_anchors.get("below_top_inset_count")
+    ):
+        raise RuntimeError(
+            f"{case_id}: tray cavity continuity certificate diverges"
+        )
     local_regions = [
         region
         for reservation in plan["top_inset_reservations"]["reservations"]
@@ -117,6 +210,9 @@ def _run_case(
         "witness_status": "disabled",
         "cavities_frozen": True,
         "calibrated_cavity_depths_unchanged": True,
+        "top_void_continuity_certified": True,
+        "covered_cavity_count": len(tray_cavities),
+        "open_functional_cavity_count": len(open_cavities),
         "cavity_anchor_count": len(anchored_cavities),
         "cavity_anchors": [
             {
@@ -128,6 +224,13 @@ def _run_case(
                     "minimum_world_origin_mm"
                 ]["z"],
                 "final_origin_z_mm": item["world_origin_mm"]["z"],
+                "top_interface_kind": item["top_interface_kind"],
+                "intermediate_material_thickness_mm": item[
+                    "intermediate_material_thickness_mm"
+                ],
+                "top_void_continuity_certified": item[
+                    "top_void_continuity_certified"
+                ],
             }
             for item in anchored_cavities
         ],
@@ -149,17 +252,21 @@ def _run_case(
     }
 
 
-def run_local_replay() -> dict[str, object]:
+def run_local_replay(
+    case_ids: tuple[str, ...] | None = None,
+) -> dict[str, object]:
+    selected_ids = case_ids or tuple(BASE_FILENAMES)
     paths = {
         case_id: PROJECT_DIRECTORY / filename
         for case_id, filename in BASE_FILENAMES.items()
+        if case_id in selected_ids
     }
     missing = [
         case_id for case_id, path in paths.items() if not path.is_file()
     ]
     if missing:
         return {
-            "schema_version": "bgig.p64_l09u_r3_local_replay.v1",
+            "schema_version": "bgig.p64_l09u_r4_local_replay.v2",
             "status": "skipped_local_projects_missing",
             "missing_case_ids": missing,
             "read_only": True,
@@ -175,7 +282,7 @@ def run_local_replay() -> dict[str, object]:
     if before != after:
         raise RuntimeError("A local source project changed during replay.")
     return {
-        "schema_version": "bgig.p64_l09u_r3_local_replay.v1",
+        "schema_version": "bgig.p64_l09u_r4_local_replay.v2",
         "status": "passed",
         "read_only": True,
         "source_projects_unchanged": True,
@@ -190,8 +297,15 @@ def run_local_replay() -> dict[str, object]:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--write-summary", type=Path)
+    parser.add_argument(
+        "--case-id",
+        action="append",
+        choices=tuple(BASE_FILENAMES),
+    )
     args = parser.parse_args()
-    receipt = run_local_replay()
+    receipt = run_local_replay(
+        tuple(args.case_id) if args.case_id else None
+    )
     if args.write_summary is not None:
         args.write_summary.parent.mkdir(parents=True, exist_ok=True)
         args.write_summary.write_text(

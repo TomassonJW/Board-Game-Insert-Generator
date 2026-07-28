@@ -1,24 +1,25 @@
 # Next Actions
 
 <!-- P64-L09U-NEXT -->
-## Action courante : exécuter la gate P64-L09U-R3-V
+## Action courante : exécuter la gate P64-L09U-R4-V
 
-0.1.73 reste `human-KO`, `do-not-run`. P64-L09U-R3 est terminé et validé
-automatiquement dans la candidate 0.1.74.
+0.1.74 est `human-KO`, `do-not-run`. P64-L09U-R4 est terminé et validé
+automatiquement dans la candidate 0.1.75.
 
 Thomas vérifie maintenant uniquement :
 
-1. profondeur `10,6 mm` avant/après finalisation ;
-2. origine Z avec et sans plateau ;
-3. coupes et paliers locaux de `CasLimite02+` ;
-4. affichage séparé du budget, de la terminaison et du temps total ;
-5. fidélité aperçu/Fusion et matérialisation progressive des trois cas.
+1. absence de dalle entre plateau et cavité dans `CasLimite01+` ;
+2. cavités sous coupe directement accessibles après retrait du plateau ;
+3. cavités sans coupe locale ouvertes sur leur propre face fonctionnelle ;
+4. même comportement dans `CasLimite02+` et `CasLimite01++` ;
+5. profondeurs, paliers, temps, aperçu/Fusion et matérialisation progressive
+   toujours conformes.
 
 Recette unique :
-`docs/P64_L09U_R3_V_0174_FUSION_GATE_RECIPE.md`.
+`docs/P64_L09U_R4_V_0175_FUSION_GATE_RECIPE.md`.
 
 Preuve automatisée :
-`docs/P64_L09U_R3_0174_CORRECTIVE_EVIDENCE.md`.
+`docs/P64_L09U_R4_0175_CORRECTIVE_EVIDENCE.md`.
 
 Aucun benchmark/holdout. Les projets personnels restent en lecture seule.
 `fusion-validated=false`, `print-validated=false`.

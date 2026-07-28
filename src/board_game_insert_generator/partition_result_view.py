@@ -172,6 +172,21 @@ def build_partition_result_view(partition: object) -> dict[str, object]:
                         "top_separation_mm": frozen.get(
                             "top_separation_mm"
                         ),
+                        "intermediate_material_thickness_mm": frozen.get(
+                            "intermediate_material_thickness_mm"
+                        ),
+                        "top_interface_kind": frozen.get(
+                            "top_interface_kind"
+                        ),
+                        "top_void_continuity_certified": frozen.get(
+                            "top_void_continuity_certified"
+                        ),
+                        "functional_top_z_mm": frozen.get(
+                            "functional_top_z_mm"
+                        ),
+                        "functional_top_access_certified": frozen.get(
+                            "functional_top_access_certified"
+                        ),
                     }
                 )
             top_cavities.append(cavity_view)

@@ -1,7 +1,33 @@
 # Backlog
 
 <!-- P64-L09U-BACKLOG -->
-## Correctif P64-L09U-R3
+## Correctif P64-L09U-R4
+
+### P64-L09U-R3-V — Gate humaine Fusion 0.1.74
+
+- Statut : `done-human-KO`, `do-not-run`.
+- Acquis : calibre, encastrements locaux, temps et matérialisation préservés.
+- Bloquant : paroi intermédiaire qui enferme les cavités sous plateau.
+- Preuve : `docs/P64_L09U_R3_V_0174_HUMAN_KO_EVIDENCE.md`.
+
+### P64-L09U-R4 — Accès direct sous les plateaux
+
+- Statut : `done`, `automated-validated`.
+- Utiliser uniquement les coupes locales réellement portées par le conteneur.
+- Joindre directement cavité et découpe, sans matière intermédiaire.
+- Conserver les autres cavités ouvertes sur leur face fonctionnelle locale.
+- Cible : `0.1.75`.
+- Runbook : `docs/P64_L09U_R4_END_TO_END_RUNBOOK.md`.
+
+### P64-L09U-R4-V — Gate humaine Fusion
+
+- Statut : `ready-human-gate`.
+- Candidate : `0.1.75`.
+- Recette : `docs/P64_L09U_R4_V_0175_FUSION_GATE_RECIPE.md`.
+- Preuve : `docs/P64_L09U_R4_0175_CORRECTIVE_EVIDENCE.md`.
+- `fusion-validated=false`, `print-validated=false`.
+
+### Historique R3
 
 ### P64-L09U-R2-V — Gate humaine Fusion 0.1.73
 

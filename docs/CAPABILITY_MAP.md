@@ -1,24 +1,30 @@
 # Capability Map
 
 <!-- P64-L09U-CAPABILITY -->
-## P64-L09U-R3 — profondeur calibrée et réservations locales
+## P64-L09U-R4 — cavités ouvertes sous plateaux
 
 - `C-CAVITY` : `automated-validated`. Calibre, X/Y et orientation figés ;
-  ancrage Z final et épaisseurs restantes certifiés.
-- `C-RESERVATION` : `automated-validated`. Régions XY exactes et intervalles Z
-  locaux, sans cumul hors recouvrement.
-- `C-STAGED-CALCULATION` : `automated-validated`. Recherche, plafond,
-  terminaison et temps mural total sont distincts.
-- `C-FINALIZATION`, `C-CAD-IR`, `C-PREVIEW` : `automated-validated`, preuves
-  d'ancrage et paliers alignées de bout en bout.
-- `C-FUSION` : `implemented`, `automated-validated`; observation réelle encore
-  humaine. BRep transitoire et rendu progressif préservés.
-- `C-QUALITY` : préparateur `126/126`, suite autorisée `895/895`, trois replays
+  accès local supérieur et fond certifiés.
+- `C-RESERVATION` : `automated-validated`. Seule une coupe locale réelle du
+  propriétaire peut abaisser une cavité ; la jonction contient `0 mm` de
+  matière intermédiaire.
+- `C-FINALIZATION`, `C-CAD-IR`, `C-PREVIEW` : `automated-validated`, continuité
+  du vide et face fonctionnelle locale alignées de bout en bout.
+- `C-FUSION` : `implemented`, `automated-validated`; le plan refuse une dalle
+  réintroduite. Observation réelle encore humaine.
+- `C-STAGED-CALCULATION` et chemin BRep transitoire : acquis R3 préservés.
+- `C-QUALITY` : préparateur `130/130`, suite autorisée `899/899`, trois replays
   personnels exacts en lecture seule.
-- `C-RELEASE` : 0.1.74 `ready-human-gate`.
+- `C-RELEASE` : 0.1.75 `ready-human-gate`.
 - `C-PRINT` : `print-validated=false`.
 
 `fusion-validated=false`, `print-validated=false`.
+
+### Historique R3 clôturé en human-KO
+
+- `C-RELEASE` : 0.1.74 `human-KO`, `do-not-run`.
+- `C-CAVITY` : profondeur correcte, mais accès sous plateau bloqué par une
+  paroi intermédiaire.
 
 ### Historique R2 clôturé en human-KO
 

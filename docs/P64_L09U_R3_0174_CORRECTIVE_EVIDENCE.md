@@ -1,5 +1,8 @@
 # P64-L09U-R3 — preuve corrective 0.1.74
 
+> Historique : la gate humaine a classé 0.1.74 `human-KO`, `do-not-run`.
+> Voir `docs/P64_L09U_R3_V_0174_HUMAN_KO_EVIDENCE.md`.
+
 Date : 2026-07-28.
 
 Statut : `automated-validated`, `ready-human-gate`,

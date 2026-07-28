@@ -574,6 +574,11 @@ class FusionCavityCutPlan:
     calibrated_depth_source_mm: float | None = None
     calibrated_depth_final_mm: float | None = None
     top_separation_mm: float | None = None
+    intermediate_material_thickness_mm: float | None = None
+    top_interface_kind: str = ""
+    top_void_continuity_certified: bool = False
+    functional_top_z_mm: float | None = None
+    functional_top_access_certified: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         payload = {
@@ -611,6 +616,18 @@ class FusionCavityCutPlan:
             )
         if self.top_separation_mm is not None:
             payload["top_separation_mm"] = self.top_separation_mm
+        if self.intermediate_material_thickness_mm is not None:
+            payload["intermediate_material_thickness_mm"] = (
+                self.intermediate_material_thickness_mm
+            )
+        if self.top_interface_kind:
+            payload["top_interface_kind"] = self.top_interface_kind
+        if self.top_void_continuity_certified:
+            payload["top_void_continuity_certified"] = True
+        if self.functional_top_z_mm is not None:
+            payload["functional_top_z_mm"] = self.functional_top_z_mm
+        if self.functional_top_access_certified:
+            payload["functional_top_access_certified"] = True
 
         return payload
 
@@ -3999,6 +4016,48 @@ def _cavity_cut_plans(
                 geometry_origin.z + cut_plane_local_z
             )
             retained_floor_mm = local_origin.z
+        if (
+            cavity_source == "frozen_content_cavity"
+            and parameters.get("anchor_kind") == "below_top_inset"
+            and (
+                abs(
+                    float(
+                        parameters.get(
+                            "intermediate_material_thickness_mm",
+                            -1.0,
+                        )
+                    )
+                )
+                > 0.0001
+                or abs(
+                    float(parameters.get("top_separation_mm", -1.0))
+                )
+                > 0.0001
+                or parameters.get("top_interface_kind")
+                != "direct_void_to_removable_top_inset"
+                or parameters.get("top_void_continuity_certified")
+                is not True
+            )
+        ):
+            raise FusionSkeletonError(
+                f"Frozen cavity {cavity_id!r} must join its removable top inset without intermediate material."
+            )
+        if (
+            cavity_source == "frozen_content_cavity"
+            and parameters.get("anchor_kind") == "open_top"
+            and (
+                parameters.get("functional_top_access_certified")
+                is not True
+                or abs(
+                    float(parameters.get("functional_top_z_mm", -1.0))
+                    - cut_plane_world_z
+                )
+                > 0.0001
+            )
+        ):
+            raise FusionSkeletonError(
+                f"Frozen cavity {cavity_id!r} must open on its certified local functional top."
+            )
         if is_top_inset:
             if parameters.get("non_perforating") is not True:
                 raise FusionSkeletonError(
@@ -4107,6 +4166,29 @@ def _cavity_cut_plans(
                 top_separation_mm=_optional_number(
                     parameters,
                     "top_separation_mm",
+                ),
+                intermediate_material_thickness_mm=_optional_number(
+                    parameters,
+                    "intermediate_material_thickness_mm",
+                ),
+                top_interface_kind=str(
+                    parameters.get("top_interface_kind", "")
+                ),
+                top_void_continuity_certified=bool(
+                    parameters.get(
+                        "top_void_continuity_certified",
+                        False,
+                    )
+                ),
+                functional_top_z_mm=_optional_number(
+                    parameters,
+                    "functional_top_z_mm",
+                ),
+                functional_top_access_certified=bool(
+                    parameters.get(
+                        "functional_top_access_certified",
+                        False,
+                    )
                 ),
             )
         )

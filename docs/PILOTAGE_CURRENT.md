@@ -1,34 +1,46 @@
 # Pilotage courant
 
 <!-- P64-L09U-CURRENT -->
-## Reprise canonique P64-L09U-R3
+## Reprise canonique P64-L09U-R4
 
-- `0.1.73` est `human-KO`, `do-not-run` pour une utilisation finale.
-- P64-L09U-R3 est `automated-validated` et la candidate `0.1.74` est
+- `0.1.74` est `human-KO`, `do-not-run` : les cavités sous plateau étaient
+  enfermées par une paroi intermédiaire.
+- P64-L09U-R4 est `automated-validated` et la candidate `0.1.75` est
   `ready-human-gate`.
-- La profondeur calibrée reste inchangée ; l'exemple `10 mm + 0,6 mm` reste
-  `10,6 mm` du minimum au plan Fusion.
-- La finalisation ne change ni X/Y, ni orientation, ni dimensions. Elle résout
-  seulement Z avec un fond et une séparation supérieure certifiés.
-- Les plateaux/livrets produisent des régions XY et intervalles Z locaux :
-  aucun cumul hors intersection, paliers exacts dans les recouvrements.
-- L'affichage distingue recherche, plafond, terminaison et temps mural total.
-- Le BRep transitoire, le rendu progressif, le rollback et l'absence de Combine
-  rectangulaire sont préservés.
-- Validation : préparateur `126/126`, suite autorisée `895/895`, un test SCIP
+- Une cavité n'est abaissée que si son propre conteneur porte une coupe locale
+  réelle. Son sommet coïncide alors avec le dessous de la coupe :
+  séparation et matière intermédiaire `0 mm`.
+- Un conteneur situé sous l'empreinte globale mais sans coupe locale garde sa
+  cavité ouverte sur sa face fonctionnelle locale.
+- Profondeur, X/Y, orientation et dimensions restent figés ; le fond canonique,
+  les parois latérales et les paliers locaux restent certifiés.
+- L'aperçu, la CAD IR et le plan Fusion portent la continuité du vide et
+  refusent une dalle réintroduite.
+- Le BRep transitoire, le rendu progressif, le rollback, les temps honnêtes et
+  l'absence de Combine rectangulaire sont préservés.
+- Validation : préparateur `130/130`, suite autorisée `899/899`, un test SCIP
   ignoré et douze modules interdits exclus.
-- Les trois replays personnels passent en lecture seule avec SHA-256 inchangés.
-- Prochaine action unique : gate humaine P64-L09U-R3-V selon
-  `docs/P64_L09U_R3_V_0174_FUSION_GATE_RECIPE.md`.
+- Les trois replays personnels passent en lecture seule : `21` cavités sous
+  coupe directement accessibles, `43` cavités ouvertes localement, SHA-256
+  inchangés.
+- Prochaine action unique : gate humaine P64-L09U-R4-V selon
+  `docs/P64_L09U_R4_V_0175_FUSION_GATE_RECIPE.md`.
 - Aucun benchmark/holdout ; projets personnels en lecture seule ;
   `fusion-validated=false`, `print-validated=false`.
 
-Autorités R3 :
+Autorités R4 :
 
-- `docs/P64_L09U_R2_V_0173_HUMAN_KO_EVIDENCE.md` ;
-- `docs/DECISIONS/ADR-0099-profondeur-calibree-et-reservations-superieures-locales.md` ;
-- `docs/P64_L09U_R3_0174_CORRECTIVE_EVIDENCE.md` ;
-- `docs/P64_L09U_R3_V_0174_FUSION_GATE_RECIPE.md`.
+- `docs/P64_L09U_R3_V_0174_HUMAN_KO_EVIDENCE.md` ;
+- `docs/DECISIONS/ADR-0100-plateau-amovible-et-cavite-sans-paroi-intermediaire.md` ;
+- `docs/P64_L09U_R4_0175_CORRECTIVE_EVIDENCE.md` ;
+- `docs/P64_L09U_R4_V_0175_FUSION_GATE_RECIPE.md`.
+
+### Historique R3 clôturé en human-KO
+
+- `0.1.74` a confirmé le calibre, les encastrements locaux, les temps et le
+  chemin Fusion transitoire, mais a laissé une paroi canonique entre les
+  plateaux et les cavités.
+- Preuve : `docs/P64_L09U_R3_V_0174_HUMAN_KO_EVIDENCE.md`.
 
 ### Historique R2 clôturé en human-KO
 

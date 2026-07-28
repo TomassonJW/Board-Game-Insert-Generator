@@ -6,6 +6,9 @@ import unittest
 from board_game_insert_generator.contextual_local_analysis import (
     IncrementalLocalAnalysisEngine,
 )
+from board_game_insert_generator.coupled_finalization import (
+    _resolve_final_cavity_contracts,
+)
 from board_game_insert_generator.partition_cad import build_partition_cad
 from board_game_insert_generator.partition_result_view import (
     build_partition_result_view,
@@ -16,6 +19,7 @@ from board_game_insert_generator.staged_calculation import (
 )
 from fusion_addin.BoardGameInsertGenerator.fusion_skeleton import (
     FUSION_GENERATION_MODE_COMPACT_ONLY,
+    FusionSkeletonError,
     generation_plan_from_cad_ir,
 )
 from scripts.fusion.p64_l09sv_preflight import (
@@ -180,6 +184,16 @@ class P64L09UR3DepthLocalInsetsTests(unittest.TestCase):
         self.assertEqual(cavity["anchor_kind"], "open_top")
         self.assertTrue(cavity["top_open"])
         self.assertEqual(cavity["responsible_reservation_id"], "")
+        self.assertEqual(
+            cavity["top_interface_kind"],
+            "open_functional_face",
+        )
+        self.assertTrue(cavity["functional_top_access_certified"])
+        self.assertEqual(
+            cavity["world_origin_mm"]["z"]
+            + cavity["world_size_mm"]["z"],
+            cavity["functional_top_z_mm"],
+        )
         self.assertGreaterEqual(
             cavity["retained_floor_mm"],
             cavity["minimum_floor_mm"],
@@ -193,18 +207,39 @@ class P64L09UR3DepthLocalInsetsTests(unittest.TestCase):
             cavity["minimum_world_origin_mm"]["y"],
         )
 
-    def test_local_inset_moves_only_z_below_the_canonical_wall(self) -> None:
+    def test_local_inset_joins_cavity_without_intermediate_wall(self) -> None:
         placement = self.inset_plan["placements"][0]
         cavity = placement["frozen_cavities_v1"][0]
+        responsible_cut = next(
+            value
+            for value in placement["top_inset_cuts"]
+            if value["kind"] == "top_inset"
+            and value["reservation_id"]
+            == cavity["responsible_reservation_id"]
+            and value["local_region_id"]
+            == cavity["responsible_local_region_id"]
+        )
+        cavity_top = (
+            cavity["world_origin_mm"]["z"]
+            + cavity["world_size_mm"]["z"]
+        )
 
         self.assertEqual(cavity["anchor_kind"], "below_top_inset")
         self.assertFalse(cavity["top_open"])
         self.assertTrue(cavity["responsible_reservation_id"])
         self.assertTrue(cavity["responsible_local_region_id"])
+        self.assertEqual(cavity_top, responsible_cut["world_origin_mm"]["z"])
+        self.assertEqual(cavity["top_separation_mm"], 0.0)
+        self.assertEqual(cavity["minimum_top_separation_mm"], 0.0)
         self.assertEqual(
-            cavity["top_separation_mm"],
-            cavity["minimum_top_separation_mm"],
+            cavity["intermediate_material_thickness_mm"],
+            0.0,
         )
+        self.assertEqual(
+            cavity["top_interface_kind"],
+            "direct_void_to_removable_top_inset",
+        )
+        self.assertTrue(cavity["top_void_continuity_certified"])
         self.assertGreaterEqual(
             cavity["retained_floor_mm"],
             cavity["minimum_floor_mm"],
@@ -255,6 +290,35 @@ class P64L09UR3DepthLocalInsetsTests(unittest.TestCase):
             fusion_cut.top_separation_mm,
             cavity["top_separation_mm"],
         )
+        self.assertEqual(
+            preview["top_interface_kind"],
+            "direct_void_to_removable_top_inset",
+        )
+        self.assertTrue(preview["top_void_continuity_certified"])
+        self.assertEqual(
+            cad_operation["parameters"][
+                "intermediate_material_thickness_mm"
+            ],
+            0.0,
+        )
+        self.assertEqual(
+            cad_operation["parameters"]["top_interface_kind"],
+            "direct_void_to_removable_top_inset",
+        )
+        self.assertTrue(
+            cad_operation["parameters"][
+                "top_void_continuity_certified"
+            ]
+        )
+        self.assertEqual(
+            fusion_cut.intermediate_material_thickness_mm,
+            0.0,
+        )
+        self.assertEqual(
+            fusion_cut.top_interface_kind,
+            "direct_void_to_removable_top_inset",
+        )
+        self.assertTrue(fusion_cut.top_void_continuity_certified)
 
     def test_local_steps_reach_preview_cad_ir_and_fusion(self) -> None:
         reservations = self.stepped_plan["top_inset_reservations"][
@@ -311,6 +375,154 @@ class P64L09UR3DepthLocalInsetsTests(unittest.TestCase):
                 for value in fusion_top_cuts
             )
         )
+
+    def test_every_tray_anchored_cavity_has_a_direct_void_path(self) -> None:
+        for label, plan in (
+            ("single", self.inset_plan),
+            ("stepped", self.stepped_plan),
+        ):
+            with self.subTest(label=label):
+                anchored = [
+                    cavity
+                    for placement in plan["placements"]
+                    for cavity in placement.get("frozen_cavities_v1", [])
+                    if cavity["anchor_kind"] == "below_top_inset"
+                ]
+                self.assertTrue(anchored)
+                for cavity in anchored:
+                    placement = next(
+                        value
+                        for value in plan["placements"]
+                        if value["id"] == cavity["owner_id"]
+                    )
+                    responsible_cut = next(
+                        value
+                        for value in placement["top_inset_cuts"]
+                        if value["kind"] == "top_inset"
+                        and value["reservation_id"]
+                        == cavity["responsible_reservation_id"]
+                        and value["local_region_id"]
+                        == cavity["responsible_local_region_id"]
+                    )
+                    self.assertEqual(
+                        cavity["world_origin_mm"]["z"]
+                        + cavity["world_size_mm"]["z"],
+                        responsible_cut["world_origin_mm"]["z"],
+                    )
+                    self.assertEqual(
+                        cavity["intermediate_material_thickness_mm"],
+                        0.0,
+                    )
+                    self.assertTrue(
+                        cavity["top_void_continuity_certified"]
+                    )
+
+    def test_every_other_cavity_opens_on_its_local_functional_top(self) -> None:
+        open_cavities = [
+            cavity
+            for plan in (
+                self.open_plan,
+                self.inset_plan,
+                self.stepped_plan,
+            )
+            for placement in plan["placements"]
+            for cavity in placement.get("frozen_cavities_v1", [])
+            if cavity["anchor_kind"] == "open_top"
+        ]
+        self.assertTrue(open_cavities)
+        for cavity in open_cavities:
+            self.assertEqual(
+                cavity["top_interface_kind"],
+                "open_functional_face",
+            )
+            self.assertTrue(
+                cavity["functional_top_access_certified"]
+            )
+            self.assertEqual(
+                cavity["world_origin_mm"]["z"]
+                + cavity["world_size_mm"]["z"],
+                cavity["functional_top_z_mm"],
+            )
+
+    def test_fusion_refuses_reintroduced_material_under_the_tray(self) -> None:
+        cad_ir = deepcopy(self.inset_cad["cad_ir"])
+        cad_ir["metadata"].pop("artifact_identity", None)
+        cavity_operation = next(
+            operation
+            for operation in cad_ir["components"][0]["body"][
+                "operations"
+            ]
+            if operation["kind"] == "subtract_rectangular_cavity"
+            and operation["parameters"]["anchor_kind"]
+            == "below_top_inset"
+        )
+        cavity_operation["parameters"][
+            "intermediate_material_thickness_mm"
+        ] = 1.2
+
+        with self.assertRaisesRegex(
+            FusionSkeletonError,
+            "without intermediate material",
+        ):
+            generation_plan_from_cad_ir(
+                cad_ir,
+                FUSION_GENERATION_MODE_COMPACT_ONLY,
+            )
+
+    def test_global_tray_footprint_without_owner_cut_keeps_local_top_open(
+        self,
+    ) -> None:
+        project = _calibrated_project(with_reservation=True)
+        group_id = project["container_groups"][0]["id"]
+        placement = {
+            "id": "lower-owner",
+            "container_group_id": group_id,
+            "origin_mm": {"x": 0.0, "y": 0.0, "z": 0.0},
+            "world_size_mm": {"x": 30.0, "y": 20.0, "z": 20.0},
+        }
+        source_cavity = {
+            "owner_id": "lower-owner",
+            "cavity_index": 0,
+            "cavity_key": "lower-cavity",
+            "world_origin_mm": {"x": 2.0, "y": 2.0, "z": 5.0},
+            "world_size_mm": {"x": 10.0, "y": 10.0, "z": 5.0},
+            "source_owner_origin_mm": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+            },
+            "source_owner_world_size_mm": {
+                "x": 20.0,
+                "y": 20.0,
+                "z": 10.0,
+            },
+            "source_rotation_deg_z": 0,
+        }
+        cad_prisms = [
+            {
+                "cad_origin_mm": {"x": 0.0, "y": 0.0, "z": 0.0},
+                "cad_size_mm": {"x": 20.0, "y": 20.0, "z": 10.0},
+            },
+            {
+                "cad_origin_mm": {"x": 20.0, "y": 0.0, "z": 0.0},
+                "cad_size_mm": {"x": 10.0, "y": 20.0, "z": 20.0},
+            },
+        ]
+
+        certificate = _resolve_final_cavity_contracts(
+            placement,
+            [source_cavity],
+            [],
+            project=project,
+            cad_prisms=cad_prisms,
+        )
+        cavity = certificate["cavities"][0]
+
+        self.assertTrue(certificate["certified"])
+        self.assertEqual(cavity["anchor_kind"], "open_top")
+        self.assertEqual(cavity["functional_top_z_mm"], 10.0)
+        self.assertEqual(cavity["world_origin_mm"]["z"], 5.0)
+        self.assertTrue(cavity["functional_top_access_certified"])
 
     def test_source_project_is_not_mutated_by_the_artifact_build(self) -> None:
         source = _calibrated_project(with_reservation=True)

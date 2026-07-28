@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prépare la fixture publique et le reçu correctif P64-L09U-R3-V."""
+"""Prépare la fixture publique et le reçu correctif P64-L09U-R4-V."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ from scripts.fusion.p64_l09sv_preflight import (
 from scripts.fusion.p64_l09tv_preflight import gate_project
 
 
-ADDIN_VERSION = "0.1.74"
+ADDIN_VERSION = "0.1.75"
 FIXTURE_FILENAME = "p64-l09uw-01-exact-composite.bgig.json"
 SUMMARY_FILENAME = "p64-l09uw-preflight-summary.json"
 TARGETED_MATRIX = (
@@ -28,6 +28,8 @@ TARGETED_MATRIX = (
     "frozen_cavity_world_pose",
     "calibrated_cavity_depth_unchanged",
     "deterministic_final_cavity_z_anchor",
+    "direct_void_between_top_inset_and_cavity",
+    "zero_intermediate_material_under_removable_tray",
     "local_disjoint_top_insets",
     "local_overlapping_top_inset_steps",
     "truthful_budget_wall_and_cleanup_timing",
@@ -71,8 +73,33 @@ def build_preflight() -> tuple[dict[str, object], dict[str, object]]:
         raise RuntimeError(
             "The corrective fixture does not prove bounded owner batches."
         )
+    anchor_certificate = end_to_end["finalization"][
+        "composite_certificate"
+    ]["cavity_anchor_certificate"]
+    anchored_cavities = [
+        value
+        for value in anchor_certificate["cavities"]
+        if value["anchor_kind"] == "below_top_inset"
+    ]
+    if (
+        anchor_certificate["certified"] is not True
+        or not anchored_cavities
+        or anchor_certificate["direct_top_inset_void_count"]
+        != anchor_certificate["below_top_inset_count"]
+        or anchor_certificate["top_void_continuity_certified"] is not True
+        or any(
+            value["top_interface_kind"]
+            != "direct_void_to_removable_top_inset"
+            or value["intermediate_material_thickness_mm"] != 0.0
+            or value["top_separation_mm"] != 0.0
+            for value in anchored_cavities
+        )
+    ):
+        raise RuntimeError(
+            "The corrective fixture does not prove direct cavity access below the removable tray."
+        )
     summary: dict[str, object] = {
-        "schema_version": "bgig.p64_l09uw_fusion_preflight.v1",
+        "schema_version": "bgig.p64_l09uw_fusion_preflight.v2",
         "addin_version": ADDIN_VERSION,
         "fixture": {
             "filename": FIXTURE_FILENAME,
@@ -110,6 +137,11 @@ def build_preflight() -> tuple[dict[str, object], dict[str, object]]:
             "composite_cavities_frozen": True,
             "calibrated_cavity_depths_unchanged": True,
             "final_cavity_z_anchor_deterministic": True,
+            "top_inset_cavity_interface": (
+                "direct_void_to_removable_top_inset"
+            ),
+            "intermediate_material_thickness_mm": 0.0,
+            "top_void_continuity_certified": True,
             "top_inset_depth_is_local_by_xy_region": True,
             "budget_wall_and_cleanup_times_separated": True,
             "composite_preview_uses_cad_prisms": True,

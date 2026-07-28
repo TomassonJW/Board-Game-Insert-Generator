@@ -974,3 +974,18 @@ Fusion ou impression n'est revendiquée par L07E.
 Le CAD IR et l'adaptateur Fusion recoivent uniquement des corps finaux issus d'un `finalized_plan` courant et recertifie. Les annexes XY restent soudees a leur proprietaire et ne creent aucun composant utilisateur supplementaire. Les encoches plateau/livret sont appliquees seulement aux corps finaux qui atteignent le plan reserve et chevauchent son empreinte.
 
 Le package `0.1.67` est installe depuis le commit publie `832c9d5`, avec preflight `85c578d`. Sa gate humaine doit rejouer le projet complexe a 28 conteneurs qui a invalide `0.1.66`.
+
+## P64-L09U-R4 — booléens continus sous plateau
+
+Le CAD IR conserve l'ordre logique `unions -> cavités -> coupes de plateau`.
+Pour une cavité `below_top_inset`, sa coupe et l'encastrement local possèdent
+une interface coplanaire et un vide continu. Aucune feature, extrusion ou
+paroi intermédiaire n'est ajoutée.
+
+Pour une cavité `open_top` d'un corps composite, le plan Fusion utilise sa face
+fonctionnelle locale certifiée plutôt que le sommet de la boîte englobante du
+module. L'adaptateur refuse les deux divergences avant création géométrique.
+
+Le corps BRep transitoire, la persistance unique par module, la respiration
+entre modules et le rollback global restent inchangés. La candidate 0.1.75
+reste `fusion-validated=false` avant P64-L09U-R4-V.

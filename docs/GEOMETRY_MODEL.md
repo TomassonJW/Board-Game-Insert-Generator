@@ -648,3 +648,18 @@ spécifique. Aucun solveur ne permute X ou Y avec Z sans ce choix utilisateur.
 `Empilé verticalement` reste une intention de disposition de plusieurs groupes
 déjà orientés. Elle ne constitue pas la pile physique et ne remplace jamais le
 nombre d'unités par pile ou `Basculer`.
+
+## P64-L09U-R4 — interface entre plateau amovible et cavité
+
+Une cavité calibrée possède une face fonctionnelle locale, qui n'est pas
+forcément le sommet de la boîte englobante d'un corps composite.
+
+- Sans coupe de plateau portée par son propriétaire, la cavité s'ouvre sur
+  cette face locale.
+- Avec une coupe locale réelle recouvrante, le dessous de la coupe et le sommet
+  de la cavité sont coplanaires.
+- Leur séparation imprimée vaut `0 mm` : le plateau amovible est la fermeture.
+- Le fond et les parois latérales conservent leurs valeurs canoniques.
+
+Une empreinte globale de réservation ne suffit jamais à abaisser une cavité
+d'un autre corps situé plus bas. Voir ADR-0100.

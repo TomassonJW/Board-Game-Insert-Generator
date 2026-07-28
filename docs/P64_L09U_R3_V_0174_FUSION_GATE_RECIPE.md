@@ -1,6 +1,9 @@
 # P64-L09U-R3-V — recette Fusion 0.1.74
 
-Statut : `ready-human-gate`.
+Statut historique : `done-human-KO`, `do-not-run`.
+
+La recette courante est
+`docs/P64_L09U_R4_V_0175_FUSION_GATE_RECIPE.md`.
 
 Avant le verdict : `fusion-validated=false`, `print-validated=false`.
 

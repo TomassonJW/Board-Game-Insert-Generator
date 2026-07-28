@@ -1470,7 +1470,6 @@ def _attach_xy_composite_geometry(
             placement_cuts,
             project=project,
             cad_prisms=cad_prisms,
-            top_inset_reservations=reservations,
         )
         if anchor_certificate.get("certified") is not True:
             return _rejected_composite_materialization(
@@ -1673,52 +1672,6 @@ def _attach_rectangular_cavity_anchors(
     return _aggregate_cavity_anchor_certificates(placements)
 
 
-def _local_reservation_anchor_cuts(
-    cavity_rect: Sequence[float],
-    reservations: Sequence[Mapping[str, object]],
-) -> list[dict[str, object]]:
-    """Expose exact local reservation intervals to the cavity anchor."""
-
-    cuts: list[dict[str, object]] = []
-    for reservation in reservations:
-        raw_regions = reservation.get("local_depth_regions", ())
-        if not isinstance(raw_regions, (list, tuple)):
-            continue
-        for raw_region in raw_regions:
-            if not isinstance(raw_region, Mapping):
-                continue
-            origin = _object_mapping(raw_region["cut_origin_mm"])
-            size = _object_mapping(raw_region["cut_size_mm"])
-            region_rect = (
-                float(origin["x"]),
-                float(origin["y"]),
-                float(origin["x"]) + float(size["x"]),
-                float(origin["y"]) + float(size["y"]),
-            )
-            if not _rectangles_overlap(cavity_rect, region_rect):
-                continue
-            bottom = float(raw_region["layer_bottom_z_mm"])
-            top = float(raw_region["layer_top_z_mm"])
-            cuts.append(
-                {
-                    "kind": "top_inset",
-                    "reservation_id": str(reservation["id"]),
-                    "local_region_id": str(raw_region["id"]),
-                    "world_origin_mm": {
-                        "x": float(origin["x"]),
-                        "y": float(origin["y"]),
-                        "z": bottom,
-                    },
-                    "size_mm": {
-                        "x": float(size["x"]),
-                        "y": float(size["y"]),
-                        "z": top - bottom,
-                    },
-                }
-            )
-    return cuts
-
-
 def _resolve_final_cavity_contracts(
     placement: Mapping[str, object],
     frozen_cavities: Sequence[Mapping[str, object]],
@@ -1726,7 +1679,6 @@ def _resolve_final_cavity_contracts(
     *,
     project: Mapping[str, object],
     cad_prisms: Sequence[Mapping[str, object]] | None,
-    top_inset_reservations: Sequence[Mapping[str, object]] = (),
 ) -> dict[str, object]:
     owner_id = str(placement["id"])
     owner_origin = tuple(
@@ -1737,7 +1689,7 @@ def _resolve_final_cavity_contracts(
         float(_mapping_value(placement["world_size_mm"], axis))
         for axis in ("x", "y", "z")
     )
-    wall, floor = _resolved_owner_wall_and_floor(project, placement)
+    _, floor = _resolved_owner_wall_and_floor(project, placement)
     contracts: list[dict[str, object]] = []
     rejection_codes: list[str] = []
     for source in sorted(
@@ -1773,12 +1725,6 @@ def _resolve_final_cavity_contracts(
                 _world_xy_rectangle(value),
             )
         ]
-        overlapping_cuts.extend(
-            _local_reservation_anchor_cuts(
-                cavity_rect,
-                top_inset_reservations,
-            )
-        )
         overlapping_cuts = [
             value
             for value in overlapping_cuts
@@ -1800,13 +1746,19 @@ def _resolve_final_cavity_contracts(
             cut_bottom = float(
                 _mapping_value(responsible["world_origin_mm"], "z")
             )
-            cavity_top = cut_bottom - wall
+            # The removable flat item closes the cavity while installed.  Its
+            # localized inset and the calibrated cavity are therefore one
+            # continuous void: printable wall material must not be inserted
+            # between their two matching Z planes.
+            cavity_top = cut_bottom
             anchor_kind = "below_top_inset"
-            separation = wall
+            separation = 0.0
+            top_interface_kind = "direct_void_to_removable_top_inset"
         else:
             cavity_top = functional_top
             anchor_kind = "open_top"
             separation = 0.0
+            top_interface_kind = "open_functional_face"
         final_origin = (
             source_origin[0],
             source_origin[1],
@@ -1861,8 +1813,14 @@ def _resolve_final_cavity_contracts(
             "retained_floor_mm": round(retained_floor, 6),
             "minimum_floor_mm": round(floor, 6),
             "top_separation_mm": round(separation, 6),
-            "minimum_top_separation_mm": (
-                round(wall, 6) if responsible is not None else 0.0
+            "minimum_top_separation_mm": 0.0,
+            "intermediate_material_thickness_mm": 0.0,
+            "top_interface_kind": top_interface_kind,
+            "top_void_continuity_certified": True,
+            "functional_top_z_mm": round(functional_top, 6),
+            "functional_top_access_certified": bool(
+                anchor_kind != "open_top"
+                or abs(cavity_top - functional_top) <= 0.0001
             ),
         }
         contracts.append(
@@ -1887,6 +1845,15 @@ def _resolve_final_cavity_contracts(
         ),
         "below_top_inset_count": sum(
             value["anchor_kind"] == "below_top_inset"
+            for value in contracts
+        ),
+        "direct_top_inset_void_count": sum(
+            value["top_interface_kind"]
+            == "direct_void_to_removable_top_inset"
+            for value in contracts
+        ),
+        "top_void_continuity_certified": all(
+            value["top_void_continuity_certified"]
             for value in contracts
         ),
         "calibrated_depths_unchanged": all(
@@ -1921,6 +1888,15 @@ def _aggregate_cavity_anchor_certificates(
         ),
         "below_top_inset_count": sum(
             value.get("anchor_kind") == "below_top_inset"
+            for value in cavities
+        ),
+        "direct_top_inset_void_count": sum(
+            value.get("top_interface_kind")
+            == "direct_void_to_removable_top_inset"
+            for value in cavities
+        ),
+        "top_void_continuity_certified": all(
+            value.get("top_void_continuity_certified") is True
             for value in cavities
         ),
         "calibrated_depths_unchanged": all(
