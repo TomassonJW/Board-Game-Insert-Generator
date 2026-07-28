@@ -14,9 +14,46 @@ from board_game_insert_generator.product_grid import (
     outward_size_mm,
     ticks_to_mm,
 )
+from scripts.fusion.p64_l09u_r7_grid_audit import (
+    audit_replay_summary,
+)
 
 
 class ProductGridTests(unittest.TestCase):
+    def test_replay_audit_excludes_source_and_rejects_derived_off_grid(
+        self,
+    ) -> None:
+        payload = {
+            "results": [
+                {
+                    "diagnostics": {
+                        "minimal_plan": {
+                            "top_inset_reservations": {
+                                "product_grid_migration_v1": {
+                                    "source_physical_dimensions_mm": {
+                                        "x": 10.04,
+                                    }
+                                },
+                                "cut_origin_mm": {"x": 10.0},
+                            },
+                            "placements": [],
+                        },
+                        "cad_ir": {
+                            "derived_origin_mm": {"x": 2.24}
+                        },
+                        "fusion_plan": {},
+                    }
+                }
+            ]
+        }
+
+        report = audit_replay_summary(payload)
+
+        self.assertEqual(report["status"], "failed")
+        self.assertEqual(report["audited_length_count"], 2)
+        self.assertEqual(report["off_grid_count"], 1)
+        self.assertEqual(report["off_grid"][0]["value"], 2.24)
+
     def test_nearest_uses_half_away_from_zero(self) -> None:
         self.assertEqual(PRODUCT_GRID_SCHEMA_V1, "bgig.product_grid.v1")
         self.assertEqual(PRODUCT_GRID_STEP_MM, 0.1)

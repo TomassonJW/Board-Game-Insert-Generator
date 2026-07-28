@@ -1161,6 +1161,8 @@ def _top_inset_payload(value: dict[str, object]) -> dict[str, object]:
         "reserved_prisms", "reservation_certificates", "cavity_depth_compensations",
         "support", "blockers", "warnings", "summary", "invariants",
         "automatic_xy_search",
+        "product_grid_v1", "canonical_geometry_identity_v1",
+        "canonical_geometry_digest",
     )
     return {key: deepcopy(value[key]) for key in keys if key in value}
 

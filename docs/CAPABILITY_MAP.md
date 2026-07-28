@@ -13,14 +13,14 @@
   déplacement silencieux ni micro-prisme/coupe sur les deux replays.
 - `C-CAD-IR`, `C-PREVIEW`, `C-FUSION` : ordre, intervalles et certificat final
   propagés ; observation réelle encore requise, `fusion-validated=false`.
-- `C-QUANTIZATION` : `implemented-core` pour candidats, empreintes et prises
-  XY ; propagation finale encore partielle.
-- `C-QUALITY` : D passe `75/75`; deux replays personnels exacts, SHA inchangés.
+- `C-QUANTIZATION` : `automated-validated`, zéro valeur effective hors grille
+  dans le plan, la finalisation, la CAD IR et le plan Fusion des deux replays.
+- `C-QUALITY` : E passe `77/77`; deux replays personnels exacts, SHA inchangés.
 - `C-RELEASE` : 0.1.77 `human-KO`, `do-not-run`; aucune candidate R7 encore.
 - `C-PRINT` : `print-validated=false`.
 
 ADR-0103 et ADR-0104 sont acceptées. R7-C et R7-D sont validés
-automatiquement ; R7-E est la prochaine mission.
+automatiquement ; R7-F est la prochaine mission.
 
 ### Historique R6 clôturé en human-KO
 

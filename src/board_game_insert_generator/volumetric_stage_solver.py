@@ -15,6 +15,7 @@ from math import ceil, isclose
 from typing import Any
 
 from board_game_insert_generator.material_support import envelope_support_contract
+from board_game_insert_generator.product_grid import ceil_mm, nearest_mm
 
 
 VOLUMETRIC_STAGE_SOLVER_SCHEMA_V1 = "bgig.volumetric_stage_solver.v1"
@@ -2254,9 +2255,13 @@ def _dimension_contract(
         deviated = target is not None and not isclose(calculated, float(target), abs_tol=0.001)
         axes[axis] = {
             "mode": modes[axis],
-            "minimum_mm": _round(minimum[axis]),
-            "target_mm": _round(float(target)) if target is not None else None,
-            "calculated_mm": _round(calculated),
+            "minimum_mm": ceil_mm(minimum[axis]),
+            "target_mm": (
+                nearest_mm(float(target))
+                if target is not None
+                else None
+            ),
+            "calculated_mm": nearest_mm(calculated),
             "status": "deviated" if deviated else "satisfied",
             "reason": (
                 "La cible souple a ete ajustee pour fermer l etage."

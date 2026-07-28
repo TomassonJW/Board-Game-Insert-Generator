@@ -63,11 +63,14 @@
 
 ### P64-L09U-R7-E — Quantification et migrations
 
-- Statut : `ready`.
+- Statut : `done`, `automated-validated`.
+- Zéro longueur effective hors grille sur les deux replays.
+- Migration sans écriture et digest fonctionnel en ticks.
+- Validation : `77/77`; aucun gain de temps revendiqué.
 
 ### P64-L09U-R7-F — Candidate et gate
 
-- Statut : `pending`, dépend de R7-C à R7-E.
+- Statut : `ready`.
 - La gate Fusion finale reste humaine.
 
 ### Historique R6

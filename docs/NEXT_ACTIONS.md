@@ -1,7 +1,7 @@
 # Next Actions
 
 <!-- P64-L09U-NEXT -->
-## Action courante : P64-L09U-R7-E — quantification finale et migrations
+## Action courante : P64-L09U-R7-F — validation et candidate
 
 0.1.77 est `human-KO`, `do-not-run`. Sa correction de profondeur est confirmée
 et doit être conservée, mais le placement automatique, les parois finales et
@@ -53,9 +53,17 @@ R7-D est terminé :
 - zéro volume additif résiduel au-dessus des corps finaux ;
 - `75/75`, deux SHA personnels inchangés.
 
-Prochaine mission unique : achever la grille `0,1 mm` sur les dimensions
-dérivées publiées, vérifier certificats/digests/migrations et consolider les
-mesures sans benchmark interdit.
+R7-E est terminé :
+
+- zéro longueur effective hors grille sur les deux replays ;
+- migration source/effectif sans écriture ;
+- digest fonctionnel en ticks et finaliseur v13 ;
+- aucun gain de performance revendiqué ;
+- `77/77`, deux SHA personnels inchangés.
+
+Prochaine mission unique : exécuter la suite autorisée complète, relire le
+diff, construire et installer la candidate Fusion, puis ouvrir uniquement la
+nouvelle gate humaine.
 
 Contrat : `docs/P64_L09U_R7_END_TO_END_RUNBOOK.md`.
 Preuve : `docs/P64_L09U_R6_V_0177_HUMAN_KO_EVIDENCE.md`.
@@ -67,6 +75,8 @@ Preuve C3 :
 `docs/P64_L09U_R7_C3_FINAL_MATERIAL_RECERTIFICATION_EVIDENCE.md`.
 Preuve D :
 `docs/P64_L09U_R7_D_AUTOMATIC_STACK_AND_MATERIALIZATION_EVIDENCE.md`.
+Preuve E :
+`docs/P64_L09U_R7_E_PRODUCT_GRID_AND_MIGRATION_EVIDENCE.md`.
 
 Aucun benchmark/holdout/corpus/tournoi. Les projets personnels restent en
 lecture seule. `fusion-validated=false`, `print-validated=false`.

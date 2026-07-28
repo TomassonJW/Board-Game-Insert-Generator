@@ -42,6 +42,7 @@ from board_game_insert_generator.partition_solver import (
     _values,
 )
 from board_game_insert_generator.project_v1 import normalize_project_draft
+from board_game_insert_generator.product_grid import nearest_mm
 from board_game_insert_generator.solver_contract import (
     PlacementSnapshot,
     SolverBudget,
@@ -1381,7 +1382,11 @@ def _selected_variant_envelope_contract(
                     axis: {
                         "mode": _mapping(constraints["dimension_modes"])[axis],
                         "minimum_mm": minimum[axis],
-                        "target_mm": target[axis],
+                        "target_mm": (
+                            nearest_mm(float(target[axis]))
+                            if target[axis] is not None
+                            else None
+                        ),
                         "calculated_mm": final[axis],
                         "target_deviation_mm": (
                             _round(final[axis] - float(target[axis]))

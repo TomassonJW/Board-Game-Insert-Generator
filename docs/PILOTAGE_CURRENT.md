@@ -31,8 +31,10 @@
   déplacement, zéro prisme/coupe sous `1,2 mm` sur les deux replays.
 - R7-D est terminé : livret sous plateau selon l'empreinte orientée,
   intervalles Z exacts jusqu'au plan Fusion et résiduel additif nul.
-- La prochaine mission est R7-E : quantification finale, digests, migrations
-  et mesures.
+- R7-E est terminé : zéro longueur effective hors grille sur les deux replays,
+  migrations sans écriture, digest en ticks et finaliseur v13.
+- La prochaine mission est R7-F : suite autorisée, package, installation et
+  ouverture de la gate humaine.
 - Aucun benchmark/holdout/corpus/tournoi, aucune UI manuelle ;
   `fusion-validated=false`, `print-validated=false`.
 
@@ -46,6 +48,7 @@ Autorités R7 :
 - `docs/P64_L09U_R7_C2_CANONICAL_WALLS_AND_SCORE_EVIDENCE.md`.
 - `docs/P64_L09U_R7_C3_FINAL_MATERIAL_RECERTIFICATION_EVIDENCE.md`.
 - `docs/P64_L09U_R7_D_AUTOMATIC_STACK_AND_MATERIALIZATION_EVIDENCE.md`.
+- `docs/P64_L09U_R7_E_PRODUCT_GRID_AND_MIGRATION_EVIDENCE.md`.
 
 ### Historique R6 clôturé en human-KO
 

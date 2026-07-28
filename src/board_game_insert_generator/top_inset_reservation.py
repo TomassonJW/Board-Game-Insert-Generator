@@ -9,6 +9,8 @@ content cavity.
 from __future__ import annotations
 
 from copy import deepcopy
+import hashlib
+import json
 from math import isclose
 from typing import Any
 
@@ -128,6 +130,17 @@ def _derive_top_inset_reservations(
         }
         for item in sorted(reservations, key=lambda value: int(value["removal_order"]))
     ]
+    canonical_geometry_identity = _canonical_geometry_identity(
+        reservations
+    )
+    migration_required_count = sum(
+        bool(
+            _mapping(
+                reservation["product_grid_migration_v1"]
+            )["source_physical_axes_off_grid"]
+        )
+        for reservation in reservations
+    )
     status = "blocked" if blockers else ("not_required" if not reservations else "ready_for_intersection")
     return {
         "schema_version": TOP_INSET_RESERVATION_SCHEMA_V1,
@@ -142,6 +155,16 @@ def _derive_top_inset_reservations(
         "removal_sequence": removal_sequence,
         "blockers": blockers,
         "automatic_xy_search": search,
+        "canonical_geometry_identity_v1": (
+            canonical_geometry_identity
+        ),
+        "canonical_geometry_digest": hashlib.sha256(
+            json.dumps(
+                canonical_geometry_identity,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest(),
         "product_grid_v1": {
             "schema_version": PRODUCT_GRID_SCHEMA_V1,
             "step_mm": PRODUCT_GRID_STEP_MM,
@@ -149,6 +172,9 @@ def _derive_top_inset_reservations(
             "required_xy_envelopes_quantized_outward": True,
             "numeric_epsilon_mm": _EPSILON,
             "epsilon_is_not_search_resolution": True,
+            "migration_required_count": migration_required_count,
+            "source_project_written": False,
+            "functional_geometry_digest_uses_ticks": True,
         },
         "summary": {
             "status": status,
@@ -1033,6 +1059,19 @@ def _relocate_reservation(
             "y": nearest_ticks(size["y"]),
         },
     }
+    migration = _mapping(result["product_grid_migration_v1"])
+    migration["effective_candidate_origin_mm"] = {
+        "x": nearest_mm(x),
+        "y": nearest_mm(y),
+    }
+    migration["candidate_origin_ticks"] = {
+        "x": nearest_ticks(x),
+        "y": nearest_ticks(y),
+    }
+    migration["initial_origin_replaced_by_search"] = bool(
+        abs(x - old_cut_origin["x"]) > _EPSILON
+        or abs(y - old_cut_origin["y"]) > _EPSILON
+    )
     grip, grip_blocker = _grip_zone(
         x,
         y,
@@ -1228,12 +1267,12 @@ def _automatic_layout_score_components(
             healthy_stack_overlap_area
         ),
         "minimum_wall_slack_mm": _round(
-            min(wall_slacks, default=0.0)
+            nearest_mm(min(wall_slacks, default=0.0))
         ),
-        "useful_center_distance_mm": _round(
+        "useful_center_distance_mm": nearest_mm(
             useful_center_distance
         ),
-        "box_center_distance_mm": _round(box_center_distance),
+        "box_center_distance_mm": nearest_mm(box_center_distance),
         "deterministic_signature": list(
             _automatic_layout_signature(reservations)
         ),
@@ -2126,17 +2165,30 @@ def _resolve_item(
     rotation, physical_x, physical_y = chosen
     clearance_x = clearance_values['x'] if rotation == 0 else clearance_values['y']
     clearance_y = clearance_values['y'] if rotation == 0 else clearance_values['x']
-    cut_x = outward_size_mm(physical_x + 2.0 * clearance_x)
-    cut_y = outward_size_mm(physical_y + 2.0 * clearance_y)
+    required_cut_x = physical_x + 2.0 * clearance_x
+    required_cut_y = physical_y + 2.0 * clearance_y
+    required_total_thickness = (
+        dimensions["z"] * int(item["quantity"])
+        + clearance_values["z"]
+    )
+    cut_x = outward_size_mm(required_cut_x)
+    cut_y = outward_size_mm(required_cut_y)
+    total_thickness = outward_size_mm(
+        required_total_thickness
+    )
     origin_value = item.get("origin_mm")
     if origin_value is None:
-        cut_origin_x = nearest_mm((box["x"] - cut_x) / 2.0)
-        cut_origin_y = nearest_mm((box["y"] - cut_y) / 2.0)
+        required_origin_x = (box["x"] - cut_x) / 2.0
+        required_origin_y = (box["y"] - cut_y) / 2.0
+        cut_origin_x = nearest_mm(required_origin_x)
+        cut_origin_y = nearest_mm(required_origin_y)
         placement_source = "auto_center"
     else:
         physical_origin = _xy(origin_value)
-        cut_origin_x = nearest_mm(physical_origin["x"] - clearance_x)
-        cut_origin_y = nearest_mm(physical_origin["y"] - clearance_y)
+        required_origin_x = physical_origin["x"] - clearance_x
+        required_origin_y = physical_origin["y"] - clearance_y
+        cut_origin_x = nearest_mm(required_origin_x)
+        cut_origin_y = nearest_mm(required_origin_y)
         placement_source = "explicit_origin"
     if (
         cut_origin_x < -_EPSILON
@@ -2204,6 +2256,61 @@ def _resolve_item(
                 "_stack_order_migration"
             ],
             "manual_stack_mode_implemented": False,
+            "product_grid_migration_v1": {
+                "schema_version": "bgig.product_grid_migration.v1",
+                "product_grid_schema": PRODUCT_GRID_SCHEMA_V1,
+                "step_mm": PRODUCT_GRID_STEP_MM,
+                "source_project_written": False,
+                "source_physical_dimensions_mm": _rounded_dimension(
+                    dimensions
+                ),
+                "source_physical_axes_off_grid": [
+                    axis
+                    for axis in ("x", "y", "z")
+                    if not is_on_product_grid(dimensions[axis])
+                ],
+                "required_cut_size_before_grid_mm": {
+                    "x": _round(required_cut_x),
+                    "y": _round(required_cut_y),
+                },
+                "effective_cut_size_mm": {
+                    "x": cut_x,
+                    "y": cut_y,
+                },
+                "cut_size_rounding_direction": {
+                    "x": _rounding_direction(
+                        required_cut_x,
+                        cut_x,
+                    ),
+                    "y": _rounding_direction(
+                        required_cut_y,
+                        cut_y,
+                    ),
+                },
+                "required_total_thickness_before_grid_mm": _round(
+                    required_total_thickness
+                ),
+                "effective_total_thickness_mm": total_thickness,
+                "total_thickness_rounding_direction": (
+                    _rounding_direction(
+                        required_total_thickness,
+                        total_thickness,
+                    )
+                ),
+                "required_initial_origin_before_grid_mm": {
+                    "x": _round(required_origin_x),
+                    "y": _round(required_origin_y),
+                },
+                "effective_candidate_origin_mm": {
+                    "x": cut_origin_x,
+                    "y": cut_origin_y,
+                },
+                "candidate_origin_ticks": {
+                    "x": nearest_ticks(cut_origin_x),
+                    "y": nearest_ticks(cut_origin_y),
+                },
+                "prior_layout_artifacts_invalidated": True,
+            },
             "rotation_deg_z": rotation,
             "placement_source": placement_source,
             "physical_size_mm": {
@@ -2215,7 +2322,7 @@ def _resolve_item(
                 "x": nearest_mm(cut_origin_x + clearance_x),
                 "y": nearest_mm(cut_origin_y + clearance_y),
             },
-            "total_thickness_mm": _round(dimensions["z"] * int(item["quantity"]) + clearance_values["z"]),
+            "total_thickness_mm": total_thickness,
             "clearance_effective_v1": {
                 "role": "flat_inset",
                 "values_mm": _rounded_dimension(clearance_values),
@@ -2372,6 +2479,106 @@ def _cavity_world_bounds(
     return {"x": x, "y": y, "width": width, "height": height, "depth": cavity_size["z"]}
 
 
+def _canonical_geometry_identity(
+    reservations: list[dict[str, object]],
+) -> dict[str, object]:
+    return {
+        "schema_version": "bgig.flat_layout_geometry_identity.v1",
+        "product_grid_schema": PRODUCT_GRID_SCHEMA_V1,
+        "product_grid_step_mm": PRODUCT_GRID_STEP_MM,
+        "rounding_policy": (
+            "nearest_half_away_and_conservative_envelopes_v1"
+        ),
+        "automatic_stack_order_policy": (
+            "automatic_oriented_footprint_ascending_v1"
+        ),
+        "reservations": [
+            {
+                "flat_item_id": reservation["flat_item_id"],
+                "rotation_deg_z": reservation["rotation_deg_z"],
+                "stack_order": reservation["stack_order"],
+                "origin_ticks": {
+                    axis: nearest_ticks(
+                        float(
+                            _mapping(
+                                reservation["cut_origin_mm"]
+                            )[axis]
+                        )
+                    )
+                    for axis in ("x", "y")
+                },
+                "size_ticks": {
+                    axis: nearest_ticks(
+                        float(
+                            _mapping(
+                                reservation["cut_size_mm"]
+                            )[axis]
+                        )
+                    )
+                    for axis in ("x", "y")
+                },
+                "grip_origin_ticks": {
+                    axis: nearest_ticks(
+                        float(
+                            _mapping(
+                                _mapping(
+                                    reservation["grip_zone"]
+                                )["origin_mm"]
+                            )[axis]
+                        )
+                    )
+                    for axis in ("x", "y")
+                },
+                "grip_size_ticks": {
+                    axis: nearest_ticks(
+                        float(
+                            _mapping(
+                                _mapping(
+                                    reservation["grip_zone"]
+                                )["size_mm"]
+                            )[axis]
+                        )
+                    )
+                    for axis in ("x", "y")
+                },
+                "local_regions": [
+                    {
+                        "id": region["id"],
+                        "origin_ticks": {
+                            axis: nearest_ticks(
+                                float(
+                                    _mapping(
+                                        region["cut_origin_mm"]
+                                    )[axis]
+                                )
+                            )
+                            for axis in ("x", "y")
+                        },
+                        "size_ticks": {
+                            axis: nearest_ticks(
+                                float(
+                                    _mapping(
+                                        region["cut_size_mm"]
+                                    )[axis]
+                                )
+                            )
+                            for axis in ("x", "y")
+                        },
+                        "bottom_z_ticks": nearest_ticks(
+                            float(region["layer_bottom_z_mm"])
+                        ),
+                        "top_z_ticks": nearest_ticks(
+                            float(region["layer_top_z_mm"])
+                        ),
+                    }
+                    for region in _local_depth_regions(reservation)
+                ],
+            }
+            for reservation in reservations
+        ],
+    }
+
+
 def _ordered_flat_items(
     items: list[dict[str, object]],
     *,
@@ -2428,7 +2635,10 @@ def _automatic_flat_stack_key(
         _round(oriented_x * oriented_y),
         _round(max(oriented_x, oriented_y)),
         _round(min(oriented_x, oriented_y)),
-        _round(dimensions["z"] * int(item["quantity"])),
+        outward_size_mm(
+            dimensions["z"] * int(item["quantity"])
+            + clearance["z"]
+        ),
         str(item["kind"]),
         str(item["id"]),
     )
@@ -2495,6 +2705,12 @@ def _dimension(value: object) -> dict[str, float]:
 
 def _rounded_dimension(value: dict[str, float]) -> dict[str, float]:
     return {axis: _round(value[axis]) for axis in ("x", "y", "z")}
+
+
+def _rounding_direction(source: float, effective: float) -> str:
+    if abs(source - effective) <= _EPSILON:
+        return "unchanged"
+    return "up" if effective > source else "down"
 
 
 def _xy(value: object) -> dict[str, float]:

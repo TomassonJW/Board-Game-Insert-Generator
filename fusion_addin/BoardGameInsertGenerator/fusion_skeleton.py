@@ -4194,9 +4194,13 @@ def _cavity_cut_plans(
                 ),
                 cavity_id=cavity_id,
                 cut_origin_mm=FusionVectorMm(
-                    x=geometry_origin.x + local_origin.x,
-                    y=geometry_origin.y + local_origin.y,
-                    z=cut_plane_world_z,
+                    x=_product_grid_mm(
+                        geometry_origin.x + local_origin.x
+                    ),
+                    y=_product_grid_mm(
+                        geometry_origin.y + local_origin.y
+                    ),
+                    z=_product_grid_mm(cut_plane_world_z),
                 ),
                 cut_size_mm=cavity_size,
                 requested_local_origin_mm=local_origin,
@@ -4816,6 +4820,15 @@ def _required_number(source: dict[str, Any], key: str, label: str) -> float:
     if number < 0:
         raise FusionSkeletonError(f"CAD IR {label} {key} must be non-negative.")
     return number
+
+
+def _product_grid_mm(value: float) -> float:
+    canonical = round(float(value) * 10.0) / 10.0
+    if abs(float(value) - canonical) > 0.0001:
+        raise FusionSkeletonError(
+            "CAD IR derived geometry is not on the 0.1 mm product grid."
+        )
+    return canonical
 
 
 def _optional_number(

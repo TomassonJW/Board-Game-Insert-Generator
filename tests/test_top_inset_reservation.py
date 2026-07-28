@@ -459,6 +459,71 @@ class TopInsetReservationTests(unittest.TestCase):
             ]
         )
 
+    def test_off_grid_source_is_preserved_and_effective_layout_migrates(
+        self,
+    ) -> None:
+        value = project()
+        value["flat_items"] = [
+            flat(
+                "legacy-booklet",
+                x=70.04,
+                y=120.06,
+                z=2.03,
+            )
+        ]
+
+        result = derive_top_inset_reservations(value)
+
+        self.assertEqual(result["status"], "ready_for_intersection")
+        reservation = result["reservations"][0]
+        migration = reservation["product_grid_migration_v1"]
+        self.assertEqual(
+            reservation["physical_size_mm"],
+            {"x": 70.04, "y": 120.06, "z": 2.03},
+        )
+        self.assertEqual(
+            migration["source_physical_axes_off_grid"],
+            ["x", "y", "z"],
+        )
+        self.assertTrue(
+            all(
+                is_on_product_grid(value)
+                for value in (
+                    *reservation["cut_origin_mm"].values(),
+                    *reservation["cut_size_mm"].values(),
+                    reservation["total_thickness_mm"],
+                )
+            )
+        )
+        self.assertEqual(
+            migration["total_thickness_rounding_direction"],
+            "up",
+        )
+        self.assertEqual(
+            result["product_grid_v1"][
+                "migration_required_count"
+            ],
+            1,
+        )
+        self.assertFalse(
+            result["product_grid_v1"]["source_project_written"]
+        )
+        identity = result["canonical_geometry_identity_v1"]
+        self.assertTrue(
+            all(
+                isinstance(value, int)
+                for reservation_identity in identity["reservations"]
+                for field in (
+                    "origin_ticks",
+                    "size_ticks",
+                    "grip_origin_ticks",
+                    "grip_size_ticks",
+                )
+                for value in reservation_identity[field].values()
+            )
+        )
+        self.assertEqual(len(result["canonical_geometry_digest"]), 64)
+
     def test_axis_anchors_are_deduplicated_after_grid_quantization(
         self,
     ) -> None:

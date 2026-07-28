@@ -58,7 +58,7 @@ from board_game_insert_generator.top_inset_reservation import (
 
 COUPLED_FINALIZATION_SCHEMA_V1 = "bgig.coupled_finalization.v1"
 COUPLED_FINALIZATION_FAMILY_ID = "bounded_coupled_finalization"
-COUPLED_FINALIZATION_VERSION = "bgig.bounded_coupled_finalization.v12"
+COUPLED_FINALIZATION_VERSION = "bgig.bounded_coupled_finalization.v13"
 COUPLED_FINALIZATION_POLICY = (
     "global_rectangular_then_vertical_first_continuous_then_bounded_xy_composite"
 )

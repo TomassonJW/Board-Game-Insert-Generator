@@ -17,6 +17,7 @@ from board_game_insert_generator.partition_cad import build_partition_cad
 from board_game_insert_generator.partition_result_view import (
     build_partition_result_view,
 )
+from board_game_insert_generator.product_grid import is_on_product_grid
 from board_game_insert_generator.staged_calculation import (
     ARTIFACT_KIND_FINALIZED,
     StagedCalculationSession,
@@ -508,6 +509,20 @@ class P64L09UR3DepthLocalInsetsTests(unittest.TestCase):
         self.assertEqual(
             self.stepped_fusion.final_material_envelope_certificate,
             certificate,
+        )
+        self.assertTrue(
+            all(
+                is_on_product_grid(number)
+                for cut in self.stepped_fusion.cavity_cuts
+                for number in (
+                    cut.cut_origin_mm.x,
+                    cut.cut_origin_mm.y,
+                    cut.cut_origin_mm.z,
+                    cut.cut_size_mm.x,
+                    cut.cut_size_mm.y,
+                    cut.cut_size_mm.z,
+                )
+            )
         )
 
     def test_micro_overlap_smaller_than_a_wall_anchors_the_full_cavity(
