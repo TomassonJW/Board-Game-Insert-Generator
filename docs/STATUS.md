@@ -6,7 +6,7 @@
 Date : 2026-07-28.
 
 Statut : `P64-L09U-R7-V-human-KO`, `do-not-run`,
-`P64-L09U-R8-A-ready`,
+`P64-L09U-R8-A-done-diagnostic`, `P64-L09U-R8-B-ready`,
 `fusion-validated=false`, `print-validated=false`.
 
 - 0.1.78 est `human-KO`, `do-not-run`.
@@ -19,8 +19,18 @@ Statut : `P64-L09U-R7-V-human-KO`, `do-not-run`,
 - Le contrat R8 proposé sépare enveloppes minimales, assemblage, finalisation
   des conteneurs et encastrements strictement soustractifs.
 - Un plateau ou livret ne doit créer aucun volume imprimable positif.
-- R8-A doit localiser la première divergence et profiler le calcul avant tout
-  changement structurel.
+- R8-A localise la première matière positive dans la finalisation composite :
+  une cellule est rehaussée de `final_size_mm` à `cad_size_mm` uniquement sous
+  une réservation plate.
+- La CAD IR exacte de `CasLimite02++` reconnaît `125 019,76 mm³` ajoutés
+  au-dessus des corps dits finaux, puis certifie leur compensation par un
+  volume de coupe planifié identique.
+- Le plan Fusion déplace trois coupes livret de `[63,8 ; 65,8]` à
+  `[67,8 ; 69,8]`; la BRep laisse `31 209,20 mm³` du vide demandé non retiré.
+- Les replays locaux sans SCIP natif comptent `818`, `9 019` et `649` états
+  sans complétion selon cas et effort. Ils ne remplacent pas les temps Fusion.
+- R8-B doit fixer par ADR le conteneur finalisé explicite, puis une passe
+  uniquement soustractive partagée jusqu'à la BRep.
 - Les acquis de profondeur, accès, parois, ordre, grille `0,1 mm` et BRep
   transitoire restent obligatoires.
 - Aucun benchmark/holdout/corpus/tournoi ; aucune UI manuelle.
@@ -29,6 +39,8 @@ Preuve humaine :
 `docs/P64_L09U_R7_V_0178_HUMAN_KO_EVIDENCE.md`.
 Hand-off :
 `docs/P64_L09U_R8_SUBTRACTIVE_FLAT_INSETS_HANDOFF.md`.
+Diagnostic :
+`docs/P64_L09U_R8_A_SUBTRACTIVE_PIPELINE_DIAGNOSTIC_EVIDENCE.md`.
 
 ### Historique R7 clôturé en human-KO
 

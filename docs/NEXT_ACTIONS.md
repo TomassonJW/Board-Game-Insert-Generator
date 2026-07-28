@@ -1,7 +1,7 @@
 # Next Actions
 
 <!-- P64-L09U-NEXT -->
-## Action courante : P64-L09U-R8-A — preuve, profil et première divergence
+## Action courante : P64-L09U-R8-B — ADR du pipeline strictement soustractif
 
 0.1.78 est `human-KO`, `do-not-run`.
 
@@ -13,23 +13,33 @@ puis imposer le pipeline produit suivant :
 3. appliquer les plateaux et livrets comme des coupes locales seulement ;
 4. ne créer aucun volume positif, corps, plaque, rail ou support pour eux.
 
-R8-A est la seule mission `ready` :
+R8-A est terminée :
 
-- conserver le journal et les trois captures humaines ;
-- rejouer `CasLimite02+` et `CasLimite02++` en lecture seule ;
-- tracer frontière minimale, poses, finalisation, cellules XY, coupes, cavités,
-  CAD IR, plan Fusion et BRep ;
-- localiser la première apparition d'une matière positive attribuable à un
-  élément plat ;
-- profiler chaque phase du calcul et compter candidats, rejets et solveurs ;
-- expliquer les échecs Normal/intermédiaire et les recherches de `87–91 s` ;
-- ne coder aucun correctif avant ce diagnostic.
+- projets personnels inchangés après replays en lecture seule ;
+- première matière positive localisée dans la finalisation composite ;
+- `125 019,76 mm³` ajoutés au-dessus des corps dits finaux sur
+  `CasLimite02++` ;
+- trois intervalles livret déplacés de `+4 mm` par le plan Fusion ;
+- `31 209,20 mm³` du vide demandé non retiré par la BRep ;
+- recherche, lanes, candidats, rejets, temps et mémoire profilés ;
+- aucune modification de code produit.
 
-R8-B rédigera ensuite l'ADR structurelle. R8-C à R8-G restent `blocked` par A
-puis B.
+R8-B est la seule mission `ready` :
 
-Preuve :
-`docs/P64_L09U_R7_V_0178_HUMAN_KO_EVIDENCE.md`.
+- formaliser `matière finale = conteneur finalisé - union des encastrements` ;
+- rendre illégaux tout volume, union ou corps positif lié à un élément plat ;
+- choisir la séparation explicite du conteneur finalisé et de la passe de
+  soustraction, ou documenter une meilleure option ;
+- préciser les contrats de l'aperçu, du certificat, de la CAD IR, du plan
+  Fusion et de la BRep ;
+- découper R8-C à R8-F en incréments bornés et testables.
+
+R8-C à R8-G restent `blocked-by-R8-B`.
+
+Preuves :
+
+- `docs/P64_L09U_R7_V_0178_HUMAN_KO_EVIDENCE.md` ;
+- `docs/P64_L09U_R8_A_SUBTRACTIVE_PIPELINE_DIAGNOSTIC_EVIDENCE.md`.
 
 Hand-off :
 `docs/P64_L09U_R8_SUBTRACTIVE_FLAT_INSETS_HANDOFF.md`.

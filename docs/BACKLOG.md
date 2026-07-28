@@ -12,16 +12,20 @@
 
 ### P64-L09U-R8-A — Preuve, profil et première divergence
 
-- Statut : `ready`.
+- Statut : `done-diagnostic`.
 - Rejouer les deux projets personnels en lecture seule.
 - Tracer chaque étape jusqu'aux opérations BRep.
 - Localiser la première matière positive liée à un élément plat.
 - Profiler phases, candidats, rejets, solveurs, temps et mémoire.
 - Aucun correctif avant le diagnostic.
+- Résultat : première matière positive dans la finalisation composite, puis
+  trois coupes Fusion décalées de `+4 mm` et `31 209,20 mm³` non retirés.
+- Preuve :
+  `docs/P64_L09U_R8_A_SUBTRACTIVE_PIPELINE_DIAGNOSTIC_EVIDENCE.md`.
 
 ### P64-L09U-R8-B — ADR du pipeline soustractif
 
-- Statut : `blocked-by-R8-A`.
+- Statut : `ready`.
 - Comparer correction locale, séparation de modèle et reconstruction bornée.
 - Formaliser enveloppes, finalisation, cellules XY et coupes seulement.
 

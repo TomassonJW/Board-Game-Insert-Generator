@@ -19,8 +19,19 @@
   support provient uniquement de la matière déjà présente dans les conteneurs.
 - La profondeur de coupe locale est la somme exacte des épaisseurs couvrantes :
   `4 mm`, `2 mm` ou `6 mm` dans le cas forcé.
-- R8-A localise la première apparition de matière positive et profile la
-  recherche avant tout correctif. R8-B portera l'ADR structurelle.
+- R8-A est terminée : la première matière positive liée aux éléments plats
+  apparaît dans la finalisation composite, lors du passage de
+  `final_size_mm` à `cad_size_mm`.
+- Sur la CAD IR exacte de `CasLimite02++`, le certificat accepte
+  `125 019,76 mm³` ajoutés puis autant de coupe prévue. Il prouve une
+  compensation volumique, pas l'absence de matière positive.
+- Le plan Fusion déplace trois coupes de livret de `[63,8 ; 65,8]` à
+  `[67,8 ; 69,8]`. La BRep laisse `31 209,20 mm³` du vide demandé non retiré.
+- Les replays locaux sans SCIP natif ne trouvent aucune complétion :
+  `818` états en Normal, puis `9 019` en Approfondi sur `CasLimite02+`;
+  `649` états en Normal sur `CasLimite02++`.
+- R8-B est maintenant la mission unique `ready`. Elle doit fixer par ADR un
+  conteneur finalisé explicite puis une passe de coupes uniquement.
 - Les acquis R6/R7 restent à préserver : profondeurs, accès, parois minimales,
   ordre automatique, grille `0,1 mm`, BRep transitoire et projets personnels en
   lecture seule.
@@ -30,7 +41,8 @@
 Autorités R8 :
 
 - `docs/P64_L09U_R7_V_0178_HUMAN_KO_EVIDENCE.md` ;
-- `docs/P64_L09U_R8_SUBTRACTIVE_FLAT_INSETS_HANDOFF.md`.
+- `docs/P64_L09U_R8_SUBTRACTIVE_FLAT_INSETS_HANDOFF.md` ;
+- `docs/P64_L09U_R8_A_SUBTRACTIVE_PIPELINE_DIAGNOSTIC_EVIDENCE.md`.
 
 ### Historique R7 clôturé en human-KO
 

@@ -14,8 +14,8 @@ cavités et exige des recherches de `87–91 s`.
 
 ```text
 P64-L09U-R7-V human-KO 0.1.78
-  -> R8-A preuve, profil, première divergence [ready]
-  -> R8-B ADR pipeline strictement soustractif
+  -> R8-A preuve, profil, première divergence [done]
+  -> R8-B ADR pipeline strictement soustractif [ready]
   -> R8-C calcul minimal séparé
   -> R8-D finalisation des conteneurs
   -> R8-E encastrements par coupes seulement

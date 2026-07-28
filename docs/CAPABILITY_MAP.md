@@ -7,19 +7,23 @@
   non creusées ou inaccessibles dans la scène finale.
 - `C-TOP-RESERVATION` : `human-KO`. Une réservation produit encore de grandes
   plaques, rails ou appuis au lieu d'une coupe seulement.
-- `C-STAGED-CALCULATION` : `human-KO`. Le calcul minimal exige jusqu'à
-  `90,991 s` et deux efforts préalables échouent sur `CasLimite02+`.
-- `C-FINALIZATION` : `human-KO`. Le certificat publie un succès malgré une
-  géométrie positive interdite liée aux éléments plats.
-- `C-CAD-IR` : à diagnostiquer ; la première apparition de la matière positive
-  entre plan minimal, finalisation, CAD IR et plan Fusion n'est pas localisée.
-- `C-FUSION` : `human-KO`. Aperçu, certificat et corps Fusion ne racontent pas
-  le même contrat.
+- `C-STAGED-CALCULATION` : `human-KO`, diagnostiqué. Le calcul minimal exige
+  jusqu'à `90,991 s`; Normal et Long épuisent chacun une invocation SCIP sans
+  candidat sur `CasLimite02+`.
+- `C-FINALIZATION` : `human-KO`, première divergence localisée. Le passage de
+  `final_size_mm` à `cad_size_mm` crée `125 019,76 mm³` conditionnés par les
+  réservations plates sur `CasLimite02++`.
+- `C-CAD-IR` : contrat spatial fidèle à l'amont, mais positif/soustractif
+  ambigu. Le certificat compense volume ajouté et coupe prévue.
+- `C-FUSION` : `human-KO`, cause mesurée. Trois coupes livret sont décalées de
+  `+4 mm`; la BRep laisse `31 209,20 mm³` du vide demandé non retiré.
 - `C-PRODUCT-GRID` : acquis automatisé à préserver, résolution `0,1 mm`.
-- `C-RELEASE` : 0.1.78 `human-KO`, `do-not-run`; R8-A `ready`.
+- `C-RELEASE` : 0.1.78 `human-KO`, `do-not-run`; R8-A `done-diagnostic`,
+  R8-B `ready`.
 - `C-PRINT` : `print-validated=false`.
 
-Prochaine frontière : R8-A, preuve instrumentée et première divergence.
+Prochaine frontière : R8-B, ADR du conteneur finalisé puis de la passe
+strictement soustractive.
 
 ### Historique R7 clôturé en human-KO
 
