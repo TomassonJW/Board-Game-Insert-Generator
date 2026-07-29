@@ -58,7 +58,7 @@ Résultat global : en attente avant installation.
 
 Le préparateur à blanc passe :
 
-- matrice ciblée : `151/151` ;
+- matrice ciblée : `153/153` ;
 - `CasLimite02+` : replay lecture seule réussi ;
 - `CasLimite02++` : replay lecture seule réussi ;
 - installation AppData : simulée, aucune écriture ;
@@ -68,7 +68,7 @@ Préflight :
 
 ```text
 version=0.1.79
-digest=5c251f13bfad275ec490fbdb5a1af5dc48864d8771703c73978fb93a708ac55a
+digest=ebd2d0b055397c280d6d6eaf1112f251700dec8ee16061a8c0feb218a2ff3f71
 operations=2
 flat_positive_volume_mm3=0.0
 flat_positive_bodies=0
@@ -77,6 +77,11 @@ new_printable_bodies=0
 fusion-validated=false
 print-validated=false
 ```
+
+Douze constructions successives du préflight donnent le même digest
+`ebd2d0b0...3f71`. Les observations temporelles et les artefacts de run
+historiques R6 ne participent pas au hash R8 ; leurs contrats hérités restent
+couverts.
 
 Le digest CAD historique P66 est mis à jour de
 `4213ef61...aad6` à `9614f170...844` parce que la CAD IR porte désormais le

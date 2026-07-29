@@ -50,13 +50,43 @@ AUTHORIZED_EXCLUDED_TEST_MODULES = (
 
 
 def stable_digest(payload: object) -> str:
+    stable_payload = _without_volatile_observations(payload)
+    if isinstance(stable_payload, dict):
+        inherited_r7 = stable_payload.get(
+            "inherited_r7_preflight"
+        )
+        if isinstance(inherited_r7, dict):
+            inherited_r6 = inherited_r7.get(
+                "inherited_r6_preflight"
+            )
+            if isinstance(inherited_r6, dict):
+                inherited_r7["inherited_r6_preflight"] = {
+                    key: value
+                    for key, value in inherited_r6.items()
+                    if key not in {"end_to_end", "preflight_digest"}
+                }
     canonical = json.dumps(
-        payload,
+        stable_payload,
         ensure_ascii=False,
         sort_keys=True,
         separators=(",", ":"),
     )
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def _without_volatile_observations(value: object) -> object:
+    if isinstance(value, Mapping):
+        return {
+            str(key): _without_volatile_observations(item)
+            for key, item in value.items()
+            if not str(key).endswith("observed_ms")
+        }
+    if isinstance(value, (list, tuple)):
+        return [
+            _without_volatile_observations(item)
+            for item in value
+        ]
+    return value
 
 
 def _mapping(value: object, label: str) -> Mapping[str, object]:

@@ -78,8 +78,8 @@
 
 - Statut : `in-progress-candidate-prepared-not-installed`.
 - Candidate 0.1.79, préflight et préparateur créés.
-- Préparateur à blanc `151/151`, deux replays personnels en lecture seule,
-  préflight `5c251f13...ac55a`.
+- Préparateur à blanc `153/153`, deux replays personnels en lecture seule,
+  préflight stable `ebd2d0b0...3f71`.
 - Suite autorisée, intégration directe et installation automatique restantes.
 - La dernière validation reste humaine.
 - Preuve : `docs/P64_L09U_R8_0179_CORRECTIVE_EVIDENCE.md`.

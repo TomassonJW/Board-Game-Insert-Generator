@@ -3,11 +3,11 @@
 La candidate 0.1.79 possède un préflight et un préparateur distincts de la
 candidate 0.1.78 rejetée.
 
-Le préparateur à blanc passe `151/151` tests ciblés et rejoue
+Le préparateur à blanc passe `153/153` tests ciblés et rejoue
 `CasLimite02+` puis `CasLimite02++` en lecture seule. Les SHA attendus sont
 contrôlés avant et après chaque replay.
 
-Le préflight `5c251f13...ac55a` certifie de bout en bout :
+Le préflight stable `ebd2d0b0...3f71` certifie de bout en bout :
 
 - zéro volume, corps, union, opération positive ou nouveau corps imprimable
   lié aux éléments plats ;

@@ -73,10 +73,10 @@ Statut : `P64-L09U-R7-V-human-KO`, `do-not-run`,
 - Validation R8-F : `302/302` tests ciblés.
 - R8-G prépare la candidate 0.1.79 avec un préflight strict et un préparateur
   automatique.
-- Préparateur à blanc : `151/151`, deux replays personnels en lecture seule,
+- Préparateur à blanc : `153/153`, deux replays personnels en lecture seule,
   SHA contrôlés avant/après, aucune écriture AppData.
-- Préflight : `5c251f13...ac55a`, plan CAD, certificat Fusion et intervalles
-  BRep identiques, compteurs positifs plats tous nuls.
+- Préflight stable : `ebd2d0b0...3f71`, plan CAD, certificat Fusion et
+  intervalles BRep identiques, compteurs positifs plats tous nuls.
 - La suite autorisée, le commit de candidate et l’installation restent à
   exécuter avant la gate humaine.
 - Les acquis de profondeur, accès, parois, ordre, grille `0,1 mm` et BRep

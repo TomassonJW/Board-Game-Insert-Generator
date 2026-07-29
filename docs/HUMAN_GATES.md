@@ -40,8 +40,8 @@ Statut : `prepared-not-installed`, `do-not-run-yet`,
 `fusion-validated=false`, `print-validated=false`.
 
 La candidate 0.1.79 et sa recette sont prêtes. Le préparateur à blanc passe
-`151/151` tests ciblés, deux replays personnels en lecture seule et le
-préflight strict `5c251f13...ac55a`.
+`153/153` tests ciblés, deux replays personnels en lecture seule et le
+préflight strict stable `ebd2d0b0...3f71`.
 
 La gate ne sera ouverte qu’après la suite globale autorisée, l’intégration du
 commit de candidate et la vérification de l’installation locale.

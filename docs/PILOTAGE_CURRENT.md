@@ -65,9 +65,9 @@
 - Les SHA personnels restent inchangés ; la validation ciblée passe `302/302`.
 - R8-G est en cours : la candidate 0.1.79, son préflight et son préparateur
   sont prêts, mais l’add-in n’est pas encore installé.
-- Le préparateur à blanc passe `151/151` tests ciblés et deux replays
+- Le préparateur à blanc passe `153/153` tests ciblés et deux replays
   personnels strictement en lecture seule ; le préflight vaut
-  `5c251f13...ac55a`.
+  `ebd2d0b0...3f71` de façon stable.
 - Il reste à exécuter la suite autorisée, figer et intégrer le commit de
   candidate, installer l’add-in automatiquement, puis ouvrir la gate humaine.
 - Les acquis R6/R7 restent à préserver : profondeurs, accès, parois minimales,

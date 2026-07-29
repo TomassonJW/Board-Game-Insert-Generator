@@ -8,6 +8,7 @@ from scripts.fusion.p64_l09u_r8v_preflight import (
     ADDIN_VERSION,
     AUTHORIZED_EXCLUDED_TEST_MODULES,
     build_preflight,
+    stable_digest,
 )
 
 
@@ -92,6 +93,47 @@ class P64L09UR8ReleaseGateTests(unittest.TestCase):
         self.assertFalse(
             suite["forbidden_solver_campaigns_executed"]
         )
+
+    def test_preflight_digest_ignores_only_volatile_timings(self) -> None:
+        first = {
+            "contract": {"value": 7, "observed_ms": 12.5},
+            "calculation_observed_ms": 10.0,
+        }
+        second = {
+            "contract": {"value": 7, "observed_ms": 99.9},
+            "calculation_observed_ms": 88.8,
+        }
+
+        self.assertEqual(stable_digest(first), stable_digest(second))
+        second["contract"]["value"] = 8
+        self.assertNotEqual(stable_digest(first), stable_digest(second))
+
+    def test_preflight_digest_keeps_inherited_contract_not_run_artifacts(
+        self,
+    ) -> None:
+        first = {
+            "inherited_r7_preflight": {
+                "r7_contract": {"grid_step_mm": 0.1},
+                "inherited_r6_preflight": {
+                    "runtime_contract": {"cavity_access": True},
+                    "end_to_end": {"artifact_digest": "first"},
+                    "preflight_digest": "first",
+                },
+            }
+        }
+        second = json.loads(json.dumps(first))
+        second["inherited_r7_preflight"]["inherited_r6_preflight"][
+            "end_to_end"
+        ]["artifact_digest"] = "second"
+        second["inherited_r7_preflight"]["inherited_r6_preflight"][
+            "preflight_digest"
+        ] = "second"
+
+        self.assertEqual(stable_digest(first), stable_digest(second))
+        second["inherited_r7_preflight"]["inherited_r6_preflight"][
+            "runtime_contract"
+        ]["cavity_access"] = False
+        self.assertNotEqual(stable_digest(first), stable_digest(second))
 
     def test_manifest_and_preparer_pin_candidate(self) -> None:
         manifest = json.loads(

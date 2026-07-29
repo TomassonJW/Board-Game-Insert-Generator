@@ -78,8 +78,8 @@ R8-F est terminée :
 R8-G est en cours :
 
 - candidate 0.1.79, préflight et préparateur créés ;
-- préparateur à blanc `151/151`, deux replays personnels en lecture seule ;
-- préflight `5c251f13...ac55a`, compteurs positifs plats tous nuls ;
+- préparateur à blanc `153/153`, deux replays personnels en lecture seule ;
+- préflight stable `ebd2d0b0...3f71`, compteurs positifs plats tous nuls ;
 - exécuter exactement la suite autorisée en excluant avant import les douze
   modules nommés dans la preuve corrective ;
 - figer le commit de candidate, intégrer et pousser `main` ;
