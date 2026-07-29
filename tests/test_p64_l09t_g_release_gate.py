@@ -222,7 +222,8 @@ class P64L09TGReleaseGateTests(unittest.TestCase):
                 top_insets = [
                     value
                     for value in result["fusion"].cavity_cuts
-                    if value.policy == "localized_top_inset_v1"
+                    if value.policy
+                    == "strictly_subtractive_flat_inset_v1"
                 ]
                 self.assertEqual(
                     {
@@ -230,6 +231,36 @@ class P64L09TGReleaseGateTests(unittest.TestCase):
                         for value in top_insets
                     },
                     {"flat-001", "flat-002"},
+                )
+                self.assertTrue(
+                    all(
+                        value.boolean_operation == "difference"
+                        and value.geometry_attribution
+                        in {"flat_inset", "flat_grip"}
+                        for value in top_insets
+                    )
+                )
+                certificate = (
+                    result["fusion"].subtractive_flat_inset_certificate
+                )
+                self.assertIsNotNone(certificate)
+                self.assertEqual(
+                    certificate["flat_positive_volume_mm3"],
+                    0.0,
+                )
+                self.assertEqual(
+                    certificate["flat_positive_body_count"],
+                    0,
+                )
+                self.assertEqual(
+                    certificate["flat_positive_union_count"],
+                    0,
+                )
+                self.assertEqual(
+                    certificate[
+                        "new_printable_body_count_attributed_to_flat_items"
+                    ],
+                    0,
                 )
                 interval_depths = {
                     round(
