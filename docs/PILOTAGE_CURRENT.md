@@ -63,13 +63,16 @@
 - `CasLimite02+` passe en lecture seule avec `20` opérations identiques ;
   `CasLimite02++` passe avec `23` opérations et `2/4/6 mm`.
 - Les SHA personnels restent inchangés ; la validation ciblée passe `302/302`.
-- R8-G est en cours : la candidate 0.1.79, son préflight et son préparateur
-  sont prêts, mais l’add-in n’est pas encore installé.
-- Le préparateur à blanc passe `153/153` tests ciblés et deux replays
-  personnels strictement en lecture seule ; le préflight vaut
-  `ebd2d0b0...3f71` de façon stable.
-- Il reste à exécuter la suite autorisée, figer et intégrer le commit de
-  candidate, installer l’add-in automatiquement, puis ouvrir la gate humaine.
+- R8-G est terminée : la candidate 0.1.79 du commit `8baaaa9` est installée et
+  vérifiée avec ses réglages locaux.
+- Le préparateur réel passe `153/153` tests ciblés et deux replays personnels
+  strictement en lecture seule ; le préflight stable vaut
+  `ebd2d0b0...3f71`.
+- La suite autorisée finale passe `945/945` en `650,355 s`, avec une
+  intégration SCIP native ignorée et douze modules interdits exclus avant
+  import.
+- La prochaine action unique est la gate humaine P64-L09U-R8-V selon la
+  recette 0.1.79.
 - Les acquis R6/R7 restent à préserver : profondeurs, accès, parois minimales,
   ordre automatique, grille `0,1 mm`, BRep transitoire et projets personnels en
   lecture seule.

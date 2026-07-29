@@ -27,24 +27,24 @@ R8 est autorisé sans nouvelle gate intermédiaire. Une nouvelle gate humaine ne
 sera ouverte qu'après diagnostic, ADR, corrections automatisées, intégration et
 installation d'une nouvelle candidate.
 
-R8-A à R8-F sont terminées. ADR-0105 est acceptée et la chaîne automatisée est
-strictement soustractive ; R8-G reste autorisée sans nouvelle observation de
-0.1.78. La prochaine observation humaine portera uniquement sur la nouvelle
-candidate installée.
+R8-A à R8-G sont terminées. ADR-0105 est acceptée, la chaîne automatisée est
+strictement soustractive et la candidate 0.1.79 est installée. La prochaine
+observation humaine porte uniquement sur cette nouvelle candidate.
 
 `fusion-validated=false`, `print-validated=false`.
 
-## P64-L09U-R8-V — gate 0.1.79 en préparation
+## P64-L09U-R8-V — gate 0.1.79 prête
 
-Statut : `prepared-not-installed`, `do-not-run-yet`,
+Statut : `ready-human-gate`, candidate 0.1.79 installée depuis `8baaaa9`,
 `fusion-validated=false`, `print-validated=false`.
 
-La candidate 0.1.79 et sa recette sont prêtes. Le préparateur à blanc passe
+La candidate 0.1.79 et sa recette sont prêtes. Le préparateur réel passe
 `153/153` tests ciblés, deux replays personnels en lecture seule et le
 préflight strict stable `ebd2d0b0...3f71`.
 
-La gate ne sera ouverte qu’après la suite globale autorisée, l’intégration du
-commit de candidate et la vérification de l’installation locale.
+La suite autorisée passe `945/945` et l’installation locale est vérifiée. La
+gate demande uniquement l’observation humaine de la scène Fusion réelle, sans
+sauvegarder les projets personnels.
 
 Recette :
 `docs/P64_L09U_R8_V_0179_FUSION_GATE_RECIPE.md`.

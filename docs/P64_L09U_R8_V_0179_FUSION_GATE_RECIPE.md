@@ -1,6 +1,7 @@
 # P64-L09U-R8-V — recette Fusion 0.1.79
 
-Statut courant : `prepared-not-installed`, `do-not-run-yet`,
+Statut courant : `ready-human-gate`, candidate 0.1.79 installée depuis
+`8baaaa9`,
 `fusion-validated=false`, `print-validated=false`.
 
 Cette recette ne concerne que la candidate 0.1.79. Ne rejoue pas la gate

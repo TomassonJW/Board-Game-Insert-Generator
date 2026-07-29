@@ -2,7 +2,8 @@
 
 Date : 2026-07-29.
 
-Statut courant : `candidate-prepared-not-installed`,
+Statut courant : `automated-validated`, `installed-local`,
+`ready-human-gate`,
 `fusion-validated=false`, `print-validated=false`.
 
 La candidate 0.1.78 reste `human-KO`, `do-not-run`. La candidate corrective
@@ -52,7 +53,22 @@ Les douze modules suivants sont exclus avant import :
 
 Aucun benchmark, holdout, corpus ou tournoi n’est exécuté.
 
-Résultat global : en attente avant installation.
+Résultat global final :
+
+```text
+BGIG_AUTHORIZED_SUITE modules=118 excluded=12
+Ran 945 tests in 650.355s
+OK (skipped=1)
+```
+
+Le test ignoré est l’intégration SCIP native indisponible dans cet
+environnement.
+
+La première passe globale a correctement signalé trois sous-tests R7 qui
+filtraient encore l’ancienne politique `localized_top_inset_v1`. Le produit
+publiait bien la nouvelle politique soustractive. Le témoin a été aligné sur
+`strictly_subtractive_flat_inset_v1` et renforcé par les compteurs positifs
+nuls. La reproduction causale passe, puis les suites globales finales passent.
 
 ## Validation ciblée et préflight
 
@@ -102,9 +118,19 @@ place, ni copiés dans le dépôt.
 
 ## Installation
 
-En attente de la suite globale autorisée et du commit de candidate. La recette
-humaine ne doit pas être exécutée avant la vérification de l’installation
-locale.
+Le package du commit `8baaaa9` est installé et vérifié dans le dossier add-in
+Fusion :
+
+- manifeste installé : `0.1.79` ;
+- marqueur installé : `8baaaa9` ;
+- runtime embarqué et marqueurs strictement soustractifs : conformes ;
+- réglages UI locaux : écrits ;
+- préparateur réel : `153/153` tests ciblés ;
+- deux replays personnels : réussis, SHA inchangés ;
+- préflight installé : `ebd2d0b0...3f71`.
+
+La candidate est `ready-human-gate`. Aucune observation Fusion réelle n’est
+encore revendiquée.
 
 Recette :
 `docs/P64_L09U_R8_V_0179_FUSION_GATE_RECIPE.md`.

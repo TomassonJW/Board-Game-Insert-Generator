@@ -1,7 +1,7 @@
 # Next Actions
 
 <!-- P64-L09U-NEXT -->
-## Action courante : P64-L09U-R8-G — candidate et nouvelle gate
+## Action courante : P64-L09U-R8-V — gate Fusion 0.1.79
 
 0.1.78 est `human-KO`, `do-not-run`.
 
@@ -75,16 +75,19 @@ R8-F est terminée :
 - les deux SHA personnels restent inchangés ;
 - validation ciblée `302/302`.
 
-R8-G est en cours :
+R8-G est terminée :
 
 - candidate 0.1.79, préflight et préparateur créés ;
-- préparateur à blanc `153/153`, deux replays personnels en lecture seule ;
+- préparateur réel `153/153`, deux replays personnels en lecture seule ;
 - préflight stable `ebd2d0b0...3f71`, compteurs positifs plats tous nuls ;
-- exécuter exactement la suite autorisée en excluant avant import les douze
-  modules nommés dans la preuve corrective ;
-- figer le commit de candidate, intégrer et pousser `main` ;
-- installer automatiquement l’add-in et ses réglages locaux ;
-- livrer uniquement la recette humaine finale.
+- suite autorisée `945/945` en `650,355 s`, un test SCIP ignoré et douze
+  modules exclus avant import ;
+- commit `8baaaa9` intégré et poussé dans `main` ;
+- add-in 0.1.79 et réglages locaux installés et vérifiés.
+
+La seule action restante est humaine : exécuter
+`docs/P64_L09U_R8_V_0179_FUSION_GATE_RECIPE.md` sans sauvegarder les deux
+projets personnels.
 
 Preuves :
 

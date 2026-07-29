@@ -76,13 +76,24 @@
 
 ### P64-L09U-R8-G — Candidate et nouvelle gate humaine
 
-- Statut : `in-progress-candidate-prepared-not-installed`.
+- Statut : `done-automated-validated`, `installed-local`.
 - Candidate 0.1.79, préflight et préparateur créés.
-- Préparateur à blanc `153/153`, deux replays personnels en lecture seule,
+- Préparateur réel `153/153`, deux replays personnels en lecture seule,
   préflight stable `ebd2d0b0...3f71`.
-- Suite autorisée, intégration directe et installation automatique restantes.
+- Suite autorisée `945/945`, commit `8baaaa9` intégré, add-in installé et
+  vérifié.
 - La dernière validation reste humaine.
 - Preuve : `docs/P64_L09U_R8_0179_CORRECTIVE_EVIDENCE.md`.
+
+### P64-L09U-R8-V — Gate humaine Fusion 0.1.79
+
+- Statut : `ready-human-gate`.
+- Ne pas sauvegarder `CasLimite02+` ou `CasLimite02++`.
+- Vérifier les corps imprimables, les profondeurs `2/4/6 mm`, les cavités,
+  les accès, les parois, l’ordre automatique et l’absence de matière positive
+  liée aux éléments plats.
+- Recette :
+  `docs/P64_L09U_R8_V_0179_FUSION_GATE_RECIPE.md`.
 
 Hand-off :
 `docs/P64_L09U_R8_SUBTRACTIVE_FLAT_INSETS_HANDOFF.md`.

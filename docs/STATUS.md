@@ -11,7 +11,8 @@ Statut : `P64-L09U-R7-V-human-KO`, `do-not-run`,
 `P64-L09U-R8-D-automated-validated`,
 `P64-L09U-R8-E-automated-validated`,
 `P64-L09U-R8-F-automated-validated`,
-`P64-L09U-R8-G-candidate-prepared-not-installed`,
+`P64-L09U-R8-G-automated-validated`, `installed-local`,
+`P64-L09U-R8-V-ready-human-gate`,
 `fusion-validated=false`, `print-validated=false`.
 
 - 0.1.78 est `human-KO`, `do-not-run`.
@@ -71,14 +72,17 @@ Statut : `P64-L09U-R7-V-human-KO`, `do-not-run`,
   tous les comptes aperçu/CAD IR/Fusion/BRep sont identiques.
 - Les SHA personnels sont inchangés avant/après.
 - Validation R8-F : `302/302` tests ciblés.
-- R8-G prépare la candidate 0.1.79 avec un préflight strict et un préparateur
+- R8-G livre la candidate 0.1.79 avec un préflight strict et un préparateur
   automatique.
-- Préparateur à blanc : `153/153`, deux replays personnels en lecture seule,
-  SHA contrôlés avant/après, aucune écriture AppData.
+- Préparateur réel : `153/153`, deux replays personnels en lecture seule,
+  SHA contrôlés avant/après et sources inchangées.
 - Préflight stable : `ebd2d0b0...3f71`, plan CAD, certificat Fusion et
   intervalles BRep identiques, compteurs positifs plats tous nuls.
-- La suite autorisée, le commit de candidate et l’installation restent à
-  exécuter avant la gate humaine.
+- Suite autorisée finale : `945/945` en `650,355 s`, un test SCIP natif
+  ignoré, douze modules interdits exclus avant import.
+- Le package du commit `8baaaa9` est installé et vérifié ; manifeste 0.1.79,
+  marqueur, runtime et réglages UI conformes.
+- P64-L09U-R8-V est maintenant la seule action restante.
 - Les acquis de profondeur, accès, parois, ordre, grille `0,1 mm` et BRep
   transitoire restent obligatoires.
 - Aucun benchmark/holdout/corpus/tournoi ; aucune UI manuelle.

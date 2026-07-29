@@ -17,21 +17,23 @@
   même plan soustractif et contrôlent digest, certificat et intervalles.
 - `C-FUSION` : R8-F `automated-validated`, `fusion-validated=false`. Les
   replays personnels prouvent `20/20` et `23/23` opérations identiques
-  jusqu’à l’intervalle BRep ; l’observation humaine reste nécessaire après
-  R8-G.
+  jusqu’à l’intervalle BRep ; la candidate 0.1.79 est installée et
+  l’observation humaine R8-V reste nécessaire.
 - `C-PRODUCT-GRID` : acquis automatisé à préserver, résolution `0,1 mm`.
+- `C-QUALITY` : préparateur `153/153`, suite autorisée `945/945`, un test
+  SCIP ignoré, douze modules interdits exclus avant import et deux replays
+  personnels avec SHA inchangés.
 - `C-ARCHITECTURE` : ADR-0105 acceptée. Les conteneurs finalisés figent toute
   géométrie positive avant une passe plate uniquement soustractive.
 - `C-MINIMAL-LAYOUT` : R8-C `automated-validated`. Le certificat minimal
   prouve `0 mm³`, `0` corps, `0` union, `0` support et `0` coupe positifs liés
   aux éléments plats ; toute compensation Z est rejetée.
 - `C-RELEASE` : 0.1.78 `human-KO`, `do-not-run`; R8-A `done-diagnostic`,
-  R8-B `done-architecture`, R8-C à R8-F `automated-validated`; candidate
-  0.1.79 préparée mais pas encore installée.
+  R8-B `done-architecture`, R8-C à R8-G `automated-validated`; candidate
+  0.1.79 du commit `8baaaa9` installée et `ready-human-gate`.
 - `C-PRINT` : `print-validated=false`.
 
-Prochaine frontière : R8-G, suite autorisée, commit de candidate et
-installation.
+Prochaine frontière : gate humaine P64-L09U-R8-V.
 
 ### Historique R7 clôturé en human-KO
 
