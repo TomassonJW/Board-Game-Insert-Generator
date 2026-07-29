@@ -63,17 +63,19 @@
 
 ### P64-L09U-R9-D — Candidate et gate finale
 
-- Statut : `ready-to-install`, R9-C et sa validation complète sont terminées.
+- Statut : `done-installed`, R9-C et sa validation complète sont terminées.
 - Préparer, intégrer et installer automatiquement la nouvelle candidate.
 - Thomas reçoit uniquement la recette humaine finale de performance et de
   non-régression géométrique.
 - Candidate 0.1.80, préflight, préparateur et recette créés.
 - Préparateur en mode sec : `174` tests ciblés, `1` skip prévu, deux replays
   personnels à `4,403 s` et `4,400 s`, SHA inchangés.
+- Installation réelle depuis `4522f72` : `4,259 s` et `4,458 s`, manifeste,
+  runtime, réglages, commit et marqueurs R9 vérifiés.
 
 ### P64-L09U-R9-V — Gate humaine Fusion 0.1.80
 
-- Statut : `prepared-not-human-observed`.
+- Statut : `ready-human-gate`.
 - Mesurer une seule recherche Approfondie fraîche sur chaque projet.
 - Confirmer brièvement les acquis fonctionnels 0.1.79 sans rejouer R8.
 - Recette :

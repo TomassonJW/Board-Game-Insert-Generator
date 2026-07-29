@@ -20,5 +20,9 @@ Résultat :
 - suite autorisée : `953` tests passés, `1` skip prévu ;
 - préparateur 0.1.80 en mode sec : `174` tests ciblés, `1` skip prévu.
 
-La candidate 0.1.80, son préflight et sa recette humaine sont prêts à installer.
+La candidate 0.1.80 a été installée depuis `4522f72`. L’installation réelle
+repasse les calculs à `4,259 s` et `4,458 s`, conserve digest et SHA, puis
+vérifie manifeste, runtime, réglages, commit et marqueurs R9.
+
+La recette humaine R9-V est la seule action restante.
 `fusion-validated=false`, `print-validated=false`.

@@ -1,7 +1,7 @@
 # Capability Map
 
 <!-- P64-L09U-CAPABILITY -->
-## P64-L09U-R9 — candidate 0.1.80 prête à installer
+## P64-L09U-R9 — candidate 0.1.80 installée
 
 - `C-STAGED-CALCULATION` : `automated-validated`. Les deux calculs de
   référence passent à `3,727 s` et `3,911 s`; le préparateur les confirme à
@@ -23,12 +23,11 @@
   passés ; `1` skip prévu dans chaque gate concernée.
 - `C-FUSION` : résultat 0.1.79 `human-positive`; candidate performance 0.1.80
   encore `prepared-not-human-observed`.
-- `C-RELEASE` : package, préflight, préparateur et recette 0.1.80 prêts ;
-  installation réelle prochaine.
+- `C-RELEASE` : 0.1.80 installée depuis `4522f72`; manifeste, runtime,
+  réglages, commit et marqueurs R9 vérifiés.
 - `C-PRINT` : `print-validated=false`.
 
-Prochaine frontière : installer 0.1.80 puis exécuter uniquement
-P64-L09U-R9-V.
+Prochaine frontière : exécuter uniquement P64-L09U-R9-V.
 
 ### Historique R9-A à R9-C
 

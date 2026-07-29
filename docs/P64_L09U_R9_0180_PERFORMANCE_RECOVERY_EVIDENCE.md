@@ -1,6 +1,6 @@
 # P64-L09U-R9 — preuve de récupération de performance 0.1.80
 
-Statut : `automated-validated`, candidate 0.1.80 en préparation,
+Statut : `automated-validated`, candidate 0.1.80 installée depuis `4522f72`,
 `fusion-validated=false`, `print-validated=false`.
 
 ## Verdict automatisé
@@ -75,6 +75,11 @@ replay fonctionnel complet, sans prétendre à une comparaison de fichiers
 installés inexistante.
 
 ## Gate restante
+
+L’installation réelle a repassé les deux calculs à `4,259 s` et `4,458 s`,
+avec finalisations à `2,881 s` et `2,896 s`. Le manifeste 0.1.80, le runtime,
+les réglages locaux, le marqueur `4522f72` et les marqueurs de code R9 ont été
+vérifiés.
 
 La seule gate restante est la recette humaine Fusion 0.1.80 :
 `docs/P64_L09U_R9_V_0180_FUSION_GATE_RECIPE.md`.

@@ -1,9 +1,9 @@
 # Next Actions
 
 <!-- P64-L09U-NEXT -->
-## Action courante : P64-L09U-R9-D — installer la candidate 0.1.80
+## Action courante : P64-L09U-R9-V — recette humaine 0.1.80
 
-R9-A à R9-C sont terminées et intégrées dans `main`.
+R9-A à R9-D sont terminées et intégrées dans `main`.
 
 Acquis automatisés :
 
@@ -15,13 +15,16 @@ Acquis automatisés :
 6. `953` tests autorisés passés, `1` skip prévu ;
 7. préflight et préparateur 0.1.80 validés en mode sec avec `174` tests
    ciblés et `1` skip prévu.
+8. candidate installée depuis `4522f72`, avec deux calculs à `4,259 s` et
+   `4,458 s`, version, runtime, réglages, commit et marqueurs R9 vérifiés.
 
 Action immédiate unique :
 
-1. intégrer le package 0.1.80 final dans `main` ;
-2. installer automatiquement cette candidate et ses réglages locaux ;
-3. vérifier version, commit, runtime et marqueurs R9 dans le dossier installé ;
-4. remettre à Thomas uniquement
+1. Thomas ferme puis rouvre Fusion et vérifie la version 0.1.80 ;
+2. il exécute une seule recherche Approfondie sur chaque projet ;
+3. il relève séparément calcul, finalisation et matérialisation ;
+4. il confirme brièvement les acquis fonctionnels 0.1.79 ;
+5. il renvoie le verdict décrit dans
    `docs/P64_L09U_R9_V_0180_FUSION_GATE_RECIPE.md`.
 
 La gate humaine portera sur la performance des deux projets et un contrôle

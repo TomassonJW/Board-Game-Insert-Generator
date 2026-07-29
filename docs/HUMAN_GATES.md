@@ -3,7 +3,7 @@
 <!-- P64-L09U-GATE -->
 ## P64-L09U-R9-V — gate performance Fusion 0.1.80
 
-Statut : `prepared-not-human-observed`, candidate 0.1.80 prête à installer,
+Statut : `ready-human-gate`, candidate 0.1.80 installée depuis `4522f72`,
 `fusion-validated=false`, `print-validated=false`.
 
 Le résultat fonctionnel de 0.1.79 est acquis. Cette gate ne rejoue pas R8 :
@@ -17,7 +17,8 @@ Preuves automatisées :
 - digest fonctionnel `a3ef2f44...8817bc46` conservé ;
 - projets personnels inchangés ;
 - `953` tests autorisés passés, `1` skip prévu ;
-- préflight 0.1.80 et installation sèche conformes.
+- installation réelle : calculs à `4,259 s` et `4,458 s`, version, commit,
+  runtime, réglages et marqueurs R9 conformes.
 
 Recette :
 `docs/P64_L09U_R9_V_0180_FUSION_GATE_RECIPE.md`.

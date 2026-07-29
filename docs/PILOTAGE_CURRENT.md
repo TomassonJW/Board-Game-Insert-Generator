@@ -16,13 +16,16 @@
   la finalisation mesure `2,654 s` puis `2,500 s`.
 - Le préparateur 0.1.80 en mode sec repasse les deux projets à `4,403 s` et
   `4,400 s`, avec SHA avant/après identiques.
+- L’installation réelle depuis `4522f72` les repasse à `4,259 s` et
+  `4,458 s`, puis vérifie manifeste 0.1.80, runtime, réglages, marqueur de
+  commit et sources R9 installées.
 - Suite ciblée du préparateur : `174` tests, `1` skip prévu. Suite autorisée
   complète : `953` tests, `1` skip prévu, aucun échec.
 - Grille `0,1 mm`, epsilon `0,0001 mm`, valeurs physiques, budgets,
   profondeurs, cavités, parois, finalisation et matérialisation sont inchangés.
-- La candidate Fusion 0.1.80, son préflight, son préparateur et sa recette
-  humaine sont prêts. L’installation réelle est la prochaine action autonome.
-- La gate reste `prepared-not-human-observed`,
+- La candidate Fusion 0.1.80 est installée. La seule action restante est la
+  recette humaine R9-V.
+- La gate est `ready-human-gate`,
   `fusion-validated=false`, `print-validated=false`.
 
 Autorités :

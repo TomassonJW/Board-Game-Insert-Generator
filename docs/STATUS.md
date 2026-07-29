@@ -7,8 +7,8 @@ Date : 2026-07-29.
 
 Statut : `P64-L09U-R9-A-complete`,
 `P64-L09U-R9-B-complete`, `P64-L09U-R9-C-automated-validated`,
-`P64-L09U-R9-D-ready-to-install`,
-`P64-L09U-R9-V-prepared-not-human-observed`,
+`P64-L09U-R9-D-done-installed`,
+`P64-L09U-R9-V-ready-human-gate`,
 `fusion-validated=false`, `print-validated=false`.
 
 - Le résultat humain 0.1.79 reste l’autorité fonctionnelle.
@@ -28,8 +28,12 @@ Statut : `P64-L09U-R9-A-complete`,
 - Suite ciblée du préparateur : `174` tests passés, `1` skip prévu.
 - Suite autorisée complète : `953` tests passés, `1` skip prévu, douze modules
   interdits exclus avant import.
-- Candidate 0.1.80, préflight, préparateur et recette humaine prêts ;
-  installation réelle encore à exécuter.
+- Candidate 0.1.80 installée depuis `4522f72`.
+- Installation réelle : calculs `4,259 s` et `4,458 s`, finalisations
+  `2,881 s` et `2,896 s`, digest et SHA inchangés.
+- Manifeste, runtime, réglages, marqueur de commit et cinq marqueurs R9
+  installés vérifiés indépendamment.
+- La seule action restante est la recette humaine R9-V.
 
 Preuve :
 `docs/P64_L09U_R9_0180_PERFORMANCE_RECOVERY_EVIDENCE.md`.
