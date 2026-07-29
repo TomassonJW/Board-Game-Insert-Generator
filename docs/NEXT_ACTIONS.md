@@ -1,7 +1,7 @@
 # Next Actions
 
 <!-- P64-L09U-NEXT -->
-## Action courante : P64-L09U-R8-D — conteneurs finalisés et figés
+## Action courante : P64-L09U-R8-E — passe d’encastrement soustractive
 
 0.1.78 est `human-KO`, `do-not-run`.
 
@@ -43,16 +43,27 @@ R8-C est terminée :
 - le solveur et ses budgets restent inchangés sous une nouvelle identité ;
 - validation ciblée `67/67`.
 
-R8-D est la seule mission `ready` :
+R8-D est terminée :
 
-- remplacer le couple `final_size_mm` / `cad_size_mm` ;
-- produire `bgig.finalized_container_geometry.v1` et le composite v3 ;
-- attribuer toute géométrie positive à `container_finalization` ;
-- figer son digest avant les soustractions ;
-- conserver les cavités, accès, fonds, parois et propriétaires ;
-- ne modifier encore ni le plan Fusion, ni l'exécuteur BRep.
+- `bgig.finalized_container_geometry.v1` et le composite v3 sont publiés ;
+- `closure_*` et `final_*` ont des responsabilités distinctes ;
+- les nouveaux corps ne publient plus aucun champ exécutable `cad_*` ;
+- toute géométrie positive est attribuée à `container_finalization` ;
+- le digest positif exclut les opérations soustractives ;
+- corps, unions, opérations et volume positifs plats valent zéro ;
+- la CAD IR refuse un certificat positif plat non nul ;
+- validation ciblée `90/90`.
 
-R8-E à R8-G restent `blocked-by-R8-D`.
+R8-E est la seule mission `ready` :
+
+- extraire `bgig.flat_inset_subtraction_plan.v1` ;
+- produire uniquement des opérations négatives après la finalisation ;
+- appliquer exactement les profondeurs locales `4/2/6 mm` ;
+- garantir les cavités creusées, ouvertes et accessibles ;
+- prouver que le digest positif R8-D ne change pas ;
+- ne créer aucun corps, support, union ou volume positif plat.
+
+R8-F et R8-G restent `blocked-by-R8-E`.
 
 Preuves :
 
@@ -60,7 +71,8 @@ Preuves :
 - `docs/P64_L09U_R8_A_SUBTRACTIVE_PIPELINE_DIAGNOSTIC_EVIDENCE.md` ;
 - `docs/DECISIONS/ADR-0105-conteneurs-finalises-et-encastrements-strictement-soustractifs.md` ;
 - `docs/P64_L09U_R8_B_SUBTRACTIVE_PIPELINE_DECISION_EVIDENCE.md` ;
-- `docs/P64_L09U_R8_C_MINIMAL_SUBTRACTIVE_BOUNDARY_EVIDENCE.md`.
+- `docs/P64_L09U_R8_C_MINIMAL_SUBTRACTIVE_BOUNDARY_EVIDENCE.md` ;
+- `docs/P64_L09U_R8_D_FINALIZED_CONTAINER_GEOMETRY_EVIDENCE.md`.
 
 Hand-off :
 `docs/P64_L09U_R8_SUBTRACTIVE_FLAT_INSETS_HANDOFF.md`.

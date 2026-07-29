@@ -3,11 +3,12 @@
 <!-- P64-L09U-STATUS -->
 ## P64-L09U-R8 — éléments plats strictement soustractifs
 
-Date : 2026-07-28.
+Date : 2026-07-29.
 
 Statut : `P64-L09U-R7-V-human-KO`, `do-not-run`,
 `P64-L09U-R8-A-done-diagnostic`, `P64-L09U-R8-B-done-architecture`,
-`P64-L09U-R8-C-automated-validated`, `P64-L09U-R8-D-ready`,
+`P64-L09U-R8-C-automated-validated`,
+`P64-L09U-R8-D-automated-validated`, `P64-L09U-R8-E-ready`,
 `fusion-validated=false`, `print-validated=false`.
 
 - 0.1.78 est `human-KO`, `do-not-run`.
@@ -42,8 +43,18 @@ Statut : `P64-L09U-R7-V-human-KO`, `do-not-run`,
 - L'identité du solveur devient `p64-l09u-r8-c-v1`; algorithme, lanes et
   budgets restent inchangés.
 - Validation R8-C : `67/67` tests ciblés et compilation Python OK.
-- R8-D doit figer la géométrie positive des conteneurs finalisés avant toute
-  passe plate.
+- R8-D publie `bgig.finalized_container_geometry.v1`,
+  `bgig.xy_composite_container_body.v3` et le certificat de matérialisation
+  composite v3.
+- Les nouveaux corps distinguent `closure_*` et `final_*`; ils ne publient
+  plus `cad_origin_mm` ou `cad_size_mm`.
+- Le digest positif est indépendant des soustractions et toute opération
+  positive reste attribuée à `container_finalization`.
+- Les compteurs plats restent à `0 corps / 0 union / 0 opération / 0 mm³`.
+- Validation R8-D : `90/90` tests ciblés, compilation Python et
+  `git diff --check` OK.
+- R8-E doit maintenant construire et appliquer la passe d’encastrement
+  uniquement soustractive sans modifier le digest positif.
 - Les acquis de profondeur, accès, parois, ordre, grille `0,1 mm` et BRep
   transitoire restent obligatoires.
 - Aucun benchmark/holdout/corpus/tournoi ; aucune UI manuelle.
@@ -60,6 +71,8 @@ Preuve R8-B :
 `docs/P64_L09U_R8_B_SUBTRACTIVE_PIPELINE_DECISION_EVIDENCE.md`.
 Preuve R8-C :
 `docs/P64_L09U_R8_C_MINIMAL_SUBTRACTIVE_BOUNDARY_EVIDENCE.md`.
+Preuve R8-D :
+`docs/P64_L09U_R8_D_FINALIZED_CONTAINER_GEOMETRY_EVIDENCE.md`.
 
 ### Historique R7 clôturé en human-KO
 

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import Any
+from typing import Any, Mapping
 
 from board_game_insert_generator.partition_solver import PARTITION_PLAN_SCHEMA_V1
 from board_game_insert_generator.preview_explanations import build_preview_explanations
@@ -445,7 +445,10 @@ def _composite_prisms(
     composite = placement.get("composite_body")
     if not isinstance(composite, dict):
         return []
-    if composite.get("schema_version") != "bgig.xy_composite_cad_body.v2":
+    if composite.get("schema_version") not in {
+        "bgig.xy_composite_cad_body.v2",
+        "bgig.xy_composite_container_body.v3",
+    }:
         return []
     return _mappings(
         composite.get("prisms"),
@@ -474,13 +477,16 @@ def _top_prism_rectangles(
         dict[str, float],
     ] = {}
     for index, prism in enumerate(prisms):
+        origin_field, size_field = _composite_prism_geometry_fields(
+            prism
+        )
         origin = _dimension(
-            prism.get("cad_origin_mm"),
-            f"composite.prisms[{index}].cad_origin_mm",
+            prism.get(origin_field),
+            f"composite.prisms[{index}].{origin_field}",
         )
         size = _dimension(
-            prism.get("cad_size_mm"),
-            f"composite.prisms[{index}].cad_size_mm",
+            prism.get(size_field),
+            f"composite.prisms[{index}].{size_field}",
         )
         key = (
             _round(origin["x"]),
@@ -507,13 +513,16 @@ def _section_prism_rectangles(
         dict[str, float],
     ] = {}
     for index, prism in enumerate(prisms):
+        origin_field, size_field = _composite_prism_geometry_fields(
+            prism
+        )
         origin = _dimension(
-            prism.get("cad_origin_mm"),
-            f"composite.prisms[{index}].cad_origin_mm",
+            prism.get(origin_field),
+            f"composite.prisms[{index}].{origin_field}",
         )
         size = _dimension(
-            prism.get("cad_size_mm"),
-            f"composite.prisms[{index}].cad_size_mm",
+            prism.get(size_field),
+            f"composite.prisms[{index}].{size_field}",
         )
         if not _crosses(section_y, origin["y"], size["y"]):
             continue
@@ -530,6 +539,17 @@ def _section_prism_rectangles(
             "height_mm": key[3],
         }
     return [rectangles[key] for key in sorted(rectangles)]
+
+
+def _composite_prism_geometry_fields(
+    prism: Mapping[str, object],
+) -> tuple[str, str]:
+    if (
+        "final_origin_mm" in prism
+        and "closure_origin_mm" in prism
+    ):
+        return "final_origin_mm", "final_size_mm"
+    return "cad_origin_mm", "cad_size_mm"
 
 
 def _frozen_cavity_world_bounds(

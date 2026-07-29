@@ -1,5 +1,21 @@
 # Quality Rules
 
+<!-- P64-L09U-R8-QUALITY -->
+## Garde positive des conteneurs finalisés
+
+- Un plan finalisé publie `bgig.finalized_container_geometry.v1`.
+- Le nombre de corps positifs certifiés égale le nombre de propriétaires
+  imprimables.
+- Toute opération positive porte
+  `positive_geometry_source=container_finalization`.
+- `flat_positive_body_count`, `flat_positive_union_count`,
+  `flat_positive_operation_count` et `flat_positive_volume_mm3` valent zéro.
+- `new_printable_body_count_attributed_to_flat_items` vaut zéro.
+- Un composite v3 ne contient ni `cad_origin_mm`, ni `cad_size_mm`.
+- Le digest positif est calculé avant les soustractions et ne dépend d’aucune
+  cavité ou coupe.
+- Toute divergence bloque la CAD IR avant la construction du plan Fusion.
+
 <!-- P64-L09T-QUALITY -->
 ## Gardes P64-L09T
 

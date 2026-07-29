@@ -43,6 +43,7 @@ ARTIFACT_KIND_FINALIZED = "finalized_plan"
 COMPOSITE_PRISM_JOIN_OPERATION_KIND = "join_rectangular_prism"
 COMPOSITE_BODY_SCHEMA_V1 = "bgig.xy_composite_cad_body.v1"
 COMPOSITE_BODY_SCHEMA_V2 = "bgig.xy_composite_cad_body.v2"
+COMPOSITE_BODY_SCHEMA_V3 = "bgig.xy_composite_container_body.v3"
 _EPSILON = 0.0001
 
 
@@ -133,6 +134,11 @@ def build_partition_cad(
         }
     if int(summary.get("automatic_body_count", -1)) != 0:
         raise PartitionCadBuildError("P59 refuse tout plan dont automatic_body_count n est pas zero.")
+    if (
+        identity is not None
+        and identity.get("artifact_kind") == ARTIFACT_KIND_FINALIZED
+    ):
+        _assert_finalized_container_geometry_certificate(plan)
 
     build = _components(project, plan)
     if build.blockers:
@@ -200,6 +206,14 @@ def build_partition_cad(
                     _mapping(plan.get("finalization"), "partition.finalization").get(
                         "composite_materialization_certificate"
                     )
+                    if isinstance(plan.get("finalization"), dict)
+                    else None
+                ),
+                "finalized_container_geometry_certificate": (
+                    _mapping(
+                        plan.get("finalization"),
+                        "partition.finalization",
+                    ).get("finalized_container_geometry_certificate")
                     if isinstance(plan.get("finalization"), dict)
                     else None
                 ),
@@ -388,6 +402,60 @@ def _selected_plan_is_cad_eligible(
             return False
     return True
 
+
+def _assert_finalized_container_geometry_certificate(
+    plan: Mapping[str, object],
+) -> None:
+    finalization = _mapping(
+        plan.get("finalization"),
+        "partition.finalization",
+    )
+    certificate = _mapping(
+        finalization.get("finalized_container_geometry_certificate"),
+        "partition.finalization.finalized_container_geometry_certificate",
+    )
+    placements = _mappings(
+        plan.get("placements", []),
+        "partition.placements",
+    )
+    if (
+        certificate.get("schema_version")
+        != "bgig.finalized_container_geometry.v1"
+        or certificate.get("certified") is not True
+        or int(certificate.get("container_positive_body_count", -1))
+        != len(placements)
+        or int(certificate.get("flat_positive_body_count", -1)) != 0
+        or int(certificate.get("flat_positive_union_count", -1)) != 0
+        or abs(
+            float(certificate.get("flat_positive_volume_mm3", -1.0))
+        )
+        > _EPSILON
+        or int(
+            certificate.get(
+                "new_printable_body_count_attributed_to_flat_items",
+                -1,
+            )
+        )
+        != 0
+        or certificate.get(
+            "positive_geometry_frozen_before_flat_subtractions"
+        )
+        is not True
+        or int(
+            certificate.get(
+                "ambiguous_cad_geometry_field_count",
+                -1,
+            )
+        )
+        != 0
+        or not str(certificate.get("positive_geometry_digest", ""))
+    ):
+        raise PartitionCadBuildError(
+            "Le certificat de geometrie positive des conteneurs "
+            "finalises est absent ou invalide."
+        )
+
+
 def _components(project: dict[str, object], plan: dict[str, object]) -> _BuildResult:
     layout = _mapping(project["layout"], "project.layout")
     components: list[CadComponent] = []
@@ -419,10 +487,13 @@ def _container_component(placement: dict[str, object], index: int) -> CadCompone
         if isinstance(placement.get("composite_body"), dict)
         else None
     )
-    composite_v2 = bool(
+    composite_uses_frozen_world_geometry = bool(
         composite_body is not None
         and composite_body.get("schema_version")
-        == COMPOSITE_BODY_SCHEMA_V2
+        in {
+            COMPOSITE_BODY_SCHEMA_V2,
+            COMPOSITE_BODY_SCHEMA_V3,
+        }
     )
     frozen_contracts = (
         _mappings(
@@ -473,7 +544,7 @@ def _container_component(placement: dict[str, object], index: int) -> CadCompone
             require_top_open=(
                 not frozen_contracts
                 or (
-                    not composite_v2
+                    not composite_uses_frozen_world_geometry
                     and frozen_contracts[cavity_index].get(
                         "anchor_kind"
                     )
@@ -650,6 +721,7 @@ def _component(
         if composite_schema not in {
             COMPOSITE_BODY_SCHEMA_V1,
             COMPOSITE_BODY_SCHEMA_V2,
+            COMPOSITE_BODY_SCHEMA_V3,
         }:
             raise PartitionCadBuildError(
                 f"Schema composite inconnu pour {instance_id!r}."
@@ -658,7 +730,10 @@ def _component(
             raise PartitionCadBuildError(
                 f"Le corps composite {instance_id!r} n est pas certifie."
             )
-        if composite_schema == COMPOSITE_BODY_SCHEMA_V2:
+        if composite_schema in {
+            COMPOSITE_BODY_SCHEMA_V2,
+            COMPOSITE_BODY_SCHEMA_V3,
+        }:
             declared_digest = str(
                 composite_body.get("geometry_digest", "")
             )
@@ -674,6 +749,37 @@ def _component(
                 raise PartitionCadBuildError(
                     f"Le corps composite {instance_id!r} diverge de son certificat."
                 )
+        if composite_schema == COMPOSITE_BODY_SCHEMA_V3:
+            raw_v3_prisms = composite_body.get("prisms", ())
+            if (
+                not isinstance(raw_v3_prisms, (list, tuple))
+                or any(
+                    isinstance(value, Mapping)
+                    and (
+                        "cad_origin_mm" in value
+                        or "cad_size_mm" in value
+                    )
+                    for value in raw_v3_prisms
+                )
+            ):
+                raise PartitionCadBuildError(
+                    "Le corps finalise contient encore un champ CAD "
+                    f"ambigu pour {instance_id!r}."
+                )
+            positive_geometry_digest = str(
+                composite_body.get("positive_geometry_digest", "")
+            )
+            if (
+                not positive_geometry_digest
+                or positive_geometry_digest
+                != canonical_digest(
+                    _composite_positive_geometry_payload(composite_body)
+                )
+            ):
+                raise PartitionCadBuildError(
+                    "La geometrie positive du conteneur finalise "
+                    f"{instance_id!r} diverge de son certificat."
+                )
         prisms = _mappings(
             composite_body.get("prisms", []),
             f"placement[{index}].composite_body.prisms",
@@ -683,14 +789,44 @@ def _component(
                 f"Le corps composite {instance_id!r} exige un coeur en premier."
             )
         core = prisms[0]
+        executable_origin_key = (
+            "final_origin_mm"
+            if composite_schema == COMPOSITE_BODY_SCHEMA_V3
+            else "cad_origin_mm"
+        )
+        executable_size_key = (
+            "final_size_mm"
+            if composite_schema == COMPOSITE_BODY_SCHEMA_V3
+            else "cad_size_mm"
+        )
         create_parameters = {
-            "origin_mm": deepcopy(core["cad_origin_mm"]),
-            "size_mm": deepcopy(core["cad_size_mm"]),
-            "origin_source": "composite_core_prism",
-            "size_source": "composite_core_prism",
+            "origin_mm": deepcopy(core[executable_origin_key]),
+            "size_mm": deepcopy(core[executable_size_key]),
+            "origin_source": (
+                "finalized_container_core_prism"
+                if composite_schema == COMPOSITE_BODY_SCHEMA_V3
+                else "composite_core_prism"
+            ),
+            "size_source": (
+                "finalized_container_core_prism"
+                if composite_schema == COMPOSITE_BODY_SCHEMA_V3
+                else "composite_core_prism"
+            ),
             "core_prism_id": core["prism_id"],
             "coordinate_frame": "scene.frame",
         }
+        if composite_schema == COMPOSITE_BODY_SCHEMA_V3:
+            create_parameters.update(
+                {
+                    "geometry_role": "finalized_container",
+                    "positive_geometry_source": (
+                        "container_finalization"
+                    ),
+                    "positive_geometry_digest": composite_body[
+                        "positive_geometry_digest"
+                    ],
+                }
+            )
         join_operations = _composite_join_operations(
             body_id,
             composite_body,
@@ -728,6 +864,7 @@ def _component(
                     cavity,
                     frozen_world_pose=(
                         composite_schema == COMPOSITE_BODY_SCHEMA_V2
+                        or composite_schema == COMPOSITE_BODY_SCHEMA_V3
                         or frozen_cavity_anchors
                     ),
                     frozen_contract=(
@@ -762,6 +899,54 @@ def _component(
     )
 
 
+def _composite_positive_geometry_payload(
+    composite_body: Mapping[str, object],
+) -> dict[str, object]:
+    raw_prisms = composite_body.get("prisms", ())
+    prisms = (
+        tuple(
+            value
+            for value in raw_prisms
+            if isinstance(value, Mapping)
+        )
+        if isinstance(raw_prisms, (list, tuple))
+        else ()
+    )
+    return {
+        "schema_version": COMPOSITE_BODY_SCHEMA_V3,
+        "owner_id": str(composite_body.get("owner_id", "")),
+        "geometry_role": str(
+            composite_body.get("geometry_role", "")
+        ),
+        "positive_geometry_source": str(
+            composite_body.get("positive_geometry_source", "")
+        ),
+        "core_prism_id": str(
+            composite_body.get("core_prism_id", "")
+        ),
+        "prisms": [
+            {
+                key: deepcopy(prism.get(key))
+                for key in (
+                    "prism_id",
+                    "owner_id",
+                    "kind",
+                    "geometry_role",
+                    "positive_geometry_source",
+                    "closure_origin_mm",
+                    "closure_size_mm",
+                    "final_origin_mm",
+                    "final_size_mm",
+                    "local_origin_from_core_mm",
+                    "attached_to_prism_id",
+                    "attachment_axis",
+                )
+            }
+            for prism in prisms
+        ],
+    }
+
+
 def _composite_join_operations(
     body_id: str,
     composite_body: dict[str, object],
@@ -776,6 +961,7 @@ def _composite_join_operations(
     if policy not in {
         "bounded_xy_composite_v1",
         "hybrid_xy_composite_v2",
+        "finalized_container_union_v3",
     }:
         raise PartitionCadBuildError(
             f"Politique composite inconnue : {policy!r}."
@@ -800,8 +986,27 @@ def _composite_join_operations(
                     "attached_to_prism_id": parent_id,
                     "attachment_axis": axis,
                     "local_origin_mm": deepcopy(prism["local_origin_from_core_mm"]),
-                    "size_mm": deepcopy(prism["cad_size_mm"]),
+                    "size_mm": deepcopy(
+                        prism[
+                            "final_size_mm"
+                            if policy == "finalized_container_union_v3"
+                            else "cad_size_mm"
+                        ]
+                    ),
                     "final_size_mm": deepcopy(prism["final_size_mm"]),
+                    **(
+                        {
+                            "closure_size_mm": deepcopy(
+                                prism["closure_size_mm"]
+                            ),
+                            "geometry_role": "finalized_container",
+                            "positive_geometry_source": (
+                                "container_finalization"
+                            ),
+                        }
+                        if policy == "finalized_container_union_v3"
+                        else {}
+                    ),
                     "coordinate_frame": "body.local",
                     "execution_status": PARTITION_CAD_STATUS_READY,
                     "fusion_generation": PARTITION_CAD_STATUS_READY,

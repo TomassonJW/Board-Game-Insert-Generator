@@ -177,27 +177,47 @@ class PartitionResultViewTests(unittest.TestCase):
                         }
                     ],
                     "composite_body": {
-                        "schema_version": "bgig.xy_composite_cad_body.v2",
+                        "schema_version": "bgig.xy_composite_container_body.v3",
                         "prisms": [
                             {
-                                "cad_origin_mm": {
+                                "closure_origin_mm": {
                                     "x": 10.0,
                                     "y": 0.0,
                                     "z": 0.0,
                                 },
-                                "cad_size_mm": {
+                                "closure_size_mm": {
+                                    "x": 20.0,
+                                    "y": 30.0,
+                                    "z": 38.0,
+                                },
+                                "final_origin_mm": {
+                                    "x": 10.0,
+                                    "y": 0.0,
+                                    "z": 0.0,
+                                },
+                                "final_size_mm": {
                                     "x": 20.0,
                                     "y": 30.0,
                                     "z": 40.0,
                                 },
                             },
                             {
-                                "cad_origin_mm": {
+                                "closure_origin_mm": {
                                     "x": 30.0,
                                     "y": 10.0,
                                     "z": 0.0,
                                 },
-                                "cad_size_mm": {
+                                "closure_size_mm": {
+                                    "x": 30.0,
+                                    "y": 10.0,
+                                    "z": 20.0,
+                                },
+                                "final_origin_mm": {
+                                    "x": 30.0,
+                                    "y": 10.0,
+                                    "z": 0.0,
+                                },
+                                "final_size_mm": {
                                     "x": 30.0,
                                     "y": 10.0,
                                     "z": 20.0,

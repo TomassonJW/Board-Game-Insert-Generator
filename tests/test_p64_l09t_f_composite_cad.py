@@ -7,12 +7,16 @@ from board_game_insert_generator.contextual_local_analysis import (
     IncrementalLocalAnalysisEngine,
 )
 from board_game_insert_generator.coupled_finalization import (
+    _composite_positive_geometry_payload,
     _frozen_cavity_contracts,
 )
 from board_game_insert_generator.free_3d_greedy_solver import (
     Free3DPlacement,
 )
-from board_game_insert_generator.partition_cad import build_partition_cad
+from board_game_insert_generator.partition_cad import (
+    PartitionCadBuildError,
+    build_partition_cad,
+)
 from board_game_insert_generator.incremental_project_state import (
     canonical_digest,
 )
@@ -82,10 +86,15 @@ class P64L09TFCompositeCadTests(unittest.TestCase):
             FUSION_GENERATION_MODE_COMPACT_ONLY,
         )
 
-    def test_hybrid_v2_is_the_published_exact_finalization(self) -> None:
+    def test_finalized_container_v3_is_the_published_positive_geometry(
+        self,
+    ) -> None:
         finalization = self.plan["finalization"]
         certificate = finalization[
             "composite_materialization_certificate"
+        ]
+        geometry_certificate = finalization[
+            "finalized_container_geometry_certificate"
         ]
 
         self.assertEqual(
@@ -107,25 +116,90 @@ class P64L09TFCompositeCadTests(unittest.TestCase):
             ]
         )
         self.assertTrue(certificate["certified"])
+        self.assertEqual(
+            certificate["schema_version"],
+            "bgig.xy_composite_container_materialization_certificate.v3",
+        )
         self.assertEqual(certificate["printable_residual_volume_mm3"], 0.0)
         self.assertTrue(certificate["owner_unions_connected"])
         self.assertTrue(certificate["minimum_reservation_wall_certified"])
         self.assertGreater(
-            certificate["content_cavity_cut_volume_mm3"],
+            certificate["content_cavity_subtraction_volume_mm3"],
             0.0,
         )
         self.assertAlmostEqual(
-            certificate["exact_cut_volume_mm3"],
-            certificate["content_cavity_cut_volume_mm3"]
-            + certificate["access_and_top_cut_volume_mm3"],
+            certificate["exact_subtraction_volume_mm3"],
+            certificate["content_cavity_subtraction_volume_mm3"]
+            + certificate["access_and_top_subtraction_volume_mm3"],
             places=6,
         )
         self.assertAlmostEqual(
             certificate["final_material_volume_mm3"],
-            certificate["cad_union_before_cuts_volume_mm3"]
-            - certificate["exact_cut_volume_mm3"],
+            certificate[
+                "finalized_container_union_before_subtractions_volume_mm3"
+            ]
+            - certificate["exact_subtraction_volume_mm3"],
             places=6,
         )
+        self.assertTrue(geometry_certificate["certified"])
+        self.assertEqual(
+            geometry_certificate["schema_version"],
+            "bgig.finalized_container_geometry.v1",
+        )
+        self.assertEqual(
+            geometry_certificate["flat_positive_body_count"],
+            0,
+        )
+        self.assertEqual(
+            geometry_certificate["flat_positive_union_count"],
+            0,
+        )
+        self.assertEqual(
+            geometry_certificate["flat_positive_volume_mm3"],
+            0.0,
+        )
+        self.assertTrue(
+            geometry_certificate[
+                "positive_geometry_frozen_before_flat_subtractions"
+            ]
+        )
+        self.assertEqual(
+            geometry_certificate,
+            certificate[
+                "finalized_container_geometry_certificate"
+            ],
+        )
+        for placement in self.plan["placements"]:
+            body = placement["composite_body"]
+            self.assertEqual(
+                body["schema_version"],
+                "bgig.xy_composite_container_body.v3",
+            )
+            self.assertEqual(
+                body["positive_geometry_source"],
+                "container_finalization",
+            )
+            self.assertEqual(
+                body["positive_geometry_digest"],
+                canonical_digest(
+                    _composite_positive_geometry_payload(body)
+                ),
+            )
+            for prism in body["prisms"]:
+                self.assertNotIn("cad_origin_mm", prism)
+                self.assertNotIn("cad_size_mm", prism)
+                self.assertEqual(
+                    prism["geometry_role"],
+                    "finalized_container",
+                )
+                self.assertEqual(
+                    prism["positive_geometry_source"],
+                    "container_finalization",
+                )
+                self.assertGreaterEqual(
+                    prism["final_size_mm"]["z"],
+                    prism["closure_size_mm"]["z"],
+                )
 
     def test_cavity_depth_is_exact_and_final_z_anchor_is_certified(self) -> None:
         minimal = self.minimal_selection["partition"]["placements"][0]
@@ -235,7 +309,11 @@ class P64L09TFCompositeCadTests(unittest.TestCase):
         self.assertTrue(self.fusion.additive_prism_joins)
         self.assertTrue(
             all(
-                value.policy == "hybrid_xy_composite_v2"
+                value.policy
+                in {
+                    "hybrid_xy_composite_v2",
+                    "finalized_container_union_v3",
+                }
                 and value.attachment_axis in {"x", "y"}
                 for value in self.fusion.additive_prism_joins
             )
@@ -278,7 +356,7 @@ class P64L09TFCompositeCadTests(unittest.TestCase):
     def test_cad_refuses_a_composite_geometry_digest_divergence(self) -> None:
         corrupted = deepcopy(self.plan)
         body = corrupted["placements"][0]["composite_body"]
-        body["prisms"][0]["cad_size_mm"]["x"] += 0.1
+        body["prisms"][0]["final_size_mm"]["x"] += 0.1
         corrupted.pop("plan_digest")
         corrupted["plan_digest"] = canonical_digest(corrupted)
         identity = deepcopy(self.final_selection)
@@ -322,6 +400,30 @@ class P64L09TFCompositeCadTests(unittest.TestCase):
                 for blocker in result["blockers"]
             )
         )
+
+    def test_cad_refuses_flat_positive_volume_in_finalized_certificate(
+        self,
+    ) -> None:
+        corrupted = deepcopy(self.plan)
+        certificate = corrupted["finalization"][
+            "finalized_container_geometry_certificate"
+        ]
+        certificate["flat_positive_volume_mm3"] = 1.0
+        corrupted.pop("plan_digest")
+        corrupted["plan_digest"] = canonical_digest(corrupted)
+        identity = deepcopy(self.final_selection)
+        identity["partition_plan_digest"] = corrupted["plan_digest"]
+
+        with self.assertRaisesRegex(
+            PartitionCadBuildError,
+            "certificat de geometrie positive",
+        ):
+            build_partition_cad(
+                self.project,
+                partition=corrupted,
+                artifact_identity=identity,
+                effort_profile="normal",
+            )
 
     def test_frozen_cavity_pose_follows_a_quarter_turn_exactly(self) -> None:
         placement = Free3DPlacement(

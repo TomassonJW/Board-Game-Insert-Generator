@@ -1,5 +1,27 @@
 # Architecture
 
+<!-- P64-L09U-R8-ARCHITECTURE -->
+## Frontière positive R8
+
+Le calcul minimal ne produit que les enveloppes, poses et réservations
+virtuelles. La finalisation construit ensuite la géométrie positive des
+conteneurs et la fige dans `bgig.finalized_container_geometry.v1`. Une passe
+ultérieure applique les éléments plats uniquement par soustraction.
+
+Un nouveau composite utilise `bgig.xy_composite_container_body.v3` :
+
+- `closure_*` décrit la fermeture volumique source ;
+- `final_*` décrit le conteneur positif exécutable ;
+- aucune dimension exécutable `cad_*` n’est publiée ;
+- toutes les créations et unions positives sont attribuées à
+  `container_finalization` ;
+- le digest positif exclut cavités, accès et encastrements.
+
+`partition_cad.py` refuse un artefact finalisé si ce digest diverge ou si un
+corps, une union, une opération ou un volume positif est attribué à un plateau
+ou à un livret. Les anciens schémas composites v1/v2 restent lisibles pour les
+artefacts historiques, sans être produits par R8.
+
 <!-- P64-L09T-ARCHITECTURE -->
 ## Frontiere P64-L09T
 

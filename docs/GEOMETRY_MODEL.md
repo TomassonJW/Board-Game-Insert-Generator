@@ -1,5 +1,29 @@
 # Geometry Model
 
+<!-- P64-L09U-R8-GEOMETRY -->
+## Conteneur finalisé puis encastrements négatifs
+
+La géométrie positive d’un conteneur finalisé est l’union de ses prismes
+`final_*`. Les prismes `closure_*` restent une preuve de la fermeture source,
+pas une seconde géométrie exécutable.
+
+Le résultat avec éléments plats doit respecter :
+
+```text
+géométrie finale
+  = conteneur finalisé sans éléments plats
+  - union des encastrements locaux
+```
+
+Le digest positif couvre seulement les prismes finalisés et leurs attaches. Il
+doit rester identique avant et après les encastrements. Un plateau ou livret ne
+peut introduire ni prisme, ni plaque, ni rail, ni pont, ni support, ni corps,
+ni union positive.
+
+Les profondeurs locales restent la somme exacte des épaisseurs couvrantes. Une
+cellule couverte par `4 mm` et `2 mm` doit donc recevoir une soustraction de
+`6 mm`, sans reboucher une cavité existante.
+
 <!-- P64-L09T-GEOMETRY -->
 ## Geometrie figee et annexes hybrides
 

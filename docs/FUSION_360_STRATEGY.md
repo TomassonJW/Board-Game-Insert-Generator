@@ -1,5 +1,22 @@
 # Fusion 360 Strategy
 
+<!-- P64-L09U-R8-FUSION -->
+## Frontière R8 des corps positifs
+
+Fusion reçoit les créations et unions positives d’un conteneur finalisé sous
+la politique `finalized_container_union_v3`. Cette politique ne représente
+aucun support de plateau ou de livret : elle matérialise seulement les prismes
+`final_*` déjà décidés et certifiés par le cœur Python.
+
+Le squelette Fusion vérifie toujours l’ordre topologique et les vraies attaches
+X/Y. Il ne recalcule aucune dimension. Les opérations plates devront arriver
+ensuite comme soustractions distinctes ; R8-D ne modifie pas encore leur
+traduction Z ni l’exécuteur BRep.
+
+Les politiques historiques `bounded_xy_composite_v1` et
+`hybrid_xy_composite_v2` restent acceptées pour relire d’anciens artefacts,
+mais les nouveaux plans R8 publient uniquement v3.
+
 <!-- P64-L09T-FUSION -->
 ## Strategie P64-L09T
 

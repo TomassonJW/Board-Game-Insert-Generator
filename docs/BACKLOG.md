@@ -46,13 +46,17 @@
 
 ### P64-L09U-R8-D — Conteneurs finalisés avant encastrement
 
-- Statut : `ready`.
+- Statut : `done-automated-validated`.
 - Remplir la boîte avec les conteneurs tout en réservant les hauteurs locales.
 - Recertifier fonds, parois, cavités et accès.
+- Résultat : géométrie positive v3 attribuée aux seuls conteneurs, digest figé,
+  aucun champ exécutable `cad_*` et compteurs positifs plats nuls.
+- Preuve :
+  `docs/P64_L09U_R8_D_FINALIZED_CONTAINER_GEOMETRY_EVIDENCE.md`.
 
-### P64-L09U-R8-E — Passe d'encastrement soustractive
+### P64-L09U-R8-E — Passe d’encastrement soustractive
 
-- Statut : `blocked-by-R8-D`.
+- Statut : `ready`.
 - Profondeurs locales exactes `4/2/6 mm`.
 - Zéro union, zéro corps et zéro volume positif attribuables aux éléments plats.
 

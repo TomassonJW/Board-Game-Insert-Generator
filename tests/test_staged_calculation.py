@@ -421,7 +421,7 @@ class StagedCalculationTests(unittest.TestCase):
         )
         self.assertTrue(
             all(
-                value.policy == "hybrid_xy_composite_v2"
+                value.policy == "finalized_container_union_v3"
                 and value.attachment_axis in {"x", "y"}
                 for value in fusion.additive_prism_joins
             )

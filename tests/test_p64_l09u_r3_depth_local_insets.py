@@ -483,7 +483,10 @@ class P64L09UR3DepthLocalInsetsTests(unittest.TestCase):
         )
 
         self.assertEqual(len(cells), 1)
-        self.assertEqual(cells[0]["final_size_mm"], (40.0, 30.0, 10.0))
+        self.assertEqual(
+            cells[0]["closure_size_mm"],
+            (40.0, 30.0, 10.0),
+        )
 
     def test_final_material_certificate_reaches_fusion_plan(self) -> None:
         certificate = self.stepped_plan["finalization"][
@@ -495,15 +498,26 @@ class P64L09UR3DepthLocalInsetsTests(unittest.TestCase):
         composite_certificate = self.stepped_plan["finalization"][
             "composite_materialization_certificate"
         ]
-        self.assertTrue(
-            composite_certificate[
-                "no_additive_volume_above_final_bodies"
-            ]
-        )
         self.assertEqual(
             composite_certificate[
-                "additive_above_final_residual_volume_mm3"
+                "container_fill_subtraction_balance_error_mm3"
             ],
+            0.0,
+        )
+        geometry_certificate = composite_certificate[
+            "finalized_container_geometry_certificate"
+        ]
+        self.assertTrue(geometry_certificate["certified"])
+        self.assertEqual(
+            geometry_certificate["flat_positive_body_count"],
+            0,
+        )
+        self.assertEqual(
+            geometry_certificate["flat_positive_union_count"],
+            0,
+        )
+        self.assertEqual(
+            geometry_certificate["flat_positive_volume_mm3"],
             0.0,
         )
         self.assertEqual(
@@ -719,12 +733,12 @@ class P64L09UR3DepthLocalInsetsTests(unittest.TestCase):
         }
         cad_prisms = [
             {
-                "cad_origin_mm": {"x": 0.0, "y": 0.0, "z": 0.0},
-                "cad_size_mm": {"x": 20.0, "y": 20.0, "z": 10.0},
+                "final_origin_mm": {"x": 0.0, "y": 0.0, "z": 0.0},
+                "final_size_mm": {"x": 20.0, "y": 20.0, "z": 10.0},
             },
             {
-                "cad_origin_mm": {"x": 20.0, "y": 0.0, "z": 0.0},
-                "cad_size_mm": {"x": 10.0, "y": 20.0, "z": 20.0},
+                "final_origin_mm": {"x": 20.0, "y": 0.0, "z": 0.0},
+                "final_size_mm": {"x": 10.0, "y": 20.0, "z": 20.0},
             },
         ]
 
@@ -749,13 +763,13 @@ class P64L09UR3DepthLocalInsetsTests(unittest.TestCase):
         cad_prisms = [
             {
                 "prism_id": "owner:under-tray",
-                "cad_origin_mm": {"x": 0.0, "y": 0.0, "z": 0.0},
-                "cad_size_mm": {"x": 5.0, "y": 10.0, "z": 20.0},
+                "final_origin_mm": {"x": 0.0, "y": 0.0, "z": 0.0},
+                "final_size_mm": {"x": 5.0, "y": 10.0, "z": 20.0},
             },
             {
                 "prism_id": "owner:outside-tray",
-                "cad_origin_mm": {"x": 5.0, "y": 0.0, "z": 0.0},
-                "cad_size_mm": {"x": 5.0, "y": 10.0, "z": 20.0},
+                "final_origin_mm": {"x": 5.0, "y": 0.0, "z": 0.0},
+                "final_size_mm": {"x": 5.0, "y": 10.0, "z": 20.0},
             },
         ]
         top_inset_cuts = [
@@ -864,12 +878,12 @@ class P64L09UR3DepthLocalInsetsTests(unittest.TestCase):
             [
                 {
                     "prism_id": "owner:shallow-inset",
-                    "cad_origin_mm": {
+                    "final_origin_mm": {
                         "x": 0.0,
                         "y": 0.0,
                         "z": 0.0,
                     },
-                    "cad_size_mm": {
+                    "final_size_mm": {
                         "x": 10.0,
                         "y": 10.0,
                         "z": 20.0,

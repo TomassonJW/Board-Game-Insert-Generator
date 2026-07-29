@@ -3880,6 +3880,7 @@ def _additive_prism_join_plans(
         if policy in {
             "bounded_xy_composite_v1",
             "hybrid_xy_composite_v2",
+            "finalized_container_union_v3",
         }:
             prism_id = _required_text(
                 parameters, "prism_id", f"body {blank.cad_id} composite prism"

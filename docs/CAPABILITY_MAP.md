@@ -10,11 +10,12 @@
 - `C-STAGED-CALCULATION` : `human-KO`, diagnostiqué. Le calcul minimal exige
   jusqu'à `90,991 s`; Normal et Long épuisent chacun une invocation SCIP sans
   candidat sur `CasLimite02+`.
-- `C-FINALIZATION` : `human-KO`, première divergence localisée. Le passage de
-  `final_size_mm` à `cad_size_mm` crée `125 019,76 mm³` conditionnés par les
-  réservations plates sur `CasLimite02++`.
-- `C-CAD-IR` : contrat spatial fidèle à l'amont, mais positif/soustractif
-  ambigu. Le certificat compense volume ajouté et coupe prévue.
+- `C-FINALIZATION` : R8-D `automated-validated`. Le composite v3 distingue la
+  fermeture de la géométrie positive du conteneur finalisé et supprime les
+  champs exécutables `cad_*`.
+- `C-CAD-IR` : R8-D `automated-validated` sur la frontière positive. Le digest
+  positif est figé avant les soustractions et la CAD IR refuse tout compteur
+  positif plat non nul.
 - `C-FUSION` : `human-KO`, cause mesurée. Trois coupes livret sont décalées de
   `+4 mm`; la BRep laisse `31 209,20 mm³` du vide demandé non retiré.
 - `C-PRODUCT-GRID` : acquis automatisé à préserver, résolution `0,1 mm`.
@@ -24,11 +25,10 @@
   prouve `0 mm³`, `0` corps, `0` union, `0` support et `0` coupe positifs liés
   aux éléments plats ; toute compensation Z est rejetée.
 - `C-RELEASE` : 0.1.78 `human-KO`, `do-not-run`; R8-A `done-diagnostic`,
-  R8-B `done-architecture`, R8-C `automated-validated`, R8-D `ready`.
+  R8-B `done-architecture`, R8-C et R8-D `automated-validated`, R8-E `ready`.
 - `C-PRINT` : `print-validated=false`.
 
-Prochaine frontière : R8-D, géométrie positive explicite et figée des
-conteneurs finalisés.
+Prochaine frontière : R8-E, passe plate distincte et uniquement soustractive.
 
 ### Historique R7 clôturé en human-KO
 

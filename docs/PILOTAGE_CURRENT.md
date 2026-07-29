@@ -42,8 +42,15 @@
 - Le certificat produit global contrôle cette frontière. Le solveur garde le
   même algorithme et les mêmes budgets sous l'identité
   `p64-l09u-r8-c-v1`.
-- R8-D est maintenant la mission unique `ready`. Elle doit figer la géométrie
-  positive des conteneurs finalisés et supprimer l'extension `cad_*`.
+- R8-D est terminée : `bgig.finalized_container_geometry.v1` fige la
+  géométrie positive des seuls conteneurs finalisés avant les soustractions.
+- `bgig.xy_composite_container_body.v3` distingue `closure_*` de `final_*` et
+  ne publie plus aucun champ exécutable `cad_*`.
+- Corps, unions, opérations et volume positifs liés aux éléments plats valent
+  zéro ; la CAD IR refuse toute divergence du certificat ou de son digest.
+- La validation ciblée R8-D passe `90/90`.
+- R8-E est maintenant la mission unique `ready`. Elle doit extraire une passe
+  d’encastrement uniquement négative et conserver le digest positif R8-D.
 - Les acquis R6/R7 restent à préserver : profondeurs, accès, parois minimales,
   ordre automatique, grille `0,1 mm`, BRep transitoire et projets personnels en
   lecture seule.
@@ -57,7 +64,8 @@ Autorités R8 :
 - `docs/P64_L09U_R8_A_SUBTRACTIVE_PIPELINE_DIAGNOSTIC_EVIDENCE.md` ;
 - `docs/DECISIONS/ADR-0105-conteneurs-finalises-et-encastrements-strictement-soustractifs.md` ;
 - `docs/P64_L09U_R8_B_SUBTRACTIVE_PIPELINE_DECISION_EVIDENCE.md` ;
-- `docs/P64_L09U_R8_C_MINIMAL_SUBTRACTIVE_BOUNDARY_EVIDENCE.md`.
+- `docs/P64_L09U_R8_C_MINIMAL_SUBTRACTIVE_BOUNDARY_EVIDENCE.md` ;
+- `docs/P64_L09U_R8_D_FINALIZED_CONTAINER_GEOMETRY_EVIDENCE.md`.
 
 ### Historique R7 clôturé en human-KO
 

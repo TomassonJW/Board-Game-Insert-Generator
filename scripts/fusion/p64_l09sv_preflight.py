@@ -239,7 +239,7 @@ def run_end_to_end(
             ),
             "all_annexes_xy": all(
                 join.attachment_axis in {"x", "y"}
-                and join.policy == "hybrid_xy_composite_v2"
+                and join.policy == "finalized_container_union_v3"
                 for join in fusion.additive_prism_joins
             ),
             "fusion_observed": False,
