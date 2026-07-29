@@ -27,15 +27,27 @@ L'essai de fin de front Normal est rejeté : `6,618 s`, mais digest divergent
 `269f…009`. L'arrêt historique du beam et les 12 candidats Approfondis restent
 donc inchangés.
 
-R9-C doit maintenant :
+R9-C a maintenant intégré :
 
 1. exécuter d'abord la première lane interne Approfondie exacte ;
 2. arrêter le portfolio quand cette lane possède une solution certifiée ;
 3. lancer SCIP seulement si ce préfixe interne échoue ;
-4. préserver le digest autoritaire, les deux SHA personnels et toute la
-   géométrie R8 ;
-5. rejouer les deux projets de bout en bout et vérifier que la finalisation et
-   la matérialisation restent rapides.
+4. préserver le digest autoritaire et les deux SHA personnels.
+
+Mesures orchestrées :
+
+- `CasLimite02+` : `10,013 s`, une lane, zéro SCIP ;
+- `CasLimite02++` : `9,791 s`, une lane, zéro SCIP ;
+- digest `a3ef…bc46` conservé.
+
+Action immédiate :
+
+1. fermer seulement le coût plat résiduel si un incrément exact reste
+   raisonnable ;
+2. rejouer les deux projets de bout en bout ;
+3. vérifier géométrie, finalisation, CAD IR, plan Fusion et matérialisation ;
+4. lancer la suite autorisée complète ;
+5. préparer et installer la candidate R9-D.
 
 Premier gain acquis avant routage :
 

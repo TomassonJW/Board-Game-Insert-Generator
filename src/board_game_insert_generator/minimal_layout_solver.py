@@ -103,7 +103,7 @@ from board_game_insert_generator.reserved_floor_stack_solver import (
 
 
 MINIMAL_LAYOUT_FAMILY_ID = "minimal_layout_portfolio"
-MINIMAL_LAYOUT_SOLVER_VERSION = "p64-l09u-r8-c-v1"
+MINIMAL_LAYOUT_SOLVER_VERSION = "p64-l09u-r9-c-v1"
 MINIMAL_LAYOUT_PORTFOLIO_SCHEMA_V1 = "bgig.minimal_layout_portfolio.v1"
 _AXES = ("x", "y", "z")
 _EPSILON = 0.0001
@@ -404,6 +404,47 @@ def solve_minimal_layout(
     deadline_at_ms = (
         started_at_ms + solver_deadline_seconds(effort_profile) * 1000.0
     )
+    prior_lane_reports: tuple[Mapping[str, object], ...] = ()
+    remaining_lane_specs: Sequence[MinimalLaneSpec] | None = None
+    if _uses_r9_certified_internal_prefix(
+        raw_project,
+        effort_profile=effort_profile,
+        initial_incumbent=initial_incumbent,
+    ):
+        deep_lanes = minimal_lane_specs(EFFORT_DEEP)
+        prefix_plan = _solve_minimal_layout_once(
+            raw_project,
+            effort_profile=effort_profile,
+            request_id=request_id,
+            request_revision=request_revision,
+            cancel_check=cancel_check,
+            container_frontiers=container_frontiers,
+            frontier_digests=frontier_digests,
+            lane_specs_override=deep_lanes[:1],
+            deadline_at_ms=deadline_at_ms,
+            initial_incumbent=None,
+            external_lane_enabled=False,
+            first_certified_lane_authority=True,
+            skipped_lane_ids=(
+                tuple(value.lane_id for value in deep_lanes[1:])
+                + (_SCIP_PRODUCT_LANE.lane_id,)
+            ),
+        )
+        prefix_status = _solver_result_status(prefix_plan)
+        if prefix_status in {
+            SOLUTION_FOUND,
+            INVALID_INPUT,
+            STALE_OR_CANCELLED,
+        }:
+            return prefix_plan
+        if _deadline_has_expired(deadline_at_ms):
+            return prefix_plan
+        prior_lane_reports = tuple(
+            _mapping_items(
+                _plan_search_provenance(prefix_plan).get("lanes")
+            )
+        )
+        remaining_lane_specs = deep_lanes[1:]
     if (
         initial_incumbent is None
         and isinstance(raw_project, Mapping)
@@ -448,6 +489,7 @@ def solve_minimal_layout(
             deadline_at_ms=deadline_at_ms,
             initial_incumbent=initial_incumbent,
             external_lane_enabled=initial_incumbent is None,
+            prior_lane_reports=prior_lane_reports,
         )
         primary_status = _solver_result_status(primary_plan)
         if primary_status in {
@@ -468,10 +510,30 @@ def solve_minimal_layout(
         cancel_check=cancel_check,
         container_frontiers=container_frontiers,
         frontier_digests=frontier_digests,
+        lane_specs_override=remaining_lane_specs,
         deadline_at_ms=deadline_at_ms,
         initial_incumbent=initial_incumbent,
         external_lane_report_override=external_fallback_report,
+        prior_lane_reports=prior_lane_reports,
     )
+
+
+def _uses_r9_certified_internal_prefix(
+    raw_project: object,
+    *,
+    effort_profile: str,
+    initial_incumbent: Mapping[str, object] | None,
+) -> bool:
+    """Select the exact Deep prefix only where R9 measured its authority."""
+
+    return bool(
+        effort_profile == EFFORT_DEEP
+        and initial_incumbent is None
+        and isinstance(raw_project, Mapping)
+        and raw_project.get("flat_items")
+        and len(_mapping_items(raw_project.get("container_groups"))) < 12
+    )
+
 
 def _solve_minimal_layout_once(
     raw_project: object,
@@ -488,6 +550,9 @@ def _solve_minimal_layout_once(
     initial_incumbent: Mapping[str, object] | None = None,
     external_lane_enabled: bool = False,
     external_lane_report_override: Mapping[str, object] | None = None,
+    prior_lane_reports: Sequence[Mapping[str, object]] = (),
+    first_certified_lane_authority: bool = False,
+    skipped_lane_ids: Sequence[str] = (),
 ) -> dict[str, object]:
     """Execute one explicit lane prefix or extension without orchestration."""
 
@@ -614,7 +679,14 @@ def _solve_minimal_layout_once(
     }
 
     aggregate = Counter()
-    lane_reports: list[dict[str, object]] = []
+    lane_reports = [
+        deepcopy(dict(value))
+        for value in prior_lane_reports
+    ]
+    for report in lane_reports:
+        for key, value in _mapping(report.get("telemetry")).items():
+            if isinstance(value, int) and not isinstance(value, bool):
+                aggregate[key] += value
     warm_start_proposal, warm_start_report = _certify_warm_start_incumbent(
         initial_incumbent,
         problem=certification_problem,
@@ -1371,6 +1443,14 @@ def _solve_minimal_layout_once(
             )
         ),
         "deadline_reached": deadline_reached,
+        "first_certified_lane_authority": (
+            first_certified_lane_authority
+        ),
+        "skipped_lane_ids": list(skipped_lane_ids),
+        "scip_fallback_invoked": bool(
+            external_lane_report is not None
+            and external_lane_report.get("invocation_count")
+        ),
         "stop_reason": (
             "global_deadline_reached_with_candidate"
             if deadline_reached
@@ -1383,7 +1463,11 @@ def _solve_minimal_layout_once(
                     else (
                         "certified_witness_incumbent_preserved_after_lane_search"
                         if witness_selected
-                        else "bounded_lane_prefix_completed"
+                        else (
+                            "first_certified_lane_completed"
+                            if first_certified_lane_authority
+                            else "bounded_lane_prefix_completed"
+                        )
                     )
                 )
             )
@@ -1451,7 +1535,11 @@ def _solve_minimal_layout_once(
             "propagation_id": selected.lane.propagation_id,
             "translation_id": selected.translation_id,
             "placement_digest": selected.certified.placement_digest,
-            "statement": "best_certified_proposal_found_within_budget",
+            "statement": (
+                "best_certified_proposal_from_first_certified_lane_within_budget"
+                if first_certified_lane_authority
+                else "best_certified_proposal_found_within_budget"
+            ),
             "floor_first_rank": _floor_first_rank_diagnostic(
                 selected.certified.plan
             ),

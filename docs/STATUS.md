@@ -37,6 +37,9 @@ Statut : `P64-L09U-R8-V-human-positive-partial`,
 - Le premier incrément R9-C déduplique les rangs plats dans un seul appel :
   `10,341 s` sur `CasLimite02+` et `9,288 s` sur `CasLimite02++`, avec digest
   `a3ef…bc46` et SHA personnels inchangés.
+- Le routage R9-C complet mesure `10,013 s` sur `CasLimite02+` et `9,791 s`
+  sur `CasLimite02++` : une lane, zéro appel SCIP, digest autoritaire
+  inchangé.
 - La fin de front Normal est explicitement rejetée : elle atteint `6,618 s`
   mais change le digest en `269f…009`.
 - Le GO autonome va jusqu'à une nouvelle candidate Fusion installée et une

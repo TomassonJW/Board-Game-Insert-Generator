@@ -3,8 +3,10 @@
 <!-- P64-L09U-CAPABILITY -->
 ## P64-L09U-R9 — performance sous résultat fonctionnel constant
 
-- `C-STAGED-CALCULATION` : `human-KO` pour la performance. Les succès
-  autoritaires restent `90,991 s` et `87,192 s`.
+- `C-STAGED-CALCULATION` : la candidate reste `human-KO` aux temps
+  `90,991 s` et `87,192 s`. R9-C mesure désormais `10,013 s` et `9,791 s`
+  en automatisé : une lane, zéro SCIP, digest autoritaire préservé. La
+  performance Fusion reste à confirmer humainement.
 - `C-MINIMAL-LAYOUT` : R9-A `complete-diagnostic`, R9-B
   `complete-architecture`, R9-C `active`. Le digest
   autoritaire `a3ef2f44...8817bc46` vient de la première lane interne
@@ -22,8 +24,8 @@
   candidate installée.
 - `C-PRINT` : `print-validated=false`.
 
-Prochaine frontière : P64-L09U-R9-C, routage du préfixe interne certifié avant
-SCIP selon ADR-0106.
+Prochaine frontière : P64-L09U-R9-C, fermeture du coût plat résiduel puis
+validation complète avant candidate.
 
 ### Historique R8 positif fonctionnel, performance KO
 

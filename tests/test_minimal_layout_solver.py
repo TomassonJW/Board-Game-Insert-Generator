@@ -380,6 +380,103 @@ class MinimalLayoutSolverTests(unittest.TestCase):
         self.assertLessEqual(len(provenance["lanes"]), 9)
         self.assertEqual(provenance["finalization_invocation_count"], 0)
 
+    def test_deep_flat_project_certifies_internal_prefix_before_scip(self) -> None:
+        project = localized_reservation_project()
+
+        with (
+            patch(
+                "board_game_insert_generator.minimal_layout_solver."
+                "scip_product_runtime_configured",
+                return_value=True,
+            ),
+            patch(
+                "board_game_insert_generator.minimal_layout_solver."
+                "solve_scip_product_3d"
+            ) as external_solver,
+        ):
+            plan = solve_minimal_layout(project, effort_profile="deep")
+
+        self.assertEqual(plan["solver"]["result"]["status"], SOLUTION_FOUND)
+        external_solver.assert_not_called()
+        provenance = plan["minimal_layout"]["search_provenance"]
+        self.assertTrue(provenance["first_certified_lane_authority"])
+        self.assertFalse(provenance["scip_fallback_invoked"])
+        self.assertEqual(
+            provenance["lane_prefix_ids"],
+            ["historical_legacy_corner"],
+        )
+        self.assertIn(
+            "external_scip_real_3d",
+            provenance["skipped_lane_ids"],
+        )
+        self.assertEqual(
+            provenance["selected"]["statement"],
+            "best_certified_proposal_from_first_certified_lane_within_budget",
+        )
+
+    def test_deep_flat_prefix_failure_keeps_scip_as_honest_fallback(self) -> None:
+        project = localized_reservation_project()
+        prefix_report = {
+            "lane_id": "historical_legacy_corner",
+            "telemetry": {"search_states": 12},
+        }
+
+        def plan(
+            status: str,
+            *,
+            lanes: list[dict[str, object]] | None = None,
+        ) -> dict[str, object]:
+            return {
+                "solver": {
+                    "result": {"status": status},
+                    "telemetry": {"stop_reason": "bounded_test_result"},
+                },
+                "minimal_layout": {
+                    "search_provenance": {
+                        "lanes": lanes or [],
+                    }
+                },
+            }
+
+        prefix_failure = plan(
+            NO_SOLUTION_WITHIN_BUDGET,
+            lanes=[prefix_report],
+        )
+        projection_failure = plan(NO_SOLUTION_WITHIN_BUDGET)
+        scip_success = plan(SOLUTION_FOUND)
+
+        with (
+            patch(
+                "board_game_insert_generator.minimal_layout_solver."
+                "scip_product_runtime_configured",
+                return_value=True,
+            ),
+            patch(
+                "board_game_insert_generator.minimal_layout_solver."
+                "_solve_minimal_layout_once",
+                side_effect=(
+                    prefix_failure,
+                    projection_failure,
+                    scip_success,
+                ),
+            ) as solve_once,
+        ):
+            result = solve_minimal_layout(project, effort_profile="deep")
+
+        self.assertIs(result, scip_success)
+        self.assertEqual(solve_once.call_count, 3)
+        first_call = solve_once.call_args_list[0].kwargs
+        self.assertEqual(
+            [value.lane_id for value in first_call["lane_specs_override"]],
+            ["historical_legacy_corner"],
+        )
+        fallback_call = solve_once.call_args_list[2].kwargs
+        self.assertTrue(fallback_call["external_lane_enabled"])
+        self.assertEqual(
+            fallback_call["prior_lane_reports"],
+            (prefix_report,),
+        )
+
     def test_open_thin_stack_is_allowed_by_envelope_support(self) -> None:
         project = _project_from_dimensions(
             {

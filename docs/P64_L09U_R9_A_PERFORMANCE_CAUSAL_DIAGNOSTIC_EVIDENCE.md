@@ -190,6 +190,23 @@ La recherche beam reste entre 2,29 et 2,30 s. Le coût résiduel reste dans les
 13 certifications et 15 résolutions de poses plates ; il n'est pas déplacé
 vers la finalisation ou la matérialisation.
 
+## Routage R9-C mesuré
+
+Le profil Approfondi des projets avec éléments plats et moins de douze groupes
+exécute désormais la première lane interne exacte avant SCIP.
+
+Les deux replays orchestrés complets donnent :
+
+| Projet | Calcul 0.1.79 | Calcul R9-C | SCIP | Lanes | Digest |
+|---|---:|---:|---:|---:|---|
+| `CasLimite02+` | 90,991 s | 10,013 s | 0 | 1 | `a3ef…bc46` |
+| `CasLimite02++` | 87,192 s | 9,791 s | 0 | 1 | `a3ef…bc46` |
+
+Le gain atteint environ 89 % sans augmenter un budget ou un plafond. Le profil
+Normal n'emprunte pas clandestinement les limites Approfondies ; son contrat
+reste inchangé. Si le préfixe Approfondi ne certifie aucune solution, le
+rapport de lane est conservé et SCIP reste un repli honnête.
+
 ## Mémoire
 
 Le replay Normal passe d'environ 46,4 Mio à 54,0 Mio de working set, avec un
@@ -208,6 +225,7 @@ est du calcul répété.
 | projection interne Normal, puis recertification | 4,118 s (`+`) ; 3,902 s (`++`) | digest `3ca1…696a` | rapide mais disposition différente, refusée |
 | première lane interne Approfondie complète | 13,363 s | digest autoritaire `a3ef…bc46` | base fonctionnelle retenue |
 | première lane + déduplication locale exacte de rang | 10,341 s (`+`) ; 9,288 s (`++`) | digest autoritaire | incrément R9-B retenu |
+| routage orchestré du préfixe avant SCIP | 10,013 s (`+`) ; 9,791 s (`++`) | digest autoritaire, 0 SCIP, 1 lane | incrément R9-C retenu |
 | front Normal terminé puis limité à six candidats | 6,618 s | digest `269f…009` | plus rapide mais ensemble de choix élargi, refusé |
 | optimisation SCIP seule | non retenue | premier témoin SCIP rejeté | mauvais chemin d'autorité |
 | hausse de budget ou de candidats | non mesurée | masquerait le coût | interdite |

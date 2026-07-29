@@ -29,10 +29,12 @@
   strictement locale des classements plats.
 - Le premier incrément R9-C conserve le digest autoritaire et mesure
   `10,341 s` sur `CasLimite02+`, `9,288 s` sur `CasLimite02++`.
+- Le routage orchestré du préfixe avant SCIP mesure ensuite `10,013 s` et
+  `9,791 s` : une lane, zéro appel SCIP, digest `a3ef…bc46` inchangé.
 - La fin de front Normal à `6,618 s` est rejetée car elle produit
   `269f…009` ; l'arrêt historique du beam reste inchangé.
-- P64-L09U-R9-C est l'action courante. Elle doit router ce préfixe avant SCIP
-  et maximiser la performance sous
+- P64-L09U-R9-C est l'action courante. Elle doit fermer le coût plat résiduel
+  si un incrément exact reste raisonnable, puis valider de bout en bout sous
   résultat fonctionnel constant, sans nouvelle valeur physique, sans dégrader
   la grille, sans gonfler les budgets et sans perdre de solution certifiée.
 - Les deux projets personnels restent strictement en lecture seule avec SHA

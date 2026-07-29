@@ -46,7 +46,11 @@
 - Essai de fin de front Normal : rejeté malgré `6,618 s`, car digest divergent
   `269f…009`.
 - Incrément suivant : première lane interne Approfondie avant SCIP, arrêt du
-  portfolio sur certification, SCIP en repli seulement.
+  portfolio sur certification, SCIP en repli seulement — intégré :
+  `10,013 s` et `9,791 s`, une lane, zéro SCIP, digest autoritaire conservé.
+- Incrément suivant : optimiser seulement un coût plat exact encore dominant,
+  si le gain reste causal et sans changement de résultat, puis validation
+  complète.
 
 ### P64-L09U-R9-D — Candidate et gate finale
 
