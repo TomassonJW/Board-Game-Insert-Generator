@@ -1,6 +1,28 @@
 # Capability Map
 
 <!-- P64-L09U-CAPABILITY -->
+## P64-L09U-R9 — performance sous résultat fonctionnel constant
+
+- `C-STAGED-CALCULATION` : `human-KO` pour la performance. Les succès
+  autoritaires restent `90,991 s` et `87,192 s`.
+- `C-MINIMAL-LAYOUT` : R9-A `ready-diagnostic`. Le résultat certifié courant,
+  ses digests fonctionnels et sa capacité doivent être préservés.
+- `C-OBSERVABILITY` : lacune connue sur la lane/solveur des succès SCIP
+  approfondis ; attribution causale requise avant optimisation.
+- `C-PRODUCT-GRID` : `0,1 mm`, acquis obligatoire. L'epsilon interne reste
+  distinct et ne crée aucune position candidate.
+- `C-FINALIZATION` et `C-MATERIALIZATION` : positifs dans l'observation
+  humaine ; les mesures historiques restent environ `2,1 s` et `0,8 s`.
+- `C-FUSION` : géométrie, ordre et dispositions 0.1.79 `human-positive` ;
+  performance KO, donc `fusion-validated=false` globalement.
+- `C-RELEASE` : 0.1.79 `human-positive-partial`; R9 ira jusqu'à une nouvelle
+  candidate installée.
+- `C-PRINT` : `print-validated=false`.
+
+Prochaine frontière : P64-L09U-R9-A, diagnostic causal de performance.
+
+### Historique R8 positif fonctionnel, performance KO
+
 ## P64-L09U-R8 — pipeline soustractif des éléments plats
 
 - `C-CAVITY` : régression humaine en 0.1.78 ; certaines cavités sont fermées,
@@ -15,10 +37,9 @@
   plates.
 - `C-CAD-IR` : R8-F `automated-validated`. Aperçu et CAD IR reconstruisent le
   même plan soustractif et contrôlent digest, certificat et intervalles.
-- `C-FUSION` : R8-F `automated-validated`, `fusion-validated=false`. Les
-  replays personnels prouvent `20/20` et `23/23` opérations identiques
-  jusqu’à l’intervalle BRep ; la candidate 0.1.79 est installée et
-  l’observation humaine R8-V reste nécessaire.
+- `C-FUSION` : R8-F `automated-validated` et 0.1.79 `human-positive` pour la
+  géométrie, l'ordre et les dispositions. La performance reste KO ;
+  `fusion-validated=false` globalement.
 - `C-PRODUCT-GRID` : acquis automatisé à préserver, résolution `0,1 mm`.
 - `C-QUALITY` : préparateur `153/153`, suite autorisée `945/945`, un test
   SCIP ignoré, douze modules interdits exclus avant import et deux replays
@@ -30,10 +51,10 @@
   aux éléments plats ; toute compensation Z est rejetée.
 - `C-RELEASE` : 0.1.78 `human-KO`, `do-not-run`; R8-A `done-diagnostic`,
   R8-B `done-architecture`, R8-C à R8-G `automated-validated`; candidate
-  0.1.79 du commit `8baaaa9` installée et `ready-human-gate`.
+  0.1.79 du commit `8baaaa9` installée et `human-positive-partial`.
 - `C-PRINT` : `print-validated=false`.
 
-Prochaine frontière : gate humaine P64-L09U-R8-V.
+Prochaine frontière : P64-L09U-R9-A.
 
 ### Historique R7 clôturé en human-KO
 

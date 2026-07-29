@@ -1,6 +1,38 @@
 # Status
 
 <!-- P64-L09U-STATUS -->
+## P64-L09U-R9 — récupération de performance
+
+Date : 2026-07-29.
+
+Statut : `P64-L09U-R8-V-human-positive-partial`,
+`P64-L09U-R9-A-ready`, `fusion-validated=false`,
+`print-validated=false`.
+
+- Thomas juge conformes le résultat, l'ordre et les dispositions de la
+  candidate Fusion 0.1.79.
+- Le pipeline strictement soustractif R8 est humainement positif.
+- Le calcul reste proche de `1 min 30`, contre environ `4 s` historiquement :
+  la performance reste KO.
+- Les succès autoritaires documentés sont `90,991 s` et `87,192 s`.
+- La grille produit est déjà `0,1 mm` ; l'epsilon `0,0001 mm` n'est pas un pas
+  de recherche.
+- R9 doit maximiser la performance sans modifier le résultat fonctionnel, les
+  valeurs physiques, la grille, les budgets pour masquer le coût ou les
+  projets personnels.
+- R9-A attribue d'abord le coût exact et complète la télémétrie manquante des
+  succès SCIP.
+- Le GO autonome va jusqu'à une nouvelle candidate Fusion installée et une
+  recette humaine finale.
+
+Preuve humaine :
+`docs/P64_L09U_R8_V_0179_HUMAN_POSITIVE_PERFORMANCE_KO_EVIDENCE.md`.
+
+Handoff :
+`docs/P64_L09U_R9_PERFORMANCE_RECOVERY_HANDOFF.md`.
+
+### Historique R8 positif fonctionnel, performance KO
+
 ## P64-L09U-R8 — éléments plats strictement soustractifs
 
 Date : 2026-07-29.
@@ -12,7 +44,7 @@ Statut : `P64-L09U-R7-V-human-KO`, `do-not-run`,
 `P64-L09U-R8-E-automated-validated`,
 `P64-L09U-R8-F-automated-validated`,
 `P64-L09U-R8-G-automated-validated`, `installed-local`,
-`P64-L09U-R8-V-ready-human-gate`,
+`P64-L09U-R8-V-human-positive-partial`,
 `fusion-validated=false`, `print-validated=false`.
 
 - 0.1.78 est `human-KO`, `do-not-run`.
@@ -82,7 +114,9 @@ Statut : `P64-L09U-R7-V-human-KO`, `do-not-run`,
   ignoré, douze modules interdits exclus avant import.
 - Le package du commit `8baaaa9` est installé et vérifié ; manifeste 0.1.79,
   marqueur, runtime et réglages UI conformes.
-- P64-L09U-R8-V est maintenant la seule action restante.
+- P64-L09U-R8-V confirme humainement la géométrie, l'ordre et les dispositions.
+- La performance proche de `1 min 30` reste KO ; P64-L09U-R9-A est l'action
+  suivante.
 - Les acquis de profondeur, accès, parois, ordre, grille `0,1 mm` et BRep
   transitoire restent obligatoires.
 - Aucun benchmark/holdout/corpus/tournoi ; aucune UI manuelle.
@@ -107,6 +141,8 @@ Preuve R8-F :
 `docs/P64_L09U_R8_F_END_TO_END_FIDELITY_EVIDENCE.md`.
 Preuve candidate :
 `docs/P64_L09U_R8_0179_CORRECTIVE_EVIDENCE.md`.
+Preuve humaine 0.1.79 :
+`docs/P64_L09U_R8_V_0179_HUMAN_POSITIVE_PERFORMANCE_KO_EVIDENCE.md`.
 
 ### Historique R7 clôturé en human-KO
 

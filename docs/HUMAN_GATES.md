@@ -33,21 +33,26 @@ observation humaine porte uniquement sur cette nouvelle candidate.
 
 `fusion-validated=false`, `print-validated=false`.
 
-## P64-L09U-R8-V — gate 0.1.79 prête
+## P64-L09U-R8-V — observation positive, performance KO
 
-Statut : `ready-human-gate`, candidate 0.1.79 installée depuis `8baaaa9`,
-`fusion-validated=false`, `print-validated=false`.
+Statut : `human-positive-partial`, candidate 0.1.79 installée depuis
+`8baaaa9`, `fusion-validated=false`, `print-validated=false`.
 
-La candidate 0.1.79 et sa recette sont prêtes. Le préparateur réel passe
-`153/153` tests ciblés, deux replays personnels en lecture seule et le
-préflight strict stable `ebd2d0b0...3f71`.
+Thomas juge conformes le résultat, l'ordre et les dispositions. Aucun défaut
+géométrique R8 n'est signalé : le pipeline soustractif est humainement positif.
 
-La suite autorisée passe `945/945` et l’installation locale est vérifiée. La
-gate demande uniquement l’observation humaine de la scène Fusion réelle, sans
-sauvegarder les projets personnels.
+Le calcul reste toutefois proche de `1 min 30`, contre environ `4 s`
+historiquement. Cette régression de performance empêche la promotion globale
+en `fusion-validated` et ouvre P64-L09U-R9.
 
-Recette :
-`docs/P64_L09U_R8_V_0179_FUSION_GATE_RECIPE.md`.
+R8 ne doit pas être rejouée. Ses résultats fonctionnels deviennent des acquis
+obligatoires de la correction de performance.
+
+Preuve :
+`docs/P64_L09U_R8_V_0179_HUMAN_POSITIVE_PERFORMANCE_KO_EVIDENCE.md`.
+
+Handoff R9 :
+`docs/P64_L09U_R9_PERFORMANCE_RECOVERY_HANDOFF.md`.
 
 ### Préparation R7 historique
 

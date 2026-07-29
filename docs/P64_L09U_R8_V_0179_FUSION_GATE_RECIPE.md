@@ -1,8 +1,15 @@
 # P64-L09U-R8-V — recette Fusion 0.1.79
 
-Statut courant : `ready-human-gate`, candidate 0.1.79 installée depuis
-`8baaaa9`,
+Statut historique : gate exécutée, verdict `human-positive-partial`.
+La géométrie, l'ordre et les dispositions sont conformes ; la performance de
+calcul proche de `1 min 30` est KO.
 `fusion-validated=false`, `print-validated=false`.
+
+Ne pas rejouer cette recette. La suite canonique est P64-L09U-R9 :
+`docs/P64_L09U_R9_PERFORMANCE_RECOVERY_HANDOFF.md`.
+
+Preuve humaine :
+`docs/P64_L09U_R8_V_0179_HUMAN_POSITIVE_PERFORMANCE_KO_EVIDENCE.md`.
 
 Cette recette ne concerne que la candidate 0.1.79. Ne rejoue pas la gate
 0.1.78. Ne sauvegarde ni `CasLimite02+` ni `CasLimite02++`.

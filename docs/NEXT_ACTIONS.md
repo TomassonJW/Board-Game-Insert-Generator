@@ -1,7 +1,43 @@
 # Next Actions
 
 <!-- P64-L09U-NEXT -->
-## Action courante : P64-L09U-R8-V — gate Fusion 0.1.79
+## Action courante : P64-L09U-R9-A — diagnostic causal de performance
+
+Thomas confirme que le résultat, l'ordre et les dispositions de la candidate
+0.1.79 sont conformes. Le pipeline R8 est `human-positive` sur son contrat
+fonctionnel.
+
+Le calcul reste proche de `1 min 30`, contre environ `4 s` historiquement. La
+gate 0.1.79 est donc `human-positive-partial` : performance `human-KO`,
+`fusion-validated=false`, `print-validated=false`.
+
+R9-A doit :
+
+1. préserver strictement le résultat fonctionnel R8 ;
+2. attribuer le coût entre préparation, projection sans éléments plats, SCIP,
+   lanes internes, certification, finalisation et matérialisation ;
+3. compléter la télémétrie manquante des succès SCIP approfondis ;
+4. mesurer candidats, états, essais, complétions, rejets, temps et mémoire ;
+5. expliquer le passage d'environ `4 s` à `87–91 s` sans supposition ;
+6. comparer les options selon simplicité, robustesse, maintenance,
+   testabilité, gain probable et risque fonctionnel ;
+7. créer une ADR avant tout changement algorithmique structurant.
+
+La grille produit est déjà `0,1 mm`. L'epsilon interne `0,0001 mm` n'est pas
+un pas de recherche et ne doit pas être grossi.
+
+Le GO autonome est acquis jusqu'à une nouvelle candidate installée et une
+recette humaine finale. Les deux projets personnels restent en lecture seule
+avec SHA avant/après. Aucun benchmark, holdout, corpus ou tournoi solveur.
+
+Preuves et handoff :
+
+- `docs/P64_L09U_R8_V_0179_HUMAN_POSITIVE_PERFORMANCE_KO_EVIDENCE.md` ;
+- `docs/P64_L09U_R9_PERFORMANCE_RECOVERY_HANDOFF.md`.
+
+### Historique R8 — pipeline soustractif validé fonctionnellement
+
+## Ancienne action : P64-L09U-R8-V — gate Fusion 0.1.79
 
 0.1.78 est `human-KO`, `do-not-run`.
 
@@ -85,9 +121,9 @@ R8-G est terminée :
 - commit `8baaaa9` intégré et poussé dans `main` ;
 - add-in 0.1.79 et réglages locaux installés et vérifiés.
 
-La seule action restante est humaine : exécuter
-`docs/P64_L09U_R8_V_0179_FUSION_GATE_RECIPE.md` sans sauvegarder les deux
-projets personnels.
+La gate a reçu un verdict `human-positive-partial` : géométrie, ordre et
+dispositions conformes ; performance proche de `1 min 30` KO. R8 ne doit pas
+être rejouée.
 
 Preuves :
 
@@ -105,7 +141,8 @@ Hand-off :
 `docs/P64_L09U_R8_SUBTRACTIVE_FLAT_INSETS_HANDOFF.md`.
 
 Aucun benchmark/holdout/corpus/tournoi. Les projets personnels restent en
-lecture seule. `fusion-validated=false`, `print-validated=false`.
+lecture seule. La suite active est R9 ;
+`fusion-validated=false`, `print-validated=false`.
 
 ### Historique R7 clôturé en human-KO
 

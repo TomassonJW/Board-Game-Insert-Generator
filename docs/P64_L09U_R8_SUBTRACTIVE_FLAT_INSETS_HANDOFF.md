@@ -2,7 +2,13 @@
 
 Date : 2026-07-28.
 
-Statut d'entrée : `ready`, GO direct acquis.
+Statut historique : R8 terminé, candidate 0.1.79
+`human-positive-partial`. La géométrie est conforme ; la performance est KO.
+
+Ne pas relancer ce handoff. La suite canonique est :
+`docs/P64_L09U_R9_PERFORMANCE_RECOVERY_HANDOFF.md`.
+
+Statut d'entrée historique : `ready`, GO direct acquis.
 
 ## Verdict de départ
 

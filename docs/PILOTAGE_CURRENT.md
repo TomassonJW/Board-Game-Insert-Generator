@@ -1,6 +1,41 @@
 # Pilotage courant
 
 <!-- P64-L09U-CURRENT -->
+## Reprise canonique P64-L09U-R9
+
+- Thomas juge le résultat, l'ordre et les dispositions de la candidate 0.1.79
+  conformes dans Fusion.
+- Le pipeline strictement soustractif R8 est donc `human-positive` sur son
+  contrat fonctionnel.
+- Le calcul reste proche de `1 min 30`, contre environ `4 s` historiquement :
+  la performance est `human-KO`.
+- La gate 0.1.79 est `human-positive-partial` ;
+  `fusion-validated=false`, `print-validated=false`.
+- Les succès historiques documentés restent `90,991 s` sur
+  `CasLimite02+` et `87,192 s` sur `CasLimite02++`.
+- La finition et la matérialisation historiques restent rapides, environ
+  `2,1 s` puis `0,8 s` ; le goulet connu est la recherche de disposition.
+- La grille produit est déjà `0,1 mm`. L'epsilon interne `0,0001 mm` sert aux
+  comparaisons et n'est pas un pas de recherche.
+- P64-L09U-R9 doit maximiser la performance sous résultat fonctionnel constant,
+  sans nouvelle valeur physique, sans dégrader la grille, sans gonfler les
+  budgets et sans perdre de solution certifiée.
+- R9-A commence par une attribution causale complète : préparation, projection,
+  SCIP, lanes internes, certification, finalisation et matérialisation.
+- Les deux projets personnels restent strictement en lecture seule avec SHA
+  avant/après ; aucun benchmark, holdout, corpus ou tournoi n'est autorisé.
+- Le GO autonome R9 est acquis. Le Goal va jusqu'à une nouvelle candidate
+  installée et une recette humaine finale.
+
+Autorités R9 :
+
+- `docs/P64_L09U_R8_V_0179_HUMAN_POSITIVE_PERFORMANCE_KO_EVIDENCE.md` ;
+- `docs/P64_L09U_R9_PERFORMANCE_RECOVERY_HANDOFF.md` ;
+- `docs/P64_L09U_R8_A_SUBTRACTIVE_PIPELINE_DIAGNOSTIC_EVIDENCE.md` ;
+- ADR-0103, ADR-0104 et ADR-0105.
+
+### Historique R8 positif fonctionnel, performance KO
+
 ## Reprise canonique P64-L09U-R8
 
 - `0.1.78` est `human-KO`, `do-not-run`.
@@ -71,13 +106,15 @@
 - La suite autorisée finale passe `945/945` en `650,355 s`, avec une
   intégration SCIP native ignorée et douze modules interdits exclus avant
   import.
-- La prochaine action unique est la gate humaine P64-L09U-R8-V selon la
-  recette 0.1.79.
+- R8-V est `human-positive` sur la géométrie, l'ordre, les dispositions et le
+  pipeline soustractif ; la performance proche de `1 min 30` reste KO.
+- La prochaine action unique est P64-L09U-R9-A.
 - Les acquis R6/R7 restent à préserver : profondeurs, accès, parois minimales,
   ordre automatique, grille `0,1 mm`, BRep transitoire et projets personnels en
   lecture seule.
 - Aucun benchmark/holdout/corpus/tournoi, aucune UI manuelle ;
-  `fusion-validated=false`, `print-validated=false`.
+  gate globale `human-positive-partial`, `fusion-validated=false`,
+  `print-validated=false`.
 
 Autorités R8 :
 
@@ -91,7 +128,8 @@ Autorités R8 :
 - `docs/P64_L09U_R8_E_SUBTRACTIVE_FLAT_INSET_PLAN_EVIDENCE.md` ;
 - `docs/P64_L09U_R8_F_END_TO_END_FIDELITY_EVIDENCE.md` ;
 - `docs/P64_L09U_R8_0179_CORRECTIVE_EVIDENCE.md` ;
-- `docs/P64_L09U_R8_V_0179_FUSION_GATE_RECIPE.md`.
+- `docs/P64_L09U_R8_V_0179_FUSION_GATE_RECIPE.md` ;
+- `docs/P64_L09U_R8_V_0179_HUMAN_POSITIVE_PERFORMANCE_KO_EVIDENCE.md`.
 
 ### Historique R7 clôturé en human-KO
 

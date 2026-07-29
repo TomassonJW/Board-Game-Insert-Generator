@@ -6,6 +6,32 @@ et la lecture par capabilities dans `docs/CAPABILITY_MAP.md`. La nomenclature
 et le role de ces documents sont definis dans `docs/PILOTAGE_GLOSSARY.md`.
 
 <!-- P64-L09U-ROADMAP -->
+## Correctif P64-L09U-R9 — récupération de performance
+
+La candidate 0.1.79 est humainement positive pour le résultat, l'ordre, les
+dispositions et le pipeline strictement soustractif. Son calcul reste proche
+de `1 min 30`, contre environ `4 s` historiquement.
+
+```text
+P64-L09U-R8-V human-positive-partial 0.1.79
+  -> R9-A diagnostic causal et télémétrie complète [ready]
+  -> R9-B ADR d'optimisation [pending]
+  -> R9-C optimisations incrémentales mesurées [pending]
+  -> R9-D candidate installée [pending]
+  -> P64-L09U-R9-V gate Fusion performance + non-régression [pending]
+```
+
+R9 conserve la grille `0,1 mm`, les valeurs physiques, la capacité, les
+certificats et la géométrie R8. Aucun budget ne peut être augmenté pour masquer
+le coût.
+
+Preuve :
+`docs/P64_L09U_R8_V_0179_HUMAN_POSITIVE_PERFORMANCE_KO_EVIDENCE.md`.
+Handoff :
+`docs/P64_L09U_R9_PERFORMANCE_RECOVERY_HANDOFF.md`.
+
+### Historique R8 positif fonctionnel, performance KO
+
 ## Correctif P64-L09U-R8 — pipeline soustractif des éléments plats
 
 0.1.78 est `human-KO`. Malgré les contrats R7 automatisés, la scène contient
@@ -21,7 +47,7 @@ P64-L09U-R7-V human-KO 0.1.78
   -> R8-E encastrements par coupes seulement [done]
   -> R8-F fidélité et régressions de bout en bout [done]
   -> R8-G candidate 0.1.79 [done-installed]
-  -> P64-L09U-R8-V gate Fusion humaine [current]
+  -> P64-L09U-R8-V human-positive-partial [done]
 ```
 
 Le futur placement manuel des plateaux/livrets reste compatible avec les

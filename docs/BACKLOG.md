@@ -1,6 +1,54 @@
 # Backlog
 
 <!-- P64-L09U-BACKLOG -->
+## Correctif P64-L09U-R9 — récupération de performance
+
+### P64-L09U-R8-V — Verdict humain Fusion 0.1.79
+
+- Statut : `done-human-positive-partial`.
+- Acquis : résultat, ordre, dispositions et pipeline soustractif conformes.
+- Bloquant : calcul proche de `1 min 30`, contre environ `4 s`
+  historiquement.
+- `fusion-validated=false`, `print-validated=false`.
+- Preuve :
+  `docs/P64_L09U_R8_V_0179_HUMAN_POSITIVE_PERFORMANCE_KO_EVIDENCE.md`.
+
+### P64-L09U-R9-A — Diagnostic causal de performance
+
+- Statut : `ready`.
+- Attribuer le coût exact entre préparation, projection, SCIP, lanes internes,
+  certification, finalisation et matérialisation.
+- Compléter la télémétrie des succès approfondis.
+- Mesurer candidats, états, essais, complétions, rejets, temps et mémoire.
+- Expliquer le passage d'environ `4 s` à `87–91 s`.
+- Ne pas corriger avant d'avoir comparé les options.
+
+### P64-L09U-R9-B — ADR d'optimisation
+
+- Statut : `pending`, dépend de R9-A.
+- Comparer déduplication, symétries, propagation, incumbent, arrêt précoce
+  certifié et suppression de travail répété.
+- Préserver le résultat fonctionnel, la capacité et les statuts honnêtes.
+
+### P64-L09U-R9-C — Optimisations incrémentales
+
+- Statut : `pending`, dépend de R9-B.
+- Un changement causal, testé, mesuré, documenté et intégré à la fois.
+- Aucun budget augmenté, aucune grille ou valeur physique modifiée.
+- Replays personnels strictement en lecture seule avec SHA avant/après.
+
+### P64-L09U-R9-D — Candidate et gate finale
+
+- Statut : `pending`, dépend des gains R9-C et de la validation complète.
+- Préparer, intégrer et installer automatiquement la nouvelle candidate.
+- Thomas reçoit uniquement la recette humaine finale de performance et de
+  non-régression géométrique.
+
+Handoff :
+`docs/P64_L09U_R9_PERFORMANCE_RECOVERY_HANDOFF.md`.
+
+### Historique R8 positif fonctionnel, performance KO
+
 ## Correctif P64-L09U-R8
 
 ### P64-L09U-R7-V — Gate humaine Fusion 0.1.78
@@ -87,13 +135,12 @@
 
 ### P64-L09U-R8-V — Gate humaine Fusion 0.1.79
 
-- Statut : `ready-human-gate`.
+- Statut : `done-human-positive-partial`.
 - Ne pas sauvegarder `CasLimite02+` ou `CasLimite02++`.
-- Vérifier les corps imprimables, les profondeurs `2/4/6 mm`, les cavités,
-  les accès, les parois, l’ordre automatique et l’absence de matière positive
-  liée aux éléments plats.
-- Recette :
-  `docs/P64_L09U_R8_V_0179_FUSION_GATE_RECIPE.md`.
+- Résultat, ordre, dispositions et pipeline soustractif jugés conformes.
+- Performance proche de `1 min 30` KO ; reprise dans R9.
+- Preuve :
+  `docs/P64_L09U_R8_V_0179_HUMAN_POSITIVE_PERFORMANCE_KO_EVIDENCE.md`.
 
 Hand-off :
 `docs/P64_L09U_R8_SUBTRACTIVE_FLAT_INSETS_HANDOFF.md`.
