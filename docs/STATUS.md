@@ -6,7 +6,8 @@
 Date : 2026-07-29.
 
 Statut : `P64-L09U-R8-V-human-positive-partial`,
-`P64-L09U-R9-A-ready`, `fusion-validated=false`,
+`P64-L09U-R9-A-complete`, `P64-L09U-R9-B-active`,
+`fusion-validated=false`,
 `print-validated=false`.
 
 - Thomas juge conformes le résultat, l'ordre et les dispositions de la
@@ -20,13 +21,29 @@ Statut : `P64-L09U-R8-V-human-positive-partial`,
 - R9 doit maximiser la performance sans modifier le résultat fonctionnel, les
   valeurs physiques, la grille, les budgets pour masquer le coût ou les
   projets personnels.
-- R9-A attribue d'abord le coût exact et complète la télémétrie manquante des
-  succès SCIP.
+- R9-A reproduit le KO : `23,408 s` en Normal sans solution et `92,968 s` en
+  Approfondi avec solution.
+- Les projets avec et sans éléments plats produisent le même payload SCIP
+  `77182c19...900bc183`.
+- SCIP consomme environ `68,1 s`, puis son témoin est rejeté par
+  `MINIMAL_ENVELOPE_EXPANDED`.
+- Le résultat humain vient de la première lane interne Approfondie et porte le
+  digest `a3ef2f44...8817bc46`.
+- La variante interne Normal à environ `4 s` a été refusée car elle change la
+  disposition.
+- ADR-0106 est acceptée ; R9-B implémente le préfixe interne certifié, l'arrêt
+  sur sa première lane certifiée et SCIP seulement en repli.
 - Le GO autonome va jusqu'à une nouvelle candidate Fusion installée et une
   recette humaine finale.
 
 Preuve humaine :
 `docs/P64_L09U_R8_V_0179_HUMAN_POSITIVE_PERFORMANCE_KO_EVIDENCE.md`.
+
+Diagnostic R9-A :
+`docs/P64_L09U_R9_A_PERFORMANCE_CAUSAL_DIAGNOSTIC_EVIDENCE.md`.
+
+Décision R9-B :
+`docs/DECISIONS/ADR-0106-prefixe-interne-certifie-avant-scip.md`.
 
 Handoff :
 `docs/P64_L09U_R9_PERFORMANCE_RECOVERY_HANDOFF.md`.

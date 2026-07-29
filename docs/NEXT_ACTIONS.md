@@ -1,7 +1,7 @@
 # Next Actions
 
 <!-- P64-L09U-NEXT -->
-## Action courante : P64-L09U-R9-A — diagnostic causal de performance
+## Action courante : P64-L09U-R9-B — préfixe interne certifié
 
 Thomas confirme que le résultat, l'ordre et les dispositions de la candidate
 0.1.79 sont conformes. Le pipeline R8 est `human-positive` sur son contrat
@@ -11,17 +11,31 @@ Le calcul reste proche de `1 min 30`, contre environ `4 s` historiquement. La
 gate 0.1.79 est donc `human-positive-partial` : performance `human-KO`,
 `fusion-validated=false`, `print-validated=false`.
 
-R9-A doit :
+R9-A est terminé :
 
-1. préserver strictement le résultat fonctionnel R8 ;
-2. attribuer le coût entre préparation, projection sans éléments plats, SCIP,
-   lanes internes, certification, finalisation et matérialisation ;
-3. compléter la télémétrie manquante des succès SCIP approfondis ;
-4. mesurer candidats, états, essais, complétions, rejets, temps et mémoire ;
-5. expliquer le passage d'environ `4 s` à `87–91 s` sans supposition ;
-6. comparer les options selon simplicité, robustesse, maintenance,
-   testabilité, gain probable et risque fonctionnel ;
-7. créer une ADR avant tout changement algorithmique structurant.
+1. les deux préparations appellent le même payload SCIP ;
+2. SCIP consomme environ `68,1 s` avant un témoin rejeté ;
+3. le résultat humain vient de la première lane interne Approfondie ;
+4. son digest de placement autoritaire est `a3ef2f44...8817bc46` ;
+5. la voie Normal à environ `4 s` est refusée car elle produit une autre
+   disposition.
+
+R9-B doit maintenant implémenter ADR-0106 par incréments :
+
+1. terminer le front interne déjà ouvert sans augmenter les budgets ni le
+   plafond de candidats publiés ;
+2. conserver les meilleures complétions selon les axes géométriques produit ;
+3. certifier le lot borné contre le projet complet ;
+4. arrêter sur la première lane certifiée ;
+5. lancer SCIP seulement si le préfixe interne échoue ;
+6. supprimer les classements plats strictement répétés dans un appel ;
+7. préserver le digest autoritaire, les deux SHA personnels et toute la
+   géométrie R8.
+
+Preuves :
+
+- `docs/P64_L09U_R9_A_PERFORMANCE_CAUSAL_DIAGNOSTIC_EVIDENCE.md` ;
+- `docs/DECISIONS/ADR-0106-prefixe-interne-certifie-avant-scip.md`.
 
 La grille produit est déjà `0,1 mm`. L'epsilon interne `0,0001 mm` n'est pas
 un pas de recherche et ne doit pas être grossi.

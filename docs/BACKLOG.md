@@ -15,24 +15,28 @@
 
 ### P64-L09U-R9-A — Diagnostic causal de performance
 
-- Statut : `ready`.
+- Statut : `done-diagnostic`.
 - Attribuer le coût exact entre préparation, projection, SCIP, lanes internes,
   certification, finalisation et matérialisation.
 - Compléter la télémétrie des succès approfondis.
 - Mesurer candidats, états, essais, complétions, rejets, temps et mémoire.
 - Expliquer le passage d'environ `4 s` à `87–91 s`.
 - Ne pas corriger avant d'avoir comparé les options.
+- Preuve :
+  `docs/P64_L09U_R9_A_PERFORMANCE_CAUSAL_DIAGNOSTIC_EVIDENCE.md`.
 
 ### P64-L09U-R9-B — ADR d'optimisation
 
-- Statut : `pending`, dépend de R9-A.
+- Statut : `done-architecture`.
 - Comparer déduplication, symétries, propagation, incumbent, arrêt précoce
   certifié et suppression de travail répété.
 - Préserver le résultat fonctionnel, la capacité et les statuts honnêtes.
+- Décision :
+  `docs/DECISIONS/ADR-0106-prefixe-interne-certifie-avant-scip.md`.
 
 ### P64-L09U-R9-C — Optimisations incrémentales
 
-- Statut : `pending`, dépend de R9-B.
+- Statut : `active`, dépend de R9-B terminé.
 - Un changement causal, testé, mesuré, documenté et intégré à la fois.
 - Aucun budget augmenté, aucune grille ou valeur physique modifiée.
 - Replays personnels strictement en lecture seule avec SHA avant/après.

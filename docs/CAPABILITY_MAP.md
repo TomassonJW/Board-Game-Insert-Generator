@@ -5,10 +5,12 @@
 
 - `C-STAGED-CALCULATION` : `human-KO` pour la performance. Les succès
   autoritaires restent `90,991 s` et `87,192 s`.
-- `C-MINIMAL-LAYOUT` : R9-A `ready-diagnostic`. Le résultat certifié courant,
-  ses digests fonctionnels et sa capacité doivent être préservés.
-- `C-OBSERVABILITY` : lacune connue sur la lane/solveur des succès SCIP
-  approfondis ; attribution causale requise avant optimisation.
+- `C-MINIMAL-LAYOUT` : R9-A `complete-diagnostic`, R9-B `active`. Le digest
+  autoritaire `a3ef2f44...8817bc46` vient de la première lane interne
+  Approfondie et doit être préservé.
+- `C-OBSERVABILITY` : attribution causale acquise. Deux appels SCIP identiques
+  consomment environ `68,1 s`, le témoin natif est rejeté, puis le repli interne
+  produit le résultat visible.
 - `C-PRODUCT-GRID` : `0,1 mm`, acquis obligatoire. L'epsilon interne reste
   distinct et ne crée aucune position candidate.
 - `C-FINALIZATION` et `C-MATERIALIZATION` : positifs dans l'observation
@@ -19,7 +21,7 @@
   candidate installée.
 - `C-PRINT` : `print-validated=false`.
 
-Prochaine frontière : P64-L09U-R9-A, diagnostic causal de performance.
+Prochaine frontière : P64-L09U-R9-B, préfixe interne certifié selon ADR-0106.
 
 ### Historique R8 positif fonctionnel, performance KO
 

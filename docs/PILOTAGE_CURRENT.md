@@ -17,11 +17,19 @@
   `2,1 s` puis `0,8 s` ; le goulet connu est la recherche de disposition.
 - La grille produit est déjà `0,1 mm`. L'epsilon interne `0,0001 mm` sert aux
   comparaisons et n'est pas un pas de recherche.
-- P64-L09U-R9 doit maximiser la performance sous résultat fonctionnel constant,
-  sans nouvelle valeur physique, sans dégrader la grille, sans gonfler les
-  budgets et sans perdre de solution certifiée.
-- R9-A commence par une attribution causale complète : préparation, projection,
-  SCIP, lanes internes, certification, finalisation et matérialisation.
+- R9-A est terminé : le chemin 0.1.79 lance deux fois le même payload SCIP,
+  consomme environ `68,1 s`, rejette le témoin natif par
+  `MINIMAL_ENVELOPE_EXPANDED`, puis trouve le résultat humain dans le repli
+  interne.
+- Le digest de placement autoritaire local est
+  `a3ef2f44...8817bc46`. La variante Normal à environ `4 s` produit
+  `3ca1d3d4...63e1696a` et a été refusée car sa disposition diverge.
+- ADR-0106 est acceptée pour R9-B : préfixe interne complet et borné, première
+  lane certifiée comme autorité, SCIP seulement en repli, déduplication
+  strictement locale des classements plats.
+- P64-L09U-R9-B est l'action courante. Elle doit maximiser la performance sous
+  résultat fonctionnel constant, sans nouvelle valeur physique, sans dégrader
+  la grille, sans gonfler les budgets et sans perdre de solution certifiée.
 - Les deux projets personnels restent strictement en lecture seule avec SHA
   avant/après ; aucun benchmark, holdout, corpus ou tournoi n'est autorisé.
 - Le GO autonome R9 est acquis. Le Goal va jusqu'à une nouvelle candidate
@@ -31,6 +39,8 @@ Autorités R9 :
 
 - `docs/P64_L09U_R8_V_0179_HUMAN_POSITIVE_PERFORMANCE_KO_EVIDENCE.md` ;
 - `docs/P64_L09U_R9_PERFORMANCE_RECOVERY_HANDOFF.md` ;
+- `docs/P64_L09U_R9_A_PERFORMANCE_CAUSAL_DIAGNOSTIC_EVIDENCE.md` ;
+- `docs/DECISIONS/ADR-0106-prefixe-interne-certifie-avant-scip.md` ;
 - `docs/P64_L09U_R8_A_SUBTRACTIVE_PIPELINE_DIAGNOSTIC_EVIDENCE.md` ;
 - ADR-0103, ADR-0104 et ADR-0105.
 
