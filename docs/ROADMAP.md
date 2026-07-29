@@ -14,19 +14,25 @@ de `1 min 30`, contre environ `4 s` historiquement.
 
 ```text
 P64-L09U-R8-V human-positive-partial 0.1.79
-  -> R9-A diagnostic causal et télémétrie complète [ready]
-  -> R9-B ADR d'optimisation [pending]
-  -> R9-C optimisations incrémentales mesurées [pending]
-  -> R9-D candidate installée [pending]
-  -> P64-L09U-R9-V gate Fusion performance + non-régression [pending]
+  -> R9-A diagnostic causal et télémétrie complète [done]
+  -> R9-B ADR d'optimisation [done]
+  -> R9-C optimisations incrémentales mesurées [done-automated-validated]
+  -> R9-D candidate 0.1.80 [ready-to-install]
+  -> P64-L09U-R9-V gate Fusion performance + non-régression [prepared]
 ```
 
 R9 conserve la grille `0,1 mm`, les valeurs physiques, la capacité, les
 certificats et la géométrie R8. Aucun budget ne peut être augmenté pour masquer
 le coût.
 
+R9-C conserve le placement autoritaire et ramène les deux calculs automatisés
+à `3,727 s` et `3,911 s`. La suite autorisée passe `953` tests avec `1` skip
+prévu. La candidate 0.1.80 est prête à installer avant la gate humaine finale.
+
 Preuve :
 `docs/P64_L09U_R8_V_0179_HUMAN_POSITIVE_PERFORMANCE_KO_EVIDENCE.md`.
+Preuve R9 :
+`docs/P64_L09U_R9_0180_PERFORMANCE_RECOVERY_EVIDENCE.md`.
 Handoff :
 `docs/P64_L09U_R9_PERFORMANCE_RECOVERY_HANDOFF.md`.
 

@@ -1,6 +1,39 @@
 # Pilotage courant
 
 <!-- P64-L09U-CURRENT -->
+## Reprise canonique P64-L09U-R9-V
+
+- Le résultat fonctionnel de 0.1.79 reste l’autorité humaine : géométrie,
+  ordre, dispositions et pipeline strictement soustractif conformes.
+- R9-A à R9-C sont terminées. Le goulet dominant était le passage répété par
+  SCIP avant le repli interne qui produisait réellement le résultat accepté.
+- Le solveur `p64-l09u-r9-c-v2` exécute maintenant la première voie interne
+  Approfondie exacte avant SCIP et garde le premier groupe géométrique
+  entièrement certifié comme autorité.
+- SCIP reste un repli honnête si cette voie ne livre aucune solution certifiée.
+- Les deux replays de bout en bout conservent le digest
+  `a3ef2f44...8817bc46` et mesurent `3,727 s` puis `3,911 s` au calcul ;
+  la finalisation mesure `2,654 s` puis `2,500 s`.
+- Le préparateur 0.1.80 en mode sec repasse les deux projets à `4,403 s` et
+  `4,400 s`, avec SHA avant/après identiques.
+- Suite ciblée du préparateur : `174` tests, `1` skip prévu. Suite autorisée
+  complète : `953` tests, `1` skip prévu, aucun échec.
+- Grille `0,1 mm`, epsilon `0,0001 mm`, valeurs physiques, budgets,
+  profondeurs, cavités, parois, finalisation et matérialisation sont inchangés.
+- La candidate Fusion 0.1.80, son préflight, son préparateur et sa recette
+  humaine sont prêts. L’installation réelle est la prochaine action autonome.
+- La gate reste `prepared-not-human-observed`,
+  `fusion-validated=false`, `print-validated=false`.
+
+Autorités :
+
+- `docs/P64_L09U_R9_0180_PERFORMANCE_RECOVERY_EVIDENCE.md` ;
+- `docs/P64_L09U_R9_V_0180_FUSION_GATE_RECIPE.md` ;
+- `docs/P64_L09U_R9_A_PERFORMANCE_CAUSAL_DIAGNOSTIC_EVIDENCE.md` ;
+- `docs/DECISIONS/ADR-0106-prefixe-interne-certifie-avant-scip.md`.
+
+### Historique R9-A à R9-C
+
 ## Reprise canonique P64-L09U-R9
 
 - Thomas juge le résultat, l'ordre et les dispositions de la candidate 0.1.79

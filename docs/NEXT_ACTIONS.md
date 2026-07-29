@@ -1,7 +1,40 @@
 # Next Actions
 
 <!-- P64-L09U-NEXT -->
-## Action courante : P64-L09U-R9-C — préfixe interne certifié
+## Action courante : P64-L09U-R9-D — installer la candidate 0.1.80
+
+R9-A à R9-C sont terminées et intégrées dans `main`.
+
+Acquis automatisés :
+
+1. même digest fonctionnel `a3ef2f44...8817bc46` sur les deux projets ;
+2. calculs de bout en bout à `3,727 s` et `3,911 s` ;
+3. second replay du préparateur à `4,403 s` et `4,400 s` ;
+4. finalisations à `2,654 s` et `2,500 s` sur le replay de référence ;
+5. SHA personnels inchangés avant/après ;
+6. `953` tests autorisés passés, `1` skip prévu ;
+7. préflight et préparateur 0.1.80 validés en mode sec avec `174` tests
+   ciblés et `1` skip prévu.
+
+Action immédiate unique :
+
+1. intégrer le package 0.1.80 final dans `main` ;
+2. installer automatiquement cette candidate et ses réglages locaux ;
+3. vérifier version, commit, runtime et marqueurs R9 dans le dossier installé ;
+4. remettre à Thomas uniquement
+   `docs/P64_L09U_R9_V_0180_FUSION_GATE_RECIPE.md`.
+
+La gate humaine portera sur la performance des deux projets et un contrôle
+visuel bref des acquis 0.1.79. Elle ne rejoue pas la recette R8.
+
+`fusion-validated=false`, `print-validated=false`.
+
+Preuve :
+`docs/P64_L09U_R9_0180_PERFORMANCE_RECOVERY_EVIDENCE.md`.
+
+### Historique R9-C — préfixe interne certifié
+
+## Ancienne action : P64-L09U-R9-C — préfixe interne certifié
 
 Thomas confirme que le résultat, l'ordre et les dispositions de la candidate
 0.1.79 sont conformes. Le pipeline R8 est `human-positive` sur son contrat

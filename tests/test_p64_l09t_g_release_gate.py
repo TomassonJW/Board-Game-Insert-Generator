@@ -308,7 +308,7 @@ class P64L09TGReleaseGateTests(unittest.TestCase):
         local_replay = (
             ROOT / "scripts" / "fusion" / "p64_l09t_local_replay.py"
         ).read_text(encoding="utf-8")
-        self.assertEqual(manifest["version"], "0.1.79")
+        self.assertEqual(manifest["version"], "0.1.80")
         for marker in (
             'expectedVersion -ne "0.1.70"',
             "p64_l09t_local_replay.py",

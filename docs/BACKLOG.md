@@ -36,7 +36,7 @@
 
 ### P64-L09U-R9-C — Optimisations incrémentales
 
-- Statut : `active`, dépend de R9-B terminé.
+- Statut : `done-automated-validated`, dépend de R9-B terminé.
 - Un changement causal, testé, mesuré, documenté et intégré à la fois.
 - Aucun budget augmenté, aucune grille ou valeur physique modifiée.
 - Replays personnels strictement en lecture seule avec SHA avant/après.
@@ -57,14 +57,27 @@
   `4,052 s`, 12 complétions beam inchangées, 2 candidats certifiés, digest
   autoritaire inchangé.
 - Premier candidat seul : rejeté, car `CasLimite02+` choisit `cab1…9878`.
-- Incrément suivant : validation complète et fermeture R9-C.
+- Validation de bout en bout : `3,727 s` et `3,911 s`, finalisations
+  `2,654 s` et `2,500 s`, digest autoritaire et SHA personnels inchangés.
+- Suite autorisée complète : `953` tests passés, `1` skip prévu.
 
 ### P64-L09U-R9-D — Candidate et gate finale
 
-- Statut : `pending`, dépend des gains R9-C et de la validation complète.
+- Statut : `ready-to-install`, R9-C et sa validation complète sont terminées.
 - Préparer, intégrer et installer automatiquement la nouvelle candidate.
 - Thomas reçoit uniquement la recette humaine finale de performance et de
   non-régression géométrique.
+- Candidate 0.1.80, préflight, préparateur et recette créés.
+- Préparateur en mode sec : `174` tests ciblés, `1` skip prévu, deux replays
+  personnels à `4,403 s` et `4,400 s`, SHA inchangés.
+
+### P64-L09U-R9-V — Gate humaine Fusion 0.1.80
+
+- Statut : `prepared-not-human-observed`.
+- Mesurer une seule recherche Approfondie fraîche sur chaque projet.
+- Confirmer brièvement les acquis fonctionnels 0.1.79 sans rejouer R8.
+- Recette :
+  `docs/P64_L09U_R9_V_0180_FUSION_GATE_RECIPE.md`.
 
 Handoff :
 `docs/P64_L09U_R9_PERFORMANCE_RECOVERY_HANDOFF.md`.

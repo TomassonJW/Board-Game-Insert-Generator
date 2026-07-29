@@ -1,6 +1,37 @@
 # Capability Map
 
 <!-- P64-L09U-CAPABILITY -->
+## P64-L09U-R9 — candidate 0.1.80 prête à installer
+
+- `C-STAGED-CALCULATION` : `automated-validated`. Les deux calculs de
+  référence passent à `3,727 s` et `3,911 s`; le préparateur les confirme à
+  `4,403 s` et `4,400 s`.
+- `C-MINIMAL-LAYOUT` : `automated-validated`. Le placement autoritaire
+  `a3ef2f44...8817bc46` est conservé par la première voie interne Approfondie
+  et le premier groupe géométrique entièrement certifié.
+- `C-OBSERVABILITY` : attribution causale et compteurs R9 acquis. SCIP est un
+  repli explicite, jamais un coût caché après une solution interne certifiée.
+- `C-TOP-RESERVATION` : classements exacts dédupliqués dans l’appel courant,
+  rectangles utiles et bornes de collision préparés une seule fois.
+- `C-PRODUCT-GRID` : `0,1 mm`, inchangé ; epsilon numérique `0,0001 mm`
+  distinct.
+- `C-FINALIZATION` : `automated-validated`, `2,654 s` et `2,500 s` sur le
+  replay de référence, sans déplacement du coût de calcul.
+- `C-CAD-IR` et `C-MATERIALIZATION` : chaîne automatisée conforme, pipeline
+  strictement soustractif et digest fonctionnel conservé.
+- `C-QUALITY` : `174` tests ciblés du préparateur et `953` tests autorisés
+  passés ; `1` skip prévu dans chaque gate concernée.
+- `C-FUSION` : résultat 0.1.79 `human-positive`; candidate performance 0.1.80
+  encore `prepared-not-human-observed`.
+- `C-RELEASE` : package, préflight, préparateur et recette 0.1.80 prêts ;
+  installation réelle prochaine.
+- `C-PRINT` : `print-validated=false`.
+
+Prochaine frontière : installer 0.1.80 puis exécuter uniquement
+P64-L09U-R9-V.
+
+### Historique R9-A à R9-C
+
 ## P64-L09U-R9 — performance sous résultat fonctionnel constant
 
 - `C-STAGED-CALCULATION` : la candidate reste `human-KO` aux temps

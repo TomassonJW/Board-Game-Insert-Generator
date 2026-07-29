@@ -1,6 +1,35 @@
 # Human Gates
 
 <!-- P64-L09U-GATE -->
+## P64-L09U-R9-V — gate performance Fusion 0.1.80
+
+Statut : `prepared-not-human-observed`, candidate 0.1.80 prête à installer,
+`fusion-validated=false`, `print-validated=false`.
+
+Le résultat fonctionnel de 0.1.79 est acquis. Cette gate ne rejoue pas R8 :
+elle mesure une seule recherche Approfondie fraîche sur chacun des deux projets,
+puis confirme brièvement l’absence de régression visible.
+
+Preuves automatisées :
+
+- calculs frais de référence à `3,727 s` et `3,911 s` ;
+- replays du préparateur à `4,403 s` et `4,400 s` ;
+- digest fonctionnel `a3ef2f44...8817bc46` conservé ;
+- projets personnels inchangés ;
+- `953` tests autorisés passés, `1` skip prévu ;
+- préflight 0.1.80 et installation sèche conformes.
+
+Recette :
+`docs/P64_L09U_R9_V_0180_FUSION_GATE_RECIPE.md`.
+
+Preuve :
+`docs/P64_L09U_R9_0180_PERFORMANCE_RECOVERY_EVIDENCE.md`.
+
+Thomas garde l’autorité sur le verdict de performance. Une gate positive ne
+vaut pas validation d’impression.
+
+### Historique des gates R7 et R8
+
 ## P64-L09U-R7-V — gate 0.1.78 close en KO
 
 Verdict : `human-KO`, `do-not-run`.

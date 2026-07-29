@@ -1,6 +1,44 @@
 # Status
 
 <!-- P64-L09U-STATUS -->
+## P64-L09U-R9 — candidate de performance 0.1.80
+
+Date : 2026-07-29.
+
+Statut : `P64-L09U-R9-A-complete`,
+`P64-L09U-R9-B-complete`, `P64-L09U-R9-C-automated-validated`,
+`P64-L09U-R9-D-ready-to-install`,
+`P64-L09U-R9-V-prepared-not-human-observed`,
+`fusion-validated=false`, `print-validated=false`.
+
+- Le résultat humain 0.1.79 reste l’autorité fonctionnelle.
+- Le solveur `p64-l09u-r9-c-v2` place la première voie interne Approfondie
+  avant SCIP et certifie entièrement le premier groupe géométrique.
+- Les deux projets personnels gardent le placement
+  `a3ef2f44...8817bc46`.
+- Replays de référence : calcul `3,727 s` et `3,911 s`, finalisation
+  `2,654 s` et `2,500 s`.
+- Replays du préparateur : calcul `4,403 s` et `4,400 s`.
+- Les SHA personnels restent inchangés ; aucune sauvegarde ni charge utile de
+  dépôt n’est écrite.
+- Le pipeline reste strictement soustractif, avec `0 mm³`, `0` corps,
+  `0` union et `0` nouveau corps imprimable positifs liés aux éléments plats.
+- Profondeurs `2/4/6 mm`, cavités, accès, parois, grille `0,1 mm`, epsilon
+  `0,0001 mm`, budgets, rollback et BRep transitoire restent inchangés.
+- Suite ciblée du préparateur : `174` tests passés, `1` skip prévu.
+- Suite autorisée complète : `953` tests passés, `1` skip prévu, douze modules
+  interdits exclus avant import.
+- Candidate 0.1.80, préflight, préparateur et recette humaine prêts ;
+  installation réelle encore à exécuter.
+
+Preuve :
+`docs/P64_L09U_R9_0180_PERFORMANCE_RECOVERY_EVIDENCE.md`.
+
+Recette :
+`docs/P64_L09U_R9_V_0180_FUSION_GATE_RECIPE.md`.
+
+### Historique R9-A à R9-C
+
 ## P64-L09U-R9 — récupération de performance
 
 Date : 2026-07-29.
