@@ -77,10 +77,14 @@ def _run_case(
     raw_project: dict[str, object],
     *,
     include_diagnostics: bool = False,
+    calculation_effort: str = "normal",
 ) -> dict[str, object]:
     project = normalize_project_draft(raw_project).project
-    settings = {"method": "auto", "effort": "normal"}
-    engine = IncrementalLocalAnalysisEngine(project, effort_profile="normal")
+    settings = {"method": "auto", "effort": calculation_effort}
+    engine = IncrementalLocalAnalysisEngine(
+        project,
+        effort_profile=calculation_effort,
+    )
     session = StagedCalculationSession(project, solver_settings=settings)
     session.synchronize(
         project,
@@ -100,6 +104,21 @@ def _run_case(
         raise RuntimeError(
             f"{case_id}: calculation={calculated['solver_result']['status']}"
         )
+    calculated_partition = _mapping(
+        calculated["partition"],
+        f"{case_id}: calculated partition",
+    )
+    calculated_provenance = _mapping(
+        _mapping(
+            calculated_partition["minimal_layout"],
+            f"{case_id}: calculated minimal layout",
+        )["search_provenance"],
+        f"{case_id}: calculated search provenance",
+    )
+    calculated_selected = _mapping(
+        calculated_provenance["selected"],
+        f"{case_id}: calculated selected proposal",
+    )
     started = perf_counter()
     finalized = session.finalize_volume(finishing_effort_profile="normal")
     finishing_ms = round((perf_counter() - started) * 1000.0, 3)
@@ -122,7 +141,7 @@ def _run_case(
         project,
         partition=plan,
         artifact_identity=selected,
-        effort_profile="normal",
+        effort_profile=calculation_effort,
     )
     if cad["status"] != "ready_for_fusion":
         raise RuntimeError(
@@ -360,7 +379,11 @@ def _run_case(
     ]
     result = {
         "case_id": case_id,
+        "calculation_effort": calculation_effort,
         "calculation_status": "solution_found",
+        "placement_digest": str(
+            calculated_selected["placement_digest"]
+        ),
         "finalization_status": "solution_found",
         "cad_status": cad["status"],
         "witness_status": "disabled",
@@ -428,6 +451,7 @@ def run_local_replay(
     case_ids: tuple[str, ...] | None = None,
     *,
     include_diagnostics: bool = False,
+    calculation_effort: str = "normal",
 ) -> dict[str, object]:
     selected_ids = case_ids or tuple(BASE_FILENAMES)
     paths = {
@@ -459,6 +483,7 @@ def run_local_replay(
             case_id,
             project,
             include_diagnostics=include_diagnostics,
+            calculation_effort=calculation_effort,
         )
         for case_id, project in cases.items()
     ]
@@ -479,6 +504,7 @@ def run_local_replay(
         "source_sha256_before": before,
         "source_sha256_after": after,
         "case_count": len(results),
+        "calculation_effort": calculation_effort,
         "results": results,
         "repository_payload_written": False,
     }
@@ -493,10 +519,16 @@ def main() -> int:
         choices=tuple(BASE_FILENAMES),
     )
     parser.add_argument("--include-diagnostics", action="store_true")
+    parser.add_argument(
+        "--calculation-effort",
+        choices=("quick", "short", "normal", "long", "deep"),
+        default="normal",
+    )
     args = parser.parse_args()
     receipt = run_local_replay(
         tuple(args.case_id) if args.case_id else None,
         include_diagnostics=args.include_diagnostics,
+        calculation_effort=args.calculation_effort,
     )
     if args.write_summary is not None:
         args.write_summary.parent.mkdir(parents=True, exist_ok=True)

@@ -70,8 +70,8 @@ class P66AcceptancePreparationTests(unittest.TestCase):
         self.assertEqual(first["partition"], second["partition"])
         self.assertEqual(first["summary"], {
             "status": "constructed",
-            "plan_digest": "367c7e252cdb38dca08158374fca681817a43ba5661c8a75440c4299c6e12550",
-            "cad_digest": "9614f17033fd9f01a5ae55819b74c297686c1b08d876e55c025fe4df6cf31844",
+            "plan_digest": "7dd8375c3ce20f1f476cca3d57c0028e18c5c940ac30f5c1a70f3c2e1012ab5f",
+            "cad_digest": "35b5a208d9f4ab2101f90782a564567fd910d6673ca7a55264e1b57b07c9d067",
             "source_digest": "b50079b71a9d8efe76c94c563992d293897177561ccccfff46068213b1afa640",
             "materializable": True,
             "cad_ready": True,
