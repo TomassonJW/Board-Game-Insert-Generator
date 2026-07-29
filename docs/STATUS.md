@@ -40,6 +40,8 @@ Statut : `P64-L09U-R8-V-human-positive-partial`,
 - Le routage R9-C complet mesure `10,013 s` sur `CasLimite02+` et `9,791 s`
   sur `CasLimite02++` : une lane, zéro appel SCIP, digest autoritaire
   inchangé.
+- La préparation unique des bornes de collision plates réduit encore ces
+  temps à `8,916 s` et `8,240 s`, sans changement de résultat.
 - La fin de front Normal est explicitement rejetée : elle atteint `6,618 s`
   mais change le digest en `269f…009`.
 - Le GO autonome va jusqu'à une nouvelle candidate Fusion installée et une

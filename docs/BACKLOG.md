@@ -51,6 +51,8 @@
 - Incrément suivant : optimiser seulement un coût plat exact encore dominant,
   si le gain reste causal et sans changement de résultat, puis validation
   complète.
+- Bornes de collision et copies temporaires plates : intégré, `8,916 s` et
+  `8,240 s`, digest autoritaire inchangé.
 
 ### P64-L09U-R9-D — Candidate et gate finale
 

@@ -860,6 +860,9 @@ def _resolve_automatic_xy_layout(
     placement_material_rectangles = _placement_material_rectangles(
         placements
     )
+    reserved_prism_placement_bounds = _reserved_prism_placement_bounds(
+        placements
+    )
     useful_placement_rectangles = _useful_placement_rectangles(
         placements,
         design_top_z=design_top_z,
@@ -883,6 +886,9 @@ def _resolve_automatic_xy_layout(
             placements=placements,
             require_reserved_prisms=require_reserved_prisms,
             placement_material_rectangles=placement_material_rectangles,
+            reserved_prism_placement_bounds=(
+                reserved_prism_placement_bounds
+            ),
             useful_placement_rectangles=useful_placement_rectangles,
         )
         rank_cache[signature] = rank
@@ -1223,7 +1229,10 @@ def _relocate_reservation(
     box: dict[str, float],
     minimum_boundary_wall_mm: float,
 ) -> tuple[dict[str, object], list[dict[str, object]]]:
-    result = deepcopy(template)
+    result = dict(template)
+    result["product_grid_migration_v1"] = deepcopy(
+        template["product_grid_migration_v1"]
+    )
     old_cut_origin = _xy(result["cut_origin_mm"])
     physical_origin = _xy(result["physical_origin_mm"])
     clearance_x = physical_origin["x"] - old_cut_origin["x"]
@@ -1289,6 +1298,7 @@ def _automatic_layout_rank(
     placements: list[dict[str, object]],
     require_reserved_prisms: bool,
     placement_material_rectangles: list[dict[str, object]] | None = None,
+    reserved_prism_placement_bounds: list[dict[str, object]] | None = None,
     useful_placement_rectangles: list[dict[str, float]] | None = None,
 ) -> tuple[object, ...]:
     layered = _resolve_vertical_layers(
@@ -1297,7 +1307,14 @@ def _automatic_layout_rank(
         copy_reservations=False,
     )
     reserved_prism_violation_count = (
-        len(_reserved_prism_collision_ids(layered, placements, design_top_z))
+        len(
+            _reserved_prism_collision_ids(
+                layered,
+                placements,
+                design_top_z,
+                placement_bounds=reserved_prism_placement_bounds,
+            )
+        )
         if require_reserved_prisms
         else 0
     )
@@ -1675,6 +1692,32 @@ def _placement_material_rectangles(
     return result
 
 
+def _reserved_prism_placement_bounds(
+    placements: list[dict[str, object]],
+) -> list[dict[str, object]]:
+    result: list[dict[str, object]] = []
+    for placement in placements:
+        if (
+            "origin_mm" not in placement
+            or "world_size_mm" not in placement
+        ):
+            continue
+        origin = _dimension(placement["origin_mm"])
+        size = _dimension(placement["world_size_mm"])
+        result.append(
+            {
+                "placement_id": str(placement["id"]),
+                "x": origin["x"],
+                "y": origin["y"],
+                "width": size["x"],
+                "height": size["y"],
+                "bottom_z_mm": origin["z"],
+                "top_z_mm": origin["z"] + size["z"],
+            }
+        )
+    return result
+
+
 def certify_top_inset_material_fragments(
     reservations: list[dict[str, object]],
     material_rectangles: list[dict[str, object]],
@@ -1720,12 +1763,7 @@ def _material_fragment_certificate(
         )
         for cut_kind, local_region_id, cut_rect in cut_rectangles:
             for material in material_rectangles:
-                material_rect = {
-                    "x": float(material["x"]),
-                    "y": float(material["y"]),
-                    "width": float(material["width"]),
-                    "height": float(material["height"]),
-                }
+                material_rect = material
                 intersection = _intersection(cut_rect, material_rect)
                 if intersection is None:
                     continue
@@ -2056,8 +2094,15 @@ def _reserved_prism_collision_ids(
     reservations: list[dict[str, object]],
     placements: list[dict[str, object]],
     design_top_z: float,
+    *,
+    placement_bounds: list[dict[str, object]] | None = None,
 ) -> list[str]:
-    result: list[str] = []
+    bounds = (
+        placement_bounds
+        if placement_bounds is not None
+        else _reserved_prism_placement_bounds(placements)
+    )
+    result: set[str] = set()
     for reservation in reservations:
         for region in _local_depth_regions(reservation):
             footprint = _xy_rect(
@@ -2065,28 +2110,22 @@ def _reserved_prism_collision_ids(
                 region["cut_size_mm"],
             )
             support_plane = float(region["layer_bottom_z_mm"])
-            for placement in placements:
-                if (
-                    "origin_mm" not in placement
-                    or "world_size_mm" not in placement
-                ):
-                    continue
-                body_origin = _dimension(placement["origin_mm"])
-                body_size = _dimension(placement["world_size_mm"])
+            for placement in bounds:
                 body_rect = {
-                    "x": body_origin["x"],
-                    "y": body_origin["y"],
-                    "width": body_size["x"],
-                    "height": body_size["y"],
+                    "x": float(placement["x"]),
+                    "y": float(placement["y"]),
+                    "width": float(placement["width"]),
+                    "height": float(placement["height"]),
                 }
                 if (
                     _intersection(body_rect, footprint) is not None
-                    and body_origin["z"] < design_top_z - _EPSILON
+                    and float(placement["bottom_z_mm"])
+                    < design_top_z - _EPSILON
                     and support_plane
-                    < body_origin["z"] + body_size["z"] - _EPSILON
+                    < float(placement["top_z_mm"]) - _EPSILON
                 ):
-                    result.append(str(placement["id"]))
-    return sorted(set(result))
+                    result.add(str(placement["placement_id"]))
+    return sorted(result)
 
 
 def _rect_distance(

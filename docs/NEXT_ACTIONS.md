@@ -36,8 +36,8 @@ R9-C a maintenant intégré :
 
 Mesures orchestrées :
 
-- `CasLimite02+` : `10,013 s`, une lane, zéro SCIP ;
-- `CasLimite02++` : `9,791 s`, une lane, zéro SCIP ;
+- `CasLimite02+` : `8,916 s`, une lane, zéro SCIP ;
+- `CasLimite02++` : `8,240 s`, une lane, zéro SCIP ;
 - digest `a3ef…bc46` conservé.
 
 Action immédiate :

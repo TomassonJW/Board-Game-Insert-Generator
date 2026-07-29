@@ -207,6 +207,14 @@ Normal n'emprunte pas clandestinement les limites Approfondies ; son contrat
 reste inchangé. Si le préfixe Approfondi ne certifie aucune solution, le
 rapport de lane est conservé et SCIP reste un repli honnête.
 
+Un incrément exact supplémentaire remplace les copies profondes temporaires
+par des copies ciblées et pré-calcule les bornes immuables de collision pour
+chaque appel :
+
+- `CasLimite02+` : `8,916 s` ;
+- `CasLimite02++` : `8,240 s` ;
+- digest, métriques et SHA personnels inchangés.
+
 ## Mémoire
 
 Le replay Normal passe d'environ 46,4 Mio à 54,0 Mio de working set, avec un
@@ -226,6 +234,7 @@ est du calcul répété.
 | première lane interne Approfondie complète | 13,363 s | digest autoritaire `a3ef…bc46` | base fonctionnelle retenue |
 | première lane + déduplication locale exacte de rang | 10,341 s (`+`) ; 9,288 s (`++`) | digest autoritaire | incrément R9-B retenu |
 | routage orchestré du préfixe avant SCIP | 10,013 s (`+`) ; 9,791 s (`++`) | digest autoritaire, 0 SCIP, 1 lane | incrément R9-C retenu |
+| bornes de collision préparées une fois par appel | 8,916 s (`+`) ; 8,240 s (`++`) | digest autoritaire | incrément exact retenu |
 | front Normal terminé puis limité à six candidats | 6,618 s | digest `269f…009` | plus rapide mais ensemble de choix élargi, refusé |
 | optimisation SCIP seule | non retenue | premier témoin SCIP rejeté | mauvais chemin d'autorité |
 | hausse de budget ou de candidats | non mesurée | masquerait le coût | interdite |

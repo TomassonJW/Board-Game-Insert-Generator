@@ -31,6 +31,8 @@
   `10,341 s` sur `CasLimite02+`, `9,288 s` sur `CasLimite02++`.
 - Le routage orchestré du préfixe avant SCIP mesure ensuite `10,013 s` et
   `9,791 s` : une lane, zéro appel SCIP, digest `a3ef…bc46` inchangé.
+- Les bornes de collision plates préparées une fois par appel ramènent ensuite
+  les temps à `8,916 s` et `8,240 s`, sans changement fonctionnel.
 - La fin de front Normal à `6,618 s` est rejetée car elle produit
   `269f…009` ; l'arrêt historique du beam reste inchangé.
 - P64-L09U-R9-C est l'action courante. Elle doit fermer le coût plat résiduel
